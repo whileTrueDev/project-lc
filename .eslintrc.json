@@ -1,11 +1,73 @@
 {
   "root": true,
-  "ignorePatterns": ["**/*"],
-  "plugins": ["@nrwl/nx"],
+  "ignorePatterns": [
+    "**/*"
+  ],
+  "env": {
+    "jest": true,
+    "es6": true,
+    "node": true
+  },
+  "extends": [
+    "airbnb",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "@nrwl/nx"
+  ],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js",
+          ".ts",
+          ".jsx",
+          ".tsx"
+        ]
+      }
+    }
+  },
   "overrides": [
     {
-      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "files": [
+        "*.ts",
+        "*.tsx",
+        "*.js",
+        "*.jsx"
+      ],
       "rules": {
+        "no-useless-constructor": "off",
+        "no-plusplus": "off",
+        "lines-between-class-members": [
+          "error",
+          "always",
+          {
+            "exceptAfterSingleLine": true
+          }
+        ],
+        "no-use-before-define": "off",
+        "linebreak-style": "off",
+        "camelcase": "warn",
+        "max-classes-per-file": "off",
+        "class-methods-use-this": "off",
+        "no-underscore-dangle": 0,
+        "no-shadow": "off",
+        "import/extensions": [
+          "error",
+          "ignorePackages",
+          {
+            "js": "never",
+            "ts": "never",
+            "jsx": "never",
+            "tsx": "never"
+          }
+        ],
+        "import/no-unresolved": "off",
+        "import/no-extraneous-dependencies": "off",
+        "import/prefer-default-export": "off",
+        "@typescript-eslint/no-var-requires": "warn",
+        "@typescript-eslint/no-use-before-define": 2,
+        "@typescript-eslint/no-shadow": "error",
         "@nrwl/nx/enforce-module-boundaries": [
           "error",
           {
@@ -14,7 +76,9 @@
             "depConstraints": [
               {
                 "sourceTag": "*",
-                "onlyDependOnLibsWithTags": ["*"]
+                "onlyDependOnLibsWithTags": [
+                  "*"
+                ]
               }
             ]
           }
@@ -22,14 +86,56 @@
       }
     },
     {
-      "files": ["*.ts", "*.tsx"],
-      "extends": ["plugin:@nrwl/nx/typescript"],
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
+      "extends": [
+        "plugin:@nrwl/nx/typescript"
+      ],
       "rules": {}
     },
     {
-      "files": ["*.js", "*.jsx"],
-      "extends": ["plugin:@nrwl/nx/javascript"],
+      "files": [
+        "*.js",
+        "*.jsx"
+      ],
+      "extends": [
+        "plugin:@nrwl/nx/javascript"
+      ],
       "rules": {}
+    },
+    {
+      "files": [
+        "*.jsx",
+        "*.tsx"
+      ],
+      "rules": {
+        "react/jsx-props-no-spreading": "warn",
+        "react/jsx-uses-react": "off",
+        "react/react-in-jsx-scope": "off",
+        "react/jsx-filename-extension": [
+          2,
+          {
+            "extensions": [
+              ".js",
+              ".jsx",
+              ".ts",
+              ".tsx"
+            ]
+          }
+        ],
+        "react/require-default-props": 0,
+        "react/jsx-wrap-multilines": "off",
+        "react/jsx-indent": "off",
+        "react/jsx-one-expression-per-line": "off",
+        "react/jsx-curly-newline": "off",
+        "react/prop-types": "off",
+        "react/destructuring-assignment": "off",
+        "react/no-unused-prop-types": "off",
+        "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+        "react-hooks/exhaustive-deps": "warn" // Checks effect dependencies
+      }
     }
   ]
 }

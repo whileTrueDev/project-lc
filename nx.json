@@ -27,12 +27,30 @@
     ]
   },
   "projects": {
-    "project-lc": {
+    "api": {
       "tags": []
     },
-    "project-lc-e2e": {
+    "components": {
+      "tags": []
+    },
+    "hooks": {
+      "tags": []
+    },
+    "prisma-orm": {
+      "tags": []
+    },
+    "shared-types": {
+      "tags": []
+    },
+    "socket": {
+      "tags": []
+    },
+    "web": {
+      "tags": []
+    },
+    "web-e2e": {
       "tags": [],
-      "implicitDependencies": ["project-lc"]
+      "implicitDependencies": ["web"]
     }
   }
 }

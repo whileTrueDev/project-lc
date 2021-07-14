@@ -1,0 +1,50 @@
+{
+  "extends": [
+    "../../.eslintrc.json"
+  ],
+  "ignorePatterns": [
+    "!**/*"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts",
+        "*.tsx",
+        "*.js",
+        "*.jsx"
+      ],
+      "rules": {
+        "no-useless-constructor": "off",
+        "no-plusplus": "off",
+        "lines-between-class-members": [
+          "error",
+          "always",
+          {
+            "exceptAfterSingleLine": true
+          }
+        ],
+        "no-use-before-define": "off",
+        "linebreak-style": "off",
+        "camelcase": "warn",
+        "max-classes-per-file": "off",
+        "class-methods-use-this": "off",
+        "no-underscore-dangle": 0,
+        "no-shadow": "off"
+      }
+    },
+    {
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
+      "rules": {}
+    },
+    {
+      "files": [
+        "*.js",
+        "*.jsx"
+      ],
+      "rules": {}
+    }
+  ]
+}

@@ -14,7 +14,12 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@project-lc/components": ["libs/components/src/index.ts"],
+      "@project-lc/hooks": ["libs/hooks/src/index.ts"],
+      "@project-lc/prisma-orm": ["libs/prisma-orm/src/index.ts"],
+      "@project-lc/shared-types": ["libs/shared-types/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
