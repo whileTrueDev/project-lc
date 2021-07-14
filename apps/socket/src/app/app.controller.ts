@@ -7,8 +7,8 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @Render('index.jsx')
+  @Render('index')
   getData() {
-    return { msg: this.appService.getData() };
+    return { msg: this.appService.getHello() };
   }
 }

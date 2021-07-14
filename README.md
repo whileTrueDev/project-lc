@@ -15,7 +15,17 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 
 ### apps
 
+1. api
+2. socket
+3. web
+4. web-e2e
+
 ### libs
+
+1. components
+2. hooks
+3. prisma-orm
+4. shared-types
 
 ### 
 
