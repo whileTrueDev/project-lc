@@ -45,6 +45,9 @@
     "socket": {
       "tags": []
     },
+    "stores": {
+      "tags": []
+    },
     "web": {
       "tags": []
     },

@@ -8,16 +8,12 @@
       "targets": {
         "build": {
           "executor": "@nrwl/node:build",
-          "outputs": [
-            "{options.outputPath}"
-          ],
+          "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
             "tsConfig": "apps/api/tsconfig.app.json",
-            "assets": [
-              "apps/api/src/assets"
-            ]
+            "assets": ["apps/api/src/assets"]
           },
           "configurations": {
             "production": {
@@ -42,16 +38,12 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/api/**/*.ts"
-            ]
+            "lintFilePatterns": ["apps/api/**/*.ts"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/apps/api"
-          ],
+          "outputs": ["coverage/apps/api"],
           "options": {
             "jestConfig": "apps/api/jest.config.js",
             "passWithNoTests": true
@@ -67,16 +59,12 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/components/**/*.{ts,tsx,js,jsx}"
-            ]
+            "lintFilePatterns": ["libs/components/**/*.{ts,tsx,js,jsx}"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/components"
-          ],
+          "outputs": ["coverage/libs/components"],
           "options": {
             "jestConfig": "libs/components/jest.config.js",
             "passWithNoTests": true
@@ -92,16 +80,12 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/hooks/**/*.{ts,tsx,js,jsx}"
-            ]
+            "lintFilePatterns": ["libs/hooks/**/*.{ts,tsx,js,jsx}"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/hooks"
-          ],
+          "outputs": ["coverage/libs/hooks"],
           "options": {
             "jestConfig": "libs/hooks/jest.config.js",
             "passWithNoTests": true
@@ -117,19 +101,71 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/prisma-orm/**/*.ts"
-            ]
+            "lintFilePatterns": ["libs/prisma-orm/**/*.ts"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/prisma-orm"
-          ],
+          "outputs": ["coverage/libs/prisma-orm"],
           "options": {
             "jestConfig": "libs/prisma-orm/jest.config.js",
             "passWithNoTests": true
+          }
+        },
+        "prisma-generate": {
+          "executor": "@nrwl/workspace:run-commands",
+          "outputs": [],
+          "options": {
+            "command": "../../node_modules/.bin/prisma generate",
+            "cwd": "libs/prisma-orm"
+          }
+        },
+        "migrate-save": {
+          "executor": "@nrwl/workspace:run-commands",
+          "outputs": [],
+          "options": {
+            "command": "../../node_modules/.bin/prisma migrate dev --create-only --preview-feature --schema ./prisma/schema.prisma",
+            "cwd": "libs/prisma-orm"
+          }
+        },
+        "migrate-up": {
+          "executor": "@nrwl/workspace:run-commands",
+          "outputs": [],
+          "options": {
+            "command": "../../node_modules/.bin/prisma migrate dev --preview-feature --schema ./prisma/schema.prisma",
+            "cwd": "libs/prisma-orm"
+          }
+        },
+        "migrate-reset": {
+          "executor": "@nrwl/workspace:run-commands",
+          "outputs": [],
+          "options": {
+            "command": "../../node_modules/.bin/prisma migrate reset --preview-feature --schema ./prisma/schema.prisma",
+            "cwd": "libs/prisma-orm"
+          }
+        },
+        "migrate-deploy": {
+          "executor": "@nrwl/workspace:run-commands",
+          "outputs": [],
+          "options": {
+            "command": "../../node_modules/.bin/prisma migrate deploy --preview-feature --schema ./prisma/schema.prisma",
+            "cwd": "libs/prisma-orm"
+          }
+        },
+        "migrate-status": {
+          "executor": "@nrwl/workspace:run-commands",
+          "outputs": [],
+          "options": {
+            "command": "../../node_modules/.bin/prisma migrate status --preview-feature --schema ./prisma/schema.prisma",
+            "cwd": "libs/prisma-orm"
+          }
+        },
+        "studio": {
+          "executor": "@nrwl/workspace:run-commands",
+          "outputs": [],
+          "options": {
+            "command": "../../node_modules/.bin/prisma studio --schema ./prisma/schema.prisma",
+            "cwd": "libs/prisma-orm"
           }
         }
       }
@@ -142,16 +178,12 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/shared-types/**/*.ts"
-            ]
+            "lintFilePatterns": ["libs/shared-types/**/*.ts"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/shared-types"
-          ],
+          "outputs": ["coverage/libs/shared-types"],
           "options": {
             "jestConfig": "libs/shared-types/jest.config.js",
             "passWithNoTests": true
@@ -166,17 +198,12 @@
       "targets": {
         "build": {
           "executor": "@nrwl/node:build",
-          "outputs": [
-            "{options.outputPath}"
-          ],
+          "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/socket",
             "main": "apps/socket/src/main.ts",
             "tsConfig": "apps/socket/tsconfig.app.json",
-            "assets": [
-              "apps/socket/src/assets",
-              "apps/socket/src/views"
-            ]
+            "assets": ["apps/socket/src/assets", "apps/socket/src/views"]
           },
           "configurations": {
             "production": {
@@ -201,18 +228,35 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/socket/**/*.ts"
-            ]
+            "lintFilePatterns": ["apps/socket/**/*.ts"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/apps/socket"
-          ],
+          "outputs": ["coverage/apps/socket"],
           "options": {
             "jestConfig": "apps/socket/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "stores": {
+      "root": "libs/stores",
+      "sourceRoot": "libs/stores/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/stores/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/stores"],
+          "options": {
+            "jestConfig": "libs/stores/jest.config.js",
             "passWithNoTests": true
           }
         }
@@ -225,9 +269,7 @@
       "targets": {
         "build": {
           "executor": "@nrwl/next:build",
-          "outputs": [
-            "{options.outputPath}"
-          ],
+          "outputs": ["{options.outputPath}"],
           "options": {
             "root": "apps/web",
             "outputPath": "dist/apps/web"
@@ -257,9 +299,7 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/apps/web"
-          ],
+          "outputs": ["coverage/apps/web"],
           "options": {
             "jestConfig": "apps/web/jest.config.js",
             "passWithNoTests": true
@@ -268,9 +308,7 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/web/**/*.{ts,tsx,js,jsx}"
-            ]
+            "lintFilePatterns": ["apps/web/**/*.{ts,tsx,js,jsx}"]
           }
         }
       }
@@ -296,9 +334,7 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/web-e2e/**/*.{js,ts}"
-            ]
+            "lintFilePatterns": ["apps/web-e2e/**/*.{js,ts}"]
           }
         }
       }

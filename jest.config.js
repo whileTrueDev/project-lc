@@ -7,5 +7,6 @@ module.exports = {
     '<rootDir>/libs/shared-types',
     '<rootDir>/apps/socket',
     '<rootDir>/libs/prisma-orm',
+    '<rootDir>/libs/stores',
   ],
 };

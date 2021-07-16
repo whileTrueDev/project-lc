@@ -17,6 +17,7 @@ async function bootstrap() {
 
   app.enableCors();
 
+  console.log('apps/socket process.env: ', process.env);
   const port = process.env.PORT || 3002;
   await app.listen(port, () => {
     Logger.log(`Listening at http://localhost:${port}`);
