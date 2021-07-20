@@ -8,5 +8,6 @@ module.exports = {
     '<rootDir>/apps/socket',
     '<rootDir>/libs/prisma-orm',
     '<rootDir>/libs/stores',
+    '<rootDir>/libs/firstmall-db',
   ],
 };

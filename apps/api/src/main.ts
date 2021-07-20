@@ -12,7 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 3000;
 
-  console.log('apps/api process.env: ', process.env);
+  // console.log('apps/api process.env: ', process.env);
   await app.listen(port, () => {
     Logger.log(`Listening at http://localhost:${port}`);
   });

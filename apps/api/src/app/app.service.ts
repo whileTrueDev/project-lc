@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
+import { firstmallDb } from '@project-lc/firstmall-db';
 
 @Injectable()
 export class AppService {
   constructor(private readonly prisma: PrismaService) {}
 
-  getData(): { message: string } {
-    return { message: 'Welcome to api!' };
+  async getData(): Promise<{ message: string }> {
+    const result = await firstmallDb();
+    return { message: result };
   }
 
   getUserData(userWHereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | null> {
