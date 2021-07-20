@@ -54,9 +54,26 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
 
 4. **Prisma Client를 통해 데이터 접근하기**
 
-    데이터베이스 접근을 위한 `/libs/src/lib/prisma-orm.service` 를 미리 정의해 두었습니다. API서버 또는 Socket 서버와 같이 데이터베이스 접근이 필요한 경우, 해당 service를 가져와 사용합니다. `apps/api`, `apps/socket` 두 애플리케이션의 app.module에 prismaService를 provider로 작성하여 두었으므로, AppModule의 하위 모듈에서는 모두 prismaService에 접근가능합니다.
+    데이터베이스 접근을 위한 `/libs/src/lib/prisma-orm.service` 를 미리 정의해 두었습니다. API서버 또는 Socket 서버와 같이 데이터베이스 접근이 필요한 경우, 해당 service를 가져와 사용합니다. `apps/api`, `apps/socket` 두 애플리케이션의 app.module에 prismaService를 provider로 작성하여 두었으므로, AppModule의 하위 모듈에서는 모두 `imports: [forwardRef(() => AppModule)]` 처리를 통해 prismaService에 접근가능합니다.
 
-    ```typescript
+    ```ts
+    // apps/../some.module.ts
+    import { forwardRef, Module } from '@nestjs/common';
+    import { AppModule } from '../app.module';
+    import { SomeService } from './some.service';
+
+    @Module({
+        imports: [forwardRef(() => AppModule)],
+        controllers: [...],
+        providers: [SomeService, ...],
+        exports: [...],
+    })
+    export class SomeModule {}
+    ```
+
+    ```ts
+    // apps/../some.service.ts
+
     // DB 접근 객체 (dependency injection 통해 사용)
     import { PrismaService } from '@project-lc/prisma-orm';
     // InputTypes, OutputTypes, ModelTypes

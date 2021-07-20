@@ -9,5 +9,6 @@ import { AppService } from './app.service';
   imports: [FirstmallDbModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
+  exports: [PrismaService],
 })
 export class AppModule {}
