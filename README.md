@@ -51,6 +51,10 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 
    독립몰 데이터베이스에의 접근은 모두 이 라이브러리에서 이루어집니다. 원활한 구분을 위해 퍼스트몰과 관련된 DB에 접근하기 위한 service, module등은 모두 `FM` 접두어를 가집니다.
 
+7. `nest-modules`
+
+   nestjs 애플리케이션에서 동시에 사용가능한 모듈의 경우 여기에 정의합니다. service와 module만 작성하고, controller는 애플리케이션 단에서 작성합니다. 더 자세한 내용은 [libs/nest-modules](./libs/nest-modules/README.md)에서 확인할 수 있습니다.
+
 ## 새 애플리케이션 / 라이브러리 생성하기
 
 필요시, Dan(hwasurr)에게 말씀하세요.  
