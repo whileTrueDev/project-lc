@@ -39,6 +39,9 @@
     "hooks": {
       "tags": []
     },
+    "nest-modules": {
+      "tags": []
+    },
     "prisma-orm": {
       "tags": []
     },

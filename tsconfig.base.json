@@ -18,6 +18,7 @@
       "@project-lc/components": ["libs/components/src/index.ts"],
       "@project-lc/firstmall-db": ["libs/firstmall-db/src/index.ts"],
       "@project-lc/hooks": ["libs/hooks/src/index.ts"],
+      "@project-lc/nest-modules": ["libs/nest-modules/src/index.ts"],
       "@project-lc/prisma-orm": ["libs/prisma-orm/src/index.ts"],
       "@project-lc/shared-types": ["libs/shared-types/src/index.ts"],
       "@project-lc/stores": ["libs/stores/src/index.ts"]

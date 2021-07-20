@@ -1,14 +1,19 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { FMGoodsService } from '@project-lc/firstmall-db';
 import { Prisma } from '@prisma/client';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly firstmallGoods: FMGoodsService,
+  ) {}
 
   @Get()
   getData() {
-    return this.appService.getData();
+    return this.firstmallGoods.findAll();
+    // return this.appService.getData();
   }
 
   @Get('users')

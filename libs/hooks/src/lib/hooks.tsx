@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 
-/* eslint-disable-next-line */
-export interface HooksProps {}
+export function useSeconds() {
+  const [value, setValue] = useState(0);
 
-export function Hooks(props: HooksProps) {
-  return (
-    <div>
-      <h1>Welcome to hooks!</h1>
-    </div>
-  );
+  useEffect(() => {
+    setTimeout(() => {
+      setValue(value + 1);
+    }, 1000);
+  }, [value]);
+
+  return { value, setValue };
 }
 
-export default Hooks;
+export default useSeconds;

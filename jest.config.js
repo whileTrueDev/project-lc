@@ -9,5 +9,6 @@ module.exports = {
     '<rootDir>/libs/prisma-orm',
     '<rootDir>/libs/stores',
     '<rootDir>/libs/firstmall-db',
+    '<rootDir>/libs/nest-modules',
   ],
 };
