@@ -14,7 +14,7 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
 
 2. **데이터베이스에 스키마 반영하기**
 
-    데이터베이스에 schema.prisma 의 사항을 반영하기 위해서는 마이그레이션 작업이 필요합니다. `prisma migrate <TYPE_OF_TASK>` 의 명령어로 마이그레이션을 진행할 수 있습니다.
+    데이터베이스에 schema.prisma 의 사항을 반영하기 위해서는 마이그레이션 작업이 필요합니다.
 
     ```bash
     yarn nx run prisma-orm:migrate-dev --name <MIGRATION_NAME>
@@ -38,7 +38,7 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
     `yarn nx run prisma-orm:migrate-dev`, `yarn nx run prisma-orm:migrate-reset` 명령어는 개발환경에서만 사용합니다. 절대 프로덕션 마이그레이션 작업에 해당 명령어를 사용하지 않습니다.
 
     **참고**  
-    prisma 공식문서와 다르게, yarn nx run 으로 실행시키는 이유는 사용될 수 있는 몇 가지 prisma 명령어를 개발 환경에서 사용될 수 있는 몇가지 명령어로 다시 정리해두었기 때문입니다. 또한 nx만의 구조 때문에 --schema 옵션을 통해 파일을 명시해주어야만 하므로, 해당 옵션까지 모두 포함시켜 정리해뒀습니다.
+    prisma 공식문서와 다르게, yarn nx run 으로 실행시키는 이유는 사용될 수 있는 몇 가지 prisma 명령어를 개발 환경에서 사용될 수 있는 몇가지 명령어로 다시 정리해두었기 때문입니다. 또한 nx만의 구조 때문에 --schema 옵션을 통해 파일을 명시해주어야만 하므로, 해당 옵션까지 모두 포함시켜 정리해뒀습니다. 날것의 명령어를 보고싶은 분은 `workspace.json` 의 `project` -> `prisma-orm` -> `targets` 에서 각 명령어를 확인할 수 있습니다.
 
 3. **Prisma Client 생성하기**
 
