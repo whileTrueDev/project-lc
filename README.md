@@ -136,6 +136,6 @@ App, Lib 별 더 자세한 내용은 해당 폴더의 README.md에 있습니다.
 
 기본 프로세스: `개발자개인` 브랜치 -> `dev` (코드 충돌 해결 필요, 푸쉬 불가, only PR)  
 로컬에서 테스트 필요시: 작업 완료된 `dev`로 진행  (푸쉬 불가, only PR)
-테스트 완료시: `dev` or `test` -> `staging` (푸시 불가, only PR)  
+테스트 완료시: `dev` -> `staging` (푸시 불가, only PR)  
 배포시: `staging` -> `master` (푸시 불가, only PR)  
 핫픽스 필요시: `hotfix` -> `master` (푸시 불가, only PR)  
