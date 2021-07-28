@@ -17,7 +17,7 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
     데이터베이스에 schema.prisma 의 사항을 반영하기 위해서는 마이그레이션 작업이 필요합니다. `prisma migrate <TYPE_OF_TASK>` 의 명령어로 마이그레이션을 진행할 수 있습니다.
 
     ```bash
-    yarn nx run prisma-orm:migrate-up --name <MIGRATION_NAME>
+    yarn nx run prisma-orm:migrate-dev --name <MIGRATION_NAME>
     ```
 
     앞의 명령어는 SQL 마이그레이션 파일을 생성함과 동시에, 해당 마이그레이션 SQL 파일을 연결된 데이터베이스에 실행합니다. 이를 통해 데이터베이스 테이블을 생성하는 작업이 완료되었습니다.
@@ -25,7 +25,7 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
     만약 데이터베이스에 마이그레이션 작업을 실행하지 않고, 마이그레이션 파일만 만들고 싶은 경우 다음 명령어를 사용할 수 있습니다.
 
     ```bash
-    yarn nx run prisma-orm:migrate-save
+    yarn nx run prisma-orm:migrate-create-only
     ```
 
     실행한 마이그레이션 작업을 취소하고자 한다면 다음 명령어를 실행시킬 수 있습니다.
@@ -34,15 +34,15 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
     yarn nx run prisma-orm:migrate-reset
     ```
 
-    주의  
-    `yarn nx run prisma-orm:migrate-save`, `yarn nx run prisma-orm:migrate-reset` 명령어는 개발환경에서만 사용합니다. 절대 프로덕션 마이그레이션 작업에 해당 명령어를 사용하지 않습니다.
+    **주의**  
+    `yarn nx run prisma-orm:migrate-dev`, `yarn nx run prisma-orm:migrate-reset` 명령어는 개발환경에서만 사용합니다. 절대 프로덕션 마이그레이션 작업에 해당 명령어를 사용하지 않습니다.
 
-    참고  
+    **참고**  
     prisma 공식문서와 다르게, yarn nx run 으로 실행시키는 이유는 사용될 수 있는 몇 가지 prisma 명령어를 개발 환경에서 사용될 수 있는 몇가지 명령어로 다시 정리해두었기 때문입니다. 또한 nx만의 구조 때문에 --schema 옵션을 통해 파일을 명시해주어야만 하므로, 해당 옵션까지 모두 포함시켜 정리해뒀습니다.
 
 3. **Prisma Client 생성하기**
 
-    개발환경에서 사용될 수 있는 위의 `prisma migrate dev` 명령어는 마이그레이션 작업을 실행함과 동시에 자동적으로 Prisma Client를 생성하는 작업까지 실행합니다.
+    개발환경에서 사용될 수 있는 위의 `yarn nx run prisma-orm:migrate-dev` 명령어는 마이그레이션 작업을 실행함과 동시에 자동적으로 Prisma Client를 생성하는 작업까지 실행합니다.
 
     위와 같은 상황이 아닌 경우, 다음 명령어로 Prisma Client를 생성합니다. Prisma Client는 데이터베이스에 접근할 수 있는 엔진을 탑재한 업격히 타입정의된 클래스입니다. 이 명령어의 작업은 Prisma Client를 함과 동시에 input과 arguments에 대한 타입정의도 함께 생성합니다.
 
@@ -100,6 +100,6 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
     `@prisma/client`는 위 3번 단락에서 설명한 `generate` 명령어 통해 자동으로 생성된 타입정보가 있는 패키지입니다. `schema.prisma` 스키마 파일 `Post` 에 대한 정보가 있다고 가정하였을 때, 생성된 `@prisma/client` 패키지에는 `Post`가 타입스크립트 인터페이스로 자동으로 정의되어 있습니다.
 
     **주의**  
-    자동으로 생성된 `@prisma/client` 패키지에서 곧바로 PrismaClient를 가져와 인스턴스화 시켜 사용하지 말고, PrismaService를 사용하시기를 권장합니다. (PrismaClient는 인스턴스화 시킬때마다 개별적으로 connecitonPool을 만들어 사용합니다.) 불가피하게 PrismaClient를 가져와 인스턴스화 하여 사용하여야 하는 경우, `$connect`와 `$disconnect`를 올바른 상황에 사용하셔야 합니다. 그렇지 않은 경우, 데이터베이스 connection이 정상적으로 종료되지 않을 수 있습니다.
+    자동으로 생성된 `@prisma/client` 패키지에서 곧바로 PrismaClient를 가져와 인스턴스화 시켜 사용하지 않고, PrismaService를 사용하시기를 권장합니다. (PrismaClient는 인스턴스화 시킬때마다 개별적으로 connecitonPool을 만들어 사용합니다.) 불가피하게 PrismaClient를 가져와 인스턴스화 하여 사용하여야 하는 경우, `$connect`와 `$disconnect`를 올바른 상황에 사용하셔야 합니다. 그렇지 않은 경우, 데이터베이스 connection이 정상적으로 종료되지 않을 수 있습니다.
 
     prismaClient의 CRUD 방법에 대한 API 레퍼런스는 [여기](https://www.prisma.io/docs/concepts/components/prisma-client/crud)에서 확인할 수 있습니다.
