@@ -103,3 +103,10 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
     자동으로 생성된 `@prisma/client` 패키지에서 곧바로 PrismaClient를 가져와 인스턴스화 시켜 사용하지 않고, PrismaService를 사용하시기를 권장합니다. (PrismaClient는 인스턴스화 시킬때마다 개별적으로 connecitonPool을 만들어 사용합니다.) 불가피하게 PrismaClient를 가져와 인스턴스화 하여 사용하여야 하는 경우, `$connect`와 `$disconnect`를 올바른 상황에 사용하셔야 합니다. 그렇지 않은 경우, 데이터베이스 connection이 정상적으로 종료되지 않을 수 있습니다.
 
     prismaClient의 CRUD 방법에 대한 API 레퍼런스는 [여기](https://www.prisma.io/docs/concepts/components/prisma-client/crud)에서 확인할 수 있습니다.
+
+
+5. migrate 실패시 롤백하기
+
+    ```bash
+    yarn nx run prisma-orm:migrate-rollback --args="--target=<마이그레이션이름>"
+    ```

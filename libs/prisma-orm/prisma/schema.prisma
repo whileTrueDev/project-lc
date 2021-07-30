@@ -2,9 +2,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator docs {
-  provider = "node ../../node_modules/prisma-docs-generator"
-}
+// generator docs {
+//   provider = "node ../../node_modules/prisma-docs-generator"
+// }
 
 datasource db {
   provider = "mysql"
@@ -12,10 +12,11 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  name         String?
+  posts        Post[]
+  Notification Notification[]
 }
 
 model Post {
@@ -25,4 +26,13 @@ model Post {
   published Boolean? @default(false)
   authorId  Int?
   author    User?    @relation(fields: [authorId], references: [id])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  title     String
+  userId    Int
+  contents  String   @default("")
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }

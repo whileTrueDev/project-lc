@@ -1,5 +1,11 @@
-import { Components } from '@project-lc/components';
-import styles from './index.module.css';
+import {
+  Navbar,
+  Features,
+  TestComponent,
+  ColorModeSwitcher,
+  CommonFooter,
+} from '@project-lc/components';
+import { Box, Flex } from '@chakra-ui/react';
 
 export function Index() {
   /*
@@ -8,8 +14,15 @@ export function Index() {
    * Note: The corresponding styles are in the ./index.css file.
    */
   return (
-    <div className={styles.page}>
-      <Components />
+    <div>
+      <Navbar />
+      <Flex minH="100vh" justify="space-between" flexDirection="column">
+        <Box>
+          <TestComponent />
+          <Features />
+        </Box>
+        <CommonFooter />
+      </Flex>
     </div>
   );
 }

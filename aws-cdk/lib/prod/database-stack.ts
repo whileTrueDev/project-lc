@@ -1,27 +1,28 @@
-import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as rds from '@aws-cdk/aws-rds';
+import * as cdk from '@aws-cdk/core';
 
-export class AwsCdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+interface LCProdDatabaseStackProps extends cdk.StackProps {
+  vpc: ec2.Vpc;
+  backendSecGrp: ec2.SecurityGroup;
+}
+
+export class LCProdDatabaseStack extends cdk.Stack {
+  public readonly db: rds.DatabaseInstance;
+
+  constructor(scope: cdk.Construct, id: string, props: LCProdDatabaseStackProps) {
     super(scope, id, props);
 
-    const vpc = new ec2.Vpc(this, 'Vpc');
+    const { vpc, backendSecGrp } = props;
 
     // * 보안그룹
-    // 백엔드 보안그룹
-    const backendSecGrp = new ec2.SecurityGroup(this, 'backendSecGrp', {
-      vpc,
-      description: 'backend sec grp',
-      allowAllOutbound: false,
-    });
-
     // db 보안그룹
     const dbSecGrp = new ec2.SecurityGroup(this, 'dbSecGrp', {
       vpc,
       description: 'database sec grp',
       allowAllOutbound: false,
     });
+    // * 보안그룹 룰 지정
     dbSecGrp.addEgressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(3306),
@@ -38,24 +39,21 @@ export class AwsCdkStack extends cdk.Stack {
       'Allow port 3306 for inbound traffics from the backend server',
     );
 
-    // * ******************************
-    // * 데이터베이스
-    // * ******************************
-
-    // db 엔진
+    // * DB 엔진
     const dbEngine = rds.DatabaseInstanceEngine.mysql({
       version: rds.MysqlEngineVersion.VER_8_0_25,
     });
 
-    // db
-    const db = new rds.DatabaseInstance(this, 'DB', {
-      databaseName: 'project-lc-dev-db',
+    // * RDS 데이터베이스 인스턴스
+    this.db = new rds.DatabaseInstance(this, 'DB', {
+      databaseName: 'project-lc-prod-db', // rename 필요
       vpc,
       engine: dbEngine,
       credentials: {
         username: 'admin',
       },
       allocatedStorage: 20,
+      maxAllocatedStorage: 300,
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.NANO),
       vpcSubnets: {
         subnetFilters: [ec2.SubnetFilter.onePerAz()],
@@ -68,10 +66,12 @@ export class AwsCdkStack extends cdk.Stack {
         parameters: {
           time_zone: 'Asia/Seoul',
           wait_timeout: '180',
-          max_allowed_packet: '16777216', // 16 GB (if memory capacity is lower than this, rds will use the entire memory)
+          max_allowed_packet: '16777216',
         },
       }),
       deletionProtection: false,
+      iamAuthentication: true,
+      enablePerformanceInsights: true,
     });
   }
 }

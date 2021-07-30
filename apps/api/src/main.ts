@@ -5,14 +5,16 @@
 
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app/app.module';
+import { AppSetting } from './settings/appSetting';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+async function bootstrap(): Promise<void> {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const appsetting = new AppSetting(app);
+  appsetting.initialize();
+
   const port = process.env.PORT || 3000;
-
-  // console.log('apps/api process.env: ', process.env);
   await app.listen(port, () => {
     Logger.log(`Listening at http://localhost:${port}`);
   });

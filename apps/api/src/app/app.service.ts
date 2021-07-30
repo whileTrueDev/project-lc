@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import { Notification, Prisma, User } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 
 @Injectable()
@@ -51,6 +51,12 @@ export class AppService {
   async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
     return this.prisma.user.delete({
       where,
+    });
+  }
+
+  async findNotification(): Promise<Notification[]> {
+    return this.prisma.notification.findMany({
+      include: { user: true },
     });
   }
 }

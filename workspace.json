@@ -6,6 +6,21 @@
       "sourceRoot": "apps/api/src",
       "projectType": "application",
       "targets": {
+        "dockerize": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/api/Dockerfile . -t hwasurr/project-lc-api:{args.tag}",
+              "docker tag hwasurr/project-lc-api:{args.tag} hwasurr/project-lc-api:latest ",
+              "docker push hwasurr/project-lc-api:{args.tag}",
+              {
+                "command": "docker push hwasurr/project-lc-api:latest",
+                "forwardAllArgs": false
+              }
+            ],
+            "parallel": false
+          }
+        },
         "build": {
           "executor": "@nrwl/node:build",
           "outputs": [
@@ -17,7 +32,8 @@
             "tsConfig": "apps/api/tsconfig.app.json",
             "assets": [
               "apps/api/src/assets"
-            ]
+            ],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -210,7 +226,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "outputs": [],
           "options": {
-            "command": "../../node_modules/.bin/prisma migrate reset --preview-feature --schema ./prisma/schema.prisma",
+            "command": "../../node_modules/.bin/prisma migrate reset --preview-feature --schema ./prisma/schema.prisma --force",
             "cwd": "libs/prisma-orm"
           }
         },
@@ -227,6 +243,14 @@
           "outputs": [],
           "options": {
             "command": "../../node_modules/.bin/prisma migrate status --preview-feature --schema ./prisma/schema.prisma",
+            "cwd": "libs/prisma-orm"
+          }
+        },
+        "migrate-rollback": {
+          "executor": "@nrwl/workspace:run-commands",
+          "outputs": [],
+          "options": {
+            "command": "../../node_modules/.bin/prisma migrate resolve --schema ./prisma/schema.prisma --rolled-back {args.target}",
             "cwd": "libs/prisma-orm"
           }
         },
@@ -270,6 +294,21 @@
       "sourceRoot": "apps/socket/src",
       "projectType": "application",
       "targets": {
+        "dockerize": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/socket/Dockerfile . -t hwasurr/project-lc-socket:{args.tag}",
+              "docker tag hwasurr/project-lc-socket:{args.tag} hwasurr/project-lc-socket:latest ",
+              "docker push hwasurr/project-lc-socket:{args.tag}",
+              {
+                "command": "docker push hwasurr/project-lc-socket:latest",
+                "forwardAllArgs": false
+              }
+            ],
+            "parallel": false
+          }
+        },
         "build": {
           "executor": "@nrwl/node:build",
           "outputs": [
@@ -282,7 +321,8 @@
             "assets": [
               "apps/socket/src/assets",
               "apps/socket/src/views"
-            ]
+            ],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {

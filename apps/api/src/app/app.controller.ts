@@ -13,13 +13,17 @@ export class AppController {
   @Get()
   getData() {
     return this.firstmallGoods.findAll();
-    // return this.appService.getData();
   }
 
   @Get('users')
   async getUsers() {
     const result = await this.appService.getUserData({ id: 1 });
     return result;
+  }
+
+  @Get('notifications')
+  async getNotifications() {
+    return this.appService.findNotification();
   }
 
   @Post('users')
