@@ -32,7 +32,7 @@ jobs:
         run: yarn build api --prod
 
       - name: Dockerize "api"
-        run: yarn nx dockerize api --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}
+        run: yarn nx dockerize api --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}"
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
