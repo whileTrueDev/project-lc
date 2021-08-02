@@ -10,6 +10,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
+              "docker login -u {args.username} -p {args.password}",
               "docker build -f ./apps/api/Dockerfile . -t hwasurr/project-lc-api:{args.tag}",
               "docker tag hwasurr/project-lc-api:{args.tag} hwasurr/project-lc-api:latest ",
               "docker push hwasurr/project-lc-api:{args.tag}",
