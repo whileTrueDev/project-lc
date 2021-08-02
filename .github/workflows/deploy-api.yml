@@ -29,7 +29,7 @@ jobs:
 
       #  Build API server
       - name: Build "api"
-        run: yarn build api --prod"
+        run: yarn build api --prod
 
       - name: Dockerize "api"
         run: yarn nx dockerize api --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}
