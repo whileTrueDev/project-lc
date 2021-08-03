@@ -52,3 +52,5 @@ jobs:
 
       - name: Prisma Migrate
         run: yarn nx run prisma-orm:migrate-deploy
+        env:
+          DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
