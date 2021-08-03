@@ -203,7 +203,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "outputs": [],
           "options": {
-            "command": "../../node_modules/.bin/prisma generate",
+            "command": "prisma generate",
             "cwd": "libs/prisma-orm"
           }
         },
@@ -211,7 +211,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "outputs": [],
           "options": {
-            "command": "../../node_modules/.bin/prisma migrate dev --create-only --preview-feature --schema ./prisma/schema.prisma",
+            "command": "prisma migrate dev --create-only --preview-feature --schema ./prisma/schema.prisma",
             "cwd": "libs/prisma-orm"
           }
         },
@@ -219,7 +219,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "outputs": [],
           "options": {
-            "command": "../../node_modules/.bin/prisma migrate dev --preview-feature --schema ./prisma/schema.prisma",
+            "command": "prisma migrate dev --preview-feature --schema ./prisma/schema.prisma",
             "cwd": "libs/prisma-orm"
           }
         },
@@ -227,7 +227,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "outputs": [],
           "options": {
-            "command": "../../node_modules/.bin/prisma migrate reset --preview-feature --schema ./prisma/schema.prisma --force",
+            "command": "prisma migrate reset --preview-feature --schema ./prisma/schema.prisma --force",
             "cwd": "libs/prisma-orm"
           }
         },
@@ -235,7 +235,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "outputs": [],
           "options": {
-            "command": "../../node_modules/.bin/prisma migrate deploy --preview-feature --schema ./prisma/schema.prisma",
+            "command": "prisma migrate deploy --preview-feature --schema ./prisma/schema.prisma",
             "cwd": "libs/prisma-orm"
           }
         },
@@ -243,7 +243,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "outputs": [],
           "options": {
-            "command": "../../node_modules/.bin/prisma migrate status --preview-feature --schema ./prisma/schema.prisma",
+            "command": "prisma migrate status --preview-feature --schema ./prisma/schema.prisma",
             "cwd": "libs/prisma-orm"
           }
         },
@@ -251,7 +251,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "outputs": [],
           "options": {
-            "command": "../../node_modules/.bin/prisma migrate resolve --schema ./prisma/schema.prisma --rolled-back {args.target}",
+            "command": "prisma migrate resolve --schema ./prisma/schema.prisma --rolled-back {args.target}",
             "cwd": "libs/prisma-orm"
           }
         },
@@ -259,7 +259,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "outputs": [],
           "options": {
-            "command": "../../node_modules/.bin/prisma studio --schema ./prisma/schema.prisma",
+            "command": "prisma studio --schema ./prisma/schema.prisma",
             "cwd": "libs/prisma-orm"
           }
         }
