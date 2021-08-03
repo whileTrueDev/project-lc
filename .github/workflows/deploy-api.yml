@@ -53,11 +53,12 @@ jobs:
           wait-for-service-stability: true
 
       - name: RDS token authentication
+        id: RDS-token-authentication
         run: |
           export TEMP_RDS_TOKEN="$(aws rds generate-db-auth-token --hostname ${{ secrets.RDS_HOST }} --port 3306 --region ap-northeast-2 --username githubactions)"
-          echo "::set-env name=TEMP_RDS_TOKEN::$TEMP_RDS_TOKEN" 
+          echo "::set-output name=TEMP_RDS_TOKEN::$TEMP_RDS_TOKEN"
 
       - name: Prisma Migrate
         run: yarn nx run prisma-orm:migrate-deploy
         env:
-          DATABASE_URL: mysql://githubactions:$TEMP_RDS_TOKEN@${{ secrets.RDS_HOST }}/public
+          DATABASE_URL: mysql://githubactions:${{ steps.RDS-token-authentication.outputs.TEMP_RDS_TOKEN }}@${{ secrets.RDS_HOST }}/public
