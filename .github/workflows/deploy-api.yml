@@ -40,7 +40,7 @@ jobs:
         with:
           task-definition: apps/api/task-definition.json
           container-name: project-lc-api
-          image: ${{ secrets.DOCKER_USERNAME }}/test-truepoint-api:${{ github.sha }}
+          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-api:${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
