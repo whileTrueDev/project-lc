@@ -47,7 +47,7 @@ export class LCDevDatabaseStack extends cdk.Stack {
         },
       }),
       deletionProtection: false,
-      iamAuthentication: false,
+      iamAuthentication: true,
       enablePerformanceInsights: false,
       cloudwatchLogsExports: ['error', 'slowquery', 'general'],
     });

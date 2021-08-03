@@ -19,6 +19,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
+          role-to-assume: ${{ secrets.AWS_ACTIONS_DB_ROLE_ARN_PROJECT_LC }}
 
       #  Install All Dependencies
       - name: Install dependencies
@@ -50,7 +51,12 @@ jobs:
           cluster: project-lc
           wait-for-service-stability: true
 
+      - name: RDS token authentication
+        run: |
+          export TEMP_RDS_TOKEN="$(aws rds generate-db-auth-token --hostname ${{ secrets.RDS_HOST }} --port 3306 --region ap-northeast-2 --username githubactions)"
+          echo "::set-env name=TEMP_RDS_TOKEN::$TEMP_RDS_TOKEN" 
+
       - name: Prisma Migrate
         run: yarn nx run prisma-orm:migrate-deploy
         env:
-          DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
+          DATABASE_URL: mysql://githubactions:$TEMP_RDS_TOKEN@${{ secrets.RDS_HOST }}/public
