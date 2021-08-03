@@ -59,6 +59,8 @@ jobs:
           echo "::set-output name=TEMP_RDS_TOKEN::$TEMP_RDS_TOKEN"
 
       - name: Prisma Migrate
-        run: yarn nx run prisma-orm:migrate-deploy
+        run: |
+          echo "mysql://githubactions:${{ steps.RDS-token-authentication.outputs.TEMP_RDS_TOKEN }}@${{ secrets.RDS_HOST }}/public"
+          yarn nx run prisma-orm:migrate-deploy
         env:
           DATABASE_URL: mysql://githubactions:${{ steps.RDS-token-authentication.outputs.TEMP_RDS_TOKEN }}@${{ secrets.RDS_HOST }}/public
