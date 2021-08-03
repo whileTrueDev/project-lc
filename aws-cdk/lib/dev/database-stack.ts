@@ -4,7 +4,7 @@ import * as cdk from '@aws-cdk/core';
 
 interface LCDevDatabaseStackProps extends cdk.StackProps {
   vpc: ec2.Vpc;
-  backendSecGrp?: ec2.SecurityGroup;
+  dbSecGrp: ec2.SecurityGroup;
 }
 
 export class LCDevDatabaseStack extends cdk.Stack {
@@ -13,31 +13,7 @@ export class LCDevDatabaseStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: LCDevDatabaseStackProps) {
     super(scope, id, props);
 
-    const { vpc, backendSecGrp } = props;
-
-    // * 보안그룹
-    // db 보안그룹
-    const dbSecGrp = new ec2.SecurityGroup(this, 'LC-DEV-DB-SecGrp', {
-      vpc,
-      description: 'database sec grp',
-      allowAllOutbound: false,
-    });
-    // * 보안그룹 룰 지정
-    dbSecGrp.addEgressRule(
-      ec2.Peer.ipv4('59.22.64.86/32'),
-      ec2.Port.tcp(3306),
-      'Allow port 3306 for outbound traffics to the backend server',
-    );
-    dbSecGrp.addIngressRule(
-      ec2.Peer.ipv4('59.22.64.86/32'),
-      ec2.Port.tcp(3306),
-      'Allow port 3306 for outbound traffics to the whiletrue developers',
-    );
-    // dbSecGrp.addIngressRule(
-    //   backendSecGrp,
-    //   ec2.Port.tcp(3306),
-    //   'Allow port 3306 for inbound traffics from the backend server',
-    // );
+    const { vpc, dbSecGrp } = props;
 
     // * DB 엔진
     const dbEngine = rds.DatabaseInstanceEngine.mysql({

@@ -29,5 +29,8 @@ if (process.env.NODE_ENV === 'production') {
   // VPC 생성
   const vpcStack = new LCDevVpcStack(app, 'LC-DEV-VPC');
   // 데이터베이스 스택 생성
-  new LCDevDatabaseStack(app, 'LC-DEV-RDS', { vpc: vpcStack.vpc });
+  new LCDevDatabaseStack(app, 'LC-DEV-RDS', {
+    vpc: vpcStack.vpc,
+    dbSecGrp: vpcStack.dbSecGrp,
+  });
 }
