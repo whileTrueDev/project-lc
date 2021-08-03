@@ -20,6 +20,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
           role-to-assume: ${{ secrets.AWS_ACTIONS_DB_ROLE_ARN_PROJECT_LC }}
+          role-duration-seconds: 1500
 
       #  Install All Dependencies
       - name: Install dependencies
