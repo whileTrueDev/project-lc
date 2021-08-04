@@ -50,12 +50,7 @@ jobs:
 
       - name: Check api affected
         id: CheckApiAffected
-        run: |
-          export API_AFFECTED = $(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)
-          if [$API_AFFECTED -eq 1]
-          then
-            echo '::set-output name=API_AFFECTED::api'
-          fi
+        run: echo '::set-output name=API_AFFECTED::$(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)'
       
       # - name: Check socket affected
       #   id: CheckSocketAffected
@@ -67,7 +62,7 @@ jobs:
       #     fi
 
       - name: Fill in the new image ID in the Amazon ECS task definition API
-        if: ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 'api' }}
+        if: ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 1 }}
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
@@ -76,7 +71,7 @@ jobs:
           image: ${{ secrets.DOCKER_USERNAME }}/project-lc-api-dev:${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition API
-        if: ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 'api' }}
+        if: ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 1 }}
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
@@ -85,7 +80,7 @@ jobs:
           wait-for-service-stability: false
 
       - name: Prisma Migrate
-        if: ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 'api' }}
+        if: ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 1 }}
         run: yarn nx run prisma-orm:migrate-deploy
         env:
           DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
