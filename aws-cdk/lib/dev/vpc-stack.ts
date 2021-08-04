@@ -52,10 +52,15 @@ export class LCDevVpcStack extends cdk.Stack {
       'Allow port 3306 for outbound traffics to the whiletrue developers',
     );
     this.dbSecGrp.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      // apiSecGrp ?? this.apiSecGrp,
+      apiSecGrp ?? this.apiSecGrp,
       ec2.Port.tcp(3306),
       'Allow port 3306 only to traffic from api security group',
+    );
+
+    this.dbSecGrp.addIngressRule(
+      ec2.SecurityGroup.fromSecurityGroupId(this, 'FindBuilderSgId', 'sg-018ad88ec19a7a179'),
+      ec2.Port.tcp(3306),
+      'Allow github actions builder',
     );
 
     return this.dbSecGrp;

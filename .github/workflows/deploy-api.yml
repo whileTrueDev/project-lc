@@ -7,7 +7,7 @@ name: Dev deploy to AWS ECS - "api"
 jobs:
   deploy:
     name: Deploy
-    runs-on: windows-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout
