@@ -21,6 +21,7 @@ export class LCDevAppStack extends cdk.Stack {
     const cluster = new ecs.Cluster(this, `${PREFIX}EcsCluster`, {
       vpc,
       clusterName: constants.DEV.ECS_CLUSTER,
+      containerInsights: true,
     });
 
     const apiTaskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSTaskDef`, {

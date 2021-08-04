@@ -22,7 +22,7 @@
             "parallel": false
           }
         },
-        "dockerize:dev": {
+        "dockerize-dev": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
@@ -326,7 +326,7 @@
             "parallel": false
           }
         },
-        "dockerize:dev": {
+        "dockerize-dev": {
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
