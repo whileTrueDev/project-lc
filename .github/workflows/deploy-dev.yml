@@ -18,23 +18,6 @@ jobs:
       - name: Install dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
-      - name: Check api affected
-        id: CheckApiAffected
-        env:
-          TARGET: api
-        run: |
-          echo 'API_AFFECTED=$(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep $TARGET)' >> $GITHUB_ENV
-          echo '::set-output name=API_AFFECTED::$API_AFFECTED'
-
-      - name: Echo api affected
-        env:
-          TARGET: api
-        run: |
-          echo ${{ steps.CheckApiAffected.outputs.API_AFFECTED }}
-          echo ${{ contains(steps.CheckApiAffected.outputs.API_AFFECTED, 'api') }}
-          echo ${{ env.API_AFFECTED }}
-          echo ${{ contains(env.API_AFFECTED, 'api') }}
-
       - name: Check api affected2
         id: CheckApiAffected2
         run: tools/check-need-deploy.sh
