@@ -27,7 +27,7 @@ jobs:
 
       # Dockerize and Push to DockerHub
       - name: Dockerize
-        run: yarn affected --target=dockerize-dev --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}"
+        run: yarn affected --target=dockerize-dev --base=$BEFORE_SHA --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}"
 
   Deploy:
     name: Deploy Job
