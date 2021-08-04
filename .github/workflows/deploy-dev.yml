@@ -6,90 +6,72 @@ name: Dev deploy to AWS ECS - "api"
 env:
   BEFORE_SHA: ${{ github.event.before }}
 jobs:
-
-  Test:
-    name: Test
+  Build:
+    name: Build Job
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Check api affected2
-        id: CheckApiAffected2
+      #  Install All Dependencies
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1 # install dependencies using cache
+
+      # Generate Prisma Client
+      - name: Primsa generate
+        run: yarn nx run prisma-orm:prisma-generate
+
+      #  Build API server
+      - name: Build
+        run: yarn affected:build --prod --base=$BEFORE_SHA
+
+      # Dockerize and Push to DockerHub
+      - name: Dockerize
+        run: yarn affected --target=dockerize-dev --base=$BEFORE_SHA --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}"
+
+  Deploy:
+    name: Deploy Job
+    runs-on: self-hosted
+    needs: [Build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      
+      #  Install All Dependencies
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1 # install dependencies using cache
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
+          aws-region: ap-northeast-2
+
+      - name: Check api affected
+        id: CheckApiAffected
         run: tools/check-need-deploy.sh
 
-  # Build:
-  #   name: Build Job
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v1
+      - name: Fill in the new image ID in the Amazon ECS task definition API
+        if: ${{ success() }}
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: apps/api/task-definition-dev.json
+          container-name: project-lc-api-dev
+          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-api-dev:${{ github.sha }}
 
-  #     #  Install All Dependencies
-  #     - name: Install dependencies
-  #       uses: bahmutov/npm-install@v1 # install dependencies using cache
+      - name: Deploy Amazon ECS task definition API
+        if: ${{ success() }}
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: project-lc-api-dev-service
+          cluster: project-lc-dev
+          wait-for-service-stability: false
 
-  #     # Generate Prisma Client
-  #     - name: Primsa generate
-  #       run: yarn nx run prisma-orm:prisma-generate
-
-  #     #  Build API server
-  #     - name: Build
-  #       run: yarn affected:build --prod --base=$BEFORE_SHA
-
-  #     # Dockerize and Push to DockerHub
-  #     - name: Dockerize
-  #       run: yarn affected --target=dockerize-dev --base=$BEFORE_SHA --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}"
-
-  # Deploy:
-  #   name: Deploy Job
-  #   runs-on: self-hosted
-  #   needs: [Build]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v1
-      
-  #     #  Install All Dependencies
-  #     - name: Install dependencies
-  #       uses: bahmutov/npm-install@v1 # install dependencies using cache
-
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
-  #         aws-region: ap-northeast-2
-
-  #     - name: Check api affected
-  #       id: CheckApiAffected
-  #       run: echo '::set-output name=API_AFFECTED::$(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)'
-
-  #     - name: Echo api affected
-  #       run: |
-  #         echo ${{ steps.CheckApiAffected.outputs.API_AFFECTED }}
-  #         echo ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 1 }}
-  #         echo ${{ steps.CheckApiAffected.outputs.API_AFFECTED == '1' }}
-      
-  #     - name: Fill in the new image ID in the Amazon ECS task definition API
-  #       if: ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 1 }}
-  #       id: task-def
-  #       uses: aws-actions/amazon-ecs-render-task-definition@v1
-  #       with:
-  #         task-definition: apps/api/task-definition-dev.json
-  #         container-name: project-lc-api-dev
-  #         image: ${{ secrets.DOCKER_USERNAME }}/project-lc-api-dev:${{ github.sha }}
-
-  #     - name: Deploy Amazon ECS task definition API
-  #       if: ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 1 }}
-  #       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-  #       with:
-  #         task-definition: ${{ steps.task-def.outputs.task-definition }}
-  #         service: project-lc-api-dev-service
-  #         cluster: project-lc-dev
-  #         wait-for-service-stability: false
-
-  #     - name: Prisma Migrate
-  #       if: ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 1 }}
-  #       run: yarn nx run prisma-orm:migrate-deploy
-  #       env:
-  #         DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
+      - name: Prisma Migrate
+        if: ${{ success() }}
+        run: yarn nx run prisma-orm:migrate-deploy
+        env:
+          DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}

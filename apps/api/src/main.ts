@@ -11,6 +11,7 @@ import { AppSetting } from './settings/appSetting';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
   const appsetting = new AppSetting(app);
 
   appsetting.initialize();
