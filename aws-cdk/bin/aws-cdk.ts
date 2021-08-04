@@ -37,5 +37,6 @@ if (process.env.NODE_ENV === 'production') {
   new LCDevAppStack(app, 'LC-DEV-APP', {
     vpc: vpcStack.vpc,
     apiSecGrp: vpcStack.apiSecGrp,
+    socketSecGrp: vpcStack.socketSecGrp,
   });
 }
