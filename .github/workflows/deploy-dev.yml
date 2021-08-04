@@ -21,7 +21,7 @@ jobs:
       - name: Check api affected
         id: CheckApiAffected
         run: |
-          echo "API_AFFECTED=$(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)"" >> $GITHUB_ENV
+          echo 'API_AFFECTED=$(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)' >> $GITHUB_ENV
           echo '::set-output name=API_AFFECTED::$API_AFFECTED'
 
       - name: Echo api affected

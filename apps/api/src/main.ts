@@ -16,7 +16,6 @@ async function bootstrap(): Promise<void> {
   appsetting.initialize();
 
   const port = process.env.PORT || 3000;
-
   await app.listen(port, () => {
     Logger.log(`Listening at http://localhost:${port}`);
   });
