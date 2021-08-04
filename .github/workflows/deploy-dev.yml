@@ -27,12 +27,17 @@ jobs:
           echo '::set-output name=API_AFFECTED::$API_AFFECTED'
 
       - name: Echo api affected
+        env:
+          TARGET: api
         run: |
           echo ${{ steps.CheckApiAffected.outputs.API_AFFECTED }}
           echo ${{ contains(steps.CheckApiAffected.outputs.API_AFFECTED, 'api') }}
           echo ${{ env.API_AFFECTED }}
           echo ${{ contains(env.API_AFFECTED, 'api') }}
 
+      - name: Check api affected2
+        id: CheckApiAffected
+        run: tools/check-need-deploy.sh
 
   # Build:
   #   name: Build Job
