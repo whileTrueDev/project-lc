@@ -13,10 +13,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      
-      #  Install All Dependencies
-      - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check api affected2
         id: CheckApiAffected2
