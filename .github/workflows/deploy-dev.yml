@@ -9,7 +9,7 @@ on:
       - "libs/prisma-orm/**"
       - "libs/shared-types/**"
 
-name: Dev deploy to AWS ECS - "api"
+name: Deploy to AWS ECS "Dev"
 env:
   BEFORE_SHA: ${{ github.event.before }}
 jobs:
