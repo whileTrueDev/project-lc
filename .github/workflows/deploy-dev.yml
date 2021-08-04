@@ -1,6 +1,13 @@
 on:
   push:
     branches: [dev]
+    paths:
+      - "apps/api/**"
+      - "apps/socket/**"
+      - "libs/firstmall-db/**"
+      - "libs/nest-modules/**"
+      - "libs/prisma-orm/**"
+      - "libs/shared-types/**"
 
 name: Dev deploy to AWS ECS - "api"
 env:
