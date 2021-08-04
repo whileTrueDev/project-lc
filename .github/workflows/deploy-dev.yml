@@ -3,7 +3,8 @@ on:
     branches: [dev]
 
 name: Dev deploy to AWS ECS - "api"
-
+env:
+  BEFORE_SHA: ${{ github.event.before }}
 jobs:
   Build:
     name: Build Job
@@ -22,7 +23,7 @@ jobs:
 
       #  Build API server
       - name: Build
-        run: yarn affected:build --prod
+        run: yarn affected:build --prod --base=$BEFORE_SHA
 
       # Dockerize and Push to DockerHub
       - name: Dockerize
