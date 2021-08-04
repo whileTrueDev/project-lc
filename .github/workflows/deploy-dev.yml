@@ -51,8 +51,8 @@ jobs:
       - name: Check api affected
         id: CheckApiAffected
         run: |
-          API_AFFECTED = $(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)
-          if [API_AFFECTED -eq 1]
+          export API_AFFECTED = $(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)
+          if [$API_AFFECTED -eq 1]
           then
             echo '::set-output name=API_AFFECTED::api'
           fi
