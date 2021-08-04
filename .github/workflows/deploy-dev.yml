@@ -41,15 +41,16 @@ jobs:
       - name: Install dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
+      - name: Check api affected
+        run: tools/check-need-api-deploy.sh
+
       - name: Configure AWS credentials
+        if: ${{ success() }}
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
-
-      - name: Check api affected
-        run: tools/check-need-api-deploy.sh
 
       - name: Fill in the new image ID in the Amazon ECS task definition API
         if: ${{ success() }}
@@ -87,15 +88,16 @@ jobs:
       - name: Install dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
+      - name: Check Socket affected
+        run: tools/check-need-socket-deploy.sh
+
       - name: Configure AWS credentials
+        if: ${{ success() }}
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
-
-      - name: Check Socket affected
-        run: tools/check-need-socket-deploy.sh
 
       - name: Fill in the new image ID in the Amazon ECS task definition Socket
         if: ${{ success() }}

@@ -315,6 +315,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
+              "docker login -u {args.username} -p {args.password}",
               "docker build -f ./apps/socket/Dockerfile . -t hwasurr/project-lc-socket:{args.tag}",
               "docker tag hwasurr/project-lc-socket:{args.tag} hwasurr/project-lc-socket:latest ",
               "docker push hwasurr/project-lc-socket:{args.tag}",
@@ -330,6 +331,7 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
+              "docker login -u {args.username} -p {args.password}",
               "docker build -f ./apps/socket/Dockerfile . -t hwasurr/project-lc-socket-dev:{args.tag}",
               "docker tag hwasurr/project-lc-socket-dev:{args.tag} hwasurr/project-lc-socket-dev:latest ",
               "docker push hwasurr/project-lc-socket-dev:{args.tag}",
