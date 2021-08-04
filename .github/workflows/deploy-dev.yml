@@ -21,7 +21,7 @@ jobs:
       - name: Check api affected
         id: CheckApiAffected
         run: |
-          yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api) >> $GITHUB_ENV
+          echo 'API_AFFECTED=$(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)' >> $GITHUB_ENV
           echo '::set-output name=API_AFFECTED::$API_AFFECTED'
 
       - name: Echo api affected
@@ -30,10 +30,10 @@ jobs:
           echo ${{ steps.CheckApiAffected.outputs.API_AFFECTED == 1 }}
           echo ${{ steps.CheckApiAffected.outputs.API_AFFECTED == '1' }}
           echo ${{ steps.CheckApiAffected.outputs.API_AFFECTED == '$(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)' }}
-          echo ${{ $API_AFFECTED }}
-          echo ${{ $API_AFFECTED == 1 }}
-          echo ${{ $API_AFFECTED == '1' }}
-          echo ${{ $API_AFFECTED == '$(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)' }}
+          echo ${{ env.API_AFFECTED }}
+          echo ${{ env.API_AFFECTED == 1 }}
+          echo ${{ env.API_AFFECTED == '1' }}
+          echo ${{ env.API_AFFECTED == '$(yarn affected:apps --plain --base HEAD~1 --head HEAD | grep -c api)' }}
 
   # Build:
   #   name: Build Job
