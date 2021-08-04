@@ -22,6 +22,22 @@
             "parallel": false
           }
         },
+        "dockerize:dev": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker login -u {args.username} -p {args.password}",
+              "docker build -f ./apps/api/Dockerfile . -t hwasurr/project-lc-api-dev:{args.tag}",
+              "docker tag hwasurr/project-lc-api-dev:{args.tag} hwasurr/project-lc-api-dev:latest ",
+              "docker push hwasurr/project-lc-api-dev:{args.tag}",
+              {
+                "command": "docker push hwasurr/project-lc-api-dev:latest",
+                "forwardAllArgs": false
+              }
+            ],
+            "parallel": false
+          }
+        },
         "build": {
           "executor": "@nrwl/node:build",
           "outputs": [
@@ -304,6 +320,21 @@
               "docker push hwasurr/project-lc-socket:{args.tag}",
               {
                 "command": "docker push hwasurr/project-lc-socket:latest",
+                "forwardAllArgs": false
+              }
+            ],
+            "parallel": false
+          }
+        },
+        "dockerize:dev": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/socket/Dockerfile . -t hwasurr/project-lc-socket-dev:{args.tag}",
+              "docker tag hwasurr/project-lc-socket-dev:{args.tag} hwasurr/project-lc-socket-dev:latest ",
+              "docker push hwasurr/project-lc-socket-dev:{args.tag}",
+              {
+                "command": "docker push hwasurr/project-lc-socket-dev:latest",
                 "forwardAllArgs": false
               }
             ],

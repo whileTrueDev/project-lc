@@ -9,7 +9,7 @@
                 "logDriver": "awslogs",
                 "secretOptions": null,
                 "options": {
-                    "awslogs-group": "/ecs/project-lc-api",
+                    "awslogs-group": "/ecs/project-lc-api-dev",
                     "awslogs-region": "ap-northeast-2",
                     "awslogs-stream-prefix": "ecs"
                 }
@@ -33,7 +33,7 @@
             "workingDirectory": null,
             "secrets": [
                 {
-                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/LC_DB_URL",
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/LC_DEV_DB_URL",
                     "name": "DATABASE_URL"
                 }
             ],
@@ -42,7 +42,7 @@
             "memoryReservation": null,
             "volumesFrom": [],
             "stopTimeout": null,
-            "image": "hwasurr/project-lc-api",
+            "image": "hwasurr/project-lc-api-dev",
             "startTimeout": null,
             "firelensConfiguration": null,
             "dependsOn": null,
@@ -59,13 +59,13 @@
             "dockerLabels": null,
             "systemControls": null,
             "privileged": null,
-            "name": "project-lc-api"
+            "name": "project-lc-api-dev"
         }
     ],
     "placementConstraints": [],
     "memory": "512",
     "taskRoleArn": null,
-    "family": "project-lc-api",
+    "family": "project-lc-api-dev",
     "pidMode": null,
     "requiresCompatibilities": [
         "FARGATE"

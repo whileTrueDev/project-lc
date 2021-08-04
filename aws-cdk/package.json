@@ -22,8 +22,11 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "@aws-cdk/aws-ecs": "^1.116.0",
     "@aws-cdk/aws-rds": "^1.116.0",
     "@aws-cdk/core": "^1.116.0",
+    "dotenv": "^10.0.0",
+    "joi": "^17.4.2",
     "source-map-support": "^0.5.16"
   }
 }

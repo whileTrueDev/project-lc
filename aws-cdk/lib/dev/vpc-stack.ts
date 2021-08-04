@@ -1,5 +1,6 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
+import { constants } from '../../constants';
 
 // CONSTANTS
 const ID_PREFIX = 'LC-DEV-';
@@ -24,11 +25,11 @@ export class LCDevVpcStack extends cdk.Stack {
       subnetConfiguration: [
         {
           subnetType: ec2.SubnetType.PUBLIC,
-          name: 'Ingress Subnet',
+          name: constants.DEV.INGRESS_SUBNET_GROUP_NAME,
         },
         {
           subnetType: ec2.SubnetType.ISOLATED,
-          name: 'Isolated Subnet for DB',
+          name: constants.DEV.ISOLATED_SUBNET_GROUP_NAME,
         },
       ],
     });
