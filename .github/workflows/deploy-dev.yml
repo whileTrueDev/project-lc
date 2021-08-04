@@ -36,7 +36,7 @@ jobs:
           echo ${{ contains(env.API_AFFECTED, 'api') }}
 
       - name: Check api affected2
-        id: CheckApiAffected
+        id: CheckApiAffected2
         run: tools/check-need-deploy.sh
 
   # Build:
