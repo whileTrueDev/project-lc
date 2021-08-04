@@ -5,7 +5,7 @@ on:
 name: Dev deploy to AWS ECS - "api"
 
 jobs:
-  deploy:
+  api-deploy:
     name: Deploy
     runs-on: self-hosted
 
@@ -19,8 +19,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
-          role-to-assume: ${{ secrets.AWS_ACTIONS_DB_ROLE_ARN_PROJECT_LC }}
-          role-duration-seconds: 1500
 
       #  Install All Dependencies
       - name: Install dependencies
@@ -50,7 +48,7 @@ jobs:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: project-lc-api-service
           cluster: project-lc
-          wait-for-service-stability: true
+          wait-for-service-stability: false
 
       - name: Prisma Migrate
         run: yarn nx run prisma-orm:migrate-deploy
