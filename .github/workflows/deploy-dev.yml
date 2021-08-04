@@ -50,7 +50,7 @@ jobs:
 
       - name: Check api affected
         id: CheckApiAffected
-        run: tools/check-need-deploy.sh
+        run: tools/check-need-api-deploy.sh
 
       - name: Fill in the new image ID in the Amazon ECS task definition API
         if: ${{ success() }}

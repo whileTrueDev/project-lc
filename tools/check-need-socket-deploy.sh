@@ -1,5 +1,5 @@
 # Name of the app to check. Change this to your application name!
-APP=api
+APP=socket
 
 yarn install
 
