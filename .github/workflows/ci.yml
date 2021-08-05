@@ -7,49 +7,41 @@ jobs:
     name: Lint Job
     runs-on: ubuntu-latest
     steps:
-      - name: Extract branch name
-        uses: nelonoel/branch-name@v1.0.1
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install Dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
       - name: Check Lint all affected apps and libs
-        run: yarn affected:lint --base="${BRANCH_NAME}"
+        run: yarn affected:lint --base="$GITHUB_BASE_REF"
   Test:
     name: Test Job
     runs-on: ubuntu-latest
     steps:
-      - name: Extract branch name
-        uses: nelonoel/branch-name@v1.0.1
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install Dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
       - name: Run tests all affected apps and libs
-        run: yarn affected:test --base="${BRANCH_NAME}"
+        run: yarn affected:test --base="$GITHUB_BASE_REF"
   # e2eTest:
   #   name: E2ETest Job
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - name: Extract branch name
-  #       uses: nelonoel/branch-name@v1.0.1
   #     - name: Checkout
   #       uses: actions/checkout@v1
   #     - name: Install Dependencies
   #       uses: bahmutov/npm-install@v1 # install dependencies using cache
   #     - name: Run e2e tests all affected apps and libs
-  #       run: yarn affected:e2e --base="${BRANCH_NAME}"
+  #       run: yarn affected:e2e --base="$GITHUB_BASE_REF"
   Build:
     name: Build Job
     runs-on: ubuntu-latest
     steps:
-      - name: Extract branch name
-        uses: nelonoel/branch-name@v1.0.1
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install Dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
       - name: Run Build all affected apps and libs
-        run: yarn affected:build --base="${BRANCH_NAME}"
+        run: yarn affected:build --base="$GITHUB_BASE_REF"
 
 
