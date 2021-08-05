@@ -1,1 +1,1 @@
-export const getGreeting = () => cy.get('h1');
+export const getGreeting = () => cy.get('h2.chakra-heading');

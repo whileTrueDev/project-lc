@@ -1,0 +1,49 @@
+on:
+  pull_request:
+    branches: [master, staging, dev]
+env:
+  BEFORE_SHA: ${{ github.event.before }}
+name: Continous Integration Workflow
+jobs:
+  Lint:
+    name: Lint Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install Dependencies
+        uses: bahmutov/npm-install@v1 # install dependencies using cache
+      - name: Check Lint all affected apps and libs
+        uses: yarn affected:lint --base=$BEFORE_SHA
+  Test:
+    name: Test Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install Dependencies
+        uses: bahmutov/npm-install@v1 # install dependencies using cache
+      - name: Run tests all affected apps and libs
+        uses: yarn affected:test --base=$BEFORE_SHA
+  # e2eTest:
+  #   name: E2ETest Job
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v1
+  #     - name: Install Dependencies
+  #       uses: bahmutov/npm-install@v1 # install dependencies using cache
+  #     - name: Run e2e tests all affected apps and libs
+  #       uses: yarn affected:e2e --base=$BEFORE_SHA
+  Build:
+    name: Build Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install Dependencies
+        uses: bahmutov/npm-install@v1 # install dependencies using cache
+      - name: Run Build all affected apps and libs
+        uses: yarn affected:build --base=$BEFORE_SHA
+
+

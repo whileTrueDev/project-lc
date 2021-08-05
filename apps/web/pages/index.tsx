@@ -1,18 +1,7 @@
-import {
-  Navbar,
-  Features,
-  TestComponent,
-  ColorModeSwitcher,
-  CommonFooter,
-} from '@project-lc/components';
 import { Box, Flex } from '@chakra-ui/react';
+import { CommonFooter, Features, Navbar, TestComponent } from '@project-lc/components';
 
 export function Index() {
-  /*
-   * Replace the elements below with your own.
-   *
-   * Note: The corresponding styles are in the ./index.css file.
-   */
   return (
     <div>
       <Navbar />

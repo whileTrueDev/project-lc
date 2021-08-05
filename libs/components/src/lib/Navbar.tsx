@@ -125,6 +125,7 @@ const DesktopNav = () => {
               >
                 <Stack>
                   {navItem.children.map((child) => (
+                    // eslint-disable-next-line react/jsx-props-no-spreading
                     <DesktopSubNav key={child.label} {...child} />
                   ))}
                 </Stack>
@@ -174,6 +175,7 @@ const MobileNav = () => {
   return (
     <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
       {NAV_ITEMS.map((navItem) => (
+        // eslint-disable-next-line react/jsx-props-no-spreading
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
     </Stack>

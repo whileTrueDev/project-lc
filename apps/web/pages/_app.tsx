@@ -11,6 +11,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
       <div className="app">
         <ChakraProvider theme={theme}>
           <main>
+            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
             <Component {...pageProps} />
           </main>
         </ChakraProvider>
