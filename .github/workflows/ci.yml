@@ -12,7 +12,7 @@ jobs:
       - name: Install Dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
       - name: Check Lint all affected apps and libs
-        run: yarn affected:lint --base="${GITHUB_BASE_REF}"
+        run: yarn affected:lint --base="origin/${GITHUB_BASE_REF}"
   Test:
     name: Test Job
     runs-on: ubuntu-latest
@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
       - name: Run tests all affected apps and libs
-        run: yarn affected:test --base="${GITHUB_BASE_REF}"
+        run: yarn affected:test --base="${GITHUB_REF}"
   # e2eTest:
   #   name: E2ETest Job
   #   runs-on: ubuntu-latest
@@ -42,6 +42,6 @@ jobs:
       - name: Install Dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
       - name: Run Build all affected apps and libs
-        run: yarn affected:build --base="${GITHUB_BASE_REF}"
+        run: yarn affected:build --base=${{ github.event.pull_request.base.ref }}
 
 
