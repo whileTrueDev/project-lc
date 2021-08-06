@@ -38,7 +38,7 @@ jobs:
 
   DeployAPI:
     name: Deploy API Job
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, project-lc-dev]
     needs: [Build]
     steps:
       - name: Checkout
@@ -85,7 +85,7 @@ jobs:
 
   DeploySocket:
     name: Deploy Socket Job
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, project-lc-dev]
     needs: [Build]
     steps:
       - name: Checkout
