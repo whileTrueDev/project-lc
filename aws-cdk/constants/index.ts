@@ -17,6 +17,10 @@ export const constants = {
      */
     ECS_DATABASE_URL_KEY: 'LC_DEV_DB_URL',
     /**
+     * 퍼스트몰 데이터베이스 SSM Parameter 키
+     */
+    FIRSTMALL_DATABASE_URL_KEY: 'LC_FIRSTMALL_DB_URL',
+    /**
      * API 서버 cloudwatch log group 명
      */
     ECS_API_LOG_GLOUP_NAME: '/ecs/project-lc-api-dev',
@@ -44,6 +48,10 @@ export const constants = {
      * VPC Subnet 인그레스 서브넷 그룹 명
      */
     INGRESS_SUBNET_GROUP_NAME: 'Ingress Subnet',
+    /**
+     * VPC Subnet 프라이빗 서브넷 그룹 명
+     */
+    PRIVATE_SUBNET_GROUP_NAME: 'Private Subnet',
     /**
      * VPC Subnet ISOLATED 서브넷 그룹 명
      */

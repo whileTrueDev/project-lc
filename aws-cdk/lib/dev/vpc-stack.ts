@@ -8,6 +8,7 @@ const ID_PREFIX = 'LC-DEV-';
 
 export class LCDevVpcStack extends cdk.Stack {
   public readonly vpc: ec2.Vpc;
+  public albSecGrp: ec2.SecurityGroup;
   public dbSecGrp: ec2.SecurityGroup;
   public apiSecGrp: ec2.SecurityGroup;
   public socketSecGrp: ec2.SecurityGroup;
@@ -20,8 +21,8 @@ export class LCDevVpcStack extends cdk.Stack {
     // *********************************************
     // * vpc
     this.vpc = new ec2.Vpc(this, `${ID_PREFIX}Vpc`, {
-      cidr: '10.0.0.0/24',
-      natGateways: 0,
+      cidr: '10.0.0.0/16',
+      natGateways: 1,
       maxAzs: 2,
       subnetConfiguration: [
         {
@@ -29,15 +30,29 @@ export class LCDevVpcStack extends cdk.Stack {
           name: constants.DEV.INGRESS_SUBNET_GROUP_NAME,
         },
         {
-          subnetType: ec2.SubnetType.ISOLATED,
-          name: constants.DEV.ISOLATED_SUBNET_GROUP_NAME,
+          subnetType: ec2.SubnetType.PRIVATE,
+          name: constants.DEV.PRIVATE_SUBNET_GROUP_NAME,
         },
       ],
     });
 
+    this.createAlbSecGrp();
     const apiSecGrp = this.createApiSecGrp();
     const socketSecGrp = this.createSocketSecGrp();
     this.createDbSecGrp(apiSecGrp, socketSecGrp);
+  }
+
+  private createAlbSecGrp() {
+    this.albSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}ALB-SecGrp`, {
+      vpc: this.vpc,
+      description: 'ALB security group for project-lc',
+      allowAllOutbound: true,
+    });
+
+    this.albSecGrp.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80), 'Allow 80 to all');
+    this.albSecGrp.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443), 'Allow 443 to all');
+
+    return this.albSecGrp;
   }
 
   private createDbSecGrp(apiSecGrp: ec2.SecurityGroup, socketSecGrp: ec2.SecurityGroup) {
@@ -66,7 +81,11 @@ export class LCDevVpcStack extends cdk.Stack {
     );
 
     this.dbSecGrp.addIngressRule(
-      ec2.SecurityGroup.fromSecurityGroupId(this, 'FindBuilderSgId', 'sg-018ad88ec19a7a179'),
+      new ec2.SecurityGroup(this, `${ID_PREFIX}BuilderSecGrp`, {
+        vpc: this.vpc,
+        description: 'github actions builder security group',
+        allowAllOutbound: true,
+      }),
       ec2.Port.tcp(3306),
       'Allow github actions builder',
     );
@@ -82,7 +101,7 @@ export class LCDevVpcStack extends cdk.Stack {
     });
 
     this.apiSecGrp.addIngressRule(
-      ec2.Peer.anyIpv4(),
+      this.albSecGrp,
       ec2.Port.tcp(3000),
       'allow port 3000 to anywhere',
     );
@@ -98,7 +117,7 @@ export class LCDevVpcStack extends cdk.Stack {
     });
 
     this.socketSecGrp.addIngressRule(
-      ec2.Peer.anyIpv4(),
+      this.albSecGrp,
       ec2.Port.tcp(3002),
       'allow port 3002 to anywhere',
     );

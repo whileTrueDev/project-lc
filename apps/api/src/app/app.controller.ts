@@ -11,6 +11,11 @@ export class AppController {
   ) {}
 
   @Get()
+  healthCheck() {
+    return 'alive';
+  }
+
+  @Get('goods')
   getData() {
     return this.firstmallGoods.findAll();
   }
