@@ -109,7 +109,7 @@
 			"export interface ${TM_FILENAME_BASE}Dto {",
 			"  _field: 'default field';",
 			"}",
-			"type ${TM_FILENAME_BASE}Res = ${3:boolean};",
+			"export type ${TM_FILENAME_BASE}Res = ${3:boolean};",
 			"",
 			"export const ${TM_FILENAME_BASE} = () => {",
 			"  return useMutation((dto: ${TM_FILENAME_BASE}Dto) =>",
