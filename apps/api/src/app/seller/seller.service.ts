@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, PrismaClient, Seller } from '@prisma/client';
+import { Prisma, Seller } from '@prisma/client';
 import argon from 'argon2';
+import { PrismaService } from '../../../../../libs/prisma-orm/src';
 
 @Injectable()
 export class SellerService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * 회원 가입
