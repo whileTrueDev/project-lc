@@ -11,28 +11,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           Int            @id @default(autoincrement())
-  email        String         @unique
-  name         String?
-  posts        Post[]
-  Notification Notification[]
-}
-
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean? @default(false)
-  authorId  Int?
-  author    User?    @relation(fields: [authorId], references: [id])
-}
-
-model Notification {
-  id        Int      @id @default(autoincrement())
-  title     String
-  userId    Int
-  contents  String   @default("")
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
+model Seller {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  password String
 }
