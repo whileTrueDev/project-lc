@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
+import { PrismaService } from '@project-lc/prisma-orm';
 import argon from 'argon2';
-import { PrismaService } from '../../../../../libs/prisma-orm/src';
 
 @Injectable()
 export class SellerService {
@@ -12,13 +12,14 @@ export class SellerService {
    */
   async signUp(signUpInput: Prisma.SellerCreateInput): Promise<Seller> {
     const hashedPw = await this.hashPassword(signUpInput.password);
-    return this.prisma.seller.create({
+    const seller = await this.prisma.seller.create({
       data: {
         email: signUpInput.email,
         name: signUpInput.name,
         password: hashedPw,
       },
     });
+    return seller;
   }
 
   /**
@@ -36,6 +37,17 @@ export class SellerService {
     });
 
     return seller;
+  }
+
+  /**
+   * 이메일 주소가 중복되는 지 체크합니다.
+   * @param email 중복체크할 이메일 주소
+   * @returns {boolean} 중복되지않아 괜찮은 경우 true, 중복된 경우 false
+   */
+  async isEmailDupCheckOk(email: string) {
+    const user = await this.prisma.seller.findFirst({ where: { email } });
+    if (user) return false;
+    return true;
   }
 
   /**
