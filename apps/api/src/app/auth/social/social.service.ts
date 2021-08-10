@@ -21,6 +21,17 @@ export class SocialService {
     return row;
   }
 
+  async findSocialAccountWithServiceId(serviceId: string, provider: string) {
+    const row = await this.prisma.socialAccount.findFirst({
+      where: {
+        serviceId,
+        provider,
+      },
+      include: { seller: true },
+    });
+    return row;
+  }
+
   async registSeller(sellerCreateInput: Prisma.SellerCreateInput) {
     const newSeller = await this.prisma.seller.create({
       data: sellerCreateInput,
@@ -38,6 +49,16 @@ export class SocialService {
     };
   }
 
+  async googleLoginTest(req) {
+    if (!req.user) {
+      // 해당 구글 계정이 없음(에러)
+      throw new BadRequestException('해당 구글 계정이 존재하지 않습니다');
+    }
+
+    const reqUser: GoogleProfile = req.user;
+    return reqUser;
+  }
+
   /** 구글 로그인 */
   async googleLogin(req) {
     if (!req.user) {
@@ -47,7 +68,13 @@ export class SocialService {
 
     const reqUser: GoogleProfile = req.user;
 
-    // 동일 email로 가입된 계정이 있는지 확인
+    // 구글 아이디로 가입된 Seller(user)있는지 확인
+    const existSocialAccount = await this.findSocialAccountWithServiceId(
+      reqUser.id,
+      'google',
+    );
+
+    // 해당 이메일로 가입된 유저 확인
     const existSeller = await this.findSellerWithEmail(reqUser.email);
 
     // 해당 email로 가입된 계정이 존재하지않으면 구글계정으로 가입(회원가입)
@@ -55,23 +82,32 @@ export class SocialService {
       const seller = {
         email: reqUser.email,
         name: reqUser.name,
-        password: null,
+        password: '',
         socialAccounts: {
           create: {
             serviceId: reqUser.id,
-            service: 'google',
+            provider: 'google',
             name: reqUser.name,
             profileImage: reqUser.picture,
           },
         },
       };
-      await this.registSeller(seller); // 회원강
+      await this.registSeller(seller); // 회원가입 후 로그인 처리
+      // 로그인처리
+      const newSeller = await this.prisma.seller.findUnique({
+        where: { email: reqUser.email },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          socialAccounts: true,
+        },
+      });
+      return this.login(newSeller);
     }
 
-    // 해당 email로 가입된 계정 존재하나 구글계정 등록 안되어있는 경우 구글계정 추가
-    const services = existSeller.socialAccounts.map((account) => account.service);
-    if (!services.includes('google')) {
-      // 구글계정 레코드 생성 & seller에 등록
+    // 구글계정 등록 안되어있는 경우 구글계정 추가
+    if (!existSocialAccount) {
       await this.prisma.seller.update({
         where: {
           email: existSeller.email,
@@ -80,7 +116,7 @@ export class SocialService {
           socialAccounts: {
             create: {
               serviceId: reqUser.id,
-              service: 'google',
+              provider: 'google',
               name: reqUser.name,
               profileImage: reqUser.picture,
             },
@@ -88,7 +124,6 @@ export class SocialService {
         },
       });
     }
-
     // 로그인처리
     const seller = await this.prisma.seller.findUnique({
       where: { email: reqUser.email },

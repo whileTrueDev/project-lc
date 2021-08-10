@@ -28,10 +28,12 @@ model MailVerificationCode {
 
 model SocialAccount {
   serviceId    String   @id // 인증 결과로 해당 서비스에서 받은 고유 식별자
-  service      String // 'google' | 'kakao' | 'naver'
+  provider     String // 'google' | 'kakao' | 'naver'
   name         String
-  profileImage String?
   registDate   DateTime @default(now())
-  seller       Seller?  @relation(fields: [sellerId], references: [id])
-  sellerId     Int?
+  profileImage String?
+  accessToken  String?
+  refreshToken String?
+  seller       Seller   @relation(fields: [sellerId], references: [id])
+  sellerId     Int
 }
