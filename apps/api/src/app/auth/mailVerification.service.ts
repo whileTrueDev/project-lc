@@ -34,7 +34,7 @@ export class MailVerificationService {
    * 메일인증을 삭제합니다. 회원가입이 완료된 이후 진행하여야 합니다.
    * @param id 삭제할 메일 인증의 고유 아이디
    */
-  public deleteSuccessedMailVerification(id: MailVerificationCode['id']) {
-    return this.prisma.mailVerificationCode.delete({ where: { id } });
+  public deleteSuccessedMailVerification(email: MailVerificationCode['email']) {
+    return this.prisma.mailVerificationCode.deleteMany({ where: { email } });
   }
 }

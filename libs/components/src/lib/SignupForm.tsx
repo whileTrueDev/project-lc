@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Divider,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -115,7 +116,7 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
         p={8}
       >
         <Stack>
-          <Heading fontSize="4xl">[서비스명] 시작하기</Heading>
+          <Heading fontSize="3xl">[서비스명] 시작하기</Heading>
           <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')} mt={2}>
             캐치프레이즈 자리입니다.
           </Text>
@@ -184,7 +185,10 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
               <FormLabel htmlFor="code">
                 이메일 인증 코드
                 <Text fontSize="sm" color="gray.500">
-                  {`${getValues('email')}로 인증코드를 보냈습니다!`}
+                  {`${getValues('email')}로 인증코드가 전송되었습니다!`}
+                </Text>
+                <Text fontSize="sm" color="gray.500">
+                  인증코드는 6자의 무작위 글자로 이루어져 있습니다.
                 </Text>
               </FormLabel>
               <Input
@@ -196,32 +200,31 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
                   required: '인증 코드를 입력해주세요.',
                   minLength: {
                     value: 6,
-                    message: '인증코드는 6자의 무작위 글자로 이루어져 있습니다.',
+                    message: '인증코드는 6자 입니다.',
                   },
                   maxLength: {
                     value: 6,
-                    message: '인증코드는 6자의 무작위 글자로 이루어져 있습니다.',
+                    message: '인증코드는 6자 입니다.',
                   },
                 })}
               />
               <FormErrorMessage>{errors.code && errors.code.message}</FormErrorMessage>
-              {(!getValues('code') || errors.code) && (
-                <Box>
-                  <Text fontSize="sm" color="gray.500">
-                    인증번호가 올바르게 도착하지 않았나요?
-                  </Text>
-                  <Button
-                    size="sm"
-                    isDisabled={tempVerifyButtonDisable}
-                    isLoading={mailVerification.isLoading}
-                    onClick={() => {
-                      startMailVerification(getValues('email')).then(disableVerifyButton);
-                    }}
-                  >
-                    재전송
-                  </Button>
-                </Box>
-              )}
+              <Flex alignItems="center" my={1}>
+                <Text fontSize="sm" color="gray.500">
+                  인증번호가 올바르게 도착하지 않았나요?
+                </Text>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  isDisabled={tempVerifyButtonDisable}
+                  isLoading={mailVerification.isLoading}
+                  onClick={() => {
+                    startMailVerification(getValues('email')).then(disableVerifyButton);
+                  }}
+                >
+                  재전송
+                </Button>
+              </Flex>
             </FormControl>
           )}
           <Divider />
