@@ -14,7 +14,8 @@ export class SellerService {
     const hashedPw = await this.hashPassword(signUpInput.password);
     return this.prisma.seller.create({
       data: {
-        ...signUpInput,
+        email: signUpInput.email,
+        name: signUpInput.name,
         password: hashedPw,
       },
     });
@@ -26,6 +27,12 @@ export class SellerService {
   async findOne(findInput: Prisma.SellerWhereUniqueInput) {
     const seller = await this.prisma.seller.findUnique({
       where: findInput,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        password: false,
+      },
     });
 
     return seller;

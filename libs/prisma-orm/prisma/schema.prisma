@@ -17,3 +17,10 @@ model Seller {
   name     String?
   password String
 }
+
+model MailVerificationCode {
+  id               Int      @id @default(autoincrement())
+  email            String   @default("")
+  verificationCode String
+  createDate       DateTime @default(now())
+}
