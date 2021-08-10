@@ -15,7 +15,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { SignUpSellerDto } from '@project-lc/shared-types';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   getEmailDupCheck,
@@ -41,9 +41,25 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
 
   // * 인증코드 페이즈
   const [phase, setPhase] = useState(1);
-  // 인증코드 메일 보내기 mutation 요청
+
+  // * 인증 코드 이메일 전송
   const mailVerification = useMailVerificationMutation();
-  const checkValidation = async () => {
+  const startMailVerification = useCallback(
+    async (email: string) => {
+      return mailVerification.mutateAsync({ email }).catch((err) => {
+        toast({
+          title: '회원가입 오류 알림',
+          description:
+            '이메일 확인을 위한 인증번호를 보내는 중, 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          status: 'error',
+        });
+      });
+    },
+    [mailVerification, toast],
+  );
+
+  // * 인증코드 메일 보내기 mutation 요청
+  const checkValidation = useCallback(async () => {
     const isValid = await trigger();
     if (isValid) {
       const email = getValues('email');
@@ -55,36 +71,40 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
           message: '이미 가입된 이메일 주소입니다.',
         });
       } else {
-        // * 인증 코드 이메일 전송
-        const isSuccess = await mailVerification.mutateAsync({ email });
-        if (isSuccess) setPhase(2);
-        else {
-          toast({
-            title: '회원가입 오류 알림',
-            description:
-              '이메일 확인을 위한 인증번호를 보내는 중, 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-            status: 'error',
-          });
-        }
+        startMailVerification(email).then(() => {
+          setPhase(2);
+        });
       }
     }
-  };
+  }, [getValues, setError, startMailVerification, trigger]);
+
+  // * 재전송 버튼 10초간 재클릭 불가능하도록 하는 기능
+  const [tempVerifyButtonDisable, setTempVerifyButtonDisable] = useState(false);
+  const disableVerifyButton = useCallback(() => {
+    setTempVerifyButtonDisable(true);
+    setTimeout(() => {
+      setTempVerifyButtonDisable(false);
+    }, 15 * 1000);
+  }, []);
 
   // * 회원가입 핸들러
   const signup = useSellerSignupMutation();
-  const onSubmit = async (data: SignUpSellerDto) => {
-    const seller = await signup.mutateAsync(data).catch((err) => {
-      // eslint-disable-next-line no-console
-      console.error(err.response);
-      setError('code', {
-        type: 'validate',
-        message: err?.response.data?.message || err.message,
+  const onSubmit = useCallback(
+    async (data: SignUpSellerDto) => {
+      const seller = await signup.mutateAsync(data).catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error(err.response);
+        setError('code', {
+          type: 'validate',
+          message: err?.response.data?.message || err.message,
+        });
       });
-    });
-    if (seller) {
-      router.push('/');
-    }
-  };
+      if (seller) {
+        router.push('/');
+      }
+    },
+    [router, setError, signup],
+  );
 
   return (
     <Stack spacing={8} mx="auto" maxW="lg" w="100%">
@@ -190,7 +210,16 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
                   <Text fontSize="sm" color="gray.500">
                     인증번호가 올바르게 도착하지 않았나요?
                   </Text>
-                  <Button size="sm">재전송</Button>
+                  <Button
+                    size="sm"
+                    isDisabled={tempVerifyButtonDisable}
+                    isLoading={mailVerification.isLoading}
+                    onClick={() => {
+                      startMailVerification(getValues('email')).then(disableVerifyButton);
+                    }}
+                  >
+                    재전송
+                  </Button>
                 </Box>
               )}
             </FormControl>
