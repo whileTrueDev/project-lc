@@ -4,9 +4,11 @@ import {
   Get,
   Post,
   Req,
+  Res,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { SendMailVerificationDto } from '@project-lc/shared-types';
 import { MailService } from '../mail/mail.service';
@@ -35,7 +37,10 @@ export class AuthController {
 
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
-  googleAuthCallback(@Req() req) {
-    return this.socialService.googleLogin(req);
+  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+    const { accessToken, refreshToken } = await this.socialService.login(req.user);
+    res.cookie('accessToken', accessToken);
+    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+    res.redirect('/front/mypage'); // TODO: front mypage로 리다이렉션
   }
 }
