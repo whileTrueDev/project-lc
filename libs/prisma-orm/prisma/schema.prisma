@@ -12,11 +12,11 @@ datasource db {
 }
 
 model Seller {
-  id             Int             @id @default(autoincrement())
-  email          String          @unique
+  id             Int                   @id @default(autoincrement())
+  email          String                @unique
   name           String?
   password       String
-  socialAccounts SocialAccount[]
+  socialAccounts SellerSocialAccount[]
 }
 
 model MailVerificationCode {
@@ -26,7 +26,7 @@ model MailVerificationCode {
   createDate       DateTime @default(now())
 }
 
-model SocialAccount {
+model SellerSocialAccount {
   serviceId    String   @id // 인증 결과로 해당 서비스에서 받은 고유 식별자
   provider     String // 'google' | 'kakao' | 'naver'
   name         String
