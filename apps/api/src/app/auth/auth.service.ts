@@ -14,10 +14,18 @@ export class AuthService {
    * @param email 입력한 이메일 문자열
    * @returns {UserPayload} User 인터페이스 객체
    */
-  async validateUser(email: string): Promise<Seller> {
+  async validateUser(email: string, password: string): Promise<Seller> {
     const user = await this.sellerService.findOne({ email });
+    if (!user) {
+      return null;
+    }
+
+    const isCorrect = await this.validatePassword(password, user.password);
+    if (!isCorrect) {
+      return null;
+    }
+
     return user;
-    // return { email: user.email, password: user.password, type: 'seller' };
   }
 
   /**

@@ -15,21 +15,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   // 사용자에 따라서 데이터 다른 동작을 하도록 해야한다.
-  async validate(email: string, pwdInput: string): Promise<SellerPayload> {
-    const user = await this.authService.validateUser(email);
+  async validate(email: string, password: string): Promise<SellerPayload> {
+    const user = await this.authService.validateUser(email, password);
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    const passwordCheck = await this.authService.validatePassword(
-      pwdInput,
-      user.password,
-    );
-    if (!passwordCheck) {
-      throw new UnauthorizedException();
-    }
-
-    const { password, ...payload } = user;
-    return payload;
+    return user;
   }
 }
