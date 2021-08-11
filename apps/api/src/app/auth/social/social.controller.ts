@@ -37,6 +37,11 @@ export class SocialController {
     res.redirect(this.frontMypageUrl);
   }
 
+  @Delete('/google/unlink/:googleId')
+  async googleUnlink(@Param('googleId') googleId: string) {
+    return this.socialService.googleUnlink(googleId);
+  }
+
   /** 네이버 ************************************************ */
   @Get('/naver/login')
   @UseGuards(AuthGuard('naver'))
@@ -53,6 +58,11 @@ export class SocialController {
     res.cookie('accessToken', accessToken);
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
     res.redirect(this.frontMypageUrl);
+  }
+
+  @Delete('/naver/unlink/:naverId')
+  async naverUnlink(@Param('naverId') naverId: string) {
+    return this.socialService.naverUnlink(naverId);
   }
 
   /** 카카오 ************************************************ */

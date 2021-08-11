@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Seller, SellerSocialAccount } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import axios from 'axios';
@@ -13,7 +14,10 @@ export type SellerWithSocialAccounts = Omit<Seller, 'password'> & {
 
 @Injectable()
 export class SocialService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
 
   /**
    * 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 셀러 계정정보 찾기
@@ -139,7 +143,85 @@ export class SocialService {
         await this.prisma.sellerSocialAccount.delete({
           where: { serviceId: kakaoId },
         });
-        return true; // 연동된 SellerId(number) 반환
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  /** 네이버 계정연동 해제 && 네이버 계정 레코드 삭제 */
+  async naverUnlink(naverId: string) {
+    const socialAccount = await this.findSocialAccountIncludeSeller({
+      provider: 'naver',
+      serviceId: naverId,
+    });
+    if (!socialAccount) {
+      throw new BadRequestException(
+        `해당 naverId로 연동된 계정이 존재하지 않음 naverId: ${naverId}`,
+      );
+    }
+
+    const naverAccessToken = socialAccount.accessToken;
+    // 네이버 계정연동 해제 요청
+    try {
+      const result = await axios.get('https://nid.naver.com/oauth2.0/token', {
+        params: {
+          client_id: this.configService.get('NAVER_CLIENT_ID'),
+          client_secret: this.configService.get('NAVER_CLIENT_SECRET'),
+          access_token: encodeURI(naverAccessToken),
+          grant_type: 'delete',
+          service_provider: 'naver',
+        },
+      });
+
+      if (result.status === 200 && result.data.result === 'success') {
+        // socialAccount에서 삭제
+        await this.prisma.sellerSocialAccount.delete({
+          where: { serviceId: naverId },
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  /** 구글 계정 연동 해제 && 구글 계정 레코드 삭제 */
+  async googleUnlink(googleId: string) {
+    const socialAccount = await this.findSocialAccountIncludeSeller({
+      provider: 'google',
+      serviceId: googleId,
+    });
+    if (!socialAccount) {
+      throw new BadRequestException(
+        `해당 googleId로 연동된 계정이 존재하지 않음 googleId: ${googleId}`,
+      );
+    }
+
+    // TODO: accessToken 만료되었는지 확인하고 재발급받기
+    const googleAccessToken = socialAccount.accessToken;
+    // 구글 계정연동 해제 요청
+    try {
+      const result = await axios.post('https://oauth2.googleapis.com/revoke', undefined, {
+        params: {
+          token: encodeURI(googleAccessToken),
+        },
+        headers: {
+          'Content-type': 'application/x-www-form-urlencoded',
+        },
+      });
+
+      if (result.status === 200) {
+        // socialAccount에서 삭제
+        await this.prisma.sellerSocialAccount.delete({
+          where: { serviceId: googleId },
+        });
+        return true;
       }
       return false;
     } catch (error) {
