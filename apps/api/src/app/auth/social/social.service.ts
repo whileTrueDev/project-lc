@@ -5,17 +5,6 @@ import { PrismaService } from '@project-lc/prisma-orm';
 export class SocialService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // TODO: id/pw 로그인과 동일한 로직일경우 수정하기
-  async login(user) {
-    console.log('토큰발급 & 저장하는 로그인 처리 - 유저정보 : ', { user });
-    // TODO: 토큰 발급
-    // TODO: 토큰 저장
-    return {
-      accessToken: '가짜토큰',
-      refreshToken: '가짜 리프레시 토큰',
-    };
-  }
-
   /**
    * 해당 구글 계정 소유하는 seller 찾거나 생성하여 반환
    * googleStrategy validate함수에서 사용

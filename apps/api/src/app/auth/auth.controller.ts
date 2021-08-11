@@ -13,14 +13,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { SendMailVerificationDto } from '@project-lc/shared-types';
 import { MailService } from '../mail/mail.service';
 import { MailVerificationService } from './mailVerification.service';
-import { SocialService } from './social/social.service';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly mailVerificationService: MailVerificationService,
     private readonly mailService: MailService,
-    private readonly socialService: SocialService,
+    private readonly authService: AuthService,
   ) {}
 
   // * 인증코드 메일 전송
@@ -38,7 +38,7 @@ export class AuthController {
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const { accessToken, refreshToken } = await this.socialService.login(req.user);
+    const { accessToken, refreshToken } = await this.authService.login(req.user);
     res.cookie('accessToken', accessToken);
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
     res.redirect('/front/mypage'); // TODO: front mypage로 리다이렉션
