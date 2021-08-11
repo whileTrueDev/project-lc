@@ -11,10 +11,42 @@ export class SocialService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * 해당 구글 계정 소유하는 seller 찾거나 생성하여 반환
+   * 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 셀러 계정정보 찾기
+   */
+  async findSellerBySocialAccount({
+    provider,
+    serviceId,
+  }: {
+    provider: string;
+    serviceId: string;
+  }) {
+    return this.prisma.sellerSocialAccount.findFirst({
+      where: { serviceId, provider },
+      include: { seller: true },
+    });
+  }
+
+  /** 셀러의 id나 email로 셀러의 소셜계정 포함한 정보 조회하기 */
+  async findSellerIncludeSocialAccount({ id, email }: { id?: number; email?: string }) {
+    if (!id && !email) {
+      throw Error('id나 email 중 하나를 입력해야 합니다');
+    }
+    const select = { id: true, email: true, name: true, socialAccounts: true };
+    if (id) {
+      return this.prisma.seller.findUnique({
+        where: { id },
+        select,
+      });
+    }
+    return this.prisma.seller.findUnique({
+      where: { email },
+      select,
+    });
+  }
+
+  /**
+   * 해당 소셜서비스 계정 소유하는 seller 찾거나 생성하여 반환
    * googleStrategy validate함수에서 사용
-   * @param param0
-   * @returns
    */
   async findOrCreateSeller({
     id,
@@ -33,13 +65,12 @@ export class SocialService {
     accessToken: string;
     refreshToken?: string;
   }): Promise<SellerWithSocialAccounts> {
-    // 해당 social service 계정으로 가입된 셀러 찾기
-    const socialAccount = await this.prisma.sellerSocialAccount.findFirst({
-      where: { serviceId: id, provider },
-      include: { seller: true },
+    const sellerHoldingSocialAccount = await this.findSellerBySocialAccount({
+      provider,
+      serviceId: id,
     });
 
-    if (!socialAccount) {
+    if (!sellerHoldingSocialAccount) {
       // 해당 social service 계정 없는경우
       // email로 셀러찾기 혹은 만들기
       const googleAccountCreateInput = {
@@ -66,16 +97,10 @@ export class SocialService {
           },
         },
       });
-      return this.prisma.seller.findUnique({
-        where: { id: createdSeller.id },
-        select: { id: true, email: true, name: true, socialAccounts: true },
-      });
+      return this.findSellerIncludeSocialAccount({ id: createdSeller.id });
     }
-
-    const test = await this.prisma.seller.findUnique({
-      where: { id: socialAccount.seller.id },
-      select: { id: true, email: true, name: true, socialAccounts: true },
+    return this.findSellerIncludeSocialAccount({
+      id: sellerHoldingSocialAccount.seller.id,
     });
-    return test;
   }
 }
