@@ -25,7 +25,9 @@ export class AuthController {
 
   // * 인증코드 메일 전송
   @Post('mail-verification')
-  sendMailVerification(@Body(ValidationPipe) dto: SendMailVerificationDto) {
+  sendMailVerification(
+    @Body(ValidationPipe) dto: SendMailVerificationDto,
+  ): Promise<boolean> {
     return this.mailService.sendVerificationMail(dto.email);
   }
 

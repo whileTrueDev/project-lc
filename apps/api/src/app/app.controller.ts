@@ -18,9 +18,4 @@ export class AppController {
   getData() {
     return this.firstmallGoods.findAll();
   }
-
-  @Get('mailtest')
-  mail() {
-    return this.mailService.sendVerificationMail();
-  }
 }
