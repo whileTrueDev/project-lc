@@ -1,14 +1,28 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from '../auth.service';
-
+import { SocialService } from './social.service';
 @Controller('auth/social')
 export class SocialController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly socialService: SocialService,
+  ) {}
+
   private readonly frontMypageUrl = 'http://localhost:3000/'; // TODO: front mypage로 리다이렉션
 
-  /** 구글 로그인 ************************************************ */
+  /** 구글 ************************************************ */
   @Get('/google/login')
   @UseGuards(AuthGuard('google'))
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -23,7 +37,7 @@ export class SocialController {
     res.redirect(this.frontMypageUrl);
   }
 
-  /** 네이버 로그인 ************************************************ */
+  /** 네이버 ************************************************ */
   @Get('/naver/login')
   @UseGuards(AuthGuard('naver'))
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -41,7 +55,7 @@ export class SocialController {
     res.redirect(this.frontMypageUrl);
   }
 
-  /** 카카오 로그인 ************************************************ */
+  /** 카카오 ************************************************ */
   @Get('/kakao/login')
   @UseGuards(AuthGuard('kakao'))
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -57,5 +71,10 @@ export class SocialController {
     res.cookie('accessToken', accessToken);
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
     res.redirect(this.frontMypageUrl);
+  }
+
+  @Delete('/kakao/unlink/:kakaoId')
+  async kakaoUnlink(@Param('kakaoId') kakaoId: string) {
+    return this.socialService.kakaoUnlink(kakaoId);
   }
 }

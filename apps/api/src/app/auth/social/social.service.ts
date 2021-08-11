@@ -1,6 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Seller, SellerSocialAccount } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
+import axios from 'axios';
 
 export type SellerWithSocialAccounts = Omit<Seller, 'password'> & {
   socialAccounts: SellerSocialAccount[];
@@ -13,7 +18,7 @@ export class SocialService {
   /**
    * 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 셀러 계정정보 찾기
    */
-  async findSellerBySocialAccount({
+  async findSocialAccountIncludeSeller({
     provider,
     serviceId,
   }: {
@@ -65,12 +70,12 @@ export class SocialService {
     accessToken: string;
     refreshToken?: string;
   }): Promise<SellerWithSocialAccounts> {
-    const sellerHoldingSocialAccount = await this.findSellerBySocialAccount({
+    const socialAccountWithSeller = await this.findSocialAccountIncludeSeller({
       provider,
       serviceId: id,
     });
 
-    if (!sellerHoldingSocialAccount) {
+    if (!socialAccountWithSeller) {
       // 해당 social service 계정 없는경우
       // email로 셀러찾기 혹은 만들기
       const googleAccountCreateInput = {
@@ -100,7 +105,46 @@ export class SocialService {
       return this.findSellerIncludeSocialAccount({ id: createdSeller.id });
     }
     return this.findSellerIncludeSocialAccount({
-      id: sellerHoldingSocialAccount.seller.id,
+      id: socialAccountWithSeller.seller.id,
     });
+  }
+
+  /** 카카오 계정 연동해제 & 카카오 소셜계정 레코드 삭제 */
+  async kakaoUnlink(kakaoId) {
+    const socialAccount = await this.findSocialAccountIncludeSeller({
+      provider: 'kakao',
+      serviceId: kakaoId,
+    });
+    if (!socialAccount) {
+      throw new BadRequestException(
+        `해당 kakaoId로 연동된 계정이 존재하지 않음 kakaoId: ${kakaoId}`,
+      );
+    }
+
+    const kakaoAccessToken = socialAccount.accessToken;
+    // 카카오 계정연동 해제 요청
+    try {
+      const result = await axios.post(
+        'https://kapi.kakao.com/v1/user/unlink',
+        undefined,
+        {
+          headers: {
+            Authorization: `Bearer ${kakaoAccessToken}`,
+          },
+        },
+      );
+
+      if (result.status === 200) {
+        // socialAccount에서 삭제
+        await this.prisma.sellerSocialAccount.delete({
+          where: { serviceId: kakaoId },
+        });
+        return true; // 연동된 SellerId(number) 반환
+      }
+      return false;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 }
