@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { Seller, SellerSocialAccount } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
+
+export type SellerWithSocialAccounts = Omit<Seller, 'password'> & {
+  socialAccounts: SellerSocialAccount[];
+};
 
 @Injectable()
 export class SocialService {
@@ -27,25 +32,25 @@ export class SocialService {
     picture: string;
     accessToken: string;
     refreshToken?: string;
-  }) {
-    // google 계정으로 가입된 셀러
+  }): Promise<SellerWithSocialAccounts> {
+    // 해당 social service 계정으로 가입된 셀러 찾기
     const socialAccount = await this.prisma.sellerSocialAccount.findFirst({
       where: { serviceId: id, provider },
       include: { seller: true },
     });
 
     if (!socialAccount) {
-      // 해당 구글계정 없는경우
+      // 해당 social service 계정 없는경우
       // email로 셀러찾기 혹은 만들기
       const googleAccountCreateInput = {
         serviceId: id,
-        provider: 'google',
+        provider,
         name,
         profileImage: picture,
         accessToken,
         refreshToken,
       };
-      await this.prisma.seller.upsert({
+      const createdSeller = await this.prisma.seller.upsert({
         where: { email },
         update: {
           socialAccounts: {
@@ -61,12 +66,16 @@ export class SocialService {
           },
         },
       });
+      return this.prisma.seller.findUnique({
+        where: { id: createdSeller.id },
+        select: { id: true, email: true, name: true, socialAccounts: true },
+      });
     }
 
-    // 구글 계정 가진 셀러 반환
-    return this.prisma.seller.findUnique({
-      where: { email },
-      select: { name: true, email: true, socialAccounts: true },
+    const test = await this.prisma.seller.findUnique({
+      where: { id: socialAccount.seller.id },
+      select: { id: true, email: true, name: true, socialAccounts: true },
     });
+    return test;
   }
 }
