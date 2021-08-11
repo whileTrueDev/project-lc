@@ -5,7 +5,6 @@ import { PrismaModule } from '@project-lc/prisma-orm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SellerModule } from './seller/seller.module';
-import { MailModule } from './mail/mail.module';
 import { mailerConfig } from '../settings/mailer.config';
 import { AuthModule } from './auth/auth.module';
 
@@ -15,7 +14,6 @@ import { AuthModule } from './auth/auth.module';
     FirstmallDbModule,
     SellerModule,
     PrismaModule,
-    MailModule,
     AuthModule,
   ],
   controllers: [AppController],

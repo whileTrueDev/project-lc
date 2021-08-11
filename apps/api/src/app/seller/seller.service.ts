@@ -25,7 +25,9 @@ export class SellerService {
   /**
    * 유저 정보 조회
    */
-  async findOne(findInput: Prisma.SellerWhereUniqueInput) {
+  async findOne(
+    findInput: Prisma.SellerWhereUniqueInput,
+  ): Promise<Omit<Seller, 'password'>> {
     const seller = await this.prisma.seller.findUnique({
       where: findInput,
       select: {
@@ -44,7 +46,7 @@ export class SellerService {
    * @param email 중복체크할 이메일 주소
    * @returns {boolean} 중복되지않아 괜찮은 경우 true, 중복된 경우 false
    */
-  async isEmailDupCheckOk(email: string) {
+  async isEmailDupCheckOk(email: string): Promise<boolean> {
     const user = await this.prisma.seller.findFirst({ where: { email } });
     if (user) return false;
     return true;
