@@ -9,6 +9,7 @@ import { SellerModule } from './seller/seller.module';
 import { MailModule } from './mail/mail.module';
 import { mailerConfig } from '../settings/mailer.config';
 import { AuthModule } from './auth/auth.module';
+import { SocialModule } from './auth/social/social.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AuthModule } from './auth/auth.module';
     MailModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    SocialModule,
   ],
   controllers: [AppController],
   providers: [AppService],

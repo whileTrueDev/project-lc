@@ -14,7 +14,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     super({
       clientID: configService.get('GOOGLE_CLIENT_ID'),
       clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
-      callbackURL: 'http://localhost:3000/auth/google/callback', // TODO: 개발환경에 따라 callback 주소 변경
+      callbackURL: 'http://localhost:3000/auth/social/google/callback', // TODO: 개발환경에 따라 callback 주소 변경
       scope: ['email', 'profile'],
     });
   }

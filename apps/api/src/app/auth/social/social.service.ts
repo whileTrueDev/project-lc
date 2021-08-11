@@ -60,7 +60,7 @@ export class SocialService {
         create: {
           email,
           name,
-          password: '',
+          password: null,
           socialAccounts: {
             create: googleAccountCreateInput,
           },
