@@ -28,16 +28,18 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    env:
+      MYSQL_DATABASE: public
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      DATABASE_URL: mysql://user:password@localhost/public
     steps:
       - name: Setup MySQL
-        env:
-          MYSQL_DATABASE: public
-          MYSQL_USER: user
-          MYSQL_PASSWORD: password
         run: |
           sudo systemctl stop mysql.service
           sudo systemctl enable mysql.service
-          sudo systemctl restart mysql.service
+          sudo systemctl status mysql.service
+          sudo /etc/init.d/mysql start
           mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
       - name: Checkout
         uses: actions/checkout@v1
