@@ -15,7 +15,12 @@ import {
   useBreakpointValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import {
+  HamburgerIcon,
+  CloseIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+} from '@chakra-ui/icons';
 import { ColorModeSwitcher } from '..';
 
 export function Navbar() {
@@ -150,7 +155,11 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
     >
       <Stack direction="row" align="center">
         <Box>
-          <Text transition="all .3s ease" _groupHover={{ color: 'pink.400' }} fontWeight={500}>
+          <Text
+            transition="all .3s ease"
+            _groupHover={{ color: 'pink.400' }}
+            fontWeight={500}
+          >
             {label}
           </Text>
           <Text fontSize="sm">{subLabel}</Text>
