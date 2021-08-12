@@ -20,10 +20,10 @@ jobs:
       mysql:
         image: mysql:8
         env:
-          MYSQL_DATABASE: public
-          MYSQL_USER: user
-          MYSQL_PASSWORD: password
-          MYSQL_ROOT_PASSWORD: rootpassword
+          DB_DATABASE: public
+          DB_USER: user
+          DB_PASSWORD: password
+          DB_ROOT_PASSWORD: rootpassword
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
