@@ -1,6 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-naver';
-
+import { getApiHost } from '@project-lc/hooks';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SocialService, SellerWithSocialAccounts } from '../social.service';
@@ -14,7 +14,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
     super({
       clientID: configService.get('NAVER_CLIENT_ID'),
       clientSecret: configService.get('NAVER_CLIENT_SECRET'),
-      callbackURL: 'http://localhost:3000/social/naver/callback', // TODO: 개발환경에 따라 callback 주소 변경
+      callbackURL: `${getApiHost()}/social/naver/callback`,
     });
   }
 
