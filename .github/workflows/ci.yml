@@ -20,10 +20,10 @@ jobs:
       mysql:
         image: mysql:8
         env:
-          DB_DATABASE: public
-          DB_USER: user
-          DB_PASSWORD: password
-          DB_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: public
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: rootpassword
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -31,7 +31,7 @@ jobs:
       - name: Setup MySQL
         run: |
           sudo /etc/init.d/mysql start
-          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
+          mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install Dependencies
