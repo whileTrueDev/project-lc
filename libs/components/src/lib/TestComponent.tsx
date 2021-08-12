@@ -1,4 +1,13 @@
-import { Flex, Container, Heading, Stack, Text, Button, Icon, IconProps } from '@chakra-ui/react';
+import {
+  Flex,
+  Container,
+  Heading,
+  Stack,
+  Text,
+  Button,
+  Icon,
+  IconProps,
+} from '@chakra-ui/react';
 
 export function TestComponent() {
   return (
@@ -20,8 +29,9 @@ export function TestComponent() {
           </Text>
         </Heading>
         <Text color="gray.500" maxW="3xl">
-          Never miss a meeting. Never be late for one too. Keep track of your meetings and receive
-          smart reminders in appropriate times. Read your smart “Daily Agenda” every morning.
+          Never miss a meeting. Never be late for one too. Keep track of your meetings and
+          receive smart reminders in appropriate times. Read your smart “Daily Agenda”
+          every morning.
         </Text>
         <Stack spacing={6} direction="row">
           <Button
@@ -125,7 +135,10 @@ export const Illustration = (props: IconProps) => {
         d="M180.316 52.2817C174.839 47.382 171.388 40.2502 171.388 32.3158C171.388 17.5592 183.323 5.57898 198.023 5.57898C207.027 5.57898 214.993 10.0733 219.815 16.9484L198.003 36.4605C197.741 35.6917 197.342 34.9419 196.803 34.2523C194.524 31.3376 190.603 30.592 188.052 32.5882C185.501 34.5845 185.28 38.5715 187.559 41.4862C188.267 42.3919 189.134 43.0881 190.069 43.5579L180.316 52.2817Z"
         fill="black"
       />
-      <path d="M494.509 78.6715H474.156L482.742 108.248H503.094L494.509 78.6715Z" fill="white" />
+      <path
+        d="M494.509 78.6715H474.156L482.742 108.248H503.094L494.509 78.6715Z"
+        fill="white"
+      />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -138,11 +151,26 @@ export const Illustration = (props: IconProps) => {
         d="M494.011 79.3434H488.442C488.07 79.3434 487.768 79.0412 487.768 78.6688C487.768 78.2964 488.069 77.9941 488.442 77.9941H494.518C494.816 77.9941 495.08 78.1924 495.163 78.4807L503.745 108.057C503.804 108.261 503.765 108.481 503.637 108.65C503.509 108.82 503.311 108.92 503.1 108.92H489.674C489.302 108.92 489 108.618 489 108.245C489.001 107.873 489.304 107.571 489.676 107.571H502.201L494.011 79.3434Z"
         fill="black"
       />
-      <path d="M493.631 81.296H476.781L477.911 84.5673H494.761L493.631 81.296Z" fill="black" />
-      <path d="M495.281 86.6476H478.431L479.561 89.9189H496.411L495.281 86.6476Z" fill="black" />
-      <path d="M496.931 92.1128H480.081L481.211 95.3842H498.061L496.931 92.1128Z" fill="black" />
-      <path d="M498.582 97.4642H481.731L482.861 100.736H499.712L498.582 97.4642Z" fill="black" />
-      <path d="M500.232 102.816H483.382L484.511 106.087H501.362L500.232 102.816Z" fill="black" />
+      <path
+        d="M493.631 81.296H476.781L477.911 84.5673H494.761L493.631 81.296Z"
+        fill="black"
+      />
+      <path
+        d="M495.281 86.6476H478.431L479.561 89.9189H496.411L495.281 86.6476Z"
+        fill="black"
+      />
+      <path
+        d="M496.931 92.1128H480.081L481.211 95.3842H498.061L496.931 92.1128Z"
+        fill="black"
+      />
+      <path
+        d="M498.582 97.4642H481.731L482.861 100.736H499.712L498.582 97.4642Z"
+        fill="black"
+      />
+      <path
+        d="M500.232 102.816H483.382L484.511 106.087H501.362L500.232 102.816Z"
+        fill="black"
+      />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -207,10 +235,22 @@ export const Illustration = (props: IconProps) => {
         d="M644.2 363.676L691.834 235.008L702 238.715L626.359 446.37H613.587L640.193 374.499H564.41V363.676H644.2Z"
         fill="black"
       />
-      <path d="M461.393 100.994H318.195L335.146 201.613H478.343L461.393 100.994Z" fill="black" />
-      <path d="M424.708 196.637H392.737L397.388 224.258H429.359L424.708 196.637Z" fill="black" />
-      <path d="M453.579 108.623H328.324L342.33 191.804H467.586L453.579 108.623Z" fill="#EAEAEB" />
-      <path d="M449.58 116.024H407.02L413.244 152.972H455.805L449.58 116.024Z" fill="white" />
+      <path
+        d="M461.393 100.994H318.195L335.146 201.613H478.343L461.393 100.994Z"
+        fill="black"
+      />
+      <path
+        d="M424.708 196.637H392.737L397.388 224.258H429.359L424.708 196.637Z"
+        fill="black"
+      />
+      <path
+        d="M453.579 108.623H328.324L342.33 191.804H467.586L453.579 108.623Z"
+        fill="#EAEAEB"
+      />
+      <path
+        d="M449.58 116.024H407.02L413.244 152.972H455.805L449.58 116.024Z"
+        fill="white"
+      />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -259,7 +299,10 @@ export const Illustration = (props: IconProps) => {
         d="M357.312 183.462H396.224C396.789 183.462 397.249 183.92 397.249 184.486C397.248 185.051 396.79 185.51 396.224 185.51H356.446C355.947 185.51 355.52 185.149 355.437 184.656L345.994 128.604C345.944 128.307 346.028 128.003 346.221 127.773C346.417 127.543 346.703 127.41 347.003 127.41H396.22C396.784 127.41 397.244 127.869 397.244 128.434C397.243 128.999 396.786 129.458 396.22 129.458H348.214L357.312 183.462Z"
         fill="black"
       />
-      <path d="M420.734 128.435H346.988L348.122 135.166H421.868L420.734 128.435Z" fill="black" />
+      <path
+        d="M420.734 128.435H346.988L348.122 135.166H421.868L420.734 128.435Z"
+        fill="black"
+      />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
