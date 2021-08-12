@@ -1,9 +1,9 @@
 import { Controller, Delete, Get, Param, Req, Res, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../auth/auth.service';
 import { SocialService } from './social.service';
-@Controller('auth/social')
+@Controller('social')
 export class SocialController {
   constructor(
     private readonly authService: AuthService,

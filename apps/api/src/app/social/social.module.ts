@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '../auth.module';
-import { AuthService } from '../auth.service';
+import { AuthModule } from '../auth/auth.module';
+import { AuthService } from '../auth/auth.service';
 import { GoogleStrategy } from './strategy/google.strategy';
 import { NaverStrategy } from './strategy/naver.strategy';
 import { SocialController } from './social.controller';

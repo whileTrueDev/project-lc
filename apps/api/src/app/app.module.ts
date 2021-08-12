@@ -9,7 +9,7 @@ import { SellerModule } from './seller/seller.module';
 import { MailModule } from './mail/mail.module';
 import { mailerConfig } from '../settings/mailer.config';
 import { AuthModule } from './auth/auth.module';
-import { SocialModule } from './auth/social/social.module';
+import { SocialModule } from './social/social.module';
 import { validationSchema } from '../settings/config.validation';
 
 @Module({

@@ -13,7 +13,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   ) {
     super({
       clientID: configService.get('KAKAO_CLIENT_ID'),
-      callbackURL: 'http://localhost:3000/auth/social/kakao/callback', // TODO: 개발환경에 따라 callback 주소 변경
+      callbackURL: 'http://localhost:3000/social/kakao/callback', // TODO: 개발환경에 따라 callback 주소 변경
     });
   }
 
