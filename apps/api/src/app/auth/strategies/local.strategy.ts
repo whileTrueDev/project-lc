@@ -1,8 +1,8 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { SellerPayload } from '../login.interface';
-import { AuthService } from './auth.service';
+import { SellerPayload } from '../../login.interface';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -11,16 +11,13 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super({
       usernameField: 'email',
     });
-    // super();
   }
 
-  // 사용자에 따라서 데이터 다른 동작을 하도록 해야한다.
   async validate(email: string, password: string): Promise<SellerPayload> {
     const user = await this.authService.validateUser(email, password);
     if (!user) {
       throw new UnauthorizedException();
     }
-
     return user;
   }
 }
