@@ -36,6 +36,7 @@ jobs:
     steps:
       - name: Setup MySQL
         run: |
+          sudo systemctl status mysql.service
           sudo /etc/init.d/mysql start
           mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
       - name: Checkout
