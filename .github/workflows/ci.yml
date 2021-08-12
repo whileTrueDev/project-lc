@@ -2,12 +2,6 @@ on:
   pull_request:
     branches: [master, staging, dev]
 
-env:
-  MYSQL_DATABASE: public
-  MYSQL_USER: user
-  MYSQL_PASSWORD: password
-  MYSQL_ROOT_PASSWORD: rootpassword
-
 name: Continous Integration Workflow
 jobs:
   Lint:
@@ -26,11 +20,20 @@ jobs:
     services:
       mysql:
         image: mysql:8
+        env:
+          MYSQL_DATABASE: public
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: rootpassword
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Setup MySQL
+        env:
+          MYSQL_DATABASE: public
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
         run: |
           sudo /etc/init.d/mysql start
           mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
