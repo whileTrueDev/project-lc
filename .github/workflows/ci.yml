@@ -17,20 +17,11 @@ jobs:
   Test:
     name: Test Job
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8
-        env:
-          MYSQL_DATABASE: public
-          MYSQL_ROOT_PASSWORD: rootpassword
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     env:
-      MYSQL_DATABASE: public
+      MYSQL_DATABASE: test_db
       MYSQL_USER: root
-      MYSQL_PASSWORD: rootpassword
-      DATABASE_URL: mysql://root:rootpassword@localhost/public
+      MYSQL_PASSWORD: root
+      DATABASE_URL: mysql://root:root@localhost/test_db
     steps:
       - name: Setup MySQL
         run: |
