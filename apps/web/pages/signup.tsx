@@ -8,12 +8,8 @@ export function Signup(): JSX.Element {
     <Box>
       <Navbar />
       <Flex align="center" justify="center" minH="calc(100vh - 200px)">
-        <Box display={step === 0 ? 'block' : 'none'}>
-          <SignupStart moveToSignupForm={() => setStep(1)} />
-        </Box>
-        <Box display={step === 1 ? 'block' : 'none'}>
-          <SignupForm enableShadow moveToSignupStart={() => setStep(0)} />
-        </Box>
+        {step === 0 && <SignupStart moveToSignupForm={() => setStep(1)} />}
+        {step === 1 && <SignupForm enableShadow moveToSignupStart={() => setStep(0)} />}
       </Flex>
     </Box>
   );
