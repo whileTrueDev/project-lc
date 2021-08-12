@@ -10,6 +10,9 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: true,
   },
+  images: {
+    domains: ['project-lc-dev-test.s3.ap-northeast-2.amazonaws.com'],
+  },
 };
 
 module.exports = withNx(nextConfig);
