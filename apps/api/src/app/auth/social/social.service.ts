@@ -9,7 +9,7 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import axios from 'axios';
 
 export type SellerWithSocialAccounts = Omit<Seller, 'password'> & {
-  socialAccounts: SellerSocialAccount[];
+  socialAccounts: Omit<SellerSocialAccount, 'accessToken' | 'refreshToken'>[];
 };
 
 @Injectable()
@@ -40,7 +40,21 @@ export class SocialService {
     if (!id && !email) {
       throw Error('id나 email 중 하나를 입력해야 합니다');
     }
-    const select = { id: true, email: true, name: true, socialAccounts: true };
+    const select = {
+      id: true,
+      email: true,
+      name: true,
+      socialAccounts: {
+        select: {
+          sellerId: true,
+          profileImage: true,
+          serviceId: true,
+          provider: true,
+          name: true,
+          registDate: true,
+        },
+      },
+    };
     if (id) {
       return this.prisma.seller.findUnique({
         where: { id },
@@ -108,6 +122,16 @@ export class SocialService {
       });
       return this.findSellerIncludeSocialAccount({ id: createdSeller.id });
     }
+
+    // 토큰정보 업데2트
+    await this.prisma.sellerSocialAccount.update({
+      where: { serviceId: id },
+      data: {
+        accessToken,
+        refreshToken,
+        profileImage: picture,
+      },
+    });
     return this.findSellerIncludeSocialAccount({
       id: socialAccountWithSeller.seller.id,
     });
@@ -203,7 +227,6 @@ export class SocialService {
       );
     }
 
-    // TODO: accessToken 만료되었는지 확인하고 재발급받기
     const googleAccessToken = socialAccount.accessToken;
     // 구글 계정연동 해제 요청
     try {

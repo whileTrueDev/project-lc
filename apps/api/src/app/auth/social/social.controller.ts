@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Query,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Req, Res, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from '../auth.service';
@@ -30,11 +20,14 @@ export class SocialController {
 
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+  async googleAuthCallback(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const { accessToken, refreshToken } = await this.authService.login(req.user);
     res.cookie('accessToken', accessToken);
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
-    res.redirect(this.frontMypageUrl);
+    return req.user;
   }
 
   @Delete('/google/unlink/:googleId')
@@ -57,7 +50,7 @@ export class SocialController {
     const { accessToken, refreshToken } = await this.authService.login(req.user);
     res.cookie('accessToken', accessToken);
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
-    res.redirect(this.frontMypageUrl);
+    return req.user;
   }
 
   @Delete('/naver/unlink/:naverId')
@@ -80,7 +73,7 @@ export class SocialController {
     const { accessToken, refreshToken } = await this.authService.login(req.user);
     res.cookie('accessToken', accessToken);
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
-    res.redirect(this.frontMypageUrl);
+    return req.user;
   }
 
   @Delete('/kakao/unlink/:kakaoId')
