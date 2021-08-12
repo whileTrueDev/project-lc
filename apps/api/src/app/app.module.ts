@@ -10,6 +10,7 @@ import { MailModule } from './mail/mail.module';
 import { mailerConfig } from '../settings/mailer.config';
 import { AuthModule } from './auth/auth.module';
 import { SocialModule } from './auth/social/social.module';
+import { validationSchema } from '../settings/config.validation';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { SocialModule } from './auth/social/social.module';
     PrismaModule,
     MailModule,
     AuthModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, validationSchema }),
     SocialModule,
   ],
   controllers: [AppController],
