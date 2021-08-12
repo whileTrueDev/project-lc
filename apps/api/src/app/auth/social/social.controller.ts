@@ -10,7 +10,7 @@ export class SocialController {
     private readonly socialService: SocialService,
   ) {}
 
-  private readonly frontMypageUrl = 'http://localhost:3000/'; // TODO: front mypage로 리다이렉션
+  private readonly frontMypageUrl = 'http://localhost:4200/'; // TODO: front mypage로 리다이렉션
 
   /** 구글 ************************************************ */
   @Get('/google/login')
@@ -20,14 +20,11 @@ export class SocialController {
 
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthCallback(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
     const { accessToken, refreshToken } = await this.authService.login(req.user);
     res.cookie('accessToken', accessToken);
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
-    return req.user;
+    res.redirect(this.frontMypageUrl);
   }
 
   @Delete('/google/unlink/:googleId')
@@ -43,14 +40,11 @@ export class SocialController {
 
   @Get('/naver/callback')
   @UseGuards(AuthGuard('naver'))
-  async naverAuthCallback(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async naverAuthCallback(@Req() req: Request, @Res() res: Response) {
     const { accessToken, refreshToken } = await this.authService.login(req.user);
     res.cookie('accessToken', accessToken);
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
-    return req.user;
+    res.redirect(this.frontMypageUrl);
   }
 
   @Delete('/naver/unlink/:naverId')
@@ -66,14 +60,11 @@ export class SocialController {
 
   @Get('/kakao/callback')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoAuthCallback(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async kakaoAuthCallback(@Req() req: Request, @Res() res: Response) {
     const { accessToken, refreshToken } = await this.authService.login(req.user);
     res.cookie('accessToken', accessToken);
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
-    return req.user;
+    res.redirect(this.frontMypageUrl);
   }
 
   @Delete('/kakao/unlink/:kakaoId')

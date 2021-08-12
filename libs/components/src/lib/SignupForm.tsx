@@ -23,11 +23,13 @@ import {
   useMailVerificationMutation,
   useSellerSignupMutation,
 } from '@project-lc/hooks';
+import { ChevronLeftIcon } from '@chakra-ui/icons';
 
 export interface SignupFormProps {
   enableShadow?: boolean;
+  moveToSignupStart?: () => void;
 }
-export function SignupForm({ enableShadow = false }: SignupFormProps) {
+export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFormProps) {
   const router = useRouter();
   const toast = useToast();
 
@@ -116,7 +118,12 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
         p={8}
       >
         <Stack>
-          <Heading fontSize="3xl">[서비스명] 시작하기</Heading>
+          <Heading fontSize="3xl">
+            <Button variant="ghost" p={0} onClick={moveToSignupStart}>
+              <ChevronLeftIcon boxSize="2em" />
+            </Button>
+            [서비스명] 시작하기
+          </Heading>
           <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')} mt={2}>
             캐치프레이즈 자리입니다.
           </Text>
