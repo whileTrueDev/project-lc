@@ -137,19 +137,31 @@ export class SocialService {
     });
   }
 
-  /** 카카오 계정 연동해제 & 카카오 소셜계정 레코드 삭제 */
-  async kakaoUnlink(kakaoId) {
+  /** 소셜계정 데이터 삭제 */
+  async deleteSocialAccountRecord(serviceId: string): Promise<boolean> {
+    await this.prisma.sellerSocialAccount.delete({
+      where: { serviceId },
+    });
+    return true;
+  }
+
+  /** 소셜계정 테이블에서 accessToken 가져오기 */
+  async getSocialAccountAccessToken(provider: string, serviceId: string) {
     const socialAccount = await this.findSocialAccountIncludeSeller({
-      provider: 'kakao',
-      serviceId: kakaoId,
+      provider,
+      serviceId,
     });
     if (!socialAccount) {
       throw new BadRequestException(
-        `해당 kakaoId로 연동된 계정이 존재하지 않음 kakaoId: ${kakaoId}`,
+        `해당 서비스로 연동된 계정이 존재하지 않음 provider: ${provider}, serviceId: ${serviceId}`,
       );
     }
+    return socialAccount.accessToken;
+  }
 
-    const kakaoAccessToken = socialAccount.accessToken;
+  /** 카카오 계정 연동해제 & 카카오 소셜계정 레코드 삭제 */
+  async kakaoUnlink(kakaoId) {
+    const kakaoAccessToken = await this.getSocialAccountAccessToken('kakao', kakaoId);
     // 카카오 계정연동 해제 요청
     try {
       const result = await axios.post(
@@ -163,11 +175,7 @@ export class SocialService {
       );
 
       if (result.status === 200) {
-        // socialAccount에서 삭제
-        await this.prisma.sellerSocialAccount.delete({
-          where: { serviceId: kakaoId },
-        });
-        return true;
+        return this.deleteSocialAccountRecord(kakaoId);
       }
       return false;
     } catch (error) {
@@ -178,17 +186,7 @@ export class SocialService {
 
   /** 네이버 계정연동 해제 && 네이버 계정 레코드 삭제 */
   async naverUnlink(naverId: string) {
-    const socialAccount = await this.findSocialAccountIncludeSeller({
-      provider: 'naver',
-      serviceId: naverId,
-    });
-    if (!socialAccount) {
-      throw new BadRequestException(
-        `해당 naverId로 연동된 계정이 존재하지 않음 naverId: ${naverId}`,
-      );
-    }
-
-    const naverAccessToken = socialAccount.accessToken;
+    const naverAccessToken = await this.getSocialAccountAccessToken('naver', naverId);
     // 네이버 계정연동 해제 요청
     try {
       const result = await axios.get('https://nid.naver.com/oauth2.0/token', {
@@ -201,12 +199,8 @@ export class SocialService {
         },
       });
 
-      if (result.status === 200 && result.data.result === 'success') {
-        // socialAccount에서 삭제
-        await this.prisma.sellerSocialAccount.delete({
-          where: { serviceId: naverId },
-        });
-        return true;
+      if (result.status === 200) {
+        return this.deleteSocialAccountRecord(naverId);
       }
       return false;
     } catch (error) {
@@ -217,17 +211,7 @@ export class SocialService {
 
   /** 구글 계정 연동 해제 && 구글 계정 레코드 삭제 */
   async googleUnlink(googleId: string) {
-    const socialAccount = await this.findSocialAccountIncludeSeller({
-      provider: 'google',
-      serviceId: googleId,
-    });
-    if (!socialAccount) {
-      throw new BadRequestException(
-        `해당 googleId로 연동된 계정이 존재하지 않음 googleId: ${googleId}`,
-      );
-    }
-
-    const googleAccessToken = socialAccount.accessToken;
+    const googleAccessToken = await this.getSocialAccountAccessToken('google', googleId);
     // 구글 계정연동 해제 요청
     try {
       const result = await axios.post('https://oauth2.googleapis.com/revoke', undefined, {
@@ -240,11 +224,7 @@ export class SocialService {
       });
 
       if (result.status === 200) {
-        // socialAccount에서 삭제
-        await this.prisma.sellerSocialAccount.delete({
-          where: { serviceId: googleId },
-        });
-        return true;
+        return this.deleteSocialAccountRecord(googleId);
       }
       return false;
     } catch (error) {
