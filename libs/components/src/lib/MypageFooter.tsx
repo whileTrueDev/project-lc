@@ -13,12 +13,18 @@ export function MypageFooter(): JSX.Element {
       py={2}
       alignItems="center"
       justify="space-between"
+      direction={{ base: 'column', sm: 'row' }}
     >
       <Stack direction="row">
         <Button size="sm" fontSize="sm" variant="ghost">
           고객센터
         </Button>
-        <Button size="sm" fontSize="sm" variant="ghost">
+        <Button
+          size="sm"
+          fontSize="sm"
+          variant="ghost"
+          display={{ base: 'none', sm: 'block' }}
+        >
           문의하기
         </Button>
         <Button size="sm" fontSize="sm" fontWeight="bold" variant="ghost">

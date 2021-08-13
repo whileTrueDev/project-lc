@@ -38,15 +38,6 @@ export const mypageNavLinks: MypageLink[] = [
     ],
   },
   {
-    name: '주문',
-    children: [
-      {
-        name: '주문목록',
-        href: '/mypage/orders',
-      },
-    ],
-  },
-  {
     name: '라이브쇼핑',
     children: [
       {
@@ -59,6 +50,27 @@ export const mypageNavLinks: MypageLink[] = [
       },
     ],
   },
-  { name: '배송정책', href: '/mypage/delivery' },
+  {
+    name: '주문',
+    children: [
+      {
+        name: '주문목록',
+        href: '/mypage/orders',
+      },
+    ],
+  },
+  {
+    name: '상점설정',
+    children: [
+      {
+        name: '상점 공통 정보',
+        href: '/mypage/shopinfo',
+      },
+      {
+        name: '배송비 정책',
+        href: '/mypage/delivery',
+      },
+    ],
+  },
   { name: '정산', href: '/mypage/settlement' },
 ];

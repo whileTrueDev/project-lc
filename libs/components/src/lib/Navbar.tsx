@@ -75,11 +75,11 @@ export function Navbar() {
           justify="flex-end"
           alignItems="center"
           direction="row"
-          spacing={{ base: 1, sm: 4 }}
+          spacing={{ base: 0, sm: 4 }}
         >
           <ColorModeSwitcher />
           <Button as="a" fontSize="sm" fontWeight={500} variant="link" href="#">
-            Sign In
+            로그인
           </Button>
           <Button
             display={{ base: 'none', md: 'inline-flex' }}
@@ -90,10 +90,10 @@ export function Navbar() {
             href="#"
             _hover={{ bg: 'pink.300' }}
           >
-            Sign Up
+            회원가입
           </Button>
           {/* 로그인 된 경우 = 아래 */}
-          <Tooltip label="계정 설정" fontSize="xs">
+          {/* <Tooltip label="계정 설정" fontSize="xs">
             <IconButton
               size="md"
               fontSize="xl"
@@ -102,9 +102,10 @@ export function Navbar() {
               aria-label="settings icon"
               icon={<AiTwotoneSetting />}
               onClick={() => router.push('/mypage/setting')}
+              display={{ base: 'none', sm: 'inline-flex' }}
             />
           </Tooltip>
-          <Avatar size="sm" />
+          <Avatar size="sm" /> */}
         </Stack>
       </Flex>
 
