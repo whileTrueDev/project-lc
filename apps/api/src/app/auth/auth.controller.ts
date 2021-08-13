@@ -3,36 +3,43 @@ import {
   Get,
   Post,
   Request,
-  Response,
   Body,
   UseGuards,
+  Res,
+  Query,
 } from '@nestjs/common';
 import express from 'express';
-import { AuthGuard } from '@nestjs/passport';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
-import { COOKIE_AUO_LOGIN_EXPIRE_TIME, COOKIE_EXPIRE_TIME } from './auth.constant';
+import { LoginToken } from './auth.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   // 최초 로그인을 담당할 Router 구현하기
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
     @Body('stayLogedIn') stayLogedIn: boolean,
+    @Query('type') userType: 'seller' | 'creator',
     @Request() req: express.Request,
-    @Response() res: express.Response,
+    @Res() res: express.Response,
   ): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
-    const { accessToken, refreshToken } = await this.authService.login(user, stayLogedIn);
-    const ageTime: number = stayLogedIn
-      ? COOKIE_AUO_LOGIN_EXPIRE_TIME
-      : COOKIE_EXPIRE_TIME;
-    // Set-Cookie 헤더로 refresh_token을 담은 HTTP Only 쿠키를 클라이언트에 심는다.
-    res.cookie('refresh_token', refreshToken, { httpOnly: true, maxAge: ageTime });
-    res.send({ access_token: accessToken });
+    const loginToken: LoginToken = this.authService.issueToken(
+      user,
+      stayLogedIn,
+      userType,
+    );
+    // response 객체 설정
+    res.cookie('refresh_token', loginToken.refresh_token, {
+      httpOnly: true,
+      maxAge: loginToken.refresh_token_expires_in,
+    });
+    res.send(loginToken);
   }
 
   @UseGuards(JwtAuthGuard)

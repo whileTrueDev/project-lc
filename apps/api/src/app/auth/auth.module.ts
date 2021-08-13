@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
+import { CipherService } from './cipher.service';
 import { AuthController } from './auth.controller';
 import { SellerModule } from '../seller/seller.module';
 import { LocalStrategy } from './strategies/local.strategy';
@@ -16,7 +17,7 @@ import { JwtConfigService } from '../../settings/jwt.setting';
       useClass: JwtConfigService,
     }),
   ],
-  providers: [AuthService, JwtStrategy, LocalStrategy],
+  providers: [AuthService, CipherService, JwtStrategy, LocalStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
