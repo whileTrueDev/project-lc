@@ -1,14 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Request,
-  Body,
-  UseGuards,
-  Res,
-  Query,
-} from '@nestjs/common';
-import express from 'express';
+import { Controller, Get, Post, Req, Body, UseGuards, Res, Query } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
@@ -24,8 +15,8 @@ export class AuthController {
   async login(
     @Body('stayLogedIn') stayLogedIn: boolean,
     @Query('type') userType: 'seller' | 'creator',
-    @Request() req: express.Request,
-    @Res() res: express.Response,
+    @Req() req: Request,
+    @Res() res: Response,
   ): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
@@ -39,12 +30,12 @@ export class AuthController {
       httpOnly: true,
       maxAge: loginToken.refresh_token_expires_in,
     });
-    res.send(loginToken);
+    res.status(200).send(loginToken);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Req() req) {
     // 요청 객체의 user로 들어가게 된다.
     return req.user;
   }

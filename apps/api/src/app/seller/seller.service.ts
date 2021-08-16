@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
-import argon from 'argon2';
+import { hash } from 'argon2';
 import { PrismaService } from '@project-lc/prisma-orm';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class SellerService {
    * @returns {string} 비밀번호 해시값
    */
   private async hashPassword(purePw: string): Promise<string> {
-    const hashed = await argon.hash(purePw);
+    const hashed = await hash(purePw);
     return hashed;
   }
 }

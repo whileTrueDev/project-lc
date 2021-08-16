@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import argon from 'argon2';
+import { verify } from 'argon2';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { LoginToken, User, UserPayload } from './auth.interface';
@@ -73,7 +73,7 @@ export class AuthService {
    * @returns {boolean} 올바른 비밀번호인지 여부
    */
   async validatePassword(pwInput: string, hashedPw: string): Promise<boolean> {
-    const isCorrect = await argon.verify(hashedPw, pwInput);
+    const isCorrect = await verify(hashedPw, pwInput);
     return isCorrect;
   }
 
