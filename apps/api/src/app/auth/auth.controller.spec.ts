@@ -18,7 +18,7 @@ describe('AuthController', () => {
   let app: INestApplication;
   const sellerService = {
     findOne: async () => {
-      const testPw = await hash('rkdghktn12');
+      const testPw = await hash('한글이름변수사용필요');
       return {
         id: 3,
         email: 'qkrcksdn0208@naver.com',
@@ -53,7 +53,7 @@ describe('AuthController', () => {
   it(`/POST login success`, () => {
     return request(app.getHttpServer())
       .post('/auth/login')
-      .send({ email: 'qkrcksdn0208@naver.com', password: 'rkdghktn12' })
+      .send({ email: 'qkrcksdn0208@naver.com', password: '한글이름변수사용필요' })
       .expect(200);
     // .expect({
     //   data: catsService.findAll(),

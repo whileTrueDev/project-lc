@@ -38,7 +38,7 @@ describe('AuthService', () => {
   it('user find', async () => {
     // 실제 DB와 함께 사용된다. -> spyOn을 통해서 바꿔보자.
     async function getResult() {
-      const testPw = await hash('rkdghktn12');
+      const testPw = await hash('한글이름변수사용필요');
       return {
         id: 3,
         email: 'qkrcksdn0208@naver.com',
@@ -49,7 +49,10 @@ describe('AuthService', () => {
 
     jest.spyOn(sellerService, 'findOne').mockImplementation(getResult);
 
-    const user = await service.validateUser('qkrcksdn0208@naver.com', 'rkdghktn12');
+    const user = await service.validateUser(
+      'qkrcksdn0208@naver.com',
+      '한글이름변수사용필요',
+    );
 
     expect(user).toEqual({ sub: 'qkrcksdn0208@naver.com' });
   });
