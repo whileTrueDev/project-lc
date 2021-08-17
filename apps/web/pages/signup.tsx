@@ -1,5 +1,5 @@
-import { SignupForm, Navbar, SignupModal } from '@project-lc/components';
 import { Box, Flex } from '@chakra-ui/react';
+import { Navbar, SignupForm } from '@project-lc/components';
 
 export function Signup(): JSX.Element {
   return (
