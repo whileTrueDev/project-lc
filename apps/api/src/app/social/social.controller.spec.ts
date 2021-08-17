@@ -1,6 +1,7 @@
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaModule } from '@project-lc/prisma-orm';
 import { AuthService } from '../auth/auth.service';
-import { AppModule } from '../app.module';
 import { SocialController } from './social.controller';
 import { SocialService } from './social.service';
 
@@ -9,7 +10,7 @@ describe('SocialController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [PrismaModule, ConfigModule],
       controllers: [SocialController],
       providers: [SocialService, AuthService],
       exports: [SocialService],
