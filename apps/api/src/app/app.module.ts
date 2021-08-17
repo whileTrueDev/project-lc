@@ -6,7 +6,6 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SellerModule } from './seller/seller.module';
-import { MailModule } from './mail/mail.module';
 import { mailerConfig } from '../settings/mailer.config';
 import { AuthModule } from './auth/auth.module';
 import { SocialModule } from './social/social.module';
@@ -18,7 +17,6 @@ import { validationSchema } from '../settings/config.validation';
     FirstmallDbModule,
     SellerModule,
     PrismaModule,
-    MailModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
     SocialModule,
