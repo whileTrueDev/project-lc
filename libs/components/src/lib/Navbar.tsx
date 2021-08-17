@@ -1,6 +1,5 @@
 import { CloseIcon, HamburgerIcon } from '@chakra-ui/icons';
 import {
-  Avatar,
   Box,
   Button,
   Collapse,
@@ -9,14 +8,12 @@ import {
   IconButton,
   Link,
   Stack,
-  Tooltip,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { AiTwotoneSetting } from 'react-icons/ai';
 import { mainNavItems, NavItem } from '../constants';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 
@@ -82,15 +79,17 @@ export function Navbar() {
             로그인
           </Button>
           <Button
+            onClick={() => router.push('/signup')}
             display={{ base: 'none', md: 'inline-flex' }}
             fontSize="sm"
             fontWeight={600}
             color="white"
             bg="pink.400"
-            href="#"
-            _hover={{ bg: 'pink.300' }}
+            _hover={{
+              bg: 'pink.300',
+            }}
           >
-            회원가입
+            시작하기
           </Button>
           {/* 로그인 된 경우 = 아래 */}
           {/* <Tooltip label="계정 설정" fontSize="xs">

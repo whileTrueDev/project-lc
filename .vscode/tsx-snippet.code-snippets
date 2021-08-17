@@ -3,13 +3,13 @@
 		"prefix": "rfc",
 		"description": "기본 컴포넌트를 생성합니다.",
 		"body": [
-			"export function ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}(): JSX.Element {",
+			"export function ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}(): JSX.Element {",
 			"  return (",
 			"    $1",
 			"  );",
 			"}",
 			"",
-			"export default ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/};"
+			"export default ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/};"
 		]
 	},
 	"SSGNextComponent": {
