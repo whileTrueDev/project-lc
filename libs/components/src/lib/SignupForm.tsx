@@ -47,14 +47,22 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
   const mailVerification = useMailVerificationMutation();
   const startMailVerification = useCallback(
     async (email: string) => {
-      return mailVerification.mutateAsync({ email }).catch((err) => {
-        toast({
-          title: '회원가입 오류 알림',
-          description:
-            '이메일 확인을 위한 인증번호를 보내는 중, 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-          status: 'error',
+      return mailVerification
+        .mutateAsync({ email })
+        .then(() =>
+          toast({
+            title: `인증 코드가 ${email}(으)로 전송되었습니다`,
+            status: 'success',
+          }),
+        )
+        .catch((err) => {
+          toast({
+            title: '회원가입 오류 알림',
+            description:
+              '이메일 확인을 위한 인증번호를 보내는 중, 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+            status: 'error',
+          });
         });
-      });
     },
     [mailVerification, toast],
   );
