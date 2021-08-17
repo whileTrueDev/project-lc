@@ -60,7 +60,7 @@ export function MypageNavbar(): JSX.Element {
                   w={{ base: '100vw', sm: 'xs' }}
                 >
                   {link.children.map((child) => (
-                    <NextLink href={child.href ?? '#'} passHref>
+                    <NextLink key={child.name} href={child.href ?? '#'} passHref>
                       <Link
                         role="group"
                         display="block"
