@@ -24,7 +24,7 @@ export class AuthService {
   ) {}
 
   /**
-   * 인증된 유저에 대해서 로그인을 실시합니다.
+   * 인증된 유저에 대해서 토큰을 발급합니다.
    * @param userPayload user(seller)의 데이터
    * @param stayLogedIn 로그인 유지 여부
    * @param userType    로그인의 user 타입
