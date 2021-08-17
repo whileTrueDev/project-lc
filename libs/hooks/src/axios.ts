@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { getApiHost } from './getHostUrl';
+// import { getApiHost } from './getHostUrl';
 
 export const cancelToken = axios.CancelToken;
 export const { isCancel } = axios;
 const axiosInstance = axios.create({
   withCredentials: true,
-  baseURL: getApiHost(),
+  baseURL: 'http://localhost:3000',
 });
 
 export default axiosInstance;

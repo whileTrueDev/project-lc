@@ -1,6 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-kakao';
-import { getApiHost } from '@project-lc/hooks';
+// import { getApiHost } from '@project-lc/hooks';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SocialService, SellerWithSocialAccounts } from '../social.service';
@@ -13,7 +13,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   ) {
     super({
       clientID: configService.get('KAKAO_CLIENT_ID'),
-      callbackURL: `${getApiHost()}/social/kakao/callback`,
+      callbackURL: `http://localhost:3000/social/kakao/callback`,
     });
   }
 
