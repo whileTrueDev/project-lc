@@ -14,4 +14,8 @@ export const validationSchema = Joi.object({
 
   // 카카오 어플리케이션
   KAKAO_CLIENT_ID: Joi.string().required(),
+
+  // Mailer account(트루포인트 메일링 계정 - ttps://mail.mytruepoint.com/)
+  MAILER_USER: Joi.string().required(),
+  MAILER_PASS: Joi.string().required(),
 });
