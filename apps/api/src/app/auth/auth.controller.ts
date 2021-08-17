@@ -9,14 +9,14 @@ import {
   Res,
   Query,
 } from '@nestjs/common';
-import { SendMailVerificationDto } from '@project-lc/shared-types';
+import { SendMailVerificationDto, loginUserRes } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { MailVerificationService } from './mailVerification.service';
 
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
-import { LoginToken } from './auth.interface';
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -43,7 +43,7 @@ export class AuthController {
   ): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
-    const loginToken: LoginToken = this.authService.issueToken(
+    const loginToken: loginUserRes = this.authService.issueToken(
       user,
       stayLogedIn,
       userType,

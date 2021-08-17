@@ -23,7 +23,8 @@ import {
   useMailVerificationMutation,
   useSellerSignupMutation,
 } from '@project-lc/hooks';
-import { ChevronLeftIcon } from '@chakra-ui/icons';
+import CenterBox from './CenterBox';
+// import { ChevronLeftIcon } from '@chakra-ui/icons';
 
 export interface SignupFormProps {
   enableShadow?: boolean;
@@ -118,156 +119,140 @@ export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFo
   );
 
   return (
-    <Stack spacing={8} mx="auto" maxW="lg" w="100%">
-      <Box
-        rounded="lg"
-        bg={useColorModeValue('white', 'gray.700')}
-        boxShadow={enableShadow ? 'md' : ''}
-        p={8}
-      >
-        <Stack>
-          <Heading fontSize="3xl">
-            <Button variant="ghost" p={0} onClick={moveToSignupStart}>
-              <ChevronLeftIcon boxSize="2em" />
-            </Button>
-            [서비스명] 시작하기
-          </Heading>
-          <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')} mt={2}>
-            캐치프레이즈 자리입니다.
-          </Text>
-        </Stack>
+    <CenterBox
+      enableShadow={enableShadow}
+      header={{ title: '[서비스명] 시작하기', desc: '캐치프레이즈 자리입니다.' }}
+    >
+      <Stack mt={4} spacing={4} as="form" onSubmit={handleSubmit(onSubmit)}>
+        <FormControl isInvalid={!!errors.name}>
+          <FormLabel htmlFor="name">이름</FormLabel>
+          <Input
+            id="name"
+            type="text"
+            placeholder="김민수"
+            autoComplete="off"
+            {...register('name', {
+              required: '이름을 작성해주세요.',
+              minLength: { value: 2, message: '이름은 2글자 이상이어야 합니다.' },
+            })}
+          />
+          <FormErrorMessage>{errors.name && errors.name.message}</FormErrorMessage>
+        </FormControl>
+        <FormControl isInvalid={!!errors.email}>
+          <FormLabel htmlFor="email">이메일</FormLabel>
+          <Input
+            id="email"
+            type="email"
+            placeholder="minsu@example.com"
+            autoComplete="off"
+            {...register('email', {
+              required: '이메일을 작성해주세요.',
+            })}
+          />
+          <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
+        </FormControl>
+        <FormControl isInvalid={!!errors.password}>
+          <FormLabel htmlFor="password">
+            암호
+            <Text
+              fontSize="xs"
+              color={useColorModeValue('gray.500', 'gray.400')}
+              as="span"
+            >
+              (문자,숫자,특수문자 포함 8자 이상)
+            </Text>
+          </FormLabel>
+          <Input
+            id="password"
+            type="password"
+            placeholder="********"
+            {...register('password', {
+              required: '암호를 작성해주세요.',
+              minLength: { value: 8, message: '비밀번호는 8자 이상이어야 합니다.' },
+              maxLength: { value: 20, message: '비밀번호는 20자 이하여야 합니다.' },
+              pattern: {
+                value: /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%^*+=-]).{8,20}$/,
+                message: '형식이 올바르지 않습니다.',
+              },
+            })}
+          />
+          <FormErrorMessage>
+            {errors.password && errors.password.message}
+          </FormErrorMessage>
+        </FormControl>
 
-        <Stack mt={4} spacing={4} as="form" onSubmit={handleSubmit(onSubmit)}>
-          <FormControl isInvalid={!!errors.name}>
-            <FormLabel htmlFor="name">이름</FormLabel>
-            <Input
-              id="name"
-              type="text"
-              placeholder="김민수"
-              autoComplete="off"
-              {...register('name', {
-                required: '이름을 작성해주세요.',
-                minLength: { value: 2, message: '이름은 2글자 이상이어야 합니다.' },
-              })}
-            />
-            <FormErrorMessage>{errors.name && errors.name.message}</FormErrorMessage>
-          </FormControl>
-          <FormControl isInvalid={!!errors.email}>
-            <FormLabel htmlFor="email">이메일</FormLabel>
-            <Input
-              id="email"
-              type="email"
-              placeholder="minsu@example.com"
-              autoComplete="off"
-              {...register('email', {
-                required: '이메일을 작성해주세요.',
-              })}
-            />
-            <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
-          </FormControl>
-          <FormControl isInvalid={!!errors.password}>
-            <FormLabel htmlFor="password">
-              암호
-              <Text
-                fontSize="xs"
-                color={useColorModeValue('gray.500', 'gray.400')}
-                as="span"
-              >
-                (문자,숫자,특수문자 포함 8자 이상)
+        {phase === 2 && (
+          <FormControl isInvalid={!!errors.code}>
+            <FormLabel htmlFor="code">
+              이메일 인증 코드
+              <Text fontSize="sm" color="gray.500">
+                {`${getValues('email')}로 인증코드가 전송되었습니다!`}
+              </Text>
+              <Text fontSize="sm" color="gray.500">
+                인증코드는 6자의 무작위 글자로 이루어져 있습니다.
               </Text>
             </FormLabel>
             <Input
-              id="password"
-              type="password"
-              placeholder="********"
-              {...register('password', {
-                required: '암호를 작성해주세요.',
-                minLength: { value: 8, message: '비밀번호는 8자 이상이어야 합니다.' },
-                maxLength: { value: 20, message: '비밀번호는 20자 이하여야 합니다.' },
-                pattern: {
-                  value: /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%^*+=-]).{8,20}$/,
-                  message: '형식이 올바르지 않습니다.',
+              autoComplete="off"
+              id="code"
+              type="code"
+              placeholder="이메일 인증코드"
+              {...register('code', {
+                required: '인증 코드를 입력해주세요.',
+                minLength: {
+                  value: 6,
+                  message: '인증코드는 6자 입니다.',
+                },
+                maxLength: {
+                  value: 6,
+                  message: '인증코드는 6자 입니다.',
                 },
               })}
             />
-            <FormErrorMessage>
-              {errors.password && errors.password.message}
-            </FormErrorMessage>
+            <FormErrorMessage>{errors.code && errors.code.message}</FormErrorMessage>
+            <Flex alignItems="center" my={1}>
+              <Text fontSize="sm" color="gray.500">
+                인증번호가 올바르게 도착하지 않았나요?
+              </Text>
+              <Button
+                variant="ghost"
+                size="sm"
+                isDisabled={tempVerifyButtonDisable}
+                isLoading={mailVerification.isLoading}
+                onClick={() => {
+                  startMailVerification(getValues('email')).then(disableVerifyButton);
+                }}
+              >
+                재전송
+              </Button>
+            </Flex>
           </FormControl>
+        )}
+        <Divider />
 
-          {phase === 2 && (
-            <FormControl isInvalid={!!errors.code}>
-              <FormLabel htmlFor="code">
-                이메일 인증 코드
-                <Text fontSize="sm" color="gray.500">
-                  {`${getValues('email')}로 인증코드가 전송되었습니다!`}
-                </Text>
-                <Text fontSize="sm" color="gray.500">
-                  인증코드는 6자의 무작위 글자로 이루어져 있습니다.
-                </Text>
-              </FormLabel>
-              <Input
-                autoComplete="off"
-                id="code"
-                type="code"
-                placeholder="이메일 인증코드"
-                {...register('code', {
-                  required: '인증 코드를 입력해주세요.',
-                  minLength: {
-                    value: 6,
-                    message: '인증코드는 6자 입니다.',
-                  },
-                  maxLength: {
-                    value: 6,
-                    message: '인증코드는 6자 입니다.',
-                  },
-                })}
-              />
-              <FormErrorMessage>{errors.code && errors.code.message}</FormErrorMessage>
-              <Flex alignItems="center" my={1}>
-                <Text fontSize="sm" color="gray.500">
-                  인증번호가 올바르게 도착하지 않았나요?
-                </Text>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  isDisabled={tempVerifyButtonDisable}
-                  isLoading={mailVerification.isLoading}
-                  onClick={() => {
-                    startMailVerification(getValues('email')).then(disableVerifyButton);
-                  }}
-                >
-                  재전송
-                </Button>
-              </Flex>
-            </FormControl>
-          )}
-          <Divider />
-
-          {phase === 1 && (
-            <Button
-              bg="blue.400"
-              color="white"
-              _hover={{ bg: 'blue.500' }}
-              onClick={checkValidation}
-              isLoading={mailVerification.isLoading}
-            >
-              가입하기
-            </Button>
-          )}
-          {phase === 2 && (
-            <Button
-              bg="blue.400"
-              color="white"
-              _hover={{ bg: 'blue.500' }}
-              type="submit"
-              isLoading={isSubmitting}
-            >
-              인증완료
-            </Button>
-          )}
-        </Stack>
-      </Box>
-    </Stack>
+        {phase === 1 && (
+          <Button
+            bg="blue.400"
+            color="white"
+            _hover={{ bg: 'blue.500' }}
+            onClick={checkValidation}
+            isLoading={mailVerification.isLoading}
+          >
+            가입하기
+          </Button>
+        )}
+        {phase === 2 && (
+          <Button
+            bg="blue.400"
+            color="white"
+            _hover={{ bg: 'blue.500' }}
+            type="submit"
+            isLoading={isSubmitting}
+          >
+            인증완료
+          </Button>
+        )}
+      </Stack>
+    </CenterBox>
   );
 }

@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { verify } from 'argon2';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { LoginToken, User, UserPayload } from './auth.interface';
+import { loginUserRes } from '@project-lc/shared-types';
+import { User, UserPayload } from './auth.interface';
 import { SellerService } from '../seller/seller.service';
 import { CipherService } from './cipher.service';
 import {
@@ -34,7 +35,7 @@ export class AuthService {
     userPayload: UserPayload,
     stayLogedIn: boolean,
     userType: string,
-  ): LoginToken {
+  ): loginUserRes {
     // token에 들어갈 데이터를 입력한다. -> 유저 타입 정도는 들어가는 것이 좋을 듯하다.
     return {
       token_type: 'bearer',
