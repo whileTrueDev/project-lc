@@ -6,3 +6,5 @@ export * from './lib/CommonFooter';
 export * from './lib/Features';
 export * from './lib/Navbar';
 export * from './lib/ChakraNextImage';
+export * from './lib/CenterBox';
+export * from './lib/LoginForm';
