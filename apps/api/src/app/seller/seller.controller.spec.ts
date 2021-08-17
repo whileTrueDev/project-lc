@@ -48,7 +48,7 @@ describe('SellerController', () => {
   describe('GET /seller :: findOne', () => {
     it('should return 200', (done) => {
       request(app.getHttpServer())
-        .get('/seller?email=hwasurr@onad.io')
+        .get('/seller?email=test@test.com')
         .expect(200)
         .expect(user, done);
     });
