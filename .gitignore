@@ -44,3 +44,6 @@ Thumbs.db
 .env.local
 .env.prod
 .env.production
+
+# Test case file
+*.test-case.ts
