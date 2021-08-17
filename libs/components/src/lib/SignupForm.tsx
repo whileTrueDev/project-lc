@@ -24,7 +24,6 @@ import {
   useSellerSignupMutation,
 } from '@project-lc/hooks';
 import CenterBox from './CenterBox';
-// import { ChevronLeftIcon } from '@chakra-ui/icons';
 
 export interface SignupFormProps {
   enableShadow?: boolean;
@@ -252,6 +251,7 @@ export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFo
             인증완료
           </Button>
         )}
+        {moveToSignupStart && <Button onClick={moveToSignupStart}>돌아가기</Button>}
       </Stack>
     </CenterBox>
   );
