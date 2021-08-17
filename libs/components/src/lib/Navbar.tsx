@@ -1,29 +1,31 @@
 import {
-  Box,
-  Flex,
-  Text,
-  IconButton,
-  Button,
-  Stack,
-  Collapse,
-  Icon,
-  Link,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  useColorModeValue,
-  useBreakpointValue,
-  useDisclosure,
-} from '@chakra-ui/react';
-import {
-  HamburgerIcon,
-  CloseIcon,
   ChevronDownIcon,
   ChevronRightIcon,
+  CloseIcon,
+  HamburgerIcon,
 } from '@chakra-ui/icons';
-import { ColorModeSwitcher } from '..';
+import {
+  Box,
+  Button,
+  Collapse,
+  Flex,
+  Icon,
+  IconButton,
+  Link,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Stack,
+  Text,
+  useBreakpointValue,
+  useColorModeValue,
+  useDisclosure,
+} from '@chakra-ui/react';
+import { useRouter } from 'next/router';
+import { ColorModeSwitcher } from './ColorModeSwitcher';
 
 export function Navbar() {
+  const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -68,20 +70,20 @@ export function Navbar() {
         <Stack flex={{ base: 1, md: 0 }} justify="flex-end" direction="row" spacing={6}>
           <ColorModeSwitcher />
           <Button as="a" fontSize="sm" fontWeight={400} variant="link" href="#">
-            Sign In
+            로그인
           </Button>
           <Button
+            onClick={() => router.push('/signup')}
             display={{ base: 'none', md: 'inline-flex' }}
             fontSize="sm"
             fontWeight={600}
             color="white"
             bg="pink.400"
-            href="#"
             _hover={{
               bg: 'pink.300',
             }}
           >
-            Sign Up
+            시작하기
           </Button>
         </Stack>
       </Flex>
