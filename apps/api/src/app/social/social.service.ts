@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { Seller, SellerSocialAccount } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import axios from 'axios';
+import { SellerService } from '../seller/seller.service';
 
 export type SellerWithSocialAccounts = Omit<Seller, 'password'> & {
   socialAccounts: Omit<SellerSocialAccount, 'accessToken' | 'refreshToken'>[];
@@ -17,6 +18,7 @@ export class SocialService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
+    private readonly sellerService: SellerService,
   ) {}
 
   /**
@@ -32,38 +34,6 @@ export class SocialService {
     return this.prisma.sellerSocialAccount.findFirst({
       where: { serviceId, provider },
       include: { seller: true },
-    });
-  }
-
-  /** 셀러의 id나 email로 셀러의 소셜계정 포함한 정보 조회하기 */
-  async findSellerIncludeSocialAccount({ id, email }: { id?: number; email?: string }) {
-    if (!id && !email) {
-      throw Error('id나 email 중 하나를 입력해야 합니다');
-    }
-    const select = {
-      id: true,
-      email: true,
-      name: true,
-      socialAccounts: {
-        select: {
-          sellerId: true,
-          profileImage: true,
-          serviceId: true,
-          provider: true,
-          name: true,
-          registDate: true,
-        },
-      },
-    };
-    if (id) {
-      return this.prisma.seller.findUnique({
-        where: { id },
-        select,
-      });
-    }
-    return this.prisma.seller.findUnique({
-      where: { email },
-      select,
     });
   }
 
@@ -87,7 +57,7 @@ export class SocialService {
     picture: string;
     accessToken: string;
     refreshToken?: string;
-  }): Promise<SellerWithSocialAccounts> {
+  }) {
     const socialAccountWithSeller = await this.findSocialAccountIncludeSeller({
       provider,
       serviceId: id,
@@ -120,7 +90,7 @@ export class SocialService {
           },
         },
       });
-      return this.findSellerIncludeSocialAccount({ id: createdSeller.id });
+      return this.sellerService.findOne({ id: createdSeller.id });
     }
 
     // 토큰정보 업데2트
@@ -132,9 +102,7 @@ export class SocialService {
         profileImage: picture,
       },
     });
-    return this.findSellerIncludeSocialAccount({
-      id: socialAccountWithSeller.seller.id,
-    });
+    return this.sellerService.findOne({ id: socialAccountWithSeller.seller.id });
   }
 
   /** 소셜계정 데이터 삭제 */

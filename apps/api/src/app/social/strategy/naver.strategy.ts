@@ -18,11 +18,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
     });
   }
 
-  async validate(
-    accessToken: string,
-    refreshToken: null,
-    profile: Profile,
-  ): Promise<SellerWithSocialAccounts> {
+  async validate(accessToken: string, refreshToken: null, profile: Profile) {
     const { email, nickname, profile_image, id } = profile._json;
     const user = await this.socialService.findOrCreateSeller({
       id,

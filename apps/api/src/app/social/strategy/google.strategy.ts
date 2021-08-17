@@ -24,7 +24,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     refreshToken: null,
     profile: Profile,
     done: VerifyCallback,
-  ): Promise<SellerWithSocialAccounts> {
+  ) {
     const { id, displayName, emails, photos } = profile;
 
     const user = await this.socialService.findOrCreateSeller({

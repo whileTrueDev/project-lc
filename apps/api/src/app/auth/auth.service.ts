@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
-  async login(user) {
-    console.log('토큰발급 & 저장하는 로그인 처리 - 유저정보 : ', { user });
-    // TODO: 토큰 발급
-    // TODO: 토큰 저장
+  // TODO : 로컬로그인 일감 병합 후 수정
+  async issueToken(user, stayLogedIn = false, type = 'seller') {
     return {
-      accessToken: '가짜토큰',
-      refreshToken: '가짜 리프레시 토큰',
+      token_type: 'bearer',
+      access_token: 'some_access_token',
+      expires_in: 'ACCESS_TOKEN_EXPIRE_TIME_INT',
+      refresh_token: 'some_refresh_token',
+      refresh_token_expires_in: 12345,
+      scope: 'userType',
     };
   }
 }
