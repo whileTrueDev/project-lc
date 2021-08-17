@@ -41,6 +41,15 @@ export class SellerService {
     return seller;
   }
 
+  /** 비밀번호를 포함한 유저정보 조회 */
+  async findOneWithPassword(findInput: Prisma.SellerWhereUniqueInput): Promise<Seller> {
+    const seller = await this.prisma.seller.findUnique({
+      where: findInput,
+    });
+
+    return seller;
+  }
+
   /**
    * 이메일 주소가 중복되는 지 체크합니다.
    * @param email 중복체크할 이메일 주소

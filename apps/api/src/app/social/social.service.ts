@@ -39,7 +39,7 @@ export class SocialService {
 
   /**
    * 해당 소셜서비스 계정 소유하는 seller 찾거나 생성하여 반환
-   * googleStrategy validate함수에서 사용
+   * google, kakao, naver strategy validate함수에서 사용
    */
   async findOrCreateSeller({
     id,

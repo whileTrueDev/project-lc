@@ -21,7 +21,7 @@ export class SocialController {
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const loginToken = await this.authService.issueToken(req.user);
+    const loginToken = await this.authService.issueTokenForSocialAccount(req.user);
     res.cookie('refresh_token', loginToken.refresh_token, {
       httpOnly: true,
       maxAge: loginToken.refresh_token_expires_in,
@@ -44,7 +44,7 @@ export class SocialController {
   @Get('/naver/callback')
   @UseGuards(AuthGuard('naver'))
   async naverAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const loginToken = await this.authService.issueToken(req.user);
+    const loginToken = await this.authService.issueTokenForSocialAccount(req.user);
     res.cookie('refresh_token', loginToken.refresh_token, {
       httpOnly: true,
       maxAge: loginToken.refresh_token_expires_in,
@@ -67,7 +67,7 @@ export class SocialController {
   @Get('/kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const loginToken = await this.authService.issueToken(req.user);
+    const loginToken = await this.authService.issueTokenForSocialAccount(req.user);
     res.cookie('refresh_token', loginToken.refresh_token, {
       httpOnly: true,
       maxAge: loginToken.refresh_token_expires_in,
