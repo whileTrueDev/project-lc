@@ -30,25 +30,30 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
     setError,
   } = useForm<LoginSellerDto>();
 
-  // * 회원가입 핸들러
+  // * 로그인 핸들러
   const login = useLoginMutation();
   const onSubmit = useCallback(
     async (data: LoginSellerDto) => {
       const seller = await login.mutateAsync(data).catch((err) => {
         // eslint-disable-next-line no-console
-        console.error(err.response);
         setError('email', {
           type: 'validate',
-          message: err?.response.data?.message || err.message,
+          message: getMessage(err?.response.data?.statusCode),
         });
       });
       if (seller) {
-        console.log(seller);
         router.push('/');
       }
     },
     [router, setError, login],
   );
+
+  function getMessage(statusCode: number | undefined) {
+    if (statusCode === 401) {
+      return '가입하지 않은 아이디이거나, 잘못된 비밀번호입니다.';
+    }
+    return '잠시후 다시 로그인 해주세요.';
+  }
 
   return (
     <CenterBox
