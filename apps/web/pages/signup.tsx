@@ -1,4 +1,4 @@
-import { SignupForm, Navbar, SignupModal, SignupStart } from '@project-lc/components';
+import { SignupForm, Navbar, SignupStart } from '@project-lc/components';
 import { Box, Flex } from '@chakra-ui/react';
 import { useState } from 'react';
 
