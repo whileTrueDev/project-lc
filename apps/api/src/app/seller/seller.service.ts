@@ -25,16 +25,14 @@ export class SellerService {
   /**
    * 유저 정보 조회
    */
-  async findOne(
-    findInput: Prisma.SellerWhereUniqueInput,
-  ): Promise<Omit<Seller, 'password'>> {
+  async findOne(findInput: Prisma.SellerWhereUniqueInput): Promise<Seller> {
     const seller = await this.prisma.seller.findUnique({
       where: findInput,
       select: {
         id: true,
         email: true,
         name: true,
-        password: false,
+        password: true,
       },
     });
 

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
@@ -9,10 +9,11 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtConfigService } from '../../settings/jwt.setting';
 import { MailVerificationService } from './mailVerification.service';
+import { SellerService } from '../seller/seller.service';
 
 @Module({
   imports: [
-    SellerModule,
+    forwardRef(() => SellerModule),
     PassportModule,
     JwtModule.registerAsync({
       useClass: JwtConfigService,
