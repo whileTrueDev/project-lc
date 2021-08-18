@@ -8,7 +8,11 @@ import { colorizedMorganMiddleware } from '@project-lc/nest-modules';
 
 export class AppSetting {
   private corsOptions = {
-    origin: ['http://localhost:4200', 'http://localhost:3011'],
+    origin: [
+      'http://localhost:4200',
+      'http://localhost:3011',
+      'https://project-lc.vercel.app',
+    ],
     credentials: true,
   };
 

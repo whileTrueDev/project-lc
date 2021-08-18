@@ -1,13 +1,28 @@
-import { Controller, Get, Post, Req, Body, UseGuards, Res, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Req,
+  Body,
+  UseGuards,
+  Res,
+  Query,
+  ValidationPipe,
+} from '@nestjs/common';
+import { SendMailVerificationDto, loginUserRes } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
-import { loginUserRes } from '@project-lc/shared-types';
+import { MailVerificationService } from './mailVerification.service';
+
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly mailVerificationService: MailVerificationService,
+  ) {}
 
   // 최초 로그인을 담당할 Router 구현하기
   @UseGuards(LocalAuthGuard)
@@ -38,5 +53,13 @@ export class AuthController {
   getProfile(@Req() req) {
     // 요청 객체의 user로 들어가게 된다.
     return req.user;
+  }
+
+  // * 인증코드 메일 전송
+  @Post('mail-verification')
+  sendMailVerification(
+    @Body(ValidationPipe) dto: SendMailVerificationDto,
+  ): Promise<boolean> {
+    return this.mailVerificationService.sendVerificationMail(dto.email);
   }
 }

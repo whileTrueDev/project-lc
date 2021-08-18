@@ -1,24 +1,31 @@
 import {
+  ChevronDownIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  HamburgerIcon,
+} from '@chakra-ui/icons';
+import {
   Box,
-  Flex,
-  Text,
-  IconButton,
   Button,
-  Stack,
   Collapse,
+  Flex,
   Icon,
+  IconButton,
   Link,
   Popover,
-  PopoverTrigger,
   PopoverContent,
-  useColorModeValue,
+  PopoverTrigger,
+  Stack,
+  Text,
   useBreakpointValue,
+  useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { ColorModeSwitcher } from '..';
+import { useRouter } from 'next/router';
+import { ColorModeSwitcher } from './ColorModeSwitcher';
 
 export function Navbar() {
+  const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -63,20 +70,20 @@ export function Navbar() {
         <Stack flex={{ base: 1, md: 0 }} justify="flex-end" direction="row" spacing={6}>
           <ColorModeSwitcher />
           <Button as="a" fontSize="sm" fontWeight={400} variant="link" href="#">
-            Sign In
+            로그인
           </Button>
           <Button
+            onClick={() => router.push('/signup')}
             display={{ base: 'none', md: 'inline-flex' }}
             fontSize="sm"
             fontWeight={600}
             color="white"
             bg="pink.400"
-            href="#"
             _hover={{
               bg: 'pink.300',
             }}
           >
-            Sign Up
+            시작하기
           </Button>
         </Stack>
       </Flex>
@@ -150,7 +157,11 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
     >
       <Stack direction="row" align="center">
         <Box>
-          <Text transition="all .3s ease" _groupHover={{ color: 'pink.400' }} fontWeight={500}>
+          <Text
+            transition="all .3s ease"
+            _groupHover={{ color: 'pink.400' }}
+            fontWeight={500}
+          >
             {label}
           </Text>
           <Text fontSize="sm">{subLabel}</Text>

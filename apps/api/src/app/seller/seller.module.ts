@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '@project-lc/prisma-orm';
+import { AuthModule } from '../auth/auth.module';
 import { SellerController } from './seller.controller';
 import { SellerService } from './seller.service';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [AuthModule],
   controllers: [SellerController],
   providers: [SellerService],
   exports: [SellerService, PrismaModule],

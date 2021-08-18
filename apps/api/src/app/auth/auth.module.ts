@@ -8,6 +8,7 @@ import { SellerModule } from '../seller/seller.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtConfigService } from '../../settings/jwt.setting';
+import { MailVerificationService } from './mailVerification.service';
 
 @Module({
   imports: [
@@ -17,7 +18,14 @@ import { JwtConfigService } from '../../settings/jwt.setting';
       useClass: JwtConfigService,
     }),
   ],
-  providers: [AuthService, CipherService, JwtStrategy, LocalStrategy],
+  providers: [
+    AuthService,
+    CipherService,
+    JwtStrategy,
+    LocalStrategy,
+    MailVerificationService,
+  ],
   controllers: [AuthController],
+  exports: [MailVerificationService],
 })
 export class AuthModule {}
