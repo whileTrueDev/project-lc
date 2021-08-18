@@ -27,7 +27,7 @@ export class SocialController {
       maxAge: loginToken.refresh_token_expires_in,
     });
     res.cookie('access_token', loginToken.access_token);
-    res.send({ user: req.user, loginToken }); // TODO: 로컬로그인 병합 후 변경하기
+    res.redirect(this.frontMypageUrl);
   }
 
   @Delete('/google/unlink/:googleId')
@@ -50,7 +50,7 @@ export class SocialController {
       maxAge: loginToken.refresh_token_expires_in,
     });
     res.cookie('access_token', loginToken.access_token);
-    res.send({ user: req.user, loginToken }); // TODO: 로컬로그인 병합 후 변경하기
+    res.redirect(this.frontMypageUrl);
   }
 
   @Delete('/naver/unlink/:naverId')
@@ -73,7 +73,7 @@ export class SocialController {
       maxAge: loginToken.refresh_token_expires_in,
     });
     res.cookie('access_token', loginToken.access_token);
-    res.send({ user: req.user, loginToken }); // TODO: 로컬로그인 병합 후 변경하기
+    res.redirect(this.frontMypageUrl);
   }
 
   @Delete('/kakao/unlink/:kakaoId')
