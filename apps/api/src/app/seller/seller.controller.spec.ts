@@ -6,7 +6,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Seller } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
-import { JwtConfigService } from '../../settings/jwt.setting';
 import { mailerConfig } from '../../settings/mailer.config';
 import { AuthModule } from '../auth/auth.module';
 import { SellerController } from './seller.controller';
@@ -31,8 +30,9 @@ describe('SellerController', () => {
         PrismaModule,
         MailerModule.forRoot(mailerConfig),
         ConfigModule.forRoot({ isGlobal: true }),
-        JwtModule.registerAsync({
-          useClass: JwtConfigService,
+        JwtModule.register({
+          secret: 'test',
+          signOptions: { expiresIn: '15m' },
         }),
       ],
     })

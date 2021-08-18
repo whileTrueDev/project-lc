@@ -4,7 +4,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
-import { JwtConfigService } from '../../settings/jwt.setting';
 import { AuthService } from '../auth/auth.service';
 import { CipherService } from '../auth/cipher.service';
 import { SellerService } from './seller.service';
@@ -21,8 +20,9 @@ describe('SellerService', () => {
       imports: [
         PrismaModule,
         ConfigModule.forRoot({ isGlobal: true }),
-        JwtModule.registerAsync({
-          useClass: JwtConfigService,
+        JwtModule.register({
+          secret: 'test',
+          signOptions: { expiresIn: '15m' },
         }),
       ],
       providers: [SellerService, AuthService, CipherService],

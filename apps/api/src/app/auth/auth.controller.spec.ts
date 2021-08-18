@@ -9,7 +9,6 @@ import { MailVerificationService } from './mailVerification.service';
 import { AuthService } from './auth.service';
 import { SellerModule } from '../seller/seller.module';
 import { CipherService } from './cipher.service';
-import { JwtConfigService } from '../../settings/jwt.setting';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -21,8 +20,9 @@ describe('AuthController', () => {
         PrismaModule,
         SellerModule,
         ConfigModule.forRoot({ isGlobal: true }),
-        JwtModule.registerAsync({
-          useClass: JwtConfigService,
+        JwtModule.register({
+          secret: 'test',
+          signOptions: { expiresIn: '15m' },
         }),
       ],
       controllers: [AuthController],

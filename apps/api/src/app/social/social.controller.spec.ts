@@ -3,7 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from '@project-lc/prisma-orm';
-import { JwtConfigService } from '../../settings/jwt.setting';
 import { mailerConfig } from '../../settings/mailer.config';
 import { AuthModule } from '../auth/auth.module';
 import { AuthService } from '../auth/auth.service';
@@ -21,8 +20,9 @@ describe('SocialController', () => {
         PrismaModule,
         AuthModule,
         ConfigModule.forRoot({ isGlobal: true }),
-        JwtModule.registerAsync({
-          useClass: JwtConfigService,
+        JwtModule.register({
+          secret: 'test',
+          signOptions: { expiresIn: '15m' },
         }),
         MailerModule.forRoot(mailerConfig),
       ],
