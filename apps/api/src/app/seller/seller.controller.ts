@@ -25,9 +25,7 @@ export class SellerController {
 
   // * 판매자 정보 조회
   @Get()
-  public findOne(
-    @Query(ValidationPipe) dto: FindSellerDto,
-  ): Promise<Omit<Seller, 'password'>> {
+  public findOne(@Query(ValidationPipe) dto: FindSellerDto): Promise<Seller> {
     return this.sellerService.findOne({ email: dto.email });
   }
 

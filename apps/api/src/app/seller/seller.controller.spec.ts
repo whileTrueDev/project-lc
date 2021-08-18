@@ -5,9 +5,9 @@ import { Seller } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
 import { mailerConfig } from '../../settings/mailer.config';
-import { AuthModule } from '../auth/auth.module';
 import { SellerController } from './seller.controller';
 import { SellerService } from './seller.service';
+import { MailVerificationService } from '../auth/mailVerification.service';
 
 describe('SellerController', () => {
   let app: NestApplication;
@@ -22,9 +22,9 @@ describe('SellerController', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, PrismaModule, MailerModule.forRoot(mailerConfig)],
+      imports: [PrismaModule, MailerModule.forRoot(mailerConfig)],
       controllers: [SellerController],
-      providers: [SellerService],
+      providers: [SellerService, MailVerificationService],
     }).compile();
 
     controller = module.get<SellerController>(SellerController);
@@ -38,7 +38,9 @@ describe('SellerController', () => {
   });
 
   afterAll(async () => {
-    return app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   it('should be defined', () => {

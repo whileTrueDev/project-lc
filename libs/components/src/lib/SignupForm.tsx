@@ -21,7 +21,7 @@ import {
   useMailVerificationMutation,
   useSellerSignupMutation,
 } from '@project-lc/hooks';
-import { CenterBox } from '@project-lc/components';
+import { CenterBox } from './CenterBox';
 
 export interface SignupFormProps {
   enableShadow?: boolean;

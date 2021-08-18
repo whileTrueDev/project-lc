@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
-import { hash } from 'argon2';
+import { hash, verify } from 'argon2';
 import { PrismaService } from '@project-lc/prisma-orm';
 
 @Injectable()
@@ -58,5 +58,16 @@ export class SellerService {
   private async hashPassword(purePw: string): Promise<string> {
     const hashed = await hash(purePw);
     return hashed;
+  }
+
+  /**
+   * 입력한 비밀번호를 해시된 비밀번호와 비교합니다.
+   * @param pwInput 입력한 비밀번호 문자열
+   * @param hashedPw 해시된 비밀번호 값
+   * @returns {boolean} 올바른 비밀번호인지 여부
+   */
+  async validatePassword(pwInput: string, hashedPw: string): Promise<boolean> {
+    const isCorrect = await verify(hashedPw, pwInput);
+    return isCorrect;
   }
 }

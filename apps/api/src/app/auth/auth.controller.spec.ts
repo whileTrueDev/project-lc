@@ -3,7 +3,9 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PrismaModule } from '@project-lc/prisma-orm';
 import { AuthService } from './auth.service';
 import { CipherService } from './cipher.service';
 import { AuthController } from './auth.controller';
@@ -13,6 +15,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtConfigService } from '../../settings/jwt.setting';
 import { SellerService } from '../seller/seller.service';
 import { findOne, authTestCases } from './auth.test-case';
+import { MailVerificationService } from './mailVerification.service';
+import { mailerConfig } from '../../settings/mailer.config';
 
 describe('AuthController', () => {
   let app: INestApplication;
@@ -21,14 +25,22 @@ describe('AuthController', () => {
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
         SellerModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+        MailerModule.forRoot(mailerConfig),
         PassportModule,
         JwtModule.registerAsync({
           useClass: JwtConfigService,
         }),
+        PrismaModule,
       ],
-      providers: [AuthService, CipherService, JwtStrategy, LocalStrategy],
+      providers: [
+        AuthService,
+        CipherService,
+        JwtStrategy,
+        LocalStrategy,
+        MailVerificationService,
+      ],
       controllers: [AuthController],
     }).compile();
 
