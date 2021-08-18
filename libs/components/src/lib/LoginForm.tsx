@@ -13,9 +13,13 @@ import {
   Stack,
   Text,
   useColorModeValue,
+  VStack,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { CenterBox } from './CenterBox';
+import GoogleLoginButton from './GoogleLoginButton';
+import NaverLoginButton from './NaverLoginButton';
+import KakaoLoginButton from './KakaoLoginButton';
 
 export interface LoginFormProps {
   enableShadow?: boolean;
@@ -113,6 +117,12 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
         >
           로그인
         </Button>
+        <Divider />
+        <VStack>
+          <GoogleLoginButton />
+          <NaverLoginButton />
+          <KakaoLoginButton />
+        </VStack>
       </Stack>
     </CenterBox>
   );
