@@ -7,6 +7,6 @@ import { SellerService } from './seller.service';
   imports: [AuthModule],
   controllers: [SellerController],
   providers: [SellerService],
-  exports: [SellerService, PrismaModule],
+  exports: [SellerService],
 })
 export class SellerModule {}
