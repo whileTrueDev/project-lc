@@ -1,22 +1,35 @@
 /* eslint-disable dot-notation */
+import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
+import { JwtConfigService } from '../../settings/jwt.setting';
+import { AuthService } from '../auth/auth.service';
+import { CipherService } from '../auth/cipher.service';
 import { SellerService } from './seller.service';
 
 describe('SellerService', () => {
   let service: SellerService;
   let __prisma: PrismaClient;
   const TEST_USER_EMAIL = 'exists_test@test.com';
+  let authService: AuthService;
 
   beforeAll(async () => {
     __prisma = new PrismaClient();
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule],
-      providers: [SellerService],
+      imports: [
+        PrismaModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+        JwtModule.registerAsync({
+          useClass: JwtConfigService,
+        }),
+      ],
+      providers: [SellerService, AuthService, CipherService],
     }).compile();
 
     service = module.get<SellerService>(SellerService);
+    authService = module.get<AuthService>(AuthService);
   });
 
   afterAll(async () => {
@@ -35,15 +48,15 @@ describe('SellerService', () => {
     });
   });
 
-  describe('[PrivateMethod] verifyPassword', () => {
+  describe('AuthService.validatePassword', () => {
     it('should return true if a valid password is provided', async () => {
       const hashed = await service['hashPassword']('test');
-      expect(await service['verifyPassword']('test', hashed)).toBe(true);
+      expect(await authService['validatePassword']('test', hashed)).toBe(true);
     });
 
     it('should return false if a invalid password is provided', async () => {
       const hashed = await service['hashPassword']('test');
-      expect(await service['verifyPassword']('invalidpassword', hashed)).toBe(false);
+      expect(await authService['validatePassword']('test', hashed)).toBe(true);
     });
   });
 

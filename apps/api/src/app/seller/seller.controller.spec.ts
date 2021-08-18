@@ -1,9 +1,12 @@
 import { MailerModule } from '@nestjs-modules/mailer';
+import { ConfigModule } from '@nestjs/config';
 import { NestApplication } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Seller } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
+import { JwtConfigService } from '../../settings/jwt.setting';
 import { mailerConfig } from '../../settings/mailer.config';
 import { AuthModule } from '../auth/auth.module';
 import { SellerController } from './seller.controller';
@@ -12,29 +15,35 @@ import { SellerService } from './seller.service';
 describe('SellerController', () => {
   let app: NestApplication;
   let controller: SellerController;
-  let service: SellerService;
+
   const user: Seller = {
     id: 1,
     name: 'tester',
     email: 'test@test.com',
     password: 'test',
   };
+  const service = { findOne: async () => Promise.resolve(user) };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, PrismaModule, MailerModule.forRoot(mailerConfig)],
-      controllers: [SellerController],
-      providers: [SellerService],
-    }).compile();
+      imports: [
+        AuthModule,
+        PrismaModule,
+        MailerModule.forRoot(mailerConfig),
+        ConfigModule.forRoot({ isGlobal: true }),
+        JwtModule.registerAsync({
+          useClass: JwtConfigService,
+        }),
+      ],
+    })
+      .overrideProvider(SellerService)
+      .useValue(service)
+      .compile();
 
     controller = module.get<SellerController>(SellerController);
-    service = module.get<SellerService>(SellerService);
-
-    jest.spyOn(service, 'signUp').mockImplementation(async () => user);
-    jest.spyOn(service, 'findOne').mockImplementation(async () => user);
 
     app = module.createNestApplication();
-    app.init();
+    await app.init();
   });
 
   afterAll(async () => {
