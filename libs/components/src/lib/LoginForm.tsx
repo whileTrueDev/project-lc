@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useRouter } from 'next/router';
-import { CenterBox } from '@project-lc/components';
 import { LoginSellerDto } from '@project-lc/shared-types';
 import { useLoginMutation } from '@project-lc/hooks';
 import { useCallback } from 'react';
@@ -16,6 +15,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
+import { CenterBox } from './CenterBox';
 
 export interface LoginFormProps {
   enableShadow?: boolean;
