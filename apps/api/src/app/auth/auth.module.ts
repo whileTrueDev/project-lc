@@ -9,7 +9,6 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtConfigService } from '../../settings/jwt.setting';
 import { MailVerificationService } from './mailVerification.service';
-import { SellerService } from '../seller/seller.service';
 
 @Module({
   imports: [
