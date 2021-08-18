@@ -8,11 +8,9 @@ import {
   ListItem,
   Grid,
   Button,
-  VStack,
+  Stack,
 } from '@chakra-ui/react';
-import GoogleLoginButton from './GoogleLoginButton';
-import KakaoLoginButton from './KakaoLoginButton';
-import NaverLoginButton from './NaverLoginButton';
+import SocialButtonGroup from './SocialButtonGroup';
 
 export function SignupStart({
   moveToSignupForm,
@@ -39,14 +37,12 @@ export function SignupStart({
           </ListItem>
         </List>
 
-        <VStack spacing={2}>
-          <GoogleLoginButton />
-          <NaverLoginButton />
-          <KakaoLoginButton />
-          <Button isFullWidth onClick={moveToSignupForm}>
+        <Stack spacing={2}>
+          <Button bg="blue.400" isFullWidth onClick={moveToSignupForm} mb={4}>
             이메일 계정으로 가입
           </Button>
-        </VStack>
+          <SocialButtonGroup />
+        </Stack>
       </Grid>
     </Box>
   );
