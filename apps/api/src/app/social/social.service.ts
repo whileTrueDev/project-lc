@@ -24,7 +24,7 @@ export class SocialService {
   /**
    * 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 셀러 계정정보 찾기
    */
-  async findSocialAccountIncludeSeller({
+  private async findSocialAccountIncludeSeller({
     provider,
     serviceId,
   }: {
@@ -114,7 +114,7 @@ export class SocialService {
   }
 
   /** 소셜계정 테이블에서 accessToken 가져오기 */
-  async getSocialAccountAccessToken(provider: string, serviceId: string) {
+  private async getSocialAccountAccessToken(provider: string, serviceId: string) {
     const socialAccount = await this.findSocialAccountIncludeSeller({
       provider,
       serviceId,

@@ -1,8 +1,18 @@
-import { Controller, Delete, Get, Param, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Req,
+  Res,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from '../auth/auth.service';
 import { SocialService } from './social.service';
+import { SocialLoginExceptionFilter } from './social-login-exception.filter';
 @Controller('social')
 export class SocialController {
   constructor(
@@ -10,7 +20,7 @@ export class SocialController {
     private readonly socialService: SocialService,
   ) {}
 
-  private readonly frontMypageUrl = 'http://localhost:4200/'; // TODO: front mypage로 리다이렉션
+  private readonly frontMypageUrl = 'http://localhost:4200/mypage';
 
   /** 구글 ************************************************ */
   @Get('/google/login')
@@ -20,6 +30,7 @@ export class SocialController {
 
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
+  @UseFilters(new SocialLoginExceptionFilter())
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
     const loginToken = await this.authService.issueTokenForSocialAccount(req.user);
     res.cookie('refresh_token', loginToken.refresh_token, {
@@ -43,6 +54,7 @@ export class SocialController {
 
   @Get('/naver/callback')
   @UseGuards(AuthGuard('naver'))
+  @UseFilters(new SocialLoginExceptionFilter())
   async naverAuthCallback(@Req() req: Request, @Res() res: Response) {
     const loginToken = await this.authService.issueTokenForSocialAccount(req.user);
     res.cookie('refresh_token', loginToken.refresh_token, {
@@ -66,6 +78,7 @@ export class SocialController {
 
   @Get('/kakao/callback')
   @UseGuards(AuthGuard('kakao'))
+  @UseFilters(new SocialLoginExceptionFilter())
   async kakaoAuthCallback(@Req() req: Request, @Res() res: Response) {
     const loginToken = await this.authService.issueTokenForSocialAccount(req.user);
     res.cookie('refresh_token', loginToken.refresh_token, {
