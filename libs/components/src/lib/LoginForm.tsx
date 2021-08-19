@@ -1,10 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useRouter } from 'next/router';
-import { LoginSellerDto } from '@project-lc/shared-types';
-import { useLoginMutation } from '@project-lc/hooks';
-import { useCallback } from 'react';
 import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
   Button,
+  CloseButton,
   Divider,
   FormControl,
   FormErrorMessage,
@@ -15,7 +15,11 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { useLoginMutation } from '@project-lc/hooks';
+import { LoginSellerDto } from '@project-lc/shared-types';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CenterBox } from './CenterBox';
 import SocialButtonGroup from './SocialButtonGroup';
@@ -30,25 +34,25 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
-    setError,
   } = useForm<LoginSellerDto>();
+
+  const [formError, setFormError] = useState('');
+  function resetFormError() {
+    setFormError('');
+  }
 
   // * 로그인 핸들러
   const login = useLoginMutation();
   const onSubmit = useCallback(
     async (data: LoginSellerDto) => {
       const seller = await login.mutateAsync(data).catch((err) => {
-        // eslint-disable-next-line no-console
-        setError('email', {
-          type: 'validate',
-          message: getMessage(err?.response.data?.statusCode),
-        });
+        setFormError(getMessage(err?.response.data?.statusCode));
       });
       if (seller) {
         router.push('/');
       }
     },
-    [router, setError, login],
+    [router, setFormError, login],
   );
 
   function getMessage(statusCode: number | undefined) {
@@ -109,6 +113,13 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
             {errors.password && errors.password.message}
           </FormErrorMessage>
         </FormControl>
+        {formError && (
+          <Alert status="error">
+            <AlertIcon />
+            <AlertTitle fontSize="sm">{formError}</AlertTitle>
+            <CloseButton onClick={resetFormError} />
+          </Alert>
+        )}
         <Divider />
         <Button
           bg="blue.400"
@@ -116,6 +127,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
           _hover={{ bg: 'blue.500' }}
           type="submit"
           isLoading={isSubmitting}
+          onClick={resetFormError}
         >
           로그인
         </Button>
