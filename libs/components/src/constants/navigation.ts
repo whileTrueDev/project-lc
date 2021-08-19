@@ -30,12 +30,7 @@ export const mypageNavLinks: MypageLink[] = [
   { name: '홈', href: '/mypage' },
   {
     name: '상품',
-    children: [
-      {
-        name: '상품목록',
-        href: '/mypage/goods',
-      },
-    ],
+    href: '/mypage/goods',
   },
   {
     name: '라이브쇼핑',
@@ -52,21 +47,11 @@ export const mypageNavLinks: MypageLink[] = [
   },
   {
     name: '주문',
-    children: [
-      {
-        name: '주문목록',
-        href: '/mypage/orders',
-      },
-    ],
+    href: '/mypage/orders',
   },
   {
     name: '상점설정',
-    children: [
-      {
-        name: '상점 공통 정보',
-        href: '/mypage/shopinfo',
-      },
-    ],
+    href: '/mypage/shopinfo',
   },
   { name: '정산', href: '/mypage/settlement' },
 ];
