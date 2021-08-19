@@ -38,12 +38,12 @@ describe('SellerService', () => {
   describe('[PrivateMethod] verifyPassword', () => {
     it('should return true if a valid password is provided', async () => {
       const hashed = await service['hashPassword']('test');
-      expect(await service['verifyPassword']('test', hashed)).toBe(true);
+      expect(await service.validatePassword('test', hashed)).toBe(true);
     });
 
     it('should return false if a invalid password is provided', async () => {
       const hashed = await service['hashPassword']('test');
-      expect(await service['verifyPassword']('invalidpassword', hashed)).toBe(false);
+      expect(await service.validatePassword('invalidpassword', hashed)).toBe(false);
     });
   });
 
