@@ -5,6 +5,7 @@ import { useLoginMutation } from '@project-lc/hooks';
 import { useCallback } from 'react';
 import {
   Button,
+  Checkbox,
   Divider,
   FormControl,
   FormErrorMessage,
@@ -31,7 +32,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
   } = useForm<LoginSellerDto>();
 
   // * 로그인 핸들러
-  const login = useLoginMutation();
+  const login = useLoginMutation('seller');
   const onSubmit = useCallback(
     async (data: LoginSellerDto) => {
       const seller = await login.mutateAsync(data).catch((err) => {
@@ -102,6 +103,11 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
           <FormErrorMessage>
             {errors.password && errors.password.message}
           </FormErrorMessage>
+        </FormControl>
+        <FormControl>
+          <Checkbox size="sm" {...register('stayLogedIn')}>
+            로그인 상태 유지
+          </Checkbox>
         </FormControl>
         <Divider />
         <Button
