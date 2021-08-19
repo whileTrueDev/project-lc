@@ -1,7 +1,4 @@
 import axios from 'axios';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 export const cancelToken = axios.CancelToken;
 export const { isCancel } = axios;
