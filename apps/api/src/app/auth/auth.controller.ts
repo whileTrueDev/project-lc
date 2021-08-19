@@ -40,18 +40,13 @@ export class AuthController {
       stayLogedIn,
       userType,
     );
-    // response 객체 설정
-    res.cookie('refresh_token', loginToken.refresh_token, {
-      httpOnly: true,
-      maxAge: loginToken.refresh_token_expires_in,
-    });
+    this.authService.handleLoginHeader(res, loginToken);
     res.status(200).send(loginToken);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Req() req) {
-    // 요청 객체의 user로 들어가게 된다.
     return req.user;
   }
 

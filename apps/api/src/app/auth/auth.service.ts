@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes } from '@project-lc/shared-types';
 import { User, UserPayload } from './auth.interface';
@@ -67,13 +67,27 @@ export class AuthService {
   }
 
   /**
-   * 요청 객체에 새로운 Access Token을 헤더에 추가합니다.
-   * @param req 요청 객체
+   * 로그인시, 응답 객체에 새로운 Access Token을 헤더에 추가합니다.
+   * @param res 요청 객체
    * @param userPayload Token에 저장될 payload
    */
-  handleAuthorizationHeader(req: Request, userPayload: UserPayload): void {
+  handleLoginHeader(res: Response, loginToken: loginUserRes): void {
+    res.append('Cache-Control', 'no-cache');
+    res.append('X-Access-Token', loginToken.access_token);
+    res.cookie('refresh_token', loginToken.refresh_token, {
+      httpOnly: true,
+      maxAge: loginToken.refresh_token_expires_in,
+    });
+  }
+
+  /**
+   * 응답 객체에 새로운 Access Token을 헤더에 추가합니다.
+   * @param res 요청 객체
+   * @param userPayload Token에 저장될 payload
+   */
+  handleAuthorizationHeader(res: Response, userPayload: UserPayload): void {
     const newAccessToken = this.createAccessTokenByRefresh(userPayload);
-    req.headers.authorization = newAccessToken;
+    res.append('X-Access-Token', `${newAccessToken}`);
   }
 
   /**
@@ -124,6 +138,6 @@ export class AuthService {
   private createAccessTokenByRefresh(tokenUserPayload: UserPayload): string {
     const userPayload = this.castUserPayload(tokenUserPayload);
     const newAccessToken = this.createAccessToken(userPayload);
-    return `Bearer ${newAccessToken}`;
+    return `${newAccessToken}`;
   }
 }

@@ -7,4 +7,11 @@ const axiosInstance = axios.create({
   baseURL: 'http://localhost:3000',
 });
 
+axiosInstance.interceptors.response.use((response) => {
+  if (response.headers['x-access-token']) {
+    axiosInstance.defaults.headers.common.Authorization = `Bearer ${response.headers['x-access-token']}`;
+  }
+  return response;
+});
+
 export default axiosInstance;
