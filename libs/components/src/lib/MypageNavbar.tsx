@@ -10,7 +10,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { mypageNavLinks } from '../constants';
+import { mypageNavLinks } from '../constants/navigation';
 
 export function MypageNavbar(): JSX.Element {
   const linkHoverColor = useColorModeValue('gray.800', 'white');

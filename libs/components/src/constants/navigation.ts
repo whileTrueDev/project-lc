@@ -66,10 +66,6 @@ export const mypageNavLinks: MypageLink[] = [
         name: '상점 공통 정보',
         href: '/mypage/shopinfo',
       },
-      {
-        name: '배송비 정책',
-        href: '/mypage/delivery',
-      },
     ],
   },
   { name: '정산', href: '/mypage/settlement' },
