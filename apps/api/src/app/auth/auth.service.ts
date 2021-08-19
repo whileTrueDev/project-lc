@@ -62,7 +62,7 @@ export class AuthService {
    * @returns {SellerPayload} User 인터페이스 객체
    */
   async validateUser(email: string, pwdInput: string): Promise<UserPayload> {
-    const user = await this.sellerService.findOneWithPassword({ email });
+    const user = await this.sellerService.findOne({ email });
     if (!user) {
       return null;
     }

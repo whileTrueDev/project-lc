@@ -26,7 +26,6 @@ export class SellerService {
    * 유저 정보 조회
    */
   async findOne(findInput: Prisma.SellerWhereUniqueInput): Promise<Seller> {
-    console.log('origin findOne');
     const seller = await this.prisma.seller.findUnique({
       where: findInput,
       select: {
@@ -35,15 +34,6 @@ export class SellerService {
         name: true,
         password: true,
       },
-    });
-
-    return seller;
-  }
-
-  /** 비밀번호를 포함한 유저정보 조회 */
-  async findOneWithPassword(findInput: Prisma.SellerWhereUniqueInput): Promise<Seller> {
-    const seller = await this.prisma.seller.findUnique({
-      where: findInput,
     });
 
     return seller;
