@@ -12,6 +12,7 @@ export class AppSetting {
       'http://localhost:4200',
       'http://localhost:3011',
       'https://project-lc.vercel.app',
+      'https://dev-project-lc.vercel.app',
     ],
     credentials: true,
     exposedHeaders: ['X-Access-Token'],

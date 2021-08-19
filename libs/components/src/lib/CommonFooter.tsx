@@ -1,16 +1,16 @@
-import { ReactNode } from 'react';
 import {
   Box,
-  Container,
-  Stack,
-  SimpleGrid,
-  Text,
-  Link,
-  VisuallyHidden,
   chakra,
+  Container,
+  Link,
+  SimpleGrid,
+  Stack,
+  Text,
   useColorModeValue,
+  VisuallyHidden,
 } from '@chakra-ui/react';
-import { FaTwitter, FaYoutube, FaInstagram } from 'react-icons/fa';
+import { ReactNode } from 'react';
+import { FaInstagram, FaYoutube } from 'react-icons/fa';
 
 const ListHeader = ({ children }: { children: ReactNode }) => {
   return (
@@ -61,26 +61,24 @@ export function CommonFooter() {
       <Container as={Stack} maxW="6xl" py={10}>
         <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={8}>
           <Stack align="flex-start">
-            <ListHeader>Company</ListHeader>
-            <Link href="/">About Us</Link>
-            <Link href="/">Blog</Link>
-            <Link href="/">Careers</Link>
-            <Link href="/">Contact Us</Link>
+            <ListHeader>회사</ListHeader>
+            <Link href="/">소개</Link>
+            <Link href="/">블로그</Link>
+            <Link href="/">인재채용</Link>
           </Stack>
 
           <Stack align="flex-start">
-            <ListHeader>Support</ListHeader>
-            <Link href="/">Help Center</Link>
-            <Link href="/">Safety Center</Link>
-            <Link href="/">Community Guidelines</Link>
+            <ListHeader>정책</ListHeader>
+            <Link href="/">쿠키 정책</Link>
+            <Link fontWeight="bold" href="/">
+              개인정보처리방침
+            </Link>
+            <Link href="/">이용약관</Link>
           </Stack>
 
           <Stack align="flex-start">
-            <ListHeader>Legal</ListHeader>
-            <Link href="/">Cookies Policy</Link>
-            <Link href="/">Privacy Policy</Link>
-            <Link href="/">Terms of Service</Link>
-            <Link href="/">Law Enforcement</Link>
+            <ListHeader>고객지원</ListHeader>
+            <Link href="/">고객센터</Link>
           </Stack>
         </SimpleGrid>
       </Container>
@@ -99,11 +97,10 @@ export function CommonFooter() {
           justify={{ md: 'space-between' }}
           align={{ md: 'center' }}
         >
-          <Text>© 2020 Chakra Templates. All rights reserved</Text>
+          <Text fontSize="sm">
+            ⓒ {new Date().getFullYear()} whileTrue All rights reserved.
+          </Text>
           <Stack direction="row" spacing={6}>
-            <SocialButton label="Twitter" href="/">
-              <FaTwitter />
-            </SocialButton>
             <SocialButton label="YouTube" href="/">
               <FaYoutube />
             </SocialButton>

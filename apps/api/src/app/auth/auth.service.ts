@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes } from '@project-lc/shared-types';
@@ -48,6 +48,13 @@ export class AuthService {
     };
   }
 
+  issueTokenForSocialAccount(user) {
+    const userPayload = this.castUser(user);
+    const stayLogedIn = true;
+    const userType = 'seller';
+    return this.issueToken(userPayload, stayLogedIn, userType);
+  }
+
   /**
    * seller의 존재 여부를 확인한다. 다른 유저 타입에 대해서도 조회가 가능하도록 구현 필요
    * @param email 입력한 이메일 문자열
@@ -58,6 +65,10 @@ export class AuthService {
     const user = await this.sellerService.findOne({ email });
     if (!user) {
       return null;
+    }
+    if (user.password === null) {
+      // 소셜로그인으로 가입된 회원
+      throw new BadRequestException();
     }
     const isCorrect = await this.sellerService.validatePassword(pwdInput, user.password);
     if (!isCorrect) {

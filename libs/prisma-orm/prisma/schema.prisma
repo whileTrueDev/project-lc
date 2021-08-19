@@ -12,10 +12,11 @@ datasource db {
 }
 
 model Seller {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  password String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
+  id             Int                   @id @default(autoincrement())
+  email          String                @unique
+  name           String?
+  password       String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
+  socialAccounts SellerSocialAccount[]
 }
 
 model MailVerificationCode {
@@ -23,4 +24,17 @@ model MailVerificationCode {
   email            String   @default("")
   verificationCode String
   createDate       DateTime @default(now())
+}
+
+model SellerSocialAccount {
+  serviceId    String   @id // 인증 결과로 해당 서비스에서 받은 고유 식별자
+  provider     String // 'google' | 'kakao' | 'naver'
+  name         String
+  registDate   DateTime @default(now())
+  profileImage String?
+  accessToken  String?
+  refreshToken String?
+  /// @onDelete(CASCADE)
+  seller       Seller   @relation(fields: [sellerId], references: [id])
+  sellerId     Int
 }
