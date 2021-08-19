@@ -34,6 +34,7 @@ model SellerSocialAccount {
   profileImage String?
   accessToken  String?
   refreshToken String?
+  /// @onDelete(CASCADE)
   seller       Seller   @relation(fields: [sellerId], references: [id])
   sellerId     Int
 }

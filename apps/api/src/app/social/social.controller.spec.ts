@@ -33,6 +33,7 @@ describe('SocialController', () => {
     controller = module.get<SocialController>(SocialController);
   });
 
+  // TODO: oauth 테스트 찾아보고 작성하기
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });

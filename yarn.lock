@@ -2774,6 +2774,20 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
+"@paljs/plugins@^3.8.2":
+  version "3.8.2"
+  resolved "https://registry.yarnpkg.com/@paljs/plugins/-/plugins-3.8.2.tgz#5f4ade5a3e0a25a33e3f911960e2cb133b4daa3d"
+  integrity sha512-9V7FArQVDPMicVRn6q9gg0v3OKUnKICx65Dya/LSc/ECSNJ/zmUHhqLBf/lWj0INje7V6FCyedjPU8gLfD7Bug==
+  dependencies:
+    "@paljs/types" "^3.6.1"
+    graphql-fields "2.0.3"
+    graphql-tag "2.12.5"
+
+"@paljs/types@^3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@paljs/types/-/types-3.6.1.tgz#e5851c360c37b838ec3fbae3c67cd2b06e103ac5"
+  integrity sha512-JTANdJCA8ErEW31x1d5q2A+sp5UZJIbN88AP8WN6zA5v5APJzgf/ub4tqYIrhpaiWOSoAa3YMfM3DIg+PYwEVw==
+
 "@phc/format@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@phc/format/-/format-1.0.0.tgz#b5627003b3216dc4362125b13f48a4daa76680e4"
@@ -8344,6 +8358,18 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   version "4.2.6"
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.6.tgz"
   integrity sha512-nTnJ528pbqxYanhpDYsi4Rd8MAeaBA67+RZ10CM1m3bTAVFEDcd5AuA4a6W5YkGZ1iNXHzZz8T6TBKLeBuNriQ==
+
+graphql-fields@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/graphql-fields/-/graphql-fields-2.0.3.tgz#5e68dff7afbb202be4f4f40623e983b22c96ab8f"
+  integrity sha512-x3VE5lUcR4XCOxPIqaO4CE+bTK8u6gVouOdpQX9+EKHr+scqtK5Pp/l8nIGqIpN1TUlkKE6jDCCycm/WtLRAwA==
+
+graphql-tag@2.12.5:
+  version "2.12.5"
+  resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.12.5.tgz#5cff974a67b417747d05c8d9f5f3cb4495d0db8f"
+  integrity sha512-5xNhP4063d16Pz3HBtKprutsPrmHZi5IdUGOWRxA2B6VF7BIRGOHZ5WQvDmJXZuPcBg7rYwaFxvQYjqkSdR3TQ==
+  dependencies:
+    tslib "^2.1.0"
 
 gzip-size@^6.0.0:
   version "6.0.0"
