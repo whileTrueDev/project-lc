@@ -120,7 +120,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
         <Text fontSize="sm">
           처음 오셨나요?
           <NextLink href="/signup" passHref>
-            <Link ml={2} color={useColorModeValue('blue.500', 'white')}>
+            <Link ml={2} color={useColorModeValue('blue.500', 'blue.400')}>
               가입하기
             </Link>
           </NextLink>

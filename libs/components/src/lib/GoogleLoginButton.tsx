@@ -10,7 +10,7 @@ export function GoogleLoginButton(): JSX.Element {
       href="http://localhost:3000/social/google/login"
       bg="white"
       color="black"
-      _hover={{ bg: 'white', color: 'gray.300' }}
+      _hover={{ boxShadow: 'lg' }}
       boxShadow="md"
     >
       <ChakraNextImage src={googleLogo} width="40" height="40" mr={4} />
