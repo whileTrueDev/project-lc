@@ -129,7 +129,6 @@ export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFo
             type="text"
             placeholder="김민수"
             autoComplete="off"
-            // disabled={phase === 2}
             isReadOnly={phase === 2}
             {...register('name', {
               required: '이름을 작성해주세요.',
@@ -144,7 +143,6 @@ export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFo
             id="email"
             type="email"
             placeholder="minsu@example.com"
-            // disabled={phase === 2}
             isReadOnly={phase === 2}
             autoComplete="off"
             {...register('email', {
@@ -171,7 +169,6 @@ export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFo
           <Input
             id="password"
             type="password"
-            // disabled={phase === 2}
             isReadOnly={phase === 2}
             placeholder="********"
             {...register('password', {
@@ -204,7 +201,6 @@ export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFo
           <Input
             id="repassword"
             type="password"
-            // disabled={phase === 2}
             isReadOnly={phase === 2}
             placeholder="********"
             {...register('repassword', {
