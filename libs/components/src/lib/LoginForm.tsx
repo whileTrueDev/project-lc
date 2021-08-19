@@ -36,6 +36,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
     formState: { errors, isSubmitting },
   } = useForm<LoginSellerDto>();
 
+  // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
   const [formError, setFormError] = useState('');
   function resetFormError() {
     setFormError('');
@@ -78,36 +79,17 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
             type="email"
             placeholder="minsu@example.com"
             autoComplete="off"
-            {...register('email', {
-              required: '이메일을 작성해주세요.',
-            })}
+            {...register('email', { required: '이메일을 작성해주세요.' })}
           />
           <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
         </FormControl>
         <FormControl isInvalid={!!errors.password}>
-          <FormLabel htmlFor="password">
-            암호
-            <Text
-              fontSize="xs"
-              color={useColorModeValue('gray.500', 'gray.400')}
-              as="span"
-            >
-              (문자,숫자,특수문자 포함 8자 이상)
-            </Text>
-          </FormLabel>
+          <FormLabel htmlFor="password">암호</FormLabel>
           <Input
             id="password"
             type="password"
             placeholder="********"
-            {...register('password', {
-              required: '암호를 작성해주세요.',
-              minLength: { value: 8, message: '비밀번호는 8자 이상이어야 합니다.' },
-              maxLength: { value: 20, message: '비밀번호는 20자 이하여야 합니다.' },
-              pattern: {
-                value: /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%^*+=-]).{8,20}$/,
-                message: '형식이 올바르지 않습니다.',
-              },
-            })}
+            {...register('password', { required: '암호를 작성해주세요.' })}
           />
           <FormErrorMessage>
             {errors.password && errors.password.message}
