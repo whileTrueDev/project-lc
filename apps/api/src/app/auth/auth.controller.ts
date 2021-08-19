@@ -12,10 +12,10 @@ import {
 import { SendMailVerificationDto, loginUserRes } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { MailVerificationService } from './mailVerification.service';
-
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
+import { UserType } from './auth.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +29,7 @@ export class AuthController {
   @Post('login')
   async login(
     @Body('stayLogedIn') stayLogedIn: boolean,
-    @Query('type') userType: 'seller' | 'creator',
+    @Query('type') userType: UserType,
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
@@ -42,6 +42,16 @@ export class AuthController {
     );
     this.authService.handleLoginHeader(res, loginToken);
     res.status(200).send(loginToken);
+  }
+
+  @Post('logout')
+  logout(@Res() res) {
+    res.cookie('refresh_token', '', {
+      httpOnly: true,
+      maxAge: 0,
+    });
+    res.set('X-Access-Token', null);
+    res.sendStatus(200);
   }
 
   @UseGuards(JwtAuthGuard)
