@@ -10,11 +10,12 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  Link,
   Stack,
   Text,
   useColorModeValue,
-  VStack,
 } from '@chakra-ui/react';
+import NextLink from 'next/link';
 import { useForm } from 'react-hook-form';
 import { CenterBox } from './CenterBox';
 import SocialButtonGroup from './SocialButtonGroup';
@@ -116,6 +117,14 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
           로그인
         </Button>
         <SocialButtonGroup />
+        <Text>
+          처음 오셨나요?
+          <NextLink href="/signup" passHref>
+            <Link ml={2} color={useColorModeValue('blue.500', 'white')}>
+              가입하기
+            </Link>
+          </NextLink>
+        </Text>
       </Stack>
     </CenterBox>
   );

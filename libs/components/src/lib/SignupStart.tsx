@@ -9,7 +9,10 @@ import {
   Grid,
   Button,
   Stack,
+  Text,
+  Link,
 } from '@chakra-ui/react';
+import NextLink from 'next/link';
 import SocialButtonGroup from './SocialButtonGroup';
 
 export function SignupStart({
@@ -42,6 +45,14 @@ export function SignupStart({
             이메일 계정으로 가입
           </Button>
           <SocialButtonGroup />
+          <Text>
+            이미 가입하셨나요?
+            <NextLink href="/login" passHref>
+              <Link ml={2} color={useColorModeValue('blue.500', 'white')}>
+                로그인
+              </Link>
+            </NextLink>
+          </Text>
         </Stack>
       </Grid>
     </Box>
