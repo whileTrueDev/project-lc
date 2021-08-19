@@ -23,7 +23,7 @@ jobs:
       MYSQL_PASSWORD: root
       DATABASE_URL: mysql://root:root@localhost/test_db
       JWT_SECRET: DUMMY_JWT_SECRET
-      CIPHER_HASH: DUMMY
+      CIPHER_HASH: dummy
       CIPHER_PASSWORD: DUMMY_CIPHER_PASSWORD
       CIPHER_SALT: DUMMY_CIPHER_SALT
     steps:
