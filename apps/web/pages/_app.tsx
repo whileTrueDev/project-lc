@@ -2,6 +2,7 @@ import { ChakraProvider, theme } from '@chakra-ui/react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
               <Component {...pageProps} />
             </main>
           </ChakraProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </div>
     </>
