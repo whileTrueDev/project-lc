@@ -1,35 +1,22 @@
 /* eslint-disable dot-notation */
-import { ConfigModule } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
-import { AuthService } from '../auth/auth.service';
-import { CipherService } from '../auth/cipher.service';
 import { SellerService } from './seller.service';
 
 describe('SellerService', () => {
   let service: SellerService;
   let __prisma: PrismaClient;
   const TEST_USER_EMAIL = 'exists_test@test.com';
-  let authService: AuthService;
 
   beforeAll(async () => {
     __prisma = new PrismaClient();
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        PrismaModule,
-        ConfigModule.forRoot({ isGlobal: true }),
-        JwtModule.register({
-          secret: 'test',
-          signOptions: { expiresIn: '15m' },
-        }),
-      ],
-      providers: [SellerService, AuthService, CipherService],
+      imports: [PrismaModule],
+      providers: [SellerService],
     }).compile();
 
     service = module.get<SellerService>(SellerService);
-    authService = module.get<AuthService>(AuthService);
   });
 
   afterAll(async () => {
@@ -48,15 +35,15 @@ describe('SellerService', () => {
     });
   });
 
-  describe('AuthService.validatePassword', () => {
+  describe('[PrivateMethod] verifyPassword', () => {
     it('should return true if a valid password is provided', async () => {
       const hashed = await service['hashPassword']('test');
-      expect(await authService['validatePassword']('test', hashed)).toBe(true);
+      expect(await service.validatePassword('test', hashed)).toBe(true);
     });
 
     it('should return false if a invalid password is provided', async () => {
       const hashed = await service['hashPassword']('test');
-      expect(await authService['validatePassword']('test', hashed)).toBe(true);
+      expect(await service.validatePassword('invalidpassword', hashed)).toBe(false);
     });
   });
 

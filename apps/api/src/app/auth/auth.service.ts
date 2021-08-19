@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { verify } from 'argon2';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes } from '@project-lc/shared-types';
@@ -67,22 +66,11 @@ export class AuthService {
     if (!user) {
       return null;
     }
-    const isCorrect = await this.validatePassword(pwdInput, user.password);
+    const isCorrect = await this.sellerService.validatePassword(pwdInput, user.password);
     if (!isCorrect) {
       return null;
     }
     return this.castUser(user);
-  }
-
-  /**
-   * 입력한 비밀번호를 해시된 비밀번호와 비교합니다.
-   * @param pwInput 입력한 비밀번호 문자열
-   * @param hashedPw 해시된 비밀번호 값
-   * @returns {boolean} 올바른 비밀번호인지 여부
-   */
-  async validatePassword(pwInput: string, hashedPw: string): Promise<boolean> {
-    const isCorrect = await verify(hashedPw, pwInput);
-    return isCorrect;
   }
 
   /**

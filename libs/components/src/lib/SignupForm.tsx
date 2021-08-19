@@ -1,14 +1,12 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useRouter } from 'next/router';
 import {
-  Box,
   Button,
   Divider,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
   Input,
   Stack,
   Text,
@@ -23,7 +21,7 @@ import {
   useMailVerificationMutation,
   useSellerSignupMutation,
 } from '@project-lc/hooks';
-import CenterBox from './CenterBox';
+import { CenterBox } from './CenterBox';
 
 export interface SignupFormProps {
   enableShadow?: boolean;

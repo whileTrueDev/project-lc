@@ -1,16 +1,15 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { MailVerificationService } from './mailVerification.service';
-
 import { CipherService } from './cipher.service';
 
 import { SellerModule } from '../seller/seller.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtConfigService } from '../../settings/jwt.setting';
+import { MailVerificationService } from './mailVerification.service';
 
 @Module({
   imports: [

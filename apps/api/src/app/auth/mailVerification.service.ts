@@ -43,7 +43,6 @@ export class MailVerificationService {
       });
       return true;
     } catch (e) {
-      console.error(e);
       throw new InternalServerErrorException(e, 'error in send email');
     }
   }
