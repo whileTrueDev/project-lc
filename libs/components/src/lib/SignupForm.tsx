@@ -16,7 +16,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { SignUpSellerDto } from '@project-lc/shared-types';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   getEmailDupCheck,
@@ -38,7 +38,8 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
     trigger,
     getValues,
     setError,
-  } = useForm<SignUpSellerDto>();
+    watch,
+  } = useForm<SignUpSellerDto & { repassword: string }>();
 
   // * 인증코드 페이즈
   const [phase, setPhase] = useState(1);
@@ -154,6 +155,10 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
               autoComplete="off"
               {...register('email', {
                 required: '이메일을 작성해주세요.',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s][^\s@]+$/,
+                  message: '이메일 형식이 올바르지 않습니다.',
+                },
               })}
             />
             <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
@@ -185,6 +190,33 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
             />
             <FormErrorMessage>
               {errors.password && errors.password.message}
+            </FormErrorMessage>
+          </FormControl>
+
+          <FormControl isInvalid={!!errors.repassword}>
+            <FormLabel htmlFor="password">
+              암호 확인
+              <Text
+                fontSize="xs"
+                color={useColorModeValue('gray.500', 'gray.400')}
+                as="span"
+              >
+                (동일한 암호를 입력하세요.)
+              </Text>
+            </FormLabel>
+
+            <Input
+              id="repassword"
+              type="password"
+              placeholder="********"
+              {...register('repassword', {
+                required: '암호 확인을 작성해주세요.',
+                validate: (value) =>
+                  value === watch('password') || '암호가 동일하지 않습니다.',
+              })}
+            />
+            <FormErrorMessage>
+              {errors.repassword && errors.repassword.message}
             </FormErrorMessage>
           </FormControl>
 
