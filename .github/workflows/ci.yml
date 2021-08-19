@@ -22,6 +22,7 @@ jobs:
       MYSQL_USER: root
       MYSQL_PASSWORD: root
       DATABASE_URL: mysql://root:root@localhost/test_db
+      JWT_SECRET: JWT_SECRET
     steps:
       - name: Setup MySQL
         run: |
