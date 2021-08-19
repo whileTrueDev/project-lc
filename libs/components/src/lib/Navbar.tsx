@@ -75,7 +75,13 @@ export function Navbar() {
           spacing={{ base: 0, sm: 4 }}
         >
           <ColorModeSwitcher />
-          <Button as="a" fontSize="sm" fontWeight={500} variant="link" href="#">
+          <Button
+            as="a"
+            fontSize="sm"
+            fontWeight={500}
+            variant="link"
+            onClick={() => router.push('/login')}
+          >
             로그인
           </Button>
           <Button

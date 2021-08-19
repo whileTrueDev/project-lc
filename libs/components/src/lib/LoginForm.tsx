@@ -55,6 +55,9 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
     if (statusCode === 401) {
       return '가입하지 않은 아이디이거나, 잘못된 비밀번호입니다.';
     }
+    if (statusCode === 400) {
+      return '소셜 계정으로 가입된 회원입니다. 소셜 계정으로 시작하기를 이용해주세요.';
+    }
     return '잠시후 다시 로그인 해주세요.';
   }
 
@@ -120,7 +123,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
         <Text fontSize="sm">
           처음 오셨나요?
           <NextLink href="/signup" passHref>
-            <Link ml={2} color={useColorModeValue('blue.500', 'white')}>
+            <Link ml={2} color={useColorModeValue('blue.500', 'blue.400')}>
               가입하기
             </Link>
           </NextLink>

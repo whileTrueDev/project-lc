@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes } from '@project-lc/shared-types';
@@ -65,6 +65,10 @@ export class AuthService {
     const user = await this.sellerService.findOne({ email });
     if (!user) {
       return null;
+    }
+    if (user.password === null) {
+      // 소셜로그인으로 가입된 회원
+      throw new BadRequestException();
     }
     const isCorrect = await this.sellerService.validatePassword(pwdInput, user.password);
     if (!isCorrect) {

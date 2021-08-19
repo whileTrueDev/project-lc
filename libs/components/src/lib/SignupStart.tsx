@@ -43,14 +43,21 @@ export function SignupStart({
           </ListItem>
         </List>
         <Stack spacing={2}>
-          <Button bg="blue.400" isFullWidth onClick={moveToSignupForm} mb={4}>
+          <Button
+            bg="blue.400"
+            color="white"
+            _hover={{ bg: 'blue.500' }}
+            isFullWidth
+            onClick={moveToSignupForm}
+            mb={4}
+          >
             이메일 계정으로 가입
           </Button>
           <SocialButtonGroup />
           <Text fontSize="sm">
             이미 가입하셨나요?
             <NextLink href="/login" passHref>
-              <Link ml={2} color={useColorModeValue('blue.500', 'white')}>
+              <Link ml={2} color={useColorModeValue('blue.500', 'blue.400')}>
                 로그인
               </Link>
             </NextLink>
