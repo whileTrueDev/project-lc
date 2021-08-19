@@ -1,18 +1,17 @@
 import { CheckIcon } from '@chakra-ui/icons';
 import {
-  Heading,
-  Box,
   useColorModeValue,
   List,
   ListIcon,
   ListItem,
-  Grid,
   Button,
   Stack,
   Text,
   Link,
+  VStack,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
+import CenterBox from './CenterBox';
 import SocialButtonGroup from './SocialButtonGroup';
 
 export function SignupStart({
@@ -21,10 +20,14 @@ export function SignupStart({
   moveToSignupForm?: () => void;
 }): JSX.Element {
   return (
-    <Box rounded="lg" bg={useColorModeValue('white', 'gray.700')} boxShadow="md" p={8}>
-      <Grid templateColumns="minmax(0, 1fr)" gap={4}>
-        <Heading fontSize="3xl">[라이브커머스] 시작하기</Heading>
-
+    <CenterBox
+      enableShadow
+      header={{
+        title: '[라이브커머스] 시작하기',
+        desc: '',
+      }}
+    >
+      <VStack mt={4} spacing={8} align="stretch">
         <List spacing={3}>
           <ListItem>
             <ListIcon as={CheckIcon} color="green.500" />
@@ -39,13 +42,12 @@ export function SignupStart({
             쉽고 빠른 크리에이터 매칭
           </ListItem>
         </List>
-
         <Stack spacing={2}>
           <Button bg="blue.400" isFullWidth onClick={moveToSignupForm} mb={4}>
             이메일 계정으로 가입
           </Button>
           <SocialButtonGroup />
-          <Text>
+          <Text fontSize="sm">
             이미 가입하셨나요?
             <NextLink href="/login" passHref>
               <Link ml={2} color={useColorModeValue('blue.500', 'white')}>
@@ -54,8 +56,8 @@ export function SignupStart({
             </NextLink>
           </Text>
         </Stack>
-      </Grid>
-    </Box>
+      </VStack>
+    </CenterBox>
   );
 }
 
