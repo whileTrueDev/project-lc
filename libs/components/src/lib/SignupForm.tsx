@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useRouter } from 'next/router';
 import {
   Box,
   Button,
@@ -15,14 +14,15 @@ import {
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react';
-import { SignUpSellerDto } from '@project-lc/shared-types';
-import { useCallback, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import {
   getEmailDupCheck,
   useMailVerificationMutation,
   useSellerSignupMutation,
 } from '@project-lc/hooks';
+import { SignUpSellerDto } from '@project-lc/shared-types';
+import { useRouter } from 'next/router';
+import { useCallback, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 export interface SignupFormProps {
   enableShadow?: boolean;
@@ -38,7 +38,8 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
     trigger,
     getValues,
     setError,
-  } = useForm<SignUpSellerDto>();
+    watch,
+  } = useForm<SignUpSellerDto & { repassword: string }>();
 
   // * 인증코드 페이즈
   const [phase, setPhase] = useState(1);
@@ -138,6 +139,7 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
               type="text"
               placeholder="김민수"
               autoComplete="off"
+              disabled={phase === 2}
               {...register('name', {
                 required: '이름을 작성해주세요.',
                 minLength: { value: 2, message: '이름은 2글자 이상이어야 합니다.' },
@@ -151,9 +153,14 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
               id="email"
               type="email"
               placeholder="minsu@example.com"
+              disabled={phase === 2}
               autoComplete="off"
               {...register('email', {
                 required: '이메일을 작성해주세요.',
+                pattern: {
+                  value: /^[\w]+@[\w]+\.[\w][\w]+$/,
+                  message: '이메일 형식이 올바르지 않습니다.',
+                },
               })}
             />
             <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
@@ -172,6 +179,7 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
             <Input
               id="password"
               type="password"
+              disabled={phase === 2}
               placeholder="********"
               {...register('password', {
                 required: '암호를 작성해주세요.',
@@ -185,6 +193,34 @@ export function SignupForm({ enableShadow = false }: SignupFormProps) {
             />
             <FormErrorMessage>
               {errors.password && errors.password.message}
+            </FormErrorMessage>
+          </FormControl>
+
+          <FormControl isInvalid={!!errors.repassword}>
+            <FormLabel htmlFor="password">
+              암호 확인
+              <Text
+                fontSize="xs"
+                color={useColorModeValue('gray.500', 'gray.400')}
+                as="span"
+              >
+                (동일한 암호를 입력하세요.)
+              </Text>
+            </FormLabel>
+
+            <Input
+              id="repassword"
+              type="password"
+              disabled={phase === 2}
+              placeholder="********"
+              {...register('repassword', {
+                required: '암호 확인을 작성해주세요.',
+                validate: (value) =>
+                  value === watch('password') || '암호가 동일하지 않습니다.',
+              })}
+            />
+            <FormErrorMessage>
+              {errors.repassword && errors.repassword.message}
             </FormErrorMessage>
           </FormControl>
 
