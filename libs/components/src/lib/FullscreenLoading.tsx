@@ -1,5 +1,8 @@
 import { Center, Spinner } from '@chakra-ui/react';
 
+/**
+ * 전체화면에 회색 backdrop & 가운데 로딩 인디케이터 보여주는 컴포넌트
+ */
 export function FullscreenLoading(): JSX.Element {
   return (
     <Center

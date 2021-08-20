@@ -1,5 +1,6 @@
 import { CloseIcon, HamburgerIcon } from '@chakra-ui/icons';
 import {
+  Avatar,
   Box,
   Button,
   Collapse,
@@ -8,12 +9,14 @@ import {
   IconButton,
   Link,
   Stack,
+  Tooltip,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import { AiTwotoneSetting } from 'react-icons/ai';
 import { mainNavItems, NavItem } from '../constants/navigation';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 
@@ -75,6 +78,7 @@ export function Navbar() {
           spacing={{ base: 0, sm: 4 }}
         >
           <ColorModeSwitcher />
+          {/* 로그인 안 된 경우 */}
           <Button
             as="a"
             fontSize="sm"
@@ -97,8 +101,14 @@ export function Navbar() {
           >
             시작하기
           </Button>
-          {/* 로그인 된 경우 = 아래 */}
-          {/* <Tooltip label="계정 설정" fontSize="xs">
+          {/* 로그인 안 된 경우 */}
+
+          {/* 
+          //TODO: 추후 로그인 상태를 global에 저장하기, 해당 상태에 따라 보여지는 컴포넌트 바꾸기 
+          계정설정 화면 개발 위해 "로그인 된 경우" 부분 주석 풀어둠
+          */}
+          {/* 로그인 된 경우 */}
+          <Tooltip label="계정 설정" fontSize="xs">
             <IconButton
               size="md"
               fontSize="xl"
@@ -110,7 +120,8 @@ export function Navbar() {
               display={{ base: 'none', sm: 'inline-flex' }}
             />
           </Tooltip>
-          <Avatar size="sm" /> */}
+          <Avatar size="sm" />
+          {/* 로그인 된 경우 */}
         </Stack>
       </Flex>
 
