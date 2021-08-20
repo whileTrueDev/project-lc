@@ -3,8 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { SellerService } from '../seller/seller.service';
+import { AuthModule } from '../auth/auth.module';
 import { SocialService } from './social.service';
+import { mailerConfig } from '../../settings/mailer.config';
 
 describe('SocialService', () => {
   let service: SocialService;
@@ -22,7 +25,12 @@ describe('SocialService', () => {
   beforeAll(async () => {
     __prisma = new PrismaClient();
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule, ConfigModule.forRoot({ isGlobal: true })],
+      imports: [
+        PrismaModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+        AuthModule,
+        MailerModule.forRoot(mailerConfig),
+      ],
       providers: [SocialService, SellerService],
     }).compile();
 
