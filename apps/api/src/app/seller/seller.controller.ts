@@ -10,6 +10,7 @@ import {
 import { Seller } from '@prisma/client';
 import {
   FindSellerDto,
+  PasswordValidateDto,
   SellerEmailDupCheckDto,
   SignUpSellerDto,
 } from '@project-lc/shared-types';
@@ -49,5 +50,12 @@ export class SellerController {
   @Get('email-check')
   public async emailDupCheck(@Query(ValidationPipe) dto: SellerEmailDupCheckDto) {
     return this.sellerService.isEmailDupCheckOk(dto.email);
+  }
+
+  // 로그인 한 사람이 본인인증을 위해 비밀번호 확인
+  // TODO: jwt guard 적용하기, 비밀번호 변경 & 기타 본인인증 시 적용?????
+  @Post('validate-password')
+  public async validatePassword(@Body(ValidationPipe) dto: PasswordValidateDto) {
+    return this.sellerService.checkPassword(dto.email, dto.password);
   }
 }
