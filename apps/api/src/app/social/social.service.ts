@@ -16,6 +16,16 @@ export type SellerWithSocialAccounts = Omit<Seller, 'password'> & {
   socialAccounts: Omit<SellerSocialAccount, 'accessToken' | 'refreshToken'>[];
 };
 
+interface sellerDataInterface {
+  id: string;
+  provider: string;
+  email: string;
+  name: string;
+  picture: string;
+  accessToken: string;
+  refreshToken?: string;
+}
+
 @Injectable()
 export class SocialService {
   constructor(
@@ -38,79 +48,66 @@ export class SocialService {
   }
 
   /**
-   * 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 셀러 계정정보 찾기
+   * 해당 소셜서비스 계정 소유하는 seller 찾거나 생성하여 반환
+   * google, kakao, naver strategy validate함수에서 사용
    */
-  private async findSocialAccountIncludeSeller({
-    provider,
-    serviceId,
-  }: {
-    provider: string;
-    serviceId: string;
-  }) {
+  async findOrCreateSeller(sellerData: sellerDataInterface) {
+    const socialAccountWithSeller = await this.selectSocialAccountRecord(sellerData);
+
+    if (!socialAccountWithSeller) {
+      const createdSeller = await this.createSocialAccountRecord(sellerData);
+      return createdSeller;
+    }
+
+    await this.updateSocialAccountRecord(sellerData);
+    return this.sellerService.findOne({ id: socialAccountWithSeller.seller.id });
+  }
+
+  /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 셀러 계정정보 찾기 */
+  private async selectSocialAccountRecord(sellerData: Partial<sellerDataInterface>) {
+    const { id, provider } = sellerData;
     return this.prisma.sellerSocialAccount.findFirst({
-      where: { serviceId, provider },
+      where: { serviceId: id, provider },
       include: { seller: true },
     });
   }
 
-  /**
-   * 해당 소셜서비스 계정 소유하는 seller 찾거나 생성하여 반환
-   * google, kakao, naver strategy validate함수에서 사용
-   */
-  async findOrCreateSeller({
-    id,
-    provider,
-    email,
-    name,
-    picture,
-    accessToken,
-    refreshToken,
-  }: {
-    id: string;
-    provider: string;
-    email: string;
-    name: string;
-    picture: string;
-    accessToken: string;
-    refreshToken?: string;
-  }) {
-    const socialAccountWithSeller = await this.findSocialAccountIncludeSeller({
-      provider,
+  /** 소셜계정 데이터 생성 */
+  private async createSocialAccountRecord(
+    sellerData: sellerDataInterface,
+  ): Promise<Seller> {
+    const { id, email, name, picture, ...rest } = sellerData;
+    const googleAccountCreateInput = {
       serviceId: id,
+      profileImage: picture,
+      name,
+      ...rest,
+    };
+
+    const createdSeller = await this.prisma.seller.upsert({
+      where: { email },
+      update: {
+        socialAccounts: {
+          create: googleAccountCreateInput,
+        },
+      },
+      create: {
+        email,
+        name,
+        password: null,
+        socialAccounts: {
+          create: googleAccountCreateInput,
+        },
+      },
     });
 
-    if (!socialAccountWithSeller) {
-      // 해당 social service 계정 없는경우
-      // email로 셀러찾기 혹은 만들기
-      const googleAccountCreateInput = {
-        serviceId: id,
-        provider,
-        name,
-        profileImage: picture,
-        accessToken,
-        refreshToken,
-      };
-      const createdSeller = await this.prisma.seller.upsert({
-        where: { email },
-        update: {
-          socialAccounts: {
-            create: googleAccountCreateInput,
-          },
-        },
-        create: {
-          email,
-          name,
-          password: null,
-          socialAccounts: {
-            create: googleAccountCreateInput,
-          },
-        },
-      });
-      return this.sellerService.findOne({ id: createdSeller.id });
-    }
+    return createdSeller;
+  }
 
-    // 토큰정보 업데2트
-    await this.prisma.sellerSocialAccount.update({
+  /** 소셜계정 데이터 업데이트(토큰) */
+  private async updateSocialAccountRecord(sellerData: sellerDataInterface) {
+    const { id, accessToken, refreshToken, picture } = sellerData;
+    const updatedSeller = await this.prisma.sellerSocialAccount.update({
       where: { serviceId: id },
       data: {
         accessToken,
@@ -118,11 +115,11 @@ export class SocialService {
         profileImage: picture,
       },
     });
-    return this.sellerService.findOne({ id: socialAccountWithSeller.seller.id });
+    return updatedSeller;
   }
 
   /** 소셜계정 데이터 삭제 */
-  async deleteSocialAccountRecord(serviceId: string): Promise<boolean> {
+  private async deleteSocialAccountRecord(serviceId: string): Promise<boolean> {
     await this.prisma.sellerSocialAccount.delete({
       where: { serviceId },
     });
@@ -131,9 +128,9 @@ export class SocialService {
 
   /** 소셜계정 테이블에서 accessToken 가져오기 */
   private async getSocialAccountAccessToken(provider: string, serviceId: string) {
-    const socialAccount = await this.findSocialAccountIncludeSeller({
+    const socialAccount = await this.selectSocialAccountRecord({
       provider,
-      serviceId,
+      id: serviceId,
     });
     if (!socialAccount) {
       throw new BadRequestException(
