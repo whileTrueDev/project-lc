@@ -13,17 +13,9 @@ export function AccountRemoveSection(): JSX.Element {
     // 프론트에서 글로벌에 저장하고 있는 유저정보 삭제
   };
 
-  const removeRequest = () => {
-    console.log('계정 삭제');
-    return Promise.resolve('true');
-  };
-
   const onRemove = () => {
-    // TODO: 계정삭제 요청
-    removeRequest().then(async () => {
-      logout();
-      router.push('/');
-    });
+    logout();
+    router.push('/');
   };
   return (
     <SettingSectionLayout title="회원 탈퇴">

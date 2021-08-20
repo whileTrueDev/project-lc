@@ -6,3 +6,4 @@ export * from './lib/hooks';
 export * from './lib/getHostUrl';
 export * from './lib/queries/useProfile';
 export * from './lib/mutation/useValidatePassword';
+export * from './lib/mutation/useDeleteSellerMutation';
