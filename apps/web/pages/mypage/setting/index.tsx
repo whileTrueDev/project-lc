@@ -1,7 +1,11 @@
-import { MypageLayout } from '@project-lc/components';
+import { MypageLayout, AccountSetting } from '@project-lc/components';
 
 export function Setting(): JSX.Element {
-  return <MypageLayout>계정 설정</MypageLayout>;
+  return (
+    <MypageLayout>
+      <AccountSetting />
+    </MypageLayout>
+  );
 }
 
 export default Setting;
