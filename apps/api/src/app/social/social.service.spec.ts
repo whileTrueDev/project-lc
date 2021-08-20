@@ -52,11 +52,11 @@ describe('SocialService', () => {
     });
   });
 
-  describe('[PrivateMethod]findSocialAccountIncludeSeller', () => {
+  describe('[PrivateMethod]selectSocialAccountRecord', () => {
     it('should find socialAccount include Seller info', async () => {
-      const { seller } = await service['findSocialAccountIncludeSeller']({
+      const { seller } = await service['selectSocialAccountRecord']({
         provider: testInfo.provider,
-        serviceId: testInfo.id,
+        id: testInfo.id,
       });
 
       expect(seller).toBeDefined();
