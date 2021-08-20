@@ -3,6 +3,7 @@ import {
   Delete,
   Get,
   Param,
+  Query,
   Req,
   Res,
   UseFilters,
@@ -21,6 +22,13 @@ export class SocialController {
   ) {}
 
   private readonly frontMypageUrl = 'http://localhost:4200/mypage';
+
+  /** email 로 가입된 셀러에 연동된 소셜계정목록 반환 */
+  @Get('/accounts')
+  // TODO: jwtGuard
+  async getSocialAccounts(@Query('email') email: string) {
+    return this.socialService.getSocialAccounts(email);
+  }
 
   /** 구글 ************************************************ */
   @Get('/google/login')
