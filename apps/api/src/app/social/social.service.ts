@@ -5,8 +5,11 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Seller, SellerSocialAccount } from '@prisma/client';
+import { loginUserRes } from '@project-lc/shared-types';
 import { PrismaService } from '@project-lc/prisma-orm';
 import axios from 'axios';
+import { Request, Response } from 'express';
+import { AuthService } from '../auth/auth.service';
 import { SellerService } from '../seller/seller.service';
 
 export type SellerWithSocialAccounts = Omit<Seller, 'password'> & {
@@ -19,7 +22,20 @@ export class SocialService {
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
     private readonly sellerService: SellerService,
+    private readonly authService: AuthService,
   ) {}
+
+  async login(req: Request, res: Response) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { user }: any = req;
+    const userPayload = this.authService.castUser(user);
+    const loginToken: loginUserRes = this.authService.issueToken(
+      userPayload,
+      true,
+      'seller',
+    );
+    this.authService.handleLoginHeader(res, loginToken);
+  }
 
   /**
    * 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 셀러 계정정보 찾기

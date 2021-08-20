@@ -48,13 +48,6 @@ export class AuthService {
     };
   }
 
-  issueTokenForSocialAccount(user) {
-    const userPayload = this.castUser(user);
-    const stayLogedIn = true;
-    const userType = 'seller';
-    return this.issueToken(userPayload, stayLogedIn, userType);
-  }
-
   /**
    * seller의 존재 여부를 확인한다. 다른 유저 타입에 대해서도 조회가 가능하도록 구현 필요
    * @param email 입력한 이메일 문자열
@@ -131,7 +124,7 @@ export class AuthService {
     }
   }
 
-  private castUser(user: User): UserPayload {
+  castUser(user: User): UserPayload {
     return {
       sub: user.email,
     };
