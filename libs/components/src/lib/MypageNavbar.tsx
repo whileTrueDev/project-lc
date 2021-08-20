@@ -10,9 +10,11 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 import { mypageNavLinks } from '../constants/navigation';
 
 export function MypageNavbar(): JSX.Element {
+  const router = useRouter();
   const linkHoverColor = useColorModeValue('gray.800', 'white');
   const subNavHoverColor = useColorModeValue('pink.50', 'gray.900');
 
@@ -35,19 +37,46 @@ export function MypageNavbar(): JSX.Element {
             <Popover trigger="hover" placement="bottom-start">
               <PopoverTrigger>
                 <Box>
-                  <NextLink href={link.href ?? '#'} passHref>
-                    <Link
-                      py={2}
-                      mx={{ base: 1, sm: 3 }}
-                      fontSize={{ base: 'xs', sm: 'sm' }}
-                      fontWeight={500}
-                      _hover={{
-                        textDecoration: 'none',
-                        color: linkHoverColor,
-                      }}
-                    >
-                      {link.name}
-                    </Link>
+                  <NextLink href={link.children ? '#' : link.href} passHref>
+                    {link.children ? (
+                      <Link
+                        py={2}
+                        mx={{ base: 1, sm: 3 }}
+                        fontSize={{ base: 'xs', sm: 'sm' }}
+                        fontWeight={router.pathname.includes(link.href) ? 'bold' : 500}
+                        textDecoration={
+                          router.pathname.includes(link.href) ? 'underline' : 'none'
+                        }
+                        textDecorationColor={
+                          router.pathname.includes(link.href) ? 'red.400' : 'none'
+                        }
+                        textDecorationThickness={
+                          router.pathname.includes(link.href) ? '0.225rem' : 'none'
+                        }
+                        _hover={{ color: linkHoverColor }}
+                      >
+                        {link.name}
+                      </Link>
+                    ) : (
+                      <Link
+                        py={2}
+                        mx={{ base: 1, sm: 3 }}
+                        fontSize={{ base: 'xs', sm: 'sm' }}
+                        fontWeight={router.pathname === link.href ? 'bold' : 500}
+                        textDecoration={
+                          router.pathname === link.href ? 'underline' : 'none'
+                        }
+                        textDecorationColor={
+                          router.pathname === link.href ? 'red.400' : 'none'
+                        }
+                        textDecorationThickness={
+                          router.pathname === link.href ? '0.225rem' : 'none'
+                        }
+                        _hover={{ color: linkHoverColor }}
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </NextLink>
                 </Box>
               </PopoverTrigger>
