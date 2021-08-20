@@ -44,13 +44,10 @@ export class AuthController {
     res.status(200).send(loginToken);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Res() res) {
-    res.cookie('refresh_token', '', {
-      httpOnly: true,
-      maxAge: 0,
-    });
-    res.set('X-Access-Token', null);
+    this.authService.handleLogoutHeader(res);
     res.sendStatus(200);
   }
 

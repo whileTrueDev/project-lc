@@ -15,7 +15,7 @@ export class AppSetting {
       'https://dev-project-lc.vercel.app',
     ],
     credentials: true,
-    exposedHeaders: ['X-Access-Token'],
+    exposedHeaders: ['X-wt-Access-Token'],
   };
 
   constructor(private readonly app: NestExpressApplication) {}

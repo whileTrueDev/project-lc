@@ -84,7 +84,7 @@ export class AuthService {
    */
   handleLoginHeader(res: Response, loginToken: loginUserRes): void {
     res.append('Cache-Control', 'no-cache');
-    res.append('X-Access-Token', loginToken.access_token);
+    res.append('X-wt-Access-Token', loginToken.access_token);
     res.cookie('refresh_token', loginToken.refresh_token, {
       httpOnly: true,
       maxAge: loginToken.refresh_token_expires_in,
@@ -92,13 +92,25 @@ export class AuthService {
   }
 
   /**
-   * 응답 객체에 새로운 Access Token을 헤더에 추가합니다.
+   * 로그아웃시, 응답 객체의 쿠키 삭제, logout을 위한 토큰 전달
+   * @param res 요청 객체
+   */
+  handleLogoutHeader(res: Response): void {
+    res.cookie('refresh_token', '', {
+      httpOnly: true,
+      maxAge: 0,
+    });
+    res.set('X-wt-Access-Token', 'logout');
+  }
+
+  /**
+   * Access Token의 만료시, 응답 객체에 새로운 Access Token을 헤더에 추가합니다.
    * @param res 요청 객체
    * @param userPayload Token에 저장될 payload
    */
   handleAuthorizationHeader(res: Response, userPayload: UserPayload): void {
     const newAccessToken = this.createAccessTokenByRefresh(userPayload);
-    res.append('X-Access-Token', `${newAccessToken}`);
+    res.append('X-wt-Access-Token', `${newAccessToken}`);
   }
 
   /**
