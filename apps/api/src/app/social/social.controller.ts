@@ -11,15 +11,11 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from '../auth/auth.service';
 import { SocialService } from './social.service';
 import { SocialLoginExceptionFilter } from './social-login-exception.filter';
 @Controller('social')
 export class SocialController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly socialService: SocialService,
-  ) {}
+  constructor(private readonly socialService: SocialService) {}
 
   private readonly frontMypageUrl = 'http://localhost:4200/mypage';
 
@@ -40,12 +36,7 @@ export class SocialController {
   @UseGuards(AuthGuard('google'))
   @UseFilters(new SocialLoginExceptionFilter())
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const loginToken = await this.authService.issueTokenForSocialAccount(req.user);
-    res.cookie('refresh_token', loginToken.refresh_token, {
-      httpOnly: true,
-      maxAge: loginToken.refresh_token_expires_in,
-    });
-    res.cookie('access_token', loginToken.access_token);
+    this.socialService.login(req, res);
     res.redirect(this.frontMypageUrl);
   }
 
@@ -64,12 +55,7 @@ export class SocialController {
   @UseGuards(AuthGuard('naver'))
   @UseFilters(new SocialLoginExceptionFilter())
   async naverAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const loginToken = await this.authService.issueTokenForSocialAccount(req.user);
-    res.cookie('refresh_token', loginToken.refresh_token, {
-      httpOnly: true,
-      maxAge: loginToken.refresh_token_expires_in,
-    });
-    res.cookie('access_token', loginToken.access_token);
+    this.socialService.login(req, res);
     res.redirect(this.frontMypageUrl);
   }
 
@@ -88,12 +74,7 @@ export class SocialController {
   @UseGuards(AuthGuard('kakao'))
   @UseFilters(new SocialLoginExceptionFilter())
   async kakaoAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const loginToken = await this.authService.issueTokenForSocialAccount(req.user);
-    res.cookie('refresh_token', loginToken.refresh_token, {
-      httpOnly: true,
-      maxAge: loginToken.refresh_token_expires_in,
-    });
-    res.cookie('access_token', loginToken.access_token);
+    this.socialService.login(req, res);
     res.redirect(this.frontMypageUrl);
   }
 
