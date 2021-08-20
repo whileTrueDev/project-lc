@@ -40,6 +40,50 @@ export class SellerService {
   }
 
   /**
+   * 해당 이메일로 가입된 계정이 삭제될 수 있는지 확인함
+   * @throws {Error}
+   */
+  private async checkCanBeDeletedSeller(email: string) {
+    const seller = await this.prisma.seller.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        password: false,
+        socialAccounts: true,
+      },
+    });
+
+    if (!seller) {
+      throw new BadRequestException('해당 계정이 존재하지 않습니다.');
+    }
+
+    if (seller.socialAccounts.length !== 0) {
+      throw new BadRequestException(
+        '연결된 소셜 계정이 존재합니다. 연결 해제를 먼저 진행해주세요.',
+      );
+    }
+  }
+
+  /**
+   * 유저 삭제(id 제외한 값을 null로 처리)
+   */
+  async deleteOne(email: string) {
+    await this.checkCanBeDeletedSeller(email);
+
+    await this.prisma.seller.update({
+      where: { email },
+      data: {
+        name: null,
+        password: null,
+      },
+    });
+
+    return true;
+  }
+
+  /**
    * 이메일 주소가 중복되는 지 체크합니다.
    * @param email 중복체크할 이메일 주소
    * @returns {boolean} 중복되지않아 괜찮은 경우 true, 중복된 경우 false

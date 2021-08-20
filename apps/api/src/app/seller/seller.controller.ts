@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Query,
@@ -50,6 +51,12 @@ export class SellerController {
   @Get('email-check')
   public async emailDupCheck(@Query(ValidationPipe) dto: SellerEmailDupCheckDto) {
     return this.sellerService.isEmailDupCheckOk(dto.email);
+  }
+
+  // 판매자 계정 삭제(id 제외한 값 null로 변경)
+  @Delete()
+  public async deleteSeller(@Body('email') email: string) {
+    return this.sellerService.deleteOne(email);
   }
 
   // 로그인 한 사람이 본인인증을 위해 비밀번호 확인
