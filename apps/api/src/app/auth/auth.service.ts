@@ -8,8 +8,8 @@ import { CipherService } from './cipher.service';
 import {
   ACCESS_TOKEN_EXPIRE_TIME,
   REFRESH_TOKEN_EXPIRE_TIME,
-  AUO_LOGIN_EXPIRE_TIME,
-  COOKIE_AUO_LOGIN_EXPIRE_TIME,
+  AUTO_LOGIN_EXPIRE_TIME,
+  COOKIE_AUTO_LOGIN_EXPIRE_TIME,
   COOKIE_EXPIRE_TIME,
   ACCESS_TOKEN_EXPIRE_TIME_INT,
 } from './auth.constant';
@@ -42,7 +42,7 @@ export class AuthService {
       expires_in: ACCESS_TOKEN_EXPIRE_TIME_INT,
       refresh_token: this.createRefreshToken(userPayload, stayLogedIn),
       refresh_token_expires_in: stayLogedIn
-        ? COOKIE_AUO_LOGIN_EXPIRE_TIME
+        ? COOKIE_AUTO_LOGIN_EXPIRE_TIME
         : COOKIE_EXPIRE_TIME,
       scope: userType,
     };
@@ -138,7 +138,7 @@ export class AuthService {
 
   private createRefreshToken(userPayload: UserPayload, stayLogedIn: boolean): string {
     const refreshToken: string = this.jwtService.sign(userPayload, {
-      expiresIn: stayLogedIn ? AUO_LOGIN_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME,
+      expiresIn: stayLogedIn ? AUTO_LOGIN_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME,
     });
     // 암호화 미사용시 제거
     const cookieRefreshToken = this.cipherService.createCookieRefreshToken(refreshToken);
