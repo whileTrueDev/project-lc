@@ -64,6 +64,10 @@ export class FmOrdersService {
         params = [dto.searchEndDate];
       }
 
+      if (dto.searchStatuses && dto.searchStatuses.length > 0) {
+        whereSql += `\nAND step IN (${dto.searchStatuses.join(',')}) `;
+      }
+
       if (dto.search) {
         whereSql += `\nAND (${searchSql}) `;
         params = params.concat(new Array(13).fill(`%${dto.search}%`));
@@ -81,9 +85,23 @@ export class FmOrdersService {
     if (dto.search) {
       whereSql = `WHERE ${searchSql}`;
       orderSql = `ORDER BY fm_order.regist_date DESC`;
+
+      if (dto.searchStatuses && dto.searchStatuses.length > 0) {
+        whereSql += `\nAND step IN (${dto.searchStatuses.join(',')}) `;
+      }
+
       return {
         sql: defaultQueryHead + whereSql + orderSql,
         params: new Array(13).fill(`%${dto.search}%`),
+      };
+    }
+
+    if (dto.searchStatuses && dto.searchStatuses.length > 0) {
+      whereSql += `WHERE step IN (${dto.searchStatuses.join(',')}) `;
+      orderSql = `ORDER BY fm_order.regist_date DESC`;
+      return {
+        sql: defaultQueryHead + whereSql + orderSql,
+        params: [],
       };
     }
     return { sql: '', params: [] };

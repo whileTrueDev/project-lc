@@ -1,8 +1,10 @@
-import { ArrowForwardIcon, Search2Icon } from '@chakra-ui/icons';
+/* eslint-disable react/jsx-props-no-spreading */
+import { Search2Icon } from '@chakra-ui/icons';
 import {
   Badge,
   Box,
   Button,
+  Checkbox,
   Flex,
   Input,
   InputGroup,
@@ -10,37 +12,41 @@ import {
   Select,
   Stack,
   Text,
-  Checkbox,
+  useBreakpoint,
 } from '@chakra-ui/react';
+import { fmOrderStatuses } from '@project-lc/shared-types';
+import { useFmOrderStore } from '@project-lc/stores';
+import moment from 'moment';
 import 'moment/locale/ko';
-import { useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
-import { fmOrderStatuses } from '@project-lc/shared-types';
-import { useForm, Controller } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+
+export interface OrderFilterFormType {
+  search: string;
+  searchDateType: '주문일' | '입금일';
+  searchStartDate: string | null; // this way is not supported https://github.com/react-hook-form/react-hook-form/issues/4704
+  searchEndDate: string | null; // this way is not supported https://github.com/react-hook-form/react-hook-form/issues/4704
+  searchStatuses: string[];
+}
 
 export function OrderFilterConsole(): JSX.Element {
+  const xSize = useBreakpoint();
+  const isMobile = useMemo(() => xSize && ['base', 'sm'].includes(xSize), [xSize]);
+
+  const handleOrderSearchStates = useFmOrderStore((s) => s.handleOrderSearchStates);
+  const { handleSubmit, control, register, watch, setValue, getValues } =
+    useForm<OrderFilterFormType>();
+
   // * react-dates 상태
   const [focusedInput, setFocusedInput] = useState<'startDate' | 'endDate' | null>(null);
-  const [startDate, setStartDate] = useState<any>();
-  const [endDate, setEndDate] = useState<any>();
 
-  // * 선택된 주문 상태 상태
-  const [selectedStatuses, setSelectedStatuses] = useState<
-    Array<keyof typeof fmOrderStatuses>
-  >([]);
-  const handleStatusSelect = useCallback((key: keyof typeof fmOrderStatuses) => {
-    setSelectedStatuses((prev) => {
-      if (prev.includes(key)) return prev.filter((x) => x !== key);
-      return prev.concat(key);
-    });
-  }, []);
-
-  const { handleSubmit, control, register } = useForm();
-  function onSubmit(data: any) {
-    alert(JSON.stringify(data, null, 2));
-  }
+  // * 필터/검색 폼 제출
+  const onSubmit: SubmitHandler<OrderFilterFormType> = (data) => {
+    handleOrderSearchStates(data);
+  };
 
   return (
     <Stack
@@ -51,7 +57,7 @@ export function OrderFilterConsole(): JSX.Element {
       as="form"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <Flex mx={1}>
+      <Flex px={[2, 4]} as="section">
         <InputGroup size="lg">
           <InputLeftElement pointerEvents="none">
             <Search2Icon size="lg" />
@@ -61,7 +67,7 @@ export function OrderFilterConsole(): JSX.Element {
             id="order-search-text-project-lc"
             type="text"
             variant="outline"
-            {...register('orderSearchText')}
+            {...register('search')}
           />
         </InputGroup>
         <Button ml={1} size="lg" border="none" type="submit">
@@ -69,42 +75,74 @@ export function OrderFilterConsole(): JSX.Element {
         </Button>
       </Flex>
 
-      <Stack spacing={4}>
-        <Box mx={1}>
+      <Stack px={[2, 4]} spacing={4} as="section">
+        {/* * 날짜 */}
+        <Box>
           <Box mb={2}>
             <Text>날짜</Text>
           </Box>
-          <Flex>
-            <Select size="sm" w={120} mr={2}>
-              <option value="주문일">주문일 기준</option>
-              <option value="입금일">입금일 기준</option>
-            </Select>
+          <Stack spacing={2} direction={isMobile ? 'column' : 'row'}>
+            <Controller
+              name="searchDateType"
+              control={control}
+              defaultValue="주문일"
+              render={({ field }) => (
+                <Select size="sm" w={120} {...field}>
+                  <option value="주문일">주문일 기준</option>
+                  <option value="입금일">입금일 기준</option>
+                </Select>
+              )}
+            />
+
             <DateRangePicker
               small
-              startDate={startDate}
-              startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
-              endDate={endDate} // momentPropTypes.momentObj or null,
-              endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
-              onDatesChange={({ startDate: _, endDate: __ }) => {
-                setStartDate(_);
-                setEndDate(__);
+              startDate={
+                watch('searchStartDate') ? moment(watch('searchStartDate')) : null
+              }
+              startDateId="searchStartDate" // PropTypes.string.isRequired,
+              endDate={watch('searchEndDate') ? moment(watch('searchEndDate')) : null} // momentPropTypes.momentObj or null,
+              endDateId="searchEndDate" // PropTypes.string.isRequired,
+              onDatesChange={({ startDate, endDate }) => {
+                setValue(
+                  'searchStartDate',
+                  startDate ? startDate.format('YYYY-MM-DD') : null,
+                );
+                setValue('searchEndDate', endDate ? endDate.format('YYYY-MM-DD') : null);
               }} // PropTypes.func.isRequired,
               focusedInput={focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
               onFocusChange={(_focusedInput) => setFocusedInput(_focusedInput)} // PropTypes.func.isRequired,
-              showClearDates
               reopenPickerOnClearDates
               isOutsideRange={() => false}
               displayFormat="YYYY-MM-DD"
+              withPortal={!!isMobile}
+              numberOfMonths={isMobile ? 1 : 2}
             />
-          </Flex>
+          </Stack>
         </Box>
-        <Box mx={2}>
+
+        {/* * 주문 상태 */}
+        <Box>
           <Stack mb={2} direction="row">
             <Text>주문 상태</Text>
-            <Button size="xs" variant="outline">
+            <Button
+              size="xs"
+              variant="outline"
+              onClick={() => {
+                setValue('searchStatuses', Object.keys(fmOrderStatuses));
+              }}
+            >
               전체 선택
             </Button>
-            <Button size="xs" variant="outline" borderColor="red.200">
+            <Button
+              size="xs"
+              variant="outline"
+              borderColor="red.200"
+              onClick={
+                getValues('searchStatuses')
+                  ? () => setValue('searchStatuses', [])
+                  : undefined
+              }
+            >
               전체 취소
             </Button>
           </Stack>
@@ -116,8 +154,20 @@ export function OrderFilterConsole(): JSX.Element {
                   aria-label={`order-status-${fmOrderStatuses[orderStatus].name}`}
                   key={orderStatus}
                   colorScheme={fmOrderStatuses[orderStatus].chakraColor}
-                  isChecked={selectedStatuses.includes(orderStatus)}
-                  onChange={(e) => handleStatusSelect(orderStatus)}
+                  isChecked={watch('searchStatuses')?.includes(orderStatus)}
+                  onChange={(_) => {
+                    const prev = getValues('searchStatuses');
+                    if (!prev) {
+                      return setValue('searchStatuses', [orderStatus]);
+                    }
+                    if (prev.includes(orderStatus)) {
+                      return setValue(
+                        'searchStatuses',
+                        prev.filter((x) => x !== orderStatus),
+                      );
+                    }
+                    return setValue('searchStatuses', prev.concat(orderStatus));
+                  }}
                 >
                   <Badge colorScheme={fmOrderStatuses[orderStatus].chakraColor}>
                     {fmOrderStatuses[orderStatus].name}

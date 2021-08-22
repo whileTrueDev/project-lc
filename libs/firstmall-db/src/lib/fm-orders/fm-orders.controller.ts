@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, ValidationPipe } from '@nestjs/common';
 import { FindFmOrdersDto } from '@project-lc/shared-types';
 import { FmOrdersService } from './fm-orders.service';
 
@@ -7,7 +7,7 @@ export class FmOrdersController {
   constructor(private readonly fmOrdersService: FmOrdersService) {}
 
   @Get()
-  findOrders(@Query() dto: FindFmOrdersDto) {
+  findOrders(@Query(ValidationPipe) dto: FindFmOrdersDto) {
     return this.fmOrdersService.findOrders(dto);
   }
 }
