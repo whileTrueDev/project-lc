@@ -11,7 +11,7 @@ function CustomDataGrid(props: DataGridProps): JSX.Element {
       }}
       localeText={{
         // Root
-        noRowsLabel: '데이터가 없습니다',
+        noRowsLabel: '데이터가 없습니다.',
         errorOverlayDefaultLabel: '에러가 발생했습니다.',
 
         // Density selector toolbar button text

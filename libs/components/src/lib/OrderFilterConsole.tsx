@@ -53,14 +53,14 @@ export function OrderFilterConsole(): JSX.Element {
       my={6}
       maxW={900}
       mx="auto"
-      spacing={6}
+      spacing={4}
       as="form"
       onSubmit={handleSubmit(onSubmit)}
     >
       <Flex px={[2, 4]} as="section">
-        <InputGroup size="lg">
+        <InputGroup size="md">
           <InputLeftElement pointerEvents="none">
-            <Search2Icon size="lg" />
+            <Search2Icon size="md" />
           </InputLeftElement>
           <Input
             placeholder="주문번호,상품번호,주문자명,입금자명,수령자명,(주문자,입금자)휴대전화,상품명"
@@ -70,7 +70,7 @@ export function OrderFilterConsole(): JSX.Element {
             {...register('search')}
           />
         </InputGroup>
-        <Button ml={1} size="lg" border="none" type="submit">
+        <Button ml={1} size="md" border="none" type="submit">
           검색
         </Button>
       </Flex>
@@ -148,32 +148,34 @@ export function OrderFilterConsole(): JSX.Element {
           </Stack>
           <Box>
             {(Object.keys(fmOrderStatuses) as Array<keyof typeof fmOrderStatuses>).map(
-              (orderStatus) => (
-                <Checkbox
-                  m={1}
-                  aria-label={`order-status-${fmOrderStatuses[orderStatus].name}`}
-                  key={orderStatus}
-                  colorScheme={fmOrderStatuses[orderStatus].chakraColor}
-                  isChecked={watch('searchStatuses')?.includes(orderStatus)}
-                  onChange={(_) => {
-                    const prev = getValues('searchStatuses');
-                    if (!prev) {
-                      return setValue('searchStatuses', [orderStatus]);
-                    }
-                    if (prev.includes(orderStatus)) {
-                      return setValue(
-                        'searchStatuses',
-                        prev.filter((x) => x !== orderStatus),
-                      );
-                    }
-                    return setValue('searchStatuses', prev.concat(orderStatus));
-                  }}
-                >
-                  <Badge colorScheme={fmOrderStatuses[orderStatus].chakraColor}>
-                    {fmOrderStatuses[orderStatus].name}
-                  </Badge>
-                </Checkbox>
-              ),
+              (orderStatus) => {
+                return (
+                  <Checkbox
+                    m={1}
+                    aria-label={`order-status-${fmOrderStatuses[orderStatus].name}`}
+                    key={orderStatus}
+                    colorScheme={fmOrderStatuses[orderStatus].chakraColor}
+                    isChecked={watch('searchStatuses')?.includes(orderStatus)}
+                    onChange={(_) => {
+                      const prev = getValues('searchStatuses');
+                      if (!prev) {
+                        return setValue('searchStatuses', [orderStatus]);
+                      }
+                      if (prev.includes(orderStatus)) {
+                        return setValue(
+                          'searchStatuses',
+                          prev.filter((x) => x !== orderStatus),
+                        );
+                      }
+                      return setValue('searchStatuses', prev.concat(orderStatus));
+                    }}
+                  >
+                    <Badge colorScheme={fmOrderStatuses[orderStatus].chakraColor}>
+                      {fmOrderStatuses[orderStatus].name}
+                    </Badge>
+                  </Checkbox>
+                );
+              },
             )}
           </Box>
         </Box>

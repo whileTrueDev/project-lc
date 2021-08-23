@@ -8,6 +8,7 @@ export class FirstmallDbService {
   constructor() {
     this.pool = createPool({
       uri: process.env.FIRSTMALL_DATABASE_URL,
+      supportBigNumbers: true,
     });
   }
 

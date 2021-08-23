@@ -13,13 +13,14 @@ export class FmOrdersService {
   async findOrders(dto: FindFmOrdersDto): Promise<FindFmOrderRes[]> {
     const { sql, params } = this.createFindOrdersQuery(dto);
     if (!sql) return [];
-    const data = (await this.db.query(sql, params)) as FmOrder[];
-    return data.map((x) => ({ ...x, id: x.order_seq }));
+    console.log(sql);
+    const data = (await this.db.query(sql, params)) as FindFmOrderRes[];
+    return data.map((x) => ({ ...x }));
   }
 
   private createFindOrdersQuery(dto: FindFmOrdersDto) {
     const defaultQueryHead = `
-    SELECT fm_order_item.goods_name, fm_order.*
+    SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
     `;
@@ -43,7 +44,7 @@ export class FmOrdersService {
 
     if (dto.searchStartDate || dto.searchEndDate) {
       let targetCol = 'regist_date';
-      orderSql = `ORDER BY ${targetCol}`;
+      orderSql = `\nORDER BY ${targetCol} DESC`;
 
       // 날짜 필터 컬럼 설정(입금/주문)
       if (dto.searchDateType === '입금일') targetCol = 'deposit_date';
@@ -84,7 +85,7 @@ export class FmOrdersService {
     }
     if (dto.search) {
       whereSql = `WHERE ${searchSql}`;
-      orderSql = `ORDER BY fm_order.regist_date DESC`;
+      orderSql = `\nORDER BY fm_order.regist_date DESC`;
 
       if (dto.searchStatuses && dto.searchStatuses.length > 0) {
         whereSql += `\nAND step IN (${dto.searchStatuses.join(',')}) `;
@@ -98,7 +99,7 @@ export class FmOrdersService {
 
     if (dto.searchStatuses && dto.searchStatuses.length > 0) {
       whereSql += `WHERE step IN (${dto.searchStatuses.join(',')}) `;
-      orderSql = `ORDER BY fm_order.regist_date DESC`;
+      orderSql = `\nORDER BY fm_order.regist_date DESC`;
       return {
         sql: defaultQueryHead + whereSql + orderSql,
         params: [],
