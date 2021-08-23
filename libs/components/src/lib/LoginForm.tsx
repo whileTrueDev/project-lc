@@ -1,9 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { useRouter } from 'next/router';
+import { LoginSellerDto } from '@project-lc/shared-types';
+import { useLoginMutation } from '@project-lc/hooks';
 import {
   Alert,
   AlertIcon,
   AlertTitle,
   Button,
+  Checkbox,
   CloseButton,
   Divider,
   FormControl,
@@ -15,10 +19,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { useLoginMutation } from '@project-lc/hooks';
-import { LoginSellerDto } from '@project-lc/shared-types';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CenterBox } from './CenterBox';
@@ -43,7 +44,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
   }
 
   // * 로그인 핸들러
-  const login = useLoginMutation();
+  const login = useLoginMutation('seller');
   const onSubmit = useCallback(
     async (data: LoginSellerDto) => {
       const seller = await login.mutateAsync(data).catch((err) => {
@@ -94,6 +95,11 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
           <FormErrorMessage>
             {errors.password && errors.password.message}
           </FormErrorMessage>
+        </FormControl>
+        <FormControl>
+          <Checkbox size="sm" {...register('stayLogedIn')}>
+            로그인 상태 유지
+          </Checkbox>
         </FormControl>
         {formError && (
           <Alert status="error">

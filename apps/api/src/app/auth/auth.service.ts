@@ -1,5 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { Request } from 'express';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes } from '@project-lc/shared-types';
 import { User, UserPayload } from './auth.interface';
@@ -8,8 +8,8 @@ import { CipherService } from './cipher.service';
 import {
   ACCESS_TOKEN_EXPIRE_TIME,
   REFRESH_TOKEN_EXPIRE_TIME,
-  AUO_LOGIN_EXPIRE_TIME,
-  COOKIE_AUO_LOGIN_EXPIRE_TIME,
+  AUTO_LOGIN_EXPIRE_TIME,
+  COOKIE_AUTO_LOGIN_EXPIRE_TIME,
   COOKIE_EXPIRE_TIME,
   ACCESS_TOKEN_EXPIRE_TIME_INT,
 } from './auth.constant';
@@ -42,17 +42,10 @@ export class AuthService {
       expires_in: ACCESS_TOKEN_EXPIRE_TIME_INT,
       refresh_token: this.createRefreshToken(userPayload, stayLogedIn),
       refresh_token_expires_in: stayLogedIn
-        ? COOKIE_AUO_LOGIN_EXPIRE_TIME
+        ? COOKIE_AUTO_LOGIN_EXPIRE_TIME
         : COOKIE_EXPIRE_TIME,
       scope: userType,
     };
-  }
-
-  issueTokenForSocialAccount(user) {
-    const userPayload = this.castUser(user);
-    const stayLogedIn = true;
-    const userType = 'seller';
-    return this.issueToken(userPayload, stayLogedIn, userType);
   }
 
   /**
@@ -78,13 +71,39 @@ export class AuthService {
   }
 
   /**
-   * 요청 객체에 새로운 Access Token을 헤더에 추가합니다.
-   * @param req 요청 객체
+   * 로그인시, 응답 객체에 새로운 Access Token을 헤더에 추가합니다.
+   * @param res 요청 객체
    * @param userPayload Token에 저장될 payload
    */
-  handleAuthorizationHeader(req: Request, userPayload: UserPayload): void {
+  handleLoginHeader(res: Response, loginToken: loginUserRes): void {
+    res.append('Cache-Control', 'no-cache');
+    res.append('X-wt-Access-Token', loginToken.access_token);
+    res.cookie('refresh_token', loginToken.refresh_token, {
+      httpOnly: true,
+      maxAge: loginToken.refresh_token_expires_in,
+    });
+  }
+
+  /**
+   * 로그아웃시, 응답 객체의 쿠키 삭제, logout을 위한 토큰 전달
+   * @param res 요청 객체
+   */
+  handleLogoutHeader(res: Response): void {
+    res.cookie('refresh_token', '', {
+      httpOnly: true,
+      maxAge: 0,
+    });
+    res.set('X-wt-Access-Token', 'logout');
+  }
+
+  /**
+   * Access Token의 만료시, 응답 객체에 새로운 Access Token을 헤더에 추가합니다.
+   * @param res 요청 객체
+   * @param userPayload Token에 저장될 payload
+   */
+  handleAuthorizationHeader(res: Response, userPayload: UserPayload): void {
     const newAccessToken = this.createAccessTokenByRefresh(userPayload);
-    req.headers.authorization = newAccessToken;
+    res.append('X-wt-Access-Token', `${newAccessToken}`);
   }
 
   /**
@@ -105,7 +124,7 @@ export class AuthService {
     }
   }
 
-  private castUser(user: User): UserPayload {
+  castUser(user: User): UserPayload {
     return {
       sub: user.email,
     };
@@ -119,7 +138,7 @@ export class AuthService {
 
   private createRefreshToken(userPayload: UserPayload, stayLogedIn: boolean): string {
     const refreshToken: string = this.jwtService.sign(userPayload, {
-      expiresIn: stayLogedIn ? AUO_LOGIN_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME,
+      expiresIn: stayLogedIn ? AUTO_LOGIN_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME,
     });
     // 암호화 미사용시 제거
     const cookieRefreshToken = this.cipherService.createCookieRefreshToken(refreshToken);
@@ -135,6 +154,6 @@ export class AuthService {
   private createAccessTokenByRefresh(tokenUserPayload: UserPayload): string {
     const userPayload = this.castUserPayload(tokenUserPayload);
     const newAccessToken = this.createAccessToken(userPayload);
-    return `Bearer ${newAccessToken}`;
+    return `${newAccessToken}`;
   }
 }

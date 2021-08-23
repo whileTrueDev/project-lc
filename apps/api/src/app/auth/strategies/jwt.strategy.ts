@@ -14,6 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  // Authorization header가 제대로 들어갔을 때 해당 함수가 수행된다.
   async validate(payload: UserPayload) {
     return payload;
   }

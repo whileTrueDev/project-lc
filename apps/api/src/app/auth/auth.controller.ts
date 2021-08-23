@@ -12,10 +12,10 @@ import {
 import { SendMailVerificationDto, loginUserRes } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { MailVerificationService } from './mailVerification.service';
-
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
+import { UserType } from './auth.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +29,7 @@ export class AuthController {
   @Post('login')
   async login(
     @Body('stayLogedIn') stayLogedIn: boolean,
-    @Query('type') userType: 'seller' | 'creator',
+    @Query('type') userType: UserType,
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
@@ -40,18 +40,20 @@ export class AuthController {
       stayLogedIn,
       userType,
     );
-    // response 객체 설정
-    res.cookie('refresh_token', loginToken.refresh_token, {
-      httpOnly: true,
-      maxAge: loginToken.refresh_token_expires_in,
-    });
+    this.authService.handleLoginHeader(res, loginToken);
     res.status(200).send(loginToken);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout(@Res() res) {
+    this.authService.handleLogoutHeader(res);
+    res.sendStatus(200);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Req() req) {
-    // 요청 객체의 user로 들어가게 된다.
     return req.user;
   }
 
