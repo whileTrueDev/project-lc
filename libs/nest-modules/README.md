@@ -4,49 +4,35 @@
 
 ## 설명
 
-이 라이브러리에서는 controller 보다는, service가 주로 구현되어야 합니다. 사용되는 nestjs애플리케이션에 따라 컨트롤러 경로는 다를 수 있기 때문입니다. 컨트롤러는 각 nestjs애플리케이션 상에서 구현하고, 해당 컨트롤러를 포함하는 모듈에서 nest-modules에 정의된 모듈을 import 하여, apps 내에 구현된 컨트롤러 상에서 사용하는 방식을 취할 수 있습니다.
+이 라이브러리에서는 nestjs 애플리케이션에서 사용될 수 있는 모듈과 exception filter, decorator, guard, middleware, interceptor, pipe 등을 정의하는 라이브러리입니다.
 
-`/libs/...`의 모듈
 
-```ts
-// libs/nest-modules/.../...module.ts
-@Module({
-    providers: [SomeLibService],
-    exports: [SomeLibService],
-})
-export class SomeLibModule {};
-```
+1. 모든 리소스는 `src/lib` 아래에 작성됩니다. 예를 들어, hello 모듈이 필요하다면 `src/lib/hello` 폴더에 `hello.module.ts`, `hello.service.ts` 를 두는 것 과 같은 모습이 될 것입니다.
+2. exception filter, decorator, guard, middleware, interceptor, pipe 는 모두 `src/lib/_nest-units` 아래에 작성됩니다.
+3. 기본적으로 빌드시 `ts`,`js` 파일만 빌드됩니다. 예외적으로 `assets` 폴더 아래의 컨텐츠는 `ts`,`js` 파일이 아니더라도 빌드에 포함됩니다.
 
-`/apps/...`의 모듈
+## 개발 편의
 
-```ts
-// apps/api/.../...module.ts
+### generator의 사용
 
-import { SomeLibModule } from '@project-lc/nest-modules';
-@Module({
-    imports: [SomeLibModule]
-    providers: [SomeAppModule],
-    exports: [SomeAppService],
-})
-export class SomeAppModule {};
-```
+- module 생성
 
-`/apps/...`의 컨트롤러
+    ```bash
+    yarn nx g @nrwl/nest:module lib/<모듈명> -p nest-modules
+    ```
 
-```ts
-// apps/api/.../...service.ts
+- service 생성
 
-import { SomeLibService } from '@project-lc/nest-modules';
-@Controller()
-export class SomeAppController {
-    constructor(private readonly someLibService: SomeLibService) {}
+    ```bash
+    yarn nx g @nrwl/nest:service lib/<서비스명> -p nest-modules
+    ```
 
-    @Get()
-    something() {
-        return this.someLibService.findSomething();
-    }
-};
-```
+- controller 생성
+
+    ```bash
+    yarn nx g @nrwl/nest:controller lib/<컨트롤러명> -p nest-modules
+    ```
+
 
 ## 테스트
 
