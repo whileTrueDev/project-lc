@@ -13,7 +13,7 @@ import { UserPayload } from '../../auth/auth.interface';
  * someControllerMethod(@Marketer() marketerSession: MarketerSession) {}
  * someControllerMethod(@Marketer() { marketerId }: MarketerSession) {}
  */
-export const GetAuthorizedSeller = createParamDecorator(
+export const SellerAuthorized = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest<Express.Request>();
     if (request.user && request.user.type === 'seller')

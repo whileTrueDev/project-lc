@@ -5,4 +5,4 @@ export * from './lib/social/social.module';
 export * from './lib/shared-module-example/shared-module-example.module';
 export * from './lib/_nest-units/middlewares/colorizedMorgan.middleware';
 export * from './lib/_nest-units/guards/jwt-auth.guard';
-export * from './lib/_nest-units/decorators/GetAuthorizedSeller.decorator';
+export * from './lib/_nest-units/decorators/sellerAuthorized.decorator';
