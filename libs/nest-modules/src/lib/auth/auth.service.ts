@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes } from '@project-lc/shared-types';
 import { Seller } from '@prisma/client';
-import { User, UserPayload } from './auth.interface';
+import { User, UserPayload, UserType } from './auth.interface';
 import { SellerService } from '../seller/seller.service';
 import { CipherService } from './cipher.service';
 import {
@@ -55,18 +55,28 @@ export class AuthService {
    * @param pwdInput 입력한 패스워드 문자열
    * @returns {SellerPayload} User 인터페이스 객체
    */
-  async validateUser(email: string, pwdInput: string): Promise<UserPayload> {
-    const user = await this.sellerService.findOne({ email });
-    if (!user) {
-      return null;
-    }
-    if (user.password === null) {
-      // 소셜로그인으로 가입된 회원
-      throw new BadRequestException();
-    }
-    const isCorrect = await this.sellerService.validatePassword(pwdInput, user.password);
-    if (!isCorrect) {
-      return null;
+  async validateUser(
+    type: UserType,
+    email: string,
+    pwdInput: string,
+  ): Promise<UserPayload> {
+    let user: Seller;
+    if (type === 'seller') {
+      user = await this.sellerService.findOne({ email });
+      if (!user) {
+        return null;
+      }
+      if (user.password === null) {
+        // 소셜로그인으로 가입된 회원
+        throw new BadRequestException();
+      }
+      const isCorrect = await this.sellerService.validatePassword(
+        pwdInput,
+        user.password,
+      );
+      if (!isCorrect) {
+        return null;
+      }
     }
     return this.castUser(user);
   }

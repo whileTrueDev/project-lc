@@ -33,6 +33,31 @@
     yarn nx g @nrwl/nest:controller lib/<컨트롤러명> -p nest-modules
     ```
 
+### controller에서 로그인된 판매자 유저 정보 가져오기
+
+`@SellerInfo()` 데코레이터는 현재 로그인된 유저의 정보(UserPayload, 이메일, 유저타입을 필드로 가지는 객체)를 가져옵니다. guard로 1차 방어한 이유 사용하는 것이 좋습니다. 다음 예시와 같이 활용할 수 있습니다.
+
+```ts
+import { JwtAuthGuard, SellerInfo, UserPayload } from '@project-lc/nest-modules';
+
+@UseGuards(JwtAuthGuard) // 컨트롤러에 전역적으로 jwt가드 설정
+@Controller('fm-orders')
+export class FmOrdersController {
+  constructor(private readonly fmOrdersService: FmOrdersService) {}
+
+  @Get()
+  findOrders(
+    // 데코레이터로 로그인된 판매자 정보 가져오기
+    // 만약 판매자가 아닌 경우(req.user.type !== 'seller'), 401에러 반환.
+    @SellerInfo() seller: UserPayload, 
+    @Query(ValidationPipe) dto: FindFmOrdersDto,
+  ) {
+    console.log(seller); // { sub: 'test@test.com', type: 'seller' }
+    return this.fmOrdersService.findOrders(dto);
+  }
+}
+
+```
 
 ## 테스트
 

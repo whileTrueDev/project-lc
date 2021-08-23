@@ -1,6 +1,6 @@
 import { Controller, Get, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { FindFmOrdersDto } from '@project-lc/shared-types';
-import { JwtAuthGuard, SellerAuthorized, UserPayload } from '@project-lc/nest-modules';
+import { JwtAuthGuard } from '@project-lc/nest-modules';
 import { FmOrdersService } from './fm-orders.service';
 
 @UseGuards(JwtAuthGuard)
@@ -9,10 +9,7 @@ export class FmOrdersController {
   constructor(private readonly fmOrdersService: FmOrdersService) {}
 
   @Get()
-  findOrders(
-    @SellerAuthorized() seller: UserPayload,
-    @Query(ValidationPipe) dto: FindFmOrdersDto,
-  ) {
+  findOrders(@Query(ValidationPipe) dto: FindFmOrdersDto) {
     return this.fmOrdersService.findOrders(dto);
   }
 }
