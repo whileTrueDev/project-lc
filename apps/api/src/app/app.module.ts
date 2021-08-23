@@ -11,7 +11,6 @@ import { validationSchema } from '../settings/config.validation';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
     MailerModule.forRoot(mailerConfig),
     FirstmallDbModule,
     SellerModule,

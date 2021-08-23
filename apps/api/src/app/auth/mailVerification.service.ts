@@ -3,7 +3,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MailVerificationCode } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { nanoid } from 'nanoid';
-import { createVerificationTemplate } from '../../mail-templates/createVerificationTemplate';
+// import { createVerificationTemplate } from '../../mail-templates/createVerificationTemplate';
 
 @Injectable()
 export class MailVerificationService {
@@ -39,7 +39,7 @@ export class MailVerificationService {
       await this.mailerService.sendMail({
         to: targetEmail,
         subject: `${code}은(는) 이메일 확인을 완료할 코드입니다.`,
-        html: createVerificationTemplate(code),
+        // html: createVerificationTemplate(code),
       });
       return true;
     } catch (e) {

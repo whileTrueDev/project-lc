@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes } from '@project-lc/shared-types';
+import { Seller } from '@prisma/client';
 import { User, UserPayload } from './auth.interface';
 import { SellerService } from '../seller/seller.service';
 import { CipherService } from './cipher.service';
@@ -124,15 +125,17 @@ export class AuthService {
     }
   }
 
-  castUser(user: User): UserPayload {
+  castUser(user: Seller): UserPayload {
     return {
       sub: user.email,
+      type: 'seller',
     };
   }
 
   private castUserPayload(userPayload: UserPayload): UserPayload {
     return {
       sub: userPayload.sub,
+      type: 'seller',
     };
   }
 

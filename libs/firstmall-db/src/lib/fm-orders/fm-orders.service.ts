@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FindFmOrderRes, FindFmOrdersDto, FmOrder } from '@project-lc/shared-types';
+import { FindFmOrderRes, FindFmOrdersDto } from '@project-lc/shared-types';
 import { FirstmallDbService } from '../firstmall-db.service';
 
 @Injectable()
@@ -13,7 +13,6 @@ export class FmOrdersService {
   async findOrders(dto: FindFmOrdersDto): Promise<FindFmOrderRes[]> {
     const { sql, params } = this.createFindOrdersQuery(dto);
     if (!sql) return [];
-    console.log(sql);
     const data = (await this.db.query(sql, params)) as FindFmOrderRes[];
     return data.map((x) => ({ ...x }));
   }

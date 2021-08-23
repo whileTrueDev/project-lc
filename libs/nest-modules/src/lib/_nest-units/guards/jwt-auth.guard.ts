@@ -1,11 +1,11 @@
 import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private authService: AuthService) {
+  constructor(private readonly authService: AuthService) {
     super();
   }
 
@@ -28,3 +28,4 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return userPayload;
   }
 }
+// ERROR [ExceptionsHandler] Cannot read property 'validateRefreshToken' of undefined

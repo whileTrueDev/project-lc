@@ -12,8 +12,8 @@ import {
 import { SendMailVerificationDto, loginUserRes } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { MailVerificationService } from './mailVerification.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LocalAuthGuard } from '../_nest-units/guards/local-auth.guard';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 import { UserType } from './auth.interface';
 
