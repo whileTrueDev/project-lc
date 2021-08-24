@@ -6,3 +6,4 @@ export * from './lib/mutation/useLogoutMutation';
 export * from './lib/hooks';
 export * from './lib/getHostUrl';
 export * from './lib/queries/useFmOrders';
+export * from './lib/useDisplaySize';

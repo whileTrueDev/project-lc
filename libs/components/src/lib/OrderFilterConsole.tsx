@@ -12,21 +12,20 @@ import {
   Select,
   Stack,
   Text,
-  useBreakpoint,
 } from '@chakra-ui/react';
+import { useDisplaySize } from '@project-lc/hooks';
 import { fmOrderStatuses, OrderFilterFormType } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
 import moment from 'moment';
 import 'moment/locale/ko';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 export function OrderFilterConsole(): JSX.Element {
-  const xSize = useBreakpoint();
-  const isMobile = useMemo(() => xSize && ['base', 'sm'].includes(xSize), [xSize]);
+  const { isMobileSize } = useDisplaySize();
 
   const handleOrderSearchStates = useFmOrderStore((s) => s.handleOrderSearchStates);
   const { handleSubmit, control, register, watch, setValue, getValues } =
@@ -75,7 +74,7 @@ export function OrderFilterConsole(): JSX.Element {
           <Box mb={2}>
             <Text>날짜</Text>
           </Box>
-          <Stack spacing={2} direction={isMobile ? 'column' : 'row'}>
+          <Stack spacing={2} direction={isMobileSize ? 'column' : 'row'}>
             <Controller
               name="searchDateType"
               control={control}
@@ -111,8 +110,8 @@ export function OrderFilterConsole(): JSX.Element {
                 reopenPickerOnClearDates
                 isOutsideRange={() => false}
                 displayFormat="YYYY-MM-DD"
-                withPortal={!!isMobile}
-                numberOfMonths={isMobile ? 1 : 2}
+                withPortal={!!isMobileSize}
+                numberOfMonths={isMobileSize ? 1 : 2}
                 startDatePlaceholderText="시작일"
                 startDateAriaLabel="시작일"
                 endDatePlaceholderText="종료일"

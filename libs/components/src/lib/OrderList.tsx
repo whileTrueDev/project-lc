@@ -19,7 +19,7 @@ import {
   GridToolbarContainer,
   GridToolbarExport,
 } from '@material-ui/data-grid';
-import { useFmOrders } from '@project-lc/hooks';
+import { useFmOrders, useDisplaySize } from '@project-lc/hooks';
 import {
   converOrderSitetypeToString,
   convertFmOrderToString,
@@ -161,11 +161,7 @@ export function OrderList(): JSX.Element {
   const fmOrderStates = useFmOrderStore();
   const orders = useFmOrders(fmOrderStates);
 
-  const xSize = useBreakpoint();
-  const isDesktopSize = useMemo(
-    () => xSize && !['md', 'lg', 'base', 'sm'].includes(xSize),
-    [xSize],
-  );
+  const { isDesktopSize } = useDisplaySize();
   const dataGridBgColor = useColorModeValue('inherit', 'gray.300');
 
   // * 선택된 행
