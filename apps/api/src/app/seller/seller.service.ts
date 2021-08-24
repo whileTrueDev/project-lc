@@ -67,17 +67,13 @@ export class SellerService {
   }
 
   /**
-   * 유저 삭제(id 제외한 값을 null로 처리)
+   * seller 삭제
    */
   async deleteOne(email: string) {
     await this.checkCanBeDeletedSeller(email);
 
-    await this.prisma.seller.update({
+    await this.prisma.seller.delete({
       where: { email },
-      data: {
-        name: null,
-        password: null,
-      },
     });
 
     return true;
