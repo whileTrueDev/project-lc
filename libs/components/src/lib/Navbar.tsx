@@ -17,7 +17,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useLogout, useProfile } from '@project-lc/hooks';
+import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { AiTwotoneSetting } from 'react-icons/ai';
@@ -27,8 +27,7 @@ import { ColorModeSwitcher } from './ColorModeSwitcher';
 export function Navbar() {
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
-  const { data: profileData, isFetching } = useProfile();
-  const isLoggedIn = !isFetching && !!profileData;
+  const { isLoggedIn } = useIsLoggedIn();
   const { logout } = useLogout();
 
   return (

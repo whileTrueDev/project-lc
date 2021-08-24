@@ -1,6 +1,8 @@
+import { useRouter } from 'next/router';
 import { useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from 'react-query';
 import { useLogoutMutation } from './mutation/useLogoutMutation';
+import { useProfile } from './queries/useProfile';
 
 export function useSeconds() {
   const [value, setValue] = useState(0);
@@ -39,4 +41,28 @@ export function useLogout() {
   }, [mutateAsync, queryClient]);
 
   return { logout };
+}
+
+/**
+ * 로그인 여부 리턴
+ */
+export function useIsLoggedIn() {
+  const { data: profileData, status } = useProfile();
+  const isLoggedIn = status === 'success' && !!profileData;
+
+  return { isLoggedIn, status };
+}
+
+/**
+ * 로그인 되어 있는 경우 메인으로 이동시키는 effect
+ */
+export function useMoveToMainIfLoggedIn() {
+  const router = useRouter();
+  const { isLoggedIn } = useIsLoggedIn();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push('/');
+    }
+  }, [isLoggedIn, router]);
 }
