@@ -36,13 +36,13 @@ export function SocialAccountUnlinkDialog(
         <ModalCloseButton />
         <ModalBody>
           <Text mb={3}>
-            소셜 계졍 연결을 해제한 이후 로그인 하실 때는 이메일 주소와 암호를 입력해야
-            합니다.
+            소셜 계정 연결을 해제한 이후 로그인 하실 때는 이메일 주소와 비밀번호를
+            입력해야 합니다.
           </Text>
           {!hasPassword && (
             <Text>
-              현재 암호가 등록되어 있지 않습니다. 계정 연결을 해제하기 전에 암호를 먼저
-              등록해주세요
+              현재 비밀번호가 등록되어 있지 않습니다. 계정 연결을 해제하기 전에 비밀번호를
+              먼저 등록해주세요
             </Text>
           )}
         </ModalBody>
