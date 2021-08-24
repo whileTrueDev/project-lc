@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from 'react-query';
-import { useRouter } from 'next/router';
 import { useLogoutMutation } from './mutation/useLogoutMutation';
 
 export function useSeconds() {
@@ -27,8 +26,16 @@ export function useLogout() {
   const { mutateAsync } = useLogoutMutation();
 
   const logout = useCallback(() => {
-    queryClient.removeQueries('Profile', { exact: true });
-    mutateAsync();
+    mutateAsync()
+      .then((res) => {
+        if (res === 'OK') {
+          queryClient.clear();
+          queryClient.removeQueries('Profile', { exact: true });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, [mutateAsync, queryClient]);
 
   return { logout };

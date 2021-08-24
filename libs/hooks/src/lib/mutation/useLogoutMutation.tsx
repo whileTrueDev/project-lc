@@ -4,9 +4,15 @@ import axios from '../../axios';
 
 export const useLogoutMutation = () => {
   const router = useRouter();
-  return useMutation(() => axios.post('/auth/logout'), {
-    onSuccess: () => {
-      router.push('/');
+  return useMutation(
+    async () => {
+      const { data } = await axios.post('/auth/logout');
+      return data;
     },
-  });
+    {
+      onSuccess: () => {
+        router.push('/');
+      },
+    },
+  );
 };
