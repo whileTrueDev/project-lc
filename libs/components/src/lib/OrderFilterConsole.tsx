@@ -47,6 +47,7 @@ export function OrderFilterConsole(): JSX.Element {
       mx="auto"
       spacing={4}
       as="form"
+      autoComplete="off"
       onSubmit={handleSubmit(onSubmit)}
     >
       <Flex px={[2, 4]} as="section">
@@ -56,6 +57,7 @@ export function OrderFilterConsole(): JSX.Element {
           </InputLeftElement>
           <Input
             placeholder="주문번호,상품번호,주문자명,입금자명,수령자명,(주문자,입금자)휴대전화,상품명"
+            autocomplete="off"
             id="order-search-text-project-lc"
             type="text"
             variant="outline"
@@ -85,30 +87,39 @@ export function OrderFilterConsole(): JSX.Element {
                 </Select>
               )}
             />
-
-            <DateRangePicker
-              small
-              startDate={
-                watch('searchStartDate') ? moment(watch('searchStartDate')) : null
-              }
-              startDateId="searchStartDate" // PropTypes.string.isRequired,
-              endDate={watch('searchEndDate') ? moment(watch('searchEndDate')) : null} // momentPropTypes.momentObj or null,
-              endDateId="searchEndDate" // PropTypes.string.isRequired,
-              onDatesChange={({ startDate, endDate }) => {
-                setValue(
-                  'searchStartDate',
-                  startDate ? startDate.format('YYYY-MM-DD') : null,
-                );
-                setValue('searchEndDate', endDate ? endDate.format('YYYY-MM-DD') : null);
-              }} // PropTypes.func.isRequired,
-              focusedInput={focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
-              onFocusChange={(_focusedInput) => setFocusedInput(_focusedInput)} // PropTypes.func.isRequired,
-              reopenPickerOnClearDates
-              isOutsideRange={() => false}
-              displayFormat="YYYY-MM-DD"
-              withPortal={!!isMobile}
-              numberOfMonths={isMobile ? 1 : 2}
-            />
+            <Box>
+              <DateRangePicker
+                small
+                startDate={
+                  watch('searchStartDate') ? moment(watch('searchStartDate')) : null
+                }
+                startDateId="searchStartDate" // PropTypes.string.isRequired,
+                endDate={watch('searchEndDate') ? moment(watch('searchEndDate')) : null} // momentPropTypes.momentObj or null,
+                endDateId="searchEndDate" // PropTypes.string.isRequired,
+                onDatesChange={({ startDate, endDate }) => {
+                  setValue(
+                    'searchStartDate',
+                    startDate ? startDate.format('YYYY-MM-DD') : null,
+                  );
+                  setValue(
+                    'searchEndDate',
+                    endDate ? endDate.format('YYYY-MM-DD') : null,
+                  );
+                }} // PropTypes.func.isRequired,
+                focusedInput={focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
+                onFocusChange={(_focusedInput) => setFocusedInput(_focusedInput)} // PropTypes.func.isRequired,
+                reopenPickerOnClearDates
+                isOutsideRange={() => false}
+                displayFormat="YYYY-MM-DD"
+                withPortal={!!isMobile}
+                numberOfMonths={isMobile ? 1 : 2}
+                startDatePlaceholderText="시작일"
+                startDateAriaLabel="시작일"
+                endDatePlaceholderText="종료일"
+                endDateAriaLabel="종료일"
+                showClearDates
+              />
+            </Box>
           </Stack>
         </Box>
 
