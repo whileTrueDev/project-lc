@@ -41,17 +41,19 @@ export function AccountRemoveDialog(props: AccountRemoveDialogProps): JSX.Elemen
         }
       })
       .catch((error) => {
+        console.error(error);
         if (error.response.status === 400) {
           toast({
             title: '탈퇴 오류',
             description: error.response.data.message,
             status: 'error',
           });
+        } else {
+          toast({
+            title: '탈퇴 오류',
+            status: 'error',
+          });
         }
-        toast({
-          title: '탈퇴 오류',
-          status: 'error',
-        });
       });
   };
   return (
@@ -61,12 +63,8 @@ export function AccountRemoveDialog(props: AccountRemoveDialogProps): JSX.Elemen
         <ModalHeader>회원 탈퇴를 진행하시겠습니까?</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>회원 탈퇴 시 모든 정보가 삭제됩니다!!!!! </Text>
-          <Text>회원 탈퇴 시 모든 정보가 삭제됩니다!!!!! </Text>
-          <Text>회원 탈퇴 시 모든 정보가 삭제됩니다!!!!! </Text>
+          {/* //TODO: 추후 문구 수정 */}
           <Text mb={3}>회원 탈퇴 시 모든 정보가 삭제됩니다!!!!! </Text>
-          <Text>해당 계정에 다시 로그인 할 수 없습니다.</Text>
-          <Text>해당 계정에 다시 로그인 할 수 없습니다.</Text>
           <Text mb={3}>해당 계정에 다시 로그인 할 수 없습니다.</Text>
           <Text mb={3}>
             연결된 소셜 계정이 있다면 소셜 계정 연결 해제를 먼저 진행해주세요.
