@@ -1,0 +1,69 @@
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
+  ModalProps,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
+
+export type SocialAccountUnlinkDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
+  headerText?: string;
+  hasPassword: boolean;
+  unlinkHandler: () => void;
+};
+
+export function SocialAccountUnlinkDialog(
+  props: SocialAccountUnlinkDialogProps,
+): JSX.Element {
+  const { isOpen, onClose, hasPassword, unlinkHandler, headerText } = props;
+  const toast = useToast();
+
+  // 다음에 로그인시 이메일과 비밀번호 사용해야 함 알림
+  // 1. 비밀번호 있는 경우 : 연동해제버튼
+  // 2. 비밀번호 없는 경우 : 현재 비밀번호 등록되어있지 않음. 비밀번호 등록 요청문구
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <ModalOverlay />
+      <ModalContent>
+        {headerText && <ModalHeader>{headerText}</ModalHeader>}
+        <ModalCloseButton />
+        <ModalBody>
+          <Text mb={3}>
+            소셜 계졍 연결을 해제한 이후 로그인 하실 때는 이메일 주소와 암호를 입력해야
+            합니다.
+          </Text>
+          {!hasPassword && (
+            <Text>
+              현재 암호가 등록되어 있지 않습니다. 계정 연결을 해제하기 전에 암호를 먼저
+              등록해주세요
+            </Text>
+          )}
+        </ModalBody>
+
+        <ModalFooter>
+          <Button mr={3} onClick={onClose}>
+            취소
+          </Button>
+          {hasPassword ? (
+            <Button colorScheme="red" onClick={unlinkHandler}>
+              연동해제
+            </Button>
+          ) : (
+            <Button colorScheme="blue" onClick={onClose}>
+              확인
+            </Button>
+          )}
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
+
+export default SocialAccountUnlinkDialog;
