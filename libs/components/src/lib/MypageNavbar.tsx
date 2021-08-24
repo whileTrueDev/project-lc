@@ -11,12 +11,20 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import { mypageNavLinks } from '../constants/navigation';
+import { useCallback } from 'react';
+import { MypageLink, mypageNavLinks } from '../constants/navigation';
 
 export function MypageNavbar(): JSX.Element {
   const router = useRouter();
   const linkHoverColor = useColorModeValue('gray.800', 'white');
   const subNavHoverColor = useColorModeValue('pink.50', 'gray.900');
+
+  // * 현재 페이지에 매치하는지 확인 함수
+  const isMatched = useCallback(
+    (link: MypageLink) =>
+      link.children ? router.pathname.includes(link.href) : router.pathname === link.href,
+    [router.pathname],
+  );
 
   return (
     <Flex
@@ -43,16 +51,10 @@ export function MypageNavbar(): JSX.Element {
                         py={2}
                         mx={{ base: 1, sm: 3 }}
                         fontSize={{ base: 'xs', sm: 'sm' }}
-                        fontWeight={router.pathname.includes(link.href) ? 'bold' : 500}
-                        textDecoration={
-                          router.pathname.includes(link.href) ? 'underline' : 'none'
-                        }
-                        textDecorationColor={
-                          router.pathname.includes(link.href) ? 'red.400' : 'none'
-                        }
-                        textDecorationThickness={
-                          router.pathname.includes(link.href) ? '0.225rem' : 'none'
-                        }
+                        fontWeight={isMatched(link) ? 'bold' : 500}
+                        textDecoration={isMatched(link) ? 'underline' : 'none'}
+                        textDecorationColor={isMatched(link) ? 'red.400' : 'none'}
+                        textDecorationThickness={isMatched(link) ? '0.225rem' : 'none'}
                         _hover={{ color: linkHoverColor }}
                       >
                         {link.name}
@@ -62,16 +64,10 @@ export function MypageNavbar(): JSX.Element {
                         py={2}
                         mx={{ base: 1, sm: 3 }}
                         fontSize={{ base: 'xs', sm: 'sm' }}
-                        fontWeight={router.pathname === link.href ? 'bold' : 500}
-                        textDecoration={
-                          router.pathname === link.href ? 'underline' : 'none'
-                        }
-                        textDecorationColor={
-                          router.pathname === link.href ? 'red.400' : 'none'
-                        }
-                        textDecorationThickness={
-                          router.pathname === link.href ? '0.225rem' : 'none'
-                        }
+                        fontWeight={isMatched(link) ? 'bold' : 500}
+                        textDecoration={isMatched(link) ? 'underline' : 'none'}
+                        textDecorationColor={isMatched(link) ? 'red.400' : 'none'}
+                        textDecorationThickness={isMatched(link) ? '0.225rem' : 'none'}
                         _hover={{ color: linkHoverColor }}
                       >
                         {link.name}
