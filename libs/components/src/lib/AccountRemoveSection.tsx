@@ -1,25 +1,11 @@
 import { Button, Text, useDisclosure } from '@chakra-ui/react';
-import { useLogoutMutation } from '@project-lc/hooks';
-import { useRouter } from 'next/router';
-import { useQueryClient } from 'react-query';
+import { useLogout } from '@project-lc/hooks';
 import AccountRemoveDialog from './AccountRemoveDialog';
 import SettingSectionLayout from './SettingSectionLayout';
 
 export function AccountRemoveSection(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const router = useRouter();
-  const { mutateAsync } = useLogoutMutation();
-  const queryClient = useQueryClient();
-
-  const logout = () => {
-    // 프론트에서 글로벌에 저장하고 있는 유저정보 삭제
-    queryClient.removeQueries('Profile', { exact: true });
-    // 로그아웃요청(토큰삭제)
-    mutateAsync().then((res) => {
-      console.log(res);
-      router.push('/');
-    });
-  };
+  const { logout } = useLogout();
 
   return (
     <SettingSectionLayout title="회원 탈퇴">
