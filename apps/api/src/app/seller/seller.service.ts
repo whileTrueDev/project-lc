@@ -130,4 +130,21 @@ export class SellerService {
     }
     return this.validatePassword(password, seller.password);
   }
+
+  /**
+   * 비밀번호 변경
+   * @param email 비밀번호 변경할 셀러의 email
+   * @param newPassword 새로운 비밀번호
+   * @returns
+   */
+  async changePassword(email: string, newPassword: string) {
+    const hashedPw = await this.hashPassword(newPassword);
+    const seller = await this.prisma.seller.update({
+      where: { email },
+      data: {
+        password: hashedPw,
+      },
+    });
+    return seller;
+  }
 }

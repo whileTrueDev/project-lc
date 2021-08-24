@@ -4,8 +4,10 @@ import {
   Controller,
   Delete,
   Get,
+  Patch,
   Post,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { Seller } from '@prisma/client';
@@ -15,6 +17,7 @@ import {
   SellerEmailDupCheckDto,
   SignUpSellerDto,
 } from '@project-lc/shared-types';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { SellerService } from './seller.service';
 
@@ -60,9 +63,15 @@ export class SellerController {
   }
 
   // 로그인 한 사람이 본인인증을 위해 비밀번호 확인
-  // TODO: jwt guard 적용하기, 비밀번호 변경 & 기타 본인인증 시 적용?????
+  @UseGuards(JwtAuthGuard)
   @Post('validate-password')
   public async validatePassword(@Body(ValidationPipe) dto: PasswordValidateDto) {
     return this.sellerService.checkPassword(dto.email, dto.password);
+  }
+
+  // 비밀번호 변경
+  @Patch('password')
+  public async changePassword(@Body(ValidationPipe) dto: PasswordValidateDto) {
+    return this.sellerService.changePassword(dto.email, dto.password);
   }
 }
