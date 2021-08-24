@@ -8,7 +8,7 @@ export interface FmOrder {
   /**
    * '고유번호'
    */
-  order_seq: number;
+  order_seq: string;
   /**
    * '맞교환주문의 원주문번호'
    */
@@ -64,7 +64,7 @@ export interface FmOrder {
   /**
    * '입금일시',
    */
-  deposit_date: Date | null;
+  deposit_date: string | Date | null;
   /**
    * '입금자명',
    */
@@ -254,7 +254,7 @@ export interface FmOrder {
   /**
    * '쿠폰할인금액',
    */
-  coupon_sale: number | null;
+  coupon_sale: string | number | null;
   /**
    * '매출증빙',
    */
@@ -289,7 +289,7 @@ export interface FmOrder {
   /**
    * '주문접수일',
    */
-  regist_date: Date;
+  regist_date: string | Date;
   /**
    * '세션아이디',
    */
@@ -500,7 +500,7 @@ export interface FmOrderItem {
   /**
    * '주문번호',
    */
-  order_seq: number;
+  order_seq: string;
   /**
    * '상품코드',
    */
