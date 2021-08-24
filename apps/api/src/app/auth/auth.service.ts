@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes } from '@project-lc/shared-types';
+import { Seller } from '@prisma/client';
 import { User, UserPayload } from './auth.interface';
 import { SellerService } from '../seller/seller.service';
 import { CipherService } from './cipher.service';
@@ -155,5 +156,20 @@ export class AuthService {
     const userPayload = this.castUserPayload(tokenUserPayload);
     const newAccessToken = this.createAccessToken(userPayload);
     return `${newAccessToken}`;
+  }
+
+  async getProfile(userPayload: UserPayload): Promise<
+    Omit<Seller, 'pasword'> & {
+      hasPassword: boolean; // 비밀번호 null 인지 여부
+    }
+  > {
+    const { sub } = userPayload; // email
+    const user = await this.sellerService.findOne({ email: sub });
+    const hasPassword = Boolean(user.password);
+    delete user.password;
+    return {
+      ...user,
+      hasPassword,
+    };
   }
 }

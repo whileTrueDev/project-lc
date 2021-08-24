@@ -222,7 +222,7 @@ export class SocialService {
           select: {
             serviceId: true,
             provider: true,
-            name: false,
+            name: true,
             registDate: true,
             profileImage: false,
             accessToken: false,
