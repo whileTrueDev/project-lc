@@ -12,11 +12,10 @@ interface MypageLayoutProps {
 }
 
 export function MypageLayout({ children }: MypageLayoutProps): JSX.Element {
-  // TODO: 임시로 로그인한 유저정보를 여기서 가져옴 추후 global state에서 가져오는걸로 수정하기, email말고 다른정보도 가져와야함
-  const { data, isFetching, error } = useProfile();
+  const { data, isLoading, error } = useProfile();
 
   return (
-    <Box position="relative" pointerEvents={!data || isFetching ? 'none' : 'auto'}>
+    <Box position="relative" pointerEvents={!data || isLoading ? 'none' : 'auto'}>
       <Navbar />
 
       <MypageNavbar />
@@ -28,7 +27,7 @@ export function MypageLayout({ children }: MypageLayoutProps): JSX.Element {
       <MypageFooter />
 
       {/* 전체화면 로딩 */}
-      {(!data || isFetching || !!error) && <FullscreenLoading />}
+      {(!data || isLoading || !!error) && <FullscreenLoading />}
 
       {/* 로그인 필요 다이얼로그 */}
       <LoginRequireAlertDialog isOpen={!!error} />

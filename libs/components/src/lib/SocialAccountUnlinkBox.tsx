@@ -37,6 +37,7 @@ export function SocialAccountUnlinkBox(props: SocialAccount) {
 
   return (
     <Flex
+      maxWidth="sm"
       boxShadow="xs"
       p="4"
       rounded="md"
