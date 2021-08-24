@@ -8,12 +8,16 @@ import {
   Heading,
   IconButton,
   Link,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Stack,
   Tooltip,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
+import { useLogout, useProfile } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { AiTwotoneSetting } from 'react-icons/ai';
@@ -23,6 +27,9 @@ import { ColorModeSwitcher } from './ColorModeSwitcher';
 export function Navbar() {
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
+  const { data: profileData, isFetching } = useProfile();
+  const isLoggedIn = !isFetching && !!profileData;
+  const { logout } = useLogout();
 
   return (
     <Box>
@@ -78,50 +85,66 @@ export function Navbar() {
           spacing={{ base: 0, sm: 4 }}
         >
           <ColorModeSwitcher />
-          {/* 로그인 안 된 경우 */}
-          <Button
-            as="a"
-            fontSize="sm"
-            fontWeight={500}
-            variant="link"
-            onClick={() => router.push('/login')}
-          >
-            로그인
-          </Button>
-          <Button
-            onClick={() => router.push('/signup')}
-            display={{ base: 'none', md: 'inline-flex' }}
-            fontSize="sm"
-            fontWeight={600}
-            color="white"
-            bg="pink.400"
-            _hover={{
-              bg: 'pink.300',
-            }}
-          >
-            시작하기
-          </Button>
-          {/* 로그인 안 된 경우 */}
-
-          {/* 
-          //TODO: 추후 로그인 상태를 global에 저장하기, 해당 상태에 따라 보여지는 컴포넌트 바꾸기 
-          계정설정 화면 개발 위해 "로그인 된 경우" 부분 주석 풀어둠
-          */}
-          {/* 로그인 된 경우 */}
-          <Tooltip label="계정 설정" fontSize="xs">
-            <IconButton
-              size="md"
-              fontSize="xl"
-              variant="ghost"
-              color="current"
-              aria-label="settings icon"
-              icon={<AiTwotoneSetting />}
-              onClick={() => router.push('/mypage/setting')}
-              display={{ base: 'none', sm: 'inline-flex' }}
-            />
-          </Tooltip>
-          <Avatar size="sm" />
-          {/* 로그인 된 경우 */}
+          {isLoggedIn ? (
+            <>
+              <Popover>
+                <PopoverTrigger>
+                  <Avatar as="button" size="sm" cursor="pointer" />
+                </PopoverTrigger>
+                <PopoverContent maxWidth="80px">
+                  <Tooltip label="계정 설정" fontSize="xs">
+                    <IconButton
+                      size="md"
+                      fontSize="xl"
+                      variant="ghost"
+                      color="current"
+                      aria-label="settings icon"
+                      icon={<AiTwotoneSetting />}
+                      onClick={() => router.push('/mypage/setting')}
+                    />
+                  </Tooltip>
+                  <Button
+                    display={{ md: 'inline-flex' }}
+                    fontSize="sm"
+                    fontWeight={600}
+                    color="white"
+                    bg="pink.400"
+                    _hover={{
+                      bg: 'pink.300',
+                    }}
+                    onClick={logout}
+                  >
+                    로그아웃
+                  </Button>
+                </PopoverContent>
+              </Popover>
+            </>
+          ) : (
+            <>
+              <Button
+                as="a"
+                fontSize="sm"
+                fontWeight={500}
+                variant="link"
+                onClick={() => router.push('/login')}
+              >
+                로그인
+              </Button>
+              <Button
+                onClick={() => router.push('/signup')}
+                display={{ base: 'none', md: 'inline-flex' }}
+                fontSize="sm"
+                fontWeight={600}
+                color="white"
+                bg="pink.400"
+                _hover={{
+                  bg: 'pink.300',
+                }}
+              >
+                시작하기
+              </Button>
+            </>
+          )}
         </Stack>
       </Flex>
 
