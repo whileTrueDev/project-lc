@@ -74,6 +74,7 @@ function CustomDataGrid(props: DataGridProps): JSX.Element {
         toolbarExportLabel: '내보내기',
         toolbarExportCSV: 'CSV 파일로 다운로드',
       }}
+      // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     />
   );

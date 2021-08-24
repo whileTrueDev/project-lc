@@ -1,6 +1,5 @@
 import create from 'zustand';
-import { OrderFilterFormType } from '@project-lc/components';
-import { FindFmOrdersDto } from '../../../shared-types/src';
+import { FindFmOrdersDto, OrderFilterFormType } from '@project-lc/shared-types';
 
 export interface FmOrderStoreState extends FindFmOrdersDto {
   handleOrderSearchStates(dto: OrderFilterFormType): void;

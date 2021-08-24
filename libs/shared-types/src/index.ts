@@ -11,3 +11,4 @@ export * from './lib/res-types/fmOrder.res';
 export * from './lib/constants/fmOrderStatuses';
 export * from './lib/constants/fmOrderSitetypes';
 export * from './lib/dto/findFmOrders.dto';
+export * from './lib/front-type/orderFilterFormType';
