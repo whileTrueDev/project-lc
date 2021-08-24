@@ -28,7 +28,7 @@ export class MockSellerService {
 export const authTestCases = [
   {
     param: { email: 'qkrcksdn0208@naver.com', pwdInput: '올바른비밀번호입력' },
-    result: { sub: 'qkrcksdn0208@naver.com' },
+    result: { sub: 'qkrcksdn0208@naver.com', type: 'seller' },
   },
   {
     param: { email: 'qkrcksdn0208@naver.com', pwdInput: '' },

@@ -4,10 +4,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Seller } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
-import { mailerConfig } from '../../settings/mailer.config';
 import { SellerController } from './seller.controller';
 import { SellerService } from './seller.service';
 import { MailVerificationService } from '../auth/mailVerification.service';
+import { mailerConfig } from '../auth/mailer.config';
 
 describe('SellerController', () => {
   let app: NestApplication;

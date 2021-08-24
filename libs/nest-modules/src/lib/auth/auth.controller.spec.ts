@@ -1,22 +1,22 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
-import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { INestApplication } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from '@project-lc/prisma-orm';
-import { AuthService } from './auth.service';
-import { CipherService } from './cipher.service';
-import { AuthController } from './auth.controller';
+import request from 'supertest';
 import { SellerModule } from '../seller/seller.module';
-import { LocalStrategy } from './strategies/local.strategy';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { JwtConfigService } from '../../settings/jwt.setting';
 import { SellerService } from '../seller/seller.service';
-import { findOne, authTestCases } from './auth.test-case';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { authTestCases, findOne } from './auth.test-case';
+import { CipherService } from './cipher.service';
+import { JwtConfigService } from './jwt.setting';
+import { mailerConfig } from './mailer.config';
 import { MailVerificationService } from './mailVerification.service';
-import { mailerConfig } from '../../settings/mailer.config';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
 
 describe('AuthController', () => {
   let app: INestApplication;
@@ -51,21 +51,31 @@ describe('AuthController', () => {
     await app.init();
   });
 
-  it(`/POST login success`, () => {
-    const successCaseParam = authTestCases[0].param;
-    return request(app.getHttpServer())
-      .post('/auth/login')
-      .send({ email: successCaseParam.email, password: successCaseParam.pwdInput })
-      .expect(200);
-  });
+  describe('POST /login', () => {
+    it(`should success`, () => {
+      const successCaseParam = authTestCases[0].param;
+      return request(app.getHttpServer())
+        .post('/auth/login?type=seller')
+        .send({ email: successCaseParam.email, password: successCaseParam.pwdInput })
+        .expect(200);
+    });
 
-  const failCaseParam = authTestCases.slice(1);
-  failCaseParam.forEach(({ param }, index) => {
-    it(`/POST login fail ${index}`, () => {
+    it('should be failed with 403 error code when the type query was not provided', () => {
+      const successCaseParam = authTestCases[0].param;
       return request(app.getHttpServer())
         .post('/auth/login')
-        .send({ email: param.email, password: param.pwdInput })
-        .expect(401);
+        .send({ email: successCaseParam.email, password: successCaseParam.pwdInput })
+        .expect(403);
+    });
+
+    const failCaseParam = authTestCases.slice(1);
+    failCaseParam.forEach(({ param }, index) => {
+      it(`should be failed with 401 error code - test case: ${index}`, () => {
+        return request(app.getHttpServer())
+          .post('/auth/login?type=seller')
+          .send({ email: param.email, password: param.pwdInput })
+          .expect(401);
+      });
     });
   });
 

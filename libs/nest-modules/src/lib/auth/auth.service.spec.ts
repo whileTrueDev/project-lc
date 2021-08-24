@@ -10,11 +10,11 @@ import { AuthController } from './auth.controller';
 import { SellerModule } from '../seller/seller.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { JwtConfigService } from '../../settings/jwt.setting';
+import { JwtConfigService } from './jwt.setting';
 import { SellerService } from '../seller/seller.service';
 import { authTestCases, findOne } from './auth.test-case';
 import { MailVerificationService } from './mailVerification.service';
-import { mailerConfig } from '../../settings/mailer.config';
+import { mailerConfig } from './mailer.config';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -49,14 +49,14 @@ describe('AuthService', () => {
 
   it('user find', async () => {
     const { param, result } = authTestCases[0];
-    const user = await service.validateUser(param.email, param.pwdInput);
+    const user = await service.validateUser('seller', param.email, param.pwdInput);
     expect(user).toEqual(result);
   });
 
   const failCaseParam = authTestCases.slice(1);
   failCaseParam.forEach(({ param, result }, index) => {
     it(`user not find ${index}`, async () => {
-      const user = await service.validateUser(param.email, param.pwdInput);
+      const user = await service.validateUser('seller', param.email, param.pwdInput);
       expect(user).toEqual(result);
     });
   });

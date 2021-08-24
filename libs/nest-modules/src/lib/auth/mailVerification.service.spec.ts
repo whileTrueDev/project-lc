@@ -3,7 +3,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
-import { mailerConfig } from '../../settings/mailer.config';
+import { mailerConfig } from './mailer.config';
 import { MailVerificationService } from './mailVerification.service';
 
 describe('MailVerificationService', () => {
