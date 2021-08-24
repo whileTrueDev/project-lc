@@ -1,10 +1,8 @@
 import { ExecutionContext } from '@nestjs/common';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Seller } from '@prisma/client';
 import request from 'supertest';
-import { JwtAuthGuard } from '../../../../nest-modules/src';
-import { FindFmOrdersDto } from '../../../../shared-types/src';
+import { JwtAuthGuard } from '@project-lc/nest-modules';
 import { ordersSample } from '../../__tests__/ordersSample';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FmOrdersController } from './fm-orders.controller';
