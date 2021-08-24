@@ -9,19 +9,17 @@ export interface PasswordCheckFormProps {
   onFail?: () => void;
 }
 
-// TODO: 비밀번호 확인과정을 넣어야하나???
 export function PasswordCheckForm(props: PasswordCheckFormProps): JSX.Element {
   const { onCancel, onConfirm, onFail } = props;
   const toast = useToast();
 
-  // TODO: useProfile 대신 로그인 된 글로벌 상태에서 email값 가져오기
   const { data } = useProfile();
   const { mutateAsync } = useValidatePassword();
-  const { register, handleSubmit, getValues, reset } = useForm();
+  const { register, handleSubmit, getValues, reset, watch } = useForm();
 
   const checkPassword = () => {
     const password = getValues('password').trim();
-    const email = data?.sub;
+    const email = data?.email;
     if (!email || !password) return;
 
     mutateAsync({ email, password })
@@ -49,13 +47,17 @@ export function PasswordCheckForm(props: PasswordCheckFormProps): JSX.Element {
       .finally(() => reset());
   };
   return (
-    <SettingSectionLayout title="암호 확인">
-      <Text>회원님의 계정 설정을 변경하기 전 본인확인을 위해 암호를 입력해주세요.</Text>
+    <SettingSectionLayout title="비밀번호 확인">
+      <Text>
+        회원님의 계정 설정을 변경하기 전 본인확인을 위해 비밀번호를 입력해주세요.
+      </Text>
       <Box as="form" onSubmit={handleSubmit(checkPassword)}>
-        <Input {...register('password', { required: true })} />
+        <Input type="password" mb={2} {...register('password', { required: true })} />
         <ButtonGroup>
           <Button onClick={onCancel}>취소</Button>
-          <Button type="submit">암호 확인</Button>
+          <Button type="submit" disabled={!watch('password')}>
+            비밀번호 확인
+          </Button>
         </ButtonGroup>
       </Box>
     </SettingSectionLayout>
