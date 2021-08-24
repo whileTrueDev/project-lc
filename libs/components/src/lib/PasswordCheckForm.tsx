@@ -3,6 +3,9 @@ import { useProfile, useValidatePassword } from '@project-lc/hooks';
 import { useForm } from 'react-hook-form';
 import SettingSectionLayout from './SettingSectionLayout';
 
+export interface PasswordCheckFormData {
+  password: string;
+}
 export interface PasswordCheckFormProps {
   onCancel: () => void;
   onConfirm: () => void;
@@ -13,13 +16,13 @@ export function PasswordCheckForm(props: PasswordCheckFormProps): JSX.Element {
   const { onCancel, onConfirm, onFail } = props;
   const toast = useToast();
 
-  const { data } = useProfile();
+  const { data: profileData } = useProfile();
   const { mutateAsync } = useValidatePassword();
-  const { register, handleSubmit, getValues, reset, watch } = useForm();
+  const { register, handleSubmit, reset, watch } = useForm<PasswordCheckFormData>();
 
-  const checkPassword = () => {
-    const password = getValues('password').trim();
-    const email = data?.email;
+  const checkPassword = (data: PasswordCheckFormData) => {
+    const { password } = data;
+    const email = profileData?.email;
     if (!email || !password) return;
 
     mutateAsync({ email, password })
@@ -38,8 +41,7 @@ export function PasswordCheckForm(props: PasswordCheckFormProps): JSX.Element {
       .catch((error) => {
         console.error(error);
         toast({
-          title: '오류 알림',
-          description: error.response.data.message,
+          title: '비밀번호 확인 오류',
           status: 'error',
         });
         if (onFail) onFail();

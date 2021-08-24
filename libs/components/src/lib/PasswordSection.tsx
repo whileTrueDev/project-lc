@@ -20,37 +20,38 @@ export function PasswordSection(): JSX.Element {
   const hasPassword = data?.hasPassword;
   return (
     <SettingSectionLayout title="비밀번호">
-      <>
-        {hasPassword ? (
-          <Button width="200px" onClick={setPwCheckFlag.toggle}>
-            비밀번호 변경하기
+      {hasPassword ? (
+        <Button width="200px" onClick={setPwCheckFlag.on}>
+          비밀번호 변경하기
+        </Button>
+      ) : (
+        <>
+          <Text>비밀번호가 등록되어 있지 않습니다. </Text>
+          <Text>이메일과 비밀번호로 로그인을 하기 위해서는 비밀번호를 등록해주세요.</Text>
+          <Button width="200px" onClick={setPwChangeFlag.on}>
+            비밀번호 등록하기
           </Button>
-        ) : (
-          <>
-            <Text>비밀번호가 등록되어 있지 않습니다. </Text>
-            <Text>
-              이메일과 비밀번호로 로그인을 하기 위해서는 비밀번호를 등록해주세요.
-            </Text>
-            <Button width="200px">비밀번호 등록하기</Button>
-          </>
-        )}
-        {pwCheckFlag && (
-          <Box boxShadow="xs" p="4" rounded="md">
-            <PasswordCheckForm
-              onCancel={setPwCheckFlag.off}
-              onConfirm={() => {
-                setPwCheckFlag.off();
-                setPwChangeFlag.on();
-              }}
-            />
-          </Box>
-        )}
-        {pwChangeflag && (
-          <Box boxShadow="xs" p="4" rounded="md">
-            <PasswordChangeForm />
-          </Box>
-        )}
-      </>
+        </>
+      )}
+      {pwCheckFlag && (
+        <Box boxShadow="xs" p="4" rounded="md">
+          <PasswordCheckForm
+            onCancel={setPwCheckFlag.off}
+            onConfirm={() => {
+              setPwCheckFlag.off();
+              setPwChangeFlag.on();
+            }}
+          />
+        </Box>
+      )}
+      {pwChangeflag && (
+        <Box boxShadow="xs" p="4" rounded="md">
+          <PasswordChangeForm
+            onCancel={setPwChangeFlag.off}
+            onConfirm={setPwChangeFlag.off}
+          />
+        </Box>
+      )}
     </SettingSectionLayout>
   );
 }

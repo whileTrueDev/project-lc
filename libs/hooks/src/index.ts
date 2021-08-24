@@ -10,3 +10,4 @@ export * from './lib/mutation/useValidatePassword';
 export * from './lib/mutation/useDeleteSellerMutation';
 export * from './lib/queries/useSocialAccounts';
 export * from './lib/mutation/useUnlinkSocialAccountMutation';
+export * from './lib/mutation/useChangePasswordMutation';
