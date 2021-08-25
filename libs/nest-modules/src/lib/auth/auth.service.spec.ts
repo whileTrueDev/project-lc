@@ -10,11 +10,11 @@ import { AuthController } from './auth.controller';
 import { SellerModule } from '../seller/seller.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { JwtConfigService } from './jwt.setting';
 import { SellerService } from '../seller/seller.service';
 import { authTestCases, findOne } from './auth.test-case';
 import { MailVerificationService } from './mailVerification.service';
-import { mailerConfig } from './mailer.config';
+import { JwtConfigService } from '../_nest-units/settings/jwt.setting';
+import { mailerConfig } from '../_nest-units/settings/mailer.config';
 
 describe('AuthService', () => {
   let service: AuthService;

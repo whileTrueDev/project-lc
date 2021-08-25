@@ -70,7 +70,7 @@ describe('SellerService', () => {
 
   describe('isEmailDupCheckOk', () => {
     it('should return true', async () => {
-      expect(await service.isEmailDupCheckOk('test@test.com')).toBe(true);
+      expect(await service.isEmailDupCheckOk('test123123@test.com')).toBe(true);
     });
 
     it('should return false', async () => {

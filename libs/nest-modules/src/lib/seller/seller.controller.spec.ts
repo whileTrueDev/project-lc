@@ -7,7 +7,7 @@ import request from 'supertest';
 import { SellerController } from './seller.controller';
 import { SellerService } from './seller.service';
 import { MailVerificationService } from '../auth/mailVerification.service';
-import { mailerConfig } from '../auth/mailer.config';
+import { mailerConfig } from '../_nest-units/settings/mailer.config';
 
 describe('SellerController', () => {
   let app: NestApplication;

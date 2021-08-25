@@ -1,7 +1,7 @@
 import { ExecutionContext } from '@nestjs/common';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GoodsModule, JwtAuthGuard } from '@project-lc/nest-modules';
+import { GoodsModule, GoodsService, JwtAuthGuard } from '@project-lc/nest-modules';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
 import { ordersSample } from '../../__tests__/ordersSample';
@@ -13,7 +13,9 @@ describe('FmOrdersController', () => {
   let app: NestApplication;
   let controller: FmOrdersController;
   let service: FmOrdersService;
+  let goodsService: GoodsService;
 
+  const TEST_EMAIL = 'test11@test.com';
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [GoodsModule, PrismaModule],
@@ -24,7 +26,7 @@ describe('FmOrdersController', () => {
       .useValue({
         canActivate: (context: ExecutionContext) => {
           const req = context.switchToHttp().getRequest();
-          req.user = { sub: 'test@test.com', type: 'seller' };
+          req.user = { sub: TEST_EMAIL, type: 'seller' };
           return true;
         },
       })
@@ -32,8 +34,18 @@ describe('FmOrdersController', () => {
 
     controller = module.get<FmOrdersController>(FmOrdersController);
     service = module.get<FmOrdersService>(FmOrdersService);
+    goodsService = module.get<GoodsService>(GoodsService);
 
-    jest.spyOn(service, 'findOrders').mockImplementation(async () => ordersSample);
+    jest
+      .spyOn(goodsService, 'findMyGoodsIds')
+      .mockImplementation(async (email: string) => {
+        if (email !== TEST_EMAIL) return [];
+        return [999999];
+      });
+    jest.spyOn(service, 'findOrders').mockImplementation(async (ids: number[]) => {
+      if (ids.length === 0) return [];
+      return ordersSample;
+    });
 
     app = module.createNestApplication();
     app.init();

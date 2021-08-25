@@ -3,7 +3,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MailVerificationCode } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { nanoid } from 'nanoid';
-import { createVerificationTemplate } from './mail-templates/createVerificationTemplate';
+import { createVerificationTemplate } from '../_nest-units/mail-templates/createVerificationTemplate';
 
 @Injectable()
 export class MailVerificationService {
