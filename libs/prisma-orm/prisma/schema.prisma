@@ -17,6 +17,7 @@ model Seller {
   name           String?
   password       String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
   socialAccounts SellerSocialAccount[]
+  goods          Goods[]
 }
 
 model MailVerificationCode {
@@ -37,4 +38,127 @@ model SellerSocialAccount {
   /// @onDelete(CASCADE)
   seller       Seller   @relation(fields: [sellerId], references: [id])
   sellerId     Int
+}
+
+// ****************************
+// * firstmall과 동일한 상품 정보 (컬럼명도 동일하게 가져갑니다.)
+// 상품 - fm_goods
+model Goods {
+  id                      Int                @id @default(autoincrement())
+  sellerId                Int
+  seller                  Seller             @relation(fields: [sellerId], references: [id])
+  options                 GoodsOptions[]
+  confirmation            GoodsConfirmation? // 상품 검수
+  // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
+  goods_name              String // 상품명
+  summary                 String // 간략 설명
+  goods_status            GoodsStatus        @default(normal) // 상품 상태
+  cancel_type             String             @default("0") // 청약철회 가능 여부, "0" or "1"
+  contents                String?            @db.LongText // 상세 설명 PC 화면
+  contents_mobile         String?            @db.LongText // 상세 설명 Mobile 화면
+  common_contents         String             @db.LongText // 상품 공통 정보
+  shipping_policy         ShopOrGoods        @default(shop) // 배송 정책 선택
+  goods_shipping_policy   LimitOrUnlimit     @default(unlimit) // 개별 배송비 선택
+  unlimit_shipping_price  Int?               @db.UnsignedInt // 배송비
+  limit_shipping_ea       Int?               @db.UnsignedTinyInt // 개별 배송 포장 단위
+  limit_shipping_price    Int?               @db.UnsignedInt // 개별 배송 단위별 배송비
+  limit_shipping_subprice Int?               @db.UnsignedTinyInt // 개별 배송 추가 배송비
+  shipping_weight_policy  ShopOrGoods        @default(shop) // 해외 배송 중량 정책
+  min_purchase_limit      LimitOrUnlimit     @default(unlimit) // 최소 구매 수량 사용 여부
+  min_purchase_ea         Int?               @db.UnsignedMediumInt // 최소 구매 수량
+  max_purchase_limit      LimitOrUnlimit     @default(unlimit) // 최대 구매 수량 사용 여부
+  max_purchase_ea         Int?               @db.UnsignedMediumInt // 최대 구매 수량
+  max_urchase_order_limit Int?               @db.UnsignedMediumInt // 최대 구매 수량 주문 횟수
+  admin_memo              String?            @db.Text // 관리자 메모
+  option_use              String             @default("0") // 옵션 사용 여부 "0" or "1"
+  option_view_type        OptionViewType     @default(divide) // 필수옵션-분리/합체형 구분
+  option_suboption_use    String             @default("0") // 추가 옵션 사용 여부 "0" or "1"
+  member_input_use        String             @default("0") // 추가 구성 옵션 사용 여부 "0" or "1"
+  image                   String // 상품 이미지 - fm_goods_image
+}
+
+// 상품 검수 정보
+model GoodsConfirmation {
+  id                         Int                       @id
+  goodsId                    Int
+  goods                      Goods                     @relation(fields: [goodsId], references: [id])
+  status                     GoodsConfirmationStatuses @default(waiting) // 검수 상태
+  firstmallGoodsConnectionId Int? // 퍼스트몰 상품 고유 ID (fm_goods.goods_seq)
+}
+
+// 상품 검수 상태 정보
+enum GoodsConfirmationStatuses {
+  waiting // 대기
+  confirmed // 승인
+  rejected // 거절
+}
+
+// 상품 옵션 - fm_goods_option
+model GoodsOptions {
+  id             Int                    @id @default(autoincrement())
+  goods          Goods                  @relation(fields: [goodsId], references: [id])
+  goodsId        Int
+  supply         GoodsOptionsSupplies[]
+  // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
+  default_option YesOrNo                @default(n) // 옵션 필수 여부
+  option_type    String                 @default("direct") // 기본값인듯? 설명도 direct
+  option_title   String? // 옵션명
+  option_code    String? // 옵션코드
+  consumer_price Decimal                @db.Decimal(10, 2) // 소비자가 (미할인가)
+  price          Decimal                @db.Decimal(10, 2) // 판매가 (할인가)
+  color          String?                @db.VarChar(10) // 컬러 hex값
+  weight         Float? //옵션 개당 무게 (단위 kg)
+  option_view    YesOrNo_UPPERCASE      @default(Y) // 옵션 노출 여부
+}
+
+// 상품 옵션 재고 - fm_goods_suply
+model GoodsOptionsSupplies {
+  id             Int          @id @default(autoincrement())
+  goodsOptions   GoodsOptions @relation(fields: [goodsOptionsId], references: [id])
+  goodsOptionsId Int
+  // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
+  stock          Int          @db.UnsignedInt // 재고
+  badstock       Int?         @db.UnsignedInt // 불량재고
+  safe_stock     Int?         @default(0) // 각 매장의 옵션별 안전 재고
+}
+
+// * 상품 - 상태
+enum GoodsStatus {
+  normal
+  runout
+  purchasing
+  unsold
+}
+
+// * 상품 - 배송 정책 선택
+// * 상품 - 헤외 배송 중량 정책
+enum ShopOrGoods {
+  shop
+  goods
+}
+
+// * 상품 - 개별 배송비 선택
+// * 상품 - 최소 구매 수량 사용 여부
+// * 상품 - 최대 구매 수량 사용 여부
+enum LimitOrUnlimit {
+  unlimit
+  limit
+}
+
+// * 상품 - 필수옵션-분리/합체형 구분
+enum OptionViewType {
+  divide
+  join
+}
+
+// * 옵션 필수 여부
+enum YesOrNo {
+  y
+  n
+}
+
+// * 옵션 노출 여부
+enum YesOrNo_UPPERCASE {
+  Y
+  N
 }
