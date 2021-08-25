@@ -1,9 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
-import { FMGoodsService } from '@project-lc/firstmall-db';
+import { FMGoodsService, FmOrdersService } from '@project-lc/firstmall-db';
 
 @Controller()
 export class AppController {
-  constructor(private readonly firstmallGoods: FMGoodsService) {}
+  constructor(
+    private readonly firstmallGoods: FMGoodsService,
+    private readonly fmOrders: FmOrdersService,
+  ) {}
 
   @Get()
   healthCheck() {

@@ -1,0 +1,28 @@
+import { Controller, Get, Query, UseGuards, ValidationPipe } from '@nestjs/common';
+import { FindFmOrdersDto } from '@project-lc/shared-types';
+import {
+  JwtAuthGuard,
+  SellerInfo,
+  UserPayload,
+  GoodsService,
+} from '@project-lc/nest-modules';
+import { FmOrdersService } from './fm-orders.service';
+
+@UseGuards(JwtAuthGuard)
+@Controller('fm-orders')
+export class FmOrdersController {
+  constructor(
+    private readonly projectLcGoodsService: GoodsService,
+    private readonly fmOrdersService: FmOrdersService,
+  ) {}
+
+  @Get()
+  async findOrders(
+    @SellerInfo() seller: UserPayload,
+    @Query(ValidationPipe) dto: FindFmOrdersDto,
+  ) {
+    // 판매자의 승인된 상품 ID 목록 조회
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    return this.fmOrdersService.findOrders(ids, dto);
+  }
+}
