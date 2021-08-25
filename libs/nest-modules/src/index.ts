@@ -4,6 +4,8 @@ export * from './lib/auth/mailer.config';
 export * from './lib/seller/seller.module';
 export * from './lib/social/social.module';
 export * from './lib/shared-module-example/shared-module-example.module';
+export * from './lib/goods/goods.module';
+export * from './lib/goods/goods.service';
 export * from './lib/_nest-units/middlewares/colorizedMorgan.middleware';
 export * from './lib/_nest-units/guards/jwt-auth.guard';
 export * from './lib/_nest-units/decorators/sellerInfo.decorator';
