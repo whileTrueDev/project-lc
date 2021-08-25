@@ -28,10 +28,10 @@ export function LoginRequireAlertDialog(
             로그인이 필요합니다
           </AlertDialogHeader>
 
-          <AlertDialogBody>메인페이지로 이동합니다</AlertDialogBody>
+          <AlertDialogBody>로그인 화면으로 이동합니다</AlertDialogBody>
 
           <AlertDialogFooter>
-            <Button onClick={() => router.push('/')} ml={3}>
+            <Button onClick={() => router.push('/login')} ml={3}>
               확인
             </Button>
           </AlertDialogFooter>
