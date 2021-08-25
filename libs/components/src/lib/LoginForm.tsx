@@ -108,7 +108,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
             <CloseButton onClick={resetFormError} />
           </Alert>
         )}
-        <Divider />
+
         <Button
           bg="blue.400"
           color="white"
@@ -119,6 +119,11 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
         >
           로그인
         </Button>
+        <NextLink href="/resetPassword" passHref>
+          <Link fontSize="sm" ml={2} color={useColorModeValue('blue.500', 'blue.400')}>
+            비밀번호를 잊어버리셨나요?
+          </Link>
+        </NextLink>
         <SocialButtonGroup />
         <Text fontSize="sm">
           처음 오셨나요?
