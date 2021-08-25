@@ -1,11 +1,10 @@
 import { Seller } from '@prisma/client';
+import { UserProfileRes } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions } from 'react-query';
 import axios from '../../axios';
 
-export type useProfileRes = Omit<Seller, 'pasword'> & {
-  hasPassword: boolean; // 비밀번호 null 인지 여부
-};
+export type useProfileRes = UserProfileRes;
 
 export const getProfile = async (): Promise<useProfileRes> => {
   return axios.get<useProfileRes>('/auth/profile').then((res) => res.data);

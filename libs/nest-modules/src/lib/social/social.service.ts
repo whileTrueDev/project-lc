@@ -213,4 +213,26 @@ export class SocialService {
       throw new InternalServerErrorException(error);
     }
   }
+
+  async getSocialAccounts(email: string) {
+    const seller = await this.prisma.seller.findUnique({
+      where: { email },
+      select: {
+        socialAccounts: {
+          select: {
+            serviceId: true,
+            provider: true,
+            name: true,
+            registDate: true,
+            profileImage: false,
+            accessToken: false,
+            refreshToken: false,
+            sellerId: false,
+          },
+        },
+      },
+    });
+
+    return seller.socialAccounts;
+  }
 }

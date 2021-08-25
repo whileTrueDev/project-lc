@@ -56,7 +56,7 @@ export class SellerController {
     return this.sellerService.isEmailDupCheckOk(dto.email);
   }
 
-  // 판매자 계정 삭제(id 제외한 값 null로 변경)
+  // 판매자 계정 삭제
   @Delete()
   public async deleteSeller(@Body('email') email: string) {
     return this.sellerService.deleteOne(email);
