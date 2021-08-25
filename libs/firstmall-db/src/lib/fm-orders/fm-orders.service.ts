@@ -67,7 +67,7 @@ export class FmOrdersService {
       }
 
       if (dto.searchStatuses && dto.searchStatuses.length > 0) {
-        whereSql += `\nAND step IN (${dto.searchStatuses.join(',')}) `;
+        whereSql += `\nAND (step IN (${dto.searchStatuses.join(',')})) `;
       }
 
       if (dto.search) {

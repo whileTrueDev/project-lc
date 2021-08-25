@@ -23,6 +23,7 @@ export class FmOrdersController {
   ) {
     // 판매자의 승인된 상품 ID 목록 조회
     const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    if (ids.length === 0) return [];
     return this.fmOrdersService.findOrders(ids, dto);
   }
 }
