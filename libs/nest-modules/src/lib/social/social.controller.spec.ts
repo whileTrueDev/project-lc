@@ -6,8 +6,8 @@ import { PrismaModule } from '@project-lc/prisma-orm';
 import { AuthModule } from '../auth/auth.module';
 import { AuthService } from '../auth/auth.service';
 import { CipherService } from '../auth/cipher.service';
-import { mailerConfig } from '../auth/mailer.config';
 import { SellerService } from '../seller/seller.service';
+import { mailerConfig } from '../_nest-units/settings/mailer.config';
 import { SocialController } from './social.controller';
 import { SocialService } from './social.service';
 
