@@ -51,15 +51,9 @@ export function SocialAccountUnlinkDialog(
           <Button mr={3} onClick={onClose}>
             취소
           </Button>
-          {hasPassword ? (
-            <Button colorScheme="red" onClick={unlinkHandler}>
-              연동해제
-            </Button>
-          ) : (
-            <Button colorScheme="blue" onClick={onClose}>
-              확인
-            </Button>
-          )}
+          <Button colorScheme="red" onClick={unlinkHandler} disabled={!hasPassword}>
+            연동해제
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
