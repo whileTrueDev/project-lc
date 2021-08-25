@@ -1,16 +1,16 @@
-import { UserProfileRes } from '@project-lc/shared-types';
+import { UserPayload } from '../src/lib/auth/auth.interface';
 
 declare global {
   namespace Express {
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
-    interface User extends UserProfileRes {}
+    interface User extends UserPayload {}
   }
 }
 
 declare module 'express-session' {
   interface SessionData {
     passport?: {
-      user: UserProfileRes;
+      user: UserPayload;
     };
   }
 }

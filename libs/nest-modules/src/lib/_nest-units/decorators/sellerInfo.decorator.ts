@@ -3,7 +3,7 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserProfileRes } from '@project-lc/shared-types';
+import { UserPayload } from '../../auth/auth.interface';
 
 /**
  * 요청으로부터 로그인된 유저 정보 데이터를 가져옵니다.
@@ -15,8 +15,6 @@ import { UserProfileRes } from '@project-lc/shared-types';
  */
 export const SellerInfo = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest<Express.Request>();
-  if (request.user && request.user.type === 'seller') {
-    return request.user as UserProfileRes;
-  }
+  if (request.user && request.user.type === 'seller') return request.user as UserPayload;
   throw new UnauthorizedException();
 });
