@@ -9,7 +9,6 @@ import {
   Button,
   ModalProps,
   Text,
-  useToast,
 } from '@chakra-ui/react';
 
 export type SocialAccountUnlinkDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
@@ -22,7 +21,6 @@ export function SocialAccountUnlinkDialog(
   props: SocialAccountUnlinkDialogProps,
 ): JSX.Element {
   const { isOpen, onClose, hasPassword, unlinkHandler, headerText } = props;
-  const toast = useToast();
 
   // 다음에 로그인시 이메일과 비밀번호 사용해야 함 알림
   // 1. 비밀번호 있는 경우 : 연동해제버튼
