@@ -1,8 +1,9 @@
 import { ExecutionContext } from '@nestjs/common';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
+import { GoodsModule, JwtAuthGuard } from '@project-lc/nest-modules';
+import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
-import { JwtAuthGuard } from '@project-lc/nest-modules';
 import { ordersSample } from '../../__tests__/ordersSample';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FmOrdersController } from './fm-orders.controller';
@@ -15,7 +16,7 @@ describe('FmOrdersController', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [],
+      imports: [GoodsModule, PrismaModule],
       controllers: [FmOrdersController],
       providers: [FmOrdersService, FirstmallDbService],
     })

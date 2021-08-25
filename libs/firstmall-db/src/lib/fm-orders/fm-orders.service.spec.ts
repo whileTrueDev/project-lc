@@ -10,6 +10,8 @@ describe('FmOrdersService', () => {
   let service: FmOrdersService;
   let db: FirstmallDbService;
 
+  const testGoodsIds = [41];
+
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule],
@@ -33,7 +35,7 @@ describe('FmOrdersService', () => {
         searchEndDate: '2020-08-24',
         searchStatuses: ['45', '55'],
       };
-      const { sql, params } = service['createFindOrdersQuery'](dto);
+      const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
       // 기본 select 구문이 올바르게 들어갔는 지 검사
       expect(sql).toContain(
@@ -41,9 +43,10 @@ describe('FmOrdersService', () => {
       );
       expect(sql).toContain('FROM fm_order');
       expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
+      expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
 
       // where 구문이 올바르게 들어갔는 지 검사
-      expect(sql).toContain('WHERE regist_date >= ? AND regist_date <= ?');
+      expect(sql).toContain('AND (DATE(regist_date) >= ? AND DATE(regist_date) <= ?)');
       expect(sql).toContain('OR fm_order.order_seq LIKE ?');
 
       // params 길이, 내용 검사
@@ -56,7 +59,7 @@ describe('FmOrdersService', () => {
 
   it('search 필드만 주어진 경우', () => {
     const dto: FindFmOrdersDto = { search: 'test' };
-    const { sql, params } = service['createFindOrdersQuery'](dto);
+    const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
     expect(sql).toContain(
@@ -64,6 +67,7 @@ describe('FmOrdersService', () => {
     );
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
+    expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
 
     // where 구문이 올바르게 들어갔는 지 검사
     expect(sql).toContain('OR order_seq LIKE ?');
@@ -78,7 +82,7 @@ describe('FmOrdersService', () => {
       searchDateType: '주문일',
       searchStartDate: '2021-08-24',
     };
-    const { sql, params } = service['createFindOrdersQuery'](dto);
+    const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
     expect(sql).toContain(
@@ -86,9 +90,10 @@ describe('FmOrdersService', () => {
     );
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
+    expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
 
     // where 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('WHERE regist_date >= ?');
+    expect(sql).toContain('AND DATE(regist_date) >= ?');
 
     // params 길이, 내용 검사
     expect(params.length).toBe(1);
@@ -100,7 +105,7 @@ describe('FmOrdersService', () => {
       searchDateType: '주문일',
       searchEndDate: '2021-08-24',
     };
-    const { sql, params } = service['createFindOrdersQuery'](dto);
+    const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
     expect(sql).toContain(
@@ -108,9 +113,10 @@ describe('FmOrdersService', () => {
     );
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
+    expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
 
     // where 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('WHERE regist_date <= ?');
+    expect(sql).toContain('AND DATE(regist_date) <= ?');
 
     // params 길이, 내용 검사
     expect(params.length).toBe(1);
@@ -121,7 +127,7 @@ describe('FmOrdersService', () => {
     const dto: FindFmOrdersDto = {
       searchStatuses: ['45', '55'],
     };
-    const { sql, params } = service['createFindOrdersQuery'](dto);
+    const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
     expect(sql).toContain(
@@ -129,9 +135,10 @@ describe('FmOrdersService', () => {
     );
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
+    expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
 
     // where 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('WHERE step IN (');
+    expect(sql).toContain('AND (step IN (');
 
     // params 길이, 내용 검사
     expect(params.length).toBe(0);
@@ -143,7 +150,7 @@ describe('FmOrdersService', () => {
       searchEndDate: '2021-08-24',
       searchStatuses: ['45', '55'],
     };
-    const { sql, params } = service['createFindOrdersQuery'](dto);
+    const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
     expect(sql).toContain(
@@ -151,9 +158,10 @@ describe('FmOrdersService', () => {
     );
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
+    expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
 
     // where 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('WHERE regist_date <= ?');
+    expect(sql).toContain('AND DATE(regist_date) <= ?');
     expect(sql).toContain('AND step IN (');
 
     // params 길이, 내용 검사
@@ -176,8 +184,8 @@ describe('FmOrdersService', () => {
         .spyOn(db, 'query')
         .mockImplementation(async () => ordersSample);
 
-      const orders = await service.findOrders(dto);
-      const { sql, params } = service['createFindOrdersQuery'](dto);
+      const orders = await service.findOrders(testGoodsIds, dto);
+      const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
       expect(querySpy).toBeCalledTimes(1);
       expect(querySpy).toBeCalledWith(sql, params);
 

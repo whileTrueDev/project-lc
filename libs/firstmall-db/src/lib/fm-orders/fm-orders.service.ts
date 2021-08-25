@@ -7,21 +7,23 @@ export class FmOrdersService {
   constructor(private readonly db: FirstmallDbService) {}
 
   /**
-   * 퍼스트몰의 주문 목록을 조회
+   * 상품 ID목록과 검색 및 필터링 정보를 통해 퍼스트몰의 주문 목록을 조회
    * @returns {FindFmOrderRes[]}
+   * @author hwasurr
    */
-  async findOrders(dto: FindFmOrdersDto): Promise<FindFmOrderRes[]> {
-    const { sql, params } = this.createFindOrdersQuery(dto);
+  async findOrders(goodsIds: number[], dto: FindFmOrdersDto): Promise<FindFmOrderRes[]> {
+    const { sql, params } = this.createFindOrdersQuery(goodsIds, dto);
     if (!sql) return [];
     const data = (await this.db.query(sql, params)) as FindFmOrderRes[];
     return data.map((x) => ({ ...x }));
   }
 
-  private createFindOrdersQuery(dto: FindFmOrdersDto) {
+  private createFindOrdersQuery(goodsIds: number[], dto: FindFmOrdersDto) {
     const defaultQueryHead = `
     SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
+    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
     `;
     const searchSql = `goods_name LIKE ?
     OR order_seq LIKE ?
@@ -50,17 +52,17 @@ export class FmOrdersService {
 
       // 시작, 끝 날짜가 다 있는 경우
       if (dto.searchStartDate && dto.searchEndDate) {
-        whereSql += `WHERE ${targetCol} >= ? AND ${targetCol} <= ?`;
+        whereSql += `\nAND (DATE(${targetCol}) >= ? AND DATE(${targetCol}) <= ?)`;
         params = [dto.searchStartDate, dto.searchEndDate];
       }
       // 시작 날짜만 있는 경우,
       if (dto.searchStartDate && !dto.searchEndDate) {
-        whereSql += `WHERE ${targetCol} >= ?`;
+        whereSql += `\nAND DATE(${targetCol}) >= ?`;
         params = [dto.searchStartDate];
       }
       // 끝 날짜만 있는 경우,
       if (!dto.searchStartDate && dto.searchEndDate) {
-        whereSql += `WHERE ${targetCol} <= ?`;
+        whereSql += `\nAND DATE(${targetCol}) <= ?`;
         params = [dto.searchEndDate];
       }
 
@@ -83,11 +85,11 @@ export class FmOrdersService {
       };
     }
     if (dto.search) {
-      whereSql = `WHERE ${searchSql}`;
+      whereSql = `\nAND ${searchSql}`;
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
 
       if (dto.searchStatuses && dto.searchStatuses.length > 0) {
-        whereSql += `\nAND step IN (${dto.searchStatuses.join(',')}) `;
+        whereSql += `\nAND (step IN (${dto.searchStatuses.join(',')})) `;
       }
 
       return {
@@ -97,7 +99,7 @@ export class FmOrdersService {
     }
 
     if (dto.searchStatuses && dto.searchStatuses.length > 0) {
-      whereSql += `WHERE step IN (${dto.searchStatuses.join(',')}) `;
+      whereSql += `AND (step IN (${dto.searchStatuses.join(',')})) `;
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
       return {
         sql: defaultQueryHead + whereSql + orderSql,
