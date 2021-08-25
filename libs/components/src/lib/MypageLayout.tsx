@@ -1,5 +1,5 @@
 import { Box, Center, Spinner } from '@chakra-ui/react';
-import { useProfile } from '@project-lc/hooks';
+import { useIsLoggedIn, useProfile } from '@project-lc/hooks';
 import React from 'react';
 import FullscreenLoading from './FullscreenLoading';
 import LoginRequireAlertDialog from './LoginRequireAlertDialog';
@@ -12,10 +12,10 @@ interface MypageLayoutProps {
 }
 
 export function MypageLayout({ children }: MypageLayoutProps): JSX.Element {
-  const { data, isLoading, error } = useProfile();
+  const { status } = useIsLoggedIn();
 
   return (
-    <Box position="relative" pointerEvents={!data || isLoading ? 'none' : 'auto'}>
+    <Box position="relative" pointerEvents={status === 'loading' ? 'none' : 'auto'}>
       <Navbar />
 
       <MypageNavbar />
@@ -27,10 +27,10 @@ export function MypageLayout({ children }: MypageLayoutProps): JSX.Element {
       <MypageFooter />
 
       {/* 전체화면 로딩 */}
-      {(!data || isLoading || !!error) && <FullscreenLoading />}
+      {status === 'loading' && <FullscreenLoading />}
 
       {/* 로그인 필요 다이얼로그 */}
-      <LoginRequireAlertDialog isOpen={!!error} />
+      <LoginRequireAlertDialog isOpen={status === 'error'} />
     </Box>
   );
 }

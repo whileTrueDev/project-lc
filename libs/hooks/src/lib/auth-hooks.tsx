@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useState, useEffect, useCallback, useLayoutEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useQueryClient } from 'react-query';
 import { useLogoutMutation } from './mutation/useLogoutMutation';
 import { useProfile } from './queries/useProfile';
@@ -46,7 +46,7 @@ export function useMoveToMainIfLoggedIn() {
   const router = useRouter();
   const { isLoggedIn } = useIsLoggedIn();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (isLoggedIn) {
       router.push('/');
     }
