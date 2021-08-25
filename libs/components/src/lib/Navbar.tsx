@@ -1,34 +1,43 @@
-import { CloseIcon, HamburgerIcon } from '@chakra-ui/icons';
+import { CloseIcon, ExternalLinkIcon, HamburgerIcon, Icon } from '@chakra-ui/icons';
 import {
   Avatar,
   Box,
   Button,
   Collapse,
+  Divider,
   Flex,
   Heading,
   IconButton,
   Link,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Stack,
   Tooltip,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
+import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import { useCallback } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
 import { mainNavItems, NavItem } from '../constants/navigation';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
+import ProfileBox from './ProfileBox';
 
 export function Navbar() {
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
   const { isLoggedIn } = useIsLoggedIn();
   const { logout } = useLogout();
+
+  const handleAccountSettingClick = useCallback(
+    () => router.push('/mypage/setting'),
+    [router],
+  );
 
   return (
     <Box>
@@ -86,37 +95,40 @@ export function Navbar() {
           <ColorModeSwitcher />
           {isLoggedIn ? (
             <>
-              <Popover>
-                <PopoverTrigger>
-                  <Avatar as="button" size="sm" cursor="pointer" />
-                </PopoverTrigger>
-                <PopoverContent maxWidth="80px">
-                  <Tooltip label="계정 설정" fontSize="xs">
-                    <IconButton
-                      size="md"
-                      fontSize="xl"
-                      variant="ghost"
-                      color="current"
-                      aria-label="settings icon"
-                      icon={<AiTwotoneSetting />}
-                      onClick={() => router.push('/mypage/setting')}
-                    />
-                  </Tooltip>
-                  <Button
-                    display={{ md: 'inline-flex' }}
-                    fontSize="sm"
-                    fontWeight={600}
-                    color="white"
-                    bg="pink.400"
-                    _hover={{
-                      bg: 'pink.300',
-                    }}
+              <Tooltip label="계정 설정" fontSize="xs">
+                <IconButton
+                  size="md"
+                  fontSize="xl"
+                  variant="ghost"
+                  color="current"
+                  aria-label="settings icon"
+                  icon={<AiTwotoneSetting />}
+                  onClick={handleAccountSettingClick}
+                />
+              </Tooltip>
+              <Menu>
+                <MenuButton as={Avatar} size="sm" cursor="pointer" />
+                <MenuList maxW="300px">
+                  <Box py={3} pr={3}>
+                    <ProfileBox />
+                  </Box>
+                  <Divider />
+                  <MenuItem
+                    my={1}
+                    icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
+                    onClick={handleAccountSettingClick}
+                  >
+                    계정 설정
+                  </MenuItem>
+                  <MenuItem
+                    my={1}
+                    icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
                     onClick={logout}
                   >
                     로그아웃
-                  </Button>
-                </PopoverContent>
-              </Popover>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
             </>
           ) : (
             <>

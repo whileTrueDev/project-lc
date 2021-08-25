@@ -16,7 +16,9 @@ export function ProfileBox(): JSX.Element {
         </Center>
       </GridItem>
       <GridItem colSpan={3}>
-        <Text fontWeight="bold">{data?.email}</Text>
+        <Text isTruncated fontWeight="bold">
+          {data?.email}
+        </Text>
       </GridItem>
       <GridItem colSpan={3}>
         <Text>{data?.name}</Text>
