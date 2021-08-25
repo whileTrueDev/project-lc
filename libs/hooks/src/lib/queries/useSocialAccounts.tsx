@@ -19,7 +19,11 @@ export const getSocialAccounts = async (email: string): Promise<SocialAccounts> 
 };
 
 export const useSocialAccounts = (email: string) => {
-  return useQuery<SocialAccounts>('SocialAccounts', () => getSocialAccounts(email), {
-    enabled: !!email,
-  });
+  return useQuery<SocialAccounts>(
+    ['SocialAccounts', email],
+    () => getSocialAccounts(email),
+    {
+      enabled: !!email,
+    },
+  );
 };
