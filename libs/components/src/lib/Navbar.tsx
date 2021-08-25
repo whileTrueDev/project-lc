@@ -109,7 +109,7 @@ export function Navbar() {
               <Menu>
                 <MenuButton as={Avatar} size="sm" cursor="pointer" />
                 <MenuList maxW="300px">
-                  <Box py={3} pr={3}>
+                  <Box p={3}>
                     <ProfileBox />
                   </Box>
                   <Divider />

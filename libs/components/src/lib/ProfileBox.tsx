@@ -10,10 +10,14 @@ export function ProfileBox(): JSX.Element {
       templateRows="repeat(2, 1fr)"
       templateColumns="repeat(4, 1fr)"
     >
-      <GridItem rowSpan={2} colSpan={1}>
-        <Center>
-          <Avatar />
-        </Center>
+      <GridItem
+        rowSpan={2}
+        colSpan={1}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Avatar />
       </GridItem>
       <GridItem colSpan={3}>
         <Text isTruncated fontWeight="bold">
