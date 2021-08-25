@@ -79,17 +79,18 @@ model Goods {
 
 // 상품 검수 정보
 model GoodsConfirmation {
-  id      Int                       @id
-  goodsId Int
-  goods   Goods                     @relation(fields: [goodsId], references: [id])
-  status  GoodsConfirmationStatuses @default(waiting)
+  id                         Int                       @id
+  goodsId                    Int
+  goods                      Goods                     @relation(fields: [goodsId], references: [id])
+  status                     GoodsConfirmationStatuses @default(waiting) // 검수 상태
+  firstmallGoodsConnectionId Int? // 퍼스트몰 상품 고유 ID (fm_goods.goods_seq)
 }
 
 // 상품 검수 상태 정보
 enum GoodsConfirmationStatuses {
-  waiting
-  confirmed
-  rejected
+  waiting // 대기
+  confirmed // 승인
+  rejected // 거절
 }
 
 // 상품 옵션 - fm_goods_option
