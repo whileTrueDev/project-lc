@@ -22,7 +22,7 @@ export interface PasswordCheckFormData {
   repassword: string;
 }
 export function PasswordChangeForm(props: PasswordCheckFormProps): JSX.Element {
-  const { onCancel, onConfirm, onFail } = props;
+  const { onCancel, onConfirm } = props;
   const toast = useToast();
   const { data: profileData } = useProfile();
   const {
