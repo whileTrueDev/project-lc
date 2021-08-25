@@ -46,33 +46,18 @@ export function MypageNavbar(): JSX.Element {
               <PopoverTrigger>
                 <Box>
                   <NextLink href={link.children ? '#' : link.href} passHref>
-                    {link.children ? (
-                      <Link
-                        py={2}
-                        mx={{ base: 1, sm: 3 }}
-                        fontSize={{ base: 'xs', sm: 'sm' }}
-                        fontWeight={isMatched(link) ? 'bold' : 500}
-                        textDecoration={isMatched(link) ? 'underline' : 'none'}
-                        textDecorationColor={isMatched(link) ? 'red.400' : 'none'}
-                        textDecorationThickness={isMatched(link) ? '0.225rem' : 'none'}
-                        _hover={{ color: linkHoverColor }}
-                      >
-                        {link.name}
-                      </Link>
-                    ) : (
-                      <Link
-                        py={2}
-                        mx={{ base: 1, sm: 3 }}
-                        fontSize={{ base: 'xs', sm: 'sm' }}
-                        fontWeight={isMatched(link) ? 'bold' : 500}
-                        textDecoration={isMatched(link) ? 'underline' : 'none'}
-                        textDecorationColor={isMatched(link) ? 'red.400' : 'none'}
-                        textDecorationThickness={isMatched(link) ? '0.225rem' : 'none'}
-                        _hover={{ color: linkHoverColor }}
-                      >
-                        {link.name}
-                      </Link>
-                    )}
+                    <Link
+                      py={2}
+                      mx={{ base: 1, sm: 3 }}
+                      fontSize={{ base: 'xs', sm: 'sm' }}
+                      fontWeight={isMatched(link) ? 'bold' : 500}
+                      textDecoration={isMatched(link) ? 'underline' : 'none'}
+                      textDecorationColor={isMatched(link) ? 'red.400' : 'none'}
+                      textDecorationThickness={isMatched(link) ? '0.225rem' : 'none'}
+                      _hover={{ color: linkHoverColor }}
+                    >
+                      {link.name}
+                    </Link>
                   </NextLink>
                 </Box>
               </PopoverTrigger>
