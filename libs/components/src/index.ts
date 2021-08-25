@@ -15,7 +15,6 @@ export * from './lib/CenterBox';
 export * from './lib/LoginForm';
 export * from './lib/MypageLayout';
 export * from './constants/navigation';
-export * from './lib/AccountSetting';
 export * from './lib/OrderList';
 export * from './lib/ProfileBox';
 export * from './lib/PasswordSection';
