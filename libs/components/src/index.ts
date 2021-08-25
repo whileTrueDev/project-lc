@@ -17,3 +17,7 @@ export * from './lib/MypageLayout';
 export * from './constants/navigation';
 export * from './lib/AccountSetting';
 export * from './lib/OrderList';
+export * from './lib/ProfileBox';
+export * from './lib/PasswordSection';
+export * from './lib/AccountRemoveSection';
+export * from './lib/SocialAccountUnlinkSection';
