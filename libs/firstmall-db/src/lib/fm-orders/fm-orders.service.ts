@@ -85,7 +85,7 @@ export class FmOrdersService {
       };
     }
     if (dto.search) {
-      whereSql = `\nAND ${searchSql}`;
+      whereSql = `\nAND (${searchSql})`;
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
 
       if (dto.searchStatuses && dto.searchStatuses.length > 0) {
