@@ -11,6 +11,11 @@ import {
   Text,
   Input,
   useToast,
+  Stack,
+  List,
+  UnorderedList,
+  ListItem,
+  Box,
 } from '@chakra-ui/react';
 import { useDeleteSellerMutation, useProfile } from '@project-lc/hooks';
 import { useForm } from 'react-hook-form';
@@ -64,13 +69,33 @@ export function AccountRemoveDialog(props: AccountRemoveDialogProps): JSX.Elemen
         <ModalCloseButton />
         <ModalBody>
           {/* //TODO: 추후 문구 수정 */}
-          <Text mb={3}>회원 탈퇴 시 모든 정보가 삭제됩니다!!!!! </Text>
-          <Text mb={3}>해당 계정에 다시 로그인 할 수 없습니다.</Text>
-          <Text mb={3}>
-            연결된 소셜 계정이 있다면 소셜 계정 연결 해제를 먼저 진행해주세요.
-          </Text>
-          <Text mb={2}>계속 진행하려면 로그인 한 계정의 이메일을 입력해주세요</Text>
-          <Input {...register('email', { required: true })} />
+          <UnorderedList spacing={2}>
+            <ListItem>
+              <Text>
+                회원 탈퇴 시 해당 계정에 다시 로그인 할 수 없으며,{' '}
+                <Text as="span" color="red.500" fontWeight="bold">
+                  판매 대금을 포함한 모든 정보가 삭제
+                </Text>
+                됩니다.
+              </Text>
+            </ListItem>
+            <ListItem>
+              연결된 소셜 계정이 있다면{' '}
+              <Text as="span" color="orange.500" fontWeight="bold">
+                소셜 계정 연결 해제
+              </Text>
+              를 먼저 진행해주세요.
+            </ListItem>
+            <ListItem>
+              <Text mb={2}>계속 진행하려면 로그인한 계정의 이메일을 입력해주세요</Text>
+            </ListItem>
+          </UnorderedList>
+          <Box mt={6}>
+            <Input
+              placeholder="탈퇴를 진행하려면 이메일을 입력하세요."
+              {...register('email', { required: true })}
+            />
+          </Box>
         </ModalBody>
 
         <ModalFooter>
@@ -80,7 +105,7 @@ export function AccountRemoveDialog(props: AccountRemoveDialogProps): JSX.Elemen
           <Button
             colorScheme="red"
             type="submit"
-            // disabled={!data || (data && data.sub !== watch('email'))}
+            disabled={!watch('email') || !data || (data && data.email !== watch('email'))}
           >
             회원 탈퇴
           </Button>

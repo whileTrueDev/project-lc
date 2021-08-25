@@ -9,6 +9,9 @@ import {
   Button,
   ModalProps,
   Text,
+  Alert,
+  AlertIcon,
+  AlertDescription,
 } from '@chakra-ui/react';
 
 export type SocialAccountUnlinkDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
@@ -38,10 +41,13 @@ export function SocialAccountUnlinkDialog(
             입력해야 합니다.
           </Text>
           {!hasPassword && (
-            <Text>
-              현재 비밀번호가 등록되어 있지 않습니다. 계정 연결을 해제하기 전에 비밀번호를
-              먼저 등록해주세요
-            </Text>
+            <Alert status="warning">
+              <AlertIcon />
+              <AlertDescription>
+                현재 비밀번호가 등록되어 있지 않습니다. 계정 연결을 해제하기 전에
+                비밀번호를 먼저 등록해주세요
+              </AlertDescription>
+            </Alert>
           )}
         </ModalBody>
 
