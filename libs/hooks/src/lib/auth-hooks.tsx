@@ -1,22 +1,8 @@
 import { useRouter } from 'next/router';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useLayoutEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useLogoutMutation } from './mutation/useLogoutMutation';
 import { useProfile } from './queries/useProfile';
-
-export function useSeconds() {
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setValue(value + 1);
-    }, 1000);
-  }, [value]);
-
-  return { value, setValue };
-}
-
-export default useSeconds;
 
 /**
  * 로그아웃 함수
@@ -60,7 +46,7 @@ export function useMoveToMainIfLoggedIn() {
   const router = useRouter();
   const { isLoggedIn } = useIsLoggedIn();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isLoggedIn) {
       router.push('/');
     }
