@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [dev]
+    branches: [] # [dev] # 2021.08.25 도메인 문제 + 개발서버 배포에 문제가 있어 비활성화
     paths:
       - "apps/api/**"
       - "apps/socket/**"
