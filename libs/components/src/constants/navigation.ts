@@ -2,7 +2,7 @@ export interface NavItem {
   label: string;
   subLabel?: string;
   // children?: Array<NavItem>;
-  href?: string;
+  href: string;
   needLogin?: boolean;
 }
 
@@ -14,15 +14,17 @@ export const mainNavItems: Array<NavItem> = [
   },
   {
     label: '입점 신청',
+    href: '#',
   },
   {
     label: '성공 사례',
+    href: '#',
   },
 ];
 
 export interface MypageLink {
   name: string;
-  href?: string;
+  href: string;
   children?: MypageLink[];
 }
 
@@ -34,6 +36,7 @@ export const mypageNavLinks: MypageLink[] = [
   },
   {
     name: '라이브쇼핑',
+    href: '/mypage/live',
     children: [
       {
         name: '라이브 예약',

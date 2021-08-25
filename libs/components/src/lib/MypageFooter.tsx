@@ -1,4 +1,12 @@
-import { Flex, useColorModeValue, Box, Text, Stack, Button } from '@chakra-ui/react';
+import {
+  Flex,
+  useColorModeValue,
+  Box,
+  Text,
+  Stack,
+  Button,
+  SimpleGrid,
+} from '@chakra-ui/react';
 
 export function MypageFooter(): JSX.Element {
   return (
@@ -13,18 +21,14 @@ export function MypageFooter(): JSX.Element {
       py={2}
       alignItems="center"
       justify="space-between"
-      direction={{ base: 'column', sm: 'row' }}
+      direction={{ base: 'column', md: 'row' }}
+      display={{ base: 'none', md: 'flex' }}
     >
-      <Stack direction="row">
+      <SimpleGrid direction="row" columns={{ base: 2, md: 4 }}>
         <Button size="sm" fontSize="sm" variant="ghost">
           고객센터
         </Button>
-        <Button
-          size="sm"
-          fontSize="sm"
-          variant="ghost"
-          display={{ base: 'none', sm: 'block' }}
-        >
+        <Button size="sm" fontSize="sm" variant="ghost">
           문의하기
         </Button>
         <Button size="sm" fontSize="sm" fontWeight="bold" variant="ghost">
@@ -33,8 +37,8 @@ export function MypageFooter(): JSX.Element {
         <Button size="sm" fontSize="sm" variant="ghost">
           이용약관
         </Button>
-      </Stack>
-      <Box>
+      </SimpleGrid>
+      <Box mt={{ base: 4, md: 0 }}>
         <Text fontSize="sm">
           ⓒ {new Date().getFullYear()} whileTrue All rights reserved.
         </Text>

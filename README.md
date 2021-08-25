@@ -53,7 +53,7 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 
 7. `nest-modules`
 
-   nestjs 애플리케이션에서 동시에 사용가능한 모듈의 경우 여기에 정의합니다. service와 module만 작성하고, controller는 애플리케이션 단에서 작성합니다. 더 자세한 내용은 [libs/nest-modules](./libs/nest-modules/README.md)에서 확인할 수 있습니다.
+   nestjs 애플리케이션에서 동시에 사용가능한 모듈의 경우 여기에 정의합니다. 커스텀으로 생성한 Guard(passport strategy 포함), Pipe, Interceptor, Middleware, ExceptionFilter, Custom Decorator 모두 해당 라이브러리에서 정의합니다. 더 자세한 내용은 [libs/nest-modules](./libs/nest-modules/README.md)에서 확인할 수 있습니다.
 
 ## 새 애플리케이션 / 라이브러리 생성하기
 

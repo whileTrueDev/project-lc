@@ -10,11 +10,21 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { mypageNavLinks } from '../constants/navigation';
+import { useRouter } from 'next/router';
+import { useCallback } from 'react';
+import { MypageLink, mypageNavLinks } from '../constants/navigation';
 
 export function MypageNavbar(): JSX.Element {
+  const router = useRouter();
   const linkHoverColor = useColorModeValue('gray.800', 'white');
   const subNavHoverColor = useColorModeValue('pink.50', 'gray.900');
+
+  // * 현재 페이지에 매치하는지 확인 함수
+  const isMatched = useCallback(
+    (link: MypageLink) =>
+      link.children ? router.pathname.includes(link.href) : router.pathname === link.href,
+    [router.pathname],
+  );
 
   return (
     <Flex
@@ -35,19 +45,34 @@ export function MypageNavbar(): JSX.Element {
             <Popover trigger="hover" placement="bottom-start">
               <PopoverTrigger>
                 <Box>
-                  <NextLink href={link.href ?? '#'} passHref>
-                    <Link
-                      py={2}
-                      mx={{ base: 1, sm: 3 }}
-                      fontSize={{ base: 'xs', sm: 'sm' }}
-                      fontWeight={500}
-                      _hover={{
-                        textDecoration: 'none',
-                        color: linkHoverColor,
-                      }}
-                    >
-                      {link.name}
-                    </Link>
+                  <NextLink href={link.children ? '#' : link.href} passHref>
+                    {link.children ? (
+                      <Link
+                        py={2}
+                        mx={{ base: 1, sm: 3 }}
+                        fontSize={{ base: 'xs', sm: 'sm' }}
+                        fontWeight={isMatched(link) ? 'bold' : 500}
+                        textDecoration={isMatched(link) ? 'underline' : 'none'}
+                        textDecorationColor={isMatched(link) ? 'red.400' : 'none'}
+                        textDecorationThickness={isMatched(link) ? '0.225rem' : 'none'}
+                        _hover={{ color: linkHoverColor }}
+                      >
+                        {link.name}
+                      </Link>
+                    ) : (
+                      <Link
+                        py={2}
+                        mx={{ base: 1, sm: 3 }}
+                        fontSize={{ base: 'xs', sm: 'sm' }}
+                        fontWeight={isMatched(link) ? 'bold' : 500}
+                        textDecoration={isMatched(link) ? 'underline' : 'none'}
+                        textDecorationColor={isMatched(link) ? 'red.400' : 'none'}
+                        textDecorationThickness={isMatched(link) ? '0.225rem' : 'none'}
+                        _hover={{ color: linkHoverColor }}
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </NextLink>
                 </Box>
               </PopoverTrigger>
