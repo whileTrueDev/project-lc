@@ -54,7 +54,8 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Req() req) {
-    return req.user;
+    // return req.user;
+    return this.authService.getProfile(req.user);
   }
 
   // * 인증코드 메일 전송

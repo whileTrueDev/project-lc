@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { loginUserRes } from '@project-lc/shared-types';
+import { loginUserRes, UserProfileRes } from '@project-lc/shared-types';
 import { Seller } from '@prisma/client';
-import { User, UserPayload, UserType } from './auth.interface';
+import { UserPayload, UserType } from './auth.interface';
 import { SellerService } from '../seller/seller.service';
 import { CipherService } from './cipher.service';
 import {
@@ -168,5 +168,19 @@ export class AuthService {
     const userPayload = this.castUserPayload(tokenUserPayload);
     const newAccessToken = this.createAccessToken(userPayload);
     return `${newAccessToken}`;
+  }
+
+  async getProfile(userPayload: UserPayload): Promise<UserProfileRes> {
+    const { sub, type } = userPayload;
+    // if (type === 'seller') {
+    const user = await this.sellerService.findOne({ email: sub });
+    const hasPassword = Boolean(user.password);
+    delete user.password;
+    return {
+      ...user,
+      type,
+      hasPassword,
+    };
+    // }
   }
 }

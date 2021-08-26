@@ -1,25 +1,43 @@
-import { CloseIcon, HamburgerIcon } from '@chakra-ui/icons';
+import { CloseIcon, ExternalLinkIcon, HamburgerIcon, Icon } from '@chakra-ui/icons';
 import {
+  Avatar,
   Box,
   Button,
   Collapse,
+  Divider,
   Flex,
   Heading,
   IconButton,
   Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Stack,
+  Tooltip,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
+import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import { useCallback } from 'react';
+import { AiTwotoneSetting } from 'react-icons/ai';
 import { mainNavItems, NavItem } from '../constants/navigation';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
+import ProfileBox from './ProfileBox';
 
 export function Navbar() {
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
+  const { isLoggedIn } = useIsLoggedIn();
+  const { logout } = useLogout();
+
+  const handleAccountSettingClick = useCallback(
+    () => router.push('/mypage/setting'),
+    [router],
+  );
 
   return (
     <Box>
@@ -75,42 +93,69 @@ export function Navbar() {
           spacing={{ base: 0, sm: 4 }}
         >
           <ColorModeSwitcher />
-          <Button
-            as="a"
-            fontSize="sm"
-            fontWeight={500}
-            variant="link"
-            onClick={() => router.push('/login')}
-          >
-            로그인
-          </Button>
-          <Button
-            onClick={() => router.push('/signup')}
-            display={{ base: 'none', md: 'inline-flex' }}
-            fontSize="sm"
-            fontWeight={600}
-            color="white"
-            bg="pink.400"
-            _hover={{
-              bg: 'pink.300',
-            }}
-          >
-            시작하기
-          </Button>
-          {/* 로그인 된 경우 = 아래 */}
-          {/* <Tooltip label="계정 설정" fontSize="xs">
-            <IconButton
-              size="md"
-              fontSize="xl"
-              variant="ghost"
-              color="current"
-              aria-label="settings icon"
-              icon={<AiTwotoneSetting />}
-              onClick={() => router.push('/mypage/setting')}
-              display={{ base: 'none', sm: 'inline-flex' }}
-            />
-          </Tooltip>
-          <Avatar size="sm" /> */}
+          {isLoggedIn ? (
+            <>
+              <Tooltip label="계정 설정" fontSize="xs">
+                <IconButton
+                  size="md"
+                  fontSize="xl"
+                  variant="ghost"
+                  color="current"
+                  aria-label="settings icon"
+                  icon={<AiTwotoneSetting />}
+                  onClick={handleAccountSettingClick}
+                />
+              </Tooltip>
+              <Menu>
+                <MenuButton as={Avatar} size="sm" cursor="pointer" />
+                <MenuList maxW="300px">
+                  <Box p={3}>
+                    <ProfileBox />
+                  </Box>
+                  <Divider />
+                  <MenuItem
+                    my={1}
+                    icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
+                    onClick={handleAccountSettingClick}
+                  >
+                    계정 설정
+                  </MenuItem>
+                  <MenuItem
+                    my={1}
+                    icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
+                    onClick={logout}
+                  >
+                    로그아웃
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </>
+          ) : (
+            <>
+              <Button
+                as="a"
+                fontSize="sm"
+                fontWeight={500}
+                variant="link"
+                onClick={() => router.push('/login')}
+              >
+                로그인
+              </Button>
+              <Button
+                onClick={() => router.push('/signup')}
+                display={{ base: 'none', md: 'inline-flex' }}
+                fontSize="sm"
+                fontWeight={600}
+                color="white"
+                bg="pink.400"
+                _hover={{
+                  bg: 'pink.300',
+                }}
+              >
+                시작하기
+              </Button>
+            </>
+          )}
         </Stack>
       </Flex>
 
