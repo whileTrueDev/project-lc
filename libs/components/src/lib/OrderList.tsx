@@ -1,6 +1,5 @@
 import { ChevronDownIcon, DownloadIcon, Icon } from '@chakra-ui/icons';
 import {
-  Badge,
   Box,
   Button,
   Menu,
@@ -19,17 +18,17 @@ import {
   GridToolbarContainer,
   GridToolbarExport,
 } from '@material-ui/data-grid';
-import { useFmOrders, useDisplaySize } from '@project-lc/hooks';
+import { useDisplaySize, useFmOrders } from '@project-lc/hooks';
 import {
   converOrderSitetypeToString,
-  convertFmOrderToString,
-  getFmOrderColor,
+  convertFmOrderStatusToString,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
 import { ChakraDataGrid } from './ChakraDataGrid';
+import FmOrderStatusBadge from './FmOrderStatusBadge';
 import TooltipedText from './TooltipedText';
 
 const columns: GridColumns = [
@@ -109,12 +108,12 @@ const columns: GridColumns = [
     sortable: false,
     width: 120,
     valueFormatter: ({ row }) => {
-      return row.depositor + (row.deposite_date ? `/${row.deposite_date}` : '');
+      return row.depositor + (row.deposit_date ? `/${row.deposit_date}` : '');
     },
     renderCell: (params) => (
       <Text>
         {params.row.depositor}
-        {params.row.deposite_date ? `/${params.row.deposite_date}` : ''}
+        {params.row.deposit_date ? `/${params.row.deposit_date}` : ''}
       </Text>
     ),
   },
@@ -148,12 +147,8 @@ const columns: GridColumns = [
     disableReorder: true,
     hideSortIcons: true,
     sortable: false,
-    valueFormatter: ({ value }) => convertFmOrderToString(value as any) || '-',
-    renderCell: (param) => (
-      <Badge lineHeight={2} colorScheme={getFmOrderColor(param.row.step)} variant="solid">
-        {convertFmOrderToString(param.row.step)}
-      </Badge>
-    ),
+    valueFormatter: ({ value }) => convertFmOrderStatusToString(value as any) || '-',
+    renderCell: (param) => <FmOrderStatusBadge orderStatus={param.row.step} />,
   },
 ];
 

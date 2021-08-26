@@ -15,10 +15,10 @@ export const fmOrderStatuses = {
   '99': { name: '결제실패', chakraColor: 'gray' },
 };
 
-export function convertFmOrderToString(key: keyof typeof fmOrderStatuses) {
+export function convertFmOrderStatusToString(key: keyof typeof fmOrderStatuses) {
   return fmOrderStatuses[key].name;
 }
 
-export function getFmOrderColor(key: keyof typeof fmOrderStatuses) {
+export function getFmOrderStatusColor(key: keyof typeof fmOrderStatuses) {
   return fmOrderStatuses[key].chakraColor;
 }

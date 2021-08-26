@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { FindFmOrdersDto } from '@project-lc/shared-types';
 import {
   JwtAuthGuard,
@@ -25,5 +25,10 @@ export class FmOrdersController {
     const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
     if (ids.length === 0) return [];
     return this.fmOrdersService.findOrders(ids, dto);
+  }
+
+  @Get(':orderId')
+  async findOneOrder(@Param('orderId') orderId: string): Promise<any | null> {
+    return this.fmOrdersService.findOneOrder(orderId);
   }
 }

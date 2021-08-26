@@ -1,43 +1,64 @@
 import { Injectable } from '@nestjs/common';
-import { FindFmOrderRes, FindFmOrdersDto } from '@project-lc/shared-types';
+import {
+  FindFmOrderDetailRes,
+  FindFmOrderRes,
+  FindFmOrdersDto,
+  FmOrder,
+  FmOrderExport,
+  FmOrderMetaInfo,
+  FmOrderOption,
+  FmOrderRefund,
+  FmOrderReturn,
+} from '@project-lc/shared-types';
 import { FirstmallDbService } from '../firstmall-db.service';
 
 @Injectable()
 export class FmOrdersService {
   constructor(private readonly db: FirstmallDbService) {}
 
+  // * **********************************
+  // * 주문 목록 조회
+  // * **********************************
   /**
    * 상품 ID목록과 검색 및 필터링 정보를 통해 퍼스트몰의 주문 목록을 조회
    * @returns {FindFmOrderRes[]}
    * @author hwasurr
    */
-  async findOrders(goodsIds: number[], dto: FindFmOrdersDto): Promise<FindFmOrderRes[]> {
+  public async findOrders(
+    goodsIds: number[],
+    dto: FindFmOrdersDto,
+  ): Promise<FindFmOrderRes[]> {
     const { sql, params } = this.createFindOrdersQuery(goodsIds, dto);
     if (!sql) return [];
     const data = (await this.db.query(sql, params)) as FindFmOrderRes[];
     return data.map((x) => ({ ...x }));
   }
 
+  /**
+   * 상품 목록 조회 쿼리와 쿼리변수를 생성합니다.
+   * @param goodsIds 찾을 주문에 속한 상품 Id 배열
+   * @param dto 검색 및 필터링 정보
+   */
   private createFindOrdersQuery(goodsIds: number[], dto: FindFmOrdersDto) {
     const defaultQueryHead = `
-    SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*
-    FROM fm_order
-    JOIN fm_order_item USING(order_seq)
-    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
-    `;
+      SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*
+      FROM fm_order
+      JOIN fm_order_item USING(order_seq)
+      WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
+      `;
     const searchSql = `goods_name LIKE ?
-    OR order_seq LIKE ?
-    OR fm_order.order_seq LIKE ?
-    OR fm_order.recipient_user_name LIKE ?
-    OR fm_order.depositor LIKE ?
-    OR fm_order.order_cellphone LIKE ?
-    OR fm_order.order_phone LIKE ?
-    OR fm_order.recipient_cellphone LIKE ?
-    OR fm_order.recipient_phone LIKE ?
-    OR fm_order.order_email LIKE ?
-    OR fm_order.recipient_user_name LIKE ?
-    OR fm_order_item.goods_name LIKE ?
-    OR fm_order_item.item_seq LIKE ?`;
+      OR order_seq LIKE ?
+      OR fm_order.order_seq LIKE ?
+      OR fm_order.recipient_user_name LIKE ?
+      OR fm_order.depositor LIKE ?
+      OR fm_order.order_cellphone LIKE ?
+      OR fm_order.order_phone LIKE ?
+      OR fm_order.recipient_cellphone LIKE ?
+      OR fm_order.recipient_phone LIKE ?
+      OR fm_order.order_email LIKE ?
+      OR fm_order.recipient_user_name LIKE ?
+      OR fm_order_item.goods_name LIKE ?
+      OR fm_order_item.item_seq LIKE ?`;
 
     let whereSql = '';
     let orderSql = '';
@@ -107,5 +128,180 @@ export class FmOrdersService {
       };
     }
     return { sql: '', params: [] };
+  }
+
+  // * **********************************
+  // * 개별 주문 조회
+  // * **********************************
+
+  /**
+   * 주어진 주문 번호에 해당하는 주문 정보를 불러옵니다.
+   * @param orderId 주문 번호
+   */
+  public async findOneOrder(
+    orderId: FmOrder['order_seq'],
+  ): Promise<FindFmOrderDetailRes | null> {
+    // * 개별 주문 정보
+    const orderInfo = await this.findOneOrderInfo(orderId);
+    if (!orderInfo) return null;
+
+    // * 개별 주문 - 상품 옵션 목록 정보
+    const orderGoodsOptions = await this.findOneOrderOptions(orderId);
+
+    // * 개별 주문 - 출고 정보
+    const orderExports = await this.findOneOrderExports(orderId);
+
+    // * 개별 주문 - 환불 정보
+    const orderRefunds = await this.findOneOrderRefunds(orderId);
+
+    // * 개별 주문 - 반품 정보
+    const orderReturns = await this.findOneOrderReturns(orderId);
+
+    return {
+      ...orderInfo,
+      options: orderGoodsOptions,
+      exports: orderExports,
+      refunds: orderRefunds,
+      returns: orderReturns,
+    };
+  }
+
+  /** 개별 주문 정보 조회 */
+  private async findOneOrderInfo(
+    orderId: FmOrder['order_seq'],
+  ): Promise<FmOrderMetaInfo> {
+    const sql = `
+    SELECT
+      fm_order_item.goods_name,
+      fm_order_item.image,
+      fm_order_shipping.shipping_cost,
+      fm_order_shipping.delivery_cost,
+      fm_order_shipping.shipping_set_name,
+      fm_order_shipping.shipping_type,
+      fm_order.order_seq as id,
+      fm_order.regist_date,
+      fm_order.sitetype,
+      fm_order.depositor,
+      fm_order.deposit_date,
+      fm_order.settleprice,
+      fm_order.step,
+      order_user_name,
+      order_phone,
+      order_cellphone,
+      order_email,
+      recipient_user_name,
+      recipient_phone,
+      recipient_cellphone,
+      recipient_email,
+      recipient_address,
+      recipient_address_street,
+      recipient_address_detail,
+      memo
+    FROM fm_order
+    JOIN fm_order_item USING(order_seq)
+    JOIN fm_order_shipping USING(order_seq)
+    LEFT JOIN fm_goods_export USING(order_seq)
+    WHERE fm_order.order_seq = ?`;
+    const result = await this.db.query(sql, [orderId]);
+    if (result.length > 0) return result[0];
+    return null;
+  }
+
+  /** 개별 주문 - 상품 옵션 목록 정보 조회 */
+  private async findOneOrderOptions(
+    orderId: FmOrder['order_seq'],
+  ): Promise<FmOrderOption[]> {
+    const findOptionsSql = `SELECT
+      fm_order_item_option.item_option_seq,
+      fm_order_item_option.ea,
+      fm_order_item_option.step,
+      fm_order_item_option.step35,
+      fm_order_item_option.step45,
+      fm_order_item_option.step55,
+      fm_order_item_option.step65,
+      fm_order_item_option.step75,
+      fm_order_item_option.step85,
+      fm_order_item_option.member_sale,
+      fm_order_item_option.mobile_sale
+    FROM  fm_order_item_option
+    WHERE order_seq = ?`;
+
+    const result = await this.db.query(findOptionsSql, [orderId]);
+    return result;
+  }
+
+  /** 개별 주문 - 출고 정보 */
+  private async findOneOrderExports(
+    orderId: FmOrder['order_seq'],
+  ): Promise<FmOrderExport> {
+    const exportsSql = `SELECT
+      fm_goods_export.export_code,
+      fm_goods_export.export_date,
+      fm_goods_export.complete_date,
+      fm_goods_export.shipping_date,
+      fm_goods_export.status export_status,
+      fm_goods_export.delivery_company_code,
+      fm_goods_export.delivery_number,
+      SUM(fm_goods_export_item.ea) ea,
+      SUM(fm_order_item_option.price) price
+    FROM fm_goods_export
+    JOIN fm_goods_export_item USING(export_code)
+    JOIN fm_order_item_option ON fm_order_item_option.item_seq = option_seq
+    WHERE fm_goods_export.order_seq = ?
+    GROUP BY export_code
+    `;
+    const exports = await this.db.query(exportsSql, [orderId]);
+    if (exports.length > 0) return exports[0];
+    return null;
+  }
+
+  /** 개별 주문 - 환불 정보 */
+  private async findOneOrderRefunds(
+    orderId: FmOrder['order_seq'],
+  ): Promise<FmOrderRefund> {
+    const sql = `SELECT
+      fm_order_refund.refund_code,
+      fm_order_refund.refund_type,
+      fm_order_refund.regist_date,
+      fm_order_refund.refund_date,
+      fm_order_refund.status,
+      fm_manager.manager_id,
+      fm_manager.memail,
+      SUM(fm_order_refund_item.ea) ea,
+      SUM(fm_order_refund_item.refund_goods_price) refund_goods_price
+    FROM fm_order_refund
+    LEFT JOIN fm_manager USING(manager_seq)
+    JOIN fm_order_refund_item USING(refund_code)
+    WHERE order_seq = ?
+    GROUP BY refund_code
+    `;
+    const result = await this.db.query(sql, [orderId]);
+    if (result.length === 0) return null;
+    return result[0];
+  }
+
+  /** 개별 주문 - 교환 정보 */
+  private async findOneOrderReturns(
+    orderId: FmOrder['order_seq'],
+  ): Promise<FmOrderReturn> {
+    const sql = `SELECT
+      fm_order_return.return_code,
+      fm_order_return.return_type,
+      fm_order_return.refund_code,
+      fm_order_return.regist_date,
+      fm_order_return.return_date,
+      fm_order_return.status,
+      fm_manager.manager_id,
+      fm_manager.memail,
+      SUM(fm_order_return_item.ea) ea
+    FROM fm_order_return
+    LEFT JOIN fm_manager USING(manager_seq)
+    JOIN fm_order_return_item USING(return_code)
+    WHERE order_seq = ?
+    GROUP BY return_code
+    `;
+    const result = await this.db.query(sql, [orderId]);
+    if (result.length === 0) return null;
+    return result[0];
   }
 }

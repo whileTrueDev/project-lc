@@ -1,3 +1,4 @@
+export * from './lib/FmOrderStatusBadge';
 export * from './lib/OrderFilterConsole';
 export * from './lib/SignupForm';
 export * from './lib/SignupModal';
