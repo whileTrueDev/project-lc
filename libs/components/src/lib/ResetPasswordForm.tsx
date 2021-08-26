@@ -1,58 +1,255 @@
-import { Box, Button } from '@chakra-ui/react';
-import { useState } from 'react';
+/* eslint-disable react/jsx-props-no-spreading */
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Stack,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
+import {
+  getEmailDupCheck,
+  useCodeVerifyMutation,
+  useMailVerificationMutation,
+  useCountdown,
+} from '@project-lc/hooks';
+import { useRouter } from 'next/router';
+import { useCallback, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import CenterBox from './CenterBox';
+import PasswordChangeForm from './PasswordChangeForm';
 
-const resetPasswordSteps = {
-  1: {
+const resetPasswordSteps = [
+  {
     header: {
-      title: '이메일 입력하기',
-      desc: '본인 인증을 위해 해당 메일로 인증 코드를 발송합니다',
+      title: '비밀번호를 잊어버리셨나요?',
+      desc: `비밀번호를 재설정하기 위한 인증 코드를 보내드립니다. \n가입 시 사용한 이메일을 입력해주세요.`,
     },
   },
-  2: {
+  {
     header: {
       title: '코드입력',
-      desc: '메일로 발송된 코드를 입력해주세요',
+      desc: '인증코드는 6자의 무작위 글자로 이루어져 있습니다.',
     },
   },
-  3: {
+  {
     header: {
       title: '비밀번호 재설정',
       desc: '새로운 비밀번호를 입력해주세요',
     },
   },
-};
+];
+
 export function ResetPasswordForm(): JSX.Element {
-  const [step, setStep] = useState<keyof typeof resetPasswordSteps>(1);
+  const router = useRouter();
+  const toast = useToast();
+
+  const {
+    register,
+    reset,
+    trigger,
+    getValues,
+    setError,
+    formState: { errors },
+  } = useForm<{ email: string; code: string }>();
+
+  const { clearTimer, startCountdown, seconds } = useCountdown();
+
+  const [step, setStep] = useState(0);
+  // 0 : 이메일 입력
+  // 1 : 인증코드 입력
+  // 2 : 비밀번호 변경
+  const moveToStepZero = useCallback(() => {
+    setStep(0);
+    reset();
+    clearTimer();
+  }, [clearTimer, reset]);
+
+  const moveToStepOne = useCallback(() => {
+    setStep(1);
+    clearTimer();
+  }, [clearTimer]);
+
+  const moveToStepTwo = useCallback(() => {
+    setStep(2);
+    clearTimer();
+  }, [clearTimer]);
+
+  const { mutateAsync: sendEmailCode, isLoading: sendEmailLoading } =
+    useMailVerificationMutation();
+  const { mutateAsync: verifyCode, isLoading: verifyCodeLoading } =
+    useCodeVerifyMutation();
+
+  // 인증코드 전송
+  const checkEmailExistAndSendCode = useCallback(async () => {
+    // 이메일 형식 확인
+    const isValidEmail = await trigger('email');
+    if (!isValidEmail) return;
+
+    // 가입여부 확인
+    const email = getValues('email');
+    const isOk = await getEmailDupCheck(email); // 중복되지않은 경우 true, 중복된 경우 false
+    if (isOk) {
+      setError('email', {
+        type: 'validate',
+        message: '가입되지 않은 이메일입니다',
+      });
+      return;
+    }
+
+    // 인증코드 전송 후 StepOne(코드확인)로 이동
+    sendEmailCode({ email })
+      .then(() => {
+        moveToStepOne();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [getValues, moveToStepOne, sendEmailCode, setError, trigger]);
+
+  // 인증코드 확인 요청
+  const checkCode = useCallback(async () => {
+    const email = getValues('email');
+    const code = getValues('code');
+
+    // 코드 형식 확인
+    const isValidCode = await trigger('code');
+    if (!isValidCode) return;
+
+    // 인증코드 확인 후 StepTwo(비밀번호 재설정)로 이동
+    verifyCode({ email, code }).then((res) => {
+      const { data: isVerified } = res;
+      if (isVerified) {
+        moveToStepTwo(); // step 2  비밀번호 변경
+      } else {
+        setError('code', {
+          type: 'validate',
+          message: '인증코드가 틀렸습니다',
+        });
+      }
+    });
+  }, [getValues, moveToStepTwo, setError, trigger, verifyCode]);
+
+  // 인증코드 재전송
+  const reSendCode = useCallback(async () => {
+    const email = getValues('email');
+    sendEmailCode({ email })
+      .then(() => {
+        toast({
+          title: '인증코드 재전송 성공',
+          status: 'success',
+        });
+        // 재전송 60초간 방지
+        startCountdown(60);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast({
+          title: '인증코드 재전송 실패',
+          status: 'error',
+        });
+      });
+  }, [getValues, sendEmailCode, startCountdown, toast]);
+
   return (
     <CenterBox enableShadow header={resetPasswordSteps[step].header}>
-      <Box>비밀번호 변경화면 {step}</Box>
-      <Button
-        onClick={() =>
-          setStep((prev) => {
-            let next = prev + 1;
-            if (next > 3) {
-              next = prev;
-            }
-            return next as keyof typeof resetPasswordSteps;
-          })
-        }
-      >
-        +
-      </Button>
-      <Button
-        onClick={() =>
-          setStep((prev) => {
-            let next = prev - 1;
-            if (next < 1) {
-              next = prev;
-            }
-            return next as keyof typeof resetPasswordSteps;
-          })
-        }
-      >
-        -
-      </Button>
+      <Box as="form">
+        {/* step 0 : 이메일 확인  */}
+        {step === 0 && (
+          <Stack py={6} spacing={2}>
+            <FormControl isInvalid={!!errors.email}>
+              <FormLabel htmlFor="email">이메일</FormLabel>
+              <Input
+                id="email"
+                type="email"
+                placeholder="minsu@example.com"
+                autoComplete="off"
+                {...register('email', {
+                  required: '이메일을 작성해주세요.',
+                  pattern: {
+                    value: /^[\w]+@[\w]+\.[\w][\w]+$/,
+                    message: '이메일 형식이 올바르지 않습니다.',
+                  },
+                })}
+              />
+              <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
+            </FormControl>
+            <ButtonGroup>
+              <Button flex={1} onClick={() => router.push('/login')} mr={2}>
+                이전
+              </Button>
+              <Button
+                flex={1}
+                onClick={checkEmailExistAndSendCode}
+                isLoading={sendEmailLoading}
+              >
+                다음
+              </Button>
+            </ButtonGroup>
+          </Stack>
+        )}
+        {/* step 1 : 코드 확인  */}
+        {step === 1 && (
+          <Stack py={4} spacing={2}>
+            <Text>{getValues('email')}로 발송된 코드를 확인해주세요.</Text>
+
+            <FormControl isInvalid={!!errors.code}>
+              <Input
+                autoComplete="off"
+                id="code"
+                placeholder="이메일 인증코드"
+                {...register('code', {
+                  required: '인증 코드를 입력해주세요.',
+                  minLength: {
+                    value: 6,
+                    message: '인증코드는 6자 입니다.',
+                  },
+                  maxLength: {
+                    value: 6,
+                    message: '인증코드는 6자 입니다.',
+                  },
+                })}
+              />
+              <FormErrorMessage>{errors.code && errors.code.message}</FormErrorMessage>
+            </FormControl>
+            <ButtonGroup>
+              <Button flex={1} onClick={moveToStepZero} mr={2}>
+                이전
+              </Button>
+              <Button flex={1} onClick={checkCode} isLoading={verifyCodeLoading}>
+                다음
+              </Button>
+            </ButtonGroup>
+
+            <Box fontSize="sm">
+              <Text as="span" mr={2}>
+                인증코드를 받지 못하셨나요?
+              </Text>
+
+              {seconds > 0 ? (
+                <Text as="span">{seconds}초 후 재전송 가능합니다</Text>
+              ) : (
+                <Button variant="link" onClick={reSendCode} isLoading={sendEmailLoading}>
+                  재전송
+                </Button>
+              )}
+            </Box>
+          </Stack>
+        )}
+      </Box>
+
+      {/* step 2 : 비밀번호 재설정 */}
+      {step === 2 && (
+        <PasswordChangeForm
+          email={getValues('email')}
+          onCancel={moveToStepZero}
+          onConfirm={() => router.push('/login')}
+        />
+      )}
     </CenterBox>
   );
 }
