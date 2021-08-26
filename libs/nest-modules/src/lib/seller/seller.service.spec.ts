@@ -77,4 +77,27 @@ describe('SellerService', () => {
       expect(await service.isEmailDupCheckOk(TEST_USER_EMAIL)).toBe(false);
     });
   });
+
+  describe('changePassword', () => {
+    it('password should be different after has been changed', async () => {
+      const passwordBefore = (await service.findOne({ email: TEST_USER_EMAIL })).password;
+      await service.changePassword(TEST_USER_EMAIL, 'newPassword!');
+      const passwordAfter = (await service.findOne({ email: TEST_USER_EMAIL })).password;
+      expect(passwordAfter !== passwordBefore).toBe(true);
+    });
+  });
+
+  describe('delete seller', () => {
+    it('should delete exist seller', async () => {
+      const TEST_DELETE_USER_EMAIL = 'test_email_to_be_deleted@gmail.com';
+      const newSeller = await service.signUp({
+        email: TEST_DELETE_USER_EMAIL,
+        name: 'tester',
+        password: 'testtest12!@',
+      });
+      expect(newSeller).toBeDefined();
+      await service.deleteOne(TEST_DELETE_USER_EMAIL);
+      expect(await service.findOne({ email: TEST_DELETE_USER_EMAIL })).toBeNull();
+    });
+  });
 });
