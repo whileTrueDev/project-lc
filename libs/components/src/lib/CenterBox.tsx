@@ -25,7 +25,12 @@ export function CenterBox({
       >
         <Stack>
           <Heading fontSize="3xl">{header.title}</Heading>
-          <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')} mt={2}>
+          <Text
+            fontSize="sm"
+            color={useColorModeValue('gray.600', 'gray.400')}
+            mt={2}
+            whiteSpace="pre-line"
+          >
             {header.desc}
           </Text>
         </Stack>
