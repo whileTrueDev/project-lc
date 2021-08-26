@@ -1,4 +1,5 @@
 import { Stack, Box, useColorModeValue, Heading, Text } from '@chakra-ui/react';
+import React from 'react';
 
 export interface CenterBoxProps {
   enableShadow?: boolean;
@@ -6,7 +7,7 @@ export interface CenterBoxProps {
     title: string;
     desc: string;
   };
-  children: JSX.Element;
+  children: React.ReactNode;
 }
 
 export function CenterBox({
