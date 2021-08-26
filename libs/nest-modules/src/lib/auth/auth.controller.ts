@@ -9,7 +9,11 @@ import {
   Query,
   ValidationPipe,
 } from '@nestjs/common';
-import { SendMailVerificationDto, loginUserRes } from '@project-lc/shared-types';
+import {
+  SendMailVerificationDto,
+  loginUserRes,
+  EmailCodeVerificationDto,
+} from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { MailVerificationService } from './mailVerification.service';
 import { LocalAuthGuard } from '../_nest-units/guards/local-auth.guard';
@@ -64,5 +68,19 @@ export class AuthController {
     @Body(ValidationPipe) dto: SendMailVerificationDto,
   ): Promise<boolean> {
     return this.mailVerificationService.sendVerificationMail(dto.email);
+  }
+
+  // * 인증코드가 맞는지 확인
+  @Post('code-verification')
+  async verifyCode(
+    @Body(ValidationPipe) dto: EmailCodeVerificationDto,
+  ): Promise<boolean> {
+    const matchingRecord = await this.mailVerificationService.checkMailVerification(
+      dto.email,
+      dto.code,
+    );
+    if (!matchingRecord) return false;
+    await this.mailVerificationService.deleteSuccessedMailVerification(dto.email);
+    return true;
   }
 }
