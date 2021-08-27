@@ -102,9 +102,11 @@ export function PasswordChangeForm(props: PasswordChangeFormProps): JSX.Element 
         </FormErrorMessage>
       </FormControl>
 
-      <ButtonGroup>
-        <Button onClick={onCancel}>취소</Button>
-        <Button type="submit" disabled={!watch('password')}>
+      <ButtonGroup spacing={2} width="100%">
+        <Button isFullWidth onClick={onCancel}>
+          취소
+        </Button>
+        <Button isFullWidth type="submit" disabled={!watch('password')}>
           비밀번호 변경
         </Button>
       </ButtonGroup>

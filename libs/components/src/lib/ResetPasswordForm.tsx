@@ -23,7 +23,7 @@ import { useForm } from 'react-hook-form';
 import CenterBox from './CenterBox';
 import PasswordChangeForm from './PasswordChangeForm';
 
-const resetPasswordSteps = [
+const resetPasswordStepHeaders = [
   {
     header: {
       title: '비밀번호를 잊어버리셨나요?',
@@ -47,6 +47,12 @@ const resetPasswordSteps = [
 export function ResetPasswordForm(): JSX.Element {
   const router = useRouter();
   const toast = useToast();
+  const showCodeSendErrorToast = useCallback(() => {
+    toast({
+      title: '인증코드 전송 실패',
+      status: 'error',
+    });
+  }, [toast]);
 
   const {
     register,
@@ -60,6 +66,7 @@ export function ResetPasswordForm(): JSX.Element {
   const { clearTimer, startCountdown, seconds } = useCountdown();
 
   const [step, setStep] = useState(0);
+  // 비밀번호 재발급 스텝
   // 0 : 이메일 입력
   // 1 : 인증코드 입력
   // 2 : 비밀번호 변경
@@ -108,8 +115,16 @@ export function ResetPasswordForm(): JSX.Element {
       })
       .catch((err) => {
         console.error(err);
+        showCodeSendErrorToast();
       });
-  }, [getValues, moveToStepOne, sendEmailCode, setError, trigger]);
+  }, [
+    getValues,
+    moveToStepOne,
+    sendEmailCode,
+    setError,
+    showCodeSendErrorToast,
+    trigger,
+  ]);
 
   // 인증코드 확인 요청
   const checkCode = useCallback(async () => {
@@ -148,15 +163,12 @@ export function ResetPasswordForm(): JSX.Element {
       })
       .catch((err) => {
         console.error(err);
-        toast({
-          title: '인증코드 재전송 실패',
-          status: 'error',
-        });
+        showCodeSendErrorToast();
       });
-  }, [getValues, sendEmailCode, startCountdown, toast]);
+  }, [getValues, sendEmailCode, showCodeSendErrorToast, startCountdown, toast]);
 
   return (
-    <CenterBox enableShadow header={resetPasswordSteps[step].header}>
+    <CenterBox enableShadow header={resetPasswordStepHeaders[step].header}>
       <Box as="form">
         {/* step 0 : 이메일 확인  */}
         {step === 0 && (
@@ -178,12 +190,12 @@ export function ResetPasswordForm(): JSX.Element {
               />
               <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
             </FormControl>
-            <ButtonGroup>
-              <Button flex={1} onClick={() => router.push('/login')} mr={2}>
+            <ButtonGroup spacing={2}>
+              <Button isFullWidth onClick={() => router.push('/login')} mr={2}>
                 이전
               </Button>
               <Button
-                flex={1}
+                isFullWidth
                 onClick={checkEmailExistAndSendCode}
                 isLoading={sendEmailLoading}
               >
@@ -216,11 +228,11 @@ export function ResetPasswordForm(): JSX.Element {
               />
               <FormErrorMessage>{errors.code && errors.code.message}</FormErrorMessage>
             </FormControl>
-            <ButtonGroup>
-              <Button flex={1} onClick={moveToStepZero} mr={2}>
+            <ButtonGroup spacing={2}>
+              <Button isFullWidth onClick={moveToStepZero}>
                 이전
               </Button>
-              <Button flex={1} onClick={checkCode} isLoading={verifyCodeLoading}>
+              <Button isFullWidth onClick={checkCode} isLoading={verifyCodeLoading}>
                 다음
               </Button>
             </ButtonGroup>
