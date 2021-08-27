@@ -3,6 +3,7 @@ import { ThemeProvider } from '@material-ui/core';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 import createChakraTheme from '../utils/createChakraTheme';
 import createMuiTheme from '../utils/createMuiTheme';
 import createQueryClient from '../utils/createReactQueryClient';
@@ -27,6 +28,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
               </main>
             </ThemeProvider>
           </ChakraProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </div>
     </>

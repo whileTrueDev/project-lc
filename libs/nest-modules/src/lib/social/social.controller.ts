@@ -3,6 +3,7 @@ import {
   Delete,
   Get,
   Param,
+  Query,
   Req,
   Res,
   UseFilters,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { SocialService } from './social.service';
 import { SocialLoginExceptionFilter } from './social-login-exception.filter';
 @Controller('social')
@@ -17,6 +19,13 @@ export class SocialController {
   constructor(private readonly socialService: SocialService) {}
 
   private readonly frontMypageUrl = 'http://localhost:4200/mypage';
+
+  /** email 로 가입된 셀러에 연동된 소셜계정목록 반환 */
+  @UseGuards(JwtAuthGuard)
+  @Get('/accounts')
+  async getSocialAccounts(@Query('email') email: string) {
+    return this.socialService.getSocialAccounts(email);
+  }
 
   /** 구글 ************************************************ */
   @Get('/google/login')

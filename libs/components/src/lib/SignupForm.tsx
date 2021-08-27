@@ -23,6 +23,16 @@ import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CenterBox } from './CenterBox';
 
+export const passwordRegisterOptions = {
+  required: '암호를 작성해주세요.',
+  minLength: { value: 8, message: '비밀번호는 8자 이상이어야 합니다.' },
+  maxLength: { value: 20, message: '비밀번호는 20자 이하여야 합니다.' },
+  pattern: {
+    value: /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%^*+=-]).{8,20}$/,
+    message: '형식이 올바르지 않습니다.',
+  },
+};
+
 export interface SignupFormProps {
   enableShadow?: boolean;
   moveToSignupStart?: () => void;
@@ -171,15 +181,7 @@ export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFo
             type="password"
             isReadOnly={phase === 2}
             placeholder="********"
-            {...register('password', {
-              required: '암호를 작성해주세요.',
-              minLength: { value: 8, message: '비밀번호는 8자 이상이어야 합니다.' },
-              maxLength: { value: 20, message: '비밀번호는 20자 이하여야 합니다.' },
-              pattern: {
-                value: /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%^*+=-]).{8,20}$/,
-                message: '형식이 올바르지 않습니다.',
-              },
-            })}
+            {...register('password', { ...passwordRegisterOptions })}
           />
           <FormErrorMessage>
             {errors.password && errors.password.message}
