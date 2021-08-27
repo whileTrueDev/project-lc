@@ -75,6 +75,10 @@ model Goods {
   option_suboption_use    String             @default("0") // 추가 옵션 사용 여부 "0" or "1"
   member_input_use        String             @default("0") // 추가 구성 옵션 사용 여부 "0" or "1"
   image                   String // 상품 이미지 - fm_goods_image
+  goods_view              GoodsView          @default(look) // 노출
+  regist_date             DateTime           @default(now()) // 상품등록일 (project-lc 에 판매자가 등록한 날짜)
+  update_date             DateTime           @default(now()) @updatedAt // 수정일 (퍼스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서 수정한 날짜)
+  runout_policy           RunoutPolicy? // 재고 정책
 }
 
 // 상품 검수 정보
@@ -128,6 +132,19 @@ enum GoodsStatus {
   runout
   purchasing
   unsold
+}
+
+// * 상품 - 노출
+enum GoodsView {
+  look
+  notLook
+}
+
+// * 상품 - 재고 정책 (재고판매)
+enum RunoutPolicy {
+  stock
+  ableStock
+  unlimited
 }
 
 // * 상품 - 배송 정책 선택
