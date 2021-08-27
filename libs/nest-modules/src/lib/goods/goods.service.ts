@@ -33,4 +33,73 @@ export class GoodsService {
       (confirmation) => confirmation.confirmation.firstmallGoodsConnectionId,
     );
   }
+
+  /**
+   * 판매자가 등록한 모든 상품 목록 조회
+   * dto : page, itemPerPage, sellerId
+   * return : maxPage, totalItemCount, currentPage, prevPage, nextPage, items
+   */
+  public async getGoodsList({
+    email,
+    page,
+    itemPerPage,
+  }: {
+    sellerId?: number;
+    email?: string;
+    page: number;
+    itemPerPage: number;
+  }) {
+    const items = await this.prisma.goods.findMany({
+      skip: (page - 1) * itemPerPage,
+      take: itemPerPage,
+      where: { seller: { email } },
+      orderBy: [{ regist_date: 'desc' }], // 등록일 내림차순
+      select: {
+        id: true,
+        sellerId: true,
+        goods_name: true,
+        runout_policy: true,
+        shipping_policy: true,
+        regist_date: true,
+        update_date: true,
+        goods_status: true,
+        goods_view: true,
+        options: {
+          select: {
+            default_option: true,
+            consumer_price: true,
+            price: true,
+            supply: {
+              select: {
+                stock: true,
+                badstock: true,
+                safe_stock: true,
+              },
+            },
+          },
+        },
+        confirmation: {
+          select: { id: true, status: true, firstmallGoodsConnectionId: true },
+        },
+      },
+    });
+
+    // 해당 판매자가 등록한 전체 아이템 개수
+    const totalItemCount = await this.prisma.goods.count({
+      where: { seller: { email } },
+    });
+    const maxPage = Math.ceil(totalItemCount / itemPerPage); // 마지막페이지
+    const currentPage = page; // 현재페이지
+    const nextPage = currentPage < maxPage ? currentPage + 1 : null; // 다음페이지
+    const prevPage = currentPage > 1 ? currentPage - 1 : null; // 이전페이지
+
+    return {
+      items,
+      totalItemCount,
+      maxPage,
+      currentPage,
+      nextPage,
+      prevPage,
+    };
+  }
 }
