@@ -7,6 +7,7 @@ import {
   AuthModule,
   SocialModule,
   mailerConfig,
+  GoodsModule,
 } from '@project-lc/nest-modules';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -23,6 +24,7 @@ import { validationSchema } from '../settings/config.validation';
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
     SocialModule,
+    GoodsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
