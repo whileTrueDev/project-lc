@@ -8,6 +8,7 @@ import {
   Res,
   Query,
   ValidationPipe,
+  HttpCode,
 } from '@nestjs/common';
 import {
   SendMailVerificationDto,
@@ -71,6 +72,7 @@ export class AuthController {
   }
 
   // * 인증코드가 맞는지 확인
+  @HttpCode(200)
   @Post('code-verification')
   async verifyCode(
     @Body(ValidationPipe) dto: EmailCodeVerificationDto,
