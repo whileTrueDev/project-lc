@@ -213,6 +213,8 @@ export class FmOrdersService {
   ): Promise<FmOrderOption[]> {
     const findOptionsSql = `SELECT
       fm_order_item_option.item_option_seq,
+      fm_order_item_option.title1,
+      fm_order_item_option.option1,
       fm_order_item_option.ea,
       fm_order_item_option.step,
       fm_order_item_option.step35,
@@ -222,8 +224,20 @@ export class FmOrdersService {
       fm_order_item_option.step75,
       fm_order_item_option.step85,
       fm_order_item_option.member_sale,
-      fm_order_item_option.mobile_sale
-    FROM  fm_order_item_option
+      fm_order_item_option.mobile_sale,
+      fm_order_item_option.color,
+      fm_order_item_option.price,
+      fm_order_item_option.ori_price,
+      fm_goods_export_item.export_code,
+      fm_order_refund_item.refund_code,
+      fm_order_return_item.return_code
+    FROM fm_order_item_option
+    LEFT JOIN fm_goods_export_item
+      ON fm_goods_export_item.option_seq = fm_order_item_option.item_option_seq
+    LEFT JOIN fm_order_refund_item
+      ON fm_order_refund_item.option_seq = fm_order_item_option.item_option_seq
+    LEFT JOIN fm_order_return_item
+      ON fm_order_return_item.option_seq = fm_order_item_option.item_option_seq
     WHERE order_seq = ?`;
 
     const result = await this.db.query(findOptionsSql, [orderId]);
@@ -267,6 +281,7 @@ export class FmOrdersService {
       fm_order_refund.status,
       fm_manager.manager_id,
       fm_manager.memail,
+      fm_manager.mcellphone,
       SUM(fm_order_refund_item.ea) ea,
       SUM(fm_order_refund_item.refund_goods_price) refund_goods_price
     FROM fm_order_refund
@@ -293,6 +308,7 @@ export class FmOrdersService {
       fm_order_return.status,
       fm_manager.manager_id,
       fm_manager.memail,
+      fm_manager.mcellphone,
       SUM(fm_order_return_item.ea) ea
     FROM fm_order_return
     LEFT JOIN fm_manager USING(manager_seq)

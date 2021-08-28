@@ -689,6 +689,14 @@ export interface FmOrderOption {
    */
   item_option_seq: number;
   /**
+   * 옵션 제목
+   */
+  title1: string;
+  /**
+   * 옵션 값
+   */
+  option1: string;
+  /**
    * 주문 상품(옵션) 개수
    */
   ea: number;
@@ -728,6 +736,30 @@ export interface FmOrderOption {
    * 모바일 할인가 (number string)
    */
   mobile_sale: string;
+  /**
+   * 옵션 색상
+   */
+  color?: string;
+  /**
+   * 옵션 금액 (상품 단가)
+   */
+  price: string;
+  /**
+   * 옵션 금액 (할인 제외)
+   */
+  ori_price: string;
+  /**
+   * 출고 번호 (출고된 경우에만 존재)
+   */
+  export_code?: string;
+  /**
+   * 환불 번호 (환불된 경우에만 존재)
+   */
+  refund_code?: string;
+  /**
+   * 반품 번호 (반품된 경우에만 존재)
+   */
+  return_code?: string;
 }
 
 export interface FmOrderExport {
@@ -742,15 +774,15 @@ export interface FmOrderExport {
   /**
    * 출고 완료 일시 (date string)
    */
-  complete_date: string;
+  complete_date?: string;
   /**
    * 배송 완료 일시 (date string)
    */
-  shipping_date: string;
+  shipping_date?: string;
   /**
    * 출고 상태 45, 55, 65, 75
    */
-  export_status: string;
+  export_status: '45' | '55' | '65' | '75';
   /**
    * 출고 택배사 코드
    * - code0 = CJ GLS
@@ -872,6 +904,10 @@ export interface FmOrderRefund {
    */
   memail: string;
   /**
+   * 환불 처리 완료 관리자 전화번호
+   */
+  mcellphone: string;
+  /**
    * 총 환불 상품(옵션) 개수
    */
   ea: string;
@@ -902,6 +938,10 @@ export interface FmOrderReturn {
    * 반품 처리 완료 관리자 이메일
    */
   memail: string;
+  /**
+   * 반품 처리 완료 관리자 전화번호
+   */
+  mcellphone: string;
   /**
    * 반품 처리 수량 (number string)
    */

@@ -2,6 +2,7 @@ import { ChevronDownIcon, DownloadIcon, Icon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
+  Link,
   Menu,
   MenuButton,
   MenuItem,
@@ -20,11 +21,12 @@ import {
 } from '@material-ui/data-grid';
 import { useDisplaySize, useFmOrders } from '@project-lc/hooks';
 import {
-  converOrderSitetypeToString,
   convertFmOrderStatusToString,
+  convertOrderSitetypeToString,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
+import NextLink from 'next/link';
 import { useMemo, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
 import { ChakraDataGrid } from './ChakraDataGrid';
@@ -32,7 +34,18 @@ import FmOrderStatusBadge from './FmOrderStatusBadge';
 import TooltipedText from './TooltipedText';
 
 const columns: GridColumns = [
-  { field: 'id', headerName: '주문번호', width: 140 },
+  {
+    field: 'id',
+    headerName: '주문번호',
+    width: 140,
+    renderCell: (params) => {
+      return (
+        <NextLink href={`/mypage/orders/${params.row.id}`} passHref>
+          <Link>{params.row.id}</Link>
+        </NextLink>
+      );
+    },
+  },
   {
     field: 'regist_date',
     headerName: '주문일시',
@@ -57,9 +70,9 @@ const columns: GridColumns = [
     hideSortIcons: true,
     sortable: false,
     width: 120,
-    valueFormatter: ({ value }) => converOrderSitetypeToString(value as any) || '-',
+    valueFormatter: ({ value }) => convertOrderSitetypeToString(value as any) || '-',
     renderCell: (params) => (
-      <Text>{converOrderSitetypeToString(params.row.sitetype)}</Text>
+      <Text>{convertOrderSitetypeToString(params.row.sitetype)}</Text>
     ),
   },
   {
@@ -108,7 +121,8 @@ const columns: GridColumns = [
     sortable: false,
     width: 120,
     valueFormatter: ({ row }) => {
-      return row.depositor + (row.deposit_date ? `/${row.deposit_date}` : '');
+      const depositdate = dayjs(row.deposit_date).format('YYYY/MM/DD HH:mm:ss');
+      return row.depositor + (row.deposit_date ? `/${depositdate}` : '');
     },
     renderCell: (params) => (
       <Text>
@@ -148,7 +162,11 @@ const columns: GridColumns = [
     hideSortIcons: true,
     sortable: false,
     valueFormatter: ({ value }) => convertFmOrderStatusToString(value as any) || '-',
-    renderCell: (param) => <FmOrderStatusBadge orderStatus={param.row.step} />,
+    renderCell: (param) => (
+      <Box lineHeight={2}>
+        <FmOrderStatusBadge orderStatus={param.row.step} />
+      </Box>
+    ),
   },
 ];
 
