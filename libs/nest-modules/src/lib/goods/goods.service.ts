@@ -40,7 +40,13 @@ export class GoodsService {
    * dto : email, page, itemPerPage, sort, direction
    * return : maxPage, totalItemCount, currentPage, prevPage, nextPage, items
    */
-  public async getGoodsList({ email, page, itemPerPage, sort, direction }: GoodsListDto) {
+  public async getGoodsList({
+    email,
+    page,
+    itemPerPage,
+    sort,
+    direction,
+  }: GoodsListDto & { email: string }) {
     const items = await this.prisma.goods.findMany({
       skip: (page - 1) * itemPerPage,
       take: itemPerPage,

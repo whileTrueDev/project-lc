@@ -1,6 +1,8 @@
-import { Controller, Delete, Get, Query, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Query, ValidationPipe } from '@nestjs/common';
 import { GoodsListDto } from '@project-lc/shared-types';
 import { GoodsService } from './goods.service';
+import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
+import { UserPayload } from '../auth/auth.interface';
 
 // @UseGuards(JwtAuthGuard)
 @Controller('goods')
@@ -9,11 +11,11 @@ export class GoodsController {
 
   @Get('/list')
   getGoodsList(
+    @SellerInfo() seller: UserPayload,
     @Query(new ValidationPipe({ transform: true })) goodsListDto: GoodsListDto,
   ) {
-    // return goodsListDto;
     return this.goodsService.getGoodsList({
-      email: goodsListDto.email,
+      email: seller.sub, // seller.email
       page: goodsListDto.page,
       itemPerPage: goodsListDto.itemPerPage,
       sort: goodsListDto.sort,
@@ -22,7 +24,8 @@ export class GoodsController {
   }
 
   @Delete()
-  deleteGoods() {
-    return this.goodsService.deleteGoods();
+  deleteGoods(@SellerInfo() seller: UserPayload, @Body() body: any) {
+    return seller;
+    // return this.goodsService.deleteGoods();
   }
 }
