@@ -6,9 +6,12 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  // * 화면 렌더링 예시 by Dan -> 예시 확인 이후 삭제해도 됩니다.
   @Get()
   @Render('index')
-  getData() {
-    return { message: this.appService.getHello() };
+  async getData() {
+    // * prisma 데이터베이스 접근 호출 예시 by Dan
+    const data = await this.appService.getHello();
+    return { message: data };
   }
 }
