@@ -7,8 +7,13 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @Render('index')
   getData() {
-    return { msg: this.appService.getHello() };
+    return this.appService.getData();
+  }
+
+  @Get('test')
+  @Render('index')
+  renterTest() {
+    return { injectVariablesLikeThis: 'injected variables' };
   }
 }
