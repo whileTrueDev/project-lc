@@ -30,7 +30,7 @@ export class GoodsController {
   ) {
     // const email = seller.sub;
     const email = 'a1919361@gmail.com';
-    return this.goodsService.deleteGoods({
+    return this.goodsService.deleteLcGoods({
       email,
       ids: dto.ids,
     });

@@ -10,7 +10,7 @@ export class GoodsService {
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
    * @param email seller.sub 로그인된 판매자 정보
-   * @param ids? 특정 상품 id의 firstMallGoodsId만 조회하고 싶을 때
+   * @param ids? 특정 상품 goods.id의 firstMallGoodsId만 조회하고 싶을 때
    */
   public async findMyGoodsIds(email: Seller['email'], ids?: number[]): Promise<number[]> {
     const goodsIds = await this.prisma.goods.findMany({
@@ -105,7 +105,7 @@ export class GoodsService {
 
   // 유저가 등록한 상품 삭제
   // dto: email, [itemId, itemId, ...]
-  public async deleteGoods({ email, ids }: { email: string; ids: number[] }) {
+  public async deleteLcGoods({ email, ids }: { email: string; ids: number[] }) {
     try {
       return this.prisma.goods.deleteMany({
         where: {
