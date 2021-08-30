@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { GoodsListDto } from '@project-lc/shared-types';
@@ -9,12 +9,14 @@ export class GoodsService {
 
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
-   * @param seller 로그인된 판매자 정보
+   * @param email seller.sub 로그인된 판매자 정보
+   * @param ids? 특정 상품 id의 firstMallGoodsId만 조회하고 싶을 때
    */
-  public async findMyGoodsIds(email: Seller['email']): Promise<number[]> {
+  public async findMyGoodsIds(email: Seller['email'], ids?: number[]): Promise<number[]> {
     const goodsIds = await this.prisma.goods.findMany({
       where: {
         seller: { email },
+        id: ids ? { in: ids } : undefined,
         AND: {
           confirmation: {
             status: 'confirmed',
@@ -101,7 +103,21 @@ export class GoodsService {
     };
   }
 
-  public async deleteGoods() {
-    const deleteGoods = await this.prisma.goods.delete;
+  // 유저가 등록한 상품 삭제
+  // dto: email, [itemId, itemId, ...]
+  public async deleteGoods({ email, ids }: { email: string; ids: number[] }) {
+    try {
+      return this.prisma.goods.deleteMany({
+        where: {
+          seller: { email },
+          id: {
+            in: ids,
+          },
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 }

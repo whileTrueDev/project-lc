@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Query, ValidationPipe } from '@nestjs/common';
-import { GoodsListDto } from '@project-lc/shared-types';
+import { DeleteGoodsDto, GoodsListDto } from '@project-lc/shared-types';
 import { GoodsService } from './goods.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
@@ -24,8 +24,15 @@ export class GoodsController {
   }
 
   @Delete()
-  deleteGoods(@SellerInfo() seller: UserPayload, @Body() body: any) {
-    return seller;
-    // return this.goodsService.deleteGoods();
+  async deleteGoods(
+    // @SellerInfo() seller: UserPayload,
+    @Body(ValidationPipe) dto: DeleteGoodsDto,
+  ) {
+    // const email = seller.sub;
+    const email = 'a1919361@gmail.com';
+    return this.goodsService.deleteGoods({
+      email,
+      ids: dto.ids,
+    });
   }
 }

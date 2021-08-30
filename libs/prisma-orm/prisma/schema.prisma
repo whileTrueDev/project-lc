@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["selectRelationCount", "orderByRelation"]
+  previewFeatures = ["selectRelationCount", "orderByRelation", "referentialActions"]
 }
 
 // generator docs {
@@ -36,7 +36,6 @@ model SellerSocialAccount {
   profileImage String?
   accessToken  String?
   refreshToken String?
-  /// @onDelete(CASCADE)
   seller       Seller   @relation(fields: [sellerId], references: [id])
   sellerId     Int
 }
@@ -101,7 +100,7 @@ enum GoodsConfirmationStatuses {
 // 상품 옵션 - fm_goods_option
 model GoodsOptions {
   id             Int                    @id @default(autoincrement())
-  goods          Goods                  @relation(fields: [goodsId], references: [id])
+  goods          Goods                  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
   goodsId        Int
   supply         GoodsOptionsSupplies[]
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
@@ -119,7 +118,7 @@ model GoodsOptions {
 // 상품 옵션 재고 - fm_goods_suply
 model GoodsOptionsSupplies {
   id             Int          @id @default(autoincrement())
-  goodsOptions   GoodsOptions @relation(fields: [goodsOptionsId], references: [id])
+  goodsOptions   GoodsOptions @relation(fields: [goodsOptionsId], references: [id], onDelete: Cascade)
   goodsOptionsId Int
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   stock          Int          @db.UnsignedInt // 재고
