@@ -18,4 +18,19 @@ export class FirstmallDbService {
     // 필요시 에러처리 등 추가
     return rows;
   }
+
+  async transaction(sqls: string[]): Promise<any> {
+    const conn = await this.pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      const queryPromises = sqls.map((sql) => conn.query(sql));
+      await Promise.all(queryPromises);
+      await conn.commit();
+    } catch (error) {
+      console.error(error);
+      await conn.rollback();
+    } finally {
+      await conn.release();
+    }
+  }
 }
