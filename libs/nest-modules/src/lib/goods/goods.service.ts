@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
+import { GoodsListDto } from '@project-lc/shared-types';
 
 @Injectable()
 export class GoodsService {
@@ -36,24 +37,15 @@ export class GoodsService {
 
   /**
    * 판매자가 등록한 모든 상품 목록 조회
-   * dto : page, itemPerPage, sellerId
+   * dto : email, page, itemPerPage, sort, direction
    * return : maxPage, totalItemCount, currentPage, prevPage, nextPage, items
    */
-  public async getGoodsList({
-    email,
-    page,
-    itemPerPage,
-  }: {
-    sellerId?: number;
-    email?: string;
-    page: number;
-    itemPerPage: number;
-  }) {
+  public async getGoodsList({ email, page, itemPerPage, sort, direction }: GoodsListDto) {
     const items = await this.prisma.goods.findMany({
       skip: (page - 1) * itemPerPage,
       take: itemPerPage,
       where: { seller: { email } },
-      orderBy: [{ regist_date: 'desc' }], // 등록일 내림차순
+      orderBy: [{ [sort]: direction }],
       select: {
         id: true,
         sellerId: true,
@@ -101,5 +93,9 @@ export class GoodsService {
       nextPage,
       prevPage,
     };
+  }
+
+  public async deleteGoods() {
+    const deleteGoods = await this.prisma.goods.delete;
   }
 }

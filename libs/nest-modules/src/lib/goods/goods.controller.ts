@@ -1,5 +1,5 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '@project-lc/nest-modules';
+import { Controller, Delete, Get, Query, ValidationPipe } from '@nestjs/common';
+import { GoodsListDto } from '@project-lc/shared-types';
 import { GoodsService } from './goods.service';
 
 // @UseGuards(JwtAuthGuard)
@@ -8,12 +8,21 @@ export class GoodsController {
   constructor(private readonly goodsService: GoodsService) {}
 
   @Get('/list')
-  getGoodsList() {
+  getGoodsList(
+    @Query(new ValidationPipe({ transform: true })) goodsListDto: GoodsListDto,
+  ) {
+    // return goodsListDto;
     return this.goodsService.getGoodsList({
-      // sellerId: 1,
-      email: 'a1919361@gmail.com',
-      page: 1,
-      itemPerPage: 10,
+      email: goodsListDto.email,
+      page: goodsListDto.page,
+      itemPerPage: goodsListDto.itemPerPage,
+      sort: goodsListDto.sort,
+      direction: goodsListDto.direction,
     });
+  }
+
+  @Delete()
+  deleteGoods() {
+    return this.goodsService.deleteGoods();
   }
 }
