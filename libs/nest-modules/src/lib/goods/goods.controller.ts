@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Query, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Query,
+  ValidationPipe,
+} from '@nestjs/common';
 import { DeleteGoodsDto, GoodsListDto } from '@project-lc/shared-types';
 import { GoodsService } from './goods.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
@@ -21,6 +31,12 @@ export class GoodsController {
       sort: goodsListDto.sort,
       direction: goodsListDto.direction,
     });
+  }
+
+  @Patch('/expose')
+  changeGoodsView(@Body() dto: { view: 'look' | 'notLook'; id: number }) {
+    const { id, view } = dto;
+    return this.goodsService.changeGoodsView(id, view);
   }
 
   @Delete()

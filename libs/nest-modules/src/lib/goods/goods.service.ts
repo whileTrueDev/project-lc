@@ -120,4 +120,18 @@ export class GoodsService {
       throw new InternalServerErrorException(error);
     }
   }
+
+  public async changeGoodsView(id: number, view: 'look' | 'notLook') {
+    try {
+      return this.prisma.goods.update({
+        where: { id },
+        data: {
+          goods_view: view,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
 }
