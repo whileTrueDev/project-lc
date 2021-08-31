@@ -1,0 +1,545 @@
+@font-face {
+  font-family: 'KOTRA';
+  src: url('/fonts/KOTRA_BOLD.ttf');
+}
+
+@font-face {
+  font-family: 'DIGITAL';
+  src: url('/fonts/LAB디지털.ttf');
+}
+
+@font-face {
+  font-family: 'JALNAN';
+  src: url('/fonts/JalnanOTF.otf');
+}
+
+@font-face {
+  font-family: 'BLACK-GOTHIC';
+  src: url('/fonts/BlackHanSans-Regular.ttf');
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  overflow: auto;
+  position: fixed;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.live-commerce {
+  width: 96.9%;
+  height: 94.5%;
+  margin-top: 0.7%;
+  position: relative;
+}
+
+/* 하단영역 */
+.bottom-area-wrapper {
+  width: 100%;
+  height: 6%;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 0px;
+  right: 0px;
+}
+
+.bottom-area-left {
+  width: 22.5%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.bottom-area-left-icon {
+  width: 18%;
+  margin-left: 10%;
+}
+
+.bottom-area-left-icon#clock {
+  width: 17%;
+  margin-right: 8%;
+}
+
+.bottom-area-left-icon.urgent#clock {
+  /* Start the shake animation and make the animation last for 0.5 seconds */
+  animation: shake 0.5s;
+
+  /* When the animation is finished, start again */
+  animation-iteration-count: infinite;
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(1px, 1px) rotate(0deg);
+  }
+  10% {
+    transform: translate(-1px, -2px) rotate(-1deg);
+  }
+  20% {
+    transform: translate(-3px, 0px) rotate(1deg);
+  }
+  30% {
+    transform: translate(3px, 2px) rotate(0deg);
+  }
+  40% {
+    transform: translate(1px, -1px) rotate(1deg);
+  }
+  50% {
+    transform: translate(-1px, 2px) rotate(-1deg);
+  }
+  60% {
+    transform: translate(-3px, 1px) rotate(0deg);
+  }
+  70% {
+    transform: translate(3px, 1px) rotate(-1deg);
+  }
+  80% {
+    transform: translate(-1px, -1px) rotate(1deg);
+  }
+  90% {
+    transform: translate(1px, 2px) rotate(0deg);
+  }
+  100% {
+    transform: translate(1px, -2px) rotate(-1deg);
+  }
+}
+
+.bottom-object {
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  opacity: 0;
+}
+
+.bottom-object span {
+  font-family: 'JALNAN';
+  font-size: 30px;
+  color: rgb(85, 83, 83);
+  -webkit-text-stroke: 1px #000000;
+}
+
+.bottom-object-quantity {
+  display: flex;
+}
+
+#current-quantity {
+  color: white;
+}
+
+#quantity-object {
+  color: yellow;
+}
+
+.bottom-timer {
+  width: 50%;
+  margin-right: 8%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  font-family: 'DIGITAL';
+  font-size: 30px;
+  color: #ffffff;
+}
+
+.bottom-timer.warning {
+  color: yellow;
+}
+
+.bottom-timer.urgent {
+  color: #ffd200;
+}
+
+.bottom-timer span {
+  width: 10%;
+  display: flex;
+  justify-content: space-around;
+}
+
+.bottom-area-right {
+  width: 77.5%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.bottom-area-right p:after {
+  content: '';
+  white-space: nowrap;
+  padding-right: 100%;
+}
+
+.bottom-area-text {
+  font-family: 'KOTRA';
+  margin-right: 100%;
+  font-size: 23px;
+  color: #ffffff;
+  -webkit-text-stroke: 1px #000000;
+}
+
+.bottom-admin {
+  font-family: 'JALNAN';
+  z-index: 3;
+  color: #27b9ac;
+  font-size: 23px;
+}
+
+.bottom-area-right p {
+  padding-left: 3%;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* 좌측 영역 */
+.left-section {
+  float: left;
+  width: 22.5%;
+  height: 94%;
+  position: relative;
+}
+
+.vertical-banner {
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+}
+
+/* 좌측 상단 랭킹 */
+.ranking-area {
+  display: flex;
+  flex-direction: column;
+  top: 3.5%;
+  width: 100%;
+  height: 25%;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.ranking-area-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ranking-text-area {
+  width: 90%;
+  height: 29%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 1%;
+  font-family: 'JALNAN';
+  font-size: 25px;
+  color: #ffffff;
+  -webkit-text-stroke: 2px black;
+}
+
+.ranking-text-area span {
+  margin-right: 1%;
+}
+
+.ranking-text-area#title {
+  font-family: 'BLACK-GOTHIC';
+  height: 15%;
+  justify-content: center;
+  padding-left: 0;
+  margin-top: 3%;
+  margin-bottom: 0;
+  font-size: 45px;
+  color: #ffd200;
+}
+
+.ranking-id-wrapper {
+  display: flex;
+  align-items: center;
+  width: 60%;
+  margin-left: 3%;
+}
+
+.ranking-text-area-id {
+  width: 85%;
+  display: block;
+  margin-left: 2%;
+  font-size: 30px;
+  color: #27b9ac;
+  -webkit-text-stroke: 1.5px black;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#ranking-icon {
+  width: 15%;
+  margin-right: 1%;
+}
+
+/* 좌측 배너영역 */
+.left-banner-area {
+  width: 100%;
+  height: 71.5%;
+  left: 0%;
+  bottom: 0%;
+  position: absolute;
+  background-color: white;
+  background: rgba(253, 253, 253, 0.8);
+}
+/* 우측상단 온애드 로고 */
+.top-right-logo {
+  top: 2.5%;
+  right: 2%;
+  position: fixed;
+}
+
+/* 우측 상단 응원메세지 영역 */
+.top-right {
+  display: none;
+  width: 34.4%;
+  height: 44.5%;
+  top: 9.5%;
+  right: 3%;
+  position: fixed;
+}
+
+.donation-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  -webkit-text-stroke: 1.5px rgb(46, 45, 45);
+  font-family: 'KOTRA';
+}
+
+.animated.heartbeat {
+  font-size: 20px;
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+}
+
+#donation-user-id {
+  font-size: 40px;
+  font-weight: bold;
+  color: #32c3a6;
+}
+
+#donation-num {
+  font-size: 40px;
+  font-weight: bold;
+  color: #32c3a6;
+}
+
+#message {
+  font-size: 40px;
+  color: rgb(255, 255, 255);
+}
+
+#donation-sub {
+  color: rgb(255, 255, 255);
+}
+
+.donation-image {
+  width: 100%;
+  height: 100%;
+  margin-bottom: 10px;
+}
+
+#donation-top {
+  margin: 6px;
+}
+
+/* 가상광고 */
+.virtual-ad {
+  position: fixed;
+  bottom: 10.7%;
+  right: 0px;
+  width: 40.6%;
+  height: 39%;
+}
+
+.virtual-ad img {
+  width: 100%;
+  height: 100%;
+}
+
+.virtual-ad-full {
+  position: fixed;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 13;
+}
+
+.virtual-ad-full img {
+  background-color: #ffffff;
+  width: 100%;
+  height: 100%;
+}
+
+/* 룰렛 */
+@font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff')
+    format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.roullette-area {
+  background-color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.roullette-container {
+  width: 508px;
+  height: 671px;
+  text-align: center;
+  position: relative;
+  margin: 0px auto;
+}
+
+.customerId {
+  position: absolute;
+}
+
+.board-start.done {
+  padding: 10px;
+  background: #f00;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 150px;
+  border: 1px solid #000;
+  color: #fff;
+  background: #f00;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  position: absolute;
+  left: 165px;
+  top: 210px;
+  z-index: 9;
+  width: 150px;
+  border-radius: 100px;
+}
+
+.board-start p {
+  width: 100%;
+}
+.board_bg {
+  width: 508px;
+  height: 508px;
+  top: 40px;
+  left: 0px;
+  z-index: 2;
+}
+.board_bg p {
+  width: 100%;
+}
+.board-on {
+  width: 508px;
+  height: 508px;
+  top: 40px;
+  left: 0px;
+  z-index: 3;
+  background-image: url('//img.babathe.com/upload/specialDisplay/htmlImage/2019/test/roulette_circle_bg.png');
+  background-size: 508px;
+}
+.board-on p {
+  position: absolute;
+  width: 100px;
+  top: 115px;
+  height: 100px;
+}
+
+.board-on p:nth-child(1) {
+  left: 55px;
+  transform: rotate(-60deg);
+  top: 120px;
+}
+.board-on p:nth-child(2) {
+  left: 62px;
+  transform: rotate(-113deg);
+  top: 286px;
+}
+.board-on p:nth-child(3) {
+  left: 208px;
+  top: 372px;
+  transform: rotate(-180deg);
+}
+.board-on p:nth-child(4) {
+  left: 351px;
+  top: 286px;
+  transform: rotate(-245deg);
+}
+.board-on p:nth-child(5) {
+  left: 351px;
+  top: 125px;
+  transform: rotate(-292deg);
+}
+.board-on p:nth-child(6) {
+  left: 205px;
+  top: 42px;
+  transform: rotate(5deg);
+}
+/* 
+.customerId.board_arrow {
+  width: 90px;
+  height: 105px;
+  top: 0px;
+  left: 195px;
+  z-index: 5;
+}
+.roullette-area .roullette-container .char1 {
+  width: 259px;
+  height: 246px;
+  top: 400px;
+  left: 90px;
+  z-index: 1;
+}
+.roullette-area .roullette-container .char2 {
+  width: 175px;
+  height: 198px;
+  top: 449px;
+  left: 600px;
+  z-index: 1;
+}
+.roullette-area .roullette-container .char3 {
+  width: 112px;
+  height: 108px;
+  top: 540px;
+  left: 550px;
+  z-index: 3;
+}
+.roullette-area .roullette-container .txt1 {
+  width: 420px;
+  height: 30px;
+  bottom: 20px;
+  left: 260px;
+  z-index: 3;
+} */

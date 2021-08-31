@@ -4,9 +4,9 @@ import { colorizedMorganMiddleware } from '@project-lc/nest-modules';
 
 export class AppSetting {
   constructor(private readonly app: NestExpressApplication) {}
-
   public initialize() {
     this.app.useStaticAssets(join(__dirname, 'public'));
+    this.app.useStaticAssets(join(__dirname, 'assets'));
     this.app.setBaseViewsDir(join(__dirname, 'views'));
     this.app.setViewEngine('hbs');
     this.app.enableCors();
