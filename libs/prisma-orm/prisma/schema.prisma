@@ -36,7 +36,7 @@ model SellerSocialAccount {
   profileImage String?
   accessToken  String?
   refreshToken String?
-  seller       Seller   @relation(fields: [sellerId], references: [id])
+  seller       Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   sellerId     Int
 }
 
@@ -46,7 +46,7 @@ model SellerSocialAccount {
 model Goods {
   id                      Int                @id @default(autoincrement())
   sellerId                Int
-  seller                  Seller             @relation(fields: [sellerId], references: [id])
+  seller                  Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   options                 GoodsOptions[]
   confirmation            GoodsConfirmation? // 상품 검수
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
@@ -85,7 +85,7 @@ model Goods {
 model GoodsConfirmation {
   id                         Int                       @id
   goodsId                    Int
-  goods                      Goods                     @relation(fields: [goodsId], references: [id])
+  goods                      Goods                     @relation(fields: [goodsId], references: [id], onDelete: Cascade)
   status                     GoodsConfirmationStatuses @default(waiting) // 검수 상태
   firstmallGoodsConnectionId Int? // 퍼스트몰 상품 고유 ID (fm_goods.goods_seq)
 }
