@@ -12,10 +12,10 @@ export enum SortDirection {
 
 export class GoodsListDto {
   @IsNumber()
-  page = 1;
+  page: number;
 
   @IsNumber()
-  itemPerPage = 10;
+  itemPerPage: number;
 
   @IsEnum(SortColumn)
   sort = SortColumn.REGIST_DATE;

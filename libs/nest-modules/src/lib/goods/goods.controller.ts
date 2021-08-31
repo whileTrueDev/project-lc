@@ -1,19 +1,22 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   ParseIntPipe,
   Patch,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { DeleteGoodsDto, GoodsListDto } from '@project-lc/shared-types';
+import { DeleteGoodsDto, SortColumn, SortDirection } from '@project-lc/shared-types';
 import { GoodsService } from './goods.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('goods')
 export class GoodsController {
   constructor(private readonly goodsService: GoodsService) {}
@@ -21,15 +24,19 @@ export class GoodsController {
   @Get('/list')
   getGoodsList(
     @SellerInfo() seller: UserPayload,
-    @Query(new ValidationPipe({ transform: true })) goodsListDto: GoodsListDto,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('itemPerPage', new DefaultValuePipe(10), ParseIntPipe) itemPerPage: number,
+    @Query('sort', new DefaultValuePipe(SortColumn.REGIST_DATE)) sort: SortColumn,
+    @Query('direction', new DefaultValuePipe(SortDirection.DESC))
+    direction: SortDirection,
   ) {
     return this.goodsService.getGoodsList({
       // email: 'a1919361@gmail.com',
       email: seller.sub, // seller.email
-      page: goodsListDto.page,
-      itemPerPage: goodsListDto.itemPerPage,
-      sort: goodsListDto.sort,
-      direction: goodsListDto.direction,
+      page,
+      itemPerPage,
+      sort,
+      direction,
     });
   }
 
