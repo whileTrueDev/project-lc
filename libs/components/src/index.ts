@@ -21,3 +21,4 @@ export * from './lib/PasswordSection';
 export * from './lib/AccountRemoveSection';
 export * from './lib/SocialAccountUnlinkSection';
 export * from './lib/FullscreenLoading';
+export * from './lib/SellerGoodsList';
