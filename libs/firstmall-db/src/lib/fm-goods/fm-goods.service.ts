@@ -36,10 +36,102 @@ export class FMGoodsService {
     }
   }
 
-  // goods_seq인 상품의 옵션과 재고정보 조회
+  // 상품의 옵션과 재고정보 조회
   async getStockInfo(goodsSeq: number) {
     const query = `
       SELECT 
+        o.*,
+        s.stock as stock,
+			  case when s.stock <= 0 then 1 else 0 end as stocknothing,
+			  s.badstock as badstock,
+			  s.reservation15 as reservation15,
+			  s.reservation25 as reservation25,
+			  s.total_supply_price	as total_supply_price,
+			  s.total_stock			as total_stock,
+			  s.total_badstock		as total_badstock,
+			  case when ( CONVERT(s.stock * 1, SIGNED) - CONVERT(s.reservation15 * 1, SIGNED)) <= 0 then 1 else 0 end as rstocknothing
+      FROM 
+        fm_goods_option o, fm_goods_supply s
+      WHERE 
+        o.option_seq = s.option_seq 
+        AND o.goods_seq =${goodsSeq}
     `;
+
+    const data = await this.db.query(query);
+
+    // 해당 상품의 옵션별 이름, 가격, 재고정보---------------------
+    const optionsInfo = data.map((option) => {
+      const {
+        option_seq, // 옵션 id
+        default_option, // 필수여부
+        option_title, // 옵션명(색상 등)
+        option1, // 옵션1 값 (화이트 등)
+        consumer_price, // 소비자가
+        price, // 판매가
+        stock, // 재고
+        badstock, // 불량재고
+        reservation15, // 주문접수 이상 출고예약량,
+        option_view, // 옵션 노출 여부
+      } = option;
+
+      return {
+        id: option_seq,
+        default_option,
+        option_title,
+        option1,
+        consumer_price,
+        price,
+        stock,
+        badstock,
+        option_view,
+        rstock: stock - badstock - reservation15, // 해당 옵션의 가용재고
+      };
+    });
+
+    // 해당 상품의 전체 재고 정보------------------------------
+    const stockInfo = optionsInfo.reduce(
+      (total, option) => {
+        return {
+          rstock: total.rstock + option.rstock,
+          a_stock_count:
+            option.rstock > 0 ? total.a_stock_count + 1 : total.a_stock_count,
+          b_stock_count:
+            option.rstock <= 0 ? total.b_stock_count + 1 : total.b_stock_count,
+          a_rstock: option.rstock > 0 ? total.a_rstock + option.rstock : total.a_rstock,
+          b_rstock: option.rstock <= 0 ? total.b_rstock + option.rstock : total.b_rstock,
+          a_stock: option.rstock > 0 ? total.a_stock + option.stock : total.a_stock,
+          b_stock: option.rstock <= 0 ? total.b_stock + option.stock : total.b_stock,
+        };
+      },
+      {
+        rstock: 0, // 해당 상품의 전체 가용 재고
+        a_stock_count: 0, // 가용재고 1개 이상인 옵션 개수
+        b_stock_count: 0, // 가용재고 0개 이하인 옵션 개수
+        a_rstock: 0, // 가용재고 1개 이상인 옵션의 가용재고
+        b_rstock: 0, // 가용재고 0개 이하인 옵션의 가용재고
+        a_stock: 0, // 가용재고 1개 이상인 옵션의 재고
+        b_stock: 0, // 가용재고 0개 이하인 옵션의 재고
+      },
+    );
+
+    return {
+      options: optionsInfo,
+      ...stockInfo,
+    };
+  }
+
+  // goods_seq인 상품의 노출정보 변경
+  async changeGoodsView(id: number, view: 'look' | 'notLook') {
+    const query = `
+    UPDATE fm_goods 
+    SET goods_view='${view}'
+    WHERE goods_seq=${id}
+    `;
+    try {
+      return this.db.query(query);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 }

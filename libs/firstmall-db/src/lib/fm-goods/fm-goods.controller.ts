@@ -3,12 +3,13 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   ParseIntPipe,
+  Patch,
+  Query,
   ValidationPipe,
 } from '@nestjs/common';
 import { DeleteGoodsDto } from '@project-lc/shared-types';
-import { GoodsService } from '@project-lc/nest-modules';
+import { GoodsService, SellerInfo, UserPayload } from '@project-lc/nest-modules';
 import { FMGoodsService } from './fm-goods.service';
 
 @Controller('fm-goods')
@@ -18,18 +19,34 @@ export class FmGoodsController {
     private readonly projectLcGoodsService: GoodsService,
   ) {}
 
-  @Get('/:goodsSeq/stock')
-  getStockInfo(@Param('goodsSeq', ParseIntPipe) goodsSeq: number) {
-    return this.fmGoodsService.getStockInfo(goodsSeq);
+  @Get('/stock')
+  getStockInfo(@Query('id', ParseIntPipe) id: number) {
+    return this.fmGoodsService.getStockInfo(id);
   }
 
+  /**
+   * fm_goods 테이블의 상품 노출여부를 변경
+   * @param dto
+   * @returns
+   */
+  @Patch('/expose')
+  changeGoodsView(@Body() dto: { view: 'look' | 'notLook'; id: number }) {
+    const { id, view } = dto;
+    return this.fmGoodsService.changeGoodsView(id, view);
+  }
+
+  /**
+   * fm_goods테이블의 상품 데이터를 삭제
+   * @param dto
+   * @returns
+   */
   @Delete()
   async deleteGoods(
-    // @SellerInfo() seller: UserPayload,
+    @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: DeleteGoodsDto,
   ) {
-    // const email = seller.sub;
-    const email = 'a1919361@gmail.com';
+    const email = seller.sub;
+    // const email = 'a1919361@gmail.com';
 
     const confirmedFmGoodsIds = await this.projectLcGoodsService.findMyGoodsIds(
       email,

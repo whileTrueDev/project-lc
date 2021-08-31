@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   ParseIntPipe,
   Patch,
   Query,
@@ -25,12 +24,18 @@ export class GoodsController {
     @Query(new ValidationPipe({ transform: true })) goodsListDto: GoodsListDto,
   ) {
     return this.goodsService.getGoodsList({
+      // email: 'a1919361@gmail.com',
       email: seller.sub, // seller.email
       page: goodsListDto.page,
       itemPerPage: goodsListDto.itemPerPage,
       sort: goodsListDto.sort,
       direction: goodsListDto.direction,
     });
+  }
+
+  @Get('/stock')
+  getStockInfo(@Query('id', ParseIntPipe) id: number) {
+    return this.goodsService.getStockInfo(id);
   }
 
   @Patch('/expose')
@@ -41,11 +46,11 @@ export class GoodsController {
 
   @Delete()
   async deleteGoods(
-    // @SellerInfo() seller: UserPayload,
+    @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: DeleteGoodsDto,
   ) {
-    // const email = seller.sub;
-    const email = 'a1919361@gmail.com';
+    const email = seller.sub;
+    // const email = 'a1919361@gmail.com';
     return this.goodsService.deleteLcGoods({
       email,
       ids: dto.ids,

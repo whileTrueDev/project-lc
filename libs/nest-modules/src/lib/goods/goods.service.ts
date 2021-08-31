@@ -10,7 +10,7 @@ export class GoodsService {
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
    * @param email seller.sub 로그인된 판매자 정보
-   * @param ids? 특정 상품 goods.id의 firstMallGoodsId만 조회하고 싶을 때
+   * @param ids? 특정 상품의 firstMallGoodsId만 조회하고 싶을 때
    */
   public async findMyGoodsIds(email: Seller['email'], ids?: number[]): Promise<number[]> {
     const goodsIds = await this.prisma.goods.findMany({
@@ -38,7 +38,8 @@ export class GoodsService {
   }
 
   /**
-   * 판매자가 등록한 모든 상품 목록 조회
+   * 모든 상품 목록 조회
+   * email 이 주어지면 해당 판매자의 상품만 조회
    * dto : email, page, itemPerPage, sort, direction
    * return : maxPage, totalItemCount, currentPage, prevPage, nextPage, items
    */
@@ -48,7 +49,7 @@ export class GoodsService {
     itemPerPage,
     sort,
     direction,
-  }: GoodsListDto & { email: string }) {
+  }: GoodsListDto & { email?: string }) {
     const items = await this.prisma.goods.findMany({
       skip: (page - 1) * itemPerPage,
       take: itemPerPage,
@@ -103,6 +104,73 @@ export class GoodsService {
     };
   }
 
+  // 옵션 재고 조회
+  public async getStockInfo(goods_seq: number) {
+    const optionStocks = await this.prisma.goodsOptions.findMany({
+      where: { goods: { id: goods_seq } },
+      include: { supply: true },
+    });
+
+    // 해당 상품의 옵션별 이름, 가격, 재고정보---------------------
+    const optionsInfo = optionStocks.map((option) => {
+      const {
+        id,
+        default_option,
+        option_title,
+        consumer_price,
+        price,
+        option_view,
+        supply,
+      } = option;
+
+      const stock = supply.reduce((sum, sup) => sum + sup.stock, 0); // 옵션의 재고
+      const badstock = supply.reduce((sum, sup) => sum + sup.badstock, 0); // 옵션의 불량재고
+      const rstock = stock - badstock; // 옵션의 가용재고
+      return {
+        id,
+        default_option,
+        option_title,
+        consumer_price,
+        price,
+        option_view,
+        stock,
+        badstock,
+        rstock, // 가용재고
+      };
+    });
+
+    // 해당 상품의 전체 재고 정보------------------------------
+    const stockInfo = optionsInfo.reduce(
+      (total, option) => {
+        return {
+          rstock: total.rstock + option.rstock,
+          a_stock_count:
+            option.rstock > 0 ? total.a_stock_count + 1 : total.a_stock_count,
+          b_stock_count:
+            option.rstock <= 0 ? total.b_stock_count + 1 : total.b_stock_count,
+          a_rstock: option.rstock > 0 ? total.a_rstock + option.rstock : total.a_rstock,
+          b_rstock: option.rstock <= 0 ? total.b_rstock + option.rstock : total.b_rstock,
+          a_stock: option.rstock > 0 ? total.a_stock + option.stock : total.a_stock,
+          b_stock: option.rstock <= 0 ? total.b_stock + option.stock : total.b_stock,
+        };
+      },
+      {
+        rstock: 0, // 해당 상품의 전체 가용 재고
+        a_stock_count: 0, // 가용재고 1개 이상인 옵션 개수
+        b_stock_count: 0, // 가용재고 0개 이하인 옵션 개수
+        a_rstock: 0, // 가용재고 1개 이상인 옵션의 가용재고
+        b_rstock: 0, // 가용재고 0개 이하인 옵션의 가용재고
+        a_stock: 0, // 가용재고 1개 이상인 옵션의 재고
+        b_stock: 0, // 가용재고 0개 이하인 옵션의 재고
+      },
+    );
+
+    return {
+      options: optionsInfo,
+      ...stockInfo,
+    };
+  }
+
   // 유저가 등록한 상품 삭제
   // dto: email, [itemId, itemId, ...]
   public async deleteLcGoods({ email, ids }: { email: string; ids: number[] }) {
@@ -121,6 +189,7 @@ export class GoodsService {
     }
   }
 
+  // 노출여부 변경
   public async changeGoodsView(id: number, view: 'look' | 'notLook') {
     try {
       return this.prisma.goods.update({
