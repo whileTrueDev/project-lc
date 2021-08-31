@@ -8,7 +8,10 @@ import {
   Divider,
   Center,
   VStack,
+  useDisclosure,
 } from '@chakra-ui/react';
+import { Fragment } from 'react';
+import { BusinessRegistrationDialog } from './BusinessRegistrationDialog';
 
 // grid 내에서 동일한 포맷팅을 수행하는 테이블 구현
 export function makeTable({
@@ -16,10 +19,10 @@ export function makeTable({
   value,
 }: {
   title: string;
-  value: string;
+  value: string | JSX.Element;
 }): JSX.Element {
   return (
-    <>
+    <Fragment key={title}>
       <GridItem
         colSpan={[2, 1, 1, 1]}
         p={3}
@@ -46,7 +49,7 @@ export function makeTable({
       >
         {value}
       </GridItem>
-    </>
+    </Fragment>
   );
 }
 
@@ -59,15 +62,18 @@ const columns = [
 ];
 
 export function BusinessRegistrationBox(): JSX.Element {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
       <Flex direction="row" justifyContent="space-between" pb={1} mb={3}>
         <Text fontSize="lg" fontWeight="medium">
           사업자 등록 정보
         </Text>
-        <Button size="sm">사업자 등록증 등록</Button>
+        <Button size="sm" onClick={onOpen}>
+          사업자 등록증 등록
+        </Button>
       </Flex>
-      {/* <Button as="span">등록하기</Button> */}
       {columns && columns.length > 0 ? (
         <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
           {columns.map((element) => makeTable(element))}
@@ -83,6 +89,7 @@ export function BusinessRegistrationBox(): JSX.Element {
           </Center>
         </>
       )}
+      <BusinessRegistrationDialog isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 }

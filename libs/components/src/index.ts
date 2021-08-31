@@ -25,3 +25,4 @@ export * from './lib/SettlementStateBox';
 export * from './lib/BusinessRegistrationBox';
 export * from './lib/SettlementAccountBox';
 export * from './lib/SettlementListBox';
+export * from './lib/BusinessRegistrationDialog';
