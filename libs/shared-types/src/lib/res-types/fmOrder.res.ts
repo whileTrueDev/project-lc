@@ -817,10 +817,6 @@ export interface FmOrderExport {
    * 총 출고 상품(옵션) 개수
    */
   ea: string;
-  /**
-   * 총 출고 상품(옵션) 가격
-   */
-  price: string;
 }
 
 /**
@@ -842,6 +838,7 @@ export type FmOrderMetaInfo = Pick<
   | 'recipient_phone'
   | 'recipient_cellphone'
   | 'recipient_email'
+  | 'recipient_zipcode'
   | 'recipient_address'
   | 'recipient_address_detail'
   | 'recipient_address_street'
@@ -849,7 +846,7 @@ export type FmOrderMetaInfo = Pick<
 > & {
   /** 주문아이디 */
   id: FmOrder['order_seq'];
-} & Pick<FmOrderItem, 'goods_name' | 'image'> & {
+} & Pick<FmOrderItem, 'goods_seq' | 'goods_name' | 'image'> & {
     /**
      * 배송비
      */
@@ -917,13 +914,13 @@ export interface FmOrderRefund {
   refund_goods_price: string;
 }
 
-export interface FmOrderReturn {
+export interface FmOrderReturnBase {
   /**
    * 반품 코드
    */
   return_code: string;
   /**
-   * 환불 코드 - 환풀이 포함된 경우
+   * 환불 코드 - 환불이 포함된 경우
    */
   refund_code: string;
   /**
@@ -958,7 +955,92 @@ export interface FmOrderReturn {
    * 반품 완료 일시 (date string)
    */
   return_date: string;
+  /**
+   * 선택한 반품/환불 사유
+   */
+  reason_desc: string;
+  /**
+   * 반품 상세 사유 (직접입력)
+   */
+  return_reason: string;
+  /**
+   * 반품방법 (user: 고객이 배송, shop: 상점이 회수)
+   */
+  return_method: 'user' | 'shop';
+  /**
+   * 회수지 우편번호
+   */
+  sender_zipcode: string;
+  /**
+   * 회수지 주소 도로명/지번 구분
+   */
+  sender_address_type: 'street' | 'zibun';
+  /**
+   * 회수지 주소
+   */
+  sender_address: string;
+  /**
+   * 회수지 도로명주소
+   */
+  sender_address_street: string;
+  /**
+   * 회수지 주소 상세
+   */
+  sender_address_detail: string;
+  /**
+   * 반송자 전화번호
+   */
+  phone: string;
+  /**
+   * 반송자 폰번호
+   */
+  cellphone: string;
 }
+
+export interface FmOrderReturnBaseItem {
+  /**
+   * 반품 상품 고유 번호
+   */
+  return_item_seq: number;
+  /**
+   * 반품 상품 코드
+   */
+  item_seq: number;
+  /**
+   * 반품 상품 옵션 코드 (fm_order_item_option.item_option_seq)
+   */
+  option_seq: number;
+  /**
+   * 반품 개수
+   */
+  ea: number;
+  /**
+   * 반품 사유
+   */
+  reason_desc: string;
+}
+
+export type FmOrderReturn = FmOrderReturnBase & {
+  /**
+   * 환불 상품 옵션 목록
+   */
+  items: Array<
+    FmOrderReturnBaseItem &
+      Pick<
+        FmOrderOption,
+        | 'item_option_seq'
+        | 'title1'
+        | 'option1'
+        | 'ea'
+        | 'step'
+        | 'member_sale'
+        | 'mobile_sale'
+        | 'color'
+        | 'price'
+        | 'ori_price'
+      >
+  >;
+};
 
 /**
  * 상품 상세 정보 반환 데이터 타입

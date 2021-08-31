@@ -4,6 +4,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GoodsModule, GoodsService, JwtAuthGuard } from '@project-lc/nest-modules';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
+import {
+  orderDetailExportsSample,
+  orderDetailOptionsSample,
+  orderDetailRefundsSample,
+  orderDetailReturnsSample,
+  orderMetaInfoSample,
+} from '../../__tests__/orderDetailSample';
 import { ordersSample } from '../../__tests__/ordersSample';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FmOrdersController } from './fm-orders.controller';
@@ -66,6 +73,24 @@ describe('FmOrdersController', () => {
       return request(app.getHttpServer())
         .get('/fm-orders?search=test')
         .expect(200, ordersSample);
+    });
+  });
+
+  describe('GET /fm-orders', () => {
+    const result = {
+      ...orderMetaInfoSample,
+      options: orderDetailOptionsSample,
+      exports: orderDetailExportsSample,
+      refunds: orderDetailRefundsSample,
+      returns: orderDetailReturnsSample,
+    };
+    it('should be return 200', async () => {
+      jest.spyOn(service, 'findOneOrder').mockImplementation(async (id: string) => {
+        if (!id) return null;
+        return result;
+      });
+
+      return request(app.getHttpServer()).get('/fm-orders/1234').expect(200, result);
     });
   });
 });

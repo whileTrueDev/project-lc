@@ -3,6 +3,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrdersDto } from '@project-lc/shared-types';
 import { ordersSample } from '../../__tests__/ordersSample';
+import {
+  orderDetailExportsSample,
+  orderDetailOptionsSample,
+  orderDetailRefundsSample,
+  orderDetailReturnsSample,
+  orderMetaInfoSample,
+} from '../../__tests__/orderDetailSample';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FmOrdersService } from './fm-orders.service';
 
@@ -191,6 +198,125 @@ describe('FmOrdersService', () => {
 
       expect(orders[0].goods_name).toEqual(ordersSample[0].goods_name);
       expect(orders[0].id).toEqual(ordersSample[0].id);
+    });
+  });
+
+  describe('[PRIVATE Method] findOneOrderInfo', () => {
+    const orderId = 'TESTORDERID';
+
+    it('should be successed', async () => {
+      const querySpy = jest
+        .spyOn(db, 'query')
+        .mockImplementation(async () => [orderMetaInfoSample]);
+      const orderDetail = await service['findOneOrderInfo'](orderId);
+
+      expect(querySpy).toBeCalledTimes(2);
+
+      expect(orderDetail).toEqual(orderMetaInfoSample);
+    });
+
+    it('should be return null', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
+      const orderDetail = await service['findOneOrderInfo'](orderId);
+      expect(querySpy).toBeCalledTimes(3);
+
+      expect(orderDetail).toEqual(null);
+    });
+  });
+
+  describe('[PRIVATE Method] findOneOrderOptions', () => {
+    const orderId = 'TESTORDERID';
+
+    it('should be successed', async () => {
+      const querySpy = jest
+        .spyOn(db, 'query')
+        .mockImplementation(async () => orderDetailOptionsSample);
+      const orderDetail = await service['findOneOrderOptions'](orderId);
+
+      expect(querySpy).toBeCalledTimes(4);
+
+      expect(orderDetail).toEqual(orderDetailOptionsSample);
+    });
+
+    it('should be return empty array', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
+      const orderDetail = await service['findOneOrderOptions'](orderId);
+      expect(querySpy).toBeCalledTimes(5);
+
+      expect(orderDetail).toEqual([]);
+    });
+  });
+
+  describe('[PRIVATE Method] findOneOrderExports', () => {
+    const orderId = 'TESTORDERID';
+
+    it('should be successed', async () => {
+      const querySpy = jest
+        .spyOn(db, 'query')
+        .mockImplementation(async () => [orderDetailExportsSample]);
+      const orderDetail = await service['findOneOrderExports'](orderId);
+
+      expect(querySpy).toBeCalledTimes(6);
+
+      expect(orderDetail).toEqual(orderDetailExportsSample);
+    });
+
+    it('should be return null', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
+      const orderDetail = await service['findOneOrderExports'](orderId);
+      expect(querySpy).toBeCalledTimes(7);
+
+      expect(orderDetail).toEqual(null);
+    });
+  });
+
+  describe('[PRIVATE Method] findOneOrderRefunds', () => {
+    const orderId = 'TESTORDERID';
+
+    it('should be successed', async () => {
+      const querySpy = jest
+        .spyOn(db, 'query')
+        .mockImplementation(async () => [orderDetailRefundsSample]);
+      const orderDetail = await service['findOneOrderRefunds'](orderId);
+
+      expect(querySpy).toBeCalledTimes(8);
+
+      expect(orderDetail).toEqual(orderDetailRefundsSample);
+    });
+
+    it('should be return null', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
+      const orderDetail = await service['findOneOrderRefunds'](orderId);
+      expect(querySpy).toBeCalledTimes(9);
+
+      expect(orderDetail).toEqual(null);
+    });
+  });
+
+  describe('[PRIVATE Method] findOneOrderReturns', () => {
+    const orderId = 'TESTORDERID';
+
+    it('should be successed', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async (sql) => {
+        const { items, ...rest } = orderDetailReturnsSample;
+        if (sql.includes('GROUP BY return_code')) {
+          return [rest];
+        }
+        return items;
+      });
+      const orderDetail = await service['findOneOrderReturns'](orderId);
+
+      expect(querySpy).toBeCalledTimes(11);
+
+      expect(orderDetail).toEqual(orderDetailReturnsSample);
+    });
+
+    it('should be return null', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
+      const orderDetail = await service['findOneOrderReturns'](orderId);
+      expect(querySpy).toBeCalledTimes(12);
+
+      expect(orderDetail).toEqual(null);
     });
   });
 });

@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query, UseGuards, ValidationPipe } from '@nestjs/common';
-import { FindFmOrdersDto } from '@project-lc/shared-types';
+import { FindFmOrderDetailRes, FindFmOrdersDto } from '@project-lc/shared-types';
 import {
   JwtAuthGuard,
   SellerInfo,
@@ -28,7 +28,9 @@ export class FmOrdersController {
   }
 
   @Get(':orderId')
-  async findOneOrder(@Param('orderId') orderId: string): Promise<any | null> {
+  async findOneOrder(
+    @Param('orderId') orderId: string,
+  ): Promise<FindFmOrderDetailRes | null> {
     return this.fmOrdersService.findOneOrder(orderId);
   }
 }

@@ -9,6 +9,7 @@ import {
   FmOrderOption,
   FmOrderRefund,
   FmOrderReturn,
+  FmOrderReturnBase,
 } from '@project-lc/shared-types';
 import { FirstmallDbService } from '../firstmall-db.service';
 
@@ -172,6 +173,7 @@ export class FmOrdersService {
   ): Promise<FmOrderMetaInfo> {
     const sql = `
     SELECT
+      fm_order_item.goods_seq,
       fm_order_item.goods_name,
       fm_order_item.image,
       fm_order_shipping.shipping_cost,
@@ -193,8 +195,10 @@ export class FmOrdersService {
       recipient_phone,
       recipient_cellphone,
       recipient_email,
+      recipient_zipcode,
       recipient_address,
       recipient_address_street,
+      recipient_address_detail,
       recipient_address_detail,
       memo
     FROM fm_order
@@ -256,11 +260,9 @@ export class FmOrdersService {
       fm_goods_export.status export_status,
       fm_goods_export.delivery_company_code,
       fm_goods_export.delivery_number,
-      SUM(fm_goods_export_item.ea) ea,
-      SUM(fm_order_item_option.price) price
+      SUM(fm_goods_export_item.ea) ea
     FROM fm_goods_export
     JOIN fm_goods_export_item USING(export_code)
-    JOIN fm_order_item_option ON fm_order_item_option.item_seq = option_seq
     WHERE fm_goods_export.order_seq = ?
     GROUP BY export_code
     `;
@@ -301,11 +303,21 @@ export class FmOrdersService {
   ): Promise<FmOrderReturn> {
     const sql = `SELECT
       fm_order_return.return_code,
-      fm_order_return.return_type,
       fm_order_return.refund_code,
+      fm_order_return.return_type,
+      fm_order_return.status,
       fm_order_return.regist_date,
       fm_order_return.return_date,
-      fm_order_return.status,
+      fm_order_return.reason_desc,
+      fm_order_return.return_reason,
+      fm_order_return.return_method,
+      fm_order_return.sender_zipcode,
+      fm_order_return.sender_address_type,
+      fm_order_return.sender_address,
+      fm_order_return.sender_address_street,
+      fm_order_return.sender_address_detail,
+      fm_order_return.phone,
+      fm_order_return.cellphone,
       fm_manager.manager_id,
       fm_manager.memail,
       fm_manager.mcellphone,
@@ -318,6 +330,36 @@ export class FmOrdersService {
     `;
     const result = await this.db.query(sql, [orderId]);
     if (result.length === 0) return null;
-    return result[0];
+
+    const returns = result[0] as FmOrderReturnBase;
+
+    const itemsResult = await this.db.query(
+      `SELECT
+        fm_order_return_item.return_item_seq,
+        fm_order_return_item.item_seq,
+        fm_order_return_item.option_seq,
+        fm_order_return_item.ea,
+        fm_order_return_item.reason_desc,
+        fm_order_item_option.item_option_seq,
+        fm_order_item_option.title1,
+        fm_order_item_option.option1,
+        fm_order_item_option.ea,
+        fm_order_item_option.step,
+        fm_order_item_option.member_sale,
+        fm_order_item_option.mobile_sale,
+        fm_order_item_option.color,
+        fm_order_item_option.price,
+        fm_order_item_option.ori_price
+      FROM fm_order_return_item
+      JOIN fm_order_item_option
+        ON fm_order_item_option.item_option_seq = fm_order_return_item.option_seq
+      WHERE return_code = ?`,
+      [returns.return_code],
+    );
+
+    return {
+      ...returns,
+      items: itemsResult,
+    };
   }
 }
