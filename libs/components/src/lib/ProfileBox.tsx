@@ -1,4 +1,4 @@
-import { Avatar, Center, Grid, GridItem, Text } from '@chakra-ui/react';
+import { Avatar, Grid, GridItem, Text } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
 
 export function ProfileBox(): JSX.Element {
