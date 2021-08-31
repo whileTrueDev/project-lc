@@ -1,7 +1,13 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { GoodsListDto } from '@project-lc/shared-types';
+import {
+  GoodsListDto,
+  GoodsOptionWithStockInfo,
+  GoodsOptionsWithSupplies,
+  TotalStockInfo,
+  GoodsListRes,
+} from '@project-lc/shared-types';
 
 @Injectable()
 export class GoodsService {
@@ -49,40 +55,38 @@ export class GoodsService {
     itemPerPage,
     sort,
     direction,
-  }: GoodsListDto & { email?: string }) {
+  }: GoodsListDto & { email?: string }): Promise<GoodsListRes> {
     const items = await this.prisma.goods.findMany({
       skip: (page - 1) * itemPerPage,
       take: itemPerPage,
       where: { seller: { email } },
       orderBy: [{ [sort]: direction }],
-      select: {
-        id: true,
-        sellerId: true,
-        goods_name: true,
-        runout_policy: true,
-        shipping_policy: true,
-        regist_date: true,
-        update_date: true,
-        goods_status: true,
-        goods_view: true,
+      include: {
         options: {
-          select: {
-            default_option: true,
-            consumer_price: true,
-            price: true,
-            supply: {
-              select: {
-                stock: true,
-                badstock: true,
-                safe_stock: true,
-              },
-            },
+          include: {
+            supply: true,
           },
         },
-        confirmation: {
-          select: { id: true, status: true, firstmallGoodsConnectionId: true },
-        },
+        confirmation: true,
       },
+    });
+
+    const list = items.map((item) => {
+      const optionsWithStockInfo = this.addAvailableStockInfoToOptions(item.options);
+      const itemStockInfo = this.intergrateOptionStocks(optionsWithStockInfo);
+      return {
+        id: item.id,
+        sellerId: item.sellerId,
+        goods_name: item.goods_name,
+        runout_policy: item.runout_policy,
+        shipping_policy: item.shipping_policy,
+        regist_date: item.regist_date,
+        update_date: item.update_date,
+        goods_status: item.goods_status,
+        goods_view: item.goods_view,
+        ...itemStockInfo,
+        confirmation: item.confirmation ? item.confirmation.status : null,
+      };
     });
 
     // 해당 판매자가 등록한 전체 아이템 개수
@@ -95,7 +99,7 @@ export class GoodsService {
     const prevPage = currentPage > 1 ? currentPage - 1 : null; // 이전페이지
 
     return {
-      items,
+      items: list,
       totalItemCount,
       maxPage,
       currentPage,
@@ -104,15 +108,11 @@ export class GoodsService {
     };
   }
 
-  // 옵션 재고 조회
-  public async getStockInfo(goods_seq: number) {
-    const optionStocks = await this.prisma.goodsOptions.findMany({
-      where: { goods: { id: goods_seq } },
-      include: { supply: true },
-    });
-
-    // 해당 상품의 옵션별 이름, 가격, 재고정보---------------------
-    const optionsInfo = optionStocks.map((option) => {
+  // 상품옵션목록에 각 옵션 별 가용재고 정보를 추가
+  private addAvailableStockInfoToOptions(
+    options: GoodsOptionsWithSupplies[],
+  ): GoodsOptionWithStockInfo[] {
+    return options.map((option) => {
       const {
         id,
         default_option,
@@ -138,9 +138,13 @@ export class GoodsService {
         rstock, // 가용재고
       };
     });
+  }
 
-    // 해당 상품의 전체 재고 정보------------------------------
-    const stockInfo = optionsInfo.reduce(
+  // 옵션별 재고 통합
+  private intergrateOptionStocks(
+    optionsWithStockInfo: GoodsOptionWithStockInfo[],
+  ): TotalStockInfo {
+    return optionsWithStockInfo.reduce(
       (total, option) => {
         return {
           rstock: total.rstock + option.rstock,
@@ -164,6 +168,20 @@ export class GoodsService {
         b_stock: 0, // 가용재고 0개 이하인 옵션의 재고
       },
     );
+  }
+
+  // 옵션 재고 조회
+  public async getStockInfo(goods_seq: number) {
+    const optionStocks = await this.prisma.goodsOptions.findMany({
+      where: { goods: { id: goods_seq } },
+      include: { supply: true },
+    });
+
+    // 해당 상품의 옵션별 이름, 가격, 재고정보 추가
+    const optionsInfo = this.addAvailableStockInfoToOptions(optionStocks);
+
+    // 해당 상품의 전체 재고 정보------------------------------
+    const stockInfo = this.intergrateOptionStocks(optionsInfo);
 
     return {
       options: optionsInfo,

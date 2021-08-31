@@ -17,3 +17,4 @@ export * from './lib/front-type/orderFilterFormType';
 export * from './lib/res-types/userProfile.res';
 export * from './lib/dto/goodsList.dto';
 export * from './lib/dto/deleteGoods.dto';
+export * from './lib/res-types/goodsList.res';
