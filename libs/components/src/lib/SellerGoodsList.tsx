@@ -18,6 +18,7 @@ import {
   Icon,
   useDisclosure,
   useToast,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import {
   useDeleteFmGoods,
@@ -45,6 +46,7 @@ import {
   GOODS_VIEW,
   GOODS_CONFIRMATION_STATUS,
 } from '../constants/goodsStatus';
+import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 
 function formatPrice(price: number): string {
   const formattedPrice = price.toLocaleString();
@@ -54,6 +56,7 @@ function formatDate(date: Date): string {
   return dayjs(date).format('YYYY/MM/DD HH:mm');
 }
 
+// * 상품목록 datagrid 컬럼 ***********************************************
 const columns: GridColumns = [
   { field: 'id', headerName: 'ID', width: 40, sortable: false },
   {
@@ -141,9 +144,21 @@ const columns: GridColumns = [
   {
     field: 'goods_view',
     headerName: '노출',
-    minWidth: 50,
+    width: 60,
     valueGetter: ({ row }) => {
       return GOODS_VIEW[row.goods_view as GoodsView];
+    },
+    renderCell: ({ row }) => {
+      const goodsId = row.id;
+      const goodsView = row.goods_view;
+      const confirmedGoodsId = row.confirmation?.firstmallGoodsConnectionId;
+      return (
+        <GoodsExposeSwitch
+          goodsId={goodsId}
+          goodsView={goodsView}
+          confirmedGoodsId={confirmedGoodsId}
+        />
+      );
     },
     sortable: false,
   },
@@ -151,12 +166,16 @@ const columns: GridColumns = [
   {
     field: 'confirmation',
     headerName: '검수',
-    minWidth: 50,
+    width: 60,
     renderCell: ({ row }) => {
       const { label, colorScheme } = row.confirmation
         ? GOODS_CONFIRMATION_STATUS[row.confirmation.status as GoodsConfirmationStatuses]
         : GOODS_CONFIRMATION_STATUS.waiting;
-      return <Badge colorScheme={colorScheme}>{label}</Badge>;
+      return (
+        <Badge variant="solid" colorScheme={colorScheme} width="100%">
+          {label}
+        </Badge>
+      );
     },
     sortable: false,
   },
@@ -180,6 +199,7 @@ const columns: GridColumns = [
     },
   },
 ];
+// * 상품목록 datagrid 컬럼 끝*********************************************
 
 export function SellerGoodsList(): JSX.Element {
   const queryClient = useQueryClient();
@@ -207,10 +227,12 @@ export function SellerGoodsList(): JSX.Element {
     },
   );
 
+  // 페이지당 보여질 행 개수 변경 핸들러
   const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target;
     changeItemPerPage(Number(value));
   };
+  // 상품 정렬 변경 핸들러
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target;
     switch (value) {
@@ -224,17 +246,25 @@ export function SellerGoodsList(): JSX.Element {
     }
   };
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef<HTMLButtonElement>(null);
-
+  // 선택된 상품 id
   const [selectedGoodsIds, setSelectedGoodsIds] = useState<GridSelectionModel>([]);
   const hasSelectedGoods = selectedGoodsIds.length > 0;
+
+  // 상품선택 핸들러
   const handleSelection = (selectionModel: GridSelectionModel) => {
     setSelectedGoodsIds(selectionModel);
   };
 
+  // 상품삭제 시 alert 다이얼로그
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Goods테이블에서 삭제요청
   const deleteLcGoods = useDeleteLcGoods();
+  // fm-goods 테이블에서 삭제요청
   const deleteFmGoods = useDeleteFmGoods();
+
+  // 삭제 다이얼로그에서 확인 눌렀을 때 상품삭제 핸들러
   const handleDelete = async () => {
     if (!data || !hasSelectedGoods) return;
     // 검수된 상품
@@ -272,6 +302,7 @@ export function SellerGoodsList(): JSX.Element {
   return (
     <Box>
       <ChakraDataGrid
+        bg={useColorModeValue('inherit', 'gray.300')}
         loading={isLoading}
         rows={data?.items || []}
         autoHeight
