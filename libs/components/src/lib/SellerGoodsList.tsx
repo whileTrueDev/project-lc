@@ -9,8 +9,22 @@ import {
   Stack,
   Text,
   Link,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Icon,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
-import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
+import {
+  useDeleteFmGoods,
+  useDeleteLcGoods,
+  useProfile,
+  useSellerGoodsList,
+} from '@project-lc/hooks';
 import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
 import dayjs from 'dayjs';
 import {
@@ -21,6 +35,9 @@ import {
 } from '@prisma/client';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import { SortColumn, SortDirection } from '@project-lc/shared-types';
+import { useRef, useState } from 'react';
+import { WarningTwoIcon } from '@chakra-ui/icons';
+import { useQueryClient } from 'react-query';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import {
   RUNOUT_POLICY,
@@ -137,7 +154,7 @@ const columns: GridColumns = [
     minWidth: 50,
     renderCell: ({ row }) => {
       const { label, colorScheme } = row.confirmation
-        ? GOODS_CONFIRMATION_STATUS[row.confirmation as GoodsConfirmationStatuses]
+        ? GOODS_CONFIRMATION_STATUS[row.confirmation.status as GoodsConfirmationStatuses]
         : GOODS_CONFIRMATION_STATUS.waiting;
       return <Badge colorScheme={colorScheme}>{label}</Badge>;
     },
@@ -165,6 +182,8 @@ const columns: GridColumns = [
 ];
 
 export function SellerGoodsList(): JSX.Element {
+  const queryClient = useQueryClient();
+  const toast = useToast();
   const { data: profileData } = useProfile();
   const {
     page,
@@ -187,9 +206,7 @@ export function SellerGoodsList(): JSX.Element {
       enabled: !!profileData?.email,
     },
   );
-  const handleSelection = (selectionModel: GridSelectionModel) => {
-    console.log({ selectionModel });
-  };
+
   const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target;
     changeItemPerPage(Number(value));
@@ -206,9 +223,52 @@ export function SellerGoodsList(): JSX.Element {
       default:
     }
   };
-  const handleDelete = () => {
-    console.log('delete');
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  const [selectedGoodsIds, setSelectedGoodsIds] = useState<GridSelectionModel>([]);
+  const hasSelectedGoods = selectedGoodsIds.length > 0;
+  const handleSelection = (selectionModel: GridSelectionModel) => {
+    setSelectedGoodsIds(selectionModel);
   };
+
+  const deleteLcGoods = useDeleteLcGoods();
+  const deleteFmGoods = useDeleteFmGoods();
+  const handleDelete = async () => {
+    if (!data || !hasSelectedGoods) return;
+    // 검수된 상품
+    const confirmedGoods = data.items.filter(
+      (item) =>
+        selectedGoodsIds.includes(item.id) &&
+        item.confirmation &&
+        item.confirmation.status === 'confirmed' &&
+        item.confirmation.firstmallGoodsConnectionId !== null,
+    );
+
+    try {
+      // 전체 선택된 상품 Goods테이블에서 삭제요청
+      const deleteGoodsFromLcDb = deleteLcGoods.mutateAsync({
+        ids: selectedGoodsIds.map((id) => Number(id)),
+      });
+      // 선택된 상품 중 검수된 상품은 fm-goods 테이블에서 삭제요청
+      const deleteGoodsFromFmDb = deleteFmGoods.mutateAsync({
+        ids: confirmedGoods.map((item) => Number(item.id)),
+      });
+      await Promise.all([deleteGoodsFromLcDb, deleteGoodsFromFmDb]);
+      queryClient.invalidateQueries('SellerGoodsList');
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: '상품 삭제 중 오류가 발생하였습니다',
+        status: 'error',
+        isClosable: true,
+      });
+    } finally {
+      onClose();
+    }
+  };
+
   return (
     <Box>
       <ChakraDataGrid
@@ -227,7 +287,7 @@ export function SellerGoodsList(): JSX.Element {
         components={{
           Toolbar: () => (
             <Stack spacing={3} direction="row" justify="space-between" p={2}>
-              <Button onClick={handleDelete} colorScheme="red" size="sm">
+              <Button onClick={onOpen} colorScheme="red" size="sm">
                 선택 삭제
               </Button>
               <Stack direction="row">
@@ -255,6 +315,42 @@ export function SellerGoodsList(): JSX.Element {
           ),
         }}
       />
+      {/* 상품 삭제 alert */}
+      <AlertDialog
+        isCentered
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              <Text>
+                <Icon as={WarningTwoIcon} color="red.500" mr={2} />
+                상품 삭제
+              </Text>
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              {!hasSelectedGoods
+                ? '삭제할 상품을 선택해주세요'
+                : '상품 삭제시 복구가 불가합니다. 선택한 상품을 삭제하시겠습니까?'}
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              {hasSelectedGoods && <Button onClick={onClose}>취소</Button>}
+              <Button
+                onClick={!hasSelectedGoods ? onClose : handleDelete}
+                ml={3}
+                colorScheme={!hasSelectedGoods ? undefined : 'red'}
+                isLoading={deleteLcGoods.isLoading || deleteFmGoods.isLoading}
+              >
+                확인
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 }

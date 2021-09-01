@@ -6,10 +6,16 @@ import {
   ParseIntPipe,
   Patch,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { DeleteGoodsDto } from '@project-lc/shared-types';
-import { GoodsService, SellerInfo, UserPayload } from '@project-lc/nest-modules';
+import {
+  GoodsService,
+  JwtAuthGuard,
+  SellerInfo,
+  UserPayload,
+} from '@project-lc/nest-modules';
 import { FMGoodsService } from './fm-goods.service';
 
 @Controller('fm-goods')
@@ -41,6 +47,7 @@ export class FmGoodsController {
    * @returns
    */
   @Delete()
+  @UseGuards(JwtAuthGuard)
   async deleteGoods(
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: DeleteGoodsDto,
