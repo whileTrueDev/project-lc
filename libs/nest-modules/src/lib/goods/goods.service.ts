@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Seller } from '@prisma/client';
+import { GoodsView, Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsListDto,
@@ -89,7 +89,7 @@ export class GoodsService {
         default_price: defaultOption.price, // 판매가(할인가)
         default_consumer_price: defaultOption.consumer_price, // 소비자가(미할인가)
         ...itemStockInfo,
-        confirmation: item.confirmation ? item.confirmation.status : null,
+        confirmation: item.confirmation,
       };
     });
 
@@ -212,7 +212,7 @@ export class GoodsService {
   }
 
   // 노출여부 변경
-  public async changeGoodsView(id: number, view: 'look' | 'notLook') {
+  public async changeGoodsView(id: number, view: GoodsView) {
     try {
       return this.prisma.goods.update({
         where: { id },

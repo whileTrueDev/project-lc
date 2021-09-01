@@ -1,5 +1,6 @@
 import {
   Goods,
+  GoodsConfirmation,
   GoodsConfirmationStatuses,
   GoodsOptions,
   GoodsOptionsSupplies,
@@ -46,7 +47,7 @@ export type SellerGoodsListItem = Pick<
   | 'goods_view'
 > &
   TotalStockInfo & {
-    confirmation?: null | GoodsConfirmationStatuses;
+    confirmation?: GoodsConfirmation;
     default_price: Decimal; // 판매가(할인가) - GoodsOptions중 default_option의 판매가
     default_consumer_price: Decimal; // 소비자가(미할인가) - GoodsOptions중 default_option의 소비자가
   };

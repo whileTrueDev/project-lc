@@ -11,6 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { DeleteGoodsDto, SortColumn, SortDirection } from '@project-lc/shared-types';
+import { GoodsView } from '@prisma/client';
 import { GoodsService } from './goods.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
@@ -46,7 +47,7 @@ export class GoodsController {
   }
 
   @Patch('/expose')
-  changeGoodsView(@Body() dto: { view: 'look' | 'notLook'; id: number }) {
+  changeGoodsView(@Body() dto: { view: GoodsView; id: number }) {
     const { id, view } = dto;
     return this.goodsService.changeGoodsView(id, view);
   }
