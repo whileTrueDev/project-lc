@@ -1,5 +1,15 @@
 /* eslint-disable camelcase */
-import { Badge, Box, Text } from '@chakra-ui/react';
+import NextLink from 'next/link';
+import {
+  Badge,
+  Box,
+  Button,
+  ButtonGroup,
+  Select,
+  Stack,
+  Text,
+  Link,
+} from '@chakra-ui/react';
 import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
 import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
 import dayjs from 'dayjs';
@@ -10,6 +20,7 @@ import {
   RunoutPolicy,
 } from '@prisma/client';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
+import { SortColumn, SortDirection } from '@project-lc/shared-types';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import {
   RUNOUT_POLICY,
@@ -28,7 +39,25 @@ function formatDate(date: Date): string {
 
 const columns: GridColumns = [
   { field: 'id', headerName: 'ID', width: 40, sortable: false },
-  { field: 'goods_name', headerName: '상품명', sortable: false },
+  {
+    field: 'goods_name',
+    headerName: '상품명',
+    minWidth: 120,
+    flex: 1,
+    sortable: false,
+    // TODO: 상품 상세페이지 일감 진행 후 상품 상세페이지로 이동 기능 추가
+    renderCell: ({ row }) => {
+      const goodsId = row.id;
+      const { goods_name } = row;
+      return (
+        <NextLink href={`#${goodsId}`} passHref>
+          <Link width="100%">
+            <Text isTruncated>{goods_name}</Text>
+          </Link>
+        </NextLink>
+      );
+    },
+  },
   {
     field: 'default_price',
     headerName: '판매가',
@@ -41,47 +70,6 @@ const columns: GridColumns = [
     headerName: '정가',
     type: 'number',
     valueFormatter: ({ row }) => formatPrice(Number(row.default_consumer_price)),
-    sortable: false,
-  },
-  {
-    field: 'runout_policy',
-    headerName: '재고판매',
-    align: 'center',
-    valueGetter: ({ row }) => {
-      return RUNOUT_POLICY[row.runout_policy as RunoutPolicy];
-    },
-    sortable: false,
-  },
-  { field: 'shipping_policy', headerName: '배송비', sortable: false }, // TODO: 배송비 정책 혹은 상품 등록 진행 후 배송비 정책 연결 필요
-  {
-    field: 'date',
-    headerName: '등록일/수정일',
-    width: 150,
-    renderCell: ({ row }) => {
-      const { regist_date, update_date } = row;
-      return (
-        <Box>
-          <Text height="20px">{formatDate(regist_date as Date)}</Text>
-          <Text>{formatDate(update_date as Date)}</Text>
-        </Box>
-      );
-    },
-    sortable: false,
-  },
-  {
-    field: 'goods_status',
-    headerName: '상태',
-    valueGetter: ({ row }) => {
-      return GOODS_STATUS[row.goods_status as GoodsStatus];
-    },
-    sortable: false,
-  },
-  {
-    field: 'goods_view',
-    headerName: '노출',
-    valueGetter: ({ row }) => {
-      return GOODS_VIEW[row.goods_view as GoodsView];
-    },
     sortable: false,
   },
   {
@@ -99,8 +87,54 @@ const columns: GridColumns = [
     sortable: false,
   },
   {
+    field: 'runout_policy',
+    headerName: '재고판매',
+    align: 'center',
+    valueGetter: ({ row }) => {
+      return RUNOUT_POLICY[row.runout_policy as RunoutPolicy];
+    },
+    sortable: false,
+  },
+  // TODO: 배송비 정책 혹은 상품 등록 진행 후 배송비 정책 연결 필요
+  { field: 'shipping_policy', headerName: '배송비', sortable: false, minWidth: 80 },
+  {
+    field: 'date',
+    headerName: '등록일/수정일',
+    minWidth: 150,
+    renderCell: ({ row }) => {
+      const { regist_date, update_date } = row;
+      return (
+        <Box>
+          <Text height="20px">{formatDate(regist_date as Date)}</Text>
+          <Text>{formatDate(update_date as Date)}</Text>
+        </Box>
+      );
+    },
+    sortable: false,
+  },
+  {
+    field: 'goods_status',
+    headerName: '상태',
+    minWidth: 50,
+    valueGetter: ({ row }) => {
+      return GOODS_STATUS[row.goods_status as GoodsStatus];
+    },
+    sortable: false,
+  },
+  {
+    field: 'goods_view',
+    headerName: '노출',
+    minWidth: 50,
+    valueGetter: ({ row }) => {
+      return GOODS_VIEW[row.goods_view as GoodsView];
+    },
+    sortable: false,
+  },
+
+  {
     field: 'confirmation',
     headerName: '검수',
+    minWidth: 50,
     renderCell: ({ row }) => {
       const { label, colorScheme } = row.confirmation
         ? GOODS_CONFIRMATION_STATUS[row.confirmation as GoodsConfirmationStatuses]
@@ -108,6 +142,25 @@ const columns: GridColumns = [
       return <Badge colorScheme={colorScheme}>{label}</Badge>;
     },
     sortable: false,
+  },
+  {
+    field: 'manage',
+    headerName: '관리',
+    minWidth: 120,
+    // TODO: 상품등록 일감 진행 후 복사, 수정기능 추가
+    renderCell: ({ row }) => {
+      const goodsId = row.id;
+      return (
+        <ButtonGroup>
+          <Button size="sm" onClick={() => console.log({ goodsId })}>
+            수정
+          </Button>
+          <Button size="sm" onClick={() => console.log({ goodsId })}>
+            복사
+          </Button>
+        </ButtonGroup>
+      );
+    },
   },
 ];
 
@@ -137,6 +190,25 @@ export function SellerGoodsList(): JSX.Element {
   const handleSelection = (selectionModel: GridSelectionModel) => {
     console.log({ selectionModel });
   };
+  const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target;
+    changeItemPerPage(Number(value));
+  };
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target;
+    switch (value) {
+      case 'regist_date':
+        changeSort(SortColumn.REGIST_DATE, SortDirection.DESC);
+        break;
+      case 'goods_name':
+        changeSort(SortColumn.GOODS_NAME, SortDirection.DESC);
+        break;
+      default:
+    }
+  };
+  const handleDelete = () => {
+    console.log('delete');
+  };
   return (
     <Box>
       <ChakraDataGrid
@@ -152,6 +224,36 @@ export function SellerGoodsList(): JSX.Element {
         pageSize={itemPerPage}
         rowCount={data?.totalItemCount}
         onPageChange={changePage}
+        components={{
+          Toolbar: () => (
+            <Stack spacing={3} direction="row" justify="space-between" p={2}>
+              <Button onClick={handleDelete} colorScheme="red" size="sm">
+                선택 삭제
+              </Button>
+              <Stack direction="row">
+                <Select
+                  defaultValue={10}
+                  onChange={handlePageSizeChange}
+                  width="150px"
+                  size="sm"
+                >
+                  <option value={10}>10개씩</option>
+                  <option value={20}>20개씩</option>
+                  <option value={30}>30개씩</option>
+                </Select>
+                <Select
+                  defaultValue={SortColumn.REGIST_DATE}
+                  onChange={handleSortChange}
+                  width="150px"
+                  size="sm"
+                >
+                  <option value={SortColumn.REGIST_DATE}>최근 등록 순</option>
+                  <option value={SortColumn.GOODS_NAME}>상품명 순</option>
+                </Select>
+              </Stack>
+            </Stack>
+          ),
+        }}
       />
     </Box>
   );
