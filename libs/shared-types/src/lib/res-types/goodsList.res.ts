@@ -47,6 +47,8 @@ export type SellerGoodsListItem = Pick<
 > &
   TotalStockInfo & {
     confirmation?: null | GoodsConfirmationStatuses;
+    default_price: Decimal; // 판매가(할인가) - GoodsOptions중 default_option의 판매가
+    default_consumer_price: Decimal; // 소비자가(미할인가) - GoodsOptions중 default_option의 소비자가
   };
 
 export type GoodsListRes = {

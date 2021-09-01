@@ -74,6 +74,8 @@ export class GoodsService {
     const list = items.map((item) => {
       const optionsWithStockInfo = this.addAvailableStockInfoToOptions(item.options);
       const itemStockInfo = this.intergrateOptionStocks(optionsWithStockInfo);
+
+      const defaultOption = item.options.find((opt) => opt.default_option === 'y');
       return {
         id: item.id,
         sellerId: item.sellerId,
@@ -84,6 +86,8 @@ export class GoodsService {
         update_date: item.update_date,
         goods_status: item.goods_status,
         goods_view: item.goods_view,
+        default_price: defaultOption.price, // 판매가(할인가)
+        default_consumer_price: defaultOption.consumer_price, // 소비자가(미할인가)
         ...itemStockInfo,
         confirmation: item.confirmation ? item.confirmation.status : null,
       };
