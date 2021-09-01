@@ -55,12 +55,16 @@ describe('FmOrdersService', () => {
       // where 구문이 올바르게 들어갔는 지 검사
       expect(sql).toContain('AND (DATE(regist_date) >= ? AND DATE(regist_date) <= ?)');
       expect(sql).toContain('OR fm_order.order_seq LIKE ?');
+      expect(sql).toContain('OR REPLACE(fm_order.order_phone, "-", "") LIKE ?');
+      expect(sql).toContain('OR REPLACE(fm_order.order_cellphone, "-", "") LIKE ?');
+      expect(sql).toContain('OR REPLACE(fm_order.recipient_phone, "-", "") LIKE ?');
+      expect(sql).toContain('OR REPLACE(fm_order.recipient_cellphone, "-", "") LIKE ?');
 
       // params 길이, 내용 검사
-      expect(params.length).toBe(15);
+      expect(params.length).toBe(21);
       expect(params[0]).toEqual(dto.searchStartDate);
       expect(params[1]).toEqual(dto.searchEndDate);
-      expect(params.slice(2, 15)).toEqual(new Array(13).fill(`%${dto.search}%`));
+      expect(params.slice(2, 21)).toEqual(new Array(19).fill(`%${dto.search}%`));
     });
   });
 
@@ -78,10 +82,14 @@ describe('FmOrdersService', () => {
 
     // where 구문이 올바르게 들어갔는 지 검사
     expect(sql).toContain('OR order_seq LIKE ?');
+    expect(sql).toContain('OR REPLACE(fm_order.order_phone, "-", "") LIKE ?');
+    expect(sql).toContain('OR REPLACE(fm_order.order_cellphone, "-", "") LIKE ?');
+    expect(sql).toContain('OR REPLACE(fm_order.recipient_phone, "-", "") LIKE ?');
+    expect(sql).toContain('OR REPLACE(fm_order.recipient_cellphone, "-", "") LIKE ?');
 
     // params 길이, 내용 검사
-    expect(params.length).toBe(13);
-    expect(params).toEqual(new Array(13).fill(`%${dto.search}%`));
+    expect(params.length).toBe(19);
+    expect(params).toEqual(new Array(19).fill(`%${dto.search}%`));
   });
 
   it('searchStartDate 만 주어진 경우', () => {

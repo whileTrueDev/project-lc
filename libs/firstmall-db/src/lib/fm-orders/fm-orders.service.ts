@@ -62,7 +62,12 @@ export class FmOrdersService {
       OR fm_order.order_cellphone LIKE ?
       OR REPLACE(fm_order.order_cellphone, "-", "") LIKE ?
       OR fm_order.order_phone LIKE ?
-      OR REPLACE(fm_order.order_phone, "-", "") LIKE ?`;
+      OR REPLACE(fm_order.order_phone, "-", "") LIKE ?
+      OR fm_order.recipient_cellphone LIKE ?
+      OR REPLACE(fm_order.recipient_cellphone, "-", "") LIKE ?
+      OR fm_order.recipient_phone LIKE ?
+      OR REPLACE(fm_order.recipient_phone, "-", "") LIKE ?
+      `;
 
     let whereSql = '';
     let orderSql = '';
@@ -97,7 +102,7 @@ export class FmOrdersService {
 
       if (dto.search) {
         whereSql += `\nAND (${searchSql}) `;
-        params = params.concat(new Array(15).fill(`%${dto.search}%`));
+        params = params.concat(new Array(19).fill(`%${dto.search}%`));
         return {
           sql: defaultQueryHead + whereSql + orderSql,
           params,
@@ -119,7 +124,7 @@ export class FmOrdersService {
 
       return {
         sql: defaultQueryHead + whereSql + orderSql,
-        params: new Array(15).fill(`%${dto.search}%`),
+        params: new Array(19).fill(`%${dto.search}%`),
       };
     }
 
