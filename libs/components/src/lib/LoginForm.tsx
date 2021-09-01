@@ -6,6 +6,7 @@ import {
   Alert,
   AlertIcon,
   AlertTitle,
+  Box,
   Button,
   Checkbox,
   CloseButton,
@@ -84,6 +85,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
           />
           <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
         </FormControl>
+
         <FormControl isInvalid={!!errors.password}>
           <FormLabel htmlFor="password">암호</FormLabel>
           <Input
@@ -96,6 +98,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
             {errors.password && errors.password.message}
           </FormErrorMessage>
         </FormControl>
+
         <FormControl>
           <Checkbox size="sm" {...register('stayLogedIn')}>
             로그인 상태 유지
@@ -109,30 +112,43 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
           </Alert>
         )}
 
-        <Button
-          bg="blue.400"
-          color="white"
-          _hover={{ bg: 'blue.500' }}
-          type="submit"
-          isLoading={isSubmitting}
-          onClick={resetFormError}
-        >
-          로그인
-        </Button>
-        <NextLink href="/resetPassword" passHref>
-          <Link fontSize="sm" ml={2} color={useColorModeValue('blue.500', 'blue.400')}>
-            비밀번호를 잊어버리셨나요?
-          </Link>
-        </NextLink>
-        <SocialButtonGroup />
-        <Text fontSize="sm">
-          처음 오셨나요?
-          <NextLink href="/signup" passHref>
-            <Link ml={2} color={useColorModeValue('blue.500', 'blue.400')}>
-              가입하기
+        <Box>
+          <Button
+            isFullWidth
+            bg="blue.400"
+            color="white"
+            _hover={{ bg: 'blue.500' }}
+            type="submit"
+            isLoading={isSubmitting}
+            onClick={resetFormError}
+          >
+            로그인
+          </Button>
+        </Box>
+
+        <Box pb={2}>
+          <SocialButtonGroup />
+        </Box>
+
+        <Stack spacing={1} mt={2}>
+          <NextLink href="/resetPassword" passHref>
+            <Link fontSize="sm" textDecoration="underline">
+              암호를 잊어버리셨나요?
             </Link>
           </NextLink>
-        </Text>
+          <Text fontSize="sm">
+            처음 오셨나요?
+            <NextLink href="/signup" passHref>
+              <Link
+                ml={2}
+                color={useColorModeValue('blue.500', 'blue.400')}
+                textDecoration="underline"
+              >
+                가입하기
+              </Link>
+            </NextLink>
+          </Text>
+        </Stack>
       </Stack>
     </CenterBox>
   );
