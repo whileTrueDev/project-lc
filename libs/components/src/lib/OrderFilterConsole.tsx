@@ -51,7 +51,7 @@ export function OrderFilterConsole(): JSX.Element {
     >
       <Flex px={[2, 4]} as="section">
         <InputGroup size="md">
-          <InputLeftElement pointerEvents="none">
+          <InputLeftElement pointerEvents="none" zIndex="auto">
             <Search2Icon size="md" />
           </InputLeftElement>
           <Input

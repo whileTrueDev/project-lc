@@ -23,6 +23,7 @@ import { useDisplaySize, useFmOrders } from '@project-lc/hooks';
 import {
   convertFmOrderStatusToString,
   convertOrderSitetypeToString,
+  FmOrderStatusNumString,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
@@ -167,9 +168,9 @@ const columns: GridColumns = [
     hideSortIcons: true,
     sortable: false,
     valueFormatter: ({ value }) => convertFmOrderStatusToString(value as any) || '-',
-    renderCell: (param) => (
+    renderCell: ({ value }) => (
       <Box lineHeight={2}>
-        <FmOrderStatusBadge orderStatus={param.row.step} />
+        <FmOrderStatusBadge orderStatus={value as FmOrderStatusNumString} />
       </Box>
     ),
   },
@@ -236,25 +237,7 @@ export function OrderToolbar({ selectedItems, options }: OrderToolbarProps) {
   return (
     <GridToolbarContainer>
       <Stack spacing={2} direction="row">
-        {isMobile ? (
-          <Menu>
-            <MenuButton size="sm" as={Button} rightIcon={<ChevronDownIcon />}>
-              주문 처리 메뉴
-            </MenuButton>
-            <MenuList>
-              {options.map((opt) => (
-                <MenuItem
-                  icon={opt.icon}
-                  onClick={() => opt.onClick(selectedItems)}
-                  key={opt.name}
-                  isDisabled={selectedItems.length === 0}
-                >
-                  {opt.name}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-        ) : (
+        {isMobile ? null : (
           <>
             {options.map((opt) => (
               <Button
@@ -269,7 +252,11 @@ export function OrderToolbar({ selectedItems, options }: OrderToolbarProps) {
             ))}
             <Button size="sm" as="div" isDisabled={selectedItems.length === 0}>
               <GridToolbarExport
-                csvOptions={{ fileName: '주문목록' }}
+                csvOptions={{
+                  fileName: `project-lc_주문목록_${dayjs().format(
+                    'YYYY-MM-DD-HH-mm-ss',
+                  )}`,
+                }}
                 disabled={selectedItems.length === 0}
               />
             </Button>
