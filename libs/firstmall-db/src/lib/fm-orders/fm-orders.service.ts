@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   FindFmOrderDetailRes,
   FindFmOrderRes,
@@ -10,6 +10,7 @@ import {
   FmOrderRefund,
   FmOrderReturn,
   FmOrderReturnBase,
+  FmOrderStatusNumString,
 } from '@project-lc/shared-types';
 import { FirstmallDbService } from '../firstmall-db.service';
 
@@ -361,5 +362,50 @@ export class FmOrdersService {
       ...returns,
       items: itemsResult,
     };
+  }
+
+  /** 주문 상태 변경 */
+  public async changeOrderStatus(
+    orderId: FmOrder['order_seq'],
+    targetStatus: FmOrderStatusNumString,
+  ) {
+    const orderStatusSql = `UPDATE
+      fm_order, fm_order_item_option 
+    SET fm_order.step = ?, fm_order_item_option.step = ?
+    WHERE
+      fm_order.order_seq = ?
+    AND fm_order.order_seq = fm_order_item_option.order_seq
+    AND ea != step85`;
+
+    switch (targetStatus) {
+      // 결제확인으로 되돌리기
+      case '25': {
+        const orderItemOptionSql = `UPDATE fm_order_item_option
+        SET step35 = 0
+        WHERE order_seq = ? AND ea != step85`;
+
+        return this.db.transactionQuery(async (conn) => {
+          await conn.query(orderStatusSql, [targetStatus, targetStatus, orderId]);
+          await conn.query(orderItemOptionSql, [orderId]);
+          conn.commit();
+          return true;
+        });
+      }
+      // 상품준비로 변경
+      case '35': {
+        const orderItemOptionSql = `UPDATE fm_order_item_option
+        SET step35 = ea
+        WHERE order_seq = ? AND ea != step85`;
+
+        return this.db.transactionQuery(async (conn) => {
+          await conn.query(orderStatusSql, [targetStatus, targetStatus, orderId]);
+          await conn.query(orderItemOptionSql, [orderId]);
+          conn.commit();
+          return true;
+        });
+      }
+      default:
+        throw new BadRequestException('targetStatus parameter is required');
+    }
   }
 }

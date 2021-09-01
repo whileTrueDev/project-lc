@@ -59,9 +59,11 @@ export function OrderDetailOptionListItem({
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
       {withBadge && <FmOrderStatusBadge orderStatus={option.step} />}
-      <Text isTruncated>
-        {option.title1}: {option.option1}
-      </Text>
+      {option.title1 && option.option1 && (
+        <Text isTruncated>
+          {option.title1}: {option.option1}
+        </Text>
+      )}
       {option.color && (
         <Box w={4} h={4} bgColor={option.color} border="1px solid black" />
       )}
@@ -84,49 +86,67 @@ export function OrderDetailOptionDescription({
   const { isOpen, onToggle } = useDisclosure({});
   return (
     <Box mt={2}>
-      <ShowMoreTextButton onClick={onToggle} />
+      <ShowMoreTextButton onClick={onToggle} isOpen={isOpen} />
 
       <Collapse in={isOpen} animateOpacity unmountOnExit>
-        {order.shipping_type && order.shipping_cost && (
-          <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
-            <Text>{convertFmOrderShippingTypesToString(order.shipping_type)}</Text>
-            <TextDotConnector />
-            <Text>배송비: {Number(order.shipping_cost).toLocaleString()} 원</Text>
-          </Stack>
-        )}
+        <Box mt={2}>
+          {order.shipping_type && order.shipping_cost && (
+            <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
+              <Text>{convertFmOrderShippingTypesToString(order.shipping_type)}</Text>
+              <TextDotConnector />
+              <Text>배송비: {Number(order.shipping_cost).toLocaleString()} 원</Text>
+            </Stack>
+          )}
 
-        <Box my={2}>
-          <Text fontWeight="bold">옵션별 상태</Text>
-          <Table>
-            <Thead>
-              <Tr>
-                <Th>상품</Th>
-                <Th>총 수량</Th>
-                <Th>{convertFmOrderStatusToString('35')}</Th>
-                <Th>{convertFmOrderStatusToString('45')}</Th>
-                <Th>{convertFmOrderStatusToString('55')}</Th>
-                <Th>{convertFmOrderStatusToString('65')}</Th>
-                <Th>{convertFmOrderStatusToString('75')}</Th>
-                <Th>{convertFmOrderStatusToString('85')}</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {options.map((opt) => (
-                <Tr key={opt.item_option_seq}>
-                  <Td>
-                    {opt.title1}: {opt.option1}
-                  </Td>
-                  <Td>{opt.ea} 개</Td>
-                  <Td>{opt.step35}</Td>
-                  <Td>{opt.step45}</Td>
-                  <Td>{opt.step55}</Td>
-                  <Td>{opt.step65}</Td>
-                  <Td>{opt.step75}</Td>
-                  <Td>{opt.step85}</Td>
+          <Box my={2}>
+            <Text fontWeight="bold">상품별(옵션별) 상태</Text>
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>상품</Th>
+                  <Th>총 수량</Th>
+                  <Th>
+                    <FmOrderStatusBadge orderStatus="35" />
+                  </Th>
+                  <Th>
+                    <FmOrderStatusBadge orderStatus="45" />
+                  </Th>
+                  <Th>
+                    <FmOrderStatusBadge orderStatus="55" />
+                  </Th>
+                  <Th>
+                    <FmOrderStatusBadge orderStatus="65" />
+                  </Th>
+                  <Th>
+                    <FmOrderStatusBadge orderStatus="75" />
+                  </Th>
+                  <Th>
+                    <FmOrderStatusBadge orderStatus="85" />
+                  </Th>
                 </Tr>
-              ))}
-            </Tbody>
-          </Table>
+              </Thead>
+              <Tbody>
+                {options.map((opt) => (
+                  <Tr key={opt.item_option_seq}>
+                    {opt.title1 && opt.option1 ? (
+                      <Td>
+                        {opt.title1}: {opt.option1}
+                      </Td>
+                    ) : (
+                      <Td>{order.goods_name}</Td>
+                    )}
+                    <Td>{opt.ea} 개</Td>
+                    <Td>{opt.step35}</Td>
+                    <Td>{opt.step45}</Td>
+                    <Td>{opt.step55}</Td>
+                    <Td>{opt.step65}</Td>
+                    <Td>{opt.step75}</Td>
+                    <Td>{opt.step85}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
         </Box>
       </Collapse>
     </Box>

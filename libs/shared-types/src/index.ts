@@ -19,3 +19,4 @@ export * from './lib/res-types/fmOrder.res';
 export * from './lib/res-types/loginUserRes';
 export * from './lib/res-types/userProfile.res';
 export * from './lib/shared-types';
+export * from './lib/dto/changeFmOrderStatus.dto';

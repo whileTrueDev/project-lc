@@ -41,7 +41,9 @@ const columns: GridColumns = [
     renderCell: (params) => {
       return (
         <NextLink href={`/mypage/orders/${params.row.id}`} passHref>
-          <Link>{params.row.id}</Link>
+          <Link color="blue.500" textDecoration="underline">
+            {params.row.id}
+          </Link>
         </NextLink>
       );
     },
@@ -124,12 +126,15 @@ const columns: GridColumns = [
       const depositdate = dayjs(row.deposit_date).format('YYYY/MM/DD HH:mm:ss');
       return row.depositor + (row.deposit_date ? `/${depositdate}` : '');
     },
-    renderCell: (params) => (
-      <Text>
-        {params.row.depositor}
-        {params.row.deposit_date ? `/${params.row.deposit_date}` : ''}
-      </Text>
-    ),
+    renderCell: (params) => {
+      const t = `${params.row.depositor}
+      ${
+        params.row.deposit_date
+          ? `/${dayjs(params.row.deposit_date).format('YYYY/MM/DD HH:mm:ss')}`
+          : ''
+      }`;
+      return <TooltipedText text={t} />;
+    },
   },
   {
     field: 'settleprice',
@@ -199,7 +204,7 @@ export function OrderList(): JSX.Element {
               options={[
                 {
                   name: '출고 처리',
-                  onClick: (itemIds) => console.log(itemIds),
+                  onClick: (itemIds) => alert(itemIds),
                   icon: <Icon as={FaTruck} />,
                   emphasize: true,
                 },

@@ -10,7 +10,7 @@ export interface OrderDetailGoodsProps {
 /** 주문 상품 정보 */
 export function OrderDetailGoods({ order }: OrderDetailGoodsProps) {
   const orderPrice = useMemo(() => {
-    const reduced = order.options.reduce((p, c) => p + Number(c.price), 0);
+    const reduced = order.options.reduce((p, c) => p + Number(c.price) * Number(c.ea), 0);
     return `${reduced.toLocaleString()} 원`;
   }, [order.options]);
   return (

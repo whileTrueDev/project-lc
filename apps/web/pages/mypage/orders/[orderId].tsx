@@ -1,10 +1,18 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
-import { Box, Button, Center, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
 import {
-  FmOrderStatusBadge,
-  FmRefundStatusBadge,
-  FmReturnStatusBadge,
+  Box,
+  Button,
+  Center,
+  Skeleton,
+  SkeletonCircle,
+  SkeletonText,
+  Stack,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
+import {
   MypageLayout,
+  OrderDetailActions,
   OrderDetailDeliveryInfo,
   OrderDetailExportInfo,
   OrderDetailGoods,
@@ -12,20 +20,14 @@ import {
   OrderDetailRefundInfo,
   OrderDetailReturnInfo,
   OrderDetailSummary,
+  OrderDetailTitle,
   OrderRefundExistsAlert,
   OrderReturnExistsAlert,
   SectionWithTitle,
-  TextDotConnector,
 } from '@project-lc/components';
 import { useFmOrder } from '@project-lc/hooks';
-import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { useRouter } from 'next/router';
 import React from 'react-transition-group/node_modules/@types/react';
-
-dayjs.locale('ko');
-dayjs.extend(relativeTime);
 
 const refundSectionTitle = '환불 정보';
 const returnSectionTitle = '반품 정보';
@@ -37,14 +39,13 @@ export function OrderDetail(): JSX.Element {
 
   const order = useFmOrder(orderId);
 
-  if (order.isLoading)
+  if (order.isLoading) {
     return (
       <MypageLayout>
-        <Center>
-          <Spinner />
-        </Center>
+        <OrderDetaiLoading />
       </MypageLayout>
     );
+  }
 
   if (!order.isLoading && !order.data)
     return (
@@ -74,43 +75,45 @@ export function OrderDetail(): JSX.Element {
           </Button>
         </Box>
 
+        {/* 주문 제목 */}
         <Box as="section">
-          <Heading>주문 {order.data.id}</Heading>
-          <Stack direction="row" alignItems="center">
-            <FmOrderStatusBadge orderStatus={order.data.step} />
-            {order.data.refunds && (
-              <FmRefundStatusBadge refundStatus={order.data.refunds.status} />
-            )}
-            {order.data.returns && (
-              <FmReturnStatusBadge returnStatus={order.data.returns.status} />
-            )}
-            <TextDotConnector />
-            <Text>{dayjs(order.data.regist_date).fromNow()}</Text>
-          </Stack>
+          <OrderDetailTitle order={order.data} />
         </Box>
 
-        <Stack as="section">
-          {order.data.returns && (
-            <OrderReturnExistsAlert targetSectionTitle={returnSectionTitle} />
-          )}
-          {order.data.refunds && (
-            <OrderRefundExistsAlert targetSectionTitle={refundSectionTitle} />
-          )}
-        </Stack>
+        {/* 환불 , 반품 알림 문구 */}
+        {(order.data.returns || order.data.refunds) && (
+          <Stack as="section">
+            {order.data.returns && (
+              <OrderReturnExistsAlert targetSectionTitle={returnSectionTitle} />
+            )}
+            {order.data.refunds && (
+              <OrderRefundExistsAlert targetSectionTitle={refundSectionTitle} />
+            )}
+          </Stack>
+        )}
 
+        {/* 주문 버튼 */}
         <Box as="section" mt={4}>
+          <OrderDetailActions order={order.data} />
+        </Box>
+
+        {/* 주문 요약 */}
+        <Box as="section">
           <OrderDetailSummary order={order.data} />
         </Box>
 
+        {/* 주문 상품 정보 */}
         <SectionWithTitle title="주문 상품 정보">
           <OrderDetailGoods order={order.data} />
           <OrderDetailOptionList order={order.data} options={order.data.options} />
         </SectionWithTitle>
 
+        {/* 주문자 / 수령자 정보 */}
         <SectionWithTitle title="주문자 / 수령자 정보">
           <OrderDetailDeliveryInfo order={order.data} />
         </SectionWithTitle>
 
+        {/* 출고 정보 */}
         {order.data.exports && (
           <SectionWithTitle title="출고 정보">
             <OrderDetailExportInfo
@@ -120,12 +123,14 @@ export function OrderDetail(): JSX.Element {
           </SectionWithTitle>
         )}
 
+        {/* 반품 정보 */}
         {order.data.returns && (
           <SectionWithTitle title={returnSectionTitle}>
             <OrderDetailReturnInfo returns={order.data.returns} />
           </SectionWithTitle>
         )}
 
+        {/* 환불 정보 */}
         {order.data.refunds && (
           <SectionWithTitle title={refundSectionTitle}>
             <OrderDetailRefundInfo
@@ -140,3 +145,26 @@ export function OrderDetail(): JSX.Element {
 }
 
 export default OrderDetail;
+
+export function OrderDetaiLoading() {
+  return (
+    <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2}>
+      <Stack p={4}>
+        <Skeleton height={12} />
+        <Skeleton height={6} w={280} />
+      </Stack>
+
+      <Stack mt={6}>
+        <Stack padding="6" boxShadow="lg" bg="white" direction="row" spacing={6}>
+          <Skeleton w={280} height={72} />
+          <VStack>
+            <Box w={280}>
+              <SkeletonCircle size="12" />
+              <SkeletonText mt="4" noOfLines={4} spacing="4" />
+            </Box>
+          </VStack>
+        </Stack>
+      </Stack>
+    </Stack>
+  );
+}

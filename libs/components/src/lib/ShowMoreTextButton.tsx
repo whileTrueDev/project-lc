@@ -1,10 +1,14 @@
-import { ChevronRightIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { Button, useColorModeValue } from '@chakra-ui/react';
 
 export interface ShowMoreTextButtonProps {
   onClick: () => void;
+  isOpen?: boolean;
 }
-export function ShowMoreTextButton({ onClick }: ShowMoreTextButtonProps): JSX.Element {
+export function ShowMoreTextButton({
+  onClick,
+  isOpen = false,
+}: ShowMoreTextButtonProps): JSX.Element {
   const buttonText = useColorModeValue('#1a202c', '#ffffffeb');
   return (
     <Button
@@ -12,7 +16,7 @@ export function ShowMoreTextButton({ onClick }: ShowMoreTextButtonProps): JSX.El
       variant="link"
       color={buttonText}
       textDecoration="underline"
-      rightIcon={<ChevronRightIcon />}
+      rightIcon={isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
       onClick={onClick}
     >
       자세히 보기

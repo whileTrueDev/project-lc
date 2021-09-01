@@ -14,3 +14,4 @@ export * from './lib/queries/useFmOrders';
 export * from './lib/queries/useProfile';
 export * from './lib/queries/useSocialAccounts';
 export * from './lib/useDisplaySize';
+export * from './lib/mutation/useChangeFmOrderStatusMutation';
