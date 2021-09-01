@@ -23,6 +23,6 @@ export const useSellerGoodsList = (
   return useQuery<GoodsListRes>(
     queryKey,
     () => getSellerGoodsList({ page, itemPerPage, sort, direction }),
-    { retry: 1, ...options },
+    { retry: 1, keepPreviousData: true, ...options },
   );
 };
