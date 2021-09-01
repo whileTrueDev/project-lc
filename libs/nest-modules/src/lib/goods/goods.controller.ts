@@ -24,7 +24,7 @@ export class GoodsController {
   @Get('/list')
   getGoodsList(
     @SellerInfo() seller: UserPayload,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('page', new DefaultValuePipe(0), ParseIntPipe) page: number,
     @Query('itemPerPage', new DefaultValuePipe(10), ParseIntPipe) itemPerPage: number,
     @Query('sort', new DefaultValuePipe(SortColumn.REGIST_DATE)) sort: SortColumn,
     @Query('direction', new DefaultValuePipe(SortDirection.DESC))

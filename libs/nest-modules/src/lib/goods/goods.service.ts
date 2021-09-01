@@ -57,7 +57,7 @@ export class GoodsService {
     direction,
   }: GoodsListDto & { email?: string }): Promise<GoodsListRes> {
     const items = await this.prisma.goods.findMany({
-      skip: (page - 1) * itemPerPage,
+      skip: page * itemPerPage,
       take: itemPerPage,
       where: { seller: { email } },
       orderBy: [{ [sort]: direction }],
