@@ -54,15 +54,35 @@ export function makeTable({
 }
 
 const columns = [
-  { title: '회사명', value: '와일트루' },
-  { title: '사업자등록번호', value: '659-03-01549' },
-  { title: '대표명', value: '강동기' },
-  { title: '업태/종목', value: '교육서비스업 / 소프트웨어 개발 및 공급업' },
-  { title: '전자세금계산서 수신 이메일', value: 'qkrcksdn0208@naver.com' },
+  { title: '회사명', field: 'companyName' },
+  { title: '사업자등록번호', field: 'businessRegistrationNumber' },
+  { title: '대표명', field: 'representativeName' },
+  { title: '업태/종목', field: ['businessType', 'businessItem'] },
+  { title: '사업장소재지', field: 'businessAddress' },
+  { title: '전자세금계산서 수신 이메일', field: 'taxInvoiceMail' },
 ];
 
-export function BusinessRegistrationBox(): JSX.Element {
+function makeListRow(businessRegistration: any) {
+  if (!businessRegistration) {
+    return [];
+  }
+  return columns.map(({ title, field }) => {
+    if (Array.isArray(field)) {
+      return {
+        title,
+        value: `${businessRegistration[field[0]]} / ${businessRegistration[field[1]]}`,
+      };
+    }
+    return {
+      title,
+      value: businessRegistration[field],
+    };
+  });
+}
+
+export function BusinessRegistrationBox(props): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { businessRegistration, refetch } = props;
 
   return (
     <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
@@ -74,9 +94,9 @@ export function BusinessRegistrationBox(): JSX.Element {
           사업자 등록증 등록
         </Button>
       </Flex>
-      {columns && columns.length > 0 ? (
+      {businessRegistration ? (
         <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-          {columns.map((element) => makeTable(element))}
+          {makeListRow(businessRegistration).map((element) => makeTable(element))}
         </Grid>
       ) : (
         <>
@@ -89,7 +109,7 @@ export function BusinessRegistrationBox(): JSX.Element {
           </Center>
         </>
       )}
-      <BusinessRegistrationDialog isOpen={isOpen} onClose={onClose} />
+      <BusinessRegistrationDialog isOpen={isOpen} onClose={onClose} refetch={refetch} />
     </Box>
   );
 }

@@ -57,7 +57,7 @@ const columns: GridColumns = [
     headerName: '정산 금액',
     valueFormatter: ({ row }) =>
       new Intl.NumberFormat('kr', { style: 'currency', currency: 'KRW' }).format(
-        row.payment,
+        row.amount,
       ),
   },
   {
@@ -67,9 +67,19 @@ const columns: GridColumns = [
   },
 ];
 
+function makeListRow(sellerSettlements: any[] | undefined) {
+  if (!sellerSettlements) {
+    return [];
+  }
+  return sellerSettlements.map((element, index: number) => {
+    return { ...element, id: index, isRowSelectable: false };
+  });
+}
+
 // 정산 내역을 보여주는 데이터 그리드
-export function SettlementList(): JSX.Element {
+export function SettlementList(props): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
+  const { sellerSettlements } = props;
 
   return (
     <ChakraDataGrid
@@ -79,22 +89,7 @@ export function SettlementList(): JSX.Element {
       minHeight={150}
       density="compact"
       columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
-      rows={[
-        {
-          id: '1',
-          date: '2021-09-01 13:00:00',
-          payment: 29999,
-          state: 1,
-          isRowSelectable: false,
-        },
-        {
-          id: '2',
-          date: '2021-09-01 00:00:00',
-          payment: 49999,
-          state: 2,
-          isRowSelectable: false,
-        },
-      ]}
+      rows={makeListRow(sellerSettlements)}
       style={{ borderWidth: 0 }}
       rowCount={5}
       rowsPerPageOptions={[5, 10]}

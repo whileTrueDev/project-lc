@@ -17,6 +17,7 @@ import {
   PasswordValidateDto,
   SellerEmailDupCheckDto,
   SignUpSellerDto,
+  BusinessRegistrationDto,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -83,5 +84,22 @@ export class SellerController {
   @Patch('password')
   public async changePassword(@Body(ValidationPipe) dto: PasswordValidateDto) {
     return this.sellerService.changePassword(dto.email, dto.password);
+  }
+
+  // 본인의 사업자 등록증 등록
+  @UseGuards(JwtAuthGuard)
+  @Post('business-registration')
+  public async InsertBusinessRegistration(
+    @Body(ValidationPipe) dto: BusinessRegistrationDto,
+    @SellerInfo() sellerInfo: UserPayload,
+  ) {
+    return this.sellerService.insertBusinessRegistration(dto, sellerInfo);
+  }
+
+  // 본인의 사업자 등록증 조회
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement')
+  public async selectSellerSettlementInfo(@SellerInfo() sellerInfo: UserPayload) {
+    return this.sellerService.selectSellerSettlementInfo(sellerInfo);
   }
 }

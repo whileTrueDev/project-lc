@@ -2,11 +2,11 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
 import { hash, verify } from 'argon2';
 import { PrismaService } from '@project-lc/prisma-orm';
-
+import { BusinessRegistrationDto } from '@project-lc/shared-types';
+import { UserPayload } from '../auth/auth.interface';
 @Injectable()
 export class SellerService {
   constructor(private readonly prisma: PrismaService) {}
-
   /**
    * 회원 가입
    */
@@ -142,5 +142,82 @@ export class SellerService {
       },
     });
     return seller;
+  }
+
+  // 사업자 등록증 번호 포맷만들기
+  makeRegistrationNumberFormat(num: string) {
+    // 10자리의 문자열 -> '3-2-5'문자열
+    return `${num.slice(0, 3)}-${num.slice(3, 5)}-${num.slice(5)}`;
+  }
+
+  /**
+   * 사업자 등록증 등록
+   * @param dto 사업자 등록증 등록 정보
+   * @param sellerInfo 사용자 등록 정보
+   */
+  async insertBusinessRegistration(
+    dto: BusinessRegistrationDto,
+    sellerInfo: UserPayload,
+  ) {
+    const email = sellerInfo.sub;
+    const businessRegistration = await this.prisma.sellerBusinessRegistration.create({
+      data: {
+        companyName: dto.companyName,
+        sellerEmail: email,
+        businessRegistrationNumber: this.makeRegistrationNumberFormat(
+          dto.businessRegistrationNumber,
+        ),
+        representativeName: dto.representativeName,
+        businessType: dto.businessType,
+        businessItem: dto.businessItem,
+        businessAddress: dto.businessAddress,
+        taxInvoiceMail: dto.taxInvoiceMail,
+        fileName: dto.fileName,
+      },
+    });
+
+    return businessRegistration;
+  }
+
+  // 현재 사용자의 정산 정보
+  async selectSellerSettlementInfo(sellerInfo: UserPayload) {
+    const email = sellerInfo.sub;
+    const settlementInfo = await this.prisma.seller.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        businessRegistration: {
+          take: 1,
+          orderBy: {
+            id: 'desc',
+          },
+        },
+        sellerSettlements: {
+          take: 5,
+          orderBy: {
+            id: 'desc',
+          },
+          select: {
+            date: true,
+            state: true,
+            amount: true,
+          },
+        },
+        sellerSettlementAccount: {
+          take: 1,
+          orderBy: {
+            id: 'desc',
+          },
+          select: {
+            bank: true,
+            number: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    return settlementInfo;
   }
 }
