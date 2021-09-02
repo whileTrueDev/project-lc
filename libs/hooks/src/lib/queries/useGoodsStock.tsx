@@ -1,5 +1,3 @@
-import { YesOrNo, YesOrNo_UPPERCASE } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime';
 import { GoodsOptionWithStockInfo } from '@project-lc/shared-types';
 import { useQuery, UseQueryOptions } from 'react-query';
 import axios from '../../axios';
