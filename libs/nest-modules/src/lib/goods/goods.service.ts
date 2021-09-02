@@ -182,15 +182,7 @@ export class GoodsService {
     });
 
     // 해당 상품의 옵션별 이름, 가격, 재고정보 추가
-    const optionsInfo = this.addAvailableStockInfoToOptions(optionStocks);
-
-    // 해당 상품의 전체 재고 정보------------------------------
-    const stockInfo = this.intergrateOptionStocks(optionsInfo);
-
-    return {
-      options: optionsInfo,
-      ...stockInfo,
-    };
+    return this.addAvailableStockInfoToOptions(optionStocks);
   }
 
   // 유저가 등록한 상품 삭제

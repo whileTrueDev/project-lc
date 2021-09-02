@@ -88,36 +88,7 @@ export class FMGoodsService {
       };
     });
 
-    // 해당 상품의 전체 재고 정보------------------------------
-    const stockInfo = optionsInfo.reduce(
-      (total, option) => {
-        return {
-          rstock: total.rstock + option.rstock,
-          a_stock_count:
-            option.rstock > 0 ? total.a_stock_count + 1 : total.a_stock_count,
-          b_stock_count:
-            option.rstock <= 0 ? total.b_stock_count + 1 : total.b_stock_count,
-          a_rstock: option.rstock > 0 ? total.a_rstock + option.rstock : total.a_rstock,
-          b_rstock: option.rstock <= 0 ? total.b_rstock + option.rstock : total.b_rstock,
-          a_stock: option.rstock > 0 ? total.a_stock + option.stock : total.a_stock,
-          b_stock: option.rstock <= 0 ? total.b_stock + option.stock : total.b_stock,
-        };
-      },
-      {
-        rstock: 0, // 해당 상품의 전체 가용 재고
-        a_stock_count: 0, // 가용재고 1개 이상인 옵션 개수
-        b_stock_count: 0, // 가용재고 0개 이하인 옵션 개수
-        a_rstock: 0, // 가용재고 1개 이상인 옵션의 가용재고
-        b_rstock: 0, // 가용재고 0개 이하인 옵션의 가용재고
-        a_stock: 0, // 가용재고 1개 이상인 옵션의 재고
-        b_stock: 0, // 가용재고 0개 이하인 옵션의 재고
-      },
-    );
-
-    return {
-      options: optionsInfo,
-      ...stockInfo,
-    };
+    return optionsInfo;
   }
 
   // goods_seq인 상품의 노출정보 변경
