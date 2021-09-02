@@ -12,12 +12,55 @@ datasource db {
 }
 
 model Seller {
-  id             Int                   @id @default(autoincrement())
-  email          String                @unique
-  name           String?
-  password       String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
-  socialAccounts SellerSocialAccount[]
-  goods          Goods[]
+  id                      Int                          @id @default(autoincrement())
+  email                   String                       @unique
+  name                    String?
+  password                String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
+  socialAccounts          SellerSocialAccount[]
+  goods                   Goods[]
+  businessRegistration    SellerBusinessRegistration[]
+  sellerSettlements       SellerSettlements[]
+  sellerSettlementAccount SellerSettlementAccount[]
+}
+
+// 마케터의 사업자 등록증을 위한 모델 seller와 1 : N의 관계를 가지므로
+model SellerBusinessRegistration {
+  id                         Int    @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
+  sellerEmail                String // 등록한 판매자 ID 
+  companyName                String // 상호명
+  businessRegistrationNumber String // 사업자등록증 등록번호
+  representativeName         String // 대표자명
+  businessType               String // 업태
+  businessItem               String // 종목
+  businessAddress            String // 사업장 주소
+  taxInvoiceMail             String // 세금계산서 전용 이메일
+  fileName                   String // 등록된 s3 파일명
+
+  seller Seller @relation(fields: [sellerEmail], references: [email])
+  @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
+}
+
+// 정산 내역
+model SellerSettlements {
+  id          Int      @id @default(autoincrement()) // 정산 내역 고유 번호
+  sellerEmail String // 등록한 판매자 ID 
+  date        DateTime @default(now()) // 정산 시점
+  state       Int      @default(0) @db.UnsignedTinyInt // 정산 상태
+  amount      Int      @default(0)
+  seller      Seller   @relation(fields: [sellerEmail], references: [email])
+
+  @@index(name: "SellerSettlementsIndex", fields: [sellerEmail, id])
+}
+
+model SellerSettlementAccount {
+  id          Int    @id @default(autoincrement()) // 정산 내역 고유 번호
+  sellerEmail String // 등록한 판매자 ID 
+  bank        String
+  number      String
+  name        String
+
+  seller Seller @relation(fields: [sellerEmail], references: [email])
+  @@index(name: "SellerSettlementAccountIndex", fields: [sellerEmail, id])
 }
 
 model MailVerificationCode {
@@ -139,13 +182,13 @@ enum ShopOrGoods {
 
 // * 상품 - 개별 배송비 선택
 // * 상품 - 최소 구매 수량 사용 여부
-// * 상품 - 최대 구매 수량 사용 여부
+// * 상�� - 최대 ���매 ���량 사용 ����부
 enum LimitOrUnlimit {
   unlimit
   limit
 }
 
-// * 상품 - 필수옵션-분리/합체형 구분
+// * �����품 - 필수옵션-분리/합체형 구분
 enum OptionViewType {
   divide
   join
@@ -157,7 +200,7 @@ enum YesOrNo {
   n
 }
 
-// * 옵션 노출 여부
+// * 옵션 ���출 여부
 enum YesOrNo_UPPERCASE {
   Y
   N

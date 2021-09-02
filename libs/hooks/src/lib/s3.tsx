@@ -12,10 +12,8 @@ export const s3 = (() => {
   AWS.config.update({
     region: S3_BUCKET_REGION,
     credentials: {
-      // accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID!,
-      // secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET!,
-      accessKeyId: 'AKIA3WGW2LTZCFHFZS4W',
-      secretAccessKey: '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',
+      accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET!,
     },
   });
 

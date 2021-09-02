@@ -6,8 +6,17 @@ import {
   FormControl,
   FormErrorMessage,
 } from '@chakra-ui/react';
-import { forwardRef } from 'react';
+import { forwardRef, MutableRefObject } from 'react';
+import {
+  UseFormRegister,
+  FieldError,
+  DeepMap,
+  UseFormSetError,
+  UseFormSetValue,
+  UseFormClearErrors,
+} from 'react-hook-form';
 import { FileInput } from './FileInput';
+import { BusinessRegistrationFormDto } from './BusinessRegistrationDialog';
 
 const headerConfig = {
   colSpan: [2, 1, 1, 1],
@@ -31,8 +40,18 @@ const valueConfig = {
   mb: [3, 0, 0, 0],
 };
 
-function BusinessRegistrationFormTag(props) {
-  const { inputRef, register, errors, setError, setValue } = props;
+export interface BusinessRegistrationFormProps {
+  inputRef: MutableRefObject<null>;
+  register: UseFormRegister<BusinessRegistrationFormDto>;
+  errors: DeepMap<BusinessRegistrationFormDto, FieldError>;
+  seterror: UseFormSetError<BusinessRegistrationFormDto>;
+  setvalue: UseFormSetValue<BusinessRegistrationFormDto>;
+  clearErrors: UseFormClearErrors<BusinessRegistrationFormDto>;
+}
+
+function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
+  // 명시적 타입만 props로 전달 가능
+  const { inputRef, register, errors, seterror, setvalue, clearErrors } = props;
 
   return (
     <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
@@ -93,7 +112,7 @@ function BusinessRegistrationFormTag(props) {
           autoComplete="off"
           maxW={200}
           maxLength={10}
-          {...register('companyName', {
+          {...register('representativeName', {
             required: '대표자명을 입력해주세요.',
           })}
         />
@@ -173,7 +192,7 @@ function BusinessRegistrationFormTag(props) {
       <GridItem {...headerConfig}>사업자 등록증 이미지 업로드</GridItem>
       <GridItem {...valueConfig}>
         <FormControl isInvalid={!!errors.businessRegistrationImage}>
-          <FileInput setError={setError} setValue={setValue} />
+          <FileInput seterror={seterror} setvalue={setvalue} clearErrors={clearErrors} />
           <FormErrorMessage ml={3} mt={0}>
             {errors.businessRegistrationImage && errors.businessRegistrationImage.message}
           </FormErrorMessage>

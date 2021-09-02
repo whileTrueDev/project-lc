@@ -15,4 +15,6 @@ export class BusinessRegistrationDto {
   @IsString() businessAddress: string;
   // 세금계산서 발행 이메일
   @IsEmail() taxInvoiceMail: string;
+  // 이미지 파일명
+  @IsString() fileName: string;
 }
