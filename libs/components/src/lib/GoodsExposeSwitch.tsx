@@ -4,6 +4,7 @@ import {
   Switch,
   Spinner,
   VisuallyHidden,
+  useToast,
 } from '@chakra-ui/react';
 import { useChangeFmGoodsView, useChangeGoodsView } from '@project-lc/hooks';
 import { GoodsView } from '@prisma/client';
@@ -22,18 +23,17 @@ export function GoodsExposeSwitch({
   const queryClient = useQueryClient();
   const changeGoodsView = useChangeGoodsView();
   const changeFmGoodsView = useChangeFmGoodsView();
+  const toast = useToast();
   const changeView = async () => {
     try {
       if (confirmedGoodsId) {
         // 검수된 상품의 경우 fm-goods에서도 수정
-        console.log({ confirmedGoodsId });
         await changeFmGoodsView.mutateAsync({
           id: confirmedGoodsId,
           view: goodsView === 'look' ? 'notLook' : 'look',
         });
       }
       // 미검수 상품의 경우 Goods에서 수정
-      console.log({ goodsId });
       await changeGoodsView.mutateAsync({
         id: goodsId,
         view: goodsView === 'look' ? 'notLook' : 'look',
@@ -41,6 +41,7 @@ export function GoodsExposeSwitch({
       queryClient.invalidateQueries('SellerGoodsList');
     } catch (error) {
       console.error(error);
+      toast({ title: '상품 상태 변경 에러', status: 'error' });
     }
   };
   const label = GOODS_VIEW[goodsView];

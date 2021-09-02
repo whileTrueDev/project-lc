@@ -30,7 +30,6 @@ export const useSellerGoodsListPanelStore = create<SellerGoodsListPanelStoreStat
     },
     handleSortChange: (event: React.ChangeEvent<HTMLSelectElement>) => {
       const { value } = event.target;
-      console.log(value);
       switch (value) {
         case 'regist_date':
           set((state) => ({
