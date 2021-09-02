@@ -76,7 +76,7 @@ export function OrderDetailExportInfo({
         <Box my={2}>
           <Text fontWeight="bold">출고된 상품</Text>
           {exportOrderItemOptions.map((o) => (
-            <OrderDetailOptionListItem option={o} />
+            <OrderDetailOptionListItem key={o.item_option_seq} option={o} />
           ))}
         </Box>
       )}

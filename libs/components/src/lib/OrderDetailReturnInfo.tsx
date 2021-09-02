@@ -40,9 +40,13 @@ export function OrderDetailReturnInfo({ returns }: { returns: FmOrderReturn }) {
             </Box>
             <Text>회수 방법: {convertFmReturnMethodToString(returns.return_method)}</Text>
             <Text>상세 사유</Text>
-            <Textarea isReadOnly variant="outline" p={1} maxW={300}>
-              {returns.return_reason}
-            </Textarea>
+            <Textarea
+              isReadOnly
+              variant="outline"
+              p={1}
+              maxW={300}
+              value={returns.return_reason}
+            />
           </Stack>
           <Stack spacing={1} my={2}>
             <Box mb={2}>
@@ -66,7 +70,7 @@ export function OrderDetailReturnInfo({ returns }: { returns: FmOrderReturn }) {
         <Box my={2}>
           <Text fontWeight="bold">반품 상품</Text>
           {returns.items.map((i) => (
-            <Stack direction="row" alignItems="center">
+            <Stack key={i.return_item_seq} direction="row" alignItems="center">
               <Text isTruncated>
                 {i.title1}: {i.option1}
               </Text>

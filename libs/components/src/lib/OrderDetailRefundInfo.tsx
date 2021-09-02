@@ -64,7 +64,11 @@ export function OrderDetailRefundInfo({
         <Box my={2}>
           <Text fontWeight="bold">환불 상품</Text>
           {refundOrderItemOptions.map((o) => (
-            <OrderDetailOptionListItem option={o} withBadge={false} />
+            <OrderDetailOptionListItem
+              key={o.item_option_seq}
+              option={o}
+              withBadge={false}
+            />
           ))}
         </Box>
       )}
