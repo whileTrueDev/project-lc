@@ -11,7 +11,7 @@ export class FMGoodsService {
   }
 
   // fm-goods테이블 & 상품 연관테이블에서 goods_seq 값이 있는 데이터 삭제
-  async deleteFmGoods(ids: number[]): Promise<any> {
+  async deleteFmGoods(ids: number[]): Promise<boolean> {
     const idsParam = ids.join(',');
     try {
       const sqls = [
@@ -29,7 +29,7 @@ export class FMGoodsService {
         `DELETE FROM fm_goods WHERE goods_seq IN (${idsParam})`,
       ];
       await this.db.transaction(sqls);
-      return 'done';
+      return true;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);

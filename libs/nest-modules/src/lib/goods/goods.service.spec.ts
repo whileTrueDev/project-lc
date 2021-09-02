@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Goods, PrismaClient } from '@prisma/client';
+import { Goods, GoodsView, PrismaClient } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
+import { SortColumn, SortDirection } from '@project-lc/shared-types';
 import { GoodsService } from './goods.service';
 
 describe('GoodsService', () => {
@@ -42,6 +43,16 @@ describe('GoodsService', () => {
         common_contents: 'dummy common_contents',
         goods_name: 'dummy goods name',
         summary: 'dummy',
+        options: {
+          create: [
+            {
+              default_option: 'y',
+              price: 99999,
+              consumer_price: 99999,
+              supply: { create: { stock: 99999 } },
+            },
+          ],
+        },
         confirmation: {
           create: {
             id: 1,
@@ -54,13 +65,6 @@ describe('GoodsService', () => {
   });
 
   afterAll(async () => {
-    await __prisma.goodsConfirmation.delete({
-      where: { id: 1 },
-    });
-    await __prisma.goods.delete({
-      where: { id: TEST_GOODS.id },
-      include: { confirmation: true },
-    });
     await __prisma.seller.delete({ where: { email: TEST_USER_EMAIL } });
     await __prisma.$disconnect();
   });
@@ -78,6 +82,51 @@ describe('GoodsService', () => {
     it('should return array of goods ids (numbers)', async () => {
       const goodsIds = await service.findMyGoodsIds(TEST_USER_EMAIL);
       expect(goodsIds).toEqual([TEST_CONFIRMATION_GOODS_CONNECTION_ID]);
+    });
+  });
+
+  describe('getGoodsList', () => {
+    it('should have 1 item and totalItemCount : 1', async () => {
+      const goodsListData = await service.getGoodsList({
+        email: TEST_USER_EMAIL,
+        page: 0,
+        itemPerPage: 10,
+        sort: SortColumn.REGIST_DATE,
+        direction: SortDirection.DESC,
+      });
+
+      expect(goodsListData.items).toHaveLength(1);
+      expect(goodsListData.totalItemCount).toBe(1);
+    });
+  });
+
+  describe('changeGoodsView', () => {
+    it('goos_view should be notLook', async () => {
+      await service.changeGoodsView(TEST_GOODS.id, GoodsView.notLook);
+      const goodsListData = await service.getGoodsList({
+        email: TEST_USER_EMAIL,
+        page: 0,
+        itemPerPage: 10,
+        sort: SortColumn.REGIST_DATE,
+        direction: SortDirection.DESC,
+      });
+      expect(goodsListData.items[0].goods_view).toBe(GoodsView.notLook);
+    });
+  });
+
+  describe('deleteLcGoods', () => {
+    it('goods should be deleted', async () => {
+      await service.deleteLcGoods({ email: TEST_USER_EMAIL, ids: [TEST_GOODS.id] });
+      const goodsListData = await service.getGoodsList({
+        email: TEST_USER_EMAIL,
+        page: 0,
+        itemPerPage: 10,
+        sort: SortColumn.REGIST_DATE,
+        direction: SortDirection.DESC,
+      });
+
+      expect(goodsListData.items).toHaveLength(0);
+      expect(goodsListData.totalItemCount).toBe(0);
     });
   });
 });
