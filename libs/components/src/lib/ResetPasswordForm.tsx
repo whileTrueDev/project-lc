@@ -172,7 +172,7 @@ export function ResetPasswordForm(): JSX.Element {
       <Box as="form">
         {/* step 0 : 이메일 확인  */}
         {step === 0 && (
-          <Stack py={6} spacing={2}>
+          <Stack pt={6} spacing={6}>
             <FormControl isInvalid={!!errors.email}>
               <FormLabel htmlFor="email">이메일</FormLabel>
               <Input
@@ -180,6 +180,7 @@ export function ResetPasswordForm(): JSX.Element {
                 type="email"
                 placeholder="minsu@example.com"
                 autoComplete="off"
+                autoFocus
                 {...register('email', {
                   required: '이메일을 작성해주세요.',
                   pattern: {
@@ -206,14 +207,15 @@ export function ResetPasswordForm(): JSX.Element {
         )}
         {/* step 1 : 코드 확인  */}
         {step === 1 && (
-          <Stack py={4} spacing={2}>
+          <Stack pt={6} spacing={6}>
             <Text>{getValues('email')}로 발송된 코드를 확인해주세요.</Text>
 
             <FormControl isInvalid={!!errors.code}>
               <Input
-                autoComplete="off"
                 id="code"
                 placeholder="이메일 인증코드"
+                autoComplete="off"
+                autoFocus
                 {...register('code', {
                   required: '인증 코드를 입력해주세요.',
                   minLength: {
