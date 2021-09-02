@@ -12,9 +12,9 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useChangePasswordMutation } from '@project-lc/hooks';
+import { passwordRegisterOptions } from '@project-lc/shared-types';
 import { useForm } from 'react-hook-form';
 import { PasswordCheckFormProps } from './PasswordCheckForm';
-import { passwordRegisterOptions } from './SignupForm';
 
 export interface PasswordCheckFormData {
   password: string;

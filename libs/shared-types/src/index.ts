@@ -16,3 +16,4 @@ export * from './lib/dto/FindFmOrders.dto';
 export * from './lib/front-type/orderFilterFormType';
 export * from './lib/res-types/userProfile.res';
 export * from './lib/dto/emailCodeVerification.dto';
+export * from './lib/constants/signupRegisterOptions';
