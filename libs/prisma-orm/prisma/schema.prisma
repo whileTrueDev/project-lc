@@ -18,6 +18,7 @@ model Seller {
   password       String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
   socialAccounts SellerSocialAccount[]
   goods          Goods[]
+  loginHistory   LoginHistory[]
 }
 
 model MailVerificationCode {
@@ -161,4 +162,19 @@ enum YesOrNo {
 enum YesOrNo_UPPERCASE {
   Y
   N
+}
+
+// ****************************
+// 로그인 내역
+model LoginHistory {
+  id         Int      @id @default(autoincrement())
+  seller     Seller?  @relation(fields: [sellerId], references: [id])
+  sellerId   Int?
+  method     String // 로그인 방식
+  ip         String // 로그인 IP
+  country    String? // 로그인 국가
+  city       String? // 로그인 도시
+  device     String // 로그인 기기
+  ua         String // User-Agent 문자열
+  createDate DateTime @default(now()) // 로그인 일시
 }

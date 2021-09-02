@@ -13,3 +13,4 @@ export * from './lib/mutation/useUnlinkSocialAccountMutation';
 export * from './lib/mutation/useChangePasswordMutation';
 export * from './lib/queries/useFmOrders';
 export * from './lib/useDisplaySize';
+export * from './lib/useSocialLoginFailAlarm';

@@ -10,6 +10,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { MailVerificationService } from './mailVerification.service';
 import { JwtConfigService } from '../_nest-units/settings/jwt.setting';
+import { LoginHistoryService } from './login-history/login-history.service';
 
 // jwtAuthGuard에서 auth service를 사용하고자 할 때, Global인 경우에만 auth Service에 접근 가능.
 // 그렇지 않은 경우, 아래의 오류 발생
@@ -30,8 +31,9 @@ import { JwtConfigService } from '../_nest-units/settings/jwt.setting';
     JwtStrategy,
     LocalStrategy,
     MailVerificationService,
+    LoginHistoryService,
   ],
   controllers: [AuthController],
-  exports: [MailVerificationService, AuthService],
+  exports: [MailVerificationService, AuthService, LoginHistoryService],
 })
 export class AuthModule {}

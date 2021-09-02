@@ -5,12 +5,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Seller, SellerSocialAccount } from '@prisma/client';
-import { loginUserRes } from '@project-lc/shared-types';
 import { PrismaService } from '@project-lc/prisma-orm';
-import axios from 'axios';
+import { loginUserRes } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { AuthService } from '../auth/auth.service';
 import { SellerService } from '../seller/seller.service';
+import { GoogleApiService } from './platform-api/google-api.service';
+import { KakaoApiService } from './platform-api/kakao-api.service';
+import { NaverApiService } from './platform-api/naver-api.service';
 
 export type SellerWithSocialAccounts = Omit<Seller, 'password'> & {
   socialAccounts: Omit<SellerSocialAccount, 'accessToken' | 'refreshToken'>[];
@@ -33,9 +35,12 @@ export class SocialService {
     private readonly configService: ConfigService,
     private readonly sellerService: SellerService,
     private readonly authService: AuthService,
+    private readonly kakao: KakaoApiService,
+    private readonly naver: NaverApiService,
+    private readonly google: GoogleApiService,
   ) {}
 
-  async login(req: Request, res: Response) {
+  login(req: Request, res: Response) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
     const userPayload = this.authService.castUser(user);
@@ -118,8 +123,12 @@ export class SocialService {
     return updatedSeller;
   }
 
-  /** 소셜계정 데이터 삭제 */
-  private async deleteSocialAccountRecord(serviceId: string): Promise<boolean> {
+  /**
+   * 소셜계정 데이터 삭제
+   * @by 21.09.02 hwasurr -> 소셜로그인ExceptionFilter에서는 소셜계정이 DB에 없으므로,
+   * unlink와 구분되어야하여, public 메서드로 변경 -> 컨드롤러단에서 두가지 일을 진행하도록 변경
+   * */
+  public async deleteSocialAccountRecord(serviceId: string): Promise<boolean> {
     await this.prisma.sellerSocialAccount.delete({
       where: { serviceId },
     });
@@ -140,76 +149,109 @@ export class SocialService {
     return socialAccount.accessToken;
   }
 
-  /** 카카오 계정 연동해제 & 카카오 소셜계정 레코드 삭제 */
-  async kakaoUnlink(kakaoId) {
-    const kakaoAccessToken = await this.getSocialAccountAccessToken('kakao', kakaoId);
+  /**
+   * 카카오 계정 연동해제 & 카카오 소셜계정 레코드 삭제
+   * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
+   * */
+  async kakaoUnlink(kakaoId: string, accessTokenParam?: string) {
+    let kakaoAccessToken: string;
+    if (!accessTokenParam) {
+      kakaoAccessToken = await this.getSocialAccountAccessToken('kakao', kakaoId);
+    } else {
+      kakaoAccessToken = accessTokenParam;
+    }
     // 카카오 계정연동 해제 요청
     try {
-      const result = await axios.post(
-        'https://kapi.kakao.com/v1/user/unlink',
-        undefined,
-        {
-          headers: {
-            Authorization: `Bearer ${kakaoAccessToken}`,
-          },
-        },
-      );
-
-      if (result.status === 200) {
-        return this.deleteSocialAccountRecord(kakaoId);
-      }
-      return false;
+      await this.kakao.unlink(kakaoAccessToken);
+      return true;
     } catch (error) {
       console.error(error);
+      if (
+        error?.response &&
+        (error?.response?.status === 401 || error?.response?.data?.code === -401)
+      ) {
+        // 액세스 토큰 만료로 인한 실패의 경우, 액세스 토큰 리프레시 이후 연동 해제 진행
+        const socialAccount = await this.selectSocialAccountRecord({
+          provider: 'kakao',
+          id: kakaoId,
+        });
+        // 액세스 토큰 리프레시
+        const refreshRes = await this.kakao.refreshAccessToken(
+          socialAccount.refreshToken,
+        );
+        await this.kakao.unlink(refreshRes.access_token);
+        return true;
+      }
       throw new InternalServerErrorException(error);
     }
   }
 
-  /** 네이버 계정연동 해제 && 네이버 계정 레코드 삭제 */
-  async naverUnlink(naverId: string) {
-    const naverAccessToken = await this.getSocialAccountAccessToken('naver', naverId);
+  /**
+   * 네이버 계정연동 해제 && 네이버 계정 레코드 삭제
+   * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
+   * */
+  async naverUnlink(naverId: string, accessTokenParam?: string) {
+    let naverAccessToken: string;
+    if (!accessTokenParam) {
+      naverAccessToken = await this.getSocialAccountAccessToken('naver', naverId);
+    } else {
+      naverAccessToken = accessTokenParam;
+    }
     // 네이버 계정연동 해제 요청
     try {
-      const result = await axios.get('https://nid.naver.com/oauth2.0/token', {
-        params: {
-          client_id: this.configService.get('NAVER_CLIENT_ID'),
-          client_secret: this.configService.get('NAVER_CLIENT_SECRET'),
-          access_token: encodeURI(naverAccessToken),
-          grant_type: 'delete',
-          service_provider: 'naver',
-        },
-      });
-
-      if (result.status === 200) {
-        return this.deleteSocialAccountRecord(naverId);
+      const isSuccess = await this.naver.unlink(naverAccessToken);
+      if (!isSuccess) {
+        // 액세스 토큰 만료로 인한 실패의 경우, 액세스 토큰 리프레시 이후 연동 해제 진행
+        const socialAccount = await this.selectSocialAccountRecord({
+          provider: 'naver',
+          id: naverId,
+        });
+        const refreshRes = await this.naver.refreshAccessToken(
+          socialAccount.refreshToken,
+        );
+        return this.naver.unlink(refreshRes.access_token);
       }
-      return false;
+      return isSuccess;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);
     }
   }
 
-  /** 구글 계정 연동 해제 && 구글 계정 레코드 삭제 */
-  async googleUnlink(googleId: string) {
-    const googleAccessToken = await this.getSocialAccountAccessToken('google', googleId);
+  /**
+   * * 구글 계정 연동 해제 && 구글 계정 레코드 삭제
+   * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
+   */
+  async googleUnlink(googleId: string, accessTokenParam?: string) {
+    let googleAccessToken: string;
+    if (!accessTokenParam) {
+      googleAccessToken = await this.getSocialAccountAccessToken('google', googleId);
+    } else {
+      googleAccessToken = accessTokenParam;
+    }
     // 구글 계정연동 해제 요청
     try {
-      const result = await axios.post('https://oauth2.googleapis.com/revoke', undefined, {
-        params: {
-          token: encodeURI(googleAccessToken),
-        },
-        headers: {
-          'Content-type': 'application/x-www-form-urlencoded',
-        },
-      });
-
-      if (result.status === 200) {
-        return this.deleteSocialAccountRecord(googleId);
-      }
-      return false;
+      await this.google.unlink(googleAccessToken);
+      return true;
     } catch (error) {
       console.error(error);
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data?.error === 'invalid_token'
+      ) {
+        // 액세스 토큰 만료로 인한 실패의 경우, 액세스 토큰 리프레시 이후 연동 해제 진행
+        const socialAccount = await this.selectSocialAccountRecord({
+          provider: 'google',
+          id: googleId,
+        });
+        // 액세스 토큰 리프레시
+        const refreshRes = await this.google.refreshAccessToken(
+          socialAccount.refreshToken,
+        );
+        await this.google.unlink(refreshRes.access_token);
+        return true;
+      }
       throw new InternalServerErrorException(error);
     }
   }
