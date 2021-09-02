@@ -50,6 +50,7 @@ import {
 } from '../constants/goodsStatus';
 import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 import TextWithPopperButton from './TextWithPopperButton';
+import StockInfoButton, { ExampleStockDescription } from './StockInfoButton';
 
 function formatPrice(price: number): string {
   const formattedPrice = price.toLocaleString();
@@ -106,47 +107,27 @@ const columns: GridColumns = [
           iconAriaLabel="재고/가용 설명"
           icon={<QuestionIcon />}
         >
-          <Stack spacing={1.5} fontSize="sm">
-            <Box fontWeight="bold">
-              <Text height="20px" color="blue.500">
-                [2] 10 / 0
-              </Text>
-              <Text color="red.500">[0] 0 / 0</Text>
-            </Box>
-            <UnorderedList spacing={1}>
-              <ListItem color="blue.500">
-                가용 재고가 1개 이상인&nbsp;
-                <Text as="strong">옵션의 개수</Text>는 <Text as="strong">[2]</Text>
-                개이며
-                <br />
-                해당 옵션의&nbsp;
-                <Text as="strong">재고 합계 10</Text> /&nbsp;
-                <Text as="strong">가용 재고 합계 0</Text>
-              </ListItem>
-              <ListItem color="red.500">
-                가용 재고가 0개 이하인&nbsp;
-                <Text as="strong">옵션의 개수</Text>는 <Text as="strong">[0]</Text>
-                개이며
-                <br />
-                해당 옵션의&nbsp;
-                <Text as="strong">재고 합계 0</Text> /&nbsp;
-                <Text as="strong">가용 재고 합계 0</Text>
-              </ListItem>
-              <ListItem>( 가용재고 = 재고 - 불량재고 )</ListItem>
-            </UnorderedList>
-          </Stack>
+          <ExampleStockDescription />
         </TextWithPopperButton>
       );
     },
     renderCell: ({ row }) => {
       const { a_stock_count, b_stock_count, a_rstock, b_rstock, a_stock, b_stock } = row;
+      const goodsName = row.goods_name;
+      const goodsId = row.id;
+      const confirmedGoodsId = row.confirmation?.firstmallGoodsConnectionId;
       return (
-        <Box>
+        <Box position="relative" width="100%">
           <Text
             height="20px"
             color="blue.500"
           >{`[${a_stock_count}] ${a_stock} / ${a_rstock}`}</Text>
           <Text color="red.500">{`[${b_stock_count}] ${b_stock} / ${b_rstock}`}</Text>
+          <StockInfoButton
+            goodsId={goodsId}
+            confirmedGoodsId={confirmedGoodsId}
+            goodsName={goodsName}
+          />
         </Box>
       );
     },

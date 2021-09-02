@@ -16,3 +16,4 @@ export * from './lib/useDisplaySize';
 export * from './lib/queries/useSellerGoodsList';
 export * from './lib/mutation/useDeleteSellerGoods';
 export * from './lib/mutation/useChangeGoodsView';
+export * from './lib/queries/useGoodsStock';
