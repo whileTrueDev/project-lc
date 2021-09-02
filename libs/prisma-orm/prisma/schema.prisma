@@ -83,7 +83,7 @@ model Goods {
 
 // 상품 검수 정보
 model GoodsConfirmation {
-  id                         Int                       @id
+  id                         Int                       @id @default(autoincrement())
   goodsId                    Int
   goods                      Goods                     @relation(fields: [goodsId], references: [id], onDelete: Cascade)
   status                     GoodsConfirmationStatuses @default(waiting) // 검수 상태
