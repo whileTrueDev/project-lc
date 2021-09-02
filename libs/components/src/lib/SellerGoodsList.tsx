@@ -9,25 +9,12 @@ import {
   Stack,
   Text,
   Link,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
-  Icon,
   useDisclosure,
-  useToast,
   useColorModeValue,
   UnorderedList,
   ListItem,
 } from '@chakra-ui/react';
-import {
-  useDeleteFmGoods,
-  useDeleteLcGoods,
-  useProfile,
-  useSellerGoodsList,
-} from '@project-lc/hooks';
+import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
 import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
 import dayjs from 'dayjs';
 import {
@@ -38,9 +25,8 @@ import {
 } from '@prisma/client';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import { SortColumn } from '@project-lc/shared-types';
-import React, { useRef, useState } from 'react';
-import { QuestionIcon, WarningTwoIcon } from '@chakra-ui/icons';
-import { useQueryClient } from 'react-query';
+import { useState } from 'react';
+import { QuestionIcon } from '@chakra-ui/icons';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import {
   RUNOUT_POLICY,
@@ -51,6 +37,7 @@ import {
 import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 import TextWithPopperButton from './TextWithPopperButton';
 import StockInfoButton, { ExampleStockDescription } from './StockInfoButton';
+import DeleteGoodsAlertDialog from './DeleteGoodsAlertDialog';
 
 function formatPrice(price: number): string {
   const formattedPrice = price.toLocaleString();
@@ -247,8 +234,6 @@ const columns: GridColumns = [
 // * 상품목록 datagrid 컬럼 끝*********************************************
 
 export function SellerGoodsList(): JSX.Element {
-  const queryClient = useQueryClient();
-  const toast = useToast();
   const { data: profileData } = useProfile();
   const {
     page,
@@ -283,47 +268,6 @@ export function SellerGoodsList(): JSX.Element {
 
   // 상품삭제 시 alert 다이얼로그
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef<HTMLButtonElement>(null);
-
-  // Goods테이블에서 삭제요청
-  const deleteLcGoods = useDeleteLcGoods();
-  // fm-goods 테이블에서 삭제요청
-  const deleteFmGoods = useDeleteFmGoods();
-
-  // 삭제 다이얼로그에서 확인 눌렀을 때 상품삭제 핸들러
-  const handleDelete = async () => {
-    if (!data || !hasSelectedGoods) return;
-    // 검수된 상품
-    const confirmedGoods = data.items.filter(
-      (item) =>
-        selectedGoodsIds.includes(item.id) &&
-        item.confirmation &&
-        item.confirmation.status === 'confirmed' &&
-        item.confirmation.firstmallGoodsConnectionId !== null,
-    );
-
-    try {
-      // 전체 선택된 상품 Goods테이블에서 삭제요청
-      const deleteGoodsFromLcDb = deleteLcGoods.mutateAsync({
-        ids: selectedGoodsIds.map((id) => Number(id)),
-      });
-      // 선택된 상품 중 검수된 상품은 fm-goods 테이블에서 삭제요청
-      const deleteGoodsFromFmDb = deleteFmGoods.mutateAsync({
-        ids: confirmedGoods.map((item) => Number(item.id)),
-      });
-      await Promise.all([deleteGoodsFromLcDb, deleteGoodsFromFmDb]);
-      queryClient.invalidateQueries('SellerGoodsList');
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: '상품 삭제 중 오류가 발생하였습니다',
-        status: 'error',
-        isClosable: true,
-      });
-    } finally {
-      onClose();
-    }
-  };
 
   return (
     <Box>
@@ -368,41 +312,13 @@ export function SellerGoodsList(): JSX.Element {
         }}
       />
       {/* 상품 삭제 alert */}
-      <AlertDialog
-        isCentered
-        isOpen={isOpen}
-        leastDestructiveRef={cancelRef}
+      <DeleteGoodsAlertDialog
         onClose={onClose}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              <Text>
-                <Icon as={WarningTwoIcon} color="red.500" mr={2} />
-                상품 삭제
-              </Text>
-            </AlertDialogHeader>
-
-            <AlertDialogBody>
-              {!hasSelectedGoods
-                ? '삭제할 상품을 선택해주세요'
-                : '상품 삭제시 복구가 불가합니다. 선택한 상품을 삭제하시겠습니까?'}
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              {hasSelectedGoods && <Button onClick={onClose}>취소</Button>}
-              <Button
-                onClick={!hasSelectedGoods ? onClose : handleDelete}
-                ml={3}
-                colorScheme={!hasSelectedGoods ? undefined : 'red'}
-                isLoading={deleteLcGoods.isLoading || deleteFmGoods.isLoading}
-              >
-                확인
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+        isOpen={isOpen}
+        hasSelectedGoods={hasSelectedGoods}
+        items={data?.items}
+        selectedGoodsIds={selectedGoodsIds}
+      />
     </Box>
   );
 }
