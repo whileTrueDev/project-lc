@@ -19,6 +19,8 @@ import {
   useDisclosure,
   useToast,
   useColorModeValue,
+  UnorderedList,
+  ListItem,
 } from '@chakra-ui/react';
 import {
   useDeleteFmGoods,
@@ -35,9 +37,9 @@ import {
   RunoutPolicy,
 } from '@prisma/client';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
-import { SortColumn, SortDirection } from '@project-lc/shared-types';
-import { useRef, useState } from 'react';
-import { WarningTwoIcon } from '@chakra-ui/icons';
+import { SortColumn } from '@project-lc/shared-types';
+import React, { useRef, useState } from 'react';
+import { QuestionIcon, WarningTwoIcon } from '@chakra-ui/icons';
 import { useQueryClient } from 'react-query';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import {
@@ -47,6 +49,7 @@ import {
   GOODS_CONFIRMATION_STATUS,
 } from '../constants/goodsStatus';
 import { GoodsExposeSwitch } from './GoodsExposeSwitch';
+import TextWithPopperButton from './TextWithPopperButton';
 
 function formatPrice(price: number): string {
   const formattedPrice = price.toLocaleString();
@@ -95,12 +98,55 @@ const columns: GridColumns = [
   {
     field: 'stock',
     headerName: '재고/가용',
+    minWidth: 110,
+    renderHeader: () => {
+      return (
+        <TextWithPopperButton
+          title="재고/가용"
+          iconAriaLabel="재고/가용 설명"
+          icon={<QuestionIcon />}
+        >
+          <Stack spacing={1.5} fontSize="sm">
+            <Box fontWeight="bold">
+              <Text height="20px" color="blue.500">
+                [2] 10 / 0
+              </Text>
+              <Text color="red.500">[0] 0 / 0</Text>
+            </Box>
+            <UnorderedList spacing={1}>
+              <ListItem color="blue.500">
+                가용 재고가 1개 이상인&nbsp;
+                <Text as="strong">옵션의 개수</Text>는 <Text as="strong">[2]</Text>
+                개이며
+                <br />
+                해당 옵션의&nbsp;
+                <Text as="strong">재고 합계 10</Text> /&nbsp;
+                <Text as="strong">가용 재고 합계 0</Text>
+              </ListItem>
+              <ListItem color="red.500">
+                가용 재고가 0개 이하인&nbsp;
+                <Text as="strong">옵션의 개수</Text>는 <Text as="strong">[0]</Text>
+                개이며
+                <br />
+                해당 옵션의&nbsp;
+                <Text as="strong">재고 합계 0</Text> /&nbsp;
+                <Text as="strong">가용 재고 합계 0</Text>
+              </ListItem>
+              <ListItem>( 가용재고 = 재고 - 불량재고 )</ListItem>
+            </UnorderedList>
+          </Stack>
+        </TextWithPopperButton>
+      );
+    },
     renderCell: ({ row }) => {
       const { a_stock_count, b_stock_count, a_rstock, b_rstock, a_stock, b_stock } = row;
       return (
         <Box>
-          <Text height="20px">{`[${a_stock_count}] ${a_stock}/${a_rstock}`}</Text>
-          <Text>{`[${b_stock_count}] ${b_stock}/${b_rstock}`}</Text>
+          <Text
+            height="20px"
+            color="blue.500"
+          >{`[${a_stock_count}] ${a_stock} / ${a_rstock}`}</Text>
+          <Text color="red.500">{`[${b_stock_count}] ${b_stock} / ${b_rstock}`}</Text>
         </Box>
       );
     },
@@ -112,6 +158,24 @@ const columns: GridColumns = [
     align: 'center',
     valueGetter: ({ row }) => {
       return RUNOUT_POLICY[row.runout_policy as RunoutPolicy];
+    },
+    renderHeader: () => {
+      return (
+        <TextWithPopperButton
+          title="재고판매"
+          iconAriaLabel="재고판매 설명"
+          icon={<QuestionIcon />}
+        >
+          <Text mb={2} fontWeight="bold">
+            재고(옵션 기준)에 따른 상품 판매 설정에 따라 아래와 같이 3가지로 표기됩니다.
+          </Text>
+          <UnorderedList spacing={1}>
+            <ListItem>재고가 있으면 판매 : 재고</ListItem>
+            <ListItem>가용 재고가 있으면 판매 : 가용 재고</ListItem>
+            <ListItem>재고 상관없이 주문 가능 : 무제한</ListItem>
+          </UnorderedList>
+        </TextWithPopperButton>
+      );
     },
     sortable: false,
   },
@@ -172,7 +236,7 @@ const columns: GridColumns = [
         ? GOODS_CONFIRMATION_STATUS[row.confirmation.status as GoodsConfirmationStatuses]
         : GOODS_CONFIRMATION_STATUS.waiting;
       return (
-        <Badge variant="solid" colorScheme={colorScheme} width="100%">
+        <Badge variant="solid" colorScheme={colorScheme} width="100%" textAlign="center">
           {label}
         </Badge>
       );
@@ -211,8 +275,8 @@ export function SellerGoodsList(): JSX.Element {
     sort,
     direction,
     changePage,
-    changeItemPerPage,
-    changeSort,
+    handlePageSizeChange,
+    handleSortChange,
   } = useSellerGoodsListPanelStore();
   const { data, isLoading } = useSellerGoodsList(
     {
@@ -226,25 +290,6 @@ export function SellerGoodsList(): JSX.Element {
       enabled: !!profileData?.email,
     },
   );
-
-  // 페이지당 보여질 행 개수 변경 핸들러
-  const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const { value } = event.target;
-    changeItemPerPage(Number(value));
-  };
-  // 상품 정렬 변경 핸들러
-  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const { value } = event.target;
-    switch (value) {
-      case 'regist_date':
-        changeSort(SortColumn.REGIST_DATE, SortDirection.DESC);
-        break;
-      case 'goods_name':
-        changeSort(SortColumn.GOODS_NAME, SortDirection.DESC);
-        break;
-      default:
-    }
-  };
 
   // 선택된 상품 id
   const [selectedGoodsIds, setSelectedGoodsIds] = useState<GridSelectionModel>([]);
@@ -323,7 +368,7 @@ export function SellerGoodsList(): JSX.Element {
               </Button>
               <Stack direction="row">
                 <Select
-                  defaultValue={10}
+                  value={itemPerPage}
                   onChange={handlePageSizeChange}
                   width="150px"
                   size="sm"
@@ -332,12 +377,7 @@ export function SellerGoodsList(): JSX.Element {
                   <option value={20}>20개씩</option>
                   <option value={30}>30개씩</option>
                 </Select>
-                <Select
-                  defaultValue={SortColumn.REGIST_DATE}
-                  onChange={handleSortChange}
-                  width="150px"
-                  size="sm"
-                >
+                <Select value={sort} onChange={handleSortChange} width="150px" size="sm">
                   <option value={SortColumn.REGIST_DATE}>최근 등록 순</option>
                   <option value={SortColumn.GOODS_NAME}>상품명 순</option>
                 </Select>
