@@ -42,4 +42,3 @@ export * from './lib/BusinessRegistrationDialog';
 export * from './lib/SettlementAccountForm';
 export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
-
