@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from '@project-lc/prisma-orm';
+import request from 'supertest';
 import { Context, createMockContext, MockContext } from '../../test-utils/context';
 import { SellerModule } from '../seller/seller.module';
 import { SellerService } from '../seller/seller.service';
