@@ -17,7 +17,10 @@ export const useChangeFmOrderStatusMutation = () => {
   const queryClient = useQueryClient();
   return useMutation(changeFmOrderStatus, {
     onSuccess: ({ data }) => {
-      if (data) queryClient.invalidateQueries(['FmOrder']);
+      if (data) {
+        queryClient.invalidateQueries('FmOrder');
+        queryClient.invalidateQueries('FmOrders', { refetchInactive: true });
+      }
     },
   });
 };
