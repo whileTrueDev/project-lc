@@ -7,6 +7,7 @@ export class AppSetting {
   public initialize() {
     this.app.useStaticAssets(join(__dirname, 'public'));
     this.app.useStaticAssets(join(__dirname, 'assets'));
+    this.app.useStaticAssets(join(__dirname, 'lib'));
     this.app.setBaseViewsDir(join(__dirname, 'views'));
     this.app.setViewEngine('hbs');
     this.app.enableCors();

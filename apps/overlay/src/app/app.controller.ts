@@ -10,16 +10,15 @@ export class AppController {
   @Get()
   @Render('index')
   async getData() {
-    // * prisma 데이터베이스 접근 호출 예시 by Dan
-    const data = await this.appService.getHello();
-    return { message: data };
+    const data = 'Hello World';
+    return data;
   }
 
   @Get(':id')
   @Render('client')
   async getRender() {
     // * prisma 데이터베이스 접근 호출 예시 by Dan
-    const data = await this.appService.getHello();
+    const data = 'Hello World';
     return { message: data };
   }
 }
