@@ -175,6 +175,8 @@ export function OrderList(): JSX.Element {
       <ChakraDataGrid
         bg={dataGridBgColor}
         autoHeight
+        disableSelectionOnClick
+        disableColumnMenu
         loading={orders.isLoading}
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
         rows={orders.data || []}
