@@ -9,7 +9,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { DeleteGoodsDto } from '@project-lc/shared-types';
+import { ChangeGoodsViewDto, DeleteGoodsDto } from '@project-lc/shared-types';
 import {
   GoodsService,
   JwtAuthGuard,
@@ -36,7 +36,7 @@ export class FmGoodsController {
    * @returns
    */
   @Patch('/expose')
-  changeGoodsView(@Body() dto: { view: 'look' | 'notLook'; id: number }) {
+  changeGoodsView(@Body(ValidationPipe) dto: ChangeGoodsViewDto) {
     const { id, view } = dto;
     return this.fmGoodsService.changeGoodsView(id, view);
   }

@@ -11,11 +11,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  ChangeGoodsViewDto,
   DeleteGoodsDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
-import { GoodsView } from '@prisma/client';
 import { GoodsService } from './goods.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
@@ -37,7 +37,6 @@ export class GoodsController {
     direction: SellerGoodsSortDirection,
   ) {
     return this.goodsService.getGoodsList({
-      // email: 'a1919361@gmail.com',
       email: seller.sub, // seller.email
       page,
       itemPerPage,
@@ -52,7 +51,7 @@ export class GoodsController {
   }
 
   @Patch('/expose')
-  changeGoodsView(@Body() dto: { view: GoodsView; id: number }) {
+  changeGoodsView(@Body(ValidationPipe) dto: ChangeGoodsViewDto) {
     const { id, view } = dto;
     return this.goodsService.changeGoodsView(id, view);
   }
@@ -63,7 +62,6 @@ export class GoodsController {
     @Body(ValidationPipe) dto: DeleteGoodsDto,
   ) {
     const email = seller.sub;
-    // const email = 'a1919361@gmail.com';
     return this.goodsService.deleteLcGoods({
       email,
       ids: dto.ids,

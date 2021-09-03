@@ -27,3 +27,4 @@ export * from './lib/res-types/goodsList.res';
 export * from './lib/dto/emailCodeVerification.dto';
 export * from './lib/constants/signupRegisterOptions';
 export * from './lib/shared-types';
+export * from './lib/dto/changeGoodsView.dto';
