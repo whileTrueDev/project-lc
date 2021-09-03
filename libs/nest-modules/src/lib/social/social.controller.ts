@@ -6,17 +6,19 @@ import {
   Query,
   Req,
   Res,
-  UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { Request, Response } from 'express';
+import { LoginHistoryService } from '../auth/login-history/login-history.service';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { SocialService } from './social.service';
-import { SocialLoginExceptionFilter } from './social-login-exception.filter';
 @Controller('social')
 export class SocialController {
-  constructor(private readonly socialService: SocialService) {}
+  constructor(
+    private readonly loginHistoryService: LoginHistoryService,
+    private readonly socialService: SocialService,
+  ) {}
 
   private readonly frontMypageUrl = 'http://localhost:4200/mypage';
 
@@ -35,15 +37,18 @@ export class SocialController {
 
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
-  @UseFilters(new SocialLoginExceptionFilter())
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
     this.socialService.login(req, res);
-    res.redirect(this.frontMypageUrl);
+
+    // 로그인 기록 추가 by @hwasurr
+    this.loginHistoryService.createLoginStamp(req, '소셜/구글');
+    return res.redirect(this.frontMypageUrl);
   }
 
   @Delete('/google/unlink/:googleId')
   async googleUnlink(@Param('googleId') googleId: string) {
-    return this.socialService.googleUnlink(googleId);
+    await this.socialService.googleUnlink(googleId);
+    return this.socialService.deleteSocialAccountRecord(googleId);
   }
 
   /** 네이버 ************************************************ */
@@ -54,15 +59,17 @@ export class SocialController {
 
   @Get('/naver/callback')
   @UseGuards(AuthGuard('naver'))
-  @UseFilters(new SocialLoginExceptionFilter())
   async naverAuthCallback(@Req() req: Request, @Res() res: Response) {
     this.socialService.login(req, res);
-    res.redirect(this.frontMypageUrl);
+    // 로그인 기록 추가 by @hwasurr
+    this.loginHistoryService.createLoginStamp(req, '소셜/네이버');
+    return res.redirect(this.frontMypageUrl);
   }
 
   @Delete('/naver/unlink/:naverId')
   async naverUnlink(@Param('naverId') naverId: string) {
-    return this.socialService.naverUnlink(naverId);
+    await this.socialService.naverUnlink(naverId);
+    return this.socialService.deleteSocialAccountRecord(naverId);
   }
 
   /** 카카오 ************************************************ */
@@ -73,14 +80,16 @@ export class SocialController {
 
   @Get('/kakao/callback')
   @UseGuards(AuthGuard('kakao'))
-  @UseFilters(new SocialLoginExceptionFilter())
   async kakaoAuthCallback(@Req() req: Request, @Res() res: Response) {
     this.socialService.login(req, res);
-    res.redirect(this.frontMypageUrl);
+    // 로그인 기록 추가 by @hwasurr
+    this.loginHistoryService.createLoginStamp(req, '소셜/카카오');
+    return res.redirect(this.frontMypageUrl);
   }
 
   @Delete('/kakao/unlink/:kakaoId')
   async kakaoUnlink(@Param('kakaoId') kakaoId: string) {
-    return this.socialService.kakaoUnlink(kakaoId);
+    await this.socialService.kakaoUnlink(kakaoId);
+    return this.socialService.deleteSocialAccountRecord(kakaoId);
   }
 }

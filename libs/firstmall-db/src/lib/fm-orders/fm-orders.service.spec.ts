@@ -3,6 +3,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrdersDto } from '@project-lc/shared-types';
 import { ordersSample } from '../../__tests__/ordersSample';
+import {
+  orderDetailExportsSample,
+  orderDetailOptionsSample,
+  orderDetailRefundsSample,
+  orderDetailReturnsSample,
+  orderMetaInfoSample,
+} from '../../__tests__/orderDetailSample';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FmOrdersService } from './fm-orders.service';
 
@@ -48,12 +55,16 @@ describe('FmOrdersService', () => {
       // where 구문이 올바르게 들어갔는 지 검사
       expect(sql).toContain('AND (DATE(regist_date) >= ? AND DATE(regist_date) <= ?)');
       expect(sql).toContain('OR fm_order.order_seq LIKE ?');
+      expect(sql).toContain('OR REPLACE(fm_order.order_phone, "-", "") LIKE ?');
+      expect(sql).toContain('OR REPLACE(fm_order.order_cellphone, "-", "") LIKE ?');
+      expect(sql).toContain('OR REPLACE(fm_order.recipient_phone, "-", "") LIKE ?');
+      expect(sql).toContain('OR REPLACE(fm_order.recipient_cellphone, "-", "") LIKE ?');
 
       // params 길이, 내용 검사
-      expect(params.length).toBe(15);
+      expect(params.length).toBe(21);
       expect(params[0]).toEqual(dto.searchStartDate);
       expect(params[1]).toEqual(dto.searchEndDate);
-      expect(params.slice(2, 15)).toEqual(new Array(13).fill(`%${dto.search}%`));
+      expect(params.slice(2, 21)).toEqual(new Array(19).fill(`%${dto.search}%`));
     });
   });
 
@@ -71,10 +82,14 @@ describe('FmOrdersService', () => {
 
     // where 구문이 올바르게 들어갔는 지 검사
     expect(sql).toContain('OR order_seq LIKE ?');
+    expect(sql).toContain('OR REPLACE(fm_order.order_phone, "-", "") LIKE ?');
+    expect(sql).toContain('OR REPLACE(fm_order.order_cellphone, "-", "") LIKE ?');
+    expect(sql).toContain('OR REPLACE(fm_order.recipient_phone, "-", "") LIKE ?');
+    expect(sql).toContain('OR REPLACE(fm_order.recipient_cellphone, "-", "") LIKE ?');
 
     // params 길이, 내용 검사
-    expect(params.length).toBe(13);
-    expect(params).toEqual(new Array(13).fill(`%${dto.search}%`));
+    expect(params.length).toBe(19);
+    expect(params).toEqual(new Array(19).fill(`%${dto.search}%`));
   });
 
   it('searchStartDate 만 주어진 경우', () => {
@@ -191,6 +206,125 @@ describe('FmOrdersService', () => {
 
       expect(orders[0].goods_name).toEqual(ordersSample[0].goods_name);
       expect(orders[0].id).toEqual(ordersSample[0].id);
+    });
+  });
+
+  describe('[PRIVATE Method] findOneOrderInfo', () => {
+    const orderId = 'TESTORDERID';
+
+    it('should be successed', async () => {
+      const querySpy = jest
+        .spyOn(db, 'query')
+        .mockImplementation(async () => [orderMetaInfoSample]);
+      const orderDetail = await service['findOneOrderInfo'](orderId);
+
+      expect(querySpy).toBeCalledTimes(2);
+
+      expect(orderDetail).toEqual(orderMetaInfoSample);
+    });
+
+    it('should be return null', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
+      const orderDetail = await service['findOneOrderInfo'](orderId);
+      expect(querySpy).toBeCalledTimes(3);
+
+      expect(orderDetail).toEqual(null);
+    });
+  });
+
+  describe('[PRIVATE Method] findOneOrderOptions', () => {
+    const orderId = 'TESTORDERID';
+
+    it('should be successed', async () => {
+      const querySpy = jest
+        .spyOn(db, 'query')
+        .mockImplementation(async () => orderDetailOptionsSample);
+      const orderDetail = await service['findOneOrderOptions'](orderId);
+
+      expect(querySpy).toBeCalledTimes(4);
+
+      expect(orderDetail).toEqual(orderDetailOptionsSample);
+    });
+
+    it('should be return empty array', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
+      const orderDetail = await service['findOneOrderOptions'](orderId);
+      expect(querySpy).toBeCalledTimes(5);
+
+      expect(orderDetail).toEqual([]);
+    });
+  });
+
+  describe('[PRIVATE Method] findOneOrderExports', () => {
+    const orderId = 'TESTORDERID';
+
+    it('should be successed', async () => {
+      const querySpy = jest
+        .spyOn(db, 'query')
+        .mockImplementation(async () => [orderDetailExportsSample]);
+      const orderDetail = await service['findOneOrderExports'](orderId);
+
+      expect(querySpy).toBeCalledTimes(6);
+
+      expect(orderDetail).toEqual(orderDetailExportsSample);
+    });
+
+    it('should be return null', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
+      const orderDetail = await service['findOneOrderExports'](orderId);
+      expect(querySpy).toBeCalledTimes(7);
+
+      expect(orderDetail).toEqual(null);
+    });
+  });
+
+  describe('[PRIVATE Method] findOneOrderRefunds', () => {
+    const orderId = 'TESTORDERID';
+
+    it('should be successed', async () => {
+      const querySpy = jest
+        .spyOn(db, 'query')
+        .mockImplementation(async () => [orderDetailRefundsSample]);
+      const orderDetail = await service['findOneOrderRefunds'](orderId);
+
+      expect(querySpy).toBeCalledTimes(8);
+
+      expect(orderDetail).toEqual(orderDetailRefundsSample);
+    });
+
+    it('should be return null', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
+      const orderDetail = await service['findOneOrderRefunds'](orderId);
+      expect(querySpy).toBeCalledTimes(9);
+
+      expect(orderDetail).toEqual(null);
+    });
+  });
+
+  describe('[PRIVATE Method] findOneOrderReturns', () => {
+    const orderId = 'TESTORDERID';
+
+    it('should be successed', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async (sql) => {
+        const { items, ...rest } = orderDetailReturnsSample;
+        if (sql.includes('GROUP BY return_code')) {
+          return [rest];
+        }
+        return items;
+      });
+      const orderDetail = await service['findOneOrderReturns'](orderId);
+
+      expect(querySpy).toBeCalledTimes(11);
+
+      expect(orderDetail).toEqual(orderDetailReturnsSample);
+    });
+
+    it('should be return null', async () => {
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
+      const orderDetail = await service['findOneOrderReturns'](orderId);
+      expect(querySpy).toBeCalledTimes(12);
+
+      expect(orderDetail).toEqual(null);
     });
   });
 });
