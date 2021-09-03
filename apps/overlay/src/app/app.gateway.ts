@@ -30,7 +30,7 @@ export class AppGateway
     this.logger.log('Initialized!');
   }
 
-  async handleConnection(socket: Socket) {
+  handleConnection(socket: Socket) {
     this.logger.log(`Client Connected ${socket.id}`);
   }
 
@@ -99,10 +99,10 @@ export class AppGateway
   }
 
   @SubscribeMessage('get ranking')
-  async getRanking(@ConnectedSocket() socket: Socket, @MessageBody() roomName) {
+  async getRanking(@MessageBody() roomName: string) {
     const nicknameAndPrice = [];
     const rankings = await this.appService.getRanking();
-    rankings.map((eachNickname) => {
+    rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();
       const { nickname } = eachNickname;
       nicknameAndPrice.push({ nickname, price: Number(price) });
@@ -114,32 +114,16 @@ export class AppGateway
     this.server.to(roomName).emit('get top-left ranking', nicknameAndPrice);
   }
 
-  @SubscribeMessage('total sold price')
-  async getTotalSold() {
-    const totalSold = await this.appService.getTotalSoldPrice();
-    // this.server.to().emit('')
-    console.log(Object.values(totalSold._sum).toString());
-  }
-
-  @SubscribeMessage('get purchase message')
-  async getPurchaseMessage() {
-    const messageAndNickname = await this.appService.getMessageAndNickname();
-    console.log(messageAndNickname);
-
-    // this.server.to().emit('')
-    // console.log(Object.values(totalSold._sum).toString());
-  }
-
   @SubscribeMessage('right top purchase message')
-  async getRightTopPurchaseMessage(@MessageBody() data: PurchaseMessage) {
-    const { roomName } = data;
+  async getRightTopPurchaseMessage(@MessageBody() purchase: PurchaseMessage) {
+    const { roomName } = purchase;
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
     const rankings = await this.appService.getRanking();
     const totalSold = await this.appService.getTotalSoldPrice();
     const messageAndNickname = await this.appService.getMessageAndNickname();
 
-    rankings.map((eachNickname) => {
+    rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();
       const { nickname } = eachNickname;
       nicknameAndPrice.push({ nickname, price: Number(price) });
@@ -148,13 +132,15 @@ export class AppGateway
       return b.price - a.price;
     });
 
-    messageAndNickname.map((d: { nickname: string; text: string }) => {
+    messageAndNickname.forEach((d: { nickname: string; text: string }) => {
       bottomAreaTextAndNickname.push(`${d.text} - [${d.nickname}]`);
     });
 
-    const audioBuffer = await this.appService.googleTextToSpeech(data);
+    const audioBuffer = await this.appService.googleTextToSpeech(purchase);
 
-    this.server.to(roomName).emit('get right-top purchase message', [data, audioBuffer]);
+    this.server
+      .to(roomName)
+      .emit('get right-top purchase message', [purchase, audioBuffer]);
     this.server.to(roomName).emit('get top-left ranking', nicknameAndPrice);
     this.server.to(roomName).emit('get current quantity', totalSold);
     this.server
@@ -163,14 +149,14 @@ export class AppGateway
   }
 
   @SubscribeMessage('get all data')
-  async getAllPurchaseMessage(@MessageBody() roomName) {
+  async getAllPurchaseMessage(@MessageBody() roomName: string) {
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
     const rankings = await this.appService.getRanking();
     const totalSold = await this.appService.getTotalSoldPrice();
     const messageAndNickname = await this.appService.getMessageAndNickname();
 
-    rankings.map((eachNickname) => {
+    rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();
       const { nickname } = eachNickname;
       nicknameAndPrice.push({ nickname, price: Number(price) });
@@ -179,7 +165,7 @@ export class AppGateway
       return b.price - a.price;
     });
 
-    messageAndNickname.map((d: { nickname: string; text: string }) => {
+    messageAndNickname.forEach((d: { nickname: string; text: string }) => {
       bottomAreaTextAndNickname.push(`${d.text} - [${d.nickname}]`);
     });
 
@@ -191,7 +177,7 @@ export class AppGateway
   }
 
   @SubscribeMessage('toggle right-top onad logo')
-  handleLogo(@MessageBody() roomName) {
+  handleLogo(@MessageBody() roomName: string) {
     this.server.to(roomName).emit('toggle right-top onad logo from server');
   }
 
@@ -226,7 +212,7 @@ export class AppGateway
   }
 
   @SubscribeMessage('refresh')
-  handleRefresh(@MessageBody() roomName) {
+  handleRefresh(@MessageBody() roomName: string) {
     this.server.to(roomName).emit('refresh signal');
   }
 }

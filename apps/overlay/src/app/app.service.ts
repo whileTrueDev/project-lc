@@ -2,31 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import * as textToSpeech from '@google-cloud/text-to-speech';
 import { throwError } from 'rxjs';
-
-interface AudioEncoding {
-  speakingRate: number;
-  audioEncoding: 'MP3' | undefined | null;
-}
-
-interface Voice {
-  languageCode: string;
-  name: string;
-  ssmlGender:
-    | 'FEMALE'
-    | 'SSML_VOICE_GENDER_UNSPECIFIED'
-    | 'MALE'
-    | 'NEUTRAL'
-    | null
-    | undefined;
-}
-
+import {
+  NickNameAndPrice,
+  PriceSum,
+  NickNameAndText,
+  Voice,
+  AudioEncoding,
+} from '@project-lc/shared-types';
 @Injectable()
 export class AppService {
   constructor(private readonly prisma: PrismaService) {}
 
   // * prisma 데이터베이스 접근 호출 예시 by Dan -> 예시 확인 이후 삭제해도 됩니다.
 
-  async getRanking(): Promise<any> {
+  async getRanking(): Promise<NickNameAndPrice[]> {
     const topRanks = await this.prisma.liveCommerceRanking.groupBy({
       by: ['nickname'],
       where: {
@@ -42,7 +31,7 @@ export class AppService {
     return topRanks;
   }
 
-  async getTotalSoldPrice(): Promise<any> {
+  async getTotalSoldPrice(): Promise<PriceSum> {
     const totalSoldPrice = await this.prisma.liveCommerceRanking.aggregate({
       _sum: {
         price: true,
@@ -52,7 +41,7 @@ export class AppService {
     return totalSoldPrice;
   }
 
-  async getMessageAndNickname(): Promise<any> {
+  async getMessageAndNickname(): Promise<NickNameAndText[]> {
     const messageAndNickname = await this.prisma.liveCommerceRanking.findMany({
       select: {
         nickname: true,
@@ -73,9 +62,6 @@ export class AppService {
       },
     };
     const client = new textToSpeech.TextToSpeechClient(options);
-
-    // The text to synthesize
-
     const { userId } = purchaseData;
     const { productName } = purchaseData;
     const quantity = purchaseData.purchaseNum;

@@ -39,14 +39,18 @@ export interface SinglePurchase {
   purchaseNumber: number;
 }
 
-// export interface QueryResult {
-//   error?: MysqlError | null;
-//   result: any;
-// }
-
-export interface RankingData {
+export interface NickNameAndPrice {
   nickname: string;
-  total: number;
+  _sum: { price: number };
+}
+
+export interface NickNameAndText {
+  nickname: string;
+  text: string;
+}
+
+export interface PriceSum {
+  _sum: { price: number };
 }
 
 export interface AudioEncoding {
