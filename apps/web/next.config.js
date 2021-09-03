@@ -11,7 +11,10 @@ const nextConfig = {
     svgr: true,
   },
   images: {
-    domains: ['project-lc-dev-test.s3.ap-northeast-2.amazonaws.com'],
+    domains: [
+      'project-lc-dev-test.s3.ap-northeast-2.amazonaws.com',
+      'whiletrue.firstmall.kr',
+    ],
   },
 };
 

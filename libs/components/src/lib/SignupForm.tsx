@@ -17,21 +17,16 @@ import {
   useMailVerificationMutation,
   useSellerSignupMutation,
 } from '@project-lc/hooks';
-import { SignUpSellerDto } from '@project-lc/shared-types';
+import {
+  emailCodeRegisterOptions,
+  emailRegisterOptions,
+  passwordRegisterOptions,
+  SignUpSellerDto,
+} from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CenterBox } from './CenterBox';
-
-export const passwordRegisterOptions = {
-  required: '암호를 작성해주세요.',
-  minLength: { value: 8, message: '비밀번호는 8자 이상이어야 합니다.' },
-  maxLength: { value: 20, message: '비밀번호는 20자 이하여야 합니다.' },
-  pattern: {
-    value: /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%^*+=-]).{8,20}$/,
-    message: '형식이 올바르지 않습니다.',
-  },
-};
 
 export interface SignupFormProps {
   enableShadow?: boolean;
@@ -155,13 +150,7 @@ export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFo
             placeholder="minsu@example.com"
             isReadOnly={phase === 2}
             autoComplete="off"
-            {...register('email', {
-              required: '이메일을 작성해주세요.',
-              pattern: {
-                value: /^[\w]+@[\w]+\.[\w][\w]+$/,
-                message: '이메일 형식이 올바르지 않습니다.',
-              },
-            })}
+            {...register('email', { ...emailRegisterOptions })}
           />
           <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
         </FormControl>
@@ -232,17 +221,7 @@ export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFo
               id="code"
               type="code"
               placeholder="이메일 인증코드"
-              {...register('code', {
-                required: '인증 코드를 입력해주세요.',
-                minLength: {
-                  value: 6,
-                  message: '인증코드는 6자 입니다.',
-                },
-                maxLength: {
-                  value: 6,
-                  message: '인증코드는 6자 입니다.',
-                },
-              })}
+              {...register('code', { ...emailCodeRegisterOptions })}
             />
             <FormErrorMessage>{errors.code && errors.code.message}</FormErrorMessage>
             <Flex alignItems="center" my={1}>

@@ -1,0 +1,17 @@
+.github @hwasurr
+.vscode @hwasurr
+libs/prisma-orm @hwasurr @chanuuuuu
+libs/firstmall-db/src/lib/firstmall-db.service.ts @hwasurr
+README.md @hwasurr
+.prettierrc @hwasurr
+.eslintrc.json @hwasurr
+tsconfig.json @hwasurr
+tsconfig.lib.json @hwasurr
+tsconfig.app.json @hwasurr
+tsconfig.build.json @hwasurr
+tsconfig.spec.json @hwasurr
+tsconfig.base.json @hwasurr
+tools @hwasurr
+workspace.json @hwasurr
+nx.json @hwasurr
+Dockerfile @hwasurr
