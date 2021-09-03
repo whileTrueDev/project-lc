@@ -13,6 +13,6 @@ export const mailerConfig = {
     },
   },
   defaults: {
-    from: 'support@mytruepoint.com',
+    from: 'hwasurr@onad.io',
   },
 };

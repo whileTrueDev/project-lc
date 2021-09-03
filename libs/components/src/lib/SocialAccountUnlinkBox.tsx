@@ -4,9 +4,9 @@ import {
   useProfile,
   useUnlinkSocialAccountMutation,
 } from '@project-lc/hooks';
-import google from '../../docs/google.png';
-import naver from '../../docs/naver.png';
-import kakao from '../../docs/kakao.png';
+import google from '../../images/google.png';
+import naver from '../../images/naver.png';
+import kakao from '../../images/kakao.png';
 import { ChakraNextImage } from './ChakraNextImage';
 import SocialAccountUnlinkDialog from './SocialAccountUnlinkDialog';
 

@@ -27,6 +27,7 @@ export * from './lib/OrderRefundExistsAlert';
 export * from './lib/OrderReturnExistsAlert';
 export * from './lib/PasswordSection';
 export * from './lib/ProfileBox';
+export * from './lib/ResetPasswordForm';
 export * from './lib/SectionWithTitle';
 export * from './lib/ShowMoreTextButton';
 export * from './lib/SignupForm';
