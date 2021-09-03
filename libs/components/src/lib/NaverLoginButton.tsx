@@ -1,6 +1,6 @@
 import { Button } from '@chakra-ui/react';
+import naverLogo from '../../images/naver.png';
 import { ChakraNextImage } from './ChakraNextImage';
-import naverLogo from '../../docs/naver.png';
 
 const NAVER_COLOR = '#03c75a';
 export function NaverLoginButton(): JSX.Element {
@@ -12,8 +12,9 @@ export function NaverLoginButton(): JSX.Element {
       bg={NAVER_COLOR}
       boxShadow="md"
       _hover={{ boxShadow: 'lg' }}
+      leftIcon={<ChakraNextImage src={naverLogo} width="24" height="24" />}
+      color="white"
     >
-      <ChakraNextImage src={naverLogo} width="40" height="40" mr={4} />
       네이버 로그인
     </Button>
   );

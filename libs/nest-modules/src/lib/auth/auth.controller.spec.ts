@@ -98,6 +98,14 @@ describe('AuthController', () => {
   //     });
   //   });
   // });
+  describe('POST /code-verification', () => {
+    it('should throw 400 error with code has longer than 6 characters', () => {
+      return request(app.getHttpServer())
+        .post('/auth/code-verification')
+        .send({ email: 'test@gmail.com', code: 'wrongCodeLongerThan6Char' })
+        .expect(400);
+    });
+  });
 
   afterAll(async () => {
     await app.close();

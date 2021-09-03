@@ -1,4 +1,5 @@
 import { Stack, Box, useColorModeValue, Heading, Text } from '@chakra-ui/react';
+import React from 'react';
 
 export interface CenterBoxProps {
   enableShadow?: boolean;
@@ -6,7 +7,7 @@ export interface CenterBoxProps {
     title: string;
     desc: string;
   };
-  children: JSX.Element;
+  children: React.ReactNode;
 }
 
 export function CenterBox({
@@ -24,7 +25,12 @@ export function CenterBox({
       >
         <Stack>
           <Heading fontSize="3xl">{header.title}</Heading>
-          <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')} mt={2}>
+          <Text
+            fontSize="sm"
+            color={useColorModeValue('gray.600', 'gray.400')}
+            mt={2}
+            whiteSpace="pre-line"
+          >
             {header.desc}
           </Text>
         </Stack>
