@@ -19,13 +19,11 @@ import { useQueryClient } from 'react-query';
 export function DeleteGoodsAlertDialog({
   onClose,
   isOpen,
-  hasSelectedGoods,
   items,
   selectedGoodsIds,
 }: {
   onClose: () => void;
   isOpen: boolean;
-  hasSelectedGoods: boolean;
   items?: SellerGoodsListItem[];
   selectedGoodsIds: GridSelectionModel;
 }): JSX.Element {
@@ -39,7 +37,7 @@ export function DeleteGoodsAlertDialog({
 
   // 삭제 다이얼로그에서 확인 눌렀을 때 상품삭제 핸들러
   const handleDelete = async () => {
-    if (!items || !hasSelectedGoods) return;
+    if (!items) return;
     // 검수된 상품
     const confirmedGoods = items.filter(
       (item) =>
@@ -94,17 +92,15 @@ export function DeleteGoodsAlertDialog({
           </AlertDialogHeader>
 
           <AlertDialogBody>
-            {!hasSelectedGoods
-              ? '삭제할 상품을 선택해주세요'
-              : '상품 삭제시 복구가 불가합니다. 선택한 상품을 삭제하시겠습니까?'}
+            상품 삭제시 복구가 불가합니다. 선택한 상품을 삭제하시겠습니까?
           </AlertDialogBody>
 
           <AlertDialogFooter>
-            {hasSelectedGoods && <Button onClick={onClose}>취소</Button>}
+            <Button onClick={onClose}>취소</Button>
             <Button
-              onClick={!hasSelectedGoods ? onClose : handleDelete}
+              onClick={handleDelete}
               ml={3}
-              colorScheme={!hasSelectedGoods ? undefined : 'red'}
+              colorScheme="red"
               isLoading={deleteLcGoods.isLoading || deleteFmGoods.isLoading}
             >
               확인

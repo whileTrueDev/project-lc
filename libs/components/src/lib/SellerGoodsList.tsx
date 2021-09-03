@@ -262,7 +262,6 @@ export function SellerGoodsList(): JSX.Element {
 
   // 선택된 상품 id
   const [selectedGoodsIds, setSelectedGoodsIds] = useState<GridSelectionModel>([]);
-  const hasSelectedGoods = selectedGoodsIds.length > 0;
 
   // 상품선택 핸들러
   const handleSelection = (selectionModel: GridSelectionModel) => {
@@ -291,7 +290,12 @@ export function SellerGoodsList(): JSX.Element {
         components={{
           Toolbar: () => (
             <Stack spacing={3} direction="row" justify="space-between" p={2}>
-              <Button onClick={onOpen} colorScheme="red" size="sm">
+              <Button
+                disabled={selectedGoodsIds.length <= 0}
+                onClick={onOpen}
+                colorScheme="red"
+                size="sm"
+              >
                 선택 삭제
               </Button>
               <Stack direction="row">
@@ -318,7 +322,6 @@ export function SellerGoodsList(): JSX.Element {
       <DeleteGoodsAlertDialog
         onClose={onClose}
         isOpen={isOpen}
-        hasSelectedGoods={hasSelectedGoods}
         items={data?.items}
         selectedGoodsIds={selectedGoodsIds}
       />
