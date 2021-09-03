@@ -17,3 +17,4 @@ export * from './lib/queries/useProfile';
 export * from './lib/queries/useSocialAccounts';
 export * from './lib/useCountdown';
 export * from './lib/useDisplaySize';
+export * from './lib/useSocialLoginFailAlarm';

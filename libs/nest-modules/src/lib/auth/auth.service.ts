@@ -59,7 +59,7 @@ export class AuthService {
     type: UserType,
     email: string,
     pwdInput: string,
-  ): Promise<UserPayload> {
+  ): Promise<UserPayload | null> {
     let user: Seller;
     if (type === 'seller') {
       user = await this.sellerService.findOne({ email });
@@ -175,9 +175,9 @@ export class AuthService {
     // if (type === 'seller') {
     const user = await this.sellerService.findOne({ email: sub });
     const hasPassword = Boolean(user.password);
-    delete user.password;
+    const { password, ..._user } = user;
     return {
-      ...user,
+      ..._user,
       type,
       hasPassword,
     };
