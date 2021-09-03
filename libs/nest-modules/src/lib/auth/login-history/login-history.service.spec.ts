@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaModule } from '../../../../../prisma-orm/src';
+import { PrismaModule } from '@project-lc/prisma-orm';
 import { LoginHistoryService } from './login-history.service';
 
 describe('LoginHistoryService', () => {
