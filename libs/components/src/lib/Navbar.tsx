@@ -108,7 +108,7 @@ export function Navbar() {
               </Tooltip>
               <Menu>
                 <MenuButton as={Avatar} size="sm" cursor="pointer" />
-                <MenuList maxW="300px">
+                <MenuList w={{ base: 280, sm: 300 }}>
                   <Box p={3}>
                     <ProfileBox />
                   </Box>

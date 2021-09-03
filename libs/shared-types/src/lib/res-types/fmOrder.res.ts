@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
 
+import { fmOrderStatuses } from '../constants/fmOrderStatuses';
+
 /**
  * 퍼스트몰 주문 정보
  * @author hwasurr
@@ -52,7 +54,7 @@ export interface FmOrder {
   /**
    * '주문상태',
    */
-  step: string;
+  step: keyof typeof fmOrderStatuses;
   /**
    * '로그',
    */
@@ -671,6 +673,381 @@ export interface FmOrderItem {
  * 주문 상품 정보 응답 타입
  * @author hwasurr
  */
-export type FindFmOrderRes = FmOrder & { id: FmOrder['order_seq'] } & {
+export type FindFmOrderRes = FmOrder & {
+  /** 주문아이디 */
+  id: FmOrder['order_seq'];
+} & {
   goods_name: FmOrderItem['goods_name'];
+};
+
+/**
+ * 상품 옵션 정보
+ */
+export interface FmOrderOption {
+  /**
+   * 주문 상품(옵션) 고유번호
+   */
+  item_option_seq: number;
+  /**
+   * 옵션 제목
+   */
+  title1: string;
+  /**
+   * 옵션 값
+   */
+  option1: string;
+  /**
+   * 주문 상품(옵션) 개수
+   */
+  ea: number;
+  /**
+   * 주문 상품(옵션) 상태
+   */
+  step: FmOrder['step'];
+  /**
+   * "35" 상품준비 상태 상품(옵션) 개수
+   */
+  step35: number;
+  /**
+   * "45" 출고준비 상태 상품(옵션) 개수
+   */
+  step45: number;
+  /**
+   * "55" 출고완료 상태 상품(옵션) 개수
+   */
+  step55: number;
+  /**
+   * "65" 배송중 상태 상품(옵션) 개수
+   */
+  step65: number;
+  /**
+   * "75" 배송완료 상태 상품(옵션) 개수
+   */
+  step75: number;
+  /**
+   * "85" 결제취소 상태 상품(옵션) 개수
+   */
+  step85: number;
+  /**
+   * 회원 할인가 (number string)
+   */
+  member_sale: string;
+  /**
+   * 모바일 할인가 (number string)
+   */
+  mobile_sale: string;
+  /**
+   * 옵션 색상
+   */
+  color?: string;
+  /**
+   * 옵션 금액 (상품 단가)
+   */
+  price: string;
+  /**
+   * 옵션 금액 (할인 제외)
+   */
+  ori_price: string;
+  /**
+   * 출고 번호 (출고된 경우에만 존재)
+   */
+  export_code?: string;
+  /**
+   * 환불 번호 (환불된 경우에만 존재)
+   */
+  refund_code?: string;
+  /**
+   * 반품 번호 (반품된 경우에만 존재)
+   */
+  return_code?: string;
+}
+
+export interface FmOrderExport {
+  /**
+   * 출고 고유번호
+   */
+  export_code: string;
+  /**
+   * 출고 일시 (date string)
+   */
+  export_date: string;
+  /**
+   * 출고 완료 일시 (date string)
+   */
+  complete_date?: string;
+  /**
+   * 배송 완료 일시 (date string)
+   */
+  shipping_date?: string;
+  /**
+   * 출고 상태 45, 55, 65, 75
+   */
+  export_status: '45' | '55' | '65' | '75';
+  /**
+   * 출고 택배사 코드
+   * - code0 = CJ GLS
+   * - code1 = DHL코리아
+   * - code2 = KGB택배
+   * - code3 = 경동택배
+   * - code4 = 대한통운
+   * - code5 = 동부택배(훼밀리)
+   * - code6 = 로젠택배
+   * - code7 = 우체국택배
+   * - code8 = 하나로택배
+   * - code9 = 한진택배
+   * - code10 = 롯데택배
+   * - code11 = 동원택배
+   * - code12 = 대신택배
+   * - code13 = 세덱스
+   * - code14 = 동부익스프레스
+   * - code15 = 천일택배
+   * - code16 = 사가와택배
+   * - code17 = 일양택배
+   * - code18 = 이노지스
+   * - code19 = 편의점택배
+   * - code20 = 건영택배
+   * - code21 = 엘로우캡
+   */
+  delivery_company_code: string;
+  /**
+   * 송장번호
+   */
+  delivery_number: string;
+  /**
+   * 총 출고 상품(옵션) 개수
+   */
+  ea: string;
+}
+
+/**
+ * 주문 상세 정보 (메타정보)
+ */
+export type FmOrderMetaInfo = Pick<
+  FmOrder,
+  | 'regist_date'
+  | 'sitetype'
+  | 'depositor'
+  | 'deposit_date'
+  | 'settleprice'
+  | 'step'
+  | 'order_user_name'
+  | 'order_phone'
+  | 'order_cellphone'
+  | 'order_email'
+  | 'recipient_user_name'
+  | 'recipient_phone'
+  | 'recipient_cellphone'
+  | 'recipient_email'
+  | 'recipient_zipcode'
+  | 'recipient_address'
+  | 'recipient_address_detail'
+  | 'recipient_address_street'
+  | 'memo'
+> & {
+  /** 주문아이디 */
+  id: FmOrder['order_seq'];
+} & Pick<FmOrderItem, 'goods_seq' | 'goods_name' | 'image'> & {
+    /**
+     * 배송비
+     */
+    shipping_cost: string;
+    /**
+     * 배송비
+     */
+    delivery_cost: string;
+    /**
+     * 배송 방식 이름
+     */
+    shipping_set_name: string;
+    /**
+     * 배송비 결제 방식
+     * - free = 무료
+     * - prepay = 선불 - 주문시결제
+     * - postpaid = 착불
+     */
+    shipping_type: 'free' | 'prepay' | 'postpaid';
+  };
+
+export interface FmOrderRefund {
+  /**
+   * 환불 코드
+   */
+  refund_code: string;
+  /**
+   * 환불 구분
+   * - cancel_payment = 결제취소
+   * - return = 반품환불
+   * - shipping_price = 배송비환불
+   */
+  refund_type: 'cancel_payment' | 'return' | 'shipping_price';
+  /**
+   * 환불 접수일
+   */
+  regist_date: string;
+  /**
+   * 환불 완료 날짜
+   */
+  refund_date: string;
+  /**
+   * 환불 처리 상태
+   */
+  status: 'request' | 'ing' | 'complete';
+  /**
+   * 환불 처리 완료 관리자 아이디
+   */
+  manager_id: string;
+  /**
+   * 환불 처리 완료 관리자 이메일
+   */
+  memail: string;
+  /**
+   * 환불 처리 완료 관리자 전화번호
+   */
+  mcellphone: string;
+  /**
+   * 총 환불 상품(옵션) 개수
+   */
+  ea: string;
+  /**
+   * 총 환불 상품(옵션) 가격
+   */
+  refund_goods_price: string;
+}
+
+export interface FmOrderReturnBase {
+  /**
+   * 반품 코드
+   */
+  return_code: string;
+  /**
+   * 환불 코드 - 환불이 포함된 경우
+   */
+  refund_code: string;
+  /**
+   * 반품 타입 (return: 반품, exchange: 맞교환)
+   */
+  return_type: 'return' | 'exchange';
+  /**
+   * 반품 처리 완료 관리자 아이디
+   */
+  manager_id: string;
+  /**
+   * 반품 처리 완료 관리자 이메일
+   */
+  memail: string;
+  /**
+   * 반품 처리 완료 관리자 전화번호
+   */
+  mcellphone: string;
+  /**
+   * 반품 처리 수량 (number string)
+   */
+  ea: string;
+  /**
+   * 반품 처리 상태
+   */
+  status: 'request' | 'ing' | 'complete';
+  /**
+   * 반품 접수 일시 (date string)
+   */
+  regist_date: string;
+  /**
+   * 반품 완료 일시 (date string)
+   */
+  return_date: string;
+  /**
+   * 선택한 반품/환불 사유
+   */
+  reason_desc: string;
+  /**
+   * 반품 상세 사유 (직접입력)
+   */
+  return_reason: string;
+  /**
+   * 반품방법 (user: 고객이 배송, shop: 상점이 회수)
+   */
+  return_method: 'user' | 'shop';
+  /**
+   * 회수지 우편번호
+   */
+  sender_zipcode: string;
+  /**
+   * 회수지 주소 도로명/지번 구분
+   */
+  sender_address_type: 'street' | 'zibun';
+  /**
+   * 회수지 주소
+   */
+  sender_address: string;
+  /**
+   * 회수지 도로명주소
+   */
+  sender_address_street: string;
+  /**
+   * 회수지 주소 상세
+   */
+  sender_address_detail: string;
+  /**
+   * 반송자 전화번호
+   */
+  phone: string;
+  /**
+   * 반송자 폰번호
+   */
+  cellphone: string;
+}
+
+export interface FmOrderReturnBaseItem {
+  /**
+   * 반품 상품 고유 번호
+   */
+  return_item_seq: number;
+  /**
+   * 반품 상품 코드
+   */
+  item_seq: number;
+  /**
+   * 반품 상품 옵션 코드 (fm_order_item_option.item_option_seq)
+   */
+  option_seq: number;
+  /**
+   * 반품 개수
+   */
+  ea: number;
+  /**
+   * 반품 사유
+   */
+  reason_desc: string;
+}
+
+export type FmOrderReturn = FmOrderReturnBase & {
+  /**
+   * 환불 상품 옵션 목록
+   */
+  items: Array<
+    FmOrderReturnBaseItem &
+      Pick<
+        FmOrderOption,
+        | 'item_option_seq'
+        | 'title1'
+        | 'option1'
+        | 'ea'
+        | 'step'
+        | 'member_sale'
+        | 'mobile_sale'
+        | 'color'
+        | 'price'
+        | 'ori_price'
+      >
+  >;
+};
+
+/**
+ * 상품 상세 정보 반환 데이터 타입
+ */
+export type FindFmOrderDetailRes = FmOrderMetaInfo & {
+  options: FmOrderOption[];
+  exports?: FmOrderExport;
+  refunds?: FmOrderRefund;
+  returns?: FmOrderReturn;
 };

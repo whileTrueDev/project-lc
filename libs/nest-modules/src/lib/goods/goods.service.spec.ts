@@ -1,13 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Goods, PrismaClient } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
+import { nanoid } from 'nanoid';
 import { GoodsService } from './goods.service';
 
 describe('GoodsService', () => {
   let __prisma: PrismaClient;
   let service: GoodsService;
 
-  const TEST_USER_EMAIL = 'test@test.com';
+  const TEST_USER_EMAIL = `${nanoid(2)}test@test.com`;
   const TEST_CONFIRMATION_GOODS_CONNECTION_ID = 999;
   let TEST_GOODS: Goods;
 

@@ -1,8 +1,8 @@
 import { ChevronDownIcon, DownloadIcon, Icon } from '@chakra-ui/icons';
 import {
-  Badge,
   Box,
   Button,
+  Link,
   Menu,
   MenuButton,
   MenuItem,
@@ -19,21 +19,36 @@ import {
   GridToolbarContainer,
   GridToolbarExport,
 } from '@material-ui/data-grid';
-import { useFmOrders, useDisplaySize } from '@project-lc/hooks';
+import { useDisplaySize, useFmOrders } from '@project-lc/hooks';
 import {
-  converOrderSitetypeToString,
-  convertFmOrderToString,
-  getFmOrderColor,
+  convertFmOrderStatusToString,
+  convertOrderSitetypeToString,
+  FmOrderStatusNumString,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
+import NextLink from 'next/link';
 import { useMemo, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
 import { ChakraDataGrid } from './ChakraDataGrid';
+import FmOrderStatusBadge from './FmOrderStatusBadge';
 import TooltipedText from './TooltipedText';
 
 const columns: GridColumns = [
-  { field: 'id', headerName: '주문번호', width: 140 },
+  {
+    field: 'id',
+    headerName: '주문번호',
+    width: 140,
+    renderCell: (params) => {
+      return (
+        <NextLink href={`/mypage/orders/${params.row.id}`} passHref>
+          <Link color="blue.500" textDecoration="underline">
+            {params.row.id}
+          </Link>
+        </NextLink>
+      );
+    },
+  },
   {
     field: 'regist_date',
     headerName: '주문일시',
@@ -58,9 +73,9 @@ const columns: GridColumns = [
     hideSortIcons: true,
     sortable: false,
     width: 120,
-    valueFormatter: ({ value }) => converOrderSitetypeToString(value as any) || '-',
+    valueFormatter: ({ value }) => convertOrderSitetypeToString(value as any) || '-',
     renderCell: (params) => (
-      <Text>{converOrderSitetypeToString(params.row.sitetype)}</Text>
+      <Text>{convertOrderSitetypeToString(params.row.sitetype)}</Text>
     ),
   },
   {
@@ -109,14 +124,18 @@ const columns: GridColumns = [
     sortable: false,
     width: 120,
     valueFormatter: ({ row }) => {
-      return row.depositor + (row.deposite_date ? `/${row.deposite_date}` : '');
+      const depositdate = dayjs(row.deposit_date).format('YYYY/MM/DD HH:mm:ss');
+      return row.depositor + (row.deposit_date ? `/${depositdate}` : '');
     },
-    renderCell: (params) => (
-      <Text>
-        {params.row.depositor}
-        {params.row.deposite_date ? `/${params.row.deposite_date}` : ''}
-      </Text>
-    ),
+    renderCell: (params) => {
+      const t = `${params.row.depositor}
+      ${
+        params.row.deposit_date
+          ? `/${dayjs(params.row.deposit_date).format('YYYY/MM/DD HH:mm:ss')}`
+          : ''
+      }`;
+      return <TooltipedText text={t} />;
+    },
   },
   {
     field: 'settleprice',
@@ -148,11 +167,11 @@ const columns: GridColumns = [
     disableReorder: true,
     hideSortIcons: true,
     sortable: false,
-    valueFormatter: ({ value }) => convertFmOrderToString(value as any) || '-',
-    renderCell: (param) => (
-      <Badge lineHeight={2} colorScheme={getFmOrderColor(param.row.step)} variant="solid">
-        {convertFmOrderToString(param.row.step)}
-      </Badge>
+    valueFormatter: ({ value }) => convertFmOrderStatusToString(value as any) || '-',
+    renderCell: ({ value }) => (
+      <Box lineHeight={2}>
+        <FmOrderStatusBadge orderStatus={value as FmOrderStatusNumString} />
+      </Box>
     ),
   },
 ];
@@ -186,7 +205,7 @@ export function OrderList(): JSX.Element {
               options={[
                 {
                   name: '출고 처리',
-                  onClick: (itemIds) => console.log(itemIds),
+                  onClick: (itemIds) => alert(itemIds),
                   icon: <Icon as={FaTruck} />,
                   emphasize: true,
                 },
@@ -218,25 +237,7 @@ export function OrderToolbar({ selectedItems, options }: OrderToolbarProps) {
   return (
     <GridToolbarContainer>
       <Stack spacing={2} direction="row">
-        {isMobile ? (
-          <Menu>
-            <MenuButton size="sm" as={Button} rightIcon={<ChevronDownIcon />}>
-              주문 처리 메뉴
-            </MenuButton>
-            <MenuList>
-              {options.map((opt) => (
-                <MenuItem
-                  icon={opt.icon}
-                  onClick={() => opt.onClick(selectedItems)}
-                  key={opt.name}
-                  isDisabled={selectedItems.length === 0}
-                >
-                  {opt.name}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-        ) : (
+        {isMobile ? null : (
           <>
             {options.map((opt) => (
               <Button
@@ -251,7 +252,11 @@ export function OrderToolbar({ selectedItems, options }: OrderToolbarProps) {
             ))}
             <Button size="sm" as="div" isDisabled={selectedItems.length === 0}>
               <GridToolbarExport
-                csvOptions={{ fileName: '주문목록' }}
+                csvOptions={{
+                  fileName: `project-lc_주문목록_${dayjs().format(
+                    'YYYY-MM-DD-HH-mm-ss',
+                  )}`,
+                }}
                 disabled={selectedItems.length === 0}
               />
             </Button>
