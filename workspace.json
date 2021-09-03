@@ -240,7 +240,8 @@
             "tsConfig": "apps/overlay/tsconfig.app.json",
             "assets": [
               "apps/overlay/src/assets",
-              "apps/overlay/src/views"
+              "apps/overlay/src/views",
+              "apps/overlay/src/lib"
             ],
             "generatePackageJson": true
           },

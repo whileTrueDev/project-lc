@@ -3,7 +3,6 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
-  WsResponse,
   OnGatewayDisconnect,
   OnGatewayConnection,
   OnGatewayInit,
@@ -161,8 +160,34 @@ export class AppGateway
     this.server
       .to(roomName)
       .emit('get bottom purchase message', bottomAreaTextAndNickname);
+  }
 
-    console.log(nicknameAndPrice, totalSold, bottomAreaTextAndNickname);
+  @SubscribeMessage('get all data')
+  async getAllPurchaseMessage(@MessageBody() roomName) {
+    const nicknameAndPrice = [];
+    const bottomAreaTextAndNickname: string[] = [];
+    const rankings = await this.appService.getRanking();
+    const totalSold = await this.appService.getTotalSoldPrice();
+    const messageAndNickname = await this.appService.getMessageAndNickname();
+
+    rankings.map((eachNickname) => {
+      const price = Object.values(eachNickname._sum).toString();
+      const { nickname } = eachNickname;
+      nicknameAndPrice.push({ nickname, price: Number(price) });
+    });
+    nicknameAndPrice.sort((a, b) => {
+      return b.price - a.price;
+    });
+
+    messageAndNickname.map((d: { nickname: string; text: string }) => {
+      bottomAreaTextAndNickname.push(`${d.text} - [${d.nickname}]`);
+    });
+
+    this.server.to(roomName).emit('get top-left ranking', nicknameAndPrice);
+    this.server.to(roomName).emit('get current quantity', totalSold);
+    this.server
+      .to(roomName)
+      .emit('get bottom purchase message', bottomAreaTextAndNickname);
   }
 
   @SubscribeMessage('toggle right-top onad logo')
