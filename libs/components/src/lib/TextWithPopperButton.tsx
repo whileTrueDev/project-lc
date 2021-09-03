@@ -9,6 +9,7 @@ import {
   PopoverCloseButton,
   PopoverBody,
   Text,
+  Theme,
 } from '@chakra-ui/react';
 
 export default function TextWithPopperButton({
@@ -16,11 +17,13 @@ export default function TextWithPopperButton({
   children,
   icon,
   iconAriaLabel,
+  iconColor,
 }: {
   title: string;
   children: React.ReactNode;
   icon: React.ReactElement;
   iconAriaLabel: string;
+  iconColor?: keyof Theme['colors'];
 }) {
   const { onOpen, onClose, isOpen } = useDisclosure();
   return (
@@ -28,7 +31,13 @@ export default function TextWithPopperButton({
       <Text>{title}</Text>
       <Popover isLazy isOpen={isOpen} onOpen={onOpen} onClose={onClose}>
         <PopoverTrigger>
-          <IconButton variant="ghost" aria-label={iconAriaLabel} size="xs" icon={icon} />
+          <IconButton
+            variant="ghost"
+            aria-label={iconAriaLabel}
+            size="xs"
+            icon={icon}
+            color={iconColor}
+          />
         </PopoverTrigger>
 
         <Portal>

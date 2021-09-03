@@ -21,6 +21,7 @@ import {
   Th,
   Thead,
   Tr,
+  Theme,
 } from '@chakra-ui/react';
 import { useGoodsStock } from '@project-lc/hooks';
 import { useState } from 'react';
@@ -29,10 +30,12 @@ export function StockInfoButton({
   goodsId,
   confirmedGoodsId,
   goodsName,
+  iconColor,
 }: {
   goodsId: number;
   confirmedGoodsId?: number;
   goodsName?: string;
+  iconColor?: keyof Theme['colors'];
 }): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [enabled, setEnabled] = useState<boolean>(false);
@@ -43,6 +46,7 @@ export function StockInfoButton({
   return (
     <>
       <IconButton
+        color={iconColor}
         position="absolute"
         right={0}
         top="50%"
