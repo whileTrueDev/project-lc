@@ -29,8 +29,12 @@ export class FMGoodsService {
         `DELETE FROM fm_goods_coupon_serial WHERE goods_seq IN (${idsParam})`,
         `DELETE FROM fm_goods WHERE goods_seq IN (${idsParam})`,
       ];
-      await this.db.transaction(sqls);
-      return true;
+      return this.db.transactionQuery(async (conn) => {
+        const queryPromises = sqls.map((sql) => conn.query(sql));
+        await Promise.all(queryPromises);
+        await conn.commit();
+        return true;
+      });
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);

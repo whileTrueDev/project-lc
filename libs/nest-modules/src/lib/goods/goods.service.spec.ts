@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Goods, GoodsView, PrismaClient } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
-import { SortColumn, SortDirection } from '@project-lc/shared-types';
+import {
+  SellerGoodsSortColumn,
+  SellerGoodsSortDirection,
+} from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import { GoodsService } from './goods.service';
 
@@ -92,8 +95,8 @@ describe('GoodsService', () => {
         email: TEST_USER_EMAIL,
         page: 0,
         itemPerPage: 10,
-        sort: SortColumn.REGIST_DATE,
-        direction: SortDirection.DESC,
+        sort: SellerGoodsSortColumn.REGIST_DATE,
+        direction: SellerGoodsSortDirection.DESC,
       });
 
       expect(goodsListData.items).toHaveLength(1);
@@ -108,8 +111,8 @@ describe('GoodsService', () => {
         email: TEST_USER_EMAIL,
         page: 0,
         itemPerPage: 10,
-        sort: SortColumn.REGIST_DATE,
-        direction: SortDirection.DESC,
+        sort: SellerGoodsSortColumn.REGIST_DATE,
+        direction: SellerGoodsSortDirection.DESC,
       });
       expect(goodsListData.items[0].goods_view).toBe(GoodsView.notLook);
     });
@@ -122,8 +125,8 @@ describe('GoodsService', () => {
         email: TEST_USER_EMAIL,
         page: 0,
         itemPerPage: 10,
-        sort: SortColumn.REGIST_DATE,
-        direction: SortDirection.DESC,
+        sort: SellerGoodsSortColumn.REGIST_DATE,
+        direction: SellerGoodsSortDirection.DESC,
       });
 
       expect(goodsListData.items).toHaveLength(0);

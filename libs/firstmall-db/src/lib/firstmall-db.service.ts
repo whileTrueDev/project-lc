@@ -26,21 +26,6 @@ export class FirstmallDbService {
     return rows;
   }
 
-  async transaction(sqls: string[]): Promise<any> {
-    const conn = await this.pool.getConnection();
-    try {
-      await conn.beginTransaction();
-      const queryPromises = sqls.map((sql) => conn.query(sql));
-      await Promise.all(queryPromises);
-      await conn.commit();
-    } catch (error) {
-      console.error(error);
-      await conn.rollback();
-    } finally {
-      await conn.release();
-    }
-  }
-
   /**
    * 트랜잭션 쿼리 처리 함수
    * @param cb connection을 인수로 받는 트랜잭션 처리 콜백 함수입니다. 커넥션을 통해 쿼리를 진행하고, 해당 변경 내용을 데이터베이스에 반영시키려면 conn.commit() 을 호출해야 합니다.
