@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { FirstmallDbService } from '../firstmall-db.service';
 
@@ -42,13 +43,13 @@ export class FMGoodsService {
       SELECT 
         o.*,
         s.stock as stock,
-			  case when s.stock <= 0 then 1 else 0 end as stocknothing,
-			  s.badstock as badstock,
-			  s.reservation15 as reservation15,
-			  s.reservation25 as reservation25,
-			  s.total_supply_price	as total_supply_price,
-			  s.total_stock			as total_stock,
-			  s.total_badstock		as total_badstock,
+        case when s.stock <= 0 then 1 else 0 end as stocknothing,
+        s.badstock as badstock,
+        s.reservation15 as reservation15,
+        s.reservation25 as reservation25,
+        s.total_supply_price	as total_supply_price,
+        s.total_stock			as total_stock,
+        s.total_badstock		as total_badstock,
 			  case when ( CONVERT(s.stock * 1, SIGNED) - CONVERT(s.reservation15 * 1, SIGNED)) <= 0 then 1 else 0 end as rstocknothing
       FROM 
         fm_goods_option o, fm_goods_supply s
