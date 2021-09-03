@@ -70,6 +70,7 @@ export function StockInfoButton({
                 <Tr>
                   <Th>기본옵션여부</Th>
                   <Th>옵션명</Th>
+                  <Th>옵션값</Th>
                   <Th>소비자가</Th>
                   <Th>정가</Th>
                   <Th>옵션노출여부</Th>
@@ -84,6 +85,7 @@ export function StockInfoButton({
                     <Tr key={option.id}>
                       <Td>{option.default_option === 'y' ? '예' : '아니오'}</Td>
                       <Td>{option.option_title}</Td>
+                      <Td>{option.option1}</Td>
                       <Td>{Number(option.consumer_price).toLocaleString()}</Td>
                       <Td>{Number(option.price).toLocaleString()}</Td>
                       <Td>{option.option_view === 'Y' ? '노출' : '미노출'}</Td>

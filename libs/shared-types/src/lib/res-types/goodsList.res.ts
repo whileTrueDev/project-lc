@@ -1,7 +1,7 @@
+/* eslint-disable camelcase */
 import {
   Goods,
   GoodsConfirmation,
-  GoodsConfirmationStatuses,
   GoodsOptions,
   GoodsOptionsSupplies,
   YesOrNo,
@@ -16,7 +16,8 @@ export type GoodsOptionsWithSupplies = GoodsOptions & {
 export type GoodsOptionWithStockInfo = {
   id: number;
   default_option: YesOrNo;
-  option_title: string;
+  option_title?: string;
+  option1?: string;
   consumer_price: Decimal;
   price: Decimal;
   option_view: YesOrNo_UPPERCASE;

@@ -106,7 +106,8 @@ model GoodsOptions {
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   default_option YesOrNo                @default(n) // 옵션 필수 여부
   option_type    String                 @default("direct") // 기본값인듯? 설명도 direct
-  option_title   String? // 옵션명
+  option_title   String? // 옵션명 fm_goods_options.option_title
+  option1        String? // 옵션값 fm_goods_options.option1
   option_code    String? // 옵션코드
   consumer_price Decimal                @db.Decimal(10, 2) // 소비자가 (미할인가)
   price          Decimal                @db.Decimal(10, 2) // 판매가 (할인가)
