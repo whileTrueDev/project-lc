@@ -6,14 +6,14 @@ import moment from 'moment';
 export const s3 = (() => {
   // 해당 네임 스페이스에서의 객체선언
   // bucket 이름
-  const S3_BUCKET_NAME = 'lc-project';
+  const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME!;
   const S3_BUCKET_REGION = 'ap-northeast-2';
 
   AWS.config.update({
     region: S3_BUCKET_REGION,
     credentials: {
-      accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET!,
+      accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET!,
     },
   });
 
