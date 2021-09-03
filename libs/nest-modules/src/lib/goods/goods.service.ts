@@ -190,9 +190,15 @@ export class GoodsService {
 
   // 유저가 등록한 상품 삭제
   // dto: email, [itemId, itemId, ...]
-  public async deleteLcGoods({ email, ids }: { email: string; ids: number[] }) {
+  public async deleteLcGoods({
+    email,
+    ids,
+  }: {
+    email: string;
+    ids: number[];
+  }): Promise<boolean> {
     try {
-      return this.prisma.goods.deleteMany({
+      await this.prisma.goods.deleteMany({
         where: {
           seller: { email },
           id: {
@@ -200,6 +206,7 @@ export class GoodsService {
           },
         },
       });
+      return true;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);
@@ -207,14 +214,15 @@ export class GoodsService {
   }
 
   // 노출여부 변경
-  public async changeGoodsView(id: number, view: GoodsView) {
+  public async changeGoodsView(id: number, view: GoodsView): Promise<boolean> {
     try {
-      return this.prisma.goods.update({
+      await this.prisma.goods.update({
         where: { id },
         data: {
           goods_view: view,
         },
       });
+      return true;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);

@@ -97,14 +97,15 @@ export class FMGoodsService {
   }
 
   // goods_seq인 상품의 노출정보 변경
-  async changeGoodsView(id: number, view: 'look' | 'notLook') {
+  async changeGoodsView(id: number, view: 'look' | 'notLook'): Promise<boolean> {
     const query = `
     UPDATE fm_goods 
     SET goods_view='${view}'
     WHERE goods_seq=${id}
     `;
     try {
-      return this.db.query(query);
+      await this.db.query(query);
+      return true;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);
