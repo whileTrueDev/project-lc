@@ -24,7 +24,7 @@ import {
   RunoutPolicy,
 } from '@prisma/client';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
-import { SortColumn } from '@project-lc/shared-types';
+import { SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { QuestionIcon } from '@chakra-ui/icons';
 import { ChakraDataGrid } from './ChakraDataGrid';
@@ -306,8 +306,8 @@ export function SellerGoodsList(): JSX.Element {
                   <option value={30}>30개씩</option>
                 </Select>
                 <Select value={sort} onChange={handleSortChange} width="150px" size="sm">
-                  <option value={SortColumn.REGIST_DATE}>최근 등록 순</option>
-                  <option value={SortColumn.GOODS_NAME}>상품명 순</option>
+                  <option value={SellerGoodsSortColumn.REGIST_DATE}>최근 등록 순</option>
+                  <option value={SellerGoodsSortColumn.GOODS_NAME}>상품명 순</option>
                 </Select>
               </Stack>
             </Stack>

@@ -1,14 +1,17 @@
-import { SortColumn, SortDirection } from '@project-lc/shared-types';
+import {
+  SellerGoodsSortColumn,
+  SellerGoodsSortDirection,
+} from '@project-lc/shared-types';
 import create from 'zustand';
 
 export interface SellerGoodsListPanelStoreState {
   page: number;
   itemPerPage: number;
-  sort: SortColumn;
-  direction: SortDirection;
+  sort: SellerGoodsSortColumn;
+  direction: SellerGoodsSortDirection;
   changePage(page: number): void;
   changeItemPerPage(itemPerPage: number): void;
-  changeSort(sort: SortColumn, direction: SortDirection): void;
+  changeSort(sort: SellerGoodsSortColumn, direction: SellerGoodsSortDirection): void;
   handlePageSizeChange(event: React.ChangeEvent<HTMLSelectElement>): void;
   handleSortChange(event: React.ChangeEvent<HTMLSelectElement>): void;
 }
@@ -17,12 +20,12 @@ export const useSellerGoodsListPanelStore = create<SellerGoodsListPanelStoreStat
   (set, get) => ({
     page: 0,
     itemPerPage: 10,
-    sort: SortColumn.REGIST_DATE,
-    direction: SortDirection.DESC,
+    sort: SellerGoodsSortColumn.REGIST_DATE,
+    direction: SellerGoodsSortDirection.DESC,
     changePage: (page: number) => set((state) => ({ ...state, page })),
     changeItemPerPage: (itemPerPage: number) =>
       set((state) => ({ ...state, itemPerPage })),
-    changeSort: (sort: SortColumn, direction: SortDirection) =>
+    changeSort: (sort: SellerGoodsSortColumn, direction: SellerGoodsSortDirection) =>
       set((state) => ({ ...state, sort, direction })),
     handlePageSizeChange: (event: React.ChangeEvent<HTMLSelectElement>) => {
       const { value } = event.target;
@@ -34,15 +37,15 @@ export const useSellerGoodsListPanelStore = create<SellerGoodsListPanelStoreStat
         case 'regist_date':
           set((state) => ({
             ...state,
-            sort: SortColumn.REGIST_DATE,
-            direction: SortDirection.DESC,
+            sort: SellerGoodsSortColumn.REGIST_DATE,
+            direction: SellerGoodsSortDirection.DESC,
           }));
           break;
         case 'goods_name':
           set((state) => ({
             ...state,
-            sort: SortColumn.GOODS_NAME,
-            direction: SortDirection.DESC,
+            sort: SellerGoodsSortColumn.GOODS_NAME,
+            direction: SellerGoodsSortDirection.DESC,
           }));
           break;
         default:

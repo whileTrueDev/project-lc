@@ -10,7 +10,11 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { DeleteGoodsDto, SortColumn, SortDirection } from '@project-lc/shared-types';
+import {
+  DeleteGoodsDto,
+  SellerGoodsSortColumn,
+  SellerGoodsSortDirection,
+} from '@project-lc/shared-types';
 import { GoodsView } from '@prisma/client';
 import { GoodsService } from './goods.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
@@ -27,9 +31,10 @@ export class GoodsController {
     @SellerInfo() seller: UserPayload,
     @Query('page', new DefaultValuePipe(0), ParseIntPipe) page: number,
     @Query('itemPerPage', new DefaultValuePipe(10), ParseIntPipe) itemPerPage: number,
-    @Query('sort', new DefaultValuePipe(SortColumn.REGIST_DATE)) sort: SortColumn,
-    @Query('direction', new DefaultValuePipe(SortDirection.DESC))
-    direction: SortDirection,
+    @Query('sort', new DefaultValuePipe(SellerGoodsSortColumn.REGIST_DATE))
+    sort: SellerGoodsSortColumn,
+    @Query('direction', new DefaultValuePipe(SellerGoodsSortDirection.DESC))
+    direction: SellerGoodsSortDirection,
   ) {
     return this.goodsService.getGoodsList({
       // email: 'a1919361@gmail.com',

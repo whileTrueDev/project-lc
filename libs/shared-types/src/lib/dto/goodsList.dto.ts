@@ -1,11 +1,11 @@
 import { IsEnum, IsNumber } from 'class-validator';
 
 // Goods 테이블의 컬럼명
-export enum SortColumn {
+export enum SellerGoodsSortColumn {
   REGIST_DATE = 'regist_date',
   GOODS_NAME = 'goods_name',
 }
-export enum SortDirection {
+export enum SellerGoodsSortDirection {
   DESC = 'desc',
   ASC = 'asc',
 }
@@ -17,9 +17,9 @@ export class GoodsListDto {
   @IsNumber()
   itemPerPage: number;
 
-  @IsEnum(SortColumn)
-  sort = SortColumn.REGIST_DATE;
+  @IsEnum(SellerGoodsSortColumn)
+  sort = SellerGoodsSortColumn.REGIST_DATE;
 
-  @IsEnum(SortDirection)
-  direction = SortDirection.DESC;
+  @IsEnum(SellerGoodsSortDirection)
+  direction = SellerGoodsSortDirection.DESC;
 }
