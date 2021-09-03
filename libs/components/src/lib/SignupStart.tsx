@@ -42,6 +42,7 @@ export function SignupStart({
             쉽고 빠른 크리에이터 매칭
           </ListItem>
         </List>
+
         <Stack spacing={2}>
           <Button
             bg="blue.400"
@@ -54,10 +55,15 @@ export function SignupStart({
             이메일 계정으로 가입
           </Button>
           <SocialButtonGroup />
-          <Text fontSize="sm">
+
+          <Text fontSize="sm" pt={2}>
             이미 가입하셨나요?
             <NextLink href="/login" passHref>
-              <Link ml={2} color={useColorModeValue('blue.500', 'blue.400')}>
+              <Link
+                ml={2}
+                color={useColorModeValue('blue.500', 'blue.400')}
+                textDecoration="underline"
+              >
                 로그인
               </Link>
             </NextLink>
