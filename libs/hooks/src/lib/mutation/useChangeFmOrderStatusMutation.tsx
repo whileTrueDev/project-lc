@@ -1,5 +1,6 @@
-import { useMutation, useQueryClient } from 'react-query';
 import { FmOrder, FmOrderStatus } from '@project-lc/shared-types';
+import { useFmOrderStore } from '@project-lc/stores';
+import { useMutation, useQueryClient } from 'react-query';
 import axios from '../../axios';
 
 export interface useChangeFmOrderStatusMutationDto {
@@ -15,11 +16,24 @@ export const changeFmOrderStatus = (dto: useChangeFmOrderStatusMutationDto) =>
 
 export const useChangeFmOrderStatusMutation = () => {
   const queryClient = useQueryClient();
+  const { search, searchDateType, searchStartDate, searchEndDate, searchStatuses } =
+    useFmOrderStore();
+
   return useMutation(changeFmOrderStatus, {
     onSuccess: ({ data }) => {
       if (data) {
         queryClient.invalidateQueries('FmOrder');
-        queryClient.invalidateQueries('FmOrders', { refetchInactive: true });
+        queryClient.invalidateQueries(
+          [
+            'FmOrders',
+            search,
+            searchDateType,
+            searchEndDate,
+            searchStartDate,
+            searchStatuses,
+          ],
+          { refetchInactive: true },
+        );
       }
     },
   });
