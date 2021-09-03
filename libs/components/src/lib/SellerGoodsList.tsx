@@ -299,17 +299,12 @@ export function SellerGoodsList(): JSX.Element {
                 선택 삭제
               </Button>
               <Stack direction="row">
-                <Select
-                  value={itemPerPage}
-                  onChange={handlePageSizeChange}
-                  width="150px"
-                  size="sm"
-                >
+                <Select value={itemPerPage} onChange={handlePageSizeChange} size="sm">
                   <option value={10}>10개씩</option>
                   <option value={20}>20개씩</option>
                   <option value={30}>30개씩</option>
                 </Select>
-                <Select value={sort} onChange={handleSortChange} width="150px" size="sm">
+                <Select value={sort} onChange={handleSortChange} size="sm">
                   <option value={SellerGoodsSortColumn.REGIST_DATE}>최근 등록 순</option>
                   <option value={SellerGoodsSortColumn.GOODS_NAME}>상품명 순</option>
                 </Select>
