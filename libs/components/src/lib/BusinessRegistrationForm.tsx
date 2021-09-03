@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import {
   Grid,
   GridItem,
@@ -59,7 +60,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
       <GridItem {...valueConfig}>
         <Input
           id="companyName"
-          m={3}
+          m={[1, 3, 3, 3]}
           variant="flushed"
           borderBottomColor="blackAlpha.500"
           placeholder="회사명을 입력해주세요."
@@ -78,9 +79,9 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
         <FormControl isInvalid={!!errors.businessRegistrationNumber}>
           <Input
             id="businessRegistrationNumber"
-            m={3}
+            m={[1, 3, 3, 3]}
             variant="flushed"
-            maxW={300}
+            maxW={['inherit', 300, 300, 300]}
             maxLength={10}
             autoComplete="off"
             isRequired
@@ -104,7 +105,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
       <GridItem {...valueConfig}>
         <Input
           id="representativeName"
-          m={3}
+          m={[1, 3, 3, 3]}
           variant="flushed"
           borderBottomColor="blackAlpha.500"
           placeholder="대표자명을 입력해주세요."
@@ -122,26 +123,26 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
         <Flex direction="row">
           <Input
             id="businessType"
-            m={3}
+            m={[1, 3, 3, 3]}
             variant="flushed"
             borderBottomColor="blackAlpha.500"
             placeholder="업태"
             autoComplete="off"
             isRequired
-            maxLength={10}
+            maxLength={50}
             {...register('businessType', {
               required: '업태를 입력해주세요.',
             })}
           />
           <Input
             id="businessItem"
-            m={3}
+            m={[1, 3, 3, 3]}
             variant="flushed"
             borderBottomColor="blackAlpha.500"
             placeholder="종목"
             isRequired
             autoComplete="off"
-            maxLength={10}
+            maxLength={50}
             {...register('businessItem', {
               required: '종목을 입력해주세요.',
             })}
@@ -152,7 +153,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
       <GridItem {...valueConfig}>
         <Input
           id="businessAddress"
-          m={3}
+          m={[1, 3, 3, 3]}
           variant="flushed"
           borderBottomColor="blackAlpha.500"
           placeholder="사업장의 주소를 입력해주세요."
@@ -170,12 +171,12 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
           <Input
             id="taxInvoiceMail"
             type="email"
-            m={3}
+            m={[1, 3, 3, 3]}
             variant="flushed"
             placeholder="계산서를 받을 이메일을 입력해주세요."
             isRequired
             autoComplete="off"
-            maxW={300}
+            maxW={['inherit', 300, 300, 300]}
             {...register('taxInvoiceMail', {
               pattern: {
                 value: /^[\w]+@[\w]+\.[\w][\w]+$/,
@@ -202,6 +203,8 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
   );
 }
 
-export const BusinessRegistrationForm = forwardRef((props, ref) => {
-  return <BusinessRegistrationFormTag {...props} inputRef={ref} />;
-});
+export const BusinessRegistrationForm = forwardRef(
+  (props: Omit<BusinessRegistrationFormProps, 'inputRef'>, ref: any) => {
+    return <BusinessRegistrationFormTag {...props} inputRef={ref} />;
+  },
+);

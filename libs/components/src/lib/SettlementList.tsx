@@ -1,14 +1,11 @@
-import {
-  GridColumns,
-  // GridRowId,
-  // GridSelectionModel,
-  // GridToolbarContainer,
-  // GridToolbarExport,
-} from '@material-ui/data-grid';
+import { GridColumns } from '@material-ui/data-grid';
 import { Badge } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
 import dayjs from 'dayjs';
+import { SellerSettlements } from '@prisma/client';
 import { ChakraDataGrid } from './ChakraDataGrid';
+
+export type SettlementListProps = { sellerSettlements: SellerSettlements[] };
 
 function switchBadge(state: number): JSX.Element {
   let option = null;
@@ -50,7 +47,7 @@ const columns: GridColumns = [
   {
     field: 'date',
     headerName: '정산 날짜',
-    valueFormatter: ({ row }) => dayjs(row.date as any).format('YYYY/MM/DD HH:mm:ss'),
+    valueFormatter: ({ row }) => dayjs(row.date as Date).format('YYYY/MM/DD HH:mm:ss'),
   },
   {
     field: 'payment',
@@ -67,7 +64,7 @@ const columns: GridColumns = [
   },
 ];
 
-function makeListRow(sellerSettlements: any[] | undefined) {
+function makeListRow(sellerSettlements: SellerSettlements[] | undefined) {
   if (!sellerSettlements) {
     return [];
   }
@@ -77,7 +74,7 @@ function makeListRow(sellerSettlements: any[] | undefined) {
 }
 
 // 정산 내역을 보여주는 데이터 그리드
-export function SettlementList(props): JSX.Element {
+export function SettlementList(props: SettlementListProps): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { sellerSettlements } = props;
 
@@ -92,7 +89,7 @@ export function SettlementList(props): JSX.Element {
       rows={makeListRow(sellerSettlements)}
       style={{ borderWidth: 0 }}
       rowCount={5}
-      rowsPerPageOptions={[5, 10]}
+      rowsPerPageOptions={[25, 50]}
       disableColumnMenu
       disableColumnFilter
       disableSelectionOnClick

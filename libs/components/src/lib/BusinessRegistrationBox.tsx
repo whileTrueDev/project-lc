@@ -11,7 +11,13 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { Fragment } from 'react';
+import { SettlementInfoRefetchType } from '@project-lc/hooks';
+import { SellerBusinessRegistration } from '@prisma/client';
 import { BusinessRegistrationDialog } from './BusinessRegistrationDialog';
+
+interface SellerBusinessRegistrationInterface extends SellerBusinessRegistration {
+  [index: string]: string | number;
+}
 
 // grid 내에서 동일한 포맷팅을 수행하는 테이블 구현
 export function makeTable({
@@ -19,7 +25,7 @@ export function makeTable({
   value,
 }: {
   title: string;
-  value: string | JSX.Element;
+  value: string | number | JSX.Element;
 }): JSX.Element {
   return (
     <Fragment key={title}>
@@ -62,27 +68,36 @@ const columns = [
   { title: '전자세금계산서 수신 이메일', field: 'taxInvoiceMail' },
 ];
 
-function makeListRow(businessRegistration: any) {
-  if (!businessRegistration) {
+function makeListRow(sellerBusinessRegistration: SellerBusinessRegistrationInterface) {
+  if (!sellerBusinessRegistration) {
     return [];
   }
   return columns.map(({ title, field }) => {
     if (Array.isArray(field)) {
       return {
         title,
-        value: `${businessRegistration[field[0]]} / ${businessRegistration[field[1]]}`,
+        value: `${sellerBusinessRegistration[field[0]]} / ${
+          sellerBusinessRegistration[field[1]]
+        }`,
       };
     }
     return {
       title,
-      value: businessRegistration[field],
+      value: sellerBusinessRegistration[field],
     };
   });
 }
 
-export function BusinessRegistrationBox(props): JSX.Element {
+type BusinessRegistrationBoxProps = {
+  refetch: SettlementInfoRefetchType;
+  sellerBusinessRegistration: SellerBusinessRegistration;
+};
+
+export function BusinessRegistrationBox(
+  props: BusinessRegistrationBoxProps,
+): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { businessRegistration, refetch } = props;
+  const { sellerBusinessRegistration, refetch } = props;
 
   return (
     <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
@@ -94,14 +109,14 @@ export function BusinessRegistrationBox(props): JSX.Element {
           사업자 등록증 등록
         </Button>
       </Flex>
-      {businessRegistration ? (
+      {sellerBusinessRegistration ? (
         <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-          {makeListRow(businessRegistration).map((element) => makeTable(element))}
+          {makeListRow(sellerBusinessRegistration).map((element) => makeTable(element))}
         </Grid>
       ) : (
         <>
           <Divider color="gray.100" />
-          <Center mt={5}>
+          <Center mt={10}>
             <VStack>
               <Text>등록된 사업자 등록증이 없습니다.</Text>
               <Text fontSize="sm">위의 버튼을 통해 사업자 등록증을 등록해주세요.</Text>

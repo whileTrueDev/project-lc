@@ -12,7 +12,12 @@ import {
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { BusinessRegistrationDto } from '@project-lc/shared-types';
-import { useBusinessRegistrationMutation, s3, useProfile } from '@project-lc/hooks';
+import {
+  SettlementInfoRefetchType,
+  useBusinessRegistrationMutation,
+  s3,
+  useProfile,
+} from '@project-lc/hooks';
 
 import { BusinessRegistrationForm } from './BusinessRegistrationForm';
 // 등록 정보UI와 동일한 형태를 사용
@@ -25,16 +30,17 @@ export type BusinessRegistrationFormDto = BusinessRegistrationDto & {
 interface BusinessRegistrationDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  refetch: any;
+  refetch: SettlementInfoRefetchType;
 }
 
 // 사업자 등록증 등록 다이얼로그
 export function BusinessRegistrationDialog(props: BusinessRegistrationDialogProps) {
-  // 다이얼로그의 열린상태
   const { isOpen, onClose, refetch } = props;
+  const inputRef = useRef(null);
+  const { data: profileData } = useProfile();
   const toast = useToast();
+  const mutation = useBusinessRegistrationMutation();
 
-  // react-hook-form추가
   const {
     handleSubmit,
     register,
@@ -49,13 +55,9 @@ export function BusinessRegistrationDialog(props: BusinessRegistrationDialogProp
     onClose();
     reset();
   }
-  // 다이얼로그의 열렸을때 focus
-  const inputRef = useRef(null);
-  const { data: profileData } = useProfile();
 
-  const mutation = useBusinessRegistrationMutation();
-  // 등록을 수행하는 함수
-  async function regist(data: BusinessRegistrationFormDto) {
+  // 또 다른 s3 업로드 과정이 필요할 때, hook으로 파일 분리
+  async function saveToS3(data: BusinessRegistrationFormDto) {
     const { businessRegistrationImage, imageName, ...result } = data;
 
     // s3로 저장
@@ -66,12 +68,19 @@ export function BusinessRegistrationDialog(props: BusinessRegistrationDialogProp
       file: businessRegistrationImage,
     });
 
+    if (!savedImageName) {
+      throw new Error('S3 ERROR');
+    }
+
+    return savedImageName;
+  }
+
+  async function regist(data: BusinessRegistrationFormDto) {
+    const { businessRegistrationImage, imageName, ...result } = data;
+
     try {
-      if (!savedImageName) {
-        throw new Error('S3 ERROR');
-      }
+      const savedImageName = await saveToS3(data);
       await mutation.mutateAsync({ ...result, fileName: savedImageName });
-      // 서버에 데이터 전달.
       toast({
         title: '사업자 등록증 등록 완료',
         status: 'success',
