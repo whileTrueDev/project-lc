@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaModule } from '../../../../../prisma-orm/src';
 import { LoginHistoryService } from './login-history.service';
 
 describe('LoginHistoryService', () => {
   let service: LoginHistoryService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [PrismaModule],
       providers: [LoginHistoryService],
     }).compile();
 

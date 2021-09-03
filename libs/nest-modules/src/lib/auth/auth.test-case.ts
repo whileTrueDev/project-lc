@@ -43,3 +43,15 @@ export const authTestCases = [
     result: null,
   },
 ];
+
+export const loginHistorySample = {
+  city: 'busan',
+  country: 'KR',
+  device: 'pc',
+  ip: '::1',
+  method: '이메일',
+  id: 1,
+  sellerId: 1,
+  ua: 'UA_STRING',
+  createDate: new Date(),
+};
