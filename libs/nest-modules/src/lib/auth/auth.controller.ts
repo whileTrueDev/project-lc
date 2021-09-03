@@ -21,11 +21,13 @@ import { LocalAuthGuard } from '../_nest-units/guards/local-auth.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 import { UserType } from './auth.interface';
+import { LoginHistoryService } from './login-history/login-history.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
+    private readonly loginHistoryService: LoginHistoryService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
 
@@ -46,6 +48,8 @@ export class AuthController {
       userType,
     );
     this.authService.handleLoginHeader(res, loginToken);
+    // 로그인 히스토리 추가
+    this.loginHistoryService.createLoginStamp(req, '이메일');
     res.status(200).send(loginToken);
   }
 
@@ -58,8 +62,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Req() req) {
-    // return req.user;
+  getProfile(@Req() req: Request) {
     return this.authService.getProfile(req.user);
   }
 
