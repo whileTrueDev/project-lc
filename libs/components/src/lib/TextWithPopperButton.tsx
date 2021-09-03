@@ -26,6 +26,7 @@ export default function TextWithPopperButton({
   iconColor?: keyof Theme['colors'];
 }) {
   const { onOpen, onClose, isOpen } = useDisclosure();
+
   return (
     <>
       <Text>{title}</Text>
@@ -40,13 +41,21 @@ export default function TextWithPopperButton({
           />
         </PopoverTrigger>
 
-        <Portal>
-          <PopoverContent p={5} minWidth="400px">
+        {isOpen ? (
+          <Portal>
+            <PopoverContent p={5}>
+              <PopoverArrow />
+              <PopoverCloseButton />
+              <PopoverBody>{children}</PopoverBody>
+            </PopoverContent>
+          </Portal>
+        ) : (
+          <PopoverContent p={5}>
             <PopoverArrow />
             <PopoverCloseButton />
             <PopoverBody>{children}</PopoverBody>
           </PopoverContent>
-        </Portal>
+        )}
       </Popover>
     </>
   );
