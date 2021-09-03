@@ -12,15 +12,15 @@ datasource db {
 }
 
 model Seller {
-  id                      Int                          @id @default(autoincrement())
-  email                   String                       @unique
-  name                    String?
-  password                String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
-  socialAccounts          SellerSocialAccount[]
-  goods                   Goods[]
-  businessRegistration    SellerBusinessRegistration[]
-  sellerSettlements       SellerSettlements[]
-  sellerSettlementAccount SellerSettlementAccount[]
+  id                         Int                          @id @default(autoincrement())
+  email                      String                       @unique
+  name                       String?
+  password                   String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
+  socialAccounts             SellerSocialAccount[]
+  goods                      Goods[]
+  sellerBusinessRegistration SellerBusinessRegistration[]
+  sellerSettlements          SellerSettlements[]
+  sellerSettlementAccount    SellerSettlementAccount[]
 }
 
 // 마케터의 사업자 등록증을 위한 모델 seller와 1 : N의 관계를 가지므로
@@ -181,7 +181,7 @@ enum ShopOrGoods {
 }
 
 // * 상품 - 개별 배송비 선택
-// * 상품 - 최소 구매 수량 사용 여부
+// * 상품 - ���소 구매 수량 사용 여부
 // * 상�� - 최대 ���매 ���량 사용 ����부
 enum LimitOrUnlimit {
   unlimit

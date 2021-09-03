@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
 import { hash, verify } from 'argon2';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { BusinessRegistrationDto } from '@project-lc/shared-types';
+import { BusinessRegistrationDto, SettlementAccountDto } from '@project-lc/shared-types';
 import { UserPayload } from '../auth/auth.interface';
 @Injectable()
 export class SellerService {
@@ -160,26 +160,49 @@ export class SellerService {
     sellerInfo: UserPayload,
   ) {
     const email = sellerInfo.sub;
-    const businessRegistration = await this.prisma.sellerBusinessRegistration.create({
+    const sellerBusinessRegistration =
+      await this.prisma.sellerBusinessRegistration.create({
+        data: {
+          companyName: dto.companyName,
+          sellerEmail: email,
+          businessRegistrationNumber: this.makeRegistrationNumberFormat(
+            dto.businessRegistrationNumber,
+          ),
+          representativeName: dto.representativeName,
+          businessType: dto.businessType,
+          businessItem: dto.businessItem,
+          businessAddress: dto.businessAddress,
+          taxInvoiceMail: dto.taxInvoiceMail,
+          fileName: dto.fileName,
+        },
+      });
+
+    return sellerBusinessRegistration;
+  }
+
+  /**
+   * 정산 계좌 등록
+   * @param dto 정산 계좌 정보
+   * @param sellerInfo 사용자 등록 정보
+   */
+  async insertSettlementAccount(dto: SettlementAccountDto, sellerInfo: UserPayload) {
+    const email = sellerInfo.sub;
+    const settlementAccount = await this.prisma.sellerSettlementAccount.create({
       data: {
-        companyName: dto.companyName,
         sellerEmail: email,
-        businessRegistrationNumber: this.makeRegistrationNumberFormat(
-          dto.businessRegistrationNumber,
-        ),
-        representativeName: dto.representativeName,
-        businessType: dto.businessType,
-        businessItem: dto.businessItem,
-        businessAddress: dto.businessAddress,
-        taxInvoiceMail: dto.taxInvoiceMail,
-        fileName: dto.fileName,
+        name: dto.name,
+        number: dto.number,
+        bank: dto.bank,
       },
     });
 
-    return businessRegistration;
+    return settlementAccount;
   }
 
-  // 현재 사용자의 정산 정보
+  /**
+   * 정산 정보 조회
+   * @param sellerInfo 사용자 등록 정보
+   */
   async selectSellerSettlementInfo(sellerInfo: UserPayload) {
     const email = sellerInfo.sub;
     const settlementInfo = await this.prisma.seller.findUnique({
@@ -187,7 +210,7 @@ export class SellerService {
         email,
       },
       select: {
-        businessRegistration: {
+        sellerBusinessRegistration: {
           take: 1,
           orderBy: {
             id: 'desc',

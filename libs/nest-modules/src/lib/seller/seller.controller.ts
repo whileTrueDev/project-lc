@@ -18,6 +18,7 @@ import {
   SellerEmailDupCheckDto,
   SignUpSellerDto,
   BusinessRegistrationDto,
+  SettlementAccountDto,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -86,6 +87,13 @@ export class SellerController {
     return this.sellerService.changePassword(dto.email, dto.password);
   }
 
+  // 본인의 정산정보 조회
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement')
+  public async selectSellerSettlementInfo(@SellerInfo() sellerInfo: UserPayload) {
+    return this.sellerService.selectSellerSettlementInfo(sellerInfo);
+  }
+
   // 본인의 사업자 등록증 등록
   @UseGuards(JwtAuthGuard)
   @Post('business-registration')
@@ -96,10 +104,13 @@ export class SellerController {
     return this.sellerService.insertBusinessRegistration(dto, sellerInfo);
   }
 
-  // 본인의 사업자 등록증 조회
+  // 본인의 사업자 등록증 등록
   @UseGuards(JwtAuthGuard)
-  @Get('settlement')
-  public async selectSellerSettlementInfo(@SellerInfo() sellerInfo: UserPayload) {
-    return this.sellerService.selectSellerSettlementInfo(sellerInfo);
+  @Post('settlement-account')
+  public async InsertSettlementAccount(
+    @Body(ValidationPipe) dto: SettlementAccountDto,
+    @SellerInfo() sellerInfo: UserPayload,
+  ) {
+    return this.sellerService.insertSettlementAccount(dto, sellerInfo);
   }
 }

@@ -2,26 +2,32 @@ import {
   Box,
   Text,
   Grid,
-  GridItem,
   Button,
   Flex,
   Center,
   VStack,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { Divider } from '@material-ui/core';
+import { SettlementInfoRefetchType } from '@project-lc/hooks';
+import { SellerSettlementAccount } from '@prisma/client';
 import { makeTable } from './BusinessRegistrationBox';
+import { SettlementAccountDialog } from './SettlementAccountDialog';
 
 const columns = [
   { title: '은행명', field: 'bank' },
   { title: '계좌 번호', field: 'number' },
   { title: '예금주', field: 'name' },
 ];
+interface SellerSettlementAccountInterface extends SellerSettlementAccount {
+  [index: string]: string | number;
+}
 
-function makeListRow(settlementAccount: any) {
+function makeListRow(settlementAccount: SellerSettlementAccountInterface) {
   if (!settlementAccount) {
     return [];
   }
-  return columns.map(({ title, field }) => {
+  return columns.map(({ title, field }: { title: string; field: string }) => {
     return {
       title,
       value: settlementAccount[field],
@@ -29,7 +35,13 @@ function makeListRow(settlementAccount: any) {
   });
 }
 
-export function SettlementAccountBox(props): JSX.Element {
+type SettlementAccountBoxProps = {
+  refetch: SettlementInfoRefetchType;
+  settlementAccount: SellerSettlementAccount;
+};
+
+export function SettlementAccountBox(props: SettlementAccountBoxProps): JSX.Element {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { settlementAccount, refetch } = props;
 
   return (
@@ -38,7 +50,9 @@ export function SettlementAccountBox(props): JSX.Element {
         <Text fontSize="lg" fontWeight="medium">
           정산 계좌 정보
         </Text>
-        <Button size="sm">정산 계좌 등록</Button>
+        <Button size="sm" onClick={onOpen}>
+          정산 계좌 등록
+        </Button>
       </Flex>
       {settlementAccount ? (
         <Grid templateColumns="1fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
@@ -55,6 +69,7 @@ export function SettlementAccountBox(props): JSX.Element {
           </Center>
         </>
       )}
+      <SettlementAccountDialog isOpen={isOpen} onClose={onClose} refetch={refetch} />
     </Box>
   );
 }

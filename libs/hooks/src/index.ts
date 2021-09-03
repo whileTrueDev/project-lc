@@ -16,3 +16,4 @@ export * from './lib/mutation/useBusinessRegistrationMutation';
 export * from './lib/queries/useFmOrders';
 export * from './lib/useDisplaySize';
 export * from './lib/queries/useSettlementInfo';
+export * from './lib/mutation/useSettlementAccountMutation';
