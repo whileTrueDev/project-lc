@@ -1,4 +1,3 @@
-import { Seller } from '@prisma/client';
 import { UserProfileRes } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions } from 'react-query';
