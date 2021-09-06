@@ -11,6 +11,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { SocketInfo, SocketIdandDevice, PurchaseMessage } from '@project-lc/shared-types';
+import { OverlayService } from '@project-lc/nest-modules';
 import { AppService } from './app.service';
 
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
@@ -22,7 +23,10 @@ export class AppGateway
 
   socketInfo: SocketInfo = {};
 
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly overlayService: OverlayService,
+  ) {}
 
   private logger: Logger = new Logger('AppGateway');
 
@@ -136,7 +140,7 @@ export class AppGateway
       bottomAreaTextAndNickname.push(`${d.text} - [${d.nickname}]`);
     });
 
-    const audioBuffer = await this.appService.googleTextToSpeech(purchase);
+    const audioBuffer = await this.overlayService.googleTextToSpeech(purchase);
 
     this.server
       .to(roomName)
