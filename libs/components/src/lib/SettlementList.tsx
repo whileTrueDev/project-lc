@@ -1,5 +1,6 @@
 import { GridColumns } from '@material-ui/data-grid';
-import { Badge } from '@chakra-ui/react';
+import { makeStyles } from '@material-ui/core/styles';
+import { Badge, useColorModeValue } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { SellerSettlements } from '@prisma/client';
@@ -46,12 +47,12 @@ function switchBadge(state: number): JSX.Element {
 const columns: GridColumns = [
   {
     field: 'date',
-    headerName: '정산 날짜',
+    headerName: '날짜',
     valueFormatter: ({ row }) => dayjs(row.date as Date).format('YYYY/MM/DD HH:mm:ss'),
   },
   {
     field: 'payment',
-    headerName: '정산 금액',
+    headerName: '금액',
     valueFormatter: ({ row }) =>
       new Intl.NumberFormat('kr', { style: 'currency', currency: 'KRW' }).format(
         row.amount,
@@ -59,7 +60,7 @@ const columns: GridColumns = [
   },
   {
     field: 'state',
-    headerName: '정산 상태',
+    headerName: '상태',
     renderCell: (params) => switchBadge(params.row.state),
   },
 ];
@@ -77,17 +78,31 @@ function makeListRow(sellerSettlements: SellerSettlements[] | undefined) {
 export function SettlementList(props: SettlementListProps): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { sellerSettlements } = props;
+  const useStyle = makeStyles({
+    columnHeader: {
+      backgroundColor: useColorModeValue('inherit', '#2D3748'),
+    },
+    root: {
+      borderWidth: 0,
+      color: useColorModeValue('inherit', `rgba(255, 255, 255, 0.92)`),
+      height: '95%',
+    },
+  });
+
+  const classes = useStyle();
 
   return (
     <ChakraDataGrid
+      classes={{
+        columnHeader: classes.columnHeader,
+        root: classes.root,
+      }}
       borderWidth={0}
-      hideFooterSelectedRowCount
+      hideFooter
       headerHeight={50}
-      minHeight={150}
       density="compact"
       columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
       rows={makeListRow(sellerSettlements)}
-      style={{ borderWidth: 0 }}
       rowCount={5}
       rowsPerPageOptions={[25, 50]}
       disableColumnMenu

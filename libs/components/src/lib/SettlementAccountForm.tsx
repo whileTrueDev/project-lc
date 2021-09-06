@@ -30,7 +30,6 @@ export function SettlementAccountForm(props: SettlementAccountFormProps) {
           id="bank"
           m={[1, 3, 3, 3]}
           variant="flushed"
-          isRequired
           autoComplete="off"
           maxW={200}
           maxLength={10}
@@ -54,7 +53,6 @@ export function SettlementAccountForm(props: SettlementAccountFormProps) {
             variant="flushed"
             maxW={['inherit', 300, 300, 300]}
             autoComplete="off"
-            isRequired
             placeholder="계좌번호를 입력해주세요('-' 제외)"
             {...register('number', {
               required: "'-'을 제외하고 숫자만 입력하세요.",
@@ -79,7 +77,9 @@ export function SettlementAccountForm(props: SettlementAccountFormProps) {
             placeholder="예금주명을 입력하세요."
             autoComplete="off"
             maxW={200}
-            {...register('name')}
+            {...register('name', {
+              required: '예금주명 입력이 필요합니다.',
+            })}
           />
           <FormErrorMessage ml={3} mt={0}>
             {errors.name && errors.name.message}

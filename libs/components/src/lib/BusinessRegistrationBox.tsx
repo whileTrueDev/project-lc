@@ -75,7 +75,7 @@ export function BusinessRegistrationBox(
         </Grid>
       ) : (
         <>
-          <Divider color="gray.100" />
+          <Divider backgroundColor="gray.100" />
           <Center mt={10}>
             <VStack>
               <Text>등록된 사업자 등록증이 없습니다.</Text>
