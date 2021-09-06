@@ -6,6 +6,7 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { forwardRef, MutableRefObject } from 'react';
 import {
@@ -18,28 +19,7 @@ import {
 } from 'react-hook-form';
 import { FileInput } from './FileInput';
 import { BusinessRegistrationFormDto } from './BusinessRegistrationDialog';
-
-const headerConfig = {
-  colSpan: [2, 1, 1, 1],
-  p: 3,
-  pb: 5,
-  pt: 2,
-  fontSize: 13,
-  backgroundColor: 'gray.50',
-  borderBottomColor: 'gray.100',
-  borderBottomWidth: 1.5,
-  borderRightColor: 'gray.100',
-  borderRightWidth: 1.5,
-};
-
-const valueConfig = {
-  colSpan: [2, 1, 1, 1],
-  p: 3,
-  borderBottomColor: 'gray.100',
-  borderBottomWidth: 1.5,
-  fontSize: 14,
-  mb: [3, 0, 0, 0],
-};
+import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
 
 export interface BusinessRegistrationFormProps {
   inputRef: MutableRefObject<null>;
@@ -56,26 +36,29 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
 
   return (
     <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-      <GridItem {...headerConfig}>회사명</GridItem>
-      <GridItem {...valueConfig}>
-        <Input
-          id="companyName"
-          m={[1, 3, 3, 3]}
-          variant="flushed"
-          borderBottomColor="blackAlpha.500"
-          placeholder="회사명을 입력해주세요."
-          autoComplete="off"
-          isRequired
-          maxW={200}
-          maxLength={25}
-          {...register('companyName', {
-            required: '회사명을 입력해주세요.',
-          })}
-          ref={inputRef}
-        />
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>회사명</GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
+        <FormControl isInvalid={!!errors.companyName}>
+          <Input
+            id="companyName"
+            m={[1, 3, 3, 3]}
+            variant="flushed"
+            placeholder="회사명을 입력해주세요."
+            autoComplete="off"
+            maxW={200}
+            maxLength={25}
+            {...register('companyName', {
+              required: '회사명을 입력해주세요.',
+            })}
+            ref={inputRef}
+          />
+          <FormErrorMessage ml={3} mt={0}>
+            {errors.companyName && errors.companyName.message}
+          </FormErrorMessage>
+        </FormControl>
       </GridItem>
-      <GridItem {...headerConfig}>사업자등록번호</GridItem>
-      <GridItem {...valueConfig}>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>사업자등록번호</GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.businessRegistrationNumber}>
           <Input
             id="businessRegistrationNumber"
@@ -84,7 +67,6 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
             maxW={['inherit', 300, 300, 300]}
             maxLength={10}
             autoComplete="off"
-            isRequired
             placeholder="사업자 등록 번호를 입력해주세요('-' 제외)"
             {...register('businessRegistrationNumber', {
               required: "'-'을 제외하고 숫자만 입력하세요.",
@@ -93,7 +75,6 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
                 message: '사업자 등록 번호는 10자리의 숫자입니다.',
               },
             })}
-            borderBottomColor="blackAlpha.500"
           />
           <FormErrorMessage ml={3} mt={0}>
             {errors.businessRegistrationNumber &&
@@ -101,72 +82,86 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
           </FormErrorMessage>
         </FormControl>
       </GridItem>
-      <GridItem {...headerConfig}>대표자명</GridItem>
-      <GridItem {...valueConfig}>
-        <Input
-          id="representativeName"
-          m={[1, 3, 3, 3]}
-          variant="flushed"
-          borderBottomColor="blackAlpha.500"
-          placeholder="대표자명을 입력해주세요."
-          isRequired
-          autoComplete="off"
-          maxW={200}
-          maxLength={10}
-          {...register('representativeName', {
-            required: '대표자명을 입력해주세요.',
-          })}
-        />
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>대표자명</GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
+        <FormControl isInvalid={!!errors.representativeName}>
+          <Input
+            id="representativeName"
+            m={[1, 3, 3, 3]}
+            variant="flushed"
+            placeholder="대표자명을 입력해주세요."
+            autoComplete="off"
+            maxW={200}
+            maxLength={10}
+            {...register('representativeName', {
+              required: '대표자명을 입력해주세요.',
+            })}
+          />
+          <FormErrorMessage ml={3} mt={0}>
+            {errors.representativeName && errors.representativeName.message}
+          </FormErrorMessage>
+        </FormControl>
       </GridItem>
-      <GridItem {...headerConfig}>업태/종목</GridItem>
-      <GridItem {...valueConfig}>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>업태/종목</GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <Flex direction="row">
-          <Input
-            id="businessType"
-            m={[1, 3, 3, 3]}
-            variant="flushed"
-            borderBottomColor="blackAlpha.500"
-            placeholder="업태"
-            autoComplete="off"
-            isRequired
-            maxLength={50}
-            {...register('businessType', {
-              required: '업태를 입력해주세요.',
-            })}
-          />
-          <Input
-            id="businessItem"
-            m={[1, 3, 3, 3]}
-            variant="flushed"
-            borderBottomColor="blackAlpha.500"
-            placeholder="종목"
-            isRequired
-            autoComplete="off"
-            maxLength={50}
-            {...register('businessItem', {
-              required: '종목을 입력해주세요.',
-            })}
-          />
+          <FormControl isInvalid={!!errors.businessType} mr={1}>
+            <Input
+              id="businessType"
+              m={[1, 3, 3, 3]}
+              variant="flushed"
+              placeholder="업태"
+              autoComplete="off"
+              maxLength={50}
+              {...register('businessType', {
+                required: '업태를 입력해주세요.',
+              })}
+            />
+            <FormErrorMessage ml={3} mt={0}>
+              {errors.businessType && errors.businessType.message}
+            </FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={!!errors.businessItem}>
+            <Input
+              id="businessItem"
+              m={[1, 3, 3, 3]}
+              variant="flushed"
+              placeholder="종목"
+              autoComplete="off"
+              maxLength={50}
+              {...register('businessItem', {
+                required: '종목을 입력해주세요.',
+              })}
+            />
+            <FormErrorMessage ml={3} mt={0}>
+              {errors.businessItem && errors.businessItem.message}
+            </FormErrorMessage>
+          </FormControl>
         </Flex>
       </GridItem>
-      <GridItem {...headerConfig}>사업장 주소</GridItem>
-      <GridItem {...valueConfig}>
-        <Input
-          id="businessAddress"
-          m={[1, 3, 3, 3]}
-          variant="flushed"
-          borderBottomColor="blackAlpha.500"
-          placeholder="사업장의 주소를 입력해주세요."
-          isRequired
-          autoComplete="off"
-          maxLength={100}
-          {...register('businessAddress', {
-            required: '사업장의 주소를 입력해주세요.',
-          })}
-        />
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>사업장 주소</GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
+        <FormControl isInvalid={!!errors.businessAddress}>
+          <Input
+            id="businessAddress"
+            m={[1, 3, 3, 3]}
+            variant="flushed"
+            placeholder="사업장의 주소를 입력해주세요."
+            autoComplete="off"
+            maxLength={100}
+            {...register('businessAddress', {
+              required: '사업장의 주소를 입력해주세요.',
+            })}
+          />
+          <FormErrorMessage ml={3} mt={0}>
+            {errors.businessAddress && errors.businessAddress.message}
+          </FormErrorMessage>
+        </FormControl>
       </GridItem>
-      <GridItem {...headerConfig}>전자세금계산서 수신 이메일</GridItem>
-      <GridItem {...valueConfig}>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>
+        전자세금계산서 수신 이메일
+      </GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.taxInvoiceMail}>
           <Input
             id="taxInvoiceMail"
@@ -174,24 +169,25 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
             m={[1, 3, 3, 3]}
             variant="flushed"
             placeholder="계산서를 받을 이메일을 입력해주세요."
-            isRequired
             autoComplete="off"
             maxW={['inherit', 300, 300, 300]}
             {...register('taxInvoiceMail', {
+              required: '전자계산서 발급을 위한 이메일을 입력해주세요.',
               pattern: {
                 value: /^[\w]+@[\w]+\.[\w][\w]+$/,
                 message: '이메일 형식이 올바르지 않습니다.',
               },
             })}
-            borderBottomColor="blackAlpha.500"
           />
           <FormErrorMessage ml={3} mt={0}>
             {errors.taxInvoiceMail && errors.taxInvoiceMail.message}
           </FormErrorMessage>
         </FormControl>
       </GridItem>
-      <GridItem {...headerConfig}>사업자 등록증 이미지 업로드</GridItem>
-      <GridItem {...valueConfig}>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>
+        사업자 등록증 이미지 업로드
+      </GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.businessRegistrationImage}>
           <FileInput seterror={seterror} setvalue={setvalue} clearErrors={clearErrors} />
           <FormErrorMessage ml={3} mt={0}>

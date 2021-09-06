@@ -36,6 +36,7 @@ export function FileInput(
         });
       }
     } else {
+      // only chrome
       setvalue('businessRegistrationImage', null);
       setvalue('imageName', null);
       clearErrors(['businessRegistrationImage', 'imageName']);
@@ -45,9 +46,9 @@ export function FileInput(
   return (
     <input
       style={{ margin: '15px' }}
-      required
       accept="image/*"
       type="file"
+      required
       onChange={(e): void => {
         readImage(e);
       }}

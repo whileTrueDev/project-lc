@@ -7,11 +7,11 @@ import {
   Center,
   VStack,
   useDisclosure,
+  Divider,
 } from '@chakra-ui/react';
-import { Divider } from '@material-ui/core';
 import { SettlementInfoRefetchType } from '@project-lc/hooks';
 import { SellerSettlementAccount } from '@prisma/client';
-import { makeTable } from './BusinessRegistrationBox';
+import { GridTableItem } from './GridTableItem';
 import { SettlementAccountDialog } from './SettlementAccountDialog';
 
 const columns = [
@@ -56,11 +56,13 @@ export function SettlementAccountBox(props: SettlementAccountBoxProps): JSX.Elem
       </Flex>
       {settlementAccount ? (
         <Grid templateColumns="1fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-          {makeListRow(settlementAccount).map((element) => makeTable(element))}
+          {makeListRow(settlementAccount).map(({ title, value }) => (
+            <GridTableItem title={title} value={value} key={title} />
+          ))}
         </Grid>
       ) : (
         <>
-          <Divider color="gray.100" />
+          <Divider backgroundColor="gray.100" />
           <Center mt={10}>
             <VStack>
               <Text>등록된 정산 계좌가 없습니다.</Text>

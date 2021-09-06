@@ -2,7 +2,8 @@ export interface Bank {
   bankName: string;
   bankCode: string;
 }
-const banks: Bank[] = [
+
+export const banks: Bank[] = [
   { bankCode: '001', bankName: '한국은행' },
   { bankCode: '002', bankName: '산업은행' },
   { bankCode: '003', bankName: '기업은행' },
@@ -48,5 +49,3 @@ const banks: Bank[] = [
   { bankCode: '066', bankName: '교통은행' },
   { bankCode: '067', bankName: '중국건설은행' },
 ];
-
-export default banks;

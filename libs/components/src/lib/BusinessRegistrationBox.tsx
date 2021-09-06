@@ -2,7 +2,6 @@ import {
   Box,
   Text,
   Grid,
-  GridItem,
   Button,
   Flex,
   Divider,
@@ -10,55 +9,14 @@ import {
   VStack,
   useDisclosure,
 } from '@chakra-ui/react';
-import { Fragment } from 'react';
 import { SettlementInfoRefetchType } from '@project-lc/hooks';
 import { SellerBusinessRegistration } from '@prisma/client';
 import { BusinessRegistrationDialog } from './BusinessRegistrationDialog';
+import { GridTableItem } from './GridTableItem';
 
 interface SellerBusinessRegistrationInterface extends SellerBusinessRegistration {
   [index: string]: string | number;
 }
-
-// grid 내에서 동일한 포맷팅을 수행하는 테이블 구현
-export function makeTable({
-  title,
-  value,
-}: {
-  title: string;
-  value: string | number | JSX.Element;
-}): JSX.Element {
-  return (
-    <Fragment key={title}>
-      <GridItem
-        colSpan={[2, 1, 1, 1]}
-        p={3}
-        pb={5}
-        pt={2}
-        fontSize={13}
-        textAlign="start"
-        backgroundColor="gray.50"
-        borderBottomColor="gray.100"
-        borderBottomWidth={1.5}
-        borderRightColor="gray.100"
-        borderRightWidth={1.5}
-      >
-        {title}
-      </GridItem>
-      <GridItem
-        colSpan={[2, 1, 1, 1]}
-        p={3}
-        textAlign="start"
-        borderBottomColor="gray.100"
-        borderBottomWidth={1.5}
-        fontSize={14}
-        mb={[3, 0, 0, 0]}
-      >
-        {value}
-      </GridItem>
-    </Fragment>
-  );
-}
-
 const columns = [
   { title: '회사명', field: 'companyName' },
   { title: '사업자등록번호', field: 'businessRegistrationNumber' },
@@ -111,7 +69,9 @@ export function BusinessRegistrationBox(
       </Flex>
       {sellerBusinessRegistration ? (
         <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-          {makeListRow(sellerBusinessRegistration).map((element) => makeTable(element))}
+          {makeListRow(sellerBusinessRegistration).map(({ title, value }) => (
+            <GridTableItem title={title} value={value} key={title} />
+          ))}
         </Grid>
       ) : (
         <>

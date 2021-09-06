@@ -7,32 +7,11 @@ import {
   FormControl,
   FormErrorMessage,
   Select,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { UseFormRegister, FieldError, DeepMap } from 'react-hook-form';
-import { SettlementAccountDto } from '@project-lc/shared-types';
-import banks from '../constants/banks';
-
-const headerConfig = {
-  colSpan: [2, 1, 1, 1],
-  p: 3,
-  pb: 5,
-  pt: 2,
-  fontSize: 13,
-  backgroundColor: 'gray.50',
-  borderBottomColor: 'gray.100',
-  borderBottomWidth: 1.5,
-  borderRightColor: 'gray.100',
-  borderRightWidth: 1.5,
-};
-
-const valueConfig = {
-  colSpan: [2, 1, 1, 1],
-  p: 3,
-  borderBottomColor: 'gray.100',
-  borderBottomWidth: 1.5,
-  fontSize: 14,
-  mb: [3, 0, 0, 0],
-};
+import { banks, SettlementAccountDto } from '@project-lc/shared-types';
+import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
 
 export interface SettlementAccountFormProps {
   register: UseFormRegister<SettlementAccountDto>;
@@ -45,13 +24,12 @@ export function SettlementAccountForm(props: SettlementAccountFormProps) {
 
   return (
     <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-      <GridItem {...headerConfig}>은행</GridItem>
-      <GridItem {...valueConfig}>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>은행</GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <Select
           id="bank"
           m={[1, 3, 3, 3]}
           variant="flushed"
-          borderBottomColor="blackAlpha.500"
           isRequired
           autoComplete="off"
           maxW={200}
@@ -67,8 +45,8 @@ export function SettlementAccountForm(props: SettlementAccountFormProps) {
           ))}
         </Select>
       </GridItem>
-      <GridItem {...headerConfig}>계좌번호</GridItem>
-      <GridItem {...valueConfig}>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>계좌번호</GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.number}>
           <Input
             id="number"
@@ -85,26 +63,28 @@ export function SettlementAccountForm(props: SettlementAccountFormProps) {
                 message: '계좌번호는 숫자만 가능합니다.',
               },
             })}
-            borderBottomColor="blackAlpha.500"
           />
           <FormErrorMessage ml={3} mt={0}>
             {errors.number && errors.number.message}
           </FormErrorMessage>
         </FormControl>
       </GridItem>
-      <GridItem {...headerConfig}>예금주명</GridItem>
-      <GridItem {...valueConfig}>
-        <Input
-          id="name"
-          m={[1, 3, 3, 3]}
-          variant="flushed"
-          placeholder="예금주명을 입력하세요."
-          isRequired
-          autoComplete="off"
-          maxW={200}
-          {...register('name')}
-          borderBottomColor="blackAlpha.500"
-        />
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>예금주명</GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
+        <FormControl isInvalid={!!errors.name}>
+          <Input
+            id="name"
+            m={[1, 3, 3, 3]}
+            variant="flushed"
+            placeholder="예금주명을 입력하세요."
+            autoComplete="off"
+            maxW={200}
+            {...register('name')}
+          />
+          <FormErrorMessage ml={3} mt={0}>
+            {errors.name && errors.name.message}
+          </FormErrorMessage>
+        </FormControl>
       </GridItem>
     </Grid>
   );

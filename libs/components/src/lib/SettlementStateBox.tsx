@@ -56,7 +56,7 @@ export function SettlementStateBox(props: SettlementStateBoxProps): JSX.Element 
           사업자 등록증 등록
         </ListItem>
         <ListItem
-          backgroundColor={hasAccount ? 'whiteAlpha.50' : 'red.50'}
+          backgroundColor={hasAccount ? 'whiteAlpha.50' : 'red.300'}
           borderRadius="lg"
           p={1}
         >

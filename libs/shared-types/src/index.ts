@@ -8,6 +8,7 @@ export * from './lib/constants/fmOrderShippingTypes';
 export * from './lib/constants/fmOrderSitetypes';
 export * from './lib/constants/fmOrderStatuses';
 export * from './lib/constants/signupRegisterOptions';
+export * from './lib/constants/banks';
 export * from './lib/dto/changeFmOrderStatus.dto';
 export * from './lib/dto/emailCodeVerification.dto';
 export * from './lib/dto/FindFmOrders.dto';
