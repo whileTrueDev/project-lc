@@ -60,10 +60,10 @@ function dailyMissionTimer() {
 
     if (
       hours !== '00' &&
-      ($('.bottom-timer').attr('class')?.includes('warning') ||
-        $('.bottom-timer').attr('class')?.includes('urgent'))
+      ($('.bottom-timer').attr('class').includes('warning') ||
+        $('.bottom-timer').attr('class').includes('urgent'))
     ) {
-      if ($('.bottom-timer').attr('class')?.includes('warning')) {
+      if ($('.bottom-timer').attr('class').includes('warning')) {
         $('.bottom-timer').removeClass('warning');
       } else {
         $('.bottom-timer').removeClass('urgent');
@@ -75,7 +75,7 @@ function dailyMissionTimer() {
       hours === '00' &&
       Number(minutes) < 5 &&
       Number(minutes) !== 0 &&
-      !$('.bottom-timer').attr('class')?.includes('urgent')
+      !$('.bottom-timer').attr('class').includes('urgent')
     ) {
       $('.bottom-timer').addClass('urgent');
       $('.bottom-area-left-icon#clock').addClass('urgent');
@@ -83,12 +83,12 @@ function dailyMissionTimer() {
       hours === '00' &&
       Number(minutes) < 10 &&
       Number(minutes) !== 0 &&
-      !$('.bottom-timer').attr('class')?.includes('warning')
+      !$('.bottom-timer').attr('class').includes('warning')
     ) {
       $('.bottom-timer').addClass('warning');
     } else if (
       hours === '00' &&
-      $('.bottom-area-left-icon#clock').attr('class')?.includes('urgent') &&
+      $('.bottom-area-left-icon#clock').attr('class').includes('urgent') &&
       Number(minutes) > 5 &&
       Number(minutes) < 10
     ) {
@@ -97,7 +97,7 @@ function dailyMissionTimer() {
       $('.bottom-area-left-icon#clock').removeClass('urgent');
     } else if (
       hours === '00' &&
-      $('.bottom-area-left-icon#clock').attr('class')?.includes('urgent') &&
+      $('.bottom-area-left-icon#clock').attr('class').includes('urgent') &&
       Number(minutes) > 10
     ) {
       $('.bottom-timer').removeClass('urgent');
@@ -105,7 +105,7 @@ function dailyMissionTimer() {
     } else if (
       hours === '00' &&
       Number(minutes) > 10 &&
-      $('.bottom-timer').attr('class')?.includes('warning')
+      $('.bottom-timer').attr('class').includes('warning')
     ) {
       $('.bottom-timer').removeClass('warning');
     }
@@ -113,7 +113,7 @@ function dailyMissionTimer() {
 }
 
 async function switchImage() {
-  if (!$('.vertical-banner').attr('src')?.includes('gif')) {
+  if (!$('.vertical-banner').attr('src').includes('gif')) {
     bannerId += 1;
     if (bannerId === 12) {
       bannerId = 1;
@@ -287,7 +287,7 @@ socket.on('get right-top purchase message', async (data) => {
 });
 
 socket.on('toggle right-top onad logo from server', () => {
-  if ($('#onad-logo').attr('src')?.includes('-')) {
+  if ($('#onad-logo').attr('src').includes('-')) {
     $('#onad-logo').attr('src', '/images/onadLogo.png');
   } else {
     $('#onad-logo').attr('src', '/images/onadLogo-gray.png');
@@ -340,3 +340,5 @@ socket.on('d-day from server', (date) => {
 socket.on('refresh signal', () => {
   location.reload();
 });
+
+export {};
