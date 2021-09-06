@@ -34,5 +34,6 @@ export * from './lib/SignupForm';
 export * from './lib/SignupModal';
 export * from './lib/SignupStart';
 export * from './lib/SocialAccountUnlinkSection';
+export * from './lib/SellerGoodsList';
 export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
