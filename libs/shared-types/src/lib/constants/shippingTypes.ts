@@ -1,0 +1,40 @@
+import { ShippingCalculType } from '../front-type/shippingPolicyFormType';
+
+// 배송비 계산 기준
+export const ShippingCalculTypes: ShippingCalculType[] = ['bundle', 'each', 'free'];
+export const ShippingCalculTypeOptions: Record<ShippingCalculType, { label: string }> = {
+  bundle: { label: '묶음계산-묶음배송' },
+  each: { label: '개별계산-개별배송' },
+  free: { label: '무료계산-묶음배송' },
+};
+
+// 배송방법
+export const ShippingSetCodeOptions = {
+  delivery: { label: '택배' },
+  direct_delivery: { label: '직접배송' },
+  quick: { label: '퀵서비스' },
+  freight: { label: '화물배송' },
+  direct_store: { label: '매장수령' },
+  custom: { label: '직접입력' },
+};
+export const ShippingSetCodes: Array<keyof typeof ShippingSetCodeOptions> = [
+  'delivery',
+  'direct_delivery',
+  'quick',
+  'freight',
+  'direct_store',
+  'custom',
+];
+
+// 선불/착불정보 fm_shipping_set.prepay_info
+export const PrepayInfoOptions = {
+  all: { label: '착불/선불' },
+  delivery: { label: '선불' },
+  postpaid: { label: '착불' },
+};
+
+export const PrepayInfoTypes: Array<keyof typeof PrepayInfoOptions> = [
+  'delivery',
+  'postpaid',
+  'all',
+];
