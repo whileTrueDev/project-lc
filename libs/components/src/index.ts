@@ -40,5 +40,6 @@ export * from './lib/SettlementAccountBox';
 export * from './lib/SettlementListBox';
 export * from './lib/BusinessRegistrationDialog';
 export * from './lib/SettlementAccountForm';
+export * from './lib/SellerGoodsList';
 export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';

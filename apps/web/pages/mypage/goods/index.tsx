@@ -1,7 +1,11 @@
-import { MypageLayout } from '@project-lc/components';
+import { MypageLayout, SellerGoodsList } from '@project-lc/components';
 
 export function Goods(): JSX.Element {
-  return <MypageLayout>상품목록</MypageLayout>;
+  return (
+    <MypageLayout>
+      <SellerGoodsList />
+    </MypageLayout>
+  );
 }
 
 export default Goods;

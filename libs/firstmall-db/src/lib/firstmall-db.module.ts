@@ -4,10 +4,11 @@ import { FirstmallDbService } from './firstmall-db.service';
 import { FMGoodsService } from './fm-goods/fm-goods.service';
 import { FmOrdersService } from './fm-orders/fm-orders.service';
 import { FmOrdersController } from './fm-orders/fm-orders.controller';
+import { FmGoodsController } from './fm-goods/fm-goods.controller';
 
 @Module({
   imports: [GoodsModule],
-  controllers: [FmOrdersController],
+  controllers: [FmOrdersController, FmGoodsController],
   providers: [FirstmallDbService, FMGoodsService, FmOrdersService],
   exports: [FirstmallDbService, FMGoodsService, FmOrdersService],
 })
