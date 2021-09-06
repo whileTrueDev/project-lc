@@ -37,3 +37,4 @@ export * from './lib/SocialAccountUnlinkSection';
 export * from './lib/SellerGoodsList';
 export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
+export * from './lib/ShippingPolicyForm';
