@@ -6,6 +6,7 @@ import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
 import { SellerController } from './seller.controller';
 import { SellerService } from './seller.service';
+import { SellerSettlementService } from './seller-settlement.service';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { mailerConfig } from '../_nest-units/settings/mailer.config';
 
@@ -24,7 +25,7 @@ describe('SellerController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule, MailerModule.forRoot(mailerConfig)],
       controllers: [SellerController],
-      providers: [SellerService, MailVerificationService],
+      providers: [SellerService, MailVerificationService, SellerSettlementService],
     }).compile();
 
     controller = module.get<SellerController>(SellerController);
