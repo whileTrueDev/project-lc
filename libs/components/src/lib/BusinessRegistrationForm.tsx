@@ -17,7 +17,7 @@ import {
   UseFormSetValue,
   UseFormClearErrors,
 } from 'react-hook-form';
-import { FileInput } from './FileInput';
+import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 import { BusinessRegistrationFormDto } from './BusinessRegistrationDialog';
 import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
 
@@ -33,6 +33,37 @@ export interface BusinessRegistrationFormProps {
 function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
   // 명시적 타입만 props로 전달 가능
   const { inputRef, register, errors, seterror, setvalue, clearErrors } = props;
+
+  function handleSuccess(fileName: string, file: File) {
+    setvalue('businessRegistrationImage', file);
+    setvalue('imageName', fileName);
+    clearErrors(['businessRegistrationImage', 'imageName']);
+  }
+
+  function handleError(errorType?: ImageInputErrorTypes) {
+    switch (errorType) {
+      case 'over-size': {
+        seterror('businessRegistrationImage', {
+          type: 'validate',
+          message: '10MB 이하의 이미지를 업로드해주세요.',
+        });
+        break;
+      }
+      case 'invalid-format': {
+        seterror('businessRegistrationImage', {
+          type: 'error',
+          message: '파일의 형식이 올바르지 않습니다.',
+        });
+        break;
+      }
+      default: {
+        // only chrome
+        setvalue('businessRegistrationImage', null);
+        setvalue('imageName', null);
+        clearErrors(['businessRegistrationImage', 'imageName']);
+      }
+    }
+  }
 
   return (
     <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
@@ -189,7 +220,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
       </GridItem>
       <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.businessRegistrationImage}>
-          <FileInput seterror={seterror} setvalue={setvalue} clearErrors={clearErrors} />
+          <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
           <FormErrorMessage ml={3} mt={0}>
             {errors.businessRegistrationImage && errors.businessRegistrationImage.message}
           </FormErrorMessage>

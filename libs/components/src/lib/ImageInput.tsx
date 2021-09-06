@@ -3,10 +3,15 @@ import { BusinessRegistrationFormProps } from './BusinessRegistrationForm';
 const MB = 1024 * 1024; // 1Mbytes
 const IMAGE_SIZE_LIMIT = 5 * MB;
 
-export function FileInput(
-  props: Pick<BusinessRegistrationFormProps, 'seterror' | 'setvalue' | 'clearErrors'>,
-): JSX.Element {
-  const { seterror, setvalue, clearErrors } = props;
+export type ImageInputErrorTypes = 'over-size' | 'invalid-format' | undefined;
+
+type ImageInputProps = {
+  handleSuccess: (fileName: string, file: File) => void;
+  handleError: (errorType?: ImageInputErrorTypes) => void;
+};
+
+export function ImageInput(props: ImageInputProps): JSX.Element {
+  const { handleSuccess, handleError } = props;
 
   const readImage = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const target = event.target as HTMLInputElement;
@@ -19,27 +24,17 @@ export function FileInput(
       if (fileRegx.test(myImage.type)) {
         // 이미지 사이즈 검사
         if (myImage.size < IMAGE_SIZE_LIMIT) {
-          setvalue('businessRegistrationImage', myImage);
-          setvalue('imageName', imageName);
-          clearErrors(['businessRegistrationImage', 'imageName']);
+          handleSuccess(imageName, myImage);
         } else {
           // 사이즈 제한보다 큰 경우
-          seterror('businessRegistrationImage', {
-            type: 'validate',
-            message: '10MB 이하의 이미지를 업로드해주세요.',
-          });
+          handleError('over-size');
         }
       } else {
-        seterror('businessRegistrationImage', {
-          type: 'error',
-          message: '파일의 형식이 올바르지 않습니다.',
-        });
+        handleError('invalid-format');
       }
     } else {
       // only chrome
-      setvalue('businessRegistrationImage', null);
-      setvalue('imageName', null);
-      clearErrors(['businessRegistrationImage', 'imageName']);
+      handleError();
     }
   };
 
