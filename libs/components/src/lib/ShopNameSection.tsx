@@ -1,7 +1,7 @@
 import { Button, Flex, useDisclosure, Text } from '@chakra-ui/react';
-import { ShopNameDialog } from '@project-lc/components';
 import { useProfile } from '@project-lc/hooks';
 import SettingSectionLayout from './SettingSectionLayout';
+import { ShopNameDialog } from './ShopNameDialog';
 
 // shop 이름 변경 섹션
 export function ShopNameSection(): JSX.Element {
