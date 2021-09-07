@@ -1,6 +1,5 @@
 import { Button } from '@chakra-ui/react';
-import { ChakraNextImage } from './ChakraNextImage';
-import googleLogo from '../../docs/google.png';
+import { FcGoogle } from 'react-icons/fc';
 
 export function GoogleLoginButton(): JSX.Element {
   return (
@@ -12,8 +11,8 @@ export function GoogleLoginButton(): JSX.Element {
       color="black"
       _hover={{ boxShadow: 'lg' }}
       boxShadow="md"
+      leftIcon={<FcGoogle />}
     >
-      <ChakraNextImage src={googleLogo} width="40" height="40" mr={4} />
       구글로 로그인
     </Button>
   );

@@ -8,6 +8,9 @@ import { SellerService } from '../seller/seller.service';
 import { AuthModule } from '../auth/auth.module';
 import { SocialService } from './social.service';
 import { mailerConfig } from '../_nest-units/settings/mailer.config';
+import { KakaoApiService } from './platform-api/kakao-api.service';
+import { NaverApiService } from './platform-api/naver-api.service';
+import { GoogleApiService } from './platform-api/google-api.service';
 
 describe('SocialService', () => {
   let service: SocialService;
@@ -31,7 +34,13 @@ describe('SocialService', () => {
         AuthModule,
         MailerModule.forRoot(mailerConfig),
       ],
-      providers: [SocialService, SellerService],
+      providers: [
+        SocialService,
+        SellerService,
+        KakaoApiService,
+        NaverApiService,
+        GoogleApiService,
+      ],
     }).compile();
 
     service = module.get<SocialService>(SocialService);

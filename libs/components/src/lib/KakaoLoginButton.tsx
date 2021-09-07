@@ -1,6 +1,5 @@
-import { Button, useBoolean } from '@chakra-ui/react';
-import { ChakraNextImage } from './ChakraNextImage';
-import kakaoLogo from '../../docs/kakao.png';
+import { Button } from '@chakra-ui/react';
+import { RiKakaoTalkFill } from 'react-icons/ri';
 
 const KAKAO_COLOR = '#FEE500';
 export function KakaoLoginButton(): JSX.Element {
@@ -13,8 +12,8 @@ export function KakaoLoginButton(): JSX.Element {
       color="black"
       boxShadow="md"
       _hover={{ boxShadow: 'lg' }}
+      leftIcon={<RiKakaoTalkFill />}
     >
-      <ChakraNextImage src={kakaoLogo} width="40" height="40" mr={4} />
       카카오 로그인
     </Button>
   );

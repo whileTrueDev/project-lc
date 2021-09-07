@@ -1,5 +1,5 @@
-import { Box, Center, Spinner } from '@chakra-ui/react';
-import { useIsLoggedIn, useProfile } from '@project-lc/hooks';
+import { Box } from '@chakra-ui/react';
+import { useIsLoggedIn } from '@project-lc/hooks';
 import React from 'react';
 import FullscreenLoading from './FullscreenLoading';
 import LoginRequireAlertDialog from './LoginRequireAlertDialog';
