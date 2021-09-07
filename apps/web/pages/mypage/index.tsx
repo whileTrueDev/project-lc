@@ -1,7 +1,9 @@
-import { Box, Text } from '@chakra-ui/react';
-import { MypageLayout, StoreInfoDialog } from '@project-lc/components';
+import { Box, Text, useDisclosure } from '@chakra-ui/react';
+import { MypageLayout, ShopNameDialog } from '@project-lc/components';
 
 export function Index(): JSX.Element {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <MypageLayout>
       <Box h={200} bgColor="red.200" as="section">
@@ -11,7 +13,7 @@ export function Index(): JSX.Element {
         <Text>some components2</Text>
       </Box>
       {/* 상점명 입력 다이얼로그 (useProfile 내부에서 사용) */}
-      <StoreInfoDialog />
+      <ShopNameDialog isOpen={isOpen} onOpen={onOpen} onClose={onClose} autoCheck />
     </MypageLayout>
   );
 }

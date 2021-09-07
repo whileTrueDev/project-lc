@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `Seller` ADD COLUMN `storeName` VARCHAR(191);
+ALTER TABLE `Seller` ADD COLUMN `shopName` VARCHAR(191);

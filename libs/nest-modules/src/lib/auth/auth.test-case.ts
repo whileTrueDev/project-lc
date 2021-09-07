@@ -9,7 +9,7 @@ export async function findOne({ email }: { email: string }) {
       email: 'qkrcksdn0208@naver.com',
       name: 'authtestuser',
       password: testPw,
-      storeName: null,
+      shopName: null,
     },
   ];
 

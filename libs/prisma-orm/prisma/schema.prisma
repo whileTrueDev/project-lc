@@ -17,7 +17,7 @@ model Seller {
   email                      String                       @unique
   name                       String?
   password                   String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
-  storeName                  String? // 회원가입시에는 입력되지 않을 수 있다.
+  shopName                   String? // 회원가입시에는 입력되지 않을 수 있다.
   socialAccounts             SellerSocialAccount[]
   goods                      Goods[]
   loginHistory               LoginHistory[]

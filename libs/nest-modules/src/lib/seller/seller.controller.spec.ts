@@ -9,6 +9,7 @@ import { SellerService } from './seller.service';
 import { SellerSettlementService } from './seller-settlement.service';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { mailerConfig } from '../_nest-units/settings/mailer.config';
+import { SellerShopService } from './seller-shop.service';
 
 describe('SellerController', () => {
   let app: NestApplication;
@@ -19,14 +20,19 @@ describe('SellerController', () => {
     name: 'tester',
     email: 'test@test.com',
     password: 'test',
-    storeName: null,
+    shopName: null,
   };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule, MailerModule.forRoot(mailerConfig)],
       controllers: [SellerController],
-      providers: [SellerService, MailVerificationService, SellerSettlementService],
+      providers: [
+        SellerService,
+        MailVerificationService,
+        SellerSettlementService,
+        SellerShopService,
+      ],
     }).compile();
 
     controller = module.get<SellerController>(SellerController);

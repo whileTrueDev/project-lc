@@ -1,9 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
 import { hash, verify } from 'argon2';
-import { SellerStoreInfoDto } from '@project-lc/shared-types';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { UserPayload } from '../auth/auth.interface';
 @Injectable()
 export class SellerService {
   constructor(private readonly prisma: PrismaService) {}
@@ -17,7 +15,7 @@ export class SellerService {
         email: signUpInput.email,
         name: signUpInput.name,
         password: hashedPw,
-        storeName: null,
+        shopName: null,
       },
     });
     return seller;
@@ -34,7 +32,7 @@ export class SellerService {
         email: true,
         name: true,
         password: true,
-        storeName: true,
+        shopName: true,
       },
     });
 
@@ -144,17 +142,5 @@ export class SellerService {
       },
     });
     return seller;
-  }
-
-  async changeStoreData(dto: SellerStoreInfoDto, sellerInfo: UserPayload) {
-    const seller = await this.prisma.seller.update({
-      where: { email: sellerInfo.sub },
-      data: {
-        storeName: dto.storeName,
-      },
-    });
-    if (!seller) {
-      throw new Error(`상점명 변경불가`);
-    }
   }
 }

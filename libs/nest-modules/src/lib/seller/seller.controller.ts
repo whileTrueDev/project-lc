@@ -20,7 +20,7 @@ import {
   SignUpSellerDto,
   BusinessRegistrationDto,
   SettlementAccountDto,
-  SellerStoreInfoDto,
+  SellerShopInfoDto,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -28,12 +28,14 @@ import { SellerService } from './seller.service';
 import { SellerSettlementService } from './seller-settlement.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
+import { SellerShopService } from './seller-shop.service';
 
 @Controller('seller')
 export class SellerController {
   constructor(
     private readonly sellerService: SellerService,
     private readonly sellerSettlementService: SellerSettlementService,
+    private readonly sellerShopService: SellerShopService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
 
@@ -119,15 +121,15 @@ export class SellerController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('store')
-  public async changeStoreData(
-    @Body() dto: SellerStoreInfoDto,
+  @Patch('shop')
+  public async changeShopInfo(
+    @Body() dto: SellerShopInfoDto,
     @SellerInfo() sellerInfo: UserPayload,
     @Res() res,
   ) {
     // 데이터 변경후 전달. not body
     try {
-      await this.sellerService.changeStoreData(dto, sellerInfo);
+      await this.sellerShopService.changeShopInfo(dto, sellerInfo);
       res.sendStatus(204);
     } catch (e) {
       res.sendStatus(500);

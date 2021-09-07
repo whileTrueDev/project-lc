@@ -43,4 +43,5 @@ export * from './lib/SettlementAccountForm';
 export * from './lib/SellerGoodsList';
 export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
-export * from './lib/StoreInfoDialog';
+export * from './lib/ShopNameDialog';
+export * from './lib/ShopNameSection';

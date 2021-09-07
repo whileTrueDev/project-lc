@@ -9,22 +9,30 @@ import {
   ModalHeader,
   ModalFooter,
   Button,
-  useDisclosure,
   Text,
   Flex,
   FormControl,
   Input,
   FormLabel,
+  FormHelperText,
   FormErrorMessage,
   useToast,
 } from '@chakra-ui/react';
 import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { useProfile, useStoreInfoMutation } from '@project-lc/hooks';
+import { useProfile, useShopInfoMutation } from '@project-lc/hooks';
 import { WarningIcon } from '@chakra-ui/icons';
-import { FormHelperText } from '@material-ui/core';
 
-export function StoreInfoDialog(): JSX.Element {
+type ShopNameDialogType = {
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  autoCheck?: boolean;
+};
+
+export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
+  const { isOpen, onOpen, onClose, autoCheck } = props;
+
   const { data, refetch } = useProfile();
   const {
     register,
@@ -34,25 +42,24 @@ export function StoreInfoDialog(): JSX.Element {
   } = useForm();
   const initialRef = useRef(null);
   const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    // 렌더링 이후, seller가 가진 storeName을 프로퍼티로 가지는 경우,
-    if (data && 'storeName' in data) {
-      // 이때, data의 storeName이 없을 수 있다. -> seller의 특성이기 때문이다.
-      if (!data?.storeName) {
+    // 렌더링 이후, seller가 가진 shopName을 프로퍼티로 가지는 경우,
+    if (autoCheck && data && 'shopName' in data) {
+      // 이때, data의 shopName이 없을 수 있다. -> seller의 특성이기 때문이다.
+      if (!data?.shopName) {
         onOpen();
       }
     }
-  }, [data, onOpen]);
+  }, [data, onOpen, autoCheck]);
 
   function useClose() {
     reset();
     onClose();
   }
 
-  const mutation = useStoreInfoMutation();
-  async function useSubmit(submitData: { storeName: string }) {
+  const mutation = useShopInfoMutation();
+  async function useSubmit(submitData: { shopName: string }) {
     try {
       await mutation.mutateAsync(submitData);
       refetch();
@@ -85,31 +92,34 @@ export function StoreInfoDialog(): JSX.Element {
         <ModalHeader>상점명 등록하기</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Flex alignItems="center" backgroundColor="red.50" p={1}>
-            <WarningIcon color="red.500" m={1} />
-            <Text fontSize="sm" fontWeight="bold" color="red.500">
-              상점명이 아직 등록되지 않았습니다.
-            </Text>
-          </Flex>
-          <FormControl isInvalid={!!errors.storeName} m={2} mt={6}>
+          {!data?.shopName && (
+            <Flex alignItems="center" backgroundColor="red.50" p={1}>
+              <WarningIcon color="red.500" m={1} />
+              <Text fontSize="sm" fontWeight="bold" color="red.500">
+                상점명이 아직 등록되지 않았습니다.
+              </Text>
+            </Flex>
+          )}
+          <FormControl isInvalid={!!errors.shopName} m={2} mt={6}>
             <FormLabel fontSize="md">상점명</FormLabel>
             <FormHelperText>
               상품을 등록하기 전에 고객에게 보여질 상점명을 등록하세요.
             </FormHelperText>
             <Input
-              id="storeName"
+              id="shopName"
               variant="flushed"
               maxW={['inherit', 300, 300, 300]}
+              mt={3}
               maxLength={20}
               autoComplete="off"
               placeholder="등록할 상점명을 입력해주세요."
-              {...register('storeName', {
+              {...register('shopName', {
                 required: '상점명을 반드시 입력해주세요.',
               })}
               ref={initialRef}
             />
             <FormErrorMessage mt={1}>
-              {errors.storeName && errors.storeName.message}
+              {errors.shopName && errors.shopName.message}
             </FormErrorMessage>
           </FormControl>
         </ModalBody>
