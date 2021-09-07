@@ -19,6 +19,7 @@ describe('SellerController', () => {
     name: 'tester',
     email: 'test@test.com',
     password: 'test',
+    storeName: null,
   };
 
   beforeAll(async () => {
