@@ -10,6 +10,7 @@ import {
   UnauthorizedException,
   UseGuards,
   ValidationPipe,
+  Res,
 } from '@nestjs/common';
 import { Seller } from '@prisma/client';
 import {
@@ -19,6 +20,7 @@ import {
   SignUpSellerDto,
   BusinessRegistrationDto,
   SettlementAccountDto,
+  SellerStoreInfoDto,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -114,5 +116,21 @@ export class SellerController {
     @SellerInfo() sellerInfo: UserPayload,
   ) {
     return this.sellerSettlementService.insertSettlementAccount(dto, sellerInfo);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('store')
+  public async changeStoreData(
+    @Body() dto: SellerStoreInfoDto,
+    @SellerInfo() sellerInfo: UserPayload,
+    @Res() res,
+  ) {
+    // 데이터 변경후 전달. not body
+    try {
+      await this.sellerService.changeStoreData(dto, sellerInfo);
+      res.sendStatus(204);
+    } catch (e) {
+      res.sendStatus(500);
+    }
   }
 }
