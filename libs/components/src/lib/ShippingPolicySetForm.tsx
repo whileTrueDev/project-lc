@@ -2,8 +2,6 @@
 import {
   Box,
   Button,
-  FormControl,
-  Heading,
   Input,
   Radio,
   RadioGroup,
@@ -11,6 +9,15 @@ import {
   Stack,
   Text,
   Checkbox,
+  Divider,
+  useDisclosure,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  TextProps,
 } from '@chakra-ui/react';
 import {
   PrepayInfoOptions,
@@ -22,6 +29,29 @@ import {
 } from '@project-lc/shared-types';
 import { Controller, useForm, useFormContext } from 'react-hook-form';
 
+function InputWrapperText({
+  text,
+  children,
+}: {
+  text: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Stack direction={{ base: 'column', md: 'row' }}>
+      <Text width={{ base: '100%', md: '30%' }}>{text}</Text>
+      {children}
+    </Stack>
+  );
+}
+
+function BoldText({ children, ...rest }: { children: React.ReactNode } & TextProps) {
+  return (
+    <Text fontWeight="bold" {...rest}>
+      {children}
+    </Text>
+  );
+}
+
 export function ShippingPolicySetForm({
   onSubmit,
 }: {
@@ -30,6 +60,14 @@ export function ShippingPolicySetForm({
   // 배송비정책 그룹 폼 컨텍스트
   const groupForm = useFormContext<ShippingPolicyFormData>();
 
+  const onTempSetSubmit = (data: ShippingSetFormData) => {
+    console.log(data);
+    const prev = groupForm.getValues('shippingSets') || [];
+    const tempId = prev.length > 0 ? prev[prev.length - 1].tempId + 1 : 0;
+    groupForm.setValue('shippingSets', [...prev, { ...data, tempId }]);
+    onSubmit();
+  };
+
   // 배송설정 폼
   const { register, control, setValue, handleSubmit, watch } =
     useForm<ShippingSetFormData>({
@@ -37,36 +75,21 @@ export function ShippingPolicySetForm({
         shippingSetCode: 'delivery',
         shippingSetName: ShippingSetCodeOptions.delivery.label,
         prepayInfo: 'delivery',
+        deliveryLimit: 'unlimit',
       },
     });
 
-  const onTempSetSubmit = (data: ShippingSetFormData) => {
-    const prev = groupForm.getValues('shippingSets') || [];
-    const tempId = prev.length > 0 ? prev[prev.length - 1].tempId + 1 : 0;
-    groupForm.setValue('shippingSets', [...prev, { ...data, tempId }]);
-    onSubmit();
-  };
+  const { isOpen, onOpen, onClose } = useDisclosure();
   return (
-    <Stack
-      direction={{ base: 'column', md: 'row' }}
-      flexWrap="wrap"
-      as="form"
-      onSubmit={handleSubmit(onTempSetSubmit)}
-      border="1px"
-      borderColor="gray.200"
-      borderRadius={10}
-      spacing={2}
-      p={2}
-    >
-      {/* 배송 설정 이름, 배송 설정 코드, 착불/선불 정보 */}
-      <Box>
-        <Heading as="h6" size="sm">
-          배송 설정명
-        </Heading>
-
-        <Stack>
+    <>
+      <Stack spacing={6} as="form" onSubmit={handleSubmit(onTempSetSubmit)}>
+        {/* 배송 설정 이름, 배송 설정 코드, 착불/선불 정보 */}
+        <Stack className="shippingSetName">
           {/* 배송 설정 이름 */}
-          <Input maxLength={50} {...register('shippingSetName')} />
+          <Stack direction={{ base: 'column', md: 'row' }}>
+            <BoldText width={{ base: '100%', md: '30%' }}>배송 설정명</BoldText>
+            <Input maxLength={50} {...register('shippingSetName')} />
+          </Stack>
 
           {/* 배송 설정 코드  */}
           <Controller
@@ -78,6 +101,7 @@ export function ShippingPolicySetForm({
                 onChange={(e) => {
                   const key = e.currentTarget
                     .value as keyof typeof ShippingSetCodeOptions;
+                  // 배송설정명 input 값도 같이 변경
                   setValue('shippingSetName', ShippingSetCodeOptions[key].label);
                   onChange(e);
                 }}
@@ -108,30 +132,75 @@ export function ShippingPolicySetForm({
             )}
           />
         </Stack>
-      </Box>
-      {/* 배송 설정 이름, 배송 설정 코드, 착불/선불 정보 */}
+        {/* 배송 설정 이름, 배송 설정 코드, 착불/선불 정보 */}
 
-      {/* 반품 배송비 */}
-      <Box>
-        <Heading as="h6" size="sm">
-          반품 배송비
-        </Heading>
-        <Text>반품 편도 : </Text>
-        <Input type="number" {...register('refundShippingCost')} />
-        <Checkbox {...register('shipingFreeFlag')}>
-          배송비가 무료인 경우, 반품배송비 왕복 &nbsp;
-          {((watch('refundShippingCost') || 0) * 2).toLocaleString()}₩ 받음
-        </Checkbox>
-        <Text>(맞)교환 왕복 : </Text>
-        <Input type="number" {...register('swapShippingCost')} />
-      </Box>
-      {/* 반품 배송비 */}
+        <Divider />
 
-      {/* 배송비 */}
-      <Box />
-      {/* 배송비 */}
-      <Button type="submit">추가하기</Button>
-    </Stack>
+        {/* 반품 배송비 */}
+        <Stack className="refundShippingCost" spacing={4}>
+          <BoldText>반품 배송비</BoldText>
+
+          <Box>
+            <InputWrapperText text="반품 편도">
+              <Input type="number" {...register('refundShippingCost')} />
+            </InputWrapperText>
+            <Checkbox {...register('shipingFreeFlag')}>
+              배송비가 무료인 경우, 반품배송비 왕복 &nbsp;
+              {((watch('refundShippingCost') || 0) * 2).toLocaleString()}₩ 받기
+            </Checkbox>
+          </Box>
+
+          <InputWrapperText text="(맞)교환 왕복">
+            <Input type="number" {...register('swapShippingCost')} />
+          </InputWrapperText>
+        </Stack>
+        {/* 반품 배송비 */}
+
+        <Divider />
+
+        {/* 기본 배송비 */}
+        <Stack>
+          <BoldText>기본 배송비</BoldText>
+          <Controller
+            control={control}
+            name="deliveryLimit"
+            render={({ field }) => (
+              <RadioGroup {...field}>
+                <Stack direction="row">
+                  <Radio value="unlimit">대한민국 전국배송</Radio>
+                  <Radio value="limit">대한민국 중 지정 지역 배송</Radio>
+                </Stack>
+              </RadioGroup>
+            )}
+          />
+          <Button onClick={onOpen}>지역추가</Button>
+        </Stack>
+        {/* 기본 배송비 */}
+
+        <Divider />
+
+        {/* 추가 배송비 */}
+        <Stack>
+          <BoldText>추가 배송비</BoldText>
+          <Button onClick={onOpen}>지역추가</Button>
+        </Stack>
+        {/* 추가 배송비 */}
+
+        <Divider />
+
+        <Button type="submit">추가하기</Button>
+      </Stack>
+
+      {/* 지역정보 추가 모달 */}
+      <Modal onClose={onClose} isOpen={isOpen}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>지역 추가하기</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>모달바디</ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
 

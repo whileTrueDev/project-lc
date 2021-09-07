@@ -113,7 +113,9 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
         </ShippingPolicyFormControlWithLabel>
       )}
 
-      {/* 반송지 */}
+      {/* 반송지 
+      // TODO: 반송지 테이블 생성 후 저장된 반송지 목록 조회 기능 추가
+      */}
       <ShippingPolicyFormControlWithLabel label="반송지">
         <Stack spacing={2} alignItems="flex-start">
           <Button onClick={setFlag.toggle}>반송지 설정</Button>

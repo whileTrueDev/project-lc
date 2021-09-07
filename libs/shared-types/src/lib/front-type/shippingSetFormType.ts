@@ -1,7 +1,10 @@
 import { ShippingSetCodeOptions } from '../constants/shippingTypes';
+import { ShippingOption } from './shippingOptionFormType';
 
 // 배송설정 - 선불/착불정보
 export type PrepayInfo = 'all' | 'delivery' | '';
+//  배송지역 제한 - unlimit - 전국(전세계) / limit - 지정지역(국가)
+export type DeliveryLimit = 'limit' | 'unlimit';
 // 배송 설정 생성 폼 데이터 타입
 export interface ShippingSetFormData {
   // 임시 id
@@ -20,22 +23,6 @@ export interface ShippingSetFormData {
   shipingFreeFlag: boolean;
   // 배송비 옵션
   shippingOptions: ShippingOption[];
-}
-
-export type ShippingOptionType = 'free' | 'fixed' | 'amount' | 'cnt' | 'weight';
-export type ShippingOptionSetType = 'std' | 'add';
-
-export interface ShippingOption {
-  // 임시 id
-  tempId: number;
-  // 배송설정 타입 std - 기본 / add - 추가
-  shippingSetType: ShippingOptionSetType;
-  // 배송방법 타입 - free - 무료 / fixed - 고정 / amount - 금액 / cnt - 수량 / weight - 무게
-  shippingOptType: ShippingOptionType;
-  // 배송지역 제한여부
-  deliveryLimit: boolean;
-  // 시작구간
-  sectionStart: null | number;
-  // 끝구간
-  sectionEnd: null | number;
+  //  배송지역 제한 - unlimit - 전국(전세계) / limit - 지정지역(국가)
+  deliveryLimit: DeliveryLimit;
 }

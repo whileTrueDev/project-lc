@@ -31,3 +31,4 @@ export * from './lib/dto/changeGoodsView.dto';
 export * from './lib/front-type/shippingPolicyFormType';
 export * from './lib/constants/shippingTypes';
 export * from './lib/front-type/shippingSetFormType';
+export * from './lib/front-type/shippingOptionFormType';
