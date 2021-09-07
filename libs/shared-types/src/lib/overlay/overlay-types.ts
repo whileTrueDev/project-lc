@@ -1,17 +1,30 @@
-// import { MysqlError } from 'mysql';
-
 export interface SocketIdandDevice {
   socketId: string;
   device: string;
 }
 
-export interface SocketInfo {
-  [key: string]: any[];
+export interface PageUrlAndDevice {
+  pageUrl: string;
+  device: string;
 }
 
-export interface TextData {
+export interface SocketInfo {
+  [key: string]: SocketIdandDevice[];
+}
+
+export interface RoomAndText {
   roomName: string;
   text: string;
+}
+
+export interface RoomAndDate {
+  roomName: string;
+  date: string;
+}
+
+export interface RoomAndType {
+  roomName: string;
+  type: string;
 }
 
 export interface PurchaseMessage {
@@ -21,22 +34,6 @@ export interface PurchaseMessage {
   userId: string;
   productName: string;
   purchaseNum: string;
-}
-
-export interface ImageData {
-  which: string;
-  roomName: string;
-  imgUrl: string;
-}
-
-export interface Data {
-  which: string;
-  imgUrl: string;
-}
-
-export interface SinglePurchase {
-  name: string;
-  purchaseNumber: number;
 }
 
 export interface NickNameAndPrice {

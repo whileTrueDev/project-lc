@@ -5,6 +5,8 @@ const messageArray = [];
 let defaultDate = new Date('2021-09-04T15:00:00+0900');
 let bannerId = 0;
 let bottomMessages = [];
+const topMessages = [];
+
 let messageHtml;
 let bottomTextIndex = 0;
 
@@ -154,6 +156,18 @@ setInterval(async () => {
   }
 }, 2000);
 
+// 비회원 메세지
+setInterval(async () => {
+  if (topMessages.length !== 0 && $('.top-wrapper').css('display') === 'none') {
+    $('.top-wrapper').css({ display: 'flex' });
+    $('.top-wrapper').html(topMessages[0].messageHtml);
+    topMessages.splice(0, 1);
+    await setTimeout(() => {
+      $('.top-wrapper').fadeOut(800);
+    }, 5000);
+  }
+}, 2000);
+
 async function switchBottomText() {
   if (bottomTextIndex >= bottomMessages.length) {
     bottomTextIndex = 0;
@@ -286,6 +300,33 @@ socket.on('get right-top purchase message', async (data) => {
   messageArray.push({ audioBlob, messageHtml });
 });
 
+socket.on('get non client purchase message', async (data) => {
+  const { userId } = data;
+  const { productName } = data;
+  const price = data.purchaseNum;
+
+  messageHtml = `
+  <div class="donation-wrapper">
+    <iframe src="/audio/alarm-type-1.wav"
+    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    <div class="centered">
+      <div class ="animated heartbeat" id="donation-top">
+        <span id="nickname">
+          <span class="animated heartbeat" id="donation-user-id">${userId}</span>
+          <span class="donation-sub">님 ${productName}</span>
+          <span class="animated heartbeat" id="donation-num">${price
+            .toString()
+            .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
+          <span class="donation-sub">원 구매 감사합니다!</span>
+        </span>
+      </div>
+    </div>
+  </div>
+  
+  `;
+  topMessages.push({ messageHtml });
+});
+
 socket.on('toggle right-top onad logo from server', () => {
   if ($('#onad-logo').attr('src').includes('-')) {
     $('#onad-logo').attr('src', '/images/onadLogo.png');
@@ -318,7 +359,7 @@ socket.on('get bottom purchase message', (data) => {
 });
 
 socket.on('handle bottom area to client', () => {
-  if ($('.bottom-area-right').css('opacity') === 1) {
+  if ($('.bottom-area-right').css('opacity') === '1') {
     $('.bottom-area-right').css({ opacity: 0 });
   } else {
     $('.bottom-area-right').css({ opacity: 1 }).fadeIn(2000);
@@ -339,6 +380,28 @@ socket.on('d-day from server', (date) => {
 
 socket.on('refresh signal', () => {
   location.reload();
+});
+
+socket.on('show video from server', (type) => {
+  if (type === 'intro') {
+    const introHtml = `
+    <video class="inner-video-area" autoplay>
+      <source src="/videos/intro.mp4" type="video/mp4">
+    </video>
+      `;
+    $('.full-video').html(introHtml);
+  } else {
+    const outroHtml = `
+    <video class="inner-video-area" autoplay>
+      <source src="/videos/outro.mp4" type="video/mp4">
+    </video>
+      `;
+    $('.full-video').html(outroHtml);
+  }
+});
+
+socket.on('clear full video from server', () => {
+  $('.inner-video-area').fadeOut(800);
 });
 
 export {};

@@ -6,11 +6,18 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
   OnGatewayInit,
-  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
-import { SocketInfo, SocketIdandDevice, PurchaseMessage } from '@project-lc/shared-types';
+import {
+  SocketInfo,
+  SocketIdandDevice,
+  PurchaseMessage,
+  PageUrlAndDevice,
+  RoomAndText,
+  RoomAndDate,
+  RoomAndType,
+} from '@project-lc/shared-types';
 import { OverlayService } from '@project-lc/nest-modules';
 import { AppService } from './app.service';
 
@@ -53,10 +60,7 @@ export class AppGateway
   }
 
   @SubscribeMessage('new client')
-  handleClient(
-    socket: Socket,
-    clientUrlDevice: { pageUrl: string; device: string },
-  ): void {
+  handleClient(socket: Socket, clientUrlDevice: PageUrlAndDevice): void {
     const { pageUrl } = clientUrlDevice;
     const roomName = pageUrl?.split('/').pop();
     if (roomName) {
@@ -74,8 +78,9 @@ export class AppGateway
   }
 
   @SubscribeMessage('request creator list')
-  handleCreatorList(@ConnectedSocket() socket: Socket, @MessageBody() data) {
-    const advertiseUrl = data && data.url ? data.url.split('/')[1] : null;
+  handleCreatorList(@MessageBody() roomAndUrl: { roomName: string; url: string }) {
+    const advertiseUrl =
+      roomAndUrl && roomAndUrl.url ? roomAndUrl.url.split('/')[1] : null;
     const fullUrl: (string | undefined)[] = Object.keys(this.socketInfo)
       .map((url: string) => {
         if (advertiseUrl && url && url.split('/').indexOf(advertiseUrl) !== -1) {
@@ -86,7 +91,7 @@ export class AppGateway
       .filter((url: string | undefined) => url !== undefined && url !== '');
     if (process.env.NODE_ENV === 'development') {
       this.server
-        .to(data.clientId)
+        .to(roomAndUrl.roomName)
         .emit(
           'creator list from server',
           fullUrl[0] ? this.socketInfo[fullUrl[0]] : null,
@@ -94,7 +99,7 @@ export class AppGateway
     }
     if (process.env.NODE_ENV === 'production') {
       this.server
-        .to(data.clientId)
+        .to(roomAndUrl.roomName)
         .emit(
           'creator list from server',
           fullUrl[0] ? this.socketInfo[fullUrl[0]] : null,
@@ -186,37 +191,54 @@ export class AppGateway
   }
 
   @SubscribeMessage('bottom area message')
-  handleBottomAreaReply(@MessageBody() data) {
+  handleBottomAreaReply(@MessageBody() data: RoomAndText) {
     const { roomName } = data;
     const { text } = data;
     this.server.to(roomName).emit('get bottom area message', text);
   }
 
-  @SubscribeMessage('clear bottom area from admin')
-  handleBottomMessageArea(@MessageBody() data) {
-    const { roomName } = data;
+  @SubscribeMessage('toggle bottom area from admin')
+  handleBottomMessageArea(@MessageBody() roomName: string) {
     this.server.to(roomName).emit('handle bottom area to client');
   }
 
   @SubscribeMessage('show live commerce')
-  showLiveCommerce(@MessageBody() roomName) {
+  showLiveCommerce(@MessageBody() roomName: string) {
     this.server.to(roomName).emit('show screen');
   }
 
   @SubscribeMessage('quit live commerce')
-  hideLiveCommerce(@MessageBody() roomName) {
+  hideLiveCommerce(@MessageBody() roomName: string) {
     this.server.to(roomName).emit('hide screen');
   }
 
   @SubscribeMessage('get d-day')
-  getDday(@MessageBody() dateData) {
-    const { date } = dateData;
-    const { roomName } = dateData;
+  getDday(@MessageBody() roomAndDate: RoomAndDate) {
+    const { date } = roomAndDate;
+    const { roomName } = roomAndDate;
     this.server.to(roomName).emit('d-day from server', date);
+  }
+
+  @SubscribeMessage('get non client purchase message from admin')
+  getNonClientMessage(@MessageBody() data: PurchaseMessage) {
+    const { roomName } = data;
+    this.server.to(roomName).emit('get non client purchase message', data);
   }
 
   @SubscribeMessage('refresh')
   handleRefresh(@MessageBody() roomName: string) {
     this.server.to(roomName).emit('refresh signal');
+  }
+
+  @SubscribeMessage('show video from admin')
+  showVideo(@MessageBody() roomAndType: RoomAndType) {
+    const { roomName } = roomAndType;
+    const { type } = roomAndType;
+    this.server.to(roomName).emit('show video from server', type);
+  }
+
+  @SubscribeMessage('clear full video')
+  clearVideo(@MessageBody() roomName: string) {
+    this.server.to(roomName).emit('clear full video from server');
   }
 }
