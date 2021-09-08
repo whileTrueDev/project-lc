@@ -22,9 +22,9 @@ export interface RoomAndDate {
   date: string;
 }
 
-export interface RoomAndType {
+export interface RoomAndVideoType {
   roomName: string;
-  type: string;
+  type: 'intro' | 'outro';
 }
 
 export interface PurchaseMessage {

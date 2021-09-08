@@ -16,7 +16,7 @@ import {
   PageUrlAndDevice,
   RoomAndText,
   RoomAndDate,
-  RoomAndType,
+  RoomAndVideoType,
 } from '@project-lc/shared-types';
 import { OverlayService } from '@project-lc/nest-modules';
 import { AppService } from './app.service';
@@ -231,7 +231,7 @@ export class AppGateway
   }
 
   @SubscribeMessage('show video from admin')
-  showVideo(@MessageBody() roomAndType: RoomAndType) {
+  showVideo(@MessageBody() roomAndType: RoomAndVideoType) {
     const { roomName } = roomAndType;
     const { type } = roomAndType;
     this.server.to(roomName).emit('show video from server', type);
