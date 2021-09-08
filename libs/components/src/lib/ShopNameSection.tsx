@@ -1,7 +1,18 @@
-import { Button, Flex, useDisclosure, Text } from '@chakra-ui/react';
+/* eslint-disable react/jsx-props-no-spreading */
+
+import {
+  Button,
+  Grid,
+  GridItem,
+  Flex,
+  useDisclosure,
+  Text,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
 import SettingSectionLayout from './SettingSectionLayout';
 import { ShopNameDialog } from './ShopNameDialog';
+import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
 
 // shop 이름 변경 섹션
 export function ShopNameSection(): JSX.Element {
@@ -11,15 +22,12 @@ export function ShopNameSection(): JSX.Element {
   return (
     <SettingSectionLayout title="상점명">
       <Text>구매자들에게 보여질 상점명을 변경하세요.</Text>
-      <Flex alignItems="baseline">
-        <Text fontSize="sm" mr={2}>
-          현재 상점명 :
-        </Text>
-        <Text fontSize="2xl" fontWeight="bold" color="gray:500">
-          {' '}
-          {data?.shopName}
-        </Text>
-      </Flex>
+      <Grid templateColumns="2fr 3fr" borderTopWidth={1.5}>
+        <GridItem {...useDialogHeaderConfig(useColorModeValue)}>현재 상점명</GridItem>
+        <GridItem {...useDialogValueConfig(useColorModeValue)}>
+          <Text fontSize="lg">{data?.shopName}</Text>
+        </GridItem>
+      </Grid>
 
       <Button width="200px" onClick={onOpen}>
         상점명 변경하기
