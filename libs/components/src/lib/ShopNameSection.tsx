@@ -21,8 +21,8 @@ export function ShopNameSection(): JSX.Element {
 
   return (
     <SettingSectionLayout title="상점명">
-      <Text>구매자들에게 보여질 상점명을 변경하세요.</Text>
-      <Grid templateColumns="2fr 3fr" borderTopWidth={1.5}>
+      <Text fontSize={['sm', 'md']}>구매자들에게 보여질 상점명을 변경하세요.</Text>
+      <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
         <GridItem {...useDialogHeaderConfig(useColorModeValue)}>현재 상점명</GridItem>
         <GridItem {...useDialogValueConfig(useColorModeValue)}>
           <Text fontSize="lg">{data?.shopName}</Text>
