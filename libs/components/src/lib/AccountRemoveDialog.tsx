@@ -44,7 +44,6 @@ export function AccountRemoveDialog(props: AccountRemoveDialogProps): JSX.Elemen
         }
       })
       .catch((error) => {
-        console.error(error);
         if (error.response.status === 400 || error.response.status === 401) {
           toast({
             title: '탈퇴 오류',
