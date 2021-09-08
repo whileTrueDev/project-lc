@@ -46,11 +46,11 @@ export function SettlementAccountBox(props: SettlementAccountBoxProps): JSX.Elem
 
   return (
     <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
-      <Flex direction="row" justifyContent="space-between" pb={1} mb={3}>
+      <Flex direction={['column', 'row']} justifyContent="space-between" pb={1} mb={3}>
         <Text fontSize="lg" fontWeight="medium">
           정산 계좌 정보
         </Text>
-        <Button size="sm" onClick={onOpen}>
+        <Button size="sm" onClick={onOpen} mt={[3, 0]}>
           정산 계좌 등록
         </Button>
       </Flex>
