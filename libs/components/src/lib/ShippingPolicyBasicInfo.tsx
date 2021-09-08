@@ -12,10 +12,14 @@ import {
   Text,
   useBoolean,
 } from '@chakra-ui/react';
-import { ShippingCalculTypeOptions, ShippingCalculTypes } from '@project-lc/shared-types';
+import {
+  ShippingCalculType,
+  ShippingCalculTypeOptions,
+  ShippingCalculTypes,
+} from '@project-lc/shared-types';
+import { useShippingGroupItemStore } from '@project-lc/stores';
 import React from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
-import { useFormContext, Controller } from 'react-hook-form';
 import SectionWithTitle from './SectionWithTitle';
 
 export function ShippingPolicyFormControlWithLabel({
@@ -37,19 +41,30 @@ export function ShippingPolicyFormControlWithLabel({
 
 export function ShippingPolicyBasicInfo(): JSX.Element {
   const [open, setFlag] = useBoolean(false);
-  const { register, watch, setValue, control } = useFormContext();
+
+  const {
+    groupName,
+    shippingCalculType,
+    baseAddress,
+    postalCode,
+    detailAddress,
+    shippingStdFree,
+    shippingAddFree,
+    setGroupName,
+    setShippingCalculType,
+    clearShippingAdditionalSetting,
+    setShippingStdFree,
+    setShippingAddFree,
+    setAddress,
+    setDetailAddress,
+  } = useShippingGroupItemStore();
 
   // 배송비 계산 기준
-  const shippingCalculType = watch('shippingCalculType');
-
-  const baseAddress = watch('baseAddress');
-  const postalCode = watch('postalCode');
 
   // 주소검색 결과 타입 참고 https://postcode.map.daum.net/guide
   const handleComplete = (data: AddressData) => {
     const { address, zonecode } = data;
-    setValue('baseAddress', address);
-    setValue('postalCode', zonecode);
+    setAddress(zonecode, address);
     setFlag.off();
   };
 
@@ -57,7 +72,7 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
     <SectionWithTitle title="기본정보">
       {/* 배송그룹명 */}
       <ShippingPolicyFormControlWithLabel id="shipping-group-name" label="배송그룹명">
-        <Input {...register('groupName')} />
+        <Input value={groupName} onChange={setGroupName} />
       </ShippingPolicyFormControlWithLabel>
 
       {/* 배송비 계산 기준 */}
@@ -65,31 +80,23 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
         id="shipping-calcul-type"
         label="배송비 계산 기준"
       >
-        <Controller
-          control={control}
-          name="shippingCalculType"
-          render={({ field: { onChange, ...rest } }) => (
-            <RadioGroup
-              {...rest}
-              defaultValue="bundle"
-              onChange={(nextValue: string) => {
-                onChange(nextValue);
-                if (nextValue === 'free') {
-                  setValue('shippingStdFree', false);
-                  setValue('shippingAddFree', false);
-                }
-              }}
-            >
-              <Stack direction="row">
-                {ShippingCalculTypes.map((key) => (
-                  <Radio value={key} key={key}>
-                    {ShippingCalculTypeOptions[key].label}
-                  </Radio>
-                ))}
-              </Stack>
-            </RadioGroup>
-          )}
-        />
+        <RadioGroup
+          value={shippingCalculType}
+          onChange={(nextValue: ShippingCalculType) => {
+            if (nextValue === 'free') {
+              clearShippingAdditionalSetting();
+            }
+            setShippingCalculType(nextValue);
+          }}
+        >
+          <Stack direction="row">
+            {ShippingCalculTypes.map((key) => (
+              <Radio value={key} key={key}>
+                {ShippingCalculTypeOptions[key].label}
+              </Radio>
+            ))}
+          </Stack>
+        </RadioGroup>
       </ShippingPolicyFormControlWithLabel>
 
       {/* 배송비 추가 설정 - 배송비 계산 기준이 '무료계산'일때는 표시하지 않는다 */}
@@ -103,10 +110,18 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
               무료계산-묶음배송 배송그룹이 적용된 상품과 함께 주문하면, 배송그룹으로
               계산된 배송비
             </Text>
-            <Checkbox colorScheme="green" {...register('shippingStdFree')}>
+            <Checkbox
+              colorScheme="green"
+              isChecked={shippingStdFree}
+              onChange={setShippingStdFree}
+            >
               기본 무료
             </Checkbox>
-            <Checkbox colorScheme="green" {...register('shippingAddFree')}>
+            <Checkbox
+              colorScheme="green"
+              isChecked={shippingAddFree}
+              onChange={setShippingAddFree}
+            >
               추가 무료
             </Checkbox>
           </Stack>
@@ -124,20 +139,21 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
           </Box>
           <Input
             id="base-return-address"
-            defaultValue={baseAddress}
             readOnly
             placeholder="우편번호"
+            defaultValue={postalCode}
           />
           <Input
             id="detail-return-address"
-            defaultValue={postalCode}
+            defaultValue={baseAddress}
             readOnly
             placeholder="주소"
           />
           <Input
             id="postal-code-return-address"
             placeholder="상세주소"
-            {...register('detailAddress')}
+            value={detailAddress}
+            onChange={setDetailAddress}
           />
         </Stack>
       </ShippingPolicyFormControlWithLabel>

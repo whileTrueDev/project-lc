@@ -1,7 +1,13 @@
 import { Grid, ButtonGroup, Button, Heading } from '@chakra-ui/react';
+import { useShippingGroupItemStore } from '@project-lc/stores';
 
 /** 배송비 정책 생성 모달 상단 헤더 */
 export function ShippingPolicyHeader(): JSX.Element {
+  const { data } = useShippingGroupItemStore();
+  const onSubmit = () => {
+    console.log({ groupData: data });
+  };
+
   return (
     <Grid templateColumns="repeat(3, 1fr)" gap={2} mb={4}>
       <ButtonGroup flexWrap="wrap">
@@ -12,7 +18,9 @@ export function ShippingPolicyHeader(): JSX.Element {
         배송비 정책
       </Heading>
       <ButtonGroup justifyContent="flex-end">
-        <Button size="sm">저장</Button>
+        <Button size="sm" onClick={onSubmit}>
+          저장
+        </Button>
       </ButtonGroup>
     </Grid>
   );
