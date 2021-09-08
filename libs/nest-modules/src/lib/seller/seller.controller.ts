@@ -17,10 +17,13 @@ import {
   PasswordValidateDto,
   SellerEmailDupCheckDto,
   SignUpSellerDto,
+  BusinessRegistrationDto,
+  SettlementAccountDto,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { SellerService } from './seller.service';
+import { SellerSettlementService } from './seller-settlement.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
 
@@ -28,6 +31,7 @@ import { UserPayload } from '../auth/auth.interface';
 export class SellerController {
   constructor(
     private readonly sellerService: SellerService,
+    private readonly sellerSettlementService: SellerSettlementService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
 
@@ -83,5 +87,32 @@ export class SellerController {
   @Patch('password')
   public async changePassword(@Body(ValidationPipe) dto: PasswordValidateDto) {
     return this.sellerService.changePassword(dto.email, dto.password);
+  }
+
+  // 본인의 정산정보 조회
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement')
+  public async selectSellerSettlementInfo(@SellerInfo() sellerInfo: UserPayload) {
+    return this.sellerSettlementService.selectSellerSettlementInfo(sellerInfo);
+  }
+
+  // 본인의 사업자 등록증 등록
+  @UseGuards(JwtAuthGuard)
+  @Post('business-registration')
+  public async InsertBusinessRegistration(
+    @Body(ValidationPipe) dto: BusinessRegistrationDto,
+    @SellerInfo() sellerInfo: UserPayload,
+  ) {
+    return this.sellerSettlementService.insertBusinessRegistration(dto, sellerInfo);
+  }
+
+  // 본인의 사업자 등록증 등록
+  @UseGuards(JwtAuthGuard)
+  @Post('settlement-account')
+  public async InsertSettlementAccount(
+    @Body(ValidationPipe) dto: SettlementAccountDto,
+    @SellerInfo() sellerInfo: UserPayload,
+  ) {
+    return this.sellerSettlementService.insertSettlementAccount(dto, sellerInfo);
   }
 }
