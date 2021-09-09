@@ -133,16 +133,19 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
       */}
       <ShippingPolicyFormControlWithLabel label="반송지">
         <Stack spacing={2} alignItems="flex-start">
-          <Button onClick={setFlag.toggle}>반송지 설정</Button>
           <Box display={open ? 'block' : 'none'} width="100%">
             <DaumPostcode onComplete={handleComplete} />
           </Box>
-          <Input
-            id="base-return-address"
-            readOnly
-            placeholder="우편번호"
-            defaultValue={postalCode}
-          />
+          <Stack direction="row">
+            <Input
+              id="base-return-address"
+              readOnly
+              placeholder="우편번호"
+              defaultValue={postalCode}
+            />
+            <Button onClick={setFlag.toggle}>반송지 설정</Button>
+          </Stack>
+
           <Input
             id="detail-return-address"
             defaultValue={baseAddress}

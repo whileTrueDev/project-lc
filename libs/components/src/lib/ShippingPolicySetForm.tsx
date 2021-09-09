@@ -38,7 +38,10 @@ function InputWrapperText({
   );
 }
 
-function BoldText({ children, ...rest }: { children: React.ReactNode } & TextProps) {
+export function BoldText({
+  children,
+  ...rest
+}: { children: React.ReactNode } & TextProps) {
   return (
     <Text fontWeight="bold" {...rest}>
       {children}
@@ -71,7 +74,6 @@ export function ShippingPolicySetForm({
     setWwapShippingCost,
     setShipingFreeFlag,
     changeDeliveryLimit,
-    reset,
   } = useShippingSetItemStore();
 
   const { addShippingSet } = useShippingGroupItemStore();
@@ -93,7 +95,6 @@ export function ShippingPolicySetForm({
       shippingSetCode,
     };
     addShippingSet(set);
-    reset();
     onSubmit();
   };
   return (

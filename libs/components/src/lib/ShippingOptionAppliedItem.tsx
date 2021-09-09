@@ -1,11 +1,9 @@
-import { CloseIcon } from '@chakra-ui/icons';
-import { Stack, Text, Tag, TagLabel, TagCloseButton, Divider } from '@chakra-ui/react';
+import { Divider, Stack, Tag, TagCloseButton, TagLabel, Text } from '@chakra-ui/react';
 import { ShippingOption } from '@project-lc/shared-types';
 import { useCallback } from 'react';
 import { ShippingSelectOption } from './ShippingOptionTypeSelect';
 
-function getOptionLabel(selectOption: ShippingSelectOption, item: ShippingOption) {
-  const { suffix } = selectOption;
+export function getOptionLabel(item: ShippingOption, suffix: string) {
   const { sectionStart, sectionEnd } = item;
 
   const startLabel = sectionStart
@@ -49,7 +47,9 @@ export function ShippingOptionAppliedItem({
       ) : (
         // 금액, 가격, 무게 구간입력 구간반복인 경우
         <Stack>
-          <TagLabel fontWeight="bold">{getOptionLabel(selectOption, item)}</TagLabel>
+          <TagLabel fontWeight="bold">
+            {getOptionLabel(item, selectOption.suffix)}
+          </TagLabel>
           <Divider />
           <Text>{`${areaName} · ${costText}`}</Text>
         </Stack>
