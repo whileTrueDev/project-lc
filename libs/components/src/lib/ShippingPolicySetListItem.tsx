@@ -19,7 +19,7 @@ function OptionItemDisplay({ item }: { item: ShippingOption }) {
   const costText = shippingOptType === 'free' ? '무료' : `${cost.toLocaleString()} 원`;
 
   return (
-    <Stack direction={{ base: 'column', md: 'row' }}>
+    <Stack direction={{ base: 'column', sm: 'row' }}>
       {/* 무료, 고정 인 경우 범위 표시 안함 */}
       {!['free', 'fixed'].includes(shippingOptType) && (
         <Text>{`${getOptionLabel(item, suffix)} · `}</Text>

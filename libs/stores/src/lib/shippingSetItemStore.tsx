@@ -2,6 +2,7 @@ import {
   DeliveryLimit,
   PrepayInfo,
   ShippingOption,
+  ShippingOptionSetType,
   ShippingSetCodeOptions,
   ShippingSetFormData,
 } from '@project-lc/shared-types';
@@ -16,7 +17,7 @@ export interface ShippingSetItemStoreState extends Omit<ShippingSetFormData, 'te
   setShipingFreeFlag: (e: React.ChangeEvent<HTMLInputElement>) => void;
   changeDeliveryLimit: (deliveryLimit: DeliveryLimit) => void;
   removeShippingOption: (id: number) => void;
-  clearShippingOptions: () => void;
+  clearShippingOptions: (type?: ShippingOptionSetType) => void;
   addShippingOption: (option: Omit<ShippingOption, 'tempId'>) => void;
   setShippingOptions: (options: Omit<ShippingOption, 'tempId'>[]) => void;
   reset: () => void;
@@ -100,10 +101,15 @@ export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, g
       shippingOptions: filtered,
     }));
   },
-  clearShippingOptions: () => {
+  clearShippingOptions: (type?: ShippingOptionSetType) => {
+    const { shippingOptions } = get();
+    // ShippingOptionType 값이 주어지면 해당 타입인 옵션을 삭제
+    // 값이 없으면 전체 삭제
     set((state) => ({
       ...state,
-      shippingOptions: [],
+      shippingOptions: type
+        ? shippingOptions.filter((opt) => opt.shippingSetType !== type)
+        : [],
     }));
   },
   addShippingOption: (option: Omit<ShippingOption, 'tempId'>) => {

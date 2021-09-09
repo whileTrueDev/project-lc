@@ -50,10 +50,10 @@ export function ShippingOptionTypeSelect({
       );
       if (nextOption) {
         changeOption(nextOption);
-        clearShippingOptions();
+        clearShippingOptions(shippingSetType);
       }
     },
-    [changeOption, clearShippingOptions],
+    [changeOption, clearShippingOptions, shippingSetType],
   );
 
   let availableOptions = ShippingSelectOptions;
