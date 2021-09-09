@@ -27,7 +27,7 @@ export function ShippingOptionApplySection({
   shippingSetType?: ShippingOptionSetType;
 }): JSX.Element {
   const [selectOption, setSelectOption] = useState<ShippingSelectOption>(
-    ShippingSelectOptions[0],
+    shippingSetType === 'std' ? ShippingSelectOptions[0] : ShippingSelectOptions[1],
   );
   const changeOption = useCallback((type: ShippingSelectOption) => {
     setSelectOption(type);
@@ -35,14 +35,18 @@ export function ShippingOptionApplySection({
 
   const { shippingOptions, removeShippingOption } = useShippingSetItemStore();
   const appliedStdOptList = shippingOptions.filter(
-    (opt) => opt.shippingSetType === 'std',
+    (opt) => opt.shippingSetType === shippingSetType,
   );
 
   return (
     <Stack>
-      <ShippingOptionTypeSelect option={selectOption} changeOption={changeOption} />
+      <ShippingOptionTypeSelect
+        option={selectOption}
+        changeOption={changeOption}
+        shippingSetType={shippingSetType}
+      />
       {/* 적용된 배송비 옵션 없을때 표시문구 */}
-      {appliedStdOptList.length === 0 && (
+      {shippingSetType !== 'add' && appliedStdOptList.length === 0 && (
         <Text color="blue.500" fontSize="sm">
           <InfoIcon mr={2} />
           적용된 배송비 옵션이 없습니다. &quot;적용&quot; 버튼을 눌러 옵션을 1개 이상

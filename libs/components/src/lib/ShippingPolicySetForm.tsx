@@ -71,6 +71,7 @@ export function ShippingPolicySetForm({
     setShipingFreeFlag,
     changeDeliveryLimit,
   } = useShippingSetItemStore();
+
   // 배송 설정 추가 핸들러
   const addShippingSet = () => {
     if (shippingOptions.length === 0) {
@@ -170,10 +171,13 @@ export function ShippingPolicySetForm({
 
         {/* 추가 배송비 */}
         <Stack>
-          <BoldText>추가 배송비</BoldText>
-          <Button width="100px" onClick={toggle}>
-            {open ? '사용하지 않기' : '설정하기'}
-          </Button>
+          <Stack direction="row" alignItems="center">
+            <BoldText>추가 배송비</BoldText>
+            <Button width="100px" onClick={toggle}>
+              {open ? '사용하지 않기' : '설정하기'}
+            </Button>
+          </Stack>
+
           {open && <ShippingOptionApplySection shippingSetType="add" />}
         </Stack>
         {/* 추가 배송비 */}

@@ -9,7 +9,7 @@ export function ShippingOptionFreeApply({
 }: {
   shippingSetType: ShippingOptionSetType;
 }) {
-  const { addShippingOption, shippingOptions, deliveryLimit } = useShippingSetItemStore();
+  const { addShippingOption, shippingOptions } = useShippingSetItemStore();
 
   const isFreeOptionAdded = !!shippingOptions.find(
     (opt) => opt.shippingOptType === 'free',

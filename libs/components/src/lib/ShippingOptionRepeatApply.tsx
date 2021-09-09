@@ -65,7 +65,8 @@ export function ShippingOptionRepeatApply({
       secondSectionStart: 2,
       secondSectionEnd: 1,
       secondCost: 2500,
-      areaName: deliveryLimit === 'unlimit' ? '대한민국' : '지역 선택',
+      areaName:
+        deliveryLimit === 'limit' || shippingSetType === 'add' ? '지역 선택' : '대한민국',
     },
   });
 
@@ -106,12 +107,13 @@ export function ShippingOptionRepeatApply({
     };
     const newOptions = [firstOption, secondOption];
     // 3. addShippingOption
-    if (deliveryLimit === 'unlimit') {
-      // 전국배송인 경우 1개만 설정하도록
-      setShippingOptions(newOptions);
-    } else {
+
+    if (deliveryLimit === 'limit' || shippingSetType === 'add') {
       // 지역배송인 경우 추가하도록
       newOptions.forEach((opt) => addShippingOption(opt));
+    } else {
+      // 전국배송인 경우 1개만 설정하도록
+      setShippingOptions(newOptions);
     }
   };
 
@@ -158,14 +160,14 @@ export function ShippingOptionRepeatApply({
             render={({ field }) => {
               return (
                 <Select w={120} {...field}>
-                  {deliveryLimit === 'unlimit' ? (
-                    <option value="대한민국">대한민국</option>
-                  ) : (
+                  {deliveryLimit === 'limit' || shippingSetType === 'add' ? (
                     ['지역 선택', ...KOREA_PROVINCES].map((area) => (
                       <option key={area} value={area}>
                         {area}
                       </option>
                     ))
+                  ) : (
+                    <option value="대한민국">대한민국</option>
                   )}
                 </Select>
               );

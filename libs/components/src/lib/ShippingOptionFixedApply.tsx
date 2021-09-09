@@ -1,15 +1,15 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Stack, Input, Button, Text, Select } from '@chakra-ui/react';
+import { Button, Input, Select, Stack, Text } from '@chakra-ui/react';
 import {
   ShippingCostType,
   ShippingOption,
   ShippingOptionSetType,
 } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ErrorText } from './ShippingOptionIntervalApply';
 import { KOREA_PROVINCES } from '../constants/address';
+import { ErrorText } from './ShippingOptionIntervalApply';
 
 // 배송비 고정 옵션 적용
 export function ShippingOptionFixedApply({
@@ -28,7 +28,8 @@ export function ShippingOptionFixedApply({
   } = useForm<ShippingCostType>({
     defaultValues: {
       cost: 2500,
-      areaName: deliveryLimit === 'unlimit' ? '대한민국' : '지역 선택',
+      areaName:
+        deliveryLimit === 'limit' || shippingSetType === 'add' ? '지역 선택' : '대한민국',
     },
   });
 
@@ -39,7 +40,7 @@ export function ShippingOptionFixedApply({
   // 배송방법 추가
   const addFixedOption = useCallback(
     (data: ShippingCostType) => {
-      const { areaName, cost } = data;
+      const { areaName } = data;
       if (areaName === '지역 선택') {
         return;
       }
@@ -50,12 +51,12 @@ export function ShippingOptionFixedApply({
         sectionEnd: null,
         costItem: data,
       };
-      if (deliveryLimit === 'unlimit') {
-        // 전국배송인 경우 1개만 설정하도록
-        setShippingOptions([newOption]);
-      } else {
+      if (deliveryLimit === 'limit' || shippingSetType === 'add') {
         // 지역배송인 경우 추가하도록
         addShippingOption(newOption);
+      } else {
+        // 전국배송인 경우 1개만 설정하도록
+        setShippingOptions([newOption]);
       }
     },
     [addShippingOption, deliveryLimit, setShippingOptions, shippingSetType],
@@ -82,14 +83,14 @@ export function ShippingOptionFixedApply({
           render={({ field }) => {
             return (
               <Select w={120} {...field}>
-                {deliveryLimit === 'unlimit' ? (
-                  <option value="대한민국">대한민국</option>
-                ) : (
+                {deliveryLimit === 'limit' || shippingSetType === 'add' ? (
                   ['지역 선택', ...KOREA_PROVINCES].map((area) => (
                     <option key={area} value={area}>
                       {area}
                     </option>
                   ))
+                ) : (
+                  <option value="대한민국">대한민국</option>
                 )}
               </Select>
             );
