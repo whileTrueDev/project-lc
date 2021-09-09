@@ -1,19 +1,17 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import {
-  Center,
-  Divider,
-  Stack,
-  Text,
-  Button,
-  Input,
-  FormControl,
-  FormLabel,
-} from '@chakra-ui/react';
+import { Button, FormControl, Input, Select, Stack, Text } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
-import { ShippingOptionSetType, ShippingOptionType } from '@project-lc/shared-types';
+import {
+  ShippingCostType,
+  ShippingOptionSetType,
+  ShippingOptionType,
+} from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
+import { KOREA_PROVINCES } from '../constants/address';
+import FormControlInputWrapper from './FormControlInputWrapper';
+import { ResponsiveDivider } from './ResponsiveDivider';
 
 export function ErrorText({ children }: { children: React.ReactNode }) {
   return (
@@ -26,8 +24,7 @@ export function ErrorText({ children }: { children: React.ReactNode }) {
 type IntervalFormType = {
   sectionStart: null | number;
   sectionEnd: null | number;
-  cost: number;
-};
+} & ShippingCostType;
 
 export function ShippingOptionIntervalApply({
   shippingSetType,
@@ -38,24 +35,27 @@ export function ShippingOptionIntervalApply({
   shippingOptType: ShippingOptionType;
   suffix: string;
 }): JSX.Element {
-  const { isMobileSize } = useDisplaySize();
+  const { deliveryLimit } = useShippingSetItemStore();
   const {
     register,
     handleSubmit,
     reset,
     getValues,
+    control,
+    setValue,
     formState: { isSubmitSuccessful, errors },
   } = useForm<IntervalFormType>({
     defaultValues: {
       sectionStart: 1,
       sectionEnd: null,
       cost: 2500,
+      areaName: deliveryLimit === 'unlimit' ? '대한민국' : '지역 선택',
     },
   });
 
   const { addShippingOption, shippingOptions } = useShippingSetItemStore();
   const onSubmit = (data: IntervalFormType) => {
-    const { sectionStart, sectionEnd, cost } = data;
+    const { sectionStart, sectionEnd, cost, areaName } = data;
     // 1. costItem 생성
     // 2. shippingOption 생성
     // 3. addShippingOption
@@ -66,29 +66,29 @@ export function ShippingOptionIntervalApply({
       sectionEnd,
       costItem: {
         cost,
-        areaName: '대한민국',
-        tempId: 0,
+        areaName,
       },
     });
   };
 
   useEffect(() => {
     if (isSubmitSuccessful) {
-      reset({
-        sectionStart: shippingOptions.length
+      setValue(
+        'sectionStart',
+        shippingOptions.length
           ? shippingOptions[shippingOptions.length - 1].sectionEnd
           : null,
-        sectionEnd: null,
-        cost: 2500,
-      });
+      );
+      setValue('sectionEnd', null);
     }
-  }, [reset, isSubmitSuccessful, shippingOptions]);
+  }, [isSubmitSuccessful, shippingOptions, setValue]);
 
   useEffect(() => {
     reset({
       sectionStart: 1,
       sectionEnd: null,
       cost: 2500,
+      areaName: deliveryLimit === 'unlimit' ? '대한민국' : '지역 선택',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shippingOptType]);
@@ -100,6 +100,7 @@ export function ShippingOptionIntervalApply({
       {errors.sectionStart && <ErrorText>{errors.sectionStart.message}</ErrorText>}
       {errors.sectionEnd && <ErrorText>{errors.sectionEnd.message}</ErrorText>}
       {errors.cost && <ErrorText>{errors.cost.message}</ErrorText>}
+      {errors.areaName && <ErrorText>{errors.areaName.message}</ErrorText>}
       <Stack
         direction="row"
         as="form"
@@ -110,62 +111,83 @@ export function ShippingOptionIntervalApply({
         borderRadius="md"
         p={2}
       >
-        <Button type="submit">적용</Button>
         <Stack direction={{ base: 'column', sm: 'row' }}>
+          {/* 범위 지정 */}
           <Stack direction="row" alignItems="center">
-            <FormControl id="sectionStart">
-              <FormLabel>이상</FormLabel>
-              <Stack direction="row" alignItems="center">
-                <Input
-                  type="number"
-                  {...register('sectionStart', {
-                    required: '시작값을 입력해주세요',
-                    valueAsNumber: true,
-                    validate: {
-                      positive: (v) => (v && v > 0) || '양수를 입력해주세요',
-                    },
-                  })}
-                />
-                {suffixText}
-              </Stack>
-            </FormControl>
+            {/* 첫번째 범위 인풋 */}
+            <FormControlInputWrapper id="sectionStart" suffix={`${suffix} 이상`}>
+              <Input
+                type="number"
+                {...register('sectionStart', {
+                  required: '시작값을 입력해주세요',
+                  valueAsNumber: true,
+                  validate: {
+                    positive: (v) => (v && v > 0) || '양수를 입력해주세요',
+                  },
+                })}
+              />
+            </FormControlInputWrapper>
             <Text>~</Text>
-            <FormControl id="sectionEnd">
-              <FormLabel>미만</FormLabel>
-              <Stack direction="row" alignItems="center">
-                <Input
-                  type="number"
-                  {...register('sectionEnd', {
-                    valueAsNumber: true,
-                    validate: {
-                      biggerThanSectionStart: (v) => {
-                        const sectionStart = getValues('sectionStart');
-                        return (
-                          (sectionStart && !v) ||
-                          (sectionStart && v && v > sectionStart) ||
-                          '시작값보다 큰 값을 입력해주세요'
-                        );
-                      },
+            {/* 두번째 범위 인풋 */}
+            <FormControlInputWrapper id="sectionEnd" suffix={`${suffix} 미만`}>
+              <Input
+                type="number"
+                {...register('sectionEnd', {
+                  valueAsNumber: true,
+                  validate: {
+                    biggerThanSectionStart: (v) => {
+                      const sectionStart = getValues('sectionStart');
+                      return (
+                        (sectionStart && !v) ||
+                        (sectionStart && v && v > sectionStart) ||
+                        '시작값보다 큰 값을 입력해주세요'
+                      );
                     },
-                  })}
-                />
+                  },
+                })}
+              />
+            </FormControlInputWrapper>
+          </Stack>
+          <ResponsiveDivider />
+
+          {/* 지역, 가격 설정 */}
+          <Stack>
+            {/* 지역 설정 셀렉트 */}
+            <Controller
+              name="areaName"
+              control={control}
+              rules={{
+                validate: {
+                  selectArea: (v) => v !== '지역 선택' || '지역을 선택해주세요',
+                },
+              }}
+              render={({ field }) => {
+                return (
+                  <Select w={120} {...field}>
+                    {deliveryLimit === 'unlimit' ? (
+                      <option value="대한민국">대한민국</option>
+                    ) : (
+                      ['지역 선택', ...KOREA_PROVINCES].map((area) => (
+                        <option key={area} value={area}>
+                          {area}
+                        </option>
+                      ))
+                    )}
+                  </Select>
+                );
+              }}
+            />
+            {/* 가격 설정 */}
+            <FormControl id="cost">
+              <Stack direction="row" alignItems="center">
+                <Input type="number" {...register('cost', { required: true })} />
                 {suffixText}
               </Stack>
             </FormControl>
           </Stack>
-          <Center height={isMobileSize ? undefined : '80px'}>
-            <Divider orientation={isMobileSize ? 'horizontal' : 'vertical'} />
-          </Center>
-          <FormControl id="cost">
-            <FormLabel>대한민국</FormLabel>
-            <Stack direction="row" alignItems="center">
-              <Input type="number" {...register('cost', { required: true })} />
-              {suffixText}
-            </Stack>
-          </FormControl>
         </Stack>
 
-        <Stack />
+        <Button type="submit">적용</Button>
       </Stack>
     </>
   );

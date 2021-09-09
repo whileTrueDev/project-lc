@@ -1,5 +1,9 @@
-import { Select, Text } from '@chakra-ui/react';
-import { ShippingOptionType, ShippingPolicyFormData } from '@project-lc/shared-types';
+import { Select, Stack, Text } from '@chakra-ui/react';
+import {
+  ShippingOptionSetType,
+  ShippingOptionType,
+  ShippingPolicyFormData,
+} from '@project-lc/shared-types';
 import { useShippingGroupItemStore, useShippingSetItemStore } from '@project-lc/stores';
 import { useState, useCallback } from 'react';
 
@@ -30,10 +34,12 @@ export const ShippingSelectOptions: ShippingSelectOption[] = [
 export function ShippingOptionTypeSelect({
   option,
   changeOption,
+  shippingSetType = 'std',
 }: {
   option: ShippingSelectOption;
   changeOption: (opt: ShippingSelectOption) => void;
   onChange?: () => void;
+  shippingSetType?: ShippingOptionSetType;
 }): JSX.Element {
   const { clearShippingOptions } = useShippingSetItemStore();
   const { shippingCalculType } = useShippingGroupItemStore();
@@ -50,17 +56,16 @@ export function ShippingOptionTypeSelect({
     [changeOption, clearShippingOptions],
   );
 
+  let availableOptions = ShippingSelectOptions;
   // 배송비 계산기준 - '무료계산-묶음배송'인 경우 '무료'만 설정 가능
-  // shippingCalculType
-
-  const availableOptions =
-    shippingCalculType === 'free'
-      ? ShippingSelectOptions.slice(0, 1)
-      : ShippingSelectOptions;
+  if (shippingCalculType === 'free') availableOptions = ShippingSelectOptions.slice(0, 1);
+  // 추가옵션인 경우 '무료' 옵션 없음
+  if (shippingSetType === 'add') availableOptions = ShippingSelectOptions.slice(1);
 
   return (
-    <>
-      <Select onChange={changeHandler} value={option.key} width="150px">
+    <Stack direction="row" alignItems="center">
+      <Text>배송비</Text>
+      <Select onChange={changeHandler} value={option.key} w="150px">
         {availableOptions.map((opt) => {
           const { key, label } = opt;
           return (
@@ -70,7 +75,7 @@ export function ShippingOptionTypeSelect({
           );
         })}
       </Select>
-    </>
+    </Stack>
   );
 }
 

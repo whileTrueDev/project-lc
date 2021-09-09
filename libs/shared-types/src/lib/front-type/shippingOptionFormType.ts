@@ -21,17 +21,15 @@ export interface ShippingOption {
   // 끝구간
   sectionEnd: null | number;
 
-  // 배송비 - 지역추가시 배열로 들어감
-  costItem: ShippingCost | ShippingCost[];
+  // 배송비 - 퍼스트몰 db는 지역추가시 ShippingCostType이 배열로 들어가나 복잡하고 구현하기 어려워서 하나만 적용 가능하도록 함
+  costItem: ShippingCostType;
 }
 
-export interface ShippingCost {
-  // 임시 id
-  tempId: number;
-  // 지역그룹 명
+export interface ShippingCostType {
+  // 지역명
   areaName: string;
   // 해당 지역그룹의 배송비
   cost: number;
-  // 지역그룹에 속하는 주소(시도명) - shipping_option.delivery_limit 값이 limit 인 경우
-  areaDetail?: string[];
+  // // 지역그룹에 속하는 주소(시도명) - shipping_option.delivery_limit 값이 limit 인 경우
+  // areaDetail?: string[];
 }

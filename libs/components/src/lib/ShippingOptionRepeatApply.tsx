@@ -1,45 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import {
-  Stack,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Center,
-  Divider,
-  Text,
-} from '@chakra-ui/react';
-import { useDisplaySize } from '@project-lc/hooks';
-import {
-  ShippingCost,
-  ShippingOptionSetType,
-  ShippingOptionType,
-} from '@project-lc/shared-types';
+import { Button, FormControl, Input, Select, Stack, Text } from '@chakra-ui/react';
+import { ShippingOptionSetType, ShippingOptionType } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
-import { useForm } from 'react-hook-form';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { KOREA_PROVINCES } from '../constants/address';
+import FormControlInputWrapper from './FormControlInputWrapper';
+import { ResponsiveDivider } from './ResponsiveDivider';
 import { ErrorText } from './ShippingOptionIntervalApply';
-
-function SectionInputWrapper({
-  children,
-  id,
-  suffix,
-}: {
-  children: React.ReactNode;
-  id?: string;
-  suffix: string;
-}) {
-  return (
-    <FormControl id={id}>
-      <Stack>
-        {children}
-        <Stack direction="row" justifyContent="flex-end">
-          <Text>{suffix}</Text>
-        </Stack>
-      </Stack>
-    </FormControl>
-  );
-}
 
 function CostInputWrapper({
   children,
@@ -52,7 +20,6 @@ function CostInputWrapper({
 }) {
   return (
     <FormControl id={id}>
-      <FormLabel>대한민국</FormLabel>
       <Stack direction="row" alignItems="center">
         {children}
         <Text>{suffix}</Text>
@@ -68,15 +35,7 @@ type RepeatFormType = {
   secondSectionEnd: null | number;
   firstCost: number;
   secondCost: number;
-};
-
-const defaultValues: RepeatFormType = {
-  firstSectionStart: 1,
-  firstSectionEnd: 2,
-  firstCost: 2500,
-  secondSectionStart: 2,
-  secondSectionEnd: 1,
-  secondCost: 2500,
+  areaName: string;
 };
 
 export function ShippingOptionRepeatApply({
@@ -88,28 +47,33 @@ export function ShippingOptionRepeatApply({
   shippingOptType: ShippingOptionType;
   suffix: string;
 }): JSX.Element {
-  const { isMobileSize } = useDisplaySize();
+  const { setShippingOptions, addShippingOption, deliveryLimit } =
+    useShippingSetItemStore();
+
   const {
     register,
     handleSubmit,
     reset,
     getValues,
-    formState: { isSubmitSuccessful, errors },
+    control,
+    formState: { errors },
   } = useForm<RepeatFormType>({
-    defaultValues,
+    defaultValues: {
+      firstSectionStart: 1,
+      firstSectionEnd: 2,
+      firstCost: 2500,
+      secondSectionStart: 2,
+      secondSectionEnd: 1,
+      secondCost: 2500,
+      areaName: deliveryLimit === 'unlimit' ? '대한민국' : '지역 선택',
+    },
   });
-
-  const costItemBase = {
-    tempId: 0,
-    areaName: '대한민국',
-  };
 
   const shippingOptionBase = {
     shippingSetType,
     shippingOptType,
   };
 
-  const { setShippingOptions, shippingOptions } = useShippingSetItemStore();
   const onSubmit = (data: RepeatFormType) => {
     const {
       firstSectionStart,
@@ -118,52 +82,42 @@ export function ShippingOptionRepeatApply({
       secondSectionStart,
       secondSectionEnd,
       secondCost,
+      areaName,
     } = data;
-    // 1. costItem 생성
-    const firstCostItem: ShippingCost = {
-      ...costItemBase,
-      cost: firstCost,
-    };
-    const secondCostItem: ShippingCost = {
-      ...costItemBase,
-      cost: secondCost,
-    };
+
     // 2. shippingOption 생성
     const firstOption = {
       ...shippingOptionBase,
       sectionStart: firstSectionStart,
       sectionEnd: firstSectionEnd,
-      costItem: firstCostItem,
+      costItem: {
+        areaName,
+        cost: firstCost,
+      },
     };
     const secondOption = {
       ...shippingOptionBase,
       sectionStart: secondSectionStart,
       sectionEnd: secondSectionEnd,
-      costItem: secondCostItem,
+      costItem: {
+        areaName,
+        cost: secondCost,
+      },
     };
+    const newOptions = [firstOption, secondOption];
     // 3. addShippingOption
-    setShippingOptions([firstOption, secondOption]);
+    if (deliveryLimit === 'unlimit') {
+      // 전국배송인 경우 1개만 설정하도록
+      setShippingOptions(newOptions);
+    } else {
+      // 지역배송인 경우 추가하도록
+      newOptions.forEach((opt) => addShippingOption(opt));
+    }
   };
 
   useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset(defaultValues);
-    }
-  }, [reset, isSubmitSuccessful, shippingOptions]);
-
-  useEffect(() => {
-    reset(defaultValues);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shippingOptType]);
-
-  const divider = useMemo(
-    () => (
-      <Center height={isMobileSize ? undefined : '80px'}>
-        <Divider orientation={isMobileSize ? 'horizontal' : 'vertical'} />
-      </Center>
-    ),
-    [isMobileSize],
-  );
+    reset();
+  }, [reset, shippingOptType, deliveryLimit]);
 
   return (
     <>
@@ -179,16 +133,49 @@ export function ShippingOptionRepeatApply({
       )}
       {errors.firstCost && <ErrorText>{errors.firstCost.message}</ErrorText>}
       {errors.secondCost && <ErrorText>{errors.secondCost.message}</ErrorText>}
+      {errors.areaName && <ErrorText>{errors.areaName.message}</ErrorText>}
 
       <Stack
         direction="column"
         as="form"
         onSubmit={handleSubmit(onSubmit)}
         alignItems="center"
+        border="1px"
+        borderColor="gray.200"
+        borderRadius="md"
+        p={2}
       >
-        <Button type="submit" alignSelf="flex-start">
-          적용
-        </Button>
+        <Stack w="100%" direction="row" justifyContent="space-between">
+          {/* 지역 설정 셀렉트 */}
+          <Controller
+            name="areaName"
+            control={control}
+            rules={{
+              validate: {
+                selectArea: (v) => v !== '지역 선택' || '지역을 선택해주세요',
+              },
+            }}
+            render={({ field }) => {
+              return (
+                <Select w={120} {...field}>
+                  {deliveryLimit === 'unlimit' ? (
+                    <option value="대한민국">대한민국</option>
+                  ) : (
+                    ['지역 선택', ...KOREA_PROVINCES].map((area) => (
+                      <option key={area} value={area}>
+                        {area}
+                      </option>
+                    ))
+                  )}
+                </Select>
+              );
+            }}
+          />
+          <Button type="submit" alignSelf="flex-start">
+            적용
+          </Button>
+        </Stack>
+
         {/* 첫번째 옵션 */}
         <Stack
           direction={{ base: 'column', sm: 'row' }}
@@ -198,7 +185,7 @@ export function ShippingOptionRepeatApply({
           p={2}
         >
           <Stack direction="row" alignItems="center">
-            <SectionInputWrapper id="firstSectionStart" suffix={`${suffix} 이상`}>
+            <FormControlInputWrapper id="firstSectionStart" suffix={`${suffix} 이상`}>
               <Input
                 type="number"
                 {...register('firstSectionStart', {
@@ -209,9 +196,9 @@ export function ShippingOptionRepeatApply({
                   },
                 })}
               />
-            </SectionInputWrapper>
+            </FormControlInputWrapper>
             <Text>~</Text>
-            <SectionInputWrapper id="firstSectionEnd" suffix={`${suffix} 미만`}>
+            <FormControlInputWrapper id="firstSectionEnd" suffix={`${suffix} 미만`}>
               <Input
                 type="number"
                 {...register('firstSectionEnd', {
@@ -228,9 +215,9 @@ export function ShippingOptionRepeatApply({
                   },
                 })}
               />
-            </SectionInputWrapper>
+            </FormControlInputWrapper>
           </Stack>
-          {divider}
+          <ResponsiveDivider />
           <CostInputWrapper id="firstCost" suffix={suffix}>
             <Input type="number" {...register('firstCost', { required: true })} />
           </CostInputWrapper>
@@ -246,7 +233,7 @@ export function ShippingOptionRepeatApply({
           p={2}
         >
           <Stack direction="row" alignItems="center">
-            <SectionInputWrapper id="secondSectionStart" suffix={`${suffix} 부터는`}>
+            <FormControlInputWrapper id="secondSectionStart" suffix={`${suffix} 부터는`}>
               <Input
                 type="number"
                 {...register('secondSectionStart', {
@@ -257,9 +244,9 @@ export function ShippingOptionRepeatApply({
                   },
                 })}
               />
-            </SectionInputWrapper>
+            </FormControlInputWrapper>
             <Text>~</Text>
-            <SectionInputWrapper id="secondSectionEnd" suffix={`${suffix} 당`}>
+            <FormControlInputWrapper id="secondSectionEnd" suffix={`${suffix} 당`}>
               <Input
                 type="number"
                 {...register('secondSectionEnd', {
@@ -269,9 +256,9 @@ export function ShippingOptionRepeatApply({
                   },
                 })}
               />
-            </SectionInputWrapper>
+            </FormControlInputWrapper>
           </Stack>
-          {divider}
+          <ResponsiveDivider />
           <CostInputWrapper id="secondCost" suffix={suffix}>
             <Input type="number" {...register('secondCost', { required: true })} />
           </CostInputWrapper>

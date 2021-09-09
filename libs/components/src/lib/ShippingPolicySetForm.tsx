@@ -2,21 +2,14 @@
 import {
   Box,
   Button,
+  Checkbox,
+  Divider,
   Input,
   Radio,
   RadioGroup,
   Select,
   Stack,
   Text,
-  Checkbox,
-  Divider,
-  useDisclosure,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
   TextProps,
   useBoolean,
   useToast,
@@ -28,8 +21,7 @@ import {
   ShippingSetCodes,
 } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
-import ShippingLimitOptionApplySection from './ShippingLimitOptionApplySection';
-import ShippingUnlimitOptionApplySection from './ShippingUnlimitOptionApplySection';
+import ShippingOptionApplySection from './ShippingOptionApplySection';
 
 function InputWrapperText({
   text,
@@ -62,9 +54,6 @@ export function ShippingPolicySetForm({
   // 추가배송비 사용여부
   const [open, { toggle }] = useBoolean();
   const toast = useToast();
-
-  // 지역정보 모달.. 쓸까?? 필요없으면 삭제하기
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const {
     shippingSetName,
@@ -173,8 +162,7 @@ export function ShippingPolicySetForm({
               <Radio value="limit">대한민국 중 지정 지역 배송</Radio>
             </Stack>
           </RadioGroup>
-          {deliveryLimit === 'unlimit' && <ShippingUnlimitOptionApplySection />}
-          {deliveryLimit === 'limit' && <ShippingLimitOptionApplySection />}
+          <ShippingOptionApplySection />
         </Stack>
         {/* 기본 배송비 */}
 
@@ -186,7 +174,7 @@ export function ShippingPolicySetForm({
           <Button width="100px" onClick={toggle}>
             {open ? '사용하지 않기' : '설정하기'}
           </Button>
-          {open && <ShippingLimitOptionApplySection shippingSetType="add" />}
+          {open && <ShippingOptionApplySection shippingSetType="add" />}
         </Stack>
         {/* 추가 배송비 */}
 
@@ -194,16 +182,6 @@ export function ShippingPolicySetForm({
 
         <Button onClick={addShippingSet}>추가하기</Button>
       </Stack>
-
-      {/* 지역정보 추가 모달 */}
-      <Modal onClose={onClose} isOpen={isOpen}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>지역 추가하기</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>모달바디</ModalBody>
-        </ModalContent>
-      </Modal>
     </>
   );
 }
