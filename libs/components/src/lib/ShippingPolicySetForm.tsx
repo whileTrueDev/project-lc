@@ -20,7 +20,7 @@ import {
   ShippingSetCodeOptions,
   ShippingSetCodes,
 } from '@project-lc/shared-types';
-import { useShippingSetItemStore } from '@project-lc/stores';
+import { useShippingGroupItemStore, useShippingSetItemStore } from '@project-lc/stores';
 import ShippingOptionApplySection from './ShippingOptionApplySection';
 
 function InputWrapperText({
@@ -57,6 +57,7 @@ export function ShippingPolicySetForm({
 
   const {
     shippingSetName,
+    shippingSetCode,
     prepayInfo,
     refundShippingCost,
     swapShippingCost,
@@ -70,15 +71,18 @@ export function ShippingPolicySetForm({
     setWwapShippingCost,
     setShipingFreeFlag,
     changeDeliveryLimit,
+    reset,
   } = useShippingSetItemStore();
 
+  const { addShippingSet } = useShippingGroupItemStore();
+
   // 배송 설정 추가 핸들러
-  const addShippingSet = () => {
+  const addShippingSetHandler = () => {
     if (shippingOptions.length === 0) {
       toast({ title: '배송비 옵션을 1개 이상 적용해야 합니다', status: 'error' });
       return;
     }
-    console.log({
+    const set = {
       shippingSetName,
       prepayInfo,
       refundShippingCost,
@@ -86,8 +90,11 @@ export function ShippingPolicySetForm({
       shipingFreeFlag,
       deliveryLimit,
       shippingOptions,
-    });
-    // onSubmit();
+      shippingSetCode,
+    };
+    addShippingSet(set);
+    reset();
+    onSubmit();
   };
   return (
     <>
@@ -184,7 +191,7 @@ export function ShippingPolicySetForm({
 
         <Divider />
 
-        <Button onClick={addShippingSet}>추가하기</Button>
+        <Button onClick={addShippingSetHandler}>추가하기</Button>
       </Stack>
     </>
   );

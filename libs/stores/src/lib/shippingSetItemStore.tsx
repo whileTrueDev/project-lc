@@ -8,7 +8,6 @@ import {
 import create from 'zustand';
 
 export interface ShippingSetItemStoreState extends Omit<ShippingSetFormData, 'tempId'> {
-  data: Omit<ShippingSetFormData, 'tempId'>;
   setShippingSetName: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setShippingSetCode: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   setPrepayInfo: (prepayInfo: PrepayInfo) => void;
@@ -20,32 +19,10 @@ export interface ShippingSetItemStoreState extends Omit<ShippingSetFormData, 'te
   clearShippingOptions: () => void;
   addShippingOption: (option: Omit<ShippingOption, 'tempId'>) => void;
   setShippingOptions: (options: Omit<ShippingOption, 'tempId'>[]) => void;
-  nextOptionId: number;
+  reset: () => void;
 }
 
 export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, get) => ({
-  get data() {
-    const {
-      shippingSetCode,
-      shippingSetName,
-      prepayInfo,
-      refundShippingCost,
-      swapShippingCost,
-      shipingFreeFlag,
-      shippingOptions,
-      deliveryLimit,
-    } = get();
-    return {
-      shippingSetCode,
-      shippingSetName,
-      prepayInfo,
-      refundShippingCost,
-      swapShippingCost,
-      shipingFreeFlag,
-      shippingOptions,
-      deliveryLimit,
-    };
-  },
   shippingSetCode: 'delivery',
   shippingSetName: '택배',
   prepayInfo: 'delivery',
@@ -54,12 +31,18 @@ export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, g
   shipingFreeFlag: false,
   shippingOptions: [],
   deliveryLimit: 'unlimit',
-  get nextOptionId() {
-    const optionList = get().shippingOptions;
-    if (optionList.length) {
-      return optionList[optionList.length - 1].tempId + 1;
-    }
-    return 0;
+  reset: () => {
+    set((state) => ({
+      ...state,
+      shippingSetCode: 'delivery',
+      shippingSetName: '택배',
+      prepayInfo: 'delivery',
+      refundShippingCost: null,
+      swapShippingCost: null,
+      shipingFreeFlag: false,
+      shippingOptions: [],
+      deliveryLimit: 'unlimit',
+    }));
   },
   setShippingSetName: (e: React.ChangeEvent<HTMLInputElement>) => {
     set((state) => ({
@@ -125,13 +108,13 @@ export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, g
   },
   addShippingOption: (option: Omit<ShippingOption, 'tempId'>) => {
     const { shippingOptions } = get();
-    const nextOptionId =
+    const tempId =
       shippingOptions.length !== 0
         ? shippingOptions[shippingOptions.length - 1].tempId + 1
         : 0;
 
     const newOption = {
-      tempId: nextOptionId,
+      tempId,
       ...option,
     };
     set((state) => ({

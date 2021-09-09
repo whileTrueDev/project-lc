@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { ShippingCalculType, ShippingPolicyFormData } from '@project-lc/shared-types';
+import {
+  ShippingCalculType,
+  ShippingPolicyFormData,
+  ShippingSetFormData,
+} from '@project-lc/shared-types';
 import create from 'zustand';
 
 export interface ShippingGroupItemStoreState extends ShippingPolicyFormData {
-  data: ShippingPolicyFormData;
   setGroupName: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setShippingCalculType: (type: ShippingCalculType) => void;
   clearShippingAdditionalSetting: () => void;
@@ -11,33 +14,12 @@ export interface ShippingGroupItemStoreState extends ShippingPolicyFormData {
   setShippingAddFree: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setAddress: (postalCode: string, baseAddress: string) => void;
   setDetailAddress: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  addShippingSet: () => void;
+  addShippingSet: (item: Omit<ShippingSetFormData, 'tempId'>) => void;
   removeShippingSet: (id: number) => void;
+  reset: () => void;
 }
 export const useShippingGroupItemStore = create<ShippingGroupItemStoreState>(
   (set, get) => ({
-    get data() {
-      const {
-        groupName,
-        shippingCalculType,
-        shippingStdFree,
-        shippingAddFree,
-        postalCode,
-        baseAddress,
-        detailAddress,
-        shippingSets,
-      } = get();
-      return {
-        groupName,
-        shippingCalculType,
-        shippingStdFree,
-        shippingAddFree,
-        postalCode,
-        baseAddress,
-        detailAddress,
-        shippingSets,
-      };
-    },
     groupName: '',
     shippingCalculType: 'bundle',
     shippingStdFree: false,
@@ -46,6 +28,19 @@ export const useShippingGroupItemStore = create<ShippingGroupItemStoreState>(
     baseAddress: '',
     detailAddress: '',
     shippingSets: [],
+    reset: () => {
+      set((state) => ({
+        ...state,
+        groupName: '',
+        shippingCalculType: 'bundle',
+        shippingStdFree: false,
+        shippingAddFree: false,
+        postalCode: '',
+        baseAddress: '',
+        detailAddress: '',
+        shippingSets: [],
+      }));
+    },
     setGroupName: (e: React.ChangeEvent<HTMLInputElement>) => {
       const newGroupName = e.currentTarget.value;
       set((state) => ({ ...state, groupName: newGroupName }));
@@ -85,7 +80,16 @@ export const useShippingGroupItemStore = create<ShippingGroupItemStoreState>(
         detailAddress: e.currentTarget.value,
       }));
     },
-    addShippingSet: () => {},
+    addShippingSet: (item: Omit<ShippingSetFormData, 'tempId'>) => {
+      const { shippingSets } = get();
+      const tempId = shippingSets.length
+        ? shippingSets[shippingSets.length - 1].tempId + 1
+        : 0;
+      set((state) => ({
+        ...state,
+        shippingSets: [...shippingSets, { ...item, tempId }],
+      }));
+    },
     removeShippingSet: (id: number) => {
       const { shippingSets } = get();
       const filtered = shippingSets.filter((item) => item.tempId !== id);
