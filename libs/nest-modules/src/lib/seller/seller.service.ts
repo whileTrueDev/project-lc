@@ -2,11 +2,9 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
 import { hash, verify } from 'argon2';
 import { PrismaService } from '@project-lc/prisma-orm';
-
 @Injectable()
 export class SellerService {
   constructor(private readonly prisma: PrismaService) {}
-
   /**
    * 회원 가입
    */

@@ -1,21 +1,19 @@
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
+  Box,
   Button,
+  Input,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   ModalProps,
   Text,
-  Input,
-  useToast,
-  Stack,
-  List,
   UnorderedList,
-  ListItem,
-  Box,
+  useToast,
 } from '@chakra-ui/react';
 import { useDeleteSellerMutation, useProfile } from '@project-lc/hooks';
 import { useForm } from 'react-hook-form';
@@ -46,7 +44,6 @@ export function AccountRemoveDialog(props: AccountRemoveDialogProps): JSX.Elemen
         }
       })
       .catch((error) => {
-        console.error(error);
         if (error.response.status === 400 || error.response.status === 401) {
           toast({
             title: '탈퇴 오류',

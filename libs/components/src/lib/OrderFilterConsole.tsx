@@ -51,12 +51,12 @@ export function OrderFilterConsole(): JSX.Element {
     >
       <Flex px={[2, 4]} as="section">
         <InputGroup size="md">
-          <InputLeftElement pointerEvents="none">
+          <InputLeftElement pointerEvents="none" zIndex="auto">
             <Search2Icon size="md" />
           </InputLeftElement>
           <Input
             placeholder="주문번호,상품번호,주문자명,입금자명,수령자명,(주문자,입금자)휴대전화,상품명"
-            autocomplete="off"
+            autoComplete="off"
             id="order-search-text-project-lc"
             type="text"
             variant="outline"

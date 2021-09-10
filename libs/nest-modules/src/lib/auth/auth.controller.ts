@@ -8,19 +8,26 @@ import {
   Res,
   Query,
   ValidationPipe,
+  HttpCode,
 } from '@nestjs/common';
-import { SendMailVerificationDto, loginUserRes } from '@project-lc/shared-types';
+import {
+  SendMailVerificationDto,
+  loginUserRes,
+  EmailCodeVerificationDto,
+} from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { MailVerificationService } from './mailVerification.service';
 import { LocalAuthGuard } from '../_nest-units/guards/local-auth.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 import { UserType } from './auth.interface';
+import { LoginHistoryService } from './login-history/login-history.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
+    private readonly loginHistoryService: LoginHistoryService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
 
@@ -41,6 +48,8 @@ export class AuthController {
       userType,
     );
     this.authService.handleLoginHeader(res, loginToken);
+    // 로그인 히스토리 추가
+    this.loginHistoryService.createLoginStamp(req, '이메일');
     res.status(200).send(loginToken);
   }
 
@@ -53,8 +62,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Req() req) {
-    // return req.user;
+  getProfile(@Req() req: Request) {
     return this.authService.getProfile(req.user);
   }
 
@@ -64,5 +72,20 @@ export class AuthController {
     @Body(ValidationPipe) dto: SendMailVerificationDto,
   ): Promise<boolean> {
     return this.mailVerificationService.sendVerificationMail(dto.email);
+  }
+
+  // * 인증코드가 맞는지 확인
+  @HttpCode(200)
+  @Post('code-verification')
+  async verifyCode(
+    @Body(ValidationPipe) dto: EmailCodeVerificationDto,
+  ): Promise<boolean> {
+    const matchingRecord = await this.mailVerificationService.checkMailVerification(
+      dto.email,
+      dto.code,
+    );
+    if (!matchingRecord) return false;
+    await this.mailVerificationService.deleteSuccessedMailVerification(dto.email);
+    return true;
   }
 }
