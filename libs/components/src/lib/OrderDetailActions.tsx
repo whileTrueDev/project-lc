@@ -5,6 +5,7 @@ import { FindFmOrderDetailRes, getFmOrderStatusByNames } from '@project-lc/share
 import { useCallback } from 'react';
 import { FaTruck } from 'react-icons/fa';
 import { ConfirmDialog } from './ConfirmDialog';
+import ExportDialog from './ExportDialog';
 import FmOrderStatusBadge from './FmOrderStatusBadge';
 
 export interface OrderDetailActionsProps {
@@ -14,6 +15,7 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps) {
   const { mutateAsync: changeStatus, isLoading } = useChangeFmOrderStatusMutation();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const exportModal = useDisclosure();
   const toast = useToast();
 
   const handleStatusChange = useCallback(
@@ -35,15 +37,25 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps) {
             상품준비로 변경
           </Button>
         )}
-        <Button
-          variant={order.exports ? 'outline' : 'solid'}
-          size="sm"
-          colorScheme="pink"
-          rightIcon={<FaTruck />}
-          onClick={() => alert(`주문번호: ${order.id}`)}
-        >
-          출고처리 진행
-        </Button>
+
+        {getFmOrderStatusByNames([
+          '결제확인',
+          '상품준비',
+          '부분출고준비',
+          '부분출고완료',
+          '부분배송중',
+          '부분배송완료',
+        ]).includes(order.step) && (
+          <Button
+            variant={order.exports ? 'outline' : 'solid'}
+            size="sm"
+            colorScheme="pink"
+            rightIcon={<FaTruck />}
+            onClick={exportModal.onOpen}
+          >
+            출고처리 진행
+          </Button>
+        )}
       </Stack>
 
       <ConfirmDialog
@@ -60,6 +72,15 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps) {
           <FmOrderStatusBadge orderStatus="35" />
         </Center>
       </ConfirmDialog>
+
+      <ExportDialog
+        order={order}
+        isOpen={exportModal.isOpen}
+        onClose={exportModal.onClose}
+        onConfirm={() => {
+          console.log(order.id);
+        }}
+      />
     </>
   );
 }

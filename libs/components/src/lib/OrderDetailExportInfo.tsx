@@ -1,32 +1,40 @@
 import { Box, Button, Link, Stack, Text } from '@chakra-ui/react';
 import {
   convertFmDeliveryCompanyToString,
+  FindFmOrderDetailRes,
   FmOrderExport,
+  FmOrderItem,
   FmOrderOption,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
-import { FmOrderStatusBadge, OrderDetailOptionListItem, TextDotConnector } from '..';
+import {
+  FmOrderStatusBadge,
+  OrderDetailGoods,
+  OrderDetailOptionList,
+  OrderDetailOptionListItem,
+  TextDotConnector,
+} from '..';
 
 /** 주문 출고 정보 */
 export function OrderDetailExportInfo({
-  options,
+  items,
   exports: _exports,
 }: {
-  options: FmOrderOption[];
+  items: FindFmOrderDetailRes['items'];
   exports: FmOrderExport;
 }) {
   // * 이 출고에 포함된 상품(옵션) 목록
-  const exportOrderItemOptions = useMemo(() => {
-    return options.filter((opt) => opt.export_code === _exports.export_code);
-  }, [_exports.export_code, options]);
+  const exportOrderItems = useMemo(() => {
+    return items.filter((item) => item.export_code === _exports.export_code);
+  }, [_exports.export_code, items]);
 
   // * 이 출고에 포함된 상품의 총 가격
-  const totalExportedPrice = useMemo(() => {
-    return exportOrderItemOptions.reduce((prev, curr) => {
-      return prev + Number(curr.price);
-    }, 0);
-  }, [exportOrderItemOptions]);
+  // const totalExportedPrice = useMemo(() => {
+  //   return exportOrderItemOptions.reduce((prev, curr) => {
+  //     return prev + Number(curr.price);
+  //   }, 0);
+  // }, [exportOrderItemOptions]);
 
   const deliveryCompany = useMemo(
     () => convertFmDeliveryCompanyToString(_exports.delivery_company_code),
@@ -41,8 +49,8 @@ export function OrderDetailExportInfo({
         <FmOrderStatusBadge orderStatus={_exports.export_status} />
         <TextDotConnector />
         <Text isTruncated>{_exports.ea} 개</Text>
-        <TextDotConnector />
-        <Text isTruncated>{totalExportedPrice.toLocaleString()} 원</Text>
+        {/* <TextDotConnector /> */}
+        {/* <Text isTruncated>{totalExportedPrice.toLocaleString()} 원</Text> */}
       </Stack>
 
       <Stack direction="row" flexWrap="wrap" spacing={1.5} alignItems="center">
@@ -72,12 +80,10 @@ export function OrderDetailExportInfo({
       </Stack>
 
       {/* 이 출고에서 보내진 상품(옵션) 목록 */}
-      {exportOrderItemOptions.length > 0 && (
+      {exportOrderItems.length > 0 && (
         <Box my={2}>
           <Text fontWeight="bold">출고된 상품</Text>
-          {exportOrderItemOptions.map((o) => (
-            <OrderDetailOptionListItem key={o.item_option_seq} option={o} />
-          ))}
+          <pre>{JSON.stringify(exportOrderItems, null, 2)}</pre>
         </Box>
       )}
     </Box>

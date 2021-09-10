@@ -10,7 +10,7 @@ export interface FmOrder {
   /**
    * '고유번호'
    */
-  order_seq: string;
+  order_seq: number;
   /**
    * '맞교환주문의 원주문번호'
    */
@@ -488,25 +488,9 @@ export interface FmOrderItem {
    */
   item_seq: number;
   /**
-   * '다중배송지고유번호',
-   */
-  shipping_seq: number | null;
-  /**
-   * '입점사고유번호',
-   */
-  provider_seq: number;
-  /**
    * '상품고유번호',
    */
   goods_seq: number;
-  /**
-   * '주문번호',
-   */
-  order_seq: string;
-  /**
-   * '상품코드',
-   */
-  goods_code: string | null;
   /**
    * '상품이미지경로',
    */
@@ -515,158 +499,6 @@ export interface FmOrderItem {
    * '상품명',
    */
   goods_name: string;
-  /**
-   * '개별배송비',
-   */
-  goods_shipping_cost: string;
-  /**
-   * '배송정책(개별배송비,기본배송비)',
-   */
-  shipping_policy: 'goods' | 'shop';
-  /**
-   * '합포장단위',
-   */
-  shipping_unit: number | null;
-  /**
-   * '기본포장 배송비',
-   */
-  basic_shipping_cost: string;
-  /**
-   * '추가포장배송비',
-   */
-  add_shipping_cost: string;
-  /**
-   * '복수구매할인수량',
-   */
-  multi_discount_ea: number | null;
-  /**
-   * '부가세',
-   */
-  tax: 'tax' | 'exempt' | 'none';
-  /**
-   * '입점사명',
-   */
-  provider_name: string | null;
-  /**
-   *  '정산일자',
-   */
-  account_date: Date | null;
-  /**
-   * '개별취소가능 여부',
-   */
-  individual_refund: '1' | '0';
-  /**
-   * '본상품취소시 함께취소 여부',
-   */
-  individual_refund_inherit: '0' | '1';
-  /**
-   * '개별출고가능 여부',
-   */
-  individual_export: '1' | '0';
-  /**
-   * '개별반품교환가능 여부',
-   */
-  individual_return: '1' | '0';
-  /**
-   * '정산2',
-   */
-  account_2round: string | null;
-  /**
-   * '정산4',
-   */
-  account_4round: string | null;
-  /**
-   * '상품타입(goods:상품,gift:사은품)',
-   */
-  goods_type: 'goods' | 'gift';
-  /**
-   * '할인이벤트 고유번호',
-   */
-  event_seq: number | null;
-  /**
-   * '실물상품, 쿠폰',
-   */
-  goods_kind: 'goods' | 'coupon';
-  /**
-   * '성인상품여부',
-   */
-  adult_goods: string;
-  /**
-   * '1장값어치:금액(price), 횟수(pass)',
-   */
-  socialcp_input_type: 'price' | 'pass';
-  /**
-   * '미사용환불대상여부',
-   */
-  socialcp_use_return: '0' | '1';
-  /**
-   * '취소(환불)-이내 또는 전까지',
-   */
-  socialcp_use_emoney_day: number;
-  /**
-   * '취소(환불)-취소율',
-   */
-  socialcp_use_emoney_percent: number;
-  /**
-   * '쿠폰상품그룹',
-   */
-  social_goods_group: number;
-  /**
-   * '연동업체 주문번호',
-   */
-  linkage_order_id: string | null;
-  /**
-   * '정산일련번호',
-   */
-  account_seq: number | null;
-  /**
-   * '유효기간내-일부사용시 취소(환불)불가여부',
-   */
-  socialcp_cancel_use_refund: '0' | '1';
-  /**
-   * '유효기간내-취소(환불)여부',
-   */
-  socialcp_cancel_payoption: '0' | '1';
-  /**
-   * '유효기간내-취소율',
-   */
-  socialcp_cancel_payoption_percent: number;
-  /**
-   * 'HSCODE',
-   */
-  hscode: string | null;
-  /**
-   * '필수옵션 해외배송여부',
-   */
-  option_international_shipping_status: 'y' | 'n';
-  /**
-   * 'Npay 주문 번호',
-   */
-  npay_order_id: string | null;
-  /**
-   * '예약발송여부',
-   */
-  reservation_ship: 'y' | 'n';
-  /**
-   * '예약발송일',
-   */
-  reservation_ship_date: string | null;
-  /**
-   * '유입경로',
-   */
-  referer_domain: string | null;
-  /**
-   * '방송 일련번호',
-   */
-  bs_seq: number | null;
-  /**
-   * '방송 타입',
-   */
-  bs_type: 'live' | 'vod' | null;
-  /**
-   * '톡구매 주문번호',
-   */
-  talkbuy_order_id: string | null;
 }
 
 /**
@@ -688,6 +520,10 @@ export interface FmOrderOption {
    * 주문 상품(옵션) 고유번호
    */
   item_option_seq: number;
+  /**
+   * 주문 상품 고유번호
+   */
+  item_seq: number;
   /**
    * 옵션 제목
    */
@@ -824,6 +660,7 @@ export interface FmOrderExport {
  */
 export type FmOrderMetaInfo = Pick<
   FmOrder,
+  | 'order_seq'
   | 'regist_date'
   | 'sitetype'
   | 'depositor'
@@ -846,7 +683,7 @@ export type FmOrderMetaInfo = Pick<
 > & {
   /** 주문아이디 */
   id: FmOrder['order_seq'];
-} & Pick<FmOrderItem, 'goods_seq' | 'goods_name' | 'image'> & {
+} & Pick<FmOrderItem, 'goods_seq' | 'goods_name' | 'image' | 'item_seq'> & {
     /**
      * 배송비
      */
@@ -866,6 +703,32 @@ export type FmOrderMetaInfo = Pick<
      * - postpaid = 착불
      */
     shipping_type: 'free' | 'prepay' | 'postpaid';
+    /**
+     * 배송방법
+     * delivery = 택배
+     * postpaid = 택배착불
+     * each_delivery = 택배
+     * each_postpaid = 택배착불
+     * quick = 퀵서비스
+     * direct_delivery = 직접배송
+     * direct_store = 매장수령
+     * freight = 화물배송
+     * direct = 직접수령
+     * coupon = 티켓
+     * */
+    shipping_method:
+      | 'delivery'
+      | 'postpaid'
+      | 'each_delivery'
+      | 'each_postpaid'
+      | 'quick'
+      | 'direct_delivery'
+      | 'direct_store'
+      | 'freight'
+      | 'direct'
+      | 'coupon';
+    /** 배송그룹 */
+    shipping_group: string;
   };
 
 export interface FmOrderRefund {
@@ -1046,8 +909,8 @@ export type FmOrderReturn = FmOrderReturnBase & {
  * 상품 상세 정보 반환 데이터 타입
  */
 export type FindFmOrderDetailRes = FmOrderMetaInfo & {
-  options: FmOrderOption[];
-  exports?: FmOrderExport;
+  items: Array<FmOrderItem & { options: FmOrderOption[] }>;
+  exports?: FmOrderExport[];
   refunds?: FmOrderRefund;
   returns?: FmOrderReturn;
 };

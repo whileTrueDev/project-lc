@@ -11,6 +11,7 @@ import {
   Text,
   useBreakpoint,
   useColorModeValue,
+  useDisclosure,
 } from '@chakra-ui/react';
 import {
   GridColumns,
@@ -31,6 +32,7 @@ import NextLink from 'next/link';
 import { useMemo, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
 import { ChakraDataGrid } from './ChakraDataGrid';
+import ExportManyDialog from './ExportManyDialog';
 import FmOrderStatusBadge from './FmOrderStatusBadge';
 import TooltipedText from './TooltipedText';
 
@@ -177,20 +179,15 @@ const columns: GridColumns = [
 ];
 
 export function OrderList(): JSX.Element {
+  const exportManyDialog = useDisclosure();
   const fmOrderStates = useFmOrderStore();
   const orders = useFmOrders(fmOrderStates);
 
   const { isDesktopSize } = useDisplaySize();
   const dataGridBgColor = useColorModeValue('inherit', 'gray.300');
 
-  // * 선택된 행
-  const [selectedItems, setSelectedItems] = useState<GridRowId[]>([]);
-  const handleRowSelected = (s: GridSelectionModel) => {
-    setSelectedItems(s);
-  };
-
   return (
-    <Box minHeight={{ base: 300, md: 600 }} height={{ base: 300, md: 600 }}>
+    <Box minHeight={{ base: 300, md: 600 }} height={{ base: 300, md: 600 }} mb={24}>
       <ChakraDataGrid
         bg={dataGridBgColor}
         autoHeight
@@ -198,24 +195,33 @@ export function OrderList(): JSX.Element {
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
         rows={orders.data || []}
         checkboxSelection
-        onSelectionModelChange={handleRowSelected}
+        disableSelectionOnClick
+        selectionModel={fmOrderStates.selectedOrders}
+        onSelectionModelChange={fmOrderStates.handleOrderSelected}
         components={{
           Toolbar: () => (
             <OrderToolbar
               options={[
                 {
                   name: '출고 처리',
-                  onClick: (itemIds) => alert(itemIds),
+                  onClick: () => exportManyDialog.onOpen(),
                   icon: <Icon as={FaTruck} />,
                   emphasize: true,
                 },
               ]}
-              selectedItems={selectedItems}
             />
           ),
           ExportIcon: DownloadIcon,
         }}
       />
+
+      {exportManyDialog.isOpen && orders.data && (
+        <ExportManyDialog
+          isOpen={exportManyDialog.isOpen}
+          onClose={exportManyDialog.onClose}
+          orders={orders.data}
+        />
+      )}
     </Box>
   );
 }
@@ -223,7 +229,6 @@ export function OrderList(): JSX.Element {
 export default OrderList;
 
 interface OrderToolbarProps {
-  selectedItems: GridRowId[];
   options: {
     name: string;
     onClick: (items: GridRowId[]) => void;
@@ -231,9 +236,12 @@ interface OrderToolbarProps {
     emphasize?: boolean;
   }[];
 }
-export function OrderToolbar({ selectedItems, options }: OrderToolbarProps) {
+export function OrderToolbar({ options }: OrderToolbarProps) {
   const xSize = useBreakpoint();
   const isMobile = useMemo(() => xSize && ['base', 'sm'].includes(xSize), [xSize]);
+
+  const selectedOrders = useFmOrderStore((state) => state.selectedOrders);
+
   return (
     <GridToolbarContainer>
       <Stack spacing={2} direction="row">
@@ -245,19 +253,20 @@ export function OrderToolbar({ selectedItems, options }: OrderToolbarProps) {
                 size="sm"
                 rightIcon={opt.icon}
                 colorScheme={opt.emphasize ? 'pink' : undefined}
-                isDisabled={selectedItems.length === 0}
+                isDisabled={selectedOrders.length === 0}
+                onClick={() => opt.onClick(selectedOrders)}
               >
                 {opt.name}
               </Button>
             ))}
-            <Button size="sm" as="div" isDisabled={selectedItems.length === 0}>
+            <Button size="sm" as="div" isDisabled={selectedOrders.length === 0}>
               <GridToolbarExport
                 csvOptions={{
                   fileName: `project-lc_주문목록_${dayjs().format(
                     'YYYY-MM-DD-HH-mm-ss',
                   )}`,
                 }}
-                disabled={selectedItems.length === 0}
+                disabled={selectedOrders.length === 0}
               />
             </Button>
           </>

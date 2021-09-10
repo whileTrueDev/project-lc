@@ -8,6 +8,7 @@ import {
   SkeletonText,
   Stack,
   Text,
+  useColorModeValue,
   VStack,
 } from '@chakra-ui/react';
 import {
@@ -104,8 +105,12 @@ export function OrderDetail(): JSX.Element {
 
         {/* 주문 상품 정보 */}
         <SectionWithTitle title="주문 상품 정보">
-          <OrderDetailGoods order={order.data} />
-          <OrderDetailOptionList order={order.data} options={order.data.options} />
+          {order.data.items.map((item) => (
+            <Box key={item.item_seq}>
+              <OrderDetailGoods orderItem={item} />
+              <OrderDetailOptionList order={order.data} options={item.options} />
+            </Box>
+          ))}
         </SectionWithTitle>
 
         {/* 주문자 / 수령자 정보 */}
@@ -114,12 +119,17 @@ export function OrderDetail(): JSX.Element {
         </SectionWithTitle>
 
         {/* 출고 정보 */}
-        {order.data.exports && (
+        {order.data.exports.length > 0 && (
           <SectionWithTitle title="출고 정보">
-            <OrderDetailExportInfo
-              options={order.data.options}
-              exports={order.data.exports}
-            />
+            {order.data.exports.map((_exp) => (
+              <Box mt={6} pb={4}>
+                <OrderDetailExportInfo
+                  key={_exp.export_code}
+                  items={order.data.items}
+                  exports={_exp}
+                />
+              </Box>
+            ))}
           </SectionWithTitle>
         )}
 
@@ -131,14 +141,14 @@ export function OrderDetail(): JSX.Element {
         )}
 
         {/* 환불 정보 */}
-        {order.data.refunds && (
+        {/* {order.data.refunds && (
           <SectionWithTitle title={refundSectionTitle}>
             <OrderDetailRefundInfo
               options={order.data.options}
               refund={order.data.refunds}
             />
           </SectionWithTitle>
-        )}
+        )} */}
       </Stack>
     </MypageLayout>
   );
@@ -155,7 +165,13 @@ export function OrderDetaiLoading() {
       </Stack>
 
       <Stack mt={6}>
-        <Stack padding="6" boxShadow="lg" bg="white" direction="row" spacing={6}>
+        <Stack
+          padding="6"
+          boxShadow="lg"
+          bg={useColorModeValue('gray.200', 'gray.700')}
+          direction="row"
+          spacing={6}
+        >
           <Skeleton w={280} height={72} />
           <VStack>
             <Box w={280}>

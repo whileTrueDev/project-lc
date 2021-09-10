@@ -1,4 +1,4 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { Response } from 'express';
 import { SocialService } from './social.service';
 
@@ -48,8 +48,9 @@ export class SocialLoginExceptionFilter implements ExceptionFilter {
         break;
       }
       default: {
-        response.redirect('http://localhost:4200/login'); // TODO: 추후 주소 변경
-        break;
+        // response.redirect('http://localhost:4200/login'); // TODO: 추후 주소 변경
+
+        response.status(exception.status).json(exception);
       }
     }
   }

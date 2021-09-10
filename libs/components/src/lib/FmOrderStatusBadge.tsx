@@ -1,4 +1,4 @@
-import { Badge } from '@chakra-ui/react';
+import { Badge, BadgeProps } from '@chakra-ui/react';
 import {
   convertFmOrderStatusToString,
   fmOrderStatuses,
