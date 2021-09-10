@@ -1,4 +1,6 @@
 /* eslint-env jquery */
+/* global io, */
+/* eslint no-undef: "error" */
 
 const messageArray = [];
 
@@ -34,7 +36,7 @@ function getOS() {
 }
 
 function dailyMissionTimer() {
-  setInterval(function () {
+  setInterval(function timer() {
     // 현재 날짜를 new 연산자를 사용해서 Date 객체를 생성
     const now = new Date();
     let distance = defaultDate.getTime() - now.getTime();
@@ -73,43 +75,41 @@ function dailyMissionTimer() {
       }
     }
 
-    if (
-      hours === '00' &&
-      Number(minutes) < 5 &&
-      Number(minutes) !== 0 &&
-      !$('.bottom-timer').attr('class').includes('urgent')
-    ) {
-      $('.bottom-timer').addClass('urgent');
-      $('.bottom-area-left-icon#clock').addClass('urgent');
-    } else if (
-      hours === '00' &&
-      Number(minutes) < 10 &&
-      Number(minutes) !== 0 &&
-      !$('.bottom-timer').attr('class').includes('warning')
-    ) {
-      $('.bottom-timer').addClass('warning');
-    } else if (
-      hours === '00' &&
-      $('.bottom-area-left-icon#clock').attr('class').includes('urgent') &&
-      Number(minutes) > 5 &&
-      Number(minutes) < 10
-    ) {
-      $('.urgent').toggleClass('warning');
-      $('.bottom-timer').removeClass('urgent');
-      $('.bottom-area-left-icon#clock').removeClass('urgent');
-    } else if (
-      hours === '00' &&
-      $('.bottom-area-left-icon#clock').attr('class').includes('urgent') &&
-      Number(minutes) > 10
-    ) {
-      $('.bottom-timer').removeClass('urgent');
-      $('.bottom-area-left-icon#clock').removeClass('urgent');
-    } else if (
-      hours === '00' &&
-      Number(minutes) > 10 &&
-      $('.bottom-timer').attr('class').includes('warning')
-    ) {
-      $('.bottom-timer').removeClass('warning');
+    if (hours === '00') {
+      if (Number(minutes) < 5 && !$('.bottom-timer').attr('class').includes('urgent')) {
+        // 5분 이하 최초진입
+        $('.bottom-timer').addClass('urgent');
+        $('.bottom-area-left-icon#clock').addClass('urgent');
+      } else if (
+        // 10분 이하 최초진입
+        Number(minutes) < 10 &&
+        Number(minutes) >= 5 &&
+        !$('.bottom-timer').attr('class').includes('warning')
+      ) {
+        $('.bottom-timer').addClass('warning');
+      } else if (
+        // 5분 이하에서 5~10분 사이로 돌아올 때
+        $('.bottom-area-left-icon#clock').attr('class').includes('urgent') &&
+        Number(minutes) >= 5 &&
+        Number(minutes) <= 10
+      ) {
+        $('.bottom-timer').addClass('warning');
+        $('.bottom-timer').removeClass('urgent');
+        $('.bottom-area-left-icon#clock').removeClass('urgent');
+      } else if (
+        // 5분 이하에서 10분 이상으로 돌아갈 때
+        $('.bottom-area-left-icon#clock').attr('class').includes('urgent') &&
+        Number(minutes) >= 10
+      ) {
+        $('.bottom-timer').removeClass('urgent');
+        $('.bottom-area-left-icon#clock').removeClass('urgent');
+      } else if (
+        // 5~10분 사이에서 10분 이상으로 돌아갈 때
+        Number(minutes) >= 10 &&
+        $('.bottom-timer').attr('class').includes('warning')
+      ) {
+        $('.bottom-timer').removeClass('warning');
+      }
     }
   }, 1000);
 }
@@ -379,7 +379,7 @@ socket.on('d-day from server', (date) => {
 });
 
 socket.on('refresh signal', () => {
-  location.reload();
+  window.location.reload();
 });
 
 socket.on('show video from server', (type) => {

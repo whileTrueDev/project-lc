@@ -6,8 +6,6 @@ import { NickNameAndPrice, PriceSum, NickNameAndText } from '@project-lc/shared-
 export class AppService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // * prisma 데이터베이스 접근 호출 예시 by Dan -> 예시 확인 이후 삭제해도 됩니다.
-
   async getRanking(): Promise<NickNameAndPrice[]> {
     const topRanks = await this.prisma.liveCommerceRanking.groupBy({
       by: ['nickname'],
