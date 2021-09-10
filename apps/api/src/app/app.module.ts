@@ -8,6 +8,7 @@ import {
   SocialModule,
   mailerConfig,
   GoodsModule,
+  ShippingGroupModule,
 } from '@project-lc/nest-modules';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -25,6 +26,7 @@ import { validationSchema } from '../settings/config.validation';
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
     SocialModule,
     GoodsModule,
+    ShippingGroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],
