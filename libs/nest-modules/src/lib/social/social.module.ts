@@ -25,10 +25,10 @@ import { KakaoApiService } from './platform-api/kakao-api.service';
     GoogleStrategy,
     KakaoStrategy,
     SellerService,
-    {
-      provide: APP_FILTER,
-      useClass: SocialLoginExceptionFilter,
-    },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: SocialLoginExceptionFilter,
+    // },
   ],
   exports: [SocialService],
 })

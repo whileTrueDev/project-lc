@@ -44,3 +44,5 @@ export * from './lib/SettlementAccountForm';
 export * from './lib/SellerGoodsList';
 export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
+export * from './lib/admin/AdminPageLayout';
+export * from './lib/admin/AdminLoginForm';

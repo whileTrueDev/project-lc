@@ -31,6 +31,7 @@ export class SellerService {
         email: true,
         name: true,
         password: true,
+        shopName: true,
       },
     });
 

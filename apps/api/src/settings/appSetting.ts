@@ -10,6 +10,7 @@ export class AppSetting {
   private corsOptions = {
     origin: [
       'http://localhost:4200',
+      'http://localhost:4300',
       'http://localhost:3011',
       'https://project-lc.vercel.app',
       'https://dev-project-lc.vercel.app',

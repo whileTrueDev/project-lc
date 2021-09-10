@@ -1,6 +1,15 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import { ReactComponent as NxLogo } from '../public/nx-logo-white.svg';
+import { ChakraProvider } from '@chakra-ui/react';
+import { ThemeProvider } from '@material-ui/core';
+import { QueryClientProvider } from 'react-query';
+import createChakraTheme from '../utils/createChakraTheme';
+import createMuiTheme from '../utils/createMuiTheme';
+import createQueryClient from '../utils/createReactQueryClient';
+
+const queryClient = createQueryClient();
+const chakraTheme = createChakraTheme();
+const muiTheme = createMuiTheme();
 
 function CustomApp({ Component, pageProps }: AppProps) {
   return (
@@ -9,13 +18,15 @@ function CustomApp({ Component, pageProps }: AppProps) {
         <title>Welcome to admin!</title>
       </Head>
       <div className="app">
-        <header className="flex">
-          <NxLogo width="75" height="50" />
-          <h1>Welcome to admin!</h1>
-        </header>
-        <main>
-          <Component {...pageProps} />
-        </main>
+        <QueryClientProvider client={queryClient}>
+          <ChakraProvider theme={chakraTheme}>
+            <ThemeProvider theme={muiTheme}>
+              <main>
+                <Component {...pageProps} />
+              </main>
+            </ThemeProvider>
+          </ChakraProvider>
+        </QueryClientProvider>
       </div>
     </>
   );
