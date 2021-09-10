@@ -246,6 +246,9 @@ model ShippingGroup {
   seller                  Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   sellerId                Int
   shippingSets            ShippingSet[]
+  baseAddress             String // 기본주소
+  detailAddress           String // 상세주소
+  postalCode              String // 우편번호
   // 이하 퍼스트몰 fm_shipping_grouping 과  동일한 컬럼
   shipping_group_name     String             @db.VarChar(255) // '배송그룹명',
   shipping_calcul_type    ShippingCalculType @default(bundle) // '배송비계산기준', free무료, bundle묶음, each개별 배송비 추가설정
@@ -276,6 +279,15 @@ model ShippingSet {
   delivery_limit      LimitOrUnlimit     @default(unlimit) // 배송지역 제한 - unlimit - 전국(전세계) / limit - 지정지역(국가)',
   refund_shiping_cost Decimal?           @db.Decimal(11, 2) // '반품 배송비',
   swap_shiping_cost   Decimal?           @db.Decimal(11, 2) // '맞교환 배송비',
+  prepay_info         PrepayInfo         @default(delivery) // 선불/착불 정보
+  shiping_free_yn     YesOrNo_UPPERCASE  @default(N) //'무료배송시 반품왕복배송비',
+}
+
+// 착불/선불 정보
+enum PrepayInfo {
+  delivery
+  postpaid
+  all
 }
 
 // 배송설정 코드
@@ -297,8 +309,8 @@ enum DeliveryNation {
 // 배송 방법 테이블 fm_shipping_option 참고
 model ShippingOption {
   id                Int               @id @default(autoincrement())
+  shippingCost      ShippingCost[]
   shippingSet       ShippingSet       @relation(fields: [shipping_set_seq], references: [id], onDelete: Cascade)
-  shippingCosts     ShippingCost[]
   // 이하 퍼스트몰 fm_shipping_option 과 동일한 컬럼
   shipping_set_seq  Int
   shipping_set_type ShippingSetType   @default(std) // 배송설정 타입 std - 기본 / add - 추가
@@ -336,5 +348,4 @@ model ShippingCost {
   shipping_opt_seq   Int
   shipping_cost      Decimal?       @db.Decimal(11, 2) // 금액
   shipping_area_name String         @db.VarChar(255) // '지역명',
-
 }
