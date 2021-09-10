@@ -9,7 +9,7 @@ export type ShippingOptionType =
   | 'weight_rep';
 export type ShippingOptionSetType = 'std' | 'add';
 
-export interface ShippingOption {
+export interface ShippingOptionFormType {
   // 임시 id
   tempId: number;
   // 배송설정 타입 std - 기본 / add - 추가

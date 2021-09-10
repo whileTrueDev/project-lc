@@ -1,5 +1,5 @@
 import { ShippingSetCodeOptions } from '../constants/shippingTypes';
-import { ShippingOption } from './shippingOptionFormType';
+import { ShippingOptionFormType } from './shippingOptionFormType';
 
 // 배송설정 - 선불/착불정보
 export type PrepayInfo = 'all' | 'delivery' | 'postpaid';
@@ -19,10 +19,10 @@ export interface ShippingSetFormData {
   refundShippingCost: number | null;
   // 반품 배송비 - (맞)교환
   swapShippingCost: number | null;
-  // 무료배송시 반품왕복배송비 받을지 여부(fm_shipping_set.shiping 옵션에 대응하는 값. 해당 컬럼 이름 따라간거)
+  // 무료배송시 반품왕복배송비 받을지 여부(fm_shipping_set.shipping_free_yn 옵션에 대응하는 값)
   shipingFreeFlag: boolean;
   // 배송비 옵션
-  shippingOptions: ShippingOption[];
+  shippingOptions: ShippingOptionFormType[];
   //  배송지역 제한 - unlimit - 전국(전세계) / limit - 지정지역(국가)
   deliveryLimit: DeliveryLimit;
 }

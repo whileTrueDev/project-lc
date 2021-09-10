@@ -35,3 +35,7 @@ export * from './lib/front-type/shippingPolicyFormType';
 export * from './lib/constants/shippingTypes';
 export * from './lib/front-type/shippingSetFormType';
 export * from './lib/front-type/shippingOptionFormType';
+export * from './lib/dto/shippingGroup.dto';
+export * from './lib/dto/shippingCost.dto';
+export * from './lib/dto/shippingOption.dto';
+export * from './lib/dto/shippingSet.dto';
