@@ -31,4 +31,14 @@ export class FMGoodsService {
     if (option.length > 0) return option[0];
     return null;
   }
+
+  async findGoodsOptions(goodsSeqArr: number[]) {
+    return this.db.query(
+      `
+      SELECT *
+      FROM fm_goods_option WHERE goods_seq IN (?)
+      `,
+      [goodsSeqArr],
+    );
+  }
 }

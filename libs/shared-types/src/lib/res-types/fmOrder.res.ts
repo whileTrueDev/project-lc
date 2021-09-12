@@ -598,7 +598,7 @@ export interface FmOrderOption {
   return_code?: string;
 }
 
-export interface FmOrderExport {
+export interface FmOrderExportBase {
   /**
    * 출고 고유번호
    */
@@ -650,9 +650,47 @@ export interface FmOrderExport {
    */
   delivery_number: string;
   /**
-   * 총 출고 상품(옵션) 개수
+   * 출고에 포함된 총 상품(옵션) 수량
    */
-  ea: string;
+  totalEa: number;
+}
+
+export type FmOrderExport = FmOrderExportBase & {
+  /**
+   * 출고에 포함된 상품옵션 정보
+   */
+  itemOptions: FmOrderExportItemOption[];
+};
+
+export interface FmOrderExportItemOption {
+  /**
+   * 출고 아이템 옵션 고유 번호
+   */
+  item_option_seq: string | number;
+  /**
+   * 금액 (numberstring)
+   */
+  price: string;
+  /**
+   * 상태
+   */
+  step: FmOrder['step'];
+  /**
+   * 출고 상품(옵션) 개수
+   */
+  ea: number;
+  /**
+   * 출고 옵션 명
+   */
+  title1: string;
+  /**
+   * 출고 옵션 값
+   */
+  option1: string;
+  /**
+   * 출고 옵션이 색상인 경우 색상 16진수값
+   */
+  color?: string;
 }
 
 /**
@@ -683,55 +721,55 @@ export type FmOrderMetaInfo = Pick<
 > & {
   /** 주문아이디 */
   id: FmOrder['order_seq'];
-} & Pick<FmOrderItem, 'goods_seq' | 'goods_name' | 'image' | 'item_seq'> & {
-    /**
-     * 배송비
-     */
-    shipping_cost: string;
-    /**
-     * 배송비
-     */
-    delivery_cost: string;
-    /**
-     * 배송 방식 이름
-     */
-    shipping_set_name: string;
-    /**
-     * 배송비 결제 방식
-     * - free = 무료
-     * - prepay = 선불 - 주문시결제
-     * - postpaid = 착불
-     */
-    shipping_type: 'free' | 'prepay' | 'postpaid';
-    /**
-     * 배송방법
-     * delivery = 택배
-     * postpaid = 택배착불
-     * each_delivery = 택배
-     * each_postpaid = 택배착불
-     * quick = 퀵서비스
-     * direct_delivery = 직접배송
-     * direct_store = 매장수령
-     * freight = 화물배송
-     * direct = 직접수령
-     * coupon = 티켓
-     * */
-    shipping_method:
-      | 'delivery'
-      | 'postpaid'
-      | 'each_delivery'
-      | 'each_postpaid'
-      | 'quick'
-      | 'direct_delivery'
-      | 'direct_store'
-      | 'freight'
-      | 'direct'
-      | 'coupon';
-    /** 배송그룹 */
-    shipping_group: string;
-  };
+} & {
+  /**
+   * 배송비
+   */
+  shipping_cost: string;
+  /**
+   * 배송비
+   */
+  delivery_cost: string;
+  /**
+   * 배송 방식 이름
+   */
+  shipping_set_name: string;
+  /**
+   * 배송비 결제 방식
+   * - free = 무료
+   * - prepay = 선불 - 주문시결제
+   * - postpaid = 착불
+   */
+  shipping_type: 'free' | 'prepay' | 'postpaid';
+  /**
+   * 배송방법
+   * delivery = 택배
+   * postpaid = 택배착불
+   * each_delivery = 택배
+   * each_postpaid = 택배착불
+   * quick = 퀵서비스
+   * direct_delivery = 직접배송
+   * direct_store = 매장수령
+   * freight = 화물배송
+   * direct = 직접수령
+   * coupon = 티켓
+   * */
+  shipping_method:
+    | 'delivery'
+    | 'postpaid'
+    | 'each_delivery'
+    | 'each_postpaid'
+    | 'quick'
+    | 'direct_delivery'
+    | 'direct_store'
+    | 'freight'
+    | 'direct'
+    | 'coupon';
+  /** 배송그룹 */
+  shipping_group: string;
+};
 
-export interface FmOrderRefund {
+export interface FmOrderRefundBase {
   /**
    * 환불 코드
    */
@@ -770,12 +808,57 @@ export interface FmOrderRefund {
   /**
    * 총 환불 상품(옵션) 개수
    */
-  ea: string;
+  totalEa: string;
   /**
    * 총 환불 상품(옵션) 가격
    */
   refund_goods_price: string;
+  /**
+   * 환불 사유
+   */
+  refund_reason: string;
 }
+
+export interface FmOrderRefundItemBase {
+  /**
+   * 환불 주문 상품 고유번호
+   */
+  refund_item_seq: string | number;
+  /**
+   * 주문 상품 고유번호
+   */
+  item_seq: string | number;
+  /**
+   * 주문 상품 옵션 고유번호
+   */
+  option_seq: string | number;
+  /**
+   * 환불 주문 상품 옵션 개수
+   */
+  ea: number;
+}
+
+export type FmOrderRefundItem = FmOrderReturnItemBase &
+  Pick<
+    FmOrderOption,
+    | 'item_option_seq'
+    | 'title1'
+    | 'option1'
+    | 'ea'
+    | 'step'
+    | 'member_sale'
+    | 'mobile_sale'
+    | 'color'
+    | 'price'
+    | 'ori_price'
+  >;
+
+export type FmOrderRefund = FmOrderRefundBase & {
+  /**
+   * 반품 상품 옵션 목록
+   */
+  items: FmOrderRefundItem[];
+};
 
 export interface FmOrderReturnBase {
   /**
@@ -860,7 +943,7 @@ export interface FmOrderReturnBase {
   cellphone: string;
 }
 
-export interface FmOrderReturnBaseItem {
+export interface FmOrderReturnItemBase {
   /**
    * 반품 상품 고유 번호
    */
@@ -883,26 +966,26 @@ export interface FmOrderReturnBaseItem {
   reason_desc: string;
 }
 
+export type FmOrderReturnItem = FmOrderReturnItemBase &
+  Pick<
+    FmOrderOption,
+    | 'item_option_seq'
+    | 'title1'
+    | 'option1'
+    | 'ea'
+    | 'step'
+    | 'member_sale'
+    | 'mobile_sale'
+    | 'color'
+    | 'price'
+    | 'ori_price'
+  >;
+
 export type FmOrderReturn = FmOrderReturnBase & {
   /**
    * 환불 상품 옵션 목록
    */
-  items: Array<
-    FmOrderReturnBaseItem &
-      Pick<
-        FmOrderOption,
-        | 'item_option_seq'
-        | 'title1'
-        | 'option1'
-        | 'ea'
-        | 'step'
-        | 'member_sale'
-        | 'mobile_sale'
-        | 'color'
-        | 'price'
-        | 'ori_price'
-      >
-  >;
+  items: Array<FmOrderReturnItem>;
 };
 
 /**
@@ -911,6 +994,6 @@ export type FmOrderReturn = FmOrderReturnBase & {
 export type FindFmOrderDetailRes = FmOrderMetaInfo & {
   items: Array<FmOrderItem & { options: FmOrderOption[] }>;
   exports?: FmOrderExport[];
-  refunds?: FmOrderRefund;
-  returns?: FmOrderReturn;
+  refunds?: FmOrderRefund[];
+  returns?: FmOrderReturn[];
 };

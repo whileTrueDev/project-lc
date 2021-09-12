@@ -1,26 +1,10 @@
-import { Text, Box, Stack, Link, Flex, Avatar } from '@chakra-ui/react';
+import { Avatar, Box, Flex, Link, Stack, Text } from '@chakra-ui/react';
+import { convertFmRefundTypesToString, FmOrderRefund } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { useMemo } from 'react';
-import {
-  FmOrderOption,
-  FmOrderRefund,
-  convertFmRefundTypesToString,
-} from '@project-lc/shared-types';
-import { FmRefundStatusBadge, TextDotConnector, OrderDetailOptionListItem } from '..';
+import { FmRefundStatusBadge, OrderDetailOptionListItem, TextDotConnector } from '..';
 
 /** 주문 환불 정보 */
-export function OrderDetailRefundInfo({
-  options,
-  refund,
-}: {
-  options: FmOrderOption[];
-  refund: FmOrderRefund;
-}) {
-  // 이 환불에 포함된 상품(옵션) 목록
-  const refundOrderItemOptions = useMemo(() => {
-    return options.filter((opt) => opt.refund_code === refund.refund_code);
-  }, [options, refund.refund_code]);
-
+export function OrderDetailRefundInfo({ refund }: { refund: FmOrderRefund }) {
   return (
     <Box>
       <Stack direction="row" alignItems="center" my={2} spacing={1.5}>
@@ -29,7 +13,7 @@ export function OrderDetailRefundInfo({
         </Link>
         <FmRefundStatusBadge refundStatus={refund.status} />
         <TextDotConnector />
-        <Text isTruncated>{refund.ea} 개</Text>
+        <Text isTruncated>{refund.totalEa} 개</Text>
         <TextDotConnector />
         <Text isTruncated>{Number(refund.refund_goods_price).toLocaleString()} 원</Text>
       </Stack>
@@ -60,13 +44,13 @@ export function OrderDetailRefundInfo({
       </Box>
 
       {/* 이 환불에 포함된 상품(옵션) 목록 */}
-      {refundOrderItemOptions.length > 0 && (
+      {refund.items.length > 0 && (
         <Box my={2}>
           <Text fontWeight="bold">환불 상품</Text>
-          {refundOrderItemOptions.map((o) => (
+          {refund.items.map((itemOption) => (
             <OrderDetailOptionListItem
-              key={o.item_option_seq}
-              option={o}
+              key={itemOption.item_option_seq}
+              option={itemOption}
               withBadge={false}
             />
           ))}

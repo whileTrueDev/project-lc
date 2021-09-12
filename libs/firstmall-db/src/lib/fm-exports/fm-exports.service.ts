@@ -5,6 +5,7 @@ import {
   ExportOrderDto,
   ExportOrdersDto,
   FmOrder,
+  FmOrderItem,
   FmOrderOption,
   fmOrderStatuses,
 } from '@project-lc/shared-types';
@@ -53,28 +54,30 @@ export class FmExportsService {
     const { exportOptionsQueries, goodsExport, orderExportLog, orderStatusChange } =
       await this.createExportOrderQueries(dto, actor, exportCode);
 
+    if (!exportOptionsQueries) return null;
+
     return this.db.transactionQuery(async (conn) => {
       // * 실물 출고 처리
       await conn.query(goodsExport.sql, goodsExport.sqlParams);
       // * 상품(옵션)벌 변경 필요 사항
       await Promise.all(
-        exportOptionsQueries.map(
-          ({
+        exportOptionsQueries.map((q) => {
+          if (!q) return null;
+          const {
             exportGoodsItems,
             changeOrderItemEa,
             changeOrderItemEa2,
             reduceGoodsStock,
             orderItemStatusChange,
-          }) => {
-            return Promise.all([
-              conn.query(exportGoodsItems.sql, exportGoodsItems.sqlParams),
-              conn.query(changeOrderItemEa.sql, changeOrderItemEa.sqlParams),
-              conn.query(changeOrderItemEa2.sql, changeOrderItemEa2.sqlParams),
-              conn.query(reduceGoodsStock.sql, reduceGoodsStock.sqlParams),
-              conn.query(orderItemStatusChange.sql, orderItemStatusChange.sqlParams),
-            ]);
-          },
-        ),
+          } = q;
+          return Promise.all([
+            conn.query(exportGoodsItems.sql, exportGoodsItems.sqlParams),
+            conn.query(changeOrderItemEa.sql, changeOrderItemEa.sqlParams),
+            conn.query(changeOrderItemEa2.sql, changeOrderItemEa2.sqlParams),
+            conn.query(reduceGoodsStock.sql, reduceGoodsStock.sqlParams),
+            conn.query(orderItemStatusChange.sql, orderItemStatusChange.sqlParams),
+          ]);
+        }),
       );
       // * 주문 상태 변경
       await conn.query(orderStatusChange.sql, orderStatusChange.sqlParams);
@@ -138,7 +141,7 @@ export class FmExportsService {
     const targetStatus = '55';
     // 주문 정보 조회
     const orderInfo = await this.fmOrdersService.findOneOrder(orderId);
-    if (!orderInfo || orderInfo.exports.length > 0) return null;
+    if (!orderInfo) return null;
 
     // 실물 출고 처리 쿼리 생성
     const goodsExport = this.createGoodsExportQuery({
@@ -157,26 +160,15 @@ export class FmExportsService {
       shipping_set_name: orderInfo.shipping_set_name,
     });
 
+    const goodsSeqArr = orderInfo.items.map((i) => i.goods_seq);
     // 재고 차감 처리를 위한 상품옵션 정보 찾기
-    const goodsOptions = await Promise.all(
-      exportOptions.map((opt) =>
-        this.fmGoodsService.findOneGoodsOption({
-          goodsSeq: orderInfo.goods_seq,
-          optionTitle: opt.optionTitle,
-          option1: opt.option1,
-        }),
-      ),
-    );
+    const goodsOptions = await this.fmGoodsService.findGoodsOptions(goodsSeqArr);
 
     let targetOrderStatus: OrderAndOrderItemOptionExportStatuses = targetStatus;
     // * 상품(옵션)벌 변경 필요 사항
     const exportOptionsQueries = exportOptions.map((opt) => {
       // * 해당 상품(옵션)의 보낸 수량 없는 경우, 건너 뜀
-      if (opt.exportEa === 0) {
-        // 주문 상태를 부분 출고로 변경
-        targetOrderStatus = String(
-          Number(targetStatus) - 5,
-        ) as OrderAndOrderItemOptionExportStatuses;
+      if (!opt.exportEa || opt.exportEa === 0) {
         return null;
       }
 
@@ -208,12 +200,18 @@ export class FmExportsService {
 
       // * 주문상품(옵션) 상태 변경 쿼리
       // 현재 출고하고자 하는 옵션의 전체 정보를 가져옴.
-      const realOrderItemOption = orderInfo.options.find(
+      let opts: FmOrderOption[] = [];
+      orderInfo.items.forEach((i) => {
+        opts = opts.concat(i.options);
+      });
+
+      // 현재 옵션을 찾음
+      const realOrderItemOption = opts.find(
         (__o) => __o.item_option_seq === opt.itemOptionSeq,
       );
       // 출고 타겟 상태 (모든 주문수량 만큼 출고하지 않으면, 부분 출고 상태로 변경)
       let exportTargetStatus: OrderAndOrderItemOptionExportStatuses = targetStatus;
-      if (!(opt.exportEa >= realOrderItemOption.ea)) {
+      if (!(opt.exportEa > realOrderItemOption.ea)) {
         // 주문상품옵션의 상태를 부분 출고 상태로 설정
         exportTargetStatus = String(
           Number(targetStatus) - 5,
@@ -234,6 +232,7 @@ export class FmExportsService {
         orderItemStatusChange,
       };
     });
+
     // * 주문 상태 쿼리 변경
     const orderStatusChange = this.createChangeOrderStatusQuery(
       targetOrderStatus,
@@ -249,7 +248,7 @@ export class FmExportsService {
       actor,
     });
 
-    // 각 쿼리 반영
+    // 각 쿼리 반환
     return {
       goodsExport,
       exportOptionsQueries,

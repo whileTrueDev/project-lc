@@ -5,12 +5,15 @@ import {
   FindFmOrdersDto,
   FmOrder,
   FmOrderExport,
+  FmOrderExportBase,
+  FmOrderExportItemOption,
   FmOrderItem,
   FmOrderMetaInfo,
   FmOrderOption,
   FmOrderRefund,
   FmOrderReturn,
   FmOrderReturnBase,
+  FmOrderReturnItem,
   FmOrderStatusNumString,
 } from '@project-lc/shared-types';
 import { FirstmallDbService } from '../firstmall-db.service';
@@ -288,26 +291,44 @@ export class FmOrdersService {
       fm_goods_export.status export_status,
       fm_goods_export.delivery_company_code,
       fm_goods_export.delivery_number,
-      SUM(fm_goods_export_item.ea) ea
+      SUM(fm_goods_export_item.ea) totalEa
     FROM fm_goods_export
     JOIN fm_goods_export_item USING(export_code)
     WHERE fm_goods_export.order_seq = ?
-    GROUP BY export_code
-    `;
-    const exports = await this.db.query(exportsSql, [orderId]);
-    return exports;
+    GROUP BY export_code`;
+    const _exports: FmOrderExportBase[] = await this.db.query(exportsSql, [orderId]);
+
+    const exportItemsSql = `
+    SELECT 
+      item_option_seq, title1, option1, color, fm_goods_export_item.ea, price, step
+    FROM fm_order_item_option
+    JOIN fm_goods_export_item ON item_option_seq = option_seq
+    WHERE export_code = ?`;
+
+    const result: FmOrderExport[] = await Promise.all(
+      _exports.map(async (e) => {
+        const items = await this.db.query(exportItemsSql, [e.export_code]);
+        return {
+          ...e,
+          itemOptions: items,
+        };
+      }),
+    );
+
+    return result;
   }
 
   /** 개별 주문 - 환불 정보 */
   private async findOneOrderRefunds(
     orderId: FmOrder['order_seq'] | string,
-  ): Promise<FmOrderRefund> {
+  ): Promise<FmOrderRefund[]> {
     const sql = `SELECT
       fm_order_refund.refund_code,
       fm_order_refund.refund_type,
       fm_order_refund.regist_date,
       fm_order_refund.refund_date,
       fm_order_refund.status,
+      fm_order_refund.refund_reason,
       fm_manager.manager_id,
       fm_manager.memail,
       fm_manager.mcellphone,
@@ -319,15 +340,44 @@ export class FmOrdersService {
     WHERE order_seq = ?
     GROUP BY refund_code
     `;
-    const result = await this.db.query(sql, [orderId]);
-    if (result.length === 0) return null;
-    return result[0];
+    const refunds: FmOrderRefund[] = await this.db.query(sql, [orderId]);
+
+    const result = await Promise.all(
+      refunds.map(async (ref) => {
+        const refundItems = await this.db.query(
+          `SELECT
+            fm_order_refund_item.refund_item_seq,
+            fm_order_refund_item.item_seq,
+            fm_order_refund_item.option_seq,
+            fm_order_refund_item.ea,
+            fm_order_item_option.item_option_seq,
+            fm_order_item_option.title1,
+            fm_order_item_option.option1,
+            fm_order_item_option.ea,
+            fm_order_item_option.step,
+            fm_order_item_option.member_sale,
+            fm_order_item_option.mobile_sale,
+            fm_order_item_option.color,
+            fm_order_item_option.price,
+            fm_order_item_option.ori_price
+          FROM fm_order_refund_item
+          JOIN fm_order_item_option
+            ON fm_order_item_option.item_option_seq = fm_order_refund_item.option_seq
+          WHERE refund_code = ?`,
+          [ref.refund_code],
+        );
+
+        return { ...ref, items: refundItems };
+      }),
+    );
+
+    return result;
   }
 
   /** 개별 주문 - 교환 정보 */
   private async findOneOrderReturns(
     orderId: FmOrder['order_seq'] | string,
-  ): Promise<FmOrderReturn> {
+  ): Promise<FmOrderReturn[]> {
     const sql = `SELECT
       fm_order_return.return_code,
       fm_order_return.refund_code,
@@ -355,39 +405,39 @@ export class FmOrdersService {
     WHERE order_seq = ?
     GROUP BY return_code
     `;
-    const result = await this.db.query(sql, [orderId]);
-    if (result.length === 0) return null;
+    const returns: FmOrderReturnBase[] = await this.db.query(sql, [orderId]);
 
-    const returns = result[0] as FmOrderReturnBase;
+    const result = await Promise.all(
+      returns.map(async (ret) => {
+        const returnItems: FmOrderReturnItem[] = await this.db.query(
+          `SELECT
+            fm_order_return_item.return_item_seq,
+            fm_order_return_item.item_seq,
+            fm_order_return_item.option_seq,
+            fm_order_return_item.ea,
+            fm_order_return_item.reason_desc,
+            fm_order_item_option.item_option_seq,
+            fm_order_item_option.title1,
+            fm_order_item_option.option1,
+            fm_order_item_option.ea,
+            fm_order_item_option.step,
+            fm_order_item_option.member_sale,
+            fm_order_item_option.mobile_sale,
+            fm_order_item_option.color,
+            fm_order_item_option.price,
+            fm_order_item_option.ori_price
+          FROM fm_order_return_item
+          JOIN fm_order_item_option
+            ON fm_order_item_option.item_option_seq = fm_order_return_item.option_seq
+          WHERE return_code = ?`,
+          [ret.return_code],
+        );
 
-    const itemsResult = await this.db.query(
-      `SELECT
-        fm_order_return_item.return_item_seq,
-        fm_order_return_item.item_seq,
-        fm_order_return_item.option_seq,
-        fm_order_return_item.ea,
-        fm_order_return_item.reason_desc,
-        fm_order_item_option.item_option_seq,
-        fm_order_item_option.title1,
-        fm_order_item_option.option1,
-        fm_order_item_option.ea,
-        fm_order_item_option.step,
-        fm_order_item_option.member_sale,
-        fm_order_item_option.mobile_sale,
-        fm_order_item_option.color,
-        fm_order_item_option.price,
-        fm_order_item_option.ori_price
-      FROM fm_order_return_item
-      JOIN fm_order_item_option
-        ON fm_order_item_option.item_option_seq = fm_order_return_item.option_seq
-      WHERE return_code = ?`,
-      [returns.return_code],
+        return { ...ret, items: returnItems };
+      }),
     );
 
-    return {
-      ...returns,
-      items: itemsResult,
-    };
+    return result;
   }
 
   /** 주문 상태 변경 */

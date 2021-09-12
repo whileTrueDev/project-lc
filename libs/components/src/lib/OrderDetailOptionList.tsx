@@ -49,7 +49,7 @@ export function OrderDetailOptionListItem({
   option,
   withBadge = true,
 }: {
-  option: FmOrderOption;
+  option: Pick<FmOrderOption, 'ea' | 'price' | 'option1' | 'title1' | 'color' | 'step'>;
   withBadge?: boolean;
 }) {
   const orderPrice = useMemo(() => {

@@ -37,6 +37,7 @@ import TextDotConnector from './TextDotConnector';
 export interface ExportOrderOptionListProps {
   orderId: string;
   orderIndex?: number;
+  optionIndex?: number;
   onSubmitClick?: (id: string, idx: number) => void | Promise<void>;
   selected?: boolean;
   disableSelection?: boolean;
@@ -44,6 +45,7 @@ export interface ExportOrderOptionListProps {
 export function ExportOrderOptionList({
   orderId,
   orderIndex = 0,
+  optionIndex = 0,
   onSubmitClick,
   selected = false,
   disableSelection = false,
@@ -57,6 +59,7 @@ export function ExportOrderOptionList({
     register,
     formState: { errors },
     setValue,
+    getValues,
   } = useFormContext<ExportOrderDto[]>();
 
   // 주문 출고가능한 지 체크
@@ -107,30 +110,39 @@ export function ExportOrderOptionList({
           <FmOrderStatusBadge orderStatus={order.data.step} />
           <TextDotConnector />
           <Text fontSize="sm" ml={2}>
-            {order.data.goods_name}
+            {order.data.order_seq}
           </Text>
           <TextDotConnector />
           <Text fontSize="sm" ml={2}>
             {dayjs(order.data.regist_date).fromNow()}
           </Text>
         </HStack>
-        <Text fontSize="sm">
-          {order.data.recipient_address} {order.data.recipient_address_detail || ''}
-        </Text>
-        <Text fontSize="sm">
-          {order.data.recipient_user_name} {order.data.recipient_cellphone}
-        </Text>
+        <HStack>
+          <Text fontSize="sm">
+            {order.data.recipient_address} {order.data.recipient_address_detail || ''}
+          </Text>
+          <Text fontSize="sm">
+            {order.data.recipient_user_name} {order.data.recipient_cellphone}
+          </Text>
+        </HStack>
+        {order.data.order_user_name === order.data.recipient_user_name &&
+        order.data.order_cellphone === order.data.recipient_cellphone ? null : (
+          <HStack>
+            <Text fontSize="sm">
+              {order.data.order_user_name} {order.data.order_cellphone}
+            </Text>
+          </HStack>
+        )}
       </Stack>
       <Stack mt={4} direction="row" alignItems="center">
         <Stack flex={3}>
-          {order.data.options.map((opt, optionIndex) => (
-            <ExportOrderOptionItem
+          {order.data.items.map((item, itemIndex) => (
+            <ExportOrderItem
+              item={item}
               orderIndex={orderIndex}
-              optionIndex={optionIndex}
-              key={opt.title1 + opt.option1}
-              option={opt}
-              order={order.data}
+              itemIndex={itemIndex}
               selected={selected}
+              optionIndex={optionIndex}
             />
           ))}
         </Stack>
@@ -181,7 +193,7 @@ export function ExportOrderOptionList({
               onClick={() => {
                 if (onSubmitClick) onSubmitClick(orderId, orderIndex);
               }}
-              type={disableSelection && !onSubmitClick && selected ? 'submit' : undefined}
+              type={disableSelection && selected && !onSubmitClick ? 'submit' : undefined}
               isDisabled={!isExportable || isDone || !selected}
             >
               이 주문 출고처리
@@ -193,18 +205,68 @@ export function ExportOrderOptionList({
   );
 }
 
-export interface ExportOrderOptionItemProps {
-  order: FindFmOrderDetailRes;
-  option: FindFmOrderDetailRes['options'][0];
+export interface ExportOrderItemProps {
+  item: FindFmOrderDetailRes['items'][0];
   orderIndex: number;
+  itemIndex: number;
   optionIndex: number;
   selected?: boolean;
 }
+export function ExportOrderItem({
+  item,
+  orderIndex,
+  itemIndex,
+  selected,
+}: ExportOrderItemProps) {
+  return (
+    <Stack direction="row" alignItems="center">
+      <Box flex={1}>
+        <OrderDetailGoods orderItem={item} />
+      </Box>
+      <Box flex={2}>
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>옵션</Th>
+              <Th>총수량</Th>
+              <Th>취소</Th>
+              <Th>보냄</Th>
+              <Th>남음</Th>
+              <Th>보낼수량</Th>
+            </Tr>
+          </Thead>
+          {item.options.map((opt, optIndex) => (
+            <ExportOrderOptionItem
+              item={item}
+              key={opt.item_option_seq}
+              option={opt}
+              orderIndex={orderIndex}
+              itemIndex={itemIndex}
+              optionIndex={optIndex}
+              selected={selected}
+            />
+          ))}
+          <Tbody />
+        </Table>
+      </Box>
+    </Stack>
+  );
+}
+
+export interface ExportOrderOptionItemProps {
+  item: FindFmOrderDetailRes['items'][0];
+  option: FindFmOrderDetailRes['items'][0]['options'][0];
+  orderIndex: number;
+  optionIndex: number;
+  itemIndex: number;
+  selected?: boolean;
+}
 export function ExportOrderOptionItem({
-  order,
+  item,
   option,
   orderIndex,
   optionIndex,
+  itemIndex,
   selected,
 }: ExportOrderOptionItemProps) {
   const {
@@ -231,81 +293,79 @@ export function ExportOrderOptionItem({
     if (selected) {
       // 입력받지는 않지만, 필수 값 처리
       setValue(
-        `${orderIndex}.exportOptions.${optionIndex}.itemOptionSeq`,
+        `${orderIndex}.exportOptions.${itemIndex + optionIndex}.itemOptionSeq`,
         option.item_option_seq,
       );
-      setValue(`${orderIndex}.exportOptions.${optionIndex}.itemSeq`, option.item_seq);
-      setValue(`${orderIndex}.exportOptions.${optionIndex}.optionTitle`, option.title1);
-      setValue(`${orderIndex}.exportOptions.${optionIndex}.option1`, option.option1);
+      setValue(
+        `${orderIndex}.exportOptions.${itemIndex + optionIndex}.itemSeq`,
+        option.item_seq,
+      );
+      setValue(
+        `${orderIndex}.exportOptions.${itemIndex + optionIndex}.optionTitle`,
+        option.title1,
+      );
+      setValue(
+        `${orderIndex}.exportOptions.${itemIndex + optionIndex}.option1`,
+        option.option1,
+      );
 
       // 보낼 수량 기본값으로 남은 수량 만큼 설정되어 있도록 처리
       if (restEa > 0) {
-        setValue(`${orderIndex}.exportOptions.${optionIndex}.exportEa`, restEa);
+        setValue(
+          `${orderIndex}.exportOptions.${itemIndex + optionIndex}.exportEa`,
+          restEa,
+        );
       }
     }
-  }, [option, optionIndex, orderIndex, setValue, restEa, selected]);
+  }, [option, optionIndex, orderIndex, setValue, restEa, selected, itemIndex]);
 
   return (
-    <Stack direction="row" alignItems="center">
-      <Box flex={1}>
-        <OrderDetailGoods
-          order={order}
-          option={{
-            title: option.title1,
-            value: option.option1,
-          }}
-        />
-      </Box>
-      <Box flex={2}>
-        <Table>
-          <Thead>
-            <Tr>
-              <Th>주문수량</Th>
-              <Th>취소</Th>
-              <Th>보냄</Th>
-              <Th>남음</Th>
-              <Th>보낼수량</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr key={option.title1 + option.option1}>
-              <Td>{option.ea}</Td>
-              <Td>{option.step85}</Td>
-              <Td>{sendedEa}</Td>
-              <Td>{restEa}</Td>
-              <Td w="65px">
-                <FormControl
-                  isInvalid={
-                    !!(
-                      errors[orderIndex]?.exportOptions &&
-                      errors[orderIndex]?.exportOptions?.[optionIndex]?.exportEa
-                    )
-                  }
-                >
-                  <Input
-                    isDisabled={restEa === 0 || !selected}
-                    {...register(`${orderIndex}.exportOptions.${optionIndex}.exportEa`, {
-                      required: {
-                        message: '보낼 수량을 입력해주세요.',
-                        value: !!selected,
-                      },
-                      min: { value: 0, message: '0보다 작을 수 없습니다.' },
-                      max: { value: restEa, message: '남은 수량 보다 클 수 없습니다.' },
-                    })}
-                    w="60px"
-                    placeholder={String(restEa)}
-                  />
-                  <FormErrorMessage fontSize="xs">
-                    {errors[orderIndex]?.exportOptions &&
-                      errors[orderIndex]?.exportOptions?.[optionIndex]?.exportEa &&
-                      errors[orderIndex]?.exportOptions?.[optionIndex]?.exportEa?.message}
-                  </FormErrorMessage>
-                </FormControl>
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
-      </Box>
-    </Stack>
+    <Tr key={option.title1 + option.option1}>
+      <Td>
+        {option.title1 && option.option1 ? (
+          <Text fontSize="sm">
+            {option.title1} : {option.option1}
+          </Text>
+        ) : (
+          <Text fontSize="sm">{item.goods_name}</Text>
+        )}
+      </Td>
+      <Td>{option.ea}</Td>
+      <Td>{option.step85}</Td>
+      <Td>{sendedEa}</Td>
+      <Td>{restEa}</Td>
+      <Td w="65px">
+        <FormControl
+          isInvalid={
+            !!(
+              errors[orderIndex]?.exportOptions &&
+              errors[orderIndex]?.exportOptions?.[itemIndex + optionIndex]?.exportEa
+            )
+          }
+        >
+          <Input
+            isDisabled={restEa === 0 || !selected}
+            {...register(
+              `${orderIndex}.exportOptions.${itemIndex + optionIndex}.exportEa`,
+              {
+                required: {
+                  message: '보낼 수량을 입력해주세요.',
+                  value: !!selected && sendedEa !== option.ea,
+                },
+                min: { value: 0, message: '0보다 작을 수 없습니다.' },
+                max: { value: restEa, message: '남은 수량 보다 클 수 없습니다.' },
+              },
+            )}
+            w="60px"
+            placeholder={String(restEa)}
+          />
+          <FormErrorMessage fontSize="xs">
+            {errors[orderIndex]?.exportOptions &&
+              errors[orderIndex]?.exportOptions?.[optionIndex]?.exportEa &&
+              errors[orderIndex]?.exportOptions?.[optionIndex]?.exportEa?.message}
+          </FormErrorMessage>
+        </FormControl>
+      </Td>
+    </Tr>
   );
 }

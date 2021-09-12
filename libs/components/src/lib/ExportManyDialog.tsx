@@ -112,6 +112,8 @@ export function ExportManyDialog({
         dto.push(data);
       }
     });
+
+    console.log(dto);
     // 일괄 출고처리 요청
     return exportAll({ exportOrders: dto });
   }
@@ -168,6 +170,9 @@ export function ExportManyDialog({
           orders={orders}
           isOpen={bundleDialog.isOpen}
           onClose={bundleDialog.onClose}
+          onSuccess={() => {
+            bundleDialog.onClose();
+          }}
         />
       </FormProvider>
     </Modal>
@@ -232,6 +237,7 @@ export function BundleExportDialog({
             status: 'success',
             description: '합포장 출고 처리가 성공적으로 완료되었습니다.',
           });
+          onClose();
           if (onSuccess) onSuccess();
         })
         .catch(() =>
@@ -242,7 +248,7 @@ export function BundleExportDialog({
           }),
         );
     },
-    [exportBundledOrders, toast],
+    [exportBundledOrders, onClose, onSuccess, toast],
   );
 
   /** 합포장 출고처리 API 요청 */
@@ -308,8 +314,8 @@ export function BundleExportDialog({
 
               <UnorderedList>
                 <ListItem>
-                  선택한 주문의 주문자, 받는곳, 받는분, 받는분 연락처(휴대폰)의 정보가
-                  동일해야 합니다.
+                  선택한 모든 주문의 주문자, 받는곳, 받는분, 받는분 연락처(휴대폰)의
+                  정보가 동일해야 합니다.
                 </ListItem>
               </UnorderedList>
             </Stack>

@@ -17,24 +17,13 @@ import {
 } from '..';
 
 /** 주문 출고 정보 */
-export function OrderDetailExportInfo({
-  items,
-  exports: _exports,
-}: {
-  items: FindFmOrderDetailRes['items'];
-  exports: FmOrderExport;
-}) {
-  // * 이 출고에 포함된 상품(옵션) 목록
-  const exportOrderItems = useMemo(() => {
-    return items.filter((item) => item.export_code === _exports.export_code);
-  }, [_exports.export_code, items]);
-
+export function OrderDetailExportInfo({ exports: _exports }: { exports: FmOrderExport }) {
   // * 이 출고에 포함된 상품의 총 가격
-  // const totalExportedPrice = useMemo(() => {
-  //   return exportOrderItemOptions.reduce((prev, curr) => {
-  //     return prev + Number(curr.price);
-  //   }, 0);
-  // }, [exportOrderItemOptions]);
+  const totalExportedPrice = useMemo(() => {
+    return _exports.itemOptions.reduce((prev, curr) => {
+      return prev + Number(curr.price);
+    }, 0);
+  }, [_exports.itemOptions]);
 
   const deliveryCompany = useMemo(
     () => convertFmDeliveryCompanyToString(_exports.delivery_company_code),
@@ -48,9 +37,9 @@ export function OrderDetailExportInfo({
         </Link>
         <FmOrderStatusBadge orderStatus={_exports.export_status} />
         <TextDotConnector />
-        <Text isTruncated>{_exports.ea} 개</Text>
-        {/* <TextDotConnector /> */}
-        {/* <Text isTruncated>{totalExportedPrice.toLocaleString()} 원</Text> */}
+        <Text isTruncated>{_exports.totalEa} 개</Text>
+        <TextDotConnector />
+        <Text isTruncated>{totalExportedPrice.toLocaleString()} 원</Text>
       </Stack>
 
       <Stack direction="row" flexWrap="wrap" spacing={1.5} alignItems="center">
@@ -80,10 +69,12 @@ export function OrderDetailExportInfo({
       </Stack>
 
       {/* 이 출고에서 보내진 상품(옵션) 목록 */}
-      {exportOrderItems.length > 0 && (
+      {_exports.itemOptions.length > 0 && (
         <Box my={2}>
           <Text fontWeight="bold">출고된 상품</Text>
-          <pre>{JSON.stringify(exportOrderItems, null, 2)}</pre>
+          {_exports.itemOptions.map((io) => (
+            <OrderDetailOptionListItem key={io.item_option_seq} option={io} />
+          ))}
         </Box>
       )}
     </Box>

@@ -82,12 +82,12 @@ export function OrderDetail(): JSX.Element {
         </Box>
 
         {/* 환불 , 반품 알림 문구 */}
-        {(order.data.returns || order.data.refunds) && (
+        {(order.data.returns.length > 0 || order.data.refunds.length > 0) && (
           <Stack as="section">
-            {order.data.returns && (
+            {order.data.returns.length > 0 && (
               <OrderReturnExistsAlert targetSectionTitle={returnSectionTitle} />
             )}
-            {order.data.refunds && (
+            {order.data.refunds.length > 0 && (
               <OrderRefundExistsAlert targetSectionTitle={refundSectionTitle} />
             )}
           </Stack>
@@ -106,7 +106,7 @@ export function OrderDetail(): JSX.Element {
         {/* 주문 상품 정보 */}
         <SectionWithTitle title="주문 상품 정보">
           {order.data.items.map((item) => (
-            <Box key={item.item_seq}>
+            <Box key={item.item_seq} mt={6}>
               <OrderDetailGoods orderItem={item} />
               <OrderDetailOptionList order={order.data} options={item.options} />
             </Box>
@@ -122,33 +122,34 @@ export function OrderDetail(): JSX.Element {
         {order.data.exports.length > 0 && (
           <SectionWithTitle title="출고 정보">
             {order.data.exports.map((_exp) => (
-              <Box mt={6} pb={4}>
-                <OrderDetailExportInfo
-                  key={_exp.export_code}
-                  items={order.data.items}
-                  exports={_exp}
-                />
+              <Box key={_exp.export_code} mt={6} pb={4}>
+                <OrderDetailExportInfo key={_exp.export_code} exports={_exp} />
               </Box>
             ))}
           </SectionWithTitle>
         )}
 
         {/* 반품 정보 */}
-        {order.data.returns && (
+        {order.data.returns.length > 0 && (
           <SectionWithTitle title={returnSectionTitle}>
-            <OrderDetailReturnInfo returns={order.data.returns} />
+            {order.data.returns.map((_ret) => (
+              <Box key={_ret.return_code} mt={6} pb={4}>
+                <OrderDetailReturnInfo returns={_ret} />
+              </Box>
+            ))}
           </SectionWithTitle>
         )}
 
         {/* 환불 정보 */}
-        {/* {order.data.refunds && (
+        {order.data.refunds.length > 0 && (
           <SectionWithTitle title={refundSectionTitle}>
-            <OrderDetailRefundInfo
-              options={order.data.options}
-              refund={order.data.refunds}
-            />
+            {order.data.refunds.map((_ref) => (
+              <Box key={_ref.refund_code} mt={6} pb={4}>
+                <OrderDetailRefundInfo refund={_ref} />
+              </Box>
+            ))}
           </SectionWithTitle>
-        )} */}
+        )}
       </Stack>
     </MypageLayout>
   );
