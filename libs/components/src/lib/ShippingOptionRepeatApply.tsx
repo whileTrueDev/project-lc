@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, FormControl, Input, Select, Stack, Text } from '@chakra-ui/react';
-import { ShippingOptionSetType, ShippingOptionType } from '@project-lc/shared-types';
+import { ShippingOptType, ShippingSetType } from '@prisma/client';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -43,12 +43,15 @@ export function ShippingOptionRepeatApply({
   shippingOptType,
   suffix,
 }: {
-  shippingSetType: ShippingOptionSetType;
-  shippingOptType: ShippingOptionType;
+  shippingSetType: ShippingSetType;
+  shippingOptType: ShippingOptType;
   suffix: string;
 }): JSX.Element {
-  const { setShippingOptions, addShippingOption, deliveryLimit } =
-    useShippingSetItemStore();
+  const {
+    setShippingOptions,
+    addShippingOption,
+    delivery_limit: deliveryLimit,
+  } = useShippingSetItemStore();
 
   const {
     register,
@@ -71,8 +74,9 @@ export function ShippingOptionRepeatApply({
   });
 
   const shippingOptionBase = {
-    shippingSetType,
-    shippingOptType,
+    shipping_set_type: shippingSetType,
+    shipping_opt_type: shippingOptType,
+    default_yn: null,
   };
 
   const onSubmit = (data: RepeatFormType) => {
@@ -89,20 +93,20 @@ export function ShippingOptionRepeatApply({
     // 2. shippingOption 생성
     const firstOption = {
       ...shippingOptionBase,
-      sectionStart: firstSectionStart,
-      sectionEnd: firstSectionEnd,
-      costItem: {
-        areaName,
-        cost: firstCost,
+      section_st: firstSectionStart,
+      section_ed: firstSectionEnd,
+      shippingCost: {
+        shipping_area_name: areaName,
+        shipping_cost: firstCost,
       },
     };
     const secondOption = {
       ...shippingOptionBase,
-      sectionStart: secondSectionStart,
-      sectionEnd: secondSectionEnd,
-      costItem: {
-        areaName,
-        cost: secondCost,
+      section_st: secondSectionStart,
+      section_ed: secondSectionEnd,
+      shippingCost: {
+        shipping_area_name: areaName,
+        shipping_cost: secondCost,
       },
     };
     const newOptions = [firstOption, secondOption];
@@ -221,7 +225,16 @@ export function ShippingOptionRepeatApply({
           </Stack>
           <ResponsiveDivider />
           <CostInputWrapper id="firstCost" suffix={suffix}>
-            <Input type="number" {...register('firstCost', { required: true })} />
+            <Input
+              type="number"
+              {...register('firstCost', {
+                required: '배송비를 입력해주세요',
+                valueAsNumber: true,
+                validate: {
+                  positive: (v) => (v && v > 0) || '양수를 입력해주세요',
+                },
+              })}
+            />
           </CostInputWrapper>
         </Stack>
         {/* 첫번째 옵션 */}
@@ -262,7 +275,17 @@ export function ShippingOptionRepeatApply({
           </Stack>
           <ResponsiveDivider />
           <CostInputWrapper id="secondCost" suffix={suffix}>
-            <Input type="number" {...register('secondCost', { required: true })} />
+            <Input
+              type="number"
+              maxLength={11}
+              {...register('secondCost', {
+                required: '배송비를 입력해주세요',
+                valueAsNumber: true,
+                validate: {
+                  positive: (v) => (v && v > 0) || '양수를 입력해주세요',
+                },
+              })}
+            />
           </CostInputWrapper>
         </Stack>
         {/* 두번째 옵션 */}

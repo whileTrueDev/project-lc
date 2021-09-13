@@ -1,10 +1,10 @@
 import { Divider, Stack, Tag, TagCloseButton, TagLabel, Text } from '@chakra-ui/react';
-import { ShippingOption } from '@project-lc/shared-types';
+import { ShippingOptionDto, TempShippingOption } from '@project-lc/shared-types';
 import { useCallback } from 'react';
 import { ShippingSelectOption } from './ShippingOptionTypeSelect';
 
-export function getOptionLabel(item: ShippingOption, suffix: string) {
-  const { sectionStart, sectionEnd } = item;
+export function getOptionLabel(item: ShippingOptionDto, suffix: string) {
+  const { section_st: sectionStart, section_ed: sectionEnd } = item;
 
   const startLabel = sectionStart
     ? `${sectionStart.toLocaleString()} ${suffix} 이상`
@@ -20,10 +20,10 @@ export function ShippingOptionAppliedItem({
   onDelete,
 }: {
   selectOption: ShippingSelectOption;
-  item: ShippingOption;
+  item: TempShippingOption;
   onDelete: (id: number) => void;
 }) {
-  const { tempId, costItem } = item;
+  const { tempId, shippingCost: costItem } = item;
 
   const deleteItem = useCallback(() => onDelete(tempId), [onDelete, tempId]);
 
@@ -33,7 +33,7 @@ export function ShippingOptionAppliedItem({
   }
 
   // costItem이 1개인 경우 **********************************************
-  const { areaName, cost } = costItem;
+  const { shipping_area_name: areaName, shipping_cost: cost } = costItem;
 
   const costText = selectOption.key === 'free' ? '무료' : `${cost.toLocaleString()} 원`;
 

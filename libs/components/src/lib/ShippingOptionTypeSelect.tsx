@@ -1,11 +1,7 @@
 import { Select, Stack, Text } from '@chakra-ui/react';
-import {
-  ShippingOptionSetType,
-  ShippingOptionType,
-  ShippingPolicyFormData,
-} from '@project-lc/shared-types';
+import { ShippingOptType, ShippingSetType } from '@prisma/client';
 import { useShippingGroupItemStore, useShippingSetItemStore } from '@project-lc/stores';
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 
 // free - 무료 / fixed - 고정 / amount - 금액 / cnt - 수량 / weight - 무게
 // 금액, 수량, 무게는 구간입력, 구간반복 존재
@@ -15,7 +11,7 @@ import { useState, useCallback } from 'react';
 // 구간입력 시 하단 인풋 추가가능(옵션 증가)
 // 구간반복시 고정인풋 두개(옵션 2개 고정)
 export type ShippingSelectOption = {
-  key: ShippingOptionType;
+  key: ShippingOptType;
   label: string;
   suffix: string;
 };
@@ -39,10 +35,10 @@ export function ShippingOptionTypeSelect({
   option: ShippingSelectOption;
   changeOption: (opt: ShippingSelectOption) => void;
   onChange?: () => void;
-  shippingSetType?: ShippingOptionSetType;
+  shippingSetType?: ShippingSetType;
 }): JSX.Element {
   const { clearShippingOptions } = useShippingSetItemStore();
-  const { shippingCalculType } = useShippingGroupItemStore();
+  const { shipping_calcul_type: shippingCalculType } = useShippingGroupItemStore();
   const changeHandler = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const nextOption = ShippingSelectOptions.find(

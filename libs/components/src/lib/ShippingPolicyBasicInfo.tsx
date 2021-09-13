@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable react/jsx-props-no-spreading */
 import {
   Box,
@@ -12,11 +13,8 @@ import {
   Text,
   useBoolean,
 } from '@chakra-ui/react';
-import {
-  ShippingCalculType,
-  ShippingCalculTypeOptions,
-  ShippingCalculTypes,
-} from '@project-lc/shared-types';
+import { ShippingCalculType } from '@prisma/client';
+import { ShippingCalculTypeOptions, ShippingCalculTypes } from '@project-lc/shared-types';
 import { useShippingGroupItemStore } from '@project-lc/stores';
 import React from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
@@ -43,13 +41,13 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
   const [open, setFlag] = useBoolean(false);
 
   const {
-    groupName,
-    shippingCalculType,
+    shipping_group_name: groupName,
+    shipping_calcul_type: shippingCalculType,
     baseAddress,
     postalCode,
     detailAddress,
-    shippingStdFree,
-    shippingAddFree,
+    shipping_std_free_yn,
+    shipping_add_free_yn,
     setGroupName,
     setShippingCalculType,
     clearShippingAdditionalSetting,
@@ -58,6 +56,9 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
     setAddress,
     setDetailAddress,
   } = useShippingGroupItemStore();
+
+  const shippingStdFree = shipping_std_free_yn === 'Y';
+  const shippingAddFree = shipping_add_free_yn === 'Y';
 
   // 배송비 계산 기준
 

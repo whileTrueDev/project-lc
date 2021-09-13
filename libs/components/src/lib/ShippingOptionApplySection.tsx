@@ -1,6 +1,6 @@
 import { InfoIcon } from '@chakra-ui/icons';
 import { Stack, Text } from '@chakra-ui/react';
-import { ShippingOptionSetType } from '@project-lc/shared-types';
+import { ShippingSetType } from '@prisma/client';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useCallback, useState } from 'react';
 import ShippingOptionAppliedItem from './ShippingOptionAppliedItem';
@@ -16,15 +16,15 @@ import ShippingOptionTypeSelect, {
 /**
  *
  * deliveryLimit === 'unlimit' : 대한민국 전국배송
- *  => 배송비 타입의 areaName은 '대한민국' 고정, areaDetail: undefined
+ *  => 배송비 타입의 areaName은 '대한민국' 고정
  *
  * deliveryLimit === 'limit' : 지정 지역 배송
- *  => costItem은 여러개, areaName은 지역그룹명, detailArea?[]
+ *  => areaName은 지역명
  */
 export function ShippingOptionApplySection({
   shippingSetType = 'std',
 }: {
-  shippingSetType?: ShippingOptionSetType;
+  shippingSetType?: ShippingSetType;
 }): JSX.Element {
   const [selectOption, setSelectOption] = useState<ShippingSelectOption>(
     shippingSetType === 'std' ? ShippingSelectOptions[0] : ShippingSelectOptions[1],
@@ -35,7 +35,7 @@ export function ShippingOptionApplySection({
 
   const { shippingOptions, removeShippingOption } = useShippingSetItemStore();
   const appliedStdOptList = shippingOptions.filter(
-    (opt) => opt.shippingSetType === shippingSetType,
+    (opt) => opt.shipping_set_type === shippingSetType,
   );
 
   return (

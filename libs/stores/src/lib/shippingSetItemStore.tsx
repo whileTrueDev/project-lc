@@ -1,95 +1,100 @@
 import {
-  DeliveryLimit,
+  LimitOrUnlimit,
   PrepayInfo,
-  ShippingOption,
-  ShippingOptionSetType,
+  ShippingSetCode,
+  ShippingSetType,
+} from '@prisma/client';
+import {
+  ShippingOptionDto,
   ShippingSetCodeOptions,
-  ShippingSetFormData,
+  ShippingSetDto,
 } from '@project-lc/shared-types';
 import create from 'zustand';
 
-export interface ShippingSetItemStoreState extends Omit<ShippingSetFormData, 'tempId'> {
+export interface ShippingSetItemStoreState extends ShippingSetDto {
   setShippingSetName: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setShippingSetCode: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   setPrepayInfo: (prepayInfo: PrepayInfo) => void;
   setRefundShippingCost: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  setWwapShippingCost: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  setSwapShippingCost: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setShipingFreeFlag: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  changeDeliveryLimit: (deliveryLimit: DeliveryLimit) => void;
+  changeDeliveryLimit: (deliveryLimit: LimitOrUnlimit) => void;
   removeShippingOption: (id: number) => void;
-  clearShippingOptions: (type?: ShippingOptionSetType) => void;
-  addShippingOption: (option: Omit<ShippingOption, 'tempId'>) => void;
-  setShippingOptions: (options: Omit<ShippingOption, 'tempId'>[]) => void;
+  clearShippingOptions: (setType?: ShippingSetType) => void;
+  addShippingOption: (option: Omit<ShippingOptionDto, 'tempId'>) => void;
+  setShippingOptions: (options: Omit<ShippingOptionDto, 'tempId'>[]) => void;
   reset: () => void;
 }
 
 export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, get) => ({
-  shippingSetCode: 'delivery',
-  shippingSetName: '택배',
-  prepayInfo: 'delivery',
-  refundShippingCost: null,
-  swapShippingCost: null,
-  shipingFreeFlag: false,
+  shipping_set_code: 'delivery',
+  shipping_set_name: '택배',
+  prepay_info: 'delivery',
+  refund_shiping_cost: null,
+  swap_shiping_cost: null,
+  shiping_free_yn: 'N',
   shippingOptions: [],
-  deliveryLimit: 'unlimit',
+  delivery_limit: 'unlimit',
+  default_yn: 'N',
+  delivery_nation: 'korea',
   reset: () => {
     set((state) => ({
       ...state,
-      shippingSetCode: 'delivery',
-      shippingSetName: '택배',
-      prepayInfo: 'delivery',
-      refundShippingCost: null,
-      swapShippingCost: null,
-      shipingFreeFlag: false,
+      shipping_set_code: 'delivery',
+      shipping_set_name: '택배',
+      prepay_info: 'delivery',
+      refund_shiping_cost: null,
+      swap_shiping_cost: null,
+      shiping_free_yn: 'N',
       shippingOptions: [],
-      deliveryLimit: 'unlimit',
+      delivery_limit: 'unlimit',
     }));
   },
   setShippingSetName: (e: React.ChangeEvent<HTMLInputElement>) => {
     set((state) => ({
       ...state,
-      shippingSetName: e.currentTarget.value,
+      shipping_set_name: e.currentTarget.value,
     }));
   },
   setShippingSetCode: (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const shippingSetCode = e.currentTarget.value as keyof typeof ShippingSetCodeOptions;
+    const shippingSetCode = e.currentTarget.value as ShippingSetCode;
     const shippingSetName = ShippingSetCodeOptions[shippingSetCode].label;
     set((state) => ({
       ...state,
-      shippingSetCode,
-      shippingSetName,
+      shipping_set_code: shippingSetCode,
+      shipping_set_name: shippingSetName,
     }));
   },
   setPrepayInfo: (prepayInfo: PrepayInfo) => {
     set((state) => ({
       ...state,
-      prepayInfo,
+      prepay_info: prepayInfo,
     }));
   },
   setRefundShippingCost: (e: React.ChangeEvent<HTMLInputElement>) => {
     const refundShippingCost = Number(e.currentTarget.value);
     set((state) => ({
       ...state,
-      refundShippingCost,
+      refund_shiping_cost: refundShippingCost,
     }));
   },
-  setWwapShippingCost: (e: React.ChangeEvent<HTMLInputElement>) => {
+  setSwapShippingCost: (e: React.ChangeEvent<HTMLInputElement>) => {
     const swapShippingCost = Number(e.currentTarget.value);
     set((state) => ({
       ...state,
-      swapShippingCost,
+      swap_shiping_cost: swapShippingCost,
     }));
   },
   setShipingFreeFlag: (e: React.ChangeEvent<HTMLInputElement>) => {
     set((state) => ({
       ...state,
-      shipingFreeFlag: e.currentTarget.checked,
+      shiping_free_yn: e.currentTarget.checked ? 'Y' : 'N',
     }));
   },
-  changeDeliveryLimit: (deliveryLimit: DeliveryLimit) => {
+  changeDeliveryLimit: (deliveryLimit: LimitOrUnlimit) => {
     set((state) => ({
       ...state,
-      deliveryLimit,
+      delivery_limit: deliveryLimit,
       shippingOptions: [],
     }));
   },
@@ -101,18 +106,18 @@ export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, g
       shippingOptions: filtered,
     }));
   },
-  clearShippingOptions: (type?: ShippingOptionSetType) => {
+  clearShippingOptions: (setType?: ShippingSetType) => {
     const { shippingOptions } = get();
-    // ShippingOptionType 값이 주어지면 해당 타입인 옵션을 삭제
+    // ShippingOptionType 값이 ㅂㅏ꾸ㅣ면 해당 ShippingSetType타입인 옵션을 삭제
     // 값이 없으면 전체 삭제
     set((state) => ({
       ...state,
-      shippingOptions: type
-        ? shippingOptions.filter((opt) => opt.shippingSetType !== type)
+      shippingOptions: setType
+        ? shippingOptions.filter((opt) => opt.shipping_set_type !== setType)
         : [],
     }));
   },
-  addShippingOption: (option: Omit<ShippingOption, 'tempId'>) => {
+  addShippingOption: (option: Omit<ShippingOptionDto, 'tempId'>) => {
     const { shippingOptions } = get();
     const tempId =
       shippingOptions.length !== 0
@@ -128,7 +133,7 @@ export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, g
       shippingOptions: [...shippingOptions, newOption],
     }));
   },
-  setShippingOptions: (options: Omit<ShippingOption, 'tempId'>[]) => {
+  setShippingOptions: (options: Omit<ShippingOptionDto, 'tempId'>[]) => {
     set((state) => ({
       ...state,
       shippingOptions: [

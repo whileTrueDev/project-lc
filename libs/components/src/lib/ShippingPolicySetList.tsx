@@ -9,7 +9,7 @@ import {
   Stack,
   useDisclosure,
 } from '@chakra-ui/react';
-import { ShippingSetFormData } from '@project-lc/shared-types';
+import { TempShippingSet } from '@project-lc/shared-types';
 import { useShippingGroupItemStore, useShippingSetItemStore } from '@project-lc/stores';
 import { useCallback } from 'react';
 import SectionWithTitle from './SectionWithTitle';
@@ -28,7 +28,7 @@ export function ShippingPolicySetList(): JSX.Element {
     <SectionWithTitle title="배송 방법">
       {/* 배송 옵션 목록(임시) */}
       <Stack spacing={2} mb={2}>
-        {shippingSets.map((set: ShippingSetFormData) => (
+        {shippingSets.map((set: TempShippingSet) => (
           <SetItem key={set.tempId} set={set} onDelete={removeShippingSet} />
         ))}
       </Stack>

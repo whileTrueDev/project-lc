@@ -1,21 +1,22 @@
+/* eslint-disable camelcase */
 import { Divider, Stack, Text } from '@chakra-ui/layout';
 import { CloseButton } from '@chakra-ui/react';
 import {
   PrepayInfoOptions,
-  ShippingOption,
-  ShippingSetFormData,
+  ShippingOptionDto,
+  TempShippingSet,
 } from '@project-lc/shared-types';
 import { getOptionLabel } from './ShippingOptionAppliedItem';
 import { ShippingSelectOptions } from './ShippingOptionTypeSelect';
 import { BoldText } from './ShippingPolicySetForm';
 
-function OptionItemDisplay({ item }: { item: ShippingOption }) {
-  const { costItem, shippingOptType } = item;
+function OptionItemDisplay({ item }: { item: ShippingOptionDto }) {
+  const { shippingCost: costItem, shipping_opt_type: shippingOptType } = item;
   const selectOption = ShippingSelectOptions.find(
     (select) => select.key === shippingOptType,
   );
   const suffix = selectOption ? selectOption.suffix : '';
-  const { areaName, cost } = costItem;
+  const { shipping_area_name: areaName, shipping_cost: cost } = costItem;
   const costText = shippingOptType === 'free' ? '무료' : `${cost.toLocaleString()} 원`;
 
   return (
@@ -33,21 +34,21 @@ export function SetItem({
   set,
   onDelete,
 }: {
-  set: ShippingSetFormData;
+  set: TempShippingSet;
   onDelete: (id: number) => void;
 }) {
   const {
-    shippingSetName,
-    prepayInfo,
-    refundShippingCost,
-    swapShippingCost,
-    shipingFreeFlag,
+    shipping_set_name,
+    prepay_info,
+    refund_shiping_cost,
+    swap_shiping_cost,
+    shiping_free_yn,
     shippingOptions,
     tempId,
   } = set;
 
-  const stdOptions = shippingOptions.filter((opt) => opt.shippingSetType === 'std');
-  const addOptions = shippingOptions.filter((opt) => opt.shippingSetType === 'add');
+  const stdOptions = shippingOptions.filter((opt) => opt.shipping_set_type === 'std');
+  const addOptions = shippingOptions.filter((opt) => opt.shipping_set_type === 'add');
   return (
     <Stack
       direction="row"
@@ -63,8 +64,8 @@ export function SetItem({
         {/* 배송방법 */}
         <Stack direction="row">
           <BoldText>배송방법</BoldText>
-          <Text>{shippingSetName}</Text>
-          <Text>{PrepayInfoOptions[prepayInfo].label}</Text>
+          <Text>{shipping_set_name}</Text>
+          <Text>{PrepayInfoOptions[prepay_info].label}</Text>
         </Stack>
         <Divider />
 
@@ -74,21 +75,20 @@ export function SetItem({
           <Stack>
             <Stack direction={{ base: 'column', sm: 'row' }}>
               <Text>
-                반품 - 편도 :{' '}
-                {refundShippingCost ? refundShippingCost.toLocaleString() : 0} ₩
+                반품 - 편도 :&nbsp;
+                {refund_shiping_cost ? refund_shiping_cost.toLocaleString() : 0} ₩
               </Text>
-              {shipingFreeFlag && refundShippingCost && (
+              {shiping_free_yn === 'Y' && refund_shiping_cost && (
                 <Text>
-                  ( 배송비가 무료인 경우, 왕복 {(refundShippingCost * 2).toLocaleString()}{' '}
-                  ₩ 받음 )
+                  ( 배송비가 무료인 경우, 왕복&nbsp;
+                  {(refund_shiping_cost * 2).toLocaleString()} ₩ 받음 )
                 </Text>
               )}
             </Stack>
             <Stack direction="row">
               <Text>
-                {' '}
-                (맞)교환 - 왕복 :{' '}
-                {swapShippingCost ? swapShippingCost.toLocaleString() : 0} ₩
+                (맞)교환 - 왕복 :&nbsp;
+                {swap_shiping_cost ? swap_shiping_cost.toLocaleString() : 0} ₩
               </Text>
             </Stack>
           </Stack>

@@ -10,15 +10,20 @@ import {
   Text,
   Stack,
 } from '@chakra-ui/react';
-import React from 'react-transition-group/node_modules/@types/react';
-import { useDeleteShippingGroup, useProfile } from '@project-lc/hooks';
+import {
+  useDeleteShippingGroup,
+  useProfile,
+  useShippingGroupList,
+} from '@project-lc/hooks';
 import { useShippingGroupItemStore } from '@project-lc/stores';
-import { useShippingGroupList } from '../../../../../libs/hooks/src/lib/queries/useShippingGroupList';
 
 export function TempShippingPolicy(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: ProfileData } = useProfile();
-  const { data, isLoading } = useShippingGroupList(ProfileData.email, !!ProfileData);
+  const { data, isLoading } = useShippingGroupList(
+    ProfileData?.email || '',
+    !!ProfileData,
+  );
   const { mutateAsync } = useDeleteShippingGroup();
   const { reset } = useShippingGroupItemStore();
 

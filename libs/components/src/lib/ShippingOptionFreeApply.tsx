@@ -1,5 +1,5 @@
 import { Button, Stack, Text } from '@chakra-ui/react';
-import { ShippingOptionSetType } from '@project-lc/shared-types';
+import { ShippingSetType } from '@prisma/client';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useCallback } from 'react';
 
@@ -7,24 +7,25 @@ import { useCallback } from 'react';
 export function ShippingOptionFreeApply({
   shippingSetType,
 }: {
-  shippingSetType: ShippingOptionSetType;
+  shippingSetType: ShippingSetType;
 }) {
   const { addShippingOption, shippingOptions } = useShippingSetItemStore();
 
   const isFreeOptionAdded = !!shippingOptions.find(
-    (opt) => opt.shippingOptType === 'free',
+    (opt) => opt.shipping_opt_type === 'free',
   );
 
   // 배송방법 추가
   const addFreeOption = useCallback(() => {
     addShippingOption({
-      shippingSetType,
-      shippingOptType: 'free',
-      sectionStart: null,
-      sectionEnd: null,
-      costItem: {
-        areaName: '대한민국',
-        cost: 0,
+      shipping_set_type: shippingSetType,
+      shipping_opt_type: 'free',
+      section_st: null,
+      section_ed: null,
+      default_yn: null,
+      shippingCost: {
+        shipping_area_name: '대한민국',
+        shipping_cost: 0,
       },
     });
   }, [addShippingOption, shippingSetType]);

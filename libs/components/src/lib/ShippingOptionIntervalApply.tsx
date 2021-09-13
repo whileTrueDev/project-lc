@@ -1,10 +1,8 @@
+/* eslint-disable camelcase */
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, FormControl, Input, Select, Stack, Text } from '@chakra-ui/react';
-import {
-  ShippingCostType,
-  ShippingOptionSetType,
-  ShippingOptionType,
-} from '@project-lc/shared-types';
+import { ShippingOptType, ShippingSetType } from '@prisma/client';
+import { ShippingCostDto, ShippingOptionDto } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -20,21 +18,18 @@ export function ErrorText({ children }: { children: React.ReactNode }) {
   );
 }
 
-type IntervalFormType = {
-  sectionStart: null | number;
-  sectionEnd: null | number;
-} & ShippingCostType;
-
+type IntervalFormType = Pick<ShippingOptionDto, 'section_st' | 'section_ed'> &
+  ShippingCostDto;
 export function ShippingOptionIntervalApply({
   shippingSetType,
   shippingOptType,
   suffix,
 }: {
-  shippingSetType: ShippingOptionSetType;
-  shippingOptType: ShippingOptionType;
+  shippingSetType: ShippingSetType;
+  shippingOptType: ShippingOptType;
   suffix: string;
 }): JSX.Element {
-  const { deliveryLimit } = useShippingSetItemStore();
+  const { delivery_limit: deliveryLimit } = useShippingSetItemStore();
   const {
     register,
     handleSubmit,
@@ -45,41 +40,40 @@ export function ShippingOptionIntervalApply({
     formState: { isSubmitSuccessful, errors },
   } = useForm<IntervalFormType>({
     defaultValues: {
-      sectionStart: 1,
-      sectionEnd: null,
-      cost: 2500,
-      areaName:
+      section_st: 1,
+      section_ed: null,
+      shipping_cost: 2500,
+      shipping_area_name:
         deliveryLimit === 'limit' || shippingSetType === 'add' ? '지역 선택' : '대한민국',
     },
   });
 
   const { addShippingOption, shippingOptions } = useShippingSetItemStore();
   const onSubmit = (data: IntervalFormType) => {
-    const { sectionStart, sectionEnd, cost, areaName } = data;
-    // 1. costItem 생성
-    // 2. shippingOption 생성
-    // 3. addShippingOption
+    const { section_st, section_ed, shipping_cost, shipping_area_name } = data;
     addShippingOption({
-      shippingSetType,
-      shippingOptType,
-      sectionStart,
-      sectionEnd,
-      costItem: {
-        cost,
-        areaName,
+      default_yn: null,
+      shipping_set_type: shippingSetType,
+      shipping_opt_type: shippingOptType,
+      section_st,
+      section_ed,
+      shippingCost: {
+        shipping_cost,
+        shipping_area_name,
       },
     });
   };
 
   useEffect(() => {
     if (isSubmitSuccessful) {
+      // 시작값을 이전 옵션의 종료값으로 설정
       setValue(
-        'sectionStart',
+        'section_st',
         shippingOptions.length
-          ? shippingOptions[shippingOptions.length - 1].sectionEnd
+          ? shippingOptions[shippingOptions.length - 1].section_ed
           : null,
       );
-      setValue('sectionEnd', null);
+      setValue('section_ed', null);
     }
   }, [isSubmitSuccessful, shippingOptions, setValue]);
 
@@ -89,10 +83,12 @@ export function ShippingOptionIntervalApply({
 
   return (
     <>
-      {errors.sectionStart && <ErrorText>{errors.sectionStart.message}</ErrorText>}
-      {errors.sectionEnd && <ErrorText>{errors.sectionEnd.message}</ErrorText>}
-      {errors.cost && <ErrorText>{errors.cost.message}</ErrorText>}
-      {errors.areaName && <ErrorText>{errors.areaName.message}</ErrorText>}
+      {errors.section_st && <ErrorText>{errors.section_st.message}</ErrorText>}
+      {errors.section_ed && <ErrorText>{errors.section_ed.message}</ErrorText>}
+      {errors.shipping_cost && <ErrorText>{errors.shipping_cost.message}</ErrorText>}
+      {errors.shipping_area_name && (
+        <ErrorText>{errors.shipping_area_name.message}</ErrorText>
+      )}
       <Stack
         direction="row"
         as="form"
@@ -107,10 +103,10 @@ export function ShippingOptionIntervalApply({
           {/* 범위 지정 */}
           <Stack direction="row" alignItems="center">
             {/* 첫번째 범위 인풋 */}
-            <FormControlInputWrapper id="sectionStart" suffix={`${suffix} 이상`}>
+            <FormControlInputWrapper id="section_st" suffix={`${suffix} 이상`}>
               <Input
                 type="number"
-                {...register('sectionStart', {
+                {...register('section_st', {
                   required: '시작값을 입력해주세요',
                   valueAsNumber: true,
                   validate: {
@@ -121,17 +117,17 @@ export function ShippingOptionIntervalApply({
             </FormControlInputWrapper>
             <Text>~</Text>
             {/* 두번째 범위 인풋 */}
-            <FormControlInputWrapper id="sectionEnd" suffix={`${suffix} 미만`}>
+            <FormControlInputWrapper id="section_ed" suffix={`${suffix} 미만`}>
               <Input
                 type="number"
-                {...register('sectionEnd', {
+                {...register('section_ed', {
                   valueAsNumber: true,
                   validate: {
-                    biggerThanSectionStart: (v) => {
-                      const sectionStart = getValues('sectionStart');
+                    biggerThansection_st: (v) => {
+                      const section_st = getValues('section_st');
                       return (
-                        (sectionStart && !v) ||
-                        (sectionStart && v && v > sectionStart) ||
+                        (section_st && !v) ||
+                        (section_st && v && v > section_st) ||
                         '시작값보다 큰 값을 입력해주세요'
                       );
                     },
@@ -146,7 +142,7 @@ export function ShippingOptionIntervalApply({
           <Stack>
             {/* 지역 설정 셀렉트 */}
             <Controller
-              name="areaName"
+              name="shipping_area_name"
               control={control}
               rules={{
                 validate: {
@@ -170,9 +166,17 @@ export function ShippingOptionIntervalApply({
               }}
             />
             {/* 가격 설정 */}
-            <FormControl id="cost">
+            <FormControl id="shipping_cost">
               <Stack direction="row" alignItems="center">
-                <Input type="number" {...register('cost', { required: true })} />
+                <Input
+                  type="number"
+                  {...register('shipping_cost', {
+                    required: '배송비를 입력해주세요',
+                    validate: {
+                      positive: (v) => (v && v > 0) || '양수를 입력해주세요',
+                    },
+                  })}
+                />
                 <Text>{suffix}</Text>
               </Stack>
             </FormControl>

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable react/jsx-props-no-spreading */
 import {
   Box,
@@ -21,6 +22,7 @@ import {
   ShippingSetCodes,
 } from '@project-lc/shared-types';
 import { useShippingGroupItemStore, useShippingSetItemStore } from '@project-lc/stores';
+import { useEffect } from 'react';
 import ShippingOptionApplySection from './ShippingOptionApplySection';
 
 function InputWrapperText({
@@ -54,47 +56,57 @@ export function ShippingPolicySetForm({
 }: {
   onSubmit: () => void;
 }): JSX.Element {
-  // 추가배송비 사용여부
-  const [open, { toggle }] = useBoolean();
   const toast = useToast();
 
   const {
-    shippingSetName,
-    shippingSetCode,
-    prepayInfo,
-    refundShippingCost,
-    swapShippingCost,
-    shipingFreeFlag,
-    deliveryLimit,
+    shipping_set_name,
+    shipping_set_code,
+    prepay_info,
+    refund_shiping_cost,
+    swap_shiping_cost,
+    shiping_free_yn,
+    delivery_limit,
     shippingOptions,
     setShippingSetName,
     setShippingSetCode,
     setPrepayInfo,
     setRefundShippingCost,
-    setWwapShippingCost,
+    setSwapShippingCost,
     setShipingFreeFlag,
     changeDeliveryLimit,
+    clearShippingOptions,
   } = useShippingSetItemStore();
+
+  // 추가배송비 사용여부
+  const [open, { toggle }] = useBoolean();
+
+  useEffect(() => {
+    // open === false일때 추가배송비 초기화
+    if (open === false) {
+      clearShippingOptions('add');
+    }
+  }, [clearShippingOptions, open]);
 
   const { addShippingSet } = useShippingGroupItemStore();
 
   // 배송 설정 추가 핸들러
   const addShippingSetHandler = () => {
-    if (shippingOptions.length === 0) {
-      toast({ title: '배송비 옵션을 1개 이상 적용해야 합니다', status: 'error' });
+    if (shippingOptions.filter((opt) => opt.shipping_set_type === 'std').length === 0) {
+      toast({ title: '기본배송비 옵션을 1개 이상 적용해야 합니다', status: 'error' });
       return;
     }
-    const set = {
-      shippingSetName,
-      prepayInfo,
-      refundShippingCost,
-      swapShippingCost,
-      shipingFreeFlag,
-      deliveryLimit,
+    addShippingSet({
+      shipping_set_code,
+      shipping_set_name,
+      prepay_info,
+      refund_shiping_cost,
+      swap_shiping_cost,
+      shiping_free_yn,
       shippingOptions,
-      shippingSetCode,
-    };
-    addShippingSet(set);
+      delivery_limit,
+      default_yn: 'N',
+      delivery_nation: 'korea',
+    });
     onSubmit();
   };
   return (
@@ -105,7 +117,11 @@ export function ShippingPolicySetForm({
           {/* 배송 설정 이름 */}
           <Stack direction={{ base: 'column', md: 'row' }}>
             <BoldText width={{ base: '100%', md: '30%' }}>배송 설정명</BoldText>
-            <Input maxLength={50} value={shippingSetName} onChange={setShippingSetName} />
+            <Input
+              maxLength={50}
+              value={shipping_set_name}
+              onChange={setShippingSetName}
+            />
           </Stack>
 
           {/* 배송 설정 코드  */}
@@ -118,7 +134,7 @@ export function ShippingPolicySetForm({
           </Select>
 
           {/* 선불/착불정보  */}
-          <RadioGroup value={prepayInfo} onChange={setPrepayInfo}>
+          <RadioGroup value={prepay_info} onChange={setPrepayInfo}>
             <Stack direction="row">
               {PrepayInfoTypes.map((key) => (
                 <Radio value={key} key={key}>
@@ -140,21 +156,21 @@ export function ShippingPolicySetForm({
             <InputWrapperText text="반품 편도">
               <Input
                 type="number"
-                value={refundShippingCost ? refundShippingCost.toString() : 0}
+                value={refund_shiping_cost ? refund_shiping_cost.toString() : 0}
                 onChange={setRefundShippingCost}
               />
             </InputWrapperText>
-            <Checkbox onChange={setShipingFreeFlag} isChecked={shipingFreeFlag}>
+            <Checkbox onChange={setShipingFreeFlag} isChecked={shiping_free_yn === 'Y'}>
               배송비가 무료인 경우, 반품배송비 왕복 &nbsp;
-              {((refundShippingCost || 0) * 2).toLocaleString()}₩ 받기
+              {((refund_shiping_cost || 0) * 2).toLocaleString()}₩ 받기
             </Checkbox>
           </Box>
 
           <InputWrapperText text="(맞)교환 왕복">
             <Input
               type="number"
-              value={swapShippingCost ? swapShippingCost.toString() : 0}
-              onChange={setWwapShippingCost}
+              value={swap_shiping_cost ? swap_shiping_cost.toString() : 0}
+              onChange={setSwapShippingCost}
             />
           </InputWrapperText>
         </Stack>
@@ -165,7 +181,7 @@ export function ShippingPolicySetForm({
         {/* 기본 배송비 */}
         <Stack>
           <BoldText>기본 배송비</BoldText>
-          <RadioGroup value={deliveryLimit} onChange={changeDeliveryLimit}>
+          <RadioGroup value={delivery_limit} onChange={changeDeliveryLimit}>
             <Stack direction="row">
               <Radio value="unlimit">대한민국 전국배송</Radio>
               <Radio value="limit">대한민국 중 지정 지역 배송</Radio>

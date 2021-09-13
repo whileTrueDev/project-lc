@@ -1,10 +1,8 @@
+/* eslint-disable camelcase */
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, Input, Select, Stack, Text } from '@chakra-ui/react';
-import {
-  ShippingCostType,
-  ShippingOption,
-  ShippingOptionSetType,
-} from '@project-lc/shared-types';
+import { ShippingSetType } from '@prisma/client';
+import { ShippingCostDto, ShippingOptionDto } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useCallback, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -15,20 +13,23 @@ import { ErrorText } from './ShippingOptionIntervalApply';
 export function ShippingOptionFixedApply({
   shippingSetType,
 }: {
-  shippingSetType: ShippingOptionSetType;
+  shippingSetType: ShippingSetType;
 }): JSX.Element {
-  const { setShippingOptions, addShippingOption, deliveryLimit } =
-    useShippingSetItemStore();
+  const {
+    setShippingOptions,
+    addShippingOption,
+    delivery_limit: deliveryLimit,
+  } = useShippingSetItemStore();
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
     reset,
-  } = useForm<ShippingCostType>({
+  } = useForm<ShippingCostDto>({
     defaultValues: {
-      cost: 2500,
-      areaName:
+      shipping_cost: 2500,
+      shipping_area_name:
         deliveryLimit === 'limit' || shippingSetType === 'add' ? '지역 선택' : '대한민국',
     },
   });
@@ -39,17 +40,18 @@ export function ShippingOptionFixedApply({
 
   // 배송방법 추가
   const addFixedOption = useCallback(
-    (data: ShippingCostType) => {
-      const { areaName } = data;
-      if (areaName === '지역 선택') {
+    (data: ShippingCostDto) => {
+      const { shipping_area_name } = data;
+      if (shipping_area_name === '지역 선택') {
         return;
       }
-      const newOption: Omit<ShippingOption, 'tempId'> = {
-        shippingSetType,
-        shippingOptType: 'fixed',
-        sectionStart: null,
-        sectionEnd: null,
-        costItem: data,
+      const newOption: ShippingOptionDto = {
+        shipping_set_type: shippingSetType,
+        shipping_opt_type: 'fixed',
+        section_st: null,
+        section_ed: null,
+        default_yn: null,
+        shippingCost: data,
       };
       if (deliveryLimit === 'limit' || shippingSetType === 'add') {
         // 지역배송인 경우 추가하도록
@@ -64,8 +66,10 @@ export function ShippingOptionFixedApply({
 
   return (
     <>
-      {errors.cost && <ErrorText>{errors.cost.message}</ErrorText>}
-      {errors.areaName && <ErrorText>{errors.areaName.message}</ErrorText>}
+      {errors.shipping_cost && <ErrorText>{errors.shipping_cost.message}</ErrorText>}
+      {errors.shipping_area_name && (
+        <ErrorText>{errors.shipping_area_name.message}</ErrorText>
+      )}
       <Stack
         direction="row"
         as="form"
@@ -73,7 +77,7 @@ export function ShippingOptionFixedApply({
         onSubmit={handleSubmit(addFixedOption)}
       >
         <Controller
-          name="areaName"
+          name="shipping_area_name"
           control={control}
           rules={{
             validate: {
@@ -100,11 +104,11 @@ export function ShippingOptionFixedApply({
         <Input
           width="100px"
           type="number"
-          {...register('cost', {
+          {...register('shipping_cost', {
             required: '배송비를 입력해주세요',
             valueAsNumber: true,
             validate: {
-              positive: (v) => (v && v > 0) || '양수를 입력해주세요',
+              positive: (v) => (v && Number(v) > 0) || '양수를 입력해주세요',
             },
           })}
         />
