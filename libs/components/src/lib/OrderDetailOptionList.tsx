@@ -131,7 +131,7 @@ export function OrderDetailOptionDescription({
                         {opt.title1}: {opt.option1}
                       </Td>
                     ) : (
-                      <Td>{opt.goods_name}</Td>
+                      <Td>기본옵션</Td>
                     )}
                     <Td>{opt.ea} 개</Td>
                     <Td>{opt.step35}</Td>

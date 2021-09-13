@@ -10,7 +10,7 @@ export interface FmOrder {
   /**
    * '고유번호'
    */
-  order_seq: number;
+  order_seq: number | string;
   /**
    * '맞교환주문의 원주문번호'
    */
