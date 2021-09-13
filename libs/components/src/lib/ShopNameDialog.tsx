@@ -1,27 +1,27 @@
 // 최초 입장시에 상점명을 입력하는 다이얼로그
 // -> 추후에는 상점명 뿐 만 아니라 다른 것도 입력이 가능해야할 수 있음.
 import {
+  Alert,
+  AlertIcon,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
+  Input,
   Modal,
   ModalBody,
-  ModalContent,
   ModalCloseButton,
-  ModalOverlay,
-  ModalHeader,
+  ModalContent,
   ModalFooter,
-  Button,
+  ModalHeader,
+  ModalOverlay,
   Text,
-  Flex,
-  FormControl,
-  Input,
-  FormLabel,
-  FormHelperText,
-  FormErrorMessage,
   useToast,
 } from '@chakra-ui/react';
+import { useProfile, useShopInfoMutation } from '@project-lc/hooks';
 import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { useProfile, useShopInfoMutation } from '@project-lc/hooks';
-import { WarningIcon } from '@chakra-ui/icons';
 
 type ShopNameDialogType = {
   isOpen: boolean;
@@ -79,31 +79,24 @@ export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
   }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      size="md"
-      onClose={useClose}
-      initialFocusRef={initialRef}
-      closeOnOverlayClick={false}
-      closeOnEsc={false}
-    >
+    <Modal isOpen={isOpen} size="md" onClose={useClose} initialFocusRef={initialRef}>
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(useSubmit)}>
         <ModalHeader>상점명 등록하기</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           {!data?.shopName && (
-            <Flex alignItems="center" backgroundColor="red.50" p={1}>
-              <WarningIcon color="red.500" m={1} />
-              <Text fontSize="sm" fontWeight="bold" color="red.500">
+            <Alert status="error">
+              <AlertIcon />
+              <Text fontSize="sm" fontWeight="bold">
                 상점명이 아직 등록되지 않았습니다.
               </Text>
-            </Flex>
+            </Alert>
           )}
           <FormControl isInvalid={!!errors.shopName} m={2} mt={6}>
             <FormLabel fontSize="md">상점명</FormLabel>
             <FormHelperText>
-              상품을 등록하기 전에 고객에게 보여질 상점명을 등록하세요.
+              고객에게 보여질 상점명(브랜드명)을 등록하세요.
             </FormHelperText>
             <Input
               id="shopName"
@@ -118,13 +111,13 @@ export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
               })}
               ref={initialRef}
             />
-            <FormErrorMessage mt={1}>
+            <FormErrorMessage>
               {errors.shopName && errors.shopName.message}
             </FormErrorMessage>
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Button size="sm" type="submit" isLoading={isSubmitting}>
+          <Button type="submit" isLoading={isSubmitting}>
             등록하기
           </Button>
         </ModalFooter>
