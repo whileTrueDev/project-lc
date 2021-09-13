@@ -14,15 +14,15 @@ export class OverlayService {
       },
     };
     const client = new textToSpeech.TextToSpeechClient(options);
-    const { userId } = purchaseData;
+    const { nickname } = purchaseData;
     const { productName } = purchaseData;
     const quantity = purchaseData.purchaseNum;
-    const { text } = purchaseData;
+    const { message } = purchaseData;
 
     // 추후 선택기능 넣을 예정
     const messageWithAppreciate = `
     <speak>
-      ${userId}님 ${productName} ${quantity}원 구매 감사합니다 <break time="0.4s"/> ${text}
+      ${nickname}님 ${productName} ${quantity}원 구매 감사합니다 <break time="0.4s"/> ${message}
     </speak>
     `;
 

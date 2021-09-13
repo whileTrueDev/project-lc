@@ -258,10 +258,10 @@ socket.on('get top-left ranking', (data) => {
 });
 
 socket.on('get right-top purchase message', async (data) => {
-  const alarmType = data[0].icon;
-  const { userId } = data[0];
+  const alarmType = data[0].level;
+  const { nickname } = data[0];
   const { productName } = data[0];
-  const { text } = data[0];
+  const { message } = data[0];
   const num = data[0].purchaseNum;
   let audioBlob;
 
@@ -282,7 +282,7 @@ socket.on('get right-top purchase message', async (data) => {
       }" class="donation-image"/>
         <div class ="animated heartbeat" id="donation-top">
           <span id="nickname">
-            <span class="animated heartbeat" id="donation-user-id">${userId}</span>
+            <span class="animated heartbeat" id="donation-user-id">${nickname}</span>
             <span class="donation-sub">님 ${productName}</span>
             <span class="animated heartbeat" id="donation-num">${num}</span>
             <span class="donation-sub">원 구매!</span>
@@ -290,7 +290,7 @@ socket.on('get right-top purchase message', async (data) => {
         </div>
         <div class="animated tada delay-1s" id="donation-message">
           <span id="message">
-            ${text}
+            ${message}
           </span>
         </div>
       </div>
@@ -301,7 +301,7 @@ socket.on('get right-top purchase message', async (data) => {
 });
 
 socket.on('get non client purchase message', async (data) => {
-  const { userId } = data;
+  const { nickname } = data;
   const { productName } = data;
   const price = data.purchaseNum;
 
@@ -312,7 +312,7 @@ socket.on('get non client purchase message', async (data) => {
     <div class="centered">
       <div class ="animated heartbeat" id="donation-top">
         <span id="nickname">
-          <span class="animated heartbeat" id="donation-user-id">${userId}</span>
+          <span class="animated heartbeat" id="donation-user-id">${nickname}</span>
           <span class="donation-sub">님 ${productName}</span>
           <span class="animated heartbeat" id="donation-num">${price
             .toString()

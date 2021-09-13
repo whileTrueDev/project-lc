@@ -193,8 +193,8 @@ export class AppGateway
   @SubscribeMessage('bottom area message')
   handleBottomAreaReply(@MessageBody() data: RoomAndText) {
     const { roomName } = data;
-    const { text } = data;
-    this.server.to(roomName).emit('get bottom area message', text);
+    const { message } = data;
+    this.server.to(roomName).emit('get bottom area message', message);
   }
 
   @SubscribeMessage('toggle bottom area from admin')

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { throwError } from 'rxjs';
-import { NickNameAndPrice, PriceSum, NickNameAndText } from '@project-lc/shared-types';
+import { NicknameAndPrice, PriceSum, NicknameAndText } from '@project-lc/shared-types';
 @Injectable()
 export class AppService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getRanking(): Promise<NickNameAndPrice[]> {
+  async getRanking(): Promise<NicknameAndPrice[]> {
     const topRanks = await this.prisma.liveCommerceRanking.groupBy({
       by: ['nickname'],
       where: {
@@ -32,7 +32,7 @@ export class AppService {
     return totalSoldPrice;
   }
 
-  async getMessageAndNickname(): Promise<NickNameAndText[]> {
+  async getMessageAndNickname(): Promise<NicknameAndText[]> {
     const messageAndNickname = await this.prisma.liveCommerceRanking.findMany({
       select: {
         nickname: true,
