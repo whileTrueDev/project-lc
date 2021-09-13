@@ -192,11 +192,12 @@ export function OrderList(): JSX.Element {
         bg={dataGridBgColor}
         autoHeight
         rowsPerPageOptions={[10, 20, 50, 100]}
+        disableSelectionOnClick
+        disableColumnMenu
         loading={orders.isLoading}
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
         rows={orders.data || []}
         checkboxSelection
-        disableSelectionOnClick
         selectionModel={fmOrderStates.selectedOrders}
         onSelectionModelChange={fmOrderStates.handleOrderSelected}
         components={{

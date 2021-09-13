@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["selectRelationCount", "orderByRelation", "referentialActions"]
 }
 
 // generator docs {
@@ -12,13 +13,56 @@ datasource db {
 }
 
 model Seller {
-  id             Int                   @id @default(autoincrement())
-  email          String                @unique
-  name           String?
-  password       String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
-  socialAccounts SellerSocialAccount[]
-  goods          Goods[]
-  loginHistory   LoginHistory[]
+  id                         Int                          @id @default(autoincrement())
+  email                      String                       @unique
+  name                       String?
+  password                   String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
+  socialAccounts             SellerSocialAccount[]
+  goods                      Goods[]
+  loginHistory               LoginHistory[]
+  sellerBusinessRegistration SellerBusinessRegistration[]
+  sellerSettlements          SellerSettlements[]
+  sellerSettlementAccount    SellerSettlementAccount[]
+}
+
+// 마케터의 사업자 등록증을 위한 모델 seller와 1 : N의 관계를 가지므로
+model SellerBusinessRegistration {
+  id                         Int    @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
+  sellerEmail                String // 등록한 판매자 ID 
+  companyName                String // 상호명
+  businessRegistrationNumber String // 사업자등록증 등록번호
+  representativeName         String // 대표자명
+  businessType               String // 업태
+  businessItem               String // 종목
+  businessAddress            String // 사업장 주소
+  taxInvoiceMail             String // 세금계산서 전용 이메일
+  fileName                   String // 등록된 s3 파일명
+
+  seller Seller @relation(fields: [sellerEmail], references: [email])
+  @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
+}
+
+// 정산 내역
+model SellerSettlements {
+  id          Int      @id @default(autoincrement()) // 정산 내역 고유 번호
+  sellerEmail String // 등록한 판매자 ID 
+  date        DateTime @default(now()) // 정산 시점
+  state       Int      @default(0) @db.UnsignedTinyInt // 정산 상태
+  amount      Int      @default(0)
+  seller      Seller   @relation(fields: [sellerEmail], references: [email])
+
+  @@index(name: "SellerSettlementsIndex", fields: [sellerEmail, id])
+}
+
+model SellerSettlementAccount {
+  id          Int    @id @default(autoincrement()) // 정산 내역 고유 번호
+  sellerEmail String // 등록한 판매자 ID 
+  bank        String
+  number      String
+  name        String
+
+  seller Seller @relation(fields: [sellerEmail], references: [email])
+  @@index(name: "SellerSettlementAccountIndex", fields: [sellerEmail, id])
 }
 
 model MailVerificationCode {
@@ -36,8 +80,7 @@ model SellerSocialAccount {
   profileImage String?
   accessToken  String?
   refreshToken String?
-  /// @onDelete(CASCADE)
-  seller       Seller   @relation(fields: [sellerId], references: [id])
+  seller       Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   sellerId     Int
 }
 
@@ -47,7 +90,7 @@ model SellerSocialAccount {
 model Goods {
   id                      Int                @id @default(autoincrement())
   sellerId                Int
-  seller                  Seller             @relation(fields: [sellerId], references: [id])
+  seller                  Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   options                 GoodsOptions[]
   confirmation            GoodsConfirmation? // 상품 검수
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
@@ -76,13 +119,17 @@ model Goods {
   option_suboption_use    String             @default("0") // 추가 옵션 사용 여부 "0" or "1"
   member_input_use        String             @default("0") // 추가 구성 옵션 사용 여부 "0" or "1"
   image                   String // 상품 이미지 - fm_goods_image
+  goods_view              GoodsView          @default(look) // 노출
+  regist_date             DateTime           @default(now()) // 상품등록일 (project-lc 에 판매자가 등록한 날짜)
+  update_date             DateTime           @default(now()) @updatedAt // 수정일 (퍼스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서 수정한 날짜)
+  runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
 }
 
 // 상품 검수 정보
 model GoodsConfirmation {
-  id                         Int                       @id
+  id                         Int                       @id @default(autoincrement())
   goodsId                    Int
-  goods                      Goods                     @relation(fields: [goodsId], references: [id])
+  goods                      Goods                     @relation(fields: [goodsId], references: [id], onDelete: Cascade)
   status                     GoodsConfirmationStatuses @default(waiting) // 검수 상태
   firstmallGoodsConnectionId Int? // 퍼스트몰 상품 고유 ID (fm_goods.goods_seq)
 }
@@ -97,13 +144,14 @@ enum GoodsConfirmationStatuses {
 // 상품 옵션 - fm_goods_option
 model GoodsOptions {
   id             Int                    @id @default(autoincrement())
-  goods          Goods                  @relation(fields: [goodsId], references: [id])
+  goods          Goods                  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
   goodsId        Int
   supply         GoodsOptionsSupplies[]
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   default_option YesOrNo                @default(n) // 옵션 필수 여부
   option_type    String                 @default("direct") // 기본값인듯? 설명도 direct
-  option_title   String? // 옵션명
+  option_title   String? // 옵션명 fm_goods_options.option_title
+  option1        String? // 옵션값 fm_goods_options.option1
   option_code    String? // 옵션코드
   consumer_price Decimal                @db.Decimal(10, 2) // 소비자가 (미할인가)
   price          Decimal                @db.Decimal(10, 2) // 판매가 (할인가)
@@ -115,7 +163,7 @@ model GoodsOptions {
 // 상품 옵션 재고 - fm_goods_suply
 model GoodsOptionsSupplies {
   id             Int          @id @default(autoincrement())
-  goodsOptions   GoodsOptions @relation(fields: [goodsOptionsId], references: [id])
+  goodsOptions   GoodsOptions @relation(fields: [goodsOptionsId], references: [id], onDelete: Cascade)
   goodsOptionsId Int
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   stock          Int          @db.UnsignedInt // 재고
@@ -125,10 +173,23 @@ model GoodsOptionsSupplies {
 
 // * 상품 - 상태
 enum GoodsStatus {
-  normal
-  runout
-  purchasing
-  unsold
+  normal // 정상
+  runout // 품절
+  purchasing // 재고확보중
+  unsold // 판매중지
+}
+
+// * 상품 - 노출
+enum GoodsView {
+  look // 노출
+  notLook // 미노출
+}
+
+// * 상품 - 재고 정책 (재고판매)
+enum RunoutPolicy {
+  stock //재고
+  ableStock //가용재고
+  unlimited //무제한
 }
 
 // * 상품 - 배송 정책 선택
@@ -138,15 +199,15 @@ enum ShopOrGoods {
   goods
 }
 
-// * 상품 - 개별 배송비 선택
-// * 상품 - 최소 구매 수량 사용 여부
-// * 상품 - 최대 구매 수량 사용 여부
+// * 상��� - 개별 배송비 선택
+// * 상품 - ���소 구매 수량 사용 여부
+// * 상�� - 최대 ���매 ���량 사용 ����부
 enum LimitOrUnlimit {
   unlimit
   limit
 }
 
-// * 상품 - 필수옵션-분리/합체형 구분
+// * �����품 - 필수옵션-분리/합체형 구분
 enum OptionViewType {
   divide
   join
@@ -158,7 +219,7 @@ enum YesOrNo {
   n
 }
 
-// * 옵션 노출 여부
+// * 옵션 ���출 여부
 enum YesOrNo_UPPERCASE {
   Y
   N
