@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, FormControl, Input, Select, Stack, Text } from '@chakra-ui/react';
 import { ShippingOptType, ShippingSetType } from '@prisma/client';
+import { MAX_COST } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -194,6 +195,7 @@ export function ShippingOptionRepeatApply({
             <FormControlInputWrapper id="firstSectionStart" suffix={`${suffix} 이상`}>
               <Input
                 type="number"
+                max={MAX_COST}
                 {...register('firstSectionStart', {
                   required: '시작값을 입력해주세요',
                   valueAsNumber: true,
@@ -207,6 +209,7 @@ export function ShippingOptionRepeatApply({
             <FormControlInputWrapper id="firstSectionEnd" suffix={`${suffix} 미만`}>
               <Input
                 type="number"
+                max={MAX_COST}
                 {...register('firstSectionEnd', {
                   valueAsNumber: true,
                   validate: {
@@ -227,6 +230,7 @@ export function ShippingOptionRepeatApply({
           <CostInputWrapper id="firstCost" suffix={suffix}>
             <Input
               type="number"
+              max={MAX_COST}
               {...register('firstCost', {
                 required: '배송비를 입력해주세요',
                 valueAsNumber: true,
@@ -251,6 +255,7 @@ export function ShippingOptionRepeatApply({
             <FormControlInputWrapper id="secondSectionStart" suffix={`${suffix} 부터는`}>
               <Input
                 type="number"
+                max={MAX_COST}
                 {...register('secondSectionStart', {
                   required: '시작값을 입력해주세요',
                   valueAsNumber: true,
@@ -264,6 +269,7 @@ export function ShippingOptionRepeatApply({
             <FormControlInputWrapper id="secondSectionEnd" suffix={`${suffix} 당`}>
               <Input
                 type="number"
+                max={MAX_COST}
                 {...register('secondSectionEnd', {
                   valueAsNumber: true,
                   validate: {
@@ -277,6 +283,7 @@ export function ShippingOptionRepeatApply({
           <CostInputWrapper id="secondCost" suffix={suffix}>
             <Input
               type="number"
+              max={MAX_COST}
               maxLength={11}
               {...register('secondCost', {
                 required: '배송비를 입력해주세요',

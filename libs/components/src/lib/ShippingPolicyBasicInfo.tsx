@@ -73,7 +73,7 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
     <SectionWithTitle title="기본정보">
       {/* 배송그룹명 */}
       <ShippingPolicyFormControlWithLabel id="shipping-group-name" label="배송그룹명">
-        <Input value={groupName} onChange={setGroupName} />
+        <Input value={groupName} onChange={setGroupName} maxLength={16} />
       </ShippingPolicyFormControlWithLabel>
 
       {/* 배송비 계산 기준 */}
@@ -156,6 +156,7 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
           <Input
             id="postal-code-return-address"
             placeholder="상세주소"
+            maxLength={255}
             value={detailAddress}
             onChange={setDetailAddress}
           />

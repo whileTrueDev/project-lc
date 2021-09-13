@@ -5,6 +5,7 @@ import {
   ShippingSetType,
 } from '@prisma/client';
 import {
+  MAX_COST,
   ShippingOptionDto,
   ShippingSetCodeOptions,
   ShippingSetDto,
@@ -75,14 +76,14 @@ export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, g
     const refundShippingCost = Number(e.currentTarget.value);
     set((state) => ({
       ...state,
-      refund_shiping_cost: refundShippingCost,
+      refund_shiping_cost: Math.min(refundShippingCost, MAX_COST),
     }));
   },
   setSwapShippingCost: (e: React.ChangeEvent<HTMLInputElement>) => {
     const swapShippingCost = Number(e.currentTarget.value);
     set((state) => ({
       ...state,
-      swap_shiping_cost: swapShippingCost,
+      swap_shiping_cost: Math.min(swapShippingCost, MAX_COST),
     }));
   },
   setShipingFreeFlag: (e: React.ChangeEvent<HTMLInputElement>) => {

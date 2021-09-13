@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, FormControl, Input, Select, Stack, Text } from '@chakra-ui/react';
 import { ShippingOptType, ShippingSetType } from '@prisma/client';
-import { ShippingCostDto, ShippingOptionDto } from '@project-lc/shared-types';
+import { MAX_COST, ShippingCostDto, ShippingOptionDto } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -106,6 +106,7 @@ export function ShippingOptionIntervalApply({
             <FormControlInputWrapper id="section_st" suffix={`${suffix} 이상`}>
               <Input
                 type="number"
+                max={MAX_COST}
                 {...register('section_st', {
                   required: '시작값을 입력해주세요',
                   valueAsNumber: true,
@@ -120,6 +121,7 @@ export function ShippingOptionIntervalApply({
             <FormControlInputWrapper id="section_ed" suffix={`${suffix} 미만`}>
               <Input
                 type="number"
+                max={MAX_COST}
                 {...register('section_ed', {
                   valueAsNumber: true,
                   validate: {
@@ -170,6 +172,7 @@ export function ShippingOptionIntervalApply({
               <Stack direction="row" alignItems="center">
                 <Input
                   type="number"
+                  max={MAX_COST}
                   {...register('shipping_cost', {
                     required: '배송비를 입력해주세요',
                     validate: {

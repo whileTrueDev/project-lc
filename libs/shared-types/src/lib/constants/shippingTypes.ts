@@ -9,7 +9,7 @@ import {
 import { ShippingOptionDto } from '../dto/shippingOption.dto';
 import { ShippingSetDto } from '../dto/shippingSet.dto';
 
-// 배송비 계산 기준
+// 배송비 계산 기준 -----------------------------------------------
 export const ShippingCalculTypes: ShippingCalculType[] = ['bundle', 'each', 'free'];
 export const ShippingCalculTypeOptions: Record<ShippingCalculType, { label: string }> = {
   bundle: { label: '묶음계산-묶음배송' },
@@ -17,7 +17,10 @@ export const ShippingCalculTypeOptions: Record<ShippingCalculType, { label: stri
   free: { label: '무료계산-묶음배송' },
 };
 
-// 배송방법
+// 최대 배송비 입력값-----------------------------------------------
+export const MAX_COST = 999999999;
+
+// 배송방법 -----------------------------------------------
 export const ShippingSetCodeOptions = {
   delivery: { label: '택배' },
   direct_delivery: { label: '직접배송' },
@@ -35,7 +38,7 @@ export const ShippingSetCodes: Array<ShippingSetCode> = [
   'custom',
 ];
 
-// 선불/착불정보 fm_shipping_set.prepay_info
+// 선불/착불정보 fm_shipping_set.prepay_info -----------------------------------------------
 export const PrepayInfoOptions = {
   all: { label: '착불/선불' },
   delivery: { label: '선불' },

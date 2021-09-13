@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, Input, Select, Stack, Text } from '@chakra-ui/react';
 import { ShippingSetType } from '@prisma/client';
-import { ShippingCostDto, ShippingOptionDto } from '@project-lc/shared-types';
+import { MAX_COST, ShippingCostDto, ShippingOptionDto } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useCallback, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -104,6 +104,7 @@ export function ShippingOptionFixedApply({
         <Input
           width="100px"
           type="number"
+          max={MAX_COST}
           {...register('shipping_cost', {
             required: '배송비를 입력해주세요',
             valueAsNumber: true,
