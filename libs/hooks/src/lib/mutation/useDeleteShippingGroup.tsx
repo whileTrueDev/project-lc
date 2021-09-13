@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import axios from '../../axios';
 
 export type useDeleteShippingGroupDto = { groupId: number };
-export type useDeleteShippingGroupRes = any;
+export type useDeleteShippingGroupRes = boolean;
 
 export const useDeleteShippingGroup = () => {
   const queryClient = useQueryClient();
@@ -11,7 +11,6 @@ export const useDeleteShippingGroup = () => {
       axios.delete<useDeleteShippingGroupRes>('/shipping-group', { data: dto }),
     {
       onSuccess: (data) => {
-        console.log(data);
         queryClient.invalidateQueries('ShippingGroupList');
       },
     },

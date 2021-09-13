@@ -104,6 +104,7 @@ export class ShippingGroupService {
 
   // 배송그룹 삭제
   async deleteShippingGroup(groupId: number) {
-    return this.prisma.shippingGroup.delete({ where: { id: groupId } });
+    await this.prisma.shippingGroup.delete({ where: { id: groupId } });
+    return true;
   }
 }
