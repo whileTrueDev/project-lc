@@ -7,7 +7,7 @@ export class ShippingGroupDto implements Omit<ShippingGroup, 'id' | 'sellerId'> 
   @IsString()
   shipping_group_name: string;
 
-  @IsString()
+  @IsIn(['free', 'bundle', 'each'])
   shipping_calcul_type: ShippingCalculType;
 
   @IsIn(['Y', 'N'])
