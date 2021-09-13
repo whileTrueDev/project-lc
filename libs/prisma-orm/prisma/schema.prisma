@@ -308,14 +308,14 @@ enum DeliveryNation {
 
 // 배송 방법 테이블 fm_shipping_option 참고
 model ShippingOption {
-  id                Int               @id @default(autoincrement())
+  id                Int                @id @default(autoincrement())
   shippingCost      ShippingCost[]
-  shippingSet       ShippingSet       @relation(fields: [shipping_set_seq], references: [id], onDelete: Cascade)
+  shippingSet       ShippingSet        @relation(fields: [shipping_set_seq], references: [id], onDelete: Cascade)
   // 이하 퍼스트몰 fm_shipping_option 과 동일한 컬럼
   shipping_set_seq  Int
-  shipping_set_type ShippingSetType   @default(std) // 배송설정 타입 std - 기본 / add - 추가
-  shipping_opt_type ShippingOptType   @default(free) //'배송방법 타입 free - 무료 / fixed - 고정 / amount - 금액 / cnt - 수량 / weight - 무게',
-  default_yn        YesOrNo_UPPERCASE @default(N) // 기본 옵션인지 여부
+  shipping_set_type ShippingSetType    @default(std) // 배송설정 타입 std - 기본 / add - 추가
+  shipping_opt_type ShippingOptType    @default(free) //'배송방법 타입 free - 무료 / fixed - 고정 / amount - 금액 / cnt - 수량 / weight - 무게',
+  default_yn        YesOrNo_UPPERCASE? @default(N) // 기본 옵션인지 여부
   section_st        Float? // 시작구간(무게, 금액, 수량)
   section_ed        Float? // 끝구간(무게, 금액, 수량)
 
