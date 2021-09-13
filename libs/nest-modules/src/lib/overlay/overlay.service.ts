@@ -63,9 +63,7 @@ export class OverlayService {
     const topRanks = await this.prisma.liveCommerceRanking.groupBy({
       by: ['nickname'],
       where: {
-        loginFlag: {
-          not: '0',
-        },
+        loginFlag: true,
       },
       _sum: {
         price: true,
