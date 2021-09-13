@@ -1,8 +1,7 @@
 /* eslint-disable camelcase */
 import { ShippingCalculType, ShippingGroup, YesOrNo_UPPERCASE } from '@prisma/client';
-import { IsString } from 'class-validator';
+import { IsIn, IsString, ValidateNested } from 'class-validator';
 import { TempShippingSet } from '../constants/shippingTypes';
-// import { IsNumber } from 'class-validator';
 
 export class ShippingGroupDto implements Omit<ShippingGroup, 'id' | 'sellerId'> {
   @IsString()
@@ -11,13 +10,13 @@ export class ShippingGroupDto implements Omit<ShippingGroup, 'id' | 'sellerId'> 
   @IsString()
   shipping_calcul_type: ShippingCalculType;
 
-  @IsString()
+  @IsIn(['Y', 'N'])
   shipping_calcul_free_yn: YesOrNo_UPPERCASE | null;
 
-  @IsString()
+  @IsIn(['Y', 'N'])
   shipping_std_free_yn: YesOrNo_UPPERCASE | null;
 
-  @IsString()
+  @IsIn(['Y', 'N'])
   shipping_add_free_yn: YesOrNo_UPPERCASE | null;
 
   @IsString()
@@ -29,5 +28,6 @@ export class ShippingGroupDto implements Omit<ShippingGroup, 'id' | 'sellerId'> 
   @IsString()
   postalCode: string;
 
+  @ValidateNested({ each: true })
   shippingSets: TempShippingSet[];
 }

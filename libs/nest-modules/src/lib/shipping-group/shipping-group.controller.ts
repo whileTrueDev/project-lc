@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Post,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ShippingGroupDto } from '@project-lc/shared-types';
 import { UserPayload } from '../auth/auth.interface';
@@ -28,9 +29,7 @@ export class ShippingGroupController {
   @Post()
   createShippingGroup(
     @SellerInfo() sellerInfo: UserPayload,
-    // @Body(ValidationPipe) dto: ShippingGroup,
-    // TODO: ValidationPipe 적용시 localhost:4200/login으로 리다이렉팅됨.. 밸리데이션 적용 필요(원인 아직 못찾음)
-    @Body() dto: ShippingGroupDto,
+    @Body(ValidationPipe) dto: ShippingGroupDto,
   ) {
     return this.shippingGroupService.createShippingGroup(sellerInfo.sub, dto);
   }
