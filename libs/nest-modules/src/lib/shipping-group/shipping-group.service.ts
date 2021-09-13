@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { ShippingGroup, ShippingOption, ShippingSet } from '@project-lc/shared-types';
+import {
+  ShippingGroupDto,
+  ShippingOptionDto,
+  ShippingSetDto,
+} from '@project-lc/shared-types';
 
 @Injectable()
 export class ShippingGroupService {
@@ -18,7 +22,7 @@ export class ShippingGroupService {
   }
 
   // 배송옵션, 배송가격 생성 &  배송방법에 연결
-  async createShippingOption(setId: number, dto: ShippingOption) {
+  async createShippingOption(setId: number, dto: ShippingOptionDto) {
     const { shippingCost, ...shippingOption } = dto;
 
     const option = await this.prisma.shippingOption.create({
@@ -34,7 +38,7 @@ export class ShippingGroupService {
   }
 
   // 여러 배송옵션 생성 && 배송방법에 연결
-  async createShippingOptions(setId: number, shippingOptions: ShippingOption[]) {
+  async createShippingOptions(setId: number, shippingOptions: ShippingOptionDto[]) {
     await Promise.all(
       shippingOptions.map(async (option) => {
         await this.createShippingOption(setId, option);
@@ -43,7 +47,7 @@ export class ShippingGroupService {
   }
 
   // 배송설정 생성 && 배송그룹에 연결
-  async createShippingSet(groupId: number, dto: ShippingSet) {
+  async createShippingSet(groupId: number, dto: ShippingSetDto) {
     const { shippingOptions, ...shippingSet } = dto;
 
     const set = await this.prisma.shippingSet.create({
@@ -53,13 +57,19 @@ export class ShippingGroupService {
       },
     });
 
-    await this.createShippingOptions(set.id, shippingOptions);
+    const options: ShippingOptionDto[] = shippingOptions.map((opt) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { tempId, ...values } = opt;
+      return { ...values };
+    });
+
+    await this.createShippingOptions(set.id, options);
 
     return set;
   }
 
   // 여러 배송설정 생성 && 배송그룹에 연결
-  async createShippingSets(groupId: number, shippingSets: ShippingSet[]) {
+  async createShippingSets(groupId: number, shippingSets: ShippingSetDto[]) {
     await Promise.all(
       shippingSets.map(async (set) => {
         await this.createShippingSet(groupId, set);
@@ -69,7 +79,7 @@ export class ShippingGroupService {
 
   // 배송그룹 생성
   // 해당 함수 내부에서 배송설정 생성 -> 배송옵션 생성 -> 배송가격 생성을 순차적으로 호출함
-  async createShippingGroup(sellerEmail: string, dto: ShippingGroup) {
+  async createShippingGroup(sellerEmail: string, dto: ShippingGroupDto) {
     const { shippingSets, ...shippingGroup } = dto;
 
     const group = await this.prisma.shippingGroup.create({
@@ -82,7 +92,13 @@ export class ShippingGroupService {
       },
     });
 
-    await this.createShippingSets(group.id, shippingSets);
+    const sets: ShippingSetDto[] = shippingSets.map((set) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { tempId, ...values } = set;
+      return { ...values };
+    });
+
+    await this.createShippingSets(group.id, sets);
     return group;
   }
 

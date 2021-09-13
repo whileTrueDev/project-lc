@@ -7,8 +7,10 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard, SellerInfo, UserPayload } from '@project-lc/nest-modules';
-import { ShippingGroup } from '@project-lc/shared-types';
+import { ShippingGroupDto } from '@project-lc/shared-types';
+import { UserPayload } from '../auth/auth.interface';
+import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { ShippingGroupService } from './shipping-group.service';
 
 @UseGuards(JwtAuthGuard)
@@ -28,7 +30,7 @@ export class ShippingGroupController {
     @SellerInfo() sellerInfo: UserPayload,
     // @Body(ValidationPipe) dto: ShippingGroup,
     // TODO: ValidationPipe 적용시 localhost:4200/login으로 리다이렉팅됨.. 밸리데이션 적용 필요(원인 아직 못찾음)
-    @Body() dto: ShippingGroup,
+    @Body() dto: ShippingGroupDto,
   ) {
     return this.shippingGroupService.createShippingGroup(sellerInfo.sub, dto);
   }
