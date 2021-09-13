@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@project-lc/prisma-orm';
 import * as textToSpeech from '@google-cloud/text-to-speech';
-import { Voice, AudioEncoding } from '@project-lc/shared-types';
+import {
+  Voice,
+  AudioEncoding,
+  NicknameAndPrice,
+  PriceSum,
+  NicknameAndText,
+} from '@project-lc/shared-types';
+import { throwError } from 'rxjs';
 
 @Injectable()
 export class OverlayService {
+  constructor(private readonly prisma: PrismaService) {}
   async googleTextToSpeech(purchaseData) {
     const privateKey =
       process.env.GOOGLE_CREDENTIALS_PRIVATE_KEY?.replace(/\\n/g, '\n') || '';
@@ -25,12 +34,6 @@ export class OverlayService {
       ${nickname}님 ${productName} ${quantity}원 구매 감사합니다 <break time="0.4s"/> ${message}
     </speak>
     `;
-
-    // const messageOnlyMessage = `
-    //   <speak>
-    //     ${text}
-    //   </speak>
-    // `
 
     const audioConfig: AudioEncoding = { speakingRate: 1.3, audioEncoding: 'MP3' };
     const voice: Voice = {
@@ -54,5 +57,42 @@ export class OverlayService {
       return response.audioContent;
     }
     return false;
+  }
+
+  async getRanking(): Promise<NicknameAndPrice[]> {
+    const topRanks = await this.prisma.liveCommerceRanking.groupBy({
+      by: ['nickname'],
+      where: {
+        loginFlag: {
+          not: '0',
+        },
+      },
+      _sum: {
+        price: true,
+      },
+    });
+    if (!topRanks) throwError('Cannot Get Data From Db');
+    return topRanks;
+  }
+
+  async getTotalSoldPrice(): Promise<PriceSum> {
+    const totalSoldPrice = await this.prisma.liveCommerceRanking.aggregate({
+      _sum: {
+        price: true,
+      },
+    });
+    if (!totalSoldPrice) throwError('Cannot Get Data From Db');
+    return totalSoldPrice;
+  }
+
+  async getMessageAndNickname(): Promise<NicknameAndText[]> {
+    const messageAndNickname = await this.prisma.liveCommerceRanking.findMany({
+      select: {
+        nickname: true,
+        text: true,
+      },
+    });
+    if (!messageAndNickname) throwError('Cannot Get Data From Db');
+    return messageAndNickname;
   }
 }

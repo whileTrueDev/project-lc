@@ -11,7 +11,6 @@ import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { SocketInfo, PurchaseMessage, RoomAndText } from '@project-lc/shared-types';
 import { OverlayService } from '@project-lc/nest-modules';
-import { AppService } from './app.service';
 
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
 export class AppMessageGateway
@@ -22,10 +21,7 @@ export class AppMessageGateway
 
   socketInfo: SocketInfo = {};
 
-  constructor(
-    private readonly appService: AppService,
-    private readonly overlayService: OverlayService,
-  ) {}
+  constructor(private readonly overlayService: OverlayService) {}
 
   private logger: Logger = new Logger('AppGateway');
 
@@ -56,9 +52,9 @@ export class AppMessageGateway
     const { roomName } = purchase;
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
-    const rankings = await this.appService.getRanking();
-    const totalSold = await this.appService.getTotalSoldPrice();
-    const messageAndNickname = await this.appService.getMessageAndNickname();
+    const rankings = await this.overlayService.getRanking();
+    const totalSold = await this.overlayService.getTotalSoldPrice();
+    const messageAndNickname = await this.overlayService.getMessageAndNickname();
 
     rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();

@@ -10,7 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { SocketInfo, RoomAndDate, RoomAndVideoType } from '@project-lc/shared-types';
-import { AppService } from './app.service';
+import { OverlayService } from '@project-lc/nest-modules';
 
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
 export class AppScreenGateway
@@ -21,7 +21,7 @@ export class AppScreenGateway
 
   socketInfo: SocketInfo = {};
 
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: OverlayService) {}
 
   private logger: Logger = new Logger('AppGateway');
 
