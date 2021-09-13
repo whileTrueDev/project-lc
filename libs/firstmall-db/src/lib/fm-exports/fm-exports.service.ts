@@ -492,13 +492,16 @@ export class FmExportsService {
   private async generateExportCode() {
     const PREFIX = 'D';
     const now = dayjs().format('YYMMDDH');
-    const [{ export_seq }] = await this.db.query(
+    const res = await this.db.query(
       `SELECT export_seq FROM ${this.EXPORT_TABLE} ORDER BY export_seq DESC LIMIT 1`,
     );
-    if (!export_seq) return `${PREFIX + now}1`;
-    const newId = Number(export_seq) + 1;
-
-    return PREFIX + now + newId;
+    if (res.length === 0) return `${PREFIX + now}1`;
+    if (res.length > 0) {
+      const { export_seq } = res[0];
+      const newId = Number(export_seq) + 1;
+      return PREFIX + now + newId;
+    }
+    return `${PREFIX + now}1`;
   }
 
   /**
@@ -509,12 +512,15 @@ export class FmExportsService {
   private async generateBundleCode() {
     const PREFIX = 'B';
     const now = dayjs().format('YYMMDDH');
-    const [{ export_seq }] = await this.db.query(
+    const res = await this.db.query(
       `SELECT export_seq FROM ${this.EXPORT_TABLE} ORDER BY export_seq DESC LIMIT 1`,
     );
-    if (!export_seq) return `${PREFIX + now}1`;
-    const newId = Number(export_seq) + 1;
-
-    return PREFIX + now + newId;
+    if (res.length === 0) return `${PREFIX + now}1`;
+    if (res.length > 0) {
+      const { export_seq } = res[0];
+      const newId = Number(export_seq) + 1;
+      return PREFIX + now + newId;
+    }
+    return `${PREFIX + now}1`;
   }
 }

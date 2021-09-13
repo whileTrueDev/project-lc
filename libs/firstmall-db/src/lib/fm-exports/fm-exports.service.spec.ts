@@ -7,6 +7,7 @@ import { FmExportsService } from './fm-exports.service';
 
 describe('FmExportsService', () => {
   let service: FmExportsService;
+  let db: FirstmallDbService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,6 +15,7 @@ describe('FmExportsService', () => {
     }).compile();
 
     service = module.get<FmExportsService>(FmExportsService);
+    db = module.get<FirstmallDbService>(FirstmallDbService);
   });
 
   it('should be defined', () => {
@@ -22,6 +24,7 @@ describe('FmExportsService', () => {
 
   describe('generateExportCode', () => {
     it('should return string', async () => {
+      jest.spyOn(db, 'query').mockImplementation(async () => []);
       const code = await service['generateExportCode']();
       expect(typeof code).toEqual('string');
       expect(code).toContain('D');
@@ -30,6 +33,7 @@ describe('FmExportsService', () => {
 
   describe('generateBundleCode', () => {
     it('should return string', async () => {
+      jest.spyOn(db, 'query').mockImplementation(async () => []);
       const code = await service['generateBundleCode']();
       expect(typeof code).toEqual('string');
       expect(code).toContain('B');
