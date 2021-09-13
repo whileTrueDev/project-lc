@@ -176,8 +176,9 @@ model LiveCommerceRanking {
   nickname           String   @default("비회원")
   text               String   @db.LongText
   price              Int
-  phoneCallEventFlag String   @default("0")
-  loginFlag          String   @default("0")
+  phoneCallEventFlag Boolean  @default(false)
+  loginFlag          Boolean  @default(true)
+  creatorId          String
   createdAt          DateTime @default(now())
 }
 
