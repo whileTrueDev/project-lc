@@ -60,7 +60,7 @@ export function TempShippingPolicy(): JSX.Element {
         <ModalOverlay />
         <ModalContent>
           <ModalCloseButton />
-          <ModalBody>
+          <ModalBody maxW="4xl" mx="auto">
             <ShippingPolicyForm onSuccess={closeHandler} />
           </ModalBody>
         </ModalContent>

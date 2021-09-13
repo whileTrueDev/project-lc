@@ -100,7 +100,7 @@ export function ShippingPolicySetForm({
             />
           </Stack>
 
-          {/* 배송 설정 코드  */}
+          {/* 배송 설정 코드 Select- 택배, 퀵서비스, 직접배송 등등 */}
           <Select onChange={setShippingSetCode}>
             {ShippingSetCodes.map((key) => (
               <option key={ShippingSetCodeOptions[key].label} value={key}>
@@ -109,7 +109,7 @@ export function ShippingPolicySetForm({
             ))}
           </Select>
 
-          {/* 선불/착불정보  */}
+          {/* 선불/착불정보 Radio */}
           <RadioGroup value={prepay_info} onChange={setPrepayInfo}>
             <Stack direction="row">
               {PrepayInfoTypes.map((key) => (

@@ -106,25 +106,27 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
           id="shipping-add-setting"
           label="배송비 추가 설정"
         >
-          <Stack spacing={10} direction="row">
+          <Stack spacing={2}>
             <Text as="span">
               무료계산-묶음배송 배송그룹이 적용된 상품과 함께 주문하면, 배송그룹으로
               계산된 배송비
             </Text>
-            <Checkbox
-              colorScheme="green"
-              isChecked={shippingStdFree}
-              onChange={setShippingStdFree}
-            >
-              기본 무료
-            </Checkbox>
-            <Checkbox
-              colorScheme="green"
-              isChecked={shippingAddFree}
-              onChange={setShippingAddFree}
-            >
-              추가 무료
-            </Checkbox>
+            <Stack direction="row">
+              <Checkbox
+                colorScheme="green"
+                isChecked={shippingStdFree}
+                onChange={setShippingStdFree}
+              >
+                기본 무료
+              </Checkbox>
+              <Checkbox
+                colorScheme="green"
+                isChecked={shippingAddFree}
+                onChange={setShippingAddFree}
+              >
+                추가 무료
+              </Checkbox>
+            </Stack>
           </Stack>
         </ShippingPolicyFormControlWithLabel>
       )}
