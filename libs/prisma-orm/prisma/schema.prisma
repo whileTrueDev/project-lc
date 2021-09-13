@@ -124,6 +124,8 @@ model Goods {
   regist_date             DateTime           @default(now()) // 상품등록일 (project-lc 에 판매자가 등록한 날짜)
   update_date             DateTime           @default(now()) @updatedAt // 수정일 (퍼스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서 수정한 날짜)
   runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
+  ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
+  shippingGroupId         Int?
 }
 
 // 상품 검수 정보
@@ -249,6 +251,7 @@ model ShippingGroup {
   baseAddress             String // 기본주소
   detailAddress           String // 상세주소
   postalCode              String // 우편번호
+  goods                   Goods[]
   // 이하 퍼스트몰 fm_shipping_grouping 과  동일한 컬럼
   shipping_group_name     String             @db.VarChar(255) // '배송그룹명',
   shipping_calcul_type    ShippingCalculType @default(bundle) // '배송비계산기준', free무료, bundle묶음, each개별 배송비 추가설정

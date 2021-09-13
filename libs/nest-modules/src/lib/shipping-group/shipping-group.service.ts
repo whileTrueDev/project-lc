@@ -18,6 +18,11 @@ export class ShippingGroupService {
           email,
         },
       },
+      include: {
+        _count: {
+          select: { goods: true },
+        },
+      },
     });
   }
 

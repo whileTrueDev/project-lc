@@ -50,7 +50,8 @@ export function TempShippingPolicy(): JSX.Element {
                 x
               </Button>
               <Text>배송그룹 명 : {group.shipping_group_name} , </Text>
-              <Text>배송비 계산 기준 : {group.shipping_calcul_type}</Text>
+              <Text>배송비 계산 기준 : {group.shipping_calcul_type} ,</Text>
+              <Text>연결된 상품 개수 : {group._count.goods}</Text>
             </Stack>
           ))}
       </Stack>
