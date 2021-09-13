@@ -7,9 +7,9 @@ import {
   ShippingSetCode,
   YesOrNo_UPPERCASE,
 } from '.prisma/client';
-import { ShippingOption } from './shippingOption.dto';
+import { ShippingSetDtoType, TempShippingOption } from '../constants/shippingTypes';
 
-export class ShippingSet {
+export class ShippingSetDto implements ShippingSetDtoType {
   @IsString()
   shipping_set_code: ShippingSetCode;
 
@@ -20,7 +20,7 @@ export class ShippingSet {
   prepay_info: PrepayInfo;
 
   @IsString()
-  default_yn?: YesOrNo_UPPERCASE;
+  default_yn: YesOrNo_UPPERCASE | null;
 
   @IsString()
   delivery_nation: DeliveryNation;
@@ -29,13 +29,13 @@ export class ShippingSet {
   delivery_limit: LimitOrUnlimit;
 
   @IsNumber()
-  refund_shiping_cost?: number;
+  refund_shiping_cost: number | null;
 
   @IsNumber()
-  swap_shiping_cost?: number;
+  swap_shiping_cost: number | null;
 
   @IsString()
   shiping_free_yn: YesOrNo_UPPERCASE;
 
-  shippingOptions: ShippingOption[];
+  shippingOptions: TempShippingOption[];
 }

@@ -1,4 +1,13 @@
-import { ShippingCalculType } from '../front-type/shippingPolicyFormType';
+/* eslint-disable camelcase */
+import {
+  PrepayInfo,
+  ShippingCalculType,
+  ShippingCost,
+  ShippingSet,
+  ShippingSetCode,
+} from '@prisma/client';
+import { ShippingOptionDto } from '../dto/shippingOption.dto';
+import { ShippingSetDto } from '../dto/shippingSet.dto';
 
 // 배송비 계산 기준
 export const ShippingCalculTypes: ShippingCalculType[] = ['bundle', 'each', 'free'];
@@ -17,7 +26,7 @@ export const ShippingSetCodeOptions = {
   direct_store: { label: '매장수령' },
   custom: { label: '직접입력' },
 };
-export const ShippingSetCodes: Array<keyof typeof ShippingSetCodeOptions> = [
+export const ShippingSetCodes: Array<ShippingSetCode> = [
   'delivery',
   'direct_delivery',
   'quick',
@@ -33,8 +42,24 @@ export const PrepayInfoOptions = {
   postpaid: { label: '착불' },
 };
 
-export const PrepayInfoTypes: Array<keyof typeof PrepayInfoOptions> = [
-  'delivery',
-  'postpaid',
-  'all',
-];
+export const PrepayInfoTypes: Array<PrepayInfo> = ['delivery', 'postpaid', 'all'];
+
+// dto 타입 ---------------------------------------------------------------------
+export type TempShippingOption = ShippingOptionDto & { tempId: number };
+
+export type ShippingSetDtoType = Omit<
+  ShippingSet,
+  'id' | 'shipping_group_seq' | 'refund_shiping_cost' | 'swap_shiping_cost'
+> & {
+  refund_shiping_cost: number | null;
+  swap_shiping_cost: number | null;
+};
+
+export type TempShippingSet = ShippingSetDto & { tempId: number };
+
+export type ShippingCostDtoType = Omit<
+  ShippingCost,
+  'id' | 'shipping_opt_seq' | 'shipping_cost'
+> & {
+  shipping_cost: number;
+};
