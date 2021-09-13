@@ -115,13 +115,16 @@ export class FmExportsService {
 
     // * 일괄 출고 처리된 출고를 합포장으로 변경 처리
     const res = await this.db.transactionQuery(async (conn) => {
-      return Promise.all(
+      const r = await Promise.all(
         exportQueries.map((eq) => {
           return eq.map(({ sql, sqlParams }) =>
             conn.query(sql, sqlParams).then(() => true),
           );
         }),
       );
+
+      await conn.commit();
+      return r;
     });
 
     return res.every((arr) => arr.every((x) => !!x));

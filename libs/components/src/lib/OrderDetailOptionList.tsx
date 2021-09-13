@@ -1,25 +1,24 @@
 import {
-  Text,
   Box,
   Collapse,
   Stack,
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useMemo } from 'react';
 import { useDisplaySize } from '@project-lc/hooks';
 import {
   convertFmOrderShippingTypesToString,
-  convertFmOrderStatusToString,
   FindFmOrderDetailRes,
   FmOrderOption,
 } from '@project-lc/shared-types';
-import { ShowMoreTextButton, TextDotConnector, FmOrderStatusBadge } from '..';
+import { useMemo } from 'react';
+import { FmOrderStatusBadge, ShowMoreTextButton, TextDotConnector } from '..';
 
 /** 주문 옵션 목록 */
 export function OrderDetailOptionList({
@@ -43,7 +42,6 @@ export function OrderDetailOptionList({
     </Box>
   );
 }
-
 /** 주문 옵션 목록 아이템 */
 export function OrderDetailOptionListItem({
   option,
@@ -133,7 +131,7 @@ export function OrderDetailOptionDescription({
                         {opt.title1}: {opt.option1}
                       </Td>
                     ) : (
-                      <Td>{order.goods_name}</Td>
+                      <Td>{opt.goods_name}</Td>
                     )}
                     <Td>{opt.ea} 개</Td>
                     <Td>{opt.step35}</Td>

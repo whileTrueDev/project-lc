@@ -187,10 +187,11 @@ export function OrderList(): JSX.Element {
   const dataGridBgColor = useColorModeValue('inherit', 'gray.300');
 
   return (
-    <Box minHeight={{ base: 300, md: 600 }} height={{ base: 300, md: 600 }} mb={24}>
+    <Box minHeight={{ base: 300, md: 600 }} mb={24}>
       <ChakraDataGrid
         bg={dataGridBgColor}
         autoHeight
+        rowsPerPageOptions={[10, 20, 50, 100]}
         loading={orders.isLoading}
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
         rows={orders.data || []}

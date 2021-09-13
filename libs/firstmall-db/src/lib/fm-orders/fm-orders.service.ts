@@ -11,6 +11,7 @@ import {
   FmOrderMetaInfo,
   FmOrderOption,
   FmOrderRefund,
+  FmOrderRefundItem,
   FmOrderReturn,
   FmOrderReturnBase,
   FmOrderReturnItem,
@@ -47,11 +48,18 @@ export class FmOrdersService {
    */
   private createFindOrdersQuery(goodsIds: number[], dto: FindFmOrdersDto) {
     const defaultQueryHead = `
-      SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*
-      FROM fm_order
-      JOIN fm_order_item USING(order_seq)
-      WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
-      `;
+    SELECT
+      IF(
+        COUNT(fm_order_item.goods_name) >= 2,
+          CONCAT(goods_name, " 외 ", COUNT(fm_order_item.goods_name) - 1),
+          goods_name) goods_name,
+      fm_order.order_seq as id,
+      fm_order.*
+    FROM fm_order
+    JOIN fm_order_item USING(order_seq)
+    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
+    `;
+
     const searchSql = `goods_name LIKE ?
       OR order_seq LIKE ?
       OR fm_order.order_seq LIKE ?
@@ -75,6 +83,7 @@ export class FmOrdersService {
 
     let whereSql = '';
     let orderSql = '';
+    const groupbySql = '    GROUP BY order_seq';
     let params = [];
 
     if (dto.searchStartDate || dto.searchEndDate) {
@@ -108,13 +117,13 @@ export class FmOrdersService {
         whereSql += `\nAND (${searchSql}) `;
         params = params.concat(new Array(19).fill(`%${dto.search}%`));
         return {
-          sql: defaultQueryHead + whereSql + orderSql,
+          sql: defaultQueryHead + whereSql + groupbySql + orderSql,
           params,
         };
       }
 
       return {
-        sql: defaultQueryHead + whereSql + orderSql,
+        sql: defaultQueryHead + whereSql + groupbySql + orderSql,
         params,
       };
     }
@@ -127,7 +136,7 @@ export class FmOrdersService {
       }
 
       return {
-        sql: defaultQueryHead + whereSql + orderSql,
+        sql: defaultQueryHead + whereSql + groupbySql + orderSql,
         params: new Array(19).fill(`%${dto.search}%`),
       };
     }
@@ -136,7 +145,7 @@ export class FmOrdersService {
       whereSql += `AND (step IN (${dto.searchStatuses.join(',')})) `;
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
       return {
-        sql: defaultQueryHead + whereSql + orderSql,
+        sql: defaultQueryHead + whereSql + groupbySql + orderSql,
         params: [],
       };
     }
@@ -263,17 +272,8 @@ export class FmOrdersService {
       fm_order_item_option.mobile_sale,
       fm_order_item_option.color,
       fm_order_item_option.price,
-      fm_order_item_option.ori_price,
-      fm_goods_export_item.export_code,
-      fm_order_refund_item.refund_code,
-      fm_order_return_item.return_code
+      fm_order_item_option.ori_price
     FROM fm_order_item_option
-    LEFT JOIN fm_goods_export_item
-      ON fm_goods_export_item.option_seq = fm_order_item_option.item_option_seq
-    LEFT JOIN fm_order_refund_item
-      ON fm_order_refund_item.option_seq = fm_order_item_option.item_option_seq
-    LEFT JOIN fm_order_return_item
-      ON fm_order_return_item.option_seq = fm_order_item_option.item_option_seq
     WHERE fm_order_item_option.item_seq IN (?)`;
 
     return this.db.query(findOptionsSql, [itemSeqArray]);
@@ -285,6 +285,7 @@ export class FmOrdersService {
   ): Promise<FmOrderExport[]> {
     const exportsSql = `SELECT
       fm_goods_export.export_code,
+      fm_goods_export.bundle_export_code,
       fm_goods_export.export_date,
       fm_goods_export.complete_date,
       IF(fm_goods_export.shipping_date = "0000-00-00", null, fm_goods_export.shipping_date) as shipping_date,
@@ -300,14 +301,18 @@ export class FmOrdersService {
 
     const exportItemsSql = `
     SELECT 
+      goods_name, image,
       item_option_seq, title1, option1, color, fm_goods_export_item.ea, price, step
     FROM fm_order_item_option
+      JOIN fm_order_item USING(item_seq)
     JOIN fm_goods_export_item ON item_option_seq = option_seq
     WHERE export_code = ?`;
 
     const result: FmOrderExport[] = await Promise.all(
       _exports.map(async (e) => {
-        const items = await this.db.query(exportItemsSql, [e.export_code]);
+        const items: FmOrderExportItemOption[] = await this.db.query(exportItemsSql, [
+          e.export_code,
+        ]);
         return {
           ...e,
           itemOptions: items,
@@ -344,8 +349,10 @@ export class FmOrdersService {
 
     const result = await Promise.all(
       refunds.map(async (ref) => {
-        const refundItems = await this.db.query(
+        const refundItems: FmOrderRefundItem[] = await this.db.query(
           `SELECT
+            goods_name,
+            image,
             fm_order_refund_item.refund_item_seq,
             fm_order_refund_item.item_seq,
             fm_order_refund_item.option_seq,
@@ -361,6 +368,7 @@ export class FmOrdersService {
             fm_order_item_option.price,
             fm_order_item_option.ori_price
           FROM fm_order_refund_item
+              JOIN fm_order_item USING(item_seq)
           JOIN fm_order_item_option
             ON fm_order_item_option.item_option_seq = fm_order_refund_item.option_seq
           WHERE refund_code = ?`,
@@ -411,6 +419,8 @@ export class FmOrdersService {
       returns.map(async (ret) => {
         const returnItems: FmOrderReturnItem[] = await this.db.query(
           `SELECT
+            goods_name,
+            image,
             fm_order_return_item.return_item_seq,
             fm_order_return_item.item_seq,
             fm_order_return_item.option_seq,
@@ -427,6 +437,7 @@ export class FmOrdersService {
             fm_order_item_option.price,
             fm_order_item_option.ori_price
           FROM fm_order_return_item
+          JOIN fm_order_item USING(item_seq)
           JOIN fm_order_item_option
             ON fm_order_item_option.item_option_seq = fm_order_return_item.option_seq
           WHERE return_code = ?`,
@@ -439,6 +450,10 @@ export class FmOrdersService {
 
     return result;
   }
+
+  // * **********************************
+  // * 주문 상태 변경
+  // * **********************************
 
   /** 주문 상태 변경 */
   public async changeOrderStatus(

@@ -123,7 +123,11 @@ export function OrderDetail(): JSX.Element {
           <SectionWithTitle title="출고 정보">
             {order.data.exports.map((_exp) => (
               <Box key={_exp.export_code} mt={6} pb={4}>
-                <OrderDetailExportInfo key={_exp.export_code} exports={_exp} />
+                <OrderDetailExportInfo
+                  key={_exp.export_code}
+                  exports={_exp}
+                  orderItems={order.data.items}
+                />
               </Box>
             ))}
           </SectionWithTitle>

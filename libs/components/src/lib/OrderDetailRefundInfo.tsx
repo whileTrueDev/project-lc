@@ -1,7 +1,8 @@
-import { Avatar, Box, Flex, Link, Stack, Text } from '@chakra-ui/react';
+import { Avatar, Box, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
 import { convertFmRefundTypesToString, FmOrderRefund } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { FmRefundStatusBadge, OrderDetailOptionListItem, TextDotConnector } from '..';
+import { ChakraNextImage } from './ChakraNextImage';
 
 /** 주문 환불 정보 */
 export function OrderDetailRefundInfo({ refund }: { refund: FmOrderRefund }) {
@@ -48,11 +49,24 @@ export function OrderDetailRefundInfo({ refund }: { refund: FmOrderRefund }) {
         <Box my={2}>
           <Text fontWeight="bold">환불 상품</Text>
           {refund.items.map((itemOption) => (
-            <OrderDetailOptionListItem
-              key={itemOption.item_option_seq}
-              option={itemOption}
-              withBadge={false}
-            />
+            <Box mb={2}>
+              <HStack alignItems="center">
+                <ChakraNextImage
+                  layout="intrinsic"
+                  width={30}
+                  height={30}
+                  alt=""
+                  src={`http://whiletrue.firstmall.kr${itemOption.image || ''}`}
+                />
+                <Text ml={itemOption.image ? 2 : 0}>{itemOption.goods_name}</Text>
+                <TextDotConnector />
+                <OrderDetailOptionListItem
+                  key={itemOption.item_option_seq}
+                  option={itemOption}
+                  withBadge={false}
+                />
+              </HStack>
+            </Box>
           ))}
         </Box>
       )}

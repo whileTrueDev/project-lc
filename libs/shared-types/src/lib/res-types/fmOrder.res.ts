@@ -584,18 +584,6 @@ export interface FmOrderOption {
    * 옵션 금액 (할인 제외)
    */
   ori_price: string;
-  /**
-   * 출고 번호 (출고된 경우에만 존재)
-   */
-  export_code?: string;
-  /**
-   * 환불 번호 (환불된 경우에만 존재)
-   */
-  refund_code?: string;
-  /**
-   * 반품 번호 (반품된 경우에만 존재)
-   */
-  return_code?: string;
 }
 
 export interface FmOrderExportBase {
@@ -603,6 +591,8 @@ export interface FmOrderExportBase {
    * 출고 고유번호
    */
   export_code: string;
+  /** * 합포장 출고 고유번호 */
+  bundle_export_code?: string;
   /**
    * 출고 일시 (date string)
    */
@@ -663,6 +653,14 @@ export type FmOrderExport = FmOrderExportBase & {
 };
 
 export interface FmOrderExportItemOption {
+  /**
+   * 해당 옵션의 상품 이름
+   */
+  goods_name: string;
+  /**
+   * 해당 옵션의 상품 이미지
+   */
+  image: string;
   /**
    * 출고 아이템 옵션 고유 번호
    */
@@ -820,25 +818,21 @@ export interface FmOrderRefundBase {
 }
 
 export interface FmOrderRefundItemBase {
-  /**
-   * 환불 주문 상품 고유번호
-   */
+  /** 상품 이름 */
+  goods_name: string;
+  /** 상품 이미지 */
+  image: string;
+  /** 환불 주문 상품 고유번호 */
   refund_item_seq: string | number;
-  /**
-   * 주문 상품 고유번호
-   */
+  /** 주문 상품 고유번호 */
   item_seq: string | number;
-  /**
-   * 주문 상품 옵션 고유번호
-   */
+  /** 주문 상품 옵션 고유번호 */
   option_seq: string | number;
-  /**
-   * 환불 주문 상품 옵션 개수
-   */
+  /** 환불 주문 상품 옵션 개수 */
   ea: number;
 }
 
-export type FmOrderRefundItem = FmOrderReturnItemBase &
+export type FmOrderRefundItem = FmOrderRefundItemBase &
   Pick<
     FmOrderOption,
     | 'item_option_seq'
@@ -944,6 +938,10 @@ export interface FmOrderReturnBase {
 }
 
 export interface FmOrderReturnItemBase {
+  /** 상품 이름 */
+  goods_name: string;
+  /** 상품 이미지 */
+  image: string;
   /**
    * 반품 상품 고유 번호
    */

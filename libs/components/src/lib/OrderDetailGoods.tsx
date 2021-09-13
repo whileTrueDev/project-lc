@@ -26,7 +26,7 @@ export function OrderDetailGoods({ orderItem, option }: OrderDetailGoodsProps) {
           width={60}
           height={60}
           alt=""
-          src={`http://whiletrue.firstmall.kr${orderItem.image}`}
+          src={`http://whiletrue.firstmall.kr${orderItem.image || ''}`}
         />
       )}
       <Box ml={orderItem.image ? 4 : 0}>

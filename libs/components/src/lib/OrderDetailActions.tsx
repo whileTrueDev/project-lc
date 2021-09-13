@@ -77,9 +77,6 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps) {
         order={order}
         isOpen={exportModal.isOpen}
         onClose={exportModal.onClose}
-        onConfirm={() => {
-          console.log(order.id);
-        }}
       />
     </>
   );
