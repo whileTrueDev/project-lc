@@ -13,15 +13,15 @@ import {
   Text,
   TextProps,
   useBoolean,
-  useToast,
 } from '@chakra-ui/react';
+import { useAddShippingSetHandler } from '@project-lc/hooks';
 import {
   PrepayInfoOptions,
   PrepayInfoTypes,
   ShippingSetCodeOptions,
   ShippingSetCodes,
 } from '@project-lc/shared-types';
-import { useShippingGroupItemStore, useShippingSetItemStore } from '@project-lc/stores';
+import { useShippingSetItemStore } from '@project-lc/stores';
 import { useEffect } from 'react';
 import ShippingOptionApplySection from './ShippingOptionApplySection';
 
@@ -56,17 +56,13 @@ export function ShippingPolicySetForm({
 }: {
   onSubmit: () => void;
 }): JSX.Element {
-  const toast = useToast();
-
   const {
     shipping_set_name,
-    shipping_set_code,
     prepay_info,
     refund_shiping_cost,
     swap_shiping_cost,
     shiping_free_yn,
     delivery_limit,
-    shippingOptions,
     setShippingSetName,
     setShippingSetCode,
     setPrepayInfo,
@@ -87,28 +83,8 @@ export function ShippingPolicySetForm({
     }
   }, [clearShippingOptions, open]);
 
-  const { addShippingSet } = useShippingGroupItemStore();
-
   // 배송 설정 추가 핸들러
-  const addShippingSetHandler = () => {
-    if (shippingOptions.filter((opt) => opt.shipping_set_type === 'std').length === 0) {
-      toast({ title: '기본배송비 옵션을 1개 이상 적용해야 합니다', status: 'error' });
-      return;
-    }
-    addShippingSet({
-      shipping_set_code,
-      shipping_set_name,
-      prepay_info,
-      refund_shiping_cost,
-      swap_shiping_cost,
-      shiping_free_yn,
-      shippingOptions,
-      delivery_limit,
-      default_yn: 'N',
-      delivery_nation: 'korea',
-    });
-    onSubmit();
-  };
+  const { addShippingSetHandler } = useAddShippingSetHandler({ onSubmit });
   return (
     <>
       <Stack spacing={6}>

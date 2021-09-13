@@ -1,8 +1,6 @@
 /* eslint-disable camelcase */
-import { Button, Heading, Stack, useToast } from '@chakra-ui/react';
-import { useCreateShippingGroup } from '@project-lc/hooks';
-import { ShippingGroupDto } from '@project-lc/shared-types';
-import { useShippingGroupItemStore } from '@project-lc/stores';
+import { Button, Heading, Stack } from '@chakra-ui/react';
+import { useSaveShippingGroup } from '@project-lc/hooks';
 import ShippingPolicyBasicInfo from './ShippingPolicyBasicInfo';
 import ShippingPolicySetList from './ShippingPolicySetList';
 
@@ -11,58 +9,7 @@ export function ShippingPolicyForm({
 }: {
   onSuccess?: () => void;
 }): JSX.Element {
-  const toast = useToast();
-
-  const {
-    shipping_group_name,
-    shipping_calcul_type,
-    shipping_std_free_yn,
-    shipping_add_free_yn,
-    postalCode,
-    baseAddress,
-    detailAddress,
-    shippingSets,
-    shipping_calcul_free_yn,
-  } = useShippingGroupItemStore();
-
-  const { mutateAsync, isLoading } = useCreateShippingGroup();
-
-  const saveShippingPolicy = () => {
-    // TODO : useShippingGroupItemStore 에서 값 가져와 배송그룹명, 반송지, 배송방법 등록되어 있는지 확인 => 훅으로 분리하기
-    if (!shipping_group_name) {
-      toast({ title: '배송그룹명을 입력해주세요', status: 'error' });
-      return;
-    }
-    if (!postalCode || !detailAddress || !detailAddress) {
-      toast({ title: '반송지를 입력해주세요', status: 'error' });
-      return;
-    }
-    if (!shippingSets.length) {
-      toast({ title: '배송방법을 추가해주세요', status: 'error' });
-      return;
-    }
-
-    // TODO: 타입 통일... 혹은 훅으로 분리
-    const newGroup: ShippingGroupDto = {
-      shipping_group_name,
-      shipping_calcul_type,
-      shipping_std_free_yn,
-      shipping_add_free_yn,
-      postalCode,
-      baseAddress,
-      detailAddress,
-      shippingSets,
-      shipping_calcul_free_yn,
-    };
-    // 생성 요청
-    console.log('newGroup', newGroup);
-
-    mutateAsync(newGroup)
-      .then(() => {
-        if (onSuccess) onSuccess();
-      })
-      .catch((error) => console.error(error));
-  };
+  const { saveShippingPolicy, isLoading } = useSaveShippingGroup({ onSuccess });
 
   return (
     <Stack p={4} spacing={6}>
