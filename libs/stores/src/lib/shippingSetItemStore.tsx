@@ -105,11 +105,26 @@ export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, g
   },
   removeShippingOption: (id: number) => {
     const { shippingOptions } = get();
-    const filtered = shippingOptions.filter((opt) => opt.tempId !== id);
-    set((state) => ({
-      ...state,
-      shippingOptions: filtered,
-    }));
+
+    const optionIdx = shippingOptions.findIndex((opt) => opt.tempId === id);
+    // 옵션이 존재하지 않으면 return
+    if (optionIdx === -1) return;
+
+    if (shippingOptions[optionIdx].shipping_opt_type.includes('rep')) {
+      // 구간반복 옵션인 경우, 2개씩 삭제
+      shippingOptions.splice(optionIdx - 1, 2);
+      set((state) => ({
+        ...state,
+        shippingOptions,
+      }));
+    } else {
+      // 구간반복이 아닌경우 1개씩 삭제
+      const filtered = shippingOptions.filter((opt) => opt.tempId !== id);
+      set((state) => ({
+        ...state,
+        shippingOptions: filtered,
+      }));
+    }
   },
   clearShippingOptions: (setType?: ShippingSetType) => {
     const { shippingOptions } = get();

@@ -10,6 +10,12 @@ import FormControlInputWrapper from './FormControlInputWrapper';
 import { ResponsiveDivider } from './ResponsiveDivider';
 import { ErrorText } from './ShippingOptionIntervalApply';
 
+// 퍼스트몰 구간입력 동작
+// - 배송비 부분은 0원이 설정 가능
+// - 구간입력의 첫번째 옵션 시작값은 0 고정, 두번째 옵션 시작값은 첫번째 옵션의 마지막값 고정
+// - 첫번째 옵션의 배송비는 양수값이어야 함( 0원 불가 )
+// - 두번째 옵션의 배송비는 0원 가능
+
 function CostInputWrapper({
   children,
   id,
@@ -30,10 +36,9 @@ function CostInputWrapper({
 }
 
 type RepeatFormType = {
-  firstSectionStart: null | number;
-  firstSectionEnd: null | number;
-  secondSectionStart: null | number;
-  secondSectionEnd: null | number;
+  firstSectionStart: number;
+  firstSectionEnd: number;
+  secondSectionEnd: number;
   firstCost: number;
   secondCost: number;
   areaName: string;
@@ -52,21 +57,23 @@ export function ShippingOptionRepeatApply({
     setShippingOptions,
     addShippingOption,
     delivery_limit: deliveryLimit,
+    shippingOptions,
+    changeShippingOption,
   } = useShippingSetItemStore();
 
   const {
     register,
     handleSubmit,
-    reset,
+    setValue,
     getValues,
     control,
+    watch,
     formState: { errors },
   } = useForm<RepeatFormType>({
     defaultValues: {
-      firstSectionStart: 1,
-      firstSectionEnd: 2,
+      firstSectionStart: 0,
+      firstSectionEnd: 1,
       firstCost: 2500,
-      secondSectionStart: 2,
       secondSectionEnd: 1,
       secondCost: 2500,
       areaName:
@@ -85,7 +92,6 @@ export function ShippingOptionRepeatApply({
       firstSectionStart,
       firstSectionEnd,
       firstCost,
-      secondSectionStart,
       secondSectionEnd,
       secondCost,
       areaName,
@@ -103,7 +109,7 @@ export function ShippingOptionRepeatApply({
     };
     const secondOption = {
       ...shippingOptionBase,
-      section_st: secondSectionStart,
+      section_st: firstSectionEnd,
       section_ed: secondSectionEnd,
       shippingCost: {
         shipping_area_name: areaName,
@@ -114,8 +120,20 @@ export function ShippingOptionRepeatApply({
     // 3. addShippingOption
 
     if (deliveryLimit === 'limit' || shippingSetType === 'add') {
-      // 지역배송인 경우 추가하도록
-      newOptions.forEach((opt) => addShippingOption(opt));
+      // 지역배송인 경우
+
+      // 이미 추가된 지역인지, 인덱스로 확인
+      const sameAreaOptIdx = shippingOptions.findIndex(
+        (opt) => opt.shippingCost.shipping_area_name === areaName,
+      );
+
+      if (sameAreaOptIdx === -1) {
+        // 새로운 지역인 경우 추가하기
+        newOptions.forEach((opt) => addShippingOption(opt));
+      } else {
+        // 기존에 추가된 지역과 같은 지역인 경우 덮어쓰기
+        newOptions.forEach((opt, idx) => changeShippingOption(sameAreaOptIdx + idx, opt));
+      }
     } else {
       // 전국배송인 경우 1개만 설정하도록
       setShippingOptions(newOptions);
@@ -123,18 +141,15 @@ export function ShippingOptionRepeatApply({
   };
 
   useEffect(() => {
-    reset();
-  }, [reset, shippingOptType, deliveryLimit]);
+    setValue(
+      'areaName',
+      deliveryLimit === 'limit' || shippingSetType === 'add' ? '지역 선택' : '대한민국',
+    );
+  }, [shippingOptType, deliveryLimit, setValue, shippingSetType]);
 
   return (
     <>
-      {errors.firstSectionStart && (
-        <ErrorText>{errors.firstSectionStart.message}</ErrorText>
-      )}
       {errors.firstSectionEnd && <ErrorText>{errors.firstSectionEnd.message}</ErrorText>}
-      {errors.secondSectionStart && (
-        <ErrorText>{errors.secondSectionStart.message}</ErrorText>
-      )}
       {errors.secondSectionEnd && (
         <ErrorText>{errors.secondSectionEnd.message}</ErrorText>
       )}
@@ -196,12 +211,10 @@ export function ShippingOptionRepeatApply({
               <Input
                 type="number"
                 max={MAX_COST}
+                readOnly
                 {...register('firstSectionStart', {
                   required: '시작값을 입력해주세요',
                   valueAsNumber: true,
-                  validate: {
-                    positive: (v) => (v && v > 0) || '양수를 입력해주세요',
-                  },
                 })}
               />
             </FormControlInputWrapper>
@@ -213,13 +226,10 @@ export function ShippingOptionRepeatApply({
                 {...register('firstSectionEnd', {
                   valueAsNumber: true,
                   validate: {
-                    positive: (v) => (v && v > 0) || '양수를 입력해주세요',
+                    positive: (v) => (v ? v >= 0 : true || '음수는 입력할 수 없습니다'),
                     biggerThanSectionStart: (v) => {
                       const sectionStart = getValues('firstSectionStart');
-                      return (
-                        (sectionStart && v && v > sectionStart) ||
-                        '시작값보다 큰 값을 입력해주세요'
-                      );
+                      return v > sectionStart || '시작값보다 큰 값을 입력해주세요';
                     },
                   },
                 })}
@@ -235,7 +245,7 @@ export function ShippingOptionRepeatApply({
                 required: '배송비를 입력해주세요',
                 valueAsNumber: true,
                 validate: {
-                  positive: (v) => (v && v > 0) || '양수를 입력해주세요',
+                  positive: (v) => (v ? v >= 0 : true || '음수는 입력할 수 없습니다'),
                 },
               })}
             />
@@ -256,13 +266,8 @@ export function ShippingOptionRepeatApply({
               <Input
                 type="number"
                 max={MAX_COST}
-                {...register('secondSectionStart', {
-                  required: '시작값을 입력해주세요',
-                  valueAsNumber: true,
-                  validate: {
-                    positive: (v) => (v && v > 0) || '양수를 입력해주세요',
-                  },
-                })}
+                readOnly
+                value={watch('firstSectionEnd') || 0}
               />
             </FormControlInputWrapper>
             <Text>~</Text>
@@ -273,7 +278,7 @@ export function ShippingOptionRepeatApply({
                 {...register('secondSectionEnd', {
                   valueAsNumber: true,
                   validate: {
-                    positive: (v) => (v && v > 0) || '양수를 입력해주세요',
+                    positive: (v) => (v ? v >= 0 : true || '음수는 입력할 수 없습니다'),
                   },
                 })}
               />
@@ -289,7 +294,7 @@ export function ShippingOptionRepeatApply({
                 required: '배송비를 입력해주세요',
                 valueAsNumber: true,
                 validate: {
-                  positive: (v) => (v && v > 0) || '양수를 입력해주세요',
+                  positive: (v) => (v ? v >= 0 : true || '음수는 입력할 수 없습니다'),
                 },
               })}
             />

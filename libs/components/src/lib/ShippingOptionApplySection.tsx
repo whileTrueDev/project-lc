@@ -61,7 +61,7 @@ export function ShippingOptionApplySection({
           item={opt}
           onDelete={
             // 마지막 옵션만 삭제 가능하도록
-            (index === appliedStdOptList.length - 1 && removeShippingOption) || undefined
+            index === appliedStdOptList.length - 1 ? removeShippingOption : undefined
           }
         />
       ))}
