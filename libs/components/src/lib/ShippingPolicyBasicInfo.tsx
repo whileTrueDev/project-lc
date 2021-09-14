@@ -4,8 +4,11 @@ import {
   Box,
   Button,
   Checkbox,
+  CloseButton,
+  Collapse,
   FormControl,
   FormLabel,
+  HStack,
   Input,
   Radio,
   RadioGroup,
@@ -146,9 +149,14 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
       */}
       <ShippingPolicyFormControlWithLabel label="반송지">
         <Stack spacing={2} alignItems="flex-start">
-          <Box display={open ? 'block' : 'none'} width="100%">
-            <DaumPostcode onComplete={handleComplete} />
-          </Box>
+          {/* 주소검색 collapse */}
+          <Collapse in={open} animateOpacity>
+            <HStack width="100%" alignItems="flex-start">
+              <DaumPostcode onComplete={handleComplete} />
+              <CloseButton onClick={setFlag.off} />
+            </HStack>
+          </Collapse>
+
           <Stack direction="row">
             <Input
               id="base-return-address"
