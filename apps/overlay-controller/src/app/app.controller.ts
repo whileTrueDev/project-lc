@@ -1,19 +1,19 @@
 import { Controller, Get, Render } from '@nestjs/common';
 
+import { OverlayControllerService } from '@project-lc/nest-modules';
 import { AppService } from './app.service';
-
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly overlayControllerService: OverlayControllerService,
+  ) {}
 
   @Get()
-  getData() {
-    return this.appService.getData();
-  }
-
-  @Get('test')
   @Render('index')
-  renterTest() {
-    return { injectVariablesLikeThis: 'injected variables' };
+  async renterTest() {
+    const urlAndNicknames = await this.overlayControllerService.getCreatorUrls();
+    console.log(urlAndNicknames);
+    return { urlAndNicknames };
   }
 }

@@ -10,3 +10,5 @@ export * from './lib/_nest-units/guards/jwt-auth.guard';
 export * from './lib/_nest-units/decorators/sellerInfo.decorator';
 export * from './lib/overlay/overlay.module';
 export * from './lib/overlay/overlay.service';
+export * from './lib/overlay-controller/overlay-controller.module';
+export * from './lib/overlay-controller/overlay-controller.service';

@@ -2,18 +2,108 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.1/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.js"></script>
+    <script type='module' src="/admin.js"></script>
+    <link href="/layout.css" rel='stylesheet'>
+    <title>Controller</title>
+    <script>
+        const exports = {};
+    </script>
 </head>
 
 <body>
-    <h1>test</h1>
-    <h2>{{ injectVariablesLikeThis }}</h2>
+    <div class="search-box">
+        <table id="table_id" class="display">
+            <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>URL</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#urlAndNicknames}}
+                <tr >
+                    <td>{{userNickname}}
+                    </td>
+                    <td>{{overlayUrl}}</td>
+                    <td>
+                        <button>
+                            선택
+                        </button>
+                    </td>
+                </tr>
+                 {{/urlAndNicknames}}
+            </tbody>
+        </table>
+    </div>
+    <div class="console-box">
+        <h2>
+            화면 제어
+        </h2>
+        <div class="screen-control-box">
+            <button value="화면 띄우기">
+                화면 띄우기
+            </button>
+            <button value="화면 숨기기" >
+                화면 숨기기
+            </button>
+            <button value="로고 색상 변경" >
+                로고 색상 변경
+            </button>
+            <button value="하단 띠 토글">
+                하단 띠 토글
+            </button>
+        </div>
+        <div class="action-control-box">
+            <h2>
+                동작 제어
+            </h2>
+            <button value="Intro 송출">
+                Intro 송출
+            </button>
+            <button value="Outro 송출">
+                Outro 송출
+            </button>
+            <button value="영상 비우기">
+                영상 비우기
+            </button>
+            <button value="Outro 송출">
+                BGM 재생
+            </button>
+            <button value="Outro 종료">
+                BGM 종료
+            </button>
+            <button value="새로고침">
+                새로고침
+            </button>
+        </div>
+        <div class="object-control-box">
+            <h2>
+                목표 제어
+            </h2>
+            <p>
+                시간선택 영역
+            </p>
+            <button>
+                시간 전송
+            </button>
+            <form>
+                <input type="number" />
+                <button>
+                    목표 전송
+                </button>
+            </form>
 
-    <span id="timetic">tic</span>
-
-    <script src="./libs/timer.js"></script>
+        </div>
+    </div>
+    <div class="message-box">
+        <p>
+            메세지 제어
+        </p>
+    </div>
 </body>
 
 </html>

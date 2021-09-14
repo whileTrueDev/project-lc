@@ -1,0 +1,10 @@
+body {
+  padding: 30px;
+  display: flex;
+  flex-direction: row;
+}
+
+.search-box {
+  width: 30%;
+  height: 30%;
+}
