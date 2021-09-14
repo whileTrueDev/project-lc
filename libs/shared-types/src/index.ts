@@ -31,3 +31,4 @@ export * from './lib/dto/emailCodeVerification.dto';
 export * from './lib/constants/signupRegisterOptions';
 export * from './lib/shared-types';
 export * from './lib/dto/changeGoodsView.dto';
+export * from './lib/overlay/overlay-types';
