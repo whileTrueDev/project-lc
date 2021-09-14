@@ -24,6 +24,10 @@ export interface ShippingSetItemStoreState extends ShippingSetDto {
   clearShippingOptions: (setType?: ShippingSetType) => void;
   addShippingOption: (option: Omit<ShippingOptionDto, 'tempId'>) => void;
   setShippingOptions: (options: Omit<ShippingOptionDto, 'tempId'>[]) => void;
+  changeShippingOption: (
+    index: number,
+    newOption: Omit<ShippingOptionDto, 'tempId'>,
+  ) => void;
   reset: () => void;
 }
 
@@ -143,6 +147,15 @@ export const useShippingSetItemStore = create<ShippingSetItemStoreState>((set, g
           tempId: index,
         })),
       ],
+    }));
+  },
+  changeShippingOption: (index: number, newOption: Omit<ShippingOptionDto, 'tempId'>) => {
+    const { shippingOptions } = get();
+    const { tempId } = shippingOptions[index];
+    shippingOptions.splice(index, 1, { ...newOption, tempId });
+    set((state) => ({
+      ...state,
+      shippingOptions,
     }));
   },
 }));

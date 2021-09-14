@@ -19,6 +19,8 @@ export function ShippingOptionFixedApply({
     setShippingOptions,
     addShippingOption,
     delivery_limit: deliveryLimit,
+    shippingOptions,
+    changeShippingOption,
   } = useShippingSetItemStore();
   const {
     register,
@@ -59,14 +61,30 @@ export function ShippingOptionFixedApply({
         shippingCost: data,
       };
       if (deliveryLimit === 'limit' || shippingSetType === 'add') {
-        // 지역배송인 경우 추가하도록
-        addShippingOption(newOption);
+        // 지역배송인 경우
+        const sameAreaOptionIndex = shippingOptions.findIndex(
+          (opt) => opt.shippingCost.shipping_area_name === shipping_area_name,
+        );
+        // 기존에 동일 지역이 추가되어 있다면 해당 옵션 변경
+        if (sameAreaOptionIndex !== -1) {
+          changeShippingOption(sameAreaOptionIndex, newOption);
+        } else {
+          // 기존옵션 중 동일 지역이 없다면 추가
+          addShippingOption(newOption);
+        }
       } else {
         // 전국배송인 경우 1개만 설정하도록
         setShippingOptions([newOption]);
       }
     },
-    [addShippingOption, deliveryLimit, setShippingOptions, shippingSetType],
+    [
+      addShippingOption,
+      changeShippingOption,
+      deliveryLimit,
+      setShippingOptions,
+      shippingOptions,
+      shippingSetType,
+    ],
   );
 
   return (
