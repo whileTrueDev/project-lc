@@ -6,7 +6,6 @@ import {
   Button,
   Divider,
   FormControl,
-  FormErrorMessage,
   Input,
   ListItem,
   Modal,
@@ -28,7 +27,6 @@ import {
   useExportBundledOrdersMutation,
   useExportOrderMutation,
   useExportOrdersMutation,
-  useFmOrders,
 } from '@project-lc/hooks';
 import {
   ExportBundledOrdersDto,
@@ -36,6 +34,7 @@ import {
   ExportOrdersDto,
   FindFmOrderRes,
   fmDeliveryCompanies,
+  isOrderExportable,
 } from '@project-lc/shared-types';
 import { fmExportStore, useFmOrderStore } from '@project-lc/stores';
 import { useCallback, useMemo, useState } from 'react';
@@ -113,7 +112,6 @@ export function ExportManyDialog({
       }
     });
 
-    console.log(dto);
     // 일괄 출고처리 요청
     return exportAll({ exportOrders: dto });
   }
@@ -132,16 +130,23 @@ export function ExportManyDialog({
           <ModalHeader>출고처리</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {selectedOrders.map((orderId, orderIndex) => (
-              <Box key={orderId} mt={2}>
-                <ExportOrderOptionList
-                  onSubmitClick={onExportOneOrder}
-                  orderId={orderId as string}
-                  orderIndex={orderIndex}
-                  selected={selectedOptions.includes(orderId as string)}
-                />
-              </Box>
-            ))}
+            {selectedOrders.map((orderId, orderIndex) => {
+              const _order = orders.find((_o) => _o.id === orderId);
+              if (!_order) return null;
+              const isExportable = isOrderExportable(_order.step);
+              if (!isExportable) return null;
+
+              return (
+                <Box key={orderId} mt={2}>
+                  <ExportOrderOptionList
+                    onSubmitClick={onExportOneOrder}
+                    orderId={orderId as string}
+                    orderIndex={orderIndex}
+                    selected={selectedOptions.includes(orderId as string)}
+                  />
+                </Box>
+              );
+            })}
           </ModalBody>
           <Divider />
           <ModalFooter>

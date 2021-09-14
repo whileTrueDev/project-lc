@@ -22,6 +22,7 @@ import {
   convertOrderSitetypeToString,
   FmOrderStatusNumString,
   getFmOrderStatusByNames,
+  isOrderExportable,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
@@ -186,18 +187,7 @@ export function OrderList(): JSX.Element {
   const isExportable = useMemo(() => {
     if (!orders.data) return false;
     const _so = orders.data.filter((o) => fmOrderStates.selectedOrders.includes(o.id));
-    return (
-      _so.filter((so) =>
-        getFmOrderStatusByNames([
-          '주문접수',
-          '결제확인',
-          '상품준비',
-          '부분출고준비',
-          '출고준비',
-          '부분출고완료',
-        ]).includes(so.step),
-      ).length > 0
-    );
+    return _so.filter((so) => isOrderExportable(so.step)).length > 0;
   }, [fmOrderStates.selectedOrders, orders.data]);
 
   return (
