@@ -1,4 +1,12 @@
-import { Body, Controller, Post, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import {
   ExportBundledOrdersDto,
   ExportOrderDto,
@@ -11,6 +19,11 @@ import { FmExportsService } from './fm-exports.service';
 @UseGuards(JwtAuthGuard)
 export class FmExportsController {
   constructor(private readonly exportsService: FmExportsService) {}
+
+  @Get(':exportCode')
+  public findExports(@Param('exportCode') exportCode: string) {
+    return this.exportsService.findOne(exportCode);
+  }
 
   @Post()
   public exportOrder(

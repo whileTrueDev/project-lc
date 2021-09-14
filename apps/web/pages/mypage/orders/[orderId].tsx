@@ -43,7 +43,7 @@ export function OrderDetail(): JSX.Element {
   if (order.isLoading) {
     return (
       <MypageLayout>
-        <OrderDetaiLoading />
+        <OrderDetailLoading />
       </MypageLayout>
     );
   }
@@ -161,7 +161,7 @@ export function OrderDetail(): JSX.Element {
 
 export default OrderDetail;
 
-export function OrderDetaiLoading() {
+export function OrderDetailLoading() {
   return (
     <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2}>
       <Stack p={4}>

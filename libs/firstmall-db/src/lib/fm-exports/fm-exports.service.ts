@@ -4,8 +4,10 @@ import {
   ExportBundledOrdersDto,
   ExportOrderDto,
   ExportOrdersDto,
+  FmExport,
+  FmExportItem,
+  FmExportRes,
   FmOrder,
-  FmOrderItem,
   FmOrderOption,
   fmOrderStatuses,
 } from '@project-lc/shared-types';
@@ -42,6 +44,30 @@ export class FmExportsService {
     private readonly fmGoodsService: FMGoodsService,
     private readonly fmOrdersService: FmOrdersService,
   ) {}
+
+  /**
+   * 출고번호를 기반으로 특정 출고정보를 찾습니다.
+   * @param exportCode 출고번호
+   * @returns 출고정보
+   */
+  public async findOne(exportCode: string): Promise<FmExportRes> {
+    const findOneSql = `SELECT * FROM ${this.EXPORT_TABLE} WHERE export_code = ?`;
+    const res: FmExport[] = await this.db.query(findOneSql, [exportCode]);
+    if (res.length === 0) return null;
+    const _export = res[0];
+
+    const findItemsSql = `
+    SELECT 
+      goods_name, image,
+      item_option_seq, title1, option1, color, fm_goods_export_item.ea, price, step
+    FROM fm_order_item_option
+      JOIN fm_order_item USING(item_seq)
+    JOIN fm_goods_export_item ON item_option_seq = option_seq
+    WHERE export_code = ?`;
+    const items: FmExportItem[] = await this.db.query(findItemsSql, [exportCode]);
+
+    return { ..._export, items };
+  }
 
   /** 단일 주문 출고 처리 진행 */
   public async exportOrder(
