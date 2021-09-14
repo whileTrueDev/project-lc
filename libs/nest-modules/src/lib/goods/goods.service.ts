@@ -8,6 +8,7 @@ import {
   GoodsOptionsWithSupplies,
   TotalStockInfo,
   GoodsListRes,
+  RegistGoodsDto,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -227,5 +228,16 @@ export class GoodsService {
       console.error(error);
       throw new InternalServerErrorException(error);
     }
+  }
+
+  // 상품 등록
+  public async registGoods(email: string, dto: RegistGoodsDto) {
+    const goods = await this.prisma.goods.create({
+      data: {
+        seller: { connect: { email } },
+        ...dto,
+      },
+    });
+    return { email, dto, goods };
   }
 }

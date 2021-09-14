@@ -28,3 +28,4 @@ export * from './lib/useDisplaySize';
 export * from './lib/queries/useSettlementInfo';
 export * from './lib/mutation/useSettlementAccountMutation';
 export * from './lib/useSocialLoginFailAlarm';
+export * from './lib/mutation/useRegistGoods';

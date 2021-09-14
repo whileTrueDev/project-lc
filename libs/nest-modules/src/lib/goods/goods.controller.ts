@@ -6,6 +6,7 @@ import {
   Get,
   ParseIntPipe,
   Patch,
+  Post,
   Query,
   UseGuards,
   ValidationPipe,
@@ -13,6 +14,7 @@ import {
 import {
   ChangeGoodsViewDto,
   DeleteGoodsDto,
+  RegistGoodsDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
@@ -66,5 +68,14 @@ export class GoodsController {
       email,
       ids: dto.ids,
     });
+  }
+
+  @Post()
+  registGoods(
+    @SellerInfo() seller: UserPayload,
+    @Body(ValidationPipe) dto: RegistGoodsDto,
+  ) {
+    const email = seller.sub;
+    return this.goodsService.registGoods(email, dto);
   }
 }

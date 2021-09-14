@@ -31,3 +31,6 @@ export * from './lib/dto/emailCodeVerification.dto';
 export * from './lib/constants/signupRegisterOptions';
 export * from './lib/shared-types';
 export * from './lib/dto/changeGoodsView.dto';
+export * from './lib/dto/registGoods.dto';
+export * from './lib/dto/goodsOption.dto';
+export * from './lib/dto/goodsOptionSupply.dto';
