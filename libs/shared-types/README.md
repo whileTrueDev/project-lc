@@ -22,7 +22,7 @@ import type { SomeType } from '@project-lc/shared-types';
 
 따라서, `Prisma generate`를 통해 생성된 데이터베이스 인풋 타입은 `service`에서만 사용되고, `controller` 에서 `req.query`, `req.body`와 같은 요청 변수를 다루는 경우에는 DTO가 사용될 수 있습니다.
 
-이렇게 DTO와 데이터베이스 인풋을 따로 다루며 DTO에는 `class-validator` 를 이용한 유효성 검사를 추가합니다. `api`, `socket`, `nest-modules` 와 같은 nest 애플리케이션/라이브러리 에서는 `DTO`와 `ValiationPipe`를 이용해 쉽게 유효성 검사를 진행할 수 있습니다.
+이렇게 DTO와 데이터베이스 인풋을 따로 다루며 DTO에는 `class-validator` 를 이용한 유효성 검사를 추가합니다. `api`, `overlay`, `overlay-controller`, `nest-modules` 와 같은 nest 애플리케이션/라이브러리 에서는 `DTO`와 `ValiationPipe`를 이용해 쉽게 유효성 검사를 진행할 수 있습니다.
 
 ## Running unit tests
 

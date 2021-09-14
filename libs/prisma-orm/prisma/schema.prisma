@@ -172,6 +172,18 @@ model GoodsOptionsSupplies {
   safe_stock     Int?         @default(0) // 각 매장의 옵션별 안전 재고
 }
 
+// 라이브 커머스 랭킹 테이블
+model LiveCommerceRanking {
+  id                 Int      @id @default(autoincrement())
+  nickname           String   @default("비회원")
+  text               String   @db.LongText
+  price              Int
+  phoneCallEventFlag Boolean  @default(false)
+  loginFlag          Boolean  @default(true)
+  creatorId          String
+  createdAt          DateTime @default(now())
+}
+
 // * 상품 - 상태
 enum GoodsStatus {
   normal // 정상

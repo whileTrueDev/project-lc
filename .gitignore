@@ -44,3 +44,5 @@ Thumbs.db
 .env.local
 .env.prod
 .env.production
+
+*.exe
