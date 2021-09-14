@@ -5,7 +5,6 @@ import {
   ExportOrderDto,
   ExportOrdersDto,
   FmOrder,
-  FmOrderItem,
   FmOrderOption,
   fmOrderStatuses,
 } from '@project-lc/shared-types';
@@ -47,9 +46,10 @@ export class FmExportsService {
   public async exportOrder(
     dto: ExportOrderDto,
     actor: string,
+    index?: number, // 다중 일괄 출고처리시 중복되지 않는 출고코드 생성을 위한 인덱스값
   ): Promise<{ orderId: string; exportCode: string }> {
     // 출고 코드 생성
-    const exportCode = await this.generateExportCode();
+    const exportCode = await this.generateExportCode(index || undefined);
 
     const { exportOptionsQueries, goodsExport, orderExportLog, orderStatusChange } =
       await this.createExportOrderQueries(dto, actor, exportCode);
@@ -91,7 +91,7 @@ export class FmExportsService {
   /** 일괄 출고 처리 진행 */
   public async exportOrders(dto: ExportOrdersDto, actor: string): Promise<boolean> {
     const res = await Promise.all(
-      dto.exportOrders.map((eo) => this.exportOrder(eo, actor)),
+      dto.exportOrders.map((eo, index) => this.exportOrder(eo, actor, index)),
     );
     return res.every((exportCode) => !!exportCode);
   }
@@ -214,7 +214,7 @@ export class FmExportsService {
       );
       // 출고 타겟 상태 (모든 주문수량 만큼 출고하지 않으면, 부분 출고 상태로 변경)
       let exportTargetStatus: OrderAndOrderItemOptionExportStatuses = targetStatus;
-      if (!(opt.exportEa > realOrderItemOption.ea)) {
+      if (!(opt.exportEa >= realOrderItemOption.ea)) {
         // 주문상품옵션의 상태를 부분 출고 상태로 설정
         exportTargetStatus = String(
           Number(targetStatus) - 5,
@@ -487,9 +487,10 @@ export class FmExportsService {
   /**
    * 출고 코드를 생성합니다.
    * 출고 코드 예) D210826122
+   * @param exportIndex {number} 일괄처리의 경우 동일한 export_code가 생성될 우려가 있어, exportIndex만큼 exportCode에 더한 값을 반환하기 위한 인덱스값.
    * @returns 생성된 출고 코드
    */
-  private async generateExportCode() {
+  private async generateExportCode(exportIndex?: number) {
     const PREFIX = 'D';
     const now = dayjs().format('YYMMDDH');
     const res = await this.db.query(
@@ -498,7 +499,7 @@ export class FmExportsService {
     if (res.length === 0) return `${PREFIX + now}1`;
     if (res.length > 0) {
       const { export_seq } = res[0];
-      const newId = Number(export_seq) + 1;
+      const newId = Number(export_seq) + 1 + (exportIndex || 0);
       return PREFIX + now + newId;
     }
     return `${PREFIX + now}1`;
