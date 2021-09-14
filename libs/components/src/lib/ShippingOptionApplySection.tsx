@@ -54,12 +54,15 @@ export function ShippingOptionApplySection({
         </Text>
       )}
       {/* 적용된 배송비 옵션 목록 */}
-      {appliedStdOptList.map((opt) => (
+      {appliedStdOptList.map((opt, index) => (
         <ShippingOptionAppliedItem
           key={opt.tempId}
           selectOption={selectOption}
           item={opt}
-          onDelete={removeShippingOption}
+          onDelete={
+            // 마지막 옵션만 삭제 가능하도록
+            (index === appliedStdOptList.length - 1 && removeShippingOption) || undefined
+          }
         />
       ))}
 

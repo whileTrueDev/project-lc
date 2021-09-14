@@ -4,7 +4,7 @@ import { Button, FormControl, Input, Select, Stack, Text } from '@chakra-ui/reac
 import { ShippingOptType, ShippingSetType } from '@prisma/client';
 import { MAX_COST, ShippingCostDto, ShippingOptionDto } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { KOREA_PROVINCES } from '../constants/address';
 import FormControlInputWrapper from './FormControlInputWrapper';
@@ -18,8 +18,7 @@ export function ErrorText({ children }: { children: React.ReactNode }) {
   );
 }
 
-type IntervalFormType = Pick<ShippingOptionDto, 'section_st' | 'section_ed'> &
-  ShippingCostDto;
+type IntervalFormType = Pick<ShippingOptionDto, 'section_ed'> & ShippingCostDto;
 export function ShippingOptionIntervalApply({
   shippingSetType,
   shippingOptType,
@@ -33,14 +32,12 @@ export function ShippingOptionIntervalApply({
   const {
     register,
     handleSubmit,
-    reset,
-    getValues,
     control,
     setValue,
+    setError,
     formState: { isSubmitSuccessful, errors },
   } = useForm<IntervalFormType>({
     defaultValues: {
-      section_st: 1,
       section_ed: null,
       shipping_cost: 2500,
       shipping_area_name:
@@ -48,42 +45,76 @@ export function ShippingOptionIntervalApply({
     },
   });
 
-  const { addShippingOption, shippingOptions } = useShippingSetItemStore();
+  const [sectionStart, setSectionStart] = useState<number>(0);
+
+  const { addShippingOption, shippingOptions, setShippingOptions } =
+    useShippingSetItemStore();
+
   const onSubmit = (data: IntervalFormType) => {
-    const { section_st, section_ed, shipping_cost, shipping_area_name } = data;
-    addShippingOption({
+    const { section_ed, shipping_cost, shipping_area_name } = data;
+
+    // 기본배송비 옵션이고 && 현재 입력하려는 옵션의 배송비가 0원이고 && 이전 입력된 옵션의 배송비가 모두 0원인경우 에러
+    if (
+      shippingSetType === 'std' &&
+      shipping_cost === 0 &&
+      shippingOptions.every((opt) => opt.shippingCost.shipping_cost === 0)
+    ) {
+      setError('shipping_cost', {
+        type: 'manual',
+        message: '기본 배송비가 모두 0원입니다. 배송비를 입력해주세요.',
+      });
+      return;
+    }
+
+    const option = {
       default_yn: null,
       shipping_set_type: shippingSetType,
       shipping_opt_type: shippingOptType,
-      section_st,
+      section_st: sectionStart,
       section_ed,
       shippingCost: {
         shipping_cost,
         shipping_area_name,
       },
-    });
+    };
+
+    // 입력하는 구간시작값이 0 이고, 마지막 입력된 옵션의 구간시작값이 0인 경우 마지막 옵션을 덮어씀
+    // 아닌경우 옵션 추가함
+    if (
+      sectionStart === 0 &&
+      shippingOptions.length !== 0 &&
+      shippingOptions[shippingOptions.length - 1].section_st === 0
+    ) {
+      setShippingOptions([...shippingOptions.slice(0, -1), option]);
+    } else {
+      addShippingOption(option);
+    }
   };
 
   useEffect(() => {
     if (isSubmitSuccessful) {
-      // 시작값을 이전 옵션의 종료값으로 설정
-      setValue(
-        'section_st',
-        shippingOptions.length
-          ? shippingOptions[shippingOptions.length - 1].section_ed
-          : null,
-      );
+      // 이미 추가된 옵션이 있다면 시작값을 이전 옵션의 종료값으로 설정
+      if (shippingOptions.length > 0) {
+        setSectionStart(shippingOptions[shippingOptions.length - 1].section_ed || 0);
+      }
+      // 추가된 옵션이 없다면 구간시작값 0으로 설정
+      if (shippingOptions.length === 0) {
+        setSectionStart(0);
+      }
+
       setValue('section_ed', null);
     }
   }, [isSubmitSuccessful, shippingOptions, setValue]);
 
   useEffect(() => {
-    reset();
-  }, [reset, shippingOptType]);
+    setValue(
+      'shipping_area_name',
+      deliveryLimit === 'limit' || shippingSetType === 'add' ? '지역 선택' : '대한민국',
+    );
+  }, [deliveryLimit, setValue, shippingOptType, shippingSetType]);
 
   return (
     <>
-      {errors.section_st && <ErrorText>{errors.section_st.message}</ErrorText>}
       {errors.section_ed && <ErrorText>{errors.section_ed.message}</ErrorText>}
       {errors.shipping_cost && <ErrorText>{errors.shipping_cost.message}</ErrorText>}
       {errors.shipping_area_name && (
@@ -104,17 +135,7 @@ export function ShippingOptionIntervalApply({
           <Stack direction="row" alignItems="center">
             {/* 첫번째 범위 인풋 */}
             <FormControlInputWrapper id="section_st" suffix={`${suffix} 이상`}>
-              <Input
-                type="number"
-                max={MAX_COST}
-                {...register('section_st', {
-                  required: '시작값을 입력해주세요',
-                  valueAsNumber: true,
-                  validate: {
-                    positive: (v) => (v && v > 0) || '양수를 입력해주세요',
-                  },
-                })}
-              />
+              <Input type="number" max={MAX_COST} readOnly value={sectionStart} />
             </FormControlInputWrapper>
             <Text>~</Text>
             {/* 두번째 범위 인풋 */}
@@ -125,14 +146,7 @@ export function ShippingOptionIntervalApply({
                 {...register('section_ed', {
                   valueAsNumber: true,
                   validate: {
-                    biggerThansection_st: (v) => {
-                      const section_st = getValues('section_st');
-                      return (
-                        (section_st && !v) ||
-                        (section_st && v && v > section_st) ||
-                        '시작값보다 큰 값을 입력해주세요'
-                      );
-                    },
+                    positive: (v) => (v ? v >= 0 : true || '음수는 입력할 수 없습니다'),
                   },
                 })}
               />
@@ -141,32 +155,34 @@ export function ShippingOptionIntervalApply({
           <ResponsiveDivider />
 
           {/* 지역, 가격 설정 */}
-          <Stack>
-            {/* 지역 설정 셀렉트 */}
-            <Controller
-              name="shipping_area_name"
-              control={control}
-              rules={{
-                validate: {
-                  selectArea: (v) => v !== '지역 선택' || '지역을 선택해주세요',
-                },
-              }}
-              render={({ field }) => {
-                return (
-                  <Select w={120} {...field}>
-                    {deliveryLimit === 'limit' || shippingSetType === 'add' ? (
-                      ['지역 선택', ...KOREA_PROVINCES].map((area) => (
-                        <option key={area} value={area}>
-                          {area}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="대한민국">대한민국</option>
-                    )}
-                  </Select>
-                );
-              }}
-            />
+          <Stack justifyContent="center">
+            {/* 지역 설정 셀렉트 - 지정지역배송일때만 표시하도록 */}
+            {deliveryLimit === 'limit' && (
+              <Controller
+                name="shipping_area_name"
+                control={control}
+                rules={{
+                  validate: {
+                    selectArea: (v) => v !== '지역 선택' || '지역을 선택해주세요',
+                  },
+                }}
+                render={({ field }) => {
+                  return (
+                    <Select w={120} {...field}>
+                      {deliveryLimit === 'limit' || shippingSetType === 'add' ? (
+                        ['지역 선택', ...KOREA_PROVINCES].map((area) => (
+                          <option key={area} value={area}>
+                            {area}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="대한민국">대한민국</option>
+                      )}
+                    </Select>
+                  );
+                }}
+              />
+            )}
             {/* 가격 설정 */}
             <FormControl id="shipping_cost">
               <Stack direction="row" alignItems="center">
@@ -175,8 +191,9 @@ export function ShippingOptionIntervalApply({
                   max={MAX_COST}
                   {...register('shipping_cost', {
                     required: '배송비를 입력해주세요',
+                    valueAsNumber: true,
                     validate: {
-                      positive: (v) => (v && v > 0) || '양수를 입력해주세요',
+                      positive: (v) => v >= 0 || '음수는 입력할 수 없습니다',
                     },
                   })}
                 />

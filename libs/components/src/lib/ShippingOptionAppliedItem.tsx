@@ -8,7 +8,7 @@ export function getOptionLabel(item: ShippingOptionDto, suffix: string) {
 
   const startLabel = sectionStart
     ? `${sectionStart.toLocaleString()} ${suffix} 이상`
-    : '0 이상';
+    : `0 ${suffix} 이상`;
   const endLabel = sectionEnd ? `${sectionEnd.toLocaleString()} ${suffix} 미만` : '';
 
   return `${startLabel} ~ ${endLabel}`;
@@ -21,11 +21,15 @@ export function ShippingOptionAppliedItem({
 }: {
   selectOption: ShippingSelectOption;
   item: TempShippingOption;
-  onDelete: (id: number) => void;
+  onDelete?: (id: number) => void;
 }) {
   const { tempId, shippingCost: costItem } = item;
 
-  const deleteItem = useCallback(() => onDelete(tempId), [onDelete, tempId]);
+  const deleteItem = useCallback(() => {
+    if (onDelete) {
+      onDelete(tempId);
+    }
+  }, [onDelete, tempId]);
 
   // costItem이 여러개인 경우 **********************************************
   if (Array.isArray(costItem)) {
@@ -38,8 +42,8 @@ export function ShippingOptionAppliedItem({
   const costText = selectOption.key === 'free' ? '무료' : `${cost.toLocaleString()} 원`;
 
   return (
-    <Tag p={1}>
-      <TagCloseButton onClick={deleteItem} mr={2} />
+    <Tag p={1} pl={!onDelete ? '36px' : undefined}>
+      {onDelete && <TagCloseButton onClick={deleteItem} mr={2} />}
 
       {['free', 'fixed'].includes(selectOption.key) ? (
         // 무료, 고정인 경우
