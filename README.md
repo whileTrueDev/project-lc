@@ -17,11 +17,13 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 
 1. [api](./apps/api/README.md)  
    [Nest.js](https://docs.nestjs.com/)로 구성된 REST API 서버입니다.
-2. [socket](./apps/socket/README.md)  
+2. [overlay](./apps/overlay/README.md)  
    [Nest.js + Socket.io](https://docs.nestjs.com/websockets/gateways)로 구성된 WebScoket 서버입니다.
-3. [web](./apps/web/README.md)  
+3. [overlay-controller](./apps/overlay-controller/README.md)  
+   [Nest.js + Socket.io](https://docs.nestjs.com/websockets/gateways)로 구성된 WebScoket 서버입니다.
+4. [web](./apps/web/README.md)  
    [Next.js](https://nextjs.org/)로 구성된 프론트엔드 서버입니다.
-4. [web-e2e](./apps/web-e2e/README.md)  
+5. [web-e2e](./apps/web-e2e/README.md)  
    `web` 애플리케이션에 대한 Cypress end to end 테스트 폴더입니다.
 
 ### Libs 목록
@@ -110,7 +112,8 @@ ex.
 App, Lib 별 더 자세한 내용은 해당 폴더의 README.md에 있습니다.
 
 - [apps/api](./apps/api/README.md)
-- [apps/socket](./apps/socket/README.md)
+- [apps/overlay](./apps/overlay/README.md)
+- [apps/overlay-controller](./apps/overlay-controller/README.md)
 - [apps/web](./apps/web/README.md)
 - [libs/components](./libs/components/README.md)
 - [libs/hooks](./libs/hooks/README.md)

@@ -54,7 +54,7 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
 
 4. **Prisma Client를 통해 데이터 접근하기**
 
-    데이터베이스 접근을 위한 `/libs/src/lib/prisma-orm.service` 를 미리 정의해 두었습니다. API서버 또는 Socket 서버와 같이 데이터베이스 접근이 필요한 경우, 해당 service를 가져와 사용합니다. `apps/api`, `apps/socket` 두 애플리케이션의 app.module에 prismaService를 provider로 작성하여 두었으므로, AppModule의 하위 모듈에서는 모두 `imports: [forwardRef(() => AppModule)]` 처리를 통해 prismaService에 접근가능합니다.
+    데이터베이스 접근을 위한 `/libs/src/lib/prisma-orm.service` 를 미리 정의해 두었습니다. API서버 또는 Overlay 서버와 같이 데이터베이스 접근이 필요한 경우, 해당 service를 가져와 사용합니다. `apps/api`, `apps/overlay`, `apps/overlay-controller` 등의 애플리케이션의 app.module에 PrismaModule(Global)을 import 하도록 작성하여 두었으므로, AppModule의 하위 모듈에서는 prismaService에 접근가능합니다.
 
     ```ts
     // apps/../some.module.ts

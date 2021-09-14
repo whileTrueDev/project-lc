@@ -11,14 +11,14 @@ import { constants } from '../../constants';
 interface LCDevAppStackProps extends cdk.StackProps {
   vpc: ec2.Vpc;
   apiSecGrp: ec2.SecurityGroup;
-  socketSecGrp: ec2.SecurityGroup;
+  overlaySecGrp: ec2.SecurityGroup;
   albSecGrp: ec2.SecurityGroup;
 }
 
 const PREFIX = 'LC-DEV-APP';
 const DOMAIN = 'andad.io';
 // const API_DOMAIN = `${DOMAIN}`;
-// const SOCKET_DOMAIN = `${DOMAIN}`;
+// const OVERLAY_DOMAIN = `${DOMAIN}`;
 
 export class LCDevAppStack extends cdk.Stack {
   DBURL_PARAMETER: ssm.IStringParameter;
@@ -27,7 +27,7 @@ export class LCDevAppStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
 
-    const { vpc, apiSecGrp, socketSecGrp, albSecGrp } = props;
+    const { vpc, apiSecGrp, overlaySecGrp, albSecGrp } = props;
 
     // * ECS Cluster
     const cluster = new ecs.Cluster(this, `${PREFIX}EcsCluster`, {
@@ -57,10 +57,10 @@ export class LCDevAppStack extends cdk.Stack {
 
     // * API server
     const apiService = this.createApiAppService(cluster, apiSecGrp);
-    // * socket server
-    const socketService = this.createSocketAppService(cluster, socketSecGrp);
+    // * overlay server
+    const overlayService = this.createOverlayAppService(cluster, overlaySecGrp);
 
-    this.createALB(vpc, apiService, socketService, albSecGrp);
+    this.createALB(vpc, apiService, overlayService, albSecGrp);
     // this.createRoute53ARecord(alb);
   }
 
@@ -71,7 +71,9 @@ export class LCDevAppStack extends cdk.Stack {
     apiTaskDef.addContainer(`${PREFIX}ECSContainer`, {
       containerName: 'project-lc-api-dev',
       portMappings: [{ containerPort: constants.DEV.ECS_API_PORT }],
-      image: ecs.ContainerImage.fromRegistry(`hwasurr/${constants.DEV.ECS_API_FAMILY_NAME}`),
+      image: ecs.ContainerImage.fromRegistry(
+        `hwasurr/${constants.DEV.ECS_API_FAMILY_NAME}`,
+      ),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
@@ -100,30 +102,32 @@ export class LCDevAppStack extends cdk.Stack {
     });
   }
 
-  private createSocketAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
-    const taskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSSocketTaskDef`, {
-      family: constants.DEV.ECS_SOCKET_FAMILY_NAME,
+  private createOverlayAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
+    const taskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSOverlayTaskDef`, {
+      family: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
     });
-    taskDef.addContainer(`${PREFIX}ECSSocketContainer`, {
-      containerName: 'project-lc-socket-dev',
-      portMappings: [{ containerPort: constants.DEV.ECS_SOCKET_PORT }],
-      image: ecs.ContainerImage.fromRegistry(`hwasurr/${constants.DEV.ECS_SOCKET_FAMILY_NAME}`),
+    taskDef.addContainer(`${PREFIX}ECSOverlayContainer`, {
+      containerName: 'project-lc-overlay-dev',
+      portMappings: [{ containerPort: constants.DEV.ECS_OVERLAY_PORT }],
+      image: ecs.ContainerImage.fromRegistry(
+        `hwasurr/${constants.DEV.ECS_OVERLAY_FAMILY_NAME}`,
+      ),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
         FIRSTMALL_DATABASE_URL: ecs.Secret.fromSsmParameter(this.FIRSTMALL_DATABASE_URL),
       },
       logging: new ecs.AwsLogDriver({
-        logGroup: new logs.LogGroup(this, `${PREFIX}SocketLogGroup`, {
-          logGroupName: constants.DEV.ECS_SOCKET_LOG_GLOUP_NAME,
+        logGroup: new logs.LogGroup(this, `${PREFIX}OverlayLogGroup`, {
+          logGroupName: constants.DEV.ECS_OVERLAY_LOG_GLOUP_NAME,
           removalPolicy: cdk.RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
       }),
     });
 
-    return new ecs.FargateService(this, `${PREFIX}SocketService`, {
-      serviceName: constants.DEV.ECS_SOCKET_SERVICE_NAME,
+    return new ecs.FargateService(this, `${PREFIX}OverlayService`, {
+      serviceName: constants.DEV.ECS_OVERLAY_SERVICE_NAME,
       cluster,
       taskDefinition: taskDef,
       vpcSubnets: {
@@ -139,7 +143,7 @@ export class LCDevAppStack extends cdk.Stack {
   private createALB(
     vpc: ec2.Vpc,
     apiService: ecs.FargateService,
-    socketService: ecs.FargateService,
+    overlayAppService: ecs.FargateService,
     sg: ec2.SecurityGroup,
   ) {
     // * ALB
@@ -157,51 +161,37 @@ export class LCDevAppStack extends cdk.Stack {
     // alb.addRedirect();
 
     // ALB 타겟 그룹으로 생성
-    const apiTargetGroup = new elbv2.ApplicationTargetGroup(this, `${PREFIX}ApiTargetGroup`, {
-      vpc,
-      targetGroupName: `APITargetGroup`,
-      port: constants.DEV.ECS_API_PORT,
-      protocol: elbv2.ApplicationProtocol.HTTP,
-      healthCheck: {
-        enabled: true,
-        path: '/',
-        interval: cdk.Duration.minutes(1),
+    const apiTargetGroup = new elbv2.ApplicationTargetGroup(
+      this,
+      `${PREFIX}ApiTargetGroup`,
+      {
+        vpc,
+        targetGroupName: `APITargetGroup`,
+        port: constants.DEV.ECS_API_PORT,
+        protocol: elbv2.ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [apiService],
       },
-      targets: [apiService],
-    });
-
-    // const socketTargetGroup = new elbv2.ApplicationTargetGroup(this, `${PREFIX}SocketTargetGroup`, {
-    //   vpc,
-    //   targetGroupName: `SocketTargetGroup`,
-    //   port: constants.DEV.ECS_SOCKET_PORT,
-    //   protocol: elbv2.ApplicationProtocol.HTTP,
-    //   healthCheck: {
-    //     enabled: true,
-    //     path: '/health-check',
-    //     interval: cdk.Duration.minutes(1),
-    //   },
-    //   targets: [socketService],
-    // });
+    );
 
     // ALB에 HTTP 리스너 추가
     const truepointHttpListener = alb.addListener(`${PREFIX}ALBHttpListener`, {
       port: 80,
       defaultTargetGroups: [apiTargetGroup],
     });
-    truepointHttpListener.connections.allowDefaultPortFromAnyIpv4('https ALB open to world');
+    truepointHttpListener.connections.allowDefaultPortFromAnyIpv4(
+      'https ALB open to world',
+    );
 
     // // HTTP 리스너에 API서버 타겟그룹 추가
     // truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
     //   priority: 1,
     //   conditions: [ListenerCondition.hostHeaders([`${API_DOMAIN}`])],
     //   targetGroups: [apiTargetGroup],
-    // });
-
-    // // HTTP 리스너에 Socket서버 타겟그룹 추가
-    // truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSSocketTargetGroup`, {
-    //   priority: 2,
-    //   conditions: [ListenerCondition.hostHeaders([`${SOCKET_DOMAIN}`])],
-    //   targetGroups: [socketTargetGroup],
     // });
 
     return alb;

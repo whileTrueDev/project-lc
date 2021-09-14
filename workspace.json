@@ -168,6 +168,158 @@
         }
       }
     },
+    "overlay": {
+      "root": "apps/overlay",
+      "sourceRoot": "apps/overlay/src",
+      "projectType": "application",
+      "targets": {
+        "dockerize": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker login -u {args.username} -p {args.password}",
+              "docker build -f ./apps/overlay/Dockerfile . -t hwasurr/project-lc-overlay:{args.tag}",
+              "docker tag hwasurr/project-lc-overlay:{args.tag} hwasurr/project-lc-overlay:latest ",
+              "docker push hwasurr/project-lc-overlay:{args.tag}",
+              {
+                "command": "docker push hwasurr/project-lc-overlay:latest",
+                "forwardAllArgs": false
+              }
+            ],
+            "parallel": false
+          }
+        },
+        "dockerize-dev": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker login -u {args.username} -p {args.password}",
+              "docker build -f ./apps/overlay/Dockerfile . -t hwasurr/project-lc-overlay-dev:{args.tag}",
+              "docker tag hwasurr/project-lc-overlay-dev:{args.tag} hwasurr/project-lc-overlay-dev:latest ",
+              "docker push hwasurr/project-lc-overlay-dev:{args.tag}",
+              {
+                "command": "docker push hwasurr/project-lc-overlay-dev:latest",
+                "forwardAllArgs": false
+              }
+            ],
+            "parallel": false
+          }
+        },
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": [
+            "{options.outputPath}"
+          ],
+          "options": {
+            "outputPath": "dist/apps/overlay",
+            "main": "apps/overlay/src/main.ts",
+            "tsConfig": "apps/overlay/tsconfig.app.json",
+            "assets": [
+              "apps/overlay/src/assets",
+              "apps/overlay/src/views",
+              "apps/overlay/src/lib"
+            ],
+            "generatePackageJson": true
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/overlay/src/environments/environment.ts",
+                  "with": "apps/overlay/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "overlay:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/overlay/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/apps/overlay"
+          ],
+          "options": {
+            "jestConfig": "apps/overlay/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "overlay-controller": {
+      "root": "apps/overlay-controller",
+      "sourceRoot": "apps/overlay-controller/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": [
+            "{options.outputPath}"
+          ],
+          "options": {
+            "outputPath": "dist/apps/overlay-controller",
+            "main": "apps/overlay-controller/src/main.ts",
+            "tsConfig": "apps/overlay-controller/tsconfig.app.json",
+            "assets": [
+              "apps/overlay-controller/src/assets",
+              "apps/overlay-controller/src/views"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/overlay-controller/src/environments/environment.ts",
+                  "with": "apps/overlay-controller/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "overlay-controller:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/overlay-controller/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/apps/overlay-controller"
+          ],
+          "options": {
+            "jestConfig": "apps/overlay-controller/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "prisma-orm": {
       "root": "libs/prisma-orm",
       "sourceRoot": "libs/prisma-orm/src",
@@ -322,89 +474,6 @@
           "outputs": ["coverage/libs/shared-types"],
           "options": {
             "jestConfig": "libs/shared-types/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "socket": {
-      "root": "apps/socket",
-      "sourceRoot": "apps/socket/src",
-      "projectType": "application",
-      "targets": {
-        "dockerize": {
-          "executor": "@nrwl/workspace:run-commands",
-          "options": {
-            "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/socket/Dockerfile . -t hwasurr/project-lc-socket:{args.tag}",
-              "docker tag hwasurr/project-lc-socket:{args.tag} hwasurr/project-lc-socket:latest ",
-              "docker push hwasurr/project-lc-socket:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-socket:latest",
-                "forwardAllArgs": false
-              }
-            ],
-            "parallel": false
-          }
-        },
-        "dockerize-dev": {
-          "executor": "@nrwl/workspace:run-commands",
-          "options": {
-            "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/socket/Dockerfile . -t hwasurr/project-lc-socket-dev:{args.tag}",
-              "docker tag hwasurr/project-lc-socket-dev:{args.tag} hwasurr/project-lc-socket-dev:latest ",
-              "docker push hwasurr/project-lc-socket-dev:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-socket-dev:latest",
-                "forwardAllArgs": false
-              }
-            ],
-            "parallel": false
-          }
-        },
-        "build": {
-          "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/apps/socket",
-            "main": "apps/socket/src/main.ts",
-            "tsConfig": "apps/socket/tsconfig.app.json",
-            "assets": ["apps/socket/src/assets", "apps/socket/src/views"],
-            "generatePackageJson": true
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/socket/src/environments/environment.ts",
-                  "with": "apps/socket/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "executor": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "socket:build"
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/socket/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/socket"],
-          "options": {
-            "jestConfig": "apps/socket/jest.config.js",
             "passWithNoTests": true
           }
         }
