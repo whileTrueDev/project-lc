@@ -1,14 +1,11 @@
-import { ChevronDownIcon, DownloadIcon, Icon } from '@chakra-ui/icons';
+import { DownloadIcon, Icon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
   Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Stack,
   Text,
+  Tooltip,
   useBreakpoint,
   useColorModeValue,
   useDisclosure,
@@ -16,7 +13,6 @@ import {
 import {
   GridColumns,
   GridRowId,
-  GridSelectionModel,
   GridToolbarContainer,
   GridToolbarExport,
 } from '@material-ui/data-grid';
@@ -25,11 +21,12 @@ import {
   convertFmOrderStatusToString,
   convertOrderSitetypeToString,
   FmOrderStatusNumString,
+  getFmOrderStatusByNames,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { FaTruck } from 'react-icons/fa';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import ExportManyDialog from './ExportManyDialog';
@@ -186,6 +183,23 @@ export function OrderList(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const dataGridBgColor = useColorModeValue('inherit', 'gray.300');
 
+  const isExportable = useMemo(() => {
+    if (!orders.data) return false;
+    const _so = orders.data.filter((o) => fmOrderStates.selectedOrders.includes(o.id));
+    return (
+      _so.filter((so) =>
+        getFmOrderStatusByNames([
+          '주문접수',
+          '결제확인',
+          '상품준비',
+          '부분출고준비',
+          '출고준비',
+          '부분출고완료',
+        ]).includes(so.step),
+      ).length > 0
+    );
+  }, [fmOrderStates.selectedOrders, orders.data]);
+
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
       <ChakraDataGrid
@@ -209,6 +223,8 @@ export function OrderList(): JSX.Element {
                   onClick: () => exportManyDialog.onOpen(),
                   icon: <Icon as={FaTruck} />,
                   emphasize: true,
+                  isDisabled: !isExportable,
+                  disableMessage: '출고가능한 주문이 없습니다.',
                 },
               ]}
             />
@@ -236,6 +252,8 @@ interface OrderToolbarProps {
     onClick: (items: GridRowId[]) => void;
     icon: React.ReactElement;
     emphasize?: boolean;
+    isDisabled?: boolean;
+    disableMessage?: string;
   }[];
 }
 export function OrderToolbar({ options }: OrderToolbarProps) {
@@ -250,16 +268,24 @@ export function OrderToolbar({ options }: OrderToolbarProps) {
         {isMobile ? null : (
           <>
             {options.map((opt) => (
-              <Button
-                key={opt.name}
-                size="sm"
-                rightIcon={opt.icon}
-                colorScheme={opt.emphasize ? 'pink' : undefined}
-                isDisabled={selectedOrders.length === 0}
-                onClick={() => opt.onClick(selectedOrders)}
+              <Tooltip
+                label={opt.disableMessage}
+                placement="top-start"
+                isDisabled={!opt.isDisabled}
               >
-                {opt.name}
-              </Button>
+                <Box>
+                  <Button
+                    key={opt.name}
+                    size="sm"
+                    rightIcon={opt.icon}
+                    colorScheme={opt.emphasize ? 'pink' : undefined}
+                    isDisabled={selectedOrders.length === 0 || opt.isDisabled}
+                    onClick={() => opt.onClick(selectedOrders)}
+                  >
+                    {opt.name}
+                  </Button>
+                </Box>
+              </Tooltip>
             ))}
             <Button size="sm" as="div" isDisabled={selectedOrders.length === 0}>
               <GridToolbarExport
