@@ -2,23 +2,25 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import {
   Box,
-  Stack,
+  Button,
+  Checkbox,
   FormControl,
   FormLabel,
   Input,
-  RadioGroup,
   Radio,
-  Checkbox,
-  Button,
+  RadioGroup,
+  Stack,
   Text,
   useBoolean,
 } from '@chakra-ui/react';
 import { ShippingCalculType } from '@prisma/client';
+import { useDisplaySize } from '@project-lc/hooks';
 import { ShippingCalculTypeOptions, ShippingCalculTypes } from '@project-lc/shared-types';
 import { useShippingGroupItemStore } from '@project-lc/stores';
 import React from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import SectionWithTitle from './SectionWithTitle';
+import TextWithPopperButton from './TextWithPopperButton';
 
 export function ShippingPolicyFormControlWithLabel({
   id,
@@ -39,6 +41,7 @@ export function ShippingPolicyFormControlWithLabel({
 
 export function ShippingPolicyBasicInfo(): JSX.Element {
   const [open, setFlag] = useBoolean(false);
+  const { isMobileSize } = useDisplaySize();
 
   const {
     shipping_group_name: groupName,
@@ -90,12 +93,21 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
             setShippingCalculType(nextValue);
           }}
         >
-          <Stack direction="row">
-            {ShippingCalculTypes.map((key) => (
-              <Radio value={key} key={key}>
-                {ShippingCalculTypeOptions[key].label}
-              </Radio>
-            ))}
+          <Stack>
+            {ShippingCalculTypes.map((key) => {
+              const { label, desc } = ShippingCalculTypeOptions[key];
+              return (
+                <Radio value={key} key={key}>
+                  <TextWithPopperButton
+                    title={label}
+                    iconAriaLabel={label}
+                    placement={isMobileSize ? 'bottom' : 'right'}
+                  >
+                    <Text size="sm">{desc}</Text>
+                  </TextWithPopperButton>
+                </Radio>
+              );
+            })}
           </Stack>
         </RadioGroup>
       </ShippingPolicyFormControlWithLabel>
@@ -108,25 +120,23 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
         >
           <Stack spacing={2}>
             <Text as="span">
-              무료계산-묶음배송 배송그룹이 적용된 상품과 함께 주문하면, 배송그룹으로
-              계산된 배송비
+              해당 상품을 배송비 계산 기준인 &apos;무료계산-묶음배송&apos;인 다른 상품과
+              주문했을 때,
             </Text>
-            <Stack direction="row">
-              <Checkbox
-                colorScheme="green"
-                isChecked={shippingStdFree}
-                onChange={setShippingStdFree}
-              >
-                기본 무료
-              </Checkbox>
-              <Checkbox
-                colorScheme="green"
-                isChecked={shippingAddFree}
-                onChange={setShippingAddFree}
-              >
-                추가 무료
-              </Checkbox>
-            </Stack>
+            <Checkbox
+              colorScheme="green"
+              isChecked={shippingStdFree}
+              onChange={setShippingStdFree}
+            >
+              해당 상품의 기본 배송비를 무료로 하시겠습니까?
+            </Checkbox>
+            <Checkbox
+              colorScheme="green"
+              isChecked={shippingAddFree}
+              onChange={setShippingAddFree}
+            >
+              해당 상품의 추가 배송비를 무료로 하시겠습니까?
+            </Checkbox>
           </Stack>
         </ShippingPolicyFormControlWithLabel>
       )}

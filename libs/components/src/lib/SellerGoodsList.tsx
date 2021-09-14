@@ -92,8 +92,8 @@ const columns: GridColumns = [
         <TextWithPopperButton
           title="재고/가용"
           iconAriaLabel="재고/가용 설명"
-          icon={<QuestionIcon />}
           iconColor="black"
+          portalBody
         >
           <ExampleStockDescription />
         </TextWithPopperButton>
@@ -134,8 +134,8 @@ const columns: GridColumns = [
         <TextWithPopperButton
           title="재고판매"
           iconAriaLabel="재고판매 설명"
-          icon={<QuestionIcon />}
           iconColor="black"
+          portalBody
         >
           <Text mb={2} fontWeight="bold">
             재고(옵션 기준)에 따른 상품 판매 설정에 따라 아래와 같이 3가지로 표기됩니다.
