@@ -157,7 +157,7 @@ model GoodsOptions {
   price          Decimal                @db.Decimal(10, 2) // 판매가 (할인가)
   color          String?                @db.VarChar(10) // 컬러 hex값
   weight         Float? //옵션 개당 무게 (단위 kg)
-  option_view    YesOrNo_UPPERCASE      @default(Y) // 옵션 노출 여부
+  option_view    YesOrNo_UPPERCASE      @default(Y) // ���션 노출 여부
 }
 
 // 상품 옵션 재고 - fm_goods_suply
