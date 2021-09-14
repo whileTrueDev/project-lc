@@ -43,16 +43,15 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
     setFormError('');
   }
 
-  // * 로그인 핸들러
-  const login = useLoginMutation('admin');
+  // * 로그인 핸들러 -> admin으로 변경이 필요함.
+  const login = useLoginMutation('seller');
   const onSubmit = useCallback(
     async (data: LoginSellerDto) => {
-      console.log(data);
       const seller = await login.mutateAsync(data).catch((err) => {
         setFormError(getMessage(err?.response.data?.statusCode));
       });
       if (seller) {
-        router.push('http://localhost:4300');
+        router.push('http://localhost:4200');
       }
     },
     [router, setFormError, login],
