@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ShippingCalculType } from '@prisma/client';
 import { ShippingGroupDto, ShippingSetDto } from '@project-lc/shared-types';
@@ -52,18 +53,25 @@ export const useShippingGroupItemStore = create<ShippingGroupItemStoreState>(
         ...state,
         shipping_std_free_yn: 'N',
         shipping_add_free_yn: 'N',
+        shipping_calcul_free_yn: 'N',
       }));
     },
     setShippingStdFree: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { shipping_add_free_yn } = get();
       set((state) => ({
         ...state,
         shipping_std_free_yn: e.currentTarget.checked ? 'Y' : 'N',
+        shipping_calcul_free_yn:
+          shipping_add_free_yn === 'Y' || e.currentTarget.checked ? 'Y' : 'N',
       }));
     },
     setShippingAddFree: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { shipping_std_free_yn } = get();
       set((state) => ({
         ...state,
         shipping_add_free_yn: e.currentTarget.checked ? 'Y' : 'N',
+        shipping_calcul_free_yn:
+          shipping_std_free_yn === 'Y' || e.currentTarget.checked ? 'Y' : 'N',
       }));
     },
     setAddress: (postalCode: string, baseAddress: string) => {
