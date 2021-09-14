@@ -25,7 +25,7 @@ export function ShippingOptionFixedApply({
     handleSubmit,
     formState: { errors },
     control,
-    reset,
+    setValue,
   } = useForm<ShippingCostDto>({
     defaultValues: {
       shipping_cost: 2500,
@@ -35,8 +35,13 @@ export function ShippingOptionFixedApply({
   });
 
   useEffect(() => {
-    reset();
-  }, [deliveryLimit, reset]);
+    // deliveryLimit(전국배송, 지역배송)값 변경시 지역과 배송비 초기화
+    setValue(
+      'shipping_area_name',
+      deliveryLimit === 'limit' || shippingSetType === 'add' ? '지역 선택' : '대한민국',
+    );
+    setValue('shipping_cost', 2500);
+  }, [deliveryLimit, setValue, shippingSetType]);
 
   // 배송방법 추가
   const addFixedOption = useCallback(
