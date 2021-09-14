@@ -170,7 +170,6 @@ export class AuthService {
     return `${newAccessToken}`;
   }
 
-  // useProfile hook data
   async getProfile(userPayload: UserPayload): Promise<UserProfileRes> {
     const { sub, type } = userPayload;
     // if (type === 'seller') {

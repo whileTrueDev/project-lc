@@ -7,7 +7,6 @@ export function ShopInfoIndex(): JSX.Element {
       <Container maxWidth="2xl" p={6}>
         <VStack spacing={4} alignItems="stretch">
           <Heading mb={4}>상점설정</Heading>
-          <Divider />
           <ShopNameSection />
           <Divider />
         </VStack>
