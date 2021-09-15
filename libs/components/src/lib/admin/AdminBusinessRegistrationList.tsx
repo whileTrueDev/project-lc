@@ -1,16 +1,11 @@
 import { GridColumns } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { useColorModeValue } from '@chakra-ui/react';
-import { useDisplaySize } from '@project-lc/hooks';
-import dayjs from 'dayjs';
+import { useColorModeValue, Button } from '@chakra-ui/react';
+import { s3, useDisplaySize } from '@project-lc/hooks';
+import { SellerBusinessRegistration } from '@prisma/client';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 
 const columns: GridColumns = [
-  {
-    field: 'date',
-    headerName: '등록 날짜',
-    valueFormatter: ({ row }) => dayjs(row.date as Date).format('YYYY/MM/DD HH:mm:ss'),
-  },
   {
     field: 'sellerEmail',
     headerName: '광고주 이메일',
@@ -42,12 +37,29 @@ const columns: GridColumns = [
   {
     field: 'fileName',
     headerName: '이미지 파일',
-    valueFormatter: ({ row }) =>
-      `${process.env.NEXT_PUBLIC_S3_URL}/business-registration/${row.sellerEmail}/${row.fileName}`,
+    renderCell: (params) => downloadImageButton(params.row),
   },
 ];
 
-function makeListRow(sellerBusinessRegistrations: any[] | undefined) {
+// image down button
+function downloadImageButton(row: any): JSX.Element {
+  // 해당 링크로 들어가는 버튼
+  return (
+    <Button size="xs" onClick={() => downloadFromS3(row)}>
+      이미지 다운로드
+    </Button>
+  );
+}
+
+async function downloadFromS3(row: any) {
+  const { fileName, sellerEmail } = row;
+  const imageUrl = s3.s3DownloadImageUrl(fileName, sellerEmail);
+  window.open(imageUrl, '_blank');
+}
+
+function makeListRow(
+  sellerBusinessRegistrations: SellerBusinessRegistration[] | undefined,
+) {
   if (!sellerBusinessRegistrations) {
     return [];
   }
@@ -58,7 +70,7 @@ function makeListRow(sellerBusinessRegistrations: any[] | undefined) {
 
 // 관리자가 볼 계좌번호 등록 리스트
 export function AdminBusinessRegistrationList(props: {
-  sellerBusinessRegistrations: any[];
+  sellerBusinessRegistrations: SellerBusinessRegistration[];
 }): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { sellerBusinessRegistrations } = props;

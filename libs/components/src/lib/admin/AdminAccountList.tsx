@@ -2,12 +2,12 @@ import { GridColumns } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { useColorModeValue } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
-import dayjs from 'dayjs';
+import { SellerSettlementAccount } from '@prisma/client';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 
 const columns: GridColumns = [
   {
-    field: 'email',
+    field: 'sellerEmail',
     headerName: '광고주 이메일',
   },
   {
@@ -24,19 +24,21 @@ const columns: GridColumns = [
   },
 ];
 
-function makeListRow(sellerAccounts: any[] | undefined) {
-  if (!sellerAccounts) {
+function makeListRow(sellerSettlementAccount: SellerSettlementAccount[] | undefined) {
+  if (!sellerSettlementAccount) {
     return [];
   }
-  return sellerAccounts.map((element, index: number) => {
+  return sellerSettlementAccount.map((element, index: number) => {
     return { ...element, id: index, isRowSelectable: false };
   });
 }
 
 // 관리자가 볼 계좌번호 등록 리스트
-export function AdminAccountList(props: { sellerAccounts: any[] }): JSX.Element {
+export function AdminAccountList(props: {
+  sellerSettlementAccount: SellerSettlementAccount[];
+}): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
-  const { sellerAccounts } = props;
+  const { sellerSettlementAccount } = props;
   const useStyle = makeStyles({
     columnHeader: {
       backgroundColor: useColorModeValue('inherit', '#2D3748'),
@@ -62,7 +64,7 @@ export function AdminAccountList(props: { sellerAccounts: any[] }): JSX.Element 
       minH={300}
       density="compact"
       columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
-      rows={makeListRow(sellerAccounts)}
+      rows={makeListRow(sellerSettlementAccount)}
       rowCount={5}
       rowsPerPageOptions={[25, 50]}
       disableColumnMenu

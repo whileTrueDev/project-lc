@@ -20,7 +20,6 @@ import {
 } from '@project-lc/hooks';
 
 import { BusinessRegistrationForm } from './BusinessRegistrationForm';
-// 등록 정보UI와 동일한 형태를 사용
 
 export type BusinessRegistrationFormDto = BusinessRegistrationDto & {
   businessRegistrationImage: File | null;
