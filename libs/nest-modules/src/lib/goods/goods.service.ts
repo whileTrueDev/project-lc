@@ -69,6 +69,7 @@ export class GoodsService {
           },
         },
         confirmation: true,
+        ShippingGroup: true,
       },
     });
 
@@ -91,6 +92,12 @@ export class GoodsService {
         default_consumer_price: defaultOption.consumer_price, // 소비자가(미할인가)
         ...itemStockInfo,
         confirmation: item.confirmation,
+        shippingGroup: item.ShippingGroup
+          ? {
+              id: item.ShippingGroup.id,
+              shipping_group_name: item.ShippingGroup.shipping_group_name,
+            }
+          : undefined,
       };
     });
 
