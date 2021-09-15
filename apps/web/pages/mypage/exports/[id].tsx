@@ -7,11 +7,31 @@ import {
   OrderedList,
   Stack,
   Text,
+  Heading,
+  HStack,
+  List,
+  ListIcon,
+  Alert,
 } from '@chakra-ui/react';
-import { MypageLayout } from '@project-lc/components';
+import {
+  FmOrderStatusBadge,
+  MypageLayout,
+  TextDotConnector,
+} from '@project-lc/components';
 import { useFmExport } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
+import {
+  convertFmDeliveryCompanyToString,
+  convertOrderSitetypeToString,
+  FmExportRes,
+} from '@project-lc/shared-types';
+import dayjs from 'dayjs';
 
+import React from 'react';
+import { AiTwotoneEnvironment } from 'react-icons/ai';
+import { FaBoxOpen } from 'react-icons/fa';
+import { IoMdPerson } from 'react-icons/io';
+import { MdDateRange } from 'react-icons/md';
 import { OrderDetailLoading } from '../orders/[orderId]';
 
 export default function ExportsDetail() {
@@ -51,21 +71,69 @@ export default function ExportsDetail() {
     <MypageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2}>
         <Box as="section">
-          <Button size="sm" leftIcon={<ChevronLeftIcon />} onClick={() => router.back()}>
-            목록으로
-          </Button>
+          <ExportDetailTitle exportData={exp.data} />
         </Box>
 
         <Box as="section">
-          <Text>{id}</Text>
-          <OrderedList>
-            <ListItem>출고정보</ListItem>
-            <ListItem>연결된 주문(주문번호, 클릭시 주문으로 이동)</ListItem>
-          </OrderedList>
+          <ExportDetailSummary exportData={exp.data} />
+        </Box>
 
+        <Box as="section">
           <pre>{JSON.stringify(exp.data, null, 2)}</pre>
         </Box>
       </Stack>
     </MypageLayout>
+  );
+}
+
+export interface ExportDetailTitleProps {
+  exportData: FmExportRes;
+}
+export function ExportDetailTitle({ exportData }: ExportDetailTitleProps) {
+  return (
+    <Box>
+      <Heading>출고 {exportData.export_code}</Heading>
+      <HStack alignItems="center">
+        <FmOrderStatusBadge orderStatus={exportData.status} />
+        <TextDotConnector />
+        <Text>{dayjs(exportData.export_date).fromNow()} 출고</Text>
+      </HStack>
+    </Box>
+  );
+}
+
+export interface ExportDetailSummaryProps {
+  exportData: FmExportRes;
+}
+export function ExportDetailSummary({ exportData }: ExportDetailSummaryProps) {
+  return (
+    <List spacing={2}>
+      {exportData.shipping_date ? (
+        <ListItem isTruncated display="inline-block">
+          <Alert status="info" pl={0}>
+            <ListIcon boxSize="1.5rem" as={AiTwotoneEnvironment} color="green.500" />
+            배송완료일{' '}
+            {dayjs(exportData.shipping_date).format('YYYY년 MM월 DD일 HH:mm:ss')}
+          </Alert>
+        </ListItem>
+      ) : null}
+
+      <ListItem isTruncated>
+        <ListIcon boxSize="1.5rem" as={MdDateRange} color="green.500" />
+        출고일 {dayjs(exportData.regist_date).format('YYYY년 MM월 DD일 HH:mm:ss')}
+      </ListItem>
+      <ListItem isTruncated>
+        <ListIcon boxSize="1.5rem" as={FaBoxOpen} color="green.500" />
+        택배사 {convertFmDeliveryCompanyToString(exportData.delivery_company_code)}
+      </ListItem>
+      <ListItem isTruncated>
+        <ListIcon boxSize="1.5rem" as={IoMdPerson} color="green.500" />
+        송장번호 {exportData.delivery_number}
+      </ListItem>
+      <ListItem isTruncated>
+        <ListIcon boxSize="1.5rem" as={AiTwotoneEnvironment} color="green.500" />
+        출고 상품 개수 {exportData.items.length} 개
+      </ListItem>
+    </List>
   );
 }

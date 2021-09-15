@@ -51,7 +51,14 @@ export class FmExportsService {
    * @returns 출고정보
    */
   public async findOne(exportCode: string): Promise<FmExportRes> {
-    const findOneSql = `SELECT * FROM ${this.EXPORT_TABLE} WHERE export_code = ?`;
+    const findOneSql = `
+    SELECT *,
+    IF(
+      fm_goods_export.shipping_date = "0000-00-00",
+        null,
+        fm_goods_export.shipping_date
+      ) as shipping_date
+    FROM fm_goods_export WHERE export_code = ?`;
     const res: FmExport[] = await this.db.query(findOneSql, [exportCode]);
     if (res.length === 0) return null;
     const _export = res[0];
