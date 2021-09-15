@@ -138,6 +138,7 @@ export function ExportOrderOptionList({
         <Stack flex={3}>
           {order.data.items.map((item, itemIndex) => (
             <ExportOrderItem
+              key={item.item_seq}
               item={item}
               orderIndex={orderIndex}
               itemIndex={itemIndex}
@@ -235,18 +236,20 @@ export function ExportOrderItem({
               <Th>보낼수량</Th>
             </Tr>
           </Thead>
-          {item.options.map((opt, optIndex) => (
-            <ExportOrderOptionItem
-              item={item}
-              key={opt.item_option_seq}
-              option={opt}
-              orderIndex={orderIndex}
-              itemIndex={itemIndex}
-              optionIndex={optIndex}
-              selected={selected}
-            />
-          ))}
-          <Tbody />
+
+          <Tbody>
+            {item.options.map((opt, optIndex) => (
+              <ExportOrderOptionItem
+                item={item}
+                key={opt.item_option_seq}
+                option={opt}
+                orderIndex={orderIndex}
+                itemIndex={itemIndex}
+                optionIndex={optIndex}
+                selected={selected}
+              />
+            ))}
+          </Tbody>
         </Table>
       </Box>
     </Stack>
