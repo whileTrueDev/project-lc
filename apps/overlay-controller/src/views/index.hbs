@@ -119,9 +119,20 @@
         </div>
     </div>
     <div class="message-box">
-        <p>
+        <h2>
             메세지 제어
-        </p>
+        </h2>
+        <form>
+            <fieldset>
+                <legend>메세지 입력</legend>
+                기준 금액 <input type="number" id="standard-price"><br>
+                상품명 : <input type="text" id="product-name"><br>
+                구매액 : <input type="number" id="sold-price"><br>
+                구매자 : <input type="text" id="customer-nickname"><br>
+                메세지 : <input type="text" id="customer-message"><br>
+                <button id="message-button" type="submit">제출하기</button>
+            </fieldset>
+        </form>
     </div>
 </body>
 

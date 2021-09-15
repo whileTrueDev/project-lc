@@ -66,4 +66,47 @@ $(document).ready(function () {
     const selectedTime = $('#end-time-picker').val();
     socket.emit('get d-day', { roomName, date: selectedTime });
   });
+
+  $('form').submit(function (event) {
+    event.preventDefault();
+    let level;
+    let isLogin = true;
+    const standardPrice = $('#standard-price').val();
+    const productName = $('#product-name').val();
+    const soldPrice = $('#sold-price').val();
+    const customerNickname = $('#customer-nickname').val();
+    const customerMessage = $('#customer-message').val();
+    if (standardPrice > soldPrice) {
+      level = '1';
+      console.log(level);
+    } else {
+      level = '2';
+      console.log(level);
+    }
+    if (customerMessage.trim().length === 0) {
+      isLogin = false;
+    }
+    console.log(
+      `레벨 : ${level}
+      회원 여부 : ${isLogin}
+      구매상품 : ${productName}
+      구매액 : ${soldPrice}
+      구매자 : ${customerNickname}
+      메세지 : ${customerMessage}
+      `,
+    );
+    $.ajax({
+      type: 'POST',
+      url: 'http://localhost:3333/purchase-message',
+      data: {
+        level,
+        loginFlag: isLogin,
+        productName,
+        purchaseNum: Number(soldPrice),
+        nickname: customerNickname,
+        message: customerMessage,
+      },
+      success: alert('success'),
+    });
+  });
 });

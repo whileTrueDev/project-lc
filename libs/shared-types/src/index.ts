@@ -32,3 +32,4 @@ export * from './lib/constants/signupRegisterOptions';
 export * from './lib/shared-types';
 export * from './lib/dto/changeGoodsView.dto';
 export * from './lib/overlay/overlay-types';
+export * from './lib/overlay-controller/overlay-controller-types';
