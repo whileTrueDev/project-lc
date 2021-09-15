@@ -9,6 +9,7 @@ import {
   Query,
   ValidationPipe,
   HttpCode,
+  Header,
 } from '@nestjs/common';
 import {
   SendMailVerificationDto,
@@ -62,9 +63,9 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Req() req: Request, @Res() res: Response) {
-    res.append('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.send(this.authService.getProfile(req.user));
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  getProfile(@Req() req: Request) {
+    return this.authService.getProfile(req.user);
   }
 
   // * 인증코드 메일 전송

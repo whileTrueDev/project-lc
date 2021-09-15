@@ -10,7 +10,14 @@ export type AdminSettlementInfoType = {
 };
 
 export function getAdminSettlementInfo() {
-  return axios.get<AdminSettlementInfoType>('/admin/settlement').then((res) => res.data);
+  const PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD!;
+  return axios
+    .get<AdminSettlementInfoType>('/admin/settlement', {
+      params: {
+        password: PASSWORD,
+      },
+    })
+    .then((res) => res.data);
 }
 
 export function useAdminSettlementInfo(

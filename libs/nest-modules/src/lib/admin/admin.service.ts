@@ -18,13 +18,13 @@ export class AdminService {
       include: {
         sellerBusinessRegistration: {
           orderBy: {
-            id: 'asc',
+            id: 'desc',
           },
           take: 1,
         },
         sellerSettlementAccount: {
           orderBy: {
-            id: 'asc',
+            id: 'desc',
           },
           take: 1,
         },

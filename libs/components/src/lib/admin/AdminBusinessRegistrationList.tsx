@@ -7,6 +7,10 @@ import { ChakraDataGrid } from '../ChakraDataGrid';
 
 const columns: GridColumns = [
   {
+    field: 'companyName',
+    headerName: '회사명',
+  },
+  {
     field: 'sellerEmail',
     headerName: '광고주 이메일',
   },
