@@ -34,8 +34,9 @@ export function ShippingPolicyFormControlWithLabel({
   label: string;
   children: React.ReactNode;
 }) {
+  const { isMobileSize } = useDisplaySize();
   return (
-    <FormControl id={id} mb={6}>
+    <FormControl id={id} mb={6} minW={isMobileSize ? '100%' : 'lg'}>
       <FormLabel fontWeight="bold">{label}</FormLabel>
       {children}
     </FormControl>
