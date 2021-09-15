@@ -26,7 +26,7 @@ import {
   OrderReturnExistsAlert,
   SectionWithTitle,
 } from '@project-lc/components';
-import { useFmOrder } from '@project-lc/hooks';
+import { useDisplaySize, useFmOrder } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import React from 'react-transition-group/node_modules/@types/react';
 
@@ -39,6 +39,8 @@ export function OrderDetail(): JSX.Element {
   const orderId = router.query.orderId as string;
 
   const order = useFmOrder(orderId);
+
+  const { isMobileSize } = useDisplaySize();
 
   if (order.isLoading) {
     return (
@@ -94,9 +96,11 @@ export function OrderDetail(): JSX.Element {
         )}
 
         {/* 주문 버튼 */}
-        <Box as="section" mt={4}>
-          <OrderDetailActions order={order.data} />
-        </Box>
+        {isMobileSize ? null : (
+          <Box as="section" mt={4}>
+            <OrderDetailActions order={order.data} />
+          </Box>
+        )}
 
         {/* 주문 요약 */}
         <Box as="section">

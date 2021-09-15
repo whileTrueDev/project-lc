@@ -37,6 +37,13 @@ export function ExportDialog({
 
   /** 폼제출 핸들러 -> 출고 처리 API 요청 */
   async function onSubmit(formData: ExportOrderDto[]) {
+    if (!formData[0].exportOptions.every((o) => Number(o.exportEa) === 0)) {
+      return toast({
+        status: 'warning',
+        description:
+          '모든 주문상품의 보낼 수량이 0 입니다. 보낼 수량을 올바르게 입력해주세요.',
+      });
+    }
     // react-query 요청
     return exportMutation
       .mutateAsync({

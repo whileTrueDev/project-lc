@@ -117,7 +117,6 @@ export function getFmOrderStatusByNames(
  */
 export function isOrderExportable(step: FmOrderStatusNumString) {
   return getFmOrderStatusByNames([
-    '주문접수',
     '결제확인',
     '상품준비',
     '부분출고준비',

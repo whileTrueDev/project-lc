@@ -94,11 +94,19 @@ export function ExportManyDialog({
       if (isValid) {
         formMethods.setValue(`${orderIdx}.orderId`, orderId);
         const dto = formMethods.getValues(fieldID);
-        // 출고 처리 API 요청
-        exportOrder.mutateAsync(dto).then(onExportSuccess).catch(onExportFail);
+        if (dto.exportOptions.every((o) => Number(o.exportEa) === 0)) {
+          toast({
+            status: 'warning',
+            description:
+              '모든 주문상품의 보낼 수량이 0 입니다. 보낼 수량을 올바르게 입력해주세요.',
+          });
+        } else {
+          // 출고 처리 API 요청
+          exportOrder.mutateAsync(dto).then(onExportSuccess).catch(onExportFail);
+        }
       }
     },
-    [exportOrder, formMethods, onExportFail, onExportSuccess],
+    [exportOrder, formMethods, onExportFail, onExportSuccess, toast],
   );
 
   /** 폼제출 핸들러 -> 일괄 출고 처리 API 요청 */
@@ -108,9 +116,18 @@ export function ExportManyDialog({
     selectedKeys.forEach((k) => {
       const data = formData[Number(k)];
       if (selectedOptions.includes(data.orderId)) {
-        dto.push(data);
+        if (!data.exportOptions.every((o) => Number(o.exportEa) === 0)) {
+          dto.push(data);
+        }
       }
     });
+
+    if (dto.length === 0)
+      return toast({
+        status: 'warning',
+        description:
+          '모든 주문상품의 보낼 수량이 0 입니다. 보낼 수량을 올바르게 입력해주세요.',
+      });
 
     // 일괄 출고처리 요청
     return exportAll({ exportOrders: dto });
@@ -235,6 +252,16 @@ export function BundleExportDialog({
   /** 합포장 출고 처리 요청 */
   const exportBundle = useCallback(
     async (dto: ExportBundledOrdersDto) => {
+      const isExportable = dto.exportOrders.every((o) =>
+        o.exportOptions.every((_o) => !(Number(_o.exportEa) === 0)),
+      );
+      if (!isExportable)
+        return toast({
+          status: 'warning',
+          description:
+            '모든 주문상품의 보낼 수량이 0 입니다. 보낼 수량을 올바르게 입력해주세요.',
+        });
+
       return exportBundledOrders
         .mutateAsync(dto)
         .then(() => {
