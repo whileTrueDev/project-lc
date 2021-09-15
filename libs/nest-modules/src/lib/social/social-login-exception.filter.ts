@@ -1,5 +1,5 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { SocialService } from './social.service';
 
 @Catch(HttpException)
@@ -8,10 +8,7 @@ export class SocialLoginExceptionFilter implements ExceptionFilter {
 
   async catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
-    console.log(response.getHeaders());
-    console.log(request.headers);
     const { provider, providerId, accessToken, message } = exception.response;
 
     switch (provider) {
@@ -50,8 +47,6 @@ export class SocialLoginExceptionFilter implements ExceptionFilter {
         break;
       }
       default: {
-        // console.log('wowowowow');
-        // 로그인을 하라고 리다이렉팅
         response.redirect('http://localhost:4200/login'); // TODO: 추후 주소 변경
         break;
       }
