@@ -37,7 +37,7 @@ export function ExportDialog({
 
   /** 폼제출 핸들러 -> 출고 처리 API 요청 */
   async function onSubmit(formData: ExportOrderDto[]) {
-    if (!formData[0].exportOptions.every((o) => Number(o.exportEa) === 0)) {
+    if (formData[0].exportOptions.every((o) => Number(o.exportEa) === 0)) {
       return toast({
         status: 'warning',
         description:
