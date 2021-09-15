@@ -44,3 +44,4 @@ export * from './lib/SellerGoodsList';
 export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
 export * from './lib/GoodsRegistForm';
+export * from './lib/ShippingPolicyForm';

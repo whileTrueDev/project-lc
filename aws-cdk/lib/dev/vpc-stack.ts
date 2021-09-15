@@ -11,7 +11,7 @@ export class LCDevVpcStack extends cdk.Stack {
   public albSecGrp: ec2.SecurityGroup;
   public dbSecGrp: ec2.SecurityGroup;
   public apiSecGrp: ec2.SecurityGroup;
-  public socketSecGrp: ec2.SecurityGroup;
+  public overlaySecGrp: ec2.SecurityGroup;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -38,8 +38,8 @@ export class LCDevVpcStack extends cdk.Stack {
 
     this.createAlbSecGrp();
     const apiSecGrp = this.createApiSecGrp();
-    const socketSecGrp = this.createSocketSecGrp();
-    this.createDbSecGrp(apiSecGrp, socketSecGrp);
+    const overlaySecGrp = this.createOverlaySecGrp();
+    this.createDbSecGrp(apiSecGrp, overlaySecGrp);
   }
 
   private createAlbSecGrp() {
@@ -49,13 +49,21 @@ export class LCDevVpcStack extends cdk.Stack {
       allowAllOutbound: true,
     });
 
-    this.albSecGrp.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80), 'Allow 80 to all');
-    this.albSecGrp.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443), 'Allow 443 to all');
+    this.albSecGrp.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(80),
+      'Allow 80 to all',
+    );
+    this.albSecGrp.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(443),
+      'Allow 443 to all',
+    );
 
     return this.albSecGrp;
   }
 
-  private createDbSecGrp(apiSecGrp: ec2.SecurityGroup, socketSecGrp: ec2.SecurityGroup) {
+  private createDbSecGrp(apiSecGrp: ec2.SecurityGroup, overlaySecGrp: ec2.SecurityGroup) {
     // * 보안그룹
     // db 보안그룹
     this.dbSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}DB-SecGrp`, {
@@ -75,9 +83,9 @@ export class LCDevVpcStack extends cdk.Stack {
       'Allow port 3306 only to traffic from api security group',
     );
     this.dbSecGrp.addIngressRule(
-      socketSecGrp ?? this.socketSecGrp,
+      overlaySecGrp ?? this.overlaySecGrp,
       ec2.Port.tcp(3306),
-      'Allow port 3306 only to traffic from socket security group',
+      'Allow port 3306 only to traffic from overlay security group',
     );
 
     this.dbSecGrp.addIngressRule(
@@ -109,19 +117,19 @@ export class LCDevVpcStack extends cdk.Stack {
     return this.apiSecGrp;
   }
 
-  private createSocketSecGrp() {
-    this.socketSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}Socket-SecGrp`, {
+  private createOverlaySecGrp() {
+    this.overlaySecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}Overlay-SecGrp`, {
       vpc: this.vpc,
-      description: 'socket security grp for project-lc',
+      description: 'overlay security grp for project-lc',
       allowAllOutbound: true,
     });
 
-    this.socketSecGrp.addIngressRule(
+    this.overlaySecGrp.addIngressRule(
       this.albSecGrp,
       ec2.Port.tcp(3002),
       'allow port 3002 to anywhere',
     );
 
-    return this.socketSecGrp;
+    return this.overlaySecGrp;
   }
 }

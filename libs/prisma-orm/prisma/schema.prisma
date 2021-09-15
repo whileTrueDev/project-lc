@@ -23,6 +23,7 @@ model Seller {
   sellerBusinessRegistration SellerBusinessRegistration[]
   sellerSettlements          SellerSettlements[]
   sellerSettlementAccount    SellerSettlementAccount[]
+  shippingGroups             ShippingGroup[]
 }
 
 // 마케터의 사업자 등록증을 위한 모델 seller와 1 : N의 관계를 가지므로
@@ -123,6 +124,8 @@ model Goods {
   regist_date             DateTime           @default(now()) // 상품등록일 (project-lc 에 판매자가 등록한 날짜)
   update_date             DateTime           @default(now()) @updatedAt // 수정일 (퍼스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서 수정한 날짜)
   runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
+  ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
+  shippingGroupId         Int?
 }
 
 // 상품 검수 정보
@@ -171,6 +174,18 @@ model GoodsOptionsSupplies {
   safe_stock     Int?         @default(0) // 각 매장의 옵션별 안전 재고
 }
 
+// 라이브 커머스 랭킹 테이블
+model LiveCommerceRanking {
+  id                 Int      @id @default(autoincrement())
+  nickname           String   @default("비회원")
+  text               String   @db.LongText
+  price              Int
+  phoneCallEventFlag Boolean  @default(false)
+  loginFlag          Boolean  @default(true)
+  creatorId          String
+  createdAt          DateTime @default(now())
+}
+
 // * 상품 - 상태
 enum GoodsStatus {
   normal // 정상
@@ -199,27 +214,25 @@ enum ShopOrGoods {
   goods
 }
 
-// * 상��� - 개별 배송비 선택
-// * 상품 - ���소 구매 수량 사용 여부
-// * 상�� - 최대 ���매 ���량 사용 ����부
+// * 상품- 개별 배송비 선택
+// * 상품 - 최소 구매 수량 사용 여부
+// * 상품 - 최대 구매 ���량 사용 ����부
 enum LimitOrUnlimit {
   unlimit
   limit
 }
 
-// * �����품 - 필수옵션-분리/합체형 구분
+// * 상품 - 필수옵션-분리/합체형 구분
 enum OptionViewType {
   divide
   join
 }
 
-// * 옵션 필수 여부
 enum YesOrNo {
   y
   n
 }
 
-// * 옵션 ���출 여부
 enum YesOrNo_UPPERCASE {
   Y
   N
@@ -238,4 +251,116 @@ model LoginHistory {
   device     String // 로그인 기기
   ua         String // User-Agent 문자열
   createDate DateTime @default(now()) // 로그인 일시
+}
+
+// ****************************
+// 배송비 정책 테이블 - fm_shipping_grouping 참고
+model ShippingGroup {
+  id                      Int                @id @default(autoincrement())
+  seller                  Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId                Int
+  shippingSets            ShippingSet[]
+  baseAddress             String // 기본주소
+  detailAddress           String // 상세주소
+  postalCode              String // 우편번호
+  goods                   Goods[]
+  // 이하 퍼스트몰 fm_shipping_grouping 과  동일한 컬럼
+  shipping_group_name     String             @db.VarChar(255) // '배송그룹명',
+  shipping_calcul_type    ShippingCalculType @default(bundle) // '배송비계산기준', free무료, bundle묶음, each개별 배송비 추가설정
+  shipping_calcul_free_yn YesOrNo_UPPERCASE? @default(N) // '계산 무료화 여부',
+  shipping_std_free_yn    YesOrNo_UPPERCASE? @default(N) // '기본배송비 무료화',
+  shipping_add_free_yn    YesOrNo_UPPERCASE? @default(N) // '추가배송비 무료화',
+}
+
+// 배송비 계산 기준
+enum ShippingCalculType {
+  free //무료
+  bundle // 묶음
+  each // 개별
+}
+
+// ****************************
+// 배송 설정 테이블 - fm_shipping_set 참고
+model ShippingSet {
+  id                  Int                @id @default(autoincrement())
+  shippingOptions     ShippingOption[]
+  shippingGroup       ShippingGroup      @relation(fields: [shipping_group_seq], references: [id], onDelete: Cascade)
+  // 이하 퍼스트몰 fm_shipping_set 과 동일한 컬럼
+  shipping_group_seq  Int
+  shipping_set_code   ShippingSetCode    @default(delivery) // '배송설정 코드', delivery 택배/direct_delivery 직접배송/quick 퀵서비스/freight 화물배송/custom 직접입력/direct_store 매장수령
+  shipping_set_name   String             @db.VarChar(50) // 배송설정 명',
+  default_yn          YesOrNo_UPPERCASE? @default(N) // 대표 선택 여부 - 추후 배송가능 국가별 대표지정 현재안씀.',
+  delivery_nation     DeliveryNation     @default(korea) // '배송가능국가',
+  delivery_limit      LimitOrUnlimit     @default(unlimit) // 배송지역 제한 - unlimit - 전국(전세계) / limit - 지정지역(국가)',
+  refund_shiping_cost Decimal?           @db.Decimal(11, 2) // '반품 배송비',
+  swap_shiping_cost   Decimal?           @db.Decimal(11, 2) // '맞교환 배송비',
+  prepay_info         PrepayInfo         @default(delivery) // 선불/착불 정보
+  shiping_free_yn     YesOrNo_UPPERCASE  @default(N) //'무료배송시 반품왕복배송비',
+}
+
+// 착불/선불 정보
+enum PrepayInfo {
+  delivery
+  postpaid
+  all
+}
+
+// 배송설정 코드
+enum ShippingSetCode {
+  delivery // 택배
+  direct_delivery // 직접배송
+  quick // 퀵서비스
+  freight // 화물배송
+  direct_store // 매장수령
+  custom // 직접입력
+}
+
+// 배송가능 국가
+enum DeliveryNation {
+  korea // 대한민국
+  global // 해외
+}
+
+// 배송 방법 테이블 fm_shipping_option 참고
+model ShippingOption {
+  id                Int                @id @default(autoincrement())
+  shippingCost      ShippingCost[]
+  shippingSet       ShippingSet        @relation(fields: [shipping_set_seq], references: [id], onDelete: Cascade)
+  // 이하 퍼스트몰 fm_shipping_option 과 동일한 컬럼
+  shipping_set_seq  Int
+  shipping_set_type ShippingSetType    @default(std) // 배송설정 타입 std - 기본 / add - 추가
+  shipping_opt_type ShippingOptType    @default(free) //'배송방법 타입 free - 무료 / fixed - 고정 / amount - 금액 / cnt - 수량 / weight - 무게',
+  default_yn        YesOrNo_UPPERCASE? @default(N) // 기본 옵션인지 여부
+  section_st        Float? // 시작구간(무게, 금액, 수량)
+  section_ed        Float? // 끝구간(무게, 금액, 수량)
+
+
+}
+
+// 배송설정 타입
+enum ShippingSetType {
+  std // 기본
+  add // 추가
+}
+
+// 배송방법 타입
+enum ShippingOptType {
+  free // 무료
+  fixed // 고정
+  amount // 금액(구간입력)
+  amount_rep // 금액(구간반복)
+  cnt // 수량(구간입력)
+  cnt_rep // 수량(구간반복)
+  weight // 무게(구간입력)
+  weight_rep // 무게(구간반복)
+}
+
+// 배송비 금액 테이블 fm_shipping_cost 참고,
+// 배송지역 상세 부분 구현하지 못하여 배송비 금액테이블 부분에 배송지역 추가함
+model ShippingCost {
+  id                 Int            @id @default(autoincrement())
+  shippingOption     ShippingOption @relation(fields: [shipping_opt_seq], references: [id], onDelete: Cascade)
+  shipping_opt_seq   Int
+  shipping_cost      Decimal?       @db.Decimal(11, 2) // 금액
+  shipping_area_name String         @db.VarChar(255) // '지역명',
 }
