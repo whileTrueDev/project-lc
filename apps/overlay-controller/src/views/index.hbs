@@ -1,11 +1,12 @@
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.1/css/jquery.dataTables.css">
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.js"></script>
-    <script type='module' src="/admin.js"></script>
+    <script src="/admin.js"></script>
     <link href="/layout.css" rel='stylesheet'>
     <title>Controller</title>
     <script>
@@ -25,12 +26,14 @@
             </thead>
             <tbody>
                 {{#urlAndNicknames}}
-                <tr >
-                    <td>{{userNickname}}
+                <tr class="user-row" id={{userNickname}}>
+                    <td class="nickname-cell">{{userNickname}}
                     </td>
-                    <td>{{overlayUrl}}</td>
+                    <td class="url-cell">{{overlayUrl}}</td>
                     <td>
-                        <button>
+                        <button
+                            class="socket-id-button"
+                        >
                             선택
                         </button>
                     </td>
@@ -40,20 +43,28 @@
         </table>
     </div>
     <div class="console-box">
+        <h1 id="creator-name"> 
+        </h1>
+        <h6>
+            연결상태 : 
+            <span id="connection-status">
+                크리에이터를 선택해주세요
+            </span>
+        </h6>
         <h2>
             화면 제어
         </h2>
         <div class="screen-control-box">
-            <button value="화면 띄우기">
+            <button id="screen-show-button" value="화면 띄우기">
                 화면 띄우기
             </button>
-            <button value="화면 숨기기" >
+            <button id="screen-hide-button" value="화면 숨기기" >
                 화면 숨기기
             </button>
-            <button value="로고 색상 변경" >
+            <button id="logo-toggle-button" value="로고 색상 변경" >
                 로고 색상 변경
             </button>
-            <button value="하단 띠 토글">
+            <button id="bottom-area-toggle-button" value="하단 띠 토글">
                 하단 띠 토글
             </button>
         </div>
@@ -61,22 +72,22 @@
             <h2>
                 동작 제어
             </h2>
-            <button value="Intro 송출">
+            <button id="show-intro-video-button" value="Intro 송출">
                 Intro 송출
             </button>
-            <button value="Outro 송출">
+            <button id="show-outro-video-button" value="Outro 송출">
                 Outro 송출
             </button>
-            <button value="영상 비우기">
+            <button id="hide-video-button" value="영상 비우기">
                 영상 비우기
             </button>
-            <button value="Outro 송출">
+            <button id="play-bgm-button" value="Outro 송출">
                 BGM 재생
             </button>
-            <button value="Outro 종료">
+            <button id="pause-bgm-button" value="Outro 종료">
                 BGM 종료
             </button>
-            <button value="새로고침">
+            <button id="refresh-button" value="새로고침">
                 새로고침
             </button>
         </div>
@@ -84,20 +95,26 @@
             <h2>
                 목표 제어
             </h2>
-            <form>
-                <input type="datetime-local" id="end-time"
-                    value="2021-09-15T19:30"
+            <div 
+                class="datetime-picker"
+            >
+                <input 
+                    type="datetime-local" 
+                    id="end-time-picker"
                     />
-                <button>
+                <button
+                    id="end-time-send-button"
+                >
                     시간 전송
                 </button>
-            </form>
-            <form>
+            </div>
+            {{!-- <form>
                 <input type="number" />
-                <button>
+                <button
+                >
                     목표 전송
                 </button>
-            </form>
+            </form> --}}
 
         </div>
     </div>

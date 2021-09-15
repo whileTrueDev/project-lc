@@ -13,7 +13,6 @@ export class AppController {
   @Render('index')
   async renterTest() {
     const urlAndNicknames = await this.overlayControllerService.getCreatorUrls();
-    console.log(urlAndNicknames);
     return { urlAndNicknames };
   }
 }
