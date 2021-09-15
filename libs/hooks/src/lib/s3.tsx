@@ -37,10 +37,9 @@ export const s3 = (() => {
     type: string;
     filename: string | null;
   }) {
-    // email으로 사용한다.
-    // fileName의 경우, 해당 날짜의 데이터를 추가한다.
+    const reducedName = filename?.replace(/ /gi, '');
     const prefix = moment().format('YYMMDDHHmmss').toString();
-    const fileFullName = `${prefix}_${filename}`;
+    const fileFullName = `${prefix}_${reducedName}`;
     const pathList = [type, userMail, fileFullName];
     return {
       key: path.join(...pathList),
@@ -67,11 +66,25 @@ export const s3 = (() => {
       }).promise();
       return fileName;
     } catch (error) {
+      console.log(error);
       return null;
     }
   }
 
+  // s3 bucket에서 다운로드 하기
+  function s3DownloadImageUrl(fileName: string, sellerEmail: string): string {
+    const signedUrlExpireSeconds = 60;
+    const params = {
+      Bucket: S3_BUCKET_NAME,
+      Key: `business-registration/${sellerEmail}/${fileName}`,
+      Expires: signedUrlExpireSeconds,
+    };
+    const imageUrl = new AWS.S3().getSignedUrl('getObject', params);
+    return imageUrl;
+  }
+
   return {
     s3UploadImage,
+    s3DownloadImageUrl,
   };
 })();

@@ -63,7 +63,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Req() req: Request, @Res() res: Response) {
-    // return ;
     res.append('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.send(this.authService.getProfile(req.user));
   }
