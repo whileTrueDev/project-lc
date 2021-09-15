@@ -29,21 +29,21 @@ export const constants = {
      */
     ECS_API_PORT: 3000,
     /**
-     * Socket 서버 서비스명
+     * Overlay 서버 서비스명
      */
-    ECS_SOCKET_SERVICE_NAME: 'project-lc-socket-dev-service',
+    ECS_OVERLAY_SERVICE_NAME: 'project-lc-overlay-dev-service',
     /**
-     * Socket 서버 컨테이너 패밀리명 (작업정의명)
+     * Overlay 서버 컨테이너 패밀리명 (작업정의명)
      */
-    ECS_SOCKET_FAMILY_NAME: 'project-lc-socket-dev',
+    ECS_OVERLAY_FAMILY_NAME: 'project-lc-overlay-dev',
     /**
      * API 서버 cloudwatch log group 명
      */
-    ECS_SOCKET_LOG_GLOUP_NAME: '/ecs/project-lc-socket-dev',
+    ECS_OVERLAY_LOG_GLOUP_NAME: '/ecs/project-lc-overlay-dev',
     /**
-     * Socket 서버 PORT
+     * Overlay 서버 PORT
      */
-    ECS_SOCKET_PORT: 3002,
+    ECS_OVERLAY_PORT: 3002,
     /**
      * VPC Subnet 인그레스 서브넷 그룹 명
      */

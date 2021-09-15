@@ -14,12 +14,7 @@
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
       "options": {
-        "cacheableOperations": [
-          "build",
-          "lint",
-          "test",
-          "e2e"
-        ]
+        "cacheableOperations": ["build", "lint", "test", "e2e"]
       }
     }
   },
@@ -47,13 +42,16 @@
     "nest-modules": {
       "tags": []
     },
+    "overlay": {
+      "tags": []
+    },
+    "overlay-controller": {
+      "tags": []
+    },
     "prisma-orm": {
       "tags": []
     },
     "shared-types": {
-      "tags": []
-    },
-    "socket": {
       "tags": []
     },
     "stores": {
@@ -64,9 +62,7 @@
     },
     "web-e2e": {
       "tags": [],
-      "implicitDependencies": [
-        "web"
-      ]
+      "implicitDependencies": ["web"]
     }
   }
 }

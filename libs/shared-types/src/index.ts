@@ -30,6 +30,7 @@ export * from './lib/dto/sendMailVerification.dto';
 export * from './lib/dto/settlementAccount.dto';
 export * from './lib/dto/signUpSeller.dto';
 export * from './lib/front-type/orderFilterFormType';
+export * from './lib/overlay/overlay-types';
 export * from './lib/res-types/fmExport.res';
 export * from './lib/res-types/fmGoods.res';
 export * from './lib/res-types/fmOrder.res';
