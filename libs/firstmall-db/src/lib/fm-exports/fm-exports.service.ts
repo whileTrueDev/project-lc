@@ -195,6 +195,7 @@ export class FmExportsService {
     if (!orderInfo) return null;
 
     // 실물 출고 처리 쿼리 생성
+    const today = new Date();
     const goodsExport = this.createGoodsExportQuery({
       export_code: exportCode,
       status: targetStatus, // 출고완료
@@ -202,9 +203,10 @@ export class FmExportsService {
       delivery_number: deliveryNumber, // 송장번호
       order_seq: orderId,
       domestic_shipping_method: orderInfo.shipping_method,
-      status_date: new Date(),
-      export_date: new Date(),
-      regist_date: new Date(),
+      status_date: today,
+      export_date: today,
+      complete_date: today,
+      regist_date: today,
       shipping_provider_seq: 1, // fm_provider.provider_seq
       shipping_group: orderInfo.shipping_group,
       shipping_method: orderInfo.shipping_method,
@@ -352,7 +354,7 @@ export class FmExportsService {
         params.delivery_number,
         params.status_date,
         params.export_date,
-        params.complete_date || new Date(),
+        params.complete_date || null,
         params.regist_date,
         params.shipping_provider_seq,
         params.shipping_group,
