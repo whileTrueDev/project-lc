@@ -259,6 +259,7 @@ export function OrderToolbar({ options }: OrderToolbarProps) {
           <>
             {options.map((opt) => (
               <Tooltip
+                key={opt.name}
                 label={opt.disableMessage}
                 placement="top-start"
                 isDisabled={!opt.isDisabled}
