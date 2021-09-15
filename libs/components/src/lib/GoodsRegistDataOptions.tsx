@@ -1,12 +1,4 @@
-import {
-  Button,
-  useBoolean,
-  Text,
-  Radio,
-  RadioGroup,
-  Input,
-  HStack,
-} from '@chakra-ui/react';
+import { Button, HStack, Input, Radio, RadioGroup, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import SectionWithTitle from './SectionWithTitle';
 
