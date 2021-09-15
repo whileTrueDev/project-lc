@@ -80,4 +80,4 @@ function CustomDataGrid(props: DataGridProps): JSX.Element {
   );
 }
 
-export const ChakraDataGrid = chakra(CustomDataGrid);
+export const ChakraDataGrid = chakra(CustomDataGrid, {});

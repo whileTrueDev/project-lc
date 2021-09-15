@@ -4,9 +4,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GoodsModule, GoodsService, JwtAuthGuard } from '@project-lc/nest-modules';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
+import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import {
   orderDetailExportsSample,
-  orderDetailOptionsSample,
+  orderDetailItemsSample,
   orderDetailRefundsSample,
   orderDetailReturnsSample,
   orderMetaInfoSample,
@@ -77,9 +78,9 @@ describe('FmOrdersController', () => {
   });
 
   describe('GET /fm-orders', () => {
-    const result = {
+    const result: FindFmOrderDetailRes = {
       ...orderMetaInfoSample,
-      options: orderDetailOptionsSample,
+      items: orderDetailItemsSample,
       exports: orderDetailExportsSample,
       refunds: orderDetailRefundsSample,
       returns: orderDetailReturnsSample,
