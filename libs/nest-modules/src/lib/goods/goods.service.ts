@@ -232,12 +232,30 @@ export class GoodsService {
 
   // 상품 등록
   public async registGoods(email: string, dto: RegistGoodsDto) {
-    const goods = await this.prisma.goods.create({
-      data: {
-        seller: { connect: { email } },
-        ...dto,
-      },
-    });
-    return { email, dto, goods };
+    try {
+      const { options, ...goodsData } = dto;
+      const optionsData = options.map((opt) => {
+        const { supply, ...optData } = opt;
+        return {
+          ...optData,
+          supply: {
+            create: supply,
+          },
+        };
+      });
+      const goods = await this.prisma.goods.create({
+        data: {
+          seller: { connect: { email } },
+          ...goodsData,
+          options: {
+            create: optionsData,
+          },
+        },
+      });
+      return { goodsId: goods.id };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 }
