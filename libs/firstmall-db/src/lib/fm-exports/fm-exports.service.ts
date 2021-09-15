@@ -52,13 +52,27 @@ export class FmExportsService {
    */
   public async findOne(exportCode: string): Promise<FmExportRes> {
     const findOneSql = `
-    SELECT *,
-    IF(
-      fm_goods_export.shipping_date = "0000-00-00",
-        null,
-        fm_goods_export.shipping_date
-      ) as shipping_date
-    FROM fm_goods_export WHERE export_code = ?`;
+    SELECT fm_goods_export.*,
+      IF(
+        fm_goods_export.shipping_date = "0000-00-00",
+          null,
+          fm_goods_export.shipping_date
+        ) as shipping_date,
+      recipient_user_name,
+      recipient_phone,
+      recipient_cellphone,
+      recipient_zipcode,
+      recipient_address,
+      recipient_address_street,
+      recipient_address_detail,
+      recipient_email,
+      order_user_name,
+      order_phone,
+      order_cellphone,
+      order_email
+    FROM fm_goods_export
+    JOIN fm_order USING(order_seq)
+    WHERE export_code = ?`;
     const res: FmExport[] = await this.db.query(findOneSql, [exportCode]);
     if (res.length === 0) return null;
     const _export = res[0];
@@ -338,7 +352,7 @@ export class FmExportsService {
         params.delivery_number,
         params.status_date,
         params.export_date,
-        params.complete_date || null,
+        params.complete_date || new Date(),
         params.regist_date,
         params.shipping_provider_seq,
         params.shipping_group,

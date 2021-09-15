@@ -70,7 +70,7 @@ export function OrderDetailReturnInfo({ returns }: { returns: FmOrderReturn }) {
         <Box my={2}>
           <Text fontWeight="bold">반품 상품</Text>
           {returns.items.map((i) => (
-            <Flex mb={2}>
+            <Flex mb={2} key={i.item_option_seq}>
               {i.image && (
                 <ChakraNextImage
                   layout="intrinsic"

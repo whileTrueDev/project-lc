@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import { FmOrderExportItemOption } from './fmOrder.res';
+import { FmOrder, FmOrderExportItemOption } from './fmOrder.res';
 
 export interface FmExport {
   /** 출고고유번호 */
@@ -95,9 +95,34 @@ export interface FmExport {
   talkbuy_shiping_date: string | null;
   /** 톡구매 주문번호 */
   talkbuy_order_id: string | null;
+  /** 주문자명 */
+  order_user_name: string;
+  /** 주문자전화 */
+  order_phone: string | null;
+  /** 주문자휴대폰 */
+  order_cellphone: string;
+  /** 주문자이메일 */
+  order_email: string;
+  /** 받는자 명 */
+  recipient_user_name: FmOrder['recipient_user_name'];
+  /** 받는자 전화번호 */
+  recipient_phone: FmOrder['recipient_phone'];
+  /** 받는자 휴대전화 */
+  recipient_cellphone: FmOrder['recipient_cellphone'];
+  /** 받는자 주소지 우편번호 */
+  recipient_zipcode: FmOrder['recipient_zipcode'];
+  /** 받는자 주소지 */
+  recipient_address: FmOrder['recipient_address'];
+  /** 받는자 주소지(도로명) */
+  recipient_address_street: FmOrder['recipient_address_street'];
+  /** 받는자 주소지 상세 */
+  recipient_address_detail: FmOrder['recipient_address_detail'];
+  /** 받는자 이메일 */
+  recipient_email: FmOrder['recipient_email'];
 }
 
 export type FmExportItem = FmOrderExportItemOption;
 export type FmExportRes = FmExport & {
+  /** 이 출고에 포함된 상품(옵션) 목록 */
   items: FmExportItem[];
 };
