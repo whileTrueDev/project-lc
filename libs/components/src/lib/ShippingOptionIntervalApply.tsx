@@ -52,6 +52,9 @@ export function ShippingOptionIntervalApply({
 
   const onSubmit = (data: IntervalFormType) => {
     const { section_ed, shipping_cost, shipping_area_name } = data;
+    if (shipping_area_name === '지역 선택') {
+      return;
+    }
 
     // 기본배송비 옵션이고 && 현재 입력하려는 옵션의 배송비가 0원이고 && 이전 입력된 옵션의 배송비가 모두 0원인경우 에러
     if (
@@ -147,6 +150,11 @@ export function ShippingOptionIntervalApply({
                   valueAsNumber: true,
                   validate: {
                     positive: (v) => (v ? v >= 0 : true || '음수는 입력할 수 없습니다'),
+                    biggerThanSectionStart: (v) => {
+                      return (
+                        (v ? v > sectionStart : true) || '시작값보다 큰 값을 입력해주세요'
+                      );
+                    },
                   },
                 })}
               />
@@ -156,33 +164,31 @@ export function ShippingOptionIntervalApply({
 
           {/* 지역, 가격 설정 */}
           <Stack justifyContent="center">
-            {/* 지역 설정 셀렉트 - 지정지역배송일때만 표시하도록 */}
-            {deliveryLimit === 'limit' && (
-              <Controller
-                name="shipping_area_name"
-                control={control}
-                rules={{
-                  validate: {
-                    selectArea: (v) => v !== '지역 선택' || '지역을 선택해주세요',
-                  },
-                }}
-                render={({ field }) => {
-                  return (
-                    <Select w={120} {...field}>
-                      {deliveryLimit === 'limit' || shippingSetType === 'add' ? (
-                        ['지역 선택', ...KOREA_PROVINCES].map((area) => (
-                          <option key={area} value={area}>
-                            {area}
-                          </option>
-                        ))
-                      ) : (
-                        <option value="대한민국">대한민국</option>
-                      )}
-                    </Select>
-                  );
-                }}
-              />
-            )}
+            {/* 지역 설정 셀렉트 */}
+            <Controller
+              name="shipping_area_name"
+              control={control}
+              rules={{
+                validate: {
+                  selectArea: (v) => v !== '지역 선택' || '지역을 선택해주세요',
+                },
+              }}
+              render={({ field }) => {
+                return (
+                  <Select w={120} {...field}>
+                    {deliveryLimit === 'limit' || shippingSetType === 'add' ? (
+                      ['지역 선택', ...KOREA_PROVINCES].map((area) => (
+                        <option key={area} value={area}>
+                          {area}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="대한민국">대한민국</option>
+                    )}
+                  </Select>
+                );
+              }}
+            />
             {/* 가격 설정 */}
             <FormControl id="shipping_cost">
               <Stack direction="row" alignItems="center">
