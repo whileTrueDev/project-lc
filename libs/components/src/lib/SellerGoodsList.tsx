@@ -92,8 +92,8 @@ const columns: GridColumns = [
         <TextWithPopperButton
           title="재고/가용"
           iconAriaLabel="재고/가용 설명"
-          icon={<QuestionIcon />}
           iconColor="black"
+          portalBody
         >
           <ExampleStockDescription />
         </TextWithPopperButton>
@@ -134,8 +134,8 @@ const columns: GridColumns = [
         <TextWithPopperButton
           title="재고판매"
           iconAriaLabel="재고판매 설명"
-          icon={<QuestionIcon />}
           iconColor="black"
+          portalBody
         >
           <Text mb={2} fontWeight="bold">
             재고(옵션 기준)에 따른 상품 판매 설정에 따라 아래와 같이 3가지로 표기됩니다.
@@ -150,8 +150,31 @@ const columns: GridColumns = [
     },
     sortable: false,
   },
-  // TODO: 배송비 정책 혹은 상품 등록 진행 후 배송비 정책 연결 필요
-  { field: 'shipping_policy', headerName: '배송비', sortable: false, minWidth: 80 },
+  // TODO: 배송비 정책 조회 기능 추가 필요 & 스타일링 필요
+  // TODO: Goods.shipping_policy 은 어디에 표시함?
+  {
+    field: 'shippingGroup',
+    headerName: '배송비',
+    sortable: false,
+    minWidth: 80,
+    renderCell: ({ row }) => {
+      const { shippingGroup } = row;
+      if (!shippingGroup) {
+        return <Text>shop</Text>;
+      }
+      const { id, shipping_group_name } = shippingGroup;
+      return (
+        <Button
+          data-shipping-group-id={id}
+          onClick={(e) => {
+            console.log(e.currentTarget.dataset.shippingGroupId);
+          }}
+        >
+          {shipping_group_name}
+        </Button>
+      );
+    },
+  },
   {
     field: 'date',
     headerName: '등록일/수정일',
