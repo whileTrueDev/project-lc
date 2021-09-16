@@ -13,7 +13,6 @@ model Seller {
   email                      String                       @unique
   name                       String?
   password                   String?
-  shopName                   String?
   goods                      Goods[]
   loginHistory               LoginHistory[]
   sellerBusinessRegistration SellerBusinessRegistration[]
@@ -124,7 +123,7 @@ model Goods {
   runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
-  
+
   @@index([sellerId], name: "sellerId")
 }
 
@@ -160,7 +159,7 @@ model GoodsOptions {
 model GoodsOptionsSupplies {
   id             Int          @id @default(autoincrement())
   goodsOptionsId Int
-  // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
+  // ���기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   stock          Int          @db.UnsignedInt // 재고
   badstock       Int?         @db.UnsignedInt // 불량재고
   safe_stock     Int?         @default(0) // 각 매장의 옵���별 안전 재고
@@ -230,7 +229,6 @@ enum ShopOrGoods {
   shop
   goods
 }
-
 
 // * 상품- 개별 배송비 선택
 // * 상품 - 최소 구매 수량 사용 여부
