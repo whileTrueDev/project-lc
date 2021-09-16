@@ -31,7 +31,7 @@ model Seller {
 model SellerShop {
   sellerEmail String @unique // 등록한 판매자 ID 
   shopName    String
-  seller      Seller @relation(fields: [sellerEmail], references: [email])
+  seller      Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 }
 
 // 마케터의 사업자 등록증을 위한 모델 seller와 1 : N의 관계를 가지므로
@@ -47,7 +47,7 @@ model SellerBusinessRegistration {
   taxInvoiceMail             String // 세금계산서 전용 이메일
   fileName                   String // 등록된 s3 파일명
 
-  seller Seller @relation(fields: [sellerEmail], references: [email])
+  seller Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
   @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
 }
 
@@ -58,7 +58,7 @@ model SellerSettlements {
   date        DateTime @default(now()) // 정산 시점
   state       Int      @default(0) @db.UnsignedTinyInt // 정산 상태
   amount      Int      @default(0)
-  seller      Seller   @relation(fields: [sellerEmail], references: [email])
+  seller      Seller   @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 
   @@index(name: "SellerSettlementsIndex", fields: [sellerEmail, id])
 }
@@ -70,7 +70,7 @@ model SellerSettlementAccount {
   number      String
   name        String
 
-  seller Seller @relation(fields: [sellerEmail], references: [email])
+  seller Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
   @@index(name: "SellerSettlementAccountIndex", fields: [sellerEmail, id])
 }
 
