@@ -19,7 +19,10 @@ export class FirstmallDbService {
    */
   public async query(sql: string, params?: any[]): Promise<any> {
     const conn = await this.pool.getConnection();
-    const [rows] = await conn.query(sql, params);
+    const [rows] = await conn.query(sql, params).catch((err) => {
+      console.log('[firstmall db error] FAILED - QUERY : ', sql, '\nPARAMS : ', params);
+      throw err;
+    });
 
     conn.release();
     // 필요시 에러처리 등 추가

@@ -1,37 +1,51 @@
-import { Box, Button, Link, Stack, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  Link,
+  Stack,
+  Text,
+  useColorMode,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import {
   convertFmDeliveryCompanyToString,
+  FindFmOrderDetailRes,
+  FindFmOrderRes,
   FmOrderExport,
+  FmOrderExportItemOption,
   FmOrderOption,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
-import { FmOrderStatusBadge, OrderDetailOptionListItem, TextDotConnector } from '..';
+import {
+  ChakraNextImage,
+  FmOrderStatusBadge,
+  OrderDetailOptionListItem,
+  TextDotConnector,
+} from '..';
 
 /** 주문 출고 정보 */
 export function OrderDetailExportInfo({
-  options,
   exports: _exports,
+  orderItems,
 }: {
-  options: FmOrderOption[];
   exports: FmOrderExport;
+  orderItems: FindFmOrderDetailRes['items'];
 }) {
-  // * 이 출고에 포함된 상품(옵션) 목록
-  const exportOrderItemOptions = useMemo(() => {
-    return options.filter((opt) => opt.export_code === _exports.export_code);
-  }, [_exports.export_code, options]);
-
   // * 이 출고에 포함된 상품의 총 가격
   const totalExportedPrice = useMemo(() => {
-    return exportOrderItemOptions.reduce((prev, curr) => {
+    return _exports.itemOptions.reduce((prev, curr) => {
       return prev + Number(curr.price);
     }, 0);
-  }, [exportOrderItemOptions]);
+  }, [_exports.itemOptions]);
 
+  // * 이 출고의 택배사 정보
   const deliveryCompany = useMemo(
     () => convertFmDeliveryCompanyToString(_exports.delivery_company_code),
     [_exports.delivery_company_code],
   );
+
   return (
     <Box>
       <Stack direction="row" alignItems="center" my={2} spacing={1.5}>
@@ -40,7 +54,7 @@ export function OrderDetailExportInfo({
         </Link>
         <FmOrderStatusBadge orderStatus={_exports.export_status} />
         <TextDotConnector />
-        <Text isTruncated>{_exports.ea} 개</Text>
+        <Text isTruncated>{_exports.totalEa} 개</Text>
         <TextDotConnector />
         <Text isTruncated>{totalExportedPrice.toLocaleString()} 원</Text>
       </Stack>
@@ -72,14 +86,65 @@ export function OrderDetailExportInfo({
       </Stack>
 
       {/* 이 출고에서 보내진 상품(옵션) 목록 */}
-      {exportOrderItemOptions.length > 0 && (
+      {_exports.itemOptions.length > 0 && (
         <Box my={2}>
           <Text fontWeight="bold">출고된 상품</Text>
-          {exportOrderItemOptions.map((o) => (
-            <OrderDetailOptionListItem key={o.item_option_seq} option={o} />
+          {_exports.itemOptions.map((io) => (
+            <OrderDetailExportInfoItem
+              key={io.item_option_seq}
+              itemOption={io}
+              orderItems={orderItems}
+              bundleExportCode={_exports.bundle_export_code}
+            />
           ))}
         </Box>
       )}
+    </Box>
+  );
+}
+
+function OrderDetailExportInfoItem({
+  itemOption: io,
+  orderItems,
+  bundleExportCode,
+}: {
+  itemOption: FmOrderExportItemOption;
+  orderItems: FindFmOrderDetailRes['items'];
+  bundleExportCode?: string;
+}) {
+  const emphasizeColor = useColorModeValue('red.500', 'red.300');
+  // * 합배송 여부 체크 + 현재 조회중인 주문이 아닌 다른 주문인 지 체크
+  const isBundledAndRightOrder = useMemo(() => {
+    const allOpts: FmOrderOption[] = [];
+
+    orderItems.forEach((oi) => {
+      oi.options.forEach((o) => {
+        allOpts.push(o);
+      });
+    });
+
+    const isRight = allOpts.find((x) => x.item_option_seq === io.item_option_seq);
+    if (isRight) return true;
+    return false;
+  }, [io.item_option_seq, orderItems]);
+  return (
+    <Box mb={4}>
+      <Flex alignItems="center">
+        {io.image && (
+          <ChakraNextImage
+            layout="intrinsic"
+            width={30}
+            height={30}
+            alt=""
+            src={`http://whiletrue.firstmall.kr${io.image || ''}`}
+          />
+        )}
+        <Text ml={io.image ? 2 : 0}>{io.goods_name} </Text>
+      </Flex>
+      {bundleExportCode && isBundledAndRightOrder && (
+        <Text color={emphasizeColor}>합포장(묶음배송) 상품</Text>
+      )}
+      <OrderDetailOptionListItem key={io.item_option_seq} option={io} />
     </Box>
   );
 }
