@@ -19,11 +19,12 @@ model Seller {
   password                   String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
   socialAccounts             SellerSocialAccount[]
   goods                      Goods[]
+  goodsCommonInfo            GoodsInfo[] // 상품공통정보
   loginHistory               LoginHistory[]
   sellerBusinessRegistration SellerBusinessRegistration[]
   sellerSettlements          SellerSettlements[]
   sellerSettlementAccount    SellerSettlementAccount[]
-  shippingGroups             ShippingGroup[]
+  shippingGroups             ShippingGroup[] // 배송비정책
 }
 
 // 마케터의 사업자 등록증을 위한 모델 seller와 1 : N의 관계를 가지므로
@@ -101,7 +102,7 @@ model Goods {
   cancel_type             String             @default("0") // 청약철회 가능 여부, "0" or "1"
   contents                String?            @db.LongText // 상세 설명 PC 화면
   contents_mobile         String?            @db.LongText // 상세 설명 Mobile 화면
-  common_contents         String             @db.LongText // 상품 공통 정보
+  common_contents         String             @db.LongText // 상품 공통 정보 -> 상품등록시 신규 공통정보 등록했을 때 저장됨
   shipping_policy         ShopOrGoods        @default(shop) // 배송 정책 선택
   goods_shipping_policy   LimitOrUnlimit     @default(unlimit) // 개별 배송비 선택
   unlimit_shipping_price  Int?               @db.UnsignedInt // 배송비
@@ -119,13 +120,15 @@ model Goods {
   option_view_type        OptionViewType     @default(divide) // 필수옵션-분리/합체형 구분
   option_suboption_use    String             @default("0") // 추가 옵션 사용 여부 "0" or "1"
   member_input_use        String             @default("0") // 추가 구성 옵션 사용 여부 "0" or "1"
-  image                   String // 상품 이미지 - fm_goods_image
+  image                   GoodsImages[] // 상품 이미지 - fm_goods_image
   goods_view              GoodsView          @default(look) // 노출
   regist_date             DateTime           @default(now()) // 상품등록일 (project-lc 에 판매자가 등록한 날짜)
   update_date             DateTime           @default(now()) @updatedAt // 수정일 (퍼스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서 수정한 날짜)
   runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
+  GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
+  goodsInfoId             Int?
 }
 
 // 상품 검수 정보
@@ -172,6 +175,26 @@ model GoodsOptionsSupplies {
   stock          Int          @db.UnsignedInt // 재고
   badstock       Int?         @db.UnsignedInt // 불량재고
   safe_stock     Int?         @default(0) // 각 매장의 옵션별 안전 재고
+}
+
+// 상품 사진 fm_goods_image
+model GoodsImages {
+  id         Int    @id @default(autoincrement())
+  goods      Goods  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  goodsId    Int
+  image      String
+  cut_number Int
+}
+
+// 상품 공통 정보
+model GoodsInfo {
+  id         Int    @id @default(autoincrement())
+  goods      Goods?
+  seller     Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId   Int
+  info_name  String
+  info_value String @db.LongText // 상품 공통 정보
+
 }
 
 // 라이브 커머스 랭킹 테이블
