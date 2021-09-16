@@ -14,11 +14,86 @@ import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
 
+type GoodsFormOptionsType = Omit<GoodsOptionDto, 'default_option' | 'option_title'>[];
+
 export type GoodsFormValues = Omit<RegistGoodsDto, 'options' | 'image'> & {
-  options: NestedValue<Omit<GoodsOptionDto, 'default_option' | 'option_title'>[]>;
-  image: NestedValue<GoodsImageDto[]>;
-  defaultOptionIndex: number;
+  options: NestedValue<GoodsFormOptionsType>;
+  image?: string[];
   option_title: string;
+};
+
+type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
+  options: Omit<GoodsOptionDto, 'option_title' | 'default_option'>[];
+};
+
+function goodsFormDataToDto(formData: GoodsFormSubmitDataType) {
+  const { image, options, option_title, max_purchase_ea, min_purchase_ea, ...goodsData } =
+    formData;
+
+  // options 에 default_option, option_title설정
+  const optionsDto: GoodsOptionDto[] = options.map((opt, index) => ({
+    ...opt,
+    default_option: index === 0 ? 'y' : 'n',
+    option_title,
+  }));
+
+  const a: RegistGoodsDto = {
+    ...goodsData,
+    options: optionsDto,
+    option_use: optionsDto.length > 1 ? '1' : '0',
+    max_purchase_ea: max_purchase_ea || 0,
+    min_purchase_ea: max_purchase_ea || 0,
+    image: image
+      ? image.map((img, index) => ({
+          image: img, // TODO: mutateAsync(dto) 하기 전에 image를 s3에 업로드
+          cut_number: index,
+        }))
+      : [],
+  };
+  return a;
+}
+
+const tempoptions: GoodsOptionDto[] = [
+  {
+    default_option: 'y',
+    option_type: 'direct',
+    option_title: 'sdf',
+    option1: 'sdf',
+    consumer_price: 123,
+    price: 12334,
+    option_view: 'Y',
+    supply: { stock: 14 },
+  },
+  {
+    default_option: 'y',
+    option_type: 'direct',
+    option_title: '12321sdf',
+    option1: 's223df',
+    consumer_price: 12343,
+    price: 1452334,
+    option_view: 'Y',
+    supply: { stock: 34 },
+  },
+];
+
+const dto: RegistGoodsDto = {
+  goods_name: 'testgoods',
+  summary: 'desc sum',
+  goods_status: 'normal',
+  cancel_type: '1',
+  common_contents: 'd',
+  shipping_policy: 'goods',
+  goods_shipping_policy: 'limit',
+  shipping_weight_policy: 'goods',
+  min_purchase_limit: 'limit',
+  option_use: '1',
+  option_view_type: 'divide',
+  option_suboption_use: '1',
+  member_input_use: '1',
+  image: [],
+  goods_view: 'look',
+  max_purchase_limit: 'limit',
+  options: tempoptions,
 };
 
 export function GoodsRegistForm(): JSX.Element {
@@ -27,8 +102,8 @@ export function GoodsRegistForm(): JSX.Element {
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
-      defaultOptionIndex: 0,
       option_title: '',
+      image: [],
       options: [
         {
           option_type: 'direct',
@@ -45,58 +120,14 @@ export function GoodsRegistForm(): JSX.Element {
   });
   const { handleSubmit } = methods;
 
-  const options: GoodsOptionDto[] = [
-    {
-      default_option: 'y',
-      option_type: 'direct',
-      option_title: 'sdf',
-      option1: 'sdf',
-      consumer_price: 123,
-      price: 12334,
-      option_view: 'Y',
-      supply: { stock: 14 },
-    },
-    {
-      default_option: 'y',
-      option_type: 'direct',
-      option_title: '12321sdf',
-      option1: 's223df',
-      consumer_price: 12343,
-      price: 1452334,
-      option_view: 'Y',
-      supply: { stock: 34 },
-    },
-  ];
-
-  const dto: RegistGoodsDto = {
-    goods_name: 'testgoods',
-    summary: 'desc sum',
-    goods_status: 'normal',
-    cancel_type: '1',
-    common_contents: 'd',
-    shipping_policy: 'goods',
-    goods_shipping_policy: 'limit',
-    shipping_weight_policy: 'goods',
-    min_purchase_limit: 'limit',
-    option_use: '1',
-    option_view_type: 'divide',
-    option_suboption_use: '1',
-    member_input_use: '1',
-    image: [],
-    goods_view: 'look',
-    max_purchase_limit: 'limit',
-    options,
-  };
-
-  const regist = (data: RegistGoodsDto) => {
-    const { image, ...goodsData } = data;
-    alert(JSON.stringify(data));
-    console.log(goodsData);
-    console.log(image);
+  const regist = (data: GoodsFormSubmitDataType) => {
     // TODO: options 에 default_option, option_title설정
-
     // TODO: mutateAsync(dto) 하기 전에 image를 s3에 업로드
-    // mutateAsync(dto)
+    const ddto = goodsFormDataToDto(data);
+    console.log(ddto);
+
+    // TODO: goods 필수컬럼 다시 확인후 테이블, dto 수정
+    // mutateAsync(ddto)
     //   .then((res) => {
     //     const { data: d } = res;
     //     console.log(d);
@@ -120,10 +151,10 @@ export function GoodsRegistForm(): JSX.Element {
           등록
         </Button>
         {/* 기본정보 */}
-        {/* <GoodsRegistDataBasic /> */}
+        <GoodsRegistDataBasic />
 
         {/* 판매정보 */}
-        {/* <GoodsRegistDataSales /> */}
+        <GoodsRegistDataSales />
 
         {/* 옵션 */}
         <GoodsRegistDataOptions />
@@ -142,10 +173,10 @@ export function GoodsRegistForm(): JSX.Element {
         <GoodsRegistShippingPolicy />
 
         {/* 기타정보 - 최소, 최대구매수량 */}
-        {/* <GoodsRegistExtraInfo /> */}
+        <GoodsRegistExtraInfo />
 
         {/* 메모 - textArea */}
-        {/* <GoodsRegistMemo /> */}
+        <GoodsRegistMemo />
       </Stack>
     </FormProvider>
   );

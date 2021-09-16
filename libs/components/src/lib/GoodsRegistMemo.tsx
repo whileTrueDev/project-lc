@@ -8,7 +8,7 @@ export function GoodsRegistMemo(): JSX.Element {
   const { register } = useFormContext<RegistGoodsDto>();
   return (
     <SectionWithTitle title="메모">
-      <Textarea {...register('admin_memo')} resize="none" maxlength={500} />
+      <Textarea {...register('admin_memo')} resize="none" maxLength={500} />
     </SectionWithTitle>
   );
 }
