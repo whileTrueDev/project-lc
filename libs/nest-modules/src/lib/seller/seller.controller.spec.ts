@@ -1,9 +1,9 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Seller } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
+import { FindSellerRes } from '@project-lc/shared-types';
 import { SellerController } from './seller.controller';
 import { SellerService } from './seller.service';
 import { SellerSettlementService } from './seller-settlement.service';
@@ -15,7 +15,7 @@ describe('SellerController', () => {
   let app: NestApplication;
   let controller: SellerController;
   let service: SellerService;
-  const user: Seller = {
+  const user: FindSellerRes = {
     id: 1,
     name: 'tester',
     email: 'test@test.com',
