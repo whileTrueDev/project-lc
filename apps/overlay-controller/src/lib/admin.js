@@ -25,6 +25,7 @@ $(document).ready(function () {
     creatorNickname = $(this).closest('tr').prop('id');
     const url = $(this).closest('tr').children('td.url-cell').attr('id');
     userId = $(this).closest('tr').children('td.userid-cell').attr('id');
+
     $('#creator-name').text(creatorNickname);
 
     socket.emit('request creator list', {
@@ -103,11 +104,12 @@ $(document).ready(function () {
     event.preventDefault();
     let level;
     let isLogin = true;
+
     const standardPrice = Number($('#standard-price').val());
-    const productName = $('#product-name').val();
+    const productName = $('#product-name').val().trim();
     const soldPrice = Number($('#sold-price').val());
-    const customerNickname = $('#customer-nickname').val();
-    let customerMessage = $('#customer-message').val();
+    const customerNickname = $('#customer-nickname').val().trim();
+    let customerMessage = $('#customer-message').val().trim();
     const phoneCallEventFlag = $('input[name="event"]:checked').val() === 'yes';
     const giftFlag = $('input[name="gift"]:checked').val() === 'yes';
 
@@ -121,7 +123,7 @@ $(document).ready(function () {
       level = '2';
     }
 
-    if (customerMessage.trim().length === 0) {
+    if (customerMessage.length === 0) {
       isLogin = false;
     }
 
