@@ -1,11 +1,13 @@
-import { Heading } from '@chakra-ui/react';
+import { Heading, Container } from '@chakra-ui/react';
 import { GoodsRegistForm, MypageLayout } from '@project-lc/components';
 
 export function Goods(): JSX.Element {
   return (
     <MypageLayout>
-      <Heading>상품등록</Heading>
-      <GoodsRegistForm />
+      <Container maxWidth="container.xl">
+        <Heading>상품등록</Heading>
+        <GoodsRegistForm />
+      </Container>
     </MypageLayout>
   );
 }

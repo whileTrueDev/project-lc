@@ -126,6 +126,8 @@ export function GoodsRegistForm(): JSX.Element {
     const ddto = goodsFormDataToDto(data);
     console.log(ddto);
 
+    // 입력값 확인 (options의 옵션값 등등)
+
     // TODO: goods 필수컬럼 다시 확인후 테이블, dto 수정
     // mutateAsync(ddto)
     //   .then((res) => {
@@ -151,13 +153,13 @@ export function GoodsRegistForm(): JSX.Element {
           등록
         </Button>
         {/* 기본정보 */}
-        <GoodsRegistDataBasic />
+        {/* <GoodsRegistDataBasic /> */}
 
         {/* 판매정보 */}
-        <GoodsRegistDataSales />
+        {/* <GoodsRegistDataSales /> */}
 
         {/* 옵션 */}
-        <GoodsRegistDataOptions />
+        {/* <GoodsRegistDataOptions /> */}
 
         {/* 사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개, 각 이미지는 10mb제한 */}
         {/* <GoodsRegistPictures /> */}
@@ -173,10 +175,10 @@ export function GoodsRegistForm(): JSX.Element {
         <GoodsRegistShippingPolicy />
 
         {/* 기타정보 - 최소, 최대구매수량 */}
-        <GoodsRegistExtraInfo />
+        {/* <GoodsRegistExtraInfo /> */}
 
         {/* 메모 - textArea */}
-        <GoodsRegistMemo />
+        {/* <GoodsRegistMemo /> */}
       </Stack>
     </FormProvider>
   );

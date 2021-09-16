@@ -35,7 +35,7 @@ export function GoodsOptionInput({
 function NoOptionInput() {
   const { register } = useFormContext<GoodsFormValues>();
   return (
-    <Stack>
+    <Stack maxWidth="md">
       <GoodsOptionInput
         label="정가 (미할인가)"
         inputProps={{
