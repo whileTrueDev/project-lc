@@ -7,6 +7,7 @@ const socket = io('http://localhost:3002', { transports: ['websocket'] });
 socket.on('creator list from server', (data) => {
   if (data) {
     $('#connection-status').text('✔️ 정상');
+    $('.mid-area button').attr('disabled', false);
   } else {
     $('#connection-status').text('❌ 연결되지 않음');
   }
@@ -14,7 +15,7 @@ socket.on('creator list from server', (data) => {
 
 $(document).ready(function () {
   $('#table_id').DataTable({ lengthChange: false });
-
+  $('.mid-area button').attr('disabled', true);
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
   const localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
 
@@ -76,6 +77,20 @@ $(document).ready(function () {
     socket.emit('get d-day', { roomName, date: selectedTime });
   });
 
+  $('.message-box-lock-button').click(function () {
+    if ($('.message-box-lock-button').attr('class').includes('locked')) {
+      $('#standard-price').attr('disabled', false);
+      $('#product-name').attr('disabled', false);
+      $('.message-box-lock-button').toggleClass('locked');
+      $('.message-box-lock-button').text('잠금');
+    } else {
+      $('#standard-price').attr('disabled', true);
+      $('#product-name').attr('disabled', true);
+      $('.message-box-lock-button').toggleClass('locked');
+      $('.message-box-lock-button').text('해제');
+    }
+  });
+
   $('input[name=client-checkbox]').change(function () {
     if ($('input[name=client-checkbox]').is(':checked')) {
       $('#customer-nickname').val(`${creatorNickname}팬`);
@@ -88,9 +103,9 @@ $(document).ready(function () {
     event.preventDefault();
     let level;
     let isLogin = true;
-    const standardPrice = $('#standard-price').val();
+    const standardPrice = Number($('#standard-price').val());
     const productName = $('#product-name').val();
-    const soldPrice = $('#sold-price').val();
+    const soldPrice = Number($('#sold-price').val());
     const customerNickname = $('#customer-nickname').val();
     let customerMessage = $('#customer-message').val();
     const phoneCallEventFlag = $('input[name="event"]:checked').val() === 'yes';
@@ -115,7 +130,7 @@ $(document).ready(function () {
       userId,
       loginFlag: isLogin,
       productName,
-      purchaseNum: Number(soldPrice),
+      purchaseNum: soldPrice,
       nickname: customerNickname,
       message: customerMessage,
       phoneCallEventFlag,

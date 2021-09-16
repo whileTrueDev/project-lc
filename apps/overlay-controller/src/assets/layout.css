@@ -77,10 +77,25 @@ button.socket-id-button {
   font-weight: bold;
 }
 
+button:disabled,
+button[disabled] {
+  color: #666666;
+  cursor: default;
+  opacity: 0.3;
+}
+
 button#toggle-table-button {
   width: 30px;
   margin: 5px;
   background-color: #45a049;
+}
+
+.message-box-lock-button {
+  background-color: #45a049;
+}
+
+.locked {
+  background-color: red;
 }
 
 button[type='submit']:hover {
