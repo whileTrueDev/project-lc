@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 export * from './lib/constants/fmDeliveryCompanies';
 export * from './lib/constants/fmOrderRefundStatuses';
 export * from './lib/constants/fmOrderRefundTypes';

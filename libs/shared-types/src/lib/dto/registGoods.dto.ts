@@ -8,7 +8,7 @@ import {
   ShopOrGoods,
 } from '@prisma/client';
 import { IsIn, IsString, IsOptional, ValidateNested, IsNumber } from 'class-validator';
-// import { Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { GoodsOptionDto } from './goodsOption.dto';
 
 export class RegistGoodsDto {
@@ -104,6 +104,6 @@ export class RegistGoodsDto {
   runout_policy?: RunoutPolicy;
 
   @ValidateNested({ each: true })
-  // @Type(() => GoodsOptionDto)
+  @Type(() => GoodsOptionDto)
   options: GoodsOptionDto[];
 }
