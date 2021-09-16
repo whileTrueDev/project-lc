@@ -7,14 +7,18 @@ import { UserPayload } from '../auth/auth.interface';
 export class SellerShopService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // 상점에 대한 정보 변경
   async changeShopInfo(dto: SellerShopInfoDto, sellerInfo: UserPayload) {
-    const seller = await this.prisma.seller.update({
-      where: { email: sellerInfo.sub },
-      data: {
+    const sellerShop = await this.prisma.sellerShop.upsert({
+      where: { sellerEmail: sellerInfo.sub },
+      update: { ...dto },
+      create: {
+        sellerEmail: sellerInfo.sub,
         shopName: dto.shopName,
       },
     });
-    if (!seller) {
+
+    if (!sellerShop) {
       throw new Error(`상점명 변경불가`);
     }
   }

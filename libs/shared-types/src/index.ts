@@ -33,3 +33,4 @@ export * from './lib/shared-types';
 export * from './lib/dto/changeGoodsView.dto';
 export * from './lib/dto/sellerShopInfo.dto';
 export * from './lib/overlay/overlay-types';
+export * from './lib/res-types/findSeller.res';

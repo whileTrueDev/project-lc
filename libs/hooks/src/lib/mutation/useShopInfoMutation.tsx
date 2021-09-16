@@ -4,6 +4,6 @@ import axios from '../../axios';
 
 export const useShopInfoMutation = () => {
   return useMutation((dto: SellerShopInfoDto) => {
-    return axios.patch<SellerShopInfoDto>('/seller/shop', dto);
+    return axios.patch('/seller/shop-info', dto);
   });
 };

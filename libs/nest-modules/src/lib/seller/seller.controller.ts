@@ -21,6 +21,7 @@ import {
   BusinessRegistrationDto,
   SettlementAccountDto,
   SellerShopInfoDto,
+  FindSellerRes,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -41,7 +42,7 @@ export class SellerController {
 
   // * 판매자 정보 조회
   @Get()
-  public findOne(@Query(ValidationPipe) dto: FindSellerDto): Promise<Seller> {
+  public findOne(@Query(ValidationPipe) dto: FindSellerDto): Promise<FindSellerRes> {
     return this.sellerService.findOne({ email: dto.email });
   }
 
@@ -121,13 +122,12 @@ export class SellerController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('shop')
+  @Patch('shop-info')
   public async changeShopInfo(
     @Body() dto: SellerShopInfoDto,
     @SellerInfo() sellerInfo: UserPayload,
     @Res() res,
   ) {
-    // 데이터 변경후 전달. not body
     try {
       await this.sellerShopService.changeShopInfo(dto, sellerInfo);
       res.sendStatus(204);

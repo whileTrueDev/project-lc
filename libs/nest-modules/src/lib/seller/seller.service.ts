@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
 import { hash, verify } from 'argon2';
+import { FindSellerRes } from '@project-lc/shared-types';
 import { PrismaService } from '@project-lc/prisma-orm';
 @Injectable()
 export class SellerService {
@@ -15,7 +16,6 @@ export class SellerService {
         email: signUpInput.email,
         name: signUpInput.name,
         password: hashedPw,
-        shopName: null,
       },
     });
     return seller;
@@ -24,7 +24,7 @@ export class SellerService {
   /**
    * 유저 정보 조회
    */
-  async findOne(findInput: Prisma.SellerWhereUniqueInput): Promise<Seller> {
+  async findOne(findInput: Prisma.SellerWhereUniqueInput): Promise<FindSellerRes> {
     const seller = await this.prisma.seller.findUnique({
       where: findInput,
       select: {
@@ -32,11 +32,20 @@ export class SellerService {
         email: true,
         name: true,
         password: true,
-        shopName: true,
+        sellerShop: {
+          select: {
+            shopName: true,
+          },
+        },
       },
     });
 
-    return seller;
+    // seller shop name preprocessing
+    const { sellerShop, ..._seller } = seller;
+    return {
+      ..._seller,
+      shopName: sellerShop?.shopName ? sellerShop.shopName : null,
+    };
   }
 
   /**

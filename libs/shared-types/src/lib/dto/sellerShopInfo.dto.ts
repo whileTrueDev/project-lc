@@ -1,6 +1,6 @@
-import { Seller } from '@prisma/client';
+import { SellerShop } from '@prisma/client';
 import { IsString } from 'class-validator';
 
-export class SellerShopInfoDto implements Partial<Seller> {
-  @IsString() shopName: string;
+export class SellerShopInfoDto implements Partial<SellerShop> {
+  @IsString() shopName?: string;
 }

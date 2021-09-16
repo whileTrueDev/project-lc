@@ -17,13 +17,20 @@ model Seller {
   email                      String                       @unique
   name                       String?
   password                   String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
-  shopName                   String? // 회원가입시에는 입력되지 않을 수 있다.
   socialAccounts             SellerSocialAccount[]
   goods                      Goods[]
   loginHistory               LoginHistory[]
   sellerBusinessRegistration SellerBusinessRegistration[]
   sellerSettlements          SellerSettlements[]
   sellerSettlementAccount    SellerSettlementAccount[]
+  sellerShop                 SellerShop?
+}
+
+// 마케터의 상정정보
+model SellerShop {
+  sellerEmail String @unique // 등록한 판매자 ID 
+  shopName    String
+  seller      Seller @relation(fields: [sellerEmail], references: [email])
 }
 
 // 마케터의 사업자 등록증을 위한 모델 seller와 1 : N의 관계를 가지므로

@@ -19,6 +19,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
+import { SellerShopInfoDto } from '@project-lc/shared-types';
 import { useProfile, useShopInfoMutation } from '@project-lc/hooks';
 import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
@@ -59,7 +60,7 @@ export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
   }
 
   const mutation = useShopInfoMutation();
-  async function useSubmit(submitData: { shopName: string }) {
+  async function useSubmit(submitData: SellerShopInfoDto) {
     try {
       await mutation.mutateAsync(submitData);
       refetch();
