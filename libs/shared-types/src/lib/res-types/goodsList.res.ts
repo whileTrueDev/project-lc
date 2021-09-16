@@ -11,7 +11,7 @@ import {
 import { Decimal } from '@prisma/client/runtime';
 
 export type GoodsOptionsWithSupplies = GoodsOptions & {
-  supply: GoodsOptionsSupplies[];
+  supply: GoodsOptionsSupplies;
 };
 
 export type GoodsOptionWithStockInfo = {
