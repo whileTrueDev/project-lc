@@ -1,14 +1,14 @@
 /* eslint-env jquery */
 let roomName;
 let userId;
-
+let creatorNickname;
 const socket = io('http://localhost:3002', { transports: ['websocket'] });
 
 socket.on('creator list from server', (data) => {
   if (data) {
-    $('#connection-status').text('정상');
+    $('#connection-status').text('✔️ 정상');
   } else {
-    $('#connection-status').text('에러');
+    $('#connection-status').text('❌ 연결되지 않음');
   }
 });
 
@@ -21,16 +21,22 @@ $(document).ready(function () {
   $('#end-time-picker').val(localISOTime);
 
   $('.socket-id-button').click(function () {
-    const nickname = $(this).closest('tr').prop('id');
+    creatorNickname = $(this).closest('tr').prop('id');
     const url = $(this).closest('tr').children('td.url-cell').attr('id');
     userId = $(this).closest('tr').children('td.userid-cell').attr('id');
-    $('#creator-name').text(nickname);
+    $('#creator-name').text(creatorNickname);
 
     socket.emit('request creator list', {
       roomName: socket.id,
       url,
     });
     roomName = url.split('/').pop();
+  });
+
+  $('#toggle-table-button').click(function () {
+    const text = $('#toggle-table-button').text().trim();
+    $('#toggle-table-button').text(text === '◀️' ? '▶️' : '◀️');
+    $('.search-box').toggle('slide');
   });
 
   $('#screen-show-button').click(function () {
@@ -68,6 +74,14 @@ $(document).ready(function () {
   $('#end-time-send-button').click(function () {
     const selectedTime = $('#end-time-picker').val();
     socket.emit('get d-day', { roomName, date: selectedTime });
+  });
+
+  $('input[name=client-checkbox]').change(function () {
+    if ($('input[name=client-checkbox]').is(':checked')) {
+      $('#customer-nickname').val(`${creatorNickname}팬`);
+    } else {
+      $('#customer-nickname').val('');
+    }
   });
 
   $('form').submit(function (event) {
@@ -142,6 +156,7 @@ $(document).ready(function () {
         $('input[name="gift"]').removeAttr('checked');
         $('input[name="event"]').filter('[value=no]').prop('checked', true);
         $('input[name="gift"]').filter('[value=no]').prop('checked', true);
+        $('input[name=client-checkbox]').prop('checked', false);
       },
     });
   });

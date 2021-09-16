@@ -15,148 +15,187 @@
 </head>
 
 <body>
-    <div class="search-box">
-        <table id="table_id" class="display">
-            <thead>
-                <tr>
-                    <th>이름</th>
-                    <th>ID</th>
-                    <th>URL</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#userIdAndUrlAndNicknames}}
-                <tr class="user-row" id={{userNickname}}>
-                    <td class="nickname-cell">
-                        {{userNickname}}
-                    </td>
-                    <td class="userid-cell" id={{userId}}>
-                        {{userId}}
-                    </td>
-                    <td class="url-cell" id={{overlayUrl}}>
-                        {{overlayUrl}}
-                    </td>
-                    <td>
-                        <button
-                            class="socket-id-button"
-                        >
-                            선택
-                        </button>
-                    </td>
-                </tr>
-                 {{/userIdAndUrlAndNicknames}}
-            </tbody>
-        </table>
-    </div>
-    <div class="console-box">
-        <h1 id="creator-name"> 
-        </h1>
-        <h6>
-            연결상태 : 
-            <span id="connection-status">
-                크리에이터를 선택해주세요
-            </span>
-        </h6>
-        <h2>
-            화면 제어
-        </h2>
-        <div class="screen-control-box">
-            <button id="screen-show-button" value="화면 띄우기">
-                화면 띄우기
-            </button>
-            <button id="screen-hide-button" value="화면 숨기기" >
-                화면 숨기기
-            </button>
-            <button id="logo-toggle-button" value="로고 색상 변경" >
-                로고 색상 변경
-            </button>
-            <button id="bottom-area-toggle-button" value="하단 띠 토글">
-                하단 띠 토글
-            </button>
+    <div class="upper-area">
+        <div class="search-box">
+            <table id="table_id" class="display">
+                <thead>
+                    <tr>
+                        <th>이름</th>
+                        <th>ID</th>
+                        <th>URL</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#userIdAndUrlAndNicknames}}
+                    <tr class="user-row" id={{userNickname}}>
+                        <td class="nickname-cell">
+                            {{userNickname}}
+                        </td>
+                        <td class="userid-cell" id={{userId}}>
+                            {{userId}}
+                        </td>
+                        <td class="url-cell" id={{overlayUrl}}>
+                            {{overlayUrl}}
+                        </td>
+                        <td>
+                            <button
+                                class="socket-id-button"
+                            >
+                                선택
+                            </button>
+                        </td>
+                    </tr>
+                    {{/userIdAndUrlAndNicknames}}
+                </tbody>
+            </table>
         </div>
-        <div class="action-control-box">
+        <button id="toggle-table-button">
+            ◀️
+        </button>
+        <div class="dashboard">
+            <h2>
+                지표
+            </h2>
+        </div>
+    </div>
+    <div class="mid-area">
+        <div class="console-box">
+            <h1 id="creator-name"> 
+                크리에이터를 선택해주세요
+            </h1>
+            <h4>
+                연결상태 : 
+                <span id="connection-status">
+                    ⚠️ 크리에이터를 선택해주세요
+                </span>
+            </h4>
+            <h2>
+                화면 제어
+            </h2>
+            <div class="screen-control-box">
+                <button id="screen-show-button" value="화면 띄우기" style="background-color:blue;">
+                    화면 띄우기
+                </button>
+                <button id="screen-hide-button" value="화면 숨기기" style="background-color:red;">
+                    화면 숨기기
+                </button>
+                <button id="logo-toggle-button" value="로고 색상 변경" style="background-color:dimgray;">
+                    로고 색상 변경
+                </button>
+                <button id="bottom-area-toggle-button" value="하단 띠 토글" style="background-color:dimgray;">
+                    하단 띠 토글
+                </button>
+                <button id="refresh-button" value="새로고침" style="background-color:mediumorchid">
+                    새로고침
+                </button>
+            </div>
             <h2>
                 동작 제어
             </h2>
-            <button id="show-intro-video-button" value="Intro 송출">
-                Intro 송출
-            </button>
-            <button id="show-outro-video-button" value="Outro 송출">
-                Outro 송출
-            </button>
-            <button id="hide-video-button" value="영상 비우기">
-                영상 비우기
-            </button>
-            <button id="play-bgm-button" value="Outro 송출">
-                BGM 재생
-            </button>
-            <button id="pause-bgm-button" value="Outro 종료">
-                BGM 종료
-            </button>
-            <button id="refresh-button" value="새로고침">
-                새로고침
-            </button>
-        </div>
-        <div class="object-control-box">
+            <div class="action-control-box">
+                <div class="video-controller">
+                    <h6>
+                        동영상 컨트롤러
+                    </h6>
+                    <div class="play-controller">
+                        <button id="show-intro-video-button" value="Intro 송출" style="background-color:blue;">
+                            Intro 송출
+                        </button>
+                        <button id="show-outro-video-button" value="Outro 송출" style="background-color:dodgerblue">
+                            Outro 송출
+                        </button>
+                    </div>
+                    <button id="hide-video-button" value="영상 비우기" style="background-color:red;">
+                        영상 비우기
+                    </button>
+                </div>
+                <div class="vertical-divider"></div>
+                <div class="audio-controller">
+                    <h6>
+                        오디오 컨트롤러
+                    </h6>
+                    <button id="play-bgm-button" value="Outro 송출" style="background-color:blue;">
+                        BGM 재생
+                    </button>
+                    <button id="pause-bgm-button" value="Outro 종료" style="background-color:red;">
+                        BGM 종료
+                    </button>
+                </div>
+            </div>
             <h2>
                 목표 제어
             </h2>
-            <div 
-                class="datetime-picker"
-            >
-                <input 
-                    type="datetime-local" 
-                    id="end-time-picker"
-                    />
-                <button
-                    id="end-time-send-button"
+            <div class="object-control-box">
+                <div 
+                    class="datetime-picker"
                 >
-                    시간 전송
-                </button>
-            </div>
-            {{!-- <form>
-                <input type="number" />
-                <button
-                >
-                    목표 전송
-                </button>
-            </form> --}}
+                    <input 
+                        type="datetime-local" 
+                        id="end-time-picker"
+                        />
+                    <button
+                        id="end-time-send-button"
+                        style="background-color: #45a049;"
+                    >
+                        시간 전송
+                    </button>
+                </div>
+                {{!-- <form>
+                    <input type="number" />
+                    <button
+                    >
+                        목표 전송
+                    </button>
+                </form> --}}
 
+            </div>
         </div>
-    </div>
-    <div class="message-box">
-        <h2>
-            메세지 제어
-        </h2>
-        <form>
-            <fieldset>
-                <legend>메세지 입력</legend>
-                기준 금액 <input type="number" id="standard-price"><br>
-                상품명 : <input type="text" id="product-name"><br>
-                구매액 : <input type="number" id="sold-price"><br>
-                구매자 : <input type="text" id="customer-nickname"><br>
-                메세지 : <input type="text" id="customer-message"><br>
-                선물하기 여부 : 
-                <input type="radio" id="gift-radio-no" name="gift" value="no" checked>
-                    <label for="gift-radio-no">NO</label>
-                <input type="radio" id="gift-radio-yes" name="gift" value="yes">
-                    <label for="gift-radio-yes">YES</label>
-                <br>
-                전화 이벤트 : 
-                <input type="radio" id="event-radio-no" name="event" value="no" checked>
-                    <label for="event-radio-no">NO</label>
-                <input type="radio" id="event-radio-yes" name="event" value="yes">
-                    <label for="event-radio-yes">YES</label>
-                <br>
-                <button id="message-button" type="submit">제출하기</button>
-            </fieldset>
-        </form>
-    </div>
-    <div class="dashboard">
-        <h2>
-            지표
-        </h2>
+
+        <div class="message-box">
+            <h2>
+                메세지 제어
+            </h2>
+            <div class="message-box-fixed-area">
+                <span>기준 금액</span>
+                <input type="number" id="standard-price">
+                <span>상품명</span>
+                <input type="text" id="product-name">
+            </div>
+            <form>
+                <fieldset>
+                    <legend>메세지 입력</legend>
+                    <span>구매액</span>
+                    <input type="number" id="sold-price">
+                    <span>구매자</span>
+                    <div class="customer-nickname-box">
+                        <input type="text" id="customer-nickname">
+                        <label>
+                        <input type="checkbox" id="is-client-checkbox" name="client-checkbox" value="non-client">
+                            비회원
+                        </label>
+                    </div>
+                    
+                    <span>메세지</span>
+                    <input type="text" id="customer-message">
+                    <span>선물하기 여부</span>
+                    <div class="checkbox-area">
+                        <input type="radio" id="gift-radio-no" name="gift" value="no" checked>
+                            <label for="gift-radio-no">NO</label>
+                        <input type="radio" id="gift-radio-yes" name="gift" value="yes">
+                            <label for="gift-radio-yes">YES</label>
+                    </div>
+                    <span>전화 이벤트</span>
+                    <div class="checkbox-area">
+                        <input type="radio" id="event-radio-no" name="event" value="no" checked>
+                            <label for="event-radio-no">NO</label>
+                        <input type="radio" id="event-radio-yes" name="event" value="yes">
+                            <label for="event-radio-yes">YES</label>
+                    </div>
+                    <button id="message-button" type="submit">전송</button>
+                </fieldset>
+            </form>
+        </div>
     </div>
 </body>
 
