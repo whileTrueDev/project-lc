@@ -10,6 +10,7 @@ import {
 import { IsIn, IsString, IsOptional, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { GoodsOptionDto } from './goodsOption.dto';
+import { GoodsImageDto } from './goodsImage.dto';
 
 export class RegistGoodsDto {
   @IsString()
@@ -79,6 +80,7 @@ export class RegistGoodsDto {
   max_urchase_order_limit?: number;
 
   @IsOptional()
+  @IsString()
   admin_memo?: string;
 
   @IsIn(['0', '1'])
@@ -93,8 +95,9 @@ export class RegistGoodsDto {
   @IsIn(['0', '1'])
   member_input_use: string; // 추가 구성 옵션 사용 여부 "0" or "1"
 
-  @IsString()
-  image: string;
+  @ValidateNested({ each: true })
+  @Type(() => GoodsImageDto)
+  image: GoodsImageDto[];
 
   @IsIn(['look', 'notLook'])
   goods_view: GoodsView;
@@ -106,4 +109,12 @@ export class RegistGoodsDto {
   @ValidateNested({ each: true })
   @Type(() => GoodsOptionDto)
   options: GoodsOptionDto[];
+
+  @IsOptional()
+  @IsNumber()
+  shippingGroupId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  goodsInfoId?: number;
 }

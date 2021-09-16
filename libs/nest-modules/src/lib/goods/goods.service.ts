@@ -240,7 +240,7 @@ export class GoodsService {
   // 상품 등록
   public async registGoods(email: string, dto: RegistGoodsDto) {
     try {
-      const { options, ...goodsData } = dto;
+      const { options, image, shippingGroupId, goodsInfoId, ...goodsData } = dto;
       const optionsData = options.map((opt) => {
         const { supply, ...optData } = opt;
         return {
@@ -257,6 +257,13 @@ export class GoodsService {
           options: {
             create: optionsData,
           },
+          image: {
+            create: image,
+          },
+          ShippingGroup: shippingGroupId
+            ? { connect: { id: shippingGroupId } }
+            : undefined,
+          GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
         },
       });
       return { goodsId: goods.id };

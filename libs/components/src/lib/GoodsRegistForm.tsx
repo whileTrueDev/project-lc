@@ -57,35 +57,35 @@ export function GoodsRegistForm(): JSX.Element {
     option_view_type: 'divide',
     option_suboption_use: '1',
     member_input_use: '1',
-    image: '',
+    image: [],
     goods_view: 'look',
     max_purchase_limit: 'limit',
     options,
   };
 
   const regist = (data: RegistGoodsDto) => {
-    const { image, ...goodsData } = data;
-    alert(JSON.stringify(goodsData));
-    console.log(goodsData);
-    console.log(image);
+    // const { image, ...goodsData } = data;
+    // alert(JSON.stringify(data));
+    // console.log(goodsData);
+    // console.log(image);
 
     // TODO: mutateAsync(dto) 하기 전에 image를 s3에 업로드
-    // mutateAsync(dto)
-    //   .then((res) => {
-    //     const { data } = res;
-    //     console.log(data);
-    //     alert(JSON.stringify(data));
-    //     toast({
-    //       title: '상품을 성공적으로 등록하였습니다',
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //     toast({
-    //       title: '상품 등록 중 오류가 발생하였습니다',
-    //       status: 'error',
-    //     });
-    //   });
+    mutateAsync(dto)
+      .then((res) => {
+        const { data: d } = res;
+        console.log(d);
+        alert(JSON.stringify(d));
+        toast({
+          title: '상품을 성공적으로 등록하였습니다',
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          title: '상품 등록 중 오류가 발생하였습니다',
+          status: 'error',
+        });
+      });
   };
   return (
     <FormProvider {...methods}>

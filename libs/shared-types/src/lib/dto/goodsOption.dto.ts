@@ -41,6 +41,6 @@ export class GoodsOptionDto {
   option_view: YesOrNo_UPPERCASE;
 
   @ValidateNested()
-  @Type(() => GoodsOptionDto)
+  @Type(() => GoodsOptionsSupplyDto)
   supply: GoodsOptionsSupplyDto;
 }
