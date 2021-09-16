@@ -20,12 +20,13 @@ const GOODS_CANCEL_TYPE: { value: '0' | '1'; label: string }[] = [
   { value: '1', label: '불가 (취소/교환/반품 불가)' },
 ];
 
+export type GoodsRegistRadioName = keyof Omit<RegistGoodsDto, 'options' | 'image'>;
 // 상품등록 폼에서 사용하는 라디오그룹
 export function GoodsRegistRadio({
   name,
   values,
 }: {
-  name: keyof Omit<RegistGoodsDto, 'options'>;
+  name: GoodsRegistRadioName;
   values: {
     value: RegistGoodsDto[typeof name];
     label: string;
