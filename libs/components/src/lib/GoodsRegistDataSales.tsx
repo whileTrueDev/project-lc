@@ -1,10 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { QuestionIcon } from '@chakra-ui/icons';
-import { Heading, HStack, Stack, Text } from '@chakra-ui/layout';
+import { HStack, Text } from '@chakra-ui/layout';
 import { Radio, RadioGroup } from '@chakra-ui/radio';
+import { RadioGroupProps } from '@chakra-ui/react';
 import { GoodsStatus } from '@prisma/client';
 import { RegistGoodsDto } from '@project-lc/shared-types';
-import { ChangeHandler, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import SectionWithTitle from './SectionWithTitle';
 import TextWithPopperButton from './TextWithPopperButton';
 
@@ -25,24 +26,27 @@ export type GoodsRegistRadioName = keyof Omit<RegistGoodsDto, 'options' | 'image
 export function GoodsRegistRadio({
   name,
   values,
+  ...rest
 }: {
   name: GoodsRegistRadioName;
   values: {
     value: RegistGoodsDto[typeof name];
     label: string;
   }[];
-}) {
+} & Partial<RadioGroupProps>) {
   const { register, watch } = useFormContext<RegistGoodsDto>();
   return (
-    <RadioGroup value={watch(name, values[0].value)}>
-      {values.map((item) => {
-        const { value, label } = item;
-        return (
-          <Radio key={label} {...register(name)} value={value}>
-            {label}
-          </Radio>
-        );
-      })}
+    <RadioGroup value={watch(name, values[0].value)} {...rest}>
+      <HStack>
+        {values.map((item) => {
+          const { value, label } = item;
+          return (
+            <Radio key={label} {...register(name)} value={value}>
+              {label}
+            </Radio>
+          );
+        })}
+      </HStack>
     </RadioGroup>
   );
 }

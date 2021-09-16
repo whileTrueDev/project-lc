@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable camelcase */
 import { Divider, Stack, Text } from '@chakra-ui/layout';
 import { CloseButton } from '@chakra-ui/react';
@@ -6,6 +7,7 @@ import {
   ShippingOptionDto,
   TempShippingSet,
 } from '@project-lc/shared-types';
+import { boxStyle } from '../constants/commonStyleProps';
 import { getOptionLabel } from './ShippingOptionAppliedItem';
 import { ShippingSelectOptions } from './ShippingOptionTypeSelect';
 import { BoldText } from './ShippingPolicySetForm';
@@ -50,14 +52,7 @@ export function SetItem({
   const stdOptions = shippingOptions.filter((opt) => opt.shipping_set_type === 'std');
   const addOptions = shippingOptions.filter((opt) => opt.shipping_set_type === 'add');
   return (
-    <Stack
-      direction="row"
-      key={set.tempId}
-      border="1px"
-      borderColor="gray.200"
-      borderRadius="md"
-      p={2}
-    >
+    <Stack direction="row" key={set.tempId} {...boxStyle}>
       <CloseButton onClick={() => onDelete(tempId)} />
 
       <Stack fontSize="sm">

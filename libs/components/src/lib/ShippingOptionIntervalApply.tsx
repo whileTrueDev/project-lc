@@ -7,6 +7,7 @@ import { useShippingSetItemStore } from '@project-lc/stores';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { KOREA_PROVINCES } from '../constants/address';
+import { boxStyle } from '../constants/commonStyleProps';
 import FormControlInputWrapper from './FormControlInputWrapper';
 import { ResponsiveDivider } from './ResponsiveDivider';
 
@@ -128,10 +129,7 @@ export function ShippingOptionIntervalApply({
         as="form"
         onSubmit={handleSubmit(onSubmit)}
         alignItems="center"
-        border="1px"
-        borderColor="gray.200"
-        borderRadius="md"
-        p={2}
+        {...boxStyle}
       >
         <Stack direction={{ base: 'column', sm: 'row' }}>
           {/* 범위 지정 */}
