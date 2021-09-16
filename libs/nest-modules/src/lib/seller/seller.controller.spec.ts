@@ -1,9 +1,9 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Seller } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
-import { FindSellerRes } from '@project-lc/shared-types';
 import { SellerController } from './seller.controller';
 import { SellerService } from './seller.service';
 import { SellerSettlementService } from './seller-settlement.service';
@@ -12,15 +12,20 @@ import { mailerConfig } from '../_nest-units/settings/mailer.config';
 import { SellerShopService } from './seller-shop.service';
 
 describe('SellerController', () => {
+  interface TestSeller extends Seller {
+    sellerShop: { shopName: string };
+  }
+
   let app: NestApplication;
   let controller: SellerController;
   let service: SellerService;
-  const user: FindSellerRes = {
+
+  const user: TestSeller = {
     id: 1,
     name: 'tester',
     email: 'test@test.com',
     password: 'test',
-    shopName: null,
+    sellerShop: { shopName: 'testShop' },
   };
 
   beforeAll(async () => {
