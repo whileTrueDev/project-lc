@@ -40,6 +40,9 @@ export class SellerService {
       },
     });
 
+    if (!seller) {
+      return seller;
+    }
     // seller shop name preprocessing
     const { sellerShop, ..._seller } = seller;
     return {
