@@ -13,13 +13,12 @@ export class AppController {
   @Get()
   @Render('index')
   async renterTest() {
-    const urlAndNicknames = await this.overlayControllerService.getCreatorUrls();
-    return { urlAndNicknames };
+    const userIdAndUrlAndNicknames = await this.overlayControllerService.getCreatorUrls();
+    return { userIdAndUrlAndNicknames };
   }
 
   @Post('/purchase-message')
   async uploadMessage(@Body() data: PurchaseMessageWithLoginFlag) {
-    console.log(data);
     const upload = await this.overlayControllerService.uploadPurchase(data);
     return upload;
   }

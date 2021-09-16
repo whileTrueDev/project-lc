@@ -11,6 +11,7 @@ export class OverlayControllerService {
     const urlAndNickname = await this.prisma.user.findMany({
       select: {
         userNickname: true,
+        userId: true,
         overlayUrl: true,
       },
     });
@@ -23,12 +24,14 @@ export class OverlayControllerService {
     const text = data.message;
     const price = data.purchaseNum;
     const { loginFlag } = data;
-    const creatorId = 'onad';
+    const creatorId = data.userId;
+    const { phoneCallEventFlag } = data;
+    const { giftFlag } = data;
 
-    const urlAndNickname = await this.prisma.liveCommerceRanking.create({
-      data: { nickname, text, price, loginFlag, creatorId },
+    const writePurchaseMessage = await this.prisma.liveCommerceRanking.create({
+      data: { nickname, text, price, loginFlag, creatorId, phoneCallEventFlag, giftFlag },
     });
-    if (!urlAndNickname) throwError('Cannot Get Data From Db');
-    return urlAndNickname;
+    if (!writePurchaseMessage) throwError('Cannot Get Data From Db');
+    return writePurchaseMessage;
   }
 }

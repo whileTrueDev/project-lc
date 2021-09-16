@@ -6,7 +6,7 @@
     <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.1/css/jquery.dataTables.css">
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.js"></script>
-    <script src="/admin.js"></script>
+    <script type="module" src="/admin.js"></script>
     <link href="/layout.css" rel='stylesheet'>
     <title>Controller</title>
     <script>
@@ -20,16 +20,23 @@
             <thead>
                 <tr>
                     <th>이름</th>
+                    <th>ID</th>
                     <th>URL</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                {{#urlAndNicknames}}
+                {{#userIdAndUrlAndNicknames}}
                 <tr class="user-row" id={{userNickname}}>
-                    <td class="nickname-cell">{{userNickname}}
+                    <td class="nickname-cell">
+                        {{userNickname}}
                     </td>
-                    <td class="url-cell">{{overlayUrl}}</td>
+                    <td class="userid-cell" id={{userId}}>
+                        {{userId}}
+                    </td>
+                    <td class="url-cell" id={{overlayUrl}}>
+                        {{overlayUrl}}
+                    </td>
                     <td>
                         <button
                             class="socket-id-button"
@@ -38,7 +45,7 @@
                         </button>
                     </td>
                 </tr>
-                 {{/urlAndNicknames}}
+                 {{/userIdAndUrlAndNicknames}}
             </tbody>
         </table>
     </div>
@@ -130,9 +137,26 @@
                 구매액 : <input type="number" id="sold-price"><br>
                 구매자 : <input type="text" id="customer-nickname"><br>
                 메세지 : <input type="text" id="customer-message"><br>
+                선물하기 여부 : 
+                <input type="radio" id="gift-radio-no" name="gift" value="no" checked>
+                    <label for="gift-radio-no">NO</label>
+                <input type="radio" id="gift-radio-yes" name="gift" value="yes">
+                    <label for="gift-radio-yes">YES</label>
+                <br>
+                전화 이벤트 : 
+                <input type="radio" id="event-radio-no" name="event" value="no" checked>
+                    <label for="event-radio-no">NO</label>
+                <input type="radio" id="event-radio-yes" name="event" value="yes">
+                    <label for="event-radio-yes">YES</label>
+                <br>
                 <button id="message-button" type="submit">제출하기</button>
             </fieldset>
         </form>
+    </div>
+    <div class="dashboard">
+        <h2>
+            지표
+        </h2>
     </div>
 </body>
 

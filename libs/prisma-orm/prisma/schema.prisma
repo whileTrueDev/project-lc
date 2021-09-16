@@ -178,6 +178,7 @@ model LiveCommerceRanking {
   text               String   @db.LongText
   price              Int
   phoneCallEventFlag Boolean  @default(false)
+  giftFlag           Boolean  @default(false)
   loginFlag          Boolean  @default(true)
   creatorId          String
   createDate         DateTime @default(now())

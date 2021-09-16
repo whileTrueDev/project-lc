@@ -1,5 +1,7 @@
 /* eslint-env jquery */
 let roomName;
+let userId;
+
 const socket = io('http://localhost:3002', { transports: ['websocket'] });
 
 socket.on('creator list from server', (data) => {
@@ -20,9 +22,10 @@ $(document).ready(function () {
 
   $('.socket-id-button').click(function () {
     const nickname = $(this).closest('tr').prop('id');
-    const url = $(this).closest('tr').children('td.url-cell').text();
-
+    const url = $(this).closest('tr').children('td.url-cell').attr('id');
+    userId = $(this).closest('tr').children('td.userid-cell').attr('id');
     $('#creator-name').text(nickname);
+
     socket.emit('request creator list', {
       roomName: socket.id,
       url,
@@ -76,37 +79,70 @@ $(document).ready(function () {
     const soldPrice = $('#sold-price').val();
     const customerNickname = $('#customer-nickname').val();
     const customerMessage = $('#customer-message').val();
+    const phoneCallEventFlag = $('input[name="event"]:checked').val() === 'yes';
+    const giftFlag = $('input[name="gift"]:checked').val() === 'yes';
+
     if (standardPrice > soldPrice) {
       level = '1';
-      console.log(level);
     } else {
       level = '2';
-      console.log(level);
     }
+
     if (customerMessage.trim().length === 0) {
       isLogin = false;
     }
-    console.log(
-      `레벨 : ${level}
-      회원 여부 : ${isLogin}
-      구매상품 : ${productName}
-      구매액 : ${soldPrice}
-      구매자 : ${customerNickname}
-      메세지 : ${customerMessage}
-      `,
-    );
+
+    const messageJson = JSON.stringify({
+      level,
+      userId,
+      loginFlag: isLogin,
+      productName,
+      purchaseNum: Number(soldPrice),
+      nickname: customerNickname,
+      message: customerMessage,
+      phoneCallEventFlag,
+      giftFlag,
+    });
+
     $.ajax({
       type: 'POST',
       url: 'http://localhost:3333/purchase-message',
-      data: {
-        level,
-        loginFlag: isLogin,
-        productName,
-        purchaseNum: Number(soldPrice),
-        nickname: customerNickname,
-        message: customerMessage,
+      dataType: 'json',
+      contentType: 'application/json',
+      data: messageJson,
+      success() {
+        if (isLogin) {
+          socket.emit('right top purchase message', {
+            roomName,
+            level,
+            productName,
+            purchaseNum: soldPrice,
+            nickname: customerNickname,
+            message: customerMessage,
+          });
+        } else {
+          socket.emit('get non client purchase message from admin', {
+            roomName,
+            level,
+            productName,
+            purchaseNum: soldPrice,
+            nickname: customerNickname,
+            message: '',
+          });
+        }
       },
-      success: alert('success'),
+      error() {
+        alert('메세지 전송 실패');
+      },
+      complete() {
+        $('#sold-price').val(null);
+        $('#customer-nickname').val(null);
+        $('#customer-message').val(null);
+        $('input[name="event"]').removeAttr('checked');
+        $('input[name="gift"]').removeAttr('checked');
+        $('input[name="event"]').filter('[value=no]').prop('checked', true);
+        $('input[name="gift"]').filter('[value=no]').prop('checked', true);
+      },
     });
   });
 });
