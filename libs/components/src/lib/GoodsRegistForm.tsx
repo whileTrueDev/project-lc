@@ -1,12 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Divider, Stack, Button, useToast } from '@chakra-ui/react';
+import { Button, Stack, useToast } from '@chakra-ui/react';
 import { useRegistGoods } from '@project-lc/hooks';
-import {
-  GoodsOptionDto,
-  GoodsOptionsSupplyDto,
-  RegistGoodsDto,
-} from '@project-lc/shared-types';
-import { useForm, FormProvider } from 'react-hook-form';
+import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
+import { FormProvider, useForm } from 'react-hook-form';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
 import GoodsRegistDataOptions from './GoodsRegistDataOptions';
@@ -68,7 +64,12 @@ export function GoodsRegistForm(): JSX.Element {
   };
 
   const regist = (data: RegistGoodsDto) => {
-    alert(JSON.stringify(data));
+    const { image, ...goodsData } = data;
+    alert(JSON.stringify(goodsData));
+    console.log(goodsData);
+    console.log(image);
+
+    // TODO: mutateAsync(dto) 하기 전에 image를 s3에 업로드
     // mutateAsync(dto)
     //   .then((res) => {
     //     const { data } = res;
@@ -102,7 +103,7 @@ export function GoodsRegistForm(): JSX.Element {
         <GoodsRegistDataOptions />
 
         {/* 사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개, 각 이미지는 10mb제한 */}
-        <GoodsRegistPictures />
+        {/* <GoodsRegistPictures /> */}
 
         {/* 상세설명 -  (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록, 이미지는 최대 20mb 제한, 주로 이미지로 등록함 */}
         <GoodsRegistDescription />
