@@ -45,3 +45,5 @@ export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
 export * from './lib/ShopNameDialog';
 export * from './lib/ShopNameSection';
+export * from './lib/ShippingPolicyForm';
+

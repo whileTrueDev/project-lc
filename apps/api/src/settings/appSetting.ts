@@ -1,5 +1,6 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
