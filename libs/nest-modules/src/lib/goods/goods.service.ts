@@ -137,8 +137,8 @@ export class GoodsService {
         supply,
       } = option;
 
-      const stock = supply.reduce((sum, sup) => sum + sup.stock, 0); // 옵션의 재고
-      const badstock = supply.reduce((sum, sup) => sum + sup.badstock, 0); // 옵션의 불량재고
+      const { stock } = supply; // 옵션의 재고
+      const { badstock } = supply; // 옵션의 불량재고
       const rstock = stock - badstock; // 옵션의 가용재고
       return {
         id,
