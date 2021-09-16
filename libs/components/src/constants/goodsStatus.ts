@@ -18,6 +18,13 @@ export const GOODS_STATUS: Record<GoodsStatus, string> = {
   purchasing: '재고확보중',
   unsold: '판매중지',
 };
+// 상품 판매 상태 컬러
+export const GOODS_STATUS_COLOR: Record<GoodsStatus, string> = {
+  normal: 'green',
+  runout: 'red',
+  purchasing: 'orange',
+  unsold: 'gray',
+};
 // 상품 노출 여부
 export const GOODS_VIEW: Record<GoodsView, string> = {
   look: '노출',

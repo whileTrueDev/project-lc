@@ -4,6 +4,7 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
+  Param,
   ParseIntPipe,
   Patch,
   Query,
@@ -48,6 +49,14 @@ export class GoodsController {
   @Get('/stock')
   getStockInfo(@Query('id', ParseIntPipe) id: number) {
     return this.goodsService.getStockInfo(id);
+  }
+
+  @Get(':goodsId')
+  getOneGoods(
+    @SellerInfo() seller: UserPayload,
+    @Param('goodsId') goodsId: string | number,
+  ) {
+    return this.goodsService.getOneGoods(goodsId, seller.sub);
   }
 
   @Patch('/expose')

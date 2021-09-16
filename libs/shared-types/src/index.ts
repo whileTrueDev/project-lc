@@ -39,6 +39,7 @@ export * from './lib/overlay/overlay-types';
 export * from './lib/res-types/fmExport.res';
 export * from './lib/res-types/fmGoods.res';
 export * from './lib/res-types/fmOrder.res';
+export * from './lib/res-types/goodsById.res';
 export * from './lib/res-types/goodsList.res';
 export * from './lib/res-types/loginUserRes';
 export * from './lib/res-types/userProfile.res';

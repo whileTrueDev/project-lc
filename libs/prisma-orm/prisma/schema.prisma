@@ -149,21 +149,21 @@ enum GoodsConfirmationStatuses {
 
 // 상품 옵션 - fm_goods_option
 model GoodsOptions {
-  id             Int                    @id @default(autoincrement())
-  goods          Goods                  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  id             Int                   @id @default(autoincrement())
+  goods          Goods                 @relation(fields: [goodsId], references: [id], onDelete: Cascade)
   goodsId        Int
-  supply         GoodsOptionsSupplies[]
+  supply         GoodsOptionsSupplies?
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
-  default_option YesOrNo                @default(n) // 옵션 필수 여부
-  option_type    String                 @default("direct") // 기본값인듯? 설명도 direct
+  default_option YesOrNo               @default(n) // 옵션 필수 여부
+  option_type    String                @default("direct") // 기본값인듯? 설명도 direct
   option_title   String? // 옵션명 fm_goods_options.option_title
   option1        String? // 옵션값 fm_goods_options.option1
   option_code    String? // 옵션코드
-  consumer_price Decimal                @db.Decimal(10, 2) // 소비자가 (미할인가)
-  price          Decimal                @db.Decimal(10, 2) // 판매가 (할인가)
-  color          String?                @db.VarChar(10) // 컬러 hex값
+  consumer_price Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
+  price          Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
+  color          String?               @db.VarChar(10) // 컬러 hex값
   weight         Float? //옵션 개당 무게 (단위 kg)
-  option_view    YesOrNo_UPPERCASE      @default(Y) // ���션 노출 여부
+  option_view    YesOrNo_UPPERCASE     @default(Y) // ���션 노출 여부
 }
 
 // 상품 옵션 재고 - fm_goods_suply

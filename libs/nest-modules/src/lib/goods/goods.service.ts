@@ -235,4 +235,24 @@ export class GoodsService {
       throw new InternalServerErrorException(error);
     }
   }
+
+  /** 상품 개별 정보 조회 */
+  public async getOneGoods(goodsId: string | number, email: string) {
+    return this.prisma.goods.findFirst({
+      where: {
+        id: Number(goodsId),
+        seller: {
+          email,
+        },
+      },
+      include: {
+        options: { include: { supply: true } },
+        ShippingGroup: true,
+        confirmation: true,
+        seller: true,
+        image: true,
+        GoodsInfo: true,
+      },
+    });
+  }
 }
