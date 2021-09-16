@@ -92,9 +92,13 @@ $(document).ready(function () {
     const productName = $('#product-name').val();
     const soldPrice = $('#sold-price').val();
     const customerNickname = $('#customer-nickname').val();
-    const customerMessage = $('#customer-message').val();
+    let customerMessage = $('#customer-message').val();
     const phoneCallEventFlag = $('input[name="event"]:checked').val() === 'yes';
     const giftFlag = $('input[name="gift"]:checked').val() === 'yes';
+
+    if (giftFlag) {
+      customerMessage = `[스트리머에게 선물!] ${customerMessage}`;
+    }
 
     if (standardPrice > soldPrice) {
       level = '1';
