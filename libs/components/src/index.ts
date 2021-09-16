@@ -48,3 +48,4 @@ export * from './lib/admin/AdminPageLayout';
 export * from './lib/admin/AdminLoginForm';
 export * from './lib/admin/AdminAccountList';
 export * from './lib/admin/AdminBusinessRegistrationList';
+export * from './lib/ShippingPolicyForm';

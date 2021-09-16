@@ -49,13 +49,16 @@
     "nest-modules": {
       "tags": []
     },
+    "overlay": {
+      "tags": []
+    },
+    "overlay-controller": {
+      "tags": []
+    },
     "prisma-orm": {
       "tags": []
     },
     "shared-types": {
-      "tags": []
-    },
-    "socket": {
       "tags": []
     },
     "stores": {

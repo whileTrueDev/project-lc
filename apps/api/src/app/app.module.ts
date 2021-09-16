@@ -9,6 +9,7 @@ import {
   mailerConfig,
   GoodsModule,
   AdminModule,
+  ShippingGroupModule,
 } from '@project-lc/nest-modules';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -27,6 +28,7 @@ import { validationSchema } from '../settings/config.validation';
     SocialModule,
     GoodsModule,
     AdminModule,
+    ShippingGroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

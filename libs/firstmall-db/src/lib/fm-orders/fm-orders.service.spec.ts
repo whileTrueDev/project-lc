@@ -2,7 +2,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrdersDto } from '@project-lc/shared-types';
-import { ordersSample } from '../../__tests__/ordersSample';
 import {
   orderDetailExportsSample,
   orderDetailOptionsSample,
@@ -10,6 +9,7 @@ import {
   orderDetailReturnsSample,
   orderMetaInfoSample,
 } from '../../__tests__/orderDetailSample';
+import { ordersSample } from '../../__tests__/ordersSample';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FmOrdersService } from './fm-orders.service';
 
@@ -22,7 +22,7 @@ describe('FmOrdersService', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule],
-      providers: [FmOrdersService, FirstmallDbService],
+      providers: [FirstmallDbService, FmOrdersService],
     }).compile();
 
     service = module.get<FmOrdersService>(FmOrdersService);
@@ -45,9 +45,7 @@ describe('FmOrdersService', () => {
       const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
       // 기본 select 구문이 올바르게 들어갔는 지 검사
-      expect(sql).toContain(
-        'SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*',
-      );
+      expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
       expect(sql).toContain('FROM fm_order');
       expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
       expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -73,9 +71,7 @@ describe('FmOrdersService', () => {
     const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain(
-      'SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*',
-    );
+    expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -100,9 +96,7 @@ describe('FmOrdersService', () => {
     const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain(
-      'SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*',
-    );
+    expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -123,9 +117,7 @@ describe('FmOrdersService', () => {
     const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain(
-      'SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*',
-    );
+    expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -145,9 +137,7 @@ describe('FmOrdersService', () => {
     const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain(
-      'SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*',
-    );
+    expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -168,9 +158,7 @@ describe('FmOrdersService', () => {
     const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain(
-      'SELECT fm_order_item.goods_name, fm_order.order_seq as id, fm_order.*',
-    );
+    expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -233,13 +221,13 @@ describe('FmOrdersService', () => {
   });
 
   describe('[PRIVATE Method] findOneOrderOptions', () => {
-    const orderId = 'TESTORDERID';
+    const itemSeqArr = ['TEST_ITEM_SEQ'];
 
     it('should be successed', async () => {
       const querySpy = jest
         .spyOn(db, 'query')
         .mockImplementation(async () => orderDetailOptionsSample);
-      const orderDetail = await service['findOneOrderOptions'](orderId);
+      const orderDetail = await service['findOneOrderOptions'](itemSeqArr);
 
       expect(querySpy).toBeCalledTimes(4);
 
@@ -248,7 +236,7 @@ describe('FmOrdersService', () => {
 
     it('should be return empty array', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
-      const orderDetail = await service['findOneOrderOptions'](orderId);
+      const orderDetail = await service['findOneOrderOptions'](itemSeqArr);
       expect(querySpy).toBeCalledTimes(5);
 
       expect(orderDetail).toEqual([]);
@@ -259,22 +247,26 @@ describe('FmOrdersService', () => {
     const orderId = 'TESTORDERID';
 
     it('should be successed', async () => {
-      const querySpy = jest
-        .spyOn(db, 'query')
-        .mockImplementation(async () => [orderDetailExportsSample]);
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async (sql) => {
+        const { itemOptions, ...rest } = orderDetailExportsSample[0];
+        if (sql.includes('GROUP BY export_code')) {
+          return [rest];
+        }
+        return itemOptions;
+      });
       const orderDetail = await service['findOneOrderExports'](orderId);
 
-      expect(querySpy).toBeCalledTimes(6);
+      expect(querySpy).toBeCalledTimes(7);
 
       expect(orderDetail).toEqual(orderDetailExportsSample);
     });
 
-    it('should be return null', async () => {
+    it('should be return empty array', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
       const orderDetail = await service['findOneOrderExports'](orderId);
-      expect(querySpy).toBeCalledTimes(7);
+      expect(querySpy).toBeCalledTimes(8);
 
-      expect(orderDetail).toEqual(null);
+      expect(orderDetail).toEqual([]);
     });
   });
 
@@ -282,22 +274,26 @@ describe('FmOrdersService', () => {
     const orderId = 'TESTORDERID';
 
     it('should be successed', async () => {
-      const querySpy = jest
-        .spyOn(db, 'query')
-        .mockImplementation(async () => [orderDetailRefundsSample]);
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async (sql) => {
+        const { items, ...rest } = orderDetailRefundsSample[0];
+        if (sql.includes('GROUP BY refund_code')) {
+          return [rest];
+        }
+        return items;
+      });
       const orderDetail = await service['findOneOrderRefunds'](orderId);
 
-      expect(querySpy).toBeCalledTimes(8);
+      expect(querySpy).toBeCalledTimes(10);
 
       expect(orderDetail).toEqual(orderDetailRefundsSample);
     });
 
-    it('should be return null', async () => {
+    it('should be return empty array', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
       const orderDetail = await service['findOneOrderRefunds'](orderId);
-      expect(querySpy).toBeCalledTimes(9);
+      expect(querySpy).toBeCalledTimes(11);
 
-      expect(orderDetail).toEqual(null);
+      expect(orderDetail).toEqual([]);
     });
   });
 
@@ -306,25 +302,25 @@ describe('FmOrdersService', () => {
 
     it('should be successed', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async (sql) => {
-        const { items, ...rest } = orderDetailReturnsSample;
-        if (sql.includes('GROUP BY return_code')) {
+        const { items, ...rest } = orderDetailReturnsSample[0];
+        if (sql.includes('GROUP BY')) {
           return [rest];
         }
         return items;
       });
       const orderDetail = await service['findOneOrderReturns'](orderId);
 
-      expect(querySpy).toBeCalledTimes(11);
+      expect(querySpy).toBeCalledTimes(13);
 
       expect(orderDetail).toEqual(orderDetailReturnsSample);
     });
 
-    it('should be return null', async () => {
+    it('should be return empty array', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
       const orderDetail = await service['findOneOrderReturns'](orderId);
-      expect(querySpy).toBeCalledTimes(12);
+      expect(querySpy).toBeCalledTimes(14);
 
-      expect(orderDetail).toEqual(null);
+      expect(orderDetail).toEqual([]);
     });
   });
 });
