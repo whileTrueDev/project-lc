@@ -1,8 +1,9 @@
+/* eslint-disable camelcase */
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, Stack, useToast } from '@chakra-ui/react';
 import { useRegistGoods } from '@project-lc/hooks';
-import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
-import { FormProvider, useForm } from 'react-hook-form';
+import { GoodsOptionDto, RegistGoodsDto, GoodsImageDto } from '@project-lc/shared-types';
+import { FormProvider, useForm, NestedValue } from 'react-hook-form';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
 import GoodsRegistDataOptions from './GoodsRegistDataOptions';
@@ -13,11 +14,35 @@ import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
 
+export type GoodsFormValues = Omit<RegistGoodsDto, 'options' | 'image'> & {
+  options: NestedValue<Omit<GoodsOptionDto, 'default_option' | 'option_title'>[]>;
+  image: NestedValue<GoodsImageDto[]>;
+  defaultOptionIndex: number;
+  option_title: string;
+};
+
 export function GoodsRegistForm(): JSX.Element {
   const { mutateAsync, isLoading } = useRegistGoods();
   const toast = useToast();
 
-  const methods = useForm<RegistGoodsDto>();
+  const methods = useForm<GoodsFormValues>({
+    defaultValues: {
+      defaultOptionIndex: 0,
+      option_title: '',
+      options: [
+        {
+          option_type: 'direct',
+          option1: '',
+          consumer_price: 0,
+          price: 0,
+          option_view: 'Y',
+          supply: {
+            stock: 0,
+          },
+        },
+      ],
+    },
+  });
   const { handleSubmit } = methods;
 
   const options: GoodsOptionDto[] = [
@@ -68,6 +93,7 @@ export function GoodsRegistForm(): JSX.Element {
     alert(JSON.stringify(data));
     console.log(goodsData);
     console.log(image);
+    // TODO: options 에 default_option, option_title설정
 
     // TODO: mutateAsync(dto) 하기 전에 image를 s3에 업로드
     // mutateAsync(dto)
@@ -94,10 +120,10 @@ export function GoodsRegistForm(): JSX.Element {
           등록
         </Button>
         {/* 기본정보 */}
-        <GoodsRegistDataBasic />
+        {/* <GoodsRegistDataBasic /> */}
 
         {/* 판매정보 */}
-        <GoodsRegistDataSales />
+        {/* <GoodsRegistDataSales /> */}
 
         {/* 옵션 */}
         <GoodsRegistDataOptions />
@@ -116,10 +142,10 @@ export function GoodsRegistForm(): JSX.Element {
         <GoodsRegistShippingPolicy />
 
         {/* 기타정보 - 최소, 최대구매수량 */}
-        <GoodsRegistExtraInfo />
+        {/* <GoodsRegistExtraInfo /> */}
 
         {/* 메모 - textArea */}
-        <GoodsRegistMemo />
+        {/* <GoodsRegistMemo /> */}
       </Stack>
     </FormProvider>
   );
