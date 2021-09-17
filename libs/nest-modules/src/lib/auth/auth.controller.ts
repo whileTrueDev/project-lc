@@ -9,6 +9,7 @@ import {
   Query,
   ValidationPipe,
   HttpCode,
+  Header,
 } from '@nestjs/common';
 import {
   SendMailVerificationDto,
@@ -62,6 +63,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getProfile(@Req() req: Request) {
     return this.authService.getProfile(req.user);
   }

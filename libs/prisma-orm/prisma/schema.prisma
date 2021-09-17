@@ -3,10 +3,6 @@ generator client {
   previewFeatures = ["selectRelationCount", "orderByRelation", "referentialActions"]
 }
 
-// generator docs {
-//   provider = "node ../../node_modules/prisma-docs-generator"
-// }
-
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -16,17 +12,16 @@ model Seller {
   id                         Int                          @id @default(autoincrement())
   email                      String                       @unique
   name                       String?
-  password                   String? // 소셜로그인으로 로그인하는 경우, 비밀번호가 없을 수 있다.
-  socialAccounts             SellerSocialAccount[]
+  password                   String?
   goods                      Goods[]
   loginHistory               LoginHistory[]
   sellerBusinessRegistration SellerBusinessRegistration[]
-  sellerSettlements          SellerSettlements[]
   sellerSettlementAccount    SellerSettlementAccount[]
+  sellerSettlements          SellerSettlements[]
+  socialAccounts             SellerSocialAccount[]
   shippingGroups             ShippingGroup[]
 }
 
-// 마케터의 사업자 등록증을 위한 모델 seller와 1 : N의 관계를 가지므로
 model SellerBusinessRegistration {
   id                         Int    @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
   sellerEmail                String // 등록한 판매자 ID 
@@ -38,8 +33,8 @@ model SellerBusinessRegistration {
   businessAddress            String // 사업장 주소
   taxInvoiceMail             String // 세금계산서 전용 이메일
   fileName                   String // 등록된 s3 파일명
+  seller                     Seller @relation(fields: [sellerEmail], references: [email])
 
-  seller Seller @relation(fields: [sellerEmail], references: [email])
   @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
 }
 
@@ -52,25 +47,25 @@ model SellerSettlements {
   amount      Int      @default(0)
   seller      Seller   @relation(fields: [sellerEmail], references: [email])
 
-  @@index(name: "SellerSettlementsIndex", fields: [sellerEmail, id])
+  @@index([sellerEmail, id], name: "SellerSettlementsIndex")
 }
 
 model SellerSettlementAccount {
-  id          Int    @id @default(autoincrement()) // 정산 내역 고유 번호
-  sellerEmail String // 등록한 판매자 ID 
+  id          Int    @id @default(autoincrement())
+  sellerEmail String
   bank        String
   number      String
   name        String
+  seller      Seller @relation(fields: [sellerEmail], references: [email])
 
-  seller Seller @relation(fields: [sellerEmail], references: [email])
-  @@index(name: "SellerSettlementAccountIndex", fields: [sellerEmail, id])
+  @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
 }
 
 model MailVerificationCode {
   id               Int      @id @default(autoincrement())
-  email            String   @default("")
   verificationCode String
   createDate       DateTime @default(now())
+  email            String   @default("")
 }
 
 model SellerSocialAccount {
@@ -81,8 +76,10 @@ model SellerSocialAccount {
   profileImage String?
   accessToken  String?
   refreshToken String?
-  seller       Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   sellerId     Int
+  seller       Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@index([sellerId], name: "sellerId")
 }
 
 // ****************************
@@ -126,25 +123,18 @@ model Goods {
   runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
+
+  @@index([sellerId], name: "sellerId")
 }
 
-// 상품 검수 정보
 model GoodsConfirmation {
   id                         Int                       @id @default(autoincrement())
-  goodsId                    Int
-  goods                      Goods                     @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  goodsId                    Int                       @unique
   status                     GoodsConfirmationStatuses @default(waiting) // 검수 상태
   firstmallGoodsConnectionId Int? // 퍼스트몰 상품 고유 ID (fm_goods.goods_seq)
+  goods                      Goods                     @relation(fields: [goodsId], references: [id], onDelete: Cascade)
 }
 
-// 상품 검수 상태 정보
-enum GoodsConfirmationStatuses {
-  waiting // 대기
-  confirmed // 승인
-  rejected // 거절
-}
-
-// 상품 옵션 - fm_goods_option
 model GoodsOptions {
   id             Int                    @id @default(autoincrement())
   goods          Goods                  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
@@ -161,17 +151,43 @@ model GoodsOptions {
   color          String?                @db.VarChar(10) // 컬러 hex값
   weight         Float? //옵션 개당 무게 (단위 kg)
   option_view    YesOrNo_UPPERCASE      @default(Y) // 옵션 노출 여부
+
+  @@index([goodsId], name: "goodsId")
 }
 
 // 상품 옵션 재고 - fm_goods_suply
 model GoodsOptionsSupplies {
   id             Int          @id @default(autoincrement())
-  goodsOptions   GoodsOptions @relation(fields: [goodsOptionsId], references: [id], onDelete: Cascade)
   goodsOptionsId Int
-  // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
+  // ���기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   stock          Int          @db.UnsignedInt // 재고
   badstock       Int?         @db.UnsignedInt // 불량재고
   safe_stock     Int?         @default(0) // 각 매장의 옵션별 안전 재고
+  goodsOptions   GoodsOptions @relation(fields: [goodsOptionsId], references: [id], onDelete: Cascade)
+
+  @@index([goodsOptionsId], name: "goodsOptionsId")
+}
+
+model LoginHistory {
+  id         Int      @id @default(autoincrement())
+  seller     Seller?  @relation(fields: [sellerId], references: [id])
+  sellerId   Int?
+  method     String // 로그인 방식
+  ip         String // 로그인 IP
+  country    String? // 로그인 국가
+  city       String? // 로그인 도시
+  device     String // 로그인 기기
+  ua         String // User-Agent 문자열
+  createDate DateTime @default(now()) // 로그인 일시
+
+  @@index([sellerId], name: "sellerId")
+}
+
+// 상품 검수 상태 정보
+enum GoodsConfirmationStatuses {
+  waiting // 대기
+  confirmed // 승인
+  rejected // 거절
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -216,7 +232,7 @@ enum ShopOrGoods {
 
 // * 상품- 개별 배송비 선택
 // * 상품 - 최소 구매 수량 사용 여부
-// * 상품 - 최대 구매 ���량 사용 ����부
+// * 상품 - 최대 구매 수량 사용 여부
 enum LimitOrUnlimit {
   unlimit
   limit
@@ -236,21 +252,6 @@ enum YesOrNo {
 enum YesOrNo_UPPERCASE {
   Y
   N
-}
-
-// ****************************
-// 로그인 내역
-model LoginHistory {
-  id         Int      @id @default(autoincrement())
-  seller     Seller?  @relation(fields: [sellerId], references: [id])
-  sellerId   Int?
-  method     String // 로그인 방식
-  ip         String // 로그인 IP
-  country    String? // 로그인 국가
-  city       String? // 로그인 도시
-  device     String // 로그인 기기
-  ua         String // User-Agent 문자열
-  createDate DateTime @default(now()) // 로그인 일시
 }
 
 // ****************************
