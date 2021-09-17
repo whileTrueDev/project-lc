@@ -162,7 +162,7 @@ model GoodsOptionsSupplies {
   // ���기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   stock          Int          @db.UnsignedInt // 재고
   badstock       Int?         @db.UnsignedInt // 불량재고
-  safe_stock     Int?         @default(0) // 각 매장의 옵���별 안전 재고
+  safe_stock     Int?         @default(0) // 각 매장의 옵션별 안전 재고
   goodsOptions   GoodsOptions @relation(fields: [goodsOptionsId], references: [id], onDelete: Cascade)
 
   @@index([goodsOptionsId], name: "goodsOptionsId")
@@ -175,7 +175,7 @@ model LoginHistory {
   method     String // 로그인 방식
   ip         String // 로그인 IP
   country    String? // 로그인 국가
-  city       String? // ���그인 도시
+  city       String? // 로그인 도시
   device     String // 로그인 기기
   ua         String // User-Agent 문자열
   createDate DateTime @default(now()) // 로그인 일시
@@ -232,7 +232,7 @@ enum ShopOrGoods {
 
 // * 상품- 개별 배송비 선택
 // * 상품 - 최소 구매 수량 사용 여부
-// * 상품 - 최대 구매 ���량 사용 ����부
+// * 상품 - 최대 구매 수량 사용 여부
 enum LimitOrUnlimit {
   unlimit
   limit
@@ -252,21 +252,6 @@ enum YesOrNo {
 enum YesOrNo_UPPERCASE {
   Y
   N
-}
-
-enum Goods_shipping_weight_policy {
-  shop
-  goods
-}
-
-enum Goods_min_purchase_limit {
-  unlimit
-  limit
-}
-
-enum Goods_max_purchase_limit {
-  unlimit
-  limit
 }
 
 // ****************************
