@@ -1,29 +1,53 @@
-import { Box, Stack, Text } from '@chakra-ui/react';
+import { Box, Stack, Table, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
 import { GoodsByIdRes } from '@project-lc/shared-types';
 
 export interface GoodsDetailOptionsInfoProps {
   goods: GoodsByIdRes;
 }
+
+// GoodsOptionWithStockInfo
 export function GoodsDetailOptionsInfo({ goods }: GoodsDetailOptionsInfoProps) {
   return (
     <Stack>
-      <Text fontWeight="bold">옵션</Text>
-
-      <Box>
-        {goods.options.map((option) => (
-          <Box key={option.id}>
-            <Text>{option.default_option === 'y' ? '필수옵션' : '필수옵션아님'}</Text>
-            <Text>option.option_title: {option.option_title}</Text>
-            <Text>option.option1: {option.option1}</Text>
-            <Text>option.price: {option.price}</Text>
-            <Text>option.weight: {option.weight}</Text>
-            <Text>option.option_view: {option.option_view}</Text>
-            <Text>option.supply.stock: {option.supply.stock}</Text>
-            <Text>option.supply.badstock: {option.supply.badstock}</Text>
-            <Text>option.supply.safe_stock: {option.supply.safe_stock}</Text>
-          </Box>
-        ))}
-      </Box>
+      <Table mt={4}>
+        <Thead>
+          <Tr>
+            <Th>기본옵션여부</Th>
+            <Th>옵션명</Th>
+            <Th>옵션값</Th>
+            <Th>소비자가</Th>
+            <Th>정가</Th>
+            <Th>옵션노출여부</Th>
+            <Th>총 재고</Th>
+            <Th>불량재고</Th>
+            <Th>가용재고</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {goods.options &&
+            goods.options.map((option, index) => (
+              <Tr key={option.id}>
+                <Td borderBottom="none">
+                  {option.default_option === 'y' ? '예' : '아니오'}
+                </Td>
+                <Td borderBottom="none">{option.option_title}</Td>
+                <Td borderBottom="none">{option.option1}</Td>
+                <Td borderBottom="none">
+                  {Number(option.consumer_price).toLocaleString()}
+                </Td>
+                <Td borderBottom="none">{Number(option.price).toLocaleString()}</Td>
+                <Td borderBottom="none">
+                  {option.option_view === 'Y' ? '노출' : '미노출'}
+                </Td>
+                <Td borderBottom="none">{option.supply.stock}</Td>
+                <Td borderBottom="none">{option.supply.badstock}</Td>
+                <Td borderBottom="none">
+                  {option.supply.stock - (option.supply.badstock || 0)}
+                </Td>
+              </Tr>
+            ))}
+        </Tbody>
+      </Table>
     </Stack>
   );
 }

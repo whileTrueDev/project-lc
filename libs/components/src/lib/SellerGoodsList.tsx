@@ -61,7 +61,7 @@ const columns: GridColumns = [
       const goodsId = row.id;
       const { goods_name } = row;
       return (
-        <NextLink href={`#${goodsId}`} passHref>
+        <NextLink href={`/mypage/goods/${goodsId}`} passHref>
           <Link width="100%">
             <Text isTruncated>{goods_name}</Text>
           </Link>

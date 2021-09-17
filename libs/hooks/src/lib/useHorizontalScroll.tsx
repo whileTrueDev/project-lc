@@ -58,10 +58,11 @@ export const useHorizontalScroll = (elRef: React.RefObject<HTMLDivElement>) => {
   }, [elRef]);
 
   useEffect(() => {
-    elRef.current?.addEventListener('scroll', onScroll);
+    const el = elRef.current;
+    el?.addEventListener('scroll', onScroll);
 
     return () => {
-      elRef.current?.removeEventListener('scroll', onScroll);
+      el?.removeEventListener('scroll', onScroll);
     };
   }, [elRef, onScroll]);
 

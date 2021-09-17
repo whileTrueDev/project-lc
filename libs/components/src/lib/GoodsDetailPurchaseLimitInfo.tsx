@@ -9,23 +9,19 @@ export function GoodsDetailPurchaseLimitInfo({
 }: GoodsDetailPurchaseLimitInfoProps) {
   return (
     <Stack>
-      {goods.min_purchase_limit === 'limit' && (
-        <Box>
-          <Text fontWeight="bold">최소구매수량</Text>
-          <Text>
-            {goods.min_purchase_limit === 'limit' ? goods.min_purchase_ea : '제한없음'}
-          </Text>
-        </Box>
-      )}
+      <Box>
+        <Text fontWeight="bold">최소구매수량</Text>
+        <Text>
+          {goods.min_purchase_limit === 'limit' ? goods.min_purchase_ea : '제한없음'}
+        </Text>
+      </Box>
 
-      {goods.max_purchase_limit === 'limit' && (
-        <Box>
-          <Text fontWeight="bold">최대구매수량</Text>
-          <Text>
-            {goods.max_purchase_limit === 'limit' ? goods.max_purchase_ea : '제한없음'}
-          </Text>
-        </Box>
-      )}
+      <Box>
+        <Text fontWeight="bold">최대구매수량</Text>
+        <Text>
+          {goods.max_purchase_limit === 'limit' ? goods.max_purchase_ea : '제한없음'}
+        </Text>
+      </Box>
     </Stack>
   );
 }

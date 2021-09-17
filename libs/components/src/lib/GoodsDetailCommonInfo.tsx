@@ -7,7 +7,6 @@ export interface GoodsDetailCommonInfoProps {
 export function GoodsDetailCommonInfo({ goods }: GoodsDetailCommonInfoProps) {
   return (
     <Stack>
-      <Text fontWeight="bold">상품공통정보</Text>
       <Text>{goods.common_contents}</Text>
     </Stack>
   );

@@ -6,7 +6,7 @@ export interface SummaryListProps {
   listItems: {
     id: string;
     icon: IconType;
-    value: string | React.ReactElement;
+    value: string | React.ReactElement | React.ReactNode;
     iconColor?: IconProps['color'];
     disabled?: boolean;
   }[];

@@ -1,33 +1,56 @@
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
-  Flex,
-  HStack,
-  IconButton,
-  Image,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Stack,
   Text,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { useDisplaySize, useHorizontalScroll } from '@project-lc/hooks';
 import { GoodsByIdRes } from '@project-lc/shared-types';
-import React, { useRef } from 'react';
+import React from 'react';
+import { HorizontalImageGallery } from './HorizontalImageGallery';
+import ShowMoreTextButton from './ShowMoreTextButton';
+
+const dummyText = `
+  <img src="https://picsum.photos/900/330"></img>
+
+<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+
+Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+when an unknown printer took a galley of type and scrambled it to make a type
+specimen book.</p>
+
+<br/>
+
+<p>It has survived not only five centuries, but also the leap into
+electronic typesetting, remaining essentially unchanged. It was popularised in
+the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+and more recently with desktop publishing software like Aldus PageMaker
+including versions of Lorem Ipsum</p>
+
+<div style="display:flex;justify-content:center;align-items:center;">
+  <img src="https://picsum.photos/305/305"></img>
+</div>`;
 
 export interface GoodsDetailImagesInfoProps {
   goods: GoodsByIdRes;
 }
 export function GoodsDetailImagesInfo({ goods }: GoodsDetailImagesInfoProps) {
+  const detailDialog = useDisclosure();
+
   return (
-    <Stack spacing={4}>
+    <Stack spacing={10}>
       {/* 상품이미지 */}
       <Stack spacing={2}>
+        <Text fontWeight="bold">상품 사진</Text>
+        <Text>총 {goods.image.length} 장</Text>
+
         {/* 임시 이미지. s3 업로드된 이미지 필요 */}
-        {/* {goods.image.map((x) => (
-          <Image key={x.id} src={x.image} />
-        ))} */}
-
-        <Text>상품 사진 총 {goods.image.length} 장</Text>
-
         <HorizontalImageGallery
           images={[
             'https://picsum.photos/300/300',
@@ -43,66 +66,33 @@ export function GoodsDetailImagesInfo({ goods }: GoodsDetailImagesInfoProps) {
 
       {/* 상품상세설명 */}
       <Stack>
-        <Text>상세설명 (상품 등록 작업 이후 에디터 UI작업 진행)</Text>
-        <Text>{goods.contents || '없음'}</Text>
+        <Text fontWeight="bold">상세설명 (상품 등록 작업 이후 에디터 UI작업 진행)</Text>
+        <Box maxH={350} noOfLines={dummyText.includes('<img ') ? 1 : 6}>
+          {/* {goods.contents || '없음'} */}
+          <div dangerouslySetInnerHTML={{ __html: dummyText }} />
+        </Box>
         <Box>
-          <Button>자세히보기</Button>
+          <ShowMoreTextButton onClick={detailDialog.onOpen} />
         </Box>
       </Stack>
+
+      <Modal
+        isOpen={detailDialog.isOpen}
+        onClose={detailDialog.onClose}
+        scrollBehavior="outside"
+        size="2xl"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalHeader>{goods.goods_name} 상세설명</ModalHeader>
+          <ModalBody>
+            {goods.contents}
+            {/* // TODO 텍스트에디터 작업 이후 변경 필요 */}
+            <div dangerouslySetInnerHTML={{ __html: dummyText }} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Stack>
-  );
-}
-
-export interface HorizontalImageGalleryProps {
-  images: string[];
-}
-export function HorizontalImageGallery({ images }: HorizontalImageGalleryProps) {
-  const { isMobileSize } = useDisplaySize();
-  const galleryRef = useRef<HTMLDivElement>(null);
-  const { isEndOfLeft, isEndOfRight, scrollLeft, scrollRight } =
-    useHorizontalScroll(galleryRef);
-
-  return (
-    <Flex position="relative" alignItems="center">
-      {!isMobileSize && (
-        <IconButton
-          display={!isEndOfLeft ? 'flex' : 'none'}
-          left={-5}
-          position="absolute"
-          aria-label="image-gallery-to-left"
-          icon={<ChevronLeftIcon color="black" />}
-          bgColor="whiteAlpha.900"
-          isRound
-          boxShadow="dark-lg"
-          onClick={scrollLeft}
-        />
-      )}
-      <HStack overflowX="auto" spacing={4} ref={galleryRef}>
-        {images.map((img) => (
-          <Image
-            key={img}
-            w={{ base: 260, sm: 300 }}
-            h={{ base: 260, sm: 300 }}
-            boxShadow="lg"
-            borderRadius="xl"
-            draggable={false}
-            src={img}
-          />
-        ))}
-      </HStack>
-      {!isMobileSize && (
-        <IconButton
-          display={!isEndOfRight ? 'flex' : 'none'}
-          right={-5}
-          position="absolute"
-          aria-label="image-gallery-to-right"
-          icon={<ChevronRightIcon color="black" />}
-          bgColor="whiteAlpha.900"
-          isRound
-          boxShadow="dark-lg"
-          onClick={scrollRight}
-        />
-      )}
-    </Flex>
   );
 }

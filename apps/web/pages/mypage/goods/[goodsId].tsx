@@ -1,22 +1,21 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
-import { Box, Button, HStack, Stack } from '@chakra-ui/react';
+import { Box, Button, Stack } from '@chakra-ui/react';
 import {
+  GoodsDetailActions,
   GoodsDetailCommonInfo,
   GoodsDetailImagesInfo,
   GoodsDetailInfo,
   GoodsDetailOptionsInfo,
   GoodsDetailPurchaseLimitInfo,
   GoodsDetailShippingInfo,
+  GoodsDetailSummary,
   GoodsDetailTitle,
   MypageLayout,
   SectionWithTitle,
-  SummaryList,
 } from '@project-lc/components';
 import { useGoodsById } from '@project-lc/hooks';
-import { GoodsByIdRes } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { MdDateRange } from 'react-icons/md';
 
 export function GoodsDetail(): JSX.Element {
   const router = useRouter();
@@ -29,7 +28,7 @@ export function GoodsDetail(): JSX.Element {
 
   return (
     <MypageLayout>
-      <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2}>
+      <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={8} p={2} mb={16}>
         <Box as="section">
           <Button
             size="sm"
@@ -77,56 +76,14 @@ export function GoodsDetail(): JSX.Element {
           <GoodsDetailPurchaseLimitInfo goods={goods.data} />
         </SectionWithTitle>
 
-        <SectionWithTitle title="배송정책">
-          <GoodsDetailShippingInfo goods={goods.data} />
-        </SectionWithTitle>
+        {goods.data.ShippingGroup && (
+          <SectionWithTitle title="배송정책">
+            <GoodsDetailShippingInfo goods={goods.data} />
+          </SectionWithTitle>
+        )}
       </Stack>
     </MypageLayout>
   );
 }
 
 export default GoodsDetail;
-
-export interface GoodsDetailActionsProps {
-  goods: GoodsByIdRes;
-}
-export function GoodsDetailActions({ goods }: GoodsDetailActionsProps) {
-  return (
-    <HStack>
-      <Button>버튼1</Button>
-      <Button>버튼2</Button>
-    </HStack>
-  );
-}
-
-export interface GoodsDetailSummaryProps {
-  goods: GoodsByIdRes;
-}
-export function GoodsDetailSummary({ goods }: GoodsDetailSummaryProps) {
-  return (
-    <SummaryList
-      listItems={[
-        {
-          id: 'asdf',
-          value: 'asdf',
-          icon: MdDateRange,
-        },
-        {
-          id: 'asdf2',
-          value: 'asdf2',
-          icon: MdDateRange,
-        },
-        {
-          id: 'asdf3',
-          value: 'asdf3',
-          icon: MdDateRange,
-        },
-        {
-          id: 'asdf4',
-          value: 'asdf4',
-          icon: MdDateRange,
-        },
-      ]}
-    />
-  );
-}
