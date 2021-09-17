@@ -19,6 +19,7 @@ export class ShippingGroupService {
         },
       },
       include: {
+        goods: true,
         _count: {
           select: { goods: true },
         },

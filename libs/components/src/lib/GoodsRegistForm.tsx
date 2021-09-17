@@ -27,9 +27,17 @@ type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
 };
 
 function goodsFormDataToDto(formData: GoodsFormSubmitDataType) {
-  const { image, options, option_title, max_purchase_ea, min_purchase_ea, ...goodsData } =
-    formData;
+  const {
+    image,
+    options,
+    option_title,
+    max_purchase_ea,
+    min_purchase_ea,
+    shippingGroupId,
+    ...goodsData
+  } = formData;
 
+  console.log({ shippingGroupId });
   // options 에 default_option, option_title설정
   const optionsDto: GoodsOptionDto[] = options.map((opt, index) => ({
     ...opt,
@@ -43,6 +51,7 @@ function goodsFormDataToDto(formData: GoodsFormSubmitDataType) {
     option_use: optionsDto.length > 1 ? '1' : '0',
     max_purchase_ea: max_purchase_ea || 0,
     min_purchase_ea: max_purchase_ea || 0,
+    shippingGroupId: shippingGroupId || undefined,
     image: image
       ? image.map((img, index) => ({
           image: img, // TODO: mutateAsync(dto) 하기 전에 image를 s3에 업로드
@@ -97,7 +106,7 @@ const dto: RegistGoodsDto = {
 };
 
 export function GoodsRegistForm(): JSX.Element {
-  const { mutateAsync, isLoading } = useRegistGoods();
+  // const { mutateAsync, isLoading } = useRegistGoods();
   const toast = useToast();
 
   const methods = useForm<GoodsFormValues>({
@@ -149,9 +158,7 @@ export function GoodsRegistForm(): JSX.Element {
   return (
     <FormProvider {...methods}>
       <Stack p={2} spacing={5} as="form" onSubmit={handleSubmit(regist)}>
-        <Button type="submit" isLoading={isLoading}>
-          등록
-        </Button>
+        <Button type="submit">등록</Button>
         {/* 기본정보 */}
         {/* <GoodsRegistDataBasic /> */}
 
@@ -161,17 +168,17 @@ export function GoodsRegistForm(): JSX.Element {
         {/* 옵션 */}
         {/* <GoodsRegistDataOptions /> */}
 
-        {/* 사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개, 각 이미지는 10mb제한 */}
+        {/* //TODO: 사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개, 각 이미지는 10mb제한 */}
         {/* <GoodsRegistPictures /> */}
 
-        {/* 상세설명 -  (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록, 이미지는 최대 20mb 제한, 주로 이미지로 등록함 */}
-        <GoodsRegistDescription />
+        {/* //TODO: 상세설명 -  (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록, 이미지는 최대 20mb 제한, 주로 이미지로 등록함 */}
+        {/* <GoodsRegistDescription /> */}
 
-        {/* 공통정보 => 교환/반품/배송에 표시됨 (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록,
+        {/* //TODO: 공통정보 => 교환/반품/배송에 표시됨 (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록,
       내가 생성한 공통정보 조회, 선택기능 포함  */}
-        <GoodsRegistCommonInfo />
+        {/* <GoodsRegistCommonInfo /> */}
 
-        {/* 배송정책 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
+        {/* //TODO: 배송정책 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
         <GoodsRegistShippingPolicy />
 
         {/* 기타정보 - 최소, 최대구매수량 */}
