@@ -6,9 +6,17 @@ import { FirstmallDbService } from '../firstmall-db.service';
 export class FMGoodsService {
   constructor(private readonly db: FirstmallDbService) {}
 
-  async findAll(): Promise<any[]> {
-    const query = 'select * from fm_goods order by regist_date desc limit 1';
-    return this.db.query(query);
+  /**
+   * 제공된 상품 고유번호 배열에 따라 해당되는 모든 상품의 옵션 목록을 조회
+   */
+  async findGoodsOptions(goodsSeqArr: number[]) {
+    return this.db.query(
+      `
+      SELECT *
+      FROM fm_goods_option WHERE goods_seq IN (?)
+      `,
+      [goodsSeqArr],
+    );
   }
 
   // fm-goods테이블 & 상품 연관테이블에서 goods_seq 값이 있는 데이터 삭제

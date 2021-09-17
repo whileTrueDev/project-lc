@@ -1,10 +1,23 @@
 import { ArrowForwardIcon } from '@chakra-ui/icons';
-import { Button, Center, Stack, Text, useDisclosure, useToast } from '@chakra-ui/react';
+import {
+  Alert,
+  Button,
+  Center,
+  Stack,
+  Text,
+  useDisclosure,
+  useToast,
+} from '@chakra-ui/react';
 import { useChangeFmOrderStatusMutation } from '@project-lc/hooks';
-import { FindFmOrderDetailRes, getFmOrderStatusByNames } from '@project-lc/shared-types';
+import {
+  FindFmOrderDetailRes,
+  getFmOrderStatusByNames,
+  isOrderExportable,
+} from '@project-lc/shared-types';
 import { useCallback } from 'react';
 import { FaTruck } from 'react-icons/fa';
 import { ConfirmDialog } from './ConfirmDialog';
+import ExportDialog from './ExportDialog';
 import FmOrderStatusBadge from './FmOrderStatusBadge';
 
 export interface OrderDetailActionsProps {
@@ -14,6 +27,7 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps) {
   const { mutateAsync: changeStatus, isLoading } = useChangeFmOrderStatusMutation();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const exportModal = useDisclosure();
   const toast = useToast();
 
   const handleStatusChange = useCallback(
@@ -30,20 +44,29 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps) {
   return (
     <>
       <Stack direction="row" alignItems="center">
-        {getFmOrderStatusByNames(['주문접수', '결제확인']).includes(order.step) && (
+        {getFmOrderStatusByNames(['주문접수']).includes(order.step) && (
+          <Alert status="info">
+            아직 결제확인이 되지 않은 주문입니다. 결제확인은 자동으로 처리됩니다.
+          </Alert>
+        )}
+
+        {getFmOrderStatusByNames(['결제확인']).includes(order.step) && (
           <Button colorScheme="green" size="sm" onClick={onOpen}>
             상품준비로 변경
           </Button>
         )}
-        <Button
-          variant={order.exports ? 'outline' : 'solid'}
-          size="sm"
-          colorScheme="pink"
-          rightIcon={<FaTruck />}
-          onClick={() => alert(`주문번호: ${order.id}`)}
-        >
-          출고처리 진행
-        </Button>
+
+        {isOrderExportable(order.step) && (
+          <Button
+            variant={order.exports ? 'outline' : 'solid'}
+            size="sm"
+            colorScheme="pink"
+            rightIcon={<FaTruck />}
+            onClick={exportModal.onOpen}
+          >
+            출고처리 진행
+          </Button>
+        )}
       </Stack>
 
       <ConfirmDialog
@@ -60,6 +83,12 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps) {
           <FmOrderStatusBadge orderStatus="35" />
         </Center>
       </ConfirmDialog>
+
+      <ExportDialog
+        order={order}
+        isOpen={exportModal.isOpen}
+        onClose={exportModal.onClose}
+      />
     </>
   );
 }

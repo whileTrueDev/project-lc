@@ -20,7 +20,6 @@ import {
 } from '@project-lc/hooks';
 
 import { BusinessRegistrationForm } from './BusinessRegistrationForm';
-// 등록 정보UI와 동일한 형태를 사용
 
 export type BusinessRegistrationFormDto = BusinessRegistrationDto & {
   businessRegistrationImage: File | null;
@@ -58,14 +57,14 @@ export function BusinessRegistrationDialog(props: BusinessRegistrationDialogProp
 
   // 또 다른 s3 업로드 과정이 필요할 때, hook으로 파일 분리
   async function saveToS3(data: BusinessRegistrationFormDto) {
-    const { businessRegistrationImage, imageName, ...result } = data;
-
+    const { businessRegistrationImage, imageName, companyName, ...result } = data;
     // s3로 저장
     const savedImageName = await s3.s3UploadImage({
       filename: imageName,
       userMail: profileData?.email,
       type: 'business-registration',
       file: businessRegistrationImage,
+      companyName,
     });
 
     if (!savedImageName) {

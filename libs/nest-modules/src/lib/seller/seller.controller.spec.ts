@@ -9,23 +9,35 @@ import { SellerService } from './seller.service';
 import { SellerSettlementService } from './seller-settlement.service';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { mailerConfig } from '../_nest-units/settings/mailer.config';
+import { SellerShopService } from './seller-shop.service';
 
 describe('SellerController', () => {
+  interface TestSeller extends Seller {
+    sellerShop: { shopName: string };
+  }
+
   let app: NestApplication;
   let controller: SellerController;
   let service: SellerService;
-  const user: Seller = {
+
+  const user: TestSeller = {
     id: 1,
     name: 'tester',
     email: 'test@test.com',
     password: 'test',
+    sellerShop: { shopName: 'testShop' },
   };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule, MailerModule.forRoot(mailerConfig)],
       controllers: [SellerController],
-      providers: [SellerService, MailVerificationService, SellerSettlementService],
+      providers: [
+        SellerService,
+        MailVerificationService,
+        SellerSettlementService,
+        SellerShopService,
+      ],
     }).compile();
 
     controller = module.get<SellerController>(SellerController);

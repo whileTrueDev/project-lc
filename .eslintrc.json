@@ -10,7 +10,8 @@
   },
   "extends": [
     "airbnb",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:react/recommended"
   ],
   "plugins": [
     "@nrwl/nx"
@@ -111,6 +112,8 @@
         "*.tsx"
       ],
       "rules": {
+        "react/display-name": "off",
+        "react/jsx-key": "error",
         "react/jsx-props-no-spreading": "warn",
         "react/jsx-uses-react": "off",
         "react/react-in-jsx-scope": "off",

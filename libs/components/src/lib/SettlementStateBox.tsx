@@ -41,7 +41,7 @@ export function SettlementStateBox(props: SettlementStateBoxProps): JSX.Element 
           정산 준비
         </Text>
         {!isAllReady && (
-          <Flex direction="row" mb={1} height="100%" justify="center" alignItems="center">
+          <Flex direction="row" mb={1} height="100%" alignItems="center">
             <Badge colorScheme="red" fontSize="sm" width="max-content" mr={1} pb={1}>
               정산 불가 상태
             </Badge>
@@ -56,16 +56,16 @@ export function SettlementStateBox(props: SettlementStateBoxProps): JSX.Element 
           </Flex>
         )}
       </Flex>
-      <List mt={3} spacing={1}>
+      <List mt={3} spacing={2}>
         <Divider backgroundColor="gray.100" />
-        <ListItem p={1}>
-          <Alert borderRadius="md" h={10} status={hasRegistration ? 'info' : 'error'}>
+        <ListItem>
+          <Alert borderRadius="md" h={10} status={hasRegistration ? 'success' : 'error'}>
             <ListIcon as={hasRegistration ? MdCheckCircle : MdCancel} />
             사업자 등록증 등록
           </Alert>
         </ListItem>
-        <ListItem p={1}>
-          <Alert borderRadius="md" h={10} status={hasAccount ? 'info' : 'error'}>
+        <ListItem>
+          <Alert borderRadius="md" h={10} status={hasAccount ? 'success' : 'error'}>
             <ListIcon as={hasAccount ? MdCheckCircle : MdCancel} />
             정산 계좌 등록
           </Alert>
