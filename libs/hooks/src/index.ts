@@ -32,6 +32,7 @@ export * from './lib/useOrderExportableCheck';
 export * from './lib/useOrderReturnOrRefundStatus';
 export * from './lib/useSocialLoginFailAlarm';
 export * from './lib/mutation/useShopInfoMutation';
+export * from './lib/queries/useAdminInfo';
 export * from './lib/mutation/useCreateShippingGroup';
 export * from './lib/mutation/useDeleteShippingGroup';
 export * from './lib/queries/useShippingGroupList';
