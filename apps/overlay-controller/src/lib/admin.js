@@ -1,8 +1,11 @@
 /* eslint-env jquery */
+/* global io, */
+/* eslint no-undef: "error" */
+
 let roomName;
 let userId;
 let creatorNickname;
-const socket = io('http://localhost:3002', { transports: ['websocket'] });
+const socket = io(process.env.HOST, { transports: ['websocket'] });
 
 socket.on('creator list from server', (data) => {
   if (data) {
@@ -13,7 +16,7 @@ socket.on('creator list from server', (data) => {
   }
 });
 
-$(document).ready(function () {
+$(document).ready(function ready() {
   $('#table_id').DataTable({ lengthChange: false });
   $('.mid-area button').attr('disabled', true);
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
@@ -21,7 +24,7 @@ $(document).ready(function () {
 
   $('#end-time-picker').val(localISOTime);
 
-  $('.socket-id-button').click(function () {
+  $('.socket-id-button').click(function socketIdButtonClickEvent() {
     creatorNickname = $(this).closest('tr').prop('id');
     const url = $(this).closest('tr').children('td.url-cell').attr('id');
     userId = $(this).closest('tr').children('td.userid-cell').attr('id');
@@ -35,50 +38,50 @@ $(document).ready(function () {
     roomName = url.split('/').pop();
   });
 
-  $('#toggle-table-button').click(function () {
+  $('#toggle-table-button').click(function toggleTableButtonClickEvent() {
     const text = $('#toggle-table-button').text().trim();
     $('#toggle-table-button').text(text === '◀️' ? '▶️' : '◀️');
     $('.search-box').toggle('slide');
   });
 
-  $('#screen-show-button').click(function () {
+  $('#screen-show-button').click(function screenShowButtonClickEvent() {
     socket.emit('show live commerce', roomName);
   });
 
-  $('#screen-hide-button').click(function () {
+  $('#screen-hide-button').click(function screenHideButtonClickEvent() {
     socket.emit('quit live commerce', roomName);
   });
 
-  $('#logo-toggle-button').click(function () {
+  $('#logo-toggle-button').click(function logoToggleButtonClickEvent() {
     socket.emit('toggle right-top onad logo', roomName);
   });
 
-  $('#bottom-area-toggle-button').click(function () {
+  $('#bottom-area-toggle-button').click(function bottomAreaToggleButtonClickEvent() {
     socket.emit('toggle bottom area from admin', roomName);
   });
 
-  $('#show-intro-video-button').click(function () {
+  $('#show-intro-video-button').click(function showIntroVideoButtonClickEvent() {
     socket.emit('show video from admin', { roomName, type: 'intro' });
   });
 
-  $('#show-outro-video-button').click(function () {
+  $('#show-outro-video-button').click(function showOutroVideoButtonClickEvent() {
     socket.emit('show video from admin', { roomName, type: 'outro' });
   });
 
-  $('#hide-video-button').click(function () {
+  $('#hide-video-button').click(function HideVideoButtonClickEvent() {
     socket.emit('clear full video', roomName);
   });
 
-  $('#refresh-button').click(function () {
+  $('#refresh-button').click(function refreshButtonClickEvent() {
     socket.emit('refresh', roomName);
   });
 
-  $('#end-time-send-button').click(function () {
+  $('#end-time-send-button').click(function endTimeSendButtonClickEvent() {
     const selectedTime = $('#end-time-picker').val();
     socket.emit('get d-day', { roomName, date: selectedTime });
   });
 
-  $('.message-box-lock-button').click(function () {
+  $('.message-box-lock-button').click(function messageBoxLockButtonClickEvent() {
     if ($('.message-box-lock-button').attr('class').includes('locked')) {
       $('#standard-price').attr('disabled', false);
       $('#product-name').attr('disabled', false);
@@ -92,7 +95,7 @@ $(document).ready(function () {
     }
   });
 
-  $('input[name=client-checkbox]').change(function () {
+  $('input[name=client-checkbox]').change(function clientCheckboxOnChange() {
     if ($('input[name=client-checkbox]').is(':checked')) {
       $('#customer-nickname').val(`${creatorNickname}팬`);
     } else {
@@ -100,13 +103,13 @@ $(document).ready(function () {
     }
   });
 
-  $('#bottom-message-button').click(async function () {
+  $('#bottom-message-button').click(async function bottomMessageButtonClickEvent() {
     const customerMessage = $('#customer-message').val().trim();
     await socket.emit('bottom area message', { roomName, message: customerMessage });
     $('#customer-message').val(null);
   });
 
-  $('form').submit(function (event) {
+  $('form').submit(function formSubmit(event) {
     event.preventDefault();
     let level;
     let isLogin = true;
