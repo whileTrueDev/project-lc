@@ -4,19 +4,71 @@ body {
   background-color: #f2f2f2;
 }
 
-.search-box {
+div.search-box {
   width: 30%;
   height: 30%;
 }
 
-.dashboard {
+div.dashboard {
   width: 70%;
   height: 30%;
 }
 
-.upper-area {
+div.upper-area {
   display: flex;
   direction: row;
+}
+
+div.mid-area {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+}
+
+div.message-box {
+  width: 50%;
+}
+
+div.message-box-fixed-area {
+  display: flex;
+  flex-direction: column;
+}
+
+div.video-controller {
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+}
+
+div.action-control-box {
+  display: flex;
+  justify-content: space-around;
+  border-radius: 4px;
+}
+
+div.etc-control-box {
+  display: flex;
+  flex-direction: column;
+}
+
+div.vertical-divider {
+  border-left: 1px solid rgba(180, 180, 180, 0.7);
+  height: 188px;
+  position: absolute;
+  margin-left: -3px;
+}
+div.customer-nickname-box {
+  display: flex;
+  align-items: center;
+}
+
+div.bottom-message-box {
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+div.console-box {
+  width: 40%;
 }
 
 input[type='text'] {
@@ -29,7 +81,7 @@ input[type='text'] {
   box-sizing: border-box;
 }
 
-#customer-message {
+input#customer-message {
   width: 100%;
 }
 
@@ -43,17 +95,6 @@ input[type='number'] {
   box-sizing: border-box;
 }
 
-button[type='submit'] {
-  width: 100%;
-  background-color: #4caf50;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 button {
   width: 150px;
   color: white;
@@ -63,6 +104,17 @@ button {
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+}
+
+button[type='submit'] {
+  width: 100%;
+  background-color: #4caf50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 button.socket-id-button {
@@ -90,7 +142,7 @@ button#toggle-table-button {
   background-color: #45a049;
 }
 
-.message-box-lock-button {
+button.message-box-lock-button {
   background-color: #45a049;
 }
 
@@ -102,45 +154,6 @@ button[type='submit']:hover {
   background-color: #45a049;
 }
 
-.mid-area {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-around;
-}
-
-.message-box {
-  width: 50%;
-}
-
-.message-box-fixed-area {
-  display: flex;
-  flex-direction: column;
-}
-
-.video-controller {
-  display: flex;
-  flex-direction: column;
-  border-radius: 4px;
-}
-
-.action-control-box {
-  display: flex;
-  justify-content: space-around;
-  border-radius: 4px;
-}
-
-.etc-control-box {
-  display: flex;
-  flex-direction: column;
-}
-
-.vertical-divider {
-  border-left: 1px solid rgba(180, 180, 180, 0.7);
-  height: 188px;
-  position: absolute;
-  margin-left: -3px;
-}
-
 hr.solid {
   border-top: 3px solid #bbb;
 }
@@ -150,20 +163,6 @@ fieldset {
   flex-direction: column;
 }
 
-.customer-nickname-box {
-  display: flex;
-  align-items: center;
-}
-
 label {
   margin: 3px;
-}
-
-.bottom-message-box {
-  border: 1px solid #ccc;
-  padding: 5px;
-}
-
-.console-box {
-  width: 40%;
 }
