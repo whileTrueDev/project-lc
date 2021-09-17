@@ -49,7 +49,7 @@ export function OrderDetailRefundInfo({ refund }: { refund: FmOrderRefund }) {
         <Box my={2}>
           <Text fontWeight="bold">환불 상품</Text>
           {refund.items.map((itemOption) => (
-            <Box mb={2}>
+            <Box mb={2} key={itemOption.item_option_seq}>
               <HStack alignItems="center">
                 <ChakraNextImage
                   layout="intrinsic"
