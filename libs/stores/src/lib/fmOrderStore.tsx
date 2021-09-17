@@ -1,8 +1,11 @@
 import create from 'zustand';
+import { GridRowId, GridSelectionModel } from '@material-ui/data-grid';
 import { FindFmOrdersDto, OrderFilterFormType } from '@project-lc/shared-types';
 
 export interface FmOrderStoreState extends FindFmOrdersDto {
   handleOrderSearchStates(dto: OrderFilterFormType): void;
+  selectedOrders: GridRowId[];
+  handleOrderSelected: (s: GridSelectionModel) => void;
 }
 export const useFmOrderStore = create<FmOrderStoreState>((set, get) => ({
   search: '',
@@ -18,5 +21,10 @@ export const useFmOrderStore = create<FmOrderStoreState>((set, get) => ({
       searchEndDate: dto.searchEndDate || undefined,
       searchStatuses: dto.searchStatuses,
     });
+  },
+
+  selectedOrders: [],
+  handleOrderSelected(s: GridSelectionModel) {
+    set({ selectedOrders: s });
   },
 }));

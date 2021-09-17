@@ -176,11 +176,11 @@ export class AuthService {
     const user = await this.sellerService.findOne({ email: sub });
     const hasPassword = Boolean(user.password);
     const { password, ..._user } = user;
+
     return {
       ..._user,
       type,
       hasPassword,
     };
-    // }
   }
 }

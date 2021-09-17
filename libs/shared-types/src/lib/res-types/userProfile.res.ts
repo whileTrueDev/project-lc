@@ -6,4 +6,5 @@ export interface UserProfileRes {
   name: string | null;
   email: string;
   hasPassword: boolean | null;
+  shopName?: string | null;
 }

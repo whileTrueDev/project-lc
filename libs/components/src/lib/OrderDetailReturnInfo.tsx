@@ -1,11 +1,11 @@
-import { Text, Box, Stack, Link, SimpleGrid, Textarea } from '@chakra-ui/react';
+import { Text, Box, Stack, Link, SimpleGrid, Textarea, Flex } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import {
   FmOrderReturn,
   convertFmReturnTypesToString,
   convertFmReturnMethodToString,
 } from '@project-lc/shared-types';
-import { FmReturnStatusBadge, TextDotConnector } from '..';
+import { ChakraNextImage, FmReturnStatusBadge, TextDotConnector } from '..';
 
 /** 주문 반품 정보 */
 export function OrderDetailReturnInfo({ returns }: { returns: FmOrderReturn }) {
@@ -70,16 +70,37 @@ export function OrderDetailReturnInfo({ returns }: { returns: FmOrderReturn }) {
         <Box my={2}>
           <Text fontWeight="bold">반품 상품</Text>
           {returns.items.map((i) => (
-            <Stack key={i.return_item_seq} direction="row" alignItems="center">
-              <Text isTruncated>
-                {i.title1}: {i.option1}
-              </Text>
-              {i.color && <Box w={4} h={4} bgColor={i.color} border="1px solid black" />}
-              <TextDotConnector />
-              <Text isTruncated>{i.ea} 개</Text>
-              <TextDotConnector />
-              <Text isTruncated>{i.reason_desc}</Text>
-            </Stack>
+            <Flex mb={2} key={i.item_option_seq}>
+              {i.image && (
+                <ChakraNextImage
+                  layout="intrinsic"
+                  width={30}
+                  height={30}
+                  alt=""
+                  src={`http://whiletrue.firstmall.kr${i.image || ''}`}
+                />
+              )}
+
+              <Stack
+                ml={i.image ? 2 : 0}
+                key={i.return_item_seq}
+                direction="row"
+                alignItems="center"
+              >
+                <Text isTruncated>{i.goods_name}</Text>
+                <TextDotConnector />
+                <Text isTruncated>
+                  {i.title1}: {i.option1}
+                </Text>
+                {i.color && (
+                  <Box w={4} h={4} bgColor={i.color} border="1px solid black" />
+                )}
+                <TextDotConnector />
+                <Text isTruncated>{i.ea} 개</Text>
+                <TextDotConnector />
+                <Text isTruncated>{i.reason_desc}</Text>
+              </Stack>
+            </Flex>
           ))}
         </Box>
       )}

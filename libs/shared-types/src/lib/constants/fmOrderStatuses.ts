@@ -67,10 +67,20 @@ export const fmOrderStatuses: Record<FmOrderStatusNumString, FmOrderStatus> = {
   '99': { name: '결제실패', chakraColor: 'gray' },
 };
 
+/**
+ * 주문 상태 번호에 따른 주문 상태 이름을 반환합니다.
+ * @param key 주문 상태 번호
+ * @returns 주문 상태 이름
+ */
 export function convertFmOrderStatusToString(key: keyof typeof fmOrderStatuses) {
   return fmOrderStatuses[key].name;
 }
 
+/**
+ * 주문 상태 이름에 따른 주문 상태 번호를 반환합니다.
+ * @param statusString 주문 상태 이름
+ * @returns 주문상태번호
+ */
 export function convertFmStatusStringToStatus(
   statusString: typeof fmOrderStatuses[keyof typeof fmOrderStatuses]['name'],
 ) {
@@ -80,14 +90,37 @@ export function convertFmStatusStringToStatus(
   )[0] as FmOrderStatusNumString;
 }
 
+/**
+ * 주문 상태번호에 따른 주문 색상을 반환합니다.
+ * @param key 주문 상태번호
+ * @returns 주문 색상
+ */
 export function getFmOrderStatusColor(key: keyof typeof fmOrderStatuses) {
   return fmOrderStatuses[key].chakraColor;
 }
 
+/**
+ * 주문 상태 한글명 배열을 주문 상태 배열로 변경해 줍니다.
+ * @param targetStatusNames 주문 상태 한글명 배열
+ * @returns 주문 상태번호 배열
+ */
 export function getFmOrderStatusByNames(
   targetStatusNames: Array<typeof fmOrderStatuses[keyof typeof fmOrderStatuses]['name']>,
 ) {
   const entries = Object.entries(fmOrderStatuses);
   const filtered = entries.filter(([_, value]) => targetStatusNames.includes(value.name));
   return filtered.map(([key, v]) => key) as FmOrderStatusNumString[];
+}
+
+/**
+ * 주문이 출고 처리가 가능한 지 확인합니다.
+ */
+export function isOrderExportable(step: FmOrderStatusNumString) {
+  return getFmOrderStatusByNames([
+    '결제확인',
+    '상품준비',
+    '부분출고준비',
+    '출고준비',
+    '부분출고완료',
+  ]).includes(step);
 }

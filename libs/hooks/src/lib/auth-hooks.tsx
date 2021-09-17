@@ -36,7 +36,7 @@ export function useIsLoggedIn() {
   const { data: profileData, status } = useProfile();
   const isLoggedIn = status === 'success' && !!profileData;
 
-  return { isLoggedIn, status };
+  return { isLoggedIn, status, type: profileData?.type };
 }
 
 /**
