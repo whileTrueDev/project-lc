@@ -129,6 +129,11 @@ button[type='submit']:hover {
   border-radius: 4px;
 }
 
+.etc-control-box {
+  display: flex;
+  flex-direction: column;
+}
+
 .vertical-divider {
   border-left: 1px solid rgba(180, 180, 180, 0.7);
   height: 188px;
@@ -157,4 +162,8 @@ label {
 .bottom-message-box {
   border: 1px solid #ccc;
   padding: 5px;
+}
+
+.console-box {
+  width: 40%;
 }

@@ -5,6 +5,7 @@
 let roomName;
 let userId;
 let creatorNickname;
+let isLogin = true;
 const socket = io(process.env.HOST, { transports: ['websocket'] });
 
 socket.on('creator list from server', (data) => {
@@ -81,6 +82,10 @@ $(document).ready(function ready() {
     socket.emit('get d-day', { roomName, date: selectedTime });
   });
 
+  $('#data-send-all').click(function dataSendAllButtonClickEvent() {
+    socket.emit('get all data', roomName);
+  });
+
   $('.message-box-lock-button').click(function messageBoxLockButtonClickEvent() {
     if ($('.message-box-lock-button').attr('class').includes('locked')) {
       $('#standard-price').attr('disabled', false);
@@ -98,8 +103,10 @@ $(document).ready(function ready() {
   $('input[name=client-checkbox]').change(function clientCheckboxOnChange() {
     if ($('input[name=client-checkbox]').is(':checked')) {
       $('#customer-nickname').val(`${creatorNickname}팬`);
+      isLogin = false;
     } else {
       $('#customer-nickname').val('');
+      isLogin = true;
     }
   });
 
@@ -112,7 +119,6 @@ $(document).ready(function ready() {
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
     let level;
-    let isLogin = true;
 
     const standardPrice = Number($('#standard-price').val());
     const productName = $('#product-name').val().trim();
@@ -130,10 +136,6 @@ $(document).ready(function ready() {
       level = '1';
     } else {
       level = '2';
-    }
-
-    if (customerMessage.length === 0) {
-      isLogin = false;
     }
 
     const messageJson = JSON.stringify({

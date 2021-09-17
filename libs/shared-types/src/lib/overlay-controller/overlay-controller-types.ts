@@ -1,4 +1,4 @@
-import { PurchaseMessage } from '@project-lc/shared-types';
+import { PurchaseMessage } from '../overlay/overlay-types';
 
 export interface PurchaseMessageWithLoginFlag extends Omit<PurchaseMessage, 'roomName'> {
   userId: string;
