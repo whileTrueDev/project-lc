@@ -17,9 +17,17 @@ model Seller {
   loginHistory               LoginHistory[]
   sellerBusinessRegistration SellerBusinessRegistration[]
   sellerSettlementAccount    SellerSettlementAccount[]
+  sellerShop                 SellerShop?
   sellerSettlements          SellerSettlements[]
   socialAccounts             SellerSocialAccount[]
   shippingGroups             ShippingGroup[]
+}
+
+// 마케터의 상정정보
+model SellerShop {
+  sellerEmail String @unique // 등록한 판매자 ID 
+  shopName    String
+  seller      Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 }
 
 model SellerBusinessRegistration {
@@ -33,7 +41,7 @@ model SellerBusinessRegistration {
   businessAddress            String // 사업장 주소
   taxInvoiceMail             String // 세금계산서 전용 이메일
   fileName                   String // 등록된 s3 파일명
-  seller                     Seller @relation(fields: [sellerEmail], references: [email])
+  seller Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 
   @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
 }
@@ -45,7 +53,7 @@ model SellerSettlements {
   date        DateTime @default(now()) // 정산 시점
   state       Int      @default(0) @db.UnsignedTinyInt // 정산 상태
   amount      Int      @default(0)
-  seller      Seller   @relation(fields: [sellerEmail], references: [email])
+  seller      Seller   @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 
   @@index([sellerEmail, id], name: "SellerSettlementsIndex")
 }
@@ -56,7 +64,8 @@ model SellerSettlementAccount {
   bank        String
   number      String
   name        String
-  seller      Seller @relation(fields: [sellerEmail], references: [email])
+  seller Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  
 
   @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
 }

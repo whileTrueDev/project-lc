@@ -98,6 +98,7 @@ export function SettlementList(props: SettlementListProps): JSX.Element {
         root: classes.root,
       }}
       borderWidth={0}
+      minHeight={120}
       hideFooter
       headerHeight={50}
       density="compact"
