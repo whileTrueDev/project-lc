@@ -100,6 +100,12 @@ $(document).ready(function () {
     }
   });
 
+  $('#bottom-message-button').click(async function () {
+    const customerMessage = $('#customer-message').val().trim();
+    await socket.emit('bottom area message', { roomName, message: customerMessage });
+    $('#customer-message').val(null);
+  });
+
   $('form').submit(function (event) {
     event.preventDefault();
     let level;

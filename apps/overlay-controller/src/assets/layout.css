@@ -136,6 +136,10 @@ button[type='submit']:hover {
   margin-left: -3px;
 }
 
+hr.solid {
+  border-top: 3px solid #bbb;
+}
+
 fieldset {
   display: flex;
   flex-direction: column;
@@ -148,4 +152,9 @@ fieldset {
 
 label {
   margin: 3px;
+}
+
+.bottom-message-box {
+  border: 1px solid #ccc;
+  padding: 5px;
 }
