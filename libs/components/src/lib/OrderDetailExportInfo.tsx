@@ -5,18 +5,17 @@ import {
   Link,
   Stack,
   Text,
-  useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react';
 import {
   convertFmDeliveryCompanyToString,
   FindFmOrderDetailRes,
-  FindFmOrderRes,
   FmOrderExport,
   FmOrderExportItemOption,
   FmOrderOption,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import NextLink from 'next/link';
 import { useMemo } from 'react';
 import {
   ChakraNextImage,
@@ -49,9 +48,11 @@ export function OrderDetailExportInfo({
   return (
     <Box>
       <Stack direction="row" alignItems="center" my={2} spacing={1.5}>
-        <Link isTruncated fontWeight="bold" textDecoration="underline">
-          {_exports.export_code}
-        </Link>
+        <NextLink href={`/mypage/exports/${_exports.export_code}`} passHref>
+          <Link isTruncated fontWeight="bold" textDecoration="underline">
+            {_exports.export_code}
+          </Link>
+        </NextLink>
         <FmOrderStatusBadge orderStatus={_exports.export_status} />
         <TextDotConnector />
         <Text isTruncated>{_exports.totalEa} 개</Text>
@@ -103,7 +104,7 @@ export function OrderDetailExportInfo({
   );
 }
 
-function OrderDetailExportInfoItem({
+export function OrderDetailExportInfoItem({
   itemOption: io,
   orderItems,
   bundleExportCode,

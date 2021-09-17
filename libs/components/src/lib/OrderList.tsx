@@ -21,7 +21,6 @@ import {
   convertFmOrderStatusToString,
   convertOrderSitetypeToString,
   FmOrderStatusNumString,
-  getFmOrderStatusByNames,
   isOrderExportable,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';

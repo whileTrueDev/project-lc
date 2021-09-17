@@ -4,6 +4,9 @@ import {
   ExportBundledOrdersDto,
   ExportOrderDto,
   ExportOrdersDto,
+  FmExport,
+  FmExportItem,
+  FmExportRes,
   FmOrder,
   FmOrderOption,
   fmOrderStatuses,
@@ -41,6 +44,51 @@ export class FmExportsService {
     private readonly fmGoodsService: FMGoodsService,
     private readonly fmOrdersService: FmOrdersService,
   ) {}
+
+  /**
+   * 출고번호를 기반으로 특정 출고정보를 찾습니다.
+   * @param exportCode 출고번호
+   * @returns 출고정보
+   */
+  public async findOne(exportCode: string): Promise<FmExportRes> {
+    const findOneSql = `
+    SELECT fm_goods_export.*,
+      IF(
+        fm_goods_export.shipping_date = "0000-00-00",
+          null,
+          fm_goods_export.shipping_date
+        ) as shipping_date,
+      recipient_user_name,
+      recipient_phone,
+      recipient_cellphone,
+      recipient_zipcode,
+      recipient_address,
+      recipient_address_street,
+      recipient_address_detail,
+      recipient_email,
+      order_user_name,
+      order_phone,
+      order_cellphone,
+      order_email
+    FROM fm_goods_export
+    JOIN fm_order USING(order_seq)
+    WHERE export_code = ?`;
+    const res: FmExport[] = await this.db.query(findOneSql, [exportCode]);
+    if (res.length === 0) return null;
+    const _export = res[0];
+
+    const findItemsSql = `
+    SELECT 
+      goods_name, image,
+      item_option_seq, title1, option1, color, fm_goods_export_item.ea, price, step
+    FROM fm_order_item_option
+      JOIN fm_order_item USING(item_seq)
+    JOIN fm_goods_export_item ON item_option_seq = option_seq
+    WHERE export_code = ?`;
+    const items: FmExportItem[] = await this.db.query(findItemsSql, [exportCode]);
+
+    return { ..._export, items };
+  }
 
   /** 단일 주문 출고 처리 진행 */
   public async exportOrder(
@@ -147,6 +195,7 @@ export class FmExportsService {
     if (!orderInfo) return null;
 
     // 실물 출고 처리 쿼리 생성
+    const today = new Date();
     const goodsExport = this.createGoodsExportQuery({
       export_code: exportCode,
       status: targetStatus, // 출고완료
@@ -154,9 +203,10 @@ export class FmExportsService {
       delivery_number: deliveryNumber, // 송장번호
       order_seq: orderId,
       domestic_shipping_method: orderInfo.shipping_method,
-      status_date: new Date(),
-      export_date: new Date(),
-      regist_date: new Date(),
+      status_date: today,
+      export_date: today,
+      complete_date: today,
+      regist_date: today,
       shipping_provider_seq: 1, // fm_provider.provider_seq
       shipping_group: orderInfo.shipping_group,
       shipping_method: orderInfo.shipping_method,

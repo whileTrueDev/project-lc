@@ -18,6 +18,7 @@ export * from './lib/mutation/useSettlementAccountMutation';
 export * from './lib/mutation/useUnlinkSocialAccountMutation';
 export * from './lib/mutation/useValidatePassword';
 export * from './lib/queries/useEmailDupCheck';
+export * from './lib/queries/useFmExport';
 export * from './lib/queries/useFmOrder';
 export * from './lib/queries/useFmOrders';
 export * from './lib/queries/useGoodsStock';
