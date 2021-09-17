@@ -21,6 +21,7 @@ export * from './lib/dto/emailCodeVerification.dto';
 export * from './lib/dto/exportBundledOrders.dto';
 export * from './lib/dto/exportOrder.dto';
 export * from './lib/dto/exportOrders.dto';
+export * from './lib/dto/findExports.dto';
 export * from './lib/dto/FindFmOrders.dto';
 export * from './lib/dto/findSeller.dto';
 export * from './lib/dto/goodsList.dto';
