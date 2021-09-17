@@ -7,7 +7,7 @@ export const getGoodsById = async (goodsId: number | string): Promise<GoodsByIdR
 };
 
 export const useGoodsById = (goodsId: number | string, initialData?: GoodsByIdRes) => {
-  return useQuery<GoodsByIdRes>('GoodsById', () => getGoodsById(goodsId), {
+  return useQuery<GoodsByIdRes>(['GoodsById', goodsId], () => getGoodsById(goodsId), {
     initialData,
     enabled: !!goodsId,
   });

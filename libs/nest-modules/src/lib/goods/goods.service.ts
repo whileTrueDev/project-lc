@@ -249,7 +249,6 @@ export class GoodsService {
         options: { include: { supply: true } },
         ShippingGroup: true,
         confirmation: true,
-        seller: true,
         image: true,
         GoodsInfo: true,
       },

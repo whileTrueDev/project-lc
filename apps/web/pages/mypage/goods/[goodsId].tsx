@@ -1,7 +1,12 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 import { Box, Button, HStack, Stack } from '@chakra-ui/react';
 import {
+  GoodsDetailCommonInfo,
+  GoodsDetailImagesInfo,
   GoodsDetailInfo,
+  GoodsDetailOptionsInfo,
+  GoodsDetailPurchaseLimitInfo,
+  GoodsDetailShippingInfo,
   GoodsDetailTitle,
   MypageLayout,
   SectionWithTitle,
@@ -10,6 +15,7 @@ import {
 import { useGoodsById } from '@project-lc/hooks';
 import { GoodsByIdRes } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
+import React from 'react';
 import { MdDateRange } from 'react-icons/md';
 
 export function GoodsDetail(): JSX.Element {
@@ -50,11 +56,30 @@ export function GoodsDetail(): JSX.Element {
         </Box>
 
         {/* 상품 정보 */}
-        <SectionWithTitle title="상품 정보">
+
+        <SectionWithTitle title="기본 정보">
           <GoodsDetailInfo goods={goods.data} />
         </SectionWithTitle>
 
-        <pre>{JSON.stringify(goods.data, null, 2)}</pre>
+        <SectionWithTitle title="상품사진 및 설명">
+          <GoodsDetailImagesInfo goods={goods.data} />
+        </SectionWithTitle>
+
+        <SectionWithTitle title="옵션">
+          <GoodsDetailOptionsInfo goods={goods.data} />
+        </SectionWithTitle>
+
+        <SectionWithTitle title="상품 공통 정보">
+          <GoodsDetailCommonInfo goods={goods.data} />
+        </SectionWithTitle>
+
+        <SectionWithTitle title="구매 제한">
+          <GoodsDetailPurchaseLimitInfo goods={goods.data} />
+        </SectionWithTitle>
+
+        <SectionWithTitle title="배송정책">
+          <GoodsDetailShippingInfo goods={goods.data} />
+        </SectionWithTitle>
       </Stack>
     </MypageLayout>
   );
