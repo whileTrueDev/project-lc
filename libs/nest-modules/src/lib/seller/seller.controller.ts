@@ -124,7 +124,13 @@ export class SellerController {
   @UseGuards(JwtAuthGuard)
   @Patch('shop-info')
   public async changeShopInfo(
-    @Body() dto: SellerShopInfoDto,
+    @Body(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    )
+    dto: SellerShopInfoDto,
     @SellerInfo() sellerInfo: UserPayload,
     @Res() res,
   ) {
