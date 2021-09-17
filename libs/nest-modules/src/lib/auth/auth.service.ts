@@ -181,6 +181,5 @@ export class AuthService {
       type,
       hasPassword,
     };
-    // }
   }
 }
