@@ -15,13 +15,13 @@ import {
   SendMailVerificationDto,
   loginUserRes,
   EmailCodeVerificationDto,
+  UserType,
 } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { MailVerificationService } from './mailVerification.service';
 import { LocalAuthGuard } from '../_nest-units/guards/local-auth.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
-import { UserType } from './auth.interface';
 import { LoginHistoryService } from './login-history/login-history.service';
 
 @Controller('auth')

@@ -6,8 +6,14 @@ import NextLink from 'next/link';
 export default function AdminNav(): JSX.Element {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
+  const router = useRouter();
   const { isLoggedIn } = useIsLoggedIn();
   const { logout } = useLogout();
+
+  function adminLogout() {
+    logout();
+    router.push('/');
+  }
 
   return (
     <Box>
@@ -44,8 +50,8 @@ export default function AdminNav(): JSX.Element {
         <>
           {isLoggedIn && (
             <>
-              <Button my={1} size="xs" onClick={logout}>
-                기존 계정 로그아웃
+              <Button my={1} size="sm" onClick={adminLogout}>
+                로그아웃
               </Button>
             </>
           )}

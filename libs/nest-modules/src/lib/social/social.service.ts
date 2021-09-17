@@ -43,7 +43,7 @@ export class SocialService {
   login(req: Request, res: Response) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
-    const userPayload = this.authService.castUser(user);
+    const userPayload = this.authService.castUser(user, 'seller');
     const loginToken: loginUserRes = this.authService.issueToken(
       userPayload,
       true,
