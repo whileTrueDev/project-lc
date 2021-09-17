@@ -57,11 +57,12 @@ export class GoodsService {
     itemPerPage,
     sort,
     direction,
+    groupId,
   }: GoodsListDto & { email?: string }): Promise<GoodsListRes> {
     const items = await this.prisma.goods.findMany({
       skip: page * itemPerPage,
       take: itemPerPage,
-      where: { seller: { email } },
+      where: { seller: { email }, shippingGroupId: groupId },
       orderBy: [{ [sort]: direction }],
       include: {
         options: {

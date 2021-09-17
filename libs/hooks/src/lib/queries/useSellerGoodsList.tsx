@@ -18,11 +18,11 @@ export const useSellerGoodsList = (
   dto: SellerGoodsListRequestDto,
   options?: UseQueryOptions<GoodsListRes>,
 ) => {
-  const { page, itemPerPage, sort, direction } = dto;
+  const { page, itemPerPage, sort, direction, groupId } = dto;
   const queryKey = ['SellerGoodsList', dto];
   return useQuery<GoodsListRes>(
     queryKey,
-    () => getSellerGoodsList({ page, itemPerPage, sort, direction }),
+    () => getSellerGoodsList({ page, itemPerPage, sort, direction, groupId }),
     { retry: 1, keepPreviousData: true, ...options },
   );
 };
