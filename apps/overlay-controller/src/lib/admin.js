@@ -111,9 +111,9 @@ $(document).ready(function ready() {
   });
 
   $('#bottom-message-button').click(async function bottomMessageButtonClickEvent() {
-    const customerMessage = $('#customer-message').val().trim();
+    const customerMessage = $('#admin-message').val().trim();
     await socket.emit('bottom area message', { roomName, message: customerMessage });
-    $('#customer-message').val(null);
+    $('#admin-message').val(null);
   });
 
   $('form').submit(function formSubmit(event) {
@@ -149,7 +149,7 @@ $(document).ready(function ready() {
       phoneCallEventFlag,
       giftFlag,
     });
-
+    const errorDialog = document.getElementById('dialog-message');
     $.ajax({
       type: 'POST',
       url: 'http://localhost:3333/purchase-message',
@@ -178,7 +178,10 @@ $(document).ready(function ready() {
         }
       },
       error() {
-        alert('메세지 전송 실패');
+        errorDialog.showModal();
+        setTimeout(() => {
+          errorDialog.close();
+        }, 3000);
       },
       complete() {
         $('#sold-price').val(null);

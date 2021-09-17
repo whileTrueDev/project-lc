@@ -12,6 +12,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
+    
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.1/css/jquery.dataTables.css">
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.js"></script>
     <script type="module" src="/admin.js"></script>
@@ -196,11 +197,14 @@
                 </fieldset>
             </form>
             <div class="bottom-message-box">    
-                <input type="text" id="customer-nickname" style="width:40%">
+                <input type="text" id="admin-message" style="width:40%">
                 <button id="bottom-message-button" style="background-color:gray;">하단메세지 전송</button>
             </div>
         </div>
     </div>
+    <dialog id="dialog-message" title="전송실패">
+        메세지 전송에 실패하였습니다. 서버 상태를 점검하거나, 입력값을 다시 확인해보세요
+    </dialog>
 </body>
 
 </html>
