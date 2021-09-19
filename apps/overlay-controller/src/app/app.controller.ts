@@ -2,12 +2,10 @@ import { Controller, Get, Render, Post, Body } from '@nestjs/common';
 import { PurchaseMessageWithLoginFlag } from '@project-lc/shared-types';
 import { OverlayControllerService } from '@project-lc/nest-modules';
 import { ConfigService } from '@nestjs/config';
-import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
   constructor(
-    private readonly appService: AppService,
     private readonly overlayControllerService: OverlayControllerService,
     private readonly configService: ConfigService,
   ) {}
