@@ -149,11 +149,12 @@ $(document).ready(function ready() {
       phoneCallEventFlag,
       giftFlag,
     });
+
     const errorDialog = document.getElementById('dialog-message');
     $.ajax({
       type: 'POST',
       url: 'http://localhost:3333/purchase-message',
-      dataType: 'json',
+      dataType: 'text',
       contentType: 'application/json',
       data: messageJson,
       success() {

@@ -8,7 +8,7 @@ export class OverlayControllerService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getCreatorUrls(): Promise<{ userNickname: string; overlayUrl: string }[]> {
-    const urlAndNickname = await this.prisma.user.findMany({
+    const urlAndNickname = await this.prisma.broadcaster.findMany({
       select: {
         userNickname: true,
         userId: true,
@@ -19,19 +19,27 @@ export class OverlayControllerService {
     return urlAndNickname;
   }
 
-  async uploadPurchase(data: PurchaseMessageWithLoginFlag) {
+  async uploadPurchase(data: PurchaseMessageWithLoginFlag): Promise<boolean> {
     const { nickname } = data;
     const text = data.message;
     const price = data.purchaseNum;
     const { loginFlag } = data;
-    const creatorId = data.userId;
+    const broadcasterId = data.userId;
     const { phoneCallEventFlag } = data;
     const { giftFlag } = data;
 
     const writePurchaseMessage = await this.prisma.liveCommerceRanking.create({
-      data: { nickname, text, price, loginFlag, creatorId, phoneCallEventFlag, giftFlag },
+      data: {
+        nickname,
+        text,
+        price,
+        loginFlag,
+        broadcasterId,
+        phoneCallEventFlag,
+        giftFlag,
+      },
     });
-    if (!writePurchaseMessage) throwError('Cannot Get Data From Db');
-    return writePurchaseMessage;
+    if (!writePurchaseMessage) throwError('Cannot upload data');
+    return true;
   }
 }
