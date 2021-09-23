@@ -41,7 +41,7 @@ model SellerBusinessRegistration {
   businessAddress            String // 사업장 주소
   taxInvoiceMail             String // 세금계산서 전용 이메일
   fileName                   String // 등록된 s3 파일명
-  seller Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  seller                     Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 
   @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
 }
@@ -64,8 +64,8 @@ model SellerSettlementAccount {
   bank        String
   number      String
   name        String
-  seller Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
-  
+  seller      Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+
 
   @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
 }
@@ -376,7 +376,7 @@ model ShippingCost {
   shipping_area_name String         @db.VarChar(255) // '지역명',
 }
 
-model User {
+model Broadcaster {
   id           Int      @id @default(autoincrement())
   userId       String   @db.VarChar(20) // 유저 아이디
   userName     String   @db.VarChar(20) // 유저의 실명
