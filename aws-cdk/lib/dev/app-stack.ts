@@ -23,6 +23,13 @@ const DOMAIN = 'andad.io';
 export class LCDevAppStack extends cdk.Stack {
   DBURL_PARAMETER: ssm.IStringParameter;
   FIRSTMALL_DATABASE_URL: ssm.IStringParameter;
+  GOOGLE_CLIENT_ID: ssm.IStringParameter;
+  GOOGLE_CLIENT_SECRET: ssm.IStringParameter;
+  NAVER_CLIENT_ID: ssm.IStringParameter;
+  NAVER_CLIENT_SECRET: ssm.IStringParameter;
+  KAKAO_CLIENT_ID: ssm.IStringParameter;
+  MAILER_USER: ssm.IStringParameter;
+  MAILER_PASS: ssm.IStringParameter;
 
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
@@ -36,24 +43,8 @@ export class LCDevAppStack extends cdk.Stack {
       containerInsights: true,
     });
 
-    // * DBURL 파라미터
-    this.DBURL_PARAMETER = ssm.StringParameter.fromSecureStringParameterAttributes(
-      this,
-      `${PREFIX}DBUrlSecret`,
-      {
-        parameterName: constants.DEV.ECS_DATABASE_URL_KEY,
-        version: 4,
-      },
-    );
-
-    this.FIRSTMALL_DATABASE_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
-      this,
-      `${PREFIX}FirstmallDBUrlSecret`,
-      {
-        parameterName: constants.DEV.FIRSTMALL_DATABASE_URL_KEY,
-        version: 1,
-      },
-    );
+    // * 환경변수 주입을 위한 파라미터 로딩
+    this.loadSsmParameters();
 
     // * API server
     const apiService = this.createApiAppService(cluster, apiSecGrp);
@@ -79,6 +70,13 @@ export class LCDevAppStack extends cdk.Stack {
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
         FIRSTMALL_DATABASE_URL: ecs.Secret.fromSsmParameter(this.FIRSTMALL_DATABASE_URL),
+        GOOGLE_CLIENT_ID: ecs.Secret.fromSsmParameter(this.GOOGLE_CLIENT_ID),
+        GOOGLE_CLIENT_SECRET: ecs.Secret.fromSsmParameter(this.GOOGLE_CLIENT_SECRET),
+        NAVER_CLIENT_ID: ecs.Secret.fromSsmParameter(this.NAVER_CLIENT_ID),
+        NAVER_CLIENT_SECRET: ecs.Secret.fromSsmParameter(this.NAVER_CLIENT_SECRET),
+        KAKAO_CLIENT_ID: ecs.Secret.fromSsmParameter(this.KAKAO_CLIENT_ID),
+        MAILER_USER: ecs.Secret.fromSsmParameter(this.MAILER_USER),
+        MAILER_PASS: ecs.Secret.fromSsmParameter(this.MAILER_PASS),
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}LogGroup`, {
@@ -253,5 +251,94 @@ export class LCDevAppStack extends cdk.Stack {
       recordName: ``,
       target: route53.RecordTarget.fromAlias(new targets.LoadBalancerTarget(alb)),
     });
+  }
+
+  private loadSsmParameters() {
+    this.DBURL_PARAMETER = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}DBUrlSecret`,
+      {
+        parameterName: constants.DEV.ECS_DATABASE_URL_KEY,
+        version: 4,
+      },
+    );
+
+    this.FIRSTMALL_DATABASE_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}FirstmallDBUrlSecret`,
+      {
+        parameterName: constants.DEV.FIRSTMALL_DATABASE_URL_KEY,
+        version: 1,
+      },
+    );
+
+    this.GOOGLE_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}GOOGLE_CLIENT_ID`,
+      {
+        version: 1,
+        parameterName: constants.DEV.GOOGLE_CLIENT_ID,
+      },
+    );
+    this.GOOGLE_CLIENT_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}GOOGLE_CLIENT_SECRET`,
+      {
+        version: 1,
+        parameterName: constants.DEV.GOOGLE_CLIENT_SECRET,
+      },
+    );
+    this.NAVER_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}NAVER_CLIENT_ID`,
+      {
+        version: 1,
+        parameterName: constants.DEV.NAVER_CLIENT_ID,
+      },
+    );
+    this.NAVER_CLIENT_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}NAVER_CLIENT_SECRET`,
+      {
+        version: 1,
+        parameterName: constants.DEV.NAVER_CLIENT_SECRET,
+      },
+    );
+    this.KAKAO_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}KAKAO_CLIENT_ID`,
+      {
+        version: 1,
+        parameterName: constants.DEV.KAKAO_CLIENT_ID,
+      },
+    );
+    this.MAILER_USER = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}MAILER_USER`,
+      {
+        version: 1,
+        parameterName: constants.DEV.MAILER_USER,
+      },
+    );
+    this.MAILER_PASS = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}MAILER_PASS`,
+      {
+        version: 1,
+        parameterName: constants.DEV.MAILER_PASS,
+      },
+    );
+
+    return {
+      DATABASE_URL: this.DBURL_PARAMETER,
+      FIRSTMALL_DATABASE_URL: this.FIRSTMALL_DATABASE_URL,
+      GOOGLE_CLIENT_ID: this.GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET: this.GOOGLE_CLIENT_SECRET,
+      NAVER_CLIENT_ID: this.NAVER_CLIENT_ID,
+      NAVER_CLIENT_SECRET: this.NAVER_CLIENT_SECRET,
+      KAKAO_CLIENT_ID: this.KAKAO_CLIENT_ID,
+      MAILER_USER: this.MAILER_USER,
+      MAILER_PASS: this.MAILER_PASS,
+    };
   }
 }

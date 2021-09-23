@@ -8,11 +8,12 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY ./dist/apps/overlay .
 COPY ./libs/prisma-orm/prisma ./prisma
 
-ENV PRISMA_BINARIES_MIRROR http://prisma-builds.s3-eu-west-1.amazonaws.com
-
-RUN yarn global add prisma
 RUN yarn install --prod
+RUN yarn global add prisma
 RUN prisma generate
+
+RUN yarn add argon2
+RUN npx node-pre-gyp rebuild -C ./node_modules/argon2
 
 EXPOSE 3002
 

@@ -60,5 +60,16 @@ export const constants = {
      * VPC Subnet ISOLATED 서브넷 그룹 명
      */
     ISOLATED_SUBNET_GROUP_NAME: 'Isolated Subnet for DB',
+
+    // * ************************
+    // * SSM Parameter Store Keys
+    // * ************************
+    GOOGLE_CLIENT_ID: 'PROJECT_LC_GOOGLE_CLIENT_ID',
+    GOOGLE_CLIENT_SECRET: 'PROJECT_LC_GOOGLE_CLIENT_SECRET',
+    NAVER_CLIENT_ID: 'PROJECT_LC_NAVER_CLIENT_ID',
+    NAVER_CLIENT_SECRET: 'PROJECT_LC_NAVER_CLIENT_SECRET',
+    KAKAO_CLIENT_ID: 'PROJECT_LC_KAKAO_CLIENT_ID',
+    MAILER_USER: 'PROJECT_LC_MAILER_USER',
+    MAILER_PASS: 'PROJECT_LC_MAILER_PASS',
   },
 } as const;
