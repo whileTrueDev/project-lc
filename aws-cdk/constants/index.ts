@@ -44,6 +44,10 @@ export const constants = {
      * Overlay 서버 PORT
      */
     ECS_OVERLAY_PORT: 3002,
+    /** 구글 TTS(Text To Speech) API 계정 */
+    GOOGLE_CREDENTIALS_EMAIL_KEY: 'LIVECOMMERCE_GCP_TTS_EMAIL',
+    /** 구글 TTS(Text To Speech) API private key */
+    GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY: 'LIVECOMMERCE_GCP_TTS_PRIVATE_KEY',
     /**
      * VPC Subnet 인그레스 서브넷 그룹 명
      */

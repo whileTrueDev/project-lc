@@ -64,6 +64,7 @@ export class LCDevAppStack extends cdk.Stack {
     // this.createRoute53ARecord(alb);
   }
 
+  /** API 서버 ECS Fargate Service 생성 메서드 */
   private createApiAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
     const apiTaskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSTaskDef`, {
       family: constants.DEV.ECS_API_FAMILY_NAME,
@@ -102,6 +103,7 @@ export class LCDevAppStack extends cdk.Stack {
     });
   }
 
+  /** 라-커 화면 Overlay 서버 ECS Fargate Service 생성 메서드 */
   private createOverlayAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
     const taskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSOverlayTaskDef`, {
       family: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
@@ -116,6 +118,26 @@ export class LCDevAppStack extends cdk.Stack {
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
         FIRSTMALL_DATABASE_URL: ecs.Secret.fromSsmParameter(this.FIRSTMALL_DATABASE_URL),
+        GOOGLE_CREDENTIALS_EMAIL: ecs.Secret.fromSsmParameter(
+          ssm.StringParameter.fromSecureStringParameterAttributes(
+            this,
+            `${PREFIX}GoogleTTSEmailSecret`,
+            {
+              parameterName: constants.DEV.GOOGLE_CREDENTIALS_EMAIL_KEY,
+              version: 1,
+            },
+          ),
+        ),
+        GOOGLE_CREDENTIALS_PRIVATE_KEY: ecs.Secret.fromSsmParameter(
+          ssm.StringParameter.fromSecureStringParameterAttributes(
+            this,
+            `${PREFIX}GoogleTTSKeySecret`,
+            {
+              parameterName: constants.DEV.GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY,
+              version: 1,
+            },
+          ),
+        ),
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayLogGroup`, {
@@ -187,12 +209,29 @@ export class LCDevAppStack extends cdk.Stack {
       'https ALB open to world',
     );
 
-    // // HTTP 리스너에 API서버 타겟그룹 추가
-    // truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
-    //   priority: 1,
-    //   conditions: [ListenerCondition.hostHeaders([`${API_DOMAIN}`])],
-    //   targetGroups: [apiTargetGroup],
-    // });
+    const overlayTargetGroup = new elbv2.ApplicationTargetGroup(
+      this,
+      `${PREFIX}OverlayTargetGroup`,
+      {
+        vpc,
+        targetGroupName: 'OverlayTargetGroup',
+        port: constants.DEV.ECS_OVERLAY_PORT,
+        protocol: elbv2.ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [overlayAppService],
+      },
+    );
+
+    // HTTP 리스너에 Overlay 서버 타겟그룹 추가
+    truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
+      priority: 1,
+      conditions: [elbv2.ListenerCondition.pathPatterns(['/livecommerce'])],
+      targetGroups: [overlayTargetGroup],
+    });
 
     return alb;
   }
