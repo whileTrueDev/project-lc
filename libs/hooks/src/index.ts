@@ -37,3 +37,7 @@ export * from './lib/mutation/useDeleteShippingGroup';
 export * from './lib/queries/useShippingGroupList';
 export * from './lib/shipping-group-hooks';
 export * from './lib/queries/useShippingGroupItem';
+export * from './lib/mutation/useCreateGoodsCommonInfo';
+export * from './lib/mutation/useDeleteGoodsCommonInfo';
+export * from './lib/queries/useGoodsCommonInfoItem';
+export * from './lib/queries/useGoodsCommonInfoList';
