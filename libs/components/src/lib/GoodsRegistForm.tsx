@@ -1,8 +1,9 @@
 /* eslint-disable camelcase */
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, Stack, useToast } from '@chakra-ui/react';
-import { useRegistGoods } from '@project-lc/hooks';
+import { s3, useProfile, useRegistGoods } from '@project-lc/hooks';
 import { GoodsOptionDto, RegistGoodsDto, GoodsImageDto } from '@project-lc/shared-types';
+import { String } from 'aws-sdk/clients/codebuild';
 import { FormProvider, useForm, NestedValue } from 'react-hook-form';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
@@ -11,14 +12,15 @@ import GoodsRegistDataSales from './GoodsRegistDataSales';
 import GoodsRegistDescription from './GoodsRegistDescription';
 import GoodsRegistExtraInfo from './GoodsRegistExtraInfo';
 import GoodsRegistMemo from './GoodsRegistMemo';
-import GoodsRegistPictures from './GoodsRegistPictures';
+import GoodsRegistPictures, { Preview } from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
 
 type GoodsFormOptionsType = Omit<GoodsOptionDto, 'default_option' | 'option_title'>[];
 
 export type GoodsFormValues = Omit<RegistGoodsDto, 'options' | 'image'> & {
   options: NestedValue<GoodsFormOptionsType>;
-  image?: string[];
+  // image?: Preview[];
+  image?: { file: File; filename: string; id: number }[];
   option_title: string;
 };
 
@@ -26,86 +28,67 @@ type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
   options: Omit<GoodsOptionDto, 'option_title' | 'default_option'>[];
 };
 
-function goodsFormDataToDto(formData: GoodsFormSubmitDataType) {
-  const {
-    image,
-    options,
-    option_title,
-    max_purchase_ea,
-    min_purchase_ea,
-    shippingGroupId,
-    ...goodsData
-  } = formData;
+// 상품 사진을 s3에 업로드 -> url 리턴
+async function uploadImageToS3(
+  imageFile: { file: File; filename: string; id: number },
+  userMail: string,
+) {
+  const { file, filename } = imageFile;
 
-  console.log({ shippingGroupId });
-  // options 에 default_option, option_title설정
-  const optionsDto: GoodsOptionDto[] = options.map((opt, index) => ({
-    ...opt,
-    default_option: index === 0 ? 'y' : 'n',
-    option_title,
-  }));
+  const type = 'goods';
 
-  const a: RegistGoodsDto = {
-    ...goodsData,
-    options: optionsDto,
-    option_use: optionsDto.length > 1 ? '1' : '0',
-    max_purchase_ea: max_purchase_ea || 0,
-    min_purchase_ea: max_purchase_ea || 0,
-    shippingGroupId: shippingGroupId || undefined,
-    image: image
-      ? image.map((img, index) => ({
-          image: img, // TODO: mutateAsync(dto) 하기 전에 image를 s3에 업로드
-          cut_number: index,
-        }))
-      : [],
-  };
-  return a;
+  const savedImageName = await s3.s3UploadImage({
+    filename,
+    userMail,
+    type,
+    file,
+  });
+
+  if (!savedImageName) {
+    throw new Error('S3 ERROR');
+  }
+
+  const { key, fileName } = s3.getS3Key({ userMail, type, filename });
+
+  return [
+    'https://',
+    process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
+    '.s3.',
+    'ap-northeast-2',
+    '.amazonaws.com/',
+    key,
+    fileName,
+  ].join('');
 }
 
-const tempoptions: GoodsOptionDto[] = [
-  {
-    default_option: 'y',
-    option_type: 'direct',
-    option_title: 'sdf',
-    option1: 'sdf',
-    consumer_price: 123,
-    price: 12334,
-    option_view: 'Y',
-    supply: { stock: 14 },
-  },
-  {
-    default_option: 'y',
-    option_type: 'direct',
-    option_title: '12321sdf',
-    option1: 's223df',
-    consumer_price: 12343,
-    price: 1452334,
-    option_view: 'Y',
-    supply: { stock: 34 },
-  },
-];
+// 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
+async function imageFileListToImageDto(
+  imageFileList: { file: File; filename: string; id: number }[],
+  userMail: string,
+) {
+  const savedImages = await Promise.all(
+    imageFileList.map((file) => uploadImageToS3(file, userMail)),
+  );
+  return savedImages.map((img, index) => ({
+    cut_number: index,
+    image: img,
+  }));
+}
 
-const dto: RegistGoodsDto = {
-  goods_name: 'testgoods',
-  summary: 'desc sum',
-  goods_status: 'normal',
-  cancel_type: '1',
-  common_contents: 'd',
-  shipping_policy: 'goods',
-  goods_shipping_policy: 'limit',
-  shipping_weight_policy: 'goods',
-  min_purchase_limit: 'limit',
-  option_use: '1',
-  option_view_type: 'divide',
-  option_suboption_use: '1',
-  member_input_use: '1',
-  image: [],
-  goods_view: 'look',
-  max_purchase_limit: 'limit',
-  options: tempoptions,
-};
+// options 에 default_option, option_title설정
+function addGoodsOptionInfo(
+  options: Omit<GoodsOptionDto, 'default_option' | 'option_title'>[],
+  option_title: string,
+) {
+  return options.map((opt, index) => ({
+    ...opt,
+    default_option: index === 0 ? ('y' as const) : ('n' as const),
+    option_title,
+  }));
+}
 
 export function GoodsRegistForm(): JSX.Element {
+  const { data: profileData } = useProfile();
   // const { mutateAsync, isLoading } = useRegistGoods();
   const toast = useToast();
 
@@ -129,15 +112,32 @@ export function GoodsRegistForm(): JSX.Element {
   });
   const { handleSubmit } = methods;
 
-  const regist = (data: GoodsFormSubmitDataType) => {
-    // TODO: options 에 default_option, option_title설정
-    // TODO: mutateAsync(dto) 하기 전에 image를 s3에 업로드
-    const ddto = goodsFormDataToDto(data);
-    console.log(ddto);
+  const regist = async (data: GoodsFormSubmitDataType) => {
+    const {
+      image,
+      options,
+      option_title,
+      max_purchase_ea,
+      min_purchase_ea,
+      shippingGroupId,
+      ...goodsData
+    } = data;
 
-    // 입력값 확인 (options의 옵션값 등등)
+    const goodsDto: RegistGoodsDto = {
+      ...goodsData,
+      options: addGoodsOptionInfo(options, option_title),
+      option_use: options.length > 1 ? '1' : '0',
+      max_purchase_ea: max_purchase_ea || 0,
+      min_purchase_ea: max_purchase_ea || 0,
+      shippingGroupId: shippingGroupId || undefined,
+      image:
+        image && image.length > 0
+          ? await imageFileListToImageDto(image, profileData?.email || '')
+          : [],
+    };
+    console.log(goodsDto);
 
-    // TODO: goods 필수컬럼 다시 확인후 테이블, dto 수정
+    // TODO: goods 필수컬럼(options의 옵션값 등등) 다시 확인후 테이블, dto 수정
     // mutateAsync(ddto)
     //   .then((res) => {
     //     const { data: d } = res;
@@ -169,7 +169,7 @@ export function GoodsRegistForm(): JSX.Element {
         {/* <GoodsRegistDataOptions /> */}
 
         {/* //TODO: 사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개, 각 이미지는 10mb제한 */}
-        {/* <GoodsRegistPictures /> */}
+        <GoodsRegistPictures />
 
         {/* //TODO: 상세설명 -  (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록, 이미지는 최대 20mb 제한, 주로 이미지로 등록함 */}
         {/* <GoodsRegistDescription /> */}
@@ -178,8 +178,8 @@ export function GoodsRegistForm(): JSX.Element {
       내가 생성한 공통정보 조회, 선택기능 포함  */}
         {/* <GoodsRegistCommonInfo /> */}
 
-        {/* //TODO: 배송정책 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
-        <GoodsRegistShippingPolicy />
+        {/* 배송정책 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
+        {/* <GoodsRegistShippingPolicy /> */}
 
         {/* 기타정보 - 최소, 최대구매수량 */}
         {/* <GoodsRegistExtraInfo /> */}

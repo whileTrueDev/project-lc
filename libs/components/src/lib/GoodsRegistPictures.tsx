@@ -1,15 +1,15 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Box, CloseButton, Text, Stack, useToast, ImageProps } from '@chakra-ui/react';
-import { RegistGoodsDto } from '@project-lc/shared-types';
+import { HStack, CloseButton, Text, Stack, useToast, ImageProps } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ChakraNextImage } from './ChakraNextImage';
+import { GoodsFormValues } from './GoodsRegistForm';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 import SectionWithTitle from './SectionWithTitle';
 
-type FileReaderResultType = string | ArrayBuffer | null;
+export type FileReaderResultType = string | ArrayBuffer | null;
 
-type Preview = {
+export type Preview = {
   id: number;
   fileName: string;
   url: FileReaderResultType;
@@ -21,11 +21,10 @@ export function GoodsPreviewItem(
   const { id, fileName, url, onDelete, ...rest } = props;
 
   return (
-    <Box>
-      <CloseButton onClick={onDelete} />
-      {id}
+    <HStack>
       <ChakraNextImage layout="intrinsic" alt={fileName} src={url as string} {...rest} />
-    </Box>
+      <CloseButton onClick={onDelete} />
+    </HStack>
   );
 }
 
@@ -34,7 +33,6 @@ const PREVIEW_SIZE = {
   width: 60,
   height: 60,
 };
-export const divider = '나눔';
 
 export function readAsDataURL(file: File): Promise<{
   data: FileReaderResultType;
@@ -58,14 +56,17 @@ export function readAsDataURL(file: File): Promise<{
 
 export function GoodsRegistPictures(): JSX.Element {
   const toast = useToast();
-  const { setValue } = useFormContext<RegistGoodsDto>();
+  const { setValue, getValues } = useFormContext<GoodsFormValues>();
   const [previews, setPreviews] = useState<Preview[]>([]);
 
   const deletePreview = (id: number) => {
     setPreviews((list) => {
       const filtered = list.filter((item) => item.id !== id);
-      // TODO: 사진 삭제처리
-      setValue('image', filtered.map((item) => item.url).join(divider));
+      const prevImages = getValues('image');
+      setValue(
+        'image',
+        prevImages?.filter((item) => item.id !== id),
+      );
       return [...filtered];
     });
   };
@@ -85,8 +86,11 @@ export function GoodsRegistPictures(): JSX.Element {
         const id = list.length === 0 ? 0 : list[list.length - 1].id + 1;
         const newList = [...list, { id, url: data, fileName }];
 
-        // TODO: GoodsImage테이블 생성 & Goods 테이블 image 컬럼 타입 수정(GoodsImage[]로)
-        setValue('image', newList.map((item) => item.url?.slice(0, 20)).join(divider));
+        const prevImages = getValues('image');
+        setValue(
+          'image',
+          prevImages ? [...prevImages, { id, file, filename: fileName }] : [],
+        );
 
         return newList;
       });
@@ -103,8 +107,7 @@ export function GoodsRegistPictures(): JSX.Element {
       {/* //TODO: ImageInput multiselect & 사이즈 제한 변경 */}
       <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
 
-      {/* 선택한 이미지 프리뷰 목록
-       */}
+      {/* 선택한 이미지 프리뷰 목록 */}
       <Stack direction="row" spacing={2}>
         {previews.length !== 0 &&
           previews.map((preview) => {

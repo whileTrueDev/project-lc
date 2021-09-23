@@ -18,7 +18,7 @@ export const s3 = (() => {
   });
 
   // 추후에 S3에 저장할 데이터 종류가 더해지는 경우 추가
-  type s3KeyType = 'business-registration';
+  type s3KeyType = 'business-registration' | 'goods';
 
   interface S3UploadImageOptions {
     filename: string | null;
@@ -47,7 +47,6 @@ export const s3 = (() => {
       fileName: fileFullName,
     };
   }
-
   async function s3UploadImage({ filename, userMail, type, file }: S3UploadImageOptions) {
     // key 만들기
     if (!userMail || !file) {
@@ -73,5 +72,6 @@ export const s3 = (() => {
 
   return {
     s3UploadImage,
+    getS3Key,
   };
 })();
