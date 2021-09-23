@@ -24,7 +24,7 @@ export const s3 = (() => {
     filename: string | null;
     userMail: string | undefined;
     type: s3KeyType;
-    file: File | null;
+    file: File | Buffer | null;
   }
 
   // 해당 이미지의 타입에 따라서 경로를 파일이름과 함께 생성

@@ -1,6 +1,6 @@
 import { BusinessRegistrationFormProps } from './BusinessRegistrationForm';
 
-const MB = 1024 * 1024; // 1Mbytes
+export const MB = 1024 * 1024; // 1Mbytes
 const IMAGE_SIZE_LIMIT = 5 * MB;
 
 export type ImageInputErrorTypes = 'over-size' | 'invalid-format' | undefined;

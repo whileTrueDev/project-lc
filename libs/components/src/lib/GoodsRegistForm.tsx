@@ -19,7 +19,6 @@ type GoodsFormOptionsType = Omit<GoodsOptionDto, 'default_option' | 'option_titl
 
 export type GoodsFormValues = Omit<RegistGoodsDto, 'options' | 'image'> & {
   options: NestedValue<GoodsFormOptionsType>;
-  // image?: Preview[];
   image?: { file: File; filename: string; id: number }[];
   option_title: string;
 };
@@ -29,8 +28,8 @@ type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
 };
 
 // 상품 사진을 s3에 업로드 -> url 리턴
-async function uploadImageToS3(
-  imageFile: { file: File; filename: string; id: number },
+export async function uploadGoodsImageToS3(
+  imageFile: { file: File | Buffer; filename: string; id: number },
   userMail: string,
 ) {
   const { file, filename } = imageFile;
@@ -67,7 +66,7 @@ async function imageFileListToImageDto(
   userMail: string,
 ) {
   const savedImages = await Promise.all(
-    imageFileList.map((file) => uploadImageToS3(file, userMail)),
+    imageFileList.map((file) => uploadGoodsImageToS3(file, userMail)),
   );
   return savedImages.map((img, index) => ({
     cut_number: index,
@@ -85,6 +84,35 @@ function addGoodsOptionInfo(
     default_option: index === 0 ? ('y' as const) : ('n' as const),
     option_title,
   }));
+}
+
+// 상품 상세설명 contents에서 이미지 s3에 업로드 후 src url 변경
+async function saveContentsImageToS3(contents: string, userMail: string) {
+  const parser = new DOMParser();
+  const dom = parser.parseFromString(contents, 'text/html'); // textWithImages -> getValues('contents')
+  const imageTags = Array.from(dom.querySelectorAll('img'));
+
+  await Promise.all(
+    imageTags.map(async (tag, index) => {
+      const src = tag.getAttribute('src');
+      const name = tag.dataset.fileName || '';
+      if (src && src.slice(0, 4) !== 'http') {
+        const imageBuffer = Buffer.from(
+          src.replace(/^data:image\/\w+;base64,/, ''),
+          'base64',
+        );
+        const url = await uploadGoodsImageToS3(
+          { file: imageBuffer, filename: name, id: index },
+          userMail,
+        );
+        // img src 바꾸기
+        tag.setAttribute('src', url);
+      }
+    }),
+  );
+
+  const contentsBody = dom.body.innerHTML;
+  return contentsBody;
 }
 
 export function GoodsRegistForm(): JSX.Element {
@@ -120,20 +148,26 @@ export function GoodsRegistForm(): JSX.Element {
       max_purchase_ea,
       min_purchase_ea,
       shippingGroupId,
+      contents,
       ...goodsData
     } = data;
 
+    if (!contents) return;
+    if (!profileData) return;
+    const userMail = profileData.email;
+    const contentsBody = await saveContentsImageToS3(contents, userMail);
+
     const goodsDto: RegistGoodsDto = {
       ...goodsData,
+      contents: contentsBody,
+      contents_mobile: contentsBody,
       options: addGoodsOptionInfo(options, option_title),
       option_use: options.length > 1 ? '1' : '0',
       max_purchase_ea: max_purchase_ea || 0,
       min_purchase_ea: max_purchase_ea || 0,
       shippingGroupId: shippingGroupId || undefined,
       image:
-        image && image.length > 0
-          ? await imageFileListToImageDto(image, profileData?.email || '')
-          : [],
+        image && image.length > 0 ? await imageFileListToImageDto(image, userMail) : [],
     };
     console.log(goodsDto);
 
@@ -160,32 +194,32 @@ export function GoodsRegistForm(): JSX.Element {
       <Stack p={2} spacing={5} as="form" onSubmit={handleSubmit(regist)}>
         <Button type="submit">등록</Button>
         {/* 기본정보 */}
-        {/* <GoodsRegistDataBasic /> */}
+        <GoodsRegistDataBasic />
 
         {/* 판매정보 */}
-        {/* <GoodsRegistDataSales /> */}
+        <GoodsRegistDataSales />
 
         {/* 옵션 */}
-        {/* <GoodsRegistDataOptions /> */}
+        <GoodsRegistDataOptions />
 
-        {/* //TODO: 사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개, 각 이미지는 10mb제한 */}
+        {/* 사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개,  // TODO  : 각 이미지는 10mb제한 */}
         <GoodsRegistPictures />
 
         {/* //TODO: 상세설명 -  (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록, 이미지는 최대 20mb 제한, 주로 이미지로 등록함 */}
-        {/* <GoodsRegistDescription /> */}
+        <GoodsRegistDescription />
 
         {/* //TODO: 공통정보 => 교환/반품/배송에 표시됨 (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록,
       내가 생성한 공통정보 조회, 선택기능 포함  */}
         {/* <GoodsRegistCommonInfo /> */}
 
         {/* 배송정책 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
-        {/* <GoodsRegistShippingPolicy /> */}
+        <GoodsRegistShippingPolicy />
 
         {/* 기타정보 - 최소, 최대구매수량 */}
-        {/* <GoodsRegistExtraInfo /> */}
+        <GoodsRegistExtraInfo />
 
         {/* 메모 - textArea */}
-        {/* <GoodsRegistMemo /> */}
+        <GoodsRegistMemo />
       </Stack>
     </FormProvider>
   );
