@@ -5,7 +5,7 @@ export interface GoodsDetailOptionsInfoProps {
   goods: GoodsByIdRes;
 }
 
-// GoodsOptionWithStockInfo
+// TODO 모바일 화면에서는 Table이 아닌 형태로 보여주도록 변경 필요
 export function GoodsDetailOptionsInfo({ goods }: GoodsDetailOptionsInfoProps) {
   return (
     <Stack>

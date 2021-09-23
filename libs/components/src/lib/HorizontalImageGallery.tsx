@@ -1,7 +1,8 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { Image, Flex, IconButton, HStack } from '@chakra-ui/react';
-import { useRef } from 'react';
+import { Box, Flex, HStack, IconButton, theme } from '@chakra-ui/react';
 import { useDisplaySize, useHorizontalScroll } from '@project-lc/hooks';
+import { useRef } from 'react';
+import { ChakraNextImage } from '..';
 
 export interface HorizontalImageGalleryProps {
   images: string[];
@@ -21,16 +22,18 @@ export function HorizontalImageGallery({ images }: HorizontalImageGalleryProps) 
           onClick={scrollLeft}
         />
       )}
-      <HStack overflowX="auto" spacing={4} ref={galleryRef} minW="100%">
+      <HStack spacing={4} ref={galleryRef} minW="100%" overflowX="auto" flexWrap="nowrap">
         {images.map((img) => (
-          <Image
-            key={img}
-            boxShadow="lg"
-            borderRadius="xl"
-            src={img}
-            w={{ base: 260, sm: 300 }}
-            h={{ base: 260, sm: 300 }}
-          />
+          <Box key={img} flexBasis={0} flexGrow={0} whiteSpace="nowrap">
+            <ChakraNextImage
+              layout="fixed"
+              width={isMobileSize ? 260 : 300}
+              height={isMobileSize ? 260 : 300}
+              boxShadow="lg"
+              borderRadius="xl"
+              src={img}
+            />
+          </Box>
         ))}
       </HStack>
       {!isMobileSize && (
@@ -62,6 +65,7 @@ export function ChevronIconButton({
     );
   return (
     <IconButton
+      zIndex={theme.zIndices.banner}
       display={isVisible ? 'flex' : 'none'}
       right={direction === 'right' ? -5 : undefined}
       left={direction === 'left' ? -5 : undefined}
