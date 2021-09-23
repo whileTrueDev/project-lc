@@ -88,7 +88,7 @@ export class GoodsController {
 
   /** 특정 공통정보 상세 조회 */
   @Get('/common-info')
-  getOneGoodsCommonInfo(@Body('id', ParseIntPipe) id: number) {
+  getOneGoodsCommonInfo(@Query('id', ParseIntPipe) id: number) {
     return this.goodsService.getOneGoodsCommonInfo(id);
   }
 

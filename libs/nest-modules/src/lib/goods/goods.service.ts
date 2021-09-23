@@ -278,12 +278,13 @@ export class GoodsService {
   // 상품 공통정보 생성
   async registGoodsCommonInfo(email: string, dto: GoodsInfoDto) {
     try {
-      return this.prisma.goodsInfo.create({
+      const item = await this.prisma.goodsInfo.create({
         data: {
           ...dto,
           seller: { connect: { email } },
         },
       });
+      return { id: item.id };
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error, 'error in registGoodsCommonInfo');
