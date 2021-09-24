@@ -106,7 +106,14 @@ export function GoodsDetailOptionsInfo({ goods }: GoodsDetailOptionsInfoProps) {
                     {option.default_option === 'y' ? '예' : '아니오'}
                   </Td>
                   <Td borderBottom="none">{option.option_title}</Td>
-                  <Td borderBottom="none">{option.option1}</Td>
+                  <Td borderBottom="none">
+                    <Flex alignItems="center">
+                      {option.option1}
+                      {option.color ? (
+                        <Box ml={1} bgColor={option.color} w="12px" h="12px" />
+                      ) : null}
+                    </Flex>
+                  </Td>
                   <Td borderBottom="none">
                     {Number(option.consumer_price).toLocaleString()}
                   </Td>
