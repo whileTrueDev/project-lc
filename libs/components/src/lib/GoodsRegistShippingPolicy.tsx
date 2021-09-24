@@ -40,7 +40,7 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { boxStyle } from '../constants/commonStyleProps';
 import { GOODS_VIEW } from '../constants/goodsStatus';
-import { ConfirmDialog } from './ConfirmDialog';
+import { ConfirmDialog, ConfirmDialogProps } from './ConfirmDialog';
 import { GoodsFormValues } from './GoodsRegistForm';
 import SectionWithTitle from './SectionWithTitle';
 import ShippingPolicyForm from './ShippingPolicyForm';
@@ -224,6 +224,25 @@ function ShippingGroupListItem({
   );
 }
 
+/* 배송비 정책 상세보기 모달 */
+export function ShippingGroupDetailModal(
+  props: Pick<ConfirmDialogProps, 'isOpen' | 'onClose' | 'onConfirm'> & {
+    groupId: number | null;
+  },
+) {
+  const { isOpen, onClose, onConfirm, groupId } = props;
+  return (
+    <ConfirmDialog
+      title="배송비 정책 정보"
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={onConfirm}
+    >
+      <ShippingGroupDetail groupId={groupId} />
+    </ConfirmDialog>
+  );
+}
+
 export function GoodsRegistShippingPolicy(): JSX.Element {
   const {
     isOpen: registModalOptn,
@@ -279,9 +298,8 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
         <Button onClick={onRegistModalOpen}>생성하기</Button>
       </HStack>
 
-      {/* 배송비 정책 목록 
-      // TODO: 테이블같은 스타일적용..
-      */}
+      {/* 배송비 정책 목록
+       */}
 
       <Stack spacing={2} maxWidth="lg" {...boxStyle}>
         <Flex fontSize="sm">
@@ -309,8 +327,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
       </Stack>
 
       {/* 배송비 정책 상세보기 모달 */}
-      <ConfirmDialog
-        title="배송비 정책 정보"
+      <ShippingGroupDetailModal
         isOpen={infoModalOpen}
         onClose={onInfoModalClose}
         onConfirm={() => {
@@ -319,9 +336,8 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
           setClickedGroupId(null);
           return Promise.resolve();
         }}
-      >
-        <ShippingGroupDetail groupId={clickedGroupId} />
-      </ConfirmDialog>
+        groupId={clickedGroupId}
+      />
 
       {/* 연결된 상품 확인 모달 */}
       <ConfirmDialog

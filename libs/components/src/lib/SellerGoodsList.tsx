@@ -37,6 +37,7 @@ import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 import TextWithPopperButton from './TextWithPopperButton';
 import StockInfoButton, { ExampleStockDescription } from './StockInfoButton';
 import DeleteGoodsAlertDialog from './DeleteGoodsAlertDialog';
+import { ShippingGroupDetailModal } from './GoodsRegistShippingPolicy';
 
 function formatPrice(price: number): string {
   const formattedPrice = price.toLocaleString();
@@ -44,6 +45,26 @@ function formatPrice(price: number): string {
 }
 function formatDate(date: Date): string {
   return dayjs(date).format('YYYY/MM/DD HH:mm');
+}
+
+function ShippingGroupDetailButton(props: { id: number; name: string }) {
+  const { id, name } = props;
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  return (
+    <>
+      <Button data-shipping-group-id={id} onClick={onOpen}>
+        {name}
+      </Button>
+      <ShippingGroupDetailModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={() => {
+          return Promise.resolve();
+        }}
+        groupId={id}
+      />
+    </>
+  );
 }
 
 // * 상품목록 datagrid 컬럼 ***********************************************
@@ -149,8 +170,6 @@ const columns: GridColumns = [
     },
     sortable: false,
   },
-  // TODO: 배송비 정책 조회 기능 추가 필요 & 스타일링 필요
-  // TODO: Goods.shipping_policy 은 어디에 표시함?
   {
     field: 'shippingGroup',
     headerName: '배송비',
@@ -159,19 +178,10 @@ const columns: GridColumns = [
     renderCell: ({ row }) => {
       const { shippingGroup } = row;
       if (!shippingGroup) {
-        return <Text>shop</Text>;
+        return null;
       }
       const { id, shipping_group_name } = shippingGroup;
-      return (
-        <Button
-          data-shipping-group-id={id}
-          onClick={(e) => {
-            console.log(e.currentTarget.dataset.shippingGroupId);
-          }}
-        >
-          {shipping_group_name}
-        </Button>
-      );
+      return <ShippingGroupDetailButton id={id} name={shipping_group_name} />;
     },
   },
   {
