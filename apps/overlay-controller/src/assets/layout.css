@@ -1,0 +1,168 @@
+body {
+  padding: 30px;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+}
+
+div.search-box {
+  width: 30%;
+  height: 30%;
+}
+
+div.dashboard {
+  width: 70%;
+  height: 30%;
+}
+
+div.upper-area {
+  display: flex;
+  direction: row;
+}
+
+div.mid-area {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+}
+
+div.message-box {
+  width: 50%;
+}
+
+div.message-box-fixed-area {
+  display: flex;
+  flex-direction: column;
+}
+
+div.video-controller {
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+}
+
+div.action-control-box {
+  display: flex;
+  justify-content: space-around;
+  border-radius: 4px;
+}
+
+div.etc-control-box {
+  display: flex;
+  flex-direction: column;
+}
+
+div.vertical-divider {
+  border-left: 1px solid rgba(180, 180, 180, 0.7);
+  height: 188px;
+  position: absolute;
+  margin-left: -3px;
+}
+div.customer-nickname-box {
+  display: flex;
+  align-items: center;
+}
+
+div.bottom-message-box {
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+div.console-box {
+  width: 40%;
+}
+
+input[type='text'] {
+  width: 200px;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input#customer-message {
+  width: 100%;
+}
+
+input[type='number'] {
+  width: 200px;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+button {
+  width: 150px;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button[type='submit'] {
+  width: 100%;
+  background-color: #4caf50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button.socket-id-button {
+  width: 100px;
+  background-color: #45a049;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:disabled,
+button[disabled] {
+  color: #666666;
+  cursor: default;
+  opacity: 0.3;
+}
+
+button#toggle-table-button {
+  width: 30px;
+  margin: 5px;
+  background-color: #45a049;
+}
+
+button.message-box-lock-button {
+  background-color: #45a049;
+}
+
+.locked {
+  background-color: red;
+}
+
+button[type='submit']:hover {
+  background-color: #45a049;
+}
+
+hr.solid {
+  border-top: 3px solid #bbb;
+}
+
+fieldset {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin: 3px;
+}

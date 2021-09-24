@@ -386,7 +386,8 @@
             "tsConfig": "apps/overlay-controller/tsconfig.app.json",
             "assets": [
               "apps/overlay-controller/src/assets",
-              "apps/overlay-controller/src/views"
+              "apps/overlay-controller/src/views",
+              "apps/overlay-controller/src/lib"
             ]
           },
           "configurations": {
