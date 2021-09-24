@@ -41,9 +41,11 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
   const login = useLoginMutation('admin');
   const onSubmit = useCallback(
     async (data: LoginSellerDto) => {
-      const seller = await login.mutateAsync(data).catch((err) => {
-        setFormError(getMessage(err?.response.data?.statusCode));
-      });
+      const seller = await login
+        .mutateAsync({ ...data, stayLogedIn: true })
+        .catch((err) => {
+          setFormError(getMessage(err?.response.data?.statusCode));
+        });
       if (seller) {
         router.push('http://localhost:4200/admin');
       }
