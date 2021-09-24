@@ -227,7 +227,7 @@ export class LCDevAppStack extends cdk.Stack {
     // HTTP 리스너에 Overlay 서버 타겟그룹 추가
     truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
       priority: 1,
-      conditions: [elbv2.ListenerCondition.pathPatterns(['/livecommerce'])],
+      conditions: [elbv2.ListenerCondition.hostHeaders(['preview-livecommerce.onad.io'])],
       targetGroups: [overlayTargetGroup],
     });
 
