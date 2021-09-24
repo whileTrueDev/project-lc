@@ -44,6 +44,10 @@ export const constants = {
      * Overlay 서버 PORT
      */
     ECS_OVERLAY_PORT: 3002,
+    /** 구글 TTS(Text To Speech) API 계정 */
+    GOOGLE_CREDENTIALS_EMAIL_KEY: 'LIVECOMMERCE_GCP_TTS_EMAIL',
+    /** 구글 TTS(Text To Speech) API private key */
+    GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY: 'LIVECOMMERCE_GCP_TTS_PRIVATE_KEY',
     /**
      * VPC Subnet 인그레스 서브넷 그룹 명
      */
@@ -56,5 +60,20 @@ export const constants = {
      * VPC Subnet ISOLATED 서브넷 그룹 명
      */
     ISOLATED_SUBNET_GROUP_NAME: 'Isolated Subnet for DB',
+
+    // * ************************
+    // * SSM Parameter Store Keys
+    // * ************************
+    GOOGLE_CLIENT_ID: 'PROJECT_LC_GOOGLE_CLIENT_ID',
+    GOOGLE_CLIENT_SECRET: 'PROJECT_LC_GOOGLE_CLIENT_SECRET',
+    NAVER_CLIENT_ID: 'PROJECT_LC_NAVER_CLIENT_ID',
+    NAVER_CLIENT_SECRET: 'PROJECT_LC_NAVER_CLIENT_SECRET',
+    KAKAO_CLIENT_ID: 'PROJECT_LC_KAKAO_CLIENT_ID',
+    MAILER_USER: 'PROJECT_LC_MAILER_USER',
+    MAILER_PASS: 'PROJECT_LC_MAILER_PASS',
+    JWT_SECRET: 'PROJECT_LC_JWT_SECRET',
+    CIPHER_HASH: 'PROJECT_LC_CIPHER_HASH',
+    CIPHER_PASSWORD: 'PROJECT_LC_CIPHER_PASSWORD',
+    CIPHER_SALT: 'PROJECT_LC_CIPHER_SALT',
   },
 } as const;

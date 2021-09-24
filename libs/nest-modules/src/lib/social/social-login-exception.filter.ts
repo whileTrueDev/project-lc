@@ -9,7 +9,6 @@ export class SocialLoginExceptionFilter implements ExceptionFilter {
   async catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-
     const { provider, providerId, accessToken, message } = exception.response;
 
     switch (provider) {

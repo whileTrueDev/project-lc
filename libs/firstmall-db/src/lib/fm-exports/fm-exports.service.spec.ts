@@ -4,6 +4,7 @@ import { FirstmallDbService } from '../firstmall-db.service';
 import { FMGoodsService } from '../fm-goods/fm-goods.service';
 import { FmOrdersService } from '../fm-orders/fm-orders.service';
 import { FmExportsService } from './fm-exports.service';
+import { exportItemSample, exportSample } from '../../__tests__/exportSample';
 
 describe('FmExportsService', () => {
   let service: FmExportsService;
@@ -302,6 +303,24 @@ describe('FmExportsService', () => {
         `출고완료(${params.bundleCode})`,
         params.exportCode,
       ]);
+    });
+  });
+
+  describe('findOne', () => {
+    it('return export information with exported order items', async () => {
+      jest.spyOn(db, 'query').mockImplementation(async (sql) => {
+        if (sql.includes('fm_goods_export.*,')) {
+          return [exportSample];
+        }
+        return exportItemSample;
+      });
+
+      const exportData = await service.findOne('D123456');
+
+      expect(exportData).toEqual({
+        ...exportSample,
+        items: exportItemSample,
+      });
     });
   });
 });
