@@ -62,3 +62,4 @@ export * from './lib/SocialAccountUnlinkSection';
 export * from './lib/SummaryList';
 export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
+export * from './lib/TextViewerWithDetailModal';
