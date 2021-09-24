@@ -56,7 +56,7 @@ export function GoodsRegistDescription(): JSX.Element {
       </HStack>
 
       {/* 작성한 상세설명 미리보기 */}
-      <Box ref={viewer} className="sun-editor-editable" minHeight="500px" />
+      <Box ref={viewer} className="sun-editor-editable" height="300px" overflowY="auto" />
 
       {/* 상세설명 작성 에디터 모달창 */}
       <Modal isOpen={isOpen} onClose={onClose} size="6xl">

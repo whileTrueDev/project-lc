@@ -98,7 +98,7 @@ export function GoodsRegistPictures(): JSX.Element {
   };
 
   const handleError = (errorType?: ImageInputErrorTypes) => {
-    console.log({ errorType });
+    console.error({ errorType });
   };
 
   return (

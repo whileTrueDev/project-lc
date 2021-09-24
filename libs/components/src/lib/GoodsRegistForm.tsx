@@ -1,7 +1,12 @@
 /* eslint-disable camelcase */
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, Stack, useToast } from '@chakra-ui/react';
-import { s3, useProfile, useRegistGoods } from '@project-lc/hooks';
+import {
+  s3,
+  useCreateGoodsCommonInfo,
+  useProfile,
+  useRegistGoods,
+} from '@project-lc/hooks';
 import { GoodsOptionDto, RegistGoodsDto, GoodsImageDto } from '@project-lc/shared-types';
 import { String } from 'aws-sdk/clients/codebuild';
 import { FormProvider, useForm, NestedValue } from 'react-hook-form';
@@ -15,12 +20,17 @@ import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures, { Preview } from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
 
-type GoodsFormOptionsType = Omit<GoodsOptionDto, 'default_option' | 'option_title'>[];
+export type GoodsFormOptionsType = Omit<
+  GoodsOptionDto,
+  'default_option' | 'option_title'
+>[];
 
 export type GoodsFormValues = Omit<RegistGoodsDto, 'options' | 'image'> & {
   options: NestedValue<GoodsFormOptionsType>;
   image?: { file: File; filename: string; id: number }[];
-  option_title: string;
+  option_title: string; // 옵션 제목
+  common_contents_name?: string; // 공통 정보 이름
+  common_contents_type: 'new' | 'load'; // 공통정보 신규 | 기존 불러오기
 };
 
 type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
@@ -87,7 +97,7 @@ function addGoodsOptionInfo(
 }
 
 // 상품 상세설명 contents에서 이미지 s3에 업로드 후 src url 변경
-async function saveContentsImageToS3(contents: string, userMail: string) {
+export async function saveContentsImageToS3(contents: string, userMail: string) {
   const parser = new DOMParser();
   const dom = parser.parseFromString(contents, 'text/html'); // textWithImages -> getValues('contents')
   const imageTags = Array.from(dom.querySelectorAll('img'));
@@ -118,6 +128,7 @@ async function saveContentsImageToS3(contents: string, userMail: string) {
 export function GoodsRegistForm(): JSX.Element {
   const { data: profileData } = useProfile();
   // const { mutateAsync, isLoading } = useRegistGoods();
+  const { mutateAsync: createGoodsCommonInfo } = useCreateGoodsCommonInfo();
   const toast = useToast();
 
   const methods = useForm<GoodsFormValues>({
@@ -145,20 +156,25 @@ export function GoodsRegistForm(): JSX.Element {
       image,
       options,
       option_title,
+      common_contents_name,
+      common_contents_type,
+      common_contents,
       max_purchase_ea,
       min_purchase_ea,
       shippingGroupId,
       contents,
       ...goodsData
     } = data;
+    console.log({ goodsData, data });
 
     if (!contents) return;
     if (!profileData) return;
     const userMail = profileData.email;
     const contentsBody = await saveContentsImageToS3(contents, userMail);
 
-    const goodsDto: RegistGoodsDto = {
+    let goodsDto: RegistGoodsDto = {
       ...goodsData,
+      common_contents: '',
       contents: contentsBody,
       contents_mobile: contentsBody,
       options: addGoodsOptionInfo(options, option_title),
@@ -169,6 +185,27 @@ export function GoodsRegistForm(): JSX.Element {
       image:
         image && image.length > 0 ? await imageFileListToImageDto(image, userMail) : [],
     };
+
+    // 공통정보 신규생성 & 공통정보를 입력한 경우
+    if (
+      common_contents_type === 'new' &&
+      !!common_contents &&
+      common_contents !== '<p><br></p>'
+    ) {
+      // 1. 공통정보 생성 -> 해당 아이디를 commonInfoId에 추가
+      const commonInfoBody = await saveContentsImageToS3(common_contents, userMail);
+      const res = await createGoodsCommonInfo({
+        info_name: common_contents_name || '',
+        info_value: commonInfoBody,
+      });
+
+      goodsDto = {
+        ...goodsDto,
+        goodsInfoId: res.data.id,
+        common_contents: commonInfoBody,
+      };
+    }
+
     console.log(goodsDto);
 
     // TODO: goods 필수컬럼(options의 옵션값 등등) 다시 확인후 테이블, dto 수정
@@ -194,32 +231,32 @@ export function GoodsRegistForm(): JSX.Element {
       <Stack p={2} spacing={5} as="form" onSubmit={handleSubmit(regist)}>
         <Button type="submit">등록</Button>
         {/* 기본정보 */}
-        <GoodsRegistDataBasic />
+        {/* <GoodsRegistDataBasic /> */}
 
         {/* 판매정보 */}
-        <GoodsRegistDataSales />
+        {/* <GoodsRegistDataSales /> */}
 
         {/* 옵션 */}
-        <GoodsRegistDataOptions />
+        {/* <GoodsRegistDataOptions /> */}
 
         {/* 사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개,  // TODO  : 각 이미지는 10mb제한 */}
-        <GoodsRegistPictures />
+        {/* <GoodsRegistPictures /> */}
 
-        {/* //TODO: 상세설명 -  (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록, 이미지는 최대 20mb 제한, 주로 이미지로 등록함 */}
-        <GoodsRegistDescription />
+        {/* 상세설명 -  (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록, 이미지는 최대 20mb 제한, 주로 이미지로 등록함 */}
+        {/* <GoodsRegistDescription /> */}
 
         {/* //TODO: 공통정보 => 교환/반품/배송에 표시됨 (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록,
       내가 생성한 공통정보 조회, 선택기능 포함  */}
-        {/* <GoodsRegistCommonInfo /> */}
+        <GoodsRegistCommonInfo />
 
         {/* 배송정책 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
-        <GoodsRegistShippingPolicy />
+        {/* <GoodsRegistShippingPolicy /> */}
 
         {/* 기타정보 - 최소, 최대구매수량 */}
-        <GoodsRegistExtraInfo />
+        {/* <GoodsRegistExtraInfo /> */}
 
         {/* 메모 - textArea */}
-        <GoodsRegistMemo />
+        {/* <GoodsRegistMemo /> */}
       </Stack>
     </FormProvider>
   );
