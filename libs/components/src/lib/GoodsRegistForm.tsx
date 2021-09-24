@@ -1,15 +1,15 @@
 /* eslint-disable camelcase */
 /* eslint-disable react/jsx-props-no-spreading */
-import { Button, Stack, useToast } from '@chakra-ui/react';
+import { Button, Center, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
 import {
   s3,
   useCreateGoodsCommonInfo,
   useProfile,
   useRegistGoods,
 } from '@project-lc/hooks';
-import { GoodsOptionDto, RegistGoodsDto, GoodsImageDto } from '@project-lc/shared-types';
-import { String } from 'aws-sdk/clients/codebuild';
-import { FormProvider, useForm, NestedValue } from 'react-hook-form';
+import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
+import { useRouter } from 'next/router';
+import { FormProvider, NestedValue, useForm } from 'react-hook-form';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
 import GoodsRegistDataOptions from './GoodsRegistDataOptions';
@@ -17,7 +17,7 @@ import GoodsRegistDataSales from './GoodsRegistDataSales';
 import GoodsRegistDescription from './GoodsRegistDescription';
 import GoodsRegistExtraInfo from './GoodsRegistExtraInfo';
 import GoodsRegistMemo from './GoodsRegistMemo';
-import GoodsRegistPictures, { Preview } from './GoodsRegistPictures';
+import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
 
 export type GoodsFormOptionsType = Omit<
@@ -57,17 +57,17 @@ export async function uploadGoodsImageToS3(
     throw new Error('S3 ERROR');
   }
 
-  const { key, fileName } = s3.getS3Key({ userMail, type, filename });
-
-  return [
+  const { key } = s3.getS3Key({ userMail, type, filename });
+  const url = [
     'https://',
     process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
     '.s3.',
     'ap-northeast-2',
     '.amazonaws.com/',
     key,
-    fileName,
   ].join('');
+
+  return url;
 }
 
 // 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
@@ -127,12 +127,14 @@ export async function saveContentsImageToS3(contents: string, userMail: string) 
 
 export function GoodsRegistForm(): JSX.Element {
   const { data: profileData } = useProfile();
-  // const { mutateAsync, isLoading } = useRegistGoods();
+  const { mutateAsync, isLoading } = useRegistGoods();
   const { mutateAsync: createGoodsCommonInfo } = useCreateGoodsCommonInfo();
   const toast = useToast();
+  const router = useRouter();
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
+      common_contents_type: 'new',
       option_title: '',
       image: [],
       options: [
@@ -147,11 +149,24 @@ export function GoodsRegistForm(): JSX.Element {
           },
         },
       ],
+      option_use: '1',
+      // 이하 fm_goods 기본값
+      goods_view: 'look',
+      shipping_policy: 'shop',
+      goods_shipping_policy: 'unlimit',
+      shipping_weight_policy: 'shop',
+      option_view_type: 'divide',
+      option_suboption_use: '0',
+      member_input_use: '0',
     },
   });
   const { handleSubmit } = methods;
 
   const regist = async (data: GoodsFormSubmitDataType) => {
+    console.log('regist start');
+    if (!profileData) return;
+    const userMail = profileData.email;
+
     const {
       image,
       options,
@@ -165,26 +180,29 @@ export function GoodsRegistForm(): JSX.Element {
       contents,
       ...goodsData
     } = data;
-    console.log({ goodsData, data });
-
-    if (!contents) return;
-    if (!profileData) return;
-    const userMail = profileData.email;
-    const contentsBody = await saveContentsImageToS3(contents, userMail);
+    console.log({ data });
 
     let goodsDto: RegistGoodsDto = {
       ...goodsData,
       common_contents: '',
-      contents: contentsBody,
-      contents_mobile: contentsBody,
       options: addGoodsOptionInfo(options, option_title),
       option_use: options.length > 1 ? '1' : '0',
-      max_purchase_ea: max_purchase_ea || 0,
-      min_purchase_ea: max_purchase_ea || 0,
-      shippingGroupId: shippingGroupId || undefined,
+      max_purchase_ea: Number(max_purchase_ea) || 0,
+      min_purchase_ea: Number(min_purchase_ea) || 0,
+      shippingGroupId: Number(shippingGroupId) || undefined,
       image:
         image && image.length > 0 ? await imageFileListToImageDto(image, userMail) : [],
     };
+
+    // 상세설명을 입력한 경우
+    if (contents) {
+      const contentsBody = await saveContentsImageToS3(contents, userMail);
+      goodsDto = {
+        ...goodsDto,
+        contents: contentsBody,
+        contents_mobile: contentsBody,
+      };
+    }
 
     // 공통정보 신규생성 & 공통정보를 입력한 경우
     if (
@@ -192,7 +210,7 @@ export function GoodsRegistForm(): JSX.Element {
       !!common_contents &&
       common_contents !== '<p><br></p>'
     ) {
-      // 1. 공통정보 생성 -> 해당 아이디를 commonInfoId에 추가
+      // 공통정보 생성 -> 해당 아이디를 commonInfoId에 추가
       const commonInfoBody = await saveContentsImageToS3(common_contents, userMail);
       const res = await createGoodsCommonInfo({
         info_name: common_contents_name || '',
@@ -206,57 +224,84 @@ export function GoodsRegistForm(): JSX.Element {
       };
     }
 
-    console.log(goodsDto);
-
     // TODO: goods 필수컬럼(options의 옵션값 등등) 다시 확인후 테이블, dto 수정
-    // mutateAsync(ddto)
-    //   .then((res) => {
-    //     const { data: d } = res;
-    //     console.log(d);
-    //     alert(JSON.stringify(d));
-    //     toast({
-    //       title: '상품을 성공적으로 등록하였습니다',
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //     toast({
-    //       title: '상품 등록 중 오류가 발생하였습니다',
-    //       status: 'error',
-    //     });
-    //   });
+    mutateAsync(goodsDto)
+      .then((res) => {
+        toast({
+          title: '상품을 성공적으로 등록하였습니다',
+        });
+        router.push('/mypage/goods');
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          title: '상품 등록 중 오류가 발생하였습니다',
+          status: 'error',
+        });
+      });
   };
+
   return (
     <FormProvider {...methods}>
       <Stack p={2} spacing={5} as="form" onSubmit={handleSubmit(regist)}>
-        <Button type="submit">등록</Button>
+        <Stack
+          direction="row"
+          position="sticky"
+          top="0px"
+          left="0px"
+          right="0px"
+          justifyContent="space-between"
+        >
+          <Button onClick={() => router.push('/mypage/goods')}>목록으로 돌아가기</Button>
+          <Button type="submit" colorScheme="blue" isLoading={isLoading}>
+            등록
+          </Button>
+        </Stack>
+
         {/* 기본정보 */}
-        {/* <GoodsRegistDataBasic /> */}
+        <GoodsRegistDataBasic />
 
         {/* 판매정보 */}
-        {/* <GoodsRegistDataSales /> */}
+        <GoodsRegistDataSales />
 
-        {/* 옵션 */}
-        {/* <GoodsRegistDataOptions /> */}
+        {/* 판매 옵션 */}
+        <GoodsRegistDataOptions />
 
-        {/* 사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개,  // TODO  : 각 이미지는 10mb제한 */}
-        {/* <GoodsRegistPictures /> */}
+        {/* 상품사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개,  // TODO  : 각 이미지는 10mb제한 */}
+        <GoodsRegistPictures />
 
         {/* 상세설명 -  (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록, 이미지는 최대 20mb 제한, 주로 이미지로 등록함 */}
-        {/* <GoodsRegistDescription /> */}
+        <GoodsRegistDescription />
 
-        {/* //TODO: 공통정보 => 교환/반품/배송에 표시됨 (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록,
+        {/* 상품 공통 정보 => 교환/반품/배송에 표시됨 (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록,
       내가 생성한 공통정보 조회, 선택기능 포함  */}
         <GoodsRegistCommonInfo />
 
-        {/* 배송정책 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
-        {/* <GoodsRegistShippingPolicy /> */}
+        {/* 배송비 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
+        <GoodsRegistShippingPolicy />
 
         {/* 기타정보 - 최소, 최대구매수량 */}
-        {/* <GoodsRegistExtraInfo /> */}
+        <GoodsRegistExtraInfo />
 
         {/* 메모 - textArea */}
-        {/* <GoodsRegistMemo /> */}
+        <GoodsRegistMemo />
+
+        {isLoading && (
+          <Center
+            position="fixed"
+            mt={0}
+            top="0px"
+            bottom="0px"
+            left="0px"
+            right="0px"
+            bg="gray.400"
+            opacity="0.5"
+            flexDirection="column"
+          >
+            <Spinner />
+            <Text>상품을 등록중입니다...</Text>
+          </Center>
+        )}
       </Stack>
     </FormProvider>
   );
