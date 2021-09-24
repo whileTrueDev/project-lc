@@ -8,10 +8,11 @@ export type ImageInputErrorTypes = 'over-size' | 'invalid-format' | undefined;
 type ImageInputProps = {
   handleSuccess: (fileName: string, file: File) => void;
   handleError: (errorType?: ImageInputErrorTypes) => void;
+  required?: boolean;
 };
 
 export function ImageInput(props: ImageInputProps): JSX.Element {
-  const { handleSuccess, handleError } = props;
+  const { handleSuccess, handleError, required = true } = props;
 
   const readImage = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const target = event.target as HTMLInputElement;
@@ -43,7 +44,7 @@ export function ImageInput(props: ImageInputProps): JSX.Element {
       style={{ margin: '15px' }}
       accept="image/*"
       type="file"
-      required
+      required={required}
       onChange={(e): void => {
         readImage(e);
       }}

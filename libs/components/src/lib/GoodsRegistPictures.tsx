@@ -103,9 +103,12 @@ export function GoodsRegistPictures(): JSX.Element {
 
   return (
     <SectionWithTitle title="상품사진">
-      <Text>사진</Text>
       {/* //TODO: ImageInput multiselect & 사이즈 제한 변경 */}
-      <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
+      <ImageInput
+        required={false}
+        handleSuccess={handleSuccess}
+        handleError={handleError}
+      />
 
       {/* 선택한 이미지 프리뷰 목록 */}
       <Stack direction="row" spacing={2}>
