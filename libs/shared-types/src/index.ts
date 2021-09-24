@@ -53,3 +53,4 @@ export * from './lib/dto/shippingOption.dto';
 export * from './lib/dto/shippingSet.dto';
 export * from './lib/overlay/overlay-types';
 export * from './lib/res-types/findSeller.res';
+export * from './lib/dto/goodsConfirmation.dto';

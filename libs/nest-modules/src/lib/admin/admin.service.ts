@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
+import { GoodsConfirmationDto } from '@project-lc/shared-types';
 import { SellerSettlementAccount, SellerBusinessRegistration } from '@prisma/client';
 
 export type AdminSettlementInfoType = {
@@ -35,6 +36,7 @@ export class AdminService {
     return result;
   }
 
+  // 정산정보 전처리
   private preprocessSettlementInfo(users: any) {
     const result: AdminSettlementInfoType = {
       sellerSettlementAccount: [],
@@ -52,5 +54,70 @@ export class AdminService {
     });
 
     return result;
+  }
+
+  // 관리자 페이지 상품검수 데이터, 상품검수가 완료되지 않은 상태일 경우,
+  public async getGoodsInfo({ sort, direction }) {
+    const items = await this.prisma.goods.findMany({
+      orderBy: [{ [sort]: direction }],
+      where: {
+        confirmation: {
+          status: 'waiting',
+        },
+      },
+      include: {
+        options: {
+          include: {
+            supply: true,
+          },
+        },
+        confirmation: true,
+        ShippingGroup: true,
+      },
+    });
+    const list = items.map((item) => {
+      const defaultOption = item.options.find((opt) => opt.default_option === 'y');
+      return {
+        id: item.id,
+        sellerId: item.sellerId,
+        goods_name: item.goods_name,
+        runout_policy: item.runout_policy,
+        shipping_policy: item.shipping_policy,
+        regist_date: item.regist_date,
+        update_date: item.update_date,
+        goods_status: item.goods_status,
+        goods_view: item.goods_view,
+        default_price: defaultOption.price, // 판매가(할인가)
+        default_consumer_price: defaultOption.consumer_price, // 소비자가(미할인가)
+        confirmation: item.confirmation,
+        shippingGroup: item.ShippingGroup
+          ? {
+              id: item.ShippingGroup.id,
+              shipping_group_name: item.ShippingGroup.shipping_group_name,
+            }
+          : undefined,
+      };
+    });
+
+    return {
+      items: list,
+      totalItemCount: items.length,
+    };
+  }
+
+  public async setGoodsConfirmation(dto: GoodsConfirmationDto) {
+    const goodsConfirmation = await this.prisma.goodsConfirmation.update({
+      where: { goodsId: dto.goodsId },
+      data: {
+        firstmallGoodsConnectionId: dto.firstmallGoodsConnectionId,
+        status: dto.status,
+      },
+    });
+
+    if (!goodsConfirmation) {
+      throw new Error(`승인 상태 변경불가`);
+    }
+
+    return goodsConfirmation;
   }
 }

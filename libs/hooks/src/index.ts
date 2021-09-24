@@ -38,3 +38,5 @@ export * from './lib/mutation/useCreateShippingGroup';
 export * from './lib/mutation/useDeleteShippingGroup';
 export * from './lib/queries/useShippingGroupList';
 export * from './lib/shipping-group-hooks';
+export * from './lib/queries/useAdminGoodsList';
+export * from './lib/mutation/useGoodConfirmationMutation';
