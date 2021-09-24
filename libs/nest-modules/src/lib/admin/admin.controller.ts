@@ -7,6 +7,7 @@ import {
   UseGuards,
   Put,
   Body,
+  Param,
 } from '@nestjs/common';
 import {
   SellerGoodsSortColumn,
@@ -44,6 +45,15 @@ export class AdminController {
       sort,
       direction,
     });
+  }
+
+  // 상품검수를 위한 상품 리스트
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Get('/goods/:goodsId')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  getAdminGoodsById(@Param('goodsId') goodsId: string | number) {
+    return this.adminService.getOneGoods(goodsId);
   }
 
   // 상품 검수를 수행

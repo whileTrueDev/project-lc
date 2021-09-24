@@ -24,8 +24,8 @@ export const s3 = (() => {
     filename: string | null;
     userMail: string | undefined;
     type: s3KeyType;
-    file: File | null;
-    companyName: string;
+    file: File | Buffer | null;
+    companyName?: string;
   }
 
   // 파일명에서 확장자를 추출하는 과정
@@ -49,12 +49,16 @@ export const s3 = (() => {
     userMail: string;
     type: string;
     filename: string | null;
-    companyName: string;
+    companyName?: string;
   }) {
     // 확장자 추출
     const extension = getExtension(filename);
     const prefix = moment().format('YYMMDDHHmmss').toString();
-    const fileFullName = `${prefix}_${companyName}_사업자등록증${extension}`;
+    let fileFullName = `${filename}`;
+    // companyName이 존재하지 않는 경우에 대한 분기처리
+    if (companyName) {
+      fileFullName = `${prefix}_${companyName}_사업자등록증${extension}`;
+    }
     const pathList = [type, userMail, fileFullName];
     return {
       key: path.join(...pathList),
@@ -107,5 +111,6 @@ export const s3 = (() => {
   return {
     s3UploadImage,
     s3DownloadImageUrl,
+    getS3Key,
   };
 })();

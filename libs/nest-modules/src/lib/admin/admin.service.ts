@@ -120,4 +120,29 @@ export class AdminService {
 
     return goodsConfirmation;
   }
+
+  public async getOneGoods(goodsId: string | number) {
+    return this.prisma.goods.findFirst({
+      where: {
+        id: Number(goodsId),
+      },
+      include: {
+        options: { include: { supply: true } },
+        ShippingGroup: {
+          include: {
+            shippingSets: {
+              include: {
+                shippingOptions: {
+                  include: { shippingCost: true },
+                },
+              },
+            },
+          },
+        },
+        confirmation: true,
+        image: true,
+        GoodsInfo: true,
+      },
+    });
+  }
 }
