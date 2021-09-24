@@ -43,7 +43,7 @@ describe('GoodsService', () => {
             email: TEST_USER_EMAIL,
           },
         },
-        image: 'dummy.jpg',
+        image: { create: [] },
         common_contents: 'dummy common_contents',
         goods_name: 'dummy goods name',
         summary: 'dummy',
@@ -59,7 +59,6 @@ describe('GoodsService', () => {
         },
         confirmation: {
           create: {
-            id: 1,
             status: 'confirmed',
             firstmallGoodsConnectionId: TEST_CONFIRMATION_GOODS_CONNECTION_ID,
           },
