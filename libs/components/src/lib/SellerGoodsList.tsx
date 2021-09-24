@@ -26,7 +26,6 @@ import {
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import { SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { useState } from 'react';
-import { QuestionIcon } from '@chakra-ui/icons';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import {
   RUNOUT_POLICY,
@@ -61,7 +60,7 @@ const columns: GridColumns = [
       const goodsId = row.id;
       const { goods_name } = row;
       return (
-        <NextLink href={`#${goodsId}`} passHref>
+        <NextLink href={`/mypage/goods/${goodsId}`} passHref>
           <Link width="100%">
             <Text isTruncated>{goods_name}</Text>
           </Link>
@@ -266,6 +265,7 @@ export function SellerGoodsList(): JSX.Element {
     itemPerPage,
     sort,
     direction,
+    groupId,
     changePage,
     handlePageSizeChange,
     handleSortChange,
@@ -276,6 +276,7 @@ export function SellerGoodsList(): JSX.Element {
       itemPerPage,
       sort,
       direction,
+      groupId,
       email: profileData?.email || '',
     },
     {

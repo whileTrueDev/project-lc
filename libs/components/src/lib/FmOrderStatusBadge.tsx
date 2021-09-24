@@ -1,4 +1,4 @@
-import { Badge, BadgeProps } from '@chakra-ui/react';
+import { Badge } from '@chakra-ui/react';
 import {
   convertFmOrderStatusToString,
   fmOrderStatuses,
@@ -17,5 +17,4 @@ export function FmOrderStatusBadge({
     </Badge>
   );
 }
-
 export default FmOrderStatusBadge;

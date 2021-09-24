@@ -18,7 +18,7 @@ export const s3 = (() => {
   });
 
   // 추후에 S3에 저장할 데이터 종류가 더해지는 경우 추가
-  type s3KeyType = 'business-registration';
+  type s3KeyType = 'business-registration' | 'goods';
 
   interface S3UploadImageOptions {
     filename: string | null;

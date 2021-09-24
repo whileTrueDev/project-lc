@@ -10,6 +10,24 @@ import {
 export class ShippingGroupService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // 특정 배송비그룹 정보 조회
+  async getOneShippingGroup(groupId: number) {
+    return this.prisma.shippingGroup.findUnique({
+      where: { id: groupId },
+      include: {
+        shippingSets: {
+          include: {
+            shippingOptions: {
+              include: {
+                shippingCost: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   // 해당 유저의 배송비정책 목록 조회
   async getShippingGroupList(email: string) {
     return this.prisma.shippingGroup.findMany({

@@ -6,6 +6,7 @@ import { useShippingSetItemStore } from '@project-lc/stores';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { KOREA_PROVINCES } from '../constants/address';
+import { boxStyle } from '../constants/commonStyleProps';
 import FormControlInputWrapper from './FormControlInputWrapper';
 import { ResponsiveDivider } from './ResponsiveDivider';
 import { ErrorText } from './ShippingOptionIntervalApply';
@@ -162,10 +163,7 @@ export function ShippingOptionRepeatApply({
         as="form"
         onSubmit={handleSubmit(onSubmit)}
         alignItems="center"
-        border="1px"
-        borderColor="gray.200"
-        borderRadius="md"
-        p={2}
+        {...boxStyle}
       >
         <Stack w="100%" direction="row" justifyContent="space-between">
           {/* 지역 설정 셀렉트 */}
@@ -199,13 +197,7 @@ export function ShippingOptionRepeatApply({
         </Stack>
 
         {/* 첫번째 옵션 */}
-        <Stack
-          direction={{ base: 'column', sm: 'row' }}
-          border="1px"
-          borderColor="gray.200"
-          borderRadius="md"
-          p={2}
-        >
+        <Stack direction={{ base: 'column', sm: 'row' }} {...boxStyle}>
           <Stack direction="row" alignItems="center">
             <FormControlInputWrapper id="firstSectionStart" suffix={`${suffix} 이상`}>
               <Input
@@ -254,13 +246,7 @@ export function ShippingOptionRepeatApply({
         {/* 첫번째 옵션 */}
 
         {/* 두번째 옵션 */}
-        <Stack
-          direction={{ base: 'column', sm: 'row' }}
-          border="1px"
-          borderColor="gray.200"
-          borderRadius="md"
-          p={2}
-        >
+        <Stack direction={{ base: 'column', sm: 'row' }} {...boxStyle}>
           <Stack direction="row" alignItems="center">
             <FormControlInputWrapper id="secondSectionStart" suffix={`${suffix} 부터는`}>
               <Input

@@ -9,6 +9,8 @@ export interface SellerGoodsListPanelStoreState {
   itemPerPage: number;
   sort: SellerGoodsSortColumn;
   direction: SellerGoodsSortDirection;
+  groupId?: number;
+  setGroupId(groupId: number): void;
   changePage(page: number): void;
   changeItemPerPage(itemPerPage: number): void;
   changeSort(sort: SellerGoodsSortColumn, direction: SellerGoodsSortDirection): void;
@@ -22,6 +24,7 @@ export const useSellerGoodsListPanelStore = create<SellerGoodsListPanelStoreStat
     itemPerPage: 10,
     sort: SellerGoodsSortColumn.REGIST_DATE,
     direction: SellerGoodsSortDirection.DESC,
+    setGroupId: (groupId: number) => set((state) => ({ ...state, groupId })),
     changePage: (page: number) => set((state) => ({ ...state, page })),
     changeItemPerPage: (itemPerPage: number) =>
       set((state) => ({ ...state, itemPerPage })),
