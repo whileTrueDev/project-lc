@@ -25,6 +25,7 @@ export * from './lib/GoodsDetailPurchaseLimitInfo';
 export * from './lib/GoodsDetailShippingInfo';
 export * from './lib/GoodsDetailSummary';
 export * from './lib/GoodsDetailTitle';
+export * from './lib/GoodsRegistForm';
 export * from './lib/GoodsStatusBadge';
 export * from './lib/HorizontalImageGallery';
 export * from './lib/LoginForm';

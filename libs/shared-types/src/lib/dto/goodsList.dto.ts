@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 // Goods 테이블의 컬럼명
 export enum SellerGoodsSortColumn {
@@ -22,4 +22,8 @@ export class GoodsListDto {
 
   @IsEnum(SellerGoodsSortDirection)
   direction = SellerGoodsSortDirection.DESC;
+
+  @IsNumber()
+  @IsOptional()
+  groupId?: number;
 }

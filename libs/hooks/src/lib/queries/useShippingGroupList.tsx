@@ -2,11 +2,13 @@ import { useQuery } from 'react-query';
 import { ShippingGroup } from '.prisma/client';
 import axios from '../../axios';
 
-export type ShippingGroupList = (ShippingGroup & {
+export type ShippingGroupListItemType = ShippingGroup & {
   _count: {
     goods: number;
   };
-})[];
+};
+
+export type ShippingGroupList = ShippingGroupListItemType[];
 
 export const getShippingGroupList = async (): Promise<ShippingGroupList> => {
   return axios.get<ShippingGroupList>('/shipping-group').then((res) => res.data);

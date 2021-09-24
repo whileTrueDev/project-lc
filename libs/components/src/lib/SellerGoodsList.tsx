@@ -26,7 +26,6 @@ import {
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import { SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { useState } from 'react';
-import { QuestionIcon } from '@chakra-ui/icons';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import {
   RUNOUT_POLICY,
@@ -266,6 +265,7 @@ export function SellerGoodsList(): JSX.Element {
     itemPerPage,
     sort,
     direction,
+    groupId,
     changePage,
     handlePageSizeChange,
     handleSortChange,
@@ -276,6 +276,7 @@ export function SellerGoodsList(): JSX.Element {
       itemPerPage,
       sort,
       direction,
+      groupId,
       email: profileData?.email || '',
     },
     {
