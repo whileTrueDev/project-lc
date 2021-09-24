@@ -30,7 +30,7 @@ export default function AdminNav(): JSX.Element {
         justify="space-between"
       >
         <Flex display={{ base: 'none', md: 'flex' }} ml={4}>
-          <Box key="관리자">
+          <Box key="정산정보관리">
             <NextLink href={'/admin' ?? '#'} passHref>
               <Link
                 p={2}
@@ -42,7 +42,7 @@ export default function AdminNav(): JSX.Element {
                   color: linkHoverColor,
                 }}
               >
-                관리자
+                정산정보관리
               </Link>
             </NextLink>
           </Box>

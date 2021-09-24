@@ -34,7 +34,7 @@ export function GoodsDetail(): JSX.Element {
           <Button
             size="sm"
             leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push('/admin/goods')}
+            onClick={() => router.push('/goods')}
           >
             목록으로
           </Button>
