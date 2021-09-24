@@ -21,15 +21,21 @@ const DOMAIN = 'andad.io';
 // const OVERLAY_DOMAIN = `${DOMAIN}`;
 
 export class LCDevAppStack extends cdk.Stack {
-  DBURL_PARAMETER: ssm.IStringParameter;
-  FIRSTMALL_DATABASE_URL: ssm.IStringParameter;
-  GOOGLE_CLIENT_ID: ssm.IStringParameter;
-  GOOGLE_CLIENT_SECRET: ssm.IStringParameter;
-  NAVER_CLIENT_ID: ssm.IStringParameter;
-  NAVER_CLIENT_SECRET: ssm.IStringParameter;
-  KAKAO_CLIENT_ID: ssm.IStringParameter;
-  MAILER_USER: ssm.IStringParameter;
-  MAILER_PASS: ssm.IStringParameter;
+  private DBURL_PARAMETER: ssm.IStringParameter;
+  private FIRSTMALL_DATABASE_URL: ssm.IStringParameter;
+  private GOOGLE_CLIENT_ID: ssm.IStringParameter;
+  private GOOGLE_CLIENT_SECRET: ssm.IStringParameter;
+  private NAVER_CLIENT_ID: ssm.IStringParameter;
+  private NAVER_CLIENT_SECRET: ssm.IStringParameter;
+  private KAKAO_CLIENT_ID: ssm.IStringParameter;
+  private MAILER_USER: ssm.IStringParameter;
+  private MAILER_PASS: ssm.IStringParameter;
+  private GOOGLE_CREDENTIALS_EMAIL: ssm.IStringParameter;
+  private GOOGLE_CREDENTIALS_PRIVATE_KEY: ssm.IStringParameter;
+  private JWT_SECRET: ssm.IStringParameter;
+  private CIPHER_HASH: ssm.IStringParameter;
+  private CIPHER_PASSWORD: ssm.IStringParameter;
+  private CIPHER_SALT: ssm.IStringParameter;
 
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
@@ -77,6 +83,10 @@ export class LCDevAppStack extends cdk.Stack {
         KAKAO_CLIENT_ID: ecs.Secret.fromSsmParameter(this.KAKAO_CLIENT_ID),
         MAILER_USER: ecs.Secret.fromSsmParameter(this.MAILER_USER),
         MAILER_PASS: ecs.Secret.fromSsmParameter(this.MAILER_PASS),
+        JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
+        CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
+        CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
+        CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}LogGroup`, {
@@ -117,25 +127,15 @@ export class LCDevAppStack extends cdk.Stack {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
         FIRSTMALL_DATABASE_URL: ecs.Secret.fromSsmParameter(this.FIRSTMALL_DATABASE_URL),
         GOOGLE_CREDENTIALS_EMAIL: ecs.Secret.fromSsmParameter(
-          ssm.StringParameter.fromSecureStringParameterAttributes(
-            this,
-            `${PREFIX}GoogleTTSEmailSecret`,
-            {
-              parameterName: constants.DEV.GOOGLE_CREDENTIALS_EMAIL_KEY,
-              version: 1,
-            },
-          ),
+          this.GOOGLE_CREDENTIALS_EMAIL,
         ),
         GOOGLE_CREDENTIALS_PRIVATE_KEY: ecs.Secret.fromSsmParameter(
-          ssm.StringParameter.fromSecureStringParameterAttributes(
-            this,
-            `${PREFIX}GoogleTTSKeySecret`,
-            {
-              parameterName: constants.DEV.GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY,
-              version: 1,
-            },
-          ),
+          this.GOOGLE_CREDENTIALS_PRIVATE_KEY,
         ),
+        JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
+        CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
+        CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
+        CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayLogGroup`, {
@@ -329,6 +329,61 @@ export class LCDevAppStack extends cdk.Stack {
       },
     );
 
+    this.GOOGLE_CREDENTIALS_EMAIL =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GOOGLE_CREDENTIALS_EMAIL`,
+        {
+          version: 1,
+          parameterName: constants.DEV.GOOGLE_CREDENTIALS_EMAIL_KEY,
+        },
+      );
+    this.GOOGLE_CREDENTIALS_PRIVATE_KEY =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GOOGLE_CREDENTIALS_PRIVATE_KEY`,
+        {
+          version: 1,
+          parameterName: constants.DEV.GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY,
+        },
+      );
+
+    this.JWT_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}JWT_SECRET`,
+      {
+        version: 1,
+        parameterName: constants.DEV.JWT_SECRET,
+      },
+    );
+
+    this.CIPHER_HASH = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}CIPHER_HASH`,
+      {
+        version: 1,
+        parameterName: constants.DEV.CIPHER_HASH,
+      },
+    );
+
+    this.CIPHER_PASSWORD = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}CIPHER_PASSWORD`,
+      {
+        version: 1,
+        parameterName: constants.DEV.CIPHER_PASSWORD,
+      },
+    );
+
+    this.CIPHER_SALT = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}CIPHER_SALT`,
+      {
+        version: 1,
+        parameterName: constants.DEV.CIPHER_SALT,
+      },
+    );
+
     return {
       DATABASE_URL: this.DBURL_PARAMETER,
       FIRSTMALL_DATABASE_URL: this.FIRSTMALL_DATABASE_URL,
@@ -339,6 +394,12 @@ export class LCDevAppStack extends cdk.Stack {
       KAKAO_CLIENT_ID: this.KAKAO_CLIENT_ID,
       MAILER_USER: this.MAILER_USER,
       MAILER_PASS: this.MAILER_PASS,
+      GOOGLE_CREDENTIALS_EMAIL: this.GOOGLE_CREDENTIALS_EMAIL,
+      GOOGLE_CREDENTIALS_PRIVATE_KEY: this.GOOGLE_CREDENTIALS_PRIVATE_KEY,
+      JWT_SECRET: this.JWT_SECRET,
+      CIPHER_HASH: this.CIPHER_HASH,
+      CIPHER_PASSWORD: this.CIPHER_PASSWORD,
+      CIPHER_SALT: this.CIPHER_SALT,
     };
   }
 }
