@@ -69,7 +69,7 @@ function NoOptionInput() {
 
 function UseOptionInput() {
   const { watch, control, register } = useFormContext<GoodsFormValues>();
-  const { fields, append, remove } = useFieldArray<GoodsFormValues>({
+  const { fields, append, remove } = useFieldArray<GoodsFormValues, 'options'>({
     control,
     name: 'options' as const,
   });
