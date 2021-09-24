@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const common_contents = '상품공통정보';
-const image = '';
 const testSellerEmail = 'a1919361@gmail.com';
 const testSellerData = {
   email: testSellerEmail,
@@ -26,11 +25,36 @@ async function main() {
   // 테스트 상품 1 + 옵션 + 재고 데이터 생성
   await prisma.goods.create({
     data: {
-      sellerId: seller.id,
+      seller: {
+        connect: { id: seller.id },
+      },
       goods_name: 'testGoods1',
       summary: '테스트상품1',
       common_contents,
-      image,
+      image: {
+        create: [
+          {
+            cut_number: 1,
+            image: 'https://picsum.photos/301/300',
+          },
+          {
+            cut_number: 2,
+            image: 'https://picsum.photos/300/300',
+          },
+          {
+            cut_number: 3,
+            image: 'https://picsum.photos/300/301',
+          },
+          {
+            cut_number: 4,
+            image: 'https://picsum.photos/301/301',
+          },
+          {
+            cut_number: 5,
+            image: 'https://picsum.photos/302/301',
+          },
+        ],
+      },
       options: {
         create: [
           {
@@ -44,6 +68,32 @@ async function main() {
       confirmation: {
         create: { status: 'rejected' },
       },
+      ShippingGroup: {
+        create: {
+          baseAddress: '반송지 주소',
+          detailAddress: '반송지 주소 상세',
+          postalCode: '12345',
+          shipping_group_name: '배송그룹이름',
+          seller: {
+            connect: { id: seller.id },
+          },
+          shippingSets: {
+            create: {
+              shipping_set_name: '배송세트이름',
+              shippingOptions: {
+                create: {
+                  shippingCost: {
+                    create: {
+                      shipping_area_name: 'shipping_area_name',
+                      shipping_cost: 2500,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     include: { options: { include: { supply: true } } },
   });
@@ -54,7 +104,12 @@ async function main() {
       goods_name: 'testGoods2',
       summary: '테스트상품2',
       common_contents,
-      image,
+      image: {
+        create: {
+          cut_number: 1,
+          image: 'test2.png',
+        },
+      },
       options: {
         create: [
           {
@@ -80,7 +135,12 @@ async function main() {
       goods_name: 'testGoods3',
       summary: '테스트상품3',
       common_contents,
-      image,
+      image: {
+        create: {
+          cut_number: 1,
+          image: 'test3.png',
+        },
+      },
       options: {
         create: [
           {

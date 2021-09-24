@@ -13,6 +13,7 @@ import {
   useColorModeValue,
   UnorderedList,
   ListItem,
+  Flex,
 } from '@chakra-ui/react';
 import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
 import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
@@ -210,11 +211,13 @@ const columns: GridColumns = [
       const goodsView = row.goods_view;
       const confirmedGoodsId = row.confirmation?.firstmallGoodsConnectionId;
       return (
-        <GoodsExposeSwitch
-          goodsId={goodsId}
-          goodsView={goodsView}
-          confirmedGoodsId={confirmedGoodsId}
-        />
+        <Flex alignItems="center" justifyContent="center">
+          <GoodsExposeSwitch
+            goodsId={goodsId}
+            goodsView={goodsView}
+            confirmedGoodsId={confirmedGoodsId}
+          />
+        </Flex>
       );
     },
     sortable: false,
