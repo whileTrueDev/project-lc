@@ -111,7 +111,7 @@ export function GoodsRegistPictures(): JSX.Element {
       />
 
       {/* 선택한 이미지 프리뷰 목록 */}
-      <Stack direction="row" spacing={2}>
+      <Stack direction="row" spacing={2} flexWrap="wrap">
         {previews.length !== 0 &&
           previews.map((preview) => {
             const { id } = preview;

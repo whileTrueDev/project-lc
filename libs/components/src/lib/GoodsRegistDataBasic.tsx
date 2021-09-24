@@ -11,6 +11,7 @@ export function GoodsRegistDataBasic(): JSX.Element {
       <FormControl id="goods_name" isRequired>
         <FormLabel>상품명</FormLabel>
         <Input
+          maxLength={180}
           placeholder="상품명을 입력하세요"
           {...register('goods_name', { required: true, maxLength: 180 })}
         />
@@ -19,6 +20,7 @@ export function GoodsRegistDataBasic(): JSX.Element {
       <FormControl id="summary">
         <FormLabel>간략설명</FormLabel>
         <Input
+          maxLength={180}
           placeholder="간략한 상품 설명을 입력하세요"
           {...register('summary', { required: true, maxLength: 180 })}
         />

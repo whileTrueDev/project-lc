@@ -267,7 +267,7 @@ export function GoodsRegistForm(): JSX.Element {
         {/* 판매 옵션 */}
         <GoodsRegistDataOptions />
 
-        {/* 상품사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개,  // TODO  : 각 이미지는 10mb제한 */}
+        {/* 상품사진 - (다이얼로그)여러 이미지 등록 가능, 최대 8개 */}
         <GoodsRegistPictures />
 
         {/* 상세설명 -  (다이얼로그, 에디터 필요) 에디터로 글/이미지 동시 등록, 이미지는 최대 20mb 제한, 주로 이미지로 등록함 */}

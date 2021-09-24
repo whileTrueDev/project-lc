@@ -166,15 +166,19 @@ function ShippingGroupListItem({
   const { register } = useFormContext<GoodsFormValues>();
   return (
     <Flex key={group.id} spacing={2}>
+      {/* 라디오버튼 */}
       <Radio
+        width="10%"
         {...register('shippingGroupId', { valueAsNumber: true })}
         value={String(group.id)} // String으로 안바꾸면 라디오 선택이 안됨... 왜???
       />
-      <Spacer />
+
+      {/* 배송그룹명 */}
       <Button
         variant="link"
         color="teal.500"
         textDecoration="underline"
+        width="30%"
         onClick={() => {
           nameHandler(group.id);
         }}
@@ -183,11 +187,17 @@ function ShippingGroupListItem({
           {group.shipping_group_name}({group.id})
         </Text>
       </Button>
-      <Spacer />
-      <Text>{ShippingCalculTypeOptions[group.shipping_calcul_type].label}</Text>
-      <Spacer />
+
+      {/* 배송비 계산 기준 */}
+      <Text width="30%" textAlign="center">
+        {ShippingCalculTypeOptions[group.shipping_calcul_type].label}
+      </Text>
+
+      {/* 연결된 상품 */}
       {group._count.goods > 0 ? (
         <Button
+          textAlign="center"
+          width="30%"
           variant="link"
           color="teal.500"
           textDecoration="underline"
@@ -198,9 +208,12 @@ function ShippingGroupListItem({
           {group._count.goods}
         </Button>
       ) : (
-        <Text>{group._count.goods}</Text>
+        <Text width="30%" textAlign="center">
+          {group._count.goods}
+        </Text>
       )}
-      <Spacer />
+
+      {/* 삭제버튼 */}
       <CloseButton
         size="sm"
         onClick={() => {
@@ -271,7 +284,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
       */}
 
       <Stack spacing={2} maxWidth="lg" {...boxStyle}>
-        <Flex>
+        <Flex fontSize="sm">
           <Spacer />
           <Text>배송그룹명 ( 번호 )</Text>
           <Spacer />

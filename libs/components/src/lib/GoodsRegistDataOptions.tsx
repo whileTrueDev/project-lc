@@ -94,7 +94,7 @@ function UseOptionInput() {
     <Stack>
       <HStack>
         <Text>옵션명</Text>
-        <Input size="sm" w={200} {...register('option_title', { required: true })} />
+        <Input size="sm" w={180} {...register('option_title', { required: true })} />
         <Button size="sm" onClick={addOption} ml={2}>
           옵션값 추가
         </Button>
@@ -121,7 +121,7 @@ function UseOptionInput() {
           </HStack>
           <HStack>
             <HStack>
-              <Text minWidth="50px">정가</Text>
+              <Text minWidth="40px">정가</Text>
               <Input
                 {...register(`options.${index}.consumer_price` as const, {
                   valueAsNumber: true,
@@ -131,7 +131,7 @@ function UseOptionInput() {
               />
             </HStack>
             <HStack>
-              <Text minWidth="50px">판매가</Text>
+              <Text minWidth="40px">판매가</Text>
               <Input
                 {...register(`options.${index}.price` as const, {
                   valueAsNumber: true,
@@ -143,7 +143,7 @@ function UseOptionInput() {
           </HStack>
           <HStack>
             <HStack>
-              <Text minWidth="50px">재고</Text>
+              <Text minWidth="40px">재고</Text>
               <Input
                 {...register(`options.${index}.supply.stock` as const, {
                   valueAsNumber: true,
