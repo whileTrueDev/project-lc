@@ -39,7 +39,7 @@ export class GoodsController {
     sort: SellerGoodsSortColumn,
     @Query('direction', new DefaultValuePipe(SellerGoodsSortDirection.DESC))
     direction: SellerGoodsSortDirection,
-    @Query('groupId', ParseIntPipe) groupId?: number,
+    @Query('groupId') groupId?: number,
   ) {
     return this.goodsService.getGoodsList({
       email: seller.sub, // seller.email
@@ -47,7 +47,7 @@ export class GoodsController {
       itemPerPage,
       sort,
       direction,
-      groupId,
+      groupId: groupId ? Number(groupId) : undefined,
     });
   }
 

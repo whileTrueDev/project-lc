@@ -167,7 +167,7 @@ function ShippingGroupListItem({
   return (
     <Flex key={group.id} spacing={2}>
       <Radio
-        {...register('shippingGroupId')}
+        {...register('shippingGroupId', { valueAsNumber: true })}
         value={String(group.id)} // String으로 안바꾸면 라디오 선택이 안됨... 왜???
       />
       <Spacer />
