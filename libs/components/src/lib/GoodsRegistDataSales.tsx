@@ -55,7 +55,7 @@ export function GoodsRegistDataSales(): JSX.Element {
   return (
     <SectionWithTitle title="판매정보">
       <HStack>
-        <Text>판매상태</Text>
+        <Text mr="32px">판매상태</Text>
         <GoodsRegistRadio name="goods_status" values={GOODS_STATUS} />
       </HStack>
 

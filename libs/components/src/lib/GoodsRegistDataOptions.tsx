@@ -40,7 +40,9 @@ function NoOptionInput() {
         label="정가 (미할인가)"
         inputProps={{
           type: 'number',
-          ...register(`options.0.consumer_price` as const),
+          ...register(`options.0.consumer_price` as const, {
+            valueAsNumber: true,
+          }),
         }}
       />
       <GoodsOptionInput
@@ -81,6 +83,7 @@ function UseOptionInput() {
       consumer_price: 0,
       price: 0,
       option_view: 'Y',
+      option_type: 'direct',
       supply: {
         stock: 0,
       },
@@ -180,7 +183,7 @@ export function GoodsRegistDataOptions(): JSX.Element {
 
   return (
     <SectionWithTitle title="판매 옵션">
-      <Text>
+      <Text fontWeight="bold">
         옵션 사용 여부
         <Text as="span" color="gray.500" fontSize="sm">
           ( * 변경시 기존에 추가했던 옵션은 모두 사라집니다)

@@ -1,27 +1,26 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import {
-  Text,
-  Button,
   Box,
+  Button,
+  HStack,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalOverlay,
-  HStack,
-  useDisclosure,
   ModalHeader,
-  ModalFooter,
+  ModalOverlay,
+  Text,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import SunEditorCore from 'suneditor/src/lib/core';
-import 'suneditor/dist/css/suneditor.min.css';
-
+import { useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
-import SectionWithTitle from './SectionWithTitle'; // Import Sun Editor's CSS File
+import 'suneditor/dist/css/suneditor.min.css';
+import SunEditorCore from 'suneditor/src/lib/core';
+import { boxStyle } from '../constants/commonStyleProps';
+import { GoodsFormValues } from './GoodsRegistForm';
 import { MB } from './ImageInput';
-import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
+import SectionWithTitle from './SectionWithTitle'; // Import Sun Editor's CSS File
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,
@@ -56,8 +55,13 @@ export function GoodsRegistDescription(): JSX.Element {
       </HStack>
 
       {/* 작성한 상세설명 미리보기 */}
-      <Box ref={viewer} className="sun-editor-editable" height="300px" overflowY="auto" />
-
+      <Box
+        ref={viewer}
+        className="sun-editor-editable"
+        height="300px"
+        overflowY="auto"
+        {...boxStyle}
+      />
       {/* 상세설명 작성 에디터 모달창 */}
       <Modal isOpen={isOpen} onClose={onClose} size="6xl">
         <ModalOverlay />

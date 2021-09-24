@@ -28,7 +28,6 @@ import 'suneditor/dist/css/suneditor.min.css';
 import { useFormContext } from 'react-hook-form';
 import {
   GoodsCommonInfo,
-  useCreateGoodsCommonInfo,
   useDeleteGoodsCommonInfo,
   useGoodsCommonInfoItem,
   useGoodsCommonInfoList,
@@ -38,8 +37,9 @@ import { GoodsInfo } from '@prisma/client';
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import { MB } from './ImageInput';
 import SectionWithTitle from './SectionWithTitle';
-import { GoodsFormValues, saveContentsImageToS3 } from './GoodsRegistForm';
+import { GoodsFormValues } from './GoodsRegistForm';
 import { ConfirmDialog } from './ConfirmDialog';
+import { boxStyle } from '../constants/commonStyleProps';
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,
@@ -150,7 +150,6 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   };
 
   const toast = useToast();
-  const { data: profileData } = useProfile();
 
   const setViewerContents = (contents: string) => {
     if (viewer.current) {
@@ -181,7 +180,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
       <RadioGroup
         onChange={(value) => {
           if (value === 'new') {
-            setViewerContents(getValues('common_contents'));
+            setViewerContents(getValues('common_contents') || '');
             setValue('goodsInfoId', undefined);
           }
         }}
@@ -202,7 +201,13 @@ export function GoodsRegistCommonInfo(): JSX.Element {
         <GoodsCommonInfoList onCommonInfoChange={onCommonInfoChange} />
       )}
 
-      <Box ref={viewer} className="sun-editor-editable" height="300px" overflowY="auto" />
+      <Box
+        ref={viewer}
+        className="sun-editor-editable"
+        height="300px"
+        overflowY="auto"
+        {...boxStyle}
+      />
 
       <Modal isOpen={isOpen} onClose={onClose} size="6xl">
         <ModalOverlay />

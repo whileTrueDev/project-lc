@@ -20,10 +20,7 @@ export function GoodsRegistDataBasic(): JSX.Element {
         <FormLabel>간략설명</FormLabel>
         <Input
           placeholder="간략한 상품 설명을 입력하세요"
-          {...(register('summary'),
-          {
-            maxLength: 180,
-          })}
+          {...register('summary', { required: true, maxLength: 180 })}
         />
       </FormControl>
     </SectionWithTitle>
