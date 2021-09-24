@@ -7,6 +7,7 @@ import {
   useProfile,
   useRegistGoods,
 } from '@project-lc/hooks';
+import path from 'path';
 import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { FormProvider, NestedValue, useForm } from 'react-hook-form';
@@ -45,19 +46,8 @@ export async function uploadGoodsImageToS3(
   const { file, filename } = imageFile;
 
   const type = 'goods';
-
-  const savedImageName = await s3.s3UploadImage({
-    filename,
-    userMail,
-    type,
-    file,
-  });
-
-  if (!savedImageName) {
-    throw new Error('S3 ERROR');
-  }
-
-  const { key } = s3.getS3Key({ userMail, type, filename });
+  const key = path.join(...[type, userMail, filename]);
+  await s3.s3uploadFile({ key, file });
   const url = [
     'https://',
     process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
@@ -69,7 +59,6 @@ export async function uploadGoodsImageToS3(
 
   return url;
 }
-
 // 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
 async function imageFileListToImageDto(
   imageFileList: { file: File; filename: string; id: number }[],

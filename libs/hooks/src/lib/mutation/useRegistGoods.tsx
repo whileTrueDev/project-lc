@@ -11,7 +11,7 @@ export const useRegistGoods = () => {
     (dto: useRegistGoodsDto) => axios.post<useRegistGoodsRes>('/goods', dto),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('GoodsCommonInfoList', { refetchInactive: true });
+        queryClient.invalidateQueries('SellerGoodsList', { refetchInactive: true });
       },
     },
   );

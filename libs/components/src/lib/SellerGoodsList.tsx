@@ -52,7 +52,13 @@ function ShippingGroupDetailButton(props: { id: number; name: string }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
-      <Button data-shipping-group-id={id} onClick={onOpen}>
+      <Button
+        data-shipping-group-id={id}
+        onClick={onOpen}
+        variant="link"
+        fontSize="sm"
+        colorScheme="black"
+      >
         {name}
       </Button>
       <ShippingGroupDetailModal

@@ -62,6 +62,20 @@ export const s3 = (() => {
     };
   }
 
+  async function s3uploadFile({
+    key,
+    file,
+  }: Pick<S3UploadImageOptions, 'file'> & { key: string }) {
+    if (!file) throw new Error('file should be not null');
+    return new AWS.S3.ManagedUpload({
+      params: {
+        Bucket: S3_BUCKET_NAME,
+        Key: key,
+        Body: file,
+      },
+    }).promise();
+  }
+
   async function s3UploadImage({
     filename,
     userMail,
@@ -108,5 +122,6 @@ export const s3 = (() => {
     s3UploadImage,
     getS3Key,
     s3DownloadImageUrl,
+    s3uploadFile,
   };
 })();
