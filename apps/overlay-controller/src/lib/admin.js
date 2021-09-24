@@ -9,7 +9,7 @@ let isLogin = true;
 const socket = io(process.env.HOST, { transports: ['websocket'] });
 
 socket.on('creator list from server', (data) => {
-  if (data) {
+  if (data && data.length !== 0) {
     $('#connection-status').text('✔️ 정상');
     $('.mid-area button').attr('disabled', false);
   } else {
@@ -103,10 +103,8 @@ $(document).ready(function ready() {
   $('input[name=client-checkbox]').change(function clientCheckboxOnChange() {
     if ($('input[name=client-checkbox]').is(':checked')) {
       $('#customer-nickname').val(`${creatorNickname}팬`);
-      isLogin = false;
     } else {
       $('#customer-nickname').val('');
-      isLogin = true;
     }
   });
 
@@ -127,6 +125,8 @@ $(document).ready(function ready() {
     let customerMessage = $('#customer-message').val().trim();
     const phoneCallEventFlag = $('input[name="event"]:checked').val() === 'yes';
     const giftFlag = $('input[name="gift"]:checked').val() === 'yes';
+
+    isLogin = !$('input[name=client-checkbox]').is(':checked');
 
     if (giftFlag) {
       customerMessage = `[스트리머에게 선물!] ${customerMessage}`;
