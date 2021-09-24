@@ -35,6 +35,54 @@
                 {
                     "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/LC_DEV_DB_URL",
                     "name": "DATABASE_URL"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_FIRSTMALL_DATABASE_URL",
+                    "name": "FIRSTMALL_DATABASE_URL"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_GOOGLE_CLIENT_ID",
+                    "name": "GOOGLE_CLIENT_ID"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_GOOGLE_CLIENT_SECRET",
+                    "name": "GOOGLE_CLIENT_SECRET"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_NAVER_CLIENT_ID",
+                    "name": "NAVER_CLIENT_ID"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_NAVER_CLIENT_SECRET",
+                    "name": "NAVER_CLIENT_SECRET"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_KAKAO_CLIENT_ID",
+                    "name": "KAKAO_CLIENT_ID"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_MAILER_USER",
+                    "name": "MAILER_USER"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_MAILER_PASS",
+                    "name": "MAILER_PASS"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_JWT_SECRET",
+                    "name": "JWT_SECRET"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_CIPHER_HASH",
+                    "name": "CIPHER_HASH"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_CIPHER_PASSWORD",
+                    "name": "CIPHER_PASSWORD"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_CIPHER_SALT",
+                    "name": "CIPHER_SALT"
                 }
             ],
             "dockerSecurityOptions": null,
