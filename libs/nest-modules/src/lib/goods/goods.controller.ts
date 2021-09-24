@@ -40,7 +40,7 @@ export class GoodsController {
     sort: SellerGoodsSortColumn,
     @Query('direction', new DefaultValuePipe(SellerGoodsSortDirection.DESC))
     direction: SellerGoodsSortDirection,
-    @Query('groupId', ParseIntPipe) groupId?: number,
+    @Query('groupId') groupId?: number,
   ) {
     return this.goodsService.getGoodsList({
       email: seller.sub, // seller.email
@@ -56,14 +56,6 @@ export class GoodsController {
   @Get('/stock')
   getStockInfo(@Query('id', ParseIntPipe) id: number) {
     return this.goodsService.getStockInfo(id);
-  }
-
-  @Get(':goodsId')
-  getOneGoods(
-    @SellerInfo() seller: UserPayload,
-    @Param('goodsId') goodsId: string | number,
-  ) {
-    return this.goodsService.getOneGoods(goodsId, seller.sub);
   }
 
   /** 특정 상품 노출 여부 변경 */
@@ -122,5 +114,14 @@ export class GoodsController {
   ) {
     const email = seller.sub;
     return this.goodsService.registGoods(email, dto);
+  }
+
+  /** 상품 개별 조회 */
+  @Get(':goodsId')
+  getOneGoods(
+    @SellerInfo() seller: UserPayload,
+    @Param('goodsId') goodsId: string | number,
+  ) {
+    return this.goodsService.getOneGoods(goodsId, seller.sub);
   }
 }

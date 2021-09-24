@@ -250,7 +250,17 @@ export class GoodsService {
       },
       include: {
         options: { include: { supply: true } },
-        ShippingGroup: true,
+        ShippingGroup: {
+          include: {
+            shippingSets: {
+              include: {
+                shippingOptions: {
+                  include: { shippingCost: true },
+                },
+              },
+            },
+          },
+        },
         confirmation: true,
         image: true,
         GoodsInfo: true,
