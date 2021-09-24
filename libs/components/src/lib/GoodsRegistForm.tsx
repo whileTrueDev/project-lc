@@ -163,7 +163,6 @@ export function GoodsRegistForm(): JSX.Element {
   const { handleSubmit } = methods;
 
   const regist = async (data: GoodsFormSubmitDataType) => {
-    console.log('regist start');
     if (!profileData) return;
     const userMail = profileData.email;
 
@@ -180,7 +179,6 @@ export function GoodsRegistForm(): JSX.Element {
       contents,
       ...goodsData
     } = data;
-    console.log({ data });
 
     let goodsDto: RegistGoodsDto = {
       ...goodsData,

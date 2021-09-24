@@ -250,16 +250,12 @@ const columns: GridColumns = [
     field: 'manage',
     headerName: '관리',
     minWidth: 120,
-    // TODO: 상품등록 일감 진행 후 복사, 수정기능 추가
     renderCell: ({ row }) => {
       const goodsId = row.id;
       return (
         <ButtonGroup>
           <Button size="sm" onClick={() => console.log({ goodsId })}>
             수정
-          </Button>
-          <Button size="sm" onClick={() => console.log({ goodsId })}>
-            복사
           </Button>
         </ButtonGroup>
       );
