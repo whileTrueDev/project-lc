@@ -125,7 +125,9 @@ export function ShippingOptionRepeatApply({
 
       // 이미 추가된 지역인지, 인덱스로 확인
       const sameAreaOptIdx = shippingOptions.findIndex(
-        (opt) => opt.shippingCost.shipping_area_name === areaName,
+        (opt) =>
+          opt.shippingCost.shipping_area_name === areaName &&
+          opt.shipping_set_type === shippingSetType,
       );
 
       if (sameAreaOptIdx === -1) {
