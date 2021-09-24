@@ -122,6 +122,19 @@ describe('GoodsService', () => {
     });
   });
 
+  describe('getOneGoods', () => {
+    it('should return goods', async () => {
+      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_EMAIL);
+      expect(goods).toBeDefined();
+      expect(goods.confirmation).toBeDefined();
+      expect(goods.confirmation.goodsId).toBe(TEST_GOODS.id);
+      expect(goods.GoodsInfo).toBe(null);
+      expect(goods.ShippingGroup).toBe(null);
+      expect(goods.image).toBeInstanceOf(Array);
+      expect(goods.image[0].goodsId).toBe(TEST_GOODS.id);
+    });
+  });
+
   describe('deleteLcGoods', () => {
     it('goods should be deleted', async () => {
       await service.deleteLcGoods({ email: TEST_USER_EMAIL, ids: [TEST_GOODS.id] });
