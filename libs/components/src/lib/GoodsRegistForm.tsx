@@ -1,6 +1,15 @@
 /* eslint-disable camelcase */
 /* eslint-disable react/jsx-props-no-spreading */
-import { Button, Center, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
+import {
+  Button,
+  Center,
+  Spinner,
+  Stack,
+  Text,
+  theme,
+  useColorModeValue,
+  useToast,
+} from '@chakra-ui/react';
 import {
   s3,
   useCreateGoodsCommonInfo,
@@ -11,6 +20,7 @@ import path from 'path';
 import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { FormProvider, NestedValue, useForm } from 'react-hook-form';
+import { ChevronLeftIcon } from '@chakra-ui/icons';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
 import GoodsRegistDataOptions from './GoodsRegistDataOptions';
@@ -232,14 +242,23 @@ export function GoodsRegistForm(): JSX.Element {
     <FormProvider {...methods}>
       <Stack p={2} spacing={5} as="form" onSubmit={handleSubmit(regist)}>
         <Stack
+          py={4}
+          mx={-2}
           direction="row"
           position="sticky"
+          bgColor={useColorModeValue('white', 'gray.800')}
           top="0px"
           left="0px"
           right="0px"
           justifyContent="space-between"
+          zIndex={theme.zIndices.sticky}
         >
-          <Button onClick={() => router.push('/mypage/goods')}>목록으로 돌아가기</Button>
+          <Button
+            leftIcon={<ChevronLeftIcon />}
+            onClick={() => router.push('/mypage/goods')}
+          >
+            상품목록 돌아가기
+          </Button>
           <Button type="submit" colorScheme="blue" isLoading={isLoading}>
             등록
           </Button>

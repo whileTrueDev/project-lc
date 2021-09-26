@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { EditIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -9,6 +10,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Stack,
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
@@ -49,19 +51,23 @@ export function GoodsRegistDescription(): JSX.Element {
 
   return (
     <SectionWithTitle title="상세설명">
-      <HStack>
-        <Text>상품설명</Text>
-        <Button onClick={onOpen}>설명 쓰기</Button>
-      </HStack>
+      <Stack>
+        <Box>
+          <Button rightIcon={<EditIcon />} onClick={onOpen}>
+            설명 쓰기
+          </Button>
+        </Box>
 
-      {/* 작성한 상세설명 미리보기 */}
-      <Box
-        ref={viewer}
-        className="sun-editor-editable"
-        height="300px"
-        overflowY="auto"
-        {...boxStyle}
-      />
+        {/* 작성한 상세설명 미리보기 */}
+        <Box
+          ref={viewer}
+          className="sun-editor-editable"
+          minH="100px"
+          maxHeight="300px"
+          overflowY="auto"
+          {...boxStyle}
+        />
+      </Stack>
       {/* 상세설명 작성 에디터 모달창 */}
       <Modal isOpen={isOpen} onClose={onClose} size="6xl">
         <ModalOverlay />

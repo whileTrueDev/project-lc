@@ -54,20 +54,24 @@ export function GoodsRegistRadio({
 export function GoodsRegistDataSales(): JSX.Element {
   return (
     <SectionWithTitle title="판매정보">
-      <Stack direction={{ base: 'column', sm: 'row' }} mb={2}>
-        <Text mr="32px">판매상태</Text>
-        <GoodsRegistRadio name="goods_status" values={GOODS_STATUS} />
-      </Stack>
+      <Stack>
+        <Stack spacing={{ base: 2, sm: 6 }} direction={{ base: 'column', sm: 'row' }}>
+          <Text mr="24px">판매상태</Text>
+          <GoodsRegistRadio name="goods_status" values={GOODS_STATUS} />
+        </Stack>
 
-      <Stack direction={{ base: 'column', sm: 'row' }}>
-        <TextWithPopperButton
-          title="청약철회"
-          iconAriaLabel="청약철회 설명"
-          icon={<QuestionIcon />}
-        >
-          <Text>청약철회 불가 선택 시 결제 확인 이후, 취소, 반품, 교환이 불가합니다</Text>
-        </TextWithPopperButton>
-        <GoodsRegistRadio name="cancel_type" values={GOODS_CANCEL_TYPE} />
+        <Stack spacing={{ base: 2, sm: 6 }} direction={{ base: 'column', sm: 'row' }}>
+          <TextWithPopperButton
+            title="청약철회"
+            iconAriaLabel="청약철회 설명"
+            icon={<QuestionIcon />}
+          >
+            <Text>
+              청약철회 불가 선택 시 결제 확인 이후, 취소, 반품, 교환이 불가합니다
+            </Text>
+          </TextWithPopperButton>
+          <GoodsRegistRadio name="cancel_type" values={GOODS_CANCEL_TYPE} />
+        </Stack>
       </Stack>
     </SectionWithTitle>
   );

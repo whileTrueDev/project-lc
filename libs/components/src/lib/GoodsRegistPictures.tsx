@@ -1,5 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { HStack, CloseButton, Text, Stack, useToast, ImageProps } from '@chakra-ui/react';
+import {
+  HStack,
+  CloseButton,
+  Text,
+  Stack,
+  useToast,
+  ImageProps,
+  Box,
+} from '@chakra-ui/react';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ChakraNextImage } from './ChakraNextImage';
@@ -103,27 +111,29 @@ export function GoodsRegistPictures(): JSX.Element {
 
   return (
     <SectionWithTitle title="상품사진">
-      {/* //TODO: ImageInput multiselect & 사이즈 제한 변경 */}
-      <ImageInput
-        required={false}
-        handleSuccess={handleSuccess}
-        handleError={handleError}
-      />
+      <Stack spacing={4}>
+        {/* //TODO: ImageInput multiselect & 사이즈 제한 변경 */}
+        <ImageInput
+          required={false}
+          handleSuccess={handleSuccess}
+          handleError={handleError}
+        />
 
-      {/* 선택한 이미지 프리뷰 목록 */}
-      <Stack direction="row" spacing={2} flexWrap="wrap">
-        {previews.length !== 0 &&
-          previews.map((preview) => {
-            const { id } = preview;
-            return (
-              <GoodsPreviewItem
-                key={id}
-                {...preview}
-                {...PREVIEW_SIZE}
-                onDelete={() => deletePreview(id)}
-              />
-            );
-          })}
+        {/* 선택한 이미지 프리뷰 목록 */}
+        <Stack direction="row" spacing={2} flexWrap="wrap">
+          {previews.length !== 0 &&
+            previews.map((preview) => {
+              const { id } = preview;
+              return (
+                <GoodsPreviewItem
+                  key={id}
+                  {...preview}
+                  {...PREVIEW_SIZE}
+                  onDelete={() => deletePreview(id)}
+                />
+              );
+            })}
+        </Stack>
       </Stack>
     </SectionWithTitle>
   );

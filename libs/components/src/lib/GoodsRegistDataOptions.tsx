@@ -1,7 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import {
+  Box,
   Button,
   CloseButton,
+  FormControl,
   HStack,
   Input,
   InputProps,
@@ -75,7 +77,7 @@ function UseOptionInput() {
   });
   const { isMobileSize } = useDisplaySize();
 
-  const inputWidth = isMobileSize ? '100px' : 'auto';
+  const inputWidth = isMobileSize ? '74px' : 'auto';
 
   const addOption = () => {
     append({
@@ -183,33 +185,32 @@ export function GoodsRegistDataOptions(): JSX.Element {
 
   return (
     <SectionWithTitle title="판매 옵션">
-      <Text fontWeight="bold">
-        옵션 사용 여부
-        <Text as="span" color="gray.500" fontSize="sm">
-          ( * 변경시 기존에 추가했던 옵션은 모두 사라집니다)
-        </Text>
-      </Text>
+      <Text fontWeight="bold">옵션 사용 여부</Text>
       {/* onChange 시 옵션초기화 */}
-      <GoodsRegistRadio
-        mb={4}
-        name="option_use"
-        values={OPTION_USE}
-        onChange={() => {
-          setValue('option_title', '');
-          setValue('options', [
-            {
-              option_type: 'direct',
-              option1: '',
-              consumer_price: 0,
-              price: 0,
-              option_view: 'Y',
-              supply: {
-                stock: 0,
+      <Box mb={4}>
+        <GoodsRegistRadio
+          name="option_use"
+          values={OPTION_USE}
+          onChange={() => {
+            setValue('option_title', '');
+            setValue('options', [
+              {
+                option_type: 'direct',
+                option1: '',
+                consumer_price: 0,
+                price: 0,
+                option_view: 'Y',
+                supply: {
+                  stock: 0,
+                },
               },
-            },
-          ]);
-        }}
-      />
+            ]);
+          }}
+        />
+        <Text fontWeight="normal" as="span" color="gray.500" fontSize="sm">
+          (사용 여부 변경시 기존에 추가했던 옵션은 모두 사라집니다.)
+        </Text>
+      </Box>
 
       {/* 옵션 사용하지 않는 경우 */}
       {watch('option_use') === '0' && <NoOptionInput />}

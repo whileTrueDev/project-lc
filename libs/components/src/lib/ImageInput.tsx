@@ -1,5 +1,3 @@
-import { BusinessRegistrationFormProps } from './BusinessRegistrationForm';
-
 export const MB = 1024 * 1024; // 1Mbytes
 const IMAGE_SIZE_LIMIT = 5 * MB;
 
@@ -41,7 +39,7 @@ export function ImageInput(props: ImageInputProps): JSX.Element {
 
   return (
     <input
-      style={{ margin: '15px' }}
+      style={{ maxWidth: 300 }}
       accept="image/*"
       type="file"
       required={required}

@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable camelcase */
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -21,11 +22,7 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useRef, useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import SunEditorCore from 'suneditor/src/lib/core';
-import 'suneditor/dist/css/suneditor.min.css';
-import { useFormContext } from 'react-hook-form';
+import { GoodsInfo } from '@prisma/client';
 import {
   GoodsCommonInfo,
   useDeleteGoodsCommonInfo,
@@ -33,13 +30,16 @@ import {
   useGoodsCommonInfoList,
   useProfile,
 } from '@project-lc/hooks';
-import { GoodsInfo } from '@prisma/client';
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import dynamic from 'next/dynamic';
+import { useEffect, useRef, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import 'suneditor/dist/css/suneditor.min.css';
+import SunEditorCore from 'suneditor/src/lib/core';
+import { boxStyle } from '../constants/commonStyleProps';
+import { ConfirmDialog } from './ConfirmDialog';
+import { GoodsFormValues } from './GoodsRegistForm';
 import { MB } from './ImageInput';
 import SectionWithTitle from './SectionWithTitle';
-import { GoodsFormValues } from './GoodsRegistForm';
-import { ConfirmDialog } from './ConfirmDialog';
-import { boxStyle } from '../constants/commonStyleProps';
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,
@@ -177,37 +177,49 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   };
   return (
     <SectionWithTitle title="상품 공통 정보">
-      <RadioGroup
-        onChange={(value) => {
-          if (value === 'new') {
-            setViewerContents(getValues('common_contents') || '');
-            setValue('goodsInfoId', undefined);
-          }
-        }}
-        value={watch('common_contents_type', 'new')}
-      >
-        <Stack direction="row">
-          <Radio {...register('common_contents_type')} value="new">
-            신규 등록
-          </Radio>
-          <Radio {...register('common_contents_type')} value="load">
-            기존 정보 불러오기
-          </Radio>
-        </Stack>
-      </RadioGroup>
-      {watch('common_contents_type') === 'new' ? (
-        <IconButton aria-label="Search database" icon={<EditIcon />} onClick={onOpen} />
-      ) : (
-        <GoodsCommonInfoList onCommonInfoChange={onCommonInfoChange} />
-      )}
+      <Stack>
+        <RadioGroup
+          onChange={(value) => {
+            if (value === 'new') {
+              setViewerContents(getValues('common_contents') || '');
+              setValue('goodsInfoId', undefined);
+            }
+          }}
+          value={watch('common_contents_type', 'new')}
+        >
+          <Stack direction="row">
+            <Radio {...register('common_contents_type')} value="new">
+              신규 등록
+            </Radio>
+            <Radio {...register('common_contents_type')} value="load">
+              기존 정보 불러오기
+            </Radio>
+          </Stack>
+        </RadioGroup>
 
-      <Box
-        ref={viewer}
-        className="sun-editor-editable"
-        height="300px"
-        overflowY="auto"
-        {...boxStyle}
-      />
+        <Box>
+          {watch('common_contents_type') === 'new' ? (
+            <Button
+              aria-label="Search database"
+              rightIcon={<EditIcon />}
+              onClick={onOpen}
+            >
+              공통정보쓰기
+            </Button>
+          ) : (
+            <GoodsCommonInfoList onCommonInfoChange={onCommonInfoChange} />
+          )}
+        </Box>
+
+        <Box
+          ref={viewer}
+          className="sun-editor-editable"
+          minH="100px"
+          maxHeight="300px"
+          overflowY="auto"
+          {...boxStyle}
+        />
+      </Stack>
 
       <Modal isOpen={isOpen} onClose={onClose} size="6xl">
         <ModalOverlay />
