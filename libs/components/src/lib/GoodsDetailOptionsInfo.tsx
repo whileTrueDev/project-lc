@@ -12,7 +12,7 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import { GoodsByIdRes } from '@project-lc/shared-types';
-import { useDisplaySize } from '../../../hooks/src';
+import { useDisplaySize } from '@project-lc/hooks';
 
 export interface GoodsDetailOptionsInfoProps {
   goods: GoodsByIdRes;
