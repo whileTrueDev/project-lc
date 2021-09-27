@@ -4,6 +4,8 @@ import {
   Button,
   CloseButton,
   FormControl,
+  FormErrorMessage,
+  FormLabel,
   HStack,
   Input,
   InputProps,
@@ -15,6 +17,7 @@ import {
 import { useDisplaySize } from '@project-lc/hooks';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { boxStyle } from '../constants/commonStyleProps';
+import { RequiredMark } from './GoodsRegistDataBasic';
 import { GoodsRegistRadio } from './GoodsRegistDataSales';
 import { GoodsFormValues } from './GoodsRegistForm';
 import SectionWithTitle from './SectionWithTitle';
@@ -70,7 +73,12 @@ function NoOptionInput() {
 }
 
 function UseOptionInput() {
-  const { watch, control, register } = useFormContext<GoodsFormValues>();
+  const {
+    watch,
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<GoodsFormValues>();
   const { fields, append, remove } = useFieldArray<GoodsFormValues, 'options'>({
     control,
     name: 'options' as const,
@@ -95,9 +103,24 @@ function UseOptionInput() {
   return (
     <Stack>
       <HStack>
-        <Text>옵션명</Text>
-        <Input size="sm" w={180} {...register('option_title', { required: true })} />
-        <Button size="sm" onClick={addOption} ml={2}>
+        <FormControl id="option_title" isInvalid={!!errors.option_title}>
+          <HStack>
+            <FormLabel>
+              옵션명 <RequiredMark />
+            </FormLabel>
+
+            <Input
+              {...register('option_title', { required: '옵션명을 입력해주세요.' })}
+              size="sm"
+              w={150}
+              placeholder="옵션명을 입력해주세요"
+            />
+          </HStack>
+          {errors.option_title && (
+            <FormErrorMessage>{errors.option_title.message}</FormErrorMessage>
+          )}
+        </FormControl>
+        <Button onClick={addOption} ml={2}>
           옵션값 추가
         </Button>
       </HStack>
@@ -112,10 +135,12 @@ function UseOptionInput() {
           <HStack>
             <CloseButton onClick={() => remove(index)} />
             <HStack>
-              <Text minWidth="60px">옵션값</Text>
+              <Text minWidth="60px">
+                옵션값 <RequiredMark />
+              </Text>
               <Input
                 {...register(`options.${index}.option1` as const, {
-                  required: true,
+                  required: '옵션값을 입력해주세요',
                 })}
                 size="sm"
               />

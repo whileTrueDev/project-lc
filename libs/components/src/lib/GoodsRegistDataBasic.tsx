@@ -1,8 +1,19 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from '@chakra-ui/react';
+import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
 import { RegistGoodsDto } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
 import SectionWithTitle from './SectionWithTitle';
+
+export function RequiredMark() {
+  return <Text as="span">*</Text>;
+}
 
 export function GoodsRegistDataBasic(): JSX.Element {
   const {
@@ -13,7 +24,9 @@ export function GoodsRegistDataBasic(): JSX.Element {
     <SectionWithTitle title="기본정보">
       <Stack>
         <FormControl id="goods_name" isInvalid={!!errors.goods_name}>
-          <FormLabel>상품명</FormLabel>
+          <FormLabel>
+            상품명 <RequiredMark />
+          </FormLabel>
           <Input
             maxLength={180}
             placeholder="상품명을 입력하세요"
@@ -31,7 +44,9 @@ export function GoodsRegistDataBasic(): JSX.Element {
         </FormControl>
 
         <FormControl id="summary" isInvalid={!!errors.summary}>
-          <FormLabel>간략설명</FormLabel>
+          <FormLabel>
+            간략설명 <RequiredMark />
+          </FormLabel>
           <Input
             maxLength={180}
             placeholder="간략한 상품 설명을 입력하세요"

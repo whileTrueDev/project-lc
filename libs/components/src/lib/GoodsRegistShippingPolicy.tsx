@@ -292,7 +292,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
   };
 
   return (
-    <SectionWithTitle title="배송비">
+    <SectionWithTitle title="배송비 *">
       <HStack mb={4}>
         <Text>배송비 정책을 {data && data.length === 0 ? '생성' : '선택'}해주세요</Text>
         <Button onClick={onRegistModalOpen}>생성하기</Button>

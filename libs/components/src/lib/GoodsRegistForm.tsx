@@ -192,13 +192,18 @@ export function GoodsRegistForm(): JSX.Element {
     };
 
     // 상세설명을 입력한 경우
-    if (contents) {
+    if (contents && contents !== '<p><br></p>') {
       const contentsBody = await saveContentsImageToS3(contents, userMail);
       goodsDto = {
         ...goodsDto,
         contents: contentsBody,
         contents_mobile: contentsBody,
       };
+    } else {
+      // 상세설명을 입력하지 않은 경우 - 상품 수정 기능이 없는 동안 필수값으로 설정함
+      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기
+      toast({ title: '상세설명을 입력해주세요', status: 'warning' });
+      return;
     }
 
     // 공통정보 신규생성 & 공통정보를 입력한 경우
@@ -219,9 +224,26 @@ export function GoodsRegistForm(): JSX.Element {
         goodsInfoId: res.data.id,
         common_contents: commonInfoBody,
       };
+    } else if (!data.goodsInfoId) {
+      // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함) - 상품 수정 기능이 없는 동안 필수값으로 설정함
+      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기
+      toast({
+        title: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
+        status: 'warning',
+      });
+      return;
     }
 
-    // TODO: goods 필수컬럼(options의 옵션값 등등) 다시 확인후 테이블, dto 수정
+    if (!shippingGroupId) {
+      // 배송비정책 그룹을 선택하지 않은 경우
+      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기(if문 삭제)
+      toast({
+        title: '배송비 정책을 선택해주세요',
+        status: 'warning',
+      });
+      return;
+    }
+
     mutateAsync(goodsDto)
       .then((res) => {
         toast({

@@ -176,7 +176,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
     setValue('goodsInfoId', id);
   };
   return (
-    <SectionWithTitle title="상품 공통 정보">
+    <SectionWithTitle title="상품 공통 정보 *">
       <Stack>
         <RadioGroup
           onChange={(value) => {

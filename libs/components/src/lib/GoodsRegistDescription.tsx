@@ -50,7 +50,7 @@ export function GoodsRegistDescription(): JSX.Element {
   };
 
   return (
-    <SectionWithTitle title="상세설명">
+    <SectionWithTitle title="상세설명 *">
       <Stack>
         <Box>
           <Button rightIcon={<EditIcon />} onClick={onOpen}>
