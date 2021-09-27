@@ -35,6 +35,7 @@ div.message-box-fixed-area {
 }
 
 div.video-controller {
+  width: 45%;
   display: flex;
   flex-direction: column;
   border-radius: 4px;
@@ -69,6 +70,10 @@ div.bottom-message-box {
 
 div.console-box {
   width: 40%;
+}
+
+div.etc-controller {
+  width: 45%;
 }
 
 input[type='text'] {

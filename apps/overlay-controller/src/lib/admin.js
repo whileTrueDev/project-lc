@@ -79,9 +79,12 @@ $(document).ready(function ready() {
     socket.emit('refresh', roomName);
   });
 
+  $('#alive-check-button').click(function refreshButtonClickEvent() {
+    socket.emit('connection check from admin', roomName);
+  });
+
   $('#start-time-send-button').click(function endTimeSendButtonClickEvent() {
     const selectedTime = $('#start-time-picker').val();
-    console.log(selectedTime);
     socket.emit('get start time from admin', { roomName, date: selectedTime });
   });
 
