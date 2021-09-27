@@ -1,3 +1,7 @@
+import { Button, ButtonProps, InputGroup } from '@chakra-ui/react';
+import { useRef } from 'react';
+import { FiFile } from 'react-icons/fi';
+
 export const MB = 1024 * 1024; // 1Mbytes
 const IMAGE_SIZE_LIMIT = 5 * MB;
 
@@ -7,11 +11,18 @@ type ImageInputProps = {
   handleSuccess: (fileName: string, file: File) => void;
   handleError: (errorType?: ImageInputErrorTypes) => void;
   required?: boolean;
+  variant?: 'unstype' | 'chakra';
+  size?: ButtonProps['size'];
 };
 
-export function ImageInput(props: ImageInputProps): JSX.Element {
-  const { handleSuccess, handleError, required = true } = props;
-
+export function ImageInput({
+  handleSuccess,
+  handleError,
+  required = true,
+  variant = 'unstype',
+  size,
+}: ImageInputProps): JSX.Element {
+  const inputRef = useRef<HTMLInputElement>(null);
   const readImage = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const target = event.target as HTMLInputElement;
     const files = target.files as FileList;
@@ -36,6 +47,28 @@ export function ImageInput(props: ImageInputProps): JSX.Element {
       handleError();
     }
   };
+
+  if (variant === 'chakra') {
+    return (
+      <InputGroup>
+        <input
+          ref={inputRef}
+          type="file"
+          name="project-lc-image-upload"
+          accept="image/*"
+          onChange={(e) => readImage(e)}
+          style={{ display: 'none' }}
+        />
+        <Button
+          size={size}
+          rightIcon={<FiFile />}
+          onClick={() => inputRef.current?.click()}
+        >
+          파일 업로드
+        </Button>
+      </InputGroup>
+    );
+  }
 
   return (
     <input
