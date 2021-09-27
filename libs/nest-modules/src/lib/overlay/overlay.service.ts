@@ -91,11 +91,12 @@ export class OverlayService {
     return false;
   }
 
-  async getRanking(): Promise<NicknameAndPrice[]> {
+  async getRanking(broadcasterId): Promise<NicknameAndPrice[]> {
     const topRanks = await this.prisma.liveCommerceRanking.groupBy({
       by: ['nickname'],
       where: {
         loginFlag: true,
+        broadcasterId,
       },
       _sum: {
         price: true,
@@ -115,7 +116,7 @@ export class OverlayService {
     return totalSoldPrice;
   }
 
-  async getMessageAndNickname(): Promise<NicknameAndText[]> {
+  async getMessageAndNickname(broadcasterId: string): Promise<NicknameAndText[]> {
     const messageAndNickname = await this.prisma.liveCommerceRanking.findMany({
       select: {
         nickname: true,
@@ -123,6 +124,7 @@ export class OverlayService {
       },
       where: {
         loginFlag: true,
+        broadcasterId,
       },
     });
     if (!messageAndNickname) throwError('Cannot Get Data From Db');

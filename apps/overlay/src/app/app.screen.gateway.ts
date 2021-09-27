@@ -50,7 +50,7 @@ export class AppScreenGateway
   @SubscribeMessage('get ranking')
   async getRanking(@MessageBody() roomName: string) {
     const nicknameAndPrice = [];
-    const rankings = await this.appService.getRanking();
+    const rankings = await this.appService.getRanking(roomName);
     rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();
       const { nickname } = eachNickname;
@@ -67,9 +67,9 @@ export class AppScreenGateway
   async getAllPurchaseMessage(@MessageBody() roomName: string) {
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
-    const rankings = await this.appService.getRanking();
-    const totalSold = await this.appService.getTotalSoldPrice();
-    const messageAndNickname = await this.appService.getMessageAndNickname();
+    const rankings = await this.appService.getRanking(roomName);
+    // const totalSold = await this.appService.getTotalSoldPrice();
+    const messageAndNickname = await this.appService.getMessageAndNickname(roomName);
 
     rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();
@@ -85,7 +85,7 @@ export class AppScreenGateway
     });
 
     this.server.to(roomName).emit('get top-left ranking', nicknameAndPrice);
-    this.server.to(roomName).emit('get current quantity', totalSold);
+    // this.server.to(roomName).emit('get current quantity', totalSold);
     this.server
       .to(roomName)
       .emit('get bottom purchase message', bottomAreaTextAndNickname);

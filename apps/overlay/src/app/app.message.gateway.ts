@@ -52,9 +52,9 @@ export class AppMessageGateway
     const { roomName } = purchase;
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
-    const rankings = await this.overlayService.getRanking();
-    const totalSold = await this.overlayService.getTotalSoldPrice();
-    const messageAndNickname = await this.overlayService.getMessageAndNickname();
+    const rankings = await this.overlayService.getRanking(roomName);
+    // const totalSold = await this.overlayService.getTotalSoldPrice();
+    const messageAndNickname = await this.overlayService.getMessageAndNickname(roomName);
 
     rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();
@@ -75,7 +75,7 @@ export class AppMessageGateway
       .to(roomName)
       .emit('get right-top purchase message', [purchase, audioBuffer]);
     this.server.to(roomName).emit('get top-left ranking', nicknameAndPrice);
-    this.server.to(roomName).emit('get current quantity', totalSold);
+    // this.server.to(roomName).emit('get current quantity', totalSold);
     this.server
       .to(roomName)
       .emit('get bottom purchase message', bottomAreaTextAndNickname);
