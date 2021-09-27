@@ -35,6 +35,7 @@ div.message-box-fixed-area {
 }
 
 div.video-controller {
+  width: 45%;
   display: flex;
   flex-direction: column;
   border-radius: 4px;
@@ -71,6 +72,10 @@ div.console-box {
   width: 40%;
 }
 
+div.etc-controller {
+  width: 45%;
+}
+
 input[type='text'] {
   width: 200px;
   padding: 12px 20px;
@@ -93,6 +98,10 @@ input[type='number'] {
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+}
+
+input[type='datetime-local'] {
+  height: 40px;
 }
 
 button {

@@ -117,15 +117,18 @@
                     </button>
                 </div>
                 <div class="vertical-divider"></div>
-                <div class="audio-controller">
+                <div class="etc-controller">
                     <h6>
                         기타 컨트롤러
                     </h6>
-                    <button id="data-send-all" style="background-color:cadetblue">
+                    <button id="data-send-all" style="background-color:blue">
                         데이터 재송출
                     </button>
-                     <button id="refresh-button" value="새로고침" style="background-color:mediumorchid">
+                     <button id="refresh-button" value="새로고침" style="background-color:red">
                         새로고침
+                    </button>
+                    <button id="alive-check-button" value="연결체크" style="background-color:dodgerblue">
+                        연결 체크
                     </button>
                 </div>
             </div>
@@ -138,13 +141,27 @@
                 >
                     <input 
                         type="datetime-local" 
+                        id="start-time-picker"
+                        />
+                    <button
+                        id="start-time-send-button"
+                        style="background-color: blue;"
+                    >
+                        시작 시간 전송
+                    </button>
+                </div>
+                <div 
+                    class="datetime-picker"
+                >
+                    <input 
+                        type="datetime-local" 
                         id="end-time-picker"
                         />
                     <button
                         id="end-time-send-button"
-                        style="background-color: #45a049;"
+                        style="background-color: red;"
                     >
-                        시간 전송
+                        종료 시간 전송
                     </button>
                 </div>
             </div>
