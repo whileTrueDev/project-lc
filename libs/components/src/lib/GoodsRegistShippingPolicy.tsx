@@ -19,7 +19,9 @@ import {
   Stack,
   Text,
   useDisclosure,
+  Link,
 } from '@chakra-ui/react';
+import NextLink from 'next/link';
 import {
   ShippingGroupListItemType,
   useDeleteShippingGroup,
@@ -139,10 +141,11 @@ function RelatedGoodsList({ groupId }: { groupId: number | null }) {
           return (
             <HStack key={item.id}>
               <Text>{id}</Text>
-              {/* //TODO: 상품 상세화면으로 LINK */}
-              <Button variant="link" onClick={() => console.log(id)}>
-                {goods_name}
-              </Button>
+              <NextLink href={`/mypage/goods/${id}`} passHref>
+                <Link isExternal>
+                  <Text isTruncated>{goods_name}</Text>
+                </Link>
+              </NextLink>
               <Text>{GOODS_VIEW[goods_view]}</Text>
             </HStack>
           );

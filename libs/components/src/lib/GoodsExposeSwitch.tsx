@@ -39,6 +39,7 @@ export function GoodsExposeSwitch({
         view: goodsView === 'look' ? 'notLook' : 'look',
       });
       queryClient.invalidateQueries('SellerGoodsList');
+      queryClient.invalidateQueries('GoodsById');
     } catch (error) {
       console.error(error);
       toast({ title: '상품 상태 변경 에러', status: 'error' });
@@ -46,7 +47,7 @@ export function GoodsExposeSwitch({
   };
   const label = GOODS_VIEW[goodsView];
   return (
-    <FormControl height="100%" display="flex" alignItems="center" justifyContent="center">
+    <FormControl height="100%">
       <VisuallyHidden>
         <FormLabel htmlFor={`${goodsId}_view_switch`} fontSize="sm">
           {label}

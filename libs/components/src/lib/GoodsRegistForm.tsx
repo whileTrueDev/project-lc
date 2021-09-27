@@ -48,16 +48,16 @@ type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
   options: Omit<GoodsOptionDto, 'option_title' | 'default_option'>[];
 };
 
-// 상품 사진을 s3에 업로드 -> url 리턴
+// 상품 사진, 상세설명 이미지를 s3에 업로드 -> url 리턴
 export async function uploadGoodsImageToS3(
-  imageFile: { file: File | Buffer; filename: string; id: number },
+  imageFile: { file: File | Buffer; filename: string; id: number; contentType: string },
   userMail: string,
 ) {
-  const { file, filename } = imageFile;
+  const { file, filename, contentType } = imageFile;
 
   const type = 'goods';
   const key = path.join(...[type, userMail, filename]);
-  await s3.s3uploadFile({ key, file });
+  await s3.s3uploadFile({ key, file, contentType });
   const url = [
     'https://',
     process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
@@ -69,13 +69,18 @@ export async function uploadGoodsImageToS3(
 
   return url;
 }
+
 // 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
+// 상품사진은 file 로 들어옴
 async function imageFileListToImageDto(
   imageFileList: { file: File; filename: string; id: number }[],
   userMail: string,
 ) {
   const savedImages = await Promise.all(
-    imageFileList.map((file) => uploadGoodsImageToS3(file, userMail)),
+    imageFileList.map((item) => {
+      const { file } = item;
+      return uploadGoodsImageToS3({ ...item, contentType: file.type }, userMail);
+    }),
   );
   return savedImages.map((img, index) => ({
     cut_number: index,
@@ -95,7 +100,8 @@ function addGoodsOptionInfo(
   }));
 }
 
-// 상품 상세설명 contents에서 이미지 s3에 업로드 후 src url 변경
+// 상품 '상세설명' contents에서 이미지 s3에 업로드 후 src url 변경
+// 상세설명 이미지는data:image 형태로 들어있음
 export async function saveContentsImageToS3(contents: string, userMail: string) {
   const parser = new DOMParser();
   const dom = parser.parseFromString(contents, 'text/html'); // textWithImages -> getValues('contents')
@@ -110,8 +116,9 @@ export async function saveContentsImageToS3(contents: string, userMail: string) 
           src.replace(/^data:image\/\w+;base64,/, ''),
           'base64',
         );
+        const fileType = src.substring('data:'.length, src.indexOf(';base64'));
         const url = await uploadGoodsImageToS3(
-          { file: imageBuffer, filename: name, id: index },
+          { file: imageBuffer, filename: name, id: index, contentType: fileType },
           userMail,
         );
         // img src 바꾸기

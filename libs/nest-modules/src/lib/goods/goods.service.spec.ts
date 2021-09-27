@@ -43,7 +43,12 @@ describe('GoodsService', () => {
             email: TEST_USER_EMAIL,
           },
         },
-        image: { create: [] },
+        image: {
+          create: {
+            image: 'dummy.jpg',
+            cut_number: 99999,
+          },
+        },
         common_contents: 'dummy common_contents',
         goods_name: 'dummy goods name',
         summary: 'dummy',
@@ -114,6 +119,19 @@ describe('GoodsService', () => {
         direction: SellerGoodsSortDirection.DESC,
       });
       expect(goodsListData.items[0].goods_view).toBe(GoodsView.notLook);
+    });
+  });
+
+  describe('getOneGoods', () => {
+    it('should return goods', async () => {
+      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_EMAIL);
+      expect(goods).toBeDefined();
+      expect(goods.confirmation).toBeDefined();
+      expect(goods.confirmation.goodsId).toBe(TEST_GOODS.id);
+      expect(goods.GoodsInfo).toBe(null);
+      expect(goods.ShippingGroup).toBe(null);
+      expect(goods.image).toBeInstanceOf(Array);
+      expect(goods.image[0].goodsId).toBe(TEST_GOODS.id);
     });
   });
 

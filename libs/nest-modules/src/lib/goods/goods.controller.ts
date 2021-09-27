@@ -4,6 +4,7 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
+  Param,
   ParseIntPipe,
   Patch,
   Post,
@@ -113,5 +114,14 @@ export class GoodsController {
   ) {
     const email = seller.sub;
     return this.goodsService.registGoods(email, dto);
+  }
+
+  /** 상품 개별 조회 */
+  @Get(':goodsId')
+  getOneGoods(
+    @SellerInfo() seller: UserPayload,
+    @Param('goodsId', ParseIntPipe) goodsId: number,
+  ) {
+    return this.goodsService.getOneGoods(goodsId, seller.sub);
   }
 }

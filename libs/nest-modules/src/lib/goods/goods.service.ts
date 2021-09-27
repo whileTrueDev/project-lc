@@ -239,6 +239,35 @@ export class GoodsService {
     }
   }
 
+  /** 상품 개별 정보 조회 */
+  public async getOneGoods(goodsId: number, email: string) {
+    return this.prisma.goods.findFirst({
+      where: {
+        id: goodsId,
+        seller: {
+          email,
+        },
+      },
+      include: {
+        options: { include: { supply: true } },
+        ShippingGroup: {
+          include: {
+            shippingSets: {
+              include: {
+                shippingOptions: {
+                  include: { shippingCost: true },
+                },
+              },
+            },
+          },
+        },
+        confirmation: true,
+        image: true,
+        GoodsInfo: true,
+      },
+    });
+  }
+
   // 상품 등록
   public async registGoods(email: string, dto: RegistGoodsDto) {
     try {

@@ -14,6 +14,10 @@ const nextConfig = {
     domains: [
       'project-lc-dev-test.s3.ap-northeast-2.amazonaws.com',
       'whiletrue.firstmall.kr',
+      // 테스트용 랜덤 사진 사이트. 프로덕션에는 필요 없음.
+      // by @hwasurr
+      'picsum.photos',
+      'lc-project.s3.ap-northeast-2.amazonaws.com',
     ],
   },
 };
