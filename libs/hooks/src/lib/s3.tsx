@@ -18,13 +18,13 @@ export const s3 = (() => {
   });
 
   // 추후에 S3에 저장할 데이터 종류가 더해지는 경우 추가
-  type s3KeyType = 'business-registration';
+  type s3KeyType = 'business-registration' | 'goods';
 
   interface S3UploadImageOptions {
     filename: string | null;
     userMail: string | undefined;
     type: s3KeyType;
-    file: File | null;
+    file: File | Buffer | null;
     companyName: string;
   }
 
@@ -60,6 +60,20 @@ export const s3 = (() => {
       key: path.join(...pathList),
       fileName: fileFullName,
     };
+  }
+
+  async function s3uploadFile({
+    key,
+    file,
+  }: Pick<S3UploadImageOptions, 'file'> & { key: string }) {
+    if (!file) throw new Error('file should be not null');
+    return new AWS.S3.ManagedUpload({
+      params: {
+        Bucket: S3_BUCKET_NAME,
+        Key: key,
+        Body: file,
+      },
+    }).promise();
   }
 
   async function s3UploadImage({
@@ -106,6 +120,8 @@ export const s3 = (() => {
 
   return {
     s3UploadImage,
+    getS3Key,
     s3DownloadImageUrl,
+    s3uploadFile,
   };
 })();

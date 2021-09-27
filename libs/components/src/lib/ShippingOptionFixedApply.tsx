@@ -63,7 +63,9 @@ export function ShippingOptionFixedApply({
       if (deliveryLimit === 'limit' || shippingSetType === 'add') {
         // 지역배송인 경우
         const sameAreaOptionIndex = shippingOptions.findIndex(
-          (opt) => opt.shippingCost.shipping_area_name === shipping_area_name,
+          (opt) =>
+            opt.shippingCost.shipping_area_name === shipping_area_name &&
+            opt.shipping_set_type === shippingSetType,
         );
         // 기존에 동일 지역이 추가되어 있다면 해당 옵션 변경
         if (sameAreaOptionIndex !== -1) {

@@ -1,11 +1,14 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable camelcase */
 import { Divider, Stack, Text } from '@chakra-ui/layout';
-import { CloseButton } from '@chakra-ui/react';
+import { CloseButton, Icon } from '@chakra-ui/react';
+import { FaTruck } from 'react-icons/fa';
 import {
   PrepayInfoOptions,
   ShippingOptionDto,
   TempShippingSet,
 } from '@project-lc/shared-types';
+import { boxStyle } from '../constants/commonStyleProps';
 import { getOptionLabel } from './ShippingOptionAppliedItem';
 import { ShippingSelectOptions } from './ShippingOptionTypeSelect';
 import { BoldText } from './ShippingPolicySetForm';
@@ -35,7 +38,7 @@ export function SetItem({
   onDelete,
 }: {
   set: TempShippingSet;
-  onDelete: (id: number) => void;
+  onDelete?: (id: number) => void;
 }) {
   const {
     shipping_set_name,
@@ -50,15 +53,12 @@ export function SetItem({
   const stdOptions = shippingOptions.filter((opt) => opt.shipping_set_type === 'std');
   const addOptions = shippingOptions.filter((opt) => opt.shipping_set_type === 'add');
   return (
-    <Stack
-      direction="row"
-      key={set.tempId}
-      border="1px"
-      borderColor="gray.200"
-      borderRadius="md"
-      p={2}
-    >
-      <CloseButton onClick={() => onDelete(tempId)} />
+    <Stack direction="row" key={set.tempId} {...boxStyle}>
+      {onDelete ? (
+        <CloseButton onClick={() => onDelete(tempId)} />
+      ) : (
+        <Icon as={FaTruck} />
+      )}
 
       <Stack fontSize="sm">
         {/* 배송방법 */}

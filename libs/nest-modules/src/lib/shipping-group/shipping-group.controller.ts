@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   ParseIntPipe,
   Post,
   UseGuards,
@@ -18,6 +19,12 @@ import { ShippingGroupService } from './shipping-group.service';
 @Controller('shipping-group')
 export class ShippingGroupController {
   constructor(private readonly shippingGroupService: ShippingGroupService) {}
+
+  // 배송비 그룹 상세보기 조회
+  @Get('/:groupId')
+  getOneShippingGroup(@Param('groupId', ParseIntPipe) groupId: number) {
+    return this.shippingGroupService.getOneShippingGroup(groupId);
+  }
 
   // 배송그룹 조회
   @Get()

@@ -16038,6 +16038,16 @@ stylus@0.54.5:
     sax "0.5.x"
     source-map "0.1.x"
 
+suneditor-react@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/suneditor-react/-/suneditor-react-3.3.0.tgz#06f6cef81c10a5a3e27af106eaea91068afad6c1"
+  integrity sha512-FB0C7/52MoXtAr96ACTJU3WUHAlSKTd0GnLGj8cKuXW8L8KtUOvxzXn7qGzhJS/hL9HcQCRYz1UHKUdtGIbwUg==
+
+suneditor@^2.41.3:
+  version "2.41.3"
+  resolved "https://registry.yarnpkg.com/suneditor/-/suneditor-2.41.3.tgz#2eb70d5c793ed50eab3ba2d282e984e076bb217e"
+  integrity sha512-V4Hz1PY2MhIhw2Lf1iInjEhuVp65B5EbqKb8GpBluZDfx3MnZnNm5v/+Ssr1rV9swTCUWOsl8Qo92KhLMZIllA==
+
 superagent-proxy@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/superagent-proxy/-/superagent-proxy-2.1.0.tgz#34e91f9024fbace95f0a35c50c69edf2a0d331e2"

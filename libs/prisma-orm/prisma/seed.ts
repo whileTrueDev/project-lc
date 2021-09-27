@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const common_contents = '상품공통정보';
-const image = '';
 const testSellerEmail = 'a1919361@gmail.com';
 const testSellerData = {
   email: testSellerEmail,
@@ -26,11 +25,11 @@ async function main() {
   // 테스트 상품 1 + 옵션 + 재고 데이터 생성
   await prisma.goods.create({
     data: {
-      sellerId: seller.id,
+      seller: { connect: { email: seller.email } },
       goods_name: 'testGoods1',
       summary: '테스트상품1',
       common_contents,
-      image,
+      image: { create: [] },
       options: {
         create: [
           {
@@ -42,7 +41,7 @@ async function main() {
         ],
       },
       confirmation: {
-        create: { status: 'rejected' },
+        create: { status: 'confirmed' },
       },
     },
     include: { options: { include: { supply: true } } },
@@ -50,11 +49,11 @@ async function main() {
   // 테스트 상품 2 + 옵션 + 재고 데이터 생성
   await prisma.goods.create({
     data: {
-      sellerId: seller.id,
+      seller: { connect: { email: seller.email } },
       goods_name: 'testGoods2',
       summary: '테스트상품2',
       common_contents,
-      image,
+      image: { create: [] },
       options: {
         create: [
           {
@@ -70,26 +69,8 @@ async function main() {
           },
         ],
       },
-    },
-    include: { options: { include: { supply: true } } },
-  });
-  // 테스트 상품 3 + 옵션 + 재고 데이터 생성
-  await prisma.goods.create({
-    data: {
-      sellerId: seller.id,
-      goods_name: 'testGoods3',
-      summary: '테스트상품3',
-      common_contents,
-      image,
-      options: {
-        create: [
-          {
-            default_option: 'y',
-            price: 500,
-            consumer_price: 30,
-            supply: { create: { stock: 40 } },
-          },
-        ],
+      confirmation: {
+        create: { status: 'rejected' },
       },
     },
     include: { options: { include: { supply: true } } },

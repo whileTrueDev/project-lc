@@ -8,6 +8,8 @@ import {
   GoodsOptionsWithSupplies,
   TotalStockInfo,
   GoodsListRes,
+  RegistGoodsDto,
+  GoodsInfoDto,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -56,11 +58,12 @@ export class GoodsService {
     itemPerPage,
     sort,
     direction,
+    groupId,
   }: GoodsListDto & { email?: string }): Promise<GoodsListRes> {
     const items = await this.prisma.goods.findMany({
       skip: page * itemPerPage,
       take: itemPerPage,
-      where: { seller: { email } },
+      where: { seller: { email }, shippingGroupId: groupId },
       orderBy: [{ [sort]: direction }],
       include: {
         options: {
@@ -136,8 +139,8 @@ export class GoodsService {
         supply,
       } = option;
 
-      const stock = supply.reduce((sum, sup) => sum + sup.stock, 0); // 옵션의 재고
-      const badstock = supply.reduce((sum, sup) => sum + sup.badstock, 0); // 옵션의 불량재고
+      const { stock } = supply; // 옵션의 재고
+      const { badstock } = supply; // 옵션의 불량재고
       const rstock = stock - badstock; // 옵션의 가용재고
       return {
         id,
@@ -233,6 +236,113 @@ export class GoodsService {
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  // 상품 등록
+  public async registGoods(email: string, dto: RegistGoodsDto) {
+    try {
+      const { options, image, shippingGroupId, goodsInfoId, ...goodsData } = dto;
+      const optionsData = options.map((opt) => {
+        const { supply, ...optData } = opt;
+        return {
+          ...optData,
+          supply: {
+            create: supply,
+          },
+        };
+      });
+      const goods = await this.prisma.goods.create({
+        data: {
+          seller: { connect: { email } },
+          ...goodsData,
+          options: {
+            create: optionsData,
+          },
+          image: {
+            create: image,
+          },
+          ShippingGroup: shippingGroupId
+            ? { connect: { id: shippingGroupId } }
+            : undefined,
+          GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
+        },
+      });
+      return { goodsId: goods.id };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  // 상품 공통정보 생성
+  async registGoodsCommonInfo(email: string, dto: GoodsInfoDto) {
+    try {
+      const item = await this.prisma.goodsInfo.create({
+        data: {
+          ...dto,
+          seller: { connect: { email } },
+        },
+      });
+      return { id: item.id };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error, 'error in registGoodsCommonInfo');
+    }
+  }
+
+  // 상품 공통정보 삭제
+  async deleteGoodsCommonInfo(id: number) {
+    try {
+      await this.prisma.goodsInfo.delete({
+        where: {
+          id,
+        },
+      });
+      return true;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(
+        error,
+        `error in deleteGoodsCommonInfo, id: ${id}`,
+      );
+    }
+  }
+
+  // 상품 공통정보 목록 조회
+  async getGoodsCommonInfoList(email: string) {
+    try {
+      const data = await this.prisma.goodsInfo.findMany({
+        where: {
+          seller: { email },
+        },
+        select: {
+          id: true,
+          info_name: true,
+        },
+      });
+      return data;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(
+        error,
+        `error in getGoodsCommonInfoList, sellerEmail: ${email}`,
+      );
+    }
+  }
+
+  // 상품 공통정보 특정 데이터 조회
+  async getOneGoodsCommonInfo(id: number) {
+    try {
+      return this.prisma.goodsInfo.findUnique({
+        where: { id },
+      });
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(
+        error,
+        `error in getOneGoodsCommonInfo, id: ${id}`,
+      );
     }
   }
 }
