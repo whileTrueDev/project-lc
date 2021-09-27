@@ -48,7 +48,7 @@ export class GoodsController {
       itemPerPage,
       sort,
       direction,
-      groupId,
+      groupId: groupId ? Number(groupId) : undefined,
     });
   }
 
