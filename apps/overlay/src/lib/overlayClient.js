@@ -399,11 +399,11 @@ socket.on('handle bottom area to client', () => {
 });
 
 socket.on('show screen', () => {
-  $(document.body).fadeIn(1000);
+  $('.live-commerce').fadeIn(500);
 });
 
 socket.on('hide screen', () => {
-  $(document.body).fadeOut(1000);
+  $('.live-commerce').fadeOut(500);
 });
 
 socket.on('d-day from server', (date) => {
@@ -452,6 +452,6 @@ socket.once('get stream start notification tts', (audioBuffer) => {
 });
 
 socket.on('connection check from server', () => {
-  $('.on-air').toggle();
+  $('.alive-check').toggle();
 });
 export {};

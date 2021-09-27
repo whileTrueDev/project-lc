@@ -104,14 +104,14 @@ export class AppGateway
   }
 
   @SubscribeMessage('get start time from admin')
-  getStartTime(dateData: RoomAndDate) {
+  getStartTime(@MessageBody() dateData: RoomAndDate) {
     const { date } = dateData;
     const { roomName } = dateData;
     this.server.to(roomName).emit('get start time from server', date);
   }
 
   @SubscribeMessage('connection check from admin')
-  connectionCheckFromAdmin(roomName: string) {
+  connectionCheckFromAdmin(@MessageBody() roomName: string) {
     this.server.to(roomName).emit('connection check from server');
   }
 }

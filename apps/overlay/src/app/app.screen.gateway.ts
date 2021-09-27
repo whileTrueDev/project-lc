@@ -111,6 +111,13 @@ export class AppScreenGateway
     this.server.to(roomName).emit('hide screen');
   }
 
+  @SubscribeMessage('get start time from admin')
+  getStartTime(@MessageBody() roomAndDate: RoomAndDate) {
+    const { date } = roomAndDate;
+    const { roomName } = roomAndDate;
+    this.server.to(roomName).emit('get start time from server', date);
+  }
+
   @SubscribeMessage('get d-day')
   getDday(@MessageBody() roomAndDate: RoomAndDate) {
     const { date } = roomAndDate;
