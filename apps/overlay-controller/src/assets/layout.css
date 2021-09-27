@@ -95,6 +95,10 @@ input[type='number'] {
   box-sizing: border-box;
 }
 
+input[type='datetime-local'] {
+  height: 40px;
+}
+
 button {
   width: 150px;
   color: white;
