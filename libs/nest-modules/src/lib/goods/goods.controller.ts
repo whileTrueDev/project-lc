@@ -120,7 +120,7 @@ export class GoodsController {
   @Get(':goodsId')
   getOneGoods(
     @SellerInfo() seller: UserPayload,
-    @Param('goodsId') goodsId: string | number,
+    @Param('goodsId', ParseIntPipe) goodsId: number,
   ) {
     return this.goodsService.getOneGoods(goodsId, seller.sub);
   }
