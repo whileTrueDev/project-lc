@@ -24,7 +24,6 @@ export class AppGateway
   server: Server;
 
   socketInfo: SocketInfo = {};
-  constructor(private readonly overlayService: OverlayService) {}
   private logger: Logger = new Logger('AppGateway');
 
   afterInit() {
@@ -95,23 +94,5 @@ export class AppGateway
           fullUrl[0] ? this.socketInfo[fullUrl[0]] : null,
         );
     }
-  }
-
-  @SubscribeMessage('send notification signal')
-  async sendNotificationSignal(@MessageBody() roomName: string) {
-    const audioBuffer = await this.overlayService.streamStartNotification();
-    this.server.to(roomName).emit('get stream start notification tts', audioBuffer);
-  }
-
-  @SubscribeMessage('get start time from admin')
-  getStartTime(@MessageBody() dateData: RoomAndDate) {
-    const { date } = dateData;
-    const { roomName } = dateData;
-    this.server.to(roomName).emit('get start time from server', date);
-  }
-
-  @SubscribeMessage('connection check from admin')
-  connectionCheckFromAdmin(@MessageBody() roomName: string) {
-    this.server.to(roomName).emit('connection check from server');
   }
 }
