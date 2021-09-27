@@ -1,4 +1,6 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable camelcase */
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -20,25 +22,24 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useRef, useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import SunEditorCore from 'suneditor/src/lib/core';
-import 'suneditor/dist/css/suneditor.min.css';
-import { useFormContext } from 'react-hook-form';
+import { GoodsInfo } from '@prisma/client';
 import {
   GoodsCommonInfo,
-  useCreateGoodsCommonInfo,
   useDeleteGoodsCommonInfo,
   useGoodsCommonInfoItem,
   useGoodsCommonInfoList,
   useProfile,
 } from '@project-lc/hooks';
-import { GoodsInfo } from '@prisma/client';
-import { DeleteIcon } from '@chakra-ui/icons';
+import dynamic from 'next/dynamic';
+import { useEffect, useRef, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import 'suneditor/dist/css/suneditor.min.css';
+import SunEditorCore from 'suneditor/src/lib/core';
+import { boxStyle } from '../constants/commonStyleProps';
+import { ConfirmDialog } from './ConfirmDialog';
+import { GoodsFormValues } from './GoodsRegistForm';
 import { MB } from './ImageInput';
 import SectionWithTitle from './SectionWithTitle';
-import { GoodsFormValues, saveContentsImageToS3 } from './GoodsRegistForm';
-import { ConfirmDialog } from './ConfirmDialog';
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,
@@ -59,7 +60,6 @@ function GoodsCommonInfoList({
     id: Number(value),
     enabled: !!value,
     onSuccess: (data: GoodsInfo) => {
-      console.log(data, 'load item success. id', value);
       onCommonInfoChange(data);
     },
   });
@@ -85,7 +85,6 @@ function GoodsCommonInfoList({
   // 공통정보 삭제 요청
   const deleteCommonInfo = async () => {
     if (!value) throw new Error('공통정보가 없습니다');
-    console.log('id', value);
     deleteCommonInfoItem({ id: Number(value) })
       .then((res) => {
         toast({ title: '해당 상품 공통 정보를 삭제하였습니다.' });
@@ -142,9 +141,7 @@ function GoodsCommonInfoList({
 }
 
 export function GoodsRegistCommonInfo(): JSX.Element {
-  const [loadType, setLoadType] = useState('new');
-  const [commonTitle, setCommonTitle] = useState('');
-  const { watch, setValue } = useFormContext<GoodsFormValues>();
+  const { watch, setValue, register, getValues } = useFormContext<GoodsFormValues>();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const editor = useRef<SunEditorCore>();
   const viewer = useRef<any>();
@@ -153,14 +150,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   };
 
   const toast = useToast();
-  const { data: profileData } = useProfile();
-  const { mutateAsync: createGoodsCommonInfo, isLoading } = useCreateGoodsCommonInfo();
 
-  const clearCommonInfoForm = () => {
-    if (!editor.current) return;
-    editor.current.setContents('');
-    setCommonTitle('');
-  };
   const setViewerContents = (contents: string) => {
     if (viewer.current) {
       viewer.current.innerHTML = contents;
@@ -169,36 +159,14 @@ export function GoodsRegistCommonInfo(): JSX.Element {
 
   // 공통정보 신규 등록
   const registGoodsCommonInfo = async () => {
-    if (!editor.current || !profileData) return;
-    if (!commonTitle) {
-      toast({ title: '상품 공통 정보명을 입력해주세요', status: 'warning' });
-      return;
-    }
+    if (!editor.current) return;
 
     const textWithImages = editor.current.getContents(false);
+    setViewerContents(textWithImages);
+    setValue('common_contents', textWithImages);
 
-    // 이미지가 포함된 경우 s3에 이미지 저장 & url 변경
-    const infoBody = await saveContentsImageToS3(textWithImages, profileData.email);
-
-    // 공통정보 생성 요청
-    createGoodsCommonInfo({
-      info_name: commonTitle,
-      info_value: infoBody,
-    })
-      .then((res) => {
-        clearCommonInfoForm(); // 제목, 에디터 본문 초기화
-        setViewerContents(textWithImages); // 미리보기 화면 변경
-        setValue('goodsInfoId', res.data.id); // form 데이터에 생성된 공통정보 id 추가
-        toast({ title: '상품 공통 정보를 생성하였습니다.' });
-        onClose();
-      })
-      .catch((error) => {
-        console.error(error);
-        toast({
-          title: '상품 공통 정보를 생성하던 중 오류가 발생하였습니다.',
-          status: 'error',
-        });
-      });
+    toast({ title: '상품 공통 정보가 임시 저장되었습니다.' });
+    onClose();
   };
 
   // 기존 공통정보 사용 - Select 값 변경시 뷰어 데이터 변경 && goodsInfoId 변경
@@ -208,30 +176,50 @@ export function GoodsRegistCommonInfo(): JSX.Element {
     setValue('goodsInfoId', id);
   };
   return (
-    <SectionWithTitle title="상품 공통 정보">
-      <Text>공통정보</Text>
-      <RadioGroup
-        onChange={(value) => {
-          setLoadType(value);
-          if (value === 'new') {
-            setViewerContents('');
-            setValue('goodsInfoId', undefined);
-          }
-        }}
-        value={loadType}
-      >
-        <Stack direction="row">
-          <Radio value="new">신규 등록</Radio>
-          <Radio value="load">기존 정보 불러오기</Radio>
-        </Stack>
-      </RadioGroup>
-      {loadType === 'new' ? (
-        <Button onClick={onOpen}>설명 쓰기</Button>
-      ) : (
-        <GoodsCommonInfoList onCommonInfoChange={onCommonInfoChange} />
-      )}
+    <SectionWithTitle title="상품 공통 정보 *">
+      <Stack>
+        <RadioGroup
+          onChange={(value) => {
+            if (value === 'new') {
+              setViewerContents(getValues('common_contents') || '');
+              setValue('goodsInfoId', undefined);
+            }
+          }}
+          value={watch('common_contents_type', 'new')}
+        >
+          <Stack direction="row">
+            <Radio {...register('common_contents_type')} value="new">
+              신규 등록
+            </Radio>
+            <Radio {...register('common_contents_type')} value="load">
+              기존 정보 불러오기
+            </Radio>
+          </Stack>
+        </RadioGroup>
 
-      <Box ref={viewer} className="sun-editor-editable" minHeight="500px" />
+        <Box>
+          {watch('common_contents_type') === 'new' ? (
+            <Button
+              aria-label="Search database"
+              rightIcon={<EditIcon />}
+              onClick={onOpen}
+            >
+              공통정보쓰기
+            </Button>
+          ) : (
+            <GoodsCommonInfoList onCommonInfoChange={onCommonInfoChange} />
+          )}
+        </Box>
+
+        <Box
+          ref={viewer}
+          className="sun-editor-editable"
+          minH="100px"
+          maxHeight="300px"
+          overflowY="auto"
+          {...boxStyle}
+        />
+      </Stack>
 
       <Modal isOpen={isOpen} onClose={onClose} size="6xl">
         <ModalOverlay />
@@ -242,10 +230,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
           <ModalBody>
             <Stack direction="row">
               <Text wordBreak="keep-all">상품 공통 정보명</Text>
-              <Input
-                value={commonTitle}
-                onChange={(e) => setCommonTitle(e.currentTarget.value)}
-              />
+              <Input {...register('common_contents_name')} />
             </Stack>
 
             <SunEditor
@@ -258,9 +243,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
               }}
               defaultValue={watch('common_contents')}
             />
-            <Button onClick={registGoodsCommonInfo} isLoading={isLoading}>
-              등록
-            </Button>
+            <Button onClick={registGoodsCommonInfo}>등록</Button>
           </ModalBody>
         </ModalContent>
       </Modal>

@@ -10,7 +10,6 @@ import {
   Button,
   Checkbox,
   CloseButton,
-  Divider,
   FormControl,
   FormErrorMessage,
   FormLabel,

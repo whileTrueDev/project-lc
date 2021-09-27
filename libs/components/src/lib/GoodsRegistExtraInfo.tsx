@@ -23,8 +23,8 @@ export function GoodsRegistExtraInfo(): JSX.Element {
   return (
     <SectionWithTitle title="기타정보">
       {/* 최소 구매 수량 */}
-      <FormControl>
-        <FormLabel>최소 구매 수량</FormLabel>
+      <FormControl mb={2}>
+        <FormLabel fontWeight="bold">최소 구매 수량</FormLabel>
         <RadioGroup
           value={watch('min_purchase_limit', 'unlimit')}
           onChange={(value) => {
@@ -38,7 +38,7 @@ export function GoodsRegistExtraInfo(): JSX.Element {
           <Radio {...register('min_purchase_limit')} value="unlimit">
             최소1개
           </Radio>
-          <HStack>
+          <HStack flexWrap="wrap">
             <Radio {...register('min_purchase_limit')} value="limit">
               최소
             </Radio>
@@ -51,7 +51,8 @@ export function GoodsRegistExtraInfo(): JSX.Element {
                 min: { value: 2, message: '최소 구매수량은 2개 이상이어야 합니다' },
               })}
             />
-            <Text>개 이상 구매 가능 (2 이상 입력가능)</Text>
+            <Text>개 이상 구매 가능</Text>
+            <Text>(2 이상 입력가능)</Text>
           </HStack>
         </RadioGroup>
         <ErrorText>{errors.min_purchase_ea && errors.min_purchase_ea.message}</ErrorText>
@@ -59,7 +60,7 @@ export function GoodsRegistExtraInfo(): JSX.Element {
 
       {/* 최대 구매 수량 */}
       <FormControl>
-        <FormLabel>최대 구매 수량</FormLabel>
+        <FormLabel fontWeight="bold">최대 구매 수량</FormLabel>
         <RadioGroup
           value={watch('max_purchase_limit', 'unlimit')}
           onChange={(value) => {
@@ -73,7 +74,7 @@ export function GoodsRegistExtraInfo(): JSX.Element {
           <Radio {...register('max_purchase_limit')} value="unlimit">
             제한 없음
           </Radio>
-          <HStack>
+          <HStack flexWrap="wrap">
             <Radio {...register('max_purchase_limit')} value="limit">
               최대
             </Radio>
@@ -89,7 +90,8 @@ export function GoodsRegistExtraInfo(): JSX.Element {
                 },
               })}
             />
-            <Text>개 이하 구매가능 (최소 구매 수량보다 큰 수)</Text>
+            <Text>개 이하 구매가능</Text>
+            <Text>(최소 구매 수량보다 큰 수)</Text>
           </HStack>
         </RadioGroup>
         <ErrorText>{errors.min_purchase_ea && errors.min_purchase_ea.message}</ErrorText>

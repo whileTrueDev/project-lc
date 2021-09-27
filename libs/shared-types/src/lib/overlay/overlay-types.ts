@@ -51,7 +51,7 @@ export interface PurchaseMessage {
   /** 구매물품 이름 */
   productName: string;
   /** 구매물품 가격 또는 수량 */
-  purchaseNum: string;
+  purchaseNum: number;
 }
 /** 시청자 닉네임과 닉네임별 구매금액 총액 */
 export interface NicknameAndPrice {

@@ -11,6 +11,7 @@ import {
   ExportBundledOrdersDto,
   ExportOrderDto,
   ExportOrdersDto,
+  FindExportDto,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard, SellerInfo, UserPayload } from '@project-lc/nest-modules';
 import { FmExportsService } from './fm-exports.service';
@@ -21,8 +22,8 @@ export class FmExportsController {
   constructor(private readonly exportsService: FmExportsService) {}
 
   @Get(':exportCode')
-  public findExports(@Param('exportCode') exportCode: string) {
-    return this.exportsService.findOne(exportCode);
+  public findExports(@Param(ValidationPipe) dto: FindExportDto) {
+    return this.exportsService.findOne(dto.exportCode);
   }
 
   @Post()

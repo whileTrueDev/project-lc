@@ -10,6 +10,7 @@ import {
   UnauthorizedException,
   UseGuards,
   ValidationPipe,
+  Res,
 } from '@nestjs/common';
 import { Seller } from '@prisma/client';
 import {
@@ -19,6 +20,8 @@ import {
   SignUpSellerDto,
   BusinessRegistrationDto,
   SettlementAccountDto,
+  SellerShopInfoDto,
+  FindSellerRes,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -26,18 +29,20 @@ import { SellerService } from './seller.service';
 import { SellerSettlementService } from './seller-settlement.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
+import { SellerShopService } from './seller-shop.service';
 
 @Controller('seller')
 export class SellerController {
   constructor(
     private readonly sellerService: SellerService,
     private readonly sellerSettlementService: SellerSettlementService,
+    private readonly sellerShopService: SellerShopService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
 
   // * 판매자 정보 조회
   @Get()
-  public findOne(@Query(ValidationPipe) dto: FindSellerDto): Promise<Seller> {
+  public findOne(@Query(ValidationPipe) dto: FindSellerDto): Promise<FindSellerRes> {
     return this.sellerService.findOne({ email: dto.email });
   }
 
@@ -114,5 +119,26 @@ export class SellerController {
     @SellerInfo() sellerInfo: UserPayload,
   ) {
     return this.sellerSettlementService.insertSettlementAccount(dto, sellerInfo);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('shop-info')
+  public async changeShopInfo(
+    @Body(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    )
+    dto: SellerShopInfoDto,
+    @SellerInfo() sellerInfo: UserPayload,
+    @Res() res,
+  ) {
+    try {
+      await this.sellerShopService.changeShopInfo(dto, sellerInfo);
+      res.sendStatus(204);
+    } catch (e) {
+      res.sendStatus(500);
+    }
   }
 }

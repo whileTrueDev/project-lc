@@ -21,8 +21,21 @@ const DOMAIN = 'andad.io';
 // const OVERLAY_DOMAIN = `${DOMAIN}`;
 
 export class LCDevAppStack extends cdk.Stack {
-  DBURL_PARAMETER: ssm.IStringParameter;
-  FIRSTMALL_DATABASE_URL: ssm.IStringParameter;
+  private DBURL_PARAMETER: ssm.IStringParameter;
+  private FIRSTMALL_DATABASE_URL: ssm.IStringParameter;
+  private GOOGLE_CLIENT_ID: ssm.IStringParameter;
+  private GOOGLE_CLIENT_SECRET: ssm.IStringParameter;
+  private NAVER_CLIENT_ID: ssm.IStringParameter;
+  private NAVER_CLIENT_SECRET: ssm.IStringParameter;
+  private KAKAO_CLIENT_ID: ssm.IStringParameter;
+  private MAILER_USER: ssm.IStringParameter;
+  private MAILER_PASS: ssm.IStringParameter;
+  private GOOGLE_CREDENTIALS_EMAIL: ssm.IStringParameter;
+  private GOOGLE_CREDENTIALS_PRIVATE_KEY: ssm.IStringParameter;
+  private JWT_SECRET: ssm.IStringParameter;
+  private CIPHER_HASH: ssm.IStringParameter;
+  private CIPHER_PASSWORD: ssm.IStringParameter;
+  private CIPHER_SALT: ssm.IStringParameter;
 
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
@@ -36,24 +49,8 @@ export class LCDevAppStack extends cdk.Stack {
       containerInsights: true,
     });
 
-    // * DBURL 파라미터
-    this.DBURL_PARAMETER = ssm.StringParameter.fromSecureStringParameterAttributes(
-      this,
-      `${PREFIX}DBUrlSecret`,
-      {
-        parameterName: constants.DEV.ECS_DATABASE_URL_KEY,
-        version: 4,
-      },
-    );
-
-    this.FIRSTMALL_DATABASE_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
-      this,
-      `${PREFIX}FirstmallDBUrlSecret`,
-      {
-        parameterName: constants.DEV.FIRSTMALL_DATABASE_URL_KEY,
-        version: 1,
-      },
-    );
+    // * 환경변수 주입을 위한 파라미터 로딩
+    this.loadSsmParameters();
 
     // * API server
     const apiService = this.createApiAppService(cluster, apiSecGrp);
@@ -64,6 +61,7 @@ export class LCDevAppStack extends cdk.Stack {
     // this.createRoute53ARecord(alb);
   }
 
+  /** API 서버 ECS Fargate Service 생성 메서드 */
   private createApiAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
     const apiTaskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSTaskDef`, {
       family: constants.DEV.ECS_API_FAMILY_NAME,
@@ -78,6 +76,17 @@ export class LCDevAppStack extends cdk.Stack {
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
         FIRSTMALL_DATABASE_URL: ecs.Secret.fromSsmParameter(this.FIRSTMALL_DATABASE_URL),
+        GOOGLE_CLIENT_ID: ecs.Secret.fromSsmParameter(this.GOOGLE_CLIENT_ID),
+        GOOGLE_CLIENT_SECRET: ecs.Secret.fromSsmParameter(this.GOOGLE_CLIENT_SECRET),
+        NAVER_CLIENT_ID: ecs.Secret.fromSsmParameter(this.NAVER_CLIENT_ID),
+        NAVER_CLIENT_SECRET: ecs.Secret.fromSsmParameter(this.NAVER_CLIENT_SECRET),
+        KAKAO_CLIENT_ID: ecs.Secret.fromSsmParameter(this.KAKAO_CLIENT_ID),
+        MAILER_USER: ecs.Secret.fromSsmParameter(this.MAILER_USER),
+        MAILER_PASS: ecs.Secret.fromSsmParameter(this.MAILER_PASS),
+        JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
+        CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
+        CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
+        CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}LogGroup`, {
@@ -102,6 +111,7 @@ export class LCDevAppStack extends cdk.Stack {
     });
   }
 
+  /** 라-커 화면 Overlay 서버 ECS Fargate Service 생성 메서드 */
   private createOverlayAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
     const taskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSOverlayTaskDef`, {
       family: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
@@ -116,6 +126,16 @@ export class LCDevAppStack extends cdk.Stack {
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
         FIRSTMALL_DATABASE_URL: ecs.Secret.fromSsmParameter(this.FIRSTMALL_DATABASE_URL),
+        GOOGLE_CREDENTIALS_EMAIL: ecs.Secret.fromSsmParameter(
+          this.GOOGLE_CREDENTIALS_EMAIL,
+        ),
+        GOOGLE_CREDENTIALS_PRIVATE_KEY: ecs.Secret.fromSsmParameter(
+          this.GOOGLE_CREDENTIALS_PRIVATE_KEY,
+        ),
+        JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
+        CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
+        CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
+        CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayLogGroup`, {
@@ -187,12 +207,29 @@ export class LCDevAppStack extends cdk.Stack {
       'https ALB open to world',
     );
 
-    // // HTTP 리스너에 API서버 타겟그룹 추가
-    // truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
-    //   priority: 1,
-    //   conditions: [ListenerCondition.hostHeaders([`${API_DOMAIN}`])],
-    //   targetGroups: [apiTargetGroup],
-    // });
+    const overlayTargetGroup = new elbv2.ApplicationTargetGroup(
+      this,
+      `${PREFIX}OverlayTargetGroup`,
+      {
+        vpc,
+        targetGroupName: 'OverlayTargetGroup',
+        port: constants.DEV.ECS_OVERLAY_PORT,
+        protocol: elbv2.ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [overlayAppService],
+      },
+    );
+
+    // HTTP 리스너에 Overlay 서버 타겟그룹 추가
+    truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
+      priority: 1,
+      conditions: [elbv2.ListenerCondition.hostHeaders(['preview-livecommerce.onad.io'])],
+      targetGroups: [overlayTargetGroup],
+    });
 
     return alb;
   }
@@ -214,5 +251,155 @@ export class LCDevAppStack extends cdk.Stack {
       recordName: ``,
       target: route53.RecordTarget.fromAlias(new targets.LoadBalancerTarget(alb)),
     });
+  }
+
+  private loadSsmParameters() {
+    this.DBURL_PARAMETER = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}DBUrlSecret`,
+      {
+        parameterName: constants.DEV.ECS_DATABASE_URL_KEY,
+        version: 4,
+      },
+    );
+
+    this.FIRSTMALL_DATABASE_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}FirstmallDBUrlSecret`,
+      {
+        parameterName: constants.DEV.FIRSTMALL_DATABASE_URL_KEY,
+        version: 1,
+      },
+    );
+
+    this.GOOGLE_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}GOOGLE_CLIENT_ID`,
+      {
+        version: 1,
+        parameterName: constants.DEV.GOOGLE_CLIENT_ID,
+      },
+    );
+    this.GOOGLE_CLIENT_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}GOOGLE_CLIENT_SECRET`,
+      {
+        version: 1,
+        parameterName: constants.DEV.GOOGLE_CLIENT_SECRET,
+      },
+    );
+    this.NAVER_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}NAVER_CLIENT_ID`,
+      {
+        version: 1,
+        parameterName: constants.DEV.NAVER_CLIENT_ID,
+      },
+    );
+    this.NAVER_CLIENT_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}NAVER_CLIENT_SECRET`,
+      {
+        version: 1,
+        parameterName: constants.DEV.NAVER_CLIENT_SECRET,
+      },
+    );
+    this.KAKAO_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}KAKAO_CLIENT_ID`,
+      {
+        version: 1,
+        parameterName: constants.DEV.KAKAO_CLIENT_ID,
+      },
+    );
+    this.MAILER_USER = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}MAILER_USER`,
+      {
+        version: 1,
+        parameterName: constants.DEV.MAILER_USER,
+      },
+    );
+    this.MAILER_PASS = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}MAILER_PASS`,
+      {
+        version: 1,
+        parameterName: constants.DEV.MAILER_PASS,
+      },
+    );
+
+    this.GOOGLE_CREDENTIALS_EMAIL =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GOOGLE_CREDENTIALS_EMAIL`,
+        {
+          version: 1,
+          parameterName: constants.DEV.GOOGLE_CREDENTIALS_EMAIL_KEY,
+        },
+      );
+    this.GOOGLE_CREDENTIALS_PRIVATE_KEY =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GOOGLE_CREDENTIALS_PRIVATE_KEY`,
+        {
+          version: 1,
+          parameterName: constants.DEV.GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY,
+        },
+      );
+
+    this.JWT_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}JWT_SECRET`,
+      {
+        version: 1,
+        parameterName: constants.DEV.JWT_SECRET,
+      },
+    );
+
+    this.CIPHER_HASH = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}CIPHER_HASH`,
+      {
+        version: 1,
+        parameterName: constants.DEV.CIPHER_HASH,
+      },
+    );
+
+    this.CIPHER_PASSWORD = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}CIPHER_PASSWORD`,
+      {
+        version: 1,
+        parameterName: constants.DEV.CIPHER_PASSWORD,
+      },
+    );
+
+    this.CIPHER_SALT = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}CIPHER_SALT`,
+      {
+        version: 1,
+        parameterName: constants.DEV.CIPHER_SALT,
+      },
+    );
+
+    return {
+      DATABASE_URL: this.DBURL_PARAMETER,
+      FIRSTMALL_DATABASE_URL: this.FIRSTMALL_DATABASE_URL,
+      GOOGLE_CLIENT_ID: this.GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET: this.GOOGLE_CLIENT_SECRET,
+      NAVER_CLIENT_ID: this.NAVER_CLIENT_ID,
+      NAVER_CLIENT_SECRET: this.NAVER_CLIENT_SECRET,
+      KAKAO_CLIENT_ID: this.KAKAO_CLIENT_ID,
+      MAILER_USER: this.MAILER_USER,
+      MAILER_PASS: this.MAILER_PASS,
+      GOOGLE_CREDENTIALS_EMAIL: this.GOOGLE_CREDENTIALS_EMAIL,
+      GOOGLE_CREDENTIALS_PRIVATE_KEY: this.GOOGLE_CREDENTIALS_PRIVATE_KEY,
+      JWT_SECRET: this.JWT_SECRET,
+      CIPHER_HASH: this.CIPHER_HASH,
+      CIPHER_PASSWORD: this.CIPHER_PASSWORD,
+      CIPHER_SALT: this.CIPHER_SALT,
+    };
   }
 }

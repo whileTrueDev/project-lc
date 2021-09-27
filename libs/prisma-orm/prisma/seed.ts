@@ -52,9 +52,7 @@ async function main() {
   // 테스트 상품 1 + 옵션 + 재고 데이터 생성
   await prisma.goods.create({
     data: {
-      seller: {
-        connect: { id: seller.id },
-      },
+      seller: { connect: { email: seller.email } },
       goods_name: 'testGoods1',
       summary: '테스트상품1',
       common_contents,
@@ -93,7 +91,7 @@ async function main() {
         ],
       },
       confirmation: {
-        create: { status: 'rejected' },
+        create: { status: 'confirmed' },
       },
       ShippingGroup: {
         create: {
@@ -127,7 +125,7 @@ async function main() {
   // 테스트 상품 2 + 옵션 + 재고 데이터 생성
   await prisma.goods.create({
     data: {
-      sellerId: seller.id,
+      seller: { connect: { email: seller.email } },
       goods_name: 'testGoods2',
       summary: '테스트상품2',
       common_contents,
@@ -151,6 +149,9 @@ async function main() {
             supply: { create: { stock: 3 } },
           },
         ],
+      },
+      confirmation: {
+        create: { status: 'rejected' },
       },
     },
     include: { options: { include: { supply: true } } },
@@ -177,6 +178,9 @@ async function main() {
             supply: { create: { stock: 40 } },
           },
         ],
+      },
+      confirmation: {
+        create: { status: 'confirmed' },
       },
     },
     include: { options: { include: { supply: true } } },

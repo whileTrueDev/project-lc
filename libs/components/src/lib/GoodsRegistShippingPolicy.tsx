@@ -42,7 +42,7 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { boxStyle } from '../constants/commonStyleProps';
 import { GOODS_VIEW } from '../constants/goodsStatus';
-import { ConfirmDialog } from './ConfirmDialog';
+import { ConfirmDialog, ConfirmDialogProps } from './ConfirmDialog';
 import { GoodsFormValues } from './GoodsRegistForm';
 import SectionWithTitle from './SectionWithTitle';
 import ShippingPolicyForm from './ShippingPolicyForm';
@@ -169,15 +169,19 @@ function ShippingGroupListItem({
   const { register } = useFormContext<GoodsFormValues>();
   return (
     <Flex key={group.id} spacing={2}>
+      {/* 라디오버튼 */}
       <Radio
+        width="10%"
         {...register('shippingGroupId', { valueAsNumber: true })}
         value={String(group.id)} // String으로 안바꾸면 라디오 선택이 안됨... 왜???
       />
-      <Spacer />
+
+      {/* 배송그룹명 */}
       <Button
         variant="link"
         color="teal.500"
         textDecoration="underline"
+        width="30%"
         onClick={() => {
           nameHandler(group.id);
         }}
@@ -186,11 +190,17 @@ function ShippingGroupListItem({
           {group.shipping_group_name}({group.id})
         </Text>
       </Button>
-      <Spacer />
-      <Text>{ShippingCalculTypeOptions[group.shipping_calcul_type].label}</Text>
-      <Spacer />
+
+      {/* 배송비 계산 기준 */}
+      <Text width="30%" textAlign="center">
+        {ShippingCalculTypeOptions[group.shipping_calcul_type].label}
+      </Text>
+
+      {/* 연결된 상품 */}
       {group._count.goods > 0 ? (
         <Button
+          textAlign="center"
+          width="30%"
           variant="link"
           color="teal.500"
           textDecoration="underline"
@@ -201,9 +211,12 @@ function ShippingGroupListItem({
           {group._count.goods}
         </Button>
       ) : (
-        <Text>{group._count.goods}</Text>
+        <Text width="30%" textAlign="center">
+          {group._count.goods}
+        </Text>
       )}
-      <Spacer />
+
+      {/* 삭제버튼 */}
       <CloseButton
         size="sm"
         onClick={() => {
@@ -211,6 +224,25 @@ function ShippingGroupListItem({
         }}
       />
     </Flex>
+  );
+}
+
+/* 배송비 정책 상세보기 모달 */
+export function ShippingGroupDetailModal(
+  props: Pick<ConfirmDialogProps, 'isOpen' | 'onClose' | 'onConfirm'> & {
+    groupId: number | null;
+  },
+) {
+  const { isOpen, onClose, onConfirm, groupId } = props;
+  return (
+    <ConfirmDialog
+      title="배송비 정책 정보"
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={onConfirm}
+    >
+      <ShippingGroupDetail groupId={groupId} />
+    </ConfirmDialog>
   );
 }
 
@@ -263,18 +295,17 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
   };
 
   return (
-    <SectionWithTitle title="배송비">
+    <SectionWithTitle title="배송비 *">
       <HStack mb={4}>
         <Text>배송비 정책을 {data && data.length === 0 ? '생성' : '선택'}해주세요</Text>
         <Button onClick={onRegistModalOpen}>생성하기</Button>
       </HStack>
 
-      {/* 배송비 정책 목록 
-      // TODO: 테이블같은 스타일적용..
-      */}
+      {/* 배송비 정책 목록
+       */}
 
       <Stack spacing={2} maxWidth="lg" {...boxStyle}>
-        <Flex>
+        <Flex fontSize="sm">
           <Spacer />
           <Text>배송그룹명 ( 번호 )</Text>
           <Spacer />
@@ -299,8 +330,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
       </Stack>
 
       {/* 배송비 정책 상세보기 모달 */}
-      <ConfirmDialog
-        title="배송비 정책 정보"
+      <ShippingGroupDetailModal
         isOpen={infoModalOpen}
         onClose={onInfoModalClose}
         onConfirm={() => {
@@ -309,9 +339,8 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
           setClickedGroupId(null);
           return Promise.resolve();
         }}
-      >
-        <ShippingGroupDetail groupId={clickedGroupId} />
-      </ConfirmDialog>
+        groupId={clickedGroupId}
+      />
 
       {/* 연결된 상품 확인 모달 */}
       <ConfirmDialog

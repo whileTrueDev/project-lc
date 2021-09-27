@@ -89,6 +89,9 @@ export class OverlayService {
         nickname: true,
         text: true,
       },
+      where: {
+        loginFlag: true,
+      },
     });
     if (!messageAndNickname) throwError('Cannot Get Data From Db');
     return messageAndNickname;

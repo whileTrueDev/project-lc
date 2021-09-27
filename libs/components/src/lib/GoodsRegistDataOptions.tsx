@@ -1,7 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import {
+  Box,
   Button,
   CloseButton,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   HStack,
   Input,
   InputProps,
@@ -13,6 +17,7 @@ import {
 import { useDisplaySize } from '@project-lc/hooks';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { boxStyle } from '../constants/commonStyleProps';
+import { RequiredMark } from './GoodsRegistDataBasic';
 import { GoodsRegistRadio } from './GoodsRegistDataSales';
 import { GoodsFormValues } from './GoodsRegistForm';
 import SectionWithTitle from './SectionWithTitle';
@@ -40,7 +45,9 @@ function NoOptionInput() {
         label="정가 (미할인가)"
         inputProps={{
           type: 'number',
-          ...register(`options.0.consumer_price` as const),
+          ...register(`options.0.consumer_price` as const, {
+            valueAsNumber: true,
+          }),
         }}
       />
       <GoodsOptionInput
@@ -66,14 +73,19 @@ function NoOptionInput() {
 }
 
 function UseOptionInput() {
-  const { watch, control, register } = useFormContext<GoodsFormValues>();
-  const { fields, append, remove } = useFieldArray<GoodsFormValues>({
+  const {
+    watch,
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<GoodsFormValues>();
+  const { fields, append, remove } = useFieldArray<GoodsFormValues, 'options'>({
     control,
     name: 'options' as const,
   });
   const { isMobileSize } = useDisplaySize();
 
-  const inputWidth = isMobileSize ? '100px' : 'auto';
+  const inputWidth = isMobileSize ? '74px' : 'auto';
 
   const addOption = () => {
     append({
@@ -81,6 +93,7 @@ function UseOptionInput() {
       consumer_price: 0,
       price: 0,
       option_view: 'Y',
+      option_type: 'direct',
       supply: {
         stock: 0,
       },
@@ -90,9 +103,24 @@ function UseOptionInput() {
   return (
     <Stack>
       <HStack>
-        <Text>옵션명</Text>
-        <Input size="sm" w={200} {...register('option_title', { required: true })} />
-        <Button size="sm" onClick={addOption} ml={2}>
+        <FormControl id="option_title" isInvalid={!!errors.option_title}>
+          <HStack>
+            <FormLabel>
+              옵션명 <RequiredMark />
+            </FormLabel>
+
+            <Input
+              {...register('option_title', { required: '옵션명을 입력해주세요.' })}
+              size="sm"
+              w={150}
+              placeholder="옵션명을 입력해주세요"
+            />
+          </HStack>
+          {errors.option_title && (
+            <FormErrorMessage>{errors.option_title.message}</FormErrorMessage>
+          )}
+        </FormControl>
+        <Button onClick={addOption} ml={2}>
           옵션값 추가
         </Button>
       </HStack>
@@ -107,10 +135,12 @@ function UseOptionInput() {
           <HStack>
             <CloseButton onClick={() => remove(index)} />
             <HStack>
-              <Text minWidth="60px">옵션값</Text>
+              <Text minWidth="60px">
+                옵션값 <RequiredMark />
+              </Text>
               <Input
                 {...register(`options.${index}.option1` as const, {
-                  required: true,
+                  required: '옵션값을 입력해주세요',
                 })}
                 size="sm"
               />
@@ -118,7 +148,7 @@ function UseOptionInput() {
           </HStack>
           <HStack>
             <HStack>
-              <Text minWidth="50px">정가</Text>
+              <Text minWidth="40px">정가</Text>
               <Input
                 {...register(`options.${index}.consumer_price` as const, {
                   valueAsNumber: true,
@@ -128,7 +158,7 @@ function UseOptionInput() {
               />
             </HStack>
             <HStack>
-              <Text minWidth="50px">판매가</Text>
+              <Text minWidth="40px">판매가</Text>
               <Input
                 {...register(`options.${index}.price` as const, {
                   valueAsNumber: true,
@@ -140,7 +170,7 @@ function UseOptionInput() {
           </HStack>
           <HStack>
             <HStack>
-              <Text minWidth="50px">재고</Text>
+              <Text minWidth="40px">재고</Text>
               <Input
                 {...register(`options.${index}.supply.stock` as const, {
                   valueAsNumber: true,
@@ -180,33 +210,32 @@ export function GoodsRegistDataOptions(): JSX.Element {
 
   return (
     <SectionWithTitle title="판매 옵션">
-      <Text>
-        옵션 사용 여부
-        <Text as="span" color="gray.500" fontSize="sm">
-          ( * 변경시 기존에 추가했던 옵션은 모두 사라집니다)
-        </Text>
-      </Text>
+      <Text fontWeight="bold">옵션 사용 여부</Text>
       {/* onChange 시 옵션초기화 */}
-      <GoodsRegistRadio
-        mb={4}
-        name="option_use"
-        values={OPTION_USE}
-        onChange={() => {
-          setValue('option_title', '');
-          setValue('options', [
-            {
-              option_type: 'direct',
-              option1: '',
-              consumer_price: 0,
-              price: 0,
-              option_view: 'Y',
-              supply: {
-                stock: 0,
+      <Box mb={4}>
+        <GoodsRegistRadio
+          name="option_use"
+          values={OPTION_USE}
+          onChange={() => {
+            setValue('option_title', '');
+            setValue('options', [
+              {
+                option_type: 'direct',
+                option1: '',
+                consumer_price: 0,
+                price: 0,
+                option_view: 'Y',
+                supply: {
+                  stock: 0,
+                },
               },
-            },
-          ]);
-        }}
-      />
+            ]);
+          }}
+        />
+        <Text fontWeight="normal" as="span" color="gray.500" fontSize="sm">
+          (사용 여부 변경시 기존에 추가했던 옵션은 모두 사라집니다.)
+        </Text>
+      </Box>
 
       {/* 옵션 사용하지 않는 경우 */}
       {watch('option_use') === '0' && <NoOptionInput />}

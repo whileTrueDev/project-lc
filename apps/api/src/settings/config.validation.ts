@@ -18,4 +18,12 @@ export const validationSchema = Joi.object({
   // Mailer account(트루포인트 메일링 계정 - ttps://mail.mytruepoint.com/)
   MAILER_USER: Joi.string().required(),
   MAILER_PASS: Joi.string().required(),
+
+  // JWT
+  JWT_SECRET: Joi.string().required(),
+
+  // 암호화 관련
+  CIPHER_HASH: Joi.string().required(),
+  CIPHER_PASSWORD: Joi.string().required(),
+  CIPHER_SALT: Joi.string().required(),
 });

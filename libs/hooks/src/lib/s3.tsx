@@ -25,34 +25,69 @@ export const s3 = (() => {
     userMail: string | undefined;
     type: s3KeyType;
     file: File | Buffer | null;
+    companyName: string;
+  }
+
+  // 파일명에서 확장자를 추출하는 과정
+  function getExtension(fileName: string | null) {
+    if (!fileName) {
+      return '';
+    }
+    const location = fileName.lastIndexOf('.');
+    const result = fileName.substring(location);
+    return result;
   }
 
   // 해당 이미지의 타입에 따라서 경로를 파일이름과 함께 생성
+  // 파일이름을 그대로 사용하지 않도록함.
   function getS3Key({
     userMail,
     type,
     filename,
+    companyName,
   }: {
     userMail: string;
     type: string;
     filename: string | null;
+    companyName: string;
   }) {
-    // email으로 사용한다.
-    // fileName의 경우, 해당 날짜의 데이터를 추가한다.
+    // 확장자 추출
+    const extension = getExtension(filename);
     const prefix = moment().format('YYMMDDHHmmss').toString();
-    const fileFullName = `${prefix}_${filename}`;
+    const fileFullName = `${prefix}_${companyName}_사업자등록증${extension}`;
     const pathList = [type, userMail, fileFullName];
     return {
       key: path.join(...pathList),
       fileName: fileFullName,
     };
   }
-  async function s3UploadImage({ filename, userMail, type, file }: S3UploadImageOptions) {
+
+  async function s3uploadFile({
+    key,
+    file,
+  }: Pick<S3UploadImageOptions, 'file'> & { key: string }) {
+    if (!file) throw new Error('file should be not null');
+    return new AWS.S3.ManagedUpload({
+      params: {
+        Bucket: S3_BUCKET_NAME,
+        Key: key,
+        Body: file,
+      },
+    }).promise();
+  }
+
+  async function s3UploadImage({
+    filename,
+    userMail,
+    type,
+    file,
+    companyName,
+  }: S3UploadImageOptions) {
     // key 만들기
     if (!userMail || !file) {
       return null;
     }
-    const { key, fileName } = getS3Key({ userMail, type, filename });
+    const { key, fileName } = getS3Key({ userMail, type, filename, companyName });
     try {
       await new AWS.S3.ManagedUpload({
         params: {
@@ -66,12 +101,27 @@ export const s3 = (() => {
       }).promise();
       return fileName;
     } catch (error) {
+      console.log(error);
       return null;
     }
+  }
+
+  // s3 bucket에서 다운로드 하기
+  function s3DownloadImageUrl(fileName: string, sellerEmail: string): string {
+    const signedUrlExpireSeconds = 60;
+    const params = {
+      Bucket: S3_BUCKET_NAME,
+      Key: `business-registration/${sellerEmail}/${fileName}`,
+      Expires: signedUrlExpireSeconds,
+    };
+    const imageUrl = new AWS.S3().getSignedUrl('getObject', params);
+    return imageUrl;
   }
 
   return {
     s3UploadImage,
     getS3Key,
+    s3DownloadImageUrl,
+    s3uploadFile,
   };
 })();

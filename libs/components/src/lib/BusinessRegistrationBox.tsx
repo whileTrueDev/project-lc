@@ -59,11 +59,11 @@ export function BusinessRegistrationBox(
 
   return (
     <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
-      <Flex direction="row" justifyContent="space-between" pb={1} mb={3}>
+      <Flex direction={['column', 'row']} justifyContent="space-between" pb={1} mb={3}>
         <Text fontSize="lg" fontWeight="medium">
           사업자 등록 정보
         </Text>
-        <Button size="sm" onClick={onOpen}>
+        <Button size="sm" onClick={onOpen} mt={[3, 0]}>
           사업자 등록증 등록
         </Button>
       </Flex>
