@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 // 최초 입장시에 상점명을 입력하는 다이얼로그
 // -> 추후에는 상점명 뿐 만 아니라 다른 것도 입력이 가능해야할 수 있음.
 import {
@@ -61,12 +62,12 @@ export function AdminGoodsConfirmationDialog(
         status: GoodsConfirmationStatus.CONFIRMED,
       });
       toast({
-        title: '상점명 등록이 완료되었습니다.',
+        title: '상품 검수 승인이 완료되었습니다.',
         status: 'success',
       });
     } catch (error) {
       toast({
-        title: '상점명 등록이 실패하였습니다.',
+        title: '상품 검수 승인이 실패하였습니다.',
         description: error.response.data.message,
         status: 'error',
       });
@@ -98,13 +99,11 @@ export function AdminGoodsConfirmationDialog(
               mt={3}
               maxLength={20}
               autoComplete="off"
+              type="number"
               placeholder="승인할 상품 ID를 입력 하세요."
               {...register('firstmallGoodsConnectionId', {
                 required: '상품 ID를 반드시 입력해주세요.',
-                pattern: {
-                  value: /^[0-9]*$/,
-                  message: '반드시 숫자만 입력하세요.',
-                },
+                valueAsNumber: true,
               })}
               ref={initialRef}
             />
