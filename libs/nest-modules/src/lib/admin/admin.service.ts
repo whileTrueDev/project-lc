@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { GoodsConfirmationDto } from '@project-lc/shared-types';
+import { GoodsConfirmationDto, GoodsRejectionDto } from '@project-lc/shared-types';
 import { SellerSettlementAccount, SellerBusinessRegistration } from '@prisma/client';
 
 export type AdminSettlementInfoType = {
@@ -121,7 +121,7 @@ export class AdminService {
     return goodsConfirmation;
   }
 
-  public async setGoodsRejection(dto: GoodsConfirmationDto) {
+  public async setGoodsRejection(dto: GoodsRejectionDto) {
     const goodsConfirmation = await this.prisma.goodsConfirmation.update({
       where: { goodsId: dto.goodsId },
       data: {
