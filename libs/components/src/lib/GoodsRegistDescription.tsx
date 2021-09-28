@@ -82,7 +82,7 @@ export function GoodsRegistDescription(): JSX.Element {
               setOptions={{
                 height: '500px',
                 imageUploadSizeLimit: 20 * MB, // 퍼스트몰 최대 20mb
-                buttonList: [['font', 'fontSize', 'align'], ['image']],
+                buttonList: [['font', 'fontSize', 'align', 'list'], ['image']],
               }}
               defaultValue={watch('contents')}
             />

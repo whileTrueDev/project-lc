@@ -159,6 +159,10 @@ export function GoodsRegistCommonInfo(): JSX.Element {
 
   // 공통정보 신규 등록
   const registGoodsCommonInfo = async () => {
+    if (!getValues('common_contents_name')) {
+      toast({ title: '상품 공통 정보명을 입력해주세요.', status: 'warning' });
+      return;
+    }
     if (!editor.current) return;
 
     const textWithImages = editor.current.getContents(false);
@@ -239,7 +243,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
               setOptions={{
                 height: '500px',
                 imageUploadSizeLimit: 20 * MB, // 퍼스트몰 최대 20mb
-                buttonList: [['font', 'fontSize', 'align'], ['image']],
+                buttonList: [['font', 'fontSize', 'align', 'list'], ['image']],
               }}
               defaultValue={watch('common_contents')}
             />
