@@ -48,7 +48,7 @@ function formatDate(date: Date): string {
   return dayjs(date).format('YYYY/MM/DD HH:mm');
 }
 
-function ShippingGroupDetailButton(props: { id: number; name: string }) {
+export function ShippingGroupDetailButton(props: { id: number; name: string }) {
   const { id, name } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
