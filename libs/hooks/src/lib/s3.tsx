@@ -74,6 +74,7 @@ export const s3 = (() => {
         Key: key,
         Body: file,
         ContentType: contentType,
+        ACL: 'public-read',
       },
     }).promise();
   }
