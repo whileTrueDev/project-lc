@@ -295,6 +295,7 @@ export class GoodsService {
             ? { connect: { id: shippingGroupId } }
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
+          confirmation: { create: { status: 'waiting' } },
         },
       });
       return { goodsId: goods.id };
