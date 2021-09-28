@@ -121,6 +121,21 @@ export class AdminService {
     return goodsConfirmation;
   }
 
+  public async setGoodsRejection(dto: GoodsConfirmationDto) {
+    const goodsConfirmation = await this.prisma.goodsConfirmation.update({
+      where: { goodsId: dto.goodsId },
+      data: {
+        status: dto.status,
+      },
+    });
+
+    if (!goodsConfirmation) {
+      throw new Error(`승인 상태 변경불가`);
+    }
+
+    return goodsConfirmation;
+  }
+
   public async getOneGoods(goodsId: string | number) {
     return this.prisma.goods.findFirst({
       where: {

@@ -56,11 +56,19 @@ export class AdminController {
     return this.adminService.getOneGoods(goodsId);
   }
 
-  // 상품 검수를 수행
+  // 상품 검수 승인을 수행
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Put('/goods/confirm')
   setGoodsConfirmation(@Body() dto: GoodsConfirmationDto) {
     return this.adminService.setGoodsConfirmation(dto);
+  }
+
+  // 상품 검수 반려를 수행
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Put('/goods/reject')
+  setGoodsRejection(@Body() dto: GoodsConfirmationDto) {
+    return this.adminService.setGoodsRejection(dto);
   }
 }

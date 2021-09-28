@@ -9,18 +9,22 @@ import {
   Link,
   useDisclosure,
   useColorModeValue,
+  useToast,
 } from '@chakra-ui/react';
-import { useProfile, useAdminGoodsList } from '@project-lc/hooks';
-import { GridColumns } from '@material-ui/data-grid';
+import {
+  useProfile,
+  useAdminGoodsList,
+  useGoodRejectionMutation,
+} from '@project-lc/hooks';
+import { GridColumns, GridCellParams } from '@material-ui/data-grid';
 import dayjs from 'dayjs';
 import { GoodsStatus } from '@prisma/client';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
-import { SellerGoodsSortColumn } from '@project-lc/shared-types';
+import { GoodsConfirmationStatus, SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { GOODS_STATUS } from '../../constants/goodsStatus';
-import { ShippingGroupDetailModal } from '../GoodsRegistShippingPolicy';
 import { ShippingGroupDetailButton } from '../SellerGoodsList';
 
 function formatPrice(price: number): string {
@@ -41,7 +45,6 @@ const columns: GridColumns = [
     minWidth: 120,
     flex: 1,
     sortable: false,
-    // TODO: 상품 상세페이지 일감 진행 후 상품 상세페이지로 이동 기능 추가
     renderCell: ({ row }) => {
       const goodsId = row.id;
       const { goods_name } = row;
@@ -108,9 +111,16 @@ const columns: GridColumns = [
   },
   {
     field: 'confirmation',
-    headerName: '검수하기',
+    headerName: '검수승인',
     width: 100,
-    renderCell: () => <Button size="xs">완료하기</Button>,
+    renderCell: () => <Button size="xs">승인하기</Button>,
+    sortable: false,
+  },
+  {
+    field: 'rejection',
+    headerName: '검수반려',
+    width: 100,
+    renderCell: () => <Button size="xs">반려하기</Button>,
     sortable: false,
   },
 ];
@@ -127,6 +137,7 @@ export function AdminGoodsList(): JSX.Element {
     handlePageSizeChange,
     handleSortChange,
   } = useSellerGoodsListPanelStore();
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedRow, setSelectedRow] = useState({});
   const { data, isLoading, refetch } = useAdminGoodsList(
@@ -139,10 +150,34 @@ export function AdminGoodsList(): JSX.Element {
     },
   );
 
-  function handleClick(param: any) {
+  const rejectMutation = useGoodRejectionMutation();
+
+  async function handleRejectionGood(row: any) {
+    try {
+      await rejectMutation.mutateAsync({
+        goodsId: row.id,
+        status: GoodsConfirmationStatus.REJECTED,
+      });
+      toast({
+        title: '상품이 반려되었습니다.',
+        status: 'success',
+      });
+      refetch();
+    } catch (error) {
+      toast({
+        title: '상품 반려가 실패하였습니다.',
+        status: 'error',
+      });
+    }
+  }
+
+  async function handleClick(param: GridCellParams) {
     if (param.field === 'confirmation') {
       setSelectedRow(param.row);
       onOpen();
+    }
+    if (param.field === 'rejection') {
+      handleRejectionGood(param.row);
     }
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
   }
