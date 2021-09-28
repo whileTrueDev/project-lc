@@ -8,6 +8,7 @@ import {
   PriceSum,
   NicknameAndText,
   GoogleTTSCredentials,
+  PurchaseMessage,
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
 
@@ -28,7 +29,7 @@ export class OverlayService {
     };
   }
 
-  async googleTextToSpeech(purchaseData) {
+  async googleTextToSpeech(purchaseData: PurchaseMessage) {
     const client = new textToSpeech.TextToSpeechClient(this.options);
     const { nickname } = purchaseData;
     const { productName } = purchaseData;
