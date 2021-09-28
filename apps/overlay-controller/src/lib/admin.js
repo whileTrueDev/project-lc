@@ -14,6 +14,7 @@ socket.on('creator list from server', (data) => {
     $('.mid-area button').attr('disabled', false);
   } else {
     $('#connection-status').text('❌ 연결되지 않음');
+    $('.mid-area button').attr('disabled', true);
   }
 });
 
@@ -23,6 +24,7 @@ $(document).ready(function ready() {
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
   const localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
 
+  $('#start-time-picker').val(localISOTime);
   $('#end-time-picker').val(localISOTime);
 
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
@@ -75,6 +77,15 @@ $(document).ready(function ready() {
 
   $('#refresh-button').click(function refreshButtonClickEvent() {
     socket.emit('refresh', roomName);
+  });
+
+  $('#alive-check-button').click(function aliveCheckButtonClickEvent() {
+    socket.emit('connection check from admin', roomName);
+  });
+
+  $('#start-time-send-button').click(function startTimeSendButtonClickEvent() {
+    const selectedTime = $('#start-time-picker').val();
+    socket.emit('get start time from admin', { roomName, date: selectedTime });
   });
 
   $('#end-time-send-button').click(function endTimeSendButtonClickEvent() {
