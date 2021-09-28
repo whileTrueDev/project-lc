@@ -13,6 +13,7 @@ import {
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
   GoodsConfirmationDto,
+  GoodsRejectionDto,
 } from '@project-lc/shared-types';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -68,7 +69,7 @@ export class AdminController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Put('/goods/reject')
-  setGoodsRejection(@Body() dto: GoodsConfirmationDto) {
+  setGoodsRejection(@Body() dto: GoodsRejectionDto) {
     return this.adminService.setGoodsRejection(dto);
   }
 }
