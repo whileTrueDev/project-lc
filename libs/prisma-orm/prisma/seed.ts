@@ -91,7 +91,7 @@ async function main() {
         ],
       },
       confirmation: {
-        create: { status: 'confirmed' },
+        create: { status: 'confirmed', firstmallGoodsConnectionId: 41 },
       },
       ShippingGroup: {
         create: {
@@ -180,7 +180,7 @@ async function main() {
         ],
       },
       confirmation: {
-        create: { status: 'confirmed' },
+        create: { status: 'confirmed', firstmallGoodsConnectionId: 42 },
       },
     },
     include: { options: { include: { supply: true } } },
