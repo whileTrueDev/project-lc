@@ -1,6 +1,6 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["selectRelationCount", "orderByRelation", "referentialActions"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
 }
 
 datasource db {
@@ -180,28 +180,6 @@ model GoodsOptionsSupplies {
   @@index([goodsOptionsId], name: "goodsOptionsId")
 }
 
-model LoginHistory {
-  id         Int      @id @default(autoincrement())
-  seller     Seller?  @relation(fields: [sellerId], references: [id])
-  sellerId   Int?
-  method     String // 로그인 방식
-  ip         String // 로그인 IP
-  country    String? // 로그인 국가
-  city       String? // 로그인 도시
-  device     String // 로그인 기기
-  ua         String // User-Agent 문자열
-  createDate DateTime @default(now()) // 로그인 일시
-
-  @@index([sellerId], name: "sellerId")
-}
-
-// 상품 검수 상태 정보
-enum GoodsConfirmationStatuses {
-  waiting // 대기
-  confirmed // 승인
-  rejected // 거절
-}
-
 // 상품 사진 fm_goods_image
 model GoodsImages {
   id         Int    @id @default(autoincrement())
@@ -222,16 +200,26 @@ model GoodsInfo {
 
 }
 
-// 라이브 커머스 랭킹 테이블
-model LiveCommerceRanking {
-  id                 Int      @id @default(autoincrement())
-  nickname           String   @default("비회원")
-  text               String   @db.LongText
-  price              Int
-  phoneCallEventFlag Boolean  @default(false)
-  loginFlag          Boolean  @default(true)
-  creatorId          String
-  createdAt          DateTime @default(now())
+model LoginHistory {
+  id         Int      @id @default(autoincrement())
+  seller     Seller?  @relation(fields: [sellerId], references: [id])
+  sellerId   Int?
+  method     String // 로그인 방식
+  ip         String // 로그인 IP
+  country    String? // 로그인 국가
+  city       String? // 로그인 도시
+  device     String // 로그인 기기
+  ua         String // User-Agent 문자열
+  createDate DateTime @default(now()) // 로그인 일시
+
+  @@index([sellerId], name: "sellerId")
+}
+
+// 상품 검수 상태 정보
+enum GoodsConfirmationStatuses {
+  waiting // 대기
+  confirmed // 승인
+  rejected // 거절
 }
 
 // * 상품 - 상태
@@ -396,4 +384,34 @@ model ShippingCost {
   shipping_opt_seq   Int
   shipping_cost      Decimal?       @db.Decimal(11, 2) // 금액
   shipping_area_name String         @db.VarChar(255) // '지역명',
+}
+
+// 라이브 커머스 랭킹 테이블
+model LiveCommerceRanking {
+  id                 Int         @id @default(autoincrement())
+  nickname           String      @default("비회원") // 메세지 작성자의 닉네임
+  text               String      @db.LongText // 메세지 내용
+  price              Int // 구매금액
+  phoneCallEventFlag Boolean     @default(false) // 전화 이벤트 참여 여부 
+  giftFlag           Boolean     @default(false) // 스트리머에게 선물하기 여부
+  loginFlag          Boolean     @default(true) // 회원 | 비회원 구분 \
+  broadcaster        Broadcaster @relation(fields: [broadcasterId], references: [userId])
+  broadcasterId      String      @db.VarChar(20) // 스트리머의 아이디 
+  createDate         DateTime    @default(now()) // 작성일자
+}
+
+model Broadcaster {
+  id                  Int                   @id @default(autoincrement())
+  liveCommerceRanking LiveCommerceRanking[]
+  userId              String                @db.VarChar(20) // 유저 아이디
+  userName            String                @db.VarChar(20) // 유저의 실명
+  userNickname        String                @db.VarChar(20) // 유저의 활동명
+  afreecaId           String? // 유저의 아프리카 아이디
+  twitchId            String? // 유저의 트위치 아이디
+  youtubeId           String? // 유저의 유튜브 아이디
+  overlayUrl          String // 라이브커머스 오버레이 URL
+  createDate          DateTime              @default(now())
+  deleteFlag          Boolean               @default(false) // 회원탈퇴 여부
+
+  @@index(userId)
 }

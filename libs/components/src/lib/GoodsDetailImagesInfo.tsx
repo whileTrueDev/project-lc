@@ -1,46 +1,18 @@
-import {
-  Box,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Stack,
-  Text,
-  useDisclosure,
-} from '@chakra-ui/react';
+import { Stack, Text, useDisclosure } from '@chakra-ui/react';
 import { GoodsByIdRes } from '@project-lc/shared-types';
+import { useMemo } from 'react';
 import { HorizontalImageGallery } from './HorizontalImageGallery';
-import ShowMoreTextButton from './ShowMoreTextButton';
-
-const dummyText = `
-  <img src="https://picsum.photos/900/630"></img>
-
-<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-
-Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-when an unknown printer took a galley of type and scrambled it to make a type
-specimen book.</p>
-
-<br/>
-
-<p>It has survived not only five centuries, but also the leap into
-electronic typesetting, remaining essentially unchanged. It was popularised in
-the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
-and more recently with desktop publishing software like Aldus PageMaker
-including versions of Lorem Ipsum</p>
-
-<div style="display:flex;justify-content:center;align-items:center;">
-  <img src="https://picsum.photos/305/305"></img>
-</div>`;
+import { TextViewerWithDetailModal } from './TextViewerWithDetailModal';
 
 export interface GoodsDetailImagesInfoProps {
   goods: GoodsByIdRes;
 }
 export function GoodsDetailImagesInfo({ goods }: GoodsDetailImagesInfoProps) {
-  const detailDialog = useDisclosure();
-
+  const contents = useMemo(() => goods.contents ?? '', [goods.contents]);
+  const images = useMemo(
+    () => goods.image.sort((a, b) => a.cut_number - b.cut_number).map((x) => x.image),
+    [goods.image],
+  );
   return (
     <Stack spacing={10}>
       {/* 상품이미지 */}
@@ -51,17 +23,7 @@ export function GoodsDetailImagesInfo({ goods }: GoodsDetailImagesInfoProps) {
             <Text>총 {goods.image.length} 장</Text>
 
             {/* 임시 이미지. s3 업로드된 이미지 필요 */}
-            <HorizontalImageGallery
-              images={[
-                'https://picsum.photos/300/300',
-                'https://picsum.photos/301/300',
-                'https://picsum.photos/300/301',
-                'https://picsum.photos/301/301',
-                'https://picsum.photos/302/301',
-                'https://picsum.photos/302/302',
-                'https://picsum.photos/301/302',
-              ]}
-            />
+            <HorizontalImageGallery images={images} />
           </>
         ) : (
           <Text>사진이 없는 상품입니다.</Text>
@@ -70,36 +32,16 @@ export function GoodsDetailImagesInfo({ goods }: GoodsDetailImagesInfoProps) {
 
       {/* 상품상세설명 */}
       <Stack>
-        <Text fontWeight="bold">
-          상세설명 (상품 등록 작업 이후 에디터 viewer UI작업 진행)
-        </Text>
-        <Box maxH={350} noOfLines={dummyText.includes('<img ') ? 1 : 6}>
-          {/* {goods.contents || '없음'} */}
-          {/* // TODO 텍스트에디터 작업 이후 변경 필요 */}
-          <div dangerouslySetInnerHTML={{ __html: dummyText }} />
-        </Box>
-        <Box>
-          <ShowMoreTextButton onClick={detailDialog.onOpen} />
-        </Box>
+        <Text fontWeight="bold">상세설명</Text>
+        {contents ? (
+          <TextViewerWithDetailModal
+            title={`${goods.goods_name} 상세설명`}
+            contents={contents}
+          />
+        ) : (
+          <Text>상세 설명이 입력되지 않은 상품입니다.</Text>
+        )}
       </Stack>
-
-      <Modal
-        isOpen={detailDialog.isOpen}
-        onClose={detailDialog.onClose}
-        scrollBehavior="outside"
-        size="2xl"
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton />
-          <ModalHeader>{goods.goods_name} 상세설명</ModalHeader>
-          <ModalBody>
-            {goods.contents}
-            {/* // TODO 텍스트에디터 작업 이후 변경 필요 */}
-            <div dangerouslySetInnerHTML={{ __html: dummyText }} />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
     </Stack>
   );
 }

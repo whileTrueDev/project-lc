@@ -46,17 +46,23 @@ export function DeleteGoodsAlertDialog({
         item.confirmation.status === 'confirmed' &&
         item.confirmation.firstmallGoodsConnectionId !== null,
     );
-
     try {
       // 전체 선택된 상품 Goods테이블에서 삭제요청
       const deleteGoodsFromLcDb = deleteLcGoods.mutateAsync({
         ids: selectedGoodsIds.map((id) => Number(id)),
       });
-      // 선택된 상품 중 검수된 상품은 fm-goods 테이블에서 삭제요청
-      const deleteGoodsFromFmDb = deleteFmGoods.mutateAsync({
-        ids: confirmedGoods.map((item) => Number(item.id)),
-      });
-      await Promise.all([deleteGoodsFromLcDb, deleteGoodsFromFmDb]);
+
+      const promises = [deleteGoodsFromLcDb];
+
+      if (confirmedGoods.length > 0) {
+        // 선택된 상품 중 검수된 상품이 있다면 fm-goods 테이블에서도 삭제요청
+        const deleteGoodsFromFmDb = deleteFmGoods.mutateAsync({
+          ids: confirmedGoods.map((item) => Number(item.id)),
+        });
+        promises.push(deleteGoodsFromFmDb);
+      }
+
+      await Promise.all(promises);
       queryClient.invalidateQueries('SellerGoodsList');
       toast({
         title: '상품이 삭제되었습니다',

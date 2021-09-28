@@ -2,7 +2,7 @@
 import { QuestionIcon } from '@chakra-ui/icons';
 import { HStack, Text } from '@chakra-ui/layout';
 import { Radio, RadioGroup } from '@chakra-ui/radio';
-import { RadioGroupProps } from '@chakra-ui/react';
+import { RadioGroupProps, Stack } from '@chakra-ui/react';
 import { GoodsStatus } from '@prisma/client';
 import { RegistGoodsDto } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
@@ -54,21 +54,25 @@ export function GoodsRegistRadio({
 export function GoodsRegistDataSales(): JSX.Element {
   return (
     <SectionWithTitle title="판매정보">
-      <HStack>
-        <Text>판매상태</Text>
-        <GoodsRegistRadio name="goods_status" values={GOODS_STATUS} />
-      </HStack>
+      <Stack>
+        <Stack spacing={{ base: 2, sm: 6 }} direction={{ base: 'column', sm: 'row' }}>
+          <Text mr="24px">판매상태</Text>
+          <GoodsRegistRadio name="goods_status" values={GOODS_STATUS} />
+        </Stack>
 
-      <HStack>
-        <TextWithPopperButton
-          title="청약철회"
-          iconAriaLabel="청약철회 설명"
-          icon={<QuestionIcon />}
-        >
-          <Text>청약철회 불가 선택 시 결제 확인 이후, 취소, 반품, 교환이 불가합니다</Text>
-        </TextWithPopperButton>
-        <GoodsRegistRadio name="cancel_type" values={GOODS_CANCEL_TYPE} />
-      </HStack>
+        <Stack spacing={{ base: 2, sm: 6 }} direction={{ base: 'column', sm: 'row' }}>
+          <TextWithPopperButton
+            title="청약철회"
+            iconAriaLabel="청약철회 설명"
+            icon={<QuestionIcon />}
+          >
+            <Text>
+              청약철회 불가 선택 시 결제 확인 이후, 취소, 반품, 교환이 불가합니다
+            </Text>
+          </TextWithPopperButton>
+          <GoodsRegistRadio name="cancel_type" values={GOODS_CANCEL_TYPE} />
+        </Stack>
+      </Stack>
     </SectionWithTitle>
   );
 }

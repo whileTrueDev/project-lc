@@ -240,10 +240,10 @@ export class GoodsService {
   }
 
   /** 상품 개별 정보 조회 */
-  public async getOneGoods(goodsId: string | number, email: string) {
+  public async getOneGoods(goodsId: number, email: string) {
     return this.prisma.goods.findFirst({
       where: {
-        id: Number(goodsId),
+        id: goodsId,
         seller: {
           email,
         },

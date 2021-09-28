@@ -36,7 +36,7 @@ export default function TextWithPopperButton({
   const { onOpen, onClose, isOpen } = useDisclosure();
 
   return (
-    <HStack>
+    <HStack spacing={0}>
       <Text>{title}</Text>
       <Popover
         isLazy

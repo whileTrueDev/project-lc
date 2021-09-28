@@ -4,7 +4,7 @@ import { GoodsRegistForm, MypageLayout } from '@project-lc/components';
 export function Goods(): JSX.Element {
   return (
     <MypageLayout>
-      <Container maxWidth="container.xl">
+      <Container maxWidth="container.xl" my={12}>
         <Heading>상품등록</Heading>
         <GoodsRegistForm />
       </Container>
