@@ -94,3 +94,8 @@ export interface Voice {
     | null
     | undefined;
 }
+
+/** 구글 TTS credential */
+export interface GoogleTTSCredentials {
+  [keys: string]: { private_key: string; client_email: string };
+}

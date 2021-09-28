@@ -13,8 +13,9 @@ import {
   SocketInfo,
   SocketIdandDevice,
   PageUrlAndDevice,
+  RoomAndDate,
 } from '@project-lc/shared-types';
-
+import { OverlayService } from '@project-lc/nest-modules';
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
 export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -23,7 +24,6 @@ export class AppGateway
   server: Server;
 
   socketInfo: SocketInfo = {};
-
   private logger: Logger = new Logger('AppGateway');
 
   afterInit() {

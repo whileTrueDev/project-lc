@@ -1,9 +1,11 @@
 /* eslint-env jquery */
 /* global io, */
 /* eslint no-undef: "error" */
-
+const socket = io({ transports: ['websocket'] });
+const pageUrl = window.location.href;
 const messageArray = [];
 
+let startDate = new Date('2021-09-27T14:05:00+0900');
 let defaultDate = new Date('2021-09-04T15:00:00+0900');
 let bannerId = 0;
 let bottomMessages = [];
@@ -39,6 +41,38 @@ function dailyMissionTimer() {
   setInterval(function timer() {
     // 현재 날짜를 new 연산자를 사용해서 Date 객체를 생성
     const now = new Date();
+
+    const extraTimeToStart = startDate.getTime() - now.getTime();
+
+    const extraHoursToStart = Math.floor(
+      (extraTimeToStart % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+
+    const extraMinutesToStart = Math.floor(
+      (extraTimeToStart % (1000 * 60 * 60)) / (1000 * 60),
+    );
+
+    const extraSecondsToStart = Math.floor((extraTimeToStart % (1000 * 60)) / 1000);
+    if (extraHoursToStart === 0 && extraMinutesToStart === 0) {
+      if (extraSecondsToStart === 11) {
+        const roomName = pageUrl.split('/').pop();
+        socket.emit('send notification signal', roomName);
+      } else if (extraSecondsToStart === 5) {
+        // 5sec-timer.MP3
+        $('body').append(`
+        <iframe src="/audio/5sec-timer.MP3" id="sec-timer" allow="autoplay" style="display:none"></iframe>
+        `);
+      } else if (extraSecondsToStart === 0) {
+        $('body').remove('#sec-timer');
+        const introHtml = `
+          <video class="inner-video-area" autoplay>
+            <source src="/videos/intro.mp4" type="video/mp4">
+          </video>
+            `;
+        $('.full-video').html(introHtml);
+      }
+    }
+
     let distance = defaultDate.getTime() - now.getTime();
     if (distance < 0) {
       distance = 0;
@@ -192,10 +226,8 @@ dailyMissionTimer();
 switchImage();
 switchBottomText();
 //------------------------------------------------------------------------------
-const socket = io({ transports: ['websocket'] });
 
 const device = getOS();
-const pageUrl = window.location.href;
 
 socket.emit('new client', { pageUrl, device });
 
@@ -367,11 +399,11 @@ socket.on('handle bottom area to client', () => {
 });
 
 socket.on('show screen', () => {
-  $(document.body).fadeIn(1000);
+  $('.live-commerce').fadeIn(500);
 });
 
 socket.on('hide screen', () => {
-  $(document.body).fadeOut(1000);
+  $('.live-commerce').fadeOut(500);
 });
 
 socket.on('d-day from server', (date) => {
@@ -404,4 +436,22 @@ socket.on('clear full video from server', () => {
   $('.inner-video-area').fadeOut(800);
 });
 
+socket.on('get start time from server', (timeData) => {
+  startDate = new Date(timeData);
+});
+
+socket.once('get stream start notification tts', (audioBuffer) => {
+  if (audioBuffer) {
+    const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
+    const streamStartNotificationAudioBlob = window.URL.createObjectURL(blob);
+    const sound = new Audio(streamStartNotificationAudioBlob);
+    setTimeout(() => {
+      sound.play();
+    }, 1000);
+  }
+});
+
+socket.on('connection check from server', () => {
+  $('.alive-check').toggle();
+});
 export {};

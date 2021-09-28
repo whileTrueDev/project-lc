@@ -7,22 +7,30 @@ import {
   NicknameAndPrice,
   PriceSum,
   NicknameAndText,
+  GoogleTTSCredentials,
+  PurchaseMessage,
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
 
 @Injectable()
 export class OverlayService {
-  constructor(private readonly prisma: PrismaService) {}
-  async googleTextToSpeech(purchaseData) {
-    const privateKey =
+  privateKey: string;
+  options: GoogleTTSCredentials;
+
+  constructor(private readonly prisma: PrismaService) {
+    this.privateKey =
       process.env.GOOGLE_CREDENTIALS_PRIVATE_KEY?.replace(/\\n/g, '\n') || '';
-    const options = {
+
+    this.options = {
       credentials: {
-        private_key: privateKey,
+        private_key: this.privateKey,
         client_email: process.env.GOOGLE_CREDENTIALS_EMAIL,
       },
     };
-    const client = new textToSpeech.TextToSpeechClient(options);
+  }
+
+  async googleTextToSpeech(purchaseData: PurchaseMessage) {
+    const client = new textToSpeech.TextToSpeechClient(this.options);
     const { nickname } = purchaseData;
     const { productName } = purchaseData;
     const quantity = purchaseData.purchaseNum;
@@ -41,28 +49,56 @@ export class OverlayService {
       name: 'ko-KR-Standard-A',
       ssmlGender: 'FEMALE',
     };
-    // Construct the request
     const params = {
       input: { ssml: messageWithAppreciate },
-      // Select the language and SSML voice gender (optional)
-      voice, // , ssmlGender: 'NEUTRAL'
-      // select the type of audio encoding
+      voice,
       audioConfig,
     };
 
-    // Performs the text-to-speech request
     const [response] = await client.synthesizeSpeech(params);
-    // Write the binary audio content to a local file
     if (response && response.audioContent) {
       return response.audioContent;
     }
     return false;
   }
 
-  async getRanking(): Promise<NicknameAndPrice[]> {
+  async streamStartNotification() {
+    const client = new textToSpeech.TextToSpeechClient(this.options);
+
+    const message = `
+    <speak>
+      잠시 후, 밍선하의 진국보감 라이브 커머스가 시작됩니다.
+    </speak>
+    `;
+
+    const audioConfig: AudioEncoding = { speakingRate: 1.0, audioEncoding: 'MP3' };
+    const voice: Voice = {
+      languageCode: 'ko-KR',
+      name: 'ko-KR-Wavenet-A',
+      ssmlGender: 'FEMALE',
+    };
+
+    const params = {
+      input: { ssml: message },
+      voice, // ssmlGender: 'NEUTRAL'
+      audioConfig,
+    };
+
+    const [response] = await client.synthesizeSpeech(params);
+
+    if (response && response.audioContent) {
+      return response.audioContent;
+    }
+    return false;
+  }
+
+  async getRanking(overlayUrl): Promise<NicknameAndPrice[]> {
     const topRanks = await this.prisma.liveCommerceRanking.groupBy({
       by: ['nickname'],
       where: {
+        broadcaster: {
+          overlayUrl: { contains: overlayUrl },
+        },
         loginFlag: true,
       },
       _sum: {
@@ -83,13 +119,16 @@ export class OverlayService {
     return totalSoldPrice;
   }
 
-  async getMessageAndNickname(): Promise<NicknameAndText[]> {
+  async getMessageAndNickname(overlayUrl): Promise<NicknameAndText[]> {
     const messageAndNickname = await this.prisma.liveCommerceRanking.findMany({
       select: {
         nickname: true,
         text: true,
       },
       where: {
+        broadcaster: {
+          overlayUrl: { contains: overlayUrl },
+        },
         loginFlag: true,
       },
     });

@@ -21,7 +21,7 @@ export class AppScreenGateway
 
   socketInfo: SocketInfo = {};
 
-  constructor(private readonly appService: OverlayService) {}
+  constructor(private readonly overlayService: OverlayService) {}
 
   private logger: Logger = new Logger('AppGateway');
 
@@ -50,7 +50,7 @@ export class AppScreenGateway
   @SubscribeMessage('get ranking')
   async getRanking(@MessageBody() roomName: string) {
     const nicknameAndPrice = [];
-    const rankings = await this.appService.getRanking();
+    const rankings = await this.overlayService.getRanking(roomName);
     rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();
       const { nickname } = eachNickname;
@@ -67,9 +67,9 @@ export class AppScreenGateway
   async getAllPurchaseMessage(@MessageBody() roomName: string) {
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
-    const rankings = await this.appService.getRanking();
-    const totalSold = await this.appService.getTotalSoldPrice();
-    const messageAndNickname = await this.appService.getMessageAndNickname();
+    const rankings = await this.overlayService.getRanking(roomName);
+    // const totalSold = await this.overlayService.getTotalSoldPrice();
+    const messageAndNickname = await this.overlayService.getMessageAndNickname(roomName);
 
     rankings.forEach((eachNickname) => {
       const price = Object.values(eachNickname._sum).toString();
@@ -85,7 +85,7 @@ export class AppScreenGateway
     });
 
     this.server.to(roomName).emit('get top-left ranking', nicknameAndPrice);
-    this.server.to(roomName).emit('get current quantity', totalSold);
+    // this.server.to(roomName).emit('get current quantity', totalSold);
     this.server
       .to(roomName)
       .emit('get bottom purchase message', bottomAreaTextAndNickname);
@@ -111,6 +111,13 @@ export class AppScreenGateway
     this.server.to(roomName).emit('hide screen');
   }
 
+  @SubscribeMessage('get start time from admin')
+  getStartTime(@MessageBody() roomAndDate: RoomAndDate) {
+    const { date } = roomAndDate;
+    const { roomName } = roomAndDate;
+    this.server.to(roomName).emit('get start time from server', date);
+  }
+
   @SubscribeMessage('get d-day')
   getDday(@MessageBody() roomAndDate: RoomAndDate) {
     const { date } = roomAndDate;
@@ -133,5 +140,16 @@ export class AppScreenGateway
   @SubscribeMessage('clear full video')
   clearVideo(@MessageBody() roomName: string) {
     this.server.to(roomName).emit('clear full video from server');
+  }
+
+  @SubscribeMessage('send notification signal')
+  async sendNotificationSignal(@MessageBody() roomName: string) {
+    const audioBuffer = await this.overlayService.streamStartNotification();
+    this.server.to(roomName).emit('get stream start notification tts', audioBuffer);
+  }
+
+  @SubscribeMessage('connection check from admin')
+  connectionCheckFromAdmin(@MessageBody() roomName: string) {
+    this.server.to(roomName).emit('connection check from server');
   }
 }
