@@ -87,7 +87,7 @@ function GoodsCommonInfoList({
     if (!value) throw new Error('공통정보가 없습니다');
     deleteCommonInfoItem({ id: Number(value) })
       .then((res) => {
-        toast({ title: '해당 상품 공통 정보를 삭제하였습니다.' });
+        toast({ title: '해당 상품 공통 정보를 삭제하였습니다.', status: 'success' });
       })
       .catch((error) => {
         toast({
@@ -168,7 +168,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
     setViewerContents(textWithImages);
     setValue('common_contents', textWithImages);
 
-    toast({ title: '상품 공통 정보가 임시 저장되었습니다.' });
+    toast({ title: '상품 공통 정보가 임시 저장되었습니다.', status: 'success' });
     onClose();
   };
 

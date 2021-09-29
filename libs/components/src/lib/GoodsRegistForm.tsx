@@ -255,6 +255,7 @@ export function GoodsRegistForm(): JSX.Element {
       .then((res) => {
         toast({
           title: '상품을 성공적으로 등록하였습니다',
+          status: 'success',
         });
         router.push('/mypage/goods');
       })
