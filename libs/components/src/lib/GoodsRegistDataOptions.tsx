@@ -131,8 +131,9 @@ function UseOptionInput() {
           {...boxStyle}
           direction={isMobileSize ? 'column' : 'row'}
           spacing={1}
+          flexWrap="wrap"
         >
-          <HStack>
+          <HStack mb={1}>
             <CloseButton onClick={() => remove(index)} />
             <HStack>
               <Text minWidth="60px">
@@ -146,7 +147,7 @@ function UseOptionInput() {
               />
             </HStack>
           </HStack>
-          <HStack>
+          <HStack mb={1}>
             <HStack>
               <Text minWidth="40px">정가</Text>
               <Input
@@ -157,7 +158,7 @@ function UseOptionInput() {
                 size="sm"
               />
             </HStack>
-            <HStack>
+            <HStack mb={1}>
               <Text minWidth="40px">판매가</Text>
               <Input
                 {...register(`options.${index}.price` as const, {
@@ -181,6 +182,7 @@ function UseOptionInput() {
             </HStack>
             {/* 노출 */}
             <RadioGroup
+              mb={1}
               minWidth={isMobileSize ? '150px' : 'auto'}
               value={watch(`options.${index}.option_view` as const, 'Y')}
             >
