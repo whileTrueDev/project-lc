@@ -11,6 +11,7 @@ import {
   PurchaseMessage,
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
+import AWS from 'aws-sdk';
 
 @Injectable()
 export class OverlayService {
@@ -134,5 +135,50 @@ export class OverlayService {
     });
     if (!messageAndNickname) throwError('Cannot Get Data From Db');
     return messageAndNickname;
+  }
+
+  async getImagesFromS3(): Promise<void> {
+    const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME;
+    const S3_BUCKET_REGION = 'ap-northeast-2';
+    const broadcasterId = 'kevin2022';
+    const imagesPath: Array<string> = [];
+
+    AWS.config.update({
+      region: S3_BUCKET_REGION,
+      credentials: {
+        accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET,
+      },
+    });
+
+    const listingParams = {
+      Bucket: S3_BUCKET_NAME,
+      Prefix: `vertical-banner/${broadcasterId}/`,
+    };
+
+    const s3 = new AWS.S3();
+
+    await s3
+      .listObjects(listingParams, async (err, data) => {
+        if (data) {
+          data.Contents.forEach((object) => {
+            imagesPath.push(object.Key);
+          });
+        } else {
+          console.log(err);
+        }
+      })
+      .promise();
+    imagesPath.forEach((imageName) => {
+      s3.getBucketLocation(
+        {
+          Bucket: S3_BUCKET_NAME,
+          // Key: `${imageName}`,
+        },
+        (err, data) => {
+          console.log(data);
+        },
+      );
+    });
   }
 }
