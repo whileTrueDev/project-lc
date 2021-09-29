@@ -137,11 +137,11 @@ export class OverlayService {
     return messageAndNickname;
   }
 
-  async getImagesFromS3(): Promise<void> {
+  async getVerticalImagesFromS3(): Promise<string[]> {
     const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME;
     const S3_BUCKET_REGION = 'ap-northeast-2';
     const broadcasterId = 'kevin2022';
-    const imagesPath: Array<string> = [];
+    const imagesUrls: Array<string> = [];
 
     AWS.config.update({
       region: S3_BUCKET_REGION,
@@ -162,23 +162,19 @@ export class OverlayService {
       .listObjects(listingParams, async (err, data) => {
         if (data) {
           data.Contents.forEach((object) => {
-            imagesPath.push(object.Key);
+            const imageName = object.Key.split('/').slice(-1)[0];
+            if (imageName.includes('vertical-banner')) {
+              const imageUrl = `https://${S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/vertical-banner/${broadcasterId}/${imageName}`;
+              imagesUrls.push(imageUrl);
+            }
           });
         } else {
           console.log(err);
         }
       })
       .promise();
-    imagesPath.forEach((imageName) => {
-      s3.getBucketLocation(
-        {
-          Bucket: S3_BUCKET_NAME,
-          // Key: `${imageName}`,
-        },
-        (err, data) => {
-          console.log(data);
-        },
-      );
-    });
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+    imagesUrls.sort(collator.compare);
+    return imagesUrls;
   }
 }
