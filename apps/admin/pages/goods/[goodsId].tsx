@@ -1,5 +1,5 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
-import { Box, Button, Stack } from '@chakra-ui/react';
+import { Box, Button, Flex, Stack } from '@chakra-ui/react';
 import {
   AdminPageLayout,
   GoodsDetailActions,
@@ -12,6 +12,7 @@ import {
   GoodsDetailSummary,
   GoodsDetailTitle,
   SectionWithTitle,
+  AdminGoodsStatusButtons,
 } from '@project-lc/components';
 import { useAdminGoodsById } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
@@ -31,15 +32,18 @@ export function GoodsDetail(): JSX.Element {
     <AdminPageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={8} p={2} mb={16}>
         <Box as="section">
-          <Button
-            size="sm"
-            leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push('/goods')}
-          >
-            목록으로
-          </Button>
+          <Flex direction="row" alignItems="center" justifyContent="space-between">
+            <Button
+              size="sm"
+              leftIcon={<ChevronLeftIcon />}
+              onClick={() => router.push('/goods')}
+            >
+              목록으로
+            </Button>
+            {/* 상품 검수를 위한 버튼 */}
+            <AdminGoodsStatusButtons goods={goods.data} />
+          </Flex>
         </Box>
-
         {/* 상품 제목 */}
         <Box as="section">
           <GoodsDetailTitle goods={goods.data} />

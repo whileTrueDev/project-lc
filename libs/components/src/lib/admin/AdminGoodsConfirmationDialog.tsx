@@ -18,25 +18,27 @@ import {
   useToast,
   Grid,
 } from '@chakra-ui/react';
-import { GoodsConfirmationStatus, GoodsListRes } from '@project-lc/shared-types';
+import { GoodsConfirmationStatus } from '@project-lc/shared-types';
 import { useGoodConfirmationMutation } from '@project-lc/hooks';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { GridRowData } from '@material-ui/data-grid';
-import { QueryObserverResult } from 'react-query';
 import { GridTableItem } from '../GridTableItem';
+
+// 검수 승인시에 필요한 최소한의 데이터
+type GoodRowType = { id: number; goods_name: string };
 
 type GoodsConfirmationDialogType = {
   isOpen: boolean;
   onClose: () => void;
-  row: GridRowData;
-  refetch: () => Promise<QueryObserverResult<GoodsListRes, unknown>>;
+  row: GoodRowType | GridRowData;
+  callback: () => void;
 };
 
 export function AdminGoodsConfirmationDialog(
   props: GoodsConfirmationDialogType,
 ): JSX.Element {
-  const { isOpen, onClose, row, refetch } = props;
+  const { isOpen, onClose, row, callback } = props;
 
   const {
     register,
@@ -50,7 +52,7 @@ export function AdminGoodsConfirmationDialog(
   function useClose() {
     reset();
     onClose();
-    refetch();
+    callback();
   }
 
   const mutation = useGoodConfirmationMutation();
@@ -103,7 +105,6 @@ export function AdminGoodsConfirmationDialog(
               placeholder="승인할 상품 ID를 입력 하세요."
               {...register('firstmallGoodsConnectionId', {
                 required: '상품 ID를 반드시 입력해주세요.',
-                valueAsNumber: true,
               })}
               ref={initialRef}
             />

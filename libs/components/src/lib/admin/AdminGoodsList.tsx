@@ -234,7 +234,9 @@ export function AdminGoodsList(): JSX.Element {
         isOpen={isOpen}
         onClose={onClose}
         row={selectedRow}
-        refetch={refetch}
+        callback={() => {
+          refetch();
+        }}
       />
     </Box>
   );
