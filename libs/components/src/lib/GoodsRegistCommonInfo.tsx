@@ -150,7 +150,6 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   };
 
   const toast = useToast();
-
   const setViewerContents = (contents: string) => {
     if (viewer.current) {
       viewer.current.innerHTML = contents;

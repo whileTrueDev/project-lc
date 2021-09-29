@@ -6,8 +6,14 @@ import NextLink from 'next/link';
 export default function AdminNav(): JSX.Element {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
+  const router = useRouter();
   const { isLoggedIn } = useIsLoggedIn();
   const { logout } = useLogout();
+
+  function adminLogout() {
+    logout();
+    router.push('/');
+  }
 
   return (
     <Box>
@@ -24,7 +30,7 @@ export default function AdminNav(): JSX.Element {
         justify="space-between"
       >
         <Flex display={{ base: 'none', md: 'flex' }} ml={4}>
-          <Box key="관리자">
+          <Box key="정산정보관리">
             <NextLink href={'/admin' ?? '#'} passHref>
               <Link
                 p={2}
@@ -36,7 +42,23 @@ export default function AdminNav(): JSX.Element {
                   color: linkHoverColor,
                 }}
               >
-                관리자
+                정산정보관리
+              </Link>
+            </NextLink>
+          </Box>
+          <Box key="상품검수">
+            <NextLink href={'/goods' ?? '#'} passHref>
+              <Link
+                p={2}
+                fontSize="sm"
+                fontWeight={500}
+                color={linkColor}
+                _hover={{
+                  textDecoration: 'none',
+                  color: linkHoverColor,
+                }}
+              >
+                상품검수
               </Link>
             </NextLink>
           </Box>
@@ -44,8 +66,8 @@ export default function AdminNav(): JSX.Element {
         <>
           {isLoggedIn && (
             <>
-              <Button my={1} size="xs" onClick={logout}>
-                기존 계정 로그아웃
+              <Button my={1} size="sm" onClick={adminLogout}>
+                로그아웃
               </Button>
             </>
           )}

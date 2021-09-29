@@ -53,3 +53,4 @@ export * from './lib/res-types/goodsList.res';
 export * from './lib/res-types/loginUserRes';
 export * from './lib/res-types/userProfile.res';
 export * from './lib/shared-types';
+export * from './lib/dto/goodsConfirmation.dto';

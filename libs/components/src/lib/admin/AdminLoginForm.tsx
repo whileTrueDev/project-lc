@@ -8,19 +8,13 @@ import {
   AlertTitle,
   Box,
   Button,
-  Checkbox,
   CloseButton,
-  Divider,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Input,
-  Link,
   Stack,
-  Text,
-  useColorModeValue,
 } from '@chakra-ui/react';
-import NextLink from 'next/link';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CenterBox } from '../CenterBox';
@@ -44,14 +38,16 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
   }
 
   // * 로그인 핸들러 -> admin으로 변경이 필요함.
-  const login = useLoginMutation('seller');
+  const login = useLoginMutation('admin');
   const onSubmit = useCallback(
     async (data: LoginSellerDto) => {
-      const seller = await login.mutateAsync(data).catch((err) => {
-        setFormError(getMessage(err?.response.data?.statusCode));
-      });
+      const seller = await login
+        .mutateAsync({ ...data, stayLogedIn: true })
+        .catch((err) => {
+          setFormError(getMessage(err?.response.data?.statusCode));
+        });
       if (seller) {
-        router.push('http://localhost:4200');
+        router.push('http://localhost:4200/admin');
       }
     },
     [router, setFormError, login],
@@ -95,11 +91,6 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
           </FormErrorMessage>
         </FormControl>
 
-        <FormControl>
-          <Checkbox size="sm" {...register('stayLogedIn')}>
-            로그인 상태 유지
-          </Checkbox>
-        </FormControl>
         {formError && (
           <Alert status="error">
             <AlertIcon />
@@ -121,26 +112,6 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
             로그인
           </Button>
         </Box>
-
-        <Stack spacing={1} mt={2}>
-          <NextLink href="/resetPassword" passHref>
-            <Link fontSize="sm" textDecoration="underline">
-              암호를 잊어버리셨나요?
-            </Link>
-          </NextLink>
-          <Text fontSize="sm">
-            처음 오셨나요?
-            <NextLink href="/signup" passHref>
-              <Link
-                ml={2}
-                color={useColorModeValue('blue.500', 'blue.400')}
-                textDecoration="underline"
-              >
-                가입하기
-              </Link>
-            </NextLink>
-          </Text>
-        </Stack>
       </Stack>
     </CenterBox>
   );
