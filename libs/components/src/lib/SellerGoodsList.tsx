@@ -280,6 +280,10 @@ const useStyles = makeStyles((theme) => ({
     '& .MuiDataGrid-cell .chakra-switch': {
       boxSizing: 'unset',
     },
+    '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
+      borderBottom: `1px solid #f0f0f0`,
+      borderRight: `1px solid #f0f0f0`,
+    },
   },
 }));
 
