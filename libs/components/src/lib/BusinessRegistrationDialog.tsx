@@ -102,7 +102,6 @@ export function BusinessRegistrationDialog(props: BusinessRegistrationDialogProp
       isOpen={isOpen}
       size="3xl"
       onClose={useClose}
-      closeOnOverlayClick={false}
       closeOnEsc={false}
       initialFocusRef={inputRef}
     >

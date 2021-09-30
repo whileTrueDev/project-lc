@@ -196,7 +196,6 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
         <FormControl isInvalid={!!errors.taxInvoiceMail}>
           <Input
             id="taxInvoiceMail"
-            type="email"
             m={[1, 3, 3, 3]}
             variant="flushed"
             placeholder="계산서를 받을 이메일을 입력해주세요."

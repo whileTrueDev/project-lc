@@ -48,7 +48,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
   const onSubmit = useCallback(
     async (data: LoginSellerDto) => {
       const seller = await login.mutateAsync(data).catch((err) => {
-        setFormError(getMessage(err?.response.data?.statusCode));
+        setFormError(getMessage(err?.response.data?.status));
       });
       if (seller) {
         router.push('/');
