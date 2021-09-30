@@ -92,7 +92,7 @@
   ],
   "placementConstraints": [],
   "memory": "512",
-  "taskRoleArn": "arn:aws:iam::803609402610:role/LC-DEV-APP-LCDEVAPPECSSocketTaskDefTaskRole005B60B-1GM3D80Q02ZXF",
+  "taskRoleArn": null,
   "family": "project-lc-overlay-dev",
   "pidMode": null,
   "requiresCompatibilities": [
