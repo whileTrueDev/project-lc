@@ -4,10 +4,12 @@
 const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
+const iterateLimit = $('#primary-info').data('number');
+const userId = $('#primary-info').data('userid');
 
 let startDate = new Date('2021-09-27T14:05:00+0900');
 let defaultDate = new Date('2021-09-04T15:00:00+0900');
-let bannerId = 0;
+let bannerId = 1;
 let bottomMessages = [];
 const topMessages = [];
 
@@ -149,28 +151,22 @@ function dailyMissionTimer() {
 }
 
 async function switchImage() {
-  if (!$('.vertical-banner').attr('src').includes('gif')) {
-    bannerId += 1;
-    if (bannerId === 12) {
-      bannerId = 1;
-    }
-    await setTimeout(() => {
-      $('.vertical-banner')
-        .attr('src', `/images/vertical-banner-${bannerId}.png`)
-        .fadeIn(1000);
-    }, 1000);
-
-    await setTimeout(() => {
-      $('.vertical-banner')
-        .attr('src', `/images/vertical-banner-${bannerId}.png`)
-        .fadeOut(1000);
-      switchImage();
-    }, 10000);
-  } else {
-    await setTimeout(() => {
-      switchImage();
-    }, 10000);
+  if (bannerId === iterateLimit) {
+    bannerId = 1;
   }
+  await setTimeout(() => {
+    $('.vertical-banner')
+      .attr(
+        'src',
+        `https://lc-project.s3.ap-northeast-2.amazonaws.com/vertical-banner/${userId}/vertical-banner-${bannerId}.png`,
+      )
+      .fadeIn(1000);
+  }, 1000);
+  await setTimeout(() => {
+    $('.vertical-banner').fadeOut(1000);
+    bannerId += 1;
+    switchImage();
+  }, 10000);
 }
 
 // 우측상단 응원문구 이벤트

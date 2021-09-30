@@ -3,6 +3,7 @@ import { PrismaModule } from '@project-lc/prisma-orm';
 import { OverlayService, OverlayModule } from '@project-lc/nest-modules';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { AppGateway } from './app.gateway';
 import { AppScreenGateway } from './app.screen.gateway';
 import { AppMessageGateway } from './app.message.gateway';
@@ -15,6 +16,12 @@ import { validationSchema } from '../settings/config.validation';
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
   ],
   controllers: [AppController],
-  providers: [OverlayService, AppGateway, AppScreenGateway, AppMessageGateway],
+  providers: [
+    AppService,
+    OverlayService,
+    AppGateway,
+    AppScreenGateway,
+    AppMessageGateway,
+  ],
 })
 export class AppModule {}
