@@ -1,6 +1,6 @@
 {
   "ipcMode": null,
-  "executionRoleArn": "arn:aws:iam::803609402610:role/LC-DEV-APP-LCDEVAPPECSSocketTaskDefExecutionRoleA4-1G038YWI8V8LS",
+  "executionRoleArn": "arn:aws:iam::803609402610:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "dnsSearchDomains": [],
