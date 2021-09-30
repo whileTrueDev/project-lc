@@ -297,7 +297,6 @@ socket.on('get right-top purchase message', async (data) => {
     const blob = new Blob([data[1]], { type: 'audio/mp3' });
     audioBlob = window.URL.createObjectURL(blob);
   }
-
   messageHtml = `
   <div class="donation-wrapper">
     <iframe src="/audio/${
@@ -305,9 +304,9 @@ socket.on('get right-top purchase message', async (data) => {
     }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="item">
       <div class="centered">
-      <img src="/images/${
-        alarmType === '2' ? 'donation-2.gif' : 'donation-1.gif'
-      }" class="donation-image"/>
+        <img src="https://lc-project.s3.ap-northeast-2.amazonaws.com/donation-images/${userId}/${
+    alarmType === '2' ? 'donation-2.gif' : 'donation-1.gif'
+  }" class="donation-image" />  
         <div class ="animated heartbeat" id="donation-top">
           <span id="nickname">
             <span class="animated heartbeat" id="donation-user-id">${nickname}</span>
