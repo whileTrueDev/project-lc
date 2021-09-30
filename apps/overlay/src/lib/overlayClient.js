@@ -151,7 +151,7 @@ function dailyMissionTimer() {
 async function switchImage() {
   if (!$('.vertical-banner').attr('src').includes('gif')) {
     bannerId += 1;
-    if (bannerId === 12) {
+    if (bannerId === 14) {
       bannerId = 1;
     }
     await setTimeout(() => {
