@@ -26,6 +26,7 @@ import {
 } from '@prisma/client';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import { SellerGoodsSortColumn } from '@project-lc/shared-types';
+import { makeStyles } from '@material-ui/core/styles';
 import { useState } from 'react';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import {
@@ -273,7 +274,21 @@ const columns: GridColumns = [
 ];
 // * 상품목록 datagrid 컬럼 끝*********************************************
 
+/** DataGrid style 때문에 chakra switch 이상하게 보이는거 방지하기 위해 적용 */
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& .MuiDataGrid-cell .chakra-switch': {
+      boxSizing: 'unset',
+    },
+    '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
+      borderBottom: `1px solid #f0f0f0`,
+      borderRight: `1px solid #f0f0f0`,
+    },
+  },
+}));
+
 export function SellerGoodsList(): JSX.Element {
+  const { root } = useStyles();
   const { data: profileData } = useProfile();
   const {
     page,
@@ -313,6 +328,7 @@ export function SellerGoodsList(): JSX.Element {
   return (
     <Box>
       <ChakraDataGrid
+        className={root}
         bg={useColorModeValue('inherit', 'gray.300')}
         loading={isLoading}
         rows={data?.items || []}

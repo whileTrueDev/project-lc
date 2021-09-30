@@ -38,7 +38,7 @@ export function GoodsExposeSwitch({
         id: goodsId,
         view: goodsView === 'look' ? 'notLook' : 'look',
       });
-      queryClient.invalidateQueries('SellerGoodsList');
+      queryClient.invalidateQueries('SellerGoodsList', { refetchInactive: true });
       queryClient.invalidateQueries('GoodsById');
     } catch (error) {
       console.error(error);

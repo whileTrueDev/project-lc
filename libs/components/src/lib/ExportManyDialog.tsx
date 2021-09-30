@@ -194,6 +194,7 @@ export function ExportManyDialog({
           onClose={bundleDialog.onClose}
           onSuccess={() => {
             bundleDialog.onClose();
+            onClose();
           }}
         />
       </FormProvider>

@@ -28,6 +28,7 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useMemo } from 'react';
 import { FaTruck } from 'react-icons/fa';
+import { makeStyles } from '@material-ui/core/styles';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import ExportManyDialog from './ExportManyDialog';
 import FmOrderStatusBadge from './FmOrderStatusBadge';
@@ -175,7 +176,18 @@ const columns: GridColumns = [
   },
 ];
 
+/** DataGrid style 컬럼 구분선 추가 */
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
+      borderBottom: `1px solid #f0f0f0`,
+      borderRight: `1px solid #f0f0f0`,
+    },
+  },
+}));
+
 export function OrderList(): JSX.Element {
+  const { root } = useStyles();
   const exportManyDialog = useDisclosure();
   const fmOrderStates = useFmOrderStore();
   const orders = useFmOrders(fmOrderStates);
@@ -192,6 +204,7 @@ export function OrderList(): JSX.Element {
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
       <ChakraDataGrid
+        className={root}
         bg={dataGridBgColor}
         autoHeight
         rowsPerPageOptions={[10, 20, 50, 100]}
