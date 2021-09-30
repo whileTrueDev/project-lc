@@ -26,7 +26,7 @@ export function SocialAccountUnlinkBox(props: SocialAccount) {
   const unlink = () => {
     unlinkSocialAccount({ provider, serviceId })
       .then((res) => {
-        toast({ title: '연동해제 성공' });
+        toast({ title: '연동해제 성공', status: 'success' });
         onClose();
       })
       .catch((error) => {

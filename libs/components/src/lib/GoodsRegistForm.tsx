@@ -255,6 +255,7 @@ export function GoodsRegistForm(): JSX.Element {
       .then((res) => {
         toast({
           title: '상품을 성공적으로 등록하였습니다',
+          status: 'success',
         });
         router.push('/mypage/goods');
       })
@@ -324,14 +325,14 @@ export function GoodsRegistForm(): JSX.Element {
         {isLoading && (
           <Center
             position="fixed"
-            mt={0}
-            top="0px"
+            top="-30px"
             bottom="0px"
             left="0px"
             right="0px"
             bg="gray.400"
             opacity="0.5"
             flexDirection="column"
+            zIndex={99999}
           >
             <Spinner />
             <Text>상품을 등록중입니다...</Text>
