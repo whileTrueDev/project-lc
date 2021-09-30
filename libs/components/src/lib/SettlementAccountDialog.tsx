@@ -66,13 +66,7 @@ export function SettlementAccountDialog(props: SettlementAccountDtoDialogProps) 
   }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      size="3xl"
-      onClose={useClose}
-      closeOnOverlayClick={false}
-      closeOnEsc={false}
-    >
+    <Modal isOpen={isOpen} size="3xl" onClose={useClose} closeOnEsc={false}>
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(regist)}>
         <ModalHeader>정산 계좌 등록</ModalHeader>
