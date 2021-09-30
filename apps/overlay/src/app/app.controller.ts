@@ -1,4 +1,4 @@
-import { Controller, Get, Render, Param } from '@nestjs/common';
+import { Controller, Get, Render, Param, HttpCode } from '@nestjs/common';
 import { OverlayService } from '@project-lc/nest-modules';
 import { AppService } from './app.service';
 @Controller()
@@ -11,6 +11,12 @@ export class AppController {
   @Get()
   healthCheck() {
     return 'alive';
+  }
+
+  @Get('/favicon.ico')
+  @HttpCode(204)
+  ignoreFavicon() {
+    return 'No-content';
   }
 
   @Get(':id')
