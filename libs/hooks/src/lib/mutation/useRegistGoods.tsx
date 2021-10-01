@@ -12,6 +12,7 @@ export const useRegistGoods = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries('SellerGoodsList', { refetchInactive: true });
+        queryClient.invalidateQueries('ShippingGroupList', { refetchInactive: true });
       },
     },
   );
