@@ -1,4 +1,3 @@
-
 import { Button, Heading, Stack } from '@chakra-ui/react';
 import { useSaveShippingGroup } from '@project-lc/hooks';
 import ShippingPolicyBasicInfo from './ShippingPolicyBasicInfo';

@@ -1,4 +1,3 @@
-
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ShippingCalculType } from '@prisma/client';
 import { ShippingGroupDto, ShippingSetDto } from '@project-lc/shared-types';

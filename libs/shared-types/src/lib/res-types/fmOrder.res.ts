@@ -1,5 +1,3 @@
-
-
 import { fmOrderStatuses } from '../constants/fmOrderStatuses';
 
 /**

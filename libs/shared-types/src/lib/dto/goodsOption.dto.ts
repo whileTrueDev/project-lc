@@ -1,4 +1,3 @@
-
 import { YesOrNo, YesOrNo_UPPERCASE } from '@prisma/client';
 import { IsIn, IsString, IsOptional, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
