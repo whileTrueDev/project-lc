@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { DeleteObjectsCommand, ObjectIdentifier, S3Client } from '@aws-sdk/client-s3';
+// import { DeleteObjectsCommand, ObjectIdentifier, S3Client } from '@aws-sdk/client-s3';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GoodsView, Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -11,54 +11,18 @@ import {
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
-import { parse } from 'node-html-parser';
-
-const S3_BUCKET_REGION = 'ap-northeast-2';
-const s3Client = new S3Client({
-  region: S3_BUCKET_REGION,
-  credentials: {
-    secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET,
-    accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID,
-  },
-});
-
-export const deleteMultipleObjects = (objList: ObjectIdentifier[]) => {
-  return s3Client.send(
-    new DeleteObjectsCommand({
-      Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-      Delete: {
-        Objects: objList,
-      },
-    }),
-  );
-};
-
-/** htmlString[] 에서 <img> 태그 src[] 리턴  */
-export function getImgSrcListFromHtmlStringList(htmlContentsList: string[]) {
-  return [].concat(
-    ...htmlContentsList.map((content) => {
-      const dom = parse(content);
-      return Array.from(dom.querySelectorAll('img')).map((elem) =>
-        elem.getAttribute('src'),
-      );
-    }),
-  );
-}
-
-/** imgSrc 에서 s3에 업로드 된 url의 key[] 리턴 */
-export function getS3KeyListFromImgSrcList(srcList: string[]) {
-  const S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
-  const GOODS_DIRECTORY = 'goods/';
-  const GOODS_IMAGE_URL_DOMAIN = `${S3_DOMIAN}${GOODS_DIRECTORY}`;
-
-  return srcList
-    .filter((src) => src.startsWith(GOODS_IMAGE_URL_DOMAIN))
-    .map((src) => src.replace(S3_DOMIAN, ''));
-}
+import {
+  S3Service,
+  getImgSrcListFromHtmlStringList,
+  getS3KeyListFromImgSrcList,
+} from '../s3/s3.service';
 
 @Injectable()
 export class GoodsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly s3service: S3Service,
+  ) {}
 
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
@@ -299,7 +263,7 @@ export class GoodsService {
     // img src에서 s3에 저장된 이미지만 찾기
     const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
 
-    return deleteMultipleObjects(s3ImageKeys.map((key) => ({ Key: key })));
+    return this.s3service.deleteMultipleObjects(s3ImageKeys.map((key) => ({ Key: key })));
   }
 
   /** 상품과 연결된 GoodsImages url값을 찾아서 s3 객체 삭제 요청 리턴 */
@@ -321,7 +285,7 @@ export class GoodsService {
     // 이미지 중 s3에 업로드된 이미지 찾기
     const s3ImageKeys = getS3KeyListFromImgSrcList(imageList);
 
-    return deleteMultipleObjects(s3ImageKeys.map((key) => ({ Key: key })));
+    return this.s3service.deleteMultipleObjects(s3ImageKeys.map((key) => ({ Key: key })));
   }
 
   // 노출여부 변경

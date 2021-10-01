@@ -2,14 +2,17 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { GoodsInfoDto } from '@project-lc/shared-types';
 import {
-  deleteMultipleObjects,
+  S3Service,
   getImgSrcListFromHtmlStringList,
   getS3KeyListFromImgSrcList,
-} from '../goods/goods.service';
+} from '../s3/s3.service';
 
 @Injectable()
 export class GoodsInfoService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly s3service: S3Service,
+  ) {}
 
   test() {
     return 'goodsInfo test';
@@ -87,7 +90,7 @@ export class GoodsInfoService {
       // img src에서 s3에 저장된 이미지만 찾기
       const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
 
-      const deleteCommonInfoImage = deleteMultipleObjects(
+      const deleteCommonInfoImage = this.s3service.deleteMultipleObjects(
         s3ImageKeys.map((key) => ({ Key: key })),
       );
       // 공통정보 내 포함된 s3이미지 파일 삭제요청 필요
