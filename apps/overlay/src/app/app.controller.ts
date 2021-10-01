@@ -1,4 +1,12 @@
-import { Controller, Get, Render, Param, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Render,
+  Param,
+  HttpCode,
+  NotFoundException,
+  Catch,
+} from '@nestjs/common';
 import { OverlayService } from '@project-lc/nest-modules';
 import { AppService } from './app.service';
 @Controller()
@@ -23,10 +31,14 @@ export class AppController {
   @Render('client')
   async getRender(@Param('id') id: string) {
     const overlayUrl = `/${id}`;
-    const userId = await this.appService.getUserId(overlayUrl);
-    const verticalImagesLength = await this.overlayService.getVerticalImagesFromS3(
-      userId,
-    );
-    return { verticalImagesLength, userId };
+    try {
+      const userId = await this.appService.getUserId(overlayUrl);
+      const verticalImagesLength = await this.overlayService.getVerticalImagesFromS3(
+        userId,
+      );
+      return { verticalImagesLength, userId };
+    } catch {
+      throw new NotFoundException('user not found');
+    }
   }
 }

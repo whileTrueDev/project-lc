@@ -7,7 +7,7 @@ export class AppService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getUserId(overlayUrl: string): Promise<{ userId: string }> {
-    const userId = await this.prisma.broadcaster.findFirst({
+    const userId = await this.prisma.broadcaster.findUnique({
       select: {
         userId: true,
       },
