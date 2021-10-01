@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button, Input, Select, Stack, Text } from '@chakra-ui/react';
 import { ShippingSetType } from '@prisma/client';

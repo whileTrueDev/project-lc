@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+
 import NextLink from 'next/link';
 import {
   Box,

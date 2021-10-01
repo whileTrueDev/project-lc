@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GoodsView, Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';

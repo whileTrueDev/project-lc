@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+
 import { IsNumber, IsString } from 'class-validator';
 import {
   ShippingOption,

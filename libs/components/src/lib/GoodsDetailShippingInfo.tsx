@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { Box, Stack, Text } from '@chakra-ui/react';
 import {
   GoodsByIdRes,

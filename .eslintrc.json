@@ -48,7 +48,7 @@
         ],
         "no-use-before-define": "off",
         "linebreak-style": "off",
-        "camelcase": "warn",
+        "camelcase": "off",
         "max-classes-per-file": "off",
         "class-methods-use-this": "off",
         "no-underscore-dangle": 0,

@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable camelcase */
+
 import { Divider, Stack, Text } from '@chakra-ui/layout';
 import { CloseButton, Icon } from '@chakra-ui/react';
 import { FaTruck } from 'react-icons/fa';
