@@ -6,7 +6,9 @@ import {
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
+import { ConfigModule } from '@nestjs/config';
 import { GoodsService } from './goods.service';
+import { S3Module } from '../s3/s3.module';
 
 describe('GoodsService', () => {
   let __prisma: PrismaClient;
@@ -20,7 +22,7 @@ describe('GoodsService', () => {
     __prisma = new PrismaClient();
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule],
+      imports: [PrismaModule, S3Module, ConfigModule.forRoot({ isGlobal: true })],
       providers: [GoodsService],
     }).compile();
 
@@ -137,17 +139,18 @@ describe('GoodsService', () => {
 
   describe('deleteLcGoods', () => {
     it('goods should be deleted', async () => {
-      await service.deleteLcGoods({ email: TEST_USER_EMAIL, ids: [TEST_GOODS.id] });
-      const goodsListData = await service.getGoodsList({
-        email: TEST_USER_EMAIL,
-        page: 0,
-        itemPerPage: 10,
-        sort: SellerGoodsSortColumn.REGIST_DATE,
-        direction: SellerGoodsSortDirection.DESC,
-      });
+      const returnDeleteObjectsCommandOutput = () => Promise.resolve({ $metadata: {} });
+      jest
+        .spyOn(service, 'deleteGoodsImagesFromS3')
+        .mockImplementation(returnDeleteObjectsCommandOutput);
+      jest
+        .spyOn(service, 'deleteGoodsContentImagesFromS3')
+        .mockImplementation(returnDeleteObjectsCommandOutput);
 
-      expect(goodsListData.items).toHaveLength(0);
-      expect(goodsListData.totalItemCount).toBe(0);
+      await service.deleteLcGoods({ email: TEST_USER_EMAIL, ids: [TEST_GOODS.id] });
+
+      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_EMAIL);
+      expect(goods).toBeNull();
     });
   });
 });

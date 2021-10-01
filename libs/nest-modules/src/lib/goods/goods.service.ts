@@ -232,8 +232,7 @@ export class GoodsService {
         },
       });
 
-      const result = await Promise.all([deleteImages, deleteContentImages, deleteGoods]);
-      console.log(result);
+      await Promise.all([deleteImages, deleteContentImages, deleteGoods]);
       return true;
     } catch (error) {
       console.error(error);
@@ -267,7 +266,7 @@ export class GoodsService {
   }
 
   /** 상품과 연결된 GoodsImages url값을 찾아서 s3 객체 삭제 요청 리턴 */
-  private async deleteGoodsImagesFromS3(goodsIds: number[]) {
+  async deleteGoodsImagesFromS3(goodsIds: number[]) {
     // goods Id 와 연결된 GoodsImage 찾기
     const images = await this.prisma.goodsImages.findMany({
       where: {

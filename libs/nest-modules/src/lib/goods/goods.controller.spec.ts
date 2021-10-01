@@ -2,9 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
 import { NestApplication } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
 import { GoodsController } from './goods.controller';
 import { GoodsService } from './goods.service';
 import { GoodsInfoService } from '../goods-info/goods-info.service';
+import { S3Module } from '../s3/s3.module';
 
 describe('GoodsController', () => {
   let app: NestApplication;
@@ -13,7 +15,7 @@ describe('GoodsController', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule],
+      imports: [PrismaModule, S3Module, ConfigModule.forRoot({ isGlobal: true })],
       providers: [GoodsService, GoodsInfoService],
       controllers: [GoodsController],
     }).compile();

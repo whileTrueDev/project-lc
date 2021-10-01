@@ -18,6 +18,7 @@ export class S3Service {
     });
   }
 
+  /** lc-project 버킷에서 key[]에 해당하는 오브젝트 삭제 */
   deleteMultipleObjects(objList: ObjectIdentifier[]) {
     return this.s3Client.send(
       new DeleteObjectsCommand({
