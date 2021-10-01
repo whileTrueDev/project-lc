@@ -4,6 +4,7 @@ import request from 'supertest';
 import { NestApplication } from '@nestjs/core';
 import { GoodsController } from './goods.controller';
 import { GoodsService } from './goods.service';
+import { GoodsInfoService } from '../goods-info/goods-info.service';
 
 describe('GoodsController', () => {
   let app: NestApplication;
@@ -13,7 +14,7 @@ describe('GoodsController', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule],
-      providers: [GoodsService],
+      providers: [GoodsService, GoodsInfoService],
       controllers: [GoodsController],
     }).compile();
 
