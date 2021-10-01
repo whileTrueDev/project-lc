@@ -23,7 +23,6 @@ function CustomApp({ Component, pageProps }: AppProps) {
           <ChakraProvider theme={chakraTheme}>
             <ThemeProvider theme={muiTheme}>
               <main>
-                {/* eslint-disable-next-line react/jsx-props-no-spreading */}
                 <Component {...pageProps} />
               </main>
             </ThemeProvider>

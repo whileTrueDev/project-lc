@@ -198,7 +198,6 @@ const MobileNav = () => {
   return (
     <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
       {mainNavItems.map((navItem) => (
-        // eslint-disable-next-line react/jsx-props-no-spreading
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
     </Stack>

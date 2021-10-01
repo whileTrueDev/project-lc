@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { useRouter } from 'next/router';
 import { LoginSellerDto } from '@project-lc/shared-types';
 import { useLoginMutation } from '@project-lc/hooks';

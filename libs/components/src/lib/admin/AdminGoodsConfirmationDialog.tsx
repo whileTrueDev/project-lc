@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 // 최초 입장시에 상점명을 입력하는 다이얼로그
 // -> 추후에는 상점명 뿐 만 아니라 다른 것도 입력이 가능해야할 수 있음.
 import {

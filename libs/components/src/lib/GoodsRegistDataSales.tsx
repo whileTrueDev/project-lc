@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { QuestionIcon } from '@chakra-ui/icons';
 import { HStack, Text } from '@chakra-ui/layout';
 import { Radio, RadioGroup } from '@chakra-ui/radio';

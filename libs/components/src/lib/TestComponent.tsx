@@ -62,7 +62,6 @@ export const Illustration = (props: IconProps) => {
       viewBox="0 0 702 448"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     >
       <path
