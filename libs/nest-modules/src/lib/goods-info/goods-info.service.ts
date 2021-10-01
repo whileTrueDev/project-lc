@@ -1,6 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { GoodsInfoDto } from '@project-lc/shared-types';
+import {
+  deleteMultipleObjects,
+  getImgSrcListFromHtmlStringList,
+  getS3KeyListFromImgSrcList,
+} from '../goods/goods.service';
 
 @Injectable()
 export class GoodsInfoService {
@@ -64,41 +69,41 @@ export class GoodsInfoService {
   }
 
   /** 상품 공통정보 삭제 */
-  // async deleteGoodsCommonInfo(id: number) {
-  //   try {
-  //     // 공통정보 내 포함된 이미지
-  //     const infoContents = await this.prisma.goodsInfo.findUnique({
-  //       where: { id },
-  //       select: {
-  //         info_value: true,
-  //       },
-  //     });
+  async deleteGoodsCommonInfo(id: number) {
+    try {
+      // 공통정보 내 포함된 이미지
+      const infoContents = await this.prisma.goodsInfo.findUnique({
+        where: { id },
+        select: {
+          info_value: true,
+        },
+      });
 
-  //     const contentList = [infoContents.info_value];
+      const contentList = [infoContents.info_value];
 
-  //     // 각 contents마다 img src 구하기
-  //     const imgSrcList: string[] = this.getImgSrcListFromHtmlStringList(contentList);
+      // 각 contents마다 img src 구하기
+      const imgSrcList: string[] = getImgSrcListFromHtmlStringList(contentList);
 
-  //     // img src에서 s3에 저장된 이미지만 찾기
-  //     const s3ImageKeys = this.getS3KeyListFromImgSrcList(imgSrcList);
+      // img src에서 s3에 저장된 이미지만 찾기
+      const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
 
-  //     const deleteCommonInfoImage = deleteMultipleObjects(
-  //       s3ImageKeys.map((key) => ({ Key: key })),
-  //     );
-  //     // 공통정보 내 포함된 s3이미지 파일 삭제요청 필요
-  //     const deleteGoods = this.prisma.goodsInfo.delete({
-  //       where: {
-  //         id,
-  //       },
-  //     });
-  //     await Promise.all([deleteCommonInfoImage, deleteGoods]);
-  //     return true;
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new InternalServerErrorException(
-  //       error,
-  //       `error in deleteGoodsCommonInfo, id: ${id}`,
-  //     );
-  //   }
-  // }
+      const deleteCommonInfoImage = deleteMultipleObjects(
+        s3ImageKeys.map((key) => ({ Key: key })),
+      );
+      // 공통정보 내 포함된 s3이미지 파일 삭제요청 필요
+      const deleteGoods = this.prisma.goodsInfo.delete({
+        where: {
+          id,
+        },
+      });
+      await Promise.all([deleteCommonInfoImage, deleteGoods]);
+      return true;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(
+        error,
+        `error in deleteGoodsCommonInfo, id: ${id}`,
+      );
+    }
+  }
 }

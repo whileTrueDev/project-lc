@@ -1,17 +1,16 @@
 /* eslint-disable camelcase */
+import { DeleteObjectsCommand, ObjectIdentifier, S3Client } from '@aws-sdk/client-s3';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GoodsView, Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsListDto,
-  GoodsOptionWithStockInfo,
-  GoodsOptionsWithSupplies,
-  TotalStockInfo,
   GoodsListRes,
+  GoodsOptionsWithSupplies,
+  GoodsOptionWithStockInfo,
   RegistGoodsDto,
-  GoodsInfoDto,
+  TotalStockInfo,
 } from '@project-lc/shared-types';
-import { S3Client, DeleteObjectsCommand, ObjectIdentifier } from '@aws-sdk/client-s3';
 import { parse } from 'node-html-parser';
 
 const S3_BUCKET_REGION = 'ap-northeast-2';
@@ -23,7 +22,7 @@ const s3Client = new S3Client({
   },
 });
 
-const deleteMultipleObjects = (objList: ObjectIdentifier[]) => {
+export const deleteMultipleObjects = (objList: ObjectIdentifier[]) => {
   return s3Client.send(
     new DeleteObjectsCommand({
       Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
@@ -33,6 +32,29 @@ const deleteMultipleObjects = (objList: ObjectIdentifier[]) => {
     }),
   );
 };
+
+/** htmlString[] 에서 <img> 태그 src[] 리턴  */
+export function getImgSrcListFromHtmlStringList(htmlContentsList: string[]) {
+  return [].concat(
+    ...htmlContentsList.map((content) => {
+      const dom = parse(content);
+      return Array.from(dom.querySelectorAll('img')).map((elem) =>
+        elem.getAttribute('src'),
+      );
+    }),
+  );
+}
+
+/** imgSrc 에서 s3에 업로드 된 url의 key[] 리턴 */
+export function getS3KeyListFromImgSrcList(srcList: string[]) {
+  const S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
+  const GOODS_DIRECTORY = 'goods/';
+  const GOODS_IMAGE_URL_DOMAIN = `${S3_DOMIAN}${GOODS_DIRECTORY}`;
+
+  return srcList
+    .filter((src) => src.startsWith(GOODS_IMAGE_URL_DOMAIN))
+    .map((src) => src.replace(S3_DOMIAN, ''));
+}
 
 @Injectable()
 export class GoodsService {
@@ -272,39 +294,16 @@ export class GoodsService {
     const contentList = goodsContents.map(({ contents }) => contents);
 
     // 각 contents마다 img src 구하기
-    const imgSrcList: string[] = this.getImgSrcListFromHtmlStringList(contentList);
+    const imgSrcList: string[] = getImgSrcListFromHtmlStringList(contentList);
 
     // img src에서 s3에 저장된 이미지만 찾기
-    const s3ImageKeys = this.getS3KeyListFromImgSrcList(imgSrcList);
+    const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
 
     return deleteMultipleObjects(s3ImageKeys.map((key) => ({ Key: key })));
   }
 
-  /** htmlString[] 에서 <img> 태그 src[] 리턴  */
-  getImgSrcListFromHtmlStringList(htmlContentsList: string[]) {
-    return [].concat(
-      ...htmlContentsList.map((content) => {
-        const dom = parse(content);
-        return Array.from(dom.querySelectorAll('img')).map((elem) =>
-          elem.getAttribute('src'),
-        );
-      }),
-    );
-  }
-
-  /** imgSrc 에서 s3에 업로드 된 url의 key[] 리턴 */
-  getS3KeyListFromImgSrcList(srcList: string[]) {
-    const S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
-    const GOODS_DIRECTORY = 'goods/';
-    const GOODS_IMAGE_URL_DOMAIN = `${S3_DOMIAN}${GOODS_DIRECTORY}`;
-
-    return srcList
-      .filter((src) => src.startsWith(GOODS_IMAGE_URL_DOMAIN))
-      .map((src) => src.replace(S3_DOMIAN, ''));
-  }
-
   /** 상품과 연결된 GoodsImages url값을 찾아서 s3 객체 삭제 요청 리턴 */
-  async deleteGoodsImagesFromS3(goodsIds: number[]) {
+  private async deleteGoodsImagesFromS3(goodsIds: number[]) {
     // goods Id 와 연결된 GoodsImage 찾기
     const images = await this.prisma.goodsImages.findMany({
       where: {
@@ -320,7 +319,7 @@ export class GoodsService {
     const imageList = images.map(({ image }) => image);
 
     // 이미지 중 s3에 업로드된 이미지 찾기
-    const s3ImageKeys = this.getS3KeyListFromImgSrcList(imageList);
+    const s3ImageKeys = getS3KeyListFromImgSrcList(imageList);
 
     return deleteMultipleObjects(s3ImageKeys.map((key) => ({ Key: key })));
   }
@@ -404,45 +403,6 @@ export class GoodsService {
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);
-    }
-  }
-
-  // 상품 공통정보 삭제
-  async deleteGoodsCommonInfo(id: number) {
-    try {
-      // 공통정보 내 포함된 이미지
-      const infoContents = await this.prisma.goodsInfo.findUnique({
-        where: { id },
-        select: {
-          info_value: true,
-        },
-      });
-
-      const contentList = [infoContents.info_value];
-
-      // 각 contents마다 img src 구하기
-      const imgSrcList: string[] = this.getImgSrcListFromHtmlStringList(contentList);
-
-      // img src에서 s3에 저장된 이미지만 찾기
-      const s3ImageKeys = this.getS3KeyListFromImgSrcList(imgSrcList);
-
-      const deleteCommonInfoImage = deleteMultipleObjects(
-        s3ImageKeys.map((key) => ({ Key: key })),
-      );
-      // 공통정보 내 포함된 s3이미지 파일 삭제요청 필요
-      const deleteGoods = this.prisma.goodsInfo.delete({
-        where: {
-          id,
-        },
-      });
-      await Promise.all([deleteCommonInfoImage, deleteGoods]);
-      return true;
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(
-        error,
-        `error in deleteGoodsCommonInfo, id: ${id}`,
-      );
     }
   }
 }

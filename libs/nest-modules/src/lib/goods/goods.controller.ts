@@ -84,13 +84,10 @@ export class GoodsController {
     return this.commonInfoService.registGoodsCommonInfo(email, dto);
   }
 
-  /** 공통정보 삭제 
-   //TODO: commonInfoService 메서드로 바꾸기
-   * 
-  */
+  /** 공통정보 삭제  */
   @Delete('/common-info')
   deleteCommonInfo(@Body('id', ParseIntPipe) id: number) {
-    return this.goodsService.deleteGoodsCommonInfo(id);
+    return this.commonInfoService.deleteGoodsCommonInfo(id);
   }
 
   /** 공통정보 목록 조회 */
