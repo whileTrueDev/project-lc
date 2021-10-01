@@ -29,7 +29,7 @@ export const s3 = (() => {
   }
 
   // 파일명에서 확장자를 추출하는 과정
-  function getExtension(fileName: string | null) {
+  function getExtension(fileName: string | null): string {
     if (!fileName) {
       return '';
     }
@@ -50,7 +50,10 @@ export const s3 = (() => {
     type: string;
     filename: string | null;
     companyName?: string;
-  }) {
+  }): {
+    key: string;
+    fileName: string;
+  } {
     // 확장자 추출
     const extension = getExtension(filename);
     const prefix = moment().format('YYMMDDHHmmss').toString();
@@ -70,7 +73,10 @@ export const s3 = (() => {
     key,
     file,
     contentType,
-  }: Pick<S3UploadImageOptions, 'file'> & { key: string; contentType: string }) {
+  }: Pick<S3UploadImageOptions, 'file'> & {
+    key: string;
+    contentType: string;
+  }): Promise<AWS.S3.ManagedUpload.SendData> {
     if (!file) throw new Error('file should be not null');
     return new AWS.S3.ManagedUpload({
       params: {
@@ -89,7 +95,7 @@ export const s3 = (() => {
     type,
     file,
     companyName,
-  }: S3UploadImageOptions) {
+  }: S3UploadImageOptions): Promise<string | null> {
     // key 만들기
     if (!userMail || !file) {
       return null;

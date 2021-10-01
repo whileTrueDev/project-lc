@@ -32,7 +32,7 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
 
   // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
   const [formError, setFormError] = useState('');
-  function resetFormError() {
+  function resetFormError(): void {
     setFormError('');
   }
 
@@ -52,7 +52,7 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
     [router, setFormError, login],
   );
 
-  function getMessage(statusCode: number | undefined) {
+  function getMessage(statusCode: number | undefined): string {
     if (statusCode === 401) {
       return '가입하지 않은 아이디이거나, 잘못된 비밀번호입니다.';
     }

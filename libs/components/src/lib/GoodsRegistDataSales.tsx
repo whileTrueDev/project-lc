@@ -32,7 +32,7 @@ export function GoodsRegistRadio({
     value: RegistGoodsDto[typeof name];
     label: string;
   }[];
-} & Partial<RadioGroupProps>) {
+} & Partial<RadioGroupProps>): JSX.Element {
   const { register, watch } = useFormContext<RegistGoodsDto>();
   return (
     <RadioGroup value={watch(name, values[0].value)} {...rest}>

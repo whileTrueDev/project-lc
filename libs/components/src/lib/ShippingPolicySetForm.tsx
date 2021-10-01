@@ -29,7 +29,7 @@ function InputWrapperText({
 }: {
   text: string;
   children: React.ReactNode;
-}) {
+}): JSX.Element {
   return (
     <Stack direction={{ base: 'column', md: 'row' }}>
       <Text width={{ base: '100%', md: '30%' }}>{text}</Text>
@@ -41,7 +41,7 @@ function InputWrapperText({
 export function BoldText({
   children,
   ...rest
-}: { children: React.ReactNode } & TextProps) {
+}: { children: React.ReactNode } & TextProps): JSX.Element {
   return (
     <Text fontWeight="bold" {...rest}>
       {children}

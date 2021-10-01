@@ -1,5 +1,6 @@
 import {
   FmOrderRefund,
+  FmOrderRefundBase,
   fmOrderRefundStatses,
   FmOrderReturn,
   fmOrderReturnStatuses,
@@ -13,7 +14,7 @@ import { useMemo } from 'react';
  */
 export const useOrderReturnOrRefundStatus = (
   returnOrRefundArray?: FmOrderReturn[] | FmOrderRefund[],
-) => {
+): FmOrderRefundBase['status'] | null => {
   // 이 주문의 여러 환불 상태 중, 최종 환불 상태 찾기
   const realStatus:
     | keyof typeof fmOrderRefundStatses

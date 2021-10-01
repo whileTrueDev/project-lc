@@ -23,7 +23,7 @@ import FmOrderStatusBadge from './FmOrderStatusBadge';
 export interface OrderDetailActionsProps {
   order: FindFmOrderDetailRes;
 }
-export function OrderDetailActions({ order }: OrderDetailActionsProps) {
+export function OrderDetailActions({ order }: OrderDetailActionsProps): JSX.Element {
   const { mutateAsync: changeStatus, isLoading } = useChangeFmOrderStatusMutation();
 
   const { isOpen, onOpen, onClose } = useDisclosure();

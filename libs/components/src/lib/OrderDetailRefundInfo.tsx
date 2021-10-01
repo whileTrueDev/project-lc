@@ -5,7 +5,11 @@ import { FmRefundStatusBadge, OrderDetailOptionListItem, TextDotConnector } from
 import { ChakraNextImage } from './ChakraNextImage';
 
 /** 주문 환불 정보 */
-export function OrderDetailRefundInfo({ refund }: { refund: FmOrderRefund }) {
+export function OrderDetailRefundInfo({
+  refund,
+}: {
+  refund: FmOrderRefund;
+}): JSX.Element {
   return (
     <Box>
       <Stack direction="row" alignItems="center" my={2} spacing={1.5}>

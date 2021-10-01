@@ -31,7 +31,10 @@ export interface SignupFormProps {
   enableShadow?: boolean;
   moveToSignupStart?: () => void;
 }
-export function SignupForm({ enableShadow = false, moveToSignupStart }: SignupFormProps) {
+export function SignupForm({
+  enableShadow = false,
+  moveToSignupStart,
+}: SignupFormProps): JSX.Element {
   const router = useRouter();
   const toast = useToast();
 

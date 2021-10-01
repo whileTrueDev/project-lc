@@ -1,5 +1,6 @@
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryResult } from 'react-query';
 import { FindFmOrdersDto, FindFmOrderRes } from '@project-lc/shared-types';
+import { AxiosError } from 'axios';
 import axios from '../../axios';
 
 export const getFmOrders = async (dto: FindFmOrdersDto): Promise<FindFmOrderRes[]> => {
@@ -16,8 +17,10 @@ export const getFmOrders = async (dto: FindFmOrdersDto): Promise<FindFmOrderRes[
     .then((res) => res.data);
 };
 
-export const useFmOrders = (dto: FindFmOrdersDto) => {
-  return useQuery<FindFmOrderRes[]>(
+export const useFmOrders = (
+  dto: FindFmOrdersDto,
+): UseQueryResult<FindFmOrderRes[], AxiosError> => {
+  return useQuery<FindFmOrderRes[], AxiosError>(
     [
       'FmOrders',
       dto.search,

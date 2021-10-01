@@ -109,7 +109,7 @@ export function ExportManyDialog({
   );
 
   /** 폼제출 핸들러 -> 일괄 출고 처리 API 요청 */
-  async function onSubmit(formData: ExportOrderDto[]) {
+  async function onSubmit(formData: ExportOrderDto[]): Promise<void> {
     const selectedKeys = Object.keys(formData);
     const dto: ExportOrderDto[] = [];
     selectedKeys.forEach((k) => {
@@ -121,15 +121,17 @@ export function ExportManyDialog({
       }
     });
 
-    if (dto.length === 0)
-      return toast({
+    if (dto.length === 0) {
+      toast({
         status: 'warning',
         description:
           '모든 주문상품의 보낼 수량이 0 입니다. 보낼 수량을 올바르게 입력해주세요.',
       });
+      return;
+    }
 
     // 일괄 출고처리 요청
-    return exportAll({ exportOrders: dto });
+    await exportAll({ exportOrders: dto });
   }
 
   return (
@@ -213,7 +215,7 @@ export function BundleExportDialog({
   onClose: () => void;
   onSuccess?: () => Promise<void> | void;
   orders: FindFmOrderRes[];
-}) {
+}): JSX.Element {
   const toast = useToast();
   const { getValues } = useFormContext<ExportOrderDto[]>();
   const selectedOptions = fmExportStore((s) => s.selectedOptions);
@@ -284,7 +286,7 @@ export function BundleExportDialog({
   );
 
   /** 합포장 출고처리 API 요청 */
-  async function onBundledExportSubmit() {
+  async function onBundledExportSubmit(): Promise<string | number | void> {
     const formData = getValues();
     const selectedKeys = Object.keys(formData);
     const _orders: ExportOrderDto[] = [];

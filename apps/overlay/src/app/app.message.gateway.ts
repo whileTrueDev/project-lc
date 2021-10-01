@@ -9,7 +9,12 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
-import { SocketInfo, PurchaseMessage, RoomAndText } from '@project-lc/shared-types';
+import {
+  SocketInfo,
+  PurchaseMessage,
+  RoomAndText,
+  SocketIdandDevice,
+} from '@project-lc/shared-types';
 import { OverlayService } from '@project-lc/nest-modules';
 
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
@@ -25,15 +30,15 @@ export class AppMessageGateway
 
   private logger: Logger = new Logger('AppGateway');
 
-  afterInit() {
+  afterInit(): void {
     this.logger.log('Initialized!');
   }
 
-  handleConnection(socket: Socket) {
+  handleConnection(socket: Socket): void {
     this.logger.log(`Client Connected ${socket.id}`);
   }
 
-  handleDisconnect(socket: Socket) {
+  handleDisconnect(socket: Socket): SocketIdandDevice[] {
     const SOCKET_ID: string = socket.id;
     if (Object.values(this.socketInfo)) {
       const itemToFind = Object.values(this.socketInfo)[0]?.find(
@@ -48,7 +53,9 @@ export class AppMessageGateway
   }
 
   @SubscribeMessage('right top purchase message')
-  async getRightTopPurchaseMessage(@MessageBody() purchase: PurchaseMessage) {
+  async getRightTopPurchaseMessage(
+    @MessageBody() purchase: PurchaseMessage,
+  ): Promise<void> {
     const { roomName } = purchase;
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
@@ -82,14 +89,14 @@ export class AppMessageGateway
   }
 
   @SubscribeMessage('bottom area message')
-  handleBottomAreaReply(@MessageBody() data: RoomAndText) {
+  handleBottomAreaReply(@MessageBody() data: RoomAndText): void {
     const { roomName } = data;
     const { message } = data;
     this.server.to(roomName).emit('get bottom area message', message);
   }
 
   @SubscribeMessage('get non client purchase message from admin')
-  getNonClientMessage(@MessageBody() data: PurchaseMessage) {
+  getNonClientMessage(@MessageBody() data: PurchaseMessage): void {
     const { roomName } = data;
     this.server.to(roomName).emit('get non client purchase message', data);
   }

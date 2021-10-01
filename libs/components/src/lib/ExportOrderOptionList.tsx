@@ -48,7 +48,7 @@ export function ExportOrderOptionList({
   onSubmitClick,
   selected = false,
   disableSelection = false,
-}: ExportOrderOptionListProps) {
+}: ExportOrderOptionListProps): JSX.Element | null {
   const borderColor = useColorModeValue('gray.300', 'gray.500');
   const submitBtnVariant = useColorModeValue('solid', 'outline');
   const order = useFmOrder(orderId);
@@ -217,7 +217,7 @@ export function ExportOrderItem({
   orderIndex,
   itemIndex,
   selected,
-}: ExportOrderItemProps) {
+}: ExportOrderItemProps): JSX.Element {
   return (
     <Stack direction="row" alignItems="center">
       <Box flex={1}>
@@ -270,7 +270,7 @@ export function ExportOrderOptionItem({
   optionIndex,
   itemIndex,
   selected,
-}: ExportOrderOptionItemProps) {
+}: ExportOrderOptionItemProps): JSX.Element {
   const {
     register,
     formState: { errors },

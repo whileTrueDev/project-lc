@@ -10,7 +10,7 @@ import { RegistGoodsDto } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
 import SectionWithTitle from './SectionWithTitle';
 
-export function RequiredMark() {
+export function RequiredMark(): JSX.Element {
   return <Text as="span">*</Text>;
 }
 

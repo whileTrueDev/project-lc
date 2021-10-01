@@ -1,7 +1,8 @@
 // 등록된 계좌 리스트
 // 등록된 사업자 등록증 리스트
 import { SellerSettlementAccount, SellerBusinessRegistration } from '@prisma/client';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export type AdminSettlementInfoType = {
@@ -9,14 +10,18 @@ export type AdminSettlementInfoType = {
   sellerBusinessRegistration: SellerBusinessRegistration[];
 };
 
-export function getAdminSettlementInfo() {
+export function getAdminSettlementInfo(): Promise<AdminSettlementInfoType> {
   return axios.get<AdminSettlementInfoType>('/admin/settlement').then((res) => res.data);
 }
 
 export function useAdminSettlementInfo(
-  options?: UseQueryOptions<AdminSettlementInfoType>,
-) {
-  return useQuery<AdminSettlementInfoType>('Settlement', getAdminSettlementInfo, {
-    ...options,
-  });
+  options?: UseQueryOptions<AdminSettlementInfoType, AxiosError>,
+): UseQueryResult<AdminSettlementInfoType, AxiosError> {
+  return useQuery<AdminSettlementInfoType, AxiosError>(
+    'Settlement',
+    getAdminSettlementInfo,
+    {
+      ...options,
+    },
+  );
 }

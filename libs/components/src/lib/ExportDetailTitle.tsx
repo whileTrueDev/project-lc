@@ -7,7 +7,7 @@ import { TextDotConnector } from './TextDotConnector';
 export interface ExportDetailTitleProps {
   exportData: FmExportRes;
 }
-export function ExportDetailTitle({ exportData }: ExportDetailTitleProps) {
+export function ExportDetailTitle({ exportData }: ExportDetailTitleProps): JSX.Element {
   return (
     <Box>
       <Heading>출고 {exportData.export_code}</Heading>

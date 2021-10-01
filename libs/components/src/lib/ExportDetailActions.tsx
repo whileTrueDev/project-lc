@@ -4,7 +4,9 @@ import { FmExportRes } from '@project-lc/shared-types';
 export interface ExportDetailActionsProps {
   exportData: FmExportRes;
 }
-export function ExportDetailActions({ exportData }: ExportDetailActionsProps) {
+export function ExportDetailActions({
+  exportData,
+}: ExportDetailActionsProps): JSX.Element {
   return (
     <HStack>
       <Button

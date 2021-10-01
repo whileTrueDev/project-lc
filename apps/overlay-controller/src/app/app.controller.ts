@@ -1,5 +1,8 @@
 import { Controller, Get, Render, Post, Body } from '@nestjs/common';
-import { PurchaseMessageWithLoginFlag } from '@project-lc/shared-types';
+import {
+  OverlayControllerMainRes,
+  PurchaseMessageWithLoginFlag,
+} from '@project-lc/shared-types';
 import { ConfigService } from '@nestjs/config';
 import { OverlayControllerService } from '@project-lc/nest-modules';
 
@@ -12,7 +15,7 @@ export class AppController {
 
   @Get()
   @Render('index')
-  async renterTest() {
+  async renterTest(): Promise<OverlayControllerMainRes> {
     const HOST = this.configService.get('OVERLAY_HOST_NAME');
 
     const userIdAndUrlAndNicknames = await this.overlayControllerService.getCreatorUrls();
@@ -20,7 +23,7 @@ export class AppController {
   }
 
   @Post('/purchase-message')
-  async uploadMessage(@Body() data: PurchaseMessageWithLoginFlag) {
+  async uploadMessage(@Body() data: PurchaseMessageWithLoginFlag): Promise<boolean> {
     const upload = await this.overlayControllerService.uploadPurchase(data);
     return upload;
   }

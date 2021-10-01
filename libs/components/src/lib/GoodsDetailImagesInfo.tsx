@@ -7,7 +7,9 @@ import { TextViewerWithDetailModal } from './TextViewerWithDetailModal';
 export interface GoodsDetailImagesInfoProps {
   goods: GoodsByIdRes;
 }
-export function GoodsDetailImagesInfo({ goods }: GoodsDetailImagesInfoProps) {
+export function GoodsDetailImagesInfo({
+  goods,
+}: GoodsDetailImagesInfoProps): JSX.Element {
   const contents = useMemo(() => goods.contents ?? '', [goods.contents]);
   const images = useMemo(
     () => goods.image.sort((a, b) => a.cut_number - b.cut_number).map((x) => x.image),

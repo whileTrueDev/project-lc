@@ -16,14 +16,14 @@ export const logo: Record<string, React.ReactNode> = {
   kakao: <ChakraNextImage src={kakao} width="40" height="40" />,
 };
 
-export function SocialAccountUnlinkBox(props: SocialAccount) {
+export function SocialAccountUnlinkBox(props: SocialAccount): JSX.Element {
   const { provider, serviceId } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { mutateAsync: unlinkSocialAccount } = useUnlinkSocialAccountMutation();
   const { data } = useProfile();
   const toast = useToast();
 
-  const unlink = () => {
+  const unlink = (): void => {
     unlinkSocialAccount({ provider, serviceId })
       .then((res) => {
         toast({ title: '연동해제 성공', status: 'success' });

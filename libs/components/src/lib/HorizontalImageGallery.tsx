@@ -7,7 +7,9 @@ import { ChakraNextImage } from '..';
 export interface HorizontalImageGalleryProps {
   images: string[];
 }
-export function HorizontalImageGallery({ images }: HorizontalImageGalleryProps) {
+export function HorizontalImageGallery({
+  images,
+}: HorizontalImageGalleryProps): JSX.Element {
   const { isMobileSize } = useDisplaySize();
   const galleryRef = useRef<HTMLDivElement>(null);
   const { isEndOfLeft, isEndOfRight, scrollLeft, scrollRight } =
@@ -56,7 +58,7 @@ export function ChevronIconButton({
   direction,
   isVisible,
   onClick,
-}: ChevronIconButtonProps) {
+}: ChevronIconButtonProps): JSX.Element {
   const icon =
     direction === 'right' ? (
       <ChevronRightIcon color="black" />

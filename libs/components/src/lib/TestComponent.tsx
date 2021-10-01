@@ -9,7 +9,7 @@ import {
   IconProps,
 } from '@chakra-ui/react';
 
-export function TestComponent() {
+export function TestComponent(): JSX.Element {
   return (
     <Container maxW="5xl">
       <Stack
@@ -55,7 +55,7 @@ export function TestComponent() {
   );
 }
 
-export const Illustration = (props: IconProps) => {
+export const Illustration = (props: IconProps): JSX.Element => {
   return (
     <Icon
       width="100%"

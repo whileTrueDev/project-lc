@@ -1,4 +1,5 @@
-import { useQuery } from 'react-query';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export const getEmailDupCheck = async (email: string): Promise<boolean> => {
@@ -9,8 +10,15 @@ export const getEmailDupCheck = async (email: string): Promise<boolean> => {
     .then((res) => res.data);
 };
 
-export const useEmailDupCheck = (initialData: boolean, email: string) => {
-  return useQuery<boolean>(['EmailDupCheck', email], () => getEmailDupCheck(email), {
-    initialData,
-  });
+export const useEmailDupCheck = (
+  initialData: boolean,
+  email: string,
+): UseQueryResult<boolean, AxiosError> => {
+  return useQuery<boolean, AxiosError>(
+    ['EmailDupCheck', email],
+    () => getEmailDupCheck(email),
+    {
+      initialData,
+    },
+  );
 };

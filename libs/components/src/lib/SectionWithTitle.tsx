@@ -9,7 +9,7 @@ export function SectionWithTitle({
   children: React.ReactNode;
   title: string;
   disableDivider?: boolean;
-}) {
+}): JSX.Element {
   return (
     <>
       {disableDivider ? null : <Divider />}

@@ -1,7 +1,13 @@
 import { FindFmOrderDetailRes, getFmOrderStatusByNames } from '@project-lc/shared-types';
 import { useMemo } from 'react';
 
-export const useOrderExportableCheck = (order?: FindFmOrderDetailRes) => {
+export interface OrderExportableCheck {
+  isDone: boolean | undefined;
+  isExportable: boolean;
+}
+export const useOrderExportableCheck = (
+  order?: FindFmOrderDetailRes,
+): OrderExportableCheck => {
   // 이미 출고가 끝난 주문 인지 확인
   const isDone = useMemo(() => {
     return order?.items.every((i) => {

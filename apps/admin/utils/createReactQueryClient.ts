@@ -1,6 +1,6 @@
 import { QueryClient } from 'react-query';
 
-const createQueryClient = () =>
+const createQueryClient = (): QueryClient =>
   new QueryClient({
     defaultOptions: {
       queries: {

@@ -48,7 +48,10 @@ function formatDate(date: Date): string {
   return dayjs(date).format('YYYY/MM/DD HH:mm');
 }
 
-export function ShippingGroupDetailButton(props: { id: number; name: string }) {
+export function ShippingGroupDetailButton(props: {
+  id: number;
+  name: string;
+}): JSX.Element {
   const { id, name } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
@@ -317,7 +320,7 @@ export function SellerGoodsList(): JSX.Element {
   const [selectedGoodsIds, setSelectedGoodsIds] = useState<GridSelectionModel>([]);
 
   // 상품선택 핸들러
-  const handleSelection = (selectionModel: GridSelectionModel) => {
+  const handleSelection = (selectionModel: GridSelectionModel): void => {
     setSelectedGoodsIds(selectionModel);
   };
 

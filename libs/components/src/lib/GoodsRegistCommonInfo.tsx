@@ -47,7 +47,7 @@ function GoodsCommonInfoList({
   onCommonInfoChange,
 }: {
   onCommonInfoChange: (data: GoodsInfo) => void;
-}) {
+}): JSX.Element {
   const { data: profileData } = useProfile();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
@@ -81,7 +81,7 @@ function GoodsCommonInfoList({
   const { mutateAsync: deleteCommonInfoItem } = useDeleteGoodsCommonInfo();
 
   // 공통정보 삭제 요청
-  const deleteCommonInfo = async () => {
+  const deleteCommonInfo = async (): Promise<void> => {
     if (!value) throw new Error('공통정보가 없습니다');
     deleteCommonInfoItem({ id: Number(value) })
       .then((res) => {
@@ -143,19 +143,19 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const editor = useRef<SunEditorCore>();
   const viewer = useRef<any>();
-  const getSunEditorInstance = (sunEditor: SunEditorCore) => {
+  const getSunEditorInstance = (sunEditor: SunEditorCore): void => {
     editor.current = sunEditor;
   };
 
   const toast = useToast();
-  const setViewerContents = (contents: string) => {
+  const setViewerContents = (contents: string): void => {
     if (viewer.current) {
       viewer.current.innerHTML = contents;
     }
   };
 
   // 공통정보 신규 등록
-  const registGoodsCommonInfo = async () => {
+  const registGoodsCommonInfo = async (): Promise<void> => {
     if (!getValues('common_contents_name')) {
       toast({ title: '상품 공통 정보명을 입력해주세요.', status: 'warning' });
       return;
@@ -171,7 +171,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   };
 
   // 기존 공통정보 사용 - Select 값 변경시 뷰어 데이터 변경 && goodsInfoId 변경
-  const onCommonInfoChange = (data: GoodsInfo) => {
+  const onCommonInfoChange = (data: GoodsInfo): void => {
     const { id, info_value } = data;
     setViewerContents(info_value || '');
     setValue('goodsInfoId', id);

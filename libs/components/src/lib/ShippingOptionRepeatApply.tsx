@@ -24,7 +24,7 @@ function CostInputWrapper({
   children: React.ReactNode;
   id?: string;
   suffix: string;
-}) {
+}): JSX.Element {
   return (
     <FormControl id={id}>
       <Stack direction="row" alignItems="center">
@@ -87,7 +87,7 @@ export function ShippingOptionRepeatApply({
     default_yn: null,
   };
 
-  const onSubmit = (data: RepeatFormType) => {
+  const onSubmit = (data: RepeatFormType): void => {
     const {
       firstSectionStart,
       firstSectionEnd,

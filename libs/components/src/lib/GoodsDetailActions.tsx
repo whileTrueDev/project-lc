@@ -5,7 +5,7 @@ import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 export interface GoodsDetailActionsProps {
   goods: GoodsByIdRes;
 }
-export function GoodsDetailActions({ goods }: GoodsDetailActionsProps) {
+export function GoodsDetailActions({ goods }: GoodsDetailActionsProps): JSX.Element {
   return (
     <Stack>
       {/* <HStack>

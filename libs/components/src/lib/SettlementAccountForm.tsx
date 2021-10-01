@@ -16,7 +16,7 @@ export interface SettlementAccountFormProps {
   errors: DeepMap<SettlementAccountDto, FieldError>;
 }
 
-export function SettlementAccountForm(props: SettlementAccountFormProps) {
+export function SettlementAccountForm(props: SettlementAccountFormProps): JSX.Element {
   // 명시적 타입만 props로 전달 가능
   const { register, errors } = props;
 

@@ -1,4 +1,5 @@
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryResult } from 'react-query';
+import { AxiosError } from 'axios';
 import { ShippingGroup, ShippingSet, ShippingOption, ShippingCost } from '.prisma/client';
 import axios from '../../axios';
 
@@ -18,8 +19,10 @@ export const getShippingGroupItem = async (
     .then((res) => res.data);
 };
 
-export const useShippingGroupItem = (groupId: number | null) => {
-  return useQuery<ShippingGroupItem>(
+export const useShippingGroupItem = (
+  groupId: number | null,
+): UseQueryResult<ShippingGroupItem, AxiosError> => {
+  return useQuery<ShippingGroupItem, AxiosError>(
     ['ShippingGroupItem', groupId],
     () => getShippingGroupItem(groupId),
     {

@@ -5,7 +5,14 @@ import { useCallback } from 'react';
 import { useCreateShippingGroup } from './mutation/useCreateShippingGroup';
 
 // 배송비 정책 생성 요청 훅 **********************************
-export const useSaveShippingGroup = ({ onSuccess }: { onSuccess?: () => void }) => {
+export const useSaveShippingGroup = ({
+  onSuccess,
+}: {
+  onSuccess?: () => void;
+}): {
+  saveShippingPolicy: () => void;
+  isLoading: boolean;
+} => {
   const toast = useToast();
 
   const {
@@ -77,7 +84,13 @@ export const useSaveShippingGroup = ({ onSuccess }: { onSuccess?: () => void }) 
 };
 
 // 배송방법 추가 훅 **********************************
-export const useAddShippingSetHandler = ({ onSubmit }: { onSubmit: () => void }) => {
+export const useAddShippingSetHandler = ({
+  onSubmit,
+}: {
+  onSubmit: () => void;
+}): {
+  addShippingSetHandler: () => void;
+} => {
   const toast = useToast();
   const {
     shipping_set_name,

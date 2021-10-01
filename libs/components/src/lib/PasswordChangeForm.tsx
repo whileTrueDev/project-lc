@@ -34,7 +34,7 @@ export function PasswordChangeForm(props: PasswordChangeFormProps): JSX.Element 
 
   const { mutateAsync } = useChangePasswordMutation();
 
-  const changePassword = (data: PasswordCheckFormData) => {
+  const changePassword = (data: PasswordCheckFormData): void => {
     if (!email) return;
 
     const { password } = data;

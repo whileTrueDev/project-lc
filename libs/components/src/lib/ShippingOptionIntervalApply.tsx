@@ -9,7 +9,7 @@ import { boxStyle } from '../constants/commonStyleProps';
 import FormControlInputWrapper from './FormControlInputWrapper';
 import { ResponsiveDivider } from './ResponsiveDivider';
 
-export function ErrorText({ children }: { children: React.ReactNode }) {
+export function ErrorText({ children }: { children: React.ReactNode }): JSX.Element {
   return (
     <Text fontSize="xs" color="red">
       {children}
@@ -49,7 +49,7 @@ export function ShippingOptionIntervalApply({
   const { addShippingOption, shippingOptions, setShippingOptions } =
     useShippingSetItemStore();
 
-  const onSubmit = (data: IntervalFormType) => {
+  const onSubmit = (data: IntervalFormType): void => {
     const { section_ed, shipping_cost, shipping_area_name } = data;
     if (shipping_area_name === '지역 선택') {
       return;

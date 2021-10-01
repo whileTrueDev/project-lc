@@ -22,6 +22,7 @@ import { useGoodConfirmationMutation } from '@project-lc/hooks';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { GridRowData } from '@material-ui/data-grid';
+import { AxiosError } from 'axios';
 import { GridTableItem } from '../GridTableItem';
 
 // 검수 승인시에 필요한 최소한의 데이터
@@ -48,14 +49,16 @@ export function AdminGoodsConfirmationDialog(
   const initialRef = useRef(null);
   const toast = useToast();
 
-  function useClose() {
+  function useClose(): void {
     reset();
     onClose();
     callback();
   }
 
   const mutation = useGoodConfirmationMutation();
-  async function useSubmit(submitData: { firstmallGoodsConnectionId: string }) {
+  async function useSubmit(submitData: {
+    firstmallGoodsConnectionId: string;
+  }): Promise<void> {
     try {
       await mutation.mutateAsync({
         goodsId: row.id,
@@ -69,7 +72,7 @@ export function AdminGoodsConfirmationDialog(
     } catch (error) {
       toast({
         title: '상품 검수 승인이 실패하였습니다.',
-        description: error.response.data.message,
+        description: (error as AxiosError).response?.data.message,
         status: 'error',
       });
     } finally {

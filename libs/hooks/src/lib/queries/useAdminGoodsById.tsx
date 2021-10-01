@@ -1,5 +1,6 @@
 import { GoodsByIdRes } from '@project-lc/shared-types';
-import { useQuery } from 'react-query';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export const getAdminGoodsById = async (
@@ -11,8 +12,8 @@ export const getAdminGoodsById = async (
 export const useAdminGoodsById = (
   goodsId: number | string,
   initialData?: GoodsByIdRes,
-) => {
-  return useQuery<GoodsByIdRes>(
+): UseQueryResult<GoodsByIdRes, AxiosError> => {
+  return useQuery<GoodsByIdRes, AxiosError>(
     ['AdminGoodsById', goodsId],
     () => getAdminGoodsById(goodsId),
     {

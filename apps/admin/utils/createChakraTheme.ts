@@ -1,5 +1,6 @@
 import { extendTheme } from '@chakra-ui/react';
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const createChakraTheme = () =>
   extendTheme({
     colors: {
