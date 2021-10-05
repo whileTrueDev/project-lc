@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { GoodsInfo } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { GoodsInfoDto } from '@project-lc/shared-types';
 import {
@@ -14,12 +15,13 @@ export class GoodsInfoService {
     private readonly s3service: S3Service,
   ) {}
 
-  test() {
-    return 'goodsInfo test';
-  }
-
   /** 상품 공통정보 생성 */
-  async registGoodsCommonInfo(email: string, dto: GoodsInfoDto) {
+  async registGoodsCommonInfo(
+    email: string,
+    dto: GoodsInfoDto,
+  ): Promise<{
+    id: number;
+  }> {
     try {
       const item = await this.prisma.goodsInfo.create({
         data: {
@@ -35,7 +37,12 @@ export class GoodsInfoService {
   }
 
   /** 상품 공통정보 목록 조회 */
-  async getGoodsCommonInfoList(email: string) {
+  async getGoodsCommonInfoList(email: string): Promise<
+    {
+      info_name: string;
+      id: number;
+    }[]
+  > {
     try {
       const data = await this.prisma.goodsInfo.findMany({
         where: {
@@ -57,7 +64,7 @@ export class GoodsInfoService {
   }
 
   /** 상품 공통정보 특정 데이터 조회 */
-  async getOneGoodsCommonInfo(id: number) {
+  async getOneGoodsCommonInfo(id: number): Promise<GoodsInfo> {
     try {
       return this.prisma.goodsInfo.findUnique({
         where: { id },
@@ -72,7 +79,7 @@ export class GoodsInfoService {
   }
 
   /** 상품 공통정보 삭제 */
-  async deleteGoodsCommonInfo(id: number) {
+  async deleteGoodsCommonInfo(id: number): Promise<boolean> {
     try {
       // 공통정보 내 포함된 이미지
       const infoContents = await this.prisma.goodsInfo.findUnique({
