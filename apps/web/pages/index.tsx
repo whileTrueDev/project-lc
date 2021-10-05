@@ -1,7 +1,7 @@
 import { Box, Flex } from '@chakra-ui/react';
 import { CommonFooter, Features, Navbar, TestComponent } from '@project-lc/components';
 
-export function Index() {
+export function Index(): JSX.Element {
   return (
     <div>
       <Navbar />

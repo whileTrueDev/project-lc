@@ -1,6 +1,8 @@
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryResult } from 'react-query';
+import { AxiosError } from 'axios';
 import { ShippingGroup } from '.prisma/client';
 import axios from '../../axios';
+import { SocialAccounts } from './useSocialAccounts';
 
 export type ShippingGroupListItemType = ShippingGroup & {
   _count: {
@@ -14,8 +16,11 @@ export const getShippingGroupList = async (): Promise<ShippingGroupList> => {
   return axios.get<ShippingGroupList>('/shipping-group').then((res) => res.data);
 };
 
-export const useShippingGroupList = (sellerEmail: string, enabled: boolean) => {
-  return useQuery<ShippingGroupList>(
+export const useShippingGroupList = (
+  sellerEmail: string,
+  enabled: boolean,
+): UseQueryResult<ShippingGroupList, AxiosError> => {
+  return useQuery<ShippingGroupList, AxiosError>(
     ['ShippingGroupList', sellerEmail],
     getShippingGroupList,
     {

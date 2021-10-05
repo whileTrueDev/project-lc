@@ -116,7 +116,7 @@ export function StockInfoButton({
 export default StockInfoButton;
 
 // 상품 목록 재고/가용 헤더에서 사용되는 재고 설명 예시
-export function ExampleStockDescription() {
+export function ExampleStockDescription(): JSX.Element {
   return (
     <Stack spacing={1.5} fontSize="sm">
       <Text>재고/가용 설명</Text>

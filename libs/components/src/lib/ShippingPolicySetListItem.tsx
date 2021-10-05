@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable camelcase */
 import { Divider, Stack, Text } from '@chakra-ui/layout';
 import { CloseButton, Icon } from '@chakra-ui/react';
 import { FaTruck } from 'react-icons/fa';
@@ -13,7 +11,7 @@ import { getOptionLabel } from './ShippingOptionAppliedItem';
 import { ShippingSelectOptions } from './ShippingOptionTypeSelect';
 import { BoldText } from './ShippingPolicySetForm';
 
-function OptionItemDisplay({ item }: { item: ShippingOptionDto }) {
+function OptionItemDisplay({ item }: { item: ShippingOptionDto }): JSX.Element {
   const { shippingCost: costItem, shipping_opt_type: shippingOptType } = item;
   const selectOption = ShippingSelectOptions.find(
     (select) => select.key === shippingOptType,
@@ -39,7 +37,7 @@ export function SetItem({
 }: {
   set: TempShippingSet;
   onDelete?: (id: number) => void;
-}) {
+}): JSX.Element {
   const {
     shipping_set_name,
     prepay_info,

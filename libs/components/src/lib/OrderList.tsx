@@ -258,7 +258,7 @@ interface OrderToolbarProps {
     disableMessage?: string;
   }[];
 }
-export function OrderToolbar({ options }: OrderToolbarProps) {
+export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
   const xSize = useBreakpoint();
   const isMobile = useMemo(() => xSize && ['base', 'sm'].includes(xSize), [xSize]);
 

@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import {
   Box,
   Button,
@@ -28,7 +27,7 @@ export function GoodsOptionInput({
 }: {
   label: string;
   inputProps?: Partial<InputProps>;
-}) {
+}): JSX.Element {
   return (
     <HStack>
       <Text flex="1">{label}</Text>
@@ -37,7 +36,7 @@ export function GoodsOptionInput({
   );
 }
 
-function NoOptionInput() {
+function NoOptionInput(): JSX.Element {
   const { register } = useFormContext<GoodsFormValues>();
   return (
     <Stack maxWidth="md">
@@ -72,7 +71,7 @@ function NoOptionInput() {
   );
 }
 
-function UseOptionInput() {
+function UseOptionInput(): JSX.Element {
   const {
     watch,
     control,
@@ -87,7 +86,7 @@ function UseOptionInput() {
 
   const inputWidth = isMobileSize ? '74px' : 'auto';
 
-  const addOption = () => {
+  const addOption = (): void => {
     append({
       option1: '',
       consumer_price: 0,

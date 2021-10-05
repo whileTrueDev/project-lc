@@ -30,12 +30,12 @@ export function AccountRemoveDialog(props: AccountRemoveDialogProps): JSX.Elemen
   const { mutateAsync } = useDeleteSellerMutation();
   const toast = useToast();
 
-  const closeModal = () => {
+  const closeModal = (): void => {
     reset();
     onClose();
   };
 
-  const deleteAccount = () => {
+  const deleteAccount = (): void => {
     mutateAsync(getValues('email'))
       .then((isDeleted) => {
         if (isDeleted) {

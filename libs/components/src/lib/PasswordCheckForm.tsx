@@ -19,7 +19,7 @@ export function PasswordCheckForm(props: PasswordCheckFormProps): JSX.Element {
   const { mutateAsync } = useValidatePassword();
   const { register, handleSubmit, reset, watch } = useForm<PasswordCheckFormData>();
 
-  const checkPassword = (data: PasswordCheckFormData) => {
+  const checkPassword = (data: PasswordCheckFormData): void => {
     const { password } = data;
     if (!email || !password) return;
 

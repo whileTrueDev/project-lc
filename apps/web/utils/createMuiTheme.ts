@@ -1,7 +1,7 @@
-import { createTheme } from '@material-ui/core';
+import { createTheme, Theme } from '@material-ui/core';
 import { cyan } from '@material-ui/core/colors';
 
-const createMuiTheme = () =>
+const createMuiTheme = (): Theme =>
   createTheme({
     palette: {
       primary: {

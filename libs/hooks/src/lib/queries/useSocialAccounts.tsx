@@ -1,4 +1,5 @@
-import { useQuery } from 'react-query';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export type SocialAccount = {
@@ -15,11 +16,16 @@ export const getSocialAccounts = async (email: string): Promise<SocialAccounts> 
     .get<SocialAccounts>('/social/accounts', { params: { email } })
     .then((res) => {
       return res.data;
+    })
+    .catch((err) => {
+      throw err;
     });
 };
 
-export const useSocialAccounts = (email: string) => {
-  return useQuery<SocialAccounts>(
+export const useSocialAccounts = (
+  email: string,
+): UseQueryResult<SocialAccounts, AxiosError> => {
+  return useQuery<SocialAccounts, AxiosError>(
     ['SocialAccounts', email],
     () => getSocialAccounts(email),
     {

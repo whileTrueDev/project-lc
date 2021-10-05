@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { SellerSocialAccount } from '@prisma/client';
 import { Request, Response } from 'express';
 import { LoginHistoryService } from '../auth/login-history/login-history.service';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -25,7 +26,11 @@ export class SocialController {
   /** email 로 가입된 셀러에 연동된 소셜계정목록 반환 */
   @UseGuards(JwtAuthGuard)
   @Get('/accounts')
-  async getSocialAccounts(@Query('email') email: string) {
+  async getSocialAccounts(
+    @Query('email') email: string,
+  ): Promise<
+    Pick<SellerSocialAccount, 'provider' | 'name' | 'serviceId' | 'registDate'>[]
+  > {
     return this.socialService.getSocialAccounts(email);
   }
 
@@ -33,11 +38,11 @@ export class SocialController {
   @Get('/google/login')
   @UseGuards(AuthGuard('google'))
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async googleAuth() {}
+  async googleAuth(): Promise<void> {}
 
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+  async googleAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
     this.socialService.login(req, res);
 
     // 로그인 기록 추가 by @hwasurr
@@ -46,7 +51,7 @@ export class SocialController {
   }
 
   @Delete('/google/unlink/:googleId')
-  async googleUnlink(@Param('googleId') googleId: string) {
+  async googleUnlink(@Param('googleId') googleId: string): Promise<boolean> {
     await this.socialService.googleUnlink(googleId);
     return this.socialService.deleteSocialAccountRecord(googleId);
   }
@@ -55,11 +60,11 @@ export class SocialController {
   @Get('/naver/login')
   @UseGuards(AuthGuard('naver'))
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async naverAuth() {}
+  async naverAuth(): Promise<void> {}
 
   @Get('/naver/callback')
   @UseGuards(AuthGuard('naver'))
-  async naverAuthCallback(@Req() req: Request, @Res() res: Response) {
+  async naverAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
     this.socialService.login(req, res);
     // 로그인 기록 추가 by @hwasurr
     this.loginHistoryService.createLoginStamp(req, '소셜/네이버');
@@ -67,7 +72,7 @@ export class SocialController {
   }
 
   @Delete('/naver/unlink/:naverId')
-  async naverUnlink(@Param('naverId') naverId: string) {
+  async naverUnlink(@Param('naverId') naverId: string): Promise<boolean> {
     await this.socialService.naverUnlink(naverId);
     return this.socialService.deleteSocialAccountRecord(naverId);
   }
@@ -76,11 +81,11 @@ export class SocialController {
   @Get('/kakao/login')
   @UseGuards(AuthGuard('kakao'))
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async kakaoAuth() {}
+  async kakaoAuth(): Promise<void> {}
 
   @Get('/kakao/callback')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoAuthCallback(@Req() req: Request, @Res() res: Response) {
+  async kakaoAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
     this.socialService.login(req, res);
     // 로그인 기록 추가 by @hwasurr
     this.loginHistoryService.createLoginStamp(req, '소셜/카카오');
@@ -88,7 +93,7 @@ export class SocialController {
   }
 
   @Delete('/kakao/unlink/:kakaoId')
-  async kakaoUnlink(@Param('kakaoId') kakaoId: string) {
+  async kakaoUnlink(@Param('kakaoId') kakaoId: string): Promise<boolean> {
     await this.socialService.kakaoUnlink(kakaoId);
     return this.socialService.deleteSocialAccountRecord(kakaoId);
   }

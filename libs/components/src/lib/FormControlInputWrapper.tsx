@@ -8,7 +8,7 @@ export function FormControlInputWrapper({
   children: React.ReactNode;
   id?: string;
   suffix: string;
-}) {
+}): JSX.Element {
   return (
     <FormControl id={id}>
       <Stack>

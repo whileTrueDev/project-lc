@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import {
   HStack,
   CloseButton,
@@ -25,7 +24,7 @@ export type Preview = {
 
 export function GoodsPreviewItem(
   props: Preview & { onDelete: () => void; width: number; height: number },
-) {
+): JSX.Element {
   const { id, fileName, url, onDelete, ...rest } = props;
 
   return (
@@ -67,7 +66,7 @@ export function GoodsRegistPictures(): JSX.Element {
   const { setValue, getValues } = useFormContext<GoodsFormValues>();
   const [previews, setPreviews] = useState<Preview[]>([]);
 
-  const deletePreview = (id: number) => {
+  const deletePreview = (id: number): void => {
     setPreviews((list) => {
       const filtered = list.filter((item) => item.id !== id);
       const prevImages = getValues('image');
@@ -79,7 +78,7 @@ export function GoodsRegistPictures(): JSX.Element {
     });
   };
 
-  const handleSuccess = (fileName: string, file: File) => {
+  const handleSuccess = (fileName: string, file: File): void => {
     // 이미지 최대 8개 등록 가능
     if (previews.length >= MAX_PICTURE_COUNT) {
       toast({
@@ -105,7 +104,7 @@ export function GoodsRegistPictures(): JSX.Element {
     });
   };
 
-  const handleError = (errorType?: ImageInputErrorTypes) => {
+  const handleError = (errorType?: ImageInputErrorTypes): void => {
     console.error({ errorType });
   };
 

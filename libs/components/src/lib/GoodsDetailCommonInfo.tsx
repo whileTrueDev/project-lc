@@ -6,7 +6,9 @@ export interface GoodsDetailCommonInfoProps {
   goods: GoodsByIdRes;
 }
 /** 상품 공통 정보 컴포넌트 */
-export function GoodsDetailCommonInfo({ goods }: GoodsDetailCommonInfoProps) {
+export function GoodsDetailCommonInfo({
+  goods,
+}: GoodsDetailCommonInfoProps): JSX.Element {
   return (
     <Stack>
       {goods.common_contents ? (

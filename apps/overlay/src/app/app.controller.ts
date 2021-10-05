@@ -3,13 +3,13 @@ import { Controller, Get, Render } from '@nestjs/common';
 @Controller()
 export class AppController {
   @Get()
-  healthCheck() {
+  healthCheck(): string {
     return 'alive';
   }
 
   @Get(':id')
   @Render('client')
-  getRender() {
+  getRender(): string {
     return '';
   }
 }

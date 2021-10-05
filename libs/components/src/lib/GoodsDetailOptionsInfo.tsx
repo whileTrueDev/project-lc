@@ -18,7 +18,9 @@ export interface GoodsDetailOptionsInfoProps {
   goods: GoodsByIdRes;
 }
 
-export function GoodsDetailOptionsInfo({ goods }: GoodsDetailOptionsInfoProps) {
+export function GoodsDetailOptionsInfo({
+  goods,
+}: GoodsDetailOptionsInfoProps): JSX.Element | null {
   const { isMobileSize, isDesktopSize, isMiddleSize } = useDisplaySize();
 
   if (isMobileSize) {

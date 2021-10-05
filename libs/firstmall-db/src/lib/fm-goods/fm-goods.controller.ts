@@ -9,7 +9,11 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { ChangeGoodsViewDto, DeleteGoodsDto } from '@project-lc/shared-types';
+import {
+  ChangeGoodsViewDto,
+  DeleteGoodsDto,
+  GoodsOptionWithStockInfo,
+} from '@project-lc/shared-types';
 import {
   GoodsService,
   JwtAuthGuard,
@@ -26,7 +30,9 @@ export class FmGoodsController {
   ) {}
 
   @Get('/stock')
-  getStockInfo(@Query('id', ParseIntPipe) id: number) {
+  getStockInfo(
+    @Query('id', ParseIntPipe) id: number,
+  ): Promise<GoodsOptionWithStockInfo[]> {
     return this.fmGoodsService.getStockInfo(id);
   }
 
@@ -36,7 +42,7 @@ export class FmGoodsController {
    * @returns
    */
   @Patch('/expose')
-  changeGoodsView(@Body(ValidationPipe) dto: ChangeGoodsViewDto) {
+  changeGoodsView(@Body(ValidationPipe) dto: ChangeGoodsViewDto): Promise<boolean> {
     const { id, view } = dto;
     return this.fmGoodsService.changeGoodsView(id, view);
   }
@@ -51,7 +57,7 @@ export class FmGoodsController {
   async deleteGoods(
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: DeleteGoodsDto,
-  ) {
+  ): Promise<boolean> {
     const email = seller.sub;
     // const email = 'a1919361@gmail.com';
 

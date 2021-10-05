@@ -1,7 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { GoodsConfirmationDto, GoodsRejectionDto } from '@project-lc/shared-types';
-import { SellerSettlementAccount, SellerBusinessRegistration } from '@prisma/client';
+import {
+  GoodsByIdRes,
+  GoodsConfirmationDto,
+  GoodsRejectionDto,
+} from '@project-lc/shared-types';
+import {
+  SellerSettlementAccount,
+  SellerBusinessRegistration,
+  GoodsConfirmation,
+} from '@prisma/client';
 
 export type AdminSettlementInfoType = {
   sellerSettlementAccount: SellerSettlementAccount[];
@@ -13,7 +21,7 @@ export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
 
   // 관리자 페이지 정산 데이터
-  public async getSettlementInfo() {
+  public async getSettlementInfo(): Promise<AdminSettlementInfoType> {
     // 전체 광고주를 기준으로 merge 한다.
     const users = await this.prisma.seller.findMany({
       include: {
@@ -37,7 +45,7 @@ export class AdminService {
   }
 
   // 정산정보 전처리
-  private preprocessSettlementInfo(users: any) {
+  private preprocessSettlementInfo(users: any): AdminSettlementInfoType {
     const result: AdminSettlementInfoType = {
       sellerSettlementAccount: [],
       sellerBusinessRegistration: [],
@@ -57,6 +65,7 @@ export class AdminService {
   }
 
   // 관리자 페이지 상품검수 데이터, 상품검수가 완료되지 않은 상태일 경우,
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   public async getGoodsInfo({ sort, direction }) {
     const items = await this.prisma.goods.findMany({
       orderBy: [{ [sort]: direction }],
@@ -105,7 +114,9 @@ export class AdminService {
     };
   }
 
-  public async setGoodsConfirmation(dto: GoodsConfirmationDto) {
+  public async setGoodsConfirmation(
+    dto: GoodsConfirmationDto,
+  ): Promise<GoodsConfirmation> {
     const goodsConfirmation = await this.prisma.goodsConfirmation.update({
       where: { goodsId: dto.goodsId },
       data: {
@@ -121,7 +132,7 @@ export class AdminService {
     return goodsConfirmation;
   }
 
-  public async setGoodsRejection(dto: GoodsRejectionDto) {
+  public async setGoodsRejection(dto: GoodsRejectionDto): Promise<GoodsConfirmation> {
     const goodsConfirmation = await this.prisma.goodsConfirmation.update({
       where: { goodsId: dto.goodsId },
       data: {
@@ -136,7 +147,7 @@ export class AdminService {
     return goodsConfirmation;
   }
 
-  public async getOneGoods(goodsId: string | number) {
+  public async getOneGoods(goodsId: string | number): Promise<GoodsByIdRes> {
     return this.prisma.goods.findFirst({
       where: {
         id: Number(goodsId),

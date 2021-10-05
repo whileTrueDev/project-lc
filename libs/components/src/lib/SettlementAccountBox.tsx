@@ -23,7 +23,10 @@ interface SellerSettlementAccountInterface extends SellerSettlementAccount {
   [index: string]: string | number;
 }
 
-function makeListRow(settlementAccount: SellerSettlementAccountInterface) {
+function makeListRow(settlementAccount: SellerSettlementAccountInterface): {
+  title: string;
+  value: string | number;
+}[] {
   if (!settlementAccount) {
     return [];
   }

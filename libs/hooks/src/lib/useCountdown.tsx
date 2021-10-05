@@ -1,4 +1,21 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  Dispatch,
+  MutableRefObject,
+  SetStateAction,
+} from 'react';
+
+export interface UseCountdownResult {
+  startCountdown: (startSecond: number) => void;
+  clearTimer: () => void;
+  seconds: number;
+  setSeconds: Dispatch<SetStateAction<number>>;
+  intervalRef: MutableRefObject<NodeJS.Timeout | null>;
+  intervalCallbackRef: MutableRefObject<() => void>;
+}
 
 /**
  * 카운트다운 위한 훅
@@ -15,7 +32,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
   </div>
  );
  */
-export function useCountdown() {
+export function useCountdown(): UseCountdownResult {
   const [seconds, setSeconds] = useState<number>(0);
   const intervalCallbackRef = useRef(() => setSeconds((second) => second - 1));
   const intervalRef = useRef<NodeJS.Timeout | null>(null);

@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import {
   Alert,
   AlertIcon,
@@ -36,16 +35,17 @@ export function ExportDialog({
   const exportMutation = useExportOrderMutation();
 
   /** 폼제출 핸들러 -> 출고 처리 API 요청 */
-  async function onSubmit(formData: ExportOrderDto[]) {
+  async function onSubmit(formData: ExportOrderDto[]): Promise<void> {
     if (formData[0].exportOptions.every((o) => Number(o.exportEa) === 0)) {
-      return toast({
+      toast({
         status: 'warning',
         description:
           '모든 주문상품의 보낼 수량이 0 입니다. 보낼 수량을 올바르게 입력해주세요.',
       });
+      return;
     }
     // react-query 요청
-    return exportMutation
+    const res = await exportMutation
       .mutateAsync({
         ...formData[0],
         orderId: String(order.order_seq),
@@ -57,11 +57,12 @@ export function ExportDialog({
         });
         onClose();
       })
-      .catch(() => {
+      .catch((err) => {
         toast({
           status: 'error',
           description: '출고 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
         });
+        throw err;
       });
   }
 

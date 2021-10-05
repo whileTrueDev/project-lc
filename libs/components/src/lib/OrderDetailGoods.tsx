@@ -9,7 +9,10 @@ export interface OrderDetailGoodsProps {
 }
 
 /** 주문 상품 정보 */
-export function OrderDetailGoods({ orderItem, option }: OrderDetailGoodsProps) {
+export function OrderDetailGoods({
+  orderItem,
+  option,
+}: OrderDetailGoodsProps): JSX.Element {
   const orderPrice = useMemo(() => {
     const reduced = orderItem.options.reduce(
       (p, c) => p + Number(c.price) * Number(c.ea),

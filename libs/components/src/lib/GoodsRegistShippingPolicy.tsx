@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-/* eslint-disable react/jsx-props-no-spreading */
 import {
   Button,
   Center,
@@ -49,7 +47,7 @@ import ShippingPolicyForm from './ShippingPolicyForm';
 import SetItem from './ShippingPolicySetListItem';
 
 // 배송비 정책 상세 정보
-function ShippingGroupDetail({ groupId }: { groupId: number | null }) {
+function ShippingGroupDetail({ groupId }: { groupId: number | null }): JSX.Element {
   const { data, isLoading } = useShippingGroupItem(groupId);
   if (!groupId) return <Text>잘못된 접근입니다. 선택된 배송비정책 id 없음</Text>;
   if (isLoading)
@@ -110,7 +108,7 @@ function ShippingGroupDetail({ groupId }: { groupId: number | null }) {
 
 // TODO: 팝업 띄우는 게 아니라 groupId로 필터링 된 상품 목록 창으로 이동시키기
 // 연결된 상품 목록
-function RelatedGoodsList({ groupId }: { groupId: number | null }) {
+function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element {
   const { data: profileData } = useProfile();
   const { data, isLoading } = useSellerGoodsList(
     {
@@ -165,7 +163,7 @@ function ShippingGroupListItem({
   nameHandler: (id: number) => void;
   countHandler: (id: number) => void;
   deleteHandler: (id: number) => void;
-}) {
+}): JSX.Element {
   const { register } = useFormContext<GoodsFormValues>();
   return (
     <Flex key={group.id} spacing={2}>
@@ -232,7 +230,7 @@ export function ShippingGroupDetailModal(
   props: Pick<ConfirmDialogProps, 'isOpen' | 'onClose' | 'onConfirm'> & {
     groupId: number | null;
   },
-) {
+): JSX.Element {
   const { isOpen, onClose, onConfirm, groupId } = props;
   return (
     <ConfirmDialog
@@ -276,20 +274,20 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
   const { reset } = useShippingGroupItemStore();
   const { mutateAsync } = useDeleteShippingGroup();
 
-  const registModalCloseHandler = () => {
+  const registModalCloseHandler = (): void => {
     reset();
     onRegistModalClose();
   };
 
-  const groupItemNameHandler = (id: number) => {
+  const groupItemNameHandler = (id: number): void => {
     setClickedGroupId(id);
     onInfoModalOpen();
   };
-  const groupItemCountHandler = (id: number) => {
+  const groupItemCountHandler = (id: number): void => {
     setClickedGroupId(id);
     onRelatedGoodsModalOpen();
   };
-  const groupItemDeleteHandler = (id: number) => {
+  const groupItemDeleteHandler = (id: number): void => {
     setClickedGroupId(id);
     onConfirmModalOpen();
   };
@@ -365,7 +363,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
         onConfirm={() => {
           const groupId = clickedGroupId;
           if (!groupId) throw new Error('shippingGroupId가 없습니다');
-          return mutateAsync({ groupId }).then(() => {
+          return mutateAsync({ groupId }).then((res) => {
             setClickedGroupId(null);
             setValue('shippingGroupId', undefined);
           });

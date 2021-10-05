@@ -8,7 +8,7 @@ export class SellerShopService {
   constructor(private readonly prisma: PrismaService) {}
 
   // 상점에 대한 정보 변경
-  async changeShopInfo(dto: SellerShopInfoDto, sellerInfo: UserPayload) {
+  async changeShopInfo(dto: SellerShopInfoDto, sellerInfo: UserPayload): Promise<void> {
     const sellerShop = await this.prisma.sellerShop.upsert({
       where: { sellerEmail: sellerInfo.sub },
       update: { ...dto },

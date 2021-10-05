@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { Button, FormControl, Input, Select, Stack, Text } from '@chakra-ui/react';
 import { ShippingOptType, ShippingSetType } from '@prisma/client';
 import { MAX_COST } from '@project-lc/shared-types';
@@ -25,7 +24,7 @@ function CostInputWrapper({
   children: React.ReactNode;
   id?: string;
   suffix: string;
-}) {
+}): JSX.Element {
   return (
     <FormControl id={id}>
       <Stack direction="row" alignItems="center">
@@ -82,13 +81,13 @@ export function ShippingOptionRepeatApply({
     },
   });
 
-  const shippingOptionBase = {
+  const shippingOptionBase: any = {
     shipping_set_type: shippingSetType,
     shipping_opt_type: shippingOptType,
     default_yn: null,
   };
 
-  const onSubmit = (data: RepeatFormType) => {
+  const onSubmit = (data: RepeatFormType): void => {
     const {
       firstSectionStart,
       firstSectionEnd,

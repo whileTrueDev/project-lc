@@ -27,7 +27,7 @@ export function OrderDetailOptionList({
 }: {
   order: FindFmOrderDetailRes;
   options: FmOrderOption[];
-}) {
+}): JSX.Element {
   const displaySize = useDisplaySize();
   return (
     <Box mt={4}>
@@ -49,7 +49,7 @@ export function OrderDetailOptionListItem({
 }: {
   option: Pick<FmOrderOption, 'ea' | 'price' | 'option1' | 'title1' | 'color' | 'step'>;
   withBadge?: boolean;
-}) {
+}): JSX.Element {
   const orderPrice = useMemo(() => {
     const price = Number(option.price) * Number(option.ea);
     return `${price.toLocaleString()} 원`;
@@ -80,7 +80,7 @@ export function OrderDetailOptionDescription({
 }: {
   order: FindFmOrderDetailRes;
   options: FmOrderOption[];
-}) {
+}): JSX.Element {
   const { isOpen, onToggle } = useDisclosure({});
   return (
     <Box mt={2}>

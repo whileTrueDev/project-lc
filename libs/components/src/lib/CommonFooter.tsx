@@ -12,7 +12,7 @@ import {
 import { ReactNode } from 'react';
 import { FaInstagram, FaYoutube } from 'react-icons/fa';
 
-const ListHeader = ({ children }: { children: ReactNode }) => {
+const ListHeader = ({ children }: { children: ReactNode }): JSX.Element => {
   return (
     <Text fontWeight="500" fontSize="lg" mb={2}>
       {children}
@@ -28,7 +28,7 @@ const SocialButton = ({
   children: ReactNode;
   label: string;
   href: string;
-}) => {
+}): JSX.Element => {
   return (
     <chakra.button
       bg={useColorModeValue('blackAlpha.100', 'whiteAlpha.100')}
@@ -52,7 +52,7 @@ const SocialButton = ({
   );
 };
 
-export function CommonFooter() {
+export function CommonFooter(): JSX.Element {
   return (
     <Box
       bg={useColorModeValue('gray.50', 'gray.900')}

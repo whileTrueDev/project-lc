@@ -17,7 +17,7 @@ interface SignupModalProps {
   isOpen: boolean;
   onClose?: () => void;
 }
-export function SignupModal({ isOpen, onClose }: SignupModalProps) {
+export function SignupModal({ isOpen, onClose }: SignupModalProps): JSX.Element {
   const isImageOpen = useBreakpointValue({ base: false, md: true });
 
   return (

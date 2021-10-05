@@ -122,7 +122,7 @@ export class AuthService {
    * @param req 요청 객체
    * @param userPayload Token에 저장될 payload
    */
-  validateRefreshToken(req: Request) {
+  validateRefreshToken(req: Request): UserPayload {
     const cookieRefreshToken: string | undefined = req.cookies?.refresh_token;
     try {
       // 암호화 미사용시 제거

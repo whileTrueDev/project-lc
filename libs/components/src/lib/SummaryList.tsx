@@ -11,7 +11,7 @@ export interface SummaryListProps {
     disabled?: boolean;
   }[];
 }
-export function SummaryList({ spacing = 2, listItems }: SummaryListProps) {
+export function SummaryList({ spacing = 2, listItems }: SummaryListProps): JSX.Element {
   return (
     <List spacing={spacing}>
       {listItems.map((i) => {

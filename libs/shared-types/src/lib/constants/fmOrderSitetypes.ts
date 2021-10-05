@@ -12,6 +12,6 @@ export const fmOrderSitetypes: FmOrderSitetypes = {
   F: '페이스북',
 };
 
-export function convertOrderSitetypeToString(key: keyof FmOrderSitetypes) {
+export function convertOrderSitetypeToString(key: keyof FmOrderSitetypes): string {
   return fmOrderSitetypes[key];
 }

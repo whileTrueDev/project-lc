@@ -1,4 +1,5 @@
-import { useQuery } from 'react-query';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export type GoodsCommonInfo = {
@@ -18,8 +19,8 @@ export const useGoodsCommonInfoList = ({
   email: string;
   enabled: boolean;
   onSuccess: (data: GoodsCommonInfo[]) => void;
-}) => {
-  return useQuery<GoodsCommonInfo[]>(
+}): UseQueryResult<GoodsCommonInfo[], AxiosError> => {
+  return useQuery<GoodsCommonInfo[], AxiosError>(
     ['GoodsCommonInfoList', email],
     getGoodsCommonInfoList,
     {

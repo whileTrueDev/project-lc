@@ -8,6 +8,6 @@ export const fmOrderShippingTypes: Record<FmOrderMetaInfo['shipping_type'], stri
 
 export const convertFmOrderShippingTypesToString = (
   key: FmOrderMetaInfo['shipping_type'],
-) => {
+): string => {
   return fmOrderShippingTypes[key];
 };

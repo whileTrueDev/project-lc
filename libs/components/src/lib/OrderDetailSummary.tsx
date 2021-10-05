@@ -12,7 +12,7 @@ import { SummaryList } from './SummaryList';
 export interface OrderDetailSummaryProps {
   order: FindFmOrderDetailRes;
 }
-export function OrderDetailSummary({ order }: OrderDetailSummaryProps) {
+export function OrderDetailSummary({ order }: OrderDetailSummaryProps): JSX.Element {
   return (
     <SummaryList
       spacing={2}

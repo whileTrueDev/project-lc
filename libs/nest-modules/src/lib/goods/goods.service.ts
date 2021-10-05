@@ -1,15 +1,15 @@
-/* eslint-disable camelcase */
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { GoodsView, Seller } from '@prisma/client';
+import { GoodsInfo, GoodsView, Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  GoodsListDto,
-  GoodsOptionWithStockInfo,
-  GoodsOptionsWithSupplies,
-  TotalStockInfo,
-  GoodsListRes,
-  RegistGoodsDto,
+  GoodsByIdRes,
   GoodsInfoDto,
+  GoodsListDto,
+  GoodsListRes,
+  GoodsOptionsWithSupplies,
+  GoodsOptionWithStockInfo,
+  RegistGoodsDto,
+  TotalStockInfo,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -188,7 +188,7 @@ export class GoodsService {
   }
 
   // 옵션 재고 조회
-  public async getStockInfo(goods_seq: number) {
+  public async getStockInfo(goods_seq: number): Promise<GoodsOptionWithStockInfo[]> {
     const optionStocks = await this.prisma.goodsOptions.findMany({
       where: { goods: { id: goods_seq } },
       include: { supply: true },
@@ -240,7 +240,7 @@ export class GoodsService {
   }
 
   /** 상품 개별 정보 조회 */
-  public async getOneGoods(goodsId: number, email: string) {
+  public async getOneGoods(goodsId: number, email: string): Promise<GoodsByIdRes> {
     return this.prisma.goods.findFirst({
       where: {
         id: goodsId,
@@ -269,7 +269,10 @@ export class GoodsService {
   }
 
   // 상품 등록
-  public async registGoods(email: string, dto: RegistGoodsDto) {
+  public async registGoods(
+    email: string,
+    dto: RegistGoodsDto,
+  ): Promise<{ goodsId: number }> {
     try {
       const { options, image, shippingGroupId, goodsInfoId, ...goodsData } = dto;
       const optionsData = options.map((opt) => {
@@ -306,7 +309,7 @@ export class GoodsService {
   }
 
   // 상품 공통정보 생성
-  async registGoodsCommonInfo(email: string, dto: GoodsInfoDto) {
+  async registGoodsCommonInfo(email: string, dto: GoodsInfoDto): Promise<{ id: number }> {
     try {
       const item = await this.prisma.goodsInfo.create({
         data: {
@@ -322,7 +325,7 @@ export class GoodsService {
   }
 
   // 상품 공통정보 삭제
-  async deleteGoodsCommonInfo(id: number) {
+  async deleteGoodsCommonInfo(id: number): Promise<boolean> {
     try {
       await this.prisma.goodsInfo.delete({
         where: {
@@ -340,7 +343,12 @@ export class GoodsService {
   }
 
   // 상품 공통정보 목록 조회
-  async getGoodsCommonInfoList(email: string) {
+  async getGoodsCommonInfoList(email: string): Promise<
+    {
+      id: number;
+      info_name: string;
+    }[]
+  > {
     try {
       const data = await this.prisma.goodsInfo.findMany({
         where: {
@@ -362,7 +370,7 @@ export class GoodsService {
   }
 
   // 상품 공통정보 특정 데이터 조회
-  async getOneGoodsCommonInfo(id: number) {
+  async getOneGoodsCommonInfo(id: number): Promise<GoodsInfo> {
     try {
       return this.prisma.goodsInfo.findUnique({
         where: { id },

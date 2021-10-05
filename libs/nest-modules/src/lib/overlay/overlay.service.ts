@@ -29,7 +29,9 @@ export class OverlayService {
     };
   }
 
-  async googleTextToSpeech(purchaseData: PurchaseMessage) {
+  async googleTextToSpeech(
+    purchaseData: PurchaseMessage,
+  ): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
     const { nickname } = purchaseData;
     const { productName } = purchaseData;
@@ -62,7 +64,7 @@ export class OverlayService {
     return false;
   }
 
-  async streamStartNotification() {
+  async streamStartNotification(): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
 
     const message = `

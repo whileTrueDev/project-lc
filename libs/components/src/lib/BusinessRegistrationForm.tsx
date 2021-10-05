@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import {
   Grid,
   GridItem,
@@ -30,17 +29,17 @@ export interface BusinessRegistrationFormProps {
   clearErrors: UseFormClearErrors<BusinessRegistrationFormDto>;
 }
 
-function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps) {
+function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.Element {
   // 명시적 타입만 props로 전달 가능
   const { inputRef, register, errors, seterror, setvalue, clearErrors } = props;
 
-  function handleSuccess(fileName: string, file: File) {
+  function handleSuccess(fileName: string, file: File): void {
     setvalue('businessRegistrationImage', file);
     setvalue('imageName', fileName);
     clearErrors(['businessRegistrationImage', 'imageName']);
   }
 
-  function handleError(errorType?: ImageInputErrorTypes) {
+  function handleError(errorType?: ImageInputErrorTypes): void {
     switch (errorType) {
       case 'over-size': {
         seterror('businessRegistrationImage', {
