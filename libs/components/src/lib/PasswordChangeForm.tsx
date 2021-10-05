@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import {
   Box,
   Button,
@@ -35,7 +34,7 @@ export function PasswordChangeForm(props: PasswordChangeFormProps): JSX.Element 
 
   const { mutateAsync } = useChangePasswordMutation();
 
-  const changePassword = (data: PasswordCheckFormData) => {
+  const changePassword = (data: PasswordCheckFormData): void => {
     if (!email) return;
 
     const { password } = data;

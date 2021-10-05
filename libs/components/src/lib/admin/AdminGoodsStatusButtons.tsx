@@ -14,7 +14,7 @@ export function AdminGoodsStatusButtons(props: { goods: GoodsByIdRes }): JSX.Ele
   const { isOpen, onOpen, onClose } = useDisclosure();
   const rejectMutation = useGoodRejectionMutation();
 
-  async function handleRejectionGood(row: any) {
+  async function handleRejectionGood(row: any): Promise<void> {
     try {
       await rejectMutation.mutateAsync({
         goodsId: row.id,

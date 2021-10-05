@@ -1,9 +1,9 @@
-/* eslint-disable camelcase */
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
-export interface KakaoAccessTokenRefreshRes {
+/** 카카오API 토큰 새로고침 반환 데이터형태 */
+export interface KakaoApiAccessTokenRefreshRes {
   /** 토큰 타입, bearer로 고정 */
   token_type: 'bearer';
   /** 갱신된 사용자 액세스 토큰 값 */
@@ -14,6 +14,12 @@ export interface KakaoAccessTokenRefreshRes {
   refresh_token?: string;
   /** 리프레시 토큰 만료 시간(초) */
   refresh_token_expires_in?: number;
+}
+
+/** 카카오API 연결 끊기 반환 데이터형태 */
+export interface KakaoApiUnlinkRes {
+  /** 연결 끊기에 성공한 사용자의 회원번호 */
+  number: string;
 }
 
 @Injectable()
@@ -32,9 +38,9 @@ export class KakaoApiService {
    */
   public async refreshAccessToken(
     refreshToken: string,
-  ): Promise<KakaoAccessTokenRefreshRes> {
+  ): Promise<KakaoApiAccessTokenRefreshRes> {
     return axios
-      .post<KakaoAccessTokenRefreshRes>(
+      .post<KakaoApiAccessTokenRefreshRes>(
         'https://kauth.kakao.com/oauth/token',
         undefined,
         {
@@ -59,9 +65,9 @@ export class KakaoApiService {
    * * 카카오 계정 연동 해제요청을 보냅니다.
    * @param accessToken 유효한 액세스토큰
    */
-  public async unlink(accessToken: string) {
+  public async unlink(accessToken: string): Promise<KakaoApiUnlinkRes> {
     return axios
-      .post(`${this.BASE_URL}/user/unlink`, undefined, {
+      .post<KakaoApiUnlinkRes>(`${this.BASE_URL}/user/unlink`, undefined, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

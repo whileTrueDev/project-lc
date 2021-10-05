@@ -87,7 +87,7 @@ export class SellerService {
    * 해당 이메일로 가입된 계정이 삭제될 수 있는지 확인함
    * @throws {Error}
    */
-  private async checkCanBeDeletedSeller(email: string) {
+  private async checkCanBeDeletedSeller(email: string): Promise<boolean> {
     const seller = await this.prisma.seller.findUnique({
       where: { email },
       select: {
@@ -108,12 +108,14 @@ export class SellerService {
         '연결된 소셜 계정이 존재합니다. 연결 해제를 먼저 진행해주세요.',
       );
     }
+
+    return !!seller;
   }
 
   /**
    * seller 삭제
    */
-  async deleteOne(email: string) {
+  async deleteOne(email: string): Promise<boolean> {
     await this.checkCanBeDeletedSeller(email);
 
     await this.prisma.seller.delete({
@@ -129,7 +131,7 @@ export class SellerService {
    * @param password 본인 비밀번호
    * @returns boolean 비밀번호가 맞는지
    */
-  async checkPassword(email: string, password: string) {
+  async checkPassword(email: string, password: string): Promise<boolean> {
     const seller = await this.findOne({ email });
     if (!seller.password) {
       throw new BadRequestException(
@@ -145,7 +147,7 @@ export class SellerService {
    * @param newPassword 새로운 비밀번호
    * @returns
    */
-  async changePassword(email: string, newPassword: string) {
+  async changePassword(email: string, newPassword: string): Promise<Seller> {
     const hashedPw = await this.hashPassword(newPassword);
     const seller = await this.prisma.seller.update({
       where: { email },

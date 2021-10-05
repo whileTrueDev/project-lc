@@ -15,11 +15,15 @@ import {
 import {
   ChangeGoodsViewDto,
   DeleteGoodsDto,
+  GoodsByIdRes,
   GoodsInfoDto,
+  GoodsListRes,
+  GoodsOptionWithStockInfo,
   RegistGoodsDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
+import { GoodsInfo } from '@prisma/client';
 import { GoodsService } from './goods.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
@@ -34,11 +38,6 @@ export class GoodsController {
     private readonly commonInfoService: GoodsInfoService,
   ) {}
 
-  @Get('infotest')
-  test() {
-    return this.commonInfoService.test();
-  }
-
   /** 상품 목록 조회 */
   @Get('/list')
   getGoodsList(
@@ -50,7 +49,7 @@ export class GoodsController {
     @Query('direction', new DefaultValuePipe(SellerGoodsSortDirection.DESC))
     direction: SellerGoodsSortDirection,
     @Query('groupId') groupId?: number,
-  ) {
+  ): Promise<GoodsListRes> {
     return this.goodsService.getGoodsList({
       email: seller.sub, // seller.email
       page,
@@ -63,13 +62,15 @@ export class GoodsController {
 
   /** 특정 상품 재고 조회 */
   @Get('/stock')
-  getStockInfo(@Query('id', ParseIntPipe) id: number) {
+  getStockInfo(
+    @Query('id', ParseIntPipe) id: number,
+  ): Promise<GoodsOptionWithStockInfo[]> {
     return this.goodsService.getStockInfo(id);
   }
 
   /** 특정 상품 노출 여부 변경 */
   @Patch('/expose')
-  changeGoodsView(@Body(ValidationPipe) dto: ChangeGoodsViewDto) {
+  changeGoodsView(@Body(ValidationPipe) dto: ChangeGoodsViewDto): Promise<boolean> {
     const { id, view } = dto;
     return this.goodsService.changeGoodsView(id, view);
   }
@@ -79,26 +80,31 @@ export class GoodsController {
   registGoodsCommonInfo(
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: GoodsInfoDto,
-  ) {
+  ): Promise<{ id: number }> {
     const email = seller.sub;
     return this.commonInfoService.registGoodsCommonInfo(email, dto);
   }
 
   /** 공통정보 삭제  */
   @Delete('/common-info')
-  deleteCommonInfo(@Body('id', ParseIntPipe) id: number) {
+  deleteCommonInfo(@Body('id', ParseIntPipe) id: number): Promise<boolean> {
     return this.commonInfoService.deleteGoodsCommonInfo(id);
   }
 
   /** 공통정보 목록 조회 */
   @Get('/common-info/list')
-  getGoodsCommonInfoList(@SellerInfo() seller: UserPayload) {
+  getGoodsCommonInfoList(@SellerInfo() seller: UserPayload): Promise<
+    {
+      id: number;
+      info_name: string;
+    }[]
+  > {
     return this.commonInfoService.getGoodsCommonInfoList(seller.sub);
   }
 
   /** 특정 공통정보 상세 조회 */
   @Get('/common-info')
-  getOneGoodsCommonInfo(@Query('id', ParseIntPipe) id: number) {
+  getOneGoodsCommonInfo(@Query('id', ParseIntPipe) id: number): Promise<GoodsInfo> {
     return this.commonInfoService.getOneGoodsCommonInfo(id);
   }
 
@@ -107,7 +113,7 @@ export class GoodsController {
   async deleteGoods(
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: DeleteGoodsDto,
-  ) {
+  ): Promise<boolean> {
     const email = seller.sub;
     return this.goodsService.deleteLcGoods({
       email,
@@ -120,7 +126,7 @@ export class GoodsController {
   registGoods(
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: RegistGoodsDto,
-  ) {
+  ): Promise<{ goodsId: number }> {
     const email = seller.sub;
     return this.goodsService.registGoods(email, dto);
   }
@@ -130,7 +136,7 @@ export class GoodsController {
   getOneGoods(
     @SellerInfo() seller: UserPayload,
     @Param('goodsId', ParseIntPipe) goodsId: number,
-  ) {
+  ): Promise<GoodsByIdRes> {
     return this.goodsService.getOneGoods(goodsId, seller.sub);
   }
 }

@@ -1,7 +1,13 @@
 // ES6 version
 import { hash } from 'argon2';
 
-export async function findOne({ email }: { email: string }) {
+export async function findOne({ email }: { email: string }): Promise<{
+  id: number;
+  email: string;
+  name: string;
+  password: string;
+  shopName: any;
+}> {
   const testPw = await hash('올바른비밀번호입력');
   const repository = [
     {

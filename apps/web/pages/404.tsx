@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 export function Custom404(): JSX.Element {
   const router = useRouter();
-  function toHome() {
+  function toHome(): void {
     router.push('/');
   }
   return (

@@ -1,16 +1,18 @@
-import { AxiosError, AxiosResponse } from 'axios';
-import { useMutation } from 'react-query';
+import { AxiosError } from 'axios';
+import { useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
 
-export type useDeleteSellerMutationRes = AxiosResponse<boolean>;
-
-export const deleteSeller = async (email: string) => {
-  const { data } = await axios.delete<AxiosError, useDeleteSellerMutationRes>('/seller', {
+export const deleteSeller = async (email: string): Promise<boolean> => {
+  const { data } = await axios.delete<boolean>('/seller', {
     data: { email },
   });
   return data;
 };
 
-export const useDeleteSellerMutation = () => {
+export const useDeleteSellerMutation = (): UseMutationResult<
+  boolean,
+  AxiosError,
+  string
+> => {
   return useMutation(deleteSeller);
 };

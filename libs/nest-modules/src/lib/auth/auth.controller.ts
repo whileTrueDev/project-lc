@@ -16,6 +16,7 @@ import {
   loginUserRes,
   EmailCodeVerificationDto,
   UserType,
+  UserProfileRes,
 } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { MailVerificationService } from './mailVerification.service';
@@ -56,7 +57,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  logout(@Res() res) {
+  logout(@Res() res): void {
     this.authService.handleLogoutHeader(res);
     res.sendStatus(200);
   }
@@ -64,7 +65,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getProfile(@Req() req: Request) {
+  getProfile(@Req() req: Request): Promise<UserProfileRes> {
     return this.authService.getProfile(req.user);
   }
 

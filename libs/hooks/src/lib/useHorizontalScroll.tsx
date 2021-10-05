@@ -1,5 +1,14 @@
 import { useState, useCallback, useEffect } from 'react';
 
+export interface HorizontalScrollToolSet {
+  isEndOfLeft: boolean;
+  isEndOfRight: boolean;
+  scrollLeft: () => void;
+  scrollRight: () => void;
+  scrollLeftToEnd: () => void;
+  scrollRightToEnd: () => void;
+}
+
 /**
  * 횡방향 스크롤이 필요한 컨테이너(ex. 이미지 갤러리)를 제어하는 기능 모음 훅
  * @param elRef 횡방향 스크롤이 필요한 컨테이너 (HTMLDivElement)
@@ -11,32 +20,34 @@ import { useState, useCallback, useEffect } from 'react';
  * - scrollLeftToEnd: 스크롤을 좌측 끝으로 이동시키는 함수
  * - scrollRightToEnd: 스크롤을 우측 끝으로 이동시키는 함수
  */
-export const useHorizontalScroll = (elRef: React.RefObject<HTMLDivElement>) => {
+export const useHorizontalScroll = (
+  elRef: React.RefObject<HTMLDivElement>,
+): HorizontalScrollToolSet => {
   const [isEndOfLeft, setIsEndOfLeft] = useState(true);
   const [isEndOfRight, setIsEndOfRight] = useState(false);
 
-  const scrollLeft = () => {
+  const scrollLeft = (): void => {
     elRef.current?.scrollTo({
       left: elRef.current?.scrollLeft - elRef.current?.offsetWidth,
       behavior: 'smooth',
     });
   };
 
-  const scrollRight = () => {
+  const scrollRight = (): void => {
     elRef.current?.scrollTo({
       left: elRef.current?.offsetWidth + elRef.current?.scrollLeft,
       behavior: 'smooth',
     });
   };
 
-  const scrollLeftToEnd = () => {
+  const scrollLeftToEnd = (): void => {
     elRef.current?.scrollTo({
       left: 0,
       behavior: 'smooth',
     });
   };
 
-  const scrollRightToEnd = () => {
+  const scrollRightToEnd = (): void => {
     elRef.current?.scrollTo({
       left: elRef.current?.scrollWidth,
       behavior: 'smooth',

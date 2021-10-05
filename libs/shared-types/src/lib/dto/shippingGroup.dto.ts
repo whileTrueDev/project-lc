@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { ShippingCalculType, ShippingGroup, YesOrNo_UPPERCASE } from '@prisma/client';
 import { IsIn, IsString, ValidateNested } from 'class-validator';
 import { TempShippingSet } from '../constants/shippingTypes';

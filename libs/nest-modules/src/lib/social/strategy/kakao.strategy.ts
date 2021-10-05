@@ -3,6 +3,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-kakao';
+import { Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
 const KAKAO_PROVIDER = 'kakao';
@@ -19,7 +20,11 @@ export class KakaoStrategy extends PassportStrategy(Strategy, KAKAO_PROVIDER) {
     });
   }
 
-  async validate(accessToken: string, refreshToken: null, profile: Profile) {
+  async validate(
+    accessToken: string,
+    refreshToken: null,
+    profile: Profile,
+  ): Promise<Seller> {
     const { id, username, _json } = profile;
     const { kakao_account } = _json;
     const { email, profile_image_url, is_default_image } = kakao_account;

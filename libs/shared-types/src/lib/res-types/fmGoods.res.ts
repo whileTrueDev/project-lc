@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 export interface FmGoodsOption {
   /** 일련번호  */
   option_seq: number;

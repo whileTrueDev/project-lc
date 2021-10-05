@@ -1,12 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { PasswordValidateDto } from '@project-lc/shared-types';
+import { AxiosError } from 'axios';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import axios from '../../axios';
 
 export type useChangePasswordMutationDto = PasswordValidateDto;
 
 export type useChangePasswordMutationRes = any;
 
-export const changePassword = async (dto: useChangePasswordMutationDto) => {
+export const changePassword = async (
+  dto: useChangePasswordMutationDto,
+): Promise<useChangePasswordMutationRes> => {
   const { data } = await axios.patch<useChangePasswordMutationRes>(
     '/seller/password',
     dto,
@@ -14,9 +17,17 @@ export const changePassword = async (dto: useChangePasswordMutationDto) => {
   return data;
 };
 
-export const useChangePasswordMutation = () => {
+export const useChangePasswordMutation = (): UseMutationResult<
+  useChangePasswordMutationRes,
+  AxiosError,
+  useChangePasswordMutationDto
+> => {
   const queryClient = useQueryClient();
-  return useMutation(changePassword, {
+  return useMutation<
+    useChangePasswordMutationRes,
+    AxiosError,
+    useChangePasswordMutationDto
+  >(changePassword, {
     onSuccess: () => {
       queryClient.invalidateQueries('Profile', { exact: true });
     },

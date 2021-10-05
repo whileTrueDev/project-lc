@@ -8,7 +8,7 @@ export function ShippingOptionFreeApply({
   shippingSetType,
 }: {
   shippingSetType: ShippingSetType;
-}) {
+}): JSX.Element {
   const { addShippingOption, shippingOptions } = useShippingSetItemStore();
 
   const isFreeOptionAdded = !!shippingOptions.find(

@@ -9,7 +9,7 @@ export interface GoodsConfirmStatusBadgeProps {
 export function GoodsConfirmStatusBadge({
   variant = 'outline',
   confirmStatus = 'waiting',
-}: GoodsConfirmStatusBadgeProps) {
+}: GoodsConfirmStatusBadgeProps): JSX.Element | null {
   if (!confirmStatus) return null;
   return (
     <Badge

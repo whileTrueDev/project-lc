@@ -1,4 +1,5 @@
-import { useMutation } from 'react-query';
+import { AxiosError } from 'axios';
+import { useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
 
 export interface useCodeVerifyMutationDto {
@@ -7,8 +8,15 @@ export interface useCodeVerifyMutationDto {
 }
 export type useCodeVerifyMutationRes = boolean;
 
-export const useCodeVerifyMutation = () => {
-  return useMutation((dto: useCodeVerifyMutationDto) =>
-    axios.post<useCodeVerifyMutationRes>('/auth/code-verification', dto),
+export const useCodeVerifyMutation = (): UseMutationResult<
+  boolean,
+  AxiosError,
+  useCodeVerifyMutationDto
+> => {
+  return useMutation<boolean, AxiosError, useCodeVerifyMutationDto>(
+    (dto: useCodeVerifyMutationDto) =>
+      axios
+        .post<useCodeVerifyMutationRes>('/auth/code-verification', dto)
+        .then((res) => res.data),
   );
 };

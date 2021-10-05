@@ -6,7 +6,7 @@ export interface GoodsDetailPurchaseLimitInfoProps {
 }
 export function GoodsDetailPurchaseLimitInfo({
   goods,
-}: GoodsDetailPurchaseLimitInfoProps) {
+}: GoodsDetailPurchaseLimitInfoProps): JSX.Element {
   return (
     <Stack>
       <Box>

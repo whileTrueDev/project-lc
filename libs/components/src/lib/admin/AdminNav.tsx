@@ -10,7 +10,7 @@ export default function AdminNav(): JSX.Element {
   const { isLoggedIn } = useIsLoggedIn();
   const { logout } = useLogout();
 
-  function adminLogout() {
+  function adminLogout(): void {
     logout();
     router.push('/');
   }

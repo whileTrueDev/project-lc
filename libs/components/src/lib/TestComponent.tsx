@@ -9,7 +9,7 @@ import {
   IconProps,
 } from '@chakra-ui/react';
 
-export function TestComponent() {
+export function TestComponent(): JSX.Element {
   return (
     <Container maxW="5xl">
       <Stack
@@ -55,14 +55,13 @@ export function TestComponent() {
   );
 }
 
-export const Illustration = (props: IconProps) => {
+export const Illustration = (props: IconProps): JSX.Element => {
   return (
     <Icon
       width="100%"
       viewBox="0 0 702 448"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     >
       <path

@@ -26,7 +26,12 @@ const columns = [
   { title: '전자세금계산서 수신 이메일', field: 'taxInvoiceMail' },
 ];
 
-function makeListRow(sellerBusinessRegistration: SellerBusinessRegistrationInterface) {
+function makeListRow(
+  sellerBusinessRegistration: SellerBusinessRegistrationInterface,
+): Array<{
+  title: string;
+  value: string | number;
+}> {
   if (!sellerBusinessRegistration) {
     return [];
   }

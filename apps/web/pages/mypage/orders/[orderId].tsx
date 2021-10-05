@@ -169,7 +169,7 @@ export function OrderDetail(): JSX.Element {
 
 export default OrderDetail;
 
-export function OrderDetailLoading() {
+export function OrderDetailLoading(): JSX.Element {
   return (
     <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2}>
       <Stack p={4}>

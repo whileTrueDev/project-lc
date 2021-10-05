@@ -1,23 +1,25 @@
 import {
-  Query,
-  DefaultValuePipe,
+  Body,
   Controller,
+  DefaultValuePipe,
   Get,
   Header,
-  UseGuards,
-  Put,
-  Body,
   Param,
+  Put,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
+import { GoodsConfirmation } from '@prisma/client';
 import {
-  SellerGoodsSortColumn,
-  SellerGoodsSortDirection,
+  GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
+  SellerGoodsSortColumn,
+  SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
-import { AdminService } from './admin.service';
-import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
+import { AdminService, AdminSettlementInfoType } from './admin.service';
 
 @Controller('admin')
 export class AdminController {
@@ -27,7 +29,7 @@ export class AdminController {
   @UseGuards(AdminGuard)
   @Get('/settlement')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getSettlementInfo() {
+  getSettlementInfo(): Promise<AdminSettlementInfoType> {
     return this.adminService.getSettlementInfo();
   }
 
@@ -36,6 +38,7 @@ export class AdminController {
   @UseGuards(AdminGuard)
   @Get('/goods')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   getGoodsInfo(
     @Query('sort', new DefaultValuePipe(SellerGoodsSortColumn.REGIST_DATE))
     sort: SellerGoodsSortColumn,
@@ -53,7 +56,7 @@ export class AdminController {
   @UseGuards(AdminGuard)
   @Get('/goods/:goodsId')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getAdminGoodsById(@Param('goodsId') goodsId: string | number) {
+  getAdminGoodsById(@Param('goodsId') goodsId: string | number): Promise<GoodsByIdRes> {
     return this.adminService.getOneGoods(goodsId);
   }
 
@@ -61,7 +64,7 @@ export class AdminController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Put('/goods/confirm')
-  setGoodsConfirmation(@Body() dto: GoodsConfirmationDto) {
+  setGoodsConfirmation(@Body() dto: GoodsConfirmationDto): Promise<GoodsConfirmation> {
     return this.adminService.setGoodsConfirmation(dto);
   }
 
@@ -69,7 +72,7 @@ export class AdminController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Put('/goods/reject')
-  setGoodsRejection(@Body() dto: GoodsRejectionDto) {
+  setGoodsRejection(@Body() dto: GoodsRejectionDto): Promise<GoodsConfirmation> {
     return this.adminService.setGoodsRejection(dto);
   }
 }

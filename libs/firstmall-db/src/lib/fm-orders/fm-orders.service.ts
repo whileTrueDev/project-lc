@@ -46,7 +46,13 @@ export class FmOrdersService {
    * @param goodsIds 찾을 주문에 속한 상품 Id 배열
    * @param dto 검색 및 필터링 정보
    */
-  private createFindOrdersQuery(goodsIds: number[], dto: FindFmOrdersDto) {
+  private createFindOrdersQuery(
+    goodsIds: number[],
+    dto: FindFmOrdersDto,
+  ): {
+    sql: string;
+    params: any[];
+  } {
     const defaultQueryHead = `
     SELECT
       IF(
@@ -459,7 +465,7 @@ export class FmOrdersService {
   public async changeOrderStatus(
     orderId: FmOrder['order_seq'] | string,
     targetStatus: FmOrderStatusNumString,
-  ) {
+  ): Promise<boolean> {
     const orderStatusSql = `UPDATE
       fm_order, fm_order_item_option 
     SET fm_order.step = ?, fm_order_item_option.step = ?

@@ -1,9 +1,11 @@
 /* eslint-disable camelcase */
 // import { DeleteObjectsCommand, ObjectIdentifier, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectsCommandOutput } from '@aws-sdk/client-s3';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GoodsView, Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  GoodsByIdRes,
   GoodsListDto,
   GoodsListRes,
   GoodsOptionsWithSupplies,
@@ -196,7 +198,7 @@ export class GoodsService {
   }
 
   // 옵션 재고 조회
-  public async getStockInfo(goods_seq: number) {
+  public async getStockInfo(goods_seq: number): Promise<GoodsOptionWithStockInfo[]> {
     const optionStocks = await this.prisma.goodsOptions.findMany({
       where: { goods: { id: goods_seq } },
       include: { supply: true },
@@ -241,7 +243,9 @@ export class GoodsService {
   }
 
   /** 상품의 contents에서 s3 url 값 찾아서 삭제 요청 리턴 */
-  async deleteGoodsContentImagesFromS3(goodsIds: number[]) {
+  async deleteGoodsContentImagesFromS3(
+    goodsIds: number[],
+  ): Promise<DeleteObjectsCommandOutput> {
     // goods Id 의 contents 모두 모으기
     const goodsContents = await this.prisma.goods.findMany({
       where: {
@@ -266,7 +270,7 @@ export class GoodsService {
   }
 
   /** 상품과 연결된 GoodsImages url값을 찾아서 s3 객체 삭제 요청 리턴 */
-  async deleteGoodsImagesFromS3(goodsIds: number[]) {
+  async deleteGoodsImagesFromS3(goodsIds: number[]): Promise<DeleteObjectsCommandOutput> {
     // goods Id 와 연결된 GoodsImage 찾기
     const images = await this.prisma.goodsImages.findMany({
       where: {
@@ -304,7 +308,7 @@ export class GoodsService {
   }
 
   /** 상품 개별 정보 조회 */
-  public async getOneGoods(goodsId: number, email: string) {
+  public async getOneGoods(goodsId: number, email: string): Promise<GoodsByIdRes> {
     return this.prisma.goods.findFirst({
       where: {
         id: goodsId,
@@ -333,7 +337,12 @@ export class GoodsService {
   }
 
   // 상품 등록
-  public async registGoods(email: string, dto: RegistGoodsDto) {
+  public async registGoods(
+    email: string,
+    dto: RegistGoodsDto,
+  ): Promise<{
+    goodsId: number;
+  }> {
     try {
       const { options, image, shippingGroupId, goodsInfoId, ...goodsData } = dto;
       const optionsData = options.map((opt) => {

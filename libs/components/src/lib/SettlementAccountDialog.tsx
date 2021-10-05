@@ -25,7 +25,9 @@ interface SettlementAccountDtoDialogProps {
 }
 
 // 계좌번호 등록 다이얼로그
-export function SettlementAccountDialog(props: SettlementAccountDtoDialogProps) {
+export function SettlementAccountDialog(
+  props: SettlementAccountDtoDialogProps,
+): JSX.Element {
   const { isOpen, onClose, refetch } = props;
   const toast = useToast();
   const mutation = useSettlementAccountMutation();
@@ -37,12 +39,12 @@ export function SettlementAccountDialog(props: SettlementAccountDtoDialogProps) 
     reset,
   } = useForm<SettlementAccountDto>();
 
-  function useClose() {
+  function useClose(): void {
     onClose();
     reset();
   }
 
-  async function regist(data: SettlementAccountDto) {
+  async function regist(data: SettlementAccountDto): Promise<void> {
     try {
       const settlementAccount = await mutation.mutateAsync(data);
       if (!settlementAccount) {
@@ -66,13 +68,7 @@ export function SettlementAccountDialog(props: SettlementAccountDtoDialogProps) 
   }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      size="3xl"
-      onClose={useClose}
-      closeOnOverlayClick={false}
-      closeOnEsc={false}
-    >
+    <Modal isOpen={isOpen} size="3xl" onClose={useClose} closeOnEsc={false}>
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(regist)}>
         <ModalHeader>정산 계좌 등록</ModalHeader>

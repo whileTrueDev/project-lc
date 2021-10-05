@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { Injectable } from '@nestjs/common';
 import {
   ExportBundledOrdersDto,
@@ -145,7 +144,10 @@ export class FmExportsService {
   }
 
   /** 일괄 합포장 처리 진행 */
-  public async exportBundledOrders(dto: ExportBundledOrdersDto, actor: string) {
+  public async exportBundledOrders(
+    dto: ExportBundledOrdersDto,
+    actor: string,
+  ): Promise<boolean> {
     // * 일괄 출고 처리
     const exportInfos = await Promise.all(
       dto.exportOrders.map((eo) => this.exportOrder(eo, actor)),
@@ -540,7 +542,7 @@ export class FmExportsService {
    * @param exportIndex {number} 일괄처리의 경우 동일한 export_code가 생성될 우려가 있어, exportIndex만큼 exportCode에 더한 값을 반환하기 위한 인덱스값.
    * @returns 생성된 출고 코드
    */
-  private async generateExportCode(exportIndex?: number) {
+  private async generateExportCode(exportIndex?: number): Promise<string> {
     const PREFIX = 'D';
     const now = dayjs().format('YYMMDDH');
     const res = await this.db.query(
@@ -560,7 +562,7 @@ export class FmExportsService {
    * 출고 코드 예) D210826122
    * @returns 생성된 출고 코드
    */
-  private async generateBundleCode() {
+  private async generateBundleCode(): Promise<string> {
     const PREFIX = 'B';
     const now = dayjs().format('YYMMDDH');
     const res = await this.db.query(

@@ -12,7 +12,9 @@ import { SummaryList } from './SummaryList';
 export interface ExportDetailSummaryProps {
   exportData: FmExportRes;
 }
-export function ExportDetailSummary({ exportData }: ExportDetailSummaryProps) {
+export function ExportDetailSummary({
+  exportData,
+}: ExportDetailSummaryProps): JSX.Element {
   return (
     <SummaryList
       listItems={[

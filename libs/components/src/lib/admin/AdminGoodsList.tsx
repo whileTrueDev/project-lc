@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import NextLink from 'next/link';
 import {
   Box,
@@ -152,7 +151,7 @@ export function AdminGoodsList(): JSX.Element {
 
   const rejectMutation = useGoodRejectionMutation();
 
-  async function handleRejectionGood(row: any) {
+  async function handleRejectionGood(row: any): Promise<void> {
     try {
       await rejectMutation.mutateAsync({
         goodsId: row.id,
@@ -171,7 +170,7 @@ export function AdminGoodsList(): JSX.Element {
     }
   }
 
-  async function handleClick(param: GridCellParams) {
+  async function handleClick(param: GridCellParams): Promise<void> {
     if (param.field === 'confirmation') {
       setSelectedRow(param.row);
       onOpen();

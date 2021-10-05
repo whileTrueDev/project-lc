@@ -28,7 +28,9 @@ export const fmDeliveryCompanies: Record<
   code21: { name: '엘로우캡' },
 };
 
-export const convertFmDeliveryCompanyToString = (companyCode: string | null) => {
+export const convertFmDeliveryCompanyToString = (
+  companyCode: string | null,
+): string | null => {
   if (!companyCode) return null;
   if (!fmDeliveryCompanies[companyCode]) return null;
   return fmDeliveryCompanies[companyCode].name;

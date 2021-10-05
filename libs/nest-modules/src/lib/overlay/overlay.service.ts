@@ -29,7 +29,9 @@ export class OverlayService {
     };
   }
 
-  async googleTextToSpeech(purchaseData: PurchaseMessage) {
+  async googleTextToSpeech(
+    purchaseData: PurchaseMessage,
+  ): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
     const { nickname } = purchaseData;
     const { productName } = purchaseData;
@@ -62,12 +64,12 @@ export class OverlayService {
     return false;
   }
 
-  async streamStartNotification() {
+  async streamStartNotification(): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
 
     const message = `
     <speak>
-      잠시 후, 밍선하의 진국보감 라이브 커머스가 시작됩니다.
+      잠시 후, 유은님의 양품떡볶이 라이브 커머스가 시작됩니다.
     </speak>
     `;
 

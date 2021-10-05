@@ -1,5 +1,6 @@
 import { GoodsOptionWithStockInfo } from '@project-lc/shared-types';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 // project-lc Goods db 재고 조회
@@ -21,8 +22,8 @@ export const getFmGoodsStock = async (
 export const useGoodsStock = (
   goodsId: number,
   confirmedGoodsId?: null | number,
-  options?: UseQueryOptions<GoodsOptionWithStockInfo[]>,
-) => {
+  options?: UseQueryOptions<GoodsOptionWithStockInfo[], AxiosError>,
+): UseQueryResult<GoodsOptionWithStockInfo[], AxiosError> => {
   const queryKey =
     confirmedGoodsId != null
       ? ['FmGoodsStock', confirmedGoodsId]
@@ -33,7 +34,7 @@ export const useGoodsStock = (
       ? () => getFmGoodsStock(confirmedGoodsId)
       : () => getGoodsStock(goodsId);
 
-  return useQuery<GoodsOptionWithStockInfo[]>(queryKey, queryFn, {
+  return useQuery<GoodsOptionWithStockInfo[], AxiosError>(queryKey, queryFn, {
     ...options,
   });
 };

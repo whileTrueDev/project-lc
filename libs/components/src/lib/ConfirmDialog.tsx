@@ -30,7 +30,7 @@ export function ConfirmDialog({
   cancelString = '취소',
   confirmString = '확인',
   children,
-}: ConfirmDialogProps) {
+}: ConfirmDialogProps): JSX.Element {
   const cancelRef = useRef<HTMLButtonElement>(null);
   return (
     <AlertDialog

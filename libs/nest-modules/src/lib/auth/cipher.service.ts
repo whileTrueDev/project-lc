@@ -14,7 +14,7 @@ export class CipherService {
   }
 
   // 필요한 초기 데이터
-  private async initializer() {
+  private async initializer(): Promise<void> {
     const hash = this.configService.get<string>('CIPHER_HASH');
     const password = this.configService.get<string>('CIPHER_PASSWORD');
     const salt = this.configService.get<string>('CIPHER_SALT');
@@ -37,7 +37,7 @@ export class CipherService {
   }
 
   // base64-urlsafe한 인코딩 실시.
-  private encodeBase64URLSafe(encryptedBuffer: Buffer) {
+  private encodeBase64URLSafe(encryptedBuffer: Buffer): string {
     return base64url(encryptedBuffer);
   }
 

@@ -1,8 +1,8 @@
-/* eslint-disable camelcase */
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
+/** 구글 인증 API 액세스토큰 새로고침시, 반환 데이터 형태 */
 export interface GoogleAccessTokenRefreshRes {
   access_token: string;
   expires_in: number;
@@ -24,7 +24,9 @@ export class GoogleApiService {
    * * 구글 access_token을 갱신하는 요청을 보냅니다.
    * @param refreshToken 구글 API 리프레시 토큰
    */
-  public async refreshAccessToken(refreshToken: string) {
+  public async refreshAccessToken(
+    refreshToken: string,
+  ): Promise<GoogleAccessTokenRefreshRes> {
     return axios
       .post<GoogleAccessTokenRefreshRes>(`${this.BASE_URL}/token`, undefined, {
         params: {
@@ -46,16 +48,19 @@ export class GoogleApiService {
 
   /**
    * * 구글 계정 연동 해제 요청을 보냅니다.
+   * ? https://developers.google.com/identity/account-linking/unlinking
    * @param accessToken 유효한 액세스토큰
    */
-  public async unlink(accessToken: string) {
-    return axios.post(`${this.BASE_URL}/revoke`, undefined, {
-      params: {
-        token: encodeURI(accessToken),
-      },
-      headers: {
-        'Content-type': 'application/x-www-form-urlencoded',
-      },
-    });
+  public async unlink(accessToken: string): Promise<boolean> {
+    return axios
+      .post<boolean>(`${this.BASE_URL}/revoke`, undefined, {
+        params: {
+          token: encodeURI(accessToken),
+        },
+        headers: {
+          'Content-type': 'application/x-www-form-urlencoded',
+        },
+      })
+      .then((res) => res.data);
   }
 }
