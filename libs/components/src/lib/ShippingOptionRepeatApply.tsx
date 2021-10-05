@@ -81,7 +81,7 @@ export function ShippingOptionRepeatApply({
     },
   });
 
-  const shippingOptionBase = {
+  const shippingOptionBase: any = {
     shipping_set_type: shippingSetType,
     shipping_opt_type: shippingOptType,
     default_yn: null,

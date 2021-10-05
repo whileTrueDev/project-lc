@@ -68,7 +68,7 @@ export function ShippingOptionIntervalApply({
       return;
     }
 
-    const option = {
+    const option: Omit<ShippingOptionDto, 'tempId'> = {
       default_yn: null,
       shipping_set_type: shippingSetType,
       shipping_opt_type: shippingOptType,
