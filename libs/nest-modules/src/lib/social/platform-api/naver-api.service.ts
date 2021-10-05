@@ -2,13 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
+/** 네이버API 액세스토큰 새로고침시, 반환 데이터 형태 */
 export interface NaverAccessTokenRefreshRes {
   /** 재발급 받은 접근토큰 */
   access_token: string;
   /** 토큰 타입 (bearer) */
   token_type: string;
-  /** 접근토큰 유효성 체크 결과 메시지 */
   expires_in: string;
+  /** 접근토큰 유효성 체크 결과 메시지 */
+}
+
+/** 네이버API 연동 해제시, 반환 데이터 형태 */
+export interface NaverApiUnlinkRes {
+  /** 삭제 처리된 접근 토큰 값 */
+  access_token: string;
+  /** 처리 결과가 성공이면 'success'가 리턴 */
+  result: string;
+  /** 접근 토큰의 유효 기간(초 단위) */
+  expires_in: number;
+  /** 에러 코드 */
+  error: string;
+  /** 에러 메시지 */
+  error_description: string;
 }
 
 @Injectable()
@@ -26,7 +41,9 @@ export class NaverApiService {
    * * 네이버 access_token을 갱신하는 요청을 보냅니다.
    * @param refreshToken 네이버 아이디로 로그인 API 갱신 토큰
    */
-  public async refreshAccessToken(refreshToken: string) {
+  public async refreshAccessToken(
+    refreshToken: string,
+  ): Promise<NaverAccessTokenRefreshRes> {
     return axios
       .get<NaverAccessTokenRefreshRes>(`${this.BASE_URL}/oauth2.0/token`, {
         params: {
@@ -50,11 +67,11 @@ export class NaverApiService {
    * ? 5.1의 접근토큰 갱신 과정에 따라 접근토큰을 갱신하는것을 권장합니다.
    * ? "접근토큰의 유효성을 점검" => this.verifyAccessToken 메서드
    */
-  public async unlink(accessToken: string) {
+  public async unlink(accessToken: string): Promise<boolean> {
     const isValidated = await this.verifyAccessToken(accessToken);
     if (!isValidated) return false;
     return axios
-      .get(`${this.BASE_URL}/oauth2.0/token`, {
+      .get<NaverApiUnlinkRes>(`${this.BASE_URL}/oauth2.0/token`, {
         params: {
           client_id: this.NAVER_CLIENT_ID,
           client_secret: this.NAVER_CLIENT_SECRET,
@@ -74,7 +91,7 @@ export class NaverApiService {
    * * 네이버 액세스 토큰을 유효한 지 검증합니다.
    * @param accessToken 검증할 액세스 토큰
    */
-  private async verifyAccessToken(accessToken: string) {
+  private async verifyAccessToken(accessToken: string): Promise<boolean> {
     return axios
       .get<{ resultcode: string; message: string }>(
         `https://openapi.naver.com/v1/nid/verify`,

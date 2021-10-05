@@ -6,6 +6,6 @@ export const fmReturnMethods: FmReturnMethods = {
   shop: '자가 반품',
 };
 
-export const convertFmReturnMethodToString = (key: keyof FmReturnMethods) => {
+export const convertFmReturnMethodToString = (key: keyof FmReturnMethods): string => {
   return fmReturnMethods[key];
 };

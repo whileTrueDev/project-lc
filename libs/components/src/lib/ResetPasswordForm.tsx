@@ -136,8 +136,7 @@ export function ResetPasswordForm(): JSX.Element {
     if (!isValidCode) return;
 
     // 인증코드 확인 후 StepTwo(비밀번호 재설정)로 이동
-    verifyCode({ email, code }).then((res) => {
-      const { data: isVerified } = res;
+    verifyCode({ email, code }).then((isVerified) => {
       if (isVerified) {
         moveToStepTwo(); // step 2  비밀번호 변경
       } else {

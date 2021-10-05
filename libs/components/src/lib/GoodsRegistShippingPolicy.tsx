@@ -363,7 +363,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
         onConfirm={() => {
           const groupId = clickedGroupId;
           if (!groupId) throw new Error('shippingGroupId가 없습니다');
-          return mutateAsync({ groupId }).then(() => {
+          return mutateAsync({ groupId }).then((res) => {
             setClickedGroupId(null);
             setValue('shippingGroupId', undefined);
           });

@@ -234,7 +234,7 @@ export function GoodsRegistForm(): JSX.Element {
 
       goodsDto = {
         ...goodsDto,
-        goodsInfoId: res.data.id,
+        goodsInfoId: res.id,
         common_contents: commonInfoBody,
       };
     } else if (!data.goodsInfoId) {

@@ -1,5 +1,6 @@
+import { UserType } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
-import { useEffect, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useLogoutMutation } from './mutation/useLogoutMutation';
 import { useProfile } from './queries/useProfile';
@@ -9,7 +10,7 @@ import { useProfile } from './queries/useProfile';
  * - 프론트에서 글로벌에 저장하고 있는 유저정보 삭제
  * - 로그아웃요청(토큰삭제)
  */
-export function useLogout() {
+export function useLogout(): { logout: () => void } {
   const queryClient = useQueryClient();
   const { mutateAsync } = useLogoutMutation();
 
@@ -32,7 +33,11 @@ export function useLogout() {
 /**
  * 로그인 여부 리턴
  */
-export function useIsLoggedIn() {
+export function useIsLoggedIn(): {
+  isLoggedIn: boolean;
+  status: 'idle' | 'error' | 'loading' | 'success';
+  type: UserType | undefined;
+} {
   const { data: profileData, status } = useProfile();
   const isLoggedIn = status === 'success' && !!profileData;
 
@@ -42,7 +47,7 @@ export function useIsLoggedIn() {
 /**
  * 로그인 되어 있는 경우 메인으로 이동시키는 effect
  */
-export function useMoveToMainIfLoggedIn() {
+export function useMoveToMainIfLoggedIn(): void {
   const router = useRouter();
   const { isLoggedIn } = useIsLoggedIn();
 

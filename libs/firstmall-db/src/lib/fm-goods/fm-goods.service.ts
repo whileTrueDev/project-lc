@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { FmGoodsOption, GoodsOptionWithStockInfo } from '@project-lc/shared-types';
 import { FirstmallDbService } from '../firstmall-db.service';
 
 @Injectable()
@@ -8,7 +9,7 @@ export class FMGoodsService {
   /**
    * 제공된 상품 고유번호 배열에 따라 해당되는 모든 상품의 옵션 목록을 조회
    */
-  async findGoodsOptions(goodsSeqArr: number[]) {
+  async findGoodsOptions(goodsSeqArr: number[]): Promise<FmGoodsOption[]> {
     return this.db.query(
       `
       SELECT *
@@ -49,7 +50,7 @@ export class FMGoodsService {
   }
 
   // 상품의 옵션과 재고정보 조회
-  async getStockInfo(goodsSeq: number) {
+  async getStockInfo(goodsSeq: number): Promise<GoodsOptionWithStockInfo[]> {
     const query = `
       SELECT 
         o.*,

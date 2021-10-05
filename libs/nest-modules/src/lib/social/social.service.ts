@@ -40,7 +40,7 @@ export class SocialService {
     private readonly google: GoogleApiService,
   ) {}
 
-  login(req: Request, res: Response) {
+  login(req: Request, res: Response): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
     const userPayload = this.authService.castUser(user, 'seller');
@@ -56,7 +56,7 @@ export class SocialService {
    * 해당 소셜서비스 계정 소유하는 seller 찾거나 생성하여 반환
    * google, kakao, naver strategy validate함수에서 사용
    */
-  async findOrCreateSeller(sellerData: sellerDataInterface) {
+  async findOrCreateSeller(sellerData: sellerDataInterface): Promise<Seller> {
     const socialAccountWithSeller = await this.selectSocialAccountRecord(sellerData);
 
     if (!socialAccountWithSeller) {
@@ -69,7 +69,13 @@ export class SocialService {
   }
 
   /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 셀러 계정정보 찾기 */
-  private async selectSocialAccountRecord(sellerData: Partial<sellerDataInterface>) {
+  private async selectSocialAccountRecord(
+    sellerData: Partial<sellerDataInterface>,
+  ): Promise<
+    SellerSocialAccount & {
+      seller: Seller;
+    }
+  > {
     const { id, provider } = sellerData;
     return this.prisma.sellerSocialAccount.findFirst({
       where: { serviceId: id, provider },
@@ -110,7 +116,9 @@ export class SocialService {
   }
 
   /** 소셜계정 데이터 업데이트(토큰) */
-  private async updateSocialAccountRecord(sellerData: sellerDataInterface) {
+  private async updateSocialAccountRecord(
+    sellerData: sellerDataInterface,
+  ): Promise<SellerSocialAccount> {
     const { id, accessToken, refreshToken, picture } = sellerData;
     const updatedSeller = await this.prisma.sellerSocialAccount.update({
       where: { serviceId: id },
@@ -136,7 +144,10 @@ export class SocialService {
   }
 
   /** 소셜계정 테이블에서 accessToken 가져오기 */
-  private async getSocialAccountAccessToken(provider: string, serviceId: string) {
+  private async getSocialAccountAccessToken(
+    provider: string,
+    serviceId: string,
+  ): Promise<string> {
     const socialAccount = await this.selectSocialAccountRecord({
       provider,
       id: serviceId,
@@ -153,7 +164,7 @@ export class SocialService {
    * 카카오 계정 연동해제 & 카카오 소셜계정 레코드 삭제
    * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
    * */
-  async kakaoUnlink(kakaoId: string, accessTokenParam?: string) {
+  async kakaoUnlink(kakaoId: string, accessTokenParam?: string): Promise<boolean> {
     let kakaoAccessToken: string;
     if (!accessTokenParam) {
       kakaoAccessToken = await this.getSocialAccountAccessToken('kakao', kakaoId);
@@ -190,7 +201,7 @@ export class SocialService {
    * 네이버 계정연동 해제 && 네이버 계정 레코드 삭제
    * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
    * */
-  async naverUnlink(naverId: string, accessTokenParam?: string) {
+  async naverUnlink(naverId: string, accessTokenParam?: string): Promise<boolean> {
     let naverAccessToken: string;
     if (!accessTokenParam) {
       naverAccessToken = await this.getSocialAccountAccessToken('naver', naverId);
@@ -222,7 +233,7 @@ export class SocialService {
    * * 구글 계정 연동 해제 && 구글 계정 레코드 삭제
    * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
    */
-  async googleUnlink(googleId: string, accessTokenParam?: string) {
+  async googleUnlink(googleId: string, accessTokenParam?: string): Promise<boolean> {
     let googleAccessToken: string;
     if (!accessTokenParam) {
       googleAccessToken = await this.getSocialAccountAccessToken('google', googleId);
@@ -256,7 +267,11 @@ export class SocialService {
     }
   }
 
-  async getSocialAccounts(email: string) {
+  async getSocialAccounts(
+    email: string,
+  ): Promise<
+    Pick<SellerSocialAccount, 'serviceId' | 'provider' | 'name' | 'registDate'>[]
+  > {
     const seller = await this.prisma.seller.findUnique({
       where: { email },
       select: {
