@@ -46,6 +46,14 @@ type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
   options: Omit<GoodsOptionDto, 'option_title' | 'default_option'>[];
 };
 
+/** 이미지 파일명 앞부분에 타임스탬프 붙임
+ * "2348238342_파일명" 형태로 리턴함
+ * */
+function addTimeStampToFilename(filename: string): string {
+  const timestamp = Date.now();
+  return `${timestamp}_${filename}`;
+}
+
 // 상품 사진, 상세설명 이미지를 s3에 업로드 -> url 리턴
 export async function uploadGoodsImageToS3(
   imageFile: { file: File | Buffer; filename: string; id: number; contentType: string },
@@ -54,11 +62,12 @@ export async function uploadGoodsImageToS3(
   const { file, filename, contentType } = imageFile;
 
   const type = 'goods';
-  const key = path.join(...[type, userMail, filename]);
+  const timestampFilename = addTimeStampToFilename(filename);
+  const key = path.join(...[type, userMail, timestampFilename]);
   await s3.s3uploadFile({ key, file, contentType });
   const url = [
     'https://',
-    process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
+    process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
     '.s3.',
     'ap-northeast-2',
     '.amazonaws.com/',
