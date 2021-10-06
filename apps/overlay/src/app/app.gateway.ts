@@ -13,9 +13,7 @@ import {
   SocketInfo,
   SocketIdandDevice,
   PageUrlAndDevice,
-  RoomAndDate,
 } from '@project-lc/shared-types';
-import { OverlayService } from '@project-lc/nest-modules';
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
 export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect

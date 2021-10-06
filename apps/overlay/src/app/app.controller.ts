@@ -5,7 +5,6 @@ import {
   Param,
   HttpCode,
   NotFoundException,
-  Catch,
 } from '@nestjs/common';
 import { OverlayService } from '@project-lc/nest-modules';
 import { AppService } from './app.service';

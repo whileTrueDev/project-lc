@@ -311,7 +311,9 @@ socket.on('get right-top purchase message', async (data) => {
           <span id="nickname">
             <span class="animated heartbeat" id="donation-user-id">${nickname}</span>
             <span class="donation-sub">님 ${productName}</span>
-            <span class="animated heartbeat" id="donation-num">${num}</span>
+            <span class="animated heartbeat" id="donation-num">${num
+              .toString()
+              .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
             <span class="donation-sub">원 구매!</span>
           </span>
         </div>

@@ -68,7 +68,7 @@ export class OverlayService {
 
     const message = `
     <speak>
-      잠시 후, 밍선하의 진국보감 라이브 커머스가 시작됩니다.
+      잠시 후, 수련수련과 싸움의 고수의 라이브 커머스가 시작됩니다.
     </speak>
     `;
 
@@ -168,7 +168,7 @@ export class OverlayService {
             }
           });
         } else {
-          console.log(err);
+          throwError(`S3 Error ${err}`);
         }
       })
       .promise();
