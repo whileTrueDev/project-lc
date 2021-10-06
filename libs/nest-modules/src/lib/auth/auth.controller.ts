@@ -15,13 +15,14 @@ import {
   SendMailVerificationDto,
   loginUserRes,
   EmailCodeVerificationDto,
+  UserType,
+  UserProfileRes,
 } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { MailVerificationService } from './mailVerification.service';
 import { LocalAuthGuard } from '../_nest-units/guards/local-auth.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
-import { UserType } from './auth.interface';
 import { LoginHistoryService } from './login-history/login-history.service';
 
 @Controller('auth')
@@ -56,7 +57,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  logout(@Res() res) {
+  logout(@Res() res): void {
     this.authService.handleLogoutHeader(res);
     res.sendStatus(200);
   }
@@ -64,7 +65,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getProfile(@Req() req: Request) {
+  getProfile(@Req() req: Request): Promise<UserProfileRes> {
     return this.authService.getProfile(req.user);
   }
 

@@ -1,4 +1,5 @@
-import { useMutation, useQueryClient } from 'react-query';
+import { AxiosError } from 'axios';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import axios from '../../axios';
 
 export interface useDeleteGoodsCommonInfoDto {
@@ -6,11 +7,15 @@ export interface useDeleteGoodsCommonInfoDto {
 }
 export type useDeleteGoodsCommonInfoRes = boolean;
 
-export const useDeleteGoodsCommonInfo = () => {
+export const useDeleteGoodsCommonInfo = (): UseMutationResult<
+  boolean,
+  AxiosError,
+  useDeleteGoodsCommonInfoDto
+> => {
   const queryClient = useQueryClient();
-  return useMutation(
+  return useMutation<boolean, AxiosError, useDeleteGoodsCommonInfoDto>(
     (dto: useDeleteGoodsCommonInfoDto) =>
-      axios.delete<useDeleteGoodsCommonInfoRes>('/goods/common-info', { data: dto }),
+      axios.delete<boolean>('/goods/common-info', { data: dto }).then((res) => res.data),
     {
       onSuccess: (data, dto) => {
         queryClient.invalidateQueries('GoodsCommonInfoList');

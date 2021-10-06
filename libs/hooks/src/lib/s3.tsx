@@ -25,11 +25,11 @@ export const s3 = (() => {
     userMail: string | undefined;
     type: s3KeyType;
     file: File | Buffer | null;
-    companyName: string;
+    companyName?: string;
   }
 
   // 파일명에서 확장자를 추출하는 과정
-  function getExtension(fileName: string | null) {
+  function getExtension(fileName: string | null): string {
     if (!fileName) {
       return '';
     }
@@ -49,12 +49,19 @@ export const s3 = (() => {
     userMail: string;
     type: string;
     filename: string | null;
-    companyName: string;
-  }) {
+    companyName?: string;
+  }): {
+    key: string;
+    fileName: string;
+  } {
     // 확장자 추출
     const extension = getExtension(filename);
     const prefix = moment().format('YYMMDDHHmmss').toString();
-    const fileFullName = `${prefix}_${companyName}_사업자등록증${extension}`;
+    let fileFullName = `${filename}`;
+    // companyName이 존재하지 않는 경우에 대한 분기처리
+    if (companyName) {
+      fileFullName = `${prefix}_${companyName}_사업자등록증${extension}`;
+    }
     const pathList = [type, userMail, fileFullName];
     return {
       key: path.join(...pathList),
@@ -66,7 +73,10 @@ export const s3 = (() => {
     key,
     file,
     contentType,
-  }: Pick<S3UploadImageOptions, 'file'> & { key: string; contentType: string }) {
+  }: Pick<S3UploadImageOptions, 'file'> & {
+    key: string;
+    contentType: string;
+  }): Promise<AWS.S3.ManagedUpload.SendData> {
     if (!file) throw new Error('file should be not null');
     return new AWS.S3.ManagedUpload({
       params: {
@@ -85,7 +95,7 @@ export const s3 = (() => {
     type,
     file,
     companyName,
-  }: S3UploadImageOptions) {
+  }: S3UploadImageOptions): Promise<string | null> {
     // key 만들기
     if (!userMail || !file) {
       return null;

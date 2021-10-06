@@ -24,7 +24,9 @@ const columns: GridColumns = [
   },
 ];
 
-function makeListRow(sellerSettlementAccount: SellerSettlementAccount[] | undefined) {
+function makeListRow(
+  sellerSettlementAccount: SellerSettlementAccount[] | undefined,
+): SellerSettlementAccount[] {
   if (!sellerSettlementAccount) {
     return [];
   }

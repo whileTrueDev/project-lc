@@ -3,6 +3,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-naver';
+import { Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
 const NAVER_PROVIDER = 'naver';
@@ -19,7 +20,11 @@ export class NaverStrategy extends PassportStrategy(Strategy, NAVER_PROVIDER) {
     });
   }
 
-  async validate(accessToken: string, refreshToken: null, profile: Profile) {
+  async validate(
+    accessToken: string,
+    refreshToken: null,
+    profile: Profile,
+  ): Promise<Seller> {
     const { email, nickname, profile_image, id } = profile._json;
 
     if (!email) {

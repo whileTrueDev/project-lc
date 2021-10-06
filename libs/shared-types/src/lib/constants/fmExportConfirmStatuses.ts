@@ -7,6 +7,8 @@ export const fmExportConfirmStatuses: Record<FmExport['buy_confirm'], string> = 
   user: '구매자',
 };
 
-export const convertFmExportConfirmStatusToString = (key: FmExport['buy_confirm']) => {
+export const convertFmExportConfirmStatusToString = (
+  key: FmExport['buy_confirm'],
+): string => {
   return fmExportConfirmStatuses[key];
 };

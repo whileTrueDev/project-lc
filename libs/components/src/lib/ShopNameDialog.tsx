@@ -23,6 +23,7 @@ import { SellerShopInfoDto } from '@project-lc/shared-types';
 import { useProfile, useShopInfoMutation } from '@project-lc/hooks';
 import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import { AxiosError } from 'axios';
 
 type ShopNameDialogType = {
   isOpen: boolean;
@@ -54,13 +55,13 @@ export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
     }
   }, [data, onOpen, autoCheck]);
 
-  function useClose() {
+  function useClose(): void {
     reset();
     onClose();
   }
 
   const mutation = useShopInfoMutation();
-  async function useSubmit(submitData: SellerShopInfoDto) {
+  async function useSubmit(submitData: SellerShopInfoDto): Promise<void> {
     try {
       await mutation.mutateAsync(submitData);
       refetch();
@@ -71,7 +72,7 @@ export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
     } catch (error) {
       toast({
         title: '상점명 등록이 실패하였습니다.',
-        description: error.response.data.message,
+        description: (error as AxiosError).response?.data.message,
         status: 'error',
       });
     } finally {

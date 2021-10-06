@@ -1,5 +1,6 @@
 import { GoodsInfo } from '@prisma/client';
-import { useQuery } from 'react-query';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export type GoodsCommonInfoItem = GoodsInfo;
@@ -20,8 +21,8 @@ export const useGoodsCommonInfoItem = ({
   id: number;
   enabled: boolean;
   onSuccess: (data: GoodsCommonInfoItem) => void;
-}) => {
-  return useQuery<GoodsCommonInfoItem>(
+}): UseQueryResult<GoodsCommonInfoItem, AxiosError> => {
+  return useQuery<GoodsCommonInfoItem, AxiosError>(
     ['GoodsCommonInfoItem', id],
     () => getGoodsCommonInfoItem(id),
     { enabled, onSuccess },

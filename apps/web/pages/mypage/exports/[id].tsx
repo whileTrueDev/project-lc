@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { OrderDetailLoading } from '../orders/[orderId]';
 
-export default function ExportsDetail() {
+export default function ExportsDetail(): JSX.Element {
   const router = useRouter();
   const id = router.query.id as string;
 

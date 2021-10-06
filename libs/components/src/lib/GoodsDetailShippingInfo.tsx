@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { Box, Stack, Text } from '@chakra-ui/react';
 import {
   GoodsByIdRes,
@@ -11,7 +10,9 @@ import ShippingPolicySetListItem from './ShippingPolicySetListItem';
 export interface GoodsDetailShippingInfoProps {
   goods: GoodsByIdRes;
 }
-export function GoodsDetailShippingInfo({ goods }: GoodsDetailShippingInfoProps) {
+export function GoodsDetailShippingInfo({
+  goods,
+}: GoodsDetailShippingInfoProps): JSX.Element | null {
   if (!goods.ShippingGroup) return null;
 
   // 타입 맞추기 위한 데이터 형태 변경

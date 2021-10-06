@@ -8,7 +8,11 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-export function SettlementPopoverButton({ children }: { children: JSX.Element }) {
+export function SettlementPopoverButton({
+  children,
+}: {
+  children: JSX.Element;
+}): JSX.Element {
   return (
     <Popover trigger="click">
       <PopoverTrigger>{children}</PopoverTrigger>

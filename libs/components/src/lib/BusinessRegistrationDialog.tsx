@@ -33,7 +33,9 @@ interface BusinessRegistrationDialogProps {
 }
 
 // 사업자 등록증 등록 다이얼로그
-export function BusinessRegistrationDialog(props: BusinessRegistrationDialogProps) {
+export function BusinessRegistrationDialog(
+  props: BusinessRegistrationDialogProps,
+): JSX.Element {
   const { isOpen, onClose, refetch } = props;
   const inputRef = useRef(null);
   const { data: profileData } = useProfile();
@@ -50,13 +52,13 @@ export function BusinessRegistrationDialog(props: BusinessRegistrationDialogProp
     clearErrors,
   } = useForm<BusinessRegistrationFormDto>();
 
-  function useClose() {
+  function useClose(): void {
     onClose();
     reset();
   }
 
   // 또 다른 s3 업로드 과정이 필요할 때, hook으로 파일 분리
-  async function saveToS3(data: BusinessRegistrationFormDto) {
+  async function saveToS3(data: BusinessRegistrationFormDto): Promise<string> {
     const { businessRegistrationImage, imageName, companyName, ...result } = data;
     // s3로 저장
     const savedImageName = await s3.s3UploadImage({
@@ -74,7 +76,7 @@ export function BusinessRegistrationDialog(props: BusinessRegistrationDialogProp
     return savedImageName;
   }
 
-  async function regist(data: BusinessRegistrationFormDto) {
+  async function regist(data: BusinessRegistrationFormDto): Promise<void> {
     const { businessRegistrationImage, imageName, ...result } = data;
 
     try {
@@ -102,7 +104,6 @@ export function BusinessRegistrationDialog(props: BusinessRegistrationDialogProp
       isOpen={isOpen}
       size="3xl"
       onClose={useClose}
-      closeOnOverlayClick={false}
       closeOnEsc={false}
       initialFocusRef={inputRef}
     >

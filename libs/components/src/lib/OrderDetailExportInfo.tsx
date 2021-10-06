@@ -31,7 +31,7 @@ export function OrderDetailExportInfo({
 }: {
   exports: FmOrderExport;
   orderItems: FindFmOrderDetailRes['items'];
-}) {
+}): JSX.Element {
   // * 이 출고에 포함된 상품의 총 가격
   const totalExportedPrice = useMemo(() => {
     return _exports.itemOptions.reduce((prev, curr) => {
@@ -112,7 +112,7 @@ export function OrderDetailExportInfoItem({
   itemOption: FmOrderExportItemOption;
   orderItems: FindFmOrderDetailRes['items'];
   bundleExportCode?: string;
-}) {
+}): JSX.Element {
   const emphasizeColor = useColorModeValue('red.500', 'red.300');
   // * 합배송 여부 체크 + 현재 조회중인 주문이 아닌 다른 주문인 지 체크
   const isBundledAndRightOrder = useMemo(() => {

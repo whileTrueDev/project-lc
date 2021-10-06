@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { IsOptional, IsNumber } from 'class-validator';
 
 export class GoodsOptionsSupplyDto {

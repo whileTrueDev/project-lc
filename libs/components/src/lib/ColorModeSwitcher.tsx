@@ -26,7 +26,6 @@ export const ColorModeSwitcher: React.FC<ColorModeSwitcherProps> = (props) => {
         onClick={toggleColorMode}
         icon={<SwitchIcon />}
         aria-label={`Switch to ${text} mode`}
-        // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
       />
     </Tooltip>

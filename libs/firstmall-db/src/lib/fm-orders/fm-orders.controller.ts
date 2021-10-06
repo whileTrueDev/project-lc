@@ -18,6 +18,7 @@ import {
   ChangeFmOrderStatusDto,
   convertFmStatusStringToStatus,
   FindFmOrderDetailRes,
+  FindFmOrderRes,
   FindFmOrdersDto,
 } from '@project-lc/shared-types';
 import { FmOrdersService } from './fm-orders.service';
@@ -34,7 +35,7 @@ export class FmOrdersController {
   async findOrders(
     @SellerInfo() seller: UserPayload,
     @Query(ValidationPipe) dto: FindFmOrdersDto,
-  ) {
+  ): Promise<FindFmOrderRes[]> {
     // 판매자의 승인된 상품 ID 목록 조회
     const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
     if (ids.length === 0) return [];
@@ -52,7 +53,7 @@ export class FmOrdersController {
   async changeOrderStatus(
     @Param('orderId') orderId: string,
     @Body(ValidationPipe) dto: ChangeFmOrderStatusDto,
-  ) {
+  ): Promise<boolean> {
     const status = convertFmStatusStringToStatus(dto.targetStatus);
     return this.fmOrdersService.changeOrderStatus(orderId, status);
   }

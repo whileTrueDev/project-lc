@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { loginUserRes, UserProfileRes } from '@project-lc/shared-types';
+import { loginUserRes, UserProfileRes, UserType } from '@project-lc/shared-types';
 import { Seller } from '@prisma/client';
-import { UserPayload, UserType } from './auth.interface';
+import { UserPayload } from './auth.interface';
 import { SellerService } from '../seller/seller.service';
 import { CipherService } from './cipher.service';
 import {
@@ -34,7 +34,7 @@ export class AuthService {
   issueToken(
     userPayload: UserPayload,
     stayLogedIn: boolean,
-    userType: string,
+    userType: UserType,
   ): loginUserRes {
     // token에 들어갈 데이터를 입력한다. -> 유저 타입 정도는 들어가는 것이 좋을 듯하다.
     return {
@@ -61,7 +61,7 @@ export class AuthService {
     pwdInput: string,
   ): Promise<UserPayload | null> {
     let user: Seller;
-    if (type === 'seller') {
+    if (['admin', 'seller'].includes(type)) {
       user = await this.sellerService.findOne({ email });
       if (!user) {
         return null;
@@ -78,7 +78,7 @@ export class AuthService {
         return null;
       }
     }
-    return this.castUser(user);
+    return this.castUser(user, type);
   }
 
   /**
@@ -122,7 +122,7 @@ export class AuthService {
    * @param req 요청 객체
    * @param userPayload Token에 저장될 payload
    */
-  validateRefreshToken(req: Request) {
+  validateRefreshToken(req: Request): UserPayload {
     const cookieRefreshToken: string | undefined = req.cookies?.refresh_token;
     try {
       // 암호화 미사용시 제거
@@ -135,17 +135,17 @@ export class AuthService {
     }
   }
 
-  castUser(user: Seller): UserPayload {
+  castUser(user: Seller, type: UserType): UserPayload {
     return {
       sub: user.email,
-      type: 'seller',
+      type,
     };
   }
 
   private castUserPayload(userPayload: UserPayload): UserPayload {
     return {
       sub: userPayload.sub,
-      type: 'seller',
+      type: userPayload.type,
     };
   }
 

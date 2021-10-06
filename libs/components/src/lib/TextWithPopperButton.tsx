@@ -32,7 +32,7 @@ export default function TextWithPopperButton({
   iconColor,
   portalBody = false,
   placement = 'bottom',
-}: TextWithPopperButtonProps) {
+}: TextWithPopperButtonProps): JSX.Element {
   const { onOpen, onClose, isOpen } = useDisclosure();
 
   return (

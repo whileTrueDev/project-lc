@@ -28,7 +28,7 @@ import { mainNavItems, NavItem } from '../constants/navigation';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import ProfileBox from './ProfileBox';
 
-export function Navbar() {
+export function Navbar(): JSX.Element {
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
   const { isLoggedIn } = useIsLoggedIn();
@@ -166,7 +166,7 @@ export function Navbar() {
   );
 }
 
-const DesktopNav = () => {
+const DesktopNav = (): JSX.Element => {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
 
@@ -194,18 +194,17 @@ const DesktopNav = () => {
   );
 };
 
-const MobileNav = () => {
+const MobileNav = (): JSX.Element => {
   return (
     <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
       {mainNavItems.map((navItem) => (
-        // eslint-disable-next-line react/jsx-props-no-spreading
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
     </Stack>
   );
 };
 
-const MobileNavItem = ({ label, href, needLogin }: NavItem) => {
+const MobileNavItem = ({ label, href, needLogin }: NavItem): JSX.Element => {
   const navItemTextColor = useColorModeValue('gray.600', 'gray.200');
 
   return (

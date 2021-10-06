@@ -55,7 +55,7 @@ function downloadImageButton(row: any): JSX.Element {
   );
 }
 
-async function downloadFromS3(row: any) {
+async function downloadFromS3(row: any): Promise<void> {
   const { fileName, sellerEmail } = row;
   const imageUrl = s3.s3DownloadImageUrl(fileName, sellerEmail);
   window.open(imageUrl, '_blank');
@@ -63,7 +63,7 @@ async function downloadFromS3(row: any) {
 
 function makeListRow(
   sellerBusinessRegistrations: SellerBusinessRegistration[] | undefined,
-) {
+): SellerBusinessRegistration[] {
   if (!sellerBusinessRegistrations) {
     return [];
   }

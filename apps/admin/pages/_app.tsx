@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { ChakraProvider } from '@chakra-ui/react';
 import { ThemeProvider } from '@material-ui/core';
 import { QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 import createChakraTheme from '../utils/createChakraTheme';
 import createMuiTheme from '../utils/createMuiTheme';
 import createQueryClient from '../utils/createReactQueryClient';
@@ -11,7 +12,7 @@ const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();
 const muiTheme = createMuiTheme();
 
-function CustomApp({ Component, pageProps }: AppProps) {
+function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <>
       <Head>
@@ -26,6 +27,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
               </main>
             </ThemeProvider>
           </ChakraProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </div>
     </>

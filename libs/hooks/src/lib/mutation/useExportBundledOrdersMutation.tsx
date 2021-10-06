@@ -1,19 +1,22 @@
 import { ExportBundledOrdersDto } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
-import { useMutation, useQueryClient } from 'react-query';
+import { AxiosError } from 'axios';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import axios from '../../axios';
 
-export type useExportBundledOrdersMutationRes = boolean;
-
-export const useExportBundledOrdersMutation = () => {
+export const useExportBundledOrdersMutation = (): UseMutationResult<
+  boolean,
+  AxiosError,
+  ExportBundledOrdersDto
+> => {
   const queryClient = useQueryClient();
   const { search, searchDateType, searchStartDate, searchEndDate, searchStatuses } =
     useFmOrderStore();
-  return useMutation(
+  return useMutation<boolean, AxiosError, ExportBundledOrdersDto>(
     (dto: ExportBundledOrdersDto) =>
-      axios.post<useExportBundledOrdersMutationRes>('/fm-exports/bundle', dto),
+      axios.post<boolean>('/fm-exports/bundle', dto).then((res) => res.data),
     {
-      onSuccess: ({ data }) => {
+      onSuccess: (data) => {
         if (data) {
           queryClient.invalidateQueries('FmOrder');
           queryClient.invalidateQueries(

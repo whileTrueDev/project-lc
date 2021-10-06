@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { IsNumber, IsString } from 'class-validator';
 import { ShippingCostDtoType } from '../constants/shippingTypes';
 

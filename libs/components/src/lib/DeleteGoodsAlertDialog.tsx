@@ -36,7 +36,7 @@ export function DeleteGoodsAlertDialog({
   const deleteFmGoods = useDeleteFmGoods();
 
   // 삭제 다이얼로그에서 확인 눌렀을 때 상품삭제 핸들러
-  const handleDelete = async () => {
+  const handleDelete = async (): Promise<void> => {
     if (!items) return;
     // 검수된 상품
     const confirmedGoods = items.filter(

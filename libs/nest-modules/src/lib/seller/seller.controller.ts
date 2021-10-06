@@ -12,7 +12,11 @@ import {
   ValidationPipe,
   Res,
 } from '@nestjs/common';
-import { Seller } from '@prisma/client';
+import {
+  Seller,
+  SellerBusinessRegistration,
+  SellerSettlementAccount,
+} from '@prisma/client';
 import {
   FindSellerDto,
   PasswordValidateDto,
@@ -26,7 +30,10 @@ import {
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { SellerService } from './seller.service';
-import { SellerSettlementService } from './seller-settlement.service';
+import {
+  SellerSettlementInfo,
+  SellerSettlementService,
+} from './seller-settlement.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
 import { SellerShopService } from './seller-shop.service';
@@ -64,7 +71,9 @@ export class SellerController {
 
   // * 이메일 주소 중복 체크
   @Get('email-check')
-  public async emailDupCheck(@Query(ValidationPipe) dto: SellerEmailDupCheckDto) {
+  public async emailDupCheck(
+    @Query(ValidationPipe) dto: SellerEmailDupCheckDto,
+  ): Promise<boolean> {
     return this.sellerService.isEmailDupCheckOk(dto.email);
   }
 
@@ -74,7 +83,7 @@ export class SellerController {
   public async deleteSeller(
     @Body('email') email: string,
     @SellerInfo() sellerInfo: UserPayload,
-  ) {
+  ): Promise<boolean> {
     if (email !== sellerInfo.sub) {
       throw new UnauthorizedException('본인의 계정이 아니면 삭제할 수 없습니다.');
     }
@@ -84,20 +93,26 @@ export class SellerController {
   // 로그인 한 사람이 본인인증을 위해 비밀번호 확인
   @UseGuards(JwtAuthGuard)
   @Post('validate-password')
-  public async validatePassword(@Body(ValidationPipe) dto: PasswordValidateDto) {
+  public async validatePassword(
+    @Body(ValidationPipe) dto: PasswordValidateDto,
+  ): Promise<boolean> {
     return this.sellerService.checkPassword(dto.email, dto.password);
   }
 
   // 비밀번호 변경
   @Patch('password')
-  public async changePassword(@Body(ValidationPipe) dto: PasswordValidateDto) {
+  public async changePassword(
+    @Body(ValidationPipe) dto: PasswordValidateDto,
+  ): Promise<Seller> {
     return this.sellerService.changePassword(dto.email, dto.password);
   }
 
   // 본인의 정산정보 조회
   @UseGuards(JwtAuthGuard)
   @Get('settlement')
-  public async selectSellerSettlementInfo(@SellerInfo() sellerInfo: UserPayload) {
+  public async selectSellerSettlementInfo(
+    @SellerInfo() sellerInfo: UserPayload,
+  ): Promise<SellerSettlementInfo> {
     return this.sellerSettlementService.selectSellerSettlementInfo(sellerInfo);
   }
 
@@ -107,7 +122,7 @@ export class SellerController {
   public async InsertBusinessRegistration(
     @Body(ValidationPipe) dto: BusinessRegistrationDto,
     @SellerInfo() sellerInfo: UserPayload,
-  ) {
+  ): Promise<SellerBusinessRegistration> {
     return this.sellerSettlementService.insertBusinessRegistration(dto, sellerInfo);
   }
 
@@ -117,7 +132,7 @@ export class SellerController {
   public async InsertSettlementAccount(
     @Body(ValidationPipe) dto: SettlementAccountDto,
     @SellerInfo() sellerInfo: UserPayload,
-  ) {
+  ): Promise<SellerSettlementAccount> {
     return this.sellerSettlementService.insertSettlementAccount(dto, sellerInfo);
   }
 
@@ -133,7 +148,7 @@ export class SellerController {
     dto: SellerShopInfoDto,
     @SellerInfo() sellerInfo: UserPayload,
     @Res() res,
-  ) {
+  ): Promise<void> {
     try {
       await this.sellerShopService.changeShopInfo(dto, sellerInfo);
       res.sendStatus(204);
