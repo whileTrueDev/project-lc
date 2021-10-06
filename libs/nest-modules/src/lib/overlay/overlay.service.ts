@@ -9,6 +9,7 @@ import {
   NicknameAndText,
   GoogleTTSCredentials,
   PurchaseMessage,
+  UserId,
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
 import AWS from 'aws-sdk';
@@ -137,7 +138,7 @@ export class OverlayService {
     return messageAndNickname;
   }
 
-  async getVerticalImagesFromS3(userId: { userId: string }): Promise<number> {
+  async getVerticalImagesFromS3(userId: UserId): Promise<number> {
     const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME;
     const S3_BUCKET_REGION = 'ap-northeast-2';
     const broadcasterId = userId.userId;
