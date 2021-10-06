@@ -7,6 +7,7 @@ import {
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import { ConfigModule } from '@nestjs/config';
+import { DeleteObjectsCommandOutput } from '@aws-sdk/client-s3';
 import { GoodsService } from './goods.service';
 import { S3Module } from '../s3/s3.module';
 
@@ -139,7 +140,8 @@ describe('GoodsService', () => {
 
   describe('deleteLcGoods', () => {
     it('goods should be deleted', async () => {
-      const returnDeleteObjectsCommandOutput = () => Promise.resolve({ $metadata: {} });
+      const returnDeleteObjectsCommandOutput = (): Promise<DeleteObjectsCommandOutput> =>
+        Promise.resolve({ $metadata: {} });
       jest
         .spyOn(service, 'deleteGoodsImagesFromS3')
         .mockImplementation(returnDeleteObjectsCommandOutput);
