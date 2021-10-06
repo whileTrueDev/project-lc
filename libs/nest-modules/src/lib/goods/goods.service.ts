@@ -219,13 +219,13 @@ export class GoodsService {
   }): Promise<boolean> {
     try {
       // 이미지 삭제
-      const deleteImages = this.deleteGoodsImagesFromS3(ids);
+      await this.deleteGoodsImagesFromS3(ids);
 
       // 상세설명 이미지 삭제
-      const deleteContentImages = this.deleteGoodsContentImagesFromS3(ids);
+      await this.deleteGoodsContentImagesFromS3(ids);
 
       // 상품삭제
-      const deleteGoods = this.prisma.goods.deleteMany({
+      await this.prisma.goods.deleteMany({
         where: {
           seller: { email },
           id: {
@@ -234,7 +234,6 @@ export class GoodsService {
         },
       });
 
-      await Promise.all([deleteImages, deleteContentImages, deleteGoods]);
       return true;
     } catch (error) {
       console.error(error);
