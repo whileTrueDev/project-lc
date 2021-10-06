@@ -17,7 +17,8 @@ export const useRegistGoods = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.invalidateQueries('SellerGoodsList', { refetchInactive: true });
-        queryClient.invalidateQueries('ShippingGroupList', { refetchInactive: true });
+
+        queryClient.invalidateQueries('ShippingGroupList', { refetchInactive: true }); // 상품 등록 후  배송비정책에 연결된 상품개수 업데이트
       },
     },
   );
