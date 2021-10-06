@@ -1,19 +1,20 @@
-import {
-  WebSocketServer,
-  WebSocketGateway,
-  SubscribeMessage,
-  MessageBody,
-  OnGatewayDisconnect,
-  OnGatewayConnection,
-  OnGatewayInit,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import {
-  SocketInfo,
-  SocketIdandDevice,
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
+import {
   PageUrlAndDevice,
+  SocketIdandDevice,
+  SocketInfo,
 } from '@project-lc/shared-types';
+import { Server, Socket } from 'socket.io';
+
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
 export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -24,15 +25,15 @@ export class AppGateway
   socketInfo: SocketInfo = {};
   private logger: Logger = new Logger('AppGateway');
 
-  afterInit() {
+  afterInit(): void {
     this.logger.log('Initialized!');
   }
 
-  handleConnection(socket: Socket) {
+  handleConnection(socket: Socket): void {
     this.logger.log(`Client Connected ${socket.id}`);
   }
 
-  handleDisconnect(socket: Socket) {
+  handleDisconnect(socket: Socket): SocketIdandDevice[] {
     const SOCKET_ID: string = socket.id;
     if (Object.values(this.socketInfo)) {
       const itemToFind = Object.values(this.socketInfo)[0]?.find(
@@ -65,7 +66,7 @@ export class AppGateway
   }
 
   @SubscribeMessage('request creator list')
-  handleCreatorList(@MessageBody() roomAndUrl: { roomName: string; url: string }) {
+  handleCreatorList(@MessageBody() roomAndUrl: { roomName: string; url: string }): void {
     const advertiseUrl =
       roomAndUrl && roomAndUrl.url ? roomAndUrl.url.split('/')[1] : null;
     const fullUrl: (string | undefined)[] = Object.keys(this.socketInfo)

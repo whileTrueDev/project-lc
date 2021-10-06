@@ -1,4 +1,4 @@
-export type UserType = 'seller' | 'creator';
+export type UserType = 'seller' | 'creator' | 'admin';
 
 export interface UserProfileRes {
   type: UserType;

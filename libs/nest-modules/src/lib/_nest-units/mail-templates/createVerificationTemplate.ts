@@ -1,4 +1,4 @@
-export const createVerificationTemplate = (code: string) => `
+export const createVerificationTemplate = (code: string): string => `
 <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
   <div style="display:flex;flex-direction:column;justify-content:center;align-items:center">
 

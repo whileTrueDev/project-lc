@@ -16,7 +16,7 @@ export class AppController {
   ) {}
 
   @Get()
-  healthCheck() {
+  healthCheck(): string {
     return 'alive';
   }
 
@@ -28,6 +28,7 @@ export class AppController {
 
   @Get(':id')
   @Render('client')
+
   async getRender(@Param('id') id: string) {
     const overlayUrl = `/${id}`;
     try {

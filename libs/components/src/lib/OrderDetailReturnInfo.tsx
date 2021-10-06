@@ -8,7 +8,11 @@ import {
 import { ChakraNextImage, FmReturnStatusBadge, TextDotConnector } from '..';
 
 /** 주문 반품 정보 */
-export function OrderDetailReturnInfo({ returns }: { returns: FmOrderReturn }) {
+export function OrderDetailReturnInfo({
+  returns,
+}: {
+  returns: FmOrderReturn;
+}): JSX.Element {
   return (
     <Box>
       <Stack direction="row" alignItems="center" my={2} spacing={1.5}>

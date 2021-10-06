@@ -1,4 +1,4 @@
-export const getApiHost = () => {
+export const getApiHost = (): string | undefined => {
   switch (process.env.NODE_ENV) {
     case 'production':
     case 'test':
@@ -9,7 +9,7 @@ export const getApiHost = () => {
   }
 };
 
-export const getWebHost = () => {
+export const getWebHost = (): string => {
   switch (process.env.NODE_ENV) {
     case 'development':
     default:

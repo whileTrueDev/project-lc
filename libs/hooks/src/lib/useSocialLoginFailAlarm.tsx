@@ -9,7 +9,7 @@ export const useSocialLoginFailAlarm = ({
   error: string | string[];
   message: string | string[];
   provider: string | string[];
-}) => {
+}): void => {
   const toast = useToast();
   useEffect(() => {
     if (error === 'true') {

@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { Search2Icon } from '@chakra-ui/icons';
 import {
   Badge,

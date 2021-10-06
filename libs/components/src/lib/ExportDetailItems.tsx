@@ -7,7 +7,7 @@ import { OrderDetailExportInfoItem } from '..';
 interface ExportDetailItemsProps {
   exportData: FmExportRes;
 }
-export function ExportDetailItems({ exportData }: ExportDetailItemsProps) {
+export function ExportDetailItems({ exportData }: ExportDetailItemsProps): JSX.Element {
   const order = useFmOrder(exportData.order_seq);
   return (
     <Box>

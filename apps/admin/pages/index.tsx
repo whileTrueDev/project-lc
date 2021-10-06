@@ -3,11 +3,11 @@ import { AdminPageLayout, AdminLoginForm } from '@project-lc/components';
 
 export function Login(): JSX.Element {
   return (
-    <AdminPageLayout>
+    <Box position="relative">
       <Flex align="center" justify="center" minH="calc(100vh - 200px)">
         <AdminLoginForm enableShadow />
       </Flex>
-    </AdminPageLayout>
+    </Box>
   );
 }
 

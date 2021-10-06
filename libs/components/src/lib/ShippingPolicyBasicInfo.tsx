@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-/* eslint-disable react/jsx-props-no-spreading */
 import {
   Box,
   Button,
@@ -33,7 +31,7 @@ export function ShippingPolicyFormControlWithLabel({
   id?: string;
   label: string;
   children: React.ReactNode;
-}) {
+}): JSX.Element {
   const { isMobileSize } = useDisplaySize();
   return (
     <FormControl id={id} mb={6} minW={isMobileSize ? '100%' : 'lg'}>
@@ -70,7 +68,7 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
   // 배송비 계산 기준
 
   // 주소검색 결과 타입 참고 https://postcode.map.daum.net/guide
-  const handleComplete = (data: AddressData) => {
+  const handleComplete = (data: AddressData): void => {
     const { address, zonecode } = data;
     setAddress(zonecode, address);
     setFlag.off();

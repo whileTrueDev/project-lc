@@ -33,7 +33,9 @@ export class FirstmallDbService {
    * 트랜잭션 쿼리 처리 함수
    * @param cb connection을 인수로 받는 트랜잭션 처리 콜백 함수입니다. 커넥션을 통해 쿼리를 진행하고, 해당 변경 내용을 데이터베이스에 반영시키려면 conn.commit() 을 호출해야 합니다.
    */
-  public async transactionQuery<R = any>(cb: (conn: Connection) => Promise<R>) {
+  public async transactionQuery<R = any>(
+    cb: (conn: Connection) => Promise<R>,
+  ): Promise<R> {
     const conn = await this.pool.getConnection();
     try {
       await conn.beginTransaction();

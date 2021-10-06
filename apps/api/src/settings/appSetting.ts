@@ -1,11 +1,10 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { colorizedMorganMiddleware } from '@project-lc/nest-modules';
 import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
-import cors from 'cors';
 import passport from 'passport';
-import { colorizedMorganMiddleware } from '@project-lc/nest-modules';
 
 export class AppSetting {
   private corsOptions = {

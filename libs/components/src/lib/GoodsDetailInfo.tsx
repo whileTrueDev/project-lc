@@ -6,7 +6,7 @@ import GoodsStatusBadge from './GoodsStatusBadge';
 export interface GoodsDetailInfoProps {
   goods: GoodsByIdRes;
 }
-export function GoodsDetailInfo({ goods }: GoodsDetailInfoProps) {
+export function GoodsDetailInfo({ goods }: GoodsDetailInfoProps): JSX.Element {
   return (
     <Stack>
       <Box>

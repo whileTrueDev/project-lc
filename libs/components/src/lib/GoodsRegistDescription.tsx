@@ -35,10 +35,10 @@ export function GoodsRegistDescription(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // The sunEditor parameter will be set to the core suneditor instance when this function is called
-  const getSunEditorInstance = (sunEditor: SunEditorCore) => {
+  const getSunEditorInstance = (sunEditor: SunEditorCore): void => {
     editor.current = sunEditor;
   };
-  const onClick = async () => {
+  const onClick = async (): Promise<void> => {
     if (!editor.current) return;
     const textWithImages = editor.current.getContents(false);
 

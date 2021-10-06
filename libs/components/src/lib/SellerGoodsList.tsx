@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import NextLink from 'next/link';
 import {
   Badge,
@@ -26,6 +25,7 @@ import {
 } from '@prisma/client';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import { SellerGoodsSortColumn } from '@project-lc/shared-types';
+import { makeStyles } from '@material-ui/core/styles';
 import { useState } from 'react';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import {
@@ -48,7 +48,10 @@ function formatDate(date: Date): string {
   return dayjs(date).format('YYYY/MM/DD HH:mm');
 }
 
-function ShippingGroupDetailButton(props: { id: number; name: string }) {
+export function ShippingGroupDetailButton(props: {
+  id: number;
+  name: string;
+}): JSX.Element {
   const { id, name } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
@@ -273,7 +276,21 @@ const columns: GridColumns = [
 ];
 // * 상품목록 datagrid 컬럼 끝*********************************************
 
+/** DataGrid style 때문에 chakra switch 이상하게 보이는거 방지하기 위해 적용 */
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& .MuiDataGrid-cell .chakra-switch': {
+      boxSizing: 'unset',
+    },
+    '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
+      borderBottom: `1px solid #f0f0f0`,
+      borderRight: `1px solid #f0f0f0`,
+    },
+  },
+}));
+
 export function SellerGoodsList(): JSX.Element {
+  const { root } = useStyles();
   const { data: profileData } = useProfile();
   const {
     page,
@@ -303,7 +320,7 @@ export function SellerGoodsList(): JSX.Element {
   const [selectedGoodsIds, setSelectedGoodsIds] = useState<GridSelectionModel>([]);
 
   // 상품선택 핸들러
-  const handleSelection = (selectionModel: GridSelectionModel) => {
+  const handleSelection = (selectionModel: GridSelectionModel): void => {
     setSelectedGoodsIds(selectionModel);
   };
 
@@ -313,6 +330,7 @@ export function SellerGoodsList(): JSX.Element {
   return (
     <Box>
       <ChakraDataGrid
+        className={root}
         bg={useColorModeValue('inherit', 'gray.300')}
         loading={isLoading}
         rows={data?.items || []}

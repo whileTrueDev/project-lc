@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { IsString } from 'class-validator';
 
 /** 상품공통정보 dto */

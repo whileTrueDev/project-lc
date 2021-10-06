@@ -79,7 +79,7 @@ export function StockInfoButton({
                   <Th>정가</Th>
                   <Th>옵션노출여부</Th>
                   <Th>총 재고</Th>
-                  <Th>불량재고</Th>
+                  {/* <Th>불량재고</Th> */}
                   <Th>가용재고</Th>
                 </Tr>
               </Thead>
@@ -94,7 +94,7 @@ export function StockInfoButton({
                       <Td>{Number(option.price).toLocaleString()}</Td>
                       <Td>{option.option_view === 'Y' ? '노출' : '미노출'}</Td>
                       <Td>{option.stock}</Td>
-                      <Td>{option.badstock}</Td>
+                      {/* <Td>{option.badstock}</Td> */}
                       <Td>{option.rstock}</Td>
                     </Tr>
                   ))}
@@ -116,7 +116,7 @@ export function StockInfoButton({
 export default StockInfoButton;
 
 // 상품 목록 재고/가용 헤더에서 사용되는 재고 설명 예시
-export function ExampleStockDescription() {
+export function ExampleStockDescription(): JSX.Element {
   return (
     <Stack spacing={1.5} fontSize="sm">
       <Text>재고/가용 설명</Text>

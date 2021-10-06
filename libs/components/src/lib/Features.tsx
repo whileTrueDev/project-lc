@@ -19,7 +19,7 @@ interface FeatureProps {
   icon?: ReactElement;
 }
 
-const Feature = ({ text, icon, iconBg }: FeatureProps) => {
+const Feature = ({ text, icon, iconBg }: FeatureProps): JSX.Element => {
   return (
     <Stack direction="row" align="center">
       <Flex w={8} h={8} align="center" justify="center" rounded="full" bg={iconBg}>
@@ -30,7 +30,7 @@ const Feature = ({ text, icon, iconBg }: FeatureProps) => {
   );
 };
 
-export function Features() {
+export function Features(): JSX.Element {
   return (
     <Container maxW="5xl" py={12}>
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>

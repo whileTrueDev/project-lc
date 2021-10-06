@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import {
   Box,
   Button,
@@ -28,7 +27,7 @@ export function GoodsOptionInput({
 }: {
   label: string;
   inputProps?: Partial<InputProps>;
-}) {
+}): JSX.Element {
   return (
     <HStack>
       <Text flex="1">{label}</Text>
@@ -37,7 +36,7 @@ export function GoodsOptionInput({
   );
 }
 
-function NoOptionInput() {
+function NoOptionInput(): JSX.Element {
   const { register } = useFormContext<GoodsFormValues>();
   return (
     <Stack maxWidth="md">
@@ -72,7 +71,7 @@ function NoOptionInput() {
   );
 }
 
-function UseOptionInput() {
+function UseOptionInput(): JSX.Element {
   const {
     watch,
     control,
@@ -87,7 +86,7 @@ function UseOptionInput() {
 
   const inputWidth = isMobileSize ? '74px' : 'auto';
 
-  const addOption = () => {
+  const addOption = (): void => {
     append({
       option1: '',
       consumer_price: 0,
@@ -131,8 +130,9 @@ function UseOptionInput() {
           {...boxStyle}
           direction={isMobileSize ? 'column' : 'row'}
           spacing={1}
+          flexWrap="wrap"
         >
-          <HStack>
+          <HStack mb={1}>
             <CloseButton onClick={() => remove(index)} />
             <HStack>
               <Text minWidth="60px">
@@ -146,7 +146,7 @@ function UseOptionInput() {
               />
             </HStack>
           </HStack>
-          <HStack>
+          <HStack mb={1}>
             <HStack>
               <Text minWidth="40px">정가</Text>
               <Input
@@ -157,7 +157,7 @@ function UseOptionInput() {
                 size="sm"
               />
             </HStack>
-            <HStack>
+            <HStack mb={1}>
               <Text minWidth="40px">판매가</Text>
               <Input
                 {...register(`options.${index}.price` as const, {
@@ -181,6 +181,7 @@ function UseOptionInput() {
             </HStack>
             {/* 노출 */}
             <RadioGroup
+              mb={1}
               minWidth={isMobileSize ? '150px' : 'auto'}
               value={watch(`options.${index}.option_view` as const, 'Y')}
             >

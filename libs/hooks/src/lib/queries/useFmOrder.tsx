@@ -1,5 +1,6 @@
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryResult } from 'react-query';
 import { FindFmOrderDetailRes, FmOrder } from '@project-lc/shared-types';
+import { AxiosError } from 'axios';
 import axios from '../../axios';
 
 export const getFmOrder = async (
@@ -11,10 +12,14 @@ export const getFmOrder = async (
 export const useFmOrder = (
   orderId?: FmOrder['order_seq'] | string,
   initialData?: FindFmOrderDetailRes,
-) => {
-  return useQuery<FindFmOrderDetailRes>(['FmOrder', orderId], () => getFmOrder(orderId), {
-    initialData,
-    enabled: !!orderId,
-    retry: false,
-  });
+): UseQueryResult<FindFmOrderDetailRes, AxiosError> => {
+  return useQuery<FindFmOrderDetailRes, AxiosError>(
+    ['FmOrder', orderId],
+    () => getFmOrder(orderId),
+    {
+      initialData,
+      enabled: !!orderId,
+      retry: false,
+    },
+  );
 };

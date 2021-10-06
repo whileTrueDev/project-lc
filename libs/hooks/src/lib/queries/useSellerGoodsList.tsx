@@ -1,5 +1,6 @@
 import { GoodsListDto, GoodsListRes } from '@project-lc/shared-types';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 type SellerGoodsListRequestDto = GoodsListDto & { email: string };
@@ -16,11 +17,11 @@ export const getSellerGoodsList = async (dto: GoodsListDto): Promise<GoodsListRe
 
 export const useSellerGoodsList = (
   dto: SellerGoodsListRequestDto,
-  options?: UseQueryOptions<GoodsListRes>,
-) => {
+  options?: UseQueryOptions<GoodsListRes, AxiosError>,
+): UseQueryResult<GoodsListRes, AxiosError> => {
   const { page, itemPerPage, sort, direction, groupId } = dto;
   const queryKey = ['SellerGoodsList', dto];
-  return useQuery<GoodsListRes>(
+  return useQuery<GoodsListRes, AxiosError>(
     queryKey,
     () => getSellerGoodsList({ page, itemPerPage, sort, direction, groupId }),
     { retry: 1, keepPreviousData: true, ...options },

@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 // grid 내에서 동일한 포맷팅을 수행하는 테이블 구현
 
 import { GridItem, useColorModeValue } from '@chakra-ui/react';
-import { Fragment } from 'react';
 
 type settlementTableItemProps = {
   title: string;

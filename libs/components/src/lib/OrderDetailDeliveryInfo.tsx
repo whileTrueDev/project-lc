@@ -22,7 +22,7 @@ export function OrderDetailDeliveryInfo({
     | 'recipient_cellphone'
     | 'recipient_email'
   >;
-}) {
+}): JSX.Element {
   // 주문자 전화
   const ordererPhone = useMemo(() => {
     return orderDeliveryData.order_phone === '--' ? null : orderDeliveryData.order_phone;

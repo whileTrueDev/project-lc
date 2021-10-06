@@ -65,7 +65,9 @@ const columns: GridColumns = [
   },
 ];
 
-function makeListRow(sellerSettlements: SellerSettlements[] | undefined) {
+function makeListRow(
+  sellerSettlements: SellerSettlements[] | undefined,
+): SellerSettlements[] {
   if (!sellerSettlements) {
     return [];
   }

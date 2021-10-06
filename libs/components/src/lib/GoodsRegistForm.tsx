@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-/* eslint-disable react/jsx-props-no-spreading */
 import {
   Button,
   Center,
@@ -52,7 +50,7 @@ type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
 export async function uploadGoodsImageToS3(
   imageFile: { file: File | Buffer; filename: string; id: number; contentType: string },
   userMail: string,
-) {
+): Promise<string> {
   const { file, filename, contentType } = imageFile;
 
   const type = 'goods';
@@ -75,7 +73,12 @@ export async function uploadGoodsImageToS3(
 async function imageFileListToImageDto(
   imageFileList: { file: File; filename: string; id: number }[],
   userMail: string,
-) {
+): Promise<
+  Array<{
+    cut_number: number;
+    image: string;
+  }>
+> {
   const savedImages = await Promise.all(
     imageFileList.map((item) => {
       const { file } = item;
@@ -92,7 +95,7 @@ async function imageFileListToImageDto(
 function addGoodsOptionInfo(
   options: Omit<GoodsOptionDto, 'default_option' | 'option_title'>[],
   option_title: string,
-) {
+): GoodsOptionDto[] {
   return options.map((opt, index) => ({
     ...opt,
     default_option: index === 0 ? ('y' as const) : ('n' as const),
@@ -102,7 +105,10 @@ function addGoodsOptionInfo(
 
 // 상품 '상세설명' contents에서 이미지 s3에 업로드 후 src url 변경
 // 상세설명 이미지는data:image 형태로 들어있음
-export async function saveContentsImageToS3(contents: string, userMail: string) {
+export async function saveContentsImageToS3(
+  contents: string,
+  userMail: string,
+): Promise<string> {
   const parser = new DOMParser();
   const dom = parser.parseFromString(contents, 'text/html'); // textWithImages -> getValues('contents')
   const imageTags = Array.from(dom.querySelectorAll('img'));
@@ -168,7 +174,7 @@ export function GoodsRegistForm(): JSX.Element {
   });
   const { handleSubmit } = methods;
 
-  const regist = async (data: GoodsFormSubmitDataType) => {
+  const regist = async (data: GoodsFormSubmitDataType): Promise<void> => {
     if (!profileData) return;
     const userMail = profileData.email;
 
@@ -228,7 +234,7 @@ export function GoodsRegistForm(): JSX.Element {
 
       goodsDto = {
         ...goodsDto,
-        goodsInfoId: res.data.id,
+        goodsInfoId: res.id,
         common_contents: commonInfoBody,
       };
     } else if (!data.goodsInfoId) {
@@ -255,6 +261,7 @@ export function GoodsRegistForm(): JSX.Element {
       .then((res) => {
         toast({
           title: '상품을 성공적으로 등록하였습니다',
+          status: 'success',
         });
         router.push('/mypage/goods');
       })
@@ -324,14 +331,14 @@ export function GoodsRegistForm(): JSX.Element {
         {isLoading && (
           <Center
             position="fixed"
-            mt={0}
-            top="0px"
+            top="-30px"
             bottom="0px"
             left="0px"
             right="0px"
             bg="gray.400"
             opacity="0.5"
             flexDirection="column"
+            zIndex={99999}
           >
             <Spinner />
             <Text>상품을 등록중입니다...</Text>

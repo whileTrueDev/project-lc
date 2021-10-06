@@ -9,7 +9,12 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
-import { SocketInfo, RoomAndDate, RoomAndVideoType } from '@project-lc/shared-types';
+import {
+  SocketInfo,
+  RoomAndDate,
+  RoomAndVideoType,
+  SocketIdandDevice,
+} from '@project-lc/shared-types';
 import { OverlayService } from '@project-lc/nest-modules';
 
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
@@ -25,15 +30,15 @@ export class AppScreenGateway
 
   private logger: Logger = new Logger('AppGateway');
 
-  afterInit() {
+  afterInit(): void {
     this.logger.log('Initialized!');
   }
 
-  handleConnection(socket: Socket) {
+  handleConnection(socket: Socket): void {
     this.logger.log(`Client Connected ${socket.id}`);
   }
 
-  handleDisconnect(socket: Socket) {
+  handleDisconnect(socket: Socket): SocketIdandDevice[] {
     const SOCKET_ID: string = socket.id;
     if (Object.values(this.socketInfo)) {
       const itemToFind = Object.values(this.socketInfo)[0]?.find(
@@ -48,7 +53,7 @@ export class AppScreenGateway
   }
 
   @SubscribeMessage('get ranking')
-  async getRanking(@MessageBody() roomName: string) {
+  async getRanking(@MessageBody() roomName: string): Promise<void> {
     const nicknameAndPrice = [];
     const rankings = await this.overlayService.getRanking(roomName);
     rankings.forEach((eachNickname) => {
@@ -64,7 +69,7 @@ export class AppScreenGateway
   }
 
   @SubscribeMessage('get all data')
-  async getAllPurchaseMessage(@MessageBody() roomName: string) {
+  async getAllPurchaseMessage(@MessageBody() roomName: string): Promise<void> {
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
     const rankings = await this.overlayService.getRanking(roomName);
@@ -92,64 +97,64 @@ export class AppScreenGateway
   }
 
   @SubscribeMessage('toggle right-top onad logo')
-  handleLogo(@MessageBody() roomName: string) {
+  handleLogo(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('toggle right-top onad logo from server');
   }
 
   @SubscribeMessage('toggle bottom area from admin')
-  handleBottomMessageArea(@MessageBody() roomName: string) {
+  handleBottomMessageArea(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('handle bottom area to client');
   }
 
   @SubscribeMessage('show live commerce')
-  showLiveCommerce(@MessageBody() roomName: string) {
+  showLiveCommerce(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('show screen');
   }
 
   @SubscribeMessage('quit live commerce')
-  hideLiveCommerce(@MessageBody() roomName: string) {
+  hideLiveCommerce(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('hide screen');
   }
 
   @SubscribeMessage('get start time from admin')
-  getStartTime(@MessageBody() roomAndDate: RoomAndDate) {
+  getStartTime(@MessageBody() roomAndDate: RoomAndDate): void {
     const { date } = roomAndDate;
     const { roomName } = roomAndDate;
     this.server.to(roomName).emit('get start time from server', date);
   }
 
   @SubscribeMessage('get d-day')
-  getDday(@MessageBody() roomAndDate: RoomAndDate) {
+  getDday(@MessageBody() roomAndDate: RoomAndDate): void {
     const { date } = roomAndDate;
     const { roomName } = roomAndDate;
     this.server.to(roomName).emit('d-day from server', date);
   }
 
   @SubscribeMessage('refresh')
-  handleRefresh(@MessageBody() roomName: string) {
+  handleRefresh(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('refresh signal');
   }
 
   @SubscribeMessage('show video from admin')
-  showVideo(@MessageBody() roomAndType: RoomAndVideoType) {
+  showVideo(@MessageBody() roomAndType: RoomAndVideoType): void {
     const { roomName } = roomAndType;
     const { type } = roomAndType;
     this.server.to(roomName).emit('show video from server', type);
   }
 
   @SubscribeMessage('clear full video')
-  clearVideo(@MessageBody() roomName: string) {
+  clearVideo(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('clear full video from server');
   }
 
   @SubscribeMessage('send notification signal')
-  async sendNotificationSignal(@MessageBody() roomName: string) {
+  async sendNotificationSignal(@MessageBody() roomName: string): Promise<void> {
     const audioBuffer = await this.overlayService.streamStartNotification();
     this.server.to(roomName).emit('get stream start notification tts', audioBuffer);
   }
 
   @SubscribeMessage('connection check from admin')
-  connectionCheckFromAdmin(@MessageBody() roomName: string) {
+  connectionCheckFromAdmin(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('connection check from server');
   }
 }

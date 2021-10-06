@@ -3,7 +3,7 @@ import { ShippingOptionDto, TempShippingOption } from '@project-lc/shared-types'
 import { useCallback } from 'react';
 import { ShippingSelectOption } from './ShippingOptionTypeSelect';
 
-export function getOptionLabel(item: ShippingOptionDto, suffix: string) {
+export function getOptionLabel(item: ShippingOptionDto, suffix: string): string {
   const { section_st: sectionStart, section_ed: sectionEnd } = item;
 
   const startLabel = sectionStart
@@ -22,7 +22,7 @@ export function ShippingOptionAppliedItem({
   selectOption: ShippingSelectOption;
   item: TempShippingOption;
   onDelete?: (id: number) => void;
-}) {
+}): JSX.Element {
   const { tempId, shippingCost: costItem } = item;
 
   const deleteItem = useCallback(() => {

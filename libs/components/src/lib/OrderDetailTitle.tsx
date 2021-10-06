@@ -17,7 +17,7 @@ dayjs.extend(relativeTime);
 export interface OrderDetailTitleProps {
   order: FindFmOrderDetailRes;
 }
-export function OrderDetailTitle({ order }: OrderDetailTitleProps) {
+export function OrderDetailTitle({ order }: OrderDetailTitleProps): JSX.Element {
   // 이 주문의 여러 환불 상태 중, 최종 환불 상태 찾기
   const refundStatus = useOrderReturnOrRefundStatus(order.refunds);
   // 이 주문의 여러 반품 상태 중, 최종 환불 상태 찾기

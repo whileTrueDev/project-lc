@@ -12,7 +12,7 @@ const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();
 const muiTheme = createMuiTheme();
 
-function CustomApp({ Component, pageProps }: AppProps) {
+function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <>
       <Head>
@@ -23,7 +23,6 @@ function CustomApp({ Component, pageProps }: AppProps) {
           <ChakraProvider theme={chakraTheme}>
             <ThemeProvider theme={muiTheme}>
               <main>
-                {/* eslint-disable-next-line react/jsx-props-no-spreading */}
                 <Component {...pageProps} />
               </main>
             </ThemeProvider>

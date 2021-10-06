@@ -6,7 +6,7 @@ import { SocialService } from './social.service';
 export class SocialLoginExceptionFilter implements ExceptionFilter {
   constructor(private readonly socialService: SocialService) {}
 
-  async catch(exception: any, host: ArgumentsHost) {
+  async catch(exception: any, host: ArgumentsHost): Promise<void> {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const { provider, providerId, accessToken, message } = exception.response;

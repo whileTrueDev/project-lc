@@ -1,6 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { MailVerificationCode } from '@prisma/client';
+import { MailVerificationCode, Prisma, PrismaPromise } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { nanoid } from 'nanoid';
 import { createVerificationTemplate } from '../_nest-units/mail-templates/createVerificationTemplate';
@@ -75,7 +75,9 @@ export class MailVerificationService {
    * 메일인증을 삭제합니다. 회원가입이 완료된 이후 진행하여야 합니다.
    * @param id 삭제할 메일 인증의 고유 아이디
    */
-  public deleteSuccessedMailVerification(email: MailVerificationCode['email']) {
+  public deleteSuccessedMailVerification(
+    email: MailVerificationCode['email'],
+  ): PrismaPromise<Prisma.BatchPayload> {
     return this.prisma.mailVerificationCode.deleteMany({ where: { email } });
   }
 }

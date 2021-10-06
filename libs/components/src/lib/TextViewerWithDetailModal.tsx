@@ -19,7 +19,7 @@ export interface TextViewerWithDetailModalProps {
 export function TextViewerWithDetailModal({
   contents,
   title,
-}: TextViewerWithDetailModalProps) {
+}: TextViewerWithDetailModalProps): JSX.Element {
   const detailDialog = useDisclosure();
   return (
     <>

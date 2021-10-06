@@ -11,7 +11,7 @@ import { GOODS_CONFIRMATION_STATUS } from '../constants/goodsStatus';
 export interface GoodsDetailSummaryProps {
   goods: GoodsByIdRes;
 }
-export function GoodsDetailSummary({ goods }: GoodsDetailSummaryProps) {
+export function GoodsDetailSummary({ goods }: GoodsDetailSummaryProps): JSX.Element {
   return (
     <SummaryList
       listItems={[
