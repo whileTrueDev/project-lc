@@ -63,7 +63,6 @@ export function ShippingOptionRepeatApply({
 
   const {
     register,
-    handleSubmit,
     setValue,
     getValues,
     control,
@@ -87,7 +86,8 @@ export function ShippingOptionRepeatApply({
     default_yn: null,
   };
 
-  const onSubmit = (data: RepeatFormType): void => {
+  const onSubmit = (): void => {
+    const data: RepeatFormType = getValues();
     const {
       firstSectionStart,
       firstSectionEnd,
@@ -159,13 +159,7 @@ export function ShippingOptionRepeatApply({
       {errors.secondCost && <ErrorText>{errors.secondCost.message}</ErrorText>}
       {errors.areaName && <ErrorText>{errors.areaName.message}</ErrorText>}
 
-      <Stack
-        direction="column"
-        as="form"
-        onSubmit={handleSubmit(onSubmit)}
-        alignItems="center"
-        {...boxStyle}
-      >
+      <Stack direction="column" as="form" alignItems="center" {...boxStyle}>
         <Stack w="100%" direction="row" justifyContent="space-between">
           {/* 지역 설정 셀렉트 */}
           <Controller
@@ -192,7 +186,7 @@ export function ShippingOptionRepeatApply({
               );
             }}
           />
-          <Button type="submit" alignSelf="flex-start">
+          <Button alignSelf="flex-start" onClick={onSubmit}>
             적용
           </Button>
         </Stack>

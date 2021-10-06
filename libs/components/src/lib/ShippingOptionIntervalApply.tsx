@@ -30,10 +30,10 @@ export function ShippingOptionIntervalApply({
   const { delivery_limit: deliveryLimit } = useShippingSetItemStore();
   const {
     register,
-    handleSubmit,
     control,
     setValue,
     setError,
+    getValues,
     formState: { isSubmitSuccessful, errors },
   } = useForm<IntervalFormType>({
     defaultValues: {
@@ -49,7 +49,8 @@ export function ShippingOptionIntervalApply({
   const { addShippingOption, shippingOptions, setShippingOptions } =
     useShippingSetItemStore();
 
-  const onSubmit = (data: IntervalFormType): void => {
+  const onSubmit = (): void => {
+    const data: IntervalFormType = getValues();
     const { section_ed, shipping_cost, shipping_area_name } = data;
     if (shipping_area_name === '지역 선택') {
       return;
@@ -122,13 +123,7 @@ export function ShippingOptionIntervalApply({
       {errors.shipping_area_name && (
         <ErrorText>{errors.shipping_area_name.message}</ErrorText>
       )}
-      <Stack
-        direction="row"
-        as="form"
-        onSubmit={handleSubmit(onSubmit)}
-        alignItems="center"
-        {...boxStyle}
-      >
+      <Stack direction="row" as="form" alignItems="center" {...boxStyle}>
         <Stack direction={{ base: 'column', sm: 'row' }}>
           {/* 범위 지정 */}
           <Stack direction="row" alignItems="center">
@@ -205,7 +200,7 @@ export function ShippingOptionIntervalApply({
           </Stack>
         </Stack>
 
-        <Button type="submit">적용</Button>
+        <Button onClick={onSubmit}>적용</Button>
       </Stack>
     </>
   );

@@ -22,10 +22,10 @@ export function ShippingOptionFixedApply({
   } = useShippingSetItemStore();
   const {
     register,
-    handleSubmit,
     formState: { errors },
     control,
     setValue,
+    getValues,
   } = useForm<ShippingCostDto>({
     defaultValues: {
       shipping_cost: 2500,
@@ -44,48 +44,47 @@ export function ShippingOptionFixedApply({
   }, [deliveryLimit, setValue, shippingSetType]);
 
   // 배송방법 추가
-  const addFixedOption = useCallback(
-    (data: ShippingCostDto) => {
-      const { shipping_area_name } = data;
-      if (shipping_area_name === '지역 선택') {
-        return;
-      }
-      const newOption: ShippingOptionDto = {
-        shipping_set_type: shippingSetType,
-        shipping_opt_type: 'fixed',
-        section_st: null,
-        section_ed: null,
-        default_yn: null,
-        shippingCost: data,
-      };
-      if (deliveryLimit === 'limit' || shippingSetType === 'add') {
-        // 지역배송인 경우
-        const sameAreaOptionIndex = shippingOptions.findIndex(
-          (opt) =>
-            opt.shippingCost.shipping_area_name === shipping_area_name &&
-            opt.shipping_set_type === shippingSetType,
-        );
-        // 기존에 동일 지역이 추가되어 있다면 해당 옵션 변경
-        if (sameAreaOptionIndex !== -1) {
-          changeShippingOption(sameAreaOptionIndex, newOption);
-        } else {
-          // 기존옵션 중 동일 지역이 없다면 추가
-          addShippingOption(newOption);
-        }
+  const addFixedOption = useCallback(() => {
+    const data: ShippingCostDto = getValues();
+    const { shipping_area_name } = data;
+    if (shipping_area_name === '지역 선택') {
+      return;
+    }
+    const newOption: ShippingOptionDto = {
+      shipping_set_type: shippingSetType,
+      shipping_opt_type: 'fixed',
+      section_st: null,
+      section_ed: null,
+      default_yn: null,
+      shippingCost: data,
+    };
+    if (deliveryLimit === 'limit' || shippingSetType === 'add') {
+      // 지역배송인 경우
+      const sameAreaOptionIndex = shippingOptions.findIndex(
+        (opt) =>
+          opt.shippingCost.shipping_area_name === shipping_area_name &&
+          opt.shipping_set_type === shippingSetType,
+      );
+      // 기존에 동일 지역이 추가되어 있다면 해당 옵션 변경
+      if (sameAreaOptionIndex !== -1) {
+        changeShippingOption(sameAreaOptionIndex, newOption);
       } else {
-        // 전국배송인 경우 1개만 설정하도록
-        setShippingOptions([newOption]);
+        // 기존옵션 중 동일 지역이 없다면 추가
+        addShippingOption(newOption);
       }
-    },
-    [
-      addShippingOption,
-      changeShippingOption,
-      deliveryLimit,
-      setShippingOptions,
-      shippingOptions,
-      shippingSetType,
-    ],
-  );
+    } else {
+      // 전국배송인 경우 1개만 설정하도록
+      setShippingOptions([newOption]);
+    }
+  }, [
+    addShippingOption,
+    changeShippingOption,
+    deliveryLimit,
+    getValues,
+    setShippingOptions,
+    shippingOptions,
+    shippingSetType,
+  ]);
 
   return (
     <>
@@ -93,12 +92,7 @@ export function ShippingOptionFixedApply({
       {errors.shipping_area_name && (
         <ErrorText>{errors.shipping_area_name.message}</ErrorText>
       )}
-      <Stack
-        direction="row"
-        as="form"
-        alignItems="center"
-        onSubmit={handleSubmit(addFixedOption)}
-      >
+      <Stack direction="row" as="form" alignItems="center">
         <Controller
           name="shipping_area_name"
           control={control}
@@ -137,7 +131,7 @@ export function ShippingOptionFixedApply({
           })}
         />
         <Text>₩</Text>
-        <Button type="submit">적용</Button>
+        <Button onClick={addFixedOption}>적용</Button>
       </Stack>
     </>
   );
