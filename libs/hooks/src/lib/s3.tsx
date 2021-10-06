@@ -69,7 +69,8 @@ export const s3 = (() => {
     };
   }
 
-  async function s3uploadFile({
+  /** public-read 로 s3 업로드 */
+  async function s3publicUploadFile({
     key,
     file,
     contentType,
@@ -135,6 +136,6 @@ export const s3 = (() => {
     s3UploadImage,
     getS3Key,
     s3DownloadImageUrl,
-    s3uploadFile,
+    s3uploadFile: s3publicUploadFile,
   };
 })();
