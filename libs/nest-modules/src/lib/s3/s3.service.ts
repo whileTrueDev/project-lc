@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { DeleteObjectsCommand, ObjectIdentifier, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectsCommand,
+  DeleteObjectsCommandOutput,
+  ObjectIdentifier,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import { parse } from 'node-html-parser';
 
@@ -19,7 +24,9 @@ export class S3Service {
   }
 
   /** lc-project 버킷에서 key[]에 해당하는 오브젝트 삭제 */
-  deleteMultipleObjects(objList: ObjectIdentifier[]) {
+  deleteMultipleObjects(
+    objList: ObjectIdentifier[],
+  ): Promise<DeleteObjectsCommandOutput> {
     return this.s3Client.send(
       new DeleteObjectsCommand({
         Bucket: this.configService.get('NEXT_PUBLIC_S3_BUCKET_NAME'),
@@ -32,7 +39,7 @@ export class S3Service {
 }
 
 /** htmlString[] 에서 <img> 태그 src[] 리턴  */
-export function getImgSrcListFromHtmlStringList(htmlContentsList: string[]) {
+export function getImgSrcListFromHtmlStringList(htmlContentsList: string[]): string[] {
   return [].concat(
     ...htmlContentsList.map((content) => {
       const dom = parse(content);
@@ -44,7 +51,7 @@ export function getImgSrcListFromHtmlStringList(htmlContentsList: string[]) {
 }
 
 /** imgSrc 에서 s3에 업로드 된 url의 key[] 리턴 */
-export function getS3KeyListFromImgSrcList(srcList: string[]) {
+export function getS3KeyListFromImgSrcList(srcList: string[]): string[] {
   const S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
   const GOODS_DIRECTORY = 'goods/';
   const GOODS_IMAGE_URL_DOMAIN = `${S3_DOMIAN}${GOODS_DIRECTORY}`;
