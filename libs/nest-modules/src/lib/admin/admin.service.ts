@@ -122,6 +122,7 @@ export class AdminService {
       data: {
         firstmallGoodsConnectionId: dto.firstmallGoodsConnectionId,
         status: dto.status,
+        rejectionReason: null,
       },
     });
 
@@ -137,6 +138,7 @@ export class AdminService {
       where: { goodsId: dto.goodsId },
       data: {
         status: dto.status,
+        rejectionReason: dto.rejectionReason,
       },
     });
 
