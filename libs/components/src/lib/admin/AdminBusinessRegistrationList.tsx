@@ -42,7 +42,7 @@ const columns: GridColumns = [
   {
     field: 'businessRegistrationImageName',
     headerName: '사업자등록증 이미지',
-    renderCell: (params) => downloadImageButton(params.row, 'business-registration'),
+    renderCell: (params) => DownloadImageButton(params.row, 'business-registration'),
   },
   {
     field: 'mailOrderSalesNumber',
@@ -51,18 +51,22 @@ const columns: GridColumns = [
   {
     field: 'mailOrderSalesImageName',
     headerName: '통신판매업등록증 이미지',
-    renderCell: (params) => downloadImageButton(params.row, 'mail-order'),
+    renderCell: (params) => DownloadImageButton(params.row, 'mail-order'),
   },
 ];
 
 // image down button
-function downloadImageButton(row: GridRowData, type: s3KeyType): JSX.Element {
+export function DownloadImageButton(row: GridRowData, type: s3KeyType): JSX.Element {
   // 해당 링크로 들어가는 버튼
   let fileName = '';
   let disabled = false;
   switch (type) {
     case 'business-registration': {
       fileName = row.businessRegistrationImageName;
+      break;
+    }
+    case 'settlement-account': {
+      fileName = row.settlementAccountImageName;
       break;
     }
     case 'mail-order': {
@@ -77,24 +81,16 @@ function downloadImageButton(row: GridRowData, type: s3KeyType): JSX.Element {
     }
   }
 
+  async function downloadFromS3(sellerEmail: string): Promise<void> {
+    const imageUrl = s3.s3DownloadImageUrl(fileName, sellerEmail, type);
+    window.open(imageUrl, '_blank');
+  }
+
   return (
-    <Button
-      size="xs"
-      onClick={() => downloadFromS3(fileName, row.sellerEmail, type)}
-      disabled={disabled}
-    >
+    <Button size="xs" onClick={() => downloadFromS3(row.sellerEmail)} disabled={disabled}>
       이미지 다운로드
     </Button>
   );
-}
-
-async function downloadFromS3(
-  fileName: string,
-  sellerEmail: string,
-  type: s3KeyType,
-): Promise<void> {
-  const imageUrl = s3.s3DownloadImageUrl(fileName, sellerEmail, type);
-  window.open(imageUrl, '_blank');
 }
 
 function makeListRow(
