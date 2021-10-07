@@ -26,7 +26,7 @@ import { AxiosError } from 'axios';
 import { GridTableItem } from '../GridTableItem';
 
 // 검수 승인시에 필요한 최소한의 데이터
-type GoodRowType = { id: number; goods_name: string };
+export type GoodRowType = { id: number; goods_name: string };
 
 type GoodsConfirmationDialogType = {
   isOpen: boolean;
@@ -81,7 +81,15 @@ export function AdminGoodsConfirmationDialog(
   }
 
   return (
-    <Modal isOpen={isOpen} size="md" onClose={useClose} initialFocusRef={initialRef}>
+    <Modal
+      isOpen={isOpen}
+      size="md"
+      onClose={() => {
+        reset();
+        onClose();
+      }}
+      initialFocusRef={initialRef}
+    >
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(useSubmit)}>
         <ModalHeader>검수 승인 하기</ModalHeader>
