@@ -31,17 +31,23 @@ export class FmOrdersController {
     private readonly fmOrdersService: FmOrdersService,
   ) {}
 
+  /** 주문 목록 조회 */
   @Get()
   async findOrders(
     @SellerInfo() seller: UserPayload,
     @Query(ValidationPipe) dto: FindFmOrdersDto,
   ): Promise<FindFmOrderRes[]> {
+    let gids: number[] | undefined; // project-lc 상품 고유 번호
+    if (dto.goodsIds && dto.goodsIds.length > 0) {
+      gids = dto.goodsIds.map((x) => Number(x));
+    }
     // 판매자의 승인된 상품 ID 목록 조회
-    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub, gids);
     if (ids.length === 0) return [];
     return this.fmOrdersService.findOrders(ids, dto);
   }
 
+  /** 개별 주문 조회 */
   @Get(':orderId')
   async findOneOrder(
     @Param('orderId') orderId: string,
