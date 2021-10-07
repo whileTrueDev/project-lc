@@ -5,13 +5,20 @@ import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import { GoodsConfirmationStatus, GoodsByIdRes } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useGoodRejectionMutation } from '@project-lc/hooks';
+import { useMemo } from 'react';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
+import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
 
 export function AdminGoodsStatusButtons(props: { goods: GoodsByIdRes }): JSX.Element {
   const { goods } = props;
   const router = useRouter();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isRejecionOpen,
+    onOpen: onRejectionOpen,
+    onClose: onRejectionClose,
+  } = useDisclosure();
   const rejectMutation = useGoodRejectionMutation();
 
   async function handleRejectionGood(row: any): Promise<void> {
@@ -34,6 +41,11 @@ export function AdminGoodsStatusButtons(props: { goods: GoodsByIdRes }): JSX.Ele
     }
   }
 
+  const goodsRowData = useMemo(
+    () => ({ id: goods.id, goods_name: goods.goods_name }),
+    [goods],
+  );
+
   return (
     <>
       <Grid templateColumns="1fr 1fr" gap={3}>
@@ -49,16 +61,23 @@ export function AdminGoodsStatusButtons(props: { goods: GoodsByIdRes }): JSX.Ele
           size="sm"
           color="red.400"
           leftIcon={<CloseIcon />}
-          onClick={() => handleRejectionGood({ id: goods.id })}
+          onClick={() => onRejectionOpen()}
         >
           검수 반려
         </Button>
       </Grid>
+      {/* 검수 승인 다이얼로그 - 퍼스트몰 상품 id 입력 */}
       <AdminGoodsConfirmationDialog
         isOpen={isOpen}
         onClose={onClose}
-        row={{ id: goods.id, goods_name: goods.goods_name }}
+        row={goodsRowData}
         callback={() => router.push('/goods')}
+      />
+      {/* 검수 반려 다이얼로그 - 반려사유 입력 */}
+      <AdminGoodsRejectionDialog
+        isOpen={isRejecionOpen}
+        onClose={onRejectionClose}
+        row={goodsRowData}
       />
     </>
   );

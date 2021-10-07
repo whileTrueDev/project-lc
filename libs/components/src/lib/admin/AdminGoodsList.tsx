@@ -25,6 +25,7 @@ import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { GOODS_STATUS } from '../../constants/goodsStatus';
 import { ShippingGroupDetailButton } from '../SellerGoodsList';
+import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
 
 function formatPrice(price: number): string {
   const formattedPrice = price.toLocaleString();
@@ -138,6 +139,11 @@ export function AdminGoodsList(): JSX.Element {
   } = useSellerGoodsListPanelStore();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isRejectionOpen,
+    onOpen: onRejectionOpen,
+    onClose: onRejectionClose,
+  } = useDisclosure();
   const [selectedRow, setSelectedRow] = useState({});
   const { data, isLoading, refetch } = useAdminGoodsList(
     {
@@ -176,7 +182,9 @@ export function AdminGoodsList(): JSX.Element {
       onOpen();
     }
     if (param.field === 'rejection') {
-      handleRejectionGood(param.row);
+      // handleRejectionGood(param.row);
+      setSelectedRow(param.row);
+      onRejectionOpen();
     }
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
   }
@@ -236,6 +244,11 @@ export function AdminGoodsList(): JSX.Element {
         callback={() => {
           refetch();
         }}
+      />
+      <AdminGoodsRejectionDialog
+        isOpen={isRejectionOpen}
+        onClose={onRejectionClose}
+        row={selectedRow}
       />
     </Box>
   );
