@@ -77,7 +77,11 @@ export function BusinessRegistrationMailOrderNumerSection(
       </GridItem>
       <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.mailOrderSalesImage}>
-          <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
+          <ImageInput
+            handleSuccess={handleSuccess}
+            handleError={handleError}
+            required={false}
+          />
           <FormErrorMessage ml={3} mt={0}>
             {errors.mailOrderSalesImage && errors.mailOrderSalesImage.message}
           </FormErrorMessage>

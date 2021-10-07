@@ -96,7 +96,11 @@ export function BusinessRegistrationDialog(
         companyName,
       });
 
-      if (!savedBusinessRegistrationImageName || !savedMailOrderSalesImageName) {
+      // 통신판매업 신고증의 경우, 선택이기 때문에 파일은 존재하나, 이미지 저장후의 이름이 존재하지 않는경우에만 에러
+      if (
+        !savedBusinessRegistrationImageName ||
+        (mailOrderSalesImageName && !savedMailOrderSalesImageName)
+      ) {
         throw new Error('S3 ERROR');
       }
 
@@ -104,8 +108,11 @@ export function BusinessRegistrationDialog(
       await mutation.mutateAsync({
         ...data,
         businessRegistrationImageName: savedBusinessRegistrationImageName,
-        mailOrderSalesImageName: savedMailOrderSalesImageName,
+        mailOrderSalesImageName: savedMailOrderSalesImageName
+          ? mailOrderSalesImageName
+          : '',
       });
+
       toast({
         title: '사업자 등록정보 등록 완료',
         status: 'success',
