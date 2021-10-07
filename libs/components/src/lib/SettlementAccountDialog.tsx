@@ -14,6 +14,8 @@ import { SettlementAccountDto } from '@project-lc/shared-types';
 import {
   useSettlementAccountMutation,
   SettlementInfoRefetchType,
+  s3,
+  useProfile,
 } from '@project-lc/hooks';
 
 import { SettlementAccountForm } from './SettlementAccountForm';
@@ -24,11 +26,16 @@ interface SettlementAccountDtoDialogProps {
   refetch: SettlementInfoRefetchType;
 }
 
+export type SettlementAccountFormDto = SettlementAccountDto & {
+  settlementAccountImage: File | null;
+};
+
 // 계좌번호 등록 다이얼로그
 export function SettlementAccountDialog(
   props: SettlementAccountDtoDialogProps,
 ): JSX.Element {
   const { isOpen, onClose, refetch } = props;
+  const { data: profileData } = useProfile();
   const toast = useToast();
   const mutation = useSettlementAccountMutation();
 
@@ -37,16 +44,37 @@ export function SettlementAccountDialog(
     register,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<SettlementAccountDto>();
+    setValue: setvalue,
+    setError: seterror,
+    clearErrors,
+  } = useForm<SettlementAccountFormDto>();
 
   function useClose(): void {
     onClose();
     reset();
   }
 
-  async function regist(data: SettlementAccountDto): Promise<void> {
+  async function regist(data: SettlementAccountFormDto): Promise<void> {
+    const { settlementAccountImageName, settlementAccountImage } = data;
     try {
-      const settlementAccount = await mutation.mutateAsync(data);
+      // s3로 이미지 저장
+      const savedSettlementAccountImageName = await s3.s3UploadImage({
+        filename: settlementAccountImageName,
+        file: settlementAccountImage,
+        type: 'settlement-account',
+        userMail: profileData?.email,
+      });
+
+      if (!savedSettlementAccountImageName) {
+        throw Error('S3 Error');
+      }
+
+      // 데이터 베이스에 저장
+      const settlementAccount = await mutation.mutateAsync({
+        ...data,
+        settlementAccountImageName: savedSettlementAccountImageName,
+      });
+
       if (!settlementAccount) {
         throw Error('정산 계좌 등록 실패');
       }
@@ -74,7 +102,13 @@ export function SettlementAccountDialog(
         <ModalHeader>정산 계좌 등록</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <SettlementAccountForm register={register} errors={errors} />
+          <SettlementAccountForm
+            register={register}
+            errors={errors}
+            seterror={seterror}
+            setvalue={setvalue}
+            clearErrors={clearErrors}
+          />
         </ModalBody>
         <ModalFooter>
           <Button type="submit" isLoading={isSubmitting}>

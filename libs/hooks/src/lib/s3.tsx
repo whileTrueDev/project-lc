@@ -3,7 +3,11 @@ import path from 'path';
 import moment from 'moment';
 
 // 추후에 S3에 저장할 데이터 종류가 더해지는 경우 추가
-export type s3KeyType = 'business-registration' | 'goods' | 'mail-order';
+export type s3KeyType =
+  | 'business-registration'
+  | 'goods'
+  | 'mail-order'
+  | 'settlement-account';
 
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
@@ -64,6 +68,10 @@ export const s3 = (() => {
         fileFullName = `${prefix}_${companyName}_통신판매업신고증${extension}`;
         break;
       }
+      case 'settlement-account': {
+        fileFullName = `${prefix}_통장사본${extension}`;
+        break;
+      }
       default: {
         fileFullName = `${filename}`;
       }
@@ -116,6 +124,7 @@ export const s3 = (() => {
       return null;
     }
     const { key, fileName } = getS3Key({ userMail, type, filename, companyName });
+
     try {
       await new AWS.S3.ManagedUpload({
         params: {
