@@ -2,6 +2,9 @@ import AWS from 'aws-sdk';
 import path from 'path';
 import moment from 'moment';
 
+// 추후에 S3에 저장할 데이터 종류가 더해지는 경우 추가
+export type s3KeyType = 'business-registration' | 'goods' | 'mail-order';
+
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
   // 해당 네임 스페이스에서의 객체선언
@@ -16,9 +19,6 @@ export const s3 = (() => {
       secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET!,
     },
   });
-
-  // 추후에 S3에 저장할 데이터 종류가 더해지는 경우 추가
-  type s3KeyType = 'business-registration' | 'goods' | 'mail-order';
 
   interface S3UploadImageOptions {
     filename: string | null;
@@ -96,14 +96,14 @@ export const s3 = (() => {
   }
 
   /**
-   * S3를 저장하는 함수
+   * S3에 이미지를 저장하는 함수
    *
    * @param file        저장할 이미지 파일
    * @param filename    저장할 이미지의 이름, 주로 확장자 추출을 위함
    * @param type         'business-registration' | 'mail-order'
    * @param userMail     업로드할 사용자의 이메일
    * @param companyName? (optional) 사업자 등록증에 등록하는 사업자명
-   * @returns
+   * @returns null 또는 파일명
    */
   async function s3UploadImage({
     file,
@@ -112,7 +112,6 @@ export const s3 = (() => {
     userMail,
     companyName,
   }: S3UploadImageOptions): Promise<string | null> {
-    // key 만들기
     if (!userMail || !file) {
       return null;
     }
@@ -135,12 +134,23 @@ export const s3 = (() => {
     }
   }
 
-  // s3 bucket에서 다운로드 하기
-  function s3DownloadImageUrl(fileName: string, sellerEmail: string): string {
+  /**
+   * S3에서 사업자등록증 또는 통신판매업신고증 다운로드
+   *
+   * @param fileName     다운로드할 이미지의 이름
+   * @param sellerEmail  다운로드할 사용자의 이메일
+   * @param type         'business-registration' | 'mail-order'
+   * @returns 해당 이미지 파일을 다운받을 수 있는 URL
+   */
+  function s3DownloadImageUrl(
+    fileName: string,
+    sellerEmail: string,
+    type: s3KeyType,
+  ): string {
     const signedUrlExpireSeconds = 60;
     const params = {
       Bucket: S3_BUCKET_NAME,
-      Key: `business-registration/${sellerEmail}/${fileName}`,
+      Key: `${type}/${sellerEmail}/${fileName}`,
       Expires: signedUrlExpireSeconds,
     };
     const imageUrl = new AWS.S3().getSignedUrl('getObject', params);
