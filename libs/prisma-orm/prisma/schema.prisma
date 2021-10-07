@@ -32,17 +32,20 @@ model SellerShop {
 }
 
 model SellerBusinessRegistration {
-  id                         Int    @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
-  sellerEmail                String // 등록한 판매자 ID 
-  companyName                String // 상호명
-  businessRegistrationNumber String // 사업자등록증 등록번호
-  representativeName         String // 대표자명
-  businessType               String // 업태
-  businessItem               String // 종목
-  businessAddress            String // 사업장 주소
-  taxInvoiceMail             String // 세금계산서 전용 이메일
-  fileName                   String // 등록된 s3 파일명
-  seller                     Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  id                            Int    @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
+  sellerEmail                   String // 등록한 판매자 ID 
+  companyName                   String // 상호명
+  businessRegistrationNumber    String // 사업자등록증 등록번호
+  representativeName            String // 대표자명
+  businessType                  String // 업태
+  businessItem                  String // 종목
+  businessAddress               String // 사업장 주소
+  taxInvoiceMail                String // 세금계산서 전용 이메일
+  businessRegistrationImageName String // 사업자등록증 이미지 파일명
+  mailOrderSalesNumber          String // 통신판매업 신고번호 
+  mailOrderSalesImageName       String // 통신판매업 이미지 파일명
+
+  seller Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 
   @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
 }
