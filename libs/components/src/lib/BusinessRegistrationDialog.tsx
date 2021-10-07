@@ -21,10 +21,22 @@ import {
 
 import { BusinessRegistrationForm } from './BusinessRegistrationForm';
 
-export type BusinessRegistrationFormDto = BusinessRegistrationDto & {
+// 사업자 등록증 이미지에 대한 DTO
+type BusinessRegistrationImageDto = {
   businessRegistrationImage: File | null;
-  imageName: string | null;
+  businessRegistrationImageName: string | null;
 };
+
+// 통신판매업 신고번호 및 이미지에 대한 DTO
+type MailOrderSalesNumberDto = {
+  mailOrderSalesNumber: string;
+  mailOrderSalesImage: File | null;
+  mailOrderSalesImageName: string | null;
+};
+
+export type BusinessRegistrationFormDto = BusinessRegistrationDto &
+  BusinessRegistrationImageDto &
+  MailOrderSalesNumberDto;
 
 interface BusinessRegistrationDialogProps {
   isOpen: boolean;
@@ -57,33 +69,45 @@ export function BusinessRegistrationDialog(
     reset();
   }
 
-  // 또 다른 s3 업로드 과정이 필요할 때, hook으로 파일 분리
-  async function saveToS3(data: BusinessRegistrationFormDto): Promise<string> {
-    const { businessRegistrationImage, imageName, companyName, ...result } = data;
-    // s3로 저장
-    const savedImageName = await s3.s3UploadImage({
-      filename: imageName,
-      userMail: profileData?.email,
-      type: 'business-registration',
-      file: businessRegistrationImage,
-      companyName,
-    });
-
-    if (!savedImageName) {
-      throw new Error('S3 ERROR');
-    }
-
-    return savedImageName;
-  }
-
   async function regist(data: BusinessRegistrationFormDto): Promise<void> {
-    const { businessRegistrationImage, imageName, ...result } = data;
+    const {
+      businessRegistrationImage,
+      businessRegistrationImageName,
+      mailOrderSalesImage,
+      mailOrderSalesImageName,
+      companyName,
+    } = data;
 
     try {
-      const savedImageName = await saveToS3(data);
-      await mutation.mutateAsync({ ...result, fileName: savedImageName });
+      // 사업자 등록증 S3 업로드
+      const savedBusinessRegistrationImageName = await s3.s3UploadImage({
+        filename: businessRegistrationImageName,
+        file: businessRegistrationImage,
+        type: 'business-registration',
+        userMail: profileData?.email,
+        companyName,
+      });
+
+      const savedMailOrderSalesImageName = await s3.s3UploadImage({
+        filename: mailOrderSalesImageName,
+        file: mailOrderSalesImage,
+        type: 'mail-order',
+        userMail: profileData?.email,
+        companyName,
+      });
+
+      if (!savedBusinessRegistrationImageName || !savedMailOrderSalesImageName) {
+        throw new Error('S3 ERROR');
+      }
+
+      // 사업자 등록증 및 통신판매업 신고증 컬럼에 값 추가
+      await mutation.mutateAsync({
+        ...data,
+        businessRegistrationImageName: savedBusinessRegistrationImageName,
+        mailOrderSalesImageName: savedMailOrderSalesImageName,
+      });
       toast({
-        title: '사업자 등록증 등록 완료',
+        title: '사업자 등록정보 등록 완료',
         status: 'success',
       });
     } catch (error) {
@@ -109,7 +133,7 @@ export function BusinessRegistrationDialog(
     >
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(regist)}>
-        <ModalHeader>사업자 등록증 등록</ModalHeader>
+        <ModalHeader>사업자 등록정보 등록</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <BusinessRegistrationForm
