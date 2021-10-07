@@ -1,43 +1,33 @@
-import NextLink from 'next/link';
 import {
   Badge,
   Box,
   Button,
   ButtonGroup,
+  Flex,
+  Link,
   Select,
   Stack,
   Text,
-  Link,
-  useDisclosure,
   useColorModeValue,
-  UnorderedList,
-  ListItem,
-  Flex,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
-import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
-import dayjs from 'dayjs';
-import {
-  GoodsConfirmationStatuses,
-  GoodsStatus,
-  GoodsView,
-  RunoutPolicy,
-} from '@prisma/client';
-import { useSellerGoodsListPanelStore } from '@project-lc/stores';
-import { SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { makeStyles } from '@material-ui/core/styles';
+import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
+import { GoodsConfirmationStatuses, GoodsStatus, GoodsView } from '@prisma/client';
+import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
+import { SellerGoodsSortColumn } from '@project-lc/shared-types';
+import { useSellerGoodsListPanelStore } from '@project-lc/stores';
+import dayjs from 'dayjs';
+import NextLink from 'next/link';
 import { useState } from 'react';
-import { ChakraDataGrid } from './ChakraDataGrid';
 import {
-  RUNOUT_POLICY,
+  GOODS_CONFIRMATION_STATUS,
   GOODS_STATUS,
   GOODS_VIEW,
-  GOODS_CONFIRMATION_STATUS,
 } from '../constants/goodsStatus';
-import { GoodsExposeSwitch } from './GoodsExposeSwitch';
-import TextWithPopperButton from './TextWithPopperButton';
-import StockInfoButton, { ExampleStockDescription } from './StockInfoButton';
+import { ChakraDataGrid } from './ChakraDataGrid';
 import DeleteGoodsAlertDialog from './DeleteGoodsAlertDialog';
+import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 import { ShippingGroupDetailModal } from './GoodsRegistShippingPolicy';
 
 function formatPrice(price: number): string {
@@ -113,73 +103,74 @@ const columns: GridColumns = [
     valueFormatter: ({ row }) => formatPrice(Number(row.default_consumer_price)),
     sortable: false,
   },
-  {
-    field: 'stock',
-    headerName: '재고/가용',
-    minWidth: 110,
-    renderHeader: () => {
-      return (
-        <TextWithPopperButton
-          title="재고/가용"
-          iconAriaLabel="재고/가용 설명"
-          iconColor="black"
-          portalBody
-        >
-          <ExampleStockDescription />
-        </TextWithPopperButton>
-      );
-    },
-    renderCell: ({ row }) => {
-      const { a_stock_count, b_stock_count, a_rstock, b_rstock, a_stock, b_stock } = row;
-      const goodsName = row.goods_name;
-      const goodsId = row.id;
-      const confirmedGoodsId = row.confirmation?.firstmallGoodsConnectionId;
-      return (
-        <Box position="relative" width="100%">
-          <Text
-            height="20px"
-            color="blue.500"
-          >{`[${a_stock_count}] ${a_stock} / ${a_rstock}`}</Text>
-          <Text color="red.500">{`[${b_stock_count}] ${b_stock} / ${b_rstock}`}</Text>
-          <StockInfoButton
-            goodsId={goodsId}
-            confirmedGoodsId={confirmedGoodsId}
-            goodsName={goodsName}
-            iconColor="black"
-          />
-        </Box>
-      );
-    },
-    sortable: false,
-  },
-  {
-    field: 'runout_policy',
-    headerName: '재고판매',
-    align: 'center',
-    valueGetter: ({ row }) => {
-      return RUNOUT_POLICY[row.runout_policy as RunoutPolicy];
-    },
-    renderHeader: () => {
-      return (
-        <TextWithPopperButton
-          title="재고판매"
-          iconAriaLabel="재고판매 설명"
-          iconColor="black"
-          portalBody
-        >
-          <Text mb={2} fontWeight="bold">
-            재고(옵션 기준)에 따른 상품 판매 설정에 따라 아래와 같이 3가지로 표기됩니다.
-          </Text>
-          <UnorderedList spacing={1}>
-            <ListItem>재고가 있으면 판매 : 재고</ListItem>
-            <ListItem>가용 재고가 있으면 판매 : 가용 재고</ListItem>
-            <ListItem>재고 상관없이 주문 가능 : 무제한</ListItem>
-          </UnorderedList>
-        </TextWithPopperButton>
-      );
-    },
-    sortable: false,
-  },
+  /* [상품 옵션] 재고 기능 임시 제거 */
+  // {
+  //   field: 'stock',
+  //   headerName: '재고/가용',
+  //   minWidth: 110,
+  //   renderHeader: () => {
+  //     return (
+  //       <TextWithPopperButton
+  //         title="재고/가용"
+  //         iconAriaLabel="재고/가용 설명"
+  //         iconColor="black"
+  //         portalBody
+  //       >
+  //         <ExampleStockDescription />
+  //       </TextWithPopperButton>
+  //     );
+  //   },
+  //   renderCell: ({ row }) => {
+  //     const { a_stock_count, b_stock_count, a_rstock, b_rstock, a_stock, b_stock } = row;
+  //     const goodsName = row.goods_name;
+  //     const goodsId = row.id;
+  //     const confirmedGoodsId = row.confirmation?.firstmallGoodsConnectionId;
+  //     return (
+  //       <Box position="relative" width="100%">
+  //         <Text
+  //           height="20px"
+  //           color="blue.500"
+  //         >{`[${a_stock_count}] ${a_stock} / ${a_rstock}`}</Text>
+  //         <Text color="red.500">{`[${b_stock_count}] ${b_stock} / ${b_rstock}`}</Text>
+  //         <StockInfoButton
+  //           goodsId={goodsId}
+  //           confirmedGoodsId={confirmedGoodsId}
+  //           goodsName={goodsName}
+  //           iconColor="black"
+  //         />
+  //       </Box>
+  //     );
+  //   },
+  //   sortable: false,
+  // },
+  // {
+  //   field: 'runout_policy',
+  //   headerName: '재고판매',
+  //   align: 'center',
+  //   valueGetter: ({ row }) => {
+  //     return RUNOUT_POLICY[row.runout_policy as RunoutPolicy];
+  //   },
+  //   renderHeader: () => {
+  //     return (
+  //       <TextWithPopperButton
+  //         title="재고판매"
+  //         iconAriaLabel="재고판매 설명"
+  //         iconColor="black"
+  //         portalBody
+  //       >
+  //         <Text mb={2} fontWeight="bold">
+  //           재고(옵션 기준)에 따른 상품 판매 설정에 따라 아래와 같이 3가지로 표기됩니다.
+  //         </Text>
+  //         <UnorderedList spacing={1}>
+  //           <ListItem>재고가 있으면 판매 : 재고</ListItem>
+  //           <ListItem>가용 재고가 있으면 판매 : 가용 재고</ListItem>
+  //           <ListItem>재고 상관없이 주문 가능 : 무제한</ListItem>
+  //         </UnorderedList>
+  //       </TextWithPopperButton>
+  //     );
+  //   },
+  //   sortable: false,
+  // },
   {
     field: 'shippingGroup',
     headerName: '배송비',

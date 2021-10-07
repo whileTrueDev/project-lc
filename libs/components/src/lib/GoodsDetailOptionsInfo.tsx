@@ -62,7 +62,8 @@ export function GoodsDetailOptionsInfo({
                   <Text fontWeight="bold">옵션노출여부</Text>
                   <Text>{option.option_view === 'Y' ? '노출' : '미노출'}</Text>
                 </Box>
-                <Box>
+                {/* [상품 옵션] 재고 기능 임시 제거 */}
+                {/* <Box>
                   <Text fontWeight="bold">총 재고</Text>
                   <Text>{option.supply.stock}</Text>
                 </Box>
@@ -75,7 +76,7 @@ export function GoodsDetailOptionsInfo({
                 <Box>
                   <Text fontWeight="bold">가용재고</Text>
                   <Text>{option.supply.stock - (option.supply.badstock || 0)}</Text>
-                </Box>
+                </Box> */}
               </SimpleGrid>
             </Box>
           ))}
@@ -95,9 +96,10 @@ export function GoodsDetailOptionsInfo({
               <Th>소비자가</Th>
               <Th>정가</Th>
               <Th>옵션노출여부</Th>
-              <Th>총 재고</Th>
+              {/* [상품 옵션] 재고 기능 임시 제거 */}
+              {/* <Th>총 재고</Th>
               <Th>불량재고</Th>
-              <Th>가용재고</Th>
+              <Th>가용재고</Th> */}
             </Tr>
           </Thead>
           <Tbody>
@@ -123,11 +125,12 @@ export function GoodsDetailOptionsInfo({
                   <Td borderBottom="none">
                     {option.option_view === 'Y' ? '노출' : '미노출'}
                   </Td>
-                  <Td borderBottom="none">{option.supply.stock}</Td>
+                  {/* [상품 옵션] 재고 기능 임시 제거 */}
+                  {/* <Td borderBottom="none">{option.supply.stock}</Td>
                   <Td borderBottom="none">{option.supply.badstock}</Td>
                   <Td borderBottom="none">
                     {option.supply.stock - (option.supply.badstock || 0)}
-                  </Td>
+                  </Td> */}
                 </Tr>
               ))}
           </Tbody>
