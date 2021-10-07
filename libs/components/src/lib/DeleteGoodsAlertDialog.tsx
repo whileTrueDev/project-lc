@@ -1,5 +1,6 @@
 import { Icon, WarningTwoIcon } from '@chakra-ui/icons';
 import {
+  Center,
   AlertDialog,
   AlertDialogOverlay,
   AlertDialogContent,
@@ -13,6 +14,7 @@ import {
   AlertDescription,
   Text,
   Stack,
+  Spinner,
 } from '@chakra-ui/react';
 import { GridSelectionModel } from '@material-ui/data-grid';
 import {
@@ -144,7 +146,12 @@ export function DeleteGoodsAlertDialog({
 
           <AlertDialogBody>
             상품 삭제시 복구가 불가합니다. 선택한 상품을 삭제하시겠습니까?
-            {!isDeletable && (
+            {orders.isLoading && (
+              <Center>
+                <Spinner />
+              </Center>
+            )}
+            {!orders.isLoading && !isDeletable && (
               <Alert status="error" mt={4}>
                 <AlertIcon />
                 <AlertDescription>
