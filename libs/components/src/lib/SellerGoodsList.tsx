@@ -1,43 +1,33 @@
-import NextLink from 'next/link';
 import {
   Badge,
   Box,
   Button,
   ButtonGroup,
+  Flex,
+  Link,
   Select,
   Stack,
   Text,
-  Link,
-  useDisclosure,
   useColorModeValue,
-  UnorderedList,
-  ListItem,
-  Flex,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
-import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
-import dayjs from 'dayjs';
-import {
-  GoodsConfirmationStatuses,
-  GoodsStatus,
-  GoodsView,
-  RunoutPolicy,
-} from '@prisma/client';
-import { useSellerGoodsListPanelStore } from '@project-lc/stores';
-import { SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { makeStyles } from '@material-ui/core/styles';
+import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
+import { GoodsConfirmationStatuses, GoodsStatus, GoodsView } from '@prisma/client';
+import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
+import { SellerGoodsSortColumn } from '@project-lc/shared-types';
+import { useSellerGoodsListPanelStore } from '@project-lc/stores';
+import dayjs from 'dayjs';
+import NextLink from 'next/link';
 import { useState } from 'react';
-import { ChakraDataGrid } from './ChakraDataGrid';
 import {
-  RUNOUT_POLICY,
+  GOODS_CONFIRMATION_STATUS,
   GOODS_STATUS,
   GOODS_VIEW,
-  GOODS_CONFIRMATION_STATUS,
 } from '../constants/goodsStatus';
-import { GoodsExposeSwitch } from './GoodsExposeSwitch';
-import TextWithPopperButton from './TextWithPopperButton';
-import StockInfoButton, { ExampleStockDescription } from './StockInfoButton';
+import { ChakraDataGrid } from './ChakraDataGrid';
 import DeleteGoodsAlertDialog from './DeleteGoodsAlertDialog';
+import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 import { ShippingGroupDetailModal } from './GoodsRegistShippingPolicy';
 
 function formatPrice(price: number): string {
