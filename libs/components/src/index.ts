@@ -76,3 +76,4 @@ export * from './lib/admin/AdminGoodsList';
 export * from './lib/admin/AdminGoodsConfirmationDialog';
 export * from './lib/TextViewerWithDetailModal';
 export * from './lib/admin/AdminGoodsStatusButtons';
+export * from './lib/LiveShoppingRegistForm';
