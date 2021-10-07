@@ -29,6 +29,7 @@ import { ChakraDataGrid } from './ChakraDataGrid';
 import DeleteGoodsAlertDialog from './DeleteGoodsAlertDialog';
 import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 import { ShippingGroupDetailModal } from './GoodsRegistShippingPolicy';
+import TextWithPopperButton from './TextWithPopperButton';
 
 function formatPrice(price: number): string {
   const formattedPrice = price.toLocaleString();
@@ -238,9 +239,41 @@ const columns: GridColumns = [
     headerName: '검수',
     width: 60,
     renderCell: ({ row }) => {
-      const { label, colorScheme } = row.confirmation
-        ? GOODS_CONFIRMATION_STATUS[row.confirmation.status as GoodsConfirmationStatuses]
-        : GOODS_CONFIRMATION_STATUS.waiting;
+      const {
+        status,
+        rejectionReason,
+      }: { status: GoodsConfirmationStatuses; rejectionReason?: string | null } =
+        row.confirmation;
+      const { label, colorScheme } =
+        GOODS_CONFIRMATION_STATUS[status as GoodsConfirmationStatuses];
+
+      // 검수 상태 : 반려된 경우
+      // 상태 옆에 '?' 버튼 추가, 해당 버튼 눌렀을 때 반려사유 팝오버
+      if (status === 'rejected') {
+        return (
+          <TextWithPopperButton
+            title={
+              <Badge
+                variant="solid"
+                colorScheme={colorScheme}
+                width="100%"
+                textAlign="center"
+              >
+                {label}
+              </Badge>
+            }
+            iconAriaLabel={label}
+            iconColor="black"
+            portalBody
+          >
+            <Text fontWeight="bold" mb={1}>
+              반려 사유
+            </Text>
+            <Text whiteSpace="break-spaces">{rejectionReason}</Text>
+          </TextWithPopperButton>
+        );
+      }
+      // 검수 상태 : 대기, 승인의 경우
       return (
         <Badge variant="solid" colorScheme={colorScheme} width="100%" textAlign="center">
           {label}
