@@ -63,13 +63,13 @@ model SellerSettlements {
 }
 
 model SellerSettlementAccount {
-  id          Int    @id @default(autoincrement())
-  sellerEmail String
-  bank        String
-  number      String
-  name        String
-  seller      Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
-
+  id                         Int    @id @default(autoincrement())
+  sellerEmail                String
+  bank                       String
+  number                     String
+  name                       String
+  settlementAccountImageName String
+  seller                     Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 
   @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
 }
@@ -392,7 +392,7 @@ model ShippingCost {
 // 라이브 커머스 랭킹 테이블
 model LiveCommerceRanking {
   id                 Int         @id @default(autoincrement())
-  nickname           String      @default("비회원") // 메세지 작성자의 닉네임
+  nickname           String      @default("���회원") // 메세지 작성자의 닉네임
   text               String      @db.LongText // 메세지 내용
   price              Int // 구매금액
   phoneCallEventFlag Boolean     @default(false) // 전화 이벤트 참여 여부 
