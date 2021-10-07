@@ -4,7 +4,7 @@ import { useColorModeValue } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
 import { SellerSettlementAccount } from '@prisma/client';
 import { ChakraDataGrid } from '../ChakraDataGrid';
-import { DownloadImageButton } from './AdminBusinessRegistrationList';
+import { AdminImageDownloadButton } from './AdminImageDownloadButton';
 
 const columns: GridColumns = [
   {
@@ -26,7 +26,7 @@ const columns: GridColumns = [
   {
     field: 'settlementAccountImageName',
     headerName: '통장사본 이미지',
-    renderCell: (params) => DownloadImageButton(params.row, 'settlement-account'),
+    renderCell: (params) => AdminImageDownloadButton(params.row, 'settlement-account'),
   },
 ];
 
