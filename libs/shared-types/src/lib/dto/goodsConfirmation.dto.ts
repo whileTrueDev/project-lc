@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsString } from 'class-validator';
 
 export enum GoodsConfirmationStatus {
   WAITING = 'waiting',
@@ -25,6 +25,5 @@ export class GoodsRejectionDto {
   status = GoodsConfirmationStatus.REJECTED;
 
   @IsString()
-  @IsOptional() // TODO: optional 삭제
-  rejectionReason?: string;
+  rejectionReason: string;
 }
