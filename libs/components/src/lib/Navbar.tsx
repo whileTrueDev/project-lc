@@ -148,11 +148,9 @@ export function Navbar(): JSX.Element {
                 fontWeight={600}
                 color="white"
                 bg="pink.400"
-                _hover={{
-                  bg: 'pink.300',
-                }}
+                _hover={{ bg: 'pink.300' }}
               >
-                시작하기
+                회원가입
               </Button>
             </>
           )}
@@ -206,6 +204,25 @@ const MobileNav = (): JSX.Element => {
 
 const MobileNavItem = ({ label, href, needLogin }: NavItem): JSX.Element => {
   const navItemTextColor = useColorModeValue('gray.600', 'gray.200');
+  const { isLoggedIn } = useIsLoggedIn();
+
+  if (needLogin) {
+    return (
+      <Flex
+        py={1}
+        justify="space-between"
+        align="center"
+        _hover={{ textDecoration: 'none' }}
+        display={isLoggedIn ? 'flex' : 'none'}
+      >
+        <NextLink href={href ?? '#'} passHref>
+          <Link fontSize="sm" fontWeight={500} color={navItemTextColor}>
+            {label}
+          </Link>
+        </NextLink>
+      </Flex>
+    );
+  }
 
   return (
     <Flex
