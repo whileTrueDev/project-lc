@@ -4,6 +4,7 @@ import { Stack, Heading } from '@chakra-ui/react';
 import { liveShoppingRegist } from '@project-lc/stores';
 import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerPhoneNumber';
 import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
+import { useApprovedGoodsList } from '../../../hooks/src/lib/queries/useApprovedGoodsList';
 
 const top100Films = [
   { title: 'The Shawshank Redemption', year: 1994 },
@@ -22,7 +23,10 @@ export function LiveShoppingRegist(): JSX.Element {
     handlePhoneNumberInput,
     handleRequestsInput,
   } = liveShoppingRegist();
-
+  const goodsList = useApprovedGoodsList({
+    email: 'leejineun94@gmail.com',
+    needName: true,
+  });
   return (
     <Stack w="100%" mt="10" spacing={12}>
       <Heading as="h6" size="xs">
