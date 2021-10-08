@@ -12,6 +12,7 @@ export const getFmOrders = async (dto: FindFmOrdersDto): Promise<FindFmOrderRes[
         searchStartDate: dto.searchStartDate,
         searchEndDate: dto.searchEndDate,
         searchStatuses: dto.searchStatuses,
+        goodsIds: dto.goodsIds,
       },
     })
     .then((res) => res.data);
@@ -28,6 +29,7 @@ export const useFmOrders = (
       dto.searchEndDate,
       dto.searchStartDate,
       dto.searchStatuses,
+      dto.goodsIds,
     ],
     () => getFmOrders(dto),
     {

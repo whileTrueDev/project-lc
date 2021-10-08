@@ -19,6 +19,7 @@ import {
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 import { BusinessRegistrationFormDto } from './BusinessRegistrationDialog';
 import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
+import { BusinessRegistrationMailOrderNumerSection } from './BusinessRegistrationMailOrderNumerSection';
 
 export interface BusinessRegistrationFormProps {
   inputRef: MutableRefObject<null>;
@@ -35,8 +36,8 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
 
   function handleSuccess(fileName: string, file: File): void {
     setvalue('businessRegistrationImage', file);
-    setvalue('imageName', fileName);
-    clearErrors(['businessRegistrationImage', 'imageName']);
+    setvalue('businessRegistrationImageName', fileName);
+    clearErrors(['businessRegistrationImage', 'businessRegistrationImageName']);
   }
 
   function handleError(errorType?: ImageInputErrorTypes): void {
@@ -58,15 +59,15 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
       default: {
         // only chrome
         setvalue('businessRegistrationImage', null);
-        setvalue('imageName', null);
-        clearErrors(['businessRegistrationImage', 'imageName']);
+        setvalue('businessRegistrationImageName', null);
+        clearErrors(['businessRegistrationImage', 'businessRegistrationImageName']);
       }
     }
   }
 
   return (
     <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>회사명</GridItem>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>회사명*</GridItem>
       <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.companyName}>
           <Input
@@ -87,7 +88,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
           </FormErrorMessage>
         </FormControl>
       </GridItem>
-      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>사업자등록번호</GridItem>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>사업자등록번호*</GridItem>
       <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.businessRegistrationNumber}>
           <Input
@@ -112,7 +113,18 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
           </FormErrorMessage>
         </FormControl>
       </GridItem>
-      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>대표자명</GridItem>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>
+        사업자 등록증 이미지 업로드*
+      </GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
+        <FormControl isInvalid={!!errors.businessRegistrationImage}>
+          <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
+          <FormErrorMessage ml={3} mt={0}>
+            {errors.businessRegistrationImage && errors.businessRegistrationImage.message}
+          </FormErrorMessage>
+        </FormControl>
+      </GridItem>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>대표자명*</GridItem>
       <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.representativeName}>
           <Input
@@ -132,7 +144,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
           </FormErrorMessage>
         </FormControl>
       </GridItem>
-      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>업태/종목</GridItem>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>업태/종목*</GridItem>
       <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <Flex direction="row">
           <FormControl isInvalid={!!errors.businessType} mr={1}>
@@ -169,7 +181,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
           </FormControl>
         </Flex>
       </GridItem>
-      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>사업장 주소</GridItem>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>사업장 주소*</GridItem>
       <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.businessAddress}>
           <Input
@@ -189,7 +201,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
         </FormControl>
       </GridItem>
       <GridItem {...useDialogHeaderConfig(useColorModeValue)}>
-        전자세금계산서 수신 이메일
+        전자세금계산서 수신 이메일*
       </GridItem>
       <GridItem {...useDialogValueConfig(useColorModeValue)}>
         <FormControl isInvalid={!!errors.taxInvoiceMail}>
@@ -213,17 +225,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
           </FormErrorMessage>
         </FormControl>
       </GridItem>
-      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>
-        사업자 등록증 이미지 업로드
-      </GridItem>
-      <GridItem {...useDialogValueConfig(useColorModeValue)}>
-        <FormControl isInvalid={!!errors.businessRegistrationImage}>
-          <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
-          <FormErrorMessage ml={3} mt={0}>
-            {errors.businessRegistrationImage && errors.businessRegistrationImage.message}
-          </FormErrorMessage>
-        </FormControl>
-      </GridItem>
+      <BusinessRegistrationMailOrderNumerSection {...props} />
     </Grid>
   );
 }

@@ -1,4 +1,4 @@
-import { useMutation, UseMutationResult } from 'react-query';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import { GoodsRejectionDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
@@ -8,7 +8,15 @@ export const useGoodRejectionMutation = (): UseMutationResult<
   AxiosError,
   GoodsRejectionDto
 > => {
-  return useMutation<any, AxiosError, GoodsRejectionDto>((dto: GoodsRejectionDto) => {
-    return axios.put<any>(`/admin/goods/reject`, dto);
-  });
+  const queryClient = useQueryClient();
+  return useMutation<any, AxiosError, GoodsRejectionDto>(
+    (dto: GoodsRejectionDto) => {
+      return axios.put<any>(`/admin/goods/reject`, dto);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('AdminGoodsList', { refetchInactive: true });
+      },
+    },
+  );
 };

@@ -1,9 +1,11 @@
+/* eslint-disable camelcase */
+// import { DeleteObjectsCommand, ObjectIdentifier, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectsCommandOutput } from '@aws-sdk/client-s3';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { GoodsInfo, GoodsView, Seller } from '@prisma/client';
+import { GoodsView, Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsByIdRes,
-  GoodsInfoDto,
   GoodsListDto,
   GoodsListRes,
   GoodsOptionsWithSupplies,
@@ -11,10 +13,18 @@ import {
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
+import {
+  S3Service,
+  getImgSrcListFromHtmlStringList,
+  getS3KeyListFromImgSrcList,
+} from '../s3/s3.service';
 
 @Injectable()
 export class GoodsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly s3service: S3Service,
+  ) {}
 
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
@@ -81,6 +91,7 @@ export class GoodsService {
       const itemStockInfo = this.intergrateOptionStocks(optionsWithStockInfo);
 
       const defaultOption = item.options.find((opt) => opt.default_option === 'y');
+
       return {
         id: item.id,
         sellerId: item.sellerId,
@@ -208,6 +219,13 @@ export class GoodsService {
     ids: number[];
   }): Promise<boolean> {
     try {
+      // 이미지 삭제
+      await this.deleteGoodsImagesFromS3(ids);
+
+      // 상세설명 이미지 삭제
+      await this.deleteGoodsContentImagesFromS3(ids);
+
+      // 상품삭제
       await this.prisma.goods.deleteMany({
         where: {
           seller: { email },
@@ -216,11 +234,61 @@ export class GoodsService {
           },
         },
       });
+
       return true;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);
     }
+  }
+
+  /** 상품의 contents에서 s3 url 값 찾아서 삭제 요청 리턴 */
+  async deleteGoodsContentImagesFromS3(
+    goodsIds: number[],
+  ): Promise<DeleteObjectsCommandOutput> {
+    // goods Id 의 contents 모두 모으기
+    const goodsContents = await this.prisma.goods.findMany({
+      where: {
+        id: {
+          in: goodsIds,
+        },
+      },
+      select: {
+        contents: true,
+      },
+    });
+
+    const contentList = goodsContents.map(({ contents }) => contents);
+
+    // 각 contents마다 img src 구하기
+    const imgSrcList: string[] = getImgSrcListFromHtmlStringList(contentList);
+
+    // img src에서 s3에 저장된 이미지만 찾기
+    const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
+
+    return this.s3service.deleteMultipleObjects(s3ImageKeys.map((key) => ({ Key: key })));
+  }
+
+  /** 상품과 연결된 GoodsImages url값을 찾아서 s3 객체 삭제 요청 리턴 */
+  async deleteGoodsImagesFromS3(goodsIds: number[]): Promise<DeleteObjectsCommandOutput> {
+    // goods Id 와 연결된 GoodsImage 찾기
+    const images = await this.prisma.goodsImages.findMany({
+      where: {
+        goodsId: {
+          in: goodsIds,
+        },
+      },
+      select: {
+        image: true,
+      },
+    });
+
+    const imageList = images.map(({ image }) => image);
+
+    // 이미지 중 s3에 업로드된 이미지 찾기
+    const s3ImageKeys = getS3KeyListFromImgSrcList(imageList);
+
+    return this.s3service.deleteMultipleObjects(s3ImageKeys.map((key) => ({ Key: key })));
   }
 
   // 노출여부 변경
@@ -272,7 +340,9 @@ export class GoodsService {
   public async registGoods(
     email: string,
     dto: RegistGoodsDto,
-  ): Promise<{ goodsId: number }> {
+  ): Promise<{
+    goodsId: number;
+  }> {
     try {
       const { options, image, shippingGroupId, goodsInfoId, ...goodsData } = dto;
       const optionsData = options.map((opt) => {
@@ -305,82 +375,6 @@ export class GoodsService {
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);
-    }
-  }
-
-  // 상품 공통정보 생성
-  async registGoodsCommonInfo(email: string, dto: GoodsInfoDto): Promise<{ id: number }> {
-    try {
-      const item = await this.prisma.goodsInfo.create({
-        data: {
-          ...dto,
-          seller: { connect: { email } },
-        },
-      });
-      return { id: item.id };
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(error, 'error in registGoodsCommonInfo');
-    }
-  }
-
-  // 상품 공통정보 삭제
-  async deleteGoodsCommonInfo(id: number): Promise<boolean> {
-    try {
-      await this.prisma.goodsInfo.delete({
-        where: {
-          id,
-        },
-      });
-      return true;
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(
-        error,
-        `error in deleteGoodsCommonInfo, id: ${id}`,
-      );
-    }
-  }
-
-  // 상품 공통정보 목록 조회
-  async getGoodsCommonInfoList(email: string): Promise<
-    {
-      id: number;
-      info_name: string;
-    }[]
-  > {
-    try {
-      const data = await this.prisma.goodsInfo.findMany({
-        where: {
-          seller: { email },
-        },
-        select: {
-          id: true,
-          info_name: true,
-        },
-      });
-      return data;
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(
-        error,
-        `error in getGoodsCommonInfoList, sellerEmail: ${email}`,
-      );
-    }
-  }
-
-  // 상품 공통정보 특정 데이터 조회
-  async getOneGoodsCommonInfo(id: number): Promise<GoodsInfo> {
-    try {
-      return this.prisma.goodsInfo.findUnique({
-        where: { id },
-      });
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(
-        error,
-        `error in getOneGoodsCommonInfo, id: ${id}`,
-      );
     }
   }
 }

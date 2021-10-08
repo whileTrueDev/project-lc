@@ -21,8 +21,9 @@ export function MypageNavbar(): JSX.Element {
 
   // * 현재 페이지에 매치하는지 확인 함수
   const isMatched = useCallback(
-    (link: MypageLink) =>
-      link.children ? router.pathname.includes(link.href) : router.pathname === link.href,
+    (link: MypageLink) => {
+      return link.checkIsActive(router.pathname, link.href);
+    },
     [router.pathname],
   );
 
@@ -45,7 +46,10 @@ export function MypageNavbar(): JSX.Element {
             <Popover trigger="hover" placement="bottom-start">
               <PopoverTrigger>
                 <Box>
-                  <NextLink href={link.children ? '#' : link.href} passHref>
+                  <NextLink
+                    href={link.children ? link.children[0].href : link.href}
+                    passHref
+                  >
                     <Link
                       py={2}
                       mx={{ base: 1, sm: 3 }}

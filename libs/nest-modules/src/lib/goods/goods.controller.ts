@@ -28,11 +28,15 @@ import { GoodsService } from './goods.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
+import { GoodsInfoService } from '../goods-info/goods-info.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('goods')
 export class GoodsController {
-  constructor(private readonly goodsService: GoodsService) {}
+  constructor(
+    private readonly goodsService: GoodsService,
+    private readonly commonInfoService: GoodsInfoService,
+  ) {}
 
   /** 상품 목록 조회 */
   @Get('/list')
@@ -78,27 +82,30 @@ export class GoodsController {
     @Body(ValidationPipe) dto: GoodsInfoDto,
   ): Promise<{ id: number }> {
     const email = seller.sub;
-    return this.goodsService.registGoodsCommonInfo(email, dto);
+    return this.commonInfoService.registGoodsCommonInfo(email, dto);
   }
 
-  /** 공통정보 삭제 */
+  /** 공통정보 삭제  */
   @Delete('/common-info')
   deleteCommonInfo(@Body('id', ParseIntPipe) id: number): Promise<boolean> {
-    return this.goodsService.deleteGoodsCommonInfo(id);
+    return this.commonInfoService.deleteGoodsCommonInfo(id);
   }
 
   /** 공통정보 목록 조회 */
   @Get('/common-info/list')
-  getGoodsCommonInfoList(
-    @SellerInfo() seller: UserPayload,
-  ): Promise<{ id: number; info_name: string }[]> {
-    return this.goodsService.getGoodsCommonInfoList(seller.sub);
+  getGoodsCommonInfoList(@SellerInfo() seller: UserPayload): Promise<
+    {
+      id: number;
+      info_name: string;
+    }[]
+  > {
+    return this.commonInfoService.getGoodsCommonInfoList(seller.sub);
   }
 
   /** 특정 공통정보 상세 조회 */
   @Get('/common-info')
   getOneGoodsCommonInfo(@Query('id', ParseIntPipe) id: number): Promise<GoodsInfo> {
-    return this.goodsService.getOneGoodsCommonInfo(id);
+    return this.commonInfoService.getOneGoodsCommonInfo(id);
   }
 
   /** 특정 상품 삭제 */

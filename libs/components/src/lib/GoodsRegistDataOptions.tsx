@@ -58,7 +58,9 @@ function NoOptionInput(): JSX.Element {
           }),
         }}
       />
-      <GoodsOptionInput
+
+      {/* [상품 옵션] 재고 기능 임시 제거 */}
+      {/* <GoodsOptionInput
         label="재고"
         inputProps={{
           type: 'number',
@@ -66,7 +68,8 @@ function NoOptionInput(): JSX.Element {
             valueAsNumber: true,
           }),
         }}
-      />
+      /> */}
+      {/* [상품 옵션] 재고 기능 임시 제거 */}
     </Stack>
   );
 }
@@ -132,6 +135,7 @@ function UseOptionInput(): JSX.Element {
           spacing={1}
           flexWrap="wrap"
         >
+          {/* 옵션값 */}
           <HStack mb={1}>
             <CloseButton onClick={() => remove(index)} />
             <HStack>
@@ -146,7 +150,10 @@ function UseOptionInput(): JSX.Element {
               />
             </HStack>
           </HStack>
+          {/* 옵션값 */}
+
           <HStack mb={1}>
+            {/* 정가 */}
             <HStack>
               <Text minWidth="40px">정가</Text>
               <Input
@@ -157,6 +164,9 @@ function UseOptionInput(): JSX.Element {
                 size="sm"
               />
             </HStack>
+            {/* 정가 */}
+
+            {/* 판매가 */}
             <HStack mb={1}>
               <Text minWidth="40px">판매가</Text>
               <Input
@@ -167,9 +177,12 @@ function UseOptionInput(): JSX.Element {
                 size="sm"
               />
             </HStack>
+            {/* 판매가 */}
           </HStack>
+
           <HStack>
-            <HStack>
+            {/* [상품 옵션] 재고 기능 임시 제거 */}
+            {/* <HStack>
               <Text minWidth="40px">재고</Text>
               <Input
                 {...register(`options.${index}.supply.stock` as const, {
@@ -178,7 +191,9 @@ function UseOptionInput(): JSX.Element {
                 width={inputWidth}
                 size="sm"
               />
-            </HStack>
+            </HStack> */}
+            {/* [상품 옵션] 재고 기능 임시 제거 */}
+
             {/* 노출 */}
             <RadioGroup
               mb={1}
@@ -194,6 +209,7 @@ function UseOptionInput(): JSX.Element {
                 </Radio>
               </HStack>
             </RadioGroup>
+            {/* 노출 */}
           </HStack>
         </Stack>
       ))}

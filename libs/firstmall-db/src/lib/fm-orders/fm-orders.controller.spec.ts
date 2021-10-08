@@ -1,10 +1,16 @@
 import { ExecutionContext } from '@nestjs/common';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GoodsModule, GoodsService, JwtAuthGuard } from '@project-lc/nest-modules';
+import {
+  GoodsModule,
+  GoodsService,
+  JwtAuthGuard,
+  S3Service,
+} from '@project-lc/nest-modules';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
+import { ConfigModule } from '@nestjs/config';
 import {
   orderDetailExportsSample,
   orderDetailItemsSample,
@@ -26,9 +32,9 @@ describe('FmOrdersController', () => {
   const TEST_EMAIL = 'test11@test.com';
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [GoodsModule, PrismaModule],
+      imports: [GoodsModule, PrismaModule, ConfigModule.forRoot({ isGlobal: true })],
       controllers: [FmOrdersController],
-      providers: [FmOrdersService, FirstmallDbService],
+      providers: [FmOrdersService, FirstmallDbService, S3Service],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({

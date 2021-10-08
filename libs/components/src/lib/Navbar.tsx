@@ -148,11 +148,9 @@ export function Navbar(): JSX.Element {
                 fontWeight={600}
                 color="white"
                 bg="pink.400"
-                _hover={{
-                  bg: 'pink.300',
-                }}
+                _hover={{ bg: 'pink.300' }}
               >
-                시작하기
+                회원가입
               </Button>
             </>
           )}
@@ -169,10 +167,16 @@ export function Navbar(): JSX.Element {
 const DesktopNav = (): JSX.Element => {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
+  const { isLoggedIn } = useIsLoggedIn();
+
+  // 로그인 여부에 따라, 로그인이 필요한 링크만 보여지도록 처리하기 위함
+  const realMainNavItems = !isLoggedIn
+    ? mainNavItems.filter((i) => !i.needLogin)
+    : mainNavItems;
 
   return (
     <Stack direction="row" spacing={4}>
-      {mainNavItems.map((navItem) => (
+      {realMainNavItems.map((navItem) => (
         <Box key={navItem.label}>
           <NextLink href={navItem.href ?? '#'} passHref>
             <Link
@@ -206,6 +210,25 @@ const MobileNav = (): JSX.Element => {
 
 const MobileNavItem = ({ label, href, needLogin }: NavItem): JSX.Element => {
   const navItemTextColor = useColorModeValue('gray.600', 'gray.200');
+  const { isLoggedIn } = useIsLoggedIn();
+
+  if (needLogin) {
+    return (
+      <Flex
+        py={1}
+        justify="space-between"
+        align="center"
+        _hover={{ textDecoration: 'none' }}
+        display={isLoggedIn ? 'flex' : 'none'}
+      >
+        <NextLink href={href ?? '#'} passHref>
+          <Link fontSize="sm" fontWeight={500} color={navItemTextColor}>
+            {label}
+          </Link>
+        </NextLink>
+      </Flex>
+    );
+  }
 
   return (
     <Flex
