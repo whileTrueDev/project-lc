@@ -11,10 +11,10 @@ export function GoodsDetailCommonInfo({
 }: GoodsDetailCommonInfoProps): JSX.Element {
   return (
     <Stack>
-      {goods.common_contents ? (
+      {goods.GoodsInfo ? (
         <TextViewerWithDetailModal
           title={`${goods.goods_name} 상품 공통 정보`}
-          contents={goods.common_contents}
+          contents={goods.GoodsInfo.info_value}
         />
       ) : (
         <Text>상품 공통 정보가 입력되지 않은 상품입니다.</Text>

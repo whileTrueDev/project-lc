@@ -5,6 +5,7 @@ import {
   GoodsDetailCommonInfo,
   GoodsDetailImagesInfo,
   GoodsDetailInfo,
+  GoodsDetailMemo,
   GoodsDetailOptionsInfo,
   GoodsDetailPurchaseLimitInfo,
   GoodsDetailShippingInfo,
@@ -81,6 +82,10 @@ export function GoodsDetail(): JSX.Element {
             <GoodsDetailShippingInfo goods={goods.data} />
           </SectionWithTitle>
         )}
+
+        <SectionWithTitle title="메모">
+          <GoodsDetailMemo goods={goods.data} />
+        </SectionWithTitle>
       </Stack>
     </MypageLayout>
   );

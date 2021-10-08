@@ -7,7 +7,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  Text,
   useDisclosure,
 } from '@chakra-ui/react';
 import { ShowMoreTextButton } from '..';
