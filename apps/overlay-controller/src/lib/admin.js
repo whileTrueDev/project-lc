@@ -125,6 +125,12 @@ $(document).ready(function ready() {
     $('#admin-message').val(null);
   });
 
+  $('#objective-button').click(async function objectiveButtonClickEvent() {
+    const objective = $('#objective-message').val();
+    await socket.emit('get objective message from admin', { roomName, objective });
+    $('#objective-message').val(null);
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
     let level;

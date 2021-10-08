@@ -95,7 +95,7 @@ export class AppMessageGateway
   }
 
   @SubscribeMessage('get objective message from admin')
-  getObjectiveMessage(@MessageBody() data: PurchaseMessage) {
+  getObjectiveMessage(@MessageBody() data: { roomName: string; objective: number }) {
     const { roomName } = data;
     this.server.to(roomName).emit('get objective message', data);
   }
