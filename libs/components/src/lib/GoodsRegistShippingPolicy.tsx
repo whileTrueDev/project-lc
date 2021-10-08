@@ -5,6 +5,7 @@ import {
   Divider,
   Flex,
   HStack,
+  Link,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -17,16 +18,14 @@ import {
   Stack,
   Text,
   useDisclosure,
-  Link,
 } from '@chakra-ui/react';
-import NextLink from 'next/link';
 import {
   ShippingGroupListItemType,
   useDeleteShippingGroup,
   useProfile,
   useSellerGoodsList,
+  useSellerShippingGroupList,
   useShippingGroupItem,
-  useShippingGroupList,
 } from '@project-lc/hooks';
 import {
   SellerGoodsSortColumn,
@@ -36,6 +35,7 @@ import {
   TempShippingSet,
 } from '@project-lc/shared-types';
 import { useShippingGroupItemStore } from '@project-lc/stores';
+import NextLink from 'next/link';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { boxStyle } from '../constants/commonStyleProps';
@@ -267,8 +267,8 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
   } = useDisclosure();
 
   const { watch, setValue } = useFormContext<GoodsFormValues>();
-  const { data: ProfileData } = useProfile();
-  const { data } = useShippingGroupList(ProfileData?.email || '', !!ProfileData);
+
+  const { data } = useSellerShippingGroupList();
   const [clickedGroupId, setClickedGroupId] = useState<null | number>(null);
 
   const { reset } = useShippingGroupItemStore();
