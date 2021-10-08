@@ -93,7 +93,6 @@ CREATE TABLE `Goods` (
     `cancel_type` VARCHAR(191) NOT NULL DEFAULT '0',
     `contents` LONGTEXT,
     `contents_mobile` LONGTEXT,
-    `common_contents` LONGTEXT NOT NULL,
     `shipping_policy` ENUM('shop', 'goods') NOT NULL DEFAULT 'shop',
     `goods_shipping_policy` ENUM('unlimit', 'limit') NOT NULL DEFAULT 'unlimit',
     `unlimit_shipping_price` INTEGER UNSIGNED,
@@ -119,7 +118,6 @@ CREATE TABLE `Goods` (
     `goodsInfoId` INTEGER,
 
     INDEX `sellerId`(`sellerId`),
-    UNIQUE INDEX `Goods_goodsInfoId_unique`(`goodsInfoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

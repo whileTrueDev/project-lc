@@ -52,7 +52,6 @@ describe('GoodsService', () => {
             cut_number: 99999,
           },
         },
-        common_contents: 'dummy common_contents',
         goods_name: 'dummy goods name',
         summary: 'dummy',
         options: {
