@@ -7,18 +7,62 @@ import {
   Select,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { UseFormRegister, FieldError, DeepMap } from 'react-hook-form';
-import { banks, SettlementAccountDto } from '@project-lc/shared-types';
+import {
+  UseFormRegister,
+  FieldError,
+  DeepMap,
+  UseFormSetError,
+  UseFormSetValue,
+  UseFormClearErrors,
+} from 'react-hook-form';
+import { banks } from '@project-lc/shared-types';
+import { SettlementAccountFormDto } from './SettlementAccountDialog';
 import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
+import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 
 export interface SettlementAccountFormProps {
-  register: UseFormRegister<SettlementAccountDto>;
-  errors: DeepMap<SettlementAccountDto, FieldError>;
+  register: UseFormRegister<SettlementAccountFormDto>;
+  errors: DeepMap<SettlementAccountFormDto, FieldError>;
+  seterror: UseFormSetError<SettlementAccountFormDto>;
+  setvalue: UseFormSetValue<SettlementAccountFormDto>;
+  clearErrors: UseFormClearErrors<SettlementAccountFormDto>;
 }
 
 export function SettlementAccountForm(props: SettlementAccountFormProps): JSX.Element {
   // 명시적 타입만 props로 전달 가능
-  const { register, errors } = props;
+  const { register, errors, seterror, setvalue, clearErrors } = props;
+
+  // 통장사본 제출
+  function handleSuccess(fileName: string, file: File): void {
+    setvalue('settlementAccountImage', file);
+    setvalue('settlementAccountImageName', fileName);
+    clearErrors(['settlementAccountImage', 'settlementAccountImageName']);
+  }
+
+  function handleError(errorType?: ImageInputErrorTypes): void {
+    switch (errorType) {
+      case 'over-size': {
+        seterror('settlementAccountImage', {
+          type: 'validate',
+          message: '10MB 이하의 이미지를 업로드해주세요.',
+        });
+        break;
+      }
+      case 'invalid-format': {
+        seterror('settlementAccountImage', {
+          type: 'error',
+          message: '파일의 형식이 올바르지 않습니다.',
+        });
+        break;
+      }
+      default: {
+        // only chrome
+        setvalue('settlementAccountImage', null);
+        setvalue('settlementAccountImageName', null);
+        clearErrors(['settlementAccountImage', 'settlementAccountImageName']);
+      }
+    }
+  }
 
   return (
     <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
@@ -81,6 +125,17 @@ export function SettlementAccountForm(props: SettlementAccountFormProps): JSX.El
           />
           <FormErrorMessage ml={3} mt={0}>
             {errors.name && errors.name.message}
+          </FormErrorMessage>
+        </FormControl>
+      </GridItem>
+      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>
+        통장사본 이미지 업로드
+      </GridItem>
+      <GridItem {...useDialogValueConfig(useColorModeValue)}>
+        <FormControl isInvalid={!!errors.settlementAccountImage}>
+          <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
+          <FormErrorMessage ml={3} mt={0}>
+            {errors.settlementAccountImage && errors.settlementAccountImage.message}
           </FormErrorMessage>
         </FormControl>
       </GridItem>

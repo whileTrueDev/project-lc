@@ -1,9 +1,10 @@
 import { GridColumns } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { useColorModeValue, Button } from '@chakra-ui/react';
-import { s3, useDisplaySize } from '@project-lc/hooks';
+import { useColorModeValue } from '@chakra-ui/react';
+import { useDisplaySize } from '@project-lc/hooks';
 import { SellerBusinessRegistration } from '@prisma/client';
 import { ChakraDataGrid } from '../ChakraDataGrid';
+import { AdminImageDownloadButton } from './AdminImageDownloadButton';
 
 const columns: GridColumns = [
   {
@@ -33,33 +34,27 @@ const columns: GridColumns = [
   {
     field: 'businessAddress',
     headerName: '사업장 주소',
+    minWidth: 1000,
   },
   {
     field: 'taxInvoiceMail',
     headerName: '계산서 발급 이메일',
   },
   {
-    field: 'fileName',
-    headerName: '이미지 파일',
-    renderCell: (params) => downloadImageButton(params.row),
+    field: 'businessRegistrationImageName',
+    headerName: '사업자등록증 이미지',
+    renderCell: (params) => AdminImageDownloadButton(params.row, 'business-registration'),
+  },
+  {
+    field: 'mailOrderSalesNumber',
+    headerName: '통신판매업등록번호',
+  },
+  {
+    field: 'mailOrderSalesImageName',
+    headerName: '통신판매업등록증 이미지',
+    renderCell: (params) => AdminImageDownloadButton(params.row, 'mail-order'),
   },
 ];
-
-// image down button
-function downloadImageButton(row: any): JSX.Element {
-  // 해당 링크로 들어가는 버튼
-  return (
-    <Button size="xs" onClick={() => downloadFromS3(row)}>
-      이미지 다운로드
-    </Button>
-  );
-}
-
-async function downloadFromS3(row: any): Promise<void> {
-  const { fileName, sellerEmail } = row;
-  const imageUrl = s3.s3DownloadImageUrl(fileName, sellerEmail);
-  window.open(imageUrl, '_blank');
-}
 
 function makeListRow(
   sellerBusinessRegistrations: SellerBusinessRegistration[] | undefined,
