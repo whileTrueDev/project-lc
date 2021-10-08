@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Center,
   CloseButton,
@@ -18,6 +17,7 @@ import {
 import { ShippingCalculTypeOptions } from '@project-lc/shared-types';
 import { useCallback } from 'react';
 import {
+  ShippingGroupContainerBox,
   ShippingGroupDeleteConfirmDialog,
   ShippingGroupDetailModal,
   ShippingGroupRegistDialog,
@@ -167,19 +167,12 @@ export function ShopInfoShippingGroup(): JSX.Element {
       <ShippingGroupRegistDialog isOpen={isOpen} onClose={onClose} onSuccess={onClose} />
 
       {/* 배송비 정책 목록 컨테이너 */}
-      <Box
-        borderWidth="1px"
-        borderRadius="lg"
-        p={4}
-        width="100%"
-        maxH="600px"
-        overflowY="auto"
-      >
+      <ShippingGroupContainerBox>
         {/* 생성된 배송비 정책 없는경우 */}
         {(!data || data.length === 0) && <Text>등록된 배송비 정책이 없습니다. </Text>}
         {/* 배송비 정책 목록 */}
         {data && data.map((g) => <ShopInfoShippingPolicyItem key={g.id} group={g} />)}
-      </Box>
+      </ShippingGroupContainerBox>
     </SettingSectionLayout>
   );
 }

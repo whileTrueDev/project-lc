@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Center,
   CloseButton,
@@ -15,9 +14,9 @@ import {
   ModalProps,
   Radio,
   RadioGroup,
-  Spacer,
   Spinner,
   Stack,
+  StackProps,
   Text,
   useDisclosure,
   useToast,
@@ -41,7 +40,6 @@ import { useShippingGroupItemStore } from '@project-lc/stores';
 import NextLink from 'next/link';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { boxStyle } from '../constants/commonStyleProps';
 import { GOODS_VIEW } from '../constants/goodsStatus';
 import { ConfirmDialog, ConfirmDialogProps } from './ConfirmDialog';
 import { GoodsFormValues } from './GoodsRegistForm';
@@ -109,6 +107,33 @@ function ShippingGroupDetail({ groupId }: { groupId: number | null }): JSX.Eleme
   );
 }
 
+// 컬럼 헤더와 목록으로 이뤄진 상자 스타일 컴포넌트 - 배송비그룹 컨테이너, 연결된상품 컨테이너에 사용할 예정
+export function OutlinedContainerBox({
+  header,
+  children,
+  ...stackProps
+}: {
+  children: React.ReactNode;
+  header: React.ReactNode;
+} & StackProps): JSX.Element {
+  return (
+    <Stack
+      spacing={2}
+      borderWidth="1px"
+      borderRadius="lg"
+      p={4}
+      width="100%"
+      maxH="600px"
+      overflowY="auto"
+      {...stackProps}
+    >
+      {header}
+      <Divider />
+      {children}
+    </Stack>
+  );
+}
+
 // 연결된 상품 목록
 function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element {
   const { data: profileData } = useProfile();
@@ -138,21 +163,15 @@ function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element 
       <Text fontSize="sm" mb={1}>
         상품명을 클릭하면 해당 상품의 상세보기 페이지로 이동합니다
       </Text>
-      <Stack
-        spacing={2}
-        borderWidth="1px"
-        borderRadius="lg"
-        p={2}
-        width="100%"
-        maxH="600px"
-        overflowY="auto"
+      <OutlinedContainerBox
+        header={
+          <HStack textAlign="center">
+            <Text width="10%">번호</Text>
+            <Text width="60%">상품명</Text>
+            <Text width="30%">노출여부</Text>
+          </HStack>
+        }
       >
-        <HStack textAlign="center">
-          <Text width="10%">번호</Text>
-          <Text width="60%">상품명</Text>
-          <Text width="30%">노출여부</Text>
-        </HStack>
-        <Divider />
         {data &&
           data.items.map((item) => {
             const { id, goods_name, goods_view } = item;
@@ -168,7 +187,7 @@ function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element 
               </HStack>
             );
           })}
-      </Stack>
+      </OutlinedContainerBox>
     </Stack>
   );
 }
@@ -187,7 +206,7 @@ function ShippingGroupListItem({
 }): JSX.Element {
   const { register } = useFormContext<GoodsFormValues>();
   return (
-    <Flex key={group.id} spacing={2}>
+    <Flex key={group.id} spacing={2} alignItems="center">
       {/* 라디오버튼 */}
       <Radio
         width="10%"
@@ -325,6 +344,28 @@ export function ShippingGroupDeleteConfirmDialog({
   );
 }
 
+/** 배송비그룹 컨테이너 상자 스타일 */
+export function ShippingGroupContainerBox({
+  children,
+  ...stackProps
+}: {
+  children: React.ReactNode;
+} & StackProps): JSX.Element {
+  return (
+    <OutlinedContainerBox
+      header={
+        <Flex fontSize="sm" justifyContent="space-around">
+          <Text>배송그룹명</Text>
+          <Text>배송비 계산 기준</Text>
+          <Text>연결된 상품</Text>
+        </Flex>
+      }
+      {...stackProps}
+    >
+      {children}
+    </OutlinedContainerBox>
+  );
+}
 export function GoodsRegistShippingPolicy(): JSX.Element {
   const {
     isOpen: registModalOpen,
@@ -382,17 +423,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
       </HStack>
 
       {/* 배송비 정책 목록 */}
-      <Stack spacing={2} maxWidth="lg" {...boxStyle}>
-        <Flex fontSize="sm">
-          <Spacer />
-          <Text>배송그룹명 ( 번호 )</Text>
-          <Spacer />
-          <Text>배송비 계산 기준</Text>
-          <Spacer />
-          <Text>연결된 상품</Text>
-          <Spacer />
-        </Flex>
-        <Divider />
+      <ShippingGroupContainerBox maxWidth="lg">
         <RadioGroup value={watch('shippingGroupId')} maxHeight="150px" overflowY="auto">
           {data &&
             data.map((g) => (
@@ -405,7 +436,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
               />
             ))}
         </RadioGroup>
-      </Stack>
+      </ShippingGroupContainerBox>
 
       {/* 배송비 정책 상세보기 모달 */}
       <ShippingGroupDetailModal
