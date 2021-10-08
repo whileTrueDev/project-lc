@@ -4,5 +4,6 @@ import { BroadcasterService } from './broadcaster.service';
 @Module({
   imports: [PrismaModule],
   providers: [BroadcasterService],
+  exports: [BroadcasterService],
 })
 export class BroadcasterModule {}
