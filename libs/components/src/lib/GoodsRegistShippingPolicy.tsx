@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Center,
   CloseButton,
@@ -133,26 +134,42 @@ function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element 
       </Center>
     );
   return (
-    <>
+    <Stack>
       <Text fontSize="sm" mb={1}>
         상품명을 클릭하면 해당 상품의 상세보기 페이지로 이동합니다
       </Text>
-      {data &&
-        data.items.map((item) => {
-          const { id, goods_name, goods_view } = item;
-          return (
-            <HStack key={item.id}>
-              <Text>{id}</Text>
-              <NextLink href={`/mypage/goods/${id}`} passHref>
-                <Link isExternal>
-                  <Text isTruncated>{goods_name}</Text>
-                </Link>
-              </NextLink>
-              <Text>{GOODS_VIEW[goods_view]}</Text>
-            </HStack>
-          );
-        })}
-    </>
+      <Stack
+        spacing={2}
+        borderWidth="1px"
+        borderRadius="lg"
+        p={2}
+        width="100%"
+        maxH="600px"
+        overflowY="auto"
+      >
+        <HStack textAlign="center">
+          <Text width="10%">번호</Text>
+          <Text width="60%">상품명</Text>
+          <Text width="30%">노출여부</Text>
+        </HStack>
+        <Divider />
+        {data &&
+          data.items.map((item) => {
+            const { id, goods_name, goods_view } = item;
+            return (
+              <HStack key={item.id} textAlign="center">
+                <Text width="10%">{id}</Text>
+                <NextLink href={`/mypage/goods/${id}`} passHref>
+                  <Link isExternal width="60%">
+                    <Text isTruncated>{goods_name}</Text>
+                  </Link>
+                </NextLink>
+                <Text width="30%">{GOODS_VIEW[goods_view]}</Text>
+              </HStack>
+            );
+          })}
+      </Stack>
+    </Stack>
   );
 }
 
