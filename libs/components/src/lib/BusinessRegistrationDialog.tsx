@@ -108,9 +108,7 @@ export function BusinessRegistrationDialog(
       await mutation.mutateAsync({
         ...data,
         businessRegistrationImageName: savedBusinessRegistrationImageName,
-        mailOrderSalesImageName: savedMailOrderSalesImageName
-          ? mailOrderSalesImageName
-          : '',
+        mailOrderSalesImageName: savedMailOrderSalesImageName || '',
       });
 
       toast({
