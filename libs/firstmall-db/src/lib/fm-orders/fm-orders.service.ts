@@ -17,6 +17,7 @@ import {
   FmOrderReturnItem,
   FmOrderStatusNumString,
 } from '@project-lc/shared-types';
+import { FmOrderMemoParser } from '@project-lc/utils';
 import { FirstmallDbService } from '../firstmall-db.service';
 
 @Injectable()
@@ -239,7 +240,10 @@ export class FmOrdersService {
     JOIN fm_order_shipping USING(order_seq)
     WHERE fm_order.order_seq = ?`;
     const result = await this.db.query(sql, [orderId]);
-    return result.length > 0 ? result[0] : null;
+    const order = result.length > 0 ? result[0] : null;
+    if (!order) return null;
+    const parser = new FmOrderMemoParser(order.memo);
+    return { ...order, memo: parser.memo };
   }
 
   private async findOneOrderItems(
