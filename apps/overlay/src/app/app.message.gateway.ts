@@ -93,4 +93,10 @@ export class AppMessageGateway
     const { roomName } = data;
     this.server.to(roomName).emit('get non client purchase message', data);
   }
+
+  @SubscribeMessage('get objective message from admin')
+  getObjectiveMessage(@MessageBody() data: PurchaseMessage) {
+    const { roomName } = data;
+    this.server.to(roomName).emit('get objective message', data);
+  }
 }

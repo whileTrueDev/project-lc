@@ -359,32 +359,32 @@ socket.on('get non client purchase message', async (data) => {
   topMessages.push({ messageHtml });
 });
 
-// socket.on('get objective message', async (data) => {
-//   const { nickname } = data;
-//   const { productName } = data;
-//   const price = data.purchaseNum;
+socket.on('get objective message', async (data) => {
+  const { nickname } = data;
+  const { productName } = data;
+  const price = data.purchaseNum;
 
-//   messageHtml = `
-//   <div class="donation-wrapper">
-//     <iframe src="/audio/alarm-type-2.wav"
-//     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
-//     <div class="centered">
-//       <div class ="animated heartbeat" id="donation-top">
-//         <span id="nickname">
-//           <span class="animated heartbeat" id="donation-user-id">수련수련</span>
-//           <span class="donation-sub">님 판매금액</span>
-//           <span class="animated heartbeat" id="donation-num">${price
-//             .toString()
-//             .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
-//           <span class="donation-sub">원 돌파!!</span>
-//         </span>
-//       </div>
-//     </div>
-//   </div>
+  messageHtml = `
+  <div class="donation-wrapper">
+    <iframe src="/audio/alarm-type-2.wav"
+    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    <div class="centered">
+      <div class ="animated heartbeat" id="donation-top">
+        <span id="nickname">
+          <span class="animated heartbeat" id="donation-user-id">수련수련</span>
+          <span class="donation-sub">님 판매금액</span>
+          <span class="animated heartbeat" id="donation-num">${price
+            .toString()
+            .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
+          <span class="donation-sub">원 돌파!!</span>
+        </span>
+      </div>
+    </div>
+  </div>
 
-//   `;
-//   topMessages.push({ messageHtml });
-// });
+  `;
+  topMessages.push({ messageHtml });
+});
 
 socket.on('toggle right-top onad logo from server', () => {
   if ($('#onad-logo').attr('src').includes('-')) {
