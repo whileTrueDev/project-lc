@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Center,
   CloseButton,
@@ -15,6 +16,7 @@ import {
   useSellerShippingGroupList,
 } from '@project-lc/hooks';
 import { ShippingCalculTypeOptions } from '@project-lc/shared-types';
+import { useShippingGroupItemStore } from '@project-lc/stores';
 import { useCallback } from 'react';
 import {
   ShippingGroupContainerBox,
@@ -147,6 +149,12 @@ export function ShopInfoShippingGroup(): JSX.Element {
   const { data, isLoading } = useSellerShippingGroupList();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const { reset } = useShippingGroupItemStore();
+  const submitSuccessHandler = (): void => {
+    reset();
+    onClose();
+  };
+
   if (isLoading) {
     return (
       <SettingSectionLayout title="배송비 정책">
@@ -164,14 +172,20 @@ export function ShopInfoShippingGroup(): JSX.Element {
       </Button>
 
       {/* 배송비 정책 생성 다이얼로그 */}
-      <ShippingGroupRegistDialog isOpen={isOpen} onClose={onClose} onSuccess={onClose} />
+      <ShippingGroupRegistDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        onSuccess={submitSuccessHandler}
+      />
 
       {/* 배송비 정책 목록 컨테이너 */}
       <ShippingGroupContainerBox>
         {/* 생성된 배송비 정책 없는경우 */}
         {(!data || data.length === 0) && <Text>등록된 배송비 정책이 없습니다. </Text>}
         {/* 배송비 정책 목록 */}
-        {data && data.map((g) => <ShopInfoShippingPolicyItem key={g.id} group={g} />)}
+        <Box maxHeight="150px" overflowY="auto">
+          {data && data.map((g) => <ShopInfoShippingPolicyItem key={g.id} group={g} />)}
+        </Box>
       </ShippingGroupContainerBox>
     </SettingSectionLayout>
   );
