@@ -84,42 +84,54 @@ export class FmOrderMemoParser {
 
   private parseMemo(s: string): FmOrderMemoItem['memo'] {
     if (!s) return null;
-    const [_, __, memo] = /(배송메모 : )(.*?)(,)/g.exec(s);
+    const processed = /(배송메모 : )(.*?)(,)/g.exec(s);
+    if (!processed) return null;
+    const [_, __, memo] = processed;
     if (!memo) return null;
     return memo;
   }
 
   private parseBroadcaster(s: string): string | null {
     if (!s) return null;
-    const [_, __, broadcaster] = /(크리에이터 채널명 : )(.*?)(,)/g.exec(s);
+    const processed = /(크리에이터 채널명 : )(.*?)(,)/g.exec(s);
+    if (!processed) return null;
+    const [_, __, broadcaster] = processed;
     if (!broadcaster) return null;
     return broadcaster;
   }
 
   private parseBuyer(s: string): FmOrderMemoItem['buyer'] {
     if (!s) return null;
-    const [_, __, buyer] = /(작성자 : )(.*?)(,)/g.exec(s);
+    const processed = /(작성자 : )(.*?)(,)/g.exec(s);
+    if (!processed) return null;
+    const [_, __, buyer] = processed;
     if (!buyer) return null;
     return buyer;
   }
 
   private parseDonationMessaage(s: string): FmOrderMemoItem['donationMessaage'] {
     if (!s) return null;
-    const [_, __, donationMessage] = /(응원내용 : )(.*?)(,)/g.exec(s);
+    const processed = /(응원내용 : )(.*?)(,)/g.exec(s);
+    if (!processed) return null;
+    const [_, __, donationMessage] = processed;
     if (!donationMessage) return null;
     return donationMessage;
   }
 
   private parsePhoneEventFlag(s: string): FmOrderMemoItem['phoneEventFlag'] {
     if (!s) return false;
-    const [_, __, phoneEventFlag] = /(통화 이벤트 : )(.*?)(,)/g.exec(s);
+    const processed = /(통화 이벤트 : )(.*?)(,)/g.exec(s);
+    if (!processed) return false;
+    const [_, __, phoneEventFlag] = processed;
     if (phoneEventFlag && phoneEventFlag === this.PHONE_EVENT_YES_TEXT) return true;
     return false;
   }
 
   private parseGiftFlag(s: string): FmOrderMemoItem['giftFlag'] {
     if (!s) return false;
-    const [_, __, giftFlag] = /(선물하기 여부 : )(.*)/g.exec(s);
+    const processed = /(선물하기 여부 : )(.*)/g.exec(s);
+    if (!processed) return false;
+    const [_, __, giftFlag] = processed;
     if (giftFlag && giftFlag === this.GIFT_YES_TEXT) return true;
     return false;
   }

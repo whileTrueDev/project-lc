@@ -72,6 +72,7 @@ export const exportItemSample: FmExportItem[] = [
     ea: 1,
     price: '1000.00',
     step: '75',
+    order_seq: '123123123123',
   },
   {
     goods_name: 'test2',
@@ -83,5 +84,6 @@ export const exportItemSample: FmExportItem[] = [
     ea: 1,
     price: '100.00',
     step: '75',
+    order_seq: '123123123123',
   },
 ];
