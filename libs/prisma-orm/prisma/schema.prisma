@@ -146,6 +146,8 @@ model GoodsConfirmation {
   firstmallGoodsConnectionId Int? // 퍼스트몰 상품 고유 ID (fm_goods.goods_seq)
   goods                      Goods                     @relation(fields: [goodsId], references: [id], onDelete: Cascade)
   rejectionReason            String?                   @db.Text // 반려사유 - 관리자가 입력
+
+  @@index([firstmallGoodsConnectionId], name: "firstmallGoodsConnectionId")
 }
 
 model GoodsOptions {

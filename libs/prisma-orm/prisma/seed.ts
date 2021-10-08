@@ -38,7 +38,20 @@ const testSellerData = {
     '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY', // asdfasdf!
 };
 
+const testAdminEmail = 'testAdmin@gmail.com';
+const testAdminData = {
+  email: testAdminEmail,
+  name: 'test관리자',
+  password:
+    '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY', // asdfasdf!
+};
+
 async function main(): Promise<void> {
+  await prisma.seller.upsert({
+    where: { email: testAdminEmail },
+    update: {},
+    create: testAdminData,
+  });
   let seller = await prisma.seller.findUnique({
     where: { email: testSellerData.email },
   });
@@ -152,7 +165,7 @@ async function main(): Promise<void> {
         ],
       },
       confirmation: {
-        create: { status: 'rejected' },
+        create: { status: 'waiting' },
       },
     },
     include: { options: { include: { supply: true } } },
