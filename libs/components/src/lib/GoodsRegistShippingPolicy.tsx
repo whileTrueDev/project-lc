@@ -11,6 +11,7 @@ import {
   ModalCloseButton,
   ModalContent,
   ModalOverlay,
+  ModalProps,
   Radio,
   RadioGroup,
   Spacer,
@@ -18,6 +19,7 @@ import {
   Stack,
   Text,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import {
   ShippingGroupListItemType,
@@ -106,7 +108,6 @@ function ShippingGroupDetail({ groupId }: { groupId: number | null }): JSX.Eleme
   );
 }
 
-// TODO: 팝업 띄우는 게 아니라 groupId로 필터링 된 상품 목록 창으로 이동시키기
 // 연결된 상품 목록
 function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element {
   const { data: profileData } = useProfile();
@@ -133,6 +134,9 @@ function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element 
     );
   return (
     <>
+      <Text fontSize="sm" mb={1}>
+        상품명을 클릭하면 해당 상품의 상세보기 페이지로 이동합니다
+      </Text>
       {data &&
         data.items.map((item) => {
           const { id, goods_name, goods_view } = item;
@@ -152,7 +156,7 @@ function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element 
   );
 }
 
-// 생성된 배송비 그룹 아이템
+// 생성된 배송비 그룹 아이템 - 상품등록 페이지에서만 사용(라디오버튼이 있음)
 function ShippingGroupListItem({
   group,
   nameHandler,
@@ -244,9 +248,69 @@ export function ShippingGroupDetailModal(
   );
 }
 
+/** 배송비 정책에 연결된 상품 보기 모달 */
+export function ShippingGroupRelatedItemsDialog(
+  props: Pick<ConfirmDialogProps, 'isOpen' | 'onClose' | 'onConfirm'> & {
+    groupId: number | null;
+  },
+): JSX.Element {
+  const { isOpen, onClose, onConfirm, groupId } = props;
+  return (
+    <ConfirmDialog
+      title="연결된 상품"
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={onConfirm}
+    >
+      <RelatedGoodsList groupId={groupId} />
+    </ConfirmDialog>
+  );
+}
+
+/** 배송비 정책 생성 모달 */
+export function ShippingGroupRegistDialog({
+  isOpen,
+  onClose,
+  onSuccess,
+}: Pick<ModalProps, 'isOpen' | 'onClose'> & {
+  onSuccess: () => void;
+}): JSX.Element {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} size="full">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalCloseButton />
+        <ModalBody maxW="4xl" mx="auto">
+          <ShippingPolicyForm onSuccess={onSuccess} />
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  );
+}
+
+/** 배송비 정책 삭제 확인 모달 */
+export function ShippingGroupDeleteConfirmDialog({
+  isOpen,
+  onClose,
+  onConfirm,
+}: Pick<ModalProps, 'isOpen' | 'onClose'> & {
+  onConfirm: () => Promise<any>;
+}): JSX.Element {
+  return (
+    <ConfirmDialog
+      title="배송비 정책 삭제"
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={onConfirm}
+    >
+      <Text>해당 배송비 그룹을 삭제하시겠습니까? 삭제 후 복구가 불가능합니다</Text>
+    </ConfirmDialog>
+  );
+}
+
 export function GoodsRegistShippingPolicy(): JSX.Element {
   const {
-    isOpen: registModalOptn,
+    isOpen: registModalOpen,
     onOpen: onRegistModalOpen,
     onClose: onRegistModalClose,
   } = useDisclosure();
@@ -270,6 +334,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
 
   const { data } = useSellerShippingGroupList();
   const [clickedGroupId, setClickedGroupId] = useState<null | number>(null);
+  const toast = useToast();
 
   const { reset } = useShippingGroupItemStore();
   const { mutateAsync } = useDeleteShippingGroup();
@@ -299,9 +364,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
         <Button onClick={onRegistModalOpen}>생성하기</Button>
       </HStack>
 
-      {/* 배송비 정책 목록
-       */}
-
+      {/* 배송비 정책 목록 */}
       <Stack spacing={2} maxWidth="lg" {...boxStyle}>
         <Flex fontSize="sm">
           <Spacer />
@@ -341,8 +404,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
       />
 
       {/* 연결된 상품 확인 모달 */}
-      <ConfirmDialog
-        title="연결된 상품"
+      <ShippingGroupRelatedItemsDialog
         isOpen={relatedGoodsModalOpen}
         onClose={onRelatedGoodsModalClose}
         onConfirm={() => {
@@ -351,37 +413,41 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
           setClickedGroupId(null);
           return Promise.resolve();
         }}
-      >
-        <RelatedGoodsList groupId={clickedGroupId} />
-      </ConfirmDialog>
+        groupId={clickedGroupId}
+      />
 
       {/* 배송비 정책 삭제 확인 모달 */}
-      <ConfirmDialog
-        title="배송비 정책 삭제"
+      <ShippingGroupDeleteConfirmDialog
         isOpen={confirmModalOpen}
         onClose={onConfirmModalClose}
         onConfirm={() => {
           const groupId = clickedGroupId;
           if (!groupId) throw new Error('shippingGroupId가 없습니다');
-          return mutateAsync({ groupId }).then((res) => {
-            setClickedGroupId(null);
-            setValue('shippingGroupId', undefined);
-          });
+          return mutateAsync({ groupId })
+            .then((res) => {
+              setClickedGroupId(null);
+              setValue('shippingGroupId', undefined);
+              toast({
+                title: '배송비 정책 삭제 성공',
+                status: 'success',
+              });
+            })
+            .catch((error) => {
+              console.error(error);
+              toast({
+                title: '배송비 정책 삭제 오류',
+                status: 'error',
+              });
+            });
         }}
-      >
-        <Text>해당 배송비 그룹을 삭제하시겠습니까? 삭제 후 복구가 불가능합니다</Text>
-      </ConfirmDialog>
+      />
 
       {/* 배송비 정책 생성 모달 */}
-      <Modal isOpen={registModalOptn} onClose={registModalCloseHandler} size="full">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton />
-          <ModalBody maxW="4xl" mx="auto">
-            <ShippingPolicyForm onSuccess={registModalCloseHandler} />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <ShippingGroupRegistDialog
+        isOpen={registModalOpen}
+        onClose={registModalCloseHandler}
+        onSuccess={registModalCloseHandler}
+      />
     </SectionWithTitle>
   );
 }
