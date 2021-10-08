@@ -63,13 +63,13 @@ model SellerSettlements {
 }
 
 model SellerSettlementAccount {
-  id          Int    @id @default(autoincrement())
-  sellerEmail String
-  bank        String
-  number      String
-  name        String
-  seller      Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
-
+  id                         Int    @id @default(autoincrement())
+  sellerEmail                String
+  bank                       String
+  number                     String
+  name                       String
+  settlementAccountImageName String
+  seller                     Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 
   @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
 }

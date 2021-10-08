@@ -74,6 +74,7 @@ export class SellerSettlementService {
         name: dto.name,
         number: dto.number,
         bank: dto.bank,
+        settlementAccountImageName: dto.settlementAccountImageName,
       },
     });
 
