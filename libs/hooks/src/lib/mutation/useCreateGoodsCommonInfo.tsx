@@ -18,7 +18,7 @@ export const useCreateGoodsCommonInfo = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries('GoodsCommonInfoList');
+        queryClient.invalidateQueries('GoodsCommonInfoList', { refetchInactive: true });
       },
     },
   );
