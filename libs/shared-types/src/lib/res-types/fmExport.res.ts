@@ -117,6 +117,8 @@ export interface FmExport {
   recipient_address_detail: FmOrder['recipient_address_detail'];
   /** 받는자 이메일 */
   recipient_email: FmOrder['recipient_email'];
+  /** 배송메모 */
+  memo: string;
 }
 
 export type FmExportItem = FmOrderExportItemOption & { order_seq: FmOrder['order_seq'] };
