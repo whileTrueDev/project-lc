@@ -1,6 +1,6 @@
 import { GridColumns } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { useColorModeValue } from '@chakra-ui/react';
+import { useColorModeValue, useDisclosure, Button } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
 import { SellerBusinessRegistration } from '@prisma/client';
 import { ChakraDataGrid } from '../ChakraDataGrid';
@@ -55,6 +55,13 @@ const columns: GridColumns = [
     renderCell: (params) => AdminImageDownloadButton(params.row, 'mail-order'),
   },
 ];
+
+// 사업자 등록 반려 클릭시
+function AdminRejectionButton(): JSX.Element {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  return <Button size="xs">반려하기</Button>;
+}
 
 function makeListRow(
   sellerBusinessRegistrations: SellerBusinessRegistration[] | undefined,
