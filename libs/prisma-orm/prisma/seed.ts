@@ -30,7 +30,7 @@ const common_contents = `
 <p>고객님께서 주문하신 상품은 입금 확인후 배송해 드립니다.</p>
 <p>다만, 상품종류에 따라서 상품의 배송이 다소 지연될 수 있습니다.</p>
 `;
-const testSellerEmail = 'a1919361@gmail.com';
+const testSellerEmail = 'testSeller@gmail.com';
 const testSellerData = {
   email: testSellerEmail,
   name: 'testSeller',
@@ -38,7 +38,20 @@ const testSellerData = {
     '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY', // asdfasdf!
 };
 
+const testAdminEmail = 'testAdmin@gmail.com';
+const testAdminData = {
+  email: testAdminEmail,
+  name: 'test관리자',
+  password:
+    '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY', // asdfasdf!
+};
+
 async function main(): Promise<void> {
+  await prisma.seller.upsert({
+    where: { email: testAdminEmail },
+    update: {},
+    create: testAdminData,
+  });
   let seller = await prisma.seller.findUnique({
     where: { email: testSellerData.email },
   });
@@ -97,7 +110,7 @@ async function main(): Promise<void> {
           baseAddress: '반송지 주소',
           detailAddress: '반송지 주소 상세',
           postalCode: '12345',
-          shipping_group_name: '배송그룹이름',
+          shipping_group_name: '기본 배송 그룹',
           seller: {
             connect: { id: seller.id },
           },
@@ -106,9 +119,10 @@ async function main(): Promise<void> {
               shipping_set_name: '배송세트이름',
               shippingOptions: {
                 create: {
+                  shipping_opt_type: 'fixed',
                   shippingCost: {
                     create: {
-                      shipping_area_name: 'shipping_area_name',
+                      shipping_area_name: '대한민국',
                       shipping_cost: 2500,
                     },
                   },
@@ -156,7 +170,7 @@ async function main(): Promise<void> {
         ],
       },
       confirmation: {
-        create: { status: 'rejected' },
+        create: { status: 'waiting' },
       },
     },
     include: { options: { include: { supply: true } } },

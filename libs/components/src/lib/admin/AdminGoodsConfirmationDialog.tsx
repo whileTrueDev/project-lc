@@ -16,6 +16,7 @@ import {
   ModalOverlay,
   useToast,
   Grid,
+  Text,
 } from '@chakra-ui/react';
 import { GoodsConfirmationStatus } from '@project-lc/shared-types';
 import { useGoodConfirmationMutation } from '@project-lc/hooks';
@@ -26,7 +27,7 @@ import { AxiosError } from 'axios';
 import { GridTableItem } from '../GridTableItem';
 
 // 검수 승인시에 필요한 최소한의 데이터
-type GoodRowType = { id: number; goods_name: string };
+export type GoodRowType = { id: number; goods_name: string };
 
 type GoodsConfirmationDialogType = {
   isOpen: boolean;
@@ -45,6 +46,7 @@ export function AdminGoodsConfirmationDialog(
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm();
   const initialRef = useRef(null);
   const toast = useToast();
@@ -81,7 +83,15 @@ export function AdminGoodsConfirmationDialog(
   }
 
   return (
-    <Modal isOpen={isOpen} size="md" onClose={useClose} initialFocusRef={initialRef}>
+    <Modal
+      isOpen={isOpen}
+      size="md"
+      onClose={() => {
+        reset();
+        onClose();
+      }}
+      initialFocusRef={initialRef}
+    >
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(useSubmit)}>
         <ModalHeader>검수 승인 하기</ModalHeader>
@@ -94,7 +104,15 @@ export function AdminGoodsConfirmationDialog(
             <FormLabel fontSize="md">상품 ID</FormLabel>
             <FormHelperText>
               퍼스트몰에 등록한 상품의 고유번호를
-              입력하세요.(http://whiletrue.firstmall.kr/goods/view?no=41 의 41을 입력)
+              입력하세요.(http://whiletrue.firstmall.kr/goods/view?no=
+              <Text as="span" color="red">
+                41
+              </Text>
+              의&nbsp;
+              <Text as="span" color="red">
+                41
+              </Text>
+              을 입력)
             </FormHelperText>
             <Input
               id="firstmallGoodsConnectionId"
@@ -117,7 +135,11 @@ export function AdminGoodsConfirmationDialog(
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Button type="submit" isLoading={isSubmitting}>
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            isDisabled={!watch('firstmallGoodsConnectionId')}
+          >
             승인하기
           </Button>
         </ModalFooter>

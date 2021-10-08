@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 
 interface TextWithPopperButtonProps extends Partial<PopoverProps> {
-  title: string;
+  title: string | React.ReactNode;
   children: React.ReactNode;
   icon?: React.ReactElement;
   iconAriaLabel: string;
@@ -35,9 +35,11 @@ export default function TextWithPopperButton({
 }: TextWithPopperButtonProps): JSX.Element {
   const { onOpen, onClose, isOpen } = useDisclosure();
 
+  const titleComponent = typeof title === 'string' ? <Text>{title}</Text> : title;
+
   return (
     <HStack spacing={0}>
-      <Text>{title}</Text>
+      {titleComponent}
       <Popover
         isLazy
         isOpen={isOpen}

@@ -24,7 +24,7 @@ export type GoodsByIdRes = Goods & {
         >;
       })
     | null;
-  confirmation: GoodsConfirmation | null;
+  confirmation: GoodsConfirmation;
   image: GoodsImages[];
   GoodsInfo: GoodsInfo | null;
 };

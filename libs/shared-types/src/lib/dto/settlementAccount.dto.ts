@@ -8,4 +8,6 @@ export class SettlementAccountDto {
   @IsString() number: string;
   // 예금주명
   @IsString() name: string;
+  // 통장사본 이미지 명
+  @IsString() settlementAccountImageName: string;
 }

@@ -63,13 +63,13 @@ model SellerSettlements {
 }
 
 model SellerSettlementAccount {
-  id          Int    @id @default(autoincrement())
-  sellerEmail String
-  bank        String
-  number      String
-  name        String
-  seller      Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
-
+  id                         Int    @id @default(autoincrement())
+  sellerEmail                String
+  bank                       String
+  number                     String
+  name                       String
+  settlementAccountImageName String
+  seller                     Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 
   @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
 }
@@ -147,6 +147,9 @@ model GoodsConfirmation {
   status                     GoodsConfirmationStatuses @default(waiting) // 검수 상태
   firstmallGoodsConnectionId Int? // 퍼스트몰 상품 고유 ID (fm_goods.goods_seq)
   goods                      Goods                     @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  rejectionReason            String?                   @db.Text // 반려사유 - 관리자가 입력
+
+  @@index([firstmallGoodsConnectionId], name: "firstmallGoodsConnectionId")
 }
 
 model GoodsOptions {
