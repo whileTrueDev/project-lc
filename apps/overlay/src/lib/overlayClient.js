@@ -316,7 +316,9 @@ socket.on('get right-top purchase message', async (data) => {
           <span id="nickname">
             <span class="animated heartbeat" id="donation-user-id">${nickname}</span>
             <span class="donation-sub">님 ${productName}</span>
-            <span class="animated heartbeat" id="donation-num">${num}</span>
+            <span class="animated heartbeat" id="donation-num">${num
+              .toString()
+              .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
             <span class="donation-sub">원 구매!</span>
           </span>
         </div>
@@ -355,6 +357,30 @@ socket.on('get non client purchase message', async (data) => {
     </div>
   </div>
   
+  `;
+  topMessages.push({ messageHtml });
+});
+
+socket.on('get objective message', async (data) => {
+  const price = data.objective;
+
+  messageHtml = `
+  <div class="donation-wrapper">
+    <iframe src="/audio/alarm-type-2.wav"
+    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    <div class="centered">
+      <div class ="animated heartbeat" id="donation-top">
+        <span id="nickname">
+          <span class="donation-sub">판매금액</span>
+          <span class="animated heartbeat" id="donation-num">${price
+            .toString()
+            .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
+          <span class="donation-sub">원 돌파!!!</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
   `;
   topMessages.push({ messageHtml });
 });

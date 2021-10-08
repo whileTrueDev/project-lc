@@ -69,11 +69,11 @@ export class OverlayService {
 
     const message = `
     <speak>
-      잠시 후, 유은님의 양품떡볶이 라이브 커머스가 시작됩니다.
+      잠시 후, 수련수련님의 싸움의고수 라이브 커머스가 시작됩니다.
     </speak>
     `;
 
-    const audioConfig: AudioEncoding = { speakingRate: 1.0, audioEncoding: 'MP3' };
+    const audioConfig: AudioEncoding = { speakingRate: 1.1, audioEncoding: 'MP3' };
     const voice: Voice = {
       languageCode: 'ko-KR',
       name: 'ko-KR-Wavenet-A',
