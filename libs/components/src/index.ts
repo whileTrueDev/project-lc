@@ -37,6 +37,7 @@ export * from './lib/GoodsRegistForm';
 export * from './lib/GoodsStatusBadge';
 export * from './lib/HorizontalImageGallery';
 export * from './lib/LoginForm';
+export * from './lib/MainBeta';
 export * from './lib/MypageLayout';
 export * from './lib/Navbar';
 export * from './lib/OrderDetailActions';
