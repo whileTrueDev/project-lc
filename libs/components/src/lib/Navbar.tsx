@@ -167,10 +167,16 @@ export function Navbar(): JSX.Element {
 const DesktopNav = (): JSX.Element => {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
+  const { isLoggedIn } = useIsLoggedIn();
+
+  // 로그인 여부에 따라, 로그인이 필요한 링크만 보여지도록 처리하기 위함
+  const realMainNavItems = !isLoggedIn
+    ? mainNavItems.filter((i) => !i.needLogin)
+    : mainNavItems;
 
   return (
     <Stack direction="row" spacing={4}>
-      {mainNavItems.map((navItem) => (
+      {realMainNavItems.map((navItem) => (
         <Box key={navItem.label}>
           <NextLink href={navItem.href ?? '#'} passHref>
             <Link
