@@ -14,3 +14,5 @@ export * from './lib/overlay/overlay.module';
 export * from './lib/overlay/overlay.service';
 export * from './lib/overlay-controller/overlay-controller.module';
 export * from './lib/overlay-controller/overlay-controller.service';
+export * from './lib/broadcaster/broadcaster.module';
+export * from './lib/broadcaster/broadcaster.service';

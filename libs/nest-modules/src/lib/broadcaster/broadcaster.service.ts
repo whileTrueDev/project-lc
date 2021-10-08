@@ -3,7 +3,7 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import { throwError } from 'rxjs';
 
 @Injectable()
-export class AppService {
+export class BroadcasterService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getUserId(overlayUrl: string): Promise<{ userId: string }> {

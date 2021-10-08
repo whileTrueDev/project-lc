@@ -6,9 +6,8 @@ import {
   HttpCode,
   NotFoundException,
 } from '@nestjs/common';
-import { OverlayService } from '@project-lc/nest-modules';
+import { OverlayService, BroadcasterService } from '@project-lc/nest-modules';
 import { UserId } from '@project-lc/shared-types';
-import { AppService } from './app.service';
 
 interface ImagesLengthAndUserId {
   verticalImagesLength: number;
@@ -18,7 +17,7 @@ interface ImagesLengthAndUserId {
 export class AppController {
   constructor(
     private readonly overlayService: OverlayService,
-    private readonly appService: AppService,
+    private readonly broadcasterService: BroadcasterService,
   ) {}
 
   @Get()
@@ -37,7 +36,7 @@ export class AppController {
   async getRender(@Param('id') id: string): Promise<ImagesLengthAndUserId> {
     const overlayUrl = `/${id}`;
     try {
-      const userId = await this.appService.getUserId(overlayUrl);
+      const userId = await this.broadcasterService.getUserId(overlayUrl);
       const verticalImagesLength = await this.overlayService.getVerticalImagesFromS3(
         userId,
       );

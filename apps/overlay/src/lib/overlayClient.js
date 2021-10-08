@@ -4,7 +4,7 @@
 const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
-const iterateLimit = $('#primary-info').data('number');
+const iterateLimit = $('#primary-info').data('number') + 1;
 const userId = $('#primary-info').data('userid');
 
 let startDate = new Date('2021-09-27T14:05:00+0900');
