@@ -59,6 +59,7 @@ export const exportSample: FmExport = {
   order_phone: '--',
   order_cellphone: '010-9999-9999',
   order_email: 'asdf@asdf.com',
+  memo: '1. 배송메모 : ㅁㄴㅇㄹ,',
 };
 
 export const exportItemSample: FmExportItem[] = [
