@@ -12,13 +12,11 @@ export const getApprovedGoodsList = async (): Promise<ApprovedGoodsList[]> => {
 
 export const useApprovedGoodsList = ({
   email,
-  needName,
 }: {
   email: string;
-  needName: boolean;
 }): UseQueryResult<ApprovedGoodsList[], AxiosError> => {
   return useQuery<ApprovedGoodsList[], AxiosError>(
-    ['ApprovedGoodsList', email, needName],
+    ['ApprovedGoodsList', email],
     getApprovedGoodsList,
   );
 };

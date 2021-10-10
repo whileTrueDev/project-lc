@@ -1,13 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
-
-import { GoodsService } from '@project-lc/nest-modules';
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApprovedGoodsNameAndIds } from '@project-lc/shared-types';
+import { GoodsService } from '../goods/goods.service';
 
 @Controller('live')
 export class LiveShoppingController {
   constructor(private readonly goodsService: GoodsService) {}
   @Get()
-  async getApprovedGoodsList(email): Promise<any[]> {
-    const goodsList = await this.goodsService.findMyGoodsIds(email);
+  async getApprovedGoodsList(@Param() email: string): Promise<ApprovedGoodsNameAndIds[]> {
+    const goodsList = await this.goodsService.findMyGoodsNames(email);
     return goodsList;
   }
 }

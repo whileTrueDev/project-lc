@@ -157,4 +157,16 @@ export class SellerService {
     });
     return seller;
   }
+
+  /** 판매자의 기본 연락처 */
+  async findDefaultContacts(sellerId: Seller['id']): Promise<any> {
+    const sellerDefaultContacts = await this.prisma.sellerContacts.findFirst({
+      where: { sellerId, isDefault: true },
+      select: {
+        email: true,
+        phoneNumber: true,
+      },
+    });
+    return sellerDefaultContacts;
+  }
 }

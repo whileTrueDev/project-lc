@@ -11,6 +11,7 @@ import {
   UseGuards,
   ValidationPipe,
   Res,
+  Param,
 } from '@nestjs/common';
 import {
   Seller,
@@ -155,5 +156,10 @@ export class SellerController {
     } catch (e) {
       res.sendStatus(500);
     }
+  }
+
+  @Get('contacts')
+  public findDefaultContacts(@Param() id): Promise<any> {
+    return this.sellerService.findDefaultContacts(id);
   }
 }

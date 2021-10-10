@@ -22,6 +22,7 @@ model Seller {
   sellerSettlements          SellerSettlements[]
   socialAccounts             SellerSocialAccount[]
   shippingGroups             ShippingGroup[]
+  SellerContacts             SellerContacts[]
 }
 
 // 마케터의 상정정보
@@ -92,6 +93,15 @@ model SellerSocialAccount {
   @@index([sellerId], name: "sellerId")
 }
 
+model SellerContacts {
+  id          Int     @id @default(autoincrement())
+  sellerId    Int
+  email       String  @default("")
+  phoneNumber String  @default("")
+  isDefault   Boolean @default(false)
+  seller      Seller  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+}
+
 // ****************************
 // * firstmall과 동일한 상품 정보 (컬럼명도 동일하게 가져갑니다.)
 // 상품 - fm_goods
@@ -134,7 +144,7 @@ model Goods {
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
   GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
-  goodsInfoId             Int?
+  goodsInfoId             Int?               @unique
 
   @@index([sellerId], name: "sellerId")
 }
@@ -170,7 +180,7 @@ model GoodsOptions {
 // 상품 옵션 재고 - fm_goods_suply
 model GoodsOptionsSupplies {
   id             Int          @id @default(autoincrement())
-  goodsOptionsId Int
+  goodsOptionsId Int          @unique
   // ���기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   stock          Int          @db.UnsignedInt // 재고
   badstock       Int?         @db.UnsignedInt // 불량재고

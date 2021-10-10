@@ -62,3 +62,8 @@ export type GoodsListRes = {
   nextPage: number | null;
   prevPage: number | null;
 };
+
+export type ApprovedGoodsNameAndIds = {
+  firstmallGoodsConnectionId: number;
+  goods_name: string;
+};
