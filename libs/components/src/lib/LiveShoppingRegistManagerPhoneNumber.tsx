@@ -73,6 +73,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
               <Input
                 id="email"
                 type="email"
+                variant="filled"
                 placeholder="minsu@example.com"
                 autoComplete="off"
                 width={300}
@@ -86,32 +87,35 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
             <Stack direction="row" alignItems="center">
               {data === '' || radio === '2' ? (
                 <InputGroup width={300} alignItems="center">
-                  <Input type="text" maxLength={3} value="" />
+                  <Input type="text" maxLength={3} />
                   <span>-</span>
-                  <Input type="text" maxLength={4} value="" />
+                  <Input type="text" maxLength={4} />
                   <span>-</span>
-                  <Input type="text" maxLength={4} value="" />
+                  <Input type="text" maxLength={4} />
                 </InputGroup>
               ) : (
                 <InputGroup width={300} alignItems="center">
                   <Input
                     type="text"
+                    variant="filled"
                     maxLength={3}
-                    value={makePhoneNumberForm(data.phoneNumber).first}
+                    defaultValue={makePhoneNumberForm(data.phoneNumber).first}
                     isDisabled
                   />
                   <span>-</span>
                   <Input
                     type="text"
+                    variant="filled"
                     maxLength={4}
-                    value={makePhoneNumberForm(data.phoneNumber).second}
+                    defaultValue={makePhoneNumberForm(data.phoneNumber).second}
                     isDisabled
                   />
                   <span>-</span>
                   <Input
                     type="text"
+                    variant="filled"
                     maxLength={4}
-                    value={makePhoneNumberForm(data.phoneNumber).third}
+                    defaultValue={makePhoneNumberForm(data.phoneNumber).third}
                     isDisabled
                   />
                 </InputGroup>

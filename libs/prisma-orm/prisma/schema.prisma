@@ -23,6 +23,7 @@ model Seller {
   socialAccounts             SellerSocialAccount[]
   shippingGroups             ShippingGroup[]
   SellerContacts             SellerContacts[]
+  LiveShopping               LiveShopping[]
 }
 
 // 마케터의 상정정보
@@ -94,12 +95,13 @@ model SellerSocialAccount {
 }
 
 model SellerContacts {
-  id          Int     @id @default(autoincrement())
-  sellerId    Int
-  email       String  @default("")
-  phoneNumber String  @default("")
-  isDefault   Boolean @default(false)
-  seller      Seller  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  id           Int            @id @default(autoincrement())
+  sellerId     Int
+  email        String         @default("")
+  phoneNumber  String         @default("")
+  isDefault    Boolean        @default(false)
+  seller       Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  LiveShopping LiveShopping[]
 }
 
 // ****************************
@@ -146,6 +148,7 @@ model Goods {
   GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
   goodsInfoId             Int?               @unique
 
+  LiveShopping LiveShopping[]
   @@index([sellerId], name: "sellerId")
 }
 
@@ -423,5 +426,21 @@ model Broadcaster {
   createDate          DateTime              @default(now())
   deleteFlag          Boolean               @default(false) // 회원탈퇴 여부
 
+  LiveShopping LiveShopping[]
   @@index(userId)
+}
+
+model LiveShopping {
+  id             Int            @id @default(autoincrement())
+  streamId       String?        @unique
+  broadcasterId  String?        @db.VarChar(20) // 스트리머의 아이디 
+  sellerId       Int
+  goodsId        Int
+  contactId      Int
+  requests       String?        @db.LongText
+  progress       String         @default("registered")
+  sellerContacts SellerContacts @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  seller         Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  goods          Goods          @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  broadcaster    Broadcaster?   @relation(fields: [broadcasterId], references: [userId])
 }
