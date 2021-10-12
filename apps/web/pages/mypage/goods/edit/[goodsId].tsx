@@ -1,6 +1,6 @@
 import { useGoodsById } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
-import { MypageLayout, GoodsRegistForm } from '@project-lc/components';
+import { MypageLayout, GoodsEditForm } from '@project-lc/components';
 import { Container, Heading } from '@chakra-ui/react';
 
 export function GoodsEdit(): JSX.Element {
@@ -15,7 +15,7 @@ export function GoodsEdit(): JSX.Element {
     <MypageLayout>
       <Container maxWidth="container.xl" my={12}>
         <Heading>상품수정 {goodsId}</Heading>
-        <GoodsRegistForm goodsData={goods.data} />
+        <GoodsEditForm goodsData={goods.data} />
       </Container>
     </MypageLayout>
   );
