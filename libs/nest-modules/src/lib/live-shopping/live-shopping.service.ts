@@ -8,6 +8,7 @@ export class LiveShoppingService {
   async createLiveShopping(sellerId, dto): Promise<any> {
     console.log('sellerID', sellerId);
     console.log('dto', dto);
+    console.log(dto.requests);
     const streamId = Math.random().toString(36).substr(2, 11);
 
     const userId = await this.prisma.seller.findFirst({
@@ -21,10 +22,11 @@ export class LiveShoppingService {
       data: {
         seller: { connect: { id: userId.id } },
         streamId,
+        requests: dto.reqeusts,
         goods: { connect: { id: dto.goods_id } },
-        sellerContacts: { connect: { id: 1 } },
+        sellerContacts: { connect: { id: dto.contactId } },
       },
     });
-    return { goodsId: liveShopping.id };
+    return { liveShoppingId: liveShopping.id };
   }
 }

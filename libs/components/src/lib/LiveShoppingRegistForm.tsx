@@ -1,6 +1,6 @@
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField } from '@material-ui/core';
-import { Stack, Heading, theme, Button, Flex } from '@chakra-ui/react';
+import { Stack, Heading, theme, Button, Flex, useToast } from '@chakra-ui/react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { liveShoppingRegist } from '@project-lc/stores';
 import {
@@ -8,15 +8,35 @@ import {
   useApprovedGoodsList,
   useDefaultContacts,
   useCreateLiveShopping,
+  useCreateSellerContacts,
 } from '@project-lc/hooks';
+import { useRouter } from 'next/router';
 import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerPhoneNumber';
 import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
 
+export interface UseForm {
+  contactId: number;
+  email: string;
+  firstNumber: string;
+  goods_id: number;
+  phoneNumber: string;
+  requests: string;
+  secondNumber: string;
+  setDefault: boolean;
+  thirdNumber: string;
+  useContact: string;
+}
+
 export function LiveShoppingRegist(): JSX.Element {
-  const { selectedGoods, handleGoodsSelect } = liveShoppingRegist();
+  const { selectedGoods, handleGoodsSelect, setDefault, handleSetDefault } =
+    liveShoppingRegist();
   const { data: profileData } = useProfile();
   const { setValue, watch } = useForm();
   const { mutateAsync } = useCreateLiveShopping();
+  const { mutateAsync: createSellerContacts } = useCreateSellerContacts();
+
+  const toast = useToast();
+  const router = useRouter();
 
   const goodsList = useApprovedGoodsList({
     email: profileData?.email || '',
@@ -26,7 +46,7 @@ export function LiveShoppingRegist(): JSX.Element {
     id: profileData?.id || '',
   });
 
-  const methods = useForm<any>({
+  const methods = useForm<UseForm>({
     defaultValues: {
       useContact: '',
       goods_id: 0,
@@ -34,35 +54,67 @@ export function LiveShoppingRegist(): JSX.Element {
       firstNumber: '',
       secondNumber: '',
       thirdNumber: '',
-      setDefault: '',
+      setDefault: undefined,
       requests: '',
     },
   });
 
   const { handleSubmit } = methods;
 
-  const regist = async (data: any): Promise<void> => {
-    const concatData = Object.assign(data);
+  const regist = async (data: UseForm): Promise<void> => {
+    console.log(data);
+    const { firstNumber, secondNumber, thirdNumber, useContact } = data;
+    const phoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
+    let concatData = Object.assign(data);
+
     concatData.goods_id = watch('goods_id');
+    concatData.phoneNumber = phoneNumber;
 
-    const { firstNumber, secondNumber, thirdNumber, useContact, setDefault } = concatData;
-
-    const fullPhoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
-    concatData.phoneNumber = fullPhoneNumber;
-    console.log(concatData);
-    if (useContact) {
-      // 기존 연락처 사용
-      console.log('기존 연락처 사용');
-      mutateAsync(concatData).then((res: any) => {
-        console.log('res', res);
-      });
+    if (useContact === 'old') {
+      mutateAsync(concatData)
+        .then(() => {
+          toast({
+            title: '상품을 성공적으로 등록하였습니다',
+            status: 'success',
+          });
+          router.push('/mypage/goods');
+        })
+        .catch(() => {
+          toast({
+            title: '상품 등록 중 오류가 발생하였습니다',
+            status: 'error',
+          });
+        });
     } else {
-      // 새로운 연락처 사용
-      console.log('새로운 연락처 사용');
-      if (setDefault) {
-        // 새로운 연락처 기본으로 설정
-        console.log('새로운 연락처 기본으로 설정');
-      }
+      concatData.setDefault = setDefault;
+
+      const contactId = await createSellerContacts({
+        email: concatData.email,
+        phoneNumber,
+        isDefault: setDefault,
+      }).catch(() => {
+        toast({
+          title: '상품 등록 중 오류가 발생하였습니다',
+          status: 'error',
+        });
+      });
+
+      concatData = Object.assign(concatData, contactId);
+
+      mutateAsync(concatData)
+        .then(() => {
+          toast({
+            title: '상품을 성공적으로 등록하였습니다',
+            status: 'success',
+          });
+          router.push('/mypage/live/vod');
+        })
+        .catch(() => {
+          toast({
+            title: '상품 등록 중 오류가 발생하였습니다',
+            status: 'error',
+          });
+        });
     }
   };
 
@@ -79,7 +131,7 @@ export function LiveShoppingRegist(): JSX.Element {
             <>
               <Autocomplete
                 options={goodsList.data}
-                getOptionLabel={(option) => option.goods_name}
+                getOptionLabel={(option) => option?.goods_name}
                 style={{ width: 300, marginTop: 0 }}
                 renderInput={(params) => (
                   <TextField {...params} label="등록할 상품명을 검색하세요" fullWidth />
@@ -90,7 +142,10 @@ export function LiveShoppingRegist(): JSX.Element {
                   handleGoodsSelect(newValue);
                 }}
               />
-              <LiveShoppingManagerPhoneNumber data={contacts.data} />
+              <LiveShoppingManagerPhoneNumber
+                data={contacts.data}
+                handleSetDefault={handleSetDefault}
+              />
               <LiveShoppingRequestInput />
               <Flex
                 py={4}
@@ -103,7 +158,7 @@ export function LiveShoppingRegist(): JSX.Element {
                 justifyContent="flex-end"
                 zIndex={theme.zIndices.sticky}
               >
-                <Button type="submit" colorScheme="blue">
+                <Button type="submit" colorScheme="blue" isDisabled={!selectedGoods}>
                   등록
                 </Button>
               </Flex>

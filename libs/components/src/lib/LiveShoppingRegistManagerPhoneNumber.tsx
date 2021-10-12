@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Radio,
   RadioGroup,
@@ -13,15 +13,24 @@ import {
 } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
 
+export interface UseFormContext {
+  useContact: string;
+  setDefault: string;
+  firstNumber: string;
+  secondNumber: string;
+  thirdNumber: string;
+  email: string;
+}
+
 export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
-  const { data } = props;
+  const { data, handleSetDefault } = props;
 
   const {
     register,
     setValue,
     formState: { errors },
     watch,
-  } = useFormContext<any>();
+  } = useFormContext<UseFormContext>();
 
   type Keys = 'first' | 'second' | 'third';
   type SlicedPhoneNumber = { [k in Keys]: string };
@@ -61,7 +70,6 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
               onChange={(value) => {
                 setValue('useContact', value);
               }}
-              // value={watch('useContact')}
               defaultValue="new"
             >
               <Stack spacing={3} direction="row">
@@ -78,7 +86,6 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
               onChange={(value) => {
                 setValue('useContact', value);
               }}
-              // value={watch('useContact')}
               defaultValue="old"
             >
               <Stack spacing={3} direction="row">
@@ -91,6 +98,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
               </Stack>
             </RadioGroup>
           )}
+
           <Stack
             outline="solid 0.5px lightgray"
             width="600px"
@@ -130,7 +138,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                   <Input
                     type="text"
                     maxLength={3}
-                    value={watch('firstNumber')}
+                    value={watch('firstNumber', '')}
                     {...register('firstNumber', {
                       required: "'-'을 제외하고 숫자만 입력하세요.",
                       pattern: {
@@ -143,7 +151,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                   <Input
                     type="text"
                     maxLength={4}
-                    value={watch('secondNumber')}
+                    value={watch('secondNumber', '')}
                     {...register('secondNumber', {
                       required: "'-'을 제외하고 숫자만 입력하세요.",
                       pattern: {
@@ -156,7 +164,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                   <Input
                     type="text"
                     maxLength={4}
-                    value={watch('thirdNumber')}
+                    value={watch('thirdNumber', '')}
                     {...register('thirdNumber', {
                       required: "'-'을 제외하고 숫자만 입력하세요.",
                       pattern: {
@@ -222,19 +230,14 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                   errors.thirdNumber &&
                   errors.thirdNumber.message}
               </FormErrorMessage>
-              {data === '' ? (
-                <Checkbox
-                  onChange={(value) => {
-                    setValue('setDefault', value);
-                  }}
-                  value="Y"
-                  isChecked
-                  isDisabled
-                >
+              {data === '' || watch('useContact') === 'old' ? (
+                <Checkbox isChecked isDisabled>
                   기본으로 설정
                 </Checkbox>
               ) : (
-                <Checkbox>기본으로 설정</Checkbox>
+                <Checkbox onChange={(e) => handleSetDefault(e.target.checked)}>
+                  기본으로 설정
+                </Checkbox>
               )}
             </Stack>
           </Stack>

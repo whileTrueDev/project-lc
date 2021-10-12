@@ -102,6 +102,7 @@ model SellerContacts {
   isDefault    Boolean        @default(false)
   seller       Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   LiveShopping LiveShopping[]
+  createDate   DateTime       @default(now())
 }
 
 // ****************************
@@ -443,4 +444,5 @@ model LiveShopping {
   seller         Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   goods          Goods          @relation(fields: [goodsId], references: [id], onDelete: Cascade)
   broadcaster    Broadcaster?   @relation(fields: [broadcasterId], references: [userId])
+  createDate     DateTime       @default(now())
 }

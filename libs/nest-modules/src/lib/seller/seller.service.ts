@@ -159,7 +159,7 @@ export class SellerService {
   }
 
   /** 판매자의 기본 연락처 */
-  async findDefaultContacts(sellerId: Seller['id']): Promise<any> {
+  async findDefaultContacts(sellerId: string): Promise<any> {
     const sellerDefaultContacts = await this.prisma.sellerContacts.findFirst({
       where: { sellerId, isDefault: true },
       select: {
@@ -168,5 +168,25 @@ export class SellerService {
       },
     });
     return sellerDefaultContacts;
+  }
+
+  async registSellerContacts(sellerId, dto): Promise<{ contactId: number }> {
+    const userId = await this.prisma.seller.findFirst({
+      where: { email: sellerId },
+      select: {
+        id: true,
+      },
+    });
+
+    const contact = await this.prisma.sellerContacts.create({
+      data: {
+        seller: { connect: { id: userId.id } },
+        email: dto.email,
+        phoneNumber: dto.phoneNumber,
+        isDefault: dto.setDefault ? true : undefined,
+      },
+    });
+    console.log(contact.id);
+    return { contactId: contact.id };
   }
 }

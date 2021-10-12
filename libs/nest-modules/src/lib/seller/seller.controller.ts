@@ -27,6 +27,7 @@ import {
   SettlementAccountDto,
   SellerShopInfoDto,
   FindSellerRes,
+  SellerContactsDTO,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -158,8 +159,19 @@ export class SellerController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('contacts')
-  public findDefaultContacts(@Param() id): Promise<any> {
-    return this.sellerService.findDefaultContacts(id);
+  public findDefaultContacts(@Query('contacts') email: string): Promise<any> {
+    return this.sellerService.findDefaultContacts(email);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('contacts-create')
+  public createContacts(
+    @SellerInfo() seller: UserPayload,
+    @Body(ValidationPipe) dto: SellerContactsDTO,
+  ): Promise<{ contactId: number }> {
+    const email = seller.sub;
+    return this.sellerService.registSellerContacts(email, dto);
   }
 }

@@ -42,6 +42,7 @@ export * from './lib/dto/shippingGroup.dto';
 export * from './lib/dto/shippingOption.dto';
 export * from './lib/dto/shippingSet.dto';
 export * from './lib/dto/signUpSeller.dto';
+export * from './lib/dto/sellerContacts.dto';
 export * from './lib/front-type/orderFilterFormType';
 export * from './lib/overlay-controller/overlay-controller-types';
 export * from './lib/overlay/overlay-types';
