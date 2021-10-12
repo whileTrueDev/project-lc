@@ -15,7 +15,8 @@ import {
 } from '@chakra-ui/react';
 
 export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
-  const { mail, phoneNumber, handleEmailInput, handlePhoneNumberInput, data } = props;
+  const { mail, phoneNumber, handleEmailInput, handlePhoneNumberInput, data, register } =
+    props;
   const [radio, setRadio] = useState('');
   type Keys = 'first' | 'second' | 'third';
   type SlicedPhoneNumber = { [k in Keys]: string };
@@ -66,8 +67,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                 placeholder="minsu@example.com"
                 autoComplete="off"
                 width={300}
-                value=""
-                // {...register('email', { required: '이메일을 작성해주세요.' })}
+                {...register('email', { required: '이메일을 작성해주세요.' })}
               />
             ) : (
               <Input
@@ -79,7 +79,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                 width={300}
                 value={data.email}
                 isDisabled
-                // {...register('email', { required: '이메일을 작성해주세요.' })}
+                {...register('email', { required: '이메일을 작성해주세요.' })}
               />
             )}
             {/* <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage> */}
@@ -87,11 +87,41 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
             <Stack direction="row" alignItems="center">
               {data === '' || radio === '2' ? (
                 <InputGroup width={300} alignItems="center">
-                  <Input type="text" maxLength={3} />
+                  <Input
+                    type="text"
+                    maxLength={3}
+                    {...register('firstNumber', {
+                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      pattern: {
+                        value: /^[0-9]+$/,
+                        message: '전화번호는 숫자만 가능합니다.',
+                      },
+                    })}
+                  />
                   <span>-</span>
-                  <Input type="text" maxLength={4} />
+                  <Input
+                    type="text"
+                    maxLength={4}
+                    {...register('secondNumber', {
+                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      pattern: {
+                        value: /^[0-9]+$/,
+                        message: '전화번호는 숫자만 가능합니다.',
+                      },
+                    })}
+                  />
                   <span>-</span>
-                  <Input type="text" maxLength={4} />
+                  <Input
+                    type="text"
+                    maxLength={4}
+                    {...register('thirdNumber', {
+                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      pattern: {
+                        value: /^[0-9]+$/,
+                        message: '전화번호는 숫자만 가능합니다.',
+                      },
+                    })}
+                  />
                 </InputGroup>
               ) : (
                 <InputGroup width={300} alignItems="center">
