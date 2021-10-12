@@ -56,10 +56,8 @@ export class FmOrdersService {
   } {
     const defaultQueryHead = `
     SELECT
-      IF(
-        COUNT(fm_order_item.goods_name) >= 2,
-          CONCAT(goods_name, " 외 ", COUNT(fm_order_item.goods_name) - 1),
-          goods_name) goods_name,
+      GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR ', ') AS goods_seq,
+      GROUP_CONCAT(goods_name SEPARATOR ', ') AS goods_name,
       fm_order.order_seq as id,
       fm_order.*
     FROM fm_order

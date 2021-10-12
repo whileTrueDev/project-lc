@@ -10,6 +10,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
+import { makeStyles } from '@material-ui/core/styles';
 import {
   GridColumns,
   GridRowId,
@@ -24,15 +25,54 @@ import {
   isOrderExportable,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
+import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useMemo } from 'react';
 import { FaTruck } from 'react-icons/fa';
-import { makeStyles } from '@material-ui/core/styles';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import ExportManyDialog from './ExportManyDialog';
 import FmOrderStatusBadge from './FmOrderStatusBadge';
 import TooltipedText from './TooltipedText';
+
+const hiddenColumns: GridColumns = [
+  { field: 'order_user_name', headerName: '주문자', hide: true },
+  { field: 'order_email', headerName: '주문자이메일', hide: true },
+  { field: 'order_cellphone', headerName: '주문자휴대폰', hide: true },
+  { field: 'order_phone', headerName: '주문자연락처', hide: true },
+  { field: 'recipient_user_name', headerName: '수령인', hide: true },
+  { field: 'recipient_email', headerName: '수령인이메일', hide: true },
+  { field: 'recipient_cellphone', headerName: '수령인휴대폰', hide: true },
+  { field: 'recipient_phone', headerName: '수령인연락처', hide: true },
+  { field: 'recipient_zipcode', headerName: '우편번호', hide: true },
+  {
+    field: 'recipient_address',
+    headerName: '배송지주소(지번)',
+    hide: true,
+    valueFormatter: ({ row }) =>
+      `${row.recipient_address} ${row.recipient_address_detail}`,
+  },
+  {
+    field: 'recipient_address_street',
+    headerName: '배송지주소(도로명)',
+    hide: true,
+    valueFormatter: ({ row }) =>
+      `${row.recipient_address_street} ${row.recipient_address_detail}`,
+  },
+  {
+    field: 'memo',
+    headerName: '배송메시지',
+    hide: true,
+    valueFormatter: ({ row }) => {
+      const parser = new FmOrderMemoParser(row.memo);
+      return parser.memo;
+    },
+  },
+  { field: 'shipping_cost', headerName: '배송비', hide: true },
+  { field: 'admin_memo', headerName: '관리자메모', hide: true },
+  { field: 'npay_order_id', headerName: '네이버페이 주문번호', hide: true },
+  { field: 'goods_seq', headerName: '상품고유번호', hide: true },
+];
 
 const columns: GridColumns = [
   {
@@ -96,18 +136,15 @@ const columns: GridColumns = [
     ),
   },
   {
-    field: 'recipient_user_name',
+    field: 'only-web_recipient_user_name',
     headerName: '주문자/받는분',
     width: 120,
     disableColumnMenu: true,
     disableReorder: true,
     hideSortIcons: true,
     sortable: false,
-    valueFormatter: ({ row }) => {
-      return (
-        row.recipient_user_name + (row.order_user_name ? `/${row.order_user_name}` : '')
-      );
-    },
+    disableExport: true,
+    valueFormatter: ({ row }) => row.recipient_user_name,
     renderCell: (params) => (
       <Text>
         {params.row.recipient_user_name}
@@ -174,10 +211,11 @@ const columns: GridColumns = [
       </Box>
     ),
   },
+  ...hiddenColumns,
 ];
 
 /** DataGrid style 컬럼 구분선 추가 */
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
       borderBottom: `1px solid #f0f0f0`,
@@ -293,6 +331,7 @@ export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
             <Button size="sm" as="div" isDisabled={selectedOrders.length === 0}>
               <GridToolbarExport
                 csvOptions={{
+                  allColumns: true,
                   fileName: `project-lc_주문목록_${dayjs().format(
                     'YYYY-MM-DD-HH-mm-ss',
                   )}`,
