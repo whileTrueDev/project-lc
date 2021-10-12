@@ -32,6 +32,7 @@ export const orderMetaInfoSample: FmOrderMetaInfo = {
   recipient_address_street: 'somewhere over the rainboe',
   recipient_address_detail: 'somewhere over the rainboe',
   memo: '1. 배송메모 : 1234,',
+  memoOriginal: '1. 배송메모 : 1234,',
   order_seq: 'asdf',
   shipping_group: 'asdf',
   shipping_method: 'delivery',

@@ -45,7 +45,7 @@ describe('FmOrdersService', () => {
       const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
       // 기본 select 구문이 올바르게 들어갔는 지 검사
-      expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
+      expect(sql).toContain('GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR');
       expect(sql).toContain('FROM fm_order');
       expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
       expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -71,7 +71,7 @@ describe('FmOrdersService', () => {
     const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
+    expect(sql).toContain('GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR');
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -96,7 +96,7 @@ describe('FmOrdersService', () => {
     const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
+    expect(sql).toContain('GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR');
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -117,7 +117,7 @@ describe('FmOrdersService', () => {
     const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
+    expect(sql).toContain('GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR');
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -137,7 +137,7 @@ describe('FmOrdersService', () => {
     const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
+    expect(sql).toContain('GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR');
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
@@ -158,7 +158,7 @@ describe('FmOrdersService', () => {
     const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
     // 기본 select 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('COUNT(fm_order_item.goods_name) >= 2,');
+    expect(sql).toContain('GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR');
     expect(sql).toContain('FROM fm_order');
     expect(sql).toContain('JOIN fm_order_item USING(order_seq)');
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
