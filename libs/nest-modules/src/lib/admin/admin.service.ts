@@ -4,18 +4,23 @@ import {
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
+  BusinessRegistrationStatus,
 } from '@project-lc/shared-types';
 import {
   SellerSettlementAccount,
   SellerBusinessRegistration,
   GoodsConfirmation,
+  BusinessRegistrationConfirmation,
 } from '@prisma/client';
+
+export type SellerBusinessRegistrationType = SellerBusinessRegistration & {
+  BusinessRegistrationConfirmation: BusinessRegistrationConfirmation | null;
+};
 
 export type AdminSettlementInfoType = {
   sellerSettlementAccount: SellerSettlementAccount[];
-  sellerBusinessRegistration: SellerBusinessRegistration[];
+  sellerBusinessRegistration: SellerBusinessRegistrationType[];
 };
-
 @Injectable()
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
@@ -26,6 +31,9 @@ export class AdminService {
     const users = await this.prisma.seller.findMany({
       include: {
         sellerBusinessRegistration: {
+          include: {
+            BusinessRegistrationConfirmation: true,
+          },
           orderBy: {
             id: 'desc',
           },
@@ -57,7 +65,13 @@ export class AdminService {
         result.sellerSettlementAccount.push(sellerSettlementAccount[0]);
       }
       if (sellerBusinessRegistration.length > 0) {
-        result.sellerBusinessRegistration.push(sellerBusinessRegistration[0]);
+        // 사업자등록정보의 상태가 대기 및 반려인 경우에만 보여준다.
+        if (
+          sellerBusinessRegistration[0].BusinessRegistrationConfirmation.status !==
+          BusinessRegistrationStatus.CONFIRMED
+        ) {
+          result.sellerBusinessRegistration.push(sellerBusinessRegistration[0]);
+        }
       }
     });
 
