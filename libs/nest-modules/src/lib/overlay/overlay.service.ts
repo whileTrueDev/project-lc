@@ -71,7 +71,7 @@ export class OverlayService {
 
     const message = `
     <speak>
-      잠시 후, 수련수련님의 싸움의고수 라이브 커머스가 시작됩니다.
+      잠시 후, 나는야꼬등어님의 동래아들 라이브 커머스가 시작됩니다.
     </speak>
     `;
 
