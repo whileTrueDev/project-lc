@@ -42,7 +42,7 @@
                     "name": "DATABASE_URL"
                 },
                 {
-                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/LC_FIRSTMALL_DATABASE_URL",
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/LC_FIRSTMALL_DB_URL",
                     "name": "FIRSTMALL_DATABASE_URL"
                 },
                 {
