@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
@@ -36,6 +37,8 @@ export class LCDevAppStack extends cdk.Stack {
   private CIPHER_HASH: ssm.IStringParameter;
   private CIPHER_PASSWORD: ssm.IStringParameter;
   private CIPHER_SALT: ssm.IStringParameter;
+  private S3_ACCESS_KEY_ID: ssm.IStringParameter;
+  private S3_ACCESS_KEY_SECRET: ssm.IStringParameter;
 
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
@@ -87,6 +90,11 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
         CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
+        AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
+        AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
+      },
+      environment: {
+        S3_BUCKET_NAME: 'lc-project',
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}LogGroup`, {
@@ -136,6 +144,11 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
         CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
+        AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
+        AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
+      },
+      environment: {
+        S3_BUCKET_NAME: 'lc-project',
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayLogGroup`, {
@@ -384,6 +397,24 @@ export class LCDevAppStack extends cdk.Stack {
       },
     );
 
+    this.S3_ACCESS_KEY_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}S3_ACCESS_KEY_ID`,
+      {
+        version: 2,
+        parameterName: constants.DEV.S3_ACCESS_KEY_ID,
+      },
+    );
+
+    this.S3_ACCESS_KEY_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}S3_ACCESS_KEY_SECRET`,
+      {
+        version: 2,
+        parameterName: constants.DEV.S3_ACCESS_KEY_SECRET,
+      },
+    );
+
     return {
       DATABASE_URL: this.DBURL_PARAMETER,
       FIRSTMALL_DATABASE_URL: this.FIRSTMALL_DATABASE_URL,
@@ -400,6 +431,8 @@ export class LCDevAppStack extends cdk.Stack {
       CIPHER_HASH: this.CIPHER_HASH,
       CIPHER_PASSWORD: this.CIPHER_PASSWORD,
       CIPHER_SALT: this.CIPHER_SALT,
+      S3_ACCESS_KEY_ID: this.S3_ACCESS_KEY_ID,
+      S3_ACCESS_KEY_SECRET: this.S3_ACCESS_KEY_SECRET,
     };
   }
 }

@@ -17,8 +17,8 @@ export class S3Service {
     this.s3Client = new S3Client({
       region: this.S3_BUCKET_REGION,
       credentials: {
-        secretAccessKey: this.configService.get('NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET'),
-        accessKeyId: this.configService.get('NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID'),
+        secretAccessKey: this.configService.get('AWS_S3_ACCESS_KEY_SECRET'),
+        accessKeyId: this.configService.get('AWS_S3_ACCESS_KEY_ID'),
       },
     });
   }
@@ -29,7 +29,7 @@ export class S3Service {
   ): Promise<DeleteObjectsCommandOutput> {
     return this.s3Client.send(
       new DeleteObjectsCommand({
-        Bucket: this.configService.get('NEXT_PUBLIC_S3_BUCKET_NAME'),
+        Bucket: this.configService.get('S3_BUCKET_NAME'),
         Delete: {
           Objects: objList,
         },

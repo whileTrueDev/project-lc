@@ -141,7 +141,7 @@ export class OverlayService {
   }
 
   async getVerticalImagesFromS3(userId: UserId): Promise<number> {
-    const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME;
+    const { S3_BUCKET_NAME } = process.env;
     const S3_BUCKET_REGION = 'ap-northeast-2';
     const broadcasterId = userId.userId;
     let imagesUrls = 0;
@@ -149,8 +149,8 @@ export class OverlayService {
     AWS.config.update({
       region: S3_BUCKET_REGION,
       credentials: {
-        accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET,
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET,
       },
     });
 
