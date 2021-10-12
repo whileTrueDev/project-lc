@@ -18,31 +18,27 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { GridRowData } from '@material-ui/data-grid';
-import { useGoodRejectionMutation } from '@project-lc/hooks';
-import { GoodsConfirmationStatus } from '@project-lc/shared-types';
-import { useRouter } from 'next/router';
+import { useBusinessRegistrationRejectionMutation } from '@project-lc/hooks';
 import { useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { GridTableItem } from '../GridTableItem';
-import { GoodRowType } from './AdminGoodsConfirmationDialog';
 
 export interface AdminGoodsRejectionDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  row: GoodRowType | GridRowData;
+  row: GridRowData;
 }
 
 type rejectionFormData = {
   rejectionReason: string;
 };
 
-export function AdminGoodsRejectionDialog({
+export function AdminBusinessRegistrationRejectionDialog({
   isOpen,
   onClose,
   row,
 }: AdminGoodsRejectionDialogProps): JSX.Element {
   const toast = useToast();
-  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -58,29 +54,28 @@ export function AdminGoodsRejectionDialog({
     reset();
   }, [reset, row]);
 
-  const rejectMutation = useGoodRejectionMutation();
+  const rejectMutation = useBusinessRegistrationRejectionMutation();
 
   async function handleRejectionGood({
-    goodsId,
+    id,
     rejectionReason,
   }: {
-    goodsId: number;
+    id: number;
     rejectionReason: string;
   }): Promise<void> {
     try {
       await rejectMutation.mutateAsync({
-        goodsId,
+        id,
         rejectionReason,
-        status: GoodsConfirmationStatus.REJECTED,
       });
       toast({
-        title: '상품이 반려되었습니다.',
+        title: '사업자등록정보가 반려되었습니다.',
         status: 'success',
       });
-      router.push('/goods');
+      onClose();
     } catch (error) {
       toast({
-        title: '상품 반려가 실패하였습니다.',
+        title: '사업자등록정보 반려가 실패하였습니다.',
         status: 'error',
       });
     }
@@ -88,27 +83,29 @@ export function AdminGoodsRejectionDialog({
 
   const useSubmit = (data: rejectionFormData): void => {
     const { rejectionReason } = data;
-    handleRejectionGood({ goodsId: row.id, rejectionReason });
+    handleRejectionGood({ id: row.id, rejectionReason });
   };
 
   return (
     <Modal isOpen={isOpen} size="xl" onClose={onClose} initialFocusRef={initialRef}>
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(useSubmit)}>
-        <ModalHeader>상품 반려 하기</ModalHeader>
+        <ModalHeader>사업자등록정보 반려 하기</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
-            <GridTableItem title="현재 상품명" value={row?.goods_name} />
+            <GridTableItem title="회사명" value={row?.companyName} />
           </Grid>
           <FormControl m={2} mt={6} isInvalid={!!errors.rejectionReason}>
             <FormLabel fontSize="md">반려사유</FormLabel>
-            <FormHelperText>해당 상품의 승인 불가 사유를 입력해주세요.</FormHelperText>
+            <FormHelperText mb={2}>
+              사업자등록정보 승인 불가 사유를 입력해주세요.
+            </FormHelperText>
             <Textarea
               isInvalid={!!errors.rejectionReason}
               minHeight="250px"
               resize="none"
-              placeholder="예) 상품명과 상품 사진이 일치하지 않습니다"
+              placeholder="예) 사업자등록정보가 존재하지 않습니다"
               {...register('rejectionReason', {
                 required: '반려 사유를 입력해주세요',
                 validate: {
@@ -120,7 +117,6 @@ export function AdminGoodsRejectionDialog({
                 },
               })}
             />
-
             <FormErrorMessage>
               {errors.rejectionReason && errors.rejectionReason.message}
             </FormErrorMessage>
@@ -139,5 +135,3 @@ export function AdminGoodsRejectionDialog({
     </Modal>
   );
 }
-
-export default AdminGoodsRejectionDialog;

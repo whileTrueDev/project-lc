@@ -1,12 +1,21 @@
-import { GridColumns } from '@material-ui/data-grid';
+import { GridColumns, GridCellParams, GridRowData } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { useColorModeValue, useDisclosure, Button } from '@chakra-ui/react';
+import { useColorModeValue, useDisclosure, Button, Badge } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
 import { SellerBusinessRegistration } from '@prisma/client';
+import { useState } from 'react';
+import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { AdminImageDownloadButton } from './AdminImageDownloadButton';
+import { AdminBusinessRegistrationRejectionDialog } from './AdminBusinessRegistrationRejectionDialog';
+import { AdminBusinessRegistrationConfirmationDialog } from './AdminBusinessRegistrationConfirmationDialog';
 
 const columns: GridColumns = [
+  {
+    field: 'businessRegistrationStatus',
+    headerName: '검수상태',
+    renderCell: (params) => ConfirmationBadge(params.row),
+  },
   {
     field: 'companyName',
     headerName: '회사명',
@@ -54,14 +63,21 @@ const columns: GridColumns = [
     headerName: '통신판매업등록증 이미지',
     renderCell: (params) => AdminImageDownloadButton(params.row, 'mail-order'),
   },
+  {
+    field: 'confirmation',
+    headerName: '검수승인',
+    width: 100,
+    renderCell: () => <Button size="xs">승인하기</Button>,
+    sortable: false,
+  },
+  {
+    field: 'rejection',
+    headerName: '검수반려',
+    width: 100,
+    renderCell: () => <Button size="xs">반려하기</Button>,
+    sortable: false,
+  },
 ];
-
-// 사업자 등록 반려 클릭시
-function AdminRejectionButton(): JSX.Element {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  return <Button size="xs">반려하기</Button>;
-}
 
 function makeListRow(
   sellerBusinessRegistrations: SellerBusinessRegistration[] | undefined,
@@ -69,9 +85,28 @@ function makeListRow(
   if (!sellerBusinessRegistrations) {
     return [];
   }
-  return sellerBusinessRegistrations.map((element, index: number) => {
-    return { ...element, id: index, isRowSelectable: false };
+  return sellerBusinessRegistrations.map((element) => {
+    return { ...element, isRowSelectable: false };
   });
+}
+
+// 사업자 등록 검수 상태 badge
+function ConfirmationBadge(row: GridRowData): JSX.Element {
+  let result = { color: 'yellow', text: '대기중' };
+  switch (row.BusinessRegistrationConfirmation.status) {
+    case BusinessRegistrationStatus.CONFIRMED: {
+      result = { color: 'green', text: '승인됨' };
+      break;
+    }
+    case BusinessRegistrationStatus.REJECTED: {
+      result = { color: 'red', text: '반려됨' };
+      break;
+    }
+    default: {
+      result = { color: 'yellow', text: '대기중' };
+    }
+  }
+  return <Badge colorScheme={result.color}>{result.text}</Badge>;
 }
 
 // 관리자가 볼 계좌번호 등록 리스트
@@ -91,26 +126,64 @@ export function AdminBusinessRegistrationList(props: {
     },
   });
 
+  const [selectedRow, setSelectedRow] = useState({});
+  const {
+    isOpen: isConfirmationOpen,
+    onOpen: onConfirmationOpen,
+    onClose: onConfirmationClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isRejectionOpen,
+    onOpen: onRejectionOpen,
+    onClose: onRejectionClose,
+  } = useDisclosure();
+
+  async function handleClick(param: GridCellParams): Promise<void> {
+    if (param.field === 'confirmation') {
+      setSelectedRow(param.row);
+      onConfirmationOpen();
+    }
+    if (param.field === 'rejection') {
+      setSelectedRow(param.row);
+      onRejectionOpen();
+    }
+    // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
+  }
+
   const classes = useStyle();
 
   return (
-    <ChakraDataGrid
-      classes={{
-        columnHeader: classes.columnHeader,
-        root: classes.root,
-      }}
-      borderWidth={0}
-      hideFooter
-      headerHeight={50}
-      minH={300}
-      density="compact"
-      columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
-      rows={makeListRow(sellerBusinessRegistrations)}
-      rowCount={5}
-      rowsPerPageOptions={[25, 50]}
-      disableColumnMenu
-      disableColumnFilter
-      disableSelectionOnClick
-    />
+    <>
+      <ChakraDataGrid
+        classes={{
+          columnHeader: classes.columnHeader,
+          root: classes.root,
+        }}
+        borderWidth={0}
+        hideFooter
+        headerHeight={50}
+        minH={300}
+        density="compact"
+        columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
+        rows={makeListRow(sellerBusinessRegistrations)}
+        rowCount={5}
+        rowsPerPageOptions={[25, 50]}
+        onCellClick={handleClick}
+        disableColumnMenu
+        disableColumnFilter
+        disableSelectionOnClick
+      />
+      <AdminBusinessRegistrationRejectionDialog
+        isOpen={isRejectionOpen}
+        onClose={onRejectionClose}
+        row={selectedRow}
+      />
+      <AdminBusinessRegistrationConfirmationDialog
+        isOpen={isConfirmationOpen}
+        onClose={onConfirmationClose}
+        row={selectedRow}
+      />
+    </>
   );
 }
