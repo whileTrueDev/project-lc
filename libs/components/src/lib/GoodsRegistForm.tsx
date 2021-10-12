@@ -29,21 +29,24 @@ import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
 
-export type GoodsFormOptionsType = Omit<
-  GoodsOptionDto,
-  'default_option' | 'option_title'
->[];
+export type GoodsFormOption = Omit<GoodsOptionDto, 'default_option' | 'option_title'> & {
+  id?: number;
+};
+
+export type GoodsFormOptionsType = GoodsFormOption[];
 
 export type GoodsFormValues = Omit<RegistGoodsDto, 'options' | 'image'> & {
+  id?: number;
   options: NestedValue<GoodsFormOptionsType>;
   image?: { file: File; filename: string; id: number }[];
   option_title: string; // 옵션 제목
+  common_contents: string; // 공통정보 내용
   common_contents_name?: string; // 공통 정보 이름
   common_contents_type: 'new' | 'load'; // 공통정보 신규 | 기존 불러오기
 };
 
 type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
-  options: Omit<GoodsOptionDto, 'option_title' | 'default_option'>[];
+  options: GoodsFormOption[];
 };
 
 /** 이미지 파일명 앞부분에 타임스탬프 붙임
@@ -102,14 +105,17 @@ async function imageFileListToImageDto(
 
 // options 에 default_option, option_title설정
 function addGoodsOptionInfo(
-  options: Omit<GoodsOptionDto, 'default_option' | 'option_title'>[],
+  options: GoodsFormOption[],
   option_title: string,
 ): GoodsOptionDto[] {
-  return options.map((opt, index) => ({
-    ...opt,
-    default_option: index === 0 ? ('y' as const) : ('n' as const),
-    option_title,
-  }));
+  return options.map((opt, index) => {
+    const { id, ...rest } = opt;
+    return {
+      ...rest,
+      default_option: index === 0 ? ('y' as const) : ('n' as const),
+      option_title,
+    };
+  });
 }
 
 // 상품 '상세설명' contents에서 이미지 s3에 업로드 후 src url 변경
@@ -159,24 +165,59 @@ export function GoodsRegistForm({
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
-      goods_name: goodsData ? goodsData.goods_name : undefined,
-      summary: goodsData ? goodsData.summary : undefined,
-      common_contents_type: 'new',
-      option_title: '',
+      // 상품 id (상품 수정하는 경우 id 존재, 상품 등록하는 경우 id undefined)
+      id: goodsData?.id || undefined,
+      // 기본정보
+      goods_name: goodsData?.goods_name || undefined, // 상품명
+      summary: goodsData?.summary || undefined, // 간략설명
+      // 판매정보
+      goods_status: goodsData ? goodsData.goods_status : 'normal', // 판매상태
+      cancel_type: goodsData ? goodsData.cancel_type : '0', // 청약철회, 기본 - 청약철회가능 0
+      // 판매옵션
+      option_use: goodsData ? goodsData.option_use : '1', // 옵션사용여부, 기본 - 옵션사용 1
+      option_title: goodsData?.options[0].option_title || '',
+      options: goodsData
+        ? goodsData.options.map((opt) => ({
+            id: opt.id,
+            option_type: opt.option_type,
+            option1: opt.option1 || '',
+            consumer_price: Number(opt.consumer_price),
+            price: Number(opt.price),
+            option_view: opt.option_view,
+            supply: {
+              stock: opt.supply.stock,
+            },
+          }))
+        : [
+            {
+              option_type: 'direct',
+              option1: '',
+              consumer_price: 0,
+              price: 0,
+              option_view: 'Y',
+              supply: {
+                stock: 0,
+              },
+            },
+          ],
+      // 상품사진
       image: [],
-      options: [
-        {
-          option_type: 'direct',
-          option1: '',
-          consumer_price: 0,
-          price: 0,
-          option_view: 'Y',
-          supply: {
-            stock: 0,
-          },
-        },
-      ],
-      option_use: '1',
+      // 상세설명
+      contents: goodsData?.contents || undefined,
+      // 상품공통정보
+      goodsInfoId: goodsData?.goodsInfoId || undefined,
+      common_contents_type: goodsData ? 'load' : 'new',
+      common_contents: goodsData?.GoodsInfo?.info_value,
+      common_contents_name: goodsData?.GoodsInfo?.info_name,
+      // 배송비정책
+      shippingGroupId: goodsData?.shippingGroupId || undefined,
+      // 기타정보 (최대, 최소구매수량)
+      min_purchase_limit: goodsData?.min_purchase_limit || 'unlimit',
+      min_purchase_ea: goodsData?.min_purchase_ea || undefined,
+      max_purchase_limit: goodsData?.max_purchase_limit || 'unlimit',
+      max_purchase_ea: goodsData?.max_purchase_ea || undefined,
+      // 메모
+      admin_memo: goodsData?.admin_memo || undefined,
       // 이하 fm_goods 기본값
       goods_view: 'look',
       shipping_policy: 'shop',
@@ -194,6 +235,7 @@ export function GoodsRegistForm({
     const userMail = profileData.email;
 
     const {
+      id,
       image,
       options,
       option_title,
@@ -207,9 +249,15 @@ export function GoodsRegistForm({
       ...goodsFormData
     } = data;
 
+    // if (id) {
+    //   console.log('상품 수정');
+    // } else {
+    //   console.log('상품 등록');
+    // }
+    // console.log(data);
+
     let goodsDto: RegistGoodsDto = {
       ...goodsFormData,
-      common_contents: '',
       options: addGoodsOptionInfo(options, option_title),
       option_use: options.length > 1 ? '1' : '0',
       max_purchase_ea: Number(max_purchase_ea) || 0,
@@ -250,7 +298,6 @@ export function GoodsRegistForm({
       goodsDto = {
         ...goodsDto,
         goodsInfoId: res.id,
-        common_contents: commonInfoBody,
       };
     } else if (!data.goodsInfoId) {
       // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함) - 상품 수정 기능이 없는 동안 필수값으로 설정함
@@ -271,6 +318,9 @@ export function GoodsRegistForm({
       });
       return;
     }
+
+    console.log('상품 등록');
+    console.log(goodsDto);
 
     mutateAsync(goodsDto)
       .then((res) => {
@@ -308,7 +358,7 @@ export function GoodsRegistForm({
             돌아가기
           </Button>
           <Button type="submit" colorScheme="blue" isLoading={isLoading}>
-            등록
+            {methods.watch('id') ? '수정' : '등록'}
           </Button>
         </Stack>
 

@@ -79,6 +79,7 @@ function UseOptionInput(): JSX.Element {
     watch,
     control,
     register,
+    getValues,
     formState: { errors },
   } = useFormContext<GoodsFormValues>();
   const { fields, append, remove } = useFieldArray<GoodsFormValues, 'options'>({
@@ -102,6 +103,12 @@ function UseOptionInput(): JSX.Element {
     });
   };
 
+  const handleDelete = (index: number, fieldId: number): void => {
+    // (상품등록 시) id: undefined인 경우 -> 임의로 id 입력됨 (기본 Key : id)
+    // (상품 수정 시) id: goods.id가 출력됨
+    console.log({ fieldId });
+    remove(index);
+  };
   return (
     <Stack>
       <HStack>
@@ -137,7 +144,7 @@ function UseOptionInput(): JSX.Element {
         >
           {/* 옵션값 */}
           <HStack mb={1}>
-            <CloseButton onClick={() => remove(index)} />
+            <CloseButton onClick={() => handleDelete(index, field.id)} />
             <HStack>
               <Text minWidth="60px">
                 옵션값 <RequiredMark />

@@ -35,7 +35,7 @@ export function GoodsRegistRadio({
 } & Partial<RadioGroupProps>): JSX.Element {
   const { register, watch } = useFormContext<RegistGoodsDto>();
   return (
-    <RadioGroup value={watch(name, values[0].value)} {...rest}>
+    <RadioGroup value={watch(name)} {...rest}>
       <HStack>
         {values.map((item) => {
           const { value, label } = item;

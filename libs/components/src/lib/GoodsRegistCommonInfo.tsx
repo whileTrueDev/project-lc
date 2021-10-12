@@ -163,7 +163,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
     if (!editor.current) return;
 
     const textWithImages = editor.current.getContents(false);
-    setViewerContents(textWithImages);
+    // setViewerContents(textWithImages);
     setValue('common_contents', textWithImages);
 
     toast({ title: '상품 공통 정보가 임시 저장되었습니다.', status: 'success' });
@@ -176,6 +176,12 @@ export function GoodsRegistCommonInfo(): JSX.Element {
     setViewerContents(info_value || '');
     setValue('goodsInfoId', id);
   };
+
+  // form 의 common_contenets 변경시 viewer 내용 변경
+  const commonContents = watch('common_contents');
+  useEffect(() => {
+    setViewerContents(commonContents);
+  }, [commonContents]);
   return (
     <SectionWithTitle title="상품 공통 정보 *">
       <Stack>
@@ -183,10 +189,11 @@ export function GoodsRegistCommonInfo(): JSX.Element {
           onChange={(value) => {
             if (value === 'new') {
               setViewerContents(getValues('common_contents') || '');
+              setValue('goods_name', '');
               setValue('goodsInfoId', undefined);
             }
           }}
-          value={watch('common_contents_type', 'new')}
+          value={watch('common_contents_type')}
         >
           <Stack direction="row">
             <Radio {...register('common_contents_type')} value="new">
