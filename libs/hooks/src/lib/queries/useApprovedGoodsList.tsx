@@ -6,8 +6,14 @@ export type ApprovedGoodsList = {
   email: string;
 };
 
-export const getApprovedGoodsList = async (): Promise<ApprovedGoodsList[]> => {
-  return axios.get<ApprovedGoodsList[]>('/live').then((res) => res.data);
+export const getApprovedGoodsList = async (
+  email: string,
+): Promise<ApprovedGoodsList[]> => {
+  return axios
+    .get<ApprovedGoodsList[]>('/live', {
+      params: { email },
+    })
+    .then((res) => res.data);
 };
 
 export const useApprovedGoodsList = ({
@@ -15,8 +21,7 @@ export const useApprovedGoodsList = ({
 }: {
   email: string;
 }): UseQueryResult<ApprovedGoodsList[], AxiosError> => {
-  return useQuery<ApprovedGoodsList[], AxiosError>(
-    ['ApprovedGoodsList', email],
-    getApprovedGoodsList,
+  return useQuery<ApprovedGoodsList[], AxiosError>(['ApprovedGoodsList', email], () =>
+    getApprovedGoodsList(email),
   );
 };

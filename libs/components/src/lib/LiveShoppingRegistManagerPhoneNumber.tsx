@@ -1,8 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Radio,
   RadioGroup,
-  Box,
   Heading,
   Stack,
   FormControl,
@@ -10,14 +9,20 @@ import {
   Input,
   FormErrorMessage,
   InputGroup,
-  InputLeftElement,
   Checkbox,
 } from '@chakra-ui/react';
+import { useFormContext } from 'react-hook-form';
 
 export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
-  const { mail, phoneNumber, handleEmailInput, handlePhoneNumberInput, data, register } =
-    props;
-  const [radio, setRadio] = useState('');
+  const { data } = props;
+
+  const {
+    register,
+    setValue,
+    formState: { errors },
+    watch,
+  } = useFormContext<any>();
+
   type Keys = 'first' | 'second' | 'third';
   type SlicedPhoneNumber = { [k in Keys]: string };
   const makePhoneNumberForm = (fullPhoneNumber: string): SlicedPhoneNumber => {
@@ -26,30 +31,63 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
     const third = fullPhoneNumber.substring(7, 11);
     return { first, second, third };
   };
+
+  const firstNumber = makePhoneNumberForm(data.phoneNumber).first;
+  const secondNumber = makePhoneNumberForm(data.phoneNumber).second;
+  const thirdNumber = makePhoneNumberForm(data.phoneNumber).third;
+  const { email } = data;
+
+  useEffect(() => {
+    if (data === '') {
+      setValue('useContact', 'new');
+      setValue('setDefault', 'N');
+    } else {
+      setValue('firstNumber', firstNumber);
+      setValue('secondNumber', secondNumber);
+      setValue('thirdNumber', thirdNumber);
+      setValue('email', email);
+    }
+  }, [data, setValue, firstNumber, secondNumber, thirdNumber, email]);
   return (
     <Stack spacing={2}>
       <Heading as="h6" size="xs">
         담당자 연락처
       </Heading>
 
-      <FormControl isRequired>
+      <FormControl isRequired isInvalid={!!errors.email}>
         <Stack spacing={2}>
           {data === '' ? (
-            <RadioGroup onChange={setRadio} defaultValue="2">
+            <RadioGroup
+              onChange={(value) => {
+                setValue('useContact', value);
+              }}
+              // value={watch('useContact')}
+              defaultValue="new"
+            >
               <Stack spacing={3} direction="row">
-                <Radio value="1" isDisabled>
+                <Radio {...register('useContact')} value="old" isDisabled>
                   기본 연락처
                 </Radio>
-                <Radio value="2" defaultChecked>
+                <Radio {...register('useContact')} value="new" defaultChecked>
                   새 연락처
                 </Radio>
               </Stack>
             </RadioGroup>
           ) : (
-            <RadioGroup onChange={setRadio} defaultValue="1">
+            <RadioGroup
+              onChange={(value) => {
+                setValue('useContact', value);
+              }}
+              // value={watch('useContact')}
+              defaultValue="old"
+            >
               <Stack spacing={3} direction="row">
-                <Radio value="1">기존 연락처</Radio>
-                <Radio value="2">새 연락처</Radio>
+                <Radio {...register('useContact')} value="old">
+                  기존 연락처
+                </Radio>
+                <Radio {...register('useContact')} value="new">
+                  새 연락처
+                </Radio>
               </Stack>
             </RadioGroup>
           )}
@@ -60,13 +98,14 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
             borderRadius="3pt"
           >
             <FormLabel htmlFor="email">이메일</FormLabel>
-            {data === '' || radio === '2' ? (
+            {data === '' || watch('useContact') === 'new' ? (
               <Input
                 id="email"
                 type="email"
                 placeholder="minsu@example.com"
                 autoComplete="off"
                 width={300}
+                value={watch('email', '')}
                 {...register('email', { required: '이메일을 작성해주세요.' })}
               />
             ) : (
@@ -82,14 +121,16 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                 {...register('email', { required: '이메일을 작성해주세요.' })}
               />
             )}
-            {/* <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage> */}
+            <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
+
             <FormLabel htmlFor="phone">전화번호</FormLabel>
             <Stack direction="row" alignItems="center">
-              {data === '' || radio === '2' ? (
+              {data === '' || watch('useContact') === 'new' ? (
                 <InputGroup width={300} alignItems="center">
                   <Input
                     type="text"
                     maxLength={3}
+                    value={watch('firstNumber')}
                     {...register('firstNumber', {
                       required: "'-'을 제외하고 숫자만 입력하세요.",
                       pattern: {
@@ -102,6 +143,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                   <Input
                     type="text"
                     maxLength={4}
+                    value={watch('secondNumber')}
                     {...register('secondNumber', {
                       required: "'-'을 제외하고 숫자만 입력하세요.",
                       pattern: {
@@ -114,6 +156,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                   <Input
                     type="text"
                     maxLength={4}
+                    value={watch('thirdNumber')}
                     {...register('thirdNumber', {
                       required: "'-'을 제외하고 숫자만 입력하세요.",
                       pattern: {
@@ -129,34 +172,69 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                     type="text"
                     variant="filled"
                     maxLength={3}
-                    defaultValue={makePhoneNumberForm(data.phoneNumber).first}
+                    value={firstNumber}
                     isDisabled
+                    {...register('firstNumber', {
+                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      pattern: {
+                        value: /^[0-9]+$/,
+                        message: '전화번호는 숫자만 가능합니다.',
+                      },
+                    })}
                   />
                   <span>-</span>
                   <Input
                     type="text"
                     variant="filled"
                     maxLength={4}
-                    defaultValue={makePhoneNumberForm(data.phoneNumber).second}
+                    value={secondNumber}
                     isDisabled
+                    {...register('secondNumber', {
+                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      pattern: {
+                        value: /^[0-9]+$/,
+                        message: '전화번호는 숫자만 가능합니다.',
+                      },
+                    })}
                   />
                   <span>-</span>
                   <Input
                     type="text"
                     variant="filled"
                     maxLength={4}
-                    defaultValue={makePhoneNumberForm(data.phoneNumber).third}
+                    value={thirdNumber}
                     isDisabled
+                    {...register('thirdNumber', {
+                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      pattern: {
+                        value: /^[0-9]+$/,
+                        message: '전화번호는 숫자만 가능합니다.',
+                      },
+                    })}
                   />
                 </InputGroup>
               )}
-
-              {data === '' || radio === '2' ? (
-                <Checkbox>기본으로 설정</Checkbox>
-              ) : (
-                <Checkbox isChecked isDisabled>
+              <FormErrorMessage>
+                {errors.firstNumber &&
+                  errors.firstNumber.message &&
+                  errors.secondNumber &&
+                  errors.secondNumber.message &&
+                  errors.thirdNumber &&
+                  errors.thirdNumber.message}
+              </FormErrorMessage>
+              {data === '' ? (
+                <Checkbox
+                  onChange={(value) => {
+                    setValue('setDefault', value);
+                  }}
+                  value="Y"
+                  isChecked
+                  isDisabled
+                >
                   기본으로 설정
                 </Checkbox>
+              ) : (
+                <Checkbox>기본으로 설정</Checkbox>
               )}
             </Stack>
           </Stack>

@@ -3,23 +3,21 @@ import { TextField } from '@material-ui/core';
 import { Stack, Heading, theme, Button, Flex } from '@chakra-ui/react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { liveShoppingRegist } from '@project-lc/stores';
-import { useProfile, useApprovedGoodsList, useDefaultContacts } from '@project-lc/hooks';
+import {
+  useProfile,
+  useApprovedGoodsList,
+  useDefaultContacts,
+  useCreateLiveShopping,
+} from '@project-lc/hooks';
 import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerPhoneNumber';
 import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
 
 export function LiveShoppingRegist(): JSX.Element {
-  const {
-    selectedGoods,
-    mail,
-    phoneNumber,
-    requests,
-    handleGoodsSelect,
-    handleEmailInput,
-    handlePhoneNumberInput,
-    handleRequestsInput,
-  } = liveShoppingRegist();
+  const { selectedGoods, handleGoodsSelect } = liveShoppingRegist();
   const { data: profileData } = useProfile();
-  const { register, handleSubmit } = useForm();
+  const { setValue, watch } = useForm();
+  const { mutateAsync } = useCreateLiveShopping();
+
   const goodsList = useApprovedGoodsList({
     email: profileData?.email || '',
   });
@@ -30,27 +28,47 @@ export function LiveShoppingRegist(): JSX.Element {
 
   const methods = useForm<any>({
     defaultValues: {
-      goodsName: '',
+      useContact: '',
+      goods_id: 0,
       email: '',
       firstNumber: '',
       secondNumber: '',
       thirdNumber: '',
+      setDefault: '',
       requests: '',
     },
   });
 
-  // const { handleSubmit } = methods;
+  const { handleSubmit } = methods;
 
   const regist = async (data: any): Promise<void> => {
-    alert('data');
-  };
+    const concatData = Object.assign(data);
+    concatData.goods_id = watch('goods_id');
 
-  console.log(goodsList.data);
-  console.log(contacts);
+    const { firstNumber, secondNumber, thirdNumber, useContact, setDefault } = concatData;
+
+    const fullPhoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
+    concatData.phoneNumber = fullPhoneNumber;
+    console.log(concatData);
+    if (useContact) {
+      // 기존 연락처 사용
+      console.log('기존 연락처 사용');
+      mutateAsync(concatData).then((res: any) => {
+        console.log('res', res);
+      });
+    } else {
+      // 새로운 연락처 사용
+      console.log('새로운 연락처 사용');
+      if (setDefault) {
+        // 새로운 연락처 기본으로 설정
+        console.log('새로운 연락처 기본으로 설정');
+      }
+    }
+  };
 
   return (
     <FormProvider {...methods}>
-      <Stack w="100%" mt="10" spacing={12} onSubmit={handleSubmit(regist)}>
+      <Stack w="100%" mt="10" spacing={12} as="form" onSubmit={handleSubmit(regist)}>
         <Heading as="h6" size="xs">
           상품
         </Heading>
@@ -68,21 +86,12 @@ export function LiveShoppingRegist(): JSX.Element {
                 )}
                 value={selectedGoods}
                 onChange={(_, newValue) => {
+                  setValue('goods_id', newValue.id);
                   handleGoodsSelect(newValue);
                 }}
               />
-              <LiveShoppingManagerPhoneNumber
-                mail={mail}
-                phoneNumber={phoneNumber}
-                handleEmailInput={handleEmailInput}
-                handlePhoneNumberInput={handlePhoneNumberInput}
-                data={contacts.data}
-                register={register}
-              />
-              <LiveShoppingRequestInput
-                requests={requests}
-                handleRequestsInput={handleRequestsInput}
-              />
+              <LiveShoppingManagerPhoneNumber data={contacts.data} />
+              <LiveShoppingRequestInput />
               <Flex
                 py={4}
                 mx={-2}

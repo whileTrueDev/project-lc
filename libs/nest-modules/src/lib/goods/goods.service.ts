@@ -385,9 +385,7 @@ export class GoodsService {
     }
   }
 
-  public async findMyGoodsNames(
-    email: Seller['email'],
-  ): Promise<ApprovedGoodsNameAndIds[]> {
+  public async findMyGoodsNames(email: string): Promise<ApprovedGoodsNameAndIds[]> {
     const goodsIds = await this.prisma.goods.findMany({
       where: {
         seller: { email },
@@ -404,6 +402,7 @@ export class GoodsService {
           },
         },
         goods_name: true,
+        id: true,
       },
     });
     const result = goodsIds.map((value) => {
