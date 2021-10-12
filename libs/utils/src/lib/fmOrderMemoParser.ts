@@ -83,56 +83,60 @@ export class FmOrderMemoParser {
   }
 
   private parseMemo(s: string): FmOrderMemoItem['memo'] {
-    if (!s) return null;
-    const processed = /(배송메모 : )(.*?)(,)/g.exec(s);
-    if (!processed) return null;
-    const [_, __, memo] = processed;
-    if (!memo) return null;
-    return memo;
+    return this.__parse({ s, regexp: /(배송메모 : )(.*?)(,)/g, targetGroupNum: 2 });
   }
 
   private parseBroadcaster(s: string): string | null {
-    if (!s) return null;
-    const processed = /(크리에이터 채널명 : )(.*?)(,)/g.exec(s);
-    if (!processed) return null;
-    const [_, __, broadcaster] = processed;
-    if (!broadcaster) return null;
-    return broadcaster;
+    return this.__parse({
+      s,
+      regexp: /(크리에이터 채널명 : )(.*?)(,)/g,
+      targetGroupNum: 2,
+    });
   }
 
   private parseBuyer(s: string): FmOrderMemoItem['buyer'] {
-    if (!s) return null;
-    const processed = /(작성자 : )(.*?)(,)/g.exec(s);
-    if (!processed) return null;
-    const [_, __, buyer] = processed;
-    if (!buyer) return null;
-    return buyer;
+    return this.__parse({ s, regexp: /(작성자 : )(.*?)(,)/g, targetGroupNum: 2 });
   }
 
   private parseDonationMessaage(s: string): FmOrderMemoItem['donationMessaage'] {
-    if (!s) return null;
-    const processed = /(응원내용 : )(.*?)(,)/g.exec(s);
-    if (!processed) return null;
-    const [_, __, donationMessage] = processed;
-    if (!donationMessage) return null;
-    return donationMessage;
+    return this.__parse({ s, regexp: /(응원내용 : )(.*?)(,)/g, targetGroupNum: 2 });
   }
 
   private parsePhoneEventFlag(s: string): FmOrderMemoItem['phoneEventFlag'] {
-    if (!s) return false;
-    const processed = /(통화 이벤트 : )(.*?)(,)/g.exec(s);
-    if (!processed) return false;
-    const [_, __, phoneEventFlag] = processed;
+    const phoneEventFlag = this.__parse({
+      s,
+      regexp: /(통화 이벤트 : )(.*?)(,)/g,
+      targetGroupNum: 2,
+    });
     if (phoneEventFlag && phoneEventFlag === this.PHONE_EVENT_YES_TEXT) return true;
     return false;
   }
 
   private parseGiftFlag(s: string): FmOrderMemoItem['giftFlag'] {
-    if (!s) return false;
-    const processed = /(선물하기 여부 : )(.*)/g.exec(s);
-    if (!processed) return false;
-    const [_, __, giftFlag] = processed;
+    const giftFlag = this.__parse({
+      s,
+      regexp: /(선물하기 여부 : )(.*)/g,
+      targetGroupNum: 2,
+    });
     if (giftFlag && giftFlag === this.GIFT_YES_TEXT) return true;
     return false;
   }
+
+  private __parse({ s, regexp, targetGroupNum }: FmOrderMemoParseOptions): string | null {
+    if (!s) return null;
+    const processed = regexp.exec(s);
+    if (!processed) return null;
+    const target = processed[targetGroupNum];
+    if (!target) return null;
+    return target;
+  }
+}
+
+interface FmOrderMemoParseOptions {
+  /** 파싱 대상 문자열 */
+  s: string;
+  /** 정규표현식 그룹을 필수적으로 포함하기를 권장 */
+  regexp: RegExp;
+  /** 정규표현식으로 그룹화된 배열 중 선택될 그룹인덱스 */
+  targetGroupNum: number;
 }
