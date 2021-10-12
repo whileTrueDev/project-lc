@@ -241,7 +241,7 @@ export class FmOrdersService {
     const order = result.length > 0 ? result[0] : null;
     if (!order) return null;
     const parser = new FmOrderMemoParser(order.memo);
-    return { ...order, memo: parser.memo };
+    return { ...order, memo: parser.memo, memoOriginal: order.memo };
   }
 
   private async findOneOrderItems(

@@ -42,26 +42,32 @@ export class FmOrderMemoParser {
     return this.__parsed;
   }
 
+  /** 배송메모 */
   get memo(): string {
     return this.__memo;
   }
 
+  /** 방송인 */
   get broadcaster(): string {
     return this.__broadcaster;
   }
 
+  /** 구매자명(닉네임) */
   get buyer(): string {
     return this.__buyer;
   }
 
+  /** 구매 메시지 */
   get donationMessaage(): string {
     return this.__donationMessaage;
   }
 
+  /** 통화 이벤트 참여 여부 */
   get phoneEventFlag(): boolean {
     return this.__phoneEventFlag;
   }
 
+  /** 선물하기 여부 */
   get giftFlag(): boolean {
     return this.__giftFlag;
   }

@@ -239,6 +239,15 @@ export function OrderList(): JSX.Element {
     return _so.filter((so) => isOrderExportable(so.step)).length > 0;
   }, [fmOrderStates.selectedOrders, orders.data]);
 
+  const filteredOrders = useMemo(() => {
+    if (!orders.data) return [];
+    return orders.data.filter((d) => {
+      const parser = new FmOrderMemoParser(d.memo || '');
+      // 선물하기가 아닌 주문만 필터링
+      return !parser.giftFlag;
+    });
+  }, [orders.data]);
+
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
       <ChakraDataGrid
@@ -250,7 +259,7 @@ export function OrderList(): JSX.Element {
         disableColumnMenu
         loading={orders.isLoading}
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
-        rows={orders.data || []}
+        rows={filteredOrders}
         checkboxSelection
         selectionModel={fmOrderStates.selectedOrders}
         onSelectionModelChange={fmOrderStates.handleOrderSelected}
