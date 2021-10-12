@@ -414,7 +414,7 @@ model Broadcaster {
   afreecaId           String? // 유저의 아프리카 아이디
   twitchId            String? // 유저의 트위치 아이디
   youtubeId           String? // 유저의 유튜브 아이디
-  overlayUrl          String // 라이브커머스 오버레이 URL
+  overlayUrl          String                @unique // 라이브커머스 오버레이 URL 
   createDate          DateTime              @default(now())
   deleteFlag          Boolean               @default(false) // 회원탈퇴 여부
 
