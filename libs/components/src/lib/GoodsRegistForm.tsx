@@ -15,7 +15,7 @@ import {
   useRegistGoods,
 } from '@project-lc/hooks';
 import path from 'path';
-import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
+import { GoodsByIdRes, GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { FormProvider, NestedValue, useForm } from 'react-hook-form';
 import { ChevronLeftIcon } from '@chakra-ui/icons';
@@ -146,7 +146,11 @@ export async function saveContentsImageToS3(
   return contentsBody;
 }
 
-export function GoodsRegistForm(): JSX.Element {
+export function GoodsRegistForm({
+  goodsData,
+}: {
+  goodsData?: GoodsByIdRes;
+}): JSX.Element {
   const { data: profileData } = useProfile();
   const { mutateAsync, isLoading } = useRegistGoods();
   const { mutateAsync: createGoodsCommonInfo } = useCreateGoodsCommonInfo();
@@ -155,6 +159,8 @@ export function GoodsRegistForm(): JSX.Element {
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
+      goods_name: goodsData ? goodsData.goods_name : undefined,
+      summary: goodsData ? goodsData.summary : undefined,
       common_contents_type: 'new',
       option_title: '',
       image: [],
@@ -198,11 +204,11 @@ export function GoodsRegistForm(): JSX.Element {
       min_purchase_ea,
       shippingGroupId,
       contents,
-      ...goodsData
+      ...goodsFormData
     } = data;
 
     let goodsDto: RegistGoodsDto = {
-      ...goodsData,
+      ...goodsFormData,
       common_contents: '',
       options: addGoodsOptionInfo(options, option_title),
       option_use: options.length > 1 ? '1' : '0',
@@ -298,11 +304,8 @@ export function GoodsRegistForm(): JSX.Element {
           justifyContent="space-between"
           zIndex={theme.zIndices.sticky}
         >
-          <Button
-            leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push('/mypage/goods')}
-          >
-            상품목록 돌아가기
+          <Button leftIcon={<ChevronLeftIcon />} onClick={router.back}>
+            돌아가기
           </Button>
           <Button type="submit" colorScheme="blue" isLoading={isLoading}>
             등록
