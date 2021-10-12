@@ -71,7 +71,7 @@ export class AdminService {
       orderBy: [{ [sort]: direction }],
       where: {
         confirmation: {
-          status: 'waiting',
+          OR: [{ status: 'waiting' }, { status: 'needReconfirmation' }],
         },
       },
       include: {
