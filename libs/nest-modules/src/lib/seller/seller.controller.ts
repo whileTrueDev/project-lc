@@ -12,11 +12,7 @@ import {
   ValidationPipe,
   Res,
 } from '@nestjs/common';
-import {
-  Seller,
-  SellerBusinessRegistration,
-  SellerSettlementAccount,
-} from '@prisma/client';
+import { Seller, SellerSettlementAccount } from '@prisma/client';
 import {
   FindSellerDto,
   PasswordValidateDto,
@@ -33,6 +29,7 @@ import { SellerService } from './seller.service';
 import {
   SellerSettlementInfo,
   SellerSettlementService,
+  SellerBusinessRegistrationType,
 } from './seller-settlement.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
@@ -107,7 +104,7 @@ export class SellerController {
     return this.sellerService.changePassword(dto.email, dto.password);
   }
 
-  // 본인의 정산정보 조회
+  // 본인의 정산정보 및 정산 검수 정보 조회
   @UseGuards(JwtAuthGuard)
   @Get('settlement')
   public async selectSellerSettlementInfo(
@@ -116,17 +113,33 @@ export class SellerController {
     return this.sellerSettlementService.selectSellerSettlementInfo(sellerInfo);
   }
 
-  // 본인의 사업자 등록증 등록
+  // 본인의 사업자 등록정보 등록
   @UseGuards(JwtAuthGuard)
   @Post('business-registration')
   public async InsertBusinessRegistration(
     @Body(ValidationPipe) dto: BusinessRegistrationDto,
     @SellerInfo() sellerInfo: UserPayload,
-  ): Promise<SellerBusinessRegistration> {
-    return this.sellerSettlementService.insertBusinessRegistration(dto, sellerInfo);
+  ): Promise<SellerBusinessRegistrationType> {
+    // 사업자 등록정보 등록
+    const sellerBusinessRegistration =
+      await this.sellerSettlementService.insertBusinessRegistration(dto, sellerInfo);
+
+    // 사업자 등록정보 검수정보 등록
+    const businessRegistrationConfirmation =
+      await this.sellerSettlementService.insertBusinessRegistrationConfirmation(
+        sellerBusinessRegistration,
+      );
+
+    // 사업자 등록정보 결과
+    const result = {
+      ...sellerBusinessRegistration,
+      BusinessRegistrationConfirmation: businessRegistrationConfirmation,
+    };
+
+    return result;
   }
 
-  // 본인의 사업자 등록증 등록
+  // 본인의 계좌정보 등록
   @UseGuards(JwtAuthGuard)
   @Post('settlement-account')
   public async InsertSettlementAccount(
