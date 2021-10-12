@@ -337,7 +337,11 @@ export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
                 </Box>
               </Tooltip>
             ))}
-            <Button size="sm" as="div" isDisabled={selectedOrders.length === 0}>
+            {/*
+             * 내보내기 기능 보류 by dan 21.10.12
+             * https://www.notion.so/whiletrue/CSV-be33d041a81d4601b005b0d3ed659d28
+             */}
+            {/* <Button size="sm" as="div" isDisabled={selectedOrders.length === 0}>
               <GridToolbarExport
                 csvOptions={{
                   allColumns: true,
@@ -347,7 +351,7 @@ export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
                 }}
                 disabled={selectedOrders.length === 0}
               />
-            </Button>
+            </Button> */}
           </>
         )}
       </Stack>
