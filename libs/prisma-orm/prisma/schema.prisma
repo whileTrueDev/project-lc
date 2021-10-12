@@ -158,12 +158,12 @@ model GoodsOptions {
   goodsId        Int
   supply         GoodsOptionsSupplies?
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
-  default_option YesOrNo               @default(n) // 옵션 필수 여부
+  default_option YesOrNo               @default(n) // 옵션 필수 ���부
   option_type    String                @default("direct") // 기본값인듯? 설명도 direct
   option_title   String? // 옵션명 fm_goods_options.option_title
   option1        String? // 옵션값 fm_goods_options.option1
   option_code    String? // 옵션코드
-  consumer_price Decimal               @db.Decimal(10, 2) // ��������비��가 (미할인가)
+  consumer_price Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
   price          Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
   color          String?               @db.VarChar(10) // 컬러 hex값
   weight         Float? //옵션 개당 무게 (단위 kg)
@@ -175,7 +175,7 @@ model GoodsOptions {
 // 상품 옵션 재고 - fm_goods_suply
 model GoodsOptionsSupplies {
   id             Int          @id @default(autoincrement())
-  goodsOptionsId Int
+  goodsOptionsId Int          @unique
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   stock          Int          @db.UnsignedInt // 재고
   badstock       Int?         @db.UnsignedInt // 불량재고
@@ -225,6 +225,7 @@ enum GoodsConfirmationStatuses {
   waiting // 대기
   confirmed // 승인
   rejected // 거절
+  needReconfirmation // 재검수 대기
 }
 
 // * 상품 - 상태
