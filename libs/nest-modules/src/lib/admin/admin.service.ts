@@ -5,17 +5,9 @@ import {
   GoodsConfirmationDto,
   GoodsRejectionDto,
   BusinessRegistrationStatus,
+  SellerBusinessRegistrationType,
 } from '@project-lc/shared-types';
-import {
-  SellerSettlementAccount,
-  SellerBusinessRegistration,
-  GoodsConfirmation,
-  BusinessRegistrationConfirmation,
-} from '@prisma/client';
-
-export type SellerBusinessRegistrationType = SellerBusinessRegistration & {
-  BusinessRegistrationConfirmation: BusinessRegistrationConfirmation | null;
-};
+import { SellerSettlementAccount, GoodsConfirmation } from '@prisma/client';
 
 export type AdminSettlementInfoType = {
   sellerSettlementAccount: SellerSettlementAccount[];

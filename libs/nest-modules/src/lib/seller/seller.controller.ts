@@ -22,6 +22,7 @@ import {
   SettlementAccountDto,
   SellerShopInfoDto,
   FindSellerRes,
+  SellerBusinessRegistrationType,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -29,7 +30,6 @@ import { SellerService } from './seller.service';
 import {
   SellerSettlementInfo,
   SellerSettlementService,
-  SellerBusinessRegistrationType,
 } from './seller-settlement.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';

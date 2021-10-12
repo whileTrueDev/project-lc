@@ -5,12 +5,12 @@ import {
   BusinessRegistrationConfirmation,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { BusinessRegistrationDto, SettlementAccountDto } from '@project-lc/shared-types';
+import {
+  BusinessRegistrationDto,
+  SettlementAccountDto,
+  SellerBusinessRegistrationType,
+} from '@project-lc/shared-types';
 import { UserPayload } from '../auth/auth.interface';
-
-export type SellerBusinessRegistrationType = SellerBusinessRegistration & {
-  BusinessRegistrationConfirmation: BusinessRegistrationConfirmation | null;
-};
 
 export type SellerSettlementInfo = {
   sellerBusinessRegistration: SellerBusinessRegistrationType[];

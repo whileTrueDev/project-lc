@@ -1,4 +1,12 @@
 import { IsString, IsNumber } from 'class-validator';
+import {
+  SellerBusinessRegistration,
+  BusinessRegistrationConfirmation,
+} from '@prisma/client';
+
+export type SellerBusinessRegistrationType = SellerBusinessRegistration & {
+  BusinessRegistrationConfirmation: BusinessRegistrationConfirmation | null;
+};
 
 // 검수 상태 TYPE
 export enum BusinessRegistrationStatus {
