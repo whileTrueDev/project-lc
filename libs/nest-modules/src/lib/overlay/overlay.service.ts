@@ -75,7 +75,7 @@ export class OverlayService {
     </speak>
     `;
 
-    const audioConfig: AudioEncoding = { speakingRate: 1.0, audioEncoding: 'MP3' };
+    const audioConfig: AudioEncoding = { speakingRate: 1.1, audioEncoding: 'MP3' };
     const voice: Voice = {
       languageCode: 'ko-KR',
       name: 'ko-KR-Wavenet-A',
