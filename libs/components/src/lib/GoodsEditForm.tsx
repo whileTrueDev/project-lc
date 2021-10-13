@@ -79,7 +79,7 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
             },
           ],
       // 상품사진
-      pictures: [],
+      image: goodsData?.image || [],
       // 상세설명
       contents: goodsData?.contents || undefined,
       // 상품공통정보
@@ -114,7 +114,6 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
 
     const {
       id,
-      pictures,
       options,
       option_title,
       common_contents_name,
@@ -136,8 +135,6 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
     //   max_purchase_ea: Number(max_purchase_ea) || 0,
     //   min_purchase_ea: Number(min_purchase_ea) || 0,
     //   shippingGroupId: Number(shippingGroupId) || undefined,
-    //   image:
-    //     pictures && pictures.length > 0 ? await imageFileListToImageDto(pictures, userMail) : [],
     // };
 
     // // 상세설명을 입력한 경우

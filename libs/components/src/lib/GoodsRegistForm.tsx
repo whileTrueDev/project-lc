@@ -165,7 +165,7 @@ export function GoodsRegistForm(): JSX.Element {
       option_use: '1', // 옵션사용여부, 기본 - 옵션사용 1
       common_contents_type: 'new',
       option_title: '',
-      pictures: [],
+      image: [],
       options: [
         {
           option_type: 'direct',
@@ -198,7 +198,6 @@ export function GoodsRegistForm(): JSX.Element {
     const userMail = profileData.email;
 
     const {
-      pictures,
       options,
       option_title,
       common_contents_name,
@@ -218,10 +217,6 @@ export function GoodsRegistForm(): JSX.Element {
       max_purchase_ea: Number(max_purchase_ea) || 0,
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
-      image:
-        pictures && pictures.length > 0
-          ? await imageFileListToImageDto(pictures, userMail)
-          : [],
     };
 
     // 상세설명을 입력한 경우
