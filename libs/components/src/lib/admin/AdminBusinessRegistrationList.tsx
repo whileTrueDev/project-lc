@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { AdminImageDownloadButton } from './AdminImageDownloadButton';
+
 import { AdminBusinessRegistrationRejectionDialog } from './AdminBusinessRegistrationRejectionDialog';
 import { AdminBusinessRegistrationConfirmationDialog } from './AdminBusinessRegistrationConfirmationDialog';
 
@@ -14,7 +15,8 @@ const columns: GridColumns = [
   {
     field: 'businessRegistrationStatus',
     headerName: '검수상태',
-    renderCell: (params) => ConfirmationBadge(params.row),
+    renderCell: (params) =>
+      ConfirmationBadge(params.row.BusinessRegistrationConfirmation.status),
   },
   {
     field: 'companyName',
@@ -91,9 +93,9 @@ function makeListRow(
 }
 
 // 사업자 등록 검수 상태 badge
-function ConfirmationBadge(row: GridRowData): JSX.Element {
-  let result = { color: 'yellow', text: '대기중' };
-  switch (row.BusinessRegistrationConfirmation.status) {
+export function ConfirmationBadge(status: string): JSX.Element {
+  let result = null;
+  switch (status) {
     case BusinessRegistrationStatus.CONFIRMED: {
       result = { color: 'green', text: '승인됨' };
       break;
@@ -102,11 +104,19 @@ function ConfirmationBadge(row: GridRowData): JSX.Element {
       result = { color: 'red', text: '반려됨' };
       break;
     }
-    default: {
+    case BusinessRegistrationStatus.WAITING: {
       result = { color: 'yellow', text: '대기중' };
+      break;
+    }
+    default: {
+      result = { color: 'red', text: '등록안됨' };
     }
   }
-  return <Badge colorScheme={result.color}>{result.text}</Badge>;
+  return (
+    <Badge colorScheme={result.color} fontSize="sm" size="sm">
+      {result.text}
+    </Badge>
+  );
 }
 
 // 관리자가 볼 계좌번호 등록 리스트

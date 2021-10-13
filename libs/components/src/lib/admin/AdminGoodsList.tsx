@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { GridCellParams, GridColumns } from '@material-ui/data-grid';
 import { GoodsStatus } from '@prisma/client';
-import { useAdminGoodsList, useProfile } from '@project-lc/hooks';
+import { useAdminGoodsList, useProfile, useDisplaySize } from '@project-lc/hooks';
 import { SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
@@ -21,6 +21,7 @@ import { ChakraDataGrid } from '../ChakraDataGrid';
 import { ShippingGroupDetailButton } from '../SellerGoodsList';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
+import { ConfirmationBadge } from './AdminBusinessRegistrationList';
 
 function formatPrice(price: number): string {
   const formattedPrice = price.toLocaleString();
@@ -37,8 +38,7 @@ const columns: GridColumns = [
   {
     field: 'goods_name',
     headerName: '상품명',
-    minWidth: 120,
-    flex: 1,
+    minWidth: 500,
     sortable: false,
     renderCell: ({ row }) => {
       const goodsId = row.id;
@@ -118,11 +118,18 @@ const columns: GridColumns = [
     renderCell: () => <Button size="xs">반려하기</Button>,
     sortable: false,
   },
+  {
+    field: 'businessRegistrationStatus',
+    headerName: '사업자등록정보검수상태',
+    width: 100,
+    renderCell: (params) => ConfirmationBadge(params.row.businessRegistrationStatus),
+  },
 ];
 // * 상품목록 datagrid 컬럼 끝*********************************************
 
 export function AdminGoodsList(): JSX.Element {
   const { data: profileData } = useProfile();
+  const { isDesktopSize } = useDisplaySize();
   const {
     itemPerPage,
     sort,
@@ -161,13 +168,13 @@ export function AdminGoodsList(): JSX.Element {
   }
 
   return (
-    <Box>
+    <>
       <ChakraDataGrid
         bg={useColorModeValue('inherit', 'gray.300')}
         loading={isLoading}
         rows={data?.items || []}
         autoHeight
-        columns={columns}
+        columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
         disableMultipleSelection
         disableSelectionOnClick
         disableColumnMenu
@@ -221,7 +228,7 @@ export function AdminGoodsList(): JSX.Element {
         onClose={onRejectionClose}
         row={selectedRow}
       />
-    </Box>
+    </>
   );
 }
 
