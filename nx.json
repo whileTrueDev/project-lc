@@ -64,6 +64,9 @@
     "stores": {
       "tags": []
     },
+    "utils": {
+      "tags": []
+    },
     "web": {
       "tags": []
     },

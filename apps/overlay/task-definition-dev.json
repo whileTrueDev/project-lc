@@ -25,7 +25,12 @@
       "command": [],
       "linuxParameters": null,
       "cpu": 0,
-      "environment": [],
+      "environment": [
+        {
+          "name": "S3_BUCKET_NAME",
+          "value": "lc-project"
+        }
+      ],
       "resourceRequirements": null,
       "ulimits": [],
       "dnsServers": [],
@@ -63,6 +68,14 @@
         {
           "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_CIPHER_SALT",
           "name": "CIPHER_SALT"
+        },
+        {
+          "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/S3_ACCESS_KEY_ID",
+          "name": "AWS_S3_ACCESS_KEY_ID"
+        },
+        {
+          "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/S3_ACCESS_KEY_SECRET",
+          "name": "AWS_S3_ACCESS_KEY_SECRET"
         }
       ],
       "dockerSecurityOptions": [],

@@ -68,7 +68,6 @@ async function main(): Promise<void> {
       seller: { connect: { email: seller.email } },
       goods_name: 'testGoods1',
       summary: '테스트상품1',
-      common_contents,
       image: {
         create: [
           {
@@ -133,6 +132,13 @@ async function main(): Promise<void> {
           },
         },
       },
+      GoodsInfo: {
+        create: {
+          info_name: '기본',
+          info_value: common_contents,
+          seller: { connect: { email: seller.email } },
+        },
+      },
     },
     include: { options: { include: { supply: true } } },
   });
@@ -142,11 +148,10 @@ async function main(): Promise<void> {
       seller: { connect: { email: seller.email } },
       goods_name: 'testGoods2',
       summary: '테스트상품2',
-      common_contents,
       image: {
         create: {
           cut_number: 1,
-          image: 'https://picsum.photos/301/300',
+          image: 'https://picsum.photos/302/303',
         },
       },
       options: {
@@ -176,11 +181,10 @@ async function main(): Promise<void> {
       sellerId: seller.id,
       goods_name: 'testGoods3',
       summary: '테스트상품3',
-      common_contents,
       image: {
         create: {
           cut_number: 1,
-          image: 'https://picsum.photos/301/300',
+          image: 'https://picsum.photos/302/304',
         },
       },
       options: {
