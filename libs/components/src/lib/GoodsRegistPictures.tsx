@@ -69,9 +69,9 @@ export function GoodsRegistPictures(): JSX.Element {
   const deletePreview = (id: number): void => {
     setPreviews((list) => {
       const filtered = list.filter((item) => item.id !== id);
-      const prevImages = getValues('image');
+      const prevImages = getValues('pictures');
       setValue(
-        'image',
+        'pictures',
         prevImages?.filter((item) => item.id !== id),
       );
       return [...filtered];
@@ -93,9 +93,9 @@ export function GoodsRegistPictures(): JSX.Element {
         const id = list.length === 0 ? 0 : list[list.length - 1].id + 1;
         const newList = [...list, { id, url: data, fileName }];
 
-        const prevImages = getValues('image');
+        const prevImages = getValues('pictures');
         setValue(
-          'image',
+          'pictures',
           prevImages ? [...prevImages, { id, file, filename: fileName }] : [],
         );
 

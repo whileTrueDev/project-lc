@@ -79,7 +79,7 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
             },
           ],
       // 상품사진
-      image: [],
+      pictures: [],
       // 상세설명
       contents: goodsData?.contents || undefined,
       // 상품공통정보
@@ -114,7 +114,7 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
 
     const {
       id,
-      image,
+      pictures,
       options,
       option_title,
       common_contents_name,
@@ -127,94 +127,86 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
       ...goodsFormData
     } = data;
 
-    // if (id) {
-    //   console.log('상품 수정');
+    console.log('상품 수정', data);
+
+    // let goodsDto: RegistGoodsDto = {
+    //   ...goodsFormData,
+    //   options: addGoodsOptionInfo(options, option_title),
+    //   option_use: options.length > 1 ? '1' : '0',
+    //   max_purchase_ea: Number(max_purchase_ea) || 0,
+    //   min_purchase_ea: Number(min_purchase_ea) || 0,
+    //   shippingGroupId: Number(shippingGroupId) || undefined,
+    //   image:
+    //     pictures && pictures.length > 0 ? await imageFileListToImageDto(pictures, userMail) : [],
+    // };
+
+    // // 상세설명을 입력한 경우
+    // if (contents && contents !== '<p><br></p>') {
+    //   const contentsBody = await saveContentsImageToS3(contents, userMail);
+    //   goodsDto = {
+    //     ...goodsDto,
+    //     contents: contentsBody,
+    //     contents_mobile: contentsBody,
+    //   };
     // } else {
-    //   console.log('상품 등록');
+    //   // 상세설명을 입력하지 않은 경우 - 상품 수정 기능이 없는 동안 필수값으로 설정함
+    //   // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기
+    //   toast({ title: '상세설명을 입력해주세요', status: 'warning' });
+    //   return;
     // }
-    // console.log(data);
 
-    let goodsDto: RegistGoodsDto = {
-      ...goodsFormData,
-      options: addGoodsOptionInfo(options, option_title),
-      option_use: options.length > 1 ? '1' : '0',
-      max_purchase_ea: Number(max_purchase_ea) || 0,
-      min_purchase_ea: Number(min_purchase_ea) || 0,
-      shippingGroupId: Number(shippingGroupId) || undefined,
-      image:
-        image && image.length > 0 ? await imageFileListToImageDto(image, userMail) : [],
-    };
+    // // 공통정보 신규생성 & 공통정보를 입력한 경우
+    // if (
+    //   common_contents_type === 'new' &&
+    //   !!common_contents &&
+    //   common_contents !== '<p><br></p>'
+    // ) {
+    //   // 공통정보 생성 -> 해당 아이디를 commonInfoId에 추가
+    //   const commonInfoBody = await saveContentsImageToS3(common_contents, userMail);
+    //   const res = await createGoodsCommonInfo({
+    //     info_name: common_contents_name || '',
+    //     info_value: commonInfoBody,
+    //   });
 
-    // 상세설명을 입력한 경우
-    if (contents && contents !== '<p><br></p>') {
-      const contentsBody = await saveContentsImageToS3(contents, userMail);
-      goodsDto = {
-        ...goodsDto,
-        contents: contentsBody,
-        contents_mobile: contentsBody,
-      };
-    } else {
-      // 상세설명을 입력하지 않은 경우 - 상품 수정 기능이 없는 동안 필수값으로 설정함
-      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기
-      toast({ title: '상세설명을 입력해주세요', status: 'warning' });
-      return;
-    }
+    //   goodsDto = {
+    //     ...goodsDto,
+    //     goodsInfoId: res.id,
+    //   };
+    // } else if (!data.goodsInfoId) {
+    //   // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함) - 상품 수정 기능이 없는 동안 필수값으로 설정함
+    //   // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기
+    //   toast({
+    //     title: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
+    //     status: 'warning',
+    //   });
+    //   return;
+    // }
 
-    // 공통정보 신규생성 & 공통정보를 입력한 경우
-    if (
-      common_contents_type === 'new' &&
-      !!common_contents &&
-      common_contents !== '<p><br></p>'
-    ) {
-      // 공통정보 생성 -> 해당 아이디를 commonInfoId에 추가
-      const commonInfoBody = await saveContentsImageToS3(common_contents, userMail);
-      const res = await createGoodsCommonInfo({
-        info_name: common_contents_name || '',
-        info_value: commonInfoBody,
-      });
+    // if (!shippingGroupId) {
+    //   // 배송비정책 그룹을 선택하지 않은 경우
+    //   // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기(if문 삭제)
+    //   toast({
+    //     title: '배송비 정책을 선택해주세요',
+    //     status: 'warning',
+    //   });
+    //   return;
+    // }
 
-      goodsDto = {
-        ...goodsDto,
-        goodsInfoId: res.id,
-      };
-    } else if (!data.goodsInfoId) {
-      // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함) - 상품 수정 기능이 없는 동안 필수값으로 설정함
-      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기
-      toast({
-        title: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
-        status: 'warning',
-      });
-      return;
-    }
-
-    if (!shippingGroupId) {
-      // 배송비정책 그룹을 선택하지 않은 경우
-      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기(if문 삭제)
-      toast({
-        title: '배송비 정책을 선택해주세요',
-        status: 'warning',
-      });
-      return;
-    }
-
-    console.log('상품 등록');
-    console.log(goodsDto);
-
-    mutateAsync(goodsDto)
-      .then((res) => {
-        toast({
-          title: '상품을 성공적으로 등록하였습니다',
-          status: 'success',
-        });
-        router.push('/mypage/goods');
-      })
-      .catch((error) => {
-        console.error(error);
-        toast({
-          title: '상품 등록 중 오류가 발생하였습니다',
-          status: 'error',
-        });
-      });
+    // mutateAsync(goodsDto)
+    //   .then((res) => {
+    //     toast({
+    //       title: '상품을 성공적으로 등록하였습니다',
+    //       status: 'success',
+    //     });
+    //     router.push('/mypage/goods');
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //     toast({
+    //       title: '상품 등록 중 오류가 발생하였습니다',
+    //       status: 'error',
+    //     });
+    //   });
   };
 
   return (

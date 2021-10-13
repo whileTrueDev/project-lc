@@ -35,10 +35,10 @@ export type GoodsFormOption = Omit<GoodsOptionDto, 'default_option' | 'option_ti
 
 export type GoodsFormOptionsType = GoodsFormOption[];
 
-export type GoodsFormValues = Omit<RegistGoodsDto, 'options' | 'image'> & {
+export type GoodsFormValues = Omit<RegistGoodsDto, 'options'> & {
   id?: number;
   options: NestedValue<GoodsFormOptionsType>;
-  image?: { file: File; filename: string; id: number }[];
+  pictures?: { file: File; filename: string; id: number }[];
   option_title: string; // 옵션 제목
   common_contents: string;
   common_contents_name?: string; // 공통 정보 이름
@@ -165,7 +165,7 @@ export function GoodsRegistForm(): JSX.Element {
       option_use: '1', // 옵션사용여부, 기본 - 옵션사용 1
       common_contents_type: 'new',
       option_title: '',
-      image: [],
+      pictures: [],
       options: [
         {
           option_type: 'direct',
@@ -198,7 +198,7 @@ export function GoodsRegistForm(): JSX.Element {
     const userMail = profileData.email;
 
     const {
-      image,
+      pictures,
       options,
       option_title,
       common_contents_name,
@@ -219,7 +219,9 @@ export function GoodsRegistForm(): JSX.Element {
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
       image:
-        image && image.length > 0 ? await imageFileListToImageDto(image, userMail) : [],
+        pictures && pictures.length > 0
+          ? await imageFileListToImageDto(pictures, userMail)
+          : [],
     };
 
     // 상세설명을 입력한 경우
