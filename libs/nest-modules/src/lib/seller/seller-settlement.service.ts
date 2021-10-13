@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { SellerBusinessRegistration, SellerSettlementAccount } from '@prisma/client';
+import {
+  SellerBusinessRegistration,
+  SellerSettlementAccount,
+  BusinessRegistrationConfirmation,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { BusinessRegistrationDto, SettlementAccountDto } from '@project-lc/shared-types';
+import {
+  BusinessRegistrationDto,
+  SettlementAccountDto,
+  SellerBusinessRegistrationType,
+} from '@project-lc/shared-types';
 import { UserPayload } from '../auth/auth.interface';
 
 export type SellerSettlementInfo = {
-  sellerBusinessRegistration: SellerBusinessRegistration[];
+  sellerBusinessRegistration: SellerBusinessRegistrationType[];
   sellerSettlements: {
     date: Date;
     state: number;
@@ -54,8 +62,25 @@ export class SellerSettlementService {
           mailOrderSalesNumber: dto.mailOrderSalesNumber,
         },
       });
-
     return sellerBusinessRegistration;
+  }
+
+  /**
+   * 정산 정보 등록 후, 검수 정보를 위한 테이블에 레코드 추가
+   * 정산 정보 등록 후 autoincrement되는 id 번호를 사용해야하므로 등록 과정 이후 진행
+   * @param sellerBusinessRegistration 삽입된 사업자 등록 정보
+   */
+  async insertBusinessRegistrationConfirmation(
+    _sellerBusinessRegistration: SellerBusinessRegistration,
+  ): Promise<BusinessRegistrationConfirmation> {
+    const businessRegistrationConfirmation =
+      await this.prisma.businessRegistrationConfirmation.create({
+        data: {
+          SellerBusinessRegistrationId: _sellerBusinessRegistration.id,
+        },
+      });
+
+    return businessRegistrationConfirmation;
   }
 
   /**
@@ -95,6 +120,9 @@ export class SellerSettlementService {
       },
       select: {
         sellerBusinessRegistration: {
+          include: {
+            BusinessRegistrationConfirmation: true,
+          },
           take: 1,
           orderBy: {
             id: 'desc',

@@ -1,21 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
+  BusinessRegistrationStatus,
+  SellerBusinessRegistrationType,
 } from '@project-lc/shared-types';
-import {
-  SellerSettlementAccount,
-  SellerBusinessRegistration,
-  GoodsConfirmation,
-} from '@prisma/client';
+import { SellerSettlementAccount, GoodsConfirmation } from '@prisma/client';
 
 export type AdminSettlementInfoType = {
   sellerSettlementAccount: SellerSettlementAccount[];
-  sellerBusinessRegistration: SellerBusinessRegistration[];
+  sellerBusinessRegistration: SellerBusinessRegistrationType[];
 };
-
 @Injectable()
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
@@ -26,6 +23,9 @@ export class AdminService {
     const users = await this.prisma.seller.findMany({
       include: {
         sellerBusinessRegistration: {
+          include: {
+            BusinessRegistrationConfirmation: true,
+          },
           orderBy: {
             id: 'desc',
           },
@@ -57,7 +57,13 @@ export class AdminService {
         result.sellerSettlementAccount.push(sellerSettlementAccount[0]);
       }
       if (sellerBusinessRegistration.length > 0) {
-        result.sellerBusinessRegistration.push(sellerBusinessRegistration[0]);
+        // 사업자등록정보의 상태가 대기 및 반려인 경우에만 보여준다.
+        if (
+          sellerBusinessRegistration[0].BusinessRegistrationConfirmation.status !==
+          BusinessRegistrationStatus.CONFIRMED
+        ) {
+          result.sellerBusinessRegistration.push(sellerBusinessRegistration[0]);
+        }
       }
     });
 
@@ -114,14 +120,40 @@ export class AdminService {
     };
   }
 
+  /** 동일한 퍼스트몰 상품 고유번호로 검수된 상품이 있는지 확인(중복 상품 연결 방지 위함) */
+  private async checkDupFMGoodsConnectionId(fmGoodsId: number): Promise<boolean> {
+    const confirmData = await this.prisma.goodsConfirmation.findFirst({
+      where: { firstmallGoodsConnectionId: fmGoodsId },
+    });
+
+    if (confirmData) {
+      return true;
+    }
+    return false;
+  }
+
   public async setGoodsConfirmation(
     dto: GoodsConfirmationDto,
   ): Promise<GoodsConfirmation> {
+    // 상품 검수 확인시 동일한 퍼스트몰 상품번호로 검수된 상품이 있는지(중복 여부) 확인 - 이미 존재하면 400 에러
+    const { firstmallGoodsConnectionId } = dto;
+    const hasDuplicatedFmGoodsConnectionId = await this.checkDupFMGoodsConnectionId(
+      firstmallGoodsConnectionId,
+    );
+
+    if (hasDuplicatedFmGoodsConnectionId) {
+      throw new BadRequestException(
+        `이미 ( 퍼스트몰 상품 고유번호 : ${firstmallGoodsConnectionId} ) 로 검수된 상품이 존재합니다. 퍼스트몰 상품 고유번호를 다시 확인해주세요.`,
+      );
+    }
+
+    // 동일한 퍼스트몰 상품번호로 검수된 상품이 없다면(중복이 아닌 경우) 그대로 검수 확인 진행
     const goodsConfirmation = await this.prisma.goodsConfirmation.update({
       where: { goodsId: dto.goodsId },
       data: {
-        firstmallGoodsConnectionId: dto.firstmallGoodsConnectionId,
+        firstmallGoodsConnectionId,
         status: dto.status,
+        rejectionReason: null,
       },
     });
 
@@ -137,6 +169,7 @@ export class AdminService {
       where: { goodsId: dto.goodsId },
       data: {
         status: dto.status,
+        rejectionReason: dto.rejectionReason,
       },
     });
 

@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber } from 'class-validator';
+import { IsEnum, IsNumber, IsString } from 'class-validator';
 
 export enum GoodsConfirmationStatus {
   WAITING = 'waiting',
@@ -23,4 +23,7 @@ export class GoodsRejectionDto {
 
   @IsEnum(GoodsConfirmationStatus)
   status = GoodsConfirmationStatus.REJECTED;
+
+  @IsString()
+  rejectionReason: string;
 }

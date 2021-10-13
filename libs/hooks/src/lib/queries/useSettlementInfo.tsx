@@ -4,11 +4,8 @@ import {
   QueryObserverResult,
   UseQueryResult,
 } from 'react-query';
-import {
-  SellerSettlementAccount,
-  SellerBusinessRegistration,
-  SellerSettlements,
-} from '@prisma/client';
+import { SellerSettlementAccount, SellerSettlements } from '@prisma/client';
+import { SellerBusinessRegistrationType } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
 
@@ -16,7 +13,7 @@ import axios from '../../axios';
 export type SettlementInfoType = {
   sellerSettlementAccount: SellerSettlementAccount[];
   sellerSettlements: SellerSettlements[];
-  sellerBusinessRegistration: SellerBusinessRegistration[];
+  sellerBusinessRegistration: SellerBusinessRegistrationType[];
 };
 
 export type SettlementInfoRefetchType = () => Promise<
