@@ -103,3 +103,11 @@ export interface GoogleTTSCredentials {
 export interface UserId {
   userId: string;
 }
+
+export interface StreamerAndProduct {
+  streamerNickname: string;
+  productName: string;
+}
+export interface StartSetting extends RoomAndDate {
+  streamerAndProduct: StreamerAndProduct;
+}

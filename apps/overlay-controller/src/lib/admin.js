@@ -4,7 +4,7 @@
 
 let roomName;
 let userId;
-let creatorNickname;
+let streamerNickname;
 let isLogin = true;
 const socket = io(process.env.HOST, { transports: ['websocket'] });
 
@@ -28,11 +28,11 @@ $(document).ready(function ready() {
   $('#end-time-picker').val(localISOTime);
 
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
-    creatorNickname = $(this).closest('tr').prop('id');
+    streamerNickname = $(this).closest('tr').prop('id');
     const url = $(this).closest('tr').children('td.url-cell').attr('id');
     userId = $(this).closest('tr').children('td.userid-cell').attr('id');
 
-    $('#creator-name').text(creatorNickname);
+    $('#creator-name').text(streamerNickname);
 
     socket.emit('request creator list', {
       roomName: socket.id,
@@ -85,7 +85,13 @@ $(document).ready(function ready() {
 
   $('#start-time-send-button').click(function startTimeSendButtonClickEvent() {
     const selectedTime = $('#start-time-picker').val();
-    socket.emit('get start time from admin', { roomName, date: selectedTime });
+    const productName = $('#product-name').val().trim();
+    const streamerAndProduct = { streamerNickname, productName };
+    socket.emit('get start time from admin', {
+      roomName,
+      date: selectedTime,
+      streamerAndProduct,
+    });
   });
 
   $('#end-time-send-button').click(function endTimeSendButtonClickEvent() {
@@ -113,7 +119,7 @@ $(document).ready(function ready() {
 
   $('input[name=client-checkbox]').change(function clientCheckboxOnChange() {
     if ($('input[name=client-checkbox]').is(':checked')) {
-      $('#customer-nickname').val(`${creatorNickname}팬`);
+      $('#customer-nickname').val(`${streamerNickname}팬`);
     } else {
       $('#customer-nickname').val('');
     }
