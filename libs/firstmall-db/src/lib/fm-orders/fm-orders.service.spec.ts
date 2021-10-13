@@ -208,7 +208,7 @@ describe('FmOrdersService', () => {
 
       expect(querySpy).toBeCalledTimes(2);
 
-      expect(orderDetail).toEqual(orderMetaInfoSample);
+      expect(orderDetail).toEqual({ ...orderMetaInfoSample, memo: '1234' });
     });
 
     it('should be return null', async () => {

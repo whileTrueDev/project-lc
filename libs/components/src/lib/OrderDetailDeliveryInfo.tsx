@@ -21,6 +21,7 @@ export function OrderDetailDeliveryInfo({
     | 'recipient_zipcode'
     | 'recipient_cellphone'
     | 'recipient_email'
+    | 'memo'
   >;
 }): JSX.Element {
   // 주문자 전화
@@ -69,6 +70,7 @@ export function OrderDetailDeliveryInfo({
         <Text>(우편번호) {orderDeliveryData.recipient_zipcode}</Text>
         <Text>(지번) {addressJibun}</Text>
         <Text>(도로명) {addressStreet}</Text>
+        <Text>(배송메모) {orderDeliveryData.memo}</Text>
         {recipientPhone && <Text>{recipientPhone}</Text>}
         <Text>{orderDeliveryData.recipient_cellphone}</Text>
         <Text>{orderDeliveryData.recipient_email}</Text>

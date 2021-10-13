@@ -13,11 +13,7 @@ export const mainNavItems: Array<NavItem> = [
     needLogin: true,
   },
   {
-    label: '입점 신청',
-    href: '#',
-  },
-  {
-    label: '성공 사례',
+    label: '크크마켓',
     href: '#',
   },
 ];
