@@ -150,7 +150,7 @@ model Goods {
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
   GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
-  goodsInfoId             Int?               @unique
+  goodsInfoId             Int?
 
   LiveShopping LiveShopping[]
   @@index([sellerId], name: "sellerId")
@@ -190,7 +190,7 @@ model GoodsOptions {
 // 상품 옵션 재고 - fm_goods_suply
 model GoodsOptionsSupplies {
   id             Int          @id @default(autoincrement())
-  goodsOptionsId Int
+  goodsOptionsId Int          @unique
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   stock          Int          @db.UnsignedInt // 재고
   badstock       Int?         @db.UnsignedInt // 불량재고
