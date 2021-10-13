@@ -44,6 +44,7 @@ export function SettlementStateBox(props: SettlementStateBoxProps): JSX.Element 
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  // 상태창 색깔을 결정하는 메모이징 변수
   const alertStatus = useMemo(() => {
     let status = 'error' as 'error' | 'success' | 'warning' | 'info';
     switch (sellerBusinessRegistration?.BusinessRegistrationConfirmation?.status) {
