@@ -12,7 +12,7 @@ import {
 } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { LiveShoppingDTO } from '@project-lc/shared-types';
-import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerPhoneNumber';
+import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerContacts';
 import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
 
 export interface UseForm {

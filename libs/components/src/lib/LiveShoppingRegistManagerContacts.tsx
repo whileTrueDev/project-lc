@@ -72,7 +72,15 @@ export function LiveShoppingManagerPhoneNumber(
         담당자 연락처
       </Heading>
 
-      <FormControl isRequired isInvalid={!!errors.email}>
+      <FormControl
+        isRequired
+        isInvalid={
+          !!errors.email ||
+          !!errors.firstNumber ||
+          !!errors.secondNumber ||
+          !!errors.thirdNumber
+        }
+      >
         <Stack spacing={2}>
           {!data ? (
             <RadioGroup
@@ -243,12 +251,9 @@ export function LiveShoppingManagerPhoneNumber(
                 </InputGroup>
               )}
               <FormErrorMessage>
-                {errors.firstNumber &&
-                  errors.firstNumber.message &&
-                  errors.secondNumber &&
-                  errors.secondNumber.message &&
-                  errors.thirdNumber &&
-                  errors.thirdNumber.message}
+                {(errors.firstNumber && errors.firstNumber.message) ||
+                  (errors.secondNumber && errors.secondNumber.message) ||
+                  (errors.thirdNumber && errors.thirdNumber.message)}
               </FormErrorMessage>
               {!data || watch('useContact') === 'old' ? (
                 <Checkbox isChecked isDisabled>
