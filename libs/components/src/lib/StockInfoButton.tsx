@@ -78,9 +78,9 @@ export function StockInfoButton({
                   <Th>소비자가</Th>
                   <Th>정가</Th>
                   <Th>옵션노출여부</Th>
-                  <Th>총 재고</Th>
-                  {/* <Th>불량재고</Th> */}
-                  <Th>가용재고</Th>
+                  {/* <Th>총 재고</Th>
+                  <Th>불량재고</Th>
+                  <Th>가용재고</Th> */}
                 </Tr>
               </Thead>
               <Tbody>
@@ -93,9 +93,9 @@ export function StockInfoButton({
                       <Td>{Number(option.consumer_price).toLocaleString()}</Td>
                       <Td>{Number(option.price).toLocaleString()}</Td>
                       <Td>{option.option_view === 'Y' ? '노출' : '미노출'}</Td>
-                      <Td>{option.stock}</Td>
-                      {/* <Td>{option.badstock}</Td> */}
-                      <Td>{option.rstock}</Td>
+                      {/* <Td>{option.stock}</Td>
+                      <Td>{option.badstock}</Td>
+                      <Td>{option.rstock}</Td> */}
                     </Tr>
                   ))}
               </Tbody>

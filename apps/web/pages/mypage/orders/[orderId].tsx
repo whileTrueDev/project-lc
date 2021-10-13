@@ -27,8 +27,9 @@ import {
   SectionWithTitle,
 } from '@project-lc/components';
 import { useDisplaySize, useFmOrder } from '@project-lc/hooks';
+import { FmOrderMemoParser } from '@project-lc/utils';
 import { useRouter } from 'next/router';
-import React from 'react-transition-group/node_modules/@types/react';
+import React, { useMemo } from 'react';
 
 const refundSectionTitle = '환불 정보';
 const returnSectionTitle = '반품 정보';
@@ -42,6 +43,14 @@ export function OrderDetail(): JSX.Element {
 
   const { isMobileSize } = useDisplaySize();
 
+  // 현재 주문이 조회 가능한 주문인지 확인
+  const isViewableOrder = useMemo(() => {
+    if (!order.data) return null;
+    const parser = new FmOrderMemoParser(order.data.memoOriginal);
+    // 주문이 선물용이 아닌 경우 조회 가능한 주문임.
+    return !parser.giftFlag;
+  }, [order.data]);
+
   if (order.isLoading) {
     return (
       <MypageLayout>
@@ -50,7 +59,7 @@ export function OrderDetail(): JSX.Element {
     );
   }
 
-  if (!order.isLoading && !order.data)
+  if (!order.isLoading && !isViewableOrder)
     return (
       <MypageLayout>
         <Box m="auto" maxW="4xl">

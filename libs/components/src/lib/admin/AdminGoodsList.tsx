@@ -1,30 +1,26 @@
-import NextLink from 'next/link';
 import {
   Box,
   Button,
+  Link,
   Select,
   Stack,
   Text,
-  Link,
-  useDisclosure,
   useColorModeValue,
-  useToast,
+  useDisclosure,
 } from '@chakra-ui/react';
-import {
-  useProfile,
-  useAdminGoodsList,
-  useGoodRejectionMutation,
-} from '@project-lc/hooks';
-import { GridColumns, GridCellParams } from '@material-ui/data-grid';
-import dayjs from 'dayjs';
+import { GridCellParams, GridColumns } from '@material-ui/data-grid';
 import { GoodsStatus } from '@prisma/client';
+import { useAdminGoodsList, useProfile } from '@project-lc/hooks';
+import { SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
-import { GoodsConfirmationStatus, SellerGoodsSortColumn } from '@project-lc/shared-types';
+import dayjs from 'dayjs';
+import NextLink from 'next/link';
 import { useState } from 'react';
-import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
-import { ChakraDataGrid } from '../ChakraDataGrid';
 import { GOODS_STATUS } from '../../constants/goodsStatus';
+import { ChakraDataGrid } from '../ChakraDataGrid';
 import { ShippingGroupDetailButton } from '../SellerGoodsList';
+import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
+import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
 
 function formatPrice(price: number): string {
   const formattedPrice = price.toLocaleString();
@@ -128,7 +124,6 @@ const columns: GridColumns = [
 export function AdminGoodsList(): JSX.Element {
   const { data: profileData } = useProfile();
   const {
-    page,
     itemPerPage,
     sort,
     direction,
@@ -136,8 +131,12 @@ export function AdminGoodsList(): JSX.Element {
     handlePageSizeChange,
     handleSortChange,
   } = useSellerGoodsListPanelStore();
-  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isRejectionOpen,
+    onOpen: onRejectionOpen,
+    onClose: onRejectionClose,
+  } = useDisclosure();
   const [selectedRow, setSelectedRow] = useState({});
   const { data, isLoading, refetch } = useAdminGoodsList(
     {
@@ -149,34 +148,14 @@ export function AdminGoodsList(): JSX.Element {
     },
   );
 
-  const rejectMutation = useGoodRejectionMutation();
-
-  async function handleRejectionGood(row: any): Promise<void> {
-    try {
-      await rejectMutation.mutateAsync({
-        goodsId: row.id,
-        status: GoodsConfirmationStatus.REJECTED,
-      });
-      toast({
-        title: '상품이 반려되었습니다.',
-        status: 'success',
-      });
-      refetch();
-    } catch (error) {
-      toast({
-        title: '상품 반려가 실패하였습니다.',
-        status: 'error',
-      });
-    }
-  }
-
   async function handleClick(param: GridCellParams): Promise<void> {
     if (param.field === 'confirmation') {
       setSelectedRow(param.row);
       onOpen();
     }
     if (param.field === 'rejection') {
-      handleRejectionGood(param.row);
+      setSelectedRow(param.row);
+      onRejectionOpen();
     }
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
   }
@@ -236,6 +215,11 @@ export function AdminGoodsList(): JSX.Element {
         callback={() => {
           refetch();
         }}
+      />
+      <AdminGoodsRejectionDialog
+        isOpen={isRejectionOpen}
+        onClose={onRejectionClose}
+        row={selectedRow}
       />
     </Box>
   );

@@ -26,6 +26,7 @@ export function ShippingOptionFixedApply({
     control,
     setValue,
     getValues,
+    trigger,
   } = useForm<ShippingCostDto>({
     defaultValues: {
       shipping_cost: 2500,
@@ -44,7 +45,12 @@ export function ShippingOptionFixedApply({
   }, [deliveryLimit, setValue, shippingSetType]);
 
   // 배송방법 추가
-  const addFixedOption = useCallback(() => {
+  const addFixedOption = useCallback(async () => {
+    // handleSubmit 이 아닌 onClick 이벤트 핸들러를 사용(상품등록 폼 내에 해당 폼이 존재하여 submit 이벤트가 버블링됨)
+    // trigger로 validation 체크 필요
+    const validationPassed = await trigger();
+    if (!validationPassed) return;
+
     const data: ShippingCostDto = getValues();
     const { shipping_area_name } = data;
     if (shipping_area_name === '지역 선택') {
@@ -84,6 +90,7 @@ export function ShippingOptionFixedApply({
     setShippingOptions,
     shippingOptions,
     shippingSetType,
+    trigger,
   ]);
 
   return (

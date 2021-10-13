@@ -49,7 +49,9 @@ export class SellerSettlementService {
           businessItem: dto.businessItem,
           businessAddress: dto.businessAddress,
           taxInvoiceMail: dto.taxInvoiceMail,
-          fileName: dto.fileName,
+          businessRegistrationImageName: dto.businessRegistrationImageName,
+          mailOrderSalesImageName: dto.mailOrderSalesImageName,
+          mailOrderSalesNumber: dto.mailOrderSalesNumber,
         },
       });
 
@@ -72,6 +74,7 @@ export class SellerSettlementService {
         name: dto.name,
         number: dto.number,
         bank: dto.bank,
+        settlementAccountImageName: dto.settlementAccountImageName,
       },
     });
 

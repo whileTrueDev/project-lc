@@ -59,6 +59,7 @@ export const exportSample: FmExport = {
   order_phone: '--',
   order_cellphone: '010-9999-9999',
   order_email: 'asdf@asdf.com',
+  memo: '1. 배송메모 : ㅁㄴㅇㄹ,',
 };
 
 export const exportItemSample: FmExportItem[] = [
@@ -72,6 +73,7 @@ export const exportItemSample: FmExportItem[] = [
     ea: 1,
     price: '1000.00',
     step: '75',
+    order_seq: '123123123123',
   },
   {
     goods_name: 'test2',
@@ -83,5 +85,6 @@ export const exportItemSample: FmExportItem[] = [
     ea: 1,
     price: '100.00',
     step: '75',
+    order_seq: '123123123123',
   },
 ];
