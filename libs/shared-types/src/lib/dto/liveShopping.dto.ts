@@ -1,8 +1,14 @@
-import { IsString, IsIn, IsOptional } from 'class-validator';
+import { IsString, IsIn, IsOptional, IsNumber } from 'class-validator';
 
 export class LiveShoppingDTO {
   @IsString()
   streamId: string;
+
+  @IsNumber()
+  goods_id: number;
+
+  @IsNumber()
+  contactId: number;
 
   @IsOptional()
   @IsString()

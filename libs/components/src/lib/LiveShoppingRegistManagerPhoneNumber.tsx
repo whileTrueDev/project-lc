@@ -12,17 +12,24 @@ import {
   Checkbox,
 } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
+import { SellerContactsDTO } from '@project-lc/shared-types';
 
 export interface UseFormContext {
   useContact: string;
-  setDefault: string;
   firstNumber: string;
   secondNumber: string;
   thirdNumber: string;
   email: string;
 }
 
-export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
+interface LiveShoppingManagerPhoneNumberProps {
+  data: SellerContactsDTO | undefined;
+  handleSetDefault(value: boolean): void;
+}
+
+export function LiveShoppingManagerPhoneNumber(
+  props: LiveShoppingManagerPhoneNumberProps,
+): JSX.Element {
   const { data, handleSetDefault } = props;
 
   const {
@@ -34,29 +41,30 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
 
   type Keys = 'first' | 'second' | 'third';
   type SlicedPhoneNumber = { [k in Keys]: string };
+
   const makePhoneNumberForm = (fullPhoneNumber: string): SlicedPhoneNumber => {
-    const first = fullPhoneNumber.substring(0, 3);
-    const second = fullPhoneNumber.substring(3, 7);
-    const third = fullPhoneNumber.substring(7, 11);
+    const first = fullPhoneNumber?.substring(0, 3) || '';
+    const second = fullPhoneNumber?.substring(3, 7) || '';
+    const third = fullPhoneNumber?.substring(7, 11) || '';
     return { first, second, third };
   };
 
-  const firstNumber = makePhoneNumberForm(data.phoneNumber).first;
-  const secondNumber = makePhoneNumberForm(data.phoneNumber).second;
-  const thirdNumber = makePhoneNumberForm(data.phoneNumber).third;
-  const { email } = data;
+  const firstNumber = data ? makePhoneNumberForm(data.phoneNumber).first : '';
+  const secondNumber = data ? makePhoneNumberForm(data.phoneNumber).second : '';
+  const thirdNumber = data ? makePhoneNumberForm(data.phoneNumber).third : '';
+  const email = data ? data.email : '';
 
   useEffect(() => {
-    if (data === '') {
+    if (!data) {
       setValue('useContact', 'new');
-      setValue('setDefault', 'N');
+      handleSetDefault(true);
     } else {
       setValue('firstNumber', firstNumber);
       setValue('secondNumber', secondNumber);
       setValue('thirdNumber', thirdNumber);
       setValue('email', email);
     }
-  }, [data, setValue, firstNumber, secondNumber, thirdNumber, email]);
+  }, [data, setValue, firstNumber, secondNumber, thirdNumber, email, handleSetDefault]);
   return (
     <Stack spacing={2}>
       <Heading as="h6" size="xs">
@@ -65,7 +73,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
 
       <FormControl isRequired isInvalid={!!errors.email}>
         <Stack spacing={2}>
-          {data === '' ? (
+          {!data ? (
             <RadioGroup
               onChange={(value) => {
                 setValue('useContact', value);
@@ -106,7 +114,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
             borderRadius="3pt"
           >
             <FormLabel htmlFor="email">이메일</FormLabel>
-            {data === '' || watch('useContact') === 'new' ? (
+            {!data || watch('useContact') === 'new' ? (
               <Input
                 id="email"
                 type="email"
@@ -133,7 +141,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
 
             <FormLabel htmlFor="phone">전화번호</FormLabel>
             <Stack direction="row" alignItems="center">
-              {data === '' || watch('useContact') === 'new' ? (
+              {!data || watch('useContact') === 'new' ? (
                 <InputGroup width={300} alignItems="center">
                   <Input
                     type="text"
@@ -230,7 +238,7 @@ export function LiveShoppingManagerPhoneNumber(props: any): JSX.Element {
                   errors.thirdNumber &&
                   errors.thirdNumber.message}
               </FormErrorMessage>
-              {data === '' || watch('useContact') === 'old' ? (
+              {!data || watch('useContact') === 'old' ? (
                 <Checkbox isChecked isDisabled>
                   기본으로 설정
                 </Checkbox>

@@ -2,7 +2,7 @@ import { Box, Heading, Stack, Textarea } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
 
 export function LiveShoppingRequestInput(): JSX.Element {
-  const { register } = useFormContext<any>();
+  const { register } = useFormContext<{ requests: string }>();
 
   return (
     <Box w="100%" mt="10">

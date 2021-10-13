@@ -1,15 +1,24 @@
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
+import { SellerContactsDTO } from '@project-lc/shared-types';
 import axios from '../../axios';
 
-export const getDefaultSellerContact = async (): Promise<any> => {
-  return axios.get<any>('/seller/contacts').then((res) => res.data);
+export const getDefaultSellerContact = async (
+  email: string,
+): Promise<SellerContactsDTO> => {
+  return axios
+    .get<SellerContactsDTO>('/seller/contacts', {
+      params: { email },
+    })
+    .then((res) => res.data);
 };
 
 export const useDefaultContacts = ({
-  id,
+  email,
 }: {
-  id: number | string;
-}): UseQueryResult<any, AxiosError> => {
-  return useQuery<any, AxiosError>(['defaultSellerContact', id], getDefaultSellerContact);
+  email: string;
+}): UseQueryResult<SellerContactsDTO, AxiosError> => {
+  return useQuery<SellerContactsDTO, AxiosError>(['defaultSellerContact', email], () =>
+    getDefaultSellerContact(email),
+  );
 };

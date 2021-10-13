@@ -11,6 +11,7 @@ import {
   useCreateSellerContacts,
 } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
+import { LiveShoppingDTO } from '@project-lc/shared-types';
 import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerPhoneNumber';
 import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
 
@@ -43,18 +44,14 @@ export function LiveShoppingRegist(): JSX.Element {
   });
 
   const contacts = useDefaultContacts({
-    id: profileData?.id || '',
+    email: profileData?.email || '',
   });
 
   const methods = useForm<UseForm>({
     defaultValues: {
       useContact: '',
-      goods_id: 0,
+      contactId: 0,
       email: '',
-      firstNumber: '',
-      secondNumber: '',
-      thirdNumber: '',
-      setDefault: undefined,
       requests: '',
     },
   });
@@ -62,16 +59,22 @@ export function LiveShoppingRegist(): JSX.Element {
   const { handleSubmit } = methods;
 
   const regist = async (data: UseForm): Promise<void> => {
-    console.log(data);
-    const { firstNumber, secondNumber, thirdNumber, useContact } = data;
+    const { firstNumber, secondNumber, thirdNumber, useContact, email } = data;
     const phoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
-    let concatData = Object.assign(data);
 
-    concatData.goods_id = watch('goods_id');
-    concatData.phoneNumber = phoneNumber;
+    const dto: LiveShoppingDTO = {
+      requests: '',
+      goods_id: 0,
+      contactId: 0,
+      streamId: '',
+      progress: 'registered',
+    };
+    dto.requests = data.requests;
+    dto.goods_id = watch('goods_id');
 
     if (useContact === 'old') {
-      mutateAsync(concatData)
+      dto.contactId = data.contactId;
+      mutateAsync(dto)
         .then(() => {
           toast({
             title: '상품을 성공적으로 등록하였습니다',
@@ -86,22 +89,22 @@ export function LiveShoppingRegist(): JSX.Element {
           });
         });
     } else {
-      concatData.setDefault = setDefault;
-
-      const contactId = await createSellerContacts({
-        email: concatData.email,
+      await createSellerContacts({
+        email,
         phoneNumber,
         isDefault: setDefault,
-      }).catch(() => {
-        toast({
-          title: '상품 등록 중 오류가 발생하였습니다',
-          status: 'error',
+      })
+        .then((value) => {
+          dto.contactId = Number(Object.values(value));
+        })
+        .catch(() => {
+          toast({
+            title: '상품 등록 중 오류가 발생하였습니다',
+            status: 'error',
+          });
         });
-      });
 
-      concatData = Object.assign(concatData, contactId);
-
-      mutateAsync(concatData)
+      mutateAsync(dto)
         .then(() => {
           toast({
             title: '상품을 성공적으로 등록하였습니다',

@@ -5,10 +5,7 @@ import { PrismaService } from '@project-lc/prisma-orm';
 export class LiveShoppingService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createLiveShopping(sellerId, dto): Promise<any> {
-    console.log('sellerID', sellerId);
-    console.log('dto', dto);
-    console.log(dto.requests);
+  async createLiveShopping(sellerId, dto): Promise<{ liveShoppingId: number }> {
     const streamId = Math.random().toString(36).substr(2, 11);
 
     const userId = await this.prisma.seller.findFirst({

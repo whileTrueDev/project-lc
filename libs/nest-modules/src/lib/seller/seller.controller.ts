@@ -11,7 +11,6 @@ import {
   UseGuards,
   ValidationPipe,
   Res,
-  Param,
 } from '@nestjs/common';
 import {
   Seller,
@@ -161,7 +160,7 @@ export class SellerController {
 
   @UseGuards(JwtAuthGuard)
   @Get('contacts')
-  public findDefaultContacts(@Query('contacts') email: string): Promise<any> {
+  public findDefaultContacts(@Query('email') email: string): Promise<SellerContactsDTO> {
     return this.sellerService.findDefaultContacts(email);
   }
 

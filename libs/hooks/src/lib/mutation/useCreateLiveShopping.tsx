@@ -1,11 +1,15 @@
 import { useMutation, UseMutationResult } from 'react-query';
-import { SettlementAccountDto } from '@project-lc/shared-types';
-import { SellerSettlementAccount } from '@prisma/client';
+import { LiveShoppingDTO } from '@project-lc/shared-types';
+import { LiveShopping } from '@prisma/client';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
 
-export const useCreateLiveShopping = (): any => {
-  return useMutation(async (dto: any) => {
-    return axios.post<any>('/live/create', dto).then((res) => res.data);
+export const useCreateLiveShopping = (): UseMutationResult<
+  LiveShopping,
+  AxiosError,
+  LiveShoppingDTO
+> => {
+  return useMutation(async (dto: LiveShoppingDTO) => {
+    return axios.post<LiveShopping>('/live/create', dto).then((res) => res.data);
   });
 };
