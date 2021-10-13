@@ -763,6 +763,8 @@ export type FmOrderMetaInfo = Pick<
     | 'coupon';
   /** 배송그룹 */
   shipping_group: string;
+} & {
+  memoOriginal: string | null;
 };
 
 export interface FmOrderRefundBase {
