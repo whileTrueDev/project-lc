@@ -158,7 +158,7 @@ model GoodsOptions {
   goodsId        Int
   supply         GoodsOptionsSupplies?
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
-  default_option YesOrNo               @default(n) // 옵션 필수 ���부
+  default_option YesOrNo               @default(n) // 옵션 필수 �������부
   option_type    String                @default("direct") // 기본값인듯? 설명도 direct
   option_title   String? // 옵션명 fm_goods_options.option_title
   option1        String? // 옵션값 fm_goods_options.option1
@@ -188,8 +188,8 @@ model GoodsOptionsSupplies {
 // 상품 사진 fm_goods_image
 model GoodsImages {
   id         Int    @id @default(autoincrement())
-  goods      Goods  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
-  goodsId    Int
+  goods      Goods? @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  goodsId    Int?
   image      String
   cut_number Int
 }
