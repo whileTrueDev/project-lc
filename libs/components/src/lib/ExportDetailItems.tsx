@@ -9,24 +9,23 @@ interface ExportDetailItemsProps {
 }
 export function ExportDetailItems({ exportData }: ExportDetailItemsProps): JSX.Element {
   const order = useFmOrder(exportData.order_seq);
+
   return (
     <Box>
-      <NextLink href={`/mypage/orders/${exportData.order_seq}`} passHref>
-        <Link isTruncated fontWeight="bold" textDecoration="underline">
-          {exportData.order_seq}
-        </Link>
-      </NextLink>
-
       <Stack mt={2}>
         {exportData.items.map((item) => (
           <Box key={item.item_option_seq}>
-            <Stack spacing={1}>
-              <OrderDetailExportInfoItem
-                itemOption={item}
-                orderItems={order.data?.items || []}
-                bundleExportCode={exportData.bundle_export_code}
-              />
-            </Stack>
+            <NextLink href={`/mypage/orders/${item.order_seq}`} passHref>
+              <Link isTruncated fontWeight="bold" textDecoration="underline">
+                {item.order_seq}
+              </Link>
+            </NextLink>
+
+            <OrderDetailExportInfoItem
+              itemOption={item}
+              orderItems={order.data?.items || []}
+              bundleExportCode={exportData.bundle_export_code}
+            />
           </Box>
         ))}
       </Stack>

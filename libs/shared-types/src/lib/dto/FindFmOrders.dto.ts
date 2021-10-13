@@ -6,4 +6,5 @@ export class FindFmOrdersDto {
   @IsOptional() @IsString() searchStartDate?: string | null;
   @IsOptional() @IsString() searchEndDate?: string | null;
   @IsOptional() @IsString({ each: true }) searchStatuses?: string[];
+  @IsOptional() @IsString({ each: true }) goodsIds?: number[];
 }

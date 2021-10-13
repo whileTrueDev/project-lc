@@ -1,4 +1,8 @@
-import { MypageLayout, ShopNameSection } from '@project-lc/components';
+import {
+  MypageLayout,
+  ShopNameSection,
+  ShopInfoShippingGroup,
+} from '@project-lc/components';
 import { Heading, VStack, Divider, Container } from '@chakra-ui/react';
 
 export function ShopInfoIndex(): JSX.Element {
@@ -9,6 +13,7 @@ export function ShopInfoIndex(): JSX.Element {
           <Heading mb={4}>상점설정</Heading>
           <ShopNameSection />
           <Divider />
+          <ShopInfoShippingGroup />
         </VStack>
       </Container>
     </MypageLayout>

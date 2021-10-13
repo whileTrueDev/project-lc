@@ -4,10 +4,12 @@
 const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
+const iterateLimit = $('#primary-info').data('number') + 1;
+const userId = $('#primary-info').data('userid');
 
 let startDate = new Date('2021-09-27T14:05:00+0900');
 let defaultDate = new Date('2021-09-04T15:00:00+0900');
-let bannerId = 0;
+let bannerId = 1;
 let bottomMessages = [];
 const topMessages = [];
 
@@ -149,28 +151,22 @@ function dailyMissionTimer() {
 }
 
 async function switchImage() {
-  if (!$('.vertical-banner').attr('src').includes('gif')) {
-    bannerId += 1;
-    if (bannerId === 14) {
-      bannerId = 1;
-    }
-    await setTimeout(() => {
-      $('.vertical-banner')
-        .attr('src', `/images/vertical-banner-${bannerId}.png`)
-        .fadeIn(1000);
-    }, 1000);
-
-    await setTimeout(() => {
-      $('.vertical-banner')
-        .attr('src', `/images/vertical-banner-${bannerId}.png`)
-        .fadeOut(1000);
-      switchImage();
-    }, 10000);
-  } else {
-    await setTimeout(() => {
-      switchImage();
-    }, 10000);
+  if (bannerId === iterateLimit) {
+    bannerId = 1;
   }
+  await setTimeout(() => {
+    $('.vertical-banner')
+      .attr(
+        'src',
+        `https://lc-project.s3.ap-northeast-2.amazonaws.com/vertical-banner/${userId}/vertical-banner-${bannerId}.png`,
+      )
+      .fadeIn(1000);
+  }, 1000);
+  await setTimeout(() => {
+    $('.vertical-banner').fadeOut(1000);
+    bannerId += 1;
+    switchImage();
+  }, 10000);
 }
 
 // 우측상단 응원문구 이벤트
@@ -301,7 +297,6 @@ socket.on('get right-top purchase message', async (data) => {
     const blob = new Blob([data[1]], { type: 'audio/mp3' });
     audioBlob = window.URL.createObjectURL(blob);
   }
-
   messageHtml = `
   <div class="donation-wrapper">
     <iframe src="/audio/${
@@ -309,14 +304,16 @@ socket.on('get right-top purchase message', async (data) => {
     }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="item">
       <div class="centered">
-      <img src="/images/${
-        alarmType === '2' ? 'donation-2.gif' : 'donation-1.gif'
-      }" class="donation-image"/>
+        <img src="https://lc-project.s3.ap-northeast-2.amazonaws.com/donation-images/${userId}/${
+    alarmType === '2' ? 'donation-2.gif' : 'donation-1.gif'
+  }" class="donation-image" />  
         <div class ="animated heartbeat" id="donation-top">
           <span id="nickname">
             <span class="animated heartbeat" id="donation-user-id">${nickname}</span>
             <span class="donation-sub">님 ${productName}</span>
-            <span class="animated heartbeat" id="donation-num">${num}</span>
+            <span class="animated heartbeat" id="donation-num">${num
+              .toString()
+              .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
             <span class="donation-sub">원 구매!</span>
           </span>
         </div>
@@ -355,6 +352,30 @@ socket.on('get non client purchase message', async (data) => {
     </div>
   </div>
   
+  `;
+  topMessages.push({ messageHtml });
+});
+
+socket.on('get objective message', async (data) => {
+  const price = data.objective;
+
+  messageHtml = `
+  <div class="donation-wrapper">
+    <iframe src="/audio/alarm-type-2.wav"
+    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    <div class="centered">
+      <div class ="animated heartbeat" id="donation-top">
+        <span id="nickname">
+          <span class="donation-sub">판매금액</span>
+          <span class="animated heartbeat" id="donation-num">${price
+            .toString()
+            .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
+          <span class="donation-sub">원 돌파!!!</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
   `;
   topMessages.push({ messageHtml });
 });

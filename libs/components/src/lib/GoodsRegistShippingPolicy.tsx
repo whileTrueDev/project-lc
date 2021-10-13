@@ -5,28 +5,29 @@ import {
   Divider,
   Flex,
   HStack,
+  Link,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalOverlay,
+  ModalProps,
   Radio,
   RadioGroup,
-  Spacer,
   Spinner,
   Stack,
+  StackProps,
   Text,
   useDisclosure,
-  Link,
+  useToast,
 } from '@chakra-ui/react';
-import NextLink from 'next/link';
 import {
   ShippingGroupListItemType,
   useDeleteShippingGroup,
   useProfile,
   useSellerGoodsList,
+  useSellerShippingGroupList,
   useShippingGroupItem,
-  useShippingGroupList,
 } from '@project-lc/hooks';
 import {
   SellerGoodsSortColumn,
@@ -36,9 +37,9 @@ import {
   TempShippingSet,
 } from '@project-lc/shared-types';
 import { useShippingGroupItemStore } from '@project-lc/stores';
+import NextLink from 'next/link';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { boxStyle } from '../constants/commonStyleProps';
 import { GOODS_VIEW } from '../constants/goodsStatus';
 import { ConfirmDialog, ConfirmDialogProps } from './ConfirmDialog';
 import { GoodsFormValues } from './GoodsRegistForm';
@@ -106,7 +107,33 @@ function ShippingGroupDetail({ groupId }: { groupId: number | null }): JSX.Eleme
   );
 }
 
-// TODO: 팝업 띄우는 게 아니라 groupId로 필터링 된 상품 목록 창으로 이동시키기
+// 컬럼 헤더와 목록으로 이뤄진 상자 스타일 컴포넌트 - 배송비그룹 컨테이너, 연결된상품 컨테이너에 사용할 예정
+export function OutlinedContainerBox({
+  header,
+  children,
+  ...stackProps
+}: {
+  children: React.ReactNode;
+  header: React.ReactNode;
+} & StackProps): JSX.Element {
+  return (
+    <Stack
+      spacing={2}
+      borderWidth="1px"
+      borderRadius="lg"
+      p={4}
+      width="100%"
+      maxH="600px"
+      overflowY="auto"
+      {...stackProps}
+    >
+      {header}
+      <Divider />
+      {children}
+    </Stack>
+  );
+}
+
 // 연결된 상품 목록
 function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element {
   const { data: profileData } = useProfile();
@@ -132,27 +159,40 @@ function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element 
       </Center>
     );
   return (
-    <>
-      {data &&
-        data.items.map((item) => {
-          const { id, goods_name, goods_view } = item;
-          return (
-            <HStack key={item.id}>
-              <Text>{id}</Text>
-              <NextLink href={`/mypage/goods/${id}`} passHref>
-                <Link isExternal>
-                  <Text isTruncated>{goods_name}</Text>
-                </Link>
-              </NextLink>
-              <Text>{GOODS_VIEW[goods_view]}</Text>
-            </HStack>
-          );
-        })}
-    </>
+    <Stack>
+      <Text fontSize="sm" mb={1}>
+        상품명을 클릭하면 해당 상품의 상세보기 페이지로 이동합니다
+      </Text>
+      <OutlinedContainerBox
+        header={
+          <HStack textAlign="center">
+            <Text width="10%">번호</Text>
+            <Text width="60%">상품명</Text>
+            <Text width="30%">노출여부</Text>
+          </HStack>
+        }
+      >
+        {data &&
+          data.items.map((item) => {
+            const { id, goods_name, goods_view } = item;
+            return (
+              <HStack key={item.id} textAlign="center">
+                <Text width="10%">{id}</Text>
+                <NextLink href={`/mypage/goods/${id}`} passHref>
+                  <Link isExternal width="60%">
+                    <Text isTruncated>{goods_name}</Text>
+                  </Link>
+                </NextLink>
+                <Text width="30%">{GOODS_VIEW[goods_view]}</Text>
+              </HStack>
+            );
+          })}
+      </OutlinedContainerBox>
+    </Stack>
   );
 }
 
-// 생성된 배송비 그룹 아이템
+// 생성된 배송비 그룹 아이템 - 상품등록 페이지에서만 사용(라디오버튼이 있음)
 function ShippingGroupListItem({
   group,
   nameHandler,
@@ -166,7 +206,7 @@ function ShippingGroupListItem({
 }): JSX.Element {
   const { register } = useFormContext<GoodsFormValues>();
   return (
-    <Flex key={group.id} spacing={2}>
+    <Flex key={group.id} spacing={2} alignItems="center">
       {/* 라디오버튼 */}
       <Radio
         width="10%"
@@ -244,9 +284,91 @@ export function ShippingGroupDetailModal(
   );
 }
 
+/** 배송비 정책에 연결된 상품 보기 모달 */
+export function ShippingGroupRelatedItemsDialog(
+  props: Pick<ConfirmDialogProps, 'isOpen' | 'onClose' | 'onConfirm'> & {
+    groupId: number | null;
+  },
+): JSX.Element {
+  const { isOpen, onClose, onConfirm, groupId } = props;
+  return (
+    <ConfirmDialog
+      title="연결된 상품"
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={onConfirm}
+    >
+      <RelatedGoodsList groupId={groupId} />
+    </ConfirmDialog>
+  );
+}
+
+/** 배송비 정책 생성 모달 */
+export function ShippingGroupRegistDialog({
+  isOpen,
+  onClose,
+  onSuccess,
+}: Pick<ModalProps, 'isOpen' | 'onClose'> & {
+  onSuccess: () => void;
+}): JSX.Element {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} size="full">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalCloseButton />
+        <ModalBody maxW="4xl" mx="auto">
+          <ShippingPolicyForm onSuccess={onSuccess} />
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  );
+}
+
+/** 배송비 정책 삭제 확인 모달 */
+export function ShippingGroupDeleteConfirmDialog({
+  isOpen,
+  onClose,
+  onConfirm,
+}: Pick<ModalProps, 'isOpen' | 'onClose'> & {
+  onConfirm: () => Promise<any>;
+}): JSX.Element {
+  return (
+    <ConfirmDialog
+      title="배송비 정책 삭제"
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={onConfirm}
+    >
+      <Text>해당 배송비 그룹을 삭제하시겠습니까? 삭제 후 복구가 불가능합니다</Text>
+    </ConfirmDialog>
+  );
+}
+
+/** 배송비그룹 컨테이너 상자 스타일 */
+export function ShippingGroupContainerBox({
+  children,
+  ...stackProps
+}: {
+  children: React.ReactNode;
+} & StackProps): JSX.Element {
+  return (
+    <OutlinedContainerBox
+      header={
+        <Flex fontSize="sm" justifyContent="space-around">
+          <Text>배송그룹명</Text>
+          <Text>배송비 계산 기준</Text>
+          <Text>연결된 상품</Text>
+        </Flex>
+      }
+      {...stackProps}
+    >
+      {children}
+    </OutlinedContainerBox>
+  );
+}
 export function GoodsRegistShippingPolicy(): JSX.Element {
   const {
-    isOpen: registModalOptn,
+    isOpen: registModalOpen,
     onOpen: onRegistModalOpen,
     onClose: onRegistModalClose,
   } = useDisclosure();
@@ -267,9 +389,10 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
   } = useDisclosure();
 
   const { watch, setValue } = useFormContext<GoodsFormValues>();
-  const { data: ProfileData } = useProfile();
-  const { data } = useShippingGroupList(ProfileData?.email || '', !!ProfileData);
+
+  const { data } = useSellerShippingGroupList();
   const [clickedGroupId, setClickedGroupId] = useState<null | number>(null);
+  const toast = useToast();
 
   const { reset } = useShippingGroupItemStore();
   const { mutateAsync } = useDeleteShippingGroup();
@@ -299,20 +422,8 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
         <Button onClick={onRegistModalOpen}>생성하기</Button>
       </HStack>
 
-      {/* 배송비 정책 목록
-       */}
-
-      <Stack spacing={2} maxWidth="lg" {...boxStyle}>
-        <Flex fontSize="sm">
-          <Spacer />
-          <Text>배송그룹명 ( 번호 )</Text>
-          <Spacer />
-          <Text>배송비 계산 기준</Text>
-          <Spacer />
-          <Text>연결된 상품</Text>
-          <Spacer />
-        </Flex>
-        <Divider />
+      {/* 배송비 정책 목록 */}
+      <ShippingGroupContainerBox maxWidth="lg">
         <RadioGroup value={watch('shippingGroupId')} maxHeight="150px" overflowY="auto">
           {data &&
             data.map((g) => (
@@ -325,7 +436,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
               />
             ))}
         </RadioGroup>
-      </Stack>
+      </ShippingGroupContainerBox>
 
       {/* 배송비 정책 상세보기 모달 */}
       <ShippingGroupDetailModal
@@ -341,8 +452,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
       />
 
       {/* 연결된 상품 확인 모달 */}
-      <ConfirmDialog
-        title="연결된 상품"
+      <ShippingGroupRelatedItemsDialog
         isOpen={relatedGoodsModalOpen}
         onClose={onRelatedGoodsModalClose}
         onConfirm={() => {
@@ -351,37 +461,41 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
           setClickedGroupId(null);
           return Promise.resolve();
         }}
-      >
-        <RelatedGoodsList groupId={clickedGroupId} />
-      </ConfirmDialog>
+        groupId={clickedGroupId}
+      />
 
       {/* 배송비 정책 삭제 확인 모달 */}
-      <ConfirmDialog
-        title="배송비 정책 삭제"
+      <ShippingGroupDeleteConfirmDialog
         isOpen={confirmModalOpen}
         onClose={onConfirmModalClose}
         onConfirm={() => {
           const groupId = clickedGroupId;
           if (!groupId) throw new Error('shippingGroupId가 없습니다');
-          return mutateAsync({ groupId }).then((res) => {
-            setClickedGroupId(null);
-            setValue('shippingGroupId', undefined);
-          });
+          return mutateAsync({ groupId })
+            .then((res) => {
+              setClickedGroupId(null);
+              setValue('shippingGroupId', undefined);
+              toast({
+                title: '배송비 정책 삭제 성공',
+                status: 'success',
+              });
+            })
+            .catch((error) => {
+              console.error(error);
+              toast({
+                title: '배송비 정책 삭제 오류',
+                status: 'error',
+              });
+            });
         }}
-      >
-        <Text>해당 배송비 그룹을 삭제하시겠습니까? 삭제 후 복구가 불가능합니다</Text>
-      </ConfirmDialog>
+      />
 
       {/* 배송비 정책 생성 모달 */}
-      <Modal isOpen={registModalOptn} onClose={registModalCloseHandler} size="full">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton />
-          <ModalBody maxW="4xl" mx="auto">
-            <ShippingPolicyForm onSuccess={registModalCloseHandler} />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <ShippingGroupRegistDialog
+        isOpen={registModalOpen}
+        onClose={registModalCloseHandler}
+        onSuccess={registModalCloseHandler}
+      />
     </SectionWithTitle>
   );
 }

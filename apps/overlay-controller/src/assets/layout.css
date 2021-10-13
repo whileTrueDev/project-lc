@@ -155,6 +155,9 @@ button.message-box-lock-button {
   background-color: #45a049;
 }
 
+button#objective-button {
+  background-color: red;
+}
 .locked {
   background-color: red;
 }

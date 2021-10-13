@@ -21,7 +21,8 @@
       "@project-lc/nest-modules": ["libs/nest-modules/src/index.ts"],
       "@project-lc/prisma-orm": ["libs/prisma-orm/src/index.ts"],
       "@project-lc/shared-types": ["libs/shared-types/src/index.ts"],
-      "@project-lc/stores": ["libs/stores/src/index.ts"]
+      "@project-lc/stores": ["libs/stores/src/index.ts"],
+      "@project-lc/utils": ["libs/utils/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
