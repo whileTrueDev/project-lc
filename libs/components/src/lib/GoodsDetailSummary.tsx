@@ -20,7 +20,6 @@ export function GoodsDetailSummary({ goods }: GoodsDetailSummaryProps): JSX.Elem
       <Stack whiteSpace="break-spaces">
         <Text>{confirmationStatusText}</Text>
         <Text>
-
           <InfoIcon mr={1} />
           상품 검수가 반려되었습니다. <br />
           아래 검수 반려 사유를 참고하여 상품 정보를 수정 하신 후 다시 등록해주세요.
