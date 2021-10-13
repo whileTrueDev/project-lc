@@ -24,13 +24,14 @@ export interface UseFormContext {
 
 interface LiveShoppingManagerPhoneNumberProps {
   data: SellerContactsDTO | undefined;
+  setDefault: boolean;
   handleSetDefault(value: boolean): void;
 }
 
 export function LiveShoppingManagerPhoneNumber(
   props: LiveShoppingManagerPhoneNumberProps,
 ): JSX.Element {
-  const { data, handleSetDefault } = props;
+  const { data, setDefault, handleSetDefault } = props;
 
   const {
     register,
@@ -93,6 +94,17 @@ export function LiveShoppingManagerPhoneNumber(
             <RadioGroup
               onChange={(value) => {
                 setValue('useContact', value);
+                if (watch('useContact') === 'new') {
+                  setValue('email', '');
+                  setValue('firstNumber', '');
+                  setValue('secondNumber', '');
+                  setValue('thirdNumber', '');
+                } else {
+                  setValue('email', data.email);
+                  setValue('firstNumber', firstNumber);
+                  setValue('secondNumber', secondNumber);
+                  setValue('thirdNumber', thirdNumber);
+                }
               }}
               defaultValue="old"
             >
@@ -243,7 +255,10 @@ export function LiveShoppingManagerPhoneNumber(
                   기본으로 설정
                 </Checkbox>
               ) : (
-                <Checkbox onChange={(e) => handleSetDefault(e.target.checked)}>
+                <Checkbox
+                  isChecked={setDefault}
+                  onChange={(e) => handleSetDefault(e.target.checked)}
+                >
                   기본으로 설정
                 </Checkbox>
               )}

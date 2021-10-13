@@ -33,7 +33,7 @@ export function LiveShoppingRegist(): JSX.Element {
     liveShoppingRegist();
   const { data: profileData } = useProfile();
   const { setValue, watch } = useForm();
-  const { mutateAsync } = useCreateLiveShopping();
+  const { mutateAsync, isLoading } = useCreateLiveShopping();
   const { mutateAsync: createSellerContacts } = useCreateSellerContacts();
 
   const toast = useToast();
@@ -61,7 +61,6 @@ export function LiveShoppingRegist(): JSX.Element {
   const regist = async (data: UseForm): Promise<void> => {
     const { firstNumber, secondNumber, thirdNumber, useContact, email } = data;
     const phoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
-
     const dto: LiveShoppingDTO = {
       requests: '',
       goods_id: 0,
@@ -75,7 +74,6 @@ export function LiveShoppingRegist(): JSX.Element {
     }
     dto.requests = data.requests;
     dto.goods_id = watch('goods_id');
-
     if (useContact === 'old') {
       mutateAsync(dto)
         .then(() => {
@@ -83,9 +81,10 @@ export function LiveShoppingRegist(): JSX.Element {
             title: '상품을 성공적으로 등록하였습니다',
             status: 'success',
           });
-          router.push('/mypage/goods');
+          handleGoodsSelect('');
+          router.push('/mypage/live/vod');
         })
-        .catch((error) => {
+        .catch(() => {
           toast({
             title: '상품 등록 중 오류가 발생하였습니다',
             status: 'error',
@@ -100,20 +99,19 @@ export function LiveShoppingRegist(): JSX.Element {
         .then((value) => {
           dto.contactId = Number(Object.values(value));
         })
-        .catch((error) => {
-          console.log(error);
+        .catch(() => {
           toast({
             title: '상품 등록 중 오류가 발생하였습니다',
             status: 'error',
           });
         });
-      console.log('dto', dto);
       mutateAsync(dto)
         .then(() => {
           toast({
             title: '상품을 성공적으로 등록하였습니다',
             status: 'success',
           });
+          handleGoodsSelect('');
           router.push('/mypage/live/vod');
         })
         .catch(() => {
@@ -151,6 +149,7 @@ export function LiveShoppingRegist(): JSX.Element {
               />
               <LiveShoppingManagerPhoneNumber
                 data={contacts.data}
+                setDefault={setDefault}
                 handleSetDefault={handleSetDefault}
               />
               <LiveShoppingRequestInput />
@@ -165,7 +164,12 @@ export function LiveShoppingRegist(): JSX.Element {
                 justifyContent="flex-end"
                 zIndex={theme.zIndices.sticky}
               >
-                <Button type="submit" colorScheme="blue" isDisabled={!selectedGoods}>
+                <Button
+                  isLoading={isLoading}
+                  type="submit"
+                  colorScheme="blue"
+                  isDisabled={!selectedGoods}
+                >
                   등록
                 </Button>
               </Flex>
