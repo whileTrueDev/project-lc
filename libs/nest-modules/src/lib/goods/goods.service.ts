@@ -91,6 +91,7 @@ export class GoodsService {
       const itemStockInfo = this.intergrateOptionStocks(optionsWithStockInfo);
 
       const defaultOption = item.options.find((opt) => opt.default_option === 'y');
+
       return {
         id: item.id,
         sellerId: item.sellerId,
