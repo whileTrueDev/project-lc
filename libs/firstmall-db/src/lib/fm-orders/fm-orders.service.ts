@@ -15,6 +15,7 @@ import {
   FmOrderReturn,
   FmOrderReturnBase,
   FmOrderReturnItem,
+  FmOrderShipping,
   FmOrderStatusNumString,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
@@ -80,10 +81,13 @@ export class FmOrdersService {
       GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR ', ') AS goods_seq,
       GROUP_CONCAT(item_seq SEPARATOR ', ') AS item_seq,
       GROUP_CONCAT(goods_name SEPARATOR ', ') AS goods_name,
+      SUM(fm_order_shipping.shipping_cost) AS totalShippingCost,
+      SUM(fm_order_shipping.delivery_cost) AS totalDeliveryCost,
       fm_order.order_seq as id,
       fm_order.*
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
+    JOIN fm_order_shipping USING(shipping_seq)
     WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
     `;
 
@@ -192,7 +196,7 @@ export class FmOrdersService {
     goodsIds: number[],
   ): Promise<FindFmOrderDetailRes | null> {
     // * 개별 주문 정보
-    const orderInfo = await this.findOneOrderInfo(orderId);
+    const orderInfo = await this.findOneOrderInfo(orderId, goodsIds);
     if (!orderInfo) return null;
 
     // * 주문 상품
@@ -234,15 +238,13 @@ export class FmOrdersService {
   /** 개별 주문 정보 조회 */
   private async findOneOrderInfo(
     orderId: FmOrder['order_seq'] | string,
+    goodsIds: number[],
   ): Promise<FmOrderMetaInfo | null> {
     const sql = `
     SELECT
-      fm_order_shipping.shipping_cost,
-      fm_order_shipping.delivery_cost,
-      fm_order_shipping.shipping_set_name,
-      fm_order_shipping.shipping_type,
-      fm_order_shipping.shipping_method,
-      fm_order_shipping.shipping_group,
+      SUM(fm_order_shipping.shipping_cost) AS totalShippingCost,
+      SUM(fm_order_shipping.delivery_cost) AS totalDeliveryCost,
+      GROUP_CONCAT(fm_order_shipping.shipping_seq) AS shipping_seq,
       fm_order.order_seq as id,
       fm_order.regist_date,
       fm_order.sitetype,
@@ -250,7 +252,7 @@ export class FmOrdersService {
       fm_order.deposit_date,
       fm_order.settleprice,
       fm_order.step,
-      order_seq,
+      fm_order.order_seq,
       order_user_name,
       order_phone,
       order_cellphone,
@@ -266,13 +268,25 @@ export class FmOrdersService {
       recipient_address_detail,
       memo
     FROM fm_order
-    JOIN fm_order_shipping USING(order_seq)
-    WHERE fm_order.order_seq = ?`;
+    JOIN fm_order_item USING(order_seq)
+    JOIN fm_order_shipping USING(shipping_seq)
+    WHERE fm_order.order_seq = ? AND goods_seq IN (${goodsIds.join(',')})`;
     const result = await this.db.query(sql, [orderId]);
     const order = result.length > 0 ? result[0] : null;
     if (!order) return null;
+
+    // 배송 관련 정보 추가를 위한 정보 조회
+    const shippingResult = await this.findOneOrderShippingInfoPerMyGoods(
+      order.shipping_seq,
+    );
+
     const parser = new FmOrderMemoParser(order.memo);
-    return { ...order, memo: parser.memo, memoOriginal: order.memo };
+    return {
+      ...order,
+      memo: parser.memo,
+      memoOriginal: order.memo,
+      shippings: shippingResult,
+    };
   }
 
   private async findOneOrderItems(
@@ -516,7 +530,25 @@ export class FmOrdersService {
     return result[0];
   }
 
-  /** 개별 주문 - 총 개수 (내 상품만) */
+  /**
+   * 개별 주문 - 배송정보 (내 상품만)
+   * @param shipping_seq 41, 42, 43 과 같이 "," 로 구분된 shipping_seq 문자열 */
+  private async findOneOrderShippingInfoPerMyGoods(
+    shipping_seq: string,
+  ): Promise<FmOrderShipping[]> {
+    const shippingResult: FmOrderShipping[] = await this.db.query(
+      `SELECT
+      shipping_seq,
+      shipping_set_name,
+      shipping_type,
+      shipping_method,
+      shipping_group,
+      shipping_cost,
+      delivery_cost
+    FROM fm_order_shipping WHERE order_seq IN (${shipping_seq})`,
+    );
+    return shippingResult;
+  }
 
   // * **********************************
   // * 주문 상태 변경

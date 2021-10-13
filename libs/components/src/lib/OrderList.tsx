@@ -172,7 +172,7 @@ const columns: GridColumns = [
       let text = '';
       if (params.row.totalPrice) {
         const totalPrice = Math.floor(Number(params.row.totalPrice));
-        const shppingCost = Math.floor(Number(params.row.shipping_cost));
+        const shppingCost = Math.floor(Number(params.row.totalShippingCost));
         let howMuch: number;
         if (!Number.isNaN(shppingCost)) {
           howMuch = totalPrice + shppingCost;

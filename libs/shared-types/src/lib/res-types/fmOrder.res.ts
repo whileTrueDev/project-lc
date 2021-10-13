@@ -516,6 +516,12 @@ export type FindFmOrderRes = FmOrder & {
   totalEa: number;
   /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 종류 수 */
   totalType: number;
+  /** 이 주문에 포함된 내 모든 상품의 배송비 총 합 */
+  totalShippingCost: string;
+  /** 이 주문에 포함된 내 모든 상품의 배송비 총 합 */
+  totalDeliveryCost: string;
+  /** 이 주문에 포함된 내 모든 상품의 상품별 배송정보 */
+  shippings: FmOrderShipping[];
 };
 
 /**
@@ -651,6 +657,7 @@ export interface FmOrderExportBase {
   totalEa: number;
 }
 
+/** 주문 출고 정보 */
 export type FmOrderExport = FmOrderExportBase & {
   /**
    * 출고에 포함된 상품옵션 정보
@@ -697,9 +704,50 @@ export interface FmOrderExportItemOption {
   color?: string;
 }
 
-/**
- * 주문 상세 정보 (메타정보)
- */
+/** 주문 배송 정보 */
+export interface FmOrderShipping {
+  /** 배송비 */
+  shippingCost: string;
+  /** 배송비 */
+  deliveryCost: string;
+  /** 배송 방식 이름 */
+  shipping_set_name: string;
+  /**
+   * 배송비 결제 방식
+   * - free = 무료
+   * - prepay = 선불 - 주문시결제
+   * - postpaid = 착불
+   */
+  shipping_type: 'free' | 'prepay' | 'postpaid';
+  /**
+   * 배송방법
+   * - delivery = 택배
+   * - postpaid = 택배착불
+   * - each_delivery = 택배
+   * - each_postpaid = 택배착불
+   * - quick = 퀵서비스
+   * - direct_delivery = 직접배송
+   * - direct_store = 매장수령
+   * - freight = 화물배송
+   * - direct = 직접수령
+   * - coupon = 티켓
+   * */
+  shipping_method:
+    | 'delivery'
+    | 'postpaid'
+    | 'each_delivery'
+    | 'each_postpaid'
+    | 'quick'
+    | 'direct_delivery'
+    | 'direct_store'
+    | 'freight'
+    | 'direct'
+    | 'coupon';
+  /** 배송그룹 */
+  shipping_group: string;
+}
+
+/** 주문 상세 정보 (메타정보) */
 export type FmOrderMetaInfo = Pick<
   FmOrder,
   | 'order_seq'
@@ -726,59 +774,19 @@ export type FmOrderMetaInfo = Pick<
   /** 주문아이디 */
   id: FmOrder['order_seq'];
 } & {
-  /**
-   * 배송비
-   */
-  shipping_cost: string;
-  /**
-   * 배송비
-   */
-  delivery_cost: string;
-  /**
-   * 배송 방식 이름
-   */
-  shipping_set_name: string;
-  /**
-   * 배송비 결제 방식
-   * - free = 무료
-   * - prepay = 선불 - 주문시결제
-   * - postpaid = 착불
-   */
-  shipping_type: 'free' | 'prepay' | 'postpaid';
-  /**
-   * 배송방법
-   * delivery = 택배
-   * postpaid = 택배착불
-   * each_delivery = 택배
-   * each_postpaid = 택배착불
-   * quick = 퀵서비스
-   * direct_delivery = 직접배송
-   * direct_store = 매장수령
-   * freight = 화물배송
-   * direct = 직접수령
-   * coupon = 티켓
-   * */
-  shipping_method:
-    | 'delivery'
-    | 'postpaid'
-    | 'each_delivery'
-    | 'each_postpaid'
-    | 'quick'
-    | 'direct_delivery'
-    | 'direct_store'
-    | 'freight'
-    | 'direct'
-    | 'coupon';
-  /** 배송그룹 */
-  shipping_group: string;
+  /** 이 주문에 포함된 내 모든 상품의 배송비 총 합 */
+  totalShippingCost: string;
+  /** 이 주문에 포함된 내 모든 상품의 배송비 총 합 */
+  totalDeliveryCost: string;
+  /** 상품별 배송정보 */
+  shippings: FmOrderShipping[];
 } & {
+  /** 배송메모 전문 */
   memoOriginal: string | null;
 };
 
 export interface FmOrderRefundBase {
-  /**
-   * 환불 코드
-   */
+  /** 환불 코드 */
   refund_code: string;
   /**
    * 환불 구분
@@ -787,41 +795,23 @@ export interface FmOrderRefundBase {
    * - shipping_price = 배송비환불
    */
   refund_type: 'cancel_payment' | 'return' | 'shipping_price';
-  /**
-   * 환불 접수일
-   */
+  /** 환불 접수일 */
   regist_date: string;
-  /**
-   * 환불 완료 날짜
-   */
+  /** 환불 완료 날짜 */
   refund_date: string;
-  /**
-   * 환불 처리 상태
-   */
+  /** 환불 처리 상태 */
   status: 'request' | 'ing' | 'complete';
-  /**
-   * 환불 처리 완료 관리자 아이디
-   */
+  /** 환불 처리 완료 관리자 아이디 */
   manager_id: string;
-  /**
-   * 환불 처리 완료 관리자 이메일
-   */
+  /** 환불 처리 완료 관리자 이메일 */
   memail: string;
-  /**
-   * 환불 처리 완료 관리자 전화번호
-   */
+  /** 환불 처리 완료 관리자 전화번호 */
   mcellphone: string;
-  /**
-   * 총 환불 상품(옵션) 개수
-   */
+  /** 총 환불 상품(옵션) 개수 */
   totalEa: string;
-  /**
-   * 총 환불 상품(옵션) 가격
-   */
+  /** 총 환불 상품(옵션) 가격 */
   refund_goods_price: string;
-  /**
-   * 환불 사유
-   */
+  /** 환불 사유 */
   refund_reason: string;
 }
 

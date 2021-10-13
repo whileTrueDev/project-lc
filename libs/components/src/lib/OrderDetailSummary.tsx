@@ -43,9 +43,9 @@ export function OrderDetailSummary({ order }: OrderDetailSummaryProps): JSX.Elem
           id: '배송비',
           icon: FaShippingFast,
           value: (() => {
-            const cost = Number(order.shipping_cost);
+            const cost = Number(order.totalShippingCost);
             if (Number.isNaN(cost) || cost === 0) return '무료배송';
-            return `배송비 ${Number(order.shipping_cost).toLocaleString()}원`;
+            return `배송비 ${Number(order.totalShippingCost).toLocaleString()}원`;
           })(),
         },
       ]}
