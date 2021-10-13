@@ -20,6 +20,7 @@ export const useBusinessRegistrationRejectionMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.invalidateQueries('Settlement', { refetchInactive: true });
+        queryClient.invalidateQueries('AdminGoodsList', { refetchInactive: true });
       },
     },
   );

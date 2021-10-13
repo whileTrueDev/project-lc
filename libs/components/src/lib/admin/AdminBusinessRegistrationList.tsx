@@ -25,6 +25,7 @@ const columns: GridColumns = [
   {
     field: 'sellerEmail',
     headerName: '광고주 이메일',
+    minWidth: 230,
   },
   {
     field: 'businessRegistrationNumber',
@@ -50,6 +51,7 @@ const columns: GridColumns = [
   {
     field: 'taxInvoiceMail',
     headerName: '계산서 발급 이메일',
+    minWidth: 230,
   },
   {
     field: 'businessRegistrationImageName',
