@@ -51,3 +51,4 @@ export * from './lib/queries/useAdminGoodsList';
 export * from './lib/mutation/useGoodConfirmationMutation';
 export * from './lib/queries/useAdminGoodsById';
 export * from './lib/mutation/useGoodRejectionMutation';
+export * from './lib/mutation/useGoodsImageMutation';
