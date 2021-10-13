@@ -107,19 +107,22 @@ $(document).ready(function ready() {
     if ($('.message-box-lock-button').attr('class').includes('locked')) {
       $('#standard-price').attr('disabled', false);
       $('#product-name').attr('disabled', false);
+      $('#fan-nickname').attr('disabled', false);
       $('.message-box-lock-button').toggleClass('locked');
       $('.message-box-lock-button').text('잠금');
     } else {
       $('#standard-price').attr('disabled', true);
       $('#product-name').attr('disabled', true);
+      $('#fan-nickname').attr('disabled', true);
       $('.message-box-lock-button').toggleClass('locked');
       $('.message-box-lock-button').text('해제');
     }
   });
 
   $('input[name=client-checkbox]').change(function clientCheckboxOnChange() {
+    const fanNickname = $('#fan-nickname').val().trim();
     if ($('input[name=client-checkbox]').is(':checked')) {
-      $('#customer-nickname').val(`${streamerNickname}팬`);
+      $('#customer-nickname').val(fanNickname);
     } else {
       $('#customer-nickname').val('');
     }
