@@ -39,7 +39,28 @@ export class FmOrdersService {
     const { sql, params } = this.createFindOrdersQuery(goodsIds, dto);
     if (!sql) return [];
     const data = (await this.db.query(sql, params)) as FindFmOrderRes[];
-    return data.map((x) => ({ ...x }));
+
+    return Promise.all(
+      data.map(async (order) => {
+        // * item_seq로 상품 옵션 찾아 총 상품 금액 계산하기
+        const orderInfoPerMyGoods = await this.findOneOrderInfoPerMyGoods(order.item_seq);
+
+        // * 판매자 상품에 기반한 주문 상태 도출
+        // 주문 상품 조회
+        const orderItems = await this.findOneOrderItems(order.order_seq, goodsIds);
+        // 개별 주문 상품 - 상품 옵션 목록 정보
+        const itemSeqArray = orderItems.map((x) => x.item_seq);
+        const orderGoodsOptions = await this.findOneOrderOptions(itemSeqArray);
+        // 판매자 상품에 기반한 주문 상태 도출
+        const realStep = orderGoodsOptions.reduce((prev, cur) => {
+          if (!prev) return cur.step;
+          if (Number(prev) > Number(cur.step)) return cur.step;
+          return prev;
+        }, order.step);
+
+        return { ...order, ...orderInfoPerMyGoods, step: realStep };
+      }),
+    );
   }
 
   /**
@@ -57,6 +78,7 @@ export class FmOrdersService {
     const defaultQueryHead = `
     SELECT
       GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR ', ') AS goods_seq,
+      GROUP_CONCAT(item_seq SEPARATOR ', ') AS item_seq,
       GROUP_CONCAT(goods_name SEPARATOR ', ') AS goods_name,
       fm_order.order_seq as id,
       fm_order.*
@@ -167,26 +189,34 @@ export class FmOrdersService {
    */
   public async findOneOrder(
     orderId: FmOrder['order_seq'] | string,
+    goodsIds: number[],
   ): Promise<FindFmOrderDetailRes | null> {
     // * 개별 주문 정보
     const orderInfo = await this.findOneOrderInfo(orderId);
     if (!orderInfo) return null;
 
     // * 주문 상품
-    const orderItems = await this.findOneOrderItems(orderId);
+    const orderItems = await this.findOneOrderItems(orderId, goodsIds);
 
     // * 개별 주문 상품 - 상품 옵션 목록 정보
     const itemSeqArray = orderItems.map((x) => x.item_seq);
     const orderGoodsOptions = await this.findOneOrderOptions(itemSeqArray);
 
     // * 개별 주문 - 출고 정보
-    const orderExports = await this.findOneOrderExports(orderId);
+    const orderExports = await this.findOneOrderExports(orderId, itemSeqArray);
 
     // * 개별 주문 - 환불 정보
     const orderRefunds = await this.findOneOrderRefunds(orderId);
 
     // * 개별 주문 - 반품 정보
     const orderReturns = await this.findOneOrderReturns(orderId);
+
+    // * 판매자 상품에 기반한 주문 상태 도출
+    const realStep = orderGoodsOptions.reduce((prev, cur) => {
+      if (!prev) return cur.step;
+      if (Number(prev) > Number(cur.step)) return cur.step;
+      return prev;
+    }, orderInfo.step);
 
     return {
       ...orderInfo,
@@ -197,6 +227,7 @@ export class FmOrdersService {
       exports: orderExports,
       refunds: orderRefunds,
       returns: orderReturns,
+      step: realStep,
     };
   }
 
@@ -246,6 +277,7 @@ export class FmOrdersService {
 
   private async findOneOrderItems(
     orderId: FmOrder['order_seq'] | string,
+    goodsIds: number[],
   ): Promise<FmOrderItem[]> {
     const sql = `
     SELECT 
@@ -255,7 +287,8 @@ export class FmOrdersService {
       fm_order_item.item_seq
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
-    WHERE fm_order.order_seq = ?`;
+    WHERE fm_order.order_seq = ?
+    AND goods_seq IN (${goodsIds.join(',')})`;
     return this.db.query(sql, [orderId]);
   }
 
@@ -290,6 +323,7 @@ export class FmOrdersService {
   /** 개별 주문 - 출고 정보 */
   private async findOneOrderExports(
     orderId: FmOrder['order_seq'] | string,
+    itemSeqArray: number[],
   ): Promise<FmOrderExport[]> {
     const exportsSql = `SELECT
       fm_goods_export.export_code,
@@ -304,6 +338,7 @@ export class FmOrdersService {
     FROM fm_goods_export
     JOIN fm_goods_export_item USING(export_code)
     WHERE fm_goods_export.order_seq = ?
+    AND fm_goods_export_item.item_seq IN (${itemSeqArray.join(',')})
     GROUP BY export_code`;
     const _exports: FmOrderExportBase[] = await this.db.query(exportsSql, [orderId]);
 
@@ -314,7 +349,8 @@ export class FmOrdersService {
     FROM fm_order_item_option
       JOIN fm_order_item USING(item_seq)
     JOIN fm_goods_export_item ON item_option_seq = option_seq
-    WHERE export_code = ?`;
+    WHERE export_code = ?
+    `;
 
     const result: FmOrderExport[] = await Promise.all(
       _exports.map(async (e) => {
@@ -458,6 +494,29 @@ export class FmOrdersService {
 
     return result;
   }
+
+  /** 개별 주문 - 총 주문 금액 (내 상품만) */
+  private async findOneOrderInfoPerMyGoods(
+    itemSeqs: string,
+  ): Promise<Pick<FindFmOrderRes, 'totalEa' | 'totalPrice' | 'totalType'>> {
+    const result: Pick<FindFmOrderRes, 'totalEa' | 'totalPrice' | 'totalType'>[] =
+      await this.db.query(`
+    SELECT
+      SUM(price) AS totalPrice,
+      SUM(ea) AS totalEa,
+      (SELECT COUNT(*) FROM (
+        SELECT SUM(item_option_seq)
+        FROM fm_order_item_option
+        WHERE item_seq IN (${itemSeqs})
+        GROUP BY item_option_seq
+      ) AS totalType) totalType
+    FROM fm_order_item_option
+    WHERE item_seq IN (${itemSeqs})`);
+    if (result.length === 0) return null;
+    return result[0];
+  }
+
+  /** 개별 주문 - 총 개수 (내 상품만) */
 
   // * **********************************
   // * 주문 상태 변경

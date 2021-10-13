@@ -14,6 +14,7 @@ export const useOrderExportableCheck = (
       return i.options.every((o) => {
         // 남은 개수가 0이거나 0보다 작을 때
         const rest = o.ea - o.step55 - o.step65 - o.step75 - o.step85;
+
         return (
           getFmOrderStatusByNames(['배송중', '배송완료']).includes(order?.step) ||
           rest <= 0

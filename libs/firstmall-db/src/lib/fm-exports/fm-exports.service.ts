@@ -11,6 +11,7 @@ import {
   fmOrderStatuses,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import { GoodsService } from '@project-lc/nest-modules';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FMGoodsService } from '../fm-goods/fm-goods.service';
 import { FmOrdersService } from '../fm-orders/fm-orders.service';
@@ -42,6 +43,7 @@ export class FmExportsService {
     private readonly db: FirstmallDbService,
     private readonly fmGoodsService: FMGoodsService,
     private readonly fmOrdersService: FmOrdersService,
+    private readonly projectLcGoodsService: GoodsService,
   ) {}
 
   /**
@@ -194,7 +196,8 @@ export class FmExportsService {
 
     const targetStatus = '55';
     // 주문 정보 조회
-    const orderInfo = await this.fmOrdersService.findOneOrder(orderId);
+    const myGoodsIds = await this.projectLcGoodsService.findMyGoodsIds(actor);
+    const orderInfo = await this.fmOrdersService.findOneOrder(orderId, myGoodsIds);
     if (!orderInfo) return null;
 
     // 실물 출고 처리 쿼리 생성
@@ -249,6 +252,7 @@ export class FmExportsService {
       const goodsOption = goodsOptions.find((_o) => {
         return _o.option1 === opt.option1 && _o.option_title === opt.optionTitle;
       });
+
       const reduceGoodsStock = this.createReduceOrderItemGoodsStockQuery(
         goodsOption.option_seq,
         opt.exportEa,

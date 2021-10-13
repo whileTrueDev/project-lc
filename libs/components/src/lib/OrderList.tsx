@@ -82,7 +82,7 @@ const columns: GridColumns = [
     renderCell: (params) => {
       return (
         <NextLink href={`/mypage/orders/${params.row.id}`} passHref>
-          <Link color="blue.500" textDecoration="underline">
+          <Link color="blue.500" textDecoration="underline" isTruncated>
             {params.row.id}
           </Link>
         </NextLink>
@@ -92,7 +92,7 @@ const columns: GridColumns = [
   {
     field: 'regist_date',
     headerName: '주문일시',
-    width: 150,
+    width: 170,
     valueFormatter: ({ row }) =>
       dayjs(row.regist_date as any).format('YYYY/MM/DD HH:mm:ss'),
     renderCell: (params) => {
@@ -119,19 +119,20 @@ const columns: GridColumns = [
     ),
   },
   {
-    field: 'total_ea',
+    field: 'totalEa',
     headerName: '수량(종류)',
     disableColumnMenu: true,
     disableReorder: true,
     hideSortIcons: true,
     sortable: false,
+    width: 120,
     valueFormatter: ({ row }) => {
-      return row.total_ea + (row.total_type ? `/${row.total_type}` : '');
+      return row.totalEa + (row.totalType ? `/${row.totalType}` : '');
     },
     renderCell: (params) => (
       <Text>
-        {params.row.total_ea}
-        {params.row.total_type ? ` (${params.row.total_type})` : ''}
+        {params.row.totalEa}
+        {params.row.totalType ? ` (${params.row.totalType})` : ''}
       </Text>
     ),
   },
@@ -153,30 +154,8 @@ const columns: GridColumns = [
     ),
   },
   {
-    field: 'depositor',
-    headerName: '결제수단/일시',
-    disableColumnMenu: true,
-    disableReorder: true,
-    hideSortIcons: true,
-    sortable: false,
-    width: 120,
-    valueFormatter: ({ row }) => {
-      const depositdate = dayjs(row.deposit_date).format('YYYY/MM/DD HH:mm:ss');
-      return row.depositor + (row.deposit_date ? `/${depositdate}` : '');
-    },
-    renderCell: (params) => {
-      const t = `${params.row.depositor}
-      ${
-        params.row.deposit_date
-          ? `/${dayjs(params.row.deposit_date).format('YYYY/MM/DD HH:mm:ss')}`
-          : ''
-      }`;
-      return <TooltipedText text={t} />;
-    },
-  },
-  {
-    field: 'settleprice',
-    headerName: '결제금액',
+    field: 'totalPrice',
+    headerName: '주문금액',
     disableColumnMenu: true,
     disableReorder: true,
     hideSortIcons: true,
@@ -190,11 +169,19 @@ const columns: GridColumns = [
       return howmuch;
     },
     renderCell: (params) => {
-      let howmuch = '';
-      if (params.row.settleprice) {
-        howmuch = `${Math.floor(Number(params.row.settleprice)).toLocaleString()}원`;
+      let text = '';
+      if (params.row.totalPrice) {
+        const totalPrice = Math.floor(Number(params.row.totalPrice));
+        const shppingCost = Math.floor(Number(params.row.shipping_cost));
+        let howMuch: number;
+        if (!Number.isNaN(shppingCost)) {
+          howMuch = totalPrice + shppingCost;
+        } else {
+          howMuch = totalPrice;
+        }
+        text = `${howMuch.toLocaleString()}원`;
       }
-      return <TooltipedText text={howmuch} />;
+      return <TooltipedText text={text} />;
     },
   },
   {
@@ -202,8 +189,7 @@ const columns: GridColumns = [
     headerName: '주문상태',
     disableColumnMenu: true,
     disableReorder: true,
-    hideSortIcons: true,
-    sortable: false,
+    width: 120,
     valueFormatter: ({ value }) => convertFmOrderStatusToString(value as any) || '-',
     renderCell: ({ value }) => (
       <Box lineHeight={2}>
@@ -211,7 +197,7 @@ const columns: GridColumns = [
       </Box>
     ),
   },
-  ...hiddenColumns,
+  // ...hiddenColumns,
 ];
 
 /** DataGrid style 컬럼 구분선 추가 */
@@ -229,7 +215,6 @@ export function OrderList(): JSX.Element {
   const exportManyDialog = useDisclosure();
   const fmOrderStates = useFmOrderStore();
   const orders = useFmOrders(fmOrderStates);
-
   const { isDesktopSize } = useDisplaySize();
   const dataGridBgColor = useColorModeValue('inherit', 'gray.300');
 
@@ -258,7 +243,13 @@ export function OrderList(): JSX.Element {
         disableSelectionOnClick
         disableColumnMenu
         loading={orders.isLoading}
-        columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
+        columns={columns.map((col) => {
+          if (col.headerName === '상품') {
+            const flex = isDesktopSize ? 1 : undefined;
+            return { ...col, flex };
+          }
+          return col;
+        })}
         rows={filteredOrders}
         checkboxSelection
         selectionModel={fmOrderStates.selectedOrders}

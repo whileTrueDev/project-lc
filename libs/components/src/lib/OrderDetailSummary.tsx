@@ -5,7 +5,7 @@ import {
 import dayjs from 'dayjs';
 import { AiTwotoneEnvironment } from 'react-icons/ai';
 import { IoMdPerson } from 'react-icons/io';
-import { FaBoxOpen } from 'react-icons/fa';
+import { FaBoxOpen, FaShippingFast } from 'react-icons/fa';
 import { MdDateRange } from 'react-icons/md';
 import { SummaryList } from './SummaryList';
 
@@ -38,6 +38,15 @@ export function OrderDetailSummary({ order }: OrderDetailSummaryProps): JSX.Elem
           id: '주문환경',
           icon: AiTwotoneEnvironment,
           value: `${convertOrderSitetypeToString(order.sitetype)}에서 주문`,
+        },
+        {
+          id: '배송비',
+          icon: FaShippingFast,
+          value: (() => {
+            const cost = Number(order.shipping_cost);
+            if (Number.isNaN(cost) || cost === 0) return '무료배송';
+            return `배송비 ${Number(order.shipping_cost).toLocaleString()}원`;
+          })(),
         },
       ]}
     />

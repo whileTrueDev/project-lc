@@ -508,6 +508,14 @@ export type FindFmOrderRes = FmOrder & {
   id: FmOrder['order_seq'];
 } & {
   goods_name: FmOrderItem['goods_name'];
+  /** 이 주문에 포함된 내 order_item 고유번호. 41, 42, 43 과 같은 형태 */
+  item_seq: string;
+  /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 가격의 합 */
+  totalPrice: string | null;
+  /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 개수 */
+  totalEa: number;
+  /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 종류 수 */
+  totalType: number;
 };
 
 /**
