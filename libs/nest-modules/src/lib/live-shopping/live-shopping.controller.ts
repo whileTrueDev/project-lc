@@ -7,7 +7,7 @@ import {
   ValidationPipe,
   Body,
 } from '@nestjs/common';
-import { ApprovedGoodsNameAndIds } from '@project-lc/shared-types';
+import { ApprovedGoodsNameAndIds, LiveShoppingDTO } from '@project-lc/shared-types';
 import { GoodsService } from '../goods/goods.service';
 import { LiveShoppingService } from './live-shopping.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
@@ -34,8 +34,8 @@ export class LiveShoppingController {
   @Post('/create')
   createLiveShopping(
     @SellerInfo() seller: UserPayload,
-    @Body(ValidationPipe) dto: any,
-  ): Promise<{ sellerId: string }> {
+    @Body(ValidationPipe) dto: LiveShoppingDTO,
+  ): Promise<{ liveShoppingId: number }> {
     const email = seller.sub;
     return this.liveShoppingService.createLiveShopping(email, dto);
   }

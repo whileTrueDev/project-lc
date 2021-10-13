@@ -14,12 +14,11 @@ export class LiveShoppingService {
         id: true,
       },
     });
-
     const liveShopping = await this.prisma.liveShopping.create({
       data: {
         seller: { connect: { id: userId.id } },
         streamId,
-        requests: dto.reqeusts,
+        requests: dto.requests,
         goods: { connect: { id: dto.goods_id } },
         sellerContacts: { connect: { id: dto.contactId } },
       },

@@ -1,6 +1,9 @@
-import { IsString, IsBoolean } from 'class-validator';
+import { IsString, IsBoolean, IsNumber } from 'class-validator';
 
 export class SellerContactsDTO {
+  @IsNumber()
+  id: number;
+
   @IsString()
   email: string;
 
@@ -10,3 +13,8 @@ export class SellerContactsDTO {
   @IsBoolean()
   isDefault: boolean;
 }
+
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+type SubPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+export type SellerContactsDTOWithoutIdDTO = SubPartial<SellerContactsDTO, 'id'>;

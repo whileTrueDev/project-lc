@@ -170,18 +170,22 @@ export class SellerService {
     const sellerDefaultContacts = await this.prisma.sellerContacts.findFirst({
       where: { sellerId: userId.id, isDefault: true },
       select: {
+        id: true,
         email: true,
         phoneNumber: true,
         isDefault: true,
+      },
+      orderBy: {
+        createDate: 'desc',
       },
     });
 
     return sellerDefaultContacts;
   }
 
-  async registSellerContacts(sellerId, dto): Promise<{ contactId: number }> {
+  async registSellerContacts(sellerEmail, dto): Promise<{ contactId: number }> {
     const userId = await this.prisma.seller.findFirst({
-      where: { email: sellerId },
+      where: { email: sellerEmail },
       select: {
         id: true,
       },

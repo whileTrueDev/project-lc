@@ -69,11 +69,14 @@ export function LiveShoppingRegist(): JSX.Element {
       streamId: '',
       progress: 'registered',
     };
+
+    if (contacts.data) {
+      dto.contactId = contacts.data.id;
+    }
     dto.requests = data.requests;
     dto.goods_id = watch('goods_id');
 
     if (useContact === 'old') {
-      dto.contactId = data.contactId;
       mutateAsync(dto)
         .then(() => {
           toast({
@@ -82,7 +85,7 @@ export function LiveShoppingRegist(): JSX.Element {
           });
           router.push('/mypage/goods');
         })
-        .catch(() => {
+        .catch((error) => {
           toast({
             title: '상품 등록 중 오류가 발생하였습니다',
             status: 'error',
@@ -97,13 +100,14 @@ export function LiveShoppingRegist(): JSX.Element {
         .then((value) => {
           dto.contactId = Number(Object.values(value));
         })
-        .catch(() => {
+        .catch((error) => {
+          console.log(error);
           toast({
             title: '상품 등록 중 오류가 발생하였습니다',
             status: 'error',
           });
         });
-
+      console.log('dto', dto);
       mutateAsync(dto)
         .then(() => {
           toast({
