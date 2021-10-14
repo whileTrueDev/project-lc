@@ -424,7 +424,11 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
 
       {/* 배송비 정책 목록 */}
       <ShippingGroupContainerBox maxWidth="lg">
-        <RadioGroup value={watch('shippingGroupId')} maxHeight="150px" overflowY="auto">
+        <RadioGroup
+          value={watch('shippingGroupId')?.toString()}
+          maxHeight="150px"
+          overflowY="auto"
+        >
           {data &&
             data.map((g) => (
               <ShippingGroupListItem
