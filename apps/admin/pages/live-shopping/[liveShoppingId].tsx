@@ -1,13 +1,14 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 import { Box, Button, Flex, Stack } from '@chakra-ui/react';
 import { AdminPageLayout } from '@project-lc/components';
-import { useAdminGoodsById } from '@project-lc/hooks';
+import { useAdminLiveShoppingList, useProfile } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
 
 export function GoodsDetail(): JSX.Element {
   const router = useRouter();
   const liveShoppingId = router.query.liveshoppingId as string;
+
   // const goods = useAdminGoodsById(liveshoppingId);
 
   // if (goods.isLoading) return <AdminPageLayout>...loading</AdminPageLayout>;

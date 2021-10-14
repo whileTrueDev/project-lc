@@ -63,7 +63,7 @@ export default function AdminNav(): JSX.Element {
             </NextLink>
           </Box>
           <Box key="라이브쇼핑관리">
-            <NextLink href={'/liveshopping' ?? '#'} passHref>
+            <NextLink href={'/live-shopping' ?? '#'} passHref>
               <Link
                 p={2}
                 fontSize="sm"
