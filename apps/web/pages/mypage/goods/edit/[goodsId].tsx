@@ -14,7 +14,7 @@ export function GoodsEdit(): JSX.Element {
   return (
     <MypageLayout>
       <Container maxWidth="container.xl" my={12}>
-        <Heading>상품수정 {goodsId}</Heading>
+        <Heading>상품수정</Heading>
         <GoodsEditForm goodsData={goods.data} />
       </Container>
     </MypageLayout>

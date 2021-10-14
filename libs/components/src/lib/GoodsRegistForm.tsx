@@ -149,6 +149,7 @@ export async function saveContentsImageToS3(
   return contentsBody;
 }
 
+/** 상품 등록 폼 컴포넌트 */
 export function GoodsRegistForm(): JSX.Element {
   const { data: profileData } = useProfile();
   const { mutateAsync, isLoading } = useRegistGoods();
@@ -229,7 +230,6 @@ export function GoodsRegistForm(): JSX.Element {
       };
     } else {
       // 상세설명을 입력하지 않은 경우 - 상품 수정 기능이 없는 동안 필수값으로 설정함
-      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기
       toast({ title: '상세설명을 입력해주세요', status: 'warning' });
       return;
     }
@@ -252,8 +252,7 @@ export function GoodsRegistForm(): JSX.Element {
         goodsInfoId: res.id,
       };
     } else if (!data.goodsInfoId) {
-      // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함) - 상품 수정 기능이 없는 동안 필수값으로 설정함
-      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기
+      // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함)
       toast({
         title: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
         status: 'warning',
@@ -263,7 +262,6 @@ export function GoodsRegistForm(): JSX.Element {
 
     if (!shippingGroupId) {
       // 배송비정책 그룹을 선택하지 않은 경우
-      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기(if문 삭제)
       toast({
         title: '배송비 정책을 선택해주세요',
         status: 'warning',
@@ -272,7 +270,7 @@ export function GoodsRegistForm(): JSX.Element {
     }
 
     mutateAsync(goodsDto)
-      .then((res) => {
+      .then(() => {
         toast({
           title: '상품을 성공적으로 등록하였습니다',
           status: 'success',
