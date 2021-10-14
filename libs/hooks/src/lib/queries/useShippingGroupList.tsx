@@ -2,7 +2,6 @@ import { useQuery, UseQueryResult } from 'react-query';
 import { AxiosError } from 'axios';
 import { ShippingGroup } from '.prisma/client';
 import axios from '../../axios';
-import { SocialAccounts } from './useSocialAccounts';
 
 export type ShippingGroupListItemType = ShippingGroup & {
   _count: {

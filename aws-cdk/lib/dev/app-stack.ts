@@ -347,7 +347,7 @@ export class LCDevAppStack extends cdk.Stack {
         this,
         `${PREFIX}GOOGLE_CREDENTIALS_EMAIL`,
         {
-          version: 1,
+          version: 2,
           parameterName: constants.DEV.GOOGLE_CREDENTIALS_EMAIL_KEY,
         },
       );
@@ -356,7 +356,7 @@ export class LCDevAppStack extends cdk.Stack {
         this,
         `${PREFIX}GOOGLE_CREDENTIALS_PRIVATE_KEY`,
         {
-          version: 1,
+          version: 2,
           parameterName: constants.DEV.GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY,
         },
       );

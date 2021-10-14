@@ -1,5 +1,5 @@
 import { AspectRatio, Button, Flex, Heading, SimpleGrid, Stack } from '@chakra-ui/react';
-import { useDisplaySize } from '@project-lc/hooks';
+import { useDisplaySize, useIsLoggedIn } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 
 function MainBetaVideo(): React.ReactElement {
@@ -18,9 +18,13 @@ function MainBetaVideo(): React.ReactElement {
 
 function MainBetaStartButton(): React.ReactElement {
   const router = useRouter();
+  const { isLoggedIn } = useIsLoggedIn();
   return (
     <Button
-      onClick={() => router.push('/login')}
+      onClick={() => {
+        if (isLoggedIn) return router.push('/mypage');
+        return router.push('/login');
+      }}
       fontWeight={600}
       color="white"
       size="lg"

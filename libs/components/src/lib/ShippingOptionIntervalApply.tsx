@@ -34,7 +34,8 @@ export function ShippingOptionIntervalApply({
     setValue,
     setError,
     getValues,
-    formState: { isSubmitSuccessful, errors },
+    formState: { errors },
+    trigger,
   } = useForm<IntervalFormType>({
     defaultValues: {
       section_ed: null,
@@ -49,7 +50,12 @@ export function ShippingOptionIntervalApply({
   const { addShippingOption, shippingOptions, setShippingOptions } =
     useShippingSetItemStore();
 
-  const onSubmit = (): void => {
+  const onSubmit = async (): Promise<void> => {
+    // handleSubmit 이 아닌 onClick 이벤트 핸들러를 사용(상품등록 폼 내에 해당 폼이 존재하여 submit 이벤트가 버블링됨)
+    // trigger로 validation 체크 필요
+    const validationPassed = await trigger();
+    if (!validationPassed) return;
+
     const data: IntervalFormType = getValues();
     const { section_ed, shipping_cost, shipping_area_name } = data;
     if (shipping_area_name === '지역 선택') {
@@ -95,19 +101,17 @@ export function ShippingOptionIntervalApply({
   };
 
   useEffect(() => {
-    if (isSubmitSuccessful) {
-      // 이미 추가된 옵션이 있다면 시작값을 이전 옵션의 종료값으로 설정
-      if (shippingOptions.length > 0) {
-        setSectionStart(shippingOptions[shippingOptions.length - 1].section_ed || 0);
-      }
-      // 추가된 옵션이 없다면 구간시작값 0으로 설정
-      if (shippingOptions.length === 0) {
-        setSectionStart(0);
-      }
-
-      setValue('section_ed', null);
+    // 이미 추가된 옵션이 있다면 시작값을 이전 옵션의 종료값으로 설정
+    if (shippingOptions.length > 0) {
+      setSectionStart(shippingOptions[shippingOptions.length - 1].section_ed || 0);
     }
-  }, [isSubmitSuccessful, shippingOptions, setValue]);
+    // 추가된 옵션이 없다면 구간시작값 0으로 설정
+    if (shippingOptions.length === 0) {
+      setSectionStart(0);
+    }
+
+    setValue('section_ed', null);
+  }, [shippingOptions, setValue]);
 
   useEffect(() => {
     setValue(

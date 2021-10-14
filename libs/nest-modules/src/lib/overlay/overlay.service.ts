@@ -66,12 +66,12 @@ export class OverlayService {
     return false;
   }
 
-  async streamStartNotification(): Promise<string | false | Uint8Array> {
+  async streamNotification(text: string): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
 
     const message = `
     <speak>
-      잠시 후, 수련수련님의 싸움의고수 라이브 커머스가 시작됩니다.
+      ${text}
     </speak>
     `;
 
