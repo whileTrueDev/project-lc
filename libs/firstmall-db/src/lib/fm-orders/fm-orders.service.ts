@@ -18,7 +18,80 @@ import {
   FmOrderStatusNumString,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
+import dayjs from 'dayjs';
 import { FirstmallDbService } from '../firstmall-db.service';
+
+function statCounter(): any {
+  const stats = {
+    배송준비중: 0,
+    배송중: 0,
+    배송완료: 0,
+  };
+
+  const sales = {
+    주문: {
+      count: 0,
+      sum: 0,
+    },
+    환불: {
+      count: 0,
+      sum: 0,
+    },
+  };
+
+  const exDay = dayjs().subtract(1, 'day');
+
+  // fm_order 테이블의 주문 상태를 통해
+  function getStatKey(step: FmOrderStatusNumString): string | null {
+    const stepNum = parseInt(step, 10);
+    if (stepNum >= 35 && stepNum <= 50) {
+      return '배송준비중';
+    }
+    if (stepNum >= 55 && stepNum <= 70) {
+      return '배송중';
+    }
+    if (stepNum === 75) {
+      return '배송완료';
+    }
+    return null;
+  }
+
+  function getSalesKey(step: FmOrderStatusNumString, regist_date: string): string | null {
+    const stepNum = parseInt(step, 10);
+    if (exDay.isBefore(dayjs(regist_date))) {
+      if (stepNum >= 35 && stepNum <= 75) {
+        return '주문';
+      }
+      if (stepNum === 85) {
+        return '환불';
+      }
+    }
+    return null;
+  }
+
+  function count(
+    step: FmOrderStatusNumString,
+    regist_date: string,
+    payment_price: number,
+  ): void {
+    const key = getStatKey(step);
+    if (key) {
+      stats[key] += 1;
+    }
+
+    const salesKey = getSalesKey(step, regist_date);
+    if (salesKey) {
+      sales[key].count += 1;
+      sales[key].sum += payment_price;
+    }
+  }
+
+  return {
+    count,
+    stats,
+    sales,
+  };
+}
 
 @Injectable()
 export class FmOrdersService {
@@ -134,6 +207,7 @@ export class FmOrdersService {
         params,
       };
     }
+
     if (dto.search) {
       whereSql = `\nAND (${searchSql})`;
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
@@ -508,5 +582,32 @@ export class FmOrdersService {
       default:
         throw new BadRequestException('targetStatus parameter is required');
     }
+  }
+
+  // * **********************************
+  // * 주문 현황 조회
+  // * **********************************
+  public async getOrdersStats(goodsIds: number[]): Promise<FindFmOrderRes[]> {
+    const sql = `
+    SELECT
+      fm_order.*
+    FROM fm_order
+    JOIN fm_order_item USING(order_seq)
+    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
+    AND DATE(regist_date) >= ?
+    ORDER BY regist_date DESC
+    `;
+    const exMonth = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+    const data = (await this.db.query(sql, [exMonth])) as FindFmOrderRes[];
+
+    const counter = statCounter();
+    const result = data.map((x) => ({ ...x }));
+    // 주문현황을 위한 counting
+    data.forEach((x) => {
+      counter.count(x.step, x.regist_date, x.payment_price);
+    });
+    console.log(counter.stats);
+    //
+    return result;
   }
 }
