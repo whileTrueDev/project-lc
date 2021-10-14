@@ -17,7 +17,7 @@ interface LiveShoppingWithGoods extends LiveShopping {
 }
 
 export const getAdminLiveShoppingList = async (
-  liveShoppingId?: number | null,
+  liveShoppingId?: string | null,
 ): Promise<LiveShoppingWithGoods[]> => {
   return axios
     .get<LiveShoppingWithGoods[]>('/admin/live-shopping', { params: { liveShoppingId } })
@@ -26,7 +26,7 @@ export const getAdminLiveShoppingList = async (
 
 export const useAdminLiveShoppingList = (dto: {
   enabled: boolean;
-  id?: number;
+  id?: string;
 }): UseQueryResult<LiveShoppingWithGoods[], AxiosError> => {
   const queryKey = ['AdminGoodsList', dto];
   return useQuery<LiveShoppingWithGoods[], AxiosError>(queryKey, () =>

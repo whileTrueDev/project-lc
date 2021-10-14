@@ -20,4 +20,16 @@ export class BroadcasterService {
     }
     return userId;
   }
+
+  async getAllBroadcasterIdAndNickname(): Promise<any> {
+    return this.prisma.broadcaster.findMany({
+      where: {
+        deleteFlag: false,
+      },
+      select: {
+        userId: true,
+        userNickname: true,
+      },
+    });
+  }
 }
