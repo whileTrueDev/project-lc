@@ -3,8 +3,9 @@ import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import axios from '../../axios';
 
+/** 상품 ****등록**** mutation */
 export type useRegistGoodsDto = RegistGoodsDto;
-export type useRegistGoodsRes = any;
+export type useRegistGoodsRes = { goodsId: number };
 
 export const useRegistGoods = (): UseMutationResult<
   useRegistGoodsRes,
@@ -13,12 +14,42 @@ export const useRegistGoods = (): UseMutationResult<
 > => {
   const queryClient = useQueryClient();
   return useMutation<useRegistGoodsRes, AxiosError, useRegistGoodsDto>(
-    (dto: useRegistGoodsDto) => axios.post<useRegistGoodsRes>('/goods', dto),
+    (dto: useRegistGoodsDto) =>
+      axios.post<useRegistGoodsRes>('/goods', dto).then((res) => res.data),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('SellerGoodsList', { refetchInactive: true });
 
         queryClient.invalidateQueries('ShippingGroupList', { refetchInactive: true }); // 상품 등록 후  배송비정책에 연결된 상품개수 업데이트
+      },
+    },
+  );
+};
+
+/** 상품 ****수정**** mutation */
+export type useEditGoodsDto = { id: number; dto: RegistGoodsDto };
+export type useEditGoodsRes = useRegistGoodsRes;
+
+export const useEditGoods = (): UseMutationResult<
+  useEditGoodsRes,
+  AxiosError,
+  useEditGoodsDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<useEditGoodsRes, AxiosError, useEditGoodsDto>(
+    (dto: useEditGoodsDto) =>
+      axios.put<useEditGoodsRes>(`/goods/${dto.id}`, dto.dto).then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        const { goodsId } = data;
+        queryClient.invalidateQueries('SellerGoodsList', { refetchInactive: true });
+
+        queryClient.invalidateQueries('ShippingGroupList', { refetchInactive: true }); // 상품 등록 후  배송비정책에 연결된 상품개수 업데이트
+
+        console.log({ goodsId }, ['GoodsById', goodsId]);
+        queryClient.invalidateQueries(['GoodsById', goodsId], {
+          refetchInactive: true,
+        });
       },
     },
   );
