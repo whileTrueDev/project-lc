@@ -9,13 +9,14 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { GoodsConfirmation } from '@prisma/client';
+import { GoodsConfirmation, LiveShopping } from '@prisma/client';
 import {
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
+  LiveShoppingDTO,
 } from '@project-lc/shared-types';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -74,5 +75,13 @@ export class AdminController {
   @Put('/goods/reject')
   setGoodsRejection(@Body() dto: GoodsRejectionDto): Promise<GoodsConfirmation> {
     return this.adminService.setGoodsRejection(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Get('/live-shopping')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  getLiveShoppings(): Promise<LiveShopping[]> {
+    return this.adminService.getRegisteredLiveShoppings();
   }
 }

@@ -62,6 +62,22 @@ export default function AdminNav(): JSX.Element {
               </Link>
             </NextLink>
           </Box>
+          <Box key="라이브쇼핑관리">
+            <NextLink href={'/liveshopping' ?? '#'} passHref>
+              <Link
+                p={2}
+                fontSize="sm"
+                fontWeight={500}
+                color={linkColor}
+                _hover={{
+                  textDecoration: 'none',
+                  color: linkHoverColor,
+                }}
+              >
+                라이브 쇼핑 관리
+              </Link>
+            </NextLink>
+          </Box>
         </Flex>
         <>
           {isLoggedIn && (

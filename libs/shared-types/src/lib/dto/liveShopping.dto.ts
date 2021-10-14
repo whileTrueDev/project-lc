@@ -1,8 +1,15 @@
-import { IsString, IsIn, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsIn, IsOptional, IsNumber, IsDate } from 'class-validator';
 
 export class LiveShoppingDTO {
   @IsString()
   streamId: string;
+
+  @IsOptional()
+  @IsString()
+  broadcasterId: string;
+
+  @IsString()
+  sellerId: string;
 
   @IsNumber()
   goods_id: number;
@@ -17,4 +24,7 @@ export class LiveShoppingDTO {
   @IsString()
   @IsIn(['registered', 'adjust'])
   progress: string;
+
+  @IsDate()
+  createDate: string;
 }

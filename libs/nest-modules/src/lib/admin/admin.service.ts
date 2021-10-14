@@ -9,6 +9,7 @@ import {
   SellerSettlementAccount,
   SellerBusinessRegistration,
   GoodsConfirmation,
+  LiveShopping,
 } from '@prisma/client';
 
 export type AdminSettlementInfoType = {
@@ -195,6 +196,25 @@ export class AdminService {
         confirmation: true,
         image: true,
         GoodsInfo: true,
+      },
+    });
+  }
+
+  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
+    return this.prisma.liveShopping.findMany({
+      where: { progress: 'registered' },
+      include: {
+        goods: {
+          select: {
+            goods_name: true,
+            summary: true,
+          },
+        },
+        seller: {
+          select: {
+            sellerShop: true,
+          },
+        },
       },
     });
   }

@@ -7,6 +7,7 @@ export * from './lib/admin/AdminGoodsList';
 export * from './lib/admin/AdminGoodsStatusButtons';
 export * from './lib/admin/AdminLoginForm';
 export * from './lib/admin/AdminPageLayout';
+export * from './lib/admin/AdminLiveShoppingList';
 export * from './lib/BusinessRegistrationBox';
 export * from './lib/BusinessRegistrationDialog';
 export * from './lib/CenterBox';
