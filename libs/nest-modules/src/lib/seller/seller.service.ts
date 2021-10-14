@@ -184,15 +184,9 @@ export class SellerService {
   }
 
   async registSellerContacts(sellerEmail, dto): Promise<{ contactId: number }> {
-    const userId = await this.prisma.seller.findFirst({
-      where: { email: sellerEmail },
-      select: {
-        id: true,
-      },
-    });
     const contact = await this.prisma.sellerContacts.create({
       data: {
-        seller: { connect: { id: userId.id } },
+        seller: { connect: { email: sellerEmail } },
         email: dto.email,
         phoneNumber: dto.phoneNumber,
         isDefault: dto.isDefault ? true : undefined,

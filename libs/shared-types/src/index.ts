@@ -57,3 +57,4 @@ export * from './lib/res-types/loginUserRes';
 export * from './lib/res-types/overlayControllerMain.res';
 export * from './lib/res-types/userProfile.res';
 export * from './lib/shared-types';
+export * from './lib/front-type/liveShoppingInputType';

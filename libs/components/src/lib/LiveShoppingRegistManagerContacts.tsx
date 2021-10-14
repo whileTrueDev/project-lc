@@ -11,38 +11,36 @@ import {
   InputGroup,
   Checkbox,
 } from '@chakra-ui/react';
-import { useFormContext } from 'react-hook-form';
-import { SellerContactsDTO } from '@project-lc/shared-types';
-
-export interface UseFormContext {
-  useContact: string;
-  firstNumber: string;
-  secondNumber: string;
-  thirdNumber: string;
-  email: string;
-}
+import {
+  FieldError,
+  DeepMap,
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormWatch,
+} from 'react-hook-form';
+import {
+  SellerContactsDTO,
+  emailRegisterOptions,
+  LiveShoppingInput,
+} from '@project-lc/shared-types';
 
 interface LiveShoppingManagerPhoneNumberProps {
   data: SellerContactsDTO | undefined;
-  setDefault: boolean;
   handleSetDefault(value: boolean): void;
+  setDefault: boolean;
+  register: UseFormRegister<LiveShoppingInput>;
+  setValue: UseFormSetValue<LiveShoppingInput>;
+  errors: DeepMap<LiveShoppingInput, FieldError>;
+  watch: UseFormWatch<LiveShoppingInput>;
 }
 
 export function LiveShoppingManagerPhoneNumber(
   props: LiveShoppingManagerPhoneNumberProps,
 ): JSX.Element {
-  const { data, setDefault, handleSetDefault } = props;
-
-  const {
-    register,
-    setValue,
-    formState: { errors },
-    watch,
-  } = useFormContext<UseFormContext>();
+  const { data, setDefault, handleSetDefault, register, setValue, errors, watch } = props;
 
   type Keys = 'first' | 'second' | 'third';
   type SlicedPhoneNumber = { [k in Keys]: string };
-
   const makePhoneNumberForm = (fullPhoneNumber: string): SlicedPhoneNumber => {
     const first = fullPhoneNumber?.substring(0, 3) || '';
     const second = fullPhoneNumber?.substring(3, 7) || '';
@@ -72,67 +70,59 @@ export function LiveShoppingManagerPhoneNumber(
         담당자 연락처
       </Heading>
 
-      <FormControl
-        isRequired
-        isInvalid={
-          !!errors.email ||
-          !!errors.firstNumber ||
-          !!errors.secondNumber ||
-          !!errors.thirdNumber
-        }
-      >
-        <Stack spacing={2}>
-          {!data ? (
-            <RadioGroup
-              onChange={(value) => {
-                setValue('useContact', value);
-              }}
-              defaultValue="new"
-            >
-              <Stack spacing={3} direction="row">
-                <Radio {...register('useContact')} value="old" isDisabled>
-                  기본 연락처
-                </Radio>
-                <Radio {...register('useContact')} value="new" defaultChecked>
-                  새 연락처
-                </Radio>
-              </Stack>
-            </RadioGroup>
-          ) : (
-            <RadioGroup
-              onChange={(value) => {
-                setValue('useContact', value);
-                if (watch('useContact') === 'new') {
-                  setValue('email', '');
-                  setValue('firstNumber', '');
-                  setValue('secondNumber', '');
-                  setValue('thirdNumber', '');
-                } else {
-                  setValue('email', data.email);
-                  setValue('firstNumber', firstNumber);
-                  setValue('secondNumber', secondNumber);
-                  setValue('thirdNumber', thirdNumber);
-                }
-              }}
-              defaultValue="old"
-            >
-              <Stack spacing={3} direction="row">
-                <Radio {...register('useContact')} value="old">
-                  기존 연락처
-                </Radio>
-                <Radio {...register('useContact')} value="new">
-                  새 연락처
-                </Radio>
-              </Stack>
-            </RadioGroup>
-          )}
-
-          <Stack
-            outline="solid 0.5px lightgray"
-            width="600px"
-            padding="7px"
-            borderRadius="3pt"
+      <Stack spacing={2}>
+        {!data ? (
+          <RadioGroup
+            onChange={(value) => {
+              setValue('useContact', value);
+            }}
+            defaultValue="new"
           >
+            <Stack spacing={3} direction="row">
+              <Radio {...register('useContact')} value="old" isDisabled>
+                기본 연락처
+              </Radio>
+              <Radio {...register('useContact')} value="new" defaultChecked>
+                새 연락처
+              </Radio>
+            </Stack>
+          </RadioGroup>
+        ) : (
+          <RadioGroup
+            onChange={(value) => {
+              setValue('useContact', value);
+              if (watch('useContact') === 'new') {
+                setValue('email', '');
+                setValue('firstNumber', '');
+                setValue('secondNumber', '');
+                setValue('thirdNumber', '');
+              } else {
+                setValue('email', data.email);
+                setValue('firstNumber', firstNumber);
+                setValue('secondNumber', secondNumber);
+                setValue('thirdNumber', thirdNumber);
+              }
+            }}
+            defaultValue="old"
+          >
+            <Stack spacing={3} direction="row">
+              <Radio {...register('useContact')} value="old">
+                기존 연락처
+              </Radio>
+              <Radio {...register('useContact')} value="new">
+                새 연락처
+              </Radio>
+            </Stack>
+          </RadioGroup>
+        )}
+
+        <Stack
+          outline="solid 0.5px lightgray"
+          width="600px"
+          padding="7px"
+          borderRadius="3pt"
+        >
+          <FormControl isRequired isInvalid={!!errors.email}>
             <FormLabel htmlFor="email">이메일</FormLabel>
             {!data || watch('useContact') === 'new' ? (
               <Input
@@ -142,7 +132,7 @@ export function LiveShoppingManagerPhoneNumber(
                 autoComplete="off"
                 width={300}
                 value={watch('email', '')}
-                {...register('email', { required: '이메일을 작성해주세요.' })}
+                {...register('email', { ...emailRegisterOptions })}
               />
             ) : (
               <Input
@@ -154,11 +144,17 @@ export function LiveShoppingManagerPhoneNumber(
                 width={300}
                 value={data.email}
                 isDisabled
-                {...register('email', { required: '이메일을 작성해주세요.' })}
+                {...register('email', { ...emailRegisterOptions })}
               />
             )}
             <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
-
+          </FormControl>
+          <FormControl
+            isRequired
+            isInvalid={
+              !!errors.firstNumber || !!errors.secondNumber || !!errors.thirdNumber
+            }
+          >
             <FormLabel htmlFor="phone">전화번호</FormLabel>
             <Stack direction="row" alignItems="center">
               {!data || watch('useContact') === 'new' ? (
@@ -250,11 +246,7 @@ export function LiveShoppingManagerPhoneNumber(
                   />
                 </InputGroup>
               )}
-              <FormErrorMessage>
-                {(errors.firstNumber && errors.firstNumber.message) ||
-                  (errors.secondNumber && errors.secondNumber.message) ||
-                  (errors.thirdNumber && errors.thirdNumber.message)}
-              </FormErrorMessage>
+
               {!data || watch('useContact') === 'old' ? (
                 <Checkbox isChecked isDisabled>
                   기본으로 설정
@@ -268,9 +260,14 @@ export function LiveShoppingManagerPhoneNumber(
                 </Checkbox>
               )}
             </Stack>
-          </Stack>
+            <FormErrorMessage>
+              {(errors.firstNumber && errors.firstNumber.message) ||
+                (errors.secondNumber && errors.secondNumber.message) ||
+                (errors.thirdNumber && errors.thirdNumber.message)}
+            </FormErrorMessage>
+          </FormControl>
         </Stack>
-      </FormControl>
+      </Stack>
     </Stack>
   );
 }

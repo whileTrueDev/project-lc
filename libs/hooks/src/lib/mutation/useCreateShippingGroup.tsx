@@ -1,11 +1,13 @@
-import { Seller, SellerContacts } from '@prisma/client';
+import { Seller, ShippingGroup } from '@prisma/client';
 import { ShippingGroupDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import axios from '../../axios';
 
 export type useCreateShippingGroupDto = ShippingGroupDto;
-export type useCreateShippingGroupRes = SellerContacts;
+export type useCreateShippingGroupRes = ShippingGroup & {
+  seller: Seller;
+};
 
 export const useCreateShippingGroup = (): UseMutationResult<
   useCreateShippingGroupRes,

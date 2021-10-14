@@ -14,7 +14,4 @@ export class SellerContactsDTO {
   isDefault: boolean;
 }
 
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-type SubPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
-export type SellerContactsDTOWithoutIdDTO = SubPartial<SellerContactsDTO, 'id'>;
+export type SellerContactsDTOWithoutIdDTO = Omit<SellerContactsDTO, 'id'>;

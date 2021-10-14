@@ -11,28 +11,14 @@ import {
   useCreateSellerContacts,
 } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
-import { LiveShoppingDTO } from '@project-lc/shared-types';
+import { LiveShoppingDTO, LiveShoppingInput } from '@project-lc/shared-types';
 import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerContacts';
 import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
-
-export interface UseForm {
-  contactId: number;
-  email: string;
-  firstNumber: string;
-  goods_id: number;
-  phoneNumber: string;
-  requests: string;
-  secondNumber: string;
-  setDefault: boolean;
-  thirdNumber: string;
-  useContact: string;
-}
 
 export function LiveShoppingRegist(): JSX.Element {
   const { selectedGoods, handleGoodsSelect, setDefault, handleSetDefault } =
     liveShoppingRegist();
   const { data: profileData } = useProfile();
-  const { setValue, watch } = useForm();
   const { mutateAsync, isLoading } = useCreateLiveShopping();
   const { mutateAsync: createSellerContacts } = useCreateSellerContacts();
 
@@ -47,7 +33,7 @@ export function LiveShoppingRegist(): JSX.Element {
     email: profileData?.email || '',
   });
 
-  const methods = useForm<UseForm>({
+  const methods = useForm<LiveShoppingInput>({
     defaultValues: {
       useContact: '',
       contactId: 0,
@@ -56,9 +42,15 @@ export function LiveShoppingRegist(): JSX.Element {
     },
   });
 
-  const { handleSubmit } = methods;
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    register,
+    formState: { errors },
+  } = methods;
 
-  const regist = async (data: UseForm): Promise<void> => {
+  const regist = async (data: LiveShoppingInput): Promise<void> => {
     const { firstNumber, secondNumber, thirdNumber, useContact, email } = data;
     const phoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
     const dto: LiveShoppingDTO = {
@@ -136,14 +128,14 @@ export function LiveShoppingRegist(): JSX.Element {
             <>
               <Autocomplete
                 options={goodsList.data}
-                getOptionLabel={(option) => option?.goods_name}
+                getOptionLabel={(option) => option?.goods_name || ''}
                 style={{ width: 300, marginTop: 0 }}
                 renderInput={(params) => (
                   <TextField {...params} label="등록할 상품명을 검색하세요" fullWidth />
                 )}
                 value={selectedGoods}
                 onChange={(_, newValue) => {
-                  setValue('goods_id', newValue.id);
+                  setValue('goods_id', newValue?.id || null);
                   handleGoodsSelect(newValue);
                 }}
               />
@@ -151,8 +143,12 @@ export function LiveShoppingRegist(): JSX.Element {
                 data={contacts.data}
                 setDefault={setDefault}
                 handleSetDefault={handleSetDefault}
+                register={register}
+                setValue={setValue}
+                errors={errors}
+                watch={watch}
               />
-              <LiveShoppingRequestInput />
+              <LiveShoppingRequestInput register={register} />
               <Flex
                 py={4}
                 mx={-2}

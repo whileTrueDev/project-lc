@@ -1,9 +1,15 @@
 import { Box, Heading, Stack, Textarea } from '@chakra-ui/react';
-import { useFormContext } from 'react-hook-form';
+import { LiveShoppingInput } from '@project-lc/shared-types';
+import { UseFormRegister } from 'react-hook-form';
 
-export function LiveShoppingRequestInput(): JSX.Element {
-  const { register } = useFormContext<{ requests: string }>();
+interface LisveShoppingRegistRequestField {
+  register: UseFormRegister<LiveShoppingInput>;
+}
 
+export function LiveShoppingRequestInput(
+  props: LisveShoppingRegistRequestField,
+): JSX.Element {
+  const { register } = props;
   return (
     <Box w="100%" mt="10">
       <Stack spacing={2}>

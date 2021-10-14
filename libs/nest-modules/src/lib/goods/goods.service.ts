@@ -394,6 +394,7 @@ export class GoodsService {
           confirmation: {
             status: 'confirmed',
           },
+          goods_status: 'normal',
         },
       },
       select: {
