@@ -54,6 +54,7 @@ export function GoodsPreviewItem(
   );
 }
 
+/** 상품 사진 등록 개수 제한 */
 const MAX_PICTURE_COUNT = 8;
 const PREVIEW_SIZE = {
   width: 60,
@@ -132,8 +133,17 @@ export function GoodsRegistPictures(): JSX.Element {
   const savePictures = async (): Promise<void> => {
     if (!profileData) return;
 
+    // 사진 개수 제한 - 저장된 이미지 + 등록할 이미지 개수가 8개 넘어가면 저장 안되도록
+    const prevImages = getValues('image');
+    if (prevImages.length + previews.length > MAX_PICTURE_COUNT) {
+      toast({
+        title: `이미지는 최대 ${MAX_PICTURE_COUNT}개 등록 가능`,
+        status: 'warning',
+      });
+      return;
+    }
+
     try {
-      const prevImages = getValues('image');
       const lastCutNumber =
         prevImages.length > 0 ? prevImages[prevImages.length - 1].cut_number : -1;
 
