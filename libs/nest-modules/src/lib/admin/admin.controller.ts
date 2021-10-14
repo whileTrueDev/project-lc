@@ -81,8 +81,9 @@ export class AdminController {
   @UseGuards(AdminGuard)
   @Get('/live-shopping')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getLiveShoppings(@Query() liveShoppingId?: number): Promise<LiveShopping[]> {
-    console.log(liveShoppingId);
+  getLiveShoppings(
+    @Query('liveShoppingId') liveShoppingId?: string,
+  ): Promise<LiveShopping[]> {
     return this.adminService.getRegisteredLiveShoppings(liveShoppingId);
   }
 }

@@ -1,24 +1,35 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 import { Box, Button, Flex, Stack } from '@chakra-ui/react';
-import { AdminPageLayout } from '@project-lc/components';
+import { AdminPageLayout, LiveShoppingDetailTitle } from '@project-lc/components';
 import { useAdminLiveShoppingList, useProfile } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
 
 export function GoodsDetail(): JSX.Element {
   const router = useRouter();
-  const liveShoppingId = router.query.liveShoppingId as unknown as number;
+  const liveShoppingId = router.query.liveShoppingId as string;
   const { data: profileData } = useProfile();
-
-  const goods = useAdminLiveShoppingList({
+  const { data, isLoading } = useAdminLiveShoppingList({
     enabled: !!profileData?.email,
     id: liveShoppingId,
   });
-  console.log(goods);
+  console.log(data);
   // if (goods.isLoading) return <AdminPageLayout>...loading</AdminPageLayout>;
 
   // if (!goods.isLoading && !goods.data)
   //   return <AdminPageLayout>...no data</AdminPageLayout>;
+
+  /**
+  - **신청됨**: 신청 직후의 상태
+  - **조율중**: 신청을 확인, 라이브 진행 방송인 선정부터 일정 등을 조율하고 있는 상태
+  - **확정됨**: 라이브 진행할 방송인 선정완료, 일정 수립 완료된 상태
+  - **라이브진행중**: 현재 라이브 방송 진행중인 상태. (→ 입력된 방송 시간에 따라 자동으로 렌더링 변경)
+  - **라이브진행완료**: 라이브 방송 진행이 완료된 상태. (→ 입력된 방송 시간 자동으로 렌더링 변경)
+  - **판매완료**: 라이브 방송 이후 판매까지 완료된 상태 (→ 판매 시간에 따라 자동으로 렌더링 변경)
+  - [기획오류. 진행안함]**~~부분정산완료**: 이 라이브를 통해 진행한 주문 중 일부가 정산된 상태~~
+  - [기획오류. 진행안함]**~~정산완료**: 이 라이브를 통해 진행한 주문이 모두 정산된 상태~~
+  - **취소됨**: 라이브 진행이 취소됨 (사유 필요)
+ */
 
   return (
     <AdminPageLayout>
@@ -36,8 +47,7 @@ export function GoodsDetail(): JSX.Element {
           </Flex>
         </Box>
         {/* 상품 제목 */}
-        Hello
-        {liveShoppingId}
+        {data && !isLoading && <LiveShoppingDetailTitle liveShopping={data[0]} />}
       </Stack>
     </AdminPageLayout>
   );
