@@ -7,10 +7,14 @@ import React from 'react';
 
 export function GoodsDetail(): JSX.Element {
   const router = useRouter();
-  const liveShoppingId = router.query.liveshoppingId as string;
+  const liveShoppingId = router.query.liveShoppingId as unknown as number;
+  const { data: profileData } = useProfile();
 
-  // const goods = useAdminGoodsById(liveshoppingId);
-
+  const goods = useAdminLiveShoppingList({
+    enabled: !!profileData?.email,
+    id: liveShoppingId,
+  });
+  console.log(goods);
   // if (goods.isLoading) return <AdminPageLayout>...loading</AdminPageLayout>;
 
   // if (!goods.isLoading && !goods.data)

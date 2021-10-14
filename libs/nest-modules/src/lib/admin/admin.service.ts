@@ -200,9 +200,9 @@ export class AdminService {
     });
   }
 
-  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
+  public async getRegisteredLiveShoppings(id?: number): Promise<LiveShopping[]> {
     return this.prisma.liveShopping.findMany({
-      where: { progress: 'registered' },
+      where: { progress: 'registered', id },
       include: {
         goods: {
           select: {

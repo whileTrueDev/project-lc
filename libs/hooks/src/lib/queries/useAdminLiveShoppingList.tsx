@@ -16,18 +16,20 @@ interface LiveShoppingWithGoods extends LiveShopping {
   };
 }
 
-export const getAdminLiveShoppingList = async (): Promise<LiveShoppingWithGoods[]> => {
+export const getAdminLiveShoppingList = async (
+  liveShoppingId?: number | null,
+): Promise<LiveShoppingWithGoods[]> => {
   return axios
-    .get<LiveShoppingWithGoods[]>('/admin/live-shopping')
+    .get<LiveShoppingWithGoods[]>('/admin/live-shopping', { params: { liveShoppingId } })
     .then((res) => res.data);
 };
 
-export const useAdminLiveShoppingList = (
-  dto: any,
-): UseQueryResult<LiveShoppingWithGoods[], AxiosError> => {
+export const useAdminLiveShoppingList = (dto: {
+  enabled: boolean;
+  id?: number;
+}): UseQueryResult<LiveShoppingWithGoods[], AxiosError> => {
   const queryKey = ['AdminGoodsList', dto];
-  return useQuery<LiveShoppingWithGoods[], AxiosError>(
-    queryKey,
-    getAdminLiveShoppingList,
+  return useQuery<LiveShoppingWithGoods[], AxiosError>(queryKey, () =>
+    getAdminLiveShoppingList(dto.id || null),
   );
 };
