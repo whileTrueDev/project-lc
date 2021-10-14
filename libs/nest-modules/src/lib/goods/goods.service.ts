@@ -12,6 +12,7 @@ import {
   GoodsImageDto,
   GoodsListDto,
   GoodsListRes,
+  GoodsOptionDto,
   GoodsOptionsWithSupplies,
   GoodsOptionWithStockInfo,
   RegistGoodsDto,
@@ -425,6 +426,100 @@ export class GoodsService {
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException(e);
+    }
+  }
+
+  /** 상품 수정시 상품 옵션 데이터 구분하는 함수(삭제, 수정, 생성) 
+   * 
+   *  option id 가 존재하면 업데이트
+     option id가 undefined이면 create
+     기존 상품에 있었으나 새로 들어온 정보에 없다면 삭제
+  */
+  private async distinguishOptions(
+    goodsId: number,
+    updateDtoOptions: GoodsOptionDto[],
+  ): Promise<{
+    willBeCreatedOptions: GoodsOptionDto[];
+    willBeUpdatedOptions: GoodsOptionDto[];
+    willBeDeletedOptIds: number[];
+  }> {
+    const originGoodsOptions = await this.prisma.goodsOptions.findMany({
+      where: { goodsId },
+      select: { id: true },
+    });
+
+    // 기존상품 옵션 id 목록
+    const originGoodsOptionsId = originGoodsOptions.map((g) => g.id);
+
+    // dto 옵션중 디비에 없는 옵션(create할거)
+    const willBeCreatedOptions = updateDtoOptions.filter((o) => !o.id);
+
+    // dto 옵션 중 디비에 존재하는 옵션(update 할거)
+    const willBeUpdatedOptions = updateDtoOptions.filter((o) => !!o.id);
+    // 디비에 존재하는 옵션 id 목록
+    const comingOptionsId = willBeUpdatedOptions.map((g) => g.id);
+
+    // 삭제할 옵션 id
+    const willBeDeletedOptIds = originGoodsOptionsId.filter(
+      (optId) => !comingOptionsId.includes(optId),
+    );
+
+    return {
+      willBeCreatedOptions,
+      willBeUpdatedOptions,
+      willBeDeletedOptIds,
+    };
+  }
+
+  /** 상품 수정 */
+  async updateOneGoods(id: number, dto: RegistGoodsDto): Promise<{ goodsId: number }> {
+    const {
+      options: comingOptions,
+      image,
+      shippingGroupId,
+      goodsInfoId,
+      ...goodsData
+    } = dto;
+
+    const { willBeCreatedOptions, willBeUpdatedOptions, willBeDeletedOptIds } =
+      await this.distinguishOptions(id, comingOptions);
+
+    try {
+      await this.prisma.goods.update({
+        where: { id },
+        data: {
+          ...goodsData,
+          options: {
+            deleteMany: willBeDeletedOptIds.map((_id) => ({ id: _id })),
+            create: willBeCreatedOptions.map((opt) => {
+              const { supply, ...rest } = opt;
+              return {
+                ...rest,
+                supply: { create: supply },
+              };
+            }),
+            update: willBeUpdatedOptions.map((opt) => {
+              const { id: optionId, supply, ...rest } = opt;
+              return {
+                where: { id: optionId },
+                data: { ...rest, supply: { update: supply } },
+              };
+            }),
+          },
+          image: {
+            connect: image.map((img) => ({ id: img.id })),
+          },
+          ShippingGroup: shippingGroupId
+            ? { connect: { id: shippingGroupId } }
+            : undefined,
+          GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
+          confirmation: { update: { status: 'needReconfirmation' } }, // 상품 수정 후 '재검수 대기' 상태로 변경
+        },
+      });
+      return { goodsId: id };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(`error in update goods, goodsId : ${id}`);
     }
   }
 }
