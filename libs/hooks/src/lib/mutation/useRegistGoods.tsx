@@ -46,8 +46,9 @@ export const useEditGoods = (): UseMutationResult<
 
         queryClient.invalidateQueries('ShippingGroupList', { refetchInactive: true }); // 상품 등록 후  배송비정책에 연결된 상품개수 업데이트
 
-        console.log({ goodsId }, ['GoodsById', goodsId]);
-        queryClient.invalidateQueries(['GoodsById', goodsId], {
+        // 상품 상세, 상품 수정페이지에서 사용하는 useGoodsById 에 goodsId 가 string으로 전달됨
+        queryClient.invalidateQueries(['GoodsById', goodsId.toString()], {
+          exact: true,
           refetchInactive: true,
         });
       },
