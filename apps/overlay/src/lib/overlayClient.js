@@ -6,6 +6,7 @@ const pageUrl = window.location.href;
 const messageArray = [];
 const iterateLimit = $('#primary-info').data('number') + 1;
 const userId = $('#primary-info').data('userid');
+let streamerAndProduct;
 
 let startDate = new Date('2021-09-27T14:05:00+0900');
 let defaultDate = new Date('2021-09-04T15:00:00+0900');
@@ -41,6 +42,8 @@ function getOS() {
 
 function dailyMissionTimer() {
   setInterval(function timer() {
+    const roomName = pageUrl.split('/').pop();
+
     // 현재 날짜를 new 연산자를 사용해서 Date 객체를 생성
     const now = new Date();
 
@@ -57,8 +60,7 @@ function dailyMissionTimer() {
     const extraSecondsToStart = Math.floor((extraTimeToStart % (1000 * 60)) / 1000);
     if (extraHoursToStart === 0 && extraMinutesToStart === 0) {
       if (extraSecondsToStart === 11) {
-        const roomName = pageUrl.split('/').pop();
-        socket.emit('send notification signal', roomName);
+        socket.emit('send notification signal', { roomName, streamerAndProduct });
       } else if (extraSecondsToStart === 5) {
         // 5sec-timer.MP3
         $('body').append(`
@@ -112,6 +114,10 @@ function dailyMissionTimer() {
     }
 
     if (hours === '00') {
+      if (Number(minutes) === 5 && Number(seconds) === 0) {
+        // 5분 남았습니다 tts 삽입 위치
+        socket.emit('send end notification signal', roomName);
+      }
       if (Number(minutes) < 5 && !$('.bottom-timer').attr('class').includes('urgent')) {
         // 5분 이하 최초진입
         $('.bottom-timer').addClass('urgent');
@@ -457,11 +463,24 @@ socket.on('clear full video from server', () => {
   $('.inner-video-area').fadeOut(800);
 });
 
-socket.on('get start time from server', (timeData) => {
-  startDate = new Date(timeData);
+socket.on('get start time from server', (startSetting) => {
+  streamerAndProduct = startSetting.streamerAndProduct;
+  $('.alive-check').css('background-color', 'blue');
+  startDate = new Date(startSetting.date);
 });
 
 socket.once('get stream start notification tts', (audioBuffer) => {
+  if (audioBuffer) {
+    const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
+    const streamStartNotificationAudioBlob = window.URL.createObjectURL(blob);
+    const sound = new Audio(streamStartNotificationAudioBlob);
+    setTimeout(() => {
+      sound.play();
+    }, 1000);
+  }
+});
+
+socket.on('get stream end notification tts', (audioBuffer) => {
   if (audioBuffer) {
     const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
     const streamStartNotificationAudioBlob = window.URL.createObjectURL(blob);
