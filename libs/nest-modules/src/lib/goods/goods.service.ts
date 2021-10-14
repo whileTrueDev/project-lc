@@ -484,6 +484,11 @@ export class GoodsService {
     const { willBeCreatedOptions, willBeUpdatedOptions, willBeDeletedOptIds } =
       await this.distinguishOptions(id, comingOptions);
 
+    const { status: prevStatus } = await this.prisma.goodsConfirmation.findFirst({
+      where: { goodsId: id },
+      select: { status: true },
+    });
+
     try {
       await this.prisma.goods.update({
         where: { id },
@@ -513,7 +518,11 @@ export class GoodsService {
             ? { connect: { id: shippingGroupId } }
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
-          confirmation: { update: { status: 'needReconfirmation' } }, // 상품 수정 후 '재검수 대기' 상태로 변경
+          confirmation: {
+            update: {
+              status: prevStatus === 'waiting' ? 'waiting' : 'needReconfirmation',
+            },
+          }, // 상품 수정 후  (승인, 거절, 재검수 대기) 상태에서는 '재검수 대기' 상태로 변경, (대기) 상태에서는 그대로 '대기' 상태
         },
       });
       return { goodsId: id };
