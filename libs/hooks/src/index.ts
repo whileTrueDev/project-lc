@@ -53,3 +53,4 @@ export * from './lib/queries/useAdminGoodsById';
 export * from './lib/mutation/useGoodRejectionMutation';
 export * from './lib/mutation/useBusinessRegistrationRejectionMutation';
 export * from './lib/mutation/useBusinessRegistrationConfirmationMutation';
+export * from './lib/queries/useFmOrdersStats';
