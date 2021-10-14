@@ -56,3 +56,4 @@ export * from './lib/queries/useDefaultContacts';
 export * from './lib/mutation/useCreateLiveShopping';
 export * from './lib/mutation/useCreateSellerContacts';
 export * from './lib/queries/useAdminLiveShoppingList';
+export * from './lib/queries/useBroadcaster';

@@ -21,10 +21,14 @@ import {
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { AdminService, AdminSettlementInfoType } from './admin.service';
+import { BroadcasterService } from '../broadcaster/broadcaster.service';
 
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly broadcasterService: BroadcasterService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
@@ -85,5 +89,13 @@ export class AdminController {
     @Query('liveShoppingId') liveShoppingId?: string,
   ): Promise<LiveShopping[]> {
     return this.adminService.getRegisteredLiveShoppings(liveShoppingId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Get('/live-shopping/broadcaster')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  getAllBroadcasters(): Promise<any> {
+    return this.broadcasterService.getAllBroadcasterIdAndNickname();
   }
 }

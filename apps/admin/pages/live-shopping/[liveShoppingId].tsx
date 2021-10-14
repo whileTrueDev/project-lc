@@ -1,7 +1,12 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 import { Box, Button, Flex, Stack } from '@chakra-ui/react';
-import { AdminPageLayout, LiveShoppingDetailTitle } from '@project-lc/components';
-import { useAdminLiveShoppingList, useProfile } from '@project-lc/hooks';
+import {
+  AdminPageLayout,
+  LiveShoppingDetailTitle,
+  BroadcasterAutocomplete,
+  LiveShoppingProgressSelector,
+} from '@project-lc/components';
+import { useAdminLiveShoppingList, useProfile, useBroadcaster } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -13,7 +18,10 @@ export function GoodsDetail(): JSX.Element {
     enabled: !!profileData?.email,
     id: liveShoppingId,
   });
+
+  const { data: broadcaster } = useBroadcaster();
   console.log(data);
+  console.log(broadcaster);
   // if (goods.isLoading) return <AdminPageLayout>...loading</AdminPageLayout>;
 
   // if (!goods.isLoading && !goods.data)
@@ -48,6 +56,8 @@ export function GoodsDetail(): JSX.Element {
         </Box>
         {/* 상품 제목 */}
         {data && !isLoading && <LiveShoppingDetailTitle liveShopping={data[0]} />}
+        <LiveShoppingProgressSelector />
+        <BroadcasterAutocomplete data={broadcaster} />
       </Stack>
     </AdminPageLayout>
   );

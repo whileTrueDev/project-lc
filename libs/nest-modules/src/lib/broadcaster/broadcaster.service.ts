@@ -29,6 +29,9 @@ export class BroadcasterService {
       select: {
         userId: true,
         userNickname: true,
+        afreecaId: true,
+        twitchId: true,
+        youtubeId: true,
       },
     });
   }
