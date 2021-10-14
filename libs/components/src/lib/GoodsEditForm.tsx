@@ -123,6 +123,7 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
       min_purchase_ea,
       shippingGroupId,
       contents,
+      image,
       ...goodsFormData
     } = data;
 
@@ -130,6 +131,7 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
 
     let goodsDto: RegistGoodsDto = {
       ...goodsFormData,
+      image,
       options: addGoodsOptionInfo(options, option_title),
       option_use: options.length > 1 ? '1' : '0',
       max_purchase_ea: Number(max_purchase_ea) || 0,
@@ -137,6 +139,25 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
       shippingGroupId: Number(shippingGroupId) || undefined,
     };
 
+    if (!shippingGroupId) {
+      // 배송비정책 그룹을 선택하지 않은 경우
+      toast({
+        title: '배송비 정책을 선택해주세요',
+        status: 'warning',
+      });
+      return;
+    }
+
+    if (!image || image.length < 1) {
+      // 등록된 사진이 없는 경우
+      toast({
+        title: '상품 사진을 1개 이상 등록해주세요',
+        status: 'warning',
+      });
+      return;
+    }
+
+    // 상세설명을 입력한 경우
     if (contents && contents !== '<p><br></p>') {
       const contentsBody = await saveContentsImageToS3(contents, userMail);
       goodsDto = {
@@ -171,15 +192,6 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
       // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함)
       toast({
         title: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
-        status: 'warning',
-      });
-      return;
-    }
-
-    if (!shippingGroupId) {
-      // 배송비정책 그룹을 선택하지 않은 경우
-      toast({
-        title: '배송비 정책을 선택해주세요',
         status: 'warning',
       });
       return;
