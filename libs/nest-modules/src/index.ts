@@ -18,3 +18,4 @@ export * from './lib/broadcaster/broadcaster.module';
 export * from './lib/broadcaster/broadcaster.service';
 export * from './lib/s3/s3.module';
 export * from './lib/s3/s3.service';
+export * from './lib/live-shopping/live-shopping.module';

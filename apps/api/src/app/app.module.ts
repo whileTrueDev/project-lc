@@ -10,6 +10,7 @@ import {
   GoodsModule,
   AdminModule,
   ShippingGroupModule,
+  LiveShoppingModule,
 } from '@project-lc/nest-modules';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -29,6 +30,7 @@ import { validationSchema } from '../settings/config.validation';
     GoodsModule,
     AdminModule,
     ShippingGroupModule,
+    LiveShoppingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
