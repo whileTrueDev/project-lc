@@ -12,7 +12,7 @@ import {
   GoodsOptionWithStockInfo,
   RegistGoodsDto,
   TotalStockInfo,
-  ApprovedGoodsNameAndIds,
+  ApprovedGoodsNameAndId,
 } from '@project-lc/shared-types';
 import {
   S3Service,
@@ -379,7 +379,7 @@ export class GoodsService {
     }
   }
 
-  public async findMyGoodsNames(email: string): Promise<ApprovedGoodsNameAndIds[]> {
+  public async findMyGoodsNames(email: string): Promise<ApprovedGoodsNameAndId[]> {
     const goodsIds = await this.prisma.goods.findMany({
       where: {
         seller: { email },

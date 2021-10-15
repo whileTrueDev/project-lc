@@ -1,30 +1,30 @@
 import {
-  Image,
   Alert,
   AlertIcon,
   Box,
   Button,
   Flex,
+  Image,
+  Spinner,
   Stack,
   Text,
   useToast,
-  Spinner,
 } from '@chakra-ui/react';
 import {
   ApprovedGoodsListItem,
   useApprovedGoodsList,
-  useCreateLiveShopping,
-  useCreateSellerContacts,
+  useCreateLiveShoppingMutation,
+  useCreateSellerContactsMutation,
   useDefaultContacts,
   useGoodsById,
   useProfile,
 } from '@project-lc/hooks';
 import { LiveShoppingDTO, LiveShoppingInput } from '@project-lc/shared-types';
 import { liveShoppingRegist } from '@project-lc/stores';
-import { useRouter } from 'next/router';
-import { FormProvider, useForm } from 'react-hook-form';
-import { useMemo } from 'react';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/router';
+import { useMemo } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { Goods } from '.prisma/client';
 import { ChakraAutoComplete } from '..';
 import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerContacts';
@@ -33,8 +33,9 @@ import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
 export function LiveShoppingRegist(): JSX.Element {
   const { selectedGoods, handleGoodsSelect, setDefault } = liveShoppingRegist();
   const { data: profileData } = useProfile();
-  const { mutateAsync, isLoading } = useCreateLiveShopping();
-  const { mutateAsync: createSellerContacts } = useCreateSellerContacts();
+  const { mutateAsync, isLoading } = useCreateLiveShoppingMutation();
+  const { mutateAsync: createSellerContacts } = useCreateSellerContactsMutation();
+
   const toast = useToast();
   const router = useRouter();
 

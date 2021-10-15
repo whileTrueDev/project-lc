@@ -4,7 +4,7 @@ import { LiveShopping } from '@prisma/client';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
 
-export const useCreateLiveShopping = (): UseMutationResult<
+export const useCreateLiveShoppingMutation = (): UseMutationResult<
   LiveShopping,
   AxiosError,
   LiveShoppingDTO
@@ -12,7 +12,7 @@ export const useCreateLiveShopping = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation(
     async (dto: LiveShoppingDTO) => {
-      return axios.post<LiveShopping>('/live/create', dto).then((res) => res.data);
+      return axios.post<LiveShopping>('/live-shopping', dto).then((res) => res.data);
     },
     {
       onSuccess: () => {
