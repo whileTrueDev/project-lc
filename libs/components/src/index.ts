@@ -81,3 +81,4 @@ export * from './lib/ShopInfoShippingGroup';
 export * from './lib/LiveShoppingDetailTitle';
 export * from './lib/BroadcasterAutocomplete';
 export * from './lib/LiveShoppingProgressSelector';
+export * from './lib/LiveShoppingDatePicker';

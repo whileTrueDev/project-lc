@@ -5,6 +5,7 @@ import {
   LiveShoppingDetailTitle,
   BroadcasterAutocomplete,
   LiveShoppingProgressSelector,
+  LiveShoppingDatePicker,
 } from '@project-lc/components';
 import { useAdminLiveShoppingList, useProfile, useBroadcaster } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
@@ -58,6 +59,7 @@ export function GoodsDetail(): JSX.Element {
         {data && !isLoading && <LiveShoppingDetailTitle liveShopping={data[0]} />}
         <LiveShoppingProgressSelector />
         <BroadcasterAutocomplete data={broadcaster} />
+        <LiveShoppingDatePicker />
       </Stack>
     </AdminPageLayout>
   );
