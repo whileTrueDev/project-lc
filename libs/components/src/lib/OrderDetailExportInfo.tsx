@@ -39,6 +39,12 @@ export function OrderDetailExportInfo({
     }, 0);
   }, [_exports.itemOptions]);
 
+  const totalExportedEa = useMemo(() => {
+    return _exports.itemOptions.reduce((prev, curr) => {
+      return prev + Number(curr.ea);
+    }, 0);
+  }, [_exports.itemOptions]);
+
   // * 이 출고의 택배사 정보
   const deliveryCompany = useMemo(
     () => convertFmDeliveryCompanyToString(_exports.delivery_company_code),
@@ -55,7 +61,7 @@ export function OrderDetailExportInfo({
         </NextLink>
         <FmOrderStatusBadge orderStatus={_exports.export_status} />
         <TextDotConnector />
-        <Text isTruncated>{_exports.totalEa} 개</Text>
+        <Text isTruncated>{totalExportedEa} 개</Text>
         <TextDotConnector />
         <Text isTruncated>{totalExportedPrice.toLocaleString()} 원</Text>
       </Stack>
