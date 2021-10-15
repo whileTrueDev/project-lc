@@ -4,16 +4,14 @@ import { SellerContacts } from '@prisma/client';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
 
-export const useCreateSellerContacts = (): UseMutationResult<
+export const useCreateSellerContactsMutation = (): UseMutationResult<
   SellerContacts,
   AxiosError,
   SellerContactsDTOWithoutIdDTO
 > => {
   return useMutation<SellerContacts, AxiosError, SellerContactsDTOWithoutIdDTO>(
     async (dto: SellerContactsDTOWithoutIdDTO) => {
-      return axios
-        .post<SellerContacts>('/seller/contacts-create', dto)
-        .then((res) => res.data);
+      return axios.post<SellerContacts>('/seller/contacts', dto).then((res) => res.data);
     },
   );
 };

@@ -12,7 +12,7 @@ import {
   GoodsOptionWithStockInfo,
   RegistGoodsDto,
   TotalStockInfo,
-  ApprovedGoodsNameAndIds,
+  ApprovedGoodsNameAndId,
 } from '@project-lc/shared-types';
 import {
   S3Service,
@@ -32,11 +32,7 @@ export class GoodsService {
    * @param email seller.sub 로그인된 판매자 정보
    * @param ids? 특정 상품의 firstMallGoodsId만 조회하고 싶을 때
    */
-  public async findMyGoodsIds(
-    email: Seller['email'],
-    ids?: number[],
-    needName?: boolean,
-  ): Promise<any[]> {
+  public async findMyGoodsIds(email: Seller['email'], ids?: number[]): Promise<number[]> {
     const goodsIds = await this.prisma.goods.findMany({
       where: {
         seller: { email },
@@ -53,12 +49,9 @@ export class GoodsService {
             firstmallGoodsConnectionId: true,
           },
         },
-        goods_name: !!needName,
       },
     });
-    if (needName) {
-      return goodsIds;
-    }
+
     return goodsIds.map(
       (confirmation) => confirmation.confirmation.firstmallGoodsConnectionId,
     );
@@ -386,7 +379,7 @@ export class GoodsService {
     }
   }
 
-  public async findMyGoodsNames(email: string): Promise<ApprovedGoodsNameAndIds[]> {
+  public async findMyGoodsNames(email: string): Promise<ApprovedGoodsNameAndId[]> {
     const goodsIds = await this.prisma.goods.findMany({
       where: {
         seller: { email },

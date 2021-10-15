@@ -9,25 +9,34 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { GoodsConfirmation, LiveShopping } from '@prisma/client';
 import {
+  GoodsConfirmation,
+  LiveShopping,
+  BusinessRegistrationConfirmation,
+} from '@prisma/client';
+import {
+  AdminService,
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
   LiveShoppingDTO,
+  BusinessRegistrationConfirmationDto,
+  BusinessRegistrationRejectionDto,
+  AdminSettlementInfoType,
 } from '@project-lc/shared-types';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
-import { AdminService, AdminSettlementInfoType } from './admin.service';
 import { BroadcasterService } from '../broadcaster/broadcaster.service';
+import { AdminSettlementService } from './admin-settlement.service';
 
 @Controller('admin')
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
     private readonly broadcasterService: BroadcasterService,
+    private readonly adminSettlementService: AdminSettlementService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -97,5 +106,25 @@ export class AdminController {
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getAllBroadcasters(): Promise<any> {
     return this.broadcasterService.getAllBroadcasterIdAndNickname();
+  }
+
+  // 상품 검수 승인을 수행
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Put('/business-registration/confirm')
+  setBusinessRegistrationConfirmation(
+    @Body() dto: BusinessRegistrationConfirmationDto,
+  ): Promise<BusinessRegistrationConfirmation> {
+    return this.adminSettlementService.setBusinessRegistrationConfirmation(dto);
+  }
+
+  // 상품 검수 반려를 수행
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Put('/business-registration/reject')
+  setBusinessRegistrationRejection(
+    @Body() dto: BusinessRegistrationRejectionDto,
+  ): Promise<BusinessRegistrationConfirmation> {
+    return this.adminSettlementService.setBusinessRegistrationRejection(dto);
   }
 }

@@ -4,7 +4,7 @@
 
 let roomName;
 let userId;
-let creatorNickname;
+let streamerNickname;
 let isLogin = true;
 const socket = io(process.env.HOST, { transports: ['websocket'] });
 
@@ -28,11 +28,11 @@ $(document).ready(function ready() {
   $('#end-time-picker').val(localISOTime);
 
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
-    creatorNickname = $(this).closest('tr').prop('id');
+    streamerNickname = $(this).closest('tr').prop('id');
     const url = $(this).closest('tr').children('td.url-cell').attr('id');
     userId = $(this).closest('tr').children('td.userid-cell').attr('id');
 
-    $('#creator-name').text(creatorNickname);
+    $('#creator-name').text(streamerNickname);
 
     socket.emit('request creator list', {
       roomName: socket.id,
@@ -85,7 +85,13 @@ $(document).ready(function ready() {
 
   $('#start-time-send-button').click(function startTimeSendButtonClickEvent() {
     const selectedTime = $('#start-time-picker').val();
-    socket.emit('get start time from admin', { roomName, date: selectedTime });
+    const productName = $('#product-name').val().trim();
+    const streamerAndProduct = { streamerNickname, productName };
+    socket.emit('get start time from admin', {
+      roomName,
+      date: selectedTime,
+      streamerAndProduct,
+    });
   });
 
   $('#end-time-send-button').click(function endTimeSendButtonClickEvent() {
@@ -101,19 +107,22 @@ $(document).ready(function ready() {
     if ($('.message-box-lock-button').attr('class').includes('locked')) {
       $('#standard-price').attr('disabled', false);
       $('#product-name').attr('disabled', false);
+      $('#fan-nickname').attr('disabled', false);
       $('.message-box-lock-button').toggleClass('locked');
       $('.message-box-lock-button').text('잠금');
     } else {
       $('#standard-price').attr('disabled', true);
       $('#product-name').attr('disabled', true);
+      $('#fan-nickname').attr('disabled', true);
       $('.message-box-lock-button').toggleClass('locked');
       $('.message-box-lock-button').text('해제');
     }
   });
 
   $('input[name=client-checkbox]').change(function clientCheckboxOnChange() {
+    const fanNickname = $('#fan-nickname').val().trim();
     if ($('input[name=client-checkbox]').is(':checked')) {
-      $('#customer-nickname').val(`${creatorNickname}팬`);
+      $('#customer-nickname').val(fanNickname);
     } else {
       $('#customer-nickname').val('');
     }

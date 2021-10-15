@@ -1,11 +1,18 @@
 import { Box, Text, useDisclosure } from '@chakra-ui/react';
-import { MypageLayout, ShopNameDialog } from '@project-lc/components';
+import {
+  MypageLayout,
+  ShopNameDialog,
+  SellerStatusSection,
+  MypageOrderStats,
+} from '@project-lc/components';
 
 export function Index(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <MypageLayout>
+      <SellerStatusSection />
+      <MypageOrderStats />
       <Box h={200} bgColor="red.200" as="section">
         <Text>some components1</Text>
       </Box>

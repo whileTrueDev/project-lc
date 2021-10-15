@@ -26,7 +26,9 @@ const columns: GridColumns = [
   {
     field: 'settlementAccountImageName',
     headerName: '통장사본 이미지',
-    renderCell: (params) => AdminImageDownloadButton(params.row, 'settlement-account'),
+    renderCell: (params) => (
+      <AdminImageDownloadButton row={params.row} type="settlement-account" />
+    ),
   },
 ];
 

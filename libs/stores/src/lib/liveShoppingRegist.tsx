@@ -1,14 +1,15 @@
 import create from 'zustand';
+import { ApprovedGoodsListItem } from '@project-lc/shared-types';
 
 export interface LiveShoppingRegistForm {
-  selectedGoods: string;
+  selectedGoods: ApprovedGoodsListItem | null;
   setDefault: boolean;
-  handleGoodsSelect(value: string): void;
+  handleGoodsSelect(value: ApprovedGoodsListItem | null): void;
   handleSetDefault(value: boolean): void;
 }
 
-export const liveShoppingRegist = create<LiveShoppingRegistForm>((set, get) => ({
-  selectedGoods: '',
+export const liveShoppingRegist = create<LiveShoppingRegistForm>((set) => ({
+  selectedGoods: null,
   setDefault: true,
   handleGoodsSelect: (value) => {
     set((state) => ({
