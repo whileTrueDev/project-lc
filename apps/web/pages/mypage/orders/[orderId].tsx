@@ -125,7 +125,11 @@ export function OrderDetail(): JSX.Element {
           {order.data.items.map((item) => (
             <Box key={item.item_seq} mt={6}>
               <OrderDetailGoods orderItem={item} />
-              <OrderDetailOptionList order={order.data} options={item.options} />
+              <OrderDetailOptionList
+                order={order.data}
+                orderItem={item}
+                options={item.options}
+              />
             </Box>
           ))}
         </SectionWithTitle>
