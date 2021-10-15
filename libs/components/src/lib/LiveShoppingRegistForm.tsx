@@ -34,6 +34,7 @@ export function LiveShoppingRegist(): JSX.Element {
 
   const methods = useForm<LiveShoppingInput>({
     defaultValues: {
+      goods_id: null,
       useContact: '',
       contactId: 0,
       email: '',
@@ -48,7 +49,7 @@ export function LiveShoppingRegist(): JSX.Element {
       title: '상품을 성공적으로 등록하였습니다',
       status: 'success',
     });
-    handleGoodsSelect('');
+    handleGoodsSelect(null);
     router.push('/mypage/live/vod');
   };
 
@@ -74,7 +75,13 @@ export function LiveShoppingRegist(): JSX.Element {
       dto.contactId = contacts.data.id;
     }
     dto.requests = data.requests;
-    dto.goods_id = watch('goods_id');
+
+    const goodsId = watch('goods_id');
+    if (!goodsId) {
+      toast({ title: '상품을 올바르게 선택해주세요.', status: 'error' });
+      return;
+    }
+    dto.goods_id = goodsId;
     if (useContact === 'old') {
       mutateAsync(dto).then(onSuccess).catch(onFail);
     } else {
@@ -116,7 +123,10 @@ export function LiveShoppingRegist(): JSX.Element {
                 onChange={(newV) => {
                   if (newV) {
                     setValue('goods_id', newV.id);
-                    handleGoodsSelect(newV.goods_name);
+                    handleGoodsSelect(newV);
+                  } else {
+                    setValue('goods_id', null);
+                    handleGoodsSelect(null);
                   }
                 }}
               />
