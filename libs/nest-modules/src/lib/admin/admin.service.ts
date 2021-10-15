@@ -7,12 +7,7 @@ import {
   BusinessRegistrationStatus,
   AdminSettlementInfoType,
 } from '@project-lc/shared-types';
-import {
-  SellerSettlementAccount,
-  SellerBusinessRegistration,
-  GoodsConfirmation,
-  LiveShopping,
-} from '@prisma/client';
+import { GoodsConfirmation, LiveShopping } from '@prisma/client';
 
 @Injectable()
 export class AdminService {
