@@ -1,43 +1,34 @@
-import { useEffect } from 'react';
 import {
+  Checkbox,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading,
+  Input,
+  InputGroup,
   Radio,
   RadioGroup,
-  Heading,
   Stack,
-  FormControl,
-  FormLabel,
-  Input,
-  FormErrorMessage,
-  InputGroup,
-  Checkbox,
 } from '@chakra-ui/react';
-import {
-  FieldError,
-  DeepMap,
-  UseFormRegister,
-  UseFormSetValue,
-  UseFormWatch,
-} from 'react-hook-form';
-import {
-  SellerContactsDTO,
-  emailRegisterOptions,
-  LiveShoppingInput,
-} from '@project-lc/shared-types';
+import { useDefaultContacts, useProfile } from '@project-lc/hooks';
+import { emailRegisterOptions, LiveShoppingInput } from '@project-lc/shared-types';
+import { liveShoppingRegist } from '@project-lc/stores';
+import { useEffect } from 'react';
+import { useFormContext } from 'react-hook-form';
 
-interface LiveShoppingManagerPhoneNumberProps {
-  data: SellerContactsDTO | undefined;
-  handleSetDefault(value: boolean): void;
-  setDefault: boolean;
-  register: UseFormRegister<LiveShoppingInput>;
-  setValue: UseFormSetValue<LiveShoppingInput>;
-  errors: DeepMap<LiveShoppingInput, FieldError>;
-  watch: UseFormWatch<LiveShoppingInput>;
-}
+export function LiveShoppingManagerPhoneNumber(): JSX.Element {
+  const { setDefault, handleSetDefault } = liveShoppingRegist();
+  const { data: profileData } = useProfile();
+  const { data } = useDefaultContacts({
+    email: profileData?.email || '',
+  });
 
-export function LiveShoppingManagerPhoneNumber(
-  props: LiveShoppingManagerPhoneNumberProps,
-): JSX.Element {
-  const { data, setDefault, handleSetDefault, register, setValue, errors, watch } = props;
+  const {
+    register,
+    setValue,
+    formState: { errors },
+    watch,
+  } = useFormContext<LiveShoppingInput>();
 
   type Keys = 'first' | 'second' | 'third';
   type SlicedPhoneNumber = { [k in Keys]: string };
@@ -64,6 +55,7 @@ export function LiveShoppingManagerPhoneNumber(
       setValue('email', email);
     }
   }, [data, setValue, firstNumber, secondNumber, thirdNumber, email, handleSetDefault]);
+
   return (
     <Stack spacing={2}>
       <Heading as="h6" size="xs">
@@ -116,12 +108,7 @@ export function LiveShoppingManagerPhoneNumber(
           </RadioGroup>
         )}
 
-        <Stack
-          outline="solid 0.5px lightgray"
-          width="600px"
-          padding="7px"
-          borderRadius="3pt"
-        >
+        <Stack borderWidth="0.025rem" maxW="600px" p={2} borderRadius="lg">
           <FormControl isRequired isInvalid={!!errors.email}>
             <FormLabel htmlFor="email">이메일</FormLabel>
             {!data || watch('useContact') === 'new' ? (
@@ -129,7 +116,7 @@ export function LiveShoppingManagerPhoneNumber(
                 id="email"
                 placeholder="minsu@example.com"
                 autoComplete="off"
-                width={300}
+                maxWidth={300}
                 value={watch('email', '')}
                 {...register('email', { ...emailRegisterOptions })}
               />
@@ -139,7 +126,7 @@ export function LiveShoppingManagerPhoneNumber(
                 variant="filled"
                 placeholder="minsu@example.com"
                 autoComplete="off"
-                width={300}
+                maxWidth={300}
                 value={data.email}
                 isDisabled
                 {...register('email', { ...emailRegisterOptions })}
@@ -156,7 +143,7 @@ export function LiveShoppingManagerPhoneNumber(
             <FormLabel htmlFor="phone">전화번호</FormLabel>
             <Stack direction="row" alignItems="center">
               {!data || watch('useContact') === 'new' ? (
-                <InputGroup width={300} alignItems="center">
+                <InputGroup maxWidth={300} alignItems="center">
                   <Input
                     type="text"
                     maxLength={3}
@@ -197,7 +184,7 @@ export function LiveShoppingManagerPhoneNumber(
                   />
                 </InputGroup>
               ) : (
-                <InputGroup width={300} alignItems="center">
+                <InputGroup maxWidth={300} alignItems="center">
                   <Input
                     type="text"
                     variant="filled"

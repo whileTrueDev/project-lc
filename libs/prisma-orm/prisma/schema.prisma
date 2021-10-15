@@ -409,7 +409,7 @@ enum ShippingOptType {
   amount_rep // 금액(구간반복)
   cnt // 수량(구간입력)
   cnt_rep // 수량(구간반복)
-  weight // 무게(구간입력)
+  weight // -> 무게(구간입력)
   weight_rep // 무게(구간반복)
 }
 
