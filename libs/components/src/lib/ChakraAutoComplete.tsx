@@ -16,9 +16,7 @@ import {
   theme,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { liveShoppingRegist } from '@project-lc/stores';
 import { useAutocomplete } from '@material-ui/lab';
-import { useFormContext } from 'react-hook-form';
 
 export interface ChakraAutoCompleteProps<T> {
   label?: string;
@@ -61,9 +59,6 @@ export function ChakraAutoComplete<T = any>({
     clearOnEscape: true,
   });
 
-  const { setValue } = useFormContext();
-  const { handleGoodsSelect } = liveShoppingRegist();
-
   const backgroundColor = useColorModeValue('white', 'gray.700');
   const hoverListItemColor = useColorModeValue('gray.100', 'gray.600');
   return (
@@ -85,7 +80,7 @@ export function ChakraAutoComplete<T = any>({
           )}
           <Input
             {...getInputProps()}
-            value={inputValue || (valueProp as string)}
+            value={inputValue}
             isDisabled={isDisabled || isLoading}
           />
           <InputRightElement mr={2}>
@@ -93,10 +88,6 @@ export function ChakraAutoComplete<T = any>({
               <CloseButton
                 {...getClearProps()}
                 isDisabled={isDisabled || isLoading}
-                onClick={() => {
-                  setValue('goods_id', '');
-                  handleGoodsSelect('');
-                }}
                 size="sm"
               />
             )}
