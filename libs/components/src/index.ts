@@ -76,4 +76,6 @@ export * from './lib/TextDotConnector';
 export * from './lib/TextViewerWithDetailModal';
 export * from './lib/admin/AdminGoodsStatusButtons';
 export * from './lib/LiveShoppingRegistForm';
+export * from './lib/SellerStatusSection';
 export * from './lib/ShopInfoShippingGroup';
+export * from './lib/MypageOrderStats';

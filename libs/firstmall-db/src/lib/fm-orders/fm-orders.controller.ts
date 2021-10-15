@@ -47,6 +47,14 @@ export class FmOrdersController {
     return this.fmOrdersService.findOrders(ids, dto);
   }
 
+  @Get('/stats')
+  async getOrdersStats(@SellerInfo() seller: UserPayload): Promise<FindFmOrderRes[]> {
+    // 판매자의 승인된 상품 ID 목록 조회
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    if (ids.length === 0) return [];
+    return this.fmOrdersService.getOrdersStats(ids);
+  }
+
   /** 개별 주문 조회 */
   @Get(':orderId')
   async findOneOrder(

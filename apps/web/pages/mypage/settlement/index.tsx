@@ -6,7 +6,7 @@ import {
   SettlementListBox,
 } from '@project-lc/components';
 import { useSettlementInfo } from '@project-lc/hooks';
-
+import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import { Heading, VStack, Divider, Container, Grid, GridItem } from '@chakra-ui/react';
 import { useMemo } from 'react';
 
@@ -14,12 +14,19 @@ import { useMemo } from 'react';
 export function Index(): JSX.Element {
   const { data: settlementData, refetch } = useSettlementInfo();
 
-  const hasAccount = useMemo(() => {
+  const hasAccount = useMemo<boolean>(() => {
     return settlementData?.sellerSettlementAccount.length > 0;
   }, [settlementData?.sellerSettlementAccount]);
 
-  const hasRegistration = useMemo(() => {
-    return settlementData?.sellerBusinessRegistration.length > 0;
+  const hasRegistration = useMemo<boolean>(() => {
+    if (settlementData?.sellerBusinessRegistration.length > 0) {
+      const { status } =
+        settlementData?.sellerBusinessRegistration[0].BusinessRegistrationConfirmation;
+      if (status === BusinessRegistrationStatus.CONFIRMED) {
+        return true;
+      }
+    }
+    return false;
   }, [settlementData?.sellerBusinessRegistration]);
 
   return (
@@ -33,6 +40,7 @@ export function Index(): JSX.Element {
               <SettlementStateBox
                 hasAccount={hasAccount}
                 hasRegistration={hasRegistration}
+                sellerBusinessRegistration={settlementData?.sellerBusinessRegistration[0]}
               />
             </GridItem>
             <GridItem colSpan={[6, 3, 3, 3]} rowSpan={2} alignItems="stretch">
