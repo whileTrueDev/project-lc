@@ -1,6 +1,6 @@
 import { Alert, AlertIcon, Button, Flex, Stack, Text, useToast } from '@chakra-ui/react';
 import {
-  ApprovedGoodsList,
+  ApprovedGoodsListItem,
   useApprovedGoodsList,
   useCreateLiveShopping,
   useCreateSellerContacts,
@@ -106,7 +106,7 @@ export function LiveShoppingRegist(): JSX.Element {
                   </Text>
                 </Alert>
               )}
-              <ChakraAutoComplete<ApprovedGoodsList>
+              <ChakraAutoComplete<ApprovedGoodsListItem>
                 label="라이브 쇼핑을 진행할 상품"
                 options={goodsList.data}
                 isLoading={goodsList.isLoading}
