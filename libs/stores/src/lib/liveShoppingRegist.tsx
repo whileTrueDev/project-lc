@@ -1,5 +1,5 @@
 import create from 'zustand';
-import { ApprovedGoodsListItem } from '@project-lc/hooks';
+import { ApprovedGoodsListItem } from '@project-lc/shared-types';
 
 export interface LiveShoppingRegistForm {
   selectedGoods: ApprovedGoodsListItem | null;

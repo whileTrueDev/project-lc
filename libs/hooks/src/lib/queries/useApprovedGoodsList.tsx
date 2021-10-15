@@ -1,12 +1,7 @@
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
+import { ApprovedGoodsListItem } from '@project-lc/shared-types';
 import axios from '../../axios';
-
-export type ApprovedGoodsListItem = {
-  goods_name: string;
-  id: number;
-  firstmallGoodsConnectionId: number;
-};
 
 export const getApprovedGoodsList = async (
   email: string,
