@@ -121,8 +121,10 @@ const columns: GridColumns = [
   {
     field: 'businessRegistrationStatus',
     headerName: '사업자등록정보검수상태',
-    width: 100,
-    renderCell: (params) => ConfirmationBadge(params.row.businessRegistrationStatus),
+    minWidth: 200,
+    renderCell: (params) => (
+      <ConfirmationBadge status={params.row.businessRegistrationStatus} />
+    ),
   },
 ];
 // * 상품목록 datagrid 컬럼 끝*********************************************

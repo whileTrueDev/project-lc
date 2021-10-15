@@ -1,4 +1,4 @@
-import { GridColumns, GridCellParams, GridRowData } from '@material-ui/data-grid';
+import { GridColumns, GridCellParams } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { useColorModeValue, useDisclosure, Button, Badge } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
@@ -15,8 +15,10 @@ const columns: GridColumns = [
   {
     field: 'businessRegistrationStatus',
     headerName: '검수상태',
-    renderCell: (params) =>
-      ConfirmationBadge(params.row.BusinessRegistrationConfirmation.status),
+    renderCell: (params) => (
+      <ConfirmationBadge status={params.row.BusinessRegistrationConfirmation.status} />
+    ),
+    minWidth: 120,
   },
   {
     field: 'companyName',
@@ -30,6 +32,7 @@ const columns: GridColumns = [
   {
     field: 'businessRegistrationNumber',
     headerName: '사업자 등록 번호',
+    minWidth: 230,
   },
   {
     field: 'representativeName',
@@ -55,17 +58,24 @@ const columns: GridColumns = [
   },
   {
     field: 'businessRegistrationImageName',
-    headerName: '사업자등록증 이미지',
-    renderCell: (params) => AdminImageDownloadButton(params.row, 'business-registration'),
+    headerName: '사업자등록증',
+    renderCell: (params) => (
+      <AdminImageDownloadButton row={params.row} type="business-registration" />
+    ),
+    minWidth: 150,
   },
   {
     field: 'mailOrderSalesNumber',
     headerName: '통신판매업등록번호',
+    minWidth: 230,
   },
   {
     field: 'mailOrderSalesImageName',
-    headerName: '통신판매업등록증 이미지',
-    renderCell: (params) => AdminImageDownloadButton(params.row, 'mail-order'),
+    headerName: '통신판매업등록증',
+    renderCell: (params) => (
+      <AdminImageDownloadButton row={params.row} type="mail-order" />
+    ),
+    minWidth: 160,
   },
   {
     field: 'confirmation',
@@ -95,7 +105,7 @@ function makeListRow(
 }
 
 // 사업자 등록 검수 상태 badge
-export function ConfirmationBadge(status: string): JSX.Element {
+export function ConfirmationBadge({ status }: { status: string }): JSX.Element {
   let result = null;
   switch (status) {
     case BusinessRegistrationStatus.CONFIRMED: {
