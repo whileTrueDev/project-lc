@@ -7,44 +7,6 @@ import {
   FmOrderReturn,
 } from '@project-lc/shared-types';
 
-export const orderMetaInfoSample: FmOrderMetaInfo = {
-  totalShippingCost: '0.00',
-  totalDeliveryCost: '0.00',
-  id: '2021082612090917531',
-  regist_date: '2021-08-26T03:09:09.000Z',
-  sitetype: 'P',
-  depositor: '테스트',
-  deposit_date: '2021-08-26T03:10:25.000Z',
-  settleprice: '1100.00',
-  step: '75',
-  order_user_name: 'username',
-  order_phone: '--',
-  order_cellphone: '010-0000-0000',
-  order_email: 'asdf@asdf.com',
-  recipient_user_name: 'username',
-  recipient_phone: '--',
-  recipient_cellphone: '010-0000-0000',
-  recipient_email: 'asdf@asdf.com',
-  recipient_zipcode: '12345',
-  recipient_address: 'somewhere over the rainboe',
-  recipient_address_street: 'somewhere over the rainboe',
-  recipient_address_detail: 'somewhere over the rainboe',
-  memo: '1. 배송메모 : 1234,',
-  memoOriginal: '1. 배송메모 : 1234,',
-  order_seq: 'asdf',
-  shippings: [
-    {
-      shipping_seq: 1,
-      deliveryCost: '2500',
-      shippingCost: '2500',
-      shipping_group: 'asdf',
-      shipping_method: 'delivery',
-      shipping_set_name: '택배',
-      shipping_type: 'free',
-    },
-  ],
-};
-
 export const orderDetailOptionsSample: FmOrderOption[] = [
   {
     item_option_seq: 4,
@@ -93,8 +55,53 @@ export const orderDetailItemsSample: Array<FmOrderItem & { options: FmOrderOptio
     image: '/data/goods/1/2021/07/_temp_16266708888484thumbCart.png',
     item_seq: 4,
     options: orderDetailOptionsSample,
+    shipping_seq: 1,
+    shipping_set_name: 'asdf',
+    shipping_type: 'free',
+    shipping_method: 'delivery',
+    shipping_group: '43_123_delivery',
   },
 ];
+
+export const orderMetaInfoSample: FmOrderMetaInfo = {
+  totalShippingCost: '0.00',
+  totalDeliveryCost: '0.00',
+  id: '2021082612090917531',
+  regist_date: '2021-08-26T03:09:09.000Z',
+  sitetype: 'P',
+  depositor: '테스트',
+  deposit_date: '2021-08-26T03:10:25.000Z',
+  settleprice: '1100.00',
+  step: '75',
+  order_user_name: 'username',
+  order_phone: '--',
+  order_cellphone: '010-0000-0000',
+  order_email: 'asdf@asdf.com',
+  recipient_user_name: 'username',
+  recipient_phone: '--',
+  recipient_cellphone: '010-0000-0000',
+  recipient_email: 'asdf@asdf.com',
+  recipient_zipcode: '12345',
+  recipient_address: 'somewhere over the rainboe',
+  recipient_address_street: 'somewhere over the rainboe',
+  recipient_address_detail: 'somewhere over the rainboe',
+  memo: '1. 배송메모 : 1234,',
+  memoOriginal: '1. 배송메모 : 1234,',
+  order_seq: 'asdf',
+  shipping_seq: '1,2',
+  shippings: [
+    {
+      shipping_seq: 1,
+      deliveryCost: '2500',
+      shippingCost: '2500',
+      shipping_group: 'asdf',
+      shipping_method: 'delivery',
+      shipping_set_name: '택배',
+      shipping_type: 'free',
+      items: orderDetailItemsSample,
+    },
+  ],
+};
 
 export const orderDetailExportsSample: FmOrderExport[] = [
   {

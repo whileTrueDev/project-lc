@@ -77,7 +77,7 @@ describe('FmOrdersService', () => {
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
 
     // where 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('OR order_seq LIKE ?');
+    expect(sql).toContain('OR fm_order.order_seq LIKE ?');
     expect(sql).toContain('OR REPLACE(fm_order.order_phone, "-", "") LIKE ?');
     expect(sql).toContain('OR REPLACE(fm_order.order_cellphone, "-", "") LIKE ?');
     expect(sql).toContain('OR REPLACE(fm_order.recipient_phone, "-", "") LIKE ?');
@@ -200,19 +200,6 @@ describe('FmOrdersService', () => {
   describe('[PRIVATE Method] findOneOrderInfo', () => {
     const orderId = 'TESTORDERID';
     const goodsIds = [1, 2];
-
-    it('should be successed', async () => {
-      const querySpy = jest.spyOn(db, 'query').mockImplementation(async (q) => {
-        const { shippings, ...rest } = orderMetaInfoSample;
-        if (q.includes('FROM fm_order_shipping WHERE order_seq IN (')) {
-          return shippings;
-        }
-        return [rest];
-      });
-      const orderDetail = await service['findOneOrderInfo'](orderId, goodsIds);
-
-      expect(orderDetail).toEqual({ ...orderMetaInfoSample });
-    });
 
     it('should be return null', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
