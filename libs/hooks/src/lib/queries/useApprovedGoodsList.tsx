@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
-export type ApprovedGoodsList = {
+export type ApprovedGoodsListItem = {
   goods_name: string;
   id: number;
   firstmallGoodsConnectionId: number;
@@ -10,9 +10,9 @@ export type ApprovedGoodsList = {
 
 export const getApprovedGoodsList = async (
   email: string,
-): Promise<ApprovedGoodsList[]> => {
+): Promise<ApprovedGoodsListItem[]> => {
   return axios
-    .get<ApprovedGoodsList[]>('/live', {
+    .get<ApprovedGoodsListItem[]>('/live', {
       params: { email },
     })
     .then((res) => res.data);
@@ -22,8 +22,8 @@ export const useApprovedGoodsList = ({
   email,
 }: {
   email: string;
-}): UseQueryResult<ApprovedGoodsList[], AxiosError> => {
-  return useQuery<ApprovedGoodsList[], AxiosError>(['ApprovedGoodsList', email], () =>
+}): UseQueryResult<ApprovedGoodsListItem[], AxiosError> => {
+  return useQuery<ApprovedGoodsListItem[], AxiosError>(['ApprovedGoodsList', email], () =>
     getApprovedGoodsList(email),
   );
 };

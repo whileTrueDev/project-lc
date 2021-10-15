@@ -23,7 +23,7 @@ import { useFormContext } from 'react-hook-form';
 export interface ChakraAutoCompleteProps<T> {
   label?: string;
   options?: T[];
-  value: T | string;
+  value?: T | string | null;
   isLoading?: boolean;
   isDisabled?: boolean;
   getOptionLabel: (opt: T) => string;
@@ -56,7 +56,7 @@ export function ChakraAutoComplete<T = any>({
     getOptionLabel,
     value: valueProp,
     onChange: (_, newValue) => {
-      if (newValue) onChange(newValue);
+      onChange(newValue);
     },
     clearOnEscape: true,
   });
@@ -78,7 +78,11 @@ export function ChakraAutoComplete<T = any>({
         ) : null}
 
         <InputGroup>
-          <InputLeftElement>{isLoading && <Spinner />}</InputLeftElement>
+          {isLoading && (
+            <InputLeftElement>
+              <Spinner />
+            </InputLeftElement>
+          )}
           <Input
             {...getInputProps()}
             value={inputValue || (valueProp as string)}

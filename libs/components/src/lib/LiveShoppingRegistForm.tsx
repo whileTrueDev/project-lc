@@ -1,16 +1,31 @@
-import { Alert, AlertIcon, Button, Flex, Stack, Text, useToast } from '@chakra-ui/react';
 import {
-  ApprovedGoodsList,
+  Image,
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Flex,
+  Stack,
+  Text,
+  useToast,
+  Spinner,
+} from '@chakra-ui/react';
+import {
+  ApprovedGoodsListItem,
   useApprovedGoodsList,
   useCreateLiveShopping,
   useCreateSellerContacts,
   useDefaultContacts,
+  useGoodsById,
   useProfile,
 } from '@project-lc/hooks';
 import { LiveShoppingDTO, LiveShoppingInput } from '@project-lc/shared-types';
 import { liveShoppingRegist } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useMemo } from 'react';
+import dayjs from 'dayjs';
+import { Goods } from '.prisma/client';
 import { ChakraAutoComplete } from '..';
 import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerContacts';
 import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
@@ -33,6 +48,7 @@ export function LiveShoppingRegist(): JSX.Element {
 
   const methods = useForm<LiveShoppingInput>({
     defaultValues: {
+      goods_id: null,
       useContact: '',
       contactId: 0,
       email: '',
@@ -47,7 +63,7 @@ export function LiveShoppingRegist(): JSX.Element {
       title: '상품을 성공적으로 등록하였습니다',
       status: 'success',
     });
-    handleGoodsSelect('');
+    handleGoodsSelect(null);
     router.push('/mypage/live/vod');
   };
 
@@ -73,7 +89,13 @@ export function LiveShoppingRegist(): JSX.Element {
       dto.contactId = contacts.data.id;
     }
     dto.requests = data.requests;
-    dto.goods_id = watch('goods_id');
+
+    const goodsId = watch('goods_id');
+    if (!goodsId) {
+      toast({ title: '상품을 올바르게 선택해주세요.', status: 'error' });
+      return;
+    }
+    dto.goods_id = goodsId;
     if (useContact === 'old') {
       mutateAsync(dto).then(onSuccess).catch(onFail);
     } else {
@@ -105,7 +127,7 @@ export function LiveShoppingRegist(): JSX.Element {
                   </Text>
                 </Alert>
               )}
-              <ChakraAutoComplete<ApprovedGoodsList>
+              <ChakraAutoComplete<ApprovedGoodsListItem>
                 label="라이브 쇼핑을 진행할 상품"
                 options={goodsList.data}
                 isLoading={goodsList.isLoading}
@@ -115,10 +137,19 @@ export function LiveShoppingRegist(): JSX.Element {
                 onChange={(newV) => {
                   if (newV) {
                     setValue('goods_id', newV.id);
-                    handleGoodsSelect(newV.goods_name);
+                    handleGoodsSelect(newV);
+                  } else {
+                    setValue('goods_id', null);
+                    handleGoodsSelect(null);
                   }
                 }}
               />
+
+              {selectedGoods && (
+                <Box mt={2}>
+                  <GoodsSummary goodsId={selectedGoods.id} />
+                </Box>
+              )}
             </Stack>
             {/* 담당자 연락처 */}
             <LiveShoppingManagerPhoneNumber />
@@ -143,3 +174,36 @@ export function LiveShoppingRegist(): JSX.Element {
 }
 
 export default LiveShoppingRegist;
+
+interface GoodsSummaryProps {
+  goodsId: Goods['id'];
+}
+function GoodsSummary({ goodsId }: GoodsSummaryProps): JSX.Element | null {
+  const goods = useGoodsById(goodsId);
+
+  const goodsFirstImage = useMemo(
+    () => goods.data?.image.find((i) => i.cut_number === 1),
+    [goods.data?.image],
+  );
+
+  if (goods.isLoading) return <Spinner />;
+  if (!goods.data) return null;
+  if (goods.isError) return null;
+
+  return (
+    <Flex maxW="300px" alignItems="center">
+      <Box>
+        {goodsFirstImage && <Image width={50} height={50} src={goodsFirstImage.image} />}
+      </Box>
+      <Box ml={2}>
+        <Text fontWeight="bold" isTruncated>
+          {goods.data.goods_name}
+        </Text>
+        <Text isTruncated>{goods.data.summary}</Text>
+        <Text isTruncated>
+          {dayjs(goods.data.regist_date).format('YYYY년 MM월 DD일 HH:mm:ss')}
+        </Text>
+      </Box>
+    </Flex>
+  );
+}

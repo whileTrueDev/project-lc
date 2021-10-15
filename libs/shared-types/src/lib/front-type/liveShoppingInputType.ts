@@ -2,7 +2,7 @@ export interface LiveShoppingInput {
   contactId: number;
   email: string;
   firstNumber: string;
-  goods_id: number;
+  goods_id: number | null;
   phoneNumber: string;
   requests: string;
   secondNumber: string;
