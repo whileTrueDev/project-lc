@@ -127,7 +127,6 @@ export function LiveShoppingManagerPhoneNumber(
             {!data || watch('useContact') === 'new' ? (
               <Input
                 id="email"
-                type="email"
                 placeholder="minsu@example.com"
                 autoComplete="off"
                 width={300}
@@ -137,7 +136,6 @@ export function LiveShoppingManagerPhoneNumber(
             ) : (
               <Input
                 id="email"
-                type="email"
                 variant="filled"
                 placeholder="minsu@example.com"
                 autoComplete="off"
@@ -164,7 +162,7 @@ export function LiveShoppingManagerPhoneNumber(
                     maxLength={3}
                     value={watch('firstNumber', '')}
                     {...register('firstNumber', {
-                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      required: '숫자만 입력하세요.',
                       pattern: {
                         value: /^[0-9]+$/,
                         message: '전화번호는 숫자만 가능합니다.',
@@ -177,7 +175,7 @@ export function LiveShoppingManagerPhoneNumber(
                     maxLength={4}
                     value={watch('secondNumber', '')}
                     {...register('secondNumber', {
-                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      required: '숫자만 입력하세요.',
                       pattern: {
                         value: /^[0-9]+$/,
                         message: '전화번호는 숫자만 가능합니다.',
@@ -190,7 +188,7 @@ export function LiveShoppingManagerPhoneNumber(
                     maxLength={4}
                     value={watch('thirdNumber', '')}
                     {...register('thirdNumber', {
-                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      required: '숫자만 입력하세요.',
                       pattern: {
                         value: /^[0-9]+$/,
                         message: '전화번호는 숫자만 가능합니다.',
@@ -207,7 +205,7 @@ export function LiveShoppingManagerPhoneNumber(
                     value={firstNumber}
                     isDisabled
                     {...register('firstNumber', {
-                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      required: '숫자만 입력하세요.',
                       pattern: {
                         value: /^[0-9]+$/,
                         message: '전화번호는 숫자만 가능합니다.',
@@ -222,7 +220,7 @@ export function LiveShoppingManagerPhoneNumber(
                     value={secondNumber}
                     isDisabled
                     {...register('secondNumber', {
-                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      required: '숫자만 입력하세요.',
                       pattern: {
                         value: /^[0-9]+$/,
                         message: '전화번호는 숫자만 가능합니다.',
@@ -237,7 +235,7 @@ export function LiveShoppingManagerPhoneNumber(
                     value={thirdNumber}
                     isDisabled
                     {...register('thirdNumber', {
-                      required: "'-'을 제외하고 숫자만 입력하세요.",
+                      required: '숫자만 입력하세요.',
                       pattern: {
                         value: /^[0-9]+$/,
                         message: '전화번호는 숫자만 가능합니다.',
