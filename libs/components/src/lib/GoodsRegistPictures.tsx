@@ -14,6 +14,7 @@ import {
   ModalOverlay,
   ModalFooter,
   Divider,
+  Box,
 } from '@chakra-ui/react';
 import {
   useGoodsImageMutation,
@@ -180,10 +181,9 @@ export function GoodsRegistPictures(): JSX.Element {
       const prevImages = getValues('image');
       const newImages = prevImages ? prevImages.filter((img) => img.id !== imageId) : [];
 
-      const result = await deleteImage.mutateAsync(imageId);
+      await deleteImage.mutateAsync(imageId);
       setValue('image', newImages);
 
-      console.log(result);
       toast({ title: '이미지가 삭제되었습니다', status: 'success' });
     } catch (error) {
       console.error(error);
@@ -194,9 +194,10 @@ export function GoodsRegistPictures(): JSX.Element {
   return (
     <SectionWithTitle title="상품사진 *">
       <Stack spacing={4}>
-        <Button width="200px" onClick={onOpen}>
-          사진 등록하기
-        </Button>
+        <Box>
+          <Button onClick={onOpen}>사진 등록하기</Button>
+        </Box>
+
         <Text>
           등록된 이미지 (등록된 이미지 삭제시 &apos;수정&apos; 버튼을 누르지 않아도 바로
           상품에 반영됩니다)
