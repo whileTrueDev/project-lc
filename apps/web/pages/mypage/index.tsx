@@ -3,6 +3,7 @@ import {
   MypageLayout,
   ShopNameDialog,
   SellerStatusSection,
+  MypageOrderStats,
 } from '@project-lc/components';
 
 export function Index(): JSX.Element {
@@ -11,6 +12,7 @@ export function Index(): JSX.Element {
   return (
     <MypageLayout>
       <SellerStatusSection />
+      <MypageOrderStats />
       <Box h={200} bgColor="red.200" as="section">
         <Text>some components1</Text>
       </Box>
