@@ -116,7 +116,7 @@ export function LiveShoppingManagerPhoneNumber(): JSX.Element {
                 id="email"
                 placeholder="minsu@example.com"
                 autoComplete="off"
-                width={300}
+                maxWidth={300}
                 value={watch('email', '')}
                 {...register('email', { ...emailRegisterOptions })}
               />
@@ -126,7 +126,7 @@ export function LiveShoppingManagerPhoneNumber(): JSX.Element {
                 variant="filled"
                 placeholder="minsu@example.com"
                 autoComplete="off"
-                width={300}
+                maxWidth={300}
                 value={data.email}
                 isDisabled
                 {...register('email', { ...emailRegisterOptions })}
@@ -143,7 +143,7 @@ export function LiveShoppingManagerPhoneNumber(): JSX.Element {
             <FormLabel htmlFor="phone">전화번호</FormLabel>
             <Stack direction="row" alignItems="center">
               {!data || watch('useContact') === 'new' ? (
-                <InputGroup width={300} alignItems="center">
+                <InputGroup maxWidth={300} alignItems="center">
                   <Input
                     type="text"
                     maxLength={3}
@@ -184,7 +184,7 @@ export function LiveShoppingManagerPhoneNumber(): JSX.Element {
                   />
                 </InputGroup>
               ) : (
-                <InputGroup width={300} alignItems="center">
+                <InputGroup maxWidth={300} alignItems="center">
                   <Input
                     type="text"
                     variant="filled"
