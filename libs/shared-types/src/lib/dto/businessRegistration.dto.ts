@@ -15,10 +15,10 @@ export class BusinessRegistrationDto {
   @IsString() businessAddress: string;
   // 세금계산서 발행 이메일
   @IsEmail() taxInvoiceMail: string;
-  // 이미지 파일명
+  // 사업자등록증 이미지 파일명
   @IsString() businessRegistrationImageName: string;
-
+  // 통신판매업신고번호
   @IsString() mailOrderSalesNumber: string;
-
+  // 통신판매업신고증 이미지 파일명
   @IsString() mailOrderSalesImageName: string;
 }
