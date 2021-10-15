@@ -7,9 +7,6 @@ import { AdminSettlementService } from './admin-settlement.service';
 
 @Module({
   imports: [BroadcasterModule],
-  providers: [AdminService, ConfigService],
-  exports: [AdminService],
-@Module({
   providers: [AdminService, ConfigService, AdminSettlementService],
   exports: [AdminService, AdminSettlementService],
   controllers: [AdminController],

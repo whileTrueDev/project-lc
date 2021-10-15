@@ -15,13 +15,11 @@ import {
   BusinessRegistrationConfirmation,
 } from '@prisma/client';
 import {
-  AdminService,
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
-  LiveShoppingDTO,
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   AdminSettlementInfoType,
@@ -30,7 +28,7 @@ import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { AdminSettlementService } from './admin-settlement.service';
-
+import { AdminService } from './admin.service';
 @Controller('admin')
 export class AdminController {
   constructor(
