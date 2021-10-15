@@ -4,18 +4,10 @@ import {
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
+  BusinessRegistrationStatus,
+  AdminSettlementInfoType,
 } from '@project-lc/shared-types';
-import {
-  SellerSettlementAccount,
-  SellerBusinessRegistration,
-  GoodsConfirmation,
-} from '@prisma/client';
-
-export type AdminSettlementInfoType = {
-  sellerSettlementAccount: SellerSettlementAccount[];
-  sellerBusinessRegistration: SellerBusinessRegistration[];
-};
-
+import { GoodsConfirmation } from '@prisma/client';
 @Injectable()
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
@@ -26,6 +18,9 @@ export class AdminService {
     const users = await this.prisma.seller.findMany({
       include: {
         sellerBusinessRegistration: {
+          include: {
+            BusinessRegistrationConfirmation: true,
+          },
           orderBy: {
             id: 'desc',
           },
@@ -57,11 +52,47 @@ export class AdminService {
         result.sellerSettlementAccount.push(sellerSettlementAccount[0]);
       }
       if (sellerBusinessRegistration.length > 0) {
-        result.sellerBusinessRegistration.push(sellerBusinessRegistration[0]);
+        // 사업자등록정보의 상태가 대기 및 반려인 경우에만 보여준다.
+        if (
+          sellerBusinessRegistration[0].BusinessRegistrationConfirmation.status !==
+          BusinessRegistrationStatus.CONFIRMED
+        ) {
+          result.sellerBusinessRegistration.push(sellerBusinessRegistration[0]);
+        }
       }
     });
 
     return result;
+  }
+
+  /**
+   * 각 상품의 판매자의 사업자등록정보 검수 여부를 판별하기 위한 Map 반환
+   * @returns (판매자의 ID - 사업자등록정보 검수 결과)의 (key-value)를 가진 Map
+   */
+  public async getConfirmedSellers(): Promise<Map<number, string>> {
+    const sellers = await this.prisma.seller.findMany({
+      include: {
+        sellerBusinessRegistration: {
+          include: {
+            BusinessRegistrationConfirmation: true,
+          },
+          orderBy: {
+            id: 'desc',
+          },
+          take: 1,
+        },
+      },
+    });
+
+    const confirmedSellers = sellers.reduce((map, seller) => {
+      if (seller.sellerBusinessRegistration.length > 0) {
+        const { BusinessRegistrationConfirmation } = seller.sellerBusinessRegistration[0];
+        map.set(seller.id, BusinessRegistrationConfirmation.status);
+      }
+      return map;
+    }, new Map<number, string>());
+
+    return confirmedSellers;
   }
 
   // 관리자 페이지 상품검수 데이터, 상품검수가 완료되지 않은 상태일 경우,
@@ -84,6 +115,10 @@ export class AdminService {
         ShippingGroup: true,
       },
     });
+
+    // 판매자의 사업자등록 검수 여부 상태를 조회하는 map사용
+    const confirmedSellers = await this.getConfirmedSellers();
+
     const list = items.map((item) => {
       const defaultOption = item.options.find((opt) => opt.default_option === 'y');
       return {
@@ -105,6 +140,7 @@ export class AdminService {
               shipping_group_name: item.ShippingGroup.shipping_group_name,
             }
           : undefined,
+        businessRegistrationStatus: confirmedSellers.get(item.sellerId),
       };
     });
 
