@@ -3,7 +3,9 @@ import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export type ApprovedGoodsList = {
-  email: string;
+  goods_name: string;
+  id: number;
+  firstmallGoodsConnectionId: number;
 };
 
 export const getApprovedGoodsList = async (

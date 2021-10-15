@@ -1,17 +1,11 @@
 import { Box, Heading, Stack, Textarea } from '@chakra-ui/react';
 import { LiveShoppingInput } from '@project-lc/shared-types';
-import { UseFormRegister } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 
-interface LisveShoppingRegistRequestField {
-  register: UseFormRegister<LiveShoppingInput>;
-}
-
-export function LiveShoppingRequestInput(
-  props: LisveShoppingRegistRequestField,
-): JSX.Element {
-  const { register } = props;
+export function LiveShoppingRequestInput(): JSX.Element {
+  const { register } = useFormContext<LiveShoppingInput>();
   return (
-    <Box w="100%" mt="10">
+    <Box w="100%">
       <Stack spacing={2}>
         <Heading as="h6" size="xs">
           요청사항
