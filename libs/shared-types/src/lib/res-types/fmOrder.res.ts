@@ -481,22 +481,19 @@ export interface FmOrder {
  * @author hwasurr
  */
 export interface FmOrderItem {
-  /**
-   * 고유번호
-   */
+  /** 고유번호 */
   item_seq: number;
-  /**
-   * '상품고유번호',
-   */
+  /** 상품고유번호 */
   goods_seq: number;
-  /**
-   * '상품이미지경로',
-   */
+  /** 상품이미지경로 */
   image: string | null;
-  /**
-   * '상품명',
-   */
+  /** 상품명 */
   goods_name: string;
+  shipping_seq: FmOrderShipping['shipping_seq'];
+  shipping_set_name: FmOrderShipping['shipping_set_name'];
+  shipping_type: FmOrderShipping['shipping_type'];
+  shipping_method: FmOrderShipping['shipping_method'];
+  shipping_group: FmOrderShipping['shipping_group'];
 }
 
 /**
@@ -506,10 +503,12 @@ export interface FmOrderItem {
 export type FindFmOrderRes = FmOrder & {
   /** 주문아이디 */
   id: FmOrder['order_seq'];
-} & {
   goods_name: FmOrderItem['goods_name'];
   /** 이 주문에 포함된 내 order_item 고유번호. 41, 42, 43 과 같은 형태 */
   item_seq: string;
+  /** 이 주문에 포함된 내 order_item들의 배송정보의 고유번호 41, 42, 43 과 같은 형태 */
+  shipping_seq: string;
+} & {
   /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 가격의 합 */
   totalPrice: string | null;
   /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 개수 */
@@ -706,6 +705,7 @@ export interface FmOrderExportItemOption {
 
 /** 주문 배송 정보 */
 export interface FmOrderShipping {
+  shipping_seq: number;
   /** 배송비 */
   shippingCost: string;
   /** 배송비 */
@@ -745,6 +745,8 @@ export interface FmOrderShipping {
     | 'coupon';
   /** 배송그룹 */
   shipping_group: string;
+  /** 이 배송방법으로 주문된 상품 목록 */
+  items: Array<FmOrderItem & { options: FmOrderOption[] }>;
 }
 
 /** 주문 상세 정보 (메타정보) */
@@ -773,6 +775,8 @@ export type FmOrderMetaInfo = Pick<
 > & {
   /** 주문아이디 */
   id: FmOrder['order_seq'];
+  /** 이 주문에 포함된 내 order_item들의 배송정보의 고유번호 41, 42, 43 과 같은 형태 */
+  shipping_seq: string;
 } & {
   /** 이 주문에 포함된 내 모든 상품의 배송비 총 합 */
   totalShippingCost: string;
@@ -992,4 +996,10 @@ export type FindFmOrderDetailRes = FmOrderMetaInfo & {
   exports?: FmOrderExport[];
   refunds?: FmOrderRefund[];
   returns?: FmOrderReturn[];
+  /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 가격의 합 */
+  totalPrice: string | null;
+  /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 개수 */
+  totalEa: number;
+  /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 종류 수 */
+  totalType: number;
 };

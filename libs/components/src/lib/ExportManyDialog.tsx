@@ -54,8 +54,8 @@ export function ExportManyDialog({
   const formMethods = useForm<ExportOrderDto[]>();
 
   const selectedOrders = useFmOrderStore((state) => state.selectedOrders);
-  const selectedOptions = fmExportStore((s) => s.selectedOptions);
-  const resetSelectedOptions = fmExportStore((s) => s.resetSelectedOptions);
+  const selectedOrderShippings = fmExportStore((s) => s.selectedOrderShippings);
+  const resetSelectedOrderShippings = fmExportStore((s) => s.resetSelectedOrderShippings);
 
   // mutations
   const exportOrder = useExportOrderMutation();
@@ -67,8 +67,8 @@ export function ExportManyDialog({
       description: '출고 처리가 성공적으로 완료되었습니다.',
     });
     onClose();
-    resetSelectedOptions();
-  }, [onClose, toast, resetSelectedOptions]);
+    resetSelectedOrderShippings();
+  }, [onClose, toast, resetSelectedOrderShippings]);
 
   const onExportFail = useCallback(() => {
     toast({
@@ -114,7 +114,7 @@ export function ExportManyDialog({
     const dto: ExportOrderDto[] = [];
     selectedKeys.forEach((k) => {
       const data = formData[Number(k)];
-      if (selectedOptions.includes(data.orderId)) {
+      if (selectedOrderShippings.includes(data.shippingSeq)) {
         if (!data.exportOptions.every((o) => Number(o.exportEa) === 0)) {
           dto.push(data);
         }
@@ -160,7 +160,6 @@ export function ExportManyDialog({
                     onSubmitClick={onExportOneOrder}
                     orderId={orderId as string}
                     orderIndex={orderIndex}
-                    selected={selectedOptions.includes(orderId as string)}
                   />
                 </Box>
               );
@@ -174,7 +173,7 @@ export function ExportManyDialog({
               colorScheme="pink"
               onClick={bundleDialog.onOpen}
               variant="outline"
-              isDisabled={selectedOptions.length < 2}
+              isDisabled={selectedOrderShippings.length < 2}
             >
               합포장출고처리
             </Button>
@@ -182,7 +181,7 @@ export function ExportManyDialog({
               ml={2}
               colorScheme="pink"
               type="submit"
-              isDisabled={selectedOptions.length === 0}
+              isDisabled={selectedOrderShippings.length === 0}
             >
               일괄출고처리
             </Button>
@@ -218,7 +217,7 @@ export function BundleExportDialog({
 }): JSX.Element {
   const toast = useToast();
   const { getValues } = useFormContext<ExportOrderDto[]>();
-  const selectedOptions = fmExportStore((s) => s.selectedOptions);
+  const selectedOrderShippings = fmExportStore((s) => s.selectedOrderShippings);
   const [deliveryCompany, setDeliveryCompany] = useState('');
   const [deliveryNumber, setDeliveryNumber] = useState('');
 
@@ -226,9 +225,13 @@ export function BundleExportDialog({
 
   /** 합포장 출고처리 가능한 지 체크 */
   const isAbleToBundle = useMemo(() => {
-    const targetOrders = orders.filter((order) =>
-      selectedOptions.includes(String(order.order_seq)),
-    );
+    const targetOrders = orders.filter((order) => {
+      const shippingIds = order.shipping_seq.split(',');
+      if (!shippingIds || shippingIds.length === 0) return false;
+      return shippingIds.some((shippingSeq) => {
+        return selectedOrderShippings.includes(Number(shippingSeq));
+      });
+    });
 
     return targetOrders.reduce((isOk, order, crrIndex) => {
       if (!isOk) return false;
@@ -249,7 +252,7 @@ export function BundleExportDialog({
 
       return true;
     }, true);
-  }, [orders, selectedOptions]);
+  }, [orders, selectedOrderShippings]);
 
   /** 합포장 출고 처리 요청 */
   const exportBundle = useCallback(
@@ -264,8 +267,17 @@ export function BundleExportDialog({
             '모든 주문상품의 보낼 수량이 0 입니다. 보낼 수량을 올바르게 입력해주세요.',
         });
 
+      // options배열의 빈 값 정리
+      const realDto = {
+        ...dto,
+        exportOrders: dto.exportOrders.map((order) => ({
+          ...order,
+          exportOptions: order.exportOptions.filter((x) => !!x),
+        })),
+      };
+
       return exportBundledOrders
-        .mutateAsync(dto)
+        .mutateAsync(realDto)
         .then(() => {
           toast({
             status: 'success',
@@ -292,13 +304,11 @@ export function BundleExportDialog({
     const _orders: ExportOrderDto[] = [];
     selectedKeys.forEach((k) => {
       const data = formData[Number(k)];
-      if (selectedOptions.includes(data.orderId)) {
-        _orders.push({
-          ...data,
-          deliveryCompanyCode: deliveryCompany,
-          deliveryNumber,
-        });
-      }
+      _orders.push({
+        ...data,
+        deliveryCompanyCode: deliveryCompany,
+        deliveryNumber,
+      });
     });
 
     // 합포장 출고처리 요청
@@ -313,7 +323,9 @@ export function BundleExportDialog({
         <ModalBody>
           {isAbleToBundle ? (
             <>
-              <Text>선택된 주문 {selectedOptions.length} 개를 합포장 처리 합니다.</Text>
+              <Text>
+                선택된 주문 {selectedOrderShippings.length} 개를 합포장 처리 합니다.
+              </Text>
               <Stack mt={4} spacing={2}>
                 <FormControl>
                   <Select

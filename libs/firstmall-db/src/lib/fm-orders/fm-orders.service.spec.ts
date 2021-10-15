@@ -189,7 +189,7 @@ describe('FmOrdersService', () => {
 
       const orders = await service.findOrders(testGoodsIds, dto);
       const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
-      expect(querySpy).toBeCalledTimes(1);
+
       expect(querySpy).toBeCalledWith(sql, params);
 
       expect(orders[0].goods_name).toEqual(ordersSample[0].goods_name);
@@ -199,22 +199,24 @@ describe('FmOrdersService', () => {
 
   describe('[PRIVATE Method] findOneOrderInfo', () => {
     const orderId = 'TESTORDERID';
+    const goodsIds = [1, 2];
 
     it('should be successed', async () => {
-      const querySpy = jest
-        .spyOn(db, 'query')
-        .mockImplementation(async () => [orderMetaInfoSample]);
-      const orderDetail = await service['findOneOrderInfo'](orderId);
+      const querySpy = jest.spyOn(db, 'query').mockImplementation(async (q) => {
+        const { shippings, ...rest } = orderMetaInfoSample;
+        if (q.includes('FROM fm_order_shipping WHERE order_seq IN (')) {
+          return shippings;
+        }
+        return [rest];
+      });
+      const orderDetail = await service['findOneOrderInfo'](orderId, goodsIds);
 
-      expect(querySpy).toBeCalledTimes(2);
-
-      expect(orderDetail).toEqual({ ...orderMetaInfoSample, memo: '1234' });
+      expect(orderDetail).toEqual({ ...orderMetaInfoSample });
     });
 
     it('should be return null', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
-      const orderDetail = await service['findOneOrderInfo'](orderId);
-      expect(querySpy).toBeCalledTimes(3);
+      const orderDetail = await service['findOneOrderInfo'](orderId, goodsIds);
 
       expect(orderDetail).toEqual(null);
     });
@@ -229,15 +231,12 @@ describe('FmOrdersService', () => {
         .mockImplementation(async () => orderDetailOptionsSample);
       const orderDetail = await service['findOneOrderOptions'](itemSeqArr);
 
-      expect(querySpy).toBeCalledTimes(4);
-
       expect(orderDetail).toEqual(orderDetailOptionsSample);
     });
 
     it('should be return empty array', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
       const orderDetail = await service['findOneOrderOptions'](itemSeqArr);
-      expect(querySpy).toBeCalledTimes(5);
 
       expect(orderDetail).toEqual([]);
     });
@@ -245,6 +244,7 @@ describe('FmOrdersService', () => {
 
   describe('[PRIVATE Method] findOneOrderExports', () => {
     const orderId = 'TESTORDERID';
+    const itemSeqArray = [1, 2];
 
     it('should be successed', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async (sql) => {
@@ -254,17 +254,14 @@ describe('FmOrdersService', () => {
         }
         return itemOptions;
       });
-      const orderDetail = await service['findOneOrderExports'](orderId);
-
-      expect(querySpy).toBeCalledTimes(7);
+      const orderDetail = await service['findOneOrderExports'](orderId, itemSeqArray);
 
       expect(orderDetail).toEqual(orderDetailExportsSample);
     });
 
     it('should be return empty array', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
-      const orderDetail = await service['findOneOrderExports'](orderId);
-      expect(querySpy).toBeCalledTimes(8);
+      const orderDetail = await service['findOneOrderExports'](orderId, itemSeqArray);
 
       expect(orderDetail).toEqual([]);
     });
@@ -283,15 +280,12 @@ describe('FmOrdersService', () => {
       });
       const orderDetail = await service['findOneOrderRefunds'](orderId);
 
-      expect(querySpy).toBeCalledTimes(10);
-
       expect(orderDetail).toEqual(orderDetailRefundsSample);
     });
 
     it('should be return empty array', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
       const orderDetail = await service['findOneOrderRefunds'](orderId);
-      expect(querySpy).toBeCalledTimes(11);
 
       expect(orderDetail).toEqual([]);
     });
@@ -310,15 +304,12 @@ describe('FmOrdersService', () => {
       });
       const orderDetail = await service['findOneOrderReturns'](orderId);
 
-      expect(querySpy).toBeCalledTimes(13);
-
       expect(orderDetail).toEqual(orderDetailReturnsSample);
     });
 
     it('should be return empty array', async () => {
       const querySpy = jest.spyOn(db, 'query').mockImplementation(async () => []);
       const orderDetail = await service['findOneOrderReturns'](orderId);
-      expect(querySpy).toBeCalledTimes(14);
 
       expect(orderDetail).toEqual([]);
     });

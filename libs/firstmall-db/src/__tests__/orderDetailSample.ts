@@ -8,10 +8,8 @@ import {
 } from '@project-lc/shared-types';
 
 export const orderMetaInfoSample: FmOrderMetaInfo = {
-  shipping_cost: '0.00',
-  delivery_cost: '0.00',
-  shipping_set_name: '택배',
-  shipping_type: 'free',
+  totalShippingCost: '0.00',
+  totalDeliveryCost: '0.00',
   id: '2021082612090917531',
   regist_date: '2021-08-26T03:09:09.000Z',
   sitetype: 'P',
@@ -34,8 +32,17 @@ export const orderMetaInfoSample: FmOrderMetaInfo = {
   memo: '1. 배송메모 : 1234,',
   memoOriginal: '1. 배송메모 : 1234,',
   order_seq: 'asdf',
-  shipping_group: 'asdf',
-  shipping_method: 'delivery',
+  shippings: [
+    {
+      shipping_seq: 1,
+      deliveryCost: '2500',
+      shippingCost: '2500',
+      shipping_group: 'asdf',
+      shipping_method: 'delivery',
+      shipping_set_name: '택배',
+      shipping_type: 'free',
+    },
+  ],
 };
 
 export const orderDetailOptionsSample: FmOrderOption[] = [

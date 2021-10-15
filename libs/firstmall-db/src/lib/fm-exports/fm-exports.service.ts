@@ -191,14 +191,38 @@ export class FmExportsService {
     actor: string,
     exportCode: string,
   ): Promise<ExportQueries> {
-    const { orderId, deliveryCompanyCode, deliveryNumber, exportOptions } =
+    const { orderId, deliveryCompanyCode, deliveryNumber, exportOptions, shippingSeq } =
       orderExportInfo;
 
     const targetStatus = '55';
+    let targetOrderStatus: OrderAndOrderItemOptionExportStatuses = targetStatus;
     // 주문 정보 조회
     const myGoodsIds = await this.projectLcGoodsService.findMyGoodsIds(actor);
     const orderInfo = await this.fmOrdersService.findOneOrder(orderId, myGoodsIds);
     if (!orderInfo) return null;
+
+    // 주문 배송 묶음의 모든 상품.옵션이 모두 요청에 포함되었는 지 확인
+    const itemOptionSeqArr = [];
+    orderInfo.shippings.forEach((s) => {
+      s.items.forEach((i) =>
+        i.options.forEach((o) => {
+          itemOptionSeqArr.push(o.item_option_seq);
+        }),
+      );
+    });
+
+    // 주문 배송 묶음의 모든 상품.옵션이 모두 요청에 포함되었는 지 확인
+    const isExportAllItemOptions = exportOptions.every((targetOpt) => {
+      return itemOptionSeqArr.includes(targetOpt.itemOptionSeq);
+    });
+    if (!isExportAllItemOptions) {
+      targetOrderStatus = '50';
+    }
+
+    const shippingInfo = orderInfo.shippings.find(
+      (ship) => ship.shipping_seq === shippingSeq,
+    );
+    if (!shippingInfo) return null;
 
     // 실물 출고 처리 쿼리 생성
     const today = new Date();
@@ -208,22 +232,21 @@ export class FmExportsService {
       delivery_company_code: deliveryCompanyCode, // 택배사 코드
       delivery_number: deliveryNumber, // 송장번호
       order_seq: orderId,
-      domestic_shipping_method: orderInfo.shipping_method,
       status_date: today,
       export_date: today,
       complete_date: today,
       regist_date: today,
       shipping_provider_seq: 1, // fm_provider.provider_seq
-      shipping_group: orderInfo.shipping_group,
-      shipping_method: orderInfo.shipping_method,
-      shipping_set_name: orderInfo.shipping_set_name,
+      domestic_shipping_method: shippingInfo.shipping_method,
+      shipping_group: shippingInfo.shipping_group,
+      shipping_method: shippingInfo.shipping_method,
+      shipping_set_name: shippingInfo.shipping_set_name,
     });
 
     const goodsSeqArr = orderInfo.items.map((i) => i.goods_seq);
     // 재고 차감 처리를 위한 상품옵션 정보 찾기
     const goodsOptions = await this.fmGoodsService.findGoodsOptions(goodsSeqArr);
 
-    let targetOrderStatus: OrderAndOrderItemOptionExportStatuses = targetStatus;
     // * 상품(옵션)벌 변경 필요 사항
     const exportOptionsQueries = exportOptions.map((opt) => {
       // * 해당 상품(옵션)의 보낸 수량 없는 경우, 건너 뜀
@@ -324,7 +347,6 @@ export class FmExportsService {
     export_code: string;
     status?: ExportStatus;
     order_seq: number | string;
-    domestic_shipping_method: string;
     delivery_company_code: string;
     delivery_number: string;
     status_date: Date | string;
@@ -332,9 +354,10 @@ export class FmExportsService {
     complete_date?: Date | string;
     regist_date: Date | string;
     shipping_provider_seq: number;
-    shipping_group: string;
-    shipping_method: string;
-    shipping_set_name: string;
+    domestic_shipping_method?: string;
+    shipping_group?: string;
+    shipping_method?: string;
+    shipping_set_name?: string;
   }): DbQueryParams {
     return {
       sql: `

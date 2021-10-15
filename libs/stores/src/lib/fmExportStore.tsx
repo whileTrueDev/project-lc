@@ -1,23 +1,25 @@
 import create from 'zustand';
 
 export interface FmExportStoreStates {
-  selectedOptions: string[];
-  handleOptionSelect: (optId: string, forceConcat?: 'forceConcat') => void;
-  resetSelectedOptions: () => void;
+  selectedOrderShippings: number[];
+  handleOrderShippingSelect: (shippingSeq: number, forceConcat?: 'forceConcat') => void;
+  resetSelectedOrderShippings: () => void;
 }
 
 export const fmExportStore = create<FmExportStoreStates>((set, get) => ({
-  selectedOptions: [],
-  handleOptionSelect: (optId, forceConcat) => {
-    return set(({ selectedOptions }) => {
-      if (selectedOptions.includes(optId)) {
-        if (forceConcat) return { selectedOptions };
-        return { selectedOptions: selectedOptions.filter((o) => o !== optId) };
+  selectedOrderShippings: [],
+  handleOrderShippingSelect: (shippingSeq, forceConcat) => {
+    return set(({ selectedOrderShippings }) => {
+      if (selectedOrderShippings.includes(shippingSeq)) {
+        if (forceConcat) return { selectedOrderShippings };
+        return {
+          selectedOrderShippings: selectedOrderShippings.filter((o) => o !== shippingSeq),
+        };
       }
-      return { selectedOptions: selectedOptions.concat(optId) };
+      return { selectedOrderShippings: selectedOrderShippings.concat(shippingSeq) };
     });
   },
-  resetSelectedOptions: () => {
-    return set({ selectedOptions: [] });
+  resetSelectedOrderShippings: () => {
+    return set({ selectedOrderShippings: [] });
   },
 }));

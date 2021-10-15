@@ -89,7 +89,9 @@ export function OrderDetailExportInfo({
       {/* 이 출고에서 보내진 상품(옵션) 목록 */}
       {_exports.itemOptions.length > 0 && (
         <Box my={2}>
-          <Text fontWeight="bold">출고된 상품</Text>
+          <Text fontWeight="bold" mb={2}>
+            출고된 상품
+          </Text>
           {_exports.itemOptions.map((io) => (
             <OrderDetailExportInfoItem
               key={io.item_option_seq}
@@ -142,7 +144,7 @@ export function OrderDetailExportInfoItem({
         )}
         <Text ml={io.image ? 2 : 0}>{io.goods_name} </Text>
       </Flex>
-      {bundleExportCode && isBundledAndRightOrder && (
+      {bundleExportCode && !isBundledAndRightOrder && (
         <Text color={emphasizeColor}>합포장(묶음배송) 상품</Text>
       )}
       <OrderDetailOptionListItem key={io.item_option_seq} option={io} />
