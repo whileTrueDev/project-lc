@@ -20,7 +20,6 @@ export function LiveShoppingRegist(): JSX.Element {
   const { data: profileData } = useProfile();
   const { mutateAsync, isLoading } = useCreateLiveShopping();
   const { mutateAsync: createSellerContacts } = useCreateSellerContacts();
-
   const toast = useToast();
   const router = useRouter();
 
@@ -111,7 +110,7 @@ export function LiveShoppingRegist(): JSX.Element {
                 options={goodsList.data}
                 isLoading={goodsList.isLoading}
                 isDisabled={!goodsList.data || goodsList.data.length === 0}
-                getOptionLabel={(opt) => opt.goods_name}
+                getOptionLabel={(opt) => opt?.goods_name || ''}
                 value={selectedGoods}
                 onChange={(newV) => {
                   if (newV) {
