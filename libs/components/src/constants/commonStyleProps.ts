@@ -1,6 +1,5 @@
 export const boxStyle = {
-  border: '1px',
-  borderColor: 'gray.200',
+  borderWidth: '1px',
   borderRadius: 'md',
   p: 2,
 };
