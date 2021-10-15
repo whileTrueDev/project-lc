@@ -75,4 +75,5 @@ export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
 export * from './lib/TextViewerWithDetailModal';
 export * from './lib/admin/AdminGoodsStatusButtons';
+export * from './lib/SellerStatusSection';
 export * from './lib/ShopInfoShippingGroup';
