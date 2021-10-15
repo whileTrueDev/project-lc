@@ -10,7 +10,7 @@ export const getApprovedGoodsList = async (
   email: string,
 ): Promise<ApprovedGoodsList[]> => {
   return axios
-    .get<ApprovedGoodsList[]>('/live', {
+    .get<ApprovedGoodsList[]>('/live-shopping/confirmed-goods', {
       params: { email },
     })
     .then((res) => res.data);

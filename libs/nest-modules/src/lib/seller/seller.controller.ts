@@ -166,7 +166,7 @@ export class SellerController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('contacts-create')
+  @Post('contacts')
   public createContacts(
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: SellerContactsDTOWithoutIdDTO,

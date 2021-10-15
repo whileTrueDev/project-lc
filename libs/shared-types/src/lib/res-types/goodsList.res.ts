@@ -63,7 +63,7 @@ export type GoodsListRes = {
   prevPage: number | null;
 };
 
-export type ApprovedGoodsNameAndIds = {
+export type ApprovedGoodsNameAndId = {
   firstmallGoodsConnectionId: number;
   goods_name: string;
 };

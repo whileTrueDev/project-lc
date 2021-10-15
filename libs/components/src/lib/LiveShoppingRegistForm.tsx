@@ -7,8 +7,8 @@ import {
   useProfile,
   useApprovedGoodsList,
   useDefaultContacts,
-  useCreateLiveShopping,
-  useCreateSellerContacts,
+  useCreateLiveShoppingMutation,
+  useCreateSellerContactsMutation,
 } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { LiveShoppingDTO, LiveShoppingInput } from '@project-lc/shared-types';
@@ -19,8 +19,8 @@ export function LiveShoppingRegist(): JSX.Element {
   const { selectedGoods, handleGoodsSelect, setDefault, handleSetDefault } =
     liveShoppingRegist();
   const { data: profileData } = useProfile();
-  const { mutateAsync, isLoading } = useCreateLiveShopping();
-  const { mutateAsync: createSellerContacts } = useCreateSellerContacts();
+  const { mutateAsync, isLoading } = useCreateLiveShoppingMutation();
+  const { mutateAsync: createSellerContacts } = useCreateSellerContactsMutation();
 
   const toast = useToast();
   const router = useRouter();
