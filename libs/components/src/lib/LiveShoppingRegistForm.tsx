@@ -1,16 +1,31 @@
-import { Alert, AlertIcon, Button, Flex, Stack, Text, useToast } from '@chakra-ui/react';
+import {
+  Image,
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Flex,
+  Stack,
+  Text,
+  useToast,
+  Spinner,
+} from '@chakra-ui/react';
 import {
   ApprovedGoodsListItem,
   useApprovedGoodsList,
   useCreateLiveShopping,
   useCreateSellerContacts,
   useDefaultContacts,
+  useGoodsById,
   useProfile,
 } from '@project-lc/hooks';
 import { LiveShoppingDTO, LiveShoppingInput } from '@project-lc/shared-types';
 import { liveShoppingRegist } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useMemo } from 'react';
+import dayjs from 'dayjs';
+import { Goods } from '.prisma/client';
 import { ChakraAutoComplete } from '..';
 import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerContacts';
 import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
@@ -130,6 +145,12 @@ export function LiveShoppingRegist(): JSX.Element {
                   }
                 }}
               />
+
+              {selectedGoods && (
+                <Box mt={2}>
+                  <GoodsSummary goodsId={selectedGoods.id} />
+                </Box>
+              )}
             </Stack>
             {/* 담당자 연락처 */}
             <LiveShoppingManagerPhoneNumber />
@@ -154,3 +175,36 @@ export function LiveShoppingRegist(): JSX.Element {
 }
 
 export default LiveShoppingRegist;
+
+interface GoodsSummaryProps {
+  goodsId: Goods['id'];
+}
+function GoodsSummary({ goodsId }: GoodsSummaryProps): JSX.Element | null {
+  const goods = useGoodsById(goodsId);
+
+  const goodsFirstImage = useMemo(
+    () => goods.data?.image.find((i) => i.cut_number === 1),
+    [goods.data?.image],
+  );
+
+  if (goods.isLoading) return <Spinner />;
+  if (!goods.data) return null;
+  if (goods.isError) return null;
+
+  return (
+    <Flex maxW="300px" alignItems="center">
+      <Box>
+        {goodsFirstImage && <Image width={50} height={50} src={goodsFirstImage.image} />}
+      </Box>
+      <Box ml={2}>
+        <Text fontWeight="bold" isTruncated>
+          {goods.data.goods_name}
+        </Text>
+        <Text isTruncated>{goods.data.summary}</Text>
+        <Text isTruncated>
+          {dayjs(goods.data.regist_date).format('YYYY년 MM월 DD일 HH:mm:ss')}
+        </Text>
+      </Box>
+    </Flex>
+  );
+}
