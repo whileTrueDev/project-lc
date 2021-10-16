@@ -14,13 +14,18 @@ interface LiveShoppingWithGoods extends LiveShopping {
       shopName: string;
     };
   };
+  broadcaster: {
+    userNickname: string;
+  };
 }
 
 export const getAdminLiveShoppingList = async (
   liveShoppingId?: string | null,
 ): Promise<LiveShoppingWithGoods[]> => {
   return axios
-    .get<LiveShoppingWithGoods[]>('/admin/live-shopping', { params: { liveShoppingId } })
+    .get<LiveShoppingWithGoods[]>('/admin/live-shopping', {
+      params: { liveShoppingId },
+    })
     .then((res) => res.data);
 };
 

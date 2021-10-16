@@ -1,24 +1,26 @@
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { TextField } from '@material-ui/core';
 import { Box } from '@chakra-ui/react';
+import { useFormContext } from 'react-hook-form';
+import { liveShoppingManage } from '@project-lc/stores';
+import { ChakraAutoComplete } from '..';
 
 export function BroadcasterAutocomplete(props: any): JSX.Element {
   const { data } = props;
+  const { handleBroadcasterSelect } = liveShoppingManage();
+  const { setValue } = useFormContext();
   return (
     <Box>
-      <Autocomplete
+      <ChakraAutoComplete
         options={data}
-        // getOptionLabel={(option) => option?.userNickname || ''}
-        style={{ width: 300, marginTop: 0 }}
-        renderInput={(params) => (
-          <TextField {...params} label="검색할 방송인을 검색하세요" fullWidth />
-        )}
-        renderOption={(option) => option?.userNickname || ''}
-        // value={selectedGoods}
-        // onChange={(_, newValue) => {
-        //   setValue('goods_id', newValue?.id || null);
-        //   handleGoodsSelect(newValue);
-        // }}
+        getOptionLabel={(option) => option?.userNickname || ''}
+        onChange={(newV) => {
+          if (newV) {
+            setValue('broadcaster', newV.id);
+            handleBroadcasterSelect(newV);
+          } else {
+            setValue('broadcaster', null);
+            handleBroadcasterSelect(null);
+          }
+        }}
       />
     </Box>
   );

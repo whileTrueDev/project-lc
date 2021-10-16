@@ -456,17 +456,20 @@ model Broadcaster {
 
 // 라이브 쇼핑
 model LiveShopping {
-  id             Int            @id @default(autoincrement())
-  streamId       String?        @unique // 방송마다 부여되는 unique 값
-  broadcasterId  String?        @db.VarChar(20) // 스트리머의 아이디 
-  sellerId       Int // 판매자 ID
-  goodsId        Int // 상품 ID
-  contactId      Int // 판매자 등록된 연락처 ID
-  requests       String?        @db.LongText // 요청사항
-  progress       String         @default("registered") // 진행상태
-  sellerContacts SellerContacts @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  seller         Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  goods          Goods          @relation(fields: [goodsId], references: [id], onDelete: Cascade)
-  broadcaster    Broadcaster?   @relation(fields: [broadcasterId], references: [userId])
-  createDate     DateTime       @default(now())
+  id                 Int            @id @default(autoincrement())
+  streamId           String?        @unique // 방송마다 부여되는 unique 값
+  broadcasterId      String?        @db.VarChar(20) // 스트리머의 아이디 
+  sellerId           Int // 판매자 ID
+  goodsId            Int // 상품 ID
+  contactId          Int // 판매자 등록된 연락처 ID
+  requests           String?        @db.LongText // 요청사항
+  progress           String         @default("registered") // 진행상태
+  startBroadcastDate DateTime? // 라이브 방송 시작 시간
+  endBroadcastDate   DateTime? // 라이브 방송 종료 시간
+  createDate         DateTime       @default(now())
+  rejectionReason    String?        @db.Text // 방송 취소 또는 거절 사유
+  sellerContacts     SellerContacts @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  seller             Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  goods              Goods          @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  broadcaster        Broadcaster?   @relation(fields: [broadcasterId], references: [userId])
 }

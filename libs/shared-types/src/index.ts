@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-export * from './lib/ApprovedGoodsListItem';
+export * from './lib/front-type/approvedGoodsListItemType';
 export * from './lib/constants/banks';
 export * from './lib/constants/fmDeliveryCompanies';
 export * from './lib/constants/fmExportConfirmStatuses';

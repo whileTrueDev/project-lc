@@ -60,3 +60,4 @@ export * from './lib/queries/useBroadcaster';
 export * from './lib/mutation/useBusinessRegistrationRejectionMutation';
 export * from './lib/mutation/useBusinessRegistrationConfirmationMutation';
 export * from './lib/queries/useFmOrdersStats';
+export * from './lib/mutation/useUpdateLiveShoppingManageMutation';

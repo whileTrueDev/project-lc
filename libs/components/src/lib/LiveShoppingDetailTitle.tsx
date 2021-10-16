@@ -9,10 +9,9 @@ export function LiveShoppingDetailTitle({ liveShopping }: any): JSX.Element {
   return (
     <>
       <Heading>{liveShopping.goods.goods_name}</Heading>
-      <Text as="span" size="md">
-        판매자명 : {liveShopping.seller.sellerShop.shopName}
-      </Text>
       <Stack direction="row" alignItems="center">
+        <Text size="md">판매자명 : </Text>
+        <Text size="md">{liveShopping.seller?.sellerShop.shopName}</Text>
         <TextDotConnector />
         <Text>{liveShopping.progress}</Text>
         <TextDotConnector />

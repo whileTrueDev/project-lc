@@ -22,8 +22,20 @@ export class LiveShoppingDTO {
   requests: string;
 
   @IsString()
-  @IsIn(['registered', 'adjust'])
+  @IsIn(['registered', 'adjust', 'confirm', 'cancel'])
   progress: string;
+
+  @IsOptional()
+  @IsDate()
+  startBroadcastDate: string;
+
+  @IsOptional()
+  @IsDate()
+  endBroadcastDate: string;
+
+  @IsOptional()
+  @IsString()
+  rejectionReason: string;
 
   @IsDate()
   createDate: string;

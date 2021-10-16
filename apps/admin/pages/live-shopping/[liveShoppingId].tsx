@@ -1,32 +1,76 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
-import { Box, Button, Flex, Stack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  Stack,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionIcon,
+  AccordionPanel,
+  Text,
+  Badge,
+  Grid,
+} from '@chakra-ui/react';
 import {
   AdminPageLayout,
   LiveShoppingDetailTitle,
   BroadcasterAutocomplete,
   LiveShoppingProgressSelector,
   LiveShoppingDatePicker,
+  GoodsDetailCommonInfo,
+  GoodsDetailImagesInfo,
+  GoodsDetailInfo,
+  GoodsDetailOptionsInfo,
+  GoodsDetailPurchaseLimitInfo,
+  GoodsDetailShippingInfo,
+  GoodsDetailSummary,
+  SectionWithTitle,
 } from '@project-lc/components';
-import { useAdminLiveShoppingList, useProfile, useBroadcaster } from '@project-lc/hooks';
+import {
+  useAdminLiveShoppingList,
+  useProfile,
+  useBroadcaster,
+  useAdminGoodsById,
+} from '@project-lc/hooks';
 import { useRouter } from 'next/router';
-import React from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 
 export function GoodsDetail(): JSX.Element {
   const router = useRouter();
   const liveShoppingId = router.query.liveShoppingId as string;
   const { data: profileData } = useProfile();
-  const { data, isLoading } = useAdminLiveShoppingList({
-    enabled: !!profileData?.email,
-    id: liveShoppingId,
-  });
+  const { data: liveShopping, isLoading: liveShoppingIsLoading } =
+    useAdminLiveShoppingList({
+      enabled: !!profileData?.email,
+      id: liveShoppingId,
+    });
+
+  const goodsId = liveShopping ? liveShopping[0].goodsId : '';
+  const goods = useAdminGoodsById(goodsId);
 
   const { data: broadcaster } = useBroadcaster();
-  console.log(data);
-  console.log(broadcaster);
-  // if (goods.isLoading) return <AdminPageLayout>...loading</AdminPageLayout>;
 
-  // if (!goods.isLoading && !goods.data)
-  //   return <AdminPageLayout>...no data</AdminPageLayout>;
+  const methods = useForm({
+    defaultValues: {
+      progress: '',
+      broadcaster: '',
+      startDate: '',
+      endDate: '',
+    },
+  });
+
+  const { handleSubmit } = methods;
+  const regist = (data: any) => {
+    console.log(data);
+  };
+
+  if (liveShoppingIsLoading || goods.isLoading)
+    return <AdminPageLayout>...loading</AdminPageLayout>;
+
+  if (!goods.isLoading && !goods.data)
+    return <AdminPageLayout>...no data</AdminPageLayout>;
 
   /**
   - **신청됨**: 신청 직후의 상태
@@ -56,10 +100,96 @@ export function GoodsDetail(): JSX.Element {
           </Flex>
         </Box>
         {/* 상품 제목 */}
-        {data && !isLoading && <LiveShoppingDetailTitle liveShopping={data[0]} />}
-        <LiveShoppingProgressSelector />
-        <BroadcasterAutocomplete data={broadcaster} />
-        <LiveShoppingDatePicker />
+        {liveShopping && !liveShoppingIsLoading && (
+          <LiveShoppingDetailTitle liveShopping={liveShopping[0]} />
+        )}
+        <Grid templateColumns="repeat(2, 1fr)" justifyItems="start">
+          <Stack spacing={5}>
+            <Stack direction="row" alignItems="center">
+              <Text as="span">진행상태</Text>
+              <Badge>{liveShopping[0].progress}</Badge>
+            </Stack>
+
+            <Stack direction="row" alignItems="center">
+              <Text as="span">방송인: </Text>
+              <Text as="span">
+                {liveShopping[0].broadcaster
+                  ? liveShopping[0].broadcaster.userNickname
+                  : '미정'}
+              </Text>
+            </Stack>
+
+            <Stack direction="row" alignItems="center">
+              <Text as="span">방송시작 시간: </Text>
+              <Text as="span">{liveShopping[0].startBroadcastDate || '미정'}</Text>
+            </Stack>
+
+            <Stack direction="row" alignItems="center">
+              <Text as="span">방송종료 시간: </Text>
+              <Text as="span">{liveShopping[0].endBroadcastDate || '미정'} </Text>
+            </Stack>
+
+            <Stack direction="row" alignItems="center">
+              <Text as="span">방송시간: </Text>
+              <Text as="span">미정</Text>
+            </Stack>
+          </Stack>
+          <FormProvider {...methods}>
+            <Stack as="form" spacing={5} onSubmit={handleSubmit(regist)}>
+              <LiveShoppingProgressSelector />
+              <BroadcasterAutocomplete data={broadcaster} />
+              <LiveShoppingDatePicker title="시작시간" registerName="startDate" />
+              <LiveShoppingDatePicker title="종료시간" registerName="endDate" />
+              <Button type="submit">등록</Button>
+            </Stack>
+          </FormProvider>
+        </Grid>
+
+        <Accordion allowMultiple>
+          <AccordionItem>
+            <AccordionButton>
+              <Box flex="1" textAlign="left">
+                상품 정보 보기
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+
+            <AccordionPanel pb={4}>
+              {/* 상품 요약 */}
+              <Box as="section">
+                <GoodsDetailSummary goods={goods.data} />
+              </Box>
+
+              {/* 상품 정보 */}
+
+              <SectionWithTitle title="기본 정보">
+                <GoodsDetailInfo goods={goods.data} />
+              </SectionWithTitle>
+
+              <SectionWithTitle title="상품사진 및 설명">
+                <GoodsDetailImagesInfo goods={goods.data} />
+              </SectionWithTitle>
+
+              <SectionWithTitle title="옵션">
+                <GoodsDetailOptionsInfo goods={goods.data} />
+              </SectionWithTitle>
+
+              <SectionWithTitle title="상품 공통 정보">
+                <GoodsDetailCommonInfo goods={goods.data} />
+              </SectionWithTitle>
+
+              <SectionWithTitle title="구매 제한">
+                <GoodsDetailPurchaseLimitInfo goods={goods.data} />
+              </SectionWithTitle>
+
+              {goods.data.ShippingGroup && (
+                <SectionWithTitle title="배송정책">
+                  <GoodsDetailShippingInfo goods={goods.data} />
+                </SectionWithTitle>
+              )}
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
       </Stack>
     </AdminPageLayout>
   );

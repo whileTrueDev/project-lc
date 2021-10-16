@@ -8,6 +8,7 @@ import {
   Put,
   Query,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import {
   GoodsConfirmation,
@@ -92,11 +93,19 @@ export class AdminController {
   @UseGuards(AdminGuard)
   @Get('/live-shopping')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getLiveShoppings(
-    @Query('liveShoppingId') liveShoppingId?: string,
-  ): Promise<LiveShopping[]> {
-    return this.adminService.getRegisteredLiveShoppings(liveShoppingId);
+  getLiveShoppings(@Query() dto: any): Promise<LiveShopping[]> {
+    return this.adminService.getRegisteredLiveShoppings(dto);
   }
+
+  // @UseGuards(JwtAuthGuard)
+  // @UseGuards(AdminGuard)
+  // @Patch('/live-shopping')
+  // @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  // setLiveShoppings(
+  //   @Body('liveShoppingId') liveShoppingId?: string,
+  // ): Promise<LiveShopping[]> {
+  //   return this.adminService.updateLiveShoppings(liveShoppingId);
+  // }
 
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)

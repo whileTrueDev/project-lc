@@ -238,7 +238,7 @@ export class AdminService {
 
   public async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
     return this.prisma.liveShopping.findMany({
-      where: { progress: 'registered', id: id ? Number(id) : undefined },
+      where: { id: id ? Number(id) : undefined },
       include: {
         goods: {
           select: {
@@ -251,7 +251,31 @@ export class AdminService {
             sellerShop: true,
           },
         },
+        broadcaster: {
+          select: {
+            userNickname: true,
+          },
+        },
       },
     });
   }
+
+  // public async updateLiveShoppings(dto: any): Promise<boolean> {
+  //   const liveShoppingUpdate = await this.prisma.liveShopping.update({
+  //     data: {
+  //       progress: dto.progress || undefined,
+  //       broadcasterId: dto.broadcaster || undefined,
+  //       startBroadcastDate: dto.startDate || undefined,
+  //       endBroadcastDate: dto.endDate || undefined,
+  //     },
+  //     where: {
+  //       id: dto.id,
+  //     },
+  //   });
+  //   if (!liveShoppingUpdate) {
+  //     throw new Error(`업데이트 실패`);
+  //   }
+
+  //   return true;
+  // }
 }
