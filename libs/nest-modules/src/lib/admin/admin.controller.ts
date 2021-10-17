@@ -93,19 +93,17 @@ export class AdminController {
   @UseGuards(AdminGuard)
   @Get('/live-shopping')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getLiveShoppings(@Query() dto: any): Promise<LiveShopping[]> {
-    return this.adminService.getRegisteredLiveShoppings(dto);
+  getLiveShoppings(@Query('liveShoppingId') dto?: string): Promise<LiveShopping[]> {
+    return this.adminService.getRegisteredLiveShoppings(dto || null);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @UseGuards(AdminGuard)
-  // @Patch('/live-shopping')
-  // @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  // setLiveShoppings(
-  //   @Body('liveShoppingId') liveShoppingId?: string,
-  // ): Promise<LiveShopping[]> {
-  //   return this.adminService.updateLiveShoppings(liveShoppingId);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Patch('/live-shopping')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  updateLiveShoppings(@Body() dto: any): Promise<boolean> {
+    return this.adminService.updateLiveShoppings(dto);
+  }
 
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)

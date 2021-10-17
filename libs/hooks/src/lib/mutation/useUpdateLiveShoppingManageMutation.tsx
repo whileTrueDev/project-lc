@@ -1,21 +1,13 @@
-import { GoodsView } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
 
-export interface useChangeGoodsViewDto {
-  view: GoodsView;
-  id: number;
-}
-export type useChangeGoodsViewRes = boolean;
-
 export const useUpdateLiveShoppingManageMutation = (): UseMutationResult<
-  useChangeGoodsViewRes,
+  any,
   AxiosError,
-  useChangeGoodsViewDto
+  any
 > => {
-  return useMutation<useChangeGoodsViewRes, AxiosError, useChangeGoodsViewDto>(
-    (dto: useChangeGoodsViewDto) =>
-      axios.patch('/admin/live-shopping', dto).then((res) => res.data),
+  return useMutation<any, AxiosError, any>((dto: any) =>
+    axios.patch('/admin/live-shopping', dto).then((res) => res.data),
   );
 };

@@ -237,6 +237,7 @@ export class AdminService {
   }
 
   public async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
+    console.log(id);
     return this.prisma.liveShopping.findMany({
       where: { id: id ? Number(id) : undefined },
       include: {
@@ -254,28 +255,35 @@ export class AdminService {
         broadcaster: {
           select: {
             userNickname: true,
+            afreecaId: true,
+            twitchId: true,
+            youtubeId: true,
           },
         },
       },
     });
   }
 
-  // public async updateLiveShoppings(dto: any): Promise<boolean> {
-  //   const liveShoppingUpdate = await this.prisma.liveShopping.update({
-  //     data: {
-  //       progress: dto.progress || undefined,
-  //       broadcasterId: dto.broadcaster || undefined,
-  //       startBroadcastDate: dto.startDate || undefined,
-  //       endBroadcastDate: dto.endDate || undefined,
-  //     },
-  //     where: {
-  //       id: dto.id,
-  //     },
-  //   });
-  //   if (!liveShoppingUpdate) {
-  //     throw new Error(`업데이트 실패`);
-  //   }
+  public async updateLiveShoppings(dto: any): Promise<boolean> {
+    console.log(dto);
+    const liveShoppingUpdate = await this.prisma.liveShopping.update({
+      data: {
+        progress: dto.progress || undefined,
+        broadcasterId: dto.broadcaster || undefined,
+        broadcastStartDate: new Date(dto.broadcastStartDate) || undefined,
+        broadcastEndDate: new Date(dto.broadcastEndDate) || undefined,
+        sellStartDate: new Date(dto.sellStartDate) || undefined,
+        sellEndDate: new Date(dto.sellEndDate) || undefined,
+        rejectionReason: dto.rejectionReason || undefined,
+      },
+      where: {
+        id: Number(dto.liveShoppingId),
+      },
+    });
+    if (!liveShoppingUpdate) {
+      throw new Error(`업데이트 실패`);
+    }
 
-  //   return true;
-  // }
+    return true;
+  }
 }

@@ -464,8 +464,10 @@ model LiveShopping {
   contactId          Int // 판매자 등록된 연락처 ID
   requests           String?        @db.LongText // 요청사항
   progress           String         @default("registered") // 진행상태
-  startBroadcastDate DateTime? // 라이브 방송 시작 시간
-  endBroadcastDate   DateTime? // 라이브 방송 종료 시간
+  broadcastStartDate DateTime? // 라이브 방송 시작 시간
+  broadcastEndDate   DateTime? // 라이브 방송 종료 시간
+  sellStartDate      DateTime? // 라이브커머스 상품판매 시작 시간
+  sellEndDate        DateTime? // 라이브커머스 상품판매 종료 시간
   createDate         DateTime       @default(now())
   rejectionReason    String?        @db.Text // 방송 취소 또는 거절 사유
   sellerContacts     SellerContacts @relation(fields: [contactId], references: [id], onDelete: Cascade)
