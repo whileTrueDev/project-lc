@@ -1,17 +1,21 @@
 /* eslint-disable dot-notation */
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { GoodsModule } from '@project-lc/nest-modules';
+import { PrismaModule } from '@project-lc/prisma-orm';
+import { exportItemSample, exportSample } from '../../__tests__/exportSample';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FMGoodsService } from '../fm-goods/fm-goods.service';
 import { FmOrdersService } from '../fm-orders/fm-orders.service';
 import { FmExportsService } from './fm-exports.service';
-import { exportItemSample, exportSample } from '../../__tests__/exportSample';
 
 describe('FmExportsService', () => {
   let service: FmExportsService;
   let db: FirstmallDbService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [GoodsModule, PrismaModule, ConfigModule.forRoot({ isGlobal: true })],
       providers: [FmExportsService, FirstmallDbService, FMGoodsService, FmOrdersService],
     }).compile();
 

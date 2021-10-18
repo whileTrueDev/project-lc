@@ -1,4 +1,5 @@
 import { FindFmOrderRes } from '@project-lc/shared-types';
+import { orderDetailItemsSample } from './orderDetailSample';
 
 export const ordersSample: FindFmOrderRes[] = [
   {
@@ -117,5 +118,24 @@ export const ordersSample: FindFmOrderRes[] = [
     talkbuy_order_id: null,
     talkbuy_order_date: null,
     talkbuy_paid_date: null,
+    item_seq: '1,2,3',
+    shipping_seq: '1,2',
+    shippings: [
+      {
+        shipping_seq: 1,
+        deliveryCost: '2500',
+        shippingCost: '2500',
+        shipping_group: 'asdf',
+        shipping_method: 'delivery',
+        shipping_set_name: '택배',
+        shipping_type: 'free',
+        items: orderDetailItemsSample,
+      },
+    ],
+    totalType: 1,
+    totalEa: 1,
+    totalPrice: '0.00',
+    totalShippingCost: '2500.00',
+    totalDeliveryCost: '2500.00',
   },
 ];

@@ -39,6 +39,12 @@ export function OrderDetailExportInfo({
     }, 0);
   }, [_exports.itemOptions]);
 
+  const totalExportedEa = useMemo(() => {
+    return _exports.itemOptions.reduce((prev, curr) => {
+      return prev + Number(curr.ea);
+    }, 0);
+  }, [_exports.itemOptions]);
+
   // * 이 출고의 택배사 정보
   const deliveryCompany = useMemo(
     () => convertFmDeliveryCompanyToString(_exports.delivery_company_code),
@@ -55,7 +61,7 @@ export function OrderDetailExportInfo({
         </NextLink>
         <FmOrderStatusBadge orderStatus={_exports.export_status} />
         <TextDotConnector />
-        <Text isTruncated>{_exports.totalEa} 개</Text>
+        <Text isTruncated>{totalExportedEa} 개</Text>
         <TextDotConnector />
         <Text isTruncated>{totalExportedPrice.toLocaleString()} 원</Text>
       </Stack>
@@ -89,7 +95,9 @@ export function OrderDetailExportInfo({
       {/* 이 출고에서 보내진 상품(옵션) 목록 */}
       {_exports.itemOptions.length > 0 && (
         <Box my={2}>
-          <Text fontWeight="bold">출고된 상품</Text>
+          <Text fontWeight="bold" mb={2}>
+            출고된 상품
+          </Text>
           {_exports.itemOptions.map((io) => (
             <OrderDetailExportInfoItem
               key={io.item_option_seq}
@@ -142,7 +150,7 @@ export function OrderDetailExportInfoItem({
         )}
         <Text ml={io.image ? 2 : 0}>{io.goods_name} </Text>
       </Flex>
-      {bundleExportCode && isBundledAndRightOrder && (
+      {bundleExportCode && !isBundledAndRightOrder && (
         <Text color={emphasizeColor}>합포장(묶음배송) 상품</Text>
       )}
       <OrderDetailOptionListItem key={io.item_option_seq} option={io} />

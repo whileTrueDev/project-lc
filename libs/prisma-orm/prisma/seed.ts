@@ -35,7 +35,8 @@ const testSellerData = {
   email: testSellerEmail,
   name: 'testSeller',
   password:
-    '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY', // asdfasdf!
+    // asdfasdf!
+    '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY',
 };
 
 const testAdminEmail = 'testAdmin@gmail.com';
@@ -43,7 +44,8 @@ const testAdminData = {
   email: testAdminEmail,
   name: 'test관리자',
   password:
-    '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY', // asdfasdf!
+    // asdfasdf!
+    '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY',
 };
 
 async function main(): Promise<void> {
