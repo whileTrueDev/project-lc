@@ -93,6 +93,8 @@ export function ExportManyDialog({
       if (isValid) {
         formMethods.setValue(`${orderIdx}.orderId`, orderId);
         const dto = formMethods.getValues(fieldID);
+        // options배열의 빈 값 정리
+        const realDto = { ...dto, exportOptions: dto.exportOptions.filter((x) => !!x) };
         if (dto.exportOptions.every((o) => Number(o.exportEa) === 0)) {
           toast({
             status: 'warning',
@@ -101,7 +103,7 @@ export function ExportManyDialog({
           });
         } else {
           // 출고 처리 API 요청
-          exportOrder.mutateAsync(dto).then(onExportSuccess).catch(onExportFail);
+          exportOrder.mutateAsync(realDto).then(onExportSuccess).catch(onExportFail);
         }
       }
     },
@@ -114,9 +116,11 @@ export function ExportManyDialog({
     const dto: ExportOrderDto[] = [];
     selectedKeys.forEach((k) => {
       const data = formData[Number(k)];
-      if (selectedOrderShippings.includes(data.shippingSeq)) {
-        if (!data.exportOptions.every((o) => Number(o.exportEa) === 0)) {
-          dto.push(data);
+      // options배열의 빈 값 정리
+      const realData = { ...data, exportOptions: data.exportOptions.filter((x) => !!x) };
+      if (selectedOrderShippings.includes(realData.shippingSeq)) {
+        if (!realData.exportOptions.every((o) => Number(o.exportEa) === 0)) {
+          dto.push(realData);
         }
       }
     });
