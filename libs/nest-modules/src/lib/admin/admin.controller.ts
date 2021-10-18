@@ -24,6 +24,8 @@ import {
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   AdminSettlementInfoType,
+  LiveShoppingDTO,
+  BroadcasterDTO,
 } from '@project-lc/shared-types';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -101,7 +103,7 @@ export class AdminController {
   @UseGuards(AdminGuard)
   @Patch('/live-shopping')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  updateLiveShoppings(@Body() dto: any): Promise<boolean> {
+  updateLiveShoppings(@Body() dto: LiveShoppingDTO): Promise<boolean> {
     return this.adminService.updateLiveShoppings(dto);
   }
 
@@ -109,7 +111,7 @@ export class AdminController {
   @UseGuards(AdminGuard)
   @Get('/live-shopping/broadcaster')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getAllBroadcasters(): Promise<any> {
+  getAllBroadcasters(): Promise<BroadcasterDTO[]> {
     return this.broadcasterService.getAllBroadcasterIdAndNickname();
   }
 

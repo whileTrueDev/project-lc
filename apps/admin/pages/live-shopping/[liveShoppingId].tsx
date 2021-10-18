@@ -43,6 +43,7 @@ import {
 } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { FormProvider, useForm } from 'react-hook-form';
+import { LiveShoppingDTO } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 
 export function GoodsDetail(): JSX.Element {
@@ -68,7 +69,7 @@ export function GoodsDetail(): JSX.Element {
   const methods = useForm({
     defaultValues: {
       progress: '',
-      broadcaster: '',
+      broadcasterId: '',
       broadcastStartDate: '',
       broadcastEndDate: '',
       sellStartDate: '',
@@ -94,7 +95,12 @@ export function GoodsDetail(): JSX.Element {
     });
   };
   const { handleSubmit, register } = methods;
-  const regist = async (data: any): Promise<void> => {
+  const regist = async (
+    data: Omit<
+      LiveShoppingDTO,
+      'streamId' | 'sellerId' | 'goods_id' | 'contactId' | 'requests'
+    >,
+  ): Promise<void> => {
     const dto = Object.assign(data, { liveShoppingId });
     mutateAsync(dto).then(onSuccess).catch(onFail);
   };
@@ -132,7 +138,10 @@ export function GoodsDetail(): JSX.Element {
         </Box>
         {/* 상품 제목 */}
         {liveShopping && !liveShoppingIsLoading && (
-          <LiveShoppingDetailTitle liveShopping={liveShopping[0]} />
+          <LiveShoppingDetailTitle
+            goodsName={liveShopping[0].goods.goods_name}
+            createDate={liveShopping[0].createDate}
+          />
         )}
         <Grid templateColumns="repeat(2, 1fr)" justifyItems="start">
           <Stack spacing={5}>

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { throwError } from 'rxjs';
-
+import { BroadcasterDTO } from '@project-lc/shared-types';
 @Injectable()
 export class BroadcasterService {
   constructor(private readonly prisma: PrismaService) {}
@@ -21,7 +21,7 @@ export class BroadcasterService {
     return userId;
   }
 
-  async getAllBroadcasterIdAndNickname(): Promise<any> {
+  async getAllBroadcasterIdAndNickname(): Promise<BroadcasterDTO[]> {
     return this.prisma.broadcaster.findMany({
       where: {
         deleteFlag: false,

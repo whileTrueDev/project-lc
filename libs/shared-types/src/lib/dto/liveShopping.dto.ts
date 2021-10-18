@@ -1,6 +1,9 @@
 import { IsString, IsIn, IsOptional, IsNumber, IsDate } from 'class-validator';
 
 export class LiveShoppingDTO {
+  @IsNumber()
+  id: number;
+
   @IsString()
   streamId: string;
 
@@ -27,15 +30,27 @@ export class LiveShoppingDTO {
 
   @IsOptional()
   @IsDate()
-  startBroadcastDate: string;
+  broadcastStartDate: string;
 
   @IsOptional()
   @IsDate()
-  endBroadcastDate: string;
+  broadcastEndDate: string;
+
+  @IsOptional()
+  @IsDate()
+  sellStartDate: string;
+
+  @IsOptional()
+  @IsDate()
+  sellEndDate: string;
 
   @IsOptional()
   @IsString()
   rejectionReason: string;
+
+  @IsOptional()
+  @IsString()
+  videoUrl: string;
 
   @IsDate()
   createDate: string;

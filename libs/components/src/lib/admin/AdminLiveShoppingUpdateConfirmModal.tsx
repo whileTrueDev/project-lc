@@ -26,7 +26,7 @@ export function AdminLiveShoppingUpdateConfirmModal(
             <LiveShoppingProgressConverter progress={watch('progress')} />
           </Text>
         ) : null}
-        {watch('broadcaster') ? <Text>진행상태 : {watch('broadcaster')}</Text> : null}
+        {watch('broadcasterId') ? <Text>진행상태 : {watch('broadcaster')}</Text> : null}
         {watch('broadcastStartDate') ? (
           <Text>
             방송시작 시간 :{' '}

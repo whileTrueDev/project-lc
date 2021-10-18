@@ -1,13 +1,20 @@
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult } from 'react-query';
+import { LiveShopping } from '@prisma/client';
+import { LiveShoppingDTO } from '@project-lc/shared-types';
 import axios from '../../axios';
 
+type LiveShoppingManage = Omit<
+  LiveShoppingDTO,
+  'streamId' | 'sellerId' | 'goods_id' | 'contactId' | 'requests'
+>;
+
 export const useUpdateLiveShoppingManageMutation = (): UseMutationResult<
-  any,
+  LiveShopping,
   AxiosError,
-  any
+  LiveShoppingManage
 > => {
-  return useMutation<any, AxiosError, any>((dto: any) =>
+  return useMutation((dto: LiveShoppingManage) =>
     axios.patch('/admin/live-shopping', dto).then((res) => res.data),
   );
 };

@@ -1,9 +1,16 @@
 import { Box, Text } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
 import { liveShoppingManage } from '@project-lc/stores';
+import { BroadcasterDTO } from '@project-lc/shared-types';
 import { ChakraAutoComplete } from '..';
 
-export function BroadcasterAutocomplete(props: any): JSX.Element {
+export interface BroadcasterAutocompleteProps {
+  data: BroadcasterDTO[];
+}
+
+export function BroadcasterAutocomplete(
+  props: BroadcasterAutocompleteProps,
+): JSX.Element {
   const { data } = props;
   const { handleBroadcasterSelect } = liveShoppingManage();
   const { setValue } = useFormContext();
@@ -15,10 +22,10 @@ export function BroadcasterAutocomplete(props: any): JSX.Element {
         getOptionLabel={(option) => option?.userNickname || ''}
         onChange={(newV) => {
           if (newV) {
-            setValue('broadcaster', newV.userId);
-            handleBroadcasterSelect(newV);
+            setValue('broadcasterId', newV.userId);
+            handleBroadcasterSelect(newV.userId);
           } else {
-            setValue('broadcaster', null);
+            setValue('broadcasterId', null);
             handleBroadcasterSelect(null);
           }
         }}

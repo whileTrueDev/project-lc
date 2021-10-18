@@ -6,6 +6,7 @@ import {
   GoodsRejectionDto,
   BusinessRegistrationStatus,
   AdminSettlementInfoType,
+  LiveShoppingDTO,
 } from '@project-lc/shared-types';
 import { GoodsConfirmation, LiveShopping } from '@prisma/client';
 
@@ -237,7 +238,6 @@ export class AdminService {
   }
 
   public async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
-    console.log(id);
     return this.prisma.liveShopping.findMany({
       where: { id: id ? Number(id) : undefined },
       include: {
@@ -264,12 +264,11 @@ export class AdminService {
     });
   }
 
-  public async updateLiveShoppings(dto: any): Promise<boolean> {
-    console.log(dto);
+  public async updateLiveShoppings(dto: LiveShoppingDTO): Promise<boolean> {
     const liveShoppingUpdate = await this.prisma.liveShopping.update({
       data: {
         progress: dto.progress || undefined,
-        broadcasterId: dto.broadcaster || undefined,
+        broadcasterId: dto.broadcasterId || undefined,
         broadcastStartDate: new Date(dto.broadcastStartDate) || undefined,
         broadcastEndDate: new Date(dto.broadcastEndDate) || undefined,
         sellStartDate: new Date(dto.sellStartDate) || undefined,
@@ -278,7 +277,7 @@ export class AdminService {
         videoUrl: dto.videoUrl || undefined,
       },
       where: {
-        id: Number(dto.liveShoppingId),
+        id: Number(dto.id),
       },
     });
     if (!liveShoppingUpdate) {
