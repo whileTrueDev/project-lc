@@ -52,6 +52,7 @@ export type SellerGoodsListItem = Pick<
     default_price: Decimal; // 판매가(할인가) - GoodsOptions중 default_option의 판매가
     default_consumer_price: Decimal; // 소비자가(미할인가) - GoodsOptions중 default_option의 소비자가
     shippingGroup?: Pick<ShippingGroup, 'id' | 'shipping_group_name'>;
+    businessRegistrationStatus?: string;
   };
 
 export type GoodsListRes = {
@@ -61,4 +62,9 @@ export type GoodsListRes = {
   currentPage: number;
   nextPage: number | null;
   prevPage: number | null;
+};
+
+export type ApprovedGoodsNameAndId = {
+  firstmallGoodsConnectionId: number;
+  goods_name: string;
 };

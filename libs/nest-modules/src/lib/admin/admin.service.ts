@@ -5,14 +5,9 @@ import {
   GoodsConfirmationDto,
   GoodsRejectionDto,
   BusinessRegistrationStatus,
-  SellerBusinessRegistrationType,
+  AdminSettlementInfoType,
 } from '@project-lc/shared-types';
-import { SellerSettlementAccount, GoodsConfirmation } from '@prisma/client';
-
-export type AdminSettlementInfoType = {
-  sellerSettlementAccount: SellerSettlementAccount[];
-  sellerBusinessRegistration: SellerBusinessRegistrationType[];
-};
+import { GoodsConfirmation } from '@prisma/client';
 @Injectable()
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
@@ -70,6 +65,36 @@ export class AdminService {
     return result;
   }
 
+  /**
+   * 각 상품의 판매자의 사업자등록정보 검수 여부를 판별하기 위한 Map 반환
+   * @returns (판매자의 ID - 사업자등록정보 검수 결과)의 (key-value)를 가진 Map
+   */
+  public async getConfirmedSellers(): Promise<Map<number, string>> {
+    const sellers = await this.prisma.seller.findMany({
+      include: {
+        sellerBusinessRegistration: {
+          include: {
+            BusinessRegistrationConfirmation: true,
+          },
+          orderBy: {
+            id: 'desc',
+          },
+          take: 1,
+        },
+      },
+    });
+
+    const confirmedSellers = sellers.reduce((map, seller) => {
+      if (seller.sellerBusinessRegistration.length > 0) {
+        const { BusinessRegistrationConfirmation } = seller.sellerBusinessRegistration[0];
+        map.set(seller.id, BusinessRegistrationConfirmation.status);
+      }
+      return map;
+    }, new Map<number, string>());
+
+    return confirmedSellers;
+  }
+
   // 관리자 페이지 상품검수 데이터, 상품검수가 완료되지 않은 상태일 경우,
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   public async getGoodsInfo({ sort, direction }) {
@@ -90,6 +115,10 @@ export class AdminService {
         ShippingGroup: true,
       },
     });
+
+    // 판매자의 사업자등록 검수 여부 상태를 조회하는 map사용
+    const confirmedSellers = await this.getConfirmedSellers();
+
     const list = items.map((item) => {
       const defaultOption = item.options.find((opt) => opt.default_option === 'y');
       return {
@@ -111,6 +140,7 @@ export class AdminService {
               shipping_group_name: item.ShippingGroup.shipping_group_name,
             }
           : undefined,
+        businessRegistrationStatus: confirmedSellers.get(item.sellerId),
       };
     });
 
