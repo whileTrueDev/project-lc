@@ -470,6 +470,7 @@ model LiveShopping {
   sellEndDate        DateTime? // 라이브커머스 상품판매 종료 시간
   createDate         DateTime       @default(now())
   rejectionReason    String?        @db.Text // 방송 취소 또는 거절 사유
+  videoUrl           String?        @db.Text
   sellerContacts     SellerContacts @relation(fields: [contactId], references: [id], onDelete: Cascade)
   seller             Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   goods              Goods          @relation(fields: [goodsId], references: [id], onDelete: Cascade)

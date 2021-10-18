@@ -1,6 +1,6 @@
 import React from 'react';
-import { ChakraNextImage } from '@project-lc/components';
-import { Box, Text } from '@chakra-ui/react';
+import { Text } from '@chakra-ui/react';
+import { ChakraNextImage } from './ChakraNextImage';
 import twitchLogo from '../../images/twitchLogo.png';
 import youtubeLogo from '../../images/youtubeLogo.png';
 import afreecaLogo from '../../images/afreecaLogo.png';

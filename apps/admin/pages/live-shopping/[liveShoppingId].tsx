@@ -11,10 +11,10 @@ import {
   AccordionIcon,
   AccordionPanel,
   Text,
-  Badge,
   Grid,
   useToast,
   Divider,
+  Input,
 } from '@chakra-ui/react';
 import {
   AdminPageLayout,
@@ -32,6 +32,7 @@ import {
   SectionWithTitle,
   BroadcasterName,
   AdminLiveShoppingUpdateConfirmModal,
+  LiveShoppingProgressConverter,
 } from '@project-lc/components';
 import {
   useAdminLiveShoppingList,
@@ -43,33 +44,6 @@ import {
 import { useRouter } from 'next/router';
 import { FormProvider, useForm } from 'react-hook-form';
 import dayjs from 'dayjs';
-import { FaGalacticSenate } from 'react-icons/fa';
-
-function switchStatus(progress: string, startDate?: Date, endDate?: Date): JSX.Element {
-  if (startDate && endDate) {
-    if (
-      new Date(startDate).valueOf() < new Date().valueOf() &&
-      new Date(endDate).valueOf() > new Date().valueOf() &&
-      progress === 'confirmed'
-    ) {
-      return <Badge colorScheme="blue">라이브 진행중</Badge>;
-    }
-    if (new Date(endDate).valueOf() < new Date().valueOf() && progress === 'confirmed') {
-      return <Badge colorScheme="telegram">방송종료</Badge>;
-    }
-  }
-
-  switch (progress) {
-    case 'adjust':
-      return <Badge colorScheme="purple">조율중</Badge>;
-    case 'confirmed':
-      return <Badge colorScheme="orange">확정</Badge>;
-    case 'cancel':
-      return <Badge colorScheme="red">취소</Badge>;
-    default:
-      return <Badge>등록됨</Badge>;
-  }
-}
 
 export function GoodsDetail(): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
@@ -100,6 +74,7 @@ export function GoodsDetail(): JSX.Element {
       sellStartDate: '',
       sellEndDate: '',
       rejectionReason: '',
+      videoUrl: '',
     },
   });
   const toast = useToast();
@@ -109,6 +84,7 @@ export function GoodsDetail(): JSX.Element {
       title: '변경 완료',
       status: 'success',
     });
+    router.reload();
   };
 
   const onFail = (): void => {
@@ -117,13 +93,14 @@ export function GoodsDetail(): JSX.Element {
       status: 'error',
     });
   };
-  console.log(liveShopping);
-  const { handleSubmit } = methods;
-  const regist = (data: any): void => {
+  const { handleSubmit, register } = methods;
+  const regist = async (data: any): Promise<void> => {
     const dto = Object.assign(data, { liveShoppingId });
-    console.log(dto);
+    mutateAsync(dto).then(onSuccess).catch(onFail);
+  };
+
+  const openConfirm = (): void => {
     setIsOpen(true);
-    // mutateAsync(dto).then(onSuccess).catch(onFail);
   };
 
   if (liveShoppingIsLoading || goods.isLoading)
@@ -151,7 +128,6 @@ export function GoodsDetail(): JSX.Element {
             >
               목록으로
             </Button>
-            {/* 상품 검수를 위한 버튼 */}
           </Flex>
         </Box>
         {/* 상품 제목 */}
@@ -160,13 +136,18 @@ export function GoodsDetail(): JSX.Element {
         )}
         <Grid templateColumns="repeat(2, 1fr)" justifyItems="start">
           <Stack spacing={5}>
+            <Text as="span">판매자 : {liveShopping[0].seller.sellerShop.shopName}</Text>
+
             <Stack direction="row" alignItems="center">
               <Text as="span">진행상태</Text>
-              {switchStatus(
-                liveShopping[0].progress,
-                liveShopping[0].broadcastStartDate,
-                liveShopping[0].broadcastEndDate,
-              )}
+              <LiveShoppingProgressConverter
+                progress={liveShopping[0].progress}
+                startDate={liveShopping[0].broadcastStartDate}
+                endDate={liveShopping[0].broadcastEndDate}
+              />
+              {liveShopping[0].progress === 'cancel' ? (
+                <Text>사유 : {liveShopping[0].rejectionReason}</Text>
+              ) : null}
             </Stack>
             <Divider />
             <Stack direction="row" alignItems="center">
@@ -221,7 +202,7 @@ export function GoodsDetail(): JSX.Element {
             </Stack>
           </Stack>
           <FormProvider {...methods}>
-            <Stack as="form" spacing={5} onSubmit={handleSubmit(regist)}>
+            <Stack as="form" spacing={5}>
               <LiveShoppingProgressSelector />
               <Divider />
               <BroadcasterAutocomplete data={broadcaster} />
@@ -241,16 +222,17 @@ export function GoodsDetail(): JSX.Element {
                 registerName="sellStartDate"
               />
               <LiveShoppingDatePicker title="판매 종료시간" registerName="sellEndDate" />
-              <Button type="submit">등록</Button>
+              <Divider />
+              <Stack>
+                <Text>영상 URL</Text>
+                <Input {...register('videoUrl')} />
+              </Stack>
+              <Button onClick={openConfirm}>등록</Button>
             </Stack>
             <AdminLiveShoppingUpdateConfirmModal
               isOpen={isOpen}
               onClose={onClose}
-              onConfirm={() => {
-                console.log('제출');
-                return 'succeed';
-                // mutateAsync(dto).then(onSuccess).catch(onFail);
-              }}
+              onConfirm={handleSubmit(regist)}
             />
           </FormProvider>
         </Grid>

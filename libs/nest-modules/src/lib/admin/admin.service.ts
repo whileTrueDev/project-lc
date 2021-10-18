@@ -275,6 +275,7 @@ export class AdminService {
         sellStartDate: new Date(dto.sellStartDate) || undefined,
         sellEndDate: new Date(dto.sellEndDate) || undefined,
         rejectionReason: dto.rejectionReason || undefined,
+        videoUrl: dto.videoUrl || undefined,
       },
       where: {
         id: Number(dto.liveShoppingId),

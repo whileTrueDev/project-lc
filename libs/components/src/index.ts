@@ -89,3 +89,4 @@ export * from './lib/LiveShoppingProgressSelector';
 export * from './lib/LiveShoppingDatePicker';
 export * from './lib/MypageOrderStats';
 export * from './lib/BroadcasterName';
+export * from './lib/LiveShoppingProgressConverter';
