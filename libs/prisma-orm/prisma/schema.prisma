@@ -146,7 +146,7 @@ model Goods {
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
   GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
-  goodsInfoId             Int?               @unique
+  goodsInfoId             Int?
 
   @@index([sellerId], name: "sellerId")
 }
@@ -200,7 +200,7 @@ model GoodsImages {
   id         Int    @id @default(autoincrement())
   goods      Goods? @relation(fields: [goodsId], references: [id], onDelete: Cascade)
   goodsId    Int?
-  image      String
+  image      String @db.VarChar(500)
   cut_number Int
 }
 
