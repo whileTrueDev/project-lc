@@ -36,12 +36,16 @@ export function AdminLiveShoppingList(): JSX.Element {
               <NextLink key={row.id} href={`/live-shopping/${row.id}`}>
                 <Link as="tr">
                   <Td>{row.id}</Td>
-
                   <Td>{dayjs(row.createDate).format('YYYY/MM/DD HH:mm')}</Td>
                   <Td>{row.goods.goods_name}</Td>
                   <Td>{row.seller.sellerShop.shopName}</Td>
                   <Td>
-                    <LiveShoppingProgressConverter progress={row.progress} />
+                    <LiveShoppingProgressConverter
+                      progress={row.progress}
+                      broadcastStartDate={row.broadcastStartDate}
+                      broadcastEndDate={row.broadcastEndDate}
+                      sellEndDate={row.sellEndDate}
+                    />
                   </Td>
                   <Td>
                     <BroadcasterName data={row.broadcaster} />

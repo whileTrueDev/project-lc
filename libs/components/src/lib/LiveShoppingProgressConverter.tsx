@@ -2,19 +2,30 @@ import { Badge } from '@chakra-ui/react';
 
 export function LiveShoppingProgressConverter(props: {
   progress: string;
-  startDate?: Date;
-  endDate?: Date;
+  broadcastStartDate: Date | null;
+  broadcastEndDate: Date | null;
+  sellEndDate: Date | null;
 }): JSX.Element {
-  const { progress, startDate, endDate } = props;
-  if (startDate && endDate) {
+  const { progress, broadcastStartDate, broadcastEndDate, sellEndDate } = props;
+  if (broadcastStartDate && broadcastEndDate) {
     if (
-      new Date(startDate).valueOf() < new Date().valueOf() &&
-      new Date(endDate).valueOf() > new Date().valueOf() &&
-      progress === 'confirmed'
+      sellEndDate &&
+      new Date(sellEndDate).valueOf() < new Date().valueOf() &&
+      progress === 'confirm'
+    ) {
+      return <Badge colorScheme="teal">판매종료</Badge>;
+    }
+    if (
+      new Date(broadcastStartDate).valueOf() < new Date().valueOf() &&
+      new Date(broadcastEndDate).valueOf() > new Date().valueOf() &&
+      progress === 'confirm'
     ) {
       return <Badge colorScheme="blue">라이브 진행중</Badge>;
     }
-    if (new Date(endDate).valueOf() < new Date().valueOf() && progress === 'confirmed') {
+    if (
+      new Date(broadcastEndDate).valueOf() < new Date().valueOf() &&
+      progress === 'confirm'
+    ) {
       return <Badge colorScheme="telegram">방송종료</Badge>;
     }
   }

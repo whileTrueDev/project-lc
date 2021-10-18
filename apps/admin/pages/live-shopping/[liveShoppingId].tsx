@@ -46,8 +46,20 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { LiveShoppingDTO } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 
-export function GoodsDetail(): JSX.Element {
+function getDuration(startDate: Date, endDate: Date): string {
   let duration;
+  if (startDate && startDate) {
+    const startTime = new Date(startDate);
+    const endTime = new Date(endDate);
+    duration = endTime.valueOf() - startTime.valueOf();
+    duration = (duration / (1000 * 60 * 60)) % 24;
+    duration = duration.toFixed(1);
+    return `${String(duration)}시간`;
+  }
+  return '미정';
+}
+
+export function GoodsDetail(): JSX.Element {
   const router = useRouter();
   const liveShoppingId = router.query.liveShoppingId as string;
   const { data: profileData } = useProfile();
@@ -116,13 +128,6 @@ export function GoodsDetail(): JSX.Element {
   if (!goods.isLoading && !goods.data)
     return <AdminPageLayout>...no data</AdminPageLayout>;
 
-  if (liveShopping[0].broadcastStartDate && liveShopping[0].broadcastEndDate) {
-    const startTime = new Date(liveShopping[0].broadcastStartDate);
-    const endTime = new Date(liveShopping[0].broadcastEndDate);
-    duration = endTime.valueOf() - startTime.valueOf();
-    duration = (duration / (1000 * 60 * 60)) % 24;
-  }
-
   return (
     <AdminPageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={8} p={2} mb={16}>
@@ -152,8 +157,9 @@ export function GoodsDetail(): JSX.Element {
               <Text as="span">진행상태</Text>
               <LiveShoppingProgressConverter
                 progress={liveShopping[0].progress}
-                startDate={liveShopping[0].broadcastStartDate}
-                endDate={liveShopping[0].broadcastEndDate}
+                broadcastStartDate={liveShopping[0].broadcastStartDate}
+                broadcastEndDate={liveShopping[0].broadcastEndDate}
+                sellEndDate={liveShopping[0].sellEndDate}
               />
               {liveShopping[0].progress === 'cancel' ? (
                 <Text>사유 : {liveShopping[0].rejectionReason}</Text>
@@ -189,7 +195,10 @@ export function GoodsDetail(): JSX.Element {
             <Stack direction="row" alignItems="center">
               <Text as="span">방송시간: </Text>
               <Text as="span" fontWeight="bold">
-                {duration ? `${duration} 시간` : '미정'}
+                {getDuration(
+                  liveShopping[0].broadcastStartDate,
+                  liveShopping[0].broadcastEndDate,
+                )}
               </Text>
             </Stack>
             <Divider />
@@ -208,6 +217,12 @@ export function GoodsDetail(): JSX.Element {
                 {liveShopping[0].sellEndDate
                   ? dayjs(liveShopping[0].sellEndDate).format('YYYY/MM/DD HH:mm')
                   : '미정'}
+              </Text>
+            </Stack>
+            <Stack direction="row" alignItems="center">
+              <Text as="span">판매시간: </Text>
+              <Text as="span" fontWeight="bold">
+                {getDuration(liveShopping[0].sellStartDate, liveShopping[0].sellEndDate)}
               </Text>
             </Stack>
           </Stack>
