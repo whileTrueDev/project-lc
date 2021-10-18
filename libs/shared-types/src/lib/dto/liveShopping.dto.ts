@@ -55,3 +55,8 @@ export class LiveShoppingDTO {
   @IsDate()
   createDate: string;
 }
+
+export type LiveShoppingRegistDTO = Pick<
+  LiveShoppingDTO,
+  'requests' | 'goods_id' | 'contactId' | 'streamId' | 'progress'
+>;
