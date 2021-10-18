@@ -137,6 +137,8 @@ function ExportOrderShippingListItem({
     shippingIndex,
   ]);
 
+  console.log(shipping);
+
   return (
     <Box
       pt={2}

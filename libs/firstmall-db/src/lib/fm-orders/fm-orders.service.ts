@@ -239,6 +239,7 @@ export class FmOrdersService {
     const shippingResult = await this.findOneOrderShippingInfo(
       orderId,
       orderInfo.shipping_seq,
+      goodsIds,
     );
     const totalShippingCost = await this.findOrderTotalShippingCost(
       orderId,
@@ -603,6 +604,7 @@ export class FmOrdersService {
   private async findOneOrderShippingInfo(
     orderId: number | string,
     shipping_seq: string,
+    goodsIds: number[],
   ): Promise<FmOrderShipping[]> {
     const shippingResult: FmOrderShipping[] = await this.db.query(
       `SELECT
@@ -626,8 +628,12 @@ export class FmOrdersService {
             fm_order_item.image,
             fm_order_item.item_seq,
             shipping_seq
-          FROM fm_order_item WHERE shipping_seq = ? AND order_seq = ?`,
-          [sh.shipping_seq, orderId],
+          FROM fm_order_item
+          WHERE
+            shipping_seq = ?
+            AND order_seq = ? 
+            AND goods_seq IN (?)`,
+          [sh.shipping_seq, orderId, goodsIds],
         );
 
         // * 해당 item의 옵션 정보 조회
