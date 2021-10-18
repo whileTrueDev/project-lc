@@ -34,6 +34,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
+    setValue,
   } = useForm<LoginSellerDto>();
 
   // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
@@ -48,12 +49,13 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
     async (data: LoginSellerDto) => {
       const seller = await login.mutateAsync(data).catch((err) => {
         setFormError(getMessage(err?.response.data?.status));
+        setValue('password', '');
       });
       if (seller) {
         router.push('/');
       }
     },
-    [router, setFormError, login],
+    [login, setValue, router],
   );
 
   function getMessage(statusCode: number | undefined): string {
