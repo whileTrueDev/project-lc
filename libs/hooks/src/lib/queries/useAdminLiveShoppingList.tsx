@@ -1,6 +1,7 @@
 import { LiveShopping } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
+import { BroadcasterDTO } from '@project-lc/shared-types';
 import axios from '../../axios';
 
 interface LiveShoppingWithGoods extends LiveShopping {
@@ -14,9 +15,7 @@ interface LiveShoppingWithGoods extends LiveShopping {
       shopName: string;
     };
   };
-  broadcaster: {
-    userNickname: string;
-  };
+  broadcaster: BroadcasterDTO;
 }
 
 export const getAdminLiveShoppingList = async (

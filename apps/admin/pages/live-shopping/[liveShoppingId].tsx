@@ -47,10 +47,6 @@ import { LiveShoppingDTO } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 
 export function GoodsDetail(): JSX.Element {
-  const [isOpen, setIsOpen] = useState(false);
-  const onClose = (): void => {
-    setIsOpen(false);
-  };
   let duration;
   const router = useRouter();
   const liveShoppingId = router.query.liveShoppingId as string;
@@ -79,6 +75,14 @@ export function GoodsDetail(): JSX.Element {
     },
   });
   const toast = useToast();
+  const [isOpen, setIsOpen] = useState(false);
+  const onClose = (): void => {
+    setIsOpen(false);
+  };
+
+  const openConfirmModal = (): void => {
+    setIsOpen(true);
+  };
 
   const onSuccess = (): void => {
     toast({
@@ -94,6 +98,7 @@ export function GoodsDetail(): JSX.Element {
       status: 'error',
     });
   };
+
   const { handleSubmit, register } = methods;
   const regist = async (
     data: Omit<
@@ -101,12 +106,8 @@ export function GoodsDetail(): JSX.Element {
       'streamId' | 'sellerId' | 'goods_id' | 'contactId' | 'requests'
     >,
   ): Promise<void> => {
-    const dto = Object.assign(data, { liveShoppingId });
+    const dto = Object.assign(data, { id: liveShoppingId });
     mutateAsync(dto).then(onSuccess).catch(onFail);
-  };
-
-  const openConfirm = (): void => {
-    setIsOpen(true);
   };
 
   if (liveShoppingIsLoading || goods.isLoading)
@@ -236,7 +237,7 @@ export function GoodsDetail(): JSX.Element {
                 <Text>영상 URL</Text>
                 <Input {...register('videoUrl')} />
               </Stack>
-              <Button onClick={openConfirm}>등록</Button>
+              <Button onClick={openConfirmModal}>등록</Button>
             </Stack>
             <AdminLiveShoppingUpdateConfirmModal
               isOpen={isOpen}

@@ -269,10 +269,14 @@ export class AdminService {
       data: {
         progress: dto.progress || undefined,
         broadcasterId: dto.broadcasterId || undefined,
-        broadcastStartDate: new Date(dto.broadcastStartDate) || undefined,
-        broadcastEndDate: new Date(dto.broadcastEndDate) || undefined,
-        sellStartDate: new Date(dto.sellStartDate) || undefined,
-        sellEndDate: new Date(dto.sellEndDate) || undefined,
+        broadcastStartDate: dto.broadcastStartDate
+          ? new Date(dto.broadcastStartDate)
+          : undefined,
+        broadcastEndDate: dto.broadcastEndDate
+          ? new Date(dto.broadcastEndDate)
+          : undefined,
+        sellStartDate: dto.sellStartDate ? new Date(dto.sellStartDate) : undefined,
+        sellEndDate: dto.sellEndDate ? new Date(dto.sellEndDate) : undefined,
         rejectionReason: dto.rejectionReason || undefined,
         videoUrl: dto.videoUrl || undefined,
       },
