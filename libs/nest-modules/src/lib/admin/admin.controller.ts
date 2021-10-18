@@ -8,8 +8,13 @@ import {
   Put,
   Query,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
-import { BusinessRegistrationConfirmation, GoodsConfirmation } from '@prisma/client';
+import {
+  GoodsConfirmation,
+  LiveShopping,
+  BusinessRegistrationConfirmation,
+} from '@prisma/client';
 import {
   GoodsByIdRes,
   GoodsConfirmationDto,
@@ -19,16 +24,19 @@ import {
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   AdminSettlementInfoType,
+  LiveShoppingDTO,
+  BroadcasterDTO,
 } from '@project-lc/shared-types';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
-import { AdminService } from './admin.service';
+import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { AdminSettlementService } from './admin-settlement.service';
-
+import { AdminService } from './admin.service';
 @Controller('admin')
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
+    private readonly broadcasterService: BroadcasterService,
     private readonly adminSettlementService: AdminSettlementService,
   ) {}
 
@@ -81,6 +89,30 @@ export class AdminController {
   @Put('/goods/reject')
   setGoodsRejection(@Body() dto: GoodsRejectionDto): Promise<GoodsConfirmation> {
     return this.adminService.setGoodsRejection(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Get('/live-shopping')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  getLiveShoppings(@Query('liveShoppingId') dto?: string): Promise<LiveShopping[]> {
+    return this.adminService.getRegisteredLiveShoppings(dto || null);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Patch('/live-shopping')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  updateLiveShoppings(@Body() dto: LiveShoppingDTO): Promise<boolean> {
+    return this.adminService.updateLiveShoppings(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Get('/live-shopping/broadcaster')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  getAllBroadcasters(): Promise<BroadcasterDTO[]> {
+    return this.broadcasterService.getAllBroadcasterIdAndNickname();
   }
 
   // 상품 검수 승인을 수행

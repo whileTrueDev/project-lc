@@ -6,8 +6,10 @@ import {
   GoodsRejectionDto,
   BusinessRegistrationStatus,
   AdminSettlementInfoType,
+  LiveShoppingDTO,
 } from '@project-lc/shared-types';
-import { GoodsConfirmation } from '@prisma/client';
+import { GoodsConfirmation, LiveShopping } from '@prisma/client';
+
 @Injectable()
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
@@ -233,5 +235,59 @@ export class AdminService {
         GoodsInfo: true,
       },
     });
+  }
+
+  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
+    return this.prisma.liveShopping.findMany({
+      where: { id: id ? Number(id) : undefined },
+      include: {
+        goods: {
+          select: {
+            goods_name: true,
+            summary: true,
+          },
+        },
+        seller: {
+          select: {
+            sellerShop: true,
+          },
+        },
+        broadcaster: {
+          select: {
+            userNickname: true,
+            afreecaId: true,
+            twitchId: true,
+            youtubeId: true,
+          },
+        },
+      },
+    });
+  }
+
+  public async updateLiveShoppings(dto: LiveShoppingDTO): Promise<boolean> {
+    const liveShoppingUpdate = await this.prisma.liveShopping.update({
+      data: {
+        progress: dto.progress || undefined,
+        broadcasterId: dto.broadcasterId || undefined,
+        broadcastStartDate: dto.broadcastStartDate
+          ? new Date(dto.broadcastStartDate)
+          : undefined,
+        broadcastEndDate: dto.broadcastEndDate
+          ? new Date(dto.broadcastEndDate)
+          : undefined,
+        sellStartDate: dto.sellStartDate ? new Date(dto.sellStartDate) : undefined,
+        sellEndDate: dto.sellEndDate ? new Date(dto.sellEndDate) : undefined,
+        rejectionReason: dto.rejectionReason || undefined,
+        videoUrl: dto.videoUrl || undefined,
+      },
+      where: {
+        id: Number(dto.id),
+      },
+    });
+    if (!liveShoppingUpdate) {
+      throw new Error(`업데이트 실패`);
+    }
+
+    return true;
   }
 }
