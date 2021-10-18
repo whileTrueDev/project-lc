@@ -77,4 +77,4 @@ export * from './lib/TextViewerWithDetailModal';
 export * from './lib/admin/AdminGoodsStatusButtons';
 export * from './lib/SellerStatusSection';
 export * from './lib/ShopInfoShippingGroup';
-export * from './lib/MypageOrderStats';
+export * from './lib/MypageStatsSection';
