@@ -12,7 +12,7 @@ type ImageInputProps = {
   variant?: 'unstyle' | 'chakra';
   size?: ButtonProps['size'];
   imageSizeLimit?: number; // 업로드 파일 용량 제한
-} & React.HTMLProps<HTMLButtonElement>;
+} & Pick<React.HTMLProps<HTMLButtonElement>, 'required' | 'multiple'>;
 
 export function ImageInput({
   handleSuccess,
