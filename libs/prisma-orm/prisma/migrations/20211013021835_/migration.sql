@@ -8,4 +8,4 @@
 CREATE UNIQUE INDEX `Goods_goodsInfoId_key` ON `Goods`(`goodsInfoId`);
 
 -- RenameIndex
-ALTER TABLE `GoodsOptionsSupplies` RENAME INDEX `GoodsOptionsSupplies_goodsOptionsId_key` TO `GoodsOptionsSupplies_goodsOptionsId_unique`;
+-- ALTER TABLE `GoodsOptionsSupplies` RENAME INDEX `GoodsOptionsSupplies_goodsOptionsId_key` TO `GoodsOptionsSupplies_goodsOptionsId_unique`;
