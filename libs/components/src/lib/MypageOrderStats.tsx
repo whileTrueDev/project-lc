@@ -1,26 +1,42 @@
-import { Flex, Text, Stat, StatLabel, StatNumber, StatHelpText } from '@chakra-ui/react';
+import {
+  Flex,
+  Text,
+  Stat,
+  StatLabel,
+  StatNumber,
+  Box,
+  Grid,
+  GridItem,
+} from '@chakra-ui/react';
 import { useFmOrdersStats } from '@project-lc/hooks';
-import { useEffect } from 'react';
+import { orderKeys, OrderStatsKeyType } from '@project-lc/shared-types';
 
 export function MypageOrderStats(): JSX.Element {
-  const orders = useFmOrdersStats();
-
-  useEffect(() => {
-    console.log(orders);
-  }, [orders]);
+  const { data } = useFmOrdersStats();
 
   return (
-    <Flex direction={['column', 'column', 'column', 'row']}>
-      <Stat>
-        <StatLabel fontSize="lg">정산 예정 금액</StatLabel>
-        <StatNumber fontSize={['4xl', '5xl', '5xl', '5xl']}>
-          20,000
-          <Text ml={1} as="span" fontSize="2xl">
-            원
-          </Text>
-        </StatNumber>
-        <StatHelpText>2021.08.02 - 2021.08.15</StatHelpText>
-      </Stat>
-    </Flex>
+    <Grid templateColumns={`repeat(${orderKeys.length}, 1fr)`}>
+      {orderKeys.map((key) => {
+        return (
+          <GridItem key={`${key}`} p={5}>
+            <Box p={[2, 2, 5, 5]} display="flex" justifyContent="center">
+              <Flex direction={['column', 'column', 'column', 'row']}>
+                <Stat>
+                  <StatLabel fontSize="xl">
+                    <Flex alignItems="center">{key}</Flex>
+                  </StatLabel>
+                  <StatNumber fontSize={['3xl', '4xl', '4xl', '4xl']}>
+                    {data?.orders[key as OrderStatsKeyType] || 0}
+                    <Text ml={1} as="span" fontSize="xl">
+                      건
+                    </Text>
+                  </StatNumber>
+                </Stat>
+              </Flex>
+            </Box>
+          </GridItem>
+        );
+      })}
+    </Grid>
   );
 }
