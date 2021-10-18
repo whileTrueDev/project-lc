@@ -64,16 +64,35 @@ model BusinessRegistrationConfirmation {
 
 // 정산 내역
 model SellerSettlements {
-  id          Int      @id @default(autoincrement()) // 정산 내역 고유 번호
-  sellerEmail String // 등록한 판매자 ID 
-  date        DateTime @default(now()) // 정산 시점
-  state       Int      @default(0) @db.UnsignedTinyInt // 정산 상태
-  amount      Int      @default(0)
-  seller      Seller   @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  id                        Int       @id @default(autoincrement()) // 정산 내역 고유 번호
+  state                     Int       @default(0) @db.UnsignedTinyInt // 정산 상태
+  amount                    Int       @default(0) // 총 정산 금액
+  round                     String // 정산회차 연도/월/차수
+  date                      DateTime  @default(now()) // 정산마감일: 정산이 마감된 날짜 = 정산 시점
+  startDate                 DateTime // 발생일: 정산대상(결제/취소/환불/...)이 발생한 날짜
+  doneDate                  DateTime? // 완료일: 정산대상(구매확정/취소/환불/...)이 완료된 날짜
+  totalCommissionRate       Decimal // 총 수수료율 (0%~100% 사이값)
+  broadcasterCommissionRate Decimal // 방송인 수수료율 (0%~100% 사이값)
+  whiletrueCommissionRate   Decimal // 와일트루 수수료율 (0%~100% 사이값)
+  totalCommission           Int // 총 수수료 금액
+  broadcasterCommission     Int // 방송인 수수료 금액
+  whiletrueCommission       Int // 와일트루 수수료 금액
+  pgCommission              Int // 전자결제 수수료
+  pgCommissionRate          Decimal // 전자결제 수수료율
+  paymentMethod             String // 결제수단
+  pg                        String // pg사
+  orderId                   String? // 주문 고유번호 (퍼스트몰 테이블의 고유번호)
+  refundId                  String? // 환불 고유번호 (퍼스트몰 테이블의 고유번호)
+  liveShoppingId            Int?      @unique // 라이브쇼핑 고유번호 (Relational)
+  sellerEmail               String // 등록한 판매자 ID
+
+  seller       Seller        @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  liveShopping LiveShopping? @relation(fields: [liveShoppingId], references: [id], onDelete: NoAction)
 
   @@index([sellerEmail, id], name: "SellerSettlementsIndex")
 }
 
+// 판매자 정산 계좌 정보
 model SellerSettlementAccount {
   id                         Int    @id @default(autoincrement())
   sellerEmail                String
@@ -345,7 +364,7 @@ model ShippingSet {
   shippingGroup       ShippingGroup      @relation(fields: [shipping_group_seq], references: [id], onDelete: Cascade)
   // 이하 퍼스트몰 fm_shipping_set 과 동일한 컬럼
   shipping_group_seq  Int
-  shipping_set_code   ShippingSetCode    @default(delivery) // '배송설정 코드', delivery 택배/direct_delivery 직접배송/quick 퀵서비스/freight 화물배송/custom 직접입력/direct_store 매장수령
+  shipping_set_code   ShippingSetCode    @default(delivery) // '배송설정 코드', delivery 택배/direct_delivery 직접���송/quick 퀵서비스/freight 화물배송/custom 직접입력/direct_store 매장수령
   shipping_set_name   String             @db.VarChar(50) // 배송설정 명',
   default_yn          YesOrNo_UPPERCASE? @default(N) // 대표 선택 여부 - 추후 배송가능 국가별 대표지정 현재안씀.',
   delivery_nation     DeliveryNation     @default(korea) // '배송가능국가',
@@ -437,6 +456,7 @@ model LiveCommerceRanking {
   createDate         DateTime    @default(now()) // 작성일자
 }
 
+// 방송인
 model Broadcaster {
   id                  Int                   @id @default(autoincrement())
   liveCommerceRanking LiveCommerceRanking[]
@@ -456,17 +476,28 @@ model Broadcaster {
 
 // 라이브 쇼핑
 model LiveShopping {
-  id             Int            @id @default(autoincrement())
-  streamId       String?        @unique // 방송마다 부여되는 unique 값
-  broadcasterId  String?        @db.VarChar(20) // 스트리머의 아이디 
-  sellerId       Int // 판매자 ID
-  goodsId        Int // 상품 ID
-  contactId      Int // 판매자 등록된 연락처 ID
-  requests       String?        @db.LongText // 요청사항
-  progress       String         @default("registered") // 진행상태
-  sellerContacts SellerContacts @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  seller         Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  goods          Goods          @relation(fields: [goodsId], references: [id], onDelete: Cascade)
-  broadcaster    Broadcaster?   @relation(fields: [broadcasterId], references: [userId])
-  createDate     DateTime       @default(now())
+  id                        Int      @id @default(autoincrement())
+  streamId                  String?  @unique // 방송마다 부여되는 unique 값
+  broadcasterId             String?  @db.VarChar(20) // 스트리머의 아이디 
+  sellerId                  Int // 판매자 ID
+  goodsId                   Int // 상품 ID
+  contactId                 Int // 판매자 등록된 연락처 ID
+  requests                  String?  @db.LongText // 요청사항
+  progress                  String   @default("registered") // 진행상태
+  broadcasterCommissionRate Decimal // 판매금 중, 방송인이 가져가는 수수료 (0%~100% 사이값)
+  whiletrueCommissionRate   Decimal // 판매금 중, project-lc(와일트루)가 가져가는 수수료 (0%~100% 사이값)
+  createDate                DateTime @default(now())
+
+  sellerContacts    SellerContacts     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  seller            Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  goods             Goods              @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  broadcaster       Broadcaster?       @relation(fields: [broadcasterId], references: [userId])
+  sellerSettlements SellerSettlements?
+}
+
+// 판매 수수료
+model SellCommission {
+  id                Int     @id @default(autoincrement())
+  commissionRate    Decimal @default("5.00") // 판매 수수료 퍼센티지 (0%~100% 사이값)
+  commissionDecimal Decimal @default("0.05") // 0~1사이의 값으로 표현한 판매수수료
 }
