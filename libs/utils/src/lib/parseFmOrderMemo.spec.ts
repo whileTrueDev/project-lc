@@ -1,6 +1,17 @@
 import { FmOrderMemoParser } from './fmOrderMemoParser';
 
 describe('FmOrderMemoParser', () => {
+  test('파싱가능하지 않은 배송메모 문자열인 경우 memo가 문자열 그대로를 반환해야 한다', () => {
+    const teststring = `집앞에 두세요.`;
+    const parser = new FmOrderMemoParser(teststring);
+    expect(parser.memo).toEqual(teststring);
+    expect(parser.broadcaster).toEqual(null);
+    expect(parser.buyer).toEqual(null);
+    expect(parser.donationMessaage).toEqual(null);
+    expect(parser.phoneEventFlag).toEqual(false);
+    expect(parser.giftFlag).toEqual(false);
+  });
+
   test('통화이벤트O, 선물O', () => {
     const teststring = `1. 배송메모 : 집앞에 두세요.,
 2. 크리에이터 채널명 : 크리에이터이름,

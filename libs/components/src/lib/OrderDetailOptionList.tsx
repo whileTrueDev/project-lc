@@ -15,6 +15,7 @@ import { useDisplaySize } from '@project-lc/hooks';
 import {
   convertFmOrderShippingTypesToString,
   FindFmOrderDetailRes,
+  FmOrderItem,
   FmOrderOption,
 } from '@project-lc/shared-types';
 import { useMemo } from 'react';
@@ -24,8 +25,10 @@ import { FmOrderStatusBadge, ShowMoreTextButton, TextDotConnector } from '..';
 export function OrderDetailOptionList({
   order,
   options,
+  orderItem,
 }: {
   order: FindFmOrderDetailRes;
+  orderItem: FmOrderItem;
   options: FmOrderOption[];
 }): JSX.Element {
   const displaySize = useDisplaySize();
@@ -37,7 +40,11 @@ export function OrderDetailOptionList({
 
       {/* 태블릿 이상의 크기에서만 보여줌 */}
       {!displaySize.isMobileSize && (
-        <OrderDetailOptionDescription order={order} options={options} />
+        <OrderDetailOptionDescription
+          order={order}
+          orderItem={orderItem}
+          options={options}
+        />
       )}
     </Box>
   );
@@ -76,23 +83,35 @@ export function OrderDetailOptionListItem({
 /** 주문 옵션 목록 자세히보기 */
 export function OrderDetailOptionDescription({
   order,
+  orderItem,
   options,
 }: {
   order: FindFmOrderDetailRes;
+  orderItem: FmOrderItem;
   options: FmOrderOption[];
 }): JSX.Element {
   const { isOpen, onToggle } = useDisclosure({});
+
+  const shipping = useMemo(
+    () => order.shippings.find((x) => orderItem.shipping_seq === x.shipping_seq),
+    [order.shippings, orderItem.shipping_seq],
+  );
+
   return (
     <Box mt={2}>
       <ShowMoreTextButton onClick={onToggle} isOpen={isOpen} />
 
       <Collapse in={isOpen} animateOpacity unmountOnExit>
         <Box mt={2}>
-          {order.shipping_type && order.shipping_cost && (
+          {shipping && (
             <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
-              <Text>{convertFmOrderShippingTypesToString(order.shipping_type)}</Text>
-              <TextDotConnector />
-              <Text>배송비: {Number(order.shipping_cost).toLocaleString()} 원</Text>
+              <Text>{convertFmOrderShippingTypesToString(orderItem.shipping_type)}</Text>
+              {orderItem.shipping_type === 'free' ? null : (
+                <>
+                  <TextDotConnector />
+                  <Text>배송비: {Number(shipping.shippingCost).toLocaleString()} 원</Text>
+                </>
+              )}
             </Stack>
           )}
 

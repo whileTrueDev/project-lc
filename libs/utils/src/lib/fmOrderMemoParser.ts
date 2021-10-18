@@ -78,6 +78,18 @@ export class FmOrderMemoParser {
    * @returns {FmOrderMemoItem}
    */
   public parse(s: string): FmOrderMemoItem {
+    const parsableStringRegexp =
+      /(1. 배송메모 : )(.*?)(,)\n(2. 크리에이터 채널명 : )(.*)(,)\n(3. 작성자 : )(.*?)(,)\n(4. 응원내용 : )(.*)(,)\n(5. 통화 이벤트 : )(.*?)(,)\n(6. 선물하기 여부 : )(.*)/g;
+    const isParsable = parsableStringRegexp.test(s);
+    if (!isParsable)
+      return {
+        memo: s,
+        broadcaster: null,
+        buyer: null,
+        donationMessaage: null,
+        phoneEventFlag: false,
+        giftFlag: false,
+      };
     return {
       memo: this.parseMemo(s),
       broadcaster: this.parseBroadcaster(s),

@@ -58,9 +58,12 @@ export class FmOrdersController {
   /** 개별 주문 조회 */
   @Get(':orderId')
   async findOneOrder(
+    @SellerInfo() seller: UserPayload,
     @Param('orderId') orderId: string,
   ): Promise<FindFmOrderDetailRes | null> {
-    return this.fmOrdersService.findOneOrder(orderId);
+    // 판매자의 승인된 상품 ID 목록 조회
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    return this.fmOrdersService.findOneOrder(orderId, ids);
   }
 
   @Put(':orderId')
