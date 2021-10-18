@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { GoodsImages, GoodsView, Seller } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsByIdRes,
@@ -391,9 +392,22 @@ export class GoodsService {
 
   /** 여러 상품이미지 등록 - 생성된 goodsImage[] 리턴 */
   async registGoodsImages(dto: GoodsImageDto[]): Promise<GoodsImages[]> {
-    await this.prisma.goodsImages.createMany({
-      data: dto,
-    });
+    try {
+      await this.prisma.goodsImages.createMany({
+        data: dto,
+      });
+    } catch (e) {
+      console.error(e);
+      if (e instanceof PrismaClientKnownRequestError) {
+        if (e.code === 'P2000') {
+          // GoodsImages.image 컬럼 타입보다 들어온 값이 큰 경우
+          throw new BadRequestException(
+            '파일 명이 너무 깁니다. 파일 명을 줄여서 다시 시도해주세요.',
+          );
+        }
+      }
+      throw new InternalServerErrorException('error in registGoodsImages');
+    }
 
     return this.prisma.goodsImages.findMany({
       where: { image: { in: dto.map((item) => item.image) } },

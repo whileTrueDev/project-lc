@@ -67,40 +67,7 @@ export async function uploadGoodsImageToS3(
   const type = 'goods';
   const timestampFilename = addTimeStampToFilename(filename);
   const key = path.join(...[type, userMail, timestampFilename]);
-  await s3.s3uploadFile({ key, file, contentType });
-  const url = [
-    'https://',
-    process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-    '.s3.',
-    'ap-northeast-2',
-    '.amazonaws.com/',
-    key,
-  ].join('');
-
-  return url;
-}
-
-// 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
-// 상품사진은 file 로 들어옴
-export async function imageFileListToImageDto(
-  imageFileList: { file: File; filename: string; id: number }[],
-  userMail: string,
-): Promise<
-  Array<{
-    cut_number: number;
-    image: string;
-  }>
-> {
-  const savedImages = await Promise.all(
-    imageFileList.map((item) => {
-      const { file } = item;
-      return uploadGoodsImageToS3({ ...item, contentType: file.type }, userMail);
-    }),
-  );
-  return savedImages.map((img, index) => ({
-    cut_number: index,
-    image: img,
-  }));
+  return s3.s3uploadFile({ key, file, contentType });
 }
 
 // options 에 default_option, option_title설정

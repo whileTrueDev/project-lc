@@ -73,7 +73,7 @@ export function GoodsEditButton({ goodsId }: { goodsId: number | string }): JSX.
     <NextLink href={`/mypage/goods/edit/${goodsId}`} passHref>
       <Link>
         <Text
-          bgColor="gray.100"
+          borderWidth="1px"
           borderRadius="md"
           textAlign="center"
           lineHeight="1.2"

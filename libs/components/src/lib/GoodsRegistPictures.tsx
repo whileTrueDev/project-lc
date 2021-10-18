@@ -24,9 +24,32 @@ import {
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ChakraNextImage } from './ChakraNextImage';
-import { GoodsFormValues, imageFileListToImageDto } from './GoodsRegistForm';
+import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 import SectionWithTitle from './SectionWithTitle';
+
+// 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
+// 상품사진은 file 로 들어옴
+export async function imageFileListToImageDto(
+  imageFileList: { file: File; filename: string; id: number }[],
+  userMail: string,
+): Promise<
+  Array<{
+    cut_number: number;
+    image: string;
+  }>
+> {
+  const savedImages = await Promise.all(
+    imageFileList.map((item) => {
+      const { file } = item;
+      return uploadGoodsImageToS3({ ...item, contentType: file.type }, userMail);
+    }),
+  );
+  return savedImages.map((img, index) => ({
+    cut_number: index,
+    image: img,
+  }));
+}
 
 export type FileReaderResultType = string | ArrayBuffer | null;
 
@@ -165,9 +188,18 @@ export function GoodsRegistPictures(): JSX.Element {
       toast({ title: '이미지가 저장되었습니다', status: 'success' });
 
       handleClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast({ title: '이미지 저장 중 오류가 발생했습니다', status: 'error' });
+      if (error?.response && error?.response?.status === 400) {
+        // 파일명 너무 길어서 url 이 db  컬럼제한에 걸린 경우
+        toast({
+          title: '이미지 저장 중 오류가 발생했습니다',
+          status: 'error',
+          description: error?.response?.data.message,
+        });
+      } else {
+        toast({ title: '이미지 저장 중 오류가 발생했습니다', status: 'error' });
+      }
     }
   };
 
@@ -191,6 +223,8 @@ export function GoodsRegistPictures(): JSX.Element {
     }
   };
 
+  const goodsId = watch('id');
+
   return (
     <SectionWithTitle title="상품사진 *">
       <Stack spacing={4}>
@@ -198,10 +232,13 @@ export function GoodsRegistPictures(): JSX.Element {
           <Button onClick={onOpen}>사진 등록하기</Button>
         </Box>
 
-        <Text>
-          등록된 이미지 (등록된 이미지 삭제시 &apos;수정&apos; 버튼을 누르지 않아도 바로
-          상품에 반영됩니다)
-        </Text>
+        {!!goodsId && (
+          <Text>
+            등록된 이미지 (등록된 이미지 삭제시 &apos;수정&apos; 버튼을 누르지 않아도 바로
+            상품에 반영됩니다)
+          </Text>
+        )}
+
         {/* 등록된 이미지 목록 */}
         <Stack direction="row" spacing={2} flexWrap="wrap">
           {savedImages &&

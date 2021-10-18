@@ -91,17 +91,22 @@ export const s3 = (() => {
   }: Pick<S3UploadImageOptions, 'file'> & {
     key: string;
     contentType: string;
-  }): Promise<AWS.S3.ManagedUpload.SendData> {
+  }): Promise<string> {
     if (!file) throw new Error('file should be not null');
-    return new AWS.S3.ManagedUpload({
-      params: {
-        Bucket: S3_BUCKET_NAME,
-        Key: key,
-        Body: file,
-        ContentType: contentType,
-        ACL: 'public-read',
-      },
-    }).promise();
+    try {
+      const result = await new AWS.S3.ManagedUpload({
+        params: {
+          Bucket: S3_BUCKET_NAME,
+          Key: key,
+          Body: file,
+          ContentType: contentType,
+          ACL: 'public-read',
+        },
+      }).promise();
+      return result.Location;
+    } catch (error) {
+      throw new Error('error in s3publicUploadFile');
+    }
   }
 
   /**
