@@ -137,8 +137,6 @@ function ExportOrderShippingListItem({
     shippingIndex,
   ]);
 
-  console.log(shipping);
-
   return (
     <Box
       pt={2}
@@ -472,14 +470,11 @@ export function ExportOrderOptionItem({
         {option.title1 && option.option1 ? (
           <Text fontSize="sm">
             {option.title1} : {option.option1}
-            <FmOrderStatusBadge orderStatus={option.step} />
           </Text>
         ) : (
-          <Text fontSize="sm">
-            {item.goods_name}
-            <FmOrderStatusBadge orderStatus={option.step} />
-          </Text>
+          <Text fontSize="sm">{item.goods_name}</Text>
         )}
+        <FmOrderStatusBadge orderStatus={option.step} />
       </Td>
       <Td>{option.ea}</Td>
       <Td>{option.step85}</Td>
