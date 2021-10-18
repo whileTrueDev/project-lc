@@ -1,11 +1,15 @@
 import { Badge } from '@chakra-ui/react';
 
-export function LiveShoppingProgressConverter(props: {
+export interface LiveShoppingProgressConverterProps {
   progress: string;
-  broadcastStartDate: Date | null;
-  broadcastEndDate: Date | null;
-  sellEndDate: Date | null;
-}): JSX.Element {
+  broadcastStartDate?: Date | null;
+  broadcastEndDate?: Date | null;
+  sellEndDate?: Date | null;
+}
+
+export function LiveShoppingProgressConverter(
+  props: LiveShoppingProgressConverterProps,
+): JSX.Element {
   const { progress, broadcastStartDate, broadcastEndDate, sellEndDate } = props;
   if (broadcastStartDate && broadcastEndDate) {
     if (

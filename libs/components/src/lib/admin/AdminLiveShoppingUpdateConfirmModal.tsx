@@ -18,7 +18,7 @@ export function AdminLiveShoppingUpdateConfirmModal(
       onConfirm={onConfirm}
     >
       <Box>
-        <Text>아래와 같이 등록하시겠습니까?</Text>
+        <Text fontSize="xl">아래와 같이 등록하시겠습니까?</Text>
 
         {watch('progress') ? (
           <Text>
