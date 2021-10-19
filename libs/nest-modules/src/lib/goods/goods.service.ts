@@ -12,6 +12,7 @@ import {
   GoodsOptionWithStockInfo,
   RegistGoodsDto,
   TotalStockInfo,
+  ApprovedGoodsNameAndId,
 } from '@project-lc/shared-types';
 import {
   S3Service,
@@ -376,5 +377,37 @@ export class GoodsService {
       console.error(error);
       throw new InternalServerErrorException(error);
     }
+  }
+
+  public async findMyGoodsNames(email: string): Promise<ApprovedGoodsNameAndId[]> {
+    const goodsIds = await this.prisma.goods.findMany({
+      where: {
+        seller: { email },
+        AND: {
+          confirmation: {
+            status: 'confirmed',
+          },
+          goods_status: 'normal',
+        },
+      },
+      select: {
+        confirmation: {
+          select: {
+            firstmallGoodsConnectionId: true,
+          },
+        },
+        goods_name: true,
+        id: true,
+      },
+    });
+    const result = goodsIds.map((value) => {
+      const { confirmation, ...rest } = value;
+      const flattenResult = {
+        ...rest,
+        ...confirmation,
+      };
+      return flattenResult;
+    });
+    return result;
   }
 }

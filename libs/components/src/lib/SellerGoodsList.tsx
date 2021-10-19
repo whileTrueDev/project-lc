@@ -254,6 +254,7 @@ const columns: GridColumns = [
           <TextWithPopperButton
             title={
               <Badge
+                lineHeight="1.5"
                 variant="solid"
                 colorScheme={colorScheme}
                 width="100%"
@@ -275,7 +276,13 @@ const columns: GridColumns = [
       }
       // 검수 상태 : 대기, 승인의 경우
       return (
-        <Badge variant="solid" colorScheme={colorScheme} width="100%" textAlign="center">
+        <Badge
+          lineHeight="1.5"
+          variant="solid"
+          colorScheme={colorScheme}
+          width="100%"
+          textAlign="center"
+        >
           {label}
         </Badge>
       );

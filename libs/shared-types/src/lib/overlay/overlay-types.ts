@@ -99,3 +99,15 @@ export interface Voice {
 export interface GoogleTTSCredentials {
   [keys: string]: { private_key: string; client_email: string };
 }
+
+export interface UserId {
+  userId: string;
+}
+
+export interface StreamerAndProduct {
+  streamerNickname: string;
+  productName: string;
+}
+export interface StartSetting extends RoomAndDate {
+  streamerAndProduct: StreamerAndProduct;
+}

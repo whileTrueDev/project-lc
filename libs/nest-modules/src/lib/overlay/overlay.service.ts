@@ -9,8 +9,10 @@ import {
   NicknameAndText,
   GoogleTTSCredentials,
   PurchaseMessage,
+  UserId,
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
+import AWS from 'aws-sdk';
 
 @Injectable()
 export class OverlayService {
@@ -64,16 +66,16 @@ export class OverlayService {
     return false;
   }
 
-  async streamStartNotification(): Promise<string | false | Uint8Array> {
+  async streamNotification(text: string): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
 
     const message = `
     <speak>
-      잠시 후, 유은님의 양품떡볶이 라이브 커머스가 시작됩니다.
+      ${text}
     </speak>
     `;
 
-    const audioConfig: AudioEncoding = { speakingRate: 1.0, audioEncoding: 'MP3' };
+    const audioConfig: AudioEncoding = { speakingRate: 1.1, audioEncoding: 'MP3' };
     const voice: Voice = {
       languageCode: 'ko-KR',
       name: 'ko-KR-Wavenet-A',
@@ -136,5 +138,43 @@ export class OverlayService {
     });
     if (!messageAndNickname) throwError('Cannot Get Data From Db');
     return messageAndNickname;
+  }
+
+  async getVerticalImagesFromS3(userId: UserId): Promise<number> {
+    const { S3_BUCKET_NAME } = process.env;
+    const S3_BUCKET_REGION = 'ap-northeast-2';
+    const broadcasterId = userId.userId;
+    let imagesUrls = 0;
+
+    AWS.config.update({
+      region: S3_BUCKET_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET,
+      },
+    });
+
+    const listingParams = {
+      Bucket: S3_BUCKET_NAME,
+      Prefix: `vertical-banner/${broadcasterId}/`,
+    };
+
+    const s3 = new AWS.S3();
+
+    await s3
+      .listObjects(listingParams, async (err, data) => {
+        if (data) {
+          data.Contents.forEach((object) => {
+            const imageName = object.Key.split('/').slice(-1)[0];
+            if (imageName.includes('vertical-banner')) {
+              imagesUrls += 1;
+            }
+          });
+        } else {
+          throwError(`S3 Error ${err}`);
+        }
+      })
+      .promise();
+    return imagesUrls;
   }
 }

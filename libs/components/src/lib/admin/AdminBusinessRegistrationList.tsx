@@ -1,4 +1,4 @@
-import { GridColumns, GridCellParams, GridRowData } from '@material-ui/data-grid';
+import { GridColumns, GridCellParams } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { useColorModeValue, useDisclosure, Button, Badge } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
@@ -14,7 +14,10 @@ const columns: GridColumns = [
   {
     field: 'businessRegistrationStatus',
     headerName: '검수상태',
-    renderCell: (params) => ConfirmationBadge(params.row),
+    renderCell: (params) => (
+      <ConfirmationBadge status={params.row.BusinessRegistrationConfirmation.status} />
+    ),
+    minWidth: 120,
   },
   {
     field: 'companyName',
@@ -23,10 +26,12 @@ const columns: GridColumns = [
   {
     field: 'sellerEmail',
     headerName: '광고주 이메일',
+    minWidth: 230,
   },
   {
     field: 'businessRegistrationNumber',
     headerName: '사업자 등록 번호',
+    minWidth: 230,
   },
   {
     field: 'representativeName',
@@ -48,20 +53,42 @@ const columns: GridColumns = [
   {
     field: 'taxInvoiceMail',
     headerName: '계산서 발급 이메일',
+    minWidth: 230,
   },
   {
     field: 'businessRegistrationImageName',
-    headerName: '사업자등록증 이미지',
-    renderCell: (params) => AdminImageDownloadButton(params.row, 'business-registration'),
+    headerName: '사업자등록증',
+    renderCell: (params) => (
+      <AdminImageDownloadButton row={params.row} type="business-registration" />
+    ),
+    minWidth: 150,
   },
   {
     field: 'mailOrderSalesNumber',
     headerName: '통신판매업등록번호',
+    minWidth: 230,
   },
   {
     field: 'mailOrderSalesImageName',
-    headerName: '통신판매업등록증 이미지',
-    renderCell: (params) => AdminImageDownloadButton(params.row, 'mail-order'),
+    headerName: '통신판매업등록증',
+    renderCell: (params) => (
+      <AdminImageDownloadButton row={params.row} type="mail-order" />
+    ),
+    minWidth: 160,
+  },
+  {
+    field: 'confirmation',
+    headerName: '검수승인',
+    width: 100,
+    renderCell: () => <Button size="xs">승인하기</Button>,
+    sortable: false,
+  },
+  {
+    field: 'rejection',
+    headerName: '검수반려',
+    width: 100,
+    renderCell: () => <Button size="xs">반려하기</Button>,
+    sortable: false,
   },
   {
     field: 'confirmation',
@@ -91,9 +118,9 @@ function makeListRow(
 }
 
 // 사업자 등록 검수 상태 badge
-function ConfirmationBadge(row: GridRowData): JSX.Element {
-  let result = { color: 'yellow', text: '대기중' };
-  switch (row.BusinessRegistrationConfirmation.status) {
+export function ConfirmationBadge({ status }: { status: string }): JSX.Element {
+  let result = null;
+  switch (status) {
     case BusinessRegistrationStatus.CONFIRMED: {
       result = { color: 'green', text: '승인됨' };
       break;
@@ -102,11 +129,19 @@ function ConfirmationBadge(row: GridRowData): JSX.Element {
       result = { color: 'red', text: '반려됨' };
       break;
     }
-    default: {
+    case BusinessRegistrationStatus.WAITING: {
       result = { color: 'yellow', text: '대기중' };
+      break;
+    }
+    default: {
+      result = { color: 'red', text: '등록안됨' };
     }
   }
-  return <Badge colorScheme={result.color}>{result.text}</Badge>;
+  return (
+    <Badge colorScheme={result.color} fontSize="sm" size="sm">
+      {result.text}
+    </Badge>
+  );
 }
 
 // 관리자가 볼 계좌번호 등록 리스트

@@ -1,7 +1,10 @@
 import { useToast } from '@chakra-ui/react';
 import { ShippingGroupDto } from '@project-lc/shared-types';
 import { useShippingGroupItemStore, useShippingSetItemStore } from '@project-lc/stores';
+import { AxiosError } from 'axios';
 import { useCallback } from 'react';
+import { UseQueryResult } from 'react-query';
+import { ShippingGroupList, useProfile, useShippingGroupList } from '..';
 import { useCreateShippingGroup } from './mutation/useCreateShippingGroup';
 
 // 배송비 정책 생성 요청 훅 **********************************
@@ -140,4 +143,13 @@ export const useAddShippingSetHandler = ({
   return {
     addShippingSetHandler,
   };
+};
+
+/** 로그인한 판매자의 배송그룹 조회 훅 */
+export const useSellerShippingGroupList = (): UseQueryResult<
+  ShippingGroupList,
+  AxiosError<any>
+> => {
+  const { data: ProfileData } = useProfile();
+  return useShippingGroupList(ProfileData?.email || '', !!ProfileData);
 };

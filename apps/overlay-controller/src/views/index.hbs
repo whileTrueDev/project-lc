@@ -64,7 +64,7 @@
         </button>
         <div class="dashboard">
             <h2>
-                지표
+                반드시 상품명을 적고, 시작시간을 전송하세요.
             </h2>
         </div>
     </div>
@@ -176,6 +176,8 @@
                 <input type="number" id="standard-price">
                 <span>상품명</span>
                 <input type="text" id="product-name">
+                <span>팬닉</span>
+                <input type="text" id="fan-nickname">
                 <button class="message-box-lock-button">
                     잠금
                 </button>
@@ -203,6 +205,7 @@
                         <input type="radio" id="gift-radio-yes" name="gift" value="yes">
                             <label for="gift-radio-yes">YES</label>
                     </div>
+                    <br>
                     <span>전화 이벤트</span>
                     <div class="checkbox-area">
                         <input type="radio" id="event-radio-no" name="event" value="no" checked>
@@ -213,6 +216,11 @@
                     <button id="message-button" type="submit">응원메세지 전송</button>   
                 </fieldset>
             </form>
+            <div class="objective-box">
+                <span>중간금액</span>
+                <input type="number" id="objective-message" style="width:20%">
+                <button id="objective-button" type="submit">중간 금액 전송</button>   
+            </div>
             <div class="bottom-message-box">    
                 <input type="text" id="admin-message" style="width:40%">
                 <button id="bottom-message-button" style="background-color:gray;">하단메세지 전송</button>

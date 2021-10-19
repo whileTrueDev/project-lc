@@ -3,6 +3,10 @@ import {
   MypageLayout,
   ShopNameDialog,
   SellerStatusSection,
+<<<<<<< HEAD
+=======
+  MypageOrderStats,
+>>>>>>> 69dbf7b923a4e789ab3827637b5ffd49fb75776b
 } from '@project-lc/components';
 
 export function Index(): JSX.Element {
@@ -11,6 +15,10 @@ export function Index(): JSX.Element {
   return (
     <MypageLayout>
       <SellerStatusSection />
+<<<<<<< HEAD
+=======
+      <MypageOrderStats />
+>>>>>>> 69dbf7b923a4e789ab3827637b5ffd49fb75776b
       <Box h={200} bgColor="red.200" as="section">
         <Text>some components1</Text>
       </Box>

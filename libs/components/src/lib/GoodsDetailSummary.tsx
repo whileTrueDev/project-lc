@@ -19,7 +19,7 @@ export function GoodsDetailSummary({ goods }: GoodsDetailSummaryProps): JSX.Elem
     status === 'rejected' ? (
       <Stack whiteSpace="break-spaces">
         <Text>{confirmationStatusText}</Text>
-        <Text fontWeight="bold">
+        <Text>
           <InfoIcon mr={1} />
           상품 검수가 반려되었습니다. <br />
           아래 검수 반려 사유를 참고하여 상품 정보를 수정 하신 후 다시 등록해주세요.
@@ -28,7 +28,7 @@ export function GoodsDetailSummary({ goods }: GoodsDetailSummaryProps): JSX.Elem
           whiteSpace="break-spaces"
           borderWidth="1px"
           borderRadius="lg"
-          p={7}
+          p={4}
           height="100%"
         >
           {rejectionReason}

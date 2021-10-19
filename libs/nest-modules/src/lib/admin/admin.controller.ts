@@ -18,10 +18,11 @@ import {
   SellerGoodsSortDirection,
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
+  AdminSettlementInfoType,
 } from '@project-lc/shared-types';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
-import { AdminService, AdminSettlementInfoType } from './admin.service';
+import { AdminService } from './admin.service';
 import { AdminSettlementService } from './admin-settlement.service';
 
 @Controller('admin')

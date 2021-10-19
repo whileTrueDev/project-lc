@@ -10,12 +10,8 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import {
-  GridColumns,
-  GridRowId,
-  GridToolbarContainer,
-  GridToolbarExport,
-} from '@material-ui/data-grid';
+import { makeStyles } from '@material-ui/core/styles';
+import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-grid';
 import { useDisplaySize, useFmOrders } from '@project-lc/hooks';
 import {
   convertFmOrderStatusToString,
@@ -24,15 +20,54 @@ import {
   isOrderExportable,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
+import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useMemo } from 'react';
 import { FaTruck } from 'react-icons/fa';
-import { makeStyles } from '@material-ui/core/styles';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import ExportManyDialog from './ExportManyDialog';
 import FmOrderStatusBadge from './FmOrderStatusBadge';
 import TooltipedText from './TooltipedText';
+
+const hiddenColumns: GridColumns = [
+  { field: 'order_user_name', headerName: '주문자', hide: true },
+  { field: 'order_email', headerName: '주문자이메일', hide: true },
+  { field: 'order_cellphone', headerName: '주문자휴대폰', hide: true },
+  { field: 'order_phone', headerName: '주문자연락처', hide: true },
+  { field: 'recipient_user_name', headerName: '수령인', hide: true },
+  { field: 'recipient_email', headerName: '수령인이메일', hide: true },
+  { field: 'recipient_cellphone', headerName: '수령인휴대폰', hide: true },
+  { field: 'recipient_phone', headerName: '수령인연락처', hide: true },
+  { field: 'recipient_zipcode', headerName: '우편번호', hide: true },
+  {
+    field: 'recipient_address',
+    headerName: '배송지주소(지번)',
+    hide: true,
+    valueFormatter: ({ row }) =>
+      `${row.recipient_address} ${row.recipient_address_detail}`,
+  },
+  {
+    field: 'recipient_address_street',
+    headerName: '배송지주소(도로명)',
+    hide: true,
+    valueFormatter: ({ row }) =>
+      `${row.recipient_address_street} ${row.recipient_address_detail}`,
+  },
+  {
+    field: 'memo',
+    headerName: '배송메시지',
+    hide: true,
+    valueFormatter: ({ row }) => {
+      const parser = new FmOrderMemoParser(row.memo);
+      return parser.memo;
+    },
+  },
+  { field: 'shipping_cost', headerName: '배송비', hide: true },
+  { field: 'admin_memo', headerName: '관리자메모', hide: true },
+  { field: 'npay_order_id', headerName: '네이버페이 주문번호', hide: true },
+  { field: 'goods_seq', headerName: '상품고유번호', hide: true },
+];
 
 const columns: GridColumns = [
   {
@@ -42,7 +77,7 @@ const columns: GridColumns = [
     renderCell: (params) => {
       return (
         <NextLink href={`/mypage/orders/${params.row.id}`} passHref>
-          <Link color="blue.500" textDecoration="underline">
+          <Link color="blue.500" textDecoration="underline" isTruncated>
             {params.row.id}
           </Link>
         </NextLink>
@@ -52,7 +87,7 @@ const columns: GridColumns = [
   {
     field: 'regist_date',
     headerName: '주문일시',
-    width: 150,
+    width: 170,
     valueFormatter: ({ row }) =>
       dayjs(row.regist_date as any).format('YYYY/MM/DD HH:mm:ss'),
     renderCell: (params) => {
@@ -79,35 +114,33 @@ const columns: GridColumns = [
     ),
   },
   {
-    field: 'total_ea',
+    field: 'totalEa',
     headerName: '수량(종류)',
     disableColumnMenu: true,
     disableReorder: true,
     hideSortIcons: true,
     sortable: false,
+    width: 120,
     valueFormatter: ({ row }) => {
-      return row.total_ea + (row.total_type ? `/${row.total_type}` : '');
+      return row.totalEa + (row.totalType ? `/${row.totalType}` : '');
     },
     renderCell: (params) => (
       <Text>
-        {params.row.total_ea}
-        {params.row.total_type ? ` (${params.row.total_type})` : ''}
+        {params.row.totalEa}
+        {params.row.totalType ? ` (${params.row.totalType})` : ''}
       </Text>
     ),
   },
   {
-    field: 'recipient_user_name',
+    field: 'only-web_recipient_user_name',
     headerName: '주문자/받는분',
     width: 120,
     disableColumnMenu: true,
     disableReorder: true,
     hideSortIcons: true,
     sortable: false,
-    valueFormatter: ({ row }) => {
-      return (
-        row.recipient_user_name + (row.order_user_name ? `/${row.order_user_name}` : '')
-      );
-    },
+    disableExport: true,
+    valueFormatter: ({ row }) => row.recipient_user_name,
     renderCell: (params) => (
       <Text>
         {params.row.recipient_user_name}
@@ -116,30 +149,8 @@ const columns: GridColumns = [
     ),
   },
   {
-    field: 'depositor',
-    headerName: '결제수단/일시',
-    disableColumnMenu: true,
-    disableReorder: true,
-    hideSortIcons: true,
-    sortable: false,
-    width: 120,
-    valueFormatter: ({ row }) => {
-      const depositdate = dayjs(row.deposit_date).format('YYYY/MM/DD HH:mm:ss');
-      return row.depositor + (row.deposit_date ? `/${depositdate}` : '');
-    },
-    renderCell: (params) => {
-      const t = `${params.row.depositor}
-      ${
-        params.row.deposit_date
-          ? `/${dayjs(params.row.deposit_date).format('YYYY/MM/DD HH:mm:ss')}`
-          : ''
-      }`;
-      return <TooltipedText text={t} />;
-    },
-  },
-  {
-    field: 'settleprice',
-    headerName: '결제금액',
+    field: 'totalPrice',
+    headerName: '주문금액',
     disableColumnMenu: true,
     disableReorder: true,
     hideSortIcons: true,
@@ -153,11 +164,19 @@ const columns: GridColumns = [
       return howmuch;
     },
     renderCell: (params) => {
-      let howmuch = '';
-      if (params.row.settleprice) {
-        howmuch = `${Math.floor(Number(params.row.settleprice)).toLocaleString()}원`;
+      let text = '';
+      if (params.row.totalPrice) {
+        const totalPrice = Math.floor(Number(params.row.totalPrice));
+        const shppingCost = Math.floor(Number(params.row.totalShippingCost));
+        let howMuch: number;
+        if (!Number.isNaN(shppingCost)) {
+          howMuch = totalPrice + shppingCost;
+        } else {
+          howMuch = totalPrice;
+        }
+        text = `${howMuch.toLocaleString()}원`;
       }
-      return <TooltipedText text={howmuch} />;
+      return <TooltipedText text={text} />;
     },
   },
   {
@@ -165,8 +184,7 @@ const columns: GridColumns = [
     headerName: '주문상태',
     disableColumnMenu: true,
     disableReorder: true,
-    hideSortIcons: true,
-    sortable: false,
+    width: 120,
     valueFormatter: ({ value }) => convertFmOrderStatusToString(value as any) || '-',
     renderCell: ({ value }) => (
       <Box lineHeight={2}>
@@ -174,10 +192,11 @@ const columns: GridColumns = [
       </Box>
     ),
   },
+  // ...hiddenColumns,
 ];
 
 /** DataGrid style 컬럼 구분선 추가 */
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
       borderBottom: `1px solid #f0f0f0`,
@@ -191,7 +210,6 @@ export function OrderList(): JSX.Element {
   const exportManyDialog = useDisclosure();
   const fmOrderStates = useFmOrderStore();
   const orders = useFmOrders(fmOrderStates);
-
   const { isDesktopSize } = useDisplaySize();
   const dataGridBgColor = useColorModeValue('inherit', 'gray.300');
 
@@ -200,6 +218,15 @@ export function OrderList(): JSX.Element {
     const _so = orders.data.filter((o) => fmOrderStates.selectedOrders.includes(o.id));
     return _so.filter((so) => isOrderExportable(so.step)).length > 0;
   }, [fmOrderStates.selectedOrders, orders.data]);
+
+  const filteredOrders = useMemo(() => {
+    if (!orders.data) return [];
+    return orders.data.filter((d) => {
+      const parser = new FmOrderMemoParser(d.memo || '');
+      // 선물하기가 아닌 주문만 필터링
+      return !parser.giftFlag;
+    });
+  }, [orders.data]);
 
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
@@ -211,8 +238,14 @@ export function OrderList(): JSX.Element {
         disableSelectionOnClick
         disableColumnMenu
         loading={orders.isLoading}
-        columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
-        rows={orders.data || []}
+        columns={columns.map((col) => {
+          if (col.headerName === '상품') {
+            const flex = isDesktopSize ? 1 : undefined;
+            return { ...col, flex };
+          }
+          return col;
+        })}
+        rows={filteredOrders}
         checkboxSelection
         selectionModel={fmOrderStates.selectedOrders}
         onSelectionModelChange={fmOrderStates.handleOrderSelected}
@@ -290,16 +323,21 @@ export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
                 </Box>
               </Tooltip>
             ))}
-            <Button size="sm" as="div" isDisabled={selectedOrders.length === 0}>
+            {/*
+             * 내보내기 기능 보류 by dan 21.10.12
+             * https://www.notion.so/whiletrue/CSV-be33d041a81d4601b005b0d3ed659d28
+             */}
+            {/* <Button size="sm" as="div" isDisabled={selectedOrders.length === 0}>
               <GridToolbarExport
                 csvOptions={{
+                  allColumns: true,
                   fileName: `project-lc_주문목록_${dayjs().format(
                     'YYYY-MM-DD-HH-mm-ss',
                   )}`,
                 }}
                 disabled={selectedOrders.length === 0}
               />
-            </Button>
+            </Button> */}
           </>
         )}
       </Stack>

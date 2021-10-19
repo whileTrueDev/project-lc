@@ -22,6 +22,8 @@ model Seller {
   sellerSettlements          SellerSettlements[]
   socialAccounts             SellerSocialAccount[]
   shippingGroups             ShippingGroup[]
+  SellerContacts             SellerContacts[]
+  LiveShopping               LiveShopping[]
 }
 
 // 마케터의 상정정보
@@ -105,6 +107,18 @@ model SellerSocialAccount {
   @@index([sellerId], name: "sellerId")
 }
 
+// 판매자가 등록한 라이브 쇼핑 담당자 연락처들
+model SellerContacts {
+  id           Int            @id @default(autoincrement())
+  sellerId     Int // 판매자 아이디
+  email        String         @default("") //등록한 이메일
+  phoneNumber  String         @default("") // 등록한 전화번호
+  isDefault    Boolean        @default(false) // 기본 연락처 설정 여부
+  seller       Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  LiveShopping LiveShopping[]
+  createDate   DateTime       @default(now())
+}
+
 // ****************************
 // * firstmall과 동일한 상품 정보 (컬럼명도 동일하게 가져갑니다.)
 // 상품 - fm_goods
@@ -121,7 +135,6 @@ model Goods {
   cancel_type             String             @default("0") // 청약철회 가능 여부, "0" or "1"
   contents                String?            @db.LongText // 상세 설명 PC 화면
   contents_mobile         String?            @db.LongText // 상세 설명 Mobile 화면
-  common_contents         String             @db.LongText // 상품 공통 정보 -> 상품등록시 신규 공통정보 등록했을 때 저장됨
   shipping_policy         ShopOrGoods        @default(shop) // 배송 정책 선택
   goods_shipping_policy   LimitOrUnlimit     @default(unlimit) // 개별 배송비 선택
   unlimit_shipping_price  Int?               @db.UnsignedInt // 배송비
@@ -142,13 +155,14 @@ model Goods {
   image                   GoodsImages[] // 상품 이미지 - fm_goods_image
   goods_view              GoodsView          @default(look) // 노출
   regist_date             DateTime           @default(now()) // 상품등록일 (project-lc 에 판매자가 등록한 날짜)
-  update_date             DateTime           @default(now()) @updatedAt // 수정일 (퍼스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서 수정한 날짜)
+  update_date             DateTime           @default(now()) @updatedAt // 수정일 (퍼스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서 수��한 날짜)
   runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
   GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
   goodsInfoId             Int?               @unique
 
+  LiveShopping LiveShopping[]
   @@index([sellerId], name: "sellerId")
 }
 
@@ -174,7 +188,7 @@ model GoodsOptions {
   option_title   String? // 옵션명 fm_goods_options.option_title
   option1        String? // 옵션값 fm_goods_options.option1
   option_code    String? // 옵션코드
-  consumer_price Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
+  consumer_price Decimal               @db.Decimal(10, 2) // ��������비��가 (미할인가)
   price          Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
   color          String?               @db.VarChar(10) // 컬러 hex값
   weight         Float? //옵션 개당 무게 (단위 kg)
@@ -187,7 +201,7 @@ model GoodsOptions {
 model GoodsOptionsSupplies {
   id             Int          @id @default(autoincrement())
   goodsOptionsId Int          @unique
-  // ���기서부터는 퍼스트몰 컬럼과 동일한 컬럼
+  // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   stock          Int          @db.UnsignedInt // 재고
   badstock       Int?         @db.UnsignedInt // 불량재고
   safe_stock     Int?         @default(0) // 각 매장의 옵션별 안전 재고
@@ -208,12 +222,12 @@ model GoodsImages {
 // 상품 공통 정보
 model GoodsInfo {
   id         Int    @id @default(autoincrement())
-  goods      Goods?
-  seller     Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   sellerId   Int
   info_name  String
   info_value String @db.LongText // 상품 공통 정보
 
+  goods  Goods[]
+  seller Seller  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 }
 
 model LoginHistory {
@@ -395,7 +409,7 @@ enum ShippingOptType {
   amount_rep // 금액(구간반복)
   cnt // 수량(구간입력)
   cnt_rep // 수량(구간반복)
-  weight // 무게(구간입력)
+  weight // -> 무게(구간입력)
   weight_rep // 무게(구간반복)
 }
 
@@ -416,7 +430,7 @@ model LiveCommerceRanking {
   text               String      @db.LongText // 메세지 내용
   price              Int // 구매금액
   phoneCallEventFlag Boolean     @default(false) // 전화 이벤트 참여 여부 
-  giftFlag           Boolean     @default(false) // 스트리머에게 선물하기 여부
+  giftFlag           Boolean     @default(false) // 스트리머����� 선물하기 여부
   loginFlag          Boolean     @default(true) // 회원 | 비회원 구분 \
   broadcaster        Broadcaster @relation(fields: [broadcasterId], references: [userId])
   broadcasterId      String      @db.VarChar(20) // 스트리머의 아이디 
@@ -432,9 +446,27 @@ model Broadcaster {
   afreecaId           String? // 유저의 아프리카 아이디
   twitchId            String? // 유저의 트위치 아이디
   youtubeId           String? // 유저의 유튜브 아이디
-  overlayUrl          String // 라이브커머스 오버레이 URL
+  overlayUrl          String                @unique // 라이브커머스 오버레이 URL 
   createDate          DateTime              @default(now())
   deleteFlag          Boolean               @default(false) // 회원탈퇴 여부
 
+  LiveShopping LiveShopping[]
   @@index(userId)
+}
+
+// 라이브 쇼핑
+model LiveShopping {
+  id             Int            @id @default(autoincrement())
+  streamId       String?        @unique // 방송마다 부여되는 unique 값
+  broadcasterId  String?        @db.VarChar(20) // 스트리머의 아이디 
+  sellerId       Int // 판매자 ID
+  goodsId        Int // 상품 ID
+  contactId      Int // 판매자 등록된 연락처 ID
+  requests       String?        @db.LongText // 요청사항
+  progress       String         @default("registered") // 진행상태
+  sellerContacts SellerContacts @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  seller         Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  goods          Goods          @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  broadcaster    Broadcaster?   @relation(fields: [broadcasterId], references: [userId])
+  createDate     DateTime       @default(now())
 }
