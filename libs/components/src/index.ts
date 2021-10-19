@@ -83,3 +83,4 @@ export * from './lib/LiveShoppingRegistForm';
 export * from './lib/SellerStatusSection';
 export * from './lib/ShopInfoShippingGroup';
 export * from './lib/MypageStatsSection';
+export * from './lib/MypageNoticeSection';
