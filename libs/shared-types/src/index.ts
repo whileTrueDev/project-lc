@@ -55,6 +55,7 @@ export * from './lib/res-types/findSeller.res';
 export * from './lib/res-types/fmExport.res';
 export * from './lib/res-types/fmGoods.res';
 export * from './lib/res-types/fmOrder.res';
+export * from './lib/res-types/fmSettlements.res';
 export * from './lib/res-types/goodsById.res';
 export * from './lib/res-types/goodsList.res';
 export * from './lib/res-types/loginUserRes';

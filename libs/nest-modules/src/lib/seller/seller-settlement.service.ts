@@ -3,6 +3,7 @@ import {
   SellerBusinessRegistration,
   SellerSettlementAccount,
   BusinessRegistrationConfirmation,
+  SellerSettlements,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -154,5 +155,33 @@ export class SellerSettlementService {
     });
 
     return settlementInfo;
+  }
+
+  // *****************************
+  // * 👇 실제 정산 처리 관련
+  // *****************************
+
+  /**
+   * 정산 처리를 진행합니다.
+   * @author hwasurr(dan)
+   * */
+  public async settle(): Promise<void> {
+    // 정산 대상 불러오기
+  }
+
+  /**
+   * 정산 완료 목록을 조회합니다.
+   * @author hwasurr(dan)
+   */
+  public async findSettlementHistory(
+    sellerInfo: UserPayload,
+  ): Promise<SellerSettlements[]> {
+    return this.prisma.sellerSettlements.findMany({
+      where: { sellerEmail: sellerInfo.sub },
+      include: {
+        settlementItems: { include: { options: true } },
+        liveShopping: true,
+      },
+    });
   }
 }

@@ -72,3 +72,14 @@ export const mypageNavLinks: MypageLink[] = [
     checkIsActive: defaultIsActiveChecker,
   },
 ];
+
+export const adminNavItems: Array<NavItem> = [
+  {
+    label: '정산정보관리',
+    href: '/admin',
+  },
+  {
+    label: '상품검수',
+    href: '/goods',
+  },
+];

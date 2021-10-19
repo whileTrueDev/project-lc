@@ -12,7 +12,7 @@ import {
   ValidationPipe,
   Res,
 } from '@nestjs/common';
-import { Seller, SellerSettlementAccount } from '@prisma/client';
+import { Seller, SellerSettlementAccount, SellerSettlements } from '@prisma/client';
 import {
   FindSellerDto,
   PasswordValidateDto,
@@ -113,6 +113,15 @@ export class SellerController {
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerSettlementInfo> {
     return this.sellerSettlementService.selectSellerSettlementInfo(sellerInfo);
+  }
+
+  // 본인의 정산 대상 목록 조회
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement-history')
+  public async ㅁㄴㅇㄹ(
+    @SellerInfo() sellerInfo: UserPayload,
+  ): Promise<SellerSettlements[]> {
+    return this.sellerSettlementService.findSettlementHistory(sellerInfo);
   }
 
   // 본인의 사업자 등록정보 등록

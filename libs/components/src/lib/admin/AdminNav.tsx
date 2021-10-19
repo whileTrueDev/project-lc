@@ -2,6 +2,7 @@ import { Box, Link, Flex, useColorModeValue, Button, Stack } from '@chakra-ui/re
 import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
+import { adminNavItems } from '../..';
 
 export default function AdminNav(): JSX.Element {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
@@ -30,38 +31,24 @@ export default function AdminNav(): JSX.Element {
         justify="space-between"
       >
         <Flex display={{ base: 'none', md: 'flex' }} ml={4}>
-          <Box key="정산정보관리">
-            <NextLink href={'/admin' ?? '#'} passHref>
-              <Link
-                p={2}
-                fontSize="sm"
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                정산정보관리
-              </Link>
-            </NextLink>
-          </Box>
-          <Box key="상품검수">
-            <NextLink href={'/goods' ?? '#'} passHref>
-              <Link
-                p={2}
-                fontSize="sm"
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                상품검수
-              </Link>
-            </NextLink>
-          </Box>
+          {adminNavItems.map((adminNav) => (
+            <Box key={adminNav.label}>
+              <NextLink href={adminNav.href ?? '#'} passHref>
+                <Link
+                  p={2}
+                  fontSize="sm"
+                  fontWeight={500}
+                  color={linkColor}
+                  _hover={{
+                    textDecoration: 'none',
+                    color: linkHoverColor,
+                  }}
+                >
+                  {adminNav.label}
+                </Link>
+              </NextLink>
+            </Box>
+          ))}
         </Flex>
         <>
           {isLoggedIn && (
