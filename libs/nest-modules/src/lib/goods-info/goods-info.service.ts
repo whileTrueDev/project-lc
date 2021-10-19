@@ -3,9 +3,9 @@ import { GoodsInfo } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { GoodsInfoDto } from '@project-lc/shared-types';
 import {
-  S3Service,
   getImgSrcListFromHtmlStringList,
   getS3KeyListFromImgSrcList,
+  S3Service,
 } from '../s3/s3.service';
 
 @Injectable()
@@ -97,16 +97,19 @@ export class GoodsInfoService {
       // img src에서 s3에 저장된 이미지만 찾기
       const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
 
-      const deleteCommonInfoImage = this.s3service.deleteMultipleObjects(
-        s3ImageKeys.map((key) => ({ Key: key })),
-      );
+      // s3저장된 이미지 있는경우
+      if (s3ImageKeys.length > 0) {
+        await this.s3service.deleteMultipleObjects(
+          s3ImageKeys.map((key) => ({ Key: key })),
+        );
+      }
+
       // 공통정보 내 포함된 s3이미지 파일 삭제요청 필요
-      const deleteGoods = this.prisma.goodsInfo.delete({
+      await this.prisma.goodsInfo.delete({
         where: {
           id,
         },
       });
-      await Promise.all([deleteCommonInfoImage, deleteGoods]);
       return true;
     } catch (error) {
       console.error(error);
