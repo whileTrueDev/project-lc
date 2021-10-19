@@ -16,8 +16,8 @@ export function MypageSalesStats(): JSX.Element {
   const { data } = useFmOrdersStats();
 
   return (
-    <Grid templateColumns={['1fr 1fr', '1fr 1fr 1fr']}>
-      <GridItem colStart={[1, 2]}>
+    <Grid templateColumns="1fr 1fr">
+      <GridItem colStart={1}>
         <Box p={[2, 4, 4, 4]} display="flex" justifyContent="center">
           <Flex direction={['column', 'column', 'column', 'row']}>
             <Stat>
