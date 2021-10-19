@@ -471,3 +471,12 @@ model LiveShopping {
   broadcaster    Broadcaster?   @relation(fields: [broadcasterId], references: [userId])
   createDate     DateTime       @default(now())
 }
+
+// 공지사항
+model Notice {
+  id          Int      @id @default(autoincrement())
+  title       String // 공지사항 글의 제목
+  url         String // 공지사항 글의 notion URL
+  postingFlag Boolean  @default(false) // 공지사항 글 게시여부
+  postingDate DateTime @default(now()) // 공지사항 글 게시시간
+}
