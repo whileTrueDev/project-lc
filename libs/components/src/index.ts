@@ -77,6 +77,7 @@ export * from './lib/SummaryList';
 export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
 export * from './lib/TextViewerWithDetailModal';
+export * from './lib/GoodsEditForm';
 export * from './lib/admin/AdminGoodsStatusButtons';
 export * from './lib/LiveShoppingRegistForm';
 export * from './lib/SellerStatusSection';

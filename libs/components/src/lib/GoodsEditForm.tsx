@@ -1,3 +1,4 @@
+import { ChevronLeftIcon } from '@chakra-ui/icons';
 import {
   Button,
   Center,
@@ -8,147 +9,93 @@ import {
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react';
-import {
-  s3,
-  useCreateGoodsCommonInfo,
-  useProfile,
-  useRegistGoods,
-} from '@project-lc/hooks';
-import path from 'path';
-import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
+import { useCreateGoodsCommonInfo, useProfile, useEditGoods } from '@project-lc/hooks';
+import { GoodsByIdRes, RegistGoodsDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
-import { FormProvider, NestedValue, useForm } from 'react-hook-form';
-import { ChevronLeftIcon } from '@chakra-ui/icons';
+import { FormProvider, useForm } from 'react-hook-form';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
 import GoodsRegistDataOptions from './GoodsRegistDataOptions';
 import GoodsRegistDataSales from './GoodsRegistDataSales';
 import GoodsRegistDescription from './GoodsRegistDescription';
 import GoodsRegistExtraInfo from './GoodsRegistExtraInfo';
+import {
+  addGoodsOptionInfo,
+  GoodsFormOption,
+  GoodsFormValues,
+  saveContentsImageToS3,
+} from './GoodsRegistForm';
 import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
 
-export type GoodsFormOption = Omit<GoodsOptionDto, 'default_option' | 'option_title'> & {
-  id?: number;
-};
-
-export type GoodsFormOptionsType = GoodsFormOption[];
-
-export type GoodsFormValues = Omit<RegistGoodsDto, 'options'> & {
-  id?: number;
-  options: NestedValue<GoodsFormOptionsType>;
-  pictures?: { file: File; filename: string; id: number }[];
-  option_title: string; // 옵션 제목
-  common_contents: string;
-  common_contents_name?: string; // 공통 정보 이름
-  common_contents_type: 'new' | 'load'; // 공통정보 신규 | 기존 불러오기
-};
-
 type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
-  options: Omit<GoodsOptionDto, 'option_title' | 'default_option'>[];
+  options: GoodsFormOption[];
 };
 
-/** 이미지 파일명 앞부분에 타임스탬프 붙임
- * "2348238342_파일명" 형태로 리턴함
- * */
-export function addTimeStampToFilename(filename: string): string {
-  const timestamp = Date.now();
-  return `${timestamp}_${filename}`;
-}
-
-// 상품 사진, 상세설명 이미지를 s3에 업로드 -> url 리턴
-export async function uploadGoodsImageToS3(
-  imageFile: { file: File | Buffer; filename: string; id: number; contentType: string },
-  userMail: string,
-): Promise<string> {
-  const { file, filename, contentType } = imageFile;
-
-  const type = 'goods';
-  const timestampFilename = addTimeStampToFilename(filename);
-  const key = path.join(...[type, userMail, timestampFilename]);
-  return s3.s3uploadFile({ key, file, contentType });
-}
-
-// options 에 default_option, option_title설정
-export function addGoodsOptionInfo(
-  options: Omit<GoodsOptionDto, 'default_option' | 'option_title'>[],
-  option_title: string,
-): GoodsOptionDto[] {
-  return options.map((opt, index) => ({
-    ...opt,
-    default_option: index === 0 ? ('y' as const) : ('n' as const),
-    option_title,
-  }));
-}
-
-// 상품 '상세설명' contents에서 이미지 s3에 업로드 후 src url 변경
-// 상세설명 이미지는data:image 형태로 들어있음
-export async function saveContentsImageToS3(
-  contents: string,
-  userMail: string,
-): Promise<string> {
-  const parser = new DOMParser();
-  const dom = parser.parseFromString(contents, 'text/html'); // textWithImages -> getValues('contents')
-  const imageTags = Array.from(dom.querySelectorAll('img'));
-
-  await Promise.all(
-    imageTags.map(async (tag, index) => {
-      const src = tag.getAttribute('src');
-      const name = tag.dataset.fileName || '';
-      if (src && src.slice(0, 4) !== 'http') {
-        const imageBuffer = Buffer.from(
-          src.replace(/^data:image\/\w+;base64,/, ''),
-          'base64',
-        );
-        const fileType = src.substring('data:'.length, src.indexOf(';base64'));
-        const url = await uploadGoodsImageToS3(
-          { file: imageBuffer, filename: name, id: index, contentType: fileType },
-          userMail,
-        );
-        // img src 바꾸기
-        tag.setAttribute('src', url);
-      }
-    }),
-  );
-
-  const contentsBody = dom.body.innerHTML;
-  return contentsBody;
-}
-
-/** 상품 등록 폼 컴포넌트 */
-export function GoodsRegistForm(): JSX.Element {
+/** 상품 수정 폼 컴포넌트 */
+export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.Element {
   const { data: profileData } = useProfile();
-  const { mutateAsync, isLoading } = useRegistGoods();
+  const { mutateAsync: editGoodsRequest, isLoading } = useEditGoods();
   const { mutateAsync: createGoodsCommonInfo } = useCreateGoodsCommonInfo();
   const toast = useToast();
   const router = useRouter();
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
+      // 상품 id (상품 수정하는 경우 id 존재, 상품 등록하는 경우 id undefined)
+      id: goodsData?.id || undefined,
+      // 기본정보
+      goods_name: goodsData?.goods_name || undefined, // 상품명
+      summary: goodsData?.summary || undefined, // 간략설명
       // 판매정보
-      goods_status: 'normal', // 판매상태
-      cancel_type: '0', // 청약철회, 기본 - 청약철회가능 0
+      goods_status: goodsData ? goodsData.goods_status : 'normal', // 판매상태
+      cancel_type: goodsData ? goodsData.cancel_type : '0', // 청약철회, 기본 - 청약철회가능 0
       // 판매옵션
-      option_use: '1', // 옵션사용여부, 기본 - 옵션사용 1
-      common_contents_type: 'new',
-      option_title: '',
-      image: [],
-      options: [
-        {
-          option_type: 'direct',
-          option1: '',
-          consumer_price: 0,
-          price: 0,
-          option_view: 'Y',
-          supply: {
-            stock: 0,
-          },
-        },
-      ],
+      option_use: goodsData ? goodsData.option_use : '1', // 옵션사용여부, 기본 - 옵션사용 1
+      option_title: goodsData?.options[0].option_title || '',
+      options: goodsData
+        ? goodsData.options.map((opt) => ({
+            id: opt.id,
+            option_type: opt.option_type,
+            option1: opt.option1 || '',
+            consumer_price: Number(opt.consumer_price),
+            price: Number(opt.price),
+            option_view: opt.option_view,
+            supply: {
+              stock: opt.supply.stock,
+            },
+          }))
+        : [
+            {
+              option_type: 'direct',
+              option1: '',
+              consumer_price: 0,
+              price: 0,
+              option_view: 'Y',
+              supply: {
+                stock: 0,
+              },
+            },
+          ],
+      // 상품사진
+      image: goodsData?.image || [],
+      // 상세설명
+      contents: goodsData?.contents || undefined,
+      // 상품공통정보
+      goodsInfoId: goodsData?.goodsInfoId || undefined,
+      common_contents_type: goodsData ? 'load' : 'new',
+      common_contents: goodsData?.GoodsInfo?.info_value,
+      common_contents_name: goodsData?.GoodsInfo?.info_name,
+      // 배송비정책
+      shippingGroupId: goodsData?.shippingGroupId || undefined,
       // 기타정보 (최대, 최소구매수량)
-      min_purchase_limit: 'unlimit',
-      max_purchase_limit: 'unlimit',
+      min_purchase_limit: goodsData?.min_purchase_limit || 'unlimit',
+      min_purchase_ea: goodsData?.min_purchase_ea || undefined,
+      max_purchase_limit: goodsData?.max_purchase_limit || 'unlimit',
+      max_purchase_ea: goodsData?.max_purchase_ea || undefined,
+      // 메모
+      admin_memo: goodsData?.admin_memo || undefined,
       // 이하 fm_goods 기본값
       goods_view: 'look',
       shipping_policy: 'shop',
@@ -161,11 +108,12 @@ export function GoodsRegistForm(): JSX.Element {
   });
   const { handleSubmit } = methods;
 
-  const regist = async (data: GoodsFormSubmitDataType): Promise<void> => {
-    if (!profileData) return;
+  const editGoods = async (data: GoodsFormSubmitDataType): Promise<void> => {
+    if (!profileData || !goodsData) return;
     const userMail = profileData.email;
 
     const {
+      id,
       options,
       option_title,
       common_contents_name,
@@ -176,11 +124,13 @@ export function GoodsRegistForm(): JSX.Element {
       shippingGroupId,
       contents,
       image,
-      ...goodsData
+      ...goodsFormData
     } = data;
 
+    if (!id) return;
+
     let goodsDto: RegistGoodsDto = {
-      ...goodsData,
+      ...goodsFormData,
       image,
       options: addGoodsOptionInfo(options, option_title),
       option_use: options.length > 1 ? '1' : '0',
@@ -247,18 +197,19 @@ export function GoodsRegistForm(): JSX.Element {
       return;
     }
 
-    mutateAsync(goodsDto)
+    editGoodsRequest({ id, dto: goodsDto })
       .then(() => {
         toast({
-          title: '상품을 성공적으로 등록하였습니다',
+          title: '상품을 성공적으로 수정하였습니다',
           status: 'success',
         });
-        router.push('/mypage/goods');
+
+        router.push(`/mypage/goods/${id}`);
       })
       .catch((error) => {
         console.error(error);
         toast({
-          title: '상품 등록 중 오류가 발생하였습니다',
+          title: '상품 수정 중 오류가 발생하였습니다',
           status: 'error',
         });
       });
@@ -266,7 +217,7 @@ export function GoodsRegistForm(): JSX.Element {
 
   return (
     <FormProvider {...methods}>
-      <Stack p={2} spacing={5} as="form" onSubmit={handleSubmit(regist)}>
+      <Stack p={2} spacing={5} as="form" onSubmit={handleSubmit(editGoods)}>
         <Stack
           py={4}
           mx={-2}
@@ -279,14 +230,11 @@ export function GoodsRegistForm(): JSX.Element {
           justifyContent="space-between"
           zIndex={theme.zIndices.sticky}
         >
-          <Button
-            leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push('/mypage/goods')}
-          >
-            상품목록 돌아가기
+          <Button leftIcon={<ChevronLeftIcon />} onClick={router.back}>
+            돌아가기
           </Button>
           <Button type="submit" colorScheme="blue" isLoading={isLoading}>
-            등록
+            저장하기
           </Button>
         </Stack>
 
@@ -331,7 +279,7 @@ export function GoodsRegistForm(): JSX.Element {
             zIndex={99999}
           >
             <Spinner />
-            <Text>상품을 등록중입니다...</Text>
+            <Text>상품 정보를 수정중입니다...</Text>
           </Center>
         )}
       </Stack>
@@ -339,4 +287,4 @@ export function GoodsRegistForm(): JSX.Element {
   );
 }
 
-export default GoodsRegistForm;
+export default GoodsEditForm;

@@ -139,8 +139,7 @@ describe('GoodsService', () => {
 
   describe('deleteLcGoods', () => {
     it('goods should be deleted', async () => {
-      const returnDeleteObjectsCommandOutput = (): Promise<DeleteObjectsCommandOutput> =>
-        Promise.resolve({ $metadata: {} });
+      const returnDeleteObjectsCommandOutput = (): Promise<void> => Promise.resolve();
       jest
         .spyOn(service, 'deleteGoodsImagesFromS3')
         .mockImplementation(returnDeleteObjectsCommandOutput);
