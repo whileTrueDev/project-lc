@@ -143,7 +143,28 @@ export function GoodsRegistPictures(): JSX.Element {
 
   // 사진 등록하기 다일얼로그 - 파일업로드 인풋 에러 핸들러
   const handleError = (errorType?: ImageInputErrorTypes): void => {
-    console.error({ errorType });
+    switch (errorType) {
+      case 'invalid-format': {
+        toast({
+          title: `이미지 파일을 선택해주세요`,
+          status: 'warning',
+        });
+        return;
+      }
+      case 'over-size': {
+        toast({
+          title: `이미지 파일은 10MB 이하여야 합니다`,
+          status: 'warning',
+        });
+        return;
+      }
+      default: {
+        toast({
+          title: `이미지 파일을 선택해주세요`,
+          status: 'warning',
+        });
+      }
+    }
   };
 
   // 사진 등록하기 다일얼로그 - 닫기 핸들러
@@ -264,6 +285,7 @@ export function GoodsRegistPictures(): JSX.Element {
             <Stack>
               <Text>사진첨부</Text>
               <ImageInput
+                multiple
                 handleSuccess={handleSuccess}
                 handleError={handleError}
                 variant="chakra"
