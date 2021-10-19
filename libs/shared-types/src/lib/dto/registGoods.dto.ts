@@ -32,9 +32,6 @@ export class RegistGoodsDto {
   @IsOptional()
   contents_mobile?: string;
 
-  @IsString()
-  common_contents: string;
-
   @IsIn(['shop', 'goods'])
   shipping_policy: ShopOrGoods;
 

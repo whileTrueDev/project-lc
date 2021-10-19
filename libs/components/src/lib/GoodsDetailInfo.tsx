@@ -1,6 +1,7 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
 import { GoodsByIdRes } from '@project-lc/shared-types';
 import { GoodsConfirmStatusBadge } from './GoodsConfirmStatusBadge';
+import { GOODS_CANCEL_TYPE } from './GoodsRegistDataSales';
 import GoodsStatusBadge from './GoodsStatusBadge';
 
 export interface GoodsDetailInfoProps {
@@ -31,7 +32,9 @@ export function GoodsDetailInfo({ goods }: GoodsDetailInfoProps): JSX.Element {
 
       <Box>
         <Text fontWeight="bold">청약철회(취소,환불,교환) 가능여부</Text>
-        <Text>{goods.cancel_type ? '가능' : '불가능'}</Text>
+        <Text>
+          {GOODS_CANCEL_TYPE.find((type) => type.value === goods.cancel_type)?.label}
+        </Text>
       </Box>
     </Stack>
   );

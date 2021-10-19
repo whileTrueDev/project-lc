@@ -160,7 +160,7 @@ model Goods {
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
   GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
-  goodsInfoId             Int?               @unique
+  goodsInfoId             Int?
 
   LiveShopping LiveShopping[]
   @@index([sellerId], name: "sellerId")
@@ -183,12 +183,12 @@ model GoodsOptions {
   goodsId        Int
   supply         GoodsOptionsSupplies?
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
-  default_option YesOrNo               @default(n) // 옵션 필수 여부
+  default_option YesOrNo               @default(n) // 옵션 필수 �������부
   option_type    String                @default("direct") // 기본값인듯? 설명도 direct
   option_title   String? // 옵션명 fm_goods_options.option_title
   option1        String? // 옵션값 fm_goods_options.option1
   option_code    String? // 옵션코드
-  consumer_price Decimal               @db.Decimal(10, 2) // ��������비��가 (미할인가)
+  consumer_price Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
   price          Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
   color          String?               @db.VarChar(10) // 컬러 hex값
   weight         Float? //옵션 개당 무게 (단위 kg)
@@ -213,9 +213,9 @@ model GoodsOptionsSupplies {
 // 상품 사진 fm_goods_image
 model GoodsImages {
   id         Int    @id @default(autoincrement())
-  goods      Goods  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
-  goodsId    Int
-  image      String
+  goods      Goods? @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  goodsId    Int?
+  image      String @db.VarChar(500)
   cut_number Int
 }
 
@@ -250,6 +250,7 @@ enum GoodsConfirmationStatuses {
   waiting // 대기
   confirmed // 승인
   rejected // 거절
+  needReconfirmation // 재검수 대기
 }
 
 // 상품 검수 상태 정보
@@ -456,23 +457,31 @@ model Broadcaster {
 
 // 라이브 쇼핑
 model LiveShopping {
-  id                 Int            @id @default(autoincrement())
-  streamId           String?        @unique // 방송마다 부여되는 unique 값
-  broadcasterId      String?        @db.VarChar(20) // 스트리머의 아이디 
+  id                 Int                @id @default(autoincrement())
+  streamId           String?            @unique // 방송마다 부여되는 unique 값
+  broadcasterId      String?            @db.VarChar(20) // 스트리머의 아이디 
   sellerId           Int // 판매자 ID
   goodsId            Int // 상품 ID
+  videoId            Int?
   contactId          Int // 판매자 등록된 연락처 ID
-  requests           String?        @db.LongText // 요청사항
-  progress           String         @default("registered") // 진행상태
+  requests           String?            @db.LongText // 요청사항
+  progress           String             @default("registered") // 진행상태
   broadcastStartDate DateTime? // 라이브 방송 시작 시간
   broadcastEndDate   DateTime? // 라이브 방송 종료 시간
   sellStartDate      DateTime? // 라이브커머스 상품판매 시작 시간
   sellEndDate        DateTime? // 라이브커머스 상품판매 종료 시간
-  createDate         DateTime       @default(now())
-  rejectionReason    String?        @db.Text // 방송 취소 또는 거절 사유
-  videoUrl           String?        @db.Text
-  sellerContacts     SellerContacts @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  seller             Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  goods              Goods          @relation(fields: [goodsId], references: [id], onDelete: Cascade)
-  broadcaster        Broadcaster?   @relation(fields: [broadcasterId], references: [userId])
+  createDate         DateTime           @default(now())
+  rejectionReason    String?            @db.Text // 방송 취소 또는 거절 사유
+  sellerContacts     SellerContacts     @relation(fields: [contactId], references: [id])
+  seller             Seller             @relation(fields: [sellerId], references: [id])
+  goods              Goods              @relation(fields: [goodsId], references: [id])
+  broadcaster        Broadcaster?       @relation(fields: [broadcasterId], references: [userId])
+  liveShoppingVideo  LiveShoppingVideo? @relation(fields: [videoId], references: [id])
+}
+
+model LiveShoppingVideo {
+  id           Int            @id @default(autoincrement())
+  youtubeUrl   String?        @unique
+  createDate   DateTime       @default(now())
+  LiveShopping LiveShopping[]
 }

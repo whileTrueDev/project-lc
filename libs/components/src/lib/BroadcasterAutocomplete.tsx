@@ -1,7 +1,7 @@
 import { Box, Text } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
-import { liveShoppingManage } from '@project-lc/stores';
 import { BroadcasterDTO } from '@project-lc/shared-types';
+import { liveShoppingManage } from '@project-lc/stores';
 import { ChakraAutoComplete } from '..';
 
 export interface BroadcasterAutocompleteProps {
@@ -23,7 +23,7 @@ export function BroadcasterAutocomplete(
         onChange={(newV) => {
           if (newV) {
             setValue('broadcasterId', newV.userId);
-            handleBroadcasterSelect(newV.userId);
+            handleBroadcasterSelect(newV.userNickname);
           } else {
             setValue('broadcasterId', null);
             handleBroadcasterSelect(null);

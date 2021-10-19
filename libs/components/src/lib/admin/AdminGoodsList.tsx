@@ -9,14 +9,14 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { GridCellParams, GridColumns } from '@material-ui/data-grid';
-import { GoodsStatus } from '@prisma/client';
+import { GoodsConfirmationStatuses, GoodsStatus } from '@prisma/client';
 import { useAdminGoodsList, useProfile, useDisplaySize } from '@project-lc/hooks';
 import { SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useState } from 'react';
-import { GOODS_STATUS } from '../../constants/goodsStatus';
+import { GOODS_CONFIRMATION_STATUS, GOODS_STATUS } from '../../constants/goodsStatus';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { ShippingGroupDetailButton } from '../SellerGoodsList';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
@@ -97,10 +97,20 @@ const columns: GridColumns = [
   },
   {
     field: 'goods_status',
-    headerName: '상태',
+    headerName: '상품상태',
     minWidth: 50,
     valueGetter: ({ row }) => {
       return GOODS_STATUS[row.goods_status as GoodsStatus];
+    },
+    sortable: false,
+  },
+  {
+    field: 'confirm_status',
+    headerName: '검수상태',
+    minWidth: 50,
+    renderCell: ({ row }) => {
+      const confirmStatus = row.confirmation.status as GoodsConfirmationStatuses;
+      return <Text>{GOODS_CONFIRMATION_STATUS[confirmStatus].label}</Text>;
     },
     sortable: false,
   },
