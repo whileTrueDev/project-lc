@@ -1,6 +1,5 @@
-import { Box, Link, Table, Thead, Tbody, Tr, Th, Td, Heading } from '@chakra-ui/react';
+import { Box, Table, Thead, Tbody, Tr, Th, Td, Heading, Button } from '@chakra-ui/react';
 import { useAdminLiveShoppingList, useProfile } from '@project-lc/hooks';
-import NextLink from 'next/link';
 import dayjs from 'dayjs';
 import { LiveShoppingProgressConverter } from './LiveShoppingProgressConverter';
 import { BroadcasterName } from './BroadcasterName';
@@ -28,51 +27,53 @@ export function LiveShoppingList(): JSX.Element {
             <Th>방송종료</Th>
             <Th>판매시작</Th>
             <Th>판매종료</Th>
+            <Th />
           </Tr>
         </Thead>
         <Tbody>
           {data &&
             !isLoading &&
             data.map((row) => (
-              <NextLink key={row.id} href={`/live-shopping/${row.id}`}>
-                <Link as="tr">
-                  <Td>{row.id}</Td>
-                  <Td>{dayjs(row.createDate).format('YYYY/MM/DD HH:mm')}</Td>
-                  <Td>{row.goods.goods_name}</Td>
-                  <Td>{row.seller.sellerShop.shopName}</Td>
-                  <Td>
-                    <LiveShoppingProgressConverter
-                      progress={row.progress}
-                      broadcastStartDate={row.broadcastStartDate}
-                      broadcastEndDate={row.broadcastEndDate}
-                      sellEndDate={row.sellEndDate}
-                    />
-                  </Td>
-                  <Td>
-                    <BroadcasterName data={row.broadcaster} />
-                  </Td>
-                  <Td>
-                    {row.broadcastStartDate
-                      ? dayjs(row.broadcastStartDate).format('YYYY/MM/DD HH:mm')
-                      : '미정'}
-                  </Td>
-                  <Td>
-                    {row.broadcastEndDate
-                      ? dayjs(row.broadcastEndDate).format('YYYY/MM/DD HH:mm')
-                      : '미정'}
-                  </Td>
-                  <Td>
-                    {row.sellStartDate
-                      ? dayjs(row.sellStartDate).format('YYYY/MM/DD HH:mm')
-                      : '미정'}
-                  </Td>
-                  <Td>
-                    {row.sellEndDate
-                      ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm')
-                      : '미정'}
-                  </Td>
-                </Link>
-              </NextLink>
+              <Tr key={row.id}>
+                <Td>{row.id}</Td>
+                <Td>{dayjs(row.createDate).format('YYYY/MM/DD HH:mm')}</Td>
+                <Td>{row.goods.goods_name}</Td>
+                <Td>{row.seller.sellerShop.shopName}</Td>
+                <Td>
+                  <LiveShoppingProgressConverter
+                    progress={row.progress}
+                    broadcastStartDate={row.broadcastStartDate}
+                    broadcastEndDate={row.broadcastEndDate}
+                    sellEndDate={row.sellEndDate}
+                  />
+                </Td>
+                <Td>
+                  <BroadcasterName data={row.broadcaster} />
+                </Td>
+                <Td>
+                  {row.broadcastStartDate
+                    ? dayjs(row.broadcastStartDate).format('YYYY/MM/DD HH:mm')
+                    : '미정'}
+                </Td>
+                <Td>
+                  {row.broadcastEndDate
+                    ? dayjs(row.broadcastEndDate).format('YYYY/MM/DD HH:mm')
+                    : '미정'}
+                </Td>
+                <Td>
+                  {row.sellStartDate
+                    ? dayjs(row.sellStartDate).format('YYYY/MM/DD HH:mm')
+                    : '미정'}
+                </Td>
+                <Td>
+                  {row.sellEndDate
+                    ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm')
+                    : '미정'}
+                </Td>
+                <Td>
+                  {row.progress === 'registered' ? <Button size="xs">삭제</Button> : null}
+                </Td>
+              </Tr>
             ))}
         </Tbody>
       </Table>

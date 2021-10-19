@@ -11,14 +11,22 @@ export function BroadcasterName(props: { data: BroadcasterDTO }): JSX.Element {
 
   return (
     <>
-      <Text>{data ? data.userNickname : '미정'}</Text>
-      {data.youtubeId ? (
-        <ChakraNextImage src={youtubeLogo} width="24" height="24" />
-      ) : null}
-      {data.twitchId ? <ChakraNextImage src={twitchLogo} width="24" height="24" /> : null}
-      {data.afreecaId ? (
-        <ChakraNextImage src={afreecaLogo} width="24" height="24" />
-      ) : null}
+      {data ? (
+        <>
+          <Text>{data ? data.userNickname : '미정'}</Text>
+          {data.youtubeId ? (
+            <ChakraNextImage src={youtubeLogo} width="24" height="24" />
+          ) : null}
+          {data.twitchId ? (
+            <ChakraNextImage src={twitchLogo} width="24" height="24" />
+          ) : null}
+          {data.afreecaId ? (
+            <ChakraNextImage src={afreecaLogo} width="24" height="24" />
+          ) : null}
+        </>
+      ) : (
+        <Text>미정</Text>
+      )}
     </>
   );
 }
