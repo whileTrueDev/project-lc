@@ -3,7 +3,6 @@ import { EditIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
-  HStack,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,11 +10,10 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  Text,
   useDisclosure,
 } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import 'suneditor/dist/css/suneditor.min.css';
 import SunEditorCore from 'suneditor/src/lib/core';
@@ -38,16 +36,22 @@ export function GoodsRegistDescription(): JSX.Element {
   const getSunEditorInstance = (sunEditor: SunEditorCore): void => {
     editor.current = sunEditor;
   };
+
   const onClick = async (): Promise<void> => {
     if (!editor.current) return;
     const textWithImages = editor.current.getContents(false);
 
-    if (viewer.current) {
-      viewer.current.innerHTML = textWithImages;
-    }
     setValue('contents', textWithImages);
     onClose();
   };
+
+  const detailContents = watch('contents');
+
+  useEffect(() => {
+    if (viewer.current && !!detailContents) {
+      viewer.current.innerHTML = detailContents;
+    }
+  }, [detailContents]);
 
   return (
     <SectionWithTitle title="상세설명 *">

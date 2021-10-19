@@ -20,6 +20,9 @@ import {
   FindFmOrderDetailRes,
   FindFmOrderRes,
   FindFmOrdersDto,
+  OrderStats,
+  OrderStatsRes,
+  SalesStats,
 } from '@project-lc/shared-types';
 import { FmOrdersService } from './fm-orders.service';
 
@@ -48,19 +51,26 @@ export class FmOrdersController {
   }
 
   @Get('/stats')
-  async getOrdersStats(@SellerInfo() seller: UserPayload): Promise<FindFmOrderRes[]> {
+  async getOrdersStats(@SellerInfo() seller: UserPayload): Promise<OrderStatsRes> {
     // 판매자의 승인된 상품 ID 목록 조회
     const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
-    if (ids.length === 0) return [];
+    if (ids.length === 0)
+      return {
+        sales: new SalesStats(),
+        orders: new OrderStats(),
+      };
     return this.fmOrdersService.getOrdersStats(ids);
   }
 
   /** 개별 주문 조회 */
   @Get(':orderId')
   async findOneOrder(
+    @SellerInfo() seller: UserPayload,
     @Param('orderId') orderId: string,
   ): Promise<FindFmOrderDetailRes | null> {
-    return this.fmOrdersService.findOneOrder(orderId);
+    // 판매자의 승인된 상품 ID 목록 조회
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    return this.fmOrdersService.findOneOrder(orderId, ids);
   }
 
   @Put(':orderId')

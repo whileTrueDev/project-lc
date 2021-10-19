@@ -15,83 +15,14 @@ import {
   FmOrderReturn,
   FmOrderReturnBase,
   FmOrderReturnItem,
+  FmOrderShipping,
   FmOrderStatusNumString,
+  OrderStatsRes,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { FirstmallDbService } from '../firstmall-db.service';
-
-function statCounter(): any {
-  const stats = {
-    배송준비중: 0,
-    배송중: 0,
-    배송완료: 0,
-  };
-
-  const sales = {
-    주문: {
-      count: 0,
-      sum: 0,
-    },
-    환불: {
-      count: 0,
-      sum: 0,
-    },
-  };
-
-  const exDay = dayjs().subtract(1, 'day');
-
-  // fm_order 테이블의 주문 상태를 통해
-  function getStatKey(step: FmOrderStatusNumString): string | null {
-    const stepNum = parseInt(step, 10);
-    if (stepNum >= 35 && stepNum <= 50) {
-      return '배송준비중';
-    }
-    if (stepNum >= 55 && stepNum <= 70) {
-      return '배송중';
-    }
-    if (stepNum === 75) {
-      return '배송완료';
-    }
-    return null;
-  }
-
-  function getSalesKey(step: FmOrderStatusNumString, regist_date: string): string | null {
-    const stepNum = parseInt(step, 10);
-    if (exDay.isBefore(dayjs(regist_date))) {
-      if (stepNum >= 35 && stepNum <= 75) {
-        return '주문';
-      }
-      if (stepNum === 85) {
-        return '환불';
-      }
-    }
-    return null;
-  }
-
-  function count(
-    step: FmOrderStatusNumString,
-    regist_date: string,
-    payment_price: number,
-  ): void {
-    const key = getStatKey(step);
-    if (key) {
-      stats[key] += 1;
-    }
-
-    const salesKey = getSalesKey(step, regist_date);
-    if (salesKey) {
-      sales[key].count += 1;
-      sales[key].sum += payment_price;
-    }
-  }
-
-  return {
-    count,
-    stats,
-    sales,
-  };
-}
+import { StatCounter } from './utills/statCounter';
 
 @Injectable()
 export class FmOrdersService {
@@ -111,8 +42,44 @@ export class FmOrdersService {
   ): Promise<FindFmOrderRes[]> {
     const { sql, params } = this.createFindOrdersQuery(goodsIds, dto);
     if (!sql) return [];
-    const data = (await this.db.query(sql, params)) as FindFmOrderRes[];
-    return data.map((x) => ({ ...x }));
+    const data = (await this.db.query(sql, params)) as Omit<FindFmOrderRes, ''>[];
+
+    const detailAtteched = await Promise.all(
+      data.map(async (order) => {
+        // * item_seq로 상품 옵션 찾아 총 상품 금액 계산하기
+        const orderInfoPerMyGoods = await this.findOneOrderTotalInfoPerMyGoods(
+          order.item_seq,
+        );
+
+        // * 판매자 상품에 기반한 주문 상태 도출
+        // 주문 상품 조회
+        const orderItems = await this.findOneOrderItems(order.order_seq, goodsIds);
+        // 개별 주문 상품 - 상품 옵션 목록 정보
+        const itemSeqArray = orderItems.map((x) => x.item_seq);
+        const orderGoodsOptions = await this.findOneOrderOptions(itemSeqArray);
+        // 판매자 상품에 기반한 주문 상태 도출
+        const realStep = orderGoodsOptions.reduce((prev, cur) => {
+          if (!prev) return cur.step;
+          if (Number(prev) > Number(cur.step)) return cur.step;
+          return prev;
+        }, order.step);
+
+        const totalShippingCost = await this.findOrderTotalShippingCost(
+          order.id,
+          order.shipping_seq,
+        );
+
+        return {
+          ...order,
+          ...orderInfoPerMyGoods,
+          step: realStep,
+          totalShippingCost,
+          totalDeliveryCost: totalShippingCost,
+        };
+      }),
+    );
+
+    return detailAtteched;
   }
 
   /**
@@ -130,16 +97,18 @@ export class FmOrdersService {
     const defaultQueryHead = `
     SELECT
       GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR ', ') AS goods_seq,
+      GROUP_CONCAT(item_seq SEPARATOR ', ') AS item_seq,
       GROUP_CONCAT(goods_name SEPARATOR ', ') AS goods_name,
+      GROUP_CONCAT(fm_order_shipping.shipping_seq) AS shipping_seq,
       fm_order.order_seq as id,
       fm_order.*
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
+    JOIN fm_order_shipping USING(shipping_seq)
     WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
     `;
 
     const searchSql = `goods_name LIKE ?
-      OR order_seq LIKE ?
       OR fm_order.order_seq LIKE ?
       OR fm_order.recipient_user_name LIKE ?
       OR fm_order.depositor LIKE ?
@@ -241,20 +210,21 @@ export class FmOrdersService {
    */
   public async findOneOrder(
     orderId: FmOrder['order_seq'] | string,
+    goodsIds: number[],
   ): Promise<FindFmOrderDetailRes | null> {
     // * 개별 주문 정보
-    const orderInfo = await this.findOneOrderInfo(orderId);
+    const orderInfo = await this.findOneOrderInfo(orderId, goodsIds);
     if (!orderInfo) return null;
 
     // * 주문 상품
-    const orderItems = await this.findOneOrderItems(orderId);
+    const orderItems = await this.findOneOrderItems(orderId, goodsIds);
 
     // * 개별 주문 상품 - 상품 옵션 목록 정보
     const itemSeqArray = orderItems.map((x) => x.item_seq);
     const orderGoodsOptions = await this.findOneOrderOptions(itemSeqArray);
 
     // * 개별 주문 - 출고 정보
-    const orderExports = await this.findOneOrderExports(orderId);
+    const orderExports = await this.findOneOrderExports(orderId, itemSeqArray);
 
     // * 개별 주문 - 환불 정보
     const orderRefunds = await this.findOneOrderRefunds(orderId);
@@ -262,8 +232,32 @@ export class FmOrdersService {
     // * 개별 주문 - 반품 정보
     const orderReturns = await this.findOneOrderReturns(orderId);
 
+    // * 판매자 상품에 기반한 주문 상태 도출
+    const realStep = orderGoodsOptions.reduce((prev, cur) => {
+      if (!prev) return cur.step;
+      if (Number(prev) > Number(cur.step)) return cur.step;
+      return prev;
+    }, orderInfo.step);
+
+    // * 배송 관련 정보 추가를 위한 정보 조회
+    const shippingResult = await this.findOneOrderShippingInfo(
+      orderId,
+      orderInfo.shipping_seq,
+      goodsIds,
+    );
+    const totalShippingCost = await this.findOrderTotalShippingCost(
+      orderId,
+      orderInfo.shipping_seq,
+    );
+
+    // * 주문 중, 내 상품에 대한 총 주문 금액, 총 수량, 종 종류 정보
+    const totalInfo = await this.findOneOrderTotalInfoPerMyGoods(itemSeqArray.join(','));
+
     return {
       ...orderInfo,
+      ...totalInfo,
+      totalShippingCost,
+      totalDeliveryCost: totalShippingCost,
       items: orderItems.map((item) => ({
         ...item,
         options: orderGoodsOptions.filter((opt) => opt.item_seq === item.item_seq),
@@ -271,21 +265,19 @@ export class FmOrdersService {
       exports: orderExports,
       refunds: orderRefunds,
       returns: orderReturns,
+      step: realStep,
+      shippings: shippingResult,
     };
   }
 
   /** 개별 주문 정보 조회 */
   private async findOneOrderInfo(
     orderId: FmOrder['order_seq'] | string,
+    goodsIds: number[],
   ): Promise<FmOrderMetaInfo | null> {
     const sql = `
     SELECT
-      fm_order_shipping.shipping_cost,
-      fm_order_shipping.delivery_cost,
-      fm_order_shipping.shipping_set_name,
-      fm_order_shipping.shipping_type,
-      fm_order_shipping.shipping_method,
-      fm_order_shipping.shipping_group,
+      GROUP_CONCAT(fm_order_shipping.shipping_seq) AS shipping_seq,
       fm_order.order_seq as id,
       fm_order.regist_date,
       fm_order.sitetype,
@@ -293,7 +285,7 @@ export class FmOrdersService {
       fm_order.deposit_date,
       fm_order.settleprice,
       fm_order.step,
-      order_seq,
+      fm_order.order_seq,
       order_user_name,
       order_phone,
       order_cellphone,
@@ -309,27 +301,42 @@ export class FmOrdersService {
       recipient_address_detail,
       memo
     FROM fm_order
-    JOIN fm_order_shipping USING(order_seq)
-    WHERE fm_order.order_seq = ?`;
+    JOIN fm_order_item USING(order_seq)
+    JOIN fm_order_shipping USING(shipping_seq)
+    WHERE fm_order.order_seq = ? AND goods_seq IN (${goodsIds.join(',')})`;
     const result = await this.db.query(sql, [orderId]);
     const order = result.length > 0 ? result[0] : null;
     if (!order) return null;
+
     const parser = new FmOrderMemoParser(order.memo);
-    return { ...order, memo: parser.memo, memoOriginal: order.memo };
+    return {
+      ...order,
+      memo: parser.memo,
+      memoOriginal: order.memo,
+    };
   }
 
+  /** 개별 주문 상품 정보 조회 */
   private async findOneOrderItems(
     orderId: FmOrder['order_seq'] | string,
+    goodsIds: number[],
   ): Promise<FmOrderItem[]> {
     const sql = `
     SELECT 
       fm_order_item.goods_seq,
       fm_order_item.goods_name,
       fm_order_item.image,
-      fm_order_item.item_seq
+      fm_order_item.item_seq,
+      fm_order_shipping.shipping_seq,
+      fm_order_shipping.shipping_set_name,
+      fm_order_shipping.shipping_type,
+      fm_order_shipping.shipping_method,
+      fm_order_shipping.shipping_group
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
-    WHERE fm_order.order_seq = ?`;
+    JOIN fm_order_shipping USING(shipping_seq)
+    WHERE fm_order.order_seq = ?
+    AND goods_seq IN (${goodsIds.join(',')})`;
     return this.db.query(sql, [orderId]);
   }
 
@@ -364,6 +371,7 @@ export class FmOrdersService {
   /** 개별 주문 - 출고 정보 */
   private async findOneOrderExports(
     orderId: FmOrder['order_seq'] | string,
+    itemSeqArray: number[],
   ): Promise<FmOrderExport[]> {
     const exportsSql = `SELECT
       fm_goods_export.export_code,
@@ -378,6 +386,7 @@ export class FmOrdersService {
     FROM fm_goods_export
     JOIN fm_goods_export_item USING(export_code)
     WHERE fm_goods_export.order_seq = ?
+    AND fm_goods_export_item.item_seq IN (${itemSeqArray.join(',')})
     GROUP BY export_code`;
     const _exports: FmOrderExportBase[] = await this.db.query(exportsSql, [orderId]);
 
@@ -388,7 +397,8 @@ export class FmOrdersService {
     FROM fm_order_item_option
       JOIN fm_order_item USING(item_seq)
     JOIN fm_goods_export_item ON item_option_seq = option_seq
-    WHERE export_code = ?`;
+    WHERE export_code = ?
+    `;
 
     const result: FmOrderExport[] = await Promise.all(
       _exports.map(async (e) => {
@@ -533,6 +543,121 @@ export class FmOrdersService {
     return result;
   }
 
+  /** 개별 주문 - 총 주문 금액 (내 상품만) */
+  private async findOneOrderTotalInfoPerMyGoods(
+    itemSeqs: string,
+  ): Promise<Pick<FindFmOrderRes, 'totalEa' | 'totalPrice' | 'totalType'>> {
+    const result: Pick<FindFmOrderRes, 'totalEa' | 'totalPrice' | 'totalType'>[] =
+      await this.db.query(`
+    SELECT
+      SUM(price) AS totalPrice,
+      SUM(ea) AS totalEa,
+      (SELECT COUNT(*) FROM (
+        SELECT SUM(item_option_seq)
+        FROM fm_order_item_option
+        WHERE item_seq IN (${itemSeqs})
+        GROUP BY item_option_seq
+      ) AS totalType) totalType
+    FROM fm_order_item_option
+    WHERE item_seq IN (${itemSeqs})`);
+    if (result.length === 0) return null;
+    return result[0];
+  }
+
+  /** 개별 주문상품의 배송정보 조회 */
+  public async findOneOrderShippingInfoPerMyOrderItem(
+    orderItemSeq: FmOrderItem['item_seq'],
+  ): Promise<FmOrderShipping> {
+    const shppingInfo: FmOrderShipping[] = await this.db.query(
+      `SELECT
+    shipping_seq,
+    shipping_set_name,
+    shipping_type,
+    shipping_method,
+    shipping_group,
+    shipping_cost,
+    delivery_cost
+  FROM fm_order_shipping
+    JOIN fm_order_item USING(shipping_seq)
+  WHERE item_seq = ?`,
+      [orderItemSeq],
+    );
+    if (shppingInfo.length === 0) return null;
+    return shppingInfo[0];
+  }
+
+  /** 주문의 총 배송비 조회 */
+  private async findOrderTotalShippingCost(
+    orderId: FmOrder['order_seq'] | string,
+    orderShippingSeqArrStr: string,
+  ): Promise<string> {
+    const totalInfo: Pick<FmOrderShipping, 'shippingCost'>[] = await this.db.query(
+      `SELECT SUM(shipping_cost) AS shippingCost
+      FROM fm_order_shipping
+      WHERE shipping_seq IN (${orderShippingSeqArrStr}) AND order_seq = ?`,
+      [orderId],
+    );
+
+    if (totalInfo.length === 0) return '0';
+    return totalInfo[0].shippingCost;
+  }
+
+  /**
+   * 개별 주문 - 배송정보 (내 상품만)
+   * @param shipping_seq 41, 42, 43 과 같이 "," 로 구분된 shipping_seq 문자열 */
+  private async findOneOrderShippingInfo(
+    orderId: number | string,
+    shipping_seq: string,
+    goodsIds: number[],
+  ): Promise<FmOrderShipping[]> {
+    const shippingResult: FmOrderShipping[] = await this.db.query(
+      `SELECT
+      shipping_seq,
+      shipping_set_name,
+      shipping_type,
+      shipping_method,
+      shipping_group,
+      shipping_cost,
+      delivery_cost
+    FROM fm_order_shipping WHERE shipping_seq IN (${shipping_seq}) AND order_seq = ?`,
+      [orderId],
+    );
+
+    const result = await Promise.all(
+      shippingResult.map(async (sh) => {
+        // * 주문 중, 이 배송방식으로 주문된 주문상품목록 조회
+        const shippingItems: FmOrderItem[] = await this.db.query(
+          `SELECT fm_order_item.goods_seq,
+            fm_order_item.goods_name,
+            fm_order_item.image,
+            fm_order_item.item_seq,
+            shipping_seq
+          FROM fm_order_item
+          WHERE
+            shipping_seq = ?
+            AND order_seq = ? 
+            AND goods_seq IN (?)`,
+          [sh.shipping_seq, orderId, goodsIds],
+        );
+
+        // * 해당 item의 옵션 정보 조회
+        const shippingItemsWithOptions = await Promise.all(
+          shippingItems.map(async (si) => ({
+            ...si,
+            options: await this.findOneOrderOptions([si.item_seq]),
+          })),
+        );
+
+        return {
+          ...sh,
+          items: shippingItemsWithOptions,
+        };
+      }),
+    );
+
+    return result;
+  }
+
   // * **********************************
   // * 주문 상태 변경
   // * **********************************
@@ -585,7 +710,7 @@ export class FmOrdersService {
   // * **********************************
   // * 주문 현황 조회
   // * **********************************
-  public async getOrdersStats(goodsIds: number[]): Promise<FindFmOrderRes[]> {
+  public async getOrdersStats(goodsIds: number[]): Promise<OrderStatsRes> {
     const sql = `
     SELECT
       fm_order.*
@@ -598,14 +723,14 @@ export class FmOrdersService {
     const exMonth = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
     const data = (await this.db.query(sql, [exMonth])) as FindFmOrderRes[];
 
-    const counter = statCounter();
-    const result = data.map((x) => ({ ...x }));
-    // 주문현황을 위한 counting
+    const counter = StatCounter();
     data.forEach((x) => {
       counter.count(x.step, x.regist_date, x.payment_price);
     });
-    console.log(counter.stats);
-    //
-    return result;
+
+    return {
+      orders: counter.orders,
+      sales: counter.sales,
+    };
   }
 }

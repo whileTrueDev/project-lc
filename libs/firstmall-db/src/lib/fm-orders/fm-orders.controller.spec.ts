@@ -90,6 +90,9 @@ describe('FmOrdersController', () => {
       exports: orderDetailExportsSample,
       refunds: orderDetailRefundsSample,
       returns: orderDetailReturnsSample,
+      totalPrice: '1000',
+      totalEa: 1000,
+      totalType: 10,
     };
     it('should be return 200', async () => {
       jest.spyOn(service, 'findOneOrder').mockImplementation(async (id: string) => {

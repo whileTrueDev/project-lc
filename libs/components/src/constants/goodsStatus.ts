@@ -38,4 +38,5 @@ export const GOODS_CONFIRMATION_STATUS: Record<
   waiting: { label: '대기' },
   confirmed: { label: '승인', colorScheme: 'green' },
   rejected: { label: '거절', colorScheme: 'red' },
+  needReconfirmation: { label: '재검수 대기' },
 };

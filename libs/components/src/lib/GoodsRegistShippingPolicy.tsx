@@ -211,7 +211,7 @@ function ShippingGroupListItem({
       <Radio
         width="10%"
         {...register('shippingGroupId', { valueAsNumber: true })}
-        value={String(group.id)} // String으로 안바꾸면 라디오 선택이 안됨... 왜???
+        value={String(group.id)} // radioGroup에서 onchange일때 값이 string으로 들어가는 듯 하다
       />
 
       {/* 배송그룹명 */}
@@ -424,7 +424,11 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
 
       {/* 배송비 정책 목록 */}
       <ShippingGroupContainerBox maxWidth="lg">
-        <RadioGroup value={watch('shippingGroupId')} maxHeight="150px" overflowY="auto">
+        <RadioGroup
+          value={watch('shippingGroupId')?.toString()}
+          maxHeight="150px"
+          overflowY="auto"
+        >
           {data &&
             data.map((g) => (
               <ShippingGroupListItem

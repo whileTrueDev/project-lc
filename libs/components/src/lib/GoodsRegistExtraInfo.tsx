@@ -25,7 +25,7 @@ export function GoodsRegistExtraInfo(): JSX.Element {
       <FormControl mb={2}>
         <FormLabel fontWeight="bold">최소 구매 수량</FormLabel>
         <RadioGroup
-          value={watch('min_purchase_limit', 'unlimit')}
+          value={watch('min_purchase_limit')}
           onChange={(value) => {
             if (value === 'unlimit') {
               setValue('min_purchase_ea', undefined);
@@ -61,7 +61,7 @@ export function GoodsRegistExtraInfo(): JSX.Element {
       <FormControl>
         <FormLabel fontWeight="bold">최대 구매 수량</FormLabel>
         <RadioGroup
-          value={watch('max_purchase_limit', 'unlimit')}
+          value={watch('max_purchase_limit')}
           onChange={(value) => {
             if (value === 'unlimit') {
               setValue('max_purchase_ea', undefined);
