@@ -1,12 +1,4 @@
-import {
-  HStack,
-  CloseButton,
-  Text,
-  Stack,
-  useToast,
-  ImageProps,
-  Box,
-} from '@chakra-ui/react';
+import { CloseButton, HStack, Stack, useToast } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ChakraNextImage } from './ChakraNextImage';
@@ -105,17 +97,38 @@ export function GoodsRegistPictures(): JSX.Element {
   };
 
   const handleError = (errorType?: ImageInputErrorTypes): void => {
-    console.error({ errorType });
+    switch (errorType) {
+      case 'invalid-format': {
+        toast({
+          title: `이미지 파일을 선택해주세요`,
+          status: 'warning',
+        });
+        return;
+      }
+      case 'over-size': {
+        toast({
+          title: `이미지 파일은 10MB 이하여야 합니다`,
+          status: 'warning',
+        });
+        return;
+      }
+      default: {
+        toast({
+          title: `이미지 파일을 선택해주세요`,
+          status: 'warning',
+        });
+      }
+    }
   };
 
   return (
     <SectionWithTitle title="상품사진 *">
       <Stack spacing={4}>
-        {/* //TODO: ImageInput multiselect & 사이즈 제한 변경 */}
         <ImageInput
           handleSuccess={handleSuccess}
           handleError={handleError}
           variant="chakra"
+          multiple
         />
 
         {/* 선택한 이미지 프리뷰 목록 */}
