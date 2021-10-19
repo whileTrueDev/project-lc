@@ -36,6 +36,8 @@ export function GoodsOptionInput({
   );
 }
 
+const PRICE_INPUT_MAX = 99999999;
+
 function NoOptionInput(): JSX.Element {
   const { register } = useFormContext<GoodsFormValues>();
   return (
@@ -47,6 +49,7 @@ function NoOptionInput(): JSX.Element {
           ...register(`options.0.consumer_price` as const, {
             valueAsNumber: true,
           }),
+          max: PRICE_INPUT_MAX,
         }}
       />
       <GoodsOptionInput
@@ -56,6 +59,7 @@ function NoOptionInput(): JSX.Element {
           ...register(`options.0.price` as const, {
             valueAsNumber: true,
           }),
+          max: PRICE_INPUT_MAX,
         }}
       />
 
@@ -81,10 +85,13 @@ function UseOptionInput(): JSX.Element {
     register,
     formState: { errors },
   } = useFormContext<GoodsFormValues>();
-  const { fields, append, remove } = useFieldArray<GoodsFormValues, 'options'>({
-    control,
-    name: 'options' as const,
-  });
+  const { fields, append, remove } = useFieldArray<GoodsFormValues, 'options', 'fieldId'>(
+    {
+      control,
+      name: 'options' as const,
+      keyName: 'fieldId',
+    },
+  );
   const { isMobileSize } = useDisplaySize();
 
   const inputWidth = isMobileSize ? '74px' : 'auto';
@@ -129,7 +136,7 @@ function UseOptionInput(): JSX.Element {
 
       {fields.map((field, index) => (
         <Stack
-          key={field.id}
+          key={field.fieldId}
           {...boxStyle}
           direction={isMobileSize ? 'column' : 'row'}
           spacing={1}
@@ -138,6 +145,7 @@ function UseOptionInput(): JSX.Element {
           {/* 옵션값 */}
           <HStack mb={1}>
             <CloseButton onClick={() => remove(index)} />
+
             <HStack>
               <Text minWidth="60px">
                 옵션값 <RequiredMark />
@@ -160,7 +168,9 @@ function UseOptionInput(): JSX.Element {
                 {...register(`options.${index}.consumer_price` as const, {
                   valueAsNumber: true,
                 })}
+                max={PRICE_INPUT_MAX}
                 width={inputWidth}
+                type="number"
                 size="sm"
               />
             </HStack>
@@ -173,7 +183,9 @@ function UseOptionInput(): JSX.Element {
                 {...register(`options.${index}.price` as const, {
                   valueAsNumber: true,
                 })}
+                max={PRICE_INPUT_MAX}
                 width={inputWidth}
+                type="number"
                 size="sm"
               />
             </HStack>

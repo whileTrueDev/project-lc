@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
 import { hash, verify } from 'argon2';
-import { FindSellerRes } from '@project-lc/shared-types';
+import { FindSellerRes, SellerContactsDTO } from '@project-lc/shared-types';
 import { PrismaService } from '@project-lc/prisma-orm';
 @Injectable()
 export class SellerService {
@@ -156,5 +156,42 @@ export class SellerService {
       },
     });
     return seller;
+  }
+
+  /** 판매자의 기본 연락처 */
+  async findDefaultContacts(email: string): Promise<SellerContactsDTO> {
+    const userId = await this.prisma.seller.findFirst({
+      where: { email },
+      select: {
+        id: true,
+      },
+    });
+
+    const sellerDefaultContacts = await this.prisma.sellerContacts.findFirst({
+      where: { sellerId: userId.id, isDefault: true },
+      select: {
+        id: true,
+        email: true,
+        phoneNumber: true,
+        isDefault: true,
+      },
+      orderBy: {
+        createDate: 'desc',
+      },
+    });
+
+    return sellerDefaultContacts;
+  }
+
+  async registSellerContacts(sellerEmail, dto): Promise<{ contactId: number }> {
+    const contact = await this.prisma.sellerContacts.create({
+      data: {
+        seller: { connect: { email: sellerEmail } },
+        email: dto.email,
+        phoneNumber: dto.phoneNumber,
+        isDefault: dto.isDefault ? true : undefined,
+      },
+    });
+    return { contactId: contact.id };
   }
 }

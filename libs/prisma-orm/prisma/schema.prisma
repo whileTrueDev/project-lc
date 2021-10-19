@@ -22,6 +22,8 @@ model Seller {
   sellerSettlements          SellerSettlements[]
   socialAccounts             SellerSocialAccount[]
   shippingGroups             ShippingGroup[]
+  SellerContacts             SellerContacts[]
+  LiveShopping               LiveShopping[]
 }
 
 // 마케터의 상정정보
@@ -105,6 +107,18 @@ model SellerSocialAccount {
   @@index([sellerId], name: "sellerId")
 }
 
+// 판매자가 등록한 라이브 쇼핑 담당자 연락처들
+model SellerContacts {
+  id           Int            @id @default(autoincrement())
+  sellerId     Int // 판매자 아이디
+  email        String         @default("") //등록한 이메일
+  phoneNumber  String         @default("") // 등록한 전화번호
+  isDefault    Boolean        @default(false) // 기본 연락처 설정 여부
+  seller       Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  LiveShopping LiveShopping[]
+  createDate   DateTime       @default(now())
+}
+
 // ****************************
 // * firstmall과 동일한 상품 정보 (컬럼명도 동일하게 가져갑니다.)
 // 상품 - fm_goods
@@ -146,8 +160,9 @@ model Goods {
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
   GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
-  goodsInfoId             Int?               @unique
+  goodsInfoId             Int?
 
+  LiveShopping LiveShopping[]
   @@index([sellerId], name: "sellerId")
 }
 
@@ -168,12 +183,12 @@ model GoodsOptions {
   goodsId        Int
   supply         GoodsOptionsSupplies?
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
-  default_option YesOrNo               @default(n) // 옵션 필수 여부
+  default_option YesOrNo               @default(n) // 옵션 필수 �������부
   option_type    String                @default("direct") // 기본값인듯? 설명도 direct
   option_title   String? // 옵션명 fm_goods_options.option_title
   option1        String? // 옵션값 fm_goods_options.option1
   option_code    String? // 옵션코드
-  consumer_price Decimal               @db.Decimal(10, 2) // ��������비��가 (미할인가)
+  consumer_price Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
   price          Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
   color          String?               @db.VarChar(10) // 컬러 hex값
   weight         Float? //옵션 개당 무게 (단위 kg)
@@ -185,7 +200,7 @@ model GoodsOptions {
 // 상품 옵션 재고 - fm_goods_suply
 model GoodsOptionsSupplies {
   id             Int          @id @default(autoincrement())
-  goodsOptionsId Int
+  goodsOptionsId Int          @unique
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   stock          Int          @db.UnsignedInt // 재고
   badstock       Int?         @db.UnsignedInt // 불량재고
@@ -198,9 +213,9 @@ model GoodsOptionsSupplies {
 // 상품 사진 fm_goods_image
 model GoodsImages {
   id         Int    @id @default(autoincrement())
-  goods      Goods  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
-  goodsId    Int
-  image      String
+  goods      Goods? @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  goodsId    Int?
+  image      String @db.VarChar(500)
   cut_number Int
 }
 
@@ -235,6 +250,7 @@ enum GoodsConfirmationStatuses {
   waiting // 대기
   confirmed // 승인
   rejected // 거절
+  needReconfirmation // 재검수 대기
 }
 
 // 상품 검수 상태 정보
@@ -394,7 +410,7 @@ enum ShippingOptType {
   amount_rep // 금액(구간반복)
   cnt // 수량(구간입력)
   cnt_rep // 수량(구간반복)
-  weight // 무게(구간입력)
+  weight // -> 무게(구간입력)
   weight_rep // 무게(구간반복)
 }
 
@@ -435,5 +451,23 @@ model Broadcaster {
   createDate          DateTime              @default(now())
   deleteFlag          Boolean               @default(false) // 회원탈퇴 여부
 
+  LiveShopping LiveShopping[]
   @@index(userId)
+}
+
+// 라이브 쇼핑
+model LiveShopping {
+  id             Int            @id @default(autoincrement())
+  streamId       String?        @unique // 방송마다 부여되는 unique 값
+  broadcasterId  String?        @db.VarChar(20) // 스트리머의 아이디 
+  sellerId       Int // 판매자 ID
+  goodsId        Int // 상품 ID
+  contactId      Int // 판매자 등록된 연락처 ID
+  requests       String?        @db.LongText // 요청사항
+  progress       String         @default("registered") // 진행상태
+  sellerContacts SellerContacts @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  seller         Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  goods          Goods          @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  broadcaster    Broadcaster?   @relation(fields: [broadcasterId], references: [userId])
+  createDate     DateTime       @default(now())
 }

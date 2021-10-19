@@ -14,6 +14,7 @@ import {
   RoomAndDate,
   RoomAndVideoType,
   SocketIdandDevice,
+  StartSetting,
 } from '@project-lc/shared-types';
 import { OverlayService } from '@project-lc/nest-modules';
 
@@ -117,10 +118,16 @@ export class AppScreenGateway
   }
 
   @SubscribeMessage('get start time from admin')
-  getStartTime(@MessageBody() roomAndDate: RoomAndDate): void {
-    const { date } = roomAndDate;
-    const { roomName } = roomAndDate;
-    this.server.to(roomName).emit('get start time from server', date);
+  getStartTime(
+    @MessageBody()
+    startSetting: StartSetting,
+  ): void {
+    const { date } = startSetting;
+    const { roomName } = startSetting;
+    const { streamerAndProduct } = startSetting;
+    this.server
+      .to(roomName)
+      .emit('get start time from server', { date, streamerAndProduct });
   }
 
   @SubscribeMessage('get d-day')
@@ -148,9 +155,22 @@ export class AppScreenGateway
   }
 
   @SubscribeMessage('send notification signal')
-  async sendNotificationSignal(@MessageBody() roomName: string): Promise<void> {
-    const audioBuffer = await this.overlayService.streamStartNotification();
-    this.server.to(roomName).emit('get stream start notification tts', audioBuffer);
+  async sendNotificationSignal(
+    @MessageBody()
+    startSetting: StartSetting,
+  ): Promise<void> {
+    const text = `잠시 후, ${startSetting.streamerAndProduct.streamerNickname}님의 ${startSetting.streamerAndProduct.productName} 라이브커머스가 시작됩니다`;
+    const audioBuffer = await this.overlayService.streamNotification(text);
+    this.server
+      .to(startSetting.roomName)
+      .emit('get stream start notification tts', audioBuffer);
+  }
+
+  @SubscribeMessage('send end notification signal')
+  async sendEndSignal(@MessageBody() roomName: string): Promise<void> {
+    const text = '라이브 커머스 종료까지 5분 남았습니다.';
+    const audioBuffer = await this.overlayService.streamNotification(text);
+    this.server.to(roomName).emit('get stream end notification tts', audioBuffer);
   }
 
   @SubscribeMessage('connection check from admin')

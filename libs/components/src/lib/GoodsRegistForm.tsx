@@ -29,15 +29,18 @@ import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
 
-export type GoodsFormOptionsType = Omit<
-  GoodsOptionDto,
-  'default_option' | 'option_title'
->[];
+export type GoodsFormOption = Omit<GoodsOptionDto, 'default_option' | 'option_title'> & {
+  id?: number;
+};
 
-export type GoodsFormValues = Omit<RegistGoodsDto, 'options' | 'image'> & {
+export type GoodsFormOptionsType = GoodsFormOption[];
+
+export type GoodsFormValues = Omit<RegistGoodsDto, 'options'> & {
+  id?: number;
   options: NestedValue<GoodsFormOptionsType>;
-  image?: { file: File; filename: string; id: number }[];
+  pictures?: { file: File; filename: string; id: number }[];
   option_title: string; // 옵션 제목
+  common_contents: string;
   common_contents_name?: string; // 공통 정보 이름
   common_contents_type: 'new' | 'load'; // 공통정보 신규 | 기존 불러오기
 };
@@ -49,7 +52,7 @@ type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
 /** 이미지 파일명 앞부분에 타임스탬프 붙임
  * "2348238342_파일명" 형태로 리턴함
  * */
-function addTimeStampToFilename(filename: string): string {
+export function addTimeStampToFilename(filename: string): string {
   const timestamp = Date.now();
   return `${timestamp}_${filename}`;
 }
@@ -64,44 +67,11 @@ export async function uploadGoodsImageToS3(
   const type = 'goods';
   const timestampFilename = addTimeStampToFilename(filename);
   const key = path.join(...[type, userMail, timestampFilename]);
-  await s3.s3uploadFile({ key, file, contentType });
-  const url = [
-    'https://',
-    process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-    '.s3.',
-    'ap-northeast-2',
-    '.amazonaws.com/',
-    key,
-  ].join('');
-
-  return url;
-}
-
-// 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
-// 상품사진은 file 로 들어옴
-async function imageFileListToImageDto(
-  imageFileList: { file: File; filename: string; id: number }[],
-  userMail: string,
-): Promise<
-  Array<{
-    cut_number: number;
-    image: string;
-  }>
-> {
-  const savedImages = await Promise.all(
-    imageFileList.map((item) => {
-      const { file } = item;
-      return uploadGoodsImageToS3({ ...item, contentType: file.type }, userMail);
-    }),
-  );
-  return savedImages.map((img, index) => ({
-    cut_number: index,
-    image: img,
-  }));
+  return s3.s3uploadFile({ key, file, contentType });
 }
 
 // options 에 default_option, option_title설정
-function addGoodsOptionInfo(
+export function addGoodsOptionInfo(
   options: Omit<GoodsOptionDto, 'default_option' | 'option_title'>[],
   option_title: string,
 ): GoodsOptionDto[] {
@@ -146,6 +116,7 @@ export async function saveContentsImageToS3(
   return contentsBody;
 }
 
+/** 상품 등록 폼 컴포넌트 */
 export function GoodsRegistForm(): JSX.Element {
   const { data: profileData } = useProfile();
   const { mutateAsync, isLoading } = useRegistGoods();
@@ -155,6 +126,11 @@ export function GoodsRegistForm(): JSX.Element {
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
+      // 판매정보
+      goods_status: 'normal', // 판매상태
+      cancel_type: '0', // 청약철회, 기본 - 청약철회가능 0
+      // 판매옵션
+      option_use: '1', // 옵션사용여부, 기본 - 옵션사용 1
       common_contents_type: 'new',
       option_title: '',
       image: [],
@@ -170,7 +146,9 @@ export function GoodsRegistForm(): JSX.Element {
           },
         },
       ],
-      option_use: '1',
+      // 기타정보 (최대, 최소구매수량)
+      min_purchase_limit: 'unlimit',
+      max_purchase_limit: 'unlimit',
       // 이하 fm_goods 기본값
       goods_view: 'look',
       shipping_policy: 'shop',
@@ -188,7 +166,6 @@ export function GoodsRegistForm(): JSX.Element {
     const userMail = profileData.email;
 
     const {
-      image,
       options,
       option_title,
       common_contents_name,
@@ -198,20 +175,37 @@ export function GoodsRegistForm(): JSX.Element {
       min_purchase_ea,
       shippingGroupId,
       contents,
+      image,
       ...goodsData
     } = data;
 
     let goodsDto: RegistGoodsDto = {
       ...goodsData,
-      common_contents: '',
+      image,
       options: addGoodsOptionInfo(options, option_title),
       option_use: options.length > 1 ? '1' : '0',
       max_purchase_ea: Number(max_purchase_ea) || 0,
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
-      image:
-        image && image.length > 0 ? await imageFileListToImageDto(image, userMail) : [],
     };
+
+    if (!shippingGroupId) {
+      // 배송비정책 그룹을 선택하지 않은 경우
+      toast({
+        title: '배송비 정책을 선택해주세요',
+        status: 'warning',
+      });
+      return;
+    }
+
+    if (!image || image.length < 1) {
+      // 등록된 사진이 없는 경우
+      toast({
+        title: '상품 사진을 1개 이상 등록해주세요',
+        status: 'warning',
+      });
+      return;
+    }
 
     // 상세설명을 입력한 경우
     if (contents && contents !== '<p><br></p>') {
@@ -223,7 +217,6 @@ export function GoodsRegistForm(): JSX.Element {
       };
     } else {
       // 상세설명을 입력하지 않은 경우 - 상품 수정 기능이 없는 동안 필수값으로 설정함
-      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기
       toast({ title: '상세설명을 입력해주세요', status: 'warning' });
       return;
     }
@@ -244,11 +237,9 @@ export function GoodsRegistForm(): JSX.Element {
       goodsDto = {
         ...goodsDto,
         goodsInfoId: res.id,
-        common_contents: commonInfoBody,
       };
     } else if (!data.goodsInfoId) {
-      // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함) - 상품 수정 기능이 없는 동안 필수값으로 설정함
-      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기
+      // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함)
       toast({
         title: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
         status: 'warning',
@@ -256,18 +247,8 @@ export function GoodsRegistForm(): JSX.Element {
       return;
     }
 
-    if (!shippingGroupId) {
-      // 배송비정책 그룹을 선택하지 않은 경우
-      // TODO: 수정기능 추가 후 옵셔널 값으로 변경하기(if문 삭제)
-      toast({
-        title: '배송비 정책을 선택해주세요',
-        status: 'warning',
-      });
-      return;
-    }
-
     mutateAsync(goodsDto)
-      .then((res) => {
+      .then(() => {
         toast({
           title: '상품을 성공적으로 등록하였습니다',
           status: 'success',

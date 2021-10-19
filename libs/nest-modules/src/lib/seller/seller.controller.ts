@@ -22,6 +22,8 @@ import {
   SettlementAccountDto,
   SellerShopInfoDto,
   FindSellerRes,
+  SellerContactsDTO,
+  SellerContactsDTOWithoutIdDTO,
   SellerBusinessRegistrationType,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -168,5 +170,21 @@ export class SellerController {
     } catch (e) {
       res.sendStatus(500);
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('contacts')
+  public findDefaultContacts(@Query('email') email: string): Promise<SellerContactsDTO> {
+    return this.sellerService.findDefaultContacts(email);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('contacts')
+  public createContacts(
+    @SellerInfo() seller: UserPayload,
+    @Body(ValidationPipe) dto: SellerContactsDTOWithoutIdDTO,
+  ): Promise<{ contactId: number }> {
+    const email = seller.sub;
+    return this.sellerService.registSellerContacts(email, dto);
   }
 }

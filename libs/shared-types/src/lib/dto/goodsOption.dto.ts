@@ -4,6 +4,9 @@ import { Type } from 'class-transformer';
 import { GoodsOptionsSupplyDto } from './goodsOptionSupply.dto';
 
 export class GoodsOptionDto {
+  @IsOptional()
+  id?: number;
+
   @IsIn(['y', 'n'])
   default_option: YesOrNo;
 

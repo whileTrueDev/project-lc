@@ -1,5 +1,12 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsIn, IsNumberString, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsIn,
+  IsInt,
+  IsNumberString,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { fmDeliveryCompanies } from '../constants/fmDeliveryCompanies';
 import { FmOrderExport } from '../res-types/fmOrder.res';
 
@@ -29,6 +36,10 @@ export class ExportOrderDto {
   /** 출고 송장번호 */
   @IsString()
   deliveryNumber: string;
+
+  /** 출고할 배송묶음의 고유번호 */
+  @IsInt()
+  shippingSeq: number;
 
   /** 출고 옵션 정보 */
   @IsArray()

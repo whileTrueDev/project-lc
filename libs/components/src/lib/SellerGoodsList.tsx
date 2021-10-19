@@ -2,7 +2,6 @@ import {
   Badge,
   Box,
   Button,
-  ButtonGroup,
   Flex,
   Link,
   Select,
@@ -65,6 +64,28 @@ export function ShippingGroupDetailButton(props: {
         groupId={id}
       />
     </>
+  );
+}
+
+/** 상품 수정 페이지로 이동하는 링크 */
+export function GoodsEditButton({ goodsId }: { goodsId: number | string }): JSX.Element {
+  return (
+    <NextLink href={`/mypage/goods/edit/${goodsId}`} passHref>
+      <Link>
+        <Text
+          borderWidth="1px"
+          borderRadius="md"
+          textAlign="center"
+          lineHeight="1.2"
+          fontWeight="semibold"
+          fontSize="sm"
+          height={8}
+          p={2}
+        >
+          수정하기
+        </Text>
+      </Link>
+    </NextLink>
   );
 }
 
@@ -237,7 +258,7 @@ const columns: GridColumns = [
   {
     field: 'confirmation',
     headerName: '검수',
-    width: 60,
+    width: 90,
     renderCell: ({ row }) => {
       const {
         status,
@@ -292,16 +313,10 @@ const columns: GridColumns = [
   {
     field: 'manage',
     headerName: '관리',
-    minWidth: 120,
+    minWidth: 60,
     renderCell: ({ row }) => {
       const goodsId = row.id;
-      return (
-        <ButtonGroup>
-          <Button size="sm" onClick={() => console.log({ goodsId })}>
-            수정
-          </Button>
-        </ButtonGroup>
-      );
+      return <GoodsEditButton goodsId={goodsId} />;
     },
   },
 ];

@@ -1,22 +1,28 @@
 /* eslint-disable camelcase */
-// import { DeleteObjectsCommand, ObjectIdentifier, S3Client } from '@aws-sdk/client-s3';
-import { DeleteObjectsCommandOutput } from '@aws-sdk/client-s3';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { GoodsView, Seller } from '@prisma/client';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { GoodsImages, GoodsView, Seller } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsByIdRes,
+  GoodsImageDto,
   GoodsListDto,
   GoodsListRes,
+  GoodsOptionDto,
   GoodsOptionsWithSupplies,
   GoodsOptionWithStockInfo,
   RegistGoodsDto,
   TotalStockInfo,
+  ApprovedGoodsNameAndId,
 } from '@project-lc/shared-types';
 import {
-  S3Service,
   getImgSrcListFromHtmlStringList,
   getS3KeyListFromImgSrcList,
+  S3Service,
 } from '../s3/s3.service';
 
 @Injectable()
@@ -243,9 +249,7 @@ export class GoodsService {
   }
 
   /** 상품의 contents에서 s3 url 값 찾아서 삭제 요청 리턴 */
-  async deleteGoodsContentImagesFromS3(
-    goodsIds: number[],
-  ): Promise<DeleteObjectsCommandOutput> {
+  async deleteGoodsContentImagesFromS3(goodsIds: number[]): Promise<void> {
     // goods Id 의 contents 모두 모으기
     const goodsContents = await this.prisma.goods.findMany({
       where: {
@@ -266,11 +270,15 @@ export class GoodsService {
     // img src에서 s3에 저장된 이미지만 찾기
     const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
 
-    return this.s3service.deleteMultipleObjects(s3ImageKeys.map((key) => ({ Key: key })));
+    if (s3ImageKeys.length > 0) {
+      await this.s3service.deleteMultipleObjects(
+        s3ImageKeys.map((key) => ({ Key: key })),
+      );
+    }
   }
 
   /** 상품과 연결된 GoodsImages url값을 찾아서 s3 객체 삭제 요청 리턴 */
-  async deleteGoodsImagesFromS3(goodsIds: number[]): Promise<DeleteObjectsCommandOutput> {
+  async deleteGoodsImagesFromS3(goodsIds: number[]): Promise<void> {
     // goods Id 와 연결된 GoodsImage 찾기
     const images = await this.prisma.goodsImages.findMany({
       where: {
@@ -288,7 +296,11 @@ export class GoodsService {
     // 이미지 중 s3에 업로드된 이미지 찾기
     const s3ImageKeys = getS3KeyListFromImgSrcList(imageList);
 
-    return this.s3service.deleteMultipleObjects(s3ImageKeys.map((key) => ({ Key: key })));
+    if (s3ImageKeys.length > 0) {
+      await this.s3service.deleteMultipleObjects(
+        s3ImageKeys.map((key) => ({ Key: key })),
+      );
+    }
   }
 
   // 노출여부 변경
@@ -362,7 +374,7 @@ export class GoodsService {
             create: optionsData,
           },
           image: {
-            create: image,
+            connect: image.map((img) => ({ id: img.id })),
           },
           ShippingGroup: shippingGroupId
             ? { connect: { id: shippingGroupId } }
@@ -376,5 +388,193 @@ export class GoodsService {
       console.error(error);
       throw new InternalServerErrorException(error);
     }
+  }
+
+  /** 여러 상품이미지 등록 - 생성된 goodsImage[] 리턴 */
+  async registGoodsImages(dto: GoodsImageDto[]): Promise<GoodsImages[]> {
+    try {
+      await this.prisma.goodsImages.createMany({
+        data: dto,
+      });
+    } catch (e) {
+      console.error(e);
+      if (e instanceof PrismaClientKnownRequestError) {
+        if (e.code === 'P2000') {
+          // GoodsImages.image 컬럼 타입보다 들어온 값이 큰 경우
+          throw new BadRequestException(
+            '파일 명이 너무 깁니다. 파일 명을 줄여서 다시 시도해주세요.',
+          );
+        }
+      }
+      throw new InternalServerErrorException('error in registGoodsImages');
+    }
+
+    return this.prisma.goodsImages.findMany({
+      where: { image: { in: dto.map((item) => item.image) } },
+    });
+  }
+
+  /** 하나의 상품이미지 삭제 */
+  async deleteGoodsImage(imageId: number): Promise<boolean> {
+    const imageToDeleted = await this.prisma.goodsImages.findUnique({
+      where: { id: imageId },
+    });
+
+    if (!imageToDeleted)
+      throw new BadRequestException(
+        `상품 이미지 데이터가 존재하지 않습니다 id : ${imageId}`,
+      );
+
+    try {
+      const url = imageToDeleted.image;
+      const S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
+      if (url.includes(S3_DOMIAN)) {
+        const Key = url.replace(S3_DOMIAN, '');
+        await this.s3service.deleteMultipleObjects([{ Key }]);
+      }
+
+      await this.prisma.goodsImages.delete({
+        where: { id: imageId },
+      });
+      return true;
+    } catch (e) {
+      console.error(e);
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  /** 상품 수정시 상품 옵션 데이터 구분하는 함수(삭제, 수정, 생성) 
+   * 
+   *  option id 가 존재하면 업데이트
+     option id가 undefined이면 create
+     기존 상품에 있었으나 새로 들어온 정보에 없다면 삭제
+  */
+  private async distinguishOptions(
+    goodsId: number,
+    updateDtoOptions: GoodsOptionDto[],
+  ): Promise<{
+    willBeCreatedOptions: GoodsOptionDto[];
+    willBeUpdatedOptions: GoodsOptionDto[];
+    willBeDeletedOptIds: number[];
+  }> {
+    const originGoodsOptions = await this.prisma.goodsOptions.findMany({
+      where: { goodsId },
+      select: { id: true },
+    });
+
+    // 기존상품 옵션 id 목록
+    const originGoodsOptionsId = originGoodsOptions.map((g) => g.id);
+
+    // dto 옵션중 디비에 없는 옵션(create할거)
+    const willBeCreatedOptions = updateDtoOptions.filter((o) => !o.id);
+
+    // dto 옵션 중 디비에 존재하는 옵션(update 할거)
+    const willBeUpdatedOptions = updateDtoOptions.filter((o) => !!o.id);
+    // 디비에 존재하는 옵션 id 목록
+    const comingOptionsId = willBeUpdatedOptions.map((g) => g.id);
+
+    // 삭제할 옵션 id
+    const willBeDeletedOptIds = originGoodsOptionsId.filter(
+      (optId) => !comingOptionsId.includes(optId),
+    );
+
+    return {
+      willBeCreatedOptions,
+      willBeUpdatedOptions,
+      willBeDeletedOptIds,
+    };
+  }
+
+  /** 상품 수정 */
+  async updateOneGoods(id: number, dto: RegistGoodsDto): Promise<{ goodsId: number }> {
+    const {
+      options: comingOptions,
+      image,
+      shippingGroupId,
+      goodsInfoId,
+      ...goodsData
+    } = dto;
+
+    const { willBeCreatedOptions, willBeUpdatedOptions, willBeDeletedOptIds } =
+      await this.distinguishOptions(id, comingOptions);
+
+    const { status: prevStatus } = await this.prisma.goodsConfirmation.findFirst({
+      where: { goodsId: id },
+      select: { status: true },
+    });
+
+    try {
+      await this.prisma.goods.update({
+        where: { id },
+        data: {
+          ...goodsData,
+          options: {
+            deleteMany: willBeDeletedOptIds.map((_id) => ({ id: _id })),
+            create: willBeCreatedOptions.map((opt) => {
+              const { supply, ...rest } = opt;
+              return {
+                ...rest,
+                supply: { create: supply },
+              };
+            }),
+            update: willBeUpdatedOptions.map((opt) => {
+              const { id: optionId, supply, ...rest } = opt;
+              return {
+                where: { id: optionId },
+                data: { ...rest, supply: { update: supply } },
+              };
+            }),
+          },
+          image: {
+            connect: image.map((img) => ({ id: img.id })),
+          },
+          ShippingGroup: shippingGroupId
+            ? { connect: { id: shippingGroupId } }
+            : undefined,
+          GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
+          confirmation: {
+            update: {
+              status: prevStatus === 'waiting' ? 'waiting' : 'needReconfirmation',
+            },
+          }, // 상품 수정 후  (승인, 거절, 재검수 대기) 상태에서는 '재검수 대기' 상태로 변경, (대기) 상태에서는 그대로 '대기' 상태
+        },
+      });
+      return { goodsId: id };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(`error in update goods, goodsId : ${id}`);
+    }
+  }
+
+  public async findMyGoodsNames(email: string): Promise<ApprovedGoodsNameAndId[]> {
+    const goodsIds = await this.prisma.goods.findMany({
+      where: {
+        seller: { email },
+        AND: {
+          confirmation: {
+            status: 'confirmed',
+          },
+          goods_status: 'normal',
+        },
+      },
+      select: {
+        confirmation: {
+          select: {
+            firstmallGoodsConnectionId: true,
+          },
+        },
+        goods_name: true,
+        id: true,
+      },
+    });
+    const result = goodsIds.map((value) => {
+      const { confirmation, ...rest } = value;
+      const flattenResult = {
+        ...rest,
+        ...confirmation,
+      };
+      return flattenResult;
+    });
+    return result;
   }
 }

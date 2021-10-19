@@ -17,7 +17,7 @@ export const useDeleteShippingGroup = (): UseMutationResult<
         .delete<useDeleteShippingGroupRes>('/shipping-group', { data: dto })
         .then((res) => res.data),
     {
-      onSuccess: (data) => {
+      onSuccess: () => {
         queryClient.invalidateQueries('ShippingGroupList');
       },
     },

@@ -42,26 +42,32 @@ export class FmOrderMemoParser {
     return this.__parsed;
   }
 
+  /** 배송메모 */
   get memo(): string {
     return this.__memo;
   }
 
+  /** 방송인 */
   get broadcaster(): string {
     return this.__broadcaster;
   }
 
+  /** 구매자명(닉네임) */
   get buyer(): string {
     return this.__buyer;
   }
 
+  /** 구매 메시지 */
   get donationMessaage(): string {
     return this.__donationMessaage;
   }
 
+  /** 통화 이벤트 참여 여부 */
   get phoneEventFlag(): boolean {
     return this.__phoneEventFlag;
   }
 
+  /** 선물하기 여부 */
   get giftFlag(): boolean {
     return this.__giftFlag;
   }
@@ -72,6 +78,18 @@ export class FmOrderMemoParser {
    * @returns {FmOrderMemoItem}
    */
   public parse(s: string): FmOrderMemoItem {
+    const parsableStringRegexp =
+      /(1. 배송메모 : )(.*?)(,)\n(2. 크리에이터 채널명 : )(.*)(,)\n(3. 작성자 : )(.*?)(,)\n(4. 응원내용 : )(.*)(,)\n(5. 통화 이벤트 : )(.*?)(,)\n(6. 선물하기 여부 : )(.*)/g;
+    const isParsable = parsableStringRegexp.test(s);
+    if (!isParsable)
+      return {
+        memo: s,
+        broadcaster: null,
+        buyer: null,
+        donationMessaage: null,
+        phoneEventFlag: false,
+        giftFlag: false,
+      };
     return {
       memo: this.parseMemo(s),
       broadcaster: this.parseBroadcaster(s),
