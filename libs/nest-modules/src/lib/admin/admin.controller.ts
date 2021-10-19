@@ -93,7 +93,7 @@ export class AdminController {
 
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
-  @Get('/live-shopping')
+  @Get('/live-shoppings')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getLiveShoppings(@Query('liveShoppingId') dto?: string): Promise<LiveShopping[]> {
     return this.adminService.getRegisteredLiveShoppings(dto || null);
@@ -103,13 +103,17 @@ export class AdminController {
   @UseGuards(AdminGuard)
   @Patch('/live-shopping')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  updateLiveShoppings(@Body() dto: LiveShoppingDTO): Promise<boolean> {
-    return this.adminService.updateLiveShoppings(dto);
+  async updateLiveShoppings(@Body() dto: LiveShoppingDTO): Promise<boolean> {
+    let videoId;
+    if (dto.videoUrl) {
+      videoId = await this.adminService.registVideoUrl(dto.videoUrl);
+    }
+    return this.adminService.updateLiveShoppings(dto, videoId);
   }
 
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
-  @Get('/live-shopping/broadcaster')
+  @Get('/live-shopping/broadcasters')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getAllBroadcasters(): Promise<BroadcasterDTO[]> {
     return this.broadcasterService.getAllBroadcasterIdAndNickname();

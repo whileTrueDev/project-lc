@@ -37,7 +37,7 @@ import {
 import {
   useAdminLiveShoppingList,
   useProfile,
-  useBroadcaster,
+  useAdminBroadcaster,
   useAdminGoodsById,
   useUpdateLiveShoppingManageMutation,
 } from '@project-lc/hooks';
@@ -70,7 +70,7 @@ export function GoodsDetail(): JSX.Element {
 
   const goodsId = liveShopping ? liveShopping[0].goodsId : '';
   const goods = useAdminGoodsById(goodsId);
-  const { data: broadcaster } = useBroadcaster();
+  const { data: broadcaster } = useAdminBroadcaster();
   const { mutateAsync } = useUpdateLiveShoppingManageMutation();
   const methods = useForm({
     defaultValues: {

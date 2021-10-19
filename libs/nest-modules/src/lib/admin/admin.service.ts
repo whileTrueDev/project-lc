@@ -264,8 +264,14 @@ export class AdminService {
     });
   }
 
-  public async updateLiveShoppings(dto: LiveShoppingDTO): Promise<boolean> {
+  public async updateLiveShoppings(
+    dto: LiveShoppingDTO,
+    videoId?: number | null,
+  ): Promise<boolean> {
     const liveShoppingUpdate = await this.prisma.liveShopping.update({
+      where: {
+        id: Number(dto.id),
+      },
       data: {
         progress: dto.progress || undefined,
         broadcasterId: dto.broadcasterId || undefined,
@@ -278,10 +284,7 @@ export class AdminService {
         sellStartDate: dto.sellStartDate ? new Date(dto.sellStartDate) : undefined,
         sellEndDate: dto.sellEndDate ? new Date(dto.sellEndDate) : undefined,
         rejectionReason: dto.rejectionReason || undefined,
-        videoUrl: dto.videoUrl || undefined,
-      },
-      where: {
-        id: Number(dto.id),
+        videoId: videoId || undefined,
       },
     });
     if (!liveShoppingUpdate) {
@@ -289,5 +292,18 @@ export class AdminService {
     }
 
     return true;
+  }
+
+  public async registVideoUrl(url: string): Promise<number> {
+    const videoUrl = await this.prisma.liveShoppingVideo.create({
+      data: {
+        youtubeUrl: url || undefined,
+      },
+    });
+    if (!videoUrl) {
+      throw new Error(`비디오 등록 실패`);
+    }
+
+    return videoUrl.id;
   }
 }

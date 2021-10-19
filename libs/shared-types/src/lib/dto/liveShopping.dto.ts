@@ -49,7 +49,7 @@ export class LiveShoppingDTO {
   rejectionReason: string;
 
   @IsOptional()
-  @IsString()
+  @IsNumber()
   videoUrl: string;
 
   @IsDate()
