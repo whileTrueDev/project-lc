@@ -132,7 +132,7 @@ export class FmOrdersService {
           if (!prev) return cur.step;
           if (Number(prev) > Number(cur.step)) return cur.step;
           return prev;
-        }, order.step);
+        }, orderGoodsOptions[0].step);
 
         const totalShippingCost = await this.findOrderTotalShippingCost(
           order.id,
@@ -307,7 +307,7 @@ export class FmOrdersService {
       if (!prev) return cur.step;
       if (Number(prev) > Number(cur.step)) return cur.step;
       return prev;
-    }, orderInfo.step);
+    }, orderGoodsOptions[0].step);
 
     // * 배송 관련 정보 추가를 위한 정보 조회
     const shippingResult = await this.findOneOrderShippingInfo(
