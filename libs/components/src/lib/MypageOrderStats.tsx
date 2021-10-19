@@ -18,14 +18,19 @@ export function MypageOrderStats(): JSX.Element {
     <Grid templateColumns={`repeat(${orderKeys.length}, 1fr)`}>
       {orderKeys.map((key) => {
         return (
-          <GridItem key={`${key}`} p={5}>
+          <GridItem key={`${key}`} p={5} colSpan={[orderKeys.length, 1, 1, 1]}>
             <Box p={[2, 2, 5, 5]} display="flex" justifyContent="center">
-              <Flex direction={['column', 'column', 'column', 'row']}>
+              <Flex direction="row">
                 <Stat>
-                  <StatLabel fontSize="xl">
+                  <StatLabel fontSize={['lg', 'xl']}>
                     <Flex alignItems="center">{key}</Flex>
                   </StatLabel>
-                  <StatNumber fontSize={['3xl', '4xl', '4xl', '4xl']}>
+                  <StatNumber
+                    fontSize={['3xl', '4xl', '4xl', '4xl']}
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="baseline"
+                  >
                     {data?.orders[key as OrderStatsKeyType] || 0}
                     <Text ml={1} as="span" fontSize="xl">
                       건

@@ -16,8 +16,8 @@ export function MypageSalesStats(): JSX.Element {
   const { data } = useFmOrdersStats();
 
   return (
-    <Grid templateColumns="1fr 1fr 1fr">
-      <GridItem colStart={2}>
+    <Grid templateColumns={['1fr 1fr', '1fr 1fr 1fr']}>
+      <GridItem colStart={[1, 2]}>
         <Box p={[2, 4, 4, 4]} display="flex" justifyContent="center">
           <Flex direction={['column', 'column', 'column', 'row']}>
             <Stat>
@@ -27,7 +27,7 @@ export function MypageSalesStats(): JSX.Element {
                   주문
                 </Flex>
               </StatLabel>
-              <StatNumber fontSize={['3xl', '5xl', '5xl', '5xl']}>
+              <StatNumber fontSize={['2xl', '5xl', '5xl', '5xl']}>
                 {data?.sales.주문.sum || 0}
                 <Text ml={1} as="span" fontSize="2xl">
                   원
@@ -35,7 +35,7 @@ export function MypageSalesStats(): JSX.Element {
               </StatNumber>
               <StatHelpText fontSize="lg">
                 총
-                <Text ml={1} mr={0.5} as="span" fontSize="2xl">
+                <Text ml={1} mr={0.5} as="span" fontSize={['lg', '2xl', '2xl', '2xl']}>
                   {data?.sales.주문.count || 0}
                 </Text>
                 건
@@ -54,7 +54,7 @@ export function MypageSalesStats(): JSX.Element {
                   환불
                 </Flex>
               </StatLabel>
-              <StatNumber fontSize={['3xl', '5xl', '5xl', '5xl']}>
+              <StatNumber fontSize={['2xl', '5xl', '5xl', '5xl']}>
                 {data?.sales.환불.sum || 0}
                 <Text ml={1} as="span" fontSize="2xl">
                   원
@@ -62,7 +62,7 @@ export function MypageSalesStats(): JSX.Element {
               </StatNumber>
               <StatHelpText fontSize="lg">
                 총
-                <Text ml={1} mr={0.5} as="span" fontSize="2xl">
+                <Text ml={1} mr={0.5} as="span" fontSize={['lg', '2xl', '2xl', '2xl']}>
                   {data?.sales.환불.count || 0}
                 </Text>
                 건
