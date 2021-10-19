@@ -6,20 +6,21 @@ import dayjs from 'dayjs';
 export function LiveShoppingDatePicker(props: {
   title: string;
   registerName: string;
+  min?: string;
 }): JSX.Element {
-  const { title, registerName } = props;
+  const { title, registerName, min } = props;
   const { register } = useFormContext();
   const now = dayjs().format('YYYY-MM-DDThh:mm');
   return (
     <Box>
       <Text>{title}</Text>
       <TextField
-        {...register(`${registerName}`)}
+        {...register(`${registerName}`, { min: min || now })}
         id="datetime-local"
         type="datetime-local"
         defaultValue={now}
         inputProps={{
-          min: now,
+          min: min || now,
         }}
       />
     </Box>

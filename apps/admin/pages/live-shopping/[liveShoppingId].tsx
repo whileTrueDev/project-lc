@@ -47,14 +47,13 @@ import { LiveShoppingDTO } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 
 function getDuration(startDate: Date, endDate: Date): string {
-  let duration;
   if (startDate && startDate) {
-    const startTime = new Date(startDate);
-    const endTime = new Date(endDate);
-    duration = endTime.valueOf() - startTime.valueOf();
-    duration = (duration / (1000 * 60 * 60)) % 24;
-    duration = duration.toFixed(1);
-    return `${String(duration)}시간`;
+    const startTime = dayjs(startDate);
+    const endTime = dayjs(endDate);
+    const duration = endTime.diff(startTime);
+    const hours = duration / (1000 * 60 * 60);
+    const stringfiedHours = hours.toFixed(1);
+    return `${stringfiedHours}시간`;
   }
   return '미정';
 }
@@ -71,7 +70,6 @@ export function GoodsDetail(): JSX.Element {
 
   const goodsId = liveShopping ? liveShopping[0].goodsId : '';
   const goods = useAdminGoodsById(goodsId);
-
   const { data: broadcaster } = useBroadcaster();
   const { mutateAsync } = useUpdateLiveShoppingManageMutation();
   const methods = useForm({
@@ -111,7 +109,7 @@ export function GoodsDetail(): JSX.Element {
     });
   };
 
-  const { handleSubmit, register } = methods;
+  const { handleSubmit, register, watch } = methods;
   const regist = async (
     data: Omit<
       LiveShoppingDTO,
@@ -127,7 +125,6 @@ export function GoodsDetail(): JSX.Element {
 
   if (!goods.isLoading && !goods.data)
     return <AdminPageLayout>...no data</AdminPageLayout>;
-
   return (
     <AdminPageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={8} p={2} mb={16}>
@@ -136,7 +133,7 @@ export function GoodsDetail(): JSX.Element {
             <Button
               size="sm"
               leftIcon={<ChevronLeftIcon />}
-              onClick={() => router.push('/goods')}
+              onClick={() => router.push('/live-shopping')}
             >
               목록으로
             </Button>
@@ -240,13 +237,28 @@ export function GoodsDetail(): JSX.Element {
               <LiveShoppingDatePicker
                 title="방송 종료시간"
                 registerName="broadcastEndDate"
+                min={watch('broadcastStartDate')}
               />
+              {dayjs(watch('broadcastStartDate')) > dayjs(watch('broadcastEndDate')) && (
+                <Text as="em" color="tomato">
+                  방송 종료시간이 시작시간보다 빠릅니다
+                </Text>
+              )}
               <Divider />
               <LiveShoppingDatePicker
                 title="판매 시작시간"
                 registerName="sellStartDate"
               />
-              <LiveShoppingDatePicker title="판매 종료시간" registerName="sellEndDate" />
+              <LiveShoppingDatePicker
+                title="판매 종료시간"
+                registerName="sellEndDate"
+                min={watch('sellStartDate')}
+              />
+              {dayjs(watch('sellStartDate')) > dayjs(watch('sellEndDate')) && (
+                <Text as="em" color="tomato">
+                  판매 종료시간이 시작시간보다 빠릅니다
+                </Text>
+              )}
               <Divider />
               <Stack>
                 <Text>영상 URL</Text>

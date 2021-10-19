@@ -1,6 +1,7 @@
 import { Box, Text } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
 import dayjs from 'dayjs';
+import { liveShoppingManage } from '@project-lc/stores';
 import { LiveShoppingProgressConverter } from '../LiveShoppingProgressConverter';
 import { ConfirmDialog, ConfirmDialogProps } from '../ConfirmDialog';
 
@@ -9,7 +10,7 @@ export function AdminLiveShoppingUpdateConfirmModal(
 ): JSX.Element {
   const { isOpen, onClose, onConfirm } = props;
   const { watch } = useFormContext();
-
+  const { selectedBroadcaster } = liveShoppingManage();
   return (
     <ConfirmDialog
       title="등록정보 확인"
@@ -26,7 +27,7 @@ export function AdminLiveShoppingUpdateConfirmModal(
             <LiveShoppingProgressConverter progress={watch('progress')} />
           </Text>
         ) : null}
-        {watch('broadcasterId') ? <Text>진행상태 : {watch('broadcaster')}</Text> : null}
+        {watch('broadcasterId') ? <Text>방송인 : {selectedBroadcaster}</Text> : null}
         {watch('broadcastStartDate') ? (
           <Text>
             방송시작 시간 :{' '}
@@ -39,6 +40,11 @@ export function AdminLiveShoppingUpdateConfirmModal(
             {dayjs(watch('broadcastEndDate')).format('A YYYY/MM/DD HH:mm:ss')}
           </Text>
         ) : null}
+        {dayjs(watch('broadcastStartDate')) > dayjs(watch('broadcastEndDate')) && (
+          <Text as="em" color="tomato">
+            방송 종료시간이 시작시간보다 빠릅니다
+          </Text>
+        )}
         {watch('sellStartDate') ? (
           <Text>
             판매시작 시간 :{' '}
@@ -50,6 +56,11 @@ export function AdminLiveShoppingUpdateConfirmModal(
             판매종료 시간 : {dayjs(watch('sellEndDate')).format('A YYYY/MM/DD HH:mm:ss')}
           </Text>
         ) : null}
+        {dayjs(watch('sellStartDate')) > dayjs(watch('sellEndDate')) && (
+          <Text as="em" color="tomato">
+            방송 종료시간이 시작시간보다 빠릅니다
+          </Text>
+        )}
         {watch('rejectionReason') ? (
           <Text>거절사유 : {watch('rejectionReason')}</Text>
         ) : null}
