@@ -10,12 +10,18 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalProps,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react';
 import { useOrderExportableCheck, useExportOrderMutation } from '@project-lc/hooks';
-import { ExportOrderDto, FindFmOrderDetailRes } from '@project-lc/shared-types';
+import {
+  ExportOrderDto,
+  FindFmOrderDetailRes,
+  FindFmOrderRes,
+} from '@project-lc/shared-types';
 import { useCallback } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { ExportBundleDialog } from './ExportBundleDialog';
 import { ExportOrderOptionList } from './ExportOrderOptionList';
 
 export type OrderExportDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
@@ -31,6 +37,7 @@ export function ExportDialog({
   // 이미 출고가 끝난 주문인 지 체크
   const { isDone } = useOrderExportableCheck(order);
 
+  const bundleDialog = useDisclosure();
   const toast = useToast();
   const formMethods = useForm<ExportOrderDto[]>();
   const exportOrder = useExportOrderMutation();
@@ -106,8 +113,27 @@ export function ExportDialog({
           </ModalBody>
           <ModalFooter>
             <Button onClick={onClose}>취소</Button>
+            <Button
+              ml={2}
+              colorScheme="pink"
+              onClick={bundleDialog.onOpen}
+              variant="outline"
+              isDisabled={order.shippings.length < 2}
+            >
+              합포장출고처리
+            </Button>
           </ModalFooter>
         </ModalContent>
+
+        <ExportBundleDialog
+          orders={[order]}
+          isOpen={bundleDialog.isOpen}
+          onClose={bundleDialog.onClose}
+          onSuccess={() => {
+            bundleDialog.onClose();
+            onClose();
+          }}
+        />
       </FormProvider>
     </Modal>
   );

@@ -25,8 +25,13 @@ import {
   OrderRefundExistsAlert,
   OrderReturnExistsAlert,
   SectionWithTitle,
+  TextDotConnector,
 } from '@project-lc/components';
 import { useDisplaySize, useFmOrder } from '@project-lc/hooks';
+import {
+  convertFmOrderShippingTypesToString,
+  FmOrderShipping,
+} from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
@@ -122,15 +127,8 @@ export function OrderDetail(): JSX.Element {
 
         {/* 주문 상품 정보 */}
         <SectionWithTitle title="주문 상품 정보">
-          {order.data.items.map((item) => (
-            <Box key={item.item_seq} mt={6}>
-              <OrderDetailGoods orderItem={item} />
-              <OrderDetailOptionList
-                order={order.data}
-                orderItem={item}
-                options={item.options}
-              />
-            </Box>
+          {order.data.shippings.map((shipping) => (
+            <OrderDetailShippingItem key={shipping.shipping_seq} shipping={shipping} />
           ))}
         </SectionWithTitle>
 
@@ -208,5 +206,37 @@ export function OrderDetailLoading(): JSX.Element {
         </Stack>
       </Stack>
     </Stack>
+  );
+}
+
+interface OrderDetailShippingItemProps {
+  shipping: FmOrderShipping;
+}
+function OrderDetailShippingItem({
+  shipping,
+}: OrderDetailShippingItemProps): JSX.Element {
+  return (
+    <Box key={shipping.shipping_seq} mt={6} borderWidth="0.025rem" p={2} pl={4}>
+      {/* 배송정보 */}
+      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
+        <Text>{convertFmOrderShippingTypesToString(shipping.shipping_type)}</Text>
+        {shipping.shipping_type === 'free' ? null : (
+          <>
+            <TextDotConnector />
+            <Text>배송비: {Number(shipping.shipping_cost).toLocaleString()} 원</Text>
+          </>
+        )}
+      </Stack>
+
+      {/* 상품(옵션) 정보 */}
+      <Box mt={4}>
+        {shipping.items.map((item) => (
+          <Box key={item.item_seq} mt={2}>
+            <OrderDetailGoods orderItem={item} />
+            <OrderDetailOptionList options={item.options} />
+          </Box>
+        ))}
+      </Box>
+    </Box>
   );
 }

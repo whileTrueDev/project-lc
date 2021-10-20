@@ -709,7 +709,11 @@ export interface FmOrderShipping {
   /** 배송비 */
   shippingCost: string;
   /** 배송비 */
+  shipping_cost: string;
+  /** 배송비 */
   deliveryCost: string;
+  /** 배송비 */
+  delivery_cost: string;
   /** 배송 방식 이름 */
   shipping_set_name: string;
   /**

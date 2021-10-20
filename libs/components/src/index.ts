@@ -14,6 +14,7 @@ export * from './lib/ChakraAutoComplete';
 export * from './lib/ChakraNextImage';
 export * from './lib/ColorModeSwitcher';
 export * from './lib/CommonFooter';
+export * from './lib/ExportBundleDialog';
 export * from './lib/ExportDetailActions';
 export * from './lib/ExportDetailItems';
 export * from './lib/ExportDetailSummary';
