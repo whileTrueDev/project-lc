@@ -18,9 +18,9 @@ export function Index(): JSX.Element {
         {/* 마이페이지 요약지표 영역 */}
         <MypageStatsSection />
 
-        {/* 공지사항 영역 */}
-        <Grid p={2} pt={1} gap={3} templateColumns="repeat(6, 1fr)">
-          <GridItem colSpan={[6, 4, 4, 4]} alignItems="stretch">
+        <Grid p={2} pt={1} gap={3} templateColumns="repeat(7, 1fr)">
+          <GridItem colSpan={[6, 5, 5, 5]} alignItems="stretch">
+            {/* 공지사항 영역 */}
             <MypageNoticeSection />
           </GridItem>
         </Grid>
