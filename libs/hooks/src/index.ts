@@ -20,6 +20,7 @@ export * from './lib/mutation/useExportOrderMutation';
 export * from './lib/mutation/useExportOrdersMutation';
 export * from './lib/mutation/useGoodConfirmationMutation';
 export * from './lib/mutation/useGoodRejectionMutation';
+export * from './lib/mutation/useGoodsImageMutation';
 export * from './lib/mutation/useLoginMutation';
 export * from './lib/mutation/useLogoutMutation';
 export * from './lib/mutation/useMailVerificationMutation';

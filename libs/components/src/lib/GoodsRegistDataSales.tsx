@@ -15,7 +15,7 @@ const GOODS_STATUS: { value: GoodsStatus; label: string }[] = [
   { value: 'unsold', label: '판매중지' },
 ];
 // 상품등록 - 청약철회
-const GOODS_CANCEL_TYPE: { value: '0' | '1'; label: string }[] = [
+export const GOODS_CANCEL_TYPE: { value: '0' | '1'; label: string }[] = [
   { value: '0', label: '가능' },
   { value: '1', label: '불가 (취소/교환/반품 불가)' },
 ];
@@ -35,7 +35,7 @@ export function GoodsRegistRadio({
 } & Partial<RadioGroupProps>): JSX.Element {
   const { register, watch } = useFormContext<RegistGoodsDto>();
   return (
-    <RadioGroup value={watch(name, values[0].value)} {...rest}>
+    <RadioGroup value={watch(name)} {...rest}>
       <HStack>
         {values.map((item) => {
           const { value, label } = item;

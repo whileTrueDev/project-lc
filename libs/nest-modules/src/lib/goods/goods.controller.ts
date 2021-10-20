@@ -8,14 +8,17 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { GoodsImages, GoodsInfo } from '@prisma/client';
 import {
   ChangeGoodsViewDto,
   DeleteGoodsDto,
   GoodsByIdRes,
+  GoodsImageDto,
   GoodsInfoDto,
   GoodsListRes,
   GoodsOptionWithStockInfo,
@@ -23,12 +26,11 @@ import {
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
-import { GoodsInfo } from '@prisma/client';
-import { GoodsService } from './goods.service';
-import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { UserPayload } from '../auth/auth.interface';
-import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { GoodsInfoService } from '../goods-info/goods-info.service';
+import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
+import { GoodsService } from './goods.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('goods')
@@ -37,6 +39,18 @@ export class GoodsController {
     private readonly goodsService: GoodsService,
     private readonly commonInfoService: GoodsInfoService,
   ) {}
+
+  /** 상품 이미지 생성 */
+  @Post('/image')
+  registGoodsImages(@Body(ValidationPipe) dto: GoodsImageDto[]): Promise<GoodsImages[]> {
+    return this.goodsService.registGoodsImages(dto);
+  }
+
+  /** 상품 이미지 삭제 */
+  @Delete('/image')
+  deleteGoodsImage(@Body('imageId', ParseIntPipe) imageId: number): Promise<boolean> {
+    return this.goodsService.deleteGoodsImage(imageId);
+  }
 
   /** 상품 목록 조회 */
   @Get('/list')
@@ -138,5 +152,14 @@ export class GoodsController {
     @Param('goodsId', ParseIntPipe) goodsId: number,
   ): Promise<GoodsByIdRes> {
     return this.goodsService.getOneGoods(goodsId, seller.sub);
+  }
+
+  /** 상품 수정 */
+  @Put(':goodsId')
+  updateOneGoods(
+    @Param('goodsId', ParseIntPipe) goodsId: number,
+    @Body(ValidationPipe) dto: RegistGoodsDto,
+  ): Promise<{ goodsId: number }> {
+    return this.goodsService.updateOneGoods(goodsId, dto);
   }
 }
