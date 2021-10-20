@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
+import { throwError } from 'rxjs';
 
 @Injectable()
 export class LiveShoppingService {
@@ -24,5 +25,18 @@ export class LiveShoppingService {
       },
     });
     return { liveShoppingId: liveShopping.id };
+  }
+
+  async deleteLiveShopping(liveShoppingId: { liveShoppingId: number }): Promise<boolean> {
+    const doDelete = await this.prisma.liveShopping.delete({
+      where: {
+        id: liveShoppingId.liveShoppingId,
+      },
+    });
+
+    if (!doDelete) {
+      throwError('라이브 쇼핑 삭제 실패');
+    }
+    return true;
   }
 }

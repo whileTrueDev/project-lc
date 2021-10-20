@@ -1,8 +1,26 @@
-import { Box, Table, Thead, Tbody, Tr, Th, Td, Heading, Button } from '@chakra-ui/react';
-import { useAdminLiveShoppingList, useProfile } from '@project-lc/hooks';
+import { useState } from 'react';
+import {
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Heading,
+  Button,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
+import {
+  useAdminLiveShoppingList,
+  useProfile,
+  useDeleteLiveShopping,
+} from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { LiveShoppingProgressConverter } from './LiveShoppingProgressConverter';
 import { BroadcasterName } from './BroadcasterName';
+import { ConfirmDialog } from './ConfirmDialog';
 
 export function LiveShoppingList(): JSX.Element {
   const { data: profileData } = useProfile();
@@ -10,6 +28,40 @@ export function LiveShoppingList(): JSX.Element {
   const { data, isLoading } = useAdminLiveShoppingList({
     enabled: !!profileData?.email,
   });
+
+  const [isOpen, setIsOpen] = useState(false);
+  const onClose = (): void => {
+    setIsOpen(false);
+  };
+  const { mutateAsync } = useDeleteLiveShopping();
+  const toast = useToast();
+
+  const deleteLiveShopping = async (): Promise<void> => {
+    mutateAsync(1)
+      .then((isDeleted) => {
+        if (isDeleted) {
+          toast({
+            title: '삭제 완료하였습니다',
+            status: 'error',
+          });
+          setIsOpen(false);
+        }
+      })
+      .catch((error) => {
+        if (error.response.status === 400 || error.response.status === 401) {
+          toast({
+            title: '삭제 오류',
+            description: error.response.data.message,
+            status: 'error',
+          });
+        } else {
+          toast({
+            title: '삭제 오류',
+            status: 'error',
+          });
+        }
+      });
+  };
 
   return (
     <Box p={5}>
@@ -71,12 +123,29 @@ export function LiveShoppingList(): JSX.Element {
                     : '미정'}
                 </Td>
                 <Td>
-                  {row.progress === 'registered' ? <Button size="xs">삭제</Button> : null}
+                  {row.progress === 'registered' ? (
+                    <Button
+                      size="xs"
+                      onClick={() => {
+                        setIsOpen(true);
+                      }}
+                    >
+                      삭제
+                    </Button>
+                  ) : null}
                 </Td>
               </Tr>
             ))}
         </Tbody>
       </Table>
+      <ConfirmDialog
+        title="라이브 쇼핑 삭제"
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={deleteLiveShopping}
+      >
+        <Text>삭제하시겠습니까?</Text>
+      </ConfirmDialog>
     </Box>
   );
 }

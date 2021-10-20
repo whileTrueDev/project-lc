@@ -6,6 +6,7 @@ import {
   Post,
   ValidationPipe,
   Body,
+  Delete,
 } from '@nestjs/common';
 import { ApprovedGoodsNameAndId, LiveShoppingRegistDTO } from '@project-lc/shared-types';
 import { GoodsService } from '../goods/goods.service';
@@ -30,6 +31,13 @@ export class LiveShoppingController {
   ): Promise<{ liveShoppingId: number }> {
     const email = seller.sub;
     return this.liveShoppingService.createLiveShopping(email, dto);
+  }
+
+  @Delete()
+  deleteLiveShopping(
+    @Body(ValidationPipe) liveShoppingId: { liveShoppingId: number },
+  ): Promise<boolean> {
+    return this.liveShoppingService.deleteLiveShopping(liveShoppingId);
   }
 
   @Get('/confirmed-goods')
