@@ -45,7 +45,7 @@ export const mypageNavLinks: MypageLink[] = [
     checkIsActive: defaultIsActiveChecker,
     children: [
       {
-        name: '라이브 예약',
+        name: '내 라이브 쇼핑 관리',
         href: '/mypage/live',
         checkIsActive: defaultIsActiveChecker,
       },
