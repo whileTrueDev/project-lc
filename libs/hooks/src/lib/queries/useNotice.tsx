@@ -10,10 +10,16 @@ export function getNotice(): Promise<Notice[]> {
   return axios.get<Notice[]>('/notice').then((res) => res.data);
 }
 
+export function getAdminNotice(): Promise<Notice[]> {
+  return axios.get<Notice[]>('/notice/admin').then((res) => res.data);
+}
+
 export function useNoticeInfo(
   options?: UseQueryOptions<Notice[], AxiosError>,
+  type?: 'admin' | undefined,
 ): UseQueryResult<Notice[], AxiosError> {
-  return useQuery<Notice[], AxiosError>('Notice', getNotice, {
+  const fetchFunction = type === 'admin' ? getAdminNotice : getNotice;
+  return useQuery<Notice[], AxiosError>('Notice', fetchFunction, {
     ...options,
   });
 }
