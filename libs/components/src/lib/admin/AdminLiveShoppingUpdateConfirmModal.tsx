@@ -1,7 +1,7 @@
 import { Box, Text } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
 import dayjs from 'dayjs';
-import { liveShoppingManage } from '@project-lc/stores';
+import { liveShoppingManageStore } from '@project-lc/stores';
 import { LiveShoppingProgressConverter } from '../LiveShoppingProgressConverter';
 import { ConfirmDialog, ConfirmDialogProps } from '../ConfirmDialog';
 
@@ -10,7 +10,7 @@ export function AdminLiveShoppingUpdateConfirmModal(
 ): JSX.Element {
   const { isOpen, onClose, onConfirm } = props;
   const { watch } = useFormContext();
-  const { selectedBroadcaster } = liveShoppingManage();
+  const { selectedBroadcaster } = liveShoppingManageStore();
   return (
     <ConfirmDialog
       title="등록정보 확인"
