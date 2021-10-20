@@ -260,6 +260,9 @@ export class AdminService {
             youtubeId: true,
           },
         },
+        liveShoppingVideo: {
+          select: { youtubeUrl: true },
+        },
       },
     });
   }

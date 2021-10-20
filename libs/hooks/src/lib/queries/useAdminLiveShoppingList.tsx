@@ -16,6 +16,7 @@ interface LiveShoppingWithGoods extends LiveShopping {
     };
   };
   broadcaster: BroadcasterDTO;
+  liveShoppingVideo: { youtubeUrl: string };
 }
 
 export const getAdminLiveShoppingList = async (

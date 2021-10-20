@@ -11,7 +11,10 @@ import {
   Button,
   Text,
   useToast,
+  Link,
+  Stack,
 } from '@chakra-ui/react';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
 import {
   useAdminLiveShoppingList,
   useProfile,
@@ -30,27 +33,28 @@ export function LiveShoppingList(): JSX.Element {
   });
 
   const [isOpen, setIsOpen] = useState(false);
-  const [toDelete, setToDelete] = useState(0);
-  const handleModalOpen = (liveShoppingId: number | null) => {
-    console.log(liveShoppingId);
-    // setIsOpen(true);
-    // setToDelete(liveShoppingId);
+  const [liveShoppingId, setLiveShoppingId] = useState(0);
+  const handleModalOpen = (id: number): void => {
+    setIsOpen(true);
+    setLiveShoppingId(id);
   };
+
   const onClose = (): void => {
     setIsOpen(false);
   };
+
   const { mutateAsync } = useDeleteLiveShopping();
+
   const toast = useToast();
 
   const deleteLiveShopping = async (): Promise<void> => {
-    mutateAsync(1)
+    mutateAsync(liveShoppingId)
       .then((isDeleted) => {
         if (isDeleted) {
           toast({
             title: '삭제 완료하였습니다',
             status: 'error',
           });
-          setIsOpen(false);
         }
       })
       .catch((error) => {
@@ -75,16 +79,13 @@ export function LiveShoppingList(): JSX.Element {
       <Table variant="simple">
         <Thead>
           <Tr>
-            <Th>ID</Th>
-            <Th>등록일자</Th>
+            <Th />
             <Th>상품명</Th>
-            <Th>상점명</Th>
             <Th>상태</Th>
             <Th>방송인</Th>
-            <Th>방송시작</Th>
-            <Th>방송종료</Th>
-            <Th>판매시작</Th>
-            <Th>판매종료</Th>
+            <Th width="15%">방송시간</Th>
+            <Th width="15%">판매시간</Th>
+            <Th>유튜브영상</Th>
             <Th />
           </Tr>
         </Thead>
@@ -93,10 +94,8 @@ export function LiveShoppingList(): JSX.Element {
             !isLoading &&
             data.map((row, index) => (
               <Tr key={row.id}>
-                <Td>{index}</Td>
-                <Td>{dayjs(row.createDate).format('YYYY/MM/DD HH:mm')}</Td>
+                <Td>{index + 1}</Td>
                 <Td>{row.goods.goods_name}</Td>
-                <Td>{row.seller.sellerShop.shopName}</Td>
                 <Td>
                   <LiveShoppingProgressConverter
                     progress={row.progress}
@@ -105,35 +104,58 @@ export function LiveShoppingList(): JSX.Element {
                     sellEndDate={row.sellEndDate}
                   />
                 </Td>
-                <Td>
+                <Td align="center">
                   <BroadcasterName data={row.broadcaster} />
                 </Td>
                 <Td>
-                  {row.broadcastStartDate
-                    ? dayjs(row.broadcastStartDate).format('YYYY/MM/DD HH:mm')
-                    : '미정'}
+                  <Stack alignItems="center">
+                    <Text>
+                      {row.broadcastStartDate
+                        ? dayjs(row.broadcastStartDate).format('YYYY/MM/DD HH:mm')
+                        : '미정'}
+                    </Text>
+                    <Text>~</Text>
+                    <Text>
+                      {row.broadcastEndDate
+                        ? dayjs(row.broadcastEndDate).format('YYYY/MM/DD HH:mm')
+                        : '미정'}
+                    </Text>
+                  </Stack>
                 </Td>
                 <Td>
-                  {row.broadcastEndDate
-                    ? dayjs(row.broadcastEndDate).format('YYYY/MM/DD HH:mm')
-                    : '미정'}
+                  <Stack alignItems="center">
+                    <Text>
+                      {row.sellStartDate
+                        ? dayjs(row.sellStartDate).format('YYYY/MM/DD HH:mm')
+                        : '미정'}
+                    </Text>
+                    <Text>~</Text>
+                    <Text>
+                      {row.sellEndDate
+                        ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm')
+                        : '미정'}
+                    </Text>
+                  </Stack>
                 </Td>
                 <Td>
-                  {row.sellStartDate
-                    ? dayjs(row.sellStartDate).format('YYYY/MM/DD HH:mm')
-                    : '미정'}
-                </Td>
-                <Td>
-                  {row.sellEndDate
-                    ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm')
-                    : '미정'}
+                  {row.liveShoppingVideo.youtubeUrl ? (
+                    <Link
+                      href={row.liveShoppingVideo.youtubeUrl}
+                      isExternal
+                      overflow="hidden"
+                      whiteSpace="nowrap"
+                      textOverflow="ellipsis"
+                    >
+                      보러가기 <ExternalLinkIcon mx="2px" />
+                    </Link>
+                  ) : null}
                 </Td>
                 <Td>
                   {row.progress === 'registered' ? (
                     <Button
                       size="xs"
                       onClick={() => {
-                        handleModalOpen(document.querySelector('data-row-key'));
+                        handleModalOpen(row.id);
                       }}
                     >
                       삭제
