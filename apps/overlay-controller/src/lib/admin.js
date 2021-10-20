@@ -26,6 +26,7 @@ $(document).ready(function ready() {
 
   $('#start-time-picker').val(localISOTime);
   $('#end-time-picker').val(localISOTime);
+  $('#fever-time-picker').val(localISOTime);
 
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
     streamerNickname = $(this).closest('tr').prop('id');
@@ -61,6 +62,14 @@ $(document).ready(function ready() {
 
   $('#bottom-area-toggle-button').click(function bottomAreaToggleButtonClickEvent() {
     socket.emit('toggle bottom area from admin', roomName);
+  });
+
+  $('#soldout-signal-button').click(function sendSoldoutEvent() {
+    socket.emit('get soldout signal from admin', roomName);
+  });
+
+  $('#soldout-remove-button').click(function sendSoldoutRemoveEvent() {
+    socket.emit('remove soldout banner from admin', roomName);
   });
 
   $('#show-intro-video-button').click(function showIntroVideoButtonClickEvent() {
@@ -99,6 +108,11 @@ $(document).ready(function ready() {
     socket.emit('get d-day', { roomName, date: selectedTime });
   });
 
+  $('#fever-time-send-button').click(function feverTimeSendButtonClickEvent() {
+    const selectedTime = $('#fever-time-picker').val();
+    socket.emit('get fever date from admin', { roomName, date: selectedTime });
+  });
+
   $('#data-send-all').click(function dataSendAllButtonClickEvent() {
     socket.emit('get all data', roomName);
   });
@@ -128,16 +142,34 @@ $(document).ready(function ready() {
     }
   });
 
-  $('#bottom-message-button').click(async function bottomMessageButtonClickEvent() {
+  $('#bottom-message-button').click(function bottomMessageButtonClickEvent() {
     const customerMessage = $('#admin-message').val().trim();
-    await socket.emit('bottom area message', { roomName, message: customerMessage });
+    socket.emit('bottom area message', { roomName, message: customerMessage });
     $('#admin-message').val(null);
   });
 
-  $('#objective-button').click(async function objectiveButtonClickEvent() {
+  $('#fever-message-button').click(function bottomMessageButtonClickEvent() {
+    const feverMessage = $('#admin-message').val();
+    socket.emit('get fever signal from admin', { roomName, message: feverMessage });
+    $('#admin-message').val(null);
+  });
+
+  $('#objective-button').click(function objectiveButtonClickEvent() {
     const objective = $('#objective-message').val();
-    await socket.emit('get objective message from admin', { roomName, objective });
+    socket.emit('get objective message from admin', { roomName, objective });
     $('#objective-message').val(null);
+  });
+
+  $('#calling-button').click(function callingButtonClickEvent() {
+    socket.emit('get notification image from admin', { roomName, type: 'calling' });
+  });
+
+  $('#quiz-button').click(function quizButtonClickEvent() {
+    socket.emit('get notification image from admin', { roomName, type: 'quiz' });
+  });
+
+  $('#remove-notification-button').click(function removeNotificationButtonClickEvent() {
+    socket.emit('remove notification image from admin', roomName);
   });
 
   $('form').submit(function formSubmit(event) {

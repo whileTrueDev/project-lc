@@ -177,4 +177,34 @@ export class AppScreenGateway
   connectionCheckFromAdmin(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('connection check from server');
   }
+
+  @SubscribeMessage('get soldout signal from admin')
+  getSoldoutSignal(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('get soldout signal from server');
+  }
+
+  @SubscribeMessage('remove soldout banner from admin')
+  getSoldoutRemove(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('remove soldout banner from server');
+  }
+
+  @SubscribeMessage('get fever date from admin')
+  getFeverDate(@MessageBody() roomAndDate: RoomAndDate): void {
+    const { date } = roomAndDate;
+    const { roomName } = roomAndDate;
+    this.server.to(roomName).emit('get fever date from server', date);
+  }
+
+  // get notification image from server
+  @SubscribeMessage('get notification image from admin')
+  getNotification(@MessageBody() data: { roomName: string; type: string }): void {
+    const { roomName } = data;
+    const { type } = data;
+    this.server.to(roomName).emit('get notification image from server', type);
+  }
+
+  @SubscribeMessage('remove notification image from admin')
+  removeNotification(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('remove notification image from server');
+  }
 }
