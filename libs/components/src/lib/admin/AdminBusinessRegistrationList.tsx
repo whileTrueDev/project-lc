@@ -90,20 +90,6 @@ const columns: GridColumns = [
     renderCell: () => <Button size="xs">반려하기</Button>,
     sortable: false,
   },
-  {
-    field: 'confirmation',
-    headerName: '검수승인',
-    width: 100,
-    renderCell: () => <Button size="xs">승인하기</Button>,
-    sortable: false,
-  },
-  {
-    field: 'rejection',
-    headerName: '검수반려',
-    width: 100,
-    renderCell: () => <Button size="xs">반려하기</Button>,
-    sortable: false,
-  },
 ];
 
 function makeListRow(
