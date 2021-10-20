@@ -10,7 +10,6 @@ import {
   useDisclosure,
   useToast,
   Divider,
-  Stack,
 } from '@chakra-ui/react';
 import { useNoticeInfo, useNoticeFlagMutation } from '@project-lc/hooks';
 import dayjs from 'dayjs';
