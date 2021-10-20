@@ -30,6 +30,12 @@ export function LiveShoppingList(): JSX.Element {
   });
 
   const [isOpen, setIsOpen] = useState(false);
+  const [toDelete, setToDelete] = useState(0);
+  const handleModalOpen = (liveShoppingId: number | null) => {
+    console.log(liveShoppingId);
+    // setIsOpen(true);
+    // setToDelete(liveShoppingId);
+  };
   const onClose = (): void => {
     setIsOpen(false);
   };
@@ -85,9 +91,9 @@ export function LiveShoppingList(): JSX.Element {
         <Tbody>
           {data &&
             !isLoading &&
-            data.map((row) => (
+            data.map((row, index) => (
               <Tr key={row.id}>
-                <Td>{row.id}</Td>
+                <Td>{index}</Td>
                 <Td>{dayjs(row.createDate).format('YYYY/MM/DD HH:mm')}</Td>
                 <Td>{row.goods.goods_name}</Td>
                 <Td>{row.seller.sellerShop.shopName}</Td>
@@ -127,7 +133,7 @@ export function LiveShoppingList(): JSX.Element {
                     <Button
                       size="xs"
                       onClick={() => {
-                        setIsOpen(true);
+                        handleModalOpen(document.querySelector('data-row-key'));
                       }}
                     >
                       삭제
