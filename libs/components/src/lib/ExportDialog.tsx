@@ -13,12 +13,9 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useOrderExportableCheck, useExportOrderMutation } from '@project-lc/hooks';
-import {
-  ExportOrderDto,
-  FindFmOrderDetailRes,
-  FindFmOrderRes,
-} from '@project-lc/shared-types';
+import { useExportOrderMutation, useOrderExportableCheck } from '@project-lc/hooks';
+import { ExportOrderDto, FindFmOrderDetailRes } from '@project-lc/shared-types';
+import { fmExportStore } from '@project-lc/stores';
 import { useCallback } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ExportBundleDialog } from './ExportBundleDialog';
@@ -34,6 +31,7 @@ export function ExportDialog({
   isOpen,
   onClose,
 }: OrderExportDialogProps): JSX.Element {
+  const resetSelectedOrderShippings = fmExportStore((s) => s.resetSelectedOrderShippings);
   // 이미 출고가 끝난 주문인 지 체크
   const { isDone } = useOrderExportableCheck(order);
 
@@ -112,7 +110,14 @@ export function ExportDialog({
             />
           </ModalBody>
           <ModalFooter>
-            <Button onClick={onClose}>취소</Button>
+            <Button
+              onClick={() => {
+                resetSelectedOrderShippings();
+                onClose();
+              }}
+            >
+              취소
+            </Button>
             <Button
               ml={2}
               colorScheme="pink"

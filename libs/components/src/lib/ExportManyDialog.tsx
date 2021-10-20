@@ -163,7 +163,14 @@ export function ExportManyDialog({
           </ModalBody>
           <Divider />
           <ModalFooter>
-            <Button onClick={onClose}>취소</Button>
+            <Button
+              onClick={() => {
+                resetSelectedOrderShippings();
+                onClose();
+              }}
+            >
+              취소
+            </Button>
             <Button
               ml={2}
               colorScheme="pink"
@@ -190,6 +197,7 @@ export function ExportManyDialog({
           onClose={bundleDialog.onClose}
           onSuccess={() => {
             bundleDialog.onClose();
+            resetSelectedOrderShippings();
             onClose();
           }}
         />
