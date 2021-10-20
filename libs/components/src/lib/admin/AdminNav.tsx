@@ -62,6 +62,22 @@ export default function AdminNav(): JSX.Element {
               </Link>
             </NextLink>
           </Box>
+          <Box key="공지사항">
+            <NextLink href={'/notice' ?? '#'} passHref>
+              <Link
+                p={2}
+                fontSize="sm"
+                fontWeight={500}
+                color={linkColor}
+                _hover={{
+                  textDecoration: 'none',
+                  color: linkHoverColor,
+                }}
+              >
+                공지사항
+              </Link>
+            </NextLink>
+          </Box>
         </Flex>
         <>
           {isLoggedIn && (
