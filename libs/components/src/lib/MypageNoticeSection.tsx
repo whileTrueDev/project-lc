@@ -1,6 +1,6 @@
 import { GridColumns, GridRowParams } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { useColorModeValue, Box, Text } from '@chakra-ui/react';
+import { useColorModeValue, Box, Text, Divider } from '@chakra-ui/react';
 import { useNoticeInfo } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { Notice } from '@prisma/client';
@@ -10,7 +10,7 @@ const columns: GridColumns = [
   {
     field: 'title',
     headerName: '제목',
-    minWidth: 500,
+    minWidth: 600,
   },
   {
     field: 'date',
@@ -56,6 +56,7 @@ export function MypageNoticeSection(): JSX.Element {
       <Text fontSize="lg" fontWeight="medium" pb={1}>
         공지사항
       </Text>
+      <Divider backgroundColor="gray.100" mb={3} />
       <ChakraDataGrid
         classes={{
           columnHeader: classes.columnHeader,
