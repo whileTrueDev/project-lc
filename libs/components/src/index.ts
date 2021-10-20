@@ -10,6 +10,7 @@ export * from './lib/admin/AdminPageLayout';
 export * from './lib/admin/AdminNoticeSection';
 export * from './lib/admin/AdminLiveShoppingList';
 export * from './lib/admin/AdminLiveShoppingUpdateConfirmModal';
+export * from './lib/admin/AdminGiftList';
 export * from './lib/BusinessRegistrationBox';
 export * from './lib/BusinessRegistrationDialog';
 export * from './lib/CenterBox';
