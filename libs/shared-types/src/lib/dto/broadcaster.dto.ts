@@ -18,4 +18,8 @@ export class BroadcasterDTO {
   @IsOptional()
   @IsString()
   youtubeId: string;
+
+  @IsOptional()
+  @IsString()
+  channelUrl: string;
 }

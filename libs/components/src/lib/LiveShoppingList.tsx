@@ -7,7 +7,6 @@ import {
   Tr,
   Th,
   Td,
-  Heading,
   Button,
   Text,
   useToast,
@@ -21,7 +20,6 @@ import {
   ModalCloseButton,
   useDisclosure,
   Divider,
-  Grid,
   Textarea,
 } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
@@ -98,7 +96,6 @@ export function LiveShoppingList(): JSX.Element {
 
   return (
     <Box p={5}>
-      <Heading size="md">라이브 쇼핑 리스트</Heading>
       <Table variant="simple">
         <Thead>
           <Tr>
@@ -127,8 +124,10 @@ export function LiveShoppingList(): JSX.Element {
                     sellEndDate={row.sellEndDate}
                   />
                 </Td>
-                <Td align="center">
-                  <BroadcasterName data={row.broadcaster} />
+                <Td onClick={(e) => e.stopPropagation()}>
+                  <Link href={row.broadcaster?.channelUrl} isExternal>
+                    <BroadcasterName data={row.broadcaster} />
+                  </Link>
                 </Td>
                 <Td>
                   <Stack alignItems="center">
@@ -160,7 +159,7 @@ export function LiveShoppingList(): JSX.Element {
                     </Text>
                   </Stack>
                 </Td>
-                <Td>
+                <Td onClick={(e) => e.stopPropagation()}>
                   {row.liveShoppingVideo ? (
                     <Link
                       href={row.liveShoppingVideo.youtubeUrl}
@@ -218,7 +217,9 @@ export function LiveShoppingList(): JSX.Element {
                 <Stack direction="row" alignItems="center">
                   <Text as="span">방송인: </Text>
                   {data[liveShoppingId].broadcaster ? (
-                    <BroadcasterName data={data[liveShoppingId].broadcaster} />
+                    <Link href={data[liveShoppingId].broadcaster.channelUrl} isExternal>
+                      <BroadcasterName data={data[liveShoppingId].broadcaster} />
+                    </Link>
                   ) : (
                     <Text fontWeight="bold">미정</Text>
                   )}
