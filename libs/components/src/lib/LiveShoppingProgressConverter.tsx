@@ -11,7 +11,7 @@ export function LiveShoppingProgressConverter(
   props: LiveShoppingProgressConverterProps,
 ): JSX.Element {
   const { progress, broadcastStartDate, broadcastEndDate, sellEndDate } = props;
-  if (broadcastStartDate && broadcastEndDate) {
+  if (broadcastStartDate && broadcastEndDate && progress === 'confirm') {
     if (
       sellEndDate &&
       new Date(sellEndDate).valueOf() < new Date().valueOf() &&

@@ -13,6 +13,16 @@ import {
   useToast,
   Link,
   Stack,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Divider,
+  Grid,
+  Textarea,
 } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import {
@@ -33,10 +43,23 @@ export function LiveShoppingList(): JSX.Element {
   });
 
   const [isOpen, setIsOpen] = useState(false);
+
+  const [toDeleteLiveShoppingId, setToDeleteLiveShoppingId] = useState(0);
   const [liveShoppingId, setLiveShoppingId] = useState(0);
+  const {
+    isOpen: detailIsOpen,
+    onOpen: detailOnOpen,
+    onClose: detailOnClose,
+  } = useDisclosure();
+
+  const handleDetailOnOpen = (id: number): void => {
+    setLiveShoppingId(id);
+    detailOnOpen();
+  };
+
   const handleModalOpen = (id: number): void => {
     setIsOpen(true);
-    setLiveShoppingId(id);
+    setToDeleteLiveShoppingId(id);
   };
 
   const onClose = (): void => {
@@ -48,7 +71,7 @@ export function LiveShoppingList(): JSX.Element {
   const toast = useToast();
 
   const deleteLiveShopping = async (): Promise<void> => {
-    mutateAsync(liveShoppingId)
+    mutateAsync(toDeleteLiveShoppingId)
       .then((isDeleted) => {
         if (isDeleted) {
           toast({
@@ -93,7 +116,7 @@ export function LiveShoppingList(): JSX.Element {
           {data &&
             !isLoading &&
             data.map((row, index) => (
-              <Tr key={row.id}>
+              <Tr key={row.id} onClick={() => handleDetailOnOpen(index)} cursor="pointer">
                 <Td>{index + 1}</Td>
                 <Td>{row.goods.goods_name}</Td>
                 <Td>
@@ -138,7 +161,7 @@ export function LiveShoppingList(): JSX.Element {
                   </Stack>
                 </Td>
                 <Td>
-                  {row.liveShoppingVideo.youtubeUrl ? (
+                  {row.liveShoppingVideo ? (
                     <Link
                       href={row.liveShoppingVideo.youtubeUrl}
                       isExternal
@@ -148,9 +171,11 @@ export function LiveShoppingList(): JSX.Element {
                     >
                       보러가기 <ExternalLinkIcon mx="2px" />
                     </Link>
-                  ) : null}
+                  ) : (
+                    <Text>업로드 대기</Text>
+                  )}
                 </Td>
-                <Td>
+                <Td onClick={(e) => e.stopPropagation()}>
                   {row.progress === 'registered' ? (
                     <Button
                       size="xs"
@@ -166,6 +191,98 @@ export function LiveShoppingList(): JSX.Element {
             ))}
         </Tbody>
       </Table>
+      {data && !isLoading && (
+        <Modal isOpen={detailIsOpen} onClose={detailOnClose} size="lg">
+          <ModalContent>
+            <ModalHeader>상세정보</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Stack spacing={5}>
+                <Text as="span">
+                  판매자 : {data[liveShoppingId].seller.sellerShop.shopName}
+                </Text>
+
+                <Stack direction="row" alignItems="center">
+                  <Text as="span">진행상태</Text>
+                  <LiveShoppingProgressConverter
+                    progress={data[liveShoppingId].progress}
+                    broadcastStartDate={data[liveShoppingId].broadcastStartDate}
+                    broadcastEndDate={data[liveShoppingId].broadcastEndDate}
+                    sellEndDate={data[liveShoppingId].sellEndDate}
+                  />
+                  {data[liveShoppingId].progress === 'cancel' ? (
+                    <Text>사유 : {data[liveShoppingId].rejectionReason}</Text>
+                  ) : null}
+                </Stack>
+                <Divider />
+                <Stack direction="row" alignItems="center">
+                  <Text as="span">방송인: </Text>
+                  {data[liveShoppingId].broadcaster ? (
+                    <BroadcasterName data={data[liveShoppingId].broadcaster} />
+                  ) : (
+                    <Text fontWeight="bold">미정</Text>
+                  )}
+                </Stack>
+                <Stack direction="row" alignItems="center">
+                  <Text as="span">방송시작 시간: </Text>
+                  <Text as="span" fontWeight="bold">
+                    {data[liveShoppingId].broadcastStartDate
+                      ? dayjs(data[liveShoppingId].broadcastStartDate).format(
+                          'YYYY/MM/DD HH:mm',
+                        )
+                      : '미정'}
+                  </Text>
+                </Stack>
+
+                <Stack direction="row" alignItems="center">
+                  <Text as="span">방송종료 시간: </Text>
+                  <Text as="span" fontWeight="bold">
+                    {data[liveShoppingId].broadcastEndDate
+                      ? dayjs(data[liveShoppingId].broadcastEndDate).format(
+                          'YYYY/MM/DD HH:mm',
+                        )
+                      : '미정'}
+                  </Text>
+                </Stack>
+
+                <Divider />
+                <Stack direction="row" alignItems="center">
+                  <Text as="span">판매시작 시간: </Text>
+                  <Text as="span" fontWeight="bold">
+                    {data[liveShoppingId].sellStartDate
+                      ? dayjs(data[liveShoppingId].sellStartDate).format(
+                          'YYYY/MM/DD HH:mm',
+                        )
+                      : '미정'}
+                  </Text>
+                </Stack>
+
+                <Stack direction="row" alignItems="center">
+                  <Text as="span">판매종료 시간: </Text>
+                  <Text as="span" fontWeight="bold">
+                    {data[liveShoppingId].sellEndDate
+                      ? dayjs(data[liveShoppingId].sellEndDate).format('YYYY/MM/DD HH:mm')
+                      : '미정'}
+                  </Text>
+                </Stack>
+                <Stack>
+                  <Text>요청사항</Text>
+                  <Textarea resize="none" rows={10} readOnly>
+                    {data[liveShoppingId].requests}
+                  </Textarea>
+                </Stack>
+              </Stack>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={detailOnClose}>
+                닫기
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
       <ConfirmDialog
         title="라이브 쇼핑 삭제"
         isOpen={isOpen}
