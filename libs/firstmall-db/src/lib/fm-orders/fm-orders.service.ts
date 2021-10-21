@@ -733,4 +733,26 @@ export class FmOrdersService {
       sales: counter.sales,
     };
   }
+
+  public async getOrdersStatsDuringLiveShoppingSales(dto: any): Promise<any> {
+    const salesPrice = [];
+
+    const sql = `
+    SELECT
+      SUM(fm_order.payment_price) as sales
+    FROM fm_order
+    JOIN fm_order_item USING(order_seq)
+    WHERE fm_order_item.goods_seq IN (?)
+    AND
+    DATE(deposit_date) BETWEEN ? AND ?;
+    `;
+    await dto.map(async (val) => {
+      const sellStartDate = dayjs(val.sellStartDate).format('YYYY-MM-DD HH:mm:ss');
+      const sellEndDate = dayjs(val.sellEndDate).format('YYYY-MM-DD HH:mm:ss');
+      const result = await this.db.query(sql, [val.goodsId, sellStartDate, sellEndDate]);
+      salesPrice.push({ goodsId: val.goodsId, sales: result[0].sales });
+    });
+
+    return salesPrice;
+  }
 }
