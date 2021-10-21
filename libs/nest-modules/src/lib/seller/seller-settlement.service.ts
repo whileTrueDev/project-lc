@@ -4,6 +4,7 @@ import {
   SellerSettlementAccount,
   BusinessRegistrationConfirmation,
   SellerSettlements,
+  SellCommission,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -167,6 +168,11 @@ export class SellerSettlementService {
    * */
   public async settle(): Promise<void> {
     // 정산 대상 불러오기
+  }
+
+  /** 정산 고정 수수료 정보를 조회힙니다. */
+  public async findSellCommission(): Promise<SellCommission> {
+    return this.prisma.sellCommission.findFirst();
   }
 
   /**

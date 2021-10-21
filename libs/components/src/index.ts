@@ -65,6 +65,7 @@ export * from './lib/ResetPasswordForm';
 export * from './lib/SectionWithTitle';
 export * from './lib/SellerGoodsList';
 export * from './lib/SellerStatusSection';
+export * from './lib/settlement/SettlementSellCommissionInfo';
 export * from './lib/settlement/SettlementTargetList';
 export * from './lib/SettlementAccountBox';
 export * from './lib/SettlementAccountForm';

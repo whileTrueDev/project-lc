@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -6,11 +5,6 @@ import {
   FmSettlementTargetOptions,
   FmSettlementTargets,
 } from '@project-lc/shared-types';
-import {
-  SellerSettlementItemOptions,
-  SellerSettlementItems,
-  SellerSettlements,
-} from '.prisma/client';
 import { FirstmallDbService } from '../firstmall-db.service';
 
 @Injectable()
@@ -23,10 +17,10 @@ export class FmSettlementService {
   public async findAllSettleTargetList(): Promise<Array<FmSettlementTargets>> {
     // 정산이 완료되지 않은 출고내역 조회
     const sql = `SELECT
-      export_code, status, confirm_date, order_seq,
+      export_seq, export_code, status, buy_confirm, confirm_date, order_seq,
       complete_date, account_date, shipping_date, regist_date
     FROM fm_goods_export
-    WHERE account_date IS NULL`;
+    WHERE account_date IS NULL AND buy_confirm != "none"`;
     const result: FmSettlementTargetBase[] = await this.db.query(sql);
 
     if (result.length === 0) return [];
@@ -41,7 +35,7 @@ export class FmSettlementService {
       IN (
         SELECT export_code
         FROM fm_goods_export
-        WHERE account_date IS NULL
+        WHERE account_date IS NULL AND buy_confirm != "none"
       )`;
     const exportOptions: FmSettlementTargetOptions[] = await this.db.query(sql2);
 
@@ -57,6 +51,7 @@ export class FmSettlementService {
         firstmallGoodsConnectionId: true,
         goods: {
           include: {
+            LiveShopping: true,
             seller: {
               include: {
                 sellerShop: {
@@ -66,9 +61,11 @@ export class FmSettlementService {
                 },
                 sellerSettlementAccount: {
                   select: {
+                    id: true,
                     bank: true,
                     name: true,
                     number: true,
+                    settlementAccountImageName: true,
                   },
                 },
               },
@@ -87,59 +84,16 @@ export class FmSettlementService {
             (g) => g.firstmallGoodsConnectionId === o.goods_seq,
           );
           if (lcgoods) {
-            return { ...o, seller: lcgoods.goods.seller };
+            return {
+              ...o,
+              seller: lcgoods.goods.seller,
+              LiveShopping: lcgoods.goods.LiveShopping,
+            };
           }
-          return { ...o, seller: null };
+          return { ...o, seller: null, LiveShopping: [] };
         }),
     }));
 
     return exports;
-  }
-
-  // ********************************
-  // * 유틸함수
-  // ********************************
-  private __reduceCompletedSettlements(
-    alreadyDone: (SellerSettlements & {
-      settlementItems: (SellerSettlementItems & {
-        options: SellerSettlementItemOptions[];
-      })[];
-    })[],
-  ): Record<
-    'orderIds' | 'orderItemIds' | 'orderItemOptionIds' | 'refundCodes',
-    Array<string>
-  > {
-    return alreadyDone.reduce(
-      (acc, curr) => {
-        const order = acc.orderIds.concat(curr.settlementItems.map((y) => y.orderId));
-        const refund = acc.refundCodes.concat(
-          curr.settlementItems.map((y) => y.refundCode),
-        );
-
-        const orderItemIds: string[] = [];
-        const orderItemOptionIds: string[] = [];
-        curr.settlementItems.forEach((item) => {
-          item.options.forEach((option) => {
-            if (option.itemId && option.optionId) {
-              orderItemIds.push(option.itemId);
-              orderItemOptionIds.push(option.optionId);
-            }
-          });
-        });
-
-        return {
-          orderIds: order,
-          refundCodes: refund,
-          orderItemIds,
-          orderItemOptionIds,
-        };
-      },
-      {
-        orderIds: [],
-        orderItemIds: [],
-        orderItemOptionIds: [],
-        refundCodes: [],
-      },
-    );
   }
 }

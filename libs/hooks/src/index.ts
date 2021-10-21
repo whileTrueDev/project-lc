@@ -46,6 +46,7 @@ export * from './lib/queries/useGoodsCommonInfoItem';
 export * from './lib/queries/useGoodsCommonInfoList';
 export * from './lib/queries/useGoodsStock';
 export * from './lib/queries/useProfile';
+export * from './lib/queries/useSellCommission';
 export * from './lib/queries/useSellerGoodsList';
 export * from './lib/queries/useSettlementInfo';
 export * from './lib/queries/useSettlementTargets';

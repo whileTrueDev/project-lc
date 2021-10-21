@@ -71,14 +71,14 @@ model SellerSettlements {
   date                      DateTime  @default(now()) // 정산마감일: 정산이 마감된 날짜 = 정산 시점
   startDate                 DateTime // 발생일: 정산대상(결제/취소/환불/...)이 발생한 날짜
   doneDate                  DateTime? // 완료일: 정산대상(구매확정/취소/환불/...)이 완료된 날짜
-  totalCommissionRate       Decimal   @default("0.00") // 총 수수료율 (0%~100% 사이값)
-  broadcasterCommissionRate Decimal   @default("0.00") // 방송인 수수료율 (0%~100% 사이값)
-  whiletrueCommissionRate   Decimal   @default("0.00") // 와일트루 수수료율 (0%~100% 사이값)
+  totalCommissionRate       Decimal   @default("0.00") @db.Decimal(10, 2) // 총 수수료율 (0%~100% 사이값)
+  broadcasterCommissionRate Decimal   @default("0.00") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
+  whiletrueCommissionRate   Decimal   @default("0.00") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
   totalCommission           Int       @default(0) // 총 수수료 금액
   broadcasterCommission     Int       @default(0) // 방송인 수수료 금액
   whiletrueCommission       Int       @default(0) // 와일트루 수수료 금액
   pgCommission              Int       @default(0) // 전자결제 수수료
-  pgCommissionRate          Decimal   @default("0.00") // 전자결제 수수료율
+  pgCommissionRate          Decimal   @default("0.00") @db.Decimal(10, 2) // 전자결제 수수료율
   paymentMethod             String? // 결제수단
   pg                        String? // pg사
   liveShoppingId            Int?      @unique // 라이브쇼핑 고유번호 (Relational)
@@ -91,11 +91,10 @@ model SellerSettlements {
   @@index([sellerEmail, id], name: "SellerSettlementsIndex")
 }
 
-// 정산 아이템(결제/취소/환불/...)
+// 정산 아이템(주문 정보)
 model SellerSettlementItems {
   id                  Int                           @id @default(autoincrement())
   orderId             String? // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
-  refundCode          String? // 환불 고유번호 (퍼스트몰 fm_refund.refund_code)
   sellerSettlements   SellerSettlements?            @relation(fields: [sellerSettlementsId], references: [id], onDelete: Cascade)
   sellerSettlementsId Int?
   options             SellerSettlementItemOptions[]
@@ -503,8 +502,8 @@ model LiveShopping {
   contactId                 Int // 판매자 등록된 연락처 ID
   requests                  String?  @db.LongText // 요청사항
   progress                  String   @default("registered") // 진행상태
-  broadcasterCommissionRate Decimal  @default("0") // 판매금 중, 방송인이 가져가는 수수료 (0%~100% 사이값)
-  whiletrueCommissionRate   Decimal  @default("0") // 판매금 중, project-lc(와일트루)가 가져가는 수수료 (0%~100% 사이값)
+  broadcasterCommissionRate Decimal  @default("0") @db.Decimal(10, 2) // 판매금 중, 방송인이 가져가는 수수료 (0%~100% 사이값)
+  whiletrueCommissionRate   Decimal  @default("0") @db.Decimal(10, 2) // 판매금 중, project-lc(와일트루)가 가져가는 수수료 (0%~100% 사이값)
   createDate                DateTime @default(now())
 
   sellerContacts    SellerContacts     @relation(fields: [contactId], references: [id], onDelete: Cascade)
@@ -517,6 +516,6 @@ model LiveShopping {
 // 판매 수수료
 model SellCommission {
   id                Int     @id @default(autoincrement())
-  commissionRate    Decimal @default("5.00") // 판매 수수료 퍼센티지 (0%~100% 사이값)
-  commissionDecimal Decimal @default("0.05") // 0~1사이의 값으로 표현한 판매수수료
+  commissionRate    Decimal @default("5.00") @db.Decimal(10, 2) // 판매 수수료 퍼센티지 (0%~100% 사이값)
+  commissionDecimal Decimal @default("0.05") @db.Decimal(10, 2) // 0~1사이의 값으로 표현한 판매수수료
 }

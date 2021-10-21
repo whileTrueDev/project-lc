@@ -7,30 +7,29 @@
 
 */
 -- AlterTable
-ALTER TABLE `LiveShopping` ADD COLUMN `broadcasterCommissionRate` DECIMAL(65, 30) NOT NULL DEFAULT 0,
-    ADD COLUMN `whiletrueCommissionRate` DECIMAL(65, 30) NOT NULL DEFAULT 0;
+ALTER TABLE `LiveShopping` ADD COLUMN `broadcasterCommissionRate` Decimal(10, 2) NOT NULL DEFAULT 0,
+    ADD COLUMN `whiletrueCommissionRate` Decimal(10, 2) NOT NULL DEFAULT 0;
 
 -- AlterTable
 ALTER TABLE `SellerSettlements` ADD COLUMN `broadcasterCommission` INTEGER NOT NULL DEFAULT 0,
-    ADD COLUMN `broadcasterCommissionRate` DECIMAL(65, 30) NOT NULL DEFAULT 0.00,
+    ADD COLUMN `broadcasterCommissionRate` Decimal(10, 2) NOT NULL DEFAULT 0.00,
     ADD COLUMN `doneDate` DATETIME(3),
     ADD COLUMN `liveShoppingId` INTEGER,
     ADD COLUMN `paymentMethod` VARCHAR(191),
     ADD COLUMN `pg` VARCHAR(191),
     ADD COLUMN `pgCommission` INTEGER NOT NULL DEFAULT 0,
-    ADD COLUMN `pgCommissionRate` DECIMAL(65, 30) NOT NULL DEFAULT 0.00,
+    ADD COLUMN `pgCommissionRate` Decimal(10, 2) NOT NULL DEFAULT 0.00,
     ADD COLUMN `round` VARCHAR(191) NOT NULL,
     ADD COLUMN `startDate` DATETIME(3) NOT NULL,
     ADD COLUMN `totalCommission` INTEGER NOT NULL DEFAULT 0,
-    ADD COLUMN `totalCommissionRate` DECIMAL(65, 30) NOT NULL DEFAULT 0.00,
+    ADD COLUMN `totalCommissionRate` Decimal(10, 2) NOT NULL DEFAULT 0.00,
     ADD COLUMN `whiletrueCommission` INTEGER NOT NULL DEFAULT 0,
-    ADD COLUMN `whiletrueCommissionRate` DECIMAL(65, 30) NOT NULL DEFAULT 0.00;
+    ADD COLUMN `whiletrueCommissionRate` Decimal(10, 2) NOT NULL DEFAULT 0.00;
 
 -- CreateTable
 CREATE TABLE `SellerSettlementItems` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `orderId` VARCHAR(191),
-    `refundCode` VARCHAR(191),
     `sellerSettlementsId` INTEGER,
 
     PRIMARY KEY (`id`)
@@ -49,8 +48,8 @@ CREATE TABLE `SellerSettlementItemOptions` (
 -- CreateTable
 CREATE TABLE `SellCommission` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `commissionRate` DECIMAL(65, 30) NOT NULL DEFAULT 5.00,
-    `commissionDecimal` DECIMAL(65, 30) NOT NULL DEFAULT 0.05,
+    `commissionRate` Decimal(10, 2) NOT NULL DEFAULT 5.00,
+    `commissionDecimal` Decimal(10, 2) NOT NULL DEFAULT 0.05,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -1,5 +1,9 @@
 import { Heading, Stack } from '@chakra-ui/react';
-import { AdminPageLayout, SettlementTargetList } from '@project-lc/components';
+import {
+  AdminPageLayout,
+  SettlementSellCommissionInfo,
+  SettlementTargetList,
+} from '@project-lc/components';
 
 export function SettlementIndex(): JSX.Element {
   return (
@@ -8,6 +12,9 @@ export function SettlementIndex(): JSX.Element {
         <Heading as="h3" size="lg">
           정산 대상 목록
         </Heading>
+
+        <SettlementSellCommissionInfo />
+
         <SettlementTargetList />
       </Stack>
     </AdminPageLayout>

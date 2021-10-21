@@ -12,7 +12,12 @@ import {
   ValidationPipe,
   Res,
 } from '@nestjs/common';
-import { Seller, SellerSettlementAccount, SellerSettlements } from '@prisma/client';
+import {
+  SellCommission,
+  Seller,
+  SellerSettlementAccount,
+  SellerSettlements,
+} from '@prisma/client';
 import {
   FindSellerDto,
   PasswordValidateDto,
@@ -195,5 +200,11 @@ export class SellerController {
   ): Promise<{ contactId: number }> {
     const email = seller.sub;
     return this.sellerService.registSellerContacts(email, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('sell-commission')
+  public findSellCommission(): Promise<SellCommission> {
+    return this.sellerSettlementService.findSellCommission();
   }
 }

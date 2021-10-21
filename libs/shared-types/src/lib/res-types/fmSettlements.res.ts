@@ -1,5 +1,10 @@
-import { Seller, SellerSettlementAccount, SellerShop } from '.prisma/client';
-import { FmExport } from './fmExport.res';
+import {
+  LiveShopping,
+  Seller,
+  SellerSettlementAccount,
+  SellerShop,
+} from '.prisma/client';
+import { FmExport, FmExportItem } from './fmExport.res';
 import { FmGoodsOption } from './fmGoods.res';
 import { FmOrderItem, FmOrderOption } from './fmOrder.res';
 
@@ -64,8 +69,10 @@ export type FmSettlementTargetOptions = {
   FmOrderOption;
 
 export type FmSettlementTargetBase = {
+  export_seq: FmExport['export_seq'];
   export_code: FmExport['export_code'];
   status: FmExport['status'];
+  buy_confirm: FmExport['buy_confirm'];
   confirm_date: FmExport['confirm_date'];
   order_seq: FmExport['order_seq'];
   complete_date: FmExport['complete_date'];
@@ -83,12 +90,15 @@ export type FmSettlementTargets = FmSettlementTargetBase & {
               shopName: string;
             } | null;
             sellerSettlementAccount: {
-              number: string;
-              bank: string;
-              name: string;
+              number: SellerSettlementAccount['number'];
+              bank: SellerSettlementAccount['bank'];
+              name: SellerSettlementAccount['name'];
+              id: SellerSettlementAccount['id'];
+              settlementAccountImageName: SellerSettlementAccount['settlementAccountImageName'];
             }[];
           })
         | null;
+      LiveShopping: LiveShopping[];
     }
   >;
 };
