@@ -139,24 +139,28 @@ export function AdminGiftList(props: {
 }): JSX.Element {
   const { selectedGoods } = props;
   const { root } = useStyles();
-  const orders = useFmOrdersByGoods({
-    searchStatuses: getFmOrderStatusByNames([
-      '결제확인',
-      '배송완료',
-      '배송중',
-      '부분배송완료',
-      '부분배송중',
-      '부분출고완료',
-      '부분출고준비',
-      '상품준비',
-      '주문접수',
-      '출고완료',
-      '출고준비',
-    ]),
-    goodsIds: [selectedGoods.goodsId],
-    searchStartDate: getDateString(selectedGoods?.broadcastStartDate),
-    searchEndDate: getDateString(selectedGoods?.sellEndDate),
-  });
+  const orders = useFmOrdersByGoods(
+    {
+      searchStatuses: getFmOrderStatusByNames([
+        '결제확인',
+        '배송완료',
+        '배송중',
+        '부분배송완료',
+        '부분배송중',
+        '부분출고완료',
+        '부분출고준비',
+        '상품준비',
+        '주문접수',
+        '출고완료',
+        '출고준비',
+      ]),
+      goodsIds: [selectedGoods.goodsId],
+      searchStartDate: getDateString(selectedGoods?.broadcastStartDate),
+      searchEndDate: getDateString(selectedGoods?.sellEndDate),
+    },
+    {},
+    'admin',
+  );
   const { isDesktopSize } = useDisplaySize();
   const dataGridBgColor = useColorModeValue('inherit', 'gray.300');
 
