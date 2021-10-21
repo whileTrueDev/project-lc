@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { throwError } from 'rxjs';
+import { LiveShopping } from '@prisma/client';
 
 @Injectable()
 export class LiveShoppingService {
@@ -38,5 +39,36 @@ export class LiveShoppingService {
       throwError('라이브 쇼핑 삭제 실패');
     }
     return true;
+  }
+
+  async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
+    return this.prisma.liveShopping.findMany({
+      where: { id: id ? Number(id) : undefined },
+      include: {
+        goods: {
+          select: {
+            goods_name: true,
+            summary: true,
+          },
+        },
+        seller: {
+          select: {
+            sellerShop: true,
+          },
+        },
+        broadcaster: {
+          select: {
+            userNickname: true,
+            afreecaId: true,
+            twitchId: true,
+            youtubeId: true,
+            channelUrl: true,
+          },
+        },
+        liveShoppingVideo: {
+          select: { youtubeUrl: true },
+        },
+      },
+    });
   }
 }

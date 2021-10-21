@@ -24,7 +24,7 @@ import {
 } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import {
-  useAdminLiveShoppingList,
+  useLiveShoppingList,
   useProfile,
   useDeleteLiveShopping,
 } from '@project-lc/hooks';
@@ -36,7 +36,7 @@ import { ConfirmDialog } from './ConfirmDialog';
 export function LiveShoppingList(): JSX.Element {
   const { data: profileData } = useProfile();
 
-  const { data, isLoading } = useAdminLiveShoppingList({
+  const { data, isLoading } = useLiveShoppingList({
     enabled: !!profileData?.email,
   });
 
