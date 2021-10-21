@@ -15,9 +15,10 @@ import {
   LiveShoppingWithGoods,
   useProfile,
 } from '@project-lc/hooks';
+import { LiveShopingProgress } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import dayjs from 'dayjs';
-import { LiveShoppingProgressConverter } from '../LiveShoppingProgressConverter';
+import { LiveShoppingProgressBadge } from '../LiveShoppingProgressBadge';
 import { BroadcasterName } from '../BroadcasterName';
 
 export function AdminLiveShoppingList({
@@ -34,6 +35,7 @@ export function AdminLiveShoppingList({
   // TODO: 해당 라이브쇼핑 기간에 대한 조건 부여하기 -> useQuery도 변경 필요.
   function handleClick(row: LiveShoppingWithGoods): void {
     // 만약 해당 라이브커머스가 완료된 경우, 조회가 가능하다.
+    // 시작 시간과 끝 시간을 넘겨준다.
     setGoodsId(row.goodsId);
   }
 
@@ -70,7 +72,7 @@ export function AdminLiveShoppingList({
                 </Td>
                 <Td>{row.seller.sellerShop.shopName}</Td>
                 <Td>
-                  <LiveShoppingProgressConverter
+                  <LiveShoppingProgressBadge
                     progress={row.progress}
                     broadcastStartDate={row.broadcastStartDate}
                     broadcastEndDate={row.broadcastEndDate}
@@ -107,7 +109,7 @@ export function AdminLiveShoppingList({
                       handleClick(row);
                     }}
                     // TODO : 추후에 라이브 쇼핑의 결과값에 따라 변경필요.
-                    isDisabled={!(row.progress === 'completed')}
+                    isDisabled={!(row.progress === LiveShopingProgress.확정됨)}
                   >
                     선물 목록 조회
                   </Button>
