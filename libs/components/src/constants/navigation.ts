@@ -82,4 +82,8 @@ export const adminNavItems: Array<NavItem> = [
     label: '상품검수',
     href: '/goods',
   },
+  {
+    label: '라이브쇼핑관리',
+    href: '/live-shopping',
+  },
 ];

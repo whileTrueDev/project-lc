@@ -108,4 +108,11 @@ export class AppMessageGateway
     const { roomName } = data;
     this.server.to(roomName).emit('get objective message', data);
   }
+
+  @SubscribeMessage('get fever signal from admin')
+  getFeverMessage(@MessageBody() data: RoomAndText): void {
+    const { roomName } = data;
+    const { message } = data;
+    this.server.to(roomName).emit('get fever signal from server', message);
+  }
 }

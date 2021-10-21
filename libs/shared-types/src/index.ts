@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-export * from './lib/ApprovedGoodsListItem';
+export * from './lib/front-type/approvedGoodsListItemType';
 export * from './lib/constants/banks';
 export * from './lib/constants/fmDeliveryCompanies';
 export * from './lib/constants/fmExportConfirmStatuses';
@@ -61,6 +61,7 @@ export * from './lib/res-types/goodsList.res';
 export * from './lib/res-types/loginUserRes';
 export * from './lib/res-types/overlayControllerMain.res';
 export * from './lib/res-types/userProfile.res';
+export * from './lib/dto/broadcaster.dto';
 export * from './lib/dto/businessRegistrationConfirmation.dto';
 export * from './lib/dto/adminSettlementInfo.dto';
 export * from './lib/constants/orderStats';

@@ -1,7 +1,7 @@
-import { Box, Link, Flex, useColorModeValue, Button, Stack } from '@chakra-ui/react';
+import { Box, Button, Flex, Link, useColorModeValue } from '@chakra-ui/react';
 import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
-import { useRouter } from 'next/router';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 import { adminNavItems } from '../..';
 
 export default function AdminNav(): JSX.Element {
