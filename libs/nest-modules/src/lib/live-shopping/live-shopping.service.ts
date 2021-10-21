@@ -3,6 +3,13 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import { throwError } from 'rxjs';
 import { LiveShopping } from '@prisma/client';
 
+interface LiveShoppingWithConfirmation extends LiveShopping {
+  goods: {
+    confirmation: {
+      firstmallGoodsConnectionId: number;
+    };
+  };
+}
 @Injectable()
 export class LiveShoppingService {
   constructor(private readonly prisma: PrismaService) {}
@@ -41,7 +48,10 @@ export class LiveShoppingService {
     return true;
   }
 
-  async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
+  async getRegisteredLiveShoppings(
+    id?: string,
+    needConfirmation?: boolean,
+  ): Promise<LiveShopping[] | LiveShoppingWithConfirmation[]> {
     return this.prisma.liveShopping.findMany({
       where: { id: id ? Number(id) : undefined },
       include: {
@@ -49,6 +59,13 @@ export class LiveShoppingService {
           select: {
             goods_name: true,
             summary: true,
+            confirmation: needConfirmation
+              ? {
+                  select: {
+                    firstmallGoodsConnectionId: true,
+                  },
+                }
+              : undefined,
           },
         },
         seller: {

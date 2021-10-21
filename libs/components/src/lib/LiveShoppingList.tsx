@@ -27,6 +27,7 @@ import {
   useLiveShoppingList,
   useProfile,
   useDeleteLiveShopping,
+  useFmOrdersDuringLiveShoppingSales,
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { LiveShoppingProgressConverter } from './LiveShoppingProgressConverter';
@@ -39,7 +40,11 @@ export function LiveShoppingList(): JSX.Element {
   const { data, isLoading } = useLiveShoppingList({
     enabled: !!profileData?.email,
   });
-
+  console.log(data);
+  const { data: sales, isLoading: isSalesLoading } = useFmOrdersDuringLiveShoppingSales({
+    enabled: !!profileData?.email,
+  });
+  console.log(sales);
   const [isOpen, setIsOpen] = useState(false);
 
   const [toDeleteLiveShoppingId, setToDeleteLiveShoppingId] = useState(0);

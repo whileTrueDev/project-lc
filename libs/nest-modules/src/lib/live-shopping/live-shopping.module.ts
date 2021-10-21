@@ -7,5 +7,6 @@ import { LiveShoppingService } from './live-shopping.service';
   imports: [S3Module, GoodsModule],
   providers: [LiveShoppingService],
   controllers: [LiveShoppingController],
+  exports: [LiveShoppingService],
 })
 export class LiveShoppingModule {}

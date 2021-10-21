@@ -13,6 +13,7 @@ import {
   JwtAuthGuard,
   SellerInfo,
   UserPayload,
+  LiveShoppingService,
 } from '@project-lc/nest-modules';
 import {
   ChangeFmOrderStatusDto,
@@ -24,14 +25,15 @@ import {
   OrderStatsRes,
   SalesStats,
 } from '@project-lc/shared-types';
-import { FmOrdersService } from './fm-orders.service';
 
+import { FmOrdersService } from './fm-orders.service';
 @UseGuards(JwtAuthGuard)
 @Controller('fm-orders')
 export class FmOrdersController {
   constructor(
     private readonly projectLcGoodsService: GoodsService,
     private readonly fmOrdersService: FmOrdersService,
+    private readonly liveShoppingService: LiveShoppingService,
   ) {}
 
   /** 주문 목록 조회 */
@@ -60,6 +62,31 @@ export class FmOrdersController {
         orders: new OrderStats(),
       };
     return this.fmOrdersService.getOrdersStats(ids);
+  }
+
+  @Get('/per-live-shopping')
+  async findSalesPerLiveShopping(
+    @Query('perLiveShopping')
+    dto: any,
+  ): Promise<any> {
+    let liveShoppingList = await this.liveShoppingService
+      .getRegisteredLiveShoppings(null, true)
+      .then((result) => {
+        return result.map((val) => {
+          if (val.sellStartDate && val.sellEndDate) {
+            return {
+              goodsId: val.goods.confirmation.firstmallGoodsConnectionId,
+              sellStartDate: val.sellStartDate,
+              sellEndDate: val.sellEndDate,
+            };
+          }
+          return null;
+        });
+      });
+
+    liveShoppingList = liveShoppingList?.filter((n) => n);
+
+    return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
   }
 
   /** 개별 주문 조회 */
