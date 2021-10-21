@@ -52,7 +52,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
         setValue('password', '');
       });
       if (seller) {
-        router.push('/');
+        router.push('/mypage');
       }
     },
     [login, setValue, router],
