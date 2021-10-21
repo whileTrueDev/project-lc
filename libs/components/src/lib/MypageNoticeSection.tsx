@@ -1,6 +1,6 @@
-import { GridColumns, GridRowParams } from '@material-ui/data-grid';
+import { GridColumns } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { useColorModeValue, Box, Text, Divider } from '@chakra-ui/react';
+import { useColorModeValue, Link, Box, Text, Divider } from '@chakra-ui/react';
 import { useNoticeInfo } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { Notice } from '@prisma/client';
@@ -11,6 +11,13 @@ const columns: GridColumns = [
     field: 'title',
     headerName: '제목',
     minWidth: 600,
+    renderCell: ({ row }) => {
+      return (
+        <Link isExternal href={row.url}>
+          {row.title}
+        </Link>
+      );
+    },
   },
   {
     field: 'date',
@@ -42,12 +49,6 @@ export function MypageNoticeSection(): JSX.Element {
     },
   });
 
-  async function handleClick(param: GridRowParams): Promise<void> {
-    if (param.row.url) {
-      window.open(param.row.url, '_blank');
-    }
-  }
-
   const classes = useStyle();
   const { data: notices, isLoading } = useNoticeInfo();
 
@@ -72,7 +73,6 @@ export function MypageNoticeSection(): JSX.Element {
         columns={columns}
         rows={makeListRow(notices)}
         rowsPerPageOptions={[25, 50]}
-        onRowClick={handleClick}
         rowCount={5}
         pageSize={5}
         disableColumnMenu
