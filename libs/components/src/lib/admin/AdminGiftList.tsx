@@ -6,6 +6,7 @@ import {
   convertFmOrderStatusToString,
   FmOrderStatusNumString,
   getFmOrderStatusByNames,
+  LiveShoppingProgressParams,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
@@ -13,6 +14,10 @@ import { useMemo } from 'react';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import FmOrderStatusBadge from '../FmOrderStatusBadge';
 import TooltipedText from '../TooltipedText';
+
+export type SeletctedLiveShoppingType = Partial<LiveShoppingProgressParams> & {
+  goodsId: number;
+};
 
 const columns: GridColumns = [
   {
@@ -122,7 +127,17 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export function AdminGiftList({ goodsId }: { goodsId: number }): JSX.Element {
+function getDateString(date: Date | null | undefined): string | undefined {
+  if (date) {
+    return dayjs(date).format('YYYY-MM-DD');
+  }
+  return undefined;
+}
+
+export function AdminGiftList(props: {
+  selectedGoods: SeletctedLiveShoppingType;
+}): JSX.Element {
+  const { selectedGoods } = props;
   const { root } = useStyles();
   const orders = useFmOrdersByGoods({
     searchStatuses: getFmOrderStatusByNames([
@@ -138,7 +153,9 @@ export function AdminGiftList({ goodsId }: { goodsId: number }): JSX.Element {
       '출고완료',
       '출고준비',
     ]),
-    goodsIds: [goodsId],
+    goodsIds: [selectedGoods.goodsId],
+    searchStartDate: getDateString(selectedGoods?.broadcastStartDate),
+    searchEndDate: getDateString(selectedGoods?.sellEndDate),
   });
   const { isDesktopSize } = useDisplaySize();
   const dataGridBgColor = useColorModeValue('inherit', 'gray.300');

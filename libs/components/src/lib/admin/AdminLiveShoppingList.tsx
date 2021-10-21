@@ -15,16 +15,23 @@ import {
   LiveShoppingWithGoods,
   useProfile,
 } from '@project-lc/hooks';
-import { LiveShopingProgress } from '@project-lc/shared-types';
+import {
+  LiveShoppingProgressParams,
+  getLiveShoppingProgress,
+} from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import dayjs from 'dayjs';
 import { LiveShoppingProgressBadge } from '../LiveShoppingProgressBadge';
 import { BroadcasterName } from '../BroadcasterName';
 
+export type SeletctedLiveShoppingType = Partial<LiveShoppingProgressParams> & {
+  goodsId: number;
+};
+
 export function AdminLiveShoppingList({
-  setGoodsId,
+  setSelectedGoods,
 }: {
-  setGoodsId: (goodsId: number) => void;
+  setSelectedGoods: (selectedGoods: SeletctedLiveShoppingType) => void;
 }): JSX.Element {
   const { data: profileData } = useProfile();
 
@@ -32,11 +39,24 @@ export function AdminLiveShoppingList({
     enabled: !!profileData?.email,
   });
 
-  // TODO: 해당 라이브쇼핑 기간에 대한 조건 부여하기 -> useQuery도 변경 필요.
   function handleClick(row: LiveShoppingWithGoods): void {
-    // 만약 해당 라이브커머스가 완료된 경우, 조회가 가능하다.
-    // 시작 시간과 끝 시간을 넘겨준다.
-    setGoodsId(row.goodsId);
+    setSelectedGoods({
+      goodsId: row.goodsId,
+      broadcastStartDate: row.broadcastStartDate,
+      broadcastEndDate: row.broadcastEndDate,
+      sellEndDate: row.sellEndDate,
+    });
+  }
+
+  // 선물 목록을 조회할 수 있는 라이브커머스의 조건
+  function checkGiftList(row: LiveShoppingWithGoods): boolean {
+    const progress = getLiveShoppingProgress({
+      progress: row.progress,
+      broadcastStartDate: row.broadcastStartDate,
+      broadcastEndDate: row.broadcastEndDate,
+      sellEndDate: row.sellEndDate,
+    });
+    return ['판매종료', '방송진행중', '방송종료'].includes(progress);
   }
 
   return (
@@ -108,8 +128,7 @@ export function AdminLiveShoppingList({
                     onClick={() => {
                       handleClick(row);
                     }}
-                    // TODO : 추후에 라이브 쇼핑의 결과값에 따라 변경필요.
-                    isDisabled={!(row.progress === LiveShopingProgress.확정됨)}
+                    isDisabled={!checkGiftList(row)}
                   >
                     선물 목록 조회
                   </Button>

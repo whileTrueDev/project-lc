@@ -11,6 +11,8 @@ export const getFmOrdersByGoods = async (
       params: {
         searchStatuses: dto.searchStatuses,
         goodsIds: dto.goodsIds,
+        searchStartDate: dto?.searchStartDate || undefined,
+        searchEndDate: dto?.searchEndDate || undefined,
       },
     })
     .then((res) => res.data);
