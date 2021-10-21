@@ -206,5 +206,3 @@ export function AdminGiftList(props: {
     </Box>
   );
 }
-
-export default AdminGiftList;

@@ -15,18 +15,12 @@ import {
   LiveShoppingWithGoods,
   useProfile,
 } from '@project-lc/hooks';
-import {
-  LiveShoppingProgressParams,
-  getLiveShoppingProgress,
-} from '@project-lc/shared-types';
+import { getLiveShoppingProgress } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import dayjs from 'dayjs';
 import { LiveShoppingProgressBadge } from '../LiveShoppingProgressBadge';
 import { BroadcasterName } from '../BroadcasterName';
-
-export type SeletctedLiveShoppingType = Partial<LiveShoppingProgressParams> & {
-  goodsId: number;
-};
+import { SeletctedLiveShoppingType } from './AdminGiftList';
 
 export function AdminLiveShoppingList({
   setSelectedGoods,
