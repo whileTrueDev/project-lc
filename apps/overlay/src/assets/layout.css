@@ -256,6 +256,7 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
+  top: 0;
   left: 0;
   opacity: 0;
   z-index: 100;
@@ -423,13 +424,13 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 13;
+  z-index: 9999;
 }
 
 .notification {
   position: fixed;
-  bottom: 10.7%;
-  right: 0px;
+  top: 2.5%;
+  right: 2%;
   width: 600px;
   height: 400px;
 }
