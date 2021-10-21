@@ -156,7 +156,7 @@ export function AdminGiftList(props: {
       ]),
       goodsIds: [selectedGoods.goodsId],
       searchStartDate: getDateString(selectedGoods?.broadcastStartDate),
-      searchEndDate: getDateString(selectedGoods?.sellEndDate),
+      searchEndDate: getDateString(selectedGoods?.broadcastEndDate),
     },
     {},
     'admin',
