@@ -13,6 +13,7 @@ import {
   Textarea,
   Box,
 } from '@chakra-ui/react';
+import { useSellerOrderCancelMutation } from '@project-lc/hooks';
 import {
   convertFmOrderStatusToString,
   FmOrderItem,
@@ -30,7 +31,7 @@ type OrderCancelItemType = Pick<
 > &
   Pick<FmOrderOption, 'item_option_seq' | 'title1' | 'option1' | 'ea' | 'step'>;
 
-type OrderCancelFormItem = OrderCancelItemType & { count: number };
+type OrderCancelFormItem = OrderCancelItemType & { cancelAmount: number };
 
 type OrderCancelForm = {
   cancelReason: string;
@@ -65,10 +66,10 @@ function flattenOrderItemOptions(
 
 function OrderCancelRequstItem({
   item,
-  countInput,
+  amountInput,
 }: {
   item: OrderCancelFormItem;
-  countInput: React.ReactNode;
+  amountInput: React.ReactNode;
 }): JSX.Element {
   const { goods_name, title1, option1, ea, image } = item;
   return (
@@ -82,13 +83,15 @@ function OrderCancelRequstItem({
       />
       <Stack>
         <Text fontWeight="bold">{goods_name}</Text>
-        <Text colorScheme="gray">
-          {title1} : {option1}
-        </Text>
+        {title1 && (
+          <Text colorScheme="gray">
+            {title1} : {option1}
+          </Text>
+        )}
       </Stack>
 
       <Text>{ea}</Text>
-      <Box>{countInput}</Box>
+      <Box>{amountInput}</Box>
     </Stack>
   );
 }
@@ -116,7 +119,10 @@ export function OrderCancelRequestDialog({
     formState: { errors },
   } = useForm<OrderCancelForm>({
     defaultValues: {
-      cancelItems: orderCancelItemList.map((item) => ({ ...item, count: item.ea })),
+      cancelItems: orderCancelItemList.map((item) => ({
+        ...item,
+        cancelAmount: item.ea,
+      })),
       cancelReason: '',
     },
   });
@@ -125,13 +131,26 @@ export function OrderCancelRequestDialog({
     control,
   });
 
+  const orderCancelRequest = useSellerOrderCancelMutation();
+
   const submit = (data: OrderCancelForm): void => {
     const { cancelItems, cancelReason } = data;
     console.log('submit');
-    console.log(cancelItems); // item_seq, item_option_seq, count 만 보내기
-    console.log(cancelReason); // 취소사유
-    console.log({ orderId: order.order_seq }); // 주문번호
     // 판매자 email은 sellerEmail 로
+    const dto = {
+      orderSeq: order.order_seq.toString(),
+      reason: cancelReason,
+      orderCancelItems: cancelItems.map((item) => {
+        const { cancelAmount, item_seq, item_option_seq } = item;
+        return {
+          amount: cancelAmount,
+          orderItemSeq: item_seq,
+          orderItemOptionSeq: item_option_seq,
+        };
+      }),
+    };
+    console.log(dto);
+    orderCancelRequest.mutateAsync(dto);
   };
 
   return (
@@ -163,10 +182,10 @@ export function OrderCancelRequestDialog({
               <OrderCancelRequstItem
                 key={field.id}
                 item={item}
-                countInput={
+                amountInput={
                   <Input
-                    isInvalid={!!errors?.cancelItems?.[index]?.count}
-                    {...register(`cancelItems.${index}.count` as const, {
+                    isInvalid={!!errors?.cancelItems?.[index]?.cancelAmount}
+                    {...register(`cancelItems.${index}.cancelAmount` as const, {
                       valueAsNumber: true,
                       required: true,
                       max: item.ea,

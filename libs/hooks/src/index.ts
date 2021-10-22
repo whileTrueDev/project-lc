@@ -64,3 +64,4 @@ export * from './lib/mutation/useNoticeMutation';
 export * from './lib/queries/useFmOrdersStats';
 export * from './lib/queries/useNotice';
 export * from './lib/mutation/useUpdateLiveShoppingManageMutation';
+export * from './lib/mutation/useSellerOrderCancelMutation';
