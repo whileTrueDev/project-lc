@@ -18,7 +18,7 @@ export function LiveShoppingProgressSelector(): JSX.Element {
         {Object.keys(LIVE_SHOPPING_PROGRESS).map((key) => {
           const value = LIVE_SHOPPING_PROGRESS[key];
           return (
-            <option key={value} value={value}>
+            <option key={key} value={value}>
               key
             </option>
           );
