@@ -21,6 +21,7 @@ import {
   useDisclosure,
   Divider,
   Textarea,
+  Center,
 } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import {
@@ -33,7 +34,7 @@ import dayjs from 'dayjs';
 import { LiveShopping, Goods, GoodsConfirmation, SellerShop } from '@prisma/client';
 import { BroadcasterDTOWithoutUserId } from '@project-lc/shared-types';
 import { useQueryClient } from 'react-query';
-import { LiveShoppingProgressConverter } from './LiveShoppingProgressConverter';
+import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
 import { BroadcasterName } from './BroadcasterName';
 import { ConfirmDialog } from './ConfirmDialog';
 
@@ -131,6 +132,14 @@ export function LiveShoppingList(): JSX.Element {
       });
   };
 
+  if (data?.length === 0) {
+    return (
+      <Box mt="10">
+        <Center>새로운 라이브 쇼핑을 등록해주세요</Center>
+      </Box>
+    );
+  }
+
   return (
     <Box p={5}>
       <Table variant="simple">
@@ -158,7 +167,7 @@ export function LiveShoppingList(): JSX.Element {
                 <Td>{index + 1}</Td>
                 <Td>{row.goods.goods_name}</Td>
                 <Td>
-                  <LiveShoppingProgressConverter
+                  <LiveShoppingProgressBadge
                     progress={row.progress}
                     broadcastStartDate={row.broadcastStartDate}
                     broadcastEndDate={row.broadcastEndDate}
@@ -207,15 +216,19 @@ export function LiveShoppingList(): JSX.Element {
                   원
                 </Td>
                 <Td onClick={(e) => e.stopPropagation()}>
-                  <Link
-                    href={row.liveShoppingVideo?.youtubeUrl || '업로드 대기'}
-                    isExternal
-                    overflow="hidden"
-                    whiteSpace="nowrap"
-                    textOverflow="ellipsis"
-                  >
-                    보러가기 <ExternalLinkIcon mx="2px" />
-                  </Link>
+                  {row.liveShoppingVideo ? (
+                    <Link
+                      href={row.liveShoppingVideo?.youtubeUrl || ''}
+                      isExternal
+                      overflow="hidden"
+                      whiteSpace="nowrap"
+                      textOverflow="ellipsis"
+                    >
+                      보러가기 <ExternalLinkIcon mx="2px" />
+                    </Link>
+                  ) : (
+                    <Text> 업로드대기</Text>
+                  )}
                 </Td>
                 <Td onClick={(e) => e.stopPropagation()}>
                   {row.progress === 'registered' ? (
@@ -246,7 +259,7 @@ export function LiveShoppingList(): JSX.Element {
 
                 <Stack direction="row" alignItems="center">
                   <Text as="span">진행상태</Text>
-                  <LiveShoppingProgressConverter
+                  <LiveShoppingProgressBadge
                     progress={data[liveShoppingId].progress}
                     broadcastStartDate={data[liveShoppingId].broadcastStartDate}
                     broadcastEndDate={data[liveShoppingId].broadcastEndDate}
