@@ -7,6 +7,7 @@ import {
   JwtAuthGuard,
   AdminGuard,
   S3Service,
+  LiveShoppingModule,
 } from '@project-lc/nest-modules';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
@@ -33,7 +34,12 @@ describe('FmOrdersController', () => {
   const TEST_EMAIL = 'test11@test.com';
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [GoodsModule, PrismaModule, ConfigModule.forRoot({ isGlobal: true })],
+      imports: [
+        GoodsModule,
+        PrismaModule,
+        LiveShoppingModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+      ],
       controllers: [FmOrdersController],
       providers: [FmOrdersService, FirstmallDbService, S3Service],
     })
