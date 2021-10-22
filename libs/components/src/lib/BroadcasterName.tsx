@@ -1,12 +1,14 @@
 import React from 'react';
 import { Text } from '@chakra-ui/react';
-import { BroadcasterDTO } from '@project-lc/shared-types';
+import { BroadcasterDTOWithoutUserId } from '@project-lc/shared-types';
 import { ChakraNextImage } from './ChakraNextImage';
 import twitchLogo from '../../images/twitchLogo.png';
 import youtubeLogo from '../../images/youtubeLogo.png';
 import afreecaLogo from '../../images/afreecaLogo.png';
 
-export function BroadcasterName(props: { data: BroadcasterDTO }): JSX.Element {
+export function BroadcasterName(props: {
+  data: BroadcasterDTOWithoutUserId;
+}): JSX.Element {
   const { data } = props;
 
   return (

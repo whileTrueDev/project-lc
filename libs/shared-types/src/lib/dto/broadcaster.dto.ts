@@ -23,3 +23,5 @@ export class BroadcasterDTO {
   @IsString()
   channelUrl: string;
 }
+
+export type BroadcasterDTOWithoutUserId = Omit<BroadcasterDTO, 'userId'>;

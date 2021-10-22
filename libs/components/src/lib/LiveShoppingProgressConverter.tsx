@@ -4,7 +4,7 @@ export interface LiveShoppingProgressConverterProps {
   progress: string;
   broadcastStartDate?: Date | null;
   broadcastEndDate?: Date | null;
-  sellEndDate?: Date | null;
+  sellEndDate?: string | Date | undefined | null;
 }
 
 export function LiveShoppingProgressConverter(

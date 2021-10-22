@@ -30,9 +30,27 @@ import {
   useFmOrdersDuringLiveShoppingSales,
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
+import { LiveShopping, Goods, GoodsConfirmation, SellerShop } from '@prisma/client';
+import { BroadcasterDTOWithoutUserId } from '@project-lc/shared-types';
 import { LiveShoppingProgressConverter } from './LiveShoppingProgressConverter';
 import { BroadcasterName } from './BroadcasterName';
 import { ConfirmDialog } from './ConfirmDialog';
+
+export interface GoodsWithConfirmation extends Goods {
+  confirmation: { confirmation: GoodsConfirmation };
+}
+
+export type LiveShoppingWithoutDate = Omit<LiveShopping, 'sellStartDate' | 'sellEndDate'>;
+
+export interface LiveShoppingWithSalesFrontType extends LiveShoppingWithoutDate {
+  sellStartDate: string | Date | undefined | null;
+  sellEndDate: string | Date | undefined | null;
+  sales?: string | null;
+  broadcaster: BroadcasterDTOWithoutUserId;
+  goods: Pick<GoodsWithConfirmation, 'goods_name' | 'summary'>;
+  seller: { sellerShop: SellerShop };
+  liveShoppingVideo: { youtubeUrl: string } | null;
+}
 
 export function LiveShoppingList(): JSX.Element {
   const { data: profileData } = useProfile();
@@ -40,11 +58,21 @@ export function LiveShoppingList(): JSX.Element {
   const { data, isLoading } = useLiveShoppingList({
     enabled: !!profileData?.email,
   });
-  console.log(data);
   const { data: sales, isLoading: isSalesLoading } = useFmOrdersDuringLiveShoppingSales({
     enabled: !!profileData?.email,
   });
-  console.log(sales);
+
+  const liveShoppingWithSales: LiveShoppingWithSalesFrontType[] = [];
+
+  if (data && sales) {
+    for (let i = 0; i < data.length; i++) {
+      liveShoppingWithSales.push({
+        ...data[i],
+        ...sales.find((itmInner) => itmInner.id === data[i].id),
+      });
+    }
+  }
+
   const [isOpen, setIsOpen] = useState(false);
 
   const [toDeleteLiveShoppingId, setToDeleteLiveShoppingId] = useState(0);
@@ -110,6 +138,7 @@ export function LiveShoppingList(): JSX.Element {
             <Th>방송인</Th>
             <Th width="15%">방송시간</Th>
             <Th width="15%">판매시간</Th>
+            <Th>매출</Th>
             <Th>유튜브영상</Th>
             <Th />
           </Tr>
@@ -117,7 +146,10 @@ export function LiveShoppingList(): JSX.Element {
         <Tbody>
           {data &&
             !isLoading &&
-            data.map((row, index) => (
+            liveShoppingWithSales &&
+            !isSalesLoading &&
+            liveShoppingWithSales.length !== 0 &&
+            liveShoppingWithSales.map((row, index) => (
               <Tr key={row.id} onClick={() => handleDetailOnOpen(index)} cursor="pointer">
                 <Td>{index + 1}</Td>
                 <Td>{row.goods.goods_name}</Td>
@@ -164,20 +196,22 @@ export function LiveShoppingList(): JSX.Element {
                     </Text>
                   </Stack>
                 </Td>
+                <Td>
+                  {row.sales
+                    ? row.sales.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')
+                    : '0'}
+                  원
+                </Td>
                 <Td onClick={(e) => e.stopPropagation()}>
-                  {row.liveShoppingVideo ? (
-                    <Link
-                      href={row.liveShoppingVideo.youtubeUrl}
-                      isExternal
-                      overflow="hidden"
-                      whiteSpace="nowrap"
-                      textOverflow="ellipsis"
-                    >
-                      보러가기 <ExternalLinkIcon mx="2px" />
-                    </Link>
-                  ) : (
-                    <Text>업로드 대기</Text>
-                  )}
+                  <Link
+                    href={row.liveShoppingVideo?.youtubeUrl || '업로드 대기'}
+                    isExternal
+                    overflow="hidden"
+                    whiteSpace="nowrap"
+                    textOverflow="ellipsis"
+                  >
+                    보러가기 <ExternalLinkIcon mx="2px" />
+                  </Link>
                 </Td>
                 <Td onClick={(e) => e.stopPropagation()}>
                   {row.progress === 'registered' ? (

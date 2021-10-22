@@ -60,3 +60,12 @@ export type LiveShoppingRegistDTO = Pick<
   LiveShoppingDTO,
   'requests' | 'goods_id' | 'contactId' | 'streamId' | 'progress'
 >;
+
+export type LiveShoppingWithSales = Pick<
+  LiveShoppingDTO,
+  'id' | 'sellStartDate' | 'sellEndDate'
+>;
+
+export interface LiveShoppingWithSalesAndFmId extends LiveShoppingWithSales {
+  firstmallGoodsConnectionId: string;
+}

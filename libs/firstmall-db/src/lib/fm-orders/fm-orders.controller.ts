@@ -65,17 +65,16 @@ export class FmOrdersController {
   }
 
   @Get('/per-live-shopping')
-  async findSalesPerLiveShopping(
-    @Query('perLiveShopping')
-    dto: any,
-  ): Promise<any> {
+  async findSalesPerLiveShopping(): Promise<{ id: number; sales: string }[]> {
     let liveShoppingList = await this.liveShoppingService
       .getRegisteredLiveShoppings(null, true)
       .then((result) => {
         return result.map((val) => {
           if (val.sellStartDate && val.sellEndDate) {
             return {
-              goodsId: val.goods.confirmation.firstmallGoodsConnectionId,
+              id: val.id,
+              firstmallGoodsConnectionId:
+                val.goods.confirmation.firstmallGoodsConnectionId,
               sellStartDate: val.sellStartDate,
               sellEndDate: val.sellEndDate,
             };
@@ -85,7 +84,6 @@ export class FmOrdersController {
       });
 
     liveShoppingList = liveShoppingList?.filter((n) => n);
-
     return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
   }
 
