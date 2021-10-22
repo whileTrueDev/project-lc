@@ -21,3 +21,4 @@ export * from './lib/s3/s3.service';
 export * from './lib/live-shopping/live-shopping.module';
 export * from './lib/notice/notice.module';
 export * from './lib/notice/notice.service';
+export * from './lib/order-cancel/order-cancel.module';
