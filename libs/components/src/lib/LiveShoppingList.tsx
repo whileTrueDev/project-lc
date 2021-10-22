@@ -32,7 +32,10 @@ import {
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { LiveShopping, Goods, GoodsConfirmation, SellerShop } from '@prisma/client';
-import { BroadcasterDTOWithoutUserId } from '@project-lc/shared-types';
+import {
+  BroadcasterDTOWithoutUserId,
+  LIVE_SHOPPING_PROGRESS,
+} from '@project-lc/shared-types';
 import { useQueryClient } from 'react-query';
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
 import { BroadcasterName } from './BroadcasterName';
@@ -265,7 +268,7 @@ export function LiveShoppingList(): JSX.Element {
                     broadcastEndDate={data[liveShoppingId].broadcastEndDate}
                     sellEndDate={data[liveShoppingId].sellEndDate}
                   />
-                  {data[liveShoppingId].progress === 'cancel' ? (
+                  {data[liveShoppingId].progress === LIVE_SHOPPING_PROGRESS.취소됨 ? (
                     <Text>사유 : {data[liveShoppingId].rejectionReason}</Text>
                   ) : null}
                 </Stack>
