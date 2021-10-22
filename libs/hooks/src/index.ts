@@ -66,3 +66,4 @@ export * from './lib/queries/useNotice';
 export * from './lib/mutation/useUpdateLiveShoppingManageMutation';
 export * from './lib/mutation/useSellerOrderCancelMutation';
 export * from './lib/queries/useSellerOrderCancelRequest';
+export * from './lib/queries/useAdminOrderCancelRequest';

@@ -7,8 +7,10 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { JwtAuthGuard, SellerInfo, UserPayload } from '@project-lc/nest-modules';
 import { SellerOrderCancelRequestDto } from '@project-lc/shared-types';
+import { UserPayload } from '../auth/auth.interface';
+import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { OrderCancelService } from './order-cancel.service';
 
 @Controller('order-cancel')

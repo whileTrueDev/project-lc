@@ -6,7 +6,7 @@ import { SellerOrderCancelRequestDto } from '@project-lc/shared-types';
 export class OrderCancelService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** 판매자 주문취소 요청 생성 */
+  /** 판매자 결제취소 요청 생성 */
   public async createOrderCancelRequst({
     sellerEmail,
     ...dto
@@ -20,7 +20,7 @@ export class OrderCancelService {
       include: { orderCancelItems: true },
     });
 
-    // 해당 주문에 대해 이미 주문취소 요청을 한 경우 수정
+    // 해당 주문에 대해 이미 결제취소 요청을 한 경우 수정
     if (existCancelRequst) {
       const { id, orderCancelItems: existCancelRequestItems } = existCancelRequst;
       const updatedData = await this.prisma.sellerOrderCancelRequest.update({
@@ -56,7 +56,7 @@ export class OrderCancelService {
     return data;
   }
 
-  /** 판매자 주문취소 요청 상세 조회 */
+  /** 판매자 결제취소 요청 상세 조회 */
   public async findOneOrderCancelRequst({
     orderSeq,
     sellerEmail,
@@ -66,6 +66,20 @@ export class OrderCancelService {
   }): Promise<any> {
     const data = await this.prisma.sellerOrderCancelRequest.findFirst({
       where: { seller: { email: sellerEmail }, orderSeq, doneFlag: false },
+    });
+    return data;
+  }
+
+  /** 결제취소 요청 목록 조회 */
+  public async getAllOrderCancelRequests(): Promise<any> {
+    const data = await this.prisma.sellerOrderCancelRequest.findMany({
+      select: {
+        id: true,
+        seller: { select: { email: true, id: true } },
+        reason: true,
+        orderSeq: true,
+        createDate: true,
+      },
     });
     return data;
   }

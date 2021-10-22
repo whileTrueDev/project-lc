@@ -32,12 +32,14 @@ import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
+import { OrderCancelService } from '../order-cancel/order-cancel.service';
 @Controller('admin')
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
     private readonly broadcasterService: BroadcasterService,
     private readonly adminSettlementService: AdminSettlementService,
+    private readonly orderCancelService: OrderCancelService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -138,4 +140,15 @@ export class AdminController {
   ): Promise<BusinessRegistrationConfirmation> {
     return this.adminSettlementService.setBusinessRegistrationRejection(dto);
   }
+
+  /** 결제취소 요청 목록 조회 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Get('/order-cancel/list')
+  getAllOrderCancelRequests(): Promise<any> {
+    return this.orderCancelService.getAllOrderCancelRequests();
+  }
+
+  /** 특정 주문에 대한 결제취소 요청 조회 */
+  /** 특정 주문에 대한 결제취소 요청 상태 변경 */
 }
