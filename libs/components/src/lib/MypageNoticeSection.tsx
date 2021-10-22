@@ -37,7 +37,7 @@ function makeListRow(notices: Notice[] | undefined): Notice[] {
   });
 }
 
-// 정산 내역을 보여주는 데이터 그리드
+// 마이페이지 - 홈의 공지사항을 보여주는 영역
 export function MypageNoticeSection(): JSX.Element {
   const useStyle = makeStyles({
     columnHeader: {
