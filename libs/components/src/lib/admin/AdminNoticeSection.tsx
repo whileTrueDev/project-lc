@@ -64,7 +64,7 @@ function makeListRow(notices: Notice[] | undefined): Notice[] {
   });
 }
 
-// 정산 내역을 보여주는 데이터 그리드
+// 관리자페이지의 공지사항을 보여주는 영역
 export function AdminNoticeSection(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
