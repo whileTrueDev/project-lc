@@ -20,7 +20,7 @@ import {
 } from '@project-lc/hooks';
 import {
   ApprovedGoodsListItem,
-  LiveShoppingDTO,
+  LiveShoppingRegistDTO,
   LiveShoppingInput,
 } from '@project-lc/shared-types';
 import { liveShoppingRegist } from '@project-lc/stores';
@@ -81,7 +81,7 @@ export function LiveShoppingRegist(): JSX.Element {
   const regist = async (data: LiveShoppingInput): Promise<void> => {
     const { firstNumber, secondNumber, thirdNumber, useContact, email } = data;
     const phoneNumber = `${firstNumber}${secondNumber}${thirdNumber}`;
-    const dto: LiveShoppingDTO = {
+    const dto: LiveShoppingRegistDTO = {
       requests: '',
       goods_id: 0,
       contactId: 0,

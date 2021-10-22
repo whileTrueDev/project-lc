@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
-import { LiveShoppingDTO } from '@project-lc/shared-types';
+import { LiveShoppingRegistDTO } from '@project-lc/shared-types';
 import { LiveShopping } from '@prisma/client';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
@@ -7,11 +7,11 @@ import axios from '../../axios';
 export const useCreateLiveShoppingMutation = (): UseMutationResult<
   LiveShopping,
   AxiosError,
-  LiveShoppingDTO
+  LiveShoppingRegistDTO
 > => {
   const queryClient = useQueryClient();
   return useMutation(
-    async (dto: LiveShoppingDTO) => {
+    async (dto: LiveShoppingRegistDTO) => {
       return axios.post<LiveShopping>('/live-shopping', dto).then((res) => res.data);
     },
     {

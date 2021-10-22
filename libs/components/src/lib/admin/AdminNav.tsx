@@ -1,4 +1,4 @@
-import { Box, Link, Flex, useColorModeValue, Button, Stack } from '@chakra-ui/react';
+import { Box, Link, Flex, useColorModeValue, Button } from '@chakra-ui/react';
 import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
@@ -59,6 +59,38 @@ export default function AdminNav(): JSX.Element {
                 }}
               >
                 상품검수
+              </Link>
+            </NextLink>
+          </Box>
+          <Box key="공지사항">
+            <NextLink href={'/notice' ?? '#'} passHref>
+              <Link
+                p={2}
+                fontSize="sm"
+                fontWeight={500}
+                color={linkColor}
+                _hover={{
+                  textDecoration: 'none',
+                  color: linkHoverColor,
+                }}
+              >
+                공지사항
+              </Link>
+            </NextLink>
+          </Box>
+          <Box key="라이브쇼핑관리">
+            <NextLink href={'/live-shopping' ?? '#'} passHref>
+              <Link
+                p={2}
+                fontSize="sm"
+                fontWeight={500}
+                color={linkColor}
+                _hover={{
+                  textDecoration: 'none',
+                  color: linkHoverColor,
+                }}
+              >
+                라이브 쇼핑 관리
               </Link>
             </NextLink>
           </Box>
