@@ -60,5 +60,7 @@ export * from './lib/queries/useAdminLiveShoppingList';
 export * from './lib/queries/useAdminBroadcaster';
 export * from './lib/mutation/useBusinessRegistrationRejectionMutation';
 export * from './lib/mutation/useBusinessRegistrationConfirmationMutation';
+export * from './lib/mutation/useNoticeMutation';
 export * from './lib/queries/useFmOrdersStats';
+export * from './lib/queries/useNotice';
 export * from './lib/mutation/useUpdateLiveShoppingManageMutation';
