@@ -57,7 +57,16 @@ export class OrderCancelService {
   }
 
   /** 판매자 주문취소 요청 상세 조회 */
-  public async findOneOrderCancelRequst(): Promise<any> {
-    return '판매자 주문취소 요청 조회';
+  public async findOneOrderCancelRequst({
+    orderSeq,
+    sellerEmail,
+  }: {
+    sellerEmail: string;
+    orderSeq: string;
+  }): Promise<any> {
+    const data = await this.prisma.sellerOrderCancelRequest.findFirst({
+      where: { seller: { email: sellerEmail }, orderSeq, doneFlag: false },
+    });
+    return data;
   }
 }

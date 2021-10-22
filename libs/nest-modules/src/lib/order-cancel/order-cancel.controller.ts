@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { JwtAuthGuard, SellerInfo, UserPayload } from '@project-lc/nest-modules';
 import { SellerOrderCancelRequestDto } from '@project-lc/shared-types';
 import { OrderCancelService } from './order-cancel.service';
@@ -22,8 +30,15 @@ export class OrderCancelController {
 
   /** 판매자 주문취소 요청 조회 */
   @UseGuards(JwtAuthGuard)
-  @Get()
-  findOneOrderCancelRequst(): Promise<any> {
-    return this.orderCancelService.findOneOrderCancelRequst();
+  @Get('/:orderSeq')
+  findOneOrderCancelRequst(
+    @SellerInfo() seller: UserPayload,
+    @Param('orderSeq') orderSeq: string,
+  ): Promise<any> {
+    console.log({ orderSeq });
+    return this.orderCancelService.findOneOrderCancelRequst({
+      orderSeq,
+      sellerEmail: seller.sub,
+    });
   }
 }
