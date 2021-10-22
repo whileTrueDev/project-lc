@@ -32,6 +32,7 @@ import {
 import dayjs from 'dayjs';
 import { LiveShopping, Goods, GoodsConfirmation, SellerShop } from '@prisma/client';
 import { BroadcasterDTOWithoutUserId } from '@project-lc/shared-types';
+import { useQueryClient } from 'react-query';
 import { LiveShoppingProgressConverter } from './LiveShoppingProgressConverter';
 import { BroadcasterName } from './BroadcasterName';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -53,6 +54,8 @@ export interface LiveShoppingWithSalesFrontType extends LiveShoppingWithoutDate 
 }
 
 export function LiveShoppingList(): JSX.Element {
+  const queryClient = useQueryClient();
+
   const { data: profileData } = useProfile();
 
   const { data, isLoading } = useLiveShoppingList({
@@ -105,9 +108,10 @@ export function LiveShoppingList(): JSX.Element {
     mutateAsync(toDeleteLiveShoppingId)
       .then((isDeleted) => {
         if (isDeleted) {
+          queryClient.invalidateQueries('LiveShoppingList');
           toast({
             title: '삭제 완료하였습니다',
-            status: 'error',
+            status: 'success',
           });
         }
       })

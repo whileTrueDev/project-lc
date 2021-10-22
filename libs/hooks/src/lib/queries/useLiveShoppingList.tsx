@@ -33,7 +33,7 @@ export const useLiveShoppingList = (dto: {
   enabled: boolean;
   id?: string;
 }): UseQueryResult<LiveShoppingWithGoods[], AxiosError> => {
-  const queryKey = ['getLiveShoppingList', dto];
+  const queryKey = ['LiveShoppingList', dto];
   return useQuery<LiveShoppingWithGoods[], AxiosError>(queryKey, () =>
     getLiveShoppingList(dto.id || null),
   );
