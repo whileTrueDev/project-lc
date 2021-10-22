@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import {
   MypageLayout,
+  OrderCancelRequestExistAlert,
   OrderDetailActions,
   OrderDetailDeliveryInfo,
   OrderDetailExportInfo,
@@ -26,7 +27,11 @@ import {
   OrderReturnExistsAlert,
   SectionWithTitle,
 } from '@project-lc/components';
-import { useDisplaySize, useFmOrder } from '@project-lc/hooks';
+import {
+  useDisplaySize,
+  useFmOrder,
+  useSellerOrderCancelRequest,
+} from '@project-lc/hooks';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
@@ -40,6 +45,7 @@ export function OrderDetail(): JSX.Element {
   const orderId = router.query.orderId as string;
 
   const order = useFmOrder(orderId);
+  const orderCancel = useSellerOrderCancelRequest(orderId);
 
   const { isMobileSize } = useDisplaySize();
 
@@ -107,6 +113,9 @@ export function OrderDetail(): JSX.Element {
             )}
           </Stack>
         )}
+
+        {/* 결제취소 요청 정보 */}
+        {orderCancel.data && <OrderCancelRequestExistAlert data={orderCancel.data} />}
 
         {/* 주문 버튼 */}
         {isMobileSize ? null : (
