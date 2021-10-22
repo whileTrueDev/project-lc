@@ -4,7 +4,7 @@ import { useQuery, UseQueryResult } from 'react-query';
 import { BroadcasterDTO } from '@project-lc/shared-types';
 import axios from '../../axios';
 
-interface LiveShoppingWithGoods extends LiveShopping {
+export interface LiveShoppingWithGoods extends LiveShopping {
   goods: {
     goods_name: string;
     summary: string;

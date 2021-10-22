@@ -63,6 +63,34 @@ export class GoodsService {
   }
 
   /**
+   * 관리자가 승인된 상품 ID(firsmall db의 goods_seq) 목록을 가져옵니다.
+   * @param ids? 특정 상품의 firstMallGoodsId만 조회하고 싶을 때
+   */
+  public async findAdminGoodsIds(ids?: number[]): Promise<number[]> {
+    const goodsIds = await this.prisma.goods.findMany({
+      where: {
+        id: ids ? { in: ids } : undefined,
+        AND: {
+          confirmation: {
+            status: 'confirmed',
+          },
+        },
+      },
+      select: {
+        confirmation: {
+          select: {
+            firstmallGoodsConnectionId: true,
+          },
+        },
+      },
+    });
+
+    return goodsIds.map(
+      (confirmation) => confirmation.confirmation.firstmallGoodsConnectionId,
+    );
+  }
+
+  /**
    * 모든 상품 목록 조회
    * email 이 주어지면 해당 판매자의 상품만 조회
    * dto : email, page, itemPerPage, sort, direction

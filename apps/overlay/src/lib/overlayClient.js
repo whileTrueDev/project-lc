@@ -10,12 +10,13 @@ let streamerAndProduct;
 
 let startDate = new Date('2021-09-27T14:05:00+0900');
 let defaultDate = new Date('2021-09-04T15:00:00+0900');
+let feverDate = new Date('2021-09-27T14:05:00+0900');
 let bannerId = 1;
-let bottomMessages = [];
+const bottomMessages = [];
 const topMessages = [];
 
 let messageHtml;
-let bottomTextIndex = 0;
+const bottomTextIndex = 0;
 
 function getOS() {
   const { userAgent } = window.navigator;
@@ -156,6 +157,26 @@ function dailyMissionTimer() {
   }, 1000);
 }
 
+function feverTimer() {
+  setInterval(function timer() {
+    // 현재 날짜를 new 연산자를 사용해서 Date 객체를 생성
+    const now = new Date();
+
+    let feverDistance = feverDate.getTime() - now.getTime();
+    if (feverDistance < 0) {
+      feverDistance = 0;
+    }
+    let feverMinutes = Math.floor((feverDistance % (1000 * 60 * 60)) / (1000 * 60));
+    let feverSeconds = Math.floor((feverDistance % (1000 * 60)) / 1000);
+
+    feverMinutes = feverMinutes < 10 ? `0${String(feverMinutes)}` : String(feverMinutes);
+    feverSeconds = feverSeconds < 10 ? `0${String(feverSeconds)}` : String(feverSeconds);
+
+    $('#fever-time-min').text(feverMinutes);
+    $('#fever-time-sec').text(feverSeconds);
+  }, 1000);
+}
+
 async function switchImage() {
   if (bannerId === iterateLimit) {
     bannerId = 1;
@@ -204,29 +225,30 @@ setInterval(async () => {
   }
 }, 2000);
 
-async function switchBottomText() {
-  if (bottomTextIndex >= bottomMessages.length) {
-    bottomTextIndex = 0;
-  }
-  if (bottomMessages.length !== 0) {
-    await setTimeout(() => {
-      $('.bottom-area-text').text(`${bottomMessages[bottomTextIndex]}`).fadeIn(500);
-      bottomTextIndex += 1;
-    }, 1000);
-    await setTimeout(() => {
-      $('.bottom-area-text').fadeOut(500);
-      switchBottomText();
-    }, 10000);
-  } else {
-    await setTimeout(() => {
-      switchBottomText();
-    }, 10000);
-  }
-}
+// async function switchBottomText() {
+//   if (bottomTextIndex >= bottomMessages.length) {
+//     bottomTextIndex = 0;
+//   }
+//   if (bottomMessages.length !== 0) {
+//     await setTimeout(() => {
+//       $('.bottom-area-text').text(`${bottomMessages[bottomTextIndex]}`).fadeIn(500);
+//       bottomTextIndex += 1;
+//     }, 1000);
+//     await setTimeout(() => {
+//       $('.bottom-area-text').fadeOut(500);
+//       switchBottomText();
+//     }, 10000);
+//   } else {
+//     await setTimeout(() => {
+//       switchBottomText();
+//     }, 10000);
+//   }
+// }
 // -------------------------------------  실행 ---------------------------------
 dailyMissionTimer();
 switchImage();
-switchBottomText();
+feverTimer();
+// switchBottomText();
 //------------------------------------------------------------------------------
 
 const device = getOS();
@@ -412,10 +434,23 @@ socket.on('get bottom area message', (data) => {
   }, 10000);
 });
 
-// 하단 응원메세지
-socket.on('get bottom purchase message', (data) => {
-  bottomMessages = data;
+socket.on('get bottom fever message', (data) => {
+  $('.bottom-area-text').css({ opacity: 0 });
+  $('.bottom-area-right')
+    .prepend(
+      `
+    <p class="bottom-admin">
+      ${data}
+    </p>
+  `,
+    )
+    .fadeIn(1000);
 });
+
+// 하단 응원메세지
+// socket.on('get bottom purchase message', (data) => {
+//   bottomMessages = data;
+// });
 
 socket.on('handle bottom area to client', () => {
   if ($('.bottom-area-right').css('opacity') === '1') {
@@ -435,6 +470,10 @@ socket.on('hide screen', () => {
 
 socket.on('d-day from server', (date) => {
   defaultDate = new Date(date);
+});
+
+socket.on('get fever date from server', (date) => {
+  feverDate = new Date(date);
 });
 
 socket.on('refresh signal', () => {
@@ -489,9 +528,50 @@ socket.on('get stream end notification tts', (audioBuffer) => {
       sound.play();
     }, 1000);
   }
+  $('.notification').append(`<img id="notification" src="/images/eta.gif" />`);
+  setTimeout(() => {
+    $('.notification').empty();
+  }, 5000);
 });
 
 socket.on('connection check from server', () => {
   $('.alive-check').toggle();
+});
+
+socket.on('get soldout signal from server', () => {
+  $('.vertical-soldout-banner').css({ opacity: 1 });
+  $('body').append(`
+    <iframe src="/audio/soldout.mp3" id="soldout-alarm" allow="autoplay" style="display:none"></iframe>
+    `);
+  setTimeout(() => {
+    $('body').remove('#soldout-alarm');
+  }, 20000);
+});
+
+socket.on('remove soldout banner from server', () => {
+  $('.vertical-soldout-banner').css({ opacity: 0 });
+});
+
+socket.on('get fever signal from server', (text) => {
+  $('.bottom-area-right').css({ opacity: 1 });
+  $('.bottom-admin').text(`${text}`);
+  $('body').append(`
+    <iframe src="/audio/fever.mp3" id="fever-alarm" allow="autoplay" style="display:none"></iframe>
+    `);
+  setTimeout(() => {
+    $('#fever-alarm').remove();
+  }, 5000);
+});
+
+socket.on('get notification image from server', (type) => {
+  if (type === 'calling') {
+    $('.notification').append(`<img id="notification" src="/images/calling.png" />`);
+  } else if (type === 'quiz') {
+    $('.notification').append(`<img id="notification" src="/images/quiz.png" />`);
+  }
+});
+
+socket.on('remove notification image from server', () => {
+  $('.notification').empty();
 });
 export {};

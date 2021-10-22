@@ -64,3 +64,5 @@ export * from './lib/dto/broadcaster.dto';
 export * from './lib/dto/businessRegistrationConfirmation.dto';
 export * from './lib/dto/adminSettlementInfo.dto';
 export * from './lib/constants/orderStats';
+export * from './lib/dto/post.dto';
+export * from './lib/constants/liveShoppingProgress';

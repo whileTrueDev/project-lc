@@ -187,6 +187,18 @@ body {
   justify-content: space-around;
 }
 
+.bottom-fever-timer {
+  margin-left: 1%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  font-family: 'JALNAN';
+  font-size: 30px;
+  color: #ffffff;
+  -webkit-text-stroke: 1px #000000;
+}
+
 .bottom-area-right {
   width: 77.5%;
   height: 100%;
@@ -215,8 +227,8 @@ body {
 .bottom-admin {
   font-family: 'JALNAN';
   z-index: 3;
-  color: #27b9ac;
-  font-size: 23px;
+  -webkit-text-stroke: 1px #000000;
+  font-size: 30px;
 }
 
 .bottom-area-right p {
@@ -238,6 +250,16 @@ body {
   width: 100%;
   height: 100%;
   opacity: 1;
+}
+
+.vertical-soldout-banner {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  z-index: 100;
 }
 
 /* 좌측 상단 랭킹 */
@@ -402,5 +424,18 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 13;
+  z-index: 9999;
+}
+
+.notification {
+  position: fixed;
+  top: 2.5%;
+  right: 2%;
+  width: 600px;
+  height: 400px;
+}
+
+.notification img {
+  width: 100%;
+  height: 100%;
 }
