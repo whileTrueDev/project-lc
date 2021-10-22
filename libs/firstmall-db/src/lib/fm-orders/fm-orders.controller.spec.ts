@@ -5,6 +5,7 @@ import {
   GoodsModule,
   GoodsService,
   JwtAuthGuard,
+  AdminGuard,
   S3Service,
 } from '@project-lc/nest-modules';
 import { PrismaModule } from '@project-lc/prisma-orm';
@@ -43,6 +44,10 @@ describe('FmOrdersController', () => {
           req.user = { sub: TEST_EMAIL, type: 'seller' };
           return true;
         },
+      })
+      .overrideGuard(AdminGuard)
+      .useValue({
+        canActivate: () => true,
       })
       .compile();
 

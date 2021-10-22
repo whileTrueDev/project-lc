@@ -13,6 +13,7 @@ import {
   JwtAuthGuard,
   SellerInfo,
   UserPayload,
+  AdminGuard,
 } from '@project-lc/nest-modules';
 import {
   ChangeFmOrderStatusDto,
@@ -46,6 +47,21 @@ export class FmOrdersController {
     }
     // 판매자의 승인된 상품 ID 목록 조회
     const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub, gids);
+    if (ids.length === 0) return [];
+    return this.fmOrdersService.findOrders(ids, dto);
+  }
+
+  @UseGuards(AdminGuard)
+  @Get('/admin')
+  async findAdminOrders(
+    @Query(ValidationPipe) dto: FindFmOrdersDto,
+  ): Promise<FindFmOrderRes[]> {
+    let gids: number[] | undefined; // project-lc 상품 고유 번호
+    if (dto.goodsIds && dto.goodsIds.length > 0) {
+      gids = dto.goodsIds.map((x) => Number(x));
+    }
+    // 판매자의 승인된 상품 ID 목록 조회
+    const ids = await this.projectLcGoodsService.findAdminGoodsIds(gids);
     if (ids.length === 0) return [];
     return this.fmOrdersService.findOrders(ids, dto);
   }

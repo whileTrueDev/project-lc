@@ -2,7 +2,7 @@ import { Box, Text } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
 import dayjs from 'dayjs';
 import { liveShoppingManageStore } from '@project-lc/stores';
-import { LiveShoppingProgressConverter } from '../LiveShoppingProgressConverter';
+import { LiveShoppingProgressBadge } from '../LiveShoppingProgressBadge';
 import { ConfirmDialog, ConfirmDialogProps } from '../ConfirmDialog';
 
 export function AdminLiveShoppingUpdateConfirmModal(
@@ -24,7 +24,7 @@ export function AdminLiveShoppingUpdateConfirmModal(
         {watch('progress') ? (
           <Text>
             진행상태 :
-            <LiveShoppingProgressConverter progress={watch('progress')} />
+            <LiveShoppingProgressBadge progress={watch('progress')} />
           </Text>
         ) : null}
         {watch('broadcasterId') ? <Text>방송인 : {selectedBroadcaster}</Text> : null}
