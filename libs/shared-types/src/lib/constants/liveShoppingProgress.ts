@@ -1,7 +1,7 @@
 import { LiveShopppingProgressType } from '@prisma/client';
 
 // 한글로 접근하여 DB의 값으로 변환
-export const LiveShopingProgress: Record<string, LiveShopppingProgressType> = {
+export const LIVE_SHOPPING_PROGRESS: Record<string, LiveShopppingProgressType> = {
   등록됨: 'registered',
   조율중: 'adjusting',
   확정됨: 'confirmed',
@@ -32,11 +32,11 @@ export function getLiveShoppingProgress(params: LiveShoppingProgressParams): str
   const 방송종료시각 = getTimeValue(params?.broadcastEndDate);
   const 판매종료시각 = getTimeValue(params?.sellEndDate);
   switch (progress) {
-    case LiveShopingProgress.조율중:
+    case LIVE_SHOPPING_PROGRESS.조율중:
       return '조율중';
-    case LiveShopingProgress.취소됨:
+    case LIVE_SHOPPING_PROGRESS.취소됨:
       return '취소됨';
-    case LiveShopingProgress.확정됨:
+    case LIVE_SHOPPING_PROGRESS.확정됨:
       if (방송시작시각 && 방송종료시각) {
         if (판매종료시각 && 방송종료시각 < 현재시각 && 판매종료시각 < 현재시각) {
           return '판매종료';
