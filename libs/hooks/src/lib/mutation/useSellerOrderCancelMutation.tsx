@@ -23,8 +23,9 @@ export const useSellerOrderCancelMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: (data) => {
-        console.log('onSuccess', data);
-        // queryClient.invalidateQueries('');
+        queryClient.invalidateQueries(['SellerOrderCancelRequest', data.orderSeq], {
+          exact: true,
+        });
       },
     },
   );

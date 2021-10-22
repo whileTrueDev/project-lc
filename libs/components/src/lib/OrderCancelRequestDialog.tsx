@@ -117,6 +117,7 @@ export function OrderCancelRequestDialog({
     control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<OrderCancelForm>({
     defaultValues: {
       cancelItems: orderCancelItemList.map((item) => ({
@@ -135,8 +136,7 @@ export function OrderCancelRequestDialog({
 
   const submit = (data: OrderCancelForm): void => {
     const { cancelItems, cancelReason } = data;
-    console.log('submit');
-    // 판매자 email은 sellerEmail 로
+
     const dto = {
       orderSeq: order.order_seq.toString(),
       reason: cancelReason,
@@ -149,8 +149,14 @@ export function OrderCancelRequestDialog({
         };
       }),
     };
-    console.log(dto);
-    orderCancelRequest.mutateAsync(dto);
+
+    orderCancelRequest
+      .mutateAsync(dto)
+      .then(() => {
+        reset();
+        onClose();
+      })
+      .catch((error) => console.error(error));
   };
 
   return (
