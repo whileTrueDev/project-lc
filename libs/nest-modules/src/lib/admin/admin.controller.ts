@@ -9,6 +9,8 @@ import {
   Query,
   UseGuards,
   Patch,
+  ParseBoolPipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   GoodsConfirmation,
@@ -150,5 +152,21 @@ export class AdminController {
   }
 
   /** 특정 주문에 대한 결제취소 요청 조회 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Get('/order-cancel/:orderId')
+  getOneOrderCancelRequest(@Param('orderId') orderId: string): Promise<any> {
+    return this.orderCancelService.getOneOrderCancelRequest(orderId);
+  }
+
   /** 특정 주문에 대한 결제취소 요청 상태 변경 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Put('/order-cancel/:requestId')
+  setOrderCancelRequestDone(
+    @Param('requestId', ParseIntPipe) requestId: number,
+    @Body('doneFlag', ParseBoolPipe) doneFlag: boolean,
+  ): Promise<any> {
+    return this.orderCancelService.setOrderCancelRequestDone(requestId, doneFlag);
+  }
 }

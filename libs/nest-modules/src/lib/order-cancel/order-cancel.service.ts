@@ -73,6 +73,7 @@ export class OrderCancelService {
   /** 결제취소 요청 목록 조회 */
   public async getAllOrderCancelRequests(): Promise<any> {
     const data = await this.prisma.sellerOrderCancelRequest.findMany({
+      where: { doneFlag: false }, // 처리되지 않은 요청만 조회
       select: {
         id: true,
         seller: { select: { email: true, id: true } },
@@ -80,7 +81,39 @@ export class OrderCancelService {
         orderSeq: true,
         createDate: true,
       },
+      orderBy: { createDate: 'asc' },
     });
+    return data;
+  }
+
+  /** 특정 주문에 대한 결제취소 요청 조회 */
+  public async getOneOrderCancelRequest(orderId: string): Promise<any> {
+    const data = await this.prisma.sellerOrderCancelRequest.findFirst({
+      where: { orderSeq: orderId },
+      select: {
+        id: true,
+        seller: { select: { email: true, id: true, sellerShop: true } },
+        reason: true,
+        orderSeq: true,
+        createDate: true,
+        orderCancelItems: true,
+        doneFlag: true,
+      },
+    });
+    return data;
+  }
+
+  /** 특정 주문에 대한 결제취소 요청 상태 변경 */
+  public async setOrderCancelRequestDone(
+    requestId: number,
+    doneFlag: boolean,
+  ): Promise<any> {
+    const data = await this.prisma.sellerOrderCancelRequest.update({
+      where: { id: requestId },
+      data: { doneFlag },
+    });
+
+    console.log('updated', data);
     return data;
   }
 }
