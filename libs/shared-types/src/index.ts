@@ -67,3 +67,4 @@ export * from './lib/constants/orderStats';
 export * from './lib/dto/post.dto';
 export * from './lib/dto/sellerOrderCancel.dto';
 export * from './lib/constants/liveShoppingProgress';
+export * from './lib/res-types/orderCancelRequest.res';
