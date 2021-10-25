@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { throwError } from 'rxjs';
-import { LiveShopping } from '@prisma/client';
+import {
+  LiveShoppingParamsDto,
+  LiveShoppingWithConfirmation,
+} from '@project-lc/shared-types';
 
-interface LiveShoppingWithConfirmation extends LiveShopping {
-  goods: {
-    confirmation: {
-      firstmallGoodsConnectionId: number;
-    };
-  };
-}
 @Injectable()
 export class LiveShoppingService {
   constructor(private readonly prisma: PrismaService) {}
@@ -49,23 +45,27 @@ export class LiveShoppingService {
   }
 
   async getRegisteredLiveShoppings(
-    id?: string,
-    needConfirmation?: boolean,
-  ): Promise<LiveShopping[] | LiveShoppingWithConfirmation[]> {
+    dto: LiveShoppingParamsDto,
+  ): Promise<LiveShoppingWithConfirmation[]> {
+    const { id, goodsIds } = dto;
     return this.prisma.liveShopping.findMany({
-      where: { id: id ? Number(id) : undefined },
+      where: {
+        id: id ? Number(id) : undefined,
+        goodsId:
+          goodsIds?.length >= 1
+            ? { in: goodsIds.map((goodsid) => Number(goodsid)) }
+            : undefined,
+      },
       include: {
         goods: {
           select: {
             goods_name: true,
             summary: true,
-            confirmation: needConfirmation
-              ? {
-                  select: {
-                    firstmallGoodsConnectionId: true,
-                  },
-                }
-              : undefined,
+            confirmation: {
+              select: {
+                firstmallGoodsConnectionId: true,
+              },
+            },
           },
         },
         seller: {

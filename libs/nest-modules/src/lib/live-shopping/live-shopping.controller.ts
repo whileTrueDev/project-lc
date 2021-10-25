@@ -8,8 +8,12 @@ import {
   Body,
   Delete,
 } from '@nestjs/common';
-import { ApprovedGoodsNameAndId, LiveShoppingRegistDTO } from '@project-lc/shared-types';
-import { LiveShopping } from '@prisma/client';
+import {
+  ApprovedGoodsNameAndId,
+  LiveShoppingRegistDTO,
+  LiveShoppingParamsDto,
+  LiveShoppingWithConfirmation,
+} from '@project-lc/shared-types';
 import { GoodsService } from '../goods/goods.service';
 import { LiveShoppingService } from './live-shopping.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
@@ -26,8 +30,10 @@ export class LiveShoppingController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/list')
-  getLiveShoppings(@Query('liveShoppingId') dto?: string): Promise<LiveShopping[]> {
-    return this.liveShoppingService.getRegisteredLiveShoppings(dto || null);
+  getLiveShoppings(
+    @Query(ValidationPipe) dto?: LiveShoppingParamsDto,
+  ): Promise<LiveShoppingWithConfirmation[]> {
+    return this.liveShoppingService.getRegisteredLiveShoppings(dto);
   }
 
   /** 상품 등록 */

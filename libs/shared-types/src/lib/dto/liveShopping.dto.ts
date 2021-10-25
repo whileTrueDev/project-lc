@@ -1,5 +1,5 @@
-import { IsString, IsOptional, IsNumber, IsDate } from 'class-validator';
-import { LiveShopppingProgressType } from '@prisma/client';
+import { IsString, IsOptional, IsNumber, IsDate, IsArray } from 'class-validator';
+import { LiveShopppingProgressType, LiveShopping } from '@prisma/client';
 
 export class LiveShoppingDTO {
   @IsNumber()
@@ -68,4 +68,17 @@ export type LiveShoppingWithSales = Pick<
 
 export interface LiveShoppingWithSalesAndFmId extends LiveShoppingWithSales {
   firstmallGoodsConnectionId: string;
+}
+
+export class LiveShoppingParamsDto {
+  @IsOptional() @IsString() id?: string;
+  @IsOptional() @IsArray() goodsIds?: number[];
+}
+
+export interface LiveShoppingWithConfirmation extends LiveShopping {
+  goods: {
+    confirmation: {
+      firstmallGoodsConnectionId: number;
+    };
+  };
 }
