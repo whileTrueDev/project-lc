@@ -12,6 +12,13 @@ import {
   Input,
   Textarea,
   Box,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+  useToast,
 } from '@chakra-ui/react';
 import { useSellerOrderCancelMutation } from '@project-lc/hooks';
 import {
@@ -73,26 +80,32 @@ function OrderCancelRequstItem({
 }): JSX.Element {
   const { goods_name, title1, option1, ea, image } = item;
   return (
-    <Stack direction="row" spacing={2} justifyContent="space-around">
-      <ChakraNextImage
-        layout="intrinsic"
-        width={60}
-        height={60}
-        alt=""
-        src={`http://whiletrue.firstmall.kr${image || ''}`}
-      />
-      <Stack>
-        <Text fontWeight="bold">{goods_name}</Text>
-        {title1 && (
-          <Text colorScheme="gray">
-            {title1} : {option1}
-          </Text>
-        )}
-      </Stack>
+    <Tr direction="row" spacing={2} justifyContent="space-around">
+      <Td>
+        <ChakraNextImage
+          layout="intrinsic"
+          width={60}
+          height={60}
+          alt=""
+          src={`http://whiletrue.firstmall.kr${image || ''}`}
+        />
+      </Td>
+      <Td>
+        <Stack>
+          <Text fontWeight="bold">{goods_name}</Text>
+          {title1 && (
+            <Text colorScheme="gray">
+              {title1} : {option1}
+            </Text>
+          )}
+        </Stack>
+      </Td>
 
-      <Text>{ea}</Text>
-      <Box>{amountInput}</Box>
-    </Stack>
+      <Td>{ea}</Td>
+      <Td>
+        <Box>{amountInput}</Box>
+      </Td>
+    </Tr>
   );
 }
 
@@ -102,6 +115,7 @@ export function OrderCancelRequestDialog({
   isOpen,
   onClose,
 }: OrderCancelRequestDialogProps): JSX.Element {
+  const toast = useToast();
   // 결제취소 가능한 상품옵션목록
   const orderCancelItemList = useMemo(
     () =>
@@ -155,8 +169,12 @@ export function OrderCancelRequestDialog({
       .then(() => {
         reset();
         onClose();
+        toast({ title: '결제취소를 요청하였습니다.', status: 'success' });
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        toast({ title: '결제취소를 요청하는 중 오류가 발생했습니다.', status: 'error' });
+      });
   };
 
   return (
@@ -174,34 +192,39 @@ export function OrderCancelRequestDialog({
         <ModalBody>
           <Text>결제 취소를 요청할 상품과 수량을 선택하세요</Text>
 
-          <Stack direction="row" spacing={2} justifyContent="space-around">
-            <Text>상품 사진</Text>
-            <Text>상품명 / 옵션명</Text>
-            <Text>주문 수량</Text>
-            <Text>결제 취소 수량</Text>
-          </Stack>
-
-          {fields.map((field, index) => {
-            const item = getValues(`cancelItems.${index}`);
-            if (!item) return null;
-            return (
-              <OrderCancelRequstItem
-                key={field.id}
-                item={item}
-                amountInput={
-                  <Input
-                    isInvalid={!!errors?.cancelItems?.[index]?.cancelAmount}
-                    {...register(`cancelItems.${index}.cancelAmount` as const, {
-                      valueAsNumber: true,
-                      required: true,
-                      max: item.ea,
-                      min: 0,
-                    })}
+          <Table mb={4}>
+            <Thead>
+              <Tr>
+                <Th>상품 사진</Th>
+                <Th>상품명 / 옵션명</Th>
+                <Th>주문 수량</Th>
+                <Th>결제 취소 수량</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {fields.map((field, index) => {
+                const item = getValues(`cancelItems.${index}`);
+                if (!item) return null;
+                return (
+                  <OrderCancelRequstItem
+                    key={field.id}
+                    item={item}
+                    amountInput={
+                      <Input
+                        isInvalid={!!errors?.cancelItems?.[index]?.cancelAmount}
+                        {...register(`cancelItems.${index}.cancelAmount` as const, {
+                          valueAsNumber: true,
+                          required: true,
+                          max: item.ea,
+                          min: 0,
+                        })}
+                      />
+                    }
                   />
-                }
-              />
-            );
-          })}
+                );
+              })}
+            </Tbody>
+          </Table>
           <Text>결제 취소 사유를 입력해주세요(최대 255자)</Text>
 
           <Textarea
@@ -221,8 +244,10 @@ export function OrderCancelRequestDialog({
           {errors?.cancelReason && <ErrorText>{errors?.cancelReason.message}</ErrorText>}
         </ModalBody>
         <ModalFooter>
-          <Button onClick={onClose}>취소</Button>
-          <Button type="submit">취소요청하기</Button>
+          <Button onClick={onClose} mr={2}>
+            취소
+          </Button>
+          <Button type="submit">요청하기</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
