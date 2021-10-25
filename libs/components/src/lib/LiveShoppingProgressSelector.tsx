@@ -19,7 +19,7 @@ export function LiveShoppingProgressSelector(): JSX.Element {
           const value = LIVE_SHOPPING_PROGRESS[key];
           return (
             <option key={key} value={value}>
-              key
+              {key}
             </option>
           );
         })}
