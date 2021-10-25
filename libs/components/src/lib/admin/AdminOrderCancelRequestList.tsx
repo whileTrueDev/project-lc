@@ -1,7 +1,8 @@
 import { Spinner } from '@chakra-ui/react';
-import { GridColumns } from '@material-ui/data-grid';
+import { GridColumns, GridRowParams } from '@material-ui/data-grid';
 import { useAdminOrderCancelRequest } from '@project-lc/hooks';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/router';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 
 const columns: GridColumns = [
@@ -39,7 +40,12 @@ const columns: GridColumns = [
 ];
 
 export function AdminOrderCancelRequestList(): JSX.Element {
+  const router = useRouter();
   const orderCancelRequest = useAdminOrderCancelRequest();
+
+  const handleRowClick = (param: GridRowParams): void => {
+    router.push(`/order-cancel/${param.row?.orderSeq}`);
+  };
   if (orderCancelRequest.isLoading) return <Spinner />;
   return (
     <ChakraDataGrid
@@ -55,6 +61,7 @@ export function AdminOrderCancelRequestList(): JSX.Element {
       disableColumnMenu
       disableColumnFilter
       disableSelectionOnClick
+      onRowClick={handleRowClick}
     />
   );
 }
