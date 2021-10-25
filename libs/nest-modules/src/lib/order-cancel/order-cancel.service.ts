@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { SellerOrderCancelRequest } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { SellerOrderCancelRequestDto } from '@project-lc/shared-types';
+import {
+  OrderCancelRequestDetailRes,
+  OrderCancelRequestList,
+  SellerOrderCancelRequestDto,
+} from '@project-lc/shared-types';
 
 @Injectable()
 export class OrderCancelService {
@@ -12,7 +17,7 @@ export class OrderCancelService {
     ...dto
   }: {
     sellerEmail: string;
-  } & SellerOrderCancelRequestDto): Promise<any> {
+  } & SellerOrderCancelRequestDto): Promise<SellerOrderCancelRequest> {
     const { orderSeq, reason, orderCancelItems } = dto;
 
     const existCancelRequst = await this.prisma.sellerOrderCancelRequest.findFirst({
@@ -63,7 +68,7 @@ export class OrderCancelService {
   }: {
     sellerEmail: string;
     orderSeq: string;
-  }): Promise<any> {
+  }): Promise<SellerOrderCancelRequest> {
     const data = await this.prisma.sellerOrderCancelRequest.findFirst({
       where: { seller: { email: sellerEmail }, orderSeq, doneFlag: false },
     });
@@ -71,7 +76,7 @@ export class OrderCancelService {
   }
 
   /** 결제취소 요청 목록 조회 */
-  public async getAllOrderCancelRequests(): Promise<any> {
+  public async getAllOrderCancelRequests(): Promise<OrderCancelRequestList> {
     const data = await this.prisma.sellerOrderCancelRequest.findMany({
       where: { doneFlag: false }, // 처리되지 않은 요청만 조회
       select: {
@@ -87,7 +92,9 @@ export class OrderCancelService {
   }
 
   /** 특정 주문에 대한 결제취소 요청 조회 */
-  public async getOneOrderCancelRequest(orderId: string): Promise<any> {
+  public async getOneOrderCancelRequest(
+    orderId: string,
+  ): Promise<OrderCancelRequestDetailRes> {
     const data = await this.prisma.sellerOrderCancelRequest.findFirst({
       where: { orderSeq: orderId },
       select: {
@@ -107,13 +114,12 @@ export class OrderCancelService {
   public async setOrderCancelRequestDone(
     requestId: number,
     doneFlag: boolean,
-  ): Promise<any> {
-    const data = await this.prisma.sellerOrderCancelRequest.update({
+  ): Promise<boolean> {
+    await this.prisma.sellerOrderCancelRequest.update({
       where: { id: requestId },
       data: { doneFlag },
     });
 
-    console.log('updated', data);
-    return data;
+    return true;
   }
 }

@@ -28,6 +28,8 @@ import {
   AdminSettlementInfoType,
   LiveShoppingDTO,
   BroadcasterDTO,
+  OrderCancelRequestList,
+  OrderCancelRequestDetailRes,
 } from '@project-lc/shared-types';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -147,7 +149,7 @@ export class AdminController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Get('/order-cancel/list')
-  getAllOrderCancelRequests(): Promise<any> {
+  getAllOrderCancelRequests(): Promise<OrderCancelRequestList> {
     return this.orderCancelService.getAllOrderCancelRequests();
   }
 
@@ -155,7 +157,9 @@ export class AdminController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Get('/order-cancel/:orderId')
-  getOneOrderCancelRequest(@Param('orderId') orderId: string): Promise<any> {
+  getOneOrderCancelRequest(
+    @Param('orderId') orderId: string,
+  ): Promise<OrderCancelRequestDetailRes> {
     return this.orderCancelService.getOneOrderCancelRequest(orderId);
   }
 
@@ -166,7 +170,7 @@ export class AdminController {
   setOrderCancelRequestDone(
     @Param('requestId', ParseIntPipe) requestId: number,
     @Body('doneFlag', ParseBoolPipe) doneFlag: boolean,
-  ): Promise<any> {
+  ): Promise<boolean> {
     return this.orderCancelService.setOrderCancelRequestDone(requestId, doneFlag);
   }
 }

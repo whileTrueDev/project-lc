@@ -1,9 +1,13 @@
+import {
+  OrderCancelRequestDetailRes,
+  OrderCancelRequestList,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 /** 결제취소 요청 목록 조회 */
-export type AdminOrderCancelRequestRes = any;
+export type AdminOrderCancelRequestRes = OrderCancelRequestList;
 
 export const getAdminOrderCancelRequest =
   async (): Promise<AdminOrderCancelRequestRes> => {
@@ -23,7 +27,7 @@ export const useAdminOrderCancelRequest = (): UseQueryResult<
 };
 
 /** 특정 주문에 대한 결제취소 요청 조회 */
-export type AdminOneOrderCancelRequestRes = any;
+export type AdminOneOrderCancelRequestRes = OrderCancelRequestDetailRes;
 
 export const getAdminOneOrderCancelRequest = async (
   orderId: string,

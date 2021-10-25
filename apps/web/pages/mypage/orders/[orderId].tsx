@@ -114,8 +114,10 @@ export function OrderDetail(): JSX.Element {
           </Stack>
         )}
 
-        {/* 결제취소 요청 정보 */}
-        {orderCancel.data && <OrderCancelRequestExistAlert data={orderCancel.data} />}
+        {/* 결제취소요청 했을 경우 알림창 */}
+        {orderCancel.data && !orderCancel.data.doneFlag && (
+          <OrderCancelRequestExistAlert data={orderCancel.data} />
+        )}
 
         {/* 주문 버튼 */}
         {isMobileSize ? null : (

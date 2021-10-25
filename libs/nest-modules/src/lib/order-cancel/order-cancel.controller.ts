@@ -7,7 +7,11 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { SellerOrderCancelRequestDto } from '@project-lc/shared-types';
+import { SellerOrderCancelRequest } from '@prisma/client';
+import {
+  OrderCancelRequestDetailRes,
+  SellerOrderCancelRequestDto,
+} from '@project-lc/shared-types';
 import { UserPayload } from '../auth/auth.interface';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -23,7 +27,7 @@ export class OrderCancelController {
   createOrderCancelRequest(
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: SellerOrderCancelRequestDto,
-  ): Promise<any> {
+  ): Promise<SellerOrderCancelRequest> {
     return this.orderCancelService.createOrderCancelRequst({
       sellerEmail: seller.sub,
       ...dto,
@@ -34,13 +38,8 @@ export class OrderCancelController {
   @UseGuards(JwtAuthGuard)
   @Get('/:orderSeq')
   findOneOrderCancelRequst(
-    @SellerInfo() seller: UserPayload,
     @Param('orderSeq') orderSeq: string,
-  ): Promise<any> {
-    console.log({ orderSeq });
-    return this.orderCancelService.findOneOrderCancelRequst({
-      orderSeq,
-      sellerEmail: seller.sub,
-    });
+  ): Promise<OrderCancelRequestDetailRes> {
+    return this.orderCancelService.getOneOrderCancelRequest(orderSeq);
   }
 }
