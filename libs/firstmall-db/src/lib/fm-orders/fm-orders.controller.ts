@@ -7,6 +7,7 @@ import {
   Query,
   UseGuards,
   ValidationPipe,
+  Patch,
 } from '@nestjs/common';
 import {
   GoodsService,
@@ -49,6 +50,11 @@ export class FmOrdersController {
     const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub, gids);
     if (ids.length === 0) return [];
     return this.fmOrdersService.findOrders(ids, dto);
+  }
+
+  @Patch('/return-status')
+  async changeReturnStatus(@Body(ValidationPipe) dto: any): Promise<boolean> {
+    return this.fmOrdersService.changeReturnStatus(dto);
   }
 
   @UseGuards(AdminGuard)

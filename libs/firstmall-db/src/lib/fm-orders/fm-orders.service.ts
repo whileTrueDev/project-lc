@@ -733,4 +733,18 @@ export class FmOrdersService {
       sales: counter.sales,
     };
   }
+
+  public async changeReturnStatus(dto: any): Promise<boolean> {
+    const returnStatusSql = `
+      UPDATE
+        fm_order_return
+      SET 
+        fm_order_return.status = ?
+      WHERE
+        fm_order_return.return_code = ?
+    `;
+    await this.db.query(returnStatusSql, [dto.status, dto.returnCode]);
+
+    return true;
+  }
 }
