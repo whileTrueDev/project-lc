@@ -22,6 +22,7 @@ import {
   ApprovedGoodsListItem,
   LiveShoppingRegistDTO,
   LiveShoppingInput,
+  LIVE_SHOPPING_PROGRESS,
 } from '@project-lc/shared-types';
 import { liveShoppingRegist } from '@project-lc/stores';
 import dayjs from 'dayjs';
@@ -86,7 +87,7 @@ export function LiveShoppingRegist(): JSX.Element {
       goods_id: 0,
       contactId: 0,
       streamId: '',
-      progress: 'registered',
+      progress: LIVE_SHOPPING_PROGRESS.등록됨,
     };
 
     if (contacts.data) {

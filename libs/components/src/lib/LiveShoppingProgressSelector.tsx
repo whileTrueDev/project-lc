@@ -1,6 +1,7 @@
 import { Select, Box, Text } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
-import { LiveShoppingDTO } from '@project-lc/shared-types';
+import { LiveShoppingDTO, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
+import { LiveShopppingProgressType } from '@prisma/client';
 
 export function LiveShoppingProgressSelector(): JSX.Element {
   const { setValue, watch } = useFormContext<LiveShoppingDTO>();
@@ -10,15 +11,20 @@ export function LiveShoppingProgressSelector(): JSX.Element {
       <Text>진행상태</Text>
       <Select
         onChange={(event) => {
-          setValue('progress', event.target.value);
+          setValue('progress', event.target.value as LiveShopppingProgressType);
         }}
         placeholder="진행상태를 선택하세요"
       >
-        <option value="adjust">조율중</option>
-        <option value="confirm">확정</option>
-        <option value="cancel">취소</option>
+        {Object.keys(LIVE_SHOPPING_PROGRESS).map((key) => {
+          const value = LIVE_SHOPPING_PROGRESS[key];
+          return (
+            <option key={key} value={value}>
+              key
+            </option>
+          );
+        })}
       </Select>
-      {watch('progress') === 'cancel' && (
+      {watch('progress') === LIVE_SHOPPING_PROGRESS.취소됨 && (
         <Box mt="5">
           <Text>취소사유</Text>
           <Select

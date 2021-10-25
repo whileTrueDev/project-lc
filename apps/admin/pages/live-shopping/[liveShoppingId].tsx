@@ -32,7 +32,7 @@ import {
   SectionWithTitle,
   BroadcasterName,
   AdminLiveShoppingUpdateConfirmModal,
-  LiveShoppingProgressConverter,
+  LiveShoppingProgressBadge,
 } from '@project-lc/components';
 import {
   useAdminLiveShoppingList,
@@ -43,7 +43,7 @@ import {
 } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { FormProvider, useForm } from 'react-hook-form';
-import { LiveShoppingDTO } from '@project-lc/shared-types';
+import { LiveShoppingDTO, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 
 function getDuration(startDate: Date, endDate: Date): string {
@@ -152,13 +152,13 @@ export function GoodsDetail(): JSX.Element {
 
             <Stack direction="row" alignItems="center">
               <Text as="span">진행상태</Text>
-              <LiveShoppingProgressConverter
+              <LiveShoppingProgressBadge
                 progress={liveShopping[0].progress}
                 broadcastStartDate={liveShopping[0].broadcastStartDate}
                 broadcastEndDate={liveShopping[0].broadcastEndDate}
                 sellEndDate={liveShopping[0].sellEndDate}
               />
-              {liveShopping[0].progress === 'cancel' ? (
+              {liveShopping[0].progress === LIVE_SHOPPING_PROGRESS.취소됨 ? (
                 <Text>사유 : {liveShopping[0].rejectionReason}</Text>
               ) : null}
             </Stack>
