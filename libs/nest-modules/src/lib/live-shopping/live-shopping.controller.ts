@@ -17,7 +17,7 @@ import { UserPayload } from '../auth/auth.interface';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('live-shopping')
+@Controller('live-shoppings')
 export class LiveShoppingController {
   constructor(
     private readonly goodsService: GoodsService,
@@ -25,7 +25,7 @@ export class LiveShoppingController {
   ) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get('/list')
+  @Get()
   getLiveShoppings(@Query('liveShoppingId') dto?: string): Promise<LiveShopping[]> {
     return this.liveShoppingService.getRegisteredLiveShoppings(dto || null);
   }

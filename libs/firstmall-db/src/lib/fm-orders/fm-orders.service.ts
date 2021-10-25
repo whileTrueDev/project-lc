@@ -747,7 +747,7 @@ export class FmOrdersService {
     JOIN fm_order_item USING(order_seq)
     WHERE fm_order_item.goods_seq IN (?)
     AND
-    DATE(deposit_date) BETWEEN ? AND ?;
+    DATE(regist_date) BETWEEN ? AND ?;
     `;
 
     await Promise.all(
