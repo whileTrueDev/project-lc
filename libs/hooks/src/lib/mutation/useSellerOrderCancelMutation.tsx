@@ -6,6 +6,7 @@ import axios from '../../axios';
 export type useSellerOrderCancelMutationDto = SellerOrderCancelRequestDto;
 export type useSellerOrderCancelMutationRes = any;
 
+/** 결제취소 요청 생성 뮤테이션 */
 export const useSellerOrderCancelMutation = (): UseMutationResult<
   useSellerOrderCancelMutationRes,
   AxiosError,
@@ -25,6 +26,29 @@ export const useSellerOrderCancelMutation = (): UseMutationResult<
       onSuccess: (data) => {
         queryClient.invalidateQueries(['SellerOrderCancelRequest', data.orderSeq], {
           exact: true,
+        });
+      },
+    },
+  );
+};
+
+export type OrderCancelDoneFlagMutationDto = { requestId: number; doneFlag: boolean };
+/** 결제취소 요청 상태 변경 뮤테이션 */
+export const useSellerOrderCancelDoneFlagMutation = (): UseMutationResult<
+  any,
+  AxiosError,
+  OrderCancelDoneFlagMutationDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<any, AxiosError, OrderCancelDoneFlagMutationDto>(
+    (dto: OrderCancelDoneFlagMutationDto) =>
+      axios
+        .put<any>(`/admin/order-cancel/${dto.requestId}`, { doneFlag: dto.doneFlag })
+        .then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('AdminOrderCancelRequest', {
+          refetchInactive: true,
         });
       },
     },
