@@ -62,9 +62,7 @@ export function LiveShoppingList(): JSX.Element {
 
   const { data: profileData } = useProfile();
 
-  const { data, isLoading } = useLiveShoppingList({
-    enabled: !!profileData?.email,
-  });
+  const { data, isLoading } = useLiveShoppingList({});
   const { data: sales, isLoading: isSalesLoading } = useFmOrdersDuringLiveShoppingSales({
     enabled: !!profileData?.email,
   });
@@ -213,10 +211,7 @@ export function LiveShoppingList(): JSX.Element {
                   </Stack>
                 </Td>
                 <Td>
-                  {row.sales
-                    ? row.sales.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')
-                    : '0'}
-                  원
+                  {row.sales ? row.sales.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'}원
                 </Td>
                 <Td onClick={(e) => e.stopPropagation()}>
                   {row.liveShoppingVideo ? (

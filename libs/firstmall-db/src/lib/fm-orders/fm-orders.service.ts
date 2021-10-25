@@ -749,15 +749,14 @@ export class FmOrdersService {
     AND
     DATE(deposit_date) BETWEEN ? AND ?;
     `;
-
     await Promise.all(
       dto.map(async (val) => {
         const sellStartDate = dayjs(val.sellStartDate).format('YYYY-MM-DD HH:mm:ss');
         const sellEndDate = dayjs(val.sellEndDate).format('YYYY-MM-DD HH:mm:ss');
         const salesSum = await this.db.query(sql, [
           val.firstmallGoodsConnectionId,
-          new Date(sellStartDate),
-          new Date(sellEndDate),
+          sellStartDate,
+          sellEndDate,
         ]);
         salesPrice.push({
           id: val.id,

@@ -26,6 +26,7 @@ import {
   OrderStatsRes,
   SalesStats,
 } from '@project-lc/shared-types';
+import dayjs from 'dayjs';
 
 import { FmOrdersService } from './fm-orders.service';
 @UseGuards(JwtAuthGuard)
@@ -83,16 +84,15 @@ export class FmOrdersController {
   @Get('/per-live-shopping')
   async findSalesPerLiveShopping(): Promise<{ id: number; sales: string }[]> {
     let liveShoppingList = await this.liveShoppingService
-      .getRegisteredLiveShoppings(null, true)
+      .getRegisteredLiveShoppings({})
       .then((result) => {
         return result.map((val) => {
           if (val.sellStartDate && val.sellEndDate) {
             return {
               id: val.id,
-              firstmallGoodsConnectionId:
-                val.goods.confirmation.firstmallGoodsConnectionId,
-              sellStartDate: val.sellStartDate,
-              sellEndDate: val.sellEndDate,
+              firstmallGoodsConnectionId: `${val.goods.confirmation.firstmallGoodsConnectionId}`,
+              sellStartDate: dayjs(val.sellStartDate).toString(),
+              sellEndDate: dayjs(val.sellEndDate).toString(),
             };
           }
           return null;
