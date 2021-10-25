@@ -22,7 +22,7 @@ export class LiveShoppingController {
     private readonly liveShoppingService: LiveShoppingService,
   ) {}
 
-  /** 상품 등록 */
+  /** 라이브쇼핑 등록 */
   @Post()
   createLiveShopping(
     @SellerInfo() seller: UserPayload,

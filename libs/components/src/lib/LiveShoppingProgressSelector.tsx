@@ -1,9 +1,33 @@
-import { Select, Box, Text } from '@chakra-ui/react';
-import { useFormContext } from 'react-hook-form';
+import {
+  Alert,
+  Box,
+  Collapse,
+  Divider,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  InputGroup,
+  InputRightAddon,
+  Select,
+  Text,
+} from '@chakra-ui/react';
 import { LiveShoppingDTO } from '@project-lc/shared-types';
+import { useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 export function LiveShoppingProgressSelector(): JSX.Element {
-  const { setValue, watch } = useFormContext<LiveShoppingDTO>();
+  const {
+    setValue,
+    watch,
+    register,
+    formState: { errors },
+  } = useFormContext<LiveShoppingDTO>();
+
+  const whcr = watch('whiletrueCommissionRate');
+  const bccr = watch('broadcasterCommissionRate');
+
+  const isOverThan100 = useMemo(() => Number(whcr) + Number(bccr) > 100, [bccr, whcr]);
 
   return (
     <Box>
@@ -18,6 +42,63 @@ export function LiveShoppingProgressSelector(): JSX.Element {
         <option value="confirm">확정</option>
         <option value="cancel">취소</option>
       </Select>
+      {watch('progress') === 'confirm' && (
+        <>
+          <Box mt={5}>
+            <Divider />
+            <Box mt={2}>
+              <Text>판매 수수료율</Text>
+              <Collapse in={isOverThan100} animateOpacity>
+                <Alert my={2} status="error" maxW="300px">
+                  판매 수수료율의 합은 100을 초과할 수 없습니다.
+                </Alert>
+              </Collapse>
+              <FormControl isInvalid={!!errors.whiletrueCommissionRate}>
+                <FormLabel>와일트루</FormLabel>
+                <InputGroup>
+                  <Input
+                    placeholder="5"
+                    type="number"
+                    {...register('whiletrueCommissionRate', {
+                      valueAsNumber: true,
+                      max: { value: 100, message: '0~100사이의 값을 입력하세요' },
+                      min: { value: 0, message: '0~100사이의 값을 입력하세요' },
+                      validate: () => !isOverThan100,
+                    })}
+                  />
+                  <InputRightAddon>%</InputRightAddon>
+                </InputGroup>
+                {errors.whiletrueCommissionRate && (
+                  <FormErrorMessage>
+                    {errors.whiletrueCommissionRate.message}
+                  </FormErrorMessage>
+                )}
+              </FormControl>
+              <FormControl isInvalid={!!errors.broadcasterCommissionRate}>
+                <FormLabel>방송인</FormLabel>
+                <InputGroup>
+                  <Input
+                    placeholder="10"
+                    type="number"
+                    {...register('broadcasterCommissionRate', {
+                      valueAsNumber: true,
+                      max: { value: 100, message: '0~100사이의 값을 입력하세요' },
+                      min: { value: 0, message: '0~100사이의 값을 입력하세요' },
+                      validate: () => !isOverThan100,
+                    })}
+                  />
+                  <InputRightAddon>%</InputRightAddon>
+                </InputGroup>
+                {errors.broadcasterCommissionRate && (
+                  <FormErrorMessage>
+                    {errors.broadcasterCommissionRate.message}
+                  </FormErrorMessage>
+                )}
+              </FormControl>
+            </Box>
+          </Box>
+        </>
+      )}
       {watch('progress') === 'cancel' && (
         <Box mt="5">
           <Text>취소사유</Text>

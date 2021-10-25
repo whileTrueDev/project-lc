@@ -73,6 +73,7 @@ export * from './lib/ResetPasswordForm';
 export * from './lib/SectionWithTitle';
 export * from './lib/SellerGoodsList';
 export * from './lib/SellerStatusSection';
+export * from './lib/settlement/SettlementDoneList';
 export * from './lib/settlement/SettlementSellCommissionInfo';
 export * from './lib/settlement/SettlementTargetList';
 export * from './lib/SettlementAccountBox';

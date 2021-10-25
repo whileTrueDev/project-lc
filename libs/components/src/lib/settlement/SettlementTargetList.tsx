@@ -12,6 +12,8 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalProps,
+  Radio,
+  RadioGroup,
   Stack,
   Table,
   Tbody,
@@ -22,17 +24,24 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
-import { useSellCommission, useSettlementTargets } from '@project-lc/hooks';
-import { FmSettlementTargets } from '@project-lc/shared-types';
+import {
+  useCreateSettlementMutation,
+  useSellCommission,
+  useSettlementTargets,
+} from '@project-lc/hooks';
+import { FmSettlementTarget } from '@project-lc/shared-types';
+import { checkOrderDuringLiveShopping } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
+import { ConfirmDialog } from '../ConfirmDialog';
 
 export function SettlementTargetList(): JSX.Element | null {
   const dialog = useDisclosure();
   const targets = useSettlementTargets();
 
-  const [selectedExport, setSelectedExport] = useState<FmSettlementTargets | null>(null);
+  const [selectedExport, setSelectedExport] = useState<FmSettlementTarget | null>(null);
 
   if (!targets.data) return null;
   return (
@@ -43,6 +52,9 @@ export function SettlementTargetList(): JSX.Element | null {
             <Th>출고번호</Th>
             <Th>출고코드</Th>
             <Th>판매자명</Th>
+            <Th>구매자명</Th>
+            <Th>수령자명</Th>
+            <Th>결제방법</Th>
             <Th>출고날짜</Th>
             <Th>구매확정일</Th>
             <Th>출고에 포함된 상품 총금액</Th>
@@ -76,7 +88,10 @@ export function SettlementTargetList(): JSX.Element | null {
                     <Text color="red.400">판매자 미상</Text>
                   )}
                 </Td>
-                <Td>{dayjs(target.regist_date).format('YYYY/MM/DD HH:mm:ss')}</Td>
+                <Td>{target.order_user_name}</Td>
+                <Td>{target.recipient_user_name}</Td>
+                <Td>{target.payment}</Td>
+                <Td>{dayjs(target.export_date).format('YYYY/MM/DD HH:mm:ss')}</Td>
                 <Td>
                   {target.buy_confirm && target.confirm_date
                     ? `${dayjs(target.confirm_date).format('YYYY/MM/DD')} by ${
@@ -88,7 +103,7 @@ export function SettlementTargetList(): JSX.Element | null {
                 <Td>{isAbleToSettle ? '정산등록함' : 'X'}</Td>
                 <Td>
                   <Button
-                    size="sm"
+                    size="xs"
                     onClick={() => {
                       dialog.onOpen();
                       setSelectedExport(target);
@@ -129,14 +144,27 @@ export function SettlementTargetList(): JSX.Element | null {
 }
 
 type SettlementItemInfoDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
-  selectedSettleItem: FmSettlementTargets;
+  selectedSettleItem: FmSettlementTarget;
 };
 function SettlementItemInfoDialog({
   isOpen,
   onClose,
   selectedSettleItem,
 }: SettlementItemInfoDialogProps): JSX.Element {
+  const toast = useToast();
   const executeDialog = useDisclosure();
+  const executeSettlement = useCreateSettlementMutation();
+
+  const isAbleToSettle = selectedSettleItem.options.every((opt) => {
+    const ssa = opt.seller?.sellerSettlementAccount;
+    if (ssa && ssa.length > 0) return true;
+    return false;
+  });
+
+  const [round, setRound] = useState<'1' | '2'>('1');
+  const onRoundChange = (r: '1' | '2'): void => {
+    setRound(r);
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
@@ -153,6 +181,7 @@ function SettlementItemInfoDialog({
                 opt.goods_seq +
                 opt.item_option_seq
               }
+              settlementTarget={selectedSettleItem}
               opt={opt}
             />
           ))}
@@ -162,25 +191,63 @@ function SettlementItemInfoDialog({
           <Button mr={3} onClick={onClose}>
             닫기
           </Button>
-          <Button colorScheme="blue" onClick={executeDialog.onOpen}>
+          <Button
+            colorScheme="blue"
+            onClick={executeDialog.onOpen}
+            isDisabled={!isAbleToSettle}
+          >
             정산처리진행
           </Button>
         </ModalFooter>
       </ModalContent>
 
-      <ExecuteSettleDialog
+      <ConfirmDialog
         isOpen={executeDialog.isOpen}
         onClose={executeDialog.onClose}
-        selectedSettleItem={selectedSettleItem}
-      />
+        title={selectedSettleItem.export_code}
+        onConfirm={async () => {
+          if (!selectedSettleItem.options[0].seller?.email) {
+            toast({ title: '판매자 미상으로 정산처리 진행하지 못함', status: 'error' });
+          } else {
+            executeSettlement
+              .mutateAsync({
+                sellerEmail: selectedSettleItem.options[0].seller?.email,
+                target: selectedSettleItem,
+                round,
+              })
+              .then(() => {
+                toast({
+                  title: `출고번호 ${selectedSettleItem.export_seq} 정산처리 완료`,
+                  status: 'success',
+                });
+                onClose();
+              })
+              .catch(() => {
+                toast({ title: '정산처리 실패', status: 'error' });
+              });
+          }
+        }}
+      >
+        <Stack spacing={3}>
+          <RadioGroup onChange={onRoundChange} value={round}>
+            <Box>{dayjs().format('YYYY년MM월')}</Box>
+            <Stack direction="row">
+              <Radio value="1">1회차</Radio>
+              <Radio value="2">2회차</Radio>
+            </Stack>
+          </RadioGroup>
+        </Stack>
+      </ConfirmDialog>
     </Modal>
   );
 }
 
 function SettlementItemOptionDetail({
+  settlementTarget,
   opt,
 }: {
-  opt: FmSettlementTargets['options'][number];
+  settlementTarget: FmSettlementTarget;
+  opt: FmSettlementTarget['options'][number];
 }): JSX.Element {
   const commissionInfo = useSellCommission();
   // 이 옵션의 총 가격
@@ -193,24 +260,24 @@ function SettlementItemOptionDetail({
     return false;
   }, [opt.seller?.sellerSettlementAccount]);
 
-  const isLiveShooping = useMemo(() => {
+  const liveShopping = useMemo(() => {
+    if (opt.LiveShopping.length === 0) return null;
     // 라이브쇼핑인지 여부
     // 판매된 시각과 라이브쇼핑 판매기간을 비교해 포함되면 라이브쇼핑을 통한 구매로 판단
-    // opt.LiveShopping.some((lvs) => {
-    //   lvs.
-    // })
-    return opt.LiveShopping.length > 0;
-  }, [opt.LiveShopping.length]);
+    return opt.LiveShopping.find((lvs) => {
+      return checkOrderDuringLiveShopping(settlementTarget, lvs);
+    });
+  }, [opt.LiveShopping, settlementTarget]);
 
   const commissionPrice = useMemo(() => {
-    if (!isLiveShooping) {
+    if (!liveShopping) {
       if (commissionInfo.data) {
         return Math.floor(Number(commissionInfo.data.commissionDecimal) * totalPrice);
       }
       return 0;
     }
     return 0;
-  }, [commissionInfo.data, isLiveShooping, totalPrice]);
+  }, [commissionInfo.data, liveShopping, totalPrice]);
 
   return (
     <Grid
@@ -252,27 +319,40 @@ function SettlementItemOptionDetail({
       <GridItem>상품 가격 * 주문 개수</GridItem>
       <GridItem>{`${totalPrice.toLocaleString()}원`}</GridItem>
 
-      <GridItem>라이브 쇼핑 진행 여부</GridItem>
+      <GridItem>라이브쇼핑 주문 여부</GridItem>
       <GridItem>
-        <Text>{isLiveShooping ? 'O' : 'X'}</Text>
+        <Text
+          fontWeight={liveShopping ? 'bold' : undefined}
+          color={liveShopping ? 'green.500' : undefined}
+        >
+          {liveShopping ? 'O' : 'X'}
+        </Text>
       </GridItem>
 
       <GridItem>판매 수수료</GridItem>
-      <GridItem>
-        {isLiveShooping ? (
+      <GridItem color="green.500">
+        {liveShopping ? (
           <Box>
             <Text>
               방송인
-              {opt.LiveShopping.map((x) => x.broadcasterCommissionRate)}%
+              {liveShopping.broadcasterCommissionRate}% (
+              {Math.floor(
+                Number(liveShopping.broadcasterCommissionRate) * 0.01 * totalPrice,
+              )}
+              ) 원
             </Text>
             <Text>
               와일트루
-              {opt.LiveShopping.map((x) => x.whiletrueCommissionRate)}%
+              {liveShopping.whiletrueCommissionRate}% (
+              {Math.floor(
+                Number(liveShopping.whiletrueCommissionRate) * 0.01 * totalPrice,
+              )}
+              ) 원
             </Text>
           </Box>
         ) : (
           <Box>
-            <Text color="green.500">
+            <Text>
               {commissionInfo.data &&
                 `${commissionInfo.data.commissionRate}% (${commissionPrice}원)`}
             </Text>
@@ -315,34 +395,5 @@ function SettlementItemOptionDetail({
         )}
       </GridItem>
     </Grid>
-  );
-}
-
-type ExecuteSettleDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
-  selectedSettleItem: FmSettlementTargets;
-};
-function ExecuteSettleDialog({
-  isOpen,
-  onClose,
-  selectedSettleItem,
-}: ExecuteSettleDialogProps): JSX.Element {
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} size="xl" scrollBehavior="inside" isCentered>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>정산 대상 {selectedSettleItem.export_code}</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Box as="form">asdf</Box>
-        </ModalBody>
-
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            닫기
-          </Button>
-          <Button colorScheme="blue">정산처리진행</Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
   );
 }

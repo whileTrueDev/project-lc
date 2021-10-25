@@ -1,4 +1,12 @@
-import { IsString, IsIn, IsOptional, IsNumber, IsDate } from 'class-validator';
+import {
+  IsString,
+  IsIn,
+  IsOptional,
+  IsNumber,
+  IsDate,
+  ValidateIf,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class LiveShoppingDTO {
   @IsNumber()
@@ -54,6 +62,16 @@ export class LiveShoppingDTO {
 
   @IsDate()
   createDate: string;
+
+  @ValidateIf((o) => o.progress === 'confirm')
+  @IsNumber()
+  @IsNotEmpty()
+  whiletrueCommissionRate?: string;
+
+  @ValidateIf((o) => o.progress === 'confirm')
+  @IsNumber()
+  @IsNotEmpty()
+  broadcasterCommissionRate?: string;
 }
 
 export type LiveShoppingRegistDTO = Pick<

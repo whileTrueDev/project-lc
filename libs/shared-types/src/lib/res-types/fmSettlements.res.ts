@@ -1,12 +1,7 @@
-import {
-  LiveShopping,
-  Seller,
-  SellerSettlementAccount,
-  SellerShop,
-} from '.prisma/client';
-import { FmExport, FmExportItem } from './fmExport.res';
+import { LiveShopping, Seller, SellerSettlementAccount } from '.prisma/client';
+import { FmExport } from './fmExport.res';
 import { FmGoodsOption } from './fmGoods.res';
-import { FmOrderItem, FmOrderOption } from './fmOrder.res';
+import { FmOrder, FmOrderItem, FmOrderOption } from './fmOrder.res';
 
 export interface FmExportItemFullInfo {
   /** 고유번호 */
@@ -78,10 +73,12 @@ export type FmSettlementTargetBase = {
   complete_date: FmExport['complete_date'];
   account_date: FmExport['account_date'];
   shipping_date: FmExport['shipping_date'];
-  regist_date: FmExport['regist_date'];
-};
+  export_date: FmExport['regist_date'];
+  order_date: FmOrder['regist_date'];
+  shipping_cost: FmOrder['shipping_cost'];
+} & FmOrder;
 
-export type FmSettlementTargets = FmSettlementTargetBase & {
+export type FmSettlementTarget = FmSettlementTargetBase & {
   options: Array<
     FmSettlementTargetOptions & {
       seller:

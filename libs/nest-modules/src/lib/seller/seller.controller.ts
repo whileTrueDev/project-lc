@@ -126,7 +126,7 @@ export class SellerController {
   public async ㅁㄴㅇㄹ(
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerSettlements[]> {
-    return this.sellerSettlementService.findSettlementHistory(sellerInfo);
+    return this.sellerSettlementService.findSettlementHistory(sellerInfo.sub);
   }
 
   // 본인의 사업자 등록정보 등록

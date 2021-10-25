@@ -79,6 +79,10 @@ export const adminNavItems: Array<NavItem> = [
     href: '/admin',
   },
   {
+    label: '회차별 정산처리',
+    href: '/settlement',
+  },
+  {
     label: '상품검수',
     href: '/goods',
   },

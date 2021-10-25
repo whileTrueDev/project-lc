@@ -1,9 +1,9 @@
-import { FmSettlementTargets } from '@project-lc/shared-types';
+import { FmSettlementTarget } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
-export type SettlementTargets = Array<FmSettlementTargets>;
+export type SettlementTargets = Array<FmSettlementTarget>;
 
 export const getSettlementTargets = async (): Promise<SettlementTargets> => {
   return axios.get<SettlementTargets>('/fm-settlements/targets').then((res) => res.data);

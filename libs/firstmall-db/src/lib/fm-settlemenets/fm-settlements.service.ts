@@ -3,7 +3,7 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import {
   FmSettlementTargetBase,
   FmSettlementTargetOptions,
-  FmSettlementTargets,
+  FmSettlementTarget,
 } from '@project-lc/shared-types';
 import { FirstmallDbService } from '../firstmall-db.service';
 
@@ -14,14 +14,22 @@ export class FmSettlementService {
     private readonly prisma: PrismaService,
   ) {}
 
-  public async findAllSettleTargetList(): Promise<Array<FmSettlementTargets>> {
+  public async findAllSettleTargetList(): Promise<Array<FmSettlementTarget>> {
+    const settled = await this.prisma.sellerSettlements.findMany();
+
     // 정산이 완료되지 않은 출고내역 조회
     const sql = `SELECT
-      export_seq, export_code, status, buy_confirm, confirm_date, order_seq,
-      complete_date, account_date, shipping_date, regist_date
+      fm_order.*,
+      export_seq, export_code, status, buy_confirm, confirm_date, fm_goods_export.order_seq,
+      complete_date, account_date, shipping_date, fm_goods_export.regist_date AS export_date, fm_order.regist_date AS order_date,
+      shipping_cost
     FROM fm_goods_export
+      JOIN fm_order USING (order_seq)
     WHERE account_date IS NULL AND buy_confirm != "none"`;
-    const result: FmSettlementTargetBase[] = await this.db.query(sql);
+    const result: FmSettlementTargetBase[] = await this.db.query(
+      settled.length > 0 ? `${sql}  AND export_seq NOT IN (?)` : sql,
+      settled.map((x) => x.exportId),
+    );
 
     if (result.length === 0) return [];
 
@@ -41,6 +49,7 @@ export class FmSettlementService {
 
     // 각 출고아이템의 상품번호를 통해 project-lc seller 정보 조회 (goodsConfirmation)
     const goods_seq_arr = exportOptions.map((o) => o.goods_seq);
+
     const lcGoodsList = await this.prisma.goodsConfirmation.findMany({
       where: {
         firstmallGoodsConnectionId: {
