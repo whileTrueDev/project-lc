@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { AdminImageDownloadButton } from './AdminImageDownloadButton';
-
 import { AdminBusinessRegistrationRejectionDialog } from './AdminBusinessRegistrationRejectionDialog';
 import { AdminBusinessRegistrationConfirmationDialog } from './AdminBusinessRegistrationConfirmationDialog';
 

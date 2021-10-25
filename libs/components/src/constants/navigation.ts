@@ -90,4 +90,8 @@ export const adminNavItems: Array<NavItem> = [
     label: '라이브쇼핑관리',
     href: '/live-shopping',
   },
+  {
+    label: '공지사항',
+    href: '/notice',
+  },
 ];

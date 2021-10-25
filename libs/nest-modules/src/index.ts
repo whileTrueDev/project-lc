@@ -20,3 +20,5 @@ export * from './lib/broadcaster/broadcaster.service';
 export * from './lib/s3/s3.module';
 export * from './lib/s3/s3.service';
 export * from './lib/live-shopping/live-shopping.module';
+export * from './lib/notice/notice.module';
+export * from './lib/notice/notice.service';

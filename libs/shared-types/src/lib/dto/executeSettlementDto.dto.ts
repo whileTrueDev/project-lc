@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
-import { FmSettlementTarget } from '@project-lc/shared-types';
 import { IsEmail, IsIn, IsString } from 'class-validator';
+import { FmSettlementTarget } from '../..';
 
-class FmSettlementTargetClass implements FmSettlementTarget {
+class FmSettlementTargetClass {
   account_date: Date;
   buy_confirm: FmSettlementTarget['buy_confirm'];
   complete_date: FmSettlementTarget['complete_date'];

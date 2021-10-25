@@ -11,6 +11,7 @@ import {
   AdminModule,
   ShippingGroupModule,
   LiveShoppingModule,
+  NoticeModule,
 } from '@project-lc/nest-modules';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -31,6 +32,7 @@ import { validationSchema } from '../settings/config.validation';
     AdminModule,
     ShippingGroupModule,
     LiveShoppingModule,
+    NoticeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

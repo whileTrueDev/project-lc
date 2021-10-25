@@ -1,11 +1,11 @@
+import { LiveShopppingProgressType } from '@prisma/client';
 import {
-  IsString,
-  IsIn,
-  IsOptional,
-  IsNumber,
   IsDate,
-  ValidateIf,
   IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateIf,
 } from 'class-validator';
 
 export class LiveShoppingDTO {
@@ -33,8 +33,7 @@ export class LiveShoppingDTO {
   requests: string;
 
   @IsString()
-  @IsIn(['registered', 'adjust', 'confirm', 'cancel'])
-  progress: string;
+  progress: LiveShopppingProgressType;
 
   @IsOptional()
   @IsDate()
