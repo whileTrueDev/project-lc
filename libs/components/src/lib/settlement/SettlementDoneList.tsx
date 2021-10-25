@@ -56,9 +56,9 @@ export function SettlementDoneList(): JSX.Element | null {
             <Td>{history.exportId}</Td>
             <Td>{history.exportCode}</Td>
             <Td>{history.totalEa}</Td>
-            <Td>{history.totalPrice}</Td>
-            <Td>{history.totalCommission}</Td>
-            <Td>{history.totalAmount}</Td>
+            <Td>{history.totalPrice.toLocaleString()}</Td>
+            <Td>{history.totalCommission.toLocaleString()}</Td>
+            <Td>{history.totalAmount.toLocaleString()}</Td>
             <Td>
               <Button
                 size="xs"
