@@ -1,8 +1,11 @@
-import { IsIn } from 'class-validator';
-import { returnStatusNames } from '@project-lc/shared-types';
-import { FmOrderStatus } from '../constants/fmOrderStatuses';
+import { IsString, IsIn } from 'class-validator';
+import { FmOrderReturnBase } from '../res-types/fmOrder.res';
+import { returnStatusNames } from '../constants/fmOrderReturnStatuses';
 
 export class ChangeReturnStatusDto {
+  @IsString()
+  return_code: string;
+
   @IsIn(returnStatusNames)
-  status: FmOrderStatus['name'];
+  status: FmOrderReturnBase['status'];
 }

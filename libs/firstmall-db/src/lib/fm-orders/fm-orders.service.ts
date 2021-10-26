@@ -19,6 +19,7 @@ import {
   FmOrderStatusNumString,
   OrderStatsRes,
   LiveShoppingWithSalesAndFmId,
+  ChangeReturnStatusDto,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
@@ -735,7 +736,7 @@ export class FmOrdersService {
     };
   }
 
-  public async changeReturnStatus(dto: any): Promise<boolean> {
+  public async changeReturnStatus(dto: ChangeReturnStatusDto): Promise<boolean> {
     const returnStatusSql = `
       UPDATE
         fm_order_return
@@ -744,7 +745,7 @@ export class FmOrdersService {
       WHERE
         fm_order_return.return_code = ?
     `;
-    await this.db.query(returnStatusSql, [dto.status, dto.returnCode]);
+    await this.db.query(returnStatusSql, [dto.status, dto.return_code]);
 
     return true;
   }

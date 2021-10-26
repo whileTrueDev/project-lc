@@ -1,18 +1,23 @@
 import { AxiosError } from 'axios';
-import { useMutation, UseMutationResult } from 'react-query';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
+import { ChangeReturnStatusDto } from '@project-lc/shared-types';
 import axios from '../../axios';
-
-export interface UpdateStatus {
-  returnCode: string;
-  status: string;
-}
 
 export const useUpdateReturnStatusMutation = (): UseMutationResult<
   boolean,
   AxiosError,
-  UpdateStatus
+  ChangeReturnStatusDto
 > => {
-  return useMutation((dto: UpdateStatus) =>
-    axios.patch('/fm-orders/return-status', dto).then((res) => res.data),
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (dto: ChangeReturnStatusDto) => {
+      return axios.patch('/fm-orders/return-status', dto);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('FmOrder', { refetchInactive: true });
+      },
+    },
   );
 };

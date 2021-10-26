@@ -26,6 +26,7 @@ import {
   OrderStats,
   OrderStatsRes,
   SalesStats,
+  ChangeReturnStatusDto,
 } from '@project-lc/shared-types';
 
 import { FmOrdersService } from './fm-orders.service';
@@ -55,7 +56,9 @@ export class FmOrdersController {
   }
 
   @Patch('/return-status')
-  async changeReturnStatus(@Body(ValidationPipe) dto: any): Promise<boolean> {
+  async changeReturnStatus(
+    @Body(ValidationPipe) dto: ChangeReturnStatusDto,
+  ): Promise<boolean> {
     return this.fmOrdersService.changeReturnStatus(dto);
   }
 
