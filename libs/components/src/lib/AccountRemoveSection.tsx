@@ -9,7 +9,7 @@ export function AccountRemoveSection(): JSX.Element {
 
   return (
     <SettingSectionLayout title="회원 탈퇴">
-      <Text>탈퇴하시면 더 이상 project-lc에 로그인 할 수 없습니다.</Text>
+      <Text>탈퇴하시면 더 이상 크크쇼에 로그인 할 수 없습니다.</Text>
 
       <Button width="200px" onClick={onOpen}>
         회원 탈퇴

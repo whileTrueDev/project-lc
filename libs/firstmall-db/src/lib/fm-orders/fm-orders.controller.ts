@@ -43,7 +43,7 @@ export class FmOrdersController {
     @SellerInfo() seller: UserPayload,
     @Query(ValidationPipe) dto: FindFmOrdersDto,
   ): Promise<FindFmOrderRes[]> {
-    let gids: number[] | undefined; // project-lc 상품 고유 번호
+    let gids: number[] | undefined; // 크크쇼 상품 고유 번호
     if (dto.goodsIds && dto.goodsIds.length > 0) {
       gids = dto.goodsIds.map((x) => Number(x));
     }
@@ -70,7 +70,7 @@ export class FmOrdersController {
   async findAdminOrders(
     @Query(ValidationPipe) dto: FindFmOrdersDto,
   ): Promise<FindFmOrderRes[]> {
-    let gids: number[] | undefined; // project-lc 상품 고유 번호
+    let gids: number[] | undefined; // 크크쇼 상품 고유 번호
     if (dto.goodsIds && dto.goodsIds.length > 0) {
       gids = dto.goodsIds.map((x) => Number(x));
     }
