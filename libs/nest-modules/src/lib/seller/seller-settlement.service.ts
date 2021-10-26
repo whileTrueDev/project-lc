@@ -246,8 +246,8 @@ export class SellerSettlementService {
         recipient: target.recipient_user_name,
         paymentMethod: target.payment,
         pg: target.pg,
-        pgCommission: 0,
-        pgCommissionRate: 0,
+        pgCommission: 0, // TODO 향후 추가필요
+        pgCommissionRate: 0, // TODO 향후 추가필요
         sellerEmail: target.options[0].seller.email,
         settlementItems: {
           create: target.options.map((opt) => {

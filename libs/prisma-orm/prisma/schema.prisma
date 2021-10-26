@@ -166,7 +166,7 @@ model SellerContacts {
 
 // ****************************
 // * firstmall과 동일한 상품 정보 (컬럼명도 동일하게 ��져갑니다.)
-// �����품 - fm_goods
+// 상품 - fm_goods
 model Goods {
   id                      Int                @id @default(autoincrement())
   sellerId                Int
@@ -545,7 +545,7 @@ model LiveShoppingVideo {
   LiveShopping LiveShopping[]
 }
 
-// ���매 수수료
+// 판매 수수료
 model SellCommission {
   id                Int     @id @default(autoincrement())
   commissionRate    Decimal @default("5.00") @db.Decimal(10, 2) // 판매 수수료 퍼센티지 (0%~100% 사이값)
@@ -561,4 +561,21 @@ model Notice {
   url         String // 공지사항 글의 notion URL
   postingFlag Boolean  @default(false) // 공지사항 글 게시여부
   postingDate DateTime @default(now()) // 공지사항 글 게시시간
+}
+
+// 전자 결제 수수료 정보 (퍼스트몰의 fm_account_payment_fee와 유사함, 와일트루 정책에 따르기위해 따로 구현)
+model SellerPaymentCommission {
+  id             Int                   @id @default(autoincrement())
+  type           String // 수수료종류 pg, shop, npg, npay, kakaopay, toss, ...
+  payment        String // 결제수단 bank, card, account, virtual, cellphone, escrow_account, escrow_virtual, point, ...
+  paymentName    String // 결제수단 이름
+  commissionRate Decimal               @db.Decimal(10, 2) // 수수료율
+  commissionUnit PaymentCommissionUnit @default(P)
+  min            Int? // 최소 수수료
+  max            Int? // 최대수수료
+}
+
+enum PaymentCommissionUnit {
+  P // 퍼센트
+  W // 원
 }
