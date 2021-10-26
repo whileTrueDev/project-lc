@@ -161,9 +161,11 @@ export function SettlementDoneList(): JSX.Element | null {
                   <GridItem>
                     <Box>
                       {i.goods_name}
-                      <Text fontSize="sm">
-                        {i.option_title} : {i.option1}
-                      </Text>
+                      {i.option_title && i.option1 && (
+                        <Text fontSize="sm">
+                          {i.option_title} : {i.option1}
+                        </Text>
+                      )}
                     </Box>
                   </GridItem>
 

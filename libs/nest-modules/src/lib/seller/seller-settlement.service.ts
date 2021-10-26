@@ -265,19 +265,27 @@ export class SellerSettlementService {
               ea: opt.ea,
               price: Number(opt.price) * opt.ea,
               pricePerPiece: Number(opt.price),
-              liveShoppingId: liveShopping?.id || null,
-              whiletrueCommissionRate: liveShopping?.whiletrueCommissionRate || 0,
-              broadcasterCommissionRate: liveShopping?.broadcasterCommissionRate || 0,
-              whiletrueCommission: Math.floor(
-                0.01 *
-                  Number(liveShopping?.whiletrueCommissionRate) *
-                  (Number(opt.price) * opt.ea),
-              ),
-              broadcasterCommission: Math.floor(
-                0.01 *
-                  Number(liveShopping?.broadcasterCommissionRate) *
-                  (Number(opt.price) * opt.ea),
-              ),
+              liveShoppingId: liveShopping ? liveShopping?.id : null,
+              whiletrueCommissionRate: liveShopping
+                ? liveShopping?.whiletrueCommissionRate
+                : 0,
+              broadcasterCommissionRate: liveShopping
+                ? liveShopping?.broadcasterCommissionRate
+                : 0,
+              whiletrueCommission: liveShopping
+                ? Math.floor(
+                    0.01 *
+                      Number(liveShopping?.whiletrueCommissionRate) *
+                      (Number(opt.price) * opt.ea),
+                  )
+                : Number(opt.price) * opt.ea * Number(sellCommission.commissionDecimal),
+              broadcasterCommission: liveShopping
+                ? Math.floor(
+                    0.01 *
+                      Number(liveShopping?.broadcasterCommissionRate) *
+                      (Number(opt.price) * opt.ea),
+                  )
+                : 0,
             };
           }),
         },
