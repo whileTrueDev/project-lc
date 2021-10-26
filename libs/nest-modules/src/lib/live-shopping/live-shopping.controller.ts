@@ -28,12 +28,12 @@ export class LiveShoppingController {
     private readonly liveShoppingService: LiveShoppingService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
-  @Get('/')
+  @Get()
   getLiveShoppings(
+    @SellerInfo() seller: UserPayload,
     @Query(ValidationPipe) dto?: LiveShoppingParamsDto,
   ): Promise<LiveShoppingWithConfirmation[]> {
-    return this.liveShoppingService.getRegisteredLiveShoppings(dto);
+    return this.liveShoppingService.getRegisteredLiveShoppings(seller.sub, dto);
   }
 
   /** 상품 등록 */
@@ -42,8 +42,7 @@ export class LiveShoppingController {
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: LiveShoppingRegistDTO,
   ): Promise<{ liveShoppingId: number }> {
-    const email = seller.sub;
-    return this.liveShoppingService.createLiveShopping(email, dto);
+    return this.liveShoppingService.createLiveShopping(seller.sub, dto);
   }
 
   @Delete()

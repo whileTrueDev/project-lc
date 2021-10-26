@@ -94,9 +94,11 @@ export class FmOrdersController {
   }
 
   @Get('/per-live-shopping')
-  async findSalesPerLiveShopping(): Promise<{ id: number; sales: string }[]> {
+  async findSalesPerLiveShopping(
+    @SellerInfo() seller: UserPayload,
+  ): Promise<{ id: number; sales: string }[]> {
     let liveShoppingList = await this.liveShoppingService
-      .getRegisteredLiveShoppings({})
+      .getRegisteredLiveShoppings(seller.sub, {})
       .then((result) => {
         return result.map((val) => {
           if (val.sellStartDate && val.sellEndDate) {
