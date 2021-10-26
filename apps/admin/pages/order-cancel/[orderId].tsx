@@ -21,6 +21,7 @@ import {
 import { ChevronLeftIcon, ExternalLinkIcon } from '@chakra-ui/icons';
 import dayjs from 'dayjs';
 import React from 'react';
+import { SellerOrderCancelRequestStatus } from '@prisma/client';
 
 export function OrderCancelRequestDetail(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -40,7 +41,6 @@ export function OrderCancelRequestDetail(): JSX.Element {
     try {
       changeDoneFlag.mutateAsync({
         requestId: orderCancelRequest.data.id,
-        doneFlag: true,
       });
       toast({
         title: '처리 완료',
@@ -94,7 +94,7 @@ export function OrderCancelRequestDetail(): JSX.Element {
             <ExternalLinkIcon mr={1} />
             퍼스트몰 주문정보 보러가기
           </Link>
-          {!orderCancelRequest.data.doneFlag && (
+          {orderCancelRequest.data.status !== SellerOrderCancelRequestStatus.done && (
             <Button onClick={onOpen}>해당 결제취소요청 처리 완료하기</Button>
           )}
         </Box>

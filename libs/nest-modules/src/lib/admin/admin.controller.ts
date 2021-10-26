@@ -169,8 +169,7 @@ export class AdminController {
   @Put('/order-cancel/:requestId')
   setOrderCancelRequestDone(
     @Param('requestId', ParseIntPipe) requestId: number,
-    @Body('doneFlag', ParseBoolPipe) doneFlag: boolean,
   ): Promise<boolean> {
-    return this.orderCancelService.setOrderCancelRequestDone(requestId, doneFlag);
+    return this.orderCancelService.setOrderCancelRequestDone(requestId);
   }
 }

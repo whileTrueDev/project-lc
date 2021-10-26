@@ -33,7 +33,7 @@ export const useSellerOrderCancelMutation = (): UseMutationResult<
   );
 };
 
-export type OrderCancelDoneFlagMutationDto = { requestId: number; doneFlag: boolean };
+export type OrderCancelDoneFlagMutationDto = { requestId: number };
 /** 결제취소 요청 상태 변경 뮤테이션 */
 export const useSellerOrderCancelDoneFlagMutation = (): UseMutationResult<
   boolean,
@@ -43,11 +43,9 @@ export const useSellerOrderCancelDoneFlagMutation = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation<boolean, AxiosError, OrderCancelDoneFlagMutationDto>(
     (dto: OrderCancelDoneFlagMutationDto) =>
-      axios
-        .put<boolean>(`/admin/order-cancel/${dto.requestId}`, { doneFlag: dto.doneFlag })
-        .then((res) => res.data),
+      axios.put<boolean>(`/admin/order-cancel/${dto.requestId}`).then((res) => res.data),
     {
-      onSuccess: (data) => {
+      onSuccess: () => {
         queryClient.invalidateQueries('AdminOrderCancelRequest', {
           refetchInactive: true,
         });

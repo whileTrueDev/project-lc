@@ -1,4 +1,4 @@
-import { Spinner } from '@chakra-ui/react';
+import { Spinner, Text } from '@chakra-ui/react';
 import { GridColumns, GridRowParams } from '@material-ui/data-grid';
 import { useAdminOrderCancelRequest } from '@project-lc/hooks';
 import dayjs from 'dayjs';
@@ -47,6 +47,7 @@ export function AdminOrderCancelRequestList(): JSX.Element {
     router.push(`/order-cancel/${param.row?.orderSeq}`);
   };
   if (orderCancelRequest.isLoading) return <Spinner />;
+  if (!orderCancelRequest.data) return <Text>결제취소요청이 존재하지 않습니다</Text>;
   return (
     <ChakraDataGrid
       borderWidth={0}

@@ -7,7 +7,7 @@ import {
 
 export type OrderCancelRequestListItem = Pick<
   SellerOrderCancelRequest,
-  'id' | 'reason' | 'orderSeq' | 'createDate'
+  'id' | 'reason' | 'orderSeq' | 'createDate' | 'status'
 > & {
   seller: Pick<Seller, 'email' | 'id'>;
 };

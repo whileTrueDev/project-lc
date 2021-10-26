@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SellerOrderCancelRequest } from '@prisma/client';
+import { SellerOrderCancelRequest, SellerOrderCancelRequestStatus } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   OrderCancelRequestDetailRes,
@@ -31,7 +31,7 @@ export class OrderCancelService {
       const updatedData = await this.prisma.sellerOrderCancelRequest.update({
         where: { id },
         data: {
-          doneFlag: false,
+          status: SellerOrderCancelRequestStatus.waiting,
           reason,
           orderCancelItems: {
             update: existCancelRequestItems.map((existItem) => {
@@ -50,7 +50,7 @@ export class OrderCancelService {
     const data = await this.prisma.sellerOrderCancelRequest.create({
       data: {
         seller: { connect: { email: sellerEmail } },
-        doneFlag: false,
+        status: SellerOrderCancelRequestStatus.waiting,
         orderSeq,
         reason,
         orderCancelItems: {
@@ -70,7 +70,11 @@ export class OrderCancelService {
     orderSeq: string;
   }): Promise<SellerOrderCancelRequest> {
     const data = await this.prisma.sellerOrderCancelRequest.findFirst({
-      where: { seller: { email: sellerEmail }, orderSeq, doneFlag: false },
+      where: {
+        seller: { email: sellerEmail },
+        orderSeq,
+        status: SellerOrderCancelRequestStatus.waiting,
+      },
     });
     return data;
   }
@@ -78,13 +82,14 @@ export class OrderCancelService {
   /** 결제취소 요청 목록 조회 */
   public async getAllOrderCancelRequests(): Promise<OrderCancelRequestList> {
     const data = await this.prisma.sellerOrderCancelRequest.findMany({
-      where: { doneFlag: false }, // 처리되지 않은 요청만 조회
+      where: { status: SellerOrderCancelRequestStatus.waiting }, // 처리되지 않은 요청만 조회
       select: {
         id: true,
         seller: { select: { email: true, id: true } },
         reason: true,
         orderSeq: true,
         createDate: true,
+        status: true,
       },
       orderBy: { createDate: 'asc' },
     });
@@ -104,20 +109,17 @@ export class OrderCancelService {
         orderSeq: true,
         createDate: true,
         orderCancelItems: true,
-        doneFlag: true,
+        status: true,
       },
     });
     return data;
   }
 
   /** 특정 주문에 대한 결제취소 요청 상태 변경 */
-  public async setOrderCancelRequestDone(
-    requestId: number,
-    doneFlag: boolean,
-  ): Promise<boolean> {
+  public async setOrderCancelRequestDone(requestId: number): Promise<boolean> {
     await this.prisma.sellerOrderCancelRequest.update({
       where: { id: requestId },
-      data: { doneFlag },
+      data: { status: SellerOrderCancelRequestStatus.done },
     });
 
     return true;
