@@ -18,6 +18,7 @@ import {
   ModalOverlay,
   Text,
   useToast,
+  Stack,
 } from '@chakra-ui/react';
 import { SellerShopInfoDto } from '@project-lc/shared-types';
 import { useProfile, useShopInfoMutation } from '@project-lc/hooks';
@@ -88,12 +89,20 @@ export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
         <ModalCloseButton />
         <ModalBody>
           {!data?.shopName && (
-            <Alert status="error">
-              <AlertIcon />
-              <Text fontSize="sm" fontWeight="bold">
-                상점명이 아직 등록되지 않았습니다.
-              </Text>
-            </Alert>
+            <Stack spacing={2}>
+              <Alert status="error">
+                <AlertIcon />
+                <Text fontSize="sm" fontWeight="bold">
+                  상점명이 아직 등록되지 않았습니다.
+                </Text>
+              </Alert>
+              <Alert status="warning">
+                <AlertIcon />
+                <Text fontSize="sm">
+                  상점명을 등록하지 않은 경우, 상품등록이 반려될 수 있습니다.
+                </Text>
+              </Alert>
+            </Stack>
           )}
           <FormControl isInvalid={!!errors.shopName} m={2} mt={6}>
             <FormLabel fontSize="md">상점명</FormLabel>
