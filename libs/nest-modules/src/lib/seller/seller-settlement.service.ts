@@ -313,6 +313,11 @@ export class SellerSettlementService {
         orderId: options && options.order_seq ? String(options.order_seq) : undefined,
       },
       include: {
+        seller: {
+          include: {
+            sellerShop: true,
+          },
+        },
         settlementItems: {
           include: {
             liveShopping: true,

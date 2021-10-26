@@ -81,7 +81,7 @@ export * from './lib/settlement/SettlementSellCommissionInfo';
 export * from './lib/settlement/SettlementTargetList';
 export * from './lib/SettlementAccountBox';
 export * from './lib/SettlementAccountForm';
-export * from './lib/SettlementListBox';
+export * from './lib/SettlementList';
 export * from './lib/SettlementStateBox';
 export * from './lib/ShippingPolicyForm';
 export * from './lib/ShopInfoShippingGroup';

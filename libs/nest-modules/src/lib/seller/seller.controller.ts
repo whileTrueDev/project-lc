@@ -123,7 +123,7 @@ export class SellerController {
   // 본인의 정산 대상 목록 조회
   @UseGuards(JwtAuthGuard)
   @Get('settlement-history')
-  public async ㅁㄴㅇㄹ(
+  public async findSettlementHistory(
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerSettlements[]> {
     return this.sellerSettlementService.findSettlementHistory(sellerInfo.sub);

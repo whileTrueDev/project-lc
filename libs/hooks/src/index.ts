@@ -56,6 +56,7 @@ export * from './lib/queries/useNotice';
 export * from './lib/queries/useProfile';
 export * from './lib/queries/useSellCommission';
 export * from './lib/queries/useSellerGoodsList';
+export * from './lib/queries/useSettlementHistory';
 export * from './lib/queries/useSettlementInfo';
 export * from './lib/queries/useSettlementTargets';
 export * from './lib/queries/useShippingGroupItem';

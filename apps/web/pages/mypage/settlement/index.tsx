@@ -3,7 +3,7 @@ import {
   SettlementStateBox,
   BusinessRegistrationBox,
   SettlementAccountBox,
-  SettlementListBox,
+  SettlementList,
 } from '@project-lc/components';
 import { useSettlementInfo } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
@@ -50,10 +50,6 @@ export function Index(): JSX.Element {
                 refetch={refetch}
               />
             </GridItem>
-            <GridItem colSpan={[6, 3, 3, 3]} rowSpan={3} alignItems="stretch">
-              {/* 정산 목록 BOX */}
-              <SettlementListBox sellerSettlements={settlementData?.sellerSettlements} />
-            </GridItem>
             <GridItem colSpan={[6, 3, 3, 3]} rowSpan={2} alignItems="stretch">
               {/* 사업자 등록증 BOX */}
               <BusinessRegistrationBox
@@ -65,6 +61,16 @@ export function Index(): JSX.Element {
           <Divider />
         </VStack>
       </Container>
+
+      <Container maxW="7xl" p={[1, 6, 6, 6]}>
+        <Heading mb={4}>정산 내역</Heading>
+
+        <div>회차 목록 불러오기 :: 확인할 년도, 월, 회차 선택</div>
+      </Container>
+      <VStack alignItems="stretch">
+        {/* 정산 목록 BOX */}
+        <SettlementList />
+      </VStack>
     </MypageLayout>
   );
 }
