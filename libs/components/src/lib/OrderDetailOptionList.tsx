@@ -65,11 +65,14 @@ export function OrderDetailOptionListItem({
     <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
       {withBadge && <FmOrderStatusBadge orderStatus={option.step} />}
       {option.title1 && option.option1 && (
-        <Text isTruncated>
-          {option.title1}: {option.option1}
-        </Text>
+        <>
+          <Text isTruncated>
+            {option.title1}: {option.option1}
+          </Text>
+          <TextDotConnector />
+        </>
       )}
-      <TextDotConnector />
+
       <Text isTruncated>{option.ea} 개</Text>
       <TextDotConnector />
       <Text isTruncated>{orderPrice}</Text>
