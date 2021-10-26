@@ -15,6 +15,7 @@ import {
   getEmailDupCheck,
   useMailVerificationMutation,
   useSellerSignupMutation,
+  useLoginMutation,
 } from '@project-lc/hooks';
 import {
   emailCodeRegisterOptions,
@@ -106,6 +107,7 @@ export function SignupForm({
 
   // * 회원가입 핸들러
   const signup = useSellerSignupMutation();
+  const login = useLoginMutation('seller');
   const onSubmit = useCallback(
     async (data: SignUpSellerDto) => {
       const seller = await signup.mutateAsync(data).catch((err) => {
@@ -117,7 +119,12 @@ export function SignupForm({
         });
       });
       if (seller) {
-        router.push('/');
+        // 로그인 과정이 수행
+        await login.mutateAsync({
+          email: data.email,
+          password: data.password,
+        });
+        router.push('/mypage');
       }
     },
     [router, setError, signup],

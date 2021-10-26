@@ -3,6 +3,14 @@ import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 
+const linkList: { label: string; href: string }[] = [
+  { label: '정산정보관리', href: '/admin' },
+  { label: '상품검수', href: '/goods' },
+  { label: '공지사항', href: '/notice' },
+  { label: '라이브 쇼핑 관리', href: '/live-shopping' },
+  { label: '결제 취소 요청', href: '/order-cancel' },
+];
+
 export default function AdminNav(): JSX.Element {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
@@ -30,70 +38,24 @@ export default function AdminNav(): JSX.Element {
         justify="space-between"
       >
         <Flex display={{ base: 'none', md: 'flex' }} ml={4}>
-          <Box key="정산정보관리">
-            <NextLink href={'/admin' ?? '#'} passHref>
-              <Link
-                p={2}
-                fontSize="sm"
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                정산정보관리
-              </Link>
-            </NextLink>
-          </Box>
-          <Box key="상품검수">
-            <NextLink href={'/goods' ?? '#'} passHref>
-              <Link
-                p={2}
-                fontSize="sm"
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                상품검수
-              </Link>
-            </NextLink>
-          </Box>
-          <Box key="공지사항">
-            <NextLink href={'/notice' ?? '#'} passHref>
-              <Link
-                p={2}
-                fontSize="sm"
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                공지사항
-              </Link>
-            </NextLink>
-          </Box>
-          <Box key="라이브쇼핑관리">
-            <NextLink href={'/live-shopping' ?? '#'} passHref>
-              <Link
-                p={2}
-                fontSize="sm"
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                라이브 쇼핑 관리
-              </Link>
-            </NextLink>
-          </Box>
+          {linkList.map((link) => (
+            <Box key={link.label}>
+              <NextLink href={link.href ?? '#'} passHref>
+                <Link
+                  p={2}
+                  fontSize="sm"
+                  fontWeight={500}
+                  color={linkColor}
+                  _hover={{
+                    textDecoration: 'none',
+                    color: linkHoverColor,
+                  }}
+                >
+                  {link.label}
+                </Link>
+              </NextLink>
+            </Box>
+          ))}
         </Flex>
         <>
           {isLoggedIn && (

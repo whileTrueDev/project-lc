@@ -24,6 +24,7 @@ model Seller {
   shippingGroups             ShippingGroup[]
   SellerContacts             SellerContacts[]
   LiveShopping               LiveShopping[]
+  OrderCancelRequests        SellerOrderCancelRequest[] // 판매자의 주문취소요청
 }
 
 // 마케터의 상정정보
@@ -155,7 +156,7 @@ model Goods {
   image                   GoodsImages[] // 상품 이미지 - fm_goods_image
   goods_view              GoodsView          @default(look) // 노출
   regist_date             DateTime           @default(now()) // 상품등록일 (project-lc 에 판매자가 등록한 날짜)
-  update_date             DateTime           @default(now()) @updatedAt // 수정일 (퍼스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서수정한날짜)
+  update_date             DateTime           @default(now()) @updatedAt // 수정일 (�����스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서수정한날짜)
   runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
@@ -506,4 +507,34 @@ model Notice {
   url         String // 공지사항 글의 notion URL
   postingFlag Boolean  @default(false) // 공지사항 글 게시여부
   postingDate DateTime @default(now()) // 공지사항 글 게시시간
+}
+
+// 판매자의 주문취소(결제취소)요청 테이블
+model SellerOrderCancelRequest {
+  id               Int                            @id @default(autoincrement())
+  seller           Seller                         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId         Int
+  reason           String                         @db.VarChar(255) // 판매자의 주문취소사유
+  orderSeq         String // 주문번호 fm_order.order_seq  bigInt로 지정하니 오류가 나서 string으로 저장
+  status           SellerOrderCancelRequestStatus @default(waiting) // 관리자 처리 여부 기본: waiting, 처리 후 done
+  createDate       DateTime                       @default(now())
+  orderCancelItems SellerOrderCancelRequestItem[]
+
+  @@index(orderSeq)
+}
+
+// 판매자의 주문취소(결제취소)요청 처리상태 (나중에 다른 상태가 생길 가능성을 고려하여 enum으로 둠)
+enum SellerOrderCancelRequestStatus {
+  waiting
+  confirmed
+}
+
+// 판매자의 주문취소(결제취소)요청 상품 테이블
+model SellerOrderCancelRequestItem {
+  id                       Int                      @id @default(autoincrement())
+  orderItemSeq             Int // 주문상품번호 fm_order_item.item_seq
+  orderItemOptionSeq       Int // 주문상품옵션번호 fm_order_item_option.item_option_seq
+  amount                   Int // 취소할 주문상품옵션의 개수
+  sellerOrderCancelRequest SellerOrderCancelRequest @relation(fields: [orderSeq], references: [id], onDelete: Cascade)
+  orderSeq                 Int
 }

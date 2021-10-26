@@ -322,9 +322,12 @@ export function LiveShoppingList(): JSX.Element {
                 </Stack>
                 <Stack>
                   <Text>요청사항</Text>
-                  <Textarea resize="none" rows={10} readOnly>
-                    {data[liveShoppingId].requests}
-                  </Textarea>
+                  <Textarea
+                    resize="none"
+                    rows={10}
+                    value={data[liveShoppingId].requests || ''}
+                    readOnly
+                  />
                 </Stack>
               </Stack>
             </ModalBody>

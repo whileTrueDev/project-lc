@@ -54,6 +54,18 @@ export class FmOrdersController {
     return this.fmOrdersService.findOrders(ids, dto);
   }
 
+  /** 관리자페이지 결제취소요청에서 개별 주문 조회 */
+  @UseGuards(AdminGuard)
+  @Get('/admin/:orderId')
+  async findAdminOneOrder(
+    @Param('orderId') orderId: string,
+    @Query('sellerEmail') sellerEmail: string,
+  ): Promise<FindFmOrderDetailRes | null> {
+    // 판매자의 승인된 상품 ID 목록 조회
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(sellerEmail);
+    return this.fmOrdersService.findOneOrder(orderId, ids);
+  }
+
   @UseGuards(AdminGuard)
   @Get('/admin')
   async findAdminOrders(
