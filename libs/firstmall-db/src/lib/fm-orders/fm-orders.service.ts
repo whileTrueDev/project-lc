@@ -360,7 +360,6 @@ export class FmOrdersService {
       fm_order_item_option.step85,
       fm_order_item_option.member_sale,
       fm_order_item_option.mobile_sale,
-      fm_order_item_option.color,
       fm_order_item_option.price,
       fm_order_item_option.ori_price
     FROM fm_order_item_option
@@ -394,7 +393,7 @@ export class FmOrdersService {
     const exportItemsSql = `
     SELECT 
       goods_name, image,
-      item_option_seq, title1, option1, color, fm_goods_export_item.ea, price, step
+      item_option_seq, title1, option1, fm_goods_export_item.ea, price, step
     FROM fm_order_item_option
       JOIN fm_order_item USING(item_seq)
     JOIN fm_goods_export_item ON item_option_seq = option_seq
@@ -457,7 +456,6 @@ export class FmOrdersService {
             fm_order_item_option.step,
             fm_order_item_option.member_sale,
             fm_order_item_option.mobile_sale,
-            fm_order_item_option.color,
             fm_order_item_option.price,
             fm_order_item_option.ori_price
           FROM fm_order_refund_item
@@ -526,7 +524,6 @@ export class FmOrdersService {
             fm_order_item_option.step,
             fm_order_item_option.member_sale,
             fm_order_item_option.mobile_sale,
-            fm_order_item_option.color,
             fm_order_item_option.price,
             fm_order_item_option.ori_price
           FROM fm_order_return_item
