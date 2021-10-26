@@ -8,7 +8,7 @@ export const LIVE_SHOPPING_PROGRESS: Record<string, LiveShopppingProgressType> =
   취소됨: 'canceled',
 };
 
-function getTimeValue(date: Date | undefined): number | null {
+function getTimeValue(date: Date | string | null | undefined): number | null {
   return date ? new Date(date).valueOf() : null;
 }
 
@@ -16,7 +16,7 @@ export interface LiveShoppingProgressParams {
   progress: LiveShopppingProgressType;
   broadcastStartDate?: Date | null;
   broadcastEndDate?: Date | null;
-  sellEndDate?: Date | null;
+  sellEndDate?: string | Date | undefined | null;
 }
 
 /**

@@ -18,6 +18,7 @@ import {
   FmOrderShipping,
   FmOrderStatusNumString,
   OrderStatsRes,
+  LiveShoppingWithSalesAndFmId,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
@@ -746,5 +747,39 @@ export class FmOrdersService {
     await this.db.query(returnStatusSql, [dto.status, dto.returnCode]);
 
     return true;
+  }
+
+  public async getOrdersStatsDuringLiveShoppingSales(
+    dto: LiveShoppingWithSalesAndFmId[],
+  ): Promise<{ id: number; sales: string }[]> {
+    const salesPrice = [];
+
+    const sql = `
+    SELECT
+      SUM(fm_order.payment_price) as sales
+    FROM fm_order
+    JOIN fm_order_item USING(order_seq)
+    WHERE fm_order_item.goods_seq IN (?)
+    AND
+    DATE(regist_date) BETWEEN ? AND ?;
+    `;
+
+    await Promise.all(
+      dto.map(async (val) => {
+        const sellStartDate = dayjs(val.sellStartDate).format('YYYY-MM-DD HH:mm:ss');
+        const sellEndDate = dayjs(val.sellEndDate).format('YYYY-MM-DD HH:mm:ss');
+        const salesSum = await this.db.query(sql, [
+          val.firstmallGoodsConnectionId,
+          new Date(sellStartDate),
+          new Date(sellEndDate),
+        ]);
+        salesPrice.push({
+          id: val.id,
+          sales: salesSum[0].sales ? Number(salesSum[0].sales).toFixed() : null,
+        });
+      }),
+    );
+
+    return salesPrice;
   }
 }
