@@ -7,6 +7,7 @@ import {
   IsString,
   ValidateIf,
 } from 'class-validator';
+import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
 
 export class LiveShoppingDTO {
   @IsNumber()
@@ -62,12 +63,12 @@ export class LiveShoppingDTO {
   @IsDate()
   createDate: string;
 
-  @ValidateIf((o) => o.progress === 'confirm')
+  @ValidateIf((o) => o.progress === LIVE_SHOPPING_PROGRESS.확정됨)
   @IsNumber()
   @IsNotEmpty()
   whiletrueCommissionRate?: string;
 
-  @ValidateIf((o) => o.progress === 'confirm')
+  @ValidateIf((o) => o.progress === LIVE_SHOPPING_PROGRESS.확정됨)
   @IsNumber()
   @IsNotEmpty()
   broadcasterCommissionRate?: string;
