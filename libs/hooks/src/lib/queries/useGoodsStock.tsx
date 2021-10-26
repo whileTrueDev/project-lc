@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
-// project-lc Goods db 재고 조회
+// 크크쇼 Goods db 재고 조회
 export const getGoodsStock = async (id: number): Promise<GoodsOptionWithStockInfo[]> => {
   return axios
     .get<GoodsOptionWithStockInfo[]>('/goods/stock', { params: { id } })
