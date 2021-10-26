@@ -54,7 +54,7 @@ export function OrderDetailOptionListItem({
   option,
   withBadge = true,
 }: {
-  option: Pick<FmOrderOption, 'ea' | 'price' | 'option1' | 'title1' | 'color' | 'step'>;
+  option: Pick<FmOrderOption, 'ea' | 'price' | 'option1' | 'title1' | 'step'>;
   withBadge?: boolean;
 }): JSX.Element {
   const orderPrice = useMemo(() => {
@@ -68,9 +68,6 @@ export function OrderDetailOptionListItem({
         <Text isTruncated>
           {option.title1}: {option.option1}
         </Text>
-      )}
-      {option.color && (
-        <Box w={4} h={4} bgColor={option.color} border="1px solid black" />
       )}
       <TextDotConnector />
       <Text isTruncated>{option.ea} 개</Text>

@@ -34,15 +34,6 @@ export function GoodsDetailOptionsInfo({
                   <Text fontSize="lg" fontWeight="bold">
                     {option.option_title}: {option.option1}
                   </Text>
-                  {option.color ? (
-                    <Box
-                      ml={1}
-                      w="16px"
-                      h="16px"
-                      bgColor={option.color}
-                      border="1px solid gray"
-                    />
-                  ) : null}
                 </Flex>
               )}
               <SimpleGrid mt={2} columns={{ base: 2, sm: 3 }}>
@@ -111,12 +102,7 @@ export function GoodsDetailOptionsInfo({
                   </Td>
                   <Td borderBottom="none">{option.option_title}</Td>
                   <Td borderBottom="none">
-                    <Flex alignItems="center">
-                      {option.option1}
-                      {option.color ? (
-                        <Box ml={1} bgColor={option.color} w="12px" h="12px" />
-                      ) : null}
-                    </Flex>
+                    <Flex alignItems="center">{option.option1}</Flex>
                   </Td>
                   <Td borderBottom="none">
                     {Number(option.consumer_price).toLocaleString()}
