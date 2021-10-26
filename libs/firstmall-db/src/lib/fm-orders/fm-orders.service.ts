@@ -61,7 +61,7 @@ export class FmOrdersService {
         // 판매자 상품에 기반한 주문 상태 도출
         const realStep = orderGoodsOptions.reduce((prev, cur) => {
           if (!prev) return cur.step;
-          if (Number(prev) > Number(cur.step)) return cur.step;
+          if (Number(prev) < Number(cur.step)) return cur.step;
           return prev;
         }, order.step);
 
@@ -236,7 +236,7 @@ export class FmOrdersService {
     // * 판매자 상품에 기반한 주문 상태 도출
     const realStep = orderGoodsOptions.reduce((prev, cur) => {
       if (!prev) return cur.step;
-      if (Number(prev) > Number(cur.step)) return cur.step;
+      if (Number(prev) < Number(cur.step)) return cur.step;
       return prev;
     }, orderInfo.step);
 
