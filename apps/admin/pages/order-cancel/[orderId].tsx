@@ -104,7 +104,9 @@ export function OrderCancelRequestDetail(): JSX.Element {
             판매자
           </Text>
           <Text>이메일 : {orderCancelRequest.data.seller.email}</Text>
-          <Text>상점명 : {orderCancelRequest.data.seller.sellerShop.shopName}</Text>
+          <Text>
+            상점명 : {orderCancelRequest.data.seller?.sellerShop?.shopName || ''}
+          </Text>
         </Box>
 
         <Box>
