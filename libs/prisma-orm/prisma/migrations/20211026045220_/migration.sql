@@ -6,4 +6,4 @@
 */
 -- AlterTable
 ALTER TABLE `SellerOrderCancelRequest` DROP COLUMN `doneFlag`,
-    ADD COLUMN `status` ENUM('waiting', 'done') NOT NULL DEFAULT 'waiting';
+    ADD COLUMN `status` ENUM('waiting', 'confirmed') NOT NULL DEFAULT 'waiting';

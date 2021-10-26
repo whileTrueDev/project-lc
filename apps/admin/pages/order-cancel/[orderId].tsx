@@ -94,7 +94,8 @@ export function OrderCancelRequestDetail(): JSX.Element {
             <ExternalLinkIcon mr={1} />
             퍼스트몰 주문정보 보러가기
           </Link>
-          {orderCancelRequest.data.status !== SellerOrderCancelRequestStatus.done && (
+          {orderCancelRequest.data.status !==
+            SellerOrderCancelRequestStatus.confirmed && (
             <Button onClick={onOpen}>해당 결제취소요청 처리 완료하기</Button>
           )}
         </Box>

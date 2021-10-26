@@ -119,7 +119,7 @@ export class OrderCancelService {
   public async setOrderCancelRequestDone(requestId: number): Promise<boolean> {
     await this.prisma.sellerOrderCancelRequest.update({
       where: { id: requestId },
-      data: { status: SellerOrderCancelRequestStatus.done },
+      data: { status: SellerOrderCancelRequestStatus.confirmed },
     });
 
     return true;

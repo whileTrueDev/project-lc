@@ -117,7 +117,7 @@ export function OrderDetail(): JSX.Element {
 
         {/* 결제취소요청 했을 경우 알림창 */}
         {orderCancel.data &&
-          orderCancel.data.status === SellerOrderCancelRequestStatus.done && (
+          orderCancel.data.status !== SellerOrderCancelRequestStatus.confirmed && (
             <OrderCancelRequestExistAlert data={orderCancel.data} />
           )}
 
