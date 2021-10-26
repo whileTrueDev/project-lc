@@ -17,12 +17,12 @@ import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { OrderCancelService } from './order-cancel.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('order-cancel')
 export class OrderCancelController {
   constructor(private readonly orderCancelService: OrderCancelService) {}
 
   /** 판매자 주문취소 요청 생성 */
-  @UseGuards(JwtAuthGuard)
   @Post()
   createOrderCancelRequest(
     @SellerInfo() seller: UserPayload,
@@ -35,7 +35,6 @@ export class OrderCancelController {
   }
 
   /** 판매자 주문취소 요청 조회 */
-  @UseGuards(JwtAuthGuard)
   @Get('/:orderSeq')
   findOneOrderCancelRequst(
     @Param('orderSeq') orderSeq: string,
