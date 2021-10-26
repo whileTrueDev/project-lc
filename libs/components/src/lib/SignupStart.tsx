@@ -23,7 +23,7 @@ export function SignupStart({
     <CenterBox
       enableShadow
       header={{
-        title: '[라이브커머스] 시작하기',
+        title: '[크크쇼] 시작하기',
         desc: '',
       }}
     >
