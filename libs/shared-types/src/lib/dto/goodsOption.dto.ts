@@ -32,10 +32,6 @@ export class GoodsOptionDto {
   price: number;
 
   @IsOptional()
-  @IsString()
-  color?: string;
-
-  @IsOptional()
   @IsNumber()
   weight?: number;
 
