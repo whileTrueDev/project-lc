@@ -32,6 +32,7 @@ export class BroadcasterService {
         afreecaId: true,
         twitchId: true,
         youtubeId: true,
+        channelUrl: true,
       },
     });
   }

@@ -6,6 +6,7 @@ export * from './lib/broadcaster/broadcaster.service';
 export * from './lib/goods/goods.module';
 export * from './lib/goods/goods.service';
 export * from './lib/live-shopping/live-shopping.module';
+export * from './lib/live-shopping/live-shopping.service';
 export * from './lib/notice/notice.module';
 export * from './lib/notice/notice.service';
 export * from './lib/order-cancel/order-cancel.module';

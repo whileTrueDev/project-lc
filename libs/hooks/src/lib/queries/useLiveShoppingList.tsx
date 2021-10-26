@@ -4,7 +4,7 @@ import { useQuery, UseQueryResult } from 'react-query';
 import { BroadcasterDTO } from '@project-lc/shared-types';
 import axios from '../../axios';
 
-export interface LiveShoppingWithGoods extends LiveShopping {
+interface LiveShoppingWithGoods extends LiveShopping {
   goods: {
     goods_name: string;
     summary: string;
@@ -19,22 +19,22 @@ export interface LiveShoppingWithGoods extends LiveShopping {
   liveShoppingVideo: { youtubeUrl: string };
 }
 
-export const getAdminLiveShoppingList = async (
+export const getLiveShoppingList = async (
   liveShoppingId?: string | null,
 ): Promise<LiveShoppingWithGoods[]> => {
   return axios
-    .get<LiveShoppingWithGoods[]>('/admin/live-shoppings', {
+    .get<LiveShoppingWithGoods[]>('/live-shoppings', {
       params: { liveShoppingId },
     })
     .then((res) => res.data);
 };
 
-export const useAdminLiveShoppingList = (dto: {
+export const useLiveShoppingList = (dto: {
   enabled: boolean;
   id?: string;
 }): UseQueryResult<LiveShoppingWithGoods[], AxiosError> => {
-  const queryKey = ['AdminGoodsList', dto];
+  const queryKey = ['LiveShoppingList', dto];
   return useQuery<LiveShoppingWithGoods[], AxiosError>(queryKey, () =>
-    getAdminLiveShoppingList(dto.id || null),
+    getLiveShoppingList(dto.id || null),
   );
 };

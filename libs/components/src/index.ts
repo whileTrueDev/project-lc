@@ -48,6 +48,7 @@ export * from './lib/GoodsStatusBadge';
 export * from './lib/HorizontalImageGallery';
 export * from './lib/LiveShoppingDatePicker';
 export * from './lib/LiveShoppingDetailTitle';
+export * from './lib/LiveShoppingList';
 export * from './lib/LiveShoppingProgressBadge';
 export * from './lib/LiveShoppingProgressSelector';
 export * from './lib/LiveShoppingRegistForm';
