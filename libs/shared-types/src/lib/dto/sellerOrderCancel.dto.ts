@@ -8,10 +8,10 @@ export class SellerOrderCancelRequestDto {
   reason: string;
 
   @ValidateNested({ each: true })
-  orderCancelItems: sellerOrderCancelRequestItemDto[];
+  orderCancelItems: SellerOrderCancelRequestItemDto[];
 }
 
-export class sellerOrderCancelRequestItemDto {
+export class SellerOrderCancelRequestItemDto {
   @IsNumber()
   amount: number;
 
