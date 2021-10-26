@@ -92,6 +92,7 @@ export * from './lib/LiveShoppingProgressSelector';
 export * from './lib/LiveShoppingDatePicker';
 export * from './lib/MypageOrderStats';
 export * from './lib/BroadcasterName';
+export * from './lib/LiveShoppingList';
 export * from './lib/LiveShoppingProgressBadge';
 export * from './lib/MypageStatsSection';
 export * from './lib/MypageNoticeSection';

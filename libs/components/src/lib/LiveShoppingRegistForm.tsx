@@ -69,7 +69,7 @@ export function LiveShoppingRegist(): JSX.Element {
       status: 'success',
     });
     handleGoodsSelect(null);
-    router.push('/mypage/live/vod');
+    router.push('/mypage/live');
   };
 
   const onFail = (): void => {
