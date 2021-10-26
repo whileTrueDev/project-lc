@@ -156,7 +156,7 @@ model Goods {
   image                   GoodsImages[] // 상품 이미지 - fm_goods_image
   goods_view              GoodsView          @default(look) // 노출
   regist_date             DateTime           @default(now()) // 상품등록일 (project-lc 에 판매자가 등록한 날짜)
-  update_date             DateTime           @default(now()) @updatedAt // 수정일 (�����스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서수정한날짜)
+  update_date             DateTime           @default(now()) @updatedAt // 수정일 (���스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서수정한날짜)
   runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
@@ -191,7 +191,6 @@ model GoodsOptions {
   option_code    String? // 옵션코드
   consumer_price Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
   price          Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
-  color          String?               @db.VarChar(10) // 컬러 hex값
   weight         Float? //옵션 개당 무게 (단위 kg)
   option_view    YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
 
