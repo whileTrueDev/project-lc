@@ -60,9 +60,9 @@ export class FmOrdersService {
         // 판매자 상품에 기반한 주문 상태 도출
         const realStep = orderGoodsOptions.reduce((prev, cur) => {
           if (!prev) return cur.step;
-          if (Number(prev) > Number(cur.step)) return cur.step;
+          if (Number(prev) < Number(cur.step)) return cur.step;
           return prev;
-        }, orderGoodsOptions[0].step);
+        }, order.step);
 
         const totalShippingCost = await this.findOrderTotalShippingCost(
           order.id,
@@ -235,9 +235,9 @@ export class FmOrdersService {
     // * 판매자 상품에 기반한 주문 상태 도출
     const realStep = orderGoodsOptions.reduce((prev, cur) => {
       if (!prev) return cur.step;
-      if (Number(prev) > Number(cur.step)) return cur.step;
+      if (Number(prev) < Number(cur.step)) return cur.step;
       return prev;
-    }, orderGoodsOptions[0].step);
+    }, orderInfo.step);
 
     // * 배송 관련 정보 추가를 위한 정보 조회
     const shippingResult = await this.findOneOrderShippingInfo(
