@@ -69,6 +69,38 @@ CREATE TABLE `SellCommission` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `SellerPaymentCommission` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `type` VARCHAR(191) NOT NULL,
+    `payment` VARCHAR(191) NOT NULL,
+    `paymentName` VARCHAR(191) NOT NULL,
+    `commissionRate` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    `commissionUnit` ENUM('P','W') NOT NULL DEFAULT 'P' COMMENT '수수료 단위(원/비율)',
+    `min` INTEGER,
+    `max` INTEGER,
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Insert defuault values to SellerPaymentCommission
+INSERT INTO `SellerPaymentCommission` (
+    `type`,
+    `payment`,
+    `paymentName`,
+    `commissionRate`,
+    `commissionUnit`,
+    `min`,
+    `max`
+) VALUES
+    ("toss", "card", "토스페이먼츠-카드", 2.42, 'P', 0, 0 ),
+    ("toss", "account", "토스페이먼츠-계좌이체", 1.98, 'P', 220, 0),
+    ("toss", "virtual", "토스페이먼츠-가상계좌", 0, 'W', 330, 0),
+    ("npay", "bojo", "네이버페이 - 보조결제", 3.74, 'P', 0, 0),
+    ("npay", "virtual", "네이버페이 - 가상계좌", 1.00, 'P', 0, 275),
+    ("npay", "card", "네이버페이 - 카드", 2.20, 'P', 0, 0),
+    ("npay", "account", "네이버페이 - 계좌이체", 1.65, 'P', 0, 0),
+    ("npay", "cellphone", "네이버페이 - 휴대폰결제", 3.85, 'P', 0, 0);
+
 -- CreateIndex
 CREATE UNIQUE INDEX `SellerSettlements_exportId_key` ON `SellerSettlements`(`exportId`);
 
