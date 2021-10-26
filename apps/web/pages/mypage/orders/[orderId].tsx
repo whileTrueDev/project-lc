@@ -11,6 +11,7 @@ import {
   useColorModeValue,
   VStack,
 } from '@chakra-ui/react';
+import { SellerOrderCancelRequestStatus } from '@prisma/client';
 import {
   MypageLayout,
   OrderCancelRequestExistAlert,
@@ -115,9 +116,10 @@ export function OrderDetail(): JSX.Element {
         )}
 
         {/* 결제취소요청 했을 경우 알림창 */}
-        {orderCancel.data && !orderCancel.data.doneFlag && (
-          <OrderCancelRequestExistAlert data={orderCancel.data} />
-        )}
+        {orderCancel.data &&
+          orderCancel.data.status === SellerOrderCancelRequestStatus.done && (
+            <OrderCancelRequestExistAlert data={orderCancel.data} />
+          )}
 
         {/* 주문 버튼 */}
         {isMobileSize ? null : (
