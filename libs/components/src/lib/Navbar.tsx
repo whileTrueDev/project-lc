@@ -27,6 +27,7 @@ import { AiTwotoneSetting } from 'react-icons/ai';
 import { mainNavItems, NavItem } from '../constants/navigation';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import ProfileBox from './ProfileBox';
+import KksLogo from './KksLogo';
 
 export function Navbar(): JSX.Element {
   const router = useRouter();
@@ -75,7 +76,7 @@ export function Navbar(): JSX.Element {
                 textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
                 color={useColorModeValue('gray.800', 'white')}
               >
-                크크쇼
+                <KksLogo size="small" />
               </Link>
             </NextLink>
           </Heading>

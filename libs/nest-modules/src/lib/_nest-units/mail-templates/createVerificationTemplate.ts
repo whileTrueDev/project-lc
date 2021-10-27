@@ -2,7 +2,7 @@ export const createVerificationTemplate = (code: string): string => `
 <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
   <div style="display:flex;flex-direction:column;justify-content:center;align-items:center">
 
-    <img src="https://project-lc-dev-test.s3.ap-northeast-2.amazonaws.com/virus-4999857.svg" alt="" />
+    <img src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightModeBig.png" alt="kks-logo" />
 
     <h1 style="padding-top:32px;font-weight:800">이메일 확인 코드 : ${code}</h1>
 
