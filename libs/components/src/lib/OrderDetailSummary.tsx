@@ -52,7 +52,13 @@ export function OrderDetailSummary({ order }: OrderDetailSummaryProps): JSX.Elem
           value: (() => {
             const cost = Number(order.totalShippingCost);
             if (Number.isNaN(cost) || cost === 0) return '무료배송';
-            return `배송비 ${Number(order.totalShippingCost).toLocaleString()}원`;
+            let costFieldName = '배송비';
+            if (order.shippings.length > 1) {
+              costFieldName = '총 배송비';
+            }
+            return `${costFieldName} ${Number(
+              order.totalShippingCost,
+            ).toLocaleString()}원`;
           })(),
         },
       ]}

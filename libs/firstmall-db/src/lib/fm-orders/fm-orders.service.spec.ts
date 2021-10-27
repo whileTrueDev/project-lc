@@ -143,7 +143,7 @@ describe('FmOrdersService', () => {
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
 
     // where 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('AND (step IN (');
+    expect(sql).toContain('AND IF(step IN (40, 50, 60, 70');
 
     // params 길이, 내용 검사
     expect(params.length).toBe(0);
@@ -165,7 +165,7 @@ describe('FmOrdersService', () => {
 
     // where 구문이 올바르게 들어갔는 지 검사
     expect(sql).toContain('AND DATE(regist_date) <= ?');
-    expect(sql).toContain('AND (step IN (');
+    expect(sql).toContain('AND IF(step IN (40, 50, 60, 70');
 
     // params 길이, 내용 검사
     expect(params.length).toBe(1);

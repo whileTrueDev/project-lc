@@ -107,6 +107,7 @@ function ExportOrderShippingListItem({
     if (disableSelection) return true;
     return selectedOrderShippings.includes(shipping.shipping_seq);
   }, [disableSelection, selectedOrderShippings, shipping.shipping_seq]);
+
   // 현재 주문 상품배송 출고가능한 지 체크
   const { isDone, isExportable } = useOrderShippingItemsExportableCheck(shipping);
 
@@ -125,17 +126,8 @@ function ExportOrderShippingListItem({
       setValue(`${orderIndex * 2 + shippingIndex * 3}.orderId`, orderId);
       handleSelect(shipping.shipping_seq);
     }
-  }, [
-    handleSelect,
-    isDone,
-    isExportable,
-    orderId,
-    orderIndex,
-    selectedOrderShippings,
-    setValue,
-    shipping.shipping_seq,
-    shippingIndex,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Box
@@ -409,10 +401,10 @@ export function ExportOrderOptionItem({
 
   // 보낸 수량
   const sendedEa = useMemo(() => {
-    const _calc = option.step55 + option.step65 + option.step75 + option.step85;
+    const _calc = option.step55 + option.step65 + option.step75;
     if (_calc > option.ea) return option.ea;
     return _calc;
-  }, [option.ea, option.step55, option.step65, option.step75, option.step85]);
+  }, [option.ea, option.step55, option.step65, option.step75]);
   // 남은 수량
   const restEa = useMemo(() => {
     const _calc =
@@ -494,7 +486,7 @@ export function ExportOrderOptionItem({
             {...register(`${orderShippingIndex}.exportOptions.${realIndex}.exportEa`, {
               required: {
                 message: '보낼 수량을 입력해주세요.',
-                value: !!selected && sendedEa !== option.ea,
+                value: !!selected && option.step85 + sendedEa !== option.ea,
               },
               min: { value: 0, message: '0보다 작을 수 없습니다.' },
               max: { value: restEa, message: '남은 수량 보다 클 수 없습니다.' },

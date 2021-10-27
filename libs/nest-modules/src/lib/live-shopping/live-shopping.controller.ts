@@ -1,20 +1,20 @@
 import {
-  Controller,
-  Get,
-  UseGuards,
-  Query,
-  Post,
-  ValidationPipe,
   Body,
+  Controller,
   Delete,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
-import { ApprovedGoodsNameAndId, LiveShoppingRegistDTO } from '@project-lc/shared-types';
 import { LiveShopping } from '@prisma/client';
-import { GoodsService } from '../goods/goods.service';
-import { LiveShoppingService } from './live-shopping.service';
-import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
+import { ApprovedGoodsNameAndId, LiveShoppingRegistDTO } from '@project-lc/shared-types';
 import { UserPayload } from '../auth/auth.interface';
+import { GoodsService } from '../goods/goods.service';
+import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
+import { LiveShoppingService } from './live-shopping.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('live-shoppings')
@@ -24,13 +24,12 @@ export class LiveShoppingController {
     private readonly liveShoppingService: LiveShoppingService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   getLiveShoppings(@Query('liveShoppingId') dto?: string): Promise<LiveShopping[]> {
     return this.liveShoppingService.getRegisteredLiveShoppings(dto || null);
   }
 
-  /** 상품 등록 */
+  /** 라이브쇼핑 등록 */
   @Post()
   createLiveShopping(
     @SellerInfo() seller: UserPayload,
