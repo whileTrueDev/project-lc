@@ -278,7 +278,9 @@ export class SellerSettlementService {
                       Number(liveShopping?.whiletrueCommissionRate) *
                       (Number(opt.price) * opt.ea),
                   )
-                : Number(opt.price) * opt.ea * Number(sellCommission.commissionDecimal),
+                : Math.floor(
+                    Number(opt.price) * opt.ea * Number(sellCommission.commissionDecimal),
+                  ),
               broadcasterCommission: liveShopping
                 ? Math.floor(
                     0.01 *
