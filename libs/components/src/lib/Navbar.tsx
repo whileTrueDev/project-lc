@@ -75,7 +75,7 @@ export function Navbar(): JSX.Element {
                 textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
                 color={useColorModeValue('gray.800', 'white')}
               >
-                PROJECT_LC
+                크크쇼
               </Link>
             </NextLink>
           </Heading>

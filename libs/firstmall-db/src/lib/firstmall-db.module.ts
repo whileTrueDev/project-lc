@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { GoodsModule } from '@project-lc/nest-modules';
+import { GoodsModule, LiveShoppingModule } from '@project-lc/nest-modules';
 import { FirstmallDbService } from './firstmall-db.service';
 import { FmExportsController } from './fm-exports/fm-exports.controller';
 import { FmExportsService } from './fm-exports/fm-exports.service';
@@ -11,7 +11,7 @@ import { FmSettlementController } from './fm-settlemenets/fm-settlemenets.contro
 import { FmSettlementService } from './fm-settlemenets/fm-settlements.service';
 
 @Module({
-  imports: [GoodsModule],
+  imports: [GoodsModule, LiveShoppingModule],
   controllers: [
     FmOrdersController,
     FmGoodsController,

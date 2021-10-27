@@ -12,7 +12,7 @@ export const useCreateLiveShoppingMutation = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation(
     async (dto: LiveShoppingRegistDTO) => {
-      return axios.post<LiveShopping>('/live-shopping', dto).then((res) => res.data);
+      return axios.post<LiveShopping>('/live-shoppings', dto).then((res) => res.data);
     },
     {
       onSuccess: () => {

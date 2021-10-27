@@ -18,4 +18,10 @@ export class BroadcasterDTO {
   @IsOptional()
   @IsString()
   youtubeId: string;
+
+  @IsOptional()
+  @IsString()
+  channelUrl: string;
 }
+
+export type BroadcasterDTOWithoutUserId = Omit<BroadcasterDTO, 'userId'>;

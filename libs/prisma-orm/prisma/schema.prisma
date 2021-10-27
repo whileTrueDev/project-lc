@@ -24,6 +24,7 @@ model Seller {
   shippingGroups             ShippingGroup[]
   SellerContacts             SellerContacts[]
   LiveShopping               LiveShopping[]
+  OrderCancelRequests        SellerOrderCancelRequest[] // 판매자의 주문취소요청
 }
 
 // 마케터의 상정정보
@@ -199,8 +200,8 @@ model Goods {
   member_input_use        String             @default("0") // 추가 구성 옵션 사용 여부 "0" or "1"
   image                   GoodsImages[] // 상품 이미지 - fm_goods_image
   goods_view              GoodsView          @default(look) // 노출
-  regist_date             DateTime           @default(now()) // 상품등록일 (project-lc 에 판매자가 등록한 날짜)
-  update_date             DateTime           @default(now()) @updatedAt // 수정일 (퍼스트몰에는 코멘트에 구매수량 이라고 되어있음, project-lc 에서수정한날짜)
+  regist_date             DateTime           @default(now()) // 상품등록일 (크크쇼에 판매자가 등록한 날짜)
+  update_date             DateTime           @default(now()) @updatedAt // 수정일 (�����스트몰에는 코멘트에 구매수량 이라고 되어있음, 크크쇼 에서수정한날짜)
   runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
   ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
@@ -235,7 +236,6 @@ model GoodsOptions {
   option_code    String? // 옵션코드
   consumer_price Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
   price          Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
-  color          String?               @db.VarChar(10) // 컬러 hex값
   weight         Float? //옵션 개당 무게 (단위 kg)
   option_view    YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
 
@@ -494,6 +494,7 @@ model Broadcaster {
   twitchId            String? // 유저의 트위치 아이디
   youtubeId           String? // 유저의 유튜브 아이디
   overlayUrl          String                @unique // 라이브커머스 오버레이 URL 
+  channelUrl          String?
   createDate          DateTime              @default(now())
   deleteFlag          Boolean               @default(false) // 회원탈퇴 여부
 
@@ -570,12 +571,43 @@ model SellerPaymentCommission {
   payment        String // 결제수단 bank, card, account, virtual, cellphone, escrow_account, escrow_virtual, point, ...
   paymentName    String // 결제수단 이름
   commissionRate Decimal               @db.Decimal(10, 2) // 수수료율
-  commissionUnit PaymentCommissionUnit @default(P)
+  commissionUnit PaymentCommissionUnit @default(P) // 수수료 부과 단위 (원 or 퍼센트)
   min            Int? // 최소 수수료
   max            Int? // 최대수수료
 }
 
+// 전자결제 수수료
 enum PaymentCommissionUnit {
   P // 퍼센트
   W // 원
+}
+
+// 판매자의 주문취소(결제취소)요청 테이블
+model SellerOrderCancelRequest {
+  id               Int                            @id @default(autoincrement())
+  seller           Seller                         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId         Int
+  reason           String                         @db.VarChar(255) // 판매자의 주문취소사유
+  orderSeq         String // 주문번호 fm_order.order_seq  bigInt로 지정하니 오류가 나서 string으로 저장
+  status           SellerOrderCancelRequestStatus @default(waiting) // 관리자 처리 여부 기본: waiting, 처리 후 done
+  createDate       DateTime                       @default(now())
+  orderCancelItems SellerOrderCancelRequestItem[]
+
+  @@index(orderSeq)
+}
+
+// 판매자의 주문취소(결제취소)요청 처리상태 (나중에 다른 상태가 생길 가능성을 고려하여 enum으로 둠)
+enum SellerOrderCancelRequestStatus {
+  waiting
+  confirmed
+}
+
+// 판매자의 주문취소(결제취소)요청 상품 테이블
+model SellerOrderCancelRequestItem {
+  id                       Int                      @id @default(autoincrement())
+  orderItemSeq             Int // 주문상품번호 fm_order_item.item_seq
+  orderItemOptionSeq       Int // 주문상품옵션번호 fm_order_item_option.item_option_seq
+  amount                   Int // 취소할 주문상품옵션의 개수
+  sellerOrderCancelRequest SellerOrderCancelRequest @relation(fields: [orderSeq], references: [id], onDelete: Cascade)
+  orderSeq                 Int
 }

@@ -258,7 +258,11 @@ export class AdminService {
             afreecaId: true,
             twitchId: true,
             youtubeId: true,
+            channelUrl: true,
           },
+        },
+        liveShoppingVideo: {
+          select: { youtubeUrl: true },
         },
       },
     });
