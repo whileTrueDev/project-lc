@@ -12,7 +12,9 @@ export function Custom404(): JSX.Element {
     <Flex h="100vh" flexDirection="column" justify="center" alignItems="center">
       <VStack spacing={4}>
         <KksLogo size="big" />
-        <Heading fontSize={{ base: '2xl', sm: '4xl' }}>페이지를 찾을 수 없습니다</Heading>
+        <Heading fontSize={{ base: '2xl', sm: '4xl' }}>
+          페이지를 찾을 수 없습니다.
+        </Heading>
         <Text fontSize={{ base: 'sm', sm: 'md' }}>
           죄송합니다. 요청하신 페이지가 존재하지 않습니다.
         </Text>

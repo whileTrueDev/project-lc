@@ -70,16 +70,14 @@ export function Navbar(): JSX.Element {
           justify={{ base: 'center', md: 'start' }}
           alignItems="center"
         >
-          <Heading fontSize="md">
-            <NextLink href="/" passHref>
-              <Link
-                textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-                color={useColorModeValue('gray.800', 'white')}
-              >
-                <KksLogo size="small" />
-              </Link>
-            </NextLink>
-          </Heading>
+          <NextLink href="/" passHref>
+            <Link
+              textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
+              color={useColorModeValue('gray.800', 'white')}
+            >
+              <KksLogo size="small" />
+            </Link>
+          </NextLink>
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
             <DesktopNav />
