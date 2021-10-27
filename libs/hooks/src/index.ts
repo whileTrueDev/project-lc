@@ -33,6 +33,7 @@ export * from './lib/mutation/useSettlementAccountMutation';
 export * from './lib/mutation/useShopInfoMutation';
 export * from './lib/mutation/useUnlinkSocialAccountMutation';
 export * from './lib/mutation/useUpdateLiveShoppingManageMutation';
+export * from './lib/mutation/useUpdateReturnStatusMutation';
 export * from './lib/mutation/useValidatePassword';
 export * from './lib/queries/useAdminBroadcaster';
 export * from './lib/queries/useAdminFmOrderByGoods';

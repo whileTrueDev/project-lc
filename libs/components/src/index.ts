@@ -73,6 +73,7 @@ export * from './lib/OrderFilterConsole';
 export * from './lib/OrderList';
 export * from './lib/OrderRefundExistsAlert';
 export * from './lib/OrderReturnExistsAlert';
+export * from './lib/OrderReturnStatusDialog';
 export * from './lib/PasswordSection';
 export * from './lib/ProfileBox';
 export * from './lib/ResetPasswordForm';
