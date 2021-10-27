@@ -19,7 +19,7 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
         <title>크크쇼</title>
         <link
           rel="apple-touch-icon"
-          sizes="57x57"
+          sizes="180x180"
           href="/images/favicon/apple-touch-icon-180x180.png"
         />
         <link
