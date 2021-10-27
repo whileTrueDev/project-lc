@@ -30,6 +30,7 @@ import ExportManyDialog from './ExportManyDialog';
 import FmOrderStatusBadge from './FmOrderStatusBadge';
 import TooltipedText from './TooltipedText';
 
+// CSV다운로드 기능 임시 제거로 인해 사용은 하지 않고 일단 둠.
 const hiddenColumns: GridColumns = [
   { field: 'order_user_name', headerName: '주문자', hide: true },
   { field: 'order_email', headerName: '주문자이메일', hide: true },

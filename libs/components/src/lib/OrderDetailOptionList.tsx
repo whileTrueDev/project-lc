@@ -12,23 +12,14 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
-import {
-  convertFmOrderShippingTypesToString,
-  FindFmOrderDetailRes,
-  FmOrderItem,
-  FmOrderOption,
-} from '@project-lc/shared-types';
+import { FmOrderOption } from '@project-lc/shared-types';
 import { useMemo } from 'react';
 import { FmOrderStatusBadge, ShowMoreTextButton, TextDotConnector } from '..';
 
 /** 주문 옵션 목록 */
 export function OrderDetailOptionList({
-  order,
   options,
-  orderItem,
 }: {
-  order: FindFmOrderDetailRes;
-  orderItem: FmOrderItem;
   options: FmOrderOption[];
 }): JSX.Element {
   const displaySize = useDisplaySize();
@@ -39,13 +30,7 @@ export function OrderDetailOptionList({
       ))}
 
       {/* 태블릿 이상의 크기에서만 보여줌 */}
-      {!displaySize.isMobileSize && (
-        <OrderDetailOptionDescription
-          order={order}
-          orderItem={orderItem}
-          options={options}
-        />
-      )}
+      {!displaySize.isMobileSize && <OrderDetailOptionDescription options={options} />}
     </Box>
   );
 }
@@ -54,7 +39,7 @@ export function OrderDetailOptionListItem({
   option,
   withBadge = true,
 }: {
-  option: Pick<FmOrderOption, 'ea' | 'price' | 'option1' | 'title1' | 'color' | 'step'>;
+  option: Pick<FmOrderOption, 'ea' | 'price' | 'option1' | 'title1' | 'step'>;
   withBadge?: boolean;
 }): JSX.Element {
   const orderPrice = useMemo(() => {
@@ -65,14 +50,14 @@ export function OrderDetailOptionListItem({
     <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
       {withBadge && <FmOrderStatusBadge orderStatus={option.step} />}
       {option.title1 && option.option1 && (
-        <Text isTruncated>
-          {option.title1}: {option.option1}
-        </Text>
+        <>
+          <Text isTruncated>
+            {option.title1}: {option.option1}
+          </Text>
+          <TextDotConnector />
+        </>
       )}
-      {option.color && (
-        <Box w={4} h={4} bgColor={option.color} border="1px solid black" />
-      )}
-      <TextDotConnector />
+
       <Text isTruncated>{option.ea} 개</Text>
       <TextDotConnector />
       <Text isTruncated>{orderPrice}</Text>
@@ -82,39 +67,17 @@ export function OrderDetailOptionListItem({
 
 /** 주문 옵션 목록 자세히보기 */
 export function OrderDetailOptionDescription({
-  order,
-  orderItem,
   options,
 }: {
-  order: FindFmOrderDetailRes;
-  orderItem: FmOrderItem;
   options: FmOrderOption[];
 }): JSX.Element {
   const { isOpen, onToggle } = useDisclosure({});
-
-  const shipping = useMemo(
-    () => order.shippings.find((x) => orderItem.shipping_seq === x.shipping_seq),
-    [order.shippings, orderItem.shipping_seq],
-  );
-
   return (
     <Box mt={2}>
       <ShowMoreTextButton onClick={onToggle} isOpen={isOpen} />
 
       <Collapse in={isOpen} animateOpacity unmountOnExit>
         <Box mt={2}>
-          {shipping && (
-            <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
-              <Text>{convertFmOrderShippingTypesToString(orderItem.shipping_type)}</Text>
-              {orderItem.shipping_type === 'free' ? null : (
-                <>
-                  <TextDotConnector />
-                  <Text>배송비: {Number(shipping.shippingCost).toLocaleString()} 원</Text>
-                </>
-              )}
-            </Stack>
-          )}
-
           <Box my={2}>
             <Text fontWeight="bold">상품별(옵션별) 상태</Text>
             <Table>

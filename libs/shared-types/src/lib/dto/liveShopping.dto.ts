@@ -1,5 +1,15 @@
-import { IsString, IsOptional, IsNumber, IsDate, IsArray } from 'class-validator';
-import { LiveShopppingProgressType, LiveShopping } from '@prisma/client';
+import {
+  IsString,
+  IsArray,
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  ValidateIf,
+} from 'class-validator';
+import { LiveShopping, LiveShopppingProgressType } from '@prisma/client';
+
+import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
 
 export class LiveShoppingDTO {
   @IsNumber()
@@ -54,6 +64,16 @@ export class LiveShoppingDTO {
 
   @IsDate()
   createDate: string;
+
+  @ValidateIf((o) => o.progress === LIVE_SHOPPING_PROGRESS.확정됨)
+  @IsNumber()
+  @IsNotEmpty()
+  whiletrueCommissionRate?: string;
+
+  @ValidateIf((o) => o.progress === LIVE_SHOPPING_PROGRESS.확정됨)
+  @IsNumber()
+  @IsNotEmpty()
+  broadcasterCommissionRate?: string;
 }
 
 export type LiveShoppingRegistDTO = Pick<

@@ -584,10 +584,6 @@ export interface FmOrderOption {
    */
   mobile_sale: string;
   /**
-   * 옵션 색상
-   */
-  color?: string;
-  /**
    * 옵션 금액 (상품 단가)
    */
   price: string;
@@ -697,10 +693,6 @@ export interface FmOrderExportItemOption {
    * 출고 옵션 값
    */
   option1: string;
-  /**
-   * 출고 옵션이 색상인 경우 색상 16진수값
-   */
-  color?: string;
 }
 
 /** 주문 배송 정보 */
@@ -709,7 +701,11 @@ export interface FmOrderShipping {
   /** 배송비 */
   shippingCost: string;
   /** 배송비 */
+  shipping_cost: string;
+  /** 배송비 */
   deliveryCost: string;
+  /** 배송비 */
+  delivery_cost: string;
   /** 배송 방식 이름 */
   shipping_set_name: string;
   /**
@@ -844,7 +840,6 @@ export type FmOrderRefundItem = FmOrderRefundItemBase &
     | 'step'
     | 'member_sale'
     | 'mobile_sale'
-    | 'color'
     | 'price'
     | 'ori_price'
   >;
@@ -976,7 +971,6 @@ export type FmOrderReturnItem = FmOrderReturnItemBase &
     | 'step'
     | 'member_sale'
     | 'mobile_sale'
-    | 'color'
     | 'price'
     | 'ori_price'
   >;

@@ -7,6 +7,7 @@ import {
   Query,
   UseGuards,
   ValidationPipe,
+  Patch,
 } from '@nestjs/common';
 import {
   GoodsService,
@@ -25,6 +26,7 @@ import {
   OrderStats,
   OrderStatsRes,
   SalesStats,
+  ChangeReturnStatusDto,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 
@@ -44,7 +46,7 @@ export class FmOrdersController {
     @SellerInfo() seller: UserPayload,
     @Query(ValidationPipe) dto: FindFmOrdersDto,
   ): Promise<FindFmOrderRes[]> {
-    let gids: number[] | undefined; // project-lc 상품 고유 번호
+    let gids: number[] | undefined; // 크크쇼 상품 고유 번호
     if (dto.goodsIds && dto.goodsIds.length > 0) {
       gids = dto.goodsIds.map((x) => Number(x));
     }
@@ -52,6 +54,13 @@ export class FmOrdersController {
     const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub, gids);
     if (ids.length === 0) return [];
     return this.fmOrdersService.findOrders(ids, dto);
+  }
+
+  @Patch('/return-status')
+  async changeReturnStatus(
+    @Body(ValidationPipe) dto: ChangeReturnStatusDto,
+  ): Promise<boolean> {
+    return this.fmOrdersService.changeReturnStatus(dto);
   }
 
   /** 관리자페이지 결제취소요청에서 개별 주문 조회 */
@@ -71,7 +80,7 @@ export class FmOrdersController {
   async findAdminOrders(
     @Query(ValidationPipe) dto: FindFmOrdersDto,
   ): Promise<FindFmOrderRes[]> {
-    let gids: number[] | undefined; // project-lc 상품 고유 번호
+    let gids: number[] | undefined; // 크크쇼 상품 고유 번호
     if (dto.goodsIds && dto.goodsIds.length > 0) {
       gids = dto.goodsIds.map((x) => Number(x));
     }
