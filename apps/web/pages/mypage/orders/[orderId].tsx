@@ -51,6 +51,7 @@ export function OrderDetail(): JSX.Element {
   const orderId = router.query.orderId as string;
 
   const order = useFmOrder(orderId);
+
   const orderCancel = useSellerOrderCancelRequest(orderId);
 
   const { isMobileSize } = useDisplaySize();

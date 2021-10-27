@@ -21,6 +21,7 @@ export * from './lib/dto/businessRegistration.dto';
 export * from './lib/dto/businessRegistrationConfirmation.dto';
 export * from './lib/dto/changeFmOrderStatus.dto';
 export * from './lib/dto/changeGoodsView.dto';
+export * from './lib/dto/changeReturnStatus.dto';
 export * from './lib/dto/changeSellCommission.dto';
 export * from './lib/dto/deleteGoods.dto';
 export * from './lib/dto/emailCodeVerification.dto';
