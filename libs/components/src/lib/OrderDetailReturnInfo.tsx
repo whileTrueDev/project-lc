@@ -51,6 +51,11 @@ export function OrderDetailReturnInfo({
             (반품완료일) {dayjs(returns.return_date).format('YYYY년 MM월 DD일 HH:mm:ss')}
           </Text>
         )}
+        <Box>
+          <Button size="sm" onClick={onOpen}>
+            반품 상태 관리
+          </Button>
+        </Box>
       </Stack>
 
       <Stack my={2}>
@@ -85,7 +90,7 @@ export function OrderDetailReturnInfo({
           </Stack>
         </SimpleGrid>
       </Stack>
-      <Button onClick={onOpen}>반품 상태 관리</Button>
+
       {/* 이 반품에 포함된 상품(옵션) 목록 */}
       {returns.items.length > 0 && (
         <Box my={2}>
@@ -109,10 +114,14 @@ export function OrderDetailReturnInfo({
                 alignItems="center"
               >
                 <Text isTruncated>{i.goods_name}</Text>
-                <TextDotConnector />
-                <Text isTruncated>
-                  {i.title1}: {i.option1}
-                </Text>
+                {i.title1 && i.option1 && (
+                  <>
+                    <TextDotConnector />
+                    <Text isTruncated>
+                      {i.title1}: {i.option1}
+                    </Text>
+                  </>
+                )}
                 {i.color && (
                   <Box w={4} h={4} bgColor={i.color} border="1px solid black" />
                 )}

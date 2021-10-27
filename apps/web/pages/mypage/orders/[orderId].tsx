@@ -40,7 +40,6 @@ export function OrderDetail(): JSX.Element {
   const orderId = router.query.orderId as string;
 
   const order = useFmOrder(orderId);
-  console.log(order);
   const { isMobileSize } = useDisplaySize();
 
   // 현재 주문이 조회 가능한 주문인지 확인
