@@ -133,7 +133,7 @@ export function SignupForm({
   return (
     <CenterBox
       enableShadow={enableShadow}
-      header={{ title: '[서비스명] 시작하기', desc: '캐치프레이즈 자리입니다.' }}
+      header={{ title: '크크쇼 시작하기', desc: '캐치프레이즈 자리입니다.' }}
     >
       <Stack mt={4} spacing={4} as="form" onSubmit={handleSubmit(onSubmit)}>
         <FormControl isInvalid={!!errors.name}>

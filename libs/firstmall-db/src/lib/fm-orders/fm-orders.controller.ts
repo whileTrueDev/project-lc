@@ -45,7 +45,7 @@ export class FmOrdersController {
     @SellerInfo() seller: UserPayload,
     @Query(ValidationPipe) dto: FindFmOrdersDto,
   ): Promise<FindFmOrderRes[]> {
-    let gids: number[] | undefined; // project-lc 상품 고유 번호
+    let gids: number[] | undefined; // 크크쇼 상품 고유 번호
     if (dto.goodsIds && dto.goodsIds.length > 0) {
       gids = dto.goodsIds.map((x) => Number(x));
     }
@@ -62,12 +62,24 @@ export class FmOrdersController {
     return this.fmOrdersService.changeReturnStatus(dto);
   }
 
+  /** 관리자페이지 결제취소요청에서 개별 주문 조회 */
+  @UseGuards(AdminGuard)
+  @Get('/admin/:orderId')
+  async findAdminOneOrder(
+    @Param('orderId') orderId: string,
+    @Query('sellerEmail') sellerEmail: string,
+  ): Promise<FindFmOrderDetailRes | null> {
+    // 판매자의 승인된 상품 ID 목록 조회
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(sellerEmail);
+    return this.fmOrdersService.findOneOrder(orderId, ids);
+  }
+
   @UseGuards(AdminGuard)
   @Get('/admin')
   async findAdminOrders(
     @Query(ValidationPipe) dto: FindFmOrdersDto,
   ): Promise<FindFmOrderRes[]> {
-    let gids: number[] | undefined; // project-lc 상품 고유 번호
+    let gids: number[] | undefined; // 크크쇼 상품 고유 번호
     if (dto.goodsIds && dto.goodsIds.length > 0) {
       gids = dto.goodsIds.map((x) => Number(x));
     }

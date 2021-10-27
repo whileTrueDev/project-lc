@@ -16,7 +16,7 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <>
       <Head>
-        <title>PROJECT_LC</title>
+        <title>크크쇼</title>
       </Head>
       <div className="app">
         <QueryClientProvider client={queryClient}>

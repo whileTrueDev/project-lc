@@ -9,9 +9,9 @@ export const createVerificationTemplate = (code: string): string => `
     <p>10분 이내에 코드(${code})를 입력하여 이메일 확인을 완료하세요</p>
 
     <div style="padding-top:32px;">
-      <p>이 메일은 ProjectLC 에서 보낸 메일입니다.</p>
+      <p>이 메일은 크크쇼에서 보낸 메일입니다.</p>
       <p>코드를 요청하지 않았거나 문제가 있다면 메일 회신바랍니다.</p>
-      <p style="text-align:center;">Project - LC </p>
+      <p style="text-align:center;">크크쇼</p>
     </div>
   </div>
 </div>

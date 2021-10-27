@@ -9,6 +9,8 @@ import {
   Query,
   UseGuards,
   Patch,
+  ParseBoolPipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   GoodsConfirmation,
@@ -26,18 +28,22 @@ import {
   AdminSettlementInfoType,
   LiveShoppingDTO,
   BroadcasterDTO,
+  OrderCancelRequestList,
+  OrderCancelRequestDetailRes,
 } from '@project-lc/shared-types';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
+import { OrderCancelService } from '../order-cancel/order-cancel.service';
 @Controller('admin')
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
     private readonly broadcasterService: BroadcasterService,
     private readonly adminSettlementService: AdminSettlementService,
+    private readonly orderCancelService: OrderCancelService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -137,5 +143,33 @@ export class AdminController {
     @Body() dto: BusinessRegistrationRejectionDto,
   ): Promise<BusinessRegistrationConfirmation> {
     return this.adminSettlementService.setBusinessRegistrationRejection(dto);
+  }
+
+  /** 결제취소 요청 목록 조회 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Get('/order-cancel/list')
+  getAllOrderCancelRequests(): Promise<OrderCancelRequestList> {
+    return this.orderCancelService.getAllOrderCancelRequests();
+  }
+
+  /** 특정 주문에 대한 결제취소 요청 조회 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Get('/order-cancel/:orderId')
+  getOneOrderCancelRequest(
+    @Param('orderId') orderId: string,
+  ): Promise<OrderCancelRequestDetailRes> {
+    return this.orderCancelService.getOneOrderCancelRequest(orderId);
+  }
+
+  /** 특정 주문에 대한 결제취소 요청 상태 변경 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Put('/order-cancel/:requestId')
+  setOrderCancelRequestDone(
+    @Param('requestId', ParseIntPipe) requestId: number,
+  ): Promise<boolean> {
+    return this.orderCancelService.setOrderCancelRequestDone(requestId);
   }
 }

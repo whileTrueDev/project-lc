@@ -114,6 +114,7 @@ export function OrderDetailReturnInfo({
                 alignItems="center"
               >
                 <Text isTruncated>{i.goods_name}</Text>
+
                 {i.title1 && i.option1 && (
                   <>
                     <TextDotConnector />
@@ -121,9 +122,6 @@ export function OrderDetailReturnInfo({
                       {i.title1}: {i.option1}
                     </Text>
                   </>
-                )}
-                {i.color && (
-                  <Box w={4} h={4} bgColor={i.color} border="1px solid black" />
                 )}
                 <TextDotConnector />
                 <Text isTruncated>{i.ea} 개</Text>
