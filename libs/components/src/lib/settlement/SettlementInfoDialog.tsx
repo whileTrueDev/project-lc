@@ -43,7 +43,7 @@ export function SettlementInfoDialog({
             <GridItem>
               <Stack>
                 <Text>정산번호</Text>
-                <Text>{settlementInfo.exportId}</Text>
+                <Text>{settlementInfo.id}</Text>
               </Stack>
             </GridItem>
 
