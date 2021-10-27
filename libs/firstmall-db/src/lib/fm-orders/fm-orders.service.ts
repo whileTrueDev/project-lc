@@ -17,8 +17,10 @@ import {
   FmOrderReturnItem,
   FmOrderShipping,
   FmOrderStatusNumString,
+  getFmOrderStatusByNames,
   OrderStatsRes,
   LiveShoppingWithSalesAndFmId,
+  ChangeReturnStatusDto,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
@@ -59,11 +61,7 @@ export class FmOrdersService {
         const itemSeqArray = orderItems.map((x) => x.item_seq);
         const orderGoodsOptions = await this.findOneOrderOptions(itemSeqArray);
         // 판매자 상품에 기반한 주문 상태 도출
-        const realStep = orderGoodsOptions.reduce((prev, cur) => {
-          if (!prev) return cur.step;
-          if (Number(prev) < Number(cur.step)) return cur.step;
-          return prev;
-        }, order.step);
+        const realStep = this.getOrderRealStep(order.step, orderGoodsOptions);
 
         const totalShippingCost = await this.findOrderTotalShippingCost(
           order.id,
@@ -106,6 +104,11 @@ export class FmOrdersService {
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
     JOIN fm_order_shipping USING(shipping_seq)
+    JOIN (
+      SELECT item_seq, MIN(step) AS optionRealStep
+      FROM fm_order_item_option
+      GROUP BY item_seq
+    ) fm_order_item_option USING(item_seq)
     WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
     `;
 
@@ -158,7 +161,9 @@ export class FmOrdersService {
       }
 
       if (dto.searchStatuses && dto.searchStatuses.length > 0) {
-        whereSql += `\nAND (step IN (${dto.searchStatuses.join(',')})) `;
+        whereSql += `\nAND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
+          ',',
+        )})) `;
       }
 
       if (dto.search) {
@@ -181,7 +186,9 @@ export class FmOrdersService {
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
 
       if (dto.searchStatuses && dto.searchStatuses.length > 0) {
-        whereSql += `\nAND (step IN (${dto.searchStatuses.join(',')})) `;
+        whereSql += `\nAND IF(AND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
+          ',',
+        )})) `;
       }
 
       return {
@@ -191,7 +198,9 @@ export class FmOrdersService {
     }
 
     if (dto.searchStatuses && dto.searchStatuses.length > 0) {
-      whereSql += `AND (step IN (${dto.searchStatuses.join(',')})) `;
+      whereSql += `AND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
+        ',',
+      )}) `;
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
       return {
         sql: defaultQueryHead + whereSql + groupbySql + orderSql,
@@ -234,11 +243,7 @@ export class FmOrdersService {
     const orderReturns = await this.findOneOrderReturns(orderId);
 
     // * 판매자 상품에 기반한 주문 상태 도출
-    const realStep = orderGoodsOptions.reduce((prev, cur) => {
-      if (!prev) return cur.step;
-      if (Number(prev) < Number(cur.step)) return cur.step;
-      return prev;
-    }, orderInfo.step);
+    const realStep = this.getOrderRealStep(orderInfo.step, orderGoodsOptions);
 
     // * 배송 관련 정보 추가를 위한 정보 조회
     const shippingResult = await this.findOneOrderShippingInfo(
@@ -657,7 +662,7 @@ export class FmOrdersService {
   }
 
   // * **********************************
-  // * 주문 상태 변경
+  // * 주문 상태 관련
   // * **********************************
 
   /** 주문 상태 변경 */
@@ -705,6 +710,54 @@ export class FmOrdersService {
     }
   }
 
+  /**
+   * 판매자 본인의 상품에 의거한 실제 주문 상태를 조회합니다.
+   * 이는 여러 판매자의 상품이 하나의 주문에 포함될 수 있는 상황에 대한 처리 용도입니다.
+   */
+  private getOrderRealStep(
+    fmOrderStep: FmOrder['step'],
+    myOrderGoodsOptions: FmOrderOption[],
+  ): FmOrder['step'] {
+    if (myOrderGoodsOptions.length === 0) return fmOrderStep;
+    const isPartialStep = getFmOrderStatusByNames([
+      '부분배송완료',
+      '부분배송중',
+      '부분출고완료',
+      '부분출고준비',
+    ]).includes(fmOrderStep);
+
+    // 주문의 상태가 "부분0000"일 때,
+    if (isPartialStep) {
+      // 5를 더해 "부분" 상태를 제거한 상태
+      const nonPartialStep = String(Number(fmOrderStep) + 5) as FmOrder['step'];
+      // 옵션들 모두가 "부분" 상태를 제거한 상태만 있는 지 확인, 그렇다면 "부분" 상태를 제거한 상태를 반환
+      if (myOrderGoodsOptions.every((o) => o.step === nonPartialStep)) {
+        return nonPartialStep;
+      }
+      // 옵션들 모두가 "부분" 상태보다 작은지 확인, 그렇다면 옵션들 중 가장 높은 상태를 반환
+      if (myOrderGoodsOptions.every((o) => Number(o.step) < Number(fmOrderStep))) {
+        return myOrderGoodsOptions.reduce((acc, curr) => {
+          if (!acc) return curr.step;
+          if (Number(acc) < Number(curr.step)) return curr.step;
+          return acc;
+        }, myOrderGoodsOptions[0].step);
+      }
+      // 하나라도 더 낮은, 더 높은 상태가 있는 경우 "부분0000"상태를 그대로 반환
+      return fmOrderStep;
+    }
+
+    // 옵션들 모두가 주문상태보다 작은지 확인, 그렇다면 옵션들 중 가장 높은 상태를 반환
+    if (myOrderGoodsOptions.every((o) => Number(o.step) < Number(fmOrderStep))) {
+      return myOrderGoodsOptions.reduce((acc, curr) => {
+        if (!acc) return curr.step;
+        if (Number(acc) < Number(curr.step)) return curr.step;
+        return acc;
+      }, myOrderGoodsOptions[0].step);
+    }
+
+    return fmOrderStep;
+  }
+
   // * **********************************
   // * 주문 현황 조회
   // * **********************************
@@ -730,6 +783,20 @@ export class FmOrdersService {
       orders: counter.orders,
       sales: counter.sales,
     };
+  }
+
+  public async changeReturnStatus(dto: ChangeReturnStatusDto): Promise<boolean> {
+    const returnStatusSql = `
+      UPDATE
+        fm_order_return
+      SET 
+        fm_order_return.status = ?
+      WHERE
+        fm_order_return.return_code = ?
+    `;
+    await this.db.query(returnStatusSql, [dto.status, dto.return_code]);
+
+    return true;
   }
 
   public async getOrdersStatsDuringLiveShoppingSales(

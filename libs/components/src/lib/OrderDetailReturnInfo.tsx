@@ -1,11 +1,26 @@
-import { Text, Box, Stack, Link, SimpleGrid, Textarea, Flex } from '@chakra-ui/react';
+import {
+  Text,
+  Box,
+  Stack,
+  Link,
+  SimpleGrid,
+  Textarea,
+  Flex,
+  Button,
+  useDisclosure,
+} from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import {
   FmOrderReturn,
   convertFmReturnTypesToString,
   convertFmReturnMethodToString,
 } from '@project-lc/shared-types';
-import { ChakraNextImage, FmReturnStatusBadge, TextDotConnector } from '..';
+import {
+  ChakraNextImage,
+  FmReturnStatusBadge,
+  TextDotConnector,
+  OrderReturnStatusDialog,
+} from '..';
 
 /** 주문 반품 정보 */
 export function OrderDetailReturnInfo({
@@ -13,6 +28,8 @@ export function OrderDetailReturnInfo({
 }: {
   returns: FmOrderReturn;
 }): JSX.Element {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <Box>
       <Stack direction="row" alignItems="center" my={2} spacing={1.5}>
@@ -34,6 +51,11 @@ export function OrderDetailReturnInfo({
             (반품완료일) {dayjs(returns.return_date).format('YYYY년 MM월 DD일 HH:mm:ss')}
           </Text>
         )}
+        <Box>
+          <Button size="sm" onClick={onOpen}>
+            반품 상태 관리
+          </Button>
+        </Box>
       </Stack>
 
       <Stack my={2}>
@@ -92,10 +114,15 @@ export function OrderDetailReturnInfo({
                 alignItems="center"
               >
                 <Text isTruncated>{i.goods_name}</Text>
-                <TextDotConnector />
-                <Text isTruncated>
-                  {i.title1}: {i.option1}
-                </Text>
+
+                {i.title1 && i.option1 && (
+                  <>
+                    <TextDotConnector />
+                    <Text isTruncated>
+                      {i.title1}: {i.option1}
+                    </Text>
+                  </>
+                )}
                 <TextDotConnector />
                 <Text isTruncated>{i.ea} 개</Text>
                 <TextDotConnector />
@@ -105,6 +132,7 @@ export function OrderDetailReturnInfo({
           ))}
         </Box>
       )}
+      <OrderReturnStatusDialog isOpen={isOpen} onClose={onClose} data={returns} />
     </Box>
   );
 }

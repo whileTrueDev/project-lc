@@ -1,5 +1,5 @@
-import { Box, Text, Flex } from '@chakra-ui/react';
-import { AdminPageLayout, AdminLoginForm } from '@project-lc/components';
+import { Box, Flex } from '@chakra-ui/react';
+import { AdminLoginForm } from '@project-lc/components';
 
 export function Login(): JSX.Element {
   return (

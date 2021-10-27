@@ -7,6 +7,7 @@ import {
   Query,
   UseGuards,
   ValidationPipe,
+  Patch,
 } from '@nestjs/common';
 import {
   GoodsService,
@@ -25,6 +26,7 @@ import {
   OrderStats,
   OrderStatsRes,
   SalesStats,
+  ChangeReturnStatusDto,
 } from '@project-lc/shared-types';
 
 import { FmOrdersService } from './fm-orders.service';
@@ -51,6 +53,13 @@ export class FmOrdersController {
     const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub, gids);
     if (ids.length === 0) return [];
     return this.fmOrdersService.findOrders(ids, dto);
+  }
+
+  @Patch('/return-status')
+  async changeReturnStatus(
+    @Body(ValidationPipe) dto: ChangeReturnStatusDto,
+  ): Promise<boolean> {
+    return this.fmOrdersService.changeReturnStatus(dto);
   }
 
   /** 관리자페이지 결제취소요청에서 개별 주문 조회 */

@@ -9,6 +9,6 @@ import { SellerShopService } from './seller-shop.service';
   imports: [forwardRef(() => AuthModule)],
   controllers: [SellerController],
   providers: [SellerService, SellerSettlementService, SellerShopService],
-  exports: [SellerService],
+  exports: [SellerService, SellerSettlementService],
 })
 export class SellerModule {}
