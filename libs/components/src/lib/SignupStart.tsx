@@ -23,11 +23,13 @@ export function SignupStart({
     <CenterBox
       enableShadow
       header={{
+        // TODO : 더미 문구 변경
         title: '[라이브커머스] 시작하기',
         desc: '',
       }}
     >
       <VStack mt={4} spacing={8} align="stretch">
+        // TODO : 더미 문구 변경
         <List spacing={3}>
           <ListItem>
             <ListIcon as={CheckIcon} color="green.500" />
@@ -42,7 +44,6 @@ export function SignupStart({
             쉽고 빠른 크리에이터 매칭
           </ListItem>
         </List>
-
         <Stack spacing={2}>
           <Button
             bg="blue.400"

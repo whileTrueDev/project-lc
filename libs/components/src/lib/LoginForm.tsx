@@ -71,6 +71,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
   return (
     <CenterBox
       enableShadow={enableShadow}
+      // TODO : 더미 문구 변경
       header={{ title: '로그인', desc: '캐치프레이즈 자리입니다.' }}
     >
       <Stack mt={4} spacing={4} as="form" onSubmit={handleSubmit(onSubmit)}>
