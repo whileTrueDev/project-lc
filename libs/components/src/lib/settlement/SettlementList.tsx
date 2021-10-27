@@ -162,9 +162,7 @@ export function SettlementList(): JSX.Element | null {
                   <GridToolbarExport
                     csvOptions={{
                       allColumns: true,
-                      fileName: `project-lc_정산내역_${dayjs().format(
-                        'YYYY-MM-DD-HH-mm-ss',
-                      )}`,
+                      fileName: `project-lc_정산내역_${selectedRound}`,
                     }}
                   />
                 </Button>
