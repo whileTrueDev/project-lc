@@ -82,7 +82,7 @@ export class FmExportsService {
     const findItemsSql = `
     SELECT 
       goods_name, image,
-      item_option_seq, title1, option1, color, fm_goods_export_item.ea, price, step,
+      item_option_seq, title1, option1, fm_goods_export_item.ea, price, step,
       fm_order_item.order_seq
     FROM fm_order_item_option
       JOIN fm_order_item USING(item_seq)

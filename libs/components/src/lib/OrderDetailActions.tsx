@@ -19,6 +19,7 @@ import { FaTruck } from 'react-icons/fa';
 import { ConfirmDialog } from './ConfirmDialog';
 import ExportDialog from './ExportDialog';
 import FmOrderStatusBadge from './FmOrderStatusBadge';
+import OrderCancelRequestDialog from './OrderCancelRequestDialog';
 
 export interface OrderDetailActionsProps {
   order: FindFmOrderDetailRes;
@@ -28,6 +29,7 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps): JSX.Elem
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const exportModal = useDisclosure();
+  const cancelOrderRequestModal = useDisclosure();
   const toast = useToast();
 
   const handleStatusChange = useCallback(
@@ -53,6 +55,13 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps): JSX.Elem
         {getFmOrderStatusByNames(['결제확인']).includes(order.step) && (
           <Button colorScheme="green" size="sm" onClick={onOpen}>
             상품준비로 변경
+          </Button>
+        )}
+
+        {/* 판매자 결제취소 요청 버튼 */}
+        {getFmOrderStatusByNames(['결제확인']).includes(order.step) && (
+          <Button colorScheme="orange" size="sm" onClick={cancelOrderRequestModal.onOpen}>
+            결제취소 요청
           </Button>
         )}
 
@@ -88,6 +97,13 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps): JSX.Elem
         order={order}
         isOpen={exportModal.isOpen}
         onClose={exportModal.onClose}
+      />
+
+      {/* 결제취소 요청 다이얼로그 */}
+      <OrderCancelRequestDialog
+        order={order}
+        isOpen={cancelOrderRequestModal.isOpen}
+        onClose={cancelOrderRequestModal.onClose}
       />
     </>
   );

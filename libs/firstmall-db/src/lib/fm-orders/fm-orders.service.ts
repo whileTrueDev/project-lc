@@ -19,6 +19,7 @@ import {
   FmOrderStatusNumString,
   getFmOrderStatusByNames,
   OrderStatsRes,
+  LiveShoppingWithSalesAndFmId,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
@@ -363,7 +364,6 @@ export class FmOrdersService {
       fm_order_item_option.step85,
       fm_order_item_option.member_sale,
       fm_order_item_option.mobile_sale,
-      fm_order_item_option.color,
       fm_order_item_option.price,
       fm_order_item_option.ori_price
     FROM fm_order_item_option
@@ -397,7 +397,7 @@ export class FmOrdersService {
     const exportItemsSql = `
     SELECT 
       goods_name, image,
-      item_option_seq, title1, option1, color, fm_goods_export_item.ea, price, step
+      item_option_seq, title1, option1, fm_goods_export_item.ea, price, step
     FROM fm_order_item_option
       JOIN fm_order_item USING(item_seq)
     JOIN fm_goods_export_item ON item_option_seq = option_seq
@@ -460,7 +460,6 @@ export class FmOrdersService {
             fm_order_item_option.step,
             fm_order_item_option.member_sale,
             fm_order_item_option.mobile_sale,
-            fm_order_item_option.color,
             fm_order_item_option.price,
             fm_order_item_option.ori_price
           FROM fm_order_refund_item
@@ -529,7 +528,6 @@ export class FmOrdersService {
             fm_order_item_option.step,
             fm_order_item_option.member_sale,
             fm_order_item_option.mobile_sale,
-            fm_order_item_option.color,
             fm_order_item_option.price,
             fm_order_item_option.ori_price
           FROM fm_order_return_item
@@ -784,5 +782,39 @@ export class FmOrdersService {
       orders: counter.orders,
       sales: counter.sales,
     };
+  }
+
+  public async getOrdersStatsDuringLiveShoppingSales(
+    dto: LiveShoppingWithSalesAndFmId[],
+  ): Promise<{ id: number; sales: string }[]> {
+    const salesPrice = [];
+
+    const sql = `
+    SELECT
+      SUM(fm_order.payment_price) as sales
+    FROM fm_order
+    JOIN fm_order_item USING(order_seq)
+    WHERE fm_order_item.goods_seq IN (?)
+    AND
+    DATE(regist_date) BETWEEN ? AND ?;
+    `;
+
+    await Promise.all(
+      dto.map(async (val) => {
+        const sellStartDate = dayjs(val.sellStartDate).format('YYYY-MM-DD HH:mm:ss');
+        const sellEndDate = dayjs(val.sellEndDate).format('YYYY-MM-DD HH:mm:ss');
+        const salesSum = await this.db.query(sql, [
+          val.firstmallGoodsConnectionId,
+          new Date(sellStartDate),
+          new Date(sellEndDate),
+        ]);
+        salesPrice.push({
+          id: val.id,
+          sales: salesSum[0].sales ? Number(salesSum[0].sales).toFixed() : null,
+        });
+      }),
+    );
+
+    return salesPrice;
   }
 }
