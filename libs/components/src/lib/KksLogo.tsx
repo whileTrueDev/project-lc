@@ -2,11 +2,17 @@ import { useColorMode } from '@chakra-ui/react';
 import { ChakraNextImage } from './ChakraNextImage';
 
 export interface KksLogoProps {
-  size: string;
+  size: 'small' | 'mid' | 'big' | 'manual';
+  width?: number;
+  height?: number;
 }
 
+/**
+ * @author M'baku
+ * @description 이미지 크기가 400x150보다 클 경우 manual 옵션을 사용하세요
+ */
 export function KksLogo(props: KksLogoProps): JSX.Element {
-  const { size } = props;
+  const { size, width, height } = props;
   const { colorMode } = useColorMode();
 
   return (
@@ -15,17 +21,17 @@ export function KksLogo(props: KksLogoProps): JSX.Element {
         <>
           {colorMode === 'dark' && (
             <ChakraNextImage
-              src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoDarkModeSmall.png"
-              width="130"
-              height="41"
+              src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoDarkMode.png"
+              width="120"
+              height="45"
             />
           )}
 
           {colorMode === 'light' && (
             <ChakraNextImage
-              src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightModeSmall.png"
-              width="130"
-              height="41"
+              src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png"
+              width="120"
+              height="45"
             />
           )}
         </>
@@ -35,7 +41,7 @@ export function KksLogo(props: KksLogoProps): JSX.Element {
         <>
           {colorMode === 'dark' && (
             <ChakraNextImage
-              src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoDarkModeMid.png"
+              src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoDarkMode.png"
               width="260"
               height="82"
             />
@@ -43,7 +49,7 @@ export function KksLogo(props: KksLogoProps): JSX.Element {
 
           {colorMode === 'light' && (
             <ChakraNextImage
-              src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightModeMid.png"
+              src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png"
               width="260"
               height="82"
             />
@@ -55,17 +61,37 @@ export function KksLogo(props: KksLogoProps): JSX.Element {
         <>
           {colorMode === 'dark' && (
             <ChakraNextImage
+              src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoDarkMode.png"
+              width="400"
+              height="150"
+            />
+          )}
+
+          {colorMode === 'light' && (
+            <ChakraNextImage
+              src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png"
+              width="400"
+              height="150"
+            />
+          )}
+        </>
+      )}
+
+      {size === 'manual' && (
+        <>
+          {colorMode === 'dark' && (
+            <ChakraNextImage
               src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoDarkModeBig.png"
-              width="390"
-              height="123"
+              width={width}
+              height={height}
             />
           )}
 
           {colorMode === 'light' && (
             <ChakraNextImage
               src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightModeBig.png"
-              width="390"
-              height="123"
+              width={width}
+              height={height}
             />
           )}
         </>
