@@ -1,7 +1,7 @@
 import { Heading, Stack } from '@chakra-ui/react';
 import {
   AdminPageLayout,
-  SettlementDoneList,
+  AdminSettlementDoneList,
   SettlementSellCommissionInfo,
   SettlementTargetList,
 } from '@project-lc/components';
@@ -24,7 +24,7 @@ export function SettlementIndex(): JSX.Element {
           정산 완료 목록
         </Heading>
 
-        <SettlementDoneList />
+        <AdminSettlementDoneList />
       </Stack>
     </AdminPageLayout>
   );

@@ -1,5 +1,6 @@
+import { FindSettlementHistoryDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useQuery, UseQueryResult } from 'react-query';
+import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import {
   LiveShopping,
   Seller,
@@ -9,25 +10,30 @@ import {
 } from '.prisma/client';
 import axios from '../../axios';
 
-export type SettlementDoneList = Array<
-  SellerSettlements & {
-    settlementItems: Array<SellerSettlementItems & { liveShopping: LiveShopping }>;
-    seller: Seller & { sellerShop: SellerShop };
-  }
->;
+export type SettlementDoneItem = SellerSettlements & {
+  settlementItems: Array<SellerSettlementItems & { liveShopping: LiveShopping }>;
+  seller: Seller & { sellerShop: SellerShop };
+};
+export type SettlementDoneList = Array<SettlementDoneItem>;
 
-export const getSettlementHistory = async (): Promise<SettlementDoneList> => {
+export const getSettlementHistory = async (
+  dto: FindSettlementHistoryDto,
+): Promise<SettlementDoneList> => {
   return axios
-    .get<SettlementDoneList>('/seller/settlement-history')
+    .get<SettlementDoneList>(
+      '/seller/settlement-history',
+      dto ? { params: { ...dto } } : undefined,
+    )
     .then((res) => res.data);
 };
 
-export const useSettlementHistory = (): UseQueryResult<
-  SettlementDoneList,
-  AxiosError
-> => {
+export const useSettlementHistory = (
+  dto: FindSettlementHistoryDto,
+  options: UseQueryOptions<SettlementDoneList, AxiosError>,
+): UseQueryResult<SettlementDoneList, AxiosError> => {
   return useQuery<SettlementDoneList, AxiosError>(
-    'SettlementDoneList',
-    getSettlementHistory,
+    ['SettlementDoneList', dto.round],
+    () => getSettlementHistory(dto),
+    options,
   );
 };
