@@ -3,8 +3,6 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import * as logs from '@aws-cdk/aws-logs';
-import * as route53 from '@aws-cdk/aws-route53';
-import * as targets from '@aws-cdk/aws-route53-targets';
 import * as ssm from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
 import { constants } from '../../constants';
@@ -17,9 +15,6 @@ interface LCDevAppStackProps extends cdk.StackProps {
 }
 
 const PREFIX = 'LC-DEV-APP';
-const DOMAIN = 'andad.io';
-// const API_DOMAIN = `${DOMAIN}`;
-// const OVERLAY_DOMAIN = `${DOMAIN}`;
 
 export class LCDevAppStack extends cdk.Stack {
   private DBURL_PARAMETER: ssm.IStringParameter;
@@ -39,6 +34,8 @@ export class LCDevAppStack extends cdk.Stack {
   private CIPHER_SALT: ssm.IStringParameter;
   private S3_ACCESS_KEY_ID: ssm.IStringParameter;
   private S3_ACCESS_KEY_SECRET: ssm.IStringParameter;
+
+  public readonly alb: elbv2.ApplicationLoadBalancer;
 
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
@@ -60,8 +57,7 @@ export class LCDevAppStack extends cdk.Stack {
     // * overlay server
     const overlayService = this.createOverlayAppService(cluster, overlaySecGrp);
 
-    this.createALB(vpc, apiService, overlayService, albSecGrp);
-    // this.createRoute53ARecord(alb);
+    this.alb = this.createALB(vpc, apiService, overlayService, albSecGrp);
   }
 
   /** API 서버 ECS Fargate Service 생성 메서드 */
@@ -245,25 +241,6 @@ export class LCDevAppStack extends cdk.Stack {
     });
 
     return alb;
-  }
-
-  private createRoute53ARecord(alb: elbv2.ApplicationLoadBalancer) {
-    // Find Route53 Hosted zone
-    const truepointHostzone = route53.HostedZone.fromHostedZoneAttributes(
-      this,
-      `find${DOMAIN}Zone`,
-      {
-        zoneName: DOMAIN,
-        hostedZoneId: 'Z03356691DEYSJEBYTKT3',
-      },
-    );
-
-    // Route53 로드밸런서 타겟 생성
-    new route53.ARecord(this, 'LoadbalancerARecord', {
-      zone: truepointHostzone,
-      recordName: ``,
-      target: route53.RecordTarget.fromAlias(new targets.LoadBalancerTarget(alb)),
-    });
   }
 
   private loadSsmParameters() {

@@ -24,7 +24,8 @@ export class LCDevDatabaseStack extends cdk.Stack {
     this.db = new rds.DatabaseInstance(this, 'LC-DEV-DB', {
       vpc,
       engine: dbEngine,
-      databaseName: 'lcDev',
+      databaseName: 'public',
+      instanceIdentifier: 'kkshow-dev',
       credentials: {
         username: 'admin',
       },
