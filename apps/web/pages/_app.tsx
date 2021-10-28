@@ -17,6 +17,34 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
     <>
       <Head>
         <title>크크쇼</title>
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/images/favicon/apple-touch-icon-180x180.png"
+        />
+        <link
+          rel="android-chrome-icon"
+          sizes="192x192"
+          href="/images/favicon/android-chrome-icon-192x192.png"
+        />
+        <link
+          rel="android-chrome-icon"
+          sizes="512x512"
+          href="/images/favicon/android-chrome-icon-512x512.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/images/favicon/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/images/favicon/favicon-16x16.png"
+        />
+        <link rel="icon" href="/images/favicon/favicon.ico" />
       </Head>
       <div className="app">
         <QueryClientProvider client={queryClient}>
