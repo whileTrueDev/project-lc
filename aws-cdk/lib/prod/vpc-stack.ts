@@ -120,12 +120,23 @@ export class LCProdVpcStack extends cdk.Stack {
       'Allow port 3306 only to traffic from overlay security group',
     );
 
-    dbSecGrp.addIngressRule(
-      new ec2.SecurityGroup(this, `${ID_PREFIX}BuilderSecGrp`, {
+    const githubActionsRunnerSecGrp = new ec2.SecurityGroup(
+      this,
+      `${ID_PREFIX}BuilderSecGrp`,
+      {
         vpc: this.vpc,
         description: 'github actions builder security group',
         allowAllOutbound: true,
-      }),
+      },
+    );
+    githubActionsRunnerSecGrp.addIngressRule(
+      ec2.Peer.ipv4('59.22.64.86/32'),
+      ec2.Port.tcp(22),
+      'SSH for Admin Desktop',
+    );
+
+    dbSecGrp.addIngressRule(
+      githubActionsRunnerSecGrp,
       ec2.Port.tcp(3306),
       'Allow github actions builder',
     );
