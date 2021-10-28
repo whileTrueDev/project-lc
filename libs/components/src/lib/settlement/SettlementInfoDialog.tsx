@@ -128,7 +128,11 @@ export function SettlementInfoDialog({
               <GridItem>총 가격</GridItem>
               <GridItem>{i.price.toLocaleString()}</GridItem>
               <GridItem>라이브쇼핑 주문 여부</GridItem>
-              <GridItem>{i.liveShoppingId}</GridItem>
+              <GridItem>
+                <Text color={i.liveShoppingId ? 'green.500' : 'red.500'}>
+                  {i.liveShoppingId ? 'O' : 'X'}
+                </Text>
+              </GridItem>
               <GridItem>방송인 수수료</GridItem>
               <GridItem>
                 {i.broadcasterCommission.toLocaleString()} ({i.broadcasterCommissionRate}
