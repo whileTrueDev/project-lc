@@ -5,58 +5,80 @@ import {
   Get,
   Header,
   Param,
+  ParseIntPipe,
+  Patch,
+  Post,
   Put,
   Query,
   UseGuards,
-  Patch,
-  ParseBoolPipe,
-  ParseIntPipe,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
+  BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
-  BusinessRegistrationConfirmation,
 } from '@prisma/client';
 import {
+  AdminSettlementInfoType,
+  BroadcasterDTO,
+  BusinessRegistrationConfirmationDto,
+  BusinessRegistrationRejectionDto,
+  ChangeSellCommissionDto,
+  ExecuteSettlementDto,
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
+  LiveShoppingDTO,
+  OrderCancelRequestDetailRes,
+  OrderCancelRequestList,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
-  BusinessRegistrationConfirmationDto,
-  BusinessRegistrationRejectionDto,
-  AdminSettlementInfoType,
-  LiveShoppingDTO,
-  BroadcasterDTO,
-  OrderCancelRequestList,
-  OrderCancelRequestDetailRes,
 } from '@project-lc/shared-types';
+import { BroadcasterService } from '../broadcaster/broadcaster.service';
+import { OrderCancelService } from '../order-cancel/order-cancel.service';
+import { SellerSettlementService } from '../seller/seller-settlement.service';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
-import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
-import { OrderCancelService } from '../order-cancel/order-cancel.service';
+
+@UseGuards(JwtAuthGuard)
+@UseGuards(AdminGuard)
 @Controller('admin')
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
     private readonly broadcasterService: BroadcasterService,
     private readonly adminSettlementService: AdminSettlementService,
+    private readonly sellerSettlementService: SellerSettlementService,
     private readonly orderCancelService: OrderCancelService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Get('/settlement')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getSettlementInfo(): Promise<AdminSettlementInfoType> {
     return this.adminService.getSettlementInfo();
   }
 
+  @Post('/settlement')
+  executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
+    if (dto.target.options.length === 0) return null;
+    return this.sellerSettlementService.executeSettle(dto.sellerEmail, dto);
+  }
+
+  @Get('/settlement-history')
+  getSettlementHistory(): ReturnType<SellerSettlementService['findSettlementHistory']> {
+    return this.sellerSettlementService.findSettlementHistory();
+  }
+
+  @Put('/sell-commission')
+  updateSellCommission(
+    @Body(ValidationPipe) dto: ChangeSellCommissionDto,
+  ): Promise<boolean> {
+    return this.adminService.updateSellCommission(dto.commissionRate);
+  }
+
   // 상품검수를 위한 상품 리스트
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Get('/goods')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -73,8 +95,6 @@ export class AdminController {
   }
 
   // 상품검수를 위한 상품 리스트
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Get('/goods/:goodsId')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getAdminGoodsById(@Param('goodsId') goodsId: string | number): Promise<GoodsByIdRes> {
@@ -82,31 +102,23 @@ export class AdminController {
   }
 
   // 상품 검수 승인을 수행
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Put('/goods/confirm')
   setGoodsConfirmation(@Body() dto: GoodsConfirmationDto): Promise<GoodsConfirmation> {
     return this.adminService.setGoodsConfirmation(dto);
   }
 
   // 상품 검수 반려를 수행
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Put('/goods/reject')
   setGoodsRejection(@Body() dto: GoodsRejectionDto): Promise<GoodsConfirmation> {
     return this.adminService.setGoodsRejection(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Get('/live-shoppings')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getLiveShoppings(@Query('liveShoppingId') dto?: string): Promise<LiveShopping[]> {
     return this.adminService.getRegisteredLiveShoppings(dto || null);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Patch('/live-shopping')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   async updateLiveShoppings(@Body() dto: LiveShoppingDTO): Promise<boolean> {
@@ -117,8 +129,6 @@ export class AdminController {
     return this.adminService.updateLiveShoppings(dto, videoId);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Get('/live-shopping/broadcasters')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getAllBroadcasters(): Promise<BroadcasterDTO[]> {
@@ -126,8 +136,6 @@ export class AdminController {
   }
 
   // 상품 검수 승인을 수행
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Put('/business-registration/confirm')
   setBusinessRegistrationConfirmation(
     @Body() dto: BusinessRegistrationConfirmationDto,
@@ -136,8 +144,6 @@ export class AdminController {
   }
 
   // 상품 검수 반려를 수행
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Put('/business-registration/reject')
   setBusinessRegistrationRejection(
     @Body() dto: BusinessRegistrationRejectionDto,
@@ -146,16 +152,12 @@ export class AdminController {
   }
 
   /** 결제취소 요청 목록 조회 */
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Get('/order-cancel/list')
   getAllOrderCancelRequests(): Promise<OrderCancelRequestList> {
     return this.orderCancelService.getAllOrderCancelRequests();
   }
 
   /** 특정 주문에 대한 결제취소 요청 조회 */
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Get('/order-cancel/:orderId')
   getOneOrderCancelRequest(
     @Param('orderId') orderId: string,
@@ -164,8 +166,6 @@ export class AdminController {
   }
 
   /** 특정 주문에 대한 결제취소 요청 상태 변경 */
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Put('/order-cancel/:requestId')
   setOrderCancelRequestDone(
     @Param('requestId', ParseIntPipe) requestId: number,

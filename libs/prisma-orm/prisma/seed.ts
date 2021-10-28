@@ -205,9 +205,90 @@ async function main(): Promise<void> {
     },
     include: { options: { include: { supply: true } } },
   });
+
+  await prisma.sellerSettlementAccount.create({
+    data: {
+      bank: '농협',
+      name: '테스트',
+      number: '123456789',
+      settlementAccountImageName: 'test',
+      sellerEmail: seller.email,
+    },
+  });
+
+  const sellerContacts = await prisma.sellerContacts.create({
+    data: {
+      sellerId: seller.id,
+      email: 'testcontact@test.com',
+    },
+  });
+  const testbroadcaster = await prisma.broadcaster.create({
+    data: {
+      userNickname: '테스트방송인',
+      overlayUrl: 'test',
+      userId: 'test-broadcaster',
+      userName: '테스트방송인',
+    },
+  });
+  // 테스트 상품 4 + 라이브쇼핑 생성
+  await prisma.goods.create({
+    data: {
+      sellerId: seller.id,
+      goods_name: 'testGoods4',
+      summary: '테스트상품4',
+      image: {
+        create: {
+          cut_number: 1,
+          image: 'https://picsum.photos/302/305',
+        },
+      },
+      options: {
+        create: [
+          {
+            default_option: 'y',
+            price: 500,
+            consumer_price: 30,
+            supply: { create: { stock: 40 } },
+          },
+        ],
+      },
+      confirmation: {
+        create: { status: 'confirmed', firstmallGoodsConnectionId: 68 },
+      },
+      LiveShopping: {
+        create: {
+          sellerId: seller.id,
+          contactId: sellerContacts.id,
+          sellStartDate: new Date('2021-10-01 00:00:00.000'),
+          sellEndDate: new Date(),
+          broadcasterId: testbroadcaster.userId,
+          whiletrueCommissionRate: '5',
+          broadcasterCommissionRate: '10',
+          progress: 'confirmed',
+        },
+      },
+    },
+    include: { options: { include: { supply: true } } },
+  });
 }
 
+/** 판매 수수료 기본값 설정 */
+const generateDefaultSellCommission = async (): Promise<void> => {
+  await prisma.sellCommission.upsert({
+    create: {
+      commissionDecimal: '0.05',
+      commissionRate: '5',
+    },
+    update: {
+      commissionDecimal: '0.05',
+      commissionRate: '5',
+    },
+    where: { id: 1 },
+  });
+};
+
 main()
+  .then(() => generateDefaultSellCommission())
   .catch((e) => {
     console.error(e);
     process.exit(1);

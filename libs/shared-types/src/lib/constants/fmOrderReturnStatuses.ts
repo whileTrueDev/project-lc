@@ -18,3 +18,5 @@ export const convertFmReturnStatusToString = (
 export const getFmReturnStatusColor = (status: FmOrderReturn['status']): string => {
   return fmOrderReturnStatuses[status].chakraColor;
 };
+
+export const returnStatusNames = ['request', 'ing', 'complete'];

@@ -1,15 +1,8 @@
-import { Box, Link, Flex, useColorModeValue, Button } from '@chakra-ui/react';
+import { Box, Button, Flex, Link, useColorModeValue } from '@chakra-ui/react';
 import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
-import { useRouter } from 'next/router';
 import NextLink from 'next/link';
-
-const linkList: { label: string; href: string }[] = [
-  { label: '정산정보관리', href: '/admin' },
-  { label: '상품검수', href: '/goods' },
-  { label: '공지사항', href: '/notice' },
-  { label: '라이브 쇼핑 관리', href: '/live-shopping' },
-  { label: '결제 취소 요청', href: '/order-cancel' },
-];
+import { useRouter } from 'next/router';
+import { adminNavItems } from '../..';
 
 export default function AdminNav(): JSX.Element {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
@@ -38,9 +31,9 @@ export default function AdminNav(): JSX.Element {
         justify="space-between"
       >
         <Flex display={{ base: 'none', md: 'flex' }} ml={4}>
-          {linkList.map((link) => (
-            <Box key={link.label}>
-              <NextLink href={link.href ?? '#'} passHref>
+          {adminNavItems.map((adminNav) => (
+            <Box key={adminNav.label}>
+              <NextLink href={adminNav.href ?? '#'} passHref>
                 <Link
                   p={2}
                   fontSize="sm"
@@ -51,7 +44,7 @@ export default function AdminNav(): JSX.Element {
                     color: linkHoverColor,
                   }}
                 >
-                  {link.label}
+                  {adminNav.label}
                 </Link>
               </NextLink>
             </Box>

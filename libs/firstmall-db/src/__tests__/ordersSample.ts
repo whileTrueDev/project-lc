@@ -125,6 +125,8 @@ export const ordersSample: FindFmOrderRes[] = [
         shipping_seq: 1,
         deliveryCost: '2500',
         shippingCost: '2500',
+        delivery_cost: '2500',
+        shipping_cost: '2500',
         shipping_group: 'asdf',
         shipping_method: 'delivery',
         shipping_set_name: '택배',

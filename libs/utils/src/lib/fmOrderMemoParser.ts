@@ -14,7 +14,7 @@ export interface FmOrderMemoItem {
   giftFlag: boolean;
 }
 
-/** project-lc 주문의 수령자 배송메모 파서 */
+/** 크크쇼 주문의 수령자 배송메모 파서 */
 export class FmOrderMemoParser {
   private readonly PHONE_EVENT_YES_TEXT = '통화 이벤트 참여 합니다.';
   private readonly GIFT_YES_TEXT = '이 상품을 크리에이터에게 선물하고 싶습니다.';

@@ -63,7 +63,6 @@ export function OrderDetailRefundInfo({
                   src={`http://whiletrue.firstmall.kr${itemOption.image || ''}`}
                 />
                 <Text ml={itemOption.image ? 2 : 0}>{itemOption.goods_name}</Text>
-                <TextDotConnector />
                 <OrderDetailOptionListItem
                   key={itemOption.item_option_seq}
                   option={itemOption}

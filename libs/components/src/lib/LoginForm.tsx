@@ -19,7 +19,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CenterBox } from './CenterBox';
 import SocialButtonGroup from './SocialButtonGroup';

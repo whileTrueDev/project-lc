@@ -289,6 +289,8 @@ export class AdminService {
         sellEndDate: dto.sellEndDate ? new Date(dto.sellEndDate) : undefined,
         rejectionReason: dto.rejectionReason || undefined,
         videoId: videoId || undefined,
+        whiletrueCommissionRate: dto.whiletrueCommissionRate || 0,
+        broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
       },
     });
     if (!liveShoppingUpdate) {
@@ -309,5 +311,23 @@ export class AdminService {
     }
 
     return videoUrl.id;
+  }
+
+  /**
+   * 고정 판매 수수료율을 변경합니다.
+   * @param commissionRate 변경할 수수료율 5, 10 과 같은 100이하, 0이상의 숫자
+   * @returns 업데이트 성공 여부 boolean
+   */
+  public async updateSellCommission(commissionRate: string): Promise<boolean> {
+    const result = await this.prisma.sellCommission.update({
+      data: {
+        commissionRate,
+        commissionDecimal: Number(commissionRate) * 0.01,
+      },
+      where: { id: 1 },
+    });
+
+    if (result) return true;
+    return false;
   }
 }

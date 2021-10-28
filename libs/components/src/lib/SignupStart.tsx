@@ -24,7 +24,7 @@ export function SignupStart({
       enableShadow
       header={{
         // TODO : 더미 문구 변경
-        title: '[라이브커머스] 시작하기',
+        title: '크크쇼 시작하기',
         desc: '',
       }}
     >

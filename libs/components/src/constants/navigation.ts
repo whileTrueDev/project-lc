@@ -72,3 +72,27 @@ export const mypageNavLinks: MypageLink[] = [
     checkIsActive: defaultIsActiveChecker,
   },
 ];
+
+export const adminNavItems: Array<NavItem> = [
+  {
+    label: '정산정보관리',
+    href: '/admin',
+  },
+  {
+    label: '회차별 정산처리',
+    href: '/settlement',
+  },
+  {
+    label: '상품검수',
+    href: '/goods',
+  },
+  {
+    label: '라이브쇼핑관리',
+    href: '/live-shopping',
+  },
+  {
+    label: '공지사항',
+    href: '/notice',
+  },
+  { label: '결제 취소 요청', href: '/order-cancel' },
+];

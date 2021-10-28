@@ -8,6 +8,7 @@ import {
   FmExportRes,
   FmOrder,
   FmOrderOption,
+  FmOrderShipping,
   fmOrderStatuses,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -81,7 +82,7 @@ export class FmExportsService {
     const findItemsSql = `
     SELECT 
       goods_name, image,
-      item_option_seq, title1, option1, color, fm_goods_export_item.ea, price, step,
+      item_option_seq, title1, option1, fm_goods_export_item.ea, price, step,
       fm_order_item.order_seq
     FROM fm_order_item_option
       JOIN fm_order_item USING(item_seq)
@@ -140,6 +141,7 @@ export class FmExportsService {
 
   /** 일괄 출고 처리 진행 */
   public async exportOrders(dto: ExportOrdersDto, actor: string): Promise<boolean> {
+    // * 일괄 출고 처리
     const res = await Promise.all(
       dto.exportOrders.map((eo, index) => this.exportOrder(eo, actor, index)),
     );
@@ -151,9 +153,21 @@ export class FmExportsService {
     dto: ExportBundledOrdersDto,
     actor: string,
   ): Promise<boolean> {
+    const _exportTargets: ExportOrderDto[] = [];
+    dto.exportOrders.forEach((eo) => {
+      const idx = _exportTargets.findIndex((et) => et.orderId === eo.orderId);
+      if (idx === -1) _exportTargets.push(eo);
+      else {
+        _exportTargets[idx] = {
+          ..._exportTargets[idx],
+          exportOptions: _exportTargets[idx].exportOptions.concat(eo.exportOptions),
+        };
+      }
+    });
+
     // * 일괄 출고 처리
     const exportInfos = await Promise.all(
-      dto.exportOrders.map((eo) => this.exportOrder(eo, actor)),
+      _exportTargets.map((eo, index) => this.exportOrder(eo, actor, index)),
     );
 
     const bundleCode = await this.generateBundleCode();
@@ -198,28 +212,31 @@ export class FmExportsService {
     let targetOrderStatus: OrderAndOrderItemOptionExportStatuses = targetStatus;
     // 주문 정보 조회
     const myGoodsIds = await this.projectLcGoodsService.findMyGoodsIds(actor);
-    const orderInfo = await this.fmOrdersService.findOneOrder(orderId, myGoodsIds);
-    if (!orderInfo) return null;
+
+    const myOrderInfo = await this.fmOrdersService.findOneOrder(orderId, myGoodsIds);
+    if (!myOrderInfo) return null;
 
     // 주문 배송 묶음의 모든 상품.옵션이 모두 요청에 포함되었는 지 확인
-    const itemOptionSeqArr = [];
-    orderInfo.shippings.forEach((s) => {
-      s.items.forEach((i) =>
-        i.options.forEach((o) => {
-          itemOptionSeqArr.push(o.item_option_seq);
-        }),
+    const orderAllShippingItems: Array<FmOrderShipping & FmOrderOption> =
+      await this.db.query(
+        `SELECT * FROM fm_order_shipping
+      JOIN fm_order_item_option USING(shipping_seq)
+      WHERE fm_order_shipping.order_seq = ?
+      AND step NOT IN (85, 95, 99)`,
+        [orderId],
       );
-    });
 
     // 주문 배송 묶음의 모든 상품.옵션이 모두 요청에 포함되었는 지 확인
-    const isExportAllItemOptions = exportOptions.every((targetOpt) => {
-      return itemOptionSeqArr.includes(targetOpt.itemOptionSeq);
+    const itemOptionSeqArr = orderAllShippingItems.map((si) => si.item_option_seq);
+    const exportOptionsItemOptionSeqs = exportOptions.map((o) => o.itemOptionSeq);
+    const isExportAllItemOptions = itemOptionSeqArr.every((itemOptionSeq) => {
+      return exportOptionsItemOptionSeqs.includes(itemOptionSeq);
     });
     if (!isExportAllItemOptions) {
       targetOrderStatus = '50';
     }
 
-    const shippingInfo = orderInfo.shippings.find(
+    const shippingInfo = myOrderInfo.shippings.find(
       (ship) => ship.shipping_seq === shippingSeq,
     );
     if (!shippingInfo) return null;
@@ -243,7 +260,7 @@ export class FmExportsService {
       shipping_set_name: shippingInfo.shipping_set_name,
     });
 
-    const goodsSeqArr = orderInfo.items.map((i) => i.goods_seq);
+    const goodsSeqArr = myOrderInfo.items.map((i) => i.goods_seq);
     // 재고 차감 처리를 위한 상품옵션 정보 찾기
     const goodsOptions = await this.fmGoodsService.findGoodsOptions(goodsSeqArr);
 
@@ -284,7 +301,7 @@ export class FmExportsService {
       // * 주문상품(옵션) 상태 변경 쿼리
       // 현재 출고하고자 하는 옵션의 전체 정보를 가져옴.
       let opts: FmOrderOption[] = [];
-      orderInfo.items.forEach((i) => {
+      myOrderInfo.items.forEach((i) => {
         opts = opts.concat(i.options);
       });
 
@@ -325,7 +342,7 @@ export class FmExportsService {
     // * 출고 처리 주문 로그 쿼리 생성
     const orderExportLog = this.createOrderExportLogQuery({
       exportCode,
-      orderSeq: orderInfo.order_seq,
+      orderSeq: myOrderInfo.order_seq,
       registDate: new Date(),
       title: `${fmOrderStatuses[targetStatus].name}(${exportCode})`,
       actor,
