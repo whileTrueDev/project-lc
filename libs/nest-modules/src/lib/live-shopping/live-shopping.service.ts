@@ -4,17 +4,22 @@ import { throwError } from 'rxjs';
 import {
   LiveShoppingParamsDto,
   LiveShoppingWithConfirmation,
+  LiveShoppingRegistDTO,
 } from '@project-lc/shared-types';
+import { UserPayload } from '../auth/auth.interface';
 
 @Injectable()
 export class LiveShoppingService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createLiveShopping(sellerId, dto): Promise<{ liveShoppingId: number }> {
+  async createLiveShopping(
+    email: UserPayload['sub'],
+    dto: LiveShoppingRegistDTO,
+  ): Promise<{ liveShoppingId: number }> {
     const streamId = Math.random().toString(36).substr(2, 11);
 
     const userId = await this.prisma.seller.findFirst({
-      where: { email: sellerId },
+      where: { email },
       select: {
         id: true,
       },
@@ -45,7 +50,7 @@ export class LiveShoppingService {
   }
 
   async getRegisteredLiveShoppings(
-    email: string,
+    email: UserPayload['sub'],
     dto: LiveShoppingParamsDto,
   ): Promise<LiveShoppingWithConfirmation[]> {
     // 자신의 id를 반환하는 쿼리 수행하기

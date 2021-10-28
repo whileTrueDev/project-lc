@@ -1,10 +1,10 @@
 import {
   IsString,
-  IsOptional,
-  IsNumber,
   IsDate,
   IsArray,
   IsNotEmpty,
+  IsNumber,
+  IsOptional,
   ValidateIf,
 } from 'class-validator';
 import { LiveShopping, LiveShopppingProgressType } from '@prisma/client';

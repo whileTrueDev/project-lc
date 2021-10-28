@@ -11,6 +11,7 @@ import {
   UseGuards,
   ValidationPipe,
   Res,
+  Param,
 } from '@nestjs/common';
 import {
   SellCommission,
@@ -30,6 +31,8 @@ import {
   SellerContactsDTO,
   SellerContactsDTOWithoutIdDTO,
   SellerBusinessRegistrationType,
+  FindSettlementHistoryRoundRes,
+  FindSettlementHistoryDto,
 } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -123,10 +126,47 @@ export class SellerController {
   // 본인의 정산 대상 목록 조회
   @UseGuards(JwtAuthGuard)
   @Get('settlement-history')
-  public async ㅁㄴㅇㄹ(
+  public async findSettlementHistory(
     @SellerInfo() sellerInfo: UserPayload,
+    @Query(ValidationPipe) dto: FindSettlementHistoryDto,
   ): Promise<SellerSettlements[]> {
-    return this.sellerSettlementService.findSettlementHistory(sellerInfo.sub);
+    return this.sellerSettlementService.findSettlementHistory(sellerInfo.sub, {
+      round: dto.round,
+    });
+  }
+
+  // 본인의 정산 대상 년도 목록 조회
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement-history-years')
+  public async findSettlementHistoryYears(
+    @SellerInfo() sellerInfo: UserPayload,
+  ): Promise<string[]> {
+    return this.sellerSettlementService.findSettlementHistoryYears(sellerInfo.sub);
+  }
+
+  // 본인의 정산 대상 월 목록 조회
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement-history-months')
+  public async findSettlementHistoryMonths(
+    @SellerInfo() sellerInfo: UserPayload,
+    @Query('year') year: string,
+  ): Promise<string[]> {
+    return this.sellerSettlementService.findSettlementHistoryMonths(sellerInfo.sub, year);
+  }
+
+  // 본인의 정산 대상 월 목록 조회
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement-history-rounds')
+  public async findSettlementHistoryRounds(
+    @SellerInfo() sellerInfo: UserPayload,
+    @Query('year') year: string,
+    @Query('month') month: string,
+  ): Promise<string[]> {
+    return this.sellerSettlementService.findSettlementHistoryRounds(
+      sellerInfo.sub,
+      year,
+      month,
+    );
   }
 
   // 본인의 사업자 등록정보 등록
