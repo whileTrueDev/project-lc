@@ -31,18 +31,17 @@ export function SignupStart({
         <List spacing={3}>
           <ListItem>
             <ListIcon as={CheckIcon} color="green.500" />
-            라이브커머스 상품판매
+            라이브커머스를 통해 발생한 판매 관리
           </ListItem>
           <ListItem>
             <ListIcon as={CheckIcon} color="green.500" />
-            쉽고 빠른 크리에이터 매칭
+            상품에 맞는 크리에이터 매칭
           </ListItem>
           <ListItem>
             <ListIcon as={CheckIcon} color="green.500" />
-            쉽고 빠른 크리에이터 매칭
+            라이브 커머스 기획, 진행, 결제까지 한번에 해결
           </ListItem>
         </List>
-
         <Stack spacing={2}>
           <Button
             bg="blue.400"

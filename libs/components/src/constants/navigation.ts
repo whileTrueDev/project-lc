@@ -49,11 +49,11 @@ export const mypageNavLinks: MypageLink[] = [
         href: '/mypage/live',
         checkIsActive: defaultIsActiveChecker,
       },
-      {
-        name: 'VOD 관리',
-        href: '/mypage/live/vod',
-        checkIsActive: defaultIsActiveChecker,
-      },
+      // {
+      //   name: 'VOD 관리',
+      //   href: '/mypage/live/vod',
+      //   checkIsActive: defaultIsActiveChecker,
+      // },
     ],
   },
   {

@@ -1,7 +1,7 @@
 import {
   IsString,
-  IsArray,
   IsDate,
+  IsArray,
   IsNotEmpty,
   IsNumber,
   IsOptional,
