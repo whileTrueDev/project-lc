@@ -1,7 +1,7 @@
 import { LiveShopping } from '@prisma/client';
 import { AxiosError } from 'axios';
-import { useQuery, UseQueryResult } from 'react-query';
-import { BroadcasterDTO } from '@project-lc/shared-types';
+import { useQuery, UseQueryResult, UseQueryOptions } from 'react-query';
+import { BroadcasterDTO, LiveShoppingParamsDto } from '@project-lc/shared-types';
 import axios from '../../axios';
 
 interface LiveShoppingWithGoods extends LiveShopping {
@@ -20,21 +20,26 @@ interface LiveShoppingWithGoods extends LiveShopping {
 }
 
 export const getLiveShoppingList = async (
-  liveShoppingId?: string | null,
+  dto: LiveShoppingParamsDto,
 ): Promise<LiveShoppingWithGoods[]> => {
   return axios
     .get<LiveShoppingWithGoods[]>('/live-shoppings', {
-      params: { liveShoppingId },
+      params: {
+        liveShoppingId: dto.id,
+        goodsIds: dto.goodsIds,
+      },
     })
     .then((res) => res.data);
 };
 
-export const useLiveShoppingList = (dto: {
-  enabled: boolean;
-  id?: string;
-}): UseQueryResult<LiveShoppingWithGoods[], AxiosError> => {
+export const useLiveShoppingList = (
+  dto: LiveShoppingParamsDto,
+  options?: UseQueryOptions<LiveShoppingWithGoods[], AxiosError>,
+): UseQueryResult<LiveShoppingWithGoods[], AxiosError> => {
   const queryKey = ['LiveShoppingList', dto];
-  return useQuery<LiveShoppingWithGoods[], AxiosError>(queryKey, () =>
-    getLiveShoppingList(dto.id || null),
+  return useQuery<LiveShoppingWithGoods[], AxiosError>(
+    queryKey,
+    () => getLiveShoppingList(dto || null),
+    options,
   );
 };

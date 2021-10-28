@@ -21,8 +21,13 @@ import {
   useDeleteFmGoods,
   useDeleteLcGoods,
   useFmOrdersByGoods,
+  useLiveShoppingList,
 } from '@project-lc/hooks';
-import { getFmOrderStatusByNames, SellerGoodsListItem } from '@project-lc/shared-types';
+import {
+  getFmOrderStatusByNames,
+  SellerGoodsListItem,
+  getLiveShoppingProgress,
+} from '@project-lc/shared-types';
 import { useRef, useMemo } from 'react';
 import { useQueryClient } from 'react-query';
 
@@ -68,6 +73,26 @@ export function DeleteGoodsAlertDialog({
     { enabled: isOpen },
   );
 
+  const liveShoppings = useLiveShoppingList(
+    {
+      goodsIds: selectedGoodsIds as number[],
+    },
+    { enabled: isOpen },
+  );
+
+  // 선택된 상품목록 중, 라이브쇼핑이 존재하는 상품명
+  const hasliveShoppingList = useMemo(() => {
+    if (!liveShoppings.data) return [];
+    return liveShoppings.data.reduce((arr: string[], liveShopping) => {
+      const liveShoppingProgress = getLiveShoppingProgress(liveShopping);
+      if (['판매종료', '취소됨'].includes(liveShoppingProgress)) {
+        return arr;
+      }
+      arr.push(liveShopping.goods.goods_name);
+      return arr;
+    }, []);
+  }, [liveShoppings.data]);
+
   // 선택된 상품목록이 삭제가능한 지 여부
   const isDeletable = useMemo(() => {
     if (!orders.data) return false;
@@ -85,6 +110,16 @@ export function DeleteGoodsAlertDialog({
       });
       return;
     }
+
+    if (!(hasliveShoppingList.length === 0)) {
+      toast({
+        status: 'error',
+        title: '선택된 상품 중, 라이브 쇼핑에 등록된 상품이 포함되어 있습니다.',
+        isClosable: true,
+      });
+      return;
+    }
+
     // 검수된 상품
     const confirmedGoods = items.filter(
       (item) =>
@@ -168,6 +203,20 @@ export function DeleteGoodsAlertDialog({
                 </AlertDescription>
               </Alert>
             )}
+            {!liveShoppings.isLoading && hasliveShoppingList.length > 0 && (
+              <Alert status="error" mt={4}>
+                <AlertIcon />
+                <AlertDescription>
+                  <Stack spacing={1}>
+                    <Text>
+                      선택된 상품 목록에 라이브 쇼핑에 등록된 상품이 포함되어 있어 상품
+                      삭제가 불가능합니다.
+                    </Text>
+                    <Text as="u">등록된 상품 : {hasliveShoppingList.join(', ')}</Text>
+                  </Stack>
+                </AlertDescription>
+              </Alert>
+            )}
           </AlertDialogBody>
 
           <AlertDialogFooter>
@@ -176,7 +225,7 @@ export function DeleteGoodsAlertDialog({
               onClick={handleDelete}
               ml={3}
               colorScheme="red"
-              isDisabled={!isDeletable}
+              isDisabled={!isDeletable || !(hasliveShoppingList.length === 0)}
               isLoading={
                 deleteLcGoods.isLoading || deleteFmGoods.isLoading || orders.isLoading
               }

@@ -1,24 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { throwError } from 'rxjs';
-import { LiveShopping } from '@prisma/client';
+import {
+  LiveShoppingParamsDto,
+  LiveShoppingWithConfirmation,
+  LiveShoppingRegistDTO,
+} from '@project-lc/shared-types';
+import { UserPayload } from '../auth/auth.interface';
 
-interface LiveShoppingWithConfirmation extends LiveShopping {
-  goods: {
-    confirmation: {
-      firstmallGoodsConnectionId: number;
-    };
-  };
-}
 @Injectable()
 export class LiveShoppingService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createLiveShopping(sellerId, dto): Promise<{ liveShoppingId: number }> {
+  async createLiveShopping(
+    email: UserPayload['sub'],
+    dto: LiveShoppingRegistDTO,
+  ): Promise<{ liveShoppingId: number }> {
     const streamId = Math.random().toString(36).substr(2, 11);
 
     const userId = await this.prisma.seller.findFirst({
-      where: { email: sellerId },
+      where: { email },
       select: {
         id: true,
       },
@@ -49,23 +50,32 @@ export class LiveShoppingService {
   }
 
   async getRegisteredLiveShoppings(
-    id?: string,
-    needConfirmation?: boolean,
-  ): Promise<LiveShopping[] | LiveShoppingWithConfirmation[]> {
+    email: UserPayload['sub'],
+    dto: LiveShoppingParamsDto,
+  ): Promise<LiveShoppingWithConfirmation[]> {
+    // 자신의 id를 반환하는 쿼리 수행하기
+    const { id, goodsIds } = dto;
     return this.prisma.liveShopping.findMany({
-      where: { id: id ? Number(id) : undefined },
+      where: {
+        id: id ? Number(id) : undefined,
+        goodsId:
+          goodsIds?.length >= 1
+            ? { in: goodsIds.map((goodsid) => Number(goodsid)) }
+            : undefined,
+        seller: {
+          email,
+        },
+      },
       include: {
         goods: {
           select: {
             goods_name: true,
             summary: true,
-            confirmation: needConfirmation
-              ? {
-                  select: {
-                    firstmallGoodsConnectionId: true,
-                  },
-                }
-              : undefined,
+            confirmation: {
+              select: {
+                firstmallGoodsConnectionId: true,
+              },
+            },
           },
         },
         seller: {
