@@ -23,25 +23,23 @@ export function SignupStart({
     <CenterBox
       enableShadow
       header={{
-        // TODO : 더미 문구 변경
         title: '크크쇼 시작하기',
         desc: '',
       }}
     >
       <VStack mt={4} spacing={8} align="stretch">
-        // TODO : 더미 문구 변경
         <List spacing={3}>
           <ListItem>
             <ListIcon as={CheckIcon} color="green.500" />
-            라이브커머스 상품판매
+            라이브커머스를 통해 발생한 판매 관리
           </ListItem>
           <ListItem>
             <ListIcon as={CheckIcon} color="green.500" />
-            쉽고 빠른 크리에이터 매칭
+            상품에 맞는 크리에이터 매칭
           </ListItem>
           <ListItem>
             <ListIcon as={CheckIcon} color="green.500" />
-            쉽고 빠른 크리에이터 매칭
+            라이브 커머스 기획, 진행, 결제까지 한번에 해결
           </ListItem>
         </List>
         <Stack spacing={2}>
