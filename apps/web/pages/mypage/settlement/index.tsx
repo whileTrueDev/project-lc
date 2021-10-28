@@ -1,14 +1,15 @@
+import { Container, Divider, Grid, GridItem, Heading, VStack } from '@chakra-ui/react';
 import {
-  MypageLayout,
-  SettlementStateBox,
   BusinessRegistrationBox,
+  MypageLayout,
   SettlementAccountBox,
-  SettlementListBox,
+  SettlementList,
+  SettlementRoundHistory,
+  SettlementStateBox,
 } from '@project-lc/components';
 import { useSettlementInfo } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
-import { Heading, VStack, Divider, Container, Grid, GridItem } from '@chakra-ui/react';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 // 정산 페이지 컴포넌트
 export function Index(): JSX.Element {
@@ -31,10 +32,10 @@ export function Index(): JSX.Element {
 
   return (
     <MypageLayout>
-      <Container maxW="7xl" p={[1, 6, 6, 6]}>
+      <Container maxW="7xl" p={6}>
         <Heading mb={4}>정산</Heading>
         <VStack spacing={1} alignItems="stretch">
-          <Grid p={3} gap={3} templateColumns="repeat(6, 1fr)">
+          <Grid gap={3} templateColumns="repeat(6, 1fr)">
             <GridItem colSpan={[6, 3, 3, 3]} rowSpan={1} alignItems="stretch">
               {/* 정산 상태 BOX */}
               <SettlementStateBox
@@ -50,10 +51,6 @@ export function Index(): JSX.Element {
                 refetch={refetch}
               />
             </GridItem>
-            <GridItem colSpan={[6, 3, 3, 3]} rowSpan={3} alignItems="stretch">
-              {/* 정산 목록 BOX */}
-              <SettlementListBox sellerSettlements={settlementData?.sellerSettlements} />
-            </GridItem>
             <GridItem colSpan={[6, 3, 3, 3]} rowSpan={2} alignItems="stretch">
               {/* 사업자 등록증 BOX */}
               <BusinessRegistrationBox
@@ -65,6 +62,16 @@ export function Index(): JSX.Element {
           <Divider />
         </VStack>
       </Container>
+
+      <Container maxW="7xl" p={6}>
+        <Heading mb={4}>정산 내역</Heading>
+        <SettlementRoundHistory />
+      </Container>
+
+      <VStack alignItems="stretch">
+        {/* 정산 목록 BOX */}
+        <SettlementList />
+      </VStack>
     </MypageLayout>
   );
 }

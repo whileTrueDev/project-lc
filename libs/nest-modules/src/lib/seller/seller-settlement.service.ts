@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import {
   BusinessRegistrationConfirmation,
+  Prisma,
   SellCommission,
   SellerBusinessRegistration,
   SellerSettlementAccount,
 } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BusinessRegistrationDto,
   ExecuteSettlementDto,
+  FindSettlementHistoryRoundRes,
   FmExport,
   SellerBusinessRegistrationType,
   SettlementAccountDto,
@@ -307,6 +310,62 @@ export class SellerSettlementService {
     return this.prisma.sellCommission.findFirst({ orderBy: { id: 'desc' } });
   }
 
+  /** 정산완료 데이터의 년도 목록 조회 */
+  public async findSettlementHistoryYears(email: UserPayload['sub']): Promise<string[]> {
+    const result: { year: string }[] = await this.prisma.$queryRaw`
+    SELECT YEAR(round) AS year FROM SellerSettlements WHERE sellerEmail = ${email} GROUP BY YEAR(round)
+    `;
+
+    return result.map((m) => m.year);
+  }
+
+  /** 정산완료 데이터의 월 목록 조회 */
+  public async findSettlementHistoryMonths(
+    email: UserPayload['sub'],
+    year: string,
+  ): Promise<string[]> {
+    const result: { month: string }[] = await this.prisma.$queryRaw`
+    SELECT MONTH(round) AS month FROM SellerSettlements
+    WHERE round LIKE ${`${year}/%`} AND sellerEmail = ${email} GROUP BY MONTH(round)
+    `;
+
+    return result.map((m) => m.month);
+  }
+
+  /** 정산완료 데이터의 회차 목록 조회 */
+  public async findSettlementHistoryRounds(
+    email: UserPayload['sub'],
+    year: string,
+    month: string,
+  ): Promise<string[]> {
+    const result: { round: string }[] = await this.prisma.$queryRaw`
+    SELECT round FROM SellerSettlements
+    WHERE round LIKE ${`${year}/${month}%`} AND sellerEmail = ${email} GROUP BY round
+    `;
+
+    return result.map((m) => m.round);
+  }
+
+  /** 정산 완료 목록의 round를 기준으로 groupby 조회를 실시합니다. */
+  public async findSettlementHistoryPerRound(
+    email: UserPayload['sub'],
+  ): Promise<FindSettlementHistoryRoundRes> {
+    const result = await this.prisma.sellerSettlements.groupBy({
+      by: ['round'],
+      where: { sellerEmail: email },
+      _sum: {
+        totalPrice: true,
+        totalAmount: true,
+        totalCommission: true,
+        pgCommission: true,
+        totalEa: true,
+        shippingCost: true,
+      },
+    });
+
+    return result;
+  }
+
   /**
    * 정산 완료 목록을 조회합니다.
    * @author hwasurr(dan)
@@ -314,15 +373,25 @@ export class SellerSettlementService {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   public async findSettlementHistory(
     email?: UserPayload['sub'],
-    options?: { export_seq?: FmExport['export_seq']; order_seq?: FmExport['order_seq'] },
+    options?: {
+      round?: string;
+      export_seq?: FmExport['export_seq'];
+      order_seq?: FmExport['order_seq'];
+    },
   ) {
     return this.prisma.sellerSettlements.findMany({
       where: {
         sellerEmail: email || undefined,
         exportId: options && options.export_seq ? options.export_seq : undefined,
         orderId: options && options.order_seq ? String(options.order_seq) : undefined,
+        round: options?.round ? options.round : undefined,
       },
       include: {
+        seller: {
+          include: {
+            sellerShop: true,
+          },
+        },
         settlementItems: {
           include: {
             liveShopping: true,
