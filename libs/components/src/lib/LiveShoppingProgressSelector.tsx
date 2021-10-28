@@ -48,7 +48,7 @@ export function LiveShoppingProgressSelector(): JSX.Element {
           );
         })}
       </Select>
-      {watch('progress') === LiveShopppingProgressType.confirmed && (
+      {watch('progress') === LIVE_SHOPPING_PROGRESS.확정됨 && (
         <>
           <Box mt={5}>
             <Divider />
@@ -105,7 +105,7 @@ export function LiveShoppingProgressSelector(): JSX.Element {
           </Box>
         </>
       )}
-      {watch('progress') === LiveShopppingProgressType.canceled && (
+      {watch('progress') === LIVE_SHOPPING_PROGRESS.취소됨 && (
         <Box mt="5">
           <Text>취소사유</Text>
           <Select
