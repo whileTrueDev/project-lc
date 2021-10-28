@@ -4,15 +4,19 @@ dotenv.config();
 
 export const mailerConfig = {
   transport: {
-    host: 'smtp.mailplug.co.kr',
-    port: 465,
+    service: 'gmail',
+    host: 'smtp.google.com',
+    port: 587,
     secure: true,
     auth: {
+      type: 'OAuth2',
       user: process.env.MAILER_USER,
-      pass: process.env.MAILER_PASS,
+      clientId: process.env.GMAIL_OAUTH_CLIENT_ID,
+      clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET,
+      refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN,
     },
   },
   defaults: {
-    from: 'hwasurr@onad.io',
+    from: process.env.MAILER_USER,
   },
 };
