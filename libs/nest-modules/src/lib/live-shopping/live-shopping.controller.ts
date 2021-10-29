@@ -8,8 +8,12 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { LiveShopping } from '@prisma/client';
-import { ApprovedGoodsNameAndId, LiveShoppingRegistDTO } from '@project-lc/shared-types';
+import {
+  ApprovedGoodsNameAndId,
+  LiveShoppingRegistDTO,
+  LiveShoppingParamsDto,
+  LiveShoppingWithConfirmation,
+} from '@project-lc/shared-types';
 import { UserPayload } from '../auth/auth.interface';
 import { GoodsService } from '../goods/goods.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
@@ -25,8 +29,11 @@ export class LiveShoppingController {
   ) {}
 
   @Get()
-  getLiveShoppings(@Query('liveShoppingId') dto?: string): Promise<LiveShopping[]> {
-    return this.liveShoppingService.getRegisteredLiveShoppings(dto || null);
+  getLiveShoppings(
+    @SellerInfo() seller: UserPayload,
+    @Query(ValidationPipe) dto?: LiveShoppingParamsDto,
+  ): Promise<LiveShoppingWithConfirmation[]> {
+    return this.liveShoppingService.getRegisteredLiveShoppings(seller.sub, dto);
   }
 
   /** 라이브쇼핑 등록 */
@@ -35,8 +42,7 @@ export class LiveShoppingController {
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: LiveShoppingRegistDTO,
   ): Promise<{ liveShoppingId: number }> {
-    const email = seller.sub;
-    return this.liveShoppingService.createLiveShopping(email, dto);
+    return this.liveShoppingService.createLiveShopping(seller.sub, dto);
   }
 
   @Delete()

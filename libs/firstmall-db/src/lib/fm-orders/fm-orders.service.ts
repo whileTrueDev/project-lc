@@ -163,7 +163,7 @@ export class FmOrdersService {
       if (dto.searchStatuses && dto.searchStatuses.length > 0) {
         whereSql += `\nAND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
           ',',
-        )})) `;
+        )}) `;
       }
 
       if (dto.search) {
@@ -188,7 +188,7 @@ export class FmOrdersService {
       if (dto.searchStatuses && dto.searchStatuses.length > 0) {
         whereSql += `\nAND IF(AND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
           ',',
-        )})) `;
+        )}) `;
       }
 
       return {
@@ -200,7 +200,7 @@ export class FmOrdersService {
     if (dto.searchStatuses && dto.searchStatuses.length > 0) {
       whereSql += `AND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
         ',',
-      )}) `;
+      )})`;
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
       return {
         sql: defaultQueryHead + whereSql + groupbySql + orderSql,
@@ -813,15 +813,14 @@ export class FmOrdersService {
     AND
     DATE(regist_date) BETWEEN ? AND ?;
     `;
-
     await Promise.all(
       dto.map(async (val) => {
         const sellStartDate = dayjs(val.sellStartDate).format('YYYY-MM-DD HH:mm:ss');
         const sellEndDate = dayjs(val.sellEndDate).format('YYYY-MM-DD HH:mm:ss');
         const salesSum = await this.db.query(sql, [
           val.firstmallGoodsConnectionId,
-          new Date(sellStartDate),
-          new Date(sellEndDate),
+          sellStartDate,
+          sellEndDate,
         ]);
         salesPrice.push({
           id: val.id,

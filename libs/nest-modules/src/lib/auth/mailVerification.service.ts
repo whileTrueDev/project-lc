@@ -38,11 +38,12 @@ export class MailVerificationService {
     try {
       await this.mailerService.sendMail({
         to: targetEmail,
-        subject: `${code}은(는) 이메일 확인을 완료할 코드입니다.`,
+        subject: `[크크쇼] ${code}은(는) 이메일 확인을 완료할 코드입니다.`,
         html: createVerificationTemplate(code),
       });
       return true;
     } catch (e) {
+      console.error(e);
       throw new InternalServerErrorException(e, 'error in send email');
     }
   }
