@@ -22,15 +22,18 @@ export class LCDomainStack extends cdk.Stack {
     super(scope, id, props);
 
     const { prodALB, devALB } = props;
+    if (!devALB) {
+      throw new Error('dev ALB is not defined - from LCDomainStack');
+    }
 
     // 호스팅영역 생성
     this.createPublicHostedZone();
 
     this.prodALBTarget = new route53Targets.LoadBalancerTarget(prodALB);
-    // this.devALBTarget = new route53Targets.LoadBalancerTarget(devALB);
+    this.devALBTarget = new route53Targets.LoadBalancerTarget(devALB);
 
     this.createProdRecords();
-    // this.createDevRecords();
+    this.createDevRecords();
   }
 
   private createPublicHostedZone(): route53.PublicHostedZone {

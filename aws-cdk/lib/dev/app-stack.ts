@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+import * as acm from '@aws-cdk/aws-certificatemanager';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
@@ -17,6 +18,9 @@ interface LCDevAppStackProps extends cdk.StackProps {
 const PREFIX = 'LC-DEV-APP';
 
 export class LCDevAppStack extends cdk.Stack {
+  private readonly ACM_ARN =
+    'arn:aws:acm:ap-northeast-2:803609402610:certificate/763681b4-a8c3-47e0-998a-24754351b499';
+
   private DBURL_PARAMETER: ssm.IStringParameter;
   private FIRSTMALL_DATABASE_URL: ssm.IStringParameter;
   private GOOGLE_CLIENT_ID: ssm.IStringParameter;
@@ -195,7 +199,7 @@ export class LCDevAppStack extends cdk.Stack {
     });
 
     // If you do not provide any options for this method, it redirects HTTP port 80 to HTTPS port 443
-    // alb.addRedirect();
+    alb.addRedirect();
 
     // ALB 타겟 그룹으로 생성
     const apiTargetGroup = new elbv2.ApplicationTargetGroup(
@@ -215,14 +219,20 @@ export class LCDevAppStack extends cdk.Stack {
       },
     );
 
+    const sslCert = acm.Certificate.fromCertificateArn(
+      this,
+      'DnsCertificates',
+      this.ACM_ARN,
+    );
+
     // ALB에 HTTP 리스너 추가
-    const truepointHttpListener = alb.addListener(`${PREFIX}ALBHttpListener`, {
-      port: 80,
+    const HttpsListener = alb.addListener(`${PREFIX}ALBHttpsListener`, {
+      port: 443,
+      sslPolicy: elbv2.SslPolicy.RECOMMENDED,
+      certificates: [sslCert],
       defaultTargetGroups: [apiTargetGroup],
     });
-    truepointHttpListener.connections.allowDefaultPortFromAnyIpv4(
-      'https ALB open to world',
-    );
+    HttpsListener.connections.allowDefaultPortFromAnyIpv4('https ALB open to world');
 
     const overlayTargetGroup = new elbv2.ApplicationTargetGroup(
       this,
@@ -242,7 +252,7 @@ export class LCDevAppStack extends cdk.Stack {
     );
 
     // HTTP 리스너에 Overlay 서버 타겟그룹 추가
-    truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
+    HttpsListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
       priority: 1,
       conditions: [elbv2.ListenerCondition.hostHeaders(['preview-livecommerce.onad.io'])],
       targetGroups: [overlayTargetGroup],
