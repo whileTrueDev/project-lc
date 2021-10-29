@@ -272,7 +272,6 @@ export class LCProdAppStack extends cdk.Stack {
       );
     };
     return {
-      // TODO: PROD DB로 변경필요
       DATABASE_URL: __loadSsmParmeter(c.DATABASE_URL_KEY, 2),
       FIRSTMALL_DATABASE_URL: __loadSsmParmeter(c.FIRSTMALL_DATABASE_URL_KEY),
       GOOGLE_CLIENT_ID: __loadSsmParmeter(c.GOOGLE_CLIENT_ID_KEY, 2),

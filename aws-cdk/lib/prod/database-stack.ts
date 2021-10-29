@@ -46,7 +46,7 @@ export class LCProdDatabaseStack extends cdk.Stack {
         },
       }),
       publiclyAccessible: false,
-      deletionProtection: false, // TODO: 실제 배포시에 true로 변경.
+      deletionProtection: false,
       iamAuthentication: true,
       // enablePerformanceInsights: true,
       cloudwatchLogsExports: ['error', 'slowquery', 'general', 'audit'],

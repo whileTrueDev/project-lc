@@ -104,7 +104,7 @@ export const constants = {
     // * ************************
     // * SSM Parameter Store Keys
     // * ************************
-    DATABASE_URL_KEY: 'PROJECT_LC_DB_URL', // TODO ssm paramter store 설정 필요
+    DATABASE_URL_KEY: 'PROJECT_LC_DB_URL',
     FIRSTMALL_DATABASE_URL_KEY: 'LC_FIRSTMALL_DB_URL',
     GOOGLE_CREDENTIALS_EMAIL_KEY: 'LIVECOMMERCE_GCP_TTS_EMAIL',
     GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY: 'LIVECOMMERCE_GCP_TTS_PRIVATE_KEY',
