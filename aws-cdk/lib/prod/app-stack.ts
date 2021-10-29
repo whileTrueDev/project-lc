@@ -1,4 +1,5 @@
 import * as ec2 from '@aws-cdk/aws-ec2';
+import * as acm from '@aws-cdk/aws-certificatemanager';
 import {
   AwsLogDriver,
   Cluster,
@@ -13,6 +14,7 @@ import {
   ApplicationProtocol,
   ApplicationTargetGroup,
   ListenerCondition,
+  SslPolicy,
 } from '@aws-cdk/aws-elasticloadbalancingv2';
 import * as logs from '@aws-cdk/aws-logs';
 import * as ssm from '@aws-cdk/aws-ssm';
@@ -27,6 +29,9 @@ interface LCProdAppStackProps extends cdk.StackProps {
 }
 
 export class LCProdAppStack extends cdk.Stack {
+  private readonly ACM_ARN =
+    'arn:aws:acm:ap-northeast-2:803609402610:certificate/763681b4-a8c3-47e0-998a-24754351b499';
+
   private readonly PREFIX = constants.PROD.ID_PREFIX;
   private readonly vpc: ec2.Vpc;
   private readonly albSecGrp: ec2.SecurityGroup;
@@ -190,7 +195,7 @@ export class LCProdAppStack extends cdk.Stack {
     });
 
     // Redirect 80(http) to 440(https)
-    // alb.addRedirect();
+    alb.addRedirect();
 
     const apiTargetGroup = new ApplicationTargetGroup(
       this,
@@ -209,12 +214,20 @@ export class LCProdAppStack extends cdk.Stack {
       },
     );
 
-    const httpListener = alb.addListener(`${this.PREFIX}ALBHttpListener`, {
-      port: 80,
+    const sslCert = acm.Certificate.fromCertificateArn(
+      this,
+      'DnsCertificates',
+      this.ACM_ARN,
+    );
+    const httpsListener = alb.addListener(`${this.PREFIX}ALBHttpsListener`, {
+      port: 443,
+
+      certificates: [sslCert],
+      sslPolicy: SslPolicy.RECOMMENDED,
       defaultTargetGroups: [apiTargetGroup],
     });
-    httpListener.connections.allowDefaultPortFromAnyIpv4('Open HTTP ALB to anywhere');
-    httpListener.addTargetGroups(`${this.PREFIX}AddApiTargetGroup`, {
+    httpsListener.connections.allowDefaultPortFromAnyIpv4('Open HTTP ALB to anywhere');
+    httpsListener.addTargetGroups(`${this.PREFIX}AddApiTargetGroup`, {
       priority: 1,
       conditions: [ListenerCondition.hostHeaders([`api.${constants.PUNYCODE_DOMAIN}`])],
       targetGroups: [apiTargetGroup],
@@ -235,7 +248,7 @@ export class LCProdAppStack extends cdk.Stack {
         targets: [this.overlayService],
       },
     );
-    httpListener.addTargetGroups(`${this.PREFIX}AddOverlayTargetGroup`, {
+    httpsListener.addTargetGroups(`${this.PREFIX}AddOverlayTargetGroup`, {
       priority: 2,
       conditions: [ListenerCondition.hostHeaders([`live.${constants.PUNYCODE_DOMAIN}`])],
       targetGroups: [overlayTargetGroup],

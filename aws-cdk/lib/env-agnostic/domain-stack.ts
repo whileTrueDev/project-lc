@@ -36,7 +36,7 @@ export class LCDomainStack extends cdk.Stack {
   private createPublicHostedZone(): route53.PublicHostedZone {
     this.hostedzone = new route53.PublicHostedZone(
       this,
-      `${this.DOMAIN}_PublicHostedZone`,
+      `${this.PUNYCODE_DOMAIN}_PublicHostedZone`,
       {
         zoneName: this.PUNYCODE_DOMAIN,
         comment: `${this.DOMAIN} hosted zone`,
