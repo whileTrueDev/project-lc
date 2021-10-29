@@ -6,7 +6,7 @@ import { constants } from '../../constants';
 
 interface LCDomainStackProps extends cdk.StackProps {
   prodALB: elbv2.ApplicationLoadBalancer;
-  devALB: elbv2.ApplicationLoadBalancer;
+  devALB?: elbv2.ApplicationLoadBalancer;
 }
 
 export class LCDomainStack extends cdk.Stack {
@@ -27,10 +27,10 @@ export class LCDomainStack extends cdk.Stack {
     this.createPublicHostedZone();
 
     this.prodALBTarget = new route53Targets.LoadBalancerTarget(prodALB);
-    this.devALBTarget = new route53Targets.LoadBalancerTarget(devALB);
+    // this.devALBTarget = new route53Targets.LoadBalancerTarget(devALB);
 
     this.createProdRecords();
-    this.createDevRecords();
+    // this.createDevRecords();
   }
 
   private createPublicHostedZone(): route53.PublicHostedZone {
@@ -47,19 +47,25 @@ export class LCDomainStack extends cdk.Stack {
 
   private createProdRecords(): void {
     // 프로덕션용 ALB로 라우팅하는 기본 크크쇼.com 레코드 생성
-    new route53.ARecord(this, `${this.DOMAIN}_ARecord`, {
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord`, {
       zone: this.hostedzone,
       target: route53.RecordTarget.fromAlias(this.prodALBTarget),
     });
     // 프로덕션용 ALB로 라우팅하는 live.크크쇼.com 레코드 생성
-    new route53.ARecord(this, `${this.DOMAIN}_ARecord_live`, {
-      recordName: `live.${this.DOMAIN}`,
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_api`, {
+      recordName: `api.${this.PUNYCODE_DOMAIN}`,
       zone: this.hostedzone,
       target: route53.RecordTarget.fromAlias(this.prodALBTarget),
     });
     // 프로덕션용 ALB로 라우팅하는 live.크크쇼.com 레코드 생성
-    new route53.ARecord(this, `${this.DOMAIN}_ARecord_admin`, {
-      recordName: `admin.${this.DOMAIN}`,
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_live`, {
+      recordName: `live.${this.PUNYCODE_DOMAIN}`,
+      zone: this.hostedzone,
+      target: route53.RecordTarget.fromAlias(this.prodALBTarget),
+    });
+    // 프로덕션용 ALB로 라우팅하는 live.크크쇼.com 레코드 생성
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_admin`, {
+      recordName: `admin.${this.PUNYCODE_DOMAIN}`,
       zone: this.hostedzone,
       target: route53.RecordTarget.fromAlias(this.prodALBTarget),
     });
@@ -67,8 +73,8 @@ export class LCDomainStack extends cdk.Stack {
 
   private createDevRecords(): void {
     // Dev환경용 ALB로 라우팅하는 기본 dev.크크쇼.com 레코드 생성
-    new route53.ARecord(this, `${this.DOMAIN}_ARecord_dev`, {
-      recordName: `dev.${this.DOMAIN}`,
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_dev`, {
+      recordName: `dev.${this.PUNYCODE_DOMAIN}`,
       zone: this.hostedzone,
       target: route53.RecordTarget.fromAlias(this.devALBTarget),
     });

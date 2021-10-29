@@ -25,7 +25,9 @@ export class LCDevAppStack extends cdk.Stack {
   private NAVER_CLIENT_SECRET: ssm.IStringParameter;
   private KAKAO_CLIENT_ID: ssm.IStringParameter;
   private MAILER_USER: ssm.IStringParameter;
-  private MAILER_PASS: ssm.IStringParameter;
+  private GMAIL_OAUTH_REFRESH_TOKEN: ssm.IStringParameter;
+  private GMAIL_OAUTH_CLIENT_ID: ssm.IStringParameter;
+  private GMAIL_OAUTH_CLIENT_SECRET: ssm.IStringParameter;
   private GOOGLE_CREDENTIALS_EMAIL: ssm.IStringParameter;
   private GOOGLE_CREDENTIALS_PRIVATE_KEY: ssm.IStringParameter;
   private JWT_SECRET: ssm.IStringParameter;
@@ -81,7 +83,13 @@ export class LCDevAppStack extends cdk.Stack {
         NAVER_CLIENT_SECRET: ecs.Secret.fromSsmParameter(this.NAVER_CLIENT_SECRET),
         KAKAO_CLIENT_ID: ecs.Secret.fromSsmParameter(this.KAKAO_CLIENT_ID),
         MAILER_USER: ecs.Secret.fromSsmParameter(this.MAILER_USER),
-        MAILER_PASS: ecs.Secret.fromSsmParameter(this.MAILER_PASS),
+        GMAIL_OAUTH_REFRESH_TOKEN: ecs.Secret.fromSsmParameter(
+          this.GMAIL_OAUTH_REFRESH_TOKEN,
+        ),
+        GMAIL_OAUTH_CLIENT_ID: ecs.Secret.fromSsmParameter(this.GMAIL_OAUTH_CLIENT_ID),
+        GMAIL_OAUTH_CLIENT_SECRET: ecs.Secret.fromSsmParameter(
+          this.GMAIL_OAUTH_CLIENT_SECRET,
+        ),
         JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
         CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
         CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
@@ -266,7 +274,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}GOOGLE_CLIENT_ID`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.GOOGLE_CLIENT_ID,
       },
     );
@@ -274,7 +282,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}GOOGLE_CLIENT_SECRET`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.GOOGLE_CLIENT_SECRET,
       },
     );
@@ -282,7 +290,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}NAVER_CLIENT_ID`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.NAVER_CLIENT_ID,
       },
     );
@@ -290,7 +298,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}NAVER_CLIENT_SECRET`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.NAVER_CLIENT_SECRET,
       },
     );
@@ -298,7 +306,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}KAKAO_CLIENT_ID`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.KAKAO_CLIENT_ID,
       },
     );
@@ -306,18 +314,36 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}MAILER_USER`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.MAILER_USER,
       },
     );
-    this.MAILER_PASS = ssm.StringParameter.fromSecureStringParameterAttributes(
+    this.GMAIL_OAUTH_REFRESH_TOKEN =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GMAIL_OAUTH_REFRESH_TOKEN`,
+        {
+          version: 1,
+          parameterName: constants.DEV.GMAIL_OAUTH_REFRESH_TOKEN,
+        },
+      );
+    this.GMAIL_OAUTH_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
       this,
-      `${PREFIX}MAILER_PASS`,
+      `${PREFIX}GMAIL_OAUTH_CLIENT_ID`,
       {
         version: 1,
-        parameterName: constants.DEV.MAILER_PASS,
+        parameterName: constants.DEV.GMAIL_OAUTH_CLIENT_ID,
       },
     );
+    this.GMAIL_OAUTH_CLIENT_SECRET =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GMAIL_OAUTH_CLIENT_SECRET`,
+        {
+          version: 1,
+          parameterName: constants.DEV.GMAIL_OAUTH_CLIENT_SECRET,
+        },
+      );
 
     this.GOOGLE_CREDENTIALS_EMAIL =
       ssm.StringParameter.fromSecureStringParameterAttributes(
@@ -401,7 +427,6 @@ export class LCDevAppStack extends cdk.Stack {
       NAVER_CLIENT_SECRET: this.NAVER_CLIENT_SECRET,
       KAKAO_CLIENT_ID: this.KAKAO_CLIENT_ID,
       MAILER_USER: this.MAILER_USER,
-      MAILER_PASS: this.MAILER_PASS,
       GOOGLE_CREDENTIALS_EMAIL: this.GOOGLE_CREDENTIALS_EMAIL,
       GOOGLE_CREDENTIALS_PRIVATE_KEY: this.GOOGLE_CREDENTIALS_PRIVATE_KEY,
       JWT_SECRET: this.JWT_SECRET,

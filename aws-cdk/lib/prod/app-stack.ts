@@ -34,8 +34,6 @@ export class LCProdAppStack extends cdk.Stack {
   private readonly overlaySecGrp: ec2.SecurityGroup;
   private readonly cluster: Cluster;
   private readonly parameters: ReturnType<LCProdAppStack['loadSsmParamters']>;
-  private readonly apiTargetGroup: ApplicationTargetGroup;
-  private readonly overlayTargetGroup: ApplicationTargetGroup;
 
   public readonly apiService: FargateService;
   public readonly overlayService: FargateService;
@@ -51,12 +49,8 @@ export class LCProdAppStack extends cdk.Stack {
 
     this.parameters = this.loadSsmParamters();
     this.cluster = this.createEcsCluster();
-    const api = this.createApiService();
-    const overlay = this.createOverlayService();
-    this.apiService = api.service;
-    this.apiTargetGroup = api.targetGroup;
-    this.overlayService = overlay.service;
-    this.overlayTargetGroup = overlay.targetGroup;
+    this.apiService = this.createApiService();
+    this.overlayService = this.createOverlayService();
 
     this.alb = this.createALB();
   }
@@ -69,10 +63,7 @@ export class LCProdAppStack extends cdk.Stack {
     });
   }
 
-  private createApiService(): {
-    service: FargateService;
-    targetGroup: ApplicationTargetGroup;
-  } {
+  private createApiService(): FargateService {
     const apiTaskDef = new FargateTaskDefinition(this, `${this.PREFIX}ApiTaskDef`, {
       family: constants.PROD.ECS_API_FAMILY_NAME,
     });
@@ -92,7 +83,9 @@ export class LCProdAppStack extends cdk.Stack {
         NAVER_CLIENT_SECRET: Secret.fromSsmParameter(p.NAVER_CLIENT_SECRET),
         KAKAO_CLIENT_ID: Secret.fromSsmParameter(p.KAKAO_CLIENT_ID),
         MAILER_USER: Secret.fromSsmParameter(p.MAILER_USER),
-        MAILER_PASS: Secret.fromSsmParameter(p.MAILER_PASS),
+        GMAIL_OAUTH_REFRESH_TOKEN: Secret.fromSsmParameter(p.GMAIL_OAUTH_REFRESH_TOKEN),
+        GMAIL_OAUTH_CLIENT_ID: Secret.fromSsmParameter(p.GMAIL_OAUTH_CLIENT_ID),
+        GMAIL_OAUTH_CLIENT_SECRET: Secret.fromSsmParameter(p.GMAIL_OAUTH_CLIENT_SECRET),
         JWT_SECRET: Secret.fromSsmParameter(p.JWT_SECRET),
         CIPHER_HASH: Secret.fromSsmParameter(p.CIPHER_HASH),
         CIPHER_PASSWORD: Secret.fromSsmParameter(p.CIPHER_PASSWORD),
@@ -124,26 +117,10 @@ export class LCProdAppStack extends cdk.Stack {
       securityGroups: [this.apiSecGrp],
       assignPublicIp: false,
     });
-
-    const targetGroup = new ApplicationTargetGroup(this, `${this.PREFIX}ApiTargetGroup`, {
-      vpc: this.vpc,
-      targetGroupName: `APITargetGroup`,
-      port: constants.PROD.ECS_API_PORT,
-      protocol: ApplicationProtocol.HTTP,
-      healthCheck: {
-        enabled: true,
-        path: '/',
-        interval: cdk.Duration.minutes(1),
-      },
-      targets: [service],
-    });
-    return { service, targetGroup };
+    return service;
   }
 
-  private createOverlayService(): {
-    service: FargateService;
-    targetGroup: ApplicationTargetGroup;
-  } {
+  private createOverlayService(): FargateService {
     const overlayTaskDef = new FargateTaskDefinition(
       this,
       `${this.PREFIX}OverlayTaskDef`,
@@ -198,24 +175,7 @@ export class LCProdAppStack extends cdk.Stack {
       assignPublicIp: false,
     });
 
-    const targetGroup = new ApplicationTargetGroup(
-      this,
-      `${this.PREFIX}OverlayTargetGroup`,
-      {
-        vpc: this.vpc,
-        targetGroupName: 'OerlayTargetGroup',
-        port: constants.PROD.ECS_OVERLAY_PORT,
-        protocol: ApplicationProtocol.HTTP,
-        healthCheck: {
-          enabled: true,
-          path: '/',
-          interval: cdk.Duration.minutes(1),
-        },
-        targets: [service],
-      },
-    );
-
-    return { service, targetGroup };
+    return service;
   }
 
   private createALB(): ApplicationLoadBalancer {
@@ -230,18 +190,55 @@ export class LCProdAppStack extends cdk.Stack {
     });
 
     // Redirect 80(http) to 440(https)
-    alb.addRedirect();
+    // alb.addRedirect();
+
+    const apiTargetGroup = new ApplicationTargetGroup(
+      this,
+      `${this.PREFIX}ApiTargetGroup`,
+      {
+        vpc: this.vpc,
+        targetGroupName: `APITargetGroupProd`,
+        port: constants.PROD.ECS_API_PORT,
+        protocol: ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [this.apiService],
+      },
+    );
 
     const httpListener = alb.addListener(`${this.PREFIX}ALBHttpListener`, {
       port: 80,
-      defaultTargetGroups: [this.apiTargetGroup],
+      defaultTargetGroups: [apiTargetGroup],
     });
     httpListener.connections.allowDefaultPortFromAnyIpv4('Open HTTP ALB to anywhere');
-
-    httpListener.addTargetGroups(`${this.PREFIX}OverlayTargetGroup`, {
+    httpListener.addTargetGroups(`${this.PREFIX}AddApiTargetGroup`, {
       priority: 1,
-      conditions: [ListenerCondition.hostHeaders([`live.${constants.DOMAIN}`])],
-      targetGroups: [this.overlayTargetGroup],
+      conditions: [ListenerCondition.hostHeaders([`api.${constants.PUNYCODE_DOMAIN}`])],
+      targetGroups: [apiTargetGroup],
+    });
+    const overlayTargetGroup = new ApplicationTargetGroup(
+      this,
+      `${this.PREFIX}OverlayTargetGroup`,
+      {
+        vpc: this.vpc,
+        targetGroupName: 'OerlayTargetGroupProd',
+        port: constants.PROD.ECS_OVERLAY_PORT,
+        protocol: ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [this.overlayService],
+      },
+    );
+    httpListener.addTargetGroups(`${this.PREFIX}AddOverlayTargetGroup`, {
+      priority: 2,
+      conditions: [ListenerCondition.hostHeaders([`live.${constants.PUNYCODE_DOMAIN}`])],
+      targetGroups: [overlayTargetGroup],
     });
 
     return alb;
@@ -265,16 +262,15 @@ export class LCProdAppStack extends cdk.Stack {
       // TODO: PROD DB로 변경필요
       DATABASE_URL: __loadSsmParmeter(c.DATABASE_URL_KEY, 2),
       FIRSTMALL_DATABASE_URL: __loadSsmParmeter(c.FIRSTMALL_DATABASE_URL_KEY),
-      // TODO: ----------------------
-      // TODO: 새롭게 변경된 값들로 변경필요
-      GOOGLE_CLIENT_ID: __loadSsmParmeter(c.GOOGLE_CLIENT_ID_KEY),
-      GOOGLE_CLIENT_SECRET: __loadSsmParmeter(c.GOOGLE_CLIENT_SECRET_KEY),
-      NAVER_CLIENT_ID: __loadSsmParmeter(c.NAVER_CLIENT_ID_KEY),
-      NAVER_CLIENT_SECRET: __loadSsmParmeter(c.NAVER_CLIENT_SECRET_KEY),
-      KAKAO_CLIENT_ID: __loadSsmParmeter(c.KAKAO_CLIENT_ID_KEY),
-      MAILER_USER: __loadSsmParmeter(c.MAILER_USER_KEY),
-      MAILER_PASS: __loadSsmParmeter(c.MAILER_PASS_KEY),
-      // TODO: ----------------------
+      GOOGLE_CLIENT_ID: __loadSsmParmeter(c.GOOGLE_CLIENT_ID_KEY, 2),
+      GOOGLE_CLIENT_SECRET: __loadSsmParmeter(c.GOOGLE_CLIENT_SECRET_KEY, 2),
+      NAVER_CLIENT_ID: __loadSsmParmeter(c.NAVER_CLIENT_ID_KEY, 2),
+      NAVER_CLIENT_SECRET: __loadSsmParmeter(c.NAVER_CLIENT_SECRET_KEY, 2),
+      KAKAO_CLIENT_ID: __loadSsmParmeter(c.KAKAO_CLIENT_ID_KEY, 2),
+      MAILER_USER: __loadSsmParmeter(c.MAILER_USER_KEY, 2),
+      GMAIL_OAUTH_REFRESH_TOKEN: __loadSsmParmeter(c.GMAIL_OAUTH_REFRESH_TOKEN),
+      GMAIL_OAUTH_CLIENT_ID: __loadSsmParmeter(c.GMAIL_OAUTH_CLIENT_ID),
+      GMAIL_OAUTH_CLIENT_SECRET: __loadSsmParmeter(c.GMAIL_OAUTH_CLIENT_SECRET),
       JWT_SECRET: __loadSsmParmeter(c.JWT_SECRET_KEY),
       CIPHER_HASH: __loadSsmParmeter(c.CIPHER_HASH_KEY),
       CIPHER_PASSWORD: __loadSsmParmeter(c.CIPHER_PASSWORD_KEY),

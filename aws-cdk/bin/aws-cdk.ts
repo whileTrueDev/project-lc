@@ -26,12 +26,12 @@ new LCDevDatabaseStack(app, 'LC-DEV-RDS', {
   dbSecGrp: devVpcStack.dbSecGrp,
 });
 // API,Overlay 등 App
-const devAppStack = new LCDevAppStack(app, 'LC-DEV-APP', {
-  vpc: devVpcStack.vpc,
-  apiSecGrp: devVpcStack.apiSecGrp,
-  overlaySecGrp: devVpcStack.overlaySecGrp,
-  albSecGrp: devVpcStack.albSecGrp,
-});
+// const devAppStack = new LCDevAppStack(app, 'LC-DEV-APP', {
+//   vpc: devVpcStack.vpc,
+//   apiSecGrp: devVpcStack.apiSecGrp,
+//   overlaySecGrp: devVpcStack.overlaySecGrp,
+//   albSecGrp: devVpcStack.albSecGrp,
+// });
 
 // ************************************
 // * Production 환경
@@ -55,6 +55,6 @@ const prodAppStack = new LCProdAppStack(app, 'LC-PROD-APP', {
 // ************************************
 // * 도메인
 new LCDomainStack(app, 'LC-DOMAIN', {
-  devALB: devAppStack.alb,
+  // devALB: devAppStack.alb,
   prodALB: prodAppStack.alb,
 });
