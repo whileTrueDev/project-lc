@@ -84,7 +84,7 @@ export function AdminLiveShoppingList({
                     <Link>{row.goods.goods_name}</Link>
                   </NextLink>
                 </Td>
-                <Td>{row.seller.sellerShop.shopName}</Td>
+                <Td>{row.seller.sellerShop?.shopName || ''}</Td>
                 <Td>
                   <LiveShoppingProgressBadge
                     progress={row.progress}

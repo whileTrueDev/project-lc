@@ -15,6 +15,7 @@ import {
   useToast,
   Divider,
   Input,
+  Textarea,
 } from '@chakra-ui/react';
 import {
   AdminPageLayout,
@@ -125,6 +126,7 @@ export function GoodsDetail(): JSX.Element {
 
   if (!goods.isLoading && !goods.data)
     return <AdminPageLayout>...no data</AdminPageLayout>;
+
   return (
     <AdminPageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={8} p={2} mb={16}>
@@ -148,7 +150,9 @@ export function GoodsDetail(): JSX.Element {
         )}
         <Grid templateColumns="repeat(2, 1fr)" justifyItems="start">
           <Stack spacing={5}>
-            <Text as="span">판매자 : {liveShopping[0].seller.sellerShop.shopName}</Text>
+            <Text as="span">
+              판매자 : {liveShopping[0].seller.sellerShop?.shopName || ''}
+            </Text>
 
             <Stack direction="row" alignItems="center">
               <Text as="span">진행상태</Text>
@@ -222,6 +226,9 @@ export function GoodsDetail(): JSX.Element {
                 {getDuration(liveShopping[0].sellStartDate, liveShopping[0].sellEndDate)}
               </Text>
             </Stack>
+            <Box>
+              <Textarea resize="none" rows={10} value={liveShopping[0].requests || ''} />
+            </Box>
           </Stack>
           <FormProvider {...methods}>
             <Stack as="form" spacing={5}>
