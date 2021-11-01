@@ -81,10 +81,10 @@ export function AdminLiveShoppingList({
                 <Td>{dayjs(row.createDate).format('YYYY/MM/DD HH:mm')}</Td>
                 <Td>
                   <NextLink href={`/live-shopping/${row.id}`}>
-                    <Link>{row.goods.goods_name}</Link>
+                    <Link color="blue.500">{row.goods.goods_name}</Link>
                   </NextLink>
                 </Td>
-                <Td>{row.seller.sellerShop.shopName}</Td>
+                <Td>{row.seller?.sellerShop?.shopName || '-'}</Td>
                 <Td>
                   <LiveShoppingProgressBadge
                     progress={row.progress}
