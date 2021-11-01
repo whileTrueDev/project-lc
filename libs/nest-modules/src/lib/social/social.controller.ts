@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SellerSocialAccount } from '@prisma/client';
+import { getWebHost } from '@project-lc/utils';
 import { Request, Response } from 'express';
 import { LoginHistoryService } from '../auth/login-history/login-history.service';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -21,7 +22,7 @@ export class SocialController {
     private readonly socialService: SocialService,
   ) {}
 
-  private readonly frontMypageUrl = 'http://localhost:4200/mypage';
+  private readonly frontMypageUrl = `${getWebHost()}/mypage`;
 
   /** email 로 가입된 셀러에 연동된 소셜계정목록 반환 */
   @UseGuards(JwtAuthGuard)

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getApiHost } from './lib/getHostUrl';
+import { getApiHost } from '@project-lc/utils';
 import { tokenInterceptor } from './lib/tokenInterceptor';
 
 export const cancelToken = axios.CancelToken;

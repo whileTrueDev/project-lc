@@ -32,12 +32,11 @@ export const useSaveShippingGroup = ({
 
   const { mutateAsync, isLoading } = useCreateShippingGroup();
   const saveShippingPolicy = useCallback(() => {
-    // TODO : useShippingGroupItemStore 에서 값 가져와 배송그룹명, 반송지, 배송방법 등록되어 있는지 확인 => 훅으로 분리하기
     if (!shipping_group_name) {
       toast({ title: '배송그룹명을 입력해주세요', status: 'error' });
       return;
     }
-    if (!postalCode || !detailAddress || !detailAddress) {
+    if (!postalCode || !baseAddress || !detailAddress) {
       toast({ title: '반송지를 입력해주세요', status: 'error' });
       return;
     }
