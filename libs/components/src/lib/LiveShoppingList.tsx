@@ -252,7 +252,7 @@ export function LiveShoppingList(): JSX.Element {
             <ModalBody>
               <Stack spacing={5}>
                 <Text as="span">
-                  판매자 : {data[liveShoppingId].seller.sellerShop.shopName}
+                  판매자 : {data[liveShoppingId].seller.sellerShop?.shopName || ''}
                 </Text>
 
                 <Stack direction="row" alignItems="center">

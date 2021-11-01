@@ -9,8 +9,8 @@ import {
   Stack,
   Text,
   useToast,
+  Heading,
 } from '@chakra-ui/react';
-import { ChevronLeftIcon } from '@chakra-ui/icons';
 import {
   useApprovedGoodsList,
   useCreateLiveShoppingMutation,
@@ -119,64 +119,67 @@ export function LiveShoppingRegist(): JSX.Element {
   };
 
   return (
-    <FormProvider {...methods}>
-      <Stack w="100%" mt={10} spacing={12} as="form" onSubmit={handleSubmit(regist)}>
-        {!contacts.isLoading && !contacts.error && (
-          <>
-            {/* 라이브쇼핑 진행할 상품 */}
-            <Stack>
-              {(!goodsList.data || goodsList.data.length === 0) && (
-                <Alert status="error" my={2} mb={6}>
-                  <AlertIcon />
-                  <Text fontSize="sm">
-                    라이브 쇼핑을 진행할 수 있는 상태의 상품이 없습니다.
-                  </Text>
-                </Alert>
-              )}
+    <>
+      <Heading>라이브 쇼핑 등록</Heading>
+      <FormProvider {...methods}>
+        <Stack w="100%" mt={10} spacing={12} as="form" onSubmit={handleSubmit(regist)}>
+          {!contacts.isLoading && !contacts.error && (
+            <>
+              {/* 라이브쇼핑 진행할 상품 */}
+              <Stack>
+                {(!goodsList.data || goodsList.data.length === 0) && (
+                  <Alert status="error" my={2} mb={6}>
+                    <AlertIcon />
+                    <Text fontSize="sm">
+                      라이브 쇼핑을 진행할 수 있는 상태의 상품이 없습니다.
+                    </Text>
+                  </Alert>
+                )}
 
-              <ChakraAutoComplete<ApprovedGoodsListItem>
-                label="라이브 쇼핑을 진행할 상품"
-                options={goodsList.data}
-                isLoading={goodsList.isLoading}
-                isDisabled={!goodsList.data || goodsList.data.length === 0}
-                getOptionLabel={(opt) => opt?.go + ods_name || ''}
-                value={selectedGoods}
-                onChange={(newV) => {
-                  if (newV) {
-                    setValue('goods_id', newV.id);
-                    handleGoodsSelect(newV);
-                  } else {
-                    setValue('goods_id', null);
-                    handleGoodsSelect(null);
-                  }
-                }}
-              />
+                <ChakraAutoComplete<ApprovedGoodsListItem>
+                  label="라이브 쇼핑을 진행할 상품"
+                  options={goodsList.data}
+                  isLoading={goodsList.isLoading}
+                  isDisabled={!goodsList.data || goodsList.data.length === 0}
+                  getOptionLabel={(opt) => opt?.goods_name || ''}
+                  value={selectedGoods}
+                  onChange={(newV) => {
+                    if (newV) {
+                      setValue('goods_id', newV.id);
+                      handleGoodsSelect(newV);
+                    } else {
+                      setValue('goods_id', null);
+                      handleGoodsSelect(null);
+                    }
+                  }}
+                />
 
-              {selectedGoods && (
-                <Box mt={2}>
-                  <GoodsSummary goodsId={selectedGoods.id} />
-                </Box>
-              )}
-            </Stack>
-            {/* 담당자 연락처 */}
-            <LiveShoppingManagerPhoneNumber />
-            {/* 요청사항 */}
-            <LiveShoppingRequestInput />
-            {/* 완료 버튼 */}
-            <Flex>
-              <Button
-                type="submit"
-                colorScheme="blue"
-                isLoading={isLoading}
-                isDisabled={!selectedGoods}
-              >
-                등록
-              </Button>
-            </Flex>
-          </>
-        )}
-      </Stack>
-    </FormProvider>
+                {selectedGoods && (
+                  <Box mt={2}>
+                    <GoodsSummary goodsId={selectedGoods.id} />
+                  </Box>
+                )}
+              </Stack>
+              {/* 담당자 연락처 */}
+              <LiveShoppingManagerPhoneNumber />
+              {/* 요청사항 */}
+              <LiveShoppingRequestInput />
+              {/* 완료 버튼 */}
+              <Flex>
+                <Button
+                  type="submit"
+                  colorScheme="blue"
+                  isLoading={isLoading}
+                  isDisabled={!selectedGoods}
+                >
+                  등록
+                </Button>
+              </Flex>
+            </>
+          )}
+        </Stack>
+      </FormProvider>
+    </>
   );
 }
 
