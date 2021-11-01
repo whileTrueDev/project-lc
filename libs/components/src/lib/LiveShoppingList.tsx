@@ -133,14 +133,6 @@ export function LiveShoppingList(): JSX.Element {
       });
   };
 
-  if (data?.length === 0) {
-    return (
-      <Box mt="10">
-        <Center>새로운 라이브 쇼핑을 등록해주세요</Center>
-      </Box>
-    );
-  }
-
   return (
     <Box p={5}>
       <Table variant="simple">
@@ -159,10 +151,11 @@ export function LiveShoppingList(): JSX.Element {
         </Thead>
         <Tbody>
           {data &&
-            !isLoading &&
-            liveShoppingWithSales &&
-            !isSalesLoading &&
-            liveShoppingWithSales.length !== 0 &&
+          data.length !== 0 &&
+          !isLoading &&
+          liveShoppingWithSales &&
+          !isSalesLoading &&
+          liveShoppingWithSales.length !== 0 ? (
             liveShoppingWithSales.map((row, index) => (
               <Tr key={row.id} onClick={() => handleDetailOnOpen(index)} cursor="pointer">
                 <Td>{index + 1}</Td>
@@ -241,10 +234,17 @@ export function LiveShoppingList(): JSX.Element {
                   ) : null}
                 </Td>
               </Tr>
-            ))}
+            ))
+          ) : (
+            <Tr>
+              <Td mt="10" colSpan={9}>
+                <Center>새로운 라이브 쇼핑을 등록해주세요</Center>
+              </Td>
+            </Tr>
+          )}
         </Tbody>
       </Table>
-      {data && !isLoading && (
+      {data && data.length !== 0 && !isLoading && (
         <Modal isOpen={detailIsOpen} onClose={detailOnClose} size="lg">
           <ModalContent>
             <ModalHeader>상세정보</ModalHeader>
