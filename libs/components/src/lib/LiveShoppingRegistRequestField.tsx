@@ -1,4 +1,5 @@
-import { Box, Heading, Stack, Textarea } from '@chakra-ui/react';
+import { Box, Heading, Stack, Textarea, Text } from '@chakra-ui/react';
+import { WarningIcon } from '@chakra-ui/icons';
 import { LiveShoppingInput } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
 
@@ -10,7 +11,10 @@ const examplePlaceholder = `[예시]
 - 3만원이상 구매시 배송비 무료 이벤트
 - 인터넷 최저가라는 점을 강조해 주세요.`;
 export function LiveShoppingRequestInput(): JSX.Element {
-  const { register } = useFormContext<LiveShoppingInput>();
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<LiveShoppingInput>();
   return (
     <Box w="100%">
       <Stack spacing={2}>
@@ -21,6 +25,7 @@ export function LiveShoppingRequestInput(): JSX.Element {
           placeholder={examplePlaceholder}
           height={300}
           resize="none"
+          isInvalid={!!errors.requests}
           {...register('requests', {
             maxLength: {
               value: 500,
@@ -28,6 +33,11 @@ export function LiveShoppingRequestInput(): JSX.Element {
             },
           })}
         />
+        {errors.requests && (
+          <Text color="tomato">
+            <WarningIcon /> {errors.requests.message}
+          </Text>
+        )}
       </Stack>
     </Box>
   );
