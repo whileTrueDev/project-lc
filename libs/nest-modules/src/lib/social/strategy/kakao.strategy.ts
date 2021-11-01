@@ -3,6 +3,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-kakao';
+import { getApiHost } from '@project-lc/utils';
 import { Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
@@ -16,7 +17,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, KAKAO_PROVIDER) {
   ) {
     super({
       clientID: configService.get('KAKAO_CLIENT_ID'),
-      callbackURL: `http://localhost:3000/social/kakao/callback`,
+      callbackURL: `${getApiHost()}/social/kakao/callback`,
     });
   }
 

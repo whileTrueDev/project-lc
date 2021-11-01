@@ -1,12 +1,13 @@
 import { Button } from '@chakra-ui/react';
 import { FcGoogle } from 'react-icons/fc';
+import { getApiHost } from '@project-lc/utils';
 
 export function GoogleLoginButton(): JSX.Element {
   return (
     <Button
       as="a"
       isFullWidth
-      href="http://localhost:3000/social/google/login"
+      href={`${getApiHost()}/social/google/login`}
       bg="white"
       color="black"
       _hover={{ boxShadow: 'lg' }}

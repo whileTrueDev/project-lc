@@ -1,4 +1,4 @@
-// import { getApiHost } from '@project-lc/hooks';
+import { getApiHost } from '@project-lc/utils';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -16,7 +16,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_PROVIDER) 
     super({
       clientID: configService.get('GOOGLE_CLIENT_ID'),
       clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
-      callbackURL: `http://localhost:3000/social/google/callback`, // TODO: 개발환경에 따라 callback 주소 변경
+      callbackURL: `${getApiHost()}/social/google/callback`,
       scope: ['email', 'profile'],
     });
   }

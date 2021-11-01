@@ -3,6 +3,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-naver';
+import { getApiHost } from '@project-lc/utils';
 import { Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
@@ -16,7 +17,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, NAVER_PROVIDER) {
     super({
       clientID: configService.get('NAVER_CLIENT_ID'),
       clientSecret: configService.get('NAVER_CLIENT_SECRET'),
-      callbackURL: `http://localhost:3000/social/naver/callback`,
+      callbackURL: `${getApiHost()}/social/naver/callback`,
     });
   }
 

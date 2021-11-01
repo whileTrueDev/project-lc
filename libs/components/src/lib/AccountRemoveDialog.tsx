@@ -65,7 +65,6 @@ export function AccountRemoveDialog(props: AccountRemoveDialogProps): JSX.Elemen
         <ModalHeader>회원 탈퇴를 진행하시겠습니까?</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          {/* //TODO: 추후 문구 수정 */}
           <UnorderedList spacing={2}>
             <ListItem>
               <Text>

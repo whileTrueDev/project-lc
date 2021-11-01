@@ -1,5 +1,4 @@
 export * from './lib/auth-hooks';
-export * from './lib/getHostUrl';
 export * from './lib/mutation/useBusinessRegistrationConfirmationMutation';
 export * from './lib/mutation/useBusinessRegistrationMutation';
 export * from './lib/mutation/useBusinessRegistrationRejectionMutation';
