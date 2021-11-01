@@ -20,6 +20,7 @@ export const validationSchema = Joi.object({
   GMAIL_OAUTH_REFRESH_TOKEN: Joi.string().required(),
   GMAIL_OAUTH_CLIENT_ID: Joi.string().required(),
   GMAIL_OAUTH_CLIENT_SECRET: Joi.string().required(),
+
   // JWT
   JWT_SECRET: Joi.string().required(),
 

@@ -1,6 +1,5 @@
 import {
   Box,
-  Link,
   Table,
   Thead,
   Tbody,
@@ -9,6 +8,7 @@ import {
   Td,
   Heading,
   Button,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import {
   useAdminLiveShoppingList,
@@ -16,8 +16,8 @@ import {
   useProfile,
 } from '@project-lc/hooks';
 import { getLiveShoppingProgress } from '@project-lc/shared-types';
-import NextLink from 'next/link';
 import dayjs from 'dayjs';
+import router from 'next/router';
 import { LiveShoppingProgressBadge } from '../LiveShoppingProgressBadge';
 import { BroadcasterName } from '../BroadcasterName';
 import { SeletctedLiveShoppingType } from './AdminGiftList';
@@ -27,6 +27,7 @@ export function AdminLiveShoppingList({
 }: {
   setSelectedGoods: (selectedGoods: SeletctedLiveShoppingType) => void;
 }): JSX.Element {
+  const rowHoverColor = useColorModeValue('gray.100', 'gray.700');
   const { data: profileData } = useProfile();
 
   const { data, isLoading } = useAdminLiveShoppingList({
@@ -53,6 +54,10 @@ export function AdminLiveShoppingList({
     return ['판매종료', '방송진행중', '방송종료'].includes(progress);
   }
 
+  function handleRowClick(liveShoppingId: number): void {
+    router.push(`/live-shopping/${liveShoppingId}`);
+  }
+
   return (
     <Box p={5}>
       <Heading size="md">라이브 쇼핑 리스트</Heading>
@@ -76,15 +81,18 @@ export function AdminLiveShoppingList({
           {data &&
             !isLoading &&
             data.map((row) => (
-              <Tr key={row.id}>
+              <Tr
+                key={row.id}
+                onClick={() => handleRowClick(row.id)}
+                cursor="pointer"
+                _hover={{
+                  backgroundColor: rowHoverColor,
+                }}
+              >
                 <Td>{row.id}</Td>
                 <Td>{dayjs(row.createDate).format('YYYY/MM/DD HH:mm')}</Td>
-                <Td>
-                  <NextLink href={`/live-shopping/${row.id}`}>
-                    <Link color="blue.500">{row.goods.goods_name}</Link>
-                  </NextLink>
-                </Td>
-                <Td>{row.seller?.sellerShop?.shopName || '-'}</Td>
+                <Td>{row.goods.goods_name}</Td>
+                <Td>{row.seller.sellerShop?.shopName || ''}</Td>
                 <Td>
                   <LiveShoppingProgressBadge
                     progress={row.progress}
@@ -116,7 +124,7 @@ export function AdminLiveShoppingList({
                     ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm')
                     : '미정'}
                 </Td>
-                <Td>
+                <Td onClick={(e) => e.stopPropagation()}>
                   <Button
                     size="xs"
                     onClick={() => {

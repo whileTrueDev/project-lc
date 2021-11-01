@@ -1,4 +1,5 @@
 import { Button } from '@chakra-ui/react';
+import { getApiHost } from '@project-lc/utils';
 import naverLogo from '../../images/naver.png';
 import { ChakraNextImage } from './ChakraNextImage';
 
@@ -8,7 +9,7 @@ export function NaverLoginButton(): JSX.Element {
     <Button
       as="a"
       isFullWidth
-      href="http://localhost:3000/social/naver/login"
+      href={`${getApiHost()}/social/naver/login`}
       bg={NAVER_COLOR}
       boxShadow="md"
       _hover={{ boxShadow: 'lg' }}
