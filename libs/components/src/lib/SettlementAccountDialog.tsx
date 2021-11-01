@@ -9,7 +9,7 @@ import {
   ModalFooter,
   useToast,
 } from '@chakra-ui/react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { SettlementAccountDto } from '@project-lc/shared-types';
 import {
   useSettlementAccountMutation,
@@ -39,15 +39,12 @@ export function SettlementAccountDialog(
   const toast = useToast();
   const mutation = useSettlementAccountMutation();
 
+  const methods = useForm<SettlementAccountFormDto>();
   const {
     handleSubmit,
-    register,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
     reset,
-    setValue: setvalue,
-    setError: seterror,
-    clearErrors,
-  } = useForm<SettlementAccountFormDto>();
+  } = methods;
 
   function useClose(): void {
     onClose();
@@ -98,24 +95,20 @@ export function SettlementAccountDialog(
   return (
     <Modal isOpen={isOpen} size="3xl" onClose={useClose} closeOnEsc={false}>
       <ModalOverlay />
-      <ModalContent as="form" onSubmit={handleSubmit(regist)}>
-        <ModalHeader>정산 계좌 등록</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <SettlementAccountForm
-            register={register}
-            errors={errors}
-            seterror={seterror}
-            setvalue={setvalue}
-            clearErrors={clearErrors}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button type="submit" isLoading={isSubmitting}>
-            등록하기
-          </Button>
-        </ModalFooter>
-      </ModalContent>
+      <FormProvider {...methods}>
+        <ModalContent as="form" onSubmit={handleSubmit(regist)}>
+          <ModalHeader>정산 계좌 등록</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <SettlementAccountForm />
+          </ModalBody>
+          <ModalFooter>
+            <Button type="submit" isLoading={isSubmitting}>
+              등록하기
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </FormProvider>
     </Modal>
   );
 }

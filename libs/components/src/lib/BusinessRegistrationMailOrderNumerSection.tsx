@@ -1,36 +1,41 @@
 import {
-  GridItem,
   FormControl,
   FormErrorMessage,
-  useColorModeValue,
+  GridItem,
   Input,
+  useColorModeValue,
 } from '@chakra-ui/react';
+import { useFormContext } from 'react-hook-form';
+import { BusinessRegistrationFormDto } from './BusinessRegistrationDialog';
 import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
-import { BusinessRegistrationFormProps } from './BusinessRegistrationForm';
 
-export function BusinessRegistrationMailOrderNumerSection(
-  props: Omit<BusinessRegistrationFormProps, 'inputRef'>,
-): JSX.Element {
-  const { register, errors, setvalue, seterror, clearErrors } = props;
+export function BusinessRegistrationMailOrderNumerSection(): JSX.Element {
+  const {
+    register,
+    formState: { errors },
+    setValue,
+    setError,
+    clearErrors,
+  } = useFormContext<BusinessRegistrationFormDto>();
 
   function handleSuccess(fileName: string, file: File): void {
-    setvalue('mailOrderSalesImage', file);
-    setvalue('mailOrderSalesImageName', fileName);
+    setValue('mailOrderSalesImage', file);
+    setValue('mailOrderSalesImageName', fileName);
     clearErrors(['mailOrderSalesImage', 'mailOrderSalesImageName']);
   }
 
   function handleError(errorType?: ImageInputErrorTypes): void {
     switch (errorType) {
       case 'over-size': {
-        seterror('mailOrderSalesImage', {
+        setError('mailOrderSalesImage', {
           type: 'validate',
           message: '10MB 이하의 이미지를 업로드해주세요.',
         });
         break;
       }
       case 'invalid-format': {
-        seterror('mailOrderSalesImage', {
+        setError('mailOrderSalesImage', {
           type: 'error',
           message: '파일의 형식이 올바르지 않습니다.',
         });
@@ -38,8 +43,8 @@ export function BusinessRegistrationMailOrderNumerSection(
       }
       default: {
         // only chrome
-        setvalue('mailOrderSalesImage', null);
-        setvalue('mailOrderSalesImageName', null);
+        setValue('mailOrderSalesImage', null);
+        setValue('mailOrderSalesImageName', '');
         clearErrors(['mailOrderSalesImage', 'mailOrderSalesImageName']);
       }
     }

@@ -179,7 +179,7 @@ export class SellerSettlementService {
   ): Promise<boolean> {
     const { target, round } = dto;
     // 출고가 발생한 주문을 통해 해당 주문에 대한 이전 정산 처리를 조회
-    const { order_seq, shipping_cost, payment } = target;
+    const { order_seq, shipping_cost } = target;
     const settlementHistories = await this.findSettlementHistory(email, {
       order_seq,
     });

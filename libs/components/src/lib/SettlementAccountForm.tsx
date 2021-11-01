@@ -1,55 +1,46 @@
 import {
+  FormControl,
+  FormErrorMessage,
   Grid,
   GridItem,
   Input,
-  FormControl,
-  FormErrorMessage,
   Select,
   useColorModeValue,
 } from '@chakra-ui/react';
-import {
-  UseFormRegister,
-  FieldError,
-  DeepMap,
-  UseFormSetError,
-  UseFormSetValue,
-  UseFormClearErrors,
-} from 'react-hook-form';
 import { banks } from '@project-lc/shared-types';
-import { SettlementAccountFormDto } from './SettlementAccountDialog';
+import { useFormContext } from 'react-hook-form';
 import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
+import { SettlementAccountFormDto } from './SettlementAccountDialog';
 
-export interface SettlementAccountFormProps {
-  register: UseFormRegister<SettlementAccountFormDto>;
-  errors: DeepMap<SettlementAccountFormDto, FieldError>;
-  seterror: UseFormSetError<SettlementAccountFormDto>;
-  setvalue: UseFormSetValue<SettlementAccountFormDto>;
-  clearErrors: UseFormClearErrors<SettlementAccountFormDto>;
-}
-
-export function SettlementAccountForm(props: SettlementAccountFormProps): JSX.Element {
+export function SettlementAccountForm(): JSX.Element {
   // 명시적 타입만 props로 전달 가능
-  const { register, errors, seterror, setvalue, clearErrors } = props;
+  const {
+    register,
+    formState: { errors },
+    setError,
+    setValue,
+    clearErrors,
+  } = useFormContext<SettlementAccountFormDto>();
 
   // 통장사본 제출
   function handleSuccess(fileName: string, file: File): void {
-    setvalue('settlementAccountImage', file);
-    setvalue('settlementAccountImageName', fileName);
+    setValue('settlementAccountImage', file);
+    setValue('settlementAccountImageName', fileName);
     clearErrors(['settlementAccountImage', 'settlementAccountImageName']);
   }
 
   function handleError(errorType?: ImageInputErrorTypes): void {
     switch (errorType) {
       case 'over-size': {
-        seterror('settlementAccountImage', {
+        setError('settlementAccountImage', {
           type: 'validate',
           message: '10MB 이하의 이미지를 업로드해주세요.',
         });
         break;
       }
       case 'invalid-format': {
-        seterror('settlementAccountImage', {
+        setError('settlementAccountImage', {
           type: 'error',
           message: '파일의 형식이 올바르지 않습니다.',
         });
@@ -57,8 +48,8 @@ export function SettlementAccountForm(props: SettlementAccountFormProps): JSX.El
       }
       default: {
         // only chrome
-        setvalue('settlementAccountImage', null);
-        setvalue('settlementAccountImageName', null);
+        setValue('settlementAccountImage', null);
+        setValue('settlementAccountImageName', '');
         clearErrors(['settlementAccountImage', 'settlementAccountImageName']);
       }
     }
