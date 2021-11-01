@@ -11,8 +11,11 @@ export class AppSetting {
     origin: [
       'http://localhost:4200',
       'http://localhost:3011',
-      'https://project-lc.vercel.app',
-      'https://dev-project-lc.vercel.app',
+      'https://xn--hp4b17xa.com',
+      'https://seller.xn--hp4b17xa.com',
+      'https://xn--9z2b23wk2i.xn--hp4b17xa.com', // 판매자.크크쇼.com
+      'https://admin.xn--hp4b17xa.com',
+      'https://dev.xn--hp4b17xa.com',
     ],
     credentials: true,
     exposedHeaders: ['X-wt-Access-Token'],

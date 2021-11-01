@@ -1,10 +1,12 @@
+import * as logs from '@aws-cdk/aws-logs';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as rds from '@aws-cdk/aws-rds';
 import * as cdk from '@aws-cdk/core';
+import { constants } from '../../constants';
 
 interface LCProdDatabaseStackProps extends cdk.StackProps {
   vpc: ec2.Vpc;
-  backendSecGrp: ec2.SecurityGroup;
+  dbSecGrp: ec2.SecurityGroup;
 }
 
 export class LCProdDatabaseStack extends cdk.Stack {
@@ -12,32 +14,7 @@ export class LCProdDatabaseStack extends cdk.Stack {
 
   constructor(scope: cdk.Construct, id: string, props: LCProdDatabaseStackProps) {
     super(scope, id, props);
-
-    const { vpc, backendSecGrp } = props;
-
-    // * 보안그룹
-    // db 보안그룹
-    const dbSecGrp = new ec2.SecurityGroup(this, 'dbSecGrp', {
-      vpc,
-      description: 'database sec grp',
-      allowAllOutbound: false,
-    });
-    // * 보안그룹 룰 지정
-    dbSecGrp.addEgressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.tcp(3306),
-      'Allow port 3306 for outbound traffics to the backend server',
-    );
-    dbSecGrp.addIngressRule(
-      ec2.Peer.ipv4('59.22.64.86'),
-      ec2.Port.tcp(3306),
-      'Allow port 3306 for outbound traffics to the whiletrue developers',
-    );
-    dbSecGrp.addIngressRule(
-      backendSecGrp,
-      ec2.Port.tcp(3306),
-      'Allow port 3306 for inbound traffics from the backend server',
-    );
+    const { vpc, dbSecGrp } = props;
 
     // * DB 엔진
     const dbEngine = rds.DatabaseInstanceEngine.mysql({
@@ -45,18 +22,17 @@ export class LCProdDatabaseStack extends cdk.Stack {
     });
 
     // * RDS 데이터베이스 인스턴스
-    this.db = new rds.DatabaseInstance(this, 'DB', {
-      databaseName: 'project-lc-prod-db', // rename 필요
+    this.db = new rds.DatabaseInstance(this, `${constants.PROD.ID_PREFIX}DB`, {
+      databaseName: 'public', // 초기 데이터베이스 생성
+      instanceIdentifier: 'kkshow-production',
       vpc,
       engine: dbEngine,
-      credentials: {
-        username: 'admin',
-      },
+      credentials: { username: 'admin' },
       allocatedStorage: 20,
-      maxAllocatedStorage: 300,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.NANO),
+      maxAllocatedStorage: 500,
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
       vpcSubnets: {
-        subnetFilters: [ec2.SubnetFilter.onePerAz()],
+        subnetType: ec2.SubnetType.ISOLATED,
       },
       multiAz: false,
       autoMinorVersionUpgrade: false,
@@ -69,9 +45,12 @@ export class LCProdDatabaseStack extends cdk.Stack {
           max_allowed_packet: '16777216',
         },
       }),
+      publiclyAccessible: false,
       deletionProtection: false,
       iamAuthentication: true,
-      enablePerformanceInsights: true,
+      // enablePerformanceInsights: true,
+      cloudwatchLogsExports: ['error', 'slowquery', 'general', 'audit'],
+      cloudwatchLogsRetention: logs.RetentionDays.SIX_MONTHS,
     });
   }
 }

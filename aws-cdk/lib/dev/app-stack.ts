@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+import * as acm from '@aws-cdk/aws-certificatemanager';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import * as logs from '@aws-cdk/aws-logs';
-import * as route53 from '@aws-cdk/aws-route53';
-import * as targets from '@aws-cdk/aws-route53-targets';
 import * as ssm from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
 import { constants } from '../../constants';
@@ -17,11 +16,11 @@ interface LCDevAppStackProps extends cdk.StackProps {
 }
 
 const PREFIX = 'LC-DEV-APP';
-const DOMAIN = 'andad.io';
-// const API_DOMAIN = `${DOMAIN}`;
-// const OVERLAY_DOMAIN = `${DOMAIN}`;
 
 export class LCDevAppStack extends cdk.Stack {
+  private readonly ACM_ARN =
+    'arn:aws:acm:ap-northeast-2:803609402610:certificate/763681b4-a8c3-47e0-998a-24754351b499';
+
   private DBURL_PARAMETER: ssm.IStringParameter;
   private FIRSTMALL_DATABASE_URL: ssm.IStringParameter;
   private GOOGLE_CLIENT_ID: ssm.IStringParameter;
@@ -30,7 +29,9 @@ export class LCDevAppStack extends cdk.Stack {
   private NAVER_CLIENT_SECRET: ssm.IStringParameter;
   private KAKAO_CLIENT_ID: ssm.IStringParameter;
   private MAILER_USER: ssm.IStringParameter;
-  private MAILER_PASS: ssm.IStringParameter;
+  private GMAIL_OAUTH_REFRESH_TOKEN: ssm.IStringParameter;
+  private GMAIL_OAUTH_CLIENT_ID: ssm.IStringParameter;
+  private GMAIL_OAUTH_CLIENT_SECRET: ssm.IStringParameter;
   private GOOGLE_CREDENTIALS_EMAIL: ssm.IStringParameter;
   private GOOGLE_CREDENTIALS_PRIVATE_KEY: ssm.IStringParameter;
   private JWT_SECRET: ssm.IStringParameter;
@@ -39,6 +40,8 @@ export class LCDevAppStack extends cdk.Stack {
   private CIPHER_SALT: ssm.IStringParameter;
   private S3_ACCESS_KEY_ID: ssm.IStringParameter;
   private S3_ACCESS_KEY_SECRET: ssm.IStringParameter;
+
+  public readonly alb: elbv2.ApplicationLoadBalancer;
 
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
@@ -60,8 +63,7 @@ export class LCDevAppStack extends cdk.Stack {
     // * overlay server
     const overlayService = this.createOverlayAppService(cluster, overlaySecGrp);
 
-    this.createALB(vpc, apiService, overlayService, albSecGrp);
-    // this.createRoute53ARecord(alb);
+    this.alb = this.createALB(vpc, apiService, overlayService, albSecGrp);
   }
 
   /** API 서버 ECS Fargate Service 생성 메서드 */
@@ -85,7 +87,13 @@ export class LCDevAppStack extends cdk.Stack {
         NAVER_CLIENT_SECRET: ecs.Secret.fromSsmParameter(this.NAVER_CLIENT_SECRET),
         KAKAO_CLIENT_ID: ecs.Secret.fromSsmParameter(this.KAKAO_CLIENT_ID),
         MAILER_USER: ecs.Secret.fromSsmParameter(this.MAILER_USER),
-        MAILER_PASS: ecs.Secret.fromSsmParameter(this.MAILER_PASS),
+        GMAIL_OAUTH_REFRESH_TOKEN: ecs.Secret.fromSsmParameter(
+          this.GMAIL_OAUTH_REFRESH_TOKEN,
+        ),
+        GMAIL_OAUTH_CLIENT_ID: ecs.Secret.fromSsmParameter(this.GMAIL_OAUTH_CLIENT_ID),
+        GMAIL_OAUTH_CLIENT_SECRET: ecs.Secret.fromSsmParameter(
+          this.GMAIL_OAUTH_CLIENT_SECRET,
+        ),
         JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
         CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
         CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
@@ -191,7 +199,7 @@ export class LCDevAppStack extends cdk.Stack {
     });
 
     // If you do not provide any options for this method, it redirects HTTP port 80 to HTTPS port 443
-    // alb.addRedirect();
+    alb.addRedirect();
 
     // ALB 타겟 그룹으로 생성
     const apiTargetGroup = new elbv2.ApplicationTargetGroup(
@@ -211,14 +219,20 @@ export class LCDevAppStack extends cdk.Stack {
       },
     );
 
+    const sslCert = acm.Certificate.fromCertificateArn(
+      this,
+      'DnsCertificates',
+      this.ACM_ARN,
+    );
+
     // ALB에 HTTP 리스너 추가
-    const truepointHttpListener = alb.addListener(`${PREFIX}ALBHttpListener`, {
-      port: 80,
+    const HttpsListener = alb.addListener(`${PREFIX}ALBHttpsListener`, {
+      port: 443,
+      sslPolicy: elbv2.SslPolicy.RECOMMENDED,
+      certificates: [sslCert],
       defaultTargetGroups: [apiTargetGroup],
     });
-    truepointHttpListener.connections.allowDefaultPortFromAnyIpv4(
-      'https ALB open to world',
-    );
+    HttpsListener.connections.allowDefaultPortFromAnyIpv4('https ALB open to world');
 
     const overlayTargetGroup = new elbv2.ApplicationTargetGroup(
       this,
@@ -238,32 +252,13 @@ export class LCDevAppStack extends cdk.Stack {
     );
 
     // HTTP 리스너에 Overlay 서버 타겟그룹 추가
-    truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
+    HttpsListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
       priority: 1,
       conditions: [elbv2.ListenerCondition.hostHeaders(['preview-livecommerce.onad.io'])],
       targetGroups: [overlayTargetGroup],
     });
 
     return alb;
-  }
-
-  private createRoute53ARecord(alb: elbv2.ApplicationLoadBalancer) {
-    // Find Route53 Hosted zone
-    const truepointHostzone = route53.HostedZone.fromHostedZoneAttributes(
-      this,
-      `find${DOMAIN}Zone`,
-      {
-        zoneName: DOMAIN,
-        hostedZoneId: 'Z03356691DEYSJEBYTKT3',
-      },
-    );
-
-    // Route53 로드밸런서 타겟 생성
-    new route53.ARecord(this, 'LoadbalancerARecord', {
-      zone: truepointHostzone,
-      recordName: ``,
-      target: route53.RecordTarget.fromAlias(new targets.LoadBalancerTarget(alb)),
-    });
   }
 
   private loadSsmParameters() {
@@ -289,7 +284,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}GOOGLE_CLIENT_ID`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.GOOGLE_CLIENT_ID,
       },
     );
@@ -297,7 +292,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}GOOGLE_CLIENT_SECRET`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.GOOGLE_CLIENT_SECRET,
       },
     );
@@ -305,7 +300,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}NAVER_CLIENT_ID`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.NAVER_CLIENT_ID,
       },
     );
@@ -313,7 +308,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}NAVER_CLIENT_SECRET`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.NAVER_CLIENT_SECRET,
       },
     );
@@ -321,7 +316,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}KAKAO_CLIENT_ID`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.KAKAO_CLIENT_ID,
       },
     );
@@ -329,18 +324,36 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}MAILER_USER`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.MAILER_USER,
       },
     );
-    this.MAILER_PASS = ssm.StringParameter.fromSecureStringParameterAttributes(
+    this.GMAIL_OAUTH_REFRESH_TOKEN =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GMAIL_OAUTH_REFRESH_TOKEN`,
+        {
+          version: 1,
+          parameterName: constants.DEV.GMAIL_OAUTH_REFRESH_TOKEN,
+        },
+      );
+    this.GMAIL_OAUTH_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
       this,
-      `${PREFIX}MAILER_PASS`,
+      `${PREFIX}GMAIL_OAUTH_CLIENT_ID`,
       {
         version: 1,
-        parameterName: constants.DEV.MAILER_PASS,
+        parameterName: constants.DEV.GMAIL_OAUTH_CLIENT_ID,
       },
     );
+    this.GMAIL_OAUTH_CLIENT_SECRET =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GMAIL_OAUTH_CLIENT_SECRET`,
+        {
+          version: 1,
+          parameterName: constants.DEV.GMAIL_OAUTH_CLIENT_SECRET,
+        },
+      );
 
     this.GOOGLE_CREDENTIALS_EMAIL =
       ssm.StringParameter.fromSecureStringParameterAttributes(
@@ -424,7 +437,6 @@ export class LCDevAppStack extends cdk.Stack {
       NAVER_CLIENT_SECRET: this.NAVER_CLIENT_SECRET,
       KAKAO_CLIENT_ID: this.KAKAO_CLIENT_ID,
       MAILER_USER: this.MAILER_USER,
-      MAILER_PASS: this.MAILER_PASS,
       GOOGLE_CREDENTIALS_EMAIL: this.GOOGLE_CREDENTIALS_EMAIL,
       GOOGLE_CREDENTIALS_PRIVATE_KEY: this.GOOGLE_CREDENTIALS_PRIVATE_KEY,
       JWT_SECRET: this.JWT_SECRET,

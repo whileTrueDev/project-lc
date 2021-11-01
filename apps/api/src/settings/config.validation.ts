@@ -15,8 +15,11 @@ export const validationSchema = Joi.object({
   // 카카오 어플리케이션
   KAKAO_CLIENT_ID: Joi.string().required(),
 
-  // Mailer account
+  // Mailer account -> official.whiletrue@gmail.com
   MAILER_USER: Joi.string().required(),
+  GMAIL_OAUTH_REFRESH_TOKEN: Joi.string().required(),
+  GMAIL_OAUTH_CLIENT_ID: Joi.string().required(),
+  GMAIL_OAUTH_CLIENT_SECRET: Joi.string().required(),
 
   // JWT
   JWT_SECRET: Joi.string().required(),

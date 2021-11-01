@@ -1,15 +1,16 @@
 on:
   push:
-    branches: [dev, hwasurr-cicd]
+    branches: [master, hwasurr-cicd]
     paths:
       - "apps/api/**"
       - "apps/overlay/**"
       - "libs/firstmall-db/**"
       - "libs/nest-modules/**"
+      - "libs/utils/**"
       - "libs/prisma-orm/**"
       - "libs/shared-types/**"
 
-name: Deploy to AWS ECS "Dev"
+name: Deploy to AWS ECS "Prod"
 env:
   BEFORE_SHA: ${{ github.event.before }}
 jobs:
@@ -34,11 +35,11 @@ jobs:
 
       # Dockerize and Push to DockerHub
       - name: Dockerize
-        run: yarn affected --target=dockerize-dev --base=$BEFORE_SHA --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}"
+        run: yarn affected --target=dockerize --base=$BEFORE_SHA --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}"
 
   DeployAPI:
     name: Deploy API Job
-    runs-on: [self-hosted, linux, project-lc-dev]
+    runs-on: [self-hosted, linux, project-lc]
     needs: [Build]
     steps:
       - name: Checkout
@@ -64,28 +65,28 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: apps/api/task-definition-dev.json
-          container-name: project-lc-api-dev
-          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-api-dev:${{ github.sha }}
+          task-definition: apps/api/task-definition.json
+          container-name: project-lc-api
+          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-api:${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition API
         if: ${{ success() }}
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: project-lc-api-dev-service
-          cluster: project-lc-dev
+          service: project-lc-api-service
+          cluster: project-lc-prod
           wait-for-service-stability: false
 
       - name: Prisma Migrate
         if: ${{ success() }}
         run: yarn nx run prisma-orm:migrate-deploy
         env:
-          DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.PROD_PRISMA_DATABASE_URL }}
 
   DeployOverlay:
     name: Deploy Overlay Job
-    runs-on: [self-hosted, linux, project-lc-dev]
+    runs-on: [self-hosted, linux, project-lc]
     needs: [Build]
     steps:
       - name: Checkout
@@ -111,21 +112,21 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: apps/overlay/task-definition-dev.json
-          container-name: project-lc-overlay-dev
-          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-overlay-dev:${{ github.sha }}
+          task-definition: apps/overlay/task-definition.json
+          container-name: project-lc-overlay
+          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-overlay:${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition Overlay
         if: ${{ success() }}
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: project-lc-overlay-dev-service
-          cluster: project-lc-dev
+          service: project-lc-overlay-service
+          cluster: project-lc-prod
           wait-for-service-stability: false
 
       - name: Prisma Migrate
         if: ${{ success() }}
         run: yarn nx run prisma-orm:migrate-deploy
         env:
-          DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.PROD_PRISMA_DATABASE_URL }}
