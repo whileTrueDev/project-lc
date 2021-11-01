@@ -98,7 +98,6 @@ const columns: GridColumns = [
     minWidth: 120,
     flex: 1,
     sortable: false,
-    // TODO: 상품 상세페이지 일감 진행 후 상품 상세페이지로 이동 기능 추가
     renderCell: ({ row }) => {
       const goodsId = row.id;
       const { goods_name } = row;

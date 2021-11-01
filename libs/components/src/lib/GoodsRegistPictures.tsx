@@ -270,7 +270,7 @@ export function GoodsRegistPictures(): JSX.Element {
                 filename={i.image}
                 url={i.image || ''}
                 {...PREVIEW_SIZE}
-                onDelete={() => deletePicture(i.id as number)} // TODO: 삭제 뮤테이션 연결
+                onDelete={() => deletePicture(i.id as number)}
               />
             ))}
         </Stack>
