@@ -1,22 +1,10 @@
-import {
-  Box,
-  Link,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Heading,
-  Button,
-} from '@chakra-ui/react';
+import { Box, Table, Thead, Tbody, Tr, Th, Td, Heading, Button } from '@chakra-ui/react';
 import {
   useAdminLiveShoppingList,
   LiveShoppingWithGoods,
   useProfile,
 } from '@project-lc/hooks';
 import { getLiveShoppingProgress } from '@project-lc/shared-types';
-import NextLink from 'next/link';
 import dayjs from 'dayjs';
 import router from 'next/router';
 import { LiveShoppingProgressBadge } from '../LiveShoppingProgressBadge';
