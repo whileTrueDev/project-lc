@@ -10,6 +10,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
+import { ChevronLeftIcon } from '@chakra-ui/icons';
 import {
   useApprovedGoodsList,
   useCreateLiveShoppingMutation,
@@ -132,12 +133,13 @@ export function LiveShoppingRegist(): JSX.Element {
                   </Text>
                 </Alert>
               )}
+
               <ChakraAutoComplete<ApprovedGoodsListItem>
                 label="라이브 쇼핑을 진행할 상품"
                 options={goodsList.data}
                 isLoading={goodsList.isLoading}
                 isDisabled={!goodsList.data || goodsList.data.length === 0}
-                getOptionLabel={(opt) => opt?.goods_name || ''}
+                getOptionLabel={(opt) => opt?.go + ods_name || ''}
                 value={selectedGoods}
                 onChange={(newV) => {
                   if (newV) {
