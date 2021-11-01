@@ -6,6 +6,7 @@ import {
   GridItem,
   Input,
   useColorModeValue,
+  useMergeRefs,
 } from '@chakra-ui/react';
 import { forwardRef, MutableRefObject } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -60,6 +61,11 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
     }
   }
 
+  const { ref, ...companyName } = register('companyName', {
+    required: '회사명을 입력해주세요.',
+  });
+  const companyNameRefs = useMergeRefs(inputRef, ref);
+
   return (
     <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
       <GridItem {...useDialogHeaderConfig(useColorModeValue)}>회사명*</GridItem>
@@ -73,10 +79,8 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
             autoComplete="off"
             maxW={200}
             maxLength={25}
-            {...register('companyName', {
-              required: '회사명을 입력해주세요.',
-            })}
-            ref={inputRef}
+            {...companyName}
+            ref={companyNameRefs}
           />
           <FormErrorMessage ml={3} mt={0}>
             {errors.companyName && errors.companyName.message}

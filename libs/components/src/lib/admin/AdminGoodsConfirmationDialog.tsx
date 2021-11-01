@@ -17,6 +17,7 @@ import {
   useToast,
   Grid,
   Text,
+  useMergeRefs,
 } from '@chakra-ui/react';
 import { GoodsConfirmationStatus } from '@project-lc/shared-types';
 import { useGoodConfirmationMutation } from '@project-lc/hooks';
@@ -48,8 +49,12 @@ export function AdminGoodsConfirmationDialog(
     formState: { errors, isSubmitting },
     watch,
   } = useForm();
-  const initialRef = useRef(null);
   const toast = useToast();
+  const initialRef = useRef(null);
+  const { ref, ...firstmallGoodsConnectionId } = register('firstmallGoodsConnectionId', {
+    required: '상품 ID를 반드시 입력해주세요.',
+  });
+  const connectionIdRefs = useMergeRefs(initialRef, ref);
 
   function useClose(): void {
     reset();
@@ -123,10 +128,8 @@ export function AdminGoodsConfirmationDialog(
               autoComplete="off"
               type="number"
               placeholder="승인할 상품 ID를 입력 하세요."
-              {...register('firstmallGoodsConnectionId', {
-                required: '상품 ID를 반드시 입력해주세요.',
-              })}
-              ref={initialRef}
+              {...firstmallGoodsConnectionId}
+              ref={connectionIdRefs}
             />
             <FormErrorMessage>
               {errors.firstmallGoodsConnectionId &&
