@@ -550,7 +550,7 @@ model LiveShoppingVideo {
 model SellCommission {
   id                Int     @id @default(autoincrement())
   commissionRate    Decimal @default("5.00") @db.Decimal(10, 2) // 판매 수수료 퍼센티지 (0%~100% 사이값)
-  commissionDecimal Decimal @default("0.05") @db.Decimal(10, 2) // 0~1사이의 값으로 표현한 판매수수료
+  commissionDecimal Decimal @default("0.05") @db.Decimal(10, 4) // 0~1사이의 값으로 표현한 판매수수료
 }
 
 // -------------------------------------------------

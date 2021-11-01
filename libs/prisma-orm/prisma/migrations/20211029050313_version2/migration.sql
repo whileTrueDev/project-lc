@@ -148,7 +148,7 @@ CREATE TABLE `LiveShoppingVideo` (
 CREATE TABLE `SellCommission` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `commissionRate` DECIMAL(10, 2) NOT NULL DEFAULT 5.00,
-    `commissionDecimal` DECIMAL(10, 2) NOT NULL DEFAULT 0.05,
+    `commissionDecimal` DECIMAL(10, 4) NOT NULL DEFAULT 0.05,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
