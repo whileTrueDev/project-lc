@@ -18,9 +18,12 @@ export function LiveShoppingRequestInput(): JSX.Element {
   return (
     <Box w="100%">
       <Stack spacing={2}>
-        <Heading as="h6" size="xs">
-          요청사항
-        </Heading>
+        <Stack direction="row">
+          <Heading as="h6" size="xs">
+            요청사항
+          </Heading>
+          <Text fontSize="xs">(최대 500자)</Text>
+        </Stack>
         <Textarea
           placeholder={examplePlaceholder}
           height={300}
