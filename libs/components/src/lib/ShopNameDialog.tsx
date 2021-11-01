@@ -19,6 +19,7 @@ import {
   Text,
   useToast,
   Stack,
+  useMergeRefs,
 } from '@chakra-ui/react';
 import { SellerShopInfoDto } from '@project-lc/shared-types';
 import { useProfile, useShopInfoMutation } from '@project-lc/hooks';
@@ -35,7 +36,6 @@ type ShopNameDialogType = {
 
 export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
   const { isOpen, onOpen, onClose, autoCheck } = props;
-
   const { data, refetch } = useProfile();
   const {
     register,
@@ -43,8 +43,13 @@ export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
     reset,
     formState: { errors, isSubmitting },
   } = useForm();
-  const initialRef = useRef(null);
   const toast = useToast();
+
+  const initialRef = useRef(null);
+  const { ref, ...shopName } = register('shopName', {
+    required: '상점명을 반드시 입력해주세요.',
+  });
+  const shopNameRefs = useMergeRefs(initialRef, ref);
 
   useEffect(() => {
     // 렌더링 이후, seller가 가진 shopName을 프로퍼티로 가지는 경우,
@@ -117,10 +122,8 @@ export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
               maxLength={20}
               autoComplete="off"
               placeholder="등록할 상점명을 입력해주세요."
-              {...register('shopName', {
-                required: '상점명을 반드시 입력해주세요.',
-              })}
-              ref={initialRef}
+              {...shopName}
+              ref={shopNameRefs}
             />
             <FormErrorMessage>
               {errors.shopName && errors.shopName.message}
