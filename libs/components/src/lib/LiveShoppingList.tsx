@@ -4,6 +4,7 @@ import {
   Button,
   Center,
   Divider,
+  Flex,
   IconButton,
   Link,
   Modal,
@@ -41,6 +42,7 @@ import {
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useQueryClient } from 'react-query';
+import { BroadcasterChannelButton } from '..';
 import { BroadcasterName } from './BroadcasterName';
 import { ConfirmDialog } from './ConfirmDialog';
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
@@ -178,7 +180,14 @@ export function LiveShoppingList(): JSX.Element {
                   />
                 </Td>
                 <Td>
-                  <BroadcasterName data={row.broadcaster} />
+                  <Flex alignItems="center">
+                    <Box mr={1}>
+                      <BroadcasterName data={row.broadcaster} />
+                    </Box>
+                    <BroadcasterChannelButton
+                      channelUrl={data[liveShoppingId].broadcaster.channelUrl}
+                    />
+                  </Flex>
                 </Td>
                 <Td>
                   <Stack alignItems="center">
@@ -284,16 +293,9 @@ export function LiveShoppingList(): JSX.Element {
                     <>
                       <BroadcasterName data={data[liveShoppingId].broadcaster} />
                       {data[liveShoppingId].broadcaster.channelUrl && (
-                        <Tooltip label="방송인 채널로 이동">
-                          <IconButton
-                            aria-label="open-broadcaster-channel-button"
-                            size="sm"
-                            icon={<ExternalLinkIcon />}
-                            onClick={() =>
-                              window.open(data[liveShoppingId].broadcaster.channelUrl)
-                            }
-                          />
-                        </Tooltip>
+                        <BroadcasterChannelButton
+                          channelUrl={data[liveShoppingId].broadcaster.channelUrl}
+                        />
                       )}
                     </>
                   ) : (

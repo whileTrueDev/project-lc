@@ -10,7 +10,7 @@ const columns: GridColumns = [
   {
     field: 'title',
     headerName: '제목',
-    minWidth: 600,
+    flex: 3,
     renderCell: ({ row }) => {
       return (
         <Link isExternal href={row.url}>
@@ -24,6 +24,7 @@ const columns: GridColumns = [
     headerName: '날짜',
     valueFormatter: ({ row }) =>
       dayjs(row.postingDate as Date).format('YYYY/MM/DD HH:mm:ss'),
+    flex: 1,
     minWidth: 200,
   },
 ];
