@@ -1,6 +1,5 @@
 import { Heading, Stack, Text } from '@chakra-ui/react';
 import dayjs from 'dayjs';
-import { TextDotConnector } from '..';
 
 export function LiveShoppingDetailTitle(props: {
   goodsName: string;
@@ -11,8 +10,7 @@ export function LiveShoppingDetailTitle(props: {
     <>
       <Heading>{goodsName}</Heading>
       <Stack direction="row" alignItems="center">
-        <Text>등록시간</Text>
-        <TextDotConnector />
+        <Text>등록시간: </Text>
         <Text>{dayjs(createDate).format('YYYY-MM-DD HH:mm:ss')}</Text>
       </Stack>
     </>

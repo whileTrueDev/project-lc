@@ -13,13 +13,13 @@ export function AdminLiveShoppingUpdateConfirmModal(
   const { selectedBroadcaster } = liveShoppingManageStore();
   return (
     <ConfirmDialog
-      title="등록정보 확인"
+      title="라이브쇼핑 변경 정보 확인"
       isOpen={isOpen}
       onClose={onClose}
       onConfirm={onConfirm}
     >
       <Box>
-        <Text fontSize="xl">아래와 같이 등록하시겠습니까?</Text>
+        <Text fontSize="xl">아래와 같이 라이브쇼핑 정보를 변경하시겠습니까?</Text>
 
         {watch('progress') ? (
           <Text>

@@ -378,9 +378,11 @@ function SettlementItemOptionDetail({
 
       <GridItem>판매자 정산정보</GridItem>
       <GridItem>
-        {!opt.seller && '판매자 미상(상품 연결 정보 확인 필요)'}
+        {!opt.seller && (
+          <Text color="red.500">판매자 미상(상품 연결 정보 확인 필요)</Text>
+        )}
         {opt.seller && !isAbleToSettle ? (
-          <Text>아직 정산정보 등록하지 않음</Text>
+          <Text color="red.500">아직 정산정보 등록하지 않음</Text>
         ) : (
           <>
             {opt.seller?.sellerSettlementAccount.map((account) => (

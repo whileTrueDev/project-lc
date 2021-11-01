@@ -20,12 +20,12 @@ import { useAutocomplete } from '@material-ui/lab';
 
 export interface ChakraAutoCompleteProps<T> {
   label?: string;
-  options?: T[];
-  value?: T | string | null;
+  options: T[];
+  value?: T | null;
   isLoading?: boolean;
   isDisabled?: boolean;
-  getOptionLabel: (opt: T) => string;
-  onChange: (newValue: T) => void;
+  getOptionLabel: (opt: T | null) => string;
+  onChange: (newValue: T | null) => void;
 }
 export function ChakraAutoComplete<T = any>({
   label,
@@ -52,7 +52,7 @@ export function ChakraAutoComplete<T = any>({
     id: 'use-autocomplete-demo',
     options,
     getOptionLabel,
-    value: valueProp,
+    value: valueProp as any,
     onChange: (_, newValue) => {
       onChange(newValue);
     },

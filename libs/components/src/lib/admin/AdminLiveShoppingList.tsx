@@ -1,4 +1,15 @@
-import { Box, Table, Thead, Tbody, Tr, Th, Td, Heading, Button } from '@chakra-ui/react';
+import {
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Heading,
+  Button,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import {
   useAdminLiveShoppingList,
   LiveShoppingWithGoods,
@@ -16,6 +27,7 @@ export function AdminLiveShoppingList({
 }: {
   setSelectedGoods: (selectedGoods: SeletctedLiveShoppingType) => void;
 }): JSX.Element {
+  const rowHoverColor = useColorModeValue('gray.100', 'gray.700');
   const { data: profileData } = useProfile();
 
   const { data, isLoading } = useAdminLiveShoppingList({
@@ -69,7 +81,14 @@ export function AdminLiveShoppingList({
           {data &&
             !isLoading &&
             data.map((row) => (
-              <Tr key={row.id} onClick={() => handleRowClick(row.id)} cursor="pointer">
+              <Tr
+                key={row.id}
+                onClick={() => handleRowClick(row.id)}
+                cursor="pointer"
+                _hover={{
+                  backgroundColor: rowHoverColor,
+                }}
+              >
                 <Td>{row.id}</Td>
                 <Td>{dayjs(row.createDate).format('YYYY/MM/DD HH:mm')}</Td>
                 <Td>{row.goods.goods_name}</Td>

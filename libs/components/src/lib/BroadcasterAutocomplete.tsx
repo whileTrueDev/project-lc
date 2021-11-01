@@ -18,7 +18,7 @@ export function BroadcasterAutocomplete(
     <Box>
       <Text as="span">방송인</Text>
       <ChakraAutoComplete
-        options={data}
+        options={data || []}
         getOptionLabel={(option) => option?.userNickname || ''}
         onChange={(newV) => {
           if (newV) {

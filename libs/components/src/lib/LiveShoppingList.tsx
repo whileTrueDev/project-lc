@@ -1,45 +1,51 @@
-import { useState } from 'react';
-import {
-  Box,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Button,
-  Text,
-  useToast,
-  Link,
-  Stack,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  useDisclosure,
-  Divider,
-  Textarea,
-  Center,
-} from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import {
-  useLiveShoppingList,
-  useProfile,
+  Box,
+  Button,
+  Center,
+  Divider,
+  Flex,
+  IconButton,
+  Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Textarea,
+  Th,
+  Thead,
+  Tooltip,
+  Tr,
+  useColorModeValue,
+  useDisclosure,
+  useToast,
+} from '@chakra-ui/react';
+import { Goods, GoodsConfirmation, LiveShopping, SellerShop } from '@prisma/client';
+import {
   useDeleteLiveShopping,
   useFmOrdersDuringLiveShoppingSales,
+  useLiveShoppingList,
+  useProfile,
 } from '@project-lc/hooks';
-import dayjs from 'dayjs';
-import { LiveShopping, Goods, GoodsConfirmation, SellerShop } from '@prisma/client';
 import {
   BroadcasterDTOWithoutUserId,
   LIVE_SHOPPING_PROGRESS,
 } from '@project-lc/shared-types';
+import dayjs from 'dayjs';
+import { useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
+import { BroadcasterChannelButton } from '..';
 import { BroadcasterName } from './BroadcasterName';
 import { ConfirmDialog } from './ConfirmDialog';
+import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
 
 export interface GoodsWithConfirmation extends Goods {
   confirmation: { confirmation: GoodsConfirmation };
@@ -59,7 +65,8 @@ export interface LiveShoppingWithSalesFrontType extends LiveShoppingWithoutDate 
 
 export function LiveShoppingList(): JSX.Element {
   const queryClient = useQueryClient();
-
+  const toast = useToast();
+  const rowHoverColor = useColorModeValue('gray.100', 'gray.700');
   const { data: profileData } = useProfile();
 
   const { data, isLoading } = useLiveShoppingList({});
@@ -103,9 +110,6 @@ export function LiveShoppingList(): JSX.Element {
   };
 
   const { mutateAsync } = useDeleteLiveShopping();
-
-  const toast = useToast();
-
   const deleteLiveShopping = async (): Promise<void> => {
     mutateAsync(toDeleteLiveShoppingId)
       .then((isDeleted) => {
@@ -157,7 +161,14 @@ export function LiveShoppingList(): JSX.Element {
           !isSalesLoading &&
           liveShoppingWithSales.length !== 0 ? (
             liveShoppingWithSales.map((row, index) => (
-              <Tr key={row.id} onClick={() => handleDetailOnOpen(index)} cursor="pointer">
+              <Tr
+                key={row.id}
+                onClick={() => handleDetailOnOpen(index)}
+                cursor="pointer"
+                _hover={{
+                  backgroundColor: rowHoverColor,
+                }}
+              >
                 <Td>{index + 1}</Td>
                 <Td>{row.goods.goods_name}</Td>
                 <Td>
@@ -168,10 +179,15 @@ export function LiveShoppingList(): JSX.Element {
                     sellEndDate={row.sellEndDate}
                   />
                 </Td>
-                <Td onClick={(e) => e.stopPropagation()}>
-                  <Link href={row.broadcaster?.channelUrl} isExternal>
-                    <BroadcasterName data={row.broadcaster} />
-                  </Link>
+                <Td>
+                  <Flex alignItems="center">
+                    <Box mr={1}>
+                      <BroadcasterName data={row.broadcaster} />
+                    </Box>
+                    <BroadcasterChannelButton
+                      channelUrl={data[liveShoppingId].broadcaster.channelUrl}
+                    />
+                  </Flex>
                 </Td>
                 <Td>
                   <Stack alignItems="center">
@@ -246,14 +262,17 @@ export function LiveShoppingList(): JSX.Element {
       </Table>
       {data && data.length !== 0 && !isLoading && (
         <Modal isOpen={detailIsOpen} onClose={detailOnClose} size="lg">
+          <ModalOverlay />
           <ModalContent>
             <ModalHeader>상세정보</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Stack spacing={5}>
-                <Text as="span">
-                  판매자 : {data[liveShoppingId].seller.sellerShop.shopName}
-                </Text>
+              <Stack spacing={4}>
+                {data[liveShoppingId].seller.sellerShop && (
+                  <Text as="span">
+                    판매자 : {data[liveShoppingId].seller.sellerShop.shopName}
+                  </Text>
+                )}
 
                 <Stack direction="row" alignItems="center">
                   <Text as="span">진행상태</Text>
@@ -271,9 +290,14 @@ export function LiveShoppingList(): JSX.Element {
                 <Stack direction="row" alignItems="center">
                   <Text as="span">방송인: </Text>
                   {data[liveShoppingId].broadcaster ? (
-                    <Link href={data[liveShoppingId].broadcaster.channelUrl} isExternal>
+                    <>
                       <BroadcasterName data={data[liveShoppingId].broadcaster} />
-                    </Link>
+                      {data[liveShoppingId].broadcaster.channelUrl && (
+                        <BroadcasterChannelButton
+                          channelUrl={data[liveShoppingId].broadcaster.channelUrl}
+                        />
+                      )}
+                    </>
                   ) : (
                     <Text fontWeight="bold">미정</Text>
                   )}
@@ -320,6 +344,26 @@ export function LiveShoppingList(): JSX.Element {
                       : '미정'}
                   </Text>
                 </Stack>
+
+                <Divider />
+                <Stack direction="row" alignItems="center">
+                  <Text as="span">방송인 수수료: </Text>
+                  <Text as="span" fontWeight="bold">
+                    {data[liveShoppingId].broadcasterCommissionRate
+                      ? `${data[liveShoppingId].broadcasterCommissionRate}%`
+                      : '미정'}
+                  </Text>
+                </Stack>
+
+                <Stack direction="row" alignItems="center">
+                  <Text as="span">판매 수수료: </Text>
+                  <Text as="span" fontWeight="bold">
+                    {data[liveShoppingId].whiletrueCommissionRate
+                      ? `${data[liveShoppingId].whiletrueCommissionRate}%`
+                      : '미정'}
+                  </Text>
+                </Stack>
+
                 <Stack>
                   <Text>요청사항</Text>
                   <Textarea
@@ -333,7 +377,7 @@ export function LiveShoppingList(): JSX.Element {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={detailOnClose}>
+              <Button colorScheme="blue" onClick={detailOnClose}>
                 닫기
               </Button>
             </ModalFooter>

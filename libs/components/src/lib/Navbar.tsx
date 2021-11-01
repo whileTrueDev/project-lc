@@ -6,7 +6,6 @@ import {
   Collapse,
   Divider,
   Flex,
-  Heading,
   IconButton,
   Link,
   Menu,
@@ -14,7 +13,6 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Tooltip,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
@@ -26,8 +24,8 @@ import { useCallback } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
 import { mainNavItems, NavItem } from '../constants/navigation';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
-import ProfileBox from './ProfileBox';
 import KksLogo from './KksLogo';
+import ProfileBox from './ProfileBox';
 
 export function Navbar(): JSX.Element {
   const router = useRouter();
@@ -93,42 +91,29 @@ export function Navbar(): JSX.Element {
         >
           <ColorModeSwitcher />
           {isLoggedIn ? (
-            <>
-              <Tooltip label="계정 설정" fontSize="xs">
-                <IconButton
-                  size="md"
-                  fontSize="xl"
-                  variant="ghost"
-                  color="current"
-                  aria-label="settings icon"
-                  icon={<AiTwotoneSetting />}
+            <Menu>
+              <MenuButton as={Avatar} size="sm" cursor="pointer" />
+              <MenuList w={{ base: 280, sm: 300 }}>
+                <Box p={3}>
+                  <ProfileBox />
+                </Box>
+                <Divider />
+                <MenuItem
+                  my={1}
+                  icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
                   onClick={handleAccountSettingClick}
-                />
-              </Tooltip>
-              <Menu>
-                <MenuButton as={Avatar} size="sm" cursor="pointer" />
-                <MenuList w={{ base: 280, sm: 300 }}>
-                  <Box p={3}>
-                    <ProfileBox />
-                  </Box>
-                  <Divider />
-                  <MenuItem
-                    my={1}
-                    icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
-                    onClick={handleAccountSettingClick}
-                  >
-                    계정 설정
-                  </MenuItem>
-                  <MenuItem
-                    my={1}
-                    icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
-                    onClick={logout}
-                  >
-                    로그아웃
-                  </MenuItem>
-                </MenuList>
-              </Menu>
-            </>
+                >
+                  계정 설정
+                </MenuItem>
+                <MenuItem
+                  my={1}
+                  icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
+                  onClick={logout}
+                >
+                  로그아웃
+                </MenuItem>
+              </MenuList>
+            </Menu>
           ) : (
             <>
               <Button

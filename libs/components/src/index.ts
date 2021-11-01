@@ -13,6 +13,7 @@ export * from './lib/admin/AdminNoticeSection';
 export * from './lib/admin/AdminOrderCancelRequestList';
 export * from './lib/admin/AdminPageLayout';
 export * from './lib/BroadcasterAutocomplete';
+export * from './lib/BroadcasterChannelButton';
 export * from './lib/BroadcasterName';
 export * from './lib/BusinessRegistrationBox';
 export * from './lib/BusinessRegistrationDialog';

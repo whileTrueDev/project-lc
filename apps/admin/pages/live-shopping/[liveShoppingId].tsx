@@ -144,7 +144,7 @@ export function GoodsDetail(): JSX.Element {
         {/* 상품 제목 */}
         {liveShopping && !liveShoppingIsLoading && (
           <LiveShoppingDetailTitle
-            goodsName={liveShopping[0].goods.goods_name}
+            goodsName={`${liveShopping[0].goods.goods_name} + ${liveShopping[0].broadcaster.userNickname}`}
             createDate={liveShopping[0].createDate}
           />
         )}
@@ -155,7 +155,7 @@ export function GoodsDetail(): JSX.Element {
             </Text>
 
             <Stack direction="row" alignItems="center">
-              <Text as="span">진행상태</Text>
+              <Text as="span">현재 진행상태</Text>
               <LiveShoppingProgressBadge
                 progress={liveShopping[0].progress}
                 broadcastStartDate={liveShopping[0].broadcastStartDate}
@@ -202,7 +202,9 @@ export function GoodsDetail(): JSX.Element {
                 )}
               </Text>
             </Stack>
+
             <Divider />
+
             <Stack direction="row" alignItems="center">
               <Text as="span">판매시작 시간: </Text>
               <Text as="span" fontWeight="bold">
@@ -226,6 +228,26 @@ export function GoodsDetail(): JSX.Element {
                 {getDuration(liveShopping[0].sellStartDate, liveShopping[0].sellEndDate)}
               </Text>
             </Stack>
+
+            <Divider />
+            <Stack direction="row" alignItems="center">
+              <Text as="span">방송인 수수료: </Text>
+              <Text as="span" fontWeight="bold">
+                {liveShopping[0].broadcasterCommissionRate
+                  ? `${liveShopping[0].broadcasterCommissionRate}%`
+                  : '미정'}
+              </Text>
+            </Stack>
+
+            <Stack direction="row" alignItems="center">
+              <Text as="span">와일트루 수수료: </Text>
+              <Text as="span" fontWeight="bold">
+                {liveShopping[0].whiletrueCommissionRate
+                  ? `${liveShopping[0].whiletrueCommissionRate}%`
+                  : '미정'}
+              </Text>
+            </Stack>
+
             <Box>
               <Textarea resize="none" rows={10} value={liveShopping[0].requests || ''} />
             </Box>
@@ -271,7 +293,7 @@ export function GoodsDetail(): JSX.Element {
                 <Text>영상 URL</Text>
                 <Input {...register('videoUrl')} />
               </Stack>
-              <Button onClick={openConfirmModal}>등록</Button>
+              <Button onClick={openConfirmModal}>변경</Button>
             </Stack>
             <AdminLiveShoppingUpdateConfirmModal
               isOpen={isOpen}

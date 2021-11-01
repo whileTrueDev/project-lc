@@ -14,7 +14,7 @@ export const mainNavItems: Array<NavItem> = [
   },
   {
     label: '크크마켓',
-    href: '#',
+    href: 'https://k-kmarket.com/',
   },
 ];
 

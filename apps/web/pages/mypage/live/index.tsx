@@ -1,16 +1,19 @@
 import { MypageLayout, LiveShoppingList } from '@project-lc/components';
-import { Heading, Container, Link, Button, Stack } from '@chakra-ui/react';
+import { Heading, Container, Button, Stack } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 
 export function Live(): JSX.Element {
+  const router = useRouter();
   return (
     <MypageLayout>
       <Container maxWidth="container.xl" my={12}>
         <Heading>라이브 쇼핑 목록</Heading>
         <Stack direction="row" p={2} justifyContent="flex-end">
-          <Link href="/mypage/live/regist">
-            <Button colorScheme="blue">라이브 등록</Button>
-          </Link>
+          <Button colorScheme="blue" onClick={() => router.push('/mypage/live/regist')}>
+            라이브 쇼핑 진행 요청
+          </Button>
         </Stack>
+
         <LiveShoppingList />
       </Container>
     </MypageLayout>

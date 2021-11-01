@@ -1,23 +1,24 @@
+import * as textToSpeech from '@google-cloud/text-to-speech';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
-import * as textToSpeech from '@google-cloud/text-to-speech';
 import {
-  Voice,
   AudioEncoding,
-  NicknameAndPrice,
-  PriceSum,
-  NicknameAndText,
   GoogleTTSCredentials,
+  NicknameAndPrice,
+  NicknameAndText,
+  PriceSum,
   PurchaseMessage,
   UserId,
+  Voice,
 } from '@project-lc/shared-types';
+import S3 from 'aws-sdk/clients/s3';
 import { throwError } from 'rxjs';
-import AWS from 'aws-sdk';
 
 @Injectable()
 export class OverlayService {
   privateKey: string;
   options: GoogleTTSCredentials;
+  s3: S3;
 
   constructor(private readonly prisma: PrismaService) {
     this.privateKey =
@@ -29,6 +30,14 @@ export class OverlayService {
         client_email: process.env.GOOGLE_CREDENTIALS_EMAIL,
       },
     };
+
+    this.s3 = new S3({
+      region: 'ap-northeast-2',
+      credentials: {
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET,
+      },
+    });
   }
 
   async googleTextToSpeech(
@@ -142,26 +151,16 @@ export class OverlayService {
 
   async getVerticalImagesFromS3(userId: UserId): Promise<number> {
     const { S3_BUCKET_NAME } = process.env;
-    const S3_BUCKET_REGION = 'ap-northeast-2';
+
     const broadcasterId = userId.userId;
     let imagesUrls = 0;
-
-    AWS.config.update({
-      region: S3_BUCKET_REGION,
-      credentials: {
-        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET,
-      },
-    });
 
     const listingParams = {
       Bucket: S3_BUCKET_NAME,
       Prefix: `vertical-banner/${broadcasterId}/`,
     };
 
-    const s3 = new AWS.S3();
-
-    await s3
+    await this.s3
       .listObjects(listingParams, async (err, data) => {
         if (data) {
           data.Contents.forEach((object) => {

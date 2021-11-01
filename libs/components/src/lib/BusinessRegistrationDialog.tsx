@@ -1,24 +1,23 @@
 import {
-  Modal,
-  ModalContent,
-  ModalCloseButton,
-  ModalBody,
-  ModalOverlay,
-  ModalHeader,
   Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
   ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   useToast,
 } from '@chakra-ui/react';
-import { useRef } from 'react';
-import { useForm } from 'react-hook-form';
-import { BusinessRegistrationDto } from '@project-lc/shared-types';
 import {
+  s3,
   SettlementInfoRefetchType,
   useBusinessRegistrationMutation,
-  s3,
   useProfile,
 } from '@project-lc/hooks';
-
+import { BusinessRegistrationDto } from '@project-lc/shared-types';
+import { useRef } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { BusinessRegistrationForm } from './BusinessRegistrationForm';
 
 // 사업자 등록증 이미지에 대한 DTO
@@ -54,15 +53,12 @@ export function BusinessRegistrationDialog(
   const toast = useToast();
   const mutation = useBusinessRegistrationMutation();
 
+  const methods = useForm<BusinessRegistrationFormDto>();
   const {
     handleSubmit,
-    register,
-    formState: { errors, isSubmitting },
-    setValue: setvalue,
-    setError: seterror,
+    formState: { isSubmitting },
     reset,
-    clearErrors,
-  } = useForm<BusinessRegistrationFormDto>();
+  } = methods;
 
   function useClose(): void {
     onClose();
@@ -137,25 +133,20 @@ export function BusinessRegistrationDialog(
       initialFocusRef={inputRef}
     >
       <ModalOverlay />
-      <ModalContent as="form" onSubmit={handleSubmit(regist)}>
-        <ModalHeader>사업자 등록정보 등록</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <BusinessRegistrationForm
-            ref={inputRef}
-            register={register}
-            errors={errors}
-            seterror={seterror}
-            setvalue={setvalue}
-            clearErrors={clearErrors}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button type="submit" isLoading={isSubmitting}>
-            등록하기
-          </Button>
-        </ModalFooter>
-      </ModalContent>
+      <FormProvider {...methods}>
+        <ModalContent as="form" onSubmit={handleSubmit(regist)}>
+          <ModalHeader>사업자 등록정보 등록</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <BusinessRegistrationForm ref={inputRef} />
+          </ModalBody>
+          <ModalFooter>
+            <Button type="submit" isLoading={isSubmitting}>
+              등록하기
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </FormProvider>
     </Modal>
   );
 }

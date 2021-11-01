@@ -134,7 +134,7 @@ export function LiveShoppingRegist(): JSX.Element {
               )}
               <ChakraAutoComplete<ApprovedGoodsListItem>
                 label="라이브 쇼핑을 진행할 상품"
-                options={goodsList.data}
+                options={goodsList.data || []}
                 isLoading={goodsList.isLoading}
                 isDisabled={!goodsList.data || goodsList.data.length === 0}
                 getOptionLabel={(opt) => opt?.goods_name || ''}
