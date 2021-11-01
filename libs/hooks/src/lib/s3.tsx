@@ -1,6 +1,6 @@
-import AWS from 'aws-sdk';
+import S3 from 'aws-sdk/clients/s3';
+import dayjs from 'dayjs';
 import path from 'path';
-import moment from 'moment';
 
 // 추후에 S3에 저장할 데이터 종류가 더해지는 경우 추가
 export type s3KeyType =
@@ -16,7 +16,7 @@ export const s3 = (() => {
   const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME!;
   const S3_BUCKET_REGION = 'ap-northeast-2';
 
-  AWS.config.update({
+  const s3Client = new S3({
     region: S3_BUCKET_REGION,
     credentials: {
       accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID!,
@@ -56,7 +56,7 @@ export const s3 = (() => {
     const extension = getExtension(filename);
 
     // 등록된 파일 구별을 위한 등록시간을 통한 접두사 추가
-    const prefix = moment().format('YYMMDDHHmmss').toString();
+    const prefix = dayjs().format('YYMMDDHHmmss').toString();
 
     let fileFullName;
     switch (type) {
@@ -94,7 +94,7 @@ export const s3 = (() => {
   }): Promise<string> {
     if (!file) throw new Error('file should be not null');
     try {
-      const result = await new AWS.S3.ManagedUpload({
+      const result = await new S3.ManagedUpload({
         params: {
           Bucket: S3_BUCKET_NAME,
           Key: key,
@@ -132,7 +132,7 @@ export const s3 = (() => {
     const { key, fileName } = getS3Key({ userMail, type, filename, companyName });
 
     try {
-      await new AWS.S3.ManagedUpload({
+      await new S3.ManagedUpload({
         params: {
           // 저장 영역
           Bucket: S3_BUCKET_NAME,
@@ -168,7 +168,7 @@ export const s3 = (() => {
       Key: `${type}/${sellerEmail}/${fileName}`,
       Expires: signedUrlExpireSeconds,
     };
-    const imageUrl = new AWS.S3().getSignedUrl('getObject', params);
+    const imageUrl = s3Client.getSignedUrl('getObject', params);
     return imageUrl;
   }
 
