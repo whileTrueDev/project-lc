@@ -13,6 +13,7 @@ import {
   ExecuteSettlementDto,
   FindSettlementHistoryRoundRes,
   FmExport,
+  FmOrder,
   SellerBusinessRegistrationType,
   SettlementAccountDto,
 } from '@project-lc/shared-types';
@@ -178,7 +179,7 @@ export class SellerSettlementService {
   ): Promise<boolean> {
     const { target, round } = dto;
     // 출고가 발생한 주문을 통해 해당 주문에 대한 이전 정산 처리를 조회
-    const { order_seq, shipping_cost } = target;
+    const { order_seq, shipping_cost, payment } = target;
     const settlementHistories = await this.findSettlementHistory(email, {
       order_seq,
     });
@@ -231,6 +232,12 @@ export class SellerSettlementService {
       { ea: 0, price: 0, commission: 0 },
     );
 
+    const totalPgCommission = this.calcPgCommission({
+      paymentMethod: target.payment,
+      pg: target.pg,
+      targetAmount: totalInfo.price,
+    });
+
     // 주문정보 불러오기
     // 라이브쇼핑 주문의 경우, 일반 주문의 경우 분기처리
     const today = dayjs().format('YYYY/MM');
@@ -249,8 +256,8 @@ export class SellerSettlementService {
         recipient: target.recipient_user_name,
         paymentMethod: target.payment,
         pg: target.pg,
-        pgCommission: 0, // TODO 향후 추가필요
-        pgCommissionRate: 0, // TODO 향후 추가필요
+        pgCommission: totalPgCommission.commission,
+        pgCommissionRate: totalPgCommission.rate,
         sellerEmail: target.options[0].seller.email,
         settlementItems: {
           create: target.options.map((opt) => {
@@ -297,12 +304,50 @@ export class SellerSettlementService {
         shippingCostIncluded,
         totalEa: totalInfo.ea,
         totalPrice: totalInfo.price,
-        totalAmount: totalInfo.price - totalInfo.commission,
+        totalAmount:
+          totalInfo.price - totalInfo.commission - totalPgCommission.commission,
         totalCommission: totalInfo.commission,
       },
     });
 
     return true;
+  }
+
+  /** 정산 정보에 기반하여 정산을 진행할 총금액에서 전자결제 수수료를 계산합니다. */
+  private calcPgCommission(opts: {
+    pg: FmOrder['pg'];
+    paymentMethod: FmOrder['payment'];
+    targetAmount: number;
+  }): { commission: number; rate: string } {
+    const { pg, paymentMethod, targetAmount } = opts;
+    if (pg === 'npay' || pg === 'npg') {
+      switch (paymentMethod) {
+        case 'virtual': // 가상계좌 1%, 최대 275원
+        case 'bank': {
+          // 무통장입금 1%, 최대 275원
+          const fee = targetAmount * (1 / 100);
+          return { commission: fee > 275 ? 0 : fee, rate: '1.00%(최대275원)' };
+        }
+        case 'card': // 카드결제
+          return { commission: targetAmount * (2.2 / 100), rate: '2.2%' };
+        case 'point': // 네이버페이 포인트
+          return { commission: targetAmount * (3.74 / 100), rate: '3.74%' };
+        case 'cellphone': // 휴대폰 결제
+          return { commission: targetAmount * (3.85 / 100), rate: '3.85%' };
+        default:
+      }
+    }
+    switch (paymentMethod) {
+      case 'account': // 계좌입금
+        return { commission: targetAmount * (1.98 / 100), rate: '1.98%' };
+      case 'virtual': // 가상계좌 (고정수수료)
+        return { commission: 330, rate: '330원고정' };
+      case 'cellphone': // 휴대폰결제
+        return { commission: targetAmount * (3.85 / 100), rate: '3.85%' };
+      case 'bank': // 무통장입금
+      default:
+        return { commission: 0, rate: '0' };
+    }
   }
 
   /** 정산 고정 수수료 정보를 조회힙니다. */
