@@ -41,7 +41,7 @@ export function AdminImageDownloadButton({
   }
 
   async function downloadFromS3(sellerEmail: string): Promise<void> {
-    const imageUrl = s3.s3DownloadImageUrl(fileName, sellerEmail, type);
+    const imageUrl = await s3.s3DownloadImageUrl(fileName, sellerEmail, type);
     window.open(imageUrl, '_blank');
   }
 

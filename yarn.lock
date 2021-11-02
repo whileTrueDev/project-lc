@@ -654,6 +654,20 @@
     "@aws-sdk/types" "3.38.0"
     tslib "^2.3.0"
 
+"@aws-sdk/s3-request-presigner@^3.39.0":
+  version "3.39.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/s3-request-presigner/-/s3-request-presigner-3.39.0.tgz#68097ae39aefc8fd38a132db5186984bf7e63329"
+  integrity sha512-cLNLcFRoeY3cefkhR1gWz00I3260H/ju2ED2j5f8GYvzpsKHmQgR9Vibml4tVreaRP7tEN2gGuyTVs6PE15rjw==
+  dependencies:
+    "@aws-sdk/middleware-sdk-s3" "3.39.0"
+    "@aws-sdk/protocol-http" "3.38.0"
+    "@aws-sdk/signature-v4" "3.39.0"
+    "@aws-sdk/smithy-client" "3.38.0"
+    "@aws-sdk/types" "3.38.0"
+    "@aws-sdk/util-create-request" "3.38.0"
+    "@aws-sdk/util-format-url" "3.38.0"
+    tslib "^2.3.0"
+
 "@aws-sdk/service-error-classification@3.38.0":
   version "3.38.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/service-error-classification/-/service-error-classification-3.38.0.tgz#76aa14380809676e1d30ea21f9b7d85031a09a06"
@@ -744,12 +758,31 @@
     "@aws-sdk/is-array-buffer" "3.37.0"
     tslib "^2.3.0"
 
+"@aws-sdk/util-create-request@3.38.0":
+  version "3.38.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/util-create-request/-/util-create-request-3.38.0.tgz#315fbb3b95645061249c1629492e6b81b10c7bfa"
+  integrity sha512-+xIoXPa8Rut/lQ+KyFEwmb3cahFyuUeeXP4IU7IMXDArmnO8PYA5wQdFn1mKO/dPe3Kwef3J7tKB+S7vfVYmeA==
+  dependencies:
+    "@aws-sdk/middleware-stack" "3.38.0"
+    "@aws-sdk/smithy-client" "3.38.0"
+    "@aws-sdk/types" "3.38.0"
+    tslib "^2.3.0"
+
 "@aws-sdk/util-credentials@3.37.0":
   version "3.37.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/util-credentials/-/util-credentials-3.37.0.tgz#76261c3d7c20bee5d28e5c17741adf19558b3b67"
   integrity sha512-zcLhSZDKgBLhUjSU5HoQpuQiP3v8oE86NmV/tiZVPEaO6YVULEAB2Cfj1hpM/b/JXWzjSHfT06KXT7QUODKS+A==
   dependencies:
     "@aws-sdk/shared-ini-file-loader" "3.37.0"
+    tslib "^2.3.0"
+
+"@aws-sdk/util-format-url@3.38.0":
+  version "3.38.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/util-format-url/-/util-format-url-3.38.0.tgz#932b681b35b38e0ae7f2bfcdcba7bd566429121f"
+  integrity sha512-x3bhcKsNZ/LDu4fsc3m67ZFQwxOHSXOC56rq/vT94vwfGgkEabJtOSL9U08k+M7jhXe9O5Qmery/Lu/ETtR++Q==
+  dependencies:
+    "@aws-sdk/querystring-builder" "3.38.0"
+    "@aws-sdk/types" "3.38.0"
     tslib "^2.3.0"
 
 "@aws-sdk/util-hex-encoding@3.37.0":
