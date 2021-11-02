@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [master, hwasurr-cicd]
+    branches: [master]
     paths:
       - "apps/api/**"
       - "apps/overlay/**"
