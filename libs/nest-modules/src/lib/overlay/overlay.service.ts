@@ -11,7 +11,7 @@ import {
   UserId,
   Voice,
 } from '@project-lc/shared-types';
-import S3 from 'aws-sdk/clients/s3';
+import { S3 } from '@aws-sdk/client-s3';
 import { throwError } from 'rxjs';
 
 @Injectable()
@@ -161,19 +161,19 @@ export class OverlayService {
     };
 
     await this.s3
-      .listObjects(listingParams, async (err, data) => {
-        if (data) {
-          data.Contents.forEach((object) => {
-            const imageName = object.Key.split('/').slice(-1)[0];
-            if (imageName.includes('vertical-banner')) {
-              imagesUrls += 1;
-            }
-          });
-        } else {
-          throwError(`S3 Error ${err}`);
-        }
+      .listObjects(listingParams)
+      .then(async (data) => {
+        await data.Contents.forEach((object) => {
+          const imageName = object.Key.split('/').slice(-1)[0];
+          if (imageName.includes('vertical-banner')) {
+            imagesUrls += 1;
+          }
+        });
       })
-      .promise();
+      .catch((error) => {
+        console.error(error);
+      });
+
     return imagesUrls;
   }
 }
