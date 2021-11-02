@@ -1,3 +1,4 @@
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Goods, GoodsView, PrismaClient } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
@@ -6,10 +7,8 @@ import {
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
-import { ConfigModule } from '@nestjs/config';
-import { DeleteObjectsCommandOutput } from '@aws-sdk/client-s3';
-import { GoodsService } from './goods.service';
 import { S3Module } from '../s3/s3.module';
+import { GoodsService } from './goods.service';
 
 describe('GoodsService', () => {
   let __prisma: PrismaClient;

@@ -15,10 +15,12 @@ export function GoodsExposeSwitch({
   goodsId,
   goodsView,
   confirmedGoodsId,
+  isReadOnly = false,
 }: {
   goodsId: number;
   goodsView: GoodsView;
   confirmedGoodsId?: number;
+  isReadOnly?: boolean;
 }): JSX.Element {
   const queryClient = useQueryClient();
   const changeGoodsView = useChangeGoodsView();
@@ -60,6 +62,7 @@ export function GoodsExposeSwitch({
           id={`${goodsId}_view_switch`}
           isChecked={goodsView === 'look'}
           onChange={changeView}
+          isDisabled={isReadOnly}
         />
       )}
     </FormControl>

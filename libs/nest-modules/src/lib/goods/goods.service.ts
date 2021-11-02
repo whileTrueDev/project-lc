@@ -18,6 +18,7 @@ import {
   RegistGoodsDto,
   TotalStockInfo,
   ApprovedGoodsNameAndId,
+  getLiveShoppingProgress,
 } from '@project-lc/shared-types';
 import {
   getImgSrcListFromHtmlStringList,
@@ -117,6 +118,7 @@ export class GoodsService {
         },
         confirmation: true,
         ShippingGroup: true,
+        LiveShopping: true,
       },
     });
 
@@ -125,6 +127,18 @@ export class GoodsService {
       const itemStockInfo = this.intergrateOptionStocks(optionsWithStockInfo);
 
       const defaultOption = item.options.find((opt) => opt.default_option === 'y');
+
+      let onLiveShopping = true;
+      if (item.LiveShopping.length === 0) onLiveShopping = false;
+
+      // 상품에 연결된 라이브쇼핑 데이터가 있는 경우
+      if (item.LiveShopping.length > 0) {
+        // 모든 데이터가 '판매종료', '취소됨' 상태가 아니라면 라이브쇼핑 진행중으로 봄
+        onLiveShopping = !item.LiveShopping.every((live) => {
+          const liveShoppingProgress = getLiveShoppingProgress(live);
+          return ['판매종료', '취소됨'].includes(liveShoppingProgress);
+        });
+      }
 
       return {
         id: item.id,
@@ -146,6 +160,7 @@ export class GoodsService {
               shipping_group_name: item.ShippingGroup.shipping_group_name,
             }
           : undefined,
+        onLiveShopping,
       };
     });
 
@@ -372,6 +387,7 @@ export class GoodsService {
         confirmation: true,
         image: true,
         GoodsInfo: true,
+        LiveShopping: true,
       },
     });
   }

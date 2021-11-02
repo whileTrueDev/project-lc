@@ -74,6 +74,7 @@ export * from './lib/s3';
 export * from './lib/shipping-group-hooks';
 export * from './lib/useCountdown';
 export * from './lib/useDisplaySize';
+export * from './lib/useGoodsOnLive';
 export * from './lib/useHorizontalScroll';
 export * from './lib/useOrderExportableCheck';
 export * from './lib/useOrderReturnOrRefundStatus';

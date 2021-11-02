@@ -75,12 +75,13 @@ export function ShopInfoShippingPolicyItem({
     <>
       <Grid templateColumns="repeat(9, 1fr)" mb={1}>
         {/* 배송그룹명 */}
-        <GridItem colSpan={4}>
+        <GridItem colSpan={3}>
           <Button
             variant="link"
             onClick={onInfoModalOpen}
             isFullWidth
             textDecoration="underline"
+            color="teal.500"
           >
             <Text isTruncated>{`${shipping_group_name}`}</Text>
           </Button>
@@ -88,17 +89,18 @@ export function ShopInfoShippingPolicyItem({
 
         {/* 배송비 계산 기준 */}
         <GridItem colSpan={3}>
-          <Text>{`${ShippingCalculTypeOptions[shipping_calcul_type].label}`}</Text>
+          <Text align="center">{`${ShippingCalculTypeOptions[shipping_calcul_type].label}`}</Text>
         </GridItem>
 
         {/* 연결된 상품 */}
-        <GridItem colSpan={1}>
+        <GridItem colSpan={2}>
           {_count.goods > 0 ? (
             <Button
               variant="link"
               onClick={onRelatedGoodsModalOpen}
               isFullWidth
               textDecoration="underline"
+              color="teal.500"
             >
               <Text>{`${_count.goods}`}</Text>
             </Button>
@@ -108,7 +110,7 @@ export function ShopInfoShippingPolicyItem({
         </GridItem>
 
         {/* 삭제버튼 */}
-        <GridItem>
+        <GridItem display="flex" justifyContent="flex-end">
           <CloseButton size="sm" onClick={onConfirmModalOpen} />
         </GridItem>
       </Grid>
@@ -179,13 +181,11 @@ export function ShopInfoShippingGroup(): JSX.Element {
       />
 
       {/* 배송비 정책 목록 컨테이너 */}
-      <ShippingGroupContainerBox>
+      <ShippingGroupContainerBox maxHeight="150px" overflowY="auto">
         {/* 생성된 배송비 정책 없는경우 */}
         {(!data || data.length === 0) && <Text>등록된 배송비 정책이 없습니다. </Text>}
         {/* 배송비 정책 목록 */}
-        <Box maxHeight="150px" overflowY="auto">
-          {data && data.map((g) => <ShopInfoShippingPolicyItem key={g.id} group={g} />)}
-        </Box>
+        {data && data.map((g) => <ShopInfoShippingPolicyItem key={g.id} group={g} />)}
       </ShippingGroupContainerBox>
     </SettingSectionLayout>
   );
