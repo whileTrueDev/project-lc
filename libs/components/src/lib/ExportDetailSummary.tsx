@@ -64,7 +64,7 @@ export function ExportDetailSummary({
           id: '구매확정',
           value: `구매확정 (${convertFmExportConfirmStatusToString(
             exportData.buy_confirm,
-          )},{' '}
+          )}, 
             ${dayjs(exportData.confirm_date).format('YYYY년 MM월 DD일')})`,
           icon: IoFastFoodOutline,
           iconColor: 'blue.500',
