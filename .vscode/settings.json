@@ -23,33 +23,5 @@
   "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
-  },
-  // material-icon-theme config
-  "material-icon-theme.files.associations": {
-    // nest backend
-    "*.pipe.ts": "nest-pipe",
-    "*.guard.ts": "nest-guard",
-    "*.controller.ts": "nest-controller",
-    "*.module.ts": "nest-module",
-    "*.service.ts": "nest-service",
-    "*.middleware.ts": "nest-middleware",
-    "*.filter.ts": "nest-filter",
-    "*.interface.ts": "typescript-def",
-    "*.dto.ts": "nest-resolver",
-    "*.strategy.ts": "key",
-    "*.entity.ts": "sequelize",
-    "*.config.ts": "settings",
-    "*.roles.ts": "nest-decorator",
-    "*.decorator.ts": "nest-decorator",
-    // react frontend
-    "*.style.ts": "css"
-  },
-  "material-icon-theme.folders.associations": {
-    "interfaces": "typescript",
-    "atoms": "react-components",
-    "organisms": "core",
-    "dto": "delta",
-    "strategies": "keys",
-    "entities": "database"
   }
 }

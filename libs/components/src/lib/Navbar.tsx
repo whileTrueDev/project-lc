@@ -1,25 +1,42 @@
+import { CloseIcon, ExternalLinkIcon, HamburgerIcon, Icon } from '@chakra-ui/icons';
 import {
+  Avatar,
   Box,
-  Flex,
-  Text,
-  IconButton,
   Button,
-  Stack,
   Collapse,
-  Icon,
+  Divider,
+  Flex,
+  IconButton,
   Link,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  useColorModeValue,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Stack,
   useBreakpointValue,
+  useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { ColorModeSwitcher } from '..';
+import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
+import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import { useCallback } from 'react';
+import { AiTwotoneSetting } from 'react-icons/ai';
+import { mainNavItems, NavItem } from '../constants/navigation';
+import { ColorModeSwitcher } from './ColorModeSwitcher';
+import KksLogo from './KksLogo';
+import ProfileBox from './ProfileBox';
 
-export function Navbar() {
+export function Navbar(): JSX.Element {
+  const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
+  const { isLoggedIn } = useIsLoggedIn();
+  const { logout } = useLogout();
+
+  const handleAccountSettingClick = useCallback(
+    () => router.push('/mypage/setting'),
+    [router],
+  );
 
   return (
     <Box>
@@ -46,38 +63,81 @@ export function Navbar() {
             aria-label="Toggle Navigation"
           />
         </Flex>
-        <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-          <Text
-            textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-            fontFamily="heading"
-            color={useColorModeValue('gray.800', 'white')}
-          >
-            Logo
-          </Text>
+        <Flex
+          flex={{ base: 1 }}
+          justify={{ base: 'center', md: 'start' }}
+          alignItems="center"
+        >
+          <NextLink href="/" passHref>
+            <Link
+              textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
+              color={useColorModeValue('gray.800', 'white')}
+            >
+              <KksLogo size="small" />
+            </Link>
+          </NextLink>
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
             <DesktopNav />
           </Flex>
         </Flex>
 
-        <Stack flex={{ base: 1, md: 0 }} justify="flex-end" direction="row" spacing={6}>
+        <Stack
+          flex={{ base: 1, md: 0 }}
+          justify="flex-end"
+          alignItems="center"
+          direction="row"
+          spacing={{ base: 0, sm: 4 }}
+        >
           <ColorModeSwitcher />
-          <Button as="a" fontSize="sm" fontWeight={400} variant="link" href="#">
-            Sign In
-          </Button>
-          <Button
-            display={{ base: 'none', md: 'inline-flex' }}
-            fontSize="sm"
-            fontWeight={600}
-            color="white"
-            bg="pink.400"
-            href="#"
-            _hover={{
-              bg: 'pink.300',
-            }}
-          >
-            Sign Up
-          </Button>
+          {isLoggedIn ? (
+            <Menu>
+              <MenuButton as={Avatar} size="sm" cursor="pointer" />
+              <MenuList w={{ base: 280, sm: 300 }}>
+                <Box p={3}>
+                  <ProfileBox />
+                </Box>
+                <Divider />
+                <MenuItem
+                  my={1}
+                  icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
+                  onClick={handleAccountSettingClick}
+                >
+                  계정 설정
+                </MenuItem>
+                <MenuItem
+                  my={1}
+                  icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
+                  onClick={logout}
+                >
+                  로그아웃
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          ) : (
+            <>
+              <Button
+                as="a"
+                fontSize="sm"
+                fontWeight={500}
+                variant="link"
+                onClick={() => router.push('/login')}
+              >
+                로그인
+              </Button>
+              <Button
+                onClick={() => router.push('/signup')}
+                display={{ base: 'none', md: 'inline-flex' }}
+                fontSize="sm"
+                fontWeight={600}
+                color="white"
+                bg="pink.400"
+                _hover={{ bg: 'pink.300' }}
+              >
+                회원가입
+              </Button>
+            </>
+          )}
         </Stack>
       </Flex>
 
@@ -88,194 +148,84 @@ export function Navbar() {
   );
 }
 
-const DesktopNav = () => {
+const DesktopNav = (): JSX.Element => {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
-  const popoverContentBgColor = useColorModeValue('white', 'gray.800');
+  const { isLoggedIn } = useIsLoggedIn();
+
+  // 로그인 여부에 따라, 로그인이 필요한 링크만 보여지도록 처리하기 위함
+  const realMainNavItems = !isLoggedIn
+    ? mainNavItems.filter((i) => !i.needLogin)
+    : mainNavItems;
 
   return (
     <Stack direction="row" spacing={4}>
-      {NAV_ITEMS.map((navItem) => (
+      {realMainNavItems.map((navItem) => (
         <Box key={navItem.label}>
-          <Popover trigger="hover" placement="bottom-start">
-            <PopoverTrigger>
-              <Link
-                p={2}
-                href={navItem.href ?? '#'}
-                fontSize="sm"
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                {navItem.label}
-              </Link>
-            </PopoverTrigger>
-
-            {navItem.children && (
-              <PopoverContent
-                border={0}
-                boxShadow="xl"
-                bg={popoverContentBgColor}
-                p={4}
-                rounded="xl"
-                minW="sm"
-              >
-                <Stack>
-                  {navItem.children.map((child) => (
-                    // eslint-disable-next-line react/jsx-props-no-spreading
-                    <DesktopSubNav key={child.label} {...child} />
-                  ))}
-                </Stack>
-              </PopoverContent>
-            )}
-          </Popover>
+          <NextLink href={navItem.href ?? '#'} passHref>
+            <Link
+              p={2}
+              fontSize="sm"
+              fontWeight={500}
+              color={linkColor}
+              _hover={{
+                textDecoration: 'none',
+                color: linkHoverColor,
+              }}
+            >
+              {navItem.label}
+            </Link>
+          </NextLink>
         </Box>
       ))}
     </Stack>
   );
 };
 
-const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
-  return (
-    <Link
-      href={href}
-      role="group"
-      display="block"
-      p={2}
-      rounded="md"
-      _hover={{ bg: useColorModeValue('pink.50', 'gray.900') }}
-    >
-      <Stack direction="row" align="center">
-        <Box>
-          <Text transition="all .3s ease" _groupHover={{ color: 'pink.400' }} fontWeight={500}>
-            {label}
-          </Text>
-          <Text fontSize="sm">{subLabel}</Text>
-        </Box>
-        <Flex
-          transition="all .3s ease"
-          transform="translateX(-10px)"
-          opacity={0}
-          _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
-          justify="flex-end"
-          align="center"
-          flex={1}
-        >
-          <Icon color="pink.400" w={5} h={5} as={ChevronRightIcon} />
-        </Flex>
-      </Stack>
-    </Link>
-  );
-};
-
-const MobileNav = () => {
+const MobileNav = (): JSX.Element => {
   return (
     <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
-      {NAV_ITEMS.map((navItem) => (
-        // eslint-disable-next-line react/jsx-props-no-spreading
+      {mainNavItems.map((navItem) => (
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
     </Stack>
   );
 };
 
-const MobileNavItem = ({ label, children, href }: NavItem) => {
-  const { isOpen, onToggle } = useDisclosure();
+const MobileNavItem = ({ label, href, needLogin }: NavItem): JSX.Element => {
+  const navItemTextColor = useColorModeValue('gray.600', 'gray.200');
+  const { isLoggedIn } = useIsLoggedIn();
 
-  return (
-    <Stack spacing={4} onClick={children && onToggle}>
+  if (needLogin) {
+    return (
       <Flex
-        py={2}
-        as={Link}
-        href={href ?? '#'}
+        py={1}
         justify="space-between"
         align="center"
-        _hover={{
-          textDecoration: 'none',
-        }}
+        _hover={{ textDecoration: 'none' }}
+        display={isLoggedIn ? 'flex' : 'none'}
       >
-        <Text fontWeight={600} color={useColorModeValue('gray.600', 'gray.200')}>
-          {label}
-        </Text>
-        {children && (
-          <Icon
-            as={ChevronDownIcon}
-            transition="all .25s ease-in-out"
-            transform={isOpen ? 'rotate(180deg)' : ''}
-            w={6}
-            h={6}
-          />
-        )}
+        <NextLink href={href ?? '#'} passHref>
+          <Link fontSize="sm" fontWeight={500} color={navItemTextColor}>
+            {label}
+          </Link>
+        </NextLink>
       </Flex>
+    );
+  }
 
-      <Collapse in={isOpen} animateOpacity style={{ marginTop: '0!important' }}>
-        <Stack
-          mt={2}
-          pl={4}
-          borderLeft={1}
-          borderStyle="solid"
-          borderColor={useColorModeValue('gray.200', 'gray.700')}
-          align="start"
-        >
-          {children &&
-            children.map((child) => (
-              <Link key={child.label} py={2} href={child.href}>
-                {child.label}
-              </Link>
-            ))}
-        </Stack>
-      </Collapse>
-    </Stack>
+  return (
+    <Flex
+      py={1}
+      justify="space-between"
+      align="center"
+      _hover={{ textDecoration: 'none' }}
+    >
+      <NextLink href={href ?? '#'} passHref>
+        <Link fontSize="sm" fontWeight={500} color={navItemTextColor}>
+          {label}
+        </Link>
+      </NextLink>
+    </Flex>
   );
 };
-
-interface NavItem {
-  label: string;
-  subLabel?: string;
-  children?: Array<NavItem>;
-  href?: string;
-}
-
-const NAV_ITEMS: Array<NavItem> = [
-  {
-    label: 'Inspiration',
-    children: [
-      {
-        label: 'Explore Design Work',
-        subLabel: 'Trending Design to inspire you',
-        href: '#',
-      },
-      {
-        label: 'New & Noteworthy',
-        subLabel: 'Up-and-coming Designers',
-        href: '#',
-      },
-    ],
-  },
-  {
-    label: 'Find Work',
-    children: [
-      {
-        label: 'Job Board',
-        subLabel: 'Find your dream design job',
-        href: '#',
-      },
-      {
-        label: 'Freelance Projects',
-        subLabel: 'An exclusive list for contract work',
-        href: '#',
-      },
-    ],
-  },
-  {
-    label: 'Learn Design',
-    href: '#',
-  },
-  {
-    label: 'Hire Designers',
-    href: '#',
-  },
-];

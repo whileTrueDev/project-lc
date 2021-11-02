@@ -5,6 +5,10 @@ import 'source-map-support/register';
 import { LCDevAppStack } from '../lib/dev/app-stack';
 import { LCDevDatabaseStack } from '../lib/dev/database-stack';
 import { LCDevVpcStack } from '../lib/dev/vpc-stack';
+import { LCDomainStack } from '../lib/env-agnostic/domain-stack';
+import { LCProdAppStack } from '../lib/prod/app-stack';
+import { LCProdDatabaseStack } from '../lib/prod/database-stack';
+import { LCProdVpcStack } from '../lib/prod/vpc-stack';
 import { envCheck } from '../util/env-check';
 
 dotenv.config();
@@ -12,32 +16,45 @@ envCheck();
 
 const app = new cdk.App();
 
-if (process.env.NODE_ENV === 'production') {
-  // // VPC 스택 생성
-  // const vpcStack = new LCProdVpcStack(app, 'LC_VPC');
-  // // 애플리케이션 스택 생성
-  // const appStack = new LCProdAppStack(app, 'AwsCdkStack', {
-  //   vpc: vpcStack.vpc,
-  // });
-  // // DB 스택 생성
-  // const dbStack = new LCProdDatabaseStack(app, 'LC_RDS', {
-  //   vpc: vpcStack.vpc,
-  //   backendSecGrp: appStack.backendSecGrp,
-  // });
-} else {
-  // * Dev / Test 환경
+// ************************************
+// * Dev / Test 환경
+// VPC 생성
+const devVpcStack = new LCDevVpcStack(app, 'LC-DEV-VPC');
+// 데이터베이스 스택 생성
+new LCDevDatabaseStack(app, 'LC-DEV-RDS', {
+  vpc: devVpcStack.vpc,
+  dbSecGrp: devVpcStack.dbSecGrp,
+});
+// API,Overlay 등 App
+const devAppStack = new LCDevAppStack(app, 'LC-DEV-APP', {
+  vpc: devVpcStack.vpc,
+  apiSecGrp: devVpcStack.apiSecGrp,
+  overlaySecGrp: devVpcStack.overlaySecGrp,
+  albSecGrp: devVpcStack.albSecGrp,
+});
 
-  // VPC 생성
-  const vpcStack = new LCDevVpcStack(app, 'LC-DEV-VPC');
-  // 데이터베이스 스택 생성
-  new LCDevDatabaseStack(app, 'LC-DEV-RDS', {
-    vpc: vpcStack.vpc,
-    dbSecGrp: vpcStack.dbSecGrp,
-  });
-  new LCDevAppStack(app, 'LC-DEV-APP', {
-    vpc: vpcStack.vpc,
-    apiSecGrp: vpcStack.apiSecGrp,
-    socketSecGrp: vpcStack.socketSecGrp,
-    albSecGrp: vpcStack.albSecGrp,
-  });
-}
+// ************************************
+// * Production 환경
+// VPC
+const prodVpcStack = new LCProdVpcStack(app, 'LC-PROD-VPC');
+
+// 데이터베이스
+new LCProdDatabaseStack(app, 'LC-PROD-RDS', {
+  vpc: prodVpcStack.vpc,
+  dbSecGrp: prodVpcStack.dbSecGrp,
+});
+
+// API,Overlay 등 App
+const prodAppStack = new LCProdAppStack(app, 'LC-PROD-APP', {
+  vpc: prodVpcStack.vpc,
+  albSecGrp: prodVpcStack.albSecGrp,
+  apiSecGrp: prodVpcStack.apiSecGrp,
+  overlaySecGrp: prodVpcStack.overlaySecGrp,
+});
+
+// ************************************
+// * 도메인
+new LCDomainStack(app, 'LC-DOMAIN', {
+  devALB: devAppStack.alb,
+  prodALB: prodAppStack.alb,
+});

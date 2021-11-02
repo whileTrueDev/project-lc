@@ -1,18 +1,18 @@
-import { ReactNode } from 'react';
 import {
   Box,
-  Container,
-  Stack,
-  SimpleGrid,
-  Text,
-  Link,
-  VisuallyHidden,
   chakra,
+  Container,
+  Link,
+  SimpleGrid,
+  Stack,
+  Text,
   useColorModeValue,
+  VisuallyHidden,
 } from '@chakra-ui/react';
-import { FaTwitter, FaYoutube, FaInstagram } from 'react-icons/fa';
+import { ReactNode } from 'react';
+import { FaInstagram, FaYoutube } from 'react-icons/fa';
 
-const ListHeader = ({ children }: { children: ReactNode }) => {
+const ListHeader = ({ children }: { children: ReactNode }): JSX.Element => {
   return (
     <Text fontWeight="500" fontSize="lg" mb={2}>
       {children}
@@ -28,7 +28,7 @@ const SocialButton = ({
   children: ReactNode;
   label: string;
   href: string;
-}) => {
+}): JSX.Element => {
   return (
     <chakra.button
       bg={useColorModeValue('blackAlpha.100', 'whiteAlpha.100')}
@@ -52,7 +52,7 @@ const SocialButton = ({
   );
 };
 
-export function CommonFooter() {
+export function CommonFooter(): JSX.Element {
   return (
     <Box
       bg={useColorModeValue('gray.50', 'gray.900')}
@@ -60,27 +60,33 @@ export function CommonFooter() {
     >
       <Container as={Stack} maxW="6xl" py={10}>
         <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={8}>
+          {/* <Stack align="flex-start">
+            <ListHeader>회사</ListHeader>
+            <Link href="/">소개</Link>
+            <Link href="/">블로그</Link>
+            <Link href="/">인재채용</Link>
+          </Stack> */}
+
           <Stack align="flex-start">
-            <ListHeader>Company</ListHeader>
-            <Link href="/">About Us</Link>
-            <Link href="/">Blog</Link>
-            <Link href="/">Careers</Link>
-            <Link href="/">Contact Us</Link>
+            <ListHeader>정책</ListHeader>
+            {/* <Link href="/">쿠키 정책</Link> */}
+            <Link
+              fontWeight="bold"
+              href="https://whiletrue.notion.site/7f6758f5344246c4989ac22f3ee7532e"
+            >
+              개인정보처리방침
+            </Link>
+            <Link href="https://whiletrue.notion.site/41561f284f754560a64f36bc7c292861">
+              이용약관
+            </Link>
           </Stack>
 
           <Stack align="flex-start">
-            <ListHeader>Support</ListHeader>
-            <Link href="/">Help Center</Link>
-            <Link href="/">Safety Center</Link>
-            <Link href="/">Community Guidelines</Link>
-          </Stack>
-
-          <Stack align="flex-start">
-            <ListHeader>Legal</ListHeader>
-            <Link href="/">Cookies Policy</Link>
-            <Link href="/">Privacy Policy</Link>
-            <Link href="/">Terms of Service</Link>
-            <Link href="/">Law Enforcement</Link>
+            <ListHeader>고객지원</ListHeader>
+            {/* <Link href="/">고객센터</Link> */}
+            <Link href="https://whiletrue.notion.site/FAQ-f182f90b7e984badb031a62ddd1bd00d">
+              FAQ
+            </Link>
           </Stack>
         </SimpleGrid>
       </Container>
@@ -99,15 +105,20 @@ export function CommonFooter() {
           justify={{ md: 'space-between' }}
           align={{ md: 'center' }}
         >
-          <Text>© 2020 Chakra Templates. All rights reserved</Text>
+          <Text fontSize="sm">
+            ⓒ {new Date().getFullYear()} whileTrue All rights reserved.
+          </Text>
           <Stack direction="row" spacing={6}>
-            <SocialButton label="Twitter" href="/">
-              <FaTwitter />
-            </SocialButton>
-            <SocialButton label="YouTube" href="/">
+            <SocialButton
+              label="YouTube"
+              href="https://www.youtube.com/channel/UCN3w7jS8f6t2fPROcRY7e0g"
+            >
               <FaYoutube />
             </SocialButton>
-            <SocialButton label="Instagram" href="/">
+            <SocialButton
+              label="Instagram"
+              href="https://www.instagram.com/official.onad"
+            >
               <FaInstagram />
             </SocialButton>
           </Stack>

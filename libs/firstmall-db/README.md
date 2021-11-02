@@ -18,3 +18,23 @@ ex.
 ## 테스트
 
 Run `nx test firstmall-db` to execute the unit tests via [Jest](https://jestjs.io).
+
+## 개발 편의
+
+- module 생성
+
+```bash
+yarn nx g @nrwl/nest:module lib/<생성할 모듈명> -p firstmall-db
+```
+
+- controller 생성
+
+```bash
+yarn nx g @nrwl/nest:controller lib/<생성할 컨트롤러명> -p firstmall-db
+```
+
+- service 생성
+
+```bash
+yarn nx g @nrwl/nest:service lib/<생성할 서비스명> -p firstmall-db
+```

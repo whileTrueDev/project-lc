@@ -17,11 +17,13 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 
 1. [api](./apps/api/README.md)  
    [Nest.js](https://docs.nestjs.com/)로 구성된 REST API 서버입니다.
-2. [socket](./apps/socket/README.md)  
+2. [overlay](./apps/overlay/README.md)  
    [Nest.js + Socket.io](https://docs.nestjs.com/websockets/gateways)로 구성된 WebScoket 서버입니다.
-3. [web](./apps/web/README.md)  
+3. [overlay-controller](./apps/overlay-controller/README.md)  
+   [Nest.js + Socket.io](https://docs.nestjs.com/websockets/gateways)로 구성된 WebScoket 서버입니다.
+4. [web](./apps/web/README.md)  
    [Next.js](https://nextjs.org/)로 구성된 프론트엔드 서버입니다.
-4. [web-e2e](./apps/web-e2e/README.md)  
+5. [web-e2e](./apps/web-e2e/README.md)  
    `web` 애플리케이션에 대한 Cypress end to end 테스트 폴더입니다.
 
 ### Libs 목록
@@ -53,7 +55,7 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 
 7. `nest-modules`
 
-   nestjs 애플리케이션에서 동시에 사용가능한 모듈의 경우 여기에 정의합니다. service와 module만 작성하고, controller는 애플리케이션 단에서 작성합니다. 더 자세한 내용은 [libs/nest-modules](./libs/nest-modules/README.md)에서 확인할 수 있습니다.
+   nestjs 애플리케이션에서 동시에 사용가능한 모듈의 경우 여기에 정의합니다. 커스텀으로 생성한 Guard(passport strategy 포함), Pipe, Interceptor, Middleware, ExceptionFilter, Custom Decorator 모두 해당 라이브러리에서 정의합니다. 더 자세한 내용은 [libs/nest-modules](./libs/nest-modules/README.md)에서 확인할 수 있습니다.
 
 ## 새 애플리케이션 / 라이브러리 생성하기
 
@@ -110,7 +112,8 @@ ex.
 App, Lib 별 더 자세한 내용은 해당 폴더의 README.md에 있습니다.
 
 - [apps/api](./apps/api/README.md)
-- [apps/socket](./apps/socket/README.md)
+- [apps/overlay](./apps/overlay/README.md)
+- [apps/overlay-controller](./apps/overlay-controller/README.md)
 - [apps/web](./apps/web/README.md)
 - [libs/components](./libs/components/README.md)
 - [libs/hooks](./libs/hooks/README.md)

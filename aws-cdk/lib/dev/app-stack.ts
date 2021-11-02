@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import * as acm from '@aws-cdk/aws-certificatemanager';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import * as logs from '@aws-cdk/aws-logs';
-import * as route53 from '@aws-cdk/aws-route53';
-import * as targets from '@aws-cdk/aws-route53-targets';
 import * as ssm from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
 import { constants } from '../../constants';
@@ -11,23 +11,42 @@ import { constants } from '../../constants';
 interface LCDevAppStackProps extends cdk.StackProps {
   vpc: ec2.Vpc;
   apiSecGrp: ec2.SecurityGroup;
-  socketSecGrp: ec2.SecurityGroup;
+  overlaySecGrp: ec2.SecurityGroup;
   albSecGrp: ec2.SecurityGroup;
 }
 
 const PREFIX = 'LC-DEV-APP';
-const DOMAIN = 'andad.io';
-// const API_DOMAIN = `${DOMAIN}`;
-// const SOCKET_DOMAIN = `${DOMAIN}`;
 
 export class LCDevAppStack extends cdk.Stack {
-  DBURL_PARAMETER: ssm.IStringParameter;
-  FIRSTMALL_DATABASE_URL: ssm.IStringParameter;
+  private readonly ACM_ARN =
+    'arn:aws:acm:ap-northeast-2:803609402610:certificate/763681b4-a8c3-47e0-998a-24754351b499';
+
+  private DBURL_PARAMETER: ssm.IStringParameter;
+  private FIRSTMALL_DATABASE_URL: ssm.IStringParameter;
+  private GOOGLE_CLIENT_ID: ssm.IStringParameter;
+  private GOOGLE_CLIENT_SECRET: ssm.IStringParameter;
+  private NAVER_CLIENT_ID: ssm.IStringParameter;
+  private NAVER_CLIENT_SECRET: ssm.IStringParameter;
+  private KAKAO_CLIENT_ID: ssm.IStringParameter;
+  private MAILER_USER: ssm.IStringParameter;
+  private GMAIL_OAUTH_REFRESH_TOKEN: ssm.IStringParameter;
+  private GMAIL_OAUTH_CLIENT_ID: ssm.IStringParameter;
+  private GMAIL_OAUTH_CLIENT_SECRET: ssm.IStringParameter;
+  private GOOGLE_CREDENTIALS_EMAIL: ssm.IStringParameter;
+  private GOOGLE_CREDENTIALS_PRIVATE_KEY: ssm.IStringParameter;
+  private JWT_SECRET: ssm.IStringParameter;
+  private CIPHER_HASH: ssm.IStringParameter;
+  private CIPHER_PASSWORD: ssm.IStringParameter;
+  private CIPHER_SALT: ssm.IStringParameter;
+  private S3_ACCESS_KEY_ID: ssm.IStringParameter;
+  private S3_ACCESS_KEY_SECRET: ssm.IStringParameter;
+
+  public readonly alb: elbv2.ApplicationLoadBalancer;
 
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
 
-    const { vpc, apiSecGrp, socketSecGrp, albSecGrp } = props;
+    const { vpc, apiSecGrp, overlaySecGrp, albSecGrp } = props;
 
     // * ECS Cluster
     const cluster = new ecs.Cluster(this, `${PREFIX}EcsCluster`, {
@@ -36,34 +55,18 @@ export class LCDevAppStack extends cdk.Stack {
       containerInsights: true,
     });
 
-    // * DBURL 파라미터
-    this.DBURL_PARAMETER = ssm.StringParameter.fromSecureStringParameterAttributes(
-      this,
-      `${PREFIX}DBUrlSecret`,
-      {
-        parameterName: constants.DEV.ECS_DATABASE_URL_KEY,
-        version: 4,
-      },
-    );
-
-    this.FIRSTMALL_DATABASE_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
-      this,
-      `${PREFIX}FirstmallDBUrlSecret`,
-      {
-        parameterName: constants.DEV.FIRSTMALL_DATABASE_URL_KEY,
-        version: 1,
-      },
-    );
+    // * 환경변수 주입을 위한 파라미터 로딩
+    this.loadSsmParameters();
 
     // * API server
     const apiService = this.createApiAppService(cluster, apiSecGrp);
-    // * socket server
-    const socketService = this.createSocketAppService(cluster, socketSecGrp);
+    // * overlay server
+    const overlayService = this.createOverlayAppService(cluster, overlaySecGrp);
 
-    this.createALB(vpc, apiService, socketService, albSecGrp);
-    // this.createRoute53ARecord(alb);
+    this.alb = this.createALB(vpc, apiService, overlayService, albSecGrp);
   }
 
+  /** API 서버 ECS Fargate Service 생성 메서드 */
   private createApiAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
     const apiTaskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSTaskDef`, {
       family: constants.DEV.ECS_API_FAMILY_NAME,
@@ -71,11 +74,35 @@ export class LCDevAppStack extends cdk.Stack {
     apiTaskDef.addContainer(`${PREFIX}ECSContainer`, {
       containerName: 'project-lc-api-dev',
       portMappings: [{ containerPort: constants.DEV.ECS_API_PORT }],
-      image: ecs.ContainerImage.fromRegistry(`hwasurr/${constants.DEV.ECS_API_FAMILY_NAME}`),
+      image: ecs.ContainerImage.fromRegistry(
+        `hwasurr/${constants.DEV.ECS_API_FAMILY_NAME}`,
+      ),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
         FIRSTMALL_DATABASE_URL: ecs.Secret.fromSsmParameter(this.FIRSTMALL_DATABASE_URL),
+        GOOGLE_CLIENT_ID: ecs.Secret.fromSsmParameter(this.GOOGLE_CLIENT_ID),
+        GOOGLE_CLIENT_SECRET: ecs.Secret.fromSsmParameter(this.GOOGLE_CLIENT_SECRET),
+        NAVER_CLIENT_ID: ecs.Secret.fromSsmParameter(this.NAVER_CLIENT_ID),
+        NAVER_CLIENT_SECRET: ecs.Secret.fromSsmParameter(this.NAVER_CLIENT_SECRET),
+        KAKAO_CLIENT_ID: ecs.Secret.fromSsmParameter(this.KAKAO_CLIENT_ID),
+        MAILER_USER: ecs.Secret.fromSsmParameter(this.MAILER_USER),
+        GMAIL_OAUTH_REFRESH_TOKEN: ecs.Secret.fromSsmParameter(
+          this.GMAIL_OAUTH_REFRESH_TOKEN,
+        ),
+        GMAIL_OAUTH_CLIENT_ID: ecs.Secret.fromSsmParameter(this.GMAIL_OAUTH_CLIENT_ID),
+        GMAIL_OAUTH_CLIENT_SECRET: ecs.Secret.fromSsmParameter(
+          this.GMAIL_OAUTH_CLIENT_SECRET,
+        ),
+        JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
+        CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
+        CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
+        CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
+        AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
+        AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
+      },
+      environment: {
+        S3_BUCKET_NAME: 'lc-project',
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}LogGroup`, {
@@ -100,30 +127,48 @@ export class LCDevAppStack extends cdk.Stack {
     });
   }
 
-  private createSocketAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
-    const taskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSSocketTaskDef`, {
-      family: constants.DEV.ECS_SOCKET_FAMILY_NAME,
+  /** 라-커 화면 Overlay 서버 ECS Fargate Service 생성 메서드 */
+  private createOverlayAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
+    const taskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSOverlayTaskDef`, {
+      family: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
     });
-    taskDef.addContainer(`${PREFIX}ECSSocketContainer`, {
-      containerName: 'project-lc-socket-dev',
-      portMappings: [{ containerPort: constants.DEV.ECS_SOCKET_PORT }],
-      image: ecs.ContainerImage.fromRegistry(`hwasurr/${constants.DEV.ECS_SOCKET_FAMILY_NAME}`),
+    taskDef.addContainer(`${PREFIX}ECSOverlayContainer`, {
+      containerName: 'project-lc-overlay-dev',
+      portMappings: [{ containerPort: constants.DEV.ECS_OVERLAY_PORT }],
+      image: ecs.ContainerImage.fromRegistry(
+        `hwasurr/${constants.DEV.ECS_OVERLAY_FAMILY_NAME}`,
+      ),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
         FIRSTMALL_DATABASE_URL: ecs.Secret.fromSsmParameter(this.FIRSTMALL_DATABASE_URL),
+        GOOGLE_CREDENTIALS_EMAIL: ecs.Secret.fromSsmParameter(
+          this.GOOGLE_CREDENTIALS_EMAIL,
+        ),
+        GOOGLE_CREDENTIALS_PRIVATE_KEY: ecs.Secret.fromSsmParameter(
+          this.GOOGLE_CREDENTIALS_PRIVATE_KEY,
+        ),
+        JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
+        CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
+        CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
+        CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
+        AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
+        AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
+      },
+      environment: {
+        S3_BUCKET_NAME: 'lc-project',
       },
       logging: new ecs.AwsLogDriver({
-        logGroup: new logs.LogGroup(this, `${PREFIX}SocketLogGroup`, {
-          logGroupName: constants.DEV.ECS_SOCKET_LOG_GLOUP_NAME,
+        logGroup: new logs.LogGroup(this, `${PREFIX}OverlayLogGroup`, {
+          logGroupName: constants.DEV.ECS_OVERLAY_LOG_GLOUP_NAME,
           removalPolicy: cdk.RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
       }),
     });
 
-    return new ecs.FargateService(this, `${PREFIX}SocketService`, {
-      serviceName: constants.DEV.ECS_SOCKET_SERVICE_NAME,
+    return new ecs.FargateService(this, `${PREFIX}OverlayService`, {
+      serviceName: constants.DEV.ECS_OVERLAY_SERVICE_NAME,
       cluster,
       taskDefinition: taskDef,
       vpcSubnets: {
@@ -139,7 +184,7 @@ export class LCDevAppStack extends cdk.Stack {
   private createALB(
     vpc: ec2.Vpc,
     apiService: ecs.FargateService,
-    socketService: ecs.FargateService,
+    overlayAppService: ecs.FargateService,
     sg: ec2.SecurityGroup,
   ) {
     // * ALB
@@ -154,75 +199,252 @@ export class LCDevAppStack extends cdk.Stack {
     });
 
     // If you do not provide any options for this method, it redirects HTTP port 80 to HTTPS port 443
-    // alb.addRedirect();
+    alb.addRedirect();
 
     // ALB 타겟 그룹으로 생성
-    const apiTargetGroup = new elbv2.ApplicationTargetGroup(this, `${PREFIX}ApiTargetGroup`, {
-      vpc,
-      targetGroupName: `APITargetGroup`,
-      port: constants.DEV.ECS_API_PORT,
-      protocol: elbv2.ApplicationProtocol.HTTP,
-      healthCheck: {
-        enabled: true,
-        path: '/',
-        interval: cdk.Duration.minutes(1),
+    const apiTargetGroup = new elbv2.ApplicationTargetGroup(
+      this,
+      `${PREFIX}ApiTargetGroup`,
+      {
+        vpc,
+        targetGroupName: `APITargetGroup`,
+        port: constants.DEV.ECS_API_PORT,
+        protocol: elbv2.ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [apiService],
       },
-      targets: [apiService],
-    });
+    );
 
-    // const socketTargetGroup = new elbv2.ApplicationTargetGroup(this, `${PREFIX}SocketTargetGroup`, {
-    //   vpc,
-    //   targetGroupName: `SocketTargetGroup`,
-    //   port: constants.DEV.ECS_SOCKET_PORT,
-    //   protocol: elbv2.ApplicationProtocol.HTTP,
-    //   healthCheck: {
-    //     enabled: true,
-    //     path: '/health-check',
-    //     interval: cdk.Duration.minutes(1),
-    //   },
-    //   targets: [socketService],
-    // });
+    const sslCert = acm.Certificate.fromCertificateArn(
+      this,
+      'DnsCertificates',
+      this.ACM_ARN,
+    );
 
     // ALB에 HTTP 리스너 추가
-    const truepointHttpListener = alb.addListener(`${PREFIX}ALBHttpListener`, {
-      port: 80,
+    const HttpsListener = alb.addListener(`${PREFIX}ALBHttpsListener`, {
+      port: 443,
+      sslPolicy: elbv2.SslPolicy.RECOMMENDED,
+      certificates: [sslCert],
       defaultTargetGroups: [apiTargetGroup],
     });
-    truepointHttpListener.connections.allowDefaultPortFromAnyIpv4('https ALB open to world');
+    HttpsListener.connections.allowDefaultPortFromAnyIpv4('https ALB open to world');
 
-    // // HTTP 리스너에 API서버 타겟그룹 추가
-    // truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
-    //   priority: 1,
-    //   conditions: [ListenerCondition.hostHeaders([`${API_DOMAIN}`])],
-    //   targetGroups: [apiTargetGroup],
-    // });
+    const overlayTargetGroup = new elbv2.ApplicationTargetGroup(
+      this,
+      `${PREFIX}OverlayTargetGroup`,
+      {
+        vpc,
+        targetGroupName: 'OverlayTargetGroup',
+        port: constants.DEV.ECS_OVERLAY_PORT,
+        protocol: elbv2.ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [overlayAppService],
+      },
+    );
 
-    // // HTTP 리스너에 Socket서버 타겟그룹 추가
-    // truepointHttpListener.addTargetGroups(`${PREFIX}HTTPSSocketTargetGroup`, {
-    //   priority: 2,
-    //   conditions: [ListenerCondition.hostHeaders([`${SOCKET_DOMAIN}`])],
-    //   targetGroups: [socketTargetGroup],
-    // });
+    // HTTP 리스너에 Overlay 서버 타겟그룹 추가
+    HttpsListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
+      priority: 1,
+      conditions: [elbv2.ListenerCondition.hostHeaders(['preview-livecommerce.onad.io'])],
+      targetGroups: [overlayTargetGroup],
+    });
 
     return alb;
   }
 
-  private createRoute53ARecord(alb: elbv2.ApplicationLoadBalancer) {
-    // Find Route53 Hosted zone
-    const truepointHostzone = route53.HostedZone.fromHostedZoneAttributes(
+  private loadSsmParameters() {
+    this.DBURL_PARAMETER = ssm.StringParameter.fromSecureStringParameterAttributes(
       this,
-      `find${DOMAIN}Zone`,
+      `${PREFIX}DBUrlSecret`,
       {
-        zoneName: DOMAIN,
-        hostedZoneId: 'Z03356691DEYSJEBYTKT3',
+        parameterName: constants.DEV.ECS_DATABASE_URL_KEY,
+        version: 4,
       },
     );
 
-    // Route53 로드밸런서 타겟 생성
-    new route53.ARecord(this, 'LoadbalancerARecord', {
-      zone: truepointHostzone,
-      recordName: ``,
-      target: route53.RecordTarget.fromAlias(new targets.LoadBalancerTarget(alb)),
-    });
+    this.FIRSTMALL_DATABASE_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}FirstmallDBUrlSecret`,
+      {
+        parameterName: constants.DEV.FIRSTMALL_DATABASE_URL_KEY,
+        version: 1,
+      },
+    );
+
+    this.GOOGLE_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}GOOGLE_CLIENT_ID`,
+      {
+        version: 2,
+        parameterName: constants.DEV.GOOGLE_CLIENT_ID,
+      },
+    );
+    this.GOOGLE_CLIENT_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}GOOGLE_CLIENT_SECRET`,
+      {
+        version: 2,
+        parameterName: constants.DEV.GOOGLE_CLIENT_SECRET,
+      },
+    );
+    this.NAVER_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}NAVER_CLIENT_ID`,
+      {
+        version: 2,
+        parameterName: constants.DEV.NAVER_CLIENT_ID,
+      },
+    );
+    this.NAVER_CLIENT_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}NAVER_CLIENT_SECRET`,
+      {
+        version: 2,
+        parameterName: constants.DEV.NAVER_CLIENT_SECRET,
+      },
+    );
+    this.KAKAO_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}KAKAO_CLIENT_ID`,
+      {
+        version: 2,
+        parameterName: constants.DEV.KAKAO_CLIENT_ID,
+      },
+    );
+    this.MAILER_USER = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}MAILER_USER`,
+      {
+        version: 2,
+        parameterName: constants.DEV.MAILER_USER,
+      },
+    );
+    this.GMAIL_OAUTH_REFRESH_TOKEN =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GMAIL_OAUTH_REFRESH_TOKEN`,
+        {
+          version: 1,
+          parameterName: constants.DEV.GMAIL_OAUTH_REFRESH_TOKEN,
+        },
+      );
+    this.GMAIL_OAUTH_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}GMAIL_OAUTH_CLIENT_ID`,
+      {
+        version: 1,
+        parameterName: constants.DEV.GMAIL_OAUTH_CLIENT_ID,
+      },
+    );
+    this.GMAIL_OAUTH_CLIENT_SECRET =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GMAIL_OAUTH_CLIENT_SECRET`,
+        {
+          version: 1,
+          parameterName: constants.DEV.GMAIL_OAUTH_CLIENT_SECRET,
+        },
+      );
+
+    this.GOOGLE_CREDENTIALS_EMAIL =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GOOGLE_CREDENTIALS_EMAIL`,
+        {
+          version: 2,
+          parameterName: constants.DEV.GOOGLE_CREDENTIALS_EMAIL_KEY,
+        },
+      );
+    this.GOOGLE_CREDENTIALS_PRIVATE_KEY =
+      ssm.StringParameter.fromSecureStringParameterAttributes(
+        this,
+        `${PREFIX}GOOGLE_CREDENTIALS_PRIVATE_KEY`,
+        {
+          version: 2,
+          parameterName: constants.DEV.GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY,
+        },
+      );
+
+    this.JWT_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}JWT_SECRET`,
+      {
+        version: 1,
+        parameterName: constants.DEV.JWT_SECRET,
+      },
+    );
+
+    this.CIPHER_HASH = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}CIPHER_HASH`,
+      {
+        version: 1,
+        parameterName: constants.DEV.CIPHER_HASH,
+      },
+    );
+
+    this.CIPHER_PASSWORD = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}CIPHER_PASSWORD`,
+      {
+        version: 1,
+        parameterName: constants.DEV.CIPHER_PASSWORD,
+      },
+    );
+
+    this.CIPHER_SALT = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}CIPHER_SALT`,
+      {
+        version: 1,
+        parameterName: constants.DEV.CIPHER_SALT,
+      },
+    );
+
+    this.S3_ACCESS_KEY_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}S3_ACCESS_KEY_ID`,
+      {
+        version: 2,
+        parameterName: constants.DEV.S3_ACCESS_KEY_ID,
+      },
+    );
+
+    this.S3_ACCESS_KEY_SECRET = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}S3_ACCESS_KEY_SECRET`,
+      {
+        version: 2,
+        parameterName: constants.DEV.S3_ACCESS_KEY_SECRET,
+      },
+    );
+
+    return {
+      DATABASE_URL: this.DBURL_PARAMETER,
+      FIRSTMALL_DATABASE_URL: this.FIRSTMALL_DATABASE_URL,
+      GOOGLE_CLIENT_ID: this.GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET: this.GOOGLE_CLIENT_SECRET,
+      NAVER_CLIENT_ID: this.NAVER_CLIENT_ID,
+      NAVER_CLIENT_SECRET: this.NAVER_CLIENT_SECRET,
+      KAKAO_CLIENT_ID: this.KAKAO_CLIENT_ID,
+      MAILER_USER: this.MAILER_USER,
+      GOOGLE_CREDENTIALS_EMAIL: this.GOOGLE_CREDENTIALS_EMAIL,
+      GOOGLE_CREDENTIALS_PRIVATE_KEY: this.GOOGLE_CREDENTIALS_PRIVATE_KEY,
+      JWT_SECRET: this.JWT_SECRET,
+      CIPHER_HASH: this.CIPHER_HASH,
+      CIPHER_PASSWORD: this.CIPHER_PASSWORD,
+      CIPHER_SALT: this.CIPHER_SALT,
+      S3_ACCESS_KEY_ID: this.S3_ACCESS_KEY_ID,
+      S3_ACCESS_KEY_SECRET: this.S3_ACCESS_KEY_SECRET,
+    };
   }
 }

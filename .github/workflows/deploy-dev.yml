@@ -3,7 +3,7 @@ on:
     branches: [dev]
     paths:
       - "apps/api/**"
-      - "apps/socket/**"
+      - "apps/overlay/**"
       - "libs/firstmall-db/**"
       - "libs/nest-modules/**"
       - "libs/prisma-orm/**"
@@ -83,8 +83,8 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
 
-  DeploySocket:
-    name: Deploy Socket Job
+  DeployOverlay:
+    name: Deploy Overlay Job
     runs-on: [self-hosted, linux, project-lc-dev]
     needs: [Build]
     steps:
@@ -95,8 +95,8 @@ jobs:
       - name: Install dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
-      - name: Check Socket affected
-        run: tools/check-need-socket-deploy.sh
+      - name: Check Overlay affected
+        run: tools/check-need-overlay-deploy.sh
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -106,21 +106,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
 
-      - name: Fill in the new image ID in the Amazon ECS task definition Socket
+      - name: Fill in the new image ID in the Amazon ECS task definition Overlay
         if: ${{ success() }}
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: apps/socket/task-definition-dev.json
-          container-name: project-lc-socket-dev
-          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-socket-dev:${{ github.sha }}
+          task-definition: apps/overlay/task-definition-dev.json
+          container-name: project-lc-overlay-dev
+          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-overlay-dev:${{ github.sha }}
 
-      - name: Deploy Amazon ECS task definition Socket
+      - name: Deploy Amazon ECS task definition Overlay
         if: ${{ success() }}
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: project-lc-socket-dev-service
+          service: project-lc-overlay-dev-service
           cluster: project-lc-dev
           wait-for-service-stability: false
 

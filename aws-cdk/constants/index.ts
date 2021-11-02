@@ -1,5 +1,8 @@
 export const constants = {
+  DOMAIN: '크크쇼.com',
+  PUNYCODE_DOMAIN: 'xn--hp4b17xa.com',
   DEV: {
+    ID_PREFIX: 'LC-DEV-',
     /**
      * 개발환경의 ECS 클러스터명
      */
@@ -29,21 +32,25 @@ export const constants = {
      */
     ECS_API_PORT: 3000,
     /**
-     * Socket 서버 서비스명
+     * Overlay 서버 서비스명
      */
-    ECS_SOCKET_SERVICE_NAME: 'project-lc-socket-dev-service',
+    ECS_OVERLAY_SERVICE_NAME: 'project-lc-overlay-dev-service',
     /**
-     * Socket 서버 컨테이너 패밀리명 (작업정의명)
+     * Overlay 서버 컨테이너 패밀리명 (작업정의명)
      */
-    ECS_SOCKET_FAMILY_NAME: 'project-lc-socket-dev',
+    ECS_OVERLAY_FAMILY_NAME: 'project-lc-overlay-dev',
     /**
      * API 서버 cloudwatch log group 명
      */
-    ECS_SOCKET_LOG_GLOUP_NAME: '/ecs/project-lc-socket-dev',
+    ECS_OVERLAY_LOG_GLOUP_NAME: '/ecs/project-lc-overlay-dev',
     /**
-     * Socket 서버 PORT
+     * Overlay 서버 PORT
      */
-    ECS_SOCKET_PORT: 3002,
+    ECS_OVERLAY_PORT: 3002,
+    /** 구글 TTS(Text To Speech) API 계정 */
+    GOOGLE_CREDENTIALS_EMAIL_KEY: 'LIVECOMMERCE_GCP_TTS_EMAIL',
+    /** 구글 TTS(Text To Speech) API private key */
+    GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY: 'LIVECOMMERCE_GCP_TTS_PRIVATE_KEY',
     /**
      * VPC Subnet 인그레스 서브넷 그룹 명
      */
@@ -56,5 +63,65 @@ export const constants = {
      * VPC Subnet ISOLATED 서브넷 그룹 명
      */
     ISOLATED_SUBNET_GROUP_NAME: 'Isolated Subnet for DB',
+
+    // * ************************
+    // * SSM Parameter Store Keys
+    // * ************************
+    GOOGLE_CLIENT_ID: 'PROJECT_LC_GOOGLE_CLIENT_ID',
+    GOOGLE_CLIENT_SECRET: 'PROJECT_LC_GOOGLE_CLIENT_SECRET',
+    NAVER_CLIENT_ID: 'PROJECT_LC_NAVER_CLIENT_ID',
+    NAVER_CLIENT_SECRET: 'PROJECT_LC_NAVER_CLIENT_SECRET',
+    KAKAO_CLIENT_ID: 'PROJECT_LC_KAKAO_CLIENT_ID',
+    MAILER_USER: 'PROJECT_LC_MAILER_USER',
+    MAILER_PASS: 'PROJECT_LC_MAILER_PASS',
+    JWT_SECRET: 'PROJECT_LC_JWT_SECRET',
+    CIPHER_HASH: 'PROJECT_LC_CIPHER_HASH',
+    CIPHER_PASSWORD: 'PROJECT_LC_CIPHER_PASSWORD',
+    CIPHER_SALT: 'PROJECT_LC_CIPHER_SALT',
+    S3_ACCESS_KEY_ID: 'S3_ACCESS_KEY_ID',
+    S3_ACCESS_KEY_SECRET: 'S3_ACCESS_KEY_SECRET',
+    GMAIL_OAUTH_REFRESH_TOKEN: 'PROJECT_LC_GMAIL_OAUTH_REFRESH_TOKEN',
+    GMAIL_OAUTH_CLIENT_ID: 'PROJECT_LC_GMAIL_OAUTH_CLIENT_ID',
+    GMAIL_OAUTH_CLIENT_SECRET: 'PROJECT_LC_GMAIL_OAUTH_CLIENT_SECRET',
+  },
+  PROD: {
+    ID_PREFIX: 'LC-PROD-',
+    INGRESS_SUBNET_GROUP_NAME: 'PROD Ingress Subnet',
+    PRIVATE_SUBNET_GROUP_NAME: 'PROD Private Subnet for Apps',
+    ISOLATED_SUBNET_GROUP_NAME: 'PROD Isolated Subnet for DB',
+    // * ************************
+    // * ECS
+    // * ************************
+    ECS_CLUSTER_NAME: 'project-lc-prod',
+    ECS_API_FAMILY_NAME: 'project-lc-api',
+    ECS_API_SERVICE_NAME: 'project-lc-api-service',
+    ECS_API_LOG_GLOUP_NAME: '/ecs/project-lc-api',
+    ECS_API_PORT: 3000,
+    ECS_OVERLAY_FAMILY_NAME: 'project-lc-overlay',
+    ECS_OVERLAY_SERVICE_NAME: 'project-lc-overlay-service',
+    ECS_OVERLAY_LOG_GLOUP_NAME: '/ecs/project-lc-overlay',
+    ECS_OVERLAY_PORT: 3002,
+    // * ************************
+    // * SSM Parameter Store Keys
+    // * ************************
+    DATABASE_URL_KEY: 'PROJECT_LC_DB_URL',
+    FIRSTMALL_DATABASE_URL_KEY: 'LC_FIRSTMALL_DB_URL',
+    GOOGLE_CREDENTIALS_EMAIL_KEY: 'LIVECOMMERCE_GCP_TTS_EMAIL',
+    GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY: 'LIVECOMMERCE_GCP_TTS_PRIVATE_KEY',
+    GOOGLE_CLIENT_ID_KEY: 'PROJECT_LC_GOOGLE_CLIENT_ID',
+    GOOGLE_CLIENT_SECRET_KEY: 'PROJECT_LC_GOOGLE_CLIENT_SECRET',
+    NAVER_CLIENT_ID_KEY: 'PROJECT_LC_NAVER_CLIENT_ID',
+    NAVER_CLIENT_SECRET_KEY: 'PROJECT_LC_NAVER_CLIENT_SECRET',
+    KAKAO_CLIENT_ID_KEY: 'PROJECT_LC_KAKAO_CLIENT_ID',
+    MAILER_USER_KEY: 'PROJECT_LC_MAILER_USER',
+    GMAIL_OAUTH_REFRESH_TOKEN: 'PROJECT_LC_GMAIL_OAUTH_REFRESH_TOKEN',
+    GMAIL_OAUTH_CLIENT_ID: 'PROJECT_LC_GMAIL_OAUTH_CLIENT_ID',
+    GMAIL_OAUTH_CLIENT_SECRET: 'PROJECT_LC_GMAIL_OAUTH_CLIENT_SECRET',
+    JWT_SECRET_KEY: 'PROJECT_LC_JWT_SECRET',
+    CIPHER_HASH_KEY: 'PROJECT_LC_CIPHER_HASH',
+    CIPHER_PASSWORD_KEY: 'PROJECT_LC_CIPHER_PASSWORD',
+    CIPHER_SALT_KEY: 'PROJECT_LC_CIPHER_SALT',
+    S3_ACCESS_KEY_ID_KEY: 'S3_ACCESS_KEY_ID',
+    S3_ACCESS_KEY_SECRET_KEY: 'S3_ACCESS_KEY_SECRET',
   },
 } as const;

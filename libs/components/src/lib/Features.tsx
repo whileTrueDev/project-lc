@@ -19,7 +19,7 @@ interface FeatureProps {
   icon?: ReactElement;
 }
 
-const Feature = ({ text, icon, iconBg }: FeatureProps) => {
+const Feature = ({ text, icon, iconBg }: FeatureProps): JSX.Element => {
   return (
     <Stack direction="row" align="center">
       <Flex w={8} h={8} align="center" justify="center" rounded="full" bg={iconBg}>
@@ -30,7 +30,7 @@ const Feature = ({ text, icon, iconBg }: FeatureProps) => {
   );
 };
 
-export function Features() {
+export function Features(): JSX.Element {
   return (
     <Container maxW="5xl" py={12}>
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
@@ -49,12 +49,14 @@ export function Features() {
           </Text>
           <Heading>A digital Product design agency</Heading>
           <Text color="gray.500" fontSize="lg">
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
-            invidunt ut labore
+            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+            eirmod tempor invidunt ut labore
           </Text>
           <Stack
             spacing={4}
-            divider={<StackDivider borderColor={useColorModeValue('gray.100', 'gray.700')} />}
+            divider={
+              <StackDivider borderColor={useColorModeValue('gray.100', 'gray.700')} />
+            }
           >
             <Feature
               icon={<Icon as={IoAnalyticsSharp} color="yellow.500" w={5} h={5} />}
