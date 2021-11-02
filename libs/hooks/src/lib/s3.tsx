@@ -1,4 +1,5 @@
-import S3 from 'aws-sdk/clients/s3';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import dayjs from 'dayjs';
 import path from 'path';
 
@@ -16,7 +17,7 @@ export const s3 = (() => {
   const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME!;
   const S3_BUCKET_REGION = 'ap-northeast-2';
 
-  const s3Client = new S3({
+  const s3Client = new S3Client({
     region: S3_BUCKET_REGION,
     credentials: {
       accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID!,
@@ -94,16 +95,16 @@ export const s3 = (() => {
   }): Promise<string> {
     if (!file) throw new Error('file should be not null');
     try {
-      const result = await new S3.ManagedUpload({
-        params: {
-          Bucket: S3_BUCKET_NAME,
-          Key: key,
-          Body: file,
-          ContentType: contentType,
-          ACL: 'public-read',
-        },
-      }).promise();
-      return result.Location;
+      // v3로 변환
+      const command = new PutObjectCommand({
+        Bucket: S3_BUCKET_NAME,
+        Key: key,
+        Body: file,
+        ContentType: contentType,
+        ACL: 'public-read',
+      });
+      await s3Client.send(command);
+      return 'OK';
     } catch (error) {
       throw new Error('error in s3publicUploadFile');
     }
@@ -132,16 +133,12 @@ export const s3 = (() => {
     const { key, fileName } = getS3Key({ userMail, type, filename, companyName });
 
     try {
-      await new S3.ManagedUpload({
-        params: {
-          // 저장 영역
-          Bucket: S3_BUCKET_NAME,
-          // 저장하는 루트 + 파일이름
-          Key: key,
-          // 저장될 파일
-          Body: file,
-        },
-      }).promise();
+      const command = new PutObjectCommand({
+        Bucket: S3_BUCKET_NAME,
+        Key: key,
+        Body: file,
+      });
+      await s3Client.send(command);
       return fileName;
     } catch (error) {
       console.log(error);
@@ -157,18 +154,20 @@ export const s3 = (() => {
    * @param type         'business-registration' | 'mail-order'
    * @returns 해당 이미지 파일을 다운받을 수 있는 URL
    */
-  function s3DownloadImageUrl(
+  async function s3DownloadImageUrl(
     fileName: string,
     sellerEmail: string,
     type: s3KeyType,
-  ): string {
+  ): Promise<string> {
     const signedUrlExpireSeconds = 60;
-    const params = {
+    const command = new GetObjectCommand({
       Bucket: S3_BUCKET_NAME,
       Key: `${type}/${sellerEmail}/${fileName}`,
-      Expires: signedUrlExpireSeconds,
-    };
-    const imageUrl = s3Client.getSignedUrl('getObject', params);
+    });
+
+    const imageUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: signedUrlExpireSeconds,
+    });
     return imageUrl;
   }
 
