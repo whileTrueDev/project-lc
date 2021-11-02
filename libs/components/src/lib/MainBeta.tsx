@@ -1,18 +1,29 @@
-import { AspectRatio, Button, Flex, Heading, SimpleGrid, Stack } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, SimpleGrid, Stack } from '@chakra-ui/react';
 import { useDisplaySize, useIsLoggedIn } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 
 function MainBetaVideo(): React.ReactElement {
   return (
-    <AspectRatio maxW="750px" ratio={4 / 3}>
+    <Box
+      w={{ base: '100%', md: '89.9%' }}
+      position="relative"
+      padding={{ base: '56.3% 0 0 0', md: '50.625% 0 0 0' }}
+    >
       <iframe
         src="https://www.youtube.com/embed/4pIuCJTMXQU?controls=0&autoplay=1"
         title="project-lc-main-video"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+        }}
       />
-    </AspectRatio>
+    </Box>
   );
 }
 
