@@ -10,7 +10,6 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { makeStyles } from '@material-ui/core/styles';
 import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-grid';
 import { useDisplaySize, useFmOrders } from '@project-lc/hooks';
 import {
@@ -196,18 +195,7 @@ const columns: GridColumns = [
   // ...hiddenColumns,
 ];
 
-/** DataGrid style 컬럼 구분선 추가 */
-const useStyles = makeStyles(() => ({
-  root: {
-    '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
-      borderBottom: `1px solid #f0f0f0`,
-      borderRight: `1px solid #f0f0f0`,
-    },
-  },
-}));
-
 export function OrderList(): JSX.Element {
-  const { root } = useStyles();
   const exportManyDialog = useDisclosure();
   const fmOrderStates = useFmOrderStore();
   const orders = useFmOrders(fmOrderStates);
@@ -232,7 +220,6 @@ export function OrderList(): JSX.Element {
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
       <ChakraDataGrid
-        className={root}
         bg={dataGridBgColor}
         autoHeight
         rowsPerPageOptions={[10, 20, 50, 100]}
@@ -332,7 +319,7 @@ export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
               <GridToolbarExport
                 csvOptions={{
                   allColumns: true,
-                  fileName: `project-lc_주문목록_${dayjs().format(
+                  fileName: `크크쇼_주문목록_${dayjs().format(
                     'YYYY-MM-DD-HH-mm-ss',
                   )}`,
                 }}

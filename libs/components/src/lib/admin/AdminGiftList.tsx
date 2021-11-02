@@ -1,5 +1,4 @@
 import { Box, Text, useColorModeValue } from '@chakra-ui/react';
-import { makeStyles } from '@material-ui/core/styles';
 import { GridColumns, GridRowParams } from '@material-ui/data-grid';
 import { useDisplaySize, useFmOrdersByGoods } from '@project-lc/hooks';
 import {
@@ -117,16 +116,6 @@ const columns: GridColumns = [
   },
 ];
 
-/** DataGrid style 컬럼 구분선 추가 */
-const useStyles = makeStyles(() => ({
-  root: {
-    '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
-      borderBottom: `1px solid #f0f0f0`,
-      borderRight: `1px solid #f0f0f0`,
-    },
-  },
-}));
-
 function getDateString(date: Date | null | undefined): string | undefined {
   if (date) {
     return dayjs(date).format('YYYY-MM-DD');
@@ -138,7 +127,6 @@ export function AdminGiftList(props: {
   selectedGoods: SeletctedLiveShoppingType;
 }): JSX.Element {
   const { selectedGoods } = props;
-  const { root } = useStyles();
   const orders = useFmOrdersByGoods(
     {
       searchStatuses: getFmOrderStatusByNames([
@@ -184,7 +172,6 @@ export function AdminGiftList(props: {
   return (
     <Box minHeight={{ base: 300, md: 600 }} mt={3}>
       <ChakraDataGrid
-        className={root}
         bg={dataGridBgColor}
         autoHeight
         minH={500}

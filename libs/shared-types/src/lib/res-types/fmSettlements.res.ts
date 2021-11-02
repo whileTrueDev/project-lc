@@ -76,6 +76,7 @@ export type FmSettlementTargetBase = {
   export_date: FmExport['regist_date'];
   order_date: FmOrder['regist_date'];
   shipping_cost: FmOrder['shipping_cost'];
+  shippingCostAlreadyCalculated?: boolean;
 } & FmOrder;
 
 export type FmSettlementTarget = FmSettlementTargetBase & {

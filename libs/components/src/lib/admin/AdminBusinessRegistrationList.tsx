@@ -1,14 +1,13 @@
-import { GridColumns, GridCellParams } from '@material-ui/data-grid';
-import { makeStyles } from '@material-ui/core/styles';
-import { useColorModeValue, useDisclosure, Button, Badge } from '@chakra-ui/react';
-import { useDisplaySize } from '@project-lc/hooks';
+import { Badge, Button, useDisclosure } from '@chakra-ui/react';
+import { GridCellParams, GridColumns } from '@material-ui/data-grid';
 import { SellerBusinessRegistration } from '@prisma/client';
-import { useState } from 'react';
+import { useDisplaySize } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
+import { useState } from 'react';
 import { ChakraDataGrid } from '../ChakraDataGrid';
-import { AdminImageDownloadButton } from './AdminImageDownloadButton';
-import { AdminBusinessRegistrationRejectionDialog } from './AdminBusinessRegistrationRejectionDialog';
 import { AdminBusinessRegistrationConfirmationDialog } from './AdminBusinessRegistrationConfirmationDialog';
+import { AdminBusinessRegistrationRejectionDialog } from './AdminBusinessRegistrationRejectionDialog';
+import { AdminImageDownloadButton } from './AdminImageDownloadButton';
 
 const columns: GridColumns = [
   {
@@ -136,17 +135,6 @@ export function AdminBusinessRegistrationList(props: {
 }): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { sellerBusinessRegistrations } = props;
-  const useStyle = makeStyles({
-    columnHeader: {
-      backgroundColor: useColorModeValue('inherit', '#2D3748'),
-    },
-    root: {
-      borderWidth: 0,
-      color: useColorModeValue('inherit', `rgba(255, 255, 255, 0.92)`),
-      height: '95%',
-    },
-  });
-
   const [selectedRow, setSelectedRow] = useState({});
   const {
     isOpen: isConfirmationOpen,
@@ -172,15 +160,9 @@ export function AdminBusinessRegistrationList(props: {
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
   }
 
-  const classes = useStyle();
-
   return (
     <>
       <ChakraDataGrid
-        classes={{
-          columnHeader: classes.columnHeader,
-          root: classes.root,
-        }}
         borderWidth={0}
         hideFooter
         headerHeight={50}

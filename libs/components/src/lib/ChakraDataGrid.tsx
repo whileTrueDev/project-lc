@@ -1,7 +1,29 @@
-import { chakra } from '@chakra-ui/react';
+import { chakra, theme, useColorModeValue } from '@chakra-ui/react';
+import { makeStyles } from '@material-ui/core';
 import { DataGrid, DataGridProps } from '@material-ui/data-grid';
 
 function CustomDataGrid(props: DataGridProps): JSX.Element {
+  const useStyle = makeStyles({
+    columnHeader: {
+      backgroundColor: useColorModeValue(theme.colors.gray[50], theme.colors.gray[700]),
+    },
+    root: {
+      borderWidth: 0,
+      color: useColorModeValue('inherit', 'white'),
+      '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
+        borderBottom: `1px solid ${useColorModeValue(
+          theme.colors.gray[100],
+          theme.colors.gray[700],
+        )}`,
+        borderRight: `1px solid ${useColorModeValue(
+          theme.colors.gray[100],
+          theme.colors.gray[700],
+        )}`,
+      },
+    },
+  });
+  const classes = useStyle();
+
   return (
     <DataGrid
       componentsProps={{
@@ -73,6 +95,10 @@ function CustomDataGrid(props: DataGridProps): JSX.Element {
         toolbarExport: '내보내기',
         toolbarExportLabel: '내보내기',
         toolbarExportCSV: 'CSV 파일로 다운로드',
+      }}
+      classes={{
+        root: props.classes?.root || classes.root,
+        columnHeader: props.classes?.columnHeader || classes.columnHeader,
       }}
       {...props}
     />

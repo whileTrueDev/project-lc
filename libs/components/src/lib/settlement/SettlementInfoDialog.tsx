@@ -15,6 +15,10 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { SettlementDoneItem } from '@project-lc/hooks';
+import { FmOrder } from '@project-lc/shared-types';
+import { calcPgCommission } from '@project-lc/utils';
+import { useMemo } from 'react';
+import { LiveShopping, SellerSettlementItems } from '.prisma/client';
 
 export interface SettlementInfoDialogProps {
   isOpen: boolean;
@@ -26,6 +30,20 @@ export function SettlementInfoDialog({
   onClose,
   settlementInfo,
 }: SettlementInfoDialogProps): JSX.Element {
+  const wtCommission = useMemo(
+    () =>
+      settlementInfo.settlementItems.reduce((acc, x) => {
+        return acc + x.whiletrueCommission;
+      }, 0),
+    [settlementInfo.settlementItems],
+  );
+  const broadcasterCommission = useMemo(
+    () =>
+      settlementInfo.settlementItems.reduce((acc, x) => {
+        return acc + x.broadcasterCommission;
+      }, 0),
+    [settlementInfo.settlementItems],
+  );
   return (
     <Modal
       isOpen={isOpen}
@@ -69,9 +87,20 @@ export function SettlementInfoDialog({
             </GridItem>
 
             <GridItem>
-              <Stack>
-                <Text>총 수수료액</Text>
-                <Text>{settlementInfo.totalCommission.toLocaleString()}</Text>
+              <Stack spacing={1}>
+                <Text>수수료</Text>
+                <Text fontSize="sm">
+                  총수수료: {settlementInfo.totalCommission.toLocaleString()}
+                </Text>
+                <Text fontSize="sm">
+                  전자결제수수료: {settlementInfo.pgCommission.toLocaleString()}
+                </Text>
+                {broadcasterCommission !== 0 && (
+                  <Text fontSize="sm">
+                    방송인수수료: {broadcasterCommission.toLocaleString()}
+                  </Text>
+                )}
+                <Text fontSize="sm">크크쇼수수료: {wtCommission.toLocaleString()}</Text>
               </Stack>
             </GridItem>
 
@@ -87,63 +116,11 @@ export function SettlementInfoDialog({
             <Text fontWeight="bold">정산 상품 정보</Text>
           </Box>
           {settlementInfo.settlementItems.map((i) => (
-            <Grid
+            <SettlementInfoItem
               key={i.id}
-              my={4}
-              p={2}
-              borderWidth="thin"
-              gridColumnGap={2}
-              gridRowGap={1}
-              templateColumns="1fr 2fr"
-              gridAutoRows="minmax(20px, auto)"
-            >
-              {i.goods_image && (
-                <>
-                  <GridItem>상품 이미지</GridItem>
-                  <GridItem>
-                    <Image
-                      w="50px"
-                      h="50px"
-                      src={`http://whiletrue.firstmall.kr${i.goods_image}`}
-                    />
-                  </GridItem>
-                </>
-              )}
-              <GridItem>상품명</GridItem>
-              <GridItem>
-                <Box>
-                  {i.goods_name}
-                  {i.option_title && i.option1 && (
-                    <Text fontSize="sm">
-                      {i.option_title} : {i.option1}
-                    </Text>
-                  )}
-                </Box>
-              </GridItem>
-
-              <GridItem>개수</GridItem>
-              <GridItem>{i.ea}</GridItem>
-              <GridItem>개당 가격</GridItem>
-              <GridItem>{i.pricePerPiece.toLocaleString()}</GridItem>
-              <GridItem>총 가격</GridItem>
-              <GridItem>{i.price.toLocaleString()}</GridItem>
-              <GridItem>라이브쇼핑 주문 여부</GridItem>
-              <GridItem>
-                <Text color={i.liveShoppingId ? 'green.500' : 'red.500'}>
-                  {i.liveShoppingId ? 'O' : 'X'}
-                </Text>
-              </GridItem>
-              <GridItem>방송인 수수료</GridItem>
-              <GridItem>
-                {i.broadcasterCommission.toLocaleString()} ({i.broadcasterCommissionRate}
-                %)
-              </GridItem>
-              <GridItem>와일트루 수수료</GridItem>
-              <GridItem>
-                {i.whiletrueCommission.toLocaleString()} ({i.whiletrueCommissionRate}
-                %)
-              </GridItem>
-            </Grid>
+              settlementItem={i}
+              settlementInfo={settlementInfo}
+            />
           ))}
         </ModalBody>
 
@@ -152,5 +129,103 @@ export function SettlementInfoDialog({
         </ModalFooter>
       </ModalContent>
     </Modal>
+  );
+}
+
+export interface SettlementInfoItemProps {
+  settlementInfo: SettlementDoneItem;
+  settlementItem: SellerSettlementItems & {
+    liveShopping: LiveShopping;
+  };
+}
+export function SettlementInfoItem({
+  settlementInfo,
+  settlementItem,
+}: SettlementInfoItemProps): JSX.Element {
+  const pgCommission = useMemo(() => {
+    const shippingCost = Number(settlementInfo.shippingCost);
+    return calcPgCommission({
+      targetAmount: settlementItem.price + shippingCost,
+      paymentMethod: settlementInfo.paymentMethod as FmOrder['payment'],
+      pg: settlementInfo.pg,
+    });
+  }, [
+    settlementInfo.paymentMethod,
+    settlementInfo.pg,
+    settlementInfo.shippingCost,
+    settlementItem.price,
+  ]);
+
+  return (
+    <Grid
+      key={settlementItem.id}
+      my={4}
+      p={2}
+      borderWidth="thin"
+      gridColumnGap={2}
+      gridRowGap={1}
+      templateColumns="1fr 2fr"
+      gridAutoRows="minmax(20px, auto)"
+    >
+      {settlementItem.goods_image && (
+        <>
+          <GridItem>상품 이미지</GridItem>
+          <GridItem>
+            <Image
+              w="50px"
+              h="50px"
+              src={`http://whiletrue.firstmall.kr${settlementItem.goods_image}`}
+            />
+          </GridItem>
+        </>
+      )}
+      <GridItem>상품명</GridItem>
+      <GridItem>
+        <Box>
+          {settlementItem.goods_name}
+          {settlementItem.option_title && settlementItem.option1 && (
+            <Text fontSize="sm">
+              {settlementItem.option_title} : {settlementItem.option1}
+            </Text>
+          )}
+        </Box>
+      </GridItem>
+
+      <GridItem>개수</GridItem>
+      <GridItem>{settlementItem.ea}</GridItem>
+      <GridItem>개당 가격</GridItem>
+      <GridItem>{settlementItem.pricePerPiece.toLocaleString()}</GridItem>
+      <GridItem>총 가격</GridItem>
+      <GridItem>{settlementItem.price.toLocaleString()}</GridItem>
+      <GridItem>라이브쇼핑 주문 여부</GridItem>
+      <GridItem>
+        <Text
+          color={settlementItem.liveShoppingId ? 'green.500' : 'red.500'}
+          fontWeight={settlementItem.liveShoppingId ? 'bold' : undefined}
+        >
+          {settlementItem.liveShoppingId ? 'O' : 'X'}
+        </Text>
+      </GridItem>
+      <GridItem>전자결제수수료</GridItem>
+      <GridItem>{`${pgCommission.commission.toLocaleString()} (${
+        pgCommission.rate
+      })`}</GridItem>
+      {settlementItem.liveShoppingId ? (
+        <>
+          <GridItem>방송인 수수료</GridItem>
+          <GridItem>
+            {settlementItem.broadcasterCommission.toLocaleString()} (
+            {settlementItem.broadcasterCommissionRate}
+            %)
+          </GridItem>
+        </>
+      ) : null}
+      <GridItem>크크쇼 수수료</GridItem>
+      <GridItem>
+        {settlementItem.whiletrueCommission.toLocaleString()} (
+        {settlementItem.whiletrueCommissionRate}
+        %)
+      </GridItem>
+    </Grid>
   );
 }

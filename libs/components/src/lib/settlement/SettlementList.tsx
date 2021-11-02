@@ -1,14 +1,5 @@
 import { DownloadIcon } from '@chakra-ui/icons';
-import {
-  Box,
-  Button,
-  Stack,
-  theme,
-  Tooltip,
-  useColorModeValue,
-  useDisclosure,
-} from '@chakra-ui/react';
-import { makeStyles } from '@material-ui/core/styles';
+import { Box, Button, Stack, useDisclosure } from '@chakra-ui/react';
 import {
   GridColumns,
   GridToolbarContainer,
@@ -29,17 +20,6 @@ import { SettlementInfoDialog } from './SettlementInfoDialog';
 // 정산 내역을 보여주는 데이터 그리드
 export function SettlementList(): JSX.Element | null {
   const { isDesktopSize } = useDisplaySize();
-  const useStyle = makeStyles({
-    columnHeader: {
-      backgroundColor: useColorModeValue(theme.colors.gray[100], theme.colors.gray[700]),
-    },
-    root: {
-      borderWidth: 0,
-      color: useColorModeValue('inherit', `rgba(255, 255, 255, 0.92)`),
-      height: '95%',
-    },
-  });
-  const classes = useStyle();
 
   const { onOpen, isOpen, onClose } = useDisclosure();
   const selectedRound = settlementHistoryStore((s) => s.selectedRound);
@@ -139,10 +119,6 @@ export function SettlementList(): JSX.Element | null {
   return (
     <Box px={{ base: 2, sm: 7 }} height="400px">
       <ChakraDataGrid
-        classes={{
-          columnHeader: classes.columnHeader,
-          root: classes.root,
-        }}
         minHeight={120}
         headerHeight={50}
         hideFooter
@@ -162,7 +138,7 @@ export function SettlementList(): JSX.Element | null {
                   <GridToolbarExport
                     csvOptions={{
                       allColumns: true,
-                      fileName: `project-lc_정산내역_${selectedRound}`,
+                      fileName: `크크쇼_정산내역_${selectedRound}`,
                     }}
                   />
                 </Button>

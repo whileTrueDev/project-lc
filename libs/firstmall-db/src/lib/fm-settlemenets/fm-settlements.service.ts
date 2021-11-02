@@ -27,11 +27,19 @@ export class FmSettlementService {
       JOIN fm_order USING (order_seq)
     WHERE account_date IS NULL AND buy_confirm != "none"`;
     const result: FmSettlementTargetBase[] = await this.db.query(
-      settled.length > 0 ? `${sql}  AND export_seq NOT IN (?)` : sql,
-      settled.map((x) => x.exportId),
+      settled.length > 0
+        ? `${sql}  AND export_seq NOT IN (${settled.map((x) => x.exportId).join(',')})`
+        : sql,
     );
-
     if (result.length === 0) return [];
+
+    const realResult: FmSettlementTargetBase[] = result.map((target) => {
+      const alreadySettledExport = settled.find((s) => s.orderId === target.order_seq);
+      if (alreadySettledExport && alreadySettledExport.shippingCostIncluded) {
+        return { ...target, shipping_cost: '0', shippingCostAlreadyCalculated: true };
+      }
+      return { ...target, shippingCostAlreadyCalculated: false };
+    });
 
     // 각 출고내역별 출고 아이템 조회
     const sql2 = `
@@ -84,7 +92,7 @@ export class FmSettlementService {
       },
     });
 
-    const exports = result.map((r) => ({
+    const exports = realResult.map((r) => ({
       ...r,
       options: exportOptions
         .filter((o) => o.export_code === r.export_code)
