@@ -5,7 +5,7 @@ import { DataGrid, DataGridProps } from '@material-ui/data-grid';
 function CustomDataGrid(props: DataGridProps): JSX.Element {
   const useStyle = makeStyles({
     columnHeader: {
-      backgroundColor: useColorModeValue(theme.colors.gray[100], theme.colors.gray[700]),
+      backgroundColor: useColorModeValue(theme.colors.gray[50], theme.colors.gray[700]),
     },
     root: {
       borderWidth: 0,
@@ -98,7 +98,7 @@ function CustomDataGrid(props: DataGridProps): JSX.Element {
       }}
       classes={{
         root: props.classes?.root || classes.root,
-        columnHeader: props.classes?.root || classes.columnHeader,
+        columnHeader: props.classes?.columnHeader || classes.columnHeader,
       }}
       {...props}
     />
