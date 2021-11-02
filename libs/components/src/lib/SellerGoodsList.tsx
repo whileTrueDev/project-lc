@@ -38,6 +38,24 @@ function formatDate(date: Date): string {
   return dayjs(date).format('YYYY/MM/DD HH:mm');
 }
 
+/** 라이브쇼핑 진행중이므로 수정 불가 표시 */
+export function GoodsEditDisabledText(): JSX.Element {
+  return (
+    <TextWithPopperButton
+      title="수정불가"
+      iconAriaLabel="수정불가"
+      iconColor="black"
+      portalBody
+    >
+      <Text>
+        현재 라이브 쇼핑이 진행중인 상품으로 상품 정보를 변경할 수 없습니다. <br />
+        상품 정보를 수정하고 싶은 경우 고객센터로 문의해주세요.
+      </Text>
+    </TextWithPopperButton>
+  );
+}
+
+/** 배송비 그룹 상세정보 조회 버튼 */
 export function ShippingGroupDetailButton(props: {
   id: number;
   name: string;
@@ -68,7 +86,15 @@ export function ShippingGroupDetailButton(props: {
 }
 
 /** 상품 수정 페이지로 이동하는 링크 */
-export function GoodsEditButton({ goodsId }: { goodsId: number | string }): JSX.Element {
+export function GoodsEditButton({
+  goodsId,
+  onLiveShopping = false,
+}: {
+  goodsId: number | string;
+  onLiveShopping?: boolean;
+}): JSX.Element {
+  // 라이브쇼핑 진행중인 상품의 경우
+  if (onLiveShopping) return <GoodsEditDisabledText />;
   return (
     <NextLink href={`/mypage/goods/edit/${goodsId}`} passHref>
       <Link>
@@ -241,12 +267,14 @@ const columns: GridColumns = [
       const goodsId = row.id;
       const goodsView = row.goods_view;
       const confirmedGoodsId = row.confirmation?.firstmallGoodsConnectionId;
+      const goodsOnLiveShopping = row.onLiveShopping; // 라이브쇼핑 진행중인 경우 노출 변경 불가하도록
       return (
         <Flex alignItems="center" justifyContent="center">
           <GoodsExposeSwitch
             goodsId={goodsId}
             goodsView={goodsView}
             confirmedGoodsId={confirmedGoodsId}
+            isReadOnly={goodsOnLiveShopping}
           />
         </Flex>
       );
@@ -315,7 +343,8 @@ const columns: GridColumns = [
     minWidth: 60,
     renderCell: ({ row }) => {
       const goodsId = row.id;
-      return <GoodsEditButton goodsId={goodsId} />;
+      const goodsOnLiveShopping = row.onLiveShopping;
+      return <GoodsEditButton goodsId={goodsId} onLiveShopping={goodsOnLiveShopping} />;
     },
   },
 ];

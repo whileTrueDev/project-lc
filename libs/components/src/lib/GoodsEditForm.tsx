@@ -8,8 +8,14 @@ import {
   theme,
   useColorModeValue,
   useToast,
+  Box,
 } from '@chakra-ui/react';
-import { useCreateGoodsCommonInfo, useProfile, useEditGoods } from '@project-lc/hooks';
+import {
+  useCreateGoodsCommonInfo,
+  useProfile,
+  useEditGoods,
+  useGoodsOnLiveFlag,
+} from '@project-lc/hooks';
 import { GoodsByIdRes, RegistGoodsDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -34,7 +40,7 @@ type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
 };
 
 /** 상품 수정 폼 컴포넌트 */
-export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.Element {
+export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.Element {
   const { data: profileData } = useProfile();
   const { mutateAsync: editGoodsRequest, isLoading } = useEditGoods();
   const { mutateAsync: createGoodsCommonInfo } = useCreateGoodsCommonInfo();
@@ -43,8 +49,7 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
-      // 상품 id (상품 수정하는 경우 id 존재, 상품 등록하는 경우 id undefined)
-      id: goodsData?.id || undefined,
+      id: goodsData.id,
       // 기본정보
       goods_name: goodsData?.goods_name || undefined, // 상품명
       summary: goodsData?.summary || undefined, // 간략설명
@@ -215,6 +220,22 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
       });
   };
 
+  const onLiveShopping = useGoodsOnLiveFlag(goodsData);
+  const fixedStackBgColor = useColorModeValue('white', 'gray.800');
+
+  if (onLiveShopping) {
+    return (
+      <Stack spacing={10} py={10}>
+        <Text>해당 상품은 라이브 쇼핑 진행중인 상품으로 수정할 수 없습니다</Text>
+        <Box>
+          <Button leftIcon={<ChevronLeftIcon />} onClick={router.back}>
+            돌아가기
+          </Button>
+        </Box>
+      </Stack>
+    );
+  }
+
   return (
     <FormProvider {...methods}>
       <Stack p={2} spacing={5} as="form" onSubmit={handleSubmit(editGoods)}>
@@ -223,7 +244,7 @@ export function GoodsEditForm({ goodsData }: { goodsData?: GoodsByIdRes }): JSX.
           mx={-2}
           direction="row"
           position="sticky"
-          bgColor={useColorModeValue('white', 'gray.800')}
+          bgColor={fixedStackBgColor}
           top="0px"
           left="0px"
           right="0px"

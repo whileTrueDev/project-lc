@@ -11,7 +11,6 @@ import {
   GoodsDetailShippingInfo,
   GoodsDetailSummary,
   GoodsDetailTitle,
-  GoodsEditButton,
   MypageLayout,
   SectionWithTitle,
 } from '@project-lc/components';
@@ -32,7 +31,7 @@ export function GoodsDetail(): JSX.Element {
     <MypageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={8} p={2} mb={16}>
         <Box as="section">
-          <Stack direction="row" justifyContent="space-between">
+          <Stack direction="row">
             <Button
               size="sm"
               leftIcon={<ChevronLeftIcon />}
@@ -40,7 +39,6 @@ export function GoodsDetail(): JSX.Element {
             >
               목록으로
             </Button>
-            <GoodsEditButton goodsId={goodsId} />
           </Stack>
         </Box>
 
