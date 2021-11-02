@@ -3,6 +3,7 @@ import 'reflect-metadata';
 export * from './lib/constants/banks';
 export * from './lib/constants/fmDeliveryCompanies';
 export * from './lib/constants/fmExportConfirmStatuses';
+export * from './lib/constants/fmOrderPayments';
 export * from './lib/constants/fmOrderRefundStatuses';
 export * from './lib/constants/fmOrderRefundTypes';
 export * from './lib/constants/fmOrderReturnMethods';

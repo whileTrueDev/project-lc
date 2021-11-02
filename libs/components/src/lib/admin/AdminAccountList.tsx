@@ -1,8 +1,6 @@
 import { GridColumns } from '@material-ui/data-grid';
-import { makeStyles } from '@material-ui/core/styles';
-import { useColorModeValue } from '@chakra-ui/react';
-import { useDisplaySize } from '@project-lc/hooks';
 import { SellerSettlementAccount } from '@prisma/client';
+import { useDisplaySize } from '@project-lc/hooks';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { AdminImageDownloadButton } from './AdminImageDownloadButton';
 
@@ -49,25 +47,9 @@ export function AdminAccountList(props: {
 }): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { sellerSettlementAccount } = props;
-  const useStyle = makeStyles({
-    columnHeader: {
-      backgroundColor: useColorModeValue('inherit', '#2D3748'),
-    },
-    root: {
-      borderWidth: 0,
-      color: useColorModeValue('inherit', `rgba(255, 255, 255, 0.92)`),
-      height: '95%',
-    },
-  });
-
-  const classes = useStyle();
 
   return (
     <ChakraDataGrid
-      classes={{
-        columnHeader: classes.columnHeader,
-        root: classes.root,
-      }}
       borderWidth={0}
       hideFooter
       headerHeight={50}

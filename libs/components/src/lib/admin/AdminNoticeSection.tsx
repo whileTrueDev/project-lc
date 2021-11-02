@@ -1,19 +1,17 @@
-import { GridColumns, GridCellParams, GridRowData } from '@material-ui/data-grid';
-import { makeStyles } from '@material-ui/core/styles';
 import {
-  useColorModeValue,
   Box,
-  Text,
-  Switch,
   Button,
+  Divider,
   Flex,
+  Switch,
+  Text,
   useDisclosure,
   useToast,
-  Divider,
 } from '@chakra-ui/react';
-import { useNoticeInfo, useNoticeFlagMutation } from '@project-lc/hooks';
-import dayjs from 'dayjs';
+import { GridCellParams, GridColumns, GridRowData } from '@material-ui/data-grid';
 import { Notice } from '@prisma/client';
+import { useNoticeFlagMutation, useNoticeInfo } from '@project-lc/hooks';
+import dayjs from 'dayjs';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { AdminNoticeDialog } from './AdminNoticeDialog';
 
@@ -72,16 +70,6 @@ export function AdminNoticeSection(): JSX.Element {
   const { data: notices, isLoading } = useNoticeInfo({}, 'admin');
   const mutation = useNoticeFlagMutation();
 
-  const classes = makeStyles({
-    columnHeader: {
-      backgroundColor: useColorModeValue('inherit', '#2D3748'),
-    },
-    root: {
-      borderWidth: 0,
-      color: useColorModeValue('inherit', `rgba(255, 255, 255, 0.92)`),
-    },
-  })();
-
   async function handleClick(param: GridCellParams): Promise<void> {
     if (param.field === 'title') {
       if (param.row.url) {
@@ -121,10 +109,6 @@ export function AdminNoticeSection(): JSX.Element {
       </Text>
       <Divider backgroundColor="gray.100" />
       <ChakraDataGrid
-        classes={{
-          columnHeader: classes.columnHeader,
-          root: classes.root,
-        }}
         loading={isLoading}
         borderWidth={0}
         headerHeight={40}

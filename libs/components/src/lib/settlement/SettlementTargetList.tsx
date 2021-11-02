@@ -31,8 +31,11 @@ import {
   useSellCommission,
   useSettlementTargets,
 } from '@project-lc/hooks';
-import { FmSettlementTarget } from '@project-lc/shared-types';
-import { checkOrderDuringLiveShopping } from '@project-lc/utils';
+import {
+  convertFmOrderPaymentsToString,
+  FmSettlementTarget,
+} from '@project-lc/shared-types';
+import { calcPgCommission, checkOrderDuringLiveShopping } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { ConfirmDialog } from '../ConfirmDialog';
@@ -58,6 +61,7 @@ export function SettlementTargetList(): JSX.Element | null {
             <Th>출고날짜</Th>
             <Th>구매확정일</Th>
             <Th>출고에 포함된 상품 총금액</Th>
+            <Th>배송비</Th>
             <Th>정산계좌등록여부</Th>
             <Th>자세히보기</Th>
           </Tr>
@@ -100,6 +104,11 @@ export function SettlementTargetList(): JSX.Element | null {
                     : '-'}
                 </Td>
                 <Td>{totalPrice.toLocaleString()}</Td>
+                <Td width="120px">
+                  {target.shippingCostAlreadyCalculated
+                    ? '이미 다른출고에 의해 정산됨'
+                    : target.shipping_cost}
+                </Td>
                 <Td>{isAbleToSettle ? '정산등록함' : 'X'}</Td>
                 <Td>
                   <Button
@@ -166,6 +175,29 @@ function SettlementItemInfoDialog({
     setRound(r);
   };
 
+  const onConfirm = async (): Promise<void> => {
+    if (!selectedSettleItem.options[0].seller?.email) {
+      toast({ title: '판매자 미상으로 정산처리 진행하지 못함', status: 'error' });
+    } else {
+      executeSettlement
+        .mutateAsync({
+          sellerEmail: selectedSettleItem.options[0].seller?.email,
+          target: selectedSettleItem,
+          round,
+        })
+        .then(() => {
+          toast({
+            title: `출고번호 ${selectedSettleItem.export_seq} 정산처리 완료`,
+            status: 'success',
+          });
+          onClose();
+        })
+        .catch(() => {
+          toast({ title: '정산처리 실패', status: 'error' });
+        });
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
       <ModalOverlay />
@@ -173,6 +205,12 @@ function SettlementItemInfoDialog({
         <ModalHeader>정산 대상 {selectedSettleItem.export_code}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
+          <Box>
+            배송비:{' '}
+            {selectedSettleItem.shippingCostAlreadyCalculated
+              ? '이미 다른출고에 의해 정산됨'
+              : selectedSettleItem.shipping_cost}
+          </Box>
           {selectedSettleItem.options.map((opt) => (
             <SettlementItemOptionDetail
               key={
@@ -205,28 +243,7 @@ function SettlementItemInfoDialog({
         isOpen={executeDialog.isOpen}
         onClose={executeDialog.onClose}
         title={selectedSettleItem.export_code}
-        onConfirm={async () => {
-          if (!selectedSettleItem.options[0].seller?.email) {
-            toast({ title: '판매자 미상으로 정산처리 진행하지 못함', status: 'error' });
-          } else {
-            executeSettlement
-              .mutateAsync({
-                sellerEmail: selectedSettleItem.options[0].seller?.email,
-                target: selectedSettleItem,
-                round,
-              })
-              .then(() => {
-                toast({
-                  title: `출고번호 ${selectedSettleItem.export_seq} 정산처리 완료`,
-                  status: 'success',
-                });
-                onClose();
-              })
-              .catch(() => {
-                toast({ title: '정산처리 실패', status: 'error' });
-              });
-          }
-        }}
+        onConfirm={onConfirm}
       >
         <Stack spacing={3}>
           <RadioGroup onChange={onRoundChange} value={round}>
@@ -279,6 +296,19 @@ function SettlementItemOptionDetail({
     return 0;
   }, [commissionInfo.data, liveShopping, totalPrice]);
 
+  const pgCommission = useMemo(() => {
+    return calcPgCommission({
+      paymentMethod: settlementTarget.payment,
+      pg: settlementTarget.pg,
+      targetAmount: totalPrice + Number(settlementTarget.shipping_cost),
+    });
+  }, [
+    settlementTarget.payment,
+    settlementTarget.pg,
+    settlementTarget.shipping_cost,
+    totalPrice,
+  ]);
+
   return (
     <Grid
       my={4}
@@ -318,6 +348,15 @@ function SettlementItemOptionDetail({
 
       <GridItem>상품 가격 * 주문 개수</GridItem>
       <GridItem>{`${totalPrice.toLocaleString()}원`}</GridItem>
+
+      <GridItem>결제방법</GridItem>
+      <GridItem>{convertFmOrderPaymentsToString(settlementTarget.payment)}</GridItem>
+
+      <GridItem>pg</GridItem>
+      <GridItem>{settlementTarget.pg || '-'}</GridItem>
+
+      <GridItem>전자결제수수료</GridItem>
+      <GridItem>{`${pgCommission.commission}(${pgCommission.rate})`}</GridItem>
 
       <GridItem>라이브쇼핑 주문 여부</GridItem>
       <GridItem>
