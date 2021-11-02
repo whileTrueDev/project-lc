@@ -20,6 +20,15 @@ function CustomDataGrid(props: DataGridProps): JSX.Element {
           theme.colors.gray[700],
         )}`,
       },
+      '& .MuiIconButton-label': {
+        color: useColorModeValue(undefined, theme.colors.whiteAlpha['500']),
+      },
+      '& .MuiDataGrid-columnHeaderWrapper': {
+        backgroundColor: useColorModeValue(theme.colors.gray[50], theme.colors.gray[700]),
+      },
+      '& .MuiTablePagination-root': {
+        color: useColorModeValue('inherit', 'white'),
+      },
     },
   });
   const classes = useStyle();
