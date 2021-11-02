@@ -389,7 +389,6 @@ export function SellerGoodsList(): JSX.Element {
   return (
     <Box>
       <ChakraDataGrid
-        bg={useColorModeValue('inherit', 'gray.300')}
         loading={isLoading}
         rows={data?.items || []}
         autoHeight
