@@ -9,6 +9,7 @@ import {
   ShippingSet,
   ShippingOption,
   ShippingCost,
+  LiveShopping,
 } from '@prisma/client';
 
 export type GoodsByIdRes = Goods & {
@@ -27,4 +28,5 @@ export type GoodsByIdRes = Goods & {
   confirmation: GoodsConfirmation;
   image: GoodsImages[];
   GoodsInfo: GoodsInfo | null;
+  LiveShopping?: LiveShopping[];
 };
