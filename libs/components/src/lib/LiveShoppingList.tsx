@@ -179,14 +179,12 @@ export function LiveShoppingList(): JSX.Element {
                     sellEndDate={row.sellEndDate}
                   />
                 </Td>
-                <Td>
+                <Td onClick={(e) => e.stopPropagation()}>
                   <Flex alignItems="center">
                     <Box mr={1}>
                       <BroadcasterName data={row.broadcaster} />
                     </Box>
-                    <BroadcasterChannelButton
-                      channelUrl={data[liveShoppingId].broadcaster.channelUrl}
-                    />
+                    <BroadcasterChannelButton channelUrl={row.broadcaster?.channelUrl} />
                   </Flex>
                 </Td>
                 <Td>
