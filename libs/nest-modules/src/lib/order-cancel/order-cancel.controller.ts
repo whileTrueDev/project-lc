@@ -22,7 +22,7 @@ import { OrderCancelService } from './order-cancel.service';
 export class OrderCancelController {
   constructor(private readonly orderCancelService: OrderCancelService) {}
 
-  /** 판매자 주문취소 요청 생성 */
+  /** 판매자 결제취소 요청 생성 */
   @Post()
   createOrderCancelRequest(
     @SellerInfo() seller: UserPayload,
@@ -34,7 +34,7 @@ export class OrderCancelController {
     });
   }
 
-  /** 판매자 주문취소 요청 조회 */
+  /** 판매자 결제취소 요청 조회 */
   @Get('/:orderSeq')
   findOneOrderCancelRequst(
     @Param('orderSeq') orderSeq: string,
