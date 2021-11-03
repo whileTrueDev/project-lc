@@ -239,6 +239,7 @@ export function LiveShoppingList(): JSX.Element {
                   {row.progress === 'registered' ? (
                     <Button
                       size="xs"
+                      colorScheme="orange"
                       onClick={() => {
                         handleModalOpen(row.id);
                       }}
