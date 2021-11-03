@@ -210,15 +210,25 @@ export function OrderCancelRequestDialog({
                     key={field.id}
                     item={item}
                     amountInput={
-                      <Input
-                        isInvalid={!!errors?.cancelItems?.[index]?.cancelAmount}
-                        {...register(`cancelItems.${index}.cancelAmount` as const, {
-                          valueAsNumber: true,
-                          required: true,
-                          max: item.ea,
-                          min: 0,
-                        })}
-                      />
+                      <Stack>
+                        <Input
+                          // width="80px"
+                          isInvalid={!!errors?.cancelItems?.[index]?.cancelAmount}
+                          {...register(`cancelItems.${index}.cancelAmount` as const, {
+                            valueAsNumber: true,
+                            required: true,
+                            validate: {
+                              max: (v) => v <= item.ea || '주문수량 초과불가',
+                              min: (v) => v >= 0 || '음수 불가',
+                            },
+                          })}
+                        />
+                        {errors.cancelItems?.[index]?.cancelAmount && (
+                          <ErrorText>
+                            {errors.cancelItems?.[index]?.cancelAmount?.message}
+                          </ErrorText>
+                        )}
+                      </Stack>
                     }
                   />
                 );
