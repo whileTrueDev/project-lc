@@ -186,7 +186,7 @@ export class FmOrdersService {
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
 
       if (dto.searchStatuses && dto.searchStatuses.length > 0) {
-        whereSql += `\nAND IF(AND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
+        whereSql += `\nAND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
           ',',
         )}) `;
       }
