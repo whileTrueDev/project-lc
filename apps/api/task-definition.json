@@ -46,6 +46,18 @@
                     "name": "FIRSTMALL_DATABASE_URL"
                 },
                 {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_GMAIL_OAUTH_REFRESH_TOKEN",
+                    "name": "GMAIL_OAUTH_REFRESH_TOKEN"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_GMAIL_OAUTH_CLIENT_ID",
+                    "name": "GMAIL_OAUTH_CLIENT_ID"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_GMAIL_OAUTH_CLIENT_SECRET",
+                    "name": "GMAIL_OAUTH_CLIENT_SECRET"
+                },
+                {
                     "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_GOOGLE_CLIENT_ID",
                     "name": "GOOGLE_CLIENT_ID"
                 },
