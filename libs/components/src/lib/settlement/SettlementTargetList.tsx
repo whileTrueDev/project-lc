@@ -356,7 +356,9 @@ function SettlementItemOptionDetail({
       <GridItem>{settlementTarget.pg || '-'}</GridItem>
 
       <GridItem>전자결제수수료</GridItem>
-      <GridItem>{`${pgCommission.commission}(${pgCommission.rate})`}</GridItem>
+      <GridItem>{`${pgCommission.commission}(${
+        pgCommission.rate + pgCommission.description
+      }`}</GridItem>
 
       <GridItem>라이브쇼핑 주문 여부</GridItem>
       <GridItem>

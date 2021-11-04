@@ -116,7 +116,7 @@ model SellerSettlementItems {
   liveShopping   LiveShopping? @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
 
   sellerSettlementsId Int?
-  SellerSettlements   SellerSettlements? @relation(fields: [sellerSettlementsId], references: [id])
+  SellerSettlements   SellerSettlements? @relation(fields: [sellerSettlementsId], references: [id], onDelete: Cascade)
 }
 
 // 판매자 정산 계좌 정보
@@ -157,7 +157,7 @@ model SellerSocialAccount {
 model SellerContacts {
   id           Int            @id @default(autoincrement())
   sellerId     Int // 판매자 아이디
-  email        String         @default("") //등록한 이메일
+  email        String         @default("") //등���한 이메일
   phoneNumber  String         @default("") // 등록한 전화번호
   isDefault    Boolean        @default(false) // 기본 연락처 설정 여부
   seller       Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
