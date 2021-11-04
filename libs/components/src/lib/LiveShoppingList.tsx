@@ -5,7 +5,6 @@ import {
   Center,
   Divider,
   Flex,
-  IconButton,
   Link,
   Modal,
   ModalBody,
@@ -22,9 +21,7 @@ import {
   Textarea,
   Th,
   Thead,
-  Tooltip,
   Tr,
-  useColorModeValue,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
@@ -41,7 +38,6 @@ import {
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { useQueryClient } from 'react-query';
 import { BroadcasterChannelButton } from '..';
 import { BroadcasterName } from './BroadcasterName';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -64,9 +60,7 @@ export interface LiveShoppingWithSalesFrontType extends LiveShoppingWithoutDate 
 }
 
 export function LiveShoppingList(): JSX.Element {
-  const queryClient = useQueryClient();
   const toast = useToast();
-  const rowHoverColor = useColorModeValue('gray.100', 'gray.700');
   const { data: profileData } = useProfile();
 
   const { data, isLoading } = useLiveShoppingList({});
@@ -114,7 +108,6 @@ export function LiveShoppingList(): JSX.Element {
     mutateAsync(toDeleteLiveShoppingId)
       .then((isDeleted) => {
         if (isDeleted) {
-          queryClient.invalidateQueries('LiveShoppingList');
           toast({
             title: '삭제 완료하였습니다',
             status: 'success',
@@ -161,14 +154,7 @@ export function LiveShoppingList(): JSX.Element {
           !isSalesLoading &&
           liveShoppingWithSales.length !== 0 ? (
             liveShoppingWithSales.map((row, index) => (
-              <Tr
-                key={row.id}
-                onClick={() => handleDetailOnOpen(index)}
-                cursor="pointer"
-                _hover={{
-                  backgroundColor: rowHoverColor,
-                }}
-              >
+              <Tr key={row.id}>
                 <Td>{index + 1}</Td>
                 <Td>{row.goods.goods_name}</Td>
                 <Td>
@@ -236,17 +222,27 @@ export function LiveShoppingList(): JSX.Element {
                   )}
                 </Td>
                 <Td onClick={(e) => e.stopPropagation()}>
-                  {row.progress === 'registered' ? (
+                  <Stack>
                     <Button
                       size="xs"
-                      colorScheme="orange"
-                      onClick={() => {
-                        handleModalOpen(row.id);
-                      }}
+                      colorScheme="blue"
+                      onClick={() => handleDetailOnOpen(index)}
                     >
-                      삭제
+                      상세보기
                     </Button>
-                  ) : null}
+
+                    {row.progress === 'registered' ? (
+                      <Button
+                        size="xs"
+                        colorScheme="orange"
+                        onClick={() => {
+                          handleModalOpen(row.id);
+                        }}
+                      >
+                        삭제
+                      </Button>
+                    ) : null}
+                  </Stack>
                 </Td>
               </Tr>
             ))
@@ -259,130 +255,136 @@ export function LiveShoppingList(): JSX.Element {
           )}
         </Tbody>
       </Table>
-      {data && data.length !== 0 && !isLoading && (
-        <Modal isOpen={detailIsOpen} onClose={detailOnClose} size="lg">
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>상세정보</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Stack spacing={4}>
-                {data[liveShoppingId].seller.sellerShop && (
-                  <Text as="span">
-                    판매자 : {data[liveShoppingId].seller.sellerShop.shopName}
-                  </Text>
-                )}
-
-                <Stack direction="row" alignItems="center">
-                  <Text as="span">진행상태</Text>
-                  <LiveShoppingProgressBadge
-                    progress={data[liveShoppingId].progress}
-                    broadcastStartDate={data[liveShoppingId].broadcastStartDate}
-                    broadcastEndDate={data[liveShoppingId].broadcastEndDate}
-                    sellEndDate={data[liveShoppingId].sellEndDate}
-                  />
-                  {data[liveShoppingId].progress === LIVE_SHOPPING_PROGRESS.취소됨 ? (
-                    <Text>사유 : {data[liveShoppingId].rejectionReason}</Text>
-                  ) : null}
-                </Stack>
-                <Divider />
-                <Stack direction="row" alignItems="center">
-                  <Text as="span">방송인: </Text>
-                  {data[liveShoppingId].broadcaster ? (
-                    <>
-                      <BroadcasterName data={data[liveShoppingId].broadcaster} />
-                      {data[liveShoppingId].broadcaster.channelUrl && (
-                        <BroadcasterChannelButton
-                          channelUrl={data[liveShoppingId].broadcaster.channelUrl}
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <Text fontWeight="bold">미정</Text>
+      {data &&
+        data.length !== 0 &&
+        !isLoading &&
+        liveShoppingWithSales &&
+        !isSalesLoading && (
+          <Modal isOpen={detailIsOpen} onClose={detailOnClose} size="lg">
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>상세정보</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Stack spacing={4}>
+                  {data[liveShoppingId]?.seller.sellerShop && (
+                    <Text as="span">
+                      판매자 : {data[liveShoppingId].seller.sellerShop.shopName}
+                    </Text>
                   )}
-                </Stack>
-                <Stack direction="row" alignItems="center">
-                  <Text as="span">방송시작 시간: </Text>
-                  <Text as="span" fontWeight="bold">
-                    {data[liveShoppingId].broadcastStartDate
-                      ? dayjs(data[liveShoppingId].broadcastStartDate).format(
-                          'YYYY/MM/DD HH:mm',
-                        )
-                      : '미정'}
-                  </Text>
-                </Stack>
 
-                <Stack direction="row" alignItems="center">
-                  <Text as="span">방송종료 시간: </Text>
-                  <Text as="span" fontWeight="bold">
-                    {data[liveShoppingId].broadcastEndDate
-                      ? dayjs(data[liveShoppingId].broadcastEndDate).format(
-                          'YYYY/MM/DD HH:mm',
-                        )
-                      : '미정'}
-                  </Text>
-                </Stack>
+                  <Stack direction="row" alignItems="center">
+                    <Text as="span">진행상태</Text>
+                    <LiveShoppingProgressBadge
+                      progress={data[liveShoppingId].progress}
+                      broadcastStartDate={data[liveShoppingId].broadcastStartDate}
+                      broadcastEndDate={data[liveShoppingId].broadcastEndDate}
+                      sellEndDate={data[liveShoppingId].sellEndDate}
+                    />
+                    {data[liveShoppingId].progress === LIVE_SHOPPING_PROGRESS.취소됨 ? (
+                      <Text>사유 : {data[liveShoppingId].rejectionReason}</Text>
+                    ) : null}
+                  </Stack>
+                  <Divider />
+                  <Stack direction="row" alignItems="center">
+                    <Text as="span">방송인: </Text>
+                    {data[liveShoppingId].broadcaster ? (
+                      <>
+                        <BroadcasterName data={data[liveShoppingId].broadcaster} />
+                        {data[liveShoppingId].broadcaster.channelUrl && (
+                          <BroadcasterChannelButton
+                            channelUrl={data[liveShoppingId].broadcaster.channelUrl}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <Text fontWeight="bold">미정</Text>
+                    )}
+                  </Stack>
+                  <Stack direction="row" alignItems="center">
+                    <Text as="span">방송시작 시간: </Text>
+                    <Text as="span" fontWeight="bold">
+                      {data[liveShoppingId].broadcastStartDate
+                        ? dayjs(data[liveShoppingId].broadcastStartDate).format(
+                            'YYYY/MM/DD HH:mm',
+                          )
+                        : '미정'}
+                    </Text>
+                  </Stack>
 
-                <Divider />
-                <Stack direction="row" alignItems="center">
-                  <Text as="span">판매시작 시간: </Text>
-                  <Text as="span" fontWeight="bold">
-                    {data[liveShoppingId].sellStartDate
-                      ? dayjs(data[liveShoppingId].sellStartDate).format(
-                          'YYYY/MM/DD HH:mm',
-                        )
-                      : '미정'}
-                  </Text>
-                </Stack>
+                  <Stack direction="row" alignItems="center">
+                    <Text as="span">방송종료 시간: </Text>
+                    <Text as="span" fontWeight="bold">
+                      {data[liveShoppingId].broadcastEndDate
+                        ? dayjs(data[liveShoppingId].broadcastEndDate).format(
+                            'YYYY/MM/DD HH:mm',
+                          )
+                        : '미정'}
+                    </Text>
+                  </Stack>
 
-                <Stack direction="row" alignItems="center">
-                  <Text as="span">판매종료 시간: </Text>
-                  <Text as="span" fontWeight="bold">
-                    {data[liveShoppingId].sellEndDate
-                      ? dayjs(data[liveShoppingId].sellEndDate).format('YYYY/MM/DD HH:mm')
-                      : '미정'}
-                  </Text>
-                </Stack>
+                  <Divider />
+                  <Stack direction="row" alignItems="center">
+                    <Text as="span">판매시작 시간: </Text>
+                    <Text as="span" fontWeight="bold">
+                      {data[liveShoppingId].sellStartDate
+                        ? dayjs(data[liveShoppingId].sellStartDate).format(
+                            'YYYY/MM/DD HH:mm',
+                          )
+                        : '미정'}
+                    </Text>
+                  </Stack>
 
-                <Divider />
-                <Stack direction="row" alignItems="center">
-                  <Text as="span">방송인 수수료: </Text>
-                  <Text as="span" fontWeight="bold">
-                    {data[liveShoppingId].broadcasterCommissionRate
-                      ? `${data[liveShoppingId].broadcasterCommissionRate}%`
-                      : '미정'}
-                  </Text>
-                </Stack>
+                  <Stack direction="row" alignItems="center">
+                    <Text as="span">판매종료 시간: </Text>
+                    <Text as="span" fontWeight="bold">
+                      {data[liveShoppingId].sellEndDate
+                        ? dayjs(data[liveShoppingId].sellEndDate).format(
+                            'YYYY/MM/DD HH:mm',
+                          )
+                        : '미정'}
+                    </Text>
+                  </Stack>
 
-                <Stack direction="row" alignItems="center">
-                  <Text as="span">판매 수수료: </Text>
-                  <Text as="span" fontWeight="bold">
-                    {data[liveShoppingId].whiletrueCommissionRate
-                      ? `${data[liveShoppingId].whiletrueCommissionRate}%`
-                      : '미정'}
-                  </Text>
-                </Stack>
+                  <Divider />
+                  <Stack direction="row" alignItems="center">
+                    <Text as="span">방송인 수수료: </Text>
+                    <Text as="span" fontWeight="bold">
+                      {data[liveShoppingId].broadcasterCommissionRate
+                        ? `${data[liveShoppingId].broadcasterCommissionRate}%`
+                        : '미정'}
+                    </Text>
+                  </Stack>
 
-                <Stack>
-                  <Text>요청사항</Text>
-                  <Textarea
-                    resize="none"
-                    rows={10}
-                    value={data[liveShoppingId].requests || ''}
-                    readOnly
-                  />
-                </Stack>
-              </Stack>
-            </ModalBody>
+                  <Stack direction="row" alignItems="center">
+                    <Text as="span">판매 수수료: </Text>
+                    <Text as="span" fontWeight="bold">
+                      {data[liveShoppingId].whiletrueCommissionRate
+                        ? `${data[liveShoppingId].whiletrueCommissionRate}%`
+                        : '미정'}
+                    </Text>
+                  </Stack>
 
-            <ModalFooter>
-              <Button colorScheme="blue" onClick={detailOnClose}>
-                닫기
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
+                  <Stack>
+                    <Text>요청사항</Text>
+                    <Textarea
+                      resize="none"
+                      rows={10}
+                      value={data[liveShoppingId].requests || ''}
+                      readOnly
+                    />
+                  </Stack>
+                </Stack>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button colorScheme="blue" onClick={detailOnClose}>
+                  닫기
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        )}
 
       <ConfirmDialog
         title="라이브 쇼핑 삭제"
