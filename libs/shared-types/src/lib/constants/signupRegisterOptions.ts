@@ -9,7 +9,8 @@ export const emailRegisterOptions = {
     message: '이메일 형식이 올바르지 않습니다.',
   },
   validate: {
-    noUppercase: (v) => v.toLowerCase() === v || '영문 대문자는 사용할 수 없습니다.',
+    noUppercase: (v: string) =>
+      v.toLowerCase() === v || '영문 대문자는 사용할 수 없습니다.',
   },
 };
 
