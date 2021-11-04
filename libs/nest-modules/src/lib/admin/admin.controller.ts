@@ -121,12 +121,17 @@ export class AdminController {
 
   @Patch('/live-shopping')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  async updateLiveShoppings(@Body() dto: LiveShoppingDTO): Promise<boolean> {
+  async updateLiveShoppings(
+    @Body() data: { dto: LiveShoppingDTO; videoUrlExist?: boolean },
+  ): Promise<boolean> {
     let videoId;
-    if (dto.videoUrl) {
-      videoId = await this.adminService.registVideoUrl(dto.videoUrl);
+    if (data.dto.videoUrl) {
+      if (data.videoUrlExist) {
+        await this.adminService.deleteVideoUrl(data.dto.id);
+      }
+      videoId = await this.adminService.registVideoUrl(data.dto.videoUrl);
     }
-    return this.adminService.updateLiveShoppings(dto, videoId);
+    return this.adminService.updateLiveShoppings(data.dto, videoId);
   }
 
   @Get('/live-shopping/broadcasters')

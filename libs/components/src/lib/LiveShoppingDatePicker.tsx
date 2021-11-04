@@ -1,4 +1,4 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, useColorModeValue } from '@chakra-ui/react';
 import TextField from '@material-ui/core/TextField';
 import { useFormContext } from 'react-hook-form';
 import dayjs from 'dayjs';
@@ -12,7 +12,7 @@ export function LiveShoppingDatePicker(props: {
   const { register } = useFormContext();
   const now = dayjs().format('YYYY-MM-DDThh:mm');
   return (
-    <Box>
+    <Box bg={useColorModeValue('inherit', 'gray.600')}>
       <Text>{title}</Text>
       <TextField
         {...register(`${registerName}`, { min: min || now })}
