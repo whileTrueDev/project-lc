@@ -23,13 +23,11 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useUpdateReturnStatusMutation } from '@project-lc/hooks';
-import {
-  convertFmReturnStatusToString,
-  FmOrderReturnBase,
-} from '@project-lc/shared-types';
+import { FmOrderReturnBase } from '@project-lc/shared-types';
 import { useForm } from 'react-hook-form';
 import { AiFillWarning } from 'react-icons/ai';
 import { RiErrorWarningFill } from 'react-icons/ri';
+import { FmReturnStatusBadge } from './FmReturnStatusBadge';
 
 interface OrderRetusnStatusForm {
   status: FmOrderReturnBase['status'];
@@ -84,7 +82,7 @@ export function OrderReturnStatusDialog({
           <ModalCloseButton />
           <ModalBody>
             <Text size="lg" mb={4}>
-              현재 반품 상태 : {convertFmReturnStatusToString(data.status)}
+              현재 반품 상태 : <FmReturnStatusBadge returnStatus={data.status} />
             </Text>
             {watch('status') === 'complete' && (
               <Alert mb={2} status="warning">

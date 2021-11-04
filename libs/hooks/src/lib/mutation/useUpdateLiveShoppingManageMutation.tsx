@@ -12,9 +12,11 @@ type LiveShoppingManage = Omit<
 export const useUpdateLiveShoppingManageMutation = (): UseMutationResult<
   LiveShopping,
   AxiosError,
-  LiveShoppingManage
+  { dto: LiveShoppingManage; videoUrlExist?: boolean }
 > => {
-  return useMutation((dto: LiveShoppingManage) =>
-    axios.patch('/admin/live-shopping', dto).then((res) => res.data),
+  return useMutation((data: { dto: LiveShoppingManage; videoUrlExist?: boolean }) =>
+    axios
+      .patch('/admin/live-shopping', { dto: data.dto, videoUrlExist: data.videoUrlExist })
+      .then((res) => res.data),
   );
 };

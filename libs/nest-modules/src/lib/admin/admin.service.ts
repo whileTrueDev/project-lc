@@ -265,6 +265,7 @@ export class AdminService {
           select: { youtubeUrl: true },
         },
       },
+      orderBy: { createDate: 'desc' },
     });
   }
 
@@ -309,8 +310,24 @@ export class AdminService {
     if (!videoUrl) {
       throw new Error(`비디오 등록 실패`);
     }
-
     return videoUrl.id;
+  }
+
+  public async deleteVideoUrl(liveShoppingId: number): Promise<boolean> {
+    const videoUrl = await this.prisma.liveShopping.update({
+      where: {
+        id: Number(liveShoppingId),
+      },
+      data: {
+        liveShoppingVideo: {
+          delete: true,
+        },
+      },
+    });
+    if (!videoUrl) {
+      throw new Error(`비디오 삭제 실패`);
+    }
+    return true;
   }
 
   /**

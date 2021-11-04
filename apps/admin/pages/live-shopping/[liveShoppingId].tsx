@@ -16,6 +16,7 @@ import {
   Divider,
   Input,
   Textarea,
+  Link,
 } from '@chakra-ui/react';
 import {
   AdminPageLayout,
@@ -117,8 +118,9 @@ export function GoodsDetail(): JSX.Element {
       'streamId' | 'sellerId' | 'goods_id' | 'contactId' | 'requests'
     >,
   ): Promise<void> => {
+    const videoUrlExist = Boolean(liveShopping[0]?.liveShoppingVideo.youtubeUrl);
     const dto = Object.assign(data, { id: liveShoppingId });
-    mutateAsync(dto).then(onSuccess).catch(onFail);
+    mutateAsync({ dto, videoUrlExist }).then(onSuccess).catch(onFail);
   };
 
   if (liveShoppingIsLoading || goods.isLoading)
@@ -202,6 +204,24 @@ export function GoodsDetail(): JSX.Element {
                 )}
               </Text>
             </Stack>
+            {liveShopping[0].progress === 'confirmed' &&
+              liveShopping[0].liveShoppingVideo && (
+                <Stack direction="row" alignItems="center">
+                  <Text as="span">영상 URL: </Text>
+                  <Text as="span" fontWeight="bold">
+                    <Link
+                      isTruncated
+                      href={liveShopping[0].liveShoppingVideo.youtubeUrl || ''}
+                      fontWeight="bold"
+                      colorScheme="blue"
+                      textDecoration="underline"
+                      isExternal
+                    >
+                      {liveShopping[0].liveShoppingVideo.youtubeUrl || ''}
+                    </Link>
+                  </Text>
+                </Stack>
+              )}
 
             <Divider />
 
