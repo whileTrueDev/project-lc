@@ -34,6 +34,8 @@ export function AdminSettlementDoneList(): JSX.Element | null {
           <Th>총 정산상품 개수</Th>
           <Th>총 금액</Th>
           <Th>전자결제 수수료</Th>
+          <Th>결제방법</Th>
+          <Th>pg</Th>
           <Th>배송비</Th>
           <Th>총 수수료액</Th>
           <Th>총정산금액</Th>
@@ -51,6 +53,8 @@ export function AdminSettlementDoneList(): JSX.Element | null {
             <Td>{history.totalEa}</Td>
             <Td>{history.totalPrice.toLocaleString()}</Td>
             <Td>{history.pgCommission.toLocaleString()}</Td>
+            <Td>{history.paymentMethod}</Td>
+            <Td>{history.pg}</Td>
             <Td>{history.shippingCost}</Td>
             <Td>{history.totalCommission.toLocaleString()}</Td>
             <Td>{history.totalAmount.toLocaleString()}</Td>

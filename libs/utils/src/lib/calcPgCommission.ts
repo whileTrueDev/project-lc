@@ -10,6 +10,7 @@ export type CalcPgCommissionOptions = {
 export function calcPgCommission(opts: CalcPgCommissionOptions): {
   commission: number;
   rate: string;
+  description: string;
 } {
   const { pg, paymentMethod, targetAmount } = opts;
   if (pg === 'npay' || pg === 'npg') {
@@ -20,27 +21,48 @@ export function calcPgCommission(opts: CalcPgCommissionOptions): {
         const fee = targetAmount * (1 / 100);
         return {
           commission: fee > 275 ? 275 : Math.floor(fee),
-          rate: '1.00%(최대275원)',
+          rate: '1.00',
+          description: '% (최대275원)',
         };
       }
       case 'card': // 카드결제
-        return { commission: Math.floor(targetAmount * (2.2 / 100)), rate: '2.2%' };
+        return {
+          commission: Math.floor(targetAmount * (2.2 / 100)),
+          rate: '2.2',
+          description: '%',
+        };
       case 'point': // 네이버페이 포인트
-        return { commission: Math.floor(targetAmount * (3.74 / 100)), rate: '3.74%' };
+        return {
+          commission: Math.floor(targetAmount * (3.74 / 100)),
+          rate: '3.74',
+          description: '%',
+        };
       case 'cellphone': // 휴대폰 결제
-        return { commission: Math.floor(targetAmount * (3.85 / 100)), rate: '3.85%' };
+        return {
+          commission: Math.floor(targetAmount * (3.85 / 100)),
+          rate: '3.85',
+          description: '%',
+        };
       default:
     }
   }
   switch (paymentMethod) {
     case 'account': // 계좌입금
-      return { commission: Math.floor(targetAmount * (1.98 / 100)), rate: '1.98%' };
+      return {
+        commission: Math.floor(targetAmount * (1.98 / 100)),
+        rate: '1.98',
+        description: '%',
+      };
     case 'virtual': // 가상계좌 (고정수수료)
-      return { commission: 330, rate: '330원고정' };
+      return { commission: 330, rate: '330', description: '원 (고정)' };
     case 'cellphone': // 휴대폰결제
-      return { commission: Math.floor(targetAmount * (3.85 / 100)), rate: '3.85%' };
+      return {
+        commission: Math.floor(targetAmount * (3.85 / 100)),
+        rate: '3.85',
+        description: '%',
+      };
     case 'bank': // 무통장입금
     default:
-      return { commission: 0, rate: '무료' };
+      return { commission: 0, rate: '0', description: '무료' };
   }
 }

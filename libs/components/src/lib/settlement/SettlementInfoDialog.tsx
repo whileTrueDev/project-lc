@@ -208,7 +208,9 @@ export function SettlementInfoItem({
       </GridItem>
       <GridItem>전자결제수수료</GridItem>
       <GridItem>{`${pgCommission.commission.toLocaleString()} (${
-        pgCommission.rate
+        pgCommission.rate === '0'
+          ? pgCommission.description
+          : pgCommission.rate + pgCommission.description
       })`}</GridItem>
       {settlementItem.liveShoppingId ? (
         <>

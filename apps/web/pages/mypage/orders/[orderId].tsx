@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Center,
+  Flex,
   Skeleton,
   SkeletonCircle,
   SkeletonText,
@@ -75,7 +76,7 @@ export function OrderDetail(): JSX.Element {
   if (!order.isLoading && !isViewableOrder)
     return (
       <MypageLayout>
-        <Box m="auto" maxW="4xl">
+        <Flex m="auto" maxW="4xl" h={400} justify="center" alignItems="center">
           <Stack spacing={2}>
             <Center>
               <Text>주문 데이터를 불러오지 못했습니다.</Text>
@@ -87,7 +88,7 @@ export function OrderDetail(): JSX.Element {
               <Button onClick={() => router.push('/mypage/orders')}>돌아가기</Button>
             </Center>
           </Stack>
-        </Box>
+        </Flex>
       </MypageLayout>
     );
 

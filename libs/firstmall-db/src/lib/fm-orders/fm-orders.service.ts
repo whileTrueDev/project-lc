@@ -21,6 +21,7 @@ import {
   OrderStatsRes,
   LiveShoppingWithSalesAndFmId,
   ChangeReturnStatusDto,
+  fmOrderStatuses,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
@@ -78,6 +79,9 @@ export class FmOrdersService {
       }),
     );
 
+    if (dto.searchStatuses && dto.searchStatuses.length > 0) {
+      return detailAtteched.filter((x) => dto.searchStatuses.includes(x.step));
+    }
     return detailAtteched;
   }
 
@@ -107,9 +111,13 @@ export class FmOrdersService {
     JOIN (
       SELECT item_seq, MIN(step) AS optionRealStep
       FROM fm_order_item_option
+      JOIN fm_order_item USING(item_seq)
+      WHERE goods_seq IN (${goodsIds.join(',')})
       GROUP BY item_seq
     ) fm_order_item_option USING(item_seq)
-    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
+    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')}) AND step IN (
+      15, 25, 35, 40, 45, 50, 55, 60, 65, 70, 75, 85, 95, 99
+    )
     `;
 
     const searchSql = `goods_name LIKE ?
@@ -160,12 +168,6 @@ export class FmOrdersService {
         params = [dto.searchEndDate];
       }
 
-      if (dto.searchStatuses && dto.searchStatuses.length > 0) {
-        whereSql += `\nAND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
-          ',',
-        )}) `;
-      }
-
       if (dto.search) {
         whereSql += `\nAND (${searchSql}) `;
         params = params.concat(new Array(19).fill(`%${dto.search}%`));
@@ -185,12 +187,6 @@ export class FmOrdersService {
       whereSql = `\nAND (${searchSql})`;
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
 
-      if (dto.searchStatuses && dto.searchStatuses.length > 0) {
-        whereSql += `\nAND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
-          ',',
-        )}) `;
-      }
-
       return {
         sql: defaultQueryHead + whereSql + groupbySql + orderSql,
         params: new Array(19).fill(`%${dto.search}%`),
@@ -198,9 +194,6 @@ export class FmOrdersService {
     }
 
     if (dto.searchStatuses && dto.searchStatuses.length > 0) {
-      whereSql += `AND IF(step IN (40, 50, 60, 70), step, optionRealStep) IN (${dto.searchStatuses.join(
-        ',',
-      )})`;
       orderSql = `\nORDER BY fm_order.regist_date DESC`;
       return {
         sql: defaultQueryHead + whereSql + groupbySql + orderSql,
@@ -309,10 +302,13 @@ export class FmOrdersService {
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
     JOIN fm_order_shipping USING(shipping_seq)
-    WHERE fm_order.order_seq = ? AND goods_seq IN (${goodsIds.join(',')})`;
-    const result = await this.db.query(sql, [orderId]);
+    WHERE fm_order.order_seq = ? AND goods_seq IN (${goodsIds.join(',')})
+    `;
+    const result: FmOrderMetaInfo[] = await this.db.query(sql, [orderId]);
     const order = result.length > 0 ? result[0] : null;
     if (!order) return null;
+    // step이 정상적이지 않은 주문인 경우 조회하지 않음.
+    if (!Object.keys(fmOrderStatuses).includes(order.step)) return null;
 
     const parser = new FmOrderMemoParser(order.memo);
     return {

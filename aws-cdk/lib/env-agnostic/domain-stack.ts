@@ -77,9 +77,15 @@ export class LCDomainStack extends cdk.Stack {
   }
 
   private createDevRecords(): void {
-    // Dev환경용 ALB로 라우팅하는 기본 dev.크크쇼.com 레코드 생성
-    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_dev`, {
-      recordName: `dev.${this.PUNYCODE_DOMAIN}`,
+    // Dev환경용 ALB로 라우팅하는 기본 dev-api.크크쇼.com 레코드 생성
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_devapi`, {
+      recordName: `dev-api.${this.PUNYCODE_DOMAIN}`,
+      zone: this.hostedzone,
+      target: route53.RecordTarget.fromAlias(this.devALBTarget),
+    });
+    // Dev환경용 ALB로 라우팅하는 기본 dev-live.크크쇼.com 레코드 생성
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_devlive`, {
+      recordName: `dev-live.${this.PUNYCODE_DOMAIN}`,
       zone: this.hostedzone,
       target: route53.RecordTarget.fromAlias(this.devALBTarget),
     });
