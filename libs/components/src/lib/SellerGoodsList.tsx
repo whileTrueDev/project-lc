@@ -40,12 +40,7 @@ function formatDate(date: Date): string {
 /** 라이브쇼핑 진행중이므로 수정 불가 표시 */
 export function GoodsEditDisabledText(): JSX.Element {
   return (
-    <TextWithPopperButton
-      title="수정불가"
-      iconAriaLabel="수정불가"
-      iconColor="black"
-      portalBody
-    >
+    <TextWithPopperButton title="수정불가" iconAriaLabel="수정불가" portalBody>
       <Text>
         현재 라이브 쇼핑이 진행중인 상품으로 상품 정보를 변경할 수 없습니다. <br />
         상품 정보를 수정하고 싶은 경우 고객센터로 문의해주세요.
@@ -159,7 +154,6 @@ const columns: GridColumns = [
   //       <TextWithPopperButton
   //         title="재고/가용"
   //         iconAriaLabel="재고/가용 설명"
-  //         iconColor="black"
   //         portalBody
   //       >
   //         <ExampleStockDescription />
@@ -201,7 +195,6 @@ const columns: GridColumns = [
   //       <TextWithPopperButton
   //         title="재고판매"
   //         iconAriaLabel="재고판매 설명"
-  //         iconColor="black"
   //         portalBody
   //       >
   //         <Text mb={2} fontWeight="bold">
@@ -311,7 +304,6 @@ const columns: GridColumns = [
               </Badge>
             }
             iconAriaLabel={label}
-            iconColor="black"
             portalBody
           >
             <Text fontWeight="bold" mb={1}>
