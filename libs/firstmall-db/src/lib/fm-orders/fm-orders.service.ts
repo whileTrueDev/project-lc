@@ -21,6 +21,7 @@ import {
   OrderStatsRes,
   LiveShoppingWithSalesAndFmId,
   ChangeReturnStatusDto,
+  fmOrderStatuses,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
@@ -109,7 +110,9 @@ export class FmOrdersService {
       FROM fm_order_item_option
       GROUP BY item_seq
     ) fm_order_item_option USING(item_seq)
-    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
+    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')}) AND step IN (
+      15, 25, 35, 40, 45, 50, 55, 60, 65, 70, 75, 85, 95, 99
+    )
     `;
 
     const searchSql = `goods_name LIKE ?
@@ -309,9 +312,12 @@ export class FmOrdersService {
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
     JOIN fm_order_shipping USING(shipping_seq)
-    WHERE fm_order.order_seq = ? AND goods_seq IN (${goodsIds.join(',')})`;
-    const result = await this.db.query(sql, [orderId]);
+    WHERE fm_order.order_seq = ? AND goods_seq IN (${goodsIds.join(',')})
+    `;
+    const result: FmOrderMetaInfo[] = await this.db.query(sql, [orderId]);
     const order = result.length > 0 ? result[0] : null;
+    // step이 정상적이지 않은 주문인 경우 조회하지 않음.
+    if (!Object.keys(fmOrderStatuses).includes(order.step)) return null;
     if (!order) return null;
 
     const parser = new FmOrderMemoParser(order.memo);
