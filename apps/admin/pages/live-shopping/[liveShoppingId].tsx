@@ -42,7 +42,6 @@ import {
   useAdminBroadcaster,
   useAdminGoodsById,
   useUpdateLiveShoppingManageMutation,
-  useDeleteLiveShoppingVideoMutation,
 } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -75,7 +74,6 @@ export function GoodsDetail(): JSX.Element {
   const goods = useAdminGoodsById(goodsId);
   const { data: broadcaster } = useAdminBroadcaster();
   const { mutateAsync } = useUpdateLiveShoppingManageMutation();
-  const { mutateAsync: deleteLiveShoppingVideo } = useDeleteLiveShoppingVideoMutation();
   const methods = useForm({
     defaultValues: {
       progress: '',
