@@ -13,10 +13,15 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useExportOrderMutation, useOrderExportableCheck } from '@project-lc/hooks';
+import {
+  useExportOrderMutation,
+  useOrderExportableCheck,
+  checkShippingCanExport,
+  checkShippingExportIsDone,
+} from '@project-lc/hooks';
 import { ExportOrderDto, FindFmOrderDetailRes } from '@project-lc/shared-types';
 import { fmExportStore } from '@project-lc/stores';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ExportBundleDialog } from './ExportBundleDialog';
 import { ExportOrderOptionList } from './ExportOrderOptionList';
@@ -84,6 +89,15 @@ export function ExportDialog({
     [exportOrder, formMethods, onExportFail, onExportSuccess, toast],
   );
 
+  /** 합포장 출고처리가 가능한지 여부 */
+  const isBundleExportable = useMemo(() => {
+    return order.shippings.every((shipping) => {
+      const a = checkShippingCanExport(shipping);
+      const isShippingDone = checkShippingExportIsDone(shipping);
+      return a && !isShippingDone;
+    });
+  }, [order.shippings]);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -123,7 +137,7 @@ export function ExportDialog({
               colorScheme="pink"
               onClick={bundleDialog.onOpen}
               variant="outline"
-              isDisabled={order.shippings.length < 2}
+              isDisabled={!isBundleExportable}
             >
               합포장출고처리
             </Button>
