@@ -14,7 +14,6 @@ import {
   useProfile,
   useRegistGoods,
 } from '@project-lc/hooks';
-import path from 'path';
 import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { FormProvider, NestedValue, useForm } from 'react-hook-form';
@@ -63,11 +62,7 @@ export async function uploadGoodsImageToS3(
   userMail: string,
 ): Promise<string> {
   const { file, filename, contentType } = imageFile;
-
-  const type = 'goods';
-  const timestampFilename = addTimeStampToFilename(filename);
-  const key = path.join(...[type, userMail, timestampFilename]);
-  return s3.s3uploadFile({ key, file, contentType });
+  return s3.s3uploadFile({ file, filename, contentType, userMail, type: 'goods' });
 }
 
 // options 에 default_option, option_title설정
