@@ -254,7 +254,7 @@ export class LCDevAppStack extends cdk.Stack {
     // HTTP 리스너에 Overlay 서버 타겟그룹 추가
     HttpsListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
       priority: 1,
-      conditions: [elbv2.ListenerCondition.hostHeaders(['preview-livecommerce.onad.io'])],
+      conditions: [elbv2.ListenerCondition.hostHeaders(['dev-live.onad.io'])],
       targetGroups: [overlayTargetGroup],
     });
 
