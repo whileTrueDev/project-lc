@@ -759,13 +759,25 @@ export class FmOrdersService {
   // * **********************************
   public async getOrdersStats(goodsIds: number[]): Promise<OrderStatsRes> {
     const sql = `
+    SELECT 
+      order_seq, 
+      payment_price,
+      regist_date,	
+      min(step) as step
+    FROM (
     SELECT
-      fm_order.*
+      order_seq,
+      payment_price,
+      regist_date,
+      goods_seq,
+      item_seq
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
     WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
     AND DATE(regist_date) >= ?
-    ORDER BY regist_date DESC
+    ) AS A
+    JOIN fm_order_item_option AS B USING (order_seq, item_seq)
+    GROUP BY order_seq
     `;
     const exMonth = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
     const data = (await this.db.query(sql, [exMonth])) as FindFmOrderRes[];

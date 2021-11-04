@@ -16,6 +16,7 @@ import TooltipedText from '../TooltipedText';
 
 export type SeletctedLiveShoppingType = Partial<LiveShoppingProgressParams> & {
   goodsId: number;
+  sellStartDate?: Date | null;
 };
 
 const columns: GridColumns = [
@@ -116,7 +117,7 @@ const columns: GridColumns = [
   },
 ];
 
-function getDateString(date: Date | null | undefined): string | undefined {
+function getDateString(date: Date | string | null | undefined): string | undefined {
   if (date) {
     return dayjs(date).format('YYYY-MM-DD');
   }
@@ -143,8 +144,8 @@ export function AdminGiftList(props: {
         '출고준비',
       ]),
       goodsIds: [selectedGoods.goodsId],
-      searchStartDate: getDateString(selectedGoods?.broadcastStartDate),
-      searchEndDate: getDateString(selectedGoods?.broadcastEndDate),
+      searchStartDate: getDateString(selectedGoods?.sellStartDate),
+      searchEndDate: getDateString(selectedGoods?.sellEndDate),
     },
     {},
     'admin',

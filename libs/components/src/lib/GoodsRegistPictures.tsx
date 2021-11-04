@@ -71,7 +71,7 @@ export function GoodsPreviewItem(
   const { id, filename: fileName, url, onDelete, ...rest } = props;
 
   return (
-    <HStack>
+    <HStack mr={2} mb={2}>
       <ChakraNextImage layout="intrinsic" alt={fileName} src={url} {...rest} />
       <CloseButton onClick={onDelete} />
     </HStack>
@@ -261,7 +261,7 @@ export function GoodsRegistPictures(): JSX.Element {
         )}
 
         {/* 등록된 이미지 목록 */}
-        <Stack direction="row" spacing={2} flexWrap="wrap">
+        <Stack direction="row" flexWrap="wrap" spacing={2}>
           {savedImages &&
             savedImages.map((i) => (
               <GoodsPreviewItem

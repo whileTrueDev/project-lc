@@ -90,6 +90,7 @@ export class FmOrdersController {
     return this.fmOrdersService.findOrders(ids, dto);
   }
 
+  /** 마이페이지 요약지표 조회 */
   @Get('/stats')
   async getOrdersStats(@SellerInfo() seller: UserPayload): Promise<OrderStatsRes> {
     // 판매자의 승인된 상품 ID 목록 조회
