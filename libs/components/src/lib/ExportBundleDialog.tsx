@@ -158,7 +158,8 @@ export function ExportBundleDialog({
           {isAbleToBundle ? (
             <>
               <Text>
-                선택된 주문 {selectedOrderShippings.length} 개를 합포장 처리 합니다.
+                선택된 주문의 배송묶음 {selectedOrderShippings.length} 개를 합포장 처리
+                합니다.
               </Text>
               <Stack mt={4} spacing={2}>
                 <FormControl>
@@ -207,7 +208,7 @@ export function ExportBundleDialog({
             colorScheme="pink"
             onClick={() => onBundledExportSubmit()}
           >
-            출고처리
+            합포장 출고처리
           </Button>
           <Button onClick={onClose} ml={2}>
             취소
