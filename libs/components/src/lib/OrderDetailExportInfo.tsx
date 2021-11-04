@@ -123,7 +123,7 @@ export function OrderDetailExportInfoItem({
 }): JSX.Element {
   const emphasizeColor = useColorModeValue('red.500', 'red.300');
   // * 합배송 여부 체크 + 현재 조회중인 주문이 아닌 다른 주문인 지 체크
-  const isBundledAndRightOrder = useMemo(() => {
+  const isBundledAndCurrenSeeingOrder = useMemo(() => {
     const allOpts: FmOrderOption[] = [];
 
     orderItems.forEach((oi) => {
@@ -132,8 +132,8 @@ export function OrderDetailExportInfoItem({
       });
     });
 
-    const isRight = allOpts.find((x) => x.item_option_seq === io.item_option_seq);
-    if (isRight) return true;
+    const isCurrent = allOpts.find((x) => x.item_option_seq === io.item_option_seq);
+    if (isCurrent) return true;
     return false;
   }, [io.item_option_seq, orderItems]);
   return (
@@ -150,7 +150,7 @@ export function OrderDetailExportInfoItem({
         )}
         <Text ml={io.image ? 2 : 0}>{io.goods_name} </Text>
       </Flex>
-      {bundleExportCode && !isBundledAndRightOrder && (
+      {bundleExportCode && !isBundledAndCurrenSeeingOrder && (
         <Text color={emphasizeColor}>합포장(묶음배송) 상품</Text>
       )}
       <OrderDetailOptionListItem key={io.item_option_seq} option={io} />
