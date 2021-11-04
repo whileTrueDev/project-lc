@@ -265,6 +265,7 @@ export class AdminService {
           select: { youtubeUrl: true },
         },
       },
+      orderBy: { createDate: 'desc' },
     });
   }
 
