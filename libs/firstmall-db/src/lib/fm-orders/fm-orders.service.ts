@@ -306,9 +306,9 @@ export class FmOrdersService {
     `;
     const result: FmOrderMetaInfo[] = await this.db.query(sql, [orderId]);
     const order = result.length > 0 ? result[0] : null;
+    if (!order) return null;
     // step이 정상적이지 않은 주문인 경우 조회하지 않음.
     if (!Object.keys(fmOrderStatuses).includes(order.step)) return null;
-    if (!order) return null;
 
     const parser = new FmOrderMemoParser(order.memo);
     return {

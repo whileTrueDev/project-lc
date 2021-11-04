@@ -7,7 +7,6 @@ import {
   orderDetailOptionsSample,
   orderDetailRefundsSample,
   orderDetailReturnsSample,
-  orderMetaInfoSample,
 } from '../../__tests__/orderDetailSample';
 import { ordersSample } from '../../__tests__/ordersSample';
 import { FirstmallDbService } from '../firstmall-db.service';
@@ -40,7 +39,7 @@ describe('FmOrdersService', () => {
         searchDateType: '주문일',
         searchStartDate: '2020-08-23',
         searchEndDate: '2020-08-24',
-        searchStatuses: ['45', '55'],
+        searchStatuses: ['25', '45', '55'],
       };
       const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
@@ -143,7 +142,6 @@ describe('FmOrdersService', () => {
     expect(sql).toContain('WHERE fm_order_item.goods_seq IN (41)');
 
     // where 구문이 올바르게 들어갔는 지 검사
-    expect(sql).toContain('AND IF(step IN (40, 50, 60, 70');
 
     // params 길이, 내용 검사
     expect(params.length).toBe(0);
@@ -165,7 +163,6 @@ describe('FmOrdersService', () => {
 
     // where 구문이 올바르게 들어갔는 지 검사
     expect(sql).toContain('AND DATE(regist_date) <= ?');
-    expect(sql).toContain('AND IF(step IN (40, 50, 60, 70');
 
     // params 길이, 내용 검사
     expect(params.length).toBe(1);
@@ -179,7 +176,7 @@ describe('FmOrdersService', () => {
         searchDateType: '주문일',
         searchStartDate: '2020-08-23',
         searchEndDate: '2020-08-24',
-        searchStatuses: ['45', '55'],
+        searchStatuses: ['25', '45', '55'],
       };
 
       // db.query를 mocking + spyon 하여 db.query 함수 요청 정보를 트래킹 + 실제 호출되지 않도록
