@@ -8,7 +8,12 @@ export const emailRegisterOptions = {
     value: emailPattern,
     message: '이메일 형식이 올바르지 않습니다.',
   },
+  validate: {
+    noUppercase: (v: string) =>
+      v.toLowerCase() === v || '영문 대문자는 사용할 수 없습니다.',
+  },
 };
+
 export const passwordRegisterOptions = {
   required: '암호를 작성해주세요.',
   minLength: { value: 8, message: '비밀번호는 8자 이상이어야 합니다.' },
