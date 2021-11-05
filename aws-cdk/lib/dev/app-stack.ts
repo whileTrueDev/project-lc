@@ -95,6 +95,8 @@ export class LCDevAppStack extends cdk.Stack {
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
+        API_HOST: `https://dev-api.${+constants.PUNYCODE_DOMAIN}`,
+        SELLER_WEB_HOST: `https://xn--9z2b23wk2i.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}LogGroup`, {
@@ -149,7 +151,6 @@ export class LCDevAppStack extends cdk.Stack {
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
-        API_HOST: 'https://dev-api.xn--hp4b17xa.com',
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayLogGroup`, {

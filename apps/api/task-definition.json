@@ -33,6 +33,10 @@
                 {
                     "name": "API_HOST",
                     "value": "https://api.xn--hp4b17xa.com"
+                },
+                {
+                    "name": "SELLER_WEB_HOST",
+                    "value": "https://xn--9z2b23wk2i.xn--hp4b17xa.com"
                 }
             ],
             "resourceRequirements": null,
