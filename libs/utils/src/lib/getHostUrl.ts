@@ -11,6 +11,20 @@ export const getApiHost = (): string | undefined => {
 
 export const getWebHost = (): string => {
   switch (process.env.NODE_ENV) {
+    case 'production':
+    case 'test':
+      return process.env.NEXT_PUBLIC_WEB_HOST;
+    case 'development':
+    default:
+      return 'http://localhost:4200';
+  }
+};
+
+export const getAdminHost = (): string => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+    case 'test':
+      return process.env.NEXT_PUBLIC_ADMIN_HOST;
     case 'development':
     default:
       return 'http://localhost:4200';

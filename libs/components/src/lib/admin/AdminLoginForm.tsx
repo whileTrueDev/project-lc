@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { useLoginMutation } from '@project-lc/hooks';
 import { LoginSellerDto } from '@project-lc/shared-types';
-import { getApiHost } from '@project-lc/utils';
+import { getAdminHost } from '@project-lc/utils';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -47,7 +47,7 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
           setFormError(getMessage(err?.response.data?.statusCode));
         });
       if (seller) {
-        router.push(`${getApiHost()}/admin`);
+        router.push(`${getAdminHost()}/admin`);
       }
     },
     [router, setFormError, login],
