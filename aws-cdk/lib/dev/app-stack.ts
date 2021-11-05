@@ -152,6 +152,13 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
         CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
+        GMAIL_OAUTH_REFRESH_TOKEN: ecs.Secret.fromSsmParameter(
+          this.GMAIL_OAUTH_REFRESH_TOKEN,
+        ),
+        GMAIL_OAUTH_CLIENT_ID: ecs.Secret.fromSsmParameter(this.GMAIL_OAUTH_CLIENT_ID),
+        GMAIL_OAUTH_CLIENT_SECRET: ecs.Secret.fromSsmParameter(
+          this.GMAIL_OAUTH_CLIENT_SECRET,
+        ),
         AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
       },
