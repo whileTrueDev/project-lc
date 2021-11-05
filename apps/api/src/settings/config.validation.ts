@@ -17,9 +17,7 @@ export const validationSchema = Joi.object({
 
   // Mailer account -> official.whiletrue@gmail.com
   MAILER_USER: Joi.string().required(),
-  GMAIL_OAUTH_REFRESH_TOKEN: Joi.string().required(),
-  GMAIL_OAUTH_CLIENT_ID: Joi.string().required(),
-  GMAIL_OAUTH_CLIENT_SECRET: Joi.string().required(),
+  MAILER_PASS: Joi.string().required(),
 
   // JWT
   JWT_SECRET: Joi.string().required(),
