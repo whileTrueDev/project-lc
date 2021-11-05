@@ -16,6 +16,7 @@ export const s3 = (() => {
   // bucket 이름
   const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME!;
   const S3_BUCKET_REGION = 'ap-northeast-2';
+  const S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
 
   const s3Client = new S3Client({
     region: S3_BUCKET_REGION,
@@ -73,6 +74,10 @@ export const s3 = (() => {
         fileFullName = `${prefix}_통장사본${extension}`;
         break;
       }
+      case 'goods': {
+        fileFullName = `${prefix}_${filename}`;
+        break;
+      }
       default: {
         fileFullName = `${filename}`;
       }
@@ -86,16 +91,17 @@ export const s3 = (() => {
 
   /** public-read 로 s3 업로드 */
   async function s3publicUploadFile({
-    key,
     file,
     contentType,
-  }: Pick<S3UploadImageOptions, 'file'> & {
-    key: string;
+    filename,
+    type,
+    userMail,
+  }: S3UploadImageOptions & {
     contentType: string;
   }): Promise<string> {
-    if (!file) throw new Error('file should be not null');
+    if (!userMail || !file) throw new Error('file should be not null');
+    const { key } = getS3Key({ userMail, type, filename });
     try {
-      // v3로 변환
       const command = new PutObjectCommand({
         Bucket: S3_BUCKET_NAME,
         Key: key,
@@ -104,7 +110,7 @@ export const s3 = (() => {
         ACL: 'public-read',
       });
       await s3Client.send(command);
-      return 'OK';
+      return S3_DOMIAN + key;
     } catch (error) {
       throw new Error('error in s3publicUploadFile');
     }

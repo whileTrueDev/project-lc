@@ -40,6 +40,7 @@ export function AdminLiveShoppingList({
       broadcastStartDate: row.broadcastStartDate,
       broadcastEndDate: row.broadcastEndDate,
       sellEndDate: row.sellEndDate,
+      sellStartDate: row.sellStartDate,
     });
   }
 
@@ -51,7 +52,7 @@ export function AdminLiveShoppingList({
       broadcastEndDate: row.broadcastEndDate,
       sellEndDate: row.sellEndDate,
     });
-    return ['판매종료', '방송진행중', '방송종료'].includes(progress);
+    return ['판매종료', '방송진행중', '방송종료', '확정됨'].includes(progress);
   }
 
   function handleRowClick(liveShoppingId: number): void {

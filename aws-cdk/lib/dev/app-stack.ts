@@ -29,9 +29,7 @@ export class LCDevAppStack extends cdk.Stack {
   private NAVER_CLIENT_SECRET: ssm.IStringParameter;
   private KAKAO_CLIENT_ID: ssm.IStringParameter;
   private MAILER_USER: ssm.IStringParameter;
-  private GMAIL_OAUTH_REFRESH_TOKEN: ssm.IStringParameter;
-  private GMAIL_OAUTH_CLIENT_ID: ssm.IStringParameter;
-  private GMAIL_OAUTH_CLIENT_SECRET: ssm.IStringParameter;
+  private MAILER_PASS: ssm.IStringParameter;
   private GOOGLE_CREDENTIALS_EMAIL: ssm.IStringParameter;
   private GOOGLE_CREDENTIALS_PRIVATE_KEY: ssm.IStringParameter;
   private JWT_SECRET: ssm.IStringParameter;
@@ -87,13 +85,7 @@ export class LCDevAppStack extends cdk.Stack {
         NAVER_CLIENT_SECRET: ecs.Secret.fromSsmParameter(this.NAVER_CLIENT_SECRET),
         KAKAO_CLIENT_ID: ecs.Secret.fromSsmParameter(this.KAKAO_CLIENT_ID),
         MAILER_USER: ecs.Secret.fromSsmParameter(this.MAILER_USER),
-        GMAIL_OAUTH_REFRESH_TOKEN: ecs.Secret.fromSsmParameter(
-          this.GMAIL_OAUTH_REFRESH_TOKEN,
-        ),
-        GMAIL_OAUTH_CLIENT_ID: ecs.Secret.fromSsmParameter(this.GMAIL_OAUTH_CLIENT_ID),
-        GMAIL_OAUTH_CLIENT_SECRET: ecs.Secret.fromSsmParameter(
-          this.GMAIL_OAUTH_CLIENT_SECRET,
-        ),
+        MAILER_PASS: ecs.Secret.fromSsmParameter(this.MAILER_PASS),
         JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
         CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
         CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
@@ -103,6 +95,8 @@ export class LCDevAppStack extends cdk.Stack {
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
+        API_HOST: `https://dev-api.${+constants.PUNYCODE_DOMAIN}`,
+        SELLER_WEB_HOST: `https://xn--9z2b23wk2i.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}LogGroup`, {
@@ -254,7 +248,7 @@ export class LCDevAppStack extends cdk.Stack {
     // HTTP 리스너에 Overlay 서버 타겟그룹 추가
     HttpsListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
       priority: 1,
-      conditions: [elbv2.ListenerCondition.hostHeaders(['preview-livecommerce.onad.io'])],
+      conditions: [elbv2.ListenerCondition.hostHeaders(['dev-live.onad.io'])],
       targetGroups: [overlayTargetGroup],
     });
 
@@ -328,32 +322,14 @@ export class LCDevAppStack extends cdk.Stack {
         parameterName: constants.DEV.MAILER_USER,
       },
     );
-    this.GMAIL_OAUTH_REFRESH_TOKEN =
-      ssm.StringParameter.fromSecureStringParameterAttributes(
-        this,
-        `${PREFIX}GMAIL_OAUTH_REFRESH_TOKEN`,
-        {
-          version: 1,
-          parameterName: constants.DEV.GMAIL_OAUTH_REFRESH_TOKEN,
-        },
-      );
-    this.GMAIL_OAUTH_CLIENT_ID = ssm.StringParameter.fromSecureStringParameterAttributes(
+    this.MAILER_PASS = ssm.StringParameter.fromSecureStringParameterAttributes(
       this,
-      `${PREFIX}GMAIL_OAUTH_CLIENT_ID`,
+      `${PREFIX}MAILER_PASS`,
       {
-        version: 1,
-        parameterName: constants.DEV.GMAIL_OAUTH_CLIENT_ID,
+        version: 3,
+        parameterName: constants.DEV.MAILER_PASS,
       },
     );
-    this.GMAIL_OAUTH_CLIENT_SECRET =
-      ssm.StringParameter.fromSecureStringParameterAttributes(
-        this,
-        `${PREFIX}GMAIL_OAUTH_CLIENT_SECRET`,
-        {
-          version: 1,
-          parameterName: constants.DEV.GMAIL_OAUTH_CLIENT_SECRET,
-        },
-      );
 
     this.GOOGLE_CREDENTIALS_EMAIL =
       ssm.StringParameter.fromSecureStringParameterAttributes(

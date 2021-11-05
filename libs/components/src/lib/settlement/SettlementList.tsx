@@ -1,5 +1,5 @@
-import { DownloadIcon } from '@chakra-ui/icons';
-import { Box, Button, Stack, useDisclosure } from '@chakra-ui/react';
+import { DownloadIcon, InfoIcon } from '@chakra-ui/icons';
+import { Text, Box, Button, Kbd, Stack, useDisclosure } from '@chakra-ui/react';
 import {
   GridColumns,
   GridToolbarContainer,
@@ -19,7 +19,7 @@ import { SettlementInfoDialog } from './SettlementInfoDialog';
 
 // 정산 내역을 보여주는 데이터 그리드
 export function SettlementList(): JSX.Element | null {
-  const { isDesktopSize } = useDisplaySize();
+  const { isDesktopSize, isMobileSize } = useDisplaySize();
 
   const { onOpen, isOpen, onClose } = useDisclosure();
   const selectedRound = settlementHistoryStore((s) => s.selectedRound);
@@ -52,7 +52,7 @@ export function SettlementList(): JSX.Element | null {
         </NextLink>
       ),
     },
-    { field: 'round', headerName: '회차' },
+    { field: 'round', headerName: '회차', minWidth: 100 },
     {
       field: 'startDate',
       headerName: '출고일',
@@ -117,13 +117,30 @@ export function SettlementList(): JSX.Element | null {
   if (!data) return null;
 
   return (
-    <Box px={{ base: 2, sm: 7 }} height="400px">
+    <Box px={{ base: 2, sm: 7 }} height="400px" mb={12}>
+      {data.length > 0 && (
+        <Text mb={2}>
+          <InfoIcon color="blue.500" mr={2} />
+          {isMobileSize ? (
+            <Text as="span">목록을 좌,우로 슬라이드 할 수 있습니다.</Text>
+          ) : (
+            <Text as="span">
+              <Kbd>shift</Kbd> + <Kbd>마우스스크롤</Kbd> 을 통해 목록을 좌,우로 스크롤할
+              수 있습니다.
+            </Text>
+          )}
+        </Text>
+      )}
       <ChakraDataGrid
         minHeight={120}
         headerHeight={50}
         hideFooter
         density="compact"
-        columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
+        columns={columns.map((x) => ({
+          ...x,
+          flex: isDesktopSize ? 1 : undefined,
+          minWidth: 100,
+        }))}
         rows={data || []}
         rowCount={5}
         rowsPerPageOptions={[25, 50]}

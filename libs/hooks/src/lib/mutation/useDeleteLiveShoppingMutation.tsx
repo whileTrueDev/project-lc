@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import { useMutation, UseMutationResult } from 'react-query';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import axios from '../../axios';
 
 export const deleteLiveShopping = async (liveShoppingId: number): Promise<boolean> => {
@@ -14,5 +14,14 @@ export const useDeleteLiveShopping = (): UseMutationResult<
   AxiosError,
   number
 > => {
-  return useMutation(deleteLiveShopping);
+  const queryClient = useQueryClient();
+
+  return useMutation(deleteLiveShopping, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('LiveShoppingList', { refetchInactive: true });
+      queryClient.invalidateQueries('FmOrdersDuringLiveShoppingSales', {
+        refetchInactive: true,
+      });
+    },
+  });
 };

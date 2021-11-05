@@ -33,7 +33,7 @@ export function StatCounter(): couterProps {
 
   function getOrdersKey(step: FmOrderStatusNumString): OrderStatsKeyType | null {
     const stepNum = parseInt(step, 10);
-    if (stepNum >= 35 && stepNum <= 50) {
+    if (stepNum >= 25 && stepNum <= 50) {
       return '배송준비중';
     }
     if (stepNum >= 55 && stepNum <= 70) {

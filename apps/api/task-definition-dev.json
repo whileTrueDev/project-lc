@@ -29,6 +29,14 @@
                 {
                     "name": "S3_BUCKET_NAME",
                     "value": "lc-project"
+                },
+                {
+                    "name": "API_HOST",
+                    "value": "https://dev-api.xn--hp4b17xa.com"
+                },
+                {
+                    "name": "SELLER_WEB_HOST",
+                    "value": "https://dev-seller.xn--hp4b17xa.com"
                 }
             ],
             "resourceRequirements": null,
@@ -44,18 +52,6 @@
                 {
                     "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/LC_FIRSTMALL_DB_URL",
                     "name": "FIRSTMALL_DATABASE_URL"
-                },
-                {
-                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_GMAIL_OAUTH_REFRESH_TOKEN",
-                    "name": "GMAIL_OAUTH_REFRESH_TOKEN"
-                },
-                {
-                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_GMAIL_OAUTH_CLIENT_ID",
-                    "name": "GMAIL_OAUTH_CLIENT_ID"
-                },
-                {
-                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_GMAIL_OAUTH_CLIENT_SECRET",
-                    "name": "GMAIL_OAUTH_CLIENT_SECRET"
                 },
                 {
                     "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_GOOGLE_CLIENT_ID",

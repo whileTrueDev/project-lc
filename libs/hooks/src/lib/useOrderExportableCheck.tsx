@@ -14,6 +14,7 @@ const NON_EXPORTABLE_SATTUS_NAMES: Parameters<typeof getFmOrderStatusByNames>[0]
   '주문무효',
   '결제실패',
   '결제취소',
+  '출고완료',
 ];
 
 export interface OrderExportableCheck {
@@ -59,28 +60,37 @@ export const useOrderShippingItemsExportableCheck = (
   shipping: FmOrderShipping,
 ): OrderExportableCheck => {
   const isDone = useMemo(() => {
-    return shipping.items.every((i) => {
-      return i.options.every((o) => {
-        const rest = getOptionRestEa(o);
-        return (
-          getFmOrderStatusByNames(EXPORT_DONE_SATTUS_NAMES).includes(o.step) || rest <= 0
-        );
-      });
-    });
-  }, [shipping.items]);
+    return checkShippingExportIsDone(shipping);
+  }, [shipping]);
 
   const isExportable = useMemo(() => {
-    return !shipping.items.every((i) => {
-      return i.options.every((o) => {
-        return getFmOrderStatusByNames(NON_EXPORTABLE_SATTUS_NAMES).includes(o.step);
-      });
-    });
-  }, [shipping.items]);
+    return checkShippingCanExport(shipping);
+  }, [shipping]);
 
   return {
     isDone,
     isExportable,
   };
+};
+
+export const checkShippingCanExport = (shipping: FmOrderShipping): boolean => {
+  const isExportable = !shipping.items.every((i) => {
+    return i.options.every((o) => {
+      return getFmOrderStatusByNames(NON_EXPORTABLE_SATTUS_NAMES).includes(o.step);
+    });
+  });
+  return !!isExportable;
+};
+
+export const checkShippingExportIsDone = (shipping: FmOrderShipping): boolean => {
+  return shipping.items.every((i) => {
+    return i.options.every((o) => {
+      const rest = getOptionRestEa(o);
+      return (
+        getFmOrderStatusByNames(EXPORT_DONE_SATTUS_NAMES).includes(o.step) || rest <= 0
+      );
+    });
+  });
 };
 
 function getOptionRestEa(opt: FmOrderOption): number {

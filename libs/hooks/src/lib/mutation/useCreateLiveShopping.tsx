@@ -16,7 +16,10 @@ export const useCreateLiveShoppingMutation = (): UseMutationResult<
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('Profile');
+        queryClient.invalidateQueries('LiveShoppingList', { refetchInactive: true });
+        queryClient.invalidateQueries('FmOrdersDuringLiveShoppingSales', {
+          refetchInactive: true,
+        });
       },
     },
   );

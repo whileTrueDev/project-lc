@@ -7,7 +7,6 @@ import {
   Text,
   Tooltip,
   useBreakpoint,
-  useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
 import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-grid';
@@ -200,7 +199,6 @@ export function OrderList(): JSX.Element {
   const fmOrderStates = useFmOrderStore();
   const orders = useFmOrders(fmOrderStates);
   const { isDesktopSize } = useDisplaySize();
-  const dataGridBgColor = useColorModeValue('inherit', 'gray.300');
 
   const isExportable = useMemo(() => {
     if (!orders.data) return false;
@@ -220,7 +218,6 @@ export function OrderList(): JSX.Element {
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
       <ChakraDataGrid
-        bg={dataGridBgColor}
         autoHeight
         rowsPerPageOptions={[10, 20, 50, 100]}
         disableSelectionOnClick

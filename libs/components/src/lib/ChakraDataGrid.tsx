@@ -29,6 +29,9 @@ function CustomDataGrid(props: DataGridProps): JSX.Element {
       '& .MuiTablePagination-root': {
         color: useColorModeValue('inherit', 'white'),
       },
+      '& .MuiDataGrid-cell .chakra-switch': {
+        boxSizing: 'unset',
+      },
     },
   });
   const classes = useStyle();

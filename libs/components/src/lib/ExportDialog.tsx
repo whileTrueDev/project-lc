@@ -13,10 +13,15 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useExportOrderMutation, useOrderExportableCheck } from '@project-lc/hooks';
+import {
+  useExportOrderMutation,
+  useOrderExportableCheck,
+  checkShippingCanExport,
+  checkShippingExportIsDone,
+} from '@project-lc/hooks';
 import { ExportOrderDto, FindFmOrderDetailRes } from '@project-lc/shared-types';
 import { fmExportStore } from '@project-lc/stores';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ExportBundleDialog } from './ExportBundleDialog';
 import { ExportOrderOptionList } from './ExportOrderOptionList';
@@ -40,13 +45,19 @@ export function ExportDialog({
   const formMethods = useForm<ExportOrderDto[]>();
   const exportOrder = useExportOrderMutation();
 
+  // 모달창 닫기 && orderShipping 배열 초기화
+  const closeAndResetShippings = useCallback(() => {
+    onClose();
+    resetSelectedOrderShippings();
+  }, [onClose, resetSelectedOrderShippings]);
+
   const onExportSuccess = useCallback(() => {
     toast({
       status: 'success',
       description: '출고 처리가 성공적으로 완료되었습니다.',
     });
-    onClose();
-  }, [onClose, toast]);
+    closeAndResetShippings();
+  }, [closeAndResetShippings, toast]);
 
   const onExportFail = useCallback(
     (err: any) => {
@@ -84,10 +95,22 @@ export function ExportDialog({
     [exportOrder, formMethods, onExportFail, onExportSuccess, toast],
   );
 
+  /** 합포장 출고처리가 가능한지 여부 */
+  const isBundleExportable = useMemo(() => {
+    const exportable = order.shippings.every((shipping) => {
+      const a = checkShippingCanExport(shipping);
+      const isShippingDone = checkShippingExportIsDone(shipping);
+      return a && !isShippingDone;
+    });
+    // shipping 목록이 2개 이상이어야 합포장 출고처리 버튼 활성화
+    const shippingMoreThanTwo = order.shippings.length >= 2;
+    return exportable && shippingMoreThanTwo;
+  }, [order.shippings]);
+
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={closeAndResetShippings}
       isCentered
       size="6xl"
       scrollBehavior="inside"
@@ -110,20 +133,13 @@ export function ExportDialog({
             />
           </ModalBody>
           <ModalFooter>
-            <Button
-              onClick={() => {
-                resetSelectedOrderShippings();
-                onClose();
-              }}
-            >
-              취소
-            </Button>
+            <Button onClick={closeAndResetShippings}>취소</Button>
             <Button
               ml={2}
               colorScheme="pink"
               onClick={bundleDialog.onOpen}
               variant="outline"
-              isDisabled={order.shippings.length < 2}
+              isDisabled={!isBundleExportable}
             >
               합포장출고처리
             </Button>
@@ -136,7 +152,7 @@ export function ExportDialog({
           onClose={bundleDialog.onClose}
           onSuccess={() => {
             bundleDialog.onClose();
-            onClose();
+            closeAndResetShippings();
           }}
         />
       </FormProvider>

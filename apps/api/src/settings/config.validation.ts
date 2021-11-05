@@ -17,9 +17,7 @@ export const validationSchema = Joi.object({
 
   // Mailer account -> official.whiletrue@gmail.com
   MAILER_USER: Joi.string().required(),
-  GMAIL_OAUTH_REFRESH_TOKEN: Joi.string().required(),
-  GMAIL_OAUTH_CLIENT_ID: Joi.string().required(),
-  GMAIL_OAUTH_CLIENT_SECRET: Joi.string().required(),
+  MAILER_PASS: Joi.string().required(),
 
   // JWT
   JWT_SECRET: Joi.string().required(),
@@ -28,4 +26,11 @@ export const validationSchema = Joi.object({
   CIPHER_HASH: Joi.string().required(),
   CIPHER_PASSWORD: Joi.string().required(),
   CIPHER_SALT: Joi.string().required(),
+
+  // S3
+  S3_BUCKET_NAME: Joi.string().required(),
+
+  // 호스트명
+  API_HOST: Joi.string(),
+  SELLER_WEB_HOST: Joi.string(),
 });
