@@ -5,15 +5,17 @@ dotenv.config();
 export const mailerConfig = {
   transport: {
     service: 'gmail',
-    host: 'smtp.google.com',
-    port: 587,
+    port: 465,
+    // host: 'smtp.google.com',
+    // port: 587,
     secure: true,
     auth: {
-      type: 'OAuth2',
       user: process.env.MAILER_USER,
-      clientId: process.env.GMAIL_OAUTH_CLIENT_ID,
-      clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET,
-      refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN,
+      pass: process.env.MAILER_PASS,
+      // type: 'OAuth2',
+      // clientId: process.env.GMAIL_OAUTH_CLIENT_ID,
+      // clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET,
+      // refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN,
     },
   },
   defaults: {
