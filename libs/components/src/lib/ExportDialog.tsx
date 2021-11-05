@@ -45,13 +45,19 @@ export function ExportDialog({
   const formMethods = useForm<ExportOrderDto[]>();
   const exportOrder = useExportOrderMutation();
 
+  // 모달창 닫기 && orderShipping 배열 초기화
+  const closeAndResetShippings = useCallback(() => {
+    onClose();
+    resetSelectedOrderShippings();
+  }, [onClose, resetSelectedOrderShippings]);
+
   const onExportSuccess = useCallback(() => {
     toast({
       status: 'success',
       description: '출고 처리가 성공적으로 완료되었습니다.',
     });
-    onClose();
-  }, [onClose, toast]);
+    closeAndResetShippings();
+  }, [closeAndResetShippings, toast]);
 
   const onExportFail = useCallback(
     (err: any) => {
@@ -101,7 +107,7 @@ export function ExportDialog({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={closeAndResetShippings}
       isCentered
       size="6xl"
       scrollBehavior="inside"
@@ -124,14 +130,7 @@ export function ExportDialog({
             />
           </ModalBody>
           <ModalFooter>
-            <Button
-              onClick={() => {
-                resetSelectedOrderShippings();
-                onClose();
-              }}
-            >
-              취소
-            </Button>
+            <Button onClick={closeAndResetShippings}>취소</Button>
             <Button
               ml={2}
               colorScheme="pink"
@@ -150,7 +149,7 @@ export function ExportDialog({
           onClose={bundleDialog.onClose}
           onSuccess={() => {
             bundleDialog.onClose();
-            onClose();
+            closeAndResetShippings();
           }}
         />
       </FormProvider>
