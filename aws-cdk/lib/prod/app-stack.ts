@@ -88,6 +88,7 @@ export class LCProdAppStack extends cdk.Stack {
         NAVER_CLIENT_SECRET: Secret.fromSsmParameter(p.NAVER_CLIENT_SECRET),
         KAKAO_CLIENT_ID: Secret.fromSsmParameter(p.KAKAO_CLIENT_ID),
         MAILER_USER: Secret.fromSsmParameter(p.MAILER_USER),
+        MAILER_PASS: Secret.fromSsmParameter(p.MAILER_PASS),
         GMAIL_OAUTH_REFRESH_TOKEN: Secret.fromSsmParameter(p.GMAIL_OAUTH_REFRESH_TOKEN),
         GMAIL_OAUTH_CLIENT_ID: Secret.fromSsmParameter(p.GMAIL_OAUTH_CLIENT_ID),
         GMAIL_OAUTH_CLIENT_SECRET: Secret.fromSsmParameter(p.GMAIL_OAUTH_CLIENT_SECRET),
@@ -100,6 +101,7 @@ export class LCProdAppStack extends cdk.Stack {
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
+        API_HOST: 'https://api.xn--hp4b17xa.com',
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}ApiLogGroup`, {
@@ -280,6 +282,7 @@ export class LCProdAppStack extends cdk.Stack {
       NAVER_CLIENT_SECRET: __loadSsmParmeter(c.NAVER_CLIENT_SECRET_KEY, 2),
       KAKAO_CLIENT_ID: __loadSsmParmeter(c.KAKAO_CLIENT_ID_KEY, 2),
       MAILER_USER: __loadSsmParmeter(c.MAILER_USER_KEY, 2),
+      MAILER_PASS: __loadSsmParmeter(c.MAILER_PASS_KEY, 2),
       GMAIL_OAUTH_REFRESH_TOKEN: __loadSsmParmeter(c.GMAIL_OAUTH_REFRESH_TOKEN),
       GMAIL_OAUTH_CLIENT_ID: __loadSsmParmeter(c.GMAIL_OAUTH_CLIENT_ID),
       GMAIL_OAUTH_CLIENT_SECRET: __loadSsmParmeter(c.GMAIL_OAUTH_CLIENT_SECRET),
