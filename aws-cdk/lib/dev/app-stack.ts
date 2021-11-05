@@ -326,7 +326,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}MAILER_PASS`,
       {
-        version: 2,
+        version: 3,
         parameterName: constants.DEV.MAILER_PASS,
       },
     );
