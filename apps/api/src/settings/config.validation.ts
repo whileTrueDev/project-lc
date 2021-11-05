@@ -26,4 +26,11 @@ export const validationSchema = Joi.object({
   CIPHER_HASH: Joi.string().required(),
   CIPHER_PASSWORD: Joi.string().required(),
   CIPHER_SALT: Joi.string().required(),
+
+  // S3
+  S3_BUCKET_NAME: Joi.string().required(),
+
+  // 호스트명
+  API_HOST: Joi.string(),
+  SELLER_WEB_HOST: Joi.string(),
 });

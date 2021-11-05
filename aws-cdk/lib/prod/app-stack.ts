@@ -101,7 +101,8 @@ export class LCProdAppStack extends cdk.Stack {
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
-        API_HOST: 'https://api.xn--hp4b17xa.com',
+        API_HOST: `https://api.${+constants.PUNYCODE_DOMAIN}`,
+        SELLER_WEB_HOST: `https://dev-api.${+constants.PUNYCODE_DOMAIN}`,
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}ApiLogGroup`, {
