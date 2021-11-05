@@ -408,13 +408,13 @@ socket.on('get objective message', async (data) => {
   topMessages.push({ messageHtml });
 });
 
-socket.on('toggle right-top onad logo from server', () => {
-  if ($('#onad-logo').attr('src').includes('-')) {
-    $('#onad-logo').attr('src', '/images/onadLogo.png');
-  } else {
-    $('#onad-logo').attr('src', '/images/onadLogo-gray.png');
-  }
-});
+// socket.on('toggle right-top onad logo from server', () => {
+//   if ($('#kks-logo').attr('src').includes('-')) {
+//     $('#kks-logo').attr('src', '/images/onadLogo.png');
+//   } else {
+//     $('#kks-logo').attr('src', '/images/onadLogo-gray.png');
+//   }
+// });
 
 // 하단 메세지 (단순 답변)
 socket.on('get bottom area message', (data) => {
