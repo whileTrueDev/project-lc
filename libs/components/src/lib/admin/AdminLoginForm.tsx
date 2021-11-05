@@ -1,6 +1,3 @@
-import { useRouter } from 'next/router';
-import { LoginSellerDto } from '@project-lc/shared-types';
-import { useLoginMutation } from '@project-lc/hooks';
 import {
   Alert,
   AlertIcon,
@@ -14,6 +11,10 @@ import {
   Input,
   Stack,
 } from '@chakra-ui/react';
+import { useLoginMutation } from '@project-lc/hooks';
+import { LoginSellerDto } from '@project-lc/shared-types';
+import { getApiHost } from '@project-lc/utils';
+import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CenterBox } from '../CenterBox';
@@ -46,7 +47,7 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
           setFormError(getMessage(err?.response.data?.statusCode));
         });
       if (seller) {
-        router.push('http://localhost:4200/admin');
+        router.push(`${getApiHost()}/admin`);
       }
     },
     [router, setFormError, login],
