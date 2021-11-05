@@ -146,7 +146,11 @@ export function GoodsDetail(): JSX.Element {
         {/* 상품 제목 */}
         {liveShopping && !liveShoppingIsLoading && (
           <LiveShoppingDetailTitle
-            goodsName={`${liveShopping[0].goods.goods_name} + ${liveShopping[0].broadcaster.userNickname}`}
+            goodsName={
+              liveShopping[0].broadcaster
+                ? `${liveShopping[0].goods.goods_name} + ${liveShopping[0].broadcaster.userNickname}`
+                : `${liveShopping[0].goods.goods_name}`
+            }
             createDate={liveShopping[0].createDate}
           />
         )}
