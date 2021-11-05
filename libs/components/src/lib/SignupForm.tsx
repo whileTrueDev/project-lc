@@ -71,6 +71,7 @@ export function SignupForm({
               '이메일 확인을 위한 인증번호를 보내는 중, 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
             status: 'error',
           });
+          throw new Error('이메일 확인 전송 실패');
         });
     },
     [mailVerification, toast],
@@ -89,9 +90,7 @@ export function SignupForm({
           message: '이미 가입된 이메일 주소입니다.',
         });
       } else {
-        startMailVerification(email).then(() => {
-          setPhase(2);
-        });
+        startMailVerification(email).then(() => setPhase(2));
       }
     }
   }, [getValues, setError, startMailVerification, trigger]);
@@ -127,7 +126,7 @@ export function SignupForm({
         router.push('/mypage');
       }
     },
-    [router, setError, signup],
+    [login, router, setError, signup],
   );
 
   return (
