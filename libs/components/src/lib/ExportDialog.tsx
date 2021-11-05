@@ -97,11 +97,14 @@ export function ExportDialog({
 
   /** 합포장 출고처리가 가능한지 여부 */
   const isBundleExportable = useMemo(() => {
-    return order.shippings.every((shipping) => {
+    const exportable = order.shippings.every((shipping) => {
       const a = checkShippingCanExport(shipping);
       const isShippingDone = checkShippingExportIsDone(shipping);
       return a && !isShippingDone;
     });
+    // shipping 목록이 2개 이상이어야 합포장 출고처리 버튼 활성화
+    const shippingMoreThanTwo = order.shippings.length >= 2;
+    return exportable && shippingMoreThanTwo;
   }, [order.shippings]);
 
   return (
