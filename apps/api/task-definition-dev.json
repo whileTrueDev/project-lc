@@ -29,6 +29,10 @@
                 {
                     "name": "S3_BUCKET_NAME",
                     "value": "lc-project"
+                },
+                {
+                    "name": "API_HOST",
+                    "value": "https://dev-api.xn--hp4b17xa.com"
                 }
             ],
             "resourceRequirements": null,

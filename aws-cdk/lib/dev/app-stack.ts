@@ -157,6 +157,7 @@ export class LCDevAppStack extends cdk.Stack {
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
+        API_HOST: 'https://dev-api.xn--hp4b17xa.com',
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayLogGroup`, {
