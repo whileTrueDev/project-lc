@@ -273,7 +273,12 @@ export function GoodsDetail(): JSX.Element {
             </Stack>
 
             <Box>
-              <Textarea resize="none" rows={10} value={liveShopping[0].requests || ''} />
+              <Textarea
+                resize="none"
+                rows={10}
+                value={liveShopping[0].requests || ''}
+                readOnly
+              />
             </Box>
           </Stack>
           <FormProvider {...methods}>
