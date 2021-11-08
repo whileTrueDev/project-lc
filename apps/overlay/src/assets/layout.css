@@ -43,6 +43,9 @@ body {
 }
 
 .live-commerce {
+  display: none;
+  left: 0px;
+  bottom: 0px;
   width: 1920px;
   height: 1080px;
   position: absolute;
@@ -51,10 +54,11 @@ body {
 /* 상단 비회원 메세지 */
 .top-wrapper {
   top: 0px;
-  width: 1080px;
+  width: 1920px;
   display: none;
   align-items: center;
   justify-content: center;
+  position: absolute;
   text-shadow: -2px -2px 0 #000, 0 -2px 0 #000, 2px -2px 0 #000, 2px 0 0 #000,
     2px 2px 0 #000, 0 2px 0 #000, -2px 2px 0 #000, -2px 0 0 #000;
   font-family: 'KOTRA';
@@ -191,7 +195,6 @@ body {
 }
 
 .bottom-fever-timer {
-  margin-left: 1%;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -211,6 +214,7 @@ body {
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
   opacity: 0;
+  border-radius: 0px 15px 15px 15px;
 }
 
 .bottom-area-right p:after {
@@ -244,7 +248,6 @@ body {
 .left-section {
   top: 50px;
   left: 15px;
-  /* float: left; */
   width: 400px;
   height: 1080px;
   position: relative;
@@ -300,10 +303,11 @@ body {
   flex-wrap: wrap;
   margin: 1%;
   font-family: 'NotoSansBold';
-  font-size: 22px;
+  font-size: 20px;
   color: #ffffff;
-  text-shadow: -2px -2px 0 #000, 0 -2px 0 #000, 2px -2px 0 #000, 2px 0 0 #000,
-    2px 2px 0 #000, 0 2px 0 #000, -2px 2px 0 #000, -2px 0 0 #000;
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+    2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+    0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
 }
 
 .ranking-text-area span {
@@ -319,6 +323,8 @@ body {
   margin-bottom: 0;
   font-size: 45px;
   color: #ffd200;
+  text-shadow: 5px 5px 10px #000;
+  -webkit-text-stroke: 1px rgb(85, 85, 83);
 }
 
 .ranking-id-wrapper {
@@ -332,9 +338,10 @@ body {
   width: 85%;
   display: block;
   margin-left: 2%;
-  font-size: 22px;
-  text-shadow: -2px -2px 0 #000, 0 -2px 0 #000, 2px -2px 0 #000, 2px 0 0 #000,
-    2px 2px 0 #000, 0 2px 0 #000, -2px 2px 0 #000, -2px 0 0 #000;
+  font-size: 25px;
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+    2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+    0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
   /* overflow: hidden;
   white-space: nowrap; */
 }
@@ -383,31 +390,32 @@ body {
   height: 100%;
   align-items: center;
   justify-content: flex-start;
-  text-shadow: -2px -2px 0 #000, 0 -2px 0 #000, 2px -2px 0 #000, 2px 0 0 #000,
-    2px 2px 0 #000, 0 2px 0 #000, -2px 2px 0 #000, -2px 0 0 #000;
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+    2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+    0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
   font-family: 'NotoSansBold';
 }
 
 .animated.heartbeat {
-  font-size: 18px;
+  font-size: 28px;
   color: rgb(255, 255, 255);
   font-weight: 600;
 }
 
 #donation-user-id {
-  font-size: 25px;
+  font-size: 35px;
   font-weight: bold;
   color: rgb(0, 252, 255);
 }
 
 #donation-num {
-  font-size: 25px;
+  font-size: 35px;
   font-weight: bold;
   color: rgb(0, 252, 255);
 }
 
 #message {
-  font-size: 25px;
+  font-size: 35px;
   color: rgb(255, 255, 255);
 }
 
@@ -446,4 +454,39 @@ body {
 .notification img {
   width: 100%;
   height: 100%;
+}
+
+div.objective-wrapper {
+  bottom: 20px;
+  left: 45%;
+  display: none;
+  position: absolute;
+}
+
+div.objective-message {
+  font-family: 'NotoSansBold';
+  font-size: 30px;
+  text-shadow: -2px -2px 0 #000, 0 -2px 0 #000, 2px -2px 0 #000, 2px 0 0 #000,
+    2px 2px 0 #000, 0 2px 0 #000, -2px 2px 0 #000, -2px 0 0 #000;
+}
+
+span.objective-text {
+  color: #ffffff;
+}
+
+span.objective-value {
+  font-size: 40px;
+  color: rgb(0, 252, 255);
+}
+
+div.bottom-fever-timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 55px;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  height: 55px;
+  width: 100px;
+  border-radius: 10px 10px 0px 0px;
 }
