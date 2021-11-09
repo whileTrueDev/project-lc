@@ -457,9 +457,20 @@ body {
 }
 
 div.objective-wrapper {
+  width: 1920px;
   bottom: 20px;
-  left: 45%;
   display: none;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+}
+
+div.objective-wrapper#soldout {
+  bottom: 60px;
+  align-items: flex-end;
+}
+
+div.objective-wrapper img {
   position: absolute;
 }
 
@@ -489,4 +500,39 @@ div.bottom-fever-timer {
   height: 55px;
   width: 100px;
   border-radius: 10px 10px 0px 0px;
+}
+
+@keyframes seesaw {
+  0% {
+    transform: rotate(5deg);
+  }
+
+  25% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(-5deg);
+  }
+
+  75% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(5deg);
+  }
+}
+
+.soldout {
+  animation-name: seesaw;
+  animation-duration: 3s;
+  transform-origin: 50% 50%;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  -webkit-animation-name: seesaw;
+  -webkit-animation-duration: 3s;
+  -webkit-transform-origin: 50% 50%;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
 }

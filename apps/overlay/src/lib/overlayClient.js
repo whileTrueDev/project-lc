@@ -387,7 +387,7 @@ socket.on('get non client purchase message', async (data) => {
 socket.on('get objective message', async (data) => {
   const price = data.objective;
 
-  messageHtml = `
+  const objectiveHtml = `
   <div class="objective-inner-wrapper">
     <iframe src="/audio/mid.mp3"
     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
@@ -401,8 +401,10 @@ socket.on('get objective message', async (data) => {
   </div>
   `;
 
-  $('.objective-wrapper').html(messageHtml);
-  $('.objective-wrapper').slideToggle();
+  $('.objective-wrapper').html(objectiveHtml);
+  $('.objective-wrapper').slideToggle('slow', function () {
+    $(this).css('display', 'flex');
+  });
 
   await setTimeout(() => {
     $('.objective-wrapper').slideToggle();
@@ -539,14 +541,28 @@ socket.on('connection check from server', () => {
   $('.alive-check').toggle();
 });
 
-socket.on('get soldout signal from server', () => {
+socket.on('get soldout signal from server', async () => {
+  const soldoutHtml = `
+  <img src="/images/firework.gif" id="firework" alt="firework"/>
+  <div class="objective-inner-wrapper soldout">
+    <iframe src="/audio/firework.mp3"
+    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    <div class="objective-message">
+      <span class="objective-text">준비된 상품이 매진되었습니다</span>
+    </div>
+  </div>`;
   $('.vertical-soldout-banner').css({ opacity: 1 });
   $('body').append(`
     <iframe src="/audio/soldout_v2.mp3" id="soldout-alarm" allow="autoplay" style="display:none"></iframe>
     `);
-  setTimeout(() => {
+  $('.objective-wrapper').attr('id', 'soldout');
+  $('.objective-wrapper').html(soldoutHtml);
+  $('.objective-wrapper').css('display', 'flex');
+  await setTimeout(() => {
     $('body').remove('#soldout-alarm');
-  }, 20000);
+    $('#firework').fadeOut();
+    $('.objective-inner-wrapper').fadeOut();
+  }, 10000);
 });
 
 socket.on('remove soldout banner from server', () => {
