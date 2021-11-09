@@ -387,34 +387,37 @@ socket.on('get non client purchase message', async (data) => {
 socket.on('get objective message', async (data) => {
   const price = data.objective;
 
-  messageHtml = `
-  <div class="donation-wrapper">
-    <iframe src="/audio/alarm-type-2.wav"
+  const objectiveHtml = `
+  <div class="objective-inner-wrapper">
+    <iframe src="/audio/mid.mp3"
     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
-    <div class="centered">
-      <div class ="animated heartbeat" id="donation-top">
-        <span id="nickname">
-          <span class="donation-sub">판매금액</span>
-          <span class="animated heartbeat" id="donation-num">${price
-            .toString()
-            .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
-          <span class="donation-sub">원 돌파!!!</span>
-        </span>
-      </div>
+    <div class="objective-message">
+      <span class="objective-text">판매금액</span>
+      <span class="objective-value">${price
+        .toString()
+        .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
+      <span class="objective-text">원 돌파!!!</span>
     </div>
   </div>
-
   `;
-  topMessages.push({ messageHtml });
+
+  $('.objective-wrapper').html(objectiveHtml);
+  $('.objective-wrapper').slideToggle('slow', function () {
+    $(this).css('display', 'flex');
+  });
+
+  await setTimeout(() => {
+    $('.objective-wrapper').slideToggle();
+  }, 5000);
 });
 
-socket.on('toggle right-top onad logo from server', () => {
-  if ($('#onad-logo').attr('src').includes('-')) {
-    $('#onad-logo').attr('src', '/images/onadLogo.png');
-  } else {
-    $('#onad-logo').attr('src', '/images/onadLogo-gray.png');
-  }
-});
+// socket.on('toggle right-top onad logo from server', () => {
+//   if ($('#kks-logo').attr('src').includes('-')) {
+//     $('#kks-logo').attr('src', '/images/onadLogo.png');
+//   } else {
+//     $('#kks-logo').attr('src', '/images/onadLogo-gray.png');
+//   }
+// });
 
 // 하단 메세지 (단순 답변)
 socket.on('get bottom area message', (data) => {
@@ -538,14 +541,28 @@ socket.on('connection check from server', () => {
   $('.alive-check').toggle();
 });
 
-socket.on('get soldout signal from server', () => {
+socket.on('get soldout signal from server', async () => {
+  const soldoutHtml = `
+  <img src="/images/firework.gif" id="firework" alt="firework"/>
+  <div class="objective-inner-wrapper soldout">
+    <iframe src="/audio/firework.mp3"
+    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    <div class="objective-message">
+      <span class="objective-text">준비된 상품이 매진되었습니다</span>
+    </div>
+  </div>`;
   $('.vertical-soldout-banner').css({ opacity: 1 });
   $('body').append(`
-    <iframe src="/audio/soldout.mp3" id="soldout-alarm" allow="autoplay" style="display:none"></iframe>
+    <iframe src="/audio/soldout_v2.mp3" id="soldout-alarm" allow="autoplay" style="display:none"></iframe>
     `);
-  setTimeout(() => {
+  $('.objective-wrapper').attr('id', 'soldout');
+  $('.objective-wrapper').html(soldoutHtml);
+  $('.objective-wrapper').css('display', 'flex');
+  await setTimeout(() => {
     $('body').remove('#soldout-alarm');
-  }, 20000);
+    $('#firework').fadeOut();
+    $('.objective-inner-wrapper').fadeOut();
+  }, 10000);
 });
 
 socket.on('remove soldout banner from server', () => {

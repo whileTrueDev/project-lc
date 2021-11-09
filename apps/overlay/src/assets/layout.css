@@ -18,6 +18,11 @@
   src: url('/fonts/BlackHanSans-Regular.ttf');
 }
 
+@font-face {
+  font-family: 'NotoSansBold';
+  src: url('/fonts/NotoSansKR-Bold.otf');
+}
+
 body {
   width: 100%;
   height: 100%;
@@ -39,44 +44,46 @@ body {
 
 .live-commerce {
   display: none;
-  width: 96.9%;
-  height: 94.5%;
-  margin-top: 0.7%;
-  position: relative;
+  left: 0px;
+  bottom: 0px;
+  width: 1920px;
+  height: 1080px;
+  position: absolute;
 }
 
 /* 상단 비회원 메세지 */
 .top-wrapper {
   top: 0px;
-  width: 1080px;
+  width: 1920px;
   display: none;
   align-items: center;
   justify-content: center;
-  -webkit-text-stroke: 1.5px rgb(46, 45, 45);
+  position: absolute;
+  text-shadow: -2px -2px 0 #000, 0 -2px 0 #000, 2px -2px 0 #000, 2px 0 0 #000,
+    2px 2px 0 #000, 0 2px 0 #000, -2px 2px 0 #000, -2px 0 0 #000;
   font-family: 'KOTRA';
 }
 
 /* 하단영역 */
 .bottom-area-wrapper {
   width: 100%;
-  height: 6%;
+  height: 55px;
   position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
-  bottom: 0px;
-  right: 0px;
-  left: -2%;
+  bottom: 15px;
 }
 
 .bottom-area-left {
-  width: 22.5%;
+  width: 400px;
   height: 100%;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
 }
 
 .bottom-area-left-icon {
@@ -188,7 +195,6 @@ body {
 }
 
 .bottom-fever-timer {
-  margin-left: 1%;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -208,6 +214,7 @@ body {
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
   opacity: 0;
+  border-radius: 0px 15px 15px 15px;
 }
 
 .bottom-area-right p:after {
@@ -239,17 +246,18 @@ body {
 
 /* 좌측 영역 */
 .left-section {
-  left: -2%;
-  float: left;
-  width: 22.5%;
-  height: 94%;
+  top: 50px;
+  left: 15px;
+  width: 400px;
+  height: 1080px;
   position: relative;
 }
 
 .vertical-banner {
   width: 100%;
-  height: 100%;
+  height: 650px;
   opacity: 1;
+  border-radius: 15px;
 }
 
 .vertical-soldout-banner {
@@ -260,20 +268,21 @@ body {
   left: 0;
   opacity: 0;
   z-index: 100;
+  border-radius: 15px;
 }
 
 /* 좌측 상단 랭킹 */
 .ranking-area {
   display: flex;
   flex-direction: column;
-  top: 3.5%;
   width: 100%;
-  height: 25%;
+  height: 240px;
   position: absolute;
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1;
+  border-radius: 10px;
 }
 
 .ranking-area-inner {
@@ -293,10 +302,12 @@ body {
   justify-content: space-between;
   flex-wrap: wrap;
   margin: 1%;
-  font-family: 'JALNAN';
-  font-size: 25px;
+  font-family: 'NotoSansBold';
+  font-size: 20px;
   color: #ffffff;
-  -webkit-text-stroke: 2px black;
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+    2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+    0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
 }
 
 .ranking-text-area span {
@@ -312,6 +323,8 @@ body {
   margin-bottom: 0;
   font-size: 45px;
   color: #ffd200;
+  text-shadow: 5px 5px 10px #000;
+  -webkit-text-stroke: 1px rgb(85, 85, 83);
 }
 
 .ranking-id-wrapper {
@@ -325,42 +338,43 @@ body {
   width: 85%;
   display: block;
   margin-left: 2%;
-  font-size: 30px;
-  color: #27b9ac;
-  -webkit-text-stroke: 1.5px black;
-  overflow: hidden;
-  white-space: nowrap;
+  font-size: 25px;
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+    2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+    0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
+  /* overflow: hidden;
+  white-space: nowrap; */
 }
 
 #ranking-icon {
-  width: 15%;
+  width: 35px;
   margin-right: 1%;
 }
 
 /* 좌측 배너영역 */
 .left-banner-area {
   width: 100%;
-  height: 71.5%;
-  left: 0%;
-  bottom: 0%;
+  height: 650px;
+  top: 255px;
   position: absolute;
   background-color: white;
   background: rgba(253, 253, 253, 0.8);
+  border-radius: 15px;
 }
 /* 우측상단 온애드 로고 */
 .top-right-logo {
-  top: 2.5%;
-  right: 2%;
+  top: 15px;
+  right: 15px;
   position: fixed;
 }
 
 /* 우측 상단 응원메세지 영역 */
 .top-right {
   display: none;
-  width: 34.4%;
-  height: 44.5%;
-  top: 9.5%;
-  right: 3%;
+  width: 600px;
+  height: 450px;
+  top: 119px;
+  right: 15px;
   position: fixed;
 }
 
@@ -376,30 +390,32 @@ body {
   height: 100%;
   align-items: center;
   justify-content: flex-start;
-  -webkit-text-stroke: 1.5px rgb(46, 45, 45);
-  font-family: 'KOTRA';
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+    2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+    0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
+  font-family: 'NotoSansBold';
 }
 
 .animated.heartbeat {
-  font-size: 20px;
+  font-size: 28px;
   color: rgb(255, 255, 255);
   font-weight: 600;
 }
 
 #donation-user-id {
-  font-size: 40px;
+  font-size: 35px;
   font-weight: bold;
-  color: #32c3a6;
+  color: rgb(0, 252, 255);
 }
 
 #donation-num {
-  font-size: 40px;
+  font-size: 35px;
   font-weight: bold;
-  color: #32c3a6;
+  color: rgb(0, 252, 255);
 }
 
 #message {
-  font-size: 40px;
+  font-size: 35px;
   color: rgb(255, 255, 255);
 }
 
@@ -429,13 +445,94 @@ body {
 
 .notification {
   position: fixed;
-  top: 2.5%;
-  right: 2%;
-  width: 600px;
+  top: 119px;
+  right: 15px;
+  width: 400px;
   height: 400px;
 }
 
 .notification img {
   width: 100%;
   height: 100%;
+}
+
+div.objective-wrapper {
+  width: 1920px;
+  bottom: 20px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+}
+
+div.objective-wrapper#soldout {
+  bottom: 60px;
+  align-items: flex-end;
+}
+
+div.objective-wrapper img {
+  position: absolute;
+}
+
+div.objective-message {
+  font-family: 'NotoSansBold';
+  font-size: 30px;
+  text-shadow: -2px -2px 0 #000, 0 -2px 0 #000, 2px -2px 0 #000, 2px 0 0 #000,
+    2px 2px 0 #000, 0 2px 0 #000, -2px 2px 0 #000, -2px 0 0 #000;
+}
+
+span.objective-text {
+  color: #ffffff;
+}
+
+span.objective-value {
+  font-size: 40px;
+  color: rgb(0, 252, 255);
+}
+
+div.bottom-fever-timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 55px;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  height: 55px;
+  width: 100px;
+  border-radius: 10px 10px 0px 0px;
+}
+
+@keyframes seesaw {
+  0% {
+    transform: rotate(5deg);
+  }
+
+  25% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(-5deg);
+  }
+
+  75% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(5deg);
+  }
+}
+
+.soldout {
+  animation-name: seesaw;
+  animation-duration: 3s;
+  transform-origin: 50% 50%;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  -webkit-animation-name: seesaw;
+  -webkit-animation-duration: 3s;
+  -webkit-transform-origin: 50% 50%;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
 }
