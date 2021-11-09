@@ -58,11 +58,13 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       cancel_type: goodsData ? goodsData.cancel_type : '0', // 청약철회, 기본 - 청약철회가능 0
       // 판매옵션
       option_use: goodsData ? goodsData.option_use : '1', // 옵션사용여부, 기본 - 옵션사용 1
-      option_title: goodsData?.options[0].option_title || '',
+      option_title: '',
+      option_values: '',
       options: goodsData
         ? goodsData.options.map((opt) => ({
             id: opt.id,
             option_type: opt.option_type,
+            option_title: opt.option_title || '',
             option1: opt.option1 || '',
             consumer_price: Number(opt.consumer_price),
             price: Number(opt.price),
@@ -71,18 +73,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
               stock: opt.supply.stock,
             },
           }))
-        : [
-            {
-              option_type: 'direct',
-              option1: '',
-              consumer_price: 0,
-              price: 0,
-              option_view: 'Y',
-              supply: {
-                stock: 0,
-              },
-            },
-          ],
+        : [],
       // 상품사진
       image: goodsData?.image || [],
       // 상세설명
@@ -121,6 +112,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       id,
       options,
       option_title,
+      option_values,
       common_contents_name,
       common_contents_type,
       common_contents,
@@ -137,7 +129,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
     let goodsDto: RegistGoodsDto = {
       ...goodsFormData,
       image,
-      options: addGoodsOptionInfo(options, option_title),
+      options: addGoodsOptionInfo(options),
       option_use: options.length > 1 ? '1' : '0',
       max_purchase_ea: Number(max_purchase_ea) || 0,
       min_purchase_ea: Number(min_purchase_ea) || 0,
@@ -157,6 +149,15 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       // 등록된 사진이 없는 경우
       toast({
         title: '상품 사진을 1개 이상 등록해주세요',
+        status: 'warning',
+      });
+      return;
+    }
+
+    if (options.length === 0) {
+      // 등록된 옵션이 없는 경우
+      toast({
+        title: '상품 옵션을 1개 이상 등록해주세요',
         status: 'warning',
       });
       return;

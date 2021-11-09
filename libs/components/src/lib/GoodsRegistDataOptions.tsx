@@ -238,7 +238,7 @@ function UseOptionInput(): JSX.Element {
           flexWrap="wrap"
         >
           {/* 삭제버튼과 옵션명:옵션값 */}
-          <HStack mr={1}>
+          <HStack mr={1} flex={0.5}>
             <CloseButton onClick={() => remove(index)} />
             <Text minWidth="60px">
               {`${getValues(`options.${index}.option_title`)} : ${getValues(
