@@ -12,14 +12,17 @@ import {
   RadioGroup,
   Stack,
   Text,
+  Kbd,
 } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
 import { useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { InfoIcon } from '@chakra-ui/icons';
 import { boxStyle } from '../constants/commonStyleProps';
 import { GoodsRegistRadio } from './GoodsRegistDataSales';
 import { GoodsFormOption, GoodsFormValues } from './GoodsRegistForm';
 import SectionWithTitle from './SectionWithTitle';
+import TextWithPopperButton from './TextWithPopperButton';
 
 export function GoodsOptionInput({
   label,
@@ -178,8 +181,8 @@ function UseOptionInput(): JSX.Element {
         isInvalid={!!errors.option_title || !!errors.option_values}
       >
         <HStack flexWrap="wrap">
-          <HStack>
-            <FormLabel>옵션명</FormLabel>
+          <HStack mr={2}>
+            <FormLabel m={0}>옵션명</FormLabel>
             <Input
               {...register('option_title')}
               size="sm"
@@ -190,7 +193,18 @@ function UseOptionInput(): JSX.Element {
           </HStack>
 
           <HStack>
-            <FormLabel>옵션값</FormLabel>
+            <FormLabel m={0}>
+              <TextWithPopperButton
+                title="옵션값"
+                iconAriaLabel="옵션값 설명"
+                icon={<InfoIcon />}
+              >
+                <Text>
+                  <Kbd>,</Kbd> 로 옵션값을 구분하여 입력하면 <br />
+                  여러 옵션값을 한 번에 입력할 수 있습니다
+                </Text>
+              </TextWithPopperButton>
+            </FormLabel>
             <Input
               isInvalid={!!errors.option_values}
               {...register('option_values')}
