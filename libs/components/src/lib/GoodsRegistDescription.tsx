@@ -3,12 +3,14 @@ import { EditIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
+  Center,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   Stack,
   useDisclosure,
 } from '@chakra-ui/react';
@@ -24,6 +26,11 @@ import SectionWithTitle from './SectionWithTitle'; // Import Sun Editor's CSS Fi
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,
+  loading: () => (
+    <Center>
+      <Spinner />
+    </Center>
+  ),
 });
 
 export function GoodsRegistDescription(): JSX.Element {

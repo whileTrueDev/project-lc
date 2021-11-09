@@ -42,6 +42,11 @@ import SectionWithTitle from './SectionWithTitle';
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,
+  loading: () => (
+    <Center>
+      <Spinner />
+    </Center>
+  ),
 });
 
 /** 상품공통정보목록 셀렉트박스 *********************** */
