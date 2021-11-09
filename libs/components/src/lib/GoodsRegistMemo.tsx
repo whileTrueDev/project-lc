@@ -6,7 +6,7 @@ import SectionWithTitle from './SectionWithTitle';
 export function GoodsRegistMemo(): JSX.Element {
   const { register } = useFormContext<RegistGoodsDto>();
   return (
-    <SectionWithTitle title="메모">
+    <SectionWithTitle title="메모" variant="outlined">
       <Textarea {...register('admin_memo')} resize="none" maxLength={500} />
     </SectionWithTitle>
   );

@@ -20,7 +20,7 @@ export function GoodsRegistDataBasic(): JSX.Element {
     formState: { errors },
   } = useFormContext<RegistGoodsDto>();
   return (
-    <SectionWithTitle title="기본정보">
+    <SectionWithTitle title="기본정보" variant="outlined">
       <Stack>
         <FormControl id="goods_name" isInvalid={!!errors.goods_name}>
           <FormLabel>

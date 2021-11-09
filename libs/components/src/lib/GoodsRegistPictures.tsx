@@ -247,7 +247,7 @@ export function GoodsRegistPictures(): JSX.Element {
   const goodsId = watch('id');
 
   return (
-    <SectionWithTitle title="상품사진 *">
+    <SectionWithTitle title="상품사진 *" variant="outlined">
       <Stack spacing={4}>
         <Box>
           <Button onClick={onOpen}>사진 등록하기</Button>

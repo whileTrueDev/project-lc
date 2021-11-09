@@ -242,7 +242,6 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       <Stack p={2} spacing={5} as="form" onSubmit={handleSubmit(editGoods)}>
         <Stack
           py={4}
-          mx={-2}
           direction="row"
           position="sticky"
           bgColor={fixedStackBgColor}

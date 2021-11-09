@@ -222,7 +222,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   const commonContentsType = watch('common_contents_type');
 
   return (
-    <SectionWithTitle title="상품 공통 정보 *">
+    <SectionWithTitle title="상품 공통 정보 *" variant="outlined">
       <Stack>
         <RadioGroup
           onChange={(value) => {

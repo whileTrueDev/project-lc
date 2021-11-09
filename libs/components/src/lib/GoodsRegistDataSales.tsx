@@ -52,7 +52,7 @@ export function GoodsRegistRadio({
 
 export function GoodsRegistDataSales(): JSX.Element {
   return (
-    <SectionWithTitle title="판매정보">
+    <SectionWithTitle title="판매정보" variant="outlined">
       <Stack>
         <Stack spacing={{ base: 2, sm: 6 }} direction={{ base: 'column', sm: 'row' }}>
           <Text mr="24px">판매상태</Text>

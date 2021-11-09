@@ -238,7 +238,7 @@ function UseOptionInput(): JSX.Element {
           flexWrap="wrap"
         >
           {/* 삭제버튼과 옵션명:옵션값 */}
-          <HStack mr={1} flex={0.5}>
+          <HStack mr={1} flex={0.5} minWidth={150}>
             <CloseButton onClick={() => remove(index)} />
             <Text minWidth="60px">
               {`${getValues(`options.${index}.option_title`)} : ${getValues(
@@ -350,7 +350,7 @@ export function GoodsRegistDataOptions(): JSX.Element {
   );
 
   return (
-    <SectionWithTitle title="판매 옵션">
+    <SectionWithTitle title="판매 옵션" variant="outlined">
       <Text fontWeight="bold">옵션 사용 여부</Text>
       {/* onChange 시 옵션초기화 */}
       <Box mb={4}>
