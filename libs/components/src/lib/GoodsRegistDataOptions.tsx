@@ -238,13 +238,12 @@ function UseOptionInput(): JSX.Element {
           flexWrap="wrap"
         >
           {/* 삭제버튼과 옵션명:옵션값 */}
-          <HStack mr={1} flex={0.5} minWidth={150}>
+          <HStack mr={1} flexGrow={0.5} flexShrink={0} minWidth={150}>
             <CloseButton onClick={() => remove(index)} />
             <Text minWidth="60px">
-              {`${getValues(`options.${index}.option_title`)} : ${getValues(
-                `options.${index}.option1`,
-              )} ,`}
+              {`${getValues(`options.${index}.option_title`)} :`}
             </Text>
+            <Input {...register(`options.${index}.option1` as const)} size="sm" />
           </HStack>
 
           <HStack mb={1}>
