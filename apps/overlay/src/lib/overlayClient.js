@@ -402,9 +402,7 @@ socket.on('get objective message', async (data) => {
   `;
 
   $('.objective-wrapper').html(objectiveHtml);
-  $('.objective-wrapper').slideToggle('slow', function () {
-    $(this).css('display', 'flex');
-  });
+  $('.objective-wrapper').slideToggle();
 
   await setTimeout(() => {
     $('.objective-wrapper').slideToggle();
@@ -557,11 +555,10 @@ socket.on('get soldout signal from server', async () => {
     `);
   $('.objective-wrapper').attr('id', 'soldout');
   $('.objective-wrapper').html(soldoutHtml);
-  $('.objective-wrapper').css('display', 'flex');
+  $('.objective-wrapper').fadeIn();
   await setTimeout(() => {
     $('body').remove('#soldout-alarm');
-    $('#firework').fadeOut();
-    $('.objective-inner-wrapper').fadeOut();
+    $('.objective-wrapper').fadeOut();
   }, 10000);
 });
 

@@ -342,8 +342,8 @@ body {
   text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
     2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
     0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
-  /* overflow: hidden;
-  white-space: nowrap; */
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 #ranking-icon {
@@ -459,9 +459,8 @@ body {
 div.objective-wrapper {
   width: 1920px;
   bottom: 20px;
+  text-align: center;
   display: none;
-  align-items: center;
-  justify-content: center;
   position: absolute;
 }
 
@@ -471,7 +470,8 @@ div.objective-wrapper#soldout {
 }
 
 div.objective-wrapper img {
-  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 div.objective-message {
