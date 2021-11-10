@@ -42,6 +42,11 @@ import SectionWithTitle from './SectionWithTitle';
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,
+  loading: () => (
+    <Center>
+      <Spinner />
+    </Center>
+  ),
 });
 
 /** 상품공통정보목록 셀렉트박스 *********************** */
@@ -217,7 +222,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
   const commonContentsType = watch('common_contents_type');
 
   return (
-    <SectionWithTitle title="상품 공통 정보 *">
+    <SectionWithTitle title="상품 공통 정보 *" variant="outlined">
       <Stack>
         <RadioGroup
           onChange={(value) => {
