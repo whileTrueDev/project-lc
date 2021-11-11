@@ -529,7 +529,7 @@ socket.on('get stream end notification tts', (audioBuffer) => {
       sound.play();
     }, 1000);
   }
-  $('.notification').append(`<img id="notification" src="/images/eta.gif" />`);
+  $('.notification').html(`<img id="notification" src="/images/eta.gif" />`);
   setTimeout(() => {
     $('.notification').empty();
   }, 5000);
