@@ -172,6 +172,7 @@ const DesktopNav = (): JSX.Element => {
                 textDecoration: 'none',
                 color: linkHoverColor,
               }}
+              isExternal={navItem.isExternal}
             >
               {navItem.label}
             </Link>
