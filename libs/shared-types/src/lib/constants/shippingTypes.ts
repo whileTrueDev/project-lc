@@ -28,6 +28,23 @@ export const ShippingCalculTypeOptions: Record<
   },
 };
 
+// 배송비 추가설정 선택지 ------------------
+/** 배송비 추가설정 선택지 */
+export type ShippingAdditionalSettingOptionValue =
+  | 'bothFree'
+  | 'stdOnlyFree'
+  | 'addOnlyFree'
+  | 'bothCharge';
+export const shippingAdditionalSettingOptions: {
+  value: ShippingAdditionalSettingOptionValue;
+  label: string;
+}[] = [
+  { value: 'bothCharge', label: '기본 배송비, 추가 배송비 모두 부과' }, // 기본값
+  { value: 'stdOnlyFree', label: '기본 배송비만 무료로 계산 (추가 배송비는 부과됨) ' },
+  { value: 'addOnlyFree', label: '추가 배송비만 무료로 계산 (기본 배송비는 부과됨)' },
+  { value: 'bothFree', label: '기본 배송비, 추가 배송비 모두 무료로 계산' },
+];
+
 // 최대 배송비 입력값-----------------------------------------------
 export const MAX_COST = 999999999;
 

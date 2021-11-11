@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ShippingCalculType } from '@prisma/client';
-import { ShippingGroupDto, ShippingSetDto } from '@project-lc/shared-types';
+import {
+  ShippingAdditionalSettingOptionValue,
+  ShippingGroupDto,
+  ShippingSetDto,
+} from '@project-lc/shared-types';
 import create from 'zustand';
 
 export interface ShippingGroupItemStoreState extends ShippingGroupDto {
   setGroupName: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setShippingCalculType: (type: ShippingCalculType) => void;
   clearShippingAdditionalSetting: () => void;
-  setShippingStdFree: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  setShippingAddFree: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  setShippingAdditionalSetting: (type: ShippingAdditionalSettingOptionValue) => void;
   setAddress: (postalCode: string, baseAddress: string) => void;
   setDetailAddress: (e: React.ChangeEvent<HTMLInputElement>) => void;
   addShippingSet: (item: ShippingSetDto) => void;
@@ -55,23 +58,41 @@ export const useShippingGroupItemStore = create<ShippingGroupItemStoreState>(
         shipping_calcul_free_yn: 'N',
       }));
     },
-    setShippingStdFree: (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { shipping_add_free_yn } = get();
-      set((state) => ({
-        ...state,
-        shipping_std_free_yn: e.currentTarget.checked ? 'Y' : 'N',
-        shipping_calcul_free_yn:
-          shipping_add_free_yn === 'Y' || e.currentTarget.checked ? 'Y' : 'N',
-      }));
-    },
-    setShippingAddFree: (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { shipping_std_free_yn } = get();
-      set((state) => ({
-        ...state,
-        shipping_add_free_yn: e.currentTarget.checked ? 'Y' : 'N',
-        shipping_calcul_free_yn:
-          shipping_std_free_yn === 'Y' || e.currentTarget.checked ? 'Y' : 'N',
-      }));
+    setShippingAdditionalSetting: (type: ShippingAdditionalSettingOptionValue) => {
+      switch (type) {
+        case 'addOnlyFree':
+          set((state) => ({
+            ...state,
+            shipping_std_free_yn: 'N',
+            shipping_add_free_yn: 'Y',
+            shipping_calcul_free_yn: 'Y',
+          }));
+          break;
+        case 'stdOnlyFree':
+          set((state) => ({
+            ...state,
+            shipping_std_free_yn: 'Y',
+            shipping_add_free_yn: 'N',
+            shipping_calcul_free_yn: 'Y',
+          }));
+          break;
+        case 'bothFree':
+          set((state) => ({
+            ...state,
+            shipping_std_free_yn: 'Y',
+            shipping_add_free_yn: 'Y',
+            shipping_calcul_free_yn: 'Y',
+          }));
+          break;
+        case 'bothCharge':
+        default:
+          set((state) => ({
+            ...state,
+            shipping_std_free_yn: 'N',
+            shipping_add_free_yn: 'N',
+            shipping_calcul_free_yn: 'N',
+          }));
+      }
     },
     setAddress: (postalCode: string, baseAddress: string) => {
       set((state) => ({
