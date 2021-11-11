@@ -7,6 +7,9 @@ import {
   theme,
   useColorModeValue,
   useToast,
+  useDisclosure,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react';
 import {
   s3,
@@ -27,6 +30,7 @@ import GoodsRegistExtraInfo from './GoodsRegistExtraInfo';
 import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
+import { ConfirmDialog } from './ConfirmDialog';
 
 export type GoodsFormOption = Omit<GoodsOptionDto, 'default_option'> & {
   id?: number;
@@ -109,6 +113,7 @@ export function GoodsRegistForm(): JSX.Element {
   const { mutateAsync: createGoodsCommonInfo } = useCreateGoodsCommonInfo();
   const toast = useToast();
   const router = useRouter();
+  const goBackAlertDialog = useDisclosure();
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
@@ -265,10 +270,7 @@ export function GoodsRegistForm(): JSX.Element {
           justifyContent="space-between"
           zIndex={theme.zIndices.sticky}
         >
-          <Button
-            leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push('/mypage/goods')}
-          >
+          <Button leftIcon={<ChevronLeftIcon />} onClick={goBackAlertDialog.onOpen}>
             상품목록 돌아가기
           </Button>
           <Button type="submit" colorScheme="blue" isLoading={isLoading}>
@@ -303,6 +305,25 @@ export function GoodsRegistForm(): JSX.Element {
 
         {/* 메모 - textArea */}
         <GoodsRegistMemo />
+
+        {/* 뒤로가기 - 입력된 정보 사라짐 안내 다이얼로그 */}
+        <ConfirmDialog
+          title="상품 목록으로 돌아가기"
+          isOpen={goBackAlertDialog.isOpen}
+          onClose={goBackAlertDialog.onClose}
+          onConfirm={async () => {
+            router.push('/mypage/goods');
+          }}
+        >
+          <Alert status="warning">
+            <AlertIcon />
+            <Stack spacing={1}>
+              <Text> 목록으로 이동시 입력했던 정보는 모두 사라집니다!</Text>
+              <Text>상품 정보를 모두 입력했다면 등록 버튼을 눌러 완료해주세요</Text>
+            </Stack>
+          </Alert>
+          <Text mt={3}>정말 상품 목록으로 이동하시겠습니까?</Text>
+        </ConfirmDialog>
 
         {isLoading && (
           <Center
