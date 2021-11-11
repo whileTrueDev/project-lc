@@ -242,23 +242,29 @@ export function GoodsRegistCommonInfo(): JSX.Element {
           </Stack>
         </RadioGroup>
 
-        <Box>
-          {watch('common_contents_type') === 'new' ? (
-            <Button
-              aria-label="Search database"
-              rightIcon={<EditIcon />}
-              onClick={onOpen}
-            >
-              공통정보쓰기
-            </Button>
-          ) : (
-            <GoodsCommonInfoList
-              goodsInfoId={commonInfoId}
-              onCommonInfoChange={onCommonInfoChange}
-              onGoodsInfoDelete={clearGoodsInfoForNewInfo}
-            />
-          )}
-        </Box>
+        {watch('common_contents_type') === 'new' ? (
+          <Stack>
+            <Text>
+              ** 신규 등록 으로 작성한 상품 공통 정보는 상품 등록을 완료 할 시 기존 정보
+              리스트에 자동 추가됩니다.
+            </Text>
+            <Box>
+              <Button
+                aria-label="Search database"
+                rightIcon={<EditIcon />}
+                onClick={onOpen}
+              >
+                공통정보쓰기
+              </Button>
+            </Box>
+          </Stack>
+        ) : (
+          <GoodsCommonInfoList
+            goodsInfoId={commonInfoId}
+            onCommonInfoChange={onCommonInfoChange}
+            onGoodsInfoDelete={clearGoodsInfoForNewInfo}
+          />
+        )}
 
         <Box
           ref={viewer}
