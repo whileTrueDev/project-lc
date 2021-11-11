@@ -13,6 +13,7 @@ import {
   Spinner,
   Stack,
   useDisclosure,
+  Text,
 } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
 import { useEffect, useRef } from 'react';
@@ -63,6 +64,7 @@ export function GoodsRegistDescription(): JSX.Element {
   return (
     <SectionWithTitle title="상세설명 *" variant="outlined">
       <Stack>
+        <Text>제품 상세 내용이 담긴 대형 이미지는 이곳에 첨부해주세요.</Text>
         <Box>
           <Button rightIcon={<EditIcon />} onClick={onOpen}>
             설명 쓰기

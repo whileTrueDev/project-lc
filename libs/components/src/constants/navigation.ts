@@ -4,6 +4,7 @@ export interface NavItem {
   // children?: Array<NavItem>;
   href: string;
   needLogin?: boolean;
+  isExternal?: boolean;
 }
 
 export const mainNavItems: Array<NavItem> = [
@@ -15,6 +16,7 @@ export const mainNavItems: Array<NavItem> = [
   {
     label: '크크마켓',
     href: 'https://k-kmarket.com/',
+    isExternal: true,
   },
 ];
 
