@@ -249,6 +249,7 @@ export function GoodsRegistPictures(): JSX.Element {
   return (
     <SectionWithTitle title="상품사진 *" variant="outlined">
       <Stack spacing={4}>
+        <Text>썸네일 이미지로 사용됩니다. 가로세로 1:1 비율인 이미지를 추천합니다.</Text>
         <Box>
           <Button onClick={onOpen}>사진 등록하기</Button>
         </Box>
