@@ -8,6 +8,7 @@ import { KOREA_PROVINCES } from '../constants/address';
 import { boxStyle } from '../constants/commonStyleProps';
 import FormControlInputWrapper from './FormControlInputWrapper';
 import { ResponsiveDivider } from './ResponsiveDivider';
+import { areaSelectStyle } from './ShippingOptionFixedApply';
 
 export function ErrorText({ children }: { children: React.ReactNode }): JSX.Element {
   return (
@@ -170,7 +171,7 @@ export function ShippingOptionIntervalApply({
               }}
               render={({ field }) => {
                 return (
-                  <Select w={120} {...field}>
+                  <Select w={120} {...field} {...areaSelectStyle}>
                     {deliveryLimit === 'limit' || shippingSetType === 'add' ? (
                       ['지역 선택', ...KOREA_PROVINCES].map((area) => (
                         <option key={area} value={area}>
