@@ -56,6 +56,12 @@ class MyDocument extends Document {
           />
           <link rel="icon" href="/images/favicon/favicon.ico" />
           {/* <!-- Global site tag (gtag.js) - Google Analytics --> */}
+
+          {/* 네이버 웹마스터 도구 사이트 확인 - kkshow_dev@naver.com */}
+          <meta
+            name="naver-site-verification"
+            content="1b71b20c016704c65fe9a4ffe6815f54103dc3dd"
+          />
         </Head>
         <body>
           <noscript>
