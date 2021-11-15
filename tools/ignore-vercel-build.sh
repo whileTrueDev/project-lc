@@ -25,6 +25,6 @@ if [ $IS_AFFECTED -eq 1 ]; then
     echo "🛑 - Build cancelled (No code changes)"
     exit 0
 elif [ $IS_AFFECTED -eq 0 ]; then
-    echo "✅ - Build can proceed (Code changes Exists)"
+    echo "✅ - Build can proceed (Code changes Exist)"
     exit 1
 fi
