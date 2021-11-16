@@ -1,3 +1,9 @@
+# Ignore preview builds
+echo "VERCEL_GIT_COMMIT_REF: $VERCEL_GIT_COMMIT_REF"
+if [[ "$VERCEL_GIT_COMMIT_REF" != "master" || "$VERCEL_GIT_COMMIT_REF" != "dev" ]]; then
+    echo "🛑 - Ignoring preview builds"
+    exit 0
+fi
 
 # Name of the app to check. Change this to your application name!
 APP=admin
@@ -16,9 +22,9 @@ npx nx affected:apps --plain --base HEAD~1 --head HEAD | grep $APP -q
 IS_AFFECTED=$?
 
 if [ $IS_AFFECTED -eq 1 ]; then
-    echo "🛑 - Build cancelled"
+    echo "🛑 - Build cancelled (No code changes)"
     exit 0
 elif [ $IS_AFFECTED -eq 0 ]; then
-    echo "✅ - Build can proceed"
+    echo "✅ - Build can proceed (Code changes Exist)"
     exit 1
 fi
