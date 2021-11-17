@@ -32,6 +32,7 @@ export class SellerService {
         email: true,
         name: true,
         password: true,
+        avatar: true,
         sellerShop: {
           select: {
             shopName: true,

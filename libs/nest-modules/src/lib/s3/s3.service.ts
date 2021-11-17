@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
 import {
   DeleteObjectsCommand,
   DeleteObjectsCommandOutput,
   ObjectIdentifier,
+  PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { parse } from 'node-html-parser';
 
@@ -35,6 +36,21 @@ export class S3Service {
         },
       }),
     );
+  }
+
+  async uploadProfile({ key, file }: { key: string; file: Buffer }): Promise<any> {
+    await this.s3Client.send(
+      new PutObjectCommand({
+        Bucket: this.configService.get('S3_BUCKET_NAME'),
+        Key: key,
+        Body: file,
+        ACL: 'public-read',
+      }),
+    );
+    const avatar = `https://${this.configService.get(
+      'S3_BUCKET_NAME',
+    )}.s3.ap-northeast-2.amazonaws.com/${key}`;
+    return avatar;
   }
 }
 

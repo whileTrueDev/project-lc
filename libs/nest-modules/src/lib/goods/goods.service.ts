@@ -8,6 +8,8 @@ import { GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  ApprovedGoodsNameAndId,
+  getLiveShoppingProgress,
   GoodsByIdRes,
   GoodsImageDto,
   GoodsListDto,
@@ -17,8 +19,6 @@ import {
   GoodsOptionWithStockInfo,
   RegistGoodsDto,
   TotalStockInfo,
-  ApprovedGoodsNameAndId,
-  getLiveShoppingProgress,
 } from '@project-lc/shared-types';
 import {
   getImgSrcListFromHtmlStringList,
@@ -32,6 +32,22 @@ export class GoodsService {
     private readonly prisma: PrismaService,
     private readonly s3service: S3Service,
   ) {}
+
+  public async testAddAvatar(
+    email: Seller['email'],
+    imageBuffer: Buffer,
+    filename: string,
+  ): Promise<any> {
+    const avatar = await this.s3service.uploadProfile({
+      key: filename,
+      file: imageBuffer,
+    });
+    const user = await this.prisma.seller.update({
+      where: { email },
+      data: { avatar },
+    });
+    return true;
+  }
 
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
