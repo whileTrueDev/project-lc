@@ -14,7 +14,7 @@ export function Setting(): JSX.Element {
       <Container maxWidth="2xl" p={6}>
         <VStack spacing={4} alignItems="stretch">
           <Heading mb={4}>내계정</Heading>
-          <ProfileBox />
+          <ProfileBox allowAvatarChange />
           <Divider />
           <PasswordSection />
           <Divider />
