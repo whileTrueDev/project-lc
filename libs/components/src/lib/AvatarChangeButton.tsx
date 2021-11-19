@@ -1,3 +1,4 @@
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   Box,
@@ -24,6 +25,7 @@ import { useRef, useState } from 'react';
 import { FiCamera } from 'react-icons/fi';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import { boxStyle } from '../constants/commonStyleProps';
 import { ImageInput } from './ImageInput';
 
 export function AvatarChangeButton(): JSX.Element {
@@ -121,7 +123,6 @@ export function AvatarChangeButton(): JSX.Element {
   // 프로필 사진 변경 다이얼로그 저장하기 핸들러
   const onSubmit = async (): Promise<void> => {
     if (!croppedImageUrl || !croppedBlob) {
-      removeAvatar.mutateAsync().then(() => onClose());
       return;
     }
 
@@ -140,6 +141,7 @@ export function AvatarChangeButton(): JSX.Element {
     if (croppedImageUrl) URL.revokeObjectURL(croppedImageUrl);
     setSrc(null);
     setCroppedImageUrl('');
+    removeAvatar.mutateAsync().then(() => onClose());
   };
 
   return (
@@ -172,51 +174,55 @@ export function AvatarChangeButton(): JSX.Element {
             <ModalHeader>프로필 사진 변경하기</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Stack spacing={2} direction="row">
-                <Box>
-                  <Button onClick={reset}>초기화하기</Button>
-                </Box>
+              <Stack spacing={2}>
                 {/* 사진 선택 input */}
                 <ImageInput
                   variant="chakra"
                   handleSuccess={handleSuccess}
                   handleError={(errortype) => console.log(errortype)}
                 />
-              </Stack>
+                <Stack direction="row" flexWrap="wrap" alignItems="center" {...boxStyle}>
+                  {!src && <Text>파일 업로드 버튼을 눌러 사진을 선택해주세요</Text>}
+                  {/* 크롭할 부분 선택영역 */}
+                  {src && (
+                    <Box mt={2}>
+                      <ReactCrop
+                        src={src}
+                        crop={crop}
+                        onChange={(newCrop) => {
+                          setCrop(newCrop);
+                        }}
+                        onImageLoaded={(image) => {
+                          imageRef.current = image;
+                        }}
+                        onComplete={onCropComplete}
+                      />
+                    </Box>
+                  )}
 
-              <Stack direction="row" flexWrap="wrap" alignItems="center">
-                {!src && <Text>파일 업로드 버튼을 눌러 사진을 선택해주세요</Text>}
-                {/* 크롭할 부분 선택영역 */}
-                {src && (
-                  <Box mt={2}>
-                    <ReactCrop
-                      src={src}
-                      crop={crop}
-                      onChange={(newCrop) => {
-                        setCrop(newCrop);
-                      }}
-                      onImageLoaded={(image) => {
-                        imageRef.current = image;
-                      }}
-                      onComplete={onCropComplete}
-                    />
-                  </Box>
-                )}
-
-                {/* 크롭된 부분 아바타 컴포넌트로 미리보기 */}
-                <Box flex="1" textAlign="center">
-                  <Text mb="2">미리보기</Text>
-                  <Avatar src={croppedImageUrl} alt="crop" />
-                </Box>
+                  {/* 크롭된 부분 아바타 컴포넌트로 미리보기 */}
+                  {croppedImageUrl && (
+                    <Box flex="1" textAlign="center">
+                      <Text mb="2">미리보기</Text>
+                      <Avatar src={croppedImageUrl} alt="crop" />
+                    </Box>
+                  )}
+                </Stack>
               </Stack>
             </ModalBody>
 
             <ModalFooter>
-              <Button mr={3} onClick={onClose}>
-                취소
+              <Button mr={3} onClick={reset} leftIcon={<DeleteIcon />}>
+                프로필 사진 제거하기
               </Button>
-              <Button type="button" colorScheme="blue" onClick={onSubmit}>
-                저장하기
+              <Button
+                type="button"
+                colorScheme="blue"
+                onClick={onSubmit}
+                isDisabled={!croppedImageUrl || !croppedBlob}
+                leftIcon={<EditIcon />}
+              >
+                변경하기
               </Button>
             </ModalFooter>
           </ModalContent>

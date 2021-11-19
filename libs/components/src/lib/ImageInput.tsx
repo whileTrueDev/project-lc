@@ -79,10 +79,10 @@ export function ImageInput({
         />
         <Button
           size={size}
-          rightIcon={<FiFile />}
+          leftIcon={<FiFile />}
           onClick={() => inputRef.current?.click()}
         >
-          파일 업로드
+          사진 업로드
         </Button>
       </InputGroup>
     );
