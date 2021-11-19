@@ -105,6 +105,7 @@ export class SocialService {
       create: {
         email,
         name,
+        avatar: picture || null,
         password: null,
         socialAccounts: {
           create: googleAccountCreateInput,

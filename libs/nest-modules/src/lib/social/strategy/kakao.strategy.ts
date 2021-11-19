@@ -28,7 +28,8 @@ export class KakaoStrategy extends PassportStrategy(Strategy, KAKAO_PROVIDER) {
   ): Promise<Seller> {
     const { id, username, _json } = profile;
     const { kakao_account } = _json;
-    const { email, profile_image_url, is_default_image } = kakao_account;
+    const { email, profile: kakaoProfile } = kakao_account;
+    const { is_default_image, profile_image_url } = kakaoProfile;
 
     if (!email) {
       throw new ForbiddenException({
