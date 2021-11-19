@@ -12,9 +12,10 @@ import { SocialLoginExceptionFilter } from './social-login-exception.filter';
 import { NaverApiService } from './platform-api/naver-api.service';
 import { GoogleApiService } from './platform-api/google-api.service';
 import { KakaoApiService } from './platform-api/kakao-api.service';
+import { S3Module } from '../s3/s3.module';
 
 @Module({
-  imports: [AuthModule, SellerModule],
+  imports: [AuthModule, SellerModule, S3Module],
   controllers: [SocialController],
   providers: [
     NaverApiService,

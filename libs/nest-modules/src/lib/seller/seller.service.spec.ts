@@ -1,7 +1,9 @@
 /* eslint-disable dot-notation */
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
+import { S3Service } from '../s3/s3.service';
 import { SellerService } from './seller.service';
 
 describe('SellerService', () => {
@@ -13,7 +15,7 @@ describe('SellerService', () => {
     __prisma = new PrismaClient();
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule],
-      providers: [SellerService],
+      providers: [SellerService, S3Service, ConfigService],
     }).compile();
 
     service = module.get<SellerService>(SellerService);

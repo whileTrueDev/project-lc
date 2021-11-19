@@ -38,18 +38,27 @@ export class S3Service {
     );
   }
 
-  async uploadProfile({ key, file }: { key: string; file: Buffer }): Promise<any> {
+  async uploadProfileImage({
+    key,
+    file,
+    email,
+  }: {
+    key: string;
+    file: Buffer;
+    email: string;
+  }): Promise<string> {
+    const avatarPath = `avatar/${email}/${key}`;
     await this.s3Client.send(
       new PutObjectCommand({
         Bucket: this.configService.get('S3_BUCKET_NAME'),
-        Key: key,
+        Key: avatarPath,
         Body: file,
         ACL: 'public-read',
       }),
     );
     const avatar = `https://${this.configService.get(
       'S3_BUCKET_NAME',
-    )}.s3.ap-northeast-2.amazonaws.com/${key}`;
+    )}.s3.ap-northeast-2.amazonaws.com/${avatarPath}`;
     return avatar;
   }
 }
