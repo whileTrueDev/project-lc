@@ -10,9 +10,7 @@ import {
   Post,
   Put,
   Query,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { GoodsImages, GoodsInfo } from '@prisma/client';
@@ -28,9 +26,6 @@ import {
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
-import { FileInterceptor } from '@nestjs/platform-express';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import multer from 'multer';
 import { UserPayload } from '../auth/auth.interface';
 import { GoodsInfoService } from '../goods-info/goods-info.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
@@ -44,17 +39,6 @@ export class GoodsController {
     private readonly goodsService: GoodsService,
     private readonly commonInfoService: GoodsInfoService,
   ) {}
-
-  /** 테스트 - 셀러 아바타 추가 - 셀러 컨트롤러로 옮겨야함 */
-  @Post('/avatar')
-  @UseInterceptors(FileInterceptor('file'))
-  async addAvatar(
-    @SellerInfo() seller: UserPayload,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<any> {
-    console.log('avatar router', file);
-    return this.goodsService.testAddAvatar(seller.sub, file.buffer, file.originalname);
-  }
 
   /** 상품 이미지 생성 */
   @Post('/image')

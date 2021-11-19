@@ -33,22 +33,6 @@ export class GoodsService {
     private readonly s3service: S3Service,
   ) {}
 
-  public async testAddAvatar(
-    email: Seller['email'],
-    imageBuffer: Buffer,
-    filename: string,
-  ): Promise<any> {
-    const avatar = await this.s3service.uploadProfile({
-      key: filename,
-      file: imageBuffer,
-    });
-    const user = await this.prisma.seller.update({
-      where: { email },
-      data: { avatar },
-    });
-    return true;
-  }
-
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
    * @param email seller.sub 로그인된 판매자 정보

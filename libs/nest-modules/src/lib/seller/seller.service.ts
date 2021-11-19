@@ -3,9 +3,16 @@ import { Prisma, Seller } from '@prisma/client';
 import { hash, verify } from 'argon2';
 import { FindSellerRes, SellerContactsDTO } from '@project-lc/shared-types';
 import { PrismaService } from '@project-lc/prisma-orm';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import multer from 'multer';
+import { S3Service } from '../s3/s3.service';
 @Injectable()
 export class SellerService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly s3service: S3Service,
+  ) {}
+
   /**
    * 회원 가입
    */
@@ -194,5 +201,31 @@ export class SellerService {
       },
     });
     return { contactId: contact.id };
+  }
+
+  /** 셀러 아바타 이미지 url 저장 */
+  public async addSellerAvatar(
+    email: Seller['email'],
+    file: Express.Multer.File,
+  ): Promise<boolean> {
+    const avatarUrl = await this.s3service.uploadProfileImage({
+      key: file.originalname,
+      file: file.buffer,
+      email,
+    });
+    await this.prisma.seller.update({
+      where: { email },
+      data: { avatar: avatarUrl },
+    });
+    return true;
+  }
+
+  /** 셀러 아바타 이미지 url null 로 초기화 */
+  public async removeSellerAvatar(email: Seller['email']): Promise<boolean> {
+    await this.prisma.seller.update({
+      where: { email },
+      data: { avatar: null },
+    });
+    return true;
   }
 }
