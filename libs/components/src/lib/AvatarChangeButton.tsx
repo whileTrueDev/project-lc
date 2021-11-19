@@ -17,8 +17,8 @@ import {
 } from '@chakra-ui/react';
 import {
   useProfile,
-  useTestAvatarMutation,
-  useTestAvatarRemoveMutation,
+  useSellerAvatarMutation,
+  useSellerAvatarRemoveMutation,
 } from '@project-lc/hooks';
 import { useRef, useState } from 'react';
 import { FiCamera } from 'react-icons/fi';
@@ -115,8 +115,8 @@ export function AvatarChangeButton(): JSX.Element {
   };
 
   // 잘린 아바타 이미지 post 요청
-  const uploadAvatar = useTestAvatarMutation();
-  const removeAvatar = useTestAvatarRemoveMutation();
+  const uploadAvatar = useSellerAvatarMutation();
+  const removeAvatar = useSellerAvatarRemoveMutation();
 
   // 프로필 사진 변경 다이얼로그 저장하기 핸들러
   const onSubmit = async (): Promise<void> => {
@@ -124,7 +124,6 @@ export function AvatarChangeButton(): JSX.Element {
       removeAvatar.mutateAsync().then(() => onClose());
       return;
     }
-    // return 대신 삭제하기
 
     const formData = new FormData();
     const filename = `${Date.now()}.jpeg`; // 파일명이 동일하면 s3에서 파일은 바뀌지만 queryClient invalidate 해도 표시되는 사진은 바뀌지 않음..
