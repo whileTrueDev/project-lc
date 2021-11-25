@@ -1,6 +1,7 @@
 import { Box } from '@chakra-ui/react';
 import { useIsLoggedIn } from '@project-lc/hooks';
 import React from 'react';
+import { MypageLink, mypageNavLinks } from '..';
 import FullscreenLoading from './FullscreenLoading';
 import LoginRequireAlertDialog from './LoginRequireAlertDialog';
 import MypageFooter from './MypageFooter';
@@ -9,16 +10,20 @@ import { Navbar } from './Navbar';
 
 interface MypageLayoutProps {
   children: React.ReactNode;
+  navLinks?: Array<MypageLink>;
 }
 
-export function MypageLayout({ children }: MypageLayoutProps): JSX.Element {
+export function MypageLayout({
+  children,
+  navLinks = mypageNavLinks,
+}: MypageLayoutProps): JSX.Element {
   const { status } = useIsLoggedIn();
 
   return (
     <Box position="relative" pointerEvents={status === 'loading' ? 'none' : 'auto'}>
       <Navbar />
 
-      <MypageNavbar />
+      <MypageNavbar navLinks={navLinks} />
 
       <Box as="main" minH="calc(100vh - 60px - 60px - 60px)">
         {children}
