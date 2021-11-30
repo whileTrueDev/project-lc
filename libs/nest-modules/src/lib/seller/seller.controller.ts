@@ -35,8 +35,7 @@ import {
   SettlementAccountDto,
   SignUpSellerDto,
 } from '@project-lc/shared-types';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import multer from 'multer';
+import __multer from 'multer';
 import { UserPayload } from '../auth/auth.interface';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';

@@ -3,8 +3,7 @@ import { Prisma, Seller } from '@prisma/client';
 import { hash, verify } from 'argon2';
 import { FindSellerRes, SellerContactsDTO } from '@project-lc/shared-types';
 import { PrismaService } from '@project-lc/prisma-orm';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import multer from 'multer';
+import __multer from 'multer';
 import { S3Service } from '../s3/s3.service';
 @Injectable()
 export class SellerService {
