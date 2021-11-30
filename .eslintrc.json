@@ -98,7 +98,8 @@
           1,
           {
             "args": "all",
-            "argsIgnorePattern": "^_"
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^__"
           }
         ],
         "@typescript-eslint/no-var-requires": "warn",
