@@ -2,10 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   ValidationPipe,
 } from '@nestjs/common';
-import { SignUpDto } from '@project-lc/shared-types';
+import { EmailDupCheckDto, SignUpDto } from '@project-lc/shared-types';
 import { Broadcaster } from '.prisma/client';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { BroadcasterService } from './broadcaster.service';
@@ -31,5 +33,13 @@ export class BroadcasterController {
     const broadcaster = await this.broadcasterService.signUp(dto);
     await this.mailVerificationService.deleteSuccessedMailVerification(dto.email);
     return broadcaster;
+  }
+
+  /** 방송인 이메일 주소 중복 체크 */
+  @Get('email-check')
+  public async emailDupCheck(
+    @Query(ValidationPipe) dto: EmailDupCheckDto,
+  ): Promise<boolean> {
+    return this.broadcasterService.isEmailDupCheckOk(dto.email);
   }
 }

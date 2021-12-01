@@ -54,4 +54,15 @@ export class BroadcasterService {
     });
     return broadcaster;
   }
+
+  /**
+   * 방송인 테이블에서 이메일 주소가 중복되는 지 체크합니다.
+   * @param email 중복체크할 이메일 주소
+   * @returns {boolean} 중복되지않아 괜찮은 경우 true, 중복된 경우 false
+   */
+  async isEmailDupCheckOk(email: string): Promise<boolean> {
+    const user = await this.prisma.broadcaster.findFirst({ where: { email } });
+    if (user) return false;
+    return true;
+  }
 }
