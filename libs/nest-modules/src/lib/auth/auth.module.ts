@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller';
 import { CipherService } from './cipher.service';
 
 import { SellerModule } from '../seller/seller.module';
+import { BroadcasterModule } from '../broadcaster/broadcaster.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { MailVerificationService } from './mailVerification.service';
@@ -20,6 +21,7 @@ import { LoginHistoryService } from './login-history/login-history.service';
 @Module({
   imports: [
     forwardRef(() => SellerModule),
+    forwardRef(() => BroadcasterModule),
     PassportModule,
     JwtModule.registerAsync({
       useClass: JwtConfigService,
