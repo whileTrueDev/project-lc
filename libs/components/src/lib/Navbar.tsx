@@ -17,7 +17,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
+import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
@@ -32,6 +32,7 @@ export function Navbar(): JSX.Element {
   const { isOpen, onToggle } = useDisclosure();
   const { isLoggedIn } = useIsLoggedIn();
   const { logout } = useLogout();
+  const { data: profileData } = useProfile();
 
   const handleAccountSettingClick = useCallback(
     () => router.push('/mypage/setting'),
@@ -92,7 +93,12 @@ export function Navbar(): JSX.Element {
           <ColorModeSwitcher />
           {isLoggedIn ? (
             <Menu>
-              <MenuButton as={Avatar} size="sm" cursor="pointer" />
+              <MenuButton
+                as={Avatar}
+                size="sm"
+                cursor="pointer"
+                src={profileData?.avatar}
+              />
               <MenuList w={{ base: 280, sm: 300 }}>
                 <Box p={3}>
                   <ProfileBox />

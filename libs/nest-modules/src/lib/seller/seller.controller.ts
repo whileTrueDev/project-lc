@@ -7,12 +7,14 @@ import {
   Patch,
   Post,
   Query,
-  UnauthorizedException,
-  UseGuards,
-  ValidationPipe,
   Res,
-  Param,
+  UnauthorizedException,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   SellCommission,
   Seller,
@@ -20,30 +22,30 @@ import {
   SellerSettlements,
 } from '@prisma/client';
 import {
-  FindSellerDto,
-  PasswordValidateDto,
-  SellerEmailDupCheckDto,
-  SignUpSellerDto,
   BusinessRegistrationDto,
-  SettlementAccountDto,
-  SellerShopInfoDto,
+  FindSellerDto,
   FindSellerRes,
+  FindSettlementHistoryDto,
+  PasswordValidateDto,
+  SellerBusinessRegistrationType,
   SellerContactsDTO,
   SellerContactsDTOWithoutIdDTO,
-  SellerBusinessRegistrationType,
-  FindSettlementHistoryRoundRes,
-  FindSettlementHistoryDto,
+  SellerEmailDupCheckDto,
+  SellerShopInfoDto,
+  SettlementAccountDto,
+  SignUpSellerDto,
 } from '@project-lc/shared-types';
-import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
+import __multer from 'multer';
+import { UserPayload } from '../auth/auth.interface';
 import { MailVerificationService } from '../auth/mailVerification.service';
-import { SellerService } from './seller.service';
+import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import {
   SellerSettlementInfo,
   SellerSettlementService,
 } from './seller-settlement.service';
-import { SellerInfo } from '../_nest-units/decorators/sellerInfo.decorator';
-import { UserPayload } from '../auth/auth.interface';
 import { SellerShopService } from './seller-shop.service';
+import { SellerService } from './seller.service';
 
 @Controller('seller')
 export class SellerController {
@@ -246,5 +248,23 @@ export class SellerController {
   @Get('sell-commission')
   public findSellCommission(): Promise<SellCommission> {
     return this.sellerSettlementService.findSellCommission();
+  }
+
+  /** 셀러 아바타 이미지 s3업로드 후 url 저장 */
+  @UseGuards(JwtAuthGuard)
+  @Post('/avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async addAvatar(
+    @SellerInfo() seller: UserPayload,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<boolean> {
+    return this.sellerService.addSellerAvatar(seller.sub, file);
+  }
+
+  /** 셀러 아바타 이미지 null로 저장 */
+  @UseGuards(JwtAuthGuard)
+  @Delete('/avatar')
+  async deleteAvatar(@SellerInfo() seller: UserPayload): Promise<boolean> {
+    return this.sellerService.removeSellerAvatar(seller.sub);
   }
 }

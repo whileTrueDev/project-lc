@@ -25,6 +25,7 @@ model Seller {
   SellerContacts             SellerContacts[]
   LiveShopping               LiveShopping[]
   OrderCancelRequests        SellerOrderCancelRequest[] // 판매자의 결제취소요청
+  avatar                     String?
 }
 
 // 마케터의 상정정보
@@ -341,7 +342,7 @@ enum LimitOrUnlimit {
   limit
 }
 
-// * 상품 - 필수옵션-분리/합체형 구분
+// * 상품 - 필수옵션-분리/합체형 구���
 enum OptionViewType {
   divide
   join

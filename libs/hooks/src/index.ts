@@ -27,6 +27,7 @@ export * from './lib/mutation/useLogoutMutation';
 export * from './lib/mutation/useMailVerificationMutation';
 export * from './lib/mutation/useNoticeMutation';
 export * from './lib/mutation/useRegistGoods';
+export * from './lib/mutation/useSellerAvatarMutation';
 export * from './lib/mutation/useSellerOrderCancelMutation';
 export * from './lib/mutation/useSellerSignupMutation';
 export * from './lib/mutation/useSettlementAccountMutation';

@@ -6,6 +6,7 @@ import { PrismaModule } from '@project-lc/prisma-orm';
 import { AuthModule } from '../auth/auth.module';
 import { AuthService } from '../auth/auth.service';
 import { CipherService } from '../auth/cipher.service';
+import { S3Service } from '../s3/s3.service';
 import { SellerService } from '../seller/seller.service';
 import { mailerConfig } from '../_nest-units/settings/mailer.config';
 import { GoogleApiService } from './platform-api/google-api.service';
@@ -38,6 +39,7 @@ describe('SocialController', () => {
         KakaoApiService,
         NaverApiService,
         GoogleApiService,
+        S3Service,
       ],
     }).compile();
 

@@ -11,6 +11,7 @@ import { mailerConfig } from '../_nest-units/settings/mailer.config';
 import { KakaoApiService } from './platform-api/kakao-api.service';
 import { NaverApiService } from './platform-api/naver-api.service';
 import { GoogleApiService } from './platform-api/google-api.service';
+import { S3Service } from '../s3/s3.service';
 
 describe('SocialService', () => {
   let service: SocialService;
@@ -40,6 +41,7 @@ describe('SocialService', () => {
         KakaoApiService,
         NaverApiService,
         GoogleApiService,
+        S3Service,
       ],
     }).compile();
 

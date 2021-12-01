@@ -8,6 +8,8 @@ import { GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  ApprovedGoodsNameAndId,
+  getLiveShoppingProgress,
   GoodsByIdRes,
   GoodsImageDto,
   GoodsListDto,
@@ -17,8 +19,6 @@ import {
   GoodsOptionWithStockInfo,
   RegistGoodsDto,
   TotalStockInfo,
-  ApprovedGoodsNameAndId,
-  getLiveShoppingProgress,
 } from '@project-lc/shared-types';
 import {
   getImgSrcListFromHtmlStringList,

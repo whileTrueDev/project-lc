@@ -4,12 +4,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Seller } from '@prisma/client';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import request from 'supertest';
+import { ConfigService } from '@nestjs/config';
 import { SellerController } from './seller.controller';
 import { SellerService } from './seller.service';
 import { SellerSettlementService } from './seller-settlement.service';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { mailerConfig } from '../_nest-units/settings/mailer.config';
 import { SellerShopService } from './seller-shop.service';
+import { S3Service } from '../s3/s3.service';
 
 describe('SellerController', () => {
   interface TestSeller extends Seller {
@@ -26,6 +28,7 @@ describe('SellerController', () => {
     email: 'test@test.com',
     password: 'test',
     sellerShop: { shopName: 'testShop' },
+    avatar: null,
   };
 
   beforeAll(async () => {
@@ -37,6 +40,8 @@ describe('SellerController', () => {
         MailVerificationService,
         SellerSettlementService,
         SellerShopService,
+        S3Service,
+        ConfigService,
       ],
     }).compile();
 

@@ -1,8 +1,14 @@
 import { Avatar, Grid, GridItem, Text } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
+import { AvatarChangeButton } from './AvatarChangeButton';
 
-export function ProfileBox(): JSX.Element {
+export function ProfileBox({
+  allowAvatarChange = false,
+}: {
+  allowAvatarChange?: boolean;
+}): JSX.Element {
   const { data } = useProfile();
+
   return (
     <Grid
       maxWidth="sm"
@@ -17,7 +23,7 @@ export function ProfileBox(): JSX.Element {
         justifyContent="center"
         alignItems="center"
       >
-        <Avatar />
+        {allowAvatarChange ? <AvatarChangeButton /> : <Avatar src={data?.avatar} />}
       </GridItem>
       <GridItem colSpan={3}>
         <Text isTruncated fontWeight="bold">
