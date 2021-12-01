@@ -21,7 +21,7 @@ import {
   emailCodeRegisterOptions,
   emailRegisterOptions,
   passwordRegisterOptions,
-  SignUpSellerDto,
+  SignUpDto,
 } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
@@ -47,7 +47,7 @@ export function SignupForm({
     getValues,
     setError,
     watch,
-  } = useForm<SignUpSellerDto & { repassword: string }>();
+  } = useForm<SignUpDto & { repassword: string }>();
 
   // * 인증코드 페이즈
   const [phase, setPhase] = useState(1);
@@ -108,7 +108,7 @@ export function SignupForm({
   const signup = useSellerSignupMutation();
   const login = useLoginMutation('seller');
   const onSubmit = useCallback(
-    async (data: SignUpSellerDto) => {
+    async (data: SignUpDto) => {
       const seller = await signup.mutateAsync(data).catch((err) => {
         // eslint-disable-next-line no-console
         console.error(err.response);

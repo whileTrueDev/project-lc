@@ -33,7 +33,7 @@ import {
   SellerEmailDupCheckDto,
   SellerShopInfoDto,
   SettlementAccountDto,
-  SignUpSellerDto,
+  SignUpDto,
 } from '@project-lc/shared-types';
 import __multer from 'multer';
 import { UserPayload } from '../auth/auth.interface';
@@ -64,7 +64,7 @@ export class SellerController {
 
   // * 판매자 회원가입
   @Post()
-  public async signUp(@Body(ValidationPipe) dto: SignUpSellerDto): Promise<Seller> {
+  public async signUp(@Body(ValidationPipe) dto: SignUpDto): Promise<Seller> {
     const checkResult = await this.mailVerificationService.checkMailVerification(
       dto.email,
       dto.code,
