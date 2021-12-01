@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { throwError } from 'rxjs';
-import { BroadcasterDTO } from '@project-lc/shared-types';
+import { hash } from 'argon2';
+import { BroadcasterDTO, SignUpDto } from '@project-lc/shared-types';
+import { Broadcaster } from '@prisma/client';
 @Injectable()
 export class BroadcasterService {
   constructor(private readonly prisma: PrismaService) {}
@@ -35,5 +37,21 @@ export class BroadcasterService {
         channelUrl: true,
       },
     });
+  }
+
+  /** 방송인 회원가입 서비스 핸들러 */
+  async signUp(dto: SignUpDto): Promise<Broadcaster> {
+    const hashedPw = await hash(dto.password);
+    const broadcaster = await this.prisma.broadcaster.create({
+      data: {
+        email: dto.email,
+        userName: dto.name,
+        password: hashedPw,
+        userId: dto.email,
+        userNickname: '',
+        overlayUrl: `/${dto.email}`,
+      },
+    });
+    return broadcaster;
   }
 }
