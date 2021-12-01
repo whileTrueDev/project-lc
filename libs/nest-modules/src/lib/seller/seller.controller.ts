@@ -30,7 +30,7 @@ import {
   SellerBusinessRegistrationType,
   SellerContactsDTO,
   SellerContactsDTOWithoutIdDTO,
-  SellerEmailDupCheckDto,
+  EmailDupCheckDto,
   SellerShopInfoDto,
   SettlementAccountDto,
   SignUpDto,
@@ -81,7 +81,7 @@ export class SellerController {
   // * 이메일 주소 중복 체크
   @Get('email-check')
   public async emailDupCheck(
-    @Query(ValidationPipe) dto: SellerEmailDupCheckDto,
+    @Query(ValidationPipe) dto: EmailDupCheckDto,
   ): Promise<boolean> {
     return this.sellerService.isEmailDupCheckOk(dto.email);
   }
