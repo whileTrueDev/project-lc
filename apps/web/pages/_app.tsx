@@ -1,13 +1,11 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { ThemeProvider } from '@material-ui/core';
 import { lightBigLogoUrl, lightLogoUrl } from '@project-lc/components';
+import { createChakraTheme, createMuiTheme, createQueryClient } from '@project-lc/utils';
 import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';
 import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import createChakraTheme from '../utils/createChakraTheme';
-import createMuiTheme from '../utils/createMuiTheme';
-import createQueryClient from '../utils/createReactQueryClient';
 
 const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();

@@ -98,3 +98,31 @@ export const adminNavItems: Array<NavItem> = [
   },
   { label: '결제 취소 요청', href: '/order-cancel' },
 ];
+
+export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
+  {
+    name: '홈',
+    href: '/mypage',
+    checkIsActive: (pathname, linkHref) => pathname === linkHref,
+  },
+  {
+    name: '라이브쇼핑',
+    href: '/mypage/live',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '구입현황',
+    href: '/mypage/purchase',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '정산',
+    href: '/mypage/settlement',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '계정설정',
+    href: '/mypage/setting',
+    checkIsActive: defaultIsActiveChecker,
+  },
+];

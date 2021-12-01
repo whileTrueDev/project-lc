@@ -10,6 +10,8 @@ export class AppSetting {
   private corsOptions = {
     origin: [
       'http://localhost:4200',
+      'http://localhost:4250',
+      'http://localhost:4300',
       'http://localhost:3011',
       'https://xn--hp4b17xa.com', // 크크쇼.com
 
