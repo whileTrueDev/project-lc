@@ -98,6 +98,7 @@ export const testBroadcasterData: Prisma.BroadcasterCreateInput = {
   userNickname: '테스트방송인',
   overlayUrl: 'test',
   userId: 'test-broadcaster',
+  email: 'test-broadcaster@gmail.com',
   userName: '테스트방송인',
 };
 

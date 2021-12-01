@@ -283,7 +283,9 @@ CREATE TABLE `Broadcaster` (
     `overlayUrl` VARCHAR(191) NOT NULL,
     `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `deleteFlag` BOOLEAN NOT NULL DEFAULT false,
+    `email` VARCHAR(191) NOT NULL,
 
+    UNIQUE INDEX `Broadcaster_email_key`(`email`),
     INDEX `Broadcaster_userId_idx`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
