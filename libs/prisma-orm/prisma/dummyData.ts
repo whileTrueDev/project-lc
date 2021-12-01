@@ -99,6 +99,8 @@ export const testBroadcasterData: Prisma.BroadcasterCreateInput = {
   overlayUrl: 'test',
   userId: 'test-broadcaster',
   userName: '테스트방송인',
+  email: 'testBc@gmail.com',
+  password: COMMON_DUMMY_PASSWORD,
 };
 
 /** 판매 수수료 기본값 설정 */

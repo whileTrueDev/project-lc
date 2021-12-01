@@ -342,7 +342,7 @@ enum LimitOrUnlimit {
   limit
 }
 
-// * 상품 - 필수옵션-분리/합체형 구���
+// * 상품 - 필수옵션-분리/합체형 구
 enum OptionViewType {
   divide
   join
@@ -498,8 +498,12 @@ model Broadcaster {
   channelUrl          String?
   createDate          DateTime              @default(now())
   deleteFlag          Boolean               @default(false) // 회원탈퇴 여부
+  email               String                @unique // 방송인 이메일(가입시 사용)
+  password            String? // 비밀번호
+  avatar              String?
+  agreementFlag       Boolean               @default(false) // 이용동의 
+  LiveShopping        LiveShopping[]
 
-  LiveShopping LiveShopping[]
   @@index(userId)
 }
 
