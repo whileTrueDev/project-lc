@@ -1,7 +1,6 @@
-import { Seller } from '@prisma/client';
 import { IsEmail, IsString, Length } from 'class-validator';
 
-export class SignUpSellerDto implements Partial<Seller> {
+export class SignUpDto {
   @IsEmail() email: string;
 
   @IsString() name: string;

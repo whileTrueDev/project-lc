@@ -274,7 +274,7 @@ CREATE TABLE `LiveCommerceRanking` (
 -- CreateTable
 CREATE TABLE `Broadcaster` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `userId` VARCHAR(20) NOT NULL,
+    `userId` VARCHAR(191) NOT NULL,
     `userName` VARCHAR(20) NOT NULL,
     `userNickname` VARCHAR(20) NOT NULL,
     `afreecaId` VARCHAR(191),
@@ -284,6 +284,7 @@ CREATE TABLE `Broadcaster` (
     `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `deleteFlag` BOOLEAN NOT NULL DEFAULT false,
 
+    UNIQUE INDEX `Broadcaster_userId_key`(`userId`),
     INDEX `Broadcaster_userId_idx`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
