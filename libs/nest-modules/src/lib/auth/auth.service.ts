@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes, UserProfileRes, UserType } from '@project-lc/shared-types';
@@ -161,13 +161,19 @@ export class AuthService {
     return `${newAccessToken}`;
   }
 
-  async getProfile(userPayload: UserPayload): Promise<UserProfileRes> {
+  async getProfile(userPayload: UserPayload, appType: UserType): Promise<UserProfileRes> {
     const { sub, type } = userPayload;
     let user: Seller | Broadcaster;
     if (['admin', 'seller'].includes(type)) {
+      if (appType !== 'seller') {
+        throw new UnauthorizedException();
+      }
       user = await this.sellerService.findOne({ email: sub });
     }
     if (['broadcaster'].includes(type)) {
+      if (appType !== 'broadcaster') {
+        throw new UnauthorizedException();
+      }
       user = await this.broadcasterService.findOne({ email: sub });
     }
     const hasPassword = Boolean(user.password);
