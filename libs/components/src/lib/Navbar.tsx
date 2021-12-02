@@ -23,11 +23,15 @@ import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
 import { mainNavItems, NavItem } from '../constants/navigation';
+import { renderSiteType, SiteType } from '../constants/siteType';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import KksLogo from './KksLogo';
 import ProfileBox from './ProfileBox';
 
-export function Navbar(): JSX.Element {
+export interface NavbarProps {
+  siteType?: SiteType;
+}
+export function Navbar({ siteType = 'seller' }: NavbarProps): JSX.Element {
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
   const { isLoggedIn } = useIsLoggedIn();
@@ -77,7 +81,7 @@ export function Navbar(): JSX.Element {
               <KksLogo size="small" />
             </Link>
           </NextLink>
-
+          {renderSiteType(siteType)}
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
             <DesktopNav />
           </Flex>
@@ -236,3 +240,6 @@ const MobileNavItem = ({ label, href, needLogin }: NavItem): JSX.Element => {
     </Flex>
   );
 };
+
+export const SellerNavbar = (): JSX.Element => <Navbar siteType="seller" />;
+export const BroadcasterNavbar = (): JSX.Element => <Navbar siteType="broadcaster" />;

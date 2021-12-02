@@ -1,3 +1,4 @@
+export * from './constants/footerLinks';
 export * from './constants/navigation';
 export * from './lib/AccountRemoveSection';
 export * from './lib/admin/AdminAccountList';
@@ -15,6 +16,7 @@ export * from './lib/admin/AdminPageLayout';
 export * from './lib/BroadcasterAutocomplete';
 export * from './lib/BroadcasterChannelButton';
 export * from './lib/BroadcasterName';
+export * from './lib/BroadcasterNickName';
 export * from './lib/BusinessRegistrationBox';
 export * from './lib/BusinessRegistrationDialog';
 export * from './lib/CenterBox';
