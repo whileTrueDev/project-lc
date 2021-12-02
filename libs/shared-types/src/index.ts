@@ -24,6 +24,7 @@ export * from './lib/dto/changeFmOrderStatus.dto';
 export * from './lib/dto/changeGoodsView.dto';
 export * from './lib/dto/changeReturnStatus.dto';
 export * from './lib/dto/changeSellCommission.dto';
+export * from './lib/dto/createBroadcasterChannel.dto';
 export * from './lib/dto/deleteGoods.dto';
 export * from './lib/dto/emailCodeVerification.dto';
 export * from './lib/dto/emailDupCheck.dto';
