@@ -1,3 +1,4 @@
+export * from './constants/footerLinks';
 export * from './constants/navigation';
 export * from './lib/AccountRemoveSection';
 export * from './lib/admin/AdminAccountList';

@@ -2,7 +2,7 @@ import { MypageLayout, broadcasterCenterMypageNavLinks } from '@project-lc/compo
 
 export function SettlementIndex(): JSX.Element {
   return (
-    <MypageLayout navLinks={broadcasterCenterMypageNavLinks}>
+    <MypageLayout siteType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
       마이페이지 - 정산
     </MypageLayout>
   );

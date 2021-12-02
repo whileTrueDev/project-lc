@@ -49,7 +49,8 @@ function MainBetaStartButton(): React.ReactElement {
     </Button>
   );
 }
-export function MainBetaDesktop(): React.ReactElement {
+/** 판매자 메인화면 (베타버전, 데스크탑화면) */
+export function SellerMainBetaDesktop(): React.ReactElement {
   const { isMobileSize } = useDisplaySize();
 
   return (
@@ -66,7 +67,47 @@ export function MainBetaDesktop(): React.ReactElement {
   );
 }
 
-export function MainBetaMobile(): React.ReactElement {
+/** 판매자 메인화면 (베타버전, 모바일화면) */
+export function SellerMainBetaMobile(): React.ReactElement {
+  return (
+    <Stack>
+      <Stack minH="92vh">
+        <MainBetaVideo />
+
+        <Stack minH="50vh" justify="center" alignItems="center">
+          <Stack alignItems="center">
+            <Heading size="lg">팬들과 함께 소통하는 쇼핑</Heading>
+            <Heading size="lg">그래서, 더욱 믿을 수 있는</Heading>
+            <Flex w="100%" pt={4} alignItems="center" justify="center">
+              <MainBetaStartButton />
+            </Flex>
+          </Stack>
+        </Stack>
+      </Stack>
+    </Stack>
+  );
+}
+
+/** 방송인 메인화면 (베타버전, 데스크탑화면) */
+export function BroadcasterMainBetaDesktop(): React.ReactElement {
+  const { isMobileSize } = useDisplaySize();
+
+  return (
+    <SimpleGrid minH="92vh" columns={2} alignItems="center" px={2}>
+      <Stack justify="center" alignItems="center">
+        <Heading fontSize={{ md: '2xl', lg: '4xl' }}>팬들과 함께 소통하는 쇼핑</Heading>
+        <Heading fontSize={{ md: '2xl', lg: '4xl' }}>그래서, 더욱 믿을 수 있는</Heading>
+        <Flex w="100%" pt={4} alignItems="center" justify="center">
+          <MainBetaStartButton />
+        </Flex>
+      </Stack>
+      {!isMobileSize && <MainBetaVideo />}
+    </SimpleGrid>
+  );
+}
+
+/** 방송인 메인화면 (베타버전, 모바일화면) */
+export function BroadcasterMainBetaMobile(): React.ReactElement {
   return (
     <Stack>
       <Stack minH="92vh">

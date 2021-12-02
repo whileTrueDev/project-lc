@@ -1,9 +1,10 @@
 import { Flex } from '@chakra-ui/react';
 import {
   CommonFooter,
-  MainBetaDesktop,
-  MainBetaMobile,
+  SellerMainBetaDesktop,
+  SellerMainBetaMobile,
   Navbar,
+  sellerFooterLinkList,
 } from '@project-lc/components';
 import { useDisplaySize } from '@project-lc/hooks';
 
@@ -14,8 +15,8 @@ export function Index(): JSX.Element {
     <div>
       <Navbar />
       <Flex minH="100vh" justify="space-between" flexDirection="column">
-        {isMobileSize ? <MainBetaMobile /> : <MainBetaDesktop />}
-        <CommonFooter />
+        {isMobileSize ? <SellerMainBetaMobile /> : <SellerMainBetaDesktop />}
+        <CommonFooter footerLinkList={sellerFooterLinkList} />
       </Flex>
     </div>
   );

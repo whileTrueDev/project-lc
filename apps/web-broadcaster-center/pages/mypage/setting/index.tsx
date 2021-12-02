@@ -2,7 +2,7 @@ import { broadcasterCenterMypageNavLinks, MypageLayout } from '@project-lc/compo
 
 export function SettingIndex(): JSX.Element {
   return (
-    <MypageLayout navLinks={broadcasterCenterMypageNavLinks}>
+    <MypageLayout siteType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
       마이페이지 - 계정설정
     </MypageLayout>
   );
