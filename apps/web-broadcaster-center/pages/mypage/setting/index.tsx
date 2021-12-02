@@ -1,9 +1,22 @@
-import { broadcasterCenterMypageNavLinks, MypageLayout } from '@project-lc/components';
+import { Container, Divider, Heading, VStack } from '@chakra-ui/react';
+import {
+  broadcasterCenterMypageNavLinks,
+  BroadcasterNickName,
+  MypageLayout,
+} from '@project-lc/components';
 
 export function SettingIndex(): JSX.Element {
   return (
     <MypageLayout siteType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
-      마이페이지 - 계정설정
+      <Container maxWidth="2xl" p={6}>
+        <VStack spacing={4} alignItems="stretch">
+          <Heading mb={4}>내 계정</Heading>
+          <div>계정정보</div>
+          <Divider />
+          <BroadcasterNickName />
+          <Divider />
+        </VStack>
+      </Container>
     </MypageLayout>
   );
 }
