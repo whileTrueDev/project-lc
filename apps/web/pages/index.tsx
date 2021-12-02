@@ -3,7 +3,7 @@ import {
   CommonFooter,
   SellerMainBetaDesktop,
   SellerMainBetaMobile,
-  Navbar,
+  SellerNavbar,
   sellerFooterLinkList,
 } from '@project-lc/components';
 import { useDisplaySize } from '@project-lc/hooks';
@@ -13,7 +13,7 @@ export function Index(): JSX.Element {
 
   return (
     <div>
-      <Navbar />
+      <SellerNavbar />
       <Flex minH="100vh" justify="space-between" flexDirection="column">
         {isMobileSize ? <SellerMainBetaMobile /> : <SellerMainBetaDesktop />}
         <CommonFooter footerLinkList={sellerFooterLinkList} />

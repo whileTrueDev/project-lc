@@ -240,3 +240,6 @@ const MobileNavItem = ({ label, href, needLogin }: NavItem): JSX.Element => {
     </Flex>
   );
 };
+
+export const SellerNavbar = (): JSX.Element => <Navbar siteType="seller" />;
+export const BroadcasterNavbar = (): JSX.Element => <Navbar siteType="broadcaster" />;
