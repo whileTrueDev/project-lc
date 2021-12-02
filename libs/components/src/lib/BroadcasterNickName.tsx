@@ -29,6 +29,11 @@ export function BroadcasterNickNameSection(): JSX.Element {
       {!broadcaster.isLoading && !broadcaster.data?.userNickname && (
         <NoNicknameAlertBox />
       )}
+      {!broadcaster.isLoading && broadcaster.data?.userNickname && (
+        <Text>
+          크리에이터, 인플루언서로 활동하시면서 사용하시는 활동명 또는 채널명 입니다.
+        </Text>
+      )}
       <EditableNickname />
     </SettingSectionLayout>
   );
