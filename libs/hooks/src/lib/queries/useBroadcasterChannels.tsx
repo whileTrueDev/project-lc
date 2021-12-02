@@ -4,15 +4,18 @@ import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export const getBroadcasterChannels = async (
-  broadcasterId: number,
+  broadcasterId?: number,
 ): Promise<BroadcasterChannel[]> => {
+  if (!broadcasterId) {
+    return [];
+  }
   return axios
     .get<BroadcasterChannel[]>(`/broadcaster/${broadcasterId}/channel-list`)
     .then((res) => res.data);
 };
 
 export const useBroadcasterChannels = (
-  broadcasterId: number,
+  broadcasterId?: number,
 ): UseQueryResult<BroadcasterChannel[], AxiosError> => {
   return useQuery<BroadcasterChannel[], AxiosError>(
     ['BroadcasterChannels', broadcasterId],

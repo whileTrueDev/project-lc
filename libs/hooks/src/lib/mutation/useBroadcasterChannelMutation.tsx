@@ -31,7 +31,7 @@ export const useBroadcasterChannelDeleteMutation = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation<boolean, AxiosError, number>(
     (channelId: number) =>
-      axios.delete<boolean>(`/broadcaster/${channelId}`).then((res) => res.data),
+      axios.delete<boolean>(`/broadcaster/channel/${channelId}`).then((res) => res.data),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('BroadcasterChannels');
