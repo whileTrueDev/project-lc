@@ -15,7 +15,6 @@ model Seller {
   password                   String?
   goods                      Goods[]
   goodsCommonInfo            GoodsInfo[] // 상품공통정보
-  loginHistory               LoginHistory[]
   sellerBusinessRegistration SellerBusinessRegistration[]
   sellerSettlementAccount    SellerSettlementAccount[]
   sellerShop                 SellerShop?
@@ -278,8 +277,8 @@ model GoodsInfo {
 
 model LoginHistory {
   id         Int      @id @default(autoincrement())
-  seller     Seller?  @relation(fields: [sellerId], references: [id])
-  sellerId   Int?
+  userEmail  String
+  userType   String
   method     String // 로그인 방식
   ip         String // 로그인 IP
   country    String? // 로그인 국가
@@ -287,8 +286,6 @@ model LoginHistory {
   device     String // 로그인 기기
   ua         String // User-Agent 문자열
   createDate DateTime @default(now()) // 로그인 일시
-
-  @@index([sellerId], name: "sellerId")
 }
 
 // 상품 검수 상태 정보
