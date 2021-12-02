@@ -480,7 +480,7 @@ model LiveCommerceRanking {
   giftFlag           Boolean     @default(false) // 스트리머����� 선물하기 여부
   loginFlag          Boolean     @default(true) // 회원 | 비회원 구분 \
   broadcaster        Broadcaster @relation(fields: [broadcasterId], references: [userId])
-  broadcasterId      String      @db.VarChar(20) // 스트리머의 아이디 
+  broadcasterId      String // 스트리머의 아이디 
   createDate         DateTime    @default(now()) // 작성일자
 }
 
@@ -488,17 +488,12 @@ model LiveCommerceRanking {
 model Broadcaster {
   id                  Int                   @id @default(autoincrement())
   liveCommerceRanking LiveCommerceRanking[]
-  userId              String                @db.VarChar(20) // 유저 아이디
+  userId              String                @unique // 유저 아이디(방송인 가입시 사용하는 이메일)
   userName            String                @db.VarChar(20) // 유저의 실명
-  userNickname        String                @db.VarChar(20) // 유저의 활동명
-  afreecaId           String? // 유저의 아프리카 아이디
-  twitchId            String? // 유저의 트위치 아이디
-  youtubeId           String? // 유저의 유튜브 아이디
+  userNickname        String?               @db.VarChar(20) // 유저의 활동명
   overlayUrl          String                @unique // 라이브커머스 오버레이 URL 
-  channelUrl          String?
   createDate          DateTime              @default(now())
   deleteFlag          Boolean               @default(false) // 회원탈퇴 여부
-  email               String                @unique // 방송인 이메일(가입시 사용)
   password            String? // 비밀번호
   avatar              String?
   agreementFlag       Boolean               @default(false) // 이용동의 
@@ -513,7 +508,7 @@ model Broadcaster {
 model LiveShopping {
   id                        Int                       @id @default(autoincrement())
   streamId                  String?                   @unique // 방송마다 부여되는 unique 값
-  broadcasterId             String?                   @db.VarChar(20) // 스트리머의 아이디 
+  broadcasterId             String? //방송인의 아이디 
   sellerId                  Int // 판매자 ID
   goodsId                   Int // 상품 ID
   videoId                   Int?
