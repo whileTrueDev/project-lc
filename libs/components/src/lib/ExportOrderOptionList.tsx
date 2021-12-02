@@ -229,6 +229,11 @@ function ExportOrderSummary({
           </Text>
         </HStack>
       )}
+      {order.memo && (
+        <HStack>
+          <Text fontSize="sm">(배송메시지) {order.memo}</Text>
+        </HStack>
+      )}
     </Stack>
   );
 }
