@@ -31,10 +31,6 @@ export class BroadcasterService {
       select: {
         userId: true,
         userNickname: true,
-        afreecaId: true,
-        twitchId: true,
-        youtubeId: true,
-        channelUrl: true,
       },
     });
   }
@@ -44,10 +40,9 @@ export class BroadcasterService {
     const hashedPw = await hash(dto.password);
     const broadcaster = await this.prisma.broadcaster.create({
       data: {
-        email: dto.email,
+        userId: dto.email,
         userName: dto.name,
         password: hashedPw,
-        userId: dto.email,
         userNickname: '',
         overlayUrl: `/${dto.email}`,
       },
@@ -61,7 +56,7 @@ export class BroadcasterService {
    * @returns {boolean} 중복되지않아 괜찮은 경우 true, 중복된 경우 false
    */
   async isEmailDupCheckOk(email: string): Promise<boolean> {
-    const user = await this.prisma.broadcaster.findFirst({ where: { email } });
+    const user = await this.prisma.broadcaster.findFirst({ where: { userId: email } });
     if (user) return false;
     return true;
   }

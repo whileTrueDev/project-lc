@@ -95,11 +95,10 @@ export const testsellerExtraData: {
 
 /** 테스트방송인 생성 데이터 */
 export const testBroadcasterData: Prisma.BroadcasterCreateInput = {
-  userNickname: '테스트방송인',
-  overlayUrl: 'test',
-  userId: 'test-broadcaster',
-  email: 'test-broadcaster@gmail.com',
-  userName: '테스트방송인',
+  overlayUrl: '/test-broadcaster@gmail.com',
+  userId: 'test-broadcaster@gmail.com',
+  userName: '테스트방송인이름',
+  userNickname: '테스트방송인활동명',
 };
 
 /** 판매 수수료 기본값 설정 */
