@@ -7,8 +7,15 @@ import {
   Delete,
   Query,
   ValidationPipe,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
-import { EmailDupCheckDto, SignUpDto } from '@project-lc/shared-types';
+import {
+  CreateBroadcasterChannelDto,
+  EmailDupCheckDto,
+  SignUpDto,
+} from '@project-lc/shared-types';
+import { BroadcasterChannel } from '@prisma/client';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { Broadcaster } from '.prisma/client';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -48,19 +55,25 @@ export class BroadcasterController {
 
   /** 방송인 채널 생성 */
   @Post('/channel')
-  createBroadcasterChannel(): any {
-    return this.channelService.createBroadcasterChannel();
+  createBroadcasterChannel(
+    @Body(ValidationPipe) dto: CreateBroadcasterChannelDto,
+  ): Promise<BroadcasterChannel> {
+    return this.channelService.createBroadcasterChannel(dto);
   }
 
   /** 방송인 채널 삭제 */
   @Delete('/channel/:channelId')
-  deleteBroadcasterChannel(): any {
-    return this.channelService.deleteBroadcasterChannel();
+  deleteBroadcasterChannel(
+    @Param('channelId', ParseIntPipe) channelId: number,
+  ): Promise<boolean> {
+    return this.channelService.deleteBroadcasterChannel(channelId);
   }
 
   /** 방송인 채널 목록 조회 */
   @Get('/:broadcasterId/channel-list')
-  getBroadcasterChannelList(): any {
-    return this.channelService.getBroadcasterChannelList();
+  getBroadcasterChannelList(
+    @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
+  ): Promise<BroadcasterChannel[]> {
+    return this.channelService.getBroadcasterChannelList(broadcasterId);
   }
 }
