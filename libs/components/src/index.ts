@@ -11,6 +11,7 @@ export * from './lib/admin/AdminLiveShoppingUpdateConfirmModal';
 export * from './lib/admin/AdminLoginForm';
 export * from './lib/admin/AdminNoticeSection';
 export * from './lib/admin/AdminOrderCancelRequestList';
+export * from './lib/admin/AdminOverlayImageUploadDialog';
 export * from './lib/admin/AdminPageLayout';
 export * from './lib/BroadcasterAutocomplete';
 export * from './lib/BroadcasterChannelButton';

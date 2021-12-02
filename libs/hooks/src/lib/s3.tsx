@@ -8,7 +8,9 @@ export type s3KeyType =
   | 'business-registration'
   | 'goods'
   | 'mail-order'
-  | 'settlement-account';
+  | 'settlement-account'
+  | 'vertical-banner'
+  | 'donation-images';
 
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
@@ -32,6 +34,7 @@ export const s3 = (() => {
     type: s3KeyType;
     file: File | Buffer | null;
     companyName?: string;
+    streamId?: string;
   }
 
   type s3FileNameParams = {
@@ -39,6 +42,7 @@ export const s3 = (() => {
     type: s3KeyType;
     filename: string | null;
     companyName?: string;
+    streamId?: string;
   };
 
   // 파일명에서 확장자를 추출하는 과정
@@ -51,7 +55,13 @@ export const s3 = (() => {
     return result;
   }
 
-  function getS3Key({ userMail, type, filename, companyName }: s3FileNameParams): {
+  function getS3Key({
+    userMail,
+    type,
+    filename,
+    companyName,
+    streamId,
+  }: s3FileNameParams): {
     key: string;
     fileName: string;
   } {
@@ -82,7 +92,9 @@ export const s3 = (() => {
         fileFullName = `${filename}`;
       }
     }
-    const pathList = [type, userMail, fileFullName];
+    const pathList = streamId
+      ? [type, userMail, streamId, fileFullName]
+      : [type, userMail, fileFullName];
     return {
       key: path.join(...pathList),
       fileName: fileFullName,
@@ -96,11 +108,13 @@ export const s3 = (() => {
     filename,
     type,
     userMail,
+    streamId,
   }: S3UploadImageOptions & {
     contentType: string;
   }): Promise<string> {
     if (!userMail || !file) throw new Error('file should be not null');
-    const { key } = getS3Key({ userMail, type, filename });
+    const { key } = getS3Key({ userMail, type, filename, streamId });
+
     try {
       const command = new PutObjectCommand({
         Bucket: S3_BUCKET_NAME,
@@ -132,11 +146,18 @@ export const s3 = (() => {
     type,
     userMail,
     companyName,
+    streamId,
   }: S3UploadImageOptions): Promise<string | null> {
     if (!userMail || !file) {
       return null;
     }
-    const { key, fileName } = getS3Key({ userMail, type, filename, companyName });
+    const { key, fileName } = getS3Key({
+      userMail,
+      type,
+      filename,
+      companyName,
+      streamId,
+    });
 
     try {
       const command = new PutObjectCommand({

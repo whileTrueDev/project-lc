@@ -27,6 +27,6 @@ export const getAdminHost = (): string => {
       return process.env.NEXT_PUBLIC_ADMIN_HOST;
     case 'development':
     default:
-      return 'http://localhost:4200';
+      return 'http://localhost:4250';
   }
 };

@@ -17,6 +17,7 @@ import {
   Input,
   Textarea,
   Link,
+  useDisclosure,
 } from '@chakra-ui/react';
 import {
   AdminPageLayout,
@@ -35,6 +36,7 @@ import {
   BroadcasterName,
   AdminLiveShoppingUpdateConfirmModal,
   LiveShoppingProgressBadge,
+  AdminOverlayImageUploadDialog,
 } from '@project-lc/components';
 import {
   useAdminLiveShoppingList,
@@ -88,6 +90,11 @@ export function GoodsDetail(): JSX.Element {
   });
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const {
+    isOpen: imageDialogIsOpen,
+    onOpen: imageDialogOnOpen,
+    onClose: imageDialogOnClose,
+  } = useDisclosure();
   const onClose = (): void => {
     setIsOpen(false);
   };
@@ -128,7 +135,7 @@ export function GoodsDetail(): JSX.Element {
 
   if (!goods.isLoading && !goods.data)
     return <AdminPageLayout>...no data</AdminPageLayout>;
-
+  console.log(liveShopping[0]);
   return (
     <AdminPageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={8} p={2} mb={16}>
@@ -323,11 +330,18 @@ export function GoodsDetail(): JSX.Element {
                 <Input {...register('videoUrl')} />
               </Stack>
               <Button onClick={openConfirmModal}>변경</Button>
+              <Button onClick={imageDialogOnOpen}>오버레이 이미지 등록</Button>
             </Stack>
             <AdminLiveShoppingUpdateConfirmModal
               isOpen={isOpen}
               onClose={onClose}
               onConfirm={handleSubmit(regist)}
+            />
+            <AdminOverlayImageUploadDialog
+              isOpen={imageDialogIsOpen}
+              onClose={imageDialogOnClose}
+              broadcasterId={liveShopping[0].broadcasterId}
+              streamId={liveShopping[0].streamId}
             />
           </FormProvider>
         </Grid>
