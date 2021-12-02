@@ -38,7 +38,7 @@ import {
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { BroadcasterChannelButton } from '..';
+// import { BroadcasterChannelButton } from '..';
 import { BroadcasterName } from './BroadcasterName';
 import { ConfirmDialog } from './ConfirmDialog';
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
@@ -170,7 +170,8 @@ export function LiveShoppingList(): JSX.Element {
                     <Box mr={1}>
                       <BroadcasterName data={row.broadcaster} />
                     </Box>
-                    <BroadcasterChannelButton channelUrl={row.broadcaster?.channelUrl} />
+                    {/* //TODO: 방송인 계정설정 "플랫폼" 이후 channelUrl 전달 */}
+                    {/* <BroadcasterChannelButton channelUrl={row.broadcaster?.channelUrl} /> */}
                   </Flex>
                 </Td>
                 <Td>
@@ -291,11 +292,12 @@ export function LiveShoppingList(): JSX.Element {
                     {data[liveShoppingId].broadcaster ? (
                       <>
                         <BroadcasterName data={data[liveShoppingId].broadcaster} />
-                        {data[liveShoppingId].broadcaster.channelUrl && (
+                        {/* //TODO: 방송인 계정설정 "플랫폼" 이후 channelUrl 전달 */}
+                        {/* {data[liveShoppingId].broadcaster.channelUrl && (
                           <BroadcasterChannelButton
                             channelUrl={data[liveShoppingId].broadcaster.channelUrl}
                           />
-                        )}
+                        )} */}
                       </>
                     ) : (
                       <Text fontWeight="bold">미정</Text>

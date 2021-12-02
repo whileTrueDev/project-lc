@@ -86,10 +86,6 @@ export class LiveShoppingService {
         broadcaster: {
           select: {
             userNickname: true,
-            afreecaId: true,
-            twitchId: true,
-            youtubeId: true,
-            channelUrl: true,
           },
         },
         liveShoppingVideo: {
