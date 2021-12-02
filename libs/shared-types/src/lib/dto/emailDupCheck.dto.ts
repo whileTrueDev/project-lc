@@ -1,6 +1,6 @@
 import { IsEmail } from 'class-validator';
 
-export class SellerEmailDupCheckDto {
+export class EmailDupCheckDto {
   @IsEmail()
   email: string;
 }

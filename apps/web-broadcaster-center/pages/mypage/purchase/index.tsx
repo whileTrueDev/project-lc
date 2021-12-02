@@ -2,7 +2,7 @@ import { broadcasterCenterMypageNavLinks, MypageLayout } from '@project-lc/compo
 
 export function PurchaseIndex(): JSX.Element {
   return (
-    <MypageLayout navLinks={broadcasterCenterMypageNavLinks}>
+    <MypageLayout siteType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
       마이페이지 - 구입현황
     </MypageLayout>
   );
