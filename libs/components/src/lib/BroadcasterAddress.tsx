@@ -1,10 +1,16 @@
+import { EditIcon } from '@chakra-ui/icons';
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
   ButtonGroup,
   Collapse,
   FormControl,
   FormErrorMessage,
+  HStack,
   Input,
   InputGroup,
   InputLeftAddon,
@@ -12,26 +18,57 @@ import {
   Text,
   useDisclosure,
   useMergeRefs,
+  useToast,
 } from '@chakra-ui/react';
-import { useRef } from 'react';
+import { useBroadcaster, useBroadcasterAddressMutation } from '@project-lc/hooks';
+import { BroadcasterAddressDto } from '@project-lc/shared-types';
+import { useMemo, useRef } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import { useForm } from 'react-hook-form';
 import SettingSectionLayout from './SettingSectionLayout';
 
 export function BroadcasterAddressSection(): JSX.Element {
+  const broadcaster = useBroadcaster({ id: 1 });
   return (
     <SettingSectionLayout title="샘플 및 선물 수령 주소">
+      {!broadcaster.isLoading && !broadcaster.data?.broadcasterAddress?.address && (
+        <NoAddressAlertBox />
+      )}
+      {!broadcaster.isLoading && broadcaster.data?.broadcasterAddress?.address && (
+        <Text>상품 샘플과 시청자로부터의 선물을 수령할 주소입니다.</Text>
+      )}
       <BroadcasterAddressForm />
     </SettingSectionLayout>
   );
 }
 
-interface BroadcasterAdrressDto {
-  postalCode: string;
-  address: string;
-  detailAddress: string;
+function NoAddressAlertBox(): JSX.Element {
+  return (
+    <Alert status="warning">
+      <Stack>
+        <HStack spacing={0}>
+          <AlertIcon />
+          <AlertTitle>입력이 필요합니다!</AlertTitle>
+        </HStack>
+        <AlertDescription>
+          상품 샘플과 시청자로부터의 선물을 수령할 주소를 입력해주세요.
+        </AlertDescription>
+      </Stack>
+    </Alert>
+  );
 }
+
 export function BroadcasterAddressForm(): JSX.Element {
+  const toast = useToast();
+  const broadcaster = useBroadcaster({ id: 1 });
+  const isBroadcasterAddressExists = useMemo(() => {
+    if (!broadcaster.data) return false;
+    if (!broadcaster.data.broadcasterAddress) return false;
+    return true;
+  }, [broadcaster.data]);
+  const editMode = useDisclosure({ defaultIsOpen: isBroadcasterAddressExists });
+  const daumOpen = useDisclosure();
+
   const {
     handleSubmit,
     register,
@@ -40,7 +77,7 @@ export function BroadcasterAddressForm(): JSX.Element {
     watch,
     reset,
     formState: { errors },
-  } = useForm<BroadcasterAdrressDto>();
+  } = useForm<BroadcasterAddressDto>();
   const registered = register('address', {
     required: {
       value: true,
@@ -50,12 +87,30 @@ export function BroadcasterAddressForm(): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
   const mergedRef = useMergeRefs(registered.ref, inputRef);
 
-  function onSubmit(formData: BroadcasterAdrressDto): void {
-    console.log(formData);
+  const { mutateAsync, isLoading } = useBroadcasterAddressMutation();
+  function onSubmit(formData: BroadcasterAddressDto): void {
+    const onSuccess = (): void => {
+      // 성공시
+      reset();
+      editMode.onClose();
+      toast({ status: 'success', description: '주소가 변경되었습니다.' });
+    };
+    const onFail = (): void => {
+      toast({
+        status: 'error',
+        description: '주소 변경중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+      });
+    };
+    mutateAsync(formData)
+      .then((result) => {
+        if (result) onSuccess();
+        else onFail();
+      })
+      .catch((err) => {
+        console.log(err);
+        onFail();
+      });
   }
-
-  const editMode = useDisclosure();
-  const daumOpen = useDisclosure();
 
   function handleAddressSelected(addressData: AddressData): void {
     const { zonecode, address, buildingName } = addressData;
@@ -65,68 +120,69 @@ export function BroadcasterAddressForm(): JSX.Element {
     setValue('postalCode', zonecode);
     daumOpen.onClose();
   }
+
   return (
     <Stack as="form" onSubmit={handleSubmit(onSubmit)} w="100%">
       {!editMode.isOpen ? (
         <Stack spacing={3}>
-          <Text>주소주소주소주소주소주소주소주소주소주소주소주소주소주소주소주소</Text>
+          <BroadcasterAddressPreview address={broadcaster.data?.broadcasterAddress} />
           <Box>
-            <Button onClick={editMode.onOpen}>수정</Button>
+            <Button leftIcon={<EditIcon />} onClick={editMode.onOpen}>
+              {isBroadcasterAddressExists ? '수정' : '등록'}
+            </Button>
           </Box>
         </Stack>
       ) : (
         <Stack spacing={3}>
-          <Stack>
-            <FormControl isInvalid={!!errors.address}>
-              <InputGroup>
-                {watch('postalCode') && (
-                  <InputLeftAddon>{watch('postalCode')}</InputLeftAddon>
-                )}
-                <Input
-                  maxW="360px"
-                  readOnly
-                  onClick={daumOpen.onOpen}
-                  placeholder="주소 찾기를 클릭하여 주소를 선택해주세요"
-                  {...registered}
-                  ref={mergedRef}
-                />
-                <Button ml={2} onClick={daumOpen.onToggle}>
-                  {daumOpen.isOpen ? '닫기' : '찾기'}
-                </Button>
-              </InputGroup>
-              {errors.address && (
-                <FormErrorMessage>{errors.address?.message}</FormErrorMessage>
+          <FormControl isInvalid={!!errors.address}>
+            <InputGroup>
+              {watch('postalCode') && (
+                <InputLeftAddon>{watch('postalCode')}</InputLeftAddon>
               )}
-            </FormControl>
-
-            {watch('address') && (
-              <FormControl isInvalid={!!errors.detailAddress}>
-                <Input
-                  maxW="180px"
-                  placeholder="상세주소"
-                  {...register('detailAddress', {
-                    required: {
-                      message: '상세주소를 입력해주세요.',
-                      value: true,
-                    },
-                    maxLength: {
-                      value: 30,
-                      message: '30자 이상 작성할 수 없습니다.',
-                    },
-                  })}
-                />
-                <FormErrorMessage>{errors.detailAddress?.message}</FormErrorMessage>
-              </FormControl>
+              <Input
+                maxW="360px"
+                readOnly
+                onClick={daumOpen.onOpen}
+                placeholder="주소 찾기를 클릭하여 주소를 선택해주세요"
+                {...registered}
+                ref={mergedRef}
+              />
+              <Button ml={2} onClick={daumOpen.onToggle}>
+                {daumOpen.isOpen ? '닫기' : '찾기'}
+              </Button>
+            </InputGroup>
+            {errors.address && (
+              <FormErrorMessage>{errors.address?.message}</FormErrorMessage>
             )}
-          </Stack>
+          </FormControl>
+
+          {watch('address') && (
+            <FormControl isInvalid={!!errors.detailAddress}>
+              <Input
+                maxW="180px"
+                placeholder="상세주소"
+                {...register('detailAddress', {
+                  required: {
+                    message: '상세주소를 입력해주세요.',
+                    value: true,
+                  },
+                  maxLength: {
+                    value: 30,
+                    message: '30자 이상 작성할 수 없습니다.',
+                  },
+                })}
+              />
+              <FormErrorMessage>{errors.detailAddress?.message}</FormErrorMessage>
+            </FormControl>
+          )}
           <Collapse in={daumOpen.isOpen} animateOpacity>
-            <Box mt={4}>
-              <DaumPostcode onComplete={handleAddressSelected} />
-            </Box>
+            <DaumPostcode onComplete={handleAddressSelected} />
           </Collapse>
 
           <ButtonGroup>
-            <Button type="submit">변경</Button>
+            <Button type="submit" isLoading={isLoading}>
+              확인
+            </Button>
             <Button
               onClick={() => {
                 editMode.onClose();
@@ -140,5 +196,25 @@ export function BroadcasterAddressForm(): JSX.Element {
         </Stack>
       )}
     </Stack>
+  );
+}
+
+export interface BroadcasterAddressPreviewProps {
+  address?: {
+    postalCode: string;
+    address: string;
+    detailAddress: string;
+  };
+}
+export function BroadcasterAddressPreview({
+  address,
+}: BroadcasterAddressPreviewProps): JSX.Element | null {
+  if (!address) return null;
+  return (
+    <Box borderWidth="thin" p={2}>
+      <Text>({address.postalCode})</Text>
+      <Text>{address.address}</Text>
+      <Text>{address.detailAddress}</Text>
+    </Box>
   );
 }

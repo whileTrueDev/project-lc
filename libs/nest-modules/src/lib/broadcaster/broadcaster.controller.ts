@@ -9,12 +9,14 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  BroadcasterAddressDto,
+  BroadcasterRes,
   ChangeNicknameDto,
   EmailDupCheckDto,
   FindBroadcasterDto,
   SignUpDto,
 } from '@project-lc/shared-types';
-import { Broadcaster } from '.prisma/client';
+import { Broadcaster, BroadcasterAddress } from '.prisma/client';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { BroadcasterService } from './broadcaster.service';
 
@@ -29,7 +31,7 @@ export class BroadcasterController {
   @Get()
   public async findBroadcaster(
     @Query(ValidationPipe) dto: FindBroadcasterDto,
-  ): Promise<Broadcaster | null> {
+  ): Promise<BroadcasterRes | null> {
     return this.broadcasterService.getBroadcaster(dto);
   }
 
@@ -62,5 +64,12 @@ export class BroadcasterController {
     @Body(ValidationPipe) dto: ChangeNicknameDto,
   ): Promise<Broadcaster> {
     return this.broadcasterService.updateNickname(1, dto.nickname);
+  }
+
+  @Put('address')
+  public async updateAddress(
+    @Body(ValidationPipe) dto: BroadcasterAddressDto,
+  ): Promise<BroadcasterAddress> {
+    return this.broadcasterService.upsertAddress(1, dto);
   }
 }

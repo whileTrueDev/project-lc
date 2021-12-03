@@ -487,7 +487,6 @@ model LiveCommerceRanking {
 // 방송인
 model Broadcaster {
   id                  Int                   @id @default(autoincrement())
-  liveCommerceRanking LiveCommerceRanking[]
   userId              String                @unique // 유저 아이디(방송인 가입시 사용하는 이메일)
   userName            String                @db.VarChar(20) // 유저의 실명
   userNickname        String?               @db.VarChar(20) // 유저의 활동명
@@ -498,8 +497,21 @@ model Broadcaster {
   avatar              String?
   agreementFlag       Boolean               @default(false) // 이용동의 
   LiveShopping        LiveShopping[]
+  broadcasterAddress  BroadcasterAddress?
+  liveCommerceRanking LiveCommerceRanking[]
 
   @@index(userId)
+}
+
+model BroadcasterAddress {
+  id            Int      @id @default(autoincrement())
+  address       String // 주소 (도로명)
+  detailAddress String // 주소 상세
+  postalCode    String // 우편 번호
+  createDate    DateTime @default(now())
+
+  broadcasterId Int?         @unique
+  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 }
 
 // -------------------------------------------------

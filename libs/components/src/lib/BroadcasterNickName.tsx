@@ -96,7 +96,7 @@ export function BroadcasterNicknameForm(): JSX.Element {
       // 성공시
       reset();
       setEditMode(false);
-      toast({ title: '활동명 변경 완료되었습니다.', status: 'success' });
+      toast({ title: '활동명이 변경되었습니다.', status: 'success' });
     };
     const onError = (): void => {
       setEditMode(true);
