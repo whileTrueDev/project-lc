@@ -34,7 +34,7 @@ export function BroadcasterNickNameSection(): JSX.Element {
           크리에이터, 인플루언서로 활동하시면서 사용하시는 활동명 또는 채널명 입니다.
         </Text>
       )}
-      <EditableNickname />
+      <BroadcasterNicknameForm />
     </SettingSectionLayout>
   );
 }
@@ -59,8 +59,8 @@ function NoNicknameAlertBox(): JSX.Element {
   );
 }
 
-/** 수정가능한 닉네임 필드 */
-export function EditableNickname(): JSX.Element {
+/** 방송인 활동명 폼 */
+export function BroadcasterNicknameForm(): JSX.Element {
   const toast = useToast();
   const broadcaster = useBroadcaster({ id: 1 });
   const {
