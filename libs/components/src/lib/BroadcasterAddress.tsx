@@ -14,6 +14,7 @@ import {
   Input,
   InputGroup,
   InputLeftAddon,
+  Spinner,
   Stack,
   Text,
   useDisclosure,
@@ -29,6 +30,13 @@ import SettingSectionLayout from './SettingSectionLayout';
 
 export function BroadcasterAddressSection(): JSX.Element {
   const broadcaster = useBroadcaster({ id: 1 });
+  if (broadcaster.isLoading) {
+    return (
+      <SettingSectionLayout title="샘플 및 선물 수령 주소">
+        <Spinner />
+      </SettingSectionLayout>
+    );
+  }
   return (
     <SettingSectionLayout title="샘플 및 선물 수령 주소">
       {!broadcaster.isLoading && !broadcaster.data?.broadcasterAddress?.address && (
@@ -176,7 +184,7 @@ export function BroadcasterAddressForm(): JSX.Element {
           </Collapse>
 
           <ButtonGroup>
-            <Button type="submit" isLoading={isLoading}>
+            <Button colorScheme="blue" type="submit" isLoading={isLoading}>
               확인
             </Button>
             <Button

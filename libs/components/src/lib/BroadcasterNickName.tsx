@@ -14,6 +14,7 @@ import {
   useToast,
   FormControl,
   FormErrorMessage,
+  Spinner,
 } from '@chakra-ui/react';
 import { useBroadcaster, useUpdateNicknameMutation } from '@project-lc/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -24,6 +25,13 @@ import SettingSectionLayout from './SettingSectionLayout';
 export function BroadcasterNickNameSection(): JSX.Element {
   const broadcaster = useBroadcaster({ id: 1 });
 
+  if (broadcaster.isLoading) {
+    return (
+      <SettingSectionLayout title="활동명">
+        <Spinner />
+      </SettingSectionLayout>
+    );
+  }
   return (
     <SettingSectionLayout title="활동명">
       {!broadcaster.isLoading && !broadcaster.data?.userNickname && (
@@ -146,7 +154,7 @@ export function BroadcasterNicknameForm(): JSX.Element {
             )}
           </FormControl>
           <ButtonGroup>
-            <Button type="submit" isLoading={changeNickname.isLoading}>
+            <Button colorScheme="blue" type="submit" isLoading={changeNickname.isLoading}>
               확인
             </Button>
             <Button
