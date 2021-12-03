@@ -14,7 +14,7 @@ export function Custom404(): JSX.Element {
 
       <Flex h="100vh" flexDirection="column" justify="center" alignItems="center">
         <VStack spacing={4}>
-          <KksLogo size="big" />
+          <KksLogo siteType="seller" size="big" />
           <Heading fontSize={{ base: '2xl', sm: '4xl' }}>
             페이지를 찾을 수 없습니다.
           </Heading>
