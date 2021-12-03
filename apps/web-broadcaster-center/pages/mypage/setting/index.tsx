@@ -1,7 +1,7 @@
 import { Container, Divider, Heading, VStack } from '@chakra-ui/react';
 import {
   broadcasterCenterMypageNavLinks,
-  BroadcasterNickName,
+  BroadcasterNickNameSection,
   MypageLayout,
 } from '@project-lc/components';
 
@@ -13,7 +13,7 @@ export function SettingIndex(): JSX.Element {
           <Heading mb={4}>내 계정</Heading>
           <div>계정정보</div>
           <Divider />
-          <BroadcasterNickName />
+          <BroadcasterNickNameSection />
           <Divider />
         </VStack>
       </Container>
