@@ -4,9 +4,9 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Seller, SellerSocialAccount } from '@prisma/client';
+import { Broadcaster, Seller, SellerSocialAccount } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { loginUserRes } from '@project-lc/shared-types';
+import { loginUserRes, UserType } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { AuthService } from '../auth/auth.service';
 import { SellerService } from '../seller/seller.service';
@@ -27,6 +27,8 @@ interface sellerDataInterface {
   accessToken: string;
   refreshToken?: string;
 }
+
+type UserSocialDataType = sellerDataInterface;
 
 @Injectable()
 export class SocialService {
@@ -50,6 +52,24 @@ export class SocialService {
       'seller',
     );
     this.authService.handleLoginHeader(res, loginToken);
+  }
+
+  /**
+   * 유저타입에 따라 seller 나 broadcaster를 찾거나 생성하여 반환
+   * google, kakao, naver strategy validate함수에서 사용
+   */
+  async findOrCreateUser(
+    userType: UserType,
+    data: UserSocialDataType,
+  ): Promise<Seller | Broadcaster> {
+    // 전달된 유저타입이 방송인인 경우 -> Broadcaster, BroadcasterSocialAccounts 테이블에서 작업
+    if (userType === 'broadcaster') {
+      return this.prisma.broadcaster.findFirst();
+    }
+
+    // 전달된 유저타입이 판매자인 경우 -> Seller, SellerSocialAccounts 테이블에서 작업
+    const seller = await this.findOrCreateSeller(data);
+    return seller;
   }
 
   /**

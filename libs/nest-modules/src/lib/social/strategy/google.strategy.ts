@@ -3,6 +3,8 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-google-oauth20';
+import { Request } from 'express';
+import { USER_TYPE_KEY } from '@project-lc/shared-types';
 import { Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
@@ -18,6 +20,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_PROVIDER) 
       clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
       callbackURL: `${getApiHost()}/social/google/callback`,
       scope: ['email', 'profile'],
+      passReqToCallback: true,
     });
   }
 
@@ -30,11 +33,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_PROVIDER) 
   }
 
   async validate(
+    req: Request,
     accessToken: string,
     refreshToken: null,
     profile: Profile,
   ): Promise<Seller> {
     const { id, displayName, emails, photos } = profile;
+
+    console.log(req.query, req.cookies, req.cookies[USER_TYPE_KEY]);
 
     if (!emails[0].value) {
       throw new ForbiddenException({
