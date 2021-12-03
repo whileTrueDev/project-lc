@@ -2,23 +2,26 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get,
-  Post,
   Delete,
-  Query,
-  ValidationPipe,
+  Get,
   Param,
   ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  ValidationPipe,
 } from '@nestjs/common';
+import { BroadcasterChannel } from '@prisma/client';
 import {
+  ChangeNicknameDto,
   CreateBroadcasterChannelDto,
   EmailDupCheckDto,
+  FindBroadcasterDto,
   SignUpDto,
 } from '@project-lc/shared-types';
-import { BroadcasterChannel } from '@prisma/client';
-import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { Broadcaster } from '.prisma/client';
 import { MailVerificationService } from '../auth/mailVerification.service';
+import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterService } from './broadcaster.service';
 
 @Controller('broadcaster')
@@ -28,6 +31,14 @@ export class BroadcasterController {
     private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
+
+  /** 방송인 정보 조회 */
+  @Get()
+  public async findBroadcaster(
+    @Query(ValidationPipe) dto: FindBroadcasterDto,
+  ): Promise<Broadcaster | null> {
+    return this.broadcasterService.getBroadcaster(dto);
+  }
 
   /** 방송인 회원가입 */
   @Post()
@@ -75,5 +86,12 @@ export class BroadcasterController {
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
   ): Promise<BroadcasterChannel[]> {
     return this.channelService.getBroadcasterChannelList(broadcasterId);
+  }
+
+  @Put('nickname')
+  public async updateNickname(
+    @Body(ValidationPipe) dto: ChangeNicknameDto,
+  ): Promise<Broadcaster> {
+    return this.broadcasterService.updateNickname(1, dto.nickname);
   }
 }
