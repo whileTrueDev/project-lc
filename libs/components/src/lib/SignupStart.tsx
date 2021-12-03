@@ -68,7 +68,7 @@ export function SignupStart({
           >
             이메일 계정으로 가입
           </Button>
-          <SocialButtonGroup />
+          <SocialButtonGroup userType={userType} />
 
           <Text fontSize="sm" pt={2}>
             이미 가입하셨나요?
