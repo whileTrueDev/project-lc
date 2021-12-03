@@ -10,7 +10,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SellerSocialAccount } from '@prisma/client';
-import { getWebHost } from '@project-lc/utils';
+import { UserType } from '@project-lc/shared-types';
+import {
+  getUserTypeFromRequest,
+  getWebHost,
+  getBroadcasterWebHost,
+} from '@project-lc/utils';
 import { Request, Response } from 'express';
 import { LoginHistoryService } from '../auth/login-history/login-history.service';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -22,7 +27,11 @@ export class SocialController {
     private readonly socialService: SocialService,
   ) {}
 
-  private readonly frontMypageUrl = `${getWebHost()}/mypage`;
+  /** 소셜로그인 userType에 따른 마이페이지 주소 리턴 */
+  private getFrontMypageUrl(userType: UserType): string {
+    if (userType === 'seller') return `${getWebHost()}/mypage`;
+    return `${getBroadcasterWebHost()}/mypage`;
+  }
 
   /** email 로 가입된 셀러에 연동된 소셜계정목록 반환 */
   @UseGuards(JwtAuthGuard)
@@ -44,11 +53,12 @@ export class SocialController {
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
-    this.socialService.login(req, res);
+    const userType: UserType = getUserTypeFromRequest(req);
+    this.socialService.login(userType, req, res);
 
     // 로그인 기록 추가 by @hwasurr
-    this.loginHistoryService.createLoginStamp(req, '소셜/구글');
-    return res.redirect(this.frontMypageUrl);
+    // this.loginHistoryService.createLoginStamp(req, '소셜/구글');
+    return res.redirect(this.getFrontMypageUrl(userType));
   }
 
   @Delete('/google/unlink/:googleId')
@@ -66,10 +76,11 @@ export class SocialController {
   @Get('/naver/callback')
   @UseGuards(AuthGuard('naver'))
   async naverAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
-    this.socialService.login(req, res);
+    const userType: UserType = getUserTypeFromRequest(req);
+    this.socialService.login(userType, req, res);
     // 로그인 기록 추가 by @hwasurr
-    this.loginHistoryService.createLoginStamp(req, '소셜/네이버');
-    return res.redirect(this.frontMypageUrl);
+    // this.loginHistoryService.createLoginStamp(req, '소셜/네이버');
+    return res.redirect(this.getFrontMypageUrl(userType));
   }
 
   @Delete('/naver/unlink/:naverId')
@@ -87,10 +98,11 @@ export class SocialController {
   @Get('/kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
-    this.socialService.login(req, res);
+    const userType: UserType = getUserTypeFromRequest(req);
+    this.socialService.login(userType, req, res);
     // 로그인 기록 추가 by @hwasurr
-    this.loginHistoryService.createLoginStamp(req, '소셜/카카오');
-    return res.redirect(this.frontMypageUrl);
+    // this.loginHistoryService.createLoginStamp(req, '소셜/카카오');
+    return res.redirect(this.getFrontMypageUrl(userType));
   }
 
   @Delete('/kakao/unlink/:kakaoId')
