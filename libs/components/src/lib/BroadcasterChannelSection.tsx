@@ -68,19 +68,20 @@ export function BroadcasterChannelSection(): JSX.Element {
 
   const { data: profileData, isLoading: profileLoading } = useProfile();
   const { data: channels, isLoading: channelLoading } = useBroadcasterChannels(
-    profileData?.id,
+    profileData?.id || 1,
   );
 
   const allowAddChannel = useMemo(() => channels && channels.length < 5, [channels]);
 
   const createChannelRequest = useBroadcasterChannelCreateMutation();
   const onSubmit = (data: ChannelFormData): void => {
-    if (!profileData) return;
+    // if (!profileData) return;
 
     createChannelRequest
       .mutateAsync({
         ...data,
-        broadcasterId: profileData.id,
+        // broadcasterId: profileData.id,
+        broadcasterId: 1,
       })
       .then(() => {
         reset();
