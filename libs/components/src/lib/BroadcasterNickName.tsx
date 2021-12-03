@@ -129,7 +129,7 @@ export function EditableNickname(): JSX.Element {
             cursor="default"
             maxW={200}
             readOnly
-            value={broadcaster.data?.userNickname || undefined}
+            value={broadcaster.data?.userNickname || ''}
           />
           <Button leftIcon={<EditIcon />} onClick={onEditModeToggle}>
             {isBeginner ? '등록하기' : '수정'}
