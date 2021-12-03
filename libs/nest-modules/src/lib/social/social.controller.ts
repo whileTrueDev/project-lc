@@ -9,12 +9,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { SellerSocialAccount } from '@prisma/client';
-import { UserType } from '@project-lc/shared-types';
+import { SocialAccounts, UserType } from '@project-lc/shared-types';
 import {
+  getBroadcasterWebHost,
   getUserTypeFromRequest,
   getWebHost,
-  getBroadcasterWebHost,
 } from '@project-lc/utils';
 import { Request, Response } from 'express';
 import { LoginHistoryService } from '../auth/login-history/login-history.service';
@@ -37,11 +36,10 @@ export class SocialController {
   @UseGuards(JwtAuthGuard)
   @Get('/accounts')
   async getSocialAccounts(
+    @Query('userType') userType: UserType,
     @Query('email') email: string,
-  ): Promise<
-    Pick<SellerSocialAccount, 'provider' | 'name' | 'serviceId' | 'registDate'>[]
-  > {
-    return this.socialService.getSocialAccounts(email);
+  ): Promise<SocialAccounts> {
+    return this.socialService.getSocialAccounts(userType, email);
   }
 
   /** 구글 ************************************************ */

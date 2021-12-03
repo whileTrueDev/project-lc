@@ -11,7 +11,7 @@ import {
   SellerSocialAccount,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { loginUserRes, UserType } from '@project-lc/shared-types';
+import { loginUserRes, SocialAccounts, UserType } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
 import { AuthService } from '../auth/auth.service';
 import { SellerService } from '../seller/seller.service';
@@ -382,14 +382,33 @@ export class SocialService {
     }
   }
 
-  // TODO: user-type 에 따라 분기처리
-  async getSocialAccounts(
-    email: string,
-  ): Promise<
-    Pick<SellerSocialAccount, 'serviceId' | 'provider' | 'name' | 'registDate'>[]
-  > {
-    const seller = await this.prisma.seller.findUnique({
-      where: { email },
+  /** userType에 맞는 테이블에서 email로 유저 검색 후 해당 유저의 소셜계정 목록 반환 */
+  async getSocialAccounts(userType: UserType, email: string): Promise<SocialAccounts> {
+    // userType === 'seller' 판매자인 경우
+    if (userType === 'seller') {
+      const seller = await this.prisma.seller.findUnique({
+        where: { email },
+        select: {
+          socialAccounts: {
+            select: {
+              serviceId: true,
+              provider: true,
+              name: true,
+              registDate: true,
+              profileImage: false,
+              accessToken: false,
+              refreshToken: false,
+              sellerId: false,
+            },
+          },
+        },
+      });
+
+      return seller.socialAccounts;
+    }
+    // userType === 'broadcaster' 방송인인 경우
+    const broadcaster = await this.prisma.broadcaster.findUnique({
+      where: { userId: email },
       select: {
         socialAccounts: {
           select: {
@@ -400,12 +419,11 @@ export class SocialService {
             profileImage: false,
             accessToken: false,
             refreshToken: false,
-            sellerId: false,
+            broadcasterId: false,
           },
         },
       },
     });
-
-    return seller.socialAccounts;
+    return broadcaster.socialAccounts;
   }
 }
