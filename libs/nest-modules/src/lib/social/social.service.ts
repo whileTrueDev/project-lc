@@ -45,15 +45,14 @@ export class SocialService {
     private readonly google: GoogleApiService,
   ) {}
 
-  // TODO: 유저타입에 따라 분기처리
-  login(req: Request, res: Response): void {
+  login(userType: UserType, req: Request, res: Response): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
-    const userPayload = this.authService.castUser(user, 'seller');
+    const userPayload = this.authService.castUser(user, userType);
     const loginToken: loginUserRes = this.authService.issueToken(
       userPayload,
       true,
-      'seller',
+      userType,
     );
     this.authService.handleLoginHeader(res, loginToken);
   }
