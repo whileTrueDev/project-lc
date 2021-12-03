@@ -222,7 +222,6 @@ model GoodsConfirmation {
 
   @@index([firstmallGoodsConnectionId], name: "firstmallGoodsConnectionId")
 }
-ㅌ
 
 model GoodsOptions {
   id             Int                   @id @default(autoincrement())
