@@ -78,7 +78,7 @@ export function Navbar({ siteType = 'seller' }: NavbarProps): JSX.Element {
               textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
               color={useColorModeValue('gray.800', 'white')}
             >
-              <KksLogo size="small" />
+              <KksLogo siteType={siteType} size="small" />
             </Link>
           </NextLink>
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
