@@ -4,10 +4,16 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Query,
   ValidationPipe,
 } from '@nestjs/common';
-import { EmailDupCheckDto, SignUpDto } from '@project-lc/shared-types';
+import {
+  ChangeNicknameDto,
+  EmailDupCheckDto,
+  FindBroadcasterDto,
+  SignUpDto,
+} from '@project-lc/shared-types';
 import { Broadcaster } from '.prisma/client';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { BroadcasterService } from './broadcaster.service';
@@ -18,6 +24,14 @@ export class BroadcasterController {
     private readonly broadcasterService: BroadcasterService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
+
+  /** 방송인 정보 조회 */
+  @Get()
+  public async findBroadcaster(
+    @Query(ValidationPipe) dto: FindBroadcasterDto,
+  ): Promise<Broadcaster | null> {
+    return this.broadcasterService.getBroadcaster(dto);
+  }
 
   /** 방송인 회원가입 */
   @Post()
@@ -41,5 +55,12 @@ export class BroadcasterController {
     @Query(ValidationPipe) dto: EmailDupCheckDto,
   ): Promise<boolean> {
     return this.broadcasterService.isEmailDupCheckOk(dto.email);
+  }
+
+  @Put('nickname')
+  public async updateNickname(
+    @Body(ValidationPipe) dto: ChangeNicknameDto,
+  ): Promise<Broadcaster> {
+    return this.broadcasterService.updateNickname(1, dto.nickname);
   }
 }

@@ -1,6 +1,6 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { ThemeProvider } from '@material-ui/core';
-import { lightBigLogoUrl, lightLogoUrl } from '@project-lc/components';
+import { LOGO_S3_PREFIX, lightBigLogo, lightLogo } from '@project-lc/components';
 import { createChakraTheme, createMuiTheme, createQueryClient } from '@project-lc/utils';
 import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';
@@ -23,8 +23,8 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
           // url: 'https://방송인.크크쇼.com/', // route53 등록 후 설정
           site_name: '크크쇼 방송인센터',
           images: [
-            { url: lightLogoUrl, alt: 'KKSHOW' },
-            { url: lightBigLogoUrl, alt: 'KKSHOW' },
+            { url: LOGO_S3_PREFIX + lightLogo, alt: 'KKSHOW' },
+            { url: LOGO_S3_PREFIX + lightBigLogo, alt: 'KKSHOW' },
           ],
         }}
       />

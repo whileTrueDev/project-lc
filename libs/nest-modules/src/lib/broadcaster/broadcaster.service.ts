@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { throwError } from 'rxjs';
 import { hash } from 'argon2';
-import { BroadcasterDTO, SignUpDto } from '@project-lc/shared-types';
+import { BroadcasterDTO, FindBroadcasterDto, SignUpDto } from '@project-lc/shared-types';
 import { Broadcaster } from '@prisma/client';
 @Injectable()
 export class BroadcasterService {
@@ -59,5 +59,24 @@ export class BroadcasterService {
     const user = await this.prisma.broadcaster.findFirst({ where: { userId: email } });
     if (user) return false;
     return true;
+  }
+
+  /** 방송인 정보 조회 */
+  public async getBroadcaster(opt: FindBroadcasterDto): Promise<Broadcaster | null> {
+    const { id, email } = opt;
+    if (id) return this.prisma.broadcaster.findUnique({ where: { id: Number(id) } });
+    if (email) return this.prisma.broadcaster.findUnique({ where: { userId: email } });
+    return null;
+  }
+
+  /** 방송인 활동명 변경 */
+  public async updateNickname(
+    id: Broadcaster['id'],
+    newNick: string,
+  ): Promise<Broadcaster> {
+    return this.prisma.broadcaster.update({
+      where: { id },
+      data: { userNickname: newNick },
+    });
   }
 }
