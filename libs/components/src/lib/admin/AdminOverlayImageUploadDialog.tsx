@@ -225,13 +225,29 @@ export function AdminOverlayImageUploadDialog(
       case 'vertical-banner':
         setVerticalPreviews((list) => {
           const filtered = list.filter((item) => item.id !== id);
-          return [...filtered];
+          const idReassignImages = filtered.map((item, index) => {
+            const newImageList = {
+              ...item,
+              id: index + 1,
+              filename: `vertical-banner-${index + 1}`,
+            };
+            return newImageList;
+          });
+          return idReassignImages;
         });
         break;
       default:
         setDonationPreviews((list) => {
           const filtered = list.filter((item) => item.id !== id);
-          return [...filtered];
+          const idReassignImages = filtered.map((item, index) => {
+            const newImageList = {
+              ...item,
+              id: index + 1,
+              filename: `vertical-banner-${index + 1}`,
+            };
+            return newImageList;
+          });
+          return idReassignImages;
         });
         break;
     }
