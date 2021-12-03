@@ -95,7 +95,7 @@ export const testsellerExtraData: {
 
 /** 테스트방송인 생성 데이터 */
 export const testBroadcasterData: Prisma.BroadcasterCreateInput = {
-  email: 'testBc@gmail.com',
+  userId: 'testBc@gmail.com',
   password: COMMON_DUMMY_PASSWORD,
   overlayUrl: '/test-broadcaster@gmail.com',
   userName: '테스트방송인이름',
