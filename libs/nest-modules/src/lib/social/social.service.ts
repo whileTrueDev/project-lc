@@ -99,7 +99,7 @@ export class SocialService {
 
   /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 방송인 계정정보 찾기 */
   private async selectBroadcasterSocialAccountRecord(
-    userData: UserDataInterface,
+    userData: Partial<UserDataInterface>,
   ): Promise<BroadcasterSocialAccount & { broadcaster: Broadcaster }> {
     const { id, provider } = userData;
     return this.prisma.broadcasterSocialAccount.findFirst({
@@ -213,7 +213,16 @@ export class SocialService {
    * @by 21.09.02 hwasurr -> 소셜로그인ExceptionFilter에서는 소셜계정이 DB에 없으므로,
    * unlink와 구분되어야하여, public 메서드로 변경 -> 컨드롤러단에서 두가지 일을 진행하도록 변경
    * */
-  public async deleteSellerSocialAccountRecord(serviceId: string): Promise<boolean> {
+  public async deleteSocialAccountRecord(
+    userType: UserType,
+    serviceId: string,
+  ): Promise<boolean> {
+    // TODO: userType에 따라 다른 테이블에서 삭제처리
+    // TODO: userType else 사용하지 않아서 두번 처리되는 경우가 없는지 확인필요(admin 의 경우)
+    if (userType === 'seller' || userType === 'admin') {
+    }
+    if (userType === 'broadcaster') {
+    }
     await this.prisma.sellerSocialAccount.delete({
       where: { serviceId },
     });
@@ -256,20 +265,72 @@ export class SocialService {
     }
   }
 
-  /** 소셜계정 테이블에서 accessToken 가져오기
-   // TODO: usertype 받아서 분기처리
-   */
-  private async getSocialAccountAccessToken(
-    provider: string,
-    serviceId: string,
-  ): Promise<string> {
-    const socialAccount = await this.selectSellerSocialAccountRecord({
+  /** userType에 따른 소셜계정 테이블에서 accessToken 혹은 refreshToken 가져오기 */
+  private async getSocialAccountToken(params: {
+    userType: UserType;
+    tokenType: 'accessToken' | 'refreshToken';
+    provider: string;
+    serviceId: string;
+  }): Promise<string> {
+    const { userType, provider, serviceId, tokenType } = params;
+    let socialAccount:
+      | (SellerSocialAccount & {
+          seller: Seller;
+        })
+      | (BroadcasterSocialAccount & {
+          broadcaster: Broadcaster;
+        });
+
+    // 판매자
+    if (userType === 'seller') {
+      socialAccount = await this.selectSellerSocialAccountRecord({
+        provider,
+        id: serviceId,
+      });
+    }
+    // 방송인
+    socialAccount = await this.selectBroadcasterSocialAccountRecord({
       provider,
       id: serviceId,
     });
+
     if (!socialAccount) {
       throw new BadRequestException(
-        `해당 서비스로 연동된 계정이 존재하지 않음 provider: ${provider}, serviceId: ${serviceId}`,
+        `해당 서비스로 연동된 계정이 존재하지 않음 provider: ${provider}, serviceId: ${serviceId}, userType: ${userType}`,
+      );
+    }
+    return socialAccount[tokenType];
+  }
+
+  /** userType에 따른 소셜계정 테이블에서 accessToken  가져오기 */
+  private async getSocialAccountAccessToken(
+    userType: UserType,
+    provider: string,
+    serviceId: string,
+  ): Promise<string> {
+    let socialAccount:
+      | (SellerSocialAccount & {
+          seller: Seller;
+        })
+      | (BroadcasterSocialAccount & {
+          broadcaster: Broadcaster;
+        });
+    // 판매자
+    if (userType === 'seller') {
+      socialAccount = await this.selectSellerSocialAccountRecord({
+        provider,
+        id: serviceId,
+      });
+    }
+    // 방송인
+    socialAccount = await this.selectBroadcasterSocialAccountRecord({
+      provider,
+      id: serviceId,
+    });
+
+    if (!socialAccount) {
+      throw new BadRequestException(
+        `해당 서비스로 연동된 계정이 존재하지 않음 provider: ${provider}, serviceId: ${serviceId}, userType: ${userType}`,
       );
     }
     return socialAccount.accessToken;
@@ -348,10 +409,19 @@ export class SocialService {
    * * 구글 계정 연동 해제 && 구글 계정 레코드 삭제
    * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
    */
-  async googleUnlink(googleId: string, accessTokenParam?: string): Promise<boolean> {
+  async googleUnlink(
+    userType: UserType,
+    googleId: string,
+    accessTokenParam?: string,
+  ): Promise<boolean> {
     let googleAccessToken: string;
     if (!accessTokenParam) {
-      googleAccessToken = await this.getSocialAccountAccessToken('google', googleId);
+      googleAccessToken = await this.getSocialAccountToken({
+        userType,
+        provider: 'google',
+        tokenType: 'accessToken',
+        serviceId: googleId,
+      });
     } else {
       googleAccessToken = accessTokenParam;
     }
@@ -367,13 +437,15 @@ export class SocialService {
         error.response.data?.error === 'invalid_token'
       ) {
         // 액세스 토큰 만료로 인한 실패의 경우, 액세스 토큰 리프레시 이후 연동 해제 진행
-        const socialAccount = await this.selectSellerSocialAccountRecord({
+        const socialAccountRefreshToken = await this.getSocialAccountToken({
+          userType,
           provider: 'google',
-          id: googleId,
+          tokenType: 'refreshToken',
+          serviceId: googleId,
         });
         // 액세스 토큰 리프레시
         const refreshRes = await this.google.refreshAccessToken(
-          socialAccount.refreshToken,
+          socialAccountRefreshToken,
         );
         await this.google.unlink(refreshRes.access_token);
         return true;
@@ -403,7 +475,6 @@ export class SocialService {
           },
         },
       });
-
       return seller.socialAccounts;
     }
     // userType === 'broadcaster' 방송인인 경우

@@ -3,6 +3,7 @@ import {
   broadcasterCenterMypageNavLinks,
   BroadcasterNickName,
   MypageLayout,
+  SocialAccountUnlinkSection,
 } from '@project-lc/components';
 
 export function SettingIndex(): JSX.Element {
@@ -15,6 +16,7 @@ export function SettingIndex(): JSX.Element {
           <Divider />
           <BroadcasterNickName />
           <Divider />
+          <SocialAccountUnlinkSection userType="broadcaster" />
         </VStack>
       </Container>
     </MypageLayout>

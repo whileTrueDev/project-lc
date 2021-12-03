@@ -1,6 +1,6 @@
 import { Button, Flex, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import { useProfile, useUnlinkSocialAccountMutation } from '@project-lc/hooks';
-import { SocialAccount } from '@project-lc/shared-types';
+import { SocialAccount, UserType } from '@project-lc/shared-types';
 import google from '../../images/google.png';
 import naver from '../../images/naver.png';
 import kakao from '../../images/kakao.png';
@@ -13,15 +13,18 @@ export const logo: Record<string, React.ReactNode> = {
   kakao: <ChakraNextImage src={kakao} width="40" height="40" />,
 };
 
-export function SocialAccountUnlinkBox(props: SocialAccount): JSX.Element {
-  const { provider, serviceId } = props;
+export function SocialAccountUnlinkBox(
+  props: SocialAccount & { userType?: UserType },
+): JSX.Element {
+  const { provider, serviceId, userType = 'seller' } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { mutateAsync: unlinkSocialAccount } = useUnlinkSocialAccountMutation();
   const { data } = useProfile();
   const toast = useToast();
 
   const unlink = (): void => {
-    unlinkSocialAccount({ provider, serviceId })
+    // if (!data) return;
+    unlinkSocialAccount({ provider, serviceId, userType })
       .then((res) => {
         toast({ title: '연동해제 성공', status: 'success' });
         onClose();
@@ -47,9 +50,11 @@ export function SocialAccountUnlinkBox(props: SocialAccount): JSX.Element {
       <Button onClick={onOpen}>연동해제</Button>
       <SocialAccountUnlinkDialog
         headerText={`${provider} 계정의 연결을 해제하시겠습니까?`}
-        isOpen={!!data && isOpen}
+        isOpen={isOpen}
+        // isOpen={!!data && isOpen} // profileData 없어서 안열림
         onClose={onClose}
-        hasPassword={!!data?.hasPassword}
+        hasPassword
+        // hasPassword={!!data?.hasPassword}
         unlinkHandler={unlink}
       />
     </Flex>

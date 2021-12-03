@@ -1,6 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
-import { Response } from 'express';
-import { getWebHost } from '@project-lc/utils';
+import { Response, Request } from 'express';
+import { getUserTypeFromRequest, getWebHost } from '@project-lc/utils';
 import { SocialService } from './social.service';
 
 const WEB_LOGIN_PAGE_URL = `${getWebHost()}/login`;
@@ -12,6 +12,8 @@ export class SocialLoginExceptionFilter implements ExceptionFilter {
   async catch(exception: any, host: ArgumentsHost): Promise<void> {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+    const userType = getUserTypeFromRequest(request);
     const { provider, providerId, accessToken, message } = exception.response;
 
     const LOGIN_ERROR_REDIRECT_URL = `${getWebHost()}/login?error=true&provider=${provider}&message=${message}`;
@@ -37,7 +39,7 @@ export class SocialLoginExceptionFilter implements ExceptionFilter {
       }
       case 'google': {
         if (exception.status === 403) {
-          await this.socialService.googleUnlink(providerId, accessToken);
+          await this.socialService.googleUnlink(userType, providerId, accessToken);
           response.redirect(LOGIN_ERROR_REDIRECT_URL);
           break;
         }
