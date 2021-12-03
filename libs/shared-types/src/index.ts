@@ -16,6 +16,7 @@ export * from './lib/constants/liveShoppingProgress';
 export * from './lib/constants/orderStats';
 export * from './lib/constants/shippingTypes';
 export * from './lib/constants/signupRegisterOptions';
+export * from './lib/constants/socialLoginUserTypeKey';
 export * from './lib/dto/adminSettlementInfo.dto';
 export * from './lib/dto/broadcaster.dto';
 export * from './lib/dto/businessRegistration.dto';
