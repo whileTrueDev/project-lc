@@ -1,3 +1,4 @@
+import { UserType } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
@@ -11,9 +12,12 @@ export type SocialAccount = {
 
 export type SocialAccounts = SocialAccount[];
 
-export const getSocialAccounts = async (email: string): Promise<SocialAccounts> => {
+export const getSocialAccounts = async (
+  userType: UserType,
+  email: string,
+): Promise<SocialAccounts> => {
   return axios
-    .get<SocialAccounts>('/social/accounts', { params: { email } })
+    .get<SocialAccounts>('/social/accounts', { params: { email, userType } })
     .then((res) => {
       return res.data;
     })
@@ -23,11 +27,12 @@ export const getSocialAccounts = async (email: string): Promise<SocialAccounts> 
 };
 
 export const useSocialAccounts = (
+  userType: UserType,
   email: string,
 ): UseQueryResult<SocialAccounts, AxiosError> => {
   return useQuery<SocialAccounts, AxiosError>(
-    ['SocialAccounts', email],
-    () => getSocialAccounts(email),
+    ['SocialAccounts', email, userType],
+    () => getSocialAccounts(userType, email),
     {
       enabled: !!email,
     },
