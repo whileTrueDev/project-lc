@@ -4,7 +4,12 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Broadcaster, Seller, SellerSocialAccount } from '@prisma/client';
+import {
+  Broadcaster,
+  BroadcasterSocialAccount,
+  Seller,
+  SellerSocialAccount,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { loginUserRes, UserType } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
@@ -18,7 +23,7 @@ export type SellerWithSocialAccounts = Omit<Seller, 'password'> & {
   socialAccounts: Omit<SellerSocialAccount, 'accessToken' | 'refreshToken'>[];
 };
 
-interface sellerDataInterface {
+interface UserDataInterface {
   id: string;
   provider: string;
   email: string;
@@ -27,8 +32,6 @@ interface sellerDataInterface {
   accessToken: string;
   refreshToken?: string;
 }
-
-type UserSocialDataType = sellerDataInterface;
 
 @Injectable()
 export class SocialService {
@@ -42,6 +45,7 @@ export class SocialService {
     private readonly google: GoogleApiService,
   ) {}
 
+  // TODO: 유저타입에 따라 분기처리
   login(req: Request, res: Response): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
@@ -54,17 +58,17 @@ export class SocialService {
     this.authService.handleLoginHeader(res, loginToken);
   }
 
-  /**
-   * 유저타입에 따라 seller 나 broadcaster를 찾거나 생성하여 반환
+  /** 유저타입에 따라 seller 나 broadcaster를 찾거나 생성하여 반환
    * google, kakao, naver strategy validate함수에서 사용
    */
   async findOrCreateUser(
     userType: UserType,
-    data: UserSocialDataType,
+    data: UserDataInterface,
   ): Promise<Seller | Broadcaster> {
     // 전달된 유저타입이 방송인인 경우 -> Broadcaster, BroadcasterSocialAccounts 테이블에서 작업
     if (userType === 'broadcaster') {
-      return this.prisma.broadcaster.findFirst();
+      const broadcaster = await this.findOrCreateBroadcaster(data);
+      return broadcaster;
     }
 
     // 전달된 유저타입이 판매자인 경우 -> Seller, SellerSocialAccounts 테이블에서 작업
@@ -72,25 +76,94 @@ export class SocialService {
     return seller;
   }
 
-  /**
-   * 해당 소셜서비스 계정 소유하는 seller 찾거나 생성하여 반환
-   * google, kakao, naver strategy validate함수에서 사용
-   */
-  async findOrCreateSeller(sellerData: sellerDataInterface): Promise<Seller> {
-    const socialAccountWithSeller = await this.selectSocialAccountRecord(sellerData);
+  // -------------------------
+  // 방송인
+  // -------------------------
+  /** 해당 소셜서비스 계정 소유하는 broadcaster 찾거나 생성하여 반환 */
+  async findOrCreateBroadcaster(userData: UserDataInterface): Promise<Broadcaster> {
+    const socialAccountWithBroadcaster = await this.selectBroadcasterSocialAccountRecord(
+      userData,
+    );
+
+    if (!socialAccountWithBroadcaster) {
+      const createdBroadcaster = await this.createBroadcasterSocialAccountRecord(
+        userData,
+      );
+      return createdBroadcaster;
+    }
+
+    await this.updateSocialAccountRecord('broadcaster', userData);
+    return this.prisma.broadcaster.findUnique({
+      where: { id: socialAccountWithBroadcaster.broadcaster.id },
+    });
+  }
+
+  /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 방송인 계정정보 찾기 */
+  private async selectBroadcasterSocialAccountRecord(
+    userData: UserDataInterface,
+  ): Promise<BroadcasterSocialAccount & { broadcaster: Broadcaster }> {
+    const { id, provider } = userData;
+    return this.prisma.broadcasterSocialAccount.findFirst({
+      where: { serviceId: id, provider },
+      include: { broadcaster: true },
+    });
+  }
+
+  /** 방송인 소셜계정 데이터 생성 */
+  private async createBroadcasterSocialAccountRecord(
+    userData: UserDataInterface,
+  ): Promise<Broadcaster> {
+    const { id, email, name, picture, ...rest } = userData;
+    const socialAccountCreateInput = {
+      serviceId: id,
+      profileImage: picture,
+      name,
+      ...rest,
+    };
+
+    const createdBroadcaster = await this.prisma.broadcaster.upsert({
+      where: { userId: email },
+      update: {
+        socialAccounts: {
+          create: socialAccountCreateInput,
+        },
+      },
+      create: {
+        userId: email,
+        userName: name,
+        overlayUrl: `/${email}`,
+        avatar: picture || null,
+        password: null,
+        socialAccounts: {
+          create: socialAccountCreateInput,
+        },
+      },
+    });
+
+    return createdBroadcaster;
+  }
+
+  // -------------------------
+  // 판매자
+  // -------------------------
+  /** 해당 소셜서비스 계정 소유하는 판매자 찾거나 생성하여 반환 */
+  async findOrCreateSeller(sellerData: UserDataInterface): Promise<Seller> {
+    const socialAccountWithSeller = await this.selectSellerSocialAccountRecord(
+      sellerData,
+    );
 
     if (!socialAccountWithSeller) {
-      const createdSeller = await this.createSocialAccountRecord(sellerData);
+      const createdSeller = await this.createSellerSocialAccountRecord(sellerData);
       return createdSeller;
     }
 
-    await this.updateSocialAccountRecord(sellerData);
+    await this.updateSocialAccountRecord('seller', sellerData);
     return this.sellerService.findOne({ id: socialAccountWithSeller.seller.id });
   }
 
-  /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 셀러 계정정보 찾기 */
-  private async selectSocialAccountRecord(
-    sellerData: Partial<sellerDataInterface>,
+  /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 판매자 계정정보 찾기 */
+  private async selectSellerSocialAccountRecord(
+    sellerData: Partial<UserDataInterface>,
   ): Promise<
     SellerSocialAccount & {
       seller: Seller;
@@ -103,12 +176,12 @@ export class SocialService {
     });
   }
 
-  /** 소셜계정 데이터 생성 */
-  private async createSocialAccountRecord(
-    sellerData: sellerDataInterface,
+  /** 판매자 소셜계정 데이터 생성 */
+  private async createSellerSocialAccountRecord(
+    sellerData: UserDataInterface,
   ): Promise<Seller> {
     const { id, email, name, picture, ...rest } = sellerData;
-    const googleAccountCreateInput = {
+    const socialAccountCreateInput = {
       serviceId: id,
       profileImage: picture,
       name,
@@ -119,7 +192,7 @@ export class SocialService {
       where: { email },
       update: {
         socialAccounts: {
-          create: googleAccountCreateInput,
+          create: socialAccountCreateInput,
         },
       },
       create: {
@@ -128,7 +201,7 @@ export class SocialService {
         avatar: picture || null,
         password: null,
         socialAccounts: {
-          create: googleAccountCreateInput,
+          create: socialAccountCreateInput,
         },
       },
     });
@@ -136,40 +209,62 @@ export class SocialService {
     return createdSeller;
   }
 
-  /** 소셜계정 데이터 업데이트(토큰) */
-  private async updateSocialAccountRecord(
-    sellerData: sellerDataInterface,
-  ): Promise<SellerSocialAccount> {
-    const { id, accessToken, refreshToken, picture } = sellerData;
-    const updatedSeller = await this.prisma.sellerSocialAccount.update({
-      where: { serviceId: id },
-      data: {
-        accessToken,
-        refreshToken,
-        profileImage: picture,
-      },
-    });
-    return updatedSeller;
-  }
-
   /**
-   * 소셜계정 데이터 삭제
+   * 판매자 소셜계정 데이터 삭제
    * @by 21.09.02 hwasurr -> 소셜로그인ExceptionFilter에서는 소셜계정이 DB에 없으므로,
    * unlink와 구분되어야하여, public 메서드로 변경 -> 컨드롤러단에서 두가지 일을 진행하도록 변경
    * */
-  public async deleteSocialAccountRecord(serviceId: string): Promise<boolean> {
+  public async deleteSellerSocialAccountRecord(serviceId: string): Promise<boolean> {
     await this.prisma.sellerSocialAccount.delete({
       where: { serviceId },
     });
     return true;
   }
 
-  /** 소셜계정 테이블에서 accessToken 가져오기 */
+  /** 소셜계정 데이터 업데이트(토큰)
+   * @param userType 'seller' | 'broadcaster'
+   * @userData 소셜플랫폼에서 넘어온 정보(토큰 정보 포함)
+   */
+  private async updateSocialAccountRecord(
+    userType: UserType,
+    userData: UserDataInterface,
+  ): Promise<boolean> {
+    const { id, accessToken, refreshToken, picture } = userData;
+    const updateData = {
+      accessToken,
+      refreshToken,
+      profileImage: picture,
+    };
+
+    try {
+      if (userType === 'seller') {
+        await this.prisma.sellerSocialAccount.update({
+          where: { serviceId: id },
+          data: updateData,
+        });
+      } else {
+        await this.prisma.broadcasterSocialAccount.update({
+          where: { serviceId: id },
+          data: updateData,
+        });
+      }
+      return true;
+    } catch (error) {
+      console.error(
+        `error in updateSocialAccountRecord, userType:${userType}, userData: ${userData}`,
+      );
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  /** 소셜계정 테이블에서 accessToken 가져오기
+   // TODO: usertype 받아서 분기처리
+   */
   private async getSocialAccountAccessToken(
     provider: string,
     serviceId: string,
   ): Promise<string> {
-    const socialAccount = await this.selectSocialAccountRecord({
+    const socialAccount = await this.selectSellerSocialAccountRecord({
       provider,
       id: serviceId,
     });
@@ -203,7 +298,7 @@ export class SocialService {
         (error?.response?.status === 401 || error?.response?.data?.code === -401)
       ) {
         // 액세스 토큰 만료로 인한 실패의 경우, 액세스 토큰 리프레시 이후 연동 해제 진행
-        const socialAccount = await this.selectSocialAccountRecord({
+        const socialAccount = await this.selectSellerSocialAccountRecord({
           provider: 'kakao',
           id: kakaoId,
         });
@@ -234,7 +329,7 @@ export class SocialService {
       const isSuccess = await this.naver.unlink(naverAccessToken);
       if (!isSuccess) {
         // 액세스 토큰 만료로 인한 실패의 경우, 액세스 토큰 리프레시 이후 연동 해제 진행
-        const socialAccount = await this.selectSocialAccountRecord({
+        const socialAccount = await this.selectSellerSocialAccountRecord({
           provider: 'naver',
           id: naverId,
         });
@@ -273,7 +368,7 @@ export class SocialService {
         error.response.data?.error === 'invalid_token'
       ) {
         // 액세스 토큰 만료로 인한 실패의 경우, 액세스 토큰 리프레시 이후 연동 해제 진행
-        const socialAccount = await this.selectSocialAccountRecord({
+        const socialAccount = await this.selectSellerSocialAccountRecord({
           provider: 'google',
           id: googleId,
         });
@@ -288,6 +383,7 @@ export class SocialService {
     }
   }
 
+  // TODO: user-type 에 따라 분기처리
   async getSocialAccounts(
     email: string,
   ): Promise<

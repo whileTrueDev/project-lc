@@ -54,7 +54,7 @@ export class SocialController {
   @Delete('/google/unlink/:googleId')
   async googleUnlink(@Param('googleId') googleId: string): Promise<boolean> {
     await this.socialService.googleUnlink(googleId);
-    return this.socialService.deleteSocialAccountRecord(googleId);
+    return this.socialService.deleteSellerSocialAccountRecord(googleId);
   }
 
   /** 네이버 ************************************************ */
@@ -75,7 +75,7 @@ export class SocialController {
   @Delete('/naver/unlink/:naverId')
   async naverUnlink(@Param('naverId') naverId: string): Promise<boolean> {
     await this.socialService.naverUnlink(naverId);
-    return this.socialService.deleteSocialAccountRecord(naverId);
+    return this.socialService.deleteSellerSocialAccountRecord(naverId);
   }
 
   /** 카카오 ************************************************ */
@@ -96,6 +96,6 @@ export class SocialController {
   @Delete('/kakao/unlink/:kakaoId')
   async kakaoUnlink(@Param('kakaoId') kakaoId: string): Promise<boolean> {
     await this.socialService.kakaoUnlink(kakaoId);
-    return this.socialService.deleteSocialAccountRecord(kakaoId);
+    return this.socialService.deleteSellerSocialAccountRecord(kakaoId);
   }
 }
