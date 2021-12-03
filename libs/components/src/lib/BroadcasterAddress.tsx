@@ -162,10 +162,6 @@ export function BroadcasterAddressForm(): JSX.Element {
                 maxW="180px"
                 placeholder="상세주소"
                 {...register('detailAddress', {
-                  required: {
-                    message: '상세주소를 입력해주세요.',
-                    value: true,
-                  },
                   maxLength: {
                     value: 30,
                     message: '30자 이상 작성할 수 없습니다.',

@@ -125,14 +125,16 @@ export function BroadcasterNicknameForm(): JSX.Element {
     <Stack as="form" onSubmit={handleSubmit(onSubmit)}>
       {!editMode ? (
         <HStack>
-          <Input
-            cursor="default"
-            maxW={200}
-            readOnly
-            value={broadcaster.data?.userNickname || ''}
-          />
+          {broadcaster.data?.userNickname && (
+            <Input
+              cursor="default"
+              maxW={200}
+              readOnly
+              value={broadcaster.data.userNickname}
+            />
+          )}
           <Button leftIcon={<EditIcon />} onClick={onEditModeToggle}>
-            {isBeginner ? '등록하기' : '수정'}
+            {isBeginner ? '등록' : '수정'}
           </Button>
         </HStack>
       ) : (
