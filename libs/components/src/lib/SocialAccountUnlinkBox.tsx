@@ -1,9 +1,6 @@
 import { Button, Flex, Text, useDisclosure, useToast } from '@chakra-ui/react';
-import {
-  SocialAccount,
-  useProfile,
-  useUnlinkSocialAccountMutation,
-} from '@project-lc/hooks';
+import { useProfile, useUnlinkSocialAccountMutation } from '@project-lc/hooks';
+import { SocialAccount } from '@project-lc/shared-types';
 import google from '../../images/google.png';
 import naver from '../../images/naver.png';
 import kakao from '../../images/kakao.png';

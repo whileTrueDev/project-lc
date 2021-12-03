@@ -73,4 +73,5 @@ export * from './lib/res-types/goodsList.res';
 export * from './lib/res-types/loginUserRes';
 export * from './lib/res-types/orderCancelRequest.res';
 export * from './lib/res-types/overlayControllerMain.res';
+export * from './lib/res-types/socialAccounts.res';
 export * from './lib/res-types/userProfile.res';

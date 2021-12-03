@@ -1,16 +1,7 @@
-import { UserType } from '@project-lc/shared-types';
+import { SocialAccounts, UserType } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
-
-export type SocialAccount = {
-  provider: string;
-  registDate: Date;
-  serviceId: string;
-  name: string;
-};
-
-export type SocialAccounts = SocialAccount[];
 
 export const getSocialAccounts = async (
   userType: UserType,
