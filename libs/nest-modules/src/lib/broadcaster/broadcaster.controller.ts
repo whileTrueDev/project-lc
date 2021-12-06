@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { BroadcasterChannel } from '@prisma/client';
@@ -27,6 +28,7 @@ import { MailVerificationService } from '../auth/mailVerification.service';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterService } from './broadcaster.service';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 
 @Controller('broadcaster')
 export class BroadcasterController {
@@ -94,6 +96,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 활동명 수정 */
+  @UseGuards(JwtAuthGuard)
   @Put('nickname')
   public async updateNickname(
     @Body(ValidationPipe) dto: ChangeNicknameDto,
@@ -102,6 +105,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 연락처 목록 조회 */
+  @UseGuards(JwtAuthGuard)
   @Get('/contacts/:broadcasterId')
   public async findBroadcasterContacts(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
@@ -110,6 +114,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 연락처 생성 */
+  @UseGuards(JwtAuthGuard)
   @Post('contacts')
   public async createContact(
     @Body(ValidationPipe) dto: BroadcasterContactDto,
@@ -118,6 +123,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 연락처 수정 */
+  @UseGuards(JwtAuthGuard)
   @Put('contacts/:contactId')
   public async updateContact(
     @Param('contactId', ParseIntPipe) contactId: BroadcasterContacts['id'],
@@ -127,6 +133,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 연락처 삭제 */
+  @UseGuards(JwtAuthGuard)
   @Delete('contacts/:contactId')
   public async deleteContact(
     @Param('contactId', ParseIntPipe) contactId: BroadcasterContacts['id'],
@@ -135,6 +142,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 주소 수정 */
+  @UseGuards(JwtAuthGuard)
   @Put('address')
   public async updateAddress(
     @Body(ValidationPipe) dto: BroadcasterAddressDto,
