@@ -6,12 +6,26 @@
   - Added the required column `email` to the `Broadcaster` table without a default value. This is not possible if the table is not empty.
 
 */
--- DropIndex
-DROP INDEX `Broadcaster_userId_key` ON `Broadcaster`;
+-- DropTable
+DROP TABLE `Broadcaster`;
 
--- AlterTable
-ALTER TABLE `Broadcaster` DROP COLUMN `userId`,
-    ADD COLUMN `email` VARCHAR(191) NOT NULL;
+-- CreateTable
+CREATE TABLE `Broadcaster` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(191) NULL,
+    `userName` VARCHAR(20) NOT NULL,
+    `userNickname` VARCHAR(20) NULL,
+    `avatar` VARCHAR(191) NULL,
+    `overlayUrl` VARCHAR(191) NOT NULL,
+    `agreementFlag` BOOLEAN NOT NULL DEFAULT false,
+    `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `deleteFlag` BOOLEAN NOT NULL DEFAULT false,
 
--- CreateIndex
-CREATE UNIQUE INDEX `Broadcaster_email_key` ON `Broadcaster`(`email`);
+    UNIQUE INDEX `Broadcaster_email_key`(`email`),
+    INDEX `Broadcaster_email_idx`(`email`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `LiveShopping` ADD CONSTRAINT `LiveShopping_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `Broadcaster`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

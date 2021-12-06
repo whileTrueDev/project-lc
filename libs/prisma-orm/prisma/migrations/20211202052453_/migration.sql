@@ -6,10 +6,21 @@
   - Added the required column `userType` to the `LoginHistory` table without a default value. This is not possible if the table is not empty.
 
 */
--- DropForeignKey
-ALTER TABLE `LoginHistory` DROP FOREIGN KEY `LoginHistory_sellerId_fkey`;
+-- DropTable
+DROP TABLE `LoginHistory`;
 
--- AlterTable
-ALTER TABLE `LoginHistory` DROP COLUMN `sellerId`,
-    ADD COLUMN `userEmail` VARCHAR(191) NOT NULL,
-    ADD COLUMN `userType` VARCHAR(191) NOT NULL;
+-- CreateTable
+CREATE TABLE `LoginHistory` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userEmail` VARCHAR(191) NOT NULL,
+    `userType` VARCHAR(191) NOT NULL,
+    `method` VARCHAR(191) NOT NULL,
+    `ip` VARCHAR(191) NOT NULL,
+    `country` VARCHAR(191),
+    `city` VARCHAR(191),
+    `device` VARCHAR(191) NOT NULL,
+    `ua` VARCHAR(191) NOT NULL,
+    `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

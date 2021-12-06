@@ -15,13 +15,4 @@ ALTER TABLE `LiveShopping` DROP FOREIGN KEY `LiveShopping_broadcasterId_fkey`;
 DROP INDEX `Broadcaster_userId_idx` ON `Broadcaster`;
 
 -- AlterTable
-ALTER TABLE `LiveCommerceRanking` MODIFY `broadcasterId` INTEGER NOT NULL;
-
--- AlterTable
 ALTER TABLE `LiveShopping` MODIFY `broadcasterId` INTEGER;
-
--- AddForeignKey
-ALTER TABLE `LiveCommerceRanking` ADD CONSTRAINT `LiveCommerceRanking_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `Broadcaster`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `LiveShopping` ADD CONSTRAINT `LiveShopping_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `Broadcaster`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
