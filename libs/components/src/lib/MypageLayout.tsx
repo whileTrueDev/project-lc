@@ -4,6 +4,7 @@ import { UserType } from '@project-lc/shared-types';
 import React from 'react';
 import { FloatingHelpButton, MypageLink, mypageNavLinks } from '..';
 import FullscreenLoading from './FullscreenLoading';
+import LoginRequireAlertDialog from './LoginRequireAlertDialog';
 import MypageFooter from './MypageFooter';
 import { MypageNavbar } from './MypageNavbar';
 import { Navbar } from './Navbar';
@@ -37,8 +38,7 @@ export function MypageLayout({
       {status === 'loading' && <FullscreenLoading />}
 
       {/* 로그인 필요 다이얼로그 */}
-      {/* 로그인 기능 없이 작업하기 위해 임시 주석처리 by dan 211202 */}
-      {/* <LoginRequireAlertDialog isOpen={status === 'error'} /> */}
+      <LoginRequireAlertDialog isOpen={status === 'error'} />
 
       {/* 클릭한번에 실시간 상담 버튼 */}
       <FloatingHelpButton />
