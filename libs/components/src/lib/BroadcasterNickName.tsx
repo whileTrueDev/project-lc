@@ -6,6 +6,7 @@ import {
   FormErrorMessage,
   HStack,
   Input,
+  Spinner,
   Stack,
   Text,
   useMergeRefs,
@@ -21,6 +22,13 @@ import SettingSectionLayout from './SettingSectionLayout';
 export function BroadcasterNickNameSection(): JSX.Element {
   const broadcaster = useBroadcaster({ id: 1 });
 
+  if (broadcaster.isLoading) {
+    return (
+      <SettingSectionLayout title="활동명">
+        <Spinner />
+      </SettingSectionLayout>
+    );
+  }
   return (
     <SettingSectionLayout title="활동명">
       {!broadcaster.isLoading && !broadcaster.data?.userNickname && (
@@ -83,7 +91,7 @@ export function BroadcasterNicknameForm(): JSX.Element {
       // 성공시
       reset();
       setEditMode(false);
-      toast({ title: '활동명 변경 완료되었습니다.', status: 'success' });
+      toast({ title: '활동명이 변경되었습니다.', status: 'success' });
     };
     const onError = (): void => {
       setEditMode(true);
@@ -112,14 +120,16 @@ export function BroadcasterNicknameForm(): JSX.Element {
     <Stack as="form" onSubmit={handleSubmit(onSubmit)}>
       {!editMode ? (
         <HStack>
-          <Input
-            cursor="default"
-            maxW={200}
-            readOnly
-            value={broadcaster.data?.userNickname || ''}
-          />
+          {broadcaster.data?.userNickname && (
+            <Input
+              cursor="default"
+              maxW={200}
+              readOnly
+              value={broadcaster.data.userNickname}
+            />
+          )}
           <Button leftIcon={<EditIcon />} onClick={onEditModeToggle}>
-            {isBeginner ? '등록하기' : '수정'}
+            {isBeginner ? '등록' : '수정'}
           </Button>
         </HStack>
       ) : (
@@ -131,7 +141,7 @@ export function BroadcasterNicknameForm(): JSX.Element {
             )}
           </FormControl>
           <ButtonGroup>
-            <Button type="submit" isLoading={changeNickname.isLoading}>
+            <Button colorScheme="blue" type="submit" isLoading={changeNickname.isLoading}>
               확인
             </Button>
             <Button

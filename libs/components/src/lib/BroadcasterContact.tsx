@@ -231,8 +231,6 @@ export function BroadcasterContactAdd(): JSX.Element {
     <Box>
       <Button
         leftIcon={<AddIcon />}
-        variant="outline"
-        size="sm"
         onClick={addSection.onToggle}
         isDisabled={isContactsFull}
       >

@@ -11,15 +11,20 @@ import {
   Query,
   ValidationPipe,
 } from '@nestjs/common';
+import { BroadcasterChannel } from '@prisma/client';
 import {
+  BroadcasterAddressDto,
   BroadcasterContactDto,
+  BroadcasterRes,
   ChangeNicknameDto,
+  CreateBroadcasterChannelDto,
   EmailDupCheckDto,
   FindBroadcasterDto,
   SignUpDto,
 } from '@project-lc/shared-types';
-import { Broadcaster, BroadcasterContacts } from '.prisma/client';
+import { Broadcaster, BroadcasterAddress, BroadcasterContacts } from '.prisma/client';
 import { MailVerificationService } from '../auth/mailVerification.service';
+import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterService } from './broadcaster.service';
 
@@ -28,6 +33,7 @@ export class BroadcasterController {
   constructor(
     private readonly broadcasterService: BroadcasterService,
     private readonly contactsService: BroadcasterContactsService,
+    private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
 
@@ -35,7 +41,7 @@ export class BroadcasterController {
   @Get()
   public async findBroadcaster(
     @Query(ValidationPipe) dto: FindBroadcasterDto,
-  ): Promise<Broadcaster | null> {
+  ): Promise<BroadcasterRes | null> {
     return this.broadcasterService.getBroadcaster(dto);
   }
 
@@ -63,6 +69,31 @@ export class BroadcasterController {
     return this.broadcasterService.isEmailDupCheckOk(dto.email);
   }
 
+  /** 방송인 채널 생성 */
+  @Post('/channel')
+  createBroadcasterChannel(
+    @Body(ValidationPipe) dto: CreateBroadcasterChannelDto,
+  ): Promise<BroadcasterChannel> {
+    return this.channelService.createBroadcasterChannel(dto);
+  }
+
+  /** 방송인 채널 삭제 */
+  @Delete('/channel/:channelId')
+  deleteBroadcasterChannel(
+    @Param('channelId', ParseIntPipe) channelId: number,
+  ): Promise<boolean> {
+    return this.channelService.deleteBroadcasterChannel(channelId);
+  }
+
+  /** 방송인 채널 목록 조회 */
+  @Get('/:broadcasterId/channel-list')
+  getBroadcasterChannelList(
+    @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
+  ): Promise<BroadcasterChannel[]> {
+    return this.channelService.getBroadcasterChannelList(broadcasterId);
+  }
+
+  /** 방송인 활동명 수정 */
   @Put('nickname')
   public async updateNickname(
     @Body(ValidationPipe) dto: ChangeNicknameDto,
@@ -101,5 +132,13 @@ export class BroadcasterController {
     @Param('contactId', ParseIntPipe) contactId: BroadcasterContacts['id'],
   ): Promise<boolean> {
     return this.contactsService.deleteContact(contactId);
+  }
+
+  /** 방송인 주소 수정 */
+  @Put('address')
+  public async updateAddress(
+    @Body(ValidationPipe) dto: BroadcasterAddressDto,
+  ): Promise<BroadcasterAddress> {
+    return this.broadcasterService.upsertAddress(1, dto);
   }
 }
