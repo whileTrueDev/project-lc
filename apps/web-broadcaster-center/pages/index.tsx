@@ -5,6 +5,7 @@ import {
   BroadcasterMainBetaMobile,
   BroadcasterNavbar,
   CommonFooter,
+  FloatingHelpButton,
 } from '@project-lc/components';
 import { useDisplaySize } from '@project-lc/hooks';
 
@@ -18,6 +19,7 @@ export function Index(): JSX.Element {
         {isMobileSize ? <BroadcasterMainBetaMobile /> : <BroadcasterMainBetaDesktop />}
         <CommonFooter footerLinkList={broadcasterFooterLinkList} />
       </Flex>
+      <FloatingHelpButton />
     </div>
   );
 }

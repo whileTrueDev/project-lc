@@ -34,6 +34,7 @@ export * from './lib/ExportDetailItems';
 export * from './lib/ExportDetailSummary';
 export * from './lib/ExportDetailTitle';
 export * from './lib/Features';
+export * from './lib/FloatingHelpButton';
 export * from './lib/FmOrderStatusBadge';
 export * from './lib/FmRefundStatusBadge';
 export * from './lib/FmReturnStatusBadge';
