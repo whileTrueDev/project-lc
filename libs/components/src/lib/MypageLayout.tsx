@@ -1,7 +1,7 @@
 import { Box } from '@chakra-ui/react';
 import { useIsLoggedIn } from '@project-lc/hooks';
 import React from 'react';
-import { MypageLink, mypageNavLinks } from '..';
+import { FloatingHelpButton, MypageLink, mypageNavLinks } from '..';
 import { SiteType } from '../constants/siteType';
 import FullscreenLoading from './FullscreenLoading';
 import LoginRequireAlertDialog from './LoginRequireAlertDialog';
@@ -40,6 +40,9 @@ export function MypageLayout({
       {/* 로그인 필요 다이얼로그 */}
       {/* 로그인 기능 없이 작업하기 위해 임시 주석처리 by dan 211202 */}
       {/* <LoginRequireAlertDialog isOpen={status === 'error'} /> */}
+
+      {/* 클릭한번에 실시간 상담 버튼 */}
+      <FloatingHelpButton />
     </Box>
   );
 }
