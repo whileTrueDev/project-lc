@@ -16,14 +16,15 @@ import {
   FormErrorMessage,
   Spinner,
 } from '@chakra-ui/react';
-import { useBroadcaster, useUpdateNicknameMutation } from '@project-lc/hooks';
+import { useBroadcaster, useProfile, useUpdateNicknameMutation } from '@project-lc/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import SettingSectionLayout from './SettingSectionLayout';
 
 /** 방송인 활동명 컴포넌트. editable input */
 export function BroadcasterNickNameSection(): JSX.Element {
-  const broadcaster = useBroadcaster({ id: 1 });
+  const profile = useProfile();
+  const broadcaster = useBroadcaster({ id: profile.data?.id });
 
   if (broadcaster.isLoading) {
     return (
@@ -70,7 +71,8 @@ function NoNicknameAlertBox(): JSX.Element {
 /** 방송인 활동명 폼 */
 export function BroadcasterNicknameForm(): JSX.Element {
   const toast = useToast();
-  const broadcaster = useBroadcaster({ id: 1 });
+  const profile = useProfile();
+  const broadcaster = useBroadcaster({ id: profile.data?.id });
   const {
     register,
     handleSubmit,

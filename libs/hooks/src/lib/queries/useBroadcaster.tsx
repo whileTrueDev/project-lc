@@ -17,5 +17,6 @@ export const useBroadcaster = (
   return useQuery<BroadcasterRes | null, AxiosError>(
     ['Broadcaster', dto.id, dto.email],
     () => getBroadcaster(dto),
+    { enabled: !!(dto.id || dto.email) },
   );
 };

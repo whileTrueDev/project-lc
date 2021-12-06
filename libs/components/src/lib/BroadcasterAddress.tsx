@@ -21,7 +21,11 @@ import {
   useMergeRefs,
   useToast,
 } from '@chakra-ui/react';
-import { useBroadcaster, useBroadcasterAddressMutation } from '@project-lc/hooks';
+import {
+  useBroadcaster,
+  useBroadcasterAddressMutation,
+  useProfile,
+} from '@project-lc/hooks';
 import { BroadcasterAddressDto } from '@project-lc/shared-types';
 import { useMemo, useRef } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
@@ -29,7 +33,8 @@ import { useForm } from 'react-hook-form';
 import SettingSectionLayout from './SettingSectionLayout';
 
 export function BroadcasterAddressSection(): JSX.Element {
-  const broadcaster = useBroadcaster({ id: 1 });
+  const profile = useProfile();
+  const broadcaster = useBroadcaster({ id: profile.data?.id });
   if (broadcaster.isLoading) {
     return (
       <SettingSectionLayout title="샘플 및 선물 수령 주소">
@@ -68,7 +73,8 @@ function NoAddressAlertBox(): JSX.Element {
 
 export function BroadcasterAddressForm(): JSX.Element {
   const toast = useToast();
-  const broadcaster = useBroadcaster({ id: 1 });
+  const profile = useProfile();
+  const broadcaster = useBroadcaster({ id: profile.data?.id });
   const isBroadcasterAddressExists = useMemo(() => {
     if (!broadcaster.data) return false;
     if (!broadcaster.data.broadcasterAddress) return false;
