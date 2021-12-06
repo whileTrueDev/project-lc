@@ -255,6 +255,21 @@ export function GoodsDetail(): JSX.Element {
 
             <Divider />
             <Stack direction="row" alignItems="center">
+              <Text as="span">희망 판매 수수료: </Text>
+              <Text as="span" fontWeight="bold">
+                {liveShopping[0].desiredCommission} %
+              </Text>
+            </Stack>
+
+            <Stack direction="row" alignItems="center">
+              <Text as="span">희망 진행 기간: </Text>
+              <Text as="span" fontWeight="bold">
+                {liveShopping[0].desiredPeriod}
+              </Text>
+            </Stack>
+
+            <Divider />
+            <Stack direction="row" alignItems="center">
               <Text as="span">방송인 수수료: </Text>
               <Text as="span" fontWeight="bold">
                 {liveShopping[0].broadcasterCommissionRate
@@ -273,6 +288,7 @@ export function GoodsDetail(): JSX.Element {
             </Stack>
 
             <Box>
+              <Text>요청사항</Text>
               <Textarea
                 resize="none"
                 rows={10}

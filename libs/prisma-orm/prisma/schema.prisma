@@ -546,6 +546,8 @@ model LiveShopping {
   rejectionReason           String?                   @db.Text // 방송 취소 또는 거절 사유
   broadcasterCommissionRate Decimal                   @default("0") @db.Decimal(10, 2) // 판매금 중, 방송인이 가져가는 수수료 (0%~100% 사이값)
   whiletrueCommissionRate   Decimal                   @default("0") @db.Decimal(10, 2) // 판매금 중, project-lc(와일트루)가 가져가는 수수료 (0%~100% 사이값)
+  desiredCommission         Decimal?                  @default("0") @db.Decimal(10, 2) // 희망판매수수료
+  desiredPeriod             String?                   @default("무관") // 희망 진행 기간
 
   sellerContacts        SellerContacts          @relation(fields: [contactId], references: [id])
   seller                Seller                  @relation(fields: [sellerId], references: [id])

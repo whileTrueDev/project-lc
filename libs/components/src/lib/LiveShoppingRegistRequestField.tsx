@@ -19,7 +19,7 @@ export function LiveShoppingRequestInput(): JSX.Element {
     <Box w="100%">
       <Stack spacing={2}>
         <Stack direction="row">
-          <Heading as="h6" size="xs">
+          <Heading as="h6" size="sm">
             요청사항
           </Heading>
           <Text fontSize="xs">(최대 500자)</Text>
