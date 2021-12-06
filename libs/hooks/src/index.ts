@@ -1,4 +1,5 @@
 export * from './lib/auth-hooks';
+export * from './lib/mutation/useBroadcasterAddressMutation';
 export * from './lib/mutation/useBroadcasterChannelMutation';
 export * from './lib/mutation/useBusinessRegistrationConfirmationMutation';
 export * from './lib/mutation/useBusinessRegistrationMutation';

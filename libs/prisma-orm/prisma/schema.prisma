@@ -493,7 +493,21 @@ model Broadcaster {
   agreementFlag       Boolean               @default(false) // 이용동의 
   liveCommerceRanking LiveCommerceRanking[]
   LiveShopping        LiveShopping[]
+  broadcasterAddress  BroadcasterAddress?
+  liveCommerceRanking LiveCommerceRanking[]
   channels            BroadcasterChannel[]
+}
+
+// 방송인 선물/샘플 수령 주소 정보
+model BroadcasterAddress {
+  id            Int      @id @default(autoincrement())
+  address       String // 주소 (도로명)
+  detailAddress String // 주소 상세
+  postalCode    String // 우편 번호
+  createDate    DateTime @default(now())
+
+  broadcasterId Int?         @unique
+  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 }
 
 // 방송인 활동 플랫폼 채널정보(url)

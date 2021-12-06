@@ -1,8 +1,14 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { Prisma, Broadcaster } from '@prisma/client';
+import { Prisma, Broadcaster, BroadcasterAddress } from '@prisma/client';
 import { throwError } from 'rxjs';
-import { SignUpDto, BroadcasterDTO, FindBroadcasterDto } from '@project-lc/shared-types';
+import {
+  SignUpDto,
+  BroadcasterDTO,
+  FindBroadcasterDto,
+  BroadcasterAddressDto,
+  BroadcasterRes,
+} from '@project-lc/shared-types';
 import { hash, verify } from 'argon2';
 
 @Injectable()
@@ -104,10 +110,22 @@ export class BroadcasterService {
   }
 
   /** 방송인 정보 조회 */
-  public async getBroadcaster(opt: FindBroadcasterDto): Promise<Broadcaster | null> {
+  public async getBroadcaster(opt: FindBroadcasterDto): Promise<BroadcasterRes | null> {
     const { id, email } = opt;
-    if (id) return this.prisma.broadcaster.findUnique({ where: { id: Number(id) } });
-    if (email) return this.prisma.broadcaster.findUnique({ where: { email } });
+    if (id)
+      return this.prisma.broadcaster.findUnique({
+        where: { id: Number(id) },
+        include: {
+          broadcasterAddress: true,
+        },
+      });
+    if (email)
+      return this.prisma.broadcaster.findUnique({
+        where: { email },
+        include: {
+          broadcasterAddress: true,
+        },
+      });
     return null;
   }
 
@@ -119,6 +137,29 @@ export class BroadcasterService {
     return this.prisma.broadcaster.update({
       where: { id },
       data: { userNickname: newNick },
+    });
+  }
+
+  /** 방송인 선물/샘플 수령 주소 생성 및 수정 */
+  public async upsertAddress(
+    broadcasterId: Broadcaster['id'],
+    dto: BroadcasterAddressDto,
+  ): Promise<BroadcasterAddress> {
+    const { address, detailAddress, postalCode } = dto;
+    return this.prisma.broadcasterAddress.upsert({
+      where: { broadcasterId },
+      create: {
+        address,
+        detailAddress,
+        postalCode,
+        broadcasterId,
+      },
+      update: {
+        address,
+        detailAddress,
+        postalCode,
+        broadcasterId,
+      },
     });
   }
 }
