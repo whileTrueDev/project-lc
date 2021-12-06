@@ -60,13 +60,13 @@ export class SocialController {
     return res.redirect(this.getFrontMypageUrl(userType));
   }
 
-  @Delete('/google/unlink/:googleId')
+  @Delete('/google/unlink/:serviceId')
   async googleUnlink(
-    @Param('googleId') googleId: string,
+    @Param('serviceId') serviceId: string,
     @Body('userType') userType: UserType,
   ): Promise<boolean> {
-    await this.socialService.googleUnlink(userType, googleId);
-    return this.socialService.deleteSocialAccountRecord(googleId);
+    await this.socialService.googleUnlink(userType, serviceId);
+    return this.socialService.deleteSocialAccountRecord(userType, serviceId);
     return true;
   }
 
@@ -86,10 +86,13 @@ export class SocialController {
     return res.redirect(this.getFrontMypageUrl(userType));
   }
 
-  @Delete('/naver/unlink/:naverId')
-  async naverUnlink(@Param('naverId') naverId: string): Promise<boolean> {
-    await this.socialService.naverUnlink(naverId);
-    return this.socialService.deleteSocialAccountRecord(naverId);
+  @Delete('/naver/unlink/:serviceId')
+  async naverUnlink(
+    @Param('serviceId') serviceId: string,
+    @Body('userType') userType: UserType,
+  ): Promise<boolean> {
+    await this.socialService.naverUnlink(userType, serviceId);
+    return this.socialService.deleteSocialAccountRecord(userType, serviceId);
   }
 
   /** 카카오 ************************************************ */
@@ -108,9 +111,12 @@ export class SocialController {
     return res.redirect(this.getFrontMypageUrl(userType));
   }
 
-  @Delete('/kakao/unlink/:kakaoId')
-  async kakaoUnlink(@Param('kakaoId') kakaoId: string): Promise<boolean> {
-    await this.socialService.kakaoUnlink(kakaoId);
-    return this.socialService.deleteSocialAccountRecord(kakaoId);
+  @Delete('/kakao/unlink/:serviceId')
+  async kakaoUnlink(
+    @Param('serviceId') serviceId: string,
+    @Body('userType') userType: UserType,
+  ): Promise<boolean> {
+    await this.socialService.kakaoUnlink(userType, serviceId);
+    return this.socialService.deleteSocialAccountRecord(userType, serviceId);
   }
 }

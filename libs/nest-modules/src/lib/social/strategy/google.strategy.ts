@@ -35,7 +35,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_PROVIDER) 
   async validate(
     req: Request,
     accessToken: string,
-    refreshToken: null,
+    refreshToken: string,
     profile: Profile,
   ): Promise<Seller | Broadcaster> {
     const { id, displayName, emails, photos } = profile;

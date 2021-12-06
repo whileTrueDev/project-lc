@@ -217,15 +217,17 @@ export class SocialService {
     userType: UserType,
     serviceId: string,
   ): Promise<boolean> {
-    // TODO: userType에 따라 다른 테이블에서 삭제처리
     // TODO: userType else 사용하지 않아서 두번 처리되는 경우가 없는지 확인필요(admin 의 경우)
     if (userType === 'seller' || userType === 'admin') {
+      await this.prisma.sellerSocialAccount.delete({
+        where: { serviceId },
+      });
     }
     if (userType === 'broadcaster') {
+      await this.prisma.broadcasterSocialAccount.delete({
+        where: { serviceId },
+      });
     }
-    await this.prisma.sellerSocialAccount.delete({
-      where: { serviceId },
-    });
     return true;
   }
 
@@ -287,12 +289,13 @@ export class SocialService {
         provider,
         id: serviceId,
       });
+    } else if (userType === 'broadcaster') {
+      // 방송인
+      socialAccount = await this.selectBroadcasterSocialAccountRecord({
+        provider,
+        id: serviceId,
+      });
     }
-    // 방송인
-    socialAccount = await this.selectBroadcasterSocialAccountRecord({
-      provider,
-      id: serviceId,
-    });
 
     if (!socialAccount) {
       throw new BadRequestException(
@@ -340,10 +343,18 @@ export class SocialService {
    * 카카오 계정 연동해제 & 카카오 소셜계정 레코드 삭제
    * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
    * */
-  async kakaoUnlink(kakaoId: string, accessTokenParam?: string): Promise<boolean> {
+  async kakaoUnlink(
+    userType: UserType,
+    kakaoId: string,
+    accessTokenParam?: string,
+  ): Promise<boolean> {
     let kakaoAccessToken: string;
     if (!accessTokenParam) {
-      kakaoAccessToken = await this.getSocialAccountAccessToken('kakao', kakaoId);
+      kakaoAccessToken = await this.getSocialAccountAccessToken(
+        userType,
+        'kakao',
+        kakaoId,
+      );
     } else {
       kakaoAccessToken = accessTokenParam;
     }
@@ -377,10 +388,18 @@ export class SocialService {
    * 네이버 계정연동 해제 && 네이버 계정 레코드 삭제
    * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
    * */
-  async naverUnlink(naverId: string, accessTokenParam?: string): Promise<boolean> {
+  async naverUnlink(
+    userType: UserType,
+    naverId: string,
+    accessTokenParam?: string,
+  ): Promise<boolean> {
     let naverAccessToken: string;
     if (!accessTokenParam) {
-      naverAccessToken = await this.getSocialAccountAccessToken('naver', naverId);
+      naverAccessToken = await this.getSocialAccountAccessToken(
+        userType,
+        'naver',
+        naverId,
+      );
     } else {
       naverAccessToken = accessTokenParam;
     }
