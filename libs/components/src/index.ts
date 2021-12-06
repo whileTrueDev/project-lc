@@ -16,6 +16,7 @@ export * from './lib/admin/AdminPageLayout';
 export * from './lib/BroadcasterAddress';
 export * from './lib/BroadcasterAutocomplete';
 export * from './lib/BroadcasterChannelButton';
+export * from './lib/BroadcasterChannelSection';
 export * from './lib/BroadcasterName';
 export * from './lib/BroadcasterNickName';
 export * from './lib/BusinessRegistrationBox';

@@ -499,10 +499,12 @@ model Broadcaster {
   LiveShopping        LiveShopping[]
   broadcasterAddress  BroadcasterAddress?
   liveCommerceRanking LiveCommerceRanking[]
+  channels            BroadcasterChannel[]
 
   @@index(userId)
 }
 
+// 방송인 선물/샘플 수령 주소 정보
 model BroadcasterAddress {
   id            Int      @id @default(autoincrement())
   address       String // 주소 (도로명)
@@ -512,6 +514,15 @@ model BroadcasterAddress {
 
   broadcasterId Int?         @unique
   broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+}
+
+// 방송인 활동 플랫폼 채널정보(url)
+model BroadcasterChannel {
+  id            Int         @id @default(autoincrement())
+  url           String // 채널 url (아프리카, 트위치, 유투브, 인스타그램 ...)
+  createDate    DateTime    @default(now())
+  broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+  broadcasterId Int
 }
 
 // -------------------------------------------------
