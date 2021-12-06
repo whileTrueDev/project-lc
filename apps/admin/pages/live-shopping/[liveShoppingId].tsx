@@ -135,7 +135,6 @@ export function GoodsDetail(): JSX.Element {
 
   if (!goods.isLoading && !goods.data)
     return <AdminPageLayout>...no data</AdminPageLayout>;
-  console.log(liveShopping[0]);
   return (
     <AdminPageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={8} p={2} mb={16}>
