@@ -7,6 +7,7 @@ import { SocialController } from './social.controller';
 import { SocialService } from './social.service';
 import { KakaoStrategy } from './strategy/kakao.strategy';
 import { SellerModule } from '../seller/seller.module';
+import { BroadcasterModule } from '../broadcaster/broadcaster.module';
 import { SellerService } from '../seller/seller.service';
 import { SocialLoginExceptionFilter } from './social-login-exception.filter';
 import { NaverApiService } from './platform-api/naver-api.service';
@@ -16,7 +17,7 @@ import { S3Module } from '../s3/s3.module';
 import { SocialLoginUserTypeMiddleware } from '../_nest-units/middlewares/socialLoginUserType.middleware';
 
 @Module({
-  imports: [AuthModule, SellerModule, S3Module],
+  imports: [AuthModule, BroadcasterModule, SellerModule, S3Module],
   controllers: [SocialController],
   providers: [
     NaverApiService,

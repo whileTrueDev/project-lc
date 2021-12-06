@@ -4,7 +4,11 @@ import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export const getProfile = async (): Promise<UserProfileRes> => {
-  return axios.get<UserProfileRes>('/auth/profile').then((res) => res.data);
+  return axios
+    .get<UserProfileRes>('/auth/profile', {
+      params: { appType: process.env.NEXT_PUBLIC_APP_TYPE },
+    })
+    .then((res) => res.data);
 };
 
 export const useProfile = (

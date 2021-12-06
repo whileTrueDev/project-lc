@@ -22,7 +22,7 @@ export function BroadcasterAutocomplete(
         getOptionLabel={(option) => option?.userNickname || ''}
         onChange={(newV) => {
           if (newV) {
-            setValue('broadcasterId', newV.userId);
+            setValue('broadcasterId', newV.email);
             handleBroadcasterSelect(newV.userNickname);
           } else {
             setValue('broadcasterId', null);
