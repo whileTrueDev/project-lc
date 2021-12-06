@@ -68,7 +68,7 @@ export function BroadcasterChannelSection(): JSX.Element {
 
   const { data: profileData, isLoading: profileLoading } = useProfile();
   const { data: channels, isLoading: channelLoading } = useBroadcasterChannels(
-    profileData?.id || 1,
+    profileData?.id,
   );
 
   const allowAddChannel = useMemo(() => channels && channels.length < 5, [channels]);
@@ -80,8 +80,7 @@ export function BroadcasterChannelSection(): JSX.Element {
     createChannelRequest
       .mutateAsync({
         ...data,
-        // broadcasterId: profileData.id,
-        broadcasterId: 1,
+        broadcasterId: profileData?.id || 1,
       })
       .then(() => {
         reset();
