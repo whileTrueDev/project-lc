@@ -180,6 +180,14 @@ export class AuthService {
     const hasPassword = Boolean(user.password);
     const { password, ..._user } = user;
 
+    if ('userName' in _user) {
+      return {
+        ..._user,
+        name: _user.userName,
+        type,
+        hasPassword,
+      };
+    }
     return {
       ..._user,
       type,
