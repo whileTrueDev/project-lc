@@ -493,8 +493,22 @@ model Broadcaster {
   agreementFlag       Boolean               @default(false) // 이용동의 
   liveCommerceRanking LiveCommerceRanking[]
   LiveShopping        LiveShopping[]
+  broadcasterContacts BroadcasterContacts[]
   broadcasterAddress  BroadcasterAddress?
   channels            BroadcasterChannel[]
+}
+
+// 방송인 연락처 정보
+model BroadcasterContacts {
+  id          Int      @id @default(autoincrement())
+  name        String   @default("")
+  email       String   @default("")
+  phoneNumber String   @default("")
+  isDefault   Boolean  @default(false)
+  createDate  DateTime @default(now())
+
+  broadcasterId Int?
+  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 }
 
 // 방송인 선물/샘플 수령 주소 정보
