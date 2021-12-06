@@ -1,30 +1,29 @@
 import { Box } from '@chakra-ui/react';
 import { useIsLoggedIn } from '@project-lc/hooks';
+import { UserType } from '@project-lc/shared-types';
 import React from 'react';
 import { FloatingHelpButton, MypageLink, mypageNavLinks } from '..';
-import { SiteType } from '../constants/siteType';
 import FullscreenLoading from './FullscreenLoading';
-import LoginRequireAlertDialog from './LoginRequireAlertDialog';
 import MypageFooter from './MypageFooter';
 import { MypageNavbar } from './MypageNavbar';
 import { Navbar } from './Navbar';
 
 interface MypageLayoutProps {
   children: React.ReactNode;
-  siteType?: SiteType;
+  appType?: UserType;
   navLinks?: Array<MypageLink>;
 }
 
 export function MypageLayout({
   children,
-  siteType = 'seller',
+  appType = 'seller',
   navLinks = mypageNavLinks,
 }: MypageLayoutProps): JSX.Element {
   const { status } = useIsLoggedIn();
 
   return (
     <Box position="relative" pointerEvents={status === 'loading' ? 'none' : 'auto'}>
-      <Navbar siteType={siteType} />
+      <Navbar appType={appType} />
 
       <MypageNavbar navLinks={navLinks} />
 
