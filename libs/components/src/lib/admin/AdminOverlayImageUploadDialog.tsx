@@ -11,7 +11,6 @@ import {
   Stack,
   useToast,
   HStack,
-  CloseButton,
   VStack,
   Heading,
   useDisclosure,
@@ -22,6 +21,7 @@ import { s3 } from '@project-lc/hooks';
 import { ChakraNextImage } from '../ChakraNextImage';
 import { ConfirmDialog } from '../ConfirmDialog';
 import { ImageInput } from '../ImageInput';
+import { GoodsPreviewItem, readAsDataURL, Preview } from '../GoodsRegistPictures';
 
 type ImageUploadType = {
   isOpen: boolean;
@@ -31,35 +31,6 @@ type ImageUploadType = {
 export interface AdminOverlayImageUpload extends ImageUploadType {
   broadcasterId: string;
   streamId: string;
-}
-
-export type FileReaderResultType = string | ArrayBuffer | null;
-
-export type Preview = {
-  id: number;
-  filename: string;
-  url: FileReaderResultType;
-  file: File;
-};
-
-export function readAsDataURL(file: File): Promise<{
-  data: FileReaderResultType;
-  name: string;
-  size: number;
-  type: string;
-}> {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.onload = function () {
-      return resolve({
-        data: fileReader.result,
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      });
-    };
-    fileReader.readAsDataURL(file);
-  });
 }
 
 // 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
@@ -109,24 +80,6 @@ export async function uploadImageToS3(
     type,
     streamId,
   });
-}
-
-export function PreviewItem(
-  props: Pick<Preview, 'id' | 'filename'> & {
-    onDelete: () => void;
-    width: number;
-    height: number;
-    url: string;
-  },
-): JSX.Element {
-  const { id, filename: fileName, url, onDelete, ...rest } = props;
-
-  return (
-    <HStack mr={2} mb={2}>
-      <ChakraNextImage layout="intrinsic" alt={fileName} src={url} {...rest} />
-      <CloseButton onClick={onDelete} />
-    </HStack>
-  );
 }
 
 export async function getSavedImages(
@@ -416,7 +369,7 @@ export function AdminOverlayImageUploadDialog(
                   verticalPreviews.map((preview) => {
                     const { id, filename, url } = preview;
                     return (
-                      <PreviewItem
+                      <GoodsPreviewItem
                         key={id}
                         id={id}
                         filename={filename}
@@ -446,7 +399,7 @@ export function AdminOverlayImageUploadDialog(
                   donationPreviews.map((preview) => {
                     const { id, filename, url } = preview;
                     return (
-                      <PreviewItem
+                      <GoodsPreviewItem
                         key={id}
                         id={id}
                         filename={filename}
