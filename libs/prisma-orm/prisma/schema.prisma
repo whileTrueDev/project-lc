@@ -286,6 +286,8 @@ model LoginHistory {
   device     String // 로그인 기기
   ua         String // User-Agent 문자열
   createDate DateTime @default(now()) // 로그인 일시
+
+  @@index([userEmail, userType])
 }
 
 // 상품 검수 상태 정보
