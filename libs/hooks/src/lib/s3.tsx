@@ -1,4 +1,10 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  ListObjectsCommand,
+  DeleteObjectsCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import dayjs from 'dayjs';
 import path from 'path';
@@ -198,10 +204,50 @@ export const s3 = (() => {
     return imageUrl;
   }
 
+  async function getVerticalImagesFromS3(
+    broadcasterId: string,
+    streamId: string,
+    type: 'vertical-banner' | 'donation-images',
+  ): Promise<(string | undefined)[]> {
+    const command = new ListObjectsCommand({
+      Bucket: S3_BUCKET_NAME,
+      Prefix: `${type}/${broadcasterId}/${streamId}`,
+    });
+    const response = await s3Client.send(command);
+    const imagesLength = response.Contents || null;
+    const imagesKey = imagesLength?.map((item) => {
+      return item.Key;
+    });
+    return imagesKey || [];
+  }
+
+  async function s3DeleteImages(
+    toDeleteImages: (string | undefined)[],
+  ): Promise<boolean> {
+    const toDeleteObject: { Key: string }[] = [];
+    toDeleteImages.forEach((imageName) => {
+      toDeleteObject.push({ Key: `${imageName}` });
+    });
+    const command = new DeleteObjectsCommand({
+      Bucket: S3_BUCKET_NAME,
+      Delete: { Objects: toDeleteObject },
+    });
+
+    try {
+      await s3Client.send(command);
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
   return {
     s3UploadImage,
     getS3Key,
     s3DownloadImageUrl,
     s3uploadFile: s3publicUploadFile,
+    getVerticalImagesFromS3,
+    s3DeleteImages,
   };
 })();
