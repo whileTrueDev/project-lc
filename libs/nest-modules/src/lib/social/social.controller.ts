@@ -61,7 +61,7 @@ export class SocialController {
     this.socialService.login(userType, req, res);
 
     // 로그인 기록 추가 by @hwasurr
-    // this.loginHistoryService.createLoginStamp(req, '소셜/구글');
+    this.loginHistoryService.createLoginStamp(req, '소셜/구글');
 
     res.clearCookie(USER_TYPE_KEY);
     return res.redirect(this.getFrontMypageUrl(userType));
@@ -87,8 +87,9 @@ export class SocialController {
   async naverAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
     const userType: UserType = getUserTypeFromRequest(req);
     this.socialService.login(userType, req, res);
+
     // 로그인 기록 추가 by @hwasurr
-    // this.loginHistoryService.createLoginStamp(req, '소셜/네이버');
+    this.loginHistoryService.createLoginStamp(req, '소셜/네이버');
 
     res.clearCookie(USER_TYPE_KEY);
     return res.redirect(this.getFrontMypageUrl(userType));
@@ -114,8 +115,9 @@ export class SocialController {
   async kakaoAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
     const userType: UserType = getUserTypeFromRequest(req);
     this.socialService.login(userType, req, res);
+
     // 로그인 기록 추가 by @hwasurr
-    // this.loginHistoryService.createLoginStamp(req, '소셜/카카오');
+    this.loginHistoryService.createLoginStamp(req, '소셜/카카오');
 
     res.clearCookie(USER_TYPE_KEY);
     return res.redirect(this.getFrontMypageUrl(userType));
