@@ -40,7 +40,7 @@ export const s3 = (() => {
     type: s3KeyType;
     file: File | Buffer | null;
     companyName?: string;
-    streamId?: string;
+    liveShoppingId?: number;
   }
 
   type s3FileNameParams = {
@@ -48,7 +48,7 @@ export const s3 = (() => {
     type: s3KeyType;
     filename: string | null;
     companyName?: string;
-    streamId?: string;
+    liveShoppingId?: number;
   };
 
   // 파일명에서 확장자를 추출하는 과정
@@ -66,7 +66,7 @@ export const s3 = (() => {
     type,
     filename,
     companyName,
-    streamId,
+    liveShoppingId,
   }: s3FileNameParams): {
     key: string;
     fileName: string;
@@ -98,8 +98,8 @@ export const s3 = (() => {
         fileFullName = `${filename}`;
       }
     }
-    const pathList = streamId
-      ? [type, userMail, streamId, fileFullName]
+    const pathList = liveShoppingId
+      ? [type, userMail, String(liveShoppingId), fileFullName]
       : [type, userMail, fileFullName];
     return {
       key: path.join(...pathList),
@@ -114,12 +114,12 @@ export const s3 = (() => {
     filename,
     type,
     userMail,
-    streamId,
+    liveShoppingId,
   }: S3UploadImageOptions & {
     contentType: string;
   }): Promise<string> {
     if (!userMail || !file) throw new Error('file should be not null');
-    const { key } = getS3Key({ userMail, type, filename, streamId });
+    const { key } = getS3Key({ userMail, type, filename, liveShoppingId });
 
     try {
       const command = new PutObjectCommand({
@@ -152,7 +152,7 @@ export const s3 = (() => {
     type,
     userMail,
     companyName,
-    streamId,
+    liveShoppingId,
   }: S3UploadImageOptions): Promise<string | null> {
     if (!userMail || !file) {
       return null;
@@ -162,7 +162,7 @@ export const s3 = (() => {
       type,
       filename,
       companyName,
-      streamId,
+      liveShoppingId,
     });
 
     try {
@@ -206,12 +206,12 @@ export const s3 = (() => {
 
   async function getVerticalImagesFromS3(
     broadcasterId: string,
-    streamId: string,
+    liveShoppingId: number,
     type: 'vertical-banner' | 'donation-images',
   ): Promise<(string | undefined)[]> {
     const command = new ListObjectsCommand({
       Bucket: S3_BUCKET_NAME,
-      Prefix: `${type}/${broadcasterId}/${streamId}`,
+      Prefix: `${type}/${broadcasterId}/${liveShoppingId}`,
     });
     const response = await s3Client.send(command);
     const imagesLength = response.Contents || null;

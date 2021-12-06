@@ -340,7 +340,7 @@ export function GoodsDetail(): JSX.Element {
               isOpen={imageDialogIsOpen}
               onClose={imageDialogOnClose}
               broadcasterId={liveShopping[0].broadcasterId}
-              streamId={liveShopping[0].streamId}
+              liveShoppingId={liveShopping[0].id}
             />
           </FormProvider>
         </Grid>
