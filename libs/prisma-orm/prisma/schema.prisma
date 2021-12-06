@@ -498,8 +498,21 @@ model Broadcaster {
   avatar              String?
   agreementFlag       Boolean               @default(false) // 이용동의 
   LiveShopping        LiveShopping[]
+  broadcasterContacts BroadcasterContacts[]
 
   @@index(userId)
+}
+
+model BroadcasterContacts {
+  id          Int      @id @default(autoincrement())
+  name        String   @default("")
+  email       String   @default("")
+  phoneNumber String   @default("")
+  isDefault   Boolean  @default(false)
+  createDate  DateTime @default(now())
+
+  broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+  broadcasterId Int
 }
 
 // -------------------------------------------------

@@ -2,26 +2,32 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  BroadcasterContactDto,
   ChangeNicknameDto,
   EmailDupCheckDto,
   FindBroadcasterDto,
   SignUpDto,
 } from '@project-lc/shared-types';
-import { Broadcaster } from '.prisma/client';
+import { Broadcaster, BroadcasterContacts } from '.prisma/client';
 import { MailVerificationService } from '../auth/mailVerification.service';
+import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterService } from './broadcaster.service';
 
 @Controller('broadcaster')
 export class BroadcasterController {
   constructor(
     private readonly broadcasterService: BroadcasterService,
+    private readonly contactsService: BroadcasterContactsService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
 
@@ -62,5 +68,38 @@ export class BroadcasterController {
     @Body(ValidationPipe) dto: ChangeNicknameDto,
   ): Promise<Broadcaster> {
     return this.broadcasterService.updateNickname(1, dto.nickname);
+  }
+
+  /** 방송인 연락처 목록 조회 */
+  @Get('/contacts/:broadcasterId')
+  public async findBroadcasterContacts(
+    @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
+  ): Promise<BroadcasterContacts[]> {
+    return this.contactsService.findContacts(broadcasterId);
+  }
+
+  /** 방송인 연락처 생성 */
+  @Post('contacts')
+  public async createContact(
+    @Body(ValidationPipe) dto: BroadcasterContactDto,
+  ): Promise<BroadcasterContacts> {
+    return this.contactsService.createContact(dto.broadcasterId, dto);
+  }
+
+  /** 방송인 연락처 수정 */
+  @Put('contacts/:contactId')
+  public async updateContact(
+    @Param('contactId', ParseIntPipe) contactId: BroadcasterContacts['id'],
+    @Body(ValidationPipe) dto: BroadcasterContactDto,
+  ): Promise<boolean> {
+    return this.contactsService.updateContact(contactId, dto);
+  }
+
+  /** 방송인 연락처 삭제 */
+  @Delete('contacts/:contactId')
+  public async deleteContact(
+    @Param('contactId', ParseIntPipe) contactId: BroadcasterContacts['id'],
+  ): Promise<boolean> {
+    return this.contactsService.deleteContact(contactId);
   }
 }
