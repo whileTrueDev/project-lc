@@ -25,6 +25,7 @@ import {
   useBroadcasterContacts,
   useCreateBroadcasterContactMutation,
   useDeleteBroadcasterContactsMutation,
+  useProfile,
   useUpdateBroadcasterContactsMutation,
 } from '@project-lc/hooks';
 import {
@@ -41,7 +42,8 @@ import { ConfirmDialog, SettingNeedAlertBox } from '..';
 import SettingSectionLayout from './SettingSectionLayout';
 
 export function BroadcasterContactSection(): JSX.Element {
-  const broadcasterContacts = useBroadcasterContacts(1);
+  const profile = useProfile();
+  const broadcasterContacts = useBroadcasterContacts(profile.data?.id);
 
   if (broadcasterContacts.isLoading) {
     return (
@@ -69,7 +71,8 @@ export function BroadcasterContactSection(): JSX.Element {
 }
 
 export function BroadcasterContactList(): JSX.Element {
-  const broadcasterContacts = useBroadcasterContacts(1);
+  const profile = useProfile();
+  const broadcasterContacts = useBroadcasterContacts(profile.data?.id);
   return (
     <Stack w="100%">
       {broadcasterContacts.data &&
@@ -219,7 +222,8 @@ type BroadcasterContactFormData = Omit<
   phone3: string;
 };
 export function BroadcasterContactAdd(): JSX.Element {
-  const broadcasterContacts = useBroadcasterContacts(1);
+  const profile = useProfile();
+  const broadcasterContacts = useBroadcasterContacts(profile.data?.id);
   const addSection = useDisclosure({ defaultIsOpen: false });
 
   const isContactsFull = useMemo(
@@ -266,7 +270,8 @@ export interface BroadcasterContactFormProps {
   >;
 }
 export function BroadcasterContactForm(props: BroadcasterContactFormProps): JSX.Element {
-  const broadcasterContacts = useBroadcasterContacts(1);
+  const profile = useProfile();
+  const broadcasterContacts = useBroadcasterContacts(profile.data?.id);
   const toast = useToast();
   const {
     register,
