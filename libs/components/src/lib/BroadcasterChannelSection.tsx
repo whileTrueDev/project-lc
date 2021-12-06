@@ -143,7 +143,6 @@ export function BroadcasterChannelSection(): JSX.Element {
           />
           {errors.url && <ErrorText>{errors.url.message}</ErrorText>}
           <ButtonGroup>
-            <Button onClick={off}>취소</Button>
             <Button
               type="submit"
               isDisabled={!allowAddChannel}
@@ -152,6 +151,7 @@ export function BroadcasterChannelSection(): JSX.Element {
             >
               확인
             </Button>
+            <Button onClick={off}>취소</Button>
           </ButtonGroup>
         </Stack>
       </Collapse>
