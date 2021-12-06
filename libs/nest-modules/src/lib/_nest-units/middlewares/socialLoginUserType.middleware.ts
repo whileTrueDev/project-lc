@@ -16,8 +16,6 @@ import { Request, Response, NextFunction } from 'express';
 @Injectable()
 export class SocialLoginUserTypeMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction): void {
-    console.log('Request...');
-    console.log('req.query', req.query);
     if (req.query[USER_TYPE_KEY]) {
       res.cookie(USER_TYPE_KEY, req.query[USER_TYPE_KEY]);
     }

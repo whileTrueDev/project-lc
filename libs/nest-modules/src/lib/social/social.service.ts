@@ -217,7 +217,6 @@ export class SocialService {
     userType: UserType,
     serviceId: string,
   ): Promise<boolean> {
-    // TODO: userType else 사용하지 않아서 두번 처리되는 경우가 없는지 확인필요(admin 의 경우)
     if (userType === 'seller' || userType === 'admin') {
       await this.prisma.sellerSocialAccount.delete({
         where: { serviceId },
