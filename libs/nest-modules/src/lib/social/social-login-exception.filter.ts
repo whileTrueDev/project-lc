@@ -1,13 +1,43 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { Response, Request } from 'express';
-import { getUserTypeFromRequest, getWebHost } from '@project-lc/utils';
+import {
+  getBroadcasterWebHost,
+  getUserTypeFromRequest,
+  getWebHost,
+} from '@project-lc/utils';
+import { UserType } from '@project-lc/shared-types';
 import { SocialService } from './social.service';
-
-const WEB_LOGIN_PAGE_URL = `${getWebHost()}/login`;
 
 @Catch(HttpException)
 export class SocialLoginExceptionFilter implements ExceptionFilter {
   constructor(private readonly socialService: SocialService) {}
+
+  private getHostUrl = (userType: UserType): string => {
+    let hostUrl: string;
+    if (userType === 'seller') {
+      // 판매자의 경우
+      hostUrl = getWebHost();
+    } else {
+      // 방송인의 경우
+      hostUrl = getBroadcasterWebHost();
+    }
+    return hostUrl;
+  };
+
+  /** 소셜로그인 userType에 따른 로그인 페이지 주소 리턴 */
+  private getWebLoginPageUrl = (userType: UserType): string => {
+    const hostUrl = this.getHostUrl(userType);
+    return `${hostUrl}/login`;
+  };
+
+  private getLoginErrorRedirectUrl = (
+    userType: UserType,
+    provider: any,
+    message: any,
+  ): string => {
+    const hostUrl = this.getHostUrl(userType);
+    return `${hostUrl}/login?error=true&provider=${provider}&message=${message}`;
+  };
 
   async catch(exception: any, host: ArgumentsHost): Promise<void> {
     const ctx = host.switchToHttp();
@@ -16,7 +46,12 @@ export class SocialLoginExceptionFilter implements ExceptionFilter {
     const userType = getUserTypeFromRequest(request);
     const { provider, providerId, accessToken, message } = exception.response;
 
-    const LOGIN_ERROR_REDIRECT_URL = `${getWebHost()}/login?error=true&provider=${provider}&message=${message}`;
+    const LOGIN_ERROR_REDIRECT_URL = this.getLoginErrorRedirectUrl(
+      userType,
+      provider,
+      message,
+    );
+    const WEB_LOGIN_PAGE_URL = this.getWebLoginPageUrl(userType);
 
     switch (provider) {
       case 'kakao': {
