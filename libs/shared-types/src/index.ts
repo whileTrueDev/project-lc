@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 
 export * from './lib/constants/banks';
+export * from './lib/constants/broadcasterContacts';
 export * from './lib/constants/fmDeliveryCompanies';
 export * from './lib/constants/fmExportConfirmStatuses';
 export * from './lib/constants/fmOrderPayments';
@@ -20,6 +21,7 @@ export * from './lib/constants/socialLoginUserTypeKey';
 export * from './lib/dto/adminSettlementInfo.dto';
 export * from './lib/dto/broadcaster.dto';
 export * from './lib/dto/broadcasterAddress.dto';
+export * from './lib/dto/broadcasterContact.dto';
 export * from './lib/dto/businessRegistration.dto';
 export * from './lib/dto/businessRegistrationConfirmation.dto';
 export * from './lib/dto/changeFmOrderStatus.dto';

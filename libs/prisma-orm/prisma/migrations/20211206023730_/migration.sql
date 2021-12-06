@@ -13,6 +13,9 @@ ALTER TABLE `BroadcasterChannel` DROP FOREIGN KEY `BroadcasterChannel_broadcaste
 -- DropForeignKey
 ALTER TABLE `BroadcasterAddress` DROP FOREIGN KEY `BroadcasterAddress_broadcasterId_fkey`;
 
+-- DropForeignKey
+ALTER TABLE `BroadcasterContacts` DROP FOREIGN KEY `BroadcasterContacts_broadcasterId_fkey`;
+
 -- DropTable
 DROP TABLE `Broadcaster`;
 

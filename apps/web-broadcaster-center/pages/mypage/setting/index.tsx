@@ -1,6 +1,7 @@
 import { Container, Divider, Heading, VStack } from '@chakra-ui/react';
 import {
   broadcasterCenterMypageNavLinks,
+  BroadcasterContactSection,
   BroadcasterAddressSection,
   BroadcasterChannelSection,
   BroadcasterNickNameSection,
@@ -21,6 +22,8 @@ export function SettingIndex(): JSX.Element {
           <SocialAccountUnlinkSection userType="broadcaster" />
           <Divider />
           <BroadcasterAddressSection />
+          <Divider />
+          <BroadcasterContactSection />
           <Divider />
           <BroadcasterChannelSection />
         </VStack>
