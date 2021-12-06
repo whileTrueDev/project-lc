@@ -118,8 +118,8 @@ export function BroadcasterChannelSection(): JSX.Element {
 
       {/* 채널 url 입력창 여닫는 버튼 */}
       {allowAddChannel && (
-        <Button leftIcon={<AddIcon />} variant="outline" onClick={toggle} size="sm">
-          링크추가
+        <Button leftIcon={<AddIcon />} onClick={toggle}>
+          등록
         </Button>
       )}
 

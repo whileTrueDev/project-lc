@@ -1,24 +1,21 @@
 import { EditIcon } from '@chakra-ui/icons';
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Button,
   ButtonGroup,
-  HStack,
-  Input,
-  Stack,
-  useMergeRefs,
-  Text,
-  useToast,
   FormControl,
   FormErrorMessage,
+  HStack,
+  Input,
   Spinner,
+  Stack,
+  Text,
+  useMergeRefs,
+  useToast,
 } from '@chakra-ui/react';
 import { useBroadcaster, useProfile, useUpdateNicknameMutation } from '@project-lc/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { SettingNeedAlertBox } from '..';
 import SettingSectionLayout from './SettingSectionLayout';
 
 /** 방송인 활동명 컴포넌트. editable input */
@@ -36,7 +33,17 @@ export function BroadcasterNickNameSection(): JSX.Element {
   return (
     <SettingSectionLayout title="활동명">
       {!broadcaster.isLoading && !broadcaster.data?.userNickname && (
-        <NoNicknameAlertBox />
+        <SettingNeedAlertBox
+          text={
+            <Text>
+              크리에이터, 인플루언서로 활동하시면서 사용하시는{' '}
+              <Text as="span" fontWeight="bold">
+                활동명 혹은 채널명
+              </Text>
+              을 입력해주세요.
+            </Text>
+          }
+        />
       )}
       {!broadcaster.isLoading && broadcaster.data?.userNickname && (
         <Text>
@@ -45,26 +52,6 @@ export function BroadcasterNickNameSection(): JSX.Element {
       )}
       <BroadcasterNicknameForm />
     </SettingSectionLayout>
-  );
-}
-
-function NoNicknameAlertBox(): JSX.Element {
-  return (
-    <Alert status="warning">
-      <Stack>
-        <HStack spacing={0}>
-          <AlertIcon />
-          <AlertTitle>입력이 필요합니다!</AlertTitle>
-        </HStack>
-        <AlertDescription>
-          크리에이터, 인플루언서로 활동하시면서 사용하시는{' '}
-          <Text as="span" fontWeight="bold">
-            활동명 혹은 채널명
-          </Text>
-          을 입력해주세요.
-        </AlertDescription>
-      </Stack>
-    </Alert>
   );
 }
 
