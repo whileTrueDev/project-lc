@@ -6,6 +6,13 @@
   - Added the required column `email` to the `Broadcaster` table without a default value. This is not possible if the table is not empty.
 
 */
+
+-- DropForeignKey
+ALTER TABLE `BroadcasterChannel` DROP FOREIGN KEY `BroadcasterChannel_broadcasterId_fkey`;
+
+-- DropForeignKey
+ALTER TABLE `BroadcasterAddress` DROP FOREIGN KEY `BroadcasterAddress_broadcasterId_fkey`;
+
 -- DropTable
 DROP TABLE `Broadcaster`;
 

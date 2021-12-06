@@ -494,7 +494,6 @@ model Broadcaster {
   liveCommerceRanking LiveCommerceRanking[]
   LiveShopping        LiveShopping[]
   broadcasterAddress  BroadcasterAddress?
-  liveCommerceRanking LiveCommerceRanking[]
   channels            BroadcasterChannel[]
 }
 
