@@ -2,6 +2,7 @@ import { Box } from '@chakra-ui/react';
 import { useIsLoggedIn } from '@project-lc/hooks';
 import React from 'react';
 import { MypageLink, mypageNavLinks } from '..';
+import { SiteType } from '../constants/siteType';
 import FullscreenLoading from './FullscreenLoading';
 import LoginRequireAlertDialog from './LoginRequireAlertDialog';
 import MypageFooter from './MypageFooter';
@@ -10,18 +11,20 @@ import { Navbar } from './Navbar';
 
 interface MypageLayoutProps {
   children: React.ReactNode;
+  siteType?: SiteType;
   navLinks?: Array<MypageLink>;
 }
 
 export function MypageLayout({
   children,
+  siteType = 'seller',
   navLinks = mypageNavLinks,
 }: MypageLayoutProps): JSX.Element {
   const { status } = useIsLoggedIn();
 
   return (
     <Box position="relative" pointerEvents={status === 'loading' ? 'none' : 'auto'}>
-      <Navbar />
+      <Navbar siteType={siteType} />
 
       <MypageNavbar navLinks={navLinks} />
 
@@ -35,7 +38,8 @@ export function MypageLayout({
       {status === 'loading' && <FullscreenLoading />}
 
       {/* 로그인 필요 다이얼로그 */}
-      <LoginRequireAlertDialog isOpen={status === 'error'} />
+      {/* 로그인 기능 없이 작업하기 위해 임시 주석처리 by dan 211202 */}
+      {/* <LoginRequireAlertDialog isOpen={status === 'error'} /> */}
     </Box>
   );
 }

@@ -2,7 +2,9 @@ import { MypageLayout, broadcasterCenterMypageNavLinks } from '@project-lc/compo
 
 export function Index(): JSX.Element {
   return (
-    <MypageLayout navLinks={broadcasterCenterMypageNavLinks}>마이페이지 홈</MypageLayout>
+    <MypageLayout siteType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
+      마이페이지 홈
+    </MypageLayout>
   );
 }
 

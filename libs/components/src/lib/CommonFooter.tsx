@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 import { FaInstagram, FaYoutube } from 'react-icons/fa';
+import { FooterLinkListItem } from '../constants/footerLinks';
 
 const ListHeader = ({ children }: { children: ReactNode }): JSX.Element => {
   return (
@@ -52,7 +53,10 @@ const SocialButton = ({
   );
 };
 
-export function CommonFooter(): JSX.Element {
+export interface CommonFooterProps {
+  footerLinkList: FooterLinkListItem[];
+}
+export function CommonFooter({ footerLinkList }: CommonFooterProps): JSX.Element {
   return (
     <Box
       bg={useColorModeValue('gray.50', 'gray.900')}
@@ -60,34 +64,20 @@ export function CommonFooter(): JSX.Element {
     >
       <Container as={Stack} maxW="6xl" py={10}>
         <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={8}>
-          {/* <Stack align="flex-start">
-            <ListHeader>회사</ListHeader>
-            <Link href="/">소개</Link>
-            <Link href="/">블로그</Link>
-            <Link href="/">인재채용</Link>
-          </Stack> */}
-
-          <Stack align="flex-start">
-            <ListHeader>정책</ListHeader>
-            {/* <Link href="/">쿠키 정책</Link> */}
-            <Link
-              fontWeight="bold"
-              href="https://whiletrue.notion.site/7f6758f5344246c4989ac22f3ee7532e"
-            >
-              개인정보처리방침
-            </Link>
-            <Link href="https://whiletrue.notion.site/41561f284f754560a64f36bc7c292861">
-              이용약관
-            </Link>
-          </Stack>
-
-          <Stack align="flex-start">
-            <ListHeader>고객지원</ListHeader>
-            {/* <Link href="/">고객센터</Link> */}
-            <Link href="https://whiletrue.notion.site/FAQ-f182f90b7e984badb031a62ddd1bd00d">
-              FAQ
-            </Link>
-          </Stack>
+          {footerLinkList.map((linkList) => (
+            <Stack key={linkList.title} align="flex-start">
+              <ListHeader>{linkList.title}</ListHeader>
+              {linkList.items.map((linkItem) => (
+                <Link
+                  key={linkItem.title}
+                  href={linkItem.href}
+                  fontWeight={linkItem.isBold ? 'bold' : 'normal'}
+                >
+                  {linkItem.title}
+                </Link>
+              ))}
+            </Stack>
+          ))}
         </SimpleGrid>
       </Container>
 
