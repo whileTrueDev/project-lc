@@ -137,14 +137,13 @@ export class SocialService {
     };
 
     const createdBroadcaster = await this.prisma.broadcaster.upsert({
-      where: { userId: email },
+      where: { email },
       update: {
         socialAccounts: {
           create: socialAccountCreateInput,
         },
       },
       create: {
-        userId: email,
         email,
         userName: name,
         overlayUrl: `/${email}`,
@@ -482,7 +481,7 @@ export class SocialService {
     }
     // userType === 'broadcaster' 방송인인 경우
     const broadcaster = await this.prisma.broadcaster.findUnique({
-      where: { userId: email },
+      where: { email },
       select: {
         socialAccounts: {
           select: {

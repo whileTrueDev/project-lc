@@ -109,35 +109,6 @@ export class BroadcasterService {
     return true;
   }
 
-  /**
-   * 방송인 정보 조회
-   // TODO : 소셜로그인 한 방송인 정보 받기위해 임시로 작성함. 추후 수정 필요
-   */
-  // async findOne(findInput: Prisma.BroadcasterWhereUniqueInput): Promise<FindSellerRes> {
-  //   const broadcaster = await this.prisma.broadcaster.findUnique({
-  //     where: findInput,
-  //     select: {
-  //       id: true,
-  //       userId: true, // 이메일
-  //       userName: true,
-  //       password: true,
-  //       avatar: true,
-  //     },
-  //   });
-
-  //   if (!broadcaster) {
-  //     return null;
-  //   }
-  //   const { userId: email, userName: name, id, password, avatar } = broadcaster;
-  //   return {
-  //     id,
-  //     email,
-  //     name,
-  //     password,
-  //     avatar,
-  //   };
-  // }
-
   /** 방송인 정보 조회 */
   public async getBroadcaster(opt: FindBroadcasterDto): Promise<BroadcasterRes | null> {
     const { id, email } = opt;

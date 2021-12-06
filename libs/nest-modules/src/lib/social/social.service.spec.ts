@@ -62,15 +62,4 @@ describe('SocialService', () => {
       expect(newSeller.email).toBe(testInfo.email);
     });
   });
-
-  describe('[PrivateMethod]selectSocialAccountRecord', () => {
-    it('should find socialAccount include Seller info', async () => {
-      const { seller } = await service['selectSocialAccountRecord']({
-        provider: testInfo.provider,
-        id: testInfo.id,
-      });
-
-      expect(seller).toBeDefined();
-    });
-  });
 });
