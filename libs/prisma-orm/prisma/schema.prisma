@@ -498,8 +498,18 @@ model Broadcaster {
   avatar              String?
   agreementFlag       Boolean               @default(false) // 이용동의 
   LiveShopping        LiveShopping[]
+  channels            BroadcasterChannel[]
 
   @@index(userId)
+}
+
+// 방송인 활동 플랫폼 채널정보(url)
+model BroadcasterChannel {
+  id            Int         @id @default(autoincrement())
+  url           String // 채널 url (아프리카, 트위치, 유투브, 인스타그램 ...)
+  createDate    DateTime    @default(now())
+  broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+  broadcasterId Int
 }
 
 // -------------------------------------------------
