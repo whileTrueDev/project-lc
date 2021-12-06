@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { Broadcaster, Prisma } from '@prisma/client';
+import { Broadcaster, BroadcasterAddress, Prisma } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { BroadcasterDTO, FindSellerRes, SignUpDto } from '@project-lc/shared-types';
+import {
+  BroadcasterAddressDto,
+  BroadcasterDTO,
+  BroadcasterRes,
+  FindBroadcasterDto,
+  FindSellerRes,
+  SignUpDto,
+} from '@project-lc/shared-types';
 import { hash } from 'argon2';
 import { throwError } from 'rxjs';
+
 @Injectable()
 export class BroadcasterService {
   constructor(private readonly prisma: PrismaService) {}
@@ -89,5 +97,59 @@ export class BroadcasterService {
       password,
       avatar,
     };
+  }
+
+  /** 방송인 정보 조회 */
+  public async getBroadcaster(opt: FindBroadcasterDto): Promise<BroadcasterRes | null> {
+    const { id, email } = opt;
+    if (id)
+      return this.prisma.broadcaster.findUnique({
+        where: { id: Number(id) },
+        include: {
+          broadcasterAddress: true,
+        },
+      });
+    if (email)
+      return this.prisma.broadcaster.findUnique({
+        where: { userId: email },
+        include: {
+          broadcasterAddress: true,
+        },
+      });
+    return null;
+  }
+
+  /** 방송인 활동명 변경 */
+  public async updateNickname(
+    id: Broadcaster['id'],
+    newNick: string,
+  ): Promise<Broadcaster> {
+    return this.prisma.broadcaster.update({
+      where: { id },
+      data: { userNickname: newNick },
+    });
+  }
+
+  /** 방송인 선물/샘플 수령 주소 생성 및 수정 */
+  public async upsertAddress(
+    broadcasterId: Broadcaster['id'],
+    dto: BroadcasterAddressDto,
+  ): Promise<BroadcasterAddress> {
+    const { address, detailAddress, postalCode } = dto;
+    return this.prisma.broadcasterAddress.upsert({
+      where: { broadcasterId },
+      create: {
+        address,
+        detailAddress,
+        postalCode,
+        broadcasterId,
+      },
+      update: {
+        address,
+        detailAddress,
+        postalCode,
+        broadcasterId,
+      },
+    });
   }
 }

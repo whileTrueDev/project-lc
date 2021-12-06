@@ -487,7 +487,6 @@ model LiveCommerceRanking {
 // 방송인
 model Broadcaster {
   id                  Int                        @id @default(autoincrement())
-  liveCommerceRanking LiveCommerceRanking[]
   email               String                     @unique // 방송인 이메일(가입시 사용)
   userId              String                     @unique
   userName            String                     @db.VarChar(20) // 유저의 실명
@@ -500,6 +499,9 @@ model Broadcaster {
   agreementFlag       Boolean                    @default(false) // 이용동의 
   LiveShopping        LiveShopping[]
   socialAccounts      BroadcasterSocialAccount[]
+  broadcasterAddress  BroadcasterAddress?
+  liveCommerceRanking LiveCommerceRanking[]
+  channels            BroadcasterChannel[]
 
   @@index(userId)
 }
@@ -516,6 +518,27 @@ model BroadcasterSocialAccount {
   broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 
   @@index([broadcasterId], name: "broadcasterId")
+}
+
+// 방송인 선물/샘플 수령 주소 정보
+model BroadcasterAddress {
+  id            Int      @id @default(autoincrement())
+  address       String // 주소 (도로명)
+  detailAddress String // 주소 상세
+  postalCode    String // 우편 번호
+  createDate    DateTime @default(now())
+
+  broadcasterId Int?         @unique
+  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+}
+
+// 방송인 활동 플랫폼 채널정보(url)
+model BroadcasterChannel {
+  id            Int         @id @default(autoincrement())
+  url           String // 채널 url (아프리카, 트위치, 유투브, 인스타그램 ...)
+  createDate    DateTime    @default(now())
+  broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+  broadcasterId Int
 }
 
 // -------------------------------------------------
