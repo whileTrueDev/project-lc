@@ -1,7 +1,7 @@
+import { BroadcasterContactDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import { BroadcasterContacts } from '.prisma/client';
-import { BroadcasterContactDto } from '../../../../shared-types/src';
 import axios from '../../axios';
 
 export type useCreateBroadcasterContactMutationRes = BroadcasterContacts;
