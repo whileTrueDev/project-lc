@@ -27,5 +27,8 @@ CREATE TABLE `Broadcaster` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateIndex
+CREATE UNIQUE INDEX `Broadcaster_overlayUrl_key` ON `Broadcaster`(`overlayUrl`);
+
 -- AddForeignKey
 ALTER TABLE `LiveShopping` ADD CONSTRAINT `LiveShopping_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `Broadcaster`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
