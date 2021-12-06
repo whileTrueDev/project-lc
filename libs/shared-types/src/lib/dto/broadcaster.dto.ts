@@ -2,7 +2,7 @@ import { IsString } from 'class-validator';
 
 export class BroadcasterDTO {
   @IsString()
-  userId: string;
+  email: string;
 
   @IsString()
   userNickname: string;

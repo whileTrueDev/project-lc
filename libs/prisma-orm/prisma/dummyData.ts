@@ -32,6 +32,7 @@ export const common_contents = `
 
 export const TEST_ADMIN_EMAIL = 'testadmin@gmail.com';
 export const TEST_SELLER_EMAIL = 'testseller@gmail.com';
+export const TEST_BROADCASTER_EMAIL = 'testBc@gmail.com';
 // 비밀번호 : asdfasdf!
 export const COMMON_DUMMY_PASSWORD =
   '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY';
@@ -95,9 +96,9 @@ export const testsellerExtraData: {
 
 /** 테스트방송인 생성 데이터 */
 export const testBroadcasterData: Prisma.BroadcasterCreateInput = {
-  userId: 'testBc@gmail.com',
+  email: TEST_BROADCASTER_EMAIL,
   password: COMMON_DUMMY_PASSWORD,
-  overlayUrl: '/test-broadcaster@gmail.com',
+  overlayUrl: `/${TEST_BROADCASTER_EMAIL}`,
   userName: '테스트방송인이름',
   userNickname: '테스트방송인활동명',
 };

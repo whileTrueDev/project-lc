@@ -10,18 +10,18 @@ export class BroadcasterService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getUserId(overlayUrl: string): Promise<{ userId: string }> {
-    const userId = await this.prisma.broadcaster.findUnique({
+    const email = await this.prisma.broadcaster.findUnique({
       select: {
-        userId: true,
+        email: true,
       },
       where: {
         overlayUrl,
       },
     });
-    if (!userId) {
+    if (!email) {
       throwError('Fail to get userId by overlayUrl');
     }
-    return userId;
+    return { userId: email.email };
   }
 
   async getAllBroadcasterIdAndNickname(): Promise<BroadcasterDTO[]> {
@@ -30,7 +30,7 @@ export class BroadcasterService {
         deleteFlag: false,
       },
       select: {
-        userId: true,
+        email: true,
         userNickname: true,
       },
     });
@@ -71,7 +71,7 @@ export class BroadcasterService {
     const hashedPw = await hash(dto.password);
     const broadcaster = await this.prisma.broadcaster.create({
       data: {
-        userId: dto.email,
+        email: dto.email,
         userName: dto.name,
         password: hashedPw,
         userNickname: '',
@@ -98,7 +98,7 @@ export class BroadcasterService {
    * @returns {boolean} 중복되지않아 괜찮은 경우 true, 중복된 경우 false
    */
   async isEmailDupCheckOk(email: string): Promise<boolean> {
-    const user = await this.prisma.broadcaster.findFirst({ where: { userId: email } });
+    const user = await this.prisma.broadcaster.findFirst({ where: { email } });
     if (user) return false;
     return true;
   }
@@ -107,7 +107,7 @@ export class BroadcasterService {
   public async getBroadcaster(opt: FindBroadcasterDto): Promise<Broadcaster | null> {
     const { id, email } = opt;
     if (id) return this.prisma.broadcaster.findUnique({ where: { id: Number(id) } });
-    if (email) return this.prisma.broadcaster.findUnique({ where: { userId: email } });
+    if (email) return this.prisma.broadcaster.findUnique({ where: { email } });
     return null;
   }
 
