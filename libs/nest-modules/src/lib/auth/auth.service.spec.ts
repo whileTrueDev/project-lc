@@ -15,6 +15,7 @@ import { authTestCases, findOne } from './auth.test-case';
 import { MailVerificationService } from './mailVerification.service';
 import { JwtConfigService } from '../_nest-units/settings/jwt.setting';
 import { mailerConfig } from '../_nest-units/settings/mailer.config';
+import { BroadcasterModule } from '../broadcaster/broadcaster.module';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -26,6 +27,7 @@ describe('AuthService', () => {
         // 원래는 app module에 의존성이나, 현재에도 필요.
         ConfigModule.forRoot({ isGlobal: true }),
         SellerModule,
+        BroadcasterModule,
         PassportModule,
         MailerModule.forRoot(mailerConfig),
         JwtModule.registerAsync({
