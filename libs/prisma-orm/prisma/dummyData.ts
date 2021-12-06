@@ -97,6 +97,7 @@ export const testsellerExtraData: {
 export const testBroadcasterData: Prisma.BroadcasterCreateInput = {
   overlayUrl: '/test-broadcaster@gmail.com',
   userId: 'test-broadcaster@gmail.com',
+  email: 'test-broadcaster@gmail.com',
   userName: '테스트방송인이름',
   userNickname: '테스트방송인활동명',
 };

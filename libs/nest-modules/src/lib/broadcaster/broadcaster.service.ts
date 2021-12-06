@@ -41,6 +41,7 @@ export class BroadcasterService {
     const broadcaster = await this.prisma.broadcaster.create({
       data: {
         userId: dto.email,
+        email: dto.email,
         userName: dto.name,
         password: hashedPw,
         userNickname: '',

@@ -488,7 +488,8 @@ model LiveCommerceRanking {
 model Broadcaster {
   id                  Int                        @id @default(autoincrement())
   liveCommerceRanking LiveCommerceRanking[]
-  userId              String                     @unique // 유저 아이디(방송인 가입시 사용하는 이메일)
+  email               String                     @unique // 방송인 이메일(가입시 사용)
+  userId              String                     @unique
   userName            String                     @db.VarChar(20) // 유저의 실명
   userNickname        String?                    @db.VarChar(20) // 유저의 활동명
   overlayUrl          String                     @unique // 라이브커머스 오버레이 URL 

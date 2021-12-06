@@ -52,7 +52,7 @@ export class SocialService {
     let userPayload: UserPayload;
     // 방송인일때 전달되는 user의 키 값이 seller와 조금 다름(email 대신 userId)
     if (userType === 'broadcaster') {
-      const { userId: email, userName: name, id, password, avatar } = user;
+      const { email, userName: name, id, password, avatar } = user;
       const broadcaster = {
         id,
         email,
@@ -145,6 +145,7 @@ export class SocialService {
       },
       create: {
         userId: email,
+        email,
         userName: name,
         overlayUrl: `/${email}`,
         avatar: picture || null,
