@@ -65,8 +65,11 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getProfile(@Req() req: Request): Promise<UserProfileRes> {
-    return this.authService.getProfile(req.user);
+  getProfile(
+    @Query('appType') appType: UserType,
+    @Req() req: Request,
+  ): Promise<UserProfileRes> {
+    return this.authService.getProfile(req.user, appType);
   }
 
   // * 인증코드 메일 전송

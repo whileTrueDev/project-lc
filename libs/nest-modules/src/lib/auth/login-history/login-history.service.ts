@@ -28,11 +28,8 @@ export class LoginHistoryService {
         city: geo?.city || '',
         method: loginMethod,
         ua: uaParser.getUA(),
-        seller: {
-          connect: {
-            email: user.sub || user.email,
-          },
-        },
+        userEmail: user.sub,
+        userType: user.type,
       },
     });
   }

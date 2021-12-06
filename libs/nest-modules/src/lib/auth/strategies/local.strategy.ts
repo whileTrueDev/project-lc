@@ -17,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(req: Request, email: string, password: string): Promise<UserPayload> {
-    if (!['seller', 'creator', 'admin'].includes(req.query.type as string)) {
+    if (!['seller', 'broadcaster', 'admin'].includes(req.query.type as string)) {
       throw new ForbiddenException();
     }
     const userPayload = await this.authService.validateUser(

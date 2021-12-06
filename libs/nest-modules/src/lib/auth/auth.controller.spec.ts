@@ -19,6 +19,7 @@ import { LoginHistoryService } from './login-history/login-history.service';
 import { MailVerificationService } from './mailVerification.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { BroadcasterModule } from '../broadcaster/broadcaster.module';
 
 describe('AuthController', () => {
   let app: INestApplication;
@@ -33,6 +34,7 @@ describe('AuthController', () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [
         SellerModule,
+        BroadcasterModule,
         ConfigModule.forRoot({ isGlobal: true }),
         MailerModule.forRoot(mailerConfig),
         PassportModule,

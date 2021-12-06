@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { LoginSellerDto } from '@project-lc/shared-types';
+import { LoginSellerDto, UserType } from '@project-lc/shared-types';
 import { useLoginMutation } from '@project-lc/hooks';
 import {
   Alert,
@@ -26,9 +26,13 @@ import SocialButtonGroup from './SocialButtonGroup';
 
 export interface LoginFormProps {
   enableShadow?: boolean;
+  userType: UserType;
 }
 
-export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element {
+export function LoginForm({
+  enableShadow = false,
+  userType,
+}: LoginFormProps): JSX.Element {
   const router = useRouter();
   const {
     handleSubmit,
@@ -44,7 +48,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
   }
 
   // * 로그인 핸들러
-  const login = useLoginMutation('seller');
+  const login = useLoginMutation(userType);
   const onSubmit = useCallback(
     async (data: LoginSellerDto) => {
       const seller = await login.mutateAsync(data).catch((err) => {
