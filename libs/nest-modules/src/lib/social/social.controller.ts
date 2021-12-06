@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { SocialAccounts, UserType } from '@project-lc/shared-types';
+import { SocialAccounts, UserType, USER_TYPE_KEY } from '@project-lc/shared-types';
 import {
   getBroadcasterWebHost,
   getUserTypeFromRequest,
@@ -29,8 +29,13 @@ export class SocialController {
 
   /** 소셜로그인 userType에 따른 마이페이지 주소 리턴 */
   private getFrontMypageUrl(userType: UserType): string {
-    if (userType === 'seller') return `${getWebHost()}/mypage`;
-    return `${getBroadcasterWebHost()}/mypage`;
+    let hostUrl: string;
+    if (userType === 'broadcaster') {
+      hostUrl = getBroadcasterWebHost();
+    } else {
+      hostUrl = getWebHost();
+    }
+    return `${hostUrl}/mypage`;
   }
 
   /** email 로 가입된 셀러에 연동된 소셜계정목록 반환 */
@@ -57,6 +62,8 @@ export class SocialController {
 
     // 로그인 기록 추가 by @hwasurr
     // this.loginHistoryService.createLoginStamp(req, '소셜/구글');
+
+    res.clearCookie(USER_TYPE_KEY);
     return res.redirect(this.getFrontMypageUrl(userType));
   }
 
@@ -67,7 +74,6 @@ export class SocialController {
   ): Promise<boolean> {
     await this.socialService.googleUnlink(userType, serviceId);
     return this.socialService.deleteSocialAccountRecord(userType, serviceId);
-    return true;
   }
 
   /** 네이버 ************************************************ */
@@ -83,6 +89,8 @@ export class SocialController {
     this.socialService.login(userType, req, res);
     // 로그인 기록 추가 by @hwasurr
     // this.loginHistoryService.createLoginStamp(req, '소셜/네이버');
+
+    res.clearCookie(USER_TYPE_KEY);
     return res.redirect(this.getFrontMypageUrl(userType));
   }
 
@@ -108,6 +116,8 @@ export class SocialController {
     this.socialService.login(userType, req, res);
     // 로그인 기록 추가 by @hwasurr
     // this.loginHistoryService.createLoginStamp(req, '소셜/카카오');
+
+    res.clearCookie(USER_TYPE_KEY);
     return res.redirect(this.getFrontMypageUrl(userType));
   }
 
