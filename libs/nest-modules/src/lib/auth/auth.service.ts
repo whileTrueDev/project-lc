@@ -14,6 +14,7 @@ import {
   COOKIE_EXPIRE_TIME,
   ACCESS_TOKEN_EXPIRE_TIME_INT,
 } from './auth.constant';
+import { BroadcasterService } from '../broadcaster/broadcaster.service';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +23,7 @@ export class AuthService {
     private sellerService: SellerService,
     private jwtService: JwtService,
     private cipherService: CipherService,
+    private broadcasterService: BroadcasterService,
   ) {}
 
   /**
@@ -172,11 +174,20 @@ export class AuthService {
 
   async getProfile(userPayload: UserPayload): Promise<UserProfileRes> {
     const { sub, type } = userPayload;
-    // if (type === 'seller') {
-    const user = await this.sellerService.findOne({ email: sub });
-    const hasPassword = Boolean(user.password);
-    const { password, ..._user } = user;
-
+    if (type === 'seller') {
+      const user = await this.sellerService.findOne({ email: sub });
+      const hasPassword = Boolean(user.password);
+      const { password, ..._user } = user;
+      return {
+        ..._user,
+        type,
+        hasPassword,
+      };
+    }
+    // TODO : 소셜로그인 한 방송인 정보 받기위해 임시로 작성함. 추후 수정 필요
+    const broadcaster = await this.broadcasterService.findOne({ userId: sub });
+    const hasPassword = Boolean(broadcaster.password);
+    const { password, ..._user } = broadcaster;
     return {
       ..._user,
       type,

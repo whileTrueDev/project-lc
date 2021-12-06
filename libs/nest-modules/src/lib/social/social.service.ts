@@ -13,6 +13,7 @@ import {
 import { PrismaService } from '@project-lc/prisma-orm';
 import { loginUserRes, SocialAccounts, UserType } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
+import { UserPayload } from '../auth/auth.interface';
 import { AuthService } from '../auth/auth.service';
 import { SellerService } from '../seller/seller.service';
 import { GoogleApiService } from './platform-api/google-api.service';
@@ -48,7 +49,22 @@ export class SocialService {
   login(userType: UserType, req: Request, res: Response): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
-    const userPayload = this.authService.castUser(user, userType);
+    let userPayload: UserPayload;
+    // 방송인일때 전달되는 user의 키 값이 seller와 조금 다름(email 대신 userId)
+    if (userType === 'broadcaster') {
+      const { userId: email, userName: name, id, password, avatar } = user;
+      const broadcaster = {
+        id,
+        email,
+        name,
+        password,
+        avatar,
+      };
+      userPayload = this.authService.castUser(broadcaster, userType);
+    } else {
+      userPayload = this.authService.castUser(user, userType);
+    }
+
     const loginToken: loginUserRes = this.authService.issueToken(
       userPayload,
       true,
@@ -304,40 +320,6 @@ export class SocialService {
     return socialAccount[tokenType];
   }
 
-  /** userType에 따른 소셜계정 테이블에서 accessToken  가져오기 */
-  private async getSocialAccountAccessToken(
-    userType: UserType,
-    provider: string,
-    serviceId: string,
-  ): Promise<string> {
-    let socialAccount:
-      | (SellerSocialAccount & {
-          seller: Seller;
-        })
-      | (BroadcasterSocialAccount & {
-          broadcaster: Broadcaster;
-        });
-    // 판매자
-    if (userType === 'seller') {
-      socialAccount = await this.selectSellerSocialAccountRecord({
-        provider,
-        id: serviceId,
-      });
-    }
-    // 방송인
-    socialAccount = await this.selectBroadcasterSocialAccountRecord({
-      provider,
-      id: serviceId,
-    });
-
-    if (!socialAccount) {
-      throw new BadRequestException(
-        `해당 서비스로 연동된 계정이 존재하지 않음 provider: ${provider}, serviceId: ${serviceId}, userType: ${userType}`,
-      );
-    }
-    return socialAccount.accessToken;
-  }
-
   /**
    * 카카오 계정 연동해제 & 카카오 소셜계정 레코드 삭제
    * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
@@ -349,11 +331,12 @@ export class SocialService {
   ): Promise<boolean> {
     let kakaoAccessToken: string;
     if (!accessTokenParam) {
-      kakaoAccessToken = await this.getSocialAccountAccessToken(
+      kakaoAccessToken = await this.getSocialAccountToken({
         userType,
-        'kakao',
-        kakaoId,
-      );
+        provider: 'kakao',
+        tokenType: 'accessToken',
+        serviceId: kakaoId,
+      });
     } else {
       kakaoAccessToken = accessTokenParam;
     }
@@ -394,11 +377,12 @@ export class SocialService {
   ): Promise<boolean> {
     let naverAccessToken: string;
     if (!accessTokenParam) {
-      naverAccessToken = await this.getSocialAccountAccessToken(
+      naverAccessToken = await this.getSocialAccountToken({
         userType,
-        'naver',
-        naverId,
-      );
+        provider: 'naver',
+        tokenType: 'accessToken',
+        serviceId: naverId,
+      });
     } else {
       naverAccessToken = accessTokenParam;
     }

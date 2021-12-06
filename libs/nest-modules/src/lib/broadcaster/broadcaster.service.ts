@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { Broadcaster, Prisma } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { throwError } from 'rxjs';
+import { BroadcasterDTO, FindSellerRes, SignUpDto } from '@project-lc/shared-types';
 import { hash } from 'argon2';
-import { BroadcasterDTO, SignUpDto } from '@project-lc/shared-types';
-import { Broadcaster } from '@prisma/client';
+import { throwError } from 'rxjs';
 @Injectable()
 export class BroadcasterService {
   constructor(private readonly prisma: PrismaService) {}
@@ -59,5 +59,34 @@ export class BroadcasterService {
     const user = await this.prisma.broadcaster.findFirst({ where: { userId: email } });
     if (user) return false;
     return true;
+  }
+
+  /**
+   * 방송인 정보 조회
+   // TODO : 소셜로그인 한 방송인 정보 받기위해 임시로 작성함. 추후 수정 필요
+   */
+  async findOne(findInput: Prisma.BroadcasterWhereUniqueInput): Promise<FindSellerRes> {
+    const broadcaster = await this.prisma.broadcaster.findUnique({
+      where: findInput,
+      select: {
+        id: true,
+        userId: true, // 이메일
+        userName: true,
+        password: true,
+        avatar: true,
+      },
+    });
+
+    if (!broadcaster) {
+      return null;
+    }
+    const { userId: email, userName: name, id, password, avatar } = broadcaster;
+    return {
+      id,
+      email,
+      name,
+      password,
+      avatar,
+    };
   }
 }

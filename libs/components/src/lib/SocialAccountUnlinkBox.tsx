@@ -23,7 +23,7 @@ export function SocialAccountUnlinkBox(
   const toast = useToast();
 
   const unlink = (): void => {
-    // if (!data) return;
+    if (!data) return;
     unlinkSocialAccount({ provider, serviceId, userType })
       .then((res) => {
         toast({ title: '연동해제 성공', status: 'success' });
@@ -50,11 +50,9 @@ export function SocialAccountUnlinkBox(
       <Button onClick={onOpen}>연동해제</Button>
       <SocialAccountUnlinkDialog
         headerText={`${provider} 계정의 연결을 해제하시겠습니까?`}
-        isOpen={isOpen}
-        // isOpen={!!data && isOpen} // profileData 없어서 안열림
+        isOpen={!!data && isOpen}
         onClose={onClose}
-        hasPassword
-        // hasPassword={!!data?.hasPassword}
+        hasPassword={!!data?.hasPassword}
         unlinkHandler={unlink}
       />
     </Flex>

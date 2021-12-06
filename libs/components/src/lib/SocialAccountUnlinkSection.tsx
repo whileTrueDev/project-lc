@@ -11,10 +11,7 @@ export function SocialAccountUnlinkSection({
   userType?: UserType;
 }): JSX.Element {
   const { data: profileData } = useProfile();
-  const { data } = useSocialAccounts(
-    userType,
-    profileData?.email || userType === 'broadcaster' ? 'a1919361@gmail.com' : '',
-  ); // email
+  const { data } = useSocialAccounts(userType, profileData?.email || ''); // email
 
   return (
     <SettingSectionLayout title="연결된 소셜 서비스 계정">
