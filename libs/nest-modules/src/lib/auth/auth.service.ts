@@ -1,10 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes, UserProfileRes, UserType } from '@project-lc/shared-types';
-import { Seller } from '@prisma/client';
+import { Broadcaster, Seller } from '@prisma/client';
 import { UserPayload } from './auth.interface';
 import { SellerService } from '../seller/seller.service';
+import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { CipherService } from './cipher.service';
 import {
   ACCESS_TOKEN_EXPIRE_TIME,
@@ -20,8 +21,10 @@ export class AuthService {
   // private를 사용하는 이유는 해당 Service를 내부에서만 사용할 것이기 떄문이다.
   constructor(
     private sellerService: SellerService,
+    private broadcasterService: BroadcasterService,
     private jwtService: JwtService,
     private cipherService: CipherService,
+    private broadcasterServic: BroadcasterService,
   ) {}
 
   /**
@@ -60,23 +63,12 @@ export class AuthService {
     email: string,
     pwdInput: string,
   ): Promise<UserPayload | null> {
-    let user: Seller;
+    let user: Seller | Broadcaster;
     if (['admin', 'seller'].includes(type)) {
-      user = await this.sellerService.findOne({ email });
-      if (!user) {
-        return null;
-      }
-      if (user.password === null) {
-        // 소셜로그인으로 가입된 회원
-        throw new BadRequestException();
-      }
-      const isCorrect = await this.sellerService.validatePassword(
-        pwdInput,
-        user.password,
-      );
-      if (!isCorrect) {
-        return null;
-      }
+      user = await this.sellerService.login(email, pwdInput);
+    }
+    if (['broadcaster'].includes(type)) {
+      user = await this.broadcasterService.login(email, pwdInput);
     }
     return this.castUser(user, type);
   }
@@ -135,7 +127,7 @@ export class AuthService {
     }
   }
 
-  castUser(user: Seller, type: UserType): UserPayload {
+  castUser(user: Seller | Broadcaster, type: UserType): UserPayload {
     return {
       sub: user.email,
       type,
@@ -170,13 +162,32 @@ export class AuthService {
     return `${newAccessToken}`;
   }
 
-  async getProfile(userPayload: UserPayload): Promise<UserProfileRes> {
+  async getProfile(userPayload: UserPayload, appType: UserType): Promise<UserProfileRes> {
     const { sub, type } = userPayload;
-    // if (type === 'seller') {
-    const user = await this.sellerService.findOne({ email: sub });
+    let user: Seller | Broadcaster;
+    if (['admin', 'seller'].includes(type)) {
+      if (appType !== 'seller') {
+        throw new UnauthorizedException();
+      }
+      user = await this.sellerService.findOne({ email: sub });
+    }
+    if (['broadcaster'].includes(type)) {
+      if (appType !== 'broadcaster') {
+        throw new UnauthorizedException();
+      }
+      user = await this.broadcasterService.findOne({ email: sub });
+    }
     const hasPassword = Boolean(user.password);
     const { password, ..._user } = user;
 
+    if ('userName' in _user) {
+      return {
+        ..._user,
+        name: _user.userName,
+        type,
+        hasPassword,
+      };
+    }
     return {
       ..._user,
       type,

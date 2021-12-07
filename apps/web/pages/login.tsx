@@ -18,7 +18,7 @@ export function Login(): JSX.Element {
       <SellerNavbar />
 
       <Flex align="center" justify="center" minH="calc(100vh - 200px)">
-        <LoginForm enableShadow />
+        <LoginForm enableShadow userType="seller" />
       </Flex>
     </Box>
   );
