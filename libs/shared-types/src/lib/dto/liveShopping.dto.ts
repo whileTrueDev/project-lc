@@ -10,6 +10,7 @@ import {
 import { LiveShopping, LiveShopppingProgressType } from '@prisma/client';
 
 import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
+import { LiveShoppingInput } from '../..';
 
 export class LiveShoppingDTO {
   @IsNumber()
@@ -80,6 +81,8 @@ export type LiveShoppingRegistDTO = Pick<
   LiveShoppingDTO,
   'requests' | 'goods_id' | 'contactId' | 'progress'
 >;
+&
+  Pick<LiveShoppingInput, 'desiredPeriod' | 'desiredCommission'>;
 
 export type LiveShoppingWithSales = Pick<
   LiveShoppingDTO,

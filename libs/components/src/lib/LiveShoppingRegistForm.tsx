@@ -3,13 +3,23 @@ import {
   AlertIcon,
   Box,
   Button,
+  Collapse,
   Flex,
+  FormControl,
+  FormErrorMessage,
+  Heading,
   Image,
+  Input,
+  InputGroup,
+  InputRightAddon,
+  Radio,
+  RadioGroup,
   Spinner,
   Stack,
   Text,
+  useDisclosure,
+  useMergeRefs,
   useToast,
-  Heading,
 } from '@chakra-ui/react';
 import {
   useApprovedGoodsList,
@@ -21,15 +31,15 @@ import {
 } from '@project-lc/hooks';
 import {
   ApprovedGoodsListItem,
-  LiveShoppingRegistDTO,
   LiveShoppingInput,
+  LiveShoppingRegistDTO,
   LIVE_SHOPPING_PROGRESS,
 } from '@project-lc/shared-types';
 import { liveShoppingRegist } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import { useMemo } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useEffect, useMemo, useRef } from 'react';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { Goods } from '.prisma/client';
 import { ChakraAutoComplete } from '..';
 import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerContacts';
@@ -59,6 +69,7 @@ export function LiveShoppingRegist(): JSX.Element {
       contactId: 0,
       email: '',
       requests: '',
+      desiredPeriod: '무관',
     },
   });
 
@@ -66,7 +77,7 @@ export function LiveShoppingRegist(): JSX.Element {
 
   const onSuccess = (): void => {
     toast({
-      title: '상품을 성공적으로 등록하였습니다',
+      title: '라이브쇼핑을 성공적으로 등록하였습니다',
       status: 'success',
     });
     handleGoodsSelect(null);
@@ -75,7 +86,7 @@ export function LiveShoppingRegist(): JSX.Element {
 
   const onFail = (): void => {
     toast({
-      title: '상품 등록 중 오류가 발생하였습니다',
+      title: '라이브쇼핑 등록 중 오류가 발생하였습니다',
       status: 'error',
     });
   };
@@ -89,6 +100,8 @@ export function LiveShoppingRegist(): JSX.Element {
       contactId: 0,
       // streamId: '',
       progress: LIVE_SHOPPING_PROGRESS.등록됨,
+      desiredCommission: data.desiredCommission,
+      desiredPeriod: data.desiredPeriod,
     };
 
     if (contacts.data) {
@@ -161,6 +174,10 @@ export function LiveShoppingRegist(): JSX.Element {
               </Stack>
               {/* 담당자 연락처 */}
               <LiveShoppingManagerPhoneNumber />
+              {/* 희망 진행 기간 */}
+              <LiveShoppingDesiredPeriod />
+              {/* 희망 판매 수수료 */}
+              <LiveShoppingDesiredCommission />
               {/* 요청사항 */}
               <LiveShoppingRequestInput />
               {/* 완료 버튼 */}
@@ -183,6 +200,107 @@ export function LiveShoppingRegist(): JSX.Element {
 }
 
 export default LiveShoppingRegist;
+
+function LiveShoppingDesiredPeriod(): JSX.Element {
+  const {
+    register,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useFormContext<LiveShoppingInput>();
+  const { onOpen, isOpen, onClose } = useDisclosure();
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const registeredDesiredPeriod = register('desiredPeriod', {
+    maxLength: {
+      value: 30,
+      message: '30자 이내로 작성해주세요.',
+    },
+  });
+  const mergedRef = useMergeRefs(registeredDesiredPeriod.ref, inputRef);
+  useEffect(() => {
+    if (inputRef.current && isOpen) inputRef.current.focus();
+  }, [isOpen]);
+  return (
+    <Stack>
+      <Heading as="h6" size="sm">
+        희망 진행 기간
+      </Heading>
+      <RadioGroup
+        value={watch('desiredPeriod')}
+        onChange={(newV) => {
+          onClose();
+          setValue('desiredPeriod', newV);
+        }}
+      >
+        <Stack direction="row">
+          <Radio value="무관">무관</Radio>
+          <Radio value="가능한 빠른 일정">가능한 빠른 일정</Radio>
+          <Radio value="4주 이내">4주 이내</Radio>
+        </Stack>
+      </RadioGroup>
+
+      <Box mt={3}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            if (!isOpen) {
+              onOpen();
+              setValue('desiredPeriod', '');
+            } else {
+              onClose();
+              setValue('desiredPeriod', '무관');
+            }
+          }}
+        >
+          직접입력
+        </Button>
+      </Box>
+
+      <Collapse in={isOpen} animateOpacity unmountOnExit>
+        <Box maxW="200px">
+          <FormControl isInvalid={!!errors.desiredPeriod}>
+            <Input {...registeredDesiredPeriod} ref={mergedRef} />
+            <FormErrorMessage>{errors.desiredPeriod?.message}</FormErrorMessage>
+          </FormControl>
+        </Box>
+      </Collapse>
+    </Stack>
+  );
+}
+
+function LiveShoppingDesiredCommission(): JSX.Element {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<LiveShoppingInput>();
+
+  return (
+    <FormControl isInvalid={!!errors.desiredCommission}>
+      <Heading as="h6" size="sm">
+        희망 판매 수수료
+      </Heading>
+      <Text color="gray.500" fontSize="sm">
+        판매수수료가 높을수록 방송인 매칭 조율이 원만하며, 진행이 빠를 수 있습니다.
+      </Text>
+      <Box maxW={140} mt={2}>
+        <InputGroup>
+          <Input
+            placeholder="30"
+            type="number"
+            {...register('desiredCommission', {
+              max: { value: 100, message: '100을 넘을 수 없습니다.' },
+              min: { value: 0, message: '0보다 낮을 수 없습니다.' },
+            })}
+          />
+          <InputRightAddon>%</InputRightAddon>
+        </InputGroup>
+        <FormErrorMessage>{errors.desiredCommission?.message}</FormErrorMessage>
+      </Box>
+    </FormControl>
+  );
+}
 
 interface GoodsSummaryProps {
   goodsId: Goods['id'];

@@ -66,7 +66,7 @@ export function ChakraAutoComplete<T = any>({
       <Box {...getRootProps()}>
         {label ? (
           <FormLabel {...getInputLabelProps()}>
-            <Heading as="h6" size="xs">
+            <Heading as="h6" size="sm">
               {label}
             </Heading>
           </FormLabel>
