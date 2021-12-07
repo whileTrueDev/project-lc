@@ -20,15 +20,15 @@ export class LiveShoppingService {
 
     const userId = await this.prisma.seller.findFirst({
       where: { email },
-      select: {
-        id: true,
-      },
+      select: { id: true },
     });
     const liveShopping = await this.prisma.liveShopping.create({
       data: {
         seller: { connect: { id: userId.id } },
         streamId,
         requests: dto.requests,
+        desiredPeriod: dto.desiredPeriod,
+        desiredCommission: dto.desiredCommission || '0.00',
         goods: { connect: { id: dto.goods_id } },
         sellerContacts: { connect: { id: dto.contactId } },
       },
@@ -53,7 +53,7 @@ export class LiveShoppingService {
     email: UserPayload['sub'],
     dto: LiveShoppingParamsDto,
   ): Promise<LiveShoppingWithConfirmation[]> {
-    // 자신의 id를 반환하는 쿼리 수행하기
+    // 자신의 id를 반환하는 쿼리 수행하기
     const { id, goodsIds } = dto;
     return this.prisma.liveShopping.findMany({
       where: {

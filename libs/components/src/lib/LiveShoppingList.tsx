@@ -367,6 +367,20 @@ export function LiveShoppingList(): JSX.Element {
                     </Text>
                   </Stack>
 
+                  <Stack direction="row" alignItems="center">
+                    <Text as="span">희망 판매 수수료: </Text>
+                    <Text as="span" fontWeight="bold">
+                      {data[liveShoppingId].desiredCommission} %
+                    </Text>
+                  </Stack>
+
+                  <Stack direction="row" alignItems="center">
+                    <Text as="span">희망 진행 기간: </Text>
+                    <Text as="span" fontWeight="bold">
+                      {data[liveShoppingId].desiredPeriod}
+                    </Text>
+                  </Stack>
+
                   <Stack>
                     <Text>요청사항</Text>
                     <Textarea

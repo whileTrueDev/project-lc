@@ -23,6 +23,8 @@ const liveShopping: LiveShopping = {
   rejectionReason: null,
   requests: null,
   videoId: null,
+  desiredCommission: new Decimal('30'),
+  desiredPeriod: '무관',
 };
 
 describe('FmOrderMemoParser', () => {

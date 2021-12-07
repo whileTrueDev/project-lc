@@ -9,4 +9,9 @@ export interface LiveShoppingInput {
   setDefault: boolean;
   thirdNumber: string;
   useContact: string;
+
+  // 희망 진행 기간
+  desiredPeriod: string;
+  // 희망 판매 수수료
+  desiredCommission: string;
 }
