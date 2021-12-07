@@ -10,7 +10,7 @@ import {
 
 export function SettingIndex(): JSX.Element {
   return (
-    <MypageLayout siteType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
+    <MypageLayout appType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
       <Container maxWidth="2xl" p={6}>
         <VStack spacing={4} alignItems="stretch">
           <Heading mb={4}>내 계정</Heading>
