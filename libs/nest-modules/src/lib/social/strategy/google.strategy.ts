@@ -1,9 +1,11 @@
-import { getApiHost } from '@project-lc/utils';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { UserType } from '@project-lc/shared-types';
+import { getApiHost, getUserTypeFromRequest } from '@project-lc/utils';
+import { Request } from 'express';
 import { Profile, Strategy } from 'passport-google-oauth20';
-import { Seller } from '.prisma/client';
+import { Broadcaster, Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
 const GOOGLE_PROVIDER = 'google';
@@ -18,6 +20,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_PROVIDER) 
       clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
       callbackURL: `${getApiHost()}/social/google/callback`,
       scope: ['email', 'profile'],
+      passReqToCallback: true,
     });
   }
 
@@ -30,10 +33,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_PROVIDER) 
   }
 
   async validate(
+    req: Request,
     accessToken: string,
-    refreshToken: null,
+    refreshToken: string,
     profile: Profile,
-  ): Promise<Seller> {
+  ): Promise<Seller | Broadcaster> {
     const { id, displayName, emails, photos } = profile;
 
     if (!emails[0].value) {
@@ -45,7 +49,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_PROVIDER) 
       });
     }
 
-    const user = await this.socialService.findOrCreateSeller({
+    const userType: UserType = getUserTypeFromRequest(req);
+
+    const user = await this.socialService.findOrCreateUser(userType, {
       id,
       provider: GOOGLE_PROVIDER,
       email: emails[0].value,

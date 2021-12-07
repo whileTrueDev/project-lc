@@ -20,6 +20,16 @@ export const getWebHost = (): string => {
   }
 };
 
+export const getBroadcasterCenterHost = (): string => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+    case 'test': // return process.env.NEXT_PUBLIC_WEB_HOST || process.env.SELLER_WEB_HOST;
+    case 'development':
+    default:
+      return 'http://localhost:4300';
+  }
+};
+
 export const getAdminHost = (): string => {
   switch (process.env.NODE_ENV) {
     case 'production':
@@ -27,6 +37,16 @@ export const getAdminHost = (): string => {
       return process.env.NEXT_PUBLIC_ADMIN_HOST;
     case 'development':
     default:
-      return 'http://localhost:4200';
+      return 'http://localhost:4250';
+  }
+};
+
+export const getBroadcasterWebHost = (): string => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+    case 'test':
+    case 'development':
+    default:
+      return 'http://localhost:4300';
   }
 };

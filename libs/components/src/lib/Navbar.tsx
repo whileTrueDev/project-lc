@@ -18,20 +18,20 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
+import { UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
 import { mainNavItems, NavItem } from '../constants/navigation';
-import { SiteType } from '../constants/siteType';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import KksLogo from './KksLogo';
 import ProfileBox from './ProfileBox';
 
 export interface NavbarProps {
-  siteType?: SiteType;
+  appType?: UserType;
 }
-export function Navbar({ siteType = 'seller' }: NavbarProps): JSX.Element {
+export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
   const { isLoggedIn } = useIsLoggedIn();
@@ -78,7 +78,7 @@ export function Navbar({ siteType = 'seller' }: NavbarProps): JSX.Element {
               textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
               color={useColorModeValue('gray.800', 'white')}
             >
-              <KksLogo siteType={siteType} size="small" />
+              <KksLogo appType={appType} size="small" />
             </Link>
           </NextLink>
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
@@ -240,5 +240,5 @@ const MobileNavItem = ({ label, href, needLogin }: NavItem): JSX.Element => {
   );
 };
 
-export const SellerNavbar = (): JSX.Element => <Navbar siteType="seller" />;
-export const BroadcasterNavbar = (): JSX.Element => <Navbar siteType="broadcaster" />;
+export const SellerNavbar = (): JSX.Element => <Navbar appType="seller" />;
+export const BroadcasterNavbar = (): JSX.Element => <Navbar appType="broadcaster" />;

@@ -10,7 +10,6 @@ const liveShopping: LiveShopping = {
   contactId: 1,
   sellerId: 1,
   goodsId: 1,
-  streamId: '1234',
   broadcasterId: 1,
   whiletrueCommissionRate: new Decimal('5'),
   broadcasterCommissionRate: new Decimal('10'),
@@ -23,6 +22,8 @@ const liveShopping: LiveShopping = {
   rejectionReason: null,
   requests: null,
   videoId: null,
+  desiredCommission: new Decimal('30'),
+  desiredPeriod: '무관',
 };
 
 describe('FmOrderMemoParser', () => {

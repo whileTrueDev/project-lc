@@ -6,7 +6,7 @@ import axios from '../../axios';
 
 type LiveShoppingManage = Omit<
   LiveShoppingDTO,
-  'streamId' | 'sellerId' | 'goods_id' | 'contactId' | 'requests'
+  'sellerId' | 'goods_id' | 'contactId' | 'requests'
 >;
 
 export const useUpdateLiveShoppingManageMutation = (): UseMutationResult<

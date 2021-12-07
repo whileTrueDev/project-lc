@@ -481,20 +481,49 @@ model LiveCommerceRanking {
 
 // 방송인
 model Broadcaster {
-  id                  Int                   @id @default(autoincrement())
-  email               String                @unique // 방송인 이메일(가입시 사용)
-  userName            String                @db.VarChar(20) // 유저의 실명
-  userNickname        String?               @db.VarChar(20) // 유저의 활동명
-  overlayUrl          String                @unique // 라이브커머스 오버레이 URL 
-  createDate          DateTime              @default(now())
-  deleteFlag          Boolean               @default(false) // 회원탈퇴 여부
+  id                  Int                        @id @default(autoincrement())
+  email               String                     @unique // 방송인 이메일(가입시 사용)
+  userName            String                     @db.VarChar(20) // 유저의 실명
+  userNickname        String?                    @db.VarChar(20) // 유저의 활동명
+  overlayUrl          String                     @unique // 라이브커머스 오버레이 URL 
+  createDate          DateTime                   @default(now())
+  deleteFlag          Boolean                    @default(false) // 회원탈퇴 여부
   password            String? // 비밀번호
   avatar              String?
-  agreementFlag       Boolean               @default(false) // 이용동의 
+  agreementFlag       Boolean                    @default(false) // 이용동의 
   liveCommerceRanking LiveCommerceRanking[]
   LiveShopping        LiveShopping[]
+  socialAccounts      BroadcasterSocialAccount[]
+  broadcasterContacts BroadcasterContacts[]
   broadcasterAddress  BroadcasterAddress?
   channels            BroadcasterChannel[]
+}
+
+model BroadcasterSocialAccount {
+  serviceId     String      @id // 인증 결과로 해당 서비스에서 받은 고유 식별자
+  provider      String // 'google' | 'kakao' | 'naver'
+  name          String
+  registDate    DateTime    @default(now())
+  profileImage  String?
+  accessToken   String?
+  refreshToken  String?
+  broadcasterId Int
+  broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+
+  @@index([broadcasterId], name: "broadcasterId")
+}
+
+// 방송인 연락처 정보
+model BroadcasterContacts {
+  id          Int      @id @default(autoincrement())
+  name        String   @default("")
+  email       String   @default("")
+  phoneNumber String   @default("")
+  isDefault   Boolean  @default(false)
+  createDate  DateTime @default(now())
+
+  broadcasterId Int?
+  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 }
 
 // 방송인 선물/샘플 수령 주소 정보
@@ -523,7 +552,6 @@ model BroadcasterChannel {
 // -------------------------------------------------
 model LiveShopping {
   id                        Int                       @id @default(autoincrement())
-  streamId                  String?                   @unique // 방송마다 부여되는 unique 값
   broadcasterId             Int? //방송인의 아이디 
   sellerId                  Int // 판매자 ID
   goodsId                   Int // 상품 ID
@@ -539,6 +567,8 @@ model LiveShopping {
   rejectionReason           String?                   @db.Text // 방송 취소 또는 거절 사유
   broadcasterCommissionRate Decimal                   @default("0") @db.Decimal(10, 2) // 판매금 중, 방송인이 가져가는 수수료 (0%~100% 사이값)
   whiletrueCommissionRate   Decimal                   @default("0") @db.Decimal(10, 2) // 판매금 중, project-lc(와일트루)가 가져가는 수수료 (0%~100% 사이값)
+  desiredCommission         Decimal?                  @default("0") @db.Decimal(10, 2) // 희망판매수수료
+  desiredPeriod             String?                   @default("무관") // 희망 진행 기간
 
   sellerContacts        SellerContacts          @relation(fields: [contactId], references: [id])
   seller                Seller                  @relation(fields: [sellerId], references: [id])
