@@ -824,6 +824,11 @@ export type FmOrderMetaInfo = Pick<
 } & {
   /** 배송메모 전문 */
   memoOriginal: string | null;
+} & {
+  /** 해당 주문의 선물하기 여부 */
+  giftFlag?: boolean;
+  /** 해당 주문의 응원메시지, 작성자 닉네임 */
+  cheeringMessage?: CheeringMessage;
 };
 
 export interface FmOrderRefundBase {

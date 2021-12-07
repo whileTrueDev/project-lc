@@ -322,10 +322,19 @@ export class FmOrdersService {
     if (!Object.keys(fmOrderStatuses).includes(order.step)) return null;
 
     const parser = new FmOrderMemoParser(order.memo);
+
+    // 주문번호로 선물여부 옵션 조회
+    const giftFlag = await this.findOneOrderGiftFlag(order.order_seq);
+
+    // 응원메시지, 닉네임 조회
+    const cheeringMessage = await this.findOneOrderCheeringMessage(order.order_seq);
+
     return {
       ...order,
       memo: parser.memo,
       memoOriginal: order.memo,
+      giftFlag,
+      cheeringMessage,
     };
   }
 
