@@ -26,7 +26,7 @@ const liveShopping: LiveShopping = {
   desiredPeriod: '무관',
 };
 
-describe('FmOrderMemoParser', () => {
+describe('checkOrderDuringLiveShopping', () => {
   test('라이브쇼핑 판매시간 내에 구매한 주문의 경우, true를 반환', () => {
     const orderDate = new Date('2021-10-21 17:29:59');
 

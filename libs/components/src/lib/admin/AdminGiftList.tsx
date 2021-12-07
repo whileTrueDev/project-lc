@@ -7,7 +7,6 @@ import {
   getFmOrderStatusByNames,
   LiveShoppingProgressParams,
 } from '@project-lc/shared-types';
-import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { ChakraDataGrid } from '../ChakraDataGrid';
