@@ -50,7 +50,6 @@ export class SocialService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
     let userPayload: UserPayload;
-    // 방송인일때 전달되는 user의 키 값이 seller와 조금 다름(email 대신 userId)
     if (userType === 'broadcaster') {
       const { email, userName: name, id, password, avatar } = user;
       const broadcaster = {
@@ -64,6 +63,11 @@ export class SocialService {
     } else {
       userPayload = this.authService.castUser(user, userType);
     }
+
+    // local stragety에서 반환되는 req.user의 타입은 UserPayload이나
+    // 소셜로그인 strategy에서 반환되는 req.user의 타입은 Broadcatser임
+    // social.controller/login 에서 createLoginStamp 실행시 req.user는 userpayload로 cast되어있어야한다
+    req.user = userPayload;
 
     const loginToken: loginUserRes = this.authService.issueToken(
       userPayload,

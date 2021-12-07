@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { LoginHistory } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { Request } from 'express';
@@ -18,19 +18,23 @@ export class LoginHistoryService {
     const uaParser = new UAParser(req.get('User-Agent'));
     const device = uaParser.getDevice();
 
-    return this.prisma.loginHistory.create({
-      data: {
-        ip,
-        // https://github.com/faisalman/ua-parser-js/issues/419
-        // 일반적으로 값이 없는 경우, PC로 가정할 수 있다.
-        device: device.type || 'PC',
-        country: geo?.country || '',
-        city: geo?.city || '',
-        method: loginMethod,
-        ua: uaParser.getUA(),
-        userEmail: user.sub,
-        userType: user.type,
-      },
-    });
+    try {
+      return this.prisma.loginHistory.create({
+        data: {
+          ip,
+          // https://github.com/faisalman/ua-parser-js/issues/419
+          // 일반적으로 값이 없는 경우, PC로 가정할 수 있다.
+          device: device.type || 'PC',
+          country: geo?.country || '',
+          city: geo?.city || '',
+          method: loginMethod,
+          ua: uaParser.getUA(),
+          userEmail: user.sub,
+          userType: user.type,
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }
