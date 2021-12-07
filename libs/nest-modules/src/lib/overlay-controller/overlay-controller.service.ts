@@ -11,7 +11,6 @@ export class OverlayControllerService {
     const urlAndNickname = await this.prisma.broadcaster.findMany({
       select: {
         userNickname: true,
-        userId: true,
         overlayUrl: true,
       },
     });
@@ -24,7 +23,7 @@ export class OverlayControllerService {
     const text = data.message;
     const price = data.purchaseNum;
     const { loginFlag } = data;
-    const broadcasterId = data.userId;
+    const broadcasterEmail = data.userId;
     const { phoneCallEventFlag } = data;
     const { giftFlag } = data;
 
@@ -34,7 +33,7 @@ export class OverlayControllerService {
         text,
         price,
         loginFlag,
-        broadcasterId,
+        broadcasterEmail,
         phoneCallEventFlag,
         giftFlag,
       },

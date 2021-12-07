@@ -68,20 +68,19 @@ export function BroadcasterChannelSection(): JSX.Element {
 
   const { data: profileData, isLoading: profileLoading } = useProfile();
   const { data: channels, isLoading: channelLoading } = useBroadcasterChannels(
-    profileData?.id || 1,
+    profileData?.id,
   );
 
   const allowAddChannel = useMemo(() => channels && channels.length < 5, [channels]);
 
   const createChannelRequest = useBroadcasterChannelCreateMutation();
   const onSubmit = (data: ChannelFormData): void => {
-    // if (!profileData) return;
+    if (!profileData) return;
 
     createChannelRequest
       .mutateAsync({
         ...data,
-        // broadcasterId: profileData.id,
-        broadcasterId: 1,
+        broadcasterId: profileData.id,
       })
       .then(() => {
         reset();
@@ -118,8 +117,8 @@ export function BroadcasterChannelSection(): JSX.Element {
 
       {/* 채널 url 입력창 여닫는 버튼 */}
       {allowAddChannel && (
-        <Button leftIcon={<AddIcon />} variant="outline" onClick={toggle} size="sm">
-          링크추가
+        <Button leftIcon={<AddIcon />} onClick={toggle}>
+          등록
         </Button>
       )}
 

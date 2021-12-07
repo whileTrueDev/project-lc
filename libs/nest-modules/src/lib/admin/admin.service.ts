@@ -275,7 +275,7 @@ export class AdminService {
       },
       data: {
         progress: dto.progress || undefined,
-        broadcasterId: dto.broadcasterId || undefined,
+        broadcasterId: Number(dto.broadcasterId) || undefined,
         broadcastStartDate: dto.broadcastStartDate
           ? new Date(dto.broadcastStartDate)
           : undefined,

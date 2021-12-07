@@ -1,4 +1,5 @@
 import { ColorMode, useColorMode } from '@chakra-ui/react';
+import { UserType } from '@project-lc/shared-types';
 import { useMemo } from 'react';
 import { ChakraNextImage } from './ChakraNextImage';
 
@@ -12,18 +13,18 @@ export const sellerLogo = 'kkshow-seller-lightmode.png';
 export const broadcasterLogo = 'kkshow-broadcaster-lightmode.png';
 
 export interface KksLogoProps {
-  siteType: 'broadcaster' | 'seller';
+  appType: UserType;
   size: 'small' | 'mid' | 'big' | 'manual';
   width?: number;
   height?: number;
 }
 
 interface GetCorrectLogoOption {
-  siteType: KksLogoProps['siteType'];
+  appType: KksLogoProps['appType'];
   colorMode: ColorMode;
 }
-function getCorrectLogoInfo({ siteType, colorMode }: GetCorrectLogoOption): string {
-  switch (siteType) {
+function getCorrectLogoInfo({ appType, colorMode }: GetCorrectLogoOption): string {
+  switch (appType) {
     case 'broadcaster':
       return LOGO_S3_PREFIX + broadcasterLogo;
     case 'seller':
@@ -40,12 +41,12 @@ function getCorrectLogoInfo({ siteType, colorMode }: GetCorrectLogoOption): stri
  * @description 이미지 크기가 400x150보다 클 경우 manual 옵션을 사용하세요
  */
 export function KksLogo(props: KksLogoProps): JSX.Element | null {
-  const { size, width, height, siteType } = props;
+  const { size, width, height, appType } = props;
   const { colorMode } = useColorMode();
 
   const logoSrc = useMemo(
-    () => getCorrectLogoInfo({ colorMode, siteType }),
-    [colorMode, siteType],
+    () => getCorrectLogoInfo({ colorMode, appType }),
+    [colorMode, appType],
   );
 
   if (size === 'small') {

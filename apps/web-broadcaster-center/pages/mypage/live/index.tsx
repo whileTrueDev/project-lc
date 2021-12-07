@@ -2,7 +2,7 @@ import { broadcasterCenterMypageNavLinks, MypageLayout } from '@project-lc/compo
 
 export function LiveShoppingIndex(): JSX.Element {
   return (
-    <MypageLayout siteType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
+    <MypageLayout appType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
       마이페이지 - 라이브쇼핑
     </MypageLayout>
   );
