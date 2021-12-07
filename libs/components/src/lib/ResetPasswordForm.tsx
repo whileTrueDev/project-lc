@@ -16,7 +16,11 @@ import {
   useMailVerificationMutation,
   useCountdown,
 } from '@project-lc/hooks';
-import { emailCodeRegisterOptions, emailRegisterOptions } from '@project-lc/shared-types';
+import {
+  emailCodeRegisterOptions,
+  emailRegisterOptions,
+  UserType,
+} from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -44,7 +48,11 @@ const resetPasswordStepHeaders = [
   },
 ];
 
-export function ResetPasswordForm(): JSX.Element {
+export function ResetPasswordForm({
+  userType = 'seller',
+}: {
+  userType: UserType;
+}): JSX.Element {
   const router = useRouter();
   const toast = useToast();
   const showCodeSendErrorToast = useCallback(() => {
@@ -97,9 +105,8 @@ export function ResetPasswordForm(): JSX.Element {
     const isValidEmail = await trigger('email');
     if (!isValidEmail) return;
 
-    // 가입여부 확인
     const email = getValues('email');
-    const isOk = await getEmailDupCheck(email); // 중복되지않은 경우 true, 중복된 경우 false
+    const isOk = await getEmailDupCheck(email, userType); // 중복되지않은 경우 true, 중복된 경우 false
     if (isOk) {
       setError('email', {
         type: 'validate',
@@ -107,7 +114,6 @@ export function ResetPasswordForm(): JSX.Element {
       });
       return;
     }
-
     // 인증코드 전송 후 StepOne(코드확인)로 이동
     sendEmailCode({ email })
       .then(() => {
@@ -124,6 +130,7 @@ export function ResetPasswordForm(): JSX.Element {
     setError,
     showCodeSendErrorToast,
     trigger,
+    userType,
   ]);
 
   // 인증코드 확인 요청
@@ -245,6 +252,7 @@ export function ResetPasswordForm(): JSX.Element {
           email={getValues('email')}
           onCancel={moveToStepZero}
           onConfirm={() => router.push('/login')}
+          userType={userType}
         />
       )}
     </CenterBox>
