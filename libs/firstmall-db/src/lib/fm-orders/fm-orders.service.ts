@@ -26,7 +26,6 @@ import {
   FmOrderItemSubOption,
   CheeringMessage,
 } from '@project-lc/shared-types';
-import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { StatCounter } from './utills/statCounter';
@@ -321,8 +320,6 @@ export class FmOrdersService {
     // step이 정상적이지 않은 주문인 경우 조회하지 않음.
     if (!Object.keys(fmOrderStatuses).includes(order.step)) return null;
 
-    const parser = new FmOrderMemoParser(order.memo);
-
     // 주문번호로 선물여부 옵션 조회
     const giftFlag = await this.findOneOrderGiftFlag(order.order_seq);
 
@@ -331,8 +328,6 @@ export class FmOrdersService {
 
     return {
       ...order,
-      memo: parser.memo,
-      memoOriginal: order.memo,
       giftFlag,
       cheeringMessage,
     };
