@@ -530,7 +530,6 @@ model BroadcasterChannel {
 // -------------------------------------------------
 model LiveShopping {
   id                        Int                       @id @default(autoincrement())
-  streamId                  String?                   @unique // 방송마다 부여되는 unique 값
   broadcasterId             String? //방송인의 아이디 
   sellerId                  Int // 판매자 ID
   goodsId                   Int // 상품 ID

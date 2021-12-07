@@ -120,10 +120,7 @@ export function GoodsDetail(): JSX.Element {
 
   const { handleSubmit, register, watch } = methods;
   const regist = async (
-    data: Omit<
-      LiveShoppingDTO,
-      'streamId' | 'sellerId' | 'goods_id' | 'contactId' | 'requests'
-    >,
+    data: Omit<LiveShoppingDTO, 'sellerId' | 'goods_id' | 'contactId' | 'requests'>,
   ): Promise<void> => {
     const videoUrlExist = Boolean(liveShopping[0]?.liveShoppingVideo.youtubeUrl);
     const dto = Object.assign(data, { id: liveShoppingId });
@@ -339,7 +336,7 @@ export function GoodsDetail(): JSX.Element {
             <AdminOverlayImageUploadDialog
               isOpen={imageDialogIsOpen}
               onClose={imageDialogOnClose}
-              broadcasterId={liveShopping[0].broadcasterId}
+              broadcasterId={liveShopping[0].broadcaster.email}
               liveShoppingId={liveShopping[0].id}
             />
           </FormProvider>

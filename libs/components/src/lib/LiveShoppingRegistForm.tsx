@@ -87,7 +87,7 @@ export function LiveShoppingRegist(): JSX.Element {
       requests: '',
       goods_id: 0,
       contactId: 0,
-      streamId: '',
+      // streamId: '',
       progress: LIVE_SHOPPING_PROGRESS.등록됨,
     };
 

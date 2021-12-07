@@ -16,7 +16,7 @@ export class LiveShoppingService {
     email: UserPayload['sub'],
     dto: LiveShoppingRegistDTO,
   ): Promise<{ liveShoppingId: number }> {
-    const streamId = Math.random().toString(36).substr(2, 11);
+    // const streamId = Math.random().toString(36).substr(2, 11);
 
     const userId = await this.prisma.seller.findFirst({
       where: { email },
@@ -27,7 +27,7 @@ export class LiveShoppingService {
     const liveShopping = await this.prisma.liveShopping.create({
       data: {
         seller: { connect: { id: userId.id } },
-        streamId,
+        // streamId,
         requests: dto.requests,
         goods: { connect: { id: dto.goods_id } },
         sellerContacts: { connect: { id: dto.contactId } },
