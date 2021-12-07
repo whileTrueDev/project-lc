@@ -80,8 +80,7 @@ export class LiveShoppingDTO {
 export type LiveShoppingRegistDTO = Pick<
   LiveShoppingDTO,
   'requests' | 'goods_id' | 'contactId' | 'progress'
->;
-&
+> &
   Pick<LiveShoppingInput, 'desiredPeriod' | 'desiredCommission'>;
 
 export type LiveShoppingWithSales = Pick<
