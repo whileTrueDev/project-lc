@@ -78,6 +78,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
   //   usePagination,
   // );
   const { data: profileData } = useProfile();
+  console.log(profileData);
   const { data, isLoading } = useLiveShoppingList({});
   return (
     <Table>

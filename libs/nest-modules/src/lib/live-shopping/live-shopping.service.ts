@@ -95,22 +95,13 @@ export class LiveShoppingService {
     });
   }
 
-  async getRegisteredLiveShoppings(
-    email: UserPayload['sub'],
-    dto: LiveShoppingParamsDto,
+  async getBroadcasterRegisteredLiveShoppings(
+    broadcasterId: number,
   ): Promise<LiveShoppingWithConfirmation[]> {
     // 자신의 id를 반환하는 쿼리 수행하기
-    const { id, goodsIds } = dto;
     return this.prisma.liveShopping.findMany({
       where: {
-        id: id ? Number(id) : undefined,
-        goodsId:
-          goodsIds?.length >= 1
-            ? { in: goodsIds.map((goodsid) => Number(goodsid)) }
-            : undefined,
-        seller: {
-          email,
-        },
+        broadcasterId,
       },
       include: {
         goods: {
