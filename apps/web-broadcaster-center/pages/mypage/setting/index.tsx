@@ -6,6 +6,7 @@ import {
   BroadcasterChannelSection,
   BroadcasterNickNameSection,
   MypageLayout,
+  SocialAccountUnlinkSection,
 } from '@project-lc/components';
 
 export function SettingIndex(): JSX.Element {
@@ -17,6 +18,8 @@ export function SettingIndex(): JSX.Element {
           <div>계정정보</div>
           <Divider />
           <BroadcasterNickNameSection />
+          <Divider />
+          <SocialAccountUnlinkSection userType="broadcaster" />
           <Divider />
           <BroadcasterAddressSection />
           <Divider />

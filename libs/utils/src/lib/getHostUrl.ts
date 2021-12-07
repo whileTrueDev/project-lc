@@ -30,3 +30,13 @@ export const getAdminHost = (): string => {
       return 'http://localhost:4200';
   }
 };
+
+export const getBroadcasterWebHost = (): string => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+    case 'test':
+    case 'development':
+    default:
+      return 'http://localhost:4300';
+  }
+};

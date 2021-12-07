@@ -481,21 +481,36 @@ model LiveCommerceRanking {
 
 // 방송인
 model Broadcaster {
-  id                  Int                   @id @default(autoincrement())
-  email               String                @unique // 방송인 이메일(가입시 사용)
-  userName            String                @db.VarChar(20) // 유저의 실명
-  userNickname        String?               @db.VarChar(20) // 유저의 활동명
-  overlayUrl          String                @unique // 라이브커머스 오버레이 URL 
-  createDate          DateTime              @default(now())
-  deleteFlag          Boolean               @default(false) // 회원탈퇴 여부
+  id                  Int                        @id @default(autoincrement())
+  email               String                     @unique // 방송인 이메일(가입시 사용)
+  userName            String                     @db.VarChar(20) // 유저의 실명
+  userNickname        String?                    @db.VarChar(20) // 유저의 활동명
+  overlayUrl          String                     @unique // 라이브커머스 오버레이 URL 
+  createDate          DateTime                   @default(now())
+  deleteFlag          Boolean                    @default(false) // 회원탈퇴 여부
   password            String? // 비밀번호
   avatar              String?
-  agreementFlag       Boolean               @default(false) // 이용동의 
+  agreementFlag       Boolean                    @default(false) // 이용동의 
   liveCommerceRanking LiveCommerceRanking[]
   LiveShopping        LiveShopping[]
+  socialAccounts      BroadcasterSocialAccount[]
   broadcasterContacts BroadcasterContacts[]
   broadcasterAddress  BroadcasterAddress?
   channels            BroadcasterChannel[]
+}
+
+model BroadcasterSocialAccount {
+  serviceId     String      @id // 인증 결과로 해당 서비스에서 받은 고유 식별자
+  provider      String // 'google' | 'kakao' | 'naver'
+  name          String
+  registDate    DateTime    @default(now())
+  profileImage  String?
+  accessToken   String?
+  refreshToken  String?
+  broadcasterId Int
+  broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+
+  @@index([broadcasterId], name: "broadcasterId")
 }
 
 // 방송인 연락처 정보

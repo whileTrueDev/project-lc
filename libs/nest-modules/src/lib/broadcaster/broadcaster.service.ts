@@ -1,15 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Broadcaster, BroadcasterAddress, Prisma } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { Prisma, Broadcaster, BroadcasterAddress } from '@prisma/client';
-import { throwError } from 'rxjs';
 import {
-  SignUpDto,
-  BroadcasterDTO,
-  FindBroadcasterDto,
   BroadcasterAddressDto,
+  BroadcasterDTO,
   BroadcasterRes,
+  FindBroadcasterDto,
+  SignUpDto,
 } from '@project-lc/shared-types';
 import { hash, verify } from 'argon2';
+import { throwError } from 'rxjs';
 
 @Injectable()
 export class BroadcasterService {
