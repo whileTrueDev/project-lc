@@ -175,9 +175,9 @@ export function LiveShoppingRegist(): JSX.Element {
               {/* 담당자 연락처 */}
               <LiveShoppingManagerPhoneNumber />
               {/* 희망 진행 기간 */}
-              <liveShoppingDesiredPeriod />
+              <LiveShoppingDesiredPeriod />
               {/* 희망 판매 수수료 */}
-              <liveShoppingDesiredCommission />
+              <LiveShoppingDesiredCommission />
               {/* 요청사항 */}
               <LiveShoppingRequestInput />
               {/* 완료 버튼 */}
@@ -201,7 +201,7 @@ export function LiveShoppingRegist(): JSX.Element {
 
 export default LiveShoppingRegist;
 
-function liveShoppingDesiredPeriod(): JSX.Element {
+function LiveShoppingDesiredPeriod(): JSX.Element {
   const {
     register,
     setValue,
@@ -270,7 +270,7 @@ function liveShoppingDesiredPeriod(): JSX.Element {
   );
 }
 
-function liveShoppingDesiredCommission(): JSX.Element {
+function LiveShoppingDesiredCommission(): JSX.Element {
   const {
     register,
     formState: { errors },
