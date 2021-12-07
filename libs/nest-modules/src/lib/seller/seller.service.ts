@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
 import { hash, verify } from 'argon2';
-import { FindSellerRes, SellerContactsDTO, UserType } from '@project-lc/shared-types';
+import { FindSellerRes, SellerContactsDTO } from '@project-lc/shared-types';
 import { PrismaService } from '@project-lc/prisma-orm';
 import __multer from 'multer';
 import { S3Service } from '../s3/s3.service';
@@ -33,7 +33,7 @@ export class SellerService {
   async login(email: string, pwdInput: string): Promise<Seller | null> {
     const user = await this.findOne({ email });
     if (!user) {
-      return null;
+      throw new UnauthorizedException();
     }
     if (user.password === null) {
       // 소셜로그인으로 가입된 회원
@@ -41,7 +41,7 @@ export class SellerService {
     }
     const isCorrect = await this.validatePassword(pwdInput, user.password);
     if (!isCorrect) {
-      return null;
+      throw new UnauthorizedException();
     }
     return user;
   }
