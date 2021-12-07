@@ -16,8 +16,8 @@ export class LiveShoppingDTO {
   @IsNumber()
   id: number;
 
-  @IsString()
-  streamId: string;
+  // @IsString()
+  // streamId: string;
 
   @IsOptional()
   @IsString()
@@ -79,7 +79,7 @@ export class LiveShoppingDTO {
 
 export type LiveShoppingRegistDTO = Pick<
   LiveShoppingDTO,
-  'requests' | 'goods_id' | 'contactId' | 'streamId' | 'progress'
+  'requests' | 'goods_id' | 'contactId' | 'progress'
 > &
   Pick<LiveShoppingInput, 'desiredPeriod' | 'desiredCommission'>;
 
