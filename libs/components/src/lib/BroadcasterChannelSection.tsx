@@ -75,12 +75,12 @@ export function BroadcasterChannelSection(): JSX.Element {
 
   const createChannelRequest = useBroadcasterChannelCreateMutation();
   const onSubmit = (data: ChannelFormData): void => {
-    // if (!profileData) return;
+    if (!profileData) return;
 
     createChannelRequest
       .mutateAsync({
         ...data,
-        broadcasterId: profileData?.id || 1,
+        broadcasterId: profileData.id,
       })
       .then(() => {
         reset();
