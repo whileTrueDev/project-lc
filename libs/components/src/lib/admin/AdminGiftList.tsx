@@ -156,9 +156,8 @@ export function AdminGiftList(props: {
   const filteredOrders = useMemo(() => {
     if (!orders.data) return [];
     return orders.data.filter((d) => {
-      const parser = new FmOrderMemoParser(d.memo || '');
-      // 선물하기가 아닌 주문만 필터링
-      return parser.giftFlag;
+      // 선물하기인 주문만 필터링
+      return d.giftFlag;
     });
   }, [orders.data]);
 
