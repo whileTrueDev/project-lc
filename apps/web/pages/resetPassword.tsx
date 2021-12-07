@@ -6,7 +6,7 @@ export function Resetpassword(): JSX.Element {
     <Box>
       <SellerNavbar />
       <Flex align="center" justify="center" minH="calc(100vh - 200px)">
-        <ResetPasswordForm userType="seller" />
+        <ResetPasswordForm />
       </Flex>
     </Box>
   );

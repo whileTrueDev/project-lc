@@ -1,6 +1,5 @@
-import { Box, Button, ButtonGroup, Input, Text, useToast } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Input, useToast } from '@chakra-ui/react';
 import { useValidatePassword } from '@project-lc/hooks';
-import { UserType } from '@project-lc/shared-types';
 import { useForm } from 'react-hook-form';
 
 export interface PasswordCheckFormData {
@@ -11,7 +10,6 @@ export interface PasswordCheckFormProps {
   onCancel: () => void;
   onConfirm: () => void;
   onFail?: () => void;
-  userType: UserType;
 }
 
 export function PasswordCheckForm(props: PasswordCheckFormProps): JSX.Element {

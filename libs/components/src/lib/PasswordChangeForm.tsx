@@ -11,18 +11,17 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useChangePasswordMutation } from '@project-lc/hooks';
-import { passwordRegisterOptions, UserType } from '@project-lc/shared-types';
+import { passwordRegisterOptions } from '@project-lc/shared-types';
 import { useForm } from 'react-hook-form';
 import { PasswordCheckFormProps } from './PasswordCheckForm';
 
 export interface PasswordCheckFormData {
   password: string;
   repassword: string;
-  userType: UserType;
 }
 export type PasswordChangeFormProps = PasswordCheckFormProps;
 export function PasswordChangeForm(props: PasswordChangeFormProps): JSX.Element {
-  const { onCancel, onConfirm, email, userType } = props;
+  const { onCancel, onConfirm, email } = props;
   const toast = useToast();
 
   const {
@@ -33,7 +32,7 @@ export function PasswordChangeForm(props: PasswordChangeFormProps): JSX.Element 
     formState: { errors },
   } = useForm<PasswordCheckFormData>();
 
-  const { mutateAsync } = useChangePasswordMutation(userType);
+  const { mutateAsync } = useChangePasswordMutation();
 
   const changePassword = (data: PasswordCheckFormData): void => {
     if (!email) return;

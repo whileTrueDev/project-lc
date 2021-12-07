@@ -98,6 +98,22 @@ export class BroadcasterService {
   }
 
   /**
+   * 입력된 이메일을 가진 유저가 본인 인증을 하기 위해 비밀번호를 확인함
+   * @param email 본인 이메일
+   * @param password 본인 비밀번호
+   * @returns boolean 비밀번호가 맞는지
+   */
+  async checkPassword(email: string, password: string): Promise<boolean> {
+    const seller = await this.findOne({ email });
+    if (!seller.password) {
+      throw new BadRequestException(
+        '소셜계정으로 가입된 회원입니다. 비밀번호를 등록해주세요.',
+      );
+    }
+    return this.validatePassword(password, seller.password);
+  }
+
+  /**
    * 입력한 비밀번호를 해시된 비밀번호와 비교합니다.
    * @param pwInput 입력한 비밀번호 문자열
    * @param hashedPw 해시된 비밀번호 값

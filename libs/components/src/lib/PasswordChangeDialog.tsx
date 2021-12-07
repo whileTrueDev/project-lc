@@ -9,7 +9,6 @@ import {
   ModalProps,
 } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
-import { UserType } from '@project-lc/shared-types';
 import PasswordChangeForm from './PasswordChangeForm';
 import SettingSectionLayout from './SettingSectionLayout';
 
@@ -34,7 +33,6 @@ export function PasswordChangeDialog(props: DialogProps): JSX.Element {
               email={profileData?.email}
               onCancel={onClose}
               onConfirm={onConfirm}
-              userType={process.env.NEXT_PUBLIC_APP_TYPE as UserType}
             />
           </SettingSectionLayout>
         </ModalBody>

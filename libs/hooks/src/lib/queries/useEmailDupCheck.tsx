@@ -1,12 +1,9 @@
-import { UserType } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
-export const getEmailDupCheck = async (
-  email: string,
-  userType: UserType = 'seller',
-): Promise<boolean> => {
+export const getEmailDupCheck = async (email: string): Promise<boolean> => {
+  const userType = process.env.NEXT_PUBLIC_APP_TYPE;
   return axios
     .get<boolean>(`/${userType}/email-check`, {
       params: { email },
