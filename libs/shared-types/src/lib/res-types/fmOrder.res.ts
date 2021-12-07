@@ -593,6 +593,34 @@ export interface FmOrderOption {
   ori_price: string;
 }
 
+/**
+ * 주문상품 추가옵션(선물하기 옵션)
+ */
+export interface FmOrderItemSubOption {
+  /** 추가옵션 고유번호 */
+  item_suboption_seq: number;
+  /** 주문 번호 */
+  order_seq: number;
+  /** 옵션 제목(선물하기 여부) */
+  title: string;
+  /** 옵션 값 (선물하기) */
+  suboption: string;
+}
+
+/**
+ * 주문상품 입력옵션(닉네임, 응원메시지)
+ */
+export interface FmOrderItemInput {
+  /** 입력옵션 고유번호 */
+  item_input_seq: number;
+  /** 주문 번호 */
+  order_seq: number;
+  /** 옵션 제목 (닉네임 | 응원메시지) */
+  title: string;
+  /** 입력값 */
+  value: string;
+}
+
 export interface FmOrderExportBase {
   /**
    * 출고 고유번호

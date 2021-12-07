@@ -22,6 +22,8 @@ import {
   LiveShoppingWithSalesAndFmId,
   ChangeReturnStatusDto,
   fmOrderStatuses,
+  FmOrderItemInput,
+  FmOrderItemSubOption,
 } from '@project-lc/shared-types';
 import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
@@ -838,5 +840,37 @@ export class FmOrdersService {
     );
 
     return salesPrice;
+  }
+
+  /** 주문의 응원메시지, 구매자 닉네임(fm_order_item_input) 조회 */
+  private async findOneOrderInputOption(
+    orderId: FmOrder['order_seq'] | string,
+  ): Promise<FmOrderItemInput[]> {
+    const inputOptions = await this.db.query(`
+      SELECT
+        item_input_seq,
+        order_seq,
+        title,
+        value
+      FROM fm_order_item_input
+      WHERE order_seq = ${orderId}
+    `);
+    return inputOptions;
+  }
+
+  /** 주문의 선물하기 여부 조회 */
+  private async findOneOrderSuboption(
+    orderId: FmOrder['order_seq'] | string,
+  ): Promise<FmOrderItemSubOption> {
+    const suboption = await this.db.query(`
+      SELECT
+      item_suboption_seq,
+      order_seq,
+        title,
+        suboption
+      FROM fm_order_item_suboption
+      WHERE order_seq = ${orderId}
+    `);
+    return suboption;
   }
 }
