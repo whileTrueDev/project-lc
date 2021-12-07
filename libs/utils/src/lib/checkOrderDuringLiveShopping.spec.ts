@@ -10,7 +10,7 @@ const liveShopping: LiveShopping = {
   contactId: 1,
   sellerId: 1,
   goodsId: 1,
-  broadcasterId: '1',
+  broadcasterId: 1,
   whiletrueCommissionRate: new Decimal('5'),
   broadcasterCommissionRate: new Decimal('10'),
   createDate: new Date('2021-10-21 17:29:00'),
