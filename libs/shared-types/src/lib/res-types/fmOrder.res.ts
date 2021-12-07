@@ -521,6 +521,19 @@ export type FindFmOrderRes = FmOrder & {
   totalDeliveryCost: string;
   /** 이 주문에 포함된 내 모든 상품의 상품별 배송정보 */
   shippings: FmOrderShipping[];
+} & {
+  /** 해당 주문의 선물하기 여부 */
+  giftFlag?: boolean;
+  /** 해당 주문의 응원메시지, 작성자 닉네임 */
+  cheeringMessage?: CheeringMessage;
+};
+
+/** 응원메시지 */
+export type CheeringMessage = {
+  /** 닉네임 */
+  nickname?: string;
+  /** 응원메시지 */
+  text?: string;
 };
 
 /**
