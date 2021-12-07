@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Patch,
   Query,
   UseGuards,
   ValidationPipe,
@@ -21,6 +22,7 @@ import {
   CreateBroadcasterChannelDto,
   EmailDupCheckDto,
   FindBroadcasterDto,
+  PasswordValidateDto,
   SignUpDto,
 } from '@project-lc/shared-types';
 import { Broadcaster, BroadcasterAddress, BroadcasterContacts } from '.prisma/client';
@@ -148,5 +150,13 @@ export class BroadcasterController {
     @Body(ValidationPipe) dto: BroadcasterAddressDto,
   ): Promise<BroadcasterAddress> {
     return this.broadcasterService.upsertAddress(1, dto);
+  }
+
+  // 비밀번호 변경
+  @Patch('password')
+  public async changePassword(
+    @Body(ValidationPipe) dto: PasswordValidateDto,
+  ): Promise<Broadcaster> {
+    return this.broadcasterService.changePassword(dto.email, dto.password);
   }
 }

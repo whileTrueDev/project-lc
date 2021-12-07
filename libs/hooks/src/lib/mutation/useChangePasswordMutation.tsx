@@ -1,4 +1,4 @@
-import { PasswordValidateDto } from '@project-lc/shared-types';
+import { PasswordValidateDto, UserType } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import axios from '../../axios';
@@ -7,7 +7,7 @@ export type useChangePasswordMutationDto = PasswordValidateDto;
 
 export type useChangePasswordMutationRes = any;
 
-export const changePassword = async (
+export const changeSellerPassword = async (
   dto: useChangePasswordMutationDto,
 ): Promise<useChangePasswordMutationRes> => {
   const { data } = await axios.patch<useChangePasswordMutationRes>(
@@ -17,7 +17,19 @@ export const changePassword = async (
   return data;
 };
 
-export const useChangePasswordMutation = (): UseMutationResult<
+export const changeBroadcasterPassword = async (
+  dto: useChangePasswordMutationDto,
+): Promise<useChangePasswordMutationRes> => {
+  const { data } = await axios.patch<useChangePasswordMutationRes>(
+    '/broadcaster/password',
+    dto,
+  );
+  return data;
+};
+
+export const useChangePasswordMutation = (
+  userType: UserType,
+): UseMutationResult<
   useChangePasswordMutationRes,
   AxiosError,
   useChangePasswordMutationDto
@@ -27,7 +39,7 @@ export const useChangePasswordMutation = (): UseMutationResult<
     useChangePasswordMutationRes,
     AxiosError,
     useChangePasswordMutationDto
-  >(changePassword, {
+  >(userType === 'broadcaster' ? changeBroadcasterPassword : changeSellerPassword, {
     onSuccess: () => {
       queryClient.invalidateQueries('Profile', { exact: true });
     },
