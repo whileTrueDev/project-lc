@@ -90,7 +90,7 @@ export function SignupForm({
     if (isValid) {
       const email = getValues('email');
       // * 중복 확인
-      const isOk = await getEmailDupCheck(email, userType);
+      const isOk = await getEmailDupCheck(email);
       if (!isOk) {
         setError('email', {
           type: 'validate',
@@ -100,7 +100,7 @@ export function SignupForm({
         startMailVerification(email).then(() => setPhase(2));
       }
     }
-  }, [getValues, setError, startMailVerification, trigger, userType]);
+  }, [getValues, setError, startMailVerification, trigger]);
 
   // * 재전송 버튼 10초간 재클릭 불가능하도록 하는 기능
   const [tempVerifyButtonDisable, setTempVerifyButtonDisable] = useState(false);
