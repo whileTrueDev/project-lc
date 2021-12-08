@@ -129,6 +129,14 @@ export class LiveShoppingService {
           select: { youtubeUrl: true },
         },
       },
+      orderBy: [
+        {
+          sellStartDate: 'desc',
+        },
+        {
+          id: 'desc',
+        },
+      ],
     });
   }
 }

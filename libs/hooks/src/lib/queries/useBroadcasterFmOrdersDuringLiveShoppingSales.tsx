@@ -23,6 +23,6 @@ export const useBroadcasterFmOrdersDuringLiveShoppingSales = ({
   return useQuery<LiveShoppingWithSalesAndFmId[], AxiosError>(
     'broadCasterFmOrdersDuringLiveShoppingSales',
     () => getBroadcasterFmOrdersDuringLiveShoppingSales(broadcasterId),
-    { enabled },
+    { retry: 1, enabled },
   );
 };
