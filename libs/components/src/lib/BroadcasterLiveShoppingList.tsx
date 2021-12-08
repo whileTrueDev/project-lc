@@ -190,7 +190,6 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
     headerGroups,
     page,
     prepareRow,
-    //
     canPreviousPage,
     canNextPage,
     pageOptions,
@@ -210,33 +209,27 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
     },
     usePagination,
   );
-
-  const pageArray = [];
-
   return (
     <Box p={5}>
       {tableData && !isLoading && (
         <Table {...getTableProps()}>
           <Thead>
+            {console.log(headerGroups)}
             {headerGroups.map((headerGroup) => (
-              <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup}>
+              <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
                 {headerGroup.headers.map((column) => (
                   <Th key={column}>{column.render('Header')}</Th>
                 ))}
               </Tr>
             ))}
           </Thead>
-          <Tbody>
+          <Tbody {...getTableBodyProps()}>
             {page.map((row, i) => {
               prepareRow(row);
               return (
-                <Tr {...row.getRowProps()} key={i}>
+                <Tr {...row.getRowProps()} key={row.id}>
                   {row.cells.map((cell) => {
-                    return (
-                      <Td key={cell} {...cell.getCellProps()}>
-                        {cell.render('Cell')}
-                      </Td>
-                    );
+                    return <Td {...cell.getCellProps()}>{cell.render('Cell')}</Td>;
                   })}
                 </Tr>
               );
@@ -249,6 +242,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
         <Stack direction="row" alignItems="center">
           <Tooltip label="맨 앞으로">
             <IconButton
+              aria-label="very-front"
               onClick={() => gotoPage(0)}
               isDisabled={!canPreviousPage}
               icon={<ArrowLeftIcon h={3} w={3} />}
@@ -256,6 +250,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
           </Tooltip>
           <Tooltip label="이전 페이지">
             <IconButton
+              aria-label="front"
               onClick={previousPage}
               isDisabled={!canPreviousPage}
               icon={<ChevronLeftIcon h={6} w={6} />}
@@ -290,6 +285,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
           })}
           <Tooltip label="다음 페이지">
             <IconButton
+              aria-label="next"
               onClick={nextPage}
               isDisabled={!canNextPage}
               icon={<ChevronRightIcon h={6} w={6} />}
@@ -297,6 +293,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
           </Tooltip>
           <Tooltip label="맨 뒤로">
             <IconButton
+              aria-label="very-next"
               onClick={() => gotoPage(pageCount - 1)}
               isDisabled={!canNextPage}
               icon={<ArrowRightIcon h={3} w={3} />}
