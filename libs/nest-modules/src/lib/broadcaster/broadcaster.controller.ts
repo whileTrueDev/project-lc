@@ -18,6 +18,7 @@ import {
   BroadcasterContactDto,
   BroadcasterRes,
   BroadcasterSettlementInfoDto,
+  BroadcasterSettlementInfoRes,
   ChangeNicknameDto,
   CreateBroadcasterChannelDto,
   EmailDupCheckDto,
@@ -170,7 +171,7 @@ export class BroadcasterController {
   @Get('settlement-info/:broadcasterId')
   public async selectBroadcasterSettlementInfo(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
-  ): Promise<BroadcasterSettlementInfo | null> {
+  ): Promise<BroadcasterSettlementInfoRes> {
     return this.broadcasterSettlementService.selectBroadcasterSettlementInfo(
       broadcasterId,
     );

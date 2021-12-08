@@ -4,7 +4,10 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { BroadcasterSettlementInfoDto } from '@project-lc/shared-types';
+import {
+  BroadcasterSettlementInfoDto,
+  BroadcasterSettlementInfoRes,
+} from '@project-lc/shared-types';
 import { BroadcasterSettlementInfo } from '.prisma/client';
 import { BroadcasterService } from './broadcaster.service';
 import { CipherService } from '../auth/cipher.service';
@@ -47,6 +50,7 @@ export class BroadcasterSettlementService {
           ...data,
           idCardNumber: this.cipherService.getEncryptedText(idCardNumber),
           phoneNumber: this.cipherService.getEncryptedText(phoneNumber),
+          confirmation: { update: { status: 'waiting' } },
         },
       });
     } catch (error) {
@@ -60,13 +64,13 @@ export class BroadcasterSettlementService {
    */
   async selectBroadcasterSettlementInfo(
     broadcasterId: number,
-  ): Promise<BroadcasterSettlementInfo | null> {
+  ): Promise<BroadcasterSettlementInfoRes> {
     try {
       const data = await this.prisma.broadcasterSettlementInfo.findUnique({
         where: { broadcasterId },
         include: { confirmation: true },
       });
-      if (!data) return data;
+      if (!data) return null;
 
       // 주민등록번호, 휴대전화는 복호화 한 후 일부를 가린상태로 전송
       const { idCardNumber, phoneNumber } = data;
