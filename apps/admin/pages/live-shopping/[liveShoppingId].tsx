@@ -126,7 +126,6 @@ export function GoodsDetail(): JSX.Element {
     const dto = Object.assign(data, { id: liveShoppingId });
     mutateAsync({ dto, videoUrlExist }).then(onSuccess).catch(onFail);
   };
-
   if (liveShoppingIsLoading || goods.isLoading)
     return <AdminPageLayout>...loading</AdminPageLayout>;
 
