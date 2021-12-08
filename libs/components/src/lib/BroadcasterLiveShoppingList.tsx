@@ -1,5 +1,5 @@
-import React from 'react';
-import { useTable, usePagination } from 'react-table';
+import React, { useMemo } from 'react';
+import { useTable, usePagination, useSortBy } from 'react-table';
 import {
   Table,
   Thead,
@@ -17,82 +17,156 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  chakra,
+  Box,
 } from '@chakra-ui/react';
 import {
   ArrowRightIcon,
   ArrowLeftIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
+  TriangleDownIcon,
+  TriangleUpIcon,
 } from '@chakra-ui/icons';
 import {
   useDeleteLiveShopping,
-  useFmOrdersDuringLiveShoppingSales,
-  useLiveShoppingList,
+  useBroadcasterFmOrdersDuringLiveShoppingSales,
+  useBroadcasterLiveShoppingList,
   useProfile,
 } from '@project-lc/hooks';
 
+// export interface LiveShoppingWithSalesFrontType extends LiveShoppingWithoutDate {
+//   sellStartDate: string | Date | undefined | null;
+//   sellEndDate: string | Date | undefined | null;
+//   sales?: string | null;
+//   broadcaster: BroadcasterDTOWithoutUserId;
+//   goods: Pick<GoodsWithConfirmation, 'goods_name' | 'summary'>;
+//   seller: { sellerShop: SellerShop };
+//   liveShoppingVideo: { youtubeUrl: string } | null;
+// }
+
 export function BroadcasterLiveShoppingList(): JSX.Element {
-  const columns = React.useMemo(
+  const { data: profileData } = useProfile();
+  const { data: tableData, isLoading } = useBroadcasterLiveShoppingList({
+    broadcasterId: profileData?.id || 0,
+    enabled: !!profileData?.id,
+  });
+
+  const { data: salesData } = useBroadcasterFmOrdersDuringLiveShoppingSales({
+    broadcasterId: profileData?.id || 0,
+    enabled: !!profileData?.id,
+  });
+
+  const liveShoppingWithSales: any[] = [];
+
+  if (tableData && salesData) {
+    for (let i = 0; i < tableData.length; i++) {
+      liveShoppingWithSales.push({
+        ...tableData[i],
+        ...salesData.find((itmInner) => itmInner.id === tableData[i].id),
+      });
+    }
+  }
+
+  const columns = useMemo(
     () => [
       {
-        Header: 'Name',
-        columns: [
-          {
-            Header: 'First Name',
-            accessor: 'firstName',
-          },
-          {
-            Header: 'Last Name',
-            accessor: 'lastName',
-          },
-        ],
+        Header: '상품명',
+        accessor: 'goods.goods_name',
       },
       {
-        Header: 'Info',
-        columns: [
-          {
-            Header: 'Age',
-            accessor: 'age',
-          },
-          {
-            Header: 'Visits',
-            accessor: 'visits',
-          },
-          {
-            Header: 'Status',
-            accessor: 'status',
-          },
-          {
-            Header: 'Profile Progress',
-            accessor: 'progress',
-          },
-        ],
+        Header: '상태',
+        accessor: 'progress',
+      },
+      {
+        Header: '판매자',
+        accessor: 'seller.sellerShop.shopName',
+      },
+      {
+        Header: '방송시간',
+        accessor: 'broadcastStartDate',
+      },
+      {
+        Header: '판매시간',
+        accessor: 'sellStartDate',
+      },
+      {
+        Header: '매출',
+        accessor: 'sales',
+      },
+      {
+        Header: '유튜브영상',
+        accessor: 'liveShoppingVideo.youtubeUrl',
       },
     ],
     [],
   );
-  // const { getTableProps, getTableBodyProps, headerGroups, prepareRow } = useTable(
-  //   {
-  //     columns,
-  //   },
-  //   usePagination,
+
+  // const defaultData = useMemo(
+  //   () => [
+  //     {
+  //       goods: {
+  //         goods_name: '',
+  //       },
+  //       progress: '',
+  //       seller: {
+  //         sellerShop: {
+  //           shopName: '',
+  //         },
+  //       },
+  //       broadcastStartDate: '',
+  //       sellStartDate: '',
+  //       sale: '',
+  //       liveShoppingVideo: {
+  //         youtubeUrl: '',
+  //       },
+  //     },
+  //   ],
+  //   [],
   // );
-  const { data: profileData } = useProfile();
-  console.log(profileData);
-  const { data, isLoading } = useLiveShoppingList({});
+  console.log(tableData);
+  // console.log(liveShoppingWithSales);
+
+  const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } = useTable(
+    {
+      columns,
+      data: liveShoppingWithSales,
+    },
+    usePagination,
+  );
+
   return (
-    <Table>
-      <Thead>
-        <Tr>
-          <Th>Hello</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        <Tr>
-          <Td>Wordl</Td>
-        </Tr>
-      </Tbody>
-    </Table>
+    <Box p={5}>
+      {tableData && !isLoading && (
+        <Table {...getTableProps()}>
+          <Thead>
+            {headerGroups.map((headerGroup) => (
+              <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup}>
+                {headerGroup.headers.map((column) => (
+                  <Th key={column}>{column.render('Header')}</Th>
+                ))}
+              </Tr>
+            ))}
+          </Thead>
+          <Tbody>
+            {page.map((row, i) => {
+              prepareRow(row);
+              return (
+                <Tr {...row.getRowProps()} key={i}>
+                  {row.cells.map((cell) => {
+                    return (
+                      <Td key={cell} {...cell.getCellProps()}>
+                        {cell.render('Cell')}
+                      </Td>
+                    );
+                  })}
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </Table>
+      )}
+    </Box>
   );
 }
 export default BroadcasterLiveShoppingList;

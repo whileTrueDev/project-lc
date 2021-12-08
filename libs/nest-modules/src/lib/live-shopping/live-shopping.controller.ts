@@ -60,9 +60,9 @@ export class LiveShoppingController {
     return goodsList;
   }
 
-  @Get('/broadacaster')
+  @Get('/broadcaster')
   getBroadcasterLiveShoppings(
-    @Query(ValidationPipe) broadcasterId: number,
+    @Query('broadcasterId') broadcasterId: number,
   ): Promise<LiveShoppingWithConfirmation[]> {
     return this.liveShoppingService.getBroadcasterRegisteredLiveShoppings(broadcasterId);
   }

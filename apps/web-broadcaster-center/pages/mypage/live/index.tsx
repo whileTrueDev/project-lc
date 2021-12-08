@@ -6,7 +6,7 @@ import {
 
 export function LiveShoppingIndex(): JSX.Element {
   return (
-    <MypageLayout siteType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
+    <MypageLayout appType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
       <BroadcasterLiveShoppingList />
     </MypageLayout>
   );

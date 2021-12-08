@@ -101,7 +101,7 @@ export class LiveShoppingService {
     // 자신의 id를 반환하는 쿼리 수행하기
     return this.prisma.liveShopping.findMany({
       where: {
-        broadcasterId,
+        broadcasterId: Number(broadcasterId),
       },
       include: {
         goods: {
