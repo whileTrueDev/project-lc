@@ -329,7 +329,7 @@ export class FmOrdersService {
     return {
       ...order,
       giftFlag,
-      cheeringMessage,
+      cheeringMessage: cheeringMessage || undefined,
     };
   }
 
