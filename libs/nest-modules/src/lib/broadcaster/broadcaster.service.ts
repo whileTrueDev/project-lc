@@ -205,4 +205,17 @@ export class BroadcasterService {
     });
     return broadcaster;
   }
+
+  async changeContractionAgreement(
+    email: string,
+    agreementFlag: boolean,
+  ): Promise<Broadcaster> {
+    const broadcaster = await this.prisma.broadcaster.update({
+      where: { email },
+      data: {
+        agreementFlag,
+      },
+    });
+    return broadcaster;
+  }
 }

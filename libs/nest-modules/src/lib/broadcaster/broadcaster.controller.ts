@@ -24,6 +24,7 @@ import {
   FindBroadcasterDto,
   PasswordValidateDto,
   SignUpDto,
+  BroadcasterContractionAgreementDto,
 } from '@project-lc/shared-types';
 import { Broadcaster, BroadcasterAddress, BroadcasterContacts } from '.prisma/client';
 import { MailVerificationService } from '../auth/mailVerification.service';
@@ -167,5 +168,16 @@ export class BroadcasterController {
     @Body(ValidationPipe) dto: PasswordValidateDto,
   ): Promise<Broadcaster> {
     return this.broadcasterService.changePassword(dto.email, dto.password);
+  }
+
+  // 비밀번호 변경
+  @Patch('agreement')
+  public async changeContractionAgreement(
+    @Body(ValidationPipe) dto: BroadcasterContractionAgreementDto,
+  ): Promise<Broadcaster> {
+    return this.broadcasterService.changeContractionAgreement(
+      dto.email,
+      dto.agreementFlag,
+    );
   }
 }
