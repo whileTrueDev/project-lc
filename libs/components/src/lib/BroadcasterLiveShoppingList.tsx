@@ -84,24 +84,26 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       {
         Header: '상품명',
         accessor: 'goods.confirmation.firstmallGoodsConnectionId',
-        Cell: ({ _, row }) => {
+        Cell: ({ _, row }: any) => {
           return (
-            <Link
-              href={`http://whiletrue.firstmall.kr/goods/view?no=${row.original.goods.confirmation.firstmallGoodsConnectionId}`}
-              isExternal
-              overflow="hidden"
-              whiteSpace="nowrap"
-              textOverflow="ellipsis"
-            >
-              {row.original.goods.goods_name} <ExternalLinkIcon mx="2px" />
-            </Link>
+            <Tooltip label="상품페이지로 이동">
+              <Link
+                href={`http://whiletrue.firstmall.kr/goods/view?no=${row.original.goods.confirmation.firstmallGoodsConnectionId}`}
+                isExternal
+                overflow="hidden"
+                whiteSpace="nowrap"
+                textOverflow="ellipsis"
+              >
+                {row.original.goods.goods_name} <ExternalLinkIcon mx="2px" />
+              </Link>
+            </Tooltip>
           );
         },
       },
       {
         Header: '상태',
         accessor: 'progress',
-        Cell: ({ _, row }) => {
+        Cell: ({ _, row }: any) => {
           return (
             <LiveShoppingProgressBadge
               progress={row.progress}
@@ -118,7 +120,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       },
       {
         Header: '방송시간',
-        accessor: (row) =>
+        accessor: (row: any) =>
           `${
             row.broadcastStartDate
               ? dayjs(row.broadcastStartDate).format('YYYY/MM/DD HH:mm')
@@ -131,7 +133,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       },
       {
         Header: '판매시간',
-        accessor: (row) =>
+        accessor: (row: any) =>
           `${
             row.sellStartDate
               ? dayjs(row.sellStartDate).format('YYYY/MM/DD HH:mm')
@@ -142,14 +144,14 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       },
       {
         Header: '매출',
-        accessor: (row) =>
+        accessor: (row: any) =>
           `${row.sales ? row.sales.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'}원`,
       },
       {
         // 'liveShoppingVideo.youtubeUrl'
         Header: '유튜브영상',
         accessor: 'liveShoppingVideo.youtubeUrl',
-        Cell: ({ value, row }) => {
+        Cell: ({ value, row }: any) => {
           if (row.liveShoppingVideo) {
             return (
               <Link
@@ -169,7 +171,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       {
         Header: () => null,
         id: 'detail',
-        Cell: ({ _, row }) => (
+        Cell: ({ _, row }: any) => (
           <Button
             size="xs"
             colorScheme="blue"
@@ -204,10 +206,12 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       data: liveShoppingWithSales,
       autoResetSortBy: false,
       autoResetPage: false,
-      initialState: { pageIndex: 1 },
+      initialState: { pageIndex: 0 },
     },
     usePagination,
   );
+
+  const pageArray = [];
 
   return (
     <Box p={5}>
@@ -242,7 +246,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       )}
       <Flex justifyContent="space-between" m={4} alignItems="center">
         <Flex />
-        <Stack direction="row">
+        <Stack direction="row" alignItems="center">
           <Tooltip label="맨 앞으로">
             <IconButton
               onClick={() => gotoPage(0)}
@@ -257,6 +261,33 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
               icon={<ChevronLeftIcon h={6} w={6} />}
             />
           </Tooltip>
+          {[...Array(pageOptions.length)].map((e, i) => {
+            return pageIndex === i ? (
+              <Text
+                key={i}
+                fontWeight="bold"
+                as="ins"
+                cursor="pointer"
+                size="2xl"
+                onClick={() => {
+                  gotoPage(i);
+                }}
+              >
+                {i + 1}
+              </Text>
+            ) : (
+              <Text
+                key={i}
+                cursor="pointer"
+                size="2xl"
+                onClick={() => {
+                  gotoPage(i);
+                }}
+              >
+                {i + 1}
+              </Text>
+            );
+          })}
           <Tooltip label="다음 페이지">
             <IconButton
               onClick={nextPage}
@@ -285,16 +316,6 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
               </option>
             ))}
           </Select>
-          <Text flexShrink="0" mr={8}>
-            Page{' '}
-            <Text fontWeight="bold" as="span">
-              {pageIndex + 1}
-            </Text>{' '}
-            of{' '}
-            <Text fontWeight="bold" as="span">
-              {pageOptions.length}
-            </Text>
-          </Text>
         </Flex>
       </Flex>
       {tableData &&
