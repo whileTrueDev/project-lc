@@ -148,10 +148,9 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
           `${row.sales ? row.sales.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'}원`,
       },
       {
-        // 'liveShoppingVideo.youtubeUrl'
         Header: '유튜브영상',
         accessor: 'liveShoppingVideo.youtubeUrl',
-        Cell: ({ value, row }: any) => {
+        Cell: ({ _, row }: any) => {
           if (row.liveShoppingVideo) {
             return (
               <Link
@@ -214,22 +213,31 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       {tableData && !isLoading && (
         <Table {...getTableProps()}>
           <Thead>
-            {console.log(headerGroups)}
             {headerGroups.map((headerGroup) => (
-              <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
+              <Tr
+                {...headerGroup.getHeaderGroupProps()}
+                key={headerGroup.id}
+                data-key={headerGroup.id}
+              >
                 {headerGroup.headers.map((column) => (
-                  <Th key={column}>{column.render('Header')}</Th>
+                  <Th key={column.id} data-key={column.id}>
+                    {column.render('Header')}
+                  </Th>
                 ))}
               </Tr>
             ))}
           </Thead>
           <Tbody {...getTableBodyProps()}>
-            {page.map((row, i) => {
+            {page.map((row) => {
               prepareRow(row);
               return (
-                <Tr {...row.getRowProps()} key={row.id}>
+                <Tr {...row.getRowProps()} key={row.id} data-key={row.id}>
                   {row.cells.map((cell) => {
-                    return <Td {...cell.getCellProps()}>{cell.render('Cell')}</Td>;
+                    return (
+                      <Td key={cell.id} data-key={cell.id} {...cell.getCellProps()}>
+                        {cell.render('Cell')}
+                      </Td>
+                    );
                   })}
                 </Tr>
               );
@@ -256,10 +264,10 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
               icon={<ChevronLeftIcon h={6} w={6} />}
             />
           </Tooltip>
-          {[...Array(pageOptions.length)].map((e, i) => {
+          {[...Array(pageOptions.length)].map((value, i) => {
             return pageIndex === i ? (
               <Text
-                key={i}
+                key={value}
                 fontWeight="bold"
                 as="ins"
                 cursor="pointer"
@@ -272,7 +280,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
               </Text>
             ) : (
               <Text
-                key={i}
+                key={value}
                 cursor="pointer"
                 size="2xl"
                 onClick={() => {
