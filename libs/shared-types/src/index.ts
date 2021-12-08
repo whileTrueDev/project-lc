@@ -22,6 +22,7 @@ export * from './lib/dto/adminSettlementInfo.dto';
 export * from './lib/dto/broadcaster.dto';
 export * from './lib/dto/broadcasterAddress.dto';
 export * from './lib/dto/broadcasterContact.dto';
+export * from './lib/dto/broadcasterSettlementInfo.dto';
 export * from './lib/dto/businessRegistration.dto';
 export * from './lib/dto/businessRegistrationConfirmation.dto';
 export * from './lib/dto/changeFmOrderStatus.dto';
