@@ -18,7 +18,6 @@ import {
   isOrderExportable,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
-import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useMemo } from 'react';
@@ -58,8 +57,7 @@ const hiddenColumns: GridColumns = [
     headerName: '배송메시지',
     hide: true,
     valueFormatter: ({ row }) => {
-      const parser = new FmOrderMemoParser(row.memo);
-      return parser.memo;
+      return row.memo;
     },
   },
   { field: 'shipping_cost', headerName: '배송비', hide: true },
@@ -209,9 +207,7 @@ export function OrderList(): JSX.Element {
   const filteredOrders = useMemo(() => {
     if (!orders.data) return [];
     return orders.data.filter((d) => {
-      const parser = new FmOrderMemoParser(d.memo || '');
-      // 선물하기가 아닌 주문만 필터링
-      return !parser.giftFlag;
+      return !d.giftFlag;
     });
   }, [orders.data]);
 
