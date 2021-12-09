@@ -151,9 +151,9 @@ export const dummyGoodsList: DummyGoodsDataType[] = [
     confirmation: { status: 'confirmed', firstmallGoodsConnectionId: 42 },
   },
   {
-    goods_name: 'testGoods4 x 테스트방송인',
+    goods_name: 'testGoods4 - 선물상품 조회 테스트 83번',
     summary: '라이브쇼핑 연결',
-    confirmation: { status: 'confirmed', firstmallGoodsConnectionId: 68 },
+    confirmation: { status: 'confirmed', firstmallGoodsConnectionId: 83 },
   },
 ];
 

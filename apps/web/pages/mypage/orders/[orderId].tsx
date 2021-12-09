@@ -39,7 +39,6 @@ import {
   convertFmOrderShippingTypesToString,
   FmOrderShipping,
 } from '@project-lc/shared-types';
-import { FmOrderMemoParser } from '@project-lc/utils';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 
@@ -60,9 +59,8 @@ export function OrderDetail(): JSX.Element {
   // 현재 주문이 조회 가능한 주문인지 확인
   const isViewableOrder = useMemo(() => {
     if (!order.data) return null;
-    const parser = new FmOrderMemoParser(order.data.memoOriginal);
     // 주문이 선물용이 아닌 경우 조회 가능한 주문임.
-    return !parser.giftFlag;
+    return !order.data.giftFlag;
   }, [order.data]);
 
   if (order.isLoading) {

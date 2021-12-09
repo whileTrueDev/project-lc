@@ -184,6 +184,13 @@ describe('FmOrdersService', () => {
         .spyOn(db, 'query')
         .mockImplementation(async () => ordersSample);
 
+      await jest
+        .spyOn(FmOrdersService.prototype as any, 'findOneOrderGiftFlag')
+        .mockImplementation(() => null);
+      await jest
+        .spyOn(FmOrdersService.prototype as any, 'findOneOrderCheeringMessage')
+        .mockImplementation(() => null);
+
       const orders = await service.findOrders(testGoodsIds, dto);
       const { sql, params } = service['createFindOrdersQuery'](testGoodsIds, dto);
 
