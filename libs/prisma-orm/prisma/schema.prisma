@@ -567,7 +567,7 @@ model BroadcasterSettlementInfo {
   accountImageName      String? // 통장사본 파일 s3에 저장된 파일명(s3)
   taxManageAgreement    Boolean                                @default(false) //세무처리 관련 동의(개인사업자에만 해당)
   personalInfoAgreement Boolean                                @default(false) //정산정보 등록에 따른 개인정보 수집 및 이용동의(필수)
-  settlementAgreement   Boolean                                @default(false) //정산등록 신청서 제출에 대한 확인여부(필수
+  settlementAgreement   Boolean? //정산등록 신청서 제출에 대한 확인여부(과세유형이 개인사업자 경우만 필수)
   broadcaster           Broadcaster                            @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
   broadcasterId         Int                                    @unique
   confirmation          BroadcasterSettlementInfoConfirmation?
