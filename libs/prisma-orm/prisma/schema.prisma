@@ -557,14 +557,14 @@ model BroadcasterChannel {
 model BroadcasterSettlementInfo {
   id                    Int                                    @id @default(autoincrement())
   type                  TaxationType                           @default(naturalPerson) // 과세유형 (개인 | 개인사업자) 
-  name                  String? // 개인 이름 혹은 개인사업자명
-  idCardNumber          String? // 암호화된 주민등록번호
-  phoneNumber           String? // 암호화된 휴대전화번호
-  bank                  String? // 은행이름
-  accountNumber         String? // 계좌번호
-  accountHolder         String? // 예금주
-  idCardImageName       String? // 주민등록번호 파일 s3에 저장된 파일명(s3)
-  accountImageName      String? // 통장사본 파일 s3에 저장된 파일명(s3)
+  name                  String // 개인 이름 혹은 개인사업자명
+  idCardNumber          String // 암호화된 주민등록번호
+  phoneNumber           String // 암호화된 휴대전화번호
+  bank                  String // 은행이름
+  accountNumber         String // 계좌번호
+  accountHolder         String // 예금주
+  idCardImageName       String // 주민등록번호 파일 s3에 저장된 파일명(s3)
+  accountImageName      String // 통장사본 파일 s3에 저장된 파일명(s3)
   taxManageAgreement    Boolean                                @default(false) //세무처리 관련 동의(개인사업자에만 해당)
   personalInfoAgreement Boolean                                @default(false) //정산정보 등록에 따른 개인정보 수집 및 이용동의(필수)
   settlementAgreement   Boolean? //정산등록 신청서 제출에 대한 확인여부(과세유형이 개인사업자 경우만 필수)
