@@ -29,46 +29,6 @@ import FmOrderStatusBadge from './FmOrderStatusBadge';
 import OrderListDownloadDialog from './OrderListDownloadDialog';
 import TooltipedText from './TooltipedText';
 
-// CSV다운로드 기능 임시 제거로 인해 사용은 하지 않고 일단 둠.
-const hiddenColumns: GridColumns = [
-  { field: 'order_user_name', headerName: '주문자', hide: true },
-  { field: 'order_email', headerName: '주문자이메일', hide: true },
-  { field: 'order_cellphone', headerName: '주문자휴대폰', hide: true },
-  { field: 'order_phone', headerName: '주문자연락처', hide: true },
-  { field: 'recipient_user_name', headerName: '수령인', hide: true },
-  { field: 'recipient_email', headerName: '수령인이메일', hide: true },
-  { field: 'recipient_cellphone', headerName: '수령인휴대폰', hide: true },
-  { field: 'recipient_phone', headerName: '수령인연락처', hide: true },
-  { field: 'recipient_zipcode', headerName: '우편번호', hide: true },
-  {
-    field: 'recipient_address',
-    headerName: '배송지주소(지번)',
-    hide: true,
-    valueFormatter: ({ row }) =>
-      `${row.recipient_address} ${row.recipient_address_detail}`,
-  },
-  {
-    field: 'recipient_address_street',
-    headerName: '배송지주소(도로명)',
-    hide: true,
-    valueFormatter: ({ row }) =>
-      `${row.recipient_address_street} ${row.recipient_address_detail}`,
-  },
-  {
-    field: 'memo',
-    headerName: '배송메시지',
-    hide: true,
-    valueFormatter: ({ row }) => {
-      const parser = new FmOrderMemoParser(row.memo);
-      return parser.memo;
-    },
-  },
-  { field: 'shipping_cost', headerName: '배송비', hide: true },
-  { field: 'admin_memo', headerName: '관리자메모', hide: true },
-  { field: 'npay_order_id', headerName: '네이버페이 주문번호', hide: true },
-  { field: 'goods_seq', headerName: '상품고유번호', hide: true },
-];
-
 const columns: GridColumns = [
   {
     field: 'id',
