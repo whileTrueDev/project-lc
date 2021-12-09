@@ -14,7 +14,7 @@ export const useBroadcasterSettlementInfoMutation = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation<ResType, AxiosError, BroadcasterSettlementInfoDto>(
     (dto: BroadcasterSettlementInfoDto) =>
-      axios.post<ResType>('/broadcaster/settlement', dto).then((res) => res.data),
+      axios.post<ResType>('/broadcaster/settlement-info', dto).then((res) => res.data),
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('BroadcasterSettlementInfo');
