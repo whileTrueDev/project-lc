@@ -100,20 +100,21 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
               onChange={(value) => {
                 setValue('taxType', value);
               }}
-              defaultValue="개인(사업소득)"
+              defaultValue="naturalPerson"
             >
               <Stack spacing={3} direction="row">
-                <Radio {...register('taxType')} value="개인(사업소득)">
+                <Radio {...register('taxType')} value="naturalPerson">
                   개인(사업소득)
                 </Radio>
-                <Radio {...register('taxType')} value="개인사업자">
+                <Radio {...register('taxType')} value="selfEmployedBusiness">
                   개인사업자
                 </Radio>
               </Stack>
             </RadioGroup>
           }
         />
-        {watch('taxType') === '개인사업자' && (
+        {/* 개인사업자 (taxType === selfEmployedBusiness) 인 경우만 세무처리 관련 동의 받음 */}
+        {watch('taxType') === 'selfEmployedBusiness' && (
           <GridRowLayout
             header="세무처리 관련 설명"
             body={
