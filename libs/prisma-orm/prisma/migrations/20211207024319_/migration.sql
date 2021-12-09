@@ -1,3 +1,6 @@
+-- DropForeignKey
+ALTER TABLE `BroadcasterContacts` DROP FOREIGN KEY `BroadcasterContacts_broadcasterId_fkey`;
+
 -- DropIndex
 DROP INDEX `BroadcasterContacts_broadcasterId_fkey` ON `BroadcasterContacts`;
 
