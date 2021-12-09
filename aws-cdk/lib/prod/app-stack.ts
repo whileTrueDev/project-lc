@@ -283,7 +283,7 @@ export class LCProdAppStack extends cdk.Stack {
       NAVER_CLIENT_SECRET: __loadSsmParmeter(c.NAVER_CLIENT_SECRET_KEY, 2),
       KAKAO_CLIENT_ID: __loadSsmParmeter(c.KAKAO_CLIENT_ID_KEY, 2),
       MAILER_USER: __loadSsmParmeter(c.MAILER_USER_KEY, 2),
-      MAILER_PASS: __loadSsmParmeter(c.MAILER_PASS_KEY, 3),
+      MAILER_PASS: __loadSsmParmeter(c.MAILER_PASS_KEY, 4),
       GMAIL_OAUTH_REFRESH_TOKEN: __loadSsmParmeter(c.GMAIL_OAUTH_REFRESH_TOKEN),
       GMAIL_OAUTH_CLIENT_ID: __loadSsmParmeter(c.GMAIL_OAUTH_CLIENT_ID),
       GMAIL_OAUTH_CLIENT_SECRET: __loadSsmParmeter(c.GMAIL_OAUTH_CLIENT_SECRET),
