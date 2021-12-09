@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useTable, usePagination } from 'react-table';
+import { useTable, usePagination, TableInstance } from 'react-table';
 import {
   Table,
   Thead,
@@ -198,7 +198,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
     previousPage,
     setPageSize,
     state: { pageIndex, pageSize },
-  } = useTable(
+  }: TableInstance = useTable(
     {
       columns,
       data: liveShoppingWithSales,
