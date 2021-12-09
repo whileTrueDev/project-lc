@@ -7,11 +7,16 @@ export const MB = 1024 * 1024; // 1Mbytes
 export type ImageInputErrorTypes = 'over-size' | 'invalid-format' | undefined;
 
 type ImageInputProps = {
-  handleSuccess: (fileName: string, file: File) => void;
+  handleSuccess: (
+    fileName: string,
+    file: File,
+    type?: 'vertical-banner' | 'donation-images',
+  ) => void;
   handleError: (errorType?: ImageInputErrorTypes) => void;
   variant?: 'unstyle' | 'chakra';
   size?: ButtonProps['size'];
   imageSizeLimit?: number; // 업로드 파일 용량 제한
+  type?: 'vertical-banner' | 'donation-images';
 } & Pick<React.HTMLProps<HTMLButtonElement>, 'required' | 'multiple'>;
 
 export function ImageInput({
@@ -22,6 +27,7 @@ export function ImageInput({
   multiple = false,
   imageSizeLimit = 10 * MB, // 이미지 파일 크기 제한 기본 10mb
   size,
+  type,
 }: ImageInputProps): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -40,7 +46,7 @@ export function ImageInput({
     }
 
     // 확장자, 이미지 사이즈 검사 통과한 경우
-    handleSuccess(imageName, myImage);
+    handleSuccess(imageName, myImage, type);
   };
 
   const readImage = (event: React.ChangeEvent<HTMLInputElement>): void => {

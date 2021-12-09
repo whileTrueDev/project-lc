@@ -10,13 +10,14 @@ import {
 import { LiveShopping, LiveShopppingProgressType } from '@prisma/client';
 
 import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
+import { LiveShoppingInput } from '../..';
 
 export class LiveShoppingDTO {
   @IsNumber()
   id: number;
 
-  @IsString()
-  streamId: string;
+  // @IsString()
+  // streamId: string;
 
   @IsOptional()
   @IsString()
@@ -78,8 +79,9 @@ export class LiveShoppingDTO {
 
 export type LiveShoppingRegistDTO = Pick<
   LiveShoppingDTO,
-  'requests' | 'goods_id' | 'contactId' | 'streamId' | 'progress'
->;
+  'requests' | 'goods_id' | 'contactId' | 'progress'
+> &
+  Pick<LiveShoppingInput, 'desiredPeriod' | 'desiredCommission'>;
 
 export type LiveShoppingWithSales = Pick<
   LiveShoppingDTO,

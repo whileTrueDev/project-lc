@@ -521,6 +521,19 @@ export type FindFmOrderRes = FmOrder & {
   totalDeliveryCost: string;
   /** 이 주문에 포함된 내 모든 상품의 상품별 배송정보 */
   shippings: FmOrderShipping[];
+} & {
+  /** 해당 주문의 선물하기 여부 */
+  giftFlag?: boolean;
+  /** 해당 주문의 응원메시지, 작성자 닉네임 */
+  cheeringMessage?: CheeringMessage;
+};
+
+/** 응원메시지 */
+export type CheeringMessage = {
+  /** 닉네임 */
+  nickname?: string;
+  /** 응원메시지 */
+  text?: string;
 };
 
 /**
@@ -591,6 +604,34 @@ export interface FmOrderOption {
    * 옵션 금액 (할인 제외)
    */
   ori_price: string;
+}
+
+/**
+ * 주문상품 추가옵션(선물하기 옵션)
+ */
+export interface FmOrderItemSubOption {
+  /** 추가옵션 고유번호 */
+  item_suboption_seq: number;
+  /** 주문 번호 */
+  order_seq: number;
+  /** 옵션 제목(선물하기 여부) */
+  title: string;
+  /** 옵션 값 (선물하기) */
+  suboption: string;
+}
+
+/**
+ * 주문상품 입력옵션(닉네임, 응원메시지)
+ */
+export interface FmOrderItemInput {
+  /** 입력옵션 고유번호 */
+  item_input_seq: number;
+  /** 주문 번호 */
+  order_seq: number;
+  /** 옵션 제목 (닉네임 | 응원메시지) */
+  title: string;
+  /** 입력값 */
+  value: string;
 }
 
 export interface FmOrderExportBase {
@@ -781,8 +822,10 @@ export type FmOrderMetaInfo = Pick<
   /** 상품별 배송정보 */
   shippings: FmOrderShipping[];
 } & {
-  /** 배송메모 전문 */
-  memoOriginal: string | null;
+  /** 해당 주문의 선물하기 여부 */
+  giftFlag?: boolean;
+  /** 해당 주문의 응원메시지, 작성자 닉네임 */
+  cheeringMessage?: CheeringMessage;
 };
 
 export interface FmOrderRefundBase {
