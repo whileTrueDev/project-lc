@@ -8,19 +8,71 @@ import {
 } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
 import { banks } from '@project-lc/shared-types';
-import { CustomRowItem, SectionHeading } from './BroadcasterSettlementInfoDialog';
-import { ImageInput } from './ImageInput';
+import { useCallback } from 'react';
+import { GridRowLayout, SectionHeading } from './BroadcasterSettlementInfoDialog';
+import { ImageInput, ImageInputErrorTypes } from './ImageInput';
+
+type AccountImage = {
+  accountImageFile: File | null;
+  accountImageName: string | null;
+};
+// 정산계좌정보 입력폼 데이터 타입
+export type BroadcasterAccountData = {
+  bank: string;
+  accountNumber: number;
+  accountHolder: string;
+} & AccountImage;
 
 export function BroadcasterSettlementInfoAccount(): JSX.Element {
   const {
     register,
+    setValue,
+    clearErrors,
+    setError,
     formState: { errors },
-  } = useFormContext();
+  } = useFormContext<BroadcasterAccountData>();
+
+  const handleSuccess = useCallback(
+    (fileName: string, file: File): void => {
+      setValue('accountImageFile', file);
+      setValue('accountImageName', fileName);
+      clearErrors(['accountImageFile', 'accountImageName']);
+    },
+    [clearErrors, setValue],
+  );
+
+  const handleError = useCallback(
+    (errorType?: ImageInputErrorTypes): void => {
+      switch (errorType) {
+        case 'over-size': {
+          setError('accountImageFile', {
+            type: 'validate',
+            message: '10MB 이하의 이미지를 업로드해주세요.',
+          });
+          break;
+        }
+        case 'invalid-format': {
+          setError('accountImageFile', {
+            type: 'error',
+            message: '파일의 형식이 올바르지 않습니다.',
+          });
+          break;
+        }
+        default: {
+          // only chrome
+          setValue('accountImageFile', null);
+          setValue('accountImageName', '');
+          clearErrors(['accountImageFile', 'accountImageName']);
+        }
+      }
+    },
+    [clearErrors, setError, setValue],
+  );
   return (
     <VStack alignItems="stretch">
       <SectionHeading>정산계좌정보</SectionHeading>
       <Grid templateColumns="1fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-        <CustomRowItem
+        <GridRowLayout
           header="은행"
           body={
             <Select
@@ -41,7 +93,7 @@ export function BroadcasterSettlementInfoAccount(): JSX.Element {
             </Select>
           }
         />
-        <CustomRowItem
+        <GridRowLayout
           header="계좌번호"
           body={
             <FormControl isInvalid={!!errors.accountNumber}>
@@ -65,7 +117,7 @@ export function BroadcasterSettlementInfoAccount(): JSX.Element {
             </FormControl>
           }
         />
-        <CustomRowItem
+        <GridRowLayout
           header="예금주명"
           body={
             <FormControl isInvalid={!!errors.accountHolder}>
@@ -85,22 +137,17 @@ export function BroadcasterSettlementInfoAccount(): JSX.Element {
             </FormControl>
           }
         />
-        <CustomRowItem
+        <GridRowLayout
           header="통장사본 이미지 업로드"
           body={
-            <FormControl isInvalid={!!errors.settlementAccountImage}>
+            <FormControl isInvalid={!!errors.accountImageFile}>
               <ImageInput
-                variant="chakra"
                 size="sm"
-                handleSuccess={() => {
-                  console.log('success');
-                }}
-                handleError={() => {
-                  console.log('error');
-                }}
+                handleSuccess={handleSuccess}
+                handleError={handleError}
               />
               <FormErrorMessage ml={3} mt={0}>
-                {errors.settlementAccountImage && errors.settlementAccountImage.message}
+                {errors.accountImageFile && errors.accountImageFile.message}
               </FormErrorMessage>
             </FormControl>
           }

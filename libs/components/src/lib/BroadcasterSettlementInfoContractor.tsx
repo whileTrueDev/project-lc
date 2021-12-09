@@ -11,48 +11,110 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
+import { useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { TAX_MANAGEMENT_TERM } from '../constants/broadcastetSettlementTerms';
 import {
-  CustomRowItem,
+  GridRowLayout,
   SectionHeading,
   TermBox,
 } from './BroadcasterSettlementInfoDialog';
-import { ImageInput } from './ImageInput';
+import { ImageInput, ImageInputErrorTypes } from './ImageInput';
+
+type PhoneNumber = {
+  phone1: number;
+  phone2: number;
+  phone3: number;
+};
+type IdCardNumber = {
+  idCardNumber1: number;
+  idCardNumber2: number;
+};
+type IdCardImage = {
+  idCardImageFile: File | null;
+  idCardImageName: string | null;
+};
+// 계약자 정보 입력폼 데이터 타입
+export type BroadcasterContractorData = {
+  taxType: string;
+  taxManageAgreement: boolean;
+  name: string;
+} & PhoneNumber &
+  IdCardNumber &
+  IdCardImage;
 
 export function BroadcasterSettlementInfoContractor(): JSX.Element {
   const {
     register,
     formState: { errors },
     setValue,
+    clearErrors,
+    setError,
     watch,
-  } = useFormContext();
+  } = useFormContext<BroadcasterContractorData>();
+
+  const handleSuccess = useCallback(
+    (fileName: string, file: File): void => {
+      setValue('idCardImageFile', file);
+      setValue('idCardImageName', fileName);
+      clearErrors(['idCardImageFile', 'idCardImageName']);
+    },
+    [clearErrors, setValue],
+  );
+
+  const handleError = useCallback(
+    (errorType?: ImageInputErrorTypes): void => {
+      switch (errorType) {
+        case 'over-size': {
+          setError('idCardImageFile', {
+            type: 'validate',
+            message: '10MB 이하의 이미지를 업로드해주세요.',
+          });
+          break;
+        }
+        case 'invalid-format': {
+          setError('idCardImageFile', {
+            type: 'error',
+            message: '파일의 형식이 올바르지 않습니다.',
+          });
+          break;
+        }
+        default: {
+          // only chrome
+          setValue('idCardImageFile', null);
+          setValue('idCardImageName', '');
+          clearErrors(['idCardImageFile', 'idCardImageName']);
+        }
+      }
+    },
+    [clearErrors, setError, setValue],
+  );
   return (
     <VStack alignItems="stretch">
       <SectionHeading>계약자 정보</SectionHeading>
       <Grid templateColumns="1fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-        <CustomRowItem
+        <GridRowLayout
           header="과세 유형"
           body={
             <RadioGroup
               onChange={(value) => {
-                setValue('type', value);
+                setValue('taxType', value);
               }}
               defaultValue="개인(사업소득)"
             >
               <Stack spacing={3} direction="row">
-                <Radio {...register('type')} value="개인(사업소득)">
+                <Radio {...register('taxType')} value="개인(사업소득)">
                   개인(사업소득)
                 </Radio>
-                <Radio {...register('type')} value="개인사업자">
+                <Radio {...register('taxType')} value="개인사업자">
                   개인사업자
                 </Radio>
               </Stack>
             </RadioGroup>
           }
         />
-        {watch('type') === '개인사업자' && (
-          <CustomRowItem
+        {watch('taxType') === '개인사업자' && (
+          <GridRowLayout
             header="세무처리 관련 설명"
             body={
               <FormControl isInvalid={!!errors.taxManageAgreement}>
@@ -73,7 +135,7 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
           />
         )}
 
-        <CustomRowItem
+        <GridRowLayout
           header="성명"
           body={
             <FormControl isInvalid={!!errors.name}>
@@ -93,7 +155,7 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
             </FormControl>
           }
         />
-        <CustomRowItem
+        <GridRowLayout
           header="휴대전화번호"
           body={
             <FormControl
@@ -160,7 +222,7 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
           }
         />
 
-        <CustomRowItem
+        <GridRowLayout
           header="주민등록번호"
           body={
             <FormControl isInvalid={!!errors.idCardNumber1 || !!errors.idCardNumber2}>
@@ -205,22 +267,17 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
             </FormControl>
           }
         />
-        <CustomRowItem
+        <GridRowLayout
           header="신분증 업로드"
           body={
-            <FormControl isInvalid={!!errors.idCardImageName}>
+            <FormControl isInvalid={!!errors.idCardImageFile}>
               <ImageInput
-                variant="chakra"
                 size="sm"
-                handleSuccess={() => {
-                  console.log('success');
-                }}
-                handleError={() => {
-                  console.log('error');
-                }}
+                handleSuccess={handleSuccess}
+                handleError={handleError}
               />
               <FormErrorMessage ml={3} mt={0}>
-                {errors.idCardImageName && errors.idCardImageName.message}
+                {errors.idCardImageFile && errors.idCardImageFile.message}
               </FormErrorMessage>
             </FormControl>
           }

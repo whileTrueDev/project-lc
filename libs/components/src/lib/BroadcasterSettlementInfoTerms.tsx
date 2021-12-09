@@ -6,16 +6,21 @@ import {
 } from '../constants/broadcastetSettlementTerms';
 import { SectionHeading, TermBox } from './BroadcasterSettlementInfoDialog';
 
+// 서비스 이용 및 정산등록 동의폼 데이터타입
+export type BroadcasterAgreements = {
+  personalInfoAgreement: boolean;
+  settlementAgreement: boolean;
+};
 export function BroadcasterSettlementInfoTerms(): JSX.Element {
   const {
     register,
     formState: { errors },
-  } = useFormContext();
+  } = useFormContext<BroadcasterAgreements>();
   return (
     <VStack alignItems="flex-start">
       <SectionHeading>서비스 이용 및 정산등록 동의</SectionHeading>
       <VStack spacing={2}>
-        <FormControl isInvalid={!!errors.taxManageAgreement}>
+        <FormControl isInvalid={!!errors.personalInfoAgreement}>
           <TermBox text={PERSONAL_INFO_TERM} />
 
           <Checkbox
@@ -31,7 +36,7 @@ export function BroadcasterSettlementInfoTerms(): JSX.Element {
           </FormErrorMessage>
         </FormControl>
 
-        <FormControl isInvalid={!!errors.taxManageAgreement}>
+        <FormControl isInvalid={!!errors.settlementAgreement}>
           <TermBox text={SETTLEMENT_INFO_SUBMIT_TERM} />
 
           <Checkbox

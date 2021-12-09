@@ -12,12 +12,21 @@ import { Box, GridItem, Heading, useColorModeValue, VStack } from '@chakra-ui/re
 import { useProfile } from '@project-lc/hooks';
 import { FormProvider, useForm } from 'react-hook-form';
 import { boxStyle } from '../constants/commonStyleProps';
-import BroadcasterSettlementInfoAccount from './BroadcasterSettlementInfoAccount';
-import BroadcasterSettlementInfoContractor from './BroadcasterSettlementInfoContractor';
-import BroadcasterSettlementInfoTerms from './BroadcasterSettlementInfoTerms';
+import BroadcasterSettlementInfoAccount, {
+  BroadcasterAccountData,
+} from './BroadcasterSettlementInfoAccount';
+import BroadcasterSettlementInfoContractor, {
+  BroadcasterContractorData,
+} from './BroadcasterSettlementInfoContractor';
+import BroadcasterSettlementInfoTerms, {
+  BroadcasterAgreements,
+} from './BroadcasterSettlementInfoTerms';
 import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
 
-export function CustomRowItem({
+/** 그리드 내부 1개의 행 표시
+ @param header 레이블
+ @param body input등 formControl  */
+export function GridRowLayout({
   header,
   body,
 }: {
@@ -57,6 +66,11 @@ export function SectionHeading({ children }: { children: React.ReactNode }): JSX
   );
 }
 
+// 정산정보 폼 데이터 타입
+type BroadcasterSettlementInfoFormData = BroadcasterContractorData &
+  BroadcasterAccountData &
+  BroadcasterAgreements;
+
 export interface BroadcasterSettlementInfoDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -68,15 +82,19 @@ export function BroadcasterSettlementInfoDialog({
 }: BroadcasterSettlementInfoDialogProps): JSX.Element {
   const { data: profileData } = useProfile();
 
-  const methods = useForm();
+  const methods = useForm<BroadcasterSettlementInfoFormData>();
   const {
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
     reset,
   } = methods;
 
-  const regist = (data: any): void => {
+  const regist = (data: BroadcasterSettlementInfoFormData): void => {
     console.log('regist', data);
+
+    // 이미지  s3 등록 -> 파일이름 받기
+    // data -> settlementInfoDataDto에 맞게 변환
+    // 요청 후 성공시 reset
   };
   return (
     <Modal isOpen={isOpen} size="3xl" onClose={onClose} closeOnEsc={false}>
@@ -97,7 +115,7 @@ export function BroadcasterSettlementInfoDialog({
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" type="submit">
+            <Button colorScheme="blue" type="submit" isLoading={isSubmitting}>
               등록하기
             </Button>
           </ModalFooter>

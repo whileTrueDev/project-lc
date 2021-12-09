@@ -24,16 +24,19 @@ function BroadcasterSettlementConfirmationBadge({
   const { status, rejectionReason } = confirmation;
   if (status === 'rejected') {
     return (
-      <TextWithPopperButton
-        title={<GoodsConfirmStatusBadge confirmStatus={status} />}
-        iconAriaLabel=""
-        portalBody
-      >
-        <Text fontWeight="bold" mb={1}>
-          반려 사유
-        </Text>
-        <Text whiteSpace="break-spaces">{rejectionReason}</Text>
-      </TextWithPopperButton>
+      <>
+        <Text>검수상태 : </Text>
+        <TextWithPopperButton
+          title={<GoodsConfirmStatusBadge confirmStatus={status} />}
+          iconAriaLabel=""
+          portalBody
+        >
+          <Text fontWeight="bold" mb={1}>
+            반려 사유
+          </Text>
+          <Text whiteSpace="break-spaces">{rejectionReason}</Text>
+        </TextWithPopperButton>
+      </>
     );
   }
 
@@ -51,21 +54,15 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
   return (
     <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
       <Flex direction={['column', 'row']} justifyContent="space-between" mb={3}>
-        <Flex direction={['column', 'row']} alignItems="center" spacing={2}>
-          <Text fontSize="lg" fontWeight="medium">
-            정산 정보
-          </Text>
-          {!isLoading && settlementInfoData && (
-            <BroadcasterSettlementConfirmationBadge
-              confirmation={settlementInfoData.confirmation}
-            />
-          )}
-        </Flex>
+        <Text fontSize="lg" fontWeight="medium">
+          정산 정보
+        </Text>
 
         <Button size="sm" onClick={onOpen} colorScheme="blue">
           정산 정보 등록
         </Button>
       </Flex>
+      <Divider backgroundColor="gray.100" />
 
       {/* 정산정보 조회중인경우 */}
       {isLoading && (
@@ -77,7 +74,6 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
       {/* 정산정보 없는 경우 */}
       {!isLoading && !settlementInfoData && (
         <>
-          <Divider backgroundColor="gray.100" />
           <VStack spacing={2} justifyContent="center" py={10}>
             <Text>등록된 정산 정보가 없습니다.</Text>
             <Text fontWeight="bold">
@@ -91,18 +87,17 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
 
       {/* 정산정보 존재하는 경우 */}
       {!isLoading && settlementInfoData && (
-        // TODO: 정산정보 검수상태 & 문구 표시 -> 헤더부분에서 이쪽으로 옮기기
-        <Grid
-          templateColumns="2fr 3fr"
-          borderTopColor="gray.100"
-          borderTopWidth={1.5}
-          overflow="hidden"
-        >
-          {JSON.stringify(settlementInfoData)}
-          {/* {makeListRow(sellerBusinessRegistration).map(({ title, value }) => (
+        <>
+          <BroadcasterSettlementConfirmationBadge
+            confirmation={settlementInfoData.confirmation}
+          />
+          <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
+            {JSON.stringify(settlementInfoData, null, 2)}
+            {/* {makeListRow(sellerBusinessRegistration).map(({ title, value }) => (
             <GridTableItem title={title} value={value} key={title} />
           ))} */}
-        </Grid>
+          </Grid>
+        </>
       )}
 
       {/* 정산정보 등록 폼 다이얼로그 */}
