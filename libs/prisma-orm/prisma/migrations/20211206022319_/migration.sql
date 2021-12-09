@@ -8,9 +8,6 @@
 -- DropForeignKey
 ALTER TABLE `LiveCommerceRanking` DROP FOREIGN KEY `LiveCommerceRanking_broadcasterId_fkey`;
 
--- DropForeignKey
-ALTER TABLE `LiveShopping` DROP FOREIGN KEY `LiveShopping_broadcasterId_fkey`;
-
 -- DropIndex
 DROP INDEX `Broadcaster_userId_idx` ON `Broadcaster`;
 
