@@ -8,17 +8,10 @@ import {
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/modal';
-import {
-  Box,
-  GridItem,
-  Heading,
-  useColorModeValue,
-  useToast,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Heading, useToast, VStack } from '@chakra-ui/react';
 import { TaxationType } from '@prisma/client';
-import { useBroadcasterSettlementInfoMutation, useProfile, s3 } from '@project-lc/hooks';
-import { UserProfileRes, BroadcasterSettlementInfoDto } from '@project-lc/shared-types';
+import { s3, useBroadcasterSettlementInfoMutation, useProfile } from '@project-lc/hooks';
+import { BroadcasterSettlementInfoDto, UserProfileRes } from '@project-lc/shared-types';
 import { FormProvider, useForm } from 'react-hook-form';
 import { boxStyle } from '../constants/commonStyleProps';
 import BroadcasterSettlementInfoAccount, {
@@ -30,25 +23,6 @@ import BroadcasterSettlementInfoContractor, {
 import BroadcasterSettlementInfoTerms, {
   BroadcasterAgreements,
 } from './BroadcasterSettlementInfoTerms';
-import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
-
-/** 그리드 내부 1개의 행 표시
- @param header 레이블
- @param body input등 formControl  */
-export function GridRowLayout({
-  header,
-  body,
-}: {
-  header: string;
-  body: JSX.Element;
-}): JSX.Element {
-  return (
-    <>
-      <GridItem {...useDialogHeaderConfig(useColorModeValue)}>{header}</GridItem>
-      <GridItem {...useDialogValueConfig(useColorModeValue)}>{body}</GridItem>
-    </>
-  );
-}
 
 /** 이용약관 등 문구 표시하는 컴포넌트 */
 export function TermBox({ text }: { text: string }): JSX.Element {

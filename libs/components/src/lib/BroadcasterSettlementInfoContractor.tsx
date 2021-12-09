@@ -14,11 +14,8 @@ import {
 import { useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { TAX_MANAGEMENT_TERM } from '../constants/broadcastetSettlementTerms';
-import {
-  GridRowLayout,
-  SectionHeading,
-  TermBox,
-} from './BroadcasterSettlementInfoDialog';
+import { SectionHeading, TermBox } from './BroadcasterSettlementInfoDialog';
+import { GridTableItem } from './GridTableItem';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 
 type PhoneNumber = {
@@ -93,9 +90,9 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
     <VStack alignItems="stretch">
       <SectionHeading>계약자 정보</SectionHeading>
       <Grid templateColumns="1fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-        <GridRowLayout
-          header="과세 유형"
-          body={
+        <GridTableItem
+          title="과세 유형"
+          value={
             <RadioGroup
               onChange={(value) => {
                 setValue('taxType', value);
@@ -115,9 +112,9 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
         />
         {/* 개인사업자 (taxType === selfEmployedBusiness) 인 경우만 세무처리 관련 동의 받음 */}
         {watch('taxType') === 'selfEmployedBusiness' && (
-          <GridRowLayout
-            header="세무처리 관련 설명"
-            body={
+          <GridTableItem
+            title="세무처리 관련 설명"
+            value={
               <FormControl isInvalid={!!errors.taxManageAgreement}>
                 <TermBox text={TAX_MANAGEMENT_TERM} />
 
@@ -136,9 +133,9 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
           />
         )}
 
-        <GridRowLayout
-          header="성명"
-          body={
+        <GridTableItem
+          title="성명"
+          value={
             <FormControl isInvalid={!!errors.name}>
               <Input
                 id="name"
@@ -156,9 +153,9 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
             </FormControl>
           }
         />
-        <GridRowLayout
-          header="휴대전화번호"
-          body={
+        <GridTableItem
+          title="휴대전화번호"
+          value={
             <FormControl
               isInvalid={!!errors.phone1 || !!errors.phone2 || !!errors.phone3}
             >
@@ -223,9 +220,9 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
           }
         />
 
-        <GridRowLayout
-          header="주민등록번호"
-          body={
+        <GridTableItem
+          title="주민등록번호"
+          value={
             <FormControl isInvalid={!!errors.idCardNumber1 || !!errors.idCardNumber2}>
               <InputGroup alignItems="center">
                 <Input
@@ -268,9 +265,9 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
             </FormControl>
           }
         />
-        <GridRowLayout
-          header="신분증 업로드"
-          body={
+        <GridTableItem
+          title="신분증 업로드"
+          value={
             <FormControl isInvalid={!!errors.idCardImageFile}>
               <ImageInput
                 size="sm"

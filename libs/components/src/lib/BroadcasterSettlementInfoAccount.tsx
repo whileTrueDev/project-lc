@@ -9,8 +9,9 @@ import {
 import { useFormContext } from 'react-hook-form';
 import { banks } from '@project-lc/shared-types';
 import { useCallback } from 'react';
-import { GridRowLayout, SectionHeading } from './BroadcasterSettlementInfoDialog';
+import { SectionHeading } from './BroadcasterSettlementInfoDialog';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
+import { GridTableItem } from './GridTableItem';
 
 type AccountImage = {
   accountImageFile: File | null;
@@ -72,9 +73,9 @@ export function BroadcasterSettlementInfoAccount(): JSX.Element {
     <VStack alignItems="stretch">
       <SectionHeading>정산계좌정보</SectionHeading>
       <Grid templateColumns="1fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
-        <GridRowLayout
-          header="은행"
-          body={
+        <GridTableItem
+          title="은행"
+          value={
             <Select
               id="bank"
               variant="flushed"
@@ -93,9 +94,9 @@ export function BroadcasterSettlementInfoAccount(): JSX.Element {
             </Select>
           }
         />
-        <GridRowLayout
-          header="계좌번호"
-          body={
+        <GridTableItem
+          title="계좌번호"
+          value={
             <FormControl isInvalid={!!errors.accountNumber}>
               <Input
                 id="number"
@@ -117,9 +118,9 @@ export function BroadcasterSettlementInfoAccount(): JSX.Element {
             </FormControl>
           }
         />
-        <GridRowLayout
-          header="예금주명"
-          body={
+        <GridTableItem
+          title="예금주명"
+          value={
             <FormControl isInvalid={!!errors.accountHolder}>
               <Input
                 id="accountHolder"
@@ -137,9 +138,9 @@ export function BroadcasterSettlementInfoAccount(): JSX.Element {
             </FormControl>
           }
         />
-        <GridRowLayout
-          header="통장사본 이미지 업로드"
-          body={
+        <GridTableItem
+          title="통장사본 이미지 업로드"
+          value={
             <FormControl isInvalid={!!errors.accountImageFile}>
               <ImageInput
                 size="sm"
