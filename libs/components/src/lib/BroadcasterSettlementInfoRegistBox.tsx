@@ -12,10 +12,23 @@ import {
 } from '@chakra-ui/react';
 import { useBroadcasterSettlementInfo, useProfile } from '@project-lc/hooks';
 import { useMemo } from 'react';
-import { BroadcasterSettlementInfoConfirmation } from '.prisma/client';
+import { BroadcasterSettlementInfoConfirmation, TaxationType } from '.prisma/client';
 import { BroadcasterSettlementInfoDialog } from './BroadcasterSettlementInfoDialog';
 import { GoodsConfirmStatusBadge } from './GoodsConfirmStatusBadge';
 import { GridTableItem } from './GridTableItem';
+
+/** 검수결과 설명문 */
+const CONFIRMATION_DESC = {
+  waiting:
+    '입력하신 정산 정보를 관리자가 검수중입니다. 승인받은 후 수익금 정산이 가능합니다.',
+  rejected:
+    '승인 반려되었습니다. 아래 반려사유를 확인한 후 다시 정산 정보를 등록해주세요.',
+};
+
+const TAX_TYPE: Record<TaxationType, string> = {
+  naturalPerson: '개인(사업소득)',
+  selfEmployedBusiness: '개인사업자',
+};
 
 /** 정산정보 검수상태, 반려사유 표시 */
 function BroadcasterSettlementConfirmationDisplay({
@@ -32,19 +45,12 @@ function BroadcasterSettlementConfirmationDisplay({
 
   const description = useMemo(() => {
     if (status === 'waiting') {
-      return (
-        <Text fontSize="sm">
-          입력하신 정산 정보를 관리자가 검수중입니다. 승인받은 후 수익금 정산이
-          가능합니다.
-        </Text>
-      );
+      return <Text fontSize="sm">{CONFIRMATION_DESC.waiting}</Text>;
     }
     if (status === 'rejected') {
       return (
         <>
-          <Text fontSize="sm">
-            승인 반려되었습니다. 아래 반려사유를 확인한 후 다시 정산 정보를 등록해주세요.
-          </Text>
+          <Text fontSize="sm">{CONFIRMATION_DESC.rejected}</Text>
           <Text fontSize="sm">{rejectionReason}</Text>
         </>
       );
@@ -118,7 +124,7 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
               borderTopColor="gray.100"
               borderTopWidth={1.5}
             >
-              <GridTableItem title="과세유형" value={settlementInfoData.type} />
+              <GridTableItem title="과세유형" value={TAX_TYPE[settlementInfoData.type]} />
               <GridTableItem title="성명" value={settlementInfoData.name} />
               <GridTableItem
                 title="주민등록번호"
