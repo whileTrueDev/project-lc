@@ -10,7 +10,7 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { useBroadcasterSettlementInfo, useProfile } from '@project-lc/hooks';
+import { s3, useBroadcasterSettlementInfo, useProfile } from '@project-lc/hooks';
 import { useMemo } from 'react';
 import { BroadcasterSettlementInfoConfirmation, TaxationType } from '.prisma/client';
 import { BroadcasterSettlementInfoDialog } from './BroadcasterSettlementInfoDialog';
@@ -75,6 +75,26 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
     profileData?.id,
   );
 
+  const downloadIdCardImage = async (): Promise<void> => {
+    if (!profileData || !settlementInfoData) return;
+    const imageUrl = await s3.s3DownloadImageUrl(
+      settlementInfoData.idCardImageName,
+      profileData.email,
+      'broadcaster-id-card',
+    );
+    window.open(imageUrl, '_blank');
+  };
+
+  const downloadAccountImage = async (): Promise<void> => {
+    if (!profileData || !settlementInfoData) return;
+    const imageUrl = await s3.s3DownloadImageUrl(
+      settlementInfoData.accountImageName,
+      profileData.email,
+      'broadcaster-account-image',
+    );
+    window.open(imageUrl, '_blank');
+  };
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -136,7 +156,11 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
               />
               <GridTableItem
                 title="신분증"
-                value={<Button size="xs">신분증 확인</Button>}
+                value={
+                  <Button size="xs" onClick={downloadIdCardImage}>
+                    신분증 확인
+                  </Button>
+                }
               />
             </Grid>
           </VStack>
@@ -152,7 +176,11 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
               <GridTableItem title="계좌번호" value={settlementInfoData.accountNumber} />
               <GridTableItem
                 title="통장사본"
-                value={<Button size="xs">신분증 확인</Button>}
+                value={
+                  <Button size="xs" onClick={downloadAccountImage}>
+                    통장사본 확인
+                  </Button>
+                }
               />
             </Grid>
           </VStack>
