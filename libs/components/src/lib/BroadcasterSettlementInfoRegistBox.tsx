@@ -1,20 +1,19 @@
+import { useDisclosure } from '@chakra-ui/hooks';
 import {
-  Button,
   Box,
+  Button,
+  Center,
+  Divider,
   Flex,
   Grid,
-  Divider,
-  Center,
-  VStack,
-  Text,
   Spinner,
-  Badge,
+  Text,
+  VStack,
 } from '@chakra-ui/react';
-import { useDisclosure } from '@chakra-ui/hooks';
 import { useBroadcasterSettlementInfo, useProfile } from '@project-lc/hooks';
-import { GridTableItem } from './GridTableItem';
-import { GoodsConfirmStatusBadge } from './GoodsConfirmStatusBadge';
 import { BroadcasterSettlementInfoConfirmation } from '.prisma/client';
+import { BroadcasterSettlementInfoDialog } from './BroadcasterSettlementInfoDialog';
+import { GoodsConfirmStatusBadge } from './GoodsConfirmStatusBadge';
 import TextWithPopperButton from './TextWithPopperButton';
 
 function BroadcasterSettlementConfirmationBadge({
@@ -51,7 +50,7 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
 
   return (
     <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
-      <Flex direction={['column', 'row']} justifyContent="space-between" pb={1} mb={3}>
+      <Flex direction={['column', 'row']} justifyContent="space-between" mb={3}>
         <Flex direction={['column', 'row']} alignItems="center" spacing={2}>
           <Text fontSize="lg" fontWeight="medium">
             정산 정보
@@ -63,7 +62,7 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
           )}
         </Flex>
 
-        <Button size="sm" onClick={onOpen} mt={[3, 0]} colorScheme="blue">
+        <Button size="sm" onClick={onOpen} colorScheme="blue">
           정산 정보 등록
         </Button>
       </Flex>
@@ -92,13 +91,22 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
 
       {/* 정산정보 존재하는 경우 */}
       {!isLoading && settlementInfoData && (
-        <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
+        // TODO: 정산정보 검수상태 & 문구 표시 -> 헤더부분에서 이쪽으로 옮기기
+        <Grid
+          templateColumns="2fr 3fr"
+          borderTopColor="gray.100"
+          borderTopWidth={1.5}
+          overflow="hidden"
+        >
           {JSON.stringify(settlementInfoData)}
           {/* {makeListRow(sellerBusinessRegistration).map(({ title, value }) => (
             <GridTableItem title={title} value={value} key={title} />
           ))} */}
         </Grid>
       )}
+
+      {/* 정산정보 등록 폼 다이얼로그 */}
+      <BroadcasterSettlementInfoDialog isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 }
