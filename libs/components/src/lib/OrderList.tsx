@@ -26,6 +26,7 @@ import { FaTruck } from 'react-icons/fa';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import ExportManyDialog from './ExportManyDialog';
 import FmOrderStatusBadge from './FmOrderStatusBadge';
+import OrderListDownloadDialog from './OrderListDownloadDialog';
 import TooltipedText from './TooltipedText';
 
 // CSV다운로드 기능 임시 제거로 인해 사용은 하지 않고 일단 둠.
@@ -277,6 +278,7 @@ interface OrderToolbarProps {
   }[];
 }
 export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
+  const orderDownloadDialog = useDisclosure();
   const xSize = useBreakpoint();
   const isMobile = useMemo(() => xSize && ['base', 'sm'].includes(xSize), [xSize]);
 
@@ -284,7 +286,7 @@ export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
 
   return (
     <GridToolbarContainer>
-      <Stack spacing={2} direction="row">
+      <Stack spacing={2} direction="row" pb={2}>
         {isMobile ? null : (
           <>
             {options.map((opt) => (
@@ -308,21 +310,21 @@ export function OrderToolbar({ options }: OrderToolbarProps): JSX.Element {
                 </Box>
               </Tooltip>
             ))}
-            {/*
-             * 내보내기 기능 보류 by dan 21.10.12
-             * https://www.notion.so/whiletrue/CSV-be33d041a81d4601b005b0d3ed659d28
-             */}
-            {/* <Button size="sm" as="div" isDisabled={selectedOrders.length === 0}>
-              <GridToolbarExport
-                csvOptions={{
-                  allColumns: true,
-                  fileName: `크크쇼_주문목록_${dayjs().format(
-                    'YYYY-MM-DD-HH-mm-ss',
-                  )}`,
-                }}
-                disabled={selectedOrders.length === 0}
+            <Button
+              size="sm"
+              isDisabled={selectedOrders.length === 0}
+              rightIcon={<DownloadIcon />}
+              onClick={orderDownloadDialog.onOpen}
+            >
+              내보내기
+            </Button>
+
+            {orderDownloadDialog.isOpen && (
+              <OrderListDownloadDialog
+                isOpen={orderDownloadDialog.isOpen}
+                onClose={orderDownloadDialog.onClose}
               />
-            </Button> */}
+            )}
           </>
         )}
       </Stack>

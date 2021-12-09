@@ -39,6 +39,7 @@ export * from './lib/dto/exportOrder.dto';
 export * from './lib/dto/exportOrders.dto';
 export * from './lib/dto/findBroadcaster.dto';
 export * from './lib/dto/findExports.dto';
+export * from './lib/dto/findFmOrderDetails.dto';
 export * from './lib/dto/FindFmOrders.dto';
 export * from './lib/dto/findSeller.dto';
 export * from './lib/dto/findSettlementHistory.dto';
