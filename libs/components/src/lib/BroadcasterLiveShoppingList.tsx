@@ -69,7 +69,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
     detailOnOpen();
   };
 
-  const liveShoppingWithSales: any[] = [];
+  const liveShoppingWithSales = [];
 
   if (tableData && salesData) {
     for (let i = 0; i < tableData.length; i++) {
@@ -208,33 +208,37 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
     },
     usePagination,
   );
+
   return (
     <Box p={5}>
       {tableData && !isLoading && (
         <Table {...getTableProps()}>
           <Thead>
-            {headerGroups.map((headerGroup) => (
-              <Tr
-                {...headerGroup.getHeaderGroupProps()}
-                key={headerGroup.id}
-                data-key={headerGroup.id}
-              >
-                {headerGroup.headers.map((column) => (
-                  <Th key={column.id} data-key={column.id}>
-                    {column.render('Header')}
-                  </Th>
-                ))}
-              </Tr>
-            ))}
+            {headerGroups.map((headerGroup) => {
+              const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
+              return (
+                <Tr {...restHeaderGroupProps} key={key}>
+                  {headerGroup.headers.map((column) => {
+                    const { key: columnKey, ...restColumn } = column.getHeaderProps();
+                    return (
+                      <Th {...restColumn} key={columnKey}>
+                        {column.render('Header')}
+                      </Th>
+                    );
+                  })}
+                </Tr>
+              );
+            })}
           </Thead>
           <Tbody {...getTableBodyProps()}>
             {page.map((row) => {
               prepareRow(row);
               return (
-                <Tr {...row.getRowProps()} key={row.id} data-key={row.id}>
+                <Tr {...row.getRowProps()} key={row.id}>
                   {row.cells.map((cell) => {
+                    const { key, ...restCellProps } = cell.getCellProps();
                     return (
-                      <Td key={cell.id} data-key={cell.id} {...cell.getCellProps()}>
+                      <Td key={key} {...restCellProps}>
                         {cell.render('Cell')}
                       </Td>
                     );
