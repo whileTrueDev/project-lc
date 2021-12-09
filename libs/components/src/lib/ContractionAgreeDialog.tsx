@@ -38,7 +38,6 @@ export function ContractionAgreeDialog({
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [checkedA, setCheckedA] = useState<boolean>(false);
   const [checkedB, setCheckedB] = useState<boolean>(false);
-
   const dialog = useDisclosure();
 
   function checkedAll(value: boolean): void {
@@ -53,13 +52,13 @@ export function ContractionAgreeDialog({
         checkedAll(false);
         onClose();
       }}
-      size="md"
+      size="lg"
     >
       <ModalOverlay />
       <ModalContent>
         <ModalCloseButton />
-        <ModalBody maxW="4xl" mx="auto">
-          <Stack p={4} spacing={6}>
+        <ModalBody maxW="6xl" mx="5">
+          <Stack pt={3} pb={3} spacing={6}>
             {/* 헤더 */}
             <Heading as="h4" size="lg" textAlign="center">
               이용약관

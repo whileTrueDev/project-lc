@@ -73,7 +73,7 @@ export function ContractionAgreeSection(): JSX.Element {
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onSubmit}
-        agreementFlag={data?.agreementFlag || true}
+        agreementFlag={data?.agreementFlag === undefined ? true : data.agreementFlag}
       />
       |
     </SettingSectionLayout>
