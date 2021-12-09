@@ -1,4 +1,4 @@
-import { WorkBook, WorkSheet, writeFile } from 'xlsx';
+import { WorkBook, WorkSheet, writeFile, writeFileAsync } from 'xlsx';
 
 export abstract class SpreadSheetGenerator<T> {
   // eslint-disable-next-line prettier/prettier
@@ -27,19 +27,31 @@ export abstract class SpreadSheetGenerator<T> {
   protected abstract createSheet(data: T[]): WorkSheet;
   public abstract createXLSX(data: T[]): WorkBook;
 
-  public checkFileName(fileName: string): string {
-    if (fileName.includes('.xlsx')) return fileName;
+  private checkFileName(fileName: string): string {
+    if (fileName.includes('.')) {
+      const [file, ext] = fileName.split('.');
+      if (ext === 'xlsx') {
+        return fileName;
+      }
+      return `${file}.xlsx`;
+    }
     return `${fileName}.xlsx`;
   }
 
   public async download(fileName: string, workBook: WorkBook): Promise<boolean> {
-    await writeFile(workBook, this.checkFileName(fileName), {
-      Props: {
-        Company: 'WhileTrue',
-        Author: '크크쇼',
-        CreatedDate: new Date(),
-      },
+    return new Promise((resolve, reject) => {
+      try {
+        writeFile(workBook, this.checkFileName(fileName), {
+          Props: {
+            Company: 'WhileTrue',
+            Author: '크크쇼',
+            CreatedDate: new Date(),
+          },
+        });
+        resolve(true);
+      } catch (err) {
+        reject(err);
+      }
     });
-    return true;
   }
 }

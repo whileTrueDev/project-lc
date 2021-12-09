@@ -16,6 +16,7 @@ import {
 } from '@chakra-ui/modal';
 import { Spinner } from '@chakra-ui/spinner';
 import { LayoutProps } from '@chakra-ui/styled-system';
+import { useToast } from '@chakra-ui/toast';
 import { useFmOrderDetails } from '@project-lc/hooks';
 import {
   ORDER_DOWNLOAD_DEFAULT_FILENAME,
@@ -33,6 +34,7 @@ export function OrderListDownloadDialog({
   isOpen,
   onClose,
 }: OrderListDownloadDialogProps): JSX.Element {
+  const toast = useToast();
   // 선택된 주문
   const selectedOrders = useFmOrderStore((state) => state.selectedOrders);
   // 선택된 주문 상세 정보 조회
@@ -42,13 +44,24 @@ export function OrderListDownloadDialog({
   const fileName = useOrderListDownloadStore((st) => st.fileName);
 
   // 엑셀 생성 및 내보내기
-  const onConfirm = (): void => {
+  const onConfirm = async (): Promise<void> => {
     if (orderDetails.data) {
       const ossg = new OrderSpreadSheetGenerator({
         disabledColumnHeaders: disableHeaders,
       });
       const workbook = ossg.createXLSX(orderDetails.data);
-      ossg.download(`${fileName || ORDER_DOWNLOAD_DEFAULT_FILENAME}.xlsx`, workbook);
+      ossg
+        .download(`${fileName || ORDER_DOWNLOAD_DEFAULT_FILENAME}.xlsx`, workbook)
+        .then(() => {
+          toast({ status: 'success', title: '주문목록 다운로드 완료' });
+          onClose();
+        })
+        .catch(() => {
+          toast({
+            status: 'error',
+            title: '주문목록 다운로드중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          });
+        });
     }
   };
 
@@ -66,7 +79,12 @@ export function OrderListDownloadDialog({
         </ModalBody>
         <ModalFooter>
           <ButtonGroup>
-            <Button rightIcon={<DownloadIcon />} colorScheme="blue" onClick={onConfirm}>
+            <Button
+              isDisabled={orderDetails.isLoading || !orderDetails.data}
+              rightIcon={<DownloadIcon />}
+              colorScheme="blue"
+              onClick={onConfirm}
+            >
               다운로드
             </Button>
             <Button onClick={onClose}>취소</Button>
