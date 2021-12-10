@@ -1,9 +1,12 @@
 import {
+  Button,
+  Flex,
   FormControl,
   FormErrorMessage,
   Grid,
   Input,
   Select,
+  useDisclosure,
   VStack,
 } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
@@ -12,6 +15,7 @@ import { useCallback } from 'react';
 import { SectionHeading } from './BroadcasterSettlementInfoDialog';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 import { GridTableItem } from './GridTableItem';
+import BroadcasterImageUploadGuideDialog from './BroadcasterImageUploadGuideDialog';
 
 type AccountImage = {
   accountImageFile: File | null;
@@ -25,6 +29,7 @@ export type BroadcasterAccountData = {
 } & AccountImage;
 
 export function BroadcasterSettlementInfoAccount(): JSX.Element {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     register,
     setValue,
@@ -141,19 +146,29 @@ export function BroadcasterSettlementInfoAccount(): JSX.Element {
         <GridTableItem
           title="통장사본 이미지 업로드"
           value={
-            <FormControl isInvalid={!!errors.accountImageFile}>
-              <ImageInput
-                size="sm"
-                handleSuccess={handleSuccess}
-                handleError={handleError}
-              />
-              <FormErrorMessage ml={3} mt={0}>
-                {errors.accountImageFile && errors.accountImageFile.message}
-              </FormErrorMessage>
-            </FormControl>
+            <Flex alignItems="center">
+              <FormControl isInvalid={!!errors.accountImageFile} maxW="60%">
+                <ImageInput
+                  size="sm"
+                  handleSuccess={handleSuccess}
+                  handleError={handleError}
+                />
+                <FormErrorMessage ml={3} mt={0}>
+                  {errors.accountImageFile && errors.accountImageFile.message}
+                </FormErrorMessage>
+              </FormControl>
+              <Button size="xs" onClick={onOpen}>
+                통장사본 업로드 안내
+              </Button>
+            </Flex>
           }
         />
       </Grid>
+      <BroadcasterImageUploadGuideDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        type="account"
+      />
     </VStack>
   );
 }

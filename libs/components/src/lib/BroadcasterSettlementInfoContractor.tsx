@@ -1,5 +1,7 @@
 import {
+  Button,
   Checkbox,
+  Flex,
   FormControl,
   FormErrorMessage,
   Grid,
@@ -9,11 +11,13 @@ import {
   RadioGroup,
   Stack,
   Text,
+  useDisclosure,
   VStack,
 } from '@chakra-ui/react';
 import { useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { TAX_MANAGEMENT_TERM } from '../constants/broadcastetSettlementTerms';
+import BroadcasterImageUploadGuideDialog from './BroadcasterImageUploadGuideDialog';
 import { SectionHeading, TermBox } from './BroadcasterSettlementInfoDialog';
 import { GridTableItem } from './GridTableItem';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
@@ -41,6 +45,7 @@ export type BroadcasterContractorData = {
   IdCardImage;
 
 export function BroadcasterSettlementInfoContractor(): JSX.Element {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     register,
     formState: { errors },
@@ -268,19 +273,30 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
         <GridTableItem
           title="신분증 업로드"
           value={
-            <FormControl isInvalid={!!errors.idCardImageFile}>
-              <ImageInput
-                size="sm"
-                handleSuccess={handleSuccess}
-                handleError={handleError}
-              />
-              <FormErrorMessage ml={3} mt={0}>
-                {errors.idCardImageFile && errors.idCardImageFile.message}
-              </FormErrorMessage>
-            </FormControl>
+            <Flex alignItems="center">
+              <FormControl isInvalid={!!errors.idCardImageFile} maxW="60%">
+                <ImageInput
+                  size="sm"
+                  handleSuccess={handleSuccess}
+                  handleError={handleError}
+                />
+                <FormErrorMessage ml={3} mt={0}>
+                  {errors.idCardImageFile && errors.idCardImageFile.message}
+                </FormErrorMessage>
+              </FormControl>
+
+              <Button size="xs" onClick={onOpen}>
+                신분증 업로드 안내
+              </Button>
+            </Flex>
           }
         />
       </Grid>
+      <BroadcasterImageUploadGuideDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        type="idCard"
+      />
     </VStack>
   );
 }
