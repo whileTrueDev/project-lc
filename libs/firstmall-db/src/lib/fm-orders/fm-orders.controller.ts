@@ -146,4 +146,13 @@ export class FmOrdersController {
     const status = convertFmStatusStringToStatus(dto.targetStatus);
     return this.fmOrdersService.changeOrderStatus(orderId, status);
   }
+
+  @Get('/broadcaster/purchases')
+  async getBroadcasterPurchases(
+    @Param('firstmallGoodsConnectionId')
+    firstmallGoodsConnectionId: { firstmallGoodsConnectionId: number }[],
+  ): Promise<any> {
+    console.log('firstmallGoodsConnectionId', firstmallGoodsConnectionId);
+    return 'something';
+  }
 }

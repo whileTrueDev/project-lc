@@ -20,3 +20,24 @@ export const useFmOrdersDuringLiveShoppingSales = (
     options,
   );
 };
+
+export const getFmOrdersDuringLiveShoppingSalesPurchaseDone = async (
+  firstmallGoodsConnectionId: { firstmallGoodsConnectionId: number }[],
+): Promise<LiveShoppingWithSalesAndFmId[]> => {
+  return axios
+    .get<LiveShoppingWithSalesAndFmId[]>('/fm-orders/broadcaster/purchases', {
+      params: { firstmallGoodsConnectionId },
+    })
+    .then((res) => res.data);
+};
+
+export const useFmOrdersDuringLiveShoppingSalesPurchaseDone = (
+  firstmallGoodsConnectionId: { firstmallGoodsConnectionId: number }[],
+  options?: UseQueryOptions<LiveShoppingWithSalesAndFmId[], AxiosError>,
+): UseQueryResult<LiveShoppingWithSalesAndFmId[], AxiosError> => {
+  return useQuery<LiveShoppingWithSalesAndFmId[], AxiosError>(
+    'getFmOrdersDuringLiveShoppingSalesPurchaseDone',
+    () => getFmOrdersDuringLiveShoppingSalesPurchaseDone(firstmallGoodsConnectionId),
+    options,
+  );
+};

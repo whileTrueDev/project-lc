@@ -59,4 +59,11 @@ export class LiveShoppingController {
     const goodsList = await this.goodsService.findMyGoodsNames(email);
     return goodsList;
   }
+
+  @Get('/broadcaster/fm-connection-id')
+  async getLiveShoppingLinkFmGoodsId(
+    @Query('broadcasterId') broadcasterId: number,
+  ): Promise<any> {
+    return this.liveShoppingService.getLinkedLiveShoppingFmGoodsId(broadcasterId);
+  }
 }

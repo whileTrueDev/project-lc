@@ -5,9 +5,9 @@ import {
   LiveShoppingParamsDto,
   LiveShoppingWithConfirmation,
   LiveShoppingRegistDTO,
+  GoodsConfirmationDtoOnlyConnectionId,
 } from '@project-lc/shared-types';
 import { UserPayload } from '../auth/auth.interface';
-
 @Injectable()
 export class LiveShoppingService {
   constructor(private readonly prisma: PrismaService) {}
@@ -90,6 +90,25 @@ export class LiveShoppingService {
         },
         liveShoppingVideo: {
           select: { youtubeUrl: true },
+        },
+      },
+    });
+  }
+
+  async getLinkedLiveShoppingFmGoodsId(broadcasterId: number): Promise<any> {
+    return this.prisma.liveShopping.findMany({
+      where: {
+        broadcasterId: broadcasterId ? Number(broadcasterId) : undefined,
+      },
+      select: {
+        goods: {
+          select: {
+            confirmation: {
+              select: {
+                firstmallGoodsConnectionId: true,
+              },
+            },
+          },
         },
       },
     });
