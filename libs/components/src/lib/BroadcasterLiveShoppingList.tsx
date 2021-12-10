@@ -1,21 +1,11 @@
-import { useMemo, useState } from 'react';
-import { useTable, usePagination, TableInstance } from 'react-table';
+import { useState } from 'react';
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Flex,
-  IconButton,
-  Text,
-  Tooltip,
-  Select,
   Box,
-  Stack,
   Button,
   Link,
+  Stack,
+  Text,
+  Tooltip,
   useDisclosure,
   Modal,
   ModalBody,
@@ -26,26 +16,24 @@ import {
   ModalOverlay,
   Divider,
   Textarea,
+  Flex,
 } from '@chakra-ui/react';
-import {
-  ArrowRightIcon,
-  ArrowLeftIcon,
-  ChevronRightIcon,
-  ChevronLeftIcon,
-  ExternalLinkIcon,
-} from '@chakra-ui/icons';
-import { LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import {
   useBroadcasterFmOrdersDuringLiveShoppingSales,
   useBroadcasterLiveShoppingList,
   useProfile,
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
+import { LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
+import { ChakraDataGrid } from './ChakraDataGrid';
 
 export function BroadcasterLiveShoppingList(): JSX.Element {
   const { data: profileData } = useProfile();
   const [liveShoppingId, setLiveShoppingId] = useState(0);
+  const [pageSize, setPageSize] = useState<number>(5);
 
   const { data: tableData, isLoading } = useBroadcasterLiveShoppingList({
     broadcasterId: profileData?.id || 0,
@@ -64,8 +52,9 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
     onClose: detailOnClose,
   } = useDisclosure();
 
-  const handleDetailOnOpen = (id: number): void => {
-    setLiveShoppingId(id);
+  const handleDetailOpenClick = (id: number): void => {
+    const index = tableData?.findIndex((x) => x.id === id) || 0;
+    setLiveShoppingId(index);
     detailOnOpen();
   };
 
@@ -79,253 +68,138 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       });
     }
   }
-  const columns = useMemo(
-    () => [
-      {
-        Header: '상품명',
-        accessor: 'goods.confirmation.firstmallGoodsConnectionId',
-        Cell: ({ _, row }: any) => {
-          return (
-            <Tooltip label="상품페이지로 이동">
-              <Link
-                href={`http://whiletrue.firstmall.kr/goods/view?no=${row.original.goods.confirmation.firstmallGoodsConnectionId}`}
-                isExternal
-                overflow="hidden"
-                whiteSpace="nowrap"
-                textOverflow="ellipsis"
-              >
-                {row.original.goods.goods_name} <ExternalLinkIcon mx="2px" />
-              </Link>
-            </Tooltip>
-          );
-        },
-      },
-      {
-        Header: '상태',
-        accessor: 'progress',
-        Cell: ({ _, row }: any) => {
-          return (
-            <LiveShoppingProgressBadge
-              progress={row.progress}
-              broadcastStartDate={row.broadcastStartDate}
-              broadcastEndDate={row.broadcastEndDate}
-              sellEndDate={row.sellEndDate}
-            />
-          );
-        },
-      },
-      {
-        Header: '판매자',
-        accessor: 'seller.sellerShop.shopName',
-      },
-      {
-        Header: '방송시간',
-        accessor: (row: any) =>
-          `${
-            row.broadcastStartDate
-              ? dayjs(row.broadcastStartDate).format('YYYY/MM/DD HH:mm')
-              : '미정'
-          } - ${
-            row.broadcastEndDate
-              ? dayjs(row.broadcastEndDate).format('YYYY/MM/DD HH:mm')
-              : '미정'
-          }`,
-      },
-      {
-        Header: '판매시간',
-        accessor: (row: any) =>
-          `${
-            row.sellStartDate
-              ? dayjs(row.sellStartDate).format('YYYY/MM/DD HH:mm')
-              : '미정'
-          } - ${
-            row.sellEndDate ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm') : '미정'
-          }`,
-      },
-      {
-        Header: '매출',
-        accessor: (row: any) =>
-          `${row.sales ? row.sales.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'}원`,
-      },
-      {
-        Header: '유튜브영상',
-        accessor: 'liveShoppingVideo.youtubeUrl',
-        Cell: ({ _, row }: any) => {
-          if (row.liveShoppingVideo) {
-            return (
-              <Link
-                href={row.liveShoppingVideo?.youtubeUrl || ''}
-                isExternal
-                overflow="hidden"
-                whiteSpace="nowrap"
-                textOverflow="ellipsis"
-              >
-                보러가기 <ExternalLinkIcon mx="2px" />
-              </Link>
-            );
-          }
-          return <Text>업로드대기</Text>;
-        },
-      },
-      {
-        Header: () => null,
-        id: 'detail',
-        Cell: ({ _, row }: any) => (
-          <Button
-            size="xs"
-            colorScheme="blue"
-            onClick={() => handleDetailOnOpen(row.index)}
-          >
-            상세보기
-          </Button>
-        ),
-      },
-    ],
-    [],
-  );
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
-    pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
-    state: { pageIndex, pageSize },
-  }: TableInstance = useTable(
+
+  const columns: GridColumns = [
     {
-      columns,
-      data: liveShoppingWithSales,
-      autoResetSortBy: false,
-      autoResetPage: false,
-      initialState: { pageIndex: 0 },
+      field: 'goods.confirmation.firstmallGoodsConnectionId',
+      headerName: '상품명',
+      minWidth: 350,
+      flex: 1,
+      renderCell: ({ row }) => (
+        <Tooltip label="상품페이지로 이동">
+          <Link
+            href={`http://whiletrue.firstmall.kr/goods/view?no=${row.goods.confirmation.firstmallGoodsConnectionId}`}
+            isExternal
+          >
+            {row.goods.goods_name} <ExternalLinkIcon mx="2px" />
+          </Link>
+        </Tooltip>
+      ),
     },
-    usePagination,
-  );
+    {
+      field: 'progress',
+      headerName: '상태',
+      renderCell: ({ row }: GridRowData) => (
+        <Box lineHeight={2}>
+          <LiveShoppingProgressBadge
+            progress={row.progress}
+            broadcastStartDate={row.broadcastStartDate}
+            broadcastEndDate={row.broadcastEndDate}
+            sellEndDate={row.sellEndDate}
+          />
+        </Box>
+      ),
+    },
+    {
+      field: 'seller.sellerShop.shopName',
+      headerName: '판매자',
+      minWidth: 200,
+      flex: 1,
+      valueFormatter: (params) => params.row?.seller.sellerShop.shopName,
+    },
+    {
+      headerName: '방송시간',
+      field: '방송시간',
+      minWidth: 300,
+      flex: 1,
+      renderCell: ({ row }: GridRowData) =>
+        `${
+          row.broadcastStartDate
+            ? dayjs(row.broadcastStartDate).format('YYYY/MM/DD HH:mm')
+            : '미정'
+        } - ${
+          row.broadcastEndDate
+            ? dayjs(row.broadcastEndDate).format('YYYY/MM/DD HH:mm')
+            : '미정'
+        }`,
+    },
+    {
+      headerName: '판매시간',
+      field: '판매시간',
+      minWidth: 300,
+      flex: 1,
+      renderCell: ({ row }: GridRowData) =>
+        `${
+          row.sellStartDate ? dayjs(row.sellStartDate).format('YYYY/MM/DD HH:mm') : '미정'
+        } - ${
+          row.sellEndDate ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm') : '미정'
+        }`,
+    },
+    {
+      headerName: '매출',
+      field: 'sales',
+      valueFormatter: ({ row }) =>
+        `${row.sales ? row.sales.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'}원`,
+    },
+    {
+      headerName: '유튜브영상',
+      field: 'liveShoppingVideo.youtubeUrl',
+      minWidth: 200,
+      renderCell: ({ row }: GridRowData) => {
+        if (row.liveShoppingVideo) {
+          return (
+            <Link
+              href={row.liveShoppingVideo?.youtubeUrl || ''}
+              isExternal
+              overflow="hidden"
+              whiteSpace="nowrap"
+              textOverflow="ellipsis"
+            >
+              보러가기 <ExternalLinkIcon mx="2px" />
+            </Link>
+          );
+        }
+        return <Text>업로드대기</Text>;
+      },
+    },
+    {
+      headerName: '',
+      field: '',
+      width: 80,
+      renderCell: ({ row }: GridRowData) => (
+        <Button
+          size="xs"
+          colorScheme="blue"
+          onClick={() => {
+            handleDetailOpenClick(row.id);
+          }}
+        >
+          상세보기
+        </Button>
+      ),
+    },
+  ];
 
   return (
-    <Box p={5}>
-      {tableData && !isLoading && (
-        <Table {...getTableProps()}>
-          <Thead>
-            {headerGroups.map((headerGroup) => {
-              const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
-              return (
-                <Tr {...restHeaderGroupProps} key={key}>
-                  {headerGroup.headers.map((column) => {
-                    const { key: columnKey, ...restColumn } = column.getHeaderProps();
-                    return (
-                      <Th {...restColumn} key={columnKey}>
-                        {column.render('Header')}
-                      </Th>
-                    );
-                  })}
-                </Tr>
-              );
-            })}
-          </Thead>
-          <Tbody {...getTableBodyProps()}>
-            {page.map((row) => {
-              prepareRow(row);
-              return (
-                <Tr {...row.getRowProps()} key={row.id}>
-                  {row.cells.map((cell) => {
-                    const { key, ...restCellProps } = cell.getCellProps();
-                    return (
-                      <Td key={key} {...restCellProps}>
-                        {cell.render('Cell')}
-                      </Td>
-                    );
-                  })}
-                </Tr>
-              );
-            })}
-          </Tbody>
-        </Table>
-      )}
-      <Flex justifyContent="space-between" m={4} alignItems="center">
-        <Flex />
-        <Stack direction="row" alignItems="center">
-          <Tooltip label="맨 앞으로">
-            <IconButton
-              aria-label="very-front"
-              onClick={() => gotoPage(0)}
-              isDisabled={!canPreviousPage}
-              icon={<ArrowLeftIcon h={3} w={3} />}
-            />
-          </Tooltip>
-          <Tooltip label="이전 페이지">
-            <IconButton
-              aria-label="front"
-              onClick={previousPage}
-              isDisabled={!canPreviousPage}
-              icon={<ChevronLeftIcon h={6} w={6} />}
-            />
-          </Tooltip>
-          {[...Array(pageOptions.length)].map((value, i) => {
-            return pageIndex === i ? (
-              <Text
-                key={value}
-                fontWeight="bold"
-                as="ins"
-                cursor="pointer"
-                size="2xl"
-                onClick={() => {
-                  gotoPage(i);
-                }}
-              >
-                {i + 1}
-              </Text>
-            ) : (
-              <Text
-                key={value}
-                cursor="pointer"
-                size="2xl"
-                onClick={() => {
-                  gotoPage(i);
-                }}
-              >
-                {i + 1}
-              </Text>
-            );
-          })}
-          <Tooltip label="다음 페이지">
-            <IconButton
-              aria-label="next"
-              onClick={nextPage}
-              isDisabled={!canNextPage}
-              icon={<ChevronRightIcon h={6} w={6} />}
-            />
-          </Tooltip>
-          <Tooltip label="맨 뒤로">
-            <IconButton
-              aria-label="very-next"
-              onClick={() => gotoPage(pageCount - 1)}
-              isDisabled={!canNextPage}
-              icon={<ArrowRightIcon h={3} w={3} />}
-            />
-          </Tooltip>
-        </Stack>
-        <Flex alignItems="center">
-          <Select
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value));
-            }}
-          >
-            {[5, 10, 15].map((num) => (
-              <option key={num} value={num}>
-                {num}개씩 보기
-              </option>
-            ))}
-          </Select>
-        </Flex>
+    <Box minHeight={{ base: 300, md: 600 }} mb={24}>
+      <Flex m={4}>
+        <ChakraDataGrid
+          disableExtendRowFullWidth
+          autoHeight
+          pagination
+          autoPageSize
+          showFirstButton
+          showLastButton
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[5, 10, 15]}
+          disableSelectionOnClick
+          disableColumnMenu
+          disableColumnSelector
+          loading={isSalesLoading}
+          columns={columns}
+          rows={liveShoppingWithSales}
+        />
       </Flex>
       {tableData &&
         tableData.length !== 0 &&
@@ -448,4 +322,5 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
     </Box>
   );
 }
+
 export default BroadcasterLiveShoppingList;
