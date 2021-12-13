@@ -35,6 +35,6 @@ import { LocalStrategy } from './strategies/local.strategy';
     LoginHistoryService,
   ],
   controllers: [AuthController],
-  exports: [MailVerificationService, AuthService, LoginHistoryService],
+  exports: [MailVerificationService, AuthService, LoginHistoryService, CipherService],
 })
 export class AuthModule {}

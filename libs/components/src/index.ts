@@ -22,6 +22,7 @@ export * from './lib/BroadcasterContact';
 export * from './lib/BroadcasterLiveShoppingList';
 export * from './lib/BroadcasterName';
 export * from './lib/BroadcasterNickName';
+export * from './lib/BroadcasterSettlementInfoRegistBox';
 export * from './lib/BusinessRegistrationBox';
 export * from './lib/BusinessRegistrationDialog';
 export * from './lib/CenterBox';

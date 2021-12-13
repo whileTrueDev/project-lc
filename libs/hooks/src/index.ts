@@ -1,6 +1,7 @@
 export * from './lib/auth-hooks';
 export * from './lib/mutation/useBroadcasterAddressMutation';
 export * from './lib/mutation/useBroadcasterChannelMutation';
+export * from './lib/mutation/useBroadcasterSettlementInfoMutation';
 export * from './lib/mutation/useBusinessRegistrationConfirmationMutation';
 export * from './lib/mutation/useBusinessRegistrationMutation';
 export * from './lib/mutation/useBusinessRegistrationRejectionMutation';
@@ -56,6 +57,7 @@ export * from './lib/queries/useBroadcaster';
 export * from './lib/queries/useBroadcasterChannels';
 export * from './lib/queries/useBroadcasterContacts';
 export * from './lib/queries/useBroadcasterLiveShoppingList';
+export * from './lib/queries/useBroadcasterSettlementInfo';
 export * from './lib/queries/useDefaultContacts';
 export * from './lib/queries/useEmailDupCheck';
 export * from './lib/queries/useFmExport';
