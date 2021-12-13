@@ -128,7 +128,6 @@ export class FmOrdersController {
     return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
   }
 
-
   @Get('/broadcaster/per-live-shopping')
   async broadcasterFindSalesPerLiveShopping(
     @Query('broadcasterId') broadcasterId: number,
@@ -151,7 +150,7 @@ export class FmOrdersController {
 
     liveShoppingList = liveShoppingList?.filter((n) => n);
     return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
-    }
+  }
 
   @Get('detail')
   async findOrderDetails(
