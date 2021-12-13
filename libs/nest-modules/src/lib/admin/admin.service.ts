@@ -255,6 +255,7 @@ export class AdminService {
         broadcaster: {
           select: {
             userNickname: true,
+            email: true,
           },
         },
         liveShoppingVideo: {

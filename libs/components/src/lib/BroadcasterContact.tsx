@@ -222,6 +222,7 @@ type BroadcasterContactFormData = Omit<
   phone3: string;
 };
 export function BroadcasterContactAdd(): JSX.Element {
+  const toast = useToast();
   const profile = useProfile();
   const broadcasterContacts = useBroadcasterContacts(profile.data?.id);
   const addSection = useDisclosure({ defaultIsOpen: false });
@@ -249,7 +250,10 @@ export function BroadcasterContactAdd(): JSX.Element {
 
       <Collapse in={addSection.isOpen} animateOpacity unmountOnExit>
         <BroadcasterContactForm
-          onSuccess={addSection.onClose}
+          onSuccess={() => {
+            toast({ title: '연락처가 등록되었습니다.', status: 'success' });
+            addSection.onClose();
+          }}
           onCancel={addSection.onClose}
         />
       </Collapse>
