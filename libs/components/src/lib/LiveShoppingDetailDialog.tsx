@@ -15,17 +15,20 @@ import {
 } from '@chakra-ui/react';
 import { LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import { BroadcasterName } from './BroadcasterName';
+
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
 
 export type LiveShoppingDetailDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
   data: any;
   id: number;
+  type: 'broadcaster' | 'seller';
 };
 
 export function LiveShoppingDetailDialog(
   props: LiveShoppingDetailDialogProps,
 ): JSX.Element {
-  const { isOpen, onClose, data, id } = props;
+  const { isOpen, onClose, data, id, type } = props;
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalOverlay />
@@ -34,19 +37,19 @@ export function LiveShoppingDetailDialog(
         <ModalCloseButton />
         <ModalBody>
           <Stack spacing={4}>
-            <Stack direction="row" alignItems="center">
-              {data[id]?.seller.sellerShop && (
-                <>
-                  <Text as="span">판매자: </Text>
-                  <Text as="span">{data[id]?.seller.sellerShop.shopName}</Text>
-                </>
-              )}
-            </Stack>
+            {data[id]?.seller.sellerShop && (
+              <Stack direction="row" alignItems="center">
+                <Text as="span">판매자: </Text>
+                <Text as="span">{data[id]?.seller.sellerShop.shopName}</Text>
+              </Stack>
+            )}
 
-            <Stack direction="row" alignItems="center">
-              <Text as="span">상품명: </Text>
-              <Text as="span">{data[id]?.goods.goods_name}</Text>
-            </Stack>
+            {type === 'broadcaster' && (
+              <Stack direction="row" alignItems="center">
+                <Text as="span">상품명: </Text>
+                <Text as="span">{data[id].goods.goods_name}</Text>
+              </Stack>
+            )}
 
             <Stack direction="row" alignItems="center">
               <Text as="span">진행상태</Text>
@@ -60,7 +63,27 @@ export function LiveShoppingDetailDialog(
                 <Text>사유 : {data[id]?.rejectionReason}</Text>
               ) : null}
             </Stack>
+
             <Divider />
+
+            {type === 'seller' && (
+              <Stack direction="row" alignItems="center">
+                <Text as="span">방송인: </Text>
+                {data[id].broadcaster ? (
+                  <>
+                    <BroadcasterName data={data[id].broadcaster} />
+                    {/* //TODO: 방송인 계정설정 "플랫폼" 이후 channelUrl 전달 */}
+                    {/* {data[liveShoppingId].broadcaster.channelUrl && (
+                    <BroadcasterChannelButton
+                      channelUrl={data[liveShoppingId].broadcaster.channelUrl}
+                    />
+                  )} */}
+                  </>
+                ) : (
+                  <Text fontWeight="bold">미정</Text>
+                )}
+              </Stack>
+            )}
 
             <Stack direction="row" alignItems="center">
               <Text as="span">방송시작 시간: </Text>
@@ -108,6 +131,35 @@ export function LiveShoppingDetailDialog(
                   : '미정'}
               </Text>
             </Stack>
+
+            {type === 'seller' && (
+              <Stack direction="row" alignItems="center">
+                <Text as="span">판매 수수료: </Text>
+                <Text as="span" fontWeight="bold">
+                  {data[id].whiletrueCommissionRate
+                    ? `${data[id].whiletrueCommissionRate}%`
+                    : '미정'}
+                </Text>
+              </Stack>
+            )}
+
+            {type === 'seller' && (
+              <Stack direction="row" alignItems="center">
+                <Text as="span">희망 판매 수수료: </Text>
+                <Text as="span" fontWeight="bold">
+                  {data[id].desiredCommission} %
+                </Text>
+              </Stack>
+            )}
+
+            {type === 'seller' && (
+              <Stack direction="row" alignItems="center">
+                <Text as="span">희망 진행 기간: </Text>
+                <Text as="span" fontWeight="bold">
+                  {data[id].desiredPeriod}
+                </Text>
+              </Stack>
+            )}
 
             <Stack>
               <Text>요청사항</Text>

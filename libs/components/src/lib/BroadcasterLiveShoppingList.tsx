@@ -188,6 +188,7 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
             onClose={detailOnClose}
             data={liveShoppingWithSales}
             id={liveShoppingId}
+            type="broadcaster"
           />
         </>
       )}
