@@ -1,4 +1,4 @@
-import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
+import { useQuery, UseQueryResult } from 'react-query';
 import { LiveShoppingWithSalesAndFmId } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
@@ -15,14 +15,12 @@ export const getBroadcasterFmOrdersDuringLiveShoppingSales = async (
 
 export const useBroadcasterFmOrdersDuringLiveShoppingSales = ({
   broadcasterId,
-  enabled,
 }: {
-  broadcasterId: number;
-  enabled: boolean;
+  broadcasterId: number | undefined;
 }): UseQueryResult<LiveShoppingWithSalesAndFmId[], AxiosError> => {
   return useQuery<LiveShoppingWithSalesAndFmId[], AxiosError>(
     'broadCasterFmOrdersDuringLiveShoppingSales',
     () => getBroadcasterFmOrdersDuringLiveShoppingSales(broadcasterId),
-    { retry: 1, enabled },
+    { enabled: !!broadcasterId },
   );
 };

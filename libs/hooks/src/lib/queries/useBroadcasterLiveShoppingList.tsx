@@ -33,15 +33,13 @@ export const getBroadcasterLiveShoppingList = async (
 
 export const useBroadcasterLiveShoppingList = ({
   broadcasterId,
-  enabled,
 }: {
-  broadcasterId: number;
-  enabled: boolean;
+  broadcasterId: number | undefined;
 }): UseQueryResult<any[], AxiosError> => {
   const queryKey = ['broadcasterLiveShoppingList', broadcasterId];
   return useQuery<LiveShoppingWithGoods[], AxiosError>(
     queryKey,
     () => getBroadcasterLiveShoppingList(broadcasterId),
-    { enabled },
+    { enabled: !!broadcasterId },
   );
 };

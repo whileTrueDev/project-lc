@@ -1,23 +1,5 @@
 import { useState } from 'react';
-import {
-  Box,
-  Button,
-  Link,
-  Stack,
-  Text,
-  Tooltip,
-  useDisclosure,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Divider,
-  Textarea,
-  Flex,
-} from '@chakra-ui/react';
+import { Box, Button, Link, Text, Tooltip, useDisclosure, Flex } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import {
@@ -26,9 +8,9 @@ import {
   useProfile,
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
-import { LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
 import { ChakraDataGrid } from './ChakraDataGrid';
+import { LiveShoppingDetailDialog } from './LiveShoppingDetailDialog';
 
 export function BroadcasterLiveShoppingList(): JSX.Element {
   const { data: profileData } = useProfile();
@@ -36,14 +18,12 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
   const [pageSize, setPageSize] = useState<number>(5);
 
   const { data: tableData } = useBroadcasterLiveShoppingList({
-    broadcasterId: profileData?.id || 0,
-    enabled: !!profileData?.id,
+    broadcasterId: profileData?.id,
   });
 
   const { data: salesData, isLoading: isSalesLoading } =
     useBroadcasterFmOrdersDuringLiveShoppingSales({
-      broadcasterId: profileData?.id || 0,
-      enabled: !!profileData?.id,
+      broadcasterId: profileData?.id,
     });
 
   const {
@@ -179,151 +159,38 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       ),
     },
   ];
-  console.log('table', tableData);
-  console.log(liveShoppingWithSales);
 
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
-      <Flex m={4}>
-        <ChakraDataGrid
-          disableExtendRowFullWidth
-          autoHeight
-          pagination
-          autoPageSize
-          showFirstButton
-          showLastButton
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[5, 10, 15]}
-          disableSelectionOnClick
-          disableColumnMenu
-          disableColumnSelector
-          loading={isSalesLoading}
-          columns={columns}
-          rows={liveShoppingWithSales}
-        />
-      </Flex>
-
-      <Modal isOpen={detailIsOpen} onClose={detailOnClose} size="lg">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>상세정보</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack spacing={4}>
-              <Stack direction="row" alignItems="center">
-                {liveShoppingWithSales[liveShoppingId]?.seller.sellerShop && (
-                  <>
-                    <Text as="span">판매자: </Text>
-                    <Text as="span">
-                      {liveShoppingWithSales[liveShoppingId].seller.sellerShop.shopName}
-                    </Text>
-                  </>
-                )}
-              </Stack>
-
-              <Stack direction="row" alignItems="center">
-                <Text as="span">상품명: </Text>
-                <Text as="span">
-                  {liveShoppingWithSales[liveShoppingId].goods.goods_name}
-                </Text>
-              </Stack>
-
-              <Stack direction="row" alignItems="center">
-                <Text as="span">진행상태</Text>
-                <LiveShoppingProgressBadge
-                  progress={liveShoppingWithSales[liveShoppingId].progress}
-                  broadcastStartDate={
-                    liveShoppingWithSales[liveShoppingId].broadcastStartDate
-                  }
-                  broadcastEndDate={
-                    liveShoppingWithSales[liveShoppingId].broadcastEndDate
-                  }
-                  sellEndDate={liveShoppingWithSales[liveShoppingId].sellEndDate}
-                />
-                {liveShoppingWithSales[liveShoppingId].progress ===
-                LIVE_SHOPPING_PROGRESS.취소됨 ? (
-                  <Text>
-                    사유 : {liveShoppingWithSales[liveShoppingId].rejectionReason}
-                  </Text>
-                ) : null}
-              </Stack>
-              <Divider />
-
-              <Stack direction="row" alignItems="center">
-                <Text as="span">방송시작 시간: </Text>
-                <Text as="span" fontWeight="bold">
-                  {liveShoppingWithSales[liveShoppingId].broadcastStartDate
-                    ? dayjs(
-                        liveShoppingWithSales[liveShoppingId].broadcastStartDate,
-                      ).format('YYYY/MM/DD HH:mm')
-                    : '미정'}
-                </Text>
-              </Stack>
-
-              <Stack direction="row" alignItems="center">
-                <Text as="span">방송종료 시간: </Text>
-                <Text as="span" fontWeight="bold">
-                  {liveShoppingWithSales[liveShoppingId].broadcastEndDate
-                    ? dayjs(
-                        liveShoppingWithSales[liveShoppingId].broadcastEndDate,
-                      ).format('YYYY/MM/DD HH:mm')
-                    : '미정'}
-                </Text>
-              </Stack>
-
-              <Divider />
-              <Stack direction="row" alignItems="center">
-                <Text as="span">판매시작 시간: </Text>
-                <Text as="span" fontWeight="bold">
-                  {liveShoppingWithSales[liveShoppingId].sellStartDate
-                    ? dayjs(liveShoppingWithSales[liveShoppingId].sellStartDate).format(
-                        'YYYY/MM/DD HH:mm',
-                      )
-                    : '미정'}
-                </Text>
-              </Stack>
-
-              <Stack direction="row" alignItems="center">
-                <Text as="span">판매종료 시간: </Text>
-                <Text as="span" fontWeight="bold">
-                  {liveShoppingWithSales[liveShoppingId].sellEndDate
-                    ? dayjs(liveShoppingWithSales[liveShoppingId].sellEndDate).format(
-                        'YYYY/MM/DD HH:mm',
-                      )
-                    : '미정'}
-                </Text>
-              </Stack>
-
-              <Divider />
-              <Stack direction="row" alignItems="center">
-                <Text as="span">방송인 수수료: </Text>
-                <Text as="span" fontWeight="bold">
-                  {liveShoppingWithSales[liveShoppingId].broadcasterCommissionRate
-                    ? `${liveShoppingWithSales[liveShoppingId].broadcasterCommissionRate}%`
-                    : '미정'}
-                </Text>
-              </Stack>
-
-              <Stack>
-                <Text>요청사항</Text>
-                <Textarea
-                  resize="none"
-                  rows={10}
-                  value={liveShoppingWithSales[liveShoppingId].requests || ''}
-                  readOnly
-                />
-              </Stack>
-            </Stack>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="blue" onClick={detailOnClose}>
-              닫기
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      {liveShoppingWithSales && (
+        <>
+          <Flex m={4}>
+            <ChakraDataGrid
+              disableExtendRowFullWidth
+              autoHeight
+              pagination
+              autoPageSize
+              showFirstButton
+              showLastButton
+              pageSize={pageSize}
+              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+              rowsPerPageOptions={[5, 10, 15]}
+              disableSelectionOnClick
+              disableColumnMenu
+              disableColumnSelector
+              loading={isSalesLoading}
+              columns={columns}
+              rows={liveShoppingWithSales}
+            />
+          </Flex>
+          <LiveShoppingDetailDialog
+            isOpen={detailIsOpen}
+            onClose={detailOnClose}
+            data={liveShoppingWithSales}
+            id={liveShoppingId}
+          />
+        </>
+      )}
     </Box>
   );
 }
