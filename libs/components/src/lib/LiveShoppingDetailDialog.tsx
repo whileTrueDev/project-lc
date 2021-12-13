@@ -47,7 +47,7 @@ export function LiveShoppingDetailDialog(
             {type === 'broadcaster' && (
               <Stack direction="row" alignItems="center">
                 <Text as="span">상품명: </Text>
-                <Text as="span">{data[id].goods.goods_name}</Text>
+                <Text as="span">{data[id]?.goods.goods_name}</Text>
               </Stack>
             )}
 
@@ -147,7 +147,7 @@ export function LiveShoppingDetailDialog(
               <Stack direction="row" alignItems="center">
                 <Text as="span">희망 판매 수수료: </Text>
                 <Text as="span" fontWeight="bold">
-                  {data[id].desiredCommission} %
+                  {data[id]?.desiredCommission} %
                 </Text>
               </Stack>
             )}
@@ -156,7 +156,7 @@ export function LiveShoppingDetailDialog(
               <Stack direction="row" alignItems="center">
                 <Text as="span">희망 진행 기간: </Text>
                 <Text as="span" fontWeight="bold">
-                  {data[id].desiredPeriod}
+                  {data[id]?.desiredPeriod}
                 </Text>
               </Stack>
             )}
