@@ -566,8 +566,9 @@ model BroadcasterSettlements {
 
 // 방송인 정산 내역 - 주문정보
 model BroadcasterSettlementOrders {
-  id      Int    @id @default(autoincrement())
-  orderId String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
+  id       Int    @id @default(autoincrement())
+  orderId  String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
+  exportId Int // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_seq)
 
   liveShoppingId           Int?
   liveShopping             LiveShopping?          @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)

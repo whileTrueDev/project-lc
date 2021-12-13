@@ -1,16 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Broadcaster, BroadcasterSettlements, Prisma } from '@prisma/client';
+import { Broadcaster, BroadcasterSettlements } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-
-interface CreateBroadcasterSettlementHistoryDto {
-  round: BroadcasterSettlements['round'];
-  totalAmount: BroadcasterSettlements['totalAmount'];
-  totalCommission: BroadcasterSettlements['totalCommission'];
-}
-
-type CreateBroadcasterSettlementHistoriesDto = {
-  histories: CreateBroadcasterSettlementHistoryDto[];
-};
+import { CreateBroadcasterSettlementHistoryDto } from '@project-lc/shared-types';
 
 @Injectable()
 export class BroadcasterSettlementHistoryService {
@@ -21,23 +12,18 @@ export class BroadcasterSettlementHistoryService {
     broadcasterId: Broadcaster['id'],
     dto: CreateBroadcasterSettlementHistoryDto,
   ): Promise<BroadcasterSettlements> {
+    const { round, totalAmount, totalCommission } = dto;
     return this.prisma.broadcasterSettlements.create({
-      data: { broadcaster: { connect: { id: broadcasterId } }, ...dto },
+      data: {
+        broadcaster: { connect: { id: broadcasterId } },
+        round,
+        totalAmount,
+        totalCommission,
+        broadcasterSettlementOrders: {
+          createMany: { data: dto.items },
+        },
+      },
     });
-  }
-
-  // 정산 내역 일괄 생성
-  public async executeSettleMany(
-    broadcasterId: Broadcaster['id'],
-    dto: CreateBroadcasterSettlementHistoriesDto,
-  ): Promise<number> {
-    const data: Prisma.Enumerable<Prisma.BroadcasterSettlementsCreateManyInput> =
-      dto.histories.map((hi) => ({ ...hi, broadcasterId }));
-
-    const result = await this.prisma.broadcasterSettlements.createMany({
-      data,
-    });
-    return result.count;
   }
 
   public async findHistories(): Promise<any> {

@@ -14,6 +14,7 @@ CREATE TABLE `BroadcasterSettlements` (
 CREATE TABLE `BroadcasterSettlementOrders` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `orderId` VARCHAR(191) NOT NULL,
+    `exportId` INTEGER NOT NULL,
     `liveShoppingId` INTEGER NULL,
     `broadcasterSettlementsId` INTEGER NOT NULL,
 

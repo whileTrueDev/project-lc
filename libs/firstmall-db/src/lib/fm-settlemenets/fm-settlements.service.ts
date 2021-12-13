@@ -117,10 +117,10 @@ export class FmSettlementService {
 
   // * 방송인 정산 대상 목록 조회
   public async findBcSettleTargetList(): Promise<any> {
-    // 방송인 정산 대상 목록 = "방송인이 명시된 주문 중, 아직 정산되지 않은 '구매확정'된 상태의 모든 주문"
+    // 방송인 정산 대상 목록이란
+    // "방송인이 명시된 주문에 대한 출고 중, 아직 정산되지 않은 '구매확정'된 상태의 모든 출고"
     // 조회
-    const sql = `
-    SELECT `;
     // 반환
+    return [];
   }
 }
