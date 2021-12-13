@@ -59,6 +59,7 @@ export * from './lib/queries/useDefaultContacts';
 export * from './lib/queries/useEmailDupCheck';
 export * from './lib/queries/useFmExport';
 export * from './lib/queries/useFmOrder';
+export * from './lib/queries/useFmOrderDetails';
 export * from './lib/queries/useFmOrders';
 export * from './lib/queries/useFmOrdersByGoods';
 export * from './lib/queries/useFmOrdersDuringLiveShoppingSales';

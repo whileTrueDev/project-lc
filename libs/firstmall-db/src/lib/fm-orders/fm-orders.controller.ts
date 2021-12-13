@@ -27,6 +27,7 @@ import {
   OrderStatsRes,
   SalesStats,
   ChangeReturnStatusDto,
+  FindFmOrderDetailsDto,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 
@@ -125,6 +126,21 @@ export class FmOrdersController {
 
     liveShoppingList = liveShoppingList?.filter((n) => n);
     return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
+  }
+
+  @Get('detail')
+  async findOrderDetails(
+    @SellerInfo() seller: UserPayload,
+    @Query(ValidationPipe) dto: FindFmOrderDetailsDto,
+  ): Promise<FindFmOrderDetailRes[]> {
+    // 판매자의 승인된 상품 ID 목록 조회
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    const result = await Promise.all(
+      dto.orderIds.map((orderId) => {
+        return this.fmOrdersService.findOneOrder(orderId, ids);
+      }),
+    );
+    return result;
   }
 
   /** 개별 주문 조회 */
