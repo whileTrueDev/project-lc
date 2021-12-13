@@ -29,6 +29,7 @@ export function LiveShoppingDetailDialog(
   props: LiveShoppingDetailDialogProps,
 ): JSX.Element {
   const { isOpen, onClose, data, id, type } = props;
+  console.log(data);
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalOverlay />
