@@ -10,12 +10,19 @@ import {
 } from '@chakra-ui/react';
 import { GridCellParams, GridColumns, GridRowData } from '@material-ui/data-grid';
 import { Notice } from '@prisma/client';
-import { useNoticeFlagMutation, useNoticeInfo } from '@project-lc/hooks';
+import {
+  useDeleteNoticeMutation,
+  useNoticeFlagMutation,
+  useNoticeInfo,
+} from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { AdminNoticeDialog } from './AdminNoticeDialog';
 
-const columns = (handleChange: any): GridColumns => {
+const columns = (
+  handleChange: any,
+  handleDelete: (id: number) => Promise<void>,
+): GridColumns => {
   return [
     {
       field: 'posting',
@@ -43,13 +50,24 @@ const columns = (handleChange: any): GridColumns => {
         dayjs(row.postingDate as Date).format('YYYY/MM/DD HH:mm:ss'),
       minWidth: 200,
     },
-    // {
-    //   field: 'delete',
-    //   headerName: '지우기',
-    //   width: 120,
-    //   renderCell: () => <Button size="xs">리스트에서 지우기</Button>,
-    //   sortable: false,
-    // },
+    {
+      field: 'delete',
+      headerName: '삭제하기',
+      width: 120,
+      renderCell: ({ row }) => (
+        <Button
+          size="xs"
+          onClick={() => {
+            if (window.confirm(`공지사항 ${row.title} 를 삭제하시겠습니까?`)) {
+              handleDelete(row.id);
+            }
+          }}
+        >
+          목록에서 삭제
+        </Button>
+      ),
+      sortable: false,
+    },
   ];
 };
 
@@ -102,6 +120,25 @@ export function AdminNoticeSection(): JSX.Element {
       }
     };
 
+  // 공지사항 삭제
+  const { mutateAsync: deleteNotice } = useDeleteNoticeMutation();
+  const onDeleteSuccess = (): void => {
+    toast({ title: '공지사항 삭제 완료', status: 'success' });
+  };
+  const onDeleteFail = (): void => {
+    toast({ title: '공지사항 삭제 실패', status: 'error' });
+  };
+  const handleDelete = async (id: number): Promise<void> => {
+    return deleteNotice(id)
+      .then((res) => {
+        if (!res) onDeleteFail();
+        else onDeleteSuccess();
+      })
+      .catch((err) => {
+        console.log(err);
+        onDeleteFail();
+      });
+  };
   return (
     <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
       <Text fontSize="lg" fontWeight="medium" pb={1}>
@@ -116,7 +153,7 @@ export function AdminNoticeSection(): JSX.Element {
         autoHeight
         hideFooter
         density="compact"
-        columns={columns(handleFlagChange)}
+        columns={columns(handleFlagChange, handleDelete)}
         rows={makeListRow(notices)}
         rowsPerPageOptions={[25, 50]}
         onCellClick={handleClick}
