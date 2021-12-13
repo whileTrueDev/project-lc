@@ -204,14 +204,10 @@ export function BroadcasterPurchaseList(): JSX.Element {
   const orders = useFmOrders(fmOrderStates);
   const { isDesktopSize } = useDisplaySize();
   const { data: profileData } = useProfile();
-  const { data: liveShoppingData } = useBroadcasterLiveShoppingConnectionId(
-    profileData?.id || 0,
-  );
-  console.log(liveShoppingData);
-  const { data } = useFmOrdersDuringLiveShoppingSalesPurchaseDone(
-    liveShoppingData || [],
-    { enabled: !!liveShoppingData },
-  );
+  // const { data: liveShoppingData } = useBroadcasterLiveShoppingConnectionId(
+  //   profileData?.id || 0,
+  // );
+  const { data } = useFmOrdersDuringLiveShoppingSalesPurchaseDone(profileData?.id);
 
   const filteredOrders = useMemo(() => {
     if (!orders.data) return [];

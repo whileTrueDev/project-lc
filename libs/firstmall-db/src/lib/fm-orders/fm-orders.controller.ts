@@ -149,10 +149,16 @@ export class FmOrdersController {
 
   @Get('/broadcaster/purchases')
   async getBroadcasterPurchases(
-    @Param('firstmallGoodsConnectionId')
-    firstmallGoodsConnectionId: { firstmallGoodsConnectionId: number }[],
+    @Param('broadcasterId')
+    broadcasterId: number,
   ): Promise<any> {
-    console.log('firstmallGoodsConnectionId', firstmallGoodsConnectionId);
+    const linkedLiveShoppingFmGoodsId =
+      await this.liveShoppingService.getLinkedLiveShoppingFmGoodsId(broadcasterId);
+    const purchasedList =
+      await this.fmOrdersService.getPurchaseDoneOrderDuringLiveShopping(
+        linkedLiveShoppingFmGoodsId,
+      );
+    console.log('firstmallGoodsConnectionId', linkedLiveShoppingFmGoodsId);
     return 'something';
   }
 }

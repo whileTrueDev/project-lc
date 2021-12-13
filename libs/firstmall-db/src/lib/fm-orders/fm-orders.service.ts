@@ -900,4 +900,19 @@ export class FmOrdersService {
     if (suboption.length === 0) return false;
     return true;
   }
+
+  public async getPurchaseDoneOrderDuringLiveShopping(goods_id: number): Promise<any> {
+    const query = await this.db.query(`
+    SELECT fo.order_seq, fo.settleprice, fo.deposit_date, fo.step, fois.suboption, foii.title, foii.value
+    FROM fm_order_item AS foi 
+    RIGHT JOIN fm_order AS fo 
+    ON foi.order_seq = fo.order_seq 
+    LEFT JOIN fm_order_item_suboption AS fois
+    ON fo.order_seq = fois.order_seq
+    LEFT JOIN fm_order_item_input AS foii
+    ON fo.order_seq=foii.order_seq
+    WHERE goods_seq=${goods_id}
+`); // AND fo.step=95
+    console.log(query);
+  }
 }
