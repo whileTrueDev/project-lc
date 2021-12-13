@@ -14,6 +14,7 @@ export class FmSettlementService {
     private readonly prisma: PrismaService,
   ) {}
 
+  // * 판매자 정산 대상 목록 조회
   public async findAllSettleTargetList(): Promise<Array<FmSettlementTarget>> {
     const settled = await this.prisma.sellerSettlements.findMany();
 
@@ -112,5 +113,14 @@ export class FmSettlementService {
     }));
 
     return exports;
+  }
+
+  // * 방송인 정산 대상 목록 조회
+  public async findBcSettleTargetList(): Promise<any> {
+    // 방송인 정산 대상 목록 = "방송인이 명시된 주문 중, 아직 정산되지 않은 '구매확정'된 상태의 모든 주문"
+    // 조회
+    const sql = `
+    SELECT `;
+    // 반환
   }
 }
