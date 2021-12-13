@@ -19,7 +19,7 @@ import { LayoutProps } from '@chakra-ui/styled-system';
 import { useToast } from '@chakra-ui/toast';
 import { useFmOrderDetails } from '@project-lc/hooks';
 import {
-  ORDER_DOWNLOAD_DEFAULT_FILENAME,
+  getOrderDownloadFileName,
   useFmOrderStore,
   useOrderListDownloadStore,
 } from '@project-lc/stores';
@@ -51,7 +51,7 @@ export function OrderListDownloadDialog({
       });
       const workbook = ossg.createXLSX(orderDetails.data);
       ossg
-        .download(`${fileName || ORDER_DOWNLOAD_DEFAULT_FILENAME}.xlsx`, workbook)
+        .download(`${fileName || getOrderDownloadFileName()}.xlsx`, workbook)
         .then(() => {
           toast({ status: 'success', title: '주문목록 다운로드 완료' });
           onClose();

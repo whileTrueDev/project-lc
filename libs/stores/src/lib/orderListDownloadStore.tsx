@@ -8,11 +8,14 @@ interface OrderListDownloadStoreStates {
   setFileName: (fileName: string) => void;
 }
 
-const now = dayjs().format('YY/MM/DD');
-export const ORDER_DOWNLOAD_DEFAULT_FILENAME = `크크쇼주문목록_${now}`;
+export const getOrderDownloadFileName = (): string => {
+  const now = dayjs().format('YY/MM/DD');
+  const ORDER_DOWNLOAD_DEFAULT_FILENAME = `크크쇼주문목록_${now}`;
+  return ORDER_DOWNLOAD_DEFAULT_FILENAME;
+};
 export const useOrderListDownloadStore = create<OrderListDownloadStoreStates>(
   (set, get) => ({
-    fileName: ORDER_DOWNLOAD_DEFAULT_FILENAME,
+    fileName: getOrderDownloadFileName(),
     setFileName: (f) => {
       set({ fileName: f });
     },
