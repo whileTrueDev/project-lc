@@ -17,18 +17,26 @@ import {
   BroadcasterAddressDto,
   BroadcasterContactDto,
   BroadcasterRes,
+  BroadcasterSettlementInfoDto,
+  BroadcasterSettlementInfoRes,
   ChangeNicknameDto,
   CreateBroadcasterChannelDto,
   EmailDupCheckDto,
   FindBroadcasterDto,
   SignUpDto,
 } from '@project-lc/shared-types';
-import { Broadcaster, BroadcasterAddress, BroadcasterContacts } from '.prisma/client';
+import {
+  Broadcaster,
+  BroadcasterAddress,
+  BroadcasterContacts,
+  BroadcasterSettlementInfo,
+} from '.prisma/client';
 import { MailVerificationService } from '../auth/mailVerification.service';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterService } from './broadcaster.service';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
+import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 
 @Controller('broadcaster')
 export class BroadcasterController {
@@ -37,6 +45,7 @@ export class BroadcasterController {
     private readonly contactsService: BroadcasterContactsService,
     private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
+    private readonly broadcasterSettlementService: BroadcasterSettlementService,
   ) {}
 
   /** 방송인 정보 조회 */
@@ -148,5 +157,23 @@ export class BroadcasterController {
     @Body(ValidationPipe) dto: BroadcasterAddressDto,
   ): Promise<BroadcasterAddress> {
     return this.broadcasterService.upsertAddress(1, dto);
+  }
+
+  /** 방송인 정산정보 등록 */
+  @Post('settlement-info')
+  public async insertSettlementInfo(
+    @Body(ValidationPipe) dto: BroadcasterSettlementInfoDto,
+  ): Promise<BroadcasterSettlementInfo> {
+    return this.broadcasterSettlementService.insertSettlementInfo(dto);
+  }
+
+  /** 방송인 정산정보 조회 */
+  @Get('settlement-info/:broadcasterId')
+  public async selectBroadcasterSettlementInfo(
+    @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
+  ): Promise<BroadcasterSettlementInfoRes> {
+    return this.broadcasterSettlementService.selectBroadcasterSettlementInfo(
+      broadcasterId,
+    );
   }
 }
