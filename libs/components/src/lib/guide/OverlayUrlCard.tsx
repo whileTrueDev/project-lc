@@ -13,7 +13,11 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  title: { marginRight: theme.spacing(1), fontWeight: 'bold' },
+  title: {
+    marginRight: theme.spacing(1),
+    fontWeight: 'bold',
+    fontSize: theme.typography.body2.fontSize,
+  },
   textField: {
     maxWidth: 300,
     marginRight: theme.spacing(2),
