@@ -51,7 +51,7 @@ export function UrlCard({ profileData }: UrlCardProps): JSX.Element {
 
   return (
     <Paper className={classes.container}>
-      <Typography className={classes.title}>배너 오버레이 URL</Typography>
+      <Typography className={classes.title}>라이브 쇼핑 화면 URL</Typography>
       <Input
         className={classes.textField}
         id="overlayUrl"

@@ -133,6 +133,7 @@ export function StartGuideSection({
             onClick={(): void => {
               if (introduction) {
                 handleIntroSkip();
+                setCondition(false);
                 return;
               }
               if (activeStep === steps.length - 1) {
