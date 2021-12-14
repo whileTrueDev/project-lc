@@ -95,7 +95,7 @@ export class LiveShoppingService {
     });
   }
 
-async getLinkedLiveShoppingFmGoodsId(
+  async getLinkedLiveShoppingFmGoodsId(
     broadcasterId: number,
   ): Promise<GoodsConfirmationDtoOnlyConnectionId[]> {
     const nestedFmGoodsConnectionIds = await this.prisma.liveShopping.findMany({
@@ -120,8 +120,8 @@ async getLinkedLiveShoppingFmGoodsId(
     );
     return fmGoodsConnectionIds;
   }
-  
- async getBroadcasterRegisteredLiveShoppings(
+
+  async getBroadcasterRegisteredLiveShoppings(
     broadcasterId: number,
   ): Promise<LiveShoppingWithConfirmation[]> {
     // 자신의 id를 반환하는 쿼리 수행하기

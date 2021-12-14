@@ -66,6 +66,7 @@ export class LiveShoppingController {
   ): Promise<any> {
     return this.liveShoppingService.getLinkedLiveShoppingFmGoodsId(broadcasterId);
   }
+
   @Get('/broadcaster')
   getBroadcasterLiveShoppings(
     @Query('broadcasterId') broadcasterId: number,
