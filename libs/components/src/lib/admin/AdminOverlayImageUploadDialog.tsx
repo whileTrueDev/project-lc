@@ -71,7 +71,6 @@ export async function uploadImageToS3(
   type: 'vertical-banner' | 'donation-images',
 ): Promise<string> {
   const { file, filename, contentType } = imageFile;
-
   return s3.s3uploadFile({
     file,
     filename,
@@ -166,7 +165,6 @@ export function AdminOverlayImageUploadDialog(
       if (numberOfSavedDonationImages + donationPreviews.length > 2) {
         throw new Error('응원메세지 이미지는 2개까지 등록가능합니다.');
       }
-
       await imageFileListToImageDto(
         verticalPreviews,
         broadcasterId,

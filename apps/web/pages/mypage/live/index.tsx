@@ -6,7 +6,7 @@ export function Live(): JSX.Element {
   const router = useRouter();
   return (
     <MypageLayout>
-      <Container maxWidth="container.xl" my={12}>
+      <Container maxWidth="container.xxl" my={12}>
         <Heading>라이브 쇼핑 목록</Heading>
         <Stack direction="row" p={2} justifyContent="flex-end">
           <Button colorScheme="blue" onClick={() => router.push('/mypage/live/regist')}>

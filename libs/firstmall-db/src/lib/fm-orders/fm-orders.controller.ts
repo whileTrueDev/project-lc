@@ -27,6 +27,7 @@ import {
   OrderStatsRes,
   SalesStats,
   ChangeReturnStatusDto,
+  FindFmOrderDetailsDto,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 
@@ -125,6 +126,45 @@ export class FmOrdersController {
 
     liveShoppingList = liveShoppingList?.filter((n) => n);
     return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
+  }
+
+  @Get('/broadcaster/per-live-shopping')
+  async broadcasterFindSalesPerLiveShopping(
+    @Query('broadcasterId') broadcasterId: number,
+  ): Promise<{ id: number; sales: string }[]> {
+    let liveShoppingList = await this.liveShoppingService
+      .getBroadcasterRegisteredLiveShoppings(broadcasterId)
+      .then((result) => {
+        return result.map((val) => {
+          if (val.sellStartDate && val.sellEndDate) {
+            return {
+              id: val.id,
+              firstmallGoodsConnectionId: `${val.goods.confirmation.firstmallGoodsConnectionId}`,
+              sellStartDate: dayjs(val.sellStartDate).toString(),
+              sellEndDate: dayjs(val.sellEndDate).toString(),
+            };
+          }
+          return null;
+        });
+      });
+
+    liveShoppingList = liveShoppingList?.filter((n) => n);
+    return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
+  }
+
+  @Get('detail')
+  async findOrderDetails(
+    @SellerInfo() seller: UserPayload,
+    @Query(ValidationPipe) dto: FindFmOrderDetailsDto,
+  ): Promise<FindFmOrderDetailRes[]> {
+    // 판매자의 승인된 상품 ID 목록 조회
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    const result = await Promise.all(
+      dto.orderIds.map((orderId) => {
+        return this.fmOrdersService.findOneOrder(orderId, ids);
+      }),
+    );
+    return result;
   }
 
   /** 개별 주문 조회 */

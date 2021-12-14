@@ -53,4 +53,11 @@ export class NoticeService {
 
     return notice;
   }
+
+  // 공지사항 삭제
+  public async deleteNotice(id: Notice['id']): Promise<Notice> {
+    return this.prisma.notice.delete({
+      where: { id },
+    });
+  }
 }
