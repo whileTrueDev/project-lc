@@ -12,7 +12,11 @@ import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import { LiveShoppingDetailDialog } from './LiveShoppingDetailDialog';
 
-export function BroadcasterLiveShoppingList(): JSX.Element {
+export function BroadcasterLiveShoppingList({
+  useSmallSize = false,
+}: {
+  useSmallSize?: boolean;
+}): JSX.Element {
   const { data: profileData } = useProfile();
   const [liveShoppingId, setLiveShoppingId] = useState(0);
   const [pageSize, setPageSize] = useState<number>(5);
@@ -159,9 +163,8 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       ),
     },
   ];
-
   return (
-    <Box minHeight={{ base: 300, md: 600 }} mb={24}>
+    <Box minHeight={useSmallSize ? 0 : { base: 300, md: 600 }} mb={useSmallSize ? 1 : 24}>
       {liveShoppingWithSales && (
         <>
           <Flex m={4}>
