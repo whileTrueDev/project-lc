@@ -18,6 +18,7 @@ export * from './lib/mutation/useCreateShippingGroup';
 export * from './lib/mutation/useDeleteBroadcasterContactsMutation';
 export * from './lib/mutation/useDeleteGoodsCommonInfo';
 export * from './lib/mutation/useDeleteLiveShoppingMutation';
+export * from './lib/mutation/useDeleteNoticeMutation';
 export * from './lib/mutation/useDeleteSellerGoods';
 export * from './lib/mutation/useDeleteSellerMutation';
 export * from './lib/mutation/useDeleteShippingGroup';
