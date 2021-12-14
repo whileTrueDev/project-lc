@@ -1,8 +1,10 @@
 import { Button, Text, useDisclosure } from '@chakra-ui/react';
 import { GridCellParams, GridColumns } from '@material-ui/data-grid';
+import { TaxationType } from '@prisma/client';
 import { useAdminBroadcasterSettlementInfoList, useDisplaySize } from '@project-lc/hooks';
 import { BroadcasterSettlementInfoListRes } from '@project-lc/shared-types';
 import { useState } from 'react';
+import { TAX_TYPE } from '../BroadcasterSettlementInfoRegistBox';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import AdminBroadcasterSettlementInfoConfirmationDialog from './AdminBroadcasterSettlementInfoConfirmationDialog';
 import AdminBroadcasterSettlementInfoRejectionDialog from './AdminBroadcasterSettlementInfoRejectionDialog';
@@ -31,6 +33,7 @@ const columns: GridColumns = [
   {
     field: 'type',
     headerName: '과세유형',
+    renderCell: (params) => <Text>{TAX_TYPE[params.row.type as TaxationType]}</Text>,
     minWidth: 120,
   },
   {
