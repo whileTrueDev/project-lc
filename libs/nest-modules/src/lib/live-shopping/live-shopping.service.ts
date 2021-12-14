@@ -95,8 +95,10 @@ export class LiveShoppingService {
     });
   }
 
-  async getLinkedLiveShoppingFmGoodsId(broadcasterId: number): Promise<any> {
-    return this.prisma.liveShopping.findMany({
+  async getLinkedLiveShoppingFmGoodsId(
+    broadcasterId: number,
+  ): Promise<GoodsConfirmationDtoOnlyConnectionId[]> {
+    const nestedFmGoodsConnectionIds = await this.prisma.liveShopping.findMany({
       where: {
         broadcasterId: broadcasterId ? Number(broadcasterId) : undefined,
       },
@@ -112,5 +114,10 @@ export class LiveShoppingService {
         },
       },
     });
+    const fmGoodsConnectionIds = [];
+    nestedFmGoodsConnectionIds.map((value) =>
+      fmGoodsConnectionIds.push(value.goods.confirmation),
+    );
+    return fmGoodsConnectionIds;
   }
 }

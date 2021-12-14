@@ -25,6 +25,8 @@ import {
   FmOrderItemInput,
   FmOrderItemSubOption,
   CheeringMessage,
+  BroadcasterPurchaseDto,
+  GoodsConfirmationDtoOnlyConnectionId,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { FirstmallDbService } from '../firstmall-db.service';
@@ -901,10 +903,42 @@ export class FmOrdersService {
     return true;
   }
 
-  public async getPurchaseDoneOrderDuringLiveShopping(goods: any): Promise<any> {
+  private getMessage(value): BroadcasterPurchaseDto {
+    const newMessageRow = Object.assign(value);
+    const inputsArray = value.message.split('||');
+    let userNickname = '-';
+    let userMessage = '-';
+    for (let i = 0; i < inputsArray.length; i++) {
+      const dividedArray = inputsArray[i].split('&&');
+      if (
+        dividedArray[0] === '닉네임' &&
+        dividedArray[1] !== '입력없음' &&
+        userNickname === '-'
+      ) {
+        const nickname = dividedArray[1];
+        userNickname = nickname;
+      }
+      if (
+        dividedArray[0] === '응원메세지' &&
+        dividedArray[1] !== '입력없음' &&
+        userMessage === '-'
+      ) {
+        const message = dividedArray[1];
+        userMessage = message;
+      }
+    }
+    newMessageRow.userNickname = userNickname;
+    newMessageRow.userMessage = userMessage;
+
+    return newMessageRow;
+  }
+
+  public async getPurchaseDoneOrderDuringLiveShopping(
+    goods: GoodsConfirmationDtoOnlyConnectionId[],
+  ): Promise<BroadcasterPurchaseDto> {
     const purchaseList = [];
     const sql = `
-    SELECT fo.order_seq as id, fo.settleprice, fo.deposit_date, fo.step, fois.suboption, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
+    SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.deposit_date, fo.step, fois.suboption, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
     FROM fm_order_item AS foi 
     RIGHT JOIN fm_order AS fo 
     ON foi.order_seq = fo.order_seq 
@@ -913,20 +947,27 @@ export class FmOrdersService {
     LEFT JOIN fm_order_item_input AS foii
     ON fo.order_seq=foii.order_seq
     WHERE goods_seq = ?
+    AND fo.step = 75
     GROUP BY id
+    ORDER BY fo.deposit_date desc
 `;
     await Promise.all(
-      goods.map(async (value) => {
-        if (value.goods.confirmation.firstmallGoodsConnectionId) {
-          const query = await this.db.query(
-            sql,
-            value.goods.confirmation.firstmallGoodsConnectionId,
-          );
+      goods.map(async (value: GoodsConfirmationDtoOnlyConnectionId) => {
+        if (value.firstmallGoodsConnectionId) {
+          const connectionId = value.firstmallGoodsConnectionId;
+          const query = await this.db.query(sql, [connectionId]);
           purchaseList.push(query);
         }
       }),
     );
-    const flattenPurchaseList = [[].concat([], purchaseList)];
-    return flattenPurchaseList;
+    const flattenPurchaseList = purchaseList.reduce(function (a, b) {
+      return a.concat(b);
+    }, []);
+
+    const messageDividedflattenPurchaseList = flattenPurchaseList.map((row) => {
+      return this.getMessage(row);
+    });
+
+    return messageDividedflattenPurchaseList;
   }
 }

@@ -1,37 +1,11 @@
-import { DownloadIcon, Icon } from '@chakra-ui/icons';
+import { Box } from '@chakra-ui/react';
+import { GridColumns, GridSortModel } from '@material-ui/data-grid';
 import {
-  Box,
-  Button,
-  Link,
-  Stack,
-  Text,
-  Tooltip,
-  useBreakpoint,
-  useDisclosure,
-} from '@chakra-ui/react';
-import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-grid';
-import {
-  useDisplaySize,
-  useFmOrders,
-  useBroadcasterLiveShoppingConnectionId,
   useProfile,
   useFmOrdersDuringLiveShoppingSalesPurchaseDone,
 } from '@project-lc/hooks';
-import {
-  convertFmOrderStatusToString,
-  convertOrderSitetypeToString,
-  FmOrderStatusNumString,
-  isOrderExportable,
-} from '@project-lc/shared-types';
-import { useFmOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
-import NextLink from 'next/link';
-import { useMemo } from 'react';
-import { FaTruck } from 'react-icons/fa';
 import { ChakraDataGrid } from './ChakraDataGrid';
-import ExportManyDialog from './ExportManyDialog';
-import FmOrderStatusBadge from './FmOrderStatusBadge';
-import TooltipedText from './TooltipedText';
 
 const columns: GridColumns = [
   {
@@ -43,32 +17,28 @@ const columns: GridColumns = [
     },
   },
   {
-    field: 'title',
-    headerName: '닉네임',
-    width: 170,
+    field: 'goods_name',
+    headerName: '상품명',
+    width: 400,
+    flex: 1,
   },
   {
-    field: 'nickname',
+    field: 'userNickname',
     headerName: '닉네임',
-    width: 220,
-    valueFormatter: ({ row }) => {
-      return row.message.split('||')[0].split('&&')[1];
-    },
+    width: 140,
   },
   {
-    field: 'message',
+    field: 'userMessage',
     headerName: '메세지',
     width: 220,
-    valueFormatter: ({ row }) => {
-      return row.message.split('||')[1].split('&&')[1];
-    },
+    flex: 1,
   },
   {
     field: 'settleprice',
     headerName: '금액',
     width: 170,
     valueFormatter: ({ row }) => {
-      return row.settleprice.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return `${Number(row.settleprice).toLocaleString()}원`;
     },
   },
 ];
@@ -76,21 +46,32 @@ const columns: GridColumns = [
 export function BroadcasterPurchaseList(): JSX.Element {
   const { data: profileData } = useProfile();
 
+  const sortModel: GridSortModel = [
+    {
+      field: 'deposit_date',
+      sort: 'desc',
+    },
+  ];
+
   const { data: purchaseData, isLoading } =
     useFmOrdersDuringLiveShoppingSalesPurchaseDone(profileData?.id);
-  console.log(purchaseData);
 
   return (
-    <Box minHeight={{ base: 300, md: 600 }} mb={24}>
+    <Box minHeight={{ base: 300, md: 600 }} p={250} pt={3}>
       {purchaseData && !isLoading && (
         <ChakraDataGrid
           autoHeight
-          rowsPerPageOptions={[10, 20, 50, 100]}
+          disableExtendRowFullWidth
+          pagination
+          showFirstButton
+          showLastButton
+          rowsPerPageOptions={[15, 20, 30]}
           disableSelectionOnClick
           disableColumnMenu
           loading={isLoading}
           columns={columns}
           rows={purchaseData}
+          sortModel={sortModel}
         />
       )}
     </Box>

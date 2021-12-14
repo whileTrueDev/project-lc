@@ -27,6 +27,7 @@ import {
   OrderStatsRes,
   SalesStats,
   ChangeReturnStatusDto,
+  BroadcasterPurchaseDto,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 
@@ -151,12 +152,12 @@ export class FmOrdersController {
   async getBroadcasterPurchases(
     @Param('broadcasterId')
     broadcasterId: number,
-  ): Promise<any> {
-    const linkedLiveShoppingFmGoodsId =
+  ): Promise<BroadcasterPurchaseDto> {
+    const linkedLiveShoppingFmGoodsIds =
       await this.liveShoppingService.getLinkedLiveShoppingFmGoodsId(broadcasterId);
     const purchasedList =
       await this.fmOrdersService.getPurchaseDoneOrderDuringLiveShopping(
-        linkedLiveShoppingFmGoodsId,
+        linkedLiveShoppingFmGoodsIds,
       );
     return purchasedList;
   }
