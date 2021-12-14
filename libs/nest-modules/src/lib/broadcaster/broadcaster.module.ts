@@ -16,6 +16,6 @@ import { BroadcasterSettlementService } from './broadcaster-settlement.service';
     BroadcasterChannelService,
     BroadcasterSettlementService,
   ],
-  exports: [BroadcasterService, BroadcasterChannelService],
+  exports: [BroadcasterService, BroadcasterChannelService, BroadcasterSettlementService],
 })
 export class BroadcasterModule {}
