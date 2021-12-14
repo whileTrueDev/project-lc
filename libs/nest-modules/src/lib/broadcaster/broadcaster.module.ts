@@ -5,11 +5,17 @@ import { BroadcasterService } from './broadcaster.service';
 import { BroadcasterController } from './broadcaster.controller';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
+import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 
 @Module({
   imports: [forwardRef(() => AuthModule), PrismaModule],
   controllers: [BroadcasterController],
-  providers: [BroadcasterService, BroadcasterContactsService, BroadcasterChannelService],
+  providers: [
+    BroadcasterService,
+    BroadcasterContactsService,
+    BroadcasterChannelService,
+    BroadcasterSettlementService,
+  ],
   exports: [BroadcasterService, BroadcasterChannelService],
 })
 export class BroadcasterModule {}

@@ -59,4 +59,11 @@ export class LiveShoppingController {
     const goodsList = await this.goodsService.findMyGoodsNames(email);
     return goodsList;
   }
+
+  @Get('/broadcaster')
+  getBroadcasterLiveShoppings(
+    @Query('broadcasterId') broadcasterId: number,
+  ): Promise<LiveShoppingWithConfirmation[]> {
+    return this.liveShoppingService.getBroadcasterRegisteredLiveShoppings(broadcasterId);
+  }
 }

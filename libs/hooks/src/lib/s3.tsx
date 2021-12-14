@@ -1,4 +1,10 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  ListObjectsCommand,
+  DeleteObjectsCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import dayjs from 'dayjs';
 import path from 'path';
@@ -8,7 +14,11 @@ export type s3KeyType =
   | 'business-registration'
   | 'goods'
   | 'mail-order'
-  | 'settlement-account';
+  | 'settlement-account'
+  | 'vertical-banner'
+  | 'donation-images'
+  | 'broadcaster-id-card' // 방송인 신분증
+  | 'broadcaster-account-image'; // 방송인 통장사본
 
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
@@ -32,6 +42,7 @@ export const s3 = (() => {
     type: s3KeyType;
     file: File | Buffer | null;
     companyName?: string;
+    liveShoppingId?: number;
   }
 
   type s3FileNameParams = {
@@ -39,6 +50,7 @@ export const s3 = (() => {
     type: s3KeyType;
     filename: string | null;
     companyName?: string;
+    liveShoppingId?: number;
   };
 
   // 파일명에서 확장자를 추출하는 과정
@@ -51,7 +63,13 @@ export const s3 = (() => {
     return result;
   }
 
-  function getS3Key({ userMail, type, filename, companyName }: s3FileNameParams): {
+  function getS3Key({
+    userMail,
+    type,
+    filename,
+    companyName,
+    liveShoppingId,
+  }: s3FileNameParams): {
     key: string;
     fileName: string;
   } {
@@ -78,11 +96,24 @@ export const s3 = (() => {
         fileFullName = `${prefix}_${filename}`;
         break;
       }
+      case 'broadcaster-id-card': {
+        // 방송인 신분증
+        fileFullName = `${prefix}_신분증`;
+        break;
+      }
+      case 'broadcaster-account-image': {
+        // 방송인 통장사본
+        fileFullName = `${prefix}_통장사본`;
+        break;
+      }
+
       default: {
         fileFullName = `${filename}`;
       }
     }
-    const pathList = [type, userMail, fileFullName];
+    const pathList = liveShoppingId
+      ? [type, userMail, String(liveShoppingId), fileFullName]
+      : [type, userMail, fileFullName];
     return {
       key: path.join(...pathList),
       fileName: fileFullName,
@@ -96,11 +127,13 @@ export const s3 = (() => {
     filename,
     type,
     userMail,
+    liveShoppingId,
   }: S3UploadImageOptions & {
     contentType: string;
   }): Promise<string> {
     if (!userMail || !file) throw new Error('file should be not null');
-    const { key } = getS3Key({ userMail, type, filename });
+    const { key } = getS3Key({ userMail, type, filename, liveShoppingId });
+
     try {
       const command = new PutObjectCommand({
         Bucket: S3_BUCKET_NAME,
@@ -132,11 +165,18 @@ export const s3 = (() => {
     type,
     userMail,
     companyName,
+    liveShoppingId,
   }: S3UploadImageOptions): Promise<string | null> {
     if (!userMail || !file) {
       return null;
     }
-    const { key, fileName } = getS3Key({ userMail, type, filename, companyName });
+    const { key, fileName } = getS3Key({
+      userMail,
+      type,
+      filename,
+      companyName,
+      liveShoppingId,
+    });
 
     try {
       const command = new PutObjectCommand({
@@ -177,10 +217,50 @@ export const s3 = (() => {
     return imageUrl;
   }
 
+  async function getVerticalImagesFromS3(
+    broadcasterId: string,
+    liveShoppingId: number,
+    type: 'vertical-banner' | 'donation-images',
+  ): Promise<(string | undefined)[]> {
+    const command = new ListObjectsCommand({
+      Bucket: S3_BUCKET_NAME,
+      Prefix: `${type}/${broadcasterId}/${liveShoppingId}`,
+    });
+    const response = await s3Client.send(command);
+    const imagesLength = response.Contents || null;
+    const imagesKey = imagesLength?.map((item) => {
+      return item.Key;
+    });
+    return imagesKey || [];
+  }
+
+  async function s3DeleteImages(
+    toDeleteImages: (string | undefined)[],
+  ): Promise<boolean> {
+    const toDeleteObject: { Key: string }[] = [];
+    toDeleteImages.forEach((imageName) => {
+      toDeleteObject.push({ Key: `${imageName}` });
+    });
+    const command = new DeleteObjectsCommand({
+      Bucket: S3_BUCKET_NAME,
+      Delete: { Objects: toDeleteObject },
+    });
+
+    try {
+      await s3Client.send(command);
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
   return {
     s3UploadImage,
     getS3Key,
     s3DownloadImageUrl,
     s3uploadFile: s3publicUploadFile,
+    getVerticalImagesFromS3,
+    s3DeleteImages,
   };
 })();

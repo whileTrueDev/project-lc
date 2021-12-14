@@ -17,6 +17,7 @@ import {
   Input,
   Textarea,
   Link,
+  useDisclosure,
 } from '@chakra-ui/react';
 import {
   AdminPageLayout,
@@ -35,6 +36,7 @@ import {
   BroadcasterName,
   AdminLiveShoppingUpdateConfirmModal,
   LiveShoppingProgressBadge,
+  AdminOverlayImageUploadDialog,
 } from '@project-lc/components';
 import {
   useAdminLiveShoppingList,
@@ -88,6 +90,11 @@ export function GoodsDetail(): JSX.Element {
   });
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const {
+    isOpen: imageDialogIsOpen,
+    onOpen: imageDialogOnOpen,
+    onClose: imageDialogOnClose,
+  } = useDisclosure();
   const onClose = (): void => {
     setIsOpen(false);
   };
@@ -113,22 +120,17 @@ export function GoodsDetail(): JSX.Element {
 
   const { handleSubmit, register, watch } = methods;
   const regist = async (
-    data: Omit<
-      LiveShoppingDTO,
-      'streamId' | 'sellerId' | 'goods_id' | 'contactId' | 'requests'
-    >,
+    data: Omit<LiveShoppingDTO, 'sellerId' | 'goods_id' | 'contactId' | 'requests'>,
   ): Promise<void> => {
     const videoUrlExist = Boolean(liveShopping[0]?.liveShoppingVideo.youtubeUrl);
     const dto = Object.assign(data, { id: liveShoppingId });
     mutateAsync({ dto, videoUrlExist }).then(onSuccess).catch(onFail);
   };
-
   if (liveShoppingIsLoading || goods.isLoading)
     return <AdminPageLayout>...loading</AdminPageLayout>;
 
   if (!goods.isLoading && !goods.data)
     return <AdminPageLayout>...no data</AdminPageLayout>;
-
   return (
     <AdminPageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={8} p={2} mb={16}>
@@ -255,6 +257,21 @@ export function GoodsDetail(): JSX.Element {
 
             <Divider />
             <Stack direction="row" alignItems="center">
+              <Text as="span">희망 판매 수수료: </Text>
+              <Text as="span" fontWeight="bold">
+                {liveShopping[0].desiredCommission} %
+              </Text>
+            </Stack>
+
+            <Stack direction="row" alignItems="center">
+              <Text as="span">희망 진행 기간: </Text>
+              <Text as="span" fontWeight="bold">
+                {liveShopping[0].desiredPeriod}
+              </Text>
+            </Stack>
+
+            <Divider />
+            <Stack direction="row" alignItems="center">
               <Text as="span">방송인 수수료: </Text>
               <Text as="span" fontWeight="bold">
                 {liveShopping[0].broadcasterCommissionRate
@@ -273,6 +290,7 @@ export function GoodsDetail(): JSX.Element {
             </Stack>
 
             <Box>
+              <Text>요청사항</Text>
               <Textarea
                 resize="none"
                 rows={10}
@@ -323,11 +341,18 @@ export function GoodsDetail(): JSX.Element {
                 <Input {...register('videoUrl')} />
               </Stack>
               <Button onClick={openConfirmModal}>변경</Button>
+              <Button onClick={imageDialogOnOpen}>오버레이 이미지 등록</Button>
             </Stack>
             <AdminLiveShoppingUpdateConfirmModal
               isOpen={isOpen}
               onClose={onClose}
               onConfirm={handleSubmit(regist)}
+            />
+            <AdminOverlayImageUploadDialog
+              isOpen={imageDialogIsOpen}
+              onClose={imageDialogOnClose}
+              broadcasterId={liveShopping[0].broadcaster.email}
+              liveShoppingId={liveShopping[0].id}
             />
           </FormProvider>
         </Grid>
