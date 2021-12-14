@@ -29,7 +29,7 @@ export interface AdminGoodsRejectionDialogProps {
   row: GridRowData;
 }
 
-type rejectionFormData = {
+export type rejectionFormData = {
   rejectionReason: string;
 };
 

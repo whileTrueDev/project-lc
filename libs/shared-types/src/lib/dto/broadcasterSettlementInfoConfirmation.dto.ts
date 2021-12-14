@@ -15,5 +15,5 @@ export class BroadcasterSettlementInfoConfirmationDto {
 
   @IsString()
   @IsOptional()
-  rejectionReason: string;
+  rejectionReason?: string;
 }
