@@ -114,3 +114,4 @@ export * from './lib/TextDotConnector';
 export * from './lib/TextViewerWithDetailModal';
 export * from './lib/ContractionAgreeSection';
 export * from './lib/ContractionAgreeDialog';
+export * from './lib/StartGuideSection';
