@@ -158,7 +158,6 @@ export class FmOrdersController {
       await this.fmOrdersService.getPurchaseDoneOrderDuringLiveShopping(
         linkedLiveShoppingFmGoodsId,
       );
-    console.log('firstmallGoodsConnectionId', linkedLiveShoppingFmGoodsId);
-    return 'something';
+    return purchasedList;
   }
 }

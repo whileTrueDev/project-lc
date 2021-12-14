@@ -901,9 +901,10 @@ export class FmOrdersService {
     return true;
   }
 
-  public async getPurchaseDoneOrderDuringLiveShopping(goods_id: number): Promise<any> {
-    const query = await this.db.query(`
-    SELECT fo.order_seq, fo.settleprice, fo.deposit_date, fo.step, fois.suboption, foii.title, foii.value
+  public async getPurchaseDoneOrderDuringLiveShopping(goods: any): Promise<any> {
+    const purchaseList = [];
+    const sql = `
+    SELECT fo.order_seq as id, fo.settleprice, fo.deposit_date, fo.step, fois.suboption, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
     FROM fm_order_item AS foi 
     RIGHT JOIN fm_order AS fo 
     ON foi.order_seq = fo.order_seq 
@@ -911,8 +912,21 @@ export class FmOrdersService {
     ON fo.order_seq = fois.order_seq
     LEFT JOIN fm_order_item_input AS foii
     ON fo.order_seq=foii.order_seq
-    WHERE goods_seq=${goods_id}
-`); // AND fo.step=95
-    console.log(query);
+    WHERE goods_seq = ?
+    GROUP BY id
+`;
+    await Promise.all(
+      goods.map(async (value) => {
+        if (value.goods.confirmation.firstmallGoodsConnectionId) {
+          const query = await this.db.query(
+            sql,
+            value.goods.confirmation.firstmallGoodsConnectionId,
+          );
+          purchaseList.push(query);
+        }
+      }),
+    );
+    const flattenPurchaseList = [[].concat([], purchaseList)];
+    return flattenPurchaseList;
   }
 }
