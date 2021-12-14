@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { LoginSellerDto, UserType } from '@project-lc/shared-types';
+import { LoginUserDto, UserType } from '@project-lc/shared-types';
 import { useLoginMutation } from '@project-lc/hooks';
 import {
   Alert,
@@ -39,7 +39,7 @@ export function LoginForm({
     register,
     formState: { errors, isSubmitting },
     setValue,
-  } = useForm<LoginSellerDto>();
+  } = useForm<LoginUserDto>();
 
   // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
   const [formError, setFormError] = useState('');
@@ -50,12 +50,12 @@ export function LoginForm({
   // * 로그인 핸들러
   const login = useLoginMutation(userType);
   const onSubmit = useCallback(
-    async (data: LoginSellerDto) => {
-      const seller = await login.mutateAsync(data).catch((err) => {
+    async (data: LoginUserDto) => {
+      const user = await login.mutateAsync(data).catch((err) => {
         setFormError(getMessage(err?.response.data?.status));
         setValue('password', '');
       });
-      if (seller) {
+      if (user) {
         router.push('/mypage');
       }
     },

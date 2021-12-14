@@ -10,8 +10,9 @@ export type useChangePasswordMutationRes = any;
 export const changePassword = async (
   dto: useChangePasswordMutationDto,
 ): Promise<useChangePasswordMutationRes> => {
+  const userType = process.env.NEXT_PUBLIC_APP_TYPE;
   const { data } = await axios.patch<useChangePasswordMutationRes>(
-    '/seller/password',
+    `/${userType}/password`,
     dto,
   );
   return data;

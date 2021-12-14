@@ -97,7 +97,6 @@ export function ResetPasswordForm(): JSX.Element {
     const isValidEmail = await trigger('email');
     if (!isValidEmail) return;
 
-    // 가입여부 확인
     const email = getValues('email');
     const isOk = await getEmailDupCheck(email); // 중복되지않은 경우 true, 중복된 경우 false
     if (isOk) {

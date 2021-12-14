@@ -42,3 +42,6 @@ CREATE UNIQUE INDEX `Broadcaster_overlayUrl_key` ON `Broadcaster`(`overlayUrl`);
 
 -- AddForeignKey
 ALTER TABLE `LiveShopping` ADD CONSTRAINT `LiveShopping_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `Broadcaster`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `BroadcasterContacts` ADD CONSTRAINT `BroadcasterContacts_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `Broadcaster`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

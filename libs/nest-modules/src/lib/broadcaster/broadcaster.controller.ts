@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Patch,
   Query,
   UseGuards,
   ValidationPipe,
@@ -23,6 +24,7 @@ import {
   CreateBroadcasterChannelDto,
   EmailDupCheckDto,
   FindBroadcasterDto,
+  PasswordValidateDto,
   SignUpDto,
 } from '@project-lc/shared-types';
 import {
@@ -157,6 +159,23 @@ export class BroadcasterController {
     @Body(ValidationPipe) dto: BroadcasterAddressDto,
   ): Promise<BroadcasterAddress> {
     return this.broadcasterService.upsertAddress(1, dto);
+  }
+
+  // 로그인 한 사람이 본인인증을 위해 비밀번호 확인
+  @UseGuards(JwtAuthGuard)
+  @Post('validate-password')
+  public async validatePassword(
+    @Body(ValidationPipe) dto: PasswordValidateDto,
+  ): Promise<boolean> {
+    return this.broadcasterService.checkPassword(dto.email, dto.password);
+  }
+
+  // 비밀번호 변경
+  @Patch('password')
+  public async changePassword(
+    @Body(ValidationPipe) dto: PasswordValidateDto,
+  ): Promise<Broadcaster> {
+    return this.broadcasterService.changePassword(dto.email, dto.password);
   }
 
   /** 방송인 정산정보 등록 */
