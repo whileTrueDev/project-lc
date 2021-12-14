@@ -7,6 +7,7 @@ import {
   BroadcasterNickNameSection,
   MypageLayout,
   SocialAccountUnlinkSection,
+  BroadcasterSignoutSection,
 } from '@project-lc/components';
 
 export function SettingIndex(): JSX.Element {
@@ -26,6 +27,8 @@ export function SettingIndex(): JSX.Element {
           <BroadcasterContactSection />
           <Divider />
           <BroadcasterChannelSection />
+          <Divider />
+          <BroadcasterSignoutSection />
         </VStack>
       </Container>
     </MypageLayout>
