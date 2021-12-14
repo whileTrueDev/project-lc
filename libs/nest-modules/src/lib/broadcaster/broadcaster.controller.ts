@@ -12,6 +12,7 @@ import {
   Query,
   UseGuards,
   ValidationPipe,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { BroadcasterChannel } from '@prisma/client';
 import {
@@ -39,6 +40,8 @@ import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterService } from './broadcaster.service';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
+import { BroadcasterInfo } from '../_nest-units/decorators/broadcasterInfo.decorator';
+import { UserPayload } from '../auth/auth.interface';
 
 @Controller('broadcaster')
 export class BroadcasterController {
@@ -83,6 +86,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 채널 생성 */
+  @UseGuards(JwtAuthGuard)
   @Post('/channel')
   createBroadcasterChannel(
     @Body(ValidationPipe) dto: CreateBroadcasterChannelDto,
@@ -91,6 +95,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 채널 삭제 */
+  @UseGuards(JwtAuthGuard)
   @Delete('/channel/:channelId')
   deleteBroadcasterChannel(
     @Param('channelId', ParseIntPipe) channelId: number,
@@ -99,6 +104,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 채널 목록 조회 */
+  @UseGuards(JwtAuthGuard)
   @Get('/:broadcasterId/channel-list')
   getBroadcasterChannelList(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
@@ -179,6 +185,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 정산정보 등록 */
+  @UseGuards(JwtAuthGuard)
   @Post('settlement-info')
   public async insertSettlementInfo(
     @Body(ValidationPipe) dto: BroadcasterSettlementInfoDto,
@@ -187,6 +194,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 정산정보 조회 */
+  @UseGuards(JwtAuthGuard)
   @Get('settlement-info/:broadcasterId')
   public async selectBroadcasterSettlementInfo(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
@@ -194,5 +202,18 @@ export class BroadcasterController {
     return this.broadcasterSettlementService.selectBroadcasterSettlementInfo(
       broadcasterId,
     );
+  }
+
+  /** 방송인 계정 삭제 */
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  public async deleteBroadcaster(
+    @Body('email') email: string,
+    @BroadcasterInfo() broadcasterInfo: UserPayload,
+  ): Promise<boolean> {
+    if (email !== broadcasterInfo.sub) {
+      throw new UnauthorizedException('본인의 계정이 아니면 삭제할 수 없습니다.');
+    }
+    return this.broadcasterService.deleteOne(email);
   }
 }

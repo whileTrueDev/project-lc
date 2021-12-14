@@ -205,4 +205,13 @@ export class BroadcasterService {
     });
     return broadcaster;
   }
+
+  /** 방송인 broadcaster 삭제 */
+  async deleteOne(email: string): Promise<boolean> {
+    await this.prisma.broadcaster.delete({
+      where: { email },
+    });
+
+    return true;
+  }
 }
