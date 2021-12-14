@@ -122,7 +122,7 @@ export function GoodsDetail(): JSX.Element {
   const regist = async (
     data: Omit<LiveShoppingDTO, 'sellerId' | 'goods_id' | 'contactId' | 'requests'>,
   ): Promise<void> => {
-    const videoUrlExist = Boolean(liveShopping[0]?.liveShoppingVideo.youtubeUrl);
+    const videoUrlExist = Boolean(liveShopping[0]?.liveShoppingVideo?.youtubeUrl);
     const dto = Object.assign(data, { id: liveShoppingId });
     mutateAsync({ dto, videoUrlExist }).then(onSuccess).catch(onFail);
   };
@@ -341,19 +341,26 @@ export function GoodsDetail(): JSX.Element {
                 <Input {...register('videoUrl')} />
               </Stack>
               <Button onClick={openConfirmModal}>변경</Button>
-              <Button onClick={imageDialogOnOpen}>오버레이 이미지 등록</Button>
+              <Button
+                onClick={imageDialogOnOpen}
+                isDisabled={!liveShopping[0].broadcaster}
+              >
+                오버레이 이미지 등록
+              </Button>
             </Stack>
             <AdminLiveShoppingUpdateConfirmModal
               isOpen={isOpen}
               onClose={onClose}
               onConfirm={handleSubmit(regist)}
             />
-            <AdminOverlayImageUploadDialog
-              isOpen={imageDialogIsOpen}
-              onClose={imageDialogOnClose}
-              broadcasterId={liveShopping[0].broadcaster.email}
-              liveShoppingId={liveShopping[0].id}
-            />
+            {liveShopping[0].broadcaster && (
+              <AdminOverlayImageUploadDialog
+                isOpen={imageDialogIsOpen}
+                onClose={imageDialogOnClose}
+                broadcasterId={liveShopping[0].broadcaster.email}
+                liveShoppingId={liveShopping[0].id}
+              />
+            )}
           </FormProvider>
         </Grid>
 
