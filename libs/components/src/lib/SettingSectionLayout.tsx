@@ -8,7 +8,7 @@ interface SettingSectionLayoutProps {
 export function SettingSectionLayout(props: SettingSectionLayoutProps): JSX.Element {
   const { title, children } = props;
   return (
-    <VStack spacing={4} alignItems="flex-start" padding={2}>
+    <VStack spacing={4} alignItems="flex-start" padding={2} width="100%">
       {title && (
         <Heading as="h6" size="md">
           {title}
