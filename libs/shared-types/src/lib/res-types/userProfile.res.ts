@@ -9,4 +9,5 @@ export interface UserProfileRes {
   shopName?: string | null;
   avatar?: string;
   agreementFlag?: boolean;
+  overlayUrl?: string;
 }

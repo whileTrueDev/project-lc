@@ -242,6 +242,20 @@ export const s3 = (() => {
     }
   }
 
+  // 단일 이미지 조회
+  async function getS3GuideImage(): Promise<string> {
+    const signedUrlExpireSeconds = 3600;
+    const key = 'public/banner-guide.png';
+    const command = new GetObjectCommand({
+      Bucket: S3_BUCKET_NAME,
+      Key: key,
+    });
+    const imageUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: signedUrlExpireSeconds,
+    });
+    return imageUrl;
+  }
+
   return {
     s3UploadImage,
     getS3Key,
@@ -249,5 +263,6 @@ export const s3 = (() => {
     s3uploadFile: s3publicUploadFile,
     getVerticalImagesFromS3,
     s3DeleteImages,
+    getS3GuideImage,
   };
 })();
