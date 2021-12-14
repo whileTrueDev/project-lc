@@ -1,5 +1,5 @@
 import { Box, Flex } from '@chakra-ui/react';
-import { LoginForm, Navbar } from '@project-lc/components';
+import { LoginForm, BroadcasterNavbar } from '@project-lc/components';
 import { useMoveToMainIfLoggedIn, useSocialLoginFailAlarm } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -15,7 +15,7 @@ export function Login(): JSX.Element {
   });
   return (
     <Box>
-      <Navbar />
+      <BroadcasterNavbar />
 
       <Flex align="center" justify="center" minH="calc(100vh - 200px)">
         <LoginForm enableShadow userType="broadcaster" />

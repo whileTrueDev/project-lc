@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Input, Text, useToast } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Input, useToast } from '@chakra-ui/react';
 import { useValidatePassword } from '@project-lc/hooks';
 import { useForm } from 'react-hook-form';
 

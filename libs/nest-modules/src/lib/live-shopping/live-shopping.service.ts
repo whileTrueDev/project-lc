@@ -95,7 +95,7 @@ export class LiveShoppingService {
     });
   }
 
-  async getLinkedLiveShoppingFmGoodsId(
+async getLinkedLiveShoppingFmGoodsId(
     broadcasterId: number,
   ): Promise<GoodsConfirmationDtoOnlyConnectionId[]> {
     const nestedFmGoodsConnectionIds = await this.prisma.liveShopping.findMany({
@@ -119,5 +119,50 @@ export class LiveShoppingService {
       fmGoodsConnectionIds.push(value.goods.confirmation),
     );
     return fmGoodsConnectionIds;
+  }
+  
+ async getBroadcasterRegisteredLiveShoppings(
+    broadcasterId: number,
+  ): Promise<LiveShoppingWithConfirmation[]> {
+    // 자신의 id를 반환하는 쿼리 수행하기
+    return this.prisma.liveShopping.findMany({
+      where: {
+        broadcasterId: Number(broadcasterId),
+      },
+      include: {
+        goods: {
+          select: {
+            goods_name: true,
+            summary: true,
+            confirmation: {
+              select: {
+                firstmallGoodsConnectionId: true,
+              },
+            },
+          },
+        },
+        seller: {
+          select: {
+            sellerShop: true,
+          },
+        },
+        broadcaster: {
+          select: {
+            userNickname: true,
+          },
+        },
+        liveShoppingVideo: {
+          select: { youtubeUrl: true },
+        },
+      },
+      orderBy: [
+        {
+          sellStartDate: 'desc',
+        },
+        {
+          id: 'desc',
+        },
+      ],
+    });
   }
 }

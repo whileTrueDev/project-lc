@@ -16,7 +16,9 @@ export type s3KeyType =
   | 'mail-order'
   | 'settlement-account'
   | 'vertical-banner'
-  | 'donation-images';
+  | 'donation-images'
+  | 'broadcaster-id-card' // 방송인 신분증
+  | 'broadcaster-account-image'; // 방송인 통장사본
 
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
@@ -94,6 +96,17 @@ export const s3 = (() => {
         fileFullName = `${prefix}_${filename}`;
         break;
       }
+      case 'broadcaster-id-card': {
+        // 방송인 신분증
+        fileFullName = `${prefix}_신분증`;
+        break;
+      }
+      case 'broadcaster-account-image': {
+        // 방송인 통장사본
+        fileFullName = `${prefix}_통장사본`;
+        break;
+      }
+
       default: {
         fileFullName = `${filename}`;
       }

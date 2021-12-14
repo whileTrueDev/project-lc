@@ -12,7 +12,7 @@ import {
   Stack,
 } from '@chakra-ui/react';
 import { useLoginMutation } from '@project-lc/hooks';
-import { LoginSellerDto } from '@project-lc/shared-types';
+import { LoginUserDto } from '@project-lc/shared-types';
 import { getAdminHost } from '@project-lc/utils';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
@@ -29,7 +29,7 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
-  } = useForm<LoginSellerDto>();
+  } = useForm<LoginUserDto>();
 
   // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
   const [formError, setFormError] = useState('');
@@ -40,13 +40,13 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
   // * 로그인 핸들러 -> admin으로 변경이 필요함.
   const login = useLoginMutation('admin');
   const onSubmit = useCallback(
-    async (data: LoginSellerDto) => {
-      const seller = await login
+    async (data: LoginUserDto) => {
+      const user = await login
         .mutateAsync({ ...data, stayLogedIn: true })
         .catch((err) => {
           setFormError(getMessage(err?.response.data?.statusCode));
         });
-      if (seller) {
+      if (user) {
         router.push(`${getAdminHost()}/admin`);
       }
     },

@@ -233,6 +233,7 @@ export class FmOrdersService {
 
     // * 주문 상품
     const orderItems = await this.findOneOrderItems(orderId, goodsIds);
+    if (orderItems.length === 0) return null;
 
     // * 개별 주문 상품 - 상품 옵션 목록 정보
     const itemSeqArray = orderItems.map((x) => x.item_seq);
@@ -383,7 +384,7 @@ export class FmOrdersService {
     FROM fm_order_item_option
     WHERE fm_order_item_option.item_seq IN (?)`;
 
-    return this.db.query(findOptionsSql, [itemSeqArray]);
+    return this.db.query(findOptionsSql, itemSeqArray);
   }
 
   /** 개별 주문 - 출고 정보 */
@@ -447,7 +448,7 @@ export class FmOrdersService {
       fm_manager.manager_id,
       fm_manager.memail,
       fm_manager.mcellphone,
-      SUM(fm_order_refund_item.ea) ea,
+      SUM(fm_order_refund_item.ea) totalEa,
       SUM(fm_order_refund_item.refund_goods_price) refund_goods_price
     FROM fm_order_refund
     LEFT JOIN fm_manager USING(manager_seq)
@@ -647,11 +648,16 @@ export class FmOrdersService {
             fm_order_item.goods_name,
             fm_order_item.image,
             fm_order_item.item_seq,
-            shipping_seq
+            shipping_seq,
+            shipping_set_name,
+            shipping_type,
+            shipping_method,
+            shipping_group
           FROM fm_order_item
+          JOIN fm_order_shipping USING (shipping_seq)
           WHERE
             shipping_seq = ?
-            AND order_seq = ? 
+            AND fm_order_item.order_seq = ? 
             AND goods_seq IN (?)`,
           [sh.shipping_seq, orderId, goodsIds],
         );

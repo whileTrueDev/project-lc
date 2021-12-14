@@ -1,4 +1,4 @@
-import { Button, Text, useBoolean, useDisclosure } from '@chakra-ui/react';
+import { Button, Text, useDisclosure } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
 import PasswordChangeDialog from './PasswordChangeDialog';
 import PasswordCheckDialog from './PasswordCheckDialog';
