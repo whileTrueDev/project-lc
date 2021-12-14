@@ -938,7 +938,7 @@ export class FmOrdersService {
   ): Promise<BroadcasterPurchaseDto> {
     const purchaseList = [];
     const sql = `
-    SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.deposit_date, fo.step, fois.suboption, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
+    SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.regist_date, fo.step, fois.suboption, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
     FROM fm_order_item AS foi 
     RIGHT JOIN fm_order AS fo 
     ON foi.order_seq = fo.order_seq 

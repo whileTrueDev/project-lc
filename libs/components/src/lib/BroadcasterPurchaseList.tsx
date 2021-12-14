@@ -9,7 +9,7 @@ import { ChakraDataGrid } from './ChakraDataGrid';
 
 const columns: GridColumns = [
   {
-    field: 'deposit_date',
+    field: 'regist_date',
     headerName: '주문일',
     width: 140,
     valueFormatter: ({ row }) => {
