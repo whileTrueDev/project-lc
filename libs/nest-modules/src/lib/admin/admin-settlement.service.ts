@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { BusinessRegistrationConfirmation } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -64,14 +64,20 @@ export class AdminSettlementService {
   public async setBroadcasterSettlementInfoConfirmation(
     dto: BroadcasterSettlementInfoConfirmationDto,
   ): Promise<boolean> {
-    await this.prisma.broadcasterSettlementInfoConfirmation.update({
-      where: { id: dto.id },
-      data: {
-        status: dto.status,
-        rejectionReason:
-          dto.status === BusinessRegistrationStatus.REJECTED ? dto.rejectionReason : null,
-      },
-    });
-    return true;
+    try {
+      await this.prisma.broadcasterSettlementInfoConfirmation.update({
+        where: { settlementInfoId: dto.id },
+        data: {
+          status: dto.status,
+          rejectionReason:
+            dto.status === BusinessRegistrationStatus.REJECTED
+              ? dto.rejectionReason
+              : null,
+        },
+      });
+      return true;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }
