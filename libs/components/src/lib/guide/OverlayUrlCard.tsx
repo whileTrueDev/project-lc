@@ -1,38 +1,10 @@
-import React, { useState } from 'react';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import { Input, Paper, Typography, Button } from '@material-ui/core';
-import { UserProfileRes } from '@project-lc/shared-types';
-import { useToast } from '@chakra-ui/react';
+import { useState } from 'react';
+import { useToast, Text, Box, Button, Input } from '@chakra-ui/react';
+import { useProfile } from '@project-lc/hooks';
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    width: '100%',
-    padding: theme.spacing(2),
-    marginTop: theme.spacing(1),
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  title: {
-    marginRight: theme.spacing(1),
-    fontWeight: 'bold',
-    fontSize: theme.typography.body2.fontSize,
-  },
-  textField: {
-    maxWidth: 300,
-    marginRight: theme.spacing(2),
-    fontSize: theme.typography.body2.fontSize,
-  },
-  line: { alignItems: 'center' },
-}));
-
-interface UrlCardProps {
-  profileData: UserProfileRes;
-}
-
-export function UrlCard({ profileData }: UrlCardProps): JSX.Element {
+export function UrlCard(): JSX.Element {
   const toast = useToast();
-  const classes = useStyles();
+  const { data: profileData } = useProfile();
 
   // 오버레이 주소 10초간만 보여주기 위한 기본값
   const DEFAULT_OVERLAY_URL = '[URL복사] 버튼을 눌러주세요.';
@@ -54,31 +26,39 @@ export function UrlCard({ profileData }: UrlCardProps): JSX.Element {
   };
 
   return (
-    <Paper className={classes.container}>
-      <Typography className={classes.title}>라이브 쇼핑 화면 URL</Typography>
+    <Box
+      borderRadius="md"
+      borderWidth="1px"
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+      p={3}
+      width="100%"
+    >
+      <Text fontWeight="bold"> 라이브 쇼핑 화면 URL</Text>
       <Input
-        className={classes.textField}
+        maxW={300}
+        size="sm"
         id="overlayUrl"
-        value={profileData.agreementFlag ? overlayUrlValue : '이용 동의가 필요합니다.'}
-        readOnly
-        fullWidth
+        value={profileData?.agreementFlag ? overlayUrlValue : '이용 동의가 필요합니다.'}
+        isReadOnly
+        isFullWidth
+        variant="flushed"
         disabled={!overlayUrlValue}
       />
 
-      <div>
-        <Button
-          color="primary"
-          variant="contained"
-          disabled={!profileData.agreementFlag}
-          onClick={(): void => {
-            if (!(profileData.overlayUrl === overlayUrlValue)) {
-              handleShowOverlayUrl();
-            }
-          }}
-        >
-          URL복사
-        </Button>
-      </div>
-    </Paper>
+      <Button
+        variant="solid"
+        size="sm"
+        disabled={!profileData?.agreementFlag}
+        onClick={(): void => {
+          if (!(profileData?.overlayUrl === overlayUrlValue)) {
+            handleShowOverlayUrl();
+          }
+        }}
+      >
+        URL복사
+      </Button>
+    </Box>
   );
 }
