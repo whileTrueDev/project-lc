@@ -1,6 +1,6 @@
 import { Flex, Box, Text, Divider, Center, Link } from '@chakra-ui/react';
-import { BroadcasterLiveShoppingList } from '@project-lc/components';
 import NextLink from 'next/link';
+import { BroadcasterLiveShoppingList } from './BroadcasterLiveShoppingList';
 
 export function MypageLiveShoppingSection(): JSX.Element {
   return (
