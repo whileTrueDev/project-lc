@@ -7,6 +7,9 @@ import {
 export type BroadcasterSettlementInfoListRes = Omit<
   BroadcasterSettlementInfo,
   'taxManageAgreement' | 'personalInfoAgreement' | 'settlementAgreement'
-> &
-  BroadcasterSettlementInfoConfirmation &
-  Pick<Broadcaster, 'email' | 'userNickname'>;
+> & {
+  confirmation: BroadcasterSettlementInfoConfirmation;
+  broadcaster: Pick<Broadcaster, 'email' | 'userNickname'>;
+};
+
+export type AdminBroadcasterSettlementInfoList = BroadcasterSettlementInfoListRes[];

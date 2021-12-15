@@ -19,6 +19,7 @@ import {
   LiveShopping,
 } from '@prisma/client';
 import {
+  AdminBroadcasterSettlementInfoList,
   AdminSettlementInfoType,
   BroadcasterDTO,
   BroadcasterSettlementInfoConfirmationDto,
@@ -183,7 +184,7 @@ export class AdminController {
 
   /** 방송인 정산정보 신청 목록 조회 */
   @Get('/settelment-info-list/broadcaster')
-  getBroadcasterSettlementInfoList(): Promise<any> {
+  getBroadcasterSettlementInfoList(): Promise<AdminBroadcasterSettlementInfoList> {
     return this.broadcasterSettlementService.getBroadcasterSettlementInfoList();
   }
 

@@ -5,13 +5,14 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminBroadcasterSettlementInfoList,
   BroadcasterSettlementInfoDto,
   BroadcasterSettlementInfoRes,
   BusinessRegistrationStatus,
 } from '@project-lc/shared-types';
 import { BroadcasterSettlementInfo } from '.prisma/client';
-import { BroadcasterService } from './broadcaster.service';
 import { CipherService } from '../auth/cipher.service';
+import { BroadcasterService } from './broadcaster.service';
 
 @Injectable()
 export class BroadcasterSettlementService {
@@ -128,7 +129,7 @@ export class BroadcasterSettlementService {
    * 검수정보, 방송인 이메일, 닉네임 포함
    *
    */
-  public async getBroadcasterSettlementInfoList(): Promise<any> {
+  public async getBroadcasterSettlementInfoList(): Promise<AdminBroadcasterSettlementInfoList> {
     // 방송인 email, userNickname, settlementInfo,
     const data = await this.prisma.broadcasterSettlementInfo.findMany({
       where: {
@@ -146,6 +147,7 @@ export class BroadcasterSettlementService {
         accountHolder: true,
         accountImageName: true,
         confirmation: true,
+        broadcasterId: true,
         broadcaster: { select: { email: true, userNickname: true } },
       },
     });

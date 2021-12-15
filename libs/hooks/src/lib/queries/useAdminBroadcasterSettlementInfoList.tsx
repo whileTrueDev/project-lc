@@ -1,9 +1,7 @@
-import { BroadcasterSettlementInfoListRes } from '@project-lc/shared-types';
+import { AdminBroadcasterSettlementInfoList } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
-
-type AdminBroadcasterSettlementInfoList = BroadcasterSettlementInfoListRes[];
 
 export const getAdminBroadcasterSettlementInfoList =
   async (): Promise<AdminBroadcasterSettlementInfoList> => {
