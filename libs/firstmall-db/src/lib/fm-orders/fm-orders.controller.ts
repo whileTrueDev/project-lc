@@ -8,6 +8,7 @@ import {
   UseGuards,
   ValidationPipe,
   Patch,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   GoodsService,
@@ -190,7 +191,7 @@ export class FmOrdersController {
 
   @Get('/broadcaster/purchases')
   async getBroadcasterPurchases(
-    @Param('broadcasterId')
+    @Query('broadcasterId', ParseIntPipe)
     broadcasterId: number,
   ): Promise<BroadcasterPurchaseDto> {
     const linkedLiveShoppingFmGoodsIds =
