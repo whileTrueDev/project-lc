@@ -17,6 +17,7 @@ export * from './lib/mutation/useCreateSellerContacts';
 export * from './lib/mutation/useCreateSettlementMutation';
 export * from './lib/mutation/useCreateShippingGroup';
 export * from './lib/mutation/useDeleteBroadcasterContactsMutation';
+export * from './lib/mutation/useDeleteBroadcasterMutation';
 export * from './lib/mutation/useDeleteGoodsCommonInfo';
 export * from './lib/mutation/useDeleteLiveShoppingMutation';
 export * from './lib/mutation/useDeleteNoticeMutation';
