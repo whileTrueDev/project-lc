@@ -14,7 +14,7 @@ const columns: GridColumns = [
     headerName: '주문일',
     width: 140,
     valueFormatter: ({ row }) => {
-      return dayjs(row.deposit_date).format('YYYY/MM/DD HH:mm');
+      return dayjs(row.regist_date).format('YYYY/MM/DD HH:mm');
     },
   },
   {
