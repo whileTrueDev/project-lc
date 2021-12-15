@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { BusinessRegistrationConfirmation } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  BroadcasterSettlementInfoConfirmationDto,
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   BusinessRegistrationStatus,
@@ -57,5 +58,26 @@ export class AdminSettlementService {
     }
 
     return businessRegistrationConfirmation;
+  }
+
+  /** 방송인 정산정보 검수 승인/반려 */
+  public async setBroadcasterSettlementInfoConfirmation(
+    dto: BroadcasterSettlementInfoConfirmationDto,
+  ): Promise<boolean> {
+    try {
+      await this.prisma.broadcasterSettlementInfoConfirmation.update({
+        where: { settlementInfoId: dto.id },
+        data: {
+          status: dto.status,
+          rejectionReason:
+            dto.status === BusinessRegistrationStatus.REJECTED
+              ? dto.rejectionReason
+              : null,
+        },
+      });
+      return true;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }

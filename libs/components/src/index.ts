@@ -2,6 +2,7 @@ export * from './constants/footerLinks';
 export * from './constants/navigation';
 export * from './lib/AccountRemoveSection';
 export * from './lib/admin/AdminAccountList';
+export * from './lib/admin/AdminBroadcasterSettlementInfoList';
 export * from './lib/admin/AdminBusinessRegistrationList';
 export * from './lib/admin/AdminGiftList';
 export * from './lib/admin/AdminGoodsConfirmationDialog';

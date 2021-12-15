@@ -35,9 +35,30 @@ export function AdminImageDownloadButton({
       }
       break;
     }
+    case 'broadcaster-id-card': {
+      // 방송인 신분증
+      fileName = row.idCardImageName;
+      break;
+    }
+    case 'broadcaster-account-image': {
+      // 방송인 통장사본
+      fileName = row.accountImageName;
+      break;
+    }
     default: {
       fileName = row.businessRegistrationImageName;
     }
+  }
+
+  let userEmail = '';
+  switch (type) {
+    case 'broadcaster-id-card':
+    case 'broadcaster-account-image':
+      userEmail = row.broadcaster.email;
+      break;
+
+    default:
+      userEmail = row.sellerEmail;
   }
 
   async function downloadFromS3(sellerEmail: string): Promise<void> {
@@ -46,7 +67,7 @@ export function AdminImageDownloadButton({
   }
 
   return (
-    <Button size="xs" onClick={() => downloadFromS3(row.sellerEmail)} disabled={disabled}>
+    <Button size="xs" onClick={() => downloadFromS3(userEmail)} disabled={disabled}>
       이미지 다운로드
     </Button>
   );

@@ -25,7 +25,7 @@ const CONFIRMATION_DESC = {
     '승인 반려되었습니다. 아래 반려사유를 확인한 후 다시 정산 정보를 등록해주세요.',
 };
 
-const TAX_TYPE: Record<TaxationType, string> = {
+export const TAX_TYPE: Record<TaxationType, string> = {
   naturalPerson: '개인(사업소득)',
   selfEmployedBusiness: '개인사업자',
 };
