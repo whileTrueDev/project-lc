@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeftIcon } from '@chakra-ui/icons';
+import { ChevronLeftIcon, EditIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -18,6 +18,13 @@ import {
   Textarea,
   Link,
   useDisclosure,
+  FormLabel,
+  FormControl,
+  FormHelperText,
+  Alert,
+  AlertTitle,
+  AlertDescription,
+  AlertIcon,
 } from '@chakra-ui/react';
 import {
   AdminPageLayout,
@@ -86,6 +93,7 @@ export function GoodsDetail(): JSX.Element {
       sellEndDate: '',
       rejectionReason: '',
       videoUrl: '',
+      fmGoodsSeq: null,
     },
   });
   const toast = useToast();
@@ -104,25 +112,18 @@ export function GoodsDetail(): JSX.Element {
   };
 
   const onSuccess = (): void => {
-    toast({
-      title: '변경 완료',
-      status: 'success',
-    });
-    router.reload();
+    toast({ title: '변경 완료', status: 'success' });
   };
 
   const onFail = (): void => {
-    toast({
-      title: '변경 실패',
-      status: 'error',
-    });
+    toast({ title: '변경 실패', status: 'error' });
   };
 
   const { handleSubmit, register, watch } = methods;
   const regist = async (
     data: Omit<LiveShoppingDTO, 'sellerId' | 'goods_id' | 'contactId' | 'requests'>,
   ): Promise<void> => {
-    const videoUrlExist = Boolean(liveShopping[0]?.liveShoppingVideo.youtubeUrl);
+    const videoUrlExist = Boolean(liveShopping[0]?.liveShoppingVideo?.youtubeUrl);
     const dto = Object.assign(data, { id: liveShoppingId });
     mutateAsync({ dto, videoUrlExist }).then(onSuccess).catch(onFail);
   };
@@ -131,6 +132,7 @@ export function GoodsDetail(): JSX.Element {
 
   if (!goods.isLoading && !goods.data)
     return <AdminPageLayout>...no data</AdminPageLayout>;
+
   return (
     <AdminPageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={8} p={2} mb={16}>
@@ -156,7 +158,7 @@ export function GoodsDetail(): JSX.Element {
             createDate={liveShopping[0].createDate}
           />
         )}
-        <Grid templateColumns="repeat(2, 1fr)" justifyItems="start">
+        <Grid templateColumns="repeat(2, 1fr)" justifyItems="start" gap={4}>
           <Stack spacing={5}>
             <Text as="span">
               판매자 : {liveShopping[0].seller.sellerShop?.shopName || ''}
@@ -174,6 +176,41 @@ export function GoodsDetail(): JSX.Element {
                 <Text>사유 : {liveShopping[0].rejectionReason}</Text>
               ) : null}
             </Stack>
+
+            <Stack>
+              <Stack direction="row" alignItems="center">
+                <Text>퍼스트몰 상품 번호: </Text>
+                <Text
+                  as="span"
+                  fontWeight="bold"
+                  textDecoration={liveShopping[0].fmGoodsSeq ? 'underline' : 'unset'}
+                  color={liveShopping[0].fmGoodsSeq ? 'blue' : 'unset'}
+                  cursor={liveShopping[0].fmGoodsSeq ? 'pointer' : 'default'}
+                  onClick={() => {
+                    window.open(
+                      `http://whiletrue.firstmall.kr/goods/view?no=${liveShopping[0].fmGoodsSeq}`,
+                    );
+                  }}
+                >
+                  {liveShopping[0].fmGoodsSeq || '미입력'}
+                </Text>
+              </Stack>
+              {liveShopping[0].progress === 'confirmed' && !liveShopping[0].fmGoodsSeq && (
+                <Alert status="error">
+                  <Stack>
+                    <AlertIcon />
+                    <AlertTitle>퍼스트몰 상품 번호가 입력되지 않았습니다.</AlertTitle>
+                    <AlertDescription>
+                      진행상태가 확정됨이지만 퍼스트몰 상품 번호가 입력되지 않았습니다.
+                      <br />
+                      라이브 쇼핑 진행시 사용하는 퍼스트몰 상품 번호가 입력되지 않으면
+                      방송인 수익금이 올바르게 처리되지 않습니다.
+                    </AlertDescription>
+                  </Stack>
+                </Alert>
+              )}
+            </Stack>
+
             <Divider />
             <Stack direction="row" alignItems="center">
               <Text as="span">방송인: </Text>
@@ -299,6 +336,8 @@ export function GoodsDetail(): JSX.Element {
               />
             </Box>
           </Stack>
+
+          {/* 라이브쇼핑 정보 변경 폼 */}
           <FormProvider {...methods}>
             <Stack as="form" spacing={5}>
               <LiveShoppingProgressSelector />
@@ -321,6 +360,7 @@ export function GoodsDetail(): JSX.Element {
                 </Text>
               )}
               <Divider />
+
               <LiveShoppingDatePicker
                 title="판매 시작시간"
                 registerName="sellStartDate"
@@ -336,13 +376,37 @@ export function GoodsDetail(): JSX.Element {
                 </Text>
               )}
               <Divider />
+
               <Stack>
                 <Text>영상 URL</Text>
                 <Input {...register('videoUrl')} />
               </Stack>
+              <Divider />
+
+              <Stack maxW="300px">
+                <FormControl>
+                  <FormLabel>퍼스트몰 상품 번호</FormLabel>
+                  <FormLabel color="gray.500" fontSize="xs">
+                    해당 라이브를 위해 퍼스트몰에서 생성한 새 상품의 상품 번호를
+                    입력하세요.
+                  </FormLabel>
+                  <FormHelperText fontSize="xs">
+                    <Text fontSize="xs" color="red.500" as="span">
+                      (주의){' '}
+                    </Text>
+                    방송인,방송시각등이 확정되었음에도 입력하지 않는 경우, 방송인에게
+                    수익금으로 반영되지 않습니다.
+                  </FormHelperText>
+                  <Input mt={2} type="number" {...register('fmGoodsSeq')} />
+                </FormControl>
+              </Stack>
+
               <Button onClick={openConfirmModal}>변경</Button>
-              <Button onClick={imageDialogOnOpen}>오버레이 이미지 등록</Button>
+              <Button rightIcon={<EditIcon />} onClick={imageDialogOnOpen}>
+                오버레이 이미지 등록
+              </Button>
             </Stack>
+
             <AdminLiveShoppingUpdateConfirmModal
               isOpen={isOpen}
               onClose={onClose}

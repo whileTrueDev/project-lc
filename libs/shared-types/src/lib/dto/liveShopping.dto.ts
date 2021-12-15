@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   ValidateIf,
+  IsInt,
 } from 'class-validator';
 import { LiveShopping, LiveShopppingProgressType } from '@prisma/client';
 
@@ -75,6 +76,8 @@ export class LiveShoppingDTO {
   @IsNumber()
   @IsNotEmpty()
   broadcasterCommissionRate?: string;
+
+  @IsOptional() @IsInt() fmGoodsSeq?: LiveShopping['fmGoodsSeq'];
 }
 
 export type LiveShoppingRegistDTO = Pick<

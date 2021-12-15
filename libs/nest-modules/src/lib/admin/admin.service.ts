@@ -289,6 +289,7 @@ export class AdminService {
         videoId: videoId || undefined,
         whiletrueCommissionRate: dto.whiletrueCommissionRate || 0,
         broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
+        fmGoodsSeq: Number(dto.fmGoodsSeq) || undefined,
       },
     });
     if (!liveShoppingUpdate) {
