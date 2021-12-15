@@ -1,43 +1,32 @@
-import { Button } from '@chakra-ui/button';
 import {
+  useToast,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter,
-} from '@chakra-ui/modal';
-import {
-  FormControl,
-  FormErrorMessage,
-  FormHelperText,
-  FormLabel,
   Grid,
+  FormControl,
+  FormLabel,
+  FormHelperText,
   Textarea,
-  useToast,
+  FormErrorMessage,
+  ModalFooter,
+  Button,
 } from '@chakra-ui/react';
-import { GridRowData } from '@material-ui/data-grid';
-import { useBusinessRegistrationRejectionMutation } from '@project-lc/hooks';
+import { useAdminBroadcasterSettlementInfoConfirmMutation } from '@project-lc/hooks';
 import { useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { GridTableItem } from '../GridTableItem';
+import { AdminBroadcasterSettlementInfoConfirmationDialogProps } from './AdminBroadcasterSettlementInfoConfirmationDialog';
+import { rejectionFormData } from './AdminBusinessRegistrationRejectionDialog';
 
-export interface AdminGoodsRejectionDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  row: GridRowData;
-}
-
-export type rejectionFormData = {
-  rejectionReason: string;
-};
-
-export function AdminBusinessRegistrationRejectionDialog({
+export function AdminBroadcasterSettlementInfoRejectionDialog({
   isOpen,
   onClose,
   row,
-}: AdminGoodsRejectionDialogProps): JSX.Element {
+}: AdminBroadcasterSettlementInfoConfirmationDialogProps): JSX.Element {
   const toast = useToast();
   const {
     register,
@@ -54,7 +43,7 @@ export function AdminBusinessRegistrationRejectionDialog({
     reset();
   }, [reset, row]);
 
-  const rejectMutation = useBusinessRegistrationRejectionMutation();
+  const rejectMutation = useAdminBroadcasterSettlementInfoConfirmMutation();
 
   async function handleRejectionGood({
     id,
@@ -66,16 +55,17 @@ export function AdminBusinessRegistrationRejectionDialog({
     try {
       await rejectMutation.mutateAsync({
         id,
+        status: 'rejected',
         rejectionReason,
       });
       toast({
-        title: '사업자등록정보가 반려되었습니다.',
+        title: '방송인의 정산정보가 반려되었습니다.',
         status: 'success',
       });
       onClose();
     } catch (error) {
       toast({
-        title: '사업자등록정보 반려가 실패하였습니다.',
+        title: '방송인의 정산정보 반려가 실패하였습니다.',
         status: 'error',
       });
     }
@@ -90,22 +80,22 @@ export function AdminBusinessRegistrationRejectionDialog({
     <Modal isOpen={isOpen} size="xl" onClose={onClose} initialFocusRef={initialRef}>
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(useSubmit)}>
-        <ModalHeader>사업자등록정보 반려 하기</ModalHeader>
+        <ModalHeader>방송인 정산정보 반려 하기</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
-            <GridTableItem title="회사명" value={row?.companyName} />
+            <GridTableItem title="방송인 활동명" value={row?.broadcaster?.userNickname} />
           </Grid>
           <FormControl m={2} mt={6} isInvalid={!!errors.rejectionReason}>
             <FormLabel fontSize="md">반려사유</FormLabel>
             <FormHelperText mb={2}>
-              사업자등록정보 승인 불가 사유를 입력해주세요.
+              방송인 정산정보 승인 불가 사유를 입력해주세요.
             </FormHelperText>
             <Textarea
               isInvalid={!!errors.rejectionReason}
               minHeight="250px"
               resize="none"
-              placeholder="예) 사업자등록정보가 존재하지 않습니다"
+              placeholder="예) 업로드한 통장사본의 계좌번호와 입력하신 계좌번호가 일치하지 않습니다"
               {...register('rejectionReason', {
                 required: '반려 사유를 입력해주세요',
                 validate: {
@@ -135,3 +125,5 @@ export function AdminBusinessRegistrationRejectionDialog({
     </Modal>
   );
 }
+
+export default AdminBroadcasterSettlementInfoRejectionDialog;

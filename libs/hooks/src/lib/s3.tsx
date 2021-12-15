@@ -98,12 +98,12 @@ export const s3 = (() => {
       }
       case 'broadcaster-id-card': {
         // 방송인 신분증
-        fileFullName = `${prefix}_신분증`;
+        fileFullName = `${prefix}_신분증${extension}`;
         break;
       }
       case 'broadcaster-account-image': {
         // 방송인 통장사본
-        fileFullName = `${prefix}_통장사본`;
+        fileFullName = `${prefix}_통장사본${extension}`;
         break;
       }
 

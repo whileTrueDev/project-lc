@@ -91,13 +91,11 @@ const columns: GridColumns = [
   },
 ];
 
-function makeListRow(
-  sellerBusinessRegistrations: SellerBusinessRegistration[] | undefined,
-): SellerBusinessRegistration[] {
-  if (!sellerBusinessRegistrations) {
+export function makeListRow<T>(list: T[] | undefined): T[] {
+  if (!list) {
     return [];
   }
-  return sellerBusinessRegistrations.map((element) => {
+  return list.map((element) => {
     return { ...element, isRowSelectable: false };
   });
 }
@@ -169,7 +167,7 @@ export function AdminBusinessRegistrationList(props: {
         minH={300}
         density="compact"
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
-        rows={makeListRow(sellerBusinessRegistrations)}
+        rows={makeListRow<SellerBusinessRegistration>(sellerBusinessRegistrations)}
         rowCount={5}
         rowsPerPageOptions={[25, 50]}
         onCellClick={handleClick}
