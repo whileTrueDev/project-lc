@@ -94,12 +94,12 @@ export function ContractionAgreementSection({
       <Center>
         <VStack spacing={0}>
           <Divider mb={3} borderWidth={0.5} />
-          <Text fontSize="md" fontWeight="semibold">
+          <Text fontSize="md">
             크크쇼 서비스를 정상적으로 이용하기 위해서는 이용 동의가 필요합니다.
           </Text>
           {계약동의여부 || (
             <>
-              <Text fontSize="md" fontWeight="semibold">
+              <Text fontSize="md">
                 아래의 약관들에 대해서 동의한 이후, [이용동의완료] 버튼을 클릭해
                 완료해주세요.
               </Text>
