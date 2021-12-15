@@ -17,7 +17,7 @@ import { useState } from 'react';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { SettlementInfoDialog } from './SettlementInfoDialog';
 
-// 정산 내역을 보여주는 데이터 그리드
+/** 판매자 정산 내역 */
 export function SettlementList(): JSX.Element | null {
   const { isDesktopSize, isMobileSize } = useDisplaySize();
 

@@ -584,7 +584,7 @@ model LiveShopping {
   broadcasterId             Int? //방송인의 아이디 
   sellerId                  Int // 판매자 ID
   goodsId                   Int // 상품 ID (project-lc goods Id)
-  fmGoodsSeq                Int? // 퍼스트몰 상품 ID 라이브쇼핑진행을 위해 생성한 퍼스트몰 상품의 고유번호 (fm_goods.goods_seq)
+  fmGoodsSeq                Int?                      @unique // 퍼스트몰 상품 ID 라이브쇼핑진행을 위해 생성한 퍼스트몰 상품의 고유번호 (fm_goods.goods_seq)
   videoId                   Int?
   contactId                 Int // 판매자 등록된 연락처 ID
   requests                  String?                   @db.LongText // 요청사항
