@@ -74,7 +74,7 @@ function NoAddressAlertBox(): JSX.Element {
 export function BroadcasterAddressForm({
   defaultOpen,
 }: {
-  defaultOpen?: boolean | undefined;
+  defaultOpen?: boolean;
 }): JSX.Element {
   const toast = useToast();
   const profile = useProfile();

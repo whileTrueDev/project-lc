@@ -27,25 +27,15 @@ export function IntroSection({
       </Center>
       <Center>
         <VStack spacing={0}>
-          <Text fontSize="md" fontWeight="semibold">
-            라이브 쇼핑 진행에 필요한 정보를 등록하고
-          </Text>
-          <Text fontSize="md" fontWeight="semibold">
-            크크쇼를 시작하세요!
-          </Text>
+          <Text>라이브 쇼핑 진행에 필요한 정보를 등록하고</Text>
+          <Text>크크쇼를 시작하세요!</Text>
         </VStack>
       </Center>
       <Center>
         <VStack spacing={0}>
-          <Text fontSize="md" fontWeight="semibold">
-            크크쇼를 시작하기 위해서
-          </Text>
-          <Text fontSize="md" fontWeight="semibold">
-            연락처, 이용 동의, 플랫폼 추가
-          </Text>
-          <Text fontSize="md" fontWeight="semibold">
-            등을 진행하셔야 합니다.
-          </Text>
+          <Text>크크쇼를 시작하기 위해서</Text>
+          <Text>연락처, 이용 동의, 플랫폼 추가</Text>
+          <Text>등을 진행하셔야 합니다.</Text>
         </VStack>
       </Center>
     </Stack>

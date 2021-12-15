@@ -1,8 +1,7 @@
-import { Stack, Center, Divider, VStack, Text } from '@chakra-ui/react';
-import { useProfile, useBroadcasterChannels } from '@project-lc/hooks';
+import { Center, Divider, Stack, Text, VStack } from '@chakra-ui/react';
+import { useBroadcasterChannels, useProfile } from '@project-lc/hooks';
 import { useEffect } from 'react';
 import { BroadcasterNickNameSection } from '../BroadcasterNickName';
-import { SettingSectionLayout } from '../SettingSectionLayout';
 import { BroadcasterChannelSection } from '../BroadcasterChannelSection';
 
 export function ChannelSection({
@@ -24,15 +23,9 @@ export function ChannelSection({
       <Center>
         <VStack spacing={0}>
           <Divider mb={3} borderWidth={0.5} />
-          <Text fontSize="md" fontWeight="semibold">
-            크크쇼 라이브 커머스를 매칭하기 위해서는 판매자 분들이
-          </Text>
-          <Text fontSize="md" fontWeight="semibold">
-            방송인 분들의 채널을 확인할 수 있어야 합니다.
-          </Text>
-          <Text fontSize="md" fontWeight="semibold">
-            현재 활동하고 있는 채널들을 모두 입력해주세요.
-          </Text>
+          <Text>크크쇼 라이브 커머스를 매칭하기 위해서는 판매자 분들이</Text>
+          <Text>방송인 분들의 채널을 확인할 수 있어야 합니다.</Text>
+          <Text>현재 활동하고 있는 채널들을 모두 입력해주세요.</Text>
         </VStack>
       </Center>
       <Center>

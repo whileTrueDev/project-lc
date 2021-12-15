@@ -1,6 +1,6 @@
-import { Stack, Center, Divider, VStack, Text } from '@chakra-ui/react';
+import { Center, Divider, Stack, Text, VStack } from '@chakra-ui/react';
 import { useEffect, useMemo } from 'react';
-import { useProfile, useBroadcasterContacts, useBroadcaster } from '@project-lc/hooks';
+import { useProfile, useBroadcaster, useBroadcasterContacts } from '@project-lc/hooks';
 import { BroadcasterAddressSection } from '../BroadcasterAddress';
 import { BroadcasterContactSection } from '../BroadcasterContact';
 
@@ -34,10 +34,8 @@ export function AddressSection({
       <Center>
         <VStack spacing={0}>
           <Divider mb={3} borderWidth={0.5} />
-          <Text fontSize="md" fontWeight="semibold">
-            크크쇼 라이브 커머스를 시작하기 위해서는 연락처 등록이 필요합니다.
-          </Text>
-          <Text fontSize="md" fontWeight="semibold">
+          <Text>크크쇼 라이브 커머스를 시작하기 위해서는 연락처 등록이 필요합니다.</Text>
+          <Text>
             아래 입력창을 통해 연락처와 샘플 및 선물을 수령받을 주소를 추가하세요.
           </Text>
         </VStack>
@@ -48,7 +46,7 @@ export function AddressSection({
           <Divider />
           <BroadcasterAddressSection />
           {연락처존재여부 && 주소존재여부 && (
-            <Text colorScheme="gray" fontWeight="thin">
+            <Text colorScheme="gray.500" fontWeight="thin">
               아래의 다음 버튼을 클릭하여 다음단계를 진행해주세요.
             </Text>
           )}
