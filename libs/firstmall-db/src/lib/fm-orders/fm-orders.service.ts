@@ -27,6 +27,7 @@ import {
   CheeringMessage,
   BroadcasterPurchaseDto,
   GoodsConfirmationDtoOnlyConnectionId,
+  BroacasterPurchaseWithDivdedMessageDto,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { FirstmallDbService } from '../firstmall-db.service';
@@ -909,7 +910,7 @@ export class FmOrdersService {
     return true;
   }
 
-  private getMessage(value): BroadcasterPurchaseDto {
+  private getMessage(value: BroadcasterPurchaseDto): BroadcasterPurchaseDto {
     const newMessageRow = Object.assign(value);
     const inputsArray = value.message.split('||');
     let userNickname = '-';
@@ -941,9 +942,9 @@ export class FmOrdersService {
 
   public async getPurchaseDoneOrderDuringLiveShopping(
     goods: GoodsConfirmationDtoOnlyConnectionId[],
-  ): Promise<BroadcasterPurchaseDto> {
+  ): Promise<BroacasterPurchaseWithDivdedMessageDto> {
     const sql = `
-    SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.regist_date, fo.step, fois.suboption, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
+    SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.regist_date, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
     FROM fm_order_item AS foi 
     RIGHT JOIN fm_order AS fo 
     ON foi.order_seq = fo.order_seq 

@@ -28,7 +28,7 @@ import {
   OrderStatsRes,
   SalesStats,
   ChangeReturnStatusDto,
-  BroadcasterPurchaseDto,
+  BroacasterPurchaseWithDivdedMessageDto,
   FindFmOrderDetailsDto,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -193,7 +193,7 @@ export class FmOrdersController {
   async getBroadcasterPurchases(
     @Query('broadcasterId', ParseIntPipe)
     broadcasterId: number,
-  ): Promise<BroadcasterPurchaseDto> {
+  ): Promise<BroacasterPurchaseWithDivdedMessageDto> {
     const linkedLiveShoppingFmGoodsIds =
       await this.liveShoppingService.getFmGoodsConnectionIdLinkedToLiveShopping(
         broadcasterId,

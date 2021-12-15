@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Box } from '@chakra-ui/react';
 import { GridColumns, GridSortModel } from '@material-ui/data-grid';
 import {
@@ -45,7 +46,7 @@ const columns: GridColumns = [
 
 export function BroadcasterPurchaseList(): JSX.Element {
   const { data: profileData } = useProfile();
-
+  const [pageSize, setPageSize] = useState(15);
   const sortModel: GridSortModel = [
     {
       field: 'regist_date',
@@ -65,6 +66,8 @@ export function BroadcasterPurchaseList(): JSX.Element {
           pagination
           showFirstButton
           showLastButton
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           rowsPerPageOptions={[15, 20, 30]}
           disableSelectionOnClick
           disableColumnMenu

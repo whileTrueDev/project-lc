@@ -5,6 +5,13 @@ export class BroadcasterPurchaseDto {
   @IsString() goods_name: string;
   @IsString() settleprice: string;
   @IsString() regist_date: string;
-  @IsString() userNickname: string;
-  @IsString() userMessage: string;
+  @IsString() message: string;
 }
+
+export type BroacasterPurchaseWithDivdedMessageDto = Omit<
+  BroadcasterPurchaseDto,
+  'message'
+> & {
+  userNickname: string;
+  userMessage: string;
+};
