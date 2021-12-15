@@ -1,13 +1,16 @@
 import { Container, Divider, Heading, VStack } from '@chakra-ui/react';
 import {
-  broadcasterCenterMypageNavLinks,
-  BroadcasterContactSection,
   BroadcasterAddressSection,
+  broadcasterCenterMypageNavLinks,
   BroadcasterChannelSection,
+  BroadcasterContactSection,
   BroadcasterNickNameSection,
-  MypageLayout,
-  SocialAccountUnlinkSection,
   BroadcasterSignoutSection,
+  ContractionAgreeSection,
+  MypageLayout,
+  PasswordSection,
+  ProfileBox,
+  SocialAccountUnlinkSection,
 } from '@project-lc/components';
 
 export function SettingIndex(): JSX.Element {
@@ -16,9 +19,13 @@ export function SettingIndex(): JSX.Element {
       <Container maxWidth="2xl" p={6}>
         <VStack spacing={4} alignItems="stretch">
           <Heading mb={4}>내 계정</Heading>
-          <div>계정정보</div>
+          <ProfileBox allowAvatarChange />
           <Divider />
           <BroadcasterNickNameSection />
+          <Divider />
+          <PasswordSection />
+          <Divider />
+          <ContractionAgreeSection />
           <Divider />
           <SocialAccountUnlinkSection userType="broadcaster" />
           <Divider />
