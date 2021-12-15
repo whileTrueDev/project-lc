@@ -8,6 +8,7 @@ import {
   ModalFooter,
   Button,
   ModalHeader,
+  ButtonGroup,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Stepper, Step, StepLabel } from '@material-ui/core';
@@ -116,37 +117,38 @@ export function StartGuideSection({
           )}
         </ModalBody>
         <ModalFooter>
-          <Button
-            variant="contained"
-            onClick={(): void => {
-              if (activeStep === 0) {
-                handleIntroReset();
-                handleStepReset();
-              } else handleBack();
-            }}
-          >
-            이전
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={(): void => {
-              if (introduction) {
-                handleIntroSkip();
-                setCondition(false);
-                return;
-              }
-              if (activeStep === steps.length - 1) {
-                onClose();
-                handleStepReset();
-              } else {
-                handleNext();
-              }
-            }}
-            disabled={!condition}
-          >
-            다음
-          </Button>
+          <ButtonGroup>
+            <Button
+              onClick={(): void => {
+                if (introduction) onClose();
+                if (activeStep === 0) {
+                  handleIntroReset();
+                  handleStepReset();
+                } else handleBack();
+              }}
+            >
+              {introduction ? '닫기' : '이전'}
+            </Button>
+            <Button
+              colorScheme="blue"
+              onClick={(): void => {
+                if (introduction) {
+                  handleIntroSkip();
+                  setCondition(false);
+                  return;
+                }
+                if (activeStep === steps.length - 1) {
+                  onClose();
+                  handleStepReset();
+                } else {
+                  handleNext();
+                }
+              }}
+              disabled={!condition}
+            >
+              다음
+            </Button>
+          </ButtonGroup>
         </ModalFooter>
       </ModalContent>
     </Modal>
