@@ -6,6 +6,11 @@
   - Added the required column `email` to the `Broadcaster` table without a default value. This is not possible if the table is not empty.
 
 */
+-- DropForeignKey
+ALTER TABLE `LiveShopping` DROP FOREIGN KEY `LiveShopping_broadcasterId_fkey`;
+
+-- DropForeignKey
+ALTER TABLE `LiveCommerceRanking` DROP FOREIGN KEY `LiveCommerceRanking_broadcasterId_fkey`;
 
 -- DropForeignKey
 ALTER TABLE `BroadcasterChannel` DROP FOREIGN KEY `BroadcasterChannel_broadcasterId_fkey`;
@@ -39,6 +44,9 @@ CREATE TABLE `Broadcaster` (
 
 -- CreateIndex
 CREATE UNIQUE INDEX `Broadcaster_overlayUrl_key` ON `Broadcaster`(`overlayUrl`);
+
+-- AlterTable
+ALTER TABLE `LiveShopping` MODIFY `broadcasterId` INTEGER;
 
 -- AddForeignKey
 ALTER TABLE `LiveShopping` ADD CONSTRAINT `LiveShopping_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `Broadcaster`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

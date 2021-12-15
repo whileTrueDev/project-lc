@@ -8,4 +8,5 @@ export interface UserProfileRes {
   name?: string | null;
   shopName?: string | null;
   avatar?: string;
+  agreementFlag?: boolean;
 }

@@ -205,4 +205,18 @@ export class BroadcasterService {
     });
     return broadcaster;
   }
+
+  /** 이용동의 상태 변경 */
+  async changeContractionAgreement(
+    email: string,
+    agreementFlag: boolean,
+  ): Promise<Broadcaster> {
+    const broadcaster = await this.prisma.broadcaster.update({
+      where: { email },
+      data: {
+        agreementFlag,
+      },
+    });
+    return broadcaster;
+  }
 }

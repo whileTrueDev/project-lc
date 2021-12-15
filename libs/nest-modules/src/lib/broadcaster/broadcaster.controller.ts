@@ -26,6 +26,7 @@ import {
   FindBroadcasterDto,
   PasswordValidateDto,
   SignUpDto,
+  BroadcasterContractionAgreementDto,
 } from '@project-lc/shared-types';
 import {
   Broadcaster,
@@ -176,6 +177,18 @@ export class BroadcasterController {
     @Body(ValidationPipe) dto: PasswordValidateDto,
   ): Promise<Broadcaster> {
     return this.broadcasterService.changePassword(dto.email, dto.password);
+  }
+
+  // 이용 동의 상태 변경
+  @UseGuards(JwtAuthGuard)
+  @Patch('agreement')
+  public async changeContractionAgreement(
+    @Body(ValidationPipe) dto: BroadcasterContractionAgreementDto,
+  ): Promise<Broadcaster> {
+    return this.broadcasterService.changeContractionAgreement(
+      dto.email,
+      dto.agreementFlag,
+    );
   }
 
   /** 방송인 정산정보 등록 */

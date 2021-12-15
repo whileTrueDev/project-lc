@@ -115,3 +115,5 @@ export * from './lib/SummaryList';
 export * from './lib/TestComponent';
 export * from './lib/TextDotConnector';
 export * from './lib/TextViewerWithDetailModal';
+export * from './lib/ContractionAgreeSection';
+export * from './lib/ContractionAgreeDialog';
