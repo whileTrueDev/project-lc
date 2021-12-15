@@ -98,10 +98,11 @@ export class LiveShoppingService {
   /**
    *
    * @author m'baku
+   * @description 해당 방송인에게 매칭된 모든 라이브 쇼핑에 연결된 상품들의 FirstmallGoodsConnectionId를 반환받는다
    * @param broadcasterId
-   * @returns 라이브 쇼핑에 연결된 FirstmallGoodsConnectionId
+   * @returns firstmallGoodsConnectionIds
    */
-  async getFmGoodsConnectionIdLinkedToLiveShopping(
+  async getFmGoodsConnectionIdLinkedToLiveShoppings(
     broadcasterId: number,
   ): Promise<GoodsConfirmationDtoOnlyConnectionId[]> {
     const nestedFmGoodsConnectionIds = await this.prisma.liveShopping.findMany({
