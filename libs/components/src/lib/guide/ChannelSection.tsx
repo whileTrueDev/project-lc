@@ -1,7 +1,7 @@
 import { Stack, Center, Divider, VStack, Text } from '@chakra-ui/react';
 import { useProfile, useBroadcasterChannels } from '@project-lc/hooks';
 import { useEffect } from 'react';
-import { BroadcasterNicknameForm } from '../BroadcasterNickName';
+import { BroadcasterNickNameSection } from '../BroadcasterNickName';
 import { SettingSectionLayout } from '../SettingSectionLayout';
 import { BroadcasterChannelSection } from '../BroadcasterChannelSection';
 
@@ -37,9 +37,7 @@ export function ChannelSection({
       </Center>
       <Center>
         <VStack spacing={7} w={['6xl', 'xl']}>
-          <SettingSectionLayout title="활동명">
-            <BroadcasterNicknameForm />
-          </SettingSectionLayout>
+          <BroadcasterNickNameSection />
           <Divider />
           <BroadcasterChannelSection />
           {channels && channels?.length > 0 && (
