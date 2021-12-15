@@ -48,7 +48,7 @@ export function BroadcasterPurchaseList(): JSX.Element {
 
   const sortModel: GridSortModel = [
     {
-      field: 'deposit_date',
+      field: 'regist_date',
       sort: 'desc',
     },
   ];
