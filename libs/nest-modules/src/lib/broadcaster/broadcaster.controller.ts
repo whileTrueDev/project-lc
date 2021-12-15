@@ -179,7 +179,8 @@ export class BroadcasterController {
     return this.broadcasterService.changePassword(dto.email, dto.password);
   }
 
-  // 비밀번호 변경
+  // 이용 동의 상태 변경
+  @UseGuards(JwtAuthGuard)
   @Patch('agreement')
   public async changeContractionAgreement(
     @Body(ValidationPipe) dto: BroadcasterContractionAgreementDto,

@@ -206,6 +206,7 @@ export class BroadcasterService {
     return broadcaster;
   }
 
+  /** 이용동의 상태 변경 */
   async changeContractionAgreement(
     email: string,
     agreementFlag: boolean,
