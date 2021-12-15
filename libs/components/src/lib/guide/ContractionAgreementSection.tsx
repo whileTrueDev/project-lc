@@ -158,11 +158,11 @@ export function ContractionAgreementSection({
                     colorScheme="green"
                     isChecked={term.state === 'checkedA' ? checkedA : checkedB}
                     onChange={() => {
-                      if (term.state === 'checkedA') {
-                        setCheckedA(!checkedA);
-                      } else {
-                        setCheckedB(!checkedB);
-                      }
+                      toast({
+                        status: 'warning',
+                        description: '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
+                        duration: 1500,
+                      });
                     }}
                   >
                     동의
@@ -180,7 +180,11 @@ export function ContractionAgreementSection({
                 if (checkedA && checkedB) {
                   checkedAll(false);
                 } else {
-                  checkedAll(true);
+                  toast({
+                    status: 'warning',
+                    description: '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
+                    duration: 1500,
+                  });
                 }
               }}
             >
@@ -200,7 +204,7 @@ export function ContractionAgreementSection({
         </Center>
       )}
       {selectedTerm && (
-        <Modal isOpen={dialog.isOpen} onClose={dialog.onClose} size="full">
+        <Modal isOpen={dialog.isOpen} onClose={dialog.onClose} size="5xl">
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>{selectedTerm.title}</ModalHeader>
@@ -211,6 +215,25 @@ export function ContractionAgreementSection({
                   <p key={sentence}>{sentence}</p>
                 ))}
               </div>
+              {!계약동의여부 && (
+                <Center m={2}>
+                  <Checkbox
+                    size="md"
+                    colorScheme="green"
+                    isChecked={selectedTerm.state === 'checkedA' ? checkedA : checkedB}
+                    onChange={() => {
+                      if (selectedTerm.state === 'checkedA') {
+                        setCheckedA(!checkedA);
+                      } else {
+                        setCheckedB(!checkedB);
+                      }
+                      dialog.onClose();
+                    }}
+                  >
+                    위 약관에 동의합니다.
+                  </Checkbox>
+                </Center>
+              )}
             </ModalBody>
           </ModalContent>
         </Modal>
