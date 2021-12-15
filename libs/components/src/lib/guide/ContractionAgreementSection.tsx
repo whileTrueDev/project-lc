@@ -16,11 +16,11 @@ import {
   Text,
   useToast,
   GridItem,
+  SimpleGrid,
 } from '@chakra-ui/react';
 import { useEffect, useState, useMemo } from 'react';
 import { CheckIcon } from '@chakra-ui/icons';
 import { useProfile, useUpdateContractionAgreementMutation } from '@project-lc/hooks';
-import { Grid, Typography } from '@material-ui/core';
 import useContractStyles from '../../constants/Contract.style';
 import terms from '../../constants/contractTerms';
 import { SettingSectionLayout } from '../SettingSectionLayout';
@@ -137,49 +137,38 @@ export function ContractionAgreementSection({
         <Center>
           <Stack w={['6xl', 'xl']} spacing={5}>
             {terms.map((term) => (
-              <div key={term.state}>
-                <Grid
-                  container
-                  direction="row"
-                  justify="space-between"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <Grid item>
-                    <Typography component="p" className={classes.termTitle}>
-                      {term.title}
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      width="150px"
-                      size="sm"
-                      onClick={(): void => {
-                        setSelectedTerm(term);
-                        dialog.onOpen();
-                      }}
-                    >
-                      약관보기
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Checkbox
-                      size="md"
-                      colorScheme="green"
-                      isChecked={term.state === 'checkedA' ? checkedA : checkedB}
-                      onChange={() => {
-                        if (term.state === 'checkedA') {
-                          setCheckedA(!checkedA);
-                        } else {
-                          setCheckedB(!checkedB);
-                        }
-                      }}
-                    >
-                      동의
-                    </Checkbox>
-                  </Grid>
-                </Grid>
-              </div>
+              <SimpleGrid key={term.state} columns={3}>
+                <GridItem>
+                  <Text>{term.title}</Text>
+                </GridItem>
+                <GridItem textAlign="center">
+                  <Button
+                    size="sm"
+                    onClick={(): void => {
+                      setSelectedTerm(term);
+                      dialog.onOpen();
+                    }}
+                  >
+                    약관보기
+                  </Button>
+                </GridItem>
+                <GridItem>
+                  <Checkbox
+                    size="md"
+                    colorScheme="green"
+                    isChecked={term.state === 'checkedA' ? checkedA : checkedB}
+                    onChange={() => {
+                      if (term.state === 'checkedA') {
+                        setCheckedA(!checkedA);
+                      } else {
+                        setCheckedB(!checkedB);
+                      }
+                    }}
+                  >
+                    동의
+                  </Checkbox>
+                </GridItem>
+              </SimpleGrid>
             ))}
             <Divider />
             {/* 이용약관 동의 버튼 */}
