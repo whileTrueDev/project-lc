@@ -1,29 +1,24 @@
 import {
+  Button,
+  ButtonGroup,
+  Checkbox,
+  Divider,
+  GridItem,
+  Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalHeader,
   ModalOverlay,
   ModalProps,
-  ModalHeader,
+  SimpleGrid,
   Stack,
-  Heading,
-  Divider,
-  Modal,
+  Text,
   useDisclosure,
-  Button,
-  Checkbox,
 } from '@chakra-ui/react';
-import shortid from 'shortid';
 import { useState } from 'react';
-import { Grid, Typography } from '@material-ui/core';
 import useContractStyles from '../constants/Contract.style';
-import terms from '../constants/contractTerms';
-
-interface Term {
-  title: string;
-  state: string;
-  text: string;
-}
+import terms, { Term } from '../constants/contractTerms';
 
 export function ContractionAgreeDialog({
   isOpen,
@@ -47,6 +42,7 @@ export function ContractionAgreeDialog({
 
   return (
     <Modal
+      isCentered
       isOpen={isOpen}
       onClose={() => {
         checkedAll(false);
@@ -56,60 +52,47 @@ export function ContractionAgreeDialog({
     >
       <ModalOverlay />
       <ModalContent>
+        <ModalHeader>이용약관</ModalHeader>
         <ModalCloseButton />
-        <ModalBody maxW="6xl" mx="5">
-          <Stack pt={3} pb={3} spacing={6}>
+        <ModalBody>
+          <Stack pb={3} spacing={4}>
             {/* 헤더 */}
-            <Heading as="h4" size="lg" textAlign="center">
-              이용약관
-            </Heading>
             <Divider />
             {terms.map((term) => (
-              <div key={term.state}>
-                <Grid
-                  container
-                  direction="row"
-                  justify="space-between"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <Grid item>
-                    <Typography component="p" className={classes.termTitle}>
-                      {term.title}
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      width="150px"
-                      size="sm"
-                      onClick={(): void => {
-                        setSelectedTerm(term);
-                        dialog.onOpen();
+              <SimpleGrid key={term.state} columns={3}>
+                <GridItem>
+                  <Text>{term.title}</Text>
+                </GridItem>
+                <GridItem textAlign="center">
+                  <Button
+                    size="sm"
+                    onClick={(): void => {
+                      setSelectedTerm(term);
+                      dialog.onOpen();
+                    }}
+                  >
+                    약관보기
+                  </Button>
+                </GridItem>
+                {!agreementFlag && (
+                  <GridItem textAlign="center">
+                    <Checkbox
+                      size="md"
+                      colorScheme="green"
+                      isChecked={term.state === 'checkedA' ? checkedA : checkedB}
+                      onChange={() => {
+                        if (term.state === 'checkedA') {
+                          setCheckedA(!checkedA);
+                        } else {
+                          setCheckedB(!checkedB);
+                        }
                       }}
                     >
-                      약관보기
-                    </Button>
-                  </Grid>
-                  {!agreementFlag && (
-                    <Grid item>
-                      <Checkbox
-                        size="md"
-                        colorScheme="green"
-                        isChecked={term.state === 'checkedA' ? checkedA : checkedB}
-                        onChange={() => {
-                          if (term.state === 'checkedA') {
-                            setCheckedA(!checkedA);
-                          } else {
-                            setCheckedB(!checkedB);
-                          }
-                        }}
-                      >
-                        동의
-                      </Checkbox>
-                    </Grid>
-                  )}
-                </Grid>
-              </div>
+                      동의
+                    </Checkbox>
+                  </GridItem>
+                )}
+              </SimpleGrid>
             ))}
             <Divider />
             {/* 이용약관 동의 버튼 */}
@@ -129,16 +112,16 @@ export function ContractionAgreeDialog({
                 >
                   전체 이용약관에 동의합니다.
                 </Checkbox>
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ButtonGroup justifyContent="flex-end">
+                  <Button onClick={onClose}>취소</Button>
                   <Button
-                    width="150px"
-                    size="sm"
+                    colorScheme="blue"
                     disabled={!(checkedA && checkedB)}
                     onClick={onSubmit}
                   >
                     확인
                   </Button>
-                </div>
+                </ButtonGroup>
               </>
             )}
 
@@ -151,7 +134,7 @@ export function ContractionAgreeDialog({
                   <ModalBody maxW="6xl" mx="auto">
                     <div className={classes.inDialogContent}>
                       {selectedTerm.text.split('\n').map((sentence) => (
-                        <p key={shortid.generate()}>{sentence}</p>
+                        <p key={sentence}>{sentence}</p>
                       ))}
                     </div>
                   </ModalBody>
