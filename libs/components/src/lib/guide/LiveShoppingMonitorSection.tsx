@@ -2,7 +2,7 @@ import { Stack, Center, Divider, Grid, VStack, Text, Box, Image } from '@chakra-
 import { useEffect, useState } from 'react';
 import { useDisplaySize, s3 } from '@project-lc/hooks';
 
-export function LiveShoppingMoniterSection({
+export function LiveShoppingMonitorSection({
   completeStep,
 }: {
   completeStep: () => void;

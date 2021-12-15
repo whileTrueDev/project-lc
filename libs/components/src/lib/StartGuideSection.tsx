@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Stepper, Step, StepLabel } from '@material-ui/core';
-import { LiveShoppingMoniterSection } from './guide/LiveShoppingMoniterSection';
+import { LiveShoppingMonitorSection } from './guide/LiveShoppingMonitorSection';
 import { SettlementsSection } from './guide/SettlementsSection';
 import { ContractionAgreementSection } from './guide/ContractionAgreementSection';
 import { AddressSection } from './guide/AddressSection';
@@ -72,7 +72,7 @@ export function StartGuideSection({
     },
     {
       label: '라이브 쇼핑 화면',
-      component: <LiveShoppingMoniterSection completeStep={completeStep} />,
+      component: <LiveShoppingMonitorSection completeStep={completeStep} />,
     },
     {
       label: '수익금 출금하기',
