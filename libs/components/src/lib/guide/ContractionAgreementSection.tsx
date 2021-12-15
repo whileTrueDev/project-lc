@@ -17,7 +17,6 @@ import {
   useToast,
   GridItem,
 } from '@chakra-ui/react';
-import shortid from 'shortid';
 import { useEffect, useState, useMemo } from 'react';
 import { CheckIcon } from '@chakra-ui/icons';
 import { useProfile, useUpdateContractionAgreementMutation } from '@project-lc/hooks';
@@ -220,7 +219,7 @@ export function ContractionAgreementSection({
             <ModalBody maxW="6xl" mx="auto">
               <div className={classes.inDialogContent}>
                 {selectedTerm.text.split('\n').map((sentence) => (
-                  <p key={shortid.generate()}>{sentence}</p>
+                  <p key={sentence}>{sentence}</p>
                 ))}
               </div>
             </ModalBody>
