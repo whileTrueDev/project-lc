@@ -57,7 +57,6 @@ export * from './lib/queries/useApprovedGoodsList';
 export * from './lib/queries/useBroadcaster';
 export * from './lib/queries/useBroadcasterChannels';
 export * from './lib/queries/useBroadcasterContacts';
-export * from './lib/queries/useBroadcasterLiveShoppingConnectionId';
 export * from './lib/queries/useBroadcasterLiveShoppingList';
 export * from './lib/queries/useBroadcasterSettlementInfo';
 export * from './lib/queries/useDefaultContacts';

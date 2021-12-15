@@ -194,7 +194,9 @@ export class FmOrdersController {
     broadcasterId: number,
   ): Promise<BroadcasterPurchaseDto> {
     const linkedLiveShoppingFmGoodsIds =
-      await this.liveShoppingService.getLinkedLiveShoppingFmGoodsId(broadcasterId);
+      await this.liveShoppingService.getFmGoodsConnectionIdLinkedToLiveShopping(
+        broadcasterId,
+      );
     const purchasedList =
       await this.fmOrdersService.getPurchaseDoneOrderDuringLiveShopping(
         linkedLiveShoppingFmGoodsIds,

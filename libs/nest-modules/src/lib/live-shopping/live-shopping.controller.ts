@@ -60,13 +60,6 @@ export class LiveShoppingController {
     return goodsList;
   }
 
-  @Get('/broadcaster/fm-connection-id')
-  async getLiveShoppingLinkFmGoodsId(
-    @Query('broadcasterId') broadcasterId: number,
-  ): Promise<any> {
-    return this.liveShoppingService.getLinkedLiveShoppingFmGoodsId(broadcasterId);
-  }
-
   @Get('/broadcaster')
   getBroadcasterLiveShoppings(
     @Query('broadcasterId') broadcasterId: number,

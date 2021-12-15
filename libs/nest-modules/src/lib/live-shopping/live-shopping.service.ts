@@ -95,7 +95,13 @@ export class LiveShoppingService {
     });
   }
 
-  async getLinkedLiveShoppingFmGoodsId(
+  /**
+   *
+   * @author m'baku
+   * @param broadcasterId
+   * @returns 라이브 쇼핑에 연결된 FirstmallGoodsConnectionId
+   */
+  async getFmGoodsConnectionIdLinkedToLiveShopping(
     broadcasterId: number,
   ): Promise<GoodsConfirmationDtoOnlyConnectionId[]> {
     const nestedFmGoodsConnectionIds = await this.prisma.liveShopping.findMany({
