@@ -5,9 +5,9 @@ import {
   LiveShoppingParamsDto,
   LiveShoppingWithConfirmation,
   LiveShoppingRegistDTO,
+  GoodsConfirmationDtoOnlyConnectionId,
 } from '@project-lc/shared-types';
 import { UserPayload } from '../auth/auth.interface';
-
 @Injectable()
 export class LiveShoppingService {
   constructor(private readonly prisma: PrismaService) {}
@@ -93,6 +93,39 @@ export class LiveShoppingService {
         },
       },
     });
+  }
+
+  /**
+   *
+   * @author m'baku
+   * @description 해당 방송인에게 매칭된 모든 라이브 쇼핑에 연결된 상품들의 FirstmallGoodsConnectionId를 반환받는다
+   * @param broadcasterId
+   * @returns firstmallGoodsConnectionIds
+   */
+  async getFmGoodsConnectionIdLinkedToLiveShoppings(
+    broadcasterId: number,
+  ): Promise<GoodsConfirmationDtoOnlyConnectionId[]> {
+    const nestedFmGoodsConnectionIds = await this.prisma.liveShopping.findMany({
+      where: {
+        broadcasterId: broadcasterId ? Number(broadcasterId) : undefined,
+      },
+      select: {
+        goods: {
+          select: {
+            confirmation: {
+              select: {
+                firstmallGoodsConnectionId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const fmGoodsConnectionIds = [];
+    nestedFmGoodsConnectionIds.map((value) =>
+      fmGoodsConnectionIds.push(value.goods.confirmation),
+    );
+    return fmGoodsConnectionIds;
   }
 
   async getBroadcasterRegisteredLiveShoppings(
