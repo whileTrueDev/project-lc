@@ -270,19 +270,13 @@ export class AdminService {
     dto: LiveShoppingDTO,
     videoId?: number | null,
   ): Promise<boolean> {
-    // dto.broadcasterId 에는 방송인 email값이 담겨있음. email로 broadcasterId 찾기
-    const broadcaster = await this.prisma.broadcaster.findUnique({
-      where: { email: dto.broadcasterId },
-      select: { id: true },
-    });
-
     const liveShoppingUpdate = await this.prisma.liveShopping.update({
       where: {
         id: Number(dto.id),
       },
       data: {
         progress: dto.progress || undefined,
-        broadcasterId: broadcaster?.id,
+        broadcasterId: dto.broadcasterId || undefined,
         broadcastStartDate: dto.broadcastStartDate
           ? new Date(dto.broadcastStartDate)
           : undefined,

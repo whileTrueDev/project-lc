@@ -36,6 +36,7 @@ export class BroadcasterService {
         deleteFlag: false,
       },
       select: {
+        id: true,
         email: true,
         userNickname: true,
       },
