@@ -18,7 +18,7 @@ export function Index(): JSX.Element {
       <SellerNavbar />
       <Flex minH="100vh" justify="space-between" flexDirection="column">
         {isMobileSize ? <SellerMainBetaMobile /> : <SellerMainBetaDesktop />}
-        <InquiryForm />
+        <InquiryForm type="seller" />
         <CommonFooter footerLinkList={sellerFooterLinkList} />
       </Flex>
       <FloatingHelpButton />

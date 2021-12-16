@@ -13,15 +13,26 @@ import {
   Button,
   FormErrorMessage,
   Center,
+  useToast,
 } from '@chakra-ui/react';
 import { emailRegisterOptions, InquiryInput } from '@project-lc/shared-types';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useInquiryMutation } from '@project-lc/hooks';
 
-export function InquiryForm(): JSX.Element {
+export type InquiryFormProps = {
+  type: 'seller' | 'broadcaster';
+};
+
+export function InquiryForm(props: InquiryFormProps): JSX.Element {
+  const { type } = props;
   const [isChecked, setIsChecked] = useState(false);
   const handleIsChecked = (): void => {
     setIsChecked(!isChecked);
   };
+  const toast = useToast();
+
+  const { mutateAsync, isLoading } = useInquiryMutation();
+
   const methods = useForm<InquiryInput>({
     defaultValues: {
       name: '',
@@ -30,17 +41,41 @@ export function InquiryForm(): JSX.Element {
       brandName: '',
       homepage: '',
       content: '',
+      type,
     },
   });
+  const onSuccess = (): void => {
+    toast({
+      title: '문의가 접수되었습니다.',
+      status: 'success',
+    });
+    reset({
+      name: '',
+      email: '',
+      phoneNumber: '',
+      brandName: '',
+      homepage: '',
+      content: '',
+      type,
+    });
+    setIsChecked(false);
+  };
 
+  const onFail = (): void => {
+    toast({
+      title: '문의 접수 중 오류가 발생했습니다. 잠시 후, 다시 시도해주세요',
+      status: 'error',
+    });
+  };
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = methods;
 
   const regist = (inquiryInputs: InquiryInput): void => {
-    console.log(inquiryInputs);
+    mutateAsync(inquiryInputs).then(onSuccess).catch(onFail);
   };
 
   return (
@@ -55,11 +90,11 @@ export function InquiryForm(): JSX.Element {
           templateRows="repeat(6, 1fr)"
           templateColumns="repeat(3, 1fr)"
           gap={4}
-          // onSubmit={regist}
+          onSubmit={handleSubmit(regist)}
         >
           <GridItem rowSpan={1} colSpan={1}>
             <FormControl isRequired>
-              <FormLabel>이름</FormLabel>
+              <FormLabel>{type === 'seller' ? '이름' : '활동명'}</FormLabel>
               <Input {...register('name')} />
             </FormControl>
           </GridItem>
@@ -71,7 +106,7 @@ export function InquiryForm(): JSX.Element {
                 autoComplete="off"
                 {...register('email', { ...emailRegisterOptions })}
               />
-              <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
+              <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
             </FormControl>
           </GridItem>
           <GridItem rowSpan={1} colSpan={1}>
@@ -80,25 +115,25 @@ export function InquiryForm(): JSX.Element {
               <Input
                 placeholder={`'-' 없이 숫자만 입력해주세요`}
                 {...register('phoneNumber', {
-                  required: '숫자만 입력하세요.',
+                  // required: '숫자만 입력하세요.',
                   pattern: {
                     value: /^[0-9]+$/,
                     message: '전화번호는 숫자만 가능합니다.',
                   },
                 })}
               />
-              <FormErrorMessage>{errors.phoneNumber}</FormErrorMessage>
+              <FormErrorMessage>{errors.phoneNumber?.message}</FormErrorMessage>
             </FormControl>
           </GridItem>
           <GridItem rowSpan={1} colSpan={1}>
             <FormControl>
-              <FormLabel>브랜드명</FormLabel>
+              <FormLabel>{type === 'seller' ? '브랜드명' : '방송 플랫폼명'}</FormLabel>
               <Input {...register('brandName')} />
             </FormControl>
           </GridItem>
           <GridItem rowSpan={1} colSpan={1}>
             <FormControl>
-              <FormLabel>홈페이지</FormLabel>
+              <FormLabel>{type === 'seller' ? '홈페이지 URL' : '방송채널 URL'}</FormLabel>
               <Input {...register('homepage')} />
             </FormControl>
           </GridItem>
@@ -116,11 +151,14 @@ export function InquiryForm(): JSX.Element {
                   },
                 })}
               />
+              <Text as="em" color="red.300">
+                {errors.content?.message}
+              </Text>
             </FormControl>
           </GridItem>
           <GridItem colSpan={3} alignItems="center">
             <Center h="100%">
-              <Checkbox onChange={handleIsChecked}>
+              <Checkbox isChecked={isChecked} onChange={handleIsChecked}>
                 개인정보 수집 및 이용안내에 동의합니다
               </Checkbox>
             </Center>
@@ -132,11 +170,9 @@ export function InquiryForm(): JSX.Element {
                 _hover={{
                   bg: 'pink.300',
                 }}
-                // type="submit"
+                type="submit"
                 isDisabled={!isChecked}
-                onClick={() => {
-                  regist();
-                }}
+                isLoading={isLoading}
               >
                 문의하기
               </Button>

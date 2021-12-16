@@ -1,10 +1,10 @@
 import { Controller, Post, ValidationPipe, Body, UseGuards } from '@nestjs/common';
-import { Notice } from '@prisma/client';
-import { NoticePostDto } from '@project-lc/shared-types';
+import { InquiryDTO } from '@project-lc/shared-types';
 import { InquiryService } from './inquiry.service';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
-@Controller('notice')
+
+@Controller('inquiry')
 export class InquiryController {
   constructor(private readonly inquiryService: InquiryService) {}
 
@@ -15,8 +15,8 @@ export class InquiryController {
   //   // return this.noticeService.getAdminNotices();
   // }
 
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(AdminGuard)
   @Post()
-  postNotice(@Body(ValidationPipe) dto: InquiryService): Promise<boolean> {}
+  registInquiry(@Body(ValidationPipe) dto: InquiryDTO): Promise<boolean> {
+    return this.inquiryService.registInquiry(dto);
+  }
 }

@@ -52,6 +52,7 @@ export * from './lib/dto/goodsInfo.dto';
 export * from './lib/dto/goodsList.dto';
 export * from './lib/dto/goodsOption.dto';
 export * from './lib/dto/goodsOptionSupply.dto';
+export * from './lib/dto/inquiry.dto';
 export * from './lib/dto/liveShopping.dto';
 export * from './lib/dto/loginUser.dto';
 export * from './lib/dto/passwordValidate.dto';
