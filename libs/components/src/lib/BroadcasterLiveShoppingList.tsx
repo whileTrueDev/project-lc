@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Box, Button, Link, Text, Tooltip, useDisclosure, Flex } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Link,
+  Text,
+  Tooltip,
+  useDisclosure,
+  Flex,
+  Spinner,
+} from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import {
@@ -150,6 +159,8 @@ export function BroadcasterLiveShoppingList({
       headerName: '',
       field: '',
       width: 80,
+      sortable: false,
+      disableColumnMenu: true,
       renderCell: ({ row }: GridRowData) => (
         <Button
           size="xs"

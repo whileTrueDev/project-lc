@@ -11,11 +11,11 @@ export function BroadcasterStatusSection({
   };
 }): JSX.Element {
   return (
-    <Flex direction="row" maxW="700" m={2}>
-      <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
+    <Flex direction="row" borderWidth="thin" borderBottom="none">
+      <Grid templateColumns="2fr 3fr" width={['100%', '70%']}>
         <GridTableItem title="이메일" value={status.email} />
       </Grid>
-      <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
+      <Grid templateColumns="2fr 3fr" width={['100%', '70%']}>
         <GridTableItem title="휴대 전화" value={status.phoneNumber} />
       </Grid>
     </Flex>
