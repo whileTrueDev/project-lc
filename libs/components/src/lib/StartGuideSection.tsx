@@ -11,7 +11,7 @@ import {
   ButtonGroup,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import { Stepper, Step, StepLabel } from '@material-ui/core';
+import { Step, StepLabel } from '@material-ui/core';
 import { LiveShoppingMonitorSection } from './guide/LiveShoppingMonitorSection';
 import { SettlementsSection } from './guide/SettlementsSection';
 import { ContractionAgreementSection } from './guide/ContractionAgreementSection';
@@ -19,6 +19,7 @@ import { AddressSection } from './guide/AddressSection';
 import { ChannelSection } from './guide/ChannelSection';
 import { OverayUrlSection } from './guide/OverayUrlSection';
 import { IntroSection } from './guide/IntroSection';
+import { ChakraStepper } from './guide/ChakraStepper';
 
 export function StartGuideSection({
   isOpen,
@@ -104,13 +105,13 @@ export function StartGuideSection({
             <IntroSection completeStep={completeStep} />
           ) : (
             <>
-              <Stepper activeStep={activeStep} alternativeLabel>
+              <ChakraStepper activeStep={activeStep} alternativeLabel>
                 {steps.map((step) => (
                   <Step key={step.label}>
-                    <StepLabel color="textPrimary">{step.label}</StepLabel>
+                    <StepLabel>{step.label}</StepLabel>
                   </Step>
                 ))}
-              </Stepper>
+              </ChakraStepper>
               {/* 단계별 컴포넌트 */}
               {getStepComponent(activeStep)}
             </>
