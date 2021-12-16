@@ -698,3 +698,16 @@ model SellerOrderCancelRequestItem {
   sellerOrderCancelRequest SellerOrderCancelRequest @relation(fields: [orderSeq], references: [id], onDelete: Cascade)
   orderSeq                 Int
 }
+
+// 유저 알림메시지
+model UserNotification {
+  id         Int      @id @default(autoincrement())
+  userEmail  String // 타겟 유저 이메일
+  userType   String // seller, broadcaster
+  title      String // 알림메시지 제목
+  content    String // 알림메시지 내용
+  readState  Boolean  @default(false) // 타겟 유저가 알림 읽었는지 여부
+  createDate DateTime @default(now())
+
+  @@index([userEmail, userType])
+}
