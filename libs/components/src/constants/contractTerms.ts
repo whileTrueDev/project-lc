@@ -1,3 +1,9 @@
+export interface Term {
+  title: string;
+  state: string;
+  text: string;
+}
+
 const terms = [
   {
     title: '크크쇼 이용 약관',

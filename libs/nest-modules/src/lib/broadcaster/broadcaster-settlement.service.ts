@@ -5,12 +5,14 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminBroadcasterSettlementInfoList,
   BroadcasterSettlementInfoDto,
   BroadcasterSettlementInfoRes,
+  BusinessRegistrationStatus,
 } from '@project-lc/shared-types';
 import { BroadcasterSettlementInfo } from '.prisma/client';
-import { BroadcasterService } from './broadcaster.service';
 import { CipherService } from '../auth/cipher.service';
+import { BroadcasterService } from './broadcaster.service';
 
 @Injectable()
 export class BroadcasterSettlementService {
@@ -77,29 +79,82 @@ export class BroadcasterSettlementService {
 
       return {
         ...data,
-        idCardNumber: this.blindIdCardNumber(idCardNumber),
-        phoneNumber: this.blindPhoneNumber(phoneNumber),
+        idCardNumber: this.decryptIdCardNumber(idCardNumber, { blind: true }),
+        phoneNumber: this.decryptPhoneNumber(phoneNumber, { blind: true }),
       };
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
 
-  /** 정산정보 - 암호화된 핸드폰번호를 복호화 & 일부를 가리고 리턴함 */
-  private blindPhoneNumber(encrypted?: string): string | null {
+  /** 문자열을 *로 바꿔서 리턴 */
+  private blind(text: string, replaceText = '*'): string {
+    return text.replace(/./g, replaceText);
+  }
+
+  /** 정산정보 - 암호화된 핸드폰번호를 복호화 & blind에 true 넘기면 일부를 가리고 리턴함 */
+  private decryptPhoneNumber(
+    encrypted?: string,
+    option?: { blind?: boolean },
+  ): string | null {
     if (!encrypted) return null;
     const data = this.cipherService.getDecryptedText(encrypted);
     // 전화번호는 010-1234-1234 형태로 입력된다
-    const [first, second, third] = data.split('-');
-    return [first, second.replace(/./g, '*'), third].join('-');
+
+    if (option?.blind) {
+      const [first, second, third] = data.split('-');
+      return [first, this.blind(second), third].join('-');
+    }
+    return data;
   }
 
-  /** 정산정보 - 암호화된 주민등록번호를 복호화 & 일부를 가리고 리턴함 */
-  private blindIdCardNumber(encrypted?: string): string | null {
+  /** 정산정보 - 암호화된 주민등록번호를 복호화 & blind에 true 넘기면 일부를 가리고 리턴함  */
+  private decryptIdCardNumber(
+    encrypted?: string,
+    option?: { blind?: boolean },
+  ): string | null {
     if (!encrypted) return null;
     const data = this.cipherService.getDecryptedText(encrypted);
     // 주민등록번호는 000000-0000000 형태로 입력된다
-    const [first, second] = data.split('-');
-    return [first, second.replace(/./g, '*')].join('-');
+
+    if (option?.blind) {
+      const [first, second] = data.split('-');
+      return [first, this.blind(second)].join('-');
+    }
+
+    return data;
+  }
+
+  /** 방송인 정산정보 신청 목록 조회 - 핸드폰번호, 주민등록번호 가리지 않고 그대로 리턴함
+   * 검수정보, 방송인 이메일, 닉네임 포함
+   *
+   */
+  public async getBroadcasterSettlementInfoList(): Promise<AdminBroadcasterSettlementInfoList> {
+    // 방송인 email, userNickname, settlementInfo,
+    const data = await this.prisma.broadcasterSettlementInfo.findMany({
+      where: {
+        confirmation: { isNot: { status: BusinessRegistrationStatus.CONFIRMED } },
+      },
+      select: {
+        id: true,
+        type: true,
+        name: true,
+        idCardNumber: true,
+        idCardImageName: true,
+        phoneNumber: true,
+        bank: true,
+        accountNumber: true,
+        accountHolder: true,
+        accountImageName: true,
+        confirmation: true,
+        broadcasterId: true,
+        broadcaster: { select: { email: true, userNickname: true } },
+      },
+    });
+    return data.map((d) => ({
+      ...d,
+      idCardNumber: this.decryptIdCardNumber(d.idCardNumber),
+      phoneNumber: this.decryptPhoneNumber(d.phoneNumber),
+    }));
   }
 }

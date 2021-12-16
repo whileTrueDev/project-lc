@@ -1,29 +1,26 @@
 import {
+  Button,
+  ButtonGroup,
+  Checkbox,
+  Divider,
+  GridItem,
+  Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalHeader,
   ModalOverlay,
   ModalProps,
-  ModalHeader,
+  SimpleGrid,
   Stack,
-  Heading,
-  Divider,
-  Modal,
+  Text,
   useDisclosure,
-  Button,
-  Checkbox,
+  Center,
+  useToast,
 } from '@chakra-ui/react';
-import shortid from 'shortid';
 import { useState } from 'react';
-import { Grid, Typography } from '@material-ui/core';
 import useContractStyles from '../constants/Contract.style';
-import terms from '../constants/contractTerms';
-
-interface Term {
-  title: string;
-  state: string;
-  text: string;
-}
+import terms, { Term } from '../constants/contractTerms';
 
 export function ContractionAgreeDialog({
   isOpen,
@@ -35,6 +32,7 @@ export function ContractionAgreeDialog({
   agreementFlag: boolean;
 }): JSX.Element {
   const classes = useContractStyles();
+  const toast = useToast();
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [checkedA, setCheckedA] = useState<boolean>(false);
   const [checkedB, setCheckedB] = useState<boolean>(false);
@@ -47,6 +45,7 @@ export function ContractionAgreeDialog({
 
   return (
     <Modal
+      isCentered
       isOpen={isOpen}
       onClose={() => {
         checkedAll(false);
@@ -56,60 +55,48 @@ export function ContractionAgreeDialog({
     >
       <ModalOverlay />
       <ModalContent>
+        <ModalHeader>이용약관</ModalHeader>
         <ModalCloseButton />
-        <ModalBody maxW="6xl" mx="5">
-          <Stack pt={3} pb={3} spacing={6}>
-            {/* 헤더 */}
-            <Heading as="h4" size="lg" textAlign="center">
-              이용약관
-            </Heading>
+        <ModalBody>
+          <Stack pb={3} spacing={4}>
             <Divider />
+            {/* 헤더 */}
             {terms.map((term) => (
-              <div key={term.state}>
-                <Grid
-                  container
-                  direction="row"
-                  justify="space-between"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <Grid item>
-                    <Typography component="p" className={classes.termTitle}>
-                      {term.title}
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      width="150px"
-                      size="sm"
-                      onClick={(): void => {
-                        setSelectedTerm(term);
-                        dialog.onOpen();
+              <SimpleGrid key={term.state} columns={3}>
+                <GridItem>
+                  <Text>{term.title}</Text>
+                </GridItem>
+                <GridItem textAlign="center">
+                  <Button
+                    size="sm"
+                    onClick={(): void => {
+                      setSelectedTerm(term);
+                      dialog.onOpen();
+                    }}
+                  >
+                    약관보기
+                  </Button>
+                </GridItem>
+                {!agreementFlag && (
+                  <GridItem textAlign="center">
+                    <Checkbox
+                      size="md"
+                      colorScheme="green"
+                      isChecked={term.state === 'checkedA' ? checkedA : checkedB}
+                      onChange={() => {
+                        toast({
+                          status: 'warning',
+                          description:
+                            '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
+                          duration: 1500,
+                        });
                       }}
                     >
-                      약관보기
-                    </Button>
-                  </Grid>
-                  {!agreementFlag && (
-                    <Grid item>
-                      <Checkbox
-                        size="md"
-                        colorScheme="green"
-                        isChecked={term.state === 'checkedA' ? checkedA : checkedB}
-                        onChange={() => {
-                          if (term.state === 'checkedA') {
-                            setCheckedA(!checkedA);
-                          } else {
-                            setCheckedB(!checkedB);
-                          }
-                        }}
-                      >
-                        동의
-                      </Checkbox>
-                    </Grid>
-                  )}
-                </Grid>
-              </div>
+                      동의
+                    </Checkbox>
+                  </GridItem>
+                )}
+              </SimpleGrid>
             ))}
             <Divider />
             {/* 이용약관 동의 버튼 */}
@@ -123,27 +110,31 @@ export function ContractionAgreeDialog({
                     if (checkedA && checkedB) {
                       checkedAll(false);
                     } else {
-                      checkedAll(true);
+                      toast({
+                        status: 'warning',
+                        description: '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
+                        duration: 1500,
+                      });
                     }
                   }}
                 >
                   전체 이용약관에 동의합니다.
                 </Checkbox>
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ButtonGroup justifyContent="flex-end">
+                  <Button onClick={onClose}>취소</Button>
                   <Button
-                    width="150px"
-                    size="sm"
+                    colorScheme="blue"
                     disabled={!(checkedA && checkedB)}
                     onClick={onSubmit}
                   >
                     확인
                   </Button>
-                </div>
+                </ButtonGroup>
               </>
             )}
 
             {selectedTerm && (
-              <Modal isOpen={dialog.isOpen} onClose={dialog.onClose} size="full">
+              <Modal isOpen={dialog.isOpen} onClose={dialog.onClose} size="5xl">
                 <ModalOverlay />
                 <ModalContent>
                   <ModalHeader>{selectedTerm.title}</ModalHeader>
@@ -151,9 +142,30 @@ export function ContractionAgreeDialog({
                   <ModalBody maxW="6xl" mx="auto">
                     <div className={classes.inDialogContent}>
                       {selectedTerm.text.split('\n').map((sentence) => (
-                        <p key={shortid.generate()}>{sentence}</p>
+                        <p key={sentence}>{sentence}</p>
                       ))}
                     </div>
+                    {!agreementFlag && (
+                      <Center m={2}>
+                        <Checkbox
+                          size="md"
+                          colorScheme="green"
+                          isChecked={
+                            selectedTerm.state === 'checkedA' ? checkedA : checkedB
+                          }
+                          onChange={() => {
+                            if (selectedTerm.state === 'checkedA') {
+                              setCheckedA(!checkedA);
+                            } else {
+                              setCheckedB(!checkedB);
+                            }
+                            dialog.onClose();
+                          }}
+                        >
+                          위 약관에 동의합니다.
+                        </Checkbox>
+                      </Center>
+                    )}
                   </ModalBody>
                 </ModalContent>
               </Modal>

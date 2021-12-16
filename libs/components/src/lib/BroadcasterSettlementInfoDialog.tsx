@@ -134,7 +134,7 @@ export function BroadcasterSettlementInfoDialog({
       .mutateAsync(dto)
       .then((res) => {
         toast({
-          title: '정산정보를 제출하였습니다. 검수 경과를 기다려주세요.',
+          title: '정산정보를 제출하였습니다. 검수 결과를 기다려주세요.',
           status: 'success',
         });
         reset();

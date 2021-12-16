@@ -4789,11 +4789,6 @@
     "@types/mime" "^1"
     "@types/node" "*"
 
-"@types/shortid@^0.0.29":
-  version "0.0.29"
-  resolved "https://registry.yarnpkg.com/@types/shortid/-/shortid-0.0.29.tgz#8093ee0416a6e2bf2aa6338109114b3fbffa0e9b"
-  integrity sha1-gJPuBBam4r8qpjOBCRFLP7/6Dps=
-
 "@types/sinonjs__fake-timers@^6.0.2":
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/@types/sinonjs__fake-timers/-/sinonjs__fake-timers-6.0.4.tgz#0ecc1b9259b76598ef01942f547904ce61a6a77d"
@@ -13016,11 +13011,6 @@ nanocolors@^0.1.12:
   resolved "https://registry.yarnpkg.com/nanocolors/-/nanocolors-0.1.12.tgz#8577482c58cbd7b5bb1681db4cf48f11a87fd5f6"
   integrity sha512-2nMHqg1x5PU+unxX7PGY7AuYxl2qDx7PSrTRjizr8sxdd3l/3hBuWWaki62qmtYm2U5i4Z5E7GbjlyDFhs9/EQ==
 
-nanoid@^2.1.0:
-  version "2.1.11"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-2.1.11.tgz#ec24b8a758d591561531b4176a01e3ab4f0f0280"
-  integrity sha512-s/snB+WGm6uwi0WjsZdaVcuf3KJXlfGl2LcxgwkEwJF0D/BWzVWAZW/XY4bFaiR7s0Jk3FPvlnepg1H1b1UwlA==
-
 nanoid@^3.1.22, nanoid@^3.1.23:
   version "3.1.30"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.30.tgz#63f93cc548d2a113dc5dfbc63bfa09e2b9b64362"
@@ -13166,6 +13156,14 @@ next@11.0.1:
     util "0.12.3"
     vm-browserify "1.1.2"
     watchpack "2.1.1"
+
+nextjs-progressbar@^0.0.13:
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/nextjs-progressbar/-/nextjs-progressbar-0.0.13.tgz#2bea52d7c09af5edc101e80484103fb7bee04726"
+  integrity sha512-vuE9/j1yaFyHhMVwdlPZbGbcwnvoZZMH8fXUG+HCa+w5uojRNOMO43EL+o9YZ53QwQHsjWdfUapz+J8D/u3jFw==
+  dependencies:
+    nprogress "^0.2.0"
+    prop-types "^15.7.2"
 
 nice-try@^1.0.4:
   version "1.0.5"
@@ -13446,6 +13444,11 @@ npmlog@^5.0.1:
     console-control-strings "^1.1.0"
     gauge "^3.0.0"
     set-blocking "^2.0.0"
+
+nprogress@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/nprogress/-/nprogress-0.2.0.tgz#cb8f34c53213d895723fcbab907e9422adbcafb1"
+  integrity sha1-y480xTIT2JVyP8urkH6UIq28r7E=
 
 nth-check@^1.0.2, nth-check@~1.0.1:
   version "1.0.2"
@@ -16298,13 +16301,6 @@ shell-quote@^1.6.1:
   version "1.7.3"
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.7.3.tgz#aa40edac170445b9a431e17bb62c0b881b9c4123"
   integrity sha512-Vpfqwm4EnqGdlsBFNmHhxhElJYrdfcxPThu+ryKS5J8L/fhAwLazFZtq+S+TWZ9ANj2piSQLGj6NQg+lKPmxrw==
-
-shortid@^2.2.16:
-  version "2.2.16"
-  resolved "https://registry.yarnpkg.com/shortid/-/shortid-2.2.16.tgz#b742b8f0cb96406fd391c76bfc18a67a57fe5608"
-  integrity sha512-Ugt+GIZqvGXCIItnsL+lvFJOiN7RYqlGy7QE41O3YC1xbNSeDGIRO7xg2JJXIAj1cAGnOeC1r7/T9pgrtQbv4g==
-  dependencies:
-    nanoid "^2.1.0"
 
 side-channel@^1.0.4:
   version "1.0.4"

@@ -1,6 +1,9 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class BroadcasterDTO {
+  @IsNumber()
+  id: number;
+
   @IsString()
   email: string;
 

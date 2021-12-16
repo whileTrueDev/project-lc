@@ -29,7 +29,7 @@ type ImageUploadType = {
 };
 
 export interface AdminOverlayImageUpload extends ImageUploadType {
-  broadcasterId: string;
+  broadcasterEmail: string;
   liveShoppingId: number;
 }
 
@@ -93,7 +93,7 @@ export async function getSavedImages(
 export function AdminOverlayImageUploadDialog(
   props: AdminOverlayImageUpload,
 ): JSX.Element {
-  const { isOpen, onClose, broadcasterId, liveShoppingId } = props;
+  const { isOpen, onClose, broadcasterEmail, liveShoppingId } = props;
   const S3_IMAGE_PREFIX = `https://lc-project.s3.ap-northeast-2.amazonaws.com`;
   const toast = useToast();
   const [verticalPreviews, setVerticalPreviews] = useState<Preview[]>([]);
@@ -167,14 +167,14 @@ export function AdminOverlayImageUploadDialog(
       }
       await imageFileListToImageDto(
         verticalPreviews,
-        broadcasterId,
+        broadcasterEmail,
         liveShoppingId,
         'vertical-banner',
       );
 
       await imageFileListToImageDto(
         donationPreviews,
-        broadcasterId,
+        broadcasterEmail,
         liveShoppingId,
         'donation-images',
       );
@@ -242,7 +242,7 @@ export function AdminOverlayImageUploadDialog(
   useEffect(() => {
     const getVerticalImageName = async (): Promise<void> => {
       const verticalImages = await getSavedImages(
-        broadcasterId,
+        broadcasterEmail,
         liveShoppingId,
         'vertical-banner',
       );
@@ -251,7 +251,7 @@ export function AdminOverlayImageUploadDialog(
 
     const getDonationImageName = async (): Promise<void> => {
       const verticalImages = await getSavedImages(
-        broadcasterId,
+        broadcasterEmail,
         liveShoppingId,
         'donation-images',
       );
@@ -260,7 +260,7 @@ export function AdminOverlayImageUploadDialog(
     getVerticalImageName();
     getDonationImageName();
   }, [
-    broadcasterId,
+    broadcasterEmail,
     liveShoppingId,
     setSavedVerticalImages,
     setSavedDonationImages,

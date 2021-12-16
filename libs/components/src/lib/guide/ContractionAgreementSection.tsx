@@ -16,12 +16,11 @@ import {
   Text,
   useToast,
   GridItem,
+  SimpleGrid,
 } from '@chakra-ui/react';
-import shortid from 'shortid';
 import { useEffect, useState, useMemo } from 'react';
 import { CheckIcon } from '@chakra-ui/icons';
 import { useProfile, useUpdateContractionAgreementMutation } from '@project-lc/hooks';
-import { Grid, Typography } from '@material-ui/core';
 import useContractStyles from '../../constants/Contract.style';
 import terms from '../../constants/contractTerms';
 import { SettingSectionLayout } from '../SettingSectionLayout';
@@ -95,12 +94,12 @@ export function ContractionAgreementSection({
       <Center>
         <VStack spacing={0}>
           <Divider mb={3} borderWidth={0.5} />
-          <Text fontSize="md" fontWeight="semibold">
+          <Text fontSize="md">
             크크쇼 서비스를 정상적으로 이용하기 위해서는 이용 동의가 필요합니다.
           </Text>
           {계약동의여부 || (
             <>
-              <Text fontSize="md" fontWeight="semibold">
+              <Text fontSize="md">
                 아래의 약관들에 대해서 동의한 이후, [이용동의완료] 버튼을 클릭해
                 완료해주세요.
               </Text>
@@ -138,49 +137,38 @@ export function ContractionAgreementSection({
         <Center>
           <Stack w={['6xl', 'xl']} spacing={5}>
             {terms.map((term) => (
-              <div key={term.state}>
-                <Grid
-                  container
-                  direction="row"
-                  justify="space-between"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <Grid item>
-                    <Typography component="p" className={classes.termTitle}>
-                      {term.title}
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      width="150px"
-                      size="sm"
-                      onClick={(): void => {
-                        setSelectedTerm(term);
-                        dialog.onOpen();
-                      }}
-                    >
-                      약관보기
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Checkbox
-                      size="md"
-                      colorScheme="green"
-                      isChecked={term.state === 'checkedA' ? checkedA : checkedB}
-                      onChange={() => {
-                        if (term.state === 'checkedA') {
-                          setCheckedA(!checkedA);
-                        } else {
-                          setCheckedB(!checkedB);
-                        }
-                      }}
-                    >
-                      동의
-                    </Checkbox>
-                  </Grid>
-                </Grid>
-              </div>
+              <SimpleGrid key={term.state} columns={3}>
+                <GridItem>
+                  <Text>{term.title}</Text>
+                </GridItem>
+                <GridItem textAlign="center">
+                  <Button
+                    size="sm"
+                    onClick={(): void => {
+                      setSelectedTerm(term);
+                      dialog.onOpen();
+                    }}
+                  >
+                    약관보기
+                  </Button>
+                </GridItem>
+                <GridItem>
+                  <Checkbox
+                    size="md"
+                    colorScheme="green"
+                    isChecked={term.state === 'checkedA' ? checkedA : checkedB}
+                    onChange={() => {
+                      toast({
+                        status: 'warning',
+                        description: '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
+                        duration: 1500,
+                      });
+                    }}
+                  >
+                    동의
+                  </Checkbox>
+                </GridItem>
+              </SimpleGrid>
             ))}
             <Divider />
             {/* 이용약관 동의 버튼 */}
@@ -192,7 +180,11 @@ export function ContractionAgreementSection({
                 if (checkedA && checkedB) {
                   checkedAll(false);
                 } else {
-                  checkedAll(true);
+                  toast({
+                    status: 'warning',
+                    description: '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
+                    duration: 1500,
+                  });
                 }
               }}
             >
@@ -212,7 +204,7 @@ export function ContractionAgreementSection({
         </Center>
       )}
       {selectedTerm && (
-        <Modal isOpen={dialog.isOpen} onClose={dialog.onClose} size="full">
+        <Modal isOpen={dialog.isOpen} onClose={dialog.onClose} size="5xl">
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>{selectedTerm.title}</ModalHeader>
@@ -220,9 +212,28 @@ export function ContractionAgreementSection({
             <ModalBody maxW="6xl" mx="auto">
               <div className={classes.inDialogContent}>
                 {selectedTerm.text.split('\n').map((sentence) => (
-                  <p key={shortid.generate()}>{sentence}</p>
+                  <p key={sentence}>{sentence}</p>
                 ))}
               </div>
+              {!계약동의여부 && (
+                <Center m={2}>
+                  <Checkbox
+                    size="md"
+                    colorScheme="green"
+                    isChecked={selectedTerm.state === 'checkedA' ? checkedA : checkedB}
+                    onChange={() => {
+                      if (selectedTerm.state === 'checkedA') {
+                        setCheckedA(!checkedA);
+                      } else {
+                        setCheckedB(!checkedB);
+                      }
+                      dialog.onClose();
+                    }}
+                  >
+                    위 약관에 동의합니다.
+                  </Checkbox>
+                </Center>
+              )}
             </ModalBody>
           </ModalContent>
         </Modal>

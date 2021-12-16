@@ -8,16 +8,18 @@ import {
   ModalFooter,
   Button,
   ModalHeader,
+  ButtonGroup,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import { Stepper, Step, StepLabel } from '@material-ui/core';
-import { LiveShoppingMoniterSection } from './guide/LiveShoppingMoniterSection';
+import { Step, StepLabel } from '@material-ui/core';
+import { LiveShoppingMonitorSection } from './guide/LiveShoppingMonitorSection';
 import { SettlementsSection } from './guide/SettlementsSection';
 import { ContractionAgreementSection } from './guide/ContractionAgreementSection';
 import { AddressSection } from './guide/AddressSection';
 import { ChannelSection } from './guide/ChannelSection';
 import { OverayUrlSection } from './guide/OverayUrlSection';
 import { IntroSection } from './guide/IntroSection';
+import { ChakraStepper } from './guide/ChakraStepper';
 
 export function StartGuideSection({
   isOpen,
@@ -71,7 +73,7 @@ export function StartGuideSection({
     },
     {
       label: '라이브 쇼핑 화면',
-      component: <LiveShoppingMoniterSection completeStep={completeStep} />,
+      component: <LiveShoppingMonitorSection completeStep={completeStep} />,
     },
     {
       label: '수익금 출금하기',
@@ -103,50 +105,51 @@ export function StartGuideSection({
             <IntroSection completeStep={completeStep} />
           ) : (
             <>
-              <Stepper activeStep={activeStep} alternativeLabel>
+              <ChakraStepper activeStep={activeStep} alternativeLabel>
                 {steps.map((step) => (
                   <Step key={step.label}>
-                    <StepLabel color="textPrimary">{step.label}</StepLabel>
+                    <StepLabel>{step.label}</StepLabel>
                   </Step>
                 ))}
-              </Stepper>
+              </ChakraStepper>
               {/* 단계별 컴포넌트 */}
               {getStepComponent(activeStep)}
             </>
           )}
         </ModalBody>
         <ModalFooter>
-          <Button
-            variant="contained"
-            onClick={(): void => {
-              if (activeStep === 0) {
-                handleIntroReset();
-                handleStepReset();
-              } else handleBack();
-            }}
-          >
-            이전
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={(): void => {
-              if (introduction) {
-                handleIntroSkip();
-                setCondition(false);
-                return;
-              }
-              if (activeStep === steps.length - 1) {
-                onClose();
-                handleStepReset();
-              } else {
-                handleNext();
-              }
-            }}
-            disabled={!condition}
-          >
-            다음
-          </Button>
+          <ButtonGroup>
+            <Button
+              onClick={(): void => {
+                if (introduction) onClose();
+                if (activeStep === 0) {
+                  handleIntroReset();
+                  handleStepReset();
+                } else handleBack();
+              }}
+            >
+              {introduction ? '닫기' : '이전'}
+            </Button>
+            <Button
+              colorScheme="blue"
+              onClick={(): void => {
+                if (introduction) {
+                  handleIntroSkip();
+                  setCondition(false);
+                  return;
+                }
+                if (activeStep === steps.length - 1) {
+                  onClose();
+                  handleStepReset();
+                } else {
+                  handleNext();
+                }
+              }}
+              disabled={!condition}
+            >
+              다음
+            </Button>
+          </ButtonGroup>
         </ModalFooter>
       </ModalContent>
     </Modal>

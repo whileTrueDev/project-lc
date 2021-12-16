@@ -27,3 +27,8 @@ export class GoodsRejectionDto {
   @IsString()
   rejectionReason: string;
 }
+
+export type GoodsConfirmationDtoOnlyConnectionId = Omit<
+  GoodsConfirmationDto,
+  'goodsId' | 'status'
+>;

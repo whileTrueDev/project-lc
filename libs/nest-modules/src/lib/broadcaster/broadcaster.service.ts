@@ -36,6 +36,7 @@ export class BroadcasterService {
         deleteFlag: false,
       },
       select: {
+        id: true,
         email: true,
         userNickname: true,
       },
@@ -206,6 +207,16 @@ export class BroadcasterService {
     return broadcaster;
   }
 
+  /** 방송인 broadcaster 삭제 */
+  async deleteOne(email: string): Promise<boolean> {
+    await this.prisma.broadcaster.delete({
+      where: { email },
+    });
+
+    return true;
+  }
+
+  /** 이용동의 상태 변경 */
   async changeContractionAgreement(
     email: string,
     agreementFlag: boolean,

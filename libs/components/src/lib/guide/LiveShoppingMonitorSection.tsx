@@ -2,7 +2,7 @@ import { Stack, Center, Divider, Grid, VStack, Text, Box, Image } from '@chakra-
 import { useEffect, useState } from 'react';
 import { useDisplaySize, s3 } from '@project-lc/hooks';
 
-export function LiveShoppingMoniterSection({
+export function LiveShoppingMonitorSection({
   completeStep,
 }: {
   completeStep: () => void;
@@ -24,9 +24,7 @@ export function LiveShoppingMoniterSection({
       <Center>
         <VStack spacing={0}>
           <Divider mb={3} borderWidth={0.5} />
-          <Text fontSize="md" fontWeight="semibold">
-            라이브 쇼핑 화면 예시
-          </Text>
+          <Text>라이브 쇼핑 화면 예시</Text>
         </VStack>
       </Center>
       <VStack>
@@ -42,9 +40,7 @@ export function LiveShoppingMoniterSection({
       </VStack>
       <VStack>
         <Grid width="xl" direction="row" gap={3}>
-          <Text fontSize="md" fontWeight="semibold">
-            1. 구매랭킹 : 가장 많은 금액을 구매한 상위 닉네임 4개 박제
-          </Text>
+          <Text>1. 구매랭킹 : 가장 많은 금액을 구매한 상위 닉네임 4개 박제</Text>
           <Text fontSize="md" fontWeight="semibold">
             2. 세로배너 : 상품 정보 기재
           </Text>
