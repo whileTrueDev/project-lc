@@ -7,7 +7,6 @@ import {
   Select,
   Stack,
   Text,
-  useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
 import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';

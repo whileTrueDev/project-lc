@@ -16,6 +16,10 @@ import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-hi
     BroadcasterChannelService,
     BroadcasterSettlementHistoryService,
   ],
-  exports: [BroadcasterService, BroadcasterChannelService],
+  exports: [
+    BroadcasterService,
+    BroadcasterChannelService,
+    BroadcasterSettlementHistoryService,
+  ],
 })
 export class BroadcasterModule {}

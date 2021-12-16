@@ -92,6 +92,7 @@ export * from './lib/SellerGoodsList';
 export * from './lib/SellerStatusSection';
 export * from './lib/SettingNeedAlertBox';
 export * from './lib/settlement/AdminSettlementDoneList';
+export * from './lib/settlement/BcSettlementTargetList';
 export * from './lib/settlement/SettlementList';
 export * from './lib/settlement/SettlementRoundHistory';
 export * from './lib/settlement/SettlementSellCommissionInfo';

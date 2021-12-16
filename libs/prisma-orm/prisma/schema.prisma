@@ -552,23 +552,23 @@ model BroadcasterChannel {
 
 // 방송인 정산 내역
 model BroadcasterSettlements {
-  id              Int      @id @default(autoincrement()) // 정산 내역 고유 번호
-  round           String // 정산회차 연도/월/차수 (YYYY/MM/0차)
-  totalAmount     Int      @default(0) // 총 정산 금액
-  totalCommission Int      @default(0) // 총 수수료 금액
-  date            DateTime @default(now()) // 정산마감일: 정산이 마감된 날짜 = 정산 시점
+  id    Int      @id @default(autoincrement()) // 정산 내역 고유 번호
+  round String // 정산회차 연도/월/차수 (YYYY/MM/0차)
+  date  DateTime @default(now()) // 정산마감일: 정산이 마감된 날짜 = 정산 시점
 
-  broadcasterId Int
-  broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+  broadcasterId              Int
+  broadcaster                Broadcaster                  @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+  broadcasterSettlementItems BroadcasterSettlementItems[]
 
-  broadcasterSettlementOrders BroadcasterSettlementOrders[]
+  @@unique([broadcasterId, round])
 }
 
-// 방송인 정산 내역 - 주문정보
-model BroadcasterSettlementOrders {
-  id       Int    @id @default(autoincrement())
-  orderId  String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
-  exportId Int // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_seq)
+// 방송인 정산 내역 - 주문(출고)정보
+model BroadcasterSettlementItems {
+  id         Int    @id @default(autoincrement())
+  orderId    String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
+  exportCode String // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_code)
+  amount     Int    @default(0) // 총 정산 수익 금액
 
   liveShoppingId           Int?
   liveShopping             LiveShopping?          @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
@@ -601,13 +601,13 @@ model LiveShopping {
   desiredPeriod             String?                   @default("무관") // 희망 진행 기간
 
 
-  sellerContacts              SellerContacts                @relation(fields: [contactId], references: [id])
-  seller                      Seller                        @relation(fields: [sellerId], references: [id])
-  goods                       Goods                         @relation(fields: [goodsId], references: [id])
-  broadcaster                 Broadcaster?                  @relation(fields: [broadcasterId], references: [id])
-  liveShoppingVideo           LiveShoppingVideo?            @relation(fields: [videoId], references: [id])
-  sellerSettlementItems       SellerSettlementItems[]
-  broadcasterSettlementOrders BroadcasterSettlementOrders[]
+  sellerContacts             SellerContacts               @relation(fields: [contactId], references: [id])
+  seller                     Seller                       @relation(fields: [sellerId], references: [id])
+  goods                      Goods                        @relation(fields: [goodsId], references: [id])
+  broadcaster                Broadcaster?                 @relation(fields: [broadcasterId], references: [id])
+  liveShoppingVideo          LiveShoppingVideo?           @relation(fields: [videoId], references: [id])
+  sellerSettlementItems      SellerSettlementItems[]
+  broadcasterSettlementItems BroadcasterSettlementItems[]
 }
 
 enum LiveShopppingProgressType {

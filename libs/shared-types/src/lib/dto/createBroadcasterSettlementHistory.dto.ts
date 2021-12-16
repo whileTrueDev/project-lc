@@ -1,16 +1,21 @@
-import { BroadcasterSettlementOrders, BroadcasterSettlements } from '@prisma/client';
+import {
+  Broadcaster,
+  BroadcasterSettlementItems,
+  BroadcasterSettlements,
+} from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator';
 
-class CreateBroadcasterSettlementHistoryItem {
-  orderId: BroadcasterSettlementOrders['orderId'];
-  exportId: BroadcasterSettlementOrders['exportId'];
+export class CreateBroadcasterSettlementHistoryItem {
+  @IsString() orderId: BroadcasterSettlementItems['orderId'];
+  @IsString() exportCode: BroadcasterSettlementItems['exportCode'];
+  @IsNumber() liveShoppingId: BroadcasterSettlementItems['liveShoppingId'];
+  @IsNumber() broadcasterId: Broadcaster['id'];
+  @IsNumber() amount: BroadcasterSettlementItems['amount'];
 }
 
-export class CreateBroadcasterSettlementHistoryDto {
+export class CreateManyBroadcasterSettlementHistoryDto {
   @IsString() round: BroadcasterSettlements['round'];
-  @IsNumber() totalAmount: BroadcasterSettlements['totalAmount'];
-  @IsNumber() totalCommission: BroadcasterSettlements['totalCommission'];
 
   @IsArray()
   @ValidateNested()

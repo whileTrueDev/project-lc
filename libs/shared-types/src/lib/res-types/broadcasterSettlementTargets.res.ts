@@ -9,6 +9,10 @@ export type ExportItemWithLiveShopping = FmExportItem & {
     >;
   };
 };
-export type BroadcasterSettlementTargetRes = Array<
-  FmExport & { items: ExportItemWithLiveShopping[] }
->;
+export type BroadcasterSettlementTarget = FmExport & {
+  order_user_name: string;
+  recipient_user_name: string;
+} & {
+  items: ExportItemWithLiveShopping[];
+};
+export type BroadcasterSettlementTargetRes = Array<BroadcasterSettlementTarget>;

@@ -24,6 +24,7 @@ import {
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
+  CreateManyBroadcasterSettlementHistoryDto,
   ExecuteSettlementDto,
   GoodsByIdRes,
   GoodsConfirmationDto,
@@ -34,6 +35,7 @@ import {
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
+import { BroadcasterSettlementHistoryService } from '../broadcaster/broadcaster-settlement-history.service';
 import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { OrderCancelService } from '../order-cancel/order-cancel.service';
 import { SellerSettlementService } from '../seller/seller-settlement.service';
@@ -52,25 +54,44 @@ export class AdminController {
     private readonly adminSettlementService: AdminSettlementService,
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly orderCancelService: OrderCancelService,
+    private readonly bcSettlementService: BroadcasterSettlementHistoryService,
   ) {}
 
+  /** 판매자 정산 등록 정보 조회 */
   @Get('/settlement')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getSettlementInfo(): Promise<AdminSettlementInfoType> {
     return this.adminService.getSettlementInfo();
   }
 
+  /** 판매자 정산처리 */
   @Post('/settlement')
   executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
     if (dto.target.options.length === 0) return null;
     return this.sellerSettlementService.executeSettle(dto.sellerEmail, dto);
   }
 
+  /** 판매자 정산 완료 목록 */
   @Get('/settlement-history')
   getSettlementHistory(): ReturnType<SellerSettlementService['findSettlementHistory']> {
     return this.sellerSettlementService.findSettlementHistory();
   }
 
+  /** 방송인 단일 정산처리 */
+  @Post('/settlement/broadcaster')
+  async executeBcSettle(
+    @Body(ValidationPipe) dto: CreateManyBroadcasterSettlementHistoryDto,
+  ): Promise<number> {
+    return this.bcSettlementService.executeSettleMany(dto);
+  }
+
+  /** 방송인 정산 완료 목록 */
+  // @Get('/settlement-history')
+  // getSettlementHistory(): ReturnType<SellerSettlementService['findSettlementHistory']> {
+  //   return this.sellerSettlementService.findSettlementHistory();
+  // }
+
+  /** 판매자 정산 기본 수수료 변경 */
   @Put('/sell-commission')
   updateSellCommission(
     @Body(ValidationPipe) dto: ChangeSellCommissionDto,

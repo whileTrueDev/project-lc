@@ -125,12 +125,12 @@ export class FmSettlementService {
     // "방송인이 명시된 주문에 대한 출고 중, 아직 정산되지 않은 '구매확정'된 상태의 모든 출고"
 
     // * 앞서 이미 방송인 정산된 출고내역 조회
-    const alreadySettled = await this.prisma.broadcasterSettlementOrders.findMany({
-      select: { exportId: true },
+    const alreadySettled = await this.prisma.broadcasterSettlementItems.findMany({
+      select: { exportCode: true },
     });
-    const alreadySettledExportIds = alreadySettled.map((s) => s.exportId);
+    const alreadySettledExportCodes = alreadySettled.map((s) => s.exportCode);
 
-    // * 라이브쇼핑에 연결된 fm_goods 정보 조회
+    // * 라이브쇼핑 정보와 그것에 연결된 fm_goods 정보 조회
     const liveShoppings = await this.prisma.liveShopping.findMany({
       where: { progress: 'confirmed', NOT: { broadcasterId: null } },
       include: {
@@ -150,11 +150,17 @@ export class FmSettlementService {
 
     // * 정산 완료되지 않은, 구매완료상태의 출고 내역 조회
     const sql = `
-    SELECT * From fm_goods_export
-    WHERE export_seq ${alreadySettledExportIds.length > 0 ? 'NOT IN (?)' : ''}
+    SELECT fm_goods_export.*, order_user_name, recipient_user_name
+    FROM fm_goods_export
+    JOIN fm_order USING(order_seq)
+    WHERE export_code ${
+      alreadySettledExportCodes.length > 0 ? 'NOT IN (?)' : 'IS NOT NULL'
+    }
     AND buy_confirm != "none" AND confirm_date IS NOT NULL
     `;
-    const _exports: FmExport[] = await this.db.query(sql, [alreadySettledExportIds]);
+    const _exports: Array<
+      FmExport & { order_user_name: string; recipient_user_name: string }
+    > = await this.db.query(sql, [alreadySettledExportCodes]);
 
     // 출고 상세 주문상품 내역 조회
     const items = await this.exportsService.findExportItemsMany(
