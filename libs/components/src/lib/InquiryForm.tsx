@@ -81,7 +81,9 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
   return (
     <Container maxW="container.lg">
       <Heading>문의사항을 남겨주세요</Heading>
-      <Text>* 표시는 필수 입력 사항입니다.</Text>
+      <Text m={3} color="red.500">
+        * 표시는 필수 입력 사항입니다.
+      </Text>
       <FormProvider {...methods}>
         <Grid
           as="form"
@@ -95,7 +97,10 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
           <GridItem rowSpan={1} colSpan={1}>
             <FormControl isRequired>
               <FormLabel>{type === 'seller' ? '이름' : '활동명'}</FormLabel>
-              <Input {...register('name')} />
+              <Input
+                placeholder={type === 'seller' ? '홍길동' : '홍길동tv'}
+                {...register('name')}
+              />
             </FormControl>
           </GridItem>
           <GridItem rowSpan={1} colSpan={1}>
@@ -115,7 +120,6 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
               <Input
                 placeholder={`'-' 없이 숫자만 입력해주세요`}
                 {...register('phoneNumber', {
-                  // required: '숫자만 입력하세요.',
                   pattern: {
                     value: /^[0-9]+$/,
                     message: '전화번호는 숫자만 가능합니다.',
@@ -128,13 +132,21 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
           <GridItem rowSpan={1} colSpan={1}>
             <FormControl>
               <FormLabel>{type === 'seller' ? '브랜드명' : '방송 플랫폼명'}</FormLabel>
-              <Input {...register('brandName')} />
+              <Input
+                placeholder={type === 'seller' ? '크크쇼' : '아프리카, 트위치, 유튜브'}
+                {...register('brandName')}
+              />
             </FormControl>
           </GridItem>
           <GridItem rowSpan={1} colSpan={1}>
             <FormControl>
               <FormLabel>{type === 'seller' ? '홈페이지 URL' : '방송채널 URL'}</FormLabel>
-              <Input {...register('homepage')} />
+              <Input
+                placeholder={
+                  type === 'seller' ? 'https://크크쇼.com' : 'https://www.youtube.com/...'
+                }
+                {...register('homepage')}
+              />
             </FormControl>
           </GridItem>
           <GridItem rowSpan={1} colSpan={1} />
@@ -143,6 +155,11 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
               <FormLabel>내용</FormLabel>
               <Textarea
                 resize="none"
+                placeholder={
+                  type === 'seller'
+                    ? '입점 문의드립니다.'
+                    : '라이브 커머스 방송을 하고 싶어요'
+                }
                 isInvalid={!!errors.content}
                 {...register('content', {
                   maxLength: {

@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from 'react-query';
-import { InquiryDTO } from '@project-lc/shared-types';
+import { InquiryDto } from '@project-lc/shared-types';
 import { Inquiry } from '@prisma/client';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
@@ -7,9 +7,9 @@ import axios from '../../axios';
 export const useInquiryMutation = (): UseMutationResult<
   Inquiry,
   AxiosError,
-  InquiryDTO
+  InquiryDto
 > => {
-  return useMutation(async (dto: InquiryDTO) => {
+  return useMutation(async (dto: InquiryDto) => {
     return axios.post<Inquiry>('/inquiry', dto).then((res) => res.data);
   });
 };

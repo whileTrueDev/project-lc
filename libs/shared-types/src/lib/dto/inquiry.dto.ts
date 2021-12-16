@@ -1,9 +1,12 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { InquiryType } from '@prisma/client';
 
-export class InquiryDTO {
+export class InquiryDto {
   @IsString()
   name: string;
+
+  @IsString()
+  content: string;
 
   @IsString()
   email: string;
@@ -22,4 +25,9 @@ export class InquiryDTO {
 
   @IsEnum(InquiryType)
   type: InquiryType;
+
+  @IsBoolean()
+  readFlag: boolean;
 }
+
+export type InquiryDtoWithoutReadFlag = Omit<InquiryDto, 'readFlag'>;

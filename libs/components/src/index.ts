@@ -62,6 +62,7 @@ export * from './lib/GoodsRegistForm';
 export * from './lib/GoodsStatusBadge';
 export * from './lib/HorizontalImageGallery';
 export * from './lib/InquiryForm';
+export * from './lib/InquiryTable';
 export * from './lib/KksLogo';
 export * from './lib/LiveShoppingDatePicker';
 export * from './lib/LiveShoppingDetailDialog';
