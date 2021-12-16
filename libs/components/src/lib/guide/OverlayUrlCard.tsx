@@ -1,14 +1,10 @@
-import React, { useState } from 'react';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import { useState } from 'react';
 import { useToast, Text, Box, Button, Input } from '@chakra-ui/react';
-import { UserProfileRes } from '@project-lc/shared-types';
+import { useProfile } from '@project-lc/hooks';
 
-interface UrlCardProps {
-  profileData: UserProfileRes;
-}
-
-export function UrlCard({ profileData }: UrlCardProps): JSX.Element {
+export function UrlCard(): JSX.Element {
   const toast = useToast();
+  const { data: profileData } = useProfile();
 
   // 오버레이 주소 10초간만 보여주기 위한 기본값
   const DEFAULT_OVERLAY_URL = '[URL복사] 버튼을 눌러주세요.';
@@ -46,7 +42,6 @@ export function UrlCard({ profileData }: UrlCardProps): JSX.Element {
         id="overlayUrl"
         value={profileData?.agreementFlag ? overlayUrlValue : '이용 동의가 필요합니다.'}
         isReadOnly
-        isFullWidth
         variant="flushed"
         disabled={!overlayUrlValue}
       />

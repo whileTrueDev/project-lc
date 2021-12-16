@@ -1,5 +1,4 @@
 import { Stack, Center, Divider, VStack, Text } from '@chakra-ui/react';
-import { useProfile } from '@project-lc/hooks';
 import { useEffect } from 'react';
 import { UrlCard } from './OverlayUrlCard';
 
@@ -8,8 +7,6 @@ export function OverayUrlSection({
 }: {
   completeStep: () => void;
 }): JSX.Element {
-  const profile = useProfile();
-
   useEffect(() => {
     completeStep();
   }, [completeStep]);
@@ -25,7 +22,7 @@ export function OverayUrlSection({
       </Center>
       <Center>
         <VStack spacing={7} w={['6xl', 'xl']}>
-          {!profile.isLoading && profile.data && <UrlCard profileData={profile.data} />}
+          <UrlCard />
         </VStack>
       </Center>
       <Center>
