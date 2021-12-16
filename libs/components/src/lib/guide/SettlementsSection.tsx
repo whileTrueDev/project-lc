@@ -32,7 +32,7 @@ export function SettlementsSection({
           <Text>
             출금 신청과 정산 등록은
             <NextLink href="/mypage/settlement" passHref>
-              <Link ml={1} color="blue">
+              <Link ml={1} color="blue.500">
                 [정산]
               </Link>
             </NextLink>
