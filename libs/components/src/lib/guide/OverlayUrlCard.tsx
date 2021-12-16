@@ -42,7 +42,6 @@ export function UrlCard(): JSX.Element {
         id="overlayUrl"
         value={profileData?.agreementFlag ? overlayUrlValue : '이용 동의가 필요합니다.'}
         isReadOnly
-        isFullWidth
         variant="flushed"
         disabled={!overlayUrlValue}
       />
