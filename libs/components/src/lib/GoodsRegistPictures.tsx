@@ -21,7 +21,7 @@ import {
   useProfile,
   useDeleteGoodsImageMutation,
 } from '@project-lc/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ChakraNextImage } from './ChakraNextImage';
 import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
