@@ -45,7 +45,7 @@ export class NotificationController {
   findNotifications(
     @Query('userEmail') userEmail: string,
     @Query('userType') userType: UserType,
-    @Query('take', ParseIntPipe, new DefaultValuePipe(6)) take: number,
+    @Query('take', new DefaultValuePipe(6), ParseIntPipe) take: number,
   ): Promise<UserNotification[]> {
     return this.notificationService.findNotifications({ userEmail, userType, take });
   }

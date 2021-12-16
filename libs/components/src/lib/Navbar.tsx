@@ -27,6 +27,7 @@ import { mainNavItems, NavItem } from '../constants/navigation';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import KksLogo from './KksLogo';
 import ProfileBox from './ProfileBox';
+import UserNotificationSection from './UserNotificationSection';
 
 export interface NavbarProps {
   appType?: UserType;
@@ -86,43 +87,43 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
           </Flex>
         </Flex>
 
-        <Stack
-          flex={{ base: 1, md: 0 }}
-          justify="flex-end"
-          alignItems="center"
-          direction="row"
-          spacing={{ base: 0, sm: 4 }}
-        >
+        <Flex alignItems="center">
           <ColorModeSwitcher />
           {isLoggedIn ? (
-            <Menu>
-              <MenuButton
-                as={Avatar}
-                size="sm"
-                cursor="pointer"
-                src={profileData?.avatar}
-              />
-              <MenuList w={{ base: 280, sm: 300 }}>
-                <Box p={3}>
-                  <ProfileBox />
-                </Box>
-                <Divider />
-                <MenuItem
-                  my={1}
-                  icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
-                  onClick={handleAccountSettingClick}
-                >
-                  계정 설정
-                </MenuItem>
-                <MenuItem
-                  my={1}
-                  icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
-                  onClick={logout}
-                >
-                  로그아웃
-                </MenuItem>
-              </MenuList>
-            </Menu>
+            <>
+              <Box mr={{ base: '1', sm: '3' }}>
+                <UserNotificationSection />
+              </Box>
+
+              <Menu>
+                <MenuButton
+                  as={Avatar}
+                  size="sm"
+                  cursor="pointer"
+                  src={profileData?.avatar}
+                />
+                <MenuList w={{ base: 280, sm: 300 }}>
+                  <Box p={3}>
+                    <ProfileBox />
+                  </Box>
+                  <Divider />
+                  <MenuItem
+                    my={1}
+                    icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
+                    onClick={handleAccountSettingClick}
+                  >
+                    계정 설정
+                  </MenuItem>
+                  <MenuItem
+                    my={1}
+                    icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
+                    onClick={logout}
+                  >
+                    로그아웃
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </>
           ) : (
             <>
               <Button
@@ -147,7 +148,8 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
               </Button>
             </>
           )}
-        </Stack>
+          {/* </Stack> */}
+        </Flex>
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
