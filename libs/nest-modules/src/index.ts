@@ -9,6 +9,7 @@ export * from './lib/live-shopping/live-shopping.module';
 export * from './lib/live-shopping/live-shopping.service';
 export * from './lib/notice/notice.module';
 export * from './lib/notice/notice.service';
+export * from './lib/notification/notification.module';
 export * from './lib/order-cancel/order-cancel.module';
 export * from './lib/overlay-controller/overlay-controller.module';
 export * from './lib/overlay-controller/overlay-controller.service';
