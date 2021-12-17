@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Box, Button, Link, Text, Tooltip, useDisclosure, Flex } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Link,
+  Text,
+  Tooltip,
+  useDisclosure,
+  Flex,
+  Spinner,
+} from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import {
@@ -12,7 +21,11 @@ import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
 import { ChakraDataGrid } from './ChakraDataGrid';
 import { LiveShoppingDetailDialog } from './LiveShoppingDetailDialog';
 
-export function BroadcasterLiveShoppingList(): JSX.Element {
+export function BroadcasterLiveShoppingList({
+  useSmallSize = false,
+}: {
+  useSmallSize?: boolean;
+}): JSX.Element {
   const { data: profileData } = useProfile();
   const [liveShoppingId, setLiveShoppingId] = useState(0);
   const [pageSize, setPageSize] = useState<number>(5);
@@ -146,6 +159,8 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       headerName: '',
       field: '',
       width: 80,
+      sortable: false,
+      disableColumnMenu: true,
       renderCell: ({ row }: GridRowData) => (
         <Button
           size="xs"
@@ -159,9 +174,8 @@ export function BroadcasterLiveShoppingList(): JSX.Element {
       ),
     },
   ];
-
   return (
-    <Box minHeight={{ base: 300, md: 600 }} mb={24}>
+    <Box minHeight={useSmallSize ? 0 : { base: 300, md: 600 }} mb={useSmallSize ? 1 : 24}>
       {liveShoppingWithSales && (
         <>
           <Flex m={4}>

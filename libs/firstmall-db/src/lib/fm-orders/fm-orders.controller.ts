@@ -8,6 +8,7 @@ import {
   UseGuards,
   ValidationPipe,
   Patch,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   GoodsService,
@@ -27,6 +28,7 @@ import {
   OrderStatsRes,
   SalesStats,
   ChangeReturnStatusDto,
+  BroacasterPurchaseWithDivdedMessageDto,
   FindFmOrderDetailsDto,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -185,5 +187,21 @@ export class FmOrdersController {
   ): Promise<boolean> {
     const status = convertFmStatusStringToStatus(dto.targetStatus);
     return this.fmOrdersService.changeOrderStatus(orderId, status);
+  }
+
+  @Get('/broadcaster/purchases')
+  async getBroadcasterPurchases(
+    @Query('broadcasterId', ParseIntPipe)
+    broadcasterId: number,
+  ): Promise<BroacasterPurchaseWithDivdedMessageDto> {
+    const linkedLiveShoppingFmGoodsIds =
+      await this.liveShoppingService.getFmGoodsConnectionIdLinkedToLiveShoppings(
+        broadcasterId,
+      );
+    const purchasedList =
+      await this.fmOrdersService.getPurchaseDoneOrderDuringLiveShopping(
+        linkedLiveShoppingFmGoodsIds,
+      );
+    return purchasedList;
   }
 }

@@ -20,3 +20,23 @@ export const useFmOrdersDuringLiveShoppingSales = (
     options,
   );
 };
+
+export const getFmOrdersDuringLiveShoppingSalesPurchaseDone = async (
+  broadcasterId: number | undefined,
+): Promise<LiveShoppingWithSalesAndFmId[]> => {
+  return axios
+    .get<LiveShoppingWithSalesAndFmId[]>('/fm-orders/broadcaster/purchases', {
+      params: { broadcasterId },
+    })
+    .then((res) => res.data);
+};
+
+export const useFmOrdersDuringLiveShoppingSalesPurchaseDone = (
+  broadcasterId: number | undefined,
+): UseQueryResult<LiveShoppingWithSalesAndFmId[], AxiosError> => {
+  return useQuery<LiveShoppingWithSalesAndFmId[], AxiosError>(
+    'getFmOrdersDuringLiveShoppingSalesPurchaseDone',
+    () => getFmOrdersDuringLiveShoppingSalesPurchaseDone(broadcasterId),
+    { enabled: !!broadcasterId },
+  );
+};

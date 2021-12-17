@@ -25,6 +25,9 @@ import {
   FmOrderItemInput,
   FmOrderItemSubOption,
   CheeringMessage,
+  BroadcasterPurchaseDto,
+  GoodsConfirmationDtoOnlyConnectionId,
+  BroacasterPurchaseWithDivdedMessageDto,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { FirstmallDbService } from '../firstmall-db.service';
@@ -905,5 +908,70 @@ export class FmOrdersService {
     // 선물하기 옵션값이 존재하면 선물하기 주문 아니면 일반주문으로 취급
     if (suboption.length === 0) return false;
     return true;
+  }
+
+  private getMessage(value: BroadcasterPurchaseDto): BroadcasterPurchaseDto {
+    const newMessageRow = Object.assign(value);
+    const inputsArray = value.message.split('||');
+    let userNickname = '-';
+    let userMessage = '-';
+    for (let i = 0; i < inputsArray.length; i++) {
+      const dividedArray = inputsArray[i].split('&&');
+      if (
+        dividedArray[0] === '닉네임' &&
+        dividedArray[1] !== '입력없음' &&
+        userNickname === '-'
+      ) {
+        const nickname = dividedArray[1];
+        userNickname = nickname;
+      }
+      if (
+        dividedArray[0] === '응원메세지' &&
+        dividedArray[1] !== '입력없음' &&
+        userMessage === '-'
+      ) {
+        const message = dividedArray[1];
+        userMessage = message;
+      }
+    }
+    newMessageRow.userNickname = userNickname;
+    newMessageRow.userMessage = userMessage;
+
+    return newMessageRow;
+  }
+
+  public async getPurchaseDoneOrderDuringLiveShopping(
+    goods: GoodsConfirmationDtoOnlyConnectionId[],
+  ): Promise<BroacasterPurchaseWithDivdedMessageDto> {
+    const sql = `
+    SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.regist_date, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
+    FROM fm_order_item AS foi 
+    RIGHT JOIN fm_order AS fo 
+    ON foi.order_seq = fo.order_seq 
+    LEFT JOIN fm_order_item_suboption AS fois
+    ON fo.order_seq = fois.order_seq
+    LEFT JOIN fm_order_item_input AS foii
+    ON fo.order_seq=foii.order_seq
+    WHERE goods_seq = ?
+    AND fo.step = 75
+    GROUP BY id
+    ORDER BY fo.deposit_date desc
+`;
+    const purchaseList = await Promise.all(
+      goods.map(async (value: GoodsConfirmationDtoOnlyConnectionId) => {
+        const connectionId = value.firstmallGoodsConnectionId;
+        return this.db.query(sql, [connectionId]);
+      }),
+    );
+
+    const flattenPurchaseList = purchaseList.reduce(function (a, b) {
+      return a.concat(b);
+    }, []);
+
+    const messageDividedflattenPurchaseList = flattenPurchaseList.map((row) => {
+      return this.getMessage(row);
+    });
+
+    return messageDividedflattenPurchaseList;
   }
 }
