@@ -19,7 +19,7 @@ export function Index(): JSX.Element {
   const broadcasterContacts = useBroadcasterContacts(broadcasterProfileData?.id);
 
   const 기본연락처존재여부 = useMemo<boolean>(() => {
-    return !broadcasterContacts.isLoading && broadcasterContacts.data?.length !== 0;
+    return broadcasterContacts.data?.length !== 0;
   }, [broadcasterContacts]);
 
   const 기본연락처 = useMemo<{
