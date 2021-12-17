@@ -28,6 +28,7 @@ import {
   ChangeSellCommissionDto,
   CreateManyBroadcasterSettlementHistoryDto,
   ExecuteSettlementDto,
+  FindBcSettlementHistoriesRes,
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
@@ -57,7 +58,7 @@ export class AdminController {
     private readonly adminSettlementService: AdminSettlementService,
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly orderCancelService: OrderCancelService,
-    private readonly bcSettlementService: BroadcasterSettlementHistoryService,
+    private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
   ) {}
 
@@ -86,14 +87,14 @@ export class AdminController {
   async executeBcSettle(
     @Body(ValidationPipe) dto: CreateManyBroadcasterSettlementHistoryDto,
   ): Promise<number> {
-    return this.bcSettlementService.executeSettleMany(dto);
+    return this.bcSettlementHistoryService.executeSettleMany(dto);
   }
 
-  /** 방송인 정산 완료 목록 */
-  // @Get('/settlement-history')
-  // getSettlementHistory(): ReturnType<SellerSettlementService['findSettlementHistory']> {
-  //   return this.sellerSettlementService.findSettlementHistory();
-  // }
+  /** 방송인 정산 완료 목록 조회 */
+  @Get('/settlement-history/broadcaster')
+  public async findBroadcasterSettlementHistoriesByRound(): Promise<FindBcSettlementHistoriesRes> {
+    return this.bcSettlementHistoryService.findHistories();
+  }
 
   /** 판매자 정산 기본 수수료 변경 */
   @Put('/sell-commission')
@@ -203,13 +204,13 @@ export class AdminController {
     return this.orderCancelService.setOrderCancelRequestDone(requestId);
   }
 
-  /** 방송인 정산정보 신청 목록 조회 */
+  /** 방송인 정산등록정보 신청 목록 조회 */
   @Get('/settelment-info-list/broadcaster')
   getBroadcasterSettlementInfoList(): Promise<AdminBroadcasterSettlementInfoList> {
     return this.broadcasterSettlementService.getBroadcasterSettlementInfoList();
   }
 
-  /** 방송인 정산정보 검수상태, 사유 수정 */
+  /** 방송인 정산등록정보 검수상태, 사유 수정 */
   @Patch('settlement-info/broadcaster/confirmation')
   setBroadcasterSettlementInfoConfirmation(
     @Body()

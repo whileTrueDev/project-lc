@@ -12,6 +12,8 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Radio,
+  RadioGroup,
   Stack,
   Text,
   useColorModeValue,
@@ -32,6 +34,7 @@ import {
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useCallback, useMemo, useState } from 'react';
+import { settlementHistoryStore } from '@project-lc/stores';
 import { ConfirmDialog } from '../..';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { ChakraNextImage } from '../ChakraNextImage';
@@ -135,32 +138,37 @@ export function BcSettlementTargetList(): JSX.Element {
   const toast = useToast();
   const { mutateAsync } = useCreateSettleBcManyMutation();
   const onSuccess = (): void => {
-    toast({ status: 'success', title: '성공' });
+    toast({ status: 'success', title: '정산처리 성공' });
   };
   const onFail = (): void => {
-    toast({ status: 'error', title: '실패' });
+    toast({ status: 'error', title: '정산처리 실패' });
   };
+
+  const roundStore = settlementHistoryStore();
   async function onExecuteSettleMany(): Promise<void> {
-    const round = dayjs().format('YYYY년MM월/1회차');
-    const _export = rows.filter((r) => selectedRows.includes(r.id));
-    const dtoItems: Array<CreateBroadcasterSettlementHistoryItem> = [];
-    _export.forEach((exp) => {
-      exp.items.forEach((i) => {
-        const amount = calcSettleAmount(
-          Number(i.price),
-          i.liveShopping.broadcasterCommissionRate,
-        );
-        dtoItems.push({
-          amount,
-          exportCode: exp.export_code,
-          liveShoppingId: i.liveShopping.id,
-          broadcasterId: i.liveShopping.broadcaster.id,
-          orderId: exp.order_seq.toString(),
+    const round = roundStore.selectedRound; // 'YYYY년MM월/1회차'
+    if (!round) toast({ title: '회차를 설정해 주세요.' });
+    else {
+      const _export = rows.filter((r) => selectedRows.includes(r.id));
+      const dtoItems: Array<CreateBroadcasterSettlementHistoryItem> = [];
+      _export.forEach((exp) => {
+        exp.items.forEach((i) => {
+          const amount = calcSettleAmount(
+            Number(i.price),
+            i.liveShopping.broadcasterCommissionRate,
+          );
+          dtoItems.push({
+            amount,
+            exportCode: exp.export_code,
+            liveShoppingId: i.liveShopping.id,
+            broadcasterId: i.liveShopping.broadcaster.id,
+            orderId: exp.order_seq.toString(),
+          });
         });
       });
-    });
 
-    await mutateAsync({ round, items: dtoItems }).then(onSuccess).catch(onFail);
+      await mutateAsync({ round, items: dtoItems }).then(onSuccess).catch(onFail);
+    }
   }
 
   return (
@@ -200,8 +208,23 @@ export function BcSettlementTargetList(): JSX.Element {
         onClose={confirmDialog.onClose}
         title="일괄 정산처리 진행"
         onConfirm={onExecuteSettleMany}
+        isDisabled={!roundStore.selectedRound}
       >
         선택된 대상에 대하여 일괄 정산 처리를 진행합니까?
+        <Box>
+          <RadioGroup
+            value={roundStore.selectedRound}
+            onChange={(newV) => {
+              if (!newV) roundStore.resetRoundSelect();
+              roundStore.handleRoundSelect(newV);
+            }}
+          >
+            <Stack mt={4} direction="row" justifyContent="center">
+              <Radio value="1">1회차</Radio>
+              <Radio value="2">2회차</Radio>
+            </Stack>
+          </RadioGroup>
+        </Box>
       </ConfirmDialog>
 
       {/* 상세보기 다이얼로그 */}

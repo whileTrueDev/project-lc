@@ -3,8 +3,9 @@ import { Broadcaster } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateManyBroadcasterSettlementHistoryDto,
-  FindBCSettlementHistoriesRes,
+  FindBcSettlementHistoriesRes,
 } from '@project-lc/shared-types';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class BroadcasterSettlementHistoryService {
@@ -14,7 +15,9 @@ export class BroadcasterSettlementHistoryService {
   public async executeSettleMany(
     dto: CreateManyBroadcasterSettlementHistoryDto,
   ): Promise<number> {
-    const { round, items } = dto;
+    const { round: dtoRound, items } = dto;
+    const today = dayjs().format('YYYY/MM');
+    const round = `${today}/${dtoRound}차`;
 
     const broadcasterIds = Array.from(new Set(items.map((i) => i.broadcasterId)));
 
@@ -49,14 +52,44 @@ export class BroadcasterSettlementHistoryService {
   }
 
   /** 특정 방송인 정산 내역 조회 */
-  public async findHistories(
+  public async findHistoriesByBroadcaster(
     broadcasterId: Broadcaster['id'],
-  ): Promise<FindBCSettlementHistoriesRes> {
+  ): Promise<FindBcSettlementHistoriesRes> {
     return this.prisma.broadcasterSettlements.findMany({
       where: { broadcasterId },
-      orderBy: { round: 'desc' },
+      orderBy: [{ round: 'desc' }, { date: 'desc' }],
       include: {
-        broadcasterSettlementItems: true,
+        broadcasterSettlementItems: {
+          include: {
+            liveShopping: true,
+          },
+        },
+        broadcaster: {
+          select: {
+            id: true,
+            userNickname: true,
+          },
+        },
+      },
+    });
+  }
+
+  /** 회차별 모든 방송인 정산 내역 조회 */
+  public async findHistories(): Promise<FindBcSettlementHistoriesRes> {
+    return this.prisma.broadcasterSettlements.findMany({
+      orderBy: [{ round: 'desc' }, { date: 'desc' }],
+      include: {
+        broadcasterSettlementItems: {
+          include: {
+            liveShopping: true,
+          },
+        },
+        broadcaster: {
+          select: {
+            id: true,
+            userNickname: true,
+          },
+        },
       },
     });
   }

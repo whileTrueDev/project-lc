@@ -25,7 +25,7 @@ import {
   ChangeNicknameDto,
   CreateBroadcasterChannelDto,
   EmailDupCheckDto,
-  FindBCSettlementHistoriesRes,
+  FindBcSettlementHistoriesRes,
   FindBroadcasterDto,
   PasswordValidateDto,
   SignUpDto,
@@ -177,10 +177,10 @@ export class BroadcasterController {
   public async findSettlementHistories(
     @BroadcasterInfo() bc: UserPayload,
     @Param('broacasterId', ParseIntPipe) broadcasterId: Broadcaster['id'],
-  ): Promise<FindBCSettlementHistoriesRes> {
+  ): Promise<FindBcSettlementHistoriesRes> {
     if (bc.id !== broadcasterId)
       throw new UnauthorizedException('본인 계정의 정산 내역만 조회할 수 있습니다.');
-    return this.settlementHistoryService.findHistories(broadcasterId);
+    return this.settlementHistoryService.findHistoriesByBroadcaster(broadcasterId);
   }
 
   // 로그인 한 사람이 본인인증을 위해 비밀번호 확인

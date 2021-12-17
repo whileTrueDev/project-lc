@@ -24,6 +24,7 @@ export const useCreateSettleBcManyMutation = (): UseMutationResult<
       onSuccess: (data) => {
         if (data > 0) {
           queryClient.invalidateQueries('BcSettlementTargets');
+          queryClient.invalidateQueries('AdminBroadcasterSettlementHistories');
         }
       },
     },

@@ -1,5 +1,9 @@
 import { Heading, Stack } from '@chakra-ui/react';
-import { AdminPageLayout, BcSettlementTargetList } from '@project-lc/components';
+import {
+  AdminBcSettlementDoneList,
+  AdminPageLayout,
+  BcSettlementTargetList,
+} from '@project-lc/components';
 
 export function BroadcasterSettlement(): JSX.Element {
   return (
@@ -16,6 +20,7 @@ export function BroadcasterSettlement(): JSX.Element {
         <Heading as="h3" size="lg">
           정산 완료 목록
         </Heading>
+        <AdminBcSettlementDoneList />
       </Stack>
     </AdminPageLayout>
   );

@@ -23,6 +23,7 @@ import { BroadcasterService } from './broadcaster.service';
     BroadcasterChannelService,
     BroadcasterSettlementHistoryService,
     BroadcasterSettlementService,
+    BroadcasterSettlementHistoryService,
   ],
 })
 export class BroadcasterModule {}

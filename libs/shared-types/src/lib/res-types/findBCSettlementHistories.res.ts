@@ -1,7 +1,15 @@
-import { BroadcasterSettlements, BroadcasterSettlementItems } from '@prisma/client';
+import {
+  BroadcasterSettlements,
+  BroadcasterSettlementItems,
+  LiveShopping,
+  Broadcaster,
+} from '@prisma/client';
 
-export type FindBCSettlementHistoriesRes = Array<
+export type FindBcSettlementHistoriesRes = Array<
   BroadcasterSettlements & {
-    broadcasterSettlementItems: Array<BroadcasterSettlementItems>;
+    broadcasterSettlementItems: Array<
+      BroadcasterSettlementItems & { liveShopping: LiveShopping }
+    >;
+    broadcaster: Pick<Broadcaster, 'id' | 'userNickname'>;
   }
 >;

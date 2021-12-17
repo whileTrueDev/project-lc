@@ -37,7 +37,7 @@ function CustomDataGrid(props: DataGridProps): JSX.Element {
         boxSizing: 'unset',
       },
       '& .MuiDataGrid-overlay': {
-        backgroundColor: useColorModeValue(theme.colors.gray[50], theme.colors.gray[800]),
+        backgroundColor: useColorModeValue('white', theme.colors.gray[800]),
       },
     },
   });
