@@ -1,16 +1,16 @@
+import { Container, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
 import {
-  MypageLayout,
   broadcasterCenterMypageNavLinks,
-  MypageNoticeSection,
   BroadcasterStatusSection,
-  StartGuideCard,
-  UrlCard,
+  MypageLayout,
   MypageLiveShoppingSection,
+  MypageNoticeSection,
   SettingNeedAlertBox,
+  StartGuideCard,
   StartGuideSection,
+  UrlCard,
 } from '@project-lc/components';
-import { Container, Grid, GridItem, Box, useDisclosure } from '@chakra-ui/react';
-import { useProfile, useBroadcasterContacts } from '@project-lc/hooks';
+import { useBroadcasterContacts, useProfile } from '@project-lc/hooks';
 import { useEffect, useMemo } from 'react';
 
 export function Index(): JSX.Element {
@@ -45,37 +45,43 @@ export function Index(): JSX.Element {
     if (!기본연락처존재여부) {
       onOpen();
     }
-  }, []);
+  }, [onOpen, 기본연락처존재여부]);
 
   return (
     <MypageLayout appType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
       <Container maxW="7xl" p={[1, 6, 6, 6]}>
         {/* 방송인 기본 정보 영역 */}
         {기본연락처존재여부 ? (
-          <BroadcasterStatusSection status={기본연락처} />
+          <Grid m={2} templateColumns="1fr 1fr">
+            <BroadcasterStatusSection status={기본연락처} />
+          </Grid>
         ) : (
-          <Box m={2} maxW="700">
-            <SettingNeedAlertBox
-              title="시작 가이드 진행이 필요합니다."
-              text="시작 가이드를 진행하여 연락처 정보를 등록해주세요."
-            />
-          </Box>
+          <Grid m={2} templateColumns="1fr">
+            <GridItem>
+              <SettingNeedAlertBox
+                title="시작 가이드 진행이 필요합니다."
+                text="시작 가이드를 진행하여 연락처 정보를 등록해주세요."
+              />
+            </GridItem>
+          </Grid>
         )}
-        <Grid templateColumns="1fr 1fr" m={2} gap={2}>
-          <GridItem>
+        <Grid m={2} templateColumns="repeat(2, 1fr)" gap={2}>
+          <GridItem colSpan={{ base: 2, lg: 1 }}>
             {/* 시작 가이드 영역 */}
             <StartGuideCard onOpen={onOpen} />
           </GridItem>
-          <GridItem>
+          <GridItem colSpan={{ base: 2, lg: 1 }}>
             {/* 오버레이 URL 영역 */}
             <UrlCard />
           </GridItem>
         </Grid>
+
         {/* 라이브 쇼핑 영역 */}
         <MypageLiveShoppingSection />
-        <Grid p={2} pt={1} gap={3} templateColumns="repeat(7, 1fr)">
-          <GridItem colSpan={{ base: 7, lg: 5 }} alignItems="stretch">
-            {/* 공지사항 영역 */}
+
+        {/* 공지사항 영역 */}
+        <Grid m={2} pt={1} templateColumns="repeat(2, 1fr)">
+          <GridItem colSpan={{ base: 2 }} alignItems="stretch">
             <MypageNoticeSection />
           </GridItem>
         </Grid>
