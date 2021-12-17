@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { BroadcasterModule } from '../broadcaster/broadcaster.module';
 import { SellerModule } from '../seller/seller.module';
+import { AdminModule } from '../admin/admin.module';
 import { JwtConfigService } from '../_nest-units/settings/jwt.setting';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -21,6 +22,7 @@ import { LocalStrategy } from './strategies/local.strategy';
   imports: [
     forwardRef(() => SellerModule),
     forwardRef(() => BroadcasterModule),
+    forwardRef(() => AdminModule),
     PassportModule,
     JwtModule.registerAsync({
       useClass: JwtConfigService,
