@@ -1,9 +1,13 @@
-import { MypageLayout, broadcasterCenterMypageNavLinks } from '@project-lc/components';
+import {
+  MypageLayout,
+  broadcasterCenterMypageNavLinks,
+  BcSettlementHistory,
+} from '@project-lc/components';
 
 export function SettlementIndex(): JSX.Element {
   return (
     <MypageLayout appType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
-      마이페이지 - 정산
+      <BcSettlementHistory />
     </MypageLayout>
   );
 }

@@ -129,6 +129,7 @@ export class AuthService {
 
   castUser(user: Seller | Broadcaster, type: UserType): UserPayload {
     return {
+      id: user.id,
       sub: user.email,
       type,
     };
@@ -136,6 +137,7 @@ export class AuthService {
 
   private castUserPayload(userPayload: UserPayload): UserPayload {
     return {
+      id: userPayload.id,
       sub: userPayload.sub,
       type: userPayload.type,
     };

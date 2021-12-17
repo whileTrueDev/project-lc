@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { Broadcaster } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { CreateManyBroadcasterSettlementHistoryDto } from '@project-lc/shared-types';
+import {
+  CreateManyBroadcasterSettlementHistoryDto,
+  FindBCSettlementHistoriesRes,
+} from '@project-lc/shared-types';
 
 @Injectable()
 export class BroadcasterSettlementHistoryService {
@@ -44,8 +48,16 @@ export class BroadcasterSettlementHistoryService {
     return result.count;
   }
 
-  /** 정산 내역 조회 */
-  public async findHistories(): Promise<any> {
-    //
+  /** 특정 방송인 정산 내역 조회 */
+  public async findHistories(
+    broadcasterId: Broadcaster['id'],
+  ): Promise<FindBCSettlementHistoriesRes> {
+    return this.prisma.broadcasterSettlements.findMany({
+      where: { broadcasterId },
+      orderBy: { round: 'desc' },
+      include: {
+        broadcasterSettlementItems: true,
+      },
+    });
   }
 }

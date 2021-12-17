@@ -57,6 +57,7 @@ export * from './lib/queries/useBcSettlementTargets';
 export * from './lib/queries/useBroadcaster';
 export * from './lib/queries/useBroadcasterChannels';
 export * from './lib/queries/useBroadcasterContacts';
+export * from './lib/queries/useBroadcasterSettlementHistory';
 export * from './lib/queries/useDefaultContacts';
 export * from './lib/queries/useEmailDupCheck';
 export * from './lib/queries/useFmExport';

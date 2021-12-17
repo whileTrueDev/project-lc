@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UnauthorizedException,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -20,6 +21,7 @@ import {
   ChangeNicknameDto,
   CreateBroadcasterChannelDto,
   EmailDupCheckDto,
+  FindBCSettlementHistoriesRes,
   FindBroadcasterDto,
   SignUpDto,
 } from '@project-lc/shared-types';
@@ -29,6 +31,9 @@ import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterService } from './broadcaster.service';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
+import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-history.service';
+import { BroadcasterInfo } from '../_nest-units/decorators/broadcasterInfo.decorator';
+import { UserPayload } from '../..';
 
 @Controller('broadcaster')
 export class BroadcasterController {
@@ -37,6 +42,7 @@ export class BroadcasterController {
     private readonly contactsService: BroadcasterContactsService,
     private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
+    private readonly settlementHistoryService: BroadcasterSettlementHistoryService,
   ) {}
 
   /** 방송인 정보 조회 */
@@ -148,5 +154,17 @@ export class BroadcasterController {
     @Body(ValidationPipe) dto: BroadcasterAddressDto,
   ): Promise<BroadcasterAddress> {
     return this.broadcasterService.upsertAddress(1, dto);
+  }
+
+  /** 방송인 정산 내역 조회 */
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement-history/:broacasterId')
+  public async findSettlementHistories(
+    @BroadcasterInfo() bc: UserPayload,
+    @Param('broacasterId', ParseIntPipe) broadcasterId: Broadcaster['id'],
+  ): Promise<FindBCSettlementHistoriesRes> {
+    if (bc.id !== broadcasterId)
+      throw new UnauthorizedException('본인 계정의 정산 내역만 조회할 수 있습니다.');
+    return this.settlementHistoryService.findHistories(broadcasterId);
   }
 }
