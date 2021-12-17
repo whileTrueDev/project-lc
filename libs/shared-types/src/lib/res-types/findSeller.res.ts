@@ -4,6 +4,7 @@ export interface FindSellerRes extends Seller {
   shopName?: string;
 }
 
-export type AdminSellerListRes = (Omit<Seller, 'password'> & {
+export type AdminSellerListItem = Omit<Seller, 'password'> & {
   sellerShop: SellerShop;
-})[];
+};
+export type AdminSellerListRes = AdminSellerListItem[];

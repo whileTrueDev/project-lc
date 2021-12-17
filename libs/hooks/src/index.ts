@@ -1,5 +1,6 @@
 export * from './lib/auth-hooks';
 export * from './lib/mutation/useAdminBroadcasterSettlementInfoConfirmMutation';
+export * from './lib/mutation/useAdminCreateNotification';
 export * from './lib/mutation/useBroadcasterAddressMutation';
 export * from './lib/mutation/useBroadcasterChannelMutation';
 export * from './lib/mutation/useBroadcasterSettlementInfoMutation';

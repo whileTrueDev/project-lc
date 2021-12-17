@@ -1,21 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { UserNotification } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { UserType } from '@project-lc/shared-types';
+import {
+  CreateMultipleNotificationDto,
+  CreateNotificationDto,
+  UserType,
+} from '@project-lc/shared-types';
 
 // TODO: dto 파일 분리, 컨트롤러에 validationpipe 적용
-export class CreateNotificationDto {
-  userEmail: string;
-  userType: UserType;
-  title: string;
-  content: string;
-}
-export class CreateMultipleNotificationDto {
-  userEmailList: string[];
-  userType: UserType;
-  title: string;
-  content: string;
-}
+
 export class FindNotificationsDto {
   userEmail: string;
   userType: UserType;

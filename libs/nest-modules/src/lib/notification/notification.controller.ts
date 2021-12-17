@@ -9,10 +9,12 @@ import {
   Query,
 } from '@nestjs/common';
 import { UserNotification } from '@prisma/client';
-import { UserType } from '@project-lc/shared-types';
 import {
   CreateMultipleNotificationDto,
   CreateNotificationDto,
+  UserType,
+} from '@project-lc/shared-types';
+import {
   MarkNotificationReadStateDto,
   NotificationService,
 } from './notification.service';
