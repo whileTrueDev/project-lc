@@ -69,7 +69,6 @@ export * from './lib/dto/shippingOption.dto';
 export * from './lib/dto/shippingSet.dto';
 export * from './lib/dto/signUp.dto';
 export * from './lib/front-type/approvedGoodsListItemType';
-export * from './lib/front-type/inquiryType';
 export * from './lib/front-type/liveShoppingInputType';
 export * from './lib/front-type/orderFilterFormType';
 export * from './lib/overlay-controller/overlay-controller-types';

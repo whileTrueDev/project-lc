@@ -15,7 +15,7 @@ import {
   Center,
   useToast,
 } from '@chakra-ui/react';
-import { emailRegisterOptions, InquiryInput } from '@project-lc/shared-types';
+import { emailRegisterOptions, InquiryDto } from '@project-lc/shared-types';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useInquiryMutation } from '@project-lc/hooks';
 
@@ -33,7 +33,7 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
 
   const { mutateAsync, isLoading } = useInquiryMutation();
 
-  const methods = useForm<InquiryInput>({
+  const methods = useForm<InquiryDto>({
     defaultValues: {
       name: '',
       email: '',
@@ -74,7 +74,7 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
     reset,
   } = methods;
 
-  const regist = (inquiryInputs: InquiryInput): void => {
+  const regist = (inquiryInputs: InquiryDto): void => {
     mutateAsync(inquiryInputs).then(onSuccess).catch(onFail);
   };
 

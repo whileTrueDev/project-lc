@@ -27,6 +27,7 @@ export class InquiryDto {
   type: InquiryType;
 
   @IsBoolean()
+  @IsOptional()
   readFlag: boolean;
 }
 
