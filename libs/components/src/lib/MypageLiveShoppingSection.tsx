@@ -1,6 +1,8 @@
-import { Flex, Box, Text, Divider, Center, Link } from '@chakra-ui/react';
+import { Box, Center, Flex, Link, Text } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { BroadcasterLiveShoppingList } from './BroadcasterLiveShoppingList';
+import { CanScrollableText } from './CanScrollableText';
+import TextWithPopperButton from './TextWithPopperButton';
 
 export function MypageLiveShoppingSection(): JSX.Element {
   return (
@@ -11,11 +13,18 @@ export function MypageLiveShoppingSection(): JSX.Element {
         direction={['column', 'column', 'column', 'row']}
         justifyContent="space-between"
       >
-        <Text fontSize="lg" fontWeight="medium" pb={1}>
-          라이브 쇼핑
-        </Text>
+        <TextWithPopperButton
+          iconAriaLabel="liveshopping-section-help"
+          title={
+            <Text fontSize="lg" fontWeight="medium" pb={1}>
+              라이브 쇼핑
+            </Text>
+          }
+        >
+          <CanScrollableText />
+        </TextWithPopperButton>
       </Flex>
-      <Divider ml={5} mt={2} backgroundColor="gray.100" />
+
       <BroadcasterLiveShoppingList useSmallSize />
       <Center m={3}>
         <NextLink href="/mypage/live" passHref>
