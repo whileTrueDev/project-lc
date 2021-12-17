@@ -169,7 +169,7 @@ export function UserSearhToolbar({
 
 export function AdminNotificationSection(): JSX.Element {
   return (
-    <Stack direction={{ base: 'column', md: 'row' }} spacing={10}>
+    <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
       <AdminNotificationSellerList />
       <AdminNotificationBroadcasterList />
     </Stack>

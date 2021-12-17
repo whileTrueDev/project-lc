@@ -9,10 +9,17 @@ import {
   UserSearhToolbar,
   AdminSendNotificationDialog,
 } from './AdminNotificationSection';
+import { UserNotificationHistory } from './AdminNotificationSellerList';
 
 const broadcasterColumns: GridColumns = [
   { field: 'id', hide: true },
-  { field: 'email', headerName: '방송인 이메일' },
+  {
+    field: 'email',
+    headerName: '방송인 이메일',
+    renderCell: (params) => {
+      return <UserNotificationHistory email={params.row.email} userType="broadcaster" />;
+    },
+  },
   { field: 'userNickname', headerName: '방송인 활동명' },
 ];
 
@@ -55,8 +62,8 @@ export function AdminNotificationBroadcasterList(): JSX.Element {
 
   const messageDialog = useDisclosure();
   return (
-    <Box flex={1}>
-      <Text>방송인</Text>
+    <Box flex={1} p={2}>
+      <Text fontWeight="bold">방송인</Text>
       <ChakraDataGrid
         components={{ Toolbar: UserSearhToolbar }}
         density="compact"

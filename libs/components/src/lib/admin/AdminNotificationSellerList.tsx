@@ -1,6 +1,21 @@
-import { useDisclosure, Box, Text } from '@chakra-ui/react';
+import {
+  useDisclosure,
+  Box,
+  Text,
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Divider,
+  Spinner,
+} from '@chakra-ui/react';
 import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
-import { useAdminSellerList } from '@project-lc/hooks';
+import { useAdminSellerList, useNotifications } from '@project-lc/hooks';
+import { UserType } from '@project-lc/shared-types';
+import dayjs from 'dayjs';
 import { useState, useMemo } from 'react';
 import { boxStyle } from '../../constants/commonStyleProps';
 import { ChakraDataGrid } from '../ChakraDataGrid';
@@ -10,9 +25,63 @@ import {
   UserSearhToolbar,
 } from './AdminNotificationSection';
 
+/** 해당 유저에게 보냈던 메시지 확인(최근 6개) */
+export function UserNotificationHistory({
+  email,
+  userType,
+}: {
+  email: string;
+  userType: UserType;
+}): JSX.Element {
+  const { isOpen, onClose, onOpen } = useDisclosure();
+  const userEmail = useMemo(() => {
+    if (isOpen) return email;
+    return undefined;
+  }, [email, isOpen]);
+  const { data, isLoading } = useNotifications(userEmail, userType);
+  return (
+    <Box>
+      <Button variant="link" onClick={onOpen}>
+        {email}
+      </Button>
+      <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>보낸 메세지 확인</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {isLoading && <Spinner />}
+            {data &&
+              data.map((d) => (
+                <Box key={d.id} py={2}>
+                  <Text fontWeight="bold">{d.title}</Text>
+                  <Text>{d.content}</Text>
+                  <Text fontSize="xs">
+                    {dayjs(d.createDate).format('YYYY-MM-DD HH:mm')}
+                    <Text as="span"> - {d.readState ? '확인' : '미확인'}</Text>
+                  </Text>
+                  <Divider />
+                </Box>
+              ))}
+            {!isLoading && data && data.length === 0 && (
+              <Text>보낸 메시지가 없습니다</Text>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </Box>
+  );
+}
+
 const sellerColumns: GridColumns = [
   { field: 'id', hide: true },
-  { field: 'email', headerName: '판매자 이메일' },
+  {
+    field: 'email',
+    headerName: '판매자 이메일',
+    renderCell: (params) => {
+      return <UserNotificationHistory email={params.row.email} userType="seller" />;
+    },
+  },
   { field: 'name', headerName: '판매자 이름' },
   {
     field: 'shopName',
@@ -58,8 +127,8 @@ export function AdminNotificationSellerList(): JSX.Element {
 
   const messageDialog = useDisclosure();
   return (
-    <Box flex={1}>
-      <Text>판매자</Text>
+    <Box flex={1} p={2}>
+      <Text fontWeight="bold">판매자</Text>
       <ChakraDataGrid
         components={{ Toolbar: UserSearhToolbar }}
         density="compact"
