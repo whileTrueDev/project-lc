@@ -4,6 +4,7 @@ import {
   Button,
   Divider,
   Flex,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -13,67 +14,119 @@ import {
   ModalOverlay,
   Stack,
   Text,
-  useDisclosure,
+  Textarea,
+  useBoolean,
+  useToast,
 } from '@chakra-ui/react';
-import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
-import { useAdminBroadcaster, useAdminSellerList } from '@project-lc/hooks';
-import React, { useMemo, useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
-import { ChakraDataGrid } from '../ChakraDataGrid';
 import {
-  escapeRegExp,
-  QuickSearchInput,
-  QuickSearchInputProps,
-} from '../QuickSearchInput';
-
-const sellerColumns: GridColumns = [
-  { field: 'id', hide: true },
-  { field: 'email', headerName: '판매자 이메일' },
-  { field: 'name', headerName: '판매자 이름' },
-  {
-    field: 'shopName',
-    headerName: '상점명',
-    renderCell: (params) => <Text>{params.row.sellerShop?.shopName}</Text>,
-  },
-];
-
-const broadcasterColumns: GridColumns = [
-  { field: 'id', hide: true },
-  { field: 'email', headerName: '방송인 이메일' },
-  { field: 'userNickname', headerName: '방송인 활동명' },
-];
+  useAdminCreateMultipleNotification,
+  useAdminCreateNotification,
+} from '@project-lc/hooks';
+import { UserType } from '@project-lc/shared-types';
+import React from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import { QuickSearchInput, QuickSearchInputProps } from '../QuickSearchInput';
+import AdminNotificationBroadcasterList from './AdminNotificationBroadcasterList';
+import AdminNotificationSellerList from './AdminNotificationSellerList';
 
 export type AdminSendNotificationDialogProps = {
   isOpen: boolean;
   onClose: () => void;
-  targetUsers: any;
+  targetUsersEmailList: string[];
+  userType: UserType;
+  targetDisplay: JSX.Element;
 };
 
-function AdminSendNotificationDialog({
-  targetUsers,
+export type NotificationMessage = {
+  title: string;
+  content: string;
+};
+
+export function AdminSendNotificationDialog({
   isOpen,
   onClose,
+  userType,
+  targetUsersEmailList,
+  targetDisplay,
 }: AdminSendNotificationDialogProps): JSX.Element {
-  const formMethods = useForm();
-  const onSubmit = (): void => {
-    console.log('submit');
+  const formMethods = useForm<NotificationMessage>();
+
+  const toast = useToast();
+  const [confirmed, { on, off }] = useBoolean();
+  const createOneNotification = useAdminCreateNotification();
+  const createMultipleNotification = useAdminCreateMultipleNotification();
+
+  const handleClose = (): void => {
+    onClose();
+    off();
+    formMethods.reset();
   };
+
+  const onSubmit = async (data: NotificationMessage): Promise<void> => {
+    if (!confirmed) return;
+
+    const handleSuccess = (res: any): void => {
+      toast({ title: '메시지 전송 성공', status: 'success' });
+      handleClose();
+    };
+
+    const handleError = (error: any): void => {
+      console.error(error);
+      toast({ title: '메시지 전송 실패', status: 'error' });
+    };
+
+    // 대상 유저 1명인 경우
+    if (targetUsersEmailList.length === 1) {
+      const email = targetUsersEmailList[0];
+      await createOneNotification
+        .mutateAsync({ userEmail: email, userType, ...data })
+        .then(handleSuccess)
+        .catch(handleError);
+      return;
+    }
+    // 대상 유저 여러명인 경우
+    await createMultipleNotification
+      .mutateAsync({ userEmailList: targetUsersEmailList, userType, ...data })
+      .then(handleSuccess)
+      .catch(handleError);
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
+    <Modal isOpen={isOpen} onClose={handleClose} scrollBehavior="inside">
       <ModalOverlay />
       <FormProvider {...formMethods}>
         <ModalContent as="form" onSubmit={formMethods.handleSubmit(onSubmit)}>
           <ModalHeader>메시지 보내기</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>받는사람 </Text>
-            {JSON.stringify(targetUsers, null, 2)}
-            <Text>보낼 제목 </Text>
+            {targetDisplay}
+
+            <Text>제목 </Text>
+            <Input {...formMethods.register('title', { required: true })} />
             <Text>메시지 </Text>
+            <Textarea
+              resize="none"
+              {...formMethods.register('content', { required: true })}
+            />
           </ModalBody>
           <Divider />
           <ModalFooter>
-            <Button>보내기</Button>
+            {confirmed ? (
+              <Box>
+                <Text color="red">
+                  유저에게 전송한 메시지는 취소할 수 없습니다.
+                  <br />
+                  받는사람과 제목, 메시지 내용을 다시 한번 확인해주세요. <br />
+                  진짜로 전송하시겠습니까?
+                </Text>
+                <Button type="submit" mr={1} colorScheme="red">
+                  진짜로 보내기
+                </Button>
+                <Button onClick={off}>취소</Button>
+              </Box>
+            ) : (
+              <Button onClick={on}>보내기</Button>
+            )}
           </ModalFooter>
         </ModalContent>
       </FormProvider>
@@ -87,7 +140,7 @@ export interface UserSearchToolbarProps extends QuickSearchInputProps {
 }
 
 /** 검색창, 메시지보내기 버튼 있는 툴바 */
-function UserSearhToolbar({
+export function UserSearhToolbar({
   clearSearch,
   onChange,
   value,
@@ -115,90 +168,10 @@ function UserSearhToolbar({
 }
 
 export function AdminNotificationSection(): JSX.Element {
-  // 판매자 관련
-  const { data: sellerList } = useAdminSellerList();
-
-  const [searchText, setSearchText] = useState<string>('');
-  const requestSearch = (searchValue: string): void => {
-    setSearchText(searchValue);
-  };
-
-  const sellerListRows = useMemo(() => {
-    if (!sellerList) return [];
-    const searchRegex = new RegExp(escapeRegExp(searchText), 'i');
-
-    // row 데이터가 중첩된 객체인 경우 내부 값까지 확인함 예)row.sellerShop.shopName
-    function _searchTextInRow(row: any): boolean {
-      return Object.keys(row).some((field: any) => {
-        if (!row[field]) return false;
-        if (typeof row[field] === 'object') {
-          return _searchTextInRow(row[field]);
-        }
-        return searchRegex.test(row[field].toString());
-      });
-    }
-
-    return sellerList.filter(_searchTextInRow);
-  }, [searchText, sellerList]);
-
-  const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
-
-  const selectedUser = useMemo(() => {
-    if (!selectionModel.length) return [];
-    return sellerListRows.filter((row) => selectionModel.includes(row.id));
-  }, [selectionModel, sellerListRows]);
-
-  const messageDialog = useDisclosure();
-  // 방송인 관련
-  const { data: broadcasterList } = useAdminBroadcaster();
   return (
     <Stack direction={{ base: 'column', md: 'row' }} spacing={10}>
-      <Box flex={1}>
-        <Text>판매자</Text>
-        <ChakraDataGrid
-          components={{ Toolbar: UserSearhToolbar }}
-          density="compact"
-          columns={sellerColumns.map((c) => ({ ...c, flex: 1 }))}
-          rows={sellerListRows}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
-          autoHeight
-          checkboxSelection
-          disableColumnMenu
-          disableSelectionOnClick
-          componentsProps={{
-            toolbar: {
-              value: searchText,
-              onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-                requestSearch(e.target.value),
-              clearSearch: () => requestSearch(''),
-              onButtonClick: messageDialog.onOpen,
-              isButtonDisabled: !selectionModel.length,
-            },
-          }}
-          selectionModel={selectionModel}
-          onSelectionModelChange={setSelectionModel}
-        />
-        <AdminSendNotificationDialog
-          targetUsers={selectedUser}
-          isOpen={messageDialog.isOpen}
-          onClose={messageDialog.onClose}
-        />
-      </Box>
-      <Box flex={1}>
-        <Text>방송인</Text>
-        <ChakraDataGrid
-          density="compact"
-          columns={broadcasterColumns.map((c) => ({ ...c, flex: 1 }))}
-          rows={broadcasterList || []}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
-          autoHeight
-          checkboxSelection
-          disableColumnMenu
-          disableSelectionOnClick
-        />
-      </Box>
+      <AdminNotificationSellerList />
+      <AdminNotificationBroadcasterList />
     </Stack>
   );
 }

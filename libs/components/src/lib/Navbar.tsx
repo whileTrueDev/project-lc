@@ -132,6 +132,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
                 fontWeight={500}
                 variant="link"
                 onClick={() => router.push('/login')}
+                mr={{ base: '1', sm: '3' }}
               >
                 로그인
               </Button>
