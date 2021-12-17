@@ -20,6 +20,7 @@ import { MailVerificationService } from './mailVerification.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { BroadcasterModule } from '../broadcaster/broadcaster.module';
+import { AdminModule } from '../admin/admin.module';
 
 describe('AuthController', () => {
   let app: INestApplication;
@@ -35,6 +36,7 @@ describe('AuthController', () => {
       imports: [
         SellerModule,
         BroadcasterModule,
+        AdminModule,
         ConfigModule.forRoot({ isGlobal: true }),
         MailerModule.forRoot(mailerConfig),
         PassportModule,
