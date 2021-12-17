@@ -13,3 +13,13 @@ export const useInquiryMutation = (): UseMutationResult<
     return axios.post<Inquiry>('/inquiry', dto).then((res) => res.data);
   });
 };
+
+export const useChangeInquiryReadFlagMutation = (): UseMutationResult<
+  boolean,
+  AxiosError,
+  number
+> => {
+  return useMutation(async (inquiryId: number) => {
+    return axios.patch('/inquiry', { inquiryId }).then((res) => res.data);
+  });
+};

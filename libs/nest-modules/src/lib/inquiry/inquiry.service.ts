@@ -35,4 +35,16 @@ export class InquiryService {
       ],
     });
   }
+
+  async updateReadFlag(id: { inquiryId: number }): Promise<boolean> {
+    await this.prisma.inquiry.update({
+      where: {
+        id: id.inquiryId,
+      },
+      data: {
+        readFlag: true,
+      },
+    });
+    return true;
+  }
 }

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, ValidationPipe, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  ValidationPipe,
+  Body,
+  UseGuards,
+  Patch,
+} from '@nestjs/common';
 import { InquiryDto } from '@project-lc/shared-types';
 import { Inquiry } from '@prisma/client';
 import { InquiryService } from './inquiry.service';
@@ -19,5 +27,14 @@ export class InquiryController {
   @Post()
   registInquiry(@Body(ValidationPipe) dto: InquiryDto): Promise<boolean> {
     return this.inquiryService.registInquiry(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Patch()
+  updateInquiryReadFlag(
+    @Body(ValidationPipe) inquiryId: { inquiryId: number },
+  ): Promise<boolean> {
+    return this.inquiryService.updateReadFlag(inquiryId);
   }
 }
