@@ -64,6 +64,7 @@ export class AuthService {
     pwdInput: string,
   ): Promise<UserPayload | null> {
     let user: Seller | Broadcaster;
+    // TODO : admin login 구현하기
     if (['admin', 'seller'].includes(type)) {
       user = await this.sellerService.login(email, pwdInput);
     }
@@ -165,6 +166,7 @@ export class AuthService {
   async getProfile(userPayload: UserPayload, appType: UserType): Promise<UserProfileRes> {
     const { sub, type } = userPayload;
     let user: Seller | Broadcaster;
+    // TODO : useProfile를 위한 admin 분기처리
     if (['admin', 'seller'].includes(type)) {
       if (appType !== 'seller') {
         throw new UnauthorizedException();
