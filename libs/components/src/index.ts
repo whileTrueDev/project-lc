@@ -125,3 +125,4 @@ export * from './lib/BroadcasterStatusSection';
 export * from './lib/StartGuideCard';
 export * from './lib/guide/OverlayUrlCard';
 export * from './lib/MypageLiveShoppingSection';
+export * from './lib/admin/AdminSignUp';

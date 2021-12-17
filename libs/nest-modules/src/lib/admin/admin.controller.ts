@@ -17,6 +17,7 @@ import {
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
+  Administrator,
 } from '@prisma/client';
 import {
   AdminBroadcasterSettlementInfoList,
@@ -35,6 +36,8 @@ import {
   OrderCancelRequestList,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
+  EmailDupCheckDto,
+  AdminSignUpDto,
 } from '@project-lc/shared-types';
 import { BroadcasterSettlementService } from '../broadcaster/broadcaster-settlement.service';
 import { BroadcasterService } from '../broadcaster/broadcaster.service';
@@ -43,6 +46,7 @@ import { SellerSettlementService } from '../seller/seller-settlement.service';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { AdminSettlementService } from './admin-settlement.service';
+import { AdminAccountService } from './admin-account.service';
 import { AdminService } from './admin.service';
 
 @UseGuards(JwtAuthGuard)
@@ -53,10 +57,26 @@ export class AdminController {
     private readonly adminService: AdminService,
     private readonly broadcasterService: BroadcasterService,
     private readonly adminSettlementService: AdminSettlementService,
+    private readonly adminAccountService: AdminAccountService,
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly orderCancelService: OrderCancelService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
   ) {}
+
+  // * 판매자 회원가입
+  @Post()
+  public async signUp(@Body(ValidationPipe) dto: AdminSignUpDto): Promise<Administrator> {
+    const administrator = await this.adminAccountService.signUp(dto);
+    return administrator;
+  }
+
+  // * 이메일 주소 중복 체크
+  @Get('email-check')
+  public async emailDupCheck(
+    @Query(ValidationPipe) dto: EmailDupCheckDto,
+  ): Promise<boolean> {
+    return this.adminAccountService.isEmailDupCheckOk(dto.email);
+  }
 
   @Get('/settlement')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
@@ -189,7 +209,7 @@ export class AdminController {
   }
 
   /** 방송인 정산정보 검수상태, 사유 수정 */
-  @Patch('settlement-info/broadcaster/confirmation')
+  @Patch('/settlement-info/broadcaster/confirmation')
   setBroadcasterSettlementInfoConfirmation(
     @Body()
     dto: BroadcasterSettlementInfoConfirmationDto,
