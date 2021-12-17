@@ -698,3 +698,10 @@ model SellerOrderCancelRequestItem {
   sellerOrderCancelRequest SellerOrderCancelRequest @relation(fields: [orderSeq], references: [id], onDelete: Cascade)
   orderSeq                 Int
 }
+
+// 관리자 계정
+model Administrator {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+}
