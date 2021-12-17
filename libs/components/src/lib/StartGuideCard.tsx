@@ -12,7 +12,7 @@ export function StartGuideCard({ onOpen }: { onOpen: () => void }): JSX.Element 
         p={3}
       >
         <Text fontWeight="bold">
-          <Text as="span" color="red">
+          <Text as="span" color="red.500">
             [필수]
           </Text>
           &nbsp; 온애드 시작 가이드

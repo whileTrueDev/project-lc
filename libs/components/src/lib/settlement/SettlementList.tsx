@@ -14,6 +14,7 @@ import { settlementHistoryStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useState } from 'react';
+import { CanScrollableText } from '../CanScrollableText';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { SettlementInfoDialog } from './SettlementInfoDialog';
 
@@ -121,14 +122,7 @@ export function SettlementList(): JSX.Element | null {
       {data.length > 0 && (
         <Text mb={2}>
           <InfoIcon color="blue.500" mr={2} />
-          {isMobileSize ? (
-            <Text as="span">목록을 좌,우로 슬라이드 할 수 있습니다.</Text>
-          ) : (
-            <Text as="span">
-              <Kbd>shift</Kbd> + <Kbd>마우스스크롤</Kbd> 을 통해 목록을 좌,우로 스크롤할
-              수 있습니다.
-            </Text>
-          )}
+          <CanScrollableText />
         </Text>
       )}
       <ChakraDataGrid
