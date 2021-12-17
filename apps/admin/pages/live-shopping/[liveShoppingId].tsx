@@ -1,37 +1,36 @@
-import { useState } from 'react';
 import { ChevronLeftIcon, EditIcon } from '@chakra-ui/icons';
 import {
-  Box,
-  Button,
-  Flex,
-  Stack,
   Accordion,
-  AccordionItem,
   AccordionButton,
   AccordionIcon,
+  AccordionItem,
   AccordionPanel,
-  Text,
-  Grid,
-  useToast,
-  Divider,
-  Input,
-  Textarea,
-  Link,
-  useDisclosure,
-  FormLabel,
-  FormControl,
-  FormHelperText,
   Alert,
-  AlertTitle,
   AlertDescription,
   AlertIcon,
+  AlertTitle,
+  Box,
+  Button,
+  Divider,
+  Flex,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Grid,
+  Input,
+  Link,
+  Stack,
+  Text,
+  Textarea,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import {
+  AdminLiveShoppingUpdateConfirmModal,
+  AdminOverlayImageUploadDialog,
   AdminPageLayout,
-  LiveShoppingDetailTitle,
   BroadcasterAutocomplete,
-  LiveShoppingProgressSelector,
-  LiveShoppingDatePicker,
+  BroadcasterName,
   GoodsDetailCommonInfo,
   GoodsDetailImagesInfo,
   GoodsDetailInfo,
@@ -39,23 +38,23 @@ import {
   GoodsDetailPurchaseLimitInfo,
   GoodsDetailShippingInfo,
   GoodsDetailSummary,
-  SectionWithTitle,
-  BroadcasterName,
-  AdminLiveShoppingUpdateConfirmModal,
+  LiveShoppingDatePicker,
+  LiveShoppingDetailTitle,
   LiveShoppingProgressBadge,
-  AdminOverlayImageUploadDialog,
+  LiveShoppingProgressSelector,
+  SectionWithTitle,
 } from '@project-lc/components';
 import {
+  useAdminGoodsById,
   useAdminLiveShoppingList,
   useProfile,
-  useAdminBroadcaster,
-  useAdminGoodsById,
   useUpdateLiveShoppingManageMutation,
 } from '@project-lc/hooks';
-import { useRouter } from 'next/router';
-import { FormProvider, useForm } from 'react-hook-form';
 import { LiveShoppingDTO, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 
 function getDuration(startDate: Date, endDate: Date): string {
   if (startDate && startDate) {
@@ -81,7 +80,7 @@ export function GoodsDetail(): JSX.Element {
 
   const goodsId = liveShopping ? liveShopping[0].goodsId : '';
   const goods = useAdminGoodsById(goodsId);
-  const { data: broadcaster } = useAdminBroadcaster();
+
   const { mutateAsync } = useUpdateLiveShoppingManageMutation();
   const methods = useForm({
     defaultValues: {
@@ -342,7 +341,7 @@ export function GoodsDetail(): JSX.Element {
             <Stack as="form" spacing={5}>
               <LiveShoppingProgressSelector />
               <Divider />
-              <BroadcasterAutocomplete data={broadcaster} />
+              <BroadcasterAutocomplete />
               <Divider />
 
               <LiveShoppingDatePicker
@@ -402,7 +401,11 @@ export function GoodsDetail(): JSX.Element {
               </Stack>
 
               <Button onClick={openConfirmModal}>변경</Button>
-              <Button rightIcon={<EditIcon />} onClick={imageDialogOnOpen}>
+              <Button
+                rightIcon={<EditIcon />}
+                onClick={imageDialogOnOpen}
+                isDisabled={!liveShopping[0].broadcaster}
+              >
                 오버레이 이미지 등록
               </Button>
             </Stack>
@@ -412,12 +415,14 @@ export function GoodsDetail(): JSX.Element {
               onClose={onClose}
               onConfirm={handleSubmit(regist)}
             />
-            <AdminOverlayImageUploadDialog
-              isOpen={imageDialogIsOpen}
-              onClose={imageDialogOnClose}
-              broadcasterId={liveShopping[0].broadcaster.email}
-              liveShoppingId={liveShopping[0].id}
-            />
+            {liveShopping[0].broadcaster && (
+              <AdminOverlayImageUploadDialog
+                isOpen={imageDialogIsOpen}
+                onClose={imageDialogOnClose}
+                broadcasterEmail={liveShopping[0].broadcaster.email}
+                liveShoppingId={liveShopping[0].id}
+              />
+            )}
           </FormProvider>
         </Grid>
 

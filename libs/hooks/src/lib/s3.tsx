@@ -16,7 +16,9 @@ export type s3KeyType =
   | 'mail-order'
   | 'settlement-account'
   | 'vertical-banner'
-  | 'donation-images';
+  | 'donation-images'
+  | 'broadcaster-id-card' // 방송인 신분증
+  | 'broadcaster-account-image'; // 방송인 통장사본
 
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
@@ -94,6 +96,17 @@ export const s3 = (() => {
         fileFullName = `${prefix}_${filename}`;
         break;
       }
+      case 'broadcaster-id-card': {
+        // 방송인 신분증
+        fileFullName = `${prefix}_신분증${extension}`;
+        break;
+      }
+      case 'broadcaster-account-image': {
+        // 방송인 통장사본
+        fileFullName = `${prefix}_통장사본${extension}`;
+        break;
+      }
+
       default: {
         fileFullName = `${filename}`;
       }
@@ -242,6 +255,20 @@ export const s3 = (() => {
     }
   }
 
+  // 단일 이미지 조회
+  async function getS3GuideImage(): Promise<string> {
+    const signedUrlExpireSeconds = 3600;
+    const key = 'public/banner-guide.png';
+    const command = new GetObjectCommand({
+      Bucket: S3_BUCKET_NAME,
+      Key: key,
+    });
+    const imageUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: signedUrlExpireSeconds,
+    });
+    return imageUrl;
+  }
+
   return {
     s3UploadImage,
     getS3Key,
@@ -249,5 +276,6 @@ export const s3 = (() => {
     s3uploadFile: s3publicUploadFile,
     getVerticalImagesFromS3,
     s3DeleteImages,
+    getS3GuideImage,
   };
 })();

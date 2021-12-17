@@ -6,6 +6,9 @@ import {
   Body,
   Patch,
   UseGuards,
+  Delete,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { Notice } from '@prisma/client';
 import { NoticePostDto, NoticePatchDto } from '@project-lc/shared-types';
@@ -40,5 +43,12 @@ export class NoticeController {
   @Patch()
   patchNotice(@Body(ValidationPipe) dto: NoticePatchDto): Promise<Notice> {
     return this.noticeService.patchNotice(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
+  @Delete(':id')
+  deleteNotice(@Param('id', ParseIntPipe) id: number): Promise<Notice> {
+    return this.noticeService.deleteNotice(id);
   }
 }

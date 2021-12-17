@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Broadcaster, BroadcasterAddress, Prisma } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -36,6 +36,7 @@ export class BroadcasterService {
         deleteFlag: false,
       },
       select: {
+        id: true,
         email: true,
         userNickname: true,
       },
@@ -49,7 +50,7 @@ export class BroadcasterService {
   async login(email: string, pwdInput: string): Promise<Broadcaster | null> {
     const user = await this.findOne({ email });
     if (!user) {
-      return null;
+      throw new UnauthorizedException();
     }
     if (user.password === null) {
       // 소셜로그인으로 가입된 회원
@@ -57,7 +58,7 @@ export class BroadcasterService {
     }
     const isCorrect = await this.validatePassword(pwdInput, user.password);
     if (!isCorrect) {
-      return null;
+      throw new UnauthorizedException();
     }
     return user;
   }
@@ -85,6 +86,32 @@ export class BroadcasterService {
       },
     });
     return broadcaster;
+  }
+
+  /**
+   * 비밀번호를 단방향 암호화 합니다.
+   * @param purePw 비밀번호 문자열
+   * @returns {string} 비밀번호 해시값
+   */
+  private async hashPassword(purePw: string): Promise<string> {
+    const hashed = await hash(purePw);
+    return hashed;
+  }
+
+  /**
+   * 입력된 이메일을 가진 유저가 본인 인증을 하기 위해 비밀번호를 확인함
+   * @param email 본인 이메일
+   * @param password 본인 비밀번호
+   * @returns boolean 비밀번호가 맞는지
+   */
+  async checkPassword(email: string, password: string): Promise<boolean> {
+    const seller = await this.findOne({ email });
+    if (!seller.password) {
+      throw new BadRequestException(
+        '소셜계정으로 가입된 회원입니다. 비밀번호를 등록해주세요.',
+      );
+    }
+    return this.validatePassword(password, seller.password);
   }
 
   /**
@@ -161,5 +188,45 @@ export class BroadcasterService {
         broadcasterId,
       },
     });
+  }
+
+  /**
+   * 비밀번호 변경
+   * @param email 비밀번호 변경할 셀러의 email
+   * @param newPassword 새로운 비밀번호
+   * @returns
+   */
+  async changePassword(email: string, newPassword: string): Promise<Broadcaster> {
+    const hashedPw = await this.hashPassword(newPassword);
+    const broadcaster = await this.prisma.broadcaster.update({
+      where: { email },
+      data: {
+        password: hashedPw,
+      },
+    });
+    return broadcaster;
+  }
+
+  /** 방송인 broadcaster 삭제 */
+  async deleteOne(email: string): Promise<boolean> {
+    await this.prisma.broadcaster.delete({
+      where: { email },
+    });
+
+    return true;
+  }
+
+  /** 이용동의 상태 변경 */
+  async changeContractionAgreement(
+    email: string,
+    agreementFlag: boolean,
+  ): Promise<Broadcaster> {
+    const broadcaster = await this.prisma.broadcaster.update({
+      where: { email },
+      data: {
+        agreementFlag,
+      },
+    });
+    return broadcaster;
   }
 }

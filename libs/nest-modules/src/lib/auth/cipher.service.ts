@@ -63,4 +63,16 @@ export class CipherService {
     ]);
     return decryptedBuffer.toString('utf-8');
   }
+
+  // 개인정보 관련 암호화 - createCookieRefreshToken과 내부 동작이 같아서 토큰과 상관없지만 가져다 씀
+  getEncryptedText(text?: string): string | undefined {
+    if (!text) return undefined;
+    return this.createCookieRefreshToken(text);
+  }
+
+  // 개인정보 관련 복호화 - getRefreshToken과 내부 동작이 같아서 토큰과 상관없지만 가져다 씀
+  getDecryptedText(text?: string): string | undefined {
+    if (!text) return undefined;
+    return this.getRefreshToken(text);
+  }
 }

@@ -19,8 +19,10 @@ import {
   LiveShopping,
 } from '@prisma/client';
 import {
+  AdminBroadcasterSettlementInfoList,
   AdminSettlementInfoType,
   BroadcasterDTO,
+  BroadcasterSettlementInfoConfirmationDto,
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
@@ -36,6 +38,7 @@ import {
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
 import { BroadcasterSettlementHistoryService } from '../broadcaster/broadcaster-settlement-history.service';
+import { BroadcasterSettlementService } from '../broadcaster/broadcaster-settlement.service';
 import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { OrderCancelService } from '../order-cancel/order-cancel.service';
 import { SellerSettlementService } from '../seller/seller-settlement.service';
@@ -55,6 +58,7 @@ export class AdminController {
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly orderCancelService: OrderCancelService,
     private readonly bcSettlementService: BroadcasterSettlementHistoryService,
+    private readonly broadcasterSettlementService: BroadcasterSettlementService,
   ) {}
 
   /** 판매자 정산 등록 정보 조회 */
@@ -197,5 +201,20 @@ export class AdminController {
     @Param('requestId', ParseIntPipe) requestId: number,
   ): Promise<boolean> {
     return this.orderCancelService.setOrderCancelRequestDone(requestId);
+  }
+
+  /** 방송인 정산정보 신청 목록 조회 */
+  @Get('/settelment-info-list/broadcaster')
+  getBroadcasterSettlementInfoList(): Promise<AdminBroadcasterSettlementInfoList> {
+    return this.broadcasterSettlementService.getBroadcasterSettlementInfoList();
+  }
+
+  /** 방송인 정산정보 검수상태, 사유 수정 */
+  @Patch('settlement-info/broadcaster/confirmation')
+  setBroadcasterSettlementInfoConfirmation(
+    @Body()
+    dto: BroadcasterSettlementInfoConfirmationDto,
+  ): Promise<boolean> {
+    return this.adminSettlementService.setBroadcasterSettlementInfoConfirmation(dto);
   }
 }

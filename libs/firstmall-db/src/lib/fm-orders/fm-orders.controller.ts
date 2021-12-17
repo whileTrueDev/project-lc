@@ -8,6 +8,7 @@ import {
   UseGuards,
   ValidationPipe,
   Patch,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   GoodsService,
@@ -27,6 +28,7 @@ import {
   OrderStatsRes,
   SalesStats,
   ChangeReturnStatusDto,
+  BroacasterPurchaseWithDivdedMessageDto,
   FindFmOrderDetailsDto,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -128,6 +130,30 @@ export class FmOrdersController {
     return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
   }
 
+  @Get('/broadcaster/per-live-shopping')
+  async broadcasterFindSalesPerLiveShopping(
+    @Query('broadcasterId') broadcasterId: number,
+  ): Promise<{ id: number; sales: string }[]> {
+    let liveShoppingList = await this.liveShoppingService
+      .getBroadcasterRegisteredLiveShoppings(broadcasterId)
+      .then((result) => {
+        return result.map((val) => {
+          if (val.sellStartDate && val.sellEndDate) {
+            return {
+              id: val.id,
+              firstmallGoodsConnectionId: `${val.goods.confirmation.firstmallGoodsConnectionId}`,
+              sellStartDate: dayjs(val.sellStartDate).toString(),
+              sellEndDate: dayjs(val.sellEndDate).toString(),
+            };
+          }
+          return null;
+        });
+      });
+
+    liveShoppingList = liveShoppingList?.filter((n) => n);
+    return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
+  }
+
   @Get('detail')
   async findOrderDetails(
     @SellerInfo() seller: UserPayload,
@@ -161,5 +187,21 @@ export class FmOrdersController {
   ): Promise<boolean> {
     const status = convertFmStatusStringToStatus(dto.targetStatus);
     return this.fmOrdersService.changeOrderStatus(orderId, status);
+  }
+
+  @Get('/broadcaster/purchases')
+  async getBroadcasterPurchases(
+    @Query('broadcasterId', ParseIntPipe)
+    broadcasterId: number,
+  ): Promise<BroacasterPurchaseWithDivdedMessageDto> {
+    const linkedLiveShoppingFmGoodsIds =
+      await this.liveShoppingService.getFmGoodsConnectionIdLinkedToLiveShoppings(
+        broadcasterId,
+      );
+    const purchasedList =
+      await this.fmOrdersService.getPurchaseDoneOrderDuringLiveShopping(
+        linkedLiveShoppingFmGoodsIds,
+      );
+    return purchasedList;
   }
 }

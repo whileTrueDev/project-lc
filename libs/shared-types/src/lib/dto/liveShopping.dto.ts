@@ -21,8 +21,8 @@ export class LiveShoppingDTO {
   // streamId: string;
 
   @IsOptional()
-  @IsString()
-  broadcasterId: string;
+  @IsNumber()
+  broadcasterId: number;
 
   @IsString()
   sellerId: string;
