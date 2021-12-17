@@ -1,9 +1,12 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { Prisma, Seller, SellerShop } from '@prisma/client';
-import { hash, verify } from 'argon2';
-import { FindSellerRes, SellerContactsDTO } from '@project-lc/shared-types';
+import { Prisma, Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import __multer from 'multer';
+import {
+  AdminSellerListRes,
+  FindSellerRes,
+  SellerContactsDTO,
+} from '@project-lc/shared-types';
+import { hash, verify } from 'argon2';
 import { S3Service } from '../s3/s3.service';
 @Injectable()
 export class SellerService {
@@ -248,9 +251,7 @@ export class SellerService {
   }
 
   /** 전체 판매자 계정과 상점명 목록 조회 */
-  public async getSellerList(): Promise<
-    (Omit<Seller, 'password'> & { sellerShop: SellerShop })[]
-  > {
+  public async getSellerList(): Promise<AdminSellerListRes> {
     return this.prisma.seller.findMany({
       select: {
         sellerShop: true,

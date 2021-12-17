@@ -17,11 +17,10 @@ import {
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
-  Seller,
-  SellerShop,
 } from '@prisma/client';
 import {
   AdminBroadcasterSettlementInfoList,
+  AdminSellerListRes,
   AdminSettlementInfoType,
   BroadcasterDTO,
   BroadcasterSettlementInfoConfirmationDto,
@@ -203,7 +202,7 @@ export class AdminController {
 
   /** 전체 판매자 계정 목록 조회 */
   @Get('/sellers')
-  getSellerList(): Promise<(Omit<Seller, 'password'> & { sellerShop: SellerShop })[]> {
+  getSellerList(): Promise<AdminSellerListRes> {
     return this.sellerService.getSellerList();
   }
 }
