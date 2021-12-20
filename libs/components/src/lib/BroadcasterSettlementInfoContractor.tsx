@@ -94,7 +94,7 @@ export function BroadcasterSettlementInfoContractor(): JSX.Element {
   return (
     <VStack alignItems="stretch">
       <SectionHeading>계약자 정보</SectionHeading>
-      <Grid templateColumns="1fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
+      <Grid templateColumns="1fr 3fr" borderTopColor="gray.500" borderTopWidth={1.5}>
         <GridTableItem
           title="과세 유형"
           value={

@@ -6,7 +6,7 @@ import axios from '../../axios';
 export const getBcSettlementTargets =
   async (): Promise<BroadcasterSettlementTargetRes> => {
     return axios
-      .get<BroadcasterSettlementTargetRes>('/fm-settlements/targets/broadcaster')
+      .get<BroadcasterSettlementTargetRes>('/fm-settlements/broadcaster/targets')
       .then((res) => res.data);
   };
 
