@@ -1,8 +1,7 @@
 import { forwardRef, Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { mailerConfig } from '../_nest-units/settings/mailer.config';
+
 import { BroadcasterModule } from '../broadcaster/broadcaster.module';
 import { SellerModule } from '../seller/seller.module';
 import { AdminModule } from '../admin/admin.module';
@@ -24,7 +23,6 @@ import { LocalStrategy } from './strategies/local.strategy';
     forwardRef(() => SellerModule),
     forwardRef(() => BroadcasterModule),
     forwardRef(() => AdminModule),
-    MailerModule.forRoot(mailerConfig),
     PassportModule,
     JwtModule.registerAsync({
       useClass: JwtConfigService,
