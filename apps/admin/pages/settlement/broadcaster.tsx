@@ -9,6 +9,9 @@ export function BroadcasterSettlement(): JSX.Element {
   return (
     <AdminPageLayout>
       <Stack p={6} spacing={4}>
+        <Heading as="h3" size="lg">
+          방송인 정산 처리
+        </Heading>
         {/* 정산 대상 */}
         <Heading as="h3" size="lg">
           정산 대상 목록
