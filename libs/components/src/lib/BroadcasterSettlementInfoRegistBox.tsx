@@ -108,7 +108,7 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
           정산 정보 등록
         </Button>
       </Flex>
-      <Divider backgroundColor="gray.100" mb={3} />
+      <Divider backgroundColor="gray.500" mb={3} />
 
       {/* 정산정보 조회중인경우 */}
       {isLoading && (

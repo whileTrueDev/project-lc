@@ -40,6 +40,16 @@ type ExportQueries = {
 @Injectable()
 export class FmExportsService {
   private EXPORT_TABLE = 'fm_goods_export';
+  private findExportItemsSql = `
+    SELECT 
+      export_code, goods_seq, goods_name, image,
+      item_option_seq, title1, option1, fm_goods_export_item.ea, price, step,
+      fm_order_item.order_seq
+    FROM fm_order_item_option
+      JOIN fm_order_item USING(item_seq)
+    JOIN fm_goods_export_item ON item_option_seq = option_seq
+  `;
+
   constructor(
     private readonly db: FirstmallDbService,
     private readonly fmGoodsService: FMGoodsService,
@@ -79,18 +89,26 @@ export class FmExportsService {
     if (res.length === 0) return null;
     const _export = res[0];
 
-    const findItemsSql = `
-    SELECT 
-      goods_name, image,
-      item_option_seq, title1, option1, fm_goods_export_item.ea, price, step,
-      fm_order_item.order_seq
-    FROM fm_order_item_option
-      JOIN fm_order_item USING(item_seq)
-    JOIN fm_goods_export_item ON item_option_seq = option_seq
-    WHERE export_code = ?`;
-    const items: FmExportItem[] = await this.db.query(findItemsSql, [exportCode]);
-
+    const items = await this.findExportItems(exportCode);
     return { ..._export, items };
+  }
+
+  /** 개별 출고의 상품 내역 조회 */
+  public async findExportItems(exportCode: string): Promise<FmExportItem[]> {
+    const items: FmExportItem[] = await this.db.query(
+      `${this.findExportItemsSql}\nWHERE export_code = ?`,
+      [exportCode],
+    );
+    return items;
+  }
+
+  /** 출고의 상품 내역 목록 조회 */
+  public async findExportItemsMany(exportCodes: string[]): Promise<FmExportItem[]> {
+    const items: FmExportItem[] = await this.db.query(
+      `${this.findExportItemsSql}\nWHERE export_code IN (?)`,
+      [exportCodes],
+    );
+    return items;
   }
 
   /** 단일 주문 출고 처리 진행 */

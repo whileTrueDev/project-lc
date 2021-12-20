@@ -23,6 +23,7 @@ import { useSellCommission, useUpdateSellCommissionMutation } from '@project-lc/
 import { ChangeSellCommissionDto } from '@project-lc/shared-types';
 import { useForm } from 'react-hook-form';
 
+/** 판매자 정산 수수료율 정보 */
 export function SettlementSellCommissionInfo(): JSX.Element {
   const toast = useToast();
   const commissionInfo = useSellCommission();

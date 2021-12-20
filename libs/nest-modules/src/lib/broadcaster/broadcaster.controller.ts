@@ -6,28 +6,29 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
-  Patch,
   Query,
+  UnauthorizedException,
   UseGuards,
   ValidationPipe,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { BroadcasterChannel } from '@prisma/client';
 import {
   BroadcasterAddressDto,
   BroadcasterContactDto,
+  BroadcasterContractionAgreementDto,
   BroadcasterRes,
   BroadcasterSettlementInfoDto,
   BroadcasterSettlementInfoRes,
   ChangeNicknameDto,
   CreateBroadcasterChannelDto,
   EmailDupCheckDto,
+  FindBcSettlementHistoriesRes,
   FindBroadcasterDto,
   PasswordValidateDto,
   SignUpDto,
-  BroadcasterContractionAgreementDto,
 } from '@project-lc/shared-types';
 import {
   Broadcaster,
@@ -35,14 +36,15 @@ import {
   BroadcasterContacts,
   BroadcasterSettlementInfo,
 } from '.prisma/client';
+import { UserPayload } from '../..';
 import { MailVerificationService } from '../auth/mailVerification.service';
+import { BroadcasterInfo } from '../_nest-units/decorators/broadcasterInfo.decorator';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
-import { BroadcasterService } from './broadcaster.service';
-import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
+import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-history.service';
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
-import { BroadcasterInfo } from '../_nest-units/decorators/broadcasterInfo.decorator';
-import { UserPayload } from '../auth/auth.interface';
+import { BroadcasterService } from './broadcaster.service';
 
 @Controller('broadcaster')
 export class BroadcasterController {
@@ -51,6 +53,7 @@ export class BroadcasterController {
     private readonly contactsService: BroadcasterContactsService,
     private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
+    private readonly settlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
   ) {}
 
@@ -166,6 +169,18 @@ export class BroadcasterController {
     @Body(ValidationPipe) dto: BroadcasterAddressDto,
   ): Promise<BroadcasterAddress> {
     return this.broadcasterService.upsertAddress(1, dto);
+  }
+
+  /** 방송인 정산 내역 조회 */
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement-history/:broacasterId')
+  public async findSettlementHistories(
+    @BroadcasterInfo() bc: UserPayload,
+    @Param('broacasterId', ParseIntPipe) broadcasterId: Broadcaster['id'],
+  ): Promise<FindBcSettlementHistoriesRes> {
+    if (bc.id !== broadcasterId)
+      throw new UnauthorizedException('본인 계정의 정산 내역만 조회할 수 있습니다.');
+    return this.settlementHistoryService.findHistoriesByBroadcaster(broadcasterId);
   }
 
   // 로그인 한 사람이 본인인증을 위해 비밀번호 확인

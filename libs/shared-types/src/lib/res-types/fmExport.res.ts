@@ -121,7 +121,9 @@ export interface FmExport {
   memo: string;
 }
 
-export type FmExportItem = FmOrderExportItemOption & { order_seq: FmOrder['order_seq'] };
+export type FmExportItem = FmOrderExportItemOption & {
+  order_seq: FmOrder['order_seq'];
+};
 export type FmExportRes = FmExport & {
   /** 이 출고에 포함된 상품(옵션) 목록 */
   items: FmExportItem[];

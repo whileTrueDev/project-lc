@@ -1,25 +1,25 @@
 import {
   Box,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Heading,
   Button,
+  Heading,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
   useColorModeValue,
 } from '@chakra-ui/react';
 import {
-  useAdminLiveShoppingList,
   LiveShoppingWithGoods,
+  useAdminLiveShoppingList,
   useProfile,
 } from '@project-lc/hooks';
 import { getLiveShoppingProgress } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import router from 'next/router';
-import { LiveShoppingProgressBadge } from '../LiveShoppingProgressBadge';
 import { BroadcasterName } from '../BroadcasterName';
+import { LiveShoppingProgressBadge } from '../LiveShoppingProgressBadge';
 import { SeletctedLiveShoppingType } from './AdminGiftList';
 
 export function AdminLiveShoppingList({
@@ -75,6 +75,7 @@ export function AdminLiveShoppingList({
             <Th>방송종료</Th>
             <Th>판매시작</Th>
             <Th>판매종료</Th>
+            <Th>퍼스트몰 상품 번호</Th>
             <Th>선물 목록 조회</Th>
           </Tr>
         </Thead>
@@ -125,6 +126,7 @@ export function AdminLiveShoppingList({
                     ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm')
                     : '미정'}
                 </Td>
+                <Td>{row.fmGoodsSeq ? row.fmGoodsSeq || '미입력' : '미정'}</Td>
                 <Td onClick={(e) => e.stopPropagation()}>
                   <Button
                     size="xs"
@@ -143,5 +145,3 @@ export function AdminLiveShoppingList({
     </Box>
   );
 }
-
-export default AdminLiveShoppingList;
