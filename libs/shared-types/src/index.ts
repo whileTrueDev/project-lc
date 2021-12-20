@@ -90,3 +90,5 @@ export * from './lib/res-types/orderCancelRequest.res';
 export * from './lib/res-types/overlayControllerMain.res';
 export * from './lib/res-types/socialAccounts.res';
 export * from './lib/res-types/userProfile.res';
+export * from './lib/dto/broadcasterContractionAgreement.dto';
+export * from './lib/dto/adminSignUpDto.dto';

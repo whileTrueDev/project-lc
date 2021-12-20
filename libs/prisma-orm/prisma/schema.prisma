@@ -699,6 +699,13 @@ model SellerOrderCancelRequestItem {
   orderSeq                 Int
 }
 
+// 관리자 계정
+model Administrator {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+}
+
 // 문의하기 주체
 enum InquiryType {
   seller // 판매자
