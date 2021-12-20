@@ -14,20 +14,22 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  Administrator,
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
-  Administrator,
 } from '@prisma/client';
 import {
   AdminBroadcasterSettlementInfoList,
   AdminSettlementInfoType,
+  AdminSignUpDto,
   BroadcasterDTO,
   BroadcasterSettlementInfoConfirmationDto,
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
   CreateManyBroadcasterSettlementHistoryDto,
+  EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
   GoodsByIdRes,
@@ -38,8 +40,6 @@ import {
   OrderCancelRequestList,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
-  EmailDupCheckDto,
-  AdminSignUpDto,
 } from '@project-lc/shared-types';
 import { BroadcasterSettlementHistoryService } from '../broadcaster/broadcaster-settlement-history.service';
 import { BroadcasterSettlementService } from '../broadcaster/broadcaster-settlement.service';
@@ -48,8 +48,8 @@ import { OrderCancelService } from '../order-cancel/order-cancel.service';
 import { SellerSettlementService } from '../seller/seller-settlement.service';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
-import { AdminSettlementService } from './admin-settlement.service';
 import { AdminAccountService } from './admin-account.service';
+import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
 
 @UseGuards(JwtAuthGuard)
