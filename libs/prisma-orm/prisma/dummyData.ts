@@ -38,9 +38,8 @@ export const COMMON_DUMMY_PASSWORD =
   '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY';
 
 /** 관리자 생성 데이터 */
-export const testadminData: Prisma.SellerCreateInput = {
+export const testadminData: Prisma.AdministratorCreateInput = {
   email: TEST_ADMIN_EMAIL,
-  name: 'test관리자',
   password: COMMON_DUMMY_PASSWORD,
 };
 
