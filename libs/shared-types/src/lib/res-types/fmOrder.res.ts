@@ -1,4 +1,5 @@
 import { fmOrderStatuses } from '../constants/fmOrderStatuses';
+import { FmExport } from './fmExport.res';
 
 /**
  * 퍼스트몰 주문 정보
@@ -702,6 +703,9 @@ export type FmOrderExport = FmOrderExportBase & {
 };
 
 export interface FmOrderExportItemOption {
+  export_code: FmExport['export_code'];
+  /** 해당 옵션의 상품 고유 번호 */
+  goods_seq: string;
   /**
    * 해당 옵션의 상품 이름
    */

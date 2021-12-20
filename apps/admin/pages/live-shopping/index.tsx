@@ -14,6 +14,7 @@ export default function LiveShopping(): JSX.Element {
 
   return (
     <AdminPageLayout>
+      {/* 라이브쇼핑 목록 */}
       <AdminLiveShoppingList setSelectedGoods={setSelectedGoods} />
       {/* 라이브 쇼핑의 선물하기 목록 */}
       <Box borderWidth="1px" borderRadius="lg" p={7} m={7}>
