@@ -230,8 +230,8 @@ export class AdminController {
     return this.broadcasterSettlementService.getBroadcasterSettlementInfoList();
   }
 
-  /** 방송인 정산등록정보 검수상태, 사유 수정 */
-  @Patch('settlement-info/broadcaster/confirmation')
+  /** 방송인 정산정보 검수상태, 사유 수정 */
+  @Patch('/settlement-info/broadcaster/confirmation')
   setBroadcasterSettlementInfoConfirmation(
     @Body()
     dto: BroadcasterSettlementInfoConfirmationDto,
