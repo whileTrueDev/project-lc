@@ -26,7 +26,7 @@ export const useBroadcasterSignupMutation = (): UseMutationResult<
   );
 };
 
-/** 방송인 생성 훅 */
+/** 관리자 생성 훅 */
 export const useAdministratorSignupMutation = (): UseMutationResult<
   Administrator,
   AxiosError,

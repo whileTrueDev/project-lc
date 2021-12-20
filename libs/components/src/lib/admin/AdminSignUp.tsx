@@ -36,7 +36,7 @@ export function AdminSignUp(): JSX.Element {
     watch,
   } = useForm<AdminSignUpDto & { repassword: string }>();
 
-  // * 인증코드 메일 보내기 mutation 요청
+  // * 관리자 회원가입 유효성 체크
   const checkValidation = useCallback(async (): Promise<boolean> => {
     const isValid = await trigger();
     if (isValid) {

@@ -63,7 +63,7 @@ export class AdminController {
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
   ) {}
 
-  // * 판매자 회원가입
+  // * 관리자 회원가입
   @Post()
   public async signUp(@Body(ValidationPipe) dto: AdminSignUpDto): Promise<Administrator> {
     const administrator = await this.adminAccountService.signUp(dto);
