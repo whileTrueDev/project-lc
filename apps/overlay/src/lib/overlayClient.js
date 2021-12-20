@@ -5,7 +5,7 @@ const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
 const iterateLimit = $('#primary-info').data('number') + 1;
-const userId = $('#primary-info').data('userid');
+const email = $('#primary-info').data('email');
 let streamerAndProduct;
 
 let startDate = new Date('2021-09-27T14:05:00+0900');
@@ -185,7 +185,7 @@ async function switchImage() {
     $('.vertical-banner')
       .attr(
         'src',
-        `https://lc-project.s3.ap-northeast-2.amazonaws.com/vertical-banner/${userId}/vertical-banner-${bannerId}.png`,
+        `https://lc-project.s3.ap-northeast-2.amazonaws.com/vertical-banner/${email}/vertical-banner-${bannerId}.png`,
       )
       .fadeIn(1000);
   }, 1000);
@@ -332,7 +332,7 @@ socket.on('get right-top purchase message', async (data) => {
     }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="item">
       <div class="centered">
-        <img src="https://lc-project.s3.ap-northeast-2.amazonaws.com/donation-images/${userId}/${
+        <img src="https://lc-project.s3.ap-northeast-2.amazonaws.com/donation-images/${email}/${
     alarmType === '2' ? 'donation-2.gif' : 'donation-1.gif'
   }" class="donation-image" />  
         <div class ="animated heartbeat" id="donation-top">

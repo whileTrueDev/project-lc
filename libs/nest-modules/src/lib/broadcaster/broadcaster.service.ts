@@ -15,7 +15,7 @@ import { throwError } from 'rxjs';
 export class BroadcasterService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getUserId(overlayUrl: string): Promise<{ userId: string }> {
+  async getBroadcasterEmail(overlayUrl: string): Promise<{ email: string }> {
     const email = await this.prisma.broadcaster.findUnique({
       select: {
         email: true,
@@ -27,7 +27,7 @@ export class BroadcasterService {
     if (!email) {
       throwError('Fail to get userId by overlayUrl');
     }
-    return { userId: email.email };
+    return { email: email.email };
   }
 
   async getAllBroadcasterIdAndNickname(): Promise<BroadcasterDTO[]> {

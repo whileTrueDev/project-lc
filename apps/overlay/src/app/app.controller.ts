@@ -7,11 +7,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OverlayService, BroadcasterService } from '@project-lc/nest-modules';
-import { UserId } from '@project-lc/shared-types';
+import { BroadcasterEmail } from '@project-lc/shared-types';
 
 interface ImagesLengthAndUserId {
   verticalImagesLength: number;
-  userId: UserId;
+  email: BroadcasterEmail;
 }
 @Controller()
 export class AppController {
@@ -36,11 +36,11 @@ export class AppController {
   async getRender(@Param('id') id: string): Promise<ImagesLengthAndUserId> {
     const overlayUrl = `/${id}`;
     try {
-      const userId = await this.broadcasterService.getUserId(overlayUrl);
+      const email = await this.broadcasterService.getBroadcasterEmail(overlayUrl);
       const verticalImagesLength = await this.overlayService.getVerticalImagesFromS3(
-        userId,
+        email,
       );
-      return { verticalImagesLength, userId };
+      return { verticalImagesLength, email };
     } catch {
       throw new NotFoundException('user not found');
     }

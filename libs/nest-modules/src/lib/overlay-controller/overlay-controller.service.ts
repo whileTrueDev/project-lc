@@ -7,9 +7,12 @@ import { throwError } from 'rxjs';
 export class OverlayControllerService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getCreatorUrls(): Promise<{ userNickname: string; overlayUrl: string }[]> {
+  async getCreatorUrls(): Promise<
+    { email: string; userNickname: string; overlayUrl: string }[]
+  > {
     const urlAndNickname = await this.prisma.broadcaster.findMany({
       select: {
+        email: true,
         userNickname: true,
         overlayUrl: true,
       },
@@ -23,19 +26,19 @@ export class OverlayControllerService {
     const text = data.message;
     const price = data.purchaseNum;
     const { loginFlag } = data;
-    const broadcasterEmail = data.userId;
+    const broadcasterEmail = data.email;
     const { phoneCallEventFlag } = data;
     const { giftFlag } = data;
-
+    console.log(data);
     const writePurchaseMessage = await this.prisma.liveCommerceRanking.create({
       data: {
         nickname,
         text,
         price,
         loginFlag,
-        broadcasterEmail,
         phoneCallEventFlag,
         giftFlag,
+        broadcaster: { connect: { email: broadcasterEmail } },
       },
     });
     if (!writePurchaseMessage) throwError('Cannot upload data');

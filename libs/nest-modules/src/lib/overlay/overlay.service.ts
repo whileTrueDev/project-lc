@@ -8,7 +8,7 @@ import {
   NicknameAndText,
   PriceSum,
   PurchaseMessage,
-  UserId,
+  BroadcasterEmail,
   Voice,
 } from '@project-lc/shared-types';
 import { S3 } from '@aws-sdk/client-s3';
@@ -149,15 +149,15 @@ export class OverlayService {
     return messageAndNickname;
   }
 
-  async getVerticalImagesFromS3(userId: UserId): Promise<number> {
+  async getVerticalImagesFromS3(email: BroadcasterEmail): Promise<number> {
     const { S3_BUCKET_NAME } = process.env;
 
-    const broadcasterId = userId.userId;
+    const broadcasterEmail = email.email;
     let imagesUrls = 0;
 
     const listingParams = {
       Bucket: S3_BUCKET_NAME,
-      Prefix: `vertical-banner/${broadcasterId}/`,
+      Prefix: `vertical-banner/${broadcasterEmail}/`,
     };
 
     await this.s3

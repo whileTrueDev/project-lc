@@ -100,8 +100,8 @@ export interface GoogleTTSCredentials {
   [keys: string]: { private_key: string; client_email: string };
 }
 
-export interface UserId {
-  userId: string;
+export interface BroadcasterEmail {
+  email: string;
 }
 
 export interface StreamerAndProduct {

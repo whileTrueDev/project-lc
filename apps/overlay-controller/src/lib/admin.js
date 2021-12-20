@@ -3,7 +3,7 @@
 /* eslint no-undef: "error" */
 
 let roomName;
-let userId;
+let email;
 let streamerNickname;
 let isLogin = true;
 const socket = io(process.env.HOST, { transports: ['websocket'] });
@@ -31,7 +31,7 @@ $(document).ready(function ready() {
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
     streamerNickname = $(this).closest('tr').prop('id');
     const url = $(this).closest('tr').children('td.url-cell').attr('id');
-    userId = $(this).closest('tr').children('td.userid-cell').attr('id');
+    email = $(this).closest('tr').children('td.email-cell').attr('id');
 
     $('#creator-name').text(streamerNickname);
 
@@ -39,6 +39,7 @@ $(document).ready(function ready() {
       roomName: socket.id,
       url,
     });
+
     roomName = url.split('/').pop();
   });
 
@@ -195,10 +196,10 @@ $(document).ready(function ready() {
     } else {
       level = '2';
     }
-
+    console.log(email);
     const messageJson = JSON.stringify({
       level,
-      userId,
+      email,
       loginFlag: isLogin,
       productName,
       purchaseNum: soldPrice,
