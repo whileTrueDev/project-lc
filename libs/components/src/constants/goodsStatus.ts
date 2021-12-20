@@ -1,8 +1,8 @@
 import {
-  RunoutPolicy,
+  GoodsConfirmationStatuses,
   GoodsStatus,
   GoodsView,
-  GoodsConfirmationStatuses,
+  RunoutPolicy,
 } from '@prisma/client';
 
 // 재고에 따른 판매 설정
@@ -35,7 +35,7 @@ export const GOODS_CONFIRMATION_STATUS: Record<
   GoodsConfirmationStatuses,
   { label: string; colorScheme?: string }
 > = {
-  waiting: { label: '대기' },
+  waiting: { label: '대기', colorScheme: 'gray' },
   confirmed: { label: '승인', colorScheme: 'green' },
   rejected: { label: '거절', colorScheme: 'red' },
   needReconfirmation: { label: '재검수 대기' },

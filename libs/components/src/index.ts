@@ -20,6 +20,7 @@ export * from './lib/BroadcasterAutocomplete';
 export * from './lib/BroadcasterChannelButton';
 export * from './lib/BroadcasterChannelSection';
 export * from './lib/BroadcasterContact';
+export * from './lib/BroadcasterIncome';
 export * from './lib/BroadcasterLiveShoppingList';
 export * from './lib/BroadcasterName';
 export * from './lib/BroadcasterNickName';

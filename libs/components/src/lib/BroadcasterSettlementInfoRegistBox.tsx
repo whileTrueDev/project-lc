@@ -31,7 +31,7 @@ export const TAX_TYPE: Record<TaxationType, string> = {
 };
 
 /** 정산정보 검수상태, 반려사유 표시 */
-function BroadcasterSettlementConfirmationDisplay({
+export function BroadcasterSettlementConfirmationDisplay({
   confirmation,
 }: {
   confirmation: BroadcasterSettlementInfoConfirmation;
@@ -99,9 +99,9 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
 
   return (
     <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
-      <Flex direction={['column', 'row']} justifyContent="space-between" mb={3}>
+      <Flex direction={['column', 'row']} justifyContent="space-between" mb={3} gap={3}>
         <Text fontSize="lg" fontWeight="medium">
-          정산 정보
+          정산 등록 정보
         </Text>
 
         <Button size="sm" onClick={onOpen} colorScheme="blue">
@@ -141,7 +141,7 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
             <Text>계약자 정보</Text>
             <Grid
               templateColumns="2fr 3fr"
-              borderTopColor="gray.100"
+              borderTopColor="gray.500"
               borderTopWidth={1.5}
             >
               <GridTableItem title="과세유형" value={TAX_TYPE[settlementInfoData.type]} />
@@ -169,7 +169,7 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
             <Text>정산계좌정보</Text>
             <Grid
               templateColumns="2fr 3fr"
-              borderTopColor="gray.100"
+              borderTopColor="gray.500"
               borderTopWidth={1.5}
             >
               <GridTableItem title="예금주" value={settlementInfoData.accountHolder} />

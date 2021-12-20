@@ -116,6 +116,18 @@ export class BroadcasterController {
     return this.channelService.getBroadcasterChannelList(broadcasterId);
   }
 
+  /** 방송인 누적 정산 금액 조회 */
+  @UseGuards(JwtAuthGuard)
+  @Get('/:broadcasterId/accumulated-settlement-amount')
+  public async findAccumulatedSettlementAmount(
+    @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
+  ): Promise<number> {
+    const acc = await this.settlementHistoryService.findAccumulatedSettlementAmount(
+      broadcasterId,
+    );
+    return acc._sum.amount;
+  }
+
   /** 방송인 활동명 수정 */
   @UseGuards(JwtAuthGuard)
   @Put('nickname')
@@ -212,7 +224,7 @@ export class BroadcasterController {
     );
   }
 
-  /** 방송인 정산정보 등록 */
+  /** 방송인 정산등록정보 등록 */
   @UseGuards(JwtAuthGuard)
   @Post('settlement-info')
   public async insertSettlementInfo(
@@ -221,7 +233,7 @@ export class BroadcasterController {
     return this.broadcasterSettlementService.insertSettlementInfo(dto);
   }
 
-  /** 방송인 정산정보 조회 */
+  /** 방송인 정산등록정보 조회 */
   @UseGuards(JwtAuthGuard)
   @Get('settlement-info/:broadcasterId')
   public async selectBroadcasterSettlementInfo(

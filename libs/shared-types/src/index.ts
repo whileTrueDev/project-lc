@@ -75,6 +75,7 @@ export * from './lib/front-type/orderFilterFormType';
 export * from './lib/overlay-controller/overlay-controller-types';
 export * from './lib/overlay/overlay-types';
 export * from './lib/res-types/broadcasterSettlementInfoList.res';
+export * from './lib/res-types/broadcasterSettlementReceivableAmount.res';
 export * from './lib/res-types/broadcasterSettlementTargets.res';
 export * from './lib/res-types/findBCSettlementHistories.res';
 export * from './lib/res-types/findBroadcaster.res';
