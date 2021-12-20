@@ -82,7 +82,7 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
     <Container maxW="container.lg">
       <Heading>문의사항을 남겨주세요</Heading>
       <Text m={3} color="red.500">
-        * 표시는 필수 입력 사항입니다.
+        - 빨간 글자는 필수 입력 사항입니다.
       </Text>
       <FormProvider {...methods}>
         <Grid
@@ -95,21 +95,28 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
           onSubmit={handleSubmit(regist)}
         >
           <GridItem rowSpan={1} colSpan={1}>
-            <FormControl isRequired>
-              <FormLabel>{type === 'seller' ? '이름' : '활동명'}</FormLabel>
+            <FormControl>
+              <FormLabel color="red.500">
+                {type === 'seller' ? '이름' : '활동명'}
+              </FormLabel>
               <Input
                 placeholder={type === 'seller' ? '홍길동' : '홍길동tv'}
-                {...register('name')}
+                {...register('name', {
+                  required: { value: true, message: '이름을 입력해주세요.' },
+                })}
               />
             </FormControl>
           </GridItem>
           <GridItem rowSpan={1} colSpan={1}>
-            <FormControl isInvalid={!!errors.email} isRequired>
-              <FormLabel>이메일</FormLabel>
+            <FormControl isInvalid={!!errors.email}>
+              <FormLabel color="red.500">이메일</FormLabel>
               <Input
                 placeholder="minsu@example.com"
                 autoComplete="off"
-                {...register('email', { ...emailRegisterOptions })}
+                {...register('email', {
+                  ...emailRegisterOptions,
+                  required: { value: true, message: '이메일을 입력해주세요.' },
+                })}
               />
               <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
             </FormControl>
@@ -151,8 +158,8 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
           </GridItem>
           <GridItem rowSpan={1} colSpan={1} />
           <GridItem rowSpan={1} colSpan={3}>
-            <FormControl isRequired>
-              <FormLabel>내용</FormLabel>
+            <FormControl>
+              <FormLabel color="red.500">내용</FormLabel>
               <Textarea
                 resize="none"
                 placeholder={
@@ -166,6 +173,7 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
                     value: 500,
                     message: '500자 이하로 작성해주세요.',
                   },
+                  required: { value: true, message: '문의내용을 입력해주세요' },
                 })}
               />
               <Text as="em" color="red.300">

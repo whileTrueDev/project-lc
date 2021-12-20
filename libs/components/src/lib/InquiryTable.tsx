@@ -176,32 +176,32 @@ export function InquiryTable(): JSX.Element {
                 <Stack direction="column" p={2} spacing={5}>
                   <Stack direction="row">
                     <Text>문의자</Text>
-                    <Text fontWeight="bold">{data[inquiryIndex].name}</Text>
-                    {data[inquiryIndex].type === 'seller' ? (
+                    <Text fontWeight="bold">{data[inquiryIndex]?.name}</Text>
+                    {data[inquiryIndex]?.type === 'seller' ? (
                       <Badge colorScheme="green">판매자</Badge>
                     ) : (
                       <Badge colorScheme="red">방송인</Badge>
                     )}
                   </Stack>
-                  {data[inquiryIndex].brandName && (
+                  {data[inquiryIndex]?.brandName && (
                     <Stack direction="row">
                       <Text>
                         {data[inquiryIndex].type === 'seller' ? '브랜드명' : '활동플랫폼'}
                       </Text>
-                      <Text fontWeight="bold">{data[inquiryIndex].brandName}</Text>
+                      <Text fontWeight="bold">{data[inquiryIndex]?.brandName}</Text>
                     </Stack>
                   )}
 
-                  {data[inquiryIndex].homepage && (
+                  {data[inquiryIndex]?.homepage && (
                     <Stack direction="row">
                       <Text>URL</Text>
                       <Link href={data[inquiryIndex].homepage || ''} isExternal>
-                        {data[inquiryIndex].homepage} <ExternalLinkIcon mx="2px" />
+                        {data[inquiryIndex]?.homepage} <ExternalLinkIcon mx="2px" />
                       </Link>
                     </Stack>
                   )}
                   <Box bgColor="gray.200" p={5} borderRadius={10}>
-                    <Text>{data[inquiryIndex].content}</Text>
+                    <Text>{data[inquiryIndex]?.content}</Text>
                   </Box>
                 </Stack>
               </ModalBody>
