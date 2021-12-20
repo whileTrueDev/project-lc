@@ -93,4 +93,13 @@ export class BroadcasterSettlementHistoryService {
       },
     });
   }
+
+  /** 누적 정산 금액 조회 */
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  public async findAccumulatedSettlementAmount(broadcasterId: Broadcaster['id']) {
+    return this.prisma.broadcasterSettlementItems.aggregate({
+      where: { settlements: { broadcasterId } },
+      _sum: { amount: true },
+    });
+  }
 }
