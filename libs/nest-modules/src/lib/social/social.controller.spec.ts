@@ -15,6 +15,7 @@ import { KakaoApiService } from './platform-api/kakao-api.service';
 import { NaverApiService } from './platform-api/naver-api.service';
 import { SocialController } from './social.controller';
 import { SocialService } from './social.service';
+import { AdminModule } from '../admin/admin.module';
 
 describe('SocialController', () => {
   let controller: SocialController;
@@ -24,6 +25,7 @@ describe('SocialController', () => {
       imports: [
         PrismaModule,
         AuthModule,
+        AdminModule,
         ConfigModule.forRoot({ isGlobal: true }),
         JwtModule.register({
           secret: 'test',

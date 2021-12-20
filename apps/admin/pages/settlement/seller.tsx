@@ -10,6 +10,9 @@ export function SettlementIndex(): JSX.Element {
   return (
     <AdminPageLayout>
       <Stack p={6} spacing={4}>
+        <Heading as="h3" size="lg">
+          판매자 정산 처리
+        </Heading>
         {/* 기본판매수수료율 */}
         <SettlementSellCommissionInfo />
 

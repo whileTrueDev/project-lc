@@ -14,6 +14,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  Administrator,
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
@@ -21,12 +22,14 @@ import {
 import {
   AdminBroadcasterSettlementInfoList,
   AdminSettlementInfoType,
+  AdminSignUpDto,
   BroadcasterDTO,
   BroadcasterSettlementInfoConfirmationDto,
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
   CreateManyBroadcasterSettlementHistoryDto,
+  EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
   GoodsByIdRes,
@@ -45,6 +48,7 @@ import { OrderCancelService } from '../order-cancel/order-cancel.service';
 import { SellerSettlementService } from '../seller/seller-settlement.service';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
+import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
 
@@ -56,11 +60,27 @@ export class AdminController {
     private readonly adminService: AdminService,
     private readonly broadcasterService: BroadcasterService,
     private readonly adminSettlementService: AdminSettlementService,
+    private readonly adminAccountService: AdminAccountService,
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly orderCancelService: OrderCancelService,
     private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
   ) {}
+
+  // * 관리자 회원가입
+  @Post()
+  public async signUp(@Body(ValidationPipe) dto: AdminSignUpDto): Promise<Administrator> {
+    const administrator = await this.adminAccountService.signUp(dto);
+    return administrator;
+  }
+
+  // * 이메일 주소 중복 체크
+  @Get('email-check')
+  public async emailDupCheck(
+    @Query(ValidationPipe) dto: EmailDupCheckDto,
+  ): Promise<boolean> {
+    return this.adminAccountService.isEmailDupCheckOk(dto.email);
+  }
 
   /** 판매자 정산 등록 정보 조회 */
   @Get('/settlement')

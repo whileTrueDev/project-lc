@@ -728,3 +728,30 @@ model SellerOrderCancelRequestItem {
   sellerOrderCancelRequest SellerOrderCancelRequest @relation(fields: [orderSeq], references: [id], onDelete: Cascade)
   orderSeq                 Int
 }
+
+// 관리자 계정
+model Administrator {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+}
+
+// 문의하기 주체
+enum InquiryType {
+  seller // 판매자
+  broadcaster // 방송인
+}
+
+// 문의하기 테이블
+model Inquiry {
+  id          Int         @id @default(autoincrement())
+  name        String // 문의자 명
+  email       String // 문의자 이메일
+  content     String      @db.LongText // 내용
+  phoneNumber String? // 문의자 휴대전화
+  brandName   String? // 문의자 브랜드 이름
+  homepage    String? // 문의자 홈페이지
+  type        InquiryType
+  createDate  DateTime    @default(now())
+  readFlag    Boolean?    @default(false) // 관리자 처리 여부 
+}

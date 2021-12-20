@@ -8,18 +8,22 @@ const columns: GridColumns = [
   {
     field: 'sellerEmail',
     headerName: '광고주 이메일',
+    minWidth: 230,
   },
   {
     field: 'bank',
     headerName: '은행명',
+    minWidth: 230,
   },
   {
     field: 'number',
     headerName: '계좌번호',
+    minWidth: 230,
   },
   {
     field: 'name',
     headerName: '예금주',
+    minWidth: 230,
   },
   {
     field: 'settlementAccountImageName',
@@ -27,6 +31,7 @@ const columns: GridColumns = [
     renderCell: (params) => (
       <AdminImageDownloadButton row={params.row} type="settlement-account" />
     ),
+    minWidth: 230,
   },
 ];
 

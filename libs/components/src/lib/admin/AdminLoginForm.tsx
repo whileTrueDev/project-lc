@@ -10,7 +10,10 @@ import {
   FormLabel,
   Input,
   Stack,
+  Link,
+  useColorModeValue,
 } from '@chakra-ui/react';
+import NextLink from 'next/link';
 import { useLoginMutation } from '@project-lc/hooks';
 import { LoginUserDto } from '@project-lc/shared-types';
 import { getAdminHost } from '@project-lc/utils';
@@ -37,14 +40,13 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
     setFormError('');
   }
 
-  // * 로그인 핸들러 -> admin으로 변경이 필요함.
   const login = useLoginMutation('admin');
   const onSubmit = useCallback(
     async (data: LoginUserDto) => {
       const user = await login
         .mutateAsync({ ...data, stayLogedIn: true })
         .catch((err) => {
-          setFormError(getMessage(err?.response.data?.statusCode));
+          setFormError(getMessage(err?.response.data?.status));
         });
       if (user) {
         router.push(`${getAdminHost()}/admin`);
@@ -112,6 +114,17 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
             로그인
           </Button>
         </Box>
+      </Stack>
+      <Stack spacing={1} mt={2}>
+        <NextLink href="/signup" passHref>
+          <Link
+            ml={2}
+            color={useColorModeValue('blue.500', 'blue.400')}
+            textDecoration="underline"
+          >
+            가입하기
+          </Link>
+        </NextLink>
       </Stack>
     </CenterBox>
   );
