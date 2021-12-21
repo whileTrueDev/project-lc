@@ -3,7 +3,7 @@ import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
 import { useAdminBroadcaster } from '@project-lc/hooks';
 import { useState, useMemo } from 'react';
 import { boxStyle } from '../../constants/commonStyleProps';
-import { ChakraDataGrid } from '../ChakraDataGrid';
+import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import { escapeRegExp } from '../QuickSearchInput';
 import {
   UserSearhToolbar,
