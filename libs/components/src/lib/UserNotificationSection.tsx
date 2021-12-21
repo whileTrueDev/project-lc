@@ -3,6 +3,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  useColorModeValue,
   Text,
   Box,
   Stack,
@@ -80,6 +81,8 @@ export function UserNotificationSection(): JSX.Element {
     return data.filter((item) => item.readState === false).length;
   }, [data]);
 
+  const hoverColor = useColorModeValue('gray.50', 'gray.700');
+
   return (
     <Menu isLazy closeOnSelect={false}>
       {/* 종모양 버튼 */}
@@ -95,18 +98,33 @@ export function UserNotificationSection(): JSX.Element {
         }
       />
 
-      <MenuList w={{ base: 280, sm: 300 }}>
-        <Stack direction="row" alignItems="center" justifyContent="flex-end" pr={2}>
-          <UnreadNotification />
-          <Text fontWeight="normal">클릭시 읽음처리 됩니다</Text>
+      <MenuList w={{ base: 280, sm: 400 }} minH={300} maxH={600} overflow="auto">
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-end"
+          pr={2}
+          pb={2}
+        >
+          <Text fontSize="sm" color="gray.500">
+            클릭시 읽음처리 됩니다
+          </Text>
         </Stack>
 
         {/* 알림메시지 목록 */}
         {data &&
           data.map((noti) => (
-            <MenuItem key={noti.id} onClick={() => markAsRead(noti)}>
+            <Box
+              cursor={noti.readState ? 'default' : 'pointer'}
+              p={4}
+              _hover={noti.readState ? undefined : { backgroundColor: hoverColor }}
+              key={noti.id}
+              onClick={() => {
+                if (!noti.readState) markAsRead(noti);
+              }}
+            >
               <NotificationItem item={noti} />
-            </MenuItem>
+            </Box>
           ))}
       </MenuList>
     </Menu>
