@@ -40,6 +40,7 @@ import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { ConfirmDialog } from '../ConfirmDialog';
 
+/** 판매자 정산 대상 목록 */
 export function SettlementTargetList(): JSX.Element | null {
   const dialog = useDisclosure();
   const targets = useSettlementTargets();

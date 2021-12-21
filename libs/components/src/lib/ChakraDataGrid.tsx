@@ -28,9 +28,16 @@ function CustomDataGrid(props: DataGridProps): JSX.Element {
       },
       '& .MuiTablePagination-root': {
         color: useColorModeValue('inherit', 'white'),
+        '& .Mui-disabled svg.MuiSvgIcon-root': { color: 'inherit' },
+        '& svg.MuiSvgIcon-root': {
+          color: useColorModeValue('inherit', 'white'),
+        },
       },
       '& .MuiDataGrid-cell .chakra-switch': {
         boxSizing: 'unset',
+      },
+      '& .MuiDataGrid-overlay': {
+        backgroundColor: useColorModeValue('white', theme.colors.gray[800]),
       },
     },
   });

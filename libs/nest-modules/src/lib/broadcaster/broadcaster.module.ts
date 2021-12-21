@@ -1,11 +1,12 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { AuthModule } from '../auth/auth.module';
-import { BroadcasterService } from './broadcaster.service';
-import { BroadcasterController } from './broadcaster.controller';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
+import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-history.service';
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
+import { BroadcasterController } from './broadcaster.controller';
+import { BroadcasterService } from './broadcaster.service';
 
 @Module({
   imports: [forwardRef(() => AuthModule), PrismaModule],
@@ -14,8 +15,15 @@ import { BroadcasterSettlementService } from './broadcaster-settlement.service';
     BroadcasterService,
     BroadcasterContactsService,
     BroadcasterChannelService,
+    BroadcasterSettlementHistoryService,
     BroadcasterSettlementService,
   ],
-  exports: [BroadcasterService, BroadcasterChannelService, BroadcasterSettlementService],
+  exports: [
+    BroadcasterService,
+    BroadcasterChannelService,
+    BroadcasterSettlementHistoryService,
+    BroadcasterSettlementService,
+    BroadcasterSettlementHistoryService,
+  ],
 })
 export class BroadcasterModule {}

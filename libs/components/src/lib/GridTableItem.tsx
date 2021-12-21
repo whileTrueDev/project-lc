@@ -5,7 +5,7 @@ import { GridItem, useColorModeValue } from '@chakra-ui/react';
 
 type settlementTableItemProps = {
   title: string;
-  value: string | number | JSX.Element;
+  value: string | number | JSX.Element | null;
 };
 
 export function useTableHeaderConfig(useColorMode: typeof useColorModeValue) {

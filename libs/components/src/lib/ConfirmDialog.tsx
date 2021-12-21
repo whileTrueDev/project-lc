@@ -20,6 +20,7 @@ export interface ConfirmDialogProps
   isLoading?: boolean;
   cancelString?: string;
   confirmString?: string;
+  isDisabled?: boolean;
 }
 export function ConfirmDialog({
   title,
@@ -29,6 +30,7 @@ export function ConfirmDialog({
   isLoading,
   cancelString = '취소',
   confirmString = '확인',
+  isDisabled = false,
   children,
 }: ConfirmDialogProps): JSX.Element {
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -53,6 +55,7 @@ export function ConfirmDialog({
               colorScheme="green"
               onClick={() => onConfirm().then(() => onClose())}
               isLoading={isLoading}
+              isDisabled={isDisabled}
             >
               {confirmString}
             </Button>

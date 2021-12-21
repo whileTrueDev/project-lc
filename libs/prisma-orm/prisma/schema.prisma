@@ -488,6 +488,7 @@ model Broadcaster {
   broadcasterAddress          BroadcasterAddress?
   channels                    BroadcasterChannel[]
   BroadcasterSettlementInfo   BroadcasterSettlementInfo?
+  BroadcasterSettlements      BroadcasterSettlements[]
 }
 
 // 방송인 소셜로그인 계정
@@ -539,7 +540,33 @@ model BroadcasterChannel {
   broadcasterId Int
 }
 
-// 방송인 정산을 위한 계약자, 계좌정보(방송인 정산정보)
+// 방송인 정산 내역
+model BroadcasterSettlements {
+  id    Int      @id @default(autoincrement()) // 정산 내역 고유 번호
+  round String // 정산회차 연도/월/차수 (YYYY/MM/0차)
+  date  DateTime @default(now()) // 정산마감일: 정산이 마감된 날짜 = 정산 시점
+
+  broadcasterId              Int
+  broadcaster                Broadcaster                  @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+  broadcasterSettlementItems BroadcasterSettlementItems[]
+
+  @@unique([broadcasterId, round])
+}
+
+// 방송인 정산 내역 - 주문(출고)정보
+model BroadcasterSettlementItems {
+  id         Int    @id @default(autoincrement())
+  orderId    String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
+  exportCode String // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_code)
+  amount     Int    @default(0) // 총 정산 수익 금액
+
+  liveShoppingId           Int?
+  liveShopping             LiveShopping?          @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
+  broadcasterSettlementsId Int
+  settlements              BroadcasterSettlements @relation(fields: [broadcasterSettlementsId], references: [id], onDelete: Cascade)
+}
+
+// 방송인 정산을 위한 계약자, 계좌정보(방송인 정산등록정보)
 model BroadcasterSettlementInfo {
   id                    Int                                    @id @default(autoincrement())
   type                  TaxationType                           @default(naturalPerson) // 과세유형 (개인 | 개인사업자) 
@@ -559,7 +586,7 @@ model BroadcasterSettlementInfo {
   confirmation          BroadcasterSettlementInfoConfirmation?
 }
 
-// 방송인 정산정보 검수여부
+// 방송인 정산 등록 정보 검수여부
 model BroadcasterSettlementInfoConfirmation {
   id               Int                        @id @default(autoincrement())
   status           BusinessRegistrationStatus @default(waiting)
@@ -568,7 +595,7 @@ model BroadcasterSettlementInfoConfirmation {
   settlementInfoId Int                        @unique
 }
 
-// 방송인 정산정보 - 계약자 과세유형
+// 방송인 정산 등록 정보 - 계약자 과세유형
 enum TaxationType {
   naturalPerson // 개인(사업소득)
   selfEmployedBusiness // 개인사업자
@@ -578,25 +605,25 @@ enum TaxationType {
 // 라이브 쇼핑
 // -------------------------------------------------
 model LiveShopping {
-  id                        Int                       @id @default(autoincrement())
-  broadcasterId             Int? //방송인의 아이디 
-  sellerId                  Int // 판매자 ID
-  goodsId                   Int // 상품 ID
-  videoId                   Int?
-  contactId                 Int // 판매자 등록된 연락처 ID
-  requests                  String?                   @db.LongText // 요청사항
-  progress                  LiveShopppingProgressType @default(registered) // 진행상태
-  broadcastStartDate        DateTime? // 라이브 방송 시작 시간
-  broadcastEndDate          DateTime? // 라이브 방송 종료 시간
-  sellStartDate             DateTime? // 라이브커머스 상품판매 시작 시간
-  sellEndDate               DateTime? // 라이브커머스 상품판매 종료 시간
-  createDate                DateTime                  @default(now())
-  rejectionReason           String?                   @db.Text // 방송 취소 또는 거절 사유
-  broadcasterCommissionRate Decimal                   @default("0") @db.Decimal(10, 2) // 판매금 중, 방송인이 가져가는 수수료 (0%~100% 사이값)
-  whiletrueCommissionRate   Decimal                   @default("0") @db.Decimal(10, 2) // 판매금 중, project-lc(와일트루)가 가져가는 수수료 (0%~100% 사이값)
-  desiredCommission         Decimal?                  @default("0") @db.Decimal(10, 2) // 희망판매수수료
-  desiredPeriod             String?                   @default("무관") // 희망 진행 기간
-
+  id                          Int                           @id @default(autoincrement())
+  broadcasterId               Int? //방송인의 아이디 
+  sellerId                    Int // 판매자 ID
+  goodsId                     Int // 상품 ID (project-lc goods Id)
+  fmGoodsSeq                  Int?                          @unique // 퍼스트몰 상품 ID 라이브쇼핑진행을 위해 생성한 퍼스트몰 상품의 고유번호 (fm_goods.goods_seq)
+  videoId                     Int?
+  contactId                   Int // 판매자 등록된 연락처 ID
+  requests                    String?                       @db.LongText // 요청사항
+  progress                    LiveShopppingProgressType     @default(registered) // 진행상태
+  broadcastStartDate          DateTime? // 라이브 방송 시작 시간
+  broadcastEndDate            DateTime? // 라이브 방송 종료 시간
+  sellStartDate               DateTime? // 라이브커머스 상품판매 시작 시간
+  sellEndDate                 DateTime? // 라이브커머스 상품판매 종료 시간
+  createDate                  DateTime                      @default(now())
+  rejectionReason             String?                       @db.Text // 방송 취소 또는 거절 사유
+  broadcasterCommissionRate   Decimal                       @default("0") @db.Decimal(10, 2) // 판매금 중, 방송인이 가져가는 수수료 (0%~100% 사이값)
+  whiletrueCommissionRate     Decimal                       @default("0") @db.Decimal(10, 2) // 판매금 중, project-lc(와일트루)가 가져가는 수수료 (0%~100% 사이값)
+  desiredCommission           Decimal?                      @default("0") @db.Decimal(10, 2) // 희망판매수수료
+  desiredPeriod               String?                       @default("무관") // 희망 진행 기간
   sellerContacts              SellerContacts                @relation(fields: [contactId], references: [id])
   seller                      Seller                        @relation(fields: [sellerId], references: [id])
   goods                       Goods                         @relation(fields: [goodsId], references: [id])
@@ -604,6 +631,7 @@ model LiveShopping {
   liveShoppingVideo           LiveShoppingVideo?            @relation(fields: [videoId], references: [id])
   SellerSettlementItems       SellerSettlementItems[]
   liveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
+  BroadcasterSettlementItems  BroadcasterSettlementItems[]
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -618,7 +646,7 @@ model LiveShoppingPurchaseMessage {
   broadcaster        Broadcaster  @relation(fields: [broadcasterEmail], references: [email])
   broadcasterEmail   String // 스트리머의 아이디 
   createDate         DateTime     @default(now()) // 작성일자
-  liveShopping       LiveShopping @relation(fields: [liveShoppingId], references: [id])
+  liveShopping       LiveShopping @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
   liveShoppingId     Int // 해당 방송의 라이브 쇼핑 Id
 }
 
@@ -700,6 +728,19 @@ model SellerOrderCancelRequestItem {
   amount                   Int // 취소할 주문상품옵션의 개수
   sellerOrderCancelRequest SellerOrderCancelRequest @relation(fields: [orderSeq], references: [id], onDelete: Cascade)
   orderSeq                 Int
+}
+
+// 유저 알림메시지
+model UserNotification {
+  id         Int      @id @default(autoincrement())
+  userEmail  String // 타겟 유저 이메일
+  userType   String // seller, broadcaster
+  title      String // 알림메시지 제목
+  content    String   @db.Text // 알림메시지 내용
+  readFlag   Boolean  @default(false) // 타겟 유저가 알림 읽었는지 여부
+  createDate DateTime @default(now())
+
+  @@index([userEmail, userType])
 }
 
 // 관리자 계정

@@ -1,19 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  BroadcasterSettlementTargetRes,
+  FmExport,
+  FmSettlementTarget,
   FmSettlementTargetBase,
   FmSettlementTargetOptions,
-  FmSettlementTarget,
 } from '@project-lc/shared-types';
 import { FirstmallDbService } from '../firstmall-db.service';
+import { FmExportsService } from '../fm-exports/fm-exports.service';
 
 @Injectable()
 export class FmSettlementService {
   constructor(
     private readonly db: FirstmallDbService,
     private readonly prisma: PrismaService,
+    private readonly exportsService: FmExportsService,
   ) {}
 
+  // * 판매자 정산 대상 목록 조회
   public async findAllSettleTargetList(): Promise<Array<FmSettlementTarget>> {
     const settled = await this.prisma.sellerSettlements.findMany();
 
@@ -112,5 +117,86 @@ export class FmSettlementService {
     }));
 
     return exports;
+  }
+
+  /** 모든 방송인 정산 대상 목록 조회
+   * @param broadcasterId optional. 방송인 고유 아이디. 명시한 경우 해당 방송인의 정산 대상 목록을 조회
+   */
+  public async findBcSettleTargetList(
+    broadcasterId?: number,
+  ): Promise<BroadcasterSettlementTargetRes> {
+    // 방송인 정산 대상 목록이란
+    // "방송인이 명시된 주문에 대한 출고 중, 아직 정산되지 않은 '구매확정'된 상태의 모든 출고"
+
+    // * 앞서 이미 방송인 정산된 출고내역 조회
+    const alreadySettled = await this.prisma.broadcasterSettlementItems.findMany({
+      select: { exportCode: true },
+      where: broadcasterId ? { liveShopping: { broadcasterId } } : undefined,
+    });
+    const alreadySettledExportCodes = alreadySettled.map((s) => s.exportCode);
+
+    // * 라이브쇼핑 정보와 그것에 연결된 fm_goods 정보 조회
+    const liveShoppings = await this.prisma.liveShopping.findMany({
+      where: broadcasterId
+        ? { progress: 'confirmed', broadcasterId }
+        : { progress: 'confirmed', NOT: { broadcasterId: null } },
+      include: {
+        broadcaster: {
+          select: {
+            email: true,
+            id: true,
+            userName: true,
+            userNickname: true,
+            avatar: true,
+            agreementFlag: true,
+          },
+        },
+      },
+    });
+    const liveShoppingFmGoodsSeqs = liveShoppings.map((x) => x.fmGoodsSeq);
+
+    // * 정산 완료되지 않은, 구매완료상태의 출고 내역 조회
+    const sql = `
+    SELECT fm_goods_export.*, order_user_name, recipient_user_name
+    FROM fm_goods_export
+    JOIN fm_order USING(order_seq)
+    WHERE export_code ${
+      alreadySettledExportCodes.length > 0 ? 'NOT IN (?)' : 'IS NOT NULL'
+    }
+    AND buy_confirm != "none" AND confirm_date IS NOT NULL
+    `;
+    const _exports: Array<
+      FmExport & { order_user_name: string; recipient_user_name: string }
+    > = await this.db.query(sql, [alreadySettledExportCodes]);
+
+    // 출고 상세 주문상품 내역 조회
+    const items = await this.exportsService.findExportItemsMany(
+      _exports.map((e) => e.export_code),
+    );
+
+    const result: BroadcasterSettlementTargetRes = _exports
+      .map((exp) => {
+        // * 라이브쇼핑에 연결된 상품에 대한 주문인 지 확인
+        const expItems = items.filter((i) => {
+          return (
+            i.export_code === exp.export_code &&
+            liveShoppingFmGoodsSeqs.includes(Number(i.goods_seq))
+          );
+        });
+
+        // * 라이브쇼핑 정보 첨부
+        const realExpItems = expItems
+          .map((i) => {
+            const ls = liveShoppings.find((l) => l.fmGoodsSeq === Number(i.goods_seq));
+            return { ...i, liveShopping: ls };
+          })
+          .filter((i) => !!i.liveShopping);
+
+        if (realExpItems.length === 0) return null;
+        return { ...exp, items: realExpItems };
+      })
+      .filter((x) => !!x);
+
+    return result;
   }
 }

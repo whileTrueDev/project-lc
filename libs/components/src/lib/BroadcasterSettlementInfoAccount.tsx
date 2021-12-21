@@ -77,7 +77,7 @@ export function BroadcasterSettlementInfoAccount(): JSX.Element {
   return (
     <VStack alignItems="stretch">
       <SectionHeading>정산계좌정보</SectionHeading>
-      <Grid templateColumns="1fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>
+      <Grid templateColumns="1fr 3fr" borderTopColor="gray.500" borderTopWidth={1.5}>
         <GridTableItem
           title="은행"
           value={

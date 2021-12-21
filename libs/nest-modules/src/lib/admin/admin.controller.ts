@@ -14,20 +14,25 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  Administrator,
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
-  Administrator,
 } from '@prisma/client';
 import {
   AdminBroadcasterSettlementInfoList,
+  AdminSellerListRes,
   AdminSettlementInfoType,
+  AdminSignUpDto,
   BroadcasterDTO,
   BroadcasterSettlementInfoConfirmationDto,
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
+  CreateManyBroadcasterSettlementHistoryDto,
+  EmailDupCheckDto,
   ExecuteSettlementDto,
+  FindBcSettlementHistoriesRes,
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
@@ -36,17 +41,17 @@ import {
   OrderCancelRequestList,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
-  EmailDupCheckDto,
-  AdminSignUpDto,
 } from '@project-lc/shared-types';
+import { BroadcasterSettlementHistoryService } from '../broadcaster/broadcaster-settlement-history.service';
 import { BroadcasterSettlementService } from '../broadcaster/broadcaster-settlement.service';
 import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { OrderCancelService } from '../order-cancel/order-cancel.service';
 import { SellerSettlementService } from '../seller/seller-settlement.service';
+import { SellerService } from '../seller/seller.service';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
-import { AdminSettlementService } from './admin-settlement.service';
 import { AdminAccountService } from './admin-account.service';
+import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
 
 @UseGuards(JwtAuthGuard)
@@ -60,7 +65,9 @@ export class AdminController {
     private readonly adminAccountService: AdminAccountService,
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly orderCancelService: OrderCancelService,
+    private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
+    private readonly sellerService: SellerService,
   ) {}
 
   // * 관리자 회원가입
@@ -78,23 +85,41 @@ export class AdminController {
     return this.adminAccountService.isEmailDupCheckOk(dto.email);
   }
 
+  /** 판매자 정산 등록 정보 조회 */
   @Get('/settlement')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getSettlementInfo(): Promise<AdminSettlementInfoType> {
     return this.adminService.getSettlementInfo();
   }
 
+  /** 판매자 정산처리 */
   @Post('/settlement')
   executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
     if (dto.target.options.length === 0) return null;
     return this.sellerSettlementService.executeSettle(dto.sellerEmail, dto);
   }
 
+  /** 판매자 정산 완료 목록 */
   @Get('/settlement-history')
   getSettlementHistory(): ReturnType<SellerSettlementService['findSettlementHistory']> {
     return this.sellerSettlementService.findSettlementHistory();
   }
 
+  /** 방송인 단일 정산처리 */
+  @Post('/settlement/broadcaster')
+  async executeBcSettle(
+    @Body(ValidationPipe) dto: CreateManyBroadcasterSettlementHistoryDto,
+  ): Promise<number> {
+    return this.bcSettlementHistoryService.executeSettleMany(dto);
+  }
+
+  /** 방송인 정산 완료 목록 조회 */
+  @Get('/settlement-history/broadcaster')
+  public async findBroadcasterSettlementHistoriesByRound(): Promise<FindBcSettlementHistoriesRes> {
+    return this.bcSettlementHistoryService.findHistories();
+  }
+
+  /** 판매자 정산 기본 수수료 변경 */
   @Put('/sell-commission')
   updateSellCommission(
     @Body(ValidationPipe) dto: ChangeSellCommissionDto,
@@ -202,7 +227,7 @@ export class AdminController {
     return this.orderCancelService.setOrderCancelRequestDone(requestId);
   }
 
-  /** 방송인 정산정보 신청 목록 조회 */
+  /** 방송인 정산등록정보 신청 목록 조회 */
   @Get('/settelment-info-list/broadcaster')
   getBroadcasterSettlementInfoList(): Promise<AdminBroadcasterSettlementInfoList> {
     return this.broadcasterSettlementService.getBroadcasterSettlementInfoList();
@@ -215,5 +240,11 @@ export class AdminController {
     dto: BroadcasterSettlementInfoConfirmationDto,
   ): Promise<boolean> {
     return this.adminSettlementService.setBroadcasterSettlementInfoConfirmation(dto);
+  }
+
+  /** 전체 판매자 계정 목록 조회 */
+  @Get('/sellers')
+  getSellerList(): Promise<AdminSellerListRes> {
+    return this.sellerService.getSellerList();
   }
 }

@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 import { useState } from 'react';
 import { SettlementInfoDialog } from './SettlementInfoDialog';
 
+/** 판매자 정산 완료 목록 */
 export function AdminSettlementDoneList(): JSX.Element | null {
   const { onOpen, isOpen, onClose } = useDisclosure();
   const { isLoading, data } = useAdminSettlementDoneList();

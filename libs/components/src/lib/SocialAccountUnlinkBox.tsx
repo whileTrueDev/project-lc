@@ -52,8 +52,7 @@ export function SocialAccountUnlinkBox(
         headerText={`${provider} 계정의 연결을 해제하시겠습니까?`}
         isOpen={!!data && isOpen}
         onClose={onClose}
-        // TODO: 방송인 비밀번호 변경 추가 후 userType 분기 삭제
-        hasPassword={userType === 'broadcaster' ? true : !!data?.hasPassword}
+        hasPassword={!!data?.hasPassword}
         unlinkHandler={unlink}
       />
     </Flex>

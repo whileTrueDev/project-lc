@@ -1,7 +1,7 @@
 import { Box, Center, Flex, Link, Text } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { BroadcasterLiveShoppingList } from './BroadcasterLiveShoppingList';
-import { CanScrollableText } from './CanScrollableText';
+import { YouCanHorizontalScrollText } from './YouCanHorizontalScrollText';
 import TextWithPopperButton from './TextWithPopperButton';
 
 export function MypageLiveShoppingSection(): JSX.Element {
@@ -21,7 +21,7 @@ export function MypageLiveShoppingSection(): JSX.Element {
             </Text>
           }
         >
-          <CanScrollableText />
+          <YouCanHorizontalScrollText />
         </TextWithPopperButton>
       </Flex>
 

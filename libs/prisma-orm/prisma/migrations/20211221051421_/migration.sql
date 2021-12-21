@@ -30,4 +30,4 @@ CREATE TABLE `LiveShoppingPurchaseMessage` (
 ALTER TABLE `LiveShoppingPurchaseMessage` ADD CONSTRAINT `LiveShoppingPurchaseMessage_broadcasterEmail_fkey` FOREIGN KEY (`broadcasterEmail`) REFERENCES `Broadcaster`(`email`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `LiveShoppingPurchaseMessage` ADD CONSTRAINT `LiveShoppingPurchaseMessage_liveShoppingId_fkey` FOREIGN KEY (`liveShoppingId`) REFERENCES `LiveShopping`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `LiveShoppingPurchaseMessage` ADD CONSTRAINT `LiveShoppingPurchaseMessage_liveShoppingId_fkey` FOREIGN KEY (`liveShoppingId`) REFERENCES `LiveShopping`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
