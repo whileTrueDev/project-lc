@@ -412,7 +412,7 @@ export class FmOrdersService {
 
     const exportItemsSql = `
     SELECT 
-      goods_name, image,
+      export_code, goods_seq, goods_name, image,
       item_option_seq, title1, option1, fm_goods_export_item.ea, price, step
     FROM fm_order_item_option
       JOIN fm_order_item USING(item_seq)

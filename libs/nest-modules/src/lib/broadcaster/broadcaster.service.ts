@@ -66,7 +66,7 @@ export class BroadcasterService {
   /**
    * 유저 정보 조회
    */
-  async findOne(findInput: Prisma.SellerWhereUniqueInput): Promise<Broadcaster> {
+  async findOne(findInput: Prisma.BroadcasterWhereUniqueInput): Promise<Broadcaster> {
     const broadcaster = await this.prisma.broadcaster.findUnique({
       where: findInput,
     });

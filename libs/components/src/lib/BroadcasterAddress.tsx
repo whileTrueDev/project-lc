@@ -71,15 +71,20 @@ function NoAddressAlertBox(): JSX.Element {
   );
 }
 
-export function BroadcasterAddressForm(): JSX.Element {
+export function BroadcasterAddressForm({
+  defaultOpen,
+}: {
+  defaultOpen?: boolean;
+}): JSX.Element {
   const toast = useToast();
   const profile = useProfile();
   const broadcaster = useBroadcaster({ id: profile.data?.id });
   const isBroadcasterAddressExists = useMemo(() => {
+    if (defaultOpen) return true;
     if (!broadcaster.data) return false;
     if (!broadcaster.data.broadcasterAddress) return false;
     return true;
-  }, [broadcaster.data]);
+  }, [broadcaster.data, defaultOpen]);
   const editMode = useDisclosure({ defaultIsOpen: isBroadcasterAddressExists });
   const daumOpen = useDisclosure();
 

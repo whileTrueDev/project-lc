@@ -38,10 +38,13 @@ export class GoodsService {
    * @param email seller.sub 로그인된 판매자 정보
    * @param ids? 특정 상품의 firstMallGoodsId만 조회하고 싶을 때
    */
-  public async findMyGoodsIds(email: Seller['email'], ids?: number[]): Promise<number[]> {
+  public async findMyGoodsIds(
+    email?: Seller['email'],
+    ids?: number[],
+  ): Promise<number[]> {
     const goodsIds = await this.prisma.goods.findMany({
       where: {
-        seller: { email },
+        seller: email ? { email } : undefined,
         id: ids ? { in: ids } : undefined,
         AND: {
           confirmation: {
@@ -55,12 +58,22 @@ export class GoodsService {
             firstmallGoodsConnectionId: true,
           },
         },
+        LiveShopping: {
+          select: {
+            fmGoodsSeq: true,
+          },
+        },
       },
     });
 
-    return goodsIds.map(
-      (confirmation) => confirmation.confirmation.firstmallGoodsConnectionId,
-    );
+    const allMyGoodsIds = goodsIds.reduce((prev, goods) => {
+      const lsGoodsIds = goods.LiveShopping.map((l) => l.fmGoodsSeq);
+      return prev
+        .concat(goods.confirmation.firstmallGoodsConnectionId)
+        .concat(lsGoodsIds);
+    }, []);
+
+    return [...new Set(allMyGoodsIds)];
   }
 
   /**
@@ -83,12 +96,22 @@ export class GoodsService {
             firstmallGoodsConnectionId: true,
           },
         },
+        LiveShopping: {
+          select: {
+            fmGoodsSeq: true,
+          },
+        },
       },
     });
 
-    return goodsIds.map(
-      (confirmation) => confirmation.confirmation.firstmallGoodsConnectionId,
-    );
+    const allGoodsIds = goodsIds.reduce((prev, goods) => {
+      const lsGoodsIds = goods.LiveShopping.map((l) => l.fmGoodsSeq);
+      return prev
+        .concat(goods.confirmation.firstmallGoodsConnectionId)
+        .concat(lsGoodsIds);
+    }, []);
+
+    return [...new Set(allGoodsIds)];
   }
 
   /**

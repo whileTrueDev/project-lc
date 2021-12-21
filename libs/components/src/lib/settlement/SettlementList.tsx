@@ -1,5 +1,5 @@
 import { DownloadIcon, InfoIcon } from '@chakra-ui/icons';
-import { Text, Box, Button, Kbd, Stack, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, Stack, Text, useDisclosure } from '@chakra-ui/react';
 import {
   GridColumns,
   GridToolbarContainer,
@@ -14,12 +14,13 @@ import { settlementHistoryStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useState } from 'react';
+import { YouCanHorizontalScrollText } from '../YouCanHorizontalScrollText';
 import { ChakraDataGrid } from '../ChakraDataGrid';
 import { SettlementInfoDialog } from './SettlementInfoDialog';
 
-// 정산 내역을 보여주는 데이터 그리드
+/** 판매자 정산 내역 */
 export function SettlementList(): JSX.Element | null {
-  const { isDesktopSize, isMobileSize } = useDisplaySize();
+  const { isDesktopSize } = useDisplaySize();
 
   const { onOpen, isOpen, onClose } = useDisclosure();
   const selectedRound = settlementHistoryStore((s) => s.selectedRound);
@@ -121,14 +122,7 @@ export function SettlementList(): JSX.Element | null {
       {data.length > 0 && (
         <Text mb={2}>
           <InfoIcon color="blue.500" mr={2} />
-          {isMobileSize ? (
-            <Text as="span">목록을 좌,우로 슬라이드 할 수 있습니다.</Text>
-          ) : (
-            <Text as="span">
-              <Kbd>shift</Kbd> + <Kbd>마우스스크롤</Kbd> 을 통해 목록을 좌,우로 스크롤할
-              수 있습니다.
-            </Text>
-          )}
+          <YouCanHorizontalScrollText />
         </Text>
       )}
       <ChakraDataGrid

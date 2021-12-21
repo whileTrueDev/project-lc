@@ -16,6 +16,7 @@ import { MailVerificationService } from './mailVerification.service';
 import { JwtConfigService } from '../_nest-units/settings/jwt.setting';
 import { mailerConfig } from '../_nest-units/settings/mailer.config';
 import { BroadcasterModule } from '../broadcaster/broadcaster.module';
+import { AdminModule } from '../admin/admin.module';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -28,6 +29,7 @@ describe('AuthService', () => {
         ConfigModule.forRoot({ isGlobal: true }),
         SellerModule,
         BroadcasterModule,
+        AdminModule,
         PassportModule,
         MailerModule.forRoot(mailerConfig),
         JwtModule.registerAsync({

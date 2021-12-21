@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { GoodsConfirmation, LiveShopping } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsByIdRes,
@@ -8,7 +9,6 @@ import {
   AdminSettlementInfoType,
   LiveShoppingDTO,
 } from '@project-lc/shared-types';
-import { GoodsConfirmation, LiveShopping } from '@prisma/client';
 
 @Injectable()
 export class AdminService {
@@ -289,6 +289,7 @@ export class AdminService {
         videoId: videoId || undefined,
         whiletrueCommissionRate: dto.whiletrueCommissionRate || 0,
         broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
+        fmGoodsSeq: Number(dto.fmGoodsSeq) || undefined,
       },
     });
     if (!liveShoppingUpdate) {

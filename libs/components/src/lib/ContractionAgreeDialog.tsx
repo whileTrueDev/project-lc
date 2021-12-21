@@ -15,6 +15,8 @@ import {
   Stack,
   Text,
   useDisclosure,
+  Center,
+  useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import useContractStyles from '../constants/Contract.style';
@@ -30,6 +32,7 @@ export function ContractionAgreeDialog({
   agreementFlag: boolean;
 }): JSX.Element {
   const classes = useContractStyles();
+  const toast = useToast();
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [checkedA, setCheckedA] = useState<boolean>(false);
   const [checkedB, setCheckedB] = useState<boolean>(false);
@@ -56,8 +59,8 @@ export function ContractionAgreeDialog({
         <ModalCloseButton />
         <ModalBody>
           <Stack pb={3} spacing={4}>
-            {/* 헤더 */}
             <Divider />
+            {/* 헤더 */}
             {terms.map((term) => (
               <SimpleGrid key={term.state} columns={3}>
                 <GridItem>
@@ -81,11 +84,12 @@ export function ContractionAgreeDialog({
                       colorScheme="green"
                       isChecked={term.state === 'checkedA' ? checkedA : checkedB}
                       onChange={() => {
-                        if (term.state === 'checkedA') {
-                          setCheckedA(!checkedA);
-                        } else {
-                          setCheckedB(!checkedB);
-                        }
+                        toast({
+                          status: 'warning',
+                          description:
+                            '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
+                          duration: 1500,
+                        });
                       }}
                     >
                       동의
@@ -106,7 +110,11 @@ export function ContractionAgreeDialog({
                     if (checkedA && checkedB) {
                       checkedAll(false);
                     } else {
-                      checkedAll(true);
+                      toast({
+                        status: 'warning',
+                        description: '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
+                        duration: 1500,
+                      });
                     }
                   }}
                 >
@@ -126,7 +134,7 @@ export function ContractionAgreeDialog({
             )}
 
             {selectedTerm && (
-              <Modal isOpen={dialog.isOpen} onClose={dialog.onClose} size="full">
+              <Modal isOpen={dialog.isOpen} onClose={dialog.onClose} size="5xl">
                 <ModalOverlay />
                 <ModalContent>
                   <ModalHeader>{selectedTerm.title}</ModalHeader>
@@ -137,6 +145,27 @@ export function ContractionAgreeDialog({
                         <p key={sentence}>{sentence}</p>
                       ))}
                     </div>
+                    {!agreementFlag && (
+                      <Center m={2}>
+                        <Checkbox
+                          size="md"
+                          colorScheme="green"
+                          isChecked={
+                            selectedTerm.state === 'checkedA' ? checkedA : checkedB
+                          }
+                          onChange={() => {
+                            if (selectedTerm.state === 'checkedA') {
+                              setCheckedA(!checkedA);
+                            } else {
+                              setCheckedB(!checkedB);
+                            }
+                            dialog.onClose();
+                          }}
+                        >
+                          위 약관에 동의합니다.
+                        </Checkbox>
+                      </Center>
+                    )}
                   </ModalBody>
                 </ModalContent>
               </Modal>

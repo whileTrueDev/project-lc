@@ -5,6 +5,8 @@ export * from './lib/broadcaster/broadcaster.module';
 export * from './lib/broadcaster/broadcaster.service';
 export * from './lib/goods/goods.module';
 export * from './lib/goods/goods.service';
+export * from './lib/inquiry/inquiry.module';
+export * from './lib/inquiry/inquiry.service';
 export * from './lib/live-shopping/live-shopping.module';
 export * from './lib/live-shopping/live-shopping.service';
 export * from './lib/notice/notice.module';

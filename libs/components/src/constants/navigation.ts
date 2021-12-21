@@ -98,6 +98,7 @@ export const adminNavItems: Array<NavItem> = [
   },
   { label: '결제 취소 요청', href: '/order-cancel' },
   { label: '알림메시지 보내기', href: '/notification' },
+  { label: '문의하기 관리', href: '/inquiry' },
 ];
 
 export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [

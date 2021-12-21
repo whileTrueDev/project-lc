@@ -1,4 +1,5 @@
 import {
+  Administrator,
   Broadcaster,
   Goods,
   GoodsInfo,
@@ -23,8 +24,8 @@ import {
 const prisma = new PrismaClient();
 
 /** 테스트관리자 계정 생성 */
-async function createAdminAccount(): Promise<Seller> {
-  return prisma.seller.create({
+async function createAdminAccount(): Promise<Administrator> {
+  return prisma.administrator.create({
     data: testadminData,
   });
 }

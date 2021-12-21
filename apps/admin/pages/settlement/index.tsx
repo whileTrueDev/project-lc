@@ -1,32 +1,28 @@
-import { Heading, Stack } from '@chakra-ui/react';
-import {
-  AdminPageLayout,
-  AdminSettlementDoneList,
-  SettlementSellCommissionInfo,
-  SettlementTargetList,
-} from '@project-lc/components';
+import { Button, Center } from '@chakra-ui/react';
+import { AdminPageLayout } from '@project-lc/components';
+import router from 'next/router';
 
 export function SettlementIndex(): JSX.Element {
   return (
     <AdminPageLayout>
-      <Stack p={6} spacing={4}>
-        {/* 기본판매수수료율 */}
-        <SettlementSellCommissionInfo />
-
-        {/* 정산 대상 */}
-        <Heading as="h3" size="lg">
-          정산 대상 목록
-        </Heading>
-        <SettlementTargetList />
-      </Stack>
-
-      <Stack mt={12} p={6} spacing={4}>
-        <Heading as="h3" size="lg">
-          정산 완료 목록
-        </Heading>
-
-        <AdminSettlementDoneList />
-      </Stack>
+      <Center mt={40}>
+        <Button
+          mr={1}
+          colorScheme="linkedin"
+          h="100px"
+          onClick={() => router.push('/settlement/seller')}
+        >
+          판매자 정산페이지로 이동
+        </Button>
+        <Button
+          ml={1}
+          colorScheme="teal"
+          h="100px"
+          onClick={() => router.push('/settlement/broadcaster')}
+        >
+          방송인 정산페이지로 이동
+        </Button>
+      </Center>
     </AdminPageLayout>
   );
 }

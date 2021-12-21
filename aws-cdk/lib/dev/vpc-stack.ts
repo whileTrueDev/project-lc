@@ -74,7 +74,7 @@ export class LCDevVpcStack extends cdk.Stack {
     });
     // * 보안그룹 룰 지정
     this.dbSecGrp.addIngressRule(
-      ec2.Peer.ipv4('59.22.64.86/32'),
+      ec2.Peer.ipv4('121.175.189.231/32'),
       ec2.Port.tcp(3306),
       'Allow port 3306 for outbound traffics to the whiletrue developers',
     );
