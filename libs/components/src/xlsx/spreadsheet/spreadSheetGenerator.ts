@@ -14,7 +14,7 @@ export abstract class SpreadSheetGenerator<T> {
     return this.alphabets[idx];
   }
 
-  protected getValueTypeString(v: string | number): 's' | 'n' {
+  protected getValueTypeString(v: string | number | null | undefined): 's' | 'n' {
     switch (typeof v) {
       case 'number':
         return 'n';

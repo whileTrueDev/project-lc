@@ -23,8 +23,11 @@ import {
   useFmOrderStore,
   useOrderListDownloadStore,
 } from '@project-lc/stores';
-import { defaultColumOpts, OrderSpreadSheetGenerator } from '@project-lc/utils';
 import { useState } from 'react';
+import {
+  defaultColumOpts,
+  OrderSpreadSheetGenerator,
+} from '../xlsx/spreadsheet/orderSpreadSheetGenerator';
 
 export interface OrderListDownloadDialogProps {
   isOpen: boolean;

@@ -4,7 +4,7 @@ import { SocialAccount, UserType } from '@project-lc/shared-types';
 import google from '../../images/google.png';
 import naver from '../../images/naver.png';
 import kakao from '../../images/kakao.png';
-import { ChakraNextImage } from './ChakraNextImage';
+import { ChakraNextImage } from '../chakra-extended/ChakraNextImage';
 import SocialAccountUnlinkDialog from './SocialAccountUnlinkDialog';
 
 export const logo: Record<string, React.ReactNode> = {

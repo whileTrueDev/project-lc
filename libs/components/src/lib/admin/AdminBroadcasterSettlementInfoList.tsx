@@ -5,7 +5,7 @@ import { useAdminBroadcasterSettlementInfoList, useDisplaySize } from '@project-
 import { BroadcasterSettlementInfoListRes } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { TAX_TYPE } from '../BroadcasterSettlementInfoRegistBox';
-import { ChakraDataGrid } from '../ChakraDataGrid';
+import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import AdminBroadcasterSettlementInfoConfirmationDialog from './AdminBroadcasterSettlementInfoConfirmationDialog';
 import AdminBroadcasterSettlementInfoRejectionDialog from './AdminBroadcasterSettlementInfoRejectionDialog';
 import { ConfirmationBadge, makeListRow } from './AdminBusinessRegistrationList';

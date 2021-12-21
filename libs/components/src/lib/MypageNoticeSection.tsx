@@ -3,7 +3,7 @@ import { GridColumns } from '@material-ui/data-grid';
 import { Notice } from '@prisma/client';
 import { useNoticeInfo } from '@project-lc/hooks';
 import dayjs from 'dayjs';
-import { ChakraDataGrid } from './ChakraDataGrid';
+import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
 
 const columns: GridColumns = [
   {

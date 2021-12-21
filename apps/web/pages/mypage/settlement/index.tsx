@@ -1,13 +1,4 @@
-import {
-  Text,
-  Kbd,
-  Container,
-  Divider,
-  Grid,
-  GridItem,
-  Heading,
-  VStack,
-} from '@chakra-ui/react';
+import { Container, Divider, Grid, GridItem, Heading, VStack } from '@chakra-ui/react';
 import {
   BusinessRegistrationBox,
   MypageLayout,
@@ -15,7 +6,6 @@ import {
   SettlementList,
   SettlementRoundHistory,
   SettlementStateBox,
-  TextViewerWithDetailModal,
 } from '@project-lc/components';
 import { useSettlementInfo } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';

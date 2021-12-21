@@ -3,7 +3,7 @@ import { GridColumns, GridRowParams } from '@material-ui/data-grid';
 import { useAdminOrderCancelRequest } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import { ChakraDataGrid } from '../ChakraDataGrid';
+import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 
 const columns: GridColumns = [
   {

@@ -1,29 +1,29 @@
 import {
-  HStack,
-  CloseButton,
-  Text,
-  Stack,
-  useToast,
+  Box,
   Button,
-  useDisclosure,
+  CloseButton,
+  Divider,
+  HStack,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
-  ModalFooter,
-  Divider,
-  Box,
+  Stack,
+  Text,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import {
+  useDeleteGoodsImageMutation,
   useGoodsImageMutation,
   useProfile,
-  useDeleteGoodsImageMutation,
 } from '@project-lc/hooks';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { ChakraNextImage } from './ChakraNextImage';
+import { ChakraNextImage } from '../chakra-extended/ChakraNextImage';
 import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 import SectionWithTitle from './SectionWithTitle';

@@ -18,7 +18,7 @@ import {
   Link,
 } from '@chakra-ui/react';
 import { s3 } from '@project-lc/hooks';
-import { ChakraNextImage } from '../ChakraNextImage';
+import { ChakraNextImage } from '../../chakra-extended/ChakraNextImage';
 import { ConfirmDialog } from '../ConfirmDialog';
 import { ImageInput } from '../ImageInput';
 import { GoodsPreviewItem, readAsDataURL, Preview } from '../GoodsRegistPictures';

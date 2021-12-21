@@ -1,7 +1,7 @@
 import { Stack, Center, VStack, Text, Divider } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import naver from '../../../images/naver.png';
-import { ChakraNextImage } from '../ChakraNextImage';
+import { ChakraNextImage } from '../../chakra-extended/ChakraNextImage';
 
 export function IntroSection({
   completeStep,

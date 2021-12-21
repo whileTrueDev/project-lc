@@ -1,6 +1,6 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { ThemeProvider } from '@material-ui/core';
-import { LOGO_S3_PREFIX, lightBigLogo, lightLogo } from '@project-lc/components';
+import { LOGO_S3_PREFIX, lightBigLogo, lightLogo } from '@project-lc/components-logo';
 import { createChakraTheme, createMuiTheme, createQueryClient } from '@project-lc/utils';
 import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';

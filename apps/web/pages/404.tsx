@@ -1,5 +1,6 @@
-import { Button, Flex, Heading, Text, VStack } from '@chakra-ui/react';
-import { KksLogo } from '@project-lc/components';
+import { Button } from '@chakra-ui/button';
+import { Flex, Heading, Text, VStack } from '@chakra-ui/layout';
+import { KksLogo } from '@project-lc/components-logo';
 import { NextSeo } from 'next-seo';
 import { useRouter } from 'next/router';
 

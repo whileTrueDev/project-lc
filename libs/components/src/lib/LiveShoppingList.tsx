@@ -26,7 +26,7 @@ import { BroadcasterName } from './BroadcasterName';
 import { ConfirmDialog } from './ConfirmDialog';
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
 import { LiveShoppingDetailDialog } from './LiveShoppingDetailDialog';
-import { ChakraDataGrid } from './ChakraDataGrid';
+import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
 
 export interface GoodsWithConfirmation extends Goods {
   confirmation: { confirmation: GoodsConfirmation };

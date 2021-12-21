@@ -1,3 +1,4 @@
+/* eslint-disable react/no-danger */
 import { ColorModeScript } from '@chakra-ui/react';
 import Document, {
   DocumentContext,
