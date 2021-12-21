@@ -1,6 +1,6 @@
 # Ignore preview builds
 echo "VERCEL_GIT_COMMIT_REF: $VERCEL_GIT_COMMIT_REF"
-if [[ "$VERCEL_GIT_COMMIT_REF" != "master" || "$VERCEL_GIT_COMMIT_REF" != "dev" ]]; then
+if [ "$VERCEL_GIT_COMMIT_REF" != "master"] || ["$VERCEL_GIT_COMMIT_REF" != "dev" ]; then
     echo "🛑 - Ignoring preview builds"
     exit 0
 fi
