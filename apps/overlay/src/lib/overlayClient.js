@@ -328,7 +328,7 @@ socket.on('get right-top purchase message', async (data) => {
   messageHtml = `
   <div class="donation-wrapper">
     <iframe src="/audio/${
-      alarmType === '2' ? 'alarm-type-2.wav' : 'alarm-type-1.wav'
+      alarmType === '2' ? 'xmas-alarm-type-2.mp3' : 'xmas-alarm-type-1.mp3'
     }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="item">
       <div class="centered">
@@ -364,7 +364,7 @@ socket.on('get non client purchase message', async (data) => {
 
   messageHtml = `
   <div class="donation-wrapper">
-    <iframe src="/audio/alarm-type-1.wav"
+    <iframe src="/audio/xmas-alarm-type-1.mp3"
     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="centered">
       <div class ="animated heartbeat" id="donation-top">
