@@ -7,7 +7,7 @@ let email;
 let streamerNickname;
 let liveShoppingId;
 let isLogin = true;
-const socket = io(process.env.HOST, { transports: ['websocket'] });
+const socket = io(process.env.SOCKET_HOST, { transports: ['websocket'] });
 
 socket.on('creator list from server', (data) => {
   if (data && data.length !== 0) {
@@ -218,7 +218,7 @@ $(document).ready(function ready() {
     const errorDialog = document.getElementById('dialog-message');
     $.ajax({
       type: 'POST',
-      url: 'http://localhost:3333/purchase-message',
+      url: `${process.env.HOST}/purchase-message`,
       dataType: 'text',
       contentType: 'application/json',
       data: messageJson,

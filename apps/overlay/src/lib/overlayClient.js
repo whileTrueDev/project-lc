@@ -590,6 +590,7 @@ socket.on('remove notification image from server', () => {
 });
 
 socket.on('get liveshopping id from server', (id) => {
+  $('.alive-check').css('background-color', 'yellow');
   liveShoppingId = id;
 });
 export {};

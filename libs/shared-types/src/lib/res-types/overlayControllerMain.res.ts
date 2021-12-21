@@ -4,7 +4,8 @@ export interface OverlayControllerMainRes {
     userNickname: string;
     overlayUrl: string;
   }[];
-  HOST: any;
+  HOST: string;
+  SOCKET_HOST: string;
   liveShoppings: {
     id: number;
     broadcaster: {
