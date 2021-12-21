@@ -56,7 +56,7 @@ export class NotificationService {
     await this.prisma.userNotification.update({
       where: { id },
       data: {
-        readState: true,
+        readFlag: true,
       },
     });
     return true;

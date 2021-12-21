@@ -736,7 +736,7 @@ model UserNotification {
   userType   String // seller, broadcaster
   title      String // 알림메시지 제목
   content    String   @db.Text // 알림메시지 내용
-  readState  Boolean  @default(false) // 타겟 유저가 알림 읽었는지 여부
+  readFlag   Boolean  @default(false) // 타겟 유저가 알림 읽었는지 여부
   createDate DateTime @default(now())
 
   @@index([userEmail, userType])

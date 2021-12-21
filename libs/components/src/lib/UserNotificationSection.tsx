@@ -42,13 +42,13 @@ function CountBadge({ count }: { count: number }): JSX.Element {
 
 /** 개인알림 제목, 내용, 읽음여부 표시하는 컴포넌트 */
 function NotificationItem({ item }: { item: UserNotification }): JSX.Element {
-  const { title, content, readState, createDate } = item;
+  const { title, content, readFlag, createDate } = item;
 
   return (
     <Box>
       <Stack direction="row" alignItems="center">
         <Text fontWeight="semibold">{title}</Text>
-        {!readState && <UnreadNotification />}
+        {!readFlag && <UnreadNotification />}
       </Stack>
       <Text fontSize="xs">{dayjs(createDate).format('YYYY/MM/DD HH:mm')}</Text>
       <Text>{content}</Text>
@@ -63,7 +63,7 @@ export function UserNotificationSection(): JSX.Element {
 
   const readNotification = useNotificationMutation();
   const markAsRead = (notification: UserNotification): void => {
-    if (!profileData || notification.readState) return;
+    if (!profileData || notification.readFlag) return;
 
     readNotification
       .mutateAsync({
@@ -78,7 +78,7 @@ export function UserNotificationSection(): JSX.Element {
 
   const unreadCount: number = useMemo(() => {
     if (!data) return 0;
-    return data.filter((item) => item.readState === false).length;
+    return data.filter((item) => item.readFlag === false).length;
   }, [data]);
 
   const hoverColor = useColorModeValue('gray.50', 'gray.700');
@@ -115,12 +115,12 @@ export function UserNotificationSection(): JSX.Element {
         {data &&
           data.map((noti) => (
             <Box
-              cursor={noti.readState ? 'default' : 'pointer'}
+              cursor={noti.readFlag ? 'default' : 'pointer'}
               p={4}
-              _hover={noti.readState ? undefined : { backgroundColor: hoverColor }}
+              _hover={noti.readFlag ? undefined : { backgroundColor: hoverColor }}
               key={noti.id}
               onClick={() => {
-                if (!noti.readState) markAsRead(noti);
+                if (!noti.readFlag) markAsRead(noti);
               }}
             >
               <NotificationItem item={noti} />

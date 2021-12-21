@@ -58,7 +58,7 @@ export function UserNotificationHistory({
                   <Text>{d.content}</Text>
                   <Text fontSize="xs">
                     {dayjs(d.createDate).format('YYYY-MM-DD HH:mm')}
-                    <Text as="span"> - {d.readState ? '확인' : '미확인'}</Text>
+                    <Text as="span"> - {d.readFlag ? '확인' : '미확인'}</Text>
                   </Text>
                   <Divider />
                 </Box>
