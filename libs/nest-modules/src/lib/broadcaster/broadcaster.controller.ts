@@ -11,7 +11,9 @@ import {
   Put,
   Query,
   UnauthorizedException,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { BroadcasterChannel } from '@prisma/client';
@@ -30,6 +32,7 @@ import {
   PasswordValidateDto,
   SignUpDto,
 } from '@project-lc/shared-types';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   Broadcaster,
   BroadcasterAddress,
@@ -255,5 +258,23 @@ export class BroadcasterController {
       throw new UnauthorizedException('본인의 계정이 아니면 삭제할 수 없습니다.');
     }
     return this.broadcasterService.deleteOne(email);
+  }
+
+  /** 방송인 아바타 이미지 s3업로드 후 url 저장 */
+  @UseGuards(JwtAuthGuard)
+  @Post('/avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async addAvatar(
+    @BroadcasterInfo() broadcaster: UserPayload,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<boolean> {
+    return this.broadcasterService.addBroadcasterAvatar(broadcaster.sub, file);
+  }
+
+  /** 방송인 아바타 이미지 null로 저장 */
+  @UseGuards(JwtAuthGuard)
+  @Delete('/avatar')
+  async deleteAvatar(@BroadcasterInfo() broadcaster: UserPayload): Promise<boolean> {
+    return this.broadcasterService.removeBroadcasterAvatar(broadcaster.sub);
   }
 }

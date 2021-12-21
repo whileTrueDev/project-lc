@@ -230,6 +230,7 @@ export class SellerService {
       key: file.originalname,
       file: file.buffer,
       email,
+      userType: 'seller',
     });
     await this.prisma.seller.update({
       where: { email },
