@@ -467,41 +467,27 @@ model ShippingCost {
   shipping_area_name String         @db.VarChar(255) // '지역명',
 }
 
-// 라이브 커머스 랭킹 테이블
-model LiveCommerceRanking {
-  id                 Int         @id @default(autoincrement())
-  nickname           String      @default("비회원") // 메세지 작성자의 닉네임
-  text               String      @db.LongText // 메세지 내용
-  price              Int // 구매금액
-  phoneCallEventFlag Boolean     @default(false) // 전화 이벤트 참여 여부 
-  giftFlag           Boolean     @default(false) // 스트리머����� 선물하기 여부
-  loginFlag          Boolean     @default(true) // 회원 | 비회원 구분 \
-  broadcaster        Broadcaster @relation(fields: [broadcasterEmail], references: [email])
-  broadcasterEmail   String // 스트리머의 아이디 
-  createDate         DateTime    @default(now()) // 작성일자
-}
-
 // -------------------------------------------------
 // 방송인
 // -------------------------------------------------
 model Broadcaster {
-  id                        Int                        @id @default(autoincrement())
-  email                     String                     @unique // 방송인 이메일(가입시 사용)
-  userName                  String                     @db.VarChar(20) // 유저의 실명
-  userNickname              String?                    @db.VarChar(20) // 유저의 활동명
-  overlayUrl                String                     @unique // 라이브커머스 오버레이 URL 
-  createDate                DateTime                   @default(now())
-  deleteFlag                Boolean                    @default(false) // 회원탈퇴 여부
-  password                  String? // 비밀번호
-  avatar                    String?
-  agreementFlag             Boolean                    @default(false) // 이용동의 
-  liveCommerceRanking       LiveCommerceRanking[]
-  LiveShopping              LiveShopping[]
-  socialAccounts            BroadcasterSocialAccount[]
-  broadcasterContacts       BroadcasterContacts[]
-  broadcasterAddress        BroadcasterAddress?
-  channels                  BroadcasterChannel[]
-  BroadcasterSettlementInfo BroadcasterSettlementInfo?
+  id                          Int                           @id @default(autoincrement())
+  email                       String                        @unique // 방송인 이메일(가입시 사용)
+  userName                    String                        @db.VarChar(20) // 유저의 실명
+  userNickname                String?                       @db.VarChar(20) // 유저의 활동명
+  overlayUrl                  String                        @unique // 라이브커머스 오버레이 URL 
+  createDate                  DateTime                      @default(now())
+  deleteFlag                  Boolean                       @default(false) // 회원탈퇴 여부
+  password                    String? // 비밀번호
+  avatar                      String?
+  agreementFlag               Boolean                       @default(false) // 이용동의 
+  LiveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
+  LiveShopping                LiveShopping[]
+  socialAccounts              BroadcasterSocialAccount[]
+  broadcasterContacts         BroadcasterContacts[]
+  broadcasterAddress          BroadcasterAddress?
+  channels                    BroadcasterChannel[]
+  BroadcasterSettlementInfo   BroadcasterSettlementInfo?
 }
 
 // 방송인 소셜로그인 계정
@@ -611,12 +597,29 @@ model LiveShopping {
   desiredCommission         Decimal?                  @default("0") @db.Decimal(10, 2) // 희망판매수수료
   desiredPeriod             String?                   @default("무관") // 희망 진행 기간
 
-  sellerContacts        SellerContacts          @relation(fields: [contactId], references: [id])
-  seller                Seller                  @relation(fields: [sellerId], references: [id])
-  goods                 Goods                   @relation(fields: [goodsId], references: [id])
-  broadcaster           Broadcaster?            @relation(fields: [broadcasterId], references: [id])
-  liveShoppingVideo     LiveShoppingVideo?      @relation(fields: [videoId], references: [id])
-  SellerSettlementItems SellerSettlementItems[]
+  sellerContacts              SellerContacts                @relation(fields: [contactId], references: [id])
+  seller                      Seller                        @relation(fields: [sellerId], references: [id])
+  goods                       Goods                         @relation(fields: [goodsId], references: [id])
+  broadcaster                 Broadcaster?                  @relation(fields: [broadcasterId], references: [id])
+  liveShoppingVideo           LiveShoppingVideo?            @relation(fields: [videoId], references: [id])
+  SellerSettlementItems       SellerSettlementItems[]
+  LiveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
+}
+
+// 라이브 커머스 랭킹 테이블
+model LiveShoppingPurchaseMessage {
+  id                 Int          @id @default(autoincrement())
+  nickname           String       @default("비회원") // 메세지 작성자의 닉네임
+  text               String       @db.LongText // 메세지 내용
+  price              Int // 구매금액
+  phoneCallEventFlag Boolean      @default(false) // 전화 이벤트 참여 여부 
+  giftFlag           Boolean      @default(false) // 스트리머����� 선물하기 여부
+  loginFlag          Boolean      @default(true) // 회원 | 비회원 구분 \
+  broadcaster        Broadcaster  @relation(fields: [broadcasterEmail], references: [email])
+  broadcasterEmail   String // 스트리머의 아이디 
+  createDate         DateTime     @default(now()) // 작성일자
+  LiveShopping       LiveShopping @relation(fields: [liveShoppingId], references: [id]) // 해당 방송의 라이브 쇼핑 Id
+  liveShoppingId     Int
 }
 
 enum LiveShopppingProgressType {
