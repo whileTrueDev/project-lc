@@ -4,22 +4,10 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateMultipleNotificationDto,
   CreateNotificationDto,
-  UserType,
+  FindNotificationsDto,
+  MarkNotificationReadStateDto,
 } from '@project-lc/shared-types';
 
-// TODO: dto 파일 분리, 컨트롤러에 validationpipe 적용
-
-export class FindNotificationsDto {
-  userEmail: string;
-  userType: UserType;
-  take?: number;
-}
-
-export class MarkNotificationReadStateDto {
-  userEmail: string;
-  userType: UserType;
-  id: number;
-}
 @Injectable()
 export class NotificationService {
   constructor(private readonly prisma: PrismaService) {}

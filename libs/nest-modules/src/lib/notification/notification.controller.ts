@@ -7,33 +7,39 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserNotification } from '@prisma/client';
 import {
   CreateMultipleNotificationDto,
   CreateNotificationDto,
+  MarkNotificationReadStateDto,
   UserType,
 } from '@project-lc/shared-types';
-import {
-  MarkNotificationReadStateDto,
-  NotificationService,
-} from './notification.service';
+import { AdminGuard } from '../_nest-units/guards/admin.guard';
+import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
+import { NotificationService } from './notification.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  // TODO: admin가드 추가
   /** 관리자 -> 특정 유저에게 알림생성 */
+  @UseGuards(AdminGuard)
   @Post('/admin')
-  createNotification(@Body() dto: CreateNotificationDto): Promise<UserNotification> {
+  createNotification(
+    @Body(ValidationPipe) dto: CreateNotificationDto,
+  ): Promise<UserNotification> {
     return this.notificationService.createNotification(dto);
   }
 
   /** 관리자 -> 여러 유저에게 동일한 내용의 알림 생성 */
+  @UseGuards(AdminGuard)
   @Post('/admin/multiple')
   createMultipleNotification(
-    @Body() dto: CreateMultipleNotificationDto,
+    @Body(ValidationPipe) dto: CreateMultipleNotificationDto,
   ): Promise<boolean> {
     return this.notificationService.createMultipleNotification(dto);
   }
@@ -54,7 +60,9 @@ export class NotificationController {
 
   /** 특정 알림의 읽음상태 변경 */
   @Patch()
-  markNotificationReadState(@Body() dto: MarkNotificationReadStateDto): Promise<boolean> {
+  markNotificationReadState(
+    @Body(ValidationPipe) dto: MarkNotificationReadStateDto,
+  ): Promise<boolean> {
     return this.notificationService.markNotificationReadState(dto);
   }
 }

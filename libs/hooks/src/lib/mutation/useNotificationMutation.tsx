@@ -1,6 +1,6 @@
+import { MarkNotificationReadStateDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
-import { MarkNotificationReadStateDto } from '../../../../nest-modules/src/lib/notification/notification.service';
 import axios from '../../axios';
 
 export type useNotificationMutationRes = boolean;
