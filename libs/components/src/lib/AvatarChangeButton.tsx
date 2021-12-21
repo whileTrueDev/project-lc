@@ -18,8 +18,8 @@ import {
 } from '@chakra-ui/react';
 import {
   useProfile,
-  useSellerAvatarMutation,
-  useSellerAvatarRemoveMutation,
+  useAvatarMutation,
+  useAvatarRemoveMutation,
 } from '@project-lc/hooks';
 import { useRef, useState } from 'react';
 import { FiCamera } from 'react-icons/fi';
@@ -117,8 +117,8 @@ export function AvatarChangeButton(): JSX.Element {
   };
 
   // 잘린 아바타 이미지 post 요청
-  const uploadAvatar = useSellerAvatarMutation();
-  const removeAvatar = useSellerAvatarRemoveMutation();
+  const uploadAvatar = useAvatarMutation();
+  const removeAvatar = useAvatarRemoveMutation();
 
   // 프로필 사진 변경 다이얼로그 저장하기 핸들러
   const onSubmit = async (): Promise<void> => {

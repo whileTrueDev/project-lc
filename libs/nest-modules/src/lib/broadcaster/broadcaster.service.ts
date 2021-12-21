@@ -10,10 +10,14 @@ import {
 } from '@project-lc/shared-types';
 import { hash, verify } from 'argon2';
 import { throwError } from 'rxjs';
+import { S3Service } from '../s3/s3.service';
 
 @Injectable()
 export class BroadcasterService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly s3service: S3Service,
+  ) {}
 
   async getUserId(overlayUrl: string): Promise<{ userId: string }> {
     const email = await this.prisma.broadcaster.findUnique({
@@ -228,5 +232,32 @@ export class BroadcasterService {
       },
     });
     return broadcaster;
+  }
+
+  /** 방송인 아바타 이미지 url 저장 */
+  public async addBroadcasterAvatar(
+    email: Broadcaster['email'],
+    file: Express.Multer.File,
+  ): Promise<boolean> {
+    const avatarUrl = await this.s3service.uploadProfileImage({
+      key: file.originalname,
+      file: file.buffer,
+      email,
+      userType: 'broadcaster',
+    });
+    await this.prisma.broadcaster.update({
+      where: { email },
+      data: { avatar: avatarUrl },
+    });
+    return true;
+  }
+
+  /** 방송인 아바타 이미지 url null 로 초기화 */
+  public async removeBroadcasterAvatar(email: Broadcaster['email']): Promise<boolean> {
+    await this.prisma.broadcaster.update({
+      where: { email },
+      data: { avatar: null },
+    });
+    return true;
   }
 }

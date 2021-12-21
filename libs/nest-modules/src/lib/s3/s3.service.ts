@@ -7,6 +7,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { UserType } from '@project-lc/shared-types';
 import { parse } from 'node-html-parser';
 
 @Injectable()
@@ -42,12 +43,14 @@ export class S3Service {
     key,
     file,
     email,
+    userType,
   }: {
     key: string;
     file: Buffer;
     email: string;
+    userType: UserType;
   }): Promise<string> {
-    const avatarPath = `avatar/${email}/${key}`;
+    const avatarPath = `avatar/${userType}/${email}/${key}`;
     await this.s3Client.send(
       new PutObjectCommand({
         Bucket: this.configService.get('S3_BUCKET_NAME'),
