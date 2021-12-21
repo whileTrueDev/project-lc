@@ -86,6 +86,7 @@ export class LiveShoppingService {
         broadcaster: {
           select: {
             userNickname: true,
+            channels: true,
           },
         },
         liveShoppingVideo: {
@@ -156,6 +157,7 @@ export class LiveShoppingService {
         broadcaster: {
           select: {
             userNickname: true,
+            channels: true,
           },
         },
         liveShoppingVideo: {
