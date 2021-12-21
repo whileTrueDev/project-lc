@@ -27,6 +27,7 @@ import { ConfirmDialog } from './ConfirmDialog';
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
 import { LiveShoppingDetailDialog } from './LiveShoppingDetailDialog';
 import { ChakraDataGrid } from './ChakraDataGrid';
+import BroadcasterChannelButton from './BroadcasterChannelButton';
 
 export interface GoodsWithConfirmation extends Goods {
   confirmation: { confirmation: GoodsConfirmation };
@@ -157,8 +158,7 @@ export function LiveShoppingList(): JSX.Element {
           <Box mr={1}>
             <BroadcasterName data={row.broadcaster} />
           </Box>
-          {/* //TODO: 방송인 계정설정 "플랫폼" 이후 channelUrl 전달 */}
-          {/* <BroadcasterChannelButton channelUrl={row.broadcaster?.channelUrl} /> */}
+          <BroadcasterChannelButton channelUrl={row.broadcaster?.channels[0]?.url} />
         </Flex>
       ),
     },
