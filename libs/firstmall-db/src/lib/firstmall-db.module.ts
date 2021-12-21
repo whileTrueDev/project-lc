@@ -7,8 +7,8 @@ import { FmGoodsController } from './fm-goods/fm-goods.controller';
 import { FMGoodsService } from './fm-goods/fm-goods.service';
 import { FmOrdersController } from './fm-orders/fm-orders.controller';
 import { FmOrdersService } from './fm-orders/fm-orders.service';
-import { FmSettlementController } from './fm-settlemenets/fm-settlemenets.controller';
-import { FmSettlementService } from './fm-settlemenets/fm-settlements.service';
+import { FmSettlementController } from './fm-settlements/fm-settlements.controller';
+import { FmSettlementService } from './fm-settlements/fm-settlements.service';
 
 @Module({
   imports: [GoodsModule, LiveShoppingModule],

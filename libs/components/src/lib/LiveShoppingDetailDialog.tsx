@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import BroadcasterChannelButton from './BroadcasterChannelButton';
 import { BroadcasterName } from './BroadcasterName';
 
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
@@ -72,12 +73,9 @@ export function LiveShoppingDetailDialog(
                 {data[id].broadcaster ? (
                   <>
                     <BroadcasterName data={data[id].broadcaster} />
-                    {/* //TODO: 방송인 계정설정 "플랫폼" 이후 channelUrl 전달 */}
-                    {/* {data[liveShoppingId].broadcaster.channelUrl && (
                     <BroadcasterChannelButton
-                      channelUrl={data[liveShoppingId].broadcaster.channelUrl}
+                      channelUrl={data[id].broadcaster?.channels[0]?.url}
                     />
-                  )} */}
                   </>
                 ) : (
                   <Text fontWeight="bold">미정</Text>

@@ -40,7 +40,9 @@ export function LiveShoppingMonitorSection({
       </VStack>
       <VStack>
         <Grid width="xl" direction="row" gap={3}>
-          <Text>1. 구매랭킹 : 가장 많은 금액을 구매한 상위 닉네임 4개 박제</Text>
+          <Text fontSize="md" fontWeight="semibold">
+            1. 구매랭킹 : 가장 많은 금액을 구매한 상위 닉네임 4개 박제
+          </Text>
           <Text fontSize="md" fontWeight="semibold">
             2. 세로배너 : 상품 정보 기재
           </Text>

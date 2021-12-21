@@ -25,6 +25,7 @@ export interface SettlementInfoDialogProps {
   onClose: () => void;
   settlementInfo: SettlementDoneItem;
 }
+/** 판매자 정산 상세 정보 */
 export function SettlementInfoDialog({
   isOpen,
   onClose,

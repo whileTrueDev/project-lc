@@ -122,6 +122,8 @@ export const orderDetailExportsSample: FmOrderExport[] = [
         ea: 1,
         price: '10.00',
         step: '55',
+        export_code: 'export_code',
+        goods_seq: '1',
       },
     ],
   },

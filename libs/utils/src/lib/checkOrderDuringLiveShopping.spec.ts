@@ -22,6 +22,7 @@ const liveShopping: LiveShopping = {
   rejectionReason: null,
   requests: null,
   videoId: null,
+  fmGoodsSeq: 1,
   desiredCommission: new Decimal('30'),
   desiredPeriod: '무관',
 };
