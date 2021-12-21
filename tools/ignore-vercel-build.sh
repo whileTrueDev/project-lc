@@ -2,7 +2,7 @@
 echo "VERCEL_GIT_COMMIT_REF: $VERCEL_GIT_COMMIT_REF"
 if [[ $VERCEL_GIT_COMMIT_REF != "master" || $VERCEL_GIT_COMMIT_REF != "dev" ]]; then
     echo "🛑 - Ignoring preview builds"
-    exit 0
+    exit 0;
 fi
 
 # Name of the app to check. Change this to your application name!
