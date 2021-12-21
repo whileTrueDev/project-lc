@@ -30,6 +30,7 @@ const devAppStack = new LCDevAppStack(app, 'LC-DEV-APP', {
   vpc: devVpcStack.vpc,
   apiSecGrp: devVpcStack.apiSecGrp,
   overlaySecGrp: devVpcStack.overlaySecGrp,
+  overlayControllerSecGrp: devVpcStack.overlayControllerSecGrp,
   albSecGrp: devVpcStack.albSecGrp,
 });
 

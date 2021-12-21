@@ -349,6 +349,38 @@
       "sourceRoot": "apps/overlay-controller/src",
       "projectType": "application",
       "targets": {
+        "dockerize": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker login -u {args.username} -p {args.password}",
+              "docker build -f ./apps/overlay-controller/Dockerfile . -t hwasurr/project-lc-overlay-controller:{args.tag}",
+              "docker tag hwasurr/project-lc-overlay-controller:{args.tag} hwasurr/project-lc-overlay-controller:latest ",
+              "docker push hwasurr/project-lc-overlay-controller:{args.tag}",
+              {
+                "command": "docker push hwasurr/project-lc-overlay-controller:latest",
+                "forwardAllArgs": false
+              }
+            ],
+            "parallel": false
+          }
+        },
+        "dockerize-dev": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker login -u {args.username} -p {args.password}",
+              "docker build -f ./apps/overlay-controller/Dockerfile . -t hwasurr/project-lc-overlay-controller-dev:{args.tag}",
+              "docker tag hwasurr/project-lc-overlay-controller-dev:{args.tag} hwasurr/project-lc-overlay-controller-dev:latest ",
+              "docker push hwasurr/project-lc-overlay-controller-dev:{args.tag}",
+              {
+                "command": "docker push hwasurr/project-lc-overlay-controller-dev:latest",
+                "forwardAllArgs": false
+              }
+            ],
+            "parallel": false
+          }
+        },
         "build": {
           "executor": "@nrwl/node:build",
           "outputs": [

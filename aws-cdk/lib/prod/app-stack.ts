@@ -26,6 +26,7 @@ interface LCProdAppStackProps extends cdk.StackProps {
   albSecGrp: ec2.SecurityGroup;
   apiSecGrp: ec2.SecurityGroup;
   overlaySecGrp: ec2.SecurityGroup;
+  overlayControllerSecGrp: ec2.SecurityGroup;
 }
 
 export class LCProdAppStack extends cdk.Stack {
@@ -37,25 +38,29 @@ export class LCProdAppStack extends cdk.Stack {
   private readonly albSecGrp: ec2.SecurityGroup;
   private readonly apiSecGrp: ec2.SecurityGroup;
   private readonly overlaySecGrp: ec2.SecurityGroup;
+  private readonly overlayControllerSecGrp: ec2.SecurityGroup;
   private readonly cluster: Cluster;
   private readonly parameters: ReturnType<LCProdAppStack['loadSsmParamters']>;
 
   public readonly apiService: FargateService;
   public readonly overlayService: FargateService;
+  public readonly overlayControllerService: FargateService;
   public readonly alb: ApplicationLoadBalancer;
 
   constructor(scope: cdk.Construct, id: string, props: LCProdAppStackProps) {
     super(scope, id, props);
-    const { vpc, albSecGrp, apiSecGrp, overlaySecGrp } = props;
+    const { vpc, albSecGrp, apiSecGrp, overlaySecGrp, overlayControllerSecGrp } = props;
     this.vpc = vpc;
     this.albSecGrp = albSecGrp;
     this.apiSecGrp = apiSecGrp;
     this.overlaySecGrp = overlaySecGrp;
+    this.overlayControllerSecGrp = overlayControllerSecGrp;
 
     this.parameters = this.loadSsmParamters();
     this.cluster = this.createEcsCluster();
     this.apiService = this.createApiService();
     this.overlayService = this.createOverlayService();
+    this.overlayControllerService = this.createOverlayControllerAppService();
 
     this.alb = this.createALB();
   }
@@ -186,6 +191,63 @@ export class LCProdAppStack extends cdk.Stack {
     return service;
   }
 
+  /** 라-커 화면제어 OverlayController 서버 ECS Fargate Service 생성 메서드 */
+  private createOverlayControllerAppService(): FargateService {
+    const taskDef = new FargateTaskDefinition(
+      this,
+      `${this.PREFIX}ECSOverlayControllerTaskDef`,
+      {
+        family: constants.PROD.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
+      },
+    );
+    const p = this.parameters;
+    taskDef.addContainer(`${this.PREFIX}ECSOverlayControllerContainer`, {
+      containerName: constants.PROD.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
+      portMappings: [{ containerPort: constants.PROD.ECS_OVERLAY_CONTROLLER_PORT }],
+      image: ContainerImage.fromRegistry(
+        `hwasurr/${constants.PROD.ECS_OVERLAY_CONTROLLER_FAMILY_NAME}`,
+      ),
+      memoryLimitMiB: 512,
+      secrets: {
+        DATABASE_URL: Secret.fromSsmParameter(p.DATABASE_URL),
+        FIRSTMALL_DATABASE_URL: Secret.fromSsmParameter(p.FIRSTMALL_DATABASE_URL),
+        GOOGLE_CREDENTIALS_EMAIL: Secret.fromSsmParameter(p.GOOGLE_CREDENTIALS_EMAIL),
+        GOOGLE_CREDENTIALS_PRIVATE_KEY: Secret.fromSsmParameter(
+          p.GOOGLE_CREDENTIALS_PRIVATE_KEY,
+        ),
+        JWT_SECRET: Secret.fromSsmParameter(p.JWT_SECRET),
+        CIPHER_HASH: Secret.fromSsmParameter(p.CIPHER_HASH),
+        CIPHER_PASSWORD: Secret.fromSsmParameter(p.CIPHER_PASSWORD),
+        CIPHER_SALT: Secret.fromSsmParameter(p.CIPHER_SALT),
+        AWS_S3_ACCESS_KEY_ID: Secret.fromSsmParameter(p.S3_ACCESS_KEY_ID),
+        AWS_S3_ACCESS_KEY_SECRET: Secret.fromSsmParameter(p.S3_ACCESS_KEY_SECRET),
+      },
+      environment: {
+        S3_BUCKET_NAME: 'lc-project',
+      },
+      logging: new AwsLogDriver({
+        logGroup: new logs.LogGroup(this, `${this.PREFIX}OverlayControllerLogGroup`, {
+          logGroupName: constants.PROD.ECS_OVERLAY_CONTROLLER_LOG_GLOUP_NAME,
+          removalPolicy: cdk.RemovalPolicy.DESTROY,
+        }),
+        streamPrefix: 'ecs',
+      }),
+    });
+
+    return new FargateService(this, `${this.PREFIX}OverlayControllerService`, {
+      serviceName: constants.PROD.ECS_OVERLAY_CONTROLLER_SERVICE_NAME,
+      cluster: this.cluster,
+      taskDefinition: taskDef,
+      vpcSubnets: {
+        subnetGroupName: constants.PROD.PRIVATE_SUBNET_GROUP_NAME,
+      },
+      platformVersion: FargatePlatformVersion.LATEST,
+      desiredCount: 1,
+      securityGroups: [this.overlayControllerSecGrp],
+      assignPublicIp: false,
+    });
+  }
+
   private createALB(): ApplicationLoadBalancer {
     const alb = new ApplicationLoadBalancer(this, `${this.PREFIX}ALB`, {
       vpc: this.vpc,
@@ -224,7 +286,6 @@ export class LCProdAppStack extends cdk.Stack {
     );
     const httpsListener = alb.addListener(`${this.PREFIX}ALBHttpsListener`, {
       port: 443,
-
       certificates: [sslCert],
       sslPolicy: SslPolicy.RECOMMENDED,
       defaultTargetGroups: [apiTargetGroup],
@@ -255,6 +316,31 @@ export class LCProdAppStack extends cdk.Stack {
       priority: 2,
       conditions: [ListenerCondition.hostHeaders([`live.${constants.PUNYCODE_DOMAIN}`])],
       targetGroups: [overlayTargetGroup],
+    });
+    const overlayControllerTargetGroup = new ApplicationTargetGroup(
+      this,
+      `${this.PREFIX}OverlayControllerTargetGroup`,
+      {
+        vpc: this.vpc,
+        targetGroupName: 'OverlayControllerTargetGroupProd',
+        port: constants.PROD.ECS_OVERLAY_CONTROLLER_PORT,
+        protocol: ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [this.overlayControllerService],
+      },
+    );
+    httpsListener.addTargetGroups(`${this.PREFIX}AddOverlayControllerTargetGroup`, {
+      priority: 3,
+      conditions: [
+        ListenerCondition.hostHeaders([
+          `overlay-controller.${constants.PUNYCODE_DOMAIN}`,
+        ]),
+      ],
+      targetGroups: [overlayControllerTargetGroup],
     });
 
     return alb;
