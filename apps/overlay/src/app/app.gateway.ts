@@ -94,4 +94,13 @@ export class AppGateway
         );
     }
   }
+
+  @SubscribeMessage('liveshopping id from admin')
+  getLiveShoppingId(
+    @MessageBody() roomAndLiveShoppingId: { roomName: string; liveShoppingId: number },
+  ): void {
+    const { roomName } = roomAndLiveShoppingId;
+    const { liveShoppingId } = roomAndLiveShoppingId;
+    this.server.to(roomName).emit('get liveshopping id from server', liveShoppingId);
+  }
 }

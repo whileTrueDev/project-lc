@@ -5,6 +5,7 @@
 let roomName;
 let email;
 let streamerNickname;
+let liveShoppingId;
 let isLogin = true;
 const socket = io(process.env.HOST, { transports: ['websocket'] });
 
@@ -29,6 +30,7 @@ $(document).ready(function ready() {
   $('#fever-time-picker').val(localISOTime);
 
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
+    liveShoppingId = $(this).closest('tr').children('td.liveshopping-id-cell').attr('id');
     streamerNickname = $(this).closest('tr').prop('id');
     const url = $(this).closest('tr').children('td.url-cell').attr('id');
     email = $(this).closest('tr').children('td.email-cell').attr('id');
@@ -91,6 +93,10 @@ $(document).ready(function ready() {
 
   $('#alive-check-button').click(function aliveCheckButtonClickEvent() {
     socket.emit('connection check from admin', roomName);
+  });
+
+  $('#liveshopping-id-button').click(function liveShoppingIdButtonClickEvent() {
+    socket.emit('liveshopping id from admin', { roomName, liveShoppingId });
   });
 
   $('#start-time-send-button').click(function startTimeSendButtonClickEvent() {
@@ -198,6 +204,7 @@ $(document).ready(function ready() {
     }
     console.log(email);
     const messageJson = JSON.stringify({
+      liveShoppingId,
       level,
       email,
       loginFlag: isLogin,

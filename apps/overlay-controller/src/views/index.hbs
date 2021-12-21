@@ -24,7 +24,7 @@
 </head>
 
 <body>
-    <div class="upper-area">
+    {{!-- <div class="upper-area">
         <div class="search-box">
             <table id="table_id" class="display">
                 <thead>
@@ -56,6 +56,45 @@
                         </td>
                     </tr>
                     {{/userIdAndUrlAndNicknames}}
+                </tbody>
+            </table>
+        </div> --}}
+        <div class="upper-area">
+        <div class="search-box">
+            <table id="table_id" class="display">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>이름</th>
+                        <th>방송인MAIL</th>
+                        <th>URL</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#liveShoppings}}
+                    <tr class="user-row" id={{broadcaster.userNickname}}>
+                        <td class="liveshopping-id-cell" id={{id}}>
+                            {{id}}
+                        </td>
+                        <td class="nickname-cell">
+                            {{broadcaster.userNickname}}
+                        </td>
+                        <td class="email-cell" id={{broadcaster.email}}>
+                            {{broadcaster.email}}
+                        </td>
+                        <td class="url-cell" id={{broadcaster.overlayUrl}}>
+                            {{broadcaster.overlayUrl}}
+                        </td>
+                        <td>
+                            <button
+                                class="socket-id-button"
+                            >
+                                선택
+                            </button>
+                        </td>
+                    </tr>
+                    {{/liveShoppings}}
                 </tbody>
             </table>
         </div>
@@ -144,6 +183,9 @@
                     </button>
                     <button id="alive-check-button" value="연결체크" style="background-color:dodgerblue">
                         연결 체크
+                    </button>
+                    <button id="liveshopping-id-button" value="라이브쇼핑ID" style="background-color:dodgerblue">
+                        라이브쇼핑 ID 전송
                     </button>
                 </div>
             </div>

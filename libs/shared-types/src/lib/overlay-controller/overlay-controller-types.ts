@@ -9,4 +9,6 @@ export interface PurchaseMessageWithLoginFlag extends Omit<PurchaseMessage, 'roo
   giftFlag: boolean;
   /** 메세지 작성자 전화 이벤트 참여 여부 */
   phoneCallEventFlag: boolean;
+  /** 라이브쇼핑 ID */
+  liveShoppingId: number;
 }

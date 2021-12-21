@@ -4,12 +4,13 @@ import {
   PurchaseMessageWithLoginFlag,
 } from '@project-lc/shared-types';
 import { ConfigService } from '@nestjs/config';
-import { OverlayControllerService } from '@project-lc/nest-modules';
+import { OverlayControllerService, LiveShoppingService } from '@project-lc/nest-modules';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly overlayControllerService: OverlayControllerService,
+    private readonly liveShoppingService: LiveShoppingService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -19,7 +20,9 @@ export class AppController {
     const HOST = this.configService.get('OVERLAY_HOST_NAME');
 
     const userIdAndUrlAndNicknames = await this.overlayControllerService.getCreatorUrls();
-    return { userIdAndUrlAndNicknames, HOST };
+    const liveShoppings =
+      await this.liveShoppingService.getLiveShoppingsForOverlayController();
+    return { userIdAndUrlAndNicknames, HOST, liveShoppings };
   }
 
   @Post('/purchase-message')

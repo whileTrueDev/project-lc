@@ -481,7 +481,7 @@ model Broadcaster {
   password                    String? // 비밀번호
   avatar                      String?
   agreementFlag               Boolean                       @default(false) // 이용동의 
-  LiveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
+  liveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
   LiveShopping                LiveShopping[]
   socialAccounts              BroadcasterSocialAccount[]
   broadcasterContacts         BroadcasterContacts[]
@@ -603,7 +603,7 @@ model LiveShopping {
   broadcaster                 Broadcaster?                  @relation(fields: [broadcasterId], references: [id])
   liveShoppingVideo           LiveShoppingVideo?            @relation(fields: [videoId], references: [id])
   SellerSettlementItems       SellerSettlementItems[]
-  LiveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
+  liveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -618,7 +618,7 @@ model LiveShoppingPurchaseMessage {
   broadcaster        Broadcaster  @relation(fields: [broadcasterEmail], references: [email])
   broadcasterEmail   String // 스트리머의 아이디 
   createDate         DateTime     @default(now()) // 작성일자
-  LiveShopping       LiveShopping @relation(fields: [liveShoppingId], references: [id])
+  liveShopping       LiveShopping @relation(fields: [liveShoppingId], references: [id])
   liveShoppingId     Int // 해당 방송의 라이브 쇼핑 Id
 }
 

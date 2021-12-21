@@ -172,4 +172,32 @@ export class LiveShoppingService {
       ],
     });
   }
+
+  async getLiveShoppingsForOverlayController(): Promise<any> {
+    return this.prisma.liveShopping.findMany({
+      where: {
+        progress: 'confirmed',
+        broadcastEndDate: { gte: new Date() },
+      },
+      select: {
+        id: true,
+        broadcaster: {
+          select: {
+            email: true,
+            userNickname: true,
+            overlayUrl: true,
+          },
+        },
+      },
+      // include: {
+      //   broadcaster: {
+      //     select: {
+      //       email: true,
+      //       userNickname: true,
+      //       overlayUrl: true,
+      //     },
+      //   },
+      // },
+    });
+  }
 }

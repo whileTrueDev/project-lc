@@ -29,6 +29,7 @@ export class OverlayControllerService {
     const broadcasterEmail = data.email;
     const { phoneCallEventFlag } = data;
     const { giftFlag } = data;
+    const { liveShoppingId } = data;
     const writePurchaseMessage = await this.prisma.liveShoppingPurchaseMessage.create({
       data: {
         nickname,
@@ -37,6 +38,7 @@ export class OverlayControllerService {
         loginFlag,
         phoneCallEventFlag,
         giftFlag,
+        liveShopping: { connect: { id: Number(liveShoppingId) } },
         broadcaster: { connect: { email: broadcasterEmail } },
       },
     });
