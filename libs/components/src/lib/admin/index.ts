@@ -9,6 +9,7 @@ export * from './AdminLiveShoppingList';
 export * from './AdminLiveShoppingUpdateConfirmModal';
 export * from './AdminLoginForm';
 export * from './AdminNoticeSection';
+export * from './AdminNotificationSection';
 export * from './AdminOrderCancelRequestList';
 export * from './AdminOverlayImageUploadDialog';
 export * from './AdminPageLayout';

@@ -1,6 +1,6 @@
-import { SignupForm, SignupStart, Navbar } from '@project-lc/components';
-import { useMoveToMainIfLoggedIn } from '@project-lc/hooks';
 import { Box, Flex } from '@chakra-ui/react';
+import { BroadcasterNavbar, SignupForm, SignupStart } from '@project-lc/components';
+import { useMoveToMainIfLoggedIn } from '@project-lc/hooks';
 import React, { useState } from 'react';
 
 export function SignUp(): JSX.Element {
@@ -8,7 +8,7 @@ export function SignUp(): JSX.Element {
   useMoveToMainIfLoggedIn();
   return (
     <Box>
-      <Navbar />
+      <BroadcasterNavbar />
       <Flex align="center" justify="center" minH="calc(100vh - 200px)">
         {step === 0 && (
           <SignupStart userType="broadcaster" moveToSignupForm={() => setStep(1)} />

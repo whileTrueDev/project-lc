@@ -21,6 +21,7 @@ import {
 } from '@prisma/client';
 import {
   AdminBroadcasterSettlementInfoList,
+  AdminSellerListRes,
   AdminSettlementInfoType,
   AdminSignUpDto,
   BroadcasterDTO,
@@ -46,6 +47,7 @@ import { BroadcasterSettlementService } from '../broadcaster/broadcaster-settlem
 import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { OrderCancelService } from '../order-cancel/order-cancel.service';
 import { SellerSettlementService } from '../seller/seller-settlement.service';
+import { SellerService } from '../seller/seller.service';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
 import { AdminAccountService } from './admin-account.service';
@@ -65,6 +67,7 @@ export class AdminController {
     private readonly orderCancelService: OrderCancelService,
     private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
+    private readonly sellerService: SellerService,
   ) {}
 
   // * 관리자 회원가입
@@ -230,12 +233,18 @@ export class AdminController {
     return this.broadcasterSettlementService.getBroadcasterSettlementInfoList();
   }
 
-  /** 방송인 정산등록정보 검수상태, 사유 수정 */
-  @Patch('settlement-info/broadcaster/confirmation')
+  /** 방송인 정산정보 검수상태, 사유 수정 */
+  @Patch('/settlement-info/broadcaster/confirmation')
   setBroadcasterSettlementInfoConfirmation(
     @Body()
     dto: BroadcasterSettlementInfoConfirmationDto,
   ): Promise<boolean> {
     return this.adminSettlementService.setBroadcasterSettlementInfoConfirmation(dto);
+  }
+
+  /** 전체 판매자 계정 목록 조회 */
+  @Get('/sellers')
+  getSellerList(): Promise<AdminSellerListRes> {
+    return this.sellerService.getSellerList();
   }
 }
