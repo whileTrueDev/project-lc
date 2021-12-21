@@ -202,7 +202,6 @@ $(document).ready(function ready() {
     } else {
       level = '2';
     }
-    console.log(email);
     const messageJson = JSON.stringify({
       liveShoppingId,
       level,
