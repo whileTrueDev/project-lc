@@ -29,8 +29,7 @@ export class OverlayControllerService {
     const broadcasterEmail = data.email;
     const { phoneCallEventFlag } = data;
     const { giftFlag } = data;
-    console.log(data);
-    const writePurchaseMessage = await this.prisma.liveCommerceRanking.create({
+    const writePurchaseMessage = await this.prisma.liveShoppingPurchaseMessage.create({
       data: {
         nickname,
         text,

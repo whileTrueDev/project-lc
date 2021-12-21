@@ -618,8 +618,8 @@ model LiveShoppingPurchaseMessage {
   broadcaster        Broadcaster  @relation(fields: [broadcasterEmail], references: [email])
   broadcasterEmail   String // 스트리머의 아이디 
   createDate         DateTime     @default(now()) // 작성일자
-  LiveShopping       LiveShopping @relation(fields: [liveShoppingId], references: [id]) // 해당 방송의 라이브 쇼핑 Id
-  liveShoppingId     Int
+  LiveShopping       LiveShopping @relation(fields: [liveShoppingId], references: [id])
+  liveShoppingId     Int // 해당 방송의 라이브 쇼핑 Id
 }
 
 enum LiveShopppingProgressType {

@@ -106,7 +106,7 @@ export class OverlayService {
   }
 
   async getRanking(overlayUrl): Promise<NicknameAndPrice[]> {
-    const topRanks = await this.prisma.liveCommerceRanking.groupBy({
+    const topRanks = await this.prisma.liveShoppingPurchaseMessage.groupBy({
       by: ['nickname'],
       where: {
         broadcaster: {
@@ -123,7 +123,7 @@ export class OverlayService {
   }
 
   async getTotalSoldPrice(): Promise<PriceSum> {
-    const totalSoldPrice = await this.prisma.liveCommerceRanking.aggregate({
+    const totalSoldPrice = await this.prisma.liveShoppingPurchaseMessage.aggregate({
       _sum: {
         price: true,
       },
@@ -133,7 +133,7 @@ export class OverlayService {
   }
 
   async getMessageAndNickname(overlayUrl): Promise<NicknameAndText[]> {
-    const messageAndNickname = await this.prisma.liveCommerceRanking.findMany({
+    const messageAndNickname = await this.prisma.liveShoppingPurchaseMessage.findMany({
       select: {
         nickname: true,
         text: true,
