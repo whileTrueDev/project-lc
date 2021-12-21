@@ -103,9 +103,10 @@ export function AdminSendNotificationDialog({
 
             <Text>제목 </Text>
             <Input {...formMethods.register('title', { required: true })} />
-            <Text>메시지 </Text>
+            <Text>메시지 (최대 400자)</Text>
             <Textarea
               resize="none"
+              maxLength={400}
               {...formMethods.register('content', { required: true })}
             />
           </ModalBody>

@@ -98,7 +98,7 @@ export function UserNotificationSection(): JSX.Element {
         }
       />
 
-      <MenuList w={{ base: 280, sm: 400 }} minH={300} maxH={600} overflow="auto">
+      <MenuList w={{ base: 280, sm: 400 }} maxH={600} overflow="auto">
         <Stack
           direction="row"
           alignItems="center"
