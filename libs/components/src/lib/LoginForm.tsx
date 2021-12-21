@@ -128,7 +128,7 @@ export function LoginForm({
         </Box>
 
         <Box pb={2}>
-          <SocialButtonGroup />
+          <SocialButtonGroup userType={userType} />
         </Box>
 
         <Stack spacing={1} mt={2}>
