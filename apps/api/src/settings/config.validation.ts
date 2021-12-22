@@ -32,5 +32,8 @@ export const validationSchema = Joi.object({
 
   // 호스트명
   API_HOST: Joi.string(),
-  SELLER_WEB_HOST: Joi.string(),
+  // 판매자 센터 호스트명
+  SELLER_WEB_HOST: Joi.string().required(),
+  // 방송인 센터 호스트명
+  BROADCASTER_WEB_HOST: Joi.string().required(),
 });

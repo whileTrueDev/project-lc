@@ -107,7 +107,8 @@ export class LCProdAppStack extends cdk.Stack {
       environment: {
         S3_BUCKET_NAME: 'lc-project',
         API_HOST: `https://api.${constants.PUNYCODE_DOMAIN}`,
-        SELLER_WEB_HOST: `https://dev-api.${constants.PUNYCODE_DOMAIN}`,
+        SELLER_WEB_HOST: `https://${constants.PUNYCODE_판매자}.${constants.PUNYCODE_DOMAIN}`,
+        BROADCASTER_WEB_HOST: `https://${constants.PUNYCODE_방송인}.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}ApiLogGroup`, {
@@ -224,6 +225,8 @@ export class LCProdAppStack extends cdk.Stack {
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
+        OVERLAY_HOST: `https://${constants.PUNYCODE_라이브}.${constants.PUNYCODE_DOMAIN}`,
+        OVERLAY_CONTROLLER_HOST: `https://overlay-controller.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}OverlayControllerLogGroup`, {
