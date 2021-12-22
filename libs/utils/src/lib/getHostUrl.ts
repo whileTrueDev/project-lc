@@ -54,9 +54,8 @@ export const getBroadcasterWebHost = (): string => {
 export const getOverlayHost = (): string => {
   switch (process.env.NODE_ENV) {
     case 'production':
-      return process.env.OVERLAY_PROD_HOST;
     case 'test':
-      return process.env.OVERLAY_DEV_HOST;
+      return process.env.NEXT_PUBLIC_OVERLAY_HOST || process.env.OVERLAY_HOST;
     case 'development':
     default:
       return 'http://localhost:3002';
@@ -66,9 +65,8 @@ export const getOverlayHost = (): string => {
 export const getOverlayControllerHost = (): string => {
   switch (process.env.NODE_ENV) {
     case 'production':
-      return process.env.OVERLAY_CONTROLLER_PROD_HOST;
     case 'test':
-      return process.env.OVERLAY_CONTROLLER_DEV_HOST;
+      return process.env.OVERLAY_CONTROLLER_HOST || process.env.OVERLAY_CONTROLLER_HOST;
     case 'development':
     default:
       return 'http://localhost:3333';
