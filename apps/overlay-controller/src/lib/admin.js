@@ -3,10 +3,11 @@
 /* eslint no-undef: "error" */
 
 let roomName;
-let userId;
+let email;
 let streamerNickname;
+let liveShoppingId;
 let isLogin = true;
-const socket = io(process.env.HOST, { transports: ['websocket'] });
+const socket = io(process.env.SOCKET_HOST, { transports: ['websocket'] });
 
 socket.on('creator list from server', (data) => {
   if (data && data.length !== 0) {
@@ -29,9 +30,10 @@ $(document).ready(function ready() {
   $('#fever-time-picker').val(localISOTime);
 
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
+    liveShoppingId = $(this).closest('tr').children('td.liveshopping-id-cell').attr('id');
     streamerNickname = $(this).closest('tr').prop('id');
     const url = $(this).closest('tr').children('td.url-cell').attr('id');
-    userId = $(this).closest('tr').children('td.userid-cell').attr('id');
+    email = $(this).closest('tr').children('td.email-cell').attr('id');
 
     $('#creator-name').text(streamerNickname);
 
@@ -39,6 +41,7 @@ $(document).ready(function ready() {
       roomName: socket.id,
       url,
     });
+
     roomName = url.split('/').pop();
   });
 
@@ -90,6 +93,10 @@ $(document).ready(function ready() {
 
   $('#alive-check-button').click(function aliveCheckButtonClickEvent() {
     socket.emit('connection check from admin', roomName);
+  });
+
+  $('#liveshopping-id-button').click(function liveShoppingIdButtonClickEvent() {
+    socket.emit('liveshopping id from admin', { roomName, liveShoppingId });
   });
 
   $('#start-time-send-button').click(function startTimeSendButtonClickEvent() {
@@ -195,10 +202,10 @@ $(document).ready(function ready() {
     } else {
       level = '2';
     }
-
     const messageJson = JSON.stringify({
+      liveShoppingId,
       level,
-      userId,
+      email,
       loginFlag: isLogin,
       productName,
       purchaseNum: soldPrice,
@@ -211,7 +218,7 @@ $(document).ready(function ready() {
     const errorDialog = document.getElementById('dialog-message');
     $.ajax({
       type: 'POST',
-      url: 'http://localhost:3333/purchase-message',
+      url: `${process.env.HOST}/purchase-message`,
       dataType: 'text',
       contentType: 'application/json',
       data: messageJson,

@@ -174,4 +174,27 @@ export class LiveShoppingService {
       ],
     });
   }
+
+  async getLiveShoppingsForOverlayController(): Promise<any> {
+    // 현재 시간에 3시간 뺀 시간보다 방송종료 시간이 더 이후인 라이브쇼핑들 다 불러옴
+    const now = new Date();
+    now.setHours(now.getHours() - 3);
+
+    return this.prisma.liveShopping.findMany({
+      where: {
+        progress: 'confirmed',
+        broadcastEndDate: { gte: now },
+      },
+      select: {
+        id: true,
+        broadcaster: {
+          select: {
+            email: true,
+            userNickname: true,
+            overlayUrl: true,
+          },
+        },
+      },
+    });
+  }
 }
