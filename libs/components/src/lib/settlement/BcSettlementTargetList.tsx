@@ -32,12 +32,11 @@ import {
   convertFmDeliveryCompanyToString,
   CreateBroadcasterSettlementHistoryItem,
 } from '@project-lc/shared-types';
+import { settlementHistoryStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useCallback, useMemo, useState } from 'react';
-import { settlementHistoryStore } from '@project-lc/stores';
-import { ConfirmDialog } from '../..';
-import { ChakraDataGrid } from '../ChakraDataGrid';
-import { ChakraNextImage } from '../ChakraNextImage';
+import { ChakraNextImage, ConfirmDialog } from '../..';
+import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import { GridTableItem } from '../GridTableItem';
 
 export function calcSettleAmount(

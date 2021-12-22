@@ -28,7 +28,7 @@ import {
 } from '@project-lc/shared-types';
 import { useMemo } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { ChakraNextImage } from './ChakraNextImage';
+import { ChakraNextImage } from '../chakra-extended/ChakraNextImage';
 import { OrderExportDialogProps } from './ExportDialog';
 import { ErrorText } from './ShippingOptionIntervalApply';
 

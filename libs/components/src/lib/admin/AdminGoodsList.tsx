@@ -17,7 +17,7 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useState } from 'react';
 import { GOODS_CONFIRMATION_STATUS, GOODS_STATUS } from '../../constants/goodsStatus';
-import { ChakraDataGrid } from '../ChakraDataGrid';
+import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import { ShippingGroupDetailButton } from '../SellerGoodsList';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';

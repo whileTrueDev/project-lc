@@ -1,14 +1,5 @@
 import { useState } from 'react';
-import {
-  Box,
-  Button,
-  Link,
-  Text,
-  Tooltip,
-  useDisclosure,
-  Flex,
-  Spinner,
-} from '@chakra-ui/react';
+import { Box, Button, Link, Text, Tooltip, useDisclosure, Flex } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import {
@@ -18,7 +9,7 @@ import {
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
-import { ChakraDataGrid } from './ChakraDataGrid';
+import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
 import { LiveShoppingDetailDialog } from './LiveShoppingDetailDialog';
 
 export function BroadcasterLiveShoppingList({

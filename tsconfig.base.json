@@ -10,20 +10,48 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2017", "dom"],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@project-lc/components": ["libs/components/src/index.ts"],
-      "@project-lc/firstmall-db": ["libs/firstmall-db/src/index.ts"],
-      "@project-lc/hooks": ["libs/hooks/src/index.ts"],
-      "@project-lc/nest-modules": ["libs/nest-modules/src/index.ts"],
-      "@project-lc/prisma-orm": ["libs/prisma-orm/src/index.ts"],
-      "@project-lc/shared-types": ["libs/shared-types/src/index.ts"],
-      "@project-lc/stores": ["libs/stores/src/index.ts"],
-      "@project-lc/utils": ["libs/utils/src/index.ts"]
+      "@project-lc/components": [
+        "libs/components/src"
+      ],
+      "@project-lc/components-logo": [
+        "libs/components/src/lib/KksLogo.tsx"
+      ],
+      "@project-lc/components-orderList": [
+        "libs/components/src/order-list"
+      ],
+      "@project-lc/firstmall-db": [
+        "libs/firstmall-db/src/index.ts"
+      ],
+      "@project-lc/hooks": [
+        "libs/hooks/src/index.ts"
+      ],
+      "@project-lc/nest-modules": [
+        "libs/nest-modules/src/index.ts"
+      ],
+      "@project-lc/prisma-orm": [
+        "libs/prisma-orm/src/index.ts"
+      ],
+      "@project-lc/shared-types": [
+        "libs/shared-types/src/index.ts"
+      ],
+      "@project-lc/stores": [
+        "libs/stores/src/index.ts"
+      ],
+      "@project-lc/utils": [
+        "libs/utils/src/index.ts"
+      ]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }

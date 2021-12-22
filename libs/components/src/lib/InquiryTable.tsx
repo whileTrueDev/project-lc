@@ -20,7 +20,7 @@ import { GridColumns, GridRowData, GridToolbar } from '@material-ui/data-grid';
 import { useAdminInquiry, useChangeInquiryReadFlagMutation } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { useQueryClient } from 'react-query';
-import { ChakraDataGrid } from './ChakraDataGrid';
+import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
 
 export function InquiryTable(): JSX.Element {
   const { data, isLoading } = useAdminInquiry();

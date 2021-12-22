@@ -20,7 +20,7 @@ import { FindBcSettlementHistoriesRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { YouCanHorizontalScrollText } from '../YouCanHorizontalScrollText';
-import { ChakraDataGrid } from '../ChakraDataGrid';
+import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import { GridTableItem } from '../GridTableItem';
 import TextWithPopperButton from '../TextWithPopperButton';
 

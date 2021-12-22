@@ -12,6 +12,7 @@ export class LCProdVpcStack extends cdk.Stack {
   public readonly dbSecGrp: ec2.SecurityGroup;
   public readonly apiSecGrp: ec2.SecurityGroup;
   public readonly overlaySecGrp: ec2.SecurityGroup;
+  public readonly overlayControllerSecGrp: ec2.SecurityGroup;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -24,6 +25,7 @@ export class LCProdVpcStack extends cdk.Stack {
     this.albSecGrp = this.createAlbSecGrp();
     this.apiSecGrp = this.createApiSecGrp(this.albSecGrp);
     this.overlaySecGrp = this.createOverlaySecGrp(this.albSecGrp);
+    this.overlayControllerSecGrp = this.createOverlayControllerSecGrp(this.albSecGrp);
     this.dbSecGrp = this.createDbSecGrp({
       apiSecGrp: this.apiSecGrp,
       overlaySecGrp: this.overlaySecGrp,
@@ -86,6 +88,26 @@ export class LCProdVpcStack extends cdk.Stack {
 
     overlaySecGrp.addIngressRule(albSecGrp, ec2.Port.tcp(3002), 'allow port 3002');
     return overlaySecGrp;
+  }
+
+  /** 오버레이 컨트롤러 서버 보안 그룹 생성 */
+  private createOverlayControllerSecGrp(albSecGrp: ec2.SecurityGroup): ec2.SecurityGroup {
+    const overlayControllerSecGrp = new ec2.SecurityGroup(
+      this,
+      `${ID_PREFIX}OverlayController-SecGrp`,
+      {
+        vpc: this.vpc,
+        description: 'overlay-controller security grp for project-lc',
+        allowAllOutbound: true,
+      },
+    );
+
+    overlayControllerSecGrp.addIngressRule(
+      albSecGrp,
+      ec2.Port.tcp(3333),
+      'allow port 3333 to alb',
+    );
+    return overlayControllerSecGrp;
   }
 
   /** 데이터베이스 서버 보안그룹 생성 */

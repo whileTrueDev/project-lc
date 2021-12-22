@@ -14,7 +14,7 @@ export interface OrderSpreadSheetColumnOption {
     ship?: FindFmOrderDetailRes['shippings'][number],
     item?: FindFmOrderDetailRes['shippings'][number]['items'][number],
     itemOption?: FindFmOrderDetailRes['shippings'][number]['items'][number]['options'][number],
-  ) => string | number;
+  ) => string | number | null | undefined;
   mergeable?: boolean;
 }
 
@@ -113,18 +113,18 @@ export const defaultColumOpts: OrderSpreadSheetColumnOption[] = [
   {
     type: '상품정보',
     headerName: '상품고유번호',
-    getValue: (_, __, item) => item.goods_seq,
+    getValue: (_, __, item) => item?.goods_seq,
   },
   {
     type: '상품정보',
     headerName: '상품명',
-    getValue: (_, __, item) => item.goods_name,
+    getValue: (_, __, item) => item?.goods_name,
   },
   {
     type: '상품정보',
     headerName: '옵션',
     getValue: (_, __, ___, opt) => {
-      if (opt.title1) {
+      if (opt?.title1) {
         return `${opt.title1}: ${opt.option1}`;
       }
       return '기본옵션';
@@ -133,25 +133,25 @@ export const defaultColumOpts: OrderSpreadSheetColumnOption[] = [
   {
     type: '상품정보',
     headerName: '상태',
-    getValue: (_, __, ___, opt) => convertFmOrderStatusToString(opt.step),
+    getValue: (_, __, ___, opt) => (opt ? convertFmOrderStatusToString(opt.step) : '-'),
   },
   {
     type: '상품정보',
     headerName: '수량',
-    getValue: (_, __, ___, opt) => opt.ea,
+    getValue: (_, __, ___, opt) => opt?.ea,
   },
   {
     type: '상품정보',
     headerName: '판매가',
     getValue: (_, __, ___, opt) => {
-      const price = Number(opt.price);
-      return price - Number(opt.member_sale) - Number(opt.mobile_sale);
+      const price = Number(opt?.price);
+      return price - Number(opt?.member_sale) - Number(opt?.mobile_sale);
     },
   },
   {
     type: '상품정보',
     headerName: '판매가x수량',
-    getValue: (_, __, ___, opt) => Number(opt.price) * opt.ea,
+    getValue: (_, __, ___, opt) => Number(opt?.price) * Number(opt?.ea),
   },
 ];
 
@@ -163,7 +163,7 @@ interface OrderSpreadSheetGeneratorOptions {
 }
 
 export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<FindFmOrderDetailRes> {
-  private columns: OrderSpreadSheetGeneratorOptions['columns'];
+  private columns: OrderSpreadSheetColumnOption[];
 
   constructor(private opts?: OrderSpreadSheetGeneratorOptions) {
     super();
@@ -173,7 +173,7 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<FindFmOrderD
     }
     if (opts?.disabledColumnHeaders) {
       this.columns = this.columns.filter(
-        ({ headerName }) => !opts?.disabledColumnHeaders.includes(headerName),
+        ({ headerName }) => !opts?.disabledColumnHeaders?.includes(headerName),
       );
     }
   }
@@ -226,7 +226,9 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<FindFmOrderD
               let wch = colWidth;
               const currentCol = cols[fieldIdx];
               if (currentCol) {
-                wch = colWidth > currentCol.wch ? colWidth : currentCol.wch;
+                wch =
+                  (colWidth > Number(currentCol.wch) ? colWidth : currentCol.wch) ||
+                  colWidth;
               }
               cols[fieldIdx] = { wch };
 

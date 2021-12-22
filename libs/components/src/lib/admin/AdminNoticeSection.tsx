@@ -16,7 +16,7 @@ import {
   useNoticeInfo,
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
-import { ChakraDataGrid } from '../ChakraDataGrid';
+import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import { AdminNoticeDialog } from './AdminNoticeDialog';
 
 const columns = (

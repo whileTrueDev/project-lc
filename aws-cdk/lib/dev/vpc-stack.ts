@@ -13,6 +13,7 @@ export class LCDevVpcStack extends cdk.Stack {
   public dbSecGrp: ec2.SecurityGroup;
   public apiSecGrp: ec2.SecurityGroup;
   public overlaySecGrp: ec2.SecurityGroup;
+  public overlayControllerSecGrp: ec2.SecurityGroup;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -41,8 +42,10 @@ export class LCDevVpcStack extends cdk.Stack {
     const apiSecGrp = this.createApiSecGrp();
     const overlaySecGrp = this.createOverlaySecGrp();
     this.createDbSecGrp(apiSecGrp, overlaySecGrp);
+    this.createOverlayControllerSecGrp();
   }
 
+  /** 로드밸런서(ALB) 보안 그룹 생성 */
   private createAlbSecGrp() {
     this.albSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}ALB-SecGrp`, {
       vpc: this.vpc,
@@ -64,6 +67,7 @@ export class LCDevVpcStack extends cdk.Stack {
     return this.albSecGrp;
   }
 
+  /** 데이터베이스 보안 그룹 생성 */
   private createDbSecGrp(apiSecGrp: ec2.SecurityGroup, overlaySecGrp: ec2.SecurityGroup) {
     // * 보안그룹
     // db 보안그룹
@@ -102,6 +106,7 @@ export class LCDevVpcStack extends cdk.Stack {
     return this.dbSecGrp;
   }
 
+  /** API 서버 보안 그룹 생성 */
   private createApiSecGrp() {
     this.apiSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}API-SecGrp`, {
       vpc: this.vpc,
@@ -118,6 +123,7 @@ export class LCDevVpcStack extends cdk.Stack {
     return this.apiSecGrp;
   }
 
+  /** 오버레이 서버 보안 그룹 생성 */
   private createOverlaySecGrp() {
     this.overlaySecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}Overlay-SecGrp`, {
       vpc: this.vpc,
@@ -132,5 +138,26 @@ export class LCDevVpcStack extends cdk.Stack {
     );
 
     return this.overlaySecGrp;
+  }
+
+  /** 오버레이 컨트롤러 서버 보안 그룹 생성 */
+  private createOverlayControllerSecGrp() {
+    this.overlayControllerSecGrp = new ec2.SecurityGroup(
+      this,
+      `${ID_PREFIX}OverlayController-SecGrp`,
+      {
+        vpc: this.vpc,
+        description: 'overlay-controller security grp for project-lc',
+        allowAllOutbound: true,
+      },
+    );
+
+    this.overlayControllerSecGrp.addIngressRule(
+      this.albSecGrp,
+      ec2.Port.tcp(3333),
+      'allow port 3333 to alb',
+    );
+
+    return this.overlayControllerSecGrp;
   }
 }

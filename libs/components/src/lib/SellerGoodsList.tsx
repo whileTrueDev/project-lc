@@ -22,7 +22,7 @@ import {
   GOODS_STATUS,
   GOODS_VIEW,
 } from '../constants/goodsStatus';
-import { ChakraDataGrid } from './ChakraDataGrid';
+import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
 import DeleteGoodsAlertDialog from './DeleteGoodsAlertDialog';
 import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 import { ShippingGroupDetailModal } from './GoodsRegistShippingPolicy';

@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useState } from 'react';
 import { YouCanHorizontalScrollText } from '../YouCanHorizontalScrollText';
-import { ChakraDataGrid } from '../ChakraDataGrid';
+import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import { SettlementInfoDialog } from './SettlementInfoDialog';
 
 /** 판매자 정산 내역 */

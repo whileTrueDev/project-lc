@@ -9,7 +9,7 @@ import {
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
-import { ChakraDataGrid } from '../ChakraDataGrid';
+import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import FmOrderStatusBadge from '../FmOrderStatusBadge';
 import TooltipedText from '../TooltipedText';
 

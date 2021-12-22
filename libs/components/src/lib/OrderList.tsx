@@ -22,7 +22,7 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useMemo } from 'react';
 import { FaTruck } from 'react-icons/fa';
-import { ChakraDataGrid } from './ChakraDataGrid';
+import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
 import ExportManyDialog from './ExportManyDialog';
 import FmOrderStatusBadge from './FmOrderStatusBadge';
 import OrderListDownloadDialog from './OrderListDownloadDialog';
