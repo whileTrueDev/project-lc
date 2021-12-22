@@ -51,6 +51,7 @@ const prodAppStack = new LCProdAppStack(app, 'LC-PROD-APP', {
   albSecGrp: prodVpcStack.albSecGrp,
   apiSecGrp: prodVpcStack.apiSecGrp,
   overlaySecGrp: prodVpcStack.overlaySecGrp,
+  overlayControllerSecGrp: prodVpcStack.overlayControllerSecGrp,
 });
 
 // ************************************
