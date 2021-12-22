@@ -8,7 +8,7 @@ import {
   NicknameAndText,
   PriceSum,
   PurchaseMessage,
-  UserId,
+  BroadcasterEmail,
   Voice,
 } from '@project-lc/shared-types';
 import { S3 } from '@aws-sdk/client-s3';
@@ -106,7 +106,7 @@ export class OverlayService {
   }
 
   async getRanking(overlayUrl): Promise<NicknameAndPrice[]> {
-    const topRanks = await this.prisma.liveCommerceRanking.groupBy({
+    const topRanks = await this.prisma.liveShoppingPurchaseMessage.groupBy({
       by: ['nickname'],
       where: {
         broadcaster: {
@@ -123,7 +123,7 @@ export class OverlayService {
   }
 
   async getTotalSoldPrice(): Promise<PriceSum> {
-    const totalSoldPrice = await this.prisma.liveCommerceRanking.aggregate({
+    const totalSoldPrice = await this.prisma.liveShoppingPurchaseMessage.aggregate({
       _sum: {
         price: true,
       },
@@ -133,7 +133,7 @@ export class OverlayService {
   }
 
   async getMessageAndNickname(overlayUrl): Promise<NicknameAndText[]> {
-    const messageAndNickname = await this.prisma.liveCommerceRanking.findMany({
+    const messageAndNickname = await this.prisma.liveShoppingPurchaseMessage.findMany({
       select: {
         nickname: true,
         text: true,
@@ -149,15 +149,15 @@ export class OverlayService {
     return messageAndNickname;
   }
 
-  async getVerticalImagesFromS3(userId: UserId): Promise<number> {
+  async getVerticalImagesFromS3(email: BroadcasterEmail): Promise<number> {
     const { S3_BUCKET_NAME } = process.env;
 
-    const broadcasterId = userId.userId;
+    const broadcasterEmail = email.email;
     let imagesUrls = 0;
 
     const listingParams = {
       Bucket: S3_BUCKET_NAME,
-      Prefix: `vertical-banner/${broadcasterId}/`,
+      Prefix: `vertical-banner/${broadcasterEmail}/`,
     };
 
     await this.s3

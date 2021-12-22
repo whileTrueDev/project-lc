@@ -4,22 +4,25 @@ import {
   PurchaseMessageWithLoginFlag,
 } from '@project-lc/shared-types';
 import { ConfigService } from '@nestjs/config';
-import { OverlayControllerService } from '@project-lc/nest-modules';
-
+import { OverlayControllerService, LiveShoppingService } from '@project-lc/nest-modules';
+import { getOverlayControllerHost, getOverlayHost } from '@project-lc/utils';
 @Controller()
 export class AppController {
   constructor(
     private readonly overlayControllerService: OverlayControllerService,
+    private readonly liveShoppingService: LiveShoppingService,
     private readonly configService: ConfigService,
   ) {}
 
   @Get()
   @Render('index')
   async renterTest(): Promise<OverlayControllerMainRes> {
-    const HOST = this.configService.get('OVERLAY_HOST_NAME');
-
+    const SOCKET_HOST = getOverlayHost();
+    const HOST = getOverlayControllerHost();
     const userIdAndUrlAndNicknames = await this.overlayControllerService.getCreatorUrls();
-    return { userIdAndUrlAndNicknames, HOST };
+    const liveShoppings =
+      await this.liveShoppingService.getLiveShoppingsForOverlayController();
+    return { userIdAndUrlAndNicknames, SOCKET_HOST, HOST, liveShoppings };
   }
 
   @Post('/purchase-message')
