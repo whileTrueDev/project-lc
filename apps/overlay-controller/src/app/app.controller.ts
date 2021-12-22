@@ -1,7 +1,17 @@
-import { Controller, Get, Render, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Render,
+  Post,
+  Body,
+  Query,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import {
   OverlayControllerMainRes,
   PurchaseMessageWithLoginFlag,
+  liveShoppingPurchaseMessageDto,
 } from '@project-lc/shared-types';
 import { ConfigService } from '@nestjs/config';
 import { OverlayControllerService, LiveShoppingService } from '@project-lc/nest-modules';
@@ -25,9 +35,23 @@ export class AppController {
     return { userIdAndUrlAndNicknames, SOCKET_HOST, HOST, liveShoppings };
   }
 
+  @Get('/purchase-message')
+  async getMessage(
+    @Query('liveShoppingId') liveShoppingId: number,
+  ): Promise<liveShoppingPurchaseMessageDto[]> {
+    return this.overlayControllerService.getPurchaseMessage(liveShoppingId);
+  }
+
   @Post('/purchase-message')
   async uploadMessage(@Body() data: PurchaseMessageWithLoginFlag): Promise<boolean> {
     const upload = await this.overlayControllerService.uploadPurchase(data);
     return upload;
+  }
+
+  @Delete('/purchase-message')
+  async deleteMessage(
+    @Body('messageId', ParseIntPipe) messageId: number,
+  ): Promise<boolean> {
+    return this.overlayControllerService.deletePurchaseMessage(messageId);
   }
 }

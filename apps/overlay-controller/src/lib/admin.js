@@ -1,5 +1,5 @@
 /* eslint-env jquery */
-/* global io, */
+/* global io, Handlebars */
 /* eslint no-undef: "error" */
 
 let roomName;
@@ -20,14 +20,65 @@ socket.on('creator list from server', (data) => {
 });
 
 $(document).ready(function ready() {
-  $('#table_id').DataTable({ lengthChange: false });
   $('.mid-area button').attr('disabled', true);
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
   const localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
-
+  $('table#liveshopping-table').DataTable();
   $('#start-time-picker').val(localISOTime);
   $('#end-time-picker').val(localISOTime);
   $('#fever-time-picker').val(localISOTime);
+
+  Handlebars.registerHelper('toLocaleString', function (number) {
+    return number.toLocaleString();
+  });
+
+  Handlebars.registerHelper('dateFormatter', function (dateTime) {
+    const date = new Date(dateTime);
+    const newDate = `${
+      date.getMonth() + 1
+    }-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    return newDate;
+  });
+
+  // 구입 메세지 목록 받아오는 재귀 ajax
+  function getPurchaseMessage() {
+    $.ajax({
+      type: 'GET',
+      url: `${process.env.HOST}/purchase-message`,
+      dataType: 'json',
+      data: { liveShoppingId },
+      success(data) {
+        $('table#message-table').DataTable().destroy();
+        const source = $('#purchase-message-list').html(); // 템플릿으로 만든 text를 불러옴
+        const template = Handlebars.compile(source);
+        $('#message-tbody').html(template(data));
+        $('table#message-table').DataTable();
+        // hbs가 컴파일하여 파싱한 이후에, 이벤트 새로 등록해줘야 함.
+        $('.delete-message-button').click(function deleteMessageButtonClick() {
+          const messageId = $(this)
+            .closest('tr')
+            .children('td.message-id-cell')
+            .attr('id');
+
+          $.ajax({
+            type: 'DELETE',
+            url: `${process.env.HOST}/purchase-message`,
+            dataType: 'json',
+            data: { messageId },
+            success() {
+              getPurchaseMessage();
+            },
+            error(error) {
+              console.log(error);
+            },
+          });
+        });
+      },
+      error(error) {
+        console.log(error);
+      },
+    });
+  }
 
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
     liveShoppingId = $(this).closest('tr').children('td.liveshopping-id-cell').attr('id');
@@ -43,6 +94,7 @@ $(document).ready(function ready() {
     });
 
     roomName = url.split('/').pop();
+    getPurchaseMessage();
   });
 
   $('#toggle-table-button').click(function toggleTableButtonClickEvent() {
@@ -242,6 +294,8 @@ $(document).ready(function ready() {
             message: '',
           });
         }
+        // 메시지 전송하면, 바로 테이블 업데이트
+        getPurchaseMessage();
       },
       error() {
         errorDialog.showModal();
