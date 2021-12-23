@@ -1,5 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import {
+  BroacasterPurchaseWithDivdedMessageDto,
+  BroadcasterPurchaseDto,
+  ChangeReturnStatusDto,
   FindFmOrderDetailRes,
   FindFmOrderRes,
   FindFmOrdersDto,
@@ -8,6 +11,7 @@ import {
   FmOrderExportBase,
   FmOrderExportItemOption,
   FmOrderItem,
+  FmOrderItemSubOption,
   FmOrderMetaInfo,
   FmOrderOption,
   FmOrderRefund,
@@ -16,18 +20,12 @@ import {
   FmOrderReturnBase,
   FmOrderReturnItem,
   FmOrderShipping,
+  fmOrderStatuses,
   FmOrderStatusNumString,
   getFmOrderStatusByNames,
-  OrderStatsRes,
-  LiveShoppingWithSalesAndFmId,
-  ChangeReturnStatusDto,
-  fmOrderStatuses,
-  FmOrderItemInput,
-  FmOrderItemSubOption,
-  CheeringMessage,
-  BroadcasterPurchaseDto,
   GoodsConfirmationDtoOnlyConnectionId,
-  BroacasterPurchaseWithDivdedMessageDto,
+  LiveShoppingWithSalesAndFmId,
+  OrderStatsRes,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { FirstmallDbService } from '../firstmall-db.service';
@@ -77,9 +75,6 @@ export class FmOrdersService {
         // 주문번호로 선물여부 옵션 조회
         const giftFlag = await this.findOneOrderGiftFlag(order.order_seq);
 
-        // 응원메시지, 닉네임 조회
-        const cheeringMessage = await this.findOneOrderCheeringMessage(order.order_seq);
-
         return {
           ...order,
           ...orderInfoPerMyGoods,
@@ -87,7 +82,6 @@ export class FmOrdersService {
           totalShippingCost,
           totalDeliveryCost: totalShippingCost,
           giftFlag,
-          cheeringMessage: cheeringMessage || undefined,
         };
       }),
     );
@@ -327,13 +321,9 @@ export class FmOrdersService {
     // 주문번호로 선물여부 옵션 조회
     const giftFlag = await this.findOneOrderGiftFlag(order.order_seq);
 
-    // 응원메시지, 닉네임 조회
-    const cheeringMessage = await this.findOneOrderCheeringMessage(order.order_seq);
-
     return {
       ...order,
       giftFlag,
-      cheeringMessage: cheeringMessage || undefined,
     };
   }
 
@@ -862,32 +852,6 @@ export class FmOrdersService {
     );
 
     return salesPrice;
-  }
-
-  /** 주문의 응원메시지, 구매자 닉네임(fm_order_item_input) 조회 */
-  private async findOneOrderCheeringMessage(
-    orderId: FmOrder['order_seq'] | string,
-  ): Promise<CheeringMessage | null> {
-    // 주문번호로 입력옵션(닉네임, 응원메시지) 조회
-    const inputOptions: FmOrderItemInput[] = await this.db.query(`
-      SELECT
-        item_input_seq,
-        order_seq,
-        title,
-        value
-      FROM fm_order_item_input
-      WHERE order_seq = ${orderId}
-    `);
-
-    if (inputOptions.length === 0) return null;
-
-    const nicknameOption = inputOptions.find((opt) => opt.title.includes('닉네임'));
-    const messageOption = inputOptions.find((opt) => opt.title.includes('응원'));
-
-    return {
-      nickname: nicknameOption?.value,
-      text: messageOption?.value,
-    };
   }
 
   /** 주문의 선물하기 여부 조회 */
