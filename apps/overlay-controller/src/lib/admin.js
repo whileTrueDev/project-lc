@@ -251,6 +251,7 @@ $(document).ready(function ready() {
     let customerMessage = $('#customer-message').val().trim();
     const phoneCallEventFlag = $('input[name="event"]:checked').val() === 'yes';
     const giftFlag = $('input[name="gift"]:checked').val() === 'yes';
+    const isOnlyDb = $('#insert-only-db-checkbox').is(':checked');
 
     isLogin = !$('input[name=client-checkbox]').is(':checked');
 
@@ -276,7 +277,7 @@ $(document).ready(function ready() {
       giftFlag,
     });
 
-    const errorDialog = document.getElementById('dialog-message');
+    const errorDialog = document.getElementById('error-dialog');
     $.ajax({
       type: 'POST',
       url: `${process.env.HOST}/purchase-message`,
@@ -284,6 +285,13 @@ $(document).ready(function ready() {
       contentType: 'application/json',
       data: messageJson,
       success() {
+        if (isOnlyDb) {
+          $('#insert-dialog').fadeIn();
+          setTimeout(() => {
+            $('#insert-dialog').fadeOut();
+          }, 3000);
+          return;
+        }
         if (isLogin) {
           socket.emit('right top purchase message', {
             roomName,
@@ -320,7 +328,8 @@ $(document).ready(function ready() {
         $('input[name="gift"]').removeAttr('checked');
         $('input[name="event"]').filter('[value=no]').prop('checked', true);
         $('input[name="gift"]').filter('[value=no]').prop('checked', true);
-        $('input[name=client-checkbox]').prop('checked', false);
+        $('input[id=is-client-checkbox]').prop('checked', false);
+        $('input[id=insert-only-db-checkbox]').prop('checked', false);
       },
     });
   });

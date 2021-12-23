@@ -187,3 +187,8 @@ fieldset {
 label {
   margin: 3px;
 }
+
+#insert-dialog {
+  position: absolute;
+  top: 20px;
+}
