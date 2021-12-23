@@ -70,10 +70,7 @@
             "commands": [
               "docker build -f ./apps/api/Dockerfile -t {args.registry}/project-lc-api:{args.tag} --platform=linux/amd64 .",
               "docker tag {args.registry}/project-lc-api:{args.tag} {args.registry}/project-lc-api:latest",
-              {
-                "command": "docker push {args.registry}/project-lc-api:{args.tag}",
-                "forwardAllArgs": false
-              }
+              "docker push {args.registry}/project-lc-api:{args.tag}"
             ],
             "parallel": false
           }
@@ -82,12 +79,8 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login ",
               "docker build -f ./apps/api/Dockerfile -t {args.registry}/project-lc-api-dev:latest --platform=linux/amd64 .",
-              {
-                "command": "docker push {args.registry}/project-lc-api-dev:latest",
-                "forwardAllArgs": false
-              }
+              "docker push {args.registry}/project-lc-api-dev:latest"
             ],
             "parallel": false
           }
