@@ -19,6 +19,7 @@ class MyDocument extends Document {
     return (
       <Html lang="ko">
         <Head>
+          {/* Google Tag Manager */}
           <script
             dangerouslySetInnerHTML={{
               __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -65,6 +66,7 @@ class MyDocument extends Document {
           />
         </Head>
         <body>
+          {/* Google Tag Manager (noscript) */}
           <noscript>
             <iframe
               title="google-tag-manager"
