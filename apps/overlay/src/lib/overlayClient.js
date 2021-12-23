@@ -42,7 +42,7 @@ function getOS() {
 }
 
 function dailyMissionTimer() {
-  setInterval(async function timer() {
+  setInterval(function timer() {
     const roomName = pageUrl.split('/').pop();
 
     // 현재 날짜를 new 연산자를 사용해서 Date 객체를 생성
@@ -74,11 +74,11 @@ function dailyMissionTimer() {
             <source src="/videos/intro.mp4" type="video/mp4">
           </video>
             `;
-        await $('.full-video').html(introHtml);
-        setTimeout(() => {
+        $('.full-video').html(introHtml);
+        $('.inner-video-area').on('ended', function () {
           $('.live-commerce').show();
           $('.inner-video-area').fadeOut(500);
-        }, 7500);
+        });
       }
     }
 
@@ -485,31 +485,31 @@ socket.on('refresh signal', () => {
   window.location.reload();
 });
 
-socket.on('show video from server', async (type) => {
+socket.on('show video from server', (type) => {
   if (type === 'intro') {
     const introHtml = `
     <video class="inner-video-area" autoplay>
       <source src="/videos/intro.mp4" type="video/mp4">
     </video>
       `;
-    await $('.full-video').html(introHtml);
+    $('.full-video').html(introHtml);
 
-    setTimeout(() => {
+    $('.inner-video-area').on('ended', function () {
       $('.live-commerce').show();
       $('.inner-video-area').fadeOut(500);
-    }, 7500);
+    });
   } else {
     const outroHtml = `
     <video class="inner-video-area" autoplay>
       <source src="/videos/outro.mp4" type="video/mp4">
     </video>
       `;
-    await $('.full-video').html(outroHtml);
+    $('.full-video').html(outroHtml);
 
-    setTimeout(() => {
+    $('.inner-video-area').on('ended', function () {
       $('.live-commerce').hide();
       $('.inner-video-area').fadeOut(500);
-    }, 9500);
+    });
   }
 });
 
