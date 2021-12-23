@@ -10,6 +10,7 @@ import {
   PurchaseMessage,
   BroadcasterEmail,
   Voice,
+  LiveShoppingBroadcastDate,
 } from '@project-lc/shared-types';
 import { S3 } from '@aws-sdk/client-s3';
 import { throwError } from 'rxjs';
@@ -175,5 +176,17 @@ export class OverlayService {
       });
 
     return imagesUrls;
+  }
+
+  async getRegisteredTime(liveShoppingId: number): Promise<LiveShoppingBroadcastDate> {
+    return this.prisma.liveShopping.findFirst({
+      where: {
+        id: Number(liveShoppingId),
+      },
+      select: {
+        broadcastStartDate: true,
+        broadcastEndDate: true,
+      },
+    });
   }
 }

@@ -76,6 +76,10 @@ div.etc-controller {
   width: 45%;
 }
 
+div.purchase-message-box {
+  margin-top: 10px;
+}
+
 input[type='text'] {
   width: 200px;
   padding: 12px 20px;
@@ -166,6 +170,11 @@ button[type='submit']:hover {
   background-color: #45a049;
 }
 
+button.delete-message-button {
+  background-color: red;
+  width: 30px;
+}
+
 hr.solid {
   border-top: 3px solid #bbb;
 }
@@ -177,4 +186,9 @@ fieldset {
 
 label {
   margin: 3px;
+}
+
+#insert-dialog {
+  position: absolute;
+  top: 20px;
 }

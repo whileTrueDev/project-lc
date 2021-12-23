@@ -42,11 +42,11 @@ export class LiveShoppingDTO {
 
   @IsOptional()
   @IsDate()
-  broadcastStartDate: string;
+  broadcastStartDate: Date;
 
   @IsOptional()
   @IsDate()
-  broadcastEndDate: string;
+  broadcastEndDate: Date;
 
   @IsOptional()
   @IsDate()
@@ -107,3 +107,8 @@ export interface LiveShoppingWithConfirmation extends LiveShopping {
     };
   };
 }
+
+export type LiveShoppingBroadcastDate = Pick<
+  LiveShoppingDTO,
+  'broadcastStartDate' | 'broadcastEndDate'
+>;
