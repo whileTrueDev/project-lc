@@ -183,7 +183,9 @@ export function ShopInfoShippingGroup(): JSX.Element {
       {/* 배송비 정책 목록 컨테이너 */}
       <ShippingGroupContainerBox maxHeight="150px" overflowY="auto">
         {/* 생성된 배송비 정책 없는경우 */}
-        {(!data || data.length === 0) && <Text>등록된 배송비 정책이 없습니다. </Text>}
+        {(!data || data.length === 0) && (
+          <Text textAlign="center">등록된 배송비 정책이 없습니다. </Text>
+        )}
         {/* 배송비 정책 목록 */}
         {data && data.map((g) => <ShopInfoShippingPolicyItem key={g.id} group={g} />)}
       </ShippingGroupContainerBox>
