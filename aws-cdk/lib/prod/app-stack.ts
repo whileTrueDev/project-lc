@@ -84,12 +84,12 @@ export class LCProdAppStack extends cdk.Stack {
       lifecycleRules: [
         {
           maxImageAge: cdk.Duration.days(60),
-          description: '60일',
+          description: 'only 60 days for prod images',
           tagPrefixList: ['prod-'],
         },
         {
           maxImageAge: cdk.Duration.days(365),
-          description: 'latest 365일',
+          description: 'only 365 days for "latest" image',
           tagPrefixList: ['latest'],
         },
       ],

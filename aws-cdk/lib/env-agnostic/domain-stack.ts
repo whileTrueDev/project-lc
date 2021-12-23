@@ -42,7 +42,7 @@ export class LCDomainStack extends cdk.Stack {
       `${this.PUNYCODE_DOMAIN}_PublicHostedZone`,
       {
         zoneName: this.PUNYCODE_DOMAIN,
-        comment: `${this.DOMAIN} hosted zone`,
+        comment: `kkshow hosted zone`,
       },
     );
     return this.hostedzone;
