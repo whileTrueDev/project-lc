@@ -20,6 +20,23 @@ export type s3KeyType =
   | 'broadcaster-id-card' // 방송인 신분증
   | 'broadcaster-account-image'; // 방송인 통장사본
 
+export interface S3UploadImageOptions {
+  filename: string | null;
+  userMail: string | undefined;
+  type: s3KeyType;
+  file: File | Buffer | null;
+  companyName?: string;
+  liveShoppingId?: number;
+}
+
+export type s3FileNameParams = {
+  userMail: string;
+  type: s3KeyType;
+  filename: string | null;
+  companyName?: string;
+  liveShoppingId?: number;
+};
+
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
   // 해당 네임 스페이스에서의 객체선언
@@ -35,23 +52,6 @@ export const s3 = (() => {
       secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET!,
     },
   });
-
-  interface S3UploadImageOptions {
-    filename: string | null;
-    userMail: string | undefined;
-    type: s3KeyType;
-    file: File | Buffer | null;
-    companyName?: string;
-    liveShoppingId?: number;
-  }
-
-  type s3FileNameParams = {
-    userMail: string;
-    type: s3KeyType;
-    filename: string | null;
-    companyName?: string;
-    liveShoppingId?: number;
-  };
 
   // 파일명에서 확장자를 추출하는 과정
   function getExtension(fileName: string | null): string {

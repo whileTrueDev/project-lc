@@ -81,9 +81,6 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
   return (
     <Container maxW="container.lg">
       <Heading>문의사항을 남겨주세요</Heading>
-      <Text m={3} color="red.500">
-        - 빨간 글자는 필수 입력 사항입니다.
-      </Text>
       <FormProvider {...methods}>
         <Grid
           as="form"
@@ -92,6 +89,7 @@ export function InquiryForm(props: InquiryFormProps): JSX.Element {
           templateRows="repeat(6, 1fr)"
           templateColumns="repeat(3, 1fr)"
           gap={4}
+          mt={6}
           onSubmit={handleSubmit(regist)}
         >
           <GridItem rowSpan={1} colSpan={1}>

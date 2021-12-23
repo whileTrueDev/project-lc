@@ -4,9 +4,7 @@ import {
   FmExportRes,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { FaBoxOpen, FaShippingFast } from 'react-icons/fa';
-import { IoFastFoodOutline } from 'react-icons/io5';
-import { MdDateRange } from 'react-icons/md';
+import { FaHamburger, FaBoxOpen, FaShippingFast, FaCalendarAlt } from 'react-icons/fa';
 import { SummaryList } from './SummaryList';
 
 export interface ExportDetailSummaryProps {
@@ -23,14 +21,14 @@ export function ExportDetailSummary({
           value: `출고 등록일시 ${dayjs(exportData.regist_date).format(
             'YYYY년 MM월 DD일 HH:mm:ss',
           )}`,
-          icon: MdDateRange,
+          icon: FaCalendarAlt,
         },
         {
           id: '출고 완료일',
           value: `출고 완료일 ${dayjs(exportData.complete_date).format(
             'YYYY년 MM월 DD일',
           )}`,
-          icon: MdDateRange,
+          icon: FaCalendarAlt,
           iconColor: 'cyan.600',
           disabled: !exportData.complete_date,
         },
@@ -39,7 +37,7 @@ export function ExportDetailSummary({
           value: `배송 완료일 ${dayjs(exportData.shipping_date).format(
             'YYYY년 MM월 DD일',
           )}`,
-          icon: MdDateRange,
+          icon: FaCalendarAlt,
           iconColor: 'blue.500',
           disabled: !exportData.shipping_date,
         },
@@ -58,7 +56,7 @@ export function ExportDetailSummary({
         {
           id: '출고 상품 개수',
           value: `출고 상품 개수 ${exportData.items.length} 개`,
-          icon: IoFastFoodOutline,
+          icon: FaHamburger,
         },
         {
           id: '구매확정',
@@ -66,7 +64,7 @@ export function ExportDetailSummary({
             exportData.buy_confirm,
           )}, 
             ${dayjs(exportData.confirm_date).format('YYYY년 MM월 DD일')})`,
-          icon: IoFastFoodOutline,
+          icon: FaHamburger,
           iconColor: 'blue.500',
           disabled: !(exportData.confirm_date && exportData.buy_confirm !== 'none'),
         },

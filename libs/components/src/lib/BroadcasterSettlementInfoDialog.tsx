@@ -10,8 +10,9 @@ import {
 } from '@chakra-ui/modal';
 import { Box, Heading, useToast, VStack } from '@chakra-ui/react';
 import { TaxationType } from '@prisma/client';
-import { s3, useBroadcasterSettlementInfoMutation, useProfile } from '@project-lc/hooks';
+import { useBroadcasterSettlementInfoMutation, useProfile } from '@project-lc/hooks';
 import { BroadcasterSettlementInfoDto, UserProfileRes } from '@project-lc/shared-types';
+import { s3 } from '@project-lc/utils-s3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { boxStyle } from '../constants/commonStyleProps';
 import BroadcasterSettlementInfoAccount, {

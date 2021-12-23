@@ -1,8 +1,8 @@
 import { Box, Text } from '@chakra-ui/react';
-import { useFormContext } from 'react-hook-form';
-import { liveShoppingManageStore } from '@project-lc/stores';
+import { ChakraAutoComplete } from '@project-lc/components-core';
 import { useAdminBroadcaster } from '@project-lc/hooks';
-import { ChakraAutoComplete } from '..';
+import { liveShoppingManageStore } from '@project-lc/stores';
+import { useFormContext } from 'react-hook-form';
 
 export function BroadcasterAutocomplete(): JSX.Element {
   const { data } = useAdminBroadcaster();

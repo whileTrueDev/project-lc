@@ -1,10 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { Response, Request } from 'express';
-import {
-  getBroadcasterWebHost,
-  getUserTypeFromRequest,
-  getWebHost,
-} from '@project-lc/utils';
+import { getBroadcasterWebHost, getWebHost } from '@project-lc/utils';
+import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { UserType } from '@project-lc/shared-types';
 import { SocialService } from './social.service';
 

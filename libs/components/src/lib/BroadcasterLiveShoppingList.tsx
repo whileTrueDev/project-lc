@@ -8,8 +8,8 @@ import {
   useProfile,
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
+import { ChakraDataGrid } from '@project-lc/components-core';
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
-import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
 import { LiveShoppingDetailDialog } from './LiveShoppingDetailDialog';
 
 export function BroadcasterLiveShoppingList({

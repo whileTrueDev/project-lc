@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
 import {
   Button,
+  Divider,
+  Heading,
+  HStack,
+  Link,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Divider,
   Stack,
-  useToast,
-  HStack,
-  VStack,
-  Heading,
-  useDisclosure,
   Text,
-  Link,
+  useDisclosure,
+  useToast,
+  VStack,
 } from '@chakra-ui/react';
-import { s3 } from '@project-lc/hooks';
-import { ChakraNextImage } from '../../chakra-extended/ChakraNextImage';
+import { ChakraNextImage } from '@project-lc/components-core';
+import { s3 } from '@project-lc/utils-s3';
+import { useEffect, useState } from 'react';
 import { ConfirmDialog } from '../ConfirmDialog';
+import { GoodsPreviewItem, Preview, readAsDataURL } from '../GoodsRegistPictures';
 import { ImageInput } from '../ImageInput';
-import { GoodsPreviewItem, readAsDataURL, Preview } from '../GoodsRegistPictures';
 
 type ImageUploadType = {
   isOpen: boolean;

@@ -20,13 +20,12 @@ import {
 import { BroadcasterDTOWithoutUserId } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-// import { BroadcasterChannelButton } from '..';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
+import { ChakraDataGrid } from '@project-lc/components-core';
 import { BroadcasterName } from './BroadcasterName';
 import { ConfirmDialog } from './ConfirmDialog';
 import { LiveShoppingProgressBadge } from './LiveShoppingProgressBadge';
 import { LiveShoppingDetailDialog } from './LiveShoppingDetailDialog';
-import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
 import BroadcasterChannelButton from './BroadcasterChannelButton';
 
 export interface GoodsWithConfirmation extends Goods {

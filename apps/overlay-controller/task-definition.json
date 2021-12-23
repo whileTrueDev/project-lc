@@ -29,6 +29,14 @@
         {
           "name": "S3_BUCKET_NAME",
           "value": "lc-project"
+        },
+        {
+          "name": "OVERLAY_HOST",
+          "value": "https://xn--oi2bm8jnwi.xn--hp4b17xa.com"
+        },
+        {
+          "name": "OVERLAY_CONTROLLER_HOST",
+          "value": "https://overlay-controller.xn--hp4b17xa.com"
         }
       ],
       "resourceRequirements": null,

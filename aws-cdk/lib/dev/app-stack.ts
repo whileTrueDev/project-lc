@@ -6,6 +6,7 @@ import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import * as logs from '@aws-cdk/aws-logs';
 import * as ssm from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
+import * as ecr from '@aws-cdk/aws-ecr';
 import { constants } from '../../constants';
 
 interface LCDevAppStackProps extends cdk.StackProps {
@@ -78,15 +79,17 @@ export class LCDevAppStack extends cdk.Stack {
 
   /** API 서버 ECS Fargate Service 생성 메서드 */
   private createApiAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
+    const repo = new ecr.Repository(this, `${PREFIX}ApiRepo`, {
+      repositoryName: constants.DEV.ECS_API_FAMILY_NAME,
+      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+    });
     const apiTaskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSTaskDef`, {
       family: constants.DEV.ECS_API_FAMILY_NAME,
     });
     apiTaskDef.addContainer(`${PREFIX}ECSContainer`, {
       containerName: 'project-lc-api-dev',
       portMappings: [{ containerPort: constants.DEV.ECS_API_PORT }],
-      image: ecs.ContainerImage.fromRegistry(
-        `hwasurr/${constants.DEV.ECS_API_FAMILY_NAME}`,
-      ),
+      image: ecs.ContainerImage.fromEcrRepository(repo),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
@@ -136,15 +139,17 @@ export class LCDevAppStack extends cdk.Stack {
 
   /** 라-커 화면 Overlay 서버 ECS Fargate Service 생성 메서드 */
   private createOverlayAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
+    const repo = new ecr.Repository(this, `${PREFIX}OverlayRepo`, {
+      repositoryName: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
+      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+    });
     const taskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSOverlayTaskDef`, {
       family: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
     });
     taskDef.addContainer(`${PREFIX}ECSOverlayContainer`, {
       containerName: 'project-lc-overlay-dev',
       portMappings: [{ containerPort: constants.DEV.ECS_OVERLAY_PORT }],
-      image: ecs.ContainerImage.fromRegistry(
-        `hwasurr/${constants.DEV.ECS_OVERLAY_FAMILY_NAME}`,
-      ),
+      image: ecs.ContainerImage.fromEcrRepository(repo),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
@@ -193,6 +198,10 @@ export class LCDevAppStack extends cdk.Stack {
     cluster: ecs.Cluster,
     secgrp: ec2.SecurityGroup,
   ) {
+    const repo = new ecr.Repository(this, `${PREFIX}OverlayControllerRepo`, {
+      repositoryName: constants.DEV.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
+      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+    });
     const taskDef = new ecs.FargateTaskDefinition(
       this,
       `${PREFIX}ECSOverlayControllerTaskDef`,
@@ -203,9 +212,7 @@ export class LCDevAppStack extends cdk.Stack {
     taskDef.addContainer(`${PREFIX}ECSOverlayControllerContainer`, {
       containerName: constants.DEV.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
       portMappings: [{ containerPort: constants.DEV.ECS_OVERLAY_CONTROLLER_PORT }],
-      image: ecs.ContainerImage.fromRegistry(
-        `hwasurr/${constants.DEV.ECS_OVERLAY_CONTROLLER_FAMILY_NAME}`,
-      ),
+      image: ecs.ContainerImage.fromEcrRepository(repo),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),

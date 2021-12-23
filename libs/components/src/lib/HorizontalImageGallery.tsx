@@ -2,7 +2,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { Box, Flex, HStack, IconButton, theme } from '@chakra-ui/react';
 import { useDisplaySize, useHorizontalScroll } from '@project-lc/hooks';
 import { useRef } from 'react';
-import { ChakraNextImage } from '..';
+import { ChakraNextImage } from '@project-lc/components-core';
 
 export interface HorizontalImageGalleryProps {
   images: string[];

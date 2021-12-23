@@ -2,8 +2,8 @@ import { useDisclosure, Box, Text } from '@chakra-ui/react';
 import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
 import { useAdminBroadcaster } from '@project-lc/hooks';
 import { useState, useMemo } from 'react';
+import { ChakraDataGrid } from '@project-lc/components-core';
 import { boxStyle } from '../../constants/commonStyleProps';
-import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import { escapeRegExp } from '../QuickSearchInput';
 import {
   UserSearhToolbar,

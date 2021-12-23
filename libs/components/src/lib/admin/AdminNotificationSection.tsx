@@ -23,7 +23,6 @@ import {
   useAdminCreateNotification,
 } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
-import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { QuickSearchInput, QuickSearchInputProps } from '../QuickSearchInput';
 import AdminNotificationBroadcasterList from './AdminNotificationBroadcasterList';

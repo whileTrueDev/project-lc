@@ -10,6 +10,12 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-grid';
+import {
+  ExportManyDialog,
+  FmOrderStatusBadge,
+  TooltipedText,
+} from '@project-lc/components';
+import { ChakraDataGrid } from '@project-lc/components-core';
 import { useDisplaySize, useFmOrders } from '@project-lc/hooks';
 import {
   convertFmOrderStatusToString,
@@ -22,11 +28,7 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useMemo } from 'react';
 import { FaTruck } from 'react-icons/fa';
-import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
-import ExportManyDialog from './ExportManyDialog';
-import FmOrderStatusBadge from './FmOrderStatusBadge';
-import OrderListDownloadDialog from './OrderListDownloadDialog';
-import TooltipedText from './TooltipedText';
+import { OrderListDownloadDialog } from './OrderListDownloadDialog';
 
 const columns: GridColumns = [
   {

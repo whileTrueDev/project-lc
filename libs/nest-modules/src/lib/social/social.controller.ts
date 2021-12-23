@@ -11,11 +11,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SocialAccounts, UserType, USER_TYPE_KEY } from '@project-lc/shared-types';
-import {
-  getBroadcasterWebHost,
-  getUserTypeFromRequest,
-  getWebHost,
-} from '@project-lc/utils';
+import { getBroadcasterWebHost, getWebHost } from '@project-lc/utils';
+import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { Request, Response } from 'express';
 import { LoginHistoryService } from '../auth/login-history/login-history.service';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';

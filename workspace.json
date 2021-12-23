@@ -68,14 +68,9 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/api/Dockerfile . -t hwasurr/project-lc-api:{args.tag}",
-              "docker tag hwasurr/project-lc-api:{args.tag} hwasurr/project-lc-api:latest ",
-              "docker push hwasurr/project-lc-api:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-api:latest",
-                "forwardAllArgs": false
-              }
+              "docker build -f ./apps/api/Dockerfile -t {args.registry}/project-lc-api:{args.tag} --platform=linux/amd64 .",
+              "docker tag {args.registry}/project-lc-api:{args.tag} {args.registry}/project-lc-api:latest",
+              "docker push {args.registry}/project-lc-api:{args.tag}"
             ],
             "parallel": false
           }
@@ -84,14 +79,8 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/api/Dockerfile . -t hwasurr/project-lc-api-dev:{args.tag}",
-              "docker tag hwasurr/project-lc-api-dev:{args.tag} hwasurr/project-lc-api-dev:latest ",
-              "docker push hwasurr/project-lc-api-dev:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-api-dev:latest",
-                "forwardAllArgs": false
-              }
+              "docker build -f ./apps/api/Dockerfile -t {args.registry}/project-lc-api-dev:latest --platform=linux/amd64 .",
+              "docker push {args.registry}/project-lc-api-dev:latest"
             ],
             "parallel": false
           }
@@ -170,6 +159,81 @@
           ],
           "options": {
             "jestConfig": "libs/components/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "components-core": {
+      "root": "libs/components-core",
+      "sourceRoot": "libs/components-core/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/components-core/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/components-core"
+          ],
+          "options": {
+            "jestConfig": "libs/components-core/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "components-logo": {
+      "root": "libs/components-logo",
+      "sourceRoot": "libs/components-logo/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/components-logo/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/components-logo"
+          ],
+          "options": {
+            "jestConfig": "libs/components-logo/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "components-order": {
+      "root": "libs/components-order",
+      "sourceRoot": "libs/components-order/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/components-order/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/components-order"
+          ],
+          "options": {
+            "jestConfig": "libs/components-order/jest.config.js",
             "passWithNoTests": true
           }
         }
@@ -259,14 +323,9 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/overlay/Dockerfile . -t hwasurr/project-lc-overlay:{args.tag}",
-              "docker tag hwasurr/project-lc-overlay:{args.tag} hwasurr/project-lc-overlay:latest ",
-              "docker push hwasurr/project-lc-overlay:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-overlay:latest",
-                "forwardAllArgs": false
-              }
+              "docker build -f ./apps/overlay/Dockerfile -t {args.registry}/project-lc-overlay:{args.tag} --platform=linux/amd64 .",
+              "docker tag {args.registry}/project-lc-overlay:{args.tag} {args.registry}/project-lc-overlay:latest",
+              "docker push {args.registry}/project-lc-overlay:{args.tag}"
             ],
             "parallel": false
           }
@@ -275,14 +334,8 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/overlay/Dockerfile . -t hwasurr/project-lc-overlay-dev:{args.tag}",
-              "docker tag hwasurr/project-lc-overlay-dev:{args.tag} hwasurr/project-lc-overlay-dev:latest ",
-              "docker push hwasurr/project-lc-overlay-dev:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-overlay-dev:latest",
-                "forwardAllArgs": false
-              }
+              "docker build -f ./apps/overlay/Dockerfile -t {args.registry}/project-lc-overlay-dev:latest --platform=linux/amd64 .",
+              "docker push {args.registry}/project-lc-overlay-dev:latest"
             ],
             "parallel": false
           }
@@ -353,14 +406,9 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/overlay-controller/Dockerfile . -t hwasurr/project-lc-overlay-controller:{args.tag}",
-              "docker tag hwasurr/project-lc-overlay-controller:{args.tag} hwasurr/project-lc-overlay-controller:latest ",
-              "docker push hwasurr/project-lc-overlay-controller:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-overlay-controller:latest",
-                "forwardAllArgs": false
-              }
+              "docker build -f ./apps/overlay-controller/Dockerfile -t {args.registry}/project-lc-overlay-controller:{args.tag} --platform=linux/amd64 .",
+              "docker tag {args.registry}/project-lc-overlay-controller:{args.tag} {args.registry}/project-lc-overlay-controller:latest",
+              "docker push {args.registry}/project-lc-overlay-controller:{args.tag}"
             ],
             "parallel": false
           }
@@ -369,14 +417,8 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/overlay-controller/Dockerfile . -t hwasurr/project-lc-overlay-controller-dev:{args.tag}",
-              "docker tag hwasurr/project-lc-overlay-controller-dev:{args.tag} hwasurr/project-lc-overlay-controller-dev:latest ",
-              "docker push hwasurr/project-lc-overlay-controller-dev:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-overlay-controller-dev:latest",
-                "forwardAllArgs": false
-              }
+              "docker build -f ./apps/overlay-controller/Dockerfile -t {args.registry}/project-lc-overlay-controller-dev:latest --platform=linux/amd64 .",
+              "docker push {args.registry}/project-lc-overlay-controller-dev:latest"
             ],
             "parallel": false
           }
@@ -394,7 +436,8 @@
               "apps/overlay-controller/src/assets",
               "apps/overlay-controller/src/views",
               "apps/overlay-controller/src/lib"
-            ]
+            ],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -648,6 +691,81 @@
           ],
           "options": {
             "jestConfig": "libs/utils/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "utils-backend": {
+      "root": "libs/utils-backend",
+      "sourceRoot": "libs/utils-backend/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/utils-backend/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/utils-backend"
+          ],
+          "options": {
+            "jestConfig": "libs/utils-backend/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "utils-frontend": {
+      "root": "libs/utils-frontend",
+      "sourceRoot": "libs/utils-frontend/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/utils-frontend/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/utils-frontend"
+          ],
+          "options": {
+            "jestConfig": "libs/utils-frontend/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "utils-s3": {
+      "root": "libs/utils-s3",
+      "sourceRoot": "libs/utils-s3/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/utils-s3/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/utils-s3"
+          ],
+          "options": {
+            "jestConfig": "libs/utils-s3/jest.config.js",
             "passWithNoTests": true
           }
         }
