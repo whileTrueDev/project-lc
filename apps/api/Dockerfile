@@ -11,6 +11,7 @@ COPY ./libs/prisma-orm/prisma ./prisma
 RUN yarn global add prisma
 RUN yarn install --prod
 RUN prisma generate
+
 RUN yarn add argon2@0.28.2
 RUN npx node-pre-gyp rebuild -C ./node_modules/argon2
 
