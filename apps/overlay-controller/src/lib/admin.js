@@ -157,7 +157,14 @@ $(document).ready(function ready() {
   });
 
   $('#liveshopping-id-button').click(function liveShoppingIdButtonClickEvent() {
-    socket.emit('liveshopping id from admin', { roomName, liveShoppingId });
+    const productName = $('#product-name').val().trim();
+    const streamerAndProduct = { streamerNickname, productName };
+
+    socket.emit('liveshopping id from admin', {
+      roomName,
+      liveShoppingId,
+      streamerAndProduct,
+    });
   });
 
   $('#start-time-send-button').click(function startTimeSendButtonClickEvent() {
@@ -240,6 +247,10 @@ $(document).ready(function ready() {
     socket.emit('remove notification image from admin', roomName);
   });
 
+  $('#refresh-ranking-button').click(function refreshRankingButtonClickEvent() {
+    socket.emit('refresh ranking from admin', roomName);
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
     let level;
@@ -312,7 +323,6 @@ $(document).ready(function ready() {
           });
         }
         // 메시지 전송하면, 바로 테이블 업데이트
-        getPurchaseMessage();
       },
       error() {
         errorDialog.showModal();
@@ -321,6 +331,7 @@ $(document).ready(function ready() {
         }, 3000);
       },
       complete() {
+        getPurchaseMessage();
         $('#sold-price').val(null);
         $('#customer-nickname').val(null);
         $('#customer-message').val(null);
@@ -328,8 +339,8 @@ $(document).ready(function ready() {
         $('input[name="gift"]').removeAttr('checked');
         $('input[name="event"]').filter('[value=no]').prop('checked', true);
         $('input[name="gift"]').filter('[value=no]').prop('checked', true);
-        $('input[id=is-client-checkbox]').prop('checked', false);
-        $('input[id=insert-only-db-checkbox]').prop('checked', false);
+        $('input[name=client-checkbox]').prop('checked', false);
+        $('input[name=db-insert-checkbox]').prop('checked', false);
       },
     });
   });

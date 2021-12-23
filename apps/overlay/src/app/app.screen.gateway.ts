@@ -207,4 +207,19 @@ export class AppScreenGateway
   removeNotification(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('remove notification image from server');
   }
+
+  @SubscribeMessage('get date from registered liveshopping')
+  async getRegisteredTime(
+    @MessageBody() shoppingIdAndRoomName: { liveShoppingId: number; roomName: string },
+  ): Promise<void> {
+    const { liveShoppingId } = shoppingIdAndRoomName;
+    const { roomName } = shoppingIdAndRoomName;
+    const registeredTime = await this.overlayService.getRegisteredTime(liveShoppingId);
+    this.server.to(roomName).emit('get registered date from server', registeredTime);
+  }
+
+  @SubscribeMessage('refresh ranking from admin')
+  refreshRanking(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('refresh ranking from server');
+  }
 }

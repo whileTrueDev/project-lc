@@ -113,6 +113,9 @@
                     <button id="remove-notification-button" value="이벤트 이미지 없애기" style="background-color:darkcyan">
                         이벤트 이미지 없애기
                     </button>
+                    <button id="refresh-ranking-button" value="랭킹 새로고침" style="background-color:darkcyan">
+                        랭킹 새로고침
+                    </button>
                 </div>
                 <h2>
                     동작 제어
@@ -273,7 +276,7 @@
                         <div class="customer-nickname-box">
                             <input type="text" id="customer-nickname">
                             <label>
-                            <input type="checkbox" id="is-client-checkbox">
+                            <input type="checkbox" id="is-client-checkbox" name="client-checkbox">
                                 비회원
                             </label>
                         </div>
@@ -298,7 +301,7 @@
                         <br>
                         <div class="checkbox-area">
                             <label>
-                                <input type="checkbox" id="insert-only-db-checkbox">
+                                <input type="checkbox" id="insert-only-db-checkbox" name="db-insert-checkbox">
                                     DB에만 삽입
                                 </input>
                             </label>

@@ -100,14 +100,29 @@ export interface GoogleTTSCredentials {
   [keys: string]: { private_key: string; client_email: string };
 }
 
+/** 방송인 메일 */
 export interface BroadcasterEmail {
   email: string;
 }
 
+/** 컨트롤러에서 시작 시간 전송시 상품이름과 함께 전송 */
 export interface StreamerAndProduct {
+  /** 스트리머 이름 */
   streamerNickname: string;
+  /** 상품명 */
   productName: string;
 }
+/** 시작시간 전송시 초기 세팅 스트리머명, 상품명, 룸이름, 시간 */
 export interface StartSetting extends RoomAndDate {
+  /** 스트리머명과 상품명 */
+  streamerAndProduct: StreamerAndProduct;
+}
+/** 라이브쇼핑id 전송시 같이 전송될 값 : 룸이름, 라이브쇼핑id, 상품명, 스트리머 명 */
+export interface LiveShoppingIdWithProductNameAndRoomId {
+  /** 소켓 룸이름 */
+  roomName: string;
+  /** 라이브쇼핑 아이디 */
+  liveShoppingId: string;
+  /** 상품명과 스트리머명 */
   streamerAndProduct: StreamerAndProduct;
 }

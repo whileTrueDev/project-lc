@@ -9,7 +9,7 @@ const email = $('#primary-info').data('email');
 let streamerAndProduct;
 let liveShoppingId;
 let startDate = new Date('2021-09-27T14:05:00+0900');
-let defaultDate = new Date('2021-09-04T15:00:00+0900');
+let endDate = new Date('2021-09-04T15:00:00+0900');
 let feverDate = new Date('2021-09-27T14:05:00+0900');
 let bannerId = 1;
 const bottomMessages = [];
@@ -42,7 +42,7 @@ function getOS() {
 }
 
 function dailyMissionTimer() {
-  setInterval(function timer() {
+  setInterval(async function timer() {
     const roomName = pageUrl.split('/').pop();
 
     // 현재 날짜를 new 연산자를 사용해서 Date 객체를 생성
@@ -74,11 +74,15 @@ function dailyMissionTimer() {
             <source src="/videos/intro.mp4" type="video/mp4">
           </video>
             `;
-        $('.full-video').html(introHtml);
+        await $('.full-video').html(introHtml);
+        setTimeout(() => {
+          $('.live-commerce').show();
+          $('.inner-video-area').fadeOut(500);
+        }, 7500);
       }
     }
 
-    let distance = defaultDate.getTime() - now.getTime();
+    let distance = endDate.getTime() - now.getTime();
     if (distance < 0) {
       distance = 0;
     }
@@ -470,7 +474,7 @@ socket.on('hide screen', () => {
 });
 
 socket.on('d-day from server', (date) => {
-  defaultDate = new Date(date);
+  endDate = new Date(date);
 });
 
 socket.on('get fever date from server', (date) => {
@@ -481,21 +485,31 @@ socket.on('refresh signal', () => {
   window.location.reload();
 });
 
-socket.on('show video from server', (type) => {
+socket.on('show video from server', async (type) => {
   if (type === 'intro') {
     const introHtml = `
     <video class="inner-video-area" autoplay>
       <source src="/videos/intro.mp4" type="video/mp4">
     </video>
       `;
-    $('.full-video').html(introHtml);
+    await $('.full-video').html(introHtml);
+
+    setTimeout(() => {
+      $('.live-commerce').show();
+      $('.inner-video-area').fadeOut(500);
+    }, 7500);
   } else {
     const outroHtml = `
     <video class="inner-video-area" autoplay>
       <source src="/videos/outro.mp4" type="video/mp4">
     </video>
       `;
-    $('.full-video').html(outroHtml);
+    await $('.full-video').html(outroHtml);
+
+    setTimeout(() => {
+      $('.live-commerce').hide();
+      $('.inner-video-area').fadeOut(500);
+    }, 9500);
   }
 });
 
@@ -589,8 +603,28 @@ socket.on('remove notification image from server', () => {
   $('.notification').empty();
 });
 
-socket.on('get liveshopping id from server', (id) => {
+socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
   $('.alive-check').css('background-color', 'yellow');
-  liveShoppingId = id;
+  liveShoppingId = liveShoppingIdAndProductName.liveShoppingId;
+  streamerAndProduct = liveShoppingIdAndProductName.streamerAndProduct;
+
+  const roomName = pageUrl.split('/').pop();
+  socket.emit('get date from registered liveshopping', {
+    liveShoppingId,
+    roomName,
+  });
 });
+
+socket.on('get registered date from server', (registeredTime) => {
+  startDate = new Date(registeredTime.broadcastStartDate);
+  endDate = new Date(registeredTime.broadcastEndDate);
+});
+
+socket.on('refresh ranking from server', () => {
+  $('.ranking-text-area#title').css({ display: 'flex' });
+  $('.ranking-area-inner').html(
+    `<img src="/images/podium.png" id="podium" style="width:25%;"/>`,
+  );
+});
+
 export {};
