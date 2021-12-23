@@ -52,7 +52,16 @@ $(document).ready(function ready() {
         const source = $('#purchase-message-list').html(); // 템플릿으로 만든 text를 불러옴
         const template = Handlebars.compile(source);
         $('#message-tbody').html(template(data));
-        $('table#message-table').DataTable();
+        $('table#message-table').DataTable({
+          columnDefs: [
+            {
+              targets: 2,
+              render(data, type, row) {
+                return data.length > 40 ? `${data.substr(0, 40)}…` : data;
+              },
+            },
+          ],
+        });
         // hbs가 컴파일하여 파싱한 이후에, 이벤트 새로 등록해줘야 함.
         $('.delete-message-button').click(function deleteMessageButtonClick() {
           const messageId = $(this)
