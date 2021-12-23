@@ -22,6 +22,7 @@ import {
 } from '@chakra-ui/react';
 import { GridCellParams, GridColumns, GridSelectionModel } from '@material-ui/data-grid';
 import { Decimal } from '@prisma/client/runtime';
+import { ChakraDataGrid, ChakraNextImage } from '@project-lc/components-core';
 import {
   useBcSettlementTargets,
   useBroadcasterSettlementTotalInfo,
@@ -35,8 +36,7 @@ import {
 import { settlementHistoryStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useCallback, useMemo, useState } from 'react';
-import { ChakraNextImage, ConfirmDialog } from '../..';
-import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
+import { ConfirmDialog } from '../..';
 import { GridTableItem } from '../GridTableItem';
 
 export function calcSettleAmount(

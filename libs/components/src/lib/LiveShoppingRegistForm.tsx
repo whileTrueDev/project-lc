@@ -21,6 +21,7 @@ import {
   useMergeRefs,
   useToast,
 } from '@chakra-ui/react';
+import { ChakraAutoComplete } from '@project-lc/components-core';
 import {
   useApprovedGoodsList,
   useCreateLiveShoppingMutation,
@@ -41,7 +42,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { Goods } from '.prisma/client';
-import { ChakraAutoComplete } from '..';
 import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerContacts';
 import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
 

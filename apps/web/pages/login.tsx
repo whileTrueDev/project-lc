@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/layout';
 import { LoginForm, SellerNavbar } from '@project-lc/components';
 import { useMoveToMainIfLoggedIn, useSocialLoginFailAlarm } from '@project-lc/hooks';
 import { useRouter } from 'next/router';

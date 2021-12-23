@@ -1,13 +1,12 @@
 import {
+  Box,
+  IconButton,
   Menu,
   MenuButton,
   MenuList,
-  MenuItem,
-  useColorModeValue,
-  Text,
-  Box,
   Stack,
-  IconButton,
+  Text,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { UserNotification } from '@prisma/client';
 import { useNotificationMutation, useNotifications, useProfile } from '@project-lc/hooks';

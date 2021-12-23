@@ -17,12 +17,12 @@ import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useState } from 'react';
+import { ChakraDataGrid } from '@project-lc/components-core';
 import {
   GOODS_CONFIRMATION_STATUS,
   GOODS_STATUS,
   GOODS_VIEW,
 } from '../constants/goodsStatus';
-import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
 import DeleteGoodsAlertDialog from './DeleteGoodsAlertDialog';
 import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 import { ShippingGroupDetailModal } from './GoodsRegistShippingPolicy';

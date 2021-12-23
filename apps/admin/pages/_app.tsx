@@ -1,6 +1,10 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { ThemeProvider } from '@material-ui/core';
-import { createChakraTheme, createMuiTheme, createQueryClient } from '@project-lc/utils';
+import {
+  createChakraTheme,
+  createMuiTheme,
+  createQueryClient,
+} from '@project-lc/utils-frontend';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { QueryClientProvider } from 'react-query';

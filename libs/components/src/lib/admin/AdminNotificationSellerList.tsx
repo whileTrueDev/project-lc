@@ -17,8 +17,8 @@ import { useAdminSellerList, useNotifications } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useState, useMemo } from 'react';
+import { ChakraDataGrid } from '@project-lc/components-core';
 import { boxStyle } from '../../constants/commonStyleProps';
-import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import { escapeRegExp } from '../QuickSearchInput';
 import {
   AdminSendNotificationDialog,

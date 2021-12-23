@@ -23,7 +23,7 @@ import {
 } from '@project-lc/hooks';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { ChakraNextImage } from '../chakra-extended/ChakraNextImage';
+import { ChakraNextImage } from '@project-lc/components-core';
 import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 import SectionWithTitle from './SectionWithTitle';
