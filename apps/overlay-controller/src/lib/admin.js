@@ -7,7 +7,7 @@ let email;
 let streamerNickname;
 let liveShoppingId;
 let isLogin = true;
-const socket = io(process.env.SOCKET_HOST, { transports: ['websocket'] });
+const socket = io(process.env.OVERLAY_HOST, { transports: ['websocket'] });
 
 socket.on('creator list from server', (data) => {
   if (data && data.length !== 0) {
@@ -44,7 +44,7 @@ $(document).ready(function ready() {
   function getPurchaseMessage() {
     $.ajax({
       type: 'GET',
-      url: `${process.env.HOST}/purchase-message`,
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/purchase-message`,
       dataType: 'json',
       data: { liveShoppingId },
       success(data) {
@@ -71,7 +71,7 @@ $(document).ready(function ready() {
 
           $.ajax({
             type: 'DELETE',
-            url: `${process.env.HOST}/purchase-message`,
+            url: `${process.env.OVERLAY_CONTROLLER_HOST}/purchase-message`,
             dataType: 'json',
             data: { messageId },
             success() {
@@ -291,7 +291,7 @@ $(document).ready(function ready() {
     const errorDialog = document.getElementById('error-dialog');
     $.ajax({
       type: 'POST',
-      url: `${process.env.HOST}/purchase-message`,
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/purchase-message`,
       dataType: 'text',
       contentType: 'application/json',
       data: messageJson,

@@ -27,12 +27,17 @@ export class AppController {
   @Get()
   @Render('index')
   async renterTest(): Promise<OverlayControllerMainRes> {
-    const SOCKET_HOST = getOverlayHost();
-    const HOST = getOverlayControllerHost();
+    const OVERLAY_HOST = getOverlayHost();
+    const OVERLAY_CONTROLLER_HOST = getOverlayControllerHost();
     const userIdAndUrlAndNicknames = await this.overlayControllerService.getCreatorUrls();
     const liveShoppings =
       await this.liveShoppingService.getLiveShoppingsForOverlayController();
-    return { userIdAndUrlAndNicknames, SOCKET_HOST, HOST, liveShoppings };
+    return {
+      userIdAndUrlAndNicknames,
+      OVERLAY_HOST,
+      OVERLAY_CONTROLLER_HOST,
+      liveShoppings,
+    };
   }
 
   @Get('/purchase-message')
