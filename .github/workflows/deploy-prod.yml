@@ -33,9 +33,21 @@ jobs:
       - name: Build
         run: yarn affected:build --prod --base=$BEFORE_SHA
 
-      # Dockerize and Push to DockerHub
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Dockerize and Push to ECR
       - name: Dockerize
-        run: yarn affected --target=dockerize --base=$BEFORE_SHA --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}"
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          yarn affected \
+            --target=dockerize \
+            --base=$BEFORE_SHA \
+            --args="--registry=$ECR_REGISTRY --tag=prod-$IMAGE_TAG"
 
   DeployAPI:
     name: Deploy API Job

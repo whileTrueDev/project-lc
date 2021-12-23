@@ -29,6 +29,7 @@ export class LCProdVpcStack extends cdk.Stack {
     this.dbSecGrp = this.createDbSecGrp({
       apiSecGrp: this.apiSecGrp,
       overlaySecGrp: this.overlaySecGrp,
+      overlayControllerSecGrp: this.overlayControllerSecGrp,
     });
   }
 
@@ -114,10 +115,11 @@ export class LCProdVpcStack extends cdk.Stack {
   private createDbSecGrp({
     apiSecGrp,
     overlaySecGrp,
-  }: {
-    apiSecGrp: ec2.SecurityGroup;
-    overlaySecGrp: ec2.SecurityGroup;
-  }): ec2.SecurityGroup {
+    overlayControllerSecGrp,
+  }: Record<
+    'apiSecGrp' | 'overlaySecGrp' | 'overlayControllerSecGrp',
+    ec2.SecurityGroup
+  >): ec2.SecurityGroup {
     // * 보안그룹
     // db 보안그룹
     const dbSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}DB-SecGrp`, {
@@ -140,6 +142,11 @@ export class LCProdVpcStack extends cdk.Stack {
       overlaySecGrp ?? this.overlaySecGrp,
       ec2.Port.tcp(3306),
       'Allow port 3306 only to traffic from overlay security group',
+    );
+    dbSecGrp.addIngressRule(
+      overlayControllerSecGrp ?? this.overlayControllerSecGrp,
+      ec2.Port.tcp(3306),
+      'Allow port 3306 only to traffic from overlay controller security group',
     );
 
     const githubActionsRunnerSecGrp = new ec2.SecurityGroup(

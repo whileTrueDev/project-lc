@@ -19,6 +19,7 @@ import {
 import * as logs from '@aws-cdk/aws-logs';
 import * as ssm from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
+import { Repository } from '@aws-cdk/aws-ecr';
 import { constants } from '../../constants';
 
 interface LCProdAppStackProps extends cdk.StackProps {
@@ -73,16 +74,38 @@ export class LCProdAppStack extends cdk.Stack {
     });
   }
 
+  /** ECR 레파지토리 생성 */
+  private createEcrRepo(
+    type: 'Api' | 'Overlay' | 'OverlayController',
+    repoName: string,
+  ): Repository {
+    return new Repository(this, `${this.PREFIX}${type}Repo`, {
+      repositoryName: repoName,
+      lifecycleRules: [
+        {
+          maxImageAge: cdk.Duration.days(60),
+          description: '60일',
+          tagPrefixList: ['prod-'],
+        },
+        {
+          maxImageAge: cdk.Duration.days(365),
+          description: 'latest 365일',
+          tagPrefixList: ['latest'],
+        },
+      ],
+    });
+  }
+
   private createApiService(): FargateService {
+    const repo = this.createEcrRepo('Api', constants.PROD.ECS_API_FAMILY_NAME);
     const apiTaskDef = new FargateTaskDefinition(this, `${this.PREFIX}ApiTaskDef`, {
       family: constants.PROD.ECS_API_FAMILY_NAME,
     });
-
     const p = this.parameters;
     apiTaskDef.addContainer(`${this.PREFIX}ApiContainer`, {
       containerName: constants.PROD.ECS_API_FAMILY_NAME,
       portMappings: [{ containerPort: constants.PROD.ECS_API_PORT }],
-      image: ContainerImage.fromRegistry(`hwasurr/${constants.PROD.ECS_API_FAMILY_NAME}`),
+      image: ContainerImage.fromEcrRepository(repo),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: Secret.fromSsmParameter(p.DATABASE_URL),
@@ -135,6 +158,7 @@ export class LCProdAppStack extends cdk.Stack {
   }
 
   private createOverlayService(): FargateService {
+    const repo = this.createEcrRepo('Overlay', constants.PROD.ECS_OVERLAY_FAMILY_NAME);
     const overlayTaskDef = new FargateTaskDefinition(
       this,
       `${this.PREFIX}OverlayTaskDef`,
@@ -146,9 +170,7 @@ export class LCProdAppStack extends cdk.Stack {
     overlayTaskDef.addContainer(`${this.PREFIX}OverlayContainer`, {
       containerName: constants.PROD.ECS_OVERLAY_FAMILY_NAME,
       portMappings: [{ containerPort: constants.PROD.ECS_OVERLAY_PORT }],
-      image: ContainerImage.fromRegistry(
-        `hwasurr/${constants.PROD.ECS_OVERLAY_FAMILY_NAME}`,
-      ),
+      image: ContainerImage.fromEcrRepository(repo),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: Secret.fromSsmParameter(p.DATABASE_URL),
@@ -194,6 +216,10 @@ export class LCProdAppStack extends cdk.Stack {
 
   /** 라-커 화면제어 OverlayController 서버 ECS Fargate Service 생성 메서드 */
   private createOverlayControllerAppService(): FargateService {
+    const repo = this.createEcrRepo(
+      'OverlayController',
+      constants.PROD.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
+    );
     const taskDef = new FargateTaskDefinition(
       this,
       `${this.PREFIX}ECSOverlayControllerTaskDef`,
@@ -205,9 +231,7 @@ export class LCProdAppStack extends cdk.Stack {
     taskDef.addContainer(`${this.PREFIX}ECSOverlayControllerContainer`, {
       containerName: constants.PROD.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
       portMappings: [{ containerPort: constants.PROD.ECS_OVERLAY_CONTROLLER_PORT }],
-      image: ContainerImage.fromRegistry(
-        `hwasurr/${constants.PROD.ECS_OVERLAY_CONTROLLER_FAMILY_NAME}`,
-      ),
+      image: ContainerImage.fromEcrRepository(repo),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: Secret.fromSsmParameter(p.DATABASE_URL),
