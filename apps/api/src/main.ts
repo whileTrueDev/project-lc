@@ -15,7 +15,6 @@ async function bootstrap(): Promise<void> {
   const appsetting = new AppSetting(app);
   appsetting.initialize();
   const port = process.env.PORT || 3000;
-
   await app.listen(port, () => {
     if (!['production', 'test'].includes(process.env.NODE_ENV)) {
       Logger.log(`Server Listening at http://localhost:${port}`);

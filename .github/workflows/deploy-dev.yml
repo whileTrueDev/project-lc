@@ -82,6 +82,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
 
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Fill in the new image ID in the Amazon ECS task definition API
         if: ${{ success() }}
         id: task-def
@@ -89,7 +94,7 @@ jobs:
         with:
           task-definition: apps/api/task-definition-dev.json
           container-name: project-lc-api-dev
-          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-api-dev:latest
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-api-dev:latest
 
       - name: Deploy Amazon ECS task definition API
         if: ${{ success() }}
@@ -129,6 +134,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
 
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Fill in the new image ID in the Amazon ECS task definition Overlay
         if: ${{ success() }}
         id: task-def
@@ -136,7 +146,7 @@ jobs:
         with:
           task-definition: apps/overlay/task-definition-dev.json
           container-name: project-lc-overlay-dev
-          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-overlay-dev:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay-dev:${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition Overlay
         if: ${{ success() }}
@@ -176,6 +186,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
 
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Fill in the new image ID in the Amazon ECS task definition Overlay-controller
         if: ${{ success() }}
         id: task-def
@@ -183,7 +198,7 @@ jobs:
         with:
           task-definition: apps/overlay-controller/task-definition-dev.json
           container-name: project-lc-overlay-controller-dev
-          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-overlay-controller-dev:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay-controller-dev:${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition Overlay-controller
         if: ${{ success() }}
