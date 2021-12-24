@@ -1,3 +1,5 @@
+import { LiveShoppingsWithBroadcasterAndGoodsName } from '../dto/liveShopping.dto';
+
 export interface OverlayControllerMainRes {
   userIdAndUrlAndNicknames: {
     email: string;
@@ -6,12 +8,5 @@ export interface OverlayControllerMainRes {
   }[];
   OVERLAY_CONTROLLER_HOST: string;
   OVERLAY_HOST: string;
-  liveShoppings: {
-    id: number;
-    broadcaster: {
-      email: string;
-      userNickname: string;
-      overlayUrl: string;
-    };
-  };
+  liveShoppings: LiveShoppingsWithBroadcasterAndGoodsName[];
 }

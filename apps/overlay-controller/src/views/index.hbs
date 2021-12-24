@@ -32,6 +32,9 @@
                             <th>이름</th>
                             <th>방송인MAIL</th>
                             <th>URL</th>
+                            <th>상품명</th>
+                            <th>방송시작</th>
+                            <th>방송종료</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -49,6 +52,15 @@
                             </td>
                             <td class="url-cell" id={{broadcaster.overlayUrl}}>
                                 {{broadcaster.overlayUrl}}
+                            </td>
+                            <td class="goods-cell">
+                                {{goods.goods_name}}
+                            </td>
+                            <td class="broadcast-start-cell">
+                                {{broadcastStartDate}}
+                            </td>
+                            <td class="broadcast-end-cell">
+                                {{broadcastEndDate}}
                             </td>
                             <td>
                                 <button
@@ -113,7 +125,7 @@
                     <button id="remove-notification-button" value="이벤트 이미지 없애기" style="background-color:darkcyan">
                         이벤트 이미지 없애기
                     </button>
-                    <button id="refresh-ranking-button" value="랭킹 새로고침" style="background-color:darkcyan">
+                    <button id="refresh-ranking-button" value="랭킹 새로고침" style="background-color:red">
                         랭킹 새로고침
                     </button>
                 </div>
@@ -151,7 +163,7 @@
                         <button id="alive-check-button" value="연결체크" style="background-color:dodgerblue">
                             연결 체크
                         </button>
-                        <button id="liveshopping-id-button" value="라이브쇼핑ID" style="background-color:dodgerblue">
+                        <button id="liveshopping-id-button" value="라이브쇼핑ID" style="background-color:blueviolet">
                             라이브쇼핑 ID 전송
                         </button>
                     </div>
@@ -187,10 +199,10 @@
                                 \{{text}}
                             </td>
                             <td class="price-cell">
-                                \{{toLocaleString  price}}
+                                \{{price}}
                             </td>
                             <td class="date-cell">
-                                \{{dateFormatter createDate}}
+                                \{{createDate}}
                             </td>
                             <td>
                                 <button
