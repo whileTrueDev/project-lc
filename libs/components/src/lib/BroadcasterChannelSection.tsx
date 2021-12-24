@@ -20,6 +20,7 @@ import {
 } from '@project-lc/hooks';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { SettingNeedAlertBox } from './SettingNeedAlertBox';
 import SettingSectionLayout from './SettingSectionLayout';
 import { ErrorText } from './ShippingOptionIntervalApply';
 
@@ -104,15 +105,16 @@ export function BroadcasterChannelSection(): JSX.Element {
   }
   return (
     <SettingSectionLayout title="활동 플랫폼">
-      <Text>현재 활동하고 있는 플랫폼의 채널 주소를 입력하세요.(최대 5개)</Text>
-
       {/* 방송인이 등록한 채널 url 목록 */}
-      {channels && (
+      {channels && channels.length > 0 ? (
         <Stack>
+          <Text>현재 활동중인 플랫폼의 채널 주소를 입력하세요.(최대 5개)</Text>
           {channels.map((item) => (
             <BroadcasterChannelItem key={item.id} {...item} />
           ))}
         </Stack>
+      ) : (
+        <SettingNeedAlertBox text="현재 활동중인 플랫폼(아프리카, 유투브, 트위치, 인스타그램 등)의 채널 주소를 입력해주세요." />
       )}
 
       {/* 채널 url 입력창 여닫는 버튼 */}
