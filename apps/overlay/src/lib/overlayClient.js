@@ -189,7 +189,7 @@ async function switchImage() {
     $('.vertical-banner')
       .attr(
         'src',
-        `https://lc-project.s3.ap-northeast-2.amazonaws.com/vertical-banner/${email}/${liveShoppingId}/vertical-banner-${bannerId}.png`,
+        `https://lc-project.s3.ap-northeast-2.amazonaws.com/vertical-banner/${email}/${liveShoppingId}/vertical-banner-${bannerId}`,
       )
       .fadeIn(1000);
   }, 1000);
@@ -337,7 +337,7 @@ socket.on('get right-top purchase message', async (data) => {
     <div class="item">
       <div class="centered">
         <img src="https://lc-project.s3.ap-northeast-2.amazonaws.com/donation-images/${email}/${liveShoppingId}/${
-    alarmType === '2' ? 'donation-2.gif' : 'donation-1.gif'
+    alarmType === '2' ? 'donation-2' : 'donation-1'
   }" class="donation-image" />  
         <div class ="animated heartbeat" id="donation-top">
           <span id="nickname">
