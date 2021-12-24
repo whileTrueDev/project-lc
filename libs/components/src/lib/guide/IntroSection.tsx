@@ -23,9 +23,6 @@ export function IntroSection({
         </VStack>
       </Center>
       <Center>
-        <ChakraNextImage src={naver} width="40" height="40" />
-      </Center>
-      <Center>
         <VStack spacing={0}>
           <Text>라이브 쇼핑 진행에 필요한 정보를 등록하고</Text>
           <Text>크크쇼를 시작하세요!</Text>
