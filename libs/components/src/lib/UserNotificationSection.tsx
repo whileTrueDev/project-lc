@@ -1,15 +1,25 @@
 import {
   Box,
+  Button,
+  Center,
+  Divider,
+  Flex,
   IconButton,
   Menu,
   MenuButton,
   MenuList,
   Stack,
   Text,
+  useBoolean,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { UserNotification } from '@prisma/client';
-import { useNotificationMutation, useNotifications, useProfile } from '@project-lc/hooks';
+import {
+  Notifications,
+  useNotificationMutation,
+  useNotifications,
+  useProfile,
+} from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
@@ -40,25 +50,79 @@ function CountBadge({ count }: { count: number }): JSX.Element {
 }
 
 /** 개인알림 제목, 내용, 읽음여부 표시하는 컴포넌트 */
-function NotificationItem({ item }: { item: UserNotification }): JSX.Element {
+function NotificationItem({
+  item,
+  onClick,
+}: {
+  item: UserNotification;
+  onClick?: () => void;
+}): JSX.Element {
   const { title, content, readFlag, createDate } = item;
+  const hoverColor = useColorModeValue('gray.50', 'gray.700');
 
   return (
-    <Box>
+    <Box
+      cursor={readFlag ? 'default' : 'pointer'}
+      _hover={readFlag ? undefined : { backgroundColor: hoverColor }}
+      onClick={onClick}
+      px={4}
+    >
       <Stack direction="row" alignItems="center">
         <Text fontWeight="semibold">{title}</Text>
         {!readFlag && <UnreadNotification />}
       </Stack>
-      <Text fontSize="xs">{dayjs(createDate).format('YYYY/MM/DD HH:mm')}</Text>
       <Text>{content}</Text>
+      <Text fontSize="xs" color="gray.500">
+        {dayjs(createDate).format('YYYY/MM/DD HH:mm')}
+      </Text>
     </Box>
   );
+}
+
+function useNotificationState(data: Notifications | undefined): {
+  unreadNotifications: UserNotification[];
+  unreadCount: number;
+  recentUnreadList: UserNotification[];
+  wholeNotificationList: UserNotification[];
+} {
+  // 최근 미확인 알림 몇개 보여줄것인지
+  const MAX_RECENT_UNREAD = 6;
+
+  const unreadNotifications = useMemo(() => {
+    if (!data) return [];
+    return data.filter((item) => item.readFlag === false);
+  }, [data]);
+
+  const unreadCount = useMemo(() => {
+    return unreadNotifications.length;
+  }, [unreadNotifications]);
+
+  // 미확인 알림중 최근 MAX_RECENT_UNREAD개
+  const recentUnreadList = useMemo(() => {
+    return unreadNotifications.slice(0, MAX_RECENT_UNREAD);
+  }, [unreadNotifications]);
+
+  // 최근 미확인 알림 MAX_RECENT_UNREAD개 제외한 전체 알림목록
+  const wholeNotificationList = useMemo(() => {
+    if (!data) return [];
+    const recentUnreadIds = recentUnreadList.map((unread) => unread.id);
+    return data.filter((noti) => !recentUnreadIds.includes(noti.id));
+  }, [data, recentUnreadList]);
+
+  return {
+    unreadNotifications,
+    unreadCount,
+    recentUnreadList,
+    wholeNotificationList,
+  };
 }
 
 /** 알림버튼과 알림메시지 포함하는 컴포넌트 */
 export function UserNotificationSection(): JSX.Element {
   const { data: profileData } = useProfile();
   const { data } = useNotifications(profileData?.email);
+  const { unreadCount, recentUnreadList, wholeNotificationList } =
+    useNotificationState(data);
 
   const readNotification = useNotificationMutation();
   const markAsRead = (notification: UserNotification): void => {
@@ -75,15 +139,10 @@ export function UserNotificationSection(): JSX.Element {
       });
   };
 
-  const unreadCount: number = useMemo(() => {
-    if (!data) return 0;
-    return data.filter((item) => item.readFlag === false).length;
-  }, [data]);
-
-  const hoverColor = useColorModeValue('gray.50', 'gray.700');
+  const [wholeListOpen, { toggle, off }] = useBoolean();
 
   return (
-    <Menu isLazy closeOnSelect={false}>
+    <Menu isLazy closeOnSelect={false} onClose={off}>
       {/* 종모양 버튼 */}
       <MenuButton
         as={IconButton}
@@ -98,33 +157,60 @@ export function UserNotificationSection(): JSX.Element {
       />
 
       <MenuList w={{ base: 280, sm: 400 }} maxH={600} overflow="auto">
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="flex-end"
-          pr={2}
-          pb={2}
-        >
-          <Text fontSize="sm" color="gray.500">
-            클릭시 읽음처리 됩니다
-          </Text>
-        </Stack>
+        <Stack spacing={1}>
+          {/* 미확인 알림 */}
+          {recentUnreadList.length > 0 ? (
+            <Stack>
+              <Stack p={2} fontSize="sm" direction="row" alignItems="center">
+                <Text>최근 미확인 알림메시지</Text>
+                <Text fontSize="xs" color="gray.500">
+                  (클릭시 읽음처리 됩니다)
+                </Text>
+              </Stack>
 
-        {/* 알림메시지 목록 */}
-        {data &&
-          data.map((noti) => (
-            <Box
-              cursor={noti.readFlag ? 'default' : 'pointer'}
-              p={4}
-              _hover={noti.readFlag ? undefined : { backgroundColor: hoverColor }}
-              key={noti.id}
-              onClick={() => {
-                if (!noti.readFlag) markAsRead(noti);
-              }}
-            >
-              <NotificationItem item={noti} />
-            </Box>
-          ))}
+              {recentUnreadList.map((noti) => (
+                <NotificationItem
+                  key={noti.id}
+                  item={noti}
+                  onClick={() => markAsRead(noti)}
+                />
+              ))}
+            </Stack>
+          ) : (
+            <Text textAlign="center" p={2}>
+              새로운 알림이 없습니다.
+            </Text>
+          )}
+
+          {wholeNotificationList.length > 0 && (
+            <>
+              {/* 전체 알림목록 보기 토글 버튼 */}
+              <Center>
+                <Button onClick={toggle} size="sm" my={2}>
+                  <Text as="span">전체 알림 {wholeListOpen ? '닫기' : '보기'}</Text>
+                  <Text fontSize="sm" color="gray.500">
+                    (최근 30일 이내 알림만 볼 수 있습니다)
+                  </Text>
+                </Button>
+              </Center>
+              {/* (상단에 표시된 일부 미확인 알림 제외한)전체 알림메시지 목록 */}
+              {wholeListOpen && (
+                <Stack>
+                  {wholeNotificationList.map((noti) => (
+                    <>
+                      <NotificationItem
+                        key={noti.id}
+                        item={noti}
+                        onClick={() => markAsRead(noti)}
+                      />
+                      <Divider />
+                    </>
+                  ))}
+                </Stack>
+              )}
+            </>
+          )}
+        </Stack>
       </MenuList>
     </Menu>
   );
