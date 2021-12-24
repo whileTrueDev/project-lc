@@ -8,6 +8,8 @@ on:
       - "libs/firstmall-db/**"
       - "libs/nest-modules/**"
       - "libs/utils/**"
+      - "libs/utils-backend/**"
+      - "libs/utils-s3/**"
       - "libs/prisma-orm/**"
       - "libs/shared-types/**"
 

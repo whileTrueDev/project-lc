@@ -4,8 +4,12 @@ on:
     paths:
       - "apps/api/**"
       - "apps/overlay/**"
+      - "apps/overlay-controller/**"
       - "libs/firstmall-db/**"
       - "libs/nest-modules/**"
+      - "libs/utils/**"
+      - "libs/utils-backend/**"
+      - "libs/utils-s3/**"
       - "libs/prisma-orm/**"
       - "libs/shared-types/**"
 
