@@ -180,7 +180,7 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: apps/overlay-controller/task-definition-dev.json
+          task-definition: apps/overlay-controller/task-definition.json
           container-name: project-lc-overlay-controller
           image: ${{ secrets.DOCKER_USERNAME }}/project-lc-overlay-controller:${{ github.sha }}
 

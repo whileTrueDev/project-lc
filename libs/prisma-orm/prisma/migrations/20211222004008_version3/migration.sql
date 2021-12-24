@@ -25,9 +25,6 @@ ALTER TABLE `LoginHistory` DROP FOREIGN KEY `LoginHistory_sellerId_fkey`;
 DROP INDEX `Broadcaster_userId_idx` ON `Broadcaster`;
 
 -- DropIndex
-DROP INDEX `Broadcaster_userId_key` ON `Broadcaster`;
-
--- DropIndex
 DROP INDEX `LiveShopping_streamId_key` ON `LiveShopping`;
 
 -- AlterTable
