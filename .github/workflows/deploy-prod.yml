@@ -56,7 +56,7 @@ jobs:
         run: |
           yarn affected \
             --target=dockerize \
-            --base=$BEFOR```E_SHA \
+            --base=$BEFORE_SHA \
             --args="--registry=$ECR_REGISTRY --tag=prod-$IMAGE_TAG"
 
   DeployAPI:
