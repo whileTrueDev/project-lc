@@ -4,9 +4,12 @@ on:
     paths:
       - "apps/api/**"
       - "apps/overlay/**"
+      - "apps/overlay-controller/**"
       - "libs/firstmall-db/**"
       - "libs/nest-modules/**"
       - "libs/utils/**"
+      - "libs/utils-backend/**"
+      - "libs/utils-s3/**"
       - "libs/prisma-orm/**"
       - "libs/shared-types/**"
 
@@ -33,9 +36,30 @@ jobs:
       - name: Build
         run: yarn affected:build --prod --base=$BEFORE_SHA
 
-      # Dockerize and Push to DockerHub
+
+      - name: Configure AWS credentials
+        if: ${{ success() }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Dockerize and Push to ECR
       - name: Dockerize
-        run: yarn affected --target=dockerize --base=$BEFORE_SHA --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}"
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          yarn affected \
+            --target=dockerize \
+            --base=$BEFORE_SHA \
+            --args="--registry=$ECR_REGISTRY --tag=prod-$IMAGE_TAG"
 
   DeployAPI:
     name: Deploy API Job
@@ -60,6 +84,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
 
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Fill in the new image ID in the Amazon ECS task definition API
         if: ${{ success() }}
         id: task-def
@@ -67,7 +96,7 @@ jobs:
         with:
           task-definition: apps/api/task-definition.json
           container-name: project-lc-api
-          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-api:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-api:prod-${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition API
         if: ${{ success() }}
@@ -107,6 +136,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
 
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Fill in the new image ID in the Amazon ECS task definition Overlay
         if: ${{ success() }}
         id: task-def
@@ -114,7 +148,7 @@ jobs:
         with:
           task-definition: apps/overlay/task-definition.json
           container-name: project-lc-overlay
-          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-overlay:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay:prod-${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition Overlay
         if: ${{ success() }}
@@ -133,7 +167,7 @@ jobs:
 
   DeployOverlayController:
     name: Deploy OverlayController Job
-    runs-on: [self-hosted, linux, project-lc-dev]
+    runs-on: [self-hosted, linux, project-lc]
     needs: [Build]
     steps:
       - name: Checkout
@@ -154,14 +188,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
           aws-region: ap-northeast-2
 
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Fill in the new image ID in the Amazon ECS task definition Overlay-controller
         if: ${{ success() }}
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: apps/overlay-controller/task-definition-dev.json
+          task-definition: apps/overlay-controller/task-definition.json
           container-name: project-lc-overlay-controller
-          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-overlay-controller:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay-controller:prod-${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition Overlay-controller
         if: ${{ success() }}
@@ -169,11 +208,11 @@ jobs:
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: project-lc-overlay-controller-service
-          cluster: project-lc-dev
+          cluster: project-lc-prod
           wait-for-service-stability: false
 
       - name: Prisma Migrate
         if: ${{ success() }}
         run: yarn nx run prisma-orm:migrate-deploy
         env:
-          DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.PROD_PRISMA_DATABASE_URL }}

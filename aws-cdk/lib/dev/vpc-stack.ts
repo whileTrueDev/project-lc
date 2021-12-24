@@ -41,8 +41,8 @@ export class LCDevVpcStack extends cdk.Stack {
     this.createAlbSecGrp();
     const apiSecGrp = this.createApiSecGrp();
     const overlaySecGrp = this.createOverlaySecGrp();
-    this.createDbSecGrp(apiSecGrp, overlaySecGrp);
-    this.createOverlayControllerSecGrp();
+    const overlayControllerSecGrp = this.createOverlayControllerSecGrp();
+    this.createDbSecGrp({ apiSecGrp, overlaySecGrp, overlayControllerSecGrp });
   }
 
   /** 로드밸런서(ALB) 보안 그룹 생성 */
@@ -68,7 +68,14 @@ export class LCDevVpcStack extends cdk.Stack {
   }
 
   /** 데이터베이스 보안 그룹 생성 */
-  private createDbSecGrp(apiSecGrp: ec2.SecurityGroup, overlaySecGrp: ec2.SecurityGroup) {
+  private createDbSecGrp({
+    apiSecGrp,
+    overlaySecGrp,
+    overlayControllerSecGrp,
+  }: Record<
+    'apiSecGrp' | 'overlaySecGrp' | 'overlayControllerSecGrp',
+    ec2.SecurityGroup
+  >) {
     // * 보안그룹
     // db 보안그룹
     this.dbSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}DB-SecGrp`, {
@@ -78,7 +85,7 @@ export class LCDevVpcStack extends cdk.Stack {
     });
     // * 보안그룹 룰 지정
     this.dbSecGrp.addIngressRule(
-      ec2.Peer.ipv4('121.175.189.231/32'),
+      ec2.Peer.ipv4(constants.WHILETRUE_IP_ADDRESS),
       ec2.Port.tcp(3306),
       'Allow port 3306 for outbound traffics to the whiletrue developers',
     );
@@ -91,6 +98,11 @@ export class LCDevVpcStack extends cdk.Stack {
       overlaySecGrp ?? this.overlaySecGrp,
       ec2.Port.tcp(3306),
       'Allow port 3306 only to traffic from overlay security group',
+    );
+    this.dbSecGrp.addIngressRule(
+      overlayControllerSecGrp ?? this.overlayControllerSecGrp,
+      ec2.Port.tcp(3306),
+      'Allow port 3306 only to traffic from overlay-controller security group',
     );
 
     this.dbSecGrp.addIngressRule(

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-danger */
 import { ColorModeScript } from '@chakra-ui/react';
 import Document, {
   DocumentContext,
@@ -18,6 +19,16 @@ class MyDocument extends Document {
     return (
       <Html lang="ko">
         <Head>
+          {/* Google Tag Manager */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','GTM-PRZT6QL');`,
+            }}
+          />
           <link
             rel="apple-touch-icon"
             sizes="180x180"
@@ -48,6 +59,17 @@ class MyDocument extends Document {
           <link rel="icon" href="/images/favicon/favicon.ico" />
         </Head>
         <body>
+          {/* Google Tag Manager (noscript) */}
+          <noscript>
+            <iframe
+              title="google-tag-manager"
+              src="https://www.googletagmanager.com/ns.html?id=GTM-PRZT6QL"
+              height="0"
+              width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
+            />
+          </noscript>
+
           <ColorModeScript />
           <Main />
           <NextScript />

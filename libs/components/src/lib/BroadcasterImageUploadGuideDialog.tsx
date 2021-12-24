@@ -1,17 +1,17 @@
 import {
+  Box,
+  ListItem,
   Modal,
-  ModalOverlay,
+  ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalHeader,
-  ModalCloseButton,
-  ModalBody,
+  ModalOverlay,
   Stack,
   Text,
-  ListItem,
   UnorderedList,
-  Box,
 } from '@chakra-ui/react';
-import { ChakraNextImage } from '..';
+import { ChakraNextImage } from '@project-lc/components-core';
 
 const SERVICE_NAME = '크크쇼';
 

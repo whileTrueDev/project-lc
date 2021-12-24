@@ -4,9 +4,8 @@ import {
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { AiTwotoneEnvironment } from 'react-icons/ai';
-import { FaBoxOpen, FaShippingFast } from 'react-icons/fa';
-import { GiShoppingBag } from 'react-icons/gi';
-import { IoMdPerson } from 'react-icons/io';
+import { FaBoxOpen, FaShippingFast, FaShoppingBag, FaUser } from 'react-icons/fa';
+
 import { MdDateRange } from 'react-icons/md';
 import { SummaryList } from './SummaryList';
 
@@ -27,7 +26,7 @@ export function OrderDetailSummary({ order }: OrderDetailSummaryProps): JSX.Elem
         },
         {
           id: '주문자',
-          icon: IoMdPerson,
+          icon: FaUser,
           value: `주문자 ${order.order_user_name}`,
         },
         {
@@ -43,7 +42,7 @@ export function OrderDetailSummary({ order }: OrderDetailSummaryProps): JSX.Elem
         {
           disabled: !(order.totalType || order.totalEa),
           id: '총 주문 종류 및 수량',
-          icon: GiShoppingBag,
+          icon: FaShoppingBag,
           value: `주문상품 종류 총 ${order.totalType} 종, 주문상품 수량 총 ${order.totalEa} 개`,
         },
         {

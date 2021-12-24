@@ -1,8 +1,8 @@
 import { Button } from '@chakra-ui/react';
 import { USER_TYPE_KEY } from '@project-lc/shared-types';
 import { getApiHost } from '@project-lc/utils';
+import { ChakraNextImage } from '@project-lc/components-core';
 import naverLogo from '../../images/naver.png';
-import { ChakraNextImage } from '../chakra-extended/ChakraNextImage';
 import { UserTypeProps } from './GoogleLoginButton';
 
 const NAVER_COLOR = '#03c75a';

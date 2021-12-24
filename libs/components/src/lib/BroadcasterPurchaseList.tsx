@@ -6,7 +6,7 @@ import {
   useFmOrdersDuringLiveShoppingSalesPurchaseDone,
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
-import { ChakraDataGrid } from '../chakra-extended/ChakraDataGrid';
+import { ChakraDataGrid } from '@project-lc/components-core';
 
 const columns: GridColumns = [
   {

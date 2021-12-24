@@ -5,10 +5,17 @@ interface ProjectLcCdkEnv {
   [key: string]: string;
 }
 
-const envSchema = joi.object<ProjectLcCdkEnv>({}).unknown();
+const envSchema = joi
+  .object<ProjectLcCdkEnv>({
+    WHILETRUE_IP_ADDRESS: joi.string().required(),
+  })
+  .unknown();
 
-export const envCheck = () => {
+export const envCheck = (): any => {
   const { value, error } = envSchema.validate(process.env);
-  if (error) throw new Error('Check environment variables. - from joi validation');
+  if (error) {
+    console.log(error.details);
+    throw new Error('ENV Validation Failed - Check environment variables.');
+  }
   return value;
 };

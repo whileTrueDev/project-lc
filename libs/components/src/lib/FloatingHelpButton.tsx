@@ -1,7 +1,7 @@
 import { Button } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
-import { openKakaoChannel } from '@project-lc/utils';
-import { ChakraNextImage } from '..';
+import { openKakaoChannel } from '@project-lc/utils-frontend';
+import { ChakraNextImage } from '@project-lc/components-core';
 
 export function FloatingHelpButton(): JSX.Element {
   const { isMobileSize } = useDisplaySize();

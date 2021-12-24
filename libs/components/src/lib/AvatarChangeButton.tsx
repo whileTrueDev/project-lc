@@ -22,7 +22,8 @@ import {
   useAvatarRemoveMutation,
 } from '@project-lc/hooks';
 import { useRef, useState } from 'react';
-import { FiCamera } from 'react-icons/fi';
+import { FaCamera } from 'react-icons/fa';
+
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { boxStyle } from '../constants/commonStyleProps';
@@ -160,7 +161,7 @@ export function AvatarChangeButton(): JSX.Element {
           <Center position="absolute" width="100%" height="100%" left="0" top="0">
             <Avatar
               bg="rgba(0,0,0,0.5)"
-              icon={<Icon as={FiCamera} color="gray.200" fontSize="1.5rem" />}
+              icon={<Icon as={FaCamera} color="gray.200" fontSize="1.5rem" />}
             />
           </Center>
         )}

@@ -37,6 +37,10 @@
                 {
                     "name": "SELLER_WEB_HOST",
                     "value": "https://dev-seller.xn--hp4b17xa.com"
+                },
+                {
+                    "name": "BROADCASTER_WEB_HOST",
+                    "value": "https://dev-broadcaster.xn--hp4b17xa.com"
                 }
             ],
             "resourceRequirements": null,

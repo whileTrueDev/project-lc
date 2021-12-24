@@ -17,6 +17,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
+import { KksLogo } from '@project-lc/components-logo';
 import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
@@ -25,7 +26,6 @@ import { useCallback } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
 import { mainNavItems, NavItem } from '../constants/navigation';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
-import KksLogo from './KksLogo';
 import ProfileBox from './ProfileBox';
 import UserNotificationSection from './UserNotificationSection';
 

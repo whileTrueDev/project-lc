@@ -10,7 +10,8 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { s3, useBroadcasterSettlementInfo, useProfile } from '@project-lc/hooks';
+import { useBroadcasterSettlementInfo, useProfile } from '@project-lc/hooks';
+import { s3 } from '@project-lc/utils-s3';
 import { useMemo } from 'react';
 import { BroadcasterSettlementInfoConfirmation, TaxationType } from '.prisma/client';
 import { BroadcasterSettlementInfoDialog } from './BroadcasterSettlementInfoDialog';

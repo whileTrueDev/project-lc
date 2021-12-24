@@ -36,6 +36,15 @@
     "components": {
       "tags": []
     },
+    "components-core": {
+      "tags": []
+    },
+    "components-logo": {
+      "tags": []
+    },
+    "components-order": {
+      "tags": []
+    },
     "firstmall-db": {
       "tags": []
     },
@@ -61,6 +70,15 @@
       "tags": []
     },
     "utils": {
+      "tags": []
+    },
+    "utils-backend": {
+      "tags": []
+    },
+    "utils-frontend": {
+      "tags": []
+    },
+    "utils-s3": {
       "tags": []
     },
     "web": {

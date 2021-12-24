@@ -29,6 +29,7 @@ export class LCProdVpcStack extends cdk.Stack {
     this.dbSecGrp = this.createDbSecGrp({
       apiSecGrp: this.apiSecGrp,
       overlaySecGrp: this.overlaySecGrp,
+      overlayControllerSecGrp: this.overlayControllerSecGrp,
     });
   }
 
@@ -114,10 +115,11 @@ export class LCProdVpcStack extends cdk.Stack {
   private createDbSecGrp({
     apiSecGrp,
     overlaySecGrp,
-  }: {
-    apiSecGrp: ec2.SecurityGroup;
-    overlaySecGrp: ec2.SecurityGroup;
-  }): ec2.SecurityGroup {
+    overlayControllerSecGrp,
+  }: Record<
+    'apiSecGrp' | 'overlaySecGrp' | 'overlayControllerSecGrp',
+    ec2.SecurityGroup
+  >): ec2.SecurityGroup {
     // * 보안그룹
     // db 보안그룹
     const dbSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}DB-SecGrp`, {
@@ -127,7 +129,7 @@ export class LCProdVpcStack extends cdk.Stack {
     });
     // * 보안그룹 룰 지정
     dbSecGrp.addIngressRule(
-      ec2.Peer.ipv4('121.175.189.231/32'),
+      ec2.Peer.ipv4(constants.WHILETRUE_IP_ADDRESS),
       ec2.Port.tcp(3306),
       'Allow port 3306 for outbound traffics to the whiletrue developers',
     );
@@ -141,6 +143,11 @@ export class LCProdVpcStack extends cdk.Stack {
       ec2.Port.tcp(3306),
       'Allow port 3306 only to traffic from overlay security group',
     );
+    dbSecGrp.addIngressRule(
+      overlayControllerSecGrp ?? this.overlayControllerSecGrp,
+      ec2.Port.tcp(3306),
+      'Allow port 3306 only to traffic from overlay controller security group',
+    );
 
     const githubActionsRunnerSecGrp = new ec2.SecurityGroup(
       this,
@@ -152,7 +159,7 @@ export class LCProdVpcStack extends cdk.Stack {
       },
     );
     githubActionsRunnerSecGrp.addIngressRule(
-      ec2.Peer.ipv4('121.175.189.231/32'),
+      ec2.Peer.ipv4(constants.WHILETRUE_IP_ADDRESS),
       ec2.Port.tcp(22),
       'SSH for Admin Desktop',
     );

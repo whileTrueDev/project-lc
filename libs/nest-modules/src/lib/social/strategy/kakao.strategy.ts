@@ -1,9 +1,9 @@
-// import { getApiHost } from '@project-lc/hooks';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { UserType } from '@project-lc/shared-types';
-import { getApiHost, getUserTypeFromRequest } from '@project-lc/utils';
+import { getApiHost } from '@project-lc/utils';
+import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { Request } from 'express';
 import { Profile, Strategy } from 'passport-kakao';
 import { Broadcaster, Seller } from '.prisma/client';

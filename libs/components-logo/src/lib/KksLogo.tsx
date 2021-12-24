@@ -1,7 +1,7 @@
 import { ColorMode, useColorMode } from '@chakra-ui/color-mode';
 import { UserType } from '@project-lc/shared-types';
 import { useMemo } from 'react';
-import { ChakraNextImage } from '../chakra-extended/ChakraNextImage';
+import { ChakraNextImage } from '@project-lc/components-core';
 
 export const LOGO_S3_PREFIX =
   'https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/';

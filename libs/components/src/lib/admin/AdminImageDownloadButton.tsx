@@ -1,6 +1,6 @@
 // image down button
 import { Button } from '@chakra-ui/react';
-import { s3, s3KeyType } from '@project-lc/hooks';
+import { s3, s3KeyType } from '@project-lc/utils-s3';
 import { GridRowData } from '@material-ui/data-grid';
 
 /**

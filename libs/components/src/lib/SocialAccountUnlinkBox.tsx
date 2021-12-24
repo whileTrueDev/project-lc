@@ -1,10 +1,10 @@
 import { Button, Flex, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import { useProfile, useUnlinkSocialAccountMutation } from '@project-lc/hooks';
 import { SocialAccount, UserType } from '@project-lc/shared-types';
+import { ChakraNextImage } from '@project-lc/components-core';
 import google from '../../images/google.png';
 import naver from '../../images/naver.png';
 import kakao from '../../images/kakao.png';
-import { ChakraNextImage } from '../chakra-extended/ChakraNextImage';
 import SocialAccountUnlinkDialog from './SocialAccountUnlinkDialog';
 
 export const logo: Record<string, React.ReactNode> = {

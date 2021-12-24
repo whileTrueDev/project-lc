@@ -4,7 +4,7 @@ import { SellerBusinessRegistration } from '@prisma/client';
 import { useDisplaySize } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import { useState } from 'react';
-import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
+import { ChakraDataGrid } from '@project-lc/components-core';
 import { AdminBusinessRegistrationConfirmationDialog } from './AdminBusinessRegistrationConfirmationDialog';
 import { AdminBusinessRegistrationRejectionDialog } from './AdminBusinessRegistrationRejectionDialog';
 import { AdminImageDownloadButton } from './AdminImageDownloadButton';

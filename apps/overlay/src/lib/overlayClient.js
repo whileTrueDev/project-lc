@@ -9,7 +9,7 @@ const email = $('#primary-info').data('email');
 let streamerAndProduct;
 let liveShoppingId;
 let startDate = new Date('2021-09-27T14:05:00+0900');
-let defaultDate = new Date('2021-09-04T15:00:00+0900');
+let endDate = new Date('2021-09-04T15:00:00+0900');
 let feverDate = new Date('2021-09-27T14:05:00+0900');
 let bannerId = 1;
 const bottomMessages = [];
@@ -75,10 +75,14 @@ function dailyMissionTimer() {
           </video>
             `;
         $('.full-video').html(introHtml);
+        $('.inner-video-area').on('ended', function () {
+          $('.live-commerce').show();
+          $('.inner-video-area').fadeOut(500);
+        });
       }
     }
 
-    let distance = defaultDate.getTime() - now.getTime();
+    let distance = endDate.getTime() - now.getTime();
     if (distance < 0) {
       distance = 0;
     }
@@ -470,7 +474,7 @@ socket.on('hide screen', () => {
 });
 
 socket.on('d-day from server', (date) => {
-  defaultDate = new Date(date);
+  endDate = new Date(date);
 });
 
 socket.on('get fever date from server', (date) => {
@@ -489,6 +493,11 @@ socket.on('show video from server', (type) => {
     </video>
       `;
     $('.full-video').html(introHtml);
+
+    $('.inner-video-area').on('ended', function () {
+      $('.live-commerce').show();
+      $('.inner-video-area').fadeOut(500);
+    });
   } else {
     const outroHtml = `
     <video class="inner-video-area" autoplay>
@@ -496,6 +505,11 @@ socket.on('show video from server', (type) => {
     </video>
       `;
     $('.full-video').html(outroHtml);
+
+    $('.inner-video-area').on('ended', function () {
+      $('.live-commerce').hide();
+      $('.inner-video-area').fadeOut(500);
+    });
   }
 });
 
@@ -589,8 +603,28 @@ socket.on('remove notification image from server', () => {
   $('.notification').empty();
 });
 
-socket.on('get liveshopping id from server', (id) => {
+socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
   $('.alive-check').css('background-color', 'yellow');
-  liveShoppingId = id;
+  liveShoppingId = liveShoppingIdAndProductName.liveShoppingId;
+  streamerAndProduct = liveShoppingIdAndProductName.streamerAndProduct;
+
+  const roomName = pageUrl.split('/').pop();
+  socket.emit('get date from registered liveshopping', {
+    liveShoppingId,
+    roomName,
+  });
 });
+
+socket.on('get registered date from server', (registeredTime) => {
+  startDate = new Date(registeredTime.broadcastStartDate);
+  endDate = new Date(registeredTime.broadcastEndDate);
+});
+
+socket.on('refresh ranking from server', () => {
+  $('.ranking-text-area#title').css({ display: 'flex' });
+  $('.ranking-area-inner').html(
+    `<img src="/images/podium.png" id="podium" style="width:25%;"/>`,
+  );
+});
+
 export {};

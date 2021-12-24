@@ -1,6 +1,7 @@
-import { Stack, Center, Divider, Grid, VStack, Text, Box, Image } from '@chakra-ui/react';
+import { Box, Center, Divider, Grid, Image, Stack, Text, VStack } from '@chakra-ui/react';
+import { useDisplaySize } from '@project-lc/hooks';
+import { s3 } from '@project-lc/utils-s3';
 import { useEffect, useState } from 'react';
-import { useDisplaySize, s3 } from '@project-lc/hooks';
 
 export function LiveShoppingMonitorSection({
   completeStep,

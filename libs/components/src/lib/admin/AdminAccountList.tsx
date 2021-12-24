@@ -1,7 +1,7 @@
 import { GridColumns } from '@material-ui/data-grid';
 import { SellerSettlementAccount } from '@prisma/client';
 import { useDisplaySize } from '@project-lc/hooks';
-import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
+import { ChakraDataGrid } from '@project-lc/components-core';
 import { AdminImageDownloadButton } from './AdminImageDownloadButton';
 
 const columns: GridColumns = [
