@@ -48,7 +48,10 @@ export function BroadcasterAddressSection(): JSX.Element {
         <NoAddressAlertBox />
       )}
       {!broadcaster.isLoading && broadcaster.data?.broadcasterAddress?.address && (
-        <Text>상품 샘플과 시청자로부터의 선물을 수령할 주소입니다.</Text>
+        <Stack>
+          <Text>상품 샘플과 시청자로부터의 선물을 수령할 주소입니다.</Text>
+          <BroadcasterAddressPreview address={broadcaster.data?.broadcasterAddress} />
+        </Stack>
       )}
       <BroadcasterAddressForm />
     </SettingSectionLayout>
@@ -85,7 +88,7 @@ export function BroadcasterAddressForm({
     if (!broadcaster.data.broadcasterAddress) return false;
     return true;
   }, [broadcaster.data, defaultOpen]);
-  const editMode = useDisclosure({ defaultIsOpen: isBroadcasterAddressExists });
+  const editMode = useDisclosure({ defaultIsOpen: !isBroadcasterAddressExists });
   const daumOpen = useDisclosure();
 
   const {
@@ -144,7 +147,6 @@ export function BroadcasterAddressForm({
     <Stack as="form" onSubmit={handleSubmit(onSubmit)} w="100%">
       {!editMode.isOpen ? (
         <Stack spacing={3}>
-          <BroadcasterAddressPreview address={broadcaster.data?.broadcasterAddress} />
           <Box>
             <Button leftIcon={<EditIcon />} onClick={editMode.onOpen}>
               {isBroadcasterAddressExists ? '수정' : '등록'}
