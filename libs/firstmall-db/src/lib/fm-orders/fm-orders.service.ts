@@ -104,6 +104,7 @@ export class FmOrdersService {
     sql: string;
     params: any[];
   } {
+    const nullFilteredGoodsIds = goodsIds.filter((element, i) => element !== null);
     const defaultQueryHead = `
     SELECT
       GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR ', ') AS goods_seq,
@@ -119,10 +120,10 @@ export class FmOrdersService {
       SELECT item_seq, MIN(step) AS optionRealStep
       FROM fm_order_item_option
       JOIN fm_order_item USING(item_seq)
-      WHERE goods_seq IN (${goodsIds.join(',')})
+      WHERE goods_seq IN (${nullFilteredGoodsIds.join(',')})
       GROUP BY item_seq
     ) fm_order_item_option USING(item_seq)
-    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')}) AND step IN (
+    WHERE fm_order_item.goods_seq IN (${nullFilteredGoodsIds.join(',')}) AND step IN (
       15, 25, 35, 40, 45, 50, 55, 60, 65, 70, 75, 85, 95, 99
     )
     `;
@@ -282,6 +283,7 @@ export class FmOrdersService {
     orderId: FmOrder['order_seq'] | string,
     goodsIds: number[],
   ): Promise<FmOrderMetaInfo | null> {
+    const nullFilteredGoodsIds = goodsIds.filter((element, i) => element !== null);
     const sql = `
     SELECT
       GROUP_CONCAT(fm_order_shipping.shipping_seq) AS shipping_seq,
@@ -310,7 +312,7 @@ export class FmOrdersService {
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
     JOIN fm_order_shipping USING(shipping_seq)
-    WHERE fm_order.order_seq = ? AND goods_seq IN (${goodsIds.join(',')})
+    WHERE fm_order.order_seq = ? AND goods_seq IN (${nullFilteredGoodsIds.join(',')})
     `;
     const result: FmOrderMetaInfo[] = await this.db.query(sql, [orderId]);
     const order = result.length > 0 ? result[0] : null;
@@ -332,6 +334,8 @@ export class FmOrdersService {
     orderId: FmOrder['order_seq'] | string,
     goodsIds: number[],
   ): Promise<FmOrderItem[]> {
+    const nullFilteredGoodsIds = goodsIds.filter((element, i) => element !== null);
+
     const sql = `
     SELECT 
       fm_order_item.goods_seq,
@@ -347,7 +351,7 @@ export class FmOrdersService {
     JOIN fm_order_item USING(order_seq)
     JOIN fm_order_shipping USING(shipping_seq)
     WHERE fm_order.order_seq = ?
-    AND goods_seq IN (${goodsIds.join(',')})`;
+    AND goods_seq IN (${nullFilteredGoodsIds.join(',')})`;
     return this.db.query(sql, [orderId]);
   }
 
@@ -772,6 +776,7 @@ export class FmOrdersService {
   // * 주문 현황 조회
   // * **********************************
   public async getOrdersStats(goodsIds: number[]): Promise<OrderStatsRes> {
+    const nullFilteredGoodsIds = goodsIds.filter((element, i) => element !== null);
     const sql = `
     SELECT 
       order_seq, 
@@ -787,7 +792,7 @@ export class FmOrdersService {
       item_seq
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
-    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
+    WHERE fm_order_item.goods_seq IN (${nullFilteredGoodsIds.join(',')})
     AND DATE(regist_date) >= ?
     ) AS A
     JOIN fm_order_item_option AS B USING (order_seq, item_seq)
