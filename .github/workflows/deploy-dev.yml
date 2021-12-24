@@ -146,7 +146,7 @@ jobs:
         with:
           task-definition: apps/overlay/task-definition-dev.json
           container-name: project-lc-overlay-dev
-          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay-dev:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay-dev:latest
 
       - name: Deploy Amazon ECS task definition Overlay
         if: ${{ success() }}
@@ -198,7 +198,7 @@ jobs:
         with:
           task-definition: apps/overlay-controller/task-definition-dev.json
           container-name: project-lc-overlay-controller-dev
-          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay-controller-dev:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay-controller-dev:latest
 
       - name: Deploy Amazon ECS task definition Overlay-controller
         if: ${{ success() }}

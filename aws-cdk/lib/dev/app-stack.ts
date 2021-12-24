@@ -132,7 +132,7 @@ export class LCDevAppStack extends cdk.Stack {
       },
       platformVersion: ecs.FargatePlatformVersion.LATEST,
       desiredCount: 1,
-      securityGroup: secgrp,
+      securityGroups: [secgrp],
       assignPublicIp: false,
     });
   }
@@ -188,7 +188,7 @@ export class LCDevAppStack extends cdk.Stack {
       },
       platformVersion: ecs.FargatePlatformVersion.LATEST,
       desiredCount: 1,
-      securityGroup: secgrp,
+      securityGroups: [secgrp],
       assignPublicIp: false,
     });
   }
@@ -253,7 +253,7 @@ export class LCDevAppStack extends cdk.Stack {
       },
       platformVersion: ecs.FargatePlatformVersion.LATEST,
       desiredCount: 1,
-      securityGroup: secgrp,
+      securityGroups: [secgrp],
       assignPublicIp: false,
     });
   }
@@ -362,13 +362,14 @@ export class LCDevAppStack extends cdk.Stack {
       },
     );
 
-    // HTTP 리스너에 Overlay 서버 타겟그룹 추가
+    // HTTP 리스너에 Overlay-controller 서버 타겟그룹 추가
     HttpsListener.addTargetGroups(`${PREFIX}HTTPSOverlayControllerTargetGroup`, {
       priority: 3,
       conditions: [
         elbv2.ListenerCondition.hostHeaders([
           `dev-overlay-controller.${constants.PUNYCODE_DOMAIN}`,
         ]),
+        elbv2.ListenerCondition.sourceIps([constants.WHILETRUE_IP_ADDRESS]),
       ],
       targetGroups: [overlayControllerTargetGroup],
     });

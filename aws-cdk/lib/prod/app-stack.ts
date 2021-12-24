@@ -366,6 +366,7 @@ export class LCProdAppStack extends cdk.Stack {
         ListenerCondition.hostHeaders([
           `overlay-controller.${constants.PUNYCODE_DOMAIN}`,
         ]),
+        ListenerCondition.sourceIps([constants.WHILETRUE_IP_ADDRESS]),
       ],
       targetGroups: [overlayControllerTargetGroup],
     });

@@ -373,7 +373,6 @@
         "serve": {
           "executor": "@nrwl/node:execute",
           "options": {
-            "port": 3333,
             "buildTarget": "overlay:build"
           }
         },

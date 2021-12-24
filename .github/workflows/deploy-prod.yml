@@ -96,7 +96,7 @@ jobs:
         with:
           task-definition: apps/api/task-definition.json
           container-name: project-lc-api
-          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-api:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-api:prod-${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition API
         if: ${{ success() }}
@@ -148,7 +148,7 @@ jobs:
         with:
           task-definition: apps/overlay/task-definition.json
           container-name: project-lc-overlay
-          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay:prod-${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition Overlay
         if: ${{ success() }}
@@ -200,7 +200,7 @@ jobs:
         with:
           task-definition: apps/overlay-controller/task-definition.json
           container-name: project-lc-overlay-controller
-          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay-controller:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-overlay-controller:prod-${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition Overlay-controller
         if: ${{ success() }}

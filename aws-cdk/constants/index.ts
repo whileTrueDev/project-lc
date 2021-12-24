@@ -1,9 +1,16 @@
+import * as dotenv from 'dotenv';
+import { envCheck } from '../util/env-check';
+
+dotenv.config();
+envCheck();
+
 export const constants = {
   DOMAIN: '크크쇼.com',
   PUNYCODE_DOMAIN: 'xn--hp4b17xa.com',
   PUNYCODE_라이브: 'xn--oi2bm8jnwi',
   PUNYCODE_판매자: 'xn--9z2b23wk2i',
   PUNYCODE_방송인: 'xn--vh3b23hfsf',
+  WHILETRUE_IP_ADDRESS: process.env.WHILETRUE_IP_ADDRESS!,
   DEV: {
     ID_PREFIX: 'LC-DEV-',
     /** 개발환경의 ECS 클러스터명 */
