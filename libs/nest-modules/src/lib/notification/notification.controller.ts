@@ -44,18 +44,16 @@ export class NotificationController {
     return this.notificationService.createMultipleNotification(dto);
   }
 
-  /** 특정 유저의 알림목록 조회(생성일 내림차순)
+  /** 특정 유저의 알림목록 조회(최근 30일 이내의 알람, 생성일 내림차순)
    * @query userEmail 타겟 유저의 이메일
    * @query userType 'seller' | 'broadcaster'
-   * @query take? 기본 6개, 몇개 조회할건지
    */
   @Get()
   findNotifications(
     @Query('userEmail') userEmail: string,
     @Query('userType') userType: UserType,
-    @Query('take', new DefaultValuePipe(6), ParseIntPipe) take: number,
   ): Promise<UserNotification[]> {
-    return this.notificationService.findNotifications({ userEmail, userType, take });
+    return this.notificationService.findNotifications({ userEmail, userType });
   }
 
   /** 특정 알림의 읽음상태 변경 */
