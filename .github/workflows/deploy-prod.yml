@@ -193,7 +193,7 @@ jobs:
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: project-lc-overlay-controller-service
-          cluster: project-lc
+          cluster: project-lc-prod
           wait-for-service-stability: false
 
       - name: Prisma Migrate
