@@ -111,6 +111,17 @@ export function GoodsDetail(): JSX.Element {
   };
 
   const onSuccess = (): void => {
+    reset({
+      progress: '',
+      broadcasterId: '',
+      broadcastStartDate: '',
+      broadcastEndDate: '',
+      sellStartDate: '',
+      sellEndDate: '',
+      rejectionReason: '',
+      videoUrl: '',
+      fmGoodsSeq: null,
+    });
     toast({ title: '변경 완료', status: 'success' });
   };
 
@@ -118,7 +129,7 @@ export function GoodsDetail(): JSX.Element {
     toast({ title: '변경 실패', status: 'error' });
   };
 
-  const { handleSubmit, register, watch } = methods;
+  const { handleSubmit, register, watch, reset } = methods;
   const regist = async (
     data: Omit<LiveShoppingDTO, 'sellerId' | 'goods_id' | 'contactId' | 'requests'>,
   ): Promise<void> => {
