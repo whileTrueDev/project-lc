@@ -1,10 +1,13 @@
-export type UserType = 'seller' | 'creator' | 'admin';
+export type UserType = 'seller' | 'broadcaster' | 'admin';
 
 export interface UserProfileRes {
   type: UserType;
   id: number;
-  name: string | null;
   email: string;
   hasPassword: boolean | null;
+  name?: string | null;
   shopName?: string | null;
+  avatar?: string;
+  agreementFlag?: boolean;
+  overlayUrl?: string;
 }

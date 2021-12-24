@@ -6,6 +6,7 @@ import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import * as logs from '@aws-cdk/aws-logs';
 import * as ssm from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
+import * as ecr from '@aws-cdk/aws-ecr';
 import { constants } from '../../constants';
 
 interface LCDevAppStackProps extends cdk.StackProps {
@@ -13,6 +14,7 @@ interface LCDevAppStackProps extends cdk.StackProps {
   apiSecGrp: ec2.SecurityGroup;
   overlaySecGrp: ec2.SecurityGroup;
   albSecGrp: ec2.SecurityGroup;
+  overlayControllerSecGrp: ec2.SecurityGroup;
 }
 
 const PREFIX = 'LC-DEV-APP';
@@ -44,7 +46,7 @@ export class LCDevAppStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
 
-    const { vpc, apiSecGrp, overlaySecGrp, albSecGrp } = props;
+    const { vpc, apiSecGrp, overlaySecGrp, albSecGrp, overlayControllerSecGrp } = props;
 
     // * ECS Cluster
     const cluster = new ecs.Cluster(this, `${PREFIX}EcsCluster`, {
@@ -60,21 +62,34 @@ export class LCDevAppStack extends cdk.Stack {
     const apiService = this.createApiAppService(cluster, apiSecGrp);
     // * overlay server
     const overlayService = this.createOverlayAppService(cluster, overlaySecGrp);
+    // * overlay-controller server
+    const overlayControllerService = this.createOverlayControllerAppService(
+      cluster,
+      overlayControllerSecGrp,
+    );
 
-    this.alb = this.createALB(vpc, apiService, overlayService, albSecGrp);
+    this.alb = this.createALB({
+      vpc,
+      apiService,
+      overlayService,
+      sg: albSecGrp,
+      overlayControllerService,
+    });
   }
 
   /** API 서버 ECS Fargate Service 생성 메서드 */
   private createApiAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
+    const repo = new ecr.Repository(this, `${PREFIX}ApiRepo`, {
+      repositoryName: constants.DEV.ECS_API_FAMILY_NAME,
+      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+    });
     const apiTaskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSTaskDef`, {
       family: constants.DEV.ECS_API_FAMILY_NAME,
     });
     apiTaskDef.addContainer(`${PREFIX}ECSContainer`, {
       containerName: 'project-lc-api-dev',
       portMappings: [{ containerPort: constants.DEV.ECS_API_PORT }],
-      image: ecs.ContainerImage.fromRegistry(
-        `hwasurr/${constants.DEV.ECS_API_FAMILY_NAME}`,
-      ),
+      image: ecs.ContainerImage.fromEcrRepository(repo),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
@@ -95,8 +110,9 @@ export class LCDevAppStack extends cdk.Stack {
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
-        API_HOST: `https://dev-api.${+constants.PUNYCODE_DOMAIN}`,
-        SELLER_WEB_HOST: `https://xn--9z2b23wk2i.${constants.PUNYCODE_DOMAIN}`,
+        API_HOST: `https://dev-api.${constants.PUNYCODE_DOMAIN}`,
+        SELLER_WEB_HOST: `https://dev-seller.${constants.PUNYCODE_DOMAIN}`,
+        BROADCASTER_WEB_HOST: `https://dev-broadcaster.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}LogGroup`, {
@@ -123,15 +139,17 @@ export class LCDevAppStack extends cdk.Stack {
 
   /** 라-커 화면 Overlay 서버 ECS Fargate Service 생성 메서드 */
   private createOverlayAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
+    const repo = new ecr.Repository(this, `${PREFIX}OverlayRepo`, {
+      repositoryName: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
+      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+    });
     const taskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSOverlayTaskDef`, {
       family: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
     });
     taskDef.addContainer(`${PREFIX}ECSOverlayContainer`, {
       containerName: 'project-lc-overlay-dev',
       portMappings: [{ containerPort: constants.DEV.ECS_OVERLAY_PORT }],
-      image: ecs.ContainerImage.fromRegistry(
-        `hwasurr/${constants.DEV.ECS_OVERLAY_FAMILY_NAME}`,
-      ),
+      image: ecs.ContainerImage.fromEcrRepository(repo),
       memoryLimitMiB: 512,
       secrets: {
         DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
@@ -175,12 +193,85 @@ export class LCDevAppStack extends cdk.Stack {
     });
   }
 
-  private createALB(
-    vpc: ec2.Vpc,
-    apiService: ecs.FargateService,
-    overlayAppService: ecs.FargateService,
-    sg: ec2.SecurityGroup,
+  /** 라-커 화면제어 OverlayController 서버 ECS Fargate Service 생성 메서드 */
+  private createOverlayControllerAppService(
+    cluster: ecs.Cluster,
+    secgrp: ec2.SecurityGroup,
   ) {
+    const repo = new ecr.Repository(this, `${PREFIX}OverlayControllerRepo`, {
+      repositoryName: constants.DEV.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
+      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+    });
+    const taskDef = new ecs.FargateTaskDefinition(
+      this,
+      `${PREFIX}ECSOverlayControllerTaskDef`,
+      {
+        family: constants.DEV.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
+      },
+    );
+    taskDef.addContainer(`${PREFIX}ECSOverlayControllerContainer`, {
+      containerName: constants.DEV.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
+      portMappings: [{ containerPort: constants.DEV.ECS_OVERLAY_CONTROLLER_PORT }],
+      image: ecs.ContainerImage.fromEcrRepository(repo),
+      memoryLimitMiB: 512,
+      secrets: {
+        DATABASE_URL: ecs.Secret.fromSsmParameter(this.DBURL_PARAMETER),
+        FIRSTMALL_DATABASE_URL: ecs.Secret.fromSsmParameter(this.FIRSTMALL_DATABASE_URL),
+        GOOGLE_CREDENTIALS_EMAIL: ecs.Secret.fromSsmParameter(
+          this.GOOGLE_CREDENTIALS_EMAIL,
+        ),
+        GOOGLE_CREDENTIALS_PRIVATE_KEY: ecs.Secret.fromSsmParameter(
+          this.GOOGLE_CREDENTIALS_PRIVATE_KEY,
+        ),
+        JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
+        CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
+        CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
+        CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
+        AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
+        AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
+      },
+      environment: {
+        S3_BUCKET_NAME: 'lc-project',
+        OVERLAY_HOST: `https://dev-live.${constants.PUNYCODE_DOMAIN}`,
+        OVERLAY_CONTROLLER_HOST: `https://dev-overlay-controller.${constants.PUNYCODE_DOMAIN}`,
+      },
+      logging: new ecs.AwsLogDriver({
+        logGroup: new logs.LogGroup(this, `${PREFIX}OverlayControllerLogGroup`, {
+          logGroupName: constants.DEV.ECS_OVERLAY_CONTROLLER_LOG_GLOUP_NAME,
+          removalPolicy: cdk.RemovalPolicy.DESTROY,
+        }),
+        streamPrefix: 'ecs',
+      }),
+    });
+
+    return new ecs.FargateService(this, `${PREFIX}OverlayControllerService`, {
+      serviceName: constants.DEV.ECS_OVERLAY_CONTROLLER_SERVICE_NAME,
+      cluster,
+      taskDefinition: taskDef,
+      vpcSubnets: {
+        subnetGroupName: constants.DEV.PRIVATE_SUBNET_GROUP_NAME,
+      },
+      platformVersion: ecs.FargatePlatformVersion.LATEST,
+      desiredCount: 1,
+      securityGroup: secgrp,
+      assignPublicIp: false,
+    });
+  }
+
+  /** ALB 생성 */
+  private createALB({
+    vpc,
+    apiService,
+    overlayService,
+    overlayControllerService,
+    sg,
+  }: {
+    vpc: ec2.Vpc;
+    apiService: ecs.FargateService;
+    overlayService: ecs.FargateService;
+    overlayControllerService: ecs.FargateService;
+    sg: ec2.SecurityGroup;
+  }) {
     // * ALB
     const alb = new elbv2.ApplicationLoadBalancer(this, `${PREFIX}ALB`, {
       vpc,
@@ -241,15 +332,45 @@ export class LCDevAppStack extends cdk.Stack {
           path: '/',
           interval: cdk.Duration.minutes(1),
         },
-        targets: [overlayAppService],
+        targets: [overlayService],
       },
     );
 
     // HTTP 리스너에 Overlay 서버 타겟그룹 추가
-    HttpsListener.addTargetGroups(`${PREFIX}HTTPSApiTargetGroup`, {
-      priority: 1,
-      conditions: [elbv2.ListenerCondition.hostHeaders(['dev-live.onad.io'])],
+    HttpsListener.addTargetGroups(`${PREFIX}HTTPSOverlayTargetGroup`, {
+      priority: 2,
+      conditions: [
+        elbv2.ListenerCondition.hostHeaders([`dev-live.${constants.PUNYCODE_DOMAIN}`]),
+      ],
       targetGroups: [overlayTargetGroup],
+    });
+
+    const overlayControllerTargetGroup = new elbv2.ApplicationTargetGroup(
+      this,
+      `${PREFIX}OverlayControllerTargetGroup`,
+      {
+        vpc,
+        targetGroupName: 'OverlayControllerTargetGroup',
+        port: constants.DEV.ECS_OVERLAY_CONTROLLER_PORT,
+        protocol: elbv2.ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [overlayControllerService],
+      },
+    );
+
+    // HTTP 리스너에 Overlay 서버 타겟그룹 추가
+    HttpsListener.addTargetGroups(`${PREFIX}HTTPSOverlayControllerTargetGroup`, {
+      priority: 3,
+      conditions: [
+        elbv2.ListenerCondition.hostHeaders([
+          `dev-overlay-controller.${constants.PUNYCODE_DOMAIN}`,
+        ]),
+      ],
+      targetGroups: [overlayControllerTargetGroup],
     });
 
     return alb;
@@ -318,7 +439,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}MAILER_USER`,
       {
-        version: 2,
+        version: 3,
         parameterName: constants.DEV.MAILER_USER,
       },
     );
@@ -326,7 +447,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}MAILER_PASS`,
       {
-        version: 3,
+        version: 5,
         parameterName: constants.DEV.MAILER_PASS,
       },
     );

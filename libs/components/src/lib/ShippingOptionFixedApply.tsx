@@ -7,7 +7,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { KOREA_PROVINCES } from '../constants/address';
 import { ErrorText } from './ShippingOptionIntervalApply';
 
-// 배송비 고정 옵션 적용
+/** 지역선택 셀렉트박스 강조 스타일 */
+export const areaSelectStyle = {
+  bg: 'orange.100',
+  color: 'black',
+};
+
+/** 배송비 고정 옵션 적용 */
 export function ShippingOptionFixedApply({
   shippingSetType,
 }: {
@@ -110,7 +116,7 @@ export function ShippingOptionFixedApply({
           }}
           render={({ field }) => {
             return (
-              <Select w={120} {...field}>
+              <Select w={120} {...field} {...areaSelectStyle}>
                 {deliveryLimit === 'limit' || shippingSetType === 'add' ? (
                   ['지역 선택', ...KOREA_PROVINCES].map((area) => (
                     <option key={area} value={area}>

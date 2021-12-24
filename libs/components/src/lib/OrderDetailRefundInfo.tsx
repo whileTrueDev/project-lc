@@ -1,8 +1,8 @@
 import { Avatar, Box, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
 import { convertFmRefundTypesToString, FmOrderRefund } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import { ChakraNextImage } from '@project-lc/components-core';
 import { FmRefundStatusBadge, OrderDetailOptionListItem, TextDotConnector } from '..';
-import { ChakraNextImage } from './ChakraNextImage';
 
 /** 주문 환불 정보 */
 export function OrderDetailRefundInfo({

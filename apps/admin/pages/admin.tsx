@@ -1,8 +1,9 @@
-import { Box, Text, Button } from '@chakra-ui/react';
+import { Box, Text, Button, Heading } from '@chakra-ui/react';
 import {
   AdminPageLayout,
   AdminAccountList,
   AdminBusinessRegistrationList,
+  AdminBroadcasterSettlementInfoList,
 } from '@project-lc/components';
 import { useAdminSettlementInfo } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
@@ -26,6 +27,8 @@ export function Index(): JSX.Element {
             </Button>
           </Box>
 
+          <Heading>판매자</Heading>
+
           <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
             <Text fontSize="lg" fontWeight="medium" pb={1}>
               등록된 계좌 정보
@@ -41,6 +44,15 @@ export function Index(): JSX.Element {
             <AdminBusinessRegistrationList
               sellerBusinessRegistrations={settlementData?.sellerBusinessRegistration}
             />
+          </Box>
+
+          <Heading mt={4}>방송인</Heading>
+
+          <Box borderWidth="1px" borderRadius="lg" p={7} height="100%">
+            <Text fontSize="lg" fontWeight="medium" pb={1}>
+              방송인 정산정보 검수
+            </Text>
+            <AdminBroadcasterSettlementInfoList />
           </Box>
         </Box>
       </Box>

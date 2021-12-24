@@ -6,21 +6,23 @@ import {
   IsNumber,
   IsOptional,
   ValidateIf,
+  IsInt,
 } from 'class-validator';
 import { LiveShopping, LiveShopppingProgressType } from '@prisma/client';
 
 import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
+import { LiveShoppingInput } from '../..';
 
 export class LiveShoppingDTO {
   @IsNumber()
   id: number;
 
-  @IsString()
-  streamId: string;
+  // @IsString()
+  // streamId: string;
 
   @IsOptional()
-  @IsString()
-  broadcasterId: string;
+  @IsNumber()
+  broadcasterId: number;
 
   @IsString()
   sellerId: string;
@@ -40,11 +42,11 @@ export class LiveShoppingDTO {
 
   @IsOptional()
   @IsDate()
-  broadcastStartDate: string;
+  broadcastStartDate: Date;
 
   @IsOptional()
   @IsDate()
-  broadcastEndDate: string;
+  broadcastEndDate: Date;
 
   @IsOptional()
   @IsDate()
@@ -74,12 +76,15 @@ export class LiveShoppingDTO {
   @IsNumber()
   @IsNotEmpty()
   broadcasterCommissionRate?: string;
+
+  @IsOptional() @IsInt() fmGoodsSeq?: LiveShopping['fmGoodsSeq'];
 }
 
 export type LiveShoppingRegistDTO = Pick<
   LiveShoppingDTO,
-  'requests' | 'goods_id' | 'contactId' | 'streamId' | 'progress'
->;
+  'requests' | 'goods_id' | 'contactId' | 'progress'
+> &
+  Pick<LiveShoppingInput, 'desiredPeriod' | 'desiredCommission'>;
 
 export type LiveShoppingWithSales = Pick<
   LiveShoppingDTO,
@@ -102,3 +107,8 @@ export interface LiveShoppingWithConfirmation extends LiveShopping {
     };
   };
 }
+
+export type LiveShoppingBroadcastDate = Pick<
+  LiveShoppingDTO,
+  'broadcastStartDate' | 'broadcastEndDate'
+>;

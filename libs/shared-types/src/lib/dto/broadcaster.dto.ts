@@ -1,27 +1,14 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class BroadcasterDTO {
+  @IsNumber()
+  id: number;
+
   @IsString()
-  userId: string;
+  email: string;
 
   @IsString()
   userNickname: string;
-
-  @IsOptional()
-  @IsString()
-  afreecaId: string;
-
-  @IsOptional()
-  @IsString()
-  twitchId: string;
-
-  @IsOptional()
-  @IsString()
-  youtubeId: string;
-
-  @IsOptional()
-  @IsString()
-  channelUrl: string;
 }
 
 export type BroadcasterDTOWithoutUserId = Omit<BroadcasterDTO, 'userId'>;

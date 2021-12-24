@@ -1,4 +1,7 @@
+import { ChevronLeftIcon } from '@chakra-ui/icons';
 import {
+  Alert,
+  AlertIcon,
   Button,
   Center,
   Spinner,
@@ -6,18 +9,15 @@ import {
   Text,
   theme,
   useColorModeValue,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import {
-  s3,
-  useCreateGoodsCommonInfo,
-  useProfile,
-  useRegistGoods,
-} from '@project-lc/hooks';
+import { useCreateGoodsCommonInfo, useProfile, useRegistGoods } from '@project-lc/hooks';
 import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
+import { s3 } from '@project-lc/utils-s3';
 import { useRouter } from 'next/router';
 import { FormProvider, NestedValue, useForm } from 'react-hook-form';
-import { ChevronLeftIcon } from '@chakra-ui/icons';
+import { ConfirmDialog } from './ConfirmDialog';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
 import GoodsRegistDataOptions from './GoodsRegistDataOptions';
@@ -28,7 +28,7 @@ import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
 
-export type GoodsFormOption = Omit<GoodsOptionDto, 'default_option' | 'option_title'> & {
+export type GoodsFormOption = Omit<GoodsOptionDto, 'default_option'> & {
   id?: number;
 };
 
@@ -38,23 +38,16 @@ export type GoodsFormValues = Omit<RegistGoodsDto, 'options'> & {
   id?: number;
   options: NestedValue<GoodsFormOptionsType>;
   pictures?: { file: File; filename: string; id: number }[];
-  option_title: string; // 옵션 제목
+  option_title: string; // 옵션명
+  option_values: string; // 옵션값 (, 로 분리된 문자열)
   common_contents: string;
   common_contents_name?: string; // 공통 정보 이름
   common_contents_type: 'new' | 'load'; // 공통정보 신규 | 기존 불러오기
 };
 
 type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
-  options: Omit<GoodsOptionDto, 'option_title' | 'default_option'>[];
+  options: Omit<GoodsOptionDto, 'default_option'>[];
 };
-
-/** 이미지 파일명 앞부분에 타임스탬프 붙임
- * "2348238342_파일명" 형태로 리턴함
- * */
-export function addTimeStampToFilename(filename: string): string {
-  const timestamp = Date.now();
-  return `${timestamp}_${filename}`;
-}
 
 // 상품 사진, 상세설명 이미지를 s3에 업로드 -> url 리턴
 export async function uploadGoodsImageToS3(
@@ -65,15 +58,13 @@ export async function uploadGoodsImageToS3(
   return s3.s3uploadFile({ file, filename, contentType, userMail, type: 'goods' });
 }
 
-// options 에 default_option, option_title설정
+// options 에 default_option설정
 export function addGoodsOptionInfo(
-  options: Omit<GoodsOptionDto, 'default_option' | 'option_title'>[],
-  option_title: string,
+  options: Omit<GoodsOptionDto, 'default_option'>[],
 ): GoodsOptionDto[] {
   return options.map((opt, index) => ({
     ...opt,
     default_option: index === 0 ? ('y' as const) : ('n' as const),
-    option_title,
   }));
 }
 
@@ -118,6 +109,7 @@ export function GoodsRegistForm(): JSX.Element {
   const { mutateAsync: createGoodsCommonInfo } = useCreateGoodsCommonInfo();
   const toast = useToast();
   const router = useRouter();
+  const goBackAlertDialog = useDisclosure();
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
@@ -128,19 +120,9 @@ export function GoodsRegistForm(): JSX.Element {
       option_use: '1', // 옵션사용여부, 기본 - 옵션사용 1
       common_contents_type: 'new',
       option_title: '',
+      option_values: '',
       image: [],
-      options: [
-        {
-          option_type: 'direct',
-          option1: '',
-          consumer_price: 0,
-          price: 0,
-          option_view: 'Y',
-          supply: {
-            stock: 0,
-          },
-        },
-      ],
+      options: [],
       // 기타정보 (최대, 최소구매수량)
       min_purchase_limit: 'unlimit',
       max_purchase_limit: 'unlimit',
@@ -162,7 +144,6 @@ export function GoodsRegistForm(): JSX.Element {
 
     const {
       options,
-      option_title,
       common_contents_name,
       common_contents_type,
       common_contents,
@@ -171,13 +152,15 @@ export function GoodsRegistForm(): JSX.Element {
       shippingGroupId,
       contents,
       image,
+      option_title,
+      option_values,
       ...goodsData
     } = data;
 
     let goodsDto: RegistGoodsDto = {
       ...goodsData,
       image,
-      options: addGoodsOptionInfo(options, option_title),
+      options: addGoodsOptionInfo(options),
       option_use: options.length > 1 ? '1' : '0',
       max_purchase_ea: Number(max_purchase_ea) || 0,
       min_purchase_ea: Number(min_purchase_ea) || 0,
@@ -197,6 +180,15 @@ export function GoodsRegistForm(): JSX.Element {
       // 등록된 사진이 없는 경우
       toast({
         title: '상품 사진을 1개 이상 등록해주세요',
+        status: 'warning',
+      });
+      return;
+    }
+
+    if (options.length === 0) {
+      // 등록된 옵션이 없는 경우
+      toast({
+        title: '상품 옵션을 1개 이상 등록해주세요',
         status: 'warning',
       });
       return;
@@ -274,10 +266,7 @@ export function GoodsRegistForm(): JSX.Element {
           justifyContent="space-between"
           zIndex={theme.zIndices.sticky}
         >
-          <Button
-            leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push('/mypage/goods')}
-          >
+          <Button leftIcon={<ChevronLeftIcon />} onClick={goBackAlertDialog.onOpen}>
             상품목록 돌아가기
           </Button>
           <Button type="submit" colorScheme="blue" isLoading={isLoading}>
@@ -312,6 +301,25 @@ export function GoodsRegistForm(): JSX.Element {
 
         {/* 메모 - textArea */}
         <GoodsRegistMemo />
+
+        {/* 뒤로가기 - 입력된 정보 사라짐 안내 다이얼로그 */}
+        <ConfirmDialog
+          title="상품 목록으로 돌아가기"
+          isOpen={goBackAlertDialog.isOpen}
+          onClose={goBackAlertDialog.onClose}
+          onConfirm={async () => {
+            router.push('/mypage/goods');
+          }}
+        >
+          <Alert status="warning">
+            <AlertIcon />
+            <Stack spacing={1}>
+              <Text> 목록으로 이동시 입력했던 정보는 모두 사라집니다!</Text>
+              <Text>상품 정보를 모두 입력했다면 등록 버튼을 눌러 완료해주세요</Text>
+            </Stack>
+          </Alert>
+          <Text mt={3}>정말 상품 목록으로 이동하시겠습니까?</Text>
+        </ConfirmDialog>
 
         {isLoading && (
           <Center

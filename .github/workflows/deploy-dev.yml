@@ -32,9 +32,28 @@ jobs:
       - name: Build
         run: yarn affected:build --prod --base=$BEFORE_SHA
 
-      # Dockerize and Push to DockerHub
+      - name: Configure AWS credentials
+        if: ${{ success() }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Dockerize and Push to ECR
       - name: Dockerize
-        run: yarn affected --target=dockerize-dev --base=$BEFORE_SHA --args="--username=${{ secrets.DOCKER_USERNAME }} --password=${{ secrets.DOCKER_PASSWORD }} --tag=${{ github.sha }}"
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          yarn affected \
+            --target=dockerize-dev \
+            --base=$BEFORE_SHA \
+            --args="--registry=$ECR_REGISTRY"
 
   DeployAPI:
     name: Deploy API Job
@@ -66,7 +85,7 @@ jobs:
         with:
           task-definition: apps/api/task-definition-dev.json
           container-name: project-lc-api-dev
-          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-api-dev:${{ github.sha }}
+          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-api-dev:latest
 
       - name: Deploy Amazon ECS task definition API
         if: ${{ success() }}
@@ -79,7 +98,7 @@ jobs:
 
       - name: Prisma Migrate
         if: ${{ success() }}
-        run: yarn nx run prisma-orm:migrate-deploy
+        run: yarn nx run prisma-orm:migrate-reset
         env:
           DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
 
@@ -126,6 +145,53 @@ jobs:
 
       - name: Prisma Migrate
         if: ${{ success() }}
-        run: yarn nx run prisma-orm:migrate-deploy
+        run: yarn nx run prisma-orm:migrate-reset
+        env:
+          DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
+
+  DeployOverlayController:
+    name: Deploy OverlayController Job
+    runs-on: [self-hosted, linux, project-lc-dev]
+    needs: [Build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      
+      #  Install All Dependencies
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1 # install dependencies using cache
+
+      - name: Check Overlay affected
+        run: tools/check-need-overlay-controller-deploy.sh
+
+      - name: Configure AWS credentials
+        if: ${{ success() }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
+          aws-region: ap-northeast-2
+
+      - name: Fill in the new image ID in the Amazon ECS task definition Overlay-controller
+        if: ${{ success() }}
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: apps/overlay-controller/task-definition-dev.json
+          container-name: project-lc-overlay-controller-dev
+          image: ${{ secrets.DOCKER_USERNAME }}/project-lc-overlay-controller-dev:${{ github.sha }}
+
+      - name: Deploy Amazon ECS task definition Overlay-controller
+        if: ${{ success() }}
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: project-lc-overlay-controller-dev-service
+          cluster: project-lc-dev
+          wait-for-service-stability: false
+
+      - name: Prisma Migrate
+        if: ${{ success() }}
+        run: yarn nx run prisma-orm:migrate-reset
         env:
           DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}

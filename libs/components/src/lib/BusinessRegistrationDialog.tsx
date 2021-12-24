@@ -10,12 +10,12 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import {
-  s3,
   SettlementInfoRefetchType,
   useBusinessRegistrationMutation,
   useProfile,
 } from '@project-lc/hooks';
 import { BusinessRegistrationDto } from '@project-lc/shared-types';
+import { s3 } from '@project-lc/utils-s3';
 import { useRef } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { BusinessRegistrationForm } from './BusinessRegistrationForm';

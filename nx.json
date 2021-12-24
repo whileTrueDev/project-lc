@@ -30,14 +30,19 @@
     "admin": {
       "tags": []
     },
-    "admin-e2e": {
-      "tags": [],
-      "implicitDependencies": ["admin"]
-    },
     "api": {
       "tags": []
     },
     "components": {
+      "tags": []
+    },
+    "components-core": {
+      "tags": []
+    },
+    "components-logo": {
+      "tags": []
+    },
+    "components-order": {
       "tags": []
     },
     "firstmall-db": {
@@ -67,12 +72,20 @@
     "utils": {
       "tags": []
     },
+    "utils-backend": {
+      "tags": []
+    },
+    "utils-frontend": {
+      "tags": []
+    },
+    "utils-s3": {
+      "tags": []
+    },
     "web": {
       "tags": []
     },
-    "web-e2e": {
-      "tags": [],
-      "implicitDependencies": ["web"]
+    "web-broadcaster-center": {
+      "tags": []
     }
   }
 }

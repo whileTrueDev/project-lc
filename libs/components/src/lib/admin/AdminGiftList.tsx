@@ -7,10 +7,9 @@ import {
   getFmOrderStatusByNames,
   LiveShoppingProgressParams,
 } from '@project-lc/shared-types';
-import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
-import { ChakraDataGrid } from '../ChakraDataGrid';
+import { ChakraDataGrid } from '@project-lc/components-core';
 import FmOrderStatusBadge from '../FmOrderStatusBadge';
 import TooltipedText from '../TooltipedText';
 
@@ -156,9 +155,8 @@ export function AdminGiftList(props: {
   const filteredOrders = useMemo(() => {
     if (!orders.data) return [];
     return orders.data.filter((d) => {
-      const parser = new FmOrderMemoParser(d.memo || '');
-      // 선물하기가 아닌 주문만 필터링
-      return parser.giftFlag;
+      // 선물하기인 주문만 필터링
+      return d.giftFlag;
     });
   }, [orders.data]);
 

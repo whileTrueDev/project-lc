@@ -13,6 +13,8 @@ import {
   LiveShoppingModule,
   NoticeModule,
   OrderCancelModule,
+  NotificationModule,
+  InquiryModule,
 } from '@project-lc/nest-modules';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -35,6 +37,8 @@ import { validationSchema } from '../settings/config.validation';
     LiveShoppingModule,
     NoticeModule,
     OrderCancelModule,
+    NotificationModule,
+    InquiryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

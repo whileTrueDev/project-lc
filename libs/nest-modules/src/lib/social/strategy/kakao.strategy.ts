@@ -1,10 +1,12 @@
-// import { getApiHost } from '@project-lc/hooks';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Profile, Strategy } from 'passport-kakao';
+import { UserType } from '@project-lc/shared-types';
 import { getApiHost } from '@project-lc/utils';
-import { Seller } from '.prisma/client';
+import { getUserTypeFromRequest } from '@project-lc/utils-backend';
+import { Request } from 'express';
+import { Profile, Strategy } from 'passport-kakao';
+import { Broadcaster, Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
 const KAKAO_PROVIDER = 'kakao';
@@ -18,17 +20,20 @@ export class KakaoStrategy extends PassportStrategy(Strategy, KAKAO_PROVIDER) {
     super({
       clientID: configService.get('KAKAO_CLIENT_ID'),
       callbackURL: `${getApiHost()}/social/kakao/callback`,
+      passReqToCallback: true,
     });
   }
 
   async validate(
+    req: Request,
     accessToken: string,
     refreshToken: null,
     profile: Profile,
-  ): Promise<Seller> {
+  ): Promise<Seller | Broadcaster> {
     const { id, username, _json } = profile;
     const { kakao_account } = _json;
-    const { email, profile_image_url, is_default_image } = kakao_account;
+    const { email, profile: kakaoProfile } = kakao_account;
+    const { is_default_image, profile_image_url } = kakaoProfile;
 
     if (!email) {
       throw new ForbiddenException({
@@ -39,7 +44,9 @@ export class KakaoStrategy extends PassportStrategy(Strategy, KAKAO_PROVIDER) {
       });
     }
 
-    const user = await this.socialService.findOrCreateSeller({
+    const userType: UserType = getUserTypeFromRequest(req);
+
+    const user = await this.socialService.findOrCreateUser(userType, {
       id: String(id), // Profile에 타입정의는 string으로 되어있는데 실제값은 숫자로 넘어옴
       provider: KAKAO_PROVIDER,
       email,

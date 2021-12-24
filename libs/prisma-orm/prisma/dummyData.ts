@@ -32,14 +32,14 @@ export const common_contents = `
 
 export const TEST_ADMIN_EMAIL = 'testadmin@gmail.com';
 export const TEST_SELLER_EMAIL = 'testseller@gmail.com';
+export const TEST_BROADCASTER_EMAIL = 'testBc@gmail.com';
 // 비밀번호 : asdfasdf!
 export const COMMON_DUMMY_PASSWORD =
   '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY';
 
 /** 관리자 생성 데이터 */
-export const testadminData: Prisma.SellerCreateInput = {
+export const testadminData: Prisma.AdministratorCreateInput = {
   email: TEST_ADMIN_EMAIL,
-  name: 'test관리자',
   password: COMMON_DUMMY_PASSWORD,
 };
 
@@ -95,10 +95,11 @@ export const testsellerExtraData: {
 
 /** 테스트방송인 생성 데이터 */
 export const testBroadcasterData: Prisma.BroadcasterCreateInput = {
-  userNickname: '테스트방송인',
-  overlayUrl: 'test',
-  userId: 'test-broadcaster',
-  userName: '테스트방송인',
+  email: TEST_BROADCASTER_EMAIL,
+  password: COMMON_DUMMY_PASSWORD,
+  overlayUrl: `/${TEST_BROADCASTER_EMAIL}`,
+  userName: '테스트방송인이름',
+  userNickname: '테스트방송인활동명',
 };
 
 /** 판매 수수료 기본값 설정 */
@@ -149,9 +150,9 @@ export const dummyGoodsList: DummyGoodsDataType[] = [
     confirmation: { status: 'confirmed', firstmallGoodsConnectionId: 42 },
   },
   {
-    goods_name: 'testGoods4 x 테스트방송인',
+    goods_name: 'testGoods4 - 선물상품 조회 테스트 83번',
     summary: '라이브쇼핑 연결',
-    confirmation: { status: 'confirmed', firstmallGoodsConnectionId: 68 },
+    confirmation: { status: 'confirmed', firstmallGoodsConnectionId: 83 },
   },
 ];
 

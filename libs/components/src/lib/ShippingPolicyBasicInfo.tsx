@@ -1,7 +1,5 @@
 import {
-  Box,
   Button,
-  Checkbox,
   CloseButton,
   Collapse,
   FormControl,
@@ -16,9 +14,14 @@ import {
 } from '@chakra-ui/react';
 import { ShippingCalculType } from '@prisma/client';
 import { useDisplaySize } from '@project-lc/hooks';
-import { ShippingCalculTypeOptions, ShippingCalculTypes } from '@project-lc/shared-types';
+import {
+  shippingAdditionalSettingOptions,
+  ShippingAdditionalSettingOptionValue,
+  ShippingCalculTypeOptions,
+  ShippingCalculTypes,
+} from '@project-lc/shared-types';
 import { useShippingGroupItemStore } from '@project-lc/stores';
-import React from 'react';
+import React, { useMemo } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import SectionWithTitle from './SectionWithTitle';
 import TextWithPopperButton from './TextWithPopperButton';
@@ -56,16 +59,10 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
     setGroupName,
     setShippingCalculType,
     clearShippingAdditionalSetting,
-    setShippingStdFree,
-    setShippingAddFree,
+    setShippingAdditionalSetting,
     setAddress,
     setDetailAddress,
   } = useShippingGroupItemStore();
-
-  const shippingStdFree = shipping_std_free_yn === 'Y';
-  const shippingAddFree = shipping_add_free_yn === 'Y';
-
-  // 배송비 계산 기준
 
   // 주소검색 결과 타입 참고 https://postcode.map.daum.net/guide
   const handleComplete = (data: AddressData): void => {
@@ -73,6 +70,26 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
     setAddress(zonecode, address);
     setFlag.off();
   };
+
+  // 배송비 추가설정
+  const additionalOptionValue: ShippingAdditionalSettingOptionValue = useMemo(() => {
+    // 기본배송비 무료인 경우
+    if (shipping_std_free_yn === 'Y') {
+      // 기본배송비 무료 && 추가배송비도 무료인 경우
+      if (shipping_add_free_yn === 'Y') {
+        return 'bothFree';
+      }
+      // 기본배송비 무료 && 추가배송비는 부과인 경우
+      return 'stdOnlyFree';
+    }
+
+    // 기본배송비 부과 && 추가배송비는 무료인 경우
+    if (shipping_add_free_yn === 'Y') {
+      return 'addOnlyFree';
+    }
+    // 기본배송비 부과 && 추가배송비도 부과인 경우 - 기본값
+    return 'bothCharge';
+  }, [shipping_add_free_yn, shipping_std_free_yn]);
 
   return (
     <SectionWithTitle title="기본정보">
@@ -115,7 +132,7 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
       </ShippingPolicyFormControlWithLabel>
 
       {/* 배송비 추가 설정 - 배송비 계산 기준이 '무료계산'일때는 표시하지 않는다 */}
-      {shippingCalculType !== 'free' && (
+      <Collapse in={shippingCalculType !== 'free'} animateOpacity>
         <ShippingPolicyFormControlWithLabel
           id="shipping-add-setting"
           label="배송비 추가 설정"
@@ -125,23 +142,26 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
               해당 상품을 배송비 계산 기준인 &apos;무료계산-묶음배송&apos;인 다른 상품과
               주문했을 때,
             </Text>
-            <Checkbox
-              colorScheme="green"
-              isChecked={shippingStdFree}
-              onChange={setShippingStdFree}
+            <RadioGroup
+              value={additionalOptionValue}
+              onChange={(nextValue: ShippingAdditionalSettingOptionValue) => {
+                setShippingAdditionalSetting(nextValue);
+              }}
             >
-              해당 상품의 기본 배송비를 무료로 하시겠습니까?
-            </Checkbox>
-            <Checkbox
-              colorScheme="green"
-              isChecked={shippingAddFree}
-              onChange={setShippingAddFree}
-            >
-              해당 상품의 추가 배송비를 무료로 하시겠습니까?
-            </Checkbox>
+              <Stack>
+                {shippingAdditionalSettingOptions.map((opt) => {
+                  const { label, value } = opt;
+                  return (
+                    <Radio value={value} key={value}>
+                      <Text size="sm">{label}</Text>
+                    </Radio>
+                  );
+                })}
+              </Stack>
+            </RadioGroup>
           </Stack>
         </ShippingPolicyFormControlWithLabel>
-      )}
+      </Collapse>
 
       {/* 반송지 */}
       <ShippingPolicyFormControlWithLabel label="반송지">

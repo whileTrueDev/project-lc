@@ -3,14 +3,17 @@ import { EditIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
+  Center,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   Stack,
   useDisclosure,
+  Text,
 } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
 import { useEffect, useRef } from 'react';
@@ -24,6 +27,11 @@ import SectionWithTitle from './SectionWithTitle'; // Import Sun Editor's CSS Fi
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,
+  loading: () => (
+    <Center>
+      <Spinner />
+    </Center>
+  ),
 });
 
 export function GoodsRegistDescription(): JSX.Element {
@@ -54,8 +62,9 @@ export function GoodsRegistDescription(): JSX.Element {
   }, [detailContents]);
 
   return (
-    <SectionWithTitle title="상세설명 *">
+    <SectionWithTitle title="상세설명 *" variant="outlined">
       <Stack>
+        <Text>제품 상세 내용이 담긴 대형 이미지는 이곳에 첨부해주세요.</Text>
         <Box>
           <Button rightIcon={<EditIcon />} onClick={onOpen}>
             설명 쓰기

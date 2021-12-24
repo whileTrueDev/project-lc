@@ -1,9 +1,11 @@
 import { Divider, Stack, Text, VStack } from '@chakra-ui/react';
-import GoogleLoginButton from './GoogleLoginButton';
+import GoogleLoginButton, { UserTypeProps } from './GoogleLoginButton';
 import KakaoLoginButton from './KakaoLoginButton';
 import NaverLoginButton from './NaverLoginButton';
 
-export function SocialButtonGroup(): JSX.Element {
+export function SocialButtonGroup({
+  userType = 'seller',
+}: Partial<UserTypeProps>): JSX.Element {
   return (
     <VStack spacing={2}>
       <Stack direction="row" width="100%" alignItems="center">
@@ -13,9 +15,9 @@ export function SocialButtonGroup(): JSX.Element {
         </Text>
         <Divider flex={1} />
       </Stack>
-      <GoogleLoginButton />
-      <NaverLoginButton />
-      <KakaoLoginButton />
+      <GoogleLoginButton userType={userType} />
+      <NaverLoginButton userType={userType} />
+      <KakaoLoginButton userType={userType} />
     </VStack>
   );
 }

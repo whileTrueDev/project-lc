@@ -1,9 +1,9 @@
-import { Box, Divider, Link, Text } from '@chakra-ui/react';
+import { Box, Link, Text } from '@chakra-ui/react';
 import { GridColumns } from '@material-ui/data-grid';
 import { Notice } from '@prisma/client';
 import { useNoticeInfo } from '@project-lc/hooks';
 import dayjs from 'dayjs';
-import { ChakraDataGrid } from './ChakraDataGrid';
+import { ChakraDataGrid } from '@project-lc/components-core';
 
 const columns: GridColumns = [
   {
@@ -46,8 +46,8 @@ export function MypageNoticeSection(): JSX.Element {
       <Text fontSize="lg" fontWeight="medium" pb={1}>
         공지사항
       </Text>
-      <Divider backgroundColor="gray.100" mb={3} />
       <ChakraDataGrid
+        mt={3}
         loading={isLoading}
         borderWidth={0}
         headerHeight={40}

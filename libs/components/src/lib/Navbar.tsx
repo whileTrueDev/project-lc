@@ -17,21 +17,27 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
+import { KksLogo } from '@project-lc/components-logo';
+import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
+import { UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
 import { mainNavItems, NavItem } from '../constants/navigation';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
-import KksLogo from './KksLogo';
 import ProfileBox from './ProfileBox';
+import UserNotificationSection from './UserNotificationSection';
 
-export function Navbar(): JSX.Element {
+export interface NavbarProps {
+  appType?: UserType;
+}
+export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
   const { isLoggedIn } = useIsLoggedIn();
   const { logout } = useLogout();
+  const { data: profileData } = useProfile();
 
   const handleAccountSettingClick = useCallback(
     () => router.push('/mypage/setting'),
@@ -73,47 +79,51 @@ export function Navbar(): JSX.Element {
               textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
               color={useColorModeValue('gray.800', 'white')}
             >
-              <KksLogo size="small" />
+              <KksLogo appType={appType} size="small" />
             </Link>
           </NextLink>
-
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
             <DesktopNav />
           </Flex>
         </Flex>
 
-        <Stack
-          flex={{ base: 1, md: 0 }}
-          justify="flex-end"
-          alignItems="center"
-          direction="row"
-          spacing={{ base: 0, sm: 4 }}
-        >
+        <Flex alignItems="center">
           <ColorModeSwitcher />
           {isLoggedIn ? (
-            <Menu>
-              <MenuButton as={Avatar} size="sm" cursor="pointer" />
-              <MenuList w={{ base: 280, sm: 300 }}>
-                <Box p={3}>
-                  <ProfileBox />
-                </Box>
-                <Divider />
-                <MenuItem
-                  my={1}
-                  icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
-                  onClick={handleAccountSettingClick}
-                >
-                  계정 설정
-                </MenuItem>
-                <MenuItem
-                  my={1}
-                  icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
-                  onClick={logout}
-                >
-                  로그아웃
-                </MenuItem>
-              </MenuList>
-            </Menu>
+            <>
+              <Box mr={{ base: '1', sm: '3' }}>
+                <UserNotificationSection />
+              </Box>
+
+              <Menu>
+                <MenuButton
+                  as={Avatar}
+                  size="sm"
+                  cursor="pointer"
+                  src={profileData?.avatar}
+                />
+                <MenuList w={{ base: 280, sm: 300 }}>
+                  <Box p={3}>
+                    <ProfileBox />
+                  </Box>
+                  <Divider />
+                  <MenuItem
+                    my={1}
+                    icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
+                    onClick={handleAccountSettingClick}
+                  >
+                    계정 설정
+                  </MenuItem>
+                  <MenuItem
+                    my={1}
+                    icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
+                    onClick={logout}
+                  >
+                    로그아웃
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </>
           ) : (
             <>
               <Button
@@ -122,6 +132,7 @@ export function Navbar(): JSX.Element {
                 fontWeight={500}
                 variant="link"
                 onClick={() => router.push('/login')}
+                mr={{ base: '1', sm: '3' }}
               >
                 로그인
               </Button>
@@ -138,7 +149,8 @@ export function Navbar(): JSX.Element {
               </Button>
             </>
           )}
-        </Stack>
+          {/* </Stack> */}
+        </Flex>
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
@@ -172,6 +184,7 @@ const DesktopNav = (): JSX.Element => {
                 textDecoration: 'none',
                 color: linkHoverColor,
               }}
+              isExternal={navItem.isExternal}
             >
               {navItem.label}
             </Link>
@@ -229,3 +242,6 @@ const MobileNavItem = ({ label, href, needLogin }: NavItem): JSX.Element => {
     </Flex>
   );
 };
+
+export const SellerNavbar = (): JSX.Element => <Navbar appType="seller" />;
+export const BroadcasterNavbar = (): JSX.Element => <Navbar appType="broadcaster" />;

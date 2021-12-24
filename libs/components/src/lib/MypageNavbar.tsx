@@ -12,9 +12,12 @@ import {
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
-import { MypageLink, mypageNavLinks } from '../constants/navigation';
+import { MypageLink } from '../constants/navigation';
 
-export function MypageNavbar(): JSX.Element {
+export interface MypageNavbarProps {
+  navLinks: Array<MypageLink>;
+}
+export function MypageNavbar({ navLinks }: MypageNavbarProps): JSX.Element {
   const router = useRouter();
   const linkHoverColor = useColorModeValue('gray.800', 'white');
   const subNavHoverColor = useColorModeValue('pink.50', 'gray.900');
@@ -41,7 +44,7 @@ export function MypageNavbar(): JSX.Element {
       as="header"
     >
       <Stack direction="row" spacing={{ base: 2, sm: 4 }} as="nav">
-        {mypageNavLinks.map((link) => (
+        {navLinks.map((link) => (
           <Box key={link.name} align="center">
             <Popover trigger="hover" placement="bottom-start">
               <PopoverTrigger>

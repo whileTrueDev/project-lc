@@ -22,8 +22,13 @@ import {
   LiveShoppingWithSalesAndFmId,
   ChangeReturnStatusDto,
   fmOrderStatuses,
+  FmOrderItemInput,
+  FmOrderItemSubOption,
+  CheeringMessage,
+  BroadcasterPurchaseDto,
+  GoodsConfirmationDtoOnlyConnectionId,
+  BroacasterPurchaseWithDivdedMessageDto,
 } from '@project-lc/shared-types';
-import { FmOrderMemoParser } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { StatCounter } from './utills/statCounter';
@@ -69,12 +74,20 @@ export class FmOrdersService {
           order.shipping_seq,
         );
 
+        // 주문번호로 선물여부 옵션 조회
+        const giftFlag = await this.findOneOrderGiftFlag(order.order_seq);
+
+        // 응원메시지, 닉네임 조회
+        const cheeringMessage = await this.findOneOrderCheeringMessage(order.order_seq);
+
         return {
           ...order,
           ...orderInfoPerMyGoods,
           step: realStep,
           totalShippingCost,
           totalDeliveryCost: totalShippingCost,
+          giftFlag,
+          cheeringMessage: cheeringMessage || undefined,
         };
       }),
     );
@@ -221,6 +234,7 @@ export class FmOrdersService {
 
     // * 주문 상품
     const orderItems = await this.findOneOrderItems(orderId, goodsIds);
+    if (orderItems.length === 0) return null;
 
     // * 개별 주문 상품 - 상품 옵션 목록 정보
     const itemSeqArray = orderItems.map((x) => x.item_seq);
@@ -310,11 +324,16 @@ export class FmOrdersService {
     // step이 정상적이지 않은 주문인 경우 조회하지 않음.
     if (!Object.keys(fmOrderStatuses).includes(order.step)) return null;
 
-    const parser = new FmOrderMemoParser(order.memo);
+    // 주문번호로 선물여부 옵션 조회
+    const giftFlag = await this.findOneOrderGiftFlag(order.order_seq);
+
+    // 응원메시지, 닉네임 조회
+    const cheeringMessage = await this.findOneOrderCheeringMessage(order.order_seq);
+
     return {
       ...order,
-      memo: parser.memo,
-      memoOriginal: order.memo,
+      giftFlag,
+      cheeringMessage: cheeringMessage || undefined,
     };
   }
 
@@ -366,7 +385,7 @@ export class FmOrdersService {
     FROM fm_order_item_option
     WHERE fm_order_item_option.item_seq IN (?)`;
 
-    return this.db.query(findOptionsSql, [itemSeqArray]);
+    return this.db.query(findOptionsSql, itemSeqArray);
   }
 
   /** 개별 주문 - 출고 정보 */
@@ -393,7 +412,7 @@ export class FmOrdersService {
 
     const exportItemsSql = `
     SELECT 
-      goods_name, image,
+      export_code, goods_seq, goods_name, image,
       item_option_seq, title1, option1, fm_goods_export_item.ea, price, step
     FROM fm_order_item_option
       JOIN fm_order_item USING(item_seq)
@@ -430,7 +449,7 @@ export class FmOrdersService {
       fm_manager.manager_id,
       fm_manager.memail,
       fm_manager.mcellphone,
-      SUM(fm_order_refund_item.ea) ea,
+      SUM(fm_order_refund_item.ea) totalEa,
       SUM(fm_order_refund_item.refund_goods_price) refund_goods_price
     FROM fm_order_refund
     LEFT JOIN fm_manager USING(manager_seq)
@@ -630,11 +649,16 @@ export class FmOrdersService {
             fm_order_item.goods_name,
             fm_order_item.image,
             fm_order_item.item_seq,
-            shipping_seq
+            shipping_seq,
+            shipping_set_name,
+            shipping_type,
+            shipping_method,
+            shipping_group
           FROM fm_order_item
+          JOIN fm_order_shipping USING (shipping_seq)
           WHERE
             shipping_seq = ?
-            AND order_seq = ? 
+            AND fm_order_item.order_seq = ? 
             AND goods_seq IN (?)`,
           [sh.shipping_seq, orderId, goodsIds],
         );
@@ -838,5 +862,116 @@ export class FmOrdersService {
     );
 
     return salesPrice;
+  }
+
+  /** 주문의 응원메시지, 구매자 닉네임(fm_order_item_input) 조회 */
+  private async findOneOrderCheeringMessage(
+    orderId: FmOrder['order_seq'] | string,
+  ): Promise<CheeringMessage | null> {
+    // 주문번호로 입력옵션(닉네임, 응원메시지) 조회
+    const inputOptions: FmOrderItemInput[] = await this.db.query(`
+      SELECT
+        item_input_seq,
+        order_seq,
+        title,
+        value
+      FROM fm_order_item_input
+      WHERE order_seq = ${orderId}
+    `);
+
+    if (inputOptions.length === 0) return null;
+
+    const nicknameOption = inputOptions.find((opt) => opt.title.includes('닉네임'));
+    const messageOption = inputOptions.find((opt) => opt.title.includes('응원'));
+
+    return {
+      nickname: nicknameOption?.value,
+      text: messageOption?.value,
+    };
+  }
+
+  /** 주문의 선물하기 여부 조회 */
+  private async findOneOrderGiftFlag(
+    orderId: FmOrder['order_seq'] | string,
+  ): Promise<boolean> {
+    // 주문번호로 suboption(선물하기 옵션) 조회
+    const suboption: FmOrderItemSubOption[] = await this.db.query(`
+      SELECT
+      item_suboption_seq,
+      order_seq,
+        title,
+        suboption
+      FROM fm_order_item_suboption
+      WHERE order_seq = ${orderId}
+    `);
+
+    // 선물하기 옵션값이 존재하면 선물하기 주문 아니면 일반주문으로 취급
+    if (suboption.length === 0) return false;
+    return true;
+  }
+
+  private getMessage(value: BroadcasterPurchaseDto): BroadcasterPurchaseDto {
+    const newMessageRow = Object.assign(value);
+    const inputsArray = value.message.split('||');
+    let userNickname = '-';
+    let userMessage = '-';
+    for (let i = 0; i < inputsArray.length; i++) {
+      const dividedArray = inputsArray[i].split('&&');
+      if (
+        dividedArray[0] === '닉네임' &&
+        dividedArray[1] !== '입력없음' &&
+        userNickname === '-'
+      ) {
+        const nickname = dividedArray[1];
+        userNickname = nickname;
+      }
+      if (
+        dividedArray[0] === '응원메세지' &&
+        dividedArray[1] !== '입력없음' &&
+        userMessage === '-'
+      ) {
+        const message = dividedArray[1];
+        userMessage = message;
+      }
+    }
+    newMessageRow.userNickname = userNickname;
+    newMessageRow.userMessage = userMessage;
+
+    return newMessageRow;
+  }
+
+  public async getPurchaseDoneOrderDuringLiveShopping(
+    goods: GoodsConfirmationDtoOnlyConnectionId[],
+  ): Promise<BroacasterPurchaseWithDivdedMessageDto> {
+    const sql = `
+    SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.regist_date, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
+    FROM fm_order_item AS foi 
+    RIGHT JOIN fm_order AS fo 
+    ON foi.order_seq = fo.order_seq 
+    LEFT JOIN fm_order_item_suboption AS fois
+    ON fo.order_seq = fois.order_seq
+    LEFT JOIN fm_order_item_input AS foii
+    ON fo.order_seq=foii.order_seq
+    WHERE goods_seq = ?
+    AND fo.step = 75
+    GROUP BY id
+    ORDER BY fo.deposit_date desc
+`;
+    const purchaseList = await Promise.all(
+      goods.map(async (value: GoodsConfirmationDtoOnlyConnectionId) => {
+        const connectionId = value.firstmallGoodsConnectionId;
+        return this.db.query(sql, [connectionId]);
+      }),
+    );
+
+    const flattenPurchaseList = purchaseList.reduce(function (a, b) {
+      return a.concat(b);
+    }, []);
+
+    const messageDividedflattenPurchaseList = flattenPurchaseList.map((row) => {
+      return this.getMessage(row);
+    });
+
+    return messageDividedflattenPurchaseList;
   }
 }

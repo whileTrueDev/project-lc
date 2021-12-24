@@ -1,10 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { loginUserRes, UserProfileRes, UserType } from '@project-lc/shared-types';
-import { Seller } from '@prisma/client';
+import { Administrator, Broadcaster, Seller } from '@prisma/client';
 import { UserPayload } from './auth.interface';
 import { SellerService } from '../seller/seller.service';
+import { BroadcasterService } from '../broadcaster/broadcaster.service';
+import { AdminAccountService } from '../admin/admin-account.service';
 import { CipherService } from './cipher.service';
 import {
   ACCESS_TOKEN_EXPIRE_TIME,
@@ -13,13 +15,16 @@ import {
   COOKIE_AUTO_LOGIN_EXPIRE_TIME,
   COOKIE_EXPIRE_TIME,
   ACCESS_TOKEN_EXPIRE_TIME_INT,
+  ADMIN_ACCESS_TOKEN_EXPIRE_TIME_INT,
 } from './auth.constant';
 
 @Injectable()
 export class AuthService {
   // private를 사용하는 이유는 해당 Service를 내부에서만 사용할 것이기 떄문이다.
   constructor(
-    private sellerService: SellerService,
+    private readonly sellerService: SellerService,
+    private readonly broadcasterService: BroadcasterService,
+    private readonly adminAccountService: AdminAccountService,
     private jwtService: JwtService,
     private cipherService: CipherService,
   ) {}
@@ -40,7 +45,10 @@ export class AuthService {
     return {
       token_type: 'bearer',
       access_token: this.createAccessToken(userPayload),
-      expires_in: ACCESS_TOKEN_EXPIRE_TIME_INT,
+      expires_in:
+        userType === 'admin'
+          ? ADMIN_ACCESS_TOKEN_EXPIRE_TIME_INT
+          : ACCESS_TOKEN_EXPIRE_TIME_INT,
       refresh_token: this.createRefreshToken(userPayload, stayLogedIn),
       refresh_token_expires_in: stayLogedIn
         ? COOKIE_AUTO_LOGIN_EXPIRE_TIME
@@ -50,7 +58,7 @@ export class AuthService {
   }
 
   /**
-   * seller의 존재 여부를 확인한다. 다른 유저 타입에 대해서도 조회가 가능하도록 구현 필요
+   * seller의 존재 여부를 확인한다. (local.strategy.ts 파일에서 사용)
    * @param email 입력한 이메일 문자열
    * @param pwdInput 입력한 패스워드 문자열
    * @returns {SellerPayload} User 인터페이스 객체
@@ -60,23 +68,15 @@ export class AuthService {
     email: string,
     pwdInput: string,
   ): Promise<UserPayload | null> {
-    let user: Seller;
-    if (['admin', 'seller'].includes(type)) {
-      user = await this.sellerService.findOne({ email });
-      if (!user) {
-        return null;
-      }
-      if (user.password === null) {
-        // 소셜로그인으로 가입된 회원
-        throw new BadRequestException();
-      }
-      const isCorrect = await this.sellerService.validatePassword(
-        pwdInput,
-        user.password,
-      );
-      if (!isCorrect) {
-        return null;
-      }
+    let user: Seller | Broadcaster | Administrator;
+    if (['seller'].includes(type)) {
+      user = await this.sellerService.login(email, pwdInput);
+    }
+    if (['admin'].includes(type)) {
+      user = await this.adminAccountService.login(email, pwdInput);
+    }
+    if (['broadcaster'].includes(type)) {
+      user = await this.broadcasterService.login(email, pwdInput);
     }
     return this.castUser(user, type);
   }
@@ -135,8 +135,9 @@ export class AuthService {
     }
   }
 
-  castUser(user: Seller, type: UserType): UserPayload {
+  castUser(user: Seller | Broadcaster | Administrator, type: UserType): UserPayload {
     return {
+      id: user.id,
       sub: user.email,
       type,
     };
@@ -144,6 +145,7 @@ export class AuthService {
 
   private castUserPayload(userPayload: UserPayload): UserPayload {
     return {
+      id: userPayload.id,
       sub: userPayload.sub,
       type: userPayload.type,
     };
@@ -153,7 +155,6 @@ export class AuthService {
     const refreshToken: string = this.jwtService.sign(userPayload, {
       expiresIn: stayLogedIn ? AUTO_LOGIN_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME,
     });
-    // 암호화 미사용시 제거
     const cookieRefreshToken = this.cipherService.createCookieRefreshToken(refreshToken);
     return cookieRefreshToken;
   }
@@ -170,13 +171,39 @@ export class AuthService {
     return `${newAccessToken}`;
   }
 
-  async getProfile(userPayload: UserPayload): Promise<UserProfileRes> {
+  async getProfile(userPayload: UserPayload, appType: UserType): Promise<UserProfileRes> {
     const { sub, type } = userPayload;
-    // if (type === 'seller') {
-    const user = await this.sellerService.findOne({ email: sub });
+    let user: Seller | Broadcaster | Administrator;
+    // 판매자 정보 조회
+    if (['seller'].includes(type)) {
+      if (appType !== 'seller') {
+        throw new UnauthorizedException();
+      }
+      user = await this.sellerService.findOne({ email: sub });
+    }
+    // 방송인 정보 조회
+    if (['broadcaster'].includes(type)) {
+      if (appType !== 'broadcaster') {
+        throw new UnauthorizedException();
+      }
+      user = await this.broadcasterService.findOne({ email: sub });
+    }
+    // 관리자 정보 조회
+    if (['admin'].includes(type)) {
+      user = await this.adminAccountService.findOne({ email: sub });
+    }
+
     const hasPassword = Boolean(user.password);
     const { password, ..._user } = user;
 
+    if ('userName' in _user) {
+      return {
+        ..._user,
+        name: _user.userName,
+        type,
+        hasPassword,
+      };
+    }
     return {
       ..._user,
       type,

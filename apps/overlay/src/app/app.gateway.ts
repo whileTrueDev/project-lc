@@ -12,6 +12,7 @@ import {
   PageUrlAndDevice,
   SocketIdandDevice,
   SocketInfo,
+  LiveShoppingIdWithProductNameAndRoomId,
 } from '@project-lc/shared-types';
 import { Server, Socket } from 'socket.io';
 
@@ -93,5 +94,18 @@ export class AppGateway
           fullUrl[0] ? this.socketInfo[fullUrl[0]] : null,
         );
     }
+  }
+
+  @SubscribeMessage('liveshopping id from admin')
+  getLiveShoppingId(
+    @MessageBody()
+    roomAndLiveShoppingId: LiveShoppingIdWithProductNameAndRoomId,
+  ): void {
+    const { roomName } = roomAndLiveShoppingId;
+    const { liveShoppingId } = roomAndLiveShoppingId;
+    const { streamerAndProduct } = roomAndLiveShoppingId;
+    this.server
+      .to(roomName)
+      .emit('get liveshopping id from server', { liveShoppingId, streamerAndProduct });
   }
 }

@@ -8,7 +8,9 @@
       "targets": {
         "build": {
           "executor": "@nrwl/next:build",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "root": "apps/admin",
             "outputPath": "dist/apps/admin"
@@ -20,6 +22,7 @@
         "serve": {
           "executor": "@nrwl/next:server",
           "options": {
+            "port": 4250,
             "buildTarget": "admin:build",
             "dev": true
           },
@@ -38,7 +41,9 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/admin"],
+          "outputs": [
+            "coverage/apps/admin"
+          ],
           "options": {
             "jestConfig": "apps/admin/jest.config.js",
             "passWithNoTests": true
@@ -47,33 +52,9 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/admin/**/*.{ts,tsx,js,jsx}"]
-          }
-        }
-      }
-    },
-    "admin-e2e": {
-      "root": "apps/admin-e2e",
-      "sourceRoot": "apps/admin-e2e/src",
-      "projectType": "application",
-      "targets": {
-        "e2e": {
-          "executor": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/admin-e2e/cypress.json",
-            "tsConfig": "apps/admin-e2e/tsconfig.e2e.json",
-            "devServerTarget": "admin:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "admin:serve:production"
-            }
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/admin-e2e/**/*.{js,ts}"]
+            "lintFilePatterns": [
+              "apps/admin/**/*.{ts,tsx,js,jsx}"
+            ]
           }
         }
       }
@@ -87,14 +68,9 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/api/Dockerfile . -t hwasurr/project-lc-api:{args.tag}",
-              "docker tag hwasurr/project-lc-api:{args.tag} hwasurr/project-lc-api:latest ",
-              "docker push hwasurr/project-lc-api:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-api:latest",
-                "forwardAllArgs": false
-              }
+              "docker build -f ./apps/api/Dockerfile -t {args.registry}/project-lc-api:{args.tag} --platform=linux/amd64 .",
+              "docker tag {args.registry}/project-lc-api:{args.tag} {args.registry}/project-lc-api:latest",
+              "docker push {args.registry}/project-lc-api:{args.tag}"
             ],
             "parallel": false
           }
@@ -103,26 +79,24 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/api/Dockerfile . -t hwasurr/project-lc-api-dev:{args.tag}",
-              "docker tag hwasurr/project-lc-api-dev:{args.tag} hwasurr/project-lc-api-dev:latest ",
-              "docker push hwasurr/project-lc-api-dev:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-api-dev:latest",
-                "forwardAllArgs": false
-              }
+              "docker build -f ./apps/api/Dockerfile -t {args.registry}/project-lc-api-dev:latest --platform=linux/amd64 .",
+              "docker push {args.registry}/project-lc-api-dev:latest"
             ],
             "parallel": false
           }
         },
         "build": {
           "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
             "tsConfig": "apps/api/tsconfig.app.json",
-            "assets": ["apps/api/src/assets"],
+            "assets": [
+              "apps/api/src/assets"
+            ],
             "generatePackageJson": true
           },
           "configurations": {
@@ -148,12 +122,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/api/**/*.ts"]
+            "lintFilePatterns": [
+              "apps/api/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/api"],
+          "outputs": [
+            "coverage/apps/api"
+          ],
           "options": {
             "jestConfig": "apps/api/jest.config.js",
             "passWithNoTests": true
@@ -169,14 +147,93 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/components/**/*.{ts,tsx,js,jsx}"]
+            "lintFilePatterns": [
+              "libs/components/**/*.{ts,tsx,js,jsx}"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/components"],
+          "outputs": [
+            "coverage/libs/components"
+          ],
           "options": {
             "jestConfig": "libs/components/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "components-core": {
+      "root": "libs/components-core",
+      "sourceRoot": "libs/components-core/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/components-core/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/components-core"
+          ],
+          "options": {
+            "jestConfig": "libs/components-core/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "components-logo": {
+      "root": "libs/components-logo",
+      "sourceRoot": "libs/components-logo/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/components-logo/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/components-logo"
+          ],
+          "options": {
+            "jestConfig": "libs/components-logo/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "components-order": {
+      "root": "libs/components-order",
+      "sourceRoot": "libs/components-order/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/components-order/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/components-order"
+          ],
+          "options": {
+            "jestConfig": "libs/components-order/jest.config.js",
             "passWithNoTests": true
           }
         }
@@ -190,12 +247,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/firstmall-db/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/firstmall-db/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/firstmall-db"],
+          "outputs": [
+            "coverage/libs/firstmall-db"
+          ],
           "options": {
             "jestConfig": "libs/firstmall-db/jest.config.js",
             "passWithNoTests": true
@@ -211,12 +272,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/hooks/**/*.{ts,tsx,js,jsx}"]
+            "lintFilePatterns": [
+              "libs/hooks/**/*.{ts,tsx,js,jsx}"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/hooks"],
+          "outputs": [
+            "coverage/libs/hooks"
+          ],
           "options": {
             "jestConfig": "libs/hooks/jest.config.js",
             "passWithNoTests": true
@@ -232,12 +297,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/nest-modules/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/nest-modules/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/nest-modules"],
+          "outputs": [
+            "coverage/libs/nest-modules"
+          ],
           "options": {
             "jestConfig": "libs/nest-modules/jest.config.js",
             "passWithNoTests": true
@@ -254,14 +323,9 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/overlay/Dockerfile . -t hwasurr/project-lc-overlay:{args.tag}",
-              "docker tag hwasurr/project-lc-overlay:{args.tag} hwasurr/project-lc-overlay:latest ",
-              "docker push hwasurr/project-lc-overlay:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-overlay:latest",
-                "forwardAllArgs": false
-              }
+              "docker build -f ./apps/overlay/Dockerfile -t {args.registry}/project-lc-overlay:{args.tag} --platform=linux/amd64 .",
+              "docker tag {args.registry}/project-lc-overlay:{args.tag} {args.registry}/project-lc-overlay:latest",
+              "docker push {args.registry}/project-lc-overlay:{args.tag}"
             ],
             "parallel": false
           }
@@ -270,21 +334,17 @@
           "executor": "@nrwl/workspace:run-commands",
           "options": {
             "commands": [
-              "docker login -u {args.username} -p {args.password}",
-              "docker build -f ./apps/overlay/Dockerfile . -t hwasurr/project-lc-overlay-dev:{args.tag}",
-              "docker tag hwasurr/project-lc-overlay-dev:{args.tag} hwasurr/project-lc-overlay-dev:latest ",
-              "docker push hwasurr/project-lc-overlay-dev:{args.tag}",
-              {
-                "command": "docker push hwasurr/project-lc-overlay-dev:latest",
-                "forwardAllArgs": false
-              }
+              "docker build -f ./apps/overlay/Dockerfile -t {args.registry}/project-lc-overlay-dev:latest --platform=linux/amd64 .",
+              "docker push {args.registry}/project-lc-overlay-dev:latest"
             ],
             "parallel": false
           }
         },
         "build": {
           "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/apps/overlay",
             "main": "apps/overlay/src/main.ts",
@@ -313,18 +373,23 @@
         "serve": {
           "executor": "@nrwl/node:execute",
           "options": {
+            "port": 3333,
             "buildTarget": "overlay:build"
           }
         },
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/overlay/**/*.ts"]
+            "lintFilePatterns": [
+              "apps/overlay/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/overlay"],
+          "outputs": [
+            "coverage/apps/overlay"
+          ],
           "options": {
             "jestConfig": "apps/overlay/jest.config.js",
             "passWithNoTests": true
@@ -337,9 +402,32 @@
       "sourceRoot": "apps/overlay-controller/src",
       "projectType": "application",
       "targets": {
+        "dockerize": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/overlay-controller/Dockerfile -t {args.registry}/project-lc-overlay-controller:{args.tag} --platform=linux/amd64 .",
+              "docker tag {args.registry}/project-lc-overlay-controller:{args.tag} {args.registry}/project-lc-overlay-controller:latest",
+              "docker push {args.registry}/project-lc-overlay-controller:{args.tag}"
+            ],
+            "parallel": false
+          }
+        },
+        "dockerize-dev": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/overlay-controller/Dockerfile -t {args.registry}/project-lc-overlay-controller-dev:latest --platform=linux/amd64 .",
+              "docker push {args.registry}/project-lc-overlay-controller-dev:latest"
+            ],
+            "parallel": false
+          }
+        },
         "build": {
           "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/apps/overlay-controller",
             "main": "apps/overlay-controller/src/main.ts",
@@ -348,7 +436,8 @@
               "apps/overlay-controller/src/assets",
               "apps/overlay-controller/src/views",
               "apps/overlay-controller/src/lib"
-            ]
+            ],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
@@ -373,12 +462,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/overlay-controller/**/*.ts"]
+            "lintFilePatterns": [
+              "apps/overlay-controller/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/overlay-controller"],
+          "outputs": [
+            "coverage/apps/overlay-controller"
+          ],
           "options": {
             "jestConfig": "apps/overlay-controller/jest.config.js",
             "passWithNoTests": true
@@ -394,12 +487,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/prisma-orm/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/prisma-orm/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/prisma-orm"],
+          "outputs": [
+            "coverage/libs/prisma-orm"
+          ],
           "options": {
             "jestConfig": "libs/prisma-orm/jest.config.js",
             "passWithNoTests": true
@@ -532,12 +629,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/shared-types/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/shared-types/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/shared-types"],
+          "outputs": [
+            "coverage/libs/shared-types"
+          ],
           "options": {
             "jestConfig": "libs/shared-types/jest.config.js",
             "passWithNoTests": true
@@ -553,12 +654,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/stores/**/*.{ts,tsx,js,jsx}"]
+            "lintFilePatterns": [
+              "libs/stores/**/*.{ts,tsx,js,jsx}"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/stores"],
+          "outputs": [
+            "coverage/libs/stores"
+          ],
           "options": {
             "jestConfig": "libs/stores/jest.config.js",
             "passWithNoTests": true
@@ -574,14 +679,93 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/utils/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/utils/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/utils"],
+          "outputs": [
+            "coverage/libs/utils"
+          ],
           "options": {
             "jestConfig": "libs/utils/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "utils-backend": {
+      "root": "libs/utils-backend",
+      "sourceRoot": "libs/utils-backend/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/utils-backend/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/utils-backend"
+          ],
+          "options": {
+            "jestConfig": "libs/utils-backend/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "utils-frontend": {
+      "root": "libs/utils-frontend",
+      "sourceRoot": "libs/utils-frontend/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/utils-frontend/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/utils-frontend"
+          ],
+          "options": {
+            "jestConfig": "libs/utils-frontend/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "utils-s3": {
+      "root": "libs/utils-s3",
+      "sourceRoot": "libs/utils-s3/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/utils-s3/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/utils-s3"
+          ],
+          "options": {
+            "jestConfig": "libs/utils-s3/jest.config.js",
             "passWithNoTests": true
           }
         }
@@ -594,13 +778,25 @@
       "targets": {
         "build": {
           "executor": "@nrwl/next:build",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "root": "apps/web",
             "outputPath": "dist/apps/web"
           },
           "configurations": {
             "production": {}
+          }
+        },
+        "postbuild": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              {
+                "command": "next-sitemap --config apps/web/next-sitemap.js"
+              }
+            ]
           }
         },
         "serve": {
@@ -624,7 +820,9 @@
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/web"],
+          "outputs": [
+            "coverage/apps/web"
+          ],
           "options": {
             "jestConfig": "apps/web/jest.config.js",
             "passWithNoTests": true
@@ -633,33 +831,67 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/web/**/*.{ts,tsx,js,jsx}"]
+            "lintFilePatterns": [
+              "apps/web/**/*.{ts,tsx,js,jsx}"
+            ]
           }
         }
       }
     },
-    "web-e2e": {
-      "root": "apps/web-e2e",
-      "sourceRoot": "apps/web-e2e/src",
+    "web-broadcaster-center": {
+      "root": "apps/web-broadcaster-center",
+      "sourceRoot": "apps/web-broadcaster-center",
       "projectType": "application",
       "targets": {
-        "e2e": {
-          "executor": "@nrwl/cypress:cypress",
+        "build": {
+          "executor": "@nrwl/next:build",
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
-            "cypressConfig": "apps/web-e2e/cypress.json",
-            "tsConfig": "apps/web-e2e/tsconfig.e2e.json",
-            "devServerTarget": "web:serve"
+            "root": "apps/web-broadcaster-center",
+            "outputPath": "dist/apps/web-broadcaster-center"
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/next:server",
+          "options": {
+            "port": 4300,
+            "buildTarget": "web-broadcaster-center:build",
+            "dev": true
           },
           "configurations": {
             "production": {
-              "devServerTarget": "web:serve:production"
+              "buildTarget": "web-broadcaster-center:build:production",
+              "dev": false
             }
+          }
+        },
+        "export": {
+          "executor": "@nrwl/next:export",
+          "options": {
+            "buildTarget": "web-broadcaster-center:build:production"
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/apps/web-broadcaster-center"
+          ],
+          "options": {
+            "jestConfig": "apps/web-broadcaster-center/jest.config.js",
+            "passWithNoTests": true
           }
         },
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/web-e2e/**/*.{js,ts}"]
+            "lintFilePatterns": [
+              "apps/web-broadcaster-center/**/*.{ts,tsx,js,jsx}"
+            ]
           }
         }
       }

@@ -1,29 +1,29 @@
 import {
-  HStack,
-  CloseButton,
-  Text,
-  Stack,
-  useToast,
+  Box,
   Button,
-  useDisclosure,
+  CloseButton,
+  Divider,
+  HStack,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
-  ModalFooter,
-  Divider,
-  Box,
+  Stack,
+  Text,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import {
+  useDeleteGoodsImageMutation,
   useGoodsImageMutation,
   useProfile,
-  useDeleteGoodsImageMutation,
 } from '@project-lc/hooks';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { ChakraNextImage } from './ChakraNextImage';
+import { ChakraNextImage } from '@project-lc/components-core';
 import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
 import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 import SectionWithTitle from './SectionWithTitle';
@@ -247,8 +247,9 @@ export function GoodsRegistPictures(): JSX.Element {
   const goodsId = watch('id');
 
   return (
-    <SectionWithTitle title="상품사진 *">
+    <SectionWithTitle title="상품사진 *" variant="outlined">
       <Stack spacing={4}>
+        <Text>썸네일 이미지로 사용됩니다. 가로세로 1:1 비율인 이미지를 추천합니다.</Text>
         <Box>
           <Button onClick={onOpen}>사진 등록하기</Button>
         </Box>

@@ -10,15 +10,36 @@ import {
   Link,
   VStack,
 } from '@chakra-ui/react';
+import { UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
+import { nanoid } from 'nanoid';
 import CenterBox from './CenterBox';
 import SocialButtonGroup from './SocialButtonGroup';
 
-export function SignupStart({
-  moveToSignupForm,
-}: {
+const SELLER_DISPLAY_TEXT_LIST = [
+  '라이브커머스를 통해 발생한 판매 관리',
+  '상품에 맞는 크리에이터 매칭',
+  '라이브 커머스 기획, 진행, 결제까지 한번에 해결',
+];
+
+const BROADCASTER_DISPLAY_TEXT_LIST = [
+  '내 방송에서도 라이브로 상품 판매를!',
+  `'오늘은 내가 쇼호스트!' 시청자에게 좋은 상품을 소개해 보세요.`,
+  '누구나 쉽게 할 수 있는 화면 세팅으로 시작해 보세요.',
+];
+
+interface SignupStartProps {
+  /** 기본값은 'seller', seller | broadcaster 타입에 따라 다른 문구가 표기된다 */
+  userType?: UserType;
   moveToSignupForm?: () => void;
-}): JSX.Element {
+}
+
+export function SignupStart({
+  userType = 'seller',
+  moveToSignupForm,
+}: SignupStartProps): JSX.Element {
+  const displayTextList =
+    userType === 'seller' ? SELLER_DISPLAY_TEXT_LIST : BROADCASTER_DISPLAY_TEXT_LIST;
   return (
     <CenterBox
       enableShadow
@@ -29,18 +50,12 @@ export function SignupStart({
     >
       <VStack mt={4} spacing={8} align="stretch">
         <List spacing={3}>
-          <ListItem>
-            <ListIcon as={CheckIcon} color="green.500" />
-            라이브커머스를 통해 발생한 판매 관리
-          </ListItem>
-          <ListItem>
-            <ListIcon as={CheckIcon} color="green.500" />
-            상품에 맞는 크리에이터 매칭
-          </ListItem>
-          <ListItem>
-            <ListIcon as={CheckIcon} color="green.500" />
-            라이브 커머스 기획, 진행, 결제까지 한번에 해결
-          </ListItem>
+          {displayTextList.map((text) => (
+            <ListItem key={nanoid()}>
+              <ListIcon as={CheckIcon} color="green.500" />
+              {text}
+            </ListItem>
+          ))}
         </List>
         <Stack spacing={2}>
           <Button
@@ -53,7 +68,7 @@ export function SignupStart({
           >
             이메일 계정으로 가입
           </Button>
-          <SocialButtonGroup />
+          <SocialButtonGroup userType={userType} />
 
           <Text fontSize="sm" pt={2}>
             이미 가입하셨나요?

@@ -1,15 +1,17 @@
 import { Button } from '@chakra-ui/react';
+import { USER_TYPE_KEY } from '@project-lc/shared-types';
 import { getApiHost } from '@project-lc/utils';
+import { ChakraNextImage } from '@project-lc/components-core';
 import naverLogo from '../../images/naver.png';
-import { ChakraNextImage } from './ChakraNextImage';
+import { UserTypeProps } from './GoogleLoginButton';
 
 const NAVER_COLOR = '#03c75a';
-export function NaverLoginButton(): JSX.Element {
+export function NaverLoginButton({ userType }: UserTypeProps): JSX.Element {
   return (
     <Button
       as="a"
       isFullWidth
-      href={`${getApiHost()}/social/naver/login`}
+      href={`${getApiHost()}/social/naver/login?${USER_TYPE_KEY}=${userType}`}
       bg={NAVER_COLOR}
       boxShadow="md"
       _hover={{ boxShadow: 'lg' }}

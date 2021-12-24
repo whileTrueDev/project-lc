@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { PurchaseMessageWithLoginFlag } from '@project-lc/shared-types';
+import {
+  PurchaseMessageWithLoginFlag,
+  liveShoppingPurchaseMessageDto,
+} from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
 
 @Injectable()
 export class OverlayControllerService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getCreatorUrls(): Promise<{ userNickname: string; overlayUrl: string }[]> {
+  async getCreatorUrls(): Promise<
+    { email: string; userNickname: string; overlayUrl: string }[]
+  > {
     const urlAndNickname = await this.prisma.broadcaster.findMany({
       select: {
+        email: true,
         userNickname: true,
-        userId: true,
         overlayUrl: true,
       },
     });
@@ -24,22 +29,48 @@ export class OverlayControllerService {
     const text = data.message;
     const price = data.purchaseNum;
     const { loginFlag } = data;
-    const broadcasterId = data.userId;
+    const broadcasterEmail = data.email;
     const { phoneCallEventFlag } = data;
     const { giftFlag } = data;
-
-    const writePurchaseMessage = await this.prisma.liveCommerceRanking.create({
+    const { liveShoppingId } = data;
+    const writePurchaseMessage = await this.prisma.liveShoppingPurchaseMessage.create({
       data: {
         nickname,
         text,
         price,
         loginFlag,
-        broadcasterId,
         phoneCallEventFlag,
         giftFlag,
+        liveShopping: { connect: { id: Number(liveShoppingId) } },
+        broadcaster: { connect: { email: broadcasterEmail } },
       },
     });
-    if (!writePurchaseMessage) throwError('Cannot upload data');
+    if (!writePurchaseMessage) throwError(() => 'Cannot upload data');
+    return true;
+  }
+
+  async getPurchaseMessage(
+    liveShoppingId: number,
+  ): Promise<liveShoppingPurchaseMessageDto[]> {
+    return this.prisma.liveShoppingPurchaseMessage.findMany({
+      where: {
+        liveShoppingId: Number(liveShoppingId),
+      },
+      select: {
+        id: true,
+        nickname: true,
+        text: true,
+        price: true,
+        createDate: true,
+      },
+    });
+  }
+
+  async deletePurchaseMessage(messageId: number): Promise<boolean> {
+    const deletePurchaseMessage = await this.prisma.liveShoppingPurchaseMessage.delete({
+      where: { id: Number(messageId) },
+    });
+    if (!deletePurchaseMessage) throwError(() => 'Cannot delete data');
     return true;
   }
 }

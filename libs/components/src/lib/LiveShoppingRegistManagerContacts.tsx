@@ -58,7 +58,7 @@ export function LiveShoppingManagerPhoneNumber(): JSX.Element {
 
   return (
     <Stack spacing={2}>
-      <Heading as="h6" size="xs">
+      <Heading as="h6" size="sm">
         담당자 연락처
       </Heading>
 

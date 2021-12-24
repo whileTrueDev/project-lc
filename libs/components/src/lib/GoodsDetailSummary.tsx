@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { Text, Stack } from '@chakra-ui/react';
 import { AiTwotoneExperiment } from 'react-icons/ai';
 import { BsFillDisplayFill } from 'react-icons/bs';
-import { IoImagesOutline } from 'react-icons/io5';
+import { FaImages } from 'react-icons/fa';
 import { MdDateRange } from 'react-icons/md';
 import { InfoIcon } from '@chakra-ui/icons';
 import { SummaryList } from '..';
@@ -49,7 +49,7 @@ export function GoodsDetailSummary({ goods }: GoodsDetailSummaryProps): JSX.Elem
         {
           id: '대표이미지',
           value: `상품 이미지 ${goods.image.length} 개`,
-          icon: IoImagesOutline,
+          icon: FaImages,
         },
         {
           id: '검수',

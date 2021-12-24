@@ -1,6 +1,3 @@
-import { useRouter } from 'next/router';
-import { LoginSellerDto } from '@project-lc/shared-types';
-import { useLoginMutation } from '@project-lc/hooks';
 import {
   Alert,
   AlertIcon,
@@ -18,24 +15,31 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { useLoginMutation } from '@project-lc/hooks';
+import { LoginUserDto, UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
-import React, { useCallback, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CenterBox } from './CenterBox';
 import SocialButtonGroup from './SocialButtonGroup';
 
 export interface LoginFormProps {
   enableShadow?: boolean;
+  userType: UserType;
 }
 
-export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element {
+export function LoginForm({
+  enableShadow = false,
+  userType,
+}: LoginFormProps): JSX.Element {
   const router = useRouter();
   const {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
     setValue,
-  } = useForm<LoginSellerDto>();
+  } = useForm<LoginUserDto>();
 
   // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
   const [formError, setFormError] = useState('');
@@ -44,14 +48,14 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
   }
 
   // * 로그인 핸들러
-  const login = useLoginMutation('seller');
+  const login = useLoginMutation(userType);
   const onSubmit = useCallback(
-    async (data: LoginSellerDto) => {
-      const seller = await login.mutateAsync(data).catch((err) => {
+    async (data: LoginUserDto) => {
+      const user = await login.mutateAsync(data).catch((err) => {
         setFormError(getMessage(err?.response.data?.status));
         setValue('password', '');
       });
-      if (seller) {
+      if (user) {
         router.push('/mypage');
       }
     },
@@ -124,7 +128,7 @@ export function LoginForm({ enableShadow = false }: LoginFormProps): JSX.Element
         </Box>
 
         <Box pb={2}>
-          <SocialButtonGroup />
+          <SocialButtonGroup userType={userType} />
         </Box>
 
         <Stack spacing={1} mt={2}>

@@ -5,11 +5,23 @@ export function SectionWithTitle({
   title,
   children,
   disableDivider = false,
+  variant = 'unstyle',
 }: {
   children: React.ReactNode;
   title: string;
   disableDivider?: boolean;
+  variant?: 'unstyle' | 'outlined';
 }): JSX.Element {
+  if (variant === 'outlined') {
+    return (
+      <Box as="section" id={title} borderWidth="1px" borderRadius="sm" p={4}>
+        <Heading as="h4" size="md" isTruncated my={2}>
+          {title}
+        </Heading>
+        {children}
+      </Box>
+    );
+  }
   return (
     <>
       {disableDivider ? null : <Divider />}

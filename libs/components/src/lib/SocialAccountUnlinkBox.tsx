@@ -1,13 +1,10 @@
 import { Button, Flex, Text, useDisclosure, useToast } from '@chakra-ui/react';
-import {
-  SocialAccount,
-  useProfile,
-  useUnlinkSocialAccountMutation,
-} from '@project-lc/hooks';
+import { useProfile, useUnlinkSocialAccountMutation } from '@project-lc/hooks';
+import { SocialAccount, UserType } from '@project-lc/shared-types';
+import { ChakraNextImage } from '@project-lc/components-core';
 import google from '../../images/google.png';
 import naver from '../../images/naver.png';
 import kakao from '../../images/kakao.png';
-import { ChakraNextImage } from './ChakraNextImage';
 import SocialAccountUnlinkDialog from './SocialAccountUnlinkDialog';
 
 export const logo: Record<string, React.ReactNode> = {
@@ -16,15 +13,18 @@ export const logo: Record<string, React.ReactNode> = {
   kakao: <ChakraNextImage src={kakao} width="40" height="40" />,
 };
 
-export function SocialAccountUnlinkBox(props: SocialAccount): JSX.Element {
-  const { provider, serviceId } = props;
+export function SocialAccountUnlinkBox(
+  props: SocialAccount & { userType?: UserType },
+): JSX.Element {
+  const { provider, serviceId, userType = 'seller' } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { mutateAsync: unlinkSocialAccount } = useUnlinkSocialAccountMutation();
   const { data } = useProfile();
   const toast = useToast();
 
   const unlink = (): void => {
-    unlinkSocialAccount({ provider, serviceId })
+    if (!data) return;
+    unlinkSocialAccount({ provider, serviceId, userType })
       .then((res) => {
         toast({ title: '연동해제 성공', status: 'success' });
         onClose();

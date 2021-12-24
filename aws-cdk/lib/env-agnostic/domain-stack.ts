@@ -9,8 +9,6 @@ interface LCDomainStackProps extends cdk.StackProps {
   devALB?: elbv2.ApplicationLoadBalancer;
 }
 
-const 라이브 = 'xn--oi2bm8jnwi';
-
 export class LCDomainStack extends cdk.Stack {
   private readonly DOMAIN = constants.DOMAIN;
   private readonly PUNYCODE_DOMAIN = constants.PUNYCODE_DOMAIN;
@@ -44,7 +42,7 @@ export class LCDomainStack extends cdk.Stack {
       `${this.PUNYCODE_DOMAIN}_PublicHostedZone`,
       {
         zoneName: this.PUNYCODE_DOMAIN,
-        comment: `${this.DOMAIN} hosted zone`,
+        comment: `kkshow hosted zone`,
       },
     );
     return this.hostedzone;
@@ -70,7 +68,13 @@ export class LCDomainStack extends cdk.Stack {
     });
     // 프로덕션용 ALB로 라우팅하는 라이브.크크쇼.com 레코드 생성
     new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_live_puny`, {
-      recordName: `${라이브}.${this.PUNYCODE_DOMAIN}`,
+      recordName: `${constants.PUNYCODE_라이브}.${this.PUNYCODE_DOMAIN}`,
+      zone: this.hostedzone,
+      target: route53.RecordTarget.fromAlias(this.prodALBTarget),
+    });
+    // 프로덕션용 ALB로 라우팅하는 overlay-controller.크크쇼.com 레코드 생성
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_overlay_controller`, {
+      recordName: `overlay-controller.${this.PUNYCODE_DOMAIN}`,
       zone: this.hostedzone,
       target: route53.RecordTarget.fromAlias(this.prodALBTarget),
     });
@@ -86,6 +90,12 @@ export class LCDomainStack extends cdk.Stack {
     // Dev환경용 ALB로 라우팅하는 기본 dev-live.크크쇼.com 레코드 생성
     new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_devlive`, {
       recordName: `dev-live.${this.PUNYCODE_DOMAIN}`,
+      zone: this.hostedzone,
+      target: route53.RecordTarget.fromAlias(this.devALBTarget),
+    });
+    // Dev환경용 ALB로 라우팅하는 기본 dev-live.크크쇼.com 레코드 생성
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_devoverlay_controller`, {
+      recordName: `dev-overlay-controller.${this.PUNYCODE_DOMAIN}`,
       zone: this.hostedzone,
       target: route53.RecordTarget.fromAlias(this.devALBTarget),
     });

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -58,5 +59,12 @@ export class LiveShoppingController {
   ): Promise<ApprovedGoodsNameAndId[]> {
     const goodsList = await this.goodsService.findMyGoodsNames(email);
     return goodsList;
+  }
+
+  @Get('/broadcaster')
+  getBroadcasterLiveShoppings(
+    @Query('broadcasterId', ParseIntPipe) broadcasterId: number,
+  ): Promise<LiveShoppingWithConfirmation[]> {
+    return this.liveShoppingService.getBroadcasterRegisteredLiveShoppings(broadcasterId);
   }
 }

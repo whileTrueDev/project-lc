@@ -11,6 +11,7 @@ import { mailerConfig } from '../_nest-units/settings/mailer.config';
 import { KakaoApiService } from './platform-api/kakao-api.service';
 import { NaverApiService } from './platform-api/naver-api.service';
 import { GoogleApiService } from './platform-api/google-api.service';
+import { S3Service } from '../s3/s3.service';
 
 describe('SocialService', () => {
   let service: SocialService;
@@ -40,6 +41,7 @@ describe('SocialService', () => {
         KakaoApiService,
         NaverApiService,
         GoogleApiService,
+        S3Service,
       ],
     }).compile();
 
@@ -58,17 +60,6 @@ describe('SocialService', () => {
 
       expect(newSeller).toBeDefined();
       expect(newSeller.email).toBe(testInfo.email);
-    });
-  });
-
-  describe('[PrivateMethod]selectSocialAccountRecord', () => {
-    it('should find socialAccount include Seller info', async () => {
-      const { seller } = await service['selectSocialAccountRecord']({
-        provider: testInfo.provider,
-        id: testInfo.id,
-      });
-
-      expect(seller).toBeDefined();
     });
   });
 });

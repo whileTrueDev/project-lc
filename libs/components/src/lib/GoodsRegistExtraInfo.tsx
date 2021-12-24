@@ -20,7 +20,7 @@ export function GoodsRegistExtraInfo(): JSX.Element {
     formState: { errors },
   } = useFormContext<RegistGoodsDto>();
   return (
-    <SectionWithTitle title="기타정보">
+    <SectionWithTitle title="기타정보" variant="outlined">
       {/* 최소 구매 수량 */}
       <FormControl mb={2}>
         <FormLabel fontWeight="bold">최소 구매 수량</FormLabel>

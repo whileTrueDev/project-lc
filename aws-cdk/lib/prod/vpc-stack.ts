@@ -12,6 +12,7 @@ export class LCProdVpcStack extends cdk.Stack {
   public readonly dbSecGrp: ec2.SecurityGroup;
   public readonly apiSecGrp: ec2.SecurityGroup;
   public readonly overlaySecGrp: ec2.SecurityGroup;
+  public readonly overlayControllerSecGrp: ec2.SecurityGroup;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -24,9 +25,11 @@ export class LCProdVpcStack extends cdk.Stack {
     this.albSecGrp = this.createAlbSecGrp();
     this.apiSecGrp = this.createApiSecGrp(this.albSecGrp);
     this.overlaySecGrp = this.createOverlaySecGrp(this.albSecGrp);
+    this.overlayControllerSecGrp = this.createOverlayControllerSecGrp(this.albSecGrp);
     this.dbSecGrp = this.createDbSecGrp({
       apiSecGrp: this.apiSecGrp,
       overlaySecGrp: this.overlaySecGrp,
+      overlayControllerSecGrp: this.overlayControllerSecGrp,
     });
   }
 
@@ -88,14 +91,35 @@ export class LCProdVpcStack extends cdk.Stack {
     return overlaySecGrp;
   }
 
+  /** 오버레이 컨트롤러 서버 보안 그룹 생성 */
+  private createOverlayControllerSecGrp(albSecGrp: ec2.SecurityGroup): ec2.SecurityGroup {
+    const overlayControllerSecGrp = new ec2.SecurityGroup(
+      this,
+      `${ID_PREFIX}OverlayController-SecGrp`,
+      {
+        vpc: this.vpc,
+        description: 'overlay-controller security grp for project-lc',
+        allowAllOutbound: true,
+      },
+    );
+
+    overlayControllerSecGrp.addIngressRule(
+      albSecGrp,
+      ec2.Port.tcp(3333),
+      'allow port 3333 to alb',
+    );
+    return overlayControllerSecGrp;
+  }
+
   /** 데이터베이스 서버 보안그룹 생성 */
   private createDbSecGrp({
     apiSecGrp,
     overlaySecGrp,
-  }: {
-    apiSecGrp: ec2.SecurityGroup;
-    overlaySecGrp: ec2.SecurityGroup;
-  }): ec2.SecurityGroup {
+    overlayControllerSecGrp,
+  }: Record<
+    'apiSecGrp' | 'overlaySecGrp' | 'overlayControllerSecGrp',
+    ec2.SecurityGroup
+  >): ec2.SecurityGroup {
     // * 보안그룹
     // db 보안그룹
     const dbSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}DB-SecGrp`, {
@@ -105,7 +129,7 @@ export class LCProdVpcStack extends cdk.Stack {
     });
     // * 보안그룹 룰 지정
     dbSecGrp.addIngressRule(
-      ec2.Peer.ipv4('59.22.64.86/32'),
+      ec2.Peer.ipv4('121.175.189.231/32'),
       ec2.Port.tcp(3306),
       'Allow port 3306 for outbound traffics to the whiletrue developers',
     );
@@ -119,6 +143,11 @@ export class LCProdVpcStack extends cdk.Stack {
       ec2.Port.tcp(3306),
       'Allow port 3306 only to traffic from overlay security group',
     );
+    dbSecGrp.addIngressRule(
+      overlayControllerSecGrp ?? this.overlayControllerSecGrp,
+      ec2.Port.tcp(3306),
+      'Allow port 3306 only to traffic from overlay controller security group',
+    );
 
     const githubActionsRunnerSecGrp = new ec2.SecurityGroup(
       this,
@@ -130,7 +159,7 @@ export class LCProdVpcStack extends cdk.Stack {
       },
     );
     githubActionsRunnerSecGrp.addIngressRule(
-      ec2.Peer.ipv4('59.22.64.86/32'),
+      ec2.Peer.ipv4('121.175.189.231/32'),
       ec2.Port.tcp(22),
       'SSH for Admin Desktop',
     );

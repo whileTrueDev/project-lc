@@ -1,0 +1,127 @@
+{
+    "ipcMode": null,
+    "executionRoleArn": "arn:aws:iam::803609402610:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "dnsSearchDomains": [],
+            "environmentFiles": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "secretOptions": [],
+                "options": {
+                    "awslogs-group": "/ecs/project-lc-overlay-controller-dev",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "entryPoint": [],
+            "portMappings": [
+                {
+                    "hostPort": 3333,
+                    "protocol": "tcp",
+                    "containerPort": 3333
+                }
+            ],
+            "command": [],
+            "linuxParameters": null,
+            "cpu": 0,
+            "environment": [
+                {
+                    "name": "S3_BUCKET_NAME",
+                    "value": "lc-project"
+                },
+                {
+                    "name": "OVERLAY_HOST",
+                    "value": "https://dev-live.xn--hp4b17xa.com"
+                },
+                {
+                    "name": "OVERLAY_CONTROLLER_HOST",
+                    "value": "https://dev-overlay-controller.xn--hp4b17xa.com"
+                }
+            ],
+            "resourceRequirements": null,
+            "ulimits": [],
+            "dnsServers": [],
+            "mountPoints": [],
+            "workingDirectory": null,
+            "secrets": [
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/LC_DEV_DB_URL",
+                    "name": "DATABASE_URL"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/LC_FIRSTMALL_DB_URL",
+                    "name": "FIRSTMALL_DATABASE_URL"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/LIVECOMMERCE_GCP_TTS_EMAIL",
+                    "name": "GOOGLE_CREDENTIALS_EMAIL"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/LIVECOMMERCE_GCP_TTS_PRIVATE_KEY",
+                    "name": "GOOGLE_CREDENTIALS_PRIVATE_KEY"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_JWT_SECRET",
+                    "name": "JWT_SECRET"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_CIPHER_HASH",
+                    "name": "CIPHER_HASH"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_CIPHER_PASSWORD",
+                    "name": "CIPHER_PASSWORD"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_CIPHER_SALT",
+                    "name": "CIPHER_SALT"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/S3_ACCESS_KEY_ID",
+                    "name": "AWS_S3_ACCESS_KEY_ID"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/S3_ACCESS_KEY_SECRET",
+                    "name": "AWS_S3_ACCESS_KEY_SECRET"
+                }
+            ],
+            "dockerSecurityOptions": [],
+            "memory": 512,
+            "memoryReservation": null,
+            "volumesFrom": [],
+            "stopTimeout": null,
+            "image": "hwasurr/project-lc-overlay-controller-dev",
+            "startTimeout": null,
+            "firelensConfiguration": null,
+            "dependsOn": null,
+            "disableNetworking": null,
+            "interactive": null,
+            "healthCheck": null,
+            "essential": true,
+            "links": [],
+            "hostname": null,
+            "extraHosts": [],
+            "pseudoTerminal": null,
+            "user": null,
+            "readonlyRootFilesystem": null,
+            "dockerLabels": {},
+            "systemControls": [],
+            "privileged": null,
+            "name": "project-lc-overlay-controller-dev"
+        }
+    ],
+    "placementConstraints": [],
+    "memory": "512",
+    "taskRoleArn": null,
+    "family": "project-lc-overlay-controller-dev",
+    "pidMode": null,
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "networkMode": "awsvpc",
+    "cpu": "256",
+    "inferenceAccelerators": null,
+    "proxyConfiguration": null,
+    "volumes": []
+}

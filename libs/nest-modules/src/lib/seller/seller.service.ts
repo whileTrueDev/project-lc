@@ -1,11 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
-import { hash, verify } from 'argon2';
-import { FindSellerRes, SellerContactsDTO } from '@project-lc/shared-types';
 import { PrismaService } from '@project-lc/prisma-orm';
+import {
+  AdminSellerListRes,
+  FindSellerRes,
+  SellerContactsDTO,
+} from '@project-lc/shared-types';
+import { hash, verify } from 'argon2';
+import { S3Service } from '../s3/s3.service';
 @Injectable()
 export class SellerService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly s3service: S3Service,
+  ) {}
+
   /**
    * 회원 가입
    */
@@ -22,6 +31,25 @@ export class SellerService {
   }
 
   /**
+   * 로그인
+   */
+  async login(email: string, pwdInput: string): Promise<Seller | null> {
+    const user = await this.findOne({ email });
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    if (user.password === null) {
+      // 소셜로그인으로 가입된 회원
+      throw new BadRequestException();
+    }
+    const isCorrect = await this.validatePassword(pwdInput, user.password);
+    if (!isCorrect) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
+
+  /**
    * 유저 정보 조회
    */
   async findOne(findInput: Prisma.SellerWhereUniqueInput): Promise<FindSellerRes> {
@@ -32,6 +60,7 @@ export class SellerService {
         email: true,
         name: true,
         password: true,
+        avatar: true,
         sellerShop: {
           select: {
             shopName: true,
@@ -193,5 +222,45 @@ export class SellerService {
       },
     });
     return { contactId: contact.id };
+  }
+
+  /** 셀러 아바타 이미지 url 저장 */
+  public async addSellerAvatar(
+    email: Seller['email'],
+    file: Express.Multer.File,
+  ): Promise<boolean> {
+    const avatarUrl = await this.s3service.uploadProfileImage({
+      key: file.originalname,
+      file: file.buffer,
+      email,
+      userType: 'seller',
+    });
+    await this.prisma.seller.update({
+      where: { email },
+      data: { avatar: avatarUrl },
+    });
+    return true;
+  }
+
+  /** 셀러 아바타 이미지 url null 로 초기화 */
+  public async removeSellerAvatar(email: Seller['email']): Promise<boolean> {
+    await this.prisma.seller.update({
+      where: { email },
+      data: { avatar: null },
+    });
+    return true;
+  }
+
+  /** 전체 판매자 계정과 상점명 목록 조회 */
+  public async getSellerList(): Promise<AdminSellerListRes> {
+    return this.prisma.seller.findMany({
+      select: {
+        sellerShop: true,
+        id: true,
+        email: true,
+        name: true,
+        avatar: true,
+      },
+    });
   }
 }

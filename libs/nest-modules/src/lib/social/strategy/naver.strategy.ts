@@ -1,9 +1,12 @@
-// import { getApiHost } from '@project-lc/hooks';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Profile, Strategy } from 'passport-naver';
+import { Broadcaster } from '@prisma/client';
+import { UserType } from '@project-lc/shared-types';
 import { getApiHost } from '@project-lc/utils';
+import { getUserTypeFromRequest } from '@project-lc/utils-backend';
+import { Request } from 'express';
+import { Profile, Strategy } from 'passport-naver';
 import { Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
@@ -18,14 +21,16 @@ export class NaverStrategy extends PassportStrategy(Strategy, NAVER_PROVIDER) {
       clientID: configService.get('NAVER_CLIENT_ID'),
       clientSecret: configService.get('NAVER_CLIENT_SECRET'),
       callbackURL: `${getApiHost()}/social/naver/callback`,
+      passReqToCallback: true,
     });
   }
 
   async validate(
+    req: Request,
     accessToken: string,
     refreshToken: null,
     profile: Profile,
-  ): Promise<Seller> {
+  ): Promise<Seller | Broadcaster> {
     const { email, nickname, profile_image, id } = profile._json;
 
     if (!email) {
@@ -37,7 +42,9 @@ export class NaverStrategy extends PassportStrategy(Strategy, NAVER_PROVIDER) {
       });
     }
 
-    const user = await this.socialService.findOrCreateSeller({
+    const userType: UserType = getUserTypeFromRequest(req);
+
+    const user = await this.socialService.findOrCreateUser(userType, {
       id,
       provider: NAVER_PROVIDER,
       email,

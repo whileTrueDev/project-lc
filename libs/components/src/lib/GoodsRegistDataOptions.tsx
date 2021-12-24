@@ -12,14 +12,17 @@ import {
   RadioGroup,
   Stack,
   Text,
+  Kbd,
 } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
+import { useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { InfoIcon } from '@chakra-ui/icons';
 import { boxStyle } from '../constants/commonStyleProps';
-import { RequiredMark } from './GoodsRegistDataBasic';
 import { GoodsRegistRadio } from './GoodsRegistDataSales';
-import { GoodsFormValues } from './GoodsRegistForm';
+import { GoodsFormOption, GoodsFormValues } from './GoodsRegistForm';
 import SectionWithTitle from './SectionWithTitle';
+import TextWithPopperButton from './TextWithPopperButton';
 
 export function GoodsOptionInput({
   label,
@@ -81,8 +84,12 @@ function NoOptionInput(): JSX.Element {
 function UseOptionInput(): JSX.Element {
   const {
     watch,
+    getValues,
+    setValue,
     control,
     register,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useFormContext<GoodsFormValues>();
   const { fields, append, remove } = useFieldArray<GoodsFormValues, 'options', 'fieldId'>(
@@ -97,8 +104,59 @@ function UseOptionInput(): JSX.Element {
   const inputWidth = isMobileSize ? '74px' : 'auto';
 
   const addOption = (): void => {
-    append({
-      option1: '',
+    // 1. 옵션명, 옵션값 체크 ----------------------------------
+    const optionTitle = getValues('option_title').trim();
+    const optionValues = getValues('option_values').trim();
+
+    const existOptions = getValues('options');
+
+    // 옵션명은 최대 5개까지 등록 가능(퍼스트몰 제한)
+    const existOptionUniqueTitles = [
+      ...new Set(existOptions.map((opt) => opt.option_title)),
+    ];
+    const overMaxOptionTitleCount =
+      existOptionUniqueTitles.length >= 5 &&
+      !existOptionUniqueTitles.includes(optionTitle);
+
+    const hasError = !optionTitle || !optionValues || overMaxOptionTitleCount;
+
+    if (!optionTitle) {
+      setError('option_title', {
+        type: 'validate',
+        message: '옵션명을 입력해주세요',
+      });
+    }
+    if (!optionValues) {
+      setError('option_values', {
+        type: 'validate',
+        message: '옵션값을 입력해주세요',
+      });
+    }
+    if (overMaxOptionTitleCount) {
+      setError('option_title', {
+        type: 'error',
+        message: '옵션명은 최대 5개까지 등록 가능합니다',
+      });
+    }
+
+    if (hasError) return;
+
+    // 2. 중복되는 옵션값 제거 ----------------------
+    const validOptionValues = optionValues
+      .split(',')
+      .map((value) => value.trim())
+      .filter(
+        (value) =>
+          !existOptions.find(
+            (existOpt) =>
+              existOpt.option_title === optionTitle && existOpt.option1 === value,
+          ),
+      );
+
+    // 3. 옵션값 등록 ------------------
+    const willBeAppendedValues: GoodsFormOption[] = validOptionValues.map((optValue) => ({
+      option_title: optionTitle,
+      option1: optValue,
       consumer_price: 0,
       price: 0,
       option_view: 'Y',
@@ -106,34 +164,71 @@ function UseOptionInput(): JSX.Element {
       supply: {
         stock: 0,
       },
-    });
+    }));
+    append(willBeAppendedValues);
+
+    // 4. 오류, 옵션명, 옵션값  초기화  ------------------
+    clearErrors(['option_title', 'option_values']);
+    setValue('option_title', '');
+    setValue('option_values', '');
   };
 
   return (
     <Stack>
-      <HStack>
-        <FormControl id="option_title" isInvalid={!!errors.option_title}>
-          <HStack>
-            <FormLabel>
-              옵션명 <RequiredMark />
-            </FormLabel>
-
+      {/* 옵션명 & 옵션값 입력부분 */}
+      <FormControl
+        id="option_title_values"
+        isInvalid={!!errors.option_title || !!errors.option_values}
+      >
+        <HStack flexWrap="wrap">
+          <HStack mr={2}>
+            <FormLabel m={0}>옵션명</FormLabel>
             <Input
-              {...register('option_title', { required: '옵션명을 입력해주세요.' })}
+              {...register('option_title')}
               size="sm"
               w={150}
-              placeholder="옵션명을 입력해주세요"
+              isInvalid={!!errors.option_title}
+              placeholder="색상"
             />
           </HStack>
-          {errors.option_title && (
-            <FormErrorMessage>{errors.option_title.message}</FormErrorMessage>
-          )}
-        </FormControl>
-        <Button onClick={addOption} ml={2}>
-          옵션값 추가
-        </Button>
-      </HStack>
 
+          <HStack>
+            <FormLabel m={0}>
+              <TextWithPopperButton
+                title="옵션값"
+                iconAriaLabel="옵션값 설명"
+                icon={<InfoIcon />}
+              >
+                <Text>
+                  <Kbd>,</Kbd> 로 옵션값을 구분하여 입력하면 <br />
+                  여러 옵션값을 한 번에 입력할 수 있습니다
+                </Text>
+              </TextWithPopperButton>
+            </FormLabel>
+            <Input
+              isInvalid={!!errors.option_values}
+              {...register('option_values')}
+              size="sm"
+              w={150}
+              placeholder="검정, 노랑, 파랑"
+            />
+          </HStack>
+
+          <Button size="sm" onClick={addOption} ml={2}>
+            옵션값 추가
+          </Button>
+        </HStack>
+
+        {errors.option_title && (
+          <FormErrorMessage>{errors.option_title.message}</FormErrorMessage>
+        )}
+        {errors.option_values && (
+          <FormErrorMessage>{errors.option_values.message}</FormErrorMessage>
+        )}
+      </FormControl>
+
+      {/* 입력된 옵션값 표시부분 - 가격, 노출여부 조절 */}
+      {fields.length === 0 && <Text>상품 옵션을 추가해주세요</Text>}
       {fields.map((field, index) => (
         <Stack
           key={field.fieldId}
@@ -142,23 +237,14 @@ function UseOptionInput(): JSX.Element {
           spacing={1}
           flexWrap="wrap"
         >
-          {/* 옵션값 */}
-          <HStack mb={1}>
+          {/* 삭제버튼과 옵션명:옵션값 */}
+          <HStack mr={1} flexGrow={0.5} flexShrink={0} minWidth={150}>
             <CloseButton onClick={() => remove(index)} />
-
-            <HStack>
-              <Text minWidth="60px">
-                옵션값 <RequiredMark />
-              </Text>
-              <Input
-                {...register(`options.${index}.option1` as const, {
-                  required: '옵션값을 입력해주세요',
-                })}
-                size="sm"
-              />
-            </HStack>
+            <Text minWidth="60px">
+              {`${getValues(`options.${index}.option_title`)} :`}
+            </Text>
+            <Input {...register(`options.${index}.option1` as const)} size="sm" />
           </HStack>
-          {/* 옵션값 */}
 
           <HStack mb={1}>
             {/* 정가 */}
@@ -237,29 +323,40 @@ const OPTION_USE = [
 export function GoodsRegistDataOptions(): JSX.Element {
   const { watch, setValue } = useFormContext<GoodsFormValues>();
 
+  const initializeOptions = useCallback(
+    (value: string) => {
+      if (value === '1') {
+        // 옵션 사용하는 경우
+        setValue('options', []);
+      } else {
+        // 옵션 사용 안하는 경우
+        setValue('options', [
+          {
+            option_type: 'direct',
+            option1: '',
+            option_title: '',
+            consumer_price: 0,
+            price: 0,
+            option_view: 'Y',
+            supply: {
+              stock: 0,
+            },
+          },
+        ]);
+      }
+    },
+    [setValue],
+  );
+
   return (
-    <SectionWithTitle title="판매 옵션">
+    <SectionWithTitle title="판매 옵션" variant="outlined">
       <Text fontWeight="bold">옵션 사용 여부</Text>
       {/* onChange 시 옵션초기화 */}
       <Box mb={4}>
         <GoodsRegistRadio
           name="option_use"
           values={OPTION_USE}
-          onChange={() => {
-            setValue('option_title', '');
-            setValue('options', [
-              {
-                option_type: 'direct',
-                option1: '',
-                consumer_price: 0,
-                price: 0,
-                option_view: 'Y',
-                supply: {
-                  stock: 0,
-                },
-              },
-            ]);
-          }}
+          onChange={initializeOptions}
         />
         <Text fontWeight="normal" as="span" color="gray.500" fontSize="sm">
           (사용 여부 변경시 기존에 추가했던 옵션은 모두 사라집니다.)

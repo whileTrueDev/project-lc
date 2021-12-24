@@ -5,11 +5,11 @@ const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
 const iterateLimit = $('#primary-info').data('number') + 1;
-const userId = $('#primary-info').data('userid');
+const email = $('#primary-info').data('email');
 let streamerAndProduct;
-
+let liveShoppingId;
 let startDate = new Date('2021-09-27T14:05:00+0900');
-let defaultDate = new Date('2021-09-04T15:00:00+0900');
+let endDate = new Date('2021-09-04T15:00:00+0900');
 let feverDate = new Date('2021-09-27T14:05:00+0900');
 let bannerId = 1;
 const bottomMessages = [];
@@ -75,10 +75,14 @@ function dailyMissionTimer() {
           </video>
             `;
         $('.full-video').html(introHtml);
+        $('.inner-video-area').on('ended', function () {
+          $('.live-commerce').show();
+          $('.inner-video-area').fadeOut(500);
+        });
       }
     }
 
-    let distance = defaultDate.getTime() - now.getTime();
+    let distance = endDate.getTime() - now.getTime();
     if (distance < 0) {
       distance = 0;
     }
@@ -185,7 +189,7 @@ async function switchImage() {
     $('.vertical-banner')
       .attr(
         'src',
-        `https://lc-project.s3.ap-northeast-2.amazonaws.com/vertical-banner/${userId}/vertical-banner-${bannerId}.png`,
+        `https://lc-project.s3.ap-northeast-2.amazonaws.com/vertical-banner/${email}/${liveShoppingId}/vertical-banner-${bannerId}.png`,
       )
       .fadeIn(1000);
   }, 1000);
@@ -328,11 +332,11 @@ socket.on('get right-top purchase message', async (data) => {
   messageHtml = `
   <div class="donation-wrapper">
     <iframe src="/audio/${
-      alarmType === '2' ? 'alarm-type-2.wav' : 'alarm-type-1.wav'
+      alarmType === '2' ? 'xmas-alarm-type-2.mp3' : 'xmas-alarm-type-1.mp3'
     }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="item">
       <div class="centered">
-        <img src="https://lc-project.s3.ap-northeast-2.amazonaws.com/donation-images/${userId}/${
+        <img src="https://lc-project.s3.ap-northeast-2.amazonaws.com/donation-images/${email}/${liveShoppingId}/${
     alarmType === '2' ? 'donation-2.gif' : 'donation-1.gif'
   }" class="donation-image" />  
         <div class ="animated heartbeat" id="donation-top">
@@ -387,34 +391,35 @@ socket.on('get non client purchase message', async (data) => {
 socket.on('get objective message', async (data) => {
   const price = data.objective;
 
-  messageHtml = `
-  <div class="donation-wrapper">
-    <iframe src="/audio/alarm-type-2.wav"
+  const objectiveHtml = `
+  <div class="objective-inner-wrapper">
+    <iframe src="/audio/mid.mp3"
     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
-    <div class="centered">
-      <div class ="animated heartbeat" id="donation-top">
-        <span id="nickname">
-          <span class="donation-sub">판매금액</span>
-          <span class="animated heartbeat" id="donation-num">${price
-            .toString()
-            .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
-          <span class="donation-sub">원 돌파!!!</span>
-        </span>
-      </div>
+    <div class="objective-message">
+      <span class="objective-text">판매금액</span>
+      <span class="objective-value">${price
+        .toString()
+        .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
+      <span class="objective-text">원 돌파!!!</span>
     </div>
   </div>
-
   `;
-  topMessages.push({ messageHtml });
+
+  $('.objective-wrapper').html(objectiveHtml);
+  $('.objective-wrapper').slideToggle();
+
+  await setTimeout(() => {
+    $('.objective-wrapper').slideToggle();
+  }, 5000);
 });
 
-socket.on('toggle right-top onad logo from server', () => {
-  if ($('#onad-logo').attr('src').includes('-')) {
-    $('#onad-logo').attr('src', '/images/onadLogo.png');
-  } else {
-    $('#onad-logo').attr('src', '/images/onadLogo-gray.png');
-  }
-});
+// socket.on('toggle right-top onad logo from server', () => {
+//   if ($('#kks-logo').attr('src').includes('-')) {
+//     $('#kks-logo').attr('src', '/images/onadLogo.png');
+//   } else {
+//     $('#kks-logo').attr('src', '/images/onadLogo-gray.png');
+//   }
+// });
 
 // 하단 메세지 (단순 답변)
 socket.on('get bottom area message', (data) => {
@@ -469,7 +474,7 @@ socket.on('hide screen', () => {
 });
 
 socket.on('d-day from server', (date) => {
-  defaultDate = new Date(date);
+  endDate = new Date(date);
 });
 
 socket.on('get fever date from server', (date) => {
@@ -488,6 +493,11 @@ socket.on('show video from server', (type) => {
     </video>
       `;
     $('.full-video').html(introHtml);
+
+    $('.inner-video-area').on('ended', function () {
+      $('.live-commerce').show();
+      $('.inner-video-area').fadeOut(500);
+    });
   } else {
     const outroHtml = `
     <video class="inner-video-area" autoplay>
@@ -495,6 +505,11 @@ socket.on('show video from server', (type) => {
     </video>
       `;
     $('.full-video').html(outroHtml);
+
+    $('.inner-video-area').on('ended', function () {
+      $('.live-commerce').hide();
+      $('.inner-video-area').fadeOut(500);
+    });
   }
 });
 
@@ -528,7 +543,7 @@ socket.on('get stream end notification tts', (audioBuffer) => {
       sound.play();
     }, 1000);
   }
-  $('.notification').append(`<img id="notification" src="/images/eta.gif" />`);
+  $('.notification').html(`<img id="notification" src="/images/eta.gif" />`);
   setTimeout(() => {
     $('.notification').empty();
   }, 5000);
@@ -538,14 +553,27 @@ socket.on('connection check from server', () => {
   $('.alive-check').toggle();
 });
 
-socket.on('get soldout signal from server', () => {
+socket.on('get soldout signal from server', async () => {
+  const soldoutHtml = `
+  <img src="/images/firework.gif" id="firework" alt="firework"/>
+  <div class="objective-inner-wrapper soldout">
+    <iframe src="/audio/firework.mp3"
+    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    <div class="objective-message">
+      <span class="objective-text">준비된 상품이 매진되었습니다</span>
+    </div>
+  </div>`;
   $('.vertical-soldout-banner').css({ opacity: 1 });
   $('body').append(`
-    <iframe src="/audio/soldout.mp3" id="soldout-alarm" allow="autoplay" style="display:none"></iframe>
+    <iframe src="/audio/soldout_v2.mp3" id="soldout-alarm" allow="autoplay" style="display:none"></iframe>
     `);
-  setTimeout(() => {
+  $('.objective-wrapper').attr('id', 'soldout');
+  $('.objective-wrapper').html(soldoutHtml);
+  $('.objective-wrapper').fadeIn();
+  await setTimeout(() => {
     $('body').remove('#soldout-alarm');
-  }, 20000);
+    $('.objective-wrapper').fadeOut();
+  }, 10000);
 });
 
 socket.on('remove soldout banner from server', () => {
@@ -574,4 +602,29 @@ socket.on('get notification image from server', (type) => {
 socket.on('remove notification image from server', () => {
   $('.notification').empty();
 });
+
+socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
+  $('.alive-check').css('background-color', 'yellow');
+  liveShoppingId = liveShoppingIdAndProductName.liveShoppingId;
+  streamerAndProduct = liveShoppingIdAndProductName.streamerAndProduct;
+
+  const roomName = pageUrl.split('/').pop();
+  socket.emit('get date from registered liveshopping', {
+    liveShoppingId,
+    roomName,
+  });
+});
+
+socket.on('get registered date from server', (registeredTime) => {
+  startDate = new Date(registeredTime.broadcastStartDate);
+  endDate = new Date(registeredTime.broadcastEndDate);
+});
+
+socket.on('refresh ranking from server', () => {
+  $('.ranking-text-area#title').css({ display: 'flex' });
+  $('.ranking-area-inner').html(
+    `<img src="/images/podium.png" id="podium" style="width:25%;"/>`,
+  );
+});
+
 export {};

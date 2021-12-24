@@ -1,13 +1,8 @@
 // ES6 version
+import { FindSellerRes } from '@project-lc/shared-types';
 import { hash } from 'argon2';
 
-export async function findOne({ email }: { email: string }): Promise<{
-  id: number;
-  email: string;
-  name: string;
-  password: string;
-  shopName: any;
-}> {
+export async function findOne({ email }: { email: string }): Promise<FindSellerRes> {
   const testPw = await hash('올바른비밀번호입력');
   const repository = [
     {
@@ -16,6 +11,7 @@ export async function findOne({ email }: { email: string }): Promise<{
       name: 'authtestuser',
       password: testPw,
       shopName: null,
+      avatar: null,
     },
   ];
 

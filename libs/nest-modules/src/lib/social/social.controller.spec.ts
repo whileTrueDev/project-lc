@@ -6,13 +6,16 @@ import { PrismaModule } from '@project-lc/prisma-orm';
 import { AuthModule } from '../auth/auth.module';
 import { AuthService } from '../auth/auth.service';
 import { CipherService } from '../auth/cipher.service';
+import { S3Service } from '../s3/s3.service';
 import { SellerService } from '../seller/seller.service';
+import { BroadcasterService } from '../broadcaster/broadcaster.service';
 import { mailerConfig } from '../_nest-units/settings/mailer.config';
 import { GoogleApiService } from './platform-api/google-api.service';
 import { KakaoApiService } from './platform-api/kakao-api.service';
 import { NaverApiService } from './platform-api/naver-api.service';
 import { SocialController } from './social.controller';
 import { SocialService } from './social.service';
+import { AdminModule } from '../admin/admin.module';
 
 describe('SocialController', () => {
   let controller: SocialController;
@@ -22,6 +25,7 @@ describe('SocialController', () => {
       imports: [
         PrismaModule,
         AuthModule,
+        AdminModule,
         ConfigModule.forRoot({ isGlobal: true }),
         JwtModule.register({
           secret: 'test',
@@ -34,10 +38,12 @@ describe('SocialController', () => {
         SocialService,
         AuthService,
         SellerService,
+        BroadcasterService,
         CipherService,
         KakaoApiService,
         NaverApiService,
         GoogleApiService,
+        S3Service,
       ],
     }).compile();
 

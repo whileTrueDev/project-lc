@@ -4,6 +4,7 @@ export interface NavItem {
   // children?: Array<NavItem>;
   href: string;
   needLogin?: boolean;
+  isExternal?: boolean;
 }
 
 export const mainNavItems: Array<NavItem> = [
@@ -15,6 +16,7 @@ export const mainNavItems: Array<NavItem> = [
   {
     label: '크크마켓',
     href: 'https://k-kmarket.com/',
+    isExternal: true,
   },
 ];
 
@@ -95,4 +97,34 @@ export const adminNavItems: Array<NavItem> = [
     href: '/notice',
   },
   { label: '결제 취소 요청', href: '/order-cancel' },
+  { label: '알림메시지 보내기', href: '/notification' },
+  { label: '문의하기 관리', href: '/inquiry' },
+];
+
+export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
+  {
+    name: '홈',
+    href: '/mypage',
+    checkIsActive: (pathname, linkHref) => pathname === linkHref,
+  },
+  {
+    name: '라이브쇼핑',
+    href: '/mypage/live',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '구입현황',
+    href: '/mypage/purchase',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '정산',
+    href: '/mypage/settlement',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '계정설정',
+    href: '/mypage/setting',
+    checkIsActive: defaultIsActiveChecker,
+  },
 ];

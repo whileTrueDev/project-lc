@@ -16,25 +16,32 @@ import {
   useMailVerificationMutation,
   useSellerSignupMutation,
   useLoginMutation,
+  useBroadcasterSignupMutation,
 } from '@project-lc/hooks';
 import {
   emailCodeRegisterOptions,
   emailRegisterOptions,
   passwordRegisterOptions,
-  SignUpSellerDto,
+  SignUpDto,
+  UserType,
 } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { AxiosError } from 'axios';
+import { Broadcaster, Seller } from '.prisma/client';
 import { CenterBox } from './CenterBox';
 
 export interface SignupFormProps {
   enableShadow?: boolean;
   moveToSignupStart?: () => void;
+  /** 기본값은 'seller', seller | broadcaster 타입에 따라 라우터로 요청한다 */
+  userType?: UserType;
 }
 export function SignupForm({
   enableShadow = false,
   moveToSignupStart,
+  userType = 'seller',
 }: SignupFormProps): JSX.Element {
   const router = useRouter();
   const toast = useToast();
@@ -47,7 +54,7 @@ export function SignupForm({
     getValues,
     setError,
     watch,
-  } = useForm<SignUpSellerDto & { repassword: string }>();
+  } = useForm<SignUpDto & { repassword: string }>();
 
   // * 인증코드 페이즈
   const [phase, setPhase] = useState(1);
@@ -105,19 +112,31 @@ export function SignupForm({
   }, []);
 
   // * 회원가입 핸들러
-  const signup = useSellerSignupMutation();
-  const login = useLoginMutation('seller');
-  const onSubmit = useCallback(
-    async (data: SignUpSellerDto) => {
-      const seller = await signup.mutateAsync(data).catch((err) => {
-        // eslint-disable-next-line no-console
-        console.error(err.response);
-        setError('code', {
-          type: 'validate',
-          message: err?.response.data?.message || err.message,
-        });
+  const sellerSignup = useSellerSignupMutation();
+  const broadcasterSignup = useBroadcasterSignupMutation();
+  const login = useLoginMutation(userType);
+  const handleSignupError = useCallback(
+    (err: AxiosError): void => {
+      // eslint-disable-next-line no-console
+      console.error(err.response);
+      setError('code', {
+        type: 'validate',
+        message: err?.response?.data?.message || err.message,
       });
-      if (seller) {
+    },
+    [setError],
+  );
+  const onSubmit = useCallback(
+    async (data: SignUpDto) => {
+      let user: void | Seller | Broadcaster;
+
+      if (userType === 'seller') {
+        user = await sellerSignup.mutateAsync(data).catch(handleSignupError);
+      } else if (userType === 'broadcaster') {
+        user = await broadcasterSignup.mutateAsync(data).catch(handleSignupError);
+      }
+
+      if (user) {
         // 로그인 과정이 수행
         await login.mutateAsync({
           email: data.email,
@@ -126,7 +145,7 @@ export function SignupForm({
         router.push('/mypage');
       }
     },
-    [login, router, setError, signup],
+    [broadcasterSignup, handleSignupError, login, router, sellerSignup, userType],
   );
 
   return (

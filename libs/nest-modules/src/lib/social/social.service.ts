@@ -4,10 +4,16 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Seller, SellerSocialAccount } from '@prisma/client';
+import {
+  Broadcaster,
+  BroadcasterSocialAccount,
+  Seller,
+  SellerSocialAccount,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { loginUserRes } from '@project-lc/shared-types';
+import { loginUserRes, SocialAccounts, UserType } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
+import { UserPayload } from '../auth/auth.interface';
 import { AuthService } from '../auth/auth.service';
 import { SellerService } from '../seller/seller.service';
 import { GoogleApiService } from './platform-api/google-api.service';
@@ -18,7 +24,7 @@ export type SellerWithSocialAccounts = Omit<Seller, 'password'> & {
   socialAccounts: Omit<SellerSocialAccount, 'accessToken' | 'refreshToken'>[];
 };
 
-interface sellerDataInterface {
+interface UserDataInterface {
   id: string;
   provider: string;
   email: string;
@@ -40,37 +46,143 @@ export class SocialService {
     private readonly google: GoogleApiService,
   ) {}
 
-  login(req: Request, res: Response): void {
+  login(userType: UserType, req: Request, res: Response): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
-    const userPayload = this.authService.castUser(user, 'seller');
+    let userPayload: UserPayload;
+    if (userType === 'broadcaster') {
+      const { email, userName: name, id, password, avatar } = user;
+      const broadcaster = {
+        id,
+        email,
+        name,
+        password,
+        avatar,
+      };
+      userPayload = this.authService.castUser(broadcaster, userType);
+    } else {
+      userPayload = this.authService.castUser(user, userType);
+    }
+
+    // local stragety에서 반환되는 req.user의 타입은 UserPayload이나
+    // 소셜로그인 strategy에서 반환되는 req.user의 타입은 Broadcatser임
+    // social.controller/login 에서 createLoginStamp 실행시 req.user는 userpayload로 cast되어있어야한다
+    req.user = userPayload;
+
     const loginToken: loginUserRes = this.authService.issueToken(
       userPayload,
       true,
-      'seller',
+      userType,
     );
     this.authService.handleLoginHeader(res, loginToken);
   }
 
-  /**
-   * 해당 소셜서비스 계정 소유하는 seller 찾거나 생성하여 반환
+  /** 유저타입에 따라 seller 나 broadcaster를 찾거나 생성하여 반환
    * google, kakao, naver strategy validate함수에서 사용
    */
-  async findOrCreateSeller(sellerData: sellerDataInterface): Promise<Seller> {
-    const socialAccountWithSeller = await this.selectSocialAccountRecord(sellerData);
+  async findOrCreateUser(
+    userType: UserType,
+    data: UserDataInterface,
+  ): Promise<Seller | Broadcaster> {
+    // 전달된 유저타입이 방송인인 경우 -> Broadcaster, BroadcasterSocialAccounts 테이블에서 작업
+    if (userType === 'broadcaster') {
+      const broadcaster = await this.findOrCreateBroadcaster(data);
+      return broadcaster;
+    }
+
+    // 전달된 유저타입이 판매자인 경우 -> Seller, SellerSocialAccounts 테이블에서 작업
+    const seller = await this.findOrCreateSeller(data);
+    return seller;
+  }
+
+  // -------------------------
+  // 방송인
+  // -------------------------
+  /** 해당 소셜서비스 계정 소유하는 broadcaster 찾거나 생성하여 반환 */
+  async findOrCreateBroadcaster(userData: UserDataInterface): Promise<Broadcaster> {
+    const socialAccountWithBroadcaster = await this.selectBroadcasterSocialAccountRecord(
+      userData,
+    );
+
+    if (!socialAccountWithBroadcaster) {
+      const createdBroadcaster = await this.createBroadcasterSocialAccountRecord(
+        userData,
+      );
+      return createdBroadcaster;
+    }
+
+    await this.updateSocialAccountRecord('broadcaster', userData);
+    return this.prisma.broadcaster.findUnique({
+      where: { id: socialAccountWithBroadcaster.broadcaster.id },
+    });
+  }
+
+  /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 방송인 계정정보 찾기 */
+  private async selectBroadcasterSocialAccountRecord(
+    userData: Partial<UserDataInterface>,
+  ): Promise<BroadcasterSocialAccount & { broadcaster: Broadcaster }> {
+    const { id, provider } = userData;
+    return this.prisma.broadcasterSocialAccount.findFirst({
+      where: { serviceId: id, provider },
+      include: { broadcaster: true },
+    });
+  }
+
+  /** 방송인 소셜계정 데이터 생성 */
+  private async createBroadcasterSocialAccountRecord(
+    userData: UserDataInterface,
+  ): Promise<Broadcaster> {
+    const { id, email, name, picture, ...rest } = userData;
+    const socialAccountCreateInput = {
+      serviceId: id,
+      profileImage: picture,
+      name,
+      ...rest,
+    };
+
+    const createdBroadcaster = await this.prisma.broadcaster.upsert({
+      where: { email },
+      update: {
+        socialAccounts: {
+          create: socialAccountCreateInput,
+        },
+      },
+      create: {
+        email,
+        userName: name,
+        overlayUrl: `/${email}`,
+        avatar: picture || null,
+        password: null,
+        socialAccounts: {
+          create: socialAccountCreateInput,
+        },
+      },
+    });
+
+    return createdBroadcaster;
+  }
+
+  // -------------------------
+  // 판매자
+  // -------------------------
+  /** 해당 소셜서비스 계정 소유하는 판매자 찾거나 생성하여 반환 */
+  async findOrCreateSeller(sellerData: UserDataInterface): Promise<Seller> {
+    const socialAccountWithSeller = await this.selectSellerSocialAccountRecord(
+      sellerData,
+    );
 
     if (!socialAccountWithSeller) {
-      const createdSeller = await this.createSocialAccountRecord(sellerData);
+      const createdSeller = await this.createSellerSocialAccountRecord(sellerData);
       return createdSeller;
     }
 
-    await this.updateSocialAccountRecord(sellerData);
+    await this.updateSocialAccountRecord('seller', sellerData);
     return this.sellerService.findOne({ id: socialAccountWithSeller.seller.id });
   }
 
-  /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 셀러 계정정보 찾기 */
-  private async selectSocialAccountRecord(
-    sellerData: Partial<sellerDataInterface>,
+  /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 판매자 계정정보 찾기 */
+  private async selectSellerSocialAccountRecord(
+    sellerData: Partial<UserDataInterface>,
   ): Promise<
     SellerSocialAccount & {
       seller: Seller;
@@ -83,12 +195,12 @@ export class SocialService {
     });
   }
 
-  /** 소셜계정 데이터 생성 */
-  private async createSocialAccountRecord(
-    sellerData: sellerDataInterface,
+  /** 판매자 소셜계정 데이터 생성 */
+  private async createSellerSocialAccountRecord(
+    sellerData: UserDataInterface,
   ): Promise<Seller> {
     const { id, email, name, picture, ...rest } = sellerData;
-    const googleAccountCreateInput = {
+    const socialAccountCreateInput = {
       serviceId: id,
       profileImage: picture,
       name,
@@ -99,15 +211,16 @@ export class SocialService {
       where: { email },
       update: {
         socialAccounts: {
-          create: googleAccountCreateInput,
+          create: socialAccountCreateInput,
         },
       },
       create: {
         email,
         name,
+        avatar: picture || null,
         password: null,
         socialAccounts: {
-          create: googleAccountCreateInput,
+          create: socialAccountCreateInput,
         },
       },
     });
@@ -115,59 +228,119 @@ export class SocialService {
     return createdSeller;
   }
 
-  /** 소셜계정 데이터 업데이트(토큰) */
-  private async updateSocialAccountRecord(
-    sellerData: sellerDataInterface,
-  ): Promise<SellerSocialAccount> {
-    const { id, accessToken, refreshToken, picture } = sellerData;
-    const updatedSeller = await this.prisma.sellerSocialAccount.update({
-      where: { serviceId: id },
-      data: {
-        accessToken,
-        refreshToken,
-        profileImage: picture,
-      },
-    });
-    return updatedSeller;
-  }
-
   /**
-   * 소셜계정 데이터 삭제
+   * 판매자 소셜계정 데이터 삭제
    * @by 21.09.02 hwasurr -> 소셜로그인ExceptionFilter에서는 소셜계정이 DB에 없으므로,
    * unlink와 구분되어야하여, public 메서드로 변경 -> 컨드롤러단에서 두가지 일을 진행하도록 변경
    * */
-  public async deleteSocialAccountRecord(serviceId: string): Promise<boolean> {
-    await this.prisma.sellerSocialAccount.delete({
-      where: { serviceId },
-    });
+  public async deleteSocialAccountRecord(
+    userType: UserType,
+    serviceId: string,
+  ): Promise<boolean> {
+    if (userType === 'seller' || userType === 'admin') {
+      await this.prisma.sellerSocialAccount.delete({
+        where: { serviceId },
+      });
+    }
+    if (userType === 'broadcaster') {
+      await this.prisma.broadcasterSocialAccount.delete({
+        where: { serviceId },
+      });
+    }
     return true;
   }
 
-  /** 소셜계정 테이블에서 accessToken 가져오기 */
-  private async getSocialAccountAccessToken(
-    provider: string,
-    serviceId: string,
-  ): Promise<string> {
-    const socialAccount = await this.selectSocialAccountRecord({
-      provider,
-      id: serviceId,
-    });
+  /** 소셜계정 데이터 업데이트(토큰)
+   * @param userType 'seller' | 'broadcaster'
+   * @userData 소셜플랫폼에서 넘어온 정보(토큰 정보 포함)
+   */
+  private async updateSocialAccountRecord(
+    userType: UserType,
+    userData: UserDataInterface,
+  ): Promise<boolean> {
+    const { id, accessToken, refreshToken, picture } = userData;
+    const updateData = {
+      accessToken,
+      refreshToken,
+      profileImage: picture,
+    };
+
+    try {
+      if (userType === 'seller') {
+        await this.prisma.sellerSocialAccount.update({
+          where: { serviceId: id },
+          data: updateData,
+        });
+      } else {
+        await this.prisma.broadcasterSocialAccount.update({
+          where: { serviceId: id },
+          data: updateData,
+        });
+      }
+      return true;
+    } catch (error) {
+      console.error(
+        `error in updateSocialAccountRecord, userType:${userType}, userData: ${userData}`,
+      );
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  /** userType에 따른 소셜계정 테이블에서 accessToken 혹은 refreshToken 가져오기 */
+  private async getSocialAccountToken(params: {
+    userType: UserType;
+    tokenType: 'accessToken' | 'refreshToken';
+    provider: string;
+    serviceId: string;
+  }): Promise<string> {
+    const { userType, provider, serviceId, tokenType } = params;
+    let socialAccount:
+      | (SellerSocialAccount & {
+          seller: Seller;
+        })
+      | (BroadcasterSocialAccount & {
+          broadcaster: Broadcaster;
+        });
+
+    // 판매자
+    if (userType === 'seller') {
+      socialAccount = await this.selectSellerSocialAccountRecord({
+        provider,
+        id: serviceId,
+      });
+    } else if (userType === 'broadcaster') {
+      // 방송인
+      socialAccount = await this.selectBroadcasterSocialAccountRecord({
+        provider,
+        id: serviceId,
+      });
+    }
+
     if (!socialAccount) {
       throw new BadRequestException(
-        `해당 서비스로 연동된 계정이 존재하지 않음 provider: ${provider}, serviceId: ${serviceId}`,
+        `해당 서비스로 연동된 계정이 존재하지 않음 provider: ${provider}, serviceId: ${serviceId}, userType: ${userType}`,
       );
     }
-    return socialAccount.accessToken;
+    return socialAccount[tokenType];
   }
 
   /**
    * 카카오 계정 연동해제 & 카카오 소셜계정 레코드 삭제
    * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
    * */
-  async kakaoUnlink(kakaoId: string, accessTokenParam?: string): Promise<boolean> {
+  async kakaoUnlink(
+    userType: UserType,
+    kakaoId: string,
+    accessTokenParam?: string,
+  ): Promise<boolean> {
     let kakaoAccessToken: string;
     if (!accessTokenParam) {
-      kakaoAccessToken = await this.getSocialAccountAccessToken('kakao', kakaoId);
+      kakaoAccessToken = await this.getSocialAccountToken({
+        userType,
+        provider: 'kakao',
+        tokenType: 'accessToken',
+        serviceId: kakaoId,
+      });
     } else {
       kakaoAccessToken = accessTokenParam;
     }
@@ -182,7 +355,7 @@ export class SocialService {
         (error?.response?.status === 401 || error?.response?.data?.code === -401)
       ) {
         // 액세스 토큰 만료로 인한 실패의 경우, 액세스 토큰 리프레시 이후 연동 해제 진행
-        const socialAccount = await this.selectSocialAccountRecord({
+        const socialAccount = await this.selectSellerSocialAccountRecord({
           provider: 'kakao',
           id: kakaoId,
         });
@@ -201,10 +374,19 @@ export class SocialService {
    * 네이버 계정연동 해제 && 네이버 계정 레코드 삭제
    * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
    * */
-  async naverUnlink(naverId: string, accessTokenParam?: string): Promise<boolean> {
+  async naverUnlink(
+    userType: UserType,
+    naverId: string,
+    accessTokenParam?: string,
+  ): Promise<boolean> {
     let naverAccessToken: string;
     if (!accessTokenParam) {
-      naverAccessToken = await this.getSocialAccountAccessToken('naver', naverId);
+      naverAccessToken = await this.getSocialAccountToken({
+        userType,
+        provider: 'naver',
+        tokenType: 'accessToken',
+        serviceId: naverId,
+      });
     } else {
       naverAccessToken = accessTokenParam;
     }
@@ -213,7 +395,7 @@ export class SocialService {
       const isSuccess = await this.naver.unlink(naverAccessToken);
       if (!isSuccess) {
         // 액세스 토큰 만료로 인한 실패의 경우, 액세스 토큰 리프레시 이후 연동 해제 진행
-        const socialAccount = await this.selectSocialAccountRecord({
+        const socialAccount = await this.selectSellerSocialAccountRecord({
           provider: 'naver',
           id: naverId,
         });
@@ -233,10 +415,19 @@ export class SocialService {
    * * 구글 계정 연동 해제 && 구글 계정 레코드 삭제
    * @param accessTokenParam 액세스토큰. 인수로 제공되지 않는 경우, DB에서 가져와 사용한다. @by hwasurr
    */
-  async googleUnlink(googleId: string, accessTokenParam?: string): Promise<boolean> {
+  async googleUnlink(
+    userType: UserType,
+    googleId: string,
+    accessTokenParam?: string,
+  ): Promise<boolean> {
     let googleAccessToken: string;
     if (!accessTokenParam) {
-      googleAccessToken = await this.getSocialAccountAccessToken('google', googleId);
+      googleAccessToken = await this.getSocialAccountToken({
+        userType,
+        provider: 'google',
+        tokenType: 'accessToken',
+        serviceId: googleId,
+      });
     } else {
       googleAccessToken = accessTokenParam;
     }
@@ -252,13 +443,15 @@ export class SocialService {
         error.response.data?.error === 'invalid_token'
       ) {
         // 액세스 토큰 만료로 인한 실패의 경우, 액세스 토큰 리프레시 이후 연동 해제 진행
-        const socialAccount = await this.selectSocialAccountRecord({
+        const socialAccountRefreshToken = await this.getSocialAccountToken({
+          userType,
           provider: 'google',
-          id: googleId,
+          tokenType: 'refreshToken',
+          serviceId: googleId,
         });
         // 액세스 토큰 리프레시
         const refreshRes = await this.google.refreshAccessToken(
-          socialAccount.refreshToken,
+          socialAccountRefreshToken,
         );
         await this.google.unlink(refreshRes.access_token);
         return true;
@@ -267,12 +460,31 @@ export class SocialService {
     }
   }
 
-  async getSocialAccounts(
-    email: string,
-  ): Promise<
-    Pick<SellerSocialAccount, 'serviceId' | 'provider' | 'name' | 'registDate'>[]
-  > {
-    const seller = await this.prisma.seller.findUnique({
+  /** userType에 맞는 테이블에서 email로 유저 검색 후 해당 유저의 소셜계정 목록 반환 */
+  async getSocialAccounts(userType: UserType, email: string): Promise<SocialAccounts> {
+    // userType === 'seller' 판매자인 경우
+    if (userType === 'seller') {
+      const seller = await this.prisma.seller.findUnique({
+        where: { email },
+        select: {
+          socialAccounts: {
+            select: {
+              serviceId: true,
+              provider: true,
+              name: true,
+              registDate: true,
+              profileImage: false,
+              accessToken: false,
+              refreshToken: false,
+              sellerId: false,
+            },
+          },
+        },
+      });
+      return seller.socialAccounts;
+    }
+    // userType === 'broadcaster' 방송인인 경우
+    const broadcaster = await this.prisma.broadcaster.findUnique({
       where: { email },
       select: {
         socialAccounts: {
@@ -284,12 +496,11 @@ export class SocialService {
             profileImage: false,
             accessToken: false,
             refreshToken: false,
-            sellerId: false,
+            broadcasterId: false,
           },
         },
       },
     });
-
-    return seller.socialAccounts;
+    return broadcaster.socialAccounts;
   }
 }
