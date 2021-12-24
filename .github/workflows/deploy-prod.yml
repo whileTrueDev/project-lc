@@ -55,7 +55,7 @@ jobs:
         run: |
           yarn affected \
             --target=dockerize \
-            --base=$BEFORE_SHA \
+            --base=$BEFOR```E_SHA \
             --args="--registry=$ECR_REGISTRY --tag=prod-$IMAGE_TAG"
 
   DeployAPI:
@@ -154,7 +154,7 @@ jobs:
 
   DeployOverlayController:
     name: Deploy OverlayController Job
-    runs-on: [self-hosted, linux, project-lc-dev]
+    runs-on: [self-hosted, linux, project-lc]
     needs: [Build]
     steps:
       - name: Checkout
@@ -190,11 +190,11 @@ jobs:
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: project-lc-overlay-controller-service
-          cluster: project-lc-dev
+          cluster: project-lc
           wait-for-service-stability: false
 
       - name: Prisma Migrate
         if: ${{ success() }}
         run: yarn nx run prisma-orm:migrate-deploy
         env:
-          DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.PROD_PRISMA_DATABASE_URL }}
