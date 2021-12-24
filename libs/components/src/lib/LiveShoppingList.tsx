@@ -268,7 +268,10 @@ export function LiveShoppingList(): JSX.Element {
             columns={columns}
             rows={liveShoppingWithSales}
           />
-
+        </>
+      )}
+      {liveShoppingWithSales && liveShoppingWithSales.length !== 0 && (
+        <>
           <LiveShoppingDetailDialog
             isOpen={detailIsOpen}
             onClose={detailOnClose}

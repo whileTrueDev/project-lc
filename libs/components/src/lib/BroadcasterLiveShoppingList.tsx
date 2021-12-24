@@ -188,14 +188,16 @@ export function BroadcasterLiveShoppingList({
               rows={liveShoppingWithSales}
             />
           </Flex>
-          <LiveShoppingDetailDialog
-            isOpen={detailIsOpen}
-            onClose={detailOnClose}
-            data={liveShoppingWithSales}
-            id={liveShoppingId}
-            type="broadcaster"
-          />
         </>
+      )}
+      {liveShoppingWithSales && liveShoppingWithSales.length !== 0 && (
+        <LiveShoppingDetailDialog
+          isOpen={detailIsOpen}
+          onClose={detailOnClose}
+          data={liveShoppingWithSales}
+          id={liveShoppingId}
+          type="broadcaster"
+        />
       )}
     </Box>
   );

@@ -41,7 +41,7 @@ export function LiveShoppingDetailDialog(
             {data[id]?.seller.sellerShop && (
               <Stack direction="row" alignItems="center">
                 <Text as="span">판매자: </Text>
-                <Text as="span">{data[id]?.seller.sellerShop.shopName}</Text>
+                <Text as="span">{data[id]?.seller.sellerShop?.shopName}</Text>
               </Stack>
             )}
 
