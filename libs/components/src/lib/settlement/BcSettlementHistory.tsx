@@ -19,6 +19,7 @@ import {
 import { FindBcSettlementHistoriesRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
+import { InfoIcon } from '@chakra-ui/icons';
 import { YouCanHorizontalScrollText } from '../YouCanHorizontalScrollText';
 import { ChakraDataGrid } from '../../chakra-extended/ChakraDataGrid';
 import { GridTableItem } from '../GridTableItem';
@@ -37,6 +38,7 @@ export function BcSettlementHistoryBox(): JSX.Element {
           </Text>
         }
         iconAriaLabel="settlement-done-list-help"
+        icon={<InfoIcon />}
       >
         <YouCanHorizontalScrollText />
       </TextWithPopperButton>
@@ -121,6 +123,7 @@ export function BcSettlementHistory({
         density="compact"
         autoHeight
         pageSize={pageSize}
+        rowsPerPageOptions={[pageSize]}
         columns={
           disableHeaders
             ? columns.filter((col) => !disableHeaders.includes(col.field as ColHeader))
