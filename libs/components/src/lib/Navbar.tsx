@@ -104,7 +104,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
                 />
                 <MenuList w={{ base: 280, sm: 300 }}>
                   <Box p={3}>
-                    <ProfileBox />
+                    <ProfileBox allowAvatarChange />
                   </Box>
                   <Divider />
                   <MenuItem

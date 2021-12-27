@@ -1,5 +1,6 @@
 import { Box, Center, Flex, Link, Text } from '@chakra-ui/react';
 import NextLink from 'next/link';
+import { InfoIcon } from '@chakra-ui/icons';
 import { BroadcasterLiveShoppingList } from './BroadcasterLiveShoppingList';
 import { YouCanHorizontalScrollText } from './YouCanHorizontalScrollText';
 import TextWithPopperButton from './TextWithPopperButton';
@@ -15,6 +16,7 @@ export function MypageLiveShoppingSection(): JSX.Element {
       >
         <TextWithPopperButton
           iconAriaLabel="liveshopping-section-help"
+          icon={<InfoIcon />}
           title={
             <Text fontSize="lg" fontWeight="medium" pb={1}>
               라이브 쇼핑

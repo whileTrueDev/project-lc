@@ -10,6 +10,7 @@ import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';
 import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import NextNProgress from 'nextjs-progressbar';
 
 const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();
@@ -38,6 +39,7 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
           <ChakraProvider theme={chakraTheme}>
             <ThemeProvider theme={muiTheme}>
               <main>
+                <NextNProgress options={{ showSpinner: false }} />
                 <Component {...pageProps} />
               </main>
             </ThemeProvider>

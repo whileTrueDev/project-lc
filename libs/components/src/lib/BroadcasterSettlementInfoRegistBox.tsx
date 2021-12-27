@@ -17,6 +17,7 @@ import { BroadcasterSettlementInfoConfirmation, TaxationType } from '.prisma/cli
 import { BroadcasterSettlementInfoDialog } from './BroadcasterSettlementInfoDialog';
 import { GoodsConfirmStatusBadge } from './GoodsConfirmStatusBadge';
 import { GridTableItem } from './GridTableItem';
+import { boxStyle } from '../constants/commonStyleProps';
 
 /** 검수결과 설명문 */
 const CONFIRMATION_DESC = {
@@ -52,7 +53,9 @@ export function BroadcasterSettlementConfirmationDisplay({
       return (
         <>
           <Text fontSize="sm">{CONFIRMATION_DESC.rejected}</Text>
-          <Text fontSize="sm">{rejectionReason}</Text>
+          <Text fontSize="sm" {...boxStyle} whiteSpace="pre-line">
+            {rejectionReason}
+          </Text>
         </>
       );
     }

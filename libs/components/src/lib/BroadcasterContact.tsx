@@ -285,9 +285,11 @@ export function BroadcasterContactForm(props: BroadcasterContactFormProps): JSX.
 
   const { mutateAsync } = useCreateBroadcasterContactMutation();
   function onSubmit(formData: BroadcasterContactFormData): void {
+    if (!profile.data) return;
+
     const { email, isDefault, name, phone1, phone2, phone3 } = formData;
     const dto: BroadcasterContactDto = {
-      broadcasterId: 1,
+      broadcasterId: profile.data.id,
       email,
       isDefault,
       name,

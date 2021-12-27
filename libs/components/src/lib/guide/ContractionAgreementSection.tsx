@@ -1,27 +1,26 @@
+import { CheckIcon } from '@chakra-ui/icons';
 import {
+  Button,
+  Center,
+  Checkbox,
+  Divider,
+  GridItem,
+  HStack,
+  Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalOverlay,
   ModalHeader,
-  Stack,
-  Center,
-  Divider,
-  Modal,
-  useDisclosure,
-  Button,
-  Checkbox,
-  HStack,
-  VStack,
-  Text,
-  useToast,
-  GridItem,
+  ModalOverlay,
   SimpleGrid,
+  Stack,
+  Text,
+  useDisclosure,
+  useToast,
+  VStack,
 } from '@chakra-ui/react';
-import { useEffect, useState, useMemo } from 'react';
-import { CheckIcon } from '@chakra-ui/icons';
 import { useProfile, useUpdateContractionAgreementMutation } from '@project-lc/hooks';
-import useContractStyles from '../../constants/Contract.style';
+import { useEffect, useMemo, useState } from 'react';
 import terms from '../../constants/contractTerms';
 import { SettingSectionLayout } from '../SettingSectionLayout';
 
@@ -38,7 +37,6 @@ export function ContractionAgreementSection({
 }): JSX.Element {
   const { data } = useProfile();
   const toast = useToast();
-  const classes = useContractStyles();
   const dialog = useDisclosure();
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [checkedA, setCheckedA] = useState<boolean>(false);
@@ -121,9 +119,7 @@ export function ContractionAgreementSection({
                   </Text>
                 </GridItem>
                 <GridItem display="flex" alignItems="center">
-                  <Text fontSize="lg" as="u">
-                    이용동의 완료
-                  </Text>
+                  <Text>이용동의 완료</Text>
                   <CheckIcon color="green.500" ml={1} />
                 </GridItem>
               </HStack>
@@ -204,17 +200,18 @@ export function ContractionAgreementSection({
         </Center>
       )}
       {selectedTerm && (
-        <Modal isOpen={dialog.isOpen} onClose={dialog.onClose} size="5xl">
+        <Modal
+          isOpen={dialog.isOpen}
+          onClose={dialog.onClose}
+          size="5xl"
+          scrollBehavior="inside"
+        >
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>{selectedTerm.title}</ModalHeader>
             <ModalCloseButton />
             <ModalBody maxW="6xl" mx="auto">
-              <div className={classes.inDialogContent}>
-                {selectedTerm.text.split('\n').map((sentence) => (
-                  <p key={sentence}>{sentence}</p>
-                ))}
-              </div>
+              <Text whiteSpace="pre-line">{selectedTerm.text}</Text>
               {!계약동의여부 && (
                 <Center m={2}>
                   <Checkbox

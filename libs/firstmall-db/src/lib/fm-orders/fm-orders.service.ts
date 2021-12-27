@@ -1,5 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import {
+  BroacasterPurchaseWithDivdedMessageDto,
+  BroadcasterPurchaseDto,
+  ChangeReturnStatusDto,
   FindFmOrderDetailRes,
   FindFmOrderRes,
   FindFmOrdersDto,
@@ -8,6 +11,7 @@ import {
   FmOrderExportBase,
   FmOrderExportItemOption,
   FmOrderItem,
+  FmOrderItemSubOption,
   FmOrderMetaInfo,
   FmOrderOption,
   FmOrderRefund,
@@ -16,18 +20,12 @@ import {
   FmOrderReturnBase,
   FmOrderReturnItem,
   FmOrderShipping,
+  fmOrderStatuses,
   FmOrderStatusNumString,
   getFmOrderStatusByNames,
-  OrderStatsRes,
-  LiveShoppingWithSalesAndFmId,
-  ChangeReturnStatusDto,
-  fmOrderStatuses,
-  FmOrderItemInput,
-  FmOrderItemSubOption,
-  CheeringMessage,
-  BroadcasterPurchaseDto,
   GoodsConfirmationDtoOnlyConnectionId,
-  BroacasterPurchaseWithDivdedMessageDto,
+  LiveShoppingWithSalesAndFmId,
+  OrderStatsRes,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { FirstmallDbService } from '../firstmall-db.service';
@@ -77,9 +75,6 @@ export class FmOrdersService {
         // 주문번호로 선물여부 옵션 조회
         const giftFlag = await this.findOneOrderGiftFlag(order.order_seq);
 
-        // 응원메시지, 닉네임 조회
-        const cheeringMessage = await this.findOneOrderCheeringMessage(order.order_seq);
-
         return {
           ...order,
           ...orderInfoPerMyGoods,
@@ -87,7 +82,6 @@ export class FmOrdersService {
           totalShippingCost,
           totalDeliveryCost: totalShippingCost,
           giftFlag,
-          cheeringMessage: cheeringMessage || undefined,
         };
       }),
     );
@@ -110,6 +104,7 @@ export class FmOrdersService {
     sql: string;
     params: any[];
   } {
+    const nullFilteredGoodsIds = goodsIds.filter((g) => !!g);
     const defaultQueryHead = `
     SELECT
       GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR ', ') AS goods_seq,
@@ -125,10 +120,10 @@ export class FmOrdersService {
       SELECT item_seq, MIN(step) AS optionRealStep
       FROM fm_order_item_option
       JOIN fm_order_item USING(item_seq)
-      WHERE goods_seq IN (${goodsIds.join(',')})
+      WHERE goods_seq IN (${nullFilteredGoodsIds.join(',')})
       GROUP BY item_seq
     ) fm_order_item_option USING(item_seq)
-    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')}) AND step IN (
+    WHERE fm_order_item.goods_seq IN (${nullFilteredGoodsIds.join(',')}) AND step IN (
       15, 25, 35, 40, 45, 50, 55, 60, 65, 70, 75, 85, 95, 99
     )
     `;
@@ -288,6 +283,7 @@ export class FmOrdersService {
     orderId: FmOrder['order_seq'] | string,
     goodsIds: number[],
   ): Promise<FmOrderMetaInfo | null> {
+    const nullFilteredGoodsIds = goodsIds.filter((g) => !!g);
     const sql = `
     SELECT
       GROUP_CONCAT(fm_order_shipping.shipping_seq) AS shipping_seq,
@@ -316,7 +312,7 @@ export class FmOrdersService {
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
     JOIN fm_order_shipping USING(shipping_seq)
-    WHERE fm_order.order_seq = ? AND goods_seq IN (${goodsIds.join(',')})
+    WHERE fm_order.order_seq = ? AND goods_seq IN (${nullFilteredGoodsIds.join(',')})
     `;
     const result: FmOrderMetaInfo[] = await this.db.query(sql, [orderId]);
     const order = result.length > 0 ? result[0] : null;
@@ -327,13 +323,9 @@ export class FmOrdersService {
     // 주문번호로 선물여부 옵션 조회
     const giftFlag = await this.findOneOrderGiftFlag(order.order_seq);
 
-    // 응원메시지, 닉네임 조회
-    const cheeringMessage = await this.findOneOrderCheeringMessage(order.order_seq);
-
     return {
       ...order,
       giftFlag,
-      cheeringMessage: cheeringMessage || undefined,
     };
   }
 
@@ -342,6 +334,8 @@ export class FmOrdersService {
     orderId: FmOrder['order_seq'] | string,
     goodsIds: number[],
   ): Promise<FmOrderItem[]> {
+    const nullFilteredGoodsIds = goodsIds.filter((g) => !!g);
+
     const sql = `
     SELECT 
       fm_order_item.goods_seq,
@@ -357,7 +351,7 @@ export class FmOrdersService {
     JOIN fm_order_item USING(order_seq)
     JOIN fm_order_shipping USING(shipping_seq)
     WHERE fm_order.order_seq = ?
-    AND goods_seq IN (${goodsIds.join(',')})`;
+    AND goods_seq IN (${nullFilteredGoodsIds.join(',')})`;
     return this.db.query(sql, [orderId]);
   }
 
@@ -782,6 +776,7 @@ export class FmOrdersService {
   // * 주문 현황 조회
   // * **********************************
   public async getOrdersStats(goodsIds: number[]): Promise<OrderStatsRes> {
+    const nullFilteredGoodsIds = goodsIds.filter((g) => !!g);
     const sql = `
     SELECT 
       order_seq, 
@@ -797,7 +792,7 @@ export class FmOrdersService {
       item_seq
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
-    WHERE fm_order_item.goods_seq IN (${goodsIds.join(',')})
+    WHERE fm_order_item.goods_seq IN (${nullFilteredGoodsIds.join(',')})
     AND DATE(regist_date) >= ?
     ) AS A
     JOIN fm_order_item_option AS B USING (order_seq, item_seq)
@@ -862,32 +857,6 @@ export class FmOrdersService {
     );
 
     return salesPrice;
-  }
-
-  /** 주문의 응원메시지, 구매자 닉네임(fm_order_item_input) 조회 */
-  private async findOneOrderCheeringMessage(
-    orderId: FmOrder['order_seq'] | string,
-  ): Promise<CheeringMessage | null> {
-    // 주문번호로 입력옵션(닉네임, 응원메시지) 조회
-    const inputOptions: FmOrderItemInput[] = await this.db.query(`
-      SELECT
-        item_input_seq,
-        order_seq,
-        title,
-        value
-      FROM fm_order_item_input
-      WHERE order_seq = ${orderId}
-    `);
-
-    if (inputOptions.length === 0) return null;
-
-    const nicknameOption = inputOptions.find((opt) => opt.title.includes('닉네임'));
-    const messageOption = inputOptions.find((opt) => opt.title.includes('응원'));
-
-    return {
-      nickname: nicknameOption?.value,
-      text: messageOption?.value,
-    };
   }
 
   /** 주문의 선물하기 여부 조회 */

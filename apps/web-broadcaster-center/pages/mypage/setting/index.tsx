@@ -27,13 +27,13 @@ export function SettingIndex(): JSX.Element {
           <Divider />
           <ContractionAgreeSection />
           <Divider />
-          <SocialAccountUnlinkSection userType="broadcaster" />
-          <Divider />
           <BroadcasterAddressSection />
           <Divider />
           <BroadcasterContactSection />
           <Divider />
           <BroadcasterChannelSection />
+          <Divider />
+          <SocialAccountUnlinkSection userType="broadcaster" />
           <Divider />
           <BroadcasterSignoutSection />
         </VStack>

@@ -1,6 +1,7 @@
 import {
   Button,
   ButtonGroup,
+  Center,
   Checkbox,
   Divider,
   GridItem,
@@ -15,11 +16,9 @@ import {
   Stack,
   Text,
   useDisclosure,
-  Center,
   useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import useContractStyles from '../constants/Contract.style';
 import terms, { Term } from '../constants/contractTerms';
 
 export function ContractionAgreeDialog({
@@ -31,7 +30,6 @@ export function ContractionAgreeDialog({
   onSubmit?: () => void;
   agreementFlag: boolean;
 }): JSX.Element {
-  const classes = useContractStyles();
   const toast = useToast();
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [checkedA, setCheckedA] = useState<boolean>(false);
@@ -134,17 +132,18 @@ export function ContractionAgreeDialog({
             )}
 
             {selectedTerm && (
-              <Modal isOpen={dialog.isOpen} onClose={dialog.onClose} size="5xl">
+              <Modal
+                isOpen={dialog.isOpen}
+                onClose={dialog.onClose}
+                size="5xl"
+                scrollBehavior="inside"
+              >
                 <ModalOverlay />
                 <ModalContent>
                   <ModalHeader>{selectedTerm.title}</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody maxW="6xl" mx="auto">
-                    <div className={classes.inDialogContent}>
-                      {selectedTerm.text.split('\n').map((sentence) => (
-                        <p key={sentence}>{sentence}</p>
-                      ))}
-                    </div>
+                    <Text whiteSpace="pre-line">{selectedTerm.text}</Text>
                     {!agreementFlag && (
                       <Center m={2}>
                         <Checkbox

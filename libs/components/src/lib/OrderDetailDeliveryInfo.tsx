@@ -35,21 +35,20 @@ export function OrderDetailDeliveryInfo({
       : orderDeliveryData.recipient_phone;
   }, [orderDeliveryData.recipient_phone]);
 
-  // 지번 주소
-  const addressJibun = useMemo(
-    () =>
-      `${orderDeliveryData.recipient_address_street} ${orderDeliveryData.recipient_address_detail}`,
-    [
-      orderDeliveryData.recipient_address_detail,
-      orderDeliveryData.recipient_address_street,
-    ],
-  );
+  // 지번주소
+  const addressJibun = useMemo(() => {
+    if (!orderDeliveryData.recipient_address) return '';
+    return `${orderDeliveryData.recipient_address} ${orderDeliveryData.recipient_address_detail}`;
+  }, [orderDeliveryData.recipient_address_detail, orderDeliveryData.recipient_address]);
+
   // 도로명주소
-  const addressStreet = useMemo(
-    () =>
-      `${orderDeliveryData.recipient_address} ${orderDeliveryData.recipient_address_detail}`,
-    [orderDeliveryData.recipient_address, orderDeliveryData.recipient_address_detail],
-  );
+  const addressStreet = useMemo(() => {
+    if (!orderDeliveryData.recipient_address_street) return '';
+    return `${orderDeliveryData.recipient_address_street} ${orderDeliveryData.recipient_address_detail}`;
+  }, [
+    orderDeliveryData.recipient_address_street,
+    orderDeliveryData.recipient_address_detail,
+  ]);
 
   return (
     <SimpleGrid columns={{ base: 1, md: 2 }} spacing={2}>

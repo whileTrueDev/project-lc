@@ -181,9 +181,10 @@ export class BroadcasterController {
   @UseGuards(JwtAuthGuard)
   @Put('address')
   public async updateAddress(
+    @BroadcasterInfo() bc: UserPayload,
     @Body(ValidationPipe) dto: BroadcasterAddressDto,
   ): Promise<BroadcasterAddress> {
-    return this.broadcasterService.upsertAddress(1, dto);
+    return this.broadcasterService.upsertAddress(bc.id, dto);
   }
 
   /** 방송인 정산 내역 조회 */

@@ -54,7 +54,7 @@ export function BroadcasterSignoutSection(): JSX.Element {
   };
   return (
     <Box>
-      <Button variant="link" onClick={passwordModal.onOpen}>
+      <Button size="xs" variant="link" onClick={passwordModal.onOpen} fontWeight="thin">
         회원탈퇴
       </Button>
       <PasswordCheckDialog
