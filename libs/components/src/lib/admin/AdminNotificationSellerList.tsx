@@ -1,23 +1,23 @@
 import {
-  useDisclosure,
   Box,
-  Text,
   Button,
+  Divider,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Divider,
   Spinner,
+  Text,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
-import { useAdminSellerList, useNotifications } from '@project-lc/hooks';
+import { ChakraDataGrid } from '@project-lc/components-core';
+import { useAdminNotifications, useAdminSellerList } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { useState, useMemo } from 'react';
-import { ChakraDataGrid } from '@project-lc/components-core';
+import { useMemo, useState } from 'react';
 import { boxStyle } from '../../constants/commonStyleProps';
 import { escapeRegExp } from '../QuickSearchInput';
 import {
@@ -25,7 +25,7 @@ import {
   UserSearhToolbar,
 } from './AdminNotificationSection';
 
-/** 해당 유저에게 보냈던 메시지 확인(최근 6개) */
+/** 해당 유저에게 보냈던 메시지 확인 */
 export function UserNotificationHistory({
   email,
   userType,
@@ -35,7 +35,7 @@ export function UserNotificationHistory({
 }): JSX.Element {
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const { data, isLoading } = useNotifications(isOpen, email, userType);
+  const { data, isLoading } = useAdminNotifications(isOpen, email, userType);
   return (
     <Box>
       <Button variant="link" onClick={onOpen}>
