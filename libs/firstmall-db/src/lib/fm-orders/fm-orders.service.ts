@@ -104,7 +104,7 @@ export class FmOrdersService {
     sql: string;
     params: any[];
   } {
-    const nullFilteredGoodsIds = goodsIds.filter((element, i) => element !== null);
+    const nullFilteredGoodsIds = goodsIds.filter((g) => !!g);
     const defaultQueryHead = `
     SELECT
       GROUP_CONCAT(fm_order_item.goods_seq SEPARATOR ', ') AS goods_seq,
@@ -283,7 +283,7 @@ export class FmOrdersService {
     orderId: FmOrder['order_seq'] | string,
     goodsIds: number[],
   ): Promise<FmOrderMetaInfo | null> {
-    const nullFilteredGoodsIds = goodsIds.filter((element, i) => element !== null);
+    const nullFilteredGoodsIds = goodsIds.filter((g) => !!g);
     const sql = `
     SELECT
       GROUP_CONCAT(fm_order_shipping.shipping_seq) AS shipping_seq,
@@ -334,7 +334,7 @@ export class FmOrdersService {
     orderId: FmOrder['order_seq'] | string,
     goodsIds: number[],
   ): Promise<FmOrderItem[]> {
-    const nullFilteredGoodsIds = goodsIds.filter((element, i) => element !== null);
+    const nullFilteredGoodsIds = goodsIds.filter((g) => !!g);
 
     const sql = `
     SELECT 
@@ -776,7 +776,7 @@ export class FmOrdersService {
   // * 주문 현황 조회
   // * **********************************
   public async getOrdersStats(goodsIds: number[]): Promise<OrderStatsRes> {
-    const nullFilteredGoodsIds = goodsIds.filter((element, i) => element !== null);
+    const nullFilteredGoodsIds = goodsIds.filter((g) => !!g);
     const sql = `
     SELECT 
       order_seq, 
