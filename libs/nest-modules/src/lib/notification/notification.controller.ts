@@ -14,6 +14,7 @@ import {
   CreateNotificationDto,
   FindNotificationsDto,
   MarkNotificationReadStateDto,
+  UserType,
 } from '@project-lc/shared-types';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -49,6 +50,15 @@ export class NotificationController {
     dto: FindNotificationsDto,
   ): Promise<UserNotification[]> {
     return this.notificationService.findNotifications(dto);
+  }
+
+  /** 특정 유저의 전체 미확인 알림 일괄 읽음으로 변경 */
+  @Patch('all')
+  readAllUnreadNotification(
+    @Body('userEmail') userEmail: string,
+    @Body('userType') userType: UserType,
+  ): Promise<boolean> {
+    return this.notificationService.readAllUnreadNotification({ userEmail, userType });
   }
 
   /** 특정 알림의 읽음상태 변경 */

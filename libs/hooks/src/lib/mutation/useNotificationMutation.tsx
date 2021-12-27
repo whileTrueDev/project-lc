@@ -27,3 +27,31 @@ export const useNotificationMutation = (): UseMutationResult<
     },
   );
 };
+
+type MarkAllNotificationReadStateDto = Pick<
+  MarkNotificationReadStateDto,
+  'userEmail' | 'userType'
+>;
+
+export const useAllNotificationReadMutation = (): UseMutationResult<
+  useNotificationMutationRes,
+  AxiosError,
+  MarkAllNotificationReadStateDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    useNotificationMutationRes,
+    AxiosError,
+    MarkAllNotificationReadStateDto
+  >(
+    (dto: MarkAllNotificationReadStateDto) =>
+      axios
+        .patch<useNotificationMutationRes>('/notification/all', dto)
+        .then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('Notifications');
+      },
+    },
+  );
+};

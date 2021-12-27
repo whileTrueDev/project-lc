@@ -6,6 +6,7 @@ import {
   CreateNotificationDto,
   FindNotificationsDto,
   MarkNotificationReadStateDto,
+  UserType,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 
@@ -62,6 +63,25 @@ export class NotificationService {
       data: {
         readFlag: true,
       },
+    });
+    return true;
+  }
+
+  /** 특정 유저의 전체 미확인 알림 일괄 읽음으로 변경 */
+  async readAllUnreadNotification({
+    userEmail,
+    userType,
+  }: {
+    userEmail: string;
+    userType: UserType;
+  }): Promise<boolean> {
+    await this.prisma.userNotification.updateMany({
+      where: {
+        userEmail,
+        userType,
+        readFlag: false,
+      },
+      data: { readFlag: true },
     });
     return true;
   }

@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Divider,
-  Flex,
   IconButton,
   Menu,
   MenuButton,
@@ -15,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { UserNotification } from '@prisma/client';
 import {
+  useAllNotificationReadMutation,
   useNotificationMutation,
   useNotifications,
   useProfile,
@@ -82,12 +82,9 @@ function NotificationItem({
 /** 알림버튼과 알림메시지 포함하는 컴포넌트 */
 export function UserNotificationSection(): JSX.Element {
   const { data: profileData } = useProfile();
+
+  // 최근 알림 6개 조회 데이터
   const { data: partialNotifications } = useRecentNotifications(profileData?.email);
-  const [wholeListOpen, { toggle, off }] = useBoolean();
-  const { data: allNotifications } = useNotifications(
-    wholeListOpen && !!profileData,
-    profileData?.email,
-  );
 
   const latestNotifications = useMemo(() => {
     if (!partialNotifications) return [];
@@ -97,6 +94,14 @@ export function UserNotificationSection(): JSX.Element {
   const latestUnreadCount = useMemo(() => {
     return latestNotifications.filter((noti) => !noti.readFlag).length;
   }, [latestNotifications]);
+
+  // 전체 알림 조회 openFlag
+  const [wholeListOpen, { toggle, off }] = useBoolean();
+  // 전체 알림 조회 데이터
+  const { data: allNotifications } = useNotifications(
+    wholeListOpen && !!profileData,
+    profileData?.email,
+  );
 
   // 최근 30일 내 전체 알림목록
   const allNotificationList = useMemo(() => {
@@ -108,6 +113,7 @@ export function UserNotificationSection(): JSX.Element {
     return allNotificationList.filter((noti) => !noti.readFlag).length;
   }, [allNotificationList]);
 
+  // 특정알림 읽음처리 함수
   const readNotification = useNotificationMutation();
   const markAsRead = (notification: UserNotification): void => {
     if (!profileData || notification.readFlag) return;
@@ -115,6 +121,21 @@ export function UserNotificationSection(): JSX.Element {
     readNotification
       .mutateAsync({
         id: notification.id,
+        userEmail: profileData?.email,
+        userType: process.env.NEXT_PUBLIC_APP_TYPE as UserType,
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  // 전체알림 읽음처리 함수
+  const readAllNotification = useAllNotificationReadMutation();
+  const readAll = (): void => {
+    if (!profileData || !allUnreadCount) return;
+
+    readAllNotification
+      .mutateAsync({
         userEmail: profileData?.email,
         userType: process.env.NEXT_PUBLIC_APP_TYPE as UserType,
       })
@@ -184,7 +205,12 @@ export function UserNotificationSection(): JSX.Element {
           {wholeListOpen && (
             <Stack>
               <Box textAlign="right" px="4">
-                <Button size="xs" leftIcon={<CheckIcon />} disabled={!allUnreadCount}>
+                <Button
+                  size="xs"
+                  leftIcon={<CheckIcon />}
+                  disabled={!allUnreadCount}
+                  onClick={readAll}
+                >
                   모두 읽음
                 </Button>
               </Box>
