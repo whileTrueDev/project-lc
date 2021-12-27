@@ -105,10 +105,7 @@ export function CommonFooter({ footerLinkList }: CommonFooterProps): JSX.Element
             >
               <FaYoutube />
             </SocialButton>
-            <SocialButton
-              label="Instagram"
-              href="https://www.instagram.com/official.onad"
-            >
+            <SocialButton label="Instagram" href="https://www.instagram.com/zzmarket/">
               <FaInstagram />
             </SocialButton>
           </Stack>
