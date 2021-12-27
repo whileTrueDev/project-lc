@@ -81,7 +81,13 @@ export class LCDevAppStack extends cdk.Stack {
   private createApiAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
     const repo = new ecr.Repository(this, `${PREFIX}ApiRepo`, {
       repositoryName: constants.DEV.ECS_API_FAMILY_NAME,
-      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+      lifecycleRules: [
+        { maxImageCount: 1, tagStatus: ecr.TagStatus.ANY },
+        {
+          maxImageAge: cdk.Duration.days(1),
+          tagStatus: ecr.TagStatus.UNTAGGED,
+        },
+      ],
     });
     const apiTaskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSTaskDef`, {
       family: constants.DEV.ECS_API_FAMILY_NAME,
@@ -141,7 +147,13 @@ export class LCDevAppStack extends cdk.Stack {
   private createOverlayAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
     const repo = new ecr.Repository(this, `${PREFIX}OverlayRepo`, {
       repositoryName: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
-      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+      lifecycleRules: [
+        { maxImageCount: 1, tagStatus: ecr.TagStatus.ANY },
+        {
+          maxImageAge: cdk.Duration.days(1),
+          tagStatus: ecr.TagStatus.UNTAGGED,
+        },
+      ],
     });
     const taskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSOverlayTaskDef`, {
       family: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
@@ -200,7 +212,13 @@ export class LCDevAppStack extends cdk.Stack {
   ) {
     const repo = new ecr.Repository(this, `${PREFIX}OverlayControllerRepo`, {
       repositoryName: constants.DEV.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
-      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+      lifecycleRules: [
+        { maxImageCount: 1, tagStatus: ecr.TagStatus.ANY },
+        {
+          maxImageAge: cdk.Duration.days(1),
+          tagStatus: ecr.TagStatus.UNTAGGED,
+        },
+      ],
     });
     const taskDef = new ecs.FargateTaskDefinition(
       this,

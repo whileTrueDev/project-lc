@@ -19,7 +19,7 @@ import {
 import * as logs from '@aws-cdk/aws-logs';
 import * as ssm from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
-import { Repository } from '@aws-cdk/aws-ecr';
+import { Repository, TagStatus } from '@aws-cdk/aws-ecr';
 import { constants } from '../../constants';
 
 interface LCProdAppStackProps extends cdk.StackProps {
@@ -91,6 +91,10 @@ export class LCProdAppStack extends cdk.Stack {
           maxImageAge: cdk.Duration.days(365),
           description: 'only 365 days for "latest" image',
           tagPrefixList: ['latest'],
+        },
+        {
+          maxImageAge: cdk.Duration.days(1),
+          tagStatus: TagStatus.UNTAGGED,
         },
       ],
     });
