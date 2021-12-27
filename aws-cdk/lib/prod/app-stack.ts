@@ -130,6 +130,7 @@ export class LCProdAppStack extends cdk.Stack {
         CIPHER_SALT: Secret.fromSsmParameter(p.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: Secret.fromSsmParameter(p.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: Secret.fromSsmParameter(p.S3_ACCESS_KEY_SECRET),
+        WHILETRUE_IP_ADDRESS: Secret.fromSsmParameter(p.WHILETRUE_IP_ADDRESS),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -416,6 +417,7 @@ export class LCProdAppStack extends cdk.Stack {
         c.GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY,
         2,
       ),
+      WHILETRUE_IP_ADDRESS: __loadSsmParmeter(c.WHILETRUE_IP_ADDRESS),
     };
   }
 }
