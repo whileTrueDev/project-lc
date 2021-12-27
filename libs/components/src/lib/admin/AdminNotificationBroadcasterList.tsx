@@ -95,10 +95,12 @@ export function AdminNotificationBroadcasterList(): JSX.Element {
         targetUsersEmailList={selectedUser.map((user) => user.email)}
         targetDisplay={
           <>
-            <Text>받는사람 {selectedUser.length}명 - 방송인 활동명</Text>
+            <Text>받는사람 {selectedUser.length}명 - 방송인 이메일 (활동명)</Text>
             <Box maxH={100} overflowY="auto" {...boxStyle}>
               {selectedUser.map((user) => (
-                <Text key={user.email}>- {user.userNickname}</Text>
+                <Text key={user.email}>
+                  - {user.email} ({user.userNickname})
+                </Text>
               ))}
             </Box>
           </>

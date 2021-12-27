@@ -6,7 +6,9 @@ import {
   CreateNotificationDto,
   FindNotificationsDto,
   MarkNotificationReadStateDto,
+  UserType,
 } from '@project-lc/shared-types';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class NotificationService {
@@ -32,19 +34,24 @@ export class NotificationService {
     return true;
   }
 
-  /** 특정 유저의 알림목록 조회 -  최근 6개 createDate:desc, limit: 6 */
+  /** 특정 유저의 최근 30일 내 전체 알림 목록 조회 */
   async findNotifications({
     userEmail,
     userType,
-    take = 6,
+    take,
+    skip,
   }: FindNotificationsDto): Promise<UserNotification[]> {
     const data = await this.prisma.userNotification.findMany({
       where: {
         userEmail,
         userType,
+        createDate: {
+          gte: dayjs().subtract(30, 'day').toISOString(),
+        },
       },
       orderBy: { createDate: 'desc' },
-      take,
+      take: take || undefined,
+      skip: skip || undefined,
     });
     return data;
   }
@@ -58,6 +65,25 @@ export class NotificationService {
       data: {
         readFlag: true,
       },
+    });
+    return true;
+  }
+
+  /** 특정 유저의 전체 미확인 알림 일괄 읽음으로 변경 */
+  async readAllUnreadNotification({
+    userEmail,
+    userType,
+  }: {
+    userEmail: string;
+    userType: UserType;
+  }): Promise<boolean> {
+    await this.prisma.userNotification.updateMany({
+      where: {
+        userEmail,
+        userType,
+        readFlag: false,
+      },
+      data: { readFlag: true },
     });
     return true;
   }

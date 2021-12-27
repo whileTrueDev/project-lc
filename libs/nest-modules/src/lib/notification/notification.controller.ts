@@ -1,9 +1,7 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Get,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -14,6 +12,7 @@ import { UserNotification } from '@prisma/client';
 import {
   CreateMultipleNotificationDto,
   CreateNotificationDto,
+  FindNotificationsDto,
   MarkNotificationReadStateDto,
   UserType,
 } from '@project-lc/shared-types';
@@ -44,18 +43,22 @@ export class NotificationController {
     return this.notificationService.createMultipleNotification(dto);
   }
 
-  /** 특정 유저의 알림목록 조회(생성일 내림차순)
-   * @query userEmail 타겟 유저의 이메일
-   * @query userType 'seller' | 'broadcaster'
-   * @query take? 기본 6개, 몇개 조회할건지
-   */
+  /** 특정 유저의 알림목록 조회(최근 30일 이내의 알람, 생성일 내림차순) */
   @Get()
   findNotifications(
-    @Query('userEmail') userEmail: string,
-    @Query('userType') userType: UserType,
-    @Query('take', new DefaultValuePipe(6), ParseIntPipe) take: number,
+    @Query(new ValidationPipe({ skipMissingProperties: true }))
+    dto: FindNotificationsDto,
   ): Promise<UserNotification[]> {
-    return this.notificationService.findNotifications({ userEmail, userType, take });
+    return this.notificationService.findNotifications(dto);
+  }
+
+  /** 특정 유저의 전체 미확인 알림 일괄 읽음으로 변경 */
+  @Patch('all')
+  readAllUnreadNotification(
+    @Body('userEmail') userEmail: string,
+    @Body('userType') userType: UserType,
+  ): Promise<boolean> {
+    return this.notificationService.readAllUnreadNotification({ userEmail, userType });
   }
 
   /** 특정 알림의 읽음상태 변경 */
