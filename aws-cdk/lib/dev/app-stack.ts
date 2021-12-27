@@ -40,6 +40,7 @@ export class LCDevAppStack extends cdk.Stack {
   private CIPHER_SALT: ssm.IStringParameter;
   private S3_ACCESS_KEY_ID: ssm.IStringParameter;
   private S3_ACCESS_KEY_SECRET: ssm.IStringParameter;
+  private WHILETRUE_IP_ADDRESS: ssm.IStringParameter;
 
   public readonly alb: elbv2.ApplicationLoadBalancer;
 
@@ -81,7 +82,13 @@ export class LCDevAppStack extends cdk.Stack {
   private createApiAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
     const repo = new ecr.Repository(this, `${PREFIX}ApiRepo`, {
       repositoryName: constants.DEV.ECS_API_FAMILY_NAME,
-      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+      lifecycleRules: [
+        { maxImageCount: 1, tagStatus: ecr.TagStatus.ANY },
+        {
+          maxImageAge: cdk.Duration.days(1),
+          tagStatus: ecr.TagStatus.UNTAGGED,
+        },
+      ],
     });
     const apiTaskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSTaskDef`, {
       family: constants.DEV.ECS_API_FAMILY_NAME,
@@ -107,6 +114,7 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
+        WHILETRUE_IP_ADDRESS: ecs.Secret.fromSsmParameter(this.WHILETRUE_IP_ADDRESS),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -141,7 +149,13 @@ export class LCDevAppStack extends cdk.Stack {
   private createOverlayAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
     const repo = new ecr.Repository(this, `${PREFIX}OverlayRepo`, {
       repositoryName: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
-      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+      lifecycleRules: [
+        { maxImageCount: 1, tagStatus: ecr.TagStatus.ANY },
+        {
+          maxImageAge: cdk.Duration.days(1),
+          tagStatus: ecr.TagStatus.UNTAGGED,
+        },
+      ],
     });
     const taskDef = new ecs.FargateTaskDefinition(this, `${PREFIX}ECSOverlayTaskDef`, {
       family: constants.DEV.ECS_OVERLAY_FAMILY_NAME,
@@ -200,7 +214,13 @@ export class LCDevAppStack extends cdk.Stack {
   ) {
     const repo = new ecr.Repository(this, `${PREFIX}OverlayControllerRepo`, {
       repositoryName: constants.DEV.ECS_OVERLAY_CONTROLLER_FAMILY_NAME,
-      lifecycleRules: [{ maxImageCount: 1, tagStatus: ecr.TagStatus.ANY }],
+      lifecycleRules: [
+        { maxImageCount: 1, tagStatus: ecr.TagStatus.ANY },
+        {
+          maxImageAge: cdk.Duration.days(1),
+          tagStatus: ecr.TagStatus.UNTAGGED,
+        },
+      ],
     });
     const taskDef = new ecs.FargateTaskDefinition(
       this,
@@ -526,6 +546,15 @@ export class LCDevAppStack extends cdk.Stack {
       },
     );
 
+    this.WHILETRUE_IP_ADDRESS = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}WHILETRUE_IP_ADDRESS`,
+      {
+        version: 1,
+        parameterName: constants.DEV.WHILETRUE_IP_ADDRESS,
+      },
+    );
+
     return {
       DATABASE_URL: this.DBURL_PARAMETER,
       FIRSTMALL_DATABASE_URL: this.FIRSTMALL_DATABASE_URL,
@@ -543,6 +572,7 @@ export class LCDevAppStack extends cdk.Stack {
       CIPHER_SALT: this.CIPHER_SALT,
       S3_ACCESS_KEY_ID: this.S3_ACCESS_KEY_ID,
       S3_ACCESS_KEY_SECRET: this.S3_ACCESS_KEY_SECRET,
+      WHILETRUE_IP_ADDRESS: this.WHILETRUE_IP_ADDRESS,
     };
   }
 }

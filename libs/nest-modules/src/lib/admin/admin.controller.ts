@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  ForbiddenException,
   Get,
   Header,
+  Ip,
   Param,
   ParseIntPipe,
   Patch,
@@ -13,6 +15,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   Administrator,
   BusinessRegistrationConfirmation,
@@ -54,10 +57,9 @@ import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
 
-@UseGuards(JwtAuthGuard)
-@UseGuards(AdminGuard)
 @Controller('admin')
 export class AdminController {
+  private allowedIpAddresses: string[] = ['::1'];
   constructor(
     private readonly adminService: AdminService,
     private readonly broadcasterService: BroadcasterService,
@@ -68,11 +70,21 @@ export class AdminController {
     private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
     private readonly sellerService: SellerService,
-  ) {}
+    private readonly config: ConfigService,
+  ) {
+    const wtIp = config.get('WHILETRUE_IP_ADDRESS');
+    if (wtIp) this.allowedIpAddresses.push(wtIp);
+  }
 
   // * 관리자 회원가입
   @Post()
-  public async signUp(@Body(ValidationPipe) dto: AdminSignUpDto): Promise<Administrator> {
+  public async signUp(
+    @Ip() ip: string,
+    @Body(ValidationPipe) dto: AdminSignUpDto,
+  ): Promise<Administrator> {
+    if (!this.allowedIpAddresses.includes(ip)) {
+      throw new ForbiddenException('unexpected ip address');
+    }
     const administrator = await this.adminAccountService.signUp(dto);
     return administrator;
   }
@@ -86,6 +98,8 @@ export class AdminController {
   }
 
   /** 판매자 정산 등록 정보 조회 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Get('/settlement')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getSettlementInfo(): Promise<AdminSettlementInfoType> {
@@ -93,6 +107,8 @@ export class AdminController {
   }
 
   /** 판매자 정산처리 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Post('/settlement')
   executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
     if (dto.target.options.length === 0) return null;
@@ -100,12 +116,16 @@ export class AdminController {
   }
 
   /** 판매자 정산 완료 목록 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Get('/settlement-history')
   getSettlementHistory(): ReturnType<SellerSettlementService['findSettlementHistory']> {
     return this.sellerSettlementService.findSettlementHistory();
   }
 
   /** 방송인 단일 정산처리 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Post('/settlement/broadcaster')
   async executeBcSettle(
     @Body(ValidationPipe) dto: CreateManyBroadcasterSettlementHistoryDto,
@@ -114,12 +134,16 @@ export class AdminController {
   }
 
   /** 방송인 정산 완료 목록 조회 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Get('/settlement-history/broadcaster')
   public async findBroadcasterSettlementHistoriesByRound(): Promise<FindBcSettlementHistoriesRes> {
     return this.bcSettlementHistoryService.findHistories();
   }
 
   /** 판매자 정산 기본 수수료 변경 */
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Put('/sell-commission')
   updateSellCommission(
     @Body(ValidationPipe) dto: ChangeSellCommissionDto,
@@ -128,6 +152,8 @@ export class AdminController {
   }
 
   // 상품검수를 위한 상품 리스트
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Get('/goods')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -144,6 +170,8 @@ export class AdminController {
   }
 
   // 상품검수를 위한 상품 리스트
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Get('/goods/:goodsId')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getAdminGoodsById(@Param('goodsId') goodsId: string | number): Promise<GoodsByIdRes> {
@@ -151,23 +179,31 @@ export class AdminController {
   }
 
   // 상품 검수 승인을 수행
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Put('/goods/confirm')
   setGoodsConfirmation(@Body() dto: GoodsConfirmationDto): Promise<GoodsConfirmation> {
     return this.adminService.setGoodsConfirmation(dto);
   }
 
   // 상품 검수 반려를 수행
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Put('/goods/reject')
   setGoodsRejection(@Body() dto: GoodsRejectionDto): Promise<GoodsConfirmation> {
     return this.adminService.setGoodsRejection(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Get('/live-shoppings')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getLiveShoppings(@Query('liveShoppingId') dto?: string): Promise<LiveShopping[]> {
     return this.adminService.getRegisteredLiveShoppings(dto || null);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Patch('/live-shopping')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   async updateLiveShoppings(
@@ -183,12 +219,16 @@ export class AdminController {
     return this.adminService.updateLiveShoppings(data.dto, videoId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Get('/live-shopping/broadcasters')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getAllBroadcasters(): Promise<BroadcasterDTO[]> {
     return this.broadcasterService.getAllBroadcasterIdAndNickname();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   // 상품 검수 승인을 수행
   @Put('/business-registration/confirm')
   setBusinessRegistrationConfirmation(
@@ -197,6 +237,8 @@ export class AdminController {
     return this.adminSettlementService.setBusinessRegistrationConfirmation(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   // 상품 검수 반려를 수행
   @Put('/business-registration/reject')
   setBusinessRegistrationRejection(
@@ -205,12 +247,16 @@ export class AdminController {
     return this.adminSettlementService.setBusinessRegistrationRejection(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   /** 결제취소 요청 목록 조회 */
   @Get('/order-cancel/list')
   getAllOrderCancelRequests(): Promise<OrderCancelRequestList> {
     return this.orderCancelService.getAllOrderCancelRequests();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   /** 특정 주문에 대한 결제취소 요청 조회 */
   @Get('/order-cancel/:orderId')
   getOneOrderCancelRequest(
@@ -219,6 +265,8 @@ export class AdminController {
     return this.orderCancelService.getOneOrderCancelRequest(orderId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   /** 특정 주문에 대한 결제취소 요청 상태 변경 */
   @Put('/order-cancel/:requestId')
   setOrderCancelRequestDone(
@@ -227,12 +275,16 @@ export class AdminController {
     return this.orderCancelService.setOrderCancelRequestDone(requestId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   /** 방송인 정산등록정보 신청 목록 조회 */
   @Get('/settelment-info-list/broadcaster')
   getBroadcasterSettlementInfoList(): Promise<AdminBroadcasterSettlementInfoList> {
     return this.broadcasterSettlementService.getBroadcasterSettlementInfoList();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   /** 방송인 정산정보 검수상태, 사유 수정 */
   @Patch('/settlement-info/broadcaster/confirmation')
   setBroadcasterSettlementInfoConfirmation(
@@ -242,6 +294,8 @@ export class AdminController {
     return this.adminSettlementService.setBroadcasterSettlementInfoConfirmation(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   /** 전체 판매자 계정 목록 조회 */
   @Get('/sellers')
   getSellerList(): Promise<AdminSellerListRes> {

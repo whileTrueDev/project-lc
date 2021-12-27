@@ -19,7 +19,7 @@ import {
 import * as logs from '@aws-cdk/aws-logs';
 import * as ssm from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
-import { Repository } from '@aws-cdk/aws-ecr';
+import { Repository, TagStatus } from '@aws-cdk/aws-ecr';
 import { constants } from '../../constants';
 
 interface LCProdAppStackProps extends cdk.StackProps {
@@ -92,6 +92,10 @@ export class LCProdAppStack extends cdk.Stack {
           description: 'only 365 days for "latest" image',
           tagPrefixList: ['latest'],
         },
+        {
+          maxImageAge: cdk.Duration.days(1),
+          tagStatus: TagStatus.UNTAGGED,
+        },
       ],
     });
   }
@@ -126,6 +130,7 @@ export class LCProdAppStack extends cdk.Stack {
         CIPHER_SALT: Secret.fromSsmParameter(p.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: Secret.fromSsmParameter(p.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: Secret.fromSsmParameter(p.S3_ACCESS_KEY_SECRET),
+        WHILETRUE_IP_ADDRESS: Secret.fromSsmParameter(p.WHILETRUE_IP_ADDRESS),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -412,6 +417,7 @@ export class LCProdAppStack extends cdk.Stack {
         c.GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY,
         2,
       ),
+      WHILETRUE_IP_ADDRESS: __loadSsmParmeter(c.WHILETRUE_IP_ADDRESS),
     };
   }
 }
