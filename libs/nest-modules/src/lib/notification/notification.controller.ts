@@ -1,9 +1,7 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Get,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -14,8 +12,8 @@ import { UserNotification } from '@prisma/client';
 import {
   CreateMultipleNotificationDto,
   CreateNotificationDto,
+  FindNotificationsDto,
   MarkNotificationReadStateDto,
-  UserType,
 } from '@project-lc/shared-types';
 import { AdminGuard } from '../_nest-units/guards/admin.guard';
 import { JwtAuthGuard } from '../_nest-units/guards/jwt-auth.guard';
@@ -44,16 +42,13 @@ export class NotificationController {
     return this.notificationService.createMultipleNotification(dto);
   }
 
-  /** 특정 유저의 알림목록 조회(최근 30일 이내의 알람, 생성일 내림차순)
-   * @query userEmail 타겟 유저의 이메일
-   * @query userType 'seller' | 'broadcaster'
-   */
+  /** 특정 유저의 알림목록 조회(최근 30일 이내의 알람, 생성일 내림차순) */
   @Get()
   findNotifications(
-    @Query('userEmail') userEmail: string,
-    @Query('userType') userType: UserType,
+    @Query(new ValidationPipe({ skipMissingProperties: true }))
+    dto: FindNotificationsDto,
   ): Promise<UserNotification[]> {
-    return this.notificationService.findNotifications({ userEmail, userType });
+    return this.notificationService.findNotifications(dto);
   }
 
   /** 특정 알림의 읽음상태 변경 */

@@ -37,6 +37,7 @@ export class NotificationService {
   async findNotifications({
     userEmail,
     userType,
+    take,
   }: FindNotificationsDto): Promise<UserNotification[]> {
     const data = await this.prisma.userNotification.findMany({
       where: {
@@ -47,6 +48,7 @@ export class NotificationService {
         },
       },
       orderBy: { createDate: 'desc' },
+      take: take || undefined,
     });
     return data;
   }
