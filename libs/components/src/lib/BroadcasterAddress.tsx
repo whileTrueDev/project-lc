@@ -83,12 +83,13 @@ export function BroadcasterAddressForm({
   const profile = useProfile();
   const broadcaster = useBroadcaster({ id: profile.data?.id });
   const isBroadcasterAddressExists = useMemo(() => {
-    if (defaultOpen) return true;
     if (!broadcaster.data) return false;
     if (!broadcaster.data.broadcasterAddress) return false;
     return true;
-  }, [broadcaster.data, defaultOpen]);
-  const editMode = useDisclosure({ defaultIsOpen: !isBroadcasterAddressExists });
+  }, [broadcaster.data]);
+  const editMode = useDisclosure({
+    defaultIsOpen: defaultOpen,
+  });
   const daumOpen = useDisclosure();
 
   const {

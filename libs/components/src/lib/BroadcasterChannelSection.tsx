@@ -114,7 +114,7 @@ export function BroadcasterChannelSection(): JSX.Element {
           ))}
         </Stack>
       ) : (
-        <SettingNeedAlertBox text="현재 활동중인 플랫폼(아프리카, 유투브, 트위치, 인스타그램 등)의 채널 주소를 입력해주세요." />
+        <SettingNeedAlertBox text="현재 활동중인 방송 플랫폼(아프리카, 유튜브, 트위치, 인스타그램 등)의 채널 주소를 입력해주세요." />
       )}
 
       {/* 채널 url 입력창 여닫는 버튼 */}

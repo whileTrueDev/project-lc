@@ -47,9 +47,7 @@ export function ContractionAgreeSection(): JSX.Element {
       {data?.agreementFlag ? (
         <Grid templateColumns="2fr 3fr" width={['100%', '70%']}>
           <GridItem display="flex" alignItems="center">
-            <Text fontSize="lg" as="u">
-              이용동의 완료
-            </Text>
+            <Text>이용동의 완료</Text>
             <CheckIcon color="green.500" ml={1} />
           </GridItem>
           <GridItem>

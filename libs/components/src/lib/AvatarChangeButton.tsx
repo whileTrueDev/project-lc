@@ -1,4 +1,4 @@
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { EditIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   Box,
@@ -213,8 +213,8 @@ export function AvatarChangeButton(): JSX.Element {
             </ModalBody>
 
             <ModalFooter>
-              <Button mr={3} onClick={reset} leftIcon={<DeleteIcon />}>
-                프로필 사진 제거하기
+              <Button mr={3} onClick={reset} isDisabled={!profileData?.avatar}>
+                기본으로 변경
               </Button>
               <Button
                 type="button"
