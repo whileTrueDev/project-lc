@@ -6,6 +6,7 @@ import {
   IconButton,
   Menu,
   MenuButton,
+  MenuItem,
   MenuList,
   Stack,
   Text,
@@ -164,7 +165,7 @@ export function UserNotificationSection(): JSX.Element {
           {/* 알림메시지 존재하는 경우 */}
           {latestNotifications.length > 0 ? (
             <Stack>
-              <Stack p={2} fontSize="sm" direction="row" alignItems="center">
+              <Stack p={2} px={4} fontSize="sm" direction="row" alignItems="center">
                 <Text>최근 알림메시지</Text>
                 <Text fontSize="xs" color="gray.500">
                   (클릭시 읽음처리 됩니다)
@@ -181,18 +182,23 @@ export function UserNotificationSection(): JSX.Element {
 
               <Divider />
               {/* 전체 알림목록 보기 토글 버튼 */}
-              <Box pl={1}>
-                <Button
+              <Box>
+                <MenuItem
+                  fontSize="sm"
                   onClick={toggle}
-                  size="sm"
-                  my={2}
-                  leftIcon={wholeListOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                  icon={
+                    wholeListOpen ? (
+                      <ChevronUpIcon fontSize="lg" />
+                    ) : (
+                      <ChevronDownIcon fontSize="lg" />
+                    )
+                  }
                 >
                   <Text as="span">전체 알림 {wholeListOpen ? '닫기' : '보기'}</Text>
-                  <Text fontSize="sm" color="gray.500">
+                  <Text fontSize="xs" color="gray.500">
                     (최근 30일 이내 알림만 볼 수 있습니다)
                   </Text>
-                </Button>
+                </MenuItem>
               </Box>
             </Stack>
           ) : (

@@ -39,6 +39,7 @@ export class NotificationService {
     userEmail,
     userType,
     take,
+    skip,
   }: FindNotificationsDto): Promise<UserNotification[]> {
     const data = await this.prisma.userNotification.findMany({
       where: {
@@ -50,6 +51,7 @@ export class NotificationService {
       },
       orderBy: { createDate: 'desc' },
       take: take || undefined,
+      skip: skip || undefined,
     });
     return data;
   }

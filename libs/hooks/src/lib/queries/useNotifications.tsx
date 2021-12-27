@@ -20,6 +20,7 @@ export const getNotifications = async (
         userEmail,
         userType: userType || process.env.NEXT_PUBLIC_APP_TYPE,
         take: listType === 'part' ? TAKE : undefined,
+        skip: listType === 'all' ? TAKE : undefined,
       },
     })
     .then((res) => res.data);

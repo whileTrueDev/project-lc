@@ -13,4 +13,9 @@ export class FindNotificationsDto {
   @Type(() => Number)
   @IsNumber()
   take?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  skip?: number;
 }
