@@ -135,9 +135,10 @@ export class BroadcasterController {
   @UseGuards(JwtAuthGuard)
   @Put('nickname')
   public async updateNickname(
+    @BroadcasterInfo() bc: UserPayload,
     @Body(ValidationPipe) dto: ChangeNicknameDto,
   ): Promise<Broadcaster> {
-    return this.broadcasterService.updateNickname(1, dto.nickname);
+    return this.broadcasterService.updateNickname(bc.id, dto.nickname);
   }
 
   /** 방송인 연락처 목록 조회 */
