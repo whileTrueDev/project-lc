@@ -9,16 +9,12 @@ import {
   IsInt,
 } from 'class-validator';
 import { LiveShopping, LiveShopppingProgressType } from '@prisma/client';
-
 import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
 import { LiveShoppingInput } from '../..';
 
 export class LiveShoppingDTO {
   @IsNumber()
   id: number;
-
-  // @IsString()
-  // streamId: string;
 
   @IsOptional()
   @IsNumber()
@@ -112,3 +108,17 @@ export type LiveShoppingBroadcastDate = Pick<
   LiveShoppingDTO,
   'broadcastStartDate' | 'broadcastEndDate'
 >;
+
+export type LiveShoppingsWithBroadcasterAndGoodsName = Pick<
+  LiveShopping,
+  'id' | 'broadcastStartDate' | 'broadcastEndDate'
+> & {
+  broadcaster: {
+    email: string;
+    userNickname: string;
+    overlayUrl: string;
+  };
+  goods: {
+    goods_name: string;
+  };
+};

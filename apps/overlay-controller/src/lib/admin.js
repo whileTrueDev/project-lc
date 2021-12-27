@@ -23,22 +23,33 @@ $(document).ready(function ready() {
   $('.mid-area button').attr('disabled', true);
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
   const localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
-  $('table#liveshopping-table').DataTable();
+  $('table#liveshopping-table').DataTable({
+    columnDefs: [
+      {
+        targets: 5,
+        render(data, type, row) {
+          const date = new Date(data);
+          const newDate = `${
+            date.getMonth() + 1
+          }-${date.getDate()} <br /> ${date.getHours()}시${date.getMinutes()}분${date.getSeconds()}초`;
+          return newDate;
+        },
+      },
+      {
+        targets: 6,
+        render(data, type, row) {
+          const date = new Date(data);
+          const newDate = `${
+            date.getMonth() + 1
+          }-${date.getDate()} <br /> ${date.getHours()}시${date.getMinutes()}분${date.getSeconds()}초`;
+          return newDate;
+        },
+      },
+    ],
+  });
   $('#start-time-picker').val(localISOTime);
   $('#end-time-picker').val(localISOTime);
   $('#fever-time-picker').val(localISOTime);
-
-  Handlebars.registerHelper('toLocaleString', function (number) {
-    return number.toLocaleString();
-  });
-
-  Handlebars.registerHelper('dateFormatter', function (dateTime) {
-    const date = new Date(dateTime);
-    const newDate = `${
-      date.getMonth() + 1
-    }-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-    return newDate;
-  });
 
   // 구입 메세지 목록 받아오는 재귀 ajax
   function getPurchaseMessage() {
@@ -58,6 +69,22 @@ $(document).ready(function ready() {
               targets: 2,
               render(data, type, row) {
                 return data.length > 40 ? `${data.substr(0, 40)}…` : data;
+              },
+            },
+            {
+              targets: 3,
+              render(data, type, row) {
+                return Number(data).toLocaleString();
+              },
+            },
+            {
+              targets: 4,
+              render(data, type, row) {
+                const date = new Date(data);
+                const newDate = `${
+                  date.getMonth() + 1
+                }-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+                return newDate;
               },
             },
           ],

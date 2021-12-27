@@ -393,6 +393,7 @@ export function AdminOverlayImageUploadDialog(
                 multiple
                 handleSuccess={handleSuccess}
                 handleError={handleError}
+                imageSizeLimit={20 * 1024 * 1024}
                 variant="chakra"
                 type="donation-images"
               />
