@@ -34,11 +34,8 @@ export function UserNotificationHistory({
   userType: UserType;
 }): JSX.Element {
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const userEmail = useMemo(() => {
-    if (isOpen) return email;
-    return undefined;
-  }, [email, isOpen]);
-  const { data, isLoading } = useNotifications(userEmail, userType);
+
+  const { data, isLoading } = useNotifications(isOpen, email, userType);
   return (
     <Box>
       <Button variant="link" onClick={onOpen}>
