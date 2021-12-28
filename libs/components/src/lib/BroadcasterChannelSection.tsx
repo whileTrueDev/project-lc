@@ -1,37 +1,50 @@
-import { AddIcon } from '@chakra-ui/icons';
 import {
-  Button,
-  Input,
-  Text,
-  Stack,
-  ButtonGroup,
-  useBoolean,
-  Collapse,
-  Spinner,
-  Link,
-  useToast,
   Box,
+  Button,
+  ButtonGroup,
+  Collapse,
+  Input,
+  Link,
+  LinkProps,
+  Spinner,
+  Stack,
+  Text,
+  useBoolean,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { BroadcasterChannel } from '@prisma/client';
 import {
-  useProfile,
-  useBroadcasterChannels,
-  useBroadcasterChannelDeleteMutation,
   useBroadcasterChannelCreateMutation,
+  useBroadcasterChannelDeleteMutation,
+  useBroadcasterChannels,
+  useProfile,
 } from '@project-lc/hooks';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { boxStyle } from '../constants/commonStyleProps';
+import { AddButton } from './BroadcasterContact';
+import { ConfirmDialog } from './ConfirmDialog';
 import { SettingNeedAlertBox } from './SettingNeedAlertBox';
 import SettingSectionLayout from './SettingSectionLayout';
 import { ErrorText } from './ShippingOptionIntervalApply';
+
+export function ExternalLink({ href }: { href: string } & LinkProps): JSX.Element {
+  return (
+    <Link href={href} isExternal color="blue.500" textDecoration="underline">
+      {href}
+    </Link>
+  );
+}
 
 /** 입력한 채널 아이템 표시 & 삭제버튼 */
 function BroadcasterChannelItem(item: BroadcasterChannel): JSX.Element {
   const { id, url } = item;
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const deleteRequest = useBroadcasterChannelDeleteMutation();
-  const onClick = (): void => {
+  const onDelete = async (): Promise<void> => {
     deleteRequest.mutateAsync(id).catch((error) => {
       console.error(error);
       toast({
@@ -43,12 +56,22 @@ function BroadcasterChannelItem(item: BroadcasterChannel): JSX.Element {
 
   return (
     <Stack direction="row" alignItems="center">
-      <Link href={url} isExternal color="blue.500" textDecoration="underline">
-        {url}
-      </Link>
-      <Button onClick={onClick} size="sm" isLoading={deleteRequest.isLoading}>
+      <ExternalLink href={url} />
+      <Button onClick={onOpen} size="sm" isLoading={deleteRequest.isLoading}>
         삭제
       </Button>
+
+      <ConfirmDialog
+        title="채널 주소 삭제"
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={onDelete}
+      >
+        해당 채널 주소를 삭제하시겠습니까?
+        <Box mt={4} {...boxStyle}>
+          <ExternalLink href={url} fontSize="sm" />
+        </Box>
+      </ConfirmDialog>
     </Stack>
   );
 }
@@ -125,14 +148,7 @@ export function BroadcasterChannelSection(): JSX.Element {
 
       <Box>
         {/* 채널 url 입력창 여닫는 버튼 */}
-        <Button leftIcon={<AddIcon />} onClick={toggle} isDisabled={isChannelFull}>
-          등록
-        </Button>
-        {isChannelFull && (
-          <Text fontSize="xs" p={1} color="gray.500">
-            채널 주소는 최대 {MAX_CHANNEL_COUNT}개까지 등록 가능합니다.
-          </Text>
-        )}
+        <AddButton onClick={toggle} maxCount={MAX_CHANNEL_COUNT} isFull={isChannelFull} />
 
         {/* 채널 url 입력폼 */}
         <Collapse in={isOpen} animateOpacity>
