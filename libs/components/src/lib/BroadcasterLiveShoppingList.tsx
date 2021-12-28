@@ -59,16 +59,19 @@ export function BroadcasterLiveShoppingList({
       headerName: '상품명',
       minWidth: 350,
       flex: 1,
-      renderCell: ({ row }) => (
-        <Tooltip label="상품페이지로 이동">
-          <Link
-            href={`http://whiletrue.firstmall.kr/goods/view?no=${row.goods.confirmation.firstmallGoodsConnectionId}`}
-            isExternal
-          >
-            {row.goods.goods_name} <ExternalLinkIcon mx="2px" />
-          </Link>
-        </Tooltip>
-      ),
+      renderCell: ({ row }) =>
+        new Date(row.sellEndDate) > new Date() ? (
+          <Tooltip label="상품페이지로 이동">
+            <Link
+              href={`http://whiletrue.firstmall.kr/goods/view?no=${row.goods.confirmation.firstmallGoodsConnectionId}`}
+              isExternal
+            >
+              {row.goods.goods_name} <ExternalLinkIcon mx="2px" />
+            </Link>
+          </Tooltip>
+        ) : (
+          <Text>{row.goods.goods_name}</Text>
+        ),
     },
     {
       field: 'progress',

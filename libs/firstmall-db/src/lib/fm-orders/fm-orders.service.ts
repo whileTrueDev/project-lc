@@ -924,7 +924,7 @@ export class FmOrdersService {
     WHERE goods_seq = ?
     AND fo.step = 75
     GROUP BY id
-    ORDER BY fo.deposit_date desc
+    ORDER BY fo.regist_date desc
 `;
     const purchaseList = await Promise.all(
       goods.map(async (value: GoodsConfirmationDtoOnlyConnectionId) => {
