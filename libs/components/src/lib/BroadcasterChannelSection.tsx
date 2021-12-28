@@ -10,6 +10,7 @@ import {
   Spinner,
   Link,
   useToast,
+  Box,
 } from '@chakra-ui/react';
 import { BroadcasterChannel } from '@prisma/client';
 import {
@@ -56,6 +57,8 @@ type ChannelFormData = {
   url: string;
 };
 
+const MAX_CHANNEL_COUNT = 5;
+
 /** 활동 플랫폼 목록 표시 및 추가 섹션 컴포넌트 */
 export function BroadcasterChannelSection(): JSX.Element {
   const {
@@ -72,7 +75,10 @@ export function BroadcasterChannelSection(): JSX.Element {
     profileData?.id,
   );
 
-  const allowAddChannel = useMemo(() => channels && channels.length < 5, [channels]);
+  const isChannelFull = useMemo(
+    () => channels && channels.length >= MAX_CHANNEL_COUNT,
+    [channels],
+  );
 
   const createChannelRequest = useBroadcasterChannelCreateMutation();
   const onSubmit = (data: ChannelFormData): void => {
@@ -117,45 +123,50 @@ export function BroadcasterChannelSection(): JSX.Element {
         <SettingNeedAlertBox text="현재 활동중인 방송 플랫폼(아프리카, 유튜브, 트위치, 인스타그램 등)의 채널 주소를 입력해주세요." />
       )}
 
-      {/* 채널 url 입력창 여닫는 버튼 */}
-      {allowAddChannel && (
-        <Button leftIcon={<AddIcon />} onClick={toggle}>
+      <Box>
+        {/* 채널 url 입력창 여닫는 버튼 */}
+        <Button leftIcon={<AddIcon />} onClick={toggle} isDisabled={isChannelFull}>
           등록
         </Button>
-      )}
+        {isChannelFull && (
+          <Text fontSize="xs" p={1} color="gray.500">
+            채널 주소는 최대 {MAX_CHANNEL_COUNT}개까지 등록 가능합니다.
+          </Text>
+        )}
 
-      {/* 채널 url 입력폼 */}
-      <Collapse in={isOpen} animateOpacity>
-        <Stack as="form" onSubmit={handleSubmit(onSubmit)}>
-          <Text as="label">채널 URL (아프리카, 유투브, 트위치, 인스타그램 등)</Text>
-          <Input
-            isInvalid={!!errors.url}
-            placeholder="https://www.twitch.tv/chodan_"
-            {...register('url', {
-              required: '채널 url을 입력해주세요',
-              validate: (value) => {
-                const regex = new RegExp('^(http|https)://', 'i');
-                return (
-                  regex.test(value) ||
-                  '채널 url은 http:// 혹은 https:// 로 시작해야 합니다'
-                );
-              },
-            })}
-          />
-          {errors.url && <ErrorText>{errors.url.message}</ErrorText>}
-          <ButtonGroup>
-            <Button
-              type="submit"
-              isDisabled={!allowAddChannel}
-              isLoading={createChannelRequest.isLoading}
-              colorScheme="blue"
-            >
-              확인
-            </Button>
-            <Button onClick={off}>취소</Button>
-          </ButtonGroup>
-        </Stack>
-      </Collapse>
+        {/* 채널 url 입력폼 */}
+        <Collapse in={isOpen} animateOpacity>
+          <Stack as="form" onSubmit={handleSubmit(onSubmit)} spacing={3} mt={1}>
+            <Text as="label">채널 URL (아프리카, 유투브, 트위치, 인스타그램 등)</Text>
+            <Input
+              isInvalid={!!errors.url}
+              placeholder="https://www.twitch.tv/chodan_"
+              {...register('url', {
+                required: '채널 url을 입력해주세요',
+                validate: (value) => {
+                  const regex = new RegExp('^(http|https)://', 'i');
+                  return (
+                    regex.test(value) ||
+                    '채널 url은 http:// 혹은 https:// 로 시작해야 합니다'
+                  );
+                },
+              })}
+            />
+            {errors.url && <ErrorText>{errors.url.message}</ErrorText>}
+            <ButtonGroup>
+              <Button
+                type="submit"
+                isDisabled={isChannelFull}
+                isLoading={createChannelRequest.isLoading}
+                colorScheme="blue"
+              >
+                확인
+              </Button>
+              <Button onClick={off}>취소</Button>
+            </ButtonGroup>
+          </Stack>
+        </Collapse>
+      </Box>
     </SettingSectionLayout>
   );
 }
