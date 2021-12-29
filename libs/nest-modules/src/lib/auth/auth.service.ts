@@ -190,6 +190,9 @@ export class AuthService {
     }
     // 관리자 정보 조회
     if (['admin'].includes(type)) {
+      if (appType !== 'admin') {
+        throw new UnauthorizedException();
+      }
       user = await this.adminAccountService.findOne({ email: sub });
     }
 
