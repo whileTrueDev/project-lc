@@ -85,7 +85,6 @@ export class AdminController {
     @Body(ValidationPipe) dto: AdminSignUpDto,
   ): Promise<Administrator> {
     const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress;
-    console.log(ip);
     if (!this.allowedIpAddresses.includes(ip)) {
       throw new ForbiddenException(`unexpected ip address - ${ip}`);
     }
