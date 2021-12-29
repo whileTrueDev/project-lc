@@ -193,8 +193,8 @@ export function BroadcasterAddressForm({
               <FormErrorMessage>{errors.detailAddress?.message}</FormErrorMessage>
             </FormControl>
           )}
-          <Collapse in={daumOpen.isOpen} animateOpacity>
-            <DaumPostcode onComplete={handleAddressSelected} />
+          <Collapse in={daumOpen.isOpen} animateOpacity unmountOnExit>
+            <DaumPostcode focusContent focusInput onComplete={handleAddressSelected} />
           </Collapse>
 
           <ButtonGroup>

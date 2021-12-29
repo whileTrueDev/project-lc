@@ -1,4 +1,5 @@
 export interface Term {
+  required?: boolean;
   title: string;
   state: string;
   text: string;
@@ -6,6 +7,7 @@ export interface Term {
 
 const terms = [
   {
+    required: true,
     title: '크크쇼 이용 약관',
     state: 'checkedA',
     text: `  
@@ -317,6 +319,7 @@ const terms = [
     `,
   },
   {
+    required: true,
     title: '개인정보 처리방침',
     state: 'checkedB',
     text: `

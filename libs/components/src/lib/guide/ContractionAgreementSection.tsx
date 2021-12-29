@@ -135,7 +135,14 @@ export function ContractionAgreementSection({
             {terms.map((term) => (
               <SimpleGrid key={term.state} columns={3}>
                 <GridItem>
-                  <Text>{term.title}</Text>
+                  <Text>
+                    {term.title}{' '}
+                    {term.required && (
+                      <Text as="span" fontSize="xs" color="green.500">
+                        (필수)
+                      </Text>
+                    )}
+                  </Text>
                 </GridItem>
                 <GridItem textAlign="center">
                   <Button
@@ -154,11 +161,8 @@ export function ContractionAgreementSection({
                     colorScheme="green"
                     isChecked={term.state === 'checkedA' ? checkedA : checkedB}
                     onChange={() => {
-                      toast({
-                        status: 'warning',
-                        description: '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
-                        duration: 1500,
-                      });
+                      if (term.state === 'checkedA') setCheckedA(!checkedA);
+                      if (term.state === 'checkedB') setCheckedB(!checkedB);
                     }}
                   >
                     동의
@@ -167,21 +171,14 @@ export function ContractionAgreementSection({
               </SimpleGrid>
             ))}
             <Divider />
-            {/* 이용약관 동의 버튼 */}
+            {/* 이용약관 모두 동의 버튼 */}
             <Checkbox
               size="md"
               colorScheme="green"
               isChecked={checkedA && checkedB}
               onChange={() => {
-                if (checkedA && checkedB) {
-                  checkedAll(false);
-                } else {
-                  toast({
-                    status: 'warning',
-                    description: '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
-                    duration: 1500,
-                  });
-                }
+                if (checkedA && checkedB) checkedAll(false);
+                else checkedAll(true);
               }}
             >
               전체 이용약관에 동의합니다.
@@ -199,6 +196,7 @@ export function ContractionAgreementSection({
           </Stack>
         </Center>
       )}
+
       {selectedTerm && (
         <Modal
           isOpen={dialog.isOpen}
