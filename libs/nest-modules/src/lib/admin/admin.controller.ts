@@ -12,6 +12,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -45,6 +46,7 @@ import {
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
+import { Request } from 'express';
 import { BroadcasterSettlementHistoryService } from '../broadcaster/broadcaster-settlement-history.service';
 import { BroadcasterSettlementService } from '../broadcaster/broadcaster-settlement.service';
 import { BroadcasterService } from '../broadcaster/broadcaster.service';
@@ -79,11 +81,13 @@ export class AdminController {
   // * 관리자 회원가입
   @Post()
   public async signUp(
-    @Ip() ip: string,
+    @Req() req: Request,
     @Body(ValidationPipe) dto: AdminSignUpDto,
   ): Promise<Administrator> {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress;
+    console.log(ip);
     if (!this.allowedIpAddresses.includes(ip)) {
-      throw new ForbiddenException('unexpected ip address - ', ip);
+      throw new ForbiddenException(`unexpected ip address - ${ip}`);
     }
     const administrator = await this.adminAccountService.signUp(dto);
     return administrator;
