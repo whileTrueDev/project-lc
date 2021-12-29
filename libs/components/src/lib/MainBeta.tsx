@@ -10,7 +10,7 @@ function MainBetaVideo(): React.ReactElement {
       padding={{ base: '56.3% 0 0 0', md: '50.625% 0 0 0' }}
     >
       <iframe
-        src="https://www.youtube.com/embed/4pIuCJTMXQU?controls=0&autoplay=1"
+        src="https://www.youtube.com/embed/4pIuCJTMXQU?controls=0&autoplay=1&iv_load_policy=3&playsinline=1&rel=0"
         title="project-lc-main-video"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
