@@ -1,36 +1,50 @@
-import { AddIcon } from '@chakra-ui/icons';
 import {
+  Box,
   Button,
-  Input,
-  Text,
-  Stack,
   ButtonGroup,
-  useBoolean,
   Collapse,
-  Spinner,
+  Input,
   Link,
+  LinkProps,
+  Spinner,
+  Stack,
+  Text,
+  useBoolean,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react';
 import { BroadcasterChannel } from '@prisma/client';
 import {
-  useProfile,
-  useBroadcasterChannels,
-  useBroadcasterChannelDeleteMutation,
   useBroadcasterChannelCreateMutation,
+  useBroadcasterChannelDeleteMutation,
+  useBroadcasterChannels,
+  useProfile,
 } from '@project-lc/hooks';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { boxStyle } from '../constants/commonStyleProps';
+import { AddButton } from './BroadcasterContact';
+import { ConfirmDialog } from './ConfirmDialog';
 import { SettingNeedAlertBox } from './SettingNeedAlertBox';
 import SettingSectionLayout from './SettingSectionLayout';
 import { ErrorText } from './ShippingOptionIntervalApply';
+
+export function ExternalLink({ href }: { href: string } & LinkProps): JSX.Element {
+  return (
+    <Link href={href} isExternal color="blue.500" textDecoration="underline">
+      {href}
+    </Link>
+  );
+}
 
 /** 입력한 채널 아이템 표시 & 삭제버튼 */
 function BroadcasterChannelItem(item: BroadcasterChannel): JSX.Element {
   const { id, url } = item;
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const deleteRequest = useBroadcasterChannelDeleteMutation();
-  const onClick = (): void => {
+  const onDelete = async (): Promise<void> => {
     deleteRequest.mutateAsync(id).catch((error) => {
       console.error(error);
       toast({
@@ -42,12 +56,22 @@ function BroadcasterChannelItem(item: BroadcasterChannel): JSX.Element {
 
   return (
     <Stack direction="row" alignItems="center">
-      <Link href={url} isExternal color="blue.500" textDecoration="underline">
-        {url}
-      </Link>
-      <Button onClick={onClick} size="sm" isLoading={deleteRequest.isLoading}>
+      <ExternalLink href={url} />
+      <Button onClick={onOpen} size="sm" isLoading={deleteRequest.isLoading}>
         삭제
       </Button>
+
+      <ConfirmDialog
+        title="채널 주소 삭제"
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={onDelete}
+      >
+        해당 채널 주소를 삭제하시겠습니까?
+        <Box mt={4} {...boxStyle}>
+          <ExternalLink href={url} fontSize="sm" />
+        </Box>
+      </ConfirmDialog>
     </Stack>
   );
 }
@@ -55,6 +79,8 @@ function BroadcasterChannelItem(item: BroadcasterChannel): JSX.Element {
 type ChannelFormData = {
   url: string;
 };
+
+const MAX_CHANNEL_COUNT = 5;
 
 /** 활동 플랫폼 목록 표시 및 추가 섹션 컴포넌트 */
 export function BroadcasterChannelSection(): JSX.Element {
@@ -72,7 +98,10 @@ export function BroadcasterChannelSection(): JSX.Element {
     profileData?.id,
   );
 
-  const allowAddChannel = useMemo(() => channels && channels.length < 5, [channels]);
+  const isChannelFull = useMemo(
+    () => channels && channels.length >= MAX_CHANNEL_COUNT,
+    [channels],
+  );
 
   const createChannelRequest = useBroadcasterChannelCreateMutation();
   const onSubmit = (data: ChannelFormData): void => {
@@ -117,45 +146,43 @@ export function BroadcasterChannelSection(): JSX.Element {
         <SettingNeedAlertBox text="현재 활동중인 방송 플랫폼(아프리카, 유튜브, 트위치, 인스타그램 등)의 채널 주소를 입력해주세요." />
       )}
 
-      {/* 채널 url 입력창 여닫는 버튼 */}
-      {allowAddChannel && (
-        <Button leftIcon={<AddIcon />} onClick={toggle}>
-          등록
-        </Button>
-      )}
+      <Box>
+        {/* 채널 url 입력창 여닫는 버튼 */}
+        <AddButton onClick={toggle} maxCount={MAX_CHANNEL_COUNT} isFull={isChannelFull} />
 
-      {/* 채널 url 입력폼 */}
-      <Collapse in={isOpen} animateOpacity>
-        <Stack as="form" onSubmit={handleSubmit(onSubmit)}>
-          <Text as="label">채널 URL (아프리카, 유투브, 트위치, 인스타그램 등)</Text>
-          <Input
-            isInvalid={!!errors.url}
-            placeholder="https://www.twitch.tv/chodan_"
-            {...register('url', {
-              required: '채널 url을 입력해주세요',
-              validate: (value) => {
-                const regex = new RegExp('^(http|https)://', 'i');
-                return (
-                  regex.test(value) ||
-                  '채널 url은 http:// 혹은 https:// 로 시작해야 합니다'
-                );
-              },
-            })}
-          />
-          {errors.url && <ErrorText>{errors.url.message}</ErrorText>}
-          <ButtonGroup>
-            <Button
-              type="submit"
-              isDisabled={!allowAddChannel}
-              isLoading={createChannelRequest.isLoading}
-              colorScheme="blue"
-            >
-              확인
-            </Button>
-            <Button onClick={off}>취소</Button>
-          </ButtonGroup>
-        </Stack>
-      </Collapse>
+        {/* 채널 url 입력폼 */}
+        <Collapse in={isOpen} animateOpacity>
+          <Stack as="form" onSubmit={handleSubmit(onSubmit)} spacing={3} mt={1}>
+            <Text as="label">채널 URL (아프리카, 유투브, 트위치, 인스타그램 등)</Text>
+            <Input
+              isInvalid={!!errors.url}
+              placeholder="https://www.twitch.tv/chodan_"
+              {...register('url', {
+                required: '채널 url을 입력해주세요',
+                validate: (value) => {
+                  const regex = new RegExp('^(http|https)://', 'i');
+                  return (
+                    regex.test(value) ||
+                    '채널 url은 http:// 혹은 https:// 로 시작해야 합니다'
+                  );
+                },
+              })}
+            />
+            {errors.url && <ErrorText>{errors.url.message}</ErrorText>}
+            <ButtonGroup>
+              <Button
+                type="submit"
+                isDisabled={isChannelFull}
+                isLoading={createChannelRequest.isLoading}
+                colorScheme="blue"
+              >
+                확인
+              </Button>
+              <Button onClick={off}>취소</Button>
+            </ButtonGroup>
+          </Stack>
+        </Collapse>
+      </Box>
     </SettingSectionLayout>
   );
 }
