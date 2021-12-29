@@ -39,7 +39,7 @@ export async function imageFileListToImageDto(
   imageFileList: { file: File; filename: string; id: number }[],
   userMail: string,
   liveShoppingId: number,
-  type: 'vertical-banner' | 'donation-images',
+  type: 'vertical-banner' | 'donation-images-1' | 'donation-images-2',
 ): Promise<
   Array<{
     cut_number: number;
@@ -68,15 +68,21 @@ export async function uploadImageToS3(
   imageFile: { file: File | Buffer; filename: string; id: number; contentType: string },
   userMail: string,
   liveShoppingId: number,
-  type: 'vertical-banner' | 'donation-images',
+  type: 'vertical-banner' | 'donation-images-1' | 'donation-images-2',
 ): Promise<string> {
   const { file, filename, contentType } = imageFile;
+  let imageType: 'vertical-banner' | 'donation-images' = 'vertical-banner';
+
+  if (type === 'donation-images-1' || type === 'donation-images-2') {
+    imageType = 'donation-images';
+  }
+
   return s3.s3uploadFile({
     file,
     filename,
     contentType,
     userMail,
-    type,
+    type: imageType,
     liveShoppingId,
   });
 }
@@ -86,7 +92,7 @@ export async function getSavedImages(
   liveShoppingId: number,
   type: 'vertical-banner' | 'donation-images',
 ): Promise<(string | undefined)[]> {
-  const imageList = await s3.getVerticalImagesFromS3(broadcasterId, liveShoppingId, type);
+  const imageList = await s3.getOverlayImagesFromS3(broadcasterId, liveShoppingId, type);
   return imageList;
 }
 
@@ -97,25 +103,30 @@ export function AdminOverlayImageUploadDialog(
   const S3_IMAGE_PREFIX = `https://lc-project.s3.ap-northeast-2.amazonaws.com`;
   const toast = useToast();
   const [verticalPreviews, setVerticalPreviews] = useState<Preview[]>([]);
-  const [donationPreviews, setDonationPreviews] = useState<Preview[]>([]);
+  const [firstDonationPreviews, setFirstDonationPreviews] = useState<Preview[]>([]);
+  const [secondDonationPreviews, setSecondDonationPreviews] = useState<Preview[]>([]);
   const goBackAlertDialog = useDisclosure();
   const [savedVerticalImages, setSavedVerticalImages] = useState<(string | undefined)[]>(
     [],
   );
-  const [savedDonationImages, setSavedDonationImages] = useState<(string | undefined)[]>(
-    [],
-  );
+  const [savedFirstDonationImages, setSavedFirstDonationImages] = useState<
+    string | undefined
+  >('');
+  const [savedSecondDonationImages, setSavedSecondDonationImages] = useState<
+    string | undefined
+  >('');
   const [selectedBannerType, setSelectedBannerType] = useState<
-    'vertical-banner' | 'donation-images'
+    'vertical-banner' | 'donation-images-1' | 'donation-images-2'
   >('vertical-banner');
 
   const numberOfSavedVerticalImages = savedVerticalImages.length;
-  const numberOfSavedDonationImages = savedDonationImages.length;
+  const numberOfSavedFirstDonationImages = savedFirstDonationImages ? 1 : 0;
+  const numberOfSavedSecondDonationImages = savedSecondDonationImages ? 1 : 0;
   // 사진 등록하기 다이얼로그 - 파일업로드 인풋 성공 핸들러 -> 미리보기 previews에 이미지 추가
   const handleSuccess = (
     fileName: string,
     file: File,
-    type?: 'vertical-banner' | 'donation-images',
+    type?: 'vertical-banner' | 'donation-images-1' | 'donation-images-2',
   ): void => {
     readAsDataURL(file).then(({ data }) => {
       switch (type) {
@@ -132,18 +143,21 @@ export function AdminOverlayImageUploadDialog(
             return newList;
           });
           break;
-        default:
-          setDonationPreviews((list) => {
-            const id =
-              list.length === 0
-                ? numberOfSavedDonationImages + 1
-                : list[list.length - 1].id + 1;
-            const newList = [
-              ...list,
-              { id, url: data, filename: `donation-${id}`, file },
-            ];
+        case 'donation-images-1':
+          setFirstDonationPreviews((list) => {
+            const id = list.length === 0 ? 1 : list[list.length - 1].id + 1;
+            const newList = [...list, { id, url: data, filename: 'donation-1', file }];
             return newList;
           });
+          break;
+        case 'donation-images-2':
+          setSecondDonationPreviews((list) => {
+            const id = list.length === 0 ? 1 : list[list.length - 1].id + 1;
+            const newList = [...list, { id, url: data, filename: 'donation-2', file }];
+            return newList;
+          });
+          break;
+        default:
           break;
       }
     });
@@ -162,8 +176,11 @@ export function AdminOverlayImageUploadDialog(
       if (numberOfSavedVerticalImages + verticalPreviews.length > 15) {
         throw new Error('세로배너 이미지는 15개까지 등록가능합니다.');
       }
-      if (numberOfSavedDonationImages + donationPreviews.length > 2) {
-        throw new Error('응원메세지 이미지는 2개까지 등록가능합니다.');
+      if (numberOfSavedFirstDonationImages + firstDonationPreviews.length > 1) {
+        throw new Error('응원메세지 이미지는 단계별 1개까지 등록가능합니다.');
+      }
+      if (numberOfSavedSecondDonationImages + secondDonationPreviews.length > 1) {
+        throw new Error('응원메세지 이미지는 단계별 1개까지 등록가능합니다.');
       }
       await imageFileListToImageDto(
         verticalPreviews,
@@ -173,10 +190,17 @@ export function AdminOverlayImageUploadDialog(
       );
 
       await imageFileListToImageDto(
-        donationPreviews,
+        firstDonationPreviews,
         broadcasterEmail,
         liveShoppingId,
-        'donation-images',
+        'donation-images-1',
+      );
+
+      await imageFileListToImageDto(
+        secondDonationPreviews,
+        broadcasterEmail,
+        liveShoppingId,
+        'donation-images-2',
       );
 
       toast({ title: '이미지가 저장되었습니다', status: 'success' });
@@ -198,7 +222,7 @@ export function AdminOverlayImageUploadDialog(
   // 사진 등록하기 다이얼로그 - 미리보기 이미지 삭제 핸들러
   const deletePreview = (
     id: number,
-    type: 'vertical-banner' | 'donation-images',
+    type: 'vertical-banner' | 'donation-images-1' | 'donation-images-2',
   ): void => {
     switch (type) {
       case 'vertical-banner':
@@ -215,19 +239,35 @@ export function AdminOverlayImageUploadDialog(
           return idReassignImages;
         });
         break;
-      default:
-        setDonationPreviews((list) => {
+      case 'donation-images-1':
+        setFirstDonationPreviews((list) => {
           const filtered = list.filter((item) => item.id !== id);
           const idReassignImages = filtered.map((item, index) => {
             const newImageList = {
               ...item,
-              id: index + numberOfSavedDonationImages + 1,
-              filename: `donation-${index + numberOfSavedDonationImages + 1}`,
+              id: index,
+              filename: 'donation-1',
             };
             return newImageList;
           });
           return idReassignImages;
         });
+        break;
+      case 'donation-images-2':
+        setSecondDonationPreviews((list) => {
+          const filtered = list.filter((item) => item.id !== id);
+          const idReassignImages = filtered.map((item, index) => {
+            const newImageList = {
+              ...item,
+              id: index,
+              filename: 'donation-2',
+            };
+            return newImageList;
+          });
+          return idReassignImages;
+        });
+        break;
+      default:
         break;
     }
   };
@@ -235,7 +275,8 @@ export function AdminOverlayImageUploadDialog(
   // 사진 등록하기 다일얼로그 - 닫기 핸들러
   const handleClose = (): void => {
     setVerticalPreviews([]);
-    setDonationPreviews([]);
+    setFirstDonationPreviews([]);
+    setSecondDonationPreviews([]);
     onClose();
   };
 
@@ -250,12 +291,19 @@ export function AdminOverlayImageUploadDialog(
     };
 
     const getDonationImageName = async (): Promise<void> => {
-      const verticalImages = await getSavedImages(
+      const donationImage = await getSavedImages(
         broadcasterEmail,
         liveShoppingId,
         'donation-images',
       );
-      setSavedDonationImages(verticalImages);
+      const firstDonationImage = donationImage.find((element) =>
+        element?.includes('donation-1'),
+      );
+      const secondDonationImage = donationImage.find((element) =>
+        element?.includes('donation-2'),
+      );
+      setSavedFirstDonationImages(firstDonationImage);
+      setSavedSecondDonationImages(secondDonationImage);
     };
     getVerticalImageName();
     getDonationImageName();
@@ -263,7 +311,8 @@ export function AdminOverlayImageUploadDialog(
     broadcasterEmail,
     liveShoppingId,
     setSavedVerticalImages,
-    setSavedDonationImages,
+    setSavedFirstDonationImages,
+    setSavedSecondDonationImages.length,
     isOpen,
   ]);
 
@@ -274,6 +323,10 @@ export function AdminOverlayImageUploadDialog(
         <ModalContent>
           <ModalHeader>이미지 등록</ModalHeader>
           <ModalBody>
+            <Text color="tomato">
+              미리보기 이미지는 바로 변하지 않을 수 있습니다. <br /> 이미지 변경 후에
+              미리보기가 변하지 않는다면 이미지를 클릭하여 확인하거나 새로고침 해보세요
+            </Text>
             <Heading size="md">등록된 세로배너</Heading>
             <Stack>
               <HStack mr={2} mb={2}>
@@ -283,7 +336,7 @@ export function AdminOverlayImageUploadDialog(
                 {savedVerticalImages.length !== 0 &&
                   savedVerticalImages.map((result) => {
                     return (
-                      <VStack key={result}>
+                      <VStack key={`saved-${result}`}>
                         <Link
                           isTruncated
                           href={`${S3_IMAGE_PREFIX}/${result}`}
@@ -310,49 +363,56 @@ export function AdminOverlayImageUploadDialog(
                     setSelectedBannerType('vertical-banner');
                   }}
                 >
-                  이미지 모두 삭제
+                  세로배너 모두 삭제
                 </Button>
               )}
             </Stack>
             <Divider mt={3} mb={3} />
-            <Heading size="md">등록된 응원메세지 이미지</Heading>
-            <Stack>
-              <HStack mr={2} mb={2}>
-                {savedDonationImages.length === 0 && (
-                  <Text>등록된 이미지가 없습니다</Text>
-                )}
-                {savedDonationImages.length !== 0 &&
-                  savedDonationImages.map((result) => {
-                    return (
-                      <VStack key={result}>
-                        <Link
-                          isTruncated
-                          href={`${S3_IMAGE_PREFIX}/${result}`}
-                          fontWeight="bold"
-                          colorScheme="blue"
-                          textDecoration="underline"
-                          isExternal
+            <Stack direction="row">
+              {[savedFirstDonationImages, savedSecondDonationImages].map(
+                (donationImage, index) => {
+                  return (
+                    <Stack key={donationImage}>
+                      <Heading size="md">{`등록된 ${
+                        index + 1
+                      }단계 응원메세지 이미지`}</Heading>
+                      <HStack mr={2} mb={2}>
+                        {!donationImage && <Text>등록된 이미지가 없습니다</Text>}
+                        {donationImage && (
+                          <VStack>
+                            <Link
+                              isTruncated
+                              href={`${S3_IMAGE_PREFIX}/${donationImage}`}
+                              fontWeight="bold"
+                              colorScheme="blue"
+                              textDecoration="underline"
+                              isExternal
+                            >
+                              <ChakraNextImage
+                                layout="intrinsic"
+                                src={`${S3_IMAGE_PREFIX}/${donationImage}`}
+                                width={120}
+                                height={70}
+                              />
+                            </Link>
+                          </VStack>
+                        )}
+                      </HStack>
+                      {donationImage && (
+                        <Button
+                          onClick={() => {
+                            goBackAlertDialog.onOpen();
+                            setSelectedBannerType(
+                              index === 0 ? 'donation-images-1' : 'donation-images-2',
+                            );
+                          }}
                         >
-                          <ChakraNextImage
-                            layout="intrinsic"
-                            src={`${S3_IMAGE_PREFIX}/${result}`}
-                            width={120}
-                            height={70}
-                          />
-                        </Link>
-                      </VStack>
-                    );
-                  })}
-              </HStack>
-              {savedDonationImages.length !== 0 && (
-                <Button
-                  onClick={() => {
-                    goBackAlertDialog.onOpen();
-                    setSelectedBannerType('donation-images');
-                  }}
-                >
-                  이미지 모두 삭제
-                </Button>
+                          {`${index + 1}단계 이미지 삭제`}
+                        </Button>
+                      )}
+                    </Stack>
+                  );
+                },
               )}
             </Stack>
             <Divider mt={10} mb={10} />
@@ -389,32 +449,67 @@ export function AdminOverlayImageUploadDialog(
             <Stack>
               <Heading size="md">응원메세지 이미지 첨부</Heading>
               <Text>응원메세지 이미지는 2장까지 등록가능합니다.</Text>
-              <ImageInput
-                multiple
-                handleSuccess={handleSuccess}
-                handleError={handleError}
-                imageSizeLimit={20 * 1024 * 1024}
-                variant="chakra"
-                type="donation-images"
-              />
-              <Divider />
-              {/* 이미지 미리보기 목록 */}
-              <Stack direction="row" spacing={2} flexWrap="wrap">
-                {donationPreviews.length !== 0 &&
-                  donationPreviews.map((preview) => {
-                    const { id, filename, url } = preview;
-                    return (
-                      <GoodsPreviewItem
-                        key={id}
-                        id={id}
-                        filename={filename}
-                        url={(url as string) || ''}
-                        width={60}
-                        height={35}
-                        onDelete={() => deletePreview(id, 'donation-images')}
-                      />
-                    );
-                  })}
+              <Stack direction="row">
+                <Stack>
+                  <Text>1단계 이미지</Text>
+                  <ImageInput
+                    multiple
+                    handleSuccess={handleSuccess}
+                    handleError={handleError}
+                    imageSizeLimit={20 * 1024 * 1024}
+                    variant="chakra"
+                    type="donation-images-1"
+                  />
+                  <Divider />
+                  {/* 이미지 미리보기 목록 */}
+                  <Stack direction="row" spacing={2} flexWrap="wrap">
+                    {firstDonationPreviews.length !== 0 &&
+                      firstDonationPreviews.map((preview) => {
+                        const { id, filename, url } = preview;
+                        return (
+                          <GoodsPreviewItem
+                            key={id}
+                            id={id}
+                            filename={filename}
+                            url={(url as string) || ''}
+                            width={60}
+                            height={35}
+                            onDelete={() => deletePreview(id, 'donation-images-1')}
+                          />
+                        );
+                      })}
+                  </Stack>
+                </Stack>
+                <Stack>
+                  <Text>2단계 이미지</Text>
+                  <ImageInput
+                    multiple
+                    handleSuccess={handleSuccess}
+                    handleError={handleError}
+                    imageSizeLimit={20 * 1024 * 1024}
+                    variant="chakra"
+                    type="donation-images-2"
+                  />
+                  <Divider />
+                  {/* 이미지 미리보기 목록 */}
+                  <Stack direction="row" spacing={2} flexWrap="wrap">
+                    {secondDonationPreviews.length !== 0 &&
+                      secondDonationPreviews.map((preview) => {
+                        const { id, filename, url } = preview;
+                        return (
+                          <GoodsPreviewItem
+                            key={id}
+                            id={id}
+                            filename={filename}
+                            url={(url as string) || ''}
+                            width={60}
+                            height={35}
+                            onDelete={() => deletePreview(id, 'donation-images-2')}
+                          />
+                        );
+                      })}
+                  </Stack>
+                </Stack>
               </Stack>
             </Stack>
           </ModalBody>
@@ -438,9 +533,13 @@ export function AdminOverlayImageUploadDialog(
               await s3.s3DeleteImages(savedVerticalImages);
               setSavedVerticalImages([]);
             }
-            if (selectedBannerType === 'donation-images') {
-              await s3.s3DeleteImages(savedDonationImages);
-              setSavedDonationImages([]);
+            if (selectedBannerType === 'donation-images-1') {
+              await s3.s3DeleteImages([savedFirstDonationImages]);
+              setSavedFirstDonationImages('');
+            }
+            if (selectedBannerType === 'donation-images-2') {
+              await s3.s3DeleteImages([savedSecondDonationImages]);
+              setSavedSecondDonationImages('');
             }
           }}
         >
