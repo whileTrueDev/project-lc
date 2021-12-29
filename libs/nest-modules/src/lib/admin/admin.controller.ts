@@ -83,7 +83,7 @@ export class AdminController {
     @Body(ValidationPipe) dto: AdminSignUpDto,
   ): Promise<Administrator> {
     if (!this.allowedIpAddresses.includes(ip)) {
-      throw new ForbiddenException('unexpected ip address');
+      throw new ForbiddenException('unexpected ip address - ', ip);
     }
     const administrator = await this.adminAccountService.signUp(dto);
     return administrator;
