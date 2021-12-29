@@ -15,7 +15,7 @@ export function StartGuideCard({ onOpen }: { onOpen: () => void }): JSX.Element 
           <Text as="span" color="red.500">
             [필수]
           </Text>
-          &nbsp; 온애드 시작 가이드
+          &nbsp; 크크쇼 시작 가이드
         </Text>
 
         <Button variant="solid" size="sm" onClick={onOpen}>

@@ -217,7 +217,7 @@ export const s3 = (() => {
     return imageUrl;
   }
 
-  async function getVerticalImagesFromS3(
+  async function getOverlayImagesFromS3(
     broadcasterId: string,
     liveShoppingId: number,
     type: 'vertical-banner' | 'donation-images',
@@ -274,7 +274,7 @@ export const s3 = (() => {
     getS3Key,
     s3DownloadImageUrl,
     s3uploadFile: s3publicUploadFile,
-    getVerticalImagesFromS3,
+    getOverlayImagesFromS3,
     s3DeleteImages,
     getS3GuideImage,
   };

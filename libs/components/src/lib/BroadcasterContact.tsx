@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  ButtonProps,
   Checkbox,
   Collapse,
   Divider,
@@ -40,6 +41,7 @@ import { UseMutateAsyncFunction } from 'react-query';
 import { BroadcasterContacts } from '.prisma/client';
 import { ConfirmDialog, SettingNeedAlertBox } from '..';
 import SettingSectionLayout from './SettingSectionLayout';
+import { boxStyle } from '../constants/commonStyleProps';
 
 export function BroadcasterContactSection(): JSX.Element {
   const profile = useProfile();
@@ -188,15 +190,7 @@ export function BroadcasterContactItem({
         onConfirm={onDelete}
       >
         연락처를 삭제하시겠습니까?
-        <Box
-          mt={4}
-          px={2}
-          py={1}
-          borderWidth="thin"
-          borderRadius="md"
-          minW={200}
-          maxW={300}
-        >
+        <Box mt={4} {...boxStyle} maxW={300}>
           <Flex justifyContent="space-between">
             <Text fontSize="sm">
               <Text as="span" color="blue">
@@ -209,6 +203,42 @@ export function BroadcasterContactItem({
           <Text fontSize="sm">{contactData.phoneNumber}</Text>
         </Box>
       </ConfirmDialog>
+    </>
+  );
+}
+
+/**
+ * 계정설정 - 활동플랫폼, 연락처 등 여러개 항목 입력 가능한 부분에서 사용하는 버튼 컴포넌트
+ * maxCount, isFull 값이 주어진 경우 최대 등록 가능 개수 초과시 disabled 되고 안내문구가 뜬다
+ * @param maxCount?: number 등록가능한 최대값.
+ * @param isFull?: boolean 추가 등록 가능한지 여부
+ */
+export function AddButton(
+  props: ButtonProps & {
+    maxCount?: number;
+    isFull?: boolean;
+  },
+): JSX.Element {
+  const { maxCount, isFull, ...buttonProps } = props;
+
+  if (!maxCount || !isFull) {
+    return (
+      <Button leftIcon={<AddIcon />} {...buttonProps}>
+        등록
+      </Button>
+    );
+  }
+  return (
+    <>
+      <Button leftIcon={<AddIcon />} {...buttonProps} isDisabled={isFull}>
+        등록
+      </Button>
+
+      {isFull && (
+        <Text fontSize="xs" p={1} color="gray.500">
+          최대 {maxCount}개까지 등록 가능합니다.
+        </Text>
+      )}
     </>
   );
 }
@@ -234,20 +264,11 @@ export function BroadcasterContactAdd(): JSX.Element {
   );
   return (
     <Box>
-      <Button
-        leftIcon={<AddIcon />}
+      <AddButton
         onClick={addSection.onToggle}
-        isDisabled={isContactsFull}
-      >
-        등록
-      </Button>
-
-      {isContactsFull && (
-        <Text fontSize="xs" p={1} color="gray.500">
-          연락처는 최대 {MAX_CONTACTS_COUNT}개까지 등록 가능합니다.
-        </Text>
-      )}
-
+        maxCount={MAX_CONTACTS_COUNT}
+        isFull={isContactsFull}
+      />
       <Collapse in={addSection.isOpen} animateOpacity unmountOnExit>
         <BroadcasterContactForm
           onSuccess={() => {

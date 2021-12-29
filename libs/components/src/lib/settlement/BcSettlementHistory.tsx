@@ -76,13 +76,12 @@ export function BcSettlementHistory({
       {
         headerName: '회차',
         field: 'round',
-        width: 130,
-        flex: isDesktopSize ? 1 : undefined,
+        width: 100,
       },
       {
         headerName: '정산일',
         field: 'date',
-        width: 170,
+        width: 180,
         flex: isDesktopSize ? 1 : undefined,
         valueFormatter: ({ value }) =>
           dayjs(value as string).format('YYYY년MM월DD일 HH시'),
@@ -98,6 +97,7 @@ export function BcSettlementHistory({
       {
         headerName: '',
         field: '',
+        width: 80,
         sortable: false,
         renderCell: ({ row }) => (
           <Button

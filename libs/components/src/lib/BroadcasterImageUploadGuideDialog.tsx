@@ -128,7 +128,7 @@ export function BroadcasterImageUploadGuideDialog({
   const title = TITLE[type];
   const body = BODY[type];
   return (
-    <Modal isOpen={isOpen} onClose={onClose} closeOnEsc={false} size="2xl">
+    <Modal isOpen={isOpen} onClose={onClose} size="2xl">
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{title}</ModalHeader>
