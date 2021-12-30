@@ -154,14 +154,12 @@ App, Lib 별 더 자세한 내용은 해당 폴더의 README.md에 있습니다.
 
 ## 커밋메시지 가이드라인
 
-We have very precise rules over how our git commit messages can be formatted. This leads to **more
-readable messages** that are easy to follow when looking through the **project history**. But also,
-we use the git commit messages to **generate the Nest change log**.
+더 읽기 쉬운 커밋 메세지를 장려하기 위해 커밋메시지 규칙을 구성합니다. 커밋 메시지를 강제하기 위해 commitlint 와 husky를 사용했습니다.
+규칙은 간단하여 따르기 쉽습니다.
 
-### Commit Message Format
+### 커밋 메시지 규칙
 
-Each commit message consists of a **header**, a **body** and a **footer**. The header has a special
-format that includes a **type**, a **scope** and a **subject**:
+각 커밋 메시지는 **header**, **body**, **footer** 로 구성됩니다. header는 **type**, **scope**, **subject** 를 포함하도록 하는 특별한 규칙을 가집니다. 
 
 ```
 <type>(<scope>): <subject>
@@ -171,105 +169,54 @@ format that includes a **type**, a **scope** and a **subject**:
 <footer>
 ```
 
-The **header** is mandatory and the **scope** of the header is optional.
+**header**는 필수입니다. **scope** 는 선택사항으로, 작성하거나 작성하지않을 수 있습니다.
 
-Any line of the commit message cannot be longer than 100 characters! This allows the message to be easier
-to read on GitHub as well as in various git tools.
+github과 git과 관련한 여러 tool에서도 읽기 쉬운 커밋메시지를 유지하기 위해 모든 커밋 메시지의 각 라인은 100 자를 초과할 수 없습니다.
 
-Footer should contain a [closing reference to an issue](https://help.github.com/articles/closing-issues-via-commit-messages/) if any.
-
-Samples: (even more [samples](https://github.com/nestjs/nest/commits/master))
+다음은 올바른 커밋 메시지 **header**에 대한 예시입니다.
 
 ```
-docs(changelog): update change log to beta.5
-fix(core): need to depend on latest rxjs and zone.js
+feat: 개인 알림 기능 추가
+fix(overlay): 화면에 오버레이가 뜨지 않는 버그 수정
+docs(api): 방송인 서비스 사용법 문서 수정
 ```
 
 ### Revert
 
-If the commit reverts a previous commit, it should begin with `revert:`, followed by the header of the reverted commit. In the body it should say: `This reverts commit <hash>.`, where the hash is the SHA of the commit being reverted.
+이전 커밋을 되돌리는 경우, 커밋메시지 header에 `revert` 라는 type을 명시해야 합니다. body에는 `This reverts commit <hash>.`, hash는 되돌릴 커밋의 SHA 입니다.
 
 ### Type
 
-Must be one of the following:
+커밋 헤더의 Type은 코드 변경의 유형에 대한 정보입니다. 다음 중 하나가 명시되어야 합니다. (소문자만 허용합니다.)
 
-- **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
-- **chore**: Updating tasks etc; no production code change
-- **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
-- **docs**: Documentation only changes
-- **feat**: A new feature
-- **fix**: A bug fix
-- **perf**: A code change that improves performance
-- **refactor**: A code change that neither fixes a bug nor adds a feature
-- **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-- **test**: Adding missing tests or correcting existing tests
-- **sample**: A change to the samples
-
-### Scope
-
-The scope should be the name of the npm package affected (as perceived by person reading changelog generated from commit messages.
-
-The following is the list of supported scopes:
-
-- **common**
-- **core**
-- **sample**
-- **microservices**
-- **testing**
-- **websockets**
-
-There are currently a few exceptions to the "use package name" rule:
-
-- **packaging**: used for changes that change the npm package layout in all of our packages, e.g. public path changes, package.json changes done to all packages, d.ts file/format changes, changes to bundles, etc.
-- **changelog**: used for updating the release notes in CHANGELOG.md
-- **sample/#**: for the example apps directory, replacing # with the example app number
-- none/empty string: useful for `style`, `test` and `refactor` changes that are done across all packages (e.g. `style: add missing semicolons`)
-  <!-- * **aio**: used for docs-app (angular.io) related changes within the /aio directory of the repo -->
+- **feat**: 새로운 기능
+- **fix**: 버그 수정
+- **perf**: 성능 개선
+- **refactor**: 버그 수정 또는 새로운 기능이 아닌 코드 변경사항
+- **style**: 코딩 스타일 변경사항 (prettier 룰변경, 사용하지 않는 import, 변수 제거 등)
+- **test**: 테스트 파일 작성 또는 수정
+- **docs**: 문서 변경사항
+- **ci**: CI/CD 설정 파일 또는 스크립트 변경사항
+- **chore**: 프로덕션 코드에 대한 변경사항이 없는 작업들
 
 ### Subject
 
-The subject contains succinct description of the change:
+커밋 헤더의 Subject는 변경사항에 대한 간결한 설명을 포함해야 합니다.
 
-- use the imperative, present tense: "change" not "changed" nor "changes"
-- don't capitalize first letter
-- no dot (.) at the end
+- 명령형, 현재시제를 사용합니다.
+   ```
+   O oo 기능 변경
+   X oo 기능 변경했습니다
+   X oo 기능 변경 예정
+   X oo 기능 변경했음
+   ```
+- 마침표는 사용하지 않도록 합니다.
 
 ### Body
 
-Just as in the **subject**, use the imperative, present tense: "change" not "changed" nor "changes".
-The body should include the motivation for the change and contrast this with previous behavior.
+body 부분은 변경 사항을 작업하게 된 배경을 기술하고, 이전의 상태와 비교하는 것이 좋습니다. 또한, 명령형, 현재 시제를 사용합니다.
 
-### Footer
-
-The footer should contain any information about **Breaking Changes** and is also the place to
-reference GitHub issues that this commit **Closes**.
-
-**Breaking Changes** should start with the word `BREAKING CHANGE:` with a space or two newlines. The rest of the commit message is then used for this.
-
-A detailed explanation can be found in this [document][commit-message-format].
-
-<!-- ## <a name="cla"></a> Signing the CLA
-
-Please sign our Contributor License Agreement (CLA) before sending pull requests. For any code
-changes to be accepted, the CLA must be signed. It's a quick process, we promise!
-
-* For individuals we have a [simple click-through form][individual-cla].
-* For corporations we'll need you to
-  [print, sign and one of scan+email, fax or mail the form][corporate-cla]. -->
-
-<!-- [angular-group]: https://groups.google.com/forum/#!forum/angular -->
-
-<!-- [coc]: https://github.com/angular/code-of-conduct/blob/master/CODE_OF_CONDUCT.md -->
-
-[commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
-[corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
-[dev-doc]: https://github.com/nestjs/nest/blob/master/docs/DEVELOPER.md
-[github]: https://github.com/nestjs/nest
-[discord]: https://discordapp.com/invite/G7Qnnhy
-[individual-cla]: http://code.google.com/legal/individual-cla-v1.0.html
-[js-style-guide]: https://google.github.io/styleguide/jsguide.html
-[jsfiddle]: http://jsfiddle.net
-[plunker]: http://plnkr.co/edit
-[runnable]: http://runnable.com
-
-<!-- [stackoverflow]: http://stackoverflow.com/questions/tagged/angular -->
+```
+- 유틸 라이브러리의 빌드 효율성 증대를 위한 변경
+- <특정 함수>가 런타임에서 null 데이터를 확인하지 않아 <특정 기능>이 올바로 수행 되지 않는 점 수정
+```
