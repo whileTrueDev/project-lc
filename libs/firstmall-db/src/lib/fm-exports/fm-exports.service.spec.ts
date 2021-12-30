@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GoodsModule } from '@project-lc/nest-modules';
+import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { exportItemSample, exportSample } from '../../__tests__/exportSample';
 import { FirstmallDbService } from '../firstmall-db.service';

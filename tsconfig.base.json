@@ -10,26 +10,114 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2017", "dom"],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@project-lc/components": ["libs/components/src/index.ts"],
-      "@project-lc/components-core": ["libs/components-core/src/index.ts"],
-      "@project-lc/components-logo": ["libs/components-logo/src/index.ts"],
-      "@project-lc/components-order": ["libs/components-order/src/index.ts"],
-      "@project-lc/firstmall-db": ["libs/firstmall-db/src/index.ts"],
-      "@project-lc/hooks": ["libs/hooks/src/index.ts"],
-      "@project-lc/nest-modules": ["libs/nest-modules/src/index.ts"],
-      "@project-lc/prisma-orm": ["libs/prisma-orm/src/index.ts"],
-      "@project-lc/shared-types": ["libs/shared-types/src/index.ts"],
-      "@project-lc/stores": ["libs/stores/src/index.ts"],
-      "@project-lc/utils": ["libs/utils/src/index.ts"],
-      "@project-lc/utils-backend": ["libs/utils-backend/src/index.ts"],
-      "@project-lc/utils-frontend": ["libs/utils-frontend/src/index.ts"],
-      "@project-lc/utils-s3": ["libs/utils-s3/src/index.ts"]
+      "@project-lc/components": [
+        "libs/components/src/index.ts"
+      ],
+      "@project-lc/components-core": [
+        "libs/components-core/src/index.ts"
+      ],
+      "@project-lc/components-logo": [
+        "libs/components-logo/src/index.ts"
+      ],
+      "@project-lc/components-order": [
+        "libs/components-order/src/index.ts"
+      ],
+      "@project-lc/firstmall-db": [
+        "libs/firstmall-db/src/index.ts"
+      ],
+      "@project-lc/hooks": [
+        "libs/hooks/src/index.ts"
+      ],
+      "@project-lc/nest-core": [
+        "libs/nest-core/src/lib/index.ts"
+      ],
+      "@project-lc/nest-modules-admin": [
+        "libs/nest-modules-admin/src/index.ts"
+      ],
+      "@project-lc/nest-modules-auth": [
+        "libs/nest-modules-auth/src/index.ts"
+      ],
+      "@project-lc/nest-modules-authguard": [
+        "libs/nest-modules-authguard/src/index.ts"
+      ],
+      "@project-lc/nest-modules-broadcaster": [
+        "libs/nest-modules-broadcaster/src/index.ts"
+      ],
+      "@project-lc/nest-modules-cipher": [
+        "libs/nest-modules-cipher/src/index.ts"
+      ],
+      "@project-lc/nest-modules-goods": [
+        "libs/nest-modules-goods/src/index.ts"
+      ],
+      "@project-lc/nest-modules-inquiry": [
+        "libs/nest-modules-inquiry/src/index.ts"
+      ],
+      "@project-lc/nest-modules-jwt-helper": [
+        "libs/nest-modules-jwt-helper/src/index.ts"
+      ],
+      "@project-lc/nest-modules-liveshopping": [
+        "libs/nest-modules-liveshopping/src/index.ts"
+      ],
+      "@project-lc/nest-modules-mail": [
+        "libs/nest-modules-mail/src/index.ts"
+      ],
+      "@project-lc/nest-modules-notice": [
+        "libs/nest-modules-notice/src/index.ts"
+      ],
+      "@project-lc/nest-modules-notification": [
+        "libs/nest-modules-notification/src/index.ts"
+      ],
+      "@project-lc/nest-modules-order-cancel": [
+        "libs/nest-modules-order-cancel/src/index.ts"
+      ],
+      "@project-lc/nest-modules-overlay": [
+        "libs/nest-modules-overlay/src/index.ts"
+      ],
+      "@project-lc/nest-modules-overlay-controller": [
+        "libs/nest-modules-overlay-controller/src/index.ts"
+      ],
+      "@project-lc/nest-modules-s3": [
+        "libs/nest-modules-s3/src/index.ts"
+      ],
+      "@project-lc/nest-modules-seller": [
+        "libs/nest-modules-seller/src/index.ts"
+      ],
+      "@project-lc/nest-modules-shipping-group": [
+        "libs/nest-modules-shipping-group/src/index.ts"
+      ],
+      "@project-lc/prisma-orm": [
+        "libs/prisma-orm/src/index.ts"
+      ],
+      "@project-lc/shared-types": [
+        "libs/shared-types/src/index.ts"
+      ],
+      "@project-lc/stores": [
+        "libs/stores/src/index.ts"
+      ],
+      "@project-lc/utils": [
+        "libs/utils/src/index.ts"
+      ],
+      "@project-lc/utils-backend": [
+        "libs/utils-backend/src/index.ts"
+      ],
+      "@project-lc/utils-frontend": [
+        "libs/utils-frontend/src/index.ts"
+      ],
+      "@project-lc/utils-s3": [
+        "libs/utils-s3/src/index.ts"
+      ]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }

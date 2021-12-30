@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { OverlayControllerModule, LiveShoppingModule } from '@project-lc/nest-modules';
+import { OverlayControllerModule } from '@project-lc/nest-modules-overlay-controller';
+import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { AppController } from './app.controller';
 import { validationSchema } from '../settings/config.validation';
 

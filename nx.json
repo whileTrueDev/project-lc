@@ -51,7 +51,61 @@
     "hooks": {
       "tags": []
     },
-    "nest-modules": {
+    "nest-core": {
+      "tags": []
+    },
+    "nest-modules-admin": {
+      "tags": []
+    },
+    "nest-modules-auth": {
+      "tags": []
+    },
+    "nest-modules-authguard": {
+      "tags": []
+    },
+    "nest-modules-broadcaster": {
+      "tags": []
+    },
+    "nest-modules-cipher": {
+      "tags": []
+    },
+    "nest-modules-goods": {
+      "tags": []
+    },
+    "nest-modules-inquiry": {
+      "tags": []
+    },
+    "nest-modules-jwt-helper": {
+      "tags": []
+    },
+    "nest-modules-liveshopping": {
+      "tags": []
+    },
+    "nest-modules-mail": {
+      "tags": []
+    },
+    "nest-modules-notice": {
+      "tags": []
+    },
+    "nest-modules-notification": {
+      "tags": []
+    },
+    "nest-modules-order-cancel": {
+      "tags": []
+    },
+    "nest-modules-overlay": {
+      "tags": []
+    },
+    "nest-modules-overlay-controller": {
+      "tags": []
+    },
+    "nest-modules-s3": {
+      "tags": []
+    },
+    "nest-modules-seller": {
+      "tags": []
+    },
+    "nest-modules-shipping-group": {
       "tags": []
     },
     "overlay": {

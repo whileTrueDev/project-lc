@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { GoodsModule, LiveShoppingModule } from '@project-lc/nest-modules';
+import { GoodsModule } from '@project-lc/nest-modules-goods';
+import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { FirstmallDbService } from './firstmall-db.service';
 import { FmExportsController } from './fm-exports/fm-exports.controller';
 import { FmExportsService } from './fm-exports/fm-exports.service';

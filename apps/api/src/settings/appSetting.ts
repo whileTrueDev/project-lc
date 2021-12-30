@@ -1,5 +1,5 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { colorizedMorganMiddleware } from '@project-lc/nest-modules';
+import { colorizedMorganMiddleware } from '@project-lc/nest-core';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';

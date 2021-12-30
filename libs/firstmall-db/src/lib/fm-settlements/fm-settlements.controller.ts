@@ -1,5 +1,5 @@
 import { Controller, Get, Header, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
-import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   BroadcasterSettlementReceivableAmountRes,
   BroadcasterSettlementTargetRes,

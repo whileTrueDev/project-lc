@@ -12,7 +12,7 @@ import {
   fmOrderStatuses,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { GoodsService } from '@project-lc/nest-modules';
+import { GoodsService } from '@project-lc/nest-modules-goods';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FMGoodsService } from '../fm-goods/fm-goods.service';
 import { FmOrdersService } from '../fm-orders/fm-orders.service';
