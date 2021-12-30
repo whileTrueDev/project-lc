@@ -18,7 +18,6 @@
             2,
             "always",
             [
-                "build",
                 "chore",
                 "ci",
                 "docs",
@@ -28,8 +27,7 @@
                 "refactor",
                 "revert",
                 "style",
-                "test",
-                "sample"
+                "test"
             ]
         ],
         "type-case": [
