@@ -183,7 +183,7 @@ docs(api): 방송인 서비스 사용법 문서 수정
 
 ### Revert
 
-이전 커밋을 되돌리는 경우, 커밋메시지 header에 `revert` 라는 type을 명시해야 합니다. body에는 `This reverts commit <hash>.`, hash는 되돌릴 커밋의 SHA 입니다.
+이전 커밋을 되돌리는 경우, 커밋메시지 header에 **revert** 라는 type을 명시해야 합니다. body에는 `This reverts commit <hash>.`가 포함되도록 작성하빈다. hash는 되돌릴 커밋의 SHA 입니다.
 
 ### Type
 
