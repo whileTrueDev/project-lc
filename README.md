@@ -22,9 +22,9 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 3. [overlay-controller](./apps/overlay-controller/README.md)  
    [Nest.js + Socket.io](https://docs.nestjs.com/websockets/gateways)로 구성된 WebScoket 서버입니다.
 4. [web](./apps/web/README.md)  
-   [Next.js](https://nextjs.org/)로 구성된 프론트엔드 서버입니다.
-5. [web-e2e](./apps/web-e2e/README.md)  
-   `web` 애플리케이션에 대한 Cypress end to end 테스트 폴더입니다.
+   [Next.js](https://nextjs.org/)로 구성된 판매자센터 프론트엔드 서버입니다.
+5. [web-broadcaster-center](./apps/web-broadcaster-center/README.md)  
+   [Next.js](https://nextjs.org/)로 구성된 방송인센터 프론트엔드 서버입니다.
 
 ### Libs 목록
 
@@ -42,26 +42,36 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 
 4. `prisma-orm`
 
-   데이터베이스 접근 및 모델 정의를 위한 라이브러리로, api, socket과 같이 데이터베이스 접근이 필요한 앱에서 사용될 수 있습니다.
+   데이터베이스 접근 및 모델 정의를 위한 라이브러리로, api, overlay, overlay-controller과 같이 데이터베이스 접근이 필요한 앱에서 사용될 수 있습니다.
    이 라이브러리에 위치한 스키마를 토대로 생성한 Prisma-Client에서 제공되는 Type정의를 React 앱 등에서 사용할 수 있습니다.
 
 5. `shared-types`
 
-   공유되는 Typescript 타입정보는 모두 여기에서 생성되고 관리됩니다. Prisma Client를 통해 백엔드, 프론트엔드간 통신에 대한 타입정의(DTO, EntityType, ...)가 공유될 수 있으므로 비교적 많은 수의 타입이 생성되지 않으리라 생각합니다만, 공유되는 타입은 모두 여기에 정의하고 사용합니다.
+   공유되는 Typescript 타입정보는 모두 여기에서 생성되고 관리됩니다. 공유되는 타입은 모두 여기에 정의하고 사용합니다.
 
 6. `firstmall-db`
 
    독립몰 데이터베이스에의 접근은 모두 이 라이브러리에서 이루어집니다. 원활한 구분을 위해 퍼스트몰과 관련된 DB에 접근하기 위한 service, module등은 모두 `FM` 접두어를 가집니다.
 
-7. `nest-modules`
+7. `nest-core`와 `nest-modules-*`
 
-   nestjs 애플리케이션에서 동시에 사용가능한 모듈의 경우 여기에 정의합니다. 커스텀으로 생성한 Guard(passport strategy 포함), Pipe, Interceptor, Middleware, ExceptionFilter, Custom Decorator 모두 해당 라이브러리에서 정의합니다. 더 자세한 내용은 [libs/nest-modules](./libs/nest-modules/README.md)에서 확인할 수 있습니다.
+   nestjs 애플리케이션에서 동시에 사용가능한 모듈의 경우 여기에 정의합니다. 커스텀으로 생성한 Guard(passport strategy 포함), Pipe, Interceptor, Middleware, ExceptionFilter, Custom Decorator 의 경우 nest-core에, 이외 모든 모듈을 각각 `nest-modules-<이름>` 라이브러리에서 정의합니다.
 
 ## 새 애플리케이션 / 라이브러리 생성하기
 
-필요시, Dan(hwasurr)에게 말씀하세요.  
+App의 경우 필요시, Dan(hwasurr)에게 말씀하세요.  
 자세히 알아보고 싶은 분은 [nrwl/Nx](https://nx.dev/latest/react/getting-started/intro) 에서 알아볼 수 있습니다.  
-새로운 App과 Lib은 임의로 생성하지 마시고, 슬랙에 공표 및 토의 이후 생성하도록 합니다.
+
+lib을 생성하고자 하는 경우, 다음 명령어를 사용해 구성할 수 있습니다.
+
+```bash
+# node library
+yarn nx g @nrwl/node:lib <라이브러리 이름>
+# React library
+yarn nx g @nrwl/react:lib <라이브러리 이름>
+# Nestjs library
+yarn nx g @nrwl/nest:lib <라이브러리 이름>
+```
 
 ## 디펜던시 추가하기
 
@@ -121,7 +131,6 @@ App, Lib 별 더 자세한 내용은 해당 폴더의 README.md에 있습니다.
 - [libs/prisma-orm](./libs/prisma-orm/README.md)
 - [libs/firstmall-db](./libs/firstmall-db/README.md)
 - [libs/shared-types](./libs/shared-types/README.md)
-- [libs/nest-modules](./libs/nest-modules/README.md)
 
 ## 브랜치 전략
 
