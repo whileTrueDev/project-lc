@@ -1,10 +1,10 @@
 import { Container, Divider, Grid, GridItem, Heading, VStack } from '@chakra-ui/react';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
-import { BusinessRegistrationBox } from '@project-lc/components/BusinessRegistrationBox';
-import { SettlementAccountBox } from '@project-lc/components/SettlementAccountBox';
-import { SettlementList } from '@project-lc/components/SettlementList';
-import { SettlementRoundHistory } from '@project-lc/components/SettlementRoundHistory';
-import { SettlementStateBox } from '@project-lc/components/SettlementStateBox';
+import { BusinessRegistrationBox } from '@project-lc/components-seller/BusinessRegistrationBox';
+import { SettlementAccountBox } from '@project-lc/components-seller/SettlementAccountBox';
+import { SettlementList } from '@project-lc/components-seller/SettlementList';
+import { SettlementRoundHistory } from '@project-lc/components-seller/SettlementRoundHistory';
+import { SettlementStateBox } from '@project-lc/components-seller/SettlementStateBox';
 import { useSettlementInfo } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import React, { useMemo } from 'react';

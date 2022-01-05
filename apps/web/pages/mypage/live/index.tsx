@@ -1,6 +1,6 @@
 import { Button, Container, Heading, Stack } from '@chakra-ui/react';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
-import { LiveShoppingList } from '@project-lc/components/LiveShoppingList';
+import { LiveShoppingList } from '@project-lc/components-seller/LiveShoppingList';
 import { useRouter } from 'next/router';
 
 export function Live(): JSX.Element {

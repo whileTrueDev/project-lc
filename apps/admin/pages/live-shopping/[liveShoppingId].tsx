@@ -34,13 +34,13 @@ import { LiveShoppingDetailTitle } from '@project-lc/components-admin/LiveShoppi
 import { LiveShoppingProgressSelector } from '@project-lc/components-admin/LiveShoppingProgressSelector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 import { BroadcasterName } from '@project-lc/components-shared/BroadcasterName';
-import { GoodsDetailCommonInfo } from '@project-lc/components/GoodsDetailCommonInfo';
-import { GoodsDetailImagesInfo } from '@project-lc/components/GoodsDetailImagesInfo';
-import { GoodsDetailInfo } from '@project-lc/components/GoodsDetailInfo';
-import { GoodsDetailOptionsInfo } from '@project-lc/components/GoodsDetailOptionsInfo';
-import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components/GoodsDetailPurchaseLimitInfo';
-import { GoodsDetailShippingInfo } from '@project-lc/components/GoodsDetailShippingInfo';
-import { GoodsDetailSummary } from '@project-lc/components/GoodsDetailSummary';
+import { GoodsDetailCommonInfo } from '@project-lc/components-seller/GoodsDetailCommonInfo';
+import { GoodsDetailImagesInfo } from '@project-lc/components-seller/GoodsDetailImagesInfo';
+import { GoodsDetailInfo } from '@project-lc/components-seller/GoodsDetailInfo';
+import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/GoodsDetailOptionsInfo';
+import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/GoodsDetailPurchaseLimitInfo';
+import { GoodsDetailShippingInfo } from '@project-lc/components-seller/GoodsDetailShippingInfo';
+import { GoodsDetailSummary } from '@project-lc/components-seller/GoodsDetailSummary';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import {
   useAdminGoodsById,

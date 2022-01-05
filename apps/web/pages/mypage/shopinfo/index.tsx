@@ -1,7 +1,7 @@
 import { Container, Divider, Heading, VStack } from '@chakra-ui/react';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
-import { ShopInfoShippingGroup } from '@project-lc/components/ShopInfoShippingGroup';
-import { ShopNameSection } from '@project-lc/components/ShopNameSection';
+import { ShopInfoShippingGroup } from '@project-lc/components-seller/ShopInfoShippingGroup';
+import { ShopNameSection } from '@project-lc/components-seller/ShopNameSection';
 
 export function ShopInfoIndex(): JSX.Element {
   return (

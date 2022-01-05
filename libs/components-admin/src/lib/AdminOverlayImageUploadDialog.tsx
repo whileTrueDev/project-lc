@@ -23,7 +23,7 @@ import {
   GoodsPreviewItem,
   Preview,
   readAsDataURL,
-} from '@project-lc/components/GoodsRegistPictures';
+} from '@project-lc/components-seller/GoodsRegistPictures';
 import { s3 } from '@project-lc/utils-s3';
 import { useEffect, useState } from 'react';
 

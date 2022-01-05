@@ -30,14 +30,14 @@
       "@project-lc/components-layout/*": [
         "libs/components-layout/src/lib/*"
       ],
+      "@project-lc/components-seller/*": [
+        "libs/components-seller/src/lib/*"
+      ],
       "@project-lc/components-shared/*": [
         "libs/components-shared/src/lib/*"
       ],
       "@project-lc/components-web-bc/*": [
         "libs/components-web-bc/src/lib/*"
-      ],
-      "@project-lc/components/*": [
-        "libs/components/src/lib/*"
       ],
       "@project-lc/firstmall-db": [
         "libs/firstmall-db/src/index.ts"

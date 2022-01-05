@@ -16,18 +16,18 @@ import { SellerOrderCancelRequestStatus } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
-import { OrderCancelRequestExistAlert } from '@project-lc/components/OrderCancelRequestExistAlert';
-import { OrderDetailActions } from '@project-lc/components/OrderDetailActions';
-import { OrderDetailDeliveryInfo } from '@project-lc/components/OrderDetailDeliveryInfo';
-import { OrderDetailExportInfo } from '@project-lc/components/OrderDetailExportInfo';
-import { OrderDetailGoods } from '@project-lc/components/OrderDetailGoods';
-import { OrderDetailOptionList } from '@project-lc/components/OrderDetailOptionList';
-import { OrderDetailRefundInfo } from '@project-lc/components/OrderDetailRefundInfo';
-import { OrderDetailReturnInfo } from '@project-lc/components/OrderDetailReturnInfo';
-import { OrderDetailSummary } from '@project-lc/components/OrderDetailSummary';
-import { OrderDetailTitle } from '@project-lc/components/OrderDetailTitle';
-import { OrderRefundExistsAlert } from '@project-lc/components/OrderRefundExistsAlert';
-import { OrderReturnExistsAlert } from '@project-lc/components/OrderReturnExistsAlert';
+import { OrderCancelRequestExistAlert } from '@project-lc/components-seller/OrderCancelRequestExistAlert';
+import { OrderDetailActions } from '@project-lc/components-seller/OrderDetailActions';
+import { OrderDetailDeliveryInfo } from '@project-lc/components-seller/OrderDetailDeliveryInfo';
+import { OrderDetailExportInfo } from '@project-lc/components-seller/OrderDetailExportInfo';
+import { OrderDetailGoods } from '@project-lc/components-seller/OrderDetailGoods';
+import { OrderDetailOptionList } from '@project-lc/components-seller/OrderDetailOptionList';
+import { OrderDetailRefundInfo } from '@project-lc/components-seller/OrderDetailRefundInfo';
+import { OrderDetailReturnInfo } from '@project-lc/components-seller/OrderDetailReturnInfo';
+import { OrderDetailSummary } from '@project-lc/components-seller/OrderDetailSummary';
+import { OrderDetailTitle } from '@project-lc/components-seller/OrderDetailTitle';
+import { OrderRefundExistsAlert } from '@project-lc/components-seller/OrderRefundExistsAlert';
+import { OrderReturnExistsAlert } from '@project-lc/components-seller/OrderReturnExistsAlert';
 import {
   useDisplaySize,
   useFmOrder,

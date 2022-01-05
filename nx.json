@@ -33,9 +33,6 @@
     "api": {
       "tags": []
     },
-    "components": {
-      "tags": []
-    },
     "components-admin": {
       "tags": []
     },
@@ -46,6 +43,9 @@
       "tags": []
     },
     "components-layout": {
+      "tags": []
+    },
+    "components-seller": {
       "tags": []
     },
     "components-shared": {

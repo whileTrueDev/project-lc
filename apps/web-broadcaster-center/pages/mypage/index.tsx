@@ -1,11 +1,11 @@
 import { Container, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
 import { broadcasterCenterMypageNavLinks } from '@project-lc/components-constants/navigation';
+import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAlertBox';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeSection';
 import { BroadcasterStatusSection } from '@project-lc/components-web-bc/BroadcasterStatusSection';
 import { UrlCard } from '@project-lc/components-web-bc/guide/OverlayUrlCard';
-import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { MypageLiveShoppingSection } from '@project-lc/components-web-bc/MypageLiveShoppingSection';
-import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeSection';
-import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAlertBox';
 import { StartGuideCard } from '@project-lc/components-web-bc/StartGuideCard';
 import { StartGuideSection } from '@project-lc/components-web-bc/StartGuideSection';
 import { useBroadcasterContacts, useProfile } from '@project-lc/hooks';

@@ -1,11 +1,11 @@
 import { Box, Button, Center, Stack, Text } from '@chakra-ui/react';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
-import { ExportDetailActions } from '@project-lc/components/ExportDetailActions';
-import { ExportDetailItems } from '@project-lc/components/ExportDetailItems';
-import { ExportDetailSummary } from '@project-lc/components/ExportDetailSummary';
-import { ExportDetailTitle } from '@project-lc/components/ExportDetailTitle';
-import { OrderDetailDeliveryInfo } from '@project-lc/components/OrderDetailDeliveryInfo';
+import { ExportDetailActions } from '@project-lc/components-seller/ExportDetailActions';
+import { ExportDetailItems } from '@project-lc/components-seller/ExportDetailItems';
+import { ExportDetailSummary } from '@project-lc/components-seller/ExportDetailSummary';
+import { ExportDetailTitle } from '@project-lc/components-seller/ExportDetailTitle';
+import { OrderDetailDeliveryInfo } from '@project-lc/components-seller/OrderDetailDeliveryInfo';
 import { useFmExport } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';

@@ -15,7 +15,7 @@ import {
   GOODS_STATUS,
 } from '@project-lc/components-constants/goodsStatus';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { ShippingGroupDetailButton } from '@project-lc/components/SellerGoodsList';
+import { ShippingGroupDetailButton } from '@project-lc/components-seller/SellerGoodsList';
 import { useAdminGoodsList, useDisplaySize, useProfile } from '@project-lc/hooks';
 import { SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';

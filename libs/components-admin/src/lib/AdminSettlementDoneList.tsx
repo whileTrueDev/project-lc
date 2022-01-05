@@ -9,7 +9,7 @@ import {
   Tr,
   useDisclosure,
 } from '@chakra-ui/react';
-import { SettlementInfoDialog } from '@project-lc/components/SettlementInfoDialog';
+import { SettlementInfoDialog } from '@project-lc/components-seller/SettlementInfoDialog';
 import { IAdminSettlementDoneList, useAdminSettlementDoneList } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { useState } from 'react';

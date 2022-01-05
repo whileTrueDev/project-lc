@@ -1,6 +1,6 @@
 import { Button, Text, useDisclosure } from '@chakra-ui/react';
-import { useLogout } from '@project-lc/hooks';
 import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
+import { useLogout } from '@project-lc/hooks';
 import AccountRemoveDialog from './AccountRemoveDialog';
 
 export function AccountRemoveSection(): JSX.Element {
