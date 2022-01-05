@@ -5,7 +5,7 @@ if [ "$VERCEL_GIT_COMMIT_REF" != "master" ] && [ "$VERCEL_GIT_COMMIT_REF" != "de
     exit 0;
 fi
 # Name of the app to check. Change this to your application name!
-APP=web
+APP=web-seller
 # Determine version of Nx installed
 NX_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@nrwl/workspace'])")
 

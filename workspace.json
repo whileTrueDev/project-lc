@@ -1150,67 +1150,6 @@
         }
       }
     },
-    "web": {
-      "root": "apps/web",
-      "sourceRoot": "apps/web",
-      "projectType": "application",
-      "targets": {
-        "build": {
-          "executor": "@nrwl/next:build",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "root": "apps/web",
-            "outputPath": "dist/apps/web"
-          },
-          "configurations": {
-            "production": {}
-          }
-        },
-        "postbuild": {
-          "executor": "@nrwl/workspace:run-commands",
-          "options": {
-            "commands": [
-              {
-                "command": "next-sitemap --config apps/web/next-sitemap.js"
-              }
-            ]
-          }
-        },
-        "serve": {
-          "executor": "@nrwl/next:server",
-          "options": {
-            "buildTarget": "web:build",
-            "dev": true
-          },
-          "configurations": {
-            "production": {
-              "buildTarget": "web:build:production",
-              "dev": false
-            }
-          }
-        },
-        "export": {
-          "executor": "@nrwl/next:export",
-          "options": {
-            "buildTarget": "web:build:production"
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/web"],
-          "options": {
-            "jestConfig": "apps/web/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/web/**/*.{ts,tsx,js,jsx}"]
-          }
-        }
-      }
-    },
     "web-broadcaster-center": {
       "root": "apps/web-broadcaster-center",
       "sourceRoot": "apps/web-broadcaster-center",
@@ -1272,6 +1211,67 @@
           }
         }
       }
+    },
+    "web-seller": {
+      "root": "apps/web-seller",
+      "sourceRoot": "apps/web-seller",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/next:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "root": "apps/web-seller",
+            "outputPath": "dist/apps/web-seller"
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "postbuild": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              {
+                "command": "next-sitemap --config apps/web-seller/next-sitemap.js"
+              }
+            ]
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/next:server",
+          "options": {
+            "buildTarget": "web-seller:build",
+            "dev": true
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "web-seller:build:production",
+              "dev": false
+            }
+          }
+        },
+        "export": {
+          "executor": "@nrwl/next:export",
+          "options": {
+            "buildTarget": "web-seller:build:production"
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/web-seller"],
+          "options": {
+            "jestConfig": "apps/web-seller/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/web-seller/**/*.{ts,tsx,js,jsx}"]
+          }
+        }
+      }
     }
   },
   "cli": {
@@ -1290,5 +1290,5 @@
       }
     }
   },
-  "defaultProject": "web"
+  "defaultProject": "web-seller"
 }

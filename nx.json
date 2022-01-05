@@ -147,10 +147,10 @@
     "utils-s3": {
       "tags": []
     },
-    "web": {
+    "web-broadcaster-center": {
       "tags": []
     },
-    "web-broadcaster-center": {
+    "web-seller": {
       "tags": []
     }
   }
