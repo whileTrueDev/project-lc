@@ -77,3 +77,5 @@ export function OrderDetailDeliveryInfo({
     </SimpleGrid>
   );
 }
+
+export default OrderDetailDeliveryInfo;

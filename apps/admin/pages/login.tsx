@@ -1,5 +1,5 @@
 import { Box, Flex } from '@chakra-ui/react';
-import { AdminLoginForm } from '@project-lc/components';
+import { AdminLoginForm } from '@project-lc/components-admin/AdminLoginForm';
 
 export function Login(): JSX.Element {
   return (

@@ -7,7 +7,9 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { ChakraNextImage } from '@project-lc/components-core';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
+import { FmOrderStatusBadge } from '@project-lc/components-shared/FmOrderStatusBadge';
 import {
   convertFmDeliveryCompanyToString,
   FindFmOrderDetailRes,
@@ -18,7 +20,7 @@ import {
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useMemo } from 'react';
-import { FmOrderStatusBadge, OrderDetailOptionListItem, TextDotConnector } from '..';
+import { OrderDetailOptionListItem } from './OrderDetailOptionList';
 
 /** 주문 출고 정보 */
 export function OrderDetailExportInfo({
@@ -153,3 +155,5 @@ export function OrderDetailExportInfoItem({
     </Box>
   );
 }
+
+export default OrderDetailExportInfo;

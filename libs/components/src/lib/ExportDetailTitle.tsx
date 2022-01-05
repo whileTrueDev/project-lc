@@ -1,8 +1,8 @@
 import { Badge, Box, Heading, HStack, Text } from '@chakra-ui/react';
+import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { FmExportRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { FmOrderStatusBadge } from './FmOrderStatusBadge';
-import { TextDotConnector } from './TextDotConnector';
+import { FmOrderStatusBadge } from '@project-lc/components-shared/FmOrderStatusBadge';
 
 export interface ExportDetailTitleProps {
   exportData: FmExportRes;
@@ -23,3 +23,5 @@ export function ExportDetailTitle({ exportData }: ExportDetailTitleProps): JSX.E
     </Box>
   );
 }
+
+export default ExportDetailTitle;

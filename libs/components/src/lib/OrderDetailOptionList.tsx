@@ -11,10 +11,12 @@ import {
   Tr,
   useDisclosure,
 } from '@chakra-ui/react';
+import ShowMoreTextButton from '@project-lc/components-shared/ShowMoreTextButton';
+import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
+import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
 import { useDisplaySize } from '@project-lc/hooks';
 import { FmOrderOption } from '@project-lc/shared-types';
 import { useMemo } from 'react';
-import { FmOrderStatusBadge, ShowMoreTextButton, TextDotConnector } from '..';
 
 /** 주문 옵션 목록 */
 export function OrderDetailOptionList({

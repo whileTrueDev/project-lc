@@ -1,7 +1,7 @@
 import { Button, Text, useDisclosure } from '@chakra-ui/react';
 import { useLogout } from '@project-lc/hooks';
+import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
 import AccountRemoveDialog from './AccountRemoveDialog';
-import SettingSectionLayout from './SettingSectionLayout';
 
 export function AccountRemoveSection(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();

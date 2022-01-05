@@ -22,12 +22,12 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
+import { FmReturnStatusBadge } from '@project-lc/components-shared/FmReturnStatusBadge';
 import { useUpdateReturnStatusMutation } from '@project-lc/hooks';
 import { FmOrderReturnBase } from '@project-lc/shared-types';
 import { useForm } from 'react-hook-form';
 import { AiFillWarning } from 'react-icons/ai';
 import { RiErrorWarningFill } from 'react-icons/ri';
-import { FmReturnStatusBadge } from './FmReturnStatusBadge';
 
 interface OrderRetusnStatusForm {
   status: FmOrderReturnBase['status'];

@@ -150,3 +150,4 @@ export function BusinessRegistrationDialog(
     </Modal>
   );
 }
+export default BusinessRegistrationDialog;

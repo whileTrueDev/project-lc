@@ -16,7 +16,7 @@ import { liveShoppingRegist } from '@project-lc/stores';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-export function LiveShoppingManagerPhoneNumber(): JSX.Element {
+export function LiveShoppingManagerContacts(): JSX.Element {
   const { setDefault, handleSetDefault } = liveShoppingRegist();
   const { data: profileData } = useProfile();
   const { data } = useDefaultContacts({
@@ -257,4 +257,4 @@ export function LiveShoppingManagerPhoneNumber(): JSX.Element {
   );
 }
 
-export default LiveShoppingManagerPhoneNumber;
+export default LiveShoppingManagerContacts;

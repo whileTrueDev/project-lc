@@ -1,5 +1,6 @@
-import { Heading, Container } from '@chakra-ui/react';
-import { GoodsRegistForm, MypageLayout } from '@project-lc/components';
+import { Container, Heading } from '@chakra-ui/react';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { GoodsRegistForm } from '@project-lc/components/GoodsRegistForm';
 
 export function Goods(): JSX.Element {
   return (

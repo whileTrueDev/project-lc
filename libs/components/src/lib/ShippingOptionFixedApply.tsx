@@ -1,11 +1,11 @@
 import { Button, Input, Select, Stack, Text } from '@chakra-ui/react';
 import { ShippingSetType } from '@prisma/client';
+import { KOREA_PROVINCES } from '@project-lc/components-constants/address';
+import { ErrorText } from '@project-lc/components-core/ErrorText';
 import { MAX_COST, ShippingCostDto, ShippingOptionDto } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useCallback, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { KOREA_PROVINCES } from '../constants/address';
-import { ErrorText } from './ShippingOptionIntervalApply';
 
 /** 지역선택 셀렉트박스 강조 스타일 */
 export const areaSelectStyle = {

@@ -20,6 +20,7 @@ import {
   Tr,
   useColorModeValue,
 } from '@chakra-ui/react';
+import TextDotConnector from '@project-lc/components-core/TextDotConnector';
 import {
   useFmOrder,
   useOrderExportableCheck,
@@ -35,9 +36,8 @@ import { fmExportStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useEffect, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { OrderDetailGoods } from '..';
-import FmOrderStatusBadge from './FmOrderStatusBadge';
-import TextDotConnector from './TextDotConnector';
+import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
+import { OrderDetailGoods } from './OrderDetailGoods';
 
 export interface ExportOrderOptionListProps {
   orderId: string;
@@ -509,3 +509,4 @@ export function ExportOrderOptionItem({
     </Tr>
   );
 }
+export default ExportOrderOptionList;

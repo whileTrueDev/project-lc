@@ -65,12 +65,10 @@ App의 경우 필요시, Dan(hwasurr)에게 말씀하세요.
 lib을 생성하고자 하는 경우, 다음 명령어를 사용해 구성할 수 있습니다.
 
 ```bash
-# node library
-yarn nx g @nrwl/node:lib <라이브러리 이름>
 # React library
 yarn nx g @nrwl/react:lib <라이브러리 이름>
 # Nestjs library
-yarn nx g @nrwl/nest:lib <라이브러리 이름>
+yarn nx g @nrwl/nest:lib <라이브러리 이름(ex. nest-modules-lib1)>
 ```
 
 ## 디펜던시 추가하기

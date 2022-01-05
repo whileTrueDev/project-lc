@@ -12,12 +12,12 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { useCreateGoodsCommonInfo, useProfile, useRegistGoods } from '@project-lc/hooks';
 import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { useRouter } from 'next/router';
 import { FormProvider, NestedValue, useForm } from 'react-hook-form';
-import { ConfirmDialog } from './ConfirmDialog';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
 import GoodsRegistDataOptions from './GoodsRegistDataOptions';

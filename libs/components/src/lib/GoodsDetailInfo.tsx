@@ -1,8 +1,8 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
+import { GOODS_CANCEL_TYPE } from '@project-lc/components-constants/goodsRegistTypes';
+import { GoodsConfirmStatusBadge } from '@project-lc/components-shared/GoodsConfirmStatusBadge';
+import GoodsStatusBadge from '@project-lc/components-shared/GoodsStatusBadge';
 import { GoodsByIdRes } from '@project-lc/shared-types';
-import { GoodsConfirmStatusBadge } from './GoodsConfirmStatusBadge';
-import { GOODS_CANCEL_TYPE } from './GoodsRegistDataSales';
-import GoodsStatusBadge from './GoodsStatusBadge';
 
 export interface GoodsDetailInfoProps {
   goods: GoodsByIdRes;

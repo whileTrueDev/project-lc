@@ -7,10 +7,13 @@ import {
   Select,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
+import {
+  useDialogHeaderConfig,
+  useDialogValueConfig,
+} from '@project-lc/components-layout/GridTableItem';
 import { banks } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
-import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
-import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 import { SettlementAccountFormDto } from './SettlementAccountDialog';
 
 export function SettlementAccountForm(): JSX.Element {
@@ -133,3 +136,5 @@ export function SettlementAccountForm(): JSX.Element {
     </Grid>
   );
 }
+
+export default SettlementAccountForm;

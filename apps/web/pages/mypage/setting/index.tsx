@@ -1,11 +1,9 @@
-import {
-  MypageLayout,
-  ProfileBox,
-  PasswordSection,
-  AccountRemoveSection,
-  SocialAccountUnlinkSection,
-} from '@project-lc/components';
-import { Heading, VStack, Divider, Container } from '@chakra-ui/react';
+import { Container, Divider, Heading, VStack } from '@chakra-ui/react';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { PasswordSection } from '@project-lc/components-shared/PasswordSection';
+import { ProfileBox } from '@project-lc/components-shared/ProfileBox';
+import { SocialAccountUnlinkSection } from '@project-lc/components-shared/SocialAccountUnlinkSection';
+import { AccountRemoveSection } from '@project-lc/components/AccountRemoveSection';
 import React from 'react';
 
 export function Setting(): JSX.Element {

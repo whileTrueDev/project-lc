@@ -21,7 +21,7 @@ import {
   useMergeRefs,
   useToast,
 } from '@chakra-ui/react';
-import { ChakraAutoComplete } from '@project-lc/components-core';
+import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
 import {
   useApprovedGoodsList,
   useCreateLiveShoppingMutation,
@@ -42,10 +42,10 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { Goods } from '.prisma/client';
-import LiveShoppingManagerPhoneNumber from './LiveShoppingRegistManagerContacts';
-import LiveShoppingRequestInput from './LiveShoppingRegistRequestField';
+import LiveShoppingRegistManagerContacts from './LiveShoppingRegistManagerContacts';
+import LiveShoppingRegistRequestField from './LiveShoppingRegistRequestField';
 
-export function LiveShoppingRegist(): JSX.Element {
+export function LiveShoppingRegistForm(): JSX.Element {
   const { selectedGoods, handleGoodsSelect, setDefault } = liveShoppingRegist();
   const { data: profileData } = useProfile();
   const { mutateAsync, isLoading } = useCreateLiveShoppingMutation();
@@ -173,13 +173,13 @@ export function LiveShoppingRegist(): JSX.Element {
                 )}
               </Stack>
               {/* 담당자 연락처 */}
-              <LiveShoppingManagerPhoneNumber />
+              <LiveShoppingRegistManagerContacts />
               {/* 희망 진행 기간 */}
               <LiveShoppingDesiredPeriod />
               {/* 희망 판매 수수료 */}
               <LiveShoppingDesiredCommission />
               {/* 요청사항 */}
-              <LiveShoppingRequestInput />
+              <LiveShoppingRegistRequestField />
               {/* 완료 버튼 */}
               <Flex>
                 <Button
@@ -198,8 +198,6 @@ export function LiveShoppingRegist(): JSX.Element {
     </>
   );
 }
-
-export default LiveShoppingRegist;
 
 function LiveShoppingDesiredPeriod(): JSX.Element {
   const {
@@ -334,3 +332,4 @@ function GoodsSummary({ goodsId }: GoodsSummaryProps): JSX.Element | null {
     </Flex>
   );
 }
+export default LiveShoppingRegistForm;

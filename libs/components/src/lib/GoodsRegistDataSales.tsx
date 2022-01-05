@@ -3,21 +3,17 @@ import { HStack, Text } from '@chakra-ui/layout';
 import { Radio, RadioGroup } from '@chakra-ui/radio';
 import { RadioGroupProps, Stack } from '@chakra-ui/react';
 import { GoodsStatus } from '@prisma/client';
+import { GOODS_CANCEL_TYPE } from '@project-lc/components-constants/goodsRegistTypes';
+import TextWithPopperButton from '@project-lc/components-core/TextWithPopperButton';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { RegistGoodsDto } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
-import SectionWithTitle from './SectionWithTitle';
-import TextWithPopperButton from './TextWithPopperButton';
 
 // 상품등록 - 판매정보
 const GOODS_STATUS: { value: GoodsStatus; label: string }[] = [
   { value: 'normal', label: '정상' },
   { value: 'purchasing', label: '재고확보중' },
   { value: 'unsold', label: '판매중지' },
-];
-// 상품등록 - 청약철회
-export const GOODS_CANCEL_TYPE: { value: '0' | '1'; label: string }[] = [
-  { value: '0', label: '가능' },
-  { value: '1', label: '불가 (취소/교환/반품 불가)' },
 ];
 
 export type GoodsRegistRadioName = keyof Omit<RegistGoodsDto, 'options' | 'image'>;

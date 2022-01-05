@@ -1,16 +1,16 @@
 import {
+  FormControl,
+  FormLabel,
+  HStack,
+  Input,
   Radio,
   RadioGroup,
   Text,
-  Input,
-  HStack,
-  FormControl,
-  FormLabel,
 } from '@chakra-ui/react';
+import { ErrorText } from '@project-lc/components-core/ErrorText';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { RegistGoodsDto } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
-import SectionWithTitle from './SectionWithTitle';
-import { ErrorText } from './ShippingOptionIntervalApply';
 
 export function GoodsRegistExtraInfo(): JSX.Element {
   const {

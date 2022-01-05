@@ -1,11 +1,11 @@
+import { SummaryList } from '@project-lc/components-core/SummaryList';
 import {
   convertFmDeliveryCompanyToString,
   convertFmExportConfirmStatusToString,
   FmExportRes,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { FaHamburger, FaBoxOpen, FaShippingFast, FaCalendarAlt } from 'react-icons/fa';
-import { SummaryList } from './SummaryList';
+import { FaBoxOpen, FaCalendarAlt, FaHamburger, FaShippingFast } from 'react-icons/fa';
 
 export interface ExportDetailSummaryProps {
   exportData: FmExportRes;
@@ -72,3 +72,4 @@ export function ExportDetailSummary({
     />
   );
 }
+export default ExportDetailSummary;

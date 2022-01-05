@@ -1,15 +1,13 @@
 import { Heading, Stack, Text } from '@chakra-ui/react';
+import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
+import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
+import FmRefundStatusBadge from '@project-lc/components-shared/FmRefundStatusBadge';
+import FmReturnStatusBadge from '@project-lc/components-shared/FmReturnStatusBadge';
 import { useOrderReturnOrRefundStatus } from '@project-lc/hooks';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import {
-  FmOrderStatusBadge,
-  FmRefundStatusBadge,
-  FmReturnStatusBadge,
-  TextDotConnector,
-} from '..';
 
 dayjs.locale('ko');
 dayjs.extend(relativeTime);
@@ -40,3 +38,5 @@ export function OrderDetailTitle({ order }: OrderDetailTitleProps): JSX.Element 
     </>
   );
 }
+
+export default OrderDetailTitle;

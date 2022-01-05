@@ -9,9 +9,9 @@ import {
   Select,
   Stack,
   Text,
-  TextProps,
   useBoolean,
 } from '@chakra-ui/react';
+import { BoldText } from '@project-lc/components-core/BoldText';
 import { useAddShippingSetHandler } from '@project-lc/hooks';
 import {
   PrepayInfoOptions,
@@ -35,17 +35,6 @@ function InputWrapperText({
       <Text width={{ base: '100%', md: '30%' }}>{text}</Text>
       {children}
     </Stack>
-  );
-}
-
-export function BoldText({
-  children,
-  ...rest
-}: { children: React.ReactNode } & TextProps): JSX.Element {
-  return (
-    <Text fontWeight="bold" {...rest}>
-      {children}
-    </Text>
   );
 }
 

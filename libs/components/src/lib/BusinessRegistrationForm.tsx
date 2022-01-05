@@ -8,12 +8,15 @@ import {
   useColorModeValue,
   useMergeRefs,
 } from '@chakra-ui/react';
+import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
+import {
+  useDialogHeaderConfig,
+  useDialogValueConfig,
+} from '@project-lc/components-layout/GridTableItem';
 import { forwardRef, MutableRefObject } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { BusinessRegistrationFormDto } from './BusinessRegistrationDialog';
 import { BusinessRegistrationMailOrderNumerSection } from './BusinessRegistrationMailOrderNumerSection';
-import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
-import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 
 export interface BusinessRegistrationFormProps {
   inputRef: MutableRefObject<null>;
@@ -234,3 +237,5 @@ export const BusinessRegistrationForm = forwardRef(
     return <BusinessRegistrationFormTag {...props} inputRef={ref} />;
   },
 );
+
+export default BusinessRegistrationForm;

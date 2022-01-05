@@ -7,7 +7,7 @@ import { AiTwotoneEnvironment } from 'react-icons/ai';
 import { FaBoxOpen, FaShippingFast, FaShoppingBag, FaUser } from 'react-icons/fa';
 
 import { MdDateRange } from 'react-icons/md';
-import { SummaryList } from './SummaryList';
+import { SummaryList } from '@project-lc/components-core/SummaryList';
 
 export interface OrderDetailSummaryProps {
   order: FindFmOrderDetailRes;
@@ -64,3 +64,5 @@ export function OrderDetailSummary({ order }: OrderDetailSummaryProps): JSX.Elem
     />
   );
 }
+
+export default OrderDetailSummary;

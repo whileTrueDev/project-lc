@@ -11,22 +11,23 @@ import {
 } from '@chakra-ui/react';
 import { GridColumns, GridSelectionModel } from '@material-ui/data-grid';
 import { GoodsConfirmationStatuses, GoodsStatus, GoodsView } from '@prisma/client';
-import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
-import { SellerGoodsSortColumn } from '@project-lc/shared-types';
-import { useSellerGoodsListPanelStore } from '@project-lc/stores';
-import dayjs from 'dayjs';
-import NextLink from 'next/link';
-import { useState } from 'react';
-import { ChakraDataGrid } from '@project-lc/components-core';
 import {
   GOODS_CONFIRMATION_STATUS,
   GOODS_STATUS,
   GOODS_VIEW,
-} from '../constants/goodsStatus';
+} from '@project-lc/components-constants/goodsStatus';
+import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
+import TextWithPopperButton from '@project-lc/components-core/TextWithPopperButton';
+import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
+import { GoodsByIdRes, SellerGoodsSortColumn } from '@project-lc/shared-types';
+import { useSellerGoodsListPanelStore } from '@project-lc/stores';
+import dayjs from 'dayjs';
+import NextLink from 'next/link';
+import { useState } from 'react';
 import DeleteGoodsAlertDialog from './DeleteGoodsAlertDialog';
+import GoodsEditButton from './GoodsEditButton';
 import { GoodsExposeSwitch } from './GoodsExposeSwitch';
-import { ShippingGroupDetailModal } from './GoodsRegistShippingPolicy';
-import TextWithPopperButton from './TextWithPopperButton';
+import { ShippingGroupDetailModal } from './ShippingGroupDetailModal';
 
 function formatPrice(price: number): string {
   const formattedPrice = price.toLocaleString();
@@ -75,36 +76,6 @@ export function ShippingGroupDetailButton(props: {
         groupId={id}
       />
     </>
-  );
-}
-
-/** 상품 수정 페이지로 이동하는 링크 */
-export function GoodsEditButton({
-  goodsId,
-  onLiveShopping = false,
-}: {
-  goodsId: number | string;
-  onLiveShopping?: boolean;
-}): JSX.Element {
-  // 라이브쇼핑 진행중인 상품의 경우
-  if (onLiveShopping) return <GoodsEditDisabledText />;
-  return (
-    <NextLink href={`/mypage/goods/edit/${goodsId}`} passHref>
-      <Link>
-        <Text
-          borderWidth="1px"
-          borderRadius="md"
-          textAlign="center"
-          lineHeight="1.2"
-          fontWeight="semibold"
-          fontSize="sm"
-          height={8}
-          p={2}
-        >
-          수정하기
-        </Text>
-      </Link>
-    </NextLink>
   );
 }
 
@@ -332,9 +303,7 @@ const columns: GridColumns = [
     headerName: '관리',
     minWidth: 60,
     renderCell: ({ row }) => {
-      const goodsId = row.id;
-      const goodsOnLiveShopping = row.onLiveShopping;
-      return <GoodsEditButton goodsId={goodsId} onLiveShopping={goodsOnLiveShopping} />;
+      return <GoodsEditButton goods={row as GoodsByIdRes} />;
     },
   },
 ];

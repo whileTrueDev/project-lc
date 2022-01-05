@@ -16,6 +16,9 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import {
   useDeleteGoodsImageMutation,
   useGoodsImageMutation,
@@ -23,10 +26,7 @@ import {
 } from '@project-lc/hooks';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { ChakraNextImage } from '@project-lc/components-core';
 import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
-import { ImageInput, ImageInputErrorTypes } from './ImageInput';
-import SectionWithTitle from './SectionWithTitle';
 
 // 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
 // 상품사진은 file 로 들어옴

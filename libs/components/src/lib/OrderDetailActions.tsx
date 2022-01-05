@@ -8,6 +8,8 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
 import { useChangeFmOrderStatusMutation } from '@project-lc/hooks';
 import {
   FindFmOrderDetailRes,
@@ -16,9 +18,7 @@ import {
 } from '@project-lc/shared-types';
 import { useCallback } from 'react';
 import { FaTruck } from 'react-icons/fa';
-import { ConfirmDialog } from './ConfirmDialog';
 import ExportDialog from './ExportDialog';
-import FmOrderStatusBadge from './FmOrderStatusBadge';
 import OrderCancelRequestDialog from './OrderCancelRequestDialog';
 
 export interface OrderDetailActionsProps {
@@ -108,3 +108,5 @@ export function OrderDetailActions({ order }: OrderDetailActionsProps): JSX.Elem
     </>
   );
 }
+
+export default OrderDetailActions;

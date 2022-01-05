@@ -1,13 +1,13 @@
+import { InfoIcon } from '@chakra-ui/icons';
+import { Stack, Text } from '@chakra-ui/react';
+import { SummaryList } from '@project-lc/components-core/SummaryList';
 import { GoodsByIdRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { Text, Stack } from '@chakra-ui/react';
 import { AiTwotoneExperiment } from 'react-icons/ai';
 import { BsFillDisplayFill } from 'react-icons/bs';
 import { FaImages } from 'react-icons/fa';
 import { MdDateRange } from 'react-icons/md';
-import { InfoIcon } from '@chakra-ui/icons';
-import { SummaryList } from '..';
-import { GOODS_CONFIRMATION_STATUS } from '../constants/goodsStatus';
+import { GOODS_CONFIRMATION_STATUS } from '@project-lc/components-constants/goodsStatus';
 
 export interface GoodsDetailSummaryProps {
   goods: GoodsByIdRes;

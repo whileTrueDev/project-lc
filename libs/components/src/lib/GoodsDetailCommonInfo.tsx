@@ -1,6 +1,6 @@
 import { Stack, Text } from '@chakra-ui/react';
+import { TextViewerWithDetailModal } from '@project-lc/components-shared/TextViewerWithDetailModal';
 import { GoodsByIdRes } from '@project-lc/shared-types';
-import { TextViewerWithDetailModal } from '..';
 
 export interface GoodsDetailCommonInfoProps {
   goods: GoodsByIdRes;

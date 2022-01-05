@@ -1,16 +1,16 @@
 import {
-  Flex,
-  Text,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
   Box,
+  Flex,
   Grid,
   GridItem,
+  Stat,
+  StatHelpText,
+  StatLabel,
+  StatNumber,
+  Text,
 } from '@chakra-ui/react';
-import { AiFillShopping, AiFillInteraction } from 'react-icons/ai';
 import { useFmOrdersStats } from '@project-lc/hooks';
+import { AiFillInteraction, AiFillShopping } from 'react-icons/ai';
 
 export function MypageSalesStats(): JSX.Element {
   const { data } = useFmOrdersStats();
@@ -74,3 +74,5 @@ export function MypageSalesStats(): JSX.Element {
     </Grid>
   );
 }
+
+export default MypageSalesStats;

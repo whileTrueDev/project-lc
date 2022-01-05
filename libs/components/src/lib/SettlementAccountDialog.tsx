@@ -111,3 +111,5 @@ export function SettlementAccountDialog(
     </Modal>
   );
 }
+
+export default SettlementAccountDialog;

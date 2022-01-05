@@ -13,6 +13,8 @@ import {
   useBoolean,
 } from '@chakra-ui/react';
 import { ShippingCalculType } from '@prisma/client';
+import TextWithPopperButton from '@project-lc/components-core/TextWithPopperButton';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useDisplaySize } from '@project-lc/hooks';
 import {
   shippingAdditionalSettingOptions,
@@ -23,8 +25,6 @@ import {
 import { useShippingGroupItemStore } from '@project-lc/stores';
 import React, { useMemo } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
-import SectionWithTitle from './SectionWithTitle';
-import TextWithPopperButton from './TextWithPopperButton';
 
 export function ShippingPolicyFormControlWithLabel({
   id,

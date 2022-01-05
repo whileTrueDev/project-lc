@@ -1,10 +1,8 @@
-import { MypageLayout, OrderFilterConsole } from '@project-lc/components';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { OrderFilterConsole } from '@project-lc/components/OrderFilterConsole';
 import dynamic from 'next/dynamic';
-// import { OrderList } from '@project-lc/components-orderList';
 
-const OrderList = dynamic(() =>
-  import('@project-lc/components-order').then((mod) => mod.OrderList),
-);
+const OrderList = dynamic(() => import('@project-lc/components/OrderList'));
 
 export function Index(): JSX.Element {
   return (

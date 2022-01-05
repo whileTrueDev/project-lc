@@ -1,6 +1,10 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { ThemeProvider } from '@material-ui/core';
-import { LOGO_S3_PREFIX, lightBigLogo, lightLogo } from '@project-lc/components-logo';
+import {
+  LOGO_S3_PREFIX,
+  lightBigLogo,
+  lightLogo,
+} from '@project-lc/components-shared/KksLogo';
 import {
   createChakraTheme,
   createMuiTheme,

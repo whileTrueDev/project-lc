@@ -1,12 +1,12 @@
 import {
+  Box,
   Flex,
-  Text,
+  Grid,
+  GridItem,
   Stat,
   StatLabel,
   StatNumber,
-  Box,
-  Grid,
-  GridItem,
+  Text,
 } from '@chakra-ui/react';
 import { useFmOrdersStats } from '@project-lc/hooks';
 import { orderKeys, OrderStatsKeyType } from '@project-lc/shared-types';
@@ -45,3 +45,5 @@ export function MypageOrderStats(): JSX.Element {
     </Grid>
   );
 }
+
+export default MypageOrderStats;

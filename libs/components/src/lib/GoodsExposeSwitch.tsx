@@ -9,7 +9,7 @@ import {
 import { useChangeFmGoodsView, useChangeGoodsView } from '@project-lc/hooks';
 import { GoodsView } from '@prisma/client';
 import { useQueryClient } from 'react-query';
-import { GOODS_VIEW } from '../constants/goodsStatus';
+import { GOODS_VIEW } from '@project-lc/components-constants/goodsStatus';
 
 export function GoodsExposeSwitch({
   goodsId,

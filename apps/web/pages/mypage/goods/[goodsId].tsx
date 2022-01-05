@@ -1,19 +1,18 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
-import { Box, Button, Stack } from '@chakra-ui/react';
-import {
-  GoodsDetailActions,
-  GoodsDetailCommonInfo,
-  GoodsDetailImagesInfo,
-  GoodsDetailInfo,
-  GoodsDetailMemo,
-  GoodsDetailOptionsInfo,
-  GoodsDetailPurchaseLimitInfo,
-  GoodsDetailShippingInfo,
-  GoodsDetailSummary,
-  GoodsDetailTitle,
-  MypageLayout,
-  SectionWithTitle,
-} from '@project-lc/components';
+import { Box, Button, Center, Spinner, Stack } from '@chakra-ui/react';
+import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { GoodsDetailActions } from '@project-lc/components/GoodsDetailActions';
+import { GoodsDetailCommonInfo } from '@project-lc/components/GoodsDetailCommonInfo';
+import { GoodsDetailImagesInfo } from '@project-lc/components/GoodsDetailImagesInfo';
+import { GoodsDetailInfo } from '@project-lc/components/GoodsDetailInfo';
+import { GoodsDetailMemo } from '@project-lc/components/GoodsDetailMemo';
+import { GoodsDetailOptionsInfo } from '@project-lc/components/GoodsDetailOptionsInfo';
+import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components/GoodsDetailPurchaseLimitInfo';
+import { GoodsDetailShippingInfo } from '@project-lc/components/GoodsDetailShippingInfo';
+import { GoodsDetailSummary } from '@project-lc/components/GoodsDetailSummary';
+import { GoodsDetailTitle } from '@project-lc/components/GoodsDetailTitle';
+import GoodsEditButton from '@project-lc/components/GoodsEditButton';
 import { useGoodsById } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -23,7 +22,14 @@ export function GoodsDetail(): JSX.Element {
   const goodsId = router.query.goodsId as string;
   const goods = useGoodsById(goodsId);
 
-  if (goods.isLoading) return <MypageLayout>...loading</MypageLayout>;
+  if (goods.isLoading)
+    return (
+      <MypageLayout>
+        <Center>
+          <Spinner />
+        </Center>
+      </MypageLayout>
+    );
 
   if (!goods.isLoading && !goods.data) return <MypageLayout>...no data</MypageLayout>;
 
@@ -49,6 +55,9 @@ export function GoodsDetail(): JSX.Element {
 
         {/* 상품 버튼 */}
         <Box as="section">
+          <Box pb={2}>
+            <GoodsEditButton goods={goods.data} />
+          </Box>
           <GoodsDetailActions goods={goods.data} />
         </Box>
 

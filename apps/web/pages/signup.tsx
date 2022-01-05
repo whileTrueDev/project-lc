@@ -1,7 +1,9 @@
-import { SignupForm, SellerNavbar, SignupStart } from '@project-lc/components';
 import { Box, Flex } from '@chakra-ui/react';
-import { useState } from 'react';
+import { SellerNavbar } from '@project-lc/components-shared/Navbar';
+import { SignupForm } from '@project-lc/components-shared/SignupForm';
+import { SignupStart } from '@project-lc/components-shared/SignupStart';
 import { useMoveToMainIfLoggedIn } from '@project-lc/hooks';
+import { useState } from 'react';
 
 export function Signup(): JSX.Element {
   const [step, setStep] = useState(0);

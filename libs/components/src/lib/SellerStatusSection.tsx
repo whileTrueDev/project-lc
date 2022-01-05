@@ -3,7 +3,7 @@ import { useSettlementInfo } from '@project-lc/hooks';
 import { useMemo } from 'react';
 import { Grid, Flex } from '@chakra-ui/react';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
-import { GridTableItem } from './GridTableItem';
+import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
 
 export function SellerStatusSection(): JSX.Element {
   // 사업자등록정보 조회
@@ -36,3 +36,5 @@ export function SellerStatusSection(): JSX.Element {
     </Flex>
   );
 }
+
+export default SellerStatusSection;

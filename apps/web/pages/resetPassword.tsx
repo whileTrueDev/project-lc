@@ -1,5 +1,6 @@
 import { Box, Flex } from '@chakra-ui/react';
-import { SellerNavbar, ResetPasswordForm } from '@project-lc/components';
+import { SellerNavbar } from '@project-lc/components-shared/Navbar';
+import { ResetPasswordForm } from '@project-lc/components-shared/ResetPasswordForm';
 
 export function Resetpassword(): JSX.Element {
   return (

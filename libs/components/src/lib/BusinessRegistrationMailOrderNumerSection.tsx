@@ -5,10 +5,13 @@ import {
   Input,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
+import {
+  useDialogHeaderConfig,
+  useDialogValueConfig,
+} from '@project-lc/components-layout/GridTableItem';
 import { useFormContext } from 'react-hook-form';
 import { BusinessRegistrationFormDto } from './BusinessRegistrationDialog';
-import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
-import { ImageInput, ImageInputErrorTypes } from './ImageInput';
 
 export function BusinessRegistrationMailOrderNumerSection(): JSX.Element {
   const {
@@ -95,3 +98,5 @@ export function BusinessRegistrationMailOrderNumerSection(): JSX.Element {
     </>
   );
 }
+
+export default BusinessRegistrationMailOrderNumerSection;

@@ -12,18 +12,18 @@ import {
   ModalOverlay,
   Spinner,
   Stack,
-  useDisclosure,
   Text,
+  useDisclosure,
 } from '@chakra-ui/react';
+import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
+import { MB } from '@project-lc/components-core/ImageInput';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle'; // Import Sun Editor's CSS File
 import dynamic from 'next/dynamic';
 import { useEffect, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import 'suneditor/dist/css/suneditor.min.css';
 import SunEditorCore from 'suneditor/src/lib/core';
-import { boxStyle } from '../constants/commonStyleProps';
 import { GoodsFormValues } from './GoodsRegistForm';
-import { MB } from './ImageInput';
-import SectionWithTitle from './SectionWithTitle'; // Import Sun Editor's CSS File
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,

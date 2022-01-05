@@ -1,19 +1,19 @@
 import { Divider, Stack, Text } from '@chakra-ui/layout';
 import { CloseButton, Icon } from '@chakra-ui/react';
-import { FaTruck } from 'react-icons/fa';
+import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
+import { BoldText } from '@project-lc/components-core/BoldText';
 import {
   PrepayInfoOptions,
   ShippingOptionDto,
+  shippingSelectOptions,
   TempShippingSet,
 } from '@project-lc/shared-types';
-import { boxStyle } from '../constants/commonStyleProps';
-import { getOptionLabel } from './ShippingOptionAppliedItem';
-import { ShippingSelectOptions } from './ShippingOptionTypeSelect';
-import { BoldText } from './ShippingPolicySetForm';
+import { getShippingOptionLabel } from '@project-lc/utils-frontend';
+import { FaTruck } from 'react-icons/fa';
 
 function OptionItemDisplay({ item }: { item: ShippingOptionDto }): JSX.Element {
   const { shippingCost: costItem, shipping_opt_type: shippingOptType } = item;
-  const selectOption = ShippingSelectOptions.find(
+  const selectOption = shippingSelectOptions.find(
     (select) => select.key === shippingOptType,
   );
   const suffix = selectOption ? selectOption.suffix : '';
@@ -24,14 +24,14 @@ function OptionItemDisplay({ item }: { item: ShippingOptionDto }): JSX.Element {
     <Stack direction={{ base: 'column', sm: 'row' }}>
       {/* 무료, 고정 인 경우 범위 표시 안함 */}
       {!['free', 'fixed'].includes(shippingOptType) && (
-        <Text>{`${getOptionLabel(item, suffix)} · `}</Text>
+        <Text>{`${getShippingOptionLabel(item, suffix)} · `}</Text>
       )}
       <Text>{`${areaName} · ${costText}`}</Text>
     </Stack>
   );
 }
 
-export function SetItem({
+export function ShippingPolicySetListItem({
   set,
   onDelete,
 }: {
@@ -120,4 +120,4 @@ export function SetItem({
   );
 }
 
-export default SetItem;
+export default ShippingPolicySetListItem;

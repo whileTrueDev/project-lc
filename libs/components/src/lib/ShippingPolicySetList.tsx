@@ -12,9 +12,9 @@ import {
 import { TempShippingSet } from '@project-lc/shared-types';
 import { useShippingGroupItemStore, useShippingSetItemStore } from '@project-lc/stores';
 import { useCallback } from 'react';
-import SectionWithTitle from './SectionWithTitle';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import ShippingPolicySetForm from './ShippingPolicySetForm';
-import SetItem from './ShippingPolicySetListItem';
+import ShippingPolicySetListItem from './ShippingPolicySetListItem';
 
 export function ShippingPolicySetList(): JSX.Element {
   const { shippingSets, removeShippingSet } = useShippingGroupItemStore();
@@ -29,7 +29,11 @@ export function ShippingPolicySetList(): JSX.Element {
       {/* 배송 옵션 목록(임시) */}
       <Stack spacing={2} mb={2}>
         {shippingSets.map((set: TempShippingSet) => (
-          <SetItem key={set.tempId} set={set} onDelete={removeShippingSet} />
+          <ShippingPolicySetListItem
+            key={set.tempId}
+            set={set}
+            onDelete={removeShippingSet}
+          />
         ))}
       </Stack>
       {/* 배송방법 추가 모달 버튼 */}

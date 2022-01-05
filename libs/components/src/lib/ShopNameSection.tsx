@@ -7,9 +7,12 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
-import SettingSectionLayout from './SettingSectionLayout';
+import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
+import {
+  useDialogHeaderConfig,
+  useDialogValueConfig,
+} from '@project-lc/components-layout/GridTableItem';
 import { ShopNameDialog } from './ShopNameDialog';
-import { useDialogHeaderConfig, useDialogValueConfig } from './GridTableItem';
 
 // shop 이름 변경 섹션
 export function ShopNameSection(): JSX.Element {

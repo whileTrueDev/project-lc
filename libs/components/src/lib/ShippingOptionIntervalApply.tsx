@@ -1,22 +1,15 @@
 import { Button, FormControl, Input, Select, Stack, Text } from '@chakra-ui/react';
 import { ShippingOptType, ShippingSetType } from '@prisma/client';
+import { KOREA_PROVINCES } from '@project-lc/components-constants/address';
+import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
+import { ErrorText } from '@project-lc/components-core/ErrorText';
+import FormControlInputWrapper from '@project-lc/components-core/FormControlInputWrapper';
+import { ResponsiveDivider } from '@project-lc/components-core/ResponsiveDivider';
 import { MAX_COST, ShippingCostDto, ShippingOptionDto } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { KOREA_PROVINCES } from '../constants/address';
-import { boxStyle } from '../constants/commonStyleProps';
-import FormControlInputWrapper from './FormControlInputWrapper';
-import { ResponsiveDivider } from './ResponsiveDivider';
 import { areaSelectStyle } from './ShippingOptionFixedApply';
-
-export function ErrorText({ children }: { children: React.ReactNode }): JSX.Element {
-  return (
-    <Text fontSize="xs" color="red.500">
-      {children}
-    </Text>
-  );
-}
 
 type IntervalFormType = Pick<ShippingOptionDto, 'section_ed'> & ShippingCostDto;
 export function ShippingOptionIntervalApply({

@@ -1,5 +1,5 @@
-import { Box, Heading, Stack, Textarea, Text } from '@chakra-ui/react';
 import { WarningIcon } from '@chakra-ui/icons';
+import { Box, Heading, Stack, Text, Textarea } from '@chakra-ui/react';
 import { LiveShoppingInput } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
 
@@ -10,7 +10,7 @@ const examplePlaceholder = `[예시]
 - 다양한 레시피로 활용할 수 있다는 점을 강조해주세요.
 - 3만원이상 구매시 배송비 무료 이벤트
 - 인터넷 최저가라는 점을 강조해 주세요.`;
-export function LiveShoppingRequestInput(): JSX.Element {
+export function LiveShoppingRegistRequestField(): JSX.Element {
   const {
     register,
     formState: { errors },
@@ -46,4 +46,4 @@ export function LiveShoppingRequestInput(): JSX.Element {
   );
 }
 
-export default LiveShoppingRequestInput;
+export default LiveShoppingRegistRequestField;

@@ -20,3 +20,5 @@ export function OrderCancelRequestExistAlert({
     </Alert>
   );
 }
+
+export default OrderCancelRequestExistAlert;

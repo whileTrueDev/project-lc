@@ -1,5 +1,5 @@
 import { Button, Center } from '@chakra-ui/react';
-import { AdminPageLayout } from '@project-lc/components';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
 import router from 'next/router';
 
 export function SettlementIndex(): JSX.Element {

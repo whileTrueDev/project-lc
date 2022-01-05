@@ -1,7 +1,7 @@
 import { Badge, Box, Flex, Text } from '@chakra-ui/react';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import { useMemo } from 'react';
-import { ChakraNextImage } from '@project-lc/components-core';
 
 export interface OrderDetailGoodsProps {
   orderItem: FindFmOrderDetailRes['items'][0];

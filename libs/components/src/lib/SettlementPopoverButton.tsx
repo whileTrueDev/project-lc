@@ -1,10 +1,10 @@
 import {
   Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
   PopoverArrow,
   PopoverBody,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
   Text,
 } from '@chakra-ui/react';
 
@@ -34,3 +34,5 @@ export function SettlementPopoverButton({
     </Popover>
   );
 }
+
+export default SettlementPopoverButton;
