@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Center,
   CloseButton,
@@ -10,6 +9,7 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
+import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
 import {
   ShippingGroupListItemType,
   useDeleteShippingGroup,
@@ -21,11 +21,10 @@ import { useCallback } from 'react';
 import {
   ShippingGroupContainerBox,
   ShippingGroupDeleteConfirmDialog,
-  ShippingGroupDetailModal,
   ShippingGroupRegistDialog,
   ShippingGroupRelatedItemsDialog,
 } from './GoodsRegistShippingPolicy';
-import SettingSectionLayout from './SettingSectionLayout';
+import ShippingGroupDetailModal from './ShippingGroupDetailModal';
 
 /** 상점설정에서 사용하는 배송비정책 아이템 - 라디오버튼이 없다 */
 export function ShopInfoShippingPolicyItem({

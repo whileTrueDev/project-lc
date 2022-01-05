@@ -8,7 +8,7 @@ import {
 } from '@chakra-ui/react';
 import { RegistGoodsDto } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
-import SectionWithTitle from './SectionWithTitle';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 
 export function RequiredMark(): JSX.Element {
   return <Text as="span">*</Text>;

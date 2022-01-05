@@ -1,8 +1,8 @@
-import { Stack, Text, useDisclosure } from '@chakra-ui/react';
+import { Stack, Text } from '@chakra-ui/react';
+import { HorizontalImageGallery } from '@project-lc/components-core/HorizontalImageGallery';
+import { TextViewerWithDetailModal } from '@project-lc/components-shared/TextViewerWithDetailModal';
 import { GoodsByIdRes } from '@project-lc/shared-types';
 import { useMemo } from 'react';
-import { HorizontalImageGallery } from './HorizontalImageGallery';
-import { TextViewerWithDetailModal } from './TextViewerWithDetailModal';
 
 export interface GoodsDetailImagesInfoProps {
   goods: GoodsByIdRes;

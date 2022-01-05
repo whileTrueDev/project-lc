@@ -16,10 +16,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   handleRequest(err, user, _, context: ExecutionContext): any {
     let userPayload = user;
     if (err || !user) {
-      const req: Request = context.switchToHttp().getRequest<Request>();
+      const req = context.switchToHttp().getRequest<Request>();
       userPayload = this.jwtHelper.validateRefreshToken(req);
       if (userPayload) {
-        const res: Response = context.switchToHttp().getResponse<Response>();
+        const res = context.switchToHttp().getResponse<Response>();
         this.jwtHelper.refreshAndSetAuthorizationHeader(res, userPayload);
       } else {
         throw err || new UnauthorizedException();

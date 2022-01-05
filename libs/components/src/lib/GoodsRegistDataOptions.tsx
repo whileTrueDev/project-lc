@@ -1,3 +1,4 @@
+import { InfoIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -8,21 +9,20 @@ import {
   HStack,
   Input,
   InputProps,
+  Kbd,
   Radio,
   RadioGroup,
   Stack,
   Text,
-  Kbd,
 } from '@chakra-ui/react';
+import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
+import TextWithPopperButton from '@project-lc/components-core/TextWithPopperButton';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useDisplaySize } from '@project-lc/hooks';
 import { useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
-import { InfoIcon } from '@chakra-ui/icons';
-import { boxStyle } from '../constants/commonStyleProps';
 import { GoodsRegistRadio } from './GoodsRegistDataSales';
 import { GoodsFormOption, GoodsFormValues } from './GoodsRegistForm';
-import SectionWithTitle from './SectionWithTitle';
-import TextWithPopperButton from './TextWithPopperButton';
 
 export function GoodsOptionInput({
   label,

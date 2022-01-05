@@ -1,7 +1,8 @@
+import { Container, Heading } from '@chakra-ui/react';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { GoodsEditForm } from '@project-lc/components/GoodsEditForm';
 import { useGoodsById } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
-import { MypageLayout, GoodsEditForm } from '@project-lc/components';
-import { Container, Heading } from '@chakra-ui/react';
 
 export function GoodsEdit(): JSX.Element {
   const router = useRouter();

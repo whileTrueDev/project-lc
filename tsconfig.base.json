@@ -18,17 +18,26 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@project-lc/components": [
-        "libs/components/src/index.ts"
+      "@project-lc/components-admin/*": [
+        "libs/components-admin/src/lib/*"
       ],
-      "@project-lc/components-core": [
-        "libs/components-core/src/index.ts"
+      "@project-lc/components-constants/*": [
+        "libs/components-constants/src/lib/*"
       ],
-      "@project-lc/components-logo": [
-        "libs/components-logo/src/index.ts"
+      "@project-lc/components-core/*": [
+        "libs/components-core/src/lib/*"
       ],
-      "@project-lc/components-order": [
-        "libs/components-order/src/index.ts"
+      "@project-lc/components-layout/*": [
+        "libs/components-layout/src/lib/*"
+      ],
+      "@project-lc/components-shared/*": [
+        "libs/components-shared/src/lib/*"
+      ],
+      "@project-lc/components-web-bc/*": [
+        "libs/components-web-bc/src/lib/*"
+      ],
+      "@project-lc/components/*": [
+        "libs/components/src/lib/*"
       ],
       "@project-lc/firstmall-db": [
         "libs/firstmall-db/src/index.ts"
@@ -98,6 +107,9 @@
       ],
       "@project-lc/shared-types": [
         "libs/shared-types/src/index.ts"
+      ],
+      "@project-lc/shreadsheet": [
+        "libs/shreadsheet/src/index.ts"
       ],
       "@project-lc/stores": [
         "libs/stores/src/index.ts"

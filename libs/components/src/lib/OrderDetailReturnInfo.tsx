@@ -9,14 +9,16 @@ import {
   Textarea,
   useDisclosure,
 } from '@chakra-ui/react';
-import { ChakraNextImage } from '@project-lc/components-core';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
+import { FmReturnStatusBadge } from '@project-lc/components-shared/FmReturnStatusBadge';
 import {
   convertFmReturnMethodToString,
   convertFmReturnTypesToString,
   FmOrderReturn,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { FmReturnStatusBadge, OrderReturnStatusDialog, TextDotConnector } from '..';
+import { OrderReturnStatusDialog } from './OrderReturnStatusDialog';
 
 /** 주문 반품 정보 */
 export function OrderDetailReturnInfo({
@@ -132,3 +134,5 @@ export function OrderDetailReturnInfo({
     </Box>
   );
 }
+
+export default OrderDetailReturnInfo;

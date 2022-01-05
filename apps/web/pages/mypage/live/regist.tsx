@@ -1,7 +1,8 @@
-import { MypageLayout, LiveShoppingRegist } from '@project-lc/components';
-import { Container, Box, Flex, Button } from '@chakra-ui/react';
-import { useRouter } from 'next/router';
 import { ChevronLeftIcon } from '@chakra-ui/icons';
+import { Box, Button, Container, Flex } from '@chakra-ui/react';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { LiveShoppingRegistForm } from '@project-lc/components/LiveShoppingRegistForm';
+import { useRouter } from 'next/router';
 
 export function Live(): JSX.Element {
   const router = useRouter();
@@ -20,7 +21,7 @@ export function Live(): JSX.Element {
             </Button>
           </Flex>
         </Box>
-        <LiveShoppingRegist />
+        <LiveShoppingRegistForm />
       </Container>
     </MypageLayout>
   );

@@ -3,15 +3,13 @@ import { Stack, Text } from '@chakra-ui/react';
 import { ShippingSetType } from '@prisma/client';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useCallback, useState } from 'react';
+import { ShippingSelectOption, shippingSelectOptions } from '@project-lc/shared-types';
 import ShippingOptionAppliedItem from './ShippingOptionAppliedItem';
 import ShippingOptionFixedApply from './ShippingOptionFixedApply';
 import ShippingOptionFreeApply from './ShippingOptionFreeApply';
 import ShippingOptionIntervalApply from './ShippingOptionIntervalApply';
 import ShippingOptionRepeatApply from './ShippingOptionRepeatApply';
-import ShippingOptionTypeSelect, {
-  ShippingSelectOption,
-  ShippingSelectOptions,
-} from './ShippingOptionTypeSelect';
+import ShippingOptionTypeSelect from './ShippingOptionTypeSelect';
 
 /**
  *
@@ -27,7 +25,7 @@ export function ShippingOptionApplySection({
   shippingSetType?: ShippingSetType;
 }): JSX.Element {
   const [selectOption, setSelectOption] = useState<ShippingSelectOption>(
-    shippingSetType === 'std' ? ShippingSelectOptions[0] : ShippingSelectOptions[1],
+    shippingSetType === 'std' ? shippingSelectOptions[0] : shippingSelectOptions[1],
   );
   const changeOption = useCallback((type: ShippingSelectOption) => {
     setSelectOption(type);

@@ -1,22 +1,19 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 import { Box, Button, Flex, Stack } from '@chakra-ui/react';
-import {
-  AdminPageLayout,
-  GoodsDetailActions,
-  GoodsDetailCommonInfo,
-  GoodsDetailImagesInfo,
-  GoodsDetailInfo,
-  GoodsDetailOptionsInfo,
-  GoodsDetailPurchaseLimitInfo,
-  GoodsDetailShippingInfo,
-  GoodsDetailSummary,
-  GoodsDetailTitle,
-  SectionWithTitle,
-  AdminGoodsStatusButtons,
-} from '@project-lc/components';
+import { AdminGoodsStatusButtons } from '@project-lc/components-admin/AdminGoodsStatusButtons';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
+import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
+import { GoodsDetailActions } from '@project-lc/components/GoodsDetailActions';
+import { GoodsDetailCommonInfo } from '@project-lc/components/GoodsDetailCommonInfo';
+import { GoodsDetailImagesInfo } from '@project-lc/components/GoodsDetailImagesInfo';
+import { GoodsDetailInfo } from '@project-lc/components/GoodsDetailInfo';
+import { GoodsDetailOptionsInfo } from '@project-lc/components/GoodsDetailOptionsInfo';
+import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components/GoodsDetailPurchaseLimitInfo';
+import { GoodsDetailShippingInfo } from '@project-lc/components/GoodsDetailShippingInfo';
+import { GoodsDetailSummary } from '@project-lc/components/GoodsDetailSummary';
+import { GoodsDetailTitle } from '@project-lc/components/GoodsDetailTitle';
 import { useAdminGoodsById } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
-import React from 'react';
 
 export function GoodsDetail(): JSX.Element {
   const router = useRouter();

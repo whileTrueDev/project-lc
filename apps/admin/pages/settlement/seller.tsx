@@ -1,10 +1,8 @@
 import { Heading, Stack } from '@chakra-ui/react';
-import {
-  AdminPageLayout,
-  AdminSettlementDoneList,
-  SettlementSellCommissionInfo,
-  SettlementTargetList,
-} from '@project-lc/components';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
+import { AdminSettlementDoneList } from '@project-lc/components-admin/AdminSettlementDoneList';
+import { SettlementSellCommissionInfo } from '@project-lc/components-admin/SettlementSellCommissionInfo';
+import { SettlementTargetList } from '@project-lc/components-admin/SettlementTargetList';
 
 export function SettlementIndex(): JSX.Element {
   return (

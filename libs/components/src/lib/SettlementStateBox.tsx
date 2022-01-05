@@ -1,31 +1,31 @@
+import { InfoIcon, QuestionIcon } from '@chakra-ui/icons';
 import {
-  List,
-  ListItem,
-  ListIcon,
-  Box,
-  Flex,
-  Badge,
-  Text,
-  Divider,
   Alert,
-  IconButton,
-  Modal,
-  useDisclosure,
+  Badge,
+  Box,
   Button,
-  ModalOverlay,
+  Divider,
+  Flex,
+  IconButton,
+  List,
+  ListIcon,
+  ListItem,
+  Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalHeader,
-  ModalCloseButton,
+  ModalOverlay,
+  Text,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { InfoIcon, QuestionIcon } from '@chakra-ui/icons';
-import { MdCheckCircle, MdCancel } from 'react-icons/md';
-import { useMemo } from 'react';
 import { BusinessRegistrationConfirmation } from '@prisma/client';
 import {
   BusinessRegistrationStatus,
   SellerBusinessRegistrationType,
 } from '@project-lc/shared-types';
+import { useMemo } from 'react';
+import { MdCancel, MdCheckCircle } from 'react-icons/md';
 import { SettlementPopoverButton } from './SettlementPopoverButton';
 
 type SettlementStateBoxProps = {
@@ -177,3 +177,5 @@ function ConfirmationBadge(props: {
   }
   return components;
 }
+
+export default SettlementStateBox;

@@ -1,7 +1,7 @@
-import { Box, Text, Flex, Divider, useColorModeValue } from '@chakra-ui/react';
+import { Box, Divider, Flex, Text, useColorModeValue } from '@chakra-ui/react';
 import dayjs from 'dayjs';
-import { MypageSalesStats } from './MypageSalesStats';
 import { MypageOrderStats } from './MypageOrderStats';
+import { MypageSalesStats } from './MypageSalesStats';
 
 export function MypageStatsSection(): JSX.Element {
   return (
@@ -52,3 +52,4 @@ export function MypageStatsSection(): JSX.Element {
     </>
   );
 }
+export default MypageStatsSection;

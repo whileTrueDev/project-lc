@@ -1,11 +1,9 @@
-import { useDisclosure, Container, Grid, GridItem } from '@chakra-ui/react';
-import {
-  MypageLayout,
-  ShopNameDialog,
-  SellerStatusSection,
-  MypageStatsSection,
-  MypageNoticeSection,
-} from '@project-lc/components';
+import { Container, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeSection';
+import { MypageStatsSection } from '@project-lc/components/MypageStatsSection';
+import { SellerStatusSection } from '@project-lc/components/SellerStatusSection';
+import { ShopNameDialog } from '@project-lc/components/ShopNameDialog';
 
 export function Index(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();

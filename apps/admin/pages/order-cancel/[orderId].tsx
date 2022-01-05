@@ -13,8 +13,9 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { SellerOrderCancelRequestStatus } from '@prisma/client';
-import { AdminPageLayout, ConfirmDialog } from '@project-lc/components';
-import { ChakraNextImage } from '@project-lc/components-core';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import {
   useAdminFmOrderByGoods,
   useAdminOneOrderCancelRequest,

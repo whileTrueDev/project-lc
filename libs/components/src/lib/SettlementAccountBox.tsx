@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { SettlementInfoRefetchType } from '@project-lc/hooks';
 import { SellerSettlementAccount } from '@prisma/client';
-import { GridTableItem } from './GridTableItem';
+import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
 import { SettlementAccountDialog } from './SettlementAccountDialog';
 
 const columns = [
@@ -78,3 +78,5 @@ export function SettlementAccountBox(props: SettlementAccountBoxProps): JSX.Elem
     </Box>
   );
 }
+
+export default SettlementAccountBox;

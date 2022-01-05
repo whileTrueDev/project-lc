@@ -1,6 +1,6 @@
-import { AdminSignUp } from '@project-lc/components';
-import { useMoveToMainIfLoggedIn } from '@project-lc/hooks';
 import { Box, Flex } from '@chakra-ui/react';
+import { AdminSignUp } from '@project-lc/components-admin/AdminSignUp';
+import { useMoveToMainIfLoggedIn } from '@project-lc/hooks';
 
 export function SignUp(): JSX.Element {
   useMoveToMainIfLoggedIn();

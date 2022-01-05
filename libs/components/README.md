@@ -61,9 +61,6 @@ Run `nx test components` to execute the unit tests via [Jest](https://jestjs.io)
 | Components     | 중     | 다        | 다        |
 | react-native   | △      | X         | O         |
 
-#### Npm Trends 비교
-
-![npm-trends-ui-libs](./docs/npm-trends-ui-libs.png)
 
 #### 커스터마이징 및 스타일링 방식 비교
 

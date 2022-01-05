@@ -1,6 +1,7 @@
-import { MypageLayout, SellerGoodsList } from '@project-lc/components';
-import Link from 'next/link';
 import { Button, Stack } from '@chakra-ui/react';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { SellerGoodsList } from '@project-lc/components/SellerGoodsList';
+import Link from 'next/link';
 
 export function Goods(): JSX.Element {
   return (

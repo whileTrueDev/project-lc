@@ -1,8 +1,8 @@
-import NextLink from 'next/link';
 import { Box, Link, Stack } from '@chakra-ui/react';
 import { useFmOrder } from '@project-lc/hooks';
 import { FmExportRes } from '@project-lc/shared-types';
-import { OrderDetailExportInfoItem } from '..';
+import NextLink from 'next/link';
+import { OrderDetailExportInfoItem } from './OrderDetailExportInfo';
 
 interface ExportDetailItemsProps {
   exportData: FmExportRes;
@@ -32,3 +32,5 @@ export function ExportDetailItems({ exportData }: ExportDetailItemsProps): JSX.E
     </Box>
   );
 }
+
+export default ExportDetailItems;

@@ -1,15 +1,15 @@
 import { Button, FormControl, Input, Select, Stack, Text } from '@chakra-ui/react';
 import { ShippingOptType, ShippingSetType } from '@prisma/client';
+import { KOREA_PROVINCES } from '@project-lc/components-constants/address';
+import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
+import { ErrorText } from '@project-lc/components-core/ErrorText';
+import FormControlInputWrapper from '@project-lc/components-core/FormControlInputWrapper';
+import { ResponsiveDivider } from '@project-lc/components-core/ResponsiveDivider';
 import { MAX_COST } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { KOREA_PROVINCES } from '../constants/address';
-import { boxStyle } from '../constants/commonStyleProps';
-import FormControlInputWrapper from './FormControlInputWrapper';
-import { ResponsiveDivider } from './ResponsiveDivider';
 import { areaSelectStyle } from './ShippingOptionFixedApply';
-import { ErrorText } from './ShippingOptionIntervalApply';
 
 // 퍼스트몰 구간입력 동작
 // - 배송비 부분은 0원이 설정 가능

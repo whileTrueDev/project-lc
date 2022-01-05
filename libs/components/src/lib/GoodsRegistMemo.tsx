@@ -1,7 +1,7 @@
 import { Textarea } from '@chakra-ui/react';
 import { RegistGoodsDto } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
-import SectionWithTitle from './SectionWithTitle';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 
 export function GoodsRegistMemo(): JSX.Element {
   const { register } = useFormContext<RegistGoodsDto>();

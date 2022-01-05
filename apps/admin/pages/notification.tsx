@@ -1,4 +1,5 @@
-import { AdminNotificationSection, AdminPageLayout } from '@project-lc/components';
+import { AdminNotificationSection } from '@project-lc/components-admin/AdminNotificationSection';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
 
 export function Notification(): JSX.Element {
   return (

@@ -1,12 +1,9 @@
 import { Container, Grid, GridItem, Heading, VStack } from '@chakra-ui/layout';
-import {
-  BcSettlementHistoryBox,
-  broadcasterCenterMypageNavLinks,
-  BroadcasterIncome,
-  BroadcasterSettlementInfoRegistBox,
-  MypageLayout,
-} from '@project-lc/components';
-import React from 'react';
+import { broadcasterCenterMypageNavLinks } from '@project-lc/components-constants/navigation';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { BcSettlementHistoryBox } from '@project-lc/components-web-bc/BcSettlementHistory';
+import { BroadcasterIncome } from '@project-lc/components-web-bc/BroadcasterIncome';
+import { BroadcasterSettlementInfoRegistBox } from '@project-lc/components-web-bc/BroadcasterSettlementInfoRegistBox';
 
 export function SettlementIndex(): JSX.Element {
   return (

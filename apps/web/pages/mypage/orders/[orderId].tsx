@@ -13,23 +13,21 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { SellerOrderCancelRequestStatus } from '@prisma/client';
-import {
-  MypageLayout,
-  OrderCancelRequestExistAlert,
-  OrderDetailActions,
-  OrderDetailDeliveryInfo,
-  OrderDetailExportInfo,
-  OrderDetailGoods,
-  OrderDetailOptionList,
-  OrderDetailRefundInfo,
-  OrderDetailReturnInfo,
-  OrderDetailSummary,
-  OrderDetailTitle,
-  OrderRefundExistsAlert,
-  OrderReturnExistsAlert,
-  SectionWithTitle,
-  TextDotConnector,
-} from '@project-lc/components';
+import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
+import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { OrderCancelRequestExistAlert } from '@project-lc/components/OrderCancelRequestExistAlert';
+import { OrderDetailActions } from '@project-lc/components/OrderDetailActions';
+import { OrderDetailDeliveryInfo } from '@project-lc/components/OrderDetailDeliveryInfo';
+import { OrderDetailExportInfo } from '@project-lc/components/OrderDetailExportInfo';
+import { OrderDetailGoods } from '@project-lc/components/OrderDetailGoods';
+import { OrderDetailOptionList } from '@project-lc/components/OrderDetailOptionList';
+import { OrderDetailRefundInfo } from '@project-lc/components/OrderDetailRefundInfo';
+import { OrderDetailReturnInfo } from '@project-lc/components/OrderDetailReturnInfo';
+import { OrderDetailSummary } from '@project-lc/components/OrderDetailSummary';
+import { OrderDetailTitle } from '@project-lc/components/OrderDetailTitle';
+import { OrderRefundExistsAlert } from '@project-lc/components/OrderRefundExistsAlert';
+import { OrderReturnExistsAlert } from '@project-lc/components/OrderReturnExistsAlert';
 import {
   useDisplaySize,
   useFmOrder,

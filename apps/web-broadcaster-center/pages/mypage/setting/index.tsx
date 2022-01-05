@@ -1,17 +1,15 @@
 import { Container, Divider, Heading, VStack } from '@chakra-ui/react';
-import {
-  BroadcasterAddressSection,
-  broadcasterCenterMypageNavLinks,
-  BroadcasterChannelSection,
-  BroadcasterContactSection,
-  BroadcasterNickNameSection,
-  BroadcasterSignoutSection,
-  ContractionAgreeSection,
-  MypageLayout,
-  PasswordSection,
-  ProfileBox,
-  SocialAccountUnlinkSection,
-} from '@project-lc/components';
+import { broadcasterCenterMypageNavLinks } from '@project-lc/components-constants/navigation';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { PasswordSection } from '@project-lc/components-shared/PasswordSection';
+import { ProfileBox } from '@project-lc/components-shared/ProfileBox';
+import { SocialAccountUnlinkSection } from '@project-lc/components-shared/SocialAccountUnlinkSection';
+import { BroadcasterAddressSection } from '@project-lc/components-web-bc/BroadcasterAddress';
+import { BroadcasterChannelSection } from '@project-lc/components-web-bc/BroadcasterChannelSection';
+import { BroadcasterContactSection } from '@project-lc/components-web-bc/BroadcasterContact';
+import { BroadcasterNickNameSection } from '@project-lc/components-web-bc/BroadcasterNickName';
+import { BroadcasterSignoutSection } from '@project-lc/components-web-bc/BroadcasterSignoutSection';
+import { ContractionAgreeSection } from '@project-lc/components-web-bc/ContractionAgreeSection';
 
 export function SettingIndex(): JSX.Element {
   return (

@@ -21,6 +21,10 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { GoodsInfo } from '@prisma/client';
+import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import { MB } from '@project-lc/components-core/ImageInput';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import {
   GoodsCommonInfo,
   useDeleteGoodsCommonInfo,
@@ -34,11 +38,7 @@ import { useFormContext } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
 import 'suneditor/dist/css/suneditor.min.css';
 import SunEditorCore from 'suneditor/src/lib/core';
-import { boxStyle } from '../constants/commonStyleProps';
-import { ConfirmDialog } from './ConfirmDialog';
 import { GoodsFormValues } from './GoodsRegistForm';
-import { MB } from './ImageInput';
-import SectionWithTitle from './SectionWithTitle';
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,

@@ -11,8 +11,8 @@ import {
 } from '@chakra-ui/react';
 import { SettlementInfoRefetchType } from '@project-lc/hooks';
 import { SellerBusinessRegistration } from '@prisma/client';
+import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
 import { BusinessRegistrationDialog } from './BusinessRegistrationDialog';
-import { GridTableItem } from './GridTableItem';
 
 interface SellerBusinessRegistrationInterface extends SellerBusinessRegistration {
   [index: string]: string | number;
@@ -93,3 +93,5 @@ export function BusinessRegistrationBox(
     </Box>
   );
 }
+
+export default BusinessRegistrationBox;
