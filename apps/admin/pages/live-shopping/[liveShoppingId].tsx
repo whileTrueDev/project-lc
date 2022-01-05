@@ -25,25 +25,23 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import {
-  AdminLiveShoppingUpdateConfirmModal,
-  AdminOverlayImageUploadDialog,
-  AdminPageLayout,
-  BroadcasterAutocomplete,
-  BroadcasterName,
-  GoodsDetailCommonInfo,
-  GoodsDetailImagesInfo,
-  GoodsDetailInfo,
-  GoodsDetailOptionsInfo,
-  GoodsDetailPurchaseLimitInfo,
-  GoodsDetailShippingInfo,
-  GoodsDetailSummary,
-  LiveShoppingDatePicker,
-  LiveShoppingDetailTitle,
-  LiveShoppingProgressBadge,
-  LiveShoppingProgressSelector,
-  SectionWithTitle,
-} from '@project-lc/components';
+import { AdminLiveShoppingUpdateConfirmModal } from '@project-lc/components-admin/AdminLiveShoppingUpdateConfirmModal';
+import { AdminOverlayImageUploadDialog } from '@project-lc/components-admin/AdminOverlayImageUploadDialog';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
+import { BroadcasterAutocomplete } from '@project-lc/components-admin/BroadcasterAutocomplete';
+import { LiveShoppingDatePicker } from '@project-lc/components-admin/LiveShoppingDatePicker';
+import { LiveShoppingDetailTitle } from '@project-lc/components-admin/LiveShoppingDetailTitle';
+import { LiveShoppingProgressSelector } from '@project-lc/components-admin/LiveShoppingProgressSelector';
+import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
+import { BroadcasterName } from '@project-lc/components-shared/BroadcasterName';
+import { GoodsDetailCommonInfo } from '@project-lc/components-seller/GoodsDetailCommonInfo';
+import { GoodsDetailImagesInfo } from '@project-lc/components-seller/GoodsDetailImagesInfo';
+import { GoodsDetailInfo } from '@project-lc/components-seller/GoodsDetailInfo';
+import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/GoodsDetailOptionsInfo';
+import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/GoodsDetailPurchaseLimitInfo';
+import { GoodsDetailShippingInfo } from '@project-lc/components-seller/GoodsDetailShippingInfo';
+import { GoodsDetailSummary } from '@project-lc/components-seller/GoodsDetailSummary';
+import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import {
   useAdminGoodsById,
   useAdminLiveShoppingList,
@@ -68,7 +66,7 @@ function getDuration(startDate: Date, endDate: Date): string {
   return '미정';
 }
 
-export function GoodsDetail(): JSX.Element {
+export function LiveShoppingDetail(): JSX.Element {
   const router = useRouter();
   const liveShoppingId = router.query.liveShoppingId as string;
   const { data: profileData } = useProfile();
@@ -487,4 +485,4 @@ export function GoodsDetail(): JSX.Element {
   );
 }
 
-export default GoodsDetail;
+export default LiveShoppingDetail;

@@ -1,9 +1,7 @@
 import { Heading, Stack } from '@chakra-ui/react';
-import {
-  AdminBcSettlementDoneList,
-  AdminPageLayout,
-  BcSettlementTargetList,
-} from '@project-lc/components';
+import { AdminBcSettlementDoneList } from '@project-lc/components-admin/AdminBcSettlementDoneList';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
+import { BcSettlementTargetList } from '@project-lc/components-admin/BcSettlementTargetList';
 
 export function BroadcasterSettlement(): JSX.Element {
   return (

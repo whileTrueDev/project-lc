@@ -1,18 +1,14 @@
 import { ExecutionContext } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  GoodsModule,
-  GoodsService,
-  JwtAuthGuard,
-  AdminGuard,
-  S3Service,
-  LiveShoppingModule,
-} from '@project-lc/nest-modules';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { GoodsModule, GoodsService } from '@project-lc/nest-modules-goods';
+import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
+import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
-import request from 'supertest';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
-import { ConfigModule } from '@nestjs/config';
+import request from 'supertest';
 import {
   orderDetailExportsSample,
   orderDetailItemsSample,

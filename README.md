@@ -22,9 +22,9 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 3. [overlay-controller](./apps/overlay-controller/README.md)  
    [Nest.js + Socket.io](https://docs.nestjs.com/websockets/gateways)로 구성된 WebScoket 서버입니다.
 4. [web](./apps/web/README.md)  
-   [Next.js](https://nextjs.org/)로 구성된 프론트엔드 서버입니다.
-5. [web-e2e](./apps/web-e2e/README.md)  
-   `web` 애플리케이션에 대한 Cypress end to end 테스트 폴더입니다.
+   [Next.js](https://nextjs.org/)로 구성된 판매자센터 프론트엔드 서버입니다.
+5. [web-broadcaster-center](./apps/web-broadcaster-center/README.md)  
+   [Next.js](https://nextjs.org/)로 구성된 방송인센터 프론트엔드 서버입니다.
 
 ### Libs 목록
 
@@ -42,26 +42,34 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 
 4. `prisma-orm`
 
-   데이터베이스 접근 및 모델 정의를 위한 라이브러리로, api, socket과 같이 데이터베이스 접근이 필요한 앱에서 사용될 수 있습니다.
+   데이터베이스 접근 및 모델 정의를 위한 라이브러리로, api, overlay, overlay-controller과 같이 데이터베이스 접근이 필요한 앱에서 사용될 수 있습니다.
    이 라이브러리에 위치한 스키마를 토대로 생성한 Prisma-Client에서 제공되는 Type정의를 React 앱 등에서 사용할 수 있습니다.
 
 5. `shared-types`
 
-   공유되는 Typescript 타입정보는 모두 여기에서 생성되고 관리됩니다. Prisma Client를 통해 백엔드, 프론트엔드간 통신에 대한 타입정의(DTO, EntityType, ...)가 공유될 수 있으므로 비교적 많은 수의 타입이 생성되지 않으리라 생각합니다만, 공유되는 타입은 모두 여기에 정의하고 사용합니다.
+   공유되는 Typescript 타입정보는 모두 여기에서 생성되고 관리됩니다. 공유되는 타입은 모두 여기에 정의하고 사용합니다.
 
 6. `firstmall-db`
 
    독립몰 데이터베이스에의 접근은 모두 이 라이브러리에서 이루어집니다. 원활한 구분을 위해 퍼스트몰과 관련된 DB에 접근하기 위한 service, module등은 모두 `FM` 접두어를 가집니다.
 
-7. `nest-modules`
+7. `nest-core`와 `nest-modules-*`
 
-   nestjs 애플리케이션에서 동시에 사용가능한 모듈의 경우 여기에 정의합니다. 커스텀으로 생성한 Guard(passport strategy 포함), Pipe, Interceptor, Middleware, ExceptionFilter, Custom Decorator 모두 해당 라이브러리에서 정의합니다. 더 자세한 내용은 [libs/nest-modules](./libs/nest-modules/README.md)에서 확인할 수 있습니다.
+   nestjs 애플리케이션에서 동시에 사용가능한 모듈의 경우 여기에 정의합니다. 커스텀으로 생성한 Guard(passport strategy 포함), Pipe, Interceptor, Middleware, ExceptionFilter, Custom Decorator 의 경우 nest-core에, 이외 모든 모듈을 각각 `nest-modules-<이름>` 라이브러리에서 정의합니다.
 
 ## 새 애플리케이션 / 라이브러리 생성하기
 
-필요시, Dan(hwasurr)에게 말씀하세요.  
-자세히 알아보고 싶은 분은 [nrwl/Nx](https://nx.dev/latest/react/getting-started/intro) 에서 알아볼 수 있습니다.  
-새로운 App과 Lib은 임의로 생성하지 마시고, 슬랙에 공표 및 토의 이후 생성하도록 합니다.
+App의 경우 필요시, Dan(hwasurr)에게 말씀하세요.  
+자세히 알아보고 싶은 분은 [nrwl/Nx](https://nx.dev/latest/react/getting-started/intro) 에서 알아볼 수 있습니다.
+
+lib을 생성하고자 하는 경우, 다음 명령어를 사용해 구성할 수 있습니다.
+
+```bash
+# React library
+yarn nx g @nrwl/react:lib <라이브러리 이름>
+# Nestjs library
+yarn nx g @nrwl/nest:lib <라이브러리 이름(ex. nest-modules-lib1)>
+```
 
 ## 디펜던시 추가하기
 
@@ -87,13 +95,13 @@ ex.
 ## 테스트
 
 - 단위 테스트
-`yarn test <APP_NAME OR LIB_NAME>`
+  `yarn test <APP_NAME OR LIB_NAME>`
 - 파일이 변경된 앱/라이브러리만 단위 테스트
-`nx affected:test`
+  `nx affected:test`
 - web 종단간 테스트(End to End)
-`yarn e2e web-e2e`
+  `yarn e2e web-e2e`
 - 파일이 변경된 앱/라이브러리만 종단간 테스트(End to End)
-`nx affected:e2e`
+  `nx affected:e2e`
 
 ## Lint
 
@@ -121,24 +129,92 @@ App, Lib 별 더 자세한 내용은 해당 폴더의 README.md에 있습니다.
 - [libs/prisma-orm](./libs/prisma-orm/README.md)
 - [libs/firstmall-db](./libs/firstmall-db/README.md)
 - [libs/shared-types](./libs/shared-types/README.md)
-- [libs/nest-modules](./libs/nest-modules/README.md)
 
 ## 브랜치 전략
 
 - `master`: 현재 서비스중인 브랜치입니다.
-   - 필요 review 인원 2명 + code owner
-   - 언제나 `staging` 또는 `hotfix` 브랜치로부터 병합됩니다.
+  - 필요 review 인원 2명 + code owner
+  - 언제나 `staging` 또는 `hotfix` 브랜치로부터 병합됩니다.
 - `staging`: 개발 완료 및 테스트까지 완료된 배포 대기중인 코드에 대한 브랜치입니다.
-   - 필요 review 인원 1명
+  - 필요 review 인원 1명
 - `dev`: 개발용 브랜치입니다. 각 인원의 개발 사항을 통합하는 데에 사용됩니다. 또한 테스트서버에 서비스중인 브랜치입니다.
-   - 코드 충돌 해결 작업을 여기서 진행하는 것이 좋습니다.
-   - 테스트환경으로 곧바로 배포되도록 연결되어 있습니다.
+  - 코드 충돌 해결 작업을 여기서 진행하는 것이 좋습니다.
+  - 테스트환경으로 곧바로 배포되도록 연결되어 있습니다.
 - `<개발자 개인>-<작업명>`: 개인 개발 작업을 위한 브랜치입니다.
 - `hotfix`: 매우 급한 릴리즈된 `master`에 변경사항이 필요한 경우 사용하는 지름길용 브랜치입니다.
-   - 위험도에 따라 사용하되, 되도록 사용하지 않도록 합니다.
+  - 위험도에 따라 사용하되, 되도록 사용하지 않도록 합니다.
 
 기본 프로세스: `개발자개인` 브랜치 -> `dev` (코드 충돌 해결 필요, 푸쉬 불가, only PR)  
-로컬에서 테스트 필요시: 작업 완료된 `dev`로 진행  (푸쉬 불가, only PR)
+로컬에서 테스트 필요시: 작업 완료된 `dev`로 진행 (푸쉬 불가, only PR)
 테스트 완료시: `dev` -> `staging` (푸시 불가, only PR)  
 배포시: `staging` -> `master` (푸시 불가, only PR)  
-핫픽스 필요시: `hotfix` -> `master` (푸시 불가, only PR)  
+핫픽스 필요시: `hotfix` -> `master` (푸시 불가, only PR)
+
+## 커밋메시지 가이드라인
+
+더 읽기 쉬운 커밋 메세지를 장려하기 위해 커밋메시지 규칙을 구성합니다. 커밋 메시지를 강제하기 위해 commitlint 와 husky를 사용했습니다.
+규칙은 간단하여 따르기 쉽습니다.
+
+### 커밋 메시지 규칙
+
+각 커밋 메시지는 **header**, **body**, **footer** 로 구성됩니다. header는 **type**, **scope**, **subject** 를 포함하도록 하는 특별한 규칙을 가집니다. 
+
+```
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+**header**는 필수입니다. **scope** 는 선택사항으로, 작성하거나 작성하지않을 수 있습니다.
+
+github과 git과 관련한 여러 tool에서도 읽기 쉬운 커밋메시지를 유지하기 위해 모든 커밋 메시지의 각 라인은 100 자를 초과할 수 없습니다.
+
+다음은 올바른 커밋 메시지 **header**에 대한 예시입니다.
+
+```
+feat: 개인 알림 기능 추가
+fix(overlay): 화면에 오버레이가 뜨지 않는 버그 수정
+docs(api): 방송인 서비스 사용법 문서 수정
+```
+
+### Revert
+
+이전 커밋을 되돌리는 경우, 커밋메시지 header에 **revert** 라는 type을 명시해야 합니다. body에는 `This reverts commit <hash>.`가 포함되도록 작성하빈다. hash는 되돌릴 커밋의 SHA 입니다.
+
+### Type
+
+커밋 헤더의 Type은 코드 변경의 유형에 대한 정보입니다. 다음 중 하나가 명시되어야 합니다. (소문자만 허용합니다.)
+
+- **feat**: 새로운 기능
+- **fix**: 버그 수정
+- **perf**: 성능 개선
+- **refactor**: 버그 수정 또는 새로운 기능이 아닌 코드 변경사항
+- **style**: 코딩 스타일 변경사항 (prettier 룰변경, 사용하지 않는 import, 변수 제거 등)
+- **test**: 테스트 파일 작성 또는 수정
+- **docs**: 문서 변경사항 ( 주석만 추가되는 경우 포함 ) 
+- **ci**: CI/CD 설정 파일 또는 스크립트 변경사항
+- **chore**: 코드에 대한 변경사항이 없는 작업들(설정변경,패키지설치)
+
+### Subject
+
+커밋 헤더의 Subject는 변경사항에 대한 간결한 설명을 포함해야 합니다.
+
+- 명령형, 현재시제를 사용합니다.
+   ```
+   O oo 기능 변경
+   X oo 기능 변경했습니다
+   X oo 기능 변경 예정
+   X oo 기능 변경했음
+   ```
+- 마침표는 사용하지 않도록 합니다.
+
+### Body
+
+body 부분은 변경 사항을 작업하게 된 배경을 기술하고, 이전의 상태와 비교하는 것이 좋습니다. 또한, 명령형, 현재 시제를 사용합니다.
+
+```
+- 유틸 라이브러리의 빌드 효율성 증대를 위한 변경
+- <특정 함수>가 런타임에서 null 데이터를 확인하지 않아 <특정 기능>이 올바로 수행 되지 않는 점 수정
+```

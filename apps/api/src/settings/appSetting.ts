@@ -1,5 +1,5 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { colorizedMorganMiddleware } from '@project-lc/nest-modules';
+import { colorizedMorganMiddleware } from '@project-lc/nest-core';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
@@ -26,9 +26,6 @@ export class AppSetting {
       'https://broadcaster.xn--hp4b17xa.com', // broadcaster.크크쇼.com
       'https://xn--vh3b23hfsf.xn--hp4b17xa.com', // 방송인.크크쇼.com
       'https://dev-broadcaster.xn--hp4b17xa.com', // dev-broadcaster.크크쇼.com
-
-      'https://project-lc-dev.vercel.app',
-      'https://project-lc.vercel.app',
     ],
     credentials: true,
     exposedHeaders: ['X-wt-Access-Token'],

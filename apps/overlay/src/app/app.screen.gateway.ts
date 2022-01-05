@@ -16,7 +16,7 @@ import {
   SocketIdandDevice,
   StartSetting,
 } from '@project-lc/shared-types';
-import { OverlayService } from '@project-lc/nest-modules';
+import { OverlayService } from '@project-lc/nest-modules-overlay';
 
 @WebSocketGateway({ cors: true, transports: ['websocket'] })
 export class AppScreenGateway

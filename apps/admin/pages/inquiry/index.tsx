@@ -1,4 +1,5 @@
-import { AdminPageLayout, InquiryTable } from '@project-lc/components';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
+import { InquiryTable } from '@project-lc/components-admin/InquiryTable';
 
 export default function InquiryTablePage(): JSX.Element {
   return (

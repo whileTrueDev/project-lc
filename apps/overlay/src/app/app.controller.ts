@@ -1,12 +1,13 @@
 import {
   Controller,
   Get,
-  Render,
-  Param,
   HttpCode,
   NotFoundException,
+  Param,
+  Render,
 } from '@nestjs/common';
-import { OverlayService, BroadcasterService } from '@project-lc/nest-modules';
+import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
+import { OverlayService } from '@project-lc/nest-modules-overlay';
 import { BroadcasterEmail } from '@project-lc/shared-types';
 
 interface ImagesLengthAndUserId {

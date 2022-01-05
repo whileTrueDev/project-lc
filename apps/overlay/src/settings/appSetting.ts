@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { colorizedMorganMiddleware } from '@project-lc/nest-modules';
+import { colorizedMorganMiddleware } from '@project-lc/nest-core';
 
 export class AppSetting {
   constructor(private readonly app: NestExpressApplication) {}

@@ -1,5 +1,7 @@
 import { Box, Flex } from '@chakra-ui/react';
-import { BroadcasterNavbar, SignupForm, SignupStart } from '@project-lc/components';
+import { BroadcasterNavbar } from '@project-lc/components-shared/Navbar';
+import { SignupForm } from '@project-lc/components-shared/SignupForm';
+import { SignupStart } from '@project-lc/components-shared/SignupStart';
 import { useMoveToMainIfLoggedIn } from '@project-lc/hooks';
 import React, { useState } from 'react';
 

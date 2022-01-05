@@ -2,16 +2,17 @@ on:
   push:
     branches: [master]
     paths:
-      - "apps/api/**"
-      - "apps/overlay/**"
-      - "apps/overlay-controller/**"
-      - "libs/firstmall-db/**"
-      - "libs/nest-modules/**"
-      - "libs/utils/**"
-      - "libs/utils-backend/**"
-      - "libs/utils-s3/**"
-      - "libs/prisma-orm/**"
-      - "libs/shared-types/**"
+      - 'apps/api/**'
+      - 'apps/overlay/**'
+      - 'apps/overlay-controller/**'
+      - 'libs/firstmall-db/**'
+      - 'libs/nest-core/**'
+      - 'libs/nest-modules-*/**'
+      - 'libs/utils/**'
+      - 'libs/utils-backend/**'
+      - 'libs/utils-s3/**'
+      - 'libs/prisma-orm/**'
+      - 'libs/shared-types/**'
 
 name: Deploy to AWS ECS "Prod"
 env:
@@ -35,7 +36,6 @@ jobs:
       #  Build API server
       - name: Build
         run: yarn affected:build --prod --base=$BEFORE_SHA
-
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -68,7 +68,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      
+
       #  Install All Dependencies
       - name: Install dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
@@ -120,7 +120,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      
+
       #  Install All Dependencies
       - name: Install dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache
@@ -172,7 +172,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      
+
       #  Install All Dependencies
       - name: Install dependencies
         uses: bahmutov/npm-install@v1 # install dependencies using cache

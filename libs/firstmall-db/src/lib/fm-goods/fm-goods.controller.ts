@@ -9,17 +9,14 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { SellerInfo, UserPayload } from '@project-lc/nest-core';
+import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { GoodsService } from '@project-lc/nest-modules-goods';
 import {
   ChangeGoodsViewDto,
   DeleteGoodsDto,
   GoodsOptionWithStockInfo,
 } from '@project-lc/shared-types';
-import {
-  GoodsService,
-  JwtAuthGuard,
-  SellerInfo,
-  UserPayload,
-} from '@project-lc/nest-modules';
 import { FMGoodsService } from './fm-goods.service';
 
 @Controller('fm-goods')

@@ -1,10 +1,8 @@
-import { Box, Text, Button, Heading } from '@chakra-ui/react';
-import {
-  AdminPageLayout,
-  AdminAccountList,
-  AdminBusinessRegistrationList,
-  AdminBroadcasterSettlementInfoList,
-} from '@project-lc/components';
+import { Box, Button, Heading, Text } from '@chakra-ui/react';
+import { AdminAccountList } from '@project-lc/components-admin/AdminAccountList';
+import { AdminBroadcasterSettlementInfoList } from '@project-lc/components-admin/AdminBroadcasterSettlementInfoList';
+import { AdminBusinessRegistrationList } from '@project-lc/components-admin/AdminBusinessRegistrationList';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
 import { useAdminSettlementInfo } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 

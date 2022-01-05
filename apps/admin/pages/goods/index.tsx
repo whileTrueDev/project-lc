@@ -1,4 +1,5 @@
-import { AdminPageLayout, AdminGoodsList } from '@project-lc/components';
+import { AdminGoodsList } from '@project-lc/components-admin/AdminGoodsList';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
 
 export function Goods(): JSX.Element {
   return (

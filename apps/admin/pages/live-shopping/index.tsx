@@ -1,10 +1,11 @@
+import { Box, Text } from '@chakra-ui/react';
 import {
-  AdminPageLayout,
-  AdminLiveShoppingList,
   AdminGiftList,
   SeletctedLiveShoppingType,
-} from '@project-lc/components';
-import { Box, Text } from '@chakra-ui/react';
+} from '@project-lc/components-admin/AdminGiftList';
+import { AdminLiveShoppingList } from '@project-lc/components-admin/AdminLiveShoppingList';
+import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
+
 import { useState } from 'react';
 
 export default function LiveShopping(): JSX.Element {

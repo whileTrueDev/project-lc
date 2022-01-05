@@ -33,16 +33,25 @@
     "api": {
       "tags": []
     },
-    "components": {
+    "components-admin": {
+      "tags": []
+    },
+    "components-constants": {
       "tags": []
     },
     "components-core": {
       "tags": []
     },
-    "components-logo": {
+    "components-layout": {
       "tags": []
     },
-    "components-order": {
+    "components-seller": {
+      "tags": []
+    },
+    "components-shared": {
+      "tags": []
+    },
+    "components-web-bc": {
       "tags": []
     },
     "firstmall-db": {
@@ -51,7 +60,61 @@
     "hooks": {
       "tags": []
     },
-    "nest-modules": {
+    "nest-core": {
+      "tags": []
+    },
+    "nest-modules-admin": {
+      "tags": []
+    },
+    "nest-modules-auth": {
+      "tags": []
+    },
+    "nest-modules-authguard": {
+      "tags": []
+    },
+    "nest-modules-broadcaster": {
+      "tags": []
+    },
+    "nest-modules-cipher": {
+      "tags": []
+    },
+    "nest-modules-goods": {
+      "tags": []
+    },
+    "nest-modules-inquiry": {
+      "tags": []
+    },
+    "nest-modules-jwt-helper": {
+      "tags": []
+    },
+    "nest-modules-liveshopping": {
+      "tags": []
+    },
+    "nest-modules-mail": {
+      "tags": []
+    },
+    "nest-modules-notice": {
+      "tags": []
+    },
+    "nest-modules-notification": {
+      "tags": []
+    },
+    "nest-modules-order-cancel": {
+      "tags": []
+    },
+    "nest-modules-overlay": {
+      "tags": []
+    },
+    "nest-modules-overlay-controller": {
+      "tags": []
+    },
+    "nest-modules-s3": {
+      "tags": []
+    },
+    "nest-modules-seller": {
+      "tags": []
+    },
+    "nest-modules-shipping-group": {
       "tags": []
     },
     "overlay": {
@@ -64,6 +127,9 @@
       "tags": []
     },
     "shared-types": {
+      "tags": []
+    },
+    "shreadsheet": {
       "tags": []
     },
     "stores": {
@@ -81,10 +147,10 @@
     "utils-s3": {
       "tags": []
     },
-    "web": {
+    "web-broadcaster-center": {
       "tags": []
     },
-    "web-broadcaster-center": {
+    "web-seller": {
       "tags": []
     }
   }
