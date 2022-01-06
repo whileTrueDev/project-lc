@@ -29,6 +29,7 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
         openGraph={{
           type: 'website',
           locale: 'ko_KR',
+          url: 'https://xn--hp4b17xa.com/',
           site_name: '크크쇼',
           images: [
             { url: LOGO_S3_PREFIX + lightLogo, alt: 'KKSHOW' },

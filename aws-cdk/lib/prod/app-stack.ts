@@ -137,6 +137,7 @@ export class LCProdAppStack extends cdk.Stack {
         API_HOST: `https://api.${constants.PUNYCODE_DOMAIN}`,
         SELLER_WEB_HOST: `https://${constants.PUNYCODE_판매자}.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://${constants.PUNYCODE_방송인}.${constants.PUNYCODE_DOMAIN}`,
+        KKSHOW_WEB_HOST: `https://${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}ApiLogGroup`, {

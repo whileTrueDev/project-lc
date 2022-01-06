@@ -29,7 +29,7 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
         openGraph={{
           type: 'website',
           locale: 'ko_KR',
-          // url: 'https://방송인.크크쇼.com/', // route53 등록 후 설정
+          url: 'https://xn--vh3b23hfsf.xn--hp4b17xa.com/',
           site_name: '크크쇼 방송인센터',
           images: [
             { url: LOGO_S3_PREFIX + lightLogo, alt: 'KKSHOW' },
