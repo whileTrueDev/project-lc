@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { mailerConfig } from '@project-lc/nest-core';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
+import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { OverlayModule } from '@project-lc/nest-modules-overlay';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
@@ -13,6 +14,7 @@ import { AppScreenGateway } from './app.screen.gateway';
 
 @Module({
   imports: [
+    CipherModule,
     PrismaModule,
     OverlayModule,
     BroadcasterModule,
