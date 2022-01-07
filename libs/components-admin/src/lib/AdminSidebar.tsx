@@ -3,6 +3,7 @@ import {
   BoxProps,
   Divider,
   Flex,
+  Icon,
   Link,
   Stack,
   Text,
@@ -58,7 +59,7 @@ export interface AdminSidebarProps {
 
 function SidebarMenuLinkItem({ menu }: { menu: SidebarMenuLink }): JSX.Element {
   const router = useRouter();
-  const { href, name, children } = menu;
+  const { href, name, children, icon } = menu;
 
   const match = useMemo(() => router.pathname === href, [href, router.pathname]);
 
@@ -73,7 +74,10 @@ function SidebarMenuLinkItem({ menu }: { menu: SidebarMenuLink }): JSX.Element {
         textDecoration={match ? 'underline' : 'none'}
         textDecorationColor={match ? 'red.400' : 'none'}
       >
-        {name}
+        <Flex alignItems="center">
+          {icon && <Icon as={icon} mr={1} />}
+          {name}
+        </Flex>
       </Link>
     </NextLink>
   );

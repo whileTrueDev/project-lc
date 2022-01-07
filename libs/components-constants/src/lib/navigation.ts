@@ -1,3 +1,5 @@
+import { FcMoneyTransfer } from 'react-icons/fc';
+
 export interface NavItem {
   label: string;
   subLabel?: string;
@@ -27,6 +29,7 @@ export interface LinkItemProps {
 
 export interface SidebarMenuLink extends LinkItemProps {
   children?: SidebarMenuLink[];
+  icon?: any;
 }
 
 export interface MypageLink extends LinkItemProps {
@@ -98,7 +101,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     href: '/broadcaster',
     children: [
       { name: '정산정보 검수', href: '/broadcaster/settlement-info' },
-      { name: '정산', href: '/broadcaster/settlement' },
+      { name: '정산', href: '/broadcaster/settlement', icon: FcMoneyTransfer },
     ],
   },
   {
@@ -107,7 +110,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     children: [
       { name: '계좌정보 목록', href: '/seller/account' },
       { name: '사업자 등록정보 검수', href: '/seller/business-registration' },
-      { name: '정산', href: '/seller/settlement' },
+      { name: '정산', href: '/seller/settlement', icon: FcMoneyTransfer },
     ],
   },
   {
