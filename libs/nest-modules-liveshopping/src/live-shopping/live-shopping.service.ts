@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  GoodsConfirmationDtoOnlyConnectionId,
   LiveShoppingParamsDto,
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
+  LiveShoppingFmGoodsSeq,
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
 import { LiveShopping } from '@prisma/client';
@@ -17,8 +17,6 @@ export class LiveShoppingService {
     email: UserPayload['sub'],
     dto: LiveShoppingRegistDTO,
   ): Promise<{ liveShoppingId: number }> {
-    // const streamId = Math.random().toString(36).substr(2, 11);
-
     const userId = await this.prisma.seller.findFirst({
       where: { email },
       select: { id: true },
@@ -26,7 +24,6 @@ export class LiveShoppingService {
     const liveShopping = await this.prisma.liveShopping.create({
       data: {
         seller: { connect: { id: userId.id } },
-        // streamId,
         requests: dto.requests,
         desiredPeriod: dto.desiredPeriod,
         desiredCommission: dto.desiredCommission || '0.00',
@@ -101,28 +98,17 @@ export class LiveShoppingService {
    */
   async getFmGoodsConnectionIdLinkedToLiveShoppings(
     broadcasterId: number,
-  ): Promise<GoodsConfirmationDtoOnlyConnectionId[]> {
-    const nestedFmGoodsConnectionIds = await this.prisma.liveShopping.findMany({
+  ): Promise<LiveShoppingFmGoodsSeq[]> {
+    const fmGoodsSeqs = await this.prisma.liveShopping.findMany({
       where: {
         broadcasterId: broadcasterId ? Number(broadcasterId) : undefined,
       },
       select: {
-        goods: {
-          select: {
-            confirmation: {
-              select: {
-                firstmallGoodsConnectionId: true,
-              },
-            },
-          },
-        },
+        fmGoodsSeq: true,
       },
     });
-    const fmGoodsConnectionIds = [];
-    nestedFmGoodsConnectionIds.map((value) =>
-      fmGoodsConnectionIds.push(value.goods.confirmation),
-    );
-    return fmGoodsConnectionIds;
+
+    return fmGoodsSeqs;
   }
 
   async getBroadcasterRegisteredLiveShoppings(

@@ -23,7 +23,7 @@ import {
   fmOrderStatuses,
   FmOrderStatusNumString,
   getFmOrderStatusByNames,
-  GoodsConfirmationDtoOnlyConnectionId,
+  LiveShoppingFmGoodsSeq,
   LiveShoppingWithSales,
   OrderStatsRes,
 } from '@project-lc/shared-types';
@@ -910,7 +910,7 @@ export class FmOrdersService {
   }
 
   public async getPurchaseDoneOrderDuringLiveShopping(
-    goods: GoodsConfirmationDtoOnlyConnectionId[],
+    goods: LiveShoppingFmGoodsSeq[],
   ): Promise<BroacasterPurchaseWithDivdedMessageDto> {
     const sql = `
     SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.regist_date, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
@@ -927,8 +927,8 @@ export class FmOrdersService {
     ORDER BY fo.regist_date desc
 `;
     const purchaseList = await Promise.all(
-      goods.map(async (value: GoodsConfirmationDtoOnlyConnectionId) => {
-        const connectionId = value.firstmallGoodsConnectionId;
+      goods.map(async (value: LiveShoppingFmGoodsSeq) => {
+        const connectionId = value.fmGoodsSeq;
         return this.db.query(sql, [connectionId]);
       }),
     );

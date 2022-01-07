@@ -117,3 +117,5 @@ export type LiveShoppingsWithBroadcasterAndGoodsName = Pick<
     goods_name: string;
   };
 };
+
+export type LiveShoppingFmGoodsSeq = Pick<LiveShopping, 'fmGoodsSeq'>;
