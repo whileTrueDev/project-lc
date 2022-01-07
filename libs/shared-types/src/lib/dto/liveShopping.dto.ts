@@ -90,15 +90,6 @@ export class LiveShoppingParamsDto {
   @IsOptional() @IsString() id?: string;
   @IsOptional() @IsArray() goodsIds?: number[];
 }
-
-export interface LiveShoppingWithConfirmation extends LiveShopping {
-  goods: {
-    confirmation: {
-      firstmallGoodsConnectionId: number;
-    };
-  };
-}
-
 export type LiveShoppingBroadcastDate = Pick<
   LiveShoppingDTO,
   'broadcastStartDate' | 'broadcastEndDate'
