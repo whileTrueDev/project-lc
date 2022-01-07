@@ -83,6 +83,7 @@ export function LiveShoppingDetail(): JSX.Element {
   const methods = useForm({
     defaultValues: {
       progress: '',
+      liveShoppingName: '',
       broadcasterId: '',
       broadcastStartDate: '',
       broadcastEndDate: '',
@@ -111,6 +112,7 @@ export function LiveShoppingDetail(): JSX.Element {
   const onSuccess = (): void => {
     reset({
       progress: '',
+      liveShoppingName: '',
       broadcasterId: '',
       broadcastStartDate: '',
       broadcastEndDate: '',
@@ -158,16 +160,18 @@ export function LiveShoppingDetail(): JSX.Element {
         {/* 상품 제목 */}
         {liveShopping && !liveShoppingIsLoading && (
           <LiveShoppingDetailTitle
-            goodsName={
-              liveShopping[0].broadcaster
-                ? `${liveShopping[0].goods.goods_name} + ${liveShopping[0].broadcaster.userNickname}`
-                : `${liveShopping[0].goods.goods_name}`
-            }
+            liveShoppingName={liveShopping[0].liveShoppingName}
             createDate={liveShopping[0].createDate}
           />
         )}
         <Grid templateColumns="repeat(2, 1fr)" justifyItems="start" gap={4}>
           <Stack spacing={5}>
+            <Text as="span">
+              {'상품명 : '}
+              {liveShopping[0].broadcaster
+                ? `${liveShopping[0].goods.goods_name} + ${liveShopping[0].broadcaster.userNickname}`
+                : `${liveShopping[0].goods.goods_name}`}
+            </Text>
             <Text as="span">
               판매자 : {liveShopping[0].seller.sellerShop?.shopName || ''}
             </Text>
@@ -350,6 +354,10 @@ export function LiveShoppingDetail(): JSX.Element {
             <Stack as="form" spacing={5}>
               <LiveShoppingProgressSelector />
               <Divider />
+              <Stack>
+                <Text>라이브 쇼핑 이름</Text>
+                <Input {...register('liveShoppingName')} />
+              </Stack>
               <BroadcasterAutocomplete />
               <Divider />
 

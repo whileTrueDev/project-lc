@@ -290,6 +290,7 @@ export class AdminService {
         whiletrueCommissionRate: dto.whiletrueCommissionRate || 0,
         broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
         fmGoodsSeq: Number(dto.fmGoodsSeq) || undefined,
+        liveShoppingName: dto.liveShoppingName || undefined,
       },
     });
     if (!liveShoppingUpdate) {
