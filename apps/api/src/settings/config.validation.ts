@@ -36,6 +36,8 @@ export const validationSchema = Joi.object({
   SELLER_WEB_HOST: Joi.string().required(),
   // 방송인 센터 호스트명
   BROADCASTER_WEB_HOST: Joi.string().required(),
+  // 크크쇼 호스트명
+  KKSHOW_WEB_HOST: Joi.string().required(),
 
   // 와트 IP
   WHILETRUE_IP_ADDRESS: Joi.string(),

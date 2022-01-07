@@ -13,7 +13,7 @@ export const sellerLogo = 'kkshow-seller-lightmode.png';
 export const broadcasterLogo = 'kkshow-broadcaster-lightmode.png';
 
 export interface KksLogoProps {
-  appType: UserType;
+  appType?: UserType;
   size: 'small' | 'mid' | 'big' | 'manual';
   width?: number;
   height?: number;
@@ -50,7 +50,7 @@ export function KksLogo(props: KksLogoProps): JSX.Element | null {
   );
 
   if (size === 'small') {
-    return <ChakraNextImage src={logoSrc} width="100" height="45" />;
+    return <ChakraNextImage src={logoSrc} width="100" height="40" />;
   }
   if (size === 'mid') {
     return <ChakraNextImage src={logoSrc} width="260" height="82" />;
