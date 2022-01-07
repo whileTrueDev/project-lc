@@ -122,7 +122,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '주문',
     href: 'order',
-    children: [{ name: '결제취소 요청', href: '/order-cancel' }],
+    children: [{ name: '결제취소 요청', href: '/order/order-cancel' }],
   },
   {
     name: '일반관리',

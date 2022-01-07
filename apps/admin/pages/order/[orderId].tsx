@@ -68,7 +68,18 @@ export function OrderCancelRequestDetail(): JSX.Element {
     );
   }
   if (!orderCancelRequest.data || !fmOrder.data) {
-    return <AdminPageLayout>...no data</AdminPageLayout>;
+    return (
+      <AdminPageLayout>
+        <Button
+          size="sm"
+          leftIcon={<ChevronLeftIcon />}
+          onClick={() => router.push('/order-cancel')}
+        >
+          목록으로
+        </Button>
+        <Text>...no data</Text>
+      </AdminPageLayout>
+    );
   }
 
   return (
