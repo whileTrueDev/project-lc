@@ -92,9 +92,9 @@ export class LiveShoppingService {
   /**
    *
    * @author m'baku
-   * @description 해당 방송인에게 매칭된 모든 라이브 쇼핑에 연결된 상품들의 FirstmallGoodsConnectionId를 반환받는다
+   * @description 해당 방송인에게 매칭된 모든 라이브 쇼핑에 연결된 상품들의 fmGoodsSeq 반환받는다
    * @param broadcasterId
-   * @returns firstmallGoodsConnectionIds
+   * @returns fmGoodsSeq
    */
   async getFmGoodsConnectionIdLinkedToLiveShoppings(
     broadcasterId: number,
