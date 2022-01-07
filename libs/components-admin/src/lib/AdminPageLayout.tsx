@@ -30,7 +30,9 @@ export function AdminPageLayout({ children }: MypageLayoutProps): JSX.Element {
 
       <Flex as="main" minH="calc(100vh - 60px - 60px - 60px)" direction="row">
         <AdminSidebar isOpen={isOpen} onClose={onClose} onToggle={onToggle} />
-        <Box flex="1">{children}</Box>
+        <Box flex="1" borderWidth="1px" borderRadius="lg" p={7} height="100%">
+          {children}
+        </Box>
       </Flex>
     </Box>
   );
