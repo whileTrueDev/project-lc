@@ -20,11 +20,18 @@ export const mainNavItems: Array<NavItem> = [
   },
 ];
 
-export interface MypageLink {
+export interface LinkItemProps {
   name: string;
   href: string;
-  checkIsActive: (pathname: string, linkHref: string) => boolean;
+}
+
+export interface SidebarMenuLink extends LinkItemProps {
+  children?: SidebarMenuLink[];
+}
+
+export interface MypageLink extends LinkItemProps {
   children?: MypageLink[];
+  checkIsActive: (pathname: string, linkHref: string) => boolean;
 }
 
 const defaultIsActiveChecker = (pathname: string, linkHref: string): boolean =>
@@ -75,30 +82,57 @@ export const mypageNavLinks: MypageLink[] = [
   },
 ];
 
+/** 관리자 페이지 상단 네비바 링크 */
 export const adminNavItems: Array<NavItem> = [
   {
-    label: '정산정보관리',
-    href: '/admin',
+    label: '크크마켓',
+    href: 'https://k-kmarket.com/',
+    isExternal: true,
+  },
+];
+
+/** 관리자 페이지 사이드바 - 관리메뉴 링크 */
+export const adminSidebarMenuList: SidebarMenuLink[] = [
+  {
+    name: '방송인',
+    href: '/broadcaster',
+    children: [
+      { name: '정산정보 검수', href: '/broadcaster/settlement-info' },
+      { name: '정산', href: '/broadcaster/settlement' },
+    ],
   },
   {
-    label: '회차별 정산처리',
-    href: '/settlement',
+    name: '판매자',
+    href: '/seller',
+    children: [
+      { name: '계좌정보 목록', href: '/seller/account' },
+      { name: '사업자 등록정보 검수', href: '/seller/business-registration' },
+      { name: '정산', href: '/seller/settlement' },
+    ],
   },
   {
-    label: '상품검수',
+    name: '상품',
     href: '/goods',
+    children: [{ name: '상품검수', href: '/goods/confirmation' }],
   },
   {
-    label: '라이브쇼핑관리',
+    name: '라이브쇼핑',
     href: '/live-shopping',
   },
   {
-    label: '공지사항',
-    href: '/notice',
+    name: '주문',
+    href: 'order',
+    children: [{ name: '결제취소 요청', href: '/order-cancel' }],
   },
-  { label: '결제 취소 요청', href: '/order-cancel' },
-  { label: '알림메시지 보내기', href: '/notification' },
-  { label: '문의하기 관리', href: '/inquiry' },
+  {
+    name: '일반관리',
+    href: '/general',
+    children: [
+      { name: '문의하기', href: '/general/inquiry' },
+      { name: '알림메시지', href: '/general/notification' },
+      { name: '공지사항', href: '/general/notice' },
+    ],
+  },
 ];
 
 export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [

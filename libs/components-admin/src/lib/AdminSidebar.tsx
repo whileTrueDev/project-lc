@@ -8,6 +8,10 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import {
+  adminSidebarMenuList,
+  SidebarMenuLink,
+} from '@project-lc/components-constants/navigation';
 import { NavbarToggleButton as AdminSidebarToggleButton } from '@project-lc/components-shared/navbar';
 import { motion, Variants } from 'framer-motion';
 import NextLink from 'next/link';
@@ -53,53 +57,7 @@ export interface AdminSidebarProps {
   onToggle: () => void;
 }
 
-interface SidebarMenuLink {
-  name: string;
-  href: string;
-  children?: SidebarMenuLink[];
-}
-const adminSidebarMenuList: SidebarMenuLink[] = [
-  {
-    name: '방송인',
-    href: '/broadcaster',
-    children: [
-      { name: '정산정보 검수', href: '/broadcaster/settlement-info' },
-      { name: '정산', href: '/broadcaster/settlement' },
-    ],
-  },
-  {
-    name: '판매자',
-    href: '/seller',
-    children: [
-      { name: '계좌정보 목록', href: '/seller/account' },
-      { name: '사업자 등록정보 검수', href: '/seller/business-registration' },
-      { name: '정산', href: '/seller/settlement' },
-    ],
-  },
-  {
-    name: '상품',
-    href: '/goods',
-    children: [
-      { name: '상품검수', href: '/goods/confirmation' },
-      { name: '결제취소 요청', href: '/goods/order-cancel' },
-    ],
-  },
-  {
-    name: '라이브쇼핑',
-    href: '/live-shopping',
-  },
-  {
-    name: '일반관리',
-    href: '/general',
-    children: [
-      { name: '문의하기', href: '/general/inquiry' },
-      { name: '알림메시지', href: '/general/notification' },
-      { name: '공지사항', href: '/general/notice' },
-    ],
-  },
-];
-
-function SidebarMenuLink({ menu }: { menu: SidebarMenuLink }): JSX.Element {
+function SidebarMenuLinkItem({ menu }: { menu: SidebarMenuLink }): JSX.Element {
   const router = useRouter();
   const { href, name, children } = menu;
 
@@ -130,13 +88,13 @@ function SidebarMenuGroup({ menu }: { menu: SidebarMenuLink }): JSX.Element {
       <Divider />
       {/* 그룹명 */}
       <Box fontWeight="bold">
-        <SidebarMenuLink menu={menu} />
+        <SidebarMenuLinkItem menu={menu} />
       </Box>
       {/* 그룹내부 하위링크 */}
       {children && (
         <Stack pl={2}>
           {children.map((child) => (
-            <SidebarMenuLink key={child.href} menu={child} />
+            <SidebarMenuLinkItem key={child.href} menu={child} />
           ))}
         </Stack>
       )}

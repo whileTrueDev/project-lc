@@ -22,6 +22,7 @@ export function AdminDesktopNav(): JSX.Element {
                 textDecoration: 'none',
                 color: linkHoverColor,
               }}
+              isExternal={adminNav.isExternal}
             >
               {adminNav.label}
             </Link>
