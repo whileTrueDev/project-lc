@@ -6,10 +6,9 @@ import {
   LiveShoppingParamsDto,
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
-  LiveShoppingWithConfirmation,
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
-
+import { LiveShopping } from '@prisma/client';
 @Injectable()
 export class LiveShoppingService {
   constructor(private readonly prisma: PrismaService) {}
@@ -54,7 +53,7 @@ export class LiveShoppingService {
   async getRegisteredLiveShoppings(
     email: UserPayload['sub'],
     dto: LiveShoppingParamsDto,
-  ): Promise<LiveShoppingWithConfirmation[]> {
+  ): Promise<LiveShopping[]> {
     // 자신의 id를 반환하는 쿼리 수행하기
     const { id, goodsIds } = dto;
     return this.prisma.liveShopping.findMany({
@@ -73,11 +72,6 @@ export class LiveShoppingService {
           select: {
             goods_name: true,
             summary: true,
-            confirmation: {
-              select: {
-                firstmallGoodsConnectionId: true,
-              },
-            },
           },
         },
         seller: {
@@ -133,7 +127,7 @@ export class LiveShoppingService {
 
   async getBroadcasterRegisteredLiveShoppings(
     broadcasterId: number,
-  ): Promise<LiveShoppingWithConfirmation[]> {
+  ): Promise<LiveShopping[]> {
     // 자신의 id를 반환하는 쿼리 수행하기
     return this.prisma.liveShopping.findMany({
       where: {
@@ -144,11 +138,6 @@ export class LiveShoppingService {
           select: {
             goods_name: true,
             summary: true,
-            confirmation: {
-              select: {
-                firstmallGoodsConnectionId: true,
-              },
-            },
           },
         },
         seller: {

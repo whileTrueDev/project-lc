@@ -84,13 +84,8 @@ export type LiveShoppingRegistDTO = Pick<
 
 export type LiveShoppingWithSales = Pick<
   LiveShoppingDTO,
-  'id' | 'sellStartDate' | 'sellEndDate'
+  'id' | 'sellStartDate' | 'sellEndDate' | 'fmGoodsSeq'
 >;
-
-export interface LiveShoppingWithSalesAndFmId extends LiveShoppingWithSales {
-  firstmallGoodsConnectionId: string;
-}
-
 export class LiveShoppingParamsDto {
   @IsOptional() @IsString() id?: string;
   @IsOptional() @IsArray() goodsIds?: number[];

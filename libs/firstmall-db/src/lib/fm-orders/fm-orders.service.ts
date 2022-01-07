@@ -24,7 +24,7 @@ import {
   FmOrderStatusNumString,
   getFmOrderStatusByNames,
   GoodsConfirmationDtoOnlyConnectionId,
-  LiveShoppingWithSalesAndFmId,
+  LiveShoppingWithSales,
   OrderStatsRes,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -827,7 +827,7 @@ export class FmOrdersService {
   }
 
   public async getOrdersStatsDuringLiveShoppingSales(
-    dto: LiveShoppingWithSalesAndFmId[],
+    dto: LiveShoppingWithSales[],
   ): Promise<{ id: number; sales: string }[]> {
     const salesPrice = [];
 
@@ -845,7 +845,7 @@ export class FmOrdersService {
         const sellStartDate = dayjs(val.sellStartDate).format('YYYY-MM-DD HH:mm:ss');
         const sellEndDate = dayjs(val.sellEndDate).format('YYYY-MM-DD HH:mm:ss');
         const salesSum = await this.db.query(sql, [
-          val.firstmallGoodsConnectionId,
+          val.fmGoodsSeq,
           sellStartDate,
           sellEndDate,
         ]);
