@@ -20,6 +20,47 @@ export const mainNavItems: Array<NavItem> = [
   },
 ];
 
+export const kkshowNavLinks: Array<NavItem> = [
+  {
+    label: '크크마켓',
+    href: 'https://k-kmarket.com/',
+    isExternal: true,
+  },
+  // { label: '방송편성표', href: '/' },
+  // { label: '방송인', href: '/' },
+  // { label: 'SNS', href: '/' },
+];
+
+export const adminNavItems: Array<NavItem> = [
+  {
+    label: '정산정보관리',
+    href: '/admin',
+  },
+  {
+    label: '회차별 정산처리',
+    href: '/settlement',
+  },
+  {
+    label: '상품검수',
+    href: '/goods',
+  },
+  {
+    label: '라이브쇼핑관리',
+    href: '/live-shopping',
+  },
+  {
+    label: '공지사항',
+    href: '/notice',
+  },
+  { label: '결제 취소 요청', href: '/order-cancel' },
+  { label: '알림메시지 보내기', href: '/notification' },
+  { label: '문의하기 관리', href: '/inquiry' },
+];
+
+// ************************************************
+// 마이페이지 네비
+// ************************************************
+
 export interface MypageLink {
   name: string;
   href: string;
@@ -73,32 +114,6 @@ export const mypageNavLinks: MypageLink[] = [
     href: '/mypage/settlement',
     checkIsActive: defaultIsActiveChecker,
   },
-];
-
-export const adminNavItems: Array<NavItem> = [
-  {
-    label: '정산정보관리',
-    href: '/admin',
-  },
-  {
-    label: '회차별 정산처리',
-    href: '/settlement',
-  },
-  {
-    label: '상품검수',
-    href: '/goods',
-  },
-  {
-    label: '라이브쇼핑관리',
-    href: '/live-shopping',
-  },
-  {
-    label: '공지사항',
-    href: '/notice',
-  },
-  { label: '결제 취소 요청', href: '/order-cancel' },
-  { label: '알림메시지 보내기', href: '/notification' },
-  { label: '문의하기 관리', href: '/inquiry' },
 ];
 
 export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [

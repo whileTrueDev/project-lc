@@ -69,11 +69,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
             aria-label="Toggle Navigation"
           />
         </Flex>
-        <Flex
-          flex={{ base: 1 }}
-          justify={{ base: 'center', md: 'start' }}
-          alignItems="center"
-        >
+        <Flex flex={{ base: 1 }} justify={{ md: 'start' }} alignItems="center">
           <NextLink href="/" passHref>
             <Link
               textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
@@ -149,7 +145,6 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
               </Button>
             </>
           )}
-          {/* </Stack> */}
         </Flex>
       </Flex>
 

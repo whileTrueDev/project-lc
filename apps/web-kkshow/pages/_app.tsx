@@ -1,9 +1,9 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { ThemeProvider } from '@material-ui/core';
 import {
+  LOGO_S3_PREFIX,
   lightBigLogo,
   lightLogo,
-  LOGO_S3_PREFIX,
 } from '@project-lc/components-shared/KksLogo';
 import {
   createChakraTheme,
@@ -12,10 +12,9 @@ import {
 } from '@project-lc/utils-frontend';
 import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';
-import NextNProgress from 'nextjs-progressbar';
 import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import './global.font.css';
+import NextNProgress from 'nextjs-progressbar';
 
 const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();
@@ -25,13 +24,13 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <>
       <DefaultSeo
-        title="크크쇼 방송인센터"
-        description="라이브 커머스 전문 크크쇼 방송인 센터"
+        title="크크쇼"
+        description="라이브 커머스"
         openGraph={{
           type: 'website',
           locale: 'ko_KR',
-          url: 'https://xn--vh3b23hfsf.xn--hp4b17xa.com/',
-          site_name: '크크쇼 방송인센터',
+          url: 'https://xn--hp4b17xa.com/',
+          site_name: '크크쇼',
           images: [
             { url: LOGO_S3_PREFIX + lightLogo, alt: 'KKSHOW' },
             { url: LOGO_S3_PREFIX + lightBigLogo, alt: 'KKSHOW' },
