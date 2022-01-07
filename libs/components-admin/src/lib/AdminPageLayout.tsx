@@ -2,6 +2,7 @@ import { Box, Flex, useDisclosure } from '@chakra-ui/react';
 import LoginRequireAlertDialog from '@project-lc/components-core/LoginRequireAlertDialog';
 import { useIsLoggedIn } from '@project-lc/hooks';
 import React from 'react';
+import { NavbarToggleButton as AdminSidebarToggleButton } from '@project-lc/components-shared/navbar';
 
 import { AdminNav } from './AdminNav';
 import AdminSidebar from './AdminSidebar';
@@ -14,10 +15,15 @@ interface MypageLayoutProps {
 export function AdminPageLayout({ children }: MypageLayoutProps): JSX.Element {
   const { status } = useIsLoggedIn();
   // 사이드바 토글버튼
-  const { isOpen, onToggle, onClose } = useDisclosure();
+  const { isOpen, onClose, onToggle } = useDisclosure({ defaultIsOpen: true });
+
   return (
     <Box position="relative">
-      <AdminNav />
+      <AdminNav
+        toggleButton={
+          isOpen ? null : <AdminSidebarToggleButton isOpen={isOpen} onToggle={onToggle} />
+        }
+      />
 
       {/* 로그인 필요 다이얼로그 */}
       <LoginRequireAlertDialog isOpen={status === 'error'} />

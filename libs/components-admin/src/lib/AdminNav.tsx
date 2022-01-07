@@ -64,7 +64,11 @@ export function AdminMainLinkButton(): JSX.Element {
   );
 }
 
-export function AdminNav(): JSX.Element {
+export function AdminNav({
+  toggleButton,
+}: {
+  toggleButton?: JSX.Element | null;
+}): JSX.Element {
   return (
     <Flex
       bg={useColorModeValue('white', 'gray.800')}
@@ -78,6 +82,8 @@ export function AdminNav(): JSX.Element {
       align="center"
       justify="flex-start"
     >
+      {/* 사이드바 토글버튼(사이드바 닫혀있는경우만 보임) */}
+      {toggleButton}
       {/* 로고 - 없어서 그냥 메인으로 이동하는 링크 */}
       <AdminMainLinkButton />
 
@@ -88,6 +94,7 @@ export function AdminNav(): JSX.Element {
       <Flex alignItems="center" ml="auto">
         {/* 다크모드 토글버튼 */}
         <ColorModeSwitcher />
+        {/* //TODO: 로그인 한 관리자 아이디 표시 */}
         {/* 로그아웃 버튼( AdminPageLayout 로그인 안되어있으면 로그인 페이지로 이동하는 훅 적용되어있어서 로그인버튼은 없음) */}
         <AdminLogOutButton />
       </Flex>
