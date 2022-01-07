@@ -50,7 +50,6 @@ export function SlideSidebar({ isOpen, children }: SlideSidebarProps): JSX.Eleme
   );
 }
 
-// TODO:  새 페이지 추가하기 쉽게 구성하기
 export interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;

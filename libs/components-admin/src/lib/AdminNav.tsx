@@ -1,7 +1,7 @@
-import { Box, Button, Flex, Link, useColorModeValue } from '@chakra-ui/react';
+import { Box, Button, Flex, Link, useColorModeValue, Text } from '@chakra-ui/react';
 import { adminNavItems } from '@project-lc/components-constants/navigation';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
-import { useIsLoggedIn, useLogout } from '@project-lc/hooks';
+import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -65,6 +65,17 @@ export function AdminMainLinkButton(): JSX.Element {
   );
 }
 
+/** 로그인한 관리자 프로필 표시 - 지금은 단순히 이메일만 표시 */
+export function AdminProfile(): JSX.Element | null {
+  const { data: profileData, isLoading } = useProfile();
+
+  if (!isLoading && profileData) {
+    return <Text>{profileData.email}</Text>;
+  }
+
+  return null;
+}
+
 export function AdminNav({
   toggleButton,
 }: {
@@ -93,9 +104,10 @@ export function AdminNav({
 
       {/* 네비바 우측 메뉴 */}
       <Flex alignItems="center" ml="auto">
+        {/* 로그인한 관리자 이메일 표시 */}
+        <AdminProfile />
         {/* 다크모드 토글버튼 */}
         <ColorModeSwitcher />
-        {/* //TODO: 로그인 한 관리자 아이디 표시 */}
         {/* 로그아웃 버튼( AdminPageLayout 로그인 안되어있으면 로그인 페이지로 이동하는 훅 적용되어있어서 로그인버튼은 없음) */}
         <AdminLogOutButton />
       </Flex>
