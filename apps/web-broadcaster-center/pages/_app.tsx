@@ -1,9 +1,9 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { ThemeProvider } from '@material-ui/core';
 import {
-  LOGO_S3_PREFIX,
   lightBigLogo,
   lightLogo,
+  LOGO_S3_PREFIX,
 } from '@project-lc/components-shared/KksLogo';
 import {
   createChakraTheme,
@@ -12,9 +12,10 @@ import {
 } from '@project-lc/utils-frontend';
 import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';
+import NextNProgress from 'nextjs-progressbar';
 import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import NextNProgress from 'nextjs-progressbar';
+import '../styles/global.font.css';
 
 const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();
