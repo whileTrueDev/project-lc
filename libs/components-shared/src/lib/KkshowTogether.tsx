@@ -28,8 +28,12 @@ export function KkshowTogether({
       backgroundRepeat="no-repeat"
     >
       <Box margin="auto" maxW={1080}>
-        <Heading fontWeight={900}>크크쇼와 </Heading>
-        <Heading fontWeight={900}>함께 하시겠습니까?</Heading>
+        <Heading fontWeight={900} color="WindowText">
+          크크쇼와{' '}
+        </Heading>
+        <Heading fontWeight={900} color="WindowText">
+          함께 하시겠습니까?
+        </Heading>
         <Stack mt={4} direction={{ base: 'column', md: 'row' }}>
           {buttons.slice(0, 2).map((btn) => (
             <Button
