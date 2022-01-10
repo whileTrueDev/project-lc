@@ -12,7 +12,7 @@ import {
   adminSidebarMenuList,
   SidebarMenuLink,
 } from '@project-lc/components-constants/navigation';
-import { NavbarToggleButton as AdminSidebarToggleButton } from '@project-lc/components-shared/navbar';
+import { NavbarToggleButton } from '@project-lc/components-shared/navbar';
 import { motion, Variants } from 'framer-motion';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -116,7 +116,7 @@ export function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps): JSX.Eleme
         {isOpen && (
           <Flex justifyContent="space-between" alignItems="center">
             <Text fontWeight="extrabold">관리 메뉴</Text>
-            <AdminSidebarToggleButton isOpen={isOpen} onToggle={onToggle} />
+            <NavbarToggleButton isOpen={isOpen} onToggle={onToggle} />
           </Flex>
         )}
 
