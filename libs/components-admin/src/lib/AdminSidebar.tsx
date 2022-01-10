@@ -1,6 +1,5 @@
 import {
   Box,
-  BoxProps,
   Divider,
   Flex,
   Icon,
@@ -19,8 +18,6 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 
-export const MotionBox = motion<BoxProps>(Box);
-
 const sidebarVaraints: Variants = {
   open: { width: '200px', opacity: 1 },
   close: { width: '0px', opacity: 0 },
@@ -33,21 +30,28 @@ export interface SlideSidebarProps {
 /** open시 슬라이드되는 사이드바(트위치 사이드바와 비슷한 형태)
  * 너비 및 애니메이션은 sidebarVaraints에서 조절
  * @param isOpen : true일때 animate open, false 일때 animate close
+ *
+ * Chakra-ui 에서 const MotionBox = motion<BoxProps>(Box); 이런식으로 사용하라는 문서를 봤는데
+ * MotionBox를 사용했더니 chakraProps의 transition 타입이 적용되어 framer-motion예제에서와 같이 transition을 사용할 수 없었음
+ * 그래서 그냥 motion.nav 사용
  */
 export function SlideSidebar({ isOpen, children }: SlideSidebarProps): JSX.Element {
   return (
-    <MotionBox
-      as="nav"
-      position="sticky"
-      height="100%"
-      top={0}
+    <motion.nav
+      style={{
+        position: 'sticky',
+        height: '100%',
+        top: 0,
+      }}
       initial="open"
       animate={isOpen ? 'open' : 'close'}
       variants={sidebarVaraints}
-      // transition={{ bounce: 0 }} // 무슨 타입을 넣으란건지??
+      transition={{
+        opacity: { duration: 0.2, ease: 'easeOut' },
+      }}
     >
       {children}
-    </MotionBox>
+    </motion.nav>
   );
 }
 
