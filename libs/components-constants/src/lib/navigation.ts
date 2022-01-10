@@ -30,6 +30,21 @@ export const mainNavItems: Array<NavItem> = [
   },
 ];
 
+export const kkshowNavLinks: Array<NavItem> = [
+  {
+    label: '크크마켓',
+    href: 'https://k-kmarket.com/',
+    isExternal: true,
+  },
+  // { label: '방송편성표', href: '/' },
+  // { label: '방송인', href: '/' },
+  // { label: 'SNS', href: '/' },
+];
+
+// ************************************************
+// 마이페이지 네비
+// ************************************************
+
 export interface LinkItemProps {
   name: string;
   href: string;

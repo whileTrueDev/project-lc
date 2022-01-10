@@ -39,6 +39,9 @@
       "@project-lc/components-web-bc/*": [
         "libs/components-web-bc/src/lib/*"
       ],
+      "@project-lc/components-web-kkshow/*": [
+        "libs/components-web-kkshow/src/lib/*"
+      ],
       "@project-lc/firstmall-db": [
         "libs/firstmall-db/src/index.ts"
       ],
