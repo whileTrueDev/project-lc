@@ -1,4 +1,12 @@
-import { FcMoneyTransfer } from 'react-icons/fc';
+import {
+  FcMoneyTransfer,
+  FcInspection,
+  FcList,
+  FcDislike,
+  FcOnlineSupport,
+  FcSms,
+  FcAdvertising,
+} from 'react-icons/fc';
 
 export interface NavItem {
   label: string;
@@ -100,7 +108,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '방송인',
     href: '/broadcaster',
     children: [
-      { name: '정산정보 검수', href: '/broadcaster/settlement-info' },
+      { name: '정산정보 검수', href: '/broadcaster/settlement-info', icon: FcInspection },
       { name: '정산', href: '/broadcaster/settlement', icon: FcMoneyTransfer },
     ],
   },
@@ -108,15 +116,19 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '판매자',
     href: '/seller',
     children: [
-      { name: '계좌정보 목록', href: '/seller/account' },
-      { name: '사업자 등록정보 검수', href: '/seller/business-registration' },
+      { name: '계좌정보 목록', href: '/seller/account', icon: FcList },
+      {
+        name: '사업자 등록정보 검수',
+        href: '/seller/business-registration',
+        icon: FcInspection,
+      },
       { name: '정산', href: '/seller/settlement', icon: FcMoneyTransfer },
     ],
   },
   {
     name: '상품',
     href: '/goods',
-    children: [{ name: '상품검수', href: '/goods/confirmation' }],
+    children: [{ name: '상품검수', href: '/goods/confirmation', icon: FcInspection }],
   },
   {
     name: '라이브쇼핑',
@@ -125,15 +137,15 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '주문',
     href: 'order',
-    children: [{ name: '결제취소 요청', href: '/order/order-cancel' }],
+    children: [{ name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike }],
   },
   {
     name: '일반관리',
     href: '/general',
     children: [
-      { name: '문의하기', href: '/general/inquiry' },
-      { name: '알림메시지', href: '/general/notification' },
-      { name: '공지사항', href: '/general/notice' },
+      { name: '문의하기', href: '/general/inquiry', icon: FcOnlineSupport },
+      { name: '알림메시지', href: '/general/notification', icon: FcSms },
+      { name: '공지사항', href: '/general/notice', icon: FcAdvertising },
     ],
   },
 ];
