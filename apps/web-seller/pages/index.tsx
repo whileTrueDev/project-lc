@@ -7,6 +7,7 @@ import {
   SellerMainBetaDesktop,
   SellerMainBetaMobile,
 } from '@project-lc/components-shared/MainBeta';
+import { SellerMainHeader } from '@project-lc/components-seller/SellerMainHeader';
 import { SellerNavbar } from '@project-lc/components-shared/Navbar';
 import { useDisplaySize } from '@project-lc/hooks';
 import dayjs from 'dayjs';
@@ -21,8 +22,9 @@ export function Index(): JSX.Element {
     <div>
       <SellerNavbar />
       <Flex minH="100vh" justify="space-between" flexDirection="column">
-        {isMobileSize ? <SellerMainBetaMobile /> : <SellerMainBetaDesktop />}
-        <InquiryForm type="seller" />
+        <SellerMainHeader />
+        {/* {isMobileSize ? <SellerMainBetaMobile /> : <SellerMainBetaDesktop />}
+        <InquiryForm type="seller" /> */}
         <CommonFooter footerLinkList={sellerFooterLinkList} />
       </Flex>
       <FloatingHelpButton />
