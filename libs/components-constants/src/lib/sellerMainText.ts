@@ -11,7 +11,7 @@ export const sellerMainSectionText: Record<string, SectionData> = {
     desc: '판매의 처음부터 끝까지 편리하게 관리할 수 있습니다.',
   },
   heroImage: {
-    img: '/images/main/tv_icon.webp',
+    img: '/images/main/tv_icon/tv_icon.webp',
     title: '크크쇼',
     desc: '라이브 쇼핑 어렵지 않습니다. 크크쇼와 함께라면!',
   },
