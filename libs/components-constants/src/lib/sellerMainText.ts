@@ -16,7 +16,8 @@ export const sellerMainSectionText: Record<string, SectionData> = {
     desc: '라이브 쇼핑 어렵지 않습니다. 크크쇼와 함께라면!',
   },
   feature: {
-    title: '사장님의 마케팅을 확실하고새롭게 바꿔드리겠습니다.',
+    title: `사장님의 마케팅을 확실하고
+    새롭게 바꿔드리겠습니다.`,
   },
   process: {
     title: '라이브 쇼핑의 복잡한 절차, 크크쇼에서 한 번에 해결하세요.',
@@ -48,7 +49,7 @@ export const featureSectionBody: SectionData[] = [
     혼밥러/자취러와 같은 젊은 세대의 꾸준한 유입을 자부합니다!`,
   },
   {
-    title: '라이브 쇼핑',
+    title: '3. 유튜브 업로드, SNS 홍보',
     desc: `라이브를 진행한 영상 편집본, 홍보물 등은 크크쇼 자체 마케팅 채널(유튜브, 인스타그램, 블로그
       등)에 업로드 되어 SNS 상에 상품 검색 노출에 유리한 컨텐츠를 제작 및 업로드 해드립니다. `,
   },
