@@ -3,7 +3,8 @@ import {
   FcInspection,
   FcList,
   FcDislike,
-  FcOnlineSupport,
+  FcVideoCall,
+  FcFaq,
   FcSms,
   FcAdvertising,
 } from 'react-icons/fc';
@@ -148,6 +149,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '라이브쇼핑',
     href: '/live-shopping',
+    children: [{ name: '라이브 쇼핑 목록', href: '/live-shopping', icon: FcVideoCall }],
   },
   {
     name: '주문',
@@ -158,7 +160,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '일반관리',
     href: '/general',
     children: [
-      { name: '문의하기', href: '/general/inquiry', icon: FcOnlineSupport },
+      { name: '문의하기', href: '/general/inquiry', icon: FcFaq },
       { name: '알림메시지', href: '/general/notification', icon: FcSms },
       { name: '공지사항', href: '/general/notice', icon: FcAdvertising },
     ],
