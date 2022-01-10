@@ -2,7 +2,7 @@ import { Box, Flex, useDisclosure } from '@chakra-ui/react';
 import LoginRequireAlertDialog from '@project-lc/components-core/LoginRequireAlertDialog';
 import { useIsLoggedIn } from '@project-lc/hooks';
 import React from 'react';
-import { NavbarToggleButton as AdminSidebarToggleButton } from '@project-lc/components-shared/navbar';
+import { NavbarToggleButton } from '@project-lc/components-shared/navbar';
 
 import { AdminNav } from './AdminNav';
 import AdminSidebar from './AdminSidebar';
@@ -21,7 +21,7 @@ export function AdminPageLayout({ children }: MypageLayoutProps): JSX.Element {
     <Box position="relative">
       <AdminNav
         toggleButton={
-          isOpen ? null : <AdminSidebarToggleButton isOpen={isOpen} onToggle={onToggle} />
+          isOpen ? null : <NavbarToggleButton isOpen={isOpen} onToggle={onToggle} />
         }
       />
 
