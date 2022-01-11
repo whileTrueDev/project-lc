@@ -1,3 +1,5 @@
+const MAIN_IMAGE_PATH = '/images/main';
+
 export type SectionData = Partial<{
   title: string;
   desc: string;
@@ -11,7 +13,7 @@ export const sellerMainSectionText: Record<string, SectionData> = {
     desc: '판매의 처음부터 끝까지 편리하게 관리할 수 있습니다.',
   },
   heroImage: {
-    img: '/images/main/tv_icon/tv_icon.webp',
+    img: `${MAIN_IMAGE_PATH}/tv_icon/tv_icon.webp`,
     title: '크크쇼',
     desc: '라이브 쇼핑 어렵지 않습니다. 크크쇼와 함께라면!',
   },
@@ -20,8 +22,10 @@ export const sellerMainSectionText: Record<string, SectionData> = {
     새롭게 바꿔드리겠습니다.`,
   },
   process: {
-    title: '라이브 쇼핑의 복잡한 절차, 크크쇼에서 한 번에 해결하세요.',
-    desc: '라이브 쇼핑의 처음부터 끝까지 전문 매니저가 1:1로 전담하여 진행합니다.',
+    title: `라이브 쇼핑의 복잡한 절차, 
+    크크쇼에서 한 번에 해결하세요.`,
+    desc: `라이브 쇼핑의 처음부터 끝까지 
+    전문 매니저가 1:1로 전담하여 진행합니다.`,
     img: '', // 절차 이미지
   },
   howToUser: {
@@ -56,4 +60,11 @@ export const featureSectionBody: SectionData[] = [
 ];
 
 // process section 내용
-export const processSectionBody: SectionData[] = [{}];
+export const processSectionBody: SectionData[] = [
+  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-1.png`, title: '방송인 섭외' },
+  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-2.png`, title: '컨텐츠 기획' },
+  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-3.png`, title: '홍보물 이미지 제작' },
+  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-4.png`, title: 'SNS 홍보' },
+  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-5.png`, title: '리허설' },
+  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-6.png`, title: '본 방송 리드' },
+];

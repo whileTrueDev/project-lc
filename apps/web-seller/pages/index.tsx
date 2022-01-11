@@ -9,6 +9,7 @@ import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 // } from '@project-lc/components-shared/MainBeta';
 import { SellerMainHeader } from '@project-lc/components-seller/SellerMainHeader';
 import { SellerMainFeatureSection } from '@project-lc/components-seller/SellerMainFeatureSection';
+import { SellerMainProcessSection } from '@project-lc/components-seller/SellerMainProcessSection';
 import { SellerNavbar } from '@project-lc/components-shared/Navbar';
 import { useDisplaySize } from '@project-lc/hooks';
 import dayjs from 'dayjs';
@@ -25,6 +26,7 @@ export function Index(): JSX.Element {
       <Flex minH="100vh" justify="space-between" flexDirection="column">
         <SellerMainHeader />
         <SellerMainFeatureSection />
+        <SellerMainProcessSection />
         {/* {isMobileSize ? <SellerMainBetaMobile /> : <SellerMainBetaDesktop />}
         <InquiryForm type="seller" /> */}
         <CommonFooter footerLinkList={sellerFooterLinkList} />
