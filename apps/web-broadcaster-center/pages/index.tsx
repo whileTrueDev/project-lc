@@ -5,6 +5,9 @@ import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import { FloatingHelpButton } from '@project-lc/components-shared/FloatingHelpButton';
 import { KkshowTogether } from '@project-lc/components-shared/KkshowTogether';
 import { BroadcasterNavbar } from '@project-lc/components-shared/Navbar';
+import { BroadcasterMainHowToUse } from '@project-lc/components-web-bc/main/BroadcasterMainHowToUse';
+import { BroadcasterMainIntroduce } from '@project-lc/components-web-bc/main/BroadcasterMainIntroduce';
+import { BroadcasterMainProcess } from '@project-lc/components-web-bc/main/BroadcasterMainProcess';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { AnimatePresence } from 'framer-motion';
@@ -16,8 +19,11 @@ export function Index(): JSX.Element {
     <div>
       <Flex minH="100vh" justify="space-between" flexDirection="column">
         <BroadcasterNavbar />
+
         <BroadcasterMain />
+
         <KkshowTogether />
+
         <CommonFooter footerLinkList={broadcasterFooterLinkList} />
       </Flex>
       <FloatingHelpButton />
@@ -31,6 +37,9 @@ function BroadcasterMain(): JSX.Element {
   return (
     <Box>
       <BroadcasterMainHero />
+      <BroadcasterMainIntroduce />
+      <BroadcasterMainProcess />
+      <BroadcasterMainHowToUse />
     </Box>
   );
 }
@@ -81,6 +90,7 @@ function BroadcasterMainHero(): JSX.Element {
               갤러리2
             </Box>
             <Box
+              ml={40}
               zIndex="base"
               backgroundColor="white"
               color="WindowText"

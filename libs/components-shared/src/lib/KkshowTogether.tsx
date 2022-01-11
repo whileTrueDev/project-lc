@@ -16,22 +16,23 @@ export function KkshowTogether({
   return (
     <Box bg={useColorModeValue('gray.50', 'inherit')}>
       <Box
-        px={{ base: 4, sm: 8 }}
-        pt={10}
+        maxW="6xl"
+        px={4}
+        pt={20}
         pb={12}
-        minH={300}
-        maxW={1280}
+        minH={350}
         margin="auto"
         w="100%"
-        backgroundImage="images/vector-smart-object.png"
+        backgroundImage="/images/main/together.png"
         backgroundPosition={{
-          base: 'right -300px bottom 0px',
-          sm: 'right -150px bottom 0px',
+          base: 'right -400px bottom 0px',
+          sm: 'right -280px bottom 0px',
           md: 'right 0 bottom 100%',
         }}
+        backgroundSize={{ base: 'cover', sm: 'auto 350px' }}
         backgroundRepeat="no-repeat"
       >
-        <Box margin="auto" maxW={1080}>
+        <Box margin="auto">
           <Heading fontWeight={900}>크크쇼와 </Heading>
           <Heading fontWeight={900}>함께 하시겠습니까?</Heading>
           <Stack mt={4} direction={{ base: 'column', md: 'row' }}>
@@ -52,5 +53,3 @@ export function KkshowTogether({
     </Box>
   );
 }
-
-export default KkshowTogether;
