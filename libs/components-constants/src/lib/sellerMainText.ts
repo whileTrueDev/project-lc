@@ -1,4 +1,4 @@
-const MAIN_IMAGE_PATH = '/images/main';
+export const MAIN_IMAGE_PATH = '/images/main';
 
 export type SectionData = Partial<{
   title: string;
@@ -26,17 +26,16 @@ export const sellerMainSectionText: Record<string, SectionData> = {
     크크쇼에서 한 번에 해결하세요.`,
     desc: `라이브 쇼핑의 처음부터 끝까지 
     전문 매니저가 1:1로 전담하여 진행합니다.`,
-    img: '', // 절차 이미지
   },
   howToUse: {
     title: '크크쇼 이용 방법',
     desc: `크크쇼에서는 상품 등록, 라이브 쇼핑,
      판매관리, 정산관리까지 모두 할 수 있습니다.`,
-    img: '', // gif 이미지 제공예정
   },
   review: {
     title: '사장님들의 생생한 후기로 증명된 크크쇼 효과 ',
-    desc: `크크쇼를 진행했던 대표님들의 라이브 쇼핑 서비스에 대한 후기입니다.
+    desc: `크크쇼를 진행했던 대표님들의 
+    라이브 쇼핑 서비스에 대한 후기입니다.
     (실제 대화 내용 캡처)`,
   },
 };
