@@ -1,10 +1,11 @@
-import { SimpleGrid } from '@chakra-ui/react';
+import { Box, SimpleGrid } from '@chakra-ui/react';
 import {
   MAIN_IMAGE_PATH,
   sellerMainSectionText,
 } from '@project-lc/components-constants/sellerMainText';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useDisplaySize } from '@project-lc/hooks';
+import { motion } from 'framer-motion';
 import { useMemo } from 'react';
 import { SellerMainSectionContainer } from './SellerMainFeatureSection';
 
@@ -47,12 +48,27 @@ const chatImages = [
 export function SellerMainReviewSection(): JSX.Element {
   const { title, desc } = sellerMainSectionText.review;
   const { isMobileSize } = useDisplaySize();
+
   const chatImagesSorted = useMemo(() => {
     if (isMobileSize) {
       return chatImages.sort((a, b) => a.order.mobile - b.order.mobile);
     }
     return chatImages.sort((a, b) => a.order.desktop - b.order.desktop);
   }, [isMobileSize]);
+
+  const variants = {
+    offscreen: { opacity: 0, y: 100, scale: 0.8 },
+    onscreen: {
+      y: isMobileSize ? 0 : -50,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: 'spring',
+        bounce: 0.4,
+        duration: 1.2,
+      },
+    },
+  };
   return (
     <SellerMainSectionContainer
       sectionData={{
@@ -60,21 +76,43 @@ export function SellerMainReviewSection(): JSX.Element {
         desc,
       }}
     >
-      <SimpleGrid columns={{ base: 1, md: 2 }}>
-        {chatImagesSorted.map((item) => {
-          return (
+      <Box position="relative">
+        {/* 후기 채팅 이미지 영역 */}
+        <SimpleGrid columns={{ base: 1, md: 2 }}>
+          {chatImagesSorted.map((item) => {
+            return (
+              <ChakraNextImage
+                key={item.title}
+                layout="responsive"
+                maxW="600px"
+                width={600}
+                height={600}
+                src={item.img}
+                objectFit="contain"
+              />
+            );
+          })}
+        </SimpleGrid>
+
+        {/* 강조문구 이미지  */}
+        <motion.div
+          style={{ display: 'inline-block', minWidth: '100%' }}
+          variants={variants}
+          initial="offscreen"
+          whileInView="onscreen"
+          viewport={{ once: true, amount: 0.8 }}
+        >
+          <Box maxW="690px" m={[0, 'auto']}>
             <ChakraNextImage
-              key={item.title}
               layout="responsive"
-              maxW="600px"
-              width={600}
-              height={600}
-              src={item.img}
-              objectFit="contain"
+              width={690}
+              height={200}
+              src={`${MAIN_IMAGE_PATH}/review/last/last.png`}
+              objectFit="fill"
             />
-          );
-        })}
-      </SimpleGrid>
+          </Box>
+        </motion.div>
+      </Box>
     </SellerMainSectionContainer>
   );
 }

@@ -5,6 +5,7 @@ import {
 } from '@project-lc/components-constants/sellerMainText';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useDisplaySize } from '@project-lc/hooks';
+import { Fragment } from 'react';
 import { SellerMainSectionContainer } from './SellerMainFeatureSection';
 
 /** 과정 이미지 : 모바일화면(750이하)일때  - 이미지라서 화면 작을때 글자가 흐리게 보임 */
@@ -34,8 +35,8 @@ export function SellerMainProcessImageDeskTop(): JSX.Element {
         const { title, img } = item;
         if (!title || !img) return null;
         return (
-          <>
-            <Box key={item.title} w="100px" h="100px">
+          <Fragment key={item.title}>
+            <Box w="100px" h="100px">
               <ChakraNextImage
                 layout="responsive"
                 width={100}
@@ -46,7 +47,7 @@ export function SellerMainProcessImageDeskTop(): JSX.Element {
               <Text>{item.title}</Text>
             </Box>
             {index !== processSectionBody.length - 1 && <Text> &gt;</Text>}
-          </>
+          </Fragment>
         );
       })}
     </Flex>
