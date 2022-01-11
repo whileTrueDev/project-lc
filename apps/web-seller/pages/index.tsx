@@ -12,6 +12,7 @@ import { SellerMainFeatureSection } from '@project-lc/components-seller/SellerMa
 import { SellerMainProcessSection } from '@project-lc/components-seller/SellerMainProcessSection';
 import { SellerMainHowToUseSection } from '@project-lc/components-seller/SellerMainHowToUseSection';
 import { SellerMainReviewSection } from '@project-lc/components-seller/SellerMainReviewSection';
+import { SellerMainInquirySection } from '@project-lc/components-seller/SellerMainInquirySection';
 import { SellerNavbar } from '@project-lc/components-shared/Navbar';
 import { useDisplaySize } from '@project-lc/hooks';
 import dayjs from 'dayjs';
@@ -31,6 +32,7 @@ export function Index(): JSX.Element {
         <SellerMainProcessSection />
         <SellerMainHowToUseSection />
         <SellerMainReviewSection />
+        <SellerMainInquirySection />
         {/* {isMobileSize ? <SellerMainBetaMobile /> : <SellerMainBetaDesktop />}
         <InquiryForm type="seller" /> */}
         <CommonFooter footerLinkList={sellerFooterLinkList} />
