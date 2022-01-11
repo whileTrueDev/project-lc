@@ -3,6 +3,7 @@ import {
   sellerMainSectionText,
   featureSectionBody,
 } from '@project-lc/components-constants/sellerMainText';
+
 /**
  *
  * @returns 사장님의 마케팅을 확실하고~ 섹션
@@ -11,7 +12,15 @@ export function SellerMainFeatureSection(): JSX.Element {
   const { title } = sellerMainSectionText.feature;
   return (
     // 배경
-    <Stack bg="gray.50" py={{ base: 10, sm: 14 }}>
+    <Stack
+      bg="gray.50"
+      py={{ base: 10, sm: 14 }}
+      // TODO: 반응형일시 배경이미지 위치 어떻게 할지 생각 텍스트인데 pseudo element로 넣으면 안되려나??
+      backgroundImage={`url('/images/main/feature-bg-mobile/bg.png')`}
+      backgroundRepeat="no-repeat"
+      backgroundSize="contain"
+      backgroundPosition="bottom right"
+    >
       {/* maxWidth container */}
       <Container maxW="container.xl">
         <Stack spacing={{ base: 6, sm: 8 }}>
