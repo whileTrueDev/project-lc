@@ -89,17 +89,13 @@ export function SellerMainHowToUseItem({
 export function SellerMainHowToUseSection(): JSX.Element {
   const [selectedItem, setSelectedItem] = useState<SectionData>(howToUseSectionBody[0]);
   return (
-    <SellerMainSectionContainer
-      sectionData={sellerMainSectionText.howToUse}
-      bgProps={{
-        bg: 'gray.50',
-      }}
-    >
+    <SellerMainSectionContainer sectionData={sellerMainSectionText.howToUse} hasGrayBg>
       <Stack
         spacing={8}
         alignItems="center"
         direction={{ base: 'column', md: 'row-reverse' }}
         pl={{ base: 0, md: 4 }}
+        py={8}
       >
         {/* gif 이미지 영역 */}
         <SellerMainHowToUseImage selectedItem={selectedItem} />

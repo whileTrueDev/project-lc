@@ -11,6 +11,7 @@ import { Fragment } from 'react';
 import { SellerMainSectionContainer } from './SellerMainFeatureSection';
 
 /** 과정 이미지 : 모바일화면(750이하)일때  - 이미지라서 화면 작을때 글자가 흐리게 보임 */
+// TODO: 데스크탑처럼 따로 분리하기(다크모드 글자색)
 export function SellerMainProcessImageMobile(): JSX.Element {
   return (
     <Box position="relative">
@@ -51,6 +52,7 @@ const text = {
 const MotionText = motion<TextProps>(Text);
 /** 과정 이미지 : 데스크톱화면(750 이상)일때
  */
+
 export function SellerMainProcessImageDeskTop(): JSX.Element {
   return (
     <motion.div
@@ -59,14 +61,14 @@ export function SellerMainProcessImageDeskTop(): JSX.Element {
       whileInView="onscreen"
       viewport={{ once: true, amount: 'all' }}
     >
-      <Stack direction="row" pl={6}>
+      <Stack direction="row" p={8} justifyContent="space-around">
         {processSectionBody.map((item, index) => {
           const { title, img } = item;
           if (!title || !img) return null;
           return (
             <Fragment key={item.title}>
               <Stack alignItems="center" spacing={{ md: 4, lg: 6 }}>
-                <Box w={{ md: '75px', lg: '100px' }} maxW="100px" maxH="100px">
+                <Box w={{ md: '75px', lg: '113px' }} maxW="113px" maxH="113px">
                   <ChakraNextImage
                     layout="responsive"
                     width={100}
@@ -89,7 +91,7 @@ export function SellerMainProcessImageDeskTop(): JSX.Element {
 
               {index !== processSectionBody.length - 1 && (
                 <Box position="relative" top="10">
-                  <ChevronRightIcon boxSize="10" color="gray.700" />
+                  <ChevronRightIcon boxSize="10" color="orange.900" />
                 </Box>
               )}
             </Fragment>

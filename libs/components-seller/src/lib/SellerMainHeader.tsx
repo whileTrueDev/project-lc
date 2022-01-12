@@ -1,10 +1,8 @@
-import { Box, Center, Container, Stack, Text } from '@chakra-ui/react';
+import { Box, Center, Container, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 import { sellerMainSectionText } from '@project-lc/components-constants/sellerMainText';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 
-// TODO : 작업하다가 겹치는 스타일 -> 컴포넌트로 묶기(배경, 컨테이너 컴포넌트의 경우 동일한 컴포넌트를 사용하도록 수정하면 좋겠다)
 // contents maxWidth : 시안에는 1200px인데 container.xl로 적용함
-// TODO : desktop 사이즈 적용(모바일 기준으로 우선작업함)
 
 /** 판매자 센터 적혀있는 파란 배너 부분 */
 export function SellerMainHeroTextSection(): JSX.Element {
@@ -48,6 +46,7 @@ export function SellerMainHeroTextSection(): JSX.Element {
   );
 }
 
+// TODO: 티비 아이콘 테두리 흰색 아닌 투명으로 바꾸기
 /** 판매자 센터 적혀있는 파란 배너 부분아래 티비 아이콘 부분 */
 export function SellerMainHeroImageSection(): JSX.Element {
   const { title, desc, img } = sellerMainSectionText.heroImage;
@@ -70,7 +69,10 @@ export function SellerMainHeroImageSection(): JSX.Element {
         >
           {title}
         </Text>
-        <Text color="gray.600" fontSize={{ base: 'md', sm: 'lg' }}>
+        <Text
+          color={useColorModeValue('gray.600', 'gray.200')}
+          fontSize={{ base: 'md', sm: 'lg' }}
+        >
           {desc}
         </Text>
       </Box>

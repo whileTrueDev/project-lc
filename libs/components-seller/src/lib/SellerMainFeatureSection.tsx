@@ -1,8 +1,16 @@
-import { Stack, Text, Box, Flex, Container, StackProps } from '@chakra-ui/react';
 import {
-  sellerMainSectionText,
+  Box,
+  BoxProps,
+  Container,
+  Stack,
+  StackProps,
+  Text,
+  useColorModeValue,
+} from '@chakra-ui/react';
+import {
   featureSectionBody,
   SectionData,
+  sellerMainSectionText,
 } from '@project-lc/components-constants/sellerMainText';
 import { motion } from 'framer-motion';
 import React from 'react';
@@ -47,18 +55,28 @@ export function SellerMainSectionContainer({
   children,
   sectionData,
   bgProps,
+  hasGrayBg = false,
 }: {
+  hasGrayBg?: boolean;
   children?: React.ReactNode;
   sectionData: SectionData;
-  bgProps?: StackProps;
+  bgProps?: BoxProps;
 }): JSX.Element {
   const { title, desc } = sectionData;
+  const grayBg = useColorModeValue('gray.50', 'gray.700');
+
   return (
-    // 컨테이너 배경이 되는 부분
-    <Stack py={{ base: 10, sm: 14 }} {...bgProps}>
+    // 배경 컨테이너
+    <Box
+      py={{ base: 10, sm: 14, xl: 20 }}
+      position="relative"
+      overflow="hidden"
+      bg={hasGrayBg ? grayBg : undefined}
+      {...bgProps}
+    >
       {/* 실제 컨텐츠 영역(최대너비 1200px임, breakpoint는 xl(1280px) 사용) */}
-      <Container maxW="container.xl">
-        <Stack spacing={{ base: 6, sm: 8 }}>
+      <Container maxW="container.xl" position="relative">
+        <Stack spacing={{ base: 6, sm: 8 }} position="relative">
           <Box
             pl={{ base: 0, md: '1.5rem' }}
             textAlign={{ base: 'center', md: 'left' }}
@@ -92,7 +110,7 @@ export function SellerMainSectionContainer({
           {children}
         </Stack>
       </Container>
-    </Stack>
+    </Box>
   );
 }
 
@@ -101,7 +119,7 @@ export function SellerMainFeatureItem({ item }: { item: SectionData }): JSX.Elem
   const { title: subTitle, desc } = item;
   return (
     <Stack
-      bg="white"
+      bg={useColorModeValue('white', 'gray.700')}
       maxW="1200px"
       px={{ base: 6, md: 20 }}
       py={{ base: 6, md: 10 }}
@@ -110,9 +128,9 @@ export function SellerMainFeatureItem({ item }: { item: SectionData }): JSX.Elem
       textAlign={{ base: 'center', md: 'left' }}
       fontWeight="medium"
       borderRadius="82.5px"
-      boxShadow="md"
+      boxShadow={useColorModeValue('md', 'lg')}
       _hover={{
-        boxShadow: 'lg',
+        boxShadow: useColorModeValue('xl', 'dark-lg'),
         scale: 1.1,
       }}
       transition="all 0.3s ease-in-out"
@@ -120,7 +138,7 @@ export function SellerMainFeatureItem({ item }: { item: SectionData }): JSX.Elem
     >
       <Text
         fontSize={{ base: 'lg', md: 'xl' }}
-        color="blue.500"
+        color={useColorModeValue('blue.500', 'blue.300')}
         fontFamily="Gmarket Sans"
         w={{ base: '100%', md: '30%' }}
       >
@@ -141,12 +159,21 @@ export function SellerMainFeatureSection(): JSX.Element {
       sectionData={{
         title,
       }}
+      hasGrayBg
       bgProps={{
-        bg: 'gray.50',
-        backgroundImage: `url('/images/main/feature/bg.png')`,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'contain',
-        backgroundPosition: 'bottom right',
+        // 배경에 들어가는 KKS 글자 이미지로 맞추기 힘들어서 가상요소로 넣음
+        _before: {
+          content: `"KKS"`,
+          fontFamily: 'Gmarket Sans',
+          fontWeight: 'bold',
+          display: 'block',
+          fontSize: { base: '15rem', md: '20rem' },
+          color: useColorModeValue('gray.200', 'gray.600'),
+          opacity: 0.3,
+          right: '-0.4em',
+          bottom: '-0.3em',
+          position: 'absolute',
+        },
       }}
     >
       {featureSectionBody.map((item) => (
