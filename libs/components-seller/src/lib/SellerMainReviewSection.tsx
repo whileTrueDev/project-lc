@@ -57,7 +57,7 @@ export function SellerMainReviewSection(): JSX.Element {
   }, [isMobileSize]);
 
   const variants = {
-    offscreen: { opacity: 0, y: 100, scale: 0.8 },
+    offscreen: { opacity: 0, y: 150, scale: 0.7 },
     onscreen: {
       y: isMobileSize ? 0 : -50,
       opacity: 1,
@@ -65,7 +65,7 @@ export function SellerMainReviewSection(): JSX.Element {
       transition: {
         type: 'spring',
         bounce: 0.4,
-        duration: 1.2,
+        duration: 1.4,
       },
     },
   };
@@ -100,7 +100,7 @@ export function SellerMainReviewSection(): JSX.Element {
           variants={variants}
           initial="offscreen"
           whileInView="onscreen"
-          viewport={{ once: true, amount: 0.8 }}
+          viewport={{ once: true, amount: 'all' }}
         >
           <Box maxW="690px" m={[0, 'auto']}>
             <ChakraNextImage

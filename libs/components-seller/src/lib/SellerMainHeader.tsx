@@ -15,7 +15,7 @@ export function SellerMainHeroTextSection(): JSX.Element {
     // base~ 750까지, md ~ 750 이상인경우 {base: , md:}
     <Box
       color="white"
-      height={{ base: '200px', sm: '200px' }}
+      height={{ base: '150px', sm: '200px' }}
       bgGradient="linear(to-b, blue.400, blue.600)"
     >
       {/* 이미지 너비 제한하기 위해 컨테이터 추가함 */}
@@ -28,12 +28,11 @@ export function SellerMainHeroTextSection(): JSX.Element {
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
+        backgroundImage={`url('/images/main/bg-circle/bg-circle.png')`}
+        backgroundRepeat="no-repeat"
+        backgroundSize="cover"
+        backgroundPosition="center"
       >
-        <ChakraNextImage
-          layout="fill"
-          objectFit={{ base: 'cover' }}
-          src="/images/main/bg-circle/bg-circle.png"
-        />
         <Text
           fontSize={{ base: '3xl', sm: '4xl' }}
           fontFamily="Gmarket Sans"
