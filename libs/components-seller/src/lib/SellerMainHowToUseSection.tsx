@@ -20,7 +20,7 @@ export function SellerMainHowToUseImage({
   return (
     <AnimatePresence exitBeforeEnter>
       <motion.div
-        style={{ display: 'inline-block', minWidth: isMobileSize ? '100%' : '60%' }}
+        style={{ display: 'inline-block', minWidth: isMobileSize ? '100%' : '70%' }}
         key={selectedItem.title || ''}
         animate={{ opacity: 1, y: 0 }}
         initial={{ opacity: 0, y: -10 }}
@@ -28,7 +28,7 @@ export function SellerMainHowToUseImage({
         transition={{ duration: 0.15 }}
       >
         {selectedItem.img && (
-          <Box position="relative" boxShadow="base" borderRadius="xl" maxW="685px">
+          <Box position="relative" maxW={{ base: '658px', md: '815px' }}>
             <ChakraNextImage
               layout="responsive"
               width={685}
@@ -66,7 +66,7 @@ export function SellerMainHowToUseItem({
   const { title, desc } = item;
   if (!title || !desc) return null;
   return (
-    <Box>
+    <Box cursor="pointer" _hover={{ color: 'blue.500' }}>
       <motion.div
         onClick={onClick}
         style={{ borderRadius: '1rem', padding: '1rem' }}
@@ -74,10 +74,12 @@ export function SellerMainHowToUseItem({
         initial="notSelected"
         animate={selected ? 'selected' : 'notSelected'}
       >
-        <Text fontWeight="bold" fontSize="xl">
+        <Text fontWeight="bold" fontSize={{ base: 'lg', md: 'xl' }}>
           {title}
         </Text>
-        <Text>{desc}</Text>
+        <Text fontSize={{ base: 'sm', md: 'md' }} wordBreak="keep-all">
+          {desc}
+        </Text>
       </motion.div>
     </Box>
   );
@@ -97,6 +99,7 @@ export function SellerMainHowToUseSection(): JSX.Element {
         spacing={8}
         alignItems="center"
         direction={{ base: 'column', md: 'row-reverse' }}
+        pl={{ base: 0, md: 4 }}
       >
         {/* gif 이미지 영역 */}
         <SellerMainHowToUseImage selectedItem={selectedItem} />

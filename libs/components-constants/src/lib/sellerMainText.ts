@@ -70,30 +70,29 @@ export const processSectionBody: SectionData[] = [
 ];
 
 // how to use section 내용
-// TODO: img gif로 수정필요
 export const howToUseSectionBody: SectionData[] = [
   {
     title: '상품등록',
     desc: `판매자 승인을 받고 상품을 등록합니다.`,
-    img: `${MAIN_IMAGE_PATH}/step-desktop/step-1.png`,
+    img: `${MAIN_IMAGE_PATH}/howToUse/sell_htu_gif1.gif`,
   },
   {
     title: '라이브 쇼핑 등록',
     desc: `라이브 방송에 소개할 상품을 선택하고
   요청사항을 입력하면 담당 MD가 직접 방송인
   매칭 및 라이브 커머스 진행을 도와드립니다.   `,
-    img: `${MAIN_IMAGE_PATH}/step-desktop/step-2.png`,
+    img: `${MAIN_IMAGE_PATH}/howToUse/sell_htu_gif2.gif`,
   },
   {
     title: '판매 관리',
     desc: `라이브로 판매되는 상품 주문을 실시간으로
   확인하며, 상품 출고를 진행할 수 있습니다. `,
-    img: `${MAIN_IMAGE_PATH}/step-desktop/step-3.png`,
+    img: `${MAIN_IMAGE_PATH}/howToUse/sell_htu_gif3.gif`,
   },
   {
     title: '정산 관리',
     desc: `월 2회 구매확정 기준으로 정산 진행하며
   수익현황을 확인할 수 있습니다. `,
-    img: `${MAIN_IMAGE_PATH}/step-desktop/step-4.png`,
+    img: `${MAIN_IMAGE_PATH}/howToUse/sell_htu_gif4.gif`,
   },
 ];
