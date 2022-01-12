@@ -17,7 +17,7 @@ const blueColorPalette = {
 export const createChakraTheme = () =>
   extendTheme({
     styles: {
-      global: (props) => ({
+      global: (props: any) => ({
         body: {
           color: mode('gray.800', 'whiteAlpha.900')(props),
           bg: mode('white', 'gray.800')(props),
