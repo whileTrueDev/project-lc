@@ -3,7 +3,7 @@ import {
   Avatar,
   Box,
   Button,
-  ButtonGroup,
+  ButtonProps,
   Container,
   Divider,
   Drawer,
@@ -26,6 +26,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { mainNavItems, NavItem } from '@project-lc/components-constants/navigation';
+import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { useDisplaySize, useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
@@ -37,12 +38,24 @@ import { KksLogo } from './KksLogo';
 import ProfileBox from './ProfileBox';
 import UserNotificationSection from './UserNotificationSection';
 
+/** 네비바 우측 버튼 공통 스타일 */
+export function NavbarRightButton(props: ButtonProps): JSX.Element {
+  const { children } = props;
+  return (
+    <Button variant="unstyled" minW="80px" size="xs" fontSize="1rem" {...props}>
+      {children}
+    </Button>
+  );
+}
+
+/** 네비바 우측영역(로그인 여부에 따라 로그인 버튼 혹은 프로필 사진이 표시됨) */
 export function NavbarRightButtonSection(): JSX.Element {
   const router = useRouter();
   const { isLoggedIn } = useIsLoggedIn();
   return (
     <Flex alignItems="center" justifyContent="flex-end">
       {isLoggedIn ? (
+        // 로그인했을때
         <>
           <Box mr={{ base: '1', sm: '3' }}>
             <UserNotificationSection />
@@ -51,36 +64,34 @@ export function NavbarRightButtonSection(): JSX.Element {
           <PersonalPopoverMenu />
         </>
       ) : (
-        // 로그인 안했을때 로그인|회원가입 버튼그룹
-        <ButtonGroup>
-          <Button
-            as="a"
-            fontSize="sm"
-            fontWeight={500}
-            variant="link"
-            onClick={() => router.push('/login')}
-            mr={{ base: '1', sm: '3' }}
-          >
-            로그인
-          </Button>
-          <Button
-            onClick={() => router.push('/signup')}
-            display={{ base: 'none', md: 'inline-flex' }}
-            fontSize="sm"
-            fontWeight={600}
-            color="white"
-            bg="pink.400"
-            _hover={{ bg: 'pink.300' }}
-          >
-            회원가입
-          </Button>
-        </ButtonGroup>
+        // 로그인 안했을때
+        <>
+          <Box display={{ base: 'none', sm: 'block' }}>
+            <ColorModeSwitcher />
+          </Box>
+          {/* 로그인|회원가입 버튼그룹 컨테이너 */}
+          <Flex bg="blue.500" color="white" borderRadius="lg" height="32px" p={1}>
+            <NavbarRightButton onClick={() => router.push('/login')}>
+              로그인
+            </NavbarRightButton>
+            <Divider
+              display={{ base: 'none', md: 'inline-flex' }}
+              orientation="vertical"
+            />
+            <NavbarRightButton
+              onClick={() => router.push('/signup')}
+              display={{ base: 'none', md: 'inline-flex' }}
+            >
+              회원가입
+            </NavbarRightButton>
+          </Flex>
+        </>
       )}
     </Flex>
   );
 }
 
-/** 로그인 한 경우 네비바 우측 개인메뉴 팝오버 */
+/** 로그인 한 경우에 사용하는 네비바 우측 개인메뉴 팝오버 */
 export function PersonalPopoverMenu(): JSX.Element {
   const router = useRouter();
   const { logout } = useLogout();
@@ -113,7 +124,7 @@ export function PersonalPopoverMenu(): JSX.Element {
           계정 설정
         </MenuItem>
 
-        {/* 다크모드 버튼 - 이게 로그인 한 상태에서만 표시되는 개인메뉴에 포함되면 로그인 안한경우 다크모드 전환 불가능한데 밖에도 둬야하나?? */}
+        {/* 다크모드 버튼 */}
         <MenuItem my={1} icon={<SwitchIcon />} onClick={toggleColorMode}>
           {colorMode === 'light' ? '다크모드' : '라이트모드'}
         </MenuItem>
@@ -135,6 +146,7 @@ export function PersonalPopoverMenu(): JSX.Element {
   );
 }
 
+/** 네비바에 사용하는 크크쇼 로고(링크) */
 export function NavbarLinkLogo({ appType }: { appType: UserType }): JSX.Element {
   return (
     <NextLink href="/" passHref>
@@ -151,10 +163,11 @@ export function NavbarLinkLogo({ appType }: { appType: UserType }): JSX.Element 
 export interface NavbarProps {
   appType?: UserType;
 }
+/** 네비바 레이아웃 */
 export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
   const { isOpen, onClose, onToggle } = useDisclosure();
 
-  // 햄버거버튼(모바일화면에서만)
+  // 햄버거버튼(모바일화면에서만 표시)
   const hambergerButton = useMemo(() => {
     return (
       <Flex alignItems="center">
@@ -216,6 +229,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
   );
 }
 
+/** 데스크톱 화면에서 네비바 메뉴목록 */
 const DesktopNav = (): JSX.Element => {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
@@ -233,8 +247,8 @@ const DesktopNav = (): JSX.Element => {
           <NextLink href={navItem.href ?? '#'} passHref>
             <Link
               p={2}
-              fontSize="sm"
-              fontWeight={500}
+              fontSize={{ md: 'md', xl: 'lg' }}
+              fontWeight="bold"
               color={linkColor}
               _hover={{
                 textDecoration: 'none',
