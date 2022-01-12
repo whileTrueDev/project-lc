@@ -50,7 +50,7 @@ export function KksLogo(props: KksLogoProps): JSX.Element | null {
   );
 
   if (size === 'small') {
-    return <ChakraNextImage src={logoSrc} width="100" height="40" />;
+    return <ChakraNextImage src={logoSrc} width="90" height="53" />;
   }
   if (size === 'mid') {
     return <ChakraNextImage src={logoSrc} width="260" height="82" />;
