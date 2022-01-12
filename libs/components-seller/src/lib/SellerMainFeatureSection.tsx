@@ -65,14 +65,15 @@ export function SellerMainSectionContainer({
             position="relative"
           >
             <FadeInBar />
-            <Stack>
+
+            <Stack wordBreak="keep-all">
               {title && (
                 <Text
                   fontFamily="Gmarket Sans"
                   fontWeight="bold"
                   lineHeight="shorter"
                   whiteSpace="pre-line"
-                  fontSize={{ base: '2xl', sm: '4xl' }}
+                  fontSize={{ base: '2xl', sm: '3xl' }}
                 >
                   {title}
                 </Text>
@@ -80,6 +81,7 @@ export function SellerMainSectionContainer({
               {desc && (
                 <Text
                   whiteSpace={{ base: 'pre-line', md: 'normal' }}
+                  wordBreak="keep-all"
                   fontSize={{ base: 'sm', sm: 'lg' }}
                 >
                   {desc}
@@ -98,7 +100,7 @@ export function SellerMainSectionContainer({
 export function SellerMainFeatureItem({ item }: { item: SectionData }): JSX.Element {
   const { title: subTitle, desc } = item;
   return (
-    <Flex
+    <Stack
       bg="white"
       maxW="1200px"
       px={{ base: 6, md: 20 }}
@@ -108,15 +110,16 @@ export function SellerMainFeatureItem({ item }: { item: SectionData }): JSX.Elem
       textAlign={{ base: 'center', md: 'left' }}
       fontWeight="medium"
       borderRadius="82.5px"
-      boxShadow="sm"
+      boxShadow="md"
       _hover={{
         boxShadow: 'lg',
         scale: 1.1,
       }}
       transition="all 0.3s ease-in-out"
+      wordBreak="keep-all"
     >
       <Text
-        fontSize={{ base: 'lg', sm: 'md' }}
+        fontSize={{ base: 'lg', md: 'xl' }}
         color="blue.500"
         fontFamily="Gmarket Sans"
         w={{ base: '100%', md: '30%' }}
@@ -126,7 +129,7 @@ export function SellerMainFeatureItem({ item }: { item: SectionData }): JSX.Elem
       <Text w={{ base: '100%', md: '70%' }} fontSize={{ base: 'sm', sm: 'lg' }}>
         {desc}
       </Text>
-    </Flex>
+    </Stack>
   );
 }
 
@@ -140,7 +143,7 @@ export function SellerMainFeatureSection(): JSX.Element {
       }}
       bgProps={{
         bg: 'gray.50',
-        backgroundImage: `url('/images/main/feature-bg-mobile/bg.png')`,
+        backgroundImage: `url('/images/main/feature/bg.png')`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'contain',
         backgroundPosition: 'bottom right',

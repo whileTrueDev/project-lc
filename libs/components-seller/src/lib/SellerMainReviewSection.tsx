@@ -102,11 +102,11 @@ export function SellerMainReviewSection(): JSX.Element {
           whileInView="onscreen"
           viewport={{ once: true, amount: 'all' }}
         >
-          <Box maxW="690px" m={[0, 'auto']}>
+          <Box maxW={{ base: '690px', md: '883px' }} m={[0, 'auto']}>
             <ChakraNextImage
               layout="responsive"
-              width={690}
-              height={200}
+              width={904}
+              height={277}
               src={`${MAIN_IMAGE_PATH}/review/last/last.png`}
               objectFit="fill"
             />

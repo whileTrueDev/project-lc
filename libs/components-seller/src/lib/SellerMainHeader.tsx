@@ -64,7 +64,7 @@ export function SellerMainHeroImageSection(): JSX.Element {
       <Box>
         <Text
           color="blue.500"
-          fontSize={{ base: '3xl', sm: '5xl' }}
+          fontSize={{ base: '3xl', sm: '4xl' }}
           fontWeight="bold"
           fontFamily="Gmarket Sans"
         >
