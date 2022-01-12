@@ -45,16 +45,20 @@ export function MainSectionLayout({
           top={{ base: 0, xl: 8 }}
           left={{ base: 0, xl: -20 }}
           bgColor={whiteIndicator ? 'white' : 'blue'}
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0, transition: { duration: 0.6 } }}
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0, transition: { duration: 0.6 } }}
           viewport={{ once: true }}
         />
         <Box>
-          <Heading fontSize="3xl" whiteSpace="break-spaces">
+          <Heading fontSize={{ base: 'xl', sm: '3xl' }} whiteSpace="break-spaces">
             {title}
           </Heading>
           {subtitle && (
-            <Text mt={2} fontWeight="medium">
+            <Text
+              mt={2}
+              fontWeight="medium"
+              whiteSpace={{ base: 'break-spaces', sm: 'unset' }}
+            >
               {subtitle}
             </Text>
           )}

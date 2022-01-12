@@ -1,5 +1,19 @@
-import { Box, Container, Link, SimpleGrid, Stack, Text } from '@chakra-ui/react';
-import { FooterLinkListItem } from '@project-lc/components-constants/footerLinks';
+import {
+  Box,
+  Center,
+  Container,
+  Flex,
+  Grid,
+  GridItem,
+  Link,
+  SimpleGrid,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
+import {
+  footerInfoArr,
+  FooterLinkListItem,
+} from '@project-lc/components-constants/footerLinks';
 import { MotionButton } from '@project-lc/components-core/MotionButton';
 import { ReactNode } from 'react';
 import { FaInstagram, FaYoutube } from 'react-icons/fa';
@@ -72,33 +86,30 @@ export function CommonFooter({ footerLinkList }: CommonFooterProps): JSX.Element
         </SimpleGrid>
       </Container>
 
-      <Box borderTopWidth={1} borderStyle="solid" borderColor="gray.700">
-        <Container
-          as={Stack}
-          maxW="6xl"
-          py={4}
-          direction={{ base: 'column', md: 'row' }}
-          spacing={4}
-          justify={{ md: 'space-between' }}
-          align={{ md: 'center' }}
-        >
-          <Text fontSize="sm">
-            ⓒ {new Date().getFullYear()} whileTrue All rights reserved.
-          </Text>
+      <Flex borderTopWidth={1} borderStyle="solid" borderColor="gray.700" fontSize="sm">
+        <Container as={Stack} maxW="6xl" py={4} pt={8} direction="column" spacing={4}>
           <Stack direction="row" spacing={6}>
             <SocialButton
-              icon={<FaYoutube />}
+              icon={<FaYoutube fontSize="20px" />}
               label="YouTube"
               href="https://www.youtube.com/channel/UCN3w7jS8f6t2fPROcRY7e0g"
             />
             <SocialButton
-              icon={<FaInstagram />}
+              icon={<FaInstagram fontSize="20px" />}
               label="Instagram"
               href="https://www.instagram.com/zzmarket/"
             />
           </Stack>
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={2}>
+            {footerInfoArr.map((t) => (
+              <GridItem key={t} colSpan={t.includes('사업장소재지') ? 2 : [2, 1]}>
+                <Text>{t}</Text>
+              </GridItem>
+            ))}
+          </SimpleGrid>
+          <Text>ⓒ 2019 whileTrue All rights reserved.</Text>
         </Container>
-      </Box>
+      </Flex>
     </Box>
   );
 }
