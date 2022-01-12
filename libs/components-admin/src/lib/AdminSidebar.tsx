@@ -19,7 +19,7 @@ import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 
 const sidebarVaraints: Variants = {
-  open: { width: '200px', opacity: 1 },
+  open: { width: '240px', opacity: 1 },
   close: { width: '0px', opacity: 0 },
 };
 
@@ -39,9 +39,10 @@ export function SlideSidebar({ isOpen, children }: SlideSidebarProps): JSX.Eleme
   return (
     <motion.nav
       style={{
-        position: 'sticky',
-        height: '100%',
+        
+        height: '100vh',
         top: 0,
+        overflowY: 'auto',
       }}
       initial="open"
       animate={isOpen ? 'open' : 'close'}
@@ -112,15 +113,15 @@ function SidebarMenuGroup({ menu }: { menu: SidebarMenuLink }): JSX.Element {
 export function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps): JSX.Element {
   return (
     <SlideSidebar isOpen={isOpen}>
-      <Box borderWidth="1px" p={2}>
+      <Box  p={2} borderRightWidth="1px" height="inherit">
         {isOpen && (
-          <Flex justifyContent="space-between" alignItems="center">
+          <Flex justifyContent="space-between" alignItems="center" pb={2}>
             <Text fontWeight="extrabold">관리 메뉴</Text>
             <NavbarToggleButton isOpen={isOpen} onToggle={onToggle} />
           </Flex>
         )}
 
-        <Stack>
+        <Stack pb={40}>
           {adminSidebarMenuList.map((menu) => (
             <SidebarMenuGroup key={menu.href} menu={menu} />
           ))}
