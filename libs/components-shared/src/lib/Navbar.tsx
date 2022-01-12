@@ -210,7 +210,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
         display={{ base: 'none', md: 'flex' }}
         */}
         <Flex
-          justifyContents="space-between"
+          justifyContent="space-between"
           alignItems="center"
           display={{ base: 'none', md: 'flex' }}
         >
