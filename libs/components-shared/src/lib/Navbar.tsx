@@ -3,6 +3,8 @@ import {
   Avatar,
   Box,
   Button,
+  ButtonGroup,
+  Container,
   Divider,
   Drawer,
   DrawerBody,
@@ -10,6 +12,7 @@ import {
   DrawerContent,
   DrawerOverlay,
   Flex,
+  Grid,
   IconButton,
   Link,
   Menu,
@@ -18,139 +21,195 @@ import {
   MenuList,
   Stack,
   useBreakpointValue,
+  useColorMode,
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
 import { mainNavItems, NavItem } from '@project-lc/components-constants/navigation';
-import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { useDisplaySize, useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
+import { FaMoon, FaSun } from 'react-icons/fa';
 import { KksLogo } from './KksLogo';
 import ProfileBox from './ProfileBox';
 import UserNotificationSection from './UserNotificationSection';
 
-export interface NavbarProps {
-  appType?: UserType;
-}
-export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
+export function NavbarRightButtonSection(): JSX.Element {
   const router = useRouter();
-  const { isOpen, onClose, onToggle } = useDisclosure();
   const { isLoggedIn } = useIsLoggedIn();
+  return (
+    <Flex alignItems="center" justifyContent="flex-end">
+      {isLoggedIn ? (
+        <>
+          <Box mr={{ base: '1', sm: '3' }}>
+            <UserNotificationSection />
+          </Box>
+
+          <PersonalPopoverMenu />
+        </>
+      ) : (
+        // 로그인 안했을때 로그인|회원가입 버튼그룹
+        <ButtonGroup>
+          <Button
+            as="a"
+            fontSize="sm"
+            fontWeight={500}
+            variant="link"
+            onClick={() => router.push('/login')}
+            mr={{ base: '1', sm: '3' }}
+          >
+            로그인
+          </Button>
+          <Button
+            onClick={() => router.push('/signup')}
+            display={{ base: 'none', md: 'inline-flex' }}
+            fontSize="sm"
+            fontWeight={600}
+            color="white"
+            bg="pink.400"
+            _hover={{ bg: 'pink.300' }}
+          >
+            회원가입
+          </Button>
+        </ButtonGroup>
+      )}
+    </Flex>
+  );
+}
+
+/** 로그인 한 경우 네비바 우측 개인메뉴 팝오버 */
+export function PersonalPopoverMenu(): JSX.Element {
+  const router = useRouter();
   const { logout } = useLogout();
   const { data: profileData } = useProfile();
+
+  const { colorMode, toggleColorMode } = useColorMode();
+  const SwitchIcon = useColorModeValue(FaMoon, FaSun);
 
   const handleAccountSettingClick = useCallback(
     () => router.push('/mypage/setting'),
     [router],
   );
+  return (
+    <Menu>
+      <MenuButton as={Avatar} size="sm" cursor="pointer" src={profileData?.avatar} />
+
+      <MenuList w={{ base: 280, sm: 300 }}>
+        {/* 프로필 표시 */}
+        <Box p={3}>
+          <ProfileBox allowAvatarChange />
+        </Box>
+        <Divider />
+
+        {/* 계정설정 버튼 */}
+        <MenuItem
+          my={1}
+          icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
+          onClick={handleAccountSettingClick}
+        >
+          계정 설정
+        </MenuItem>
+
+        {/* 다크모드 버튼 - 이게 로그인 한 상태에서만 표시되는 개인메뉴에 포함되면 로그인 안한경우 다크모드 전환 불가능한데 밖에도 둬야하나?? */}
+        <MenuItem my={1} icon={<SwitchIcon />} onClick={toggleColorMode}>
+          {colorMode === 'light' ? '다크모드' : '라이트모드'}
+        </MenuItem>
+
+        {/* 알림버튼 - 기존 알림버튼 누를시 팝오버로 알림을 표시했음. 별도 알림페이지 존재하지 않음
+        알림을 메뉴에 포함시켰을 때 알림목록 표시할 방법이 떠오르지 않아 개인메뉴에 포함시키지 않음
+        */}
+
+        {/* 로그아웃 버튼 */}
+        <MenuItem
+          my={1}
+          icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
+          onClick={logout}
+        >
+          로그아웃
+        </MenuItem>
+      </MenuList>
+    </Menu>
+  );
+}
+
+export function NavbarLinkLogo({ appType }: { appType: UserType }): JSX.Element {
+  return (
+    <NextLink href="/" passHref>
+      <Link
+        textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
+        color={useColorModeValue('gray.800', 'white')}
+      >
+        <KksLogo appType={appType} size="small" />
+      </Link>
+    </NextLink>
+  );
+}
+
+export interface NavbarProps {
+  appType?: UserType;
+}
+export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
+  const { isOpen, onClose, onToggle } = useDisclosure();
+
+  // 햄버거버튼(모바일화면에서만)
+  const hambergerButton = useMemo(() => {
+    return (
+      <Flex alignItems="center">
+        <IconButton
+          ml={-2}
+          onClick={onToggle}
+          icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
+          variant="ghost"
+          aria-label="Toggle Navigation"
+        />
+      </Flex>
+    );
+  }, [isOpen, onToggle]);
 
   return (
-    <Box>
-      <Flex
-        bg={useColorModeValue('white', 'gray.800')}
-        color={useColorModeValue('gray.600', 'white')}
-        minH="60px"
-        py={{ base: 2 }}
-        px={{ base: 4 }}
-        borderBottom={1}
-        borderStyle="solid"
-        borderColor={useColorModeValue('gray.200', 'gray.900')}
-        align="center"
-      >
+    // {/* 배경이 되는 wrapper 컴포넌트 */}
+    <Box
+      bg={useColorModeValue('white', 'gray.800')}
+      color={useColorModeValue('gray.600', 'white')}
+      minH="60px"
+      py={{ base: 2 }}
+      borderBottom={1}
+      borderStyle="solid"
+      borderColor={useColorModeValue('gray.200', 'gray.900')}
+    >
+      {/* 최대너비 제한 container */}
+      <Container maxW="container.xl">
+        {/* 모바일 화면에서 네비바 레이아웃 *******
+        로고 가운데 위치시키기 위해 Grid 사용
+        display={{ base: 'grid', md: 'none' }}
+        */}
+        <Grid display={{ base: 'grid', md: 'none' }} templateColumns="repeat(3, 1fr)">
+          {hambergerButton}
+          <NavbarLinkLogo appType={appType} />
+          <NavbarRightButtonSection />
+        </Grid>
+
+        {/* 데스크톱 화면에서 네비바 레이아웃 ******
+        Flex로 표시 
+        display={{ base: 'none', md: 'flex' }}
+        */}
         <Flex
-          flex={{ base: 1, md: 'auto' }}
-          ml={{ base: -2 }}
-          display={{ base: 'flex', md: 'none' }}
+          justifyContents="space-between"
+          alignItems="center"
+          display={{ base: 'none', md: 'flex' }}
         >
-          <IconButton
-            onClick={onToggle}
-            icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
-            variant="ghost"
-            aria-label="Toggle Navigation"
-          />
-        </Flex>
-        <Flex flex={{ base: 1 }} justify={{ md: 'start' }} alignItems="center">
-          <NextLink href="/" passHref>
-            <Link
-              textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-              color={useColorModeValue('gray.800', 'white')}
-            >
-              <KksLogo appType={appType} size="small" />
-            </Link>
-          </NextLink>
-          <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-            <DesktopNav />
+          <Flex flex={{ base: 1 }} alignItems="center">
+            <NavbarLinkLogo appType={appType} />
+            <Box ml={10}>
+              <DesktopNav />
+            </Box>
           </Flex>
+          <NavbarRightButtonSection />
         </Flex>
-
-        <Flex alignItems="center">
-          <ColorModeSwitcher />
-          {isLoggedIn ? (
-            <>
-              <Box mr={{ base: '1', sm: '3' }}>
-                <UserNotificationSection />
-              </Box>
-
-              <Menu>
-                <MenuButton
-                  as={Avatar}
-                  size="sm"
-                  cursor="pointer"
-                  src={profileData?.avatar}
-                />
-                <MenuList w={{ base: 280, sm: 300 }}>
-                  <Box p={3}>
-                    <ProfileBox allowAvatarChange />
-                  </Box>
-                  <Divider />
-                  <MenuItem
-                    my={1}
-                    icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
-                    onClick={handleAccountSettingClick}
-                  >
-                    계정 설정
-                  </MenuItem>
-                  <MenuItem
-                    my={1}
-                    icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
-                    onClick={logout}
-                  >
-                    로그아웃
-                  </MenuItem>
-                </MenuList>
-              </Menu>
-            </>
-          ) : (
-            <>
-              <Button
-                as="a"
-                fontSize="sm"
-                fontWeight={500}
-                variant="link"
-                onClick={() => router.push('/login')}
-                mr={{ base: '1', sm: '3' }}
-              >
-                로그인
-              </Button>
-              <Button
-                onClick={() => router.push('/signup')}
-                display={{ base: 'none', md: 'inline-flex' }}
-                fontSize="sm"
-                fontWeight={600}
-                color="white"
-                bg="pink.400"
-                _hover={{ bg: 'pink.300' }}
-              >
-                회원가입
-              </Button>
-            </>
-          )}
-        </Flex>
-      </Flex>
+      </Container>
 
       <MobileNav isOpen={isOpen} onClose={onClose} />
     </Box>
