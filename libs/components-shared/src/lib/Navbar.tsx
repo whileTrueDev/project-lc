@@ -31,7 +31,7 @@ import { useDisplaySize, useIsLoggedIn, useLogout, useProfile } from '@project-l
 import { UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { KksLogo } from './KksLogo';
@@ -277,7 +277,10 @@ const MobileNav = ({
   const router = useRouter();
   const { isMobileSize } = useDisplaySize();
 
-  if (!isMobileSize) onClose();
+  useEffect(() => {
+    if (!isMobileSize) onClose();
+  }, [isMobileSize, onClose]);
+
   return (
     <Drawer isOpen={isOpen} placement="left" size="xs" onClose={onClose}>
       <DrawerOverlay />
