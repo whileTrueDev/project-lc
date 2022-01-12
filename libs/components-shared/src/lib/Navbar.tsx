@@ -3,8 +3,12 @@ import {
   Avatar,
   Box,
   Button,
-  Collapse,
   Divider,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerOverlay,
   Flex,
   IconButton,
   Link,
@@ -19,7 +23,7 @@ import {
 } from '@chakra-ui/react';
 import { mainNavItems, NavItem } from '@project-lc/components-constants/navigation';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
-import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
+import { useDisplaySize, useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -34,7 +38,7 @@ export interface NavbarProps {
 }
 export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
   const router = useRouter();
-  const { isOpen, onToggle } = useDisclosure();
+  const { isOpen, onClose, onToggle } = useDisclosure();
   const { isLoggedIn } = useIsLoggedIn();
   const { logout } = useLogout();
   const { data: profileData } = useProfile();
@@ -148,9 +152,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
         </Flex>
       </Flex>
 
-      <Collapse in={isOpen} animateOpacity>
-        <MobileNav />
-      </Collapse>
+      <MobileNav isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 }
@@ -190,51 +192,86 @@ const DesktopNav = (): JSX.Element => {
   );
 };
 
-const MobileNav = (): JSX.Element => {
+/** 모바일 화면 네비게이션(좌측 Drawer) */
+const MobileNav = ({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}): JSX.Element => {
+  const { isLoggedIn } = useIsLoggedIn();
+  const router = useRouter();
+  const { isMobileSize } = useDisplaySize();
+
+  if (!isMobileSize) onClose();
   return (
-    <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
-      {mainNavItems.map((navItem) => (
-        <MobileNavItem key={navItem.label} {...navItem} />
-      ))}
-    </Stack>
+    <Drawer isOpen={isOpen} placement="left" size="xs" onClose={onClose}>
+      <DrawerOverlay />
+      <DrawerContent bgGradient="linear(to-r, blue.300, blue.500)" color="white" pt={8}>
+        <DrawerCloseButton />
+
+        <DrawerBody>
+          <Stack>
+            {mainNavItems.map((navItem) => (
+              <MobileNavItem key={navItem.label} {...navItem} onClose={onClose} />
+            ))}
+
+            {/* 로그인 하지 않은 경우에만 드로어에 회원가입 버튼을 표시한다 */}
+            {!isLoggedIn && (
+              <Button
+                onClick={() => {
+                  router.push('/signup');
+                  onClose();
+                }}
+                textAlign="left"
+                fontSize="xl"
+                fontWeight="bold"
+                fontFamily="Gmarket Sans"
+                _hover={{ textDecoration: 'underline' }}
+                variant="unstyled"
+              >
+                회원가입
+              </Button>
+            )}
+          </Stack>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
   );
 };
 
-const MobileNavItem = ({ label, href, needLogin }: NavItem): JSX.Element => {
-  const navItemTextColor = useColorModeValue('gray.600', 'gray.200');
+const MobileNavItem = ({
+  label,
+  href,
+  isExternal,
+  needLogin,
+  onClose,
+}: NavItem & { onClose: () => void }): JSX.Element | null => {
   const { isLoggedIn } = useIsLoggedIn();
+  const router = useRouter();
 
-  if (needLogin) {
-    return (
-      <Flex
-        py={1}
-        justify="space-between"
-        align="center"
-        _hover={{ textDecoration: 'none' }}
-        display={isLoggedIn ? 'flex' : 'none'}
-      >
-        <NextLink href={href ?? '#'} passHref>
-          <Link fontSize="sm" fontWeight={500} color={navItemTextColor}>
-            {label}
-          </Link>
-        </NextLink>
-      </Flex>
-    );
-  }
+  if (needLogin && !isLoggedIn) return null;
 
   return (
-    <Flex
-      py={1}
-      justify="space-between"
-      align="center"
-      _hover={{ textDecoration: 'none' }}
+    <Button
+      textAlign="left"
+      fontSize="xl"
+      fontWeight="bold"
+      fontFamily="Gmarket Sans"
+      _hover={{ textDecoration: 'underline' }}
+      variant="unstyled"
+      onClick={() => {
+        if (isExternal) {
+          window.open(href, '_blank');
+        } else {
+          router.push(href);
+        }
+        onClose();
+      }}
     >
-      <NextLink href={href ?? '#'} passHref>
-        <Link fontSize="sm" fontWeight={500} color={navItemTextColor}>
-          {label}
-        </Link>
-      </NextLink>
-    </Flex>
+      {label}
+    </Button>
   );
 };
 
