@@ -7,3 +7,4 @@ export * from './middlewares/colorizedMorgan.middleware';
 export * from './middlewares/socialLoginUserType.middleware';
 export * from './settings/jwt.setting';
 export * from './settings/mailer.config';
+export * from './adapters/redis.adapter';
