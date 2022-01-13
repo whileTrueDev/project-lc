@@ -42,7 +42,13 @@ import UserNotificationSection from './UserNotificationSection';
 export function NavbarRightButton(props: ButtonProps): JSX.Element {
   const { children } = props;
   return (
-    <Button variant="unstyled" minW="80px" size="xs" fontSize="1rem" {...props}>
+    <Button
+      variant="unstyled"
+      minW={{ base: '50px', sm: '80px' }}
+      size="xs"
+      fontSize="1rem"
+      {...props}
+    >
       {children}
     </Button>
   );
@@ -66,9 +72,7 @@ export function NavbarRightButtonSection(): JSX.Element {
       ) : (
         // 로그인 안했을때
         <>
-          <Box display={{ base: 'none', sm: 'block' }}>
-            <ColorModeSwitcher />
-          </Box>
+          <ColorModeSwitcher />
           {/* 로그인|회원가입 버튼그룹 컨테이너 */}
           <Flex bg="blue.500" color="white" borderRadius="lg" height="32px" p={1}>
             <NavbarRightButton onClick={() => router.push('/login')}>
