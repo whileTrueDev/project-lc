@@ -47,9 +47,9 @@ export function SellerMainHowToUseImage({
           {selectedItem.img && (
             <ChakraNextImage
               src={selectedItem.img}
-              quality={100}
-              width={685}
-              height={400}
+              height="400"
+              width="700"
+              borderRadius="2xl"
             />
           )}
         </MotionBox>
