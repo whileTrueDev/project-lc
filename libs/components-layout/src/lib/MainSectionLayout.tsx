@@ -44,7 +44,7 @@ export function MainSectionLayout({
           position={{ base: 'static', xl: 'absolute' }}
           top={{ base: 0, xl: 8 }}
           left={{ base: 0, xl: -20 }}
-          bgColor={whiteIndicator ? 'white' : 'blue'}
+          bgColor={whiteIndicator ? 'white' : 'blue.400'}
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0, transition: { duration: 0.6 } }}
           viewport={{ once: true }}

@@ -13,7 +13,7 @@ export function BroadcasterMainIntroduce(): JSX.Element {
   return (
     <MainSectionLayout _title={'평소 방송하던 곳에서\n라이브 쇼핑을 진행해 보세요.'}>
       {introduceItems.map((item) => (
-        <BroadcasterMainLayout
+        <BroadcasterMainIntroduceLayout
           key={item.title}
           title={item.title}
           subtitle={item.subtitle}
@@ -27,14 +27,14 @@ export function BroadcasterMainIntroduce(): JSX.Element {
 }
 export default BroadcasterMainIntroduce;
 
-type BroadcasterMainLayoutProps = IntroduceItem;
-function BroadcasterMainLayout({
+type BroadcasterMainIntroduceLayoutProps = IntroduceItem;
+function BroadcasterMainIntroduceLayout({
   title,
   subtitle,
   image,
   grayBackground = false,
   reverse = false,
-}: BroadcasterMainLayoutProps): JSX.Element {
+}: BroadcasterMainIntroduceLayoutProps): JSX.Element {
   const realSubtitle = useBreakpointValue([subtitle.mobile, subtitle.pc]);
   const grayBgColor = useColorModeValue('gray.100', 'gray.900');
   return (

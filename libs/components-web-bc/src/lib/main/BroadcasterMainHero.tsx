@@ -1,9 +1,10 @@
-import { Box, Flex, Heading, IconButton, Image, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import MotionBox from '@project-lc/components-core/MotionBox';
+import { ChevronIconButton } from '@project-lc/components-core/HorizontalImageGallery';
 import { useDisplaySize } from '@project-lc/hooks';
 import { DragHandlers } from 'framer-motion';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaYoutube } from 'react-icons/fa';
 import { Thumbnail, defaultThumbnails } from './broadcasterMainConstants';
 
@@ -94,10 +95,16 @@ function ThumbnailCarousel({ thumbnails }: ThumbnailCarouselProps): JSX.Element 
     else if (info.offset.x > 200) rotate(1, true);
   };
 
+  // 5초 마다 썸네일 로테이션 추가
+  useEffect(() => {
+    const ms = 1000;
+    const t = setTimeout(() => rotate(1, true), 5 * ms);
+    return () => clearTimeout(t);
+  }, [rotate]);
+
   return (
     <Box w={1920} position="relative">
       <Flex
-        // templateColumns={{ base: 'repeat(5, 1fr)', xl: '1fr 1fr 1fr 1fr 1fr' }}
         gap={{ base: 1, sm: 4 }}
         justify="center"
         alignItems="center"
@@ -109,7 +116,9 @@ function ThumbnailCarousel({ thumbnails }: ThumbnailCarouselProps): JSX.Element 
             key={thumb.image}
             isCentered={idx === Math.ceil((data.length - 1) / 2)}
             thumbnail={thumb}
-            onClick={() => onThumbClick(idx)}
+            onThumbnailClick={() => onThumbClick(idx)}
+            onLeftIconClick={() => rotate(1, true)}
+            onRightIconClick={() => rotate()}
             onDragEnd={onThumbDragEnd}
           />
         ))}
@@ -122,13 +131,17 @@ interface ThumbnailCarouselItemProps {
   isLeft?: boolean;
   isCentered?: boolean;
   thumbnail: Thumbnail;
-  onClick: () => void;
+  onThumbnailClick: () => void;
+  onRightIconClick: () => void;
+  onLeftIconClick: () => void;
   onDragEnd: DragHandlers['onDragEnd'];
 }
 function ThumbnailCarouselItem({
   isCentered = false,
   thumbnail,
-  onClick,
+  onThumbnailClick,
+  onRightIconClick,
+  onLeftIconClick,
   onDragEnd,
 }: ThumbnailCarouselItemProps): JSX.Element {
   const { isMobileSize } = useDisplaySize();
@@ -150,10 +163,11 @@ function ThumbnailCarouselItem({
         borderRadius="2xl"
         shadow="dark-lg"
         p={4}
-        pb={3}
         transform="scale(1.5)"
         position="relative"
         w={{ base: 280, sm: 'unset' }}
+        display="flex"
+        alignItems="center"
       >
         <ChakraNextImage
           borderRadius="2xl"
@@ -162,15 +176,41 @@ function ThumbnailCarouselItem({
           height="300"
           quality={100}
         />
-        <IconButton
+        <Button
           aria-label={`link-button-${thumbnail.youtubeUrl}`}
-          icon={<FaYoutube fontSize="28px" color="red" />}
-          variant="unstyle"
+          bgColor="white"
+          fontWeight="medium"
+          _hover={{ bgColor: 'gray.100' }}
+          _active={{ bgColor: 'gray.100' }}
+          color="black"
+          my={1}
+          px={1}
+          variant="solid"
           size="xs"
+          fontSize="xx-small"
+          borderRadius="2xl"
           onClick={() => window.open(thumbnail.youtubeUrl)}
           position="absolute"
-          top={1}
-          right={1.5}
+          top={0}
+          right={1}
+          gap={1}
+        >
+          <FaYoutube fontSize="28px" color="red" />
+          영상 보기
+        </Button>
+        <ChevronIconButton
+          size={isMobileSize ? 'md' : 'xs'}
+          left={-7}
+          direction="left"
+          isVisible
+          onClick={onLeftIconClick}
+        />
+        <ChevronIconButton
+          size={isMobileSize ? 'md' : 'xs'}
+          right={-7}
+          direction="right"
+          isVisible
+          onClick={onRightIconClick}
         />
       </MotionBox>
     );
@@ -183,7 +223,7 @@ function ThumbnailCarouselItem({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       borderRadius="2xl"
-      onClick={onClick}
+      onClick={onThumbnailClick}
       w={{ base: 280, sm: 'unset' }}
     >
       <ChakraNextImage
