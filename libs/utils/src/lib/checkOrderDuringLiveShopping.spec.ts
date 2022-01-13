@@ -25,6 +25,7 @@ const liveShopping: LiveShopping = {
   fmGoodsSeq: 1,
   desiredCommission: new Decimal('30'),
   desiredPeriod: '무관',
+  liveShoppingName: '',
 };
 
 describe('checkOrderDuringLiveShopping', () => {
