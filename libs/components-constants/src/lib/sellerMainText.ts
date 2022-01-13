@@ -59,16 +59,6 @@ export const featureSectionBody: SectionData[] = [
   },
 ];
 
-// process section 내용
-export const processSectionBody: SectionData[] = [
-  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-1.png`, title: '방송인 섭외' },
-  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-2.png`, title: '컨텐츠 기획' },
-  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-3.png`, title: '홍보물 이미지 제작' },
-  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-4.png`, title: 'SNS 홍보' },
-  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-5.png`, title: '리허설' },
-  { img: `${MAIN_IMAGE_PATH}/step-desktop/step-6.png`, title: '본 방송 리드' },
-];
-
 // how to use section 내용
 export const howToUseSectionBody: SectionData[] = [
   {
@@ -95,4 +85,14 @@ export const howToUseSectionBody: SectionData[] = [
   수익현황을 확인할 수 있습니다. `,
     img: `${MAIN_IMAGE_PATH}/howToUse/sell_htu_gif4.gif`,
   },
+];
+
+// process section 내용
+export const processSectionBody = [
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-1.png`, text: '방송인 섭외' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-2.png`, text: '컨텐츠 기획' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-3.png`, text: '홍보물 이미지 제작' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-4.png`, text: 'SNS 홍보' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-5.png`, text: '리허설' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-6.png`, text: '본 방송 리드' },
 ];
