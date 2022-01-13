@@ -192,6 +192,18 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
       borderBottom={1}
       borderStyle="solid"
       borderColor={useColorModeValue('gray.200', 'gray.900')}
+
+      // <Box>
+      // <Flex
+      //   // bg={useColorModeValue('white', 'gray.800')}
+      //   color={useColorModeValue('gray.600', 'white')}
+      //   minH="60px"
+      //   py={{ base: 2 }}
+      //   px={{ base: 4 }}
+      //   borderBottom={1}
+      //   borderStyle="solid"
+      //   borderColor={useColorModeValue('gray.200', 'gray.900')}
+      //   align="center"
     >
       {/* 최대너비 제한 container */}
       <Container maxW="container.xl">

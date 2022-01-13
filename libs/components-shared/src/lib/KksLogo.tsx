@@ -10,7 +10,9 @@ export const darkBigLogo = 'kksMainLogoDarkModeBig.png';
 export const lightLogo = 'kksMainLogoLightMode.png';
 export const lightBigLogo = 'kksMainLogoLightModeBig.png';
 export const sellerLogo = 'kkshow-seller-lightmode.png';
+export const sellerDarkLogo = 'kkshow-seller-darkmode.png';
 export const broadcasterLogo = 'kkshow-broadcaster-lightmode.png';
+export const broadcasterDarkLogo = 'kkshow-broadcaster-darkmode.png';
 
 export interface KksLogoProps {
   appType?: UserType;
@@ -26,8 +28,10 @@ interface GetCorrectLogoOption {
 function getCorrectLogoInfo({ appType, colorMode }: GetCorrectLogoOption): string {
   switch (appType) {
     case 'broadcaster':
+      if (colorMode === 'dark') return LOGO_S3_PREFIX + broadcasterDarkLogo;
       return LOGO_S3_PREFIX + broadcasterLogo;
     case 'seller':
+      if (colorMode === 'dark') return LOGO_S3_PREFIX + sellerDarkLogo;
       return LOGO_S3_PREFIX + sellerLogo;
     default: {
       if (colorMode === 'dark') return LOGO_S3_PREFIX + darkLogo;
@@ -38,7 +42,8 @@ function getCorrectLogoInfo({ appType, colorMode }: GetCorrectLogoOption): strin
 
 /**
  * @author M'baku, Dan
- * @description 이미지 크기가 400x150보다 클 경우 manual 옵션을 사용하세요
+ * @description 이미지 크기가 400x150보다 클 경우 manual 옵션을 사용하세요.
+ * 이미지 비율은 x:y = 1.6969 : 1
  */
 export function KksLogo(props: KksLogoProps): JSX.Element | null {
   const { size, width, height, appType } = props;
@@ -50,13 +55,13 @@ export function KksLogo(props: KksLogoProps): JSX.Element | null {
   );
 
   if (size === 'small') {
-    return <ChakraNextImage src={logoSrc} width="90" height="53" />;
+    return <ChakraNextImage src={logoSrc} width="76.36" height="45" />;
   }
   if (size === 'mid') {
-    return <ChakraNextImage src={logoSrc} width="260" height="82" />;
+    return <ChakraNextImage src={logoSrc} width="139.15" height="82" />;
   }
   if (size === 'big') {
-    return <ChakraNextImage src={logoSrc} width="400" height="150" />;
+    return <ChakraNextImage src={logoSrc} width="254" height="150" />;
   }
   if (size === 'manual') {
     return <ChakraNextImage src={logoSrc} width={width} height={height} />;

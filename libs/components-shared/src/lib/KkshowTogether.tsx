@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Stack } from '@chakra-ui/react';
+import { Box, Button, Heading, Stack, useColorModeValue } from '@chakra-ui/react';
 
 export type KkshowTogetherButtonOption = {
   label: string;
@@ -14,42 +14,42 @@ export function KkshowTogether({
   ],
 }: KkshowTogetherProps): JSX.Element {
   return (
-    <Box
-      px={8}
-      pt={10}
-      pb={20}
-      minH={300}
-      backgroundImage="images/vector-smart-object.png"
-      backgroundSize="cover"
-      backgroundPosition={{
-        base: '61%',
-        md: 'right 30% bottom 100%',
-      }}
-      backgroundRepeat="no-repeat"
-    >
-      <Box margin="auto" maxW={1080}>
-        <Heading fontWeight={900} color="WindowText">
-          크크쇼와{' '}
-        </Heading>
-        <Heading fontWeight={900} color="WindowText">
-          함께 하시겠습니까?
-        </Heading>
-        <Stack mt={4} direction={{ base: 'column', md: 'row' }}>
-          {buttons.slice(0, 2).map((btn) => (
-            <Button
-              key={btn.label}
-              colorScheme="blue"
-              size="lg"
-              maxW="120px"
-              onClick={btn.onClick}
-            >
-              {btn.label}
-            </Button>
-          ))}
-        </Stack>
+    <Box bg={useColorModeValue('gray.50', 'inherit')}>
+      <Box
+        maxW="6xl"
+        px={4}
+        pt={20}
+        pb={12}
+        minH={350}
+        margin="auto"
+        w="100%"
+        backgroundImage="/images/main/together.png"
+        backgroundPosition={{
+          base: 'right -400px bottom 0px',
+          sm: 'right -280px bottom 0px',
+          md: 'right 0 bottom 100%',
+        }}
+        backgroundSize={{ base: 'cover', sm: 'auto 350px' }}
+        backgroundRepeat="no-repeat"
+      >
+        <Box margin="auto">
+          <Heading fontWeight={900}>크크쇼와 </Heading>
+          <Heading fontWeight={900}>함께 하시겠습니까?</Heading>
+          <Stack mt={4} direction={{ base: 'column', md: 'row' }}>
+            {buttons.slice(0, 2).map((btn) => (
+              <Button
+                key={btn.label}
+                colorScheme="blue"
+                size="lg"
+                maxW="120px"
+                onClick={btn.onClick}
+              >
+                {btn.label}
+              </Button>
+            ))}
+          </Stack>
+        </Box>
       </Box>
     </Box>
   );
 }
-
-export default KkshowTogether;
