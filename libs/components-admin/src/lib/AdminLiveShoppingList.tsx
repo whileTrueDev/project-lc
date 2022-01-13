@@ -42,7 +42,8 @@ export function AdminLiveShoppingList({
       renderCell: ({ row }) => (
         <Tooltip label="상세페이지로 이동">
           <Link href={`/live-shopping/${row.id}`} color="blue">
-            {row.liveShoppingName || '이름을 등록해주세요'}
+            {row.liveShoppingName ||
+              '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록하면 됩니다.'}
           </Link>
         </Tooltip>
       ),
