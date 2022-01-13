@@ -98,7 +98,7 @@ function ThumbnailCarousel({ thumbnails }: ThumbnailCarouselProps): JSX.Element 
   // 5초 마다 썸네일 로테이션 추가
   useEffect(() => {
     const ms = 1000;
-    const t = setTimeout(() => rotate(1, true), 5 * ms);
+    const t = setTimeout(() => rotate(1), 5 * ms);
     return () => clearTimeout(t);
   }, [rotate]);
 
@@ -120,6 +120,7 @@ function ThumbnailCarousel({ thumbnails }: ThumbnailCarouselProps): JSX.Element 
             onLeftIconClick={() => rotate(1, true)}
             onRightIconClick={() => rotate()}
             onDragEnd={onThumbDragEnd}
+            isLast={[data.length - 1, 0].includes(idx)}
           />
         ))}
       </Flex>
@@ -131,6 +132,7 @@ interface ThumbnailCarouselItemProps {
   isLeft?: boolean;
   isCentered?: boolean;
   thumbnail: Thumbnail;
+  isLast?: boolean;
   onThumbnailClick: () => void;
   onRightIconClick: () => void;
   onLeftIconClick: () => void;
@@ -143,6 +145,7 @@ function ThumbnailCarouselItem({
   onRightIconClick,
   onLeftIconClick,
   onDragEnd,
+  isLast,
 }: ThumbnailCarouselItemProps): JSX.Element {
   const { isMobileSize } = useDisplaySize();
   if (isCentered) {
@@ -225,6 +228,7 @@ function ThumbnailCarouselItem({
       borderRadius="2xl"
       onClick={onThumbnailClick}
       w={{ base: 280, sm: 'unset' }}
+      zIndex={isLast ? 0 : 1}
     >
       <ChakraNextImage
         borderRadius="2xl"
