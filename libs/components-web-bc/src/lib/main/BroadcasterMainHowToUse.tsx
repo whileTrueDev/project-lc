@@ -111,6 +111,7 @@ export function BroadcasterMainHowToUse(): JSX.Element {
                 src={howToUseItems[selected].image}
                 height="400"
                 width="700"
+                borderRadius="2xl"
               />
             </MotionBox>
           </Flex>
