@@ -39,7 +39,6 @@ export function SlideSidebar({ isOpen, children }: SlideSidebarProps): JSX.Eleme
   return (
     <motion.nav
       style={{
-        
         height: '100vh',
         top: 0,
         overflowY: 'auto',
@@ -113,7 +112,7 @@ function SidebarMenuGroup({ menu }: { menu: SidebarMenuLink }): JSX.Element {
 export function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps): JSX.Element {
   return (
     <SlideSidebar isOpen={isOpen}>
-      <Box  p={2} borderRightWidth="1px" height="inherit">
+      <Box p={2} borderRightWidth="1px" height="inherit">
         {isOpen && (
           <Flex justifyContent="space-between" alignItems="center" pb={2}>
             <Text fontWeight="extrabold">관리 메뉴</Text>
