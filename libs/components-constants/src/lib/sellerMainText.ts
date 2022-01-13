@@ -29,7 +29,7 @@ export const sellerMainSectionText: Record<string, SectionData> = {
     desc: `크크쇼에서는 상품 등록, 라이브 쇼핑,\n판매관리, 정산관리까지 모두 할 수 있습니다.`,
   },
   review: {
-    title: '사장님들의 생생한 후기로 증명된 크크쇼 효과 ',
+    title: '사장님들의 생생한 후기로 증명된\n크크쇼 효과 ',
     desc: `크크쇼를 진행했던 대표님들의\n라이브 쇼핑 서비스에 대한 후기입니다.\n(실제 대화 내용 캡처)`,
   },
 };
@@ -92,7 +92,7 @@ export const processSectionBody = [
 export const chatImages = [
   {
     title: '닭강정대표님',
-    img: `${MAIN_IMAGE_PATH}/review/chat-1/chat-1.webp`,
+    img: `${MAIN_IMAGE_PATH}/review/chat-1.jpg`,
     order: {
       mobile: 1,
       desktop: 1,
@@ -100,7 +100,7 @@ export const chatImages = [
   },
   {
     title: '굴림만두대표님',
-    img: `${MAIN_IMAGE_PATH}/review/chat-2/chat-2.webp`,
+    img: `${MAIN_IMAGE_PATH}/review/chat-2.jpg`,
     order: {
       mobile: 2,
       desktop: 2,
@@ -108,7 +108,7 @@ export const chatImages = [
   },
   {
     title: '왕만두대표님',
-    img: `${MAIN_IMAGE_PATH}/review/chat-3/chat-3.webp`,
+    img: `${MAIN_IMAGE_PATH}/review/chat-3.jpg`,
     order: {
       mobile: 3,
       desktop: 4,
@@ -116,7 +116,7 @@ export const chatImages = [
   },
   {
     title: '먹pd님',
-    img: `${MAIN_IMAGE_PATH}/review/chat-4/chat-4.webp`,
+    img: `${MAIN_IMAGE_PATH}/review/chat-4.jpg`,
     order: {
       mobile: 4,
       desktop: 3,

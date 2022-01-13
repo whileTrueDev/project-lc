@@ -1,4 +1,4 @@
-import { Box, SimpleGrid } from '@chakra-ui/react';
+import { Box, Container, SimpleGrid } from '@chakra-ui/react';
 import {
   MAIN_IMAGE_PATH,
   sellerMainSectionText,
@@ -41,21 +41,16 @@ export function SellerMainReviewSection(): JSX.Element {
         desc,
       }}
     >
-      <Box position="relative">
+      <Container maxW="container.xl" position="relative">
         {/* 후기 채팅 이미지 영역 */}
-        <SimpleGrid columns={{ base: 1, md: 2 }}>
+        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={4}>
           {chatImagesSorted.map((item) => {
+            const x = 540;
+            const y = 583;
             return (
-              <ChakraNextImage
-                key={item.title}
-                layout="responsive"
-                maxW="600px"
-                width={600}
-                height={600}
-                src={item.img}
-                objectFit="contain"
-                quality={100}
-              />
+              <Box key={item.title} position="relative" maxW={`${x}px`} m={[0, 'auto']}>
+                <ChakraNextImage width={x} height={y} src={item.img} borderRadius="2xl" />
+              </Box>
             );
           })}
         </SimpleGrid>
@@ -79,7 +74,7 @@ export function SellerMainReviewSection(): JSX.Element {
             />
           </Box>
         </motion.div>
-      </Box>
+      </Container>
     </SellerMainSectionContainer>
   );
 }
