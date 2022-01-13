@@ -1,9 +1,9 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { ThemeProvider } from '@material-ui/core';
 import {
-  LOGO_S3_PREFIX,
   lightBigLogo,
   lightLogo,
+  LOGO_S3_PREFIX,
 } from '@project-lc/components-shared/KksLogo';
 import {
   createChakraTheme,
@@ -12,9 +12,10 @@ import {
 } from '@project-lc/utils-frontend';
 import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';
+import NextNProgress from 'nextjs-progressbar';
 import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import NextNProgress from 'nextjs-progressbar';
+import '../styles/global.font.css';
 
 const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();
@@ -29,7 +30,7 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
         openGraph={{
           type: 'website',
           locale: 'ko_KR',
-          // url: 'https://방송인.크크쇼.com/', // route53 등록 후 설정
+          url: 'https://xn--vh3b23hfsf.xn--hp4b17xa.com/',
           site_name: '크크쇼 방송인센터',
           images: [
             { url: LOGO_S3_PREFIX + lightLogo, alt: 'KKSHOW' },

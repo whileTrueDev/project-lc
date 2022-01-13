@@ -41,6 +41,10 @@
                 {
                     "name": "BROADCASTER_WEB_HOST",
                     "value": "https://xn--vh3b23hfsf.xn--hp4b17xa.com"
+                },
+                {
+                    "name": "KKSHOW_WEB_HOST",
+                    "value": "https://xn--hp4b17xa.com"
                 }
             ],
             "resourceRequirements": null,

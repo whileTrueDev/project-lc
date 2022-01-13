@@ -54,6 +54,9 @@
     "components-web-bc": {
       "tags": []
     },
+    "components-web-kkshow": {
+      "tags": []
+    },
     "firstmall-db": {
       "tags": []
     },
@@ -148,6 +151,9 @@
       "tags": []
     },
     "web-broadcaster-center": {
+      "tags": []
+    },
+    "web-kkshow": {
       "tags": []
     },
     "web-seller": {

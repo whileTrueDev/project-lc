@@ -15,6 +15,7 @@ import { AppProps } from 'next/app';
 import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import NextNProgress from 'nextjs-progressbar';
+import '../styles/global.font.css';
 
 const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();
