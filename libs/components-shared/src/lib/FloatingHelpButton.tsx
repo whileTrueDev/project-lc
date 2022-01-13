@@ -14,6 +14,7 @@ export function FloatingHelpButton(): JSX.Element {
         bottom="10px"
         width="55px"
         height="55px"
+        zIndex="tooltip"
         onClick={openKakaoChannel}
       >
         <ChakraNextImage src="/images/liveContact.svg" width="55px" height="55px" />
@@ -29,6 +30,7 @@ export function FloatingHelpButton(): JSX.Element {
       width={270.5}
       height={50}
       onClick={openKakaoChannel}
+      zIndex="tooltip"
     >
       <ChakraNextImage
         src="/images/liveContactSpreaded.png"

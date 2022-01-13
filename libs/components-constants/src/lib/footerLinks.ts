@@ -87,3 +87,14 @@ export const kkshowFooterLinkList: FooterLinkListItem[] = [
     ],
   },
 ];
+
+export const footerInfoArr = [
+  '상호명 : 와일트루',
+  '사업장소재지 : 부산광역시 금정구 장전온천천로 51 (테라스파크) 313호',
+  '사업자등록번호 : 659-03-01549',
+  '통신판매업신고 : 2019-부산금정-0581',
+  '대표이사 : 강동기',
+  '개인정보담당자 : 전민관',
+  '고객센터 : 051-515-6309',
+  '메일 : support@onad.io',
+];
