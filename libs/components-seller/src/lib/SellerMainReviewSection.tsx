@@ -2,48 +2,13 @@ import { Box, SimpleGrid } from '@chakra-ui/react';
 import {
   MAIN_IMAGE_PATH,
   sellerMainSectionText,
+  chatImages,
 } from '@project-lc/components-constants/sellerMainText';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useDisplaySize } from '@project-lc/hooks';
+import { SellerMainSectionContainer } from '@project-lc/components-layout/SellerMainSectionContainer';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
-import { SellerMainSectionContainer } from './SellerMainFeatureSection';
-
-// 모바일과 데스크톱 화면에서 표시되는 순서가 조금 달라서 order로 구분함
-const chatImages = [
-  {
-    title: '닭강정대표님',
-    img: `${MAIN_IMAGE_PATH}/review/chat-1/chat-1.webp`,
-    order: {
-      mobile: 1,
-      desktop: 1,
-    },
-  },
-  {
-    title: '굴림만두대표님',
-    img: `${MAIN_IMAGE_PATH}/review/chat-2/chat-2.webp`,
-    order: {
-      mobile: 2,
-      desktop: 2,
-    },
-  },
-  {
-    title: '왕만두대표님',
-    img: `${MAIN_IMAGE_PATH}/review/chat-3/chat-3.webp`,
-    order: {
-      mobile: 3,
-      desktop: 4,
-    },
-  },
-  {
-    title: '먹pd님',
-    img: `${MAIN_IMAGE_PATH}/review/chat-4/chat-4.webp`,
-    order: {
-      mobile: 4,
-      desktop: 3,
-    },
-  },
-];
 
 export function SellerMainReviewSection(): JSX.Element {
   const { title, desc } = sellerMainSectionText.review;
@@ -101,7 +66,7 @@ export function SellerMainReviewSection(): JSX.Element {
           variants={variants}
           initial="offscreen"
           whileInView="onscreen"
-          viewport={{ once: true, amount: 0.8 }}
+          viewport={{ once: true }}
         >
           <Box maxW={{ base: '690px', md: '883px' }} m={[0, 'auto']}>
             <ChakraNextImage

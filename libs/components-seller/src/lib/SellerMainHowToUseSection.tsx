@@ -6,9 +6,9 @@ import {
 } from '@project-lc/components-constants/sellerMainText';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { MotionBox } from '@project-lc/components-core/MotionBox';
+import SellerMainSectionContainer from '@project-lc/components-layout/SellerMainSectionContainer';
 import { AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { SellerMainSectionContainer } from './SellerMainFeatureSection';
 
 const boxVariants = {
   hidden: { opacity: 0 },

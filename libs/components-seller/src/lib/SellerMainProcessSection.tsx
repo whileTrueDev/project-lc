@@ -2,14 +2,18 @@ import {
   processSectionBody,
   sellerMainSectionText,
 } from '@project-lc/components-constants/sellerMainText';
+import MainSectionLayout from '@project-lc/components-layout/MainSectionLayout';
 import { MainProcessItemList } from '@project-lc/components-shared/MainProcessItemList';
-import { SellerMainSectionContainer } from './SellerMainFeatureSection';
 
 export function SellerMainProcessSection(): JSX.Element {
   return (
-    <SellerMainSectionContainer sectionData={sellerMainSectionText.process}>
+    <MainSectionLayout
+      subtitle={sellerMainSectionText.process.desc}
+      _title={sellerMainSectionText.process.title || ''}
+      py={12}
+    >
       <MainProcessItemList processItems={processSectionBody} />
-    </SellerMainSectionContainer>
+    </MainSectionLayout>
   );
 }
 
