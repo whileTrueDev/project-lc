@@ -120,7 +120,7 @@ function ThumbnailCarousel({ thumbnails }: ThumbnailCarouselProps): JSX.Element 
             onLeftIconClick={() => rotate(1, true)}
             onRightIconClick={() => rotate()}
             onDragEnd={onThumbDragEnd}
-            isLast={idx === data.length - 1}
+            isLast={[data.length - 1, 0].includes(idx)}
           />
         ))}
       </Flex>
