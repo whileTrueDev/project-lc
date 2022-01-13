@@ -100,7 +100,7 @@ export function SellerMainReviewSection(): JSX.Element {
           variants={variants}
           initial="offscreen"
           whileInView="onscreen"
-          viewport={{ once: true, amount: 'all' }}
+          viewport={{ once: true, amount: 0.9 }}
         >
           <Box maxW={{ base: '690px', md: '883px' }} m={[0, 'auto']}>
             <ChakraNextImage
