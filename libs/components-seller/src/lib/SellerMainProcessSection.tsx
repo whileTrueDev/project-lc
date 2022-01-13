@@ -1,5 +1,5 @@
 import { ChevronRightIcon } from '@chakra-ui/icons';
-import { Box, Text, Flex, Stack, TextProps } from '@chakra-ui/react';
+import { Box, Text, Flex, Stack, TextProps, SimpleGrid } from '@chakra-ui/react';
 import {
   sellerMainSectionText,
   processSectionBody,
@@ -9,23 +9,6 @@ import { useDisplaySize } from '@project-lc/hooks';
 import { motion } from 'framer-motion';
 import { Fragment } from 'react';
 import { SellerMainSectionContainer } from './SellerMainFeatureSection';
-
-/** 과정 이미지 : 모바일화면(750이하)일때  - 이미지라서 화면 작을때 글자가 흐리게 보임 */
-// TODO: 데스크탑처럼 따로 분리하기(다크모드 글자색)
-export function SellerMainProcessImageMobile(): JSX.Element {
-  return (
-    <Box position="relative">
-      <ChakraNextImage
-        layout="responsive"
-        width={700}
-        height={432}
-        src="/images/main/step-mobile/step.png"
-        objectFit="cover"
-        objectPosition="right"
-      />
-    </Box>
-  );
-}
 
 const container = {
   offscreen: {},
@@ -48,6 +31,70 @@ const text = {
     },
   },
 };
+
+/** 과정 이미지 */
+export function SellerMainProcessImageMobile(): JSX.Element {
+  return (
+    <motion.div
+      variants={container}
+      initial="offscreen"
+      whileInView="onscreen"
+      viewport={{ once: true, amount: 0.8 }}
+    >
+      <SimpleGrid columns={3} py={4}>
+        {processSectionBody.map((item, index) => {
+          const { title, img } = item;
+          if (!title || !img) return null;
+          return (
+            <Flex
+              key={item.title}
+              justifyContent={
+                index === processSectionBody.length - 1 ? 'center' : 'flex-end'
+              }
+              mb={4}
+            >
+              <Stack alignItems="center" spacing={{ md: 4, lg: 6 }}>
+                <Box
+                  w={{ base: '60px', md: '75px', lg: '113px' }}
+                  h={{ base: '60px', md: '75px', lg: '113px' }}
+                  maxW="113px"
+                  maxH="113px"
+                >
+                  <ChakraNextImage
+                    layout="responsive"
+                    width={100}
+                    height={100}
+                    src={img}
+                    objectFit="contain"
+                  />
+                </Box>
+
+                <MotionText
+                  fontSize={{ base: 'sm', md: 'lg' }}
+                  fontWeight="bold"
+                  wordBreak="keep-all"
+                  textAlign="center"
+                  variants={text}
+                >
+                  {item.title}
+                </MotionText>
+              </Stack>
+
+              {index !== processSectionBody.length - 1 && (
+                <Box position="relative" top={{ base: '5', md: '10' }}>
+                  <ChevronRightIcon
+                    boxSize={{ base: '5', md: '10' }}
+                    color="orange.900"
+                  />
+                </Box>
+              )}
+            </Flex>
+          );
+        })}
+      </SimpleGrid>
+    </motion.div>
+  );
+}
 
 const MotionText = motion<TextProps>(Text);
 /** 과정 이미지 : 데스크톱화면(750 이상)일때
