@@ -117,6 +117,14 @@ export function LiveShoppingList(): JSX.Element {
   };
   const columns: GridColumns = [
     {
+      field: 'liveShoppingName',
+      headerName: '라이브 쇼핑명',
+      minWidth: 350,
+      flex: 1,
+      valueFormatter: ({ row }) =>
+        row.liveShoppingName || '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록됩니다.',
+    },
+    {
       field: 'fmGoodsSeq',
       headerName: '상품명',
       minWidth: 350,
@@ -155,7 +163,6 @@ export function LiveShoppingList(): JSX.Element {
       field: 'broadcaster',
       headerName: '방송인',
       minWidth: 200,
-      flex: 1,
       renderCell: ({ row }: GridRowData) => (
         <Flex alignItems="center">
           <Box mr={1}>
@@ -169,7 +176,6 @@ export function LiveShoppingList(): JSX.Element {
       headerName: '방송시간',
       field: '방송시간',
       minWidth: 300,
-      flex: 1,
       renderCell: ({ row }: GridRowData) =>
         `${
           row.broadcastStartDate
@@ -185,7 +191,6 @@ export function LiveShoppingList(): JSX.Element {
       headerName: '판매시간',
       field: '판매시간',
       minWidth: 300,
-      flex: 1,
       renderCell: ({ row }: GridRowData) =>
         `${
           row.sellStartDate ? dayjs(row.sellStartDate).format('YYYY/MM/DD HH:mm') : '미정'
@@ -223,7 +228,7 @@ export function LiveShoppingList(): JSX.Element {
     {
       headerName: '',
       field: '',
-      width: 140,
+      width: 100,
       renderCell: ({ row }: GridRowData) => (
         <Stack direction="row">
           <Button

@@ -40,6 +40,16 @@ export function LiveShoppingDetailDialog(
           <Stack spacing={4}>
             {data[id]?.seller.sellerShop && (
               <Stack direction="row" alignItems="center">
+                <Text as="span">라이브쇼핑명: </Text>
+                <Text as="span">
+                  {data[id]?.liveShoppingName ||
+                    '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록됩니다.'}
+                </Text>
+              </Stack>
+            )}
+
+            {data[id]?.seller.sellerShop && (
+              <Stack direction="row" alignItems="center">
                 <Text as="span">판매자: </Text>
                 <Text as="span">{data[id]?.seller.sellerShop?.shopName}</Text>
               </Stack>
