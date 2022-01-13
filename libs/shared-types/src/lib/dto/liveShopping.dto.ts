@@ -74,6 +74,8 @@ export class LiveShoppingDTO {
   broadcasterCommissionRate?: string;
 
   @IsOptional() @IsInt() fmGoodsSeq?: LiveShopping['fmGoodsSeq'];
+
+  @IsOptional() @IsString() liveShoppingName?: LiveShopping['liveShoppingName'];
 }
 
 export type LiveShoppingRegistDTO = Pick<

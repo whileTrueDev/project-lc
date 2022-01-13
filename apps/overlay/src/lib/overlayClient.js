@@ -332,7 +332,7 @@ socket.on('get right-top purchase message', async (data) => {
   messageHtml = `
   <div class="donation-wrapper">
     <iframe src="/audio/${
-      alarmType === '2' ? 'xmas-alarm-type-2.mp3' : 'xmas-alarm-type-1.mp3'
+      alarmType === '2' ? 'alarm-type-2.wav' : 'alarm-type-1.wav'
     }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="item">
       <div class="centered">
@@ -504,7 +504,7 @@ socket.on('show video from server', (type) => {
       <source src="/videos/outro.mp4" type="video/mp4">
     </video>
       `;
-    $('.full-video').html(outroHtml);
+    $('.full-video').hide().html(outroHtml).fadeIn(500);
 
     $('.inner-video-area').on('ended', function () {
       $('.live-commerce').hide();

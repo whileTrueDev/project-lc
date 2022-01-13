@@ -1,5 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { Box, Flex, HStack, IconButton, theme } from '@chakra-ui/react';
+import { Box, ButtonProps, Flex, HStack, IconButton, theme } from '@chakra-ui/react';
 import { useDisplaySize, useHorizontalScroll } from '@project-lc/hooks';
 import { useRef } from 'react';
 import { ChakraNextImage } from './ChakraNextImage';
@@ -51,12 +51,24 @@ export function HorizontalImageGallery({
 
 export interface ChevronIconButtonProps {
   direction: 'left' | 'right';
+  size?: ButtonProps['size'];
+  right?: number | string;
+  left?: number | string;
+  bottom?: number | string;
+  top?: number | string;
   isVisible?: boolean;
+  disableTransparent?: boolean;
   onClick: () => void;
 }
 export function ChevronIconButton({
   direction,
+  right = -5,
+  left = -5,
+  bottom,
+  top,
+  size,
   isVisible,
+  disableTransparent,
   onClick,
 }: ChevronIconButtonProps): JSX.Element {
   const icon =
@@ -65,22 +77,22 @@ export function ChevronIconButton({
     ) : (
       <ChevronLeftIcon color="black" />
     );
+  const bgColor = disableTransparent ? 'white' : 'whiteAlpha.900';
   return (
     <IconButton
+      size={size}
       zIndex={theme.zIndices.banner}
       display={isVisible ? 'flex' : 'none'}
-      right={direction === 'right' ? -5 : undefined}
-      left={direction === 'left' ? -5 : undefined}
+      right={direction === 'right' ? right : undefined}
+      left={direction === 'left' ? left : undefined}
+      bottom={bottom}
+      top={top}
       position="absolute"
       aria-label={`image-gallery-to-${direction}`}
-      _hover={{
-        bgColor: 'whiteAlpha.900',
-      }}
-      _active={{
-        bgColor: 'whiteAlpha.900',
-      }}
+      _hover={{ bgColor }}
+      _active={{ bgColor }}
       icon={icon}
-      bgColor="whiteAlpha.900"
+      bgColor={bgColor}
       isRound
       boxShadow="dark-lg"
       onClick={onClick}

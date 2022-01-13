@@ -64,12 +64,12 @@ export const howToUseItems: HowToUseItem[] = [
 ];
 
 export const processItems = [
-  { src: '/images/main/sv_icon1.png', text: '스케쥴 조율' },
-  { src: '/images/main/sv_icon2.png', text: '컨텐츠 기획' },
-  { src: '/images/main/sv_icon3.png', text: '홍보물 제작' },
-  { src: '/images/main/sv_icon4.png', text: 'SNS 홍보' },
-  { src: '/images/main/sv_icon5.png', text: '리허설' },
-  { src: '/images/main/sv_icon6.png', text: '본 방송 리드' },
+  { src: '/images/main/sv_icon1.png', text: '1. 스케쥴 조율' },
+  { src: '/images/main/sv_icon2.png', text: '2. 컨텐츠 기획' },
+  { src: '/images/main/sv_icon3.png', text: '3. 홍보물 제작' },
+  { src: '/images/main/sv_icon4.png', text: '4. SNS 홍보' },
+  { src: '/images/main/sv_icon5.png', text: '5. 리허설' },
+  { src: '/images/main/sv_icon6.png', text: '6. 본 방송 리드' },
 ];
 
 export interface IntroduceItem {

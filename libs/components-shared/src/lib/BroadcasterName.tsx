@@ -3,11 +3,18 @@ import { BroadcasterDTOWithoutUserId } from '@project-lc/shared-types';
 
 export function BroadcasterName(props: {
   data: BroadcasterDTOWithoutUserId;
+  color?: string;
 }): JSX.Element {
-  const { data } = props;
+  const { data, color } = props;
 
   return (
-    <>{data ? <Text>{data ? data.userNickname : '미정'}</Text> : <Text>미정</Text>}</>
+    <>
+      {data ? (
+        <Text color={color || 'unset'}>{data ? data.userNickname : '미정'}</Text>
+      ) : (
+        <Text>미정</Text>
+      )}
+    </>
   );
 }
 export default BroadcasterName;
