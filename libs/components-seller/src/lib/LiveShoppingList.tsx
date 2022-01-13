@@ -159,7 +159,6 @@ export function LiveShoppingList(): JSX.Element {
       field: 'broadcaster',
       headerName: '방송인',
       minWidth: 200,
-
       renderCell: ({ row }: GridRowData) => (
         <Flex alignItems="center">
           <Box mr={1}>
