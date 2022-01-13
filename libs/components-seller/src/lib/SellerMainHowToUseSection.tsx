@@ -32,7 +32,6 @@ export function SellerMainHowToUseImage({
   return (
     <AnimatePresence>
       <Flex
-        colSpan={{ base: 3, lg: 2 }}
         justifyContent="center"
         alignItems="center"
         textAlign="center"
