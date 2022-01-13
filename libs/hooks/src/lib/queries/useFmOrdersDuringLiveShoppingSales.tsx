@@ -1,20 +1,18 @@
 import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
-import { LiveShoppingWithSalesAndFmId } from '@project-lc/shared-types';
+import { LiveShopping } from '@prisma/client';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
 
-export const getFmOrdersDuringLiveShoppingSales = async (): Promise<
-  LiveShoppingWithSalesAndFmId[]
-> => {
+export const getFmOrdersDuringLiveShoppingSales = async (): Promise<LiveShopping[]> => {
   return axios
-    .get<LiveShoppingWithSalesAndFmId[]>('/fm-orders/per-live-shopping')
+    .get<LiveShopping[]>('/fm-orders/per-live-shopping')
     .then((res) => res.data);
 };
 
 export const useFmOrdersDuringLiveShoppingSales = (
-  options?: UseQueryOptions<LiveShoppingWithSalesAndFmId[], AxiosError>,
-): UseQueryResult<LiveShoppingWithSalesAndFmId[], AxiosError> => {
-  return useQuery<LiveShoppingWithSalesAndFmId[], AxiosError>(
+  options?: UseQueryOptions<LiveShopping[], AxiosError>,
+): UseQueryResult<LiveShopping[], AxiosError> => {
+  return useQuery<LiveShopping[], AxiosError>(
     'FmOrdersDuringLiveShoppingSales',
     getFmOrdersDuringLiveShoppingSales,
     options,
@@ -23,9 +21,9 @@ export const useFmOrdersDuringLiveShoppingSales = (
 
 export const getFmOrdersDuringLiveShoppingSalesPurchaseDone = async (
   broadcasterId: number | undefined,
-): Promise<LiveShoppingWithSalesAndFmId[]> => {
+): Promise<LiveShopping[]> => {
   return axios
-    .get<LiveShoppingWithSalesAndFmId[]>('/fm-orders/broadcaster/purchases', {
+    .get<LiveShopping[]>('/fm-orders/broadcaster/purchases', {
       params: { broadcasterId },
     })
     .then((res) => res.data);
@@ -33,8 +31,8 @@ export const getFmOrdersDuringLiveShoppingSalesPurchaseDone = async (
 
 export const useFmOrdersDuringLiveShoppingSalesPurchaseDone = (
   broadcasterId: number | undefined,
-): UseQueryResult<LiveShoppingWithSalesAndFmId[], AxiosError> => {
-  return useQuery<LiveShoppingWithSalesAndFmId[], AxiosError>(
+): UseQueryResult<LiveShopping[], AxiosError> => {
+  return useQuery<LiveShopping[], AxiosError>(
     'getFmOrdersDuringLiveShoppingSalesPurchaseDone',
     () => getFmOrdersDuringLiveShoppingSalesPurchaseDone(broadcasterId),
     { enabled: !!broadcasterId },

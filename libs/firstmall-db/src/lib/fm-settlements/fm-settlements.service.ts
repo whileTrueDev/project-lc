@@ -63,14 +63,14 @@ export class FmSettlementService {
     // 각 출고아이템의 상품번호를 통해 project-lc seller 정보 조회 (goodsConfirmation)
     const goods_seq_arr = exportOptions.map((o) => o.goods_seq);
 
-    const lcGoodsList = await this.prisma.goodsConfirmation.findMany({
+    const lcGoodsList = await this.prisma.liveShopping.findMany({
       where: {
-        firstmallGoodsConnectionId: {
+        fmGoodsSeq: {
           in: goods_seq_arr,
         },
       },
       select: {
-        firstmallGoodsConnectionId: true,
+        fmGoodsSeq: true,
         goods: {
           include: {
             LiveShopping: true,
@@ -102,9 +102,7 @@ export class FmSettlementService {
       options: exportOptions
         .filter((o) => o.export_code === r.export_code)
         .map((o) => {
-          const lcgoods = lcGoodsList.find(
-            (g) => g.firstmallGoodsConnectionId === o.goods_seq,
-          );
+          const lcgoods = lcGoodsList.find((g) => g.fmGoodsSeq === o.goods_seq);
           if (lcgoods) {
             return {
               ...o,

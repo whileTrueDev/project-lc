@@ -13,8 +13,9 @@ export class AppSetting {
       'http://localhost:4250',
       'http://localhost:4300',
       'http://localhost:3011',
+      // 크크쇼
       'https://xn--hp4b17xa.com', // 크크쇼.com
-
+      'https://dev.xn--hp4b17xa.com', // dev.크크쇼.com
       // 판매자
       'https://seller.xn--hp4b17xa.com', // seller.크크쇼.com
       'https://xn--9z2b23wk2i.xn--hp4b17xa.com', // 판매자.크크쇼.com

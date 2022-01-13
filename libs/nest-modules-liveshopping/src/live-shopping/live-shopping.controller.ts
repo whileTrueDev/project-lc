@@ -16,8 +16,8 @@ import {
   ApprovedGoodsNameAndId,
   LiveShoppingParamsDto,
   LiveShoppingRegistDTO,
-  LiveShoppingWithConfirmation,
 } from '@project-lc/shared-types';
+import { LiveShopping } from '@prisma/client';
 import { LiveShoppingService } from './live-shopping.service';
 
 @UseGuards(JwtAuthGuard)
@@ -32,7 +32,7 @@ export class LiveShoppingController {
   getLiveShoppings(
     @SellerInfo() seller: UserPayload,
     @Query(ValidationPipe) dto?: LiveShoppingParamsDto,
-  ): Promise<LiveShoppingWithConfirmation[]> {
+  ): Promise<LiveShopping[]> {
     return this.liveShoppingService.getRegisteredLiveShoppings(seller.sub, dto);
   }
 
@@ -63,7 +63,7 @@ export class LiveShoppingController {
   @Get('/broadcaster')
   getBroadcasterLiveShoppings(
     @Query('broadcasterId', ParseIntPipe) broadcasterId: number,
-  ): Promise<LiveShoppingWithConfirmation[]> {
+  ): Promise<LiveShopping[]> {
     return this.liveShoppingService.getBroadcasterRegisteredLiveShoppings(broadcasterId);
   }
 }
