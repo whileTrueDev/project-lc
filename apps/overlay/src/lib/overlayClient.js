@@ -504,7 +504,7 @@ socket.on('show video from server', (type) => {
       <source src="/videos/outro.mp4" type="video/mp4">
     </video>
       `;
-    $('.full-video').html(outroHtml);
+    $('.full-video').hide().html(outroHtml).fadeIn(500);
 
     $('.inner-video-area').on('ended', function () {
       $('.live-commerce').hide();
