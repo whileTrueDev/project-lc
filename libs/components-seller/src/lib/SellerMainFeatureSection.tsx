@@ -3,7 +3,6 @@ import {
   BoxProps,
   Container,
   Stack,
-  StackProps,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';

@@ -35,6 +35,7 @@ export function SellerMainHowToUseImage({
               height={400}
               src={selectedItem.img}
               objectFit="contain"
+              quality={100}
             />
           </Box>
         )}
