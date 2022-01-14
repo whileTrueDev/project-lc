@@ -1,4 +1,4 @@
-import { Box, Container, SimpleGrid } from '@chakra-ui/react';
+import { Box, Container, GridItem } from '@chakra-ui/react';
 import {
   chatImages,
   MAIN_IMAGE_PATH,
@@ -9,6 +9,15 @@ import MotionBox from '@project-lc/components-core/MotionBox';
 import { SellerMainSectionContainer } from '@project-lc/components-layout/SellerMainSectionContainer';
 import { useDisplaySize } from '@project-lc/hooks';
 import { useMemo } from 'react';
+
+export const boxVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
+};
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
 
 export function SellerMainReviewSection(): JSX.Element {
   const { title, desc } = sellerMainSectionText.review;
@@ -43,17 +52,41 @@ export function SellerMainReviewSection(): JSX.Element {
     >
       <Container maxW="container.xl" position="relative">
         {/* 후기 채팅 이미지 영역 */}
-        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={4}>
+        <MotionBox
+          display="grid"
+          variants={boxVariants}
+          viewport={{ once: true }}
+          initial="hidden"
+          whileInView="visible"
+          gridTemplateColumns={{
+            base: `repeat(1, 1fr)`,
+            lg: `repeat(2, 1fr)`,
+          }}
+          gridGap={4}
+        >
           {chatImagesSorted.map((item) => {
             const x = 540;
             const y = 583;
             return (
-              <Box key={item.title} position="relative" maxW={`${x}px`} m={[0, 'auto']}>
-                <ChakraNextImage width={x} height={y} src={item.img} borderRadius="2xl" />
-              </Box>
+              <GridItem colSpan={1} mb={4} key={item.title}>
+                <MotionBox
+                  variants={itemVariants}
+                  position="relative"
+                  maxW={`${x}px`}
+                  m={[0, 'auto']}
+                >
+                  <ChakraNextImage
+                    width={x}
+                    height={y}
+                    src={item.img}
+                    borderRadius="2xl"
+                    placeholder="blur"
+                  />
+                </MotionBox>
+              </GridItem>
             );
           })}
-        </SimpleGrid>
+        </MotionBox>
 
         {/* 강조문구 이미지  */}
 
