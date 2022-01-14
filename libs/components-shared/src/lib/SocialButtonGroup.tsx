@@ -8,12 +8,17 @@ export function SocialButtonGroup({
 }: Partial<UserTypeProps>): JSX.Element {
   return (
     <VStack spacing={2}>
-      <Stack direction="row" width="100%" alignItems="center">
-        <Divider flex={1} />
-        <Text align="center" flex={1.5}>
+      <Stack
+        direction="row"
+        width="100%"
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        <Divider flex={{ base: 0.2 }} />
+        <Text align="center" flex={{ base: 0.5 }} wordBreak="keep-all">
           소셜 계정으로 시작하기
         </Text>
-        <Divider flex={1} />
+        <Divider flex={{ base: 0.2 }} />
       </Stack>
       <GoogleLoginButton userType={userType} />
       <NaverLoginButton userType={userType} />

@@ -24,7 +24,6 @@ import {
   emailRegisterOptions,
   passwordRegisterOptions,
   SignUpDto,
-  UserType,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
