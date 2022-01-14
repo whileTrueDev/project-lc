@@ -32,7 +32,7 @@ export function MypageBreadcrumb(): JSX.Element {
       case 'setting':
         return '계정설정';
       default:
-        return /\d/.test(pathname) ? '상세보기' : '';
+        return /\d/.test(pathname) ? '상세보기' : pathname;
     }
   };
 
