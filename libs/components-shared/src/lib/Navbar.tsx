@@ -53,6 +53,22 @@ export function NavbarRightButton(props: ButtonProps): JSX.Element {
     </Button>
   );
 }
+export function NavbarToggleButton({
+  onToggle,
+  isOpen,
+}: {
+  onToggle: () => void;
+  isOpen: boolean;
+}): JSX.Element {
+  return (
+    <IconButton
+      onClick={onToggle}
+      icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
+      variant="ghost"
+      aria-label="Toggle Navigation"
+    />
+  );
+}
 
 /** 네비바 우측영역(로그인 여부에 따라 로그인 버튼 혹은 프로필 사진이 표시됨) */
 export function NavbarRightButtonSection(): JSX.Element {
