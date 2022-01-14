@@ -4,7 +4,7 @@ import { AdminSettlementDoneList } from '@project-lc/components-admin/AdminSettl
 import { SettlementSellCommissionInfo } from '@project-lc/components-admin/SettlementSellCommissionInfo';
 import { SettlementTargetList } from '@project-lc/components-admin/SettlementTargetList';
 
-export function SettlementIndex(): JSX.Element {
+export function SellerSettlement(): JSX.Element {
   return (
     <AdminPageLayout>
       <Stack p={6} spacing={4}>
@@ -32,4 +32,4 @@ export function SettlementIndex(): JSX.Element {
   );
 }
 
-export default SettlementIndex;
+export default SellerSettlement;

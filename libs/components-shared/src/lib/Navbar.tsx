@@ -29,6 +29,22 @@ import { KksLogo } from './KksLogo';
 import ProfileBox from './ProfileBox';
 import UserNotificationSection from './UserNotificationSection';
 
+export function NavbarToggleButton({
+  onToggle,
+  isOpen,
+}: {
+  onToggle: () => void;
+  isOpen: boolean;
+}): JSX.Element {
+  return (
+    <IconButton
+      onClick={onToggle}
+      icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
+      variant="ghost"
+      aria-label="Toggle Navigation"
+    />
+  );
+}
 export interface NavbarProps {
   appType?: UserType;
 }
@@ -62,12 +78,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
           ml={{ base: -2 }}
           display={{ base: 'flex', md: 'none' }}
         >
-          <IconButton
-            onClick={onToggle}
-            icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
-            variant="ghost"
-            aria-label="Toggle Navigation"
-          />
+          <NavbarToggleButton isOpen={isOpen} onToggle={onToggle} />
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ md: 'start' }} alignItems="center">
           <NextLink href="/" passHref>
