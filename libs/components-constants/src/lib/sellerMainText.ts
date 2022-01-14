@@ -79,12 +79,12 @@ export const howToUseSectionBody: SectionData[] = [
 
 // process section 내용
 export const processSectionBody = [
-  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-1.png`, text: '방송인 섭외' },
-  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-2.png`, text: '컨텐츠 기획' },
-  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-3.png`, text: '홍보물 이미지 제작' },
-  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-4.png`, text: 'SNS 홍보' },
-  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-5.png`, text: '리허설' },
-  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-6.png`, text: '본 방송 리드' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-1.png`, text: '1. 방송인 섭외' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-2.png`, text: '2. 컨텐츠 기획' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-3.png`, text: '3. 홍보물 이미지 제작' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-4.png`, text: '4. SNS 홍보' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-5.png`, text: '5. 리허설' },
+  { src: `${MAIN_IMAGE_PATH}/step-desktop/step-6.png`, text: '6. 본 방송 리드' },
 ];
 
 // 생생한 후기 이미지
