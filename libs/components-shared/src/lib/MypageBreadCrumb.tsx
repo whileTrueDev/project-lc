@@ -58,7 +58,10 @@ export function MypageBreadcrumb(): JSX.Element {
       <Breadcrumb>
         {breadcrumbs.map((breadcrumb, i) => {
           return (
-            <BreadcrumbItem key={breadcrumb.href}>
+            <BreadcrumbItem
+              key={breadcrumb.href}
+              isCurrentPage={i + 1 === breadcrumbs.length}
+            >
               <BreadcrumbLink href={breadcrumb.href}>
                 {convertToKorean(breadcrumb.breadcrumb)}
               </BreadcrumbLink>
