@@ -145,7 +145,12 @@ export function PersonalPopoverMenu(): JSX.Element {
         </MenuItem>
 
         {/* 다크모드 버튼 */}
-        <MenuItem my={1} icon={<SwitchIcon />} onClick={toggleColorMode}>
+        <MenuItem
+          my={1}
+          icon={<SwitchIcon />}
+          onClick={toggleColorMode}
+          closeOnSelect={false}
+        >
           {colorMode === 'light' ? '다크모드' : '라이트모드'}
         </MenuItem>
 
