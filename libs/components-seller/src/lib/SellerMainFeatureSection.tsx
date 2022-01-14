@@ -27,6 +27,7 @@ export function SellerMainFeatureItem({ item }: { item: SectionData }): JSX.Elem
       }}
       transition="all 0.3s ease-in-out"
       wordBreak="keep-all"
+      cursor="default"
     >
       <Text
         fontSize={{ base: 'lg', md: 'xl' }}
