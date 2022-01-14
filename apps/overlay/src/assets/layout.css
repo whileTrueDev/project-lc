@@ -536,3 +536,8 @@ div.bottom-fever-timer {
   -webkit-animation-iteration-count: infinite;
   -webkit-animation-timing-function: linear;
 }
+
+#kks-logo {
+  width: 130px;
+  height: 54px;
+}
