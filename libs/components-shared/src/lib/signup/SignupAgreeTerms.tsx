@@ -2,6 +2,7 @@ import { Button, Checkbox, Stack, Text } from '@chakra-ui/react';
 import { privacyPolicy } from '@project-lc/components-constants/terms';
 import TermBox from '@project-lc/components-core/TermBox';
 import CenterBox from '@project-lc/components-layout/CenterBox';
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { SignupProcessItemProps } from './SignupStart';
 
@@ -15,12 +16,22 @@ export function SignupAgreeTerms({
   moveToNext,
   moveToPrev,
 }: SignupAgreeTermsProps): JSX.Element {
-  const { handleSubmit, register, watch } = useForm<AgreeTermsData>();
+  const { handleSubmit, register, watch } = useForm<AgreeTermsData>({
+    defaultValues: { privacyPolicy: false },
+  });
 
   const onSubmit = (data: AgreeTermsData): void => {
     if (!moveToNext) return;
     moveToNext();
   };
+
+  const watchAll: AgreeTermsData = watch();
+
+  const everyChecked = useMemo(() => {
+    const keys = Object.keys(watchAll) as Array<keyof AgreeTermsData>;
+    return keys.every((key) => watchAll[key] === true);
+  }, [watchAll]);
+
   return (
     <CenterBox enableShadow header={{ title: '크크쇼 시작하기', desc: '' }}>
       <Stack
@@ -43,7 +54,7 @@ export function SignupAgreeTerms({
           color="white"
           _hover={{ bg: 'blue.500' }}
           type="submit"
-          isDisabled={!watch('privacyPolicy')}
+          isDisabled={!everyChecked}
         >
           다음으로
         </Button>
