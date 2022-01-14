@@ -6,7 +6,7 @@ import MypageFooter from '@project-lc/components-layout/MypageFooter';
 import { useIsLoggedIn } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import React from 'react';
-import MypageBreadcrumb from '@project-lc/components-layout/MypageBreadcrumb';
+import MypageBreadcrumb from './MypageBreadCrumb';
 import { FloatingHelpButton } from './FloatingHelpButton';
 import { MypageNavbar } from './MypageNavbar';
 import { Navbar } from './Navbar';

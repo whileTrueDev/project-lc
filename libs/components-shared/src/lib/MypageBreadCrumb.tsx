@@ -54,7 +54,7 @@ export function MypageBreadcrumb(): JSX.Element {
   }
 
   return (
-    <Box m={2}>
+    <Box m={2} ml={6}>
       <Breadcrumb>
         {breadcrumbs.map((breadcrumb, i) => {
           return (
