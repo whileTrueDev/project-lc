@@ -31,16 +31,11 @@ import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Broadcaster, Seller } from '.prisma/client';
+import { SignupProcessItemProps } from './SignupStart';
 
-export interface SignupFormProps {
-  enableShadow?: boolean;
-  moveToSignupStart?: () => void;
-  /** 기본값은 'seller', seller | broadcaster 타입에 따라 라우터로 요청한다 */
-  userType?: UserType;
-}
+export type SignupFormProps = SignupProcessItemProps;
 export function SignupForm({
-  enableShadow = false,
-  moveToSignupStart,
+  moveToPrev,
   userType = 'seller',
 }: SignupFormProps): JSX.Element {
   const router = useRouter();
@@ -149,10 +144,7 @@ export function SignupForm({
   );
 
   return (
-    <CenterBox
-      enableShadow={enableShadow}
-      header={{ title: '크크쇼 시작하기', desc: '' }}
-    >
+    <CenterBox enableShadow header={{ title: '크크쇼 시작하기', desc: '' }}>
       <Stack mt={4} spacing={4} as="form" onSubmit={handleSubmit(onSubmit)}>
         <FormControl isInvalid={!!errors.name}>
           <FormLabel htmlFor="name">이름</FormLabel>
@@ -294,7 +286,7 @@ export function SignupForm({
           </Button>
         )}
 
-        {moveToSignupStart && <Button onClick={moveToSignupStart}>돌아가기</Button>}
+        {moveToPrev && <Button onClick={moveToPrev}>돌아가기</Button>}
       </Stack>
     </CenterBox>
   );

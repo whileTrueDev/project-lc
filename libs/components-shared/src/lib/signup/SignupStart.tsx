@@ -14,7 +14,7 @@ import CenterBox from '@project-lc/components-layout/CenterBox';
 import { UserType } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import NextLink from 'next/link';
-import SocialButtonGroup from './SocialButtonGroup';
+import SocialButtonGroup from '../SocialButtonGroup';
 
 const SELLER_DISPLAY_TEXT_LIST = [
   '라이브커머스를 통해 발생한 판매 관리',
@@ -28,15 +28,16 @@ const BROADCASTER_DISPLAY_TEXT_LIST = [
   '누구나 쉽게 할 수 있는 화면 세팅으로 시작해 보세요.',
 ];
 
-interface SignupStartProps {
-  /** 기본값은 'seller', seller | broadcaster 타입에 따라 다른 문구가 표기된다 */
-  userType?: UserType;
-  moveToSignupForm?: () => void;
+export interface SignupProcessItemProps {
+  userType: UserType;
+  moveToNext?: () => void;
+  moveToPrev?: () => void;
 }
+type SignupStartProps = SignupProcessItemProps;
 
 export function SignupStart({
   userType = 'seller',
-  moveToSignupForm,
+  moveToNext,
 }: SignupStartProps): JSX.Element {
   const displayTextList =
     userType === 'seller' ? SELLER_DISPLAY_TEXT_LIST : BROADCASTER_DISPLAY_TEXT_LIST;
@@ -63,7 +64,7 @@ export function SignupStart({
             color="white"
             _hover={{ bg: 'blue.500' }}
             isFullWidth
-            onClick={moveToSignupForm}
+            onClick={moveToNext}
             mb={4}
           >
             이메일 계정으로 가입
