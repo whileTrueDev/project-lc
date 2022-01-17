@@ -19,9 +19,14 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import terms from '@project-lc/components-constants/contractTerms';
+import broadcasterTerms from '@project-lc/components-constants/broadcasterContractTerms';
+import sellerTerms from '@project-lc/components-constants/sellerContractTerms';
 import { SettingSectionLayout } from '@project-lc/components-layout/SettingSectionLayout';
-import { useProfile, useUpdateContractionAgreementMutation } from '@project-lc/hooks';
+import {
+  useProfile,
+  useBroadcasterUpdateContractionAgreementMutation,
+  useSellerUpdateContractionAgreementMutation,
+} from '@project-lc/hooks';
 import { useEffect, useMemo, useState } from 'react';
 
 interface Term {
@@ -32,8 +37,10 @@ interface Term {
 
 export function ContractionAgreementSection({
   completeStep,
+  type,
 }: {
   completeStep: () => void;
+  type: 'seller' | 'broadcaster';
 }): JSX.Element {
   const { data } = useProfile();
   const toast = useToast();
@@ -41,13 +48,20 @@ export function ContractionAgreementSection({
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [checkedA, setCheckedA] = useState<boolean>(false);
   const [checkedB, setCheckedB] = useState<boolean>(false);
+  const [sellerAgreementCheck, setSellerAgreementCheck] = useState<boolean>(false);
 
   function checkedAll(value: boolean): void {
     setCheckedA(value);
     setCheckedB(value);
   }
 
-  const mutation = useUpdateContractionAgreementMutation();
+  function sellerCheckAll(value: boolean): void {
+    setSellerAgreementCheck(value);
+  }
+
+  const broadcasterMutation = useBroadcasterUpdateContractionAgreementMutation();
+  const sellerMutation = useSellerUpdateContractionAgreementMutation();
+
   const 계약동의여부 = useMemo<boolean>(
     () => !!data?.agreementFlag,
     [data?.agreementFlag],
@@ -74,17 +88,28 @@ export function ContractionAgreementSection({
     if (!data?.email) {
       return;
     }
-
-    mutation
-      .mutateAsync({ email: data?.email, agreementFlag: true })
-      .then((result) => {
-        if (result) onSuccess();
-        else onError();
-      })
-      .catch((err) => {
-        console.log(err);
-        onError();
-      });
+    if (type === 'broadcaster') {
+      broadcasterMutation
+        .mutateAsync({ email: data?.email, agreementFlag: true })
+        .then((result) => {
+          if (result) onSuccess();
+          else onError();
+        })
+        .catch((err) => {
+          onError();
+        });
+    }
+    if (type === 'seller') {
+      sellerMutation
+        .mutateAsync({ email: data?.email, agreementFlag: true })
+        .then((result) => {
+          if (result) onSuccess();
+          else onError();
+        })
+        .catch((err) => {
+          onError();
+        });
+    }
   }
 
   return (
@@ -108,7 +133,8 @@ export function ContractionAgreementSection({
           )}
         </VStack>
       </Center>
-      {계약동의여부 ? (
+
+      {계약동의여부 && (
         <Center>
           <VStack w={['6xl', 'xl']}>
             <SettingSectionLayout title="이용 동의">
@@ -129,10 +155,79 @@ export function ContractionAgreementSection({
             </Text>
           </VStack>
         </Center>
-      ) : (
+      )}
+
+      {type === 'seller' && !계약동의여부 && (
         <Center>
           <Stack w={['6xl', 'xl']} spacing={5}>
-            {terms.map((term) => (
+            {sellerTerms.map((term) => (
+              <SimpleGrid key={term.state} columns={3}>
+                <GridItem>
+                  <Text>
+                    {term.title}{' '}
+                    {term.required && (
+                      <Text as="span" fontSize="xs" color="green.500">
+                        (필수)
+                      </Text>
+                    )}
+                  </Text>
+                </GridItem>
+                <GridItem textAlign="center">
+                  <Button
+                    size="sm"
+                    onClick={(): void => {
+                      setSelectedTerm(term);
+                      dialog.onOpen();
+                    }}
+                  >
+                    약관보기
+                  </Button>
+                </GridItem>
+                <GridItem>
+                  <Checkbox
+                    size="md"
+                    colorScheme="green"
+                    isChecked={sellerAgreementCheck}
+                    onChange={() => {
+                      setSellerAgreementCheck(!sellerAgreementCheck);
+                    }}
+                  >
+                    동의
+                  </Checkbox>
+                </GridItem>
+              </SimpleGrid>
+            ))}
+            <Divider />
+            {/* 이용약관 모두 동의 버튼 */}
+            <Checkbox
+              size="md"
+              colorScheme="green"
+              isChecked={sellerAgreementCheck}
+              onChange={() => {
+                if (sellerAgreementCheck) sellerCheckAll(false);
+                else sellerCheckAll(true);
+              }}
+            >
+              전체 이용약관에 동의합니다.
+            </Checkbox>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                width="150px"
+                size="sm"
+                disabled={!sellerAgreementCheck}
+                onClick={onSubmit}
+              >
+                확인
+              </Button>
+            </div>
+          </Stack>
+        </Center>
+      )}
+
+      {type === 'broadcaster' && !계약동의여부 && (
+        <Center>
+          <Stack w={['6xl', 'xl']} spacing={5}>
+            {broadcasterTerms.map((term) => (
               <SimpleGrid key={term.state} columns={3}>
                 <GridItem>
                   <Text>

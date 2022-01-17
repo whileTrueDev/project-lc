@@ -66,6 +66,7 @@ export * from './lib/dto/passwordValidate.dto';
 export * from './lib/dto/post.dto';
 export * from './lib/dto/registGoods.dto';
 export * from './lib/dto/sellerContacts.dto';
+export * from './lib/dto/SellerContractionAgreementDto.dto';
 export * from './lib/dto/sellerOrderCancel.dto';
 export * from './lib/dto/sellerShopInfo.dto';
 export * from './lib/dto/sendMailVerification.dto';

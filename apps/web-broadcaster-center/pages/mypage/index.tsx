@@ -4,10 +4,10 @@ import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAler
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeSection';
 import { BroadcasterStatusSection } from '@project-lc/components-web-bc/BroadcasterStatusSection';
-import { UrlCard } from '@project-lc/components-web-bc/guide/OverlayUrlCard';
+import { UrlCard } from '@project-lc/components-shared/guide/OverlayUrlCard';
 import { MypageLiveShoppingSection } from '@project-lc/components-web-bc/MypageLiveShoppingSection';
 import { StartGuideCard } from '@project-lc/components-web-bc/StartGuideCard';
-import { StartGuideSection } from '@project-lc/components-web-bc/StartGuideSection';
+import { StartGuideSection } from '@project-lc/components-shared/StartGuideSection';
 import { useBroadcasterContacts, useProfile } from '@project-lc/hooks';
 import { useEffect, useMemo } from 'react';
 
@@ -84,7 +84,7 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
       </Container>
-      <StartGuideSection isOpen={isOpen} onClose={onClose} />
+      <StartGuideSection isOpen={isOpen} onClose={onClose} type="broadcaster" />
     </MypageLayout>
   );
 }

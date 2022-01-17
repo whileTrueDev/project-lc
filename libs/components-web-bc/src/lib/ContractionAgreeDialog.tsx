@@ -19,16 +19,20 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import terms, { Term } from '@project-lc/components-constants/contractTerms';
+import broadcasterTerms from '@project-lc/components-constants/broadcasterContractTerms';
+import sellerTerms from '@project-lc/components-constants/sellerContractTerms';
+import { Term } from '@project-lc/components-constants/termType';
 
 export function ContractionAgreeDialog({
   isOpen,
   onClose,
   onSubmit,
   agreementFlag,
+  type,
 }: Pick<ModalProps, 'isOpen' | 'onClose'> & {
   onSubmit?: () => void;
   agreementFlag: boolean;
+  type: 'seller' | 'broadcaster';
 }): JSX.Element {
   const toast = useToast();
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
@@ -59,43 +63,84 @@ export function ContractionAgreeDialog({
           <Stack pb={3} spacing={4}>
             <Divider />
             {/* 헤더 */}
-            {terms.map((term) => (
-              <SimpleGrid key={term.state} columns={3}>
-                <GridItem>
-                  <Text>{term.title}</Text>
-                </GridItem>
-                <GridItem textAlign="center">
-                  <Button
-                    size="sm"
-                    onClick={(): void => {
-                      setSelectedTerm(term);
-                      dialog.onOpen();
-                    }}
-                  >
-                    약관보기
-                  </Button>
-                </GridItem>
-                {!agreementFlag && (
+            {type === 'seller' &&
+              sellerTerms.map((term) => (
+                <SimpleGrid key={term.state} columns={3}>
+                  <GridItem>
+                    <Text>{term.title}</Text>
+                  </GridItem>
                   <GridItem textAlign="center">
-                    <Checkbox
-                      size="md"
-                      colorScheme="green"
-                      isChecked={term.state === 'checkedA' ? checkedA : checkedB}
-                      onChange={() => {
-                        toast({
-                          status: 'warning',
-                          description:
-                            '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
-                          duration: 1500,
-                        });
+                    <Button
+                      size="sm"
+                      onClick={(): void => {
+                        setSelectedTerm(term);
+                        dialog.onOpen();
                       }}
                     >
-                      동의
-                    </Checkbox>
+                      약관보기
+                    </Button>
                   </GridItem>
-                )}
-              </SimpleGrid>
-            ))}
+                  {!agreementFlag && (
+                    <GridItem textAlign="center">
+                      <Checkbox
+                        size="md"
+                        colorScheme="green"
+                        // isChecked={checkedC}
+                        onChange={() => {
+                          toast({
+                            status: 'warning',
+                            description:
+                              '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
+                            duration: 1500,
+                          });
+                        }}
+                      >
+                        동의
+                      </Checkbox>
+                    </GridItem>
+                  )}
+                </SimpleGrid>
+              ))}
+
+            {type === 'broadcaster' &&
+              broadcasterTerms.map((term) => (
+                <SimpleGrid key={term.state} columns={3}>
+                  <GridItem>
+                    <Text>{term.title}</Text>
+                  </GridItem>
+                  <GridItem textAlign="center">
+                    <Button
+                      size="sm"
+                      onClick={(): void => {
+                        setSelectedTerm(term);
+                        dialog.onOpen();
+                      }}
+                    >
+                      약관보기
+                    </Button>
+                  </GridItem>
+                  {!agreementFlag && (
+                    <GridItem textAlign="center">
+                      <Checkbox
+                        size="md"
+                        colorScheme="green"
+                        isChecked={term.state === 'checkedA' ? checkedA : checkedB}
+                        onChange={() => {
+                          toast({
+                            status: 'warning',
+                            description:
+                              '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
+                            duration: 1500,
+                          });
+                        }}
+                      >
+                        동의
+                      </Checkbox>
+                    </GridItem>
+                  )}
+                </SimpleGrid>
+              ))}
+
             <Divider />
             {/* 이용약관 동의 버튼 */}
             {!agreementFlag && (

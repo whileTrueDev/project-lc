@@ -1,13 +1,22 @@
+import { useEffect } from 'react';
 import { Container, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeSection';
 import { MypageStatsSection } from '@project-lc/components-seller/MypageStatsSection';
 import { SellerStatusSection } from '@project-lc/components-seller/SellerStatusSection';
-import { ShopNameDialog } from '@project-lc/components-seller/ShopNameDialog';
+import { StartGuideSection } from '@project-lc/components-shared/StartGuideSection';
+import { useSellerAgreementFlag, useProfile } from '@project-lc/hooks';
 
 export function Index(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { data: sellerInfo } = useProfile();
+  const { data: agreementFlag } = useSellerAgreementFlag(sellerInfo?.email);
 
+  useEffect(() => {
+    if (!agreementFlag) {
+      onOpen();
+    }
+  }, [onOpen, agreementFlag]);
   return (
     <MypageLayout>
       <Container maxW="7xl" p={[1, 6, 6, 6]}>
@@ -23,7 +32,9 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
         {/* 상점명 입력 다이얼로그 (useProfile 내부에서 사용) */}
-        <ShopNameDialog isOpen={isOpen} onOpen={onOpen} onClose={onClose} autoCheck />
+        <StartGuideSection isOpen={isOpen} onClose={onClose} type="seller" />
+
+        {/* <ShopNameDialog isOpen={isOpen} onOpen={onOpen} onClose={onClose} autoCheck /> */}
       </Container>
     </MypageLayout>
   );

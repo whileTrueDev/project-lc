@@ -6,6 +6,7 @@ import {
   AdminSellerListRes,
   FindSellerRes,
   SellerContactsDTO,
+  SellerContractionAgreementDto,
 } from '@project-lc/shared-types';
 import { hash, verify } from 'argon2';
 @Injectable()
@@ -61,6 +62,7 @@ export class SellerService {
         name: true,
         password: true,
         avatar: true,
+        agreementFlag: true,
         sellerShop: {
           select: {
             shopName: true,
@@ -260,6 +262,30 @@ export class SellerService {
         email: true,
         name: true,
         avatar: true,
+      },
+    });
+  }
+
+  public async getAgreementFlag(email: Seller['email']): Promise<boolean> {
+    const agreementFlag = await this.prisma.seller.findFirst({
+      select: {
+        agreementFlag: true,
+      },
+      where: {
+        email,
+      },
+    });
+    if (agreementFlag.agreementFlag) {
+      return true;
+    }
+    return false;
+  }
+
+  public async updateAgreementFlag(dto: SellerContractionAgreementDto): Promise<Seller> {
+    return this.prisma.seller.update({
+      where: { email: dto.email },
+      data: {
+        agreementFlag: dto.agreementFlag,
       },
     });
   }

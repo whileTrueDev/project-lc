@@ -1,6 +1,9 @@
 import { Button, Grid, GridItem, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import { CheckIcon } from '@chakra-ui/icons';
-import { useProfile, useUpdateContractionAgreementMutation } from '@project-lc/hooks';
+import {
+  useProfile,
+  useBroadcasterUpdateContractionAgreementMutation,
+} from '@project-lc/hooks';
 import { SettingSectionLayout } from '@project-lc/components-layout/SettingSectionLayout';
 import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAlertBox';
 import { ContractionAgreeDialog } from './ContractionAgreeDialog';
@@ -10,7 +13,7 @@ export function ContractionAgreeSection(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
-  const mutation = useUpdateContractionAgreementMutation();
+  const mutation = useBroadcasterUpdateContractionAgreementMutation();
 
   function onSubmit(): void {
     const onSuccess = (): void => {
@@ -37,7 +40,6 @@ export function ContractionAgreeSection(): JSX.Element {
         else onError();
       })
       .catch((err) => {
-        console.log(err);
         onError();
       });
   }
@@ -72,6 +74,7 @@ export function ContractionAgreeSection(): JSX.Element {
         onClose={onClose}
         onSubmit={onSubmit}
         agreementFlag={data?.agreementFlag === undefined ? true : data.agreementFlag}
+        type="broadcaster"
       />
       |
     </SettingSectionLayout>

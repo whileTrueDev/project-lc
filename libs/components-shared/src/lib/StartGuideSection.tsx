@@ -24,7 +24,10 @@ import { SettlementsSection } from './guide/SettlementsSection';
 export function StartGuideSection({
   isOpen,
   onClose,
-}: Pick<ModalProps, 'isOpen' | 'onClose'>): JSX.Element {
+  type,
+}: Pick<ModalProps, 'isOpen' | 'onClose'> & {
+  type: 'seller' | 'broadcaster';
+}): JSX.Element {
   // 다음 단계 가능여부
   const [condition, setCondition] = useState<boolean>(false);
 
@@ -54,32 +57,45 @@ export function StartGuideSection({
   };
 
   // 각 단계 컴포넌트 목록
-  const steps = [
-    {
-      label: '크크쇼 이용약관 동의하기',
-      component: <ContractionAgreementSection completeStep={completeStep} />,
-    },
-    {
-      label: '연락처 등록하기',
-      component: <AddressSection completeStep={completeStep} />,
-    },
-    {
-      label: '채널링크 등록하기',
-      component: <ChannelSection completeStep={completeStep} />,
-    },
-    {
-      label: '라이브 쇼핑 준비하기',
-      component: <OverayUrlSection completeStep={completeStep} />,
-    },
-    {
-      label: '라이브 쇼핑 화면',
-      component: <LiveShoppingMonitorSection completeStep={completeStep} />,
-    },
-    {
-      label: '수익금 출금하기',
-      component: <SettlementsSection completeStep={completeStep} />,
-    },
-  ];
+  const steps =
+    type === 'seller'
+      ? [
+          {
+            label: '크크쇼 이용약관 동의하기',
+            component: (
+              <ContractionAgreementSection completeStep={completeStep} type={type} />
+            ),
+          },
+          { label: '상점명 등록하기' },
+        ]
+      : [
+          {
+            label: '크크쇼 이용약관 동의하기',
+            component: (
+              <ContractionAgreementSection completeStep={completeStep} type={type} />
+            ),
+          },
+          {
+            label: '연락처 등록하기',
+            component: <AddressSection completeStep={completeStep} />,
+          },
+          {
+            label: '채널링크 등록하기',
+            component: <ChannelSection completeStep={completeStep} />,
+          },
+          {
+            label: '라이브 쇼핑 준비하기',
+            component: <OverayUrlSection completeStep={completeStep} />,
+          },
+          {
+            label: '라이브 쇼핑 화면',
+            component: <LiveShoppingMonitorSection completeStep={completeStep} />,
+          },
+          {
+            label: '수익금 출금하기',
+            component: <SettlementsSection completeStep={completeStep} />,
+          },
+        ];
 
   function getStepComponent(step: number): React.ReactNode {
     return steps[step].component;

@@ -1,8 +1,8 @@
 import { Center, Divider, Stack, Text, VStack } from '@chakra-ui/react';
 import { useBroadcasterChannels, useProfile } from '@project-lc/hooks';
 import { useEffect } from 'react';
-import { BroadcasterNickNameSection } from '../BroadcasterNickName';
-import { BroadcasterChannelSection } from '../BroadcasterChannelSection';
+import { BroadcasterNickNameSection } from '@project-lc/components-web-bc//BroadcasterNickName';
+import { BroadcasterChannelSection } from '@project-lc/components-web-bc//BroadcasterChannelSection';
 
 export function ChannelSection({
   completeStep,

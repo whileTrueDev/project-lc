@@ -1,8 +1,8 @@
 import { Center, Divider, Stack, Text, VStack } from '@chakra-ui/react';
 import { useEffect, useMemo } from 'react';
 import { useProfile, useBroadcaster, useBroadcasterContacts } from '@project-lc/hooks';
-import { BroadcasterAddressSection } from '../BroadcasterAddress';
-import { BroadcasterContactSection } from '../BroadcasterContact';
+import { BroadcasterAddressSection } from '@project-lc/components-web-bc/BroadcasterAddress';
+import { BroadcasterContactSection } from '@project-lc/components-web-bc//BroadcasterContact';
 
 export function AddressSection({
   completeStep,
