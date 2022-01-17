@@ -25,9 +25,9 @@ import { SettlementsSection } from './guide/SettlementsSection';
 export function StartGuideSection({
   isOpen,
   onClose,
-  type,
+  userType,
 }: Pick<ModalProps, 'isOpen' | 'onClose'> & {
-  type: 'seller' | 'broadcaster';
+  userType: 'seller' | 'broadcaster';
 }): JSX.Element {
   // 다음 단계 가능여부
   const [condition, setCondition] = useState<boolean>(false);
@@ -59,12 +59,15 @@ export function StartGuideSection({
 
   // 각 단계 컴포넌트 목록
   const steps =
-    type === 'seller'
+    userType === 'seller'
       ? [
           {
             label: '크크쇼 이용약관 동의하기',
             component: (
-              <ContractionAgreementSection completeStep={completeStep} type={type} />
+              <ContractionAgreementSection
+                completeStep={completeStep}
+                userType={userType}
+              />
             ),
           },
           {
@@ -76,7 +79,10 @@ export function StartGuideSection({
           {
             label: '크크쇼 이용약관 동의하기',
             component: (
-              <ContractionAgreementSection completeStep={completeStep} type={type} />
+              <ContractionAgreementSection
+                completeStep={completeStep}
+                userType={userType}
+              />
             ),
           },
           {

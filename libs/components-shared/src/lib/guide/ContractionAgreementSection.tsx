@@ -37,10 +37,10 @@ interface Term {
 
 export function ContractionAgreementSection({
   completeStep,
-  type,
+  userType,
 }: {
   completeStep: () => void;
-  type: 'seller' | 'broadcaster';
+  userType: 'seller' | 'broadcaster';
 }): JSX.Element {
   const { data } = useProfile();
   const toast = useToast();
@@ -88,7 +88,7 @@ export function ContractionAgreementSection({
     if (!data?.email) {
       return;
     }
-    if (type === 'broadcaster') {
+    if (userType === 'broadcaster') {
       broadcasterMutation
         .mutateAsync({ email: data?.email, agreementFlag: true })
         .then((result) => {
@@ -99,7 +99,7 @@ export function ContractionAgreementSection({
           onError();
         });
     }
-    if (type === 'seller') {
+    if (userType === 'seller') {
       sellerMutation
         .mutateAsync({ email: data?.email, agreementFlag: true })
         .then((result) => {
@@ -157,7 +157,7 @@ export function ContractionAgreementSection({
         </Center>
       )}
 
-      {type === 'seller' && !계약동의여부 && (
+      {userType === 'seller' && !계약동의여부 && (
         <Center>
           <Stack w={['6xl', 'xl']} spacing={5}>
             {sellerTerms.map((term) => (
@@ -224,7 +224,7 @@ export function ContractionAgreementSection({
         </Center>
       )}
 
-      {type === 'broadcaster' && !계약동의여부 && (
+      {userType === 'broadcaster' && !계약동의여부 && (
         <Center>
           <Stack w={['6xl', 'xl']} spacing={5}>
             {broadcasterTerms.map((term) => (
