@@ -29,6 +29,7 @@ import {
   mainNavItems,
   NavItem,
   mypageNavLinks,
+  broadcasterCenterMypageNavLinks,
 } from '@project-lc/components-constants/navigation';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { useDisplaySize, useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
@@ -260,7 +261,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
             <Flex flex={{ base: 1 }} alignItems="center">
               <NavbarLinkLogo appType={appType} />
               <Box ml={10}>
-                <DesktopNav />
+                <MainNavItemList />
               </Box>
             </Flex>
             <NavbarRightButtonSection />
@@ -269,13 +270,13 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
       </Container>
 
       {/* 토글버튼(hambergerButton)으로 여닫는 모바일화면 네비바(Drawer) */}
-      <MobileNav isOpen={isOpen} onClose={onClose} />
+      <MobileDrawerNav isOpen={isOpen} onClose={onClose} appType={appType} />
     </Box>
   );
 }
 
 /** 데스크톱 화면에서 네비바 메뉴목록 */
-const DesktopNav = (): JSX.Element => {
+const MainNavItemList = (): JSX.Element => {
   const router = useRouter();
   const linkColor = useColorModeValue('gray.900', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.600', 'blue.100');
@@ -322,12 +323,14 @@ const DesktopNav = (): JSX.Element => {
 };
 
 /** 모바일 화면 네비게이션(좌측 Drawer) */
-const MobileNav = ({
+const MobileDrawerNav = ({
   isOpen,
   onClose,
+  appType,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  appType: UserType;
 }): JSX.Element => {
   const { isLoggedIn } = useIsLoggedIn();
   const router = useRouter();
@@ -349,7 +352,13 @@ const MobileNav = ({
               <MobileNavItem key={navItem.label} {...navItem} onClose={onClose} />
             ))}
             {/* 로그인 한 경우 마이페이지 nav 메뉴를 표시함 */}
-            {isLoggedIn && <MypageNavbar navLinks={mypageNavLinks} />}
+            {isLoggedIn && (
+              <MypageNavbar
+                navLinks={
+                  appType === 'seller' ? mypageNavLinks : broadcasterCenterMypageNavLinks
+                }
+              />
+            )}
 
             {/* 로그인 하지 않은 경우에만 드로어에 회원가입 버튼을 표시한다 */}
             {!isLoggedIn && (
