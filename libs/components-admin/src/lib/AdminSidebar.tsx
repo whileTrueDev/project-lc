@@ -12,7 +12,7 @@ import {
   adminSidebarMenuList,
   SidebarMenuLink,
 } from '@project-lc/components-constants/navigation';
-import { NavbarToggleButton } from '@project-lc/components-shared/Navbar';
+import { NavbarToggleButton } from '@project-lc/components-shared/navbar/NavbarToggleButton';
 import { motion, Variants } from 'framer-motion';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
