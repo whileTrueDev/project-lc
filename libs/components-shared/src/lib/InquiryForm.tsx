@@ -44,7 +44,7 @@ export function InquiryDialog({
       scrollBehavior="inside"
     >
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent p={{ base: 4, md: 8 }}>
         <ModalHeader>
           <Heading as="h3" fontSize={['xl', '3xl']}>
             문의사항을 남겨주세요
