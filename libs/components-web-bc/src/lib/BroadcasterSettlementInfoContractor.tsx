@@ -14,13 +14,14 @@ import {
   useDisclosure,
   VStack,
 } from '@chakra-ui/react';
-import { TAX_MANAGEMENT_TERM } from '@project-lc/components-constants/broadcastetSettlementTerms';
+import { TAX_MANAGEMENT_TERM } from '@project-lc/components-constants/broadcasterSettlementTerms';
 import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
+import TermBox from '@project-lc/components-core/TermBox';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
 import { useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
 import BroadcasterImageUploadGuideDialog from './BroadcasterImageUploadGuideDialog';
-import { SectionHeading, TermBox } from './BroadcasterSettlementInfoDialog';
+import { SectionHeading } from './BroadcasterSettlementInfoDialog';
 
 type PhoneNumber = {
   phone1: number;
