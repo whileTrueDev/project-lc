@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { Step, StepLabel } from '@material-ui/core';
 import { useState } from 'react';
+import { ShopNameSection } from '@project-lc/components-seller/ShopNameSection';
 import { AddressSection } from './guide/AddressSection';
 import { ChakraStepper } from './guide/ChakraStepper';
 import { ChannelSection } from './guide/ChannelSection';
@@ -66,7 +67,10 @@ export function StartGuideSection({
               <ContractionAgreementSection completeStep={completeStep} type={type} />
             ),
           },
-          { label: '상점명 등록하기' },
+          {
+            label: '상점명 등록하기',
+            component: <ShopNameSection completeStep={completeStep} />,
+          },
         ]
       : [
           {

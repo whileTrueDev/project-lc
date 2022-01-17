@@ -11,9 +11,8 @@ export function Index(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: sellerInfo } = useProfile();
   const { data: agreementFlag } = useSellerAgreementFlag(sellerInfo?.email);
-
   useEffect(() => {
-    if (!agreementFlag) {
+    if (agreementFlag !== undefined && !agreementFlag) {
       onOpen();
     }
   }, [onOpen, agreementFlag]);
@@ -31,10 +30,8 @@ export function Index(): JSX.Element {
             <MypageNoticeSection />
           </GridItem>
         </Grid>
-        {/* 상점명 입력 다이얼로그 (useProfile 내부에서 사용) */}
+        {/** 시작가이드 */}
         <StartGuideSection isOpen={isOpen} onClose={onClose} type="seller" />
-
-        {/* <ShopNameDialog isOpen={isOpen} onOpen={onOpen} onClose={onClose} autoCheck /> */}
       </Container>
     </MypageLayout>
   );
