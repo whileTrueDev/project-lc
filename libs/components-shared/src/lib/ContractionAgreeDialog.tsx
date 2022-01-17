@@ -16,7 +16,6 @@ import {
   Stack,
   Text,
   useDisclosure,
-  useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import broadcasterTerms from '@project-lc/components-constants/broadcasterContractTerms';
@@ -28,21 +27,25 @@ export function ContractionAgreeDialog({
   onClose,
   onSubmit,
   agreementFlag,
-  type,
+  userType,
 }: Pick<ModalProps, 'isOpen' | 'onClose'> & {
   onSubmit?: () => void;
   agreementFlag: boolean;
-  type: 'seller' | 'broadcaster';
+  userType: 'seller' | 'broadcaster';
 }): JSX.Element {
-  const toast = useToast();
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [checkedA, setCheckedA] = useState<boolean>(false);
   const [checkedB, setCheckedB] = useState<boolean>(false);
+  const [sellerAgreementCheck, setSellerAgreementCheck] = useState<boolean>(false);
   const dialog = useDisclosure();
 
   function checkedAll(value: boolean): void {
     setCheckedA(value);
     setCheckedB(value);
+  }
+
+  function sellerCheckAll(value: boolean): void {
+    setSellerAgreementCheck(value);
   }
 
   return (
@@ -63,7 +66,7 @@ export function ContractionAgreeDialog({
           <Stack pb={3} spacing={4}>
             <Divider />
             {/* 헤더 */}
-            {type === 'seller' &&
+            {userType === 'seller' &&
               sellerTerms.map((term) => (
                 <SimpleGrid key={term.state} columns={3}>
                   <GridItem>
@@ -85,14 +88,9 @@ export function ContractionAgreeDialog({
                       <Checkbox
                         size="md"
                         colorScheme="green"
-                        // isChecked={checkedC}
+                        isChecked={sellerAgreementCheck}
                         onChange={() => {
-                          toast({
-                            status: 'warning',
-                            description:
-                              '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
-                            duration: 1500,
-                          });
+                          setSellerAgreementCheck(!sellerAgreementCheck);
                         }}
                       >
                         동의
@@ -102,7 +100,7 @@ export function ContractionAgreeDialog({
                 </SimpleGrid>
               ))}
 
-            {type === 'broadcaster' &&
+            {userType === 'broadcaster' &&
               broadcasterTerms.map((term) => (
                 <SimpleGrid key={term.state} columns={3}>
                   <GridItem>
@@ -126,12 +124,8 @@ export function ContractionAgreeDialog({
                         colorScheme="green"
                         isChecked={term.state === 'checkedA' ? checkedA : checkedB}
                         onChange={() => {
-                          toast({
-                            status: 'warning',
-                            description:
-                              '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
-                            duration: 1500,
-                          });
+                          if (term.state === 'checkedA') setCheckedA(!checkedA);
+                          if (term.state === 'checkedB') setCheckedB(!checkedB);
                         }}
                       >
                         동의
@@ -143,22 +137,41 @@ export function ContractionAgreeDialog({
 
             <Divider />
             {/* 이용약관 동의 버튼 */}
-            {!agreementFlag && (
+            {userType === 'seller' && !agreementFlag && (
+              <>
+                <Checkbox
+                  size="md"
+                  colorScheme="green"
+                  isChecked={sellerAgreementCheck}
+                  onChange={() => {
+                    if (sellerAgreementCheck) sellerCheckAll(false);
+                    else sellerCheckAll(true);
+                  }}
+                >
+                  전체 이용약관에 동의합니다.
+                </Checkbox>
+                <ButtonGroup justifyContent="flex-end">
+                  <Button onClick={onClose}>취소</Button>
+                  <Button
+                    colorScheme="blue"
+                    disabled={!sellerAgreementCheck}
+                    onClick={onSubmit}
+                  >
+                    확인
+                  </Button>
+                </ButtonGroup>
+              </>
+            )}
+
+            {userType === 'broadcaster' && !agreementFlag && (
               <>
                 <Checkbox
                   size="md"
                   colorScheme="green"
                   isChecked={checkedA && checkedB}
                   onChange={() => {
-                    if (checkedA && checkedB) {
-                      checkedAll(false);
-                    } else {
-                      toast({
-                        status: 'warning',
-                        description: '약관보기를 통해 약관을 모두 읽고 동의를 누르세요.',
-                        duration: 1500,
-                      });
-                    }
+                    if (checkedA && checkedB) checkedAll(false);
+                    else checkedAll(true);
                   }}
                 >
                   전체 이용약관에 동의합니다.

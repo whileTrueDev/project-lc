@@ -3,17 +3,23 @@ import { CheckIcon } from '@chakra-ui/icons';
 import {
   useProfile,
   useBroadcasterUpdateContractionAgreementMutation,
+  useSellerUpdateContractionAgreementMutation,
 } from '@project-lc/hooks';
 import { SettingSectionLayout } from '@project-lc/components-layout/SettingSectionLayout';
 import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAlertBox';
 import { ContractionAgreeDialog } from './ContractionAgreeDialog';
 
-export function ContractionAgreeSection(): JSX.Element {
+export function ContractionAgreeSection({
+  userType,
+}: {
+  userType: 'seller' | 'broadcaster';
+}): JSX.Element {
   const { data } = useProfile();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
-  const mutation = useBroadcasterUpdateContractionAgreementMutation();
+  const broadcasterMutation = useBroadcasterUpdateContractionAgreementMutation();
+  const sellerMutation = useSellerUpdateContractionAgreementMutation();
 
   function onSubmit(): void {
     const onSuccess = (): void => {
@@ -33,15 +39,28 @@ export function ContractionAgreeSection(): JSX.Element {
       return;
     }
 
-    mutation
-      .mutateAsync({ email: data?.email, agreementFlag: true })
-      .then((result) => {
-        if (result) onSuccess();
-        else onError();
-      })
-      .catch((err) => {
-        onError();
-      });
+    if (userType === 'seller') {
+      sellerMutation
+        .mutateAsync({ email: data?.email, agreementFlag: true })
+        .then((result) => {
+          if (result) onSuccess();
+          else onError();
+        })
+        .catch((err) => {
+          onError();
+        });
+    }
+    if (userType === 'broadcaster') {
+      broadcasterMutation
+        .mutateAsync({ email: data?.email, agreementFlag: true })
+        .then((result) => {
+          if (result) onSuccess();
+          else onError();
+        })
+        .catch((err) => {
+          onError();
+        });
+    }
   }
 
   return (
@@ -74,7 +93,7 @@ export function ContractionAgreeSection(): JSX.Element {
         onClose={onClose}
         onSubmit={onSubmit}
         agreementFlag={data?.agreementFlag === undefined ? true : data.agreementFlag}
-        type="broadcaster"
+        userType={userType}
       />
       |
     </SettingSectionLayout>
