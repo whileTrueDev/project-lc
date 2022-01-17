@@ -13,83 +13,89 @@ import {
 import { MypageLink } from '@project-lc/components-constants/navigation';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export interface MypageNavbarProps {
   navLinks: Array<MypageLink>;
 }
 export function MypageNavbar({ navLinks }: MypageNavbarProps): JSX.Element {
   const router = useRouter();
-  const linkHoverColor = useColorModeValue('gray.800', 'white');
-  const subNavHoverColor = useColorModeValue('pink.50', 'gray.900');
+  const subNavHoverColor = useColorModeValue('blue.50', 'gray.900');
 
   // * 현재 페이지에 매치하는지 확인 함수
   const isMatched = useCallback(
-    (link: MypageLink) => {
-      return link.checkIsActive(router.pathname, link.href);
-    },
+    (link: MypageLink) => link.checkIsActive(router.pathname, link.href),
     [router.pathname],
   );
 
+  // * 현재 페이지에 매치하는 link의 인덱스(해당 accordion item open하기 위함)
+  const matchedLinkIndex = useMemo(() => {
+    const index = navLinks.findIndex((link) => isMatched(link));
+    return index;
+  }, [isMatched, navLinks]);
+
   return (
     <Stack as="nav" direction="column" height="100%" w="100%">
-      <Accordion allowMultiple allowToggle>
-        {navLinks.map((link) => (
-          <AccordionItem key={link.name}>
-            <AccordionButton>
-              <Box flex={1} textAlign="left">
-                <NextLink
-                  href={link.children ? link.children[0].href : link.href}
-                  passHref
-                >
-                  <Link
-                    py={2}
-                    w="100%"
-                    display="inline-block"
-                    mx={{ base: 1, sm: 3 }}
-                    fontSize={{ base: 'xs', sm: 'sm' }}
-                    fontWeight={isMatched(link) ? 'bold' : 500}
-                    textDecoration={isMatched(link) ? 'underline' : 'none'}
-                    textDecorationColor={isMatched(link) ? 'red.400' : 'none'}
-                    textDecorationThickness={isMatched(link) ? '0.225rem' : 'none'}
-                    _hover={{ color: linkHoverColor }}
-                  >
-                    {link.name}
-                  </Link>
-                </NextLink>
-              </Box>
-              {link.children && <AccordionIcon />}
-            </AccordionButton>
-            {link.children && (
-              <AccordionPanel pb={4}>
-                {link.children.map((child) => (
-                  <NextLink key={child.name} href={child.href ?? '#'} passHref>
-                    <Link
-                      role="group"
-                      display="block"
-                      p={2}
-                      rounded="md"
-                      _hover={{ bg: subNavHoverColor }}
-                    >
-                      <Stack direction="row" align="center">
-                        <Box>
-                          <Text
-                            fontSize={{ base: 'xs', sm: 'sm' }}
-                            fontWeight={500}
-                            transition="all .3s ease"
-                            _groupHover={{ color: 'pink.400' }}
-                          >
-                            {child.name}
-                          </Text>
-                        </Box>
-                      </Stack>
-                    </Link>
-                  </NextLink>
-                ))}
-              </AccordionPanel>
-            )}
-          </AccordionItem>
-        ))}
+      <Accordion allowMultiple allowToggle defaultIndex={[matchedLinkIndex]}>
+        {navLinks.map((link) => {
+          const itemStyle = {
+            p: 4,
+            m: 0,
+            w: `100%`,
+            display: 'inline-block',
+            fontSize: { base: 'lg', sm: 'md' },
+            fontWeight: isMatched(link) ? 'bold' : 500,
+            color: isMatched(link) ? 'white' : 'inherit',
+            bg: isMatched(link) ? 'blue.500' : 'none',
+            borderRightRadius: 'lg',
+          };
+
+          return (
+            <AccordionItem key={link.name} border="none">
+              <AccordionButton p={0}>
+                {link.children ? (
+                  <>
+                    <Box flex={1} textAlign="left" pr={isMatched(link) ? 8 : 0}>
+                      <Text {...itemStyle}>{link.name}</Text>
+                    </Box>
+                    <AccordionIcon />
+                  </>
+                ) : (
+                  <Box flex={1} textAlign="left" pr={isMatched(link) ? 8 : 0}>
+                    <NextLink href={link.href} passHref>
+                      <Link {...itemStyle}>{link.name}</Link>
+                    </NextLink>
+                  </Box>
+                )}
+              </AccordionButton>
+              {link.children && (
+                <AccordionPanel p={1}>
+                  {link.children.map((child) => {
+                    return (
+                      <NextLink key={child.name} href={child.href ?? '#'} passHref>
+                        <Link
+                          display="block"
+                          role="group"
+                          rounded="md"
+                          _hover={{ bg: subNavHoverColor }}
+                          _groupHover={{ color: 'blue.400' }}
+                          pl={8}
+                          py={2}
+                          transition="all .3s ease"
+                          fontSize="md"
+                          textDecoration={isMatched(child) ? 'underline' : 'none'}
+                          textDecorationThickness={isMatched(child) ? '0.2em' : 'none'}
+                        >
+                          {child.name}
+                        </Link>
+                      </NextLink>
+                    );
+                  })}
+                </AccordionPanel>
+              )}
+            </AccordionItem>
+          );
+        })}
       </Accordion>
     </Stack>
   );

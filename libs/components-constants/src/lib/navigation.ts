@@ -18,19 +18,21 @@ export interface NavItem {
   isExternal?: boolean;
 }
 
+/** 방송인센터, 판매자센터 상단 네비바 링크 */
 export const mainNavItems: Array<NavItem> = [
-  {
-    label: '마이페이지',
-    href: '/mypage',
-    needLogin: true,
-  },
   {
     label: '크크마켓',
     href: 'https://k-kmarket.com/',
     isExternal: true,
   },
+  {
+    label: '마이페이지',
+    href: '/mypage',
+    needLogin: true,
+  },
 ];
 
+/** 크크쇼 상단 네비바 링크 */
 export const kkshowNavLinks: Array<NavItem> = [
   {
     label: '크크마켓',
@@ -83,12 +85,12 @@ export const mypageNavLinks: MypageLink[] = [
       {
         name: '내 라이브 쇼핑 관리',
         href: '/mypage/live',
-        checkIsActive: defaultIsActiveChecker,
+        checkIsActive: (pathname, linkHref) => pathname === linkHref,
       },
       // {
       //   name: 'VOD 관리',
       //   href: '/mypage/live/vod',
-      //   checkIsActive: defaultIsActiveChecker,
+      //   checkIsActive: (pathname, linkHref) => pathname === linkHref,
       // },
     ],
   },

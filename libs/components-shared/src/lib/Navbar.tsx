@@ -25,16 +25,21 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { mainNavItems, NavItem } from '@project-lc/components-constants/navigation';
+import {
+  mainNavItems,
+  NavItem,
+  mypageNavLinks,
+} from '@project-lc/components-constants/navigation';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { useDisplaySize, useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { KksLogo } from './KksLogo';
+import MypageNavbar from './MypageNavbar';
 import ProfileBox from './ProfileBox';
 import UserNotificationSection from './UserNotificationSection';
 
@@ -185,12 +190,35 @@ export function NavbarLinkLogo({ appType }: { appType: UserType }): JSX.Element 
   );
 }
 
+/**  모바일 화면에서 네비바 레이아웃 ******* 로고 가운데 위치시키기 위해 Grid 사용 */
+function MobileNavLayout({ children }: { children: React.ReactNode }): JSX.Element {
+  return (
+    <Grid display={{ base: 'grid', md: 'none' }} templateColumns="repeat(3, 1fr)">
+      {children}
+    </Grid>
+  );
+}
+
+/** 데스크톱 화면에서 네비바 레이아웃 ****** Flex로 표시 */
+function DesktopNavLayout({ children }: { children: React.ReactNode }): JSX.Element {
+  return (
+    <Flex
+      justifyContent="space-between"
+      alignItems="center"
+      display={{ base: 'none', md: 'flex' }}
+    >
+      {children}
+    </Flex>
+  );
+}
+
 export interface NavbarProps {
   appType?: UserType;
 }
 /** 네비바 레이아웃 */
 export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
   const { isOpen, onClose, onToggle } = useDisclosure();
+  const { isMobileSize } = useDisplaySize();
 
   // 햄버거버튼(모바일화면에서만 표시)
   const hambergerButton = useMemo(() => {
@@ -213,6 +241,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
       bg={useColorModeValue('white', 'gray.800')}
       color={useColorModeValue('gray.600', 'white')}
       minH="60px"
+      width="100%"
       py={{ base: 2 }}
       borderBottom={1}
       borderStyle="solid"
@@ -220,35 +249,26 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
     >
       {/* 최대너비 제한 container */}
       <Container maxW="container.xl">
-        {/* 모바일 화면에서 네비바 레이아웃 *******
-        로고 가운데 위치시키기 위해 Grid 사용
-        display={{ base: 'grid', md: 'none' }}
-        */}
-        <Grid display={{ base: 'grid', md: 'none' }} templateColumns="repeat(3, 1fr)">
-          {hambergerButton}
-          <NavbarLinkLogo appType={appType} />
-          <NavbarRightButtonSection />
-        </Grid>
-
-        {/* 데스크톱 화면에서 네비바 레이아웃 ******
-        Flex로 표시 
-        display={{ base: 'none', md: 'flex' }}
-        */}
-        <Flex
-          justifyContent="space-between"
-          alignItems="center"
-          display={{ base: 'none', md: 'flex' }}
-        >
-          <Flex flex={{ base: 1 }} alignItems="center">
+        {isMobileSize ? (
+          <MobileNavLayout>
+            {hambergerButton}
             <NavbarLinkLogo appType={appType} />
-            <Box ml={10}>
-              <DesktopNav />
-            </Box>
-          </Flex>
-          <NavbarRightButtonSection />
-        </Flex>
+            <NavbarRightButtonSection />
+          </MobileNavLayout>
+        ) : (
+          <DesktopNavLayout>
+            <Flex flex={{ base: 1 }} alignItems="center">
+              <NavbarLinkLogo appType={appType} />
+              <Box ml={10}>
+                <DesktopNav />
+              </Box>
+            </Flex>
+            <NavbarRightButtonSection />
+          </DesktopNavLayout>
+        )}
       </Container>
 
+      {/* 토글버튼(hambergerButton)으로 여닫는 모바일화면 네비바(Drawer) */}
       <MobileNav isOpen={isOpen} onClose={onClose} />
     </Box>
   );
@@ -256,14 +276,22 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
 
 /** 데스크톱 화면에서 네비바 메뉴목록 */
 const DesktopNav = (): JSX.Element => {
-  const linkColor = useColorModeValue('gray.600', 'gray.200');
-  const linkHoverColor = useColorModeValue('gray.800', 'white');
+  const router = useRouter();
+  const linkColor = useColorModeValue('gray.900', 'gray.200');
+  const linkHoverColor = useColorModeValue('gray.600', 'blue.100');
   const { isLoggedIn } = useIsLoggedIn();
 
   // 로그인 여부에 따라, 로그인이 필요한 링크만 보여지도록 처리하기 위함
   const realMainNavItems = !isLoggedIn
     ? mainNavItems.filter((i) => !i.needLogin)
     : mainNavItems;
+
+  const isMatched = useCallback(
+    (href: string) => {
+      return router.pathname.includes(href);
+    },
+    [router.pathname],
+  );
 
   return (
     <Stack direction="row" spacing={4}>
@@ -279,6 +307,9 @@ const DesktopNav = (): JSX.Element => {
                 textDecoration: 'none',
                 color: linkHoverColor,
               }}
+              textDecoration={isMatched(navItem.href) ? 'underline' : 'none'}
+              textDecorationColor={isMatched(navItem.href) ? 'blue.400' : 'none'}
+              textDecorationThickness={isMatched(navItem.href) ? '0.225rem' : 'none'}
               isExternal={navItem.isExternal}
             >
               {navItem.label}
@@ -317,6 +348,8 @@ const MobileNav = ({
             {mainNavItems.map((navItem) => (
               <MobileNavItem key={navItem.label} {...navItem} onClose={onClose} />
             ))}
+            {/* 로그인 한 경우 마이페이지 nav 메뉴를 표시함 */}
+            {isLoggedIn && <MypageNavbar navLinks={mypageNavLinks} />}
 
             {/* 로그인 하지 않은 경우에만 드로어에 회원가입 버튼을 표시한다 */}
             {!isLoggedIn && (
