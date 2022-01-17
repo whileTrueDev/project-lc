@@ -1,6 +1,7 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons';
 import {
   Box,
+  Container,
   Flex,
   IconButton,
   useColorModeValue,
@@ -115,20 +116,22 @@ export function MypageLayout({
       <Navbar appType={appType} />
       {/* 가운데 영역 */}
       <Flex direction="row" position="relative">
-        {/* 사이드바(모바일화면이 아닌경우 ) */}
+        {/* 사이드바 표시(모바일화면이 아닌경우 ) */}
         {!isMobileSize && <DesktopMypageSidebar navLinks={navLinks} />}
         {/* 마이페이지 메인 컨텐츠 영역 */}
         <Box
           as="main"
           h={{
-            base: 'calc(100vh - 67px)', // 모바일 사이즈일때는 푸터 display : none이므로 푸터 높이는 제외하지 않는다
+            base: 'calc(100vh - 67px)', // 모바일 사이즈일때 푸터는 표시되지 않으므로 푸터높이는 제외하지 않는다
             md: 'calc(100vh - 67px - 60px)',
           }}
           flex={1}
           overflow="auto"
         >
+          {/* 브레드크럼 네비게이션 표시(모바일화면인 경우에만) */}
           {isMobileSize && <MypageBreadcrumb />}
-          {children}
+          {/* 실제 메인 컨텐츠 표시 */}
+          <Container maxW="8xl">{children}</Container>
         </Box>
       </Flex>
       {/* 푸터 */}
