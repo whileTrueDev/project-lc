@@ -4,13 +4,14 @@ import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAler
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeSection';
 import { BroadcasterStatusSection } from '@project-lc/components-web-bc/BroadcasterStatusSection';
-import { UrlCard } from '@project-lc/components-shared/guide/OverlayUrlCard';
+import { UrlCard } from '@project-lc/components-web-bc/OverlayUrlCard';
 import { MypageLiveShoppingSection } from '@project-lc/components-web-bc/MypageLiveShoppingSection';
 import { StartGuideCard } from '@project-lc/components-web-bc/StartGuideCard';
-import { BroadcasterAddressSection } from '@project-lc/components-web-bc/BroadcasterAddress';
-import { BroadcasterContactSection } from '@project-lc/components-web-bc//BroadcasterContact';
-import { BroadcasterNickNameSection } from '@project-lc/components-web-bc//BroadcasterNickName';
-import { BroadcasterChannelSection } from '@project-lc/components-web-bc//BroadcasterChannelSection';
+import { AddressSection } from '@project-lc/components-web-bc/AddressSection';
+import { ChannelSection } from '@project-lc/components-web-bc/ChannelSection';
+import { LiveShoppingMonitorSection } from '@project-lc/components-web-bc/LiveShoppingMonitorSection';
+import { OverayUrlSection } from '@project-lc/components-web-bc/OverayUrlSection';
+import { SettlementsSection } from '@project-lc/components-web-bc/SettlementsSection';
 import { StartGuideSection } from '@project-lc/components-shared/StartGuideSection';
 import { useBroadcasterContacts, useProfile } from '@project-lc/hooks';
 import { useEffect, useMemo } from 'react';
@@ -92,10 +93,11 @@ export function Index(): JSX.Element {
         isOpen={isOpen}
         onClose={onClose}
         userType="broadcaster"
-        BroadcasterAddressSection={BroadcasterAddressSection}
-        BroadcasterContactSection={BroadcasterContactSection}
-        BroadcasterNickNameSection={BroadcasterNickNameSection}
-        BroadcasterChannelSection={BroadcasterChannelSection}
+        AddressSection={AddressSection}
+        ChannelSection={ChannelSection}
+        LiveShoppingMonitorSection={LiveShoppingMonitorSection}
+        OverayUrlSection={OverayUrlSection}
+        SettlementsSection={SettlementsSection}
       />
     </MypageLayout>
   );

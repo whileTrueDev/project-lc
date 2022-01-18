@@ -12,31 +12,28 @@ import {
   ModalProps,
 } from '@chakra-ui/react';
 import { Step, StepLabel } from '@material-ui/core';
-import { AddressSection } from './guide/AddressSection';
 import { ChakraStepper } from './guide/ChakraStepper';
-import { ChannelSection } from './guide/ChannelSection';
-import { ContractionAgreementSection } from './guide/ContractionAgreementSection';
 import { IntroSection } from './guide/IntroSection';
-import { LiveShoppingMonitorSection } from './guide/LiveShoppingMonitorSection';
-import { OverayUrlSection } from './guide/OverayUrlSection';
-import { SettlementsSection } from './guide/SettlementsSection';
+import { ContractionAgreementSection } from './guide/ContractionAgreementSection';
 
 export function StartGuideSection({
   isOpen,
   onClose,
   userType,
   ShopNameSection,
-  BroadcasterAddressSection,
-  BroadcasterContactSection,
-  BroadcasterNickNameSection,
-  BroadcasterChannelSection,
+  AddressSection,
+  ChannelSection,
+  LiveShoppingMonitorSection,
+  OverayUrlSection,
+  SettlementsSection,
 }: Pick<ModalProps, 'isOpen' | 'onClose'> & {
   userType: 'seller' | 'broadcaster';
   ShopNameSection?: React.FunctionComponent<any>;
-  BroadcasterAddressSection?: React.FunctionComponent<any>;
-  BroadcasterContactSection?: React.FunctionComponent<any>;
-  BroadcasterNickNameSection?: React.FunctionComponent<any>;
-  BroadcasterChannelSection?: React.FunctionComponent<any>;
+  AddressSection?: React.FunctionComponent<any>;
+  ChannelSection?: React.FunctionComponent<any>;
+  LiveShoppingMonitorSection?: React.FunctionComponent<any>;
+  OverayUrlSection?: React.FunctionComponent<any>;
+  SettlementsSection?: React.FunctionComponent<any>;
 }): JSX.Element {
   // 다음 단계 가능여부
   const [condition, setCondition] = useState<boolean>(false);
@@ -96,35 +93,29 @@ export function StartGuideSection({
           },
           {
             label: '연락처 등록하기',
-            component: (
-              <AddressSection
-                completeStep={completeStep}
-                BroadcasterAddressSection={BroadcasterAddressSection}
-                BroadcasterContactSection={BroadcasterContactSection}
-              />
-            ),
+            component: AddressSection && <AddressSection completeStep={completeStep} />,
           },
           {
             label: '채널링크 등록하기',
-            component: (
-              <ChannelSection
-                completeStep={completeStep}
-                BroadcasterNickNameSection={BroadcasterNickNameSection}
-                BroadcasterChannelSection={BroadcasterChannelSection}
-              />
-            ),
+            component: ChannelSection && <ChannelSection completeStep={completeStep} />,
           },
           {
             label: '라이브 쇼핑 준비하기',
-            component: <OverayUrlSection completeStep={completeStep} />,
+            component: OverayUrlSection && (
+              <OverayUrlSection completeStep={completeStep} />
+            ),
           },
           {
             label: '라이브 쇼핑 화면',
-            component: <LiveShoppingMonitorSection completeStep={completeStep} />,
+            component: LiveShoppingMonitorSection && (
+              <LiveShoppingMonitorSection completeStep={completeStep} />
+            ),
           },
           {
             label: '수익금 출금하기',
-            component: <SettlementsSection completeStep={completeStep} />,
+            component: SettlementsSection && (
+              <SettlementsSection completeStep={completeStep} />
+            ),
           },
         ];
 

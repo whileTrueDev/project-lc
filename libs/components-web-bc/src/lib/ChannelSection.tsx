@@ -1,15 +1,13 @@
 import { Center, Divider, Stack, Text, VStack } from '@chakra-ui/react';
 import { useBroadcasterChannels, useProfile } from '@project-lc/hooks';
 import { useEffect } from 'react';
+import { BroadcasterNickNameSection } from './BroadcasterNickName';
+import { BroadcasterChannelSection } from './BroadcasterChannelSection';
 
 export function ChannelSection({
   completeStep,
-  BroadcasterNickNameSection,
-  BroadcasterChannelSection,
 }: {
   completeStep: () => void;
-  BroadcasterNickNameSection?: React.FunctionComponent<any>;
-  BroadcasterChannelSection?: React.FunctionComponent<any>;
 }): JSX.Element {
   const profile = useProfile();
   const { data: channels } = useBroadcasterChannels(profile?.data?.id);
@@ -32,9 +30,9 @@ export function ChannelSection({
       </Center>
       <Center>
         <VStack spacing={7} w={['6xl', 'xl']}>
-          {BroadcasterNickNameSection && <BroadcasterNickNameSection />}
+          <BroadcasterNickNameSection />
           <Divider />
-          {BroadcasterChannelSection && <BroadcasterChannelSection />}
+          <BroadcasterChannelSection />
           {channels && channels?.length > 0 && (
             <Text colorScheme="gray" fontWeight="thin">
               아래의 다음 버튼을 클릭하여 다음단계를 진행해주세요.
