@@ -12,17 +12,20 @@ import {
   Text,
   useBoolean,
   useColorModeValue,
+  useToast,
 } from '@chakra-ui/react';
 import { UserNotification } from '@prisma/client';
 import {
   useAllNotificationReadMutation,
   useNotificationMutation,
   useNotifications,
+  useNotificationSubscription,
   useProfile,
   useRecentNotifications,
 } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import { motion } from 'framer-motion';
 import { useMemo } from 'react';
 import { FaBell } from 'react-icons/fa';
 
@@ -83,6 +86,25 @@ function NotificationItem({
 /** 알림버튼과 알림메시지 포함하는 컴포넌트 */
 export function UserNotificationSection(): JSX.Element {
   const { data: profileData } = useProfile();
+  const toast = useToast();
+  useNotificationSubscription((newNoti) => {
+    toast({
+      isClosable: true,
+      variant: 'left-accent',
+      title: newNoti.title,
+      description: newNoti.content,
+      status: 'info',
+      position: 'top-right',
+      containerStyle: {
+        position: 'absolute',
+        top: 60,
+        maxWidth: 320,
+
+        maxHeight: '200px',
+        height: '100%',
+      },
+    });
+  });
 
   // 최근 알림 6개 조회 데이터
   const { data: partialNotifications } = useRecentNotifications(profileData?.email);
@@ -148,13 +170,30 @@ export function UserNotificationSection(): JSX.Element {
   return (
     <Menu isLazy closeOnSelect={false} onClose={off}>
       {/* 종모양 버튼 */}
+
       <MenuButton
         as={IconButton}
         variant="ghost"
         position="relative"
         icon={
           <>
-            <FaBell color="gray.750" fontSize="1.2rem" />
+            <motion.div
+              animate={
+                latestUnreadCount > 0
+                  ? {
+                      rotate: [0, 5, -5, 4, -4, 2, -2, 1, 0],
+                      transition: {
+                        duration: 2,
+                        repeat: Infinity,
+                        times: [0, 0.2, 1],
+                      },
+                    }
+                  : undefined
+              }
+            >
+              <FaBell color="gray.750" fontSize="1.2rem" />
+            </motion.div>
+
             {latestUnreadCount > 0 && <CountBadge count={latestUnreadCount} />}
           </>
         }

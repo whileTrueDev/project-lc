@@ -75,6 +75,7 @@ export * from './lib/dto/shippingGroup.dto';
 export * from './lib/dto/shippingOption.dto';
 export * from './lib/dto/shippingSet.dto';
 export * from './lib/dto/signUp.dto';
+export * from './lib/event-types/notification.event-type';
 export * from './lib/front-type/approvedGoodsListItemType';
 export * from './lib/front-type/liveShoppingInputType';
 export * from './lib/front-type/orderFilterFormType';

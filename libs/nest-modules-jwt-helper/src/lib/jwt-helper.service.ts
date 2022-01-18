@@ -72,6 +72,10 @@ export class JwtHelperService {
     });
   }
 
+  simpleAccessTokenVerify(token: string): UserPayload {
+    return this.jwtService.verify(token);
+  }
+
   private castUserPayload(userPayload: UserPayload): UserPayload {
     return {
       id: userPayload.id,
