@@ -9,7 +9,7 @@ export function SignUp(): JSX.Element {
   return (
     <Box>
       <BroadcasterNavbar />
-      <SignupProcess appType="seller" />
+      <SignupProcess appType="broadcaster" />
     </Box>
   );
 }
