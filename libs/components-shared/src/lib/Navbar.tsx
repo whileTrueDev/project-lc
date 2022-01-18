@@ -1,6 +1,5 @@
 import {
   Box,
-  Container,
   Flex,
   Grid,
   Link,
@@ -45,30 +44,28 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
       minH="60px"
       width="100%"
       py={{ base: 2 }}
+      px={{ base: 4 }}
       borderBottom={1}
       borderStyle="solid"
       borderColor={useColorModeValue('gray.200', 'gray.900')}
     >
-      {/* 최대너비 제한 container */}
-      <Container maxW="container.xl">
-        {isMobileSize ? (
-          <MobileNavLayout>
-            {hambergerButton}
+      {isMobileSize ? (
+        <MobileNavLayout>
+          {hambergerButton}
+          <NavbarLinkLogo appType={appType} />
+          <NavbarRightButtonSection />
+        </MobileNavLayout>
+      ) : (
+        <DesktopNavLayout>
+          <Flex flex={{ base: 1 }} alignItems="center">
             <NavbarLinkLogo appType={appType} />
-            <NavbarRightButtonSection />
-          </MobileNavLayout>
-        ) : (
-          <DesktopNavLayout>
-            <Flex flex={{ base: 1 }} alignItems="center">
-              <NavbarLinkLogo appType={appType} />
-              <Box ml={10}>
-                <MainNavItemList />
-              </Box>
-            </Flex>
-            <NavbarRightButtonSection />
-          </DesktopNavLayout>
-        )}
-      </Container>
+            <Box ml={10}>
+              <MainNavItemList />
+            </Box>
+          </Flex>
+          <NavbarRightButtonSection />
+        </DesktopNavLayout>
+      )}
 
       {/* 토글버튼(hambergerButton)으로 여닫는 모바일화면 네비바(Drawer) */}
       <MobileSideDrawerNav isOpen={isOpen} onClose={onClose} appType={appType} />
