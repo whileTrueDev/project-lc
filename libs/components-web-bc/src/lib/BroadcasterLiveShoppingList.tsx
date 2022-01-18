@@ -155,7 +155,7 @@ export function BroadcasterLiveShoppingList({
     },
     {
       headerName: '',
-      field: '',
+      field: '상세보기',
       width: 80,
       sortable: false,
       disableColumnMenu: true,
@@ -168,6 +168,26 @@ export function BroadcasterLiveShoppingList({
           }}
         >
           상세보기
+        </Button>
+      ),
+    },
+    {
+      headerName: '',
+      field: '실시간 현황',
+      width: 80,
+      sortable: false,
+      disableColumnMenu: true,
+      renderCell: ({ row }: GridRowData) => (
+        <Button
+          size="xs"
+          colorScheme="green"
+          onClick={() => {
+            const url = `${window.location.origin}/mypage/live/${row.id}`;
+            const windowFeatures = 'scrollbars,resizable,width=1200, height=600';
+            window.open(url, '_blank', windowFeatures);
+          }}
+        >
+          실시간 현황
         </Button>
       ),
     },
