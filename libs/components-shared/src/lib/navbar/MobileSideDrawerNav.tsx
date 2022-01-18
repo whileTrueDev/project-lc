@@ -16,7 +16,7 @@ import {
 import { useIsLoggedIn, useDisplaySize } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import MypageNavbar from '../MypageNavbar';
 
 /** 모바일 화면 네비게이션(좌측 Drawer)
@@ -41,6 +41,16 @@ export const MobileSideDrawerNav = ({
     if (!isMobileSize) onClose();
   }, [isMobileSize, onClose]);
 
+  // 모바일 드로어 네비게이션에서는 메인네비게이션 링크목록 바로 아래 마이페이지 링크 목록이 표시되도록 해놨음
+  // 로그인했을때 메인네비게이션-마이페이지버튼이 메인네비게이션 중 가장 아래 있는게 나아보여서 임의로 순서를 바꿨음
+  // 이후 메인 네비게이션 링크가 추가되거나 디자인 변경시 바꿔야함 @joni
+  const mainNavList: NavItem[] = useMemo(() => {
+    if (isLoggedIn) {
+      return [...mainNavItems].reverse();
+    }
+    return mainNavItems;
+  }, [isLoggedIn]);
+
   return (
     <Drawer isOpen={isOpen} placement="left" size="xs" onClose={onClose}>
       <DrawerOverlay />
@@ -49,10 +59,11 @@ export const MobileSideDrawerNav = ({
 
         <DrawerBody>
           <Stack>
-            {mainNavItems.map((navItem) => (
+            {/* 메인 네비게이션 링크 목록 */}
+            {mainNavList.map((navItem) => (
               <MobileNavItem key={navItem.label} {...navItem} onClose={onClose} />
             ))}
-            {/* 로그인 한 경우 마이페이지 nav 메뉴를 표시함 */}
+            {/* 로그인 한 경우 메인 네비게이션 링크 목록 아래에 마이페이지 nav 메뉴를 표시함 */}
             {isLoggedIn && (
               <MypageNavbar
                 navLinks={

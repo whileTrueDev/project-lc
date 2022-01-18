@@ -21,14 +21,14 @@ export interface NavItem {
 /** 방송인센터, 판매자센터 상단 네비바 링크 */
 export const mainNavItems: Array<NavItem> = [
   {
-    label: '크크마켓',
-    href: 'https://k-kmarket.com/',
-    isExternal: true,
-  },
-  {
     label: '마이페이지',
     href: '/mypage',
     needLogin: true,
+  },
+  {
+    label: '크크마켓',
+    href: 'https://k-kmarket.com/',
+    isExternal: true,
   },
 ];
 
