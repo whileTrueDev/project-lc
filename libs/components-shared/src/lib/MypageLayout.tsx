@@ -43,60 +43,43 @@ const variants = {
 
 export function DesktopMypageSidebar({
   navLinks,
+  isOpen,
+  onToggle,
 }: {
   navLinks: Array<MypageLink>;
+  isOpen: boolean;
+  onToggle: () => void;
 }): JSX.Element {
-  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true });
   const borderColor = useColorModeValue('gray.200', 'gray.900');
   return (
-    <>
-      {/* 마이페이지 사이드바 여는 버튼 */}
-      <MotionBox
-        initial={isOpen ? 'closed' : 'open'}
-        animate={isOpen ? 'closed' : 'open'}
-        custom="100%"
-        variants={variants}
-        position="absolute"
-        left={0}
-        top={0}
-        zIndex="1"
+    <MotionBox
+      position="relative"
+      initial={isOpen ? 'open' : 'closed'}
+      animate={isOpen ? 'open' : 'closed'}
+      variants={variants}
+      custom="200px"
+      borderRight={1}
+      borderStyle="solid"
+      borderColor={borderColor}
+      color={useColorModeValue('gray.500', 'gray.400')}
+    >
+      {/* 마이페이지 사이드바 닫는 버튼 */}
+      <Flex
+        w="100%"
+        alignItems="center"
+        justifyContent="flex-end"
+        h={`${NAVBAR_HEIGHT}px`}
       >
-        <IconButton
-          onClick={onToggle}
-          icon={<ArrowRightIcon />}
-          variant="ghost"
-          aria-label="Toggle Navigation"
-        />
-      </MotionBox>
-
-      {/* 마이페이지 사이드바 */}
-      <MotionBox
-        position="relative"
-        initial={isOpen ? 'open' : 'closed'}
-        animate={isOpen ? 'open' : 'closed'}
-        variants={variants}
-        custom="200px"
-        py={4}
-        borderRight={1}
-        borderStyle="solid"
-        borderColor={borderColor}
-        color={useColorModeValue('gray.500', 'gray.400')}
-      >
-        {/* 마이페이지 사이드바 닫는 버튼 */}
         <IconButton
           onClick={onToggle}
           icon={<ArrowLeftIcon />}
           variant="ghost"
           aria-label="Toggle Navigation"
-          position="absolute"
-          left="100%"
-          top={0}
-          zIndex="1"
         />
+      </Flex>
 
-        <MypageNavbar navLinks={navLinks} />
-      </MotionBox>
-    </>
+      <MypageNavbar navLinks={navLinks} />
+    </MotionBox>
   );
 }
 
@@ -113,6 +96,7 @@ export function MypageLayout({
 }: MypageLayoutProps): JSX.Element {
   const { status } = useIsLoggedIn();
   const { isMobileSize } = useDisplaySize();
+  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: false });
 
   return (
     <Flex
@@ -121,13 +105,34 @@ export function MypageLayout({
       overflowY="hidden"
       pointerEvents={status === 'loading' ? 'none' : 'auto'}
     >
+      {/* 사이드바 영역 */}
+      {!isMobileSize && (
+        <DesktopMypageSidebar navLinks={navLinks} isOpen={isOpen} onToggle={onToggle} />
+      )}
+      {/* 사이드바 제외한 영역 */}
       <Box flex="1">
         {/* 상단 네비바 */}
-        <Navbar appType={appType} />
+        <Navbar
+          appType={appType}
+          desktopSidebarToggleButton={
+            // 사이드바 토글버튼
+            <MotionBox
+              initial={isOpen ? 'closed' : 'open'}
+              animate={isOpen ? 'closed' : 'open'}
+              custom="40px"
+              variants={variants}
+            >
+              <IconButton
+                onClick={onToggle}
+                icon={<ArrowRightIcon />}
+                variant="ghost"
+                aria-label="Toggle Navigation"
+              />
+            </MotionBox>
+          }
+        />
         {/* 중간 영역 */}
         <Flex direction="row" position="relative">
-          {/* 사이드바(모바일화면이 아닌경우 ) */}
-          {!isMobileSize && <DesktopMypageSidebar navLinks={navLinks} />}
           {/* 마이페이지 메인 컨텐츠 영역(스크롤되는 영역) */}
           <Box
             as="main"
@@ -138,10 +143,10 @@ export function MypageLayout({
             flex={1}
             overflow="auto"
           >
-            {/* 브레드크럼 네비게이션 표시(모바일화면인 경우에만) */}
-            {isMobileSize && <MypageBreadcrumb />}
+            {/* 브레드크럼 네비게이션 표시 */}
+            <MypageBreadcrumb />
             {/* 실제 메인 컨텐츠 표시 */}
-            <Box p={4}>{children}</Box>
+            {children}
           </Box>
         </Flex>
         {/* 하단 푸터 */}

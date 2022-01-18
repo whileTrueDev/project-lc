@@ -21,9 +21,13 @@ import { NavbarToggleButton } from './navbar/NavbarToggleButton';
 
 export interface NavbarProps {
   appType?: UserType;
+  desktopSidebarToggleButton?: JSX.Element;
 }
 /** 네비바 레이아웃 */
-export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
+export function Navbar({
+  appType = 'seller',
+  desktopSidebarToggleButton,
+}: NavbarProps): JSX.Element {
   const { isOpen, onClose, onToggle } = useDisclosure();
   const { isMobileSize } = useDisplaySize();
 
@@ -58,6 +62,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
       ) : (
         <DesktopNavLayout>
           <Flex flex={{ base: 1 }} alignItems="center">
+            {desktopSidebarToggleButton}
             <NavbarLinkLogo appType={appType} />
             <Box ml={10}>
               <MainNavItemList />
