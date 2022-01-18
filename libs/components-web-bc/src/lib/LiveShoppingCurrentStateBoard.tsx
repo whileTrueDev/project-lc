@@ -1,7 +1,7 @@
-import { Box, Heading, Spinner, Text, Stack } from '@chakra-ui/react';
+import { Box, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
 import { LiveShoppingPurchaseMessage } from '@prisma/client';
 import { usePurchaseMessages } from '@project-lc/hooks';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export interface LiveShoppingCurrentStateBoardProps {
   liveShoppingId: number;
@@ -33,10 +33,33 @@ export function PurchaseMessageItem({
   );
 }
 
+export function useAlarmAudio(): {
+  audio: HTMLAudioElement | null;
+  playAudio: () => void;
+} {
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    setAudio(new Audio('/audio/fever.mp3'));
+  }, []);
+
+  const playAudio = (): void => {
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.play();
+    }
+  };
+  return { audio, playAudio };
+}
+
 export function LiveShoppingCurrentStateBoard({
   liveShoppingId,
   title,
 }: LiveShoppingCurrentStateBoardProps): JSX.Element {
+  // * 관리자 새 메시지
+  const [hasAdminAlarm, setHasAdminAlarm] = useState(false);
+
+  // * 응원메시지 데이터
   const { data, status, error, isFetching } = usePurchaseMessages({
     liveShoppingId,
     // refetchInterval: 10 * 1000, // 10초에 한번
@@ -63,6 +86,7 @@ export function LiveShoppingCurrentStateBoard({
 
       {/* 관리자메시지 */}
       <LiveShoppingCurrentStateAdminMessage />
+
       {/* 라이브 상황판 */}
       <Box>
         <Text>라이브 상황판</Text>
