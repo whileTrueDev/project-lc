@@ -17,8 +17,9 @@ import {
   LiveShoppingParamsDto,
   LiveShoppingRegistDTO,
 } from '@project-lc/shared-types';
-import { LiveShopping } from '@prisma/client';
+import { LiveShopping, LiveShoppingPurchaseMessage } from '@prisma/client';
 import { LiveShoppingService } from './live-shopping.service';
+import { PurchaseMessageService } from './purchase-message.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('live-shoppings')
@@ -26,6 +27,7 @@ export class LiveShoppingController {
   constructor(
     private readonly goodsService: GoodsService,
     private readonly liveShoppingService: LiveShoppingService,
+    private readonly purchaseMessageService: PurchaseMessageService,
   ) {}
 
   @Get()
@@ -65,5 +67,13 @@ export class LiveShoppingController {
     @Query('broadcasterId', ParseIntPipe) broadcasterId: number,
   ): Promise<LiveShopping[]> {
     return this.liveShoppingService.getBroadcasterRegisteredLiveShoppings(broadcasterId);
+  }
+
+  /** 특정 라이브 쇼핑의 현황(응원메시지 데이터) */
+  @Get('/current-state')
+  getLiveShoppingCurrentMessagesAndPrice(
+    @Query('liveShoppingId', ParseIntPipe) liveShoppingId: number,
+  ): Promise<LiveShoppingPurchaseMessage[]> {
+    return this.purchaseMessageService.getAllMessagesAndPrice(liveShoppingId);
   }
 }
