@@ -7,6 +7,10 @@ import { BroadcasterStatusSection } from '@project-lc/components-web-bc/Broadcas
 import { UrlCard } from '@project-lc/components-shared/guide/OverlayUrlCard';
 import { MypageLiveShoppingSection } from '@project-lc/components-web-bc/MypageLiveShoppingSection';
 import { StartGuideCard } from '@project-lc/components-web-bc/StartGuideCard';
+import { BroadcasterAddressSection } from '@project-lc/components-web-bc/BroadcasterAddress';
+import { BroadcasterContactSection } from '@project-lc/components-web-bc//BroadcasterContact';
+import { BroadcasterNickNameSection } from '@project-lc/components-web-bc//BroadcasterNickName';
+import { BroadcasterChannelSection } from '@project-lc/components-web-bc//BroadcasterChannelSection';
 import { StartGuideSection } from '@project-lc/components-shared/StartGuideSection';
 import { useBroadcasterContacts, useProfile } from '@project-lc/hooks';
 import { useEffect, useMemo } from 'react';
@@ -84,7 +88,15 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
       </Container>
-      <StartGuideSection isOpen={isOpen} onClose={onClose} userType="broadcaster" />
+      <StartGuideSection
+        isOpen={isOpen}
+        onClose={onClose}
+        userType="broadcaster"
+        BroadcasterAddressSection={BroadcasterAddressSection}
+        BroadcasterContactSection={BroadcasterContactSection}
+        BroadcasterNickNameSection={BroadcasterNickNameSection}
+        BroadcasterChannelSection={BroadcasterChannelSection}
+      />
     </MypageLayout>
   );
 }

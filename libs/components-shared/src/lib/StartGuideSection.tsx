@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Button,
   ButtonGroup,
@@ -11,8 +12,6 @@ import {
   ModalProps,
 } from '@chakra-ui/react';
 import { Step, StepLabel } from '@material-ui/core';
-import { useState } from 'react';
-import { ShopNameSection } from '@project-lc/components-seller/ShopNameSection';
 import { AddressSection } from './guide/AddressSection';
 import { ChakraStepper } from './guide/ChakraStepper';
 import { ChannelSection } from './guide/ChannelSection';
@@ -26,8 +25,18 @@ export function StartGuideSection({
   isOpen,
   onClose,
   userType,
+  ShopNameSection,
+  BroadcasterAddressSection,
+  BroadcasterContactSection,
+  BroadcasterNickNameSection,
+  BroadcasterChannelSection,
 }: Pick<ModalProps, 'isOpen' | 'onClose'> & {
   userType: 'seller' | 'broadcaster';
+  ShopNameSection?: React.FunctionComponent<any>;
+  BroadcasterAddressSection?: React.FunctionComponent<any>;
+  BroadcasterContactSection?: React.FunctionComponent<any>;
+  BroadcasterNickNameSection?: React.FunctionComponent<any>;
+  BroadcasterChannelSection?: React.FunctionComponent<any>;
 }): JSX.Element {
   // 다음 단계 가능여부
   const [condition, setCondition] = useState<boolean>(false);
@@ -72,7 +81,7 @@ export function StartGuideSection({
           },
           {
             label: '상점명 등록하기',
-            component: <ShopNameSection completeStep={completeStep} />,
+            component: ShopNameSection && <ShopNameSection completeStep={completeStep} />,
           },
         ]
       : [
@@ -87,11 +96,23 @@ export function StartGuideSection({
           },
           {
             label: '연락처 등록하기',
-            component: <AddressSection completeStep={completeStep} />,
+            component: (
+              <AddressSection
+                completeStep={completeStep}
+                BroadcasterAddressSection={BroadcasterAddressSection}
+                BroadcasterContactSection={BroadcasterContactSection}
+              />
+            ),
           },
           {
             label: '채널링크 등록하기',
-            component: <ChannelSection completeStep={completeStep} />,
+            component: (
+              <ChannelSection
+                completeStep={completeStep}
+                BroadcasterNickNameSection={BroadcasterNickNameSection}
+                BroadcasterChannelSection={BroadcasterChannelSection}
+              />
+            ),
           },
           {
             label: '라이브 쇼핑 준비하기',

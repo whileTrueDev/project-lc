@@ -1,13 +1,15 @@
 import { Center, Divider, Stack, Text, VStack } from '@chakra-ui/react';
 import { useEffect, useMemo } from 'react';
 import { useProfile, useBroadcaster, useBroadcasterContacts } from '@project-lc/hooks';
-import { BroadcasterAddressSection } from '@project-lc/components-web-bc/BroadcasterAddress';
-import { BroadcasterContactSection } from '@project-lc/components-web-bc//BroadcasterContact';
 
 export function AddressSection({
   completeStep,
+  BroadcasterAddressSection,
+  BroadcasterContactSection,
 }: {
   completeStep: () => void;
+  BroadcasterAddressSection?: React.FunctionComponent<any>;
+  BroadcasterContactSection?: React.FunctionComponent<any>;
 }): JSX.Element {
   const profile = useProfile();
   const broadcasterContacts = useBroadcasterContacts(profile.data?.id);
@@ -42,9 +44,9 @@ export function AddressSection({
       </Center>
       <Center>
         <VStack spacing={7} w={['6xl', 'xl']}>
-          <BroadcasterContactSection />
+          {BroadcasterContactSection && <BroadcasterContactSection />}
           <Divider />
-          <BroadcasterAddressSection />
+          {BroadcasterAddressSection && <BroadcasterAddressSection />}
           {연락처존재여부 && 주소존재여부 && (
             <Text colorScheme="gray.500" fontWeight="thin">
               아래의 다음 버튼을 클릭하여 다음단계를 진행해주세요.

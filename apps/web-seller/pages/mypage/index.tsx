@@ -6,6 +6,7 @@ import { MypageStatsSection } from '@project-lc/components-seller/MypageStatsSec
 import { SellerStatusSection } from '@project-lc/components-seller/SellerStatusSection';
 import { StartGuideSection } from '@project-lc/components-shared/StartGuideSection';
 import { useSellerAgreementFlag, useProfile } from '@project-lc/hooks';
+import { ShopNameSection } from '@project-lc/components-seller/ShopNameSection';
 
 export function Index(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -31,7 +32,12 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
         {/** 시작가이드 */}
-        <StartGuideSection isOpen={isOpen} onClose={onClose} userType="seller" />
+        <StartGuideSection
+          isOpen={isOpen}
+          onClose={onClose}
+          userType="seller"
+          ShopNameSection={ShopNameSection}
+        />
       </Container>
     </MypageLayout>
   );
