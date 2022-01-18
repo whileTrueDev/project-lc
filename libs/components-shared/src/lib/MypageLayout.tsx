@@ -75,6 +75,7 @@ export function DesktopMypageSidebar({
         borderRight={1}
         borderStyle="solid"
         borderColor={borderColor}
+        color={useColorModeValue('gray.500', 'gray.400')}
       >
         <Box textAlign="right">
           {/* 마이페이지 사이드바 닫는 버튼 */}
