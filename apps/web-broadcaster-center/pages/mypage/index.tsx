@@ -84,7 +84,7 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
       </Container>
-      <StartGuideSection isOpen={isOpen} onClose={onClose} type="broadcaster" />
+      <StartGuideSection isOpen={isOpen} onClose={onClose} userType="broadcaster" />
     </MypageLayout>
   );
 }

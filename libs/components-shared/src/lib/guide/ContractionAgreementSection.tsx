@@ -292,7 +292,40 @@ export function ContractionAgreementSection({
         </Center>
       )}
 
-      {selectedTerm && (
+      {userType === 'seller' && selectedTerm && (
+        <Modal
+          isOpen={dialog.isOpen}
+          onClose={dialog.onClose}
+          size="5xl"
+          scrollBehavior="inside"
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>{selectedTerm.title}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody maxW="6xl" mx="auto">
+              <Text whiteSpace="pre-line">{selectedTerm.text}</Text>
+              {!계약동의여부 && (
+                <Center m={2}>
+                  <Checkbox
+                    size="md"
+                    colorScheme="green"
+                    isChecked={sellerAgreementCheck}
+                    onChange={() => {
+                      setSellerAgreementCheck(!sellerAgreementCheck);
+                      dialog.onClose();
+                    }}
+                  >
+                    위 약관에 동의합니다.
+                  </Checkbox>
+                </Center>
+              )}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {userType === 'broadcaster' && selectedTerm && (
         <Modal
           isOpen={dialog.isOpen}
           onClose={dialog.onClose}

@@ -31,7 +31,7 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
         {/** 시작가이드 */}
-        <StartGuideSection isOpen={isOpen} onClose={onClose} type="seller" />
+        <StartGuideSection isOpen={isOpen} onClose={onClose} userType="seller" />
       </Container>
     </MypageLayout>
   );
