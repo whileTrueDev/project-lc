@@ -58,7 +58,7 @@ export function DesktopMypageSidebar({
         variants={variants}
         position="absolute"
         left={0}
-        top={`${NAVBAR_HEIGHT}px`}
+        top={0}
         zIndex="1"
       >
         <IconButton
@@ -76,7 +76,7 @@ export function DesktopMypageSidebar({
         animate={isOpen ? 'open' : 'closed'}
         variants={variants}
         custom="200px"
-        py={16}
+        py={4}
         borderRight={1}
         borderStyle="solid"
         borderColor={borderColor}
@@ -90,7 +90,7 @@ export function DesktopMypageSidebar({
           aria-label="Toggle Navigation"
           position="absolute"
           left="100%"
-          top={`${NAVBAR_HEIGHT}px`}
+          top={0}
           zIndex="1"
         />
 
@@ -121,15 +121,13 @@ export function MypageLayout({
       overflowY="hidden"
       pointerEvents={status === 'loading' ? 'none' : 'auto'}
     >
-      {/* 사이드바(모바일화면이 아닌경우 ) */}
-      {!isMobileSize && <DesktopMypageSidebar navLinks={navLinks} />}
-
-      {/* 사이드바 제외한 영역 */}
       <Box flex="1">
         {/* 상단 네비바 */}
         <Navbar appType={appType} />
         {/* 중간 영역 */}
         <Flex direction="row" position="relative">
+          {/* 사이드바(모바일화면이 아닌경우 ) */}
+          {!isMobileSize && <DesktopMypageSidebar navLinks={navLinks} />}
           {/* 마이페이지 메인 컨텐츠 영역(스크롤되는 영역) */}
           <Box
             as="main"
