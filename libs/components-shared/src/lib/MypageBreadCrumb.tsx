@@ -15,6 +15,8 @@ export function MypageBreadcrumb(): JSX.Element {
     switch (pathname) {
       case 'mypage':
         return '마이페이지';
+      case 'mypage#':
+        return '마이페이지';
       case 'goods':
         return '상품';
       case 'regist':
