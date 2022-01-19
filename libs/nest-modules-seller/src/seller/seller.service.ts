@@ -266,21 +266,6 @@ export class SellerService {
     });
   }
 
-  public async getAgreementFlag(email: Seller['email']): Promise<boolean> {
-    const agreementFlag = await this.prisma.seller.findFirst({
-      select: {
-        agreementFlag: true,
-      },
-      where: {
-        email,
-      },
-    });
-    if (agreementFlag.agreementFlag) {
-      return true;
-    }
-    return false;
-  }
-
   public async updateAgreementFlag(dto: SellerContractionAgreementDto): Promise<Seller> {
     return this.prisma.seller.update({
       where: { email: dto.email },

@@ -270,14 +270,6 @@ export class SellerController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/agreement')
-  async getAgreement(
-    @Param('sellerEmail') sellerEmail: Seller['email'],
-  ): Promise<boolean> {
-    return this.sellerService.getAgreementFlag(sellerEmail);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Patch('agreement')
   async updateAgreement(
     @Body(ValidationPipe) dto: SellerContractionAgreementDto,

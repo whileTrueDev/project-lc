@@ -5,18 +5,19 @@ import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeS
 import { MypageStatsSection } from '@project-lc/components-seller/MypageStatsSection';
 import { SellerStatusSection } from '@project-lc/components-seller/SellerStatusSection';
 import { StartGuideSection } from '@project-lc/components-shared/StartGuideSection';
-import { useSellerAgreementFlag, useProfile } from '@project-lc/hooks';
+import { useProfile } from '@project-lc/hooks';
 import { ShopNameSection } from '@project-lc/components-seller/ShopNameSection';
 
 export function Index(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data: sellerInfo } = useProfile();
-  const { data: agreementFlag } = useSellerAgreementFlag(sellerInfo?.email);
+  const { data: sellerInfo, isLoading } = useProfile();
+  const agreementFlag = sellerInfo?.agreementFlag || '';
+
   useEffect(() => {
-    if (agreementFlag !== undefined && !agreementFlag) {
+    if (!isLoading && !agreementFlag) {
       onOpen();
     }
-  }, [onOpen, agreementFlag]);
+  }, [isLoading, onOpen, agreementFlag]);
   return (
     <MypageLayout>
       <Container maxW="7xl" p={[1, 6, 6, 6]}>
