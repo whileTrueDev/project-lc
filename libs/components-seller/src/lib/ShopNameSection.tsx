@@ -16,16 +16,14 @@ import {
   useDialogHeaderConfig,
   useDialogValueConfig,
 } from '@project-lc/components-layout/GridTableItem';
+import { guideConditionStore } from '@project-lc/stores';
 import { ShopNameDialog } from './ShopNameDialog';
 
 // shop 이름 변경 섹션
-export function ShopNameSection({
-  completeStep,
-}: {
-  completeStep?: () => void;
-}): JSX.Element {
+export function ShopNameSection(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data } = useProfile();
+  const { completeStep } = guideConditionStore();
 
   useEffect(() => {
     if (data?.shopName && completeStep) {

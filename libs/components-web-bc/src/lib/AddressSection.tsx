@@ -1,17 +1,15 @@
 import { Center, Divider, Stack, Text, VStack } from '@chakra-ui/react';
 import { useEffect, useMemo } from 'react';
 import { useProfile, useBroadcaster, useBroadcasterContacts } from '@project-lc/hooks';
+import { guideConditionStore } from '@project-lc/stores';
 import { BroadcasterAddressSection } from './BroadcasterAddress';
 import { BroadcasterContactSection } from './BroadcasterContact';
 
-export function AddressSection({
-  completeStep,
-}: {
-  completeStep: () => void;
-}): JSX.Element {
+export function AddressSection(): JSX.Element {
   const profile = useProfile();
   const broadcasterContacts = useBroadcasterContacts(profile.data?.id);
   const broadcaster = useBroadcaster({ id: profile.data?.id });
+  const { completeStep } = guideConditionStore();
 
   const 연락처존재여부 = useMemo<boolean>(
     () => !broadcasterContacts.isLoading && broadcasterContacts.data?.length !== 0,

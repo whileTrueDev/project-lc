@@ -1,11 +1,10 @@
 import { Center, Divider, Stack, Text, VStack } from '@chakra-ui/react';
 import { useEffect } from 'react';
+import { guideConditionStore } from '@project-lc/stores';
 
-export function IntroSection({
-  completeStep,
-}: {
-  completeStep: () => void;
-}): JSX.Element {
+export function IntroSection(): JSX.Element {
+  const { completeStep } = guideConditionStore();
+
   useEffect(() => {
     completeStep();
   }, [completeStep]);

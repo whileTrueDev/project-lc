@@ -28,6 +28,7 @@ import {
   useSellerUpdateContractionAgreementMutation,
 } from '@project-lc/hooks';
 import { useEffect, useMemo, useState } from 'react';
+import { guideConditionStore } from '@project-lc/stores';
 
 interface Term {
   title: string;
@@ -36,10 +37,8 @@ interface Term {
 }
 
 export function GuideContractionAgreementSection({
-  completeStep,
   userType,
 }: {
-  completeStep: () => void;
   userType: 'seller' | 'broadcaster';
 }): JSX.Element {
   const { data } = useProfile();
@@ -49,6 +48,7 @@ export function GuideContractionAgreementSection({
   const [checkedA, setCheckedA] = useState<boolean>(false);
   const [checkedB, setCheckedB] = useState<boolean>(false);
   const [sellerAgreementCheck, setSellerAgreementCheck] = useState<boolean>(false);
+  const { completeStep } = guideConditionStore();
 
   function checkedAll(value: boolean): void {
     setCheckedA(value);

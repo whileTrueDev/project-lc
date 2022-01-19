@@ -7,11 +7,23 @@ import { SellerStatusSection } from '@project-lc/components-seller/SellerStatusS
 import { StartGuideSection } from '@project-lc/components-shared/StartGuideSection';
 import { useProfile } from '@project-lc/hooks';
 import { ShopNameSection } from '@project-lc/components-seller/ShopNameSection';
+import { GuideContractionAgreementSection } from '@project-lc/components-shared/guide/GuideContractionAgreementSection';
 
 export function Index(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: sellerInfo, isLoading } = useProfile();
   const agreementFlag = sellerInfo?.agreementFlag || '';
+
+  const steps = [
+    {
+      label: '크크쇼 이용약관 동의하기',
+      component: <GuideContractionAgreementSection userType="seller" />,
+    },
+    {
+      label: '상점명 등록하기',
+      component: <ShopNameSection />,
+    },
+  ];
 
   useEffect(() => {
     if (!isLoading && !agreementFlag) {
@@ -33,12 +45,7 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
         {/** 시작가이드 */}
-        <StartGuideSection
-          isOpen={isOpen}
-          onClose={onClose}
-          userType="seller"
-          ShopNameSection={ShopNameSection}
-        />
+        <StartGuideSection isOpen={isOpen} onClose={onClose} steps={steps} />
       </Container>
     </MypageLayout>
   );

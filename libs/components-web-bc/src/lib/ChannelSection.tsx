@@ -1,16 +1,14 @@
 import { Center, Divider, Stack, Text, VStack } from '@chakra-ui/react';
 import { useBroadcasterChannels, useProfile } from '@project-lc/hooks';
 import { useEffect } from 'react';
+import { guideConditionStore } from '@project-lc/stores';
 import { BroadcasterNickNameSection } from './BroadcasterNickName';
 import { BroadcasterChannelSection } from './BroadcasterChannelSection';
 
-export function ChannelSection({
-  completeStep,
-}: {
-  completeStep: () => void;
-}): JSX.Element {
+export function ChannelSection(): JSX.Element {
   const profile = useProfile();
   const { data: channels } = useBroadcasterChannels(profile?.data?.id);
+  const { completeStep } = guideConditionStore();
 
   useEffect(() => {
     if (channels && channels?.length > 0) {

@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from 'react';
 import { Container, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
 import { broadcasterCenterMypageNavLinks } from '@project-lc/components-constants/navigation';
 import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAlertBox';
@@ -14,7 +15,7 @@ import { OverayUrlSection } from '@project-lc/components-web-bc/OverayUrlSection
 import { SettlementsSection } from '@project-lc/components-web-bc/SettlementsSection';
 import { StartGuideSection } from '@project-lc/components-shared/StartGuideSection';
 import { useBroadcasterContacts, useProfile } from '@project-lc/hooks';
-import { useEffect, useMemo } from 'react';
+import { GuideContractionAgreementSection } from '@project-lc/components-shared/guide/GuideContractionAgreementSection';
 
 export function Index(): JSX.Element {
   const { data: broadcasterProfileData } = useProfile();
@@ -42,6 +43,33 @@ export function Index(): JSX.Element {
       email: '미등록',
     };
   }, [broadcasterContacts]);
+
+  const steps = [
+    {
+      label: '크크쇼 이용약관 동의하기',
+      component: <GuideContractionAgreementSection userType="broadcaster" />,
+    },
+    {
+      label: '연락처 등록하기',
+      component: <AddressSection />,
+    },
+    {
+      label: '채널링크 등록하기',
+      component: <ChannelSection />,
+    },
+    {
+      label: '라이브 쇼핑 준비하기',
+      component: <OverayUrlSection />,
+    },
+    {
+      label: '라이브 쇼핑 화면',
+      component: <LiveShoppingMonitorSection />,
+    },
+    {
+      label: '수익금 출금하기',
+      component: <SettlementsSection />,
+    },
+  ];
 
   // 기본 연락처 부재시에 시작가이드 실행영역
   useEffect(() => {
@@ -89,16 +117,7 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
       </Container>
-      <StartGuideSection
-        isOpen={isOpen}
-        onClose={onClose}
-        userType="broadcaster"
-        AddressSection={AddressSection}
-        ChannelSection={ChannelSection}
-        LiveShoppingMonitorSection={LiveShoppingMonitorSection}
-        OverayUrlSection={OverayUrlSection}
-        SettlementsSection={SettlementsSection}
-      />
+      <StartGuideSection isOpen={isOpen} onClose={onClose} steps={steps} />
     </MypageLayout>
   );
 }
