@@ -837,8 +837,9 @@ export class FmOrdersService {
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
     WHERE fm_order_item.goods_seq IN (?)
+    AND fm_order.step != 85 AND fm_order.step != 0
     AND
-    DATE(regist_date) BETWEEN ? AND ?;
+    regist_date BETWEEN ? AND ?;
     `;
     await Promise.all(
       dto.map(async (val) => {
