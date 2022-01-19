@@ -38,36 +38,27 @@ export function MypageNavbar({ navLinks }: MypageNavbarProps): JSX.Element {
     <Stack as="nav" direction="column" height="100%" w="100%">
       <Accordion allowMultiple allowToggle defaultIndex={[matchedLinkIndex]}>
         {navLinks.map((link) => {
-          const itemStyle = {
-            p: 4,
-            m: 0,
-            w: `100%`,
-            display: 'inline-block',
-            fontSize: { base: 'lg', sm: 'md' },
-            fontWeight: isMatched(link) ? 'bold' : 500,
-            color: isMatched(link) ? 'white' : 'inherit',
-            bg: isMatched(link) ? 'blue.500' : 'none',
-            borderRightRadius: 'lg',
-          };
-
           return (
             <AccordionItem key={link.name} border="none">
-              <AccordionButton p={0}>
+              <AccordionButton
+                p={4}
+                borderRightRadius="lg"
+                bg={isMatched(link) ? 'blue.500' : 'none'}
+                color={isMatched(link) ? 'white' : 'inherit'}
+                fontSize={{ base: 'lg', sm: 'md' }}
+                fontWeight={isMatched(link) ? 'bold' : 500}
+                justifyContent="space-between"
+                _hover={{ bg: 'blue.600', color: 'white' }}
+              >
                 {link.children ? (
                   <>
-                    <Box flex={1} textAlign="left" pr={isMatched(link) ? 8 : 0}>
-                      <Text {...itemStyle}>{link.name}</Text>
-                    </Box>
+                    <Text>{link.name}</Text>
                     <AccordionIcon />
                   </>
                 ) : (
-                  <Box flex={1} textAlign="left" pr={isMatched(link) ? 8 : 0}>
-                    <NextLink href={link.href} passHref>
-                      <Link _hover={{ textDecoration: 'none' }} {...itemStyle}>
-                        {link.name}
-                      </Link>
-                    </NextLink>
-                  </Box>
+                  <NextLink href={link.href} passHref>
+                    <Link _hover={{ textDecoration: 'none' }}>{link.name}</Link>
+                  </NextLink>
                 )}
               </AccordionButton>
               {link.children && (

@@ -21,14 +21,14 @@ const variants = {
     width,
     display: 'block',
     transition: {
-      default: { type: 'spring', bounce: 0, duration: 0.2 },
+      default: { type: 'twin', duration: 0.5 },
     },
   }),
   closed: {
     opacity: 0,
     width: 0,
     transition: {
-      default: { type: 'spring', bounce: 0, duration: 0.2 },
+      default: { type: 'twin', duration: 0.5 },
     },
     transitionEnd: { display: 'none' },
   },
