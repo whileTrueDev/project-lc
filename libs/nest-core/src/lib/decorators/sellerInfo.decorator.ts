@@ -1,11 +1,8 @@
 import {
   createParamDecorator,
   ExecutionContext,
-  Inject,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtHelperService } from '@project-lc/nest-modules-jwt-helper';
-import { Socket } from 'socket.io';
 import { UserPayload } from '../interfaces/auth.interface';
 
 /**
@@ -17,7 +14,7 @@ import { UserPayload } from '../interfaces/auth.interface';
  * someControllerMethod(@Marketer() marketerSession: MarketerSession) {}
  * someControllerMethod(@Marketer() { marketerId }: MarketerSession) {}
  */
-export const SellerInfo = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+export const SellerInfo = createParamDecorator((_: unknown, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest<Express.Request>();
   if (request.user && ['seller'].includes(request.user.type))
     return request.user as UserPayload;

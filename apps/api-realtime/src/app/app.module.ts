@@ -9,7 +9,6 @@ import { NotificationRealtimeModule } from '@project-lc/nest-modules-notificatio
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -22,6 +21,5 @@ import { AppService } from './app.service';
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
   ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

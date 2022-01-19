@@ -14,7 +14,7 @@ import { UserPayload } from '../interfaces/auth.interface';
  * someControllerMethod(@Marketer() marketerSession: MarketerSession) {}
  * someControllerMethod(@Marketer() { marketerId }: MarketerSession) {}
  */
-export const UserInfo = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+export const UserInfo = createParamDecorator((_: unknown, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest<Express.Request>();
   if (request.user && ['broadcaster', 'admin', 'broadcaster'].includes(request.user.type))
     return request.user as UserPayload;
