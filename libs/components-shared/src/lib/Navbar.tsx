@@ -61,7 +61,7 @@ export function Navbar({
         </MobileNavLayout>
       ) : (
         <DesktopNavLayout>
-          <Flex flex={{ base: 1 }} alignItems="center">
+          <Flex gap={2} flex={{ base: 1 }} alignItems="center">
             {desktopSidebarToggleButton}
             <NavbarLinkLogo appType={appType} />
             <Box ml={10}>
