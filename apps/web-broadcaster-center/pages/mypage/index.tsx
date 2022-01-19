@@ -13,7 +13,7 @@ import { ChannelSection } from '@project-lc/components-web-bc/ChannelSection';
 import { LiveShoppingMonitorSection } from '@project-lc/components-web-bc/LiveShoppingMonitorSection';
 import { OverayUrlSection } from '@project-lc/components-web-bc/OverayUrlSection';
 import { SettlementsSection } from '@project-lc/components-web-bc/SettlementsSection';
-import { StartGuideSection } from '@project-lc/components-shared/StartGuideSection';
+import { StartGuide } from '@project-lc/components-shared/StartGuide';
 import { useBroadcasterContacts, useProfile } from '@project-lc/hooks';
 import { GuideContractionAgreementSection } from '@project-lc/components-shared/guide/GuideContractionAgreementSection';
 
@@ -46,19 +46,19 @@ export function Index(): JSX.Element {
 
   const steps = [
     {
-      label: '크크쇼 이용약관 동의하기',
+      label: '이용약관 동의',
       component: <GuideContractionAgreementSection userType="broadcaster" />,
     },
     {
-      label: '연락처 등록하기',
+      label: '연락처 등록',
       component: <AddressSection />,
     },
     {
-      label: '채널링크 등록하기',
+      label: '채널링크 등록',
       component: <ChannelSection />,
     },
     {
-      label: '라이브 쇼핑 준비하기',
+      label: '라이브 쇼핑 준비',
       component: <OverayUrlSection />,
     },
     {
@@ -66,7 +66,7 @@ export function Index(): JSX.Element {
       component: <LiveShoppingMonitorSection />,
     },
     {
-      label: '수익금 출금하기',
+      label: '수익금 출금',
       component: <SettlementsSection />,
     },
   ];
@@ -117,7 +117,8 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
       </Container>
-      <StartGuideSection isOpen={isOpen} onClose={onClose} steps={steps} />
+
+      <StartGuide isOpen={isOpen} onClose={onClose} steps={steps} />
     </MypageLayout>
   );
 }

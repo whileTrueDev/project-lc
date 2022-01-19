@@ -10,6 +10,7 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalProps,
+  Text,
 } from '@chakra-ui/react';
 import { Step, StepLabel } from '@material-ui/core';
 import { guideConditionStore } from '@project-lc/stores';
@@ -22,7 +23,7 @@ interface StartGuideStep {
 }
 type StartGuideSteps = StartGuideStep[];
 
-export function StartGuideSection({
+export function StartGuide({
   isOpen,
   onClose,
   steps,
@@ -65,7 +66,8 @@ export function StartGuideSection({
         handleIntroReset();
         handleStepReset();
       }}
-      size="6xl"
+      size="2xl"
+      scrollBehavior="inside"
     >
       <ModalOverlay />
       <ModalContent>
@@ -77,10 +79,16 @@ export function StartGuideSection({
             <IntroSection />
           ) : (
             <>
-              <ChakraStepper activeStep={activeStep} alternativeLabel>
+              <ChakraStepper
+                activeStep={activeStep}
+                alternativeLabel
+                style={{ paddingLeft: 0, paddingRight: 0 }}
+              >
                 {steps.map((step) => (
                   <Step key={step.label}>
-                    <StepLabel>{step.label}</StepLabel>
+                    <StepLabel>
+                      <Text fontSize="sm">{step.label}</Text>
+                    </StepLabel>
                   </Step>
                 ))}
               </ChakraStepper>

@@ -4,7 +4,7 @@ import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeSection';
 import { MypageStatsSection } from '@project-lc/components-seller/MypageStatsSection';
 import { SellerStatusSection } from '@project-lc/components-seller/SellerStatusSection';
-import { StartGuideSection } from '@project-lc/components-shared/StartGuideSection';
+import { StartGuide } from '@project-lc/components-shared/StartGuide';
 import { useProfile } from '@project-lc/hooks';
 import { ShopNameSection } from '@project-lc/components-seller/ShopNameSection';
 import { GuideContractionAgreementSection } from '@project-lc/components-shared/guide/GuideContractionAgreementSection';
@@ -16,11 +16,11 @@ export function Index(): JSX.Element {
 
   const steps = [
     {
-      label: '크크쇼 이용약관 동의하기',
+      label: '이용약관 동의',
       component: <GuideContractionAgreementSection userType="seller" />,
     },
     {
-      label: '상점명 등록하기',
+      label: '상점명 등록',
       component: <ShopNameSection />,
     },
   ];
@@ -45,7 +45,7 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
         {/** 시작가이드 */}
-        <StartGuideSection isOpen={isOpen} onClose={onClose} steps={steps} />
+        <StartGuide isOpen={isOpen} onClose={onClose} steps={steps} />
       </Container>
     </MypageLayout>
   );
