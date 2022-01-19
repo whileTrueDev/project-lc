@@ -57,12 +57,19 @@ export function UserNotificationList(): JSX.Element {
   return (
     <Stack maxW={600}>
       <Box>
-        <Flex p={2} alignItems="center" justify="space-between">
+        <Flex
+          p={2}
+          alignItems={['flex-start', 'center']}
+          justify="space-between"
+          flexDir={['column', 'row']}
+          w="100%"
+        >
           <Box>
             <Heading>최근 알림</Heading>
             <Text fontSize="sm">최근 30일 까지의 알림을 확인할 수 있습니다.</Text>
           </Box>
           <Button
+            mt={[2, 0]}
             size="sm"
             leftIcon={<CheckIcon />}
             onClick={readAll}
@@ -127,7 +134,7 @@ function UserNotificationListItem({
       p={2}
       flexDir="column"
     >
-      <Flex justify="space-between" gap={2}>
+      <Flex flexDir={['column-reverse', 'row']} justify="space-between" gap={2}>
         <Box>
           {!notification.readFlag && <UnreadNotification />}
           <Text fontWeight="semibold">{notification.title}</Text>
