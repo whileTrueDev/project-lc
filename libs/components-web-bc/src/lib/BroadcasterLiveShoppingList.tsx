@@ -8,6 +8,7 @@ import {
   useBroadcasterFmOrdersDuringLiveShoppingSales,
   useBroadcasterLiveShoppingList,
   useProfile,
+  useDisplaySize,
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { useState } from 'react';
@@ -20,6 +21,7 @@ export function BroadcasterLiveShoppingList({
   const { data: profileData } = useProfile();
   const [liveShoppingId, setLiveShoppingId] = useState(0);
   const [pageSize, setPageSize] = useState<number>(5);
+  const { isMobileSize } = useDisplaySize();
 
   const { data: tableData } = useBroadcasterLiveShoppingList({
     broadcasterId: profileData?.id,
@@ -172,9 +174,39 @@ export function BroadcasterLiveShoppingList({
       ),
     },
   ];
+
+  const mobileColumns: GridColumns = [
+    {
+      field: 'liveShoppingName',
+      headerName: '라이브 쇼핑명',
+      minWidth: 200,
+      flex: 1,
+      valueFormatter: ({ row }) =>
+        row.liveShoppingName || '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록됩니다.',
+    },
+    {
+      headerName: '',
+      field: '',
+      width: 80,
+      sortable: false,
+      disableColumnMenu: true,
+      renderCell: ({ row }: GridRowData) => (
+        <Button
+          size="xs"
+          colorScheme="blue"
+          onClick={() => {
+            handleDetailOpenClick(row.id);
+          }}
+        >
+          상세보기
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <Box minHeight={useSmallSize ? 0 : { base: 300, md: 600 }} mb={useSmallSize ? 1 : 24}>
-      {liveShoppingWithSales && (
+      {liveShoppingWithSales && !isMobileSize && (
         <>
           <Flex m={4}>
             <ChakraDataGrid
@@ -196,6 +228,25 @@ export function BroadcasterLiveShoppingList({
             />
           </Flex>
         </>
+      )}
+      {liveShoppingWithSales && isMobileSize && (
+        <ChakraDataGrid
+          disableExtendRowFullWidth
+          autoHeight
+          pagination
+          autoPageSize
+          showFirstButton
+          showLastButton
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[5, 10, 15]}
+          disableSelectionOnClick
+          disableColumnMenu
+          disableColumnSelector
+          loading={isSalesLoading}
+          columns={mobileColumns}
+          rows={liveShoppingWithSales}
+        />
       )}
       {liveShoppingWithSales && liveShoppingWithSales.length !== 0 && (
         <LiveShoppingDetailDialog

@@ -23,6 +23,7 @@ import {
   useFmOrdersDuringLiveShoppingSales,
   useLiveShoppingList,
   useProfile,
+  useDisplaySize,
 } from '@project-lc/hooks';
 import { BroadcasterDTOWithoutUserId } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -52,6 +53,7 @@ export function LiveShoppingList(): JSX.Element {
   const { data: sales, isLoading: isSalesLoading } = useFmOrdersDuringLiveShoppingSales({
     enabled: !!profileData?.email,
   });
+  const { isMobileSize } = useDisplaySize();
 
   const liveShoppingWithSales: LiveShoppingWithSalesFrontType[] = [];
 
@@ -256,28 +258,74 @@ export function LiveShoppingList(): JSX.Element {
     },
   ];
 
+  const mobileColumns: GridColumns = [
+    {
+      field: 'liveShoppingName',
+      headerName: '라이브 쇼핑명',
+      minWidth: 200,
+      flex: 1,
+      valueFormatter: ({ row }) =>
+        row.liveShoppingName || '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록됩니다.',
+    },
+    {
+      headerName: '',
+      field: '',
+      width: 80,
+      renderCell: ({ row }: GridRowData) => (
+        <Stack direction="column">
+          <Button
+            size="xs"
+            colorScheme="blue"
+            onClick={() => {
+              handleDetailOnOpen(row.id);
+            }}
+          >
+            상세보기
+          </Button>
+        </Stack>
+      ),
+    },
+  ];
+
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
-      {data && liveShoppingWithSales && (
-        <>
-          <ChakraDataGrid
-            disableExtendRowFullWidth
-            autoHeight
-            pagination
-            autoPageSize
-            showFirstButton
-            showLastButton
-            pageSize={pageSize}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            rowsPerPageOptions={[5, 10, 15]}
-            disableSelectionOnClick
-            disableColumnMenu
-            disableColumnSelector
-            loading={isSalesLoading}
-            columns={columns}
-            rows={liveShoppingWithSales}
-          />
-        </>
+      {data && liveShoppingWithSales && !isMobileSize && (
+        <ChakraDataGrid
+          disableExtendRowFullWidth
+          autoHeight
+          pagination
+          autoPageSize
+          showFirstButton
+          showLastButton
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[5, 10, 15]}
+          disableSelectionOnClick
+          disableColumnMenu
+          disableColumnSelector
+          loading={isSalesLoading}
+          columns={columns}
+          rows={liveShoppingWithSales}
+        />
+      )}
+      {data && liveShoppingWithSales && isMobileSize && (
+        <ChakraDataGrid
+          disableExtendRowFullWidth
+          autoHeight
+          pagination
+          autoPageSize
+          showFirstButton
+          showLastButton
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[5, 10, 15]}
+          disableSelectionOnClick
+          disableColumnMenu
+          disableColumnSelector
+          loading={isSalesLoading}
+          columns={mobileColumns}
+          rows={liveShoppingWithSales}
+        />
       )}
       {liveShoppingWithSales && liveShoppingWithSales.length !== 0 && (
         <>

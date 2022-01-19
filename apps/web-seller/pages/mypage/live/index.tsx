@@ -2,13 +2,16 @@ import { Button, Container, Heading, Stack } from '@chakra-ui/react';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { LiveShoppingList } from '@project-lc/components-seller/LiveShoppingList';
 import { useRouter } from 'next/router';
+import { useDisplaySize } from '@project-lc/hooks';
 
 export function Live(): JSX.Element {
   const router = useRouter();
+  const { isMobileSize } = useDisplaySize();
+
   return (
     <MypageLayout>
       <Container maxWidth="container.xxl" my={12}>
-        <Heading>라이브 쇼핑 목록</Heading>
+        {!isMobileSize && <Heading>라이브 쇼핑 목록</Heading>}
         <Stack direction="row" p={2} justifyContent="flex-end">
           <Button colorScheme="blue" onClick={() => router.push('/mypage/live/regist')}>
             라이브 쇼핑 진행 요청
