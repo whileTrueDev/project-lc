@@ -35,7 +35,7 @@ interface Term {
   text: string;
 }
 
-export function ContractionAgreementSection({
+export function GuideContractionAgreementSection({
   completeStep,
   userType,
 }: {

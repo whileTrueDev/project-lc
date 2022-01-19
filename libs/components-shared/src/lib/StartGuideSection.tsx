@@ -14,7 +14,7 @@ import {
 import { Step, StepLabel } from '@material-ui/core';
 import { ChakraStepper } from './guide/ChakraStepper';
 import { IntroSection } from './guide/IntroSection';
-import { ContractionAgreementSection } from './guide/ContractionAgreementSection';
+import { GuideContractionAgreementSection } from './guide/GuideContractionAgreementSection';
 
 export function StartGuideSection({
   isOpen,
@@ -70,7 +70,7 @@ export function StartGuideSection({
           {
             label: '크크쇼 이용약관 동의하기',
             component: (
-              <ContractionAgreementSection
+              <GuideContractionAgreementSection
                 completeStep={completeStep}
                 userType={userType}
               />
@@ -85,7 +85,7 @@ export function StartGuideSection({
           {
             label: '크크쇼 이용약관 동의하기',
             component: (
-              <ContractionAgreementSection
+              <GuideContractionAgreementSection
                 completeStep={completeStep}
                 userType={userType}
               />
