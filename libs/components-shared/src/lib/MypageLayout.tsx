@@ -114,26 +114,20 @@ export function MypageLayout({
             </MotionBox>
           }
         />
-        {/* 중간 영역 */}
-        <Flex direction="row" position="relative">
-          {/* 마이페이지 메인 컨텐츠 영역(스크롤되는 영역) */}
-          <Box
-            as="main"
-            h={{
-              base: `calc(100vh - ${NAVBAR_HEIGHT}px)`, // 모바일 사이즈일때 푸터는 표시되지 않으므로 푸터높이는 제외하지 않는다
-              md: `calc(100vh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`,
-            }}
-            flex={1}
-            overflow="auto"
-          >
+        {/* 중간 영역 - 메인패널 */}
+        <Box as="main" h={`calc(100vh - ${NAVBAR_HEIGHT}px)`} overflow="auto">
+          {/* 마이페이지 메인 컨텐츠 영역 = 스크롤되는 영역
+          (전체높이 - 네비바높이 - 푸터높이)를 최소높이로 하여 푸터가 항상 하단에 위치하도록 함 */}
+          <Box minH={`calc(100vh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`}>
             {/* 브레드크럼 네비게이션 표시 */}
             <MypageBreadcrumb />
             {/* 실제 메인 컨텐츠 표시 */}
             {children}
           </Box>
-        </Flex>
-        {/* 하단 푸터 */}
-        <MypageFooter />
+
+          {/* 하단 푸터 */}
+          <MypageFooter />
+        </Box>
 
         {/* 전체화면 로딩 */}
         {status === 'loading' && <FullscreenLoading />}

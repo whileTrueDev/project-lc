@@ -41,7 +41,8 @@ export function MypageNavbar({ navLinks }: MypageNavbarProps): JSX.Element {
           return (
             <AccordionItem key={link.name} border="none">
               <AccordionButton
-                p={4}
+                p={0}
+                textAlign="left"
                 borderRightRadius="lg"
                 bg={isMatched(link) ? 'blue.500' : 'none'}
                 color={isMatched(link) ? 'white' : 'inherit'}
@@ -52,12 +53,16 @@ export function MypageNavbar({ navLinks }: MypageNavbarProps): JSX.Element {
               >
                 {link.children ? (
                   <>
-                    <Text>{link.name}</Text>
+                    <Text w="100%" p={4}>
+                      {link.name}
+                    </Text>
                     <AccordionIcon />
                   </>
                 ) : (
                   <NextLink href={link.href} passHref>
-                    <Link _hover={{ textDecoration: 'none' }}>{link.name}</Link>
+                    <Link _hover={{ textDecoration: 'none' }} w="100%" p={4}>
+                      {link.name}
+                    </Link>
                   </NextLink>
                 )}
               </AccordionButton>
