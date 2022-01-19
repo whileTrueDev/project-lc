@@ -63,7 +63,9 @@ export function MypageNavbar({ navLinks }: MypageNavbarProps): JSX.Element {
                 ) : (
                   <Box flex={1} textAlign="left" pr={isMatched(link) ? 8 : 0}>
                     <NextLink href={link.href} passHref>
-                      <Link {...itemStyle}>{link.name}</Link>
+                      <Link _hover={{ textDecoration: 'none' }} {...itemStyle}>
+                        {link.name}
+                      </Link>
                     </NextLink>
                   </Box>
                 )}
