@@ -20,7 +20,8 @@ socket.on('creator list from server', (data) => {
 });
 
 $(document).ready(function ready() {
-  $('.mid-area button').attr('disabled', true);
+  // TODO: 풀리퀘 올리기 전 주석 풀기
+  // $('.mid-area button').attr('disabled', true);
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
   const localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
   $('table#liveshopping-table').DataTable({

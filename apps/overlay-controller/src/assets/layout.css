@@ -192,3 +192,17 @@ label {
   position: absolute;
   top: 20px;
 }
+
+
+.admin-to-bc-live-state-board__send-button {
+  background-color: lightblue;
+}
+.admin-to-bc-live-state-board__delete-button {
+  background-color: rosybrown;
+}
+.admin-to-bc-live-state-board__alert-button {
+  background-color: sandybrown;
+}
+.admin-to-bc-live-state-board__displaying-message{
+  font-weight: bold;
+}
