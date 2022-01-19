@@ -30,7 +30,7 @@ export function StartGuideSection({
   steps: StartGuideSteps;
 }): JSX.Element {
   // 다음 단계 가능여부
-  const { condition, completeStep, setCondition } = guideConditionStore();
+  const { condition, setCondition } = guideConditionStore();
 
   const [introduction, setIntroduction] = useState<boolean>(true);
   const handleIntroSkip = (): void => {
