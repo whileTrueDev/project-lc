@@ -1,12 +1,4 @@
-import { ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons';
-import {
-  Box,
-  Container,
-  Flex,
-  IconButton,
-  useColorModeValue,
-  useDisclosure,
-} from '@chakra-ui/react';
+import { Box, Flex, useColorModeValue, useDisclosure } from '@chakra-ui/react';
 import { MypageLink, mypageNavLinks } from '@project-lc/components-constants/navigation';
 import LoginRequireAlertDialog from '@project-lc/components-core/LoginRequireAlertDialog';
 import MotionBox from '@project-lc/components-core/MotionBox';
@@ -19,6 +11,7 @@ import { FloatingHelpButton } from './FloatingHelpButton';
 import MypageBreadcrumb from './MypageBreadCrumb';
 import { MypageNavbar } from './MypageNavbar';
 import { Navbar } from './Navbar';
+import { NavbarToggleButton } from './navbar/NavbarToggleButton';
 
 const NAVBAR_HEIGHT = 67;
 const FOOTER_HEIGHT = 60;
@@ -70,12 +63,7 @@ export function DesktopMypageSidebar({
         justifyContent="flex-end"
         h={`${NAVBAR_HEIGHT}px`}
       >
-        <IconButton
-          onClick={onToggle}
-          icon={<ArrowLeftIcon />}
-          variant="ghost"
-          aria-label="Toggle Navigation"
-        />
+        <NavbarToggleButton onToggle={onToggle} isOpen={isOpen} />
       </Flex>
 
       <MypageNavbar navLinks={navLinks} />
@@ -96,7 +84,7 @@ export function MypageLayout({
 }: MypageLayoutProps): JSX.Element {
   const { status } = useIsLoggedIn();
   const { isMobileSize } = useDisplaySize();
-  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: false });
+  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true });
 
   return (
     <Flex
@@ -122,12 +110,7 @@ export function MypageLayout({
               custom="40px"
               variants={variants}
             >
-              <IconButton
-                onClick={onToggle}
-                icon={<ArrowRightIcon />}
-                variant="ghost"
-                aria-label="Toggle Navigation"
-              />
+              <NavbarToggleButton onToggle={onToggle} isOpen={isOpen} />
             </MotionBox>
           }
         />
