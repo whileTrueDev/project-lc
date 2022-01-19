@@ -1,16 +1,16 @@
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
+import { CheckIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
   Divider,
+  Flex,
   IconButton,
   Menu,
   MenuButton,
-  MenuItem,
   MenuList,
   Stack,
   Text,
-  useBoolean,
+  Tooltip,
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react';
@@ -25,12 +25,12 @@ import {
 } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { motion } from 'framer-motion';
+import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import { FaBell } from 'react-icons/fa';
 
 /** 안읽음표시 */
-function UnreadNotification(): JSX.Element {
+export function UnreadNotification(): JSX.Element {
   return <Box width="4px" height="4px" borderRadius="full" bgColor="red" />;
 }
 
@@ -54,7 +54,7 @@ function CountBadge({ count }: { count: number }): JSX.Element {
 }
 
 /** 개인알림 제목, 내용, 읽음여부 표시하는 컴포넌트 */
-function NotificationItem({
+export function NotificationItem({
   item,
   onClick,
 }: {
@@ -62,20 +62,21 @@ function NotificationItem({
   onClick?: () => void;
 }): JSX.Element {
   const { title, content, readFlag, createDate } = item;
-  const hoverColor = useColorModeValue('gray.50', 'gray.700');
+  const hoverColor = useColorModeValue('gray.50', 'gray.600');
 
   return (
     <Box
       cursor={readFlag ? 'default' : 'pointer'}
-      _hover={readFlag ? undefined : { backgroundColor: hoverColor }}
+      _hover={{ backgroundColor: hoverColor }}
       onClick={onClick}
+      p={2}
       px={4}
     >
       <Stack direction="row" alignItems="center">
         <Text fontWeight="semibold">{title}</Text>
         {!readFlag && <UnreadNotification />}
       </Stack>
-      <Text>{content}</Text>
+      <Text fontWeight="normal">{content}</Text>
       <Text fontSize="xs" color="gray.500">
         {dayjs(createDate).format('YYYY/MM/DD HH:mm')}
       </Text>
@@ -84,7 +85,8 @@ function NotificationItem({
 }
 
 /** 알림버튼과 알림메시지 포함하는 컴포넌트 */
-export function UserNotificationSection(): JSX.Element {
+export function UserNotificationMenuButton(): JSX.Element {
+  const router = useRouter();
   const { data: profileData } = useProfile();
   const toast = useToast();
   useNotificationSubscription((newNoti) => {
@@ -118,13 +120,8 @@ export function UserNotificationSection(): JSX.Element {
     return latestNotifications.filter((noti) => !noti.readFlag).length;
   }, [latestNotifications]);
 
-  // 전체 알림 조회 openFlag
-  const [wholeListOpen, { toggle, off }] = useBoolean();
   // 전체 알림 조회 데이터
-  const { data: allNotifications } = useNotifications(
-    wholeListOpen && !!profileData,
-    profileData?.email,
-  );
+  const { data: allNotifications } = useNotifications(profileData?.email);
 
   // 최근 30일 내 전체 알림목록
   const allNotificationList = useMemo(() => {
@@ -168,88 +165,43 @@ export function UserNotificationSection(): JSX.Element {
   };
 
   return (
-    <Menu isLazy closeOnSelect={false} onClose={off}>
+    <Menu isLazy closeOnSelect={false}>
       {/* 종모양 버튼 */}
 
-      <MenuButton
-        as={IconButton}
-        variant="ghost"
-        position="relative"
-        icon={
-          <>
-            <motion.div
-              animate={
-                latestUnreadCount > 0
-                  ? {
-                      rotate: [0, 5, -5, 4, -4, 2, -2, 1, 0],
-                      transition: {
-                        duration: 2,
-                        repeat: Infinity,
-                        times: [0, 0.2, 1],
-                      },
-                    }
-                  : undefined
-              }
-            >
+      <Tooltip label="알림" fontSize="xs">
+        <MenuButton
+          as={IconButton}
+          variant="ghost"
+          position="relative"
+          icon={
+            <>
               <FaBell color="gray.750" fontSize="1.2rem" />
-            </motion.div>
+              {latestUnreadCount > 0 && <CountBadge count={latestUnreadCount} />}
+            </>
+          }
+        />
+      </Tooltip>
 
-            {latestUnreadCount > 0 && <CountBadge count={latestUnreadCount} />}
-          </>
-        }
-      />
-
-      <MenuList w={{ base: 280, sm: 400 }} maxH={600} overflow="auto">
+      <MenuList w={{ base: 280, sm: 400 }} overflow="auto" cursor="default">
         <Stack spacing={1}>
           {/* 알림메시지 존재하는 경우 */}
           {latestNotifications.length > 0 ? (
-            <Stack>
-              <Stack p={2} px={4} fontSize="sm" direction="row" alignItems="center">
-                <Text>최근 알림메시지</Text>
-                <Text fontSize="xs" color="gray.500">
-                  (클릭시 읽음처리 됩니다)
-                </Text>
-              </Stack>
-
-              {latestNotifications.map((noti) => (
-                <NotificationItem
-                  key={noti.id}
-                  item={noti}
-                  onClick={() => markAsRead(noti)}
-                />
-              ))}
-
-              <Divider />
-              {/* 전체 알림목록 보기 토글 버튼 */}
-              <Box>
-                <MenuItem
-                  fontSize="sm"
-                  onClick={toggle}
-                  icon={
-                    wholeListOpen ? (
-                      <ChevronUpIcon fontSize="lg" />
-                    ) : (
-                      <ChevronDownIcon fontSize="lg" />
-                    )
-                  }
-                >
-                  <Text as="span">전체 알림 {wholeListOpen ? '닫기' : '보기'}</Text>
+            <Box>
+              <Stack
+                pb={2}
+                px={4}
+                direction="row"
+                justify="space-between"
+                alignItems="center"
+                borderBottomWidth="thin"
+              >
+                <Box>
+                  <Text fontWeight="medium">알림메시지</Text>
                   <Text fontSize="xs" color="gray.500">
-                    (최근 30일 이내 알림만 볼 수 있습니다)
+                    (클릭시 읽음처리 됩니다)
                   </Text>
-                </MenuItem>
-              </Box>
-            </Stack>
-          ) : (
-            <Text textAlign="center" p={2}>
-              새로운 알림이 없습니다.
-            </Text>
-          )}
+                </Box>
 
-          {/* 전체 알림메시지 목록 */}
-          {wholeListOpen && (
-            <Stack>
-              <Box textAlign="right" px="4">
                 <Button
                   size="xs"
                   leftIcon={<CheckIcon />}
@@ -258,16 +210,42 @@ export function UserNotificationSection(): JSX.Element {
                 >
                   모두 읽음
                 </Button>
-              </Box>
+              </Stack>
 
-              {allNotificationList.map((noti) => (
-                <NotificationItem
-                  key={noti.id}
-                  item={noti}
-                  onClick={() => markAsRead(noti)}
-                />
-              ))}
-            </Stack>
+              <Stack overflow="auto" maxH={400} minH={200}>
+                {latestNotifications.map((noti) => (
+                  <NotificationItem
+                    key={noti.id}
+                    item={noti}
+                    onClick={() => markAsRead(noti)}
+                  />
+                ))}
+              </Stack>
+
+              <Divider />
+
+              {/* 전체 알림목록 보기 토글 버튼 */}
+              <Box textAlign="center" p={2}>
+                <Button
+                  size="sm"
+                  variant="link"
+                  fontWeight="medium"
+                  onClick={() => router.push('/mypage/notifications')}
+                >
+                  전체 알림 보기
+                </Button>
+              </Box>
+            </Box>
+          ) : (
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              minH={100}
+              textAlign="center"
+              p={2}
+            >
+              <Text>아직 알림이 없습니다.</Text>
+            </Flex>
           )}
         </Stack>
       </MenuList>
@@ -275,4 +253,4 @@ export function UserNotificationSection(): JSX.Element {
   );
 }
 
-export default UserNotificationSection;
+export default UserNotificationMenuButton;

@@ -27,7 +27,7 @@ import { useCallback } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
 import { KksLogo } from './KksLogo';
 import ProfileBox from './ProfileBox';
-import UserNotificationSection from './UserNotificationSection';
+import UserNotificationMenuButton from './UserNotificationMenuButton';
 
 export interface NavbarProps {
   appType?: UserType;
@@ -88,7 +88,7 @@ export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
           {isLoggedIn ? (
             <>
               <Box mr={{ base: '1', sm: '3' }}>
-                <UserNotificationSection />
+                <UserNotificationMenuButton />
               </Box>
 
               <Menu>

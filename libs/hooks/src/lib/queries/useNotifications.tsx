@@ -20,7 +20,6 @@ export const getNotifications = async (
         userEmail,
         userType: userType || process.env.NEXT_PUBLIC_APP_TYPE,
         take: listType === 'part' ? TAKE : undefined,
-        skip: listType === 'all' ? TAKE : undefined,
       },
     })
     .then((res) => res.data);
@@ -40,13 +39,12 @@ export const useRecentNotifications = (
 
 /** 최근 30일 내 전체 알림목록 조회 */
 export const useNotifications = (
-  enabled: boolean,
   userEmail?: string,
   userType?: UserType,
 ): UseQueryResult<Notifications, AxiosError> => {
   return useQuery<Notifications, AxiosError>(
     ['Notifications', 'all', userEmail],
     () => getNotifications('all', userEmail, userType),
-    { enabled },
+    { enabled: !!userEmail },
   );
 };
