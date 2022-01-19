@@ -8,13 +8,12 @@ import {
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/modal';
-import { Box, Heading, useToast, VStack } from '@chakra-ui/react';
+import { Heading, useToast, VStack } from '@chakra-ui/react';
 import { TaxationType } from '@prisma/client';
 import { useBroadcasterSettlementInfoMutation, useProfile } from '@project-lc/hooks';
 import { BroadcasterSettlementInfoDto, UserProfileRes } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { FormProvider, useForm } from 'react-hook-form';
-import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import BroadcasterSettlementInfoAccount, {
   BroadcasterAccountData,
 } from './BroadcasterSettlementInfoAccount';
@@ -24,22 +23,6 @@ import BroadcasterSettlementInfoContractor, {
 import BroadcasterSettlementInfoTerms, {
   BroadcasterAgreements,
 } from './BroadcasterSettlementInfoTerms';
-
-/** 이용약관 등 문구 표시하는 컴포넌트 */
-export function TermBox({ text }: { text: string }): JSX.Element {
-  return (
-    <Box
-      maxHeight={100}
-      {...boxStyle}
-      mb={1}
-      overflowY="auto"
-      fontSize="sm"
-      whiteSpace="pre-line"
-    >
-      {text}
-    </Box>
-  );
-}
 
 /** 각 영역별 제목 표시 */
 export function SectionHeading({ children }: { children: React.ReactNode }): JSX.Element {

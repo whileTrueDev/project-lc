@@ -51,7 +51,7 @@ export function UserNotificationList(): JSX.Element {
   };
 
   if (isLoading || !allNotifications) {
-    return <Box>알림이 없습니다.</Box>;
+    return <Box>아직 알림이 없습니다.</Box>;
   }
 
   return (

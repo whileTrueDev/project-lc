@@ -113,7 +113,7 @@ export class FmOrdersController {
           if (val.sellStartDate && val.sellEndDate) {
             return {
               id: val.id,
-              firstmallGoodsConnectionId: `${val.goods.confirmation.firstmallGoodsConnectionId}`,
+              fmGoodsSeq: val.fmGoodsSeq,
               sellStartDate: dayjs(val.sellStartDate).toString(),
               sellEndDate: dayjs(val.sellEndDate).toString(),
             };
@@ -137,7 +137,7 @@ export class FmOrdersController {
           if (val.sellStartDate && val.sellEndDate) {
             return {
               id: val.id,
-              firstmallGoodsConnectionId: `${val.goods.confirmation.firstmallGoodsConnectionId}`,
+              fmGoodsSeq: val.fmGoodsSeq,
               sellStartDate: dayjs(val.sellStartDate).toString(),
               sellEndDate: dayjs(val.sellEndDate).toString(),
             };

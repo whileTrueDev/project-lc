@@ -185,68 +185,70 @@ export function UserNotificationMenuButton(): JSX.Element {
       <MenuList w={{ base: 280, sm: 400 }} overflow="auto" cursor="default">
         <Stack spacing={1}>
           {/* 알림메시지 존재하는 경우 */}
-          {latestNotifications.length > 0 ? (
-            <Box>
-              <Stack
-                pb={2}
-                px={4}
-                direction="row"
-                justify="space-between"
-                alignItems="center"
-                borderBottomWidth="thin"
-              >
-                <Box>
-                  <Text fontWeight="medium">알림메시지</Text>
-                  <Text fontSize="xs" color="gray.500">
-                    (클릭시 읽음처리 됩니다)
-                  </Text>
-                </Box>
-
-                <Button
-                  size="xs"
-                  leftIcon={<CheckIcon />}
-                  disabled={!allUnreadCount}
-                  onClick={readAll}
-                >
-                  모두 읽음
-                </Button>
-              </Stack>
-
-              <Stack overflow="auto" maxH={400} minH={200}>
-                {latestNotifications.map((noti) => (
-                  <NotificationItem
-                    key={noti.id}
-                    item={noti}
-                    onClick={() => markAsRead(noti)}
-                  />
-                ))}
-              </Stack>
-
-              <Divider />
-
-              {/* 전체 알림목록 보기 토글 버튼 */}
-              <Box textAlign="center" p={2}>
-                <Button
-                  size="sm"
-                  variant="link"
-                  fontWeight="medium"
-                  onClick={() => router.push('/mypage/notifications')}
-                >
-                  전체 알림 보기
-                </Button>
-              </Box>
-            </Box>
-          ) : (
-            <Flex
-              justifyContent="center"
+          <Box>
+            <Stack
+              pb={2}
+              px={4}
+              direction="row"
+              justify="space-between"
               alignItems="center"
-              minH={100}
-              textAlign="center"
-              p={2}
+              borderBottomWidth="thin"
             >
-              <Text>아직 알림이 없습니다.</Text>
-            </Flex>
-          )}
+              <Box>
+                <Text fontWeight="medium">알림메시지</Text>
+                <Text fontSize="xs" color="gray.500">
+                  (클릭시 읽음처리 됩니다)
+                </Text>
+              </Box>
+
+              <Button
+                size="xs"
+                leftIcon={<CheckIcon />}
+                disabled={!allUnreadCount}
+                onClick={readAll}
+              >
+                모두 읽음
+              </Button>
+            </Stack>
+
+            {latestNotifications.length > 0 ? (
+              <>
+                <Stack overflow="auto" maxH={400} minH={200}>
+                  {latestNotifications.map((noti) => (
+                    <NotificationItem
+                      key={noti.id}
+                      item={noti}
+                      onClick={() => markAsRead(noti)}
+                    />
+                  ))}
+                </Stack>
+
+                <Divider />
+
+                {/* 전체 알림목록 보기 토글 버튼 */}
+                <Box textAlign="center" p={2}>
+                  <Button
+                    size="sm"
+                    variant="link"
+                    fontWeight="medium"
+                    onClick={() => router.push('/mypage/notifications')}
+                  >
+                    전체 알림 보기
+                  </Button>
+                </Box>
+              </>
+            ) : (
+              <Flex
+                justifyContent="center"
+                alignItems="center"
+                minH={100}
+                textAlign="center"
+                p={2}
+              >
+                <Text>아직 알림이 없습니다.</Text>
+              </Flex>
+            )}
+          </Box>
         </Stack>
       </MenuList>
     </Menu>

@@ -83,6 +83,7 @@ export function LiveShoppingDetail(): JSX.Element {
   const methods = useForm({
     defaultValues: {
       progress: '',
+      liveShoppingName: '',
       broadcasterId: '',
       broadcastStartDate: '',
       broadcastEndDate: '',
@@ -111,6 +112,7 @@ export function LiveShoppingDetail(): JSX.Element {
   const onSuccess = (): void => {
     reset({
       progress: '',
+      liveShoppingName: '',
       broadcasterId: '',
       broadcastStartDate: '',
       broadcastEndDate: '',
@@ -158,19 +160,26 @@ export function LiveShoppingDetail(): JSX.Element {
         {/* 상품 제목 */}
         {liveShopping && !liveShoppingIsLoading && (
           <LiveShoppingDetailTitle
-            goodsName={
-              liveShopping[0].broadcaster
-                ? `${liveShopping[0].goods.goods_name} + ${liveShopping[0].broadcaster.userNickname}`
-                : `${liveShopping[0].goods.goods_name}`
-            }
+            liveShoppingName={liveShopping[0].liveShoppingName}
             createDate={liveShopping[0].createDate}
           />
         )}
         <Grid templateColumns="repeat(2, 1fr)" justifyItems="start" gap={4}>
           <Stack spacing={5}>
-            <Text as="span">
-              판매자 : {liveShopping[0].seller.sellerShop?.shopName || ''}
-            </Text>
+            <Stack direction="row">
+              <Text as="span">상품명 :</Text>
+              <Text color="blue">
+                {liveShopping[0].broadcaster
+                  ? `${liveShopping[0].goods.goods_name} + ${liveShopping[0].broadcaster.userNickname}`
+                  : `${liveShopping[0].goods.goods_name}`}
+              </Text>
+            </Stack>
+            <Stack direction="row">
+              <Text as="span">판매자 :</Text>
+              <Text color="blue">
+                {liveShopping[0].seller.sellerShop?.shopName || ''}
+              </Text>
+            </Stack>
 
             <Stack direction="row" alignItems="center">
               <Text as="span">현재 진행상태</Text>
@@ -223,14 +232,14 @@ export function LiveShoppingDetail(): JSX.Element {
             <Stack direction="row" alignItems="center">
               <Text as="span">방송인: </Text>
               {liveShopping[0].broadcaster ? (
-                <BroadcasterName data={liveShopping[0].broadcaster} />
+                <BroadcasterName data={liveShopping[0].broadcaster} color="blue" />
               ) : (
                 <Text fontWeight="bold">미정</Text>
               )}
             </Stack>
             <Stack direction="row" alignItems="center">
               <Text as="span">방송시작 시간: </Text>
-              <Text as="span" fontWeight="bold">
+              <Text as="span" fontWeight="bold" color="blue">
                 {liveShopping[0].broadcastStartDate
                   ? dayjs(liveShopping[0].broadcastStartDate).format('YYYY/MM/DD HH:mm')
                   : '미정'}
@@ -239,7 +248,7 @@ export function LiveShoppingDetail(): JSX.Element {
 
             <Stack direction="row" alignItems="center">
               <Text as="span">방송종료 시간: </Text>
-              <Text as="span" fontWeight="bold">
+              <Text as="span" fontWeight="bold" color="blue">
                 {liveShopping[0].broadcastEndDate
                   ? dayjs(liveShopping[0].broadcastEndDate).format('YYYY/MM/DD HH:mm')
                   : '미정'}
@@ -248,7 +257,7 @@ export function LiveShoppingDetail(): JSX.Element {
 
             <Stack direction="row" alignItems="center">
               <Text as="span">방송시간: </Text>
-              <Text as="span" fontWeight="bold">
+              <Text as="span" fontWeight="bold" color="blue">
                 {getDuration(
                   liveShopping[0].broadcastStartDate,
                   liveShopping[0].broadcastEndDate,
@@ -259,7 +268,7 @@ export function LiveShoppingDetail(): JSX.Element {
               liveShopping[0].liveShoppingVideo && (
                 <Stack direction="row" alignItems="center">
                   <Text as="span">영상 URL: </Text>
-                  <Text as="span" fontWeight="bold">
+                  <Text as="span" fontWeight="bold" color="blue">
                     <Link
                       isTruncated
                       href={liveShopping[0].liveShoppingVideo.youtubeUrl || ''}
@@ -278,7 +287,7 @@ export function LiveShoppingDetail(): JSX.Element {
 
             <Stack direction="row" alignItems="center">
               <Text as="span">판매시작 시간: </Text>
-              <Text as="span" fontWeight="bold">
+              <Text as="span" fontWeight="bold" color="blue">
                 {liveShopping[0].sellStartDate
                   ? dayjs(liveShopping[0].sellStartDate).format('YYYY/MM/DD HH:mm')
                   : '미정'}
@@ -287,7 +296,7 @@ export function LiveShoppingDetail(): JSX.Element {
 
             <Stack direction="row" alignItems="center">
               <Text as="span">판매종료 시간: </Text>
-              <Text as="span" fontWeight="bold">
+              <Text as="span" fontWeight="bold" color="blue">
                 {liveShopping[0].sellEndDate
                   ? dayjs(liveShopping[0].sellEndDate).format('YYYY/MM/DD HH:mm')
                   : '미정'}
@@ -295,7 +304,7 @@ export function LiveShoppingDetail(): JSX.Element {
             </Stack>
             <Stack direction="row" alignItems="center">
               <Text as="span">판매시간: </Text>
-              <Text as="span" fontWeight="bold">
+              <Text as="span" fontWeight="bold" color="blue">
                 {getDuration(liveShopping[0].sellStartDate, liveShopping[0].sellEndDate)}
               </Text>
             </Stack>
@@ -303,14 +312,14 @@ export function LiveShoppingDetail(): JSX.Element {
             <Divider />
             <Stack direction="row" alignItems="center">
               <Text as="span">희망 판매 수수료: </Text>
-              <Text as="span" fontWeight="bold">
+              <Text as="span" fontWeight="bold" color="blue">
                 {liveShopping[0].desiredCommission} %
               </Text>
             </Stack>
 
             <Stack direction="row" alignItems="center">
               <Text as="span">희망 진행 기간: </Text>
-              <Text as="span" fontWeight="bold">
+              <Text as="span" fontWeight="bold" color="blue">
                 {liveShopping[0].desiredPeriod}
               </Text>
             </Stack>
@@ -318,7 +327,7 @@ export function LiveShoppingDetail(): JSX.Element {
             <Divider />
             <Stack direction="row" alignItems="center">
               <Text as="span">방송인 수수료: </Text>
-              <Text as="span" fontWeight="bold">
+              <Text as="span" fontWeight="bold" color="blue">
                 {liveShopping[0].broadcasterCommissionRate
                   ? `${liveShopping[0].broadcasterCommissionRate}%`
                   : '미정'}
@@ -327,7 +336,7 @@ export function LiveShoppingDetail(): JSX.Element {
 
             <Stack direction="row" alignItems="center">
               <Text as="span">와일트루 수수료: </Text>
-              <Text as="span" fontWeight="bold">
+              <Text as="span" fontWeight="bold" color="blue">
                 {liveShopping[0].whiletrueCommissionRate
                   ? `${liveShopping[0].whiletrueCommissionRate}%`
                   : '미정'}
@@ -350,6 +359,10 @@ export function LiveShoppingDetail(): JSX.Element {
             <Stack as="form" spacing={5}>
               <LiveShoppingProgressSelector />
               <Divider />
+              <Stack>
+                <Text>라이브 쇼핑 이름</Text>
+                <Input {...register('liveShoppingName')} />
+              </Stack>
               <BroadcasterAutocomplete />
               <Divider />
 
@@ -409,7 +422,9 @@ export function LiveShoppingDetail(): JSX.Element {
                 </FormControl>
               </Stack>
 
-              <Button onClick={openConfirmModal}>변경</Button>
+              <Button onClick={openConfirmModal} colorScheme="blue">
+                변경
+              </Button>
               <Button
                 rightIcon={<EditIcon />}
                 onClick={imageDialogOnOpen}

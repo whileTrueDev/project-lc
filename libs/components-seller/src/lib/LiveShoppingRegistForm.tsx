@@ -282,6 +282,9 @@ function LiveShoppingDesiredCommission(): JSX.Element {
       <Text color="gray.500" fontSize="sm">
         판매수수료가 높을수록 방송인 매칭 조율이 원만하며, 진행이 빠를 수 있습니다.
       </Text>
+      <Text color="gray.500" fontSize="sm">
+        단순 희망 수수료이며, 확정 수수료는 아닙니다.
+      </Text>
       <Box maxW={140} mt={2}>
         <InputGroup>
           <Input

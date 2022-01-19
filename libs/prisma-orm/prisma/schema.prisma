@@ -607,6 +607,7 @@ enum TaxationType {
 model LiveShopping {
   id                          Int                           @id @default(autoincrement())
   broadcasterId               Int? //방송인의 아이디 
+  liveShoppingName            String? // 라이브 쇼핑의 이름 
   sellerId                    Int // 판매자 ID
   goodsId                     Int // 상품 ID (project-lc goods Id)
   fmGoodsSeq                  Int?                          @unique // 퍼스트몰 상품 ID 라이브쇼핑진행을 위해 생성한 퍼스트몰 상품의 고유번호 (fm_goods.goods_seq)

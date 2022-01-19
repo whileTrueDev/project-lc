@@ -55,15 +55,22 @@ export function BroadcasterLiveShoppingList({
 
   const columns: GridColumns = [
     {
-      field: 'goods.confirmation.firstmallGoodsConnectionId',
-      headerName: '상품명',
+      field: 'liveShoppingName',
+      headerName: '라이브 쇼핑명',
       minWidth: 350,
       flex: 1,
+      valueFormatter: ({ row }) =>
+        row.liveShoppingName || '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록됩니다.',
+    },
+    {
+      field: 'fmGoodsSeq',
+      headerName: '상품명',
+      minWidth: 350,
       renderCell: ({ row }) =>
-        new Date(row.sellEndDate) > new Date() ? (
+        new Date(row.sellEndDate) > new Date() && row.fmGoodsSeq ? (
           <Tooltip label="상품페이지로 이동">
             <Link
-              href={`http://whiletrue.firstmall.kr/goods/view?no=${row.goods.confirmation.firstmallGoodsConnectionId}`}
+              href={`http://whiletrue.firstmall.kr/goods/view?no=${row.fmGoodsSeq}`}
               isExternal
             >
               {row.goods.goods_name} <ExternalLinkIcon mx="2px" />
@@ -91,14 +98,12 @@ export function BroadcasterLiveShoppingList({
       field: 'seller.sellerShop.shopName',
       headerName: '판매자',
       minWidth: 200,
-      flex: 1,
       valueFormatter: (params) => params.row?.seller.sellerShop.shopName,
     },
     {
       headerName: '방송시간',
       field: '방송시간',
       minWidth: 300,
-      flex: 1,
       renderCell: ({ row }: GridRowData) =>
         `${
           row.broadcastStartDate
@@ -114,7 +119,6 @@ export function BroadcasterLiveShoppingList({
       headerName: '판매시간',
       field: '판매시간',
       minWidth: 300,
-      flex: 1,
       renderCell: ({ row }: GridRowData) =>
         `${
           row.sellStartDate ? dayjs(row.sellStartDate).format('YYYY/MM/DD HH:mm') : '미정'

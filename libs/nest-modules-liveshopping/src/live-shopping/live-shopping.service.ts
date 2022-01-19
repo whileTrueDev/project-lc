@@ -2,14 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  GoodsConfirmationDtoOnlyConnectionId,
   LiveShoppingParamsDto,
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
-  LiveShoppingWithConfirmation,
+  LiveShoppingFmGoodsSeq,
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
-
+import { LiveShopping } from '@prisma/client';
 @Injectable()
 export class LiveShoppingService {
   constructor(private readonly prisma: PrismaService) {}
@@ -18,8 +17,6 @@ export class LiveShoppingService {
     email: UserPayload['sub'],
     dto: LiveShoppingRegistDTO,
   ): Promise<{ liveShoppingId: number }> {
-    // const streamId = Math.random().toString(36).substr(2, 11);
-
     const userId = await this.prisma.seller.findFirst({
       where: { email },
       select: { id: true },
@@ -27,7 +24,6 @@ export class LiveShoppingService {
     const liveShopping = await this.prisma.liveShopping.create({
       data: {
         seller: { connect: { id: userId.id } },
-        // streamId,
         requests: dto.requests,
         desiredPeriod: dto.desiredPeriod,
         desiredCommission: dto.desiredCommission || '0.00',
@@ -54,7 +50,7 @@ export class LiveShoppingService {
   async getRegisteredLiveShoppings(
     email: UserPayload['sub'],
     dto: LiveShoppingParamsDto,
-  ): Promise<LiveShoppingWithConfirmation[]> {
+  ): Promise<LiveShopping[]> {
     // 자신의 id를 반환하는 쿼리 수행하기
     const { id, goodsIds } = dto;
     return this.prisma.liveShopping.findMany({
@@ -73,11 +69,6 @@ export class LiveShoppingService {
           select: {
             goods_name: true,
             summary: true,
-            confirmation: {
-              select: {
-                firstmallGoodsConnectionId: true,
-              },
-            },
           },
         },
         seller: {
@@ -101,39 +92,28 @@ export class LiveShoppingService {
   /**
    *
    * @author m'baku
-   * @description 해당 방송인에게 매칭된 모든 라이브 쇼핑에 연결된 상품들의 FirstmallGoodsConnectionId를 반환받는다
+   * @description 해당 방송인에게 매칭된 모든 라이브 쇼핑에 연결된 상품들의 fmGoodsSeq 반환받는다
    * @param broadcasterId
-   * @returns firstmallGoodsConnectionIds
+   * @returns fmGoodsSeq
    */
   async getFmGoodsConnectionIdLinkedToLiveShoppings(
     broadcasterId: number,
-  ): Promise<GoodsConfirmationDtoOnlyConnectionId[]> {
-    const nestedFmGoodsConnectionIds = await this.prisma.liveShopping.findMany({
+  ): Promise<LiveShoppingFmGoodsSeq[]> {
+    const fmGoodsSeqs = await this.prisma.liveShopping.findMany({
       where: {
         broadcasterId: broadcasterId ? Number(broadcasterId) : undefined,
       },
       select: {
-        goods: {
-          select: {
-            confirmation: {
-              select: {
-                firstmallGoodsConnectionId: true,
-              },
-            },
-          },
-        },
+        fmGoodsSeq: true,
       },
     });
-    const fmGoodsConnectionIds = [];
-    nestedFmGoodsConnectionIds.map((value) =>
-      fmGoodsConnectionIds.push(value.goods.confirmation),
-    );
-    return fmGoodsConnectionIds;
+
+    return fmGoodsSeqs;
   }
 
   async getBroadcasterRegisteredLiveShoppings(
     broadcasterId: number,
-  ): Promise<LiveShoppingWithConfirmation[]> {
+  ): Promise<LiveShopping[]> {
     // 자신의 id를 반환하는 쿼리 수행하기
     return this.prisma.liveShopping.findMany({
       where: {
@@ -144,11 +124,6 @@ export class LiveShoppingService {
           select: {
             goods_name: true,
             summary: true,
-            confirmation: {
-              select: {
-                firstmallGoodsConnectionId: true,
-              },
-            },
           },
         },
         seller: {

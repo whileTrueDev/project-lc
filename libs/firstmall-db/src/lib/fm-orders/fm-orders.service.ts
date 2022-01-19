@@ -23,8 +23,8 @@ import {
   fmOrderStatuses,
   FmOrderStatusNumString,
   getFmOrderStatusByNames,
-  GoodsConfirmationDtoOnlyConnectionId,
-  LiveShoppingWithSalesAndFmId,
+  LiveShoppingFmGoodsSeq,
+  LiveShoppingWithSales,
   OrderStatsRes,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -827,7 +827,7 @@ export class FmOrdersService {
   }
 
   public async getOrdersStatsDuringLiveShoppingSales(
-    dto: LiveShoppingWithSalesAndFmId[],
+    dto: LiveShoppingWithSales[],
   ): Promise<{ id: number; sales: string }[]> {
     const salesPrice = [];
 
@@ -837,15 +837,16 @@ export class FmOrdersService {
     FROM fm_order
     JOIN fm_order_item USING(order_seq)
     WHERE fm_order_item.goods_seq IN (?)
+    AND fm_order.step != 85 AND fm_order.step != 0
     AND
-    DATE(regist_date) BETWEEN ? AND ?;
+    regist_date BETWEEN ? AND ?;
     `;
     await Promise.all(
       dto.map(async (val) => {
         const sellStartDate = dayjs(val.sellStartDate).format('YYYY-MM-DD HH:mm:ss');
         const sellEndDate = dayjs(val.sellEndDate).format('YYYY-MM-DD HH:mm:ss');
         const salesSum = await this.db.query(sql, [
-          val.firstmallGoodsConnectionId,
+          val.fmGoodsSeq,
           sellStartDate,
           sellEndDate,
         ]);
@@ -910,7 +911,7 @@ export class FmOrdersService {
   }
 
   public async getPurchaseDoneOrderDuringLiveShopping(
-    goods: GoodsConfirmationDtoOnlyConnectionId[],
+    goods: LiveShoppingFmGoodsSeq[],
   ): Promise<BroacasterPurchaseWithDivdedMessageDto> {
     const sql = `
     SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.regist_date, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
@@ -927,8 +928,8 @@ export class FmOrdersService {
     ORDER BY fo.regist_date desc
 `;
     const purchaseList = await Promise.all(
-      goods.map(async (value: GoodsConfirmationDtoOnlyConnectionId) => {
-        const connectionId = value.firstmallGoodsConnectionId;
+      goods.map(async (value: LiveShoppingFmGoodsSeq) => {
+        const connectionId = value.fmGoodsSeq;
         return this.db.query(sql, [connectionId]);
       }),
     );

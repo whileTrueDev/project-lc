@@ -74,6 +74,8 @@ export class LiveShoppingDTO {
   broadcasterCommissionRate?: string;
 
   @IsOptional() @IsInt() fmGoodsSeq?: LiveShopping['fmGoodsSeq'];
+
+  @IsOptional() @IsString() liveShoppingName?: LiveShopping['liveShoppingName'];
 }
 
 export type LiveShoppingRegistDTO = Pick<
@@ -84,26 +86,12 @@ export type LiveShoppingRegistDTO = Pick<
 
 export type LiveShoppingWithSales = Pick<
   LiveShoppingDTO,
-  'id' | 'sellStartDate' | 'sellEndDate'
+  'id' | 'sellStartDate' | 'sellEndDate' | 'fmGoodsSeq'
 >;
-
-export interface LiveShoppingWithSalesAndFmId extends LiveShoppingWithSales {
-  firstmallGoodsConnectionId: string;
-}
-
 export class LiveShoppingParamsDto {
   @IsOptional() @IsString() id?: string;
   @IsOptional() @IsArray() goodsIds?: number[];
 }
-
-export interface LiveShoppingWithConfirmation extends LiveShopping {
-  goods: {
-    confirmation: {
-      firstmallGoodsConnectionId: number;
-    };
-  };
-}
-
 export type LiveShoppingBroadcastDate = Pick<
   LiveShoppingDTO,
   'broadcastStartDate' | 'broadcastEndDate'
@@ -122,3 +110,5 @@ export type LiveShoppingsWithBroadcasterAndGoodsName = Pick<
     goods_name: string;
   };
 };
+
+export type LiveShoppingFmGoodsSeq = Pick<LiveShopping, 'fmGoodsSeq'>;

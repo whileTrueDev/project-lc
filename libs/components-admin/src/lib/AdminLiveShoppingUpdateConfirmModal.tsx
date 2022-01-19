@@ -31,6 +31,9 @@ export function AdminLiveShoppingUpdateConfirmModal(
               <LiveShoppingProgressBadge progress={watch('progress')} />
             </Text>
           ) : null}
+          {watch('liveShoppingName') ? (
+            <Text>라이브쇼핑 이름 : {watch('liveShoppingName')}</Text>
+          ) : null}
           {watch('broadcasterId') ? <Text>방송인 : {selectedBroadcaster}</Text> : null}
           {watch('broadcastStartDate') ? (
             <Text>

@@ -3,8 +3,9 @@ import { useFormContext } from 'react-hook-form';
 import {
   PERSONAL_INFO_TERM,
   SETTLEMENT_INFO_SUBMIT_TERM,
-} from '@project-lc/components-constants/broadcastetSettlementTerms';
-import { SectionHeading, TermBox } from './BroadcasterSettlementInfoDialog';
+} from '@project-lc/components-constants/broadcasterSettlementTerms';
+import TermBox from '@project-lc/components-core/TermBox';
+import { SectionHeading } from './BroadcasterSettlementInfoDialog';
 
 // 서비스 이용 및 정산등록 동의폼 데이터타입
 export type BroadcasterAgreements = {
