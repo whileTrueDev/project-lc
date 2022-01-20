@@ -25,7 +25,7 @@ export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   /** 관리자 -> 특정 유저에게 알림생성 */
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   @Post('/admin')
   createNotification(
     @Body(ValidationPipe) dto: CreateNotificationDto,
