@@ -9,10 +9,7 @@ import {
   Render,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  LiveShoppingService,
-  LiveShoppingStateBoardMessageService,
-} from '@project-lc/nest-modules-liveshopping';
+import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import { OverlayControllerService } from '@project-lc/nest-modules-overlay-controller';
 import {
   liveShoppingPurchaseMessageDto,
@@ -25,7 +22,6 @@ export class AppController {
   constructor(
     private readonly overlayControllerService: OverlayControllerService,
     private readonly liveShoppingService: LiveShoppingService,
-    private readonly liveShoppingStateBoardMessageService: LiveShoppingStateBoardMessageService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -65,21 +61,25 @@ export class AppController {
     return this.overlayControllerService.deletePurchaseMessage(messageId);
   }
 
+  /** 라이브쇼핑 현황판 관리자메시지 생성 */
   @Post('/live-shopping-state-board-message')
   async createLiveShoppingStateBoardMessage(
     @Body('liveShoppingId', ParseIntPipe) liveShoppingId: number,
     @Body('text') text: string,
-  ): Promise<any> {
-    return this.liveShoppingStateBoardMessageService.createMessage({
+  ): Promise<boolean> {
+    return this.overlayControllerService.createLiveShoppingStateBoardMessage({
       liveShoppingId,
       text,
     });
   }
 
+  /** 라이브쇼핑 현황판 관리자메시지 삭제 */
   @Delete('/live-shopping-state-board-message')
   async deleteLiveShoppingStateBoardMessage(
     @Body('liveShoppingId', ParseIntPipe) liveShoppingId: number,
-  ): Promise<any> {
-    return this.liveShoppingStateBoardMessageService.deleteMessage(liveShoppingId);
+  ): Promise<boolean> {
+    return this.overlayControllerService.deleteLiveShoppingStateBoardMessage(
+      liveShoppingId,
+    );
   }
 }
