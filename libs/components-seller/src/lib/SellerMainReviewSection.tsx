@@ -12,7 +12,7 @@ import { useMemo } from 'react';
 
 export const boxVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
+  visible: { opacity: 1 },
 };
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -43,6 +43,7 @@ export function SellerMainReviewSection(): JSX.Element {
       },
     },
   };
+
   return (
     <SellerMainSectionContainer
       sectionData={{
@@ -71,9 +72,15 @@ export function SellerMainReviewSection(): JSX.Element {
               <GridItem colSpan={1} mb={4} key={item.title}>
                 <MotionBox
                   variants={itemVariants}
+                  viewport={{ once: true }}
+                  initial="hidden"
+                  whileInView="visible"
                   position="relative"
                   maxW={`${x}px`}
                   m={[0, 'auto']}
+                  borderRadius="2xl"
+                  boxShadow="lg"
+                  bg="gray.50"
                 >
                   <ChakraNextImage
                     width={x}
@@ -97,7 +104,12 @@ export function SellerMainReviewSection(): JSX.Element {
           whileInView="onscreen"
           viewport={{ once: true }}
         >
-          <Box maxW={{ base: '690px', md: '883px' }} m={[0, 'auto']}>
+          <Box
+            maxW={{ base: '690px', md: '883px' }}
+            m={[0, 'auto']}
+            borderRadius="2xl"
+            boxShadow="dark-lg"
+          >
             <ChakraNextImage
               layout="responsive"
               width={1200}
