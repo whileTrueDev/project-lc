@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { extendTheme } from '@chakra-ui/react';
 import { mode } from '@chakra-ui/theme-tools';
 
@@ -22,6 +23,28 @@ export const createChakraTheme = () =>
           color: mode('gray.800', 'whiteAlpha.900')(props),
           bg: mode('white', 'gray.800')(props),
         },
+        // 스크롤바 영역전체
+        '::-webkit-scrollbar': {
+          width: '6px', // vertical
+          height: '7px', // horizontal
+          opacity: 0.7,
+        },
+        // 스크롤바 바 없는 부분
+        '::-webkit-scrollbar-track': {
+          opacity: 0.7,
+          background: 'transparent',
+        },
+        // 스크롤바 바 부분
+        '::-webkit-scrollbar-thumb': {
+          backgroundColor: mode('gray.300', 'gray.500')(props),
+          borderRadius: '3px',
+        },
+        '::-webkit-scrollbar-thumb:horizontal': {
+          borderRadius: '6px',
+        },
+        '::-webkit-scrollbar-thumb:hover': {
+          backgroundColor: mode('gray.400', 'gray.400')(props),
+        },
       }),
     },
     fonts: {
@@ -29,8 +52,6 @@ export const createChakraTheme = () =>
       body: "'Noto Sans KR', sans-serif;",
     },
     colors: {
-      // 브랜드 컬러는 향후 정해지면 변경
-      // 아래는 더미
       blue: blueColorPalette,
       brand: blueColorPalette,
     },
