@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Patch,
+  Param,
   Post,
   Query,
   Res,
@@ -37,6 +38,7 @@ import {
   SellerShopInfoDto,
   SettlementAccountDto,
   SignUpDto,
+  SellerContractionAgreementDto,
 } from '@project-lc/shared-types';
 import __multer from 'multer';
 import {
@@ -265,5 +267,13 @@ export class SellerController {
   @Delete('/avatar')
   async deleteAvatar(@SellerInfo() seller: UserPayload): Promise<boolean> {
     return this.sellerService.removeSellerAvatar(seller.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('agreement')
+  async updateAgreement(
+    @Body(ValidationPipe) dto: SellerContractionAgreementDto,
+  ): Promise<Seller> {
+    return this.sellerService.updateAgreementFlag(dto);
   }
 }

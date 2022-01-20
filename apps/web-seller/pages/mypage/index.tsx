@@ -1,13 +1,35 @@
+import { useEffect } from 'react';
 import { Container, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeSection';
 import { MypageStatsSection } from '@project-lc/components-seller/MypageStatsSection';
 import { SellerStatusSection } from '@project-lc/components-seller/SellerStatusSection';
-import { ShopNameDialog } from '@project-lc/components-seller/ShopNameDialog';
+import { StartGuide } from '@project-lc/components-shared/StartGuide';
+import { useProfile } from '@project-lc/hooks';
+import { ShopNameSection } from '@project-lc/components-seller/ShopNameSection';
+import { GuideContractionAgreementSection } from '@project-lc/components-shared/guide/GuideContractionAgreementSection';
 
 export function Index(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { data: sellerInfo, isLoading } = useProfile();
+  const agreementFlag = sellerInfo?.agreementFlag || '';
 
+  const steps = [
+    {
+      label: '이용약관 동의',
+      component: <GuideContractionAgreementSection userType="seller" />,
+    },
+    {
+      label: '상점명 등록',
+      component: <ShopNameSection />,
+    },
+  ];
+
+  useEffect(() => {
+    if (!isLoading && !agreementFlag) {
+      onOpen();
+    }
+  }, [isLoading, onOpen, agreementFlag]);
   return (
     <MypageLayout>
       <Container maxW="7xl" p={[1, 6, 6, 6]}>
@@ -22,8 +44,8 @@ export function Index(): JSX.Element {
             <MypageNoticeSection />
           </GridItem>
         </Grid>
-        {/* 상점명 입력 다이얼로그 (useProfile 내부에서 사용) */}
-        <ShopNameDialog isOpen={isOpen} onOpen={onOpen} onClose={onClose} autoCheck />
+        {/** 시작가이드 */}
+        <StartGuide isOpen={isOpen} onClose={onClose} steps={steps} />
       </Container>
     </MypageLayout>
   );

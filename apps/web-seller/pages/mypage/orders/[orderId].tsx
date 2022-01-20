@@ -92,11 +92,7 @@ export function OrderDetail(): JSX.Element {
     <MypageLayout>
       <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2}>
         <Box as="section">
-          <Button
-            size="sm"
-            leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push('/mypage/orders')}
-          >
+          <Button size="sm" leftIcon={<ChevronLeftIcon />} onClick={() => router.back()}>
             목록으로
           </Button>
         </Box>

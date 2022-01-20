@@ -3,6 +3,7 @@ import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { PasswordSection } from '@project-lc/components-shared/PasswordSection';
 import { ProfileBox } from '@project-lc/components-shared/ProfileBox';
 import { SocialAccountUnlinkSection } from '@project-lc/components-shared/SocialAccountUnlinkSection';
+import { ContractionAgreeSection } from '@project-lc/components-shared/ContractionAgreeSection';
 import { AccountRemoveSection } from '@project-lc/components-seller/AccountRemoveSection';
 import React from 'react';
 
@@ -15,6 +16,8 @@ export function Setting(): JSX.Element {
           <ProfileBox allowAvatarChange />
           <Divider />
           <PasswordSection />
+          <Divider />
+          <ContractionAgreeSection userType="seller" />
           <Divider />
           <AccountRemoveSection />
           <Divider />

@@ -1,12 +1,11 @@
 import { Stack, Center, Link, VStack, Text } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import NextLink from 'next/link';
+import { guideConditionStore } from '@project-lc/stores';
 
-export function SettlementsSection({
-  completeStep,
-}: {
-  completeStep: () => void;
-}): JSX.Element {
+export function SettlementsSection(): JSX.Element {
+  const { completeStep } = guideConditionStore();
+
   useEffect(() => {
     completeStep();
   }, [completeStep]);

@@ -1,11 +1,4 @@
-export interface Term {
-  required?: boolean;
-  title: string;
-  state: string;
-  text: string;
-}
-
-const terms = [
+const broadcasterTerms = [
   {
     required: true,
     title: '크크쇼 이용 약관',
@@ -559,4 +552,4 @@ const terms = [
     `,
   },
 ];
-export default terms;
+export default broadcasterTerms;

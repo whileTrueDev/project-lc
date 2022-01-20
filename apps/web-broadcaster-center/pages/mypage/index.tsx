@@ -1,15 +1,21 @@
+import { useEffect, useMemo } from 'react';
 import { Container, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
 import { broadcasterCenterMypageNavLinks } from '@project-lc/components-constants/navigation';
 import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAlertBox';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeSection';
 import { BroadcasterStatusSection } from '@project-lc/components-web-bc/BroadcasterStatusSection';
-import { UrlCard } from '@project-lc/components-web-bc/guide/OverlayUrlCard';
+import { UrlCard } from '@project-lc/components-web-bc/OverlayUrlCard';
 import { MypageLiveShoppingSection } from '@project-lc/components-web-bc/MypageLiveShoppingSection';
 import { StartGuideCard } from '@project-lc/components-web-bc/StartGuideCard';
-import { StartGuideSection } from '@project-lc/components-web-bc/StartGuideSection';
+import { AddressSection } from '@project-lc/components-web-bc/AddressSection';
+import { ChannelSection } from '@project-lc/components-web-bc/ChannelSection';
+import { LiveShoppingMonitorSection } from '@project-lc/components-web-bc/LiveShoppingMonitorSection';
+import { OverayUrlSection } from '@project-lc/components-web-bc/OverayUrlSection';
+import { SettlementsSection } from '@project-lc/components-web-bc/SettlementsSection';
+import { StartGuide } from '@project-lc/components-shared/StartGuide';
 import { useBroadcasterContacts, useProfile } from '@project-lc/hooks';
-import { useEffect, useMemo } from 'react';
+import { GuideContractionAgreementSection } from '@project-lc/components-shared/guide/GuideContractionAgreementSection';
 
 export function Index(): JSX.Element {
   const { data: broadcasterProfileData } = useProfile();
@@ -37,6 +43,33 @@ export function Index(): JSX.Element {
       email: '미등록',
     };
   }, [broadcasterContacts]);
+
+  const steps = [
+    {
+      label: '이용약관 동의',
+      component: <GuideContractionAgreementSection userType="broadcaster" />,
+    },
+    {
+      label: '연락처 등록',
+      component: <AddressSection />,
+    },
+    {
+      label: '채널링크 등록',
+      component: <ChannelSection />,
+    },
+    {
+      label: '라이브 쇼핑 준비',
+      component: <OverayUrlSection />,
+    },
+    {
+      label: '라이브 쇼핑 화면',
+      component: <LiveShoppingMonitorSection />,
+    },
+    {
+      label: '수익금 출금',
+      component: <SettlementsSection />,
+    },
+  ];
 
   // 기본 연락처 부재시에 시작가이드 실행영역
   useEffect(() => {
@@ -84,7 +117,8 @@ export function Index(): JSX.Element {
           </GridItem>
         </Grid>
       </Container>
-      <StartGuideSection isOpen={isOpen} onClose={onClose} />
+
+      <StartGuide isOpen={isOpen} onClose={onClose} steps={steps} />
     </MypageLayout>
   );
 }
