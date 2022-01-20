@@ -1,4 +1,4 @@
-import { Box, Heading, Stack, Text } from '@chakra-ui/react';
+import { Box, Grid, GridItem, Heading, Stack, Text } from '@chakra-ui/react';
 import { LiveShoppingPurchaseMessage } from '@prisma/client';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import {
@@ -9,28 +9,7 @@ import {
 } from '@project-lc/hooks';
 import { AnimationDefinition } from 'framer-motion/types/render/utils/animation';
 import { useCallback, useMemo } from 'react';
-import LiveShoppingCurrentStateMessageFromAdmin from './LiveShoppingCurrentStateMessageFromAdmin';
-
-export function PurchaseMessageItem({
-  item,
-  index,
-}: {
-  item: LiveShoppingPurchaseMessage;
-  index: number;
-}): JSX.Element {
-  const { nickname, text, price, giftFlag } = item;
-  return (
-    <Stack direction="row">
-      <Text>{index}</Text>
-      <Text>{nickname}</Text>
-      <Text>
-        {giftFlag && '(선물)'}
-        {text}
-      </Text>
-      <Text>{price.toLocaleString()}원</Text>
-    </Stack>
-  );
-}
+import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 
 function getRefetchInterval(enable: boolean, time: number): undefined | number {
   return enable ? time : undefined;
@@ -128,32 +107,111 @@ export function LiveShoppingCurrentStateBoard({
       variants={variants}
       onAnimationComplete={onAminationCompleteHandler}
     >
-      {/* 라이브쇼핑명 - 제목 */}
-      <Heading>{title}</Heading>
+      <Stack h="100vh" p={4}>
+        {/* 라이브쇼핑명 - 제목 */}
+        <Heading textAlign="center">{title}</Heading>
 
-      {/* 관리자메시지 */}
-      <LiveShoppingCurrentStateMessageFromAdmin message={adminMessageData?.text} />
+        {/* 관리자메시지 */}
+        <SectionWithTitle variant="outlined" title="관리자 메시지">
+          {adminMessageData?.text || '없음'}
+        </SectionWithTitle>
 
-      {/* 라이브 상황판 */}
-      <Box border="1px" p={4}>
-        <Text>라이브 상황판</Text>
-        <Text>결제금액 : {totalPrice.toLocaleString()} 원</Text>
-        <Text>주문건수 : {totalPurchaseCount} 건</Text>
-        <Text>선물건수 : {totalGiftCount} 건</Text>
-      </Box>
+        {/* 라이브 상황판 */}
+        <SectionWithTitle variant="outlined" title="라이브 상황판">
+          <Stack direction="row" justifyContent="space-around">
+            <StateItem name="결제금액" value={`${totalPrice.toLocaleString()} 원`} />
+            <StateItem name="주문건수" value={`${totalPurchaseCount} 건`} />
+            <StateItem name="선물건수" value={`${totalGiftCount} 건`} />
+          </Stack>
+        </SectionWithTitle>
 
-      {/* 응원메시지 목록 */}
-      <Box border="1px" p={4}>
-        <Text>응원메시지</Text>
-        <Box maxH={200} overflowY="auto">
-          {data &&
-            data.map((d, index) => (
-              <PurchaseMessageItem item={d} index={data.length - index} key={d.id} />
-            ))}
-        </Box>
-      </Box>
+        {/* 응원메시지 목록 */}
+        <SectionWithTitle variant="outlined" title="응원메시지">
+          <Box maxH={200} overflowY="auto">
+            <MessageItemLayout
+              bg="blue.500"
+              color="white"
+              item={{
+                index: '순서',
+                nickname: '닉네임',
+                message: '응원메시지',
+                price: '주문금액',
+              }}
+            />
+
+            {data &&
+              data.map((d, index) => (
+                <PurchaseMessageItem item={d} index={data.length - index} key={d.id} />
+              ))}
+          </Box>
+        </SectionWithTitle>
+      </Stack>
     </MotionBox>
   );
 }
-
 export default LiveShoppingCurrentStateBoard;
+
+export function MessageItemLayout({
+  item,
+  bg,
+  color,
+}: {
+  item: {
+    index: string;
+    nickname: string;
+    message: string;
+    price: string;
+  };
+  bg?: string;
+  color?: string;
+}): JSX.Element {
+  const { index, nickname, message, price } = item;
+  return (
+    <Grid templateColumns="repeat(6, 1fr)" w="100%" gap={1} mb={1}>
+      <GridItem colSpan={1} h="2rem" bg={bg} color={color} px={2} textAlign="center">
+        {index}
+      </GridItem>
+      <GridItem colSpan={1} h="2rem" bg={bg} color={color} px={2}>
+        {nickname}
+      </GridItem>
+      <GridItem colSpan={3} h="2rem" bg={bg} color={color} px={2}>
+        {message}
+      </GridItem>
+      <GridItem colSpan={1} h="2rem" bg={bg} color={color} px={2}>
+        {price}
+      </GridItem>
+    </Grid>
+  );
+}
+
+export function PurchaseMessageItem({
+  item,
+  index,
+}: {
+  item: LiveShoppingPurchaseMessage;
+  index: number;
+}): JSX.Element {
+  const { nickname, text, price, giftFlag } = item;
+  return (
+    <MessageItemLayout
+      item={{
+        index: index.toString(),
+        nickname,
+        message: `${giftFlag ? '(선물)' : ''} ${text}`,
+        price: `${price.toLocaleString()}원`,
+      }}
+      bg={index % 2 === 0 ? 'teal.50' : 'gray.50'}
+    />
+  );
+}
+
+export function StateItem({ name, value }: { name: string; value: string }): JSX.Element {
+  return (
+    <Stack alignItems="center">
+      <Text>{name}</Text>
+      <Text fontSize="xl" fontWeight="bold">
+        {value}
+      </Text>
+    </Stack>
+  );
+}
