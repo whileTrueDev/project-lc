@@ -1,15 +1,14 @@
 import { Box } from '@chakra-ui/react';
 
 export interface LiveShoppingCurrentStateMessageFromAdminProps {
-  propname?: any;
+  message?: string;
 }
 export function LiveShoppingCurrentStateMessageFromAdmin({
-  propname,
+  message,
 }: LiveShoppingCurrentStateMessageFromAdminProps): JSX.Element {
   return (
-    // TODO 관리자 메시지를 표시해야함
     <Box border="1px" p={4}>
-      관리자 메시지 :
+      관리자 메시지 : {message}
     </Box>
   );
 }

@@ -1,6 +1,9 @@
 import { Box, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
 import { LiveShoppingPurchaseMessage } from '@prisma/client';
-import { usePurchaseMessages } from '@project-lc/hooks';
+import {
+  useLiveShoppingStateBoardAdminMessage,
+  usePurchaseMessages,
+} from '@project-lc/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import LiveShoppingCurrentStateMessageFromAdmin from './LiveShoppingCurrentStateMessageFromAdmin';
 
@@ -55,7 +58,7 @@ export function LiveShoppingCurrentStateBoard({
   title,
   isOnAir,
 }: LiveShoppingCurrentStateBoardProps): JSX.Element {
-  // * 관리자 새 메시지
+  // * 관리자 알림
   const [hasAdminAlarm, setHasAdminAlarm] = useState(false);
 
   // * 응원메시지 데이터
@@ -73,6 +76,12 @@ export function LiveShoppingCurrentStateBoard({
     };
   }, [data]);
 
+  // * 관리자메시지 데이터
+  const { data: adminMessageData } = useLiveShoppingStateBoardAdminMessage({
+    liveShoppingId,
+    refetchInterval: isOnAir ? 5 * 1000 : undefined, // 방송중인 경우에만 5초에 한번 조회
+  });
+
   if (status === 'loading') return <Box>Loading...</Box>;
   if (status === 'error' && error) return <Box>Error: {error.message}</Box>;
 
@@ -84,7 +93,7 @@ export function LiveShoppingCurrentStateBoard({
       </Heading>
 
       {/* 관리자메시지 */}
-      <LiveShoppingCurrentStateMessageFromAdmin />
+      <LiveShoppingCurrentStateMessageFromAdmin message={adminMessageData?.text} />
 
       {/* 라이브 상황판 */}
       <Box border="1px" p={4}>
