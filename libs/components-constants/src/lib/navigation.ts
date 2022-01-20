@@ -97,6 +97,11 @@ export const mypageNavLinks: MypageLink[] = [
         href: '/mypage/live',
         checkIsActive: (pathname, linkHref) => pathname === linkHref,
       },
+      // {
+      //   name: 'VOD 관리',
+      //   href: '/mypage/live/vod',
+      //   checkIsActive: (pathname, linkHref) => pathname === linkHref,
+      // },
     ],
   },
   {

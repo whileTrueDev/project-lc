@@ -82,9 +82,10 @@ function FoldedSidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element {
               py={4}
               px={4}
               _hover={{ bg: hoverColor, color: 'whiteAlpha.900' }}
-              bg={!link.children && isMatched ? 'blue.500' : 'none'}
-              color={!link.children && isMatched ? 'white' : 'inherit'}
-              fontWeight={!link.children && isMatched ? 'bold' : 'medium'}
+              _focus={{ bg: hoverColor, color: 'whiteAlpha.900' }}
+              bg={isMatched ? 'blue.500' : 'none'}
+              color={isMatched ? 'white' : 'inherit'}
+              fontWeight={isMatched ? 'bold' : 'medium'}
               onClick={() => {
                 if (!link.children) router.push(link.href);
               }}
@@ -102,12 +103,13 @@ function FoldedSidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element {
         <Portal>
           <PopoverContent border={0} boxShadow="xl" rounded="lg" maxW="200px">
             {link.children.map((child) => (
-              <SidebarChildItem
-                key={child.name}
-                link={child}
-                hoverColor={hoverColor}
-                leftSpacing={false}
-              />
+              <Box key={child.name} m={1} my={0.5}>
+                <SidebarChildItem
+                  link={child}
+                  hoverColor={hoverColor}
+                  leftSpacing={false}
+                />
+              </Box>
             ))}
           </PopoverContent>
         </Portal>
@@ -126,11 +128,12 @@ export function SidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element 
         py={3}
         textAlign="left"
         borderRadius="md"
-        bg={!link.children && isMatched ? 'blue.500' : 'none'}
-        color={!link.children && isMatched ? 'white' : 'inherit'}
-        fontWeight={!link.children && isMatched ? 'bold' : 'medium'}
+        bg={isMatched ? 'blue.500' : 'none'}
+        color={isMatched ? 'white' : 'inherit'}
+        fontWeight={isMatched ? 'bold' : 'medium'}
         fontSize={{ base: 'lg', sm: 'sm' }}
         _hover={{ bg: hoverColor, color: 'whiteAlpha.900' }}
+        _focus={{ bg: hoverColor, color: 'whiteAlpha.900' }}
         justifyContent="space-between"
         alignItems="center"
         onClick={() => {
@@ -174,6 +177,7 @@ function SidebarChildItem({
         role="group"
         rounded="md"
         _hover={{ bg: hoverColor, color: 'whiteAlpha.900' }}
+        _focus={{ bg: hoverColor, color: 'whiteAlpha.900' }}
         bg={isMatched ? 'blue.500' : 'none'}
         color={isMatched ? 'white' : 'inherit'}
         fontWeight={isMatched ? 'bold' : 'medium'}
