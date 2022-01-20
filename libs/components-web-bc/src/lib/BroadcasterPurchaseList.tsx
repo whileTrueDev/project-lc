@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem } from '@chakra-ui/react';
+import { Box, Container } from '@chakra-ui/react';
 import { GridColumns, GridSortModel } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import {
@@ -22,7 +22,6 @@ const columns: GridColumns = [
     field: 'goods_name',
     headerName: '상품명',
     width: 400,
-    flex: 1,
   },
   {
     field: 'userNickname',
@@ -32,13 +31,13 @@ const columns: GridColumns = [
   {
     field: 'userMessage',
     headerName: '메세지',
-    width: 220,
+    minWidth: 400,
     flex: 1,
   },
   {
     field: 'settleprice',
     headerName: '금액',
-    width: 170,
+    width: 120,
     valueFormatter: ({ row }) => {
       return `${Number(row.settleprice).toLocaleString()}원`;
     },
@@ -61,8 +60,8 @@ const mobileColumn: GridColumns = [
   },
   {
     field: 'settleprice',
-    headerName: '금액',
-    width: 170,
+    headerName: ' ',
+    width: 80,
     valueFormatter: ({ row }) => {
       return `${Number(row.settleprice).toLocaleString()}원`;
     },
@@ -84,48 +83,26 @@ export function BroadcasterPurchaseList(): JSX.Element {
     useFmOrdersDuringLiveShoppingSalesPurchaseDone(profileData?.id);
 
   return (
-    <Box minHeight={{ base: 300, md: 600 }} pt={3}>
-      {purchaseData && !isLoading && !isMobileSize && (
-        <Grid templateColumns="repeat(7, 1fr)">
-          <GridItem colSpan={1} />
-          <GridItem w="100%" colSpan={5}>
-            <ChakraDataGrid
-              autoHeight
-              disableExtendRowFullWidth
-              pagination
-              showFirstButton
-              showLastButton
-              pageSize={pageSize}
-              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-              rowsPerPageOptions={[15, 20, 30]}
-              disableSelectionOnClick
-              disableColumnMenu
-              loading={isLoading}
-              columns={isMobileSize ? mobileColumn : columns}
-              rows={purchaseData}
-              sortModel={sortModel}
-            />
-          </GridItem>
-          <GridItem colSpan={1} />
-        </Grid>
-      )}
-      {purchaseData && !isLoading && isMobileSize && (
-        <ChakraDataGrid
-          autoHeight
-          disableExtendRowFullWidth
-          pagination
-          showFirstButton
-          showLastButton
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[15, 20, 30]}
-          disableSelectionOnClick
-          disableColumnMenu
-          loading={isLoading}
-          columns={mobileColumn}
-          rows={purchaseData}
-          sortModel={sortModel}
-        />
+    <Box>
+      {purchaseData && !isLoading && (
+        <Container maxW="1600px" p={{ base: 0, md: 8 }}>
+          <ChakraDataGrid
+            autoHeight
+            disableExtendRowFullWidth
+            pagination
+            showFirstButton
+            showLastButton
+            pageSize={pageSize}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            rowsPerPageOptions={[15, 20, 30]}
+            disableSelectionOnClick
+            disableColumnMenu
+            loading={isLoading}
+            columns={isMobileSize ? mobileColumn : columns}
+            rows={purchaseData}
+            sortModel={sortModel}
+          />
+        </Container>
       )}
     </Box>
   );
