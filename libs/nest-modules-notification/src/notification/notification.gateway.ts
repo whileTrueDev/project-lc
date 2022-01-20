@@ -8,7 +8,6 @@ import {
 } from '@nestjs/websockets';
 import { corsOptions, UserInfo, UserPayload } from '@project-lc/nest-core';
 import { WsGuard } from '@project-lc/nest-modules-authguard';
-import { JwtHelperService } from '@project-lc/nest-modules-jwt-helper';
 import {
   CreateNotificationDto,
   NotificationClientToServerEvents,
