@@ -62,14 +62,16 @@ export class MailVerificationService {
       orderBy: { createDate: 'desc' },
       where: {
         email,
-        verificationCode: code,
         createDate: {
           gt: targetTime,
         },
       },
     });
 
-    return row;
+    if (row.verificationCode === code) {
+      return row;
+    }
+    return null;
   }
 
   /**

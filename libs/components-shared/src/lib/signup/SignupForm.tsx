@@ -52,13 +52,15 @@ export function SignupForm({
 
   // * 인증코드 페이즈
   const [phase, setPhase] = useState(1);
+  // 이메일 코드 최초전송 여부
+  const [isNotInitial, setIsNotInitial] = useState(false);
 
   // * 인증 코드 이메일 전송
   const mailVerification = useMailVerificationMutation();
   const startMailVerification = useCallback(
     async (email: string) => {
       return mailVerification
-        .mutateAsync({ email })
+        .mutateAsync({ email, isNotInitial })
         .then(() =>
           toast({
             title: `인증 코드가 ${email}(으)로 전송되었습니다`,
@@ -75,7 +77,7 @@ export function SignupForm({
           throw new Error('이메일 확인 전송 실패');
         });
     },
-    [mailVerification, toast],
+    [mailVerification, toast, isNotInitial],
   );
 
   // * 인증코드 메일 보내기 mutation 요청
@@ -91,7 +93,10 @@ export function SignupForm({
           message: '이미 가입된 이메일 주소입니다.',
         });
       } else {
-        startMailVerification(email).then(() => setPhase(2));
+        startMailVerification(email).then(() => {
+          setIsNotInitial(true);
+          setPhase(2);
+        });
       }
     }
   }, [getValues, setError, startMailVerification, trigger]);
