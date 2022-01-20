@@ -17,7 +17,7 @@ import { useIsLoggedIn, useDisplaySize } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
-import MypageNavbar from '../MypageNavbar';
+import MypageSidebar from './MypageSidebar';
 
 /** 모바일 화면 네비게이션(좌측 Drawer)
  * @param isOpen drawer 열림 상태를 전달한다 useDisclosure.isOpen
@@ -65,7 +65,7 @@ export const MobileSideDrawerNav = ({
             ))}
             {/* 로그인 한 경우 메인 네비게이션 링크 목록 아래에 마이페이지 nav 메뉴를 표시함 */}
             {isLoggedIn && (
-              <MypageNavbar
+              <MypageSidebar
                 navLinks={
                   appType === 'seller' ? mypageNavLinks : broadcasterCenterMypageNavLinks
                 }
