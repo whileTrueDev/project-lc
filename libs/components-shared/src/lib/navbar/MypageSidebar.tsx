@@ -99,7 +99,7 @@ function FoldedSidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element {
 
       {link.children && link.children.length > 0 && (
         <Portal>
-          <PopoverContent border={0} boxShadow="xl" p={1} rounded="lg" maxW="200px">
+          <PopoverContent border={0} boxShadow="xl" rounded="lg" maxW="200px">
             {link.children.map((child) => (
               <SidebarChildItem
                 key={child.name}
@@ -154,7 +154,8 @@ export function SidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element 
   );
 }
 
-interface SidebarChildItemProps extends SidebarItemProps {
+interface SidebarChildItemProps {
+  link: Omit<SidebarItemProps['link'], 'icon'>;
   hoverColor: string;
   leftSpacing?: boolean;
 }
@@ -177,6 +178,7 @@ function SidebarChildItem({
         fontWeight={isMatched ? 'bold' : 'medium'}
         fontSize={{ base: 'lg', sm: 'sm' }}
         pl={leftSpacing ? '44px' : 2}
+        pr={2}
         py={3}
         transition="all .3s ease"
       >
