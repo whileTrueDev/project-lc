@@ -3,11 +3,6 @@ import { LiveShoppingPurchaseMessage } from '@prisma/client';
 import { usePurchaseMessages } from '@project-lc/hooks';
 import { useEffect, useMemo, useState } from 'react';
 
-export interface LiveShoppingCurrentStateBoardProps {
-  liveShoppingId: number;
-  title: string;
-}
-
 export function LiveShoppingCurrentStateAdminMessage(): JSX.Element {
   return <Box>관리자 메시지 : // TODO 관리자 메시지를 표시해야함</Box>;
 }
@@ -52,9 +47,16 @@ export function useAlarmAudio(): {
   return { audio, playAudio };
 }
 
+export interface LiveShoppingCurrentStateBoardProps {
+  liveShoppingId: number;
+  title: string;
+  isOnAir: boolean;
+}
+
 export function LiveShoppingCurrentStateBoard({
   liveShoppingId,
   title,
+  isOnAir,
 }: LiveShoppingCurrentStateBoardProps): JSX.Element {
   // * 관리자 새 메시지
   const [hasAdminAlarm, setHasAdminAlarm] = useState(false);
@@ -62,7 +64,7 @@ export function LiveShoppingCurrentStateBoard({
   // * 응원메시지 데이터
   const { data, status, error, isFetching } = usePurchaseMessages({
     liveShoppingId,
-    // refetchInterval: 10 * 1000, // 10초에 한번
+    refetchInterval: isOnAir ? 10 * 1000 : undefined, // 방송진행중인 경우에만 10초에 한번
   });
 
   const { totalPrice, totalPurchaseCount, totalGiftCount } = useMemo(() => {
