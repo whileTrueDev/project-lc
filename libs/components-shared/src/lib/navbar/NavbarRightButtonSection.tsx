@@ -1,17 +1,17 @@
-import { Icon, ExternalLinkIcon } from '@chakra-ui/icons';
+import { ExternalLinkIcon, Icon } from '@chakra-ui/icons';
 import {
-  ButtonProps,
-  Button,
-  Flex,
+  Avatar,
   Box,
+  Button,
+  ButtonProps,
   Divider,
-  useColorMode,
-  useColorModeValue,
+  Flex,
   Menu,
   MenuButton,
-  Avatar,
-  MenuList,
   MenuItem,
+  MenuList,
+  useColorMode,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
@@ -31,6 +31,9 @@ export function NavbarRightButton(props: ButtonProps): JSX.Element {
       minW={{ base: '50px', sm: '80px' }}
       size="xs"
       fontSize="1rem"
+      _hover={{ bg: 'blue.400' }}
+      rounded="lg"
+      h="100%"
       {...props}
     >
       {children}
@@ -58,7 +61,7 @@ export function NavbarRightButtonSection(): JSX.Element {
         <>
           <ColorModeSwitcher />
           {/* 로그인|회원가입 버튼그룹 컨테이너 */}
-          <Flex bg="blue.500" color="white" borderRadius="lg" height="32px" p={1}>
+          <Flex bg="blue.500" color="white" rounded="lg" height="32px">
             <NavbarRightButton onClick={() => router.push('/login')}>
               로그인
             </NavbarRightButton>

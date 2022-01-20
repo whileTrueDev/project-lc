@@ -7,3 +7,4 @@ export * from './lib/sellerGoodsListPanelStore';
 export * from './lib/settlementHistoryStore';
 export * from './lib/shippingGroupItemStore';
 export * from './lib/shippingSetItemStore';
+export * from './lib/mypageDesktopSidebarStore';

@@ -9,6 +9,11 @@ import {
   FcAdvertising,
 } from 'react-icons/fc';
 
+import { AiOutlineShop, AiOutlineHome, AiOutlineSetting } from 'react-icons/ai';
+import { BsBox } from 'react-icons/bs';
+import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
+import { IconType } from 'react-icons/lib';
+
 export interface NavItem {
   label: string;
   subLabel?: string;
@@ -51,15 +56,16 @@ export const kkshowNavLinks: Array<NavItem> = [
 export interface LinkItemProps {
   name: string;
   href: string;
+  icon: IconType;
 }
 
-export interface SidebarMenuLink extends LinkItemProps {
+export interface SidebarMenuLink extends Omit<LinkItemProps, 'icon'> {
   children?: SidebarMenuLink[];
-  icon?: any;
+  icon?: IconType;
 }
 
 export interface MypageLink extends LinkItemProps {
-  children?: MypageLink[];
+  children?: Omit<MypageLink, 'icon'>[];
   checkIsActive: (pathname: string, linkHref: string) => boolean;
 }
 
@@ -68,16 +74,19 @@ const defaultIsActiveChecker = (pathname: string, linkHref: string): boolean =>
 
 export const mypageNavLinks: MypageLink[] = [
   {
+    icon: AiOutlineHome,
     name: '홈',
     href: '/mypage',
     checkIsActive: (pathname, linkHref) => pathname === linkHref,
   },
   {
+    icon: BsBox,
     name: '상품',
     href: '/mypage/goods',
     checkIsActive: defaultIsActiveChecker,
   },
   {
+    icon: MdLiveTv,
     name: '라이브쇼핑',
     href: '/mypage/live',
     checkIsActive: defaultIsActiveChecker,
@@ -87,26 +96,57 @@ export const mypageNavLinks: MypageLink[] = [
         href: '/mypage/live',
         checkIsActive: (pathname, linkHref) => pathname === linkHref,
       },
-      // {
-      //   name: 'VOD 관리',
-      //   href: '/mypage/live/vod',
-      //   checkIsActive: (pathname, linkHref) => pathname === linkHref,
-      // },
     ],
   },
   {
+    icon: MdOutlineShoppingCart,
     name: '주문',
     href: '/mypage/orders',
     checkIsActive: defaultIsActiveChecker,
   },
   {
+    icon: AiOutlineShop,
     name: '상점설정',
     href: '/mypage/shopinfo',
     checkIsActive: defaultIsActiveChecker,
   },
   {
+    icon: MdPayment,
     name: '정산',
     href: '/mypage/settlement',
+    checkIsActive: defaultIsActiveChecker,
+  },
+];
+
+export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
+  {
+    icon: AiOutlineHome,
+    name: '홈',
+    href: '/mypage',
+    checkIsActive: (pathname, linkHref) => pathname === linkHref,
+  },
+  {
+    icon: MdLiveTv,
+    name: '라이브쇼핑',
+    href: '/mypage/live',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    icon: MdOutlineShoppingCart,
+    name: '구입현황',
+    href: '/mypage/purchase',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    icon: MdPayment,
+    name: '정산',
+    href: '/mypage/settlement',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    icon: AiOutlineSetting,
+    name: '계정설정',
+    href: '/mypage/setting',
     checkIsActive: defaultIsActiveChecker,
   },
 ];
@@ -166,33 +206,5 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
       { name: '알림메시지', href: '/general/notification', icon: FcSms },
       { name: '공지사항', href: '/general/notice', icon: FcAdvertising },
     ],
-  },
-];
-
-export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
-  {
-    name: '홈',
-    href: '/mypage',
-    checkIsActive: (pathname, linkHref) => pathname === linkHref,
-  },
-  {
-    name: '라이브쇼핑',
-    href: '/mypage/live',
-    checkIsActive: defaultIsActiveChecker,
-  },
-  {
-    name: '구입현황',
-    href: '/mypage/purchase',
-    checkIsActive: defaultIsActiveChecker,
-  },
-  {
-    name: '정산',
-    href: '/mypage/settlement',
-    checkIsActive: defaultIsActiveChecker,
-  },
-  {
-    name: '계정설정',
-    href: '/mypage/setting',
-    checkIsActive: defaultIsActiveChecker,
   },
 ];
