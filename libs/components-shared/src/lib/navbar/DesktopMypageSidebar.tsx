@@ -24,7 +24,12 @@ export function DesktopMypageSidebar({
       w={isOpen ? 60 : 14} // 4 * 60 = 240px
     >
       {/* 마이페이지 사이드바 닫는 버튼 */}
-      <Flex py={2} px={1} pl={3} justify="space-between" alignItems="center">
+      <Flex
+        py={2}
+        px={isOpen ? 3 : 0}
+        justify={isOpen ? 'space-between' : 'center'}
+        alignItems="center"
+      >
         {isOpen && (
           <Text fontWeight="medium" fontSize="sm">
             마이페이지
