@@ -7,9 +7,12 @@ export const getPurchaseMessages = async (
   liveShoppingId: number,
 ): Promise<LiveShoppingPurchaseMessage[]> => {
   return axios
-    .get<LiveShoppingPurchaseMessage[]>('/live-shoppings/current-state', {
-      params: { liveShoppingId },
-    })
+    .get<LiveShoppingPurchaseMessage[]>(
+      '/live-shoppings/current-state-purchase-messages',
+      {
+        params: { liveShoppingId },
+      },
+    )
     .then((res) => res.data);
 };
 
