@@ -105,8 +105,7 @@ function DesktopNavLayout({ children }: { children: React.ReactNode }): JSX.Elem
 /** 데스크톱 화면에서 네비바 메뉴목록 */
 const MainNavItemList = (): JSX.Element => {
   const router = useRouter();
-  const linkColor = useColorModeValue('gray.900', 'gray.200');
-  const linkHoverColor = useColorModeValue('gray.600', 'blue.100');
+  const linkColor = useColorModeValue('blackAlpha.900', 'whilteAlpha.900');
   const { isLoggedIn } = useIsLoggedIn();
 
   // 로그인 여부에 따라, 로그인이 필요한 링크만 보여지도록 처리하기 위함
@@ -121,6 +120,12 @@ const MainNavItemList = (): JSX.Element => {
     [router.pathname],
   );
 
+  const focusEffect = {
+    textDecor: 'none',
+    bgColor: 'blue.500',
+    color: 'whiteAlpha.900',
+  };
+
   return (
     <Stack direction="row" spacing={4}>
       {realMainNavItems.map((navItem) => (
@@ -128,13 +133,11 @@ const MainNavItemList = (): JSX.Element => {
           <NextLink href={navItem.href ?? '#'} passHref>
             <Link
               p={2}
-              fontSize={{ md: 'md', xl: 'lg' }}
               fontWeight="bold"
               color={linkColor}
-              _hover={{
-                textDecoration: 'none',
-                color: linkHoverColor,
-              }}
+              rounded="md"
+              _hover={focusEffect}
+              _focus={focusEffect}
               textDecoration={isMatched(navItem.href) ? 'underline' : 'none'}
               textDecorationColor={isMatched(navItem.href) ? 'blue.400' : 'none'}
               textDecorationThickness={isMatched(navItem.href) ? '0.225rem' : 'none'}
