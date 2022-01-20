@@ -20,8 +20,7 @@ socket.on('creator list from server', (data) => {
 });
 
 $(document).ready(function ready() {
-  // 관리자 메시지 보내기(방송인 현황판 표시) 컨트롤러, liveShoppingId 할당될때 생성
-  let liveShoppingStateBoardController;
+  let liveShoppingStateBoardController; // 관리자 메시지 보내기(방송인 현황판 표시) 컨트롤러, liveShoppingId 할당될때 생성
   // TODO: 풀리퀘 올리기 전 주석 풀기
   // $('.mid-area button').attr('disabled', true);
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
@@ -387,6 +386,7 @@ $(document).ready(function ready() {
 
 class LiveShoppingStateBoardController {
   constructor(liveShoppingId) {
+    this._defaultMessage = '없음';
     this._liveShoppingId = liveShoppingId;
     this.container = $('.admin-to-bc-live-state-board-box');
     this.input = this.container.find('.admin-to-bc-live-state-board__input');
@@ -407,7 +407,7 @@ class LiveShoppingStateBoardController {
 
   init() {
     this.input.val('');
-    this.displayingMessage.text('');
+    this.displayingMessage.text(this._defaultMessage);
     this.sendButton.click(() => this.sendMessage());
     this.deleteButton.click(() => this.deleteMessage());
     this.alertButton.click(() => this.sendAlert());
@@ -437,12 +437,12 @@ class LiveShoppingStateBoardController {
   deleteMessage() {
     const currentMessage = this.displayingMessage.text();
 
-    if (!currentMessage) return;
+    if (currentMessage === this._defaultMessage) return;
 
     this.requestDeleteMessage(
       (data) => {
         this.input.val('');
-        this.displayingMessage.text('');
+        this.displayingMessage.text(this._defaultMessage);
       },
       (error) => {
         console.error(error);

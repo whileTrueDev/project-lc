@@ -46,7 +46,6 @@ export function SellerMainHeroTextSection(): JSX.Element {
   );
 }
 
-// TODO: 티비 아이콘 테두리 흰색 아닌 투명으로 바꾸기
 /** 판매자 센터 적혀있는 파란 배너 부분아래 티비 아이콘 부분 */
 export function SellerMainHeroImageSection(): JSX.Element {
   const { title, desc, img } = sellerMainSectionText.heroImage;

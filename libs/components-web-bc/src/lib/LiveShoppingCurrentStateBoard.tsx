@@ -55,13 +55,13 @@ export function LiveShoppingCurrentStateBoard({
   // * 관리자메시지 데이터
   const { data: adminMessageData } = useLiveShoppingStateBoardAdminMessage({
     liveShoppingId,
-    refetchInterval: getRefetchInterval(false, FETCH_INTERVAL.adminMessage), // TODO: isOnAir 전달
+    refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.adminMessage),
   });
 
   // * 응원메시지 데이터
   const { data, status, error } = usePurchaseMessages({
     liveShoppingId,
-    refetchInterval: getRefetchInterval(false, FETCH_INTERVAL.purchaseMessage), // TODO: isOnAir 전달
+    refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.purchaseMessage),
   });
 
   const { totalPrice, totalPurchaseCount, totalGiftCount } = useMemo(() => {
@@ -127,7 +127,7 @@ export function LiveShoppingCurrentStateBoard({
 
         {/* 응원메시지 목록 */}
         <SectionWithTitle variant="outlined" title="응원메시지">
-          <Box maxH={200} overflowY="auto">
+          <Box maxH="400px" overflowY="auto">
             <MessageItemLayout
               bg="blue.500"
               color="white"
@@ -171,10 +171,10 @@ export function MessageItemLayout({
       <GridItem colSpan={1} h="2rem" bg={bg} color={color} px={2} textAlign="center">
         {index}
       </GridItem>
-      <GridItem colSpan={1} h="2rem" bg={bg} color={color} px={2}>
+      <GridItem colSpan={1} h="2rem" bg={bg} color={color} px={2} isTruncated>
         {nickname}
       </GridItem>
-      <GridItem colSpan={3} h="2rem" bg={bg} color={color} px={2}>
+      <GridItem colSpan={3} h="2rem" bg={bg} color={color} px={2} isTruncated>
         {message}
       </GridItem>
       <GridItem colSpan={1} h="2rem" bg={bg} color={color} px={2}>
