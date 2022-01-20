@@ -91,18 +91,18 @@ export const mypageNavLinks: MypageLink[] = [
     name: '라이브쇼핑',
     href: '/mypage/live',
     checkIsActive: defaultIsActiveChecker,
-    children: [
-      {
-        name: '내 라이브 쇼핑 관리',
-        href: '/mypage/live',
-        checkIsActive: (pathname, linkHref) => pathname === linkHref,
-      },
-      // {
-      //   name: 'VOD 관리',
-      //   href: '/mypage/live/vod',
-      //   checkIsActive: (pathname, linkHref) => pathname === linkHref,
-      // },
-    ],
+    // children: [
+    // {
+    //   name: '내 라이브 쇼핑 관리',
+    //   href: '/mypage/live',
+    //   checkIsActive: (pathname, linkHref) => pathname === linkHref,
+    // },
+    // {
+    //   name: 'VOD 관리',
+    //   href: '/mypage/live/vod',
+    //   checkIsActive: (pathname, linkHref) => pathname === linkHref,
+    // },
+    // ],
   },
   {
     icon: MdOutlineShoppingCart,
