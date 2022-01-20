@@ -1,12 +1,11 @@
 import { Stack, Center, Divider, VStack, Text } from '@chakra-ui/react';
 import { useEffect } from 'react';
+import { guideConditionStore } from '@project-lc/stores';
 import { UrlCard } from './OverlayUrlCard';
 
-export function OverayUrlSection({
-  completeStep,
-}: {
-  completeStep: () => void;
-}): JSX.Element {
+export function OverayUrlSection(): JSX.Element {
+  const { completeStep } = guideConditionStore();
+
   useEffect(() => {
     completeStep();
   }, [completeStep]);

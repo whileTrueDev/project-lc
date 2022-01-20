@@ -25,6 +25,7 @@ model Seller {
   LiveShopping               LiveShopping[]
   OrderCancelRequests        SellerOrderCancelRequest[] // 판매자의 결제취소요청
   avatar                     String?
+  agreementFlag              Boolean                      @default(false) // 이용동의 
 }
 
 // 마케터의 상정정보

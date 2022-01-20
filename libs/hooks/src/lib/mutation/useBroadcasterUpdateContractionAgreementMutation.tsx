@@ -4,22 +4,25 @@ import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import { Broadcaster } from '.prisma/client';
 import axios from '../../axios';
 
-export type useUpdateContractionAgreementMutationRes = Broadcaster;
+export type useBroadcasterUpdateContractionAgreementMutationRes = Broadcaster;
 
-export const useUpdateContractionAgreementMutation = (): UseMutationResult<
-  useUpdateContractionAgreementMutationRes,
+export const useBroadcasterUpdateContractionAgreementMutation = (): UseMutationResult<
+  useBroadcasterUpdateContractionAgreementMutationRes,
   AxiosError,
   BroadcasterContractionAgreementDto
 > => {
   const queryClient = useQueryClient();
   return useMutation<
-    useUpdateContractionAgreementMutationRes,
+    useBroadcasterUpdateContractionAgreementMutationRes,
     AxiosError,
     BroadcasterContractionAgreementDto
   >(
     (dto: BroadcasterContractionAgreementDto) =>
       axios
-        .patch<useUpdateContractionAgreementMutationRes>('/broadcaster/agreement', dto)
+        .patch<useBroadcasterUpdateContractionAgreementMutationRes>(
+          '/broadcaster/agreement',
+          dto,
+        )
         .then((res) => res.data),
     {
       onSuccess: () => {

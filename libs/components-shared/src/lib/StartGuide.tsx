@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Button,
   ButtonGroup,
@@ -9,24 +10,28 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalProps,
+  Text,
 } from '@chakra-ui/react';
 import { Step, StepLabel } from '@material-ui/core';
-import { useState } from 'react';
-import { AddressSection } from './guide/AddressSection';
+import { guideConditionStore } from '@project-lc/stores';
 import { ChakraStepper } from './guide/ChakraStepper';
-import { ChannelSection } from './guide/ChannelSection';
-import { ContractionAgreementSection } from './guide/ContractionAgreementSection';
 import { IntroSection } from './guide/IntroSection';
-import { LiveShoppingMonitorSection } from './guide/LiveShoppingMonitorSection';
-import { OverayUrlSection } from './guide/OverayUrlSection';
-import { SettlementsSection } from './guide/SettlementsSection';
 
-export function StartGuideSection({
+interface StartGuideStep {
+  label: string;
+  component: JSX.Element;
+}
+type StartGuideSteps = StartGuideStep[];
+
+export function StartGuide({
   isOpen,
   onClose,
-}: Pick<ModalProps, 'isOpen' | 'onClose'>): JSX.Element {
+  steps,
+}: Pick<ModalProps, 'isOpen' | 'onClose'> & {
+  steps: StartGuideSteps;
+}): JSX.Element {
   // 다음 단계 가능여부
-  const [condition, setCondition] = useState<boolean>(false);
+  const { condition, setCondition } = guideConditionStore();
 
   const [introduction, setIntroduction] = useState<boolean>(true);
   const handleIntroSkip = (): void => {
@@ -34,10 +39,6 @@ export function StartGuideSection({
   };
   const handleIntroReset = (): void => {
     setIntroduction(true);
-  };
-
-  const completeStep = (): void => {
-    setCondition(true);
   };
 
   // 가이드 Stepper
@@ -53,34 +54,6 @@ export function StartGuideSection({
     setActiveStep(0);
   };
 
-  // 각 단계 컴포넌트 목록
-  const steps = [
-    {
-      label: '크크쇼 이용약관 동의하기',
-      component: <ContractionAgreementSection completeStep={completeStep} />,
-    },
-    {
-      label: '연락처 등록하기',
-      component: <AddressSection completeStep={completeStep} />,
-    },
-    {
-      label: '채널링크 등록하기',
-      component: <ChannelSection completeStep={completeStep} />,
-    },
-    {
-      label: '라이브 쇼핑 준비하기',
-      component: <OverayUrlSection completeStep={completeStep} />,
-    },
-    {
-      label: '라이브 쇼핑 화면',
-      component: <LiveShoppingMonitorSection completeStep={completeStep} />,
-    },
-    {
-      label: '수익금 출금하기',
-      component: <SettlementsSection completeStep={completeStep} />,
-    },
-  ];
-
   function getStepComponent(step: number): React.ReactNode {
     return steps[step].component;
   }
@@ -93,7 +66,8 @@ export function StartGuideSection({
         handleIntroReset();
         handleStepReset();
       }}
-      size="6xl"
+      size="2xl"
+      scrollBehavior="inside"
     >
       <ModalOverlay />
       <ModalContent>
@@ -102,13 +76,19 @@ export function StartGuideSection({
         <ModalBody mx="5">
           {/* 가이드 Stepper */}
           {introduction ? (
-            <IntroSection completeStep={completeStep} />
+            <IntroSection />
           ) : (
             <>
-              <ChakraStepper activeStep={activeStep} alternativeLabel>
+              <ChakraStepper
+                activeStep={activeStep}
+                alternativeLabel
+                style={{ paddingLeft: 0, paddingRight: 0 }}
+              >
                 {steps.map((step) => (
                   <Step key={step.label}>
-                    <StepLabel>{step.label}</StepLabel>
+                    <StepLabel>
+                      <Text fontSize="sm">{step.label}</Text>
+                    </StepLabel>
                   </Step>
                 ))}
               </ChakraStepper>
