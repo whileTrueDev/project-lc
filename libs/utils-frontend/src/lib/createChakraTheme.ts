@@ -35,7 +35,10 @@ export const createChakraTheme = () =>
         // 스크롤바 바 부분
         '::-webkit-scrollbar-thumb': {
           backgroundColor: 'gray',
-          borderRadius: '26px',
+          borderRadius: '3px',
+        },
+        '::-webkit-scrollbar-thumb:horizontal': {
+          borderRadius: '6px',
         },
         '::-webkit-scrollbar-thumb:hover': {
           backgroundColor: mode('gray.600', 'gray.300')(props),
