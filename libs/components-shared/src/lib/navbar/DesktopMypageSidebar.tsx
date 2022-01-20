@@ -1,16 +1,13 @@
 import { Flex, Text, useColorModeValue } from '@chakra-ui/react';
+import { mypageDesktopSidebarStore } from '@project-lc/stores';
 import MypageSidebar, { MypageSidebarPrpps } from './MypageSidebar';
 import { NavbarToggleButton } from './NavbarToggleButton';
 
-interface DesktopSidebMypagearProps extends MypageSidebarPrpps {
-  isOpen: boolean;
-  onToggle: () => void;
-}
+type DesktopSidebMypagearProps = MypageSidebarPrpps;
 export function DesktopMypageSidebar({
   navLinks,
-  isOpen,
-  onToggle,
 }: DesktopSidebMypagearProps): JSX.Element {
+  const { isOpen, onToggle } = mypageDesktopSidebarStore();
   return (
     <Flex
       as="aside"

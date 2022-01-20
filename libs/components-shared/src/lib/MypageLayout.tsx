@@ -5,7 +5,6 @@ import FullscreenLoading from '@project-lc/components-layout/FullscreenLoading';
 import MypageFooter from '@project-lc/components-layout/MypageFooter';
 import { useDisplaySize, useIsLoggedIn } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
-import { mypageDesktopSidebarStore } from '@project-lc/stores';
 import { FloatingHelpButton } from './FloatingHelpButton';
 import MypageBreadcrumb from './MypageBreadCrumb';
 import { Navbar } from './Navbar';
@@ -27,7 +26,6 @@ export function MypageLayout({
 }: MypageLayoutProps): JSX.Element {
   const { status } = useIsLoggedIn();
   const { isMobileSize } = useDisplaySize();
-  const { isOpen, onToggle } = mypageDesktopSidebarStore();
 
   return (
     <Flex
@@ -42,9 +40,7 @@ export function MypageLayout({
       {/* 사이드바 제외한 영역 */}
       <Flex h={`calc(100vh - ${NAVBAR_HEIGHT}px)`}>
         {/* 사이드바 영역 */}
-        {!isMobileSize && (
-          <DesktopMypageSidebar navLinks={navLinks} isOpen={isOpen} onToggle={onToggle} />
-        )}
+        {!isMobileSize && <DesktopMypageSidebar navLinks={navLinks} />}
 
         {/* 중간 영역 - 메인패널 */}
         <Box flex={1} as="main" overflow="auto">
