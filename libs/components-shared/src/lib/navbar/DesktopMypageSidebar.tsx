@@ -32,7 +32,7 @@ export function DesktopMypageSidebar({
       >
         {isOpen && (
           <Text fontWeight="medium" fontSize="sm">
-            마이페이지
+            메뉴
           </Text>
         )}
         <NavbarToggleButton size="sm" onToggle={onToggle} isOpen={isOpen} />
