@@ -2,10 +2,7 @@ import { Box, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
 import { LiveShoppingPurchaseMessage } from '@prisma/client';
 import { usePurchaseMessages } from '@project-lc/hooks';
 import { useEffect, useMemo, useState } from 'react';
-
-export function LiveShoppingCurrentStateAdminMessage(): JSX.Element {
-  return <Box>관리자 메시지 : // TODO 관리자 메시지를 표시해야함</Box>;
-}
+import LiveShoppingCurrentStateMessageFromAdmin from './LiveShoppingCurrentStateMessageFromAdmin';
 
 export function PurchaseMessageItem({
   item,
@@ -87,10 +84,10 @@ export function LiveShoppingCurrentStateBoard({
       </Heading>
 
       {/* 관리자메시지 */}
-      <LiveShoppingCurrentStateAdminMessage />
+      <LiveShoppingCurrentStateMessageFromAdmin />
 
       {/* 라이브 상황판 */}
-      <Box>
+      <Box border="1px" p={4}>
         <Text>라이브 상황판</Text>
         <Text>결제금액 : {totalPrice.toLocaleString()} 원</Text>
         <Text>주문건수 : {totalPurchaseCount} 건</Text>
@@ -98,7 +95,7 @@ export function LiveShoppingCurrentStateBoard({
       </Box>
 
       {/* 응원메시지 목록 */}
-      <Box>
+      <Box border="1px" p={4}>
         <Text>응원메시지</Text>
         <Box maxH={200} overflowY="auto">
           {data &&
