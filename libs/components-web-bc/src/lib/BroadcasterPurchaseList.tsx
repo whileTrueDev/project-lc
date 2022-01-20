@@ -101,7 +101,7 @@ export function BroadcasterPurchaseList(): JSX.Element {
               disableSelectionOnClick
               disableColumnMenu
               loading={isLoading}
-              columns={columns}
+              columns={isMobileSize ? mobileColumn : columns}
               rows={purchaseData}
               sortModel={sortModel}
             />

@@ -206,7 +206,7 @@ export function BroadcasterLiveShoppingList({
 
   return (
     <Box minHeight={useSmallSize ? 0 : { base: 300, md: 600 }} mb={useSmallSize ? 1 : 24}>
-      {liveShoppingWithSales && !isMobileSize && (
+      {liveShoppingWithSales && (
         <>
           <Flex m={4}>
             <ChakraDataGrid
@@ -223,31 +223,13 @@ export function BroadcasterLiveShoppingList({
               disableColumnMenu
               disableColumnSelector
               loading={isSalesLoading}
-              columns={columns}
+              columns={isMobileSize ? mobileColumns : columns}
               rows={liveShoppingWithSales}
             />
           </Flex>
         </>
       )}
-      {liveShoppingWithSales && isMobileSize && (
-        <ChakraDataGrid
-          disableExtendRowFullWidth
-          autoHeight
-          pagination
-          autoPageSize
-          showFirstButton
-          showLastButton
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[5, 10, 15]}
-          disableSelectionOnClick
-          disableColumnMenu
-          disableColumnSelector
-          loading={isSalesLoading}
-          columns={mobileColumns}
-          rows={liveShoppingWithSales}
-        />
-      )}
+
       {liveShoppingWithSales && liveShoppingWithSales.length !== 0 && (
         <LiveShoppingDetailDialog
           isOpen={detailIsOpen}

@@ -289,7 +289,7 @@ export function LiveShoppingList(): JSX.Element {
 
   return (
     <Box minHeight={{ base: 300, md: 600 }} mb={24}>
-      {data && liveShoppingWithSales && !isMobileSize && (
+      {data && liveShoppingWithSales && (
         <ChakraDataGrid
           disableExtendRowFullWidth
           autoHeight
@@ -304,29 +304,11 @@ export function LiveShoppingList(): JSX.Element {
           disableColumnMenu
           disableColumnSelector
           loading={isSalesLoading}
-          columns={columns}
+          columns={isMobileSize ? mobileColumns : columns}
           rows={liveShoppingWithSales}
         />
       )}
-      {data && liveShoppingWithSales && isMobileSize && (
-        <ChakraDataGrid
-          disableExtendRowFullWidth
-          autoHeight
-          pagination
-          autoPageSize
-          showFirstButton
-          showLastButton
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[5, 10, 15]}
-          disableSelectionOnClick
-          disableColumnMenu
-          disableColumnSelector
-          loading={isSalesLoading}
-          columns={mobileColumns}
-          rows={liveShoppingWithSales}
-        />
-      )}
+
       {liveShoppingWithSales && liveShoppingWithSales.length !== 0 && (
         <>
           <LiveShoppingDetailDialog
