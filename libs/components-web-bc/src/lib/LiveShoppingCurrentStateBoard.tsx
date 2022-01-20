@@ -1,7 +1,10 @@
-import { Box, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Box, Heading, Spinner, Stack, Text, useBoolean } from '@chakra-ui/react';
 import { LiveShoppingPurchaseMessage } from '@prisma/client';
+import MotionBox from '@project-lc/components-core/MotionBox';
 import {
+  useLiveShoppingStateBoardAdminAlert,
   useLiveShoppingStateBoardAdminMessage,
+  useLiveShoppingStateBoardAlertDeleteMutation,
   usePurchaseMessages,
 } from '@project-lc/hooks';
 import { useEffect, useMemo, useState } from 'react';
@@ -47,6 +50,35 @@ export function useAlarmAudio(): {
   return { audio, playAudio };
 }
 
+function getRefetchInterval(enable: boolean, time: number): undefined | number {
+  return enable ? time : undefined;
+}
+// 재요청 시간 ms
+const FETCH_INTERVAL = {
+  purchaseMessage: 10 * 1000,
+  adminMessage: 5 * 1000,
+  alertData: 5 * 1000,
+};
+
+const variants = {
+  default: {
+    backgroundColor: 'rgba(255,255,255,1)',
+  },
+  visible: {
+    backgroundColor: [
+      'rgba(255,0,0,1)',
+      'rgba(255,255,255,1)',
+      'rgba(255,0,0,1)',
+      'rgba(255,255,255,1)',
+      'rgba(255,0,0,1)',
+      'rgba(255,255,255,1)',
+    ],
+    transition: {
+      duration: 2,
+    },
+  },
+};
+
 export interface LiveShoppingCurrentStateBoardProps {
   liveShoppingId: number;
   title: string;
@@ -58,13 +90,10 @@ export function LiveShoppingCurrentStateBoard({
   title,
   isOnAir,
 }: LiveShoppingCurrentStateBoardProps): JSX.Element {
-  // * 관리자 알림
-  const [hasAdminAlarm, setHasAdminAlarm] = useState(false);
-
   // * 응원메시지 데이터
   const { data, status, error, isFetching } = usePurchaseMessages({
     liveShoppingId,
-    refetchInterval: isOnAir ? 10 * 1000 : undefined, // 방송진행중인 경우에만 10초에 한번
+    refetchInterval: getRefetchInterval(false, FETCH_INTERVAL.purchaseMessage), // TODO: isOnAir 전달
   });
 
   const { totalPrice, totalPurchaseCount, totalGiftCount } = useMemo(() => {
@@ -79,18 +108,54 @@ export function LiveShoppingCurrentStateBoard({
   // * 관리자메시지 데이터
   const { data: adminMessageData } = useLiveShoppingStateBoardAdminMessage({
     liveShoppingId,
-    refetchInterval: isOnAir ? 5 * 1000 : undefined, // 방송중인 경우에만 5초에 한번 조회
+    refetchInterval: getRefetchInterval(false, FETCH_INTERVAL.adminMessage), // TODO: isOnAir 전달
   });
+
+  // * 관리자 알림
+  const { data: alertData, isFetching: alertFetching } =
+    useLiveShoppingStateBoardAdminAlert({
+      liveShoppingId,
+      refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.alertData), // 방송중인 경우에만  조회
+    });
+
+  const deleteAlert = useLiveShoppingStateBoardAlertDeleteMutation();
+  const [hasAlert, { on, off }] = useBoolean();
+  const { playAudio } = useAlarmAudio();
+
+  useEffect(() => {
+    if (alertData) {
+      on();
+      playAudio();
+    }
+  }, [alertData]);
+
+
 
   if (status === 'loading') return <Box>Loading...</Box>;
   if (status === 'error' && error) return <Box>Error: {error.message}</Box>;
 
   return (
-    <Box>
+    <MotionBox
+      initial="default"
+      animate={hasAlert ? 'visible' : 'default'}
+      variants={variants}
+      onAnimationComplete={(def) => {
+        console.log(def);
+        if (def === 'visible') {
+          deleteAlert.mutateAsync({ liveShoppingId }).then(() => {
+            console.log('delete alert');
+            off();
+          });
+        }
+      }}
+    >
       {/* 라이브쇼핑명 - 제목 */}
       <Heading>
         {title} {isFetching && <Spinner />}
       </Heading>
+      {alertFetching && <Spinner />}
+      {JSON.stringify(alertData)}
+      {JSON.stringify(hasAlert)}
 
       {/* 관리자메시지 */}
       <LiveShoppingCurrentStateMessageFromAdmin message={adminMessageData?.text} />
@@ -113,7 +178,7 @@ export function LiveShoppingCurrentStateBoard({
             ))}
         </Box>
       </Box>
-    </Box>
+    </MotionBox>
   );
 }
 

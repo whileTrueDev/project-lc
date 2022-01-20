@@ -20,6 +20,7 @@ import {
 import {
   LiveShopping,
   LiveShoppingPurchaseMessage,
+  LiveShoppingStateBoardAlert,
   LiveShoppingStateBoardMessage,
 } from '@prisma/client';
 import { LiveShoppingService } from './live-shopping.service';
@@ -88,6 +89,22 @@ export class LiveShoppingController {
   getLiveShoppingStateBoardAdminMessage(
     @Query('liveShoppingId', ParseIntPipe) liveShoppingId: number,
   ): Promise<LiveShoppingStateBoardMessage | null> {
-    return this.liveShoppingStateBoardService.findOne(liveShoppingId);
+    return this.liveShoppingStateBoardService.findOneMessage(liveShoppingId);
+  }
+
+  /** 특정 라이브 쇼핑에 대한 현황판 경고알림 조회 */
+  @Get('/current-state-admin-alert')
+  getLiveShoppingStateBaordAdminAlert(
+    @Query('liveShoppingId', ParseIntPipe) liveShoppingId: number,
+  ): Promise<LiveShoppingStateBoardAlert | null> {
+    return this.liveShoppingStateBoardService.findOneAlert(liveShoppingId);
+  }
+
+  /** 특정 라이브 쇼핑에 대한 현황판 경고알림 삭제 */
+  @Delete('/current-state-admin-alert')
+  deleteLiveShoppingStateBaordAdminAlert(
+    @Body('liveShoppingId', ParseIntPipe) liveShoppingId: number,
+  ): Promise<boolean> {
+    return this.liveShoppingStateBoardService.deleteOneAlert(liveShoppingId);
   }
 }
