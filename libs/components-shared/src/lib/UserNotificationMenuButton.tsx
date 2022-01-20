@@ -182,7 +182,12 @@ export function UserNotificationMenuButton(): JSX.Element {
         />
       </Tooltip>
 
-      <MenuList w={{ base: 280, sm: 400 }} overflow="auto" cursor="default">
+      <MenuList
+        zIndex="dropdown"
+        w={{ base: 280, sm: 400 }}
+        overflow="auto"
+        cursor="default"
+      >
         <Stack spacing={1}>
           {/* 알림메시지 존재하는 경우 */}
           <Box>
