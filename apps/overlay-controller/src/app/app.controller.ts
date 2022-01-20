@@ -82,4 +82,14 @@ export class AppController {
       liveShoppingId,
     );
   }
+
+  /** 라이브쇼핑 현황판 관리자메시지 생성 */
+  @Post('/live-shopping-state-board-alert')
+  async createLiveShoppingStateBoardAlert(
+    @Body('liveShoppingId', ParseIntPipe) liveShoppingId: number,
+  ): Promise<boolean> {
+    return this.overlayControllerService.createLiveShoppingStateBoardAlert({
+      liveShoppingId,
+    });
+  }
 }

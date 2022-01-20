@@ -3,7 +3,10 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { LiveShoppingStateBoardMessage } from '@prisma/client';
+import {
+  LiveShoppingStateBoardAlert,
+  LiveShoppingStateBoardMessage,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   PurchaseMessageWithLoginFlag,
@@ -96,6 +99,22 @@ export class OverlayControllerService {
     return data;
   }
 
+  /** 라이브쇼핑 현황판 관리자 알림 찾기
+   * @param liveShoppingId 라이브쇼핑id(number)
+   * @returns liveShoppingId 로 보낸 관리자 알림 존재하는 경우 LiveShoppingStateBoardAlert 반환
+   *          해당 라이브쇼핑에 보낸 알림 존재하지 않는 경우 null
+   */
+  private async findOneLiveShoppingStateBoardAlert(
+    liveShoppingId: number,
+  ): Promise<LiveShoppingStateBoardAlert | null> {
+    const data = await this.prisma.liveShoppingStateBoardAlert.findFirst({
+      where: { liveShoppingId },
+    });
+
+    if (!data) return null;
+    return data;
+  }
+
   /** 라이브쇼핑 현황판 관리자메시지 생성
    * liveShoppingId에 보낸 관리자메시지가 이미 존재하는 경우, text 내용만 변경
    * @param liveShoppingId 라이브쇼핑id(number)
@@ -153,5 +172,31 @@ export class OverlayControllerService {
       where: { id: data.id },
     });
     return true;
+  }
+
+  /** 라이브쇼핑 현황판 관리자 알림 생성
+   * liveShoppingId에 보낸 관리자 알림이 이미 존재하는 경우 새로 생성하지 않고 그냥 true 반환
+   * @param liveShoppingId 라이브쇼핑id(number)
+   * @return 알림 생성 성공시 true 반환
+   */
+  async createLiveShoppingStateBoardAlert({
+    liveShoppingId,
+  }: {
+    liveShoppingId: number;
+  }): Promise<boolean> {
+    try {
+      const data = await this.findOneLiveShoppingStateBoardAlert(liveShoppingId);
+      if (data) return true;
+
+      await this.prisma.liveShoppingStateBoardAlert.create({
+        data: {
+          liveShoppingId,
+        },
+      });
+
+      return true;
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
   }
 }

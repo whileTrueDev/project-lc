@@ -135,10 +135,14 @@ $(document).ready(function ready() {
     roomName = url.split('/').pop();
     getPurchaseMessage();
 
-    liveShoppingStateBoardController = new LiveShoppingStateBoardController(
-      liveShoppingId,
-    );
-    liveShoppingStateBoardController.init();
+    if (liveShoppingStateBoardController) {
+      liveShoppingStateBoardController.liveShoppingId = liveShoppingId;
+    } else {
+      liveShoppingStateBoardController = new LiveShoppingStateBoardController(
+        liveShoppingId,
+      );
+      liveShoppingStateBoardController.init();
+    }
   });
 
   $('#toggle-table-button').click(function toggleTableButtonClickEvent() {
@@ -396,7 +400,14 @@ class LiveShoppingStateBoardController {
     this.alertButton = this.container.find('.admin-to-bc-live-state-board__alert-button');
   }
 
+  set liveShoppingId(liveShoppingId) {
+    this.deleteMessage(); // 새로운 liveShoppingId 할당하기전, 이전 라이브쇼핑방송에 보낸 메시지가 있다면 삭제
+    this._liveShoppingId = liveShoppingId;
+  }
+
   init() {
+    this.input.val('');
+    this.displayingMessage.text('');
     this.sendButton.click(() => this.sendMessage());
     this.deleteButton.click(() => this.deleteMessage());
     this.alertButton.click(() => this.sendAlert());
@@ -432,10 +443,6 @@ class LiveShoppingStateBoardController {
       (data) => {
         this.input.val('');
         this.displayingMessage.text('');
-        $('#insert-dialog').fadeIn();
-        setTimeout(() => {
-          $('#insert-dialog').fadeOut();
-        }, 3000);
       },
       (error) => {
         console.error(error);
@@ -444,7 +451,14 @@ class LiveShoppingStateBoardController {
   }
 
   sendAlert() {
-    this.requestCreateAlert();
+    this.requestCreateAlert(
+      (data) => {
+        console.log('alert created', data);
+      },
+      (error) => {
+        console.error(error);
+      },
+    );
   }
 
   requestCreateMessage(message, successCallback, errorCallback) {
@@ -477,7 +491,18 @@ class LiveShoppingStateBoardController {
     });
   }
 
-  requestCreateAlert() {
-    console.log('alert');
+  requestCreateAlert(successCallback, errorCallback) {
+    $.ajax({
+      type: 'POST',
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/live-shopping-state-board-alert`,
+      dataType: 'json',
+      data: { liveShoppingId: this._liveShoppingId },
+      success(data) {
+        successCallback(data);
+      },
+      error(error) {
+        errorCallback(error);
+      },
+    });
   }
 }
