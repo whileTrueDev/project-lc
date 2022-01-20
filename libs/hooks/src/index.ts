@@ -113,6 +113,7 @@ export * from './lib/useCountdown';
 export * from './lib/useDisplaySize';
 export * from './lib/useGoodsOnLive';
 export * from './lib/useHorizontalScroll';
+export * from './lib/useLiveShoppingStateBoardAlertState';
 export * from './lib/useOrderExportableCheck';
 export * from './lib/useOrderReturnOrRefundStatus';
 export * from './lib/useSocialLoginFailAlarm';

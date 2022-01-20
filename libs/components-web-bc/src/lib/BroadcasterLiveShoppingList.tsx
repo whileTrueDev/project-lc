@@ -183,7 +183,7 @@ export function BroadcasterLiveShoppingList({
           colorScheme="green"
           onClick={() => {
             const url = `${window.location.origin}/mypage/live/state/${row.id}`;
-            const windowFeatures = 'scrollbars,resizable,width=1200, height=600';
+            const windowFeatures = 'scrollbars,resizable,width=800, height=600';
             window.open(url, '_blank', windowFeatures);
           }}
         >
