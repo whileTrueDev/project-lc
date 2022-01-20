@@ -27,6 +27,7 @@ export interface MypageSidebarPrpps {
   isFolded?: boolean;
 }
 export function MypageSidebar({ navLinks, isFolded }: MypageSidebarPrpps): JSX.Element {
+  const realNavLinks = navLinks.filter((l) => !l.isInvisible);
   const router = useRouter();
 
   // * 현재 페이지에 매치하는지 확인 함수
@@ -37,14 +38,14 @@ export function MypageSidebar({ navLinks, isFolded }: MypageSidebarPrpps): JSX.E
 
   // * 현재 페이지에 매치하는 link의 인덱스(해당 accordion item open하기 위함)
   const matchedLinkIndex = useMemo(() => {
-    const index = navLinks.findIndex((link) => isMatched(link));
+    const index = realNavLinks.findIndex((link) => isMatched(link));
     return index;
-  }, [isMatched, navLinks]);
+  }, [isMatched, realNavLinks]);
 
   if (isFolded) {
     return (
       <Box as="nav">
-        {navLinks.map((link) => (
+        {realNavLinks.map((link) => (
           <FoldedSidebarItem key={link.name} link={link} isMatched={isMatched(link)} />
         ))}
       </Box>
@@ -53,7 +54,7 @@ export function MypageSidebar({ navLinks, isFolded }: MypageSidebarPrpps): JSX.E
 
   return (
     <Accordion as="nav" allowMultiple allowToggle defaultIndex={[matchedLinkIndex]}>
-      {navLinks.map((link) => (
+      {realNavLinks.map((link) => (
         <SidebarItem key={link.name} link={link} isMatched={isMatched(link)} />
       ))}
     </Accordion>

@@ -56,22 +56,23 @@ export const kkshowNavLinks: Array<NavItem> = [
 export interface LinkItemProps {
   name: string;
   href: string;
-  icon: IconType;
+  icon?: IconType;
 }
 
-export interface SidebarMenuLink extends Omit<LinkItemProps, 'icon'> {
+export interface SidebarMenuLink extends LinkItemProps {
   children?: SidebarMenuLink[];
-  icon?: IconType;
 }
 
 export interface MypageLink extends LinkItemProps {
   children?: Omit<MypageLink, 'icon'>[];
   checkIsActive: (pathname: string, linkHref: string) => boolean;
+  isInvisible?: boolean;
 }
 
 const defaultIsActiveChecker = (pathname: string, linkHref: string): boolean =>
   pathname.includes(linkHref);
 
+/** 판매자 마이페이지 링크 */
 export const mypageNavLinks: MypageLink[] = [
   {
     icon: AiOutlineHome,
@@ -105,16 +106,22 @@ export const mypageNavLinks: MypageLink[] = [
     checkIsActive: defaultIsActiveChecker,
   },
   {
+    icon: MdPayment,
+    name: '정산',
+    href: '/mypage/settlement',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
     icon: AiOutlineShop,
     name: '상점설정',
     href: '/mypage/shopinfo',
     checkIsActive: defaultIsActiveChecker,
   },
   {
-    icon: MdPayment,
-    name: '정산',
-    href: '/mypage/settlement',
+    name: '계정 설정',
+    href: '/mypage/setting',
     checkIsActive: defaultIsActiveChecker,
+    isInvisible: true,
   },
 ];
 
