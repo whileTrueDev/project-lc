@@ -9,6 +9,17 @@ export const getApiHost = (): string | undefined => {
   }
 };
 
+export const getRealtimeApiHost = (): string | undefined => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+    case 'test':
+      return process.env.NEXT_PUBLIC_REALTIME_API_HOST || process.env.REALTIME_API_HOST;
+    case 'development':
+    default:
+      return 'http://localhost:3001';
+  }
+};
+
 export const getWebHost = (): string => {
   switch (process.env.NODE_ENV) {
     case 'production':

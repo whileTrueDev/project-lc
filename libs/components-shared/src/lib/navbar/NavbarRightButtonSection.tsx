@@ -20,7 +20,7 @@ import { useCallback } from 'react';
 import { AiTwotoneSetting } from 'react-icons/ai';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import ProfileBox from '../ProfileBox';
-import UserNotificationSection from '../UserNotificationSection';
+import UserNotificationMenuButton from '../UserNotificationMenuButton';
 
 /** 네비바 우측 버튼 공통 스타일 */
 export function NavbarRightButton(props: ButtonProps): JSX.Element {
@@ -51,7 +51,7 @@ export function NavbarRightButtonSection(): JSX.Element {
         // 로그인했을때
         <>
           <Box mr={{ base: '1', sm: '3' }}>
-            <UserNotificationSection />
+            <UserNotificationMenuButton />
           </Box>
 
           <PersonalPopoverMenu />

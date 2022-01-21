@@ -1,5 +1,4 @@
 import { Button, Flex, Heading, Text, VStack } from '@chakra-ui/react';
-import { KksLogo } from '@project-lc/components-shared/KksLogo';
 import { NextSeo } from 'next-seo';
 import { useRouter } from 'next/router';
 
@@ -14,7 +13,6 @@ export function Custom404(): JSX.Element {
 
       <Flex h="100vh" flexDirection="column" justify="center" alignItems="center">
         <VStack spacing={4}>
-          <KksLogo appType="broadcaster" size="big" />
           <Heading fontSize={{ base: '2xl', sm: '4xl' }}>
             페이지를 찾을 수 없습니다.
           </Heading>
