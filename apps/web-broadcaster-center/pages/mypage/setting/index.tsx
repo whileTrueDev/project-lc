@@ -9,7 +9,7 @@ import { BroadcasterChannelSection } from '@project-lc/components-web-bc/Broadca
 import { BroadcasterContactSection } from '@project-lc/components-web-bc/BroadcasterContact';
 import { BroadcasterNickNameSection } from '@project-lc/components-web-bc/BroadcasterNickName';
 import { BroadcasterSignoutSection } from '@project-lc/components-web-bc/BroadcasterSignoutSection';
-import { ContractionAgreeSection } from '@project-lc/components-web-bc/ContractionAgreeSection';
+import { ContractionAgreeSection } from '@project-lc/components-shared/ContractionAgreeSection';
 
 export function SettingIndex(): JSX.Element {
   return (
@@ -23,7 +23,7 @@ export function SettingIndex(): JSX.Element {
           <Divider />
           <PasswordSection />
           <Divider />
-          <ContractionAgreeSection />
+          <ContractionAgreeSection userType="broadcaster" />
           <Divider />
           <BroadcasterAddressSection />
           <Divider />

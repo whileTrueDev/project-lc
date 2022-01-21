@@ -2,14 +2,12 @@ import { Box, Center, Divider, Grid, Image, Stack, Text, VStack } from '@chakra-
 import { useDisplaySize } from '@project-lc/hooks';
 import { s3 } from '@project-lc/utils-s3';
 import { useEffect, useState } from 'react';
+import { guideConditionStore } from '@project-lc/stores';
 
-export function LiveShoppingMonitorSection({
-  completeStep,
-}: {
-  completeStep: () => void;
-}): JSX.Element {
+export function LiveShoppingMonitorSection(): JSX.Element {
   const { isMobileSize } = useDisplaySize();
   const [src, setSrc] = useState<string>('');
+  const { completeStep } = guideConditionStore();
 
   useEffect(() => {
     completeStep();

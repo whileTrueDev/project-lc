@@ -2,8 +2,7 @@ import { Box, Flex, useDisclosure } from '@chakra-ui/react';
 import LoginRequireAlertDialog from '@project-lc/components-core/LoginRequireAlertDialog';
 import { useIsLoggedIn } from '@project-lc/hooks';
 import React from 'react';
-import { NavbarToggleButton } from '@project-lc/components-shared/Navbar';
-
+import { NavbarToggleButton } from '@project-lc/components-shared/navbar/NavbarToggleButton';
 import { AdminNav } from './AdminNav';
 import AdminSidebar from './AdminSidebar';
 

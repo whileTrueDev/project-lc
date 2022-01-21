@@ -18,6 +18,7 @@ import {
   useLoginMutation,
   useMailVerificationMutation,
   useSellerSignupMutation,
+  useCountdown,
 } from '@project-lc/hooks';
 import {
   emailCodeRegisterOptions,
@@ -40,6 +41,8 @@ export function SignupForm({
   const router = useRouter();
   const toast = useToast();
 
+  const { clearTimer, startCountdown, seconds } = useCountdown();
+
   const {
     handleSubmit,
     register,
@@ -52,19 +55,23 @@ export function SignupForm({
 
   // * 인증코드 페이즈
   const [phase, setPhase] = useState(1);
+  // 이메일 코드 최초전송 여부
+  const [isNotInitial, setIsNotInitial] = useState(false);
 
   // * 인증 코드 이메일 전송
   const mailVerification = useMailVerificationMutation();
   const startMailVerification = useCallback(
     async (email: string) => {
       return mailVerification
-        .mutateAsync({ email })
-        .then(() =>
+        .mutateAsync({ email, isNotInitial })
+        .then(() => {
           toast({
             title: `인증 코드가 ${email}(으)로 전송되었습니다`,
             status: 'success',
-          }),
-        )
+          });
+          clearTimer();
+          startCountdown(599);
+        })
         .catch((err) => {
           toast({
             title: '회원가입 오류 알림',
@@ -75,7 +82,7 @@ export function SignupForm({
           throw new Error('이메일 확인 전송 실패');
         });
     },
-    [mailVerification, toast],
+    [mailVerification, toast, isNotInitial, clearTimer, startCountdown],
   );
 
   // * 인증코드 메일 보내기 mutation 요청
@@ -91,7 +98,10 @@ export function SignupForm({
           message: '이미 가입된 이메일 주소입니다.',
         });
       } else {
-        startMailVerification(email).then(() => setPhase(2));
+        startMailVerification(email).then(() => {
+          setIsNotInitial(true);
+          setPhase(2);
+        });
       }
     }
   }, [getValues, setError, startMailVerification, trigger]);
@@ -141,7 +151,6 @@ export function SignupForm({
     },
     [broadcasterSignup, handleSignupError, login, router, sellerSignup, userType],
   );
-
   return (
     <CenterBox enableShadow header={{ title: '크크쇼 시작하기', desc: '' }}>
       <Stack mt={4} spacing={4} as="form" onSubmit={handleSubmit(onSubmit)}>
@@ -234,14 +243,28 @@ export function SignupForm({
                 인증코드는 6자의 무작위 글자로 이루어져 있습니다.
               </Text>
             </FormLabel>
-            <Input
-              autoComplete="off"
-              id="code"
-              type="code"
-              placeholder="이메일 인증코드"
-              {...register('code', { ...emailCodeRegisterOptions })}
-            />
+            <Flex alignItems="center" justifyContent="space-around">
+              <Input
+                autoComplete="off"
+                id="code"
+                type="code"
+                placeholder="이메일 인증코드"
+                maxWidth="sm"
+                {...register('code', { ...emailCodeRegisterOptions })}
+              />
+              {seconds > 0 ? (
+                <Text as="span" color="tomato">
+                  {`0${Math.floor(seconds / 60)}`}:
+                  {seconds % 60 < 10 ? `0${seconds % 60}` : seconds % 60}
+                </Text>
+              ) : (
+                <Text as="span" color="tomato">
+                  00:00
+                </Text>
+              )}
+            </Flex>
             <FormErrorMessage>{errors.code && errors.code.message}</FormErrorMessage>
+
             <Flex alignItems="center" my={1}>
               <Text fontSize="sm" color="gray.500">
                 인증번호가 올바르게 도착하지 않았나요?

@@ -14,9 +14,9 @@ export function MypageBreadcrumb(): JSX.Element {
   const convertToKorean = (pathname: string): string => {
     switch (pathname) {
       case 'mypage':
-        return '마이페이지';
+        return '홈';
       case 'mypage#':
-        return '마이페이지';
+        return '홈';
       case 'goods':
         return '상품';
       case 'regist':
@@ -56,7 +56,7 @@ export function MypageBreadcrumb(): JSX.Element {
   }
 
   return (
-    <Box m={2} ml={6}>
+    <Box p={2} pl={6}>
       <Breadcrumb separator=">">
         {breadcrumbs.map((breadcrumb, i) => {
           return (
