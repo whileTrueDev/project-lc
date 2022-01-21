@@ -1,11 +1,8 @@
 import { Box, Heading, Text } from '@chakra-ui/react';
 import { AdminBusinessRegistrationList } from '@project-lc/components-admin/AdminBusinessRegistrationList';
 import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
-import { useAdminSettlementInfo } from '@project-lc/hooks';
 
 export function SellerBusinessRegistration(): JSX.Element {
-  const { data: settlementData } = useAdminSettlementInfo();
-
   return (
     <AdminPageLayout>
       <Box position="relative">
@@ -15,9 +12,7 @@ export function SellerBusinessRegistration(): JSX.Element {
             <Text fontSize="lg" fontWeight="medium" pb={1}>
               등록된 사업자 등록 정보
             </Text>
-            <AdminBusinessRegistrationList
-              sellerBusinessRegistrations={settlementData?.sellerBusinessRegistration}
-            />
+            <AdminBusinessRegistrationList />
           </Box>
         </Box>
       </Box>

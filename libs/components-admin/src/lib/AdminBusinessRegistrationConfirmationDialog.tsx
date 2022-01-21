@@ -8,7 +8,15 @@ import {
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/modal';
-import { Grid, useToast } from '@chakra-ui/react';
+import {
+  Grid,
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Stack,
+  useToast,
+} from '@chakra-ui/react';
 import { GridRowData } from '@material-ui/data-grid';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
 import { useBusinessRegistrationConfirmationMutation } from '@project-lc/hooks';
@@ -54,9 +62,23 @@ export function AdminBusinessRegistrationConfirmationDialog({
           <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
             <GridTableItem title="회사명" value={row?.companyName} />
           </Grid>
+          {!row?.agreementFlag && (
+            <Alert status="error">
+              <Stack>
+                <AlertIcon />
+                <AlertTitle>이용동의를 하지 않은 사용자입니다</AlertTitle>
+                <AlertDescription>
+                  해당 판매자는 이용 약관에 동의를 하지 않았으므로 사업자 등록정보를
+                  승인할 수 없습니다.
+                </AlertDescription>
+              </Stack>
+            </Alert>
+          )}
         </ModalBody>
         <ModalFooter>
-          <Button onClick={useSubmit}>승인하기</Button>
+          <Button isDisabled={!row?.agreementFlag} onClick={useSubmit}>
+            승인하기
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

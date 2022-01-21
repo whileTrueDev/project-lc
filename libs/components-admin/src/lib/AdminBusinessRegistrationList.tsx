@@ -2,7 +2,7 @@ import { Badge, Button, useDisclosure } from '@chakra-ui/react';
 import { GridCellParams, GridColumns } from '@material-ui/data-grid';
 import { SellerBusinessRegistration } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { useDisplaySize } from '@project-lc/hooks';
+import { useDisplaySize, useAdminSettlementInfo } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { AdminBusinessRegistrationConfirmationDialog } from './AdminBusinessRegistrationConfirmationDialog';
@@ -128,11 +128,9 @@ export function ConfirmationBadge({ status }: { status: string }): JSX.Element {
 }
 
 // 관리자가 볼 계좌번호 등록 리스트
-export function AdminBusinessRegistrationList(props: {
-  sellerBusinessRegistrations: SellerBusinessRegistration[];
-}): JSX.Element {
+export function AdminBusinessRegistrationList(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
-  const { sellerBusinessRegistrations } = props;
+  const { data: settlementData } = useAdminSettlementInfo();
   const [selectedRow, setSelectedRow] = useState({});
   const {
     isOpen: isConfirmationOpen,
@@ -160,21 +158,25 @@ export function AdminBusinessRegistrationList(props: {
 
   return (
     <>
-      <ChakraDataGrid
-        borderWidth={0}
-        hideFooter
-        headerHeight={50}
-        minH={300}
-        density="compact"
-        columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
-        rows={makeListRow<SellerBusinessRegistration>(sellerBusinessRegistrations)}
-        rowCount={5}
-        rowsPerPageOptions={[25, 50]}
-        onCellClick={handleClick}
-        disableColumnMenu
-        disableColumnFilter
-        disableSelectionOnClick
-      />
+      {settlementData && (
+        <ChakraDataGrid
+          borderWidth={0}
+          hideFooter
+          headerHeight={50}
+          minH={300}
+          density="compact"
+          columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
+          rows={makeListRow<SellerBusinessRegistration>(
+            settlementData.sellerBusinessRegistration,
+          )}
+          rowCount={5}
+          rowsPerPageOptions={[25, 50]}
+          onCellClick={handleClick}
+          disableColumnMenu
+          disableColumnFilter
+          disableSelectionOnClick
+        />
+      )}
       <AdminBusinessRegistrationRejectionDialog
         isOpen={isRejectionOpen}
         onClose={onRejectionClose}
