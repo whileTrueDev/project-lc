@@ -191,13 +191,13 @@ export function PurchaseMessageItem({
   item: LiveShoppingPurchaseMessage;
   index: number;
 }): JSX.Element {
-  const { nickname, text, price, giftFlag } = item;
+  const { nickname, text, price } = item;
   return (
     <MessageItemLayout
       item={{
         index: index.toString(),
         nickname,
-        message: `${giftFlag ? '(선물)' : ''} ${text}`,
+        message: text,
         price: `${price.toLocaleString()}원`,
       }}
       bg={index % 2 === 0 ? 'teal.50' : 'gray.50'}
