@@ -57,19 +57,21 @@ export class MailVerificationService {
     code: string,
   ): Promise<MailVerificationCode> {
     const targetTime = new Date();
-    targetTime.setMinutes(-10);
+    targetTime.setMinutes(targetTime.getMinutes() - 10);
     const row = await this.prisma.mailVerificationCode.findFirst({
       orderBy: { createDate: 'desc' },
       where: {
         email,
-        verificationCode: code,
         createDate: {
           gt: targetTime,
         },
       },
     });
 
-    return row;
+    if (row?.verificationCode === code) {
+      return row;
+    }
+    return null;
   }
 
   /**

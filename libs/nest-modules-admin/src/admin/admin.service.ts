@@ -22,6 +22,11 @@ export class AdminService {
         sellerBusinessRegistration: {
           include: {
             BusinessRegistrationConfirmation: true,
+            seller: {
+              select: {
+                agreementFlag: true,
+              },
+            },
           },
           orderBy: {
             id: 'desc',
@@ -115,6 +120,12 @@ export class AdminService {
         },
         confirmation: true,
         ShippingGroup: true,
+        seller: {
+          select: {
+            name: true,
+            agreementFlag: true,
+          },
+        },
       },
     });
 
@@ -136,6 +147,8 @@ export class AdminService {
         default_price: defaultOption.price, // 판매가(할인가)
         default_consumer_price: defaultOption.consumer_price, // 소비자가(미할인가)
         confirmation: item.confirmation,
+        name: item.seller.name,
+        agreementFlag: item.seller.agreementFlag,
         shippingGroup: item.ShippingGroup
           ? {
               id: item.ShippingGroup.id,

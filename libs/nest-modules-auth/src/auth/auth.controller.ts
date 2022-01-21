@@ -73,9 +73,13 @@ export class AuthController {
 
   // * 인증코드 메일 전송
   @Post('mail-verification')
-  sendMailVerification(
+  async sendMailVerification(
     @Body(ValidationPipe) dto: SendMailVerificationDto,
   ): Promise<boolean> {
+    if (dto.isNotInitial) {
+      await this.mailVerificationService.deleteSuccessedMailVerification(dto.email);
+    }
+
     return this.mailVerificationService.sendVerificationMail(dto.email);
   }
 

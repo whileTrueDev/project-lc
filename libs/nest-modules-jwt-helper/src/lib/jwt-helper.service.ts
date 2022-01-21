@@ -72,6 +72,21 @@ export class JwtHelperService {
     });
   }
 
+  simpleVerifyAccessToken(token: string): UserPayload {
+    try {
+      let realToken = token;
+      if (token.includes('Bearer')) {
+        const splited = token.split(' ');
+        // eslint-disable-next-line prefer-destructuring
+        realToken = splited[1];
+      }
+      return this.jwtService.verify(realToken);
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
+
   private castUserPayload(userPayload: UserPayload): UserPayload {
     return {
       id: userPayload.id,

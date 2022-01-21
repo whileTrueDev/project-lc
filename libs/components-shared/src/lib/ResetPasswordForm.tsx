@@ -70,6 +70,10 @@ export function ResetPasswordForm(): JSX.Element {
   // 0 : 이메일 입력
   // 1 : 인증코드 입력
   // 2 : 비밀번호 변경
+
+  // 이메일 코드 최초전송 여부
+  const [isNotInitial, setIsNotInitial] = useState(false);
+
   const moveToStepZero = useCallback(() => {
     setStep(0);
     reset();
@@ -110,6 +114,7 @@ export function ResetPasswordForm(): JSX.Element {
     // 인증코드 전송 후 StepOne(코드확인)로 이동
     sendEmailCode({ email })
       .then(() => {
+        setIsNotInitial(true);
         moveToStepOne();
       })
       .catch((err) => {
@@ -150,7 +155,7 @@ export function ResetPasswordForm(): JSX.Element {
   // 인증코드 재전송
   const reSendCode = useCallback(async () => {
     const email = getValues('email');
-    sendEmailCode({ email })
+    sendEmailCode({ email, isNotInitial })
       .then(() => {
         toast({
           title: '인증코드 재전송 성공',
@@ -163,7 +168,14 @@ export function ResetPasswordForm(): JSX.Element {
         console.error(err);
         showCodeSendErrorToast();
       });
-  }, [getValues, sendEmailCode, showCodeSendErrorToast, startCountdown, toast]);
+  }, [
+    getValues,
+    sendEmailCode,
+    showCodeSendErrorToast,
+    startCountdown,
+    toast,
+    isNotInitial,
+  ]);
 
   return (
     <CenterBox enableShadow header={resetPasswordStepHeaders[step].header}>

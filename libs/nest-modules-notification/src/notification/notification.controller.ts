@@ -9,6 +9,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { UserNotification } from '@prisma/client';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateMultipleNotificationDto,
   CreateNotificationDto,
@@ -16,7 +17,6 @@ import {
   MarkNotificationReadStateDto,
   UserType,
 } from '@project-lc/shared-types';
-import { JwtAuthGuard, AdminGuard } from '@project-lc/nest-modules-authguard';
 import { NotificationService } from './notification.service';
 
 @UseGuards(JwtAuthGuard)

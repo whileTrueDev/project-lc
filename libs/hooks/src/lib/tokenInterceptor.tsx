@@ -1,6 +1,6 @@
 import { AxiosInstance, AxiosResponse } from 'axios';
 
-export function tokenInterceptor(axiosInstance: AxiosInstance): void {
+export function setTokenInterceptor(axiosInstance: AxiosInstance): void {
   axiosInstance.interceptors.response.use((response: AxiosResponse<any>) => {
     if (response.headers['x-wt-access-token']) {
       if (response.headers['x-wt-access-token'] === 'logout') {
@@ -13,4 +13,4 @@ export function tokenInterceptor(axiosInstance: AxiosInstance): void {
   });
 }
 
-export default tokenInterceptor;
+export default setTokenInterceptor;

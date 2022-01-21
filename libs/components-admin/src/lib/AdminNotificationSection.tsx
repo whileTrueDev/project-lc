@@ -18,6 +18,7 @@ import {
   useBoolean,
   useToast,
 } from '@chakra-ui/react';
+import { UserNotification } from '@prisma/client';
 import {
   QuickSearchInput,
   QuickSearchInputProps,
@@ -25,9 +26,15 @@ import {
 import {
   useAdminCreateMultipleNotification,
   useAdminCreateNotification,
+  useNotificationSubscription,
 } from '@project-lc/hooks';
-import { UserType } from '@project-lc/shared-types';
+import {
+  NotificationClientToServerEvents,
+  NotificationServerToClientEvents,
+  UserType,
+} from '@project-lc/shared-types';
 import { FormProvider, useForm } from 'react-hook-form';
+import { io, Socket } from 'socket.io-client';
 import AdminNotificationBroadcasterList from './AdminNotificationBroadcasterList';
 import AdminNotificationSellerList from './AdminNotificationSellerList';
 
@@ -57,6 +64,7 @@ export function AdminSendNotificationDialog({
   const [confirmed, { on, off }] = useBoolean();
   const createOneNotification = useAdminCreateNotification();
   const createMultipleNotification = useAdminCreateMultipleNotification();
+  const socket = useNotificationSubscription();
 
   const handleClose = (): void => {
     onClose();
@@ -67,8 +75,9 @@ export function AdminSendNotificationDialog({
   const onSubmit = async (data: NotificationMessage): Promise<void> => {
     if (!confirmed) return;
 
-    const handleSuccess = (res: any): void => {
+    const handleSuccess = (newNoti: UserNotification): void => {
       toast({ title: '메시지 전송 성공', status: 'success' });
+      socket?.emit('create', { ...newNoti, userType: newNoti.userType as UserType });
       handleClose();
     };
 

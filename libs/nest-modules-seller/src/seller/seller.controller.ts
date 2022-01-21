@@ -74,6 +74,7 @@ export class SellerController {
     if (!checkResult) {
       throw new BadRequestException('인증코드가 올바르지 않습니다.');
     }
+
     const seller = await this.sellerService.signUp(dto);
     await this.mailVerificationService.deleteSuccessedMailVerification(dto.email);
     return seller;
