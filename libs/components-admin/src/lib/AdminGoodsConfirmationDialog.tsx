@@ -16,6 +16,11 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Stack,
   useMergeRefs,
   useToast,
 } from '@chakra-ui/react';
@@ -28,7 +33,12 @@ import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 
 // 검수 승인시에 필요한 최소한의 데이터
-export type GoodRowType = { id: number; goods_name: string };
+export type GoodRowType = {
+  id: number;
+  goods_name: string;
+  name: string;
+  agreementFlag: boolean;
+};
 
 type GoodsConfirmationDialogType = {
   isOpen: boolean;
@@ -105,6 +115,18 @@ export function AdminGoodsConfirmationDialog(
           <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
             <GridTableItem title="현재 상품명" value={row?.goods_name} />
           </Grid>
+          {!row?.agreementFlag && (
+            <Alert status="error">
+              <Stack>
+                <AlertIcon />
+                <AlertTitle>이용동의를 하지 않은 사용자입니다</AlertTitle>
+                <AlertDescription>
+                  해당 판매자(<b>{row?.name}</b>)는 이용 약관에 동의를 하지 않았으므로
+                  상품 승인을 할 수 없습니다.
+                </AlertDescription>
+              </Stack>
+            </Alert>
+          )}
           <FormControl isInvalid={!!errors.firstmallGoodsConnectionId} m={2} mt={6}>
             <FormLabel fontSize="md">상품 ID</FormLabel>
             <FormHelperText>
@@ -141,7 +163,7 @@ export function AdminGoodsConfirmationDialog(
           <Button
             type="submit"
             isLoading={isSubmitting}
-            isDisabled={!watch('firstmallGoodsConnectionId')}
+            isDisabled={!watch('firstmallGoodsConnectionId') || !row?.agreementFlag}
           >
             승인하기
           </Button>

@@ -37,7 +37,13 @@ function formatDate(date: Date): string {
 
 // * 상품목록 datagrid 컬럼 ***********************************************
 const columns: GridColumns = [
-  { field: 'sellerId', headerName: '판매자 ID', minWidth: 110, sortable: false },
+  {
+    field: 'name',
+    headerName: '판매자 ID',
+    minWidth: 110,
+    sortable: false,
+    valueGetter: ({ row }) => row.name,
+  },
   {
     field: 'goods_name',
     headerName: '상품명',
@@ -169,7 +175,6 @@ export function AdminGoodsList(): JSX.Element {
       enabled: !!profileData?.email,
     },
   );
-
   async function handleClick(param: GridCellParams): Promise<void> {
     if (param.field === 'confirmation') {
       setSelectedRow(param.row);
