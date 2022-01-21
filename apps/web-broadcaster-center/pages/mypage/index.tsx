@@ -44,32 +44,35 @@ export function Index(): JSX.Element {
     };
   }, [broadcasterContacts]);
 
-  const steps = [
-    {
-      label: '이용약관 동의',
-      component: <GuideContractionAgreementSection userType="broadcaster" />,
-    },
-    {
-      label: '연락처 등록',
-      component: <AddressSection />,
-    },
-    {
-      label: '채널링크 등록',
-      component: <ChannelSection />,
-    },
-    {
-      label: '라이브 쇼핑 준비',
-      component: <OverayUrlSection />,
-    },
-    {
-      label: '라이브 쇼핑 화면',
-      component: <LiveShoppingMonitorSection />,
-    },
-    {
-      label: '수익금 출금',
-      component: <SettlementsSection />,
-    },
-  ];
+  const steps = useMemo(
+    () => [
+      {
+        label: '이용약관 동의',
+        component: <GuideContractionAgreementSection userType="broadcaster" />,
+      },
+      {
+        label: '연락처 등록',
+        component: <AddressSection />,
+      },
+      {
+        label: '채널링크 등록',
+        component: <ChannelSection />,
+      },
+      {
+        label: '라이브 쇼핑 준비',
+        component: <OverayUrlSection />,
+      },
+      {
+        label: '라이브 쇼핑 화면',
+        component: <LiveShoppingMonitorSection />,
+      },
+      {
+        label: '수익금 출금',
+        component: <SettlementsSection />,
+      },
+    ],
+    [],
+  );
 
   // 기본 연락처 부재시에 시작가이드 실행영역
   useEffect(() => {

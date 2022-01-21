@@ -231,6 +231,8 @@ export function LiveShoppingList(): JSX.Element {
       headerName: '',
       field: '',
       width: 100,
+      sortable: false,
+      disableColumnMenu: true,
       renderCell: ({ row }: GridRowData) => (
         <Stack direction="row">
           <Button
@@ -271,6 +273,8 @@ export function LiveShoppingList(): JSX.Element {
       headerName: '',
       field: '',
       width: 80,
+      sortable: false,
+      disableColumnMenu: true,
       renderCell: ({ row }: GridRowData) => (
         <Stack direction="column">
           <Button

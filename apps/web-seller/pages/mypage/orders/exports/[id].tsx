@@ -9,7 +9,7 @@ import { OrderDetailDeliveryInfo } from '@project-lc/components-seller/OrderDeta
 import { useFmExport } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { OrderDetailLoading } from '../orders/[orderId]';
+import { OrderDetailLoading } from '../[orderId]';
 
 export default function ExportsDetail(): JSX.Element {
   const router = useRouter();

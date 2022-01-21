@@ -1,17 +1,25 @@
-import { Button, Stack } from '@chakra-ui/react';
-import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { AddIcon } from '@chakra-ui/icons';
+import { Box, Button, Link } from '@chakra-ui/react';
 import { SellerGoodsList } from '@project-lc/components-seller/SellerGoodsList';
-import Link from 'next/link';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import NextLink from 'next/link';
 
 export function Goods(): JSX.Element {
   return (
     <MypageLayout>
-      <Stack direction="row" p={2} justifyContent="flex-end">
-        <Link href="/mypage/goods/regist" passHref>
-          <Button colorScheme="blue">상품등록</Button>
-        </Link>
-      </Stack>
-      <SellerGoodsList />
+      <Box m={[2, 4]}>
+        <NextLink href="/mypage/goods/regist" passHref>
+          <Link href="/mypage/goods/regist">
+            <Button size="sm" colorScheme="blue" leftIcon={<AddIcon />}>
+              상품 등록
+            </Button>
+          </Link>
+        </NextLink>
+
+        <Box mt={4}>
+          <SellerGoodsList />
+        </Box>
+      </Box>
     </MypageLayout>
   );
 }

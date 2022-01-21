@@ -19,9 +19,7 @@ import { useFormContext } from 'react-hook-form';
 export function LiveShoppingManagerContacts(): JSX.Element {
   const { setDefault, handleSetDefault } = liveShoppingRegist();
   const { data: profileData } = useProfile();
-  const { data } = useDefaultContacts({
-    email: profileData?.email || '',
-  });
+  const { data } = useDefaultContacts({ email: profileData?.email });
 
   const {
     register,

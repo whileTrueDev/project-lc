@@ -31,10 +31,13 @@ export function Index(): JSX.Element {
   return (
     <MypageLayout>
       <Container maxW="7xl" p={6}>
-        <Heading mb={4}>정산</Heading>
+        <Heading as="h6" size="md" mb={4}>
+          정산 정보
+        </Heading>
+
         <VStack spacing={1} alignItems="stretch">
           <Grid gap={3} templateColumns="repeat(6, 1fr)">
-            <GridItem colSpan={[6, 3, 3, 3]} rowSpan={1} alignItems="stretch">
+            <GridItem colSpan={[6, 6, 6, 3]} rowSpan={1} alignItems="stretch">
               {/* 정산 상태 BOX */}
               <SettlementStateBox
                 hasAccount={hasAccount}
@@ -42,14 +45,14 @@ export function Index(): JSX.Element {
                 sellerBusinessRegistration={settlementData?.sellerBusinessRegistration[0]}
               />
             </GridItem>
-            <GridItem colSpan={[6, 3, 3, 3]} rowSpan={2} alignItems="stretch">
+            <GridItem colSpan={[6, 6, 6, 3]} rowSpan={2} alignItems="stretch">
               {/* 계좌번호 BOX */}
               <SettlementAccountBox
                 settlementAccount={settlementData?.sellerSettlementAccount[0]}
                 refetch={refetch}
               />
             </GridItem>
-            <GridItem colSpan={[6, 3, 3, 3]} rowSpan={2} alignItems="stretch">
+            <GridItem colSpan={[6, 6, 6, 3]} rowSpan={2} alignItems="stretch">
               {/* 사업자 등록증 BOX */}
               <BusinessRegistrationBox
                 sellerBusinessRegistration={settlementData?.sellerBusinessRegistration[0]}
@@ -62,7 +65,9 @@ export function Index(): JSX.Element {
       </Container>
 
       <Container maxW="7xl" p={6}>
-        <Heading mb={4}>정산 내역</Heading>
+        <Heading as="h6" size="md" mb={4}>
+          정산 내역
+        </Heading>
         <SettlementRoundHistory />
       </Container>
 

@@ -52,9 +52,7 @@ export function ShopNameSection(): JSX.Element {
       )}
       <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
         <GridItem {...useDialogHeaderConfig(useColorModeValue)}>현재 상점명</GridItem>
-        <GridItem {...useDialogValueConfig(useColorModeValue)}>
-          <Text fontSize="lg">{data?.shopName}</Text>
-        </GridItem>
+        <GridItem {...useDialogValueConfig(useColorModeValue)}>{data?.shopName}</GridItem>
       </Grid>
 
       <Button width="200px" onClick={onOpen}>

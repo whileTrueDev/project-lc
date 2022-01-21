@@ -92,7 +92,14 @@ export function SettlementAccountDialog(
   }
 
   return (
-    <Modal isOpen={isOpen} size="3xl" onClose={useClose} closeOnEsc={false}>
+    <Modal
+      isCentered
+      scrollBehavior="inside"
+      isOpen={isOpen}
+      size="3xl"
+      onClose={useClose}
+      closeOnEsc={false}
+    >
       <ModalOverlay />
       <FormProvider {...methods}>
         <ModalContent as="form" onSubmit={handleSubmit(regist)}>

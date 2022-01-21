@@ -27,6 +27,7 @@ export interface MypageSidebarPrpps {
   isFolded?: boolean;
 }
 export function MypageSidebar({ navLinks, isFolded }: MypageSidebarPrpps): JSX.Element {
+  const realNavLinks = navLinks.filter((l) => !l.isInvisible);
   const router = useRouter();
 
   // * 현재 페이지에 매치하는지 확인 함수
@@ -37,14 +38,14 @@ export function MypageSidebar({ navLinks, isFolded }: MypageSidebarPrpps): JSX.E
 
   // * 현재 페이지에 매치하는 link의 인덱스(해당 accordion item open하기 위함)
   const matchedLinkIndex = useMemo(() => {
-    const index = navLinks.findIndex((link) => isMatched(link));
+    const index = realNavLinks.findIndex((link) => isMatched(link));
     return index;
-  }, [isMatched, navLinks]);
+  }, [isMatched, realNavLinks]);
 
   if (isFolded) {
     return (
       <Box as="nav">
-        {navLinks.map((link) => (
+        {realNavLinks.map((link) => (
           <FoldedSidebarItem key={link.name} link={link} isMatched={isMatched(link)} />
         ))}
       </Box>
@@ -53,7 +54,7 @@ export function MypageSidebar({ navLinks, isFolded }: MypageSidebarPrpps): JSX.E
 
   return (
     <Accordion as="nav" allowMultiple allowToggle defaultIndex={[matchedLinkIndex]}>
-      {navLinks.map((link) => (
+      {realNavLinks.map((link) => (
         <SidebarItem key={link.name} link={link} isMatched={isMatched(link)} />
       ))}
     </Accordion>
@@ -81,9 +82,10 @@ function FoldedSidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element {
               py={4}
               px={4}
               _hover={{ bg: hoverColor, color: 'whiteAlpha.900' }}
-              bg={!link.children && isMatched ? 'blue.500' : 'none'}
-              color={!link.children && isMatched ? 'white' : 'inherit'}
-              fontWeight={!link.children && isMatched ? 'bold' : 'medium'}
+              _focus={{ bg: hoverColor, color: 'whiteAlpha.900' }}
+              bg={isMatched ? 'blue.500' : 'none'}
+              color={isMatched ? 'white' : 'inherit'}
+              fontWeight={isMatched ? 'bold' : 'medium'}
               onClick={() => {
                 if (!link.children) router.push(link.href);
               }}
@@ -101,12 +103,13 @@ function FoldedSidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element {
         <Portal>
           <PopoverContent border={0} boxShadow="xl" rounded="lg" maxW="200px">
             {link.children.map((child) => (
-              <SidebarChildItem
-                key={child.name}
-                link={child}
-                hoverColor={hoverColor}
-                leftSpacing={false}
-              />
+              <Box key={child.name} m={1} my={0.5}>
+                <SidebarChildItem
+                  link={child}
+                  hoverColor={hoverColor}
+                  leftSpacing={false}
+                />
+              </Box>
             ))}
           </PopoverContent>
         </Portal>
@@ -125,11 +128,12 @@ export function SidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element 
         py={3}
         textAlign="left"
         borderRadius="md"
-        bg={!link.children && isMatched ? 'blue.500' : 'none'}
-        color={!link.children && isMatched ? 'white' : 'inherit'}
-        fontWeight={!link.children && isMatched ? 'bold' : 'medium'}
+        bg={isMatched ? 'blue.500' : 'none'}
+        color={isMatched ? 'white' : 'inherit'}
+        fontWeight={isMatched ? 'bold' : 'medium'}
         fontSize={{ base: 'lg', sm: 'sm' }}
         _hover={{ bg: hoverColor, color: 'whiteAlpha.900' }}
+        _focus={{ bg: hoverColor, color: 'whiteAlpha.900' }}
         justifyContent="space-between"
         alignItems="center"
         onClick={() => {
@@ -173,6 +177,7 @@ function SidebarChildItem({
         role="group"
         rounded="md"
         _hover={{ bg: hoverColor, color: 'whiteAlpha.900' }}
+        _focus={{ bg: hoverColor, color: 'whiteAlpha.900' }}
         bg={isMatched ? 'blue.500' : 'none'}
         color={isMatched ? 'white' : 'inherit'}
         fontWeight={isMatched ? 'bold' : 'medium'}

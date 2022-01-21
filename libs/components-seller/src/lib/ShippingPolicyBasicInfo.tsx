@@ -92,7 +92,7 @@ export function ShippingPolicyBasicInfo(): JSX.Element {
   }, [shipping_add_free_yn, shipping_std_free_yn]);
 
   return (
-    <SectionWithTitle title="기본정보">
+    <SectionWithTitle title="기본정보" disableDivider>
       {/* 배송그룹명 */}
       <ShippingPolicyFormControlWithLabel id="shipping-group-name" label="배송그룹명">
         <Input value={groupName} onChange={setGroupName} maxLength={16} />

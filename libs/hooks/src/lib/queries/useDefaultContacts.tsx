@@ -4,7 +4,7 @@ import { SellerContactsDTO } from '@project-lc/shared-types';
 import axios from '../../axios';
 
 export const getDefaultSellerContact = async (
-  email: string,
+  email?: string,
 ): Promise<SellerContactsDTO> => {
   return axios
     .get<SellerContactsDTO>('/seller/contacts', {
@@ -16,9 +16,13 @@ export const getDefaultSellerContact = async (
 export const useDefaultContacts = ({
   email,
 }: {
-  email: string;
+  email?: string;
 }): UseQueryResult<SellerContactsDTO, AxiosError> => {
-  return useQuery<SellerContactsDTO, AxiosError>(['defaultSellerContact', email], () =>
-    getDefaultSellerContact(email),
+  return useQuery<SellerContactsDTO, AxiosError>(
+    ['defaultSellerContact', email],
+    () => getDefaultSellerContact(email),
+    {
+      enabled: !!email,
+    },
   );
 };

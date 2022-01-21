@@ -1,4 +1,4 @@
-import { Button, Heading, Stack } from '@chakra-ui/react';
+import { Button, Stack } from '@chakra-ui/react';
 import { useSaveShippingGroup } from '@project-lc/hooks';
 import ShippingPolicyBasicInfo from './ShippingPolicyBasicInfo';
 import ShippingPolicySetList from './ShippingPolicySetList';
@@ -11,12 +11,7 @@ export function ShippingPolicyForm({
   const { saveShippingPolicy, isLoading } = useSaveShippingGroup({ onSuccess });
 
   return (
-    <Stack p={4} spacing={6}>
-      {/* 헤더 */}
-      <Heading as="h3" size="lg" textAlign="center">
-        배송비 정책
-      </Heading>
-
+    <Stack spacing={4}>
       {/* 기본정보 - 배송그룹명, 배송비 계산 기준, 배송비 추가 설정, 반송지 */}
       <ShippingPolicyBasicInfo />
 

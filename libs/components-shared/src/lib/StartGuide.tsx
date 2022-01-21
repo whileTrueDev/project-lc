@@ -68,6 +68,7 @@ export function StartGuide({
       }}
       size="2xl"
       scrollBehavior="inside"
+      isCentered
     >
       <ModalOverlay />
       <ModalContent>

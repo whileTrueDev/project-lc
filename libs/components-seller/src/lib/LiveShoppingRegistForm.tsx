@@ -58,9 +58,7 @@ export function LiveShoppingRegistForm(): JSX.Element {
     email: profileData?.email || '',
   });
 
-  const contacts = useDefaultContacts({
-    email: profileData?.email || '',
-  });
+  const contacts = useDefaultContacts({ email: profileData?.email });
 
   const methods = useForm<LiveShoppingInput>({
     defaultValues: {
@@ -133,7 +131,6 @@ export function LiveShoppingRegistForm(): JSX.Element {
 
   return (
     <>
-      <Heading>라이브 쇼핑 신청</Heading>
       <FormProvider {...methods}>
         <Stack w="100%" mt={10} spacing={12} as="form" onSubmit={handleSubmit(regist)}>
           {!contacts.isLoading && !contacts.error && (

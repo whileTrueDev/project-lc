@@ -72,6 +72,7 @@ export function SellerMainHeroImageSection(): JSX.Element {
         <Text
           color={useColorModeValue('gray.600', 'gray.200')}
           fontSize={{ base: 'md', sm: 'lg' }}
+          fontFamily="Gmarket Sans"
         >
           {desc}
         </Text>

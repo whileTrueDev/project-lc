@@ -32,14 +32,14 @@ export function Index(): JSX.Element {
   }, [isLoading, onOpen, agreementFlag]);
   return (
     <MypageLayout>
-      <Container maxW="7xl" p={[1, 6, 6, 6]}>
+      <Container maxW="7xl" p={[1, 6]}>
         {/* 판매자 검수상태 영역 */}
         <SellerStatusSection />
         {/* 마이페이지 요약지표 영역 */}
         <MypageStatsSection />
 
         <Grid p={2} pt={1} gap={3} templateColumns="repeat(7, 1fr)">
-          <GridItem colSpan={{ base: 7, lg: 5 }} alignItems="stretch">
+          <GridItem colSpan={7} alignItems="stretch">
             {/* 공지사항 영역 */}
             <MypageNoticeSection />
           </GridItem>

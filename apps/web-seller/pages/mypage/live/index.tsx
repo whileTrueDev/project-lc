@@ -1,25 +1,25 @@
-import { Button, Container, Heading, Stack } from '@chakra-ui/react';
-import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { AddIcon } from '@chakra-ui/icons';
+import { Box, Button, Link } from '@chakra-ui/react';
 import { LiveShoppingList } from '@project-lc/components-seller/LiveShoppingList';
-import { useRouter } from 'next/router';
-import { useDisplaySize } from '@project-lc/hooks';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import NextLink from 'next/link';
 
 export function Live(): JSX.Element {
-  const router = useRouter();
-  const { isMobileSize } = useDisplaySize();
-
   return (
     <MypageLayout>
-      <Container maxWidth="container.xxl" my={12}>
-        {!isMobileSize && <Heading>라이브 쇼핑 목록</Heading>}
-        <Stack direction="row" p={2} justifyContent="flex-end">
-          <Button colorScheme="blue" onClick={() => router.push('/mypage/live/regist')}>
-            라이브 쇼핑 진행 요청
-          </Button>
-        </Stack>
+      <Box m={[2, 4]}>
+        <NextLink href="/mypage/live/regist" passHref>
+          <Link href="/mypage/live/regist">
+            <Button size="sm" colorScheme="blue" leftIcon={<AddIcon />}>
+              라이브 쇼핑 진행 요청
+            </Button>
+          </Link>
+        </NextLink>
 
-        <LiveShoppingList />
-      </Container>
+        <Box mt={4}>
+          <LiveShoppingList />
+        </Box>
+      </Box>
     </MypageLayout>
   );
 }

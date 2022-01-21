@@ -56,22 +56,23 @@ export const kkshowNavLinks: Array<NavItem> = [
 export interface LinkItemProps {
   name: string;
   href: string;
-  icon: IconType;
+  icon?: IconType;
 }
 
-export interface SidebarMenuLink extends Omit<LinkItemProps, 'icon'> {
+export interface SidebarMenuLink extends LinkItemProps {
   children?: SidebarMenuLink[];
-  icon?: IconType;
 }
 
 export interface MypageLink extends LinkItemProps {
   children?: Omit<MypageLink, 'icon'>[];
   checkIsActive: (pathname: string, linkHref: string) => boolean;
+  isInvisible?: boolean;
 }
 
 const defaultIsActiveChecker = (pathname: string, linkHref: string): boolean =>
   pathname.includes(linkHref);
 
+/** 판매자 마이페이지 링크 */
 export const mypageNavLinks: MypageLink[] = [
   {
     icon: AiOutlineHome,
@@ -90,18 +91,29 @@ export const mypageNavLinks: MypageLink[] = [
     name: '라이브쇼핑',
     href: '/mypage/live',
     checkIsActive: defaultIsActiveChecker,
-    children: [
-      {
-        name: '내 라이브 쇼핑 관리',
-        href: '/mypage/live',
-        checkIsActive: (pathname, linkHref) => pathname === linkHref,
-      },
-    ],
+    // children: [
+    // {
+    //   name: '내 라이브 쇼핑 관리',
+    //   href: '/mypage/live',
+    //   checkIsActive: (pathname, linkHref) => pathname === linkHref,
+    // },
+    // {
+    //   name: 'VOD 관리',
+    //   href: '/mypage/live/vod',
+    //   checkIsActive: (pathname, linkHref) => pathname === linkHref,
+    // },
+    // ],
   },
   {
     icon: MdOutlineShoppingCart,
     name: '주문',
     href: '/mypage/orders',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    icon: MdPayment,
+    name: '정산',
+    href: '/mypage/settlement',
     checkIsActive: defaultIsActiveChecker,
   },
   {
@@ -111,9 +123,33 @@ export const mypageNavLinks: MypageLink[] = [
     checkIsActive: defaultIsActiveChecker,
   },
   {
-    icon: MdPayment,
-    name: '정산',
-    href: '/mypage/settlement',
+    name: '계정 설정',
+    href: '/mypage/setting',
+    checkIsActive: defaultIsActiveChecker,
+    isInvisible: true,
+  },
+  {
+    name: '등록',
+    href: 'regist',
+    isInvisible: true,
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '수정',
+    href: 'edit',
+    isInvisible: true,
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '출고',
+    href: 'exports',
+    isInvisible: true,
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '알림',
+    href: 'notifications',
+    isInvisible: true,
     checkIsActive: defaultIsActiveChecker,
   },
 ];
@@ -147,6 +183,12 @@ export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
     icon: AiOutlineSetting,
     name: '계정설정',
     href: '/mypage/setting',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '알림',
+    href: 'notifications',
+    isInvisible: true,
     checkIsActive: defaultIsActiveChecker,
   },
 ];

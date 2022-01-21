@@ -87,7 +87,14 @@ export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
   }
 
   return (
-    <Modal isOpen={isOpen} size="md" onClose={useClose} initialFocusRef={initialRef}>
+    <Modal
+      isOpen={isOpen}
+      size="md"
+      isCentered
+      scrollBehavior="inside"
+      onClose={useClose}
+      initialFocusRef={initialRef}
+    >
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(useSubmit)}>
         <ModalHeader>상점명 등록하기</ModalHeader>

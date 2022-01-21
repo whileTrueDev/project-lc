@@ -1,16 +1,15 @@
-import { Container, Heading } from '@chakra-ui/react';
-import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { Container } from '@chakra-ui/react';
 import { GoodsRegistForm } from '@project-lc/components-seller/GoodsRegistForm';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 
-export function Goods(): JSX.Element {
+export function GoodsRegist(): JSX.Element {
   return (
     <MypageLayout>
       <Container maxWidth="container.xl" my={12}>
-        <Heading>상품등록</Heading>
         <GoodsRegistForm />
       </Container>
     </MypageLayout>
   );
 }
 
-export default Goods;
+export default GoodsRegist;

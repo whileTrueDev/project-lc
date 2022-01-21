@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Link,
-  SimpleGrid,
-  Text,
-  useColorModeValue,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, SimpleGrid, Text, useColorModeValue } from '@chakra-ui/react';
 
 export function MypageFooter(): JSX.Element {
   return (
@@ -25,33 +17,41 @@ export function MypageFooter(): JSX.Element {
       display={{ base: 'none', md: 'flex' }}
     >
       <SimpleGrid direction="row" columns={{ base: 2, md: 4 }}>
-        {/* <Button size="sm" fontSize="sm" variant="ghost">
-          고객센터
-        </Button> */}
-        <Button size="sm" fontSize="sm" variant="ghost">
-          {/* 문의하기 */}
-          <Link href="https://whiletrue.notion.site/FAQ-f182f90b7e984badb031a62ddd1bd00d">
-            FAQ
-          </Link>
+        <Button
+          size="sm"
+          fontSize="sm"
+          variant="ghost"
+          onClick={() =>
+            window.open(
+              'https://whiletrue.notion.site/FAQ-f182f90b7e984badb031a62ddd1bd00d',
+            )
+          }
+        >
+          FAQ
         </Button>
-        <Button size="sm" fontSize="sm" variant="ghost">
-          <Link
-            fontWeight="bold"
-            href="https://whiletrue.notion.site/7f6758f5344246c4989ac22f3ee7532e"
-          >
-            개인정보처리방침
-          </Link>
+        <Button
+          size="sm"
+          fontSize="sm"
+          variant="ghost"
+          onClick={() =>
+            window.open('https://whiletrue.notion.site/7f6758f5344246c4989ac22f3ee7532e')
+          }
+        >
+          개인정보처리방침
         </Button>
-        <Button size="sm" fontSize="sm" variant="ghost">
-          <Link href="https://whiletrue.notion.site/41561f284f754560a64f36bc7c292861">
-            이용약관
-          </Link>
+        <Button
+          size="sm"
+          fontSize="sm"
+          variant="ghost"
+          onClick={() =>
+            window.open('https://whiletrue.notion.site/41561f284f754560a64f36bc7c292861')
+          }
+        >
+          이용약관
         </Button>
       </SimpleGrid>
       <Box mt={{ base: 4, md: 0 }}>
-        <Text fontSize="sm">
-          ⓒ {new Date().getFullYear()} whileTrue All rights reserved.
-        </Text>
+        <Text fontSize="sm">ⓒ 2019 whileTrue All rights reserved.</Text>
       </Box>
     </Flex>
   );

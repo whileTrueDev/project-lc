@@ -17,7 +17,7 @@ import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher
 import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
-import { AiTwotoneSetting } from 'react-icons/ai';
+import { AiOutlineSetting } from 'react-icons/ai';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import ProfileBox from '../ProfileBox';
 import UserNotificationMenuButton from '../UserNotificationMenuButton';
@@ -109,7 +109,7 @@ export function PersonalPopoverMenu(): JSX.Element {
         {/* 계정설정 버튼 */}
         <MenuItem
           my={1}
-          icon={<Icon fontSize="md" as={AiTwotoneSetting} />}
+          icon={<Icon fontSize="md" as={AiOutlineSetting} />}
           onClick={handleAccountSettingClick}
         >
           계정 설정
