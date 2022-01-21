@@ -65,7 +65,7 @@ export function UserNotificationList(): JSX.Element {
           w="100%"
         >
           <Box>
-            <Heading>최근 알림</Heading>
+            <Heading fontSize="2xl">최근 알림</Heading>
             <Text fontSize="sm">최근 30일 까지의 알림을 확인할 수 있습니다.</Text>
           </Box>
           <Button
