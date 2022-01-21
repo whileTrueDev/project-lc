@@ -146,6 +146,12 @@ export const mypageNavLinks: MypageLink[] = [
     isInvisible: true,
     checkIsActive: defaultIsActiveChecker,
   },
+  {
+    name: '알림',
+    href: 'notifications',
+    isInvisible: true,
+    checkIsActive: defaultIsActiveChecker,
+  },
 ];
 
 export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
@@ -177,6 +183,12 @@ export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
     icon: AiOutlineSetting,
     name: '계정설정',
     href: '/mypage/setting',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '알림',
+    href: 'notifications',
+    isInvisible: true,
     checkIsActive: defaultIsActiveChecker,
   },
 ];
