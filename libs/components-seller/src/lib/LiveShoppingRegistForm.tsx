@@ -58,9 +58,7 @@ export function LiveShoppingRegistForm(): JSX.Element {
     email: profileData?.email || '',
   });
 
-  const contacts = useDefaultContacts({
-    email: profileData?.email || '',
-  });
+  const contacts = useDefaultContacts({ email: profileData?.email });
 
   const methods = useForm<LiveShoppingInput>({
     defaultValues: {
