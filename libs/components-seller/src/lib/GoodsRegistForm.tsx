@@ -2,6 +2,7 @@ import { ChevronLeftIcon } from '@chakra-ui/icons';
 import {
   Alert,
   AlertIcon,
+  Box,
   Button,
   Center,
   Spinner,
@@ -255,7 +256,7 @@ export function GoodsRegistForm(): JSX.Element {
     <FormProvider {...methods}>
       <Stack p={2} spacing={5} as="form" onSubmit={handleSubmit(regist)}>
         <Stack
-          py={4}
+          py={2}
           mx={-2}
           direction="row"
           position="sticky"
@@ -341,5 +342,3 @@ export function GoodsRegistForm(): JSX.Element {
     </FormProvider>
   );
 }
-
-export default GoodsRegistForm;

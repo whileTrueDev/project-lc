@@ -52,7 +52,7 @@ export function OrderDetailExportInfo({
   return (
     <Box>
       <Stack direction="row" alignItems="center" my={2} spacing={1.5}>
-        <NextLink href={`/mypage/exports/${_exports.export_code}`} passHref>
+        <NextLink href={`/mypage/orders/exports/${_exports.export_code}`} passHref>
           <Link isTruncated fontWeight="bold" textDecoration="underline">
             {_exports.export_code}
           </Link>
@@ -68,15 +68,16 @@ export function OrderDetailExportInfo({
         <Text>{deliveryCompany}</Text>
         <TextDotConnector />
         <Text>{_exports.delivery_number}</Text>
-        <Button
+        {/* 배송 조회 기능 아직 준비중이므로 주석처리 by @dan */}
+        {/* <Button
           size="sm"
           onClick={() => alert(`택배조회 ${deliveryCompany} ${_exports.delivery_number}`)}
         >
-          택배 조회
-        </Button>
+          배송 조회
+        </Button> */}
       </Stack>
 
-      <Stack>
+      <Stack mt={2} spacing={1.5}>
         <Text>(출고일) {dayjs(_exports.export_date).format('YYYY년 MM월 DD일')}</Text>
         {_exports.complete_date && (
           <Text>

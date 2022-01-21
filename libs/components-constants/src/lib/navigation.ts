@@ -128,6 +128,24 @@ export const mypageNavLinks: MypageLink[] = [
     checkIsActive: defaultIsActiveChecker,
     isInvisible: true,
   },
+  {
+    name: '등록',
+    href: 'regist',
+    isInvisible: true,
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '수정',
+    href: 'edit',
+    isInvisible: true,
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '출고',
+    href: 'exports',
+    isInvisible: true,
+    checkIsActive: defaultIsActiveChecker,
+  },
 ];
 
 export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [

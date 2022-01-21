@@ -1,4 +1,4 @@
-import { Container, Grid, GridItem, Heading, VStack } from '@chakra-ui/layout';
+import { Container, Grid, GridItem, VStack } from '@chakra-ui/layout';
 import { broadcasterCenterMypageNavLinks } from '@project-lc/components-constants/navigation';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { BcSettlementHistoryBox } from '@project-lc/components-web-bc/BcSettlementHistory';
@@ -9,7 +9,6 @@ export function SettlementIndex(): JSX.Element {
   return (
     <MypageLayout appType="broadcaster" navLinks={broadcasterCenterMypageNavLinks}>
       <Container maxW="7xl" p={6}>
-        <Heading mb={4}>정산</Heading>
         <VStack spacing={6} alignItems="stretch">
           <Grid templateColumns="1fr">
             <GridItem>

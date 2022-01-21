@@ -9,7 +9,7 @@ export function SellerStatusSection(): JSX.Element {
   // 사업자등록정보 조회
   const { data: settlementData } = useSettlementInfo();
 
-  const memoizedStatus = useMemo<string>(() => {
+  const sellerStatus = useMemo<string>(() => {
     if (
       settlementData?.sellerBusinessRegistration &&
       settlementData?.sellerBusinessRegistration.length > 0
@@ -27,10 +27,10 @@ export function SellerStatusSection(): JSX.Element {
 
   return (
     <Flex direction="row" maxW="600" m={2}>
-      <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
-        <GridTableItem title="검수 상태" value={memoizedStatus} />
+      <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%']}>
+        <GridTableItem title="검수 상태" value={sellerStatus} />
       </Grid>
-      <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
+      <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%']}>
         <GridTableItem title="정산 주기" value="월 2회" />
       </Grid>
     </Flex>

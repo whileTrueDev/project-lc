@@ -1,4 +1,6 @@
 import {
+  ListItem,
+  OrderedList,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -22,13 +24,14 @@ export function SettlementPopoverButton({
         </PopoverHeader>
         <PopoverArrow />
         <PopoverBody>
-          <Text as="u" fontSize="xs">
-            1. 사업자 등록증이 등록되었는지 확인해주세요.
-          </Text>
-          <br />
-          <Text as="u" fontSize="xs">
-            2. 정산 계좌가 등록되었는지 확인해주세요.
-          </Text>
+          <OrderedList>
+            <ListItem fontSize="xs">
+              <Text>사업자 등록증이 등록되었는지 확인해주세요.</Text>
+            </ListItem>
+            <ListItem fontSize="xs">
+              <Text>정산 계좌가 등록되었는지 확인해주세요.</Text>
+            </ListItem>
+          </OrderedList>
         </PopoverBody>
       </PopoverContent>
     </Popover>

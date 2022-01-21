@@ -128,6 +128,8 @@ export function BusinessRegistrationDialog(
     <Modal
       isOpen={isOpen}
       size="3xl"
+      isCentered
+      scrollBehavior="inside"
       onClose={useClose}
       closeOnEsc={false}
       initialFocusRef={inputRef}
@@ -135,7 +137,7 @@ export function BusinessRegistrationDialog(
       <ModalOverlay />
       <FormProvider {...methods}>
         <ModalContent as="form" onSubmit={handleSubmit(regist)}>
-          <ModalHeader>사업자 등록정보 등록</ModalHeader>
+          <ModalHeader>사업자 등록정보 입력</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <BusinessRegistrationForm ref={inputRef} />

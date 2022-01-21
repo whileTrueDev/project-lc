@@ -10,6 +10,7 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalHeader,
   ModalOverlay,
   ModalProps,
   Radio,
@@ -233,11 +234,12 @@ export function ShippingGroupRegistDialog({
   onSuccess: () => void;
 }): JSX.Element {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="full">
+    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent mx="auto">
+        <ModalHeader>배송비 정책 생성</ModalHeader>
         <ModalCloseButton />
-        <ModalBody maxW="4xl" mx="auto">
+        <ModalBody>
           <ShippingPolicyForm onSuccess={onSuccess} />
         </ModalBody>
       </ModalContent>

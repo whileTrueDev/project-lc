@@ -363,7 +363,7 @@ export function SellerGoodsList(): JSX.Element {
         onPageChange={changePage}
         components={{
           Toolbar: () => (
-            <Stack spacing={3} direction="row" justify="space-between" p={2}>
+            <Stack spacing={3} direction="row" justify="space-between">
               <Button
                 disabled={selectedGoodsIds.length <= 0}
                 onClick={onOpen}

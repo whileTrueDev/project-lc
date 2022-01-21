@@ -24,7 +24,7 @@ export function GoodsEditButton({ goods }: { goods: GoodsByIdRes }): JSX.Element
   if (onLiveShopping) return <GoodsEditDisabledText />;
 
   const handleEditClick = (): void => {
-    router.push(`/mypage/goods/edit/${goods.id}`);
+    router.push(`/mypage/goods/${goods.id}/edit`);
   };
   return (
     <Button size="sm" variant="outline" onClick={handleEditClick}>

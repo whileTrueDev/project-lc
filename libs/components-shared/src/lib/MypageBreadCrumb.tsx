@@ -1,9 +1,14 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Box } from '@chakra-ui/react';
-import NextLink from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import { ChevronRightIcon } from '@chakra-ui/icons';
-import { mypageNavLinks } from '@project-lc/components-constants/navigation';
+import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react';
+import {
+  mypageNavLinks,
+  broadcasterCenterMypageNavLinks,
+} from '@project-lc/components-constants/navigation';
+import { UserType } from '@project-lc/shared-types';
+import { flatten } from 'lodash';
+import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface BreadCrumbItem {
   path: string;
@@ -18,21 +23,39 @@ export function MypageBreadcrumb(): JSX.Element | null {
     linkPath.shift();
 
     const pathArray = linkPath.map((path, i) => {
-      return { path, href: `/${linkPath.slice(0, i + 1).join('/')}` };
+      return {
+        path,
+        href: `/${linkPath.slice(0, i + 1).join('/')}`,
+      };
     });
     setBreadcrumbs(pathArray);
   }, [router]);
 
-  const getBreadcrumbName = useCallback((pathname: string): string => {
-    if (/[0-9]+/.test(pathname)) return pathname;
-    const currNavLink = mypageNavLinks.find((link) => link.href.includes(pathname));
-    if (!currNavLink) return pathname;
-    if (!currNavLink.children) return currNavLink.name;
-    const realNavLink = currNavLink.children.find((childLink) =>
-      childLink.href.includes(pathname),
-    );
-    return realNavLink?.name || pathname;
-  }, []);
+  const appType = process.env.NEXT_PUBLIC_APP_TYPE as UserType;
+  const navLinks = useMemo(
+    () => (appType === 'broadcaster' ? broadcasterCenterMypageNavLinks : mypageNavLinks),
+    [appType],
+  );
+  const getBreadcrumbName = useCallback(
+    (pathname: string): string => {
+      if (/[0-9]+/.test(pathname)) return pathname;
+      const currNavLink = navLinks.find((link) => link.href.includes(pathname));
+      if (!currNavLink) return pathname;
+      if (!currNavLink.children) return currNavLink.name;
+      const realNavLink = currNavLink.children.find((childLink) => {
+        return childLink.href.includes(pathname);
+      });
+      return realNavLink?.name || pathname;
+    },
+    [navLinks],
+  );
+
+  const isBreadcrumbLinkable = useCallback(
+    (href: string): boolean => {
+      return Boolean(flatten(navLinks).find((l) => l.href === href));
+    },
+    [navLinks],
+  );
 
   if (!breadcrumbs) return null;
   return (
@@ -44,7 +67,12 @@ export function MypageBreadcrumb(): JSX.Element | null {
               key={breadcrumb.href}
               isCurrentPage={i + 1 === breadcrumbs.length}
             >
-              <NextLink href={breadcrumb.href} passHref>
+              <NextLink
+                href={
+                  isBreadcrumbLinkable(breadcrumb.href) ? breadcrumb.href : router.asPath
+                }
+                passHref
+              >
                 <BreadcrumbLink
                   fontWeight={i + 1 === breadcrumbs.length ? 'bold' : 'normal'}
                 >

@@ -39,7 +39,9 @@ export function LoginForm({
     register,
     formState: { errors, isSubmitting },
     setValue,
-  } = useForm<LoginUserDto>();
+  } = useForm<LoginUserDto>({
+    defaultValues: { stayLogedIn: true },
+  });
 
   // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
   const [formError, setFormError] = useState('');

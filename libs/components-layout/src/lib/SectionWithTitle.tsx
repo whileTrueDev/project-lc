@@ -14,7 +14,7 @@ export function SectionWithTitle({
 }): JSX.Element {
   if (variant === 'outlined') {
     return (
-      <Box as="section" id={title} borderWidth="1px" borderRadius="sm" p={4}>
+      <Box as="section" id={title} borderWidth="1px" borderRadius="lg" p={4}>
         <Heading as="h4" size="md" isTruncated my={2}>
           {title}
         </Heading>
