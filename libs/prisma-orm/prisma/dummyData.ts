@@ -32,7 +32,7 @@ export const common_contents = `
 
 export const TEST_ADMIN_EMAIL = 'testadmin@gmail.com';
 export const TEST_SELLER_EMAIL = 'testseller@gmail.com';
-export const TEST_BROADCASTER_EMAIL = 'testBc@gmail.com';
+export const TEST_BROADCASTER_EMAIL = 'testbc@gmail.com';
 // 비밀번호 : asdfasdf!
 export const COMMON_DUMMY_PASSWORD =
   '$argon2i$v=19$m=4096,t=3,p=1$97nVwdfXR9h8Wu38n5YuvQ$w5XgpncJVDAxURkmyJyMzDLMe2axEV6WT1PoSxNYqjY';
@@ -156,12 +156,20 @@ export const dummyGoodsList: DummyGoodsDataType[] = [
   },
 ];
 
+const startDate = new Date();
+startDate.setDate(startDate.getDate() - 7);
+const endDate = new Date();
+endDate.setDate(endDate.getDate() + 7);
+
 export const dummyLiveShoppingData: Omit<
   Prisma.LiveShoppingCreateInput,
   'seller' | 'goods' | 'sellerContacts'
 > = {
-  sellStartDate: new Date('2021-10-01 00:00:00.000'),
-  sellEndDate: new Date(),
+  broadcastStartDate: startDate.toISOString(),
+  broadcastEndDate: endDate.toISOString(),
+  sellStartDate: startDate.toISOString(),
+  sellEndDate: endDate.toISOString(),
+  liveShoppingName: '더미 라이브 쇼핑 제목',
   whiletrueCommissionRate: '5',
   broadcasterCommissionRate: '10',
   progress: 'confirmed',
