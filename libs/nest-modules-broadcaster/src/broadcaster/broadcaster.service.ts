@@ -7,10 +7,10 @@ import {
   BroadcasterDTO,
   BroadcasterRes,
   FindBroadcasterDto,
+  BroadcasterWithoutUserNickName,
   SignUpDto,
 } from '@project-lc/shared-types';
 import { hash, verify } from 'argon2';
-import { throwError } from 'rxjs';
 import { S3Service } from '@project-lc/nest-modules-s3';
 
 @Injectable()
@@ -20,19 +20,18 @@ export class BroadcasterService {
     private readonly s3service: S3Service,
   ) {}
 
-  async getBroadcasterEmail(overlayUrl: string): Promise<{ email: string }> {
-    const email = await this.prisma.broadcaster.findUnique({
+  async getBroadcasterEmail(overlayUrl: string): Promise<BroadcasterWithoutUserNickName> {
+    const dto = await this.prisma.broadcaster.findUnique({
       select: {
+        id: true,
         email: true,
       },
       where: {
         overlayUrl,
       },
     });
-    if (!email) {
-      throwError('Fail to get userId by overlayUrl');
-    }
-    return { email: email.email };
+
+    return dto;
   }
 
   async getAllBroadcasterIdAndNickname(): Promise<BroadcasterDTO[]> {

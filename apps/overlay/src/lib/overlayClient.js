@@ -5,9 +5,9 @@ const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
 const iterateLimit = $('#primary-info').data('number') + 1;
+const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const email = $('#primary-info').data('email');
 let streamerAndProduct;
-let liveShoppingId;
 let startDate = new Date('2021-09-27T14:05:00+0900');
 let endDate = new Date('2021-09-04T15:00:00+0900');
 let feverDate = new Date('2021-09-27T14:05:00+0900');
@@ -258,6 +258,11 @@ feverTimer();
 const device = getOS();
 
 socket.emit('new client', { pageUrl, device });
+
+socket.emit('get date from registered liveshopping', {
+  liveShoppingId,
+  roomName: pageUrl.split('/').pop(),
+});
 
 socket.on('get top-left ranking', (data) => {
   const rankingArray = data;
@@ -608,7 +613,7 @@ socket.on('remove notification image from server', () => {
 
 socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
   $('.alive-check').css('background-color', 'yellow');
-  liveShoppingId = liveShoppingIdAndProductName.liveShoppingId;
+  // liveShoppingId = liveShoppingIdAndProductName.liveShoppingId;
   streamerAndProduct = liveShoppingIdAndProductName.streamerAndProduct;
 
   const roomName = pageUrl.split('/').pop();

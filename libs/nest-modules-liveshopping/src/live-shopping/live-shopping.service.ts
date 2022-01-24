@@ -6,6 +6,7 @@ import {
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
   LiveShoppingFmGoodsSeq,
+  LiveShoppingId,
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
 import { LiveShopping } from '@prisma/client';
@@ -180,6 +181,24 @@ export class LiveShoppingService {
         },
         broadcastStartDate: true,
         broadcastEndDate: true,
+      },
+    });
+  }
+
+  async getLiveShoppingForOverlay(broadcasterId: number): Promise<LiveShoppingId> {
+    const now = new Date();
+    now.setHours(now.getHours() - 3);
+    return this.prisma.liveShopping.findFirst({
+      where: {
+        broadcasterId,
+        progress: 'confirmed',
+        broadcastEndDate: { gte: now },
+      },
+      select: {
+        id: true,
+      },
+      orderBy: {
+        broadcastEndDate: 'asc',
       },
     });
   }

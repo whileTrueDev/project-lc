@@ -150,7 +150,10 @@ export class OverlayService {
     return messageAndNickname;
   }
 
-  async getVerticalImagesFromS3(email: BroadcasterEmail): Promise<number> {
+  async getVerticalImagesFromS3(
+    email: BroadcasterEmail,
+    liveShoppingId: number,
+  ): Promise<number> {
     const { S3_BUCKET_NAME } = process.env;
 
     const broadcasterEmail = email.email;
@@ -158,7 +161,7 @@ export class OverlayService {
 
     const listingParams = {
       Bucket: S3_BUCKET_NAME,
-      Prefix: `vertical-banner/${broadcasterEmail}/`,
+      Prefix: `vertical-banner/${broadcasterEmail}/${liveShoppingId}`,
     };
 
     await this.s3
