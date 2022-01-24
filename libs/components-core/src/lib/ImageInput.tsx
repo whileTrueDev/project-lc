@@ -10,13 +10,13 @@ type ImageInputProps = {
   handleSuccess: (
     fileName: string,
     file: File,
-    type?: 'vertical-banner' | 'donation-images-1' | 'donation-images-2',
+    type?: 'vertical-banner' | 'donation-images-1' | 'donation-images-2' | 'overlay-logo',
   ) => void;
   handleError: (errorType?: ImageInputErrorTypes) => void;
   variant?: 'unstyle' | 'chakra';
   size?: ButtonProps['size'];
   imageSizeLimit?: number; // 업로드 파일 용량 제한
-  type?: 'vertical-banner' | 'donation-images-1' | 'donation-images-2';
+  type?: 'vertical-banner' | 'donation-images-1' | 'donation-images-2' | 'overlay-logo';
 } & Pick<React.HTMLProps<HTMLButtonElement>, 'required' | 'multiple'>;
 
 export function ImageInput({
