@@ -20,6 +20,8 @@ socket.on('creator list from server', (data) => {
 });
 
 $(document).ready(function ready() {
+  let liveShoppingStateBoardController; // 관리자 메시지 보내기(방송인 현황판 표시) 컨트롤러, liveShoppingId 할당될때 생성
+
   $('.mid-area button').attr('disabled', true);
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
   const localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
@@ -131,6 +133,15 @@ $(document).ready(function ready() {
 
     roomName = url.split('/').pop();
     getPurchaseMessage();
+
+    if (liveShoppingStateBoardController) {
+      liveShoppingStateBoardController.liveShoppingId = liveShoppingId;
+    } else {
+      liveShoppingStateBoardController = new LiveShoppingStateBoardController(
+        liveShoppingId,
+      );
+      liveShoppingStateBoardController.init();
+    }
   });
 
   $('#toggle-table-button').click(function toggleTableButtonClickEvent() {
@@ -372,3 +383,126 @@ $(document).ready(function ready() {
     });
   });
 });
+
+class LiveShoppingStateBoardController {
+  constructor(liveShoppingId) {
+    this._defaultMessage = '없음';
+    this._liveShoppingId = liveShoppingId;
+    this.container = $('.admin-to-bc-live-state-board-box');
+    this.input = this.container.find('.admin-to-bc-live-state-board__input');
+    this.sendButton = this.container.find('.admin-to-bc-live-state-board__send-button');
+    this.displayingMessage = this.container.find(
+      '.admin-to-bc-live-state-board__displaying-message',
+    );
+    this.deleteButton = this.container.find(
+      '.admin-to-bc-live-state-board__delete-button',
+    );
+    this.alertButton = this.container.find('.admin-to-bc-live-state-board__alert-button');
+  }
+
+  set liveShoppingId(liveShoppingId) {
+    this.deleteMessage(); // 새로운 liveShoppingId 할당하기전, 이전 라이브쇼핑방송에 보낸 메시지가 있다면 삭제
+    this._liveShoppingId = liveShoppingId;
+  }
+
+  init() {
+    this.input.val('');
+    this.displayingMessage.text(this._defaultMessage);
+    this.sendButton.click(() => this.sendMessage());
+    this.deleteButton.click(() => this.deleteMessage());
+    this.alertButton.click(() => this.sendAlert());
+  }
+
+  sendMessage() {
+    const message = this.input.val();
+
+    if (!message) return;
+
+    this.requestCreateMessage(
+      message,
+      (data) => {
+        this.input.val('');
+        this.displayingMessage.text(message);
+        $('#insert-dialog').fadeIn();
+        setTimeout(() => {
+          $('#insert-dialog').fadeOut();
+        }, 3000);
+      },
+      (error) => {
+        console.error(error);
+      },
+    );
+  }
+
+  deleteMessage() {
+    const currentMessage = this.displayingMessage.text();
+
+    if (currentMessage === this._defaultMessage) return;
+
+    this.requestDeleteMessage(
+      (data) => {
+        this.input.val('');
+        this.displayingMessage.text(this._defaultMessage);
+      },
+      (error) => {
+        console.error(error);
+      },
+    );
+  }
+
+  sendAlert() {
+    this.requestCreateAlert(
+      (data) => {
+        console.log('alert created', data);
+      },
+      (error) => {
+        console.error(error);
+      },
+    );
+  }
+
+  requestCreateMessage(message, successCallback, errorCallback) {
+    $.ajax({
+      type: 'POST',
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/live-shopping-state-board-message`,
+      dataType: 'json',
+      data: { liveShoppingId: this._liveShoppingId, text: message },
+      success(data) {
+        successCallback(data);
+      },
+      error(error) {
+        errorCallback(error);
+      },
+    });
+  }
+
+  requestDeleteMessage(successCallback, errorCallback) {
+    $.ajax({
+      type: 'DELETE',
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/live-shopping-state-board-message`,
+      dataType: 'json',
+      data: { liveShoppingId: this._liveShoppingId },
+      success(data) {
+        successCallback(data);
+      },
+      error(error) {
+        errorCallback(error);
+      },
+    });
+  }
+
+  requestCreateAlert(successCallback, errorCallback) {
+    $.ajax({
+      type: 'POST',
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/live-shopping-state-board-alert`,
+      dataType: 'json',
+      data: { liveShoppingId: this._liveShoppingId },
+      success(data) {
+        successCallback(data);
+      },
+      error(error) {
+        errorCallback(error);
+      },
+    });
+  }
+}

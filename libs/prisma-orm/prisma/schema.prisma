@@ -771,3 +771,20 @@ model Inquiry {
   createDate  DateTime    @default(now())
   readFlag    Boolean?    @default(false) // 관리자 처리 여부 
 }
+
+// 오버레이 컨트롤러 관리자 -> 라이브쇼핑 현황판 메시지 테이블
+model LiveShoppingStateBoardMessage {
+  id             Int    @id @default(autoincrement())
+  text           String // 메시지 내용
+  liveShoppingId Int
+
+  @@index(liveShoppingId)
+}
+
+// 오버레이 컨트롤러 관리자 -> 라이브쇼핑 현황판 알림 테이블
+model LiveShoppingStateBoardAlert {
+  id             Int @id @default(autoincrement())
+  liveShoppingId Int
+
+  @@index(liveShoppingId)
+}

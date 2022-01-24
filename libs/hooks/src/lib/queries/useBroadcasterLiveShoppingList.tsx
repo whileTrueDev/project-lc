@@ -35,7 +35,7 @@ export const useBroadcasterLiveShoppingList = ({
   broadcasterId,
 }: {
   broadcasterId: number | undefined;
-}): UseQueryResult<any[], AxiosError> => {
+}): UseQueryResult<LiveShoppingWithGoods[], AxiosError> => {
   const queryKey = ['broadcasterLiveShoppingList', broadcasterId];
   return useQuery<LiveShoppingWithGoods[], AxiosError>(
     queryKey,
