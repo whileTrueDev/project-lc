@@ -419,7 +419,7 @@ socket.on('toggle right-top onad logo from server', () => {
   } else {
     $('#kks-logo').attr(
       'src',
-      `https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-logo/${email}/${liveShoppingId}/kks-special-logo.png`,
+      `https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-logo/${email}/${liveShoppingId}/kks-special-logo`,
     );
   }
 });
