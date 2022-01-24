@@ -413,13 +413,16 @@ socket.on('get objective message', async (data) => {
   }, 5000);
 });
 
-// socket.on('toggle right-top onad logo from server', () => {
-//   if ($('#kks-logo').attr('src').includes('-')) {
-//     $('#kks-logo').attr('src', '/images/onadLogo.png');
-//   } else {
-//     $('#kks-logo').attr('src', '/images/onadLogo-gray.png');
-//   }
-// });
+socket.on('toggle right-top onad logo from server', () => {
+  if ($('#kks-logo').attr('src').includes('s3')) {
+    $('#kks-logo').attr('src', '/images/kks-default-logo.png');
+  } else {
+    $('#kks-logo').attr(
+      'src',
+      `https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-logo/${email}/${liveShoppingId}/kks-special-logo.png`,
+    );
+  }
+});
 
 // 하단 메세지 (단순 답변)
 socket.on('get bottom area message', (data) => {
