@@ -57,6 +57,44 @@ export function BroadcasterLiveShoppingList({
 
   const columns: GridColumns = [
     {
+      headerName: '',
+      field: '상세보기',
+      width: 90,
+      sortable: false,
+      disableColumnMenu: true,
+      renderCell: ({ row }: GridRowData) => (
+        <Button
+          size="xs"
+          colorScheme="blue"
+          onClick={() => {
+            handleDetailOpenClick(row.id);
+          }}
+        >
+          상세보기
+        </Button>
+      ),
+    },
+    {
+      headerName: '',
+      field: '실시간 현황',
+      width: 100,
+      sortable: false,
+      disableColumnMenu: true,
+      renderCell: ({ row }: GridRowData) => (
+        <Button
+          size="xs"
+          colorScheme="green"
+          onClick={() => {
+            const url = `${window.location.origin}/mypage/live/state/${row.id}`;
+            const windowFeatures = 'scrollbars,resizable,width=800, height=600';
+            window.open(url, '_blank', windowFeatures);
+          }}
+        >
+          실시간 현황
+        </Button>
+      ),
+    },
+    {
       field: 'liveShoppingName',
       headerName: '라이브 쇼핑명',
       minWidth: 350,
@@ -154,24 +192,6 @@ export function BroadcasterLiveShoppingList({
         }
         return <Text>업로드대기</Text>;
       },
-    },
-    {
-      headerName: '',
-      field: '',
-      width: 80,
-      sortable: false,
-      disableColumnMenu: true,
-      renderCell: ({ row }: GridRowData) => (
-        <Button
-          size="xs"
-          colorScheme="blue"
-          onClick={() => {
-            handleDetailOpenClick(row.id);
-          }}
-        >
-          상세보기
-        </Button>
-      ),
     },
   ];
 
