@@ -542,12 +542,18 @@ div.bottom-fever-timer {
   height: 54px;
 }
 
-.nsl-ranking {
+.container {
   width: 720px;
   height: 280px;
   position: absolute;
   left: 0px;
   top: 0px;
+}
+
+.nsl-ranking {
+  width: auto;
+  height: auto;
+  /* display: none; */
   background-image: url('/images/ranking-test.png');
 }
 
@@ -555,4 +561,36 @@ div.bottom-fever-timer {
   position: absolute;
   left: 0px;
   top: 0px;
+}
+
+.nsl-donation-message {
+  display: none;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  margin-left: 5px;
+  margin-bottom: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: rgb(255, 255, 255, 0.7);
+  border-radius: 35px;
+  font-family: 'NotoSansBold';
+  text-shadow: -2px -2px 0 rgb(0 0 0), 0 -2px 0 rgb(0 0 0), 2px -2px 0 rgb(0 0 0),
+    2px 0 0 rgb(0 0 0), 2px 2px 0 rgb(0 0 0), 0 2px 0 rgb(0 0 0), -2px 2px 0 rgb(0 0 0),
+    -2px 0 0 rgb(0 0 0);
+}
+
+#donation-num {
+  font-size: 35px;
+  font-weight: bold;
+  color: rgb(0, 252, 255);
+}
+
+#message {
+  font-size: 35px;
+  color: rgb(255, 255, 255);
+}
+
+#donation-sub {
+  color: rgb(255, 255, 255);
 }

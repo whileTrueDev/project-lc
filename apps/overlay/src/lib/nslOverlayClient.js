@@ -5,8 +5,10 @@ const pageUrl = window.location.href;
 const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const iterateLimit = $('#primary-info').data('number');
 const email = $('#primary-info').data('email');
+const topMessages = [];
+let messageHtml;
 let rankingVisible;
-const bannerId = 1;
+let bannerId = 1;
 
 function getOS() {
   const { userAgent } = window.navigator;
@@ -33,48 +35,59 @@ function getOS() {
 
 const device = getOS();
 
-// async function switchImage() {
-//   if ($('.horizontal-banner-box').css('display') === 'none') {
-//     await setTimeout(() => {
-//       $('.horizontal-banner-box').fadeIn(1000);
-//     }, 1000);
-//   }
-//   if (rankingVisible) {
-//     await setTimeout(() => {
-//       $('.nsl-ranking').fadeIn(1000);
-//       rankingVisible = false;
-//       bannerId = 1;
-//     }, 1000);
-//     await setTimeout(() => {
-//       $('.nsl-ranking').fadeOut(1000);
-//       switchImage();
-//     }, 10000);
-//   } else {
-//     await setTimeout(() => {
-//       $('.horizontal-banner')
-//         .attr(
-//           'src',
-//           `https://lc-project.s3.ap-northeast-2.amazonaws.com/horizontal-banner/${email}/${liveShoppingId}/horizontal-banner-${bannerId}`,
-//         )
-//         .fadeIn(1000);
-//     }, 1000);
-//     if (bannerId === iterateLimit) {
-//       await setTimeout(() => {
-//         $('.horizontal-banner-box').fadeOut(1000);
-//         rankingVisible = true;
-//         switchImage();
-//       }, 10000);
-//     } else {
-//       await setTimeout(() => {
-//         $('.horizontal-banner').fadeOut(1000);
-//         bannerId += 1;
-//         switchImage();
-//       }, 10000);
-//     }
-//   }
-// }
+async function switchImage() {
+  if ($('.horizontal-banner-box').css('display') === 'none') {
+    await setTimeout(() => {
+      $('.horizontal-banner-box').fadeIn(1000);
+    }, 1000);
+  }
+  if (rankingVisible) {
+    await setTimeout(() => {
+      $('.nsl-ranking').fadeIn(1000);
+      rankingVisible = false;
+      bannerId = 1;
+    }, 1000);
+    await setTimeout(() => {
+      $('.nsl-ranking').fadeOut(1000);
+      switchImage();
+    }, 10000);
+  } else {
+    await setTimeout(() => {
+      $('.horizontal-banner')
+        .attr(
+          'src',
+          `https://lc-project.s3.ap-northeast-2.amazonaws.com/horizontal-banner/${email}/${liveShoppingId}/horizontal-banner-${bannerId}`,
+        )
+        .fadeIn(1000);
+    }, 1000);
+    if (bannerId === iterateLimit) {
+      await setTimeout(() => {
+        $('.horizontal-banner-box').fadeOut(1000);
+        rankingVisible = true;
+        switchImage();
+      }, 10000);
+    } else {
+      await setTimeout(() => {
+        $('.horizontal-banner').fadeOut(1000);
+        bannerId += 1;
+        switchImage();
+      }, 10000);
+    }
+  }
+}
 
-// switchImage();
+setInterval(async () => {
+  if (topMessages.length !== 0 && $('.nsl-donation-message').css('display') === 'none') {
+    $('.nsl-donation-message').css({ display: 'flex' });
+    $('.nsl-donation-message').html(topMessages[0].messageHtml);
+    topMessages.splice(0, 1);
+    await setTimeout(() => {
+      $('.nsl-donation-message').fadeOut(800);
+    }, 5000);
+  }
+}, 2000);
+
+switchImage();
 
 socket.emit('new client', { pageUrl, device });
 
@@ -86,4 +99,23 @@ socket.on('get top-left ranking', (data) => {
       `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
     );
   });
+});
+
+socket.on('get nsl donation message from server', (data) => {
+  const { nickname } = data;
+  const { price } = data;
+
+  messageHtml = `
+      <span id="donation-user-id">
+        ${nickname}
+      </span>
+      <span id="message">님&nbsp;</span>
+      <span id="donation-num">
+        ${price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}
+      </span>
+      <span id="message">
+        원 구매 감사합니다!
+      </span>`;
+
+  topMessages.push({ messageHtml });
 });
