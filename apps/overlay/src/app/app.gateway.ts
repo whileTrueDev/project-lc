@@ -51,6 +51,7 @@ export class AppGateway
   @SubscribeMessage('new client')
   handleClient(socket: Socket, clientUrlDevice: PageUrlAndDevice): void {
     const { pageUrl } = clientUrlDevice;
+
     const roomName = pageUrl?.split('/').pop();
     if (roomName) {
       socket.join(roomName);

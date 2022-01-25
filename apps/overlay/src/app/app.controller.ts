@@ -49,9 +49,37 @@ export class AppController {
         broadcasterIdAndEmail.id,
       );
 
-      const verticalImagesLength = await this.overlayService.getVerticalImagesFromS3(
+      const verticalImagesLength = await this.overlayService.getBannerImagesFromS3(
         { email },
         liveShoppingId.id,
+        'vertical-banner',
+      );
+
+      return { verticalImagesLength, email, liveShoppingId };
+    } catch {
+      throw new NotFoundException('user not found');
+    }
+  }
+
+  @Get('/nsl/:id')
+  @Render('nsl-client')
+  async renderNaverShoppingLive(@Param('id') id: string): Promise<ImagesLengthAndUserId> {
+    const overlayUrl = `/${id}`;
+    try {
+      const broadcasterIdAndEmail = await this.broadcasterService.getBroadcasterEmail(
+        overlayUrl,
+      );
+
+      const { email } = broadcasterIdAndEmail;
+
+      const liveShoppingId = await this.liveShoppingService.getLiveShoppingForOverlay(
+        broadcasterIdAndEmail.id,
+      );
+
+      const verticalImagesLength = await this.overlayService.getBannerImagesFromS3(
+        { email },
+        liveShoppingId.id,
+        'horizontal-banner',
       );
 
       return { verticalImagesLength, email, liveShoppingId };

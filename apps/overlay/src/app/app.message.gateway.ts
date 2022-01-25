@@ -60,6 +60,7 @@ export class AppMessageGateway
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
     const rankings = await this.overlayService.getRanking(roomName);
+
     // const totalSold = await this.overlayService.getTotalSoldPrice();
     const messageAndNickname = await this.overlayService.getMessageAndNickname(roomName);
 

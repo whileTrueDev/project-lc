@@ -150,9 +150,10 @@ export class OverlayService {
     return messageAndNickname;
   }
 
-  async getVerticalImagesFromS3(
+  async getBannerImagesFromS3(
     email: BroadcasterEmail,
     liveShoppingId: number,
+    bannerType: 'vertical-banner' | 'horizontal-banner',
   ): Promise<number> {
     const { S3_BUCKET_NAME } = process.env;
 
@@ -161,7 +162,7 @@ export class OverlayService {
 
     const listingParams = {
       Bucket: S3_BUCKET_NAME,
-      Prefix: `vertical-banner/${broadcasterEmail}/${liveShoppingId}`,
+      Prefix: `${bannerType}/${broadcasterEmail}/${liveShoppingId}`,
     };
 
     await this.s3
@@ -169,7 +170,7 @@ export class OverlayService {
       .then(async (data) => {
         await data.Contents.forEach((object) => {
           const imageName = object.Key.split('/').slice(-1)[0];
-          if (imageName.includes('vertical-banner')) {
+          if (imageName.includes(bannerType)) {
             imagesUrls += 1;
           }
         });

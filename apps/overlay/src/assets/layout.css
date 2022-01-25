@@ -541,3 +541,18 @@ div.bottom-fever-timer {
   width: 130px;
   height: 54px;
 }
+
+.nsl-ranking {
+  width: 720px;
+  height: 280px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  background-image: url('/images/ranking-test.png');
+}
+
+.horizontal-banner-box {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
