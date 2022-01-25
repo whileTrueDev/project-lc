@@ -16,7 +16,11 @@ import {
   OverlayControllerMainRes,
   PurchaseMessageWithLoginFlag,
 } from '@project-lc/shared-types';
-import { getOverlayControllerHost, getOverlayHost } from '@project-lc/utils';
+import {
+  getOverlayControllerHost,
+  getOverlayHost,
+  getRealtimeApiHost,
+} from '@project-lc/utils';
 @Controller()
 export class AppController {
   constructor(
@@ -30,6 +34,7 @@ export class AppController {
   async renterTest(): Promise<OverlayControllerMainRes> {
     const OVERLAY_HOST = getOverlayHost();
     const OVERLAY_CONTROLLER_HOST = getOverlayControllerHost();
+    const REALTIME_API_HOST = getRealtimeApiHost();
     const userIdAndUrlAndNicknames = await this.overlayControllerService.getCreatorUrls();
     const liveShoppings =
       await this.liveShoppingService.getLiveShoppingsForOverlayController();
@@ -38,6 +43,7 @@ export class AppController {
       OVERLAY_HOST,
       OVERLAY_CONTROLLER_HOST,
       liveShoppings,
+      REALTIME_API_HOST,
     };
   }
 
@@ -59,37 +65,5 @@ export class AppController {
     @Body('messageId', ParseIntPipe) messageId: number,
   ): Promise<boolean> {
     return this.overlayControllerService.deletePurchaseMessage(messageId);
-  }
-
-  /** 라이브쇼핑 현황판 관리자메시지 생성 */
-  @Post('/live-shopping-state-board-message')
-  async createLiveShoppingStateBoardMessage(
-    @Body('liveShoppingId', ParseIntPipe) liveShoppingId: number,
-    @Body('text') text: string,
-  ): Promise<boolean> {
-    return this.overlayControllerService.createLiveShoppingStateBoardMessage({
-      liveShoppingId,
-      text,
-    });
-  }
-
-  /** 라이브쇼핑 현황판 관리자메시지 삭제 */
-  @Delete('/live-shopping-state-board-message')
-  async deleteLiveShoppingStateBoardMessage(
-    @Body('liveShoppingId', ParseIntPipe) liveShoppingId: number,
-  ): Promise<boolean> {
-    return this.overlayControllerService.deleteLiveShoppingStateBoardMessage(
-      liveShoppingId,
-    );
-  }
-
-  /** 라이브쇼핑 현황판 관리자메시지 생성 */
-  @Post('/live-shopping-state-board-alert')
-  async createLiveShoppingStateBoardAlert(
-    @Body('liveShoppingId', ParseIntPipe) liveShoppingId: number,
-  ): Promise<boolean> {
-    return this.overlayControllerService.createLiveShoppingStateBoardAlert({
-      liveShoppingId,
-    });
   }
 }

@@ -5,6 +5,7 @@ import { mailerConfig } from '@project-lc/nest-core';
 import { AuthModule } from '@project-lc/nest-modules-auth';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { JwtHelperModule } from '@project-lc/nest-modules-jwt-helper';
+import { LiveShoppingStateRealtimeModule } from '@project-lc/nest-modules-liveshopping';
 import { NotificationRealtimeModule } from '@project-lc/nest-modules-notification';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
@@ -15,6 +16,7 @@ import { AppController } from './app.controller';
     AuthModule,
     MailerModule.forRoot(mailerConfig),
     NotificationRealtimeModule,
+    LiveShoppingStateRealtimeModule,
     PrismaModule,
     JwtHelperModule,
     CipherModule,
