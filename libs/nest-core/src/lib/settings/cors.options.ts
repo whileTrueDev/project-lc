@@ -19,6 +19,9 @@ export const corsOptions: CorsOptions = {
     'https://broadcaster.xn--hp4b17xa.com', // broadcaster.크크쇼.com
     'https://xn--vh3b23hfsf.xn--hp4b17xa.com', // 방송인.크크쇼.com
     'https://dev-broadcaster.xn--hp4b17xa.com', // dev-broadcaster.크크쇼.com
+
+    'http://localhost:3333', // 오버레이 컨트롤러
+    'https://dev-overlay-controller.xn--hp4b17xa.com', // 배포한 테스트환경용 오버레이컨트롤러 서버
   ],
   credentials: true,
   exposedHeaders: ['X-wt-Access-Token'],
