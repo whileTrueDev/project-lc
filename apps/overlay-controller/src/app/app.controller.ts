@@ -16,7 +16,11 @@ import {
   OverlayControllerMainRes,
   PurchaseMessageWithLoginFlag,
 } from '@project-lc/shared-types';
-import { getOverlayControllerHost, getOverlayHost } from '@project-lc/utils';
+import {
+  getOverlayControllerHost,
+  getOverlayHost,
+  getRealtimeApiHost,
+} from '@project-lc/utils';
 @Controller()
 export class AppController {
   constructor(
@@ -30,6 +34,7 @@ export class AppController {
   async renterTest(): Promise<OverlayControllerMainRes> {
     const OVERLAY_HOST = getOverlayHost();
     const OVERLAY_CONTROLLER_HOST = getOverlayControllerHost();
+    const REALTIME_API_HOST = getRealtimeApiHost();
     const userIdAndUrlAndNicknames = await this.overlayControllerService.getCreatorUrls();
     const liveShoppings =
       await this.liveShoppingService.getLiveShoppingsForOverlayController();
@@ -38,6 +43,7 @@ export class AppController {
       OVERLAY_HOST,
       OVERLAY_CONTROLLER_HOST,
       liveShoppings,
+      REALTIME_API_HOST,
     };
   }
 

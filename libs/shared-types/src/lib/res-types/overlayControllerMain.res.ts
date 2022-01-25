@@ -9,4 +9,5 @@ export interface OverlayControllerMainRes {
   OVERLAY_CONTROLLER_HOST: string;
   OVERLAY_HOST: string;
   liveShoppings: LiveShoppingsWithBroadcasterAndGoodsName[];
+  REALTIME_API_HOST?: string;
 }
