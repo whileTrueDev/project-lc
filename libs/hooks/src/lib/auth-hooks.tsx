@@ -1,4 +1,3 @@
-import { useToast } from '@chakra-ui/react';
 import { UserType } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
@@ -50,16 +49,11 @@ export function useIsLoggedIn(): {
  */
 export function useMoveToMainIfLoggedIn(): void {
   const router = useRouter();
-  const toast = useToast();
   const { isLoggedIn } = useIsLoggedIn();
 
   useEffect(() => {
     if (isLoggedIn) {
-      toast({
-        title: '이미 로그인 되어 있습니다. 메인 화면으로 이동합니다.',
-        status: 'info',
-      });
       router.push('/');
     }
-  }, [isLoggedIn, router, toast]);
+  }, [isLoggedIn, router]);
 }
