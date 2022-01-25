@@ -66,36 +66,4 @@ export class AppController {
   ): Promise<boolean> {
     return this.overlayControllerService.deletePurchaseMessage(messageId);
   }
-
-  /** 라이브쇼핑 현황판 관리자메시지 생성 */
-  @Post('/live-shopping-state-board-message')
-  async createLiveShoppingStateBoardMessage(
-    @Body('liveShoppingId', ParseIntPipe) liveShoppingId: number,
-    @Body('text') text: string,
-  ): Promise<boolean> {
-    return this.overlayControllerService.createLiveShoppingStateBoardMessage({
-      liveShoppingId,
-      text,
-    });
-  }
-
-  /** 라이브쇼핑 현황판 관리자메시지 삭제 */
-  @Delete('/live-shopping-state-board-message')
-  async deleteLiveShoppingStateBoardMessage(
-    @Body('liveShoppingId', ParseIntPipe) liveShoppingId: number,
-  ): Promise<boolean> {
-    return this.overlayControllerService.deleteLiveShoppingStateBoardMessage(
-      liveShoppingId,
-    );
-  }
-
-  /** 라이브쇼핑 현황판 관리자메시지 생성 */
-  @Post('/live-shopping-state-board-alert')
-  async createLiveShoppingStateBoardAlert(
-    @Body('liveShoppingId', ParseIntPipe) liveShoppingId: number,
-  ): Promise<boolean> {
-    return this.overlayControllerService.createLiveShoppingStateBoardAlert({
-      liveShoppingId,
-    });
-  }
 }

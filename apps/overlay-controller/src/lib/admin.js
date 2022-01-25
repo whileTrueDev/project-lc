@@ -63,7 +63,7 @@ $(document).ready(function ready() {
   // 구입 메세지 목록 받아오는 재귀 ajax
   function getPurchaseMessage() {
     // 현황판 업데이트를 위한 이벤트 송출
-    liveShoppingStateSocket.emit('updatePurchaseMessage', { liveShoppingId });
+    liveShoppingStateSocket.emit('updatePurchaseMessage', liveShoppingId);
     $.ajax({
       type: 'GET',
       url: `${process.env.OVERLAY_CONTROLLER_HOST}/purchase-message`,
@@ -427,20 +427,17 @@ class LiveShoppingStateBoardController {
 
     if (!message) return;
 
-    this.requestCreateMessage(
-      message,
-      (data) => {
-        this.input.val('');
-        this.displayingMessage.text(message);
-        $('#insert-dialog').fadeIn();
-        setTimeout(() => {
-          $('#insert-dialog').fadeOut();
-        }, 3000);
-      },
-      (error) => {
-        console.error(error);
-      },
-    );
+    liveShoppingStateSocket.emit('createAdminMessage', {
+      text: message,
+      liveShoppingId: this._liveShoppingId,
+    });
+
+    this.input.val('');
+    this.displayingMessage.text(message);
+    $('#insert-dialog').fadeIn();
+    setTimeout(() => {
+      $('#insert-dialog').fadeOut();
+    }, 3000);
   }
 
   deleteMessage() {
@@ -448,79 +445,16 @@ class LiveShoppingStateBoardController {
 
     if (currentMessage === this._defaultMessage) return;
 
-    this.requestDeleteMessage(
-      (data) => {
-        this.input.val('');
-        this.displayingMessage.text(this._defaultMessage);
-      },
-      (error) => {
-        console.error(error);
-      },
-    );
-  }
-
-  sendAlert() {
-    this.requestCreateAlert(
-      (data) => {
-        console.log('alert created', data);
-      },
-      (error) => {
-        console.error(error);
-      },
-    );
-  }
-
-  requestCreateMessage(message, successCallback, errorCallback) {
-    liveShoppingStateSocket.emit('createAdminMessage', {
-      text: message,
-      liveShoppingId: this._liveShoppingId,
-    });
-    $.ajax({
-      type: 'POST',
-      url: `${process.env.OVERLAY_CONTROLLER_HOST}/live-shopping-state-board-message`,
-      dataType: 'json',
-      data: { liveShoppingId: this._liveShoppingId, text: message },
-      success(data) {
-        successCallback(data);
-      },
-      error(error) {
-        errorCallback(error);
-      },
-    });
-  }
-
-  requestDeleteMessage(successCallback, errorCallback) {
     liveShoppingStateSocket.emit('createAdminMessage', {
       text: '',
       liveShoppingId: this._liveShoppingId,
     });
-    $.ajax({
-      type: 'DELETE',
-      url: `${process.env.OVERLAY_CONTROLLER_HOST}/live-shopping-state-board-message`,
-      dataType: 'json',
-      data: { liveShoppingId: this._liveShoppingId },
-      success(data) {
-        successCallback(data);
-      },
-      error(error) {
-        errorCallback(error);
-      },
-    });
+
+    this.input.val('');
+    this.displayingMessage.text(this._defaultMessage);
   }
 
-  requestCreateAlert(successCallback, errorCallback) {
+  sendAlert() {
     liveShoppingStateSocket.emit('createAdminAlert', this._liveShoppingId);
-    // $.ajax({
-    //   type: 'POST',
-    //   url: `${process.env.OVERLAY_CONTROLLER_HOST}/live-shopping-state-board-alert`,
-    //   dataType: 'json',
-    //   data: { liveShoppingId: this._liveShoppingId },
-    //   success(data) {
-    //     successCallback(data);
-    //   },
-    //   error(error) {
-    //     errorCallback(error);
-    //   },
-    // });
   }
 }
