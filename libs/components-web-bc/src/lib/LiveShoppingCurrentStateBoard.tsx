@@ -5,10 +5,11 @@ import {
   useLiveShoppingStateBoardAdminMessage,
   useLiveShoppingStateBoardAlertDeleteMutation,
   useLiveShoppingStateBoardAlertState,
+  useLiveShoppingStateSubscription,
   usePurchaseMessages,
 } from '@project-lc/hooks';
 import { AnimationDefinition } from 'framer-motion/types/render/utils/animation';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 
 function getRefetchInterval(enable: boolean, time: number): undefined | number {
@@ -52,16 +53,17 @@ export function LiveShoppingCurrentStateBoard({
   title,
   isOnAir,
 }: LiveShoppingCurrentStateBoardProps): JSX.Element {
+  const { message, alert, setAlert } = useLiveShoppingStateSubscription(liveShoppingId);
   // * 관리자메시지 데이터
-  const { data: adminMessageData } = useLiveShoppingStateBoardAdminMessage({
-    liveShoppingId,
-    refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.adminMessage),
-  });
+  // const { data: adminMessageData } = useLiveShoppingStateBoardAdminMessage({
+  //   liveShoppingId,
+  //   // refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.adminMessage),
+  // });
 
   // * 응원메시지 데이터
   const { data, status, error } = usePurchaseMessages({
     liveShoppingId,
-    refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.purchaseMessage),
+    // refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.purchaseMessage),
   });
 
   const { totalPrice, totalPurchaseCount, totalGiftCount } = useMemo(() => {
@@ -74,22 +76,32 @@ export function LiveShoppingCurrentStateBoard({
   }, [data]);
 
   // * 관리자 알림
-  const { hasAlert, setAlertFalse } = useLiveShoppingStateBoardAlertState({
-    liveShoppingId,
-    refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.alertData),
-  });
+  const hasAlert = alert;
 
-  const deleteAlert = useLiveShoppingStateBoardAlertDeleteMutation();
+  // const { hasAlert, setAlertFalse } = useLiveShoppingStateBoardAlertState({
+  //   liveShoppingId,
+  //   // refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.alertData),
+  // });
+
+  // const deleteAlert = useLiveShoppingStateBoardAlertDeleteMutation();
   // * 관리자 알림 도착으로 애니메이션 끝난 후 콜백함수 -> 관리자 알림 삭제 & 관리자 알림여부 false로 설정
+  // const onAminationCompleteHandler = useCallback(
+  //   (def: AnimationDefinition) => {
+  //     if (def === 'visible') {
+  //       deleteAlert.mutateAsync({ liveShoppingId }).then(() => {
+  //         setAlertFalse();
+  //       });
+  //     }
+  //   },
+  //   [deleteAlert, liveShoppingId, setAlertFalse],
+  // );
   const onAminationCompleteHandler = useCallback(
     (def: AnimationDefinition) => {
       if (def === 'visible') {
-        deleteAlert.mutateAsync({ liveShoppingId }).then(() => {
-          setAlertFalse();
-        });
+        setAlert(false);
       }
     },
-    [deleteAlert, liveShoppingId, setAlertFalse],
+    [setAlert],
   );
 
   if (status === 'loading') return <Box>Loading...</Box>;
@@ -113,7 +125,8 @@ export function LiveShoppingCurrentStateBoard({
 
         {/* 관리자메시지 */}
         <SectionWithTitle variant="outlined" title="관리자 메시지">
-          {adminMessageData?.text || '없음'}
+          {/* {adminMessageData?.text || '없음'} */}
+          {message || '없음'}
         </SectionWithTitle>
 
         {/* 라이브 상황판 */}
