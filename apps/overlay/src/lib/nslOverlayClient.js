@@ -112,3 +112,8 @@ socket.on('get nsl donation message from server', (data) => {
 
   topMessages.push({ messageHtml });
 });
+
+socket.on('refresh ranking from server', () => {
+  $('.ranking-text-area-id').text('');
+  $('.quantity').text('');
+});
