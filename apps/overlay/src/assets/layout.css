@@ -23,6 +23,11 @@
   src: url('/fonts/NotoSansKR-Bold.otf');
 }
 
+@font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('/fonts/GmarketSansTTFMedium.ttf');
+}
+
 body {
   width: 100%;
   height: 100%;
@@ -553,7 +558,7 @@ div.bottom-fever-timer {
 .nsl-ranking {
   width: auto;
   height: auto;
-  /* display: none; */
+  display: none;
   background-image: url('/images/ranking-test.png');
 }
 
@@ -570,27 +575,30 @@ div.bottom-fever-timer {
   bottom: 0px;
   margin-left: 5px;
   margin-bottom: 3px;
+  padding-top: 5px;
   padding-left: 10px;
   padding-right: 10px;
   background-color: rgb(255, 255, 255, 0.7);
   border-radius: 35px;
-  font-family: 'NotoSansBold';
+  font-family: 'GmarketSansMedium';
   text-shadow: -2px -2px 0 rgb(0 0 0), 0 -2px 0 rgb(0 0 0), 2px -2px 0 rgb(0 0 0),
     2px 0 0 rgb(0 0 0), 2px 2px 0 rgb(0 0 0), 0 2px 0 rgb(0 0 0), -2px 2px 0 rgb(0 0 0),
     -2px 0 0 rgb(0 0 0);
 }
 
-#donation-num {
+#nsl-donation-user-id {
   font-size: 35px;
   font-weight: bold;
   color: rgb(0, 252, 255);
 }
 
-#message {
-  font-size: 35px;
-  color: rgb(255, 255, 255);
+#nsl-donation-num {
+  font-size: 30px;
+  font-weight: bold;
+  color: rgb(0, 252, 255);
 }
 
-#donation-sub {
+#nsl-message {
+  font-size: 20px;
   color: rgb(255, 255, 255);
 }

@@ -36,39 +36,32 @@ function getOS() {
 const device = getOS();
 
 async function switchImage() {
-  if ($('.horizontal-banner-box').css('display') === 'none') {
-    await setTimeout(() => {
-      $('.horizontal-banner-box').fadeIn(1000);
-    }, 1000);
-  }
   if (rankingVisible) {
+    $('.nsl-ranking').css('display', 'block');
+    rankingVisible = false;
+    bannerId = 1;
     await setTimeout(() => {
-      $('.nsl-ranking').fadeIn(1000);
-      rankingVisible = false;
-      bannerId = 1;
-    }, 1000);
-    await setTimeout(() => {
-      $('.nsl-ranking').fadeOut(1000);
+      $('.nsl-ranking').css('display', 'none');
       switchImage();
     }, 10000);
   } else {
-    await setTimeout(() => {
-      $('.horizontal-banner')
-        .attr(
-          'src',
-          `https://lc-project.s3.ap-northeast-2.amazonaws.com/horizontal-banner/${email}/${liveShoppingId}/horizontal-banner-${bannerId}`,
-        )
-        .fadeIn(1000);
-    }, 1000);
+    if ($('.horizontal-banner-box').css('display') === 'none') {
+      $('.horizontal-banner-box').css('display', 'block');
+    }
+
+    $('.horizontal-banner').attr(
+      'src',
+      `https://lc-project.s3.ap-northeast-2.amazonaws.com/horizontal-banner/${email}/${liveShoppingId}/horizontal-banner-${bannerId}`,
+    );
+
     if (bannerId === iterateLimit) {
       await setTimeout(() => {
-        $('.horizontal-banner-box').fadeOut(1000);
+        $('.horizontal-banner-box').css('display', 'none');
         rankingVisible = true;
         switchImage();
       }, 10000);
     } else {
       await setTimeout(() => {
-        $('.horizontal-banner').fadeOut(1000);
         bannerId += 1;
         switchImage();
       }, 10000);
@@ -82,7 +75,7 @@ setInterval(async () => {
     $('.nsl-donation-message').html(topMessages[0].messageHtml);
     topMessages.splice(0, 1);
     await setTimeout(() => {
-      $('.nsl-donation-message').fadeOut(800);
+      $('.nsl-donation-message').fadeOut(1);
     }, 5000);
   }
 }, 2000);
@@ -107,7 +100,7 @@ socket.on('get nsl donation message from server', (data) => {
 
   messageHtml = `
       <span id="donation-user-id">
-        ${nickname}
+        ${nickname.substr(0, 5)}
       </span>
       <span id="message">님&nbsp;</span>
       <span id="donation-num">
