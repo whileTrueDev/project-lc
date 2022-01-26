@@ -6,8 +6,12 @@ ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY ./dist/apps/api-realtime .
-RUN yarn install --prod
+COPY ./libs/prisma-orm/prisma ./prisma
 
-EXPOSE 3000
+RUN yarn global add prisma
+RUN yarn install --prod
+RUN prisma generate
+
+EXPOSE 3001
 
 CMD NODE_ENV=production node ./main.js

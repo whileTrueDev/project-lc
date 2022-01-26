@@ -474,7 +474,7 @@ export class LCDevAppStack extends cdk.Stack {
     );
     // HTTP 리스너에 RealtimeAPI 서버 타겟그룹 추가
     HttpsListener.addTargetGroups(`${PREFIX}HTTPSRealtimeApiTargetGroup`, {
-      priority: 3,
+      priority: 4,
       conditions: [
         elbv2.ListenerCondition.hostHeaders([
           `dev-realtime.${constants.PUNYCODE_DOMAIN}`,
