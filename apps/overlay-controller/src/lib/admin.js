@@ -19,10 +19,12 @@ const liveShoppingStateSocket = io(
 socket.on('creator list from server', (data) => {
   if (data && data.length !== 0) {
     $('#connection-status').text('✔️ 정상');
-    $('.mid-area button').attr('disabled', false);
+    $('.admin-to-bc-live-state-board-box button').attr('disabled', false);
+    $('#panel-activate-checkbox').attr('disabled', false);
   } else {
     $('#connection-status').text('❌ 연결되지 않음');
     $('.mid-area button').attr('disabled', true);
+    $('#panel-activate-checkbox').attr('disabled', true);
   }
 });
 
@@ -30,6 +32,7 @@ $(document).ready(function ready() {
   let liveShoppingStateBoardController; // 관리자 메시지 보내기(방송인 현황판 표시) 컨트롤러, liveShoppingId 할당될때 생성
 
   $('.mid-area button').attr('disabled', true);
+  $('#panel-activate-checkbox').attr('disabled', true);
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
   const localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
   $('table#liveshopping-table').DataTable({
@@ -201,6 +204,13 @@ $(document).ready(function ready() {
 
   $('#alive-check-button').click(function aliveCheckButtonClickEvent() {
     socket.emit('connection check from admin', roomName);
+  });
+
+  $('#panel-activate-checkbox').click(function panelActivateButton() {
+    $('.mid-area')
+      .find('button')
+      .not('.admin-to-bc-live-state-board-box button')
+      .prop('disabled', (_, val) => !val);
   });
 
   $('#liveshopping-id-button').click(function liveShoppingIdButtonClickEvent() {
