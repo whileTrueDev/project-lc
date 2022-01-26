@@ -42,6 +42,7 @@ export class LCDevAppStack extends cdk.Stack {
   private S3_ACCESS_KEY_ID: ssm.IStringParameter;
   private S3_ACCESS_KEY_SECRET: ssm.IStringParameter;
   private WHILETRUE_IP_ADDRESS: ssm.IStringParameter;
+  private REDIS_URL: ssm.IStringParameter;
 
   public readonly alb: elbv2.ApplicationLoadBalancer;
 
@@ -269,6 +270,7 @@ export class LCDevAppStack extends cdk.Stack {
         S3_BUCKET_NAME: 'lc-project',
         OVERLAY_HOST: `https://dev-live.${constants.PUNYCODE_DOMAIN}`,
         OVERLAY_CONTROLLER_HOST: `https://dev-overlay-controller.${constants.PUNYCODE_DOMAIN}`,
+        REALTIME_API_HOST: `https://dev-realtime.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayControllerLogGroup`, {
@@ -314,6 +316,7 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
         CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
+        REDIS_URL: ecs.Secret.fromSsmParameter(this.REDIS_URL),
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}RealtimeApiLogGroup`, {
@@ -641,6 +644,15 @@ export class LCDevAppStack extends cdk.Stack {
       {
         version: 1,
         parameterName: constants.DEV.WHILETRUE_IP_ADDRESS,
+      },
+    );
+
+    this.REDIS_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}REDIS_URL`,
+      {
+        version: 1,
+        parameterName: constants.DEV.REDIS_URL,
       },
     );
 
