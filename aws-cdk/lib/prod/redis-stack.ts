@@ -32,7 +32,7 @@ export class LCRedisStack extends cdk.Stack {
       `${constants.PROD.ID_PREFIX}ElastiCacheCluster`,
       {
         vpcSecurityGroupIds: [redisSecGrp.securityGroupId],
-        clusterName: 'KksRedisCluster',
+        clusterName: 'KksProdRedisCluster',
         cacheSubnetGroupName: redisSubnetGroup.cacheSubnetGroupName,
         engine: 'redis',
         engineVersion: '6.2',
