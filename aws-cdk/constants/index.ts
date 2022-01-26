@@ -102,6 +102,10 @@ export const constants = {
     ECS_OVERLAY_CONTROLLER_SERVICE_NAME: 'project-lc-overlay-controller-service',
     ECS_OVERLAY_CONTROLLER_LOG_GLOUP_NAME: '/ecs/project-lc-overlay-controller',
     ECS_OVERLAY_CONTROLLER_PORT: 3333,
+    ECS_REALTIME_API_FAMILY_NAME: 'project-lc-realtimeapi',
+    ECS_REALTIME_API_SERVICE_NAME: 'project-lc-realtimeapi-service',
+    ECS_REALTIME_API_LOG_GLOUP_NAME: '/ecs/project-lc-realtimeapi',
+    ECS_REALTIME_API_PORT: 3001,
     // * ************************
     // * SSM Parameter Store Keys
     // * ************************
@@ -126,5 +130,6 @@ export const constants = {
     S3_ACCESS_KEY_ID_KEY: 'S3_ACCESS_KEY_ID',
     S3_ACCESS_KEY_SECRET_KEY: 'S3_ACCESS_KEY_SECRET',
     WHILETRUE_IP_ADDRESS: 'WHILETRUE_IP_ADDRESS',
+    REDIS_URL_KEY: 'PROJECT_LC_REDIS_URL',
   },
 } as const;

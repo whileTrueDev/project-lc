@@ -34,7 +34,7 @@ export class LCDevVpcStack extends cdk.Stack {
           name: constants.DEV.INGRESS_SUBNET_GROUP_NAME,
         },
         {
-          subnetType: ec2.SubnetType.PRIVATE,
+          subnetType: ec2.SubnetType.PRIVATE_WITH_NAT,
           name: constants.DEV.PRIVATE_SUBNET_GROUP_NAME,
         },
       ],
