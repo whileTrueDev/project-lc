@@ -3,6 +3,7 @@ on:
     branches: [dev]
     paths:
       - 'apps/api/**'
+      - 'apps/api-realtime/**'
       - 'apps/overlay/**'
       - 'apps/overlay-controller/**'
       - 'libs/firstmall-db/**'
@@ -215,3 +216,49 @@ jobs:
         run: yarn nx run prisma-orm:migrate-reset
         env:
           DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
+
+  DeployRealtimeAPI:
+    name: Deploy RealtimeAPI Job
+    runs-on: [self-hosted, linux, project-lc-dev]
+    needs: [Build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      #  Install All Dependencies
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1 # install dependencies using cache
+
+      - name: Check RealtimeAPI affected
+        run: tools/check-need-realtimeapi-deploy.sh
+
+      - name: Configure AWS credentials
+        if: ${{ success() }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Fill in the new image ID in the Amazon ECS task definition RealtimeAPI
+        if: ${{ success() }}
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: apps/api-realtime/task-definition-dev.json
+          container-name: project-lc-realtimeapi-dev
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-realtimeapi-dev:latest
+
+      - name: Deploy Amazon ECS task definition RealtimeAPI
+        if: ${{ success() }}
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: project-lc-realtimeapi-dev-service
+          cluster: project-lc-dev
+          wait-for-service-stability: false

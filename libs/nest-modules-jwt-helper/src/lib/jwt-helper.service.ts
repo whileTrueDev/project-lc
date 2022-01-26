@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { authConstants, UserPayload } from '@project-lc/nest-core';
 import { CipherService } from '@project-lc/nest-modules-cipher';
 import { Request, Response } from 'express';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class JwtHelperService {
@@ -36,7 +37,8 @@ export class JwtHelperService {
    * @param userPayload Token에 저장될 payload
    */
   validateRefreshToken(req: Request): UserPayload {
-    const cookieRefreshToken: string | undefined = req.cookies?.refresh_token;
+    const cookieRefreshToken: string | undefined =
+      req.cookies[authConstants.REFRESH_TOKEN_HEADER_KEY];
     try {
       // 암호화 미사용시 제거
       const refreshToken = this.cipherService.decrypt(cookieRefreshToken);
@@ -48,8 +50,30 @@ export class JwtHelperService {
   }
 
   /**
+   * socket 클라이언트로부터 refresh token을 가져와 검증 후, payload를 전달합니다.
+   * @param req 요청 객체
+   * @param userPayload Token에 저장될 payload
+   */
+  validateRefreshTokenFromSocket(socket: Socket): UserPayload {
+    const { cookie } = socket.handshake.headers;
+    const cookieString = RegExp(`${authConstants.REFRESH_TOKEN_HEADER_KEY}=[^;]+`).exec(
+      cookie,
+    );
+    const refreshToken = decodeURIComponent(
+      cookieString ? cookieString.toString().replace(/^[^=]+./, '') : '',
+    );
+    try {
+      const token = this.cipherService.decrypt(refreshToken);
+      const userPayload = this.jwtService.verify<UserPayload>(token);
+      return this.castUserPayload(userPayload);
+    } catch (err) {
+      return null;
+    }
+  }
+
+  /**
    * Access Token의 만료시, 응답 객체에 새로운 Access Token을 헤더에 추가합니다.
-   * @param res 요청 객체
+   * @param res 응답 객체
    * @param userPayload Token에 저장될 payload
    */
   refreshAndSetAuthorizationHeader(res: Response, userPayload: UserPayload): void {
@@ -82,7 +106,6 @@ export class JwtHelperService {
       }
       return this.jwtService.verify(realToken);
     } catch (err) {
-      console.log(err);
       return null;
     }
   }

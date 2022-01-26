@@ -15,6 +15,7 @@ interface LCDevAppStackProps extends cdk.StackProps {
   overlaySecGrp: ec2.SecurityGroup;
   albSecGrp: ec2.SecurityGroup;
   overlayControllerSecGrp: ec2.SecurityGroup;
+  realtimeApiSecGrp: ec2.SecurityGroup;
 }
 
 const PREFIX = 'LC-DEV-APP';
@@ -41,13 +42,21 @@ export class LCDevAppStack extends cdk.Stack {
   private S3_ACCESS_KEY_ID: ssm.IStringParameter;
   private S3_ACCESS_KEY_SECRET: ssm.IStringParameter;
   private WHILETRUE_IP_ADDRESS: ssm.IStringParameter;
+  private REDIS_URL: ssm.IStringParameter;
 
   public readonly alb: elbv2.ApplicationLoadBalancer;
 
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
 
-    const { vpc, apiSecGrp, overlaySecGrp, albSecGrp, overlayControllerSecGrp } = props;
+    const {
+      vpc,
+      apiSecGrp,
+      overlaySecGrp,
+      albSecGrp,
+      overlayControllerSecGrp,
+      realtimeApiSecGrp,
+    } = props;
 
     // * ECS Cluster
     const cluster = new ecs.Cluster(this, `${PREFIX}EcsCluster`, {
@@ -68,6 +77,11 @@ export class LCDevAppStack extends cdk.Stack {
       cluster,
       overlayControllerSecGrp,
     );
+    // * realtime API server
+    const realtimeApiService = this.createRealtimeApiAppService(
+      cluster,
+      realtimeApiSecGrp,
+    );
 
     this.alb = this.createALB({
       vpc,
@@ -75,6 +89,7 @@ export class LCDevAppStack extends cdk.Stack {
       overlayService,
       sg: albSecGrp,
       overlayControllerService,
+      realtimeApiService,
     });
   }
 
@@ -255,6 +270,7 @@ export class LCDevAppStack extends cdk.Stack {
         S3_BUCKET_NAME: 'lc-project',
         OVERLAY_HOST: `https://dev-live.${constants.PUNYCODE_DOMAIN}`,
         OVERLAY_CONTROLLER_HOST: `https://dev-overlay-controller.${constants.PUNYCODE_DOMAIN}`,
+        REALTIME_API_HOST: `https://dev-realtime.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayControllerLogGroup`, {
@@ -279,18 +295,66 @@ export class LCDevAppStack extends cdk.Stack {
     });
   }
 
+  private createRealtimeApiAppService(cluster: ecs.Cluster, secgrp: ec2.SecurityGroup) {
+    const repo = new ecr.Repository(this, `${PREFIX}RealtimeApiRepo`, {
+      repositoryName: constants.DEV.ECS_REALTIME_API_FAMILY_NAME,
+    });
+    const realtimeApiTaskDef = new ecs.FargateTaskDefinition(
+      this,
+      `${PREFIX}RealtimeApiTaskDef`,
+      {
+        family: constants.DEV.ECS_REALTIME_API_FAMILY_NAME,
+      },
+    );
+    realtimeApiTaskDef.addContainer(`${PREFIX}RealtimeApiContainer`, {
+      containerName: constants.DEV.ECS_REALTIME_API_FAMILY_NAME,
+      portMappings: [{ containerPort: constants.DEV.ECS_REALTIME_API_PORT }],
+      image: ecs.ContainerImage.fromEcrRepository(repo),
+      memoryLimitMiB: 512,
+      secrets: {
+        JWT_SECRET: ecs.Secret.fromSsmParameter(this.JWT_SECRET),
+        CIPHER_HASH: ecs.Secret.fromSsmParameter(this.CIPHER_HASH),
+        CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
+        CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
+        REDIS_URL: ecs.Secret.fromSsmParameter(this.REDIS_URL),
+      },
+      logging: new ecs.AwsLogDriver({
+        logGroup: new logs.LogGroup(this, `${PREFIX}RealtimeApiLogGroup`, {
+          logGroupName: constants.DEV.ECS_REALTIME_API_LOG_GROUP_NAME,
+          removalPolicy: cdk.RemovalPolicy.DESTROY,
+        }),
+        streamPrefix: 'ecs',
+      }),
+    });
+
+    return new ecs.FargateService(this, `${PREFIX}RealtimeApiService`, {
+      cluster,
+      serviceName: constants.DEV.ECS_REALTIME_API_SERVICE_NAME,
+      taskDefinition: realtimeApiTaskDef,
+      vpcSubnets: {
+        subnetGroupName: constants.DEV.PRIVATE_SUBNET_GROUP_NAME,
+      },
+      platformVersion: ecs.FargatePlatformVersion.LATEST,
+      desiredCount: 1,
+      securityGroups: [secgrp],
+      assignPublicIp: false,
+    });
+  }
+
   /** ALB 생성 */
   private createALB({
     vpc,
     apiService,
     overlayService,
     overlayControllerService,
+    realtimeApiService,
     sg,
   }: {
     vpc: ec2.Vpc;
     apiService: ecs.FargateService;
     overlayService: ecs.FargateService;
     overlayControllerService: ecs.FargateService;
+    realtimeApiService: ecs.FargateService;
     sg: ec2.SecurityGroup;
   }) {
     // * ALB
@@ -393,6 +457,33 @@ export class LCDevAppStack extends cdk.Stack {
         elbv2.ListenerCondition.sourceIps([constants.WHILETRUE_IP_ADDRESS]),
       ],
       targetGroups: [overlayControllerTargetGroup],
+    });
+
+    const realtimeApiTargetGroup = new elbv2.ApplicationTargetGroup(
+      this,
+      `${PREFIX}RealtimeApiTargetGroup`,
+      {
+        vpc,
+        targetGroupName: 'RealtimeApiTargetGroup',
+        port: constants.DEV.ECS_REALTIME_API_PORT,
+        protocol: elbv2.ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [realtimeApiService],
+      },
+    );
+    // HTTP 리스너에 RealtimeAPI 서버 타겟그룹 추가
+    HttpsListener.addTargetGroups(`${PREFIX}HTTPSRealtimeApiTargetGroup`, {
+      priority: 4,
+      conditions: [
+        elbv2.ListenerCondition.hostHeaders([
+          `dev-realtime.${constants.PUNYCODE_DOMAIN}`,
+        ]),
+      ],
+      targetGroups: [realtimeApiTargetGroup],
     });
 
     return alb;
@@ -553,6 +644,15 @@ export class LCDevAppStack extends cdk.Stack {
       {
         version: 1,
         parameterName: constants.DEV.WHILETRUE_IP_ADDRESS,
+      },
+    );
+
+    this.REDIS_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}REDIS_URL`,
+      {
+        version: 1,
+        parameterName: constants.DEV.REDIS_URL,
       },
     );
 

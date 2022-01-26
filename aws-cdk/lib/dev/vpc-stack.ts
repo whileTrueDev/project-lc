@@ -12,8 +12,10 @@ export class LCDevVpcStack extends cdk.Stack {
   public albSecGrp: ec2.SecurityGroup;
   public dbSecGrp: ec2.SecurityGroup;
   public apiSecGrp: ec2.SecurityGroup;
+  public realtimeApiSecGrp: ec2.SecurityGroup;
   public overlaySecGrp: ec2.SecurityGroup;
   public overlayControllerSecGrp: ec2.SecurityGroup;
+  public redisSecGrp: ec2.SecurityGroup;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -43,6 +45,9 @@ export class LCDevVpcStack extends cdk.Stack {
     const overlaySecGrp = this.createOverlaySecGrp();
     const overlayControllerSecGrp = this.createOverlayControllerSecGrp();
     this.createDbSecGrp({ apiSecGrp, overlaySecGrp, overlayControllerSecGrp });
+
+    this.createRealtimeApiSecGrp();
+    this.createRedisSecGrp();
   }
 
   /** 로드밸런서(ALB) 보안 그룹 생성 */
@@ -171,5 +176,50 @@ export class LCDevVpcStack extends cdk.Stack {
     );
 
     return this.overlayControllerSecGrp;
+  }
+
+  /** 리얼타임 API 서버 보안그룹 생성 */
+  private createRealtimeApiSecGrp() {
+    this.realtimeApiSecGrp = new ec2.SecurityGroup(
+      this,
+      `${ID_PREFIX}RealtimeApi-SecGrp`,
+      {
+        vpc: this.vpc,
+        description: 'realtime api server security grp for project-lc',
+        allowAllOutbound: true,
+      },
+    );
+
+    this.realtimeApiSecGrp.addIngressRule(
+      this.albSecGrp,
+      ec2.Port.tcp(3001),
+      'allow port 3001 to alb for kks realtime-api',
+    );
+  }
+
+  /** 레디스 서버 보안그룹 생성 */
+  private createRedisSecGrp() {
+    this.redisSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}Redis-SecGrp`, {
+      vpc: this.vpc,
+      description: 'redis security grp for project-lc',
+      allowAllOutbound: false,
+    });
+
+    // * Realtime API
+    this.redisSecGrp.addIngressRule(
+      this.realtimeApiSecGrp,
+      ec2.Port.tcp(6379),
+      'allow port 6379 from kks realtime-api',
+    );
+    this.redisSecGrp.addEgressRule(
+      this.realtimeApiSecGrp,
+      ec2.Port.tcp(6379),
+      'allow port 6379 to kks realtime-api',
+    );
+    this.realtimeApiSecGrp.addIngressRule(
+      this.redisSecGrp,
+      ec2.Port.tcp(3001),
+      'allow port 3001 to redis cluster',
+    );
   }
 }

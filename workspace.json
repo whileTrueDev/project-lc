@@ -144,6 +144,27 @@
       "sourceRoot": "apps/api-realtime/src",
       "projectType": "application",
       "targets": {
+        "dockerize": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/api-realtime/Dockerfile -t {args.registry}/project-lc-realtimeapi:{args.tag} --platform=linux/amd64 .",
+              "docker tag {args.registry}/project-lc-realtimeapi:{args.tag} {args.registry}/project-lc-realtimeapi:latest",
+              "docker push {args.registry}/project-lc-realtimeapi:{args.tag}"
+            ],
+            "parallel": false
+          }
+        },
+        "dockerize-dev": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "docker build -f ./apps/api-realtime/Dockerfile -t {args.registry}/project-lc-realtimeapi-dev:latest --platform=linux/amd64 .",
+              "docker push {args.registry}/project-lc-realtimeapi-dev:latest"
+            ],
+            "parallel": false
+          }
+        },
         "build": {
           "executor": "@nrwl/node:build",
           "outputs": [
@@ -155,7 +176,8 @@
             "tsConfig": "apps/api-realtime/tsconfig.app.json",
             "assets": [
               "apps/api-realtime/src/assets"
-            ]
+            ],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {

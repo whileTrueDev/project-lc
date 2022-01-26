@@ -53,6 +53,11 @@ export const constants = {
     PRIVATE_SUBNET_GROUP_NAME: 'Private Subnet',
     /** VPC Subnet ISOLATED 서브넷 그룹 명 */
     ISOLATED_SUBNET_GROUP_NAME: 'Isolated Subnet for DB',
+    // * ECS REALTIME API
+    ECS_REALTIME_API_SERVICE_NAME: 'project-lc-realtimeapi-dev-service',
+    ECS_REALTIME_API_FAMILY_NAME: 'project-lc-realtimeapi-dev',
+    ECS_REALTIME_API_LOG_GROUP_NAME: '/ecs/project-lc-realtimeapi-dev',
+    ECS_REALTIME_API_PORT: 3001,
 
     // * ************************
     // * SSM Parameter Store Keys
@@ -74,6 +79,7 @@ export const constants = {
     GMAIL_OAUTH_CLIENT_ID: 'PROJECT_LC_GMAIL_OAUTH_CLIENT_ID',
     GMAIL_OAUTH_CLIENT_SECRET: 'PROJECT_LC_GMAIL_OAUTH_CLIENT_SECRET',
     WHILETRUE_IP_ADDRESS: 'WHILETRUE_IP_ADDRESS',
+    REDIS_URL: 'PROJECT_LC_DEV_REDIS_URL',
   },
   PROD: {
     ID_PREFIX: 'LC-PROD-',

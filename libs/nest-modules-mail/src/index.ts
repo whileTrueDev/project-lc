@@ -1,2 +1,2 @@
-export * from './lib/mail.module';
 export * from './lib/mailVerification.service';
+export * from './lib/mail.module';
