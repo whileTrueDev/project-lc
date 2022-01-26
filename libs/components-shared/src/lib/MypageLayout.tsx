@@ -51,11 +51,15 @@ export function MypageLayout({
           width="100%"
         >
           {/* 마이페이지 메인 컨텐츠 영역 = 스크롤되는 영역 */}
-          <Box className="scroll-content" maxHeight="inherit" overflowY="scroll">
+          <Box
+            className="scroll-content"
+            maxHeight="inherit"
+            overflowY="scroll"
+            position="relative"
+          >
             {/* 메인컨텐츠 wrapper(푸터제외 영역) */}
             <Box
               className="content-wrapper"
-              overflowY="hidden"
               minHeight={`calc(100vh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`}
             >
               <MypageBreadcrumb />
