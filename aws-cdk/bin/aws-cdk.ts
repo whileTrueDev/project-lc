@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import 'source-map-support/register';
 import { LCDevAppStack } from '../lib/dev/app-stack';
 import { LCDevDatabaseStack } from '../lib/dev/database-stack';
+import { LCDevRedisStack } from '../lib/dev/redis-stack';
 import { LCDevVpcStack } from '../lib/dev/vpc-stack';
 import { LCDomainStack } from '../lib/env-agnostic/domain-stack';
 import { LCProdAppStack } from '../lib/prod/app-stack';
@@ -32,6 +33,12 @@ const devAppStack = new LCDevAppStack(app, 'LC-DEV-APP', {
   overlaySecGrp: devVpcStack.overlaySecGrp,
   overlayControllerSecGrp: devVpcStack.overlayControllerSecGrp,
   albSecGrp: devVpcStack.albSecGrp,
+  realtimeApiSecGrp: devVpcStack.realtimeApiSecGrp,
+});
+// 레디스 캐시 스택
+new LCDevRedisStack(app, 'LC-DEV-REDIS', {
+  vpc: devVpcStack.vpc,
+  redisSecGrp: devVpcStack.redisSecGrp,
 });
 
 // ************************************
