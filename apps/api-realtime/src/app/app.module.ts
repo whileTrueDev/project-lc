@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtHelperModule } from '@project-lc/nest-modules-jwt-helper';
+import { LiveShoppingStateRealtimeModule } from '@project-lc/nest-modules-liveshopping';
 import { NotificationRealtimeModule } from '@project-lc/nest-modules-notification';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
@@ -9,6 +10,7 @@ import { AppController } from './app.controller';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
     NotificationRealtimeModule,
+    LiveShoppingStateRealtimeModule,
     JwtHelperModule,
   ],
   controllers: [AppController],

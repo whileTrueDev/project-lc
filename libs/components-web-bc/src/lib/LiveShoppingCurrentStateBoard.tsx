@@ -1,25 +1,10 @@
 import { Box, Grid, GridItem, Heading, Stack, Text } from '@chakra-ui/react';
 import { LiveShoppingPurchaseMessage } from '@prisma/client';
 import MotionBox from '@project-lc/components-core/MotionBox';
-import {
-  useLiveShoppingStateBoardAdminMessage,
-  useLiveShoppingStateBoardAlertDeleteMutation,
-  useLiveShoppingStateBoardAlertState,
-  usePurchaseMessages,
-} from '@project-lc/hooks';
+import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
+import { useLiveShoppingStateSubscription, usePurchaseMessages } from '@project-lc/hooks';
 import { AnimationDefinition } from 'framer-motion/types/render/utils/animation';
 import { useCallback, useMemo } from 'react';
-import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
-
-function getRefetchInterval(enable: boolean, time: number): undefined | number {
-  return enable ? time : undefined;
-}
-// 재요청 시간 ms
-const FETCH_INTERVAL = {
-  purchaseMessage: 10 * 1000,
-  adminMessage: 5 * 1000,
-  alertData: 5 * 1000,
-};
 
 // 관리자 알림 있는경우 애니메이션 위한 variants
 const variants = {
@@ -44,24 +29,16 @@ const variants = {
 export interface LiveShoppingCurrentStateBoardProps {
   liveShoppingId: number;
   title: string;
-  isOnAir: boolean;
 }
 
 export function LiveShoppingCurrentStateBoard({
   liveShoppingId,
   title,
-  isOnAir,
 }: LiveShoppingCurrentStateBoardProps): JSX.Element {
-  // * 관리자메시지 데이터
-  const { data: adminMessageData } = useLiveShoppingStateBoardAdminMessage({
-    liveShoppingId,
-    refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.adminMessage),
-  });
-
+  const { message, alert, setAlert } = useLiveShoppingStateSubscription(liveShoppingId);
   // * 응원메시지 데이터
   const { data, status, error } = usePurchaseMessages({
     liveShoppingId,
-    refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.purchaseMessage),
   });
 
   const { totalPrice, totalPurchaseCount, totalGiftCount } = useMemo(() => {
@@ -74,22 +51,16 @@ export function LiveShoppingCurrentStateBoard({
   }, [data]);
 
   // * 관리자 알림
-  const { hasAlert, setAlertFalse } = useLiveShoppingStateBoardAlertState({
-    liveShoppingId,
-    refetchInterval: getRefetchInterval(isOnAir, FETCH_INTERVAL.alertData),
-  });
+  const hasAlert = alert;
 
-  const deleteAlert = useLiveShoppingStateBoardAlertDeleteMutation();
-  // * 관리자 알림 도착으로 애니메이션 끝난 후 콜백함수 -> 관리자 알림 삭제 & 관리자 알림여부 false로 설정
+  // * 관리자 알림 도착으로 애니메이션 끝난 후 콜백함수 -> 관리자 알림여부 false로 설정
   const onAminationCompleteHandler = useCallback(
     (def: AnimationDefinition) => {
       if (def === 'visible') {
-        deleteAlert.mutateAsync({ liveShoppingId }).then(() => {
-          setAlertFalse();
-        });
+        setAlert(false);
       }
     },
-    [deleteAlert, liveShoppingId, setAlertFalse],
+    [setAlert],
   );
 
   if (status === 'loading') return <Box>Loading...</Box>;
@@ -113,7 +84,7 @@ export function LiveShoppingCurrentStateBoard({
 
         {/* 관리자메시지 */}
         <SectionWithTitle variant="outlined" title="관리자 메시지">
-          {adminMessageData?.text || '없음'}
+          {message || '없음'}
         </SectionWithTitle>
 
         {/* 라이브 상황판 */}

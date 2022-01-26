@@ -12,12 +12,14 @@ import { BroadcasterMainProcess } from '@project-lc/components-web-bc/main/Broad
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useRouter } from 'next/router';
+import { useIsLoggedIn } from '@project-lc/hooks';
 
 dayjs.extend(relativeTime);
 
 export function Index(): JSX.Element {
   const router = useRouter();
   const inquiry = useDisclosure();
+  const { isLoggedIn } = useIsLoggedIn();
   return (
     <div>
       <Flex minH="100vh" justify="space-between" flexDirection="column">
@@ -27,7 +29,10 @@ export function Index(): JSX.Element {
 
         <KkshowTogether
           buttons={[
-            { label: '시작하기', onClick: () => router.push('/login') },
+            {
+              label: '시작하기',
+              onClick: () => router.push(isLoggedIn ? '/mypage' : '/login'),
+            },
             { label: '문의하기', onClick: () => inquiry.onOpen() },
           ]}
         />

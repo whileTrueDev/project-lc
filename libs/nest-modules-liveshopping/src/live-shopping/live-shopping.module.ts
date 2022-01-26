@@ -4,11 +4,10 @@ import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { LiveShoppingController } from './live-shopping.controller';
 import { LiveShoppingService } from './live-shopping.service';
 import { PurchaseMessageService } from './purchase-message.service';
-import { LiveShoppingStateBoardService } from './live-shopping-state-board.service';
 @Module({
   imports: [S3Module, GoodsModule],
-  providers: [LiveShoppingService, PurchaseMessageService, LiveShoppingStateBoardService],
+  providers: [LiveShoppingService, PurchaseMessageService],
   controllers: [LiveShoppingController],
-  exports: [LiveShoppingService, PurchaseMessageService, LiveShoppingStateBoardService],
+  exports: [LiveShoppingService, PurchaseMessageService],
 })
 export class LiveShoppingModule {}
