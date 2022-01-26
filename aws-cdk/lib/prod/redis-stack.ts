@@ -23,7 +23,7 @@ export class LCRedisStack extends cdk.Stack {
       {
         description: 'Elasticache Subnet Group',
         subnetIds: redisSubnets,
-        cacheSubnetGroupName: 'RedisSubnetGroup',
+        cacheSubnetGroupName: 'KksProdRedisSubnetGroup',
       },
     );
 
