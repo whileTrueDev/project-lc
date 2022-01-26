@@ -9,6 +9,7 @@ import { LCDevVpcStack } from '../lib/dev/vpc-stack';
 import { LCDomainStack } from '../lib/env-agnostic/domain-stack';
 import { LCProdAppStack } from '../lib/prod/app-stack';
 import { LCProdDatabaseStack } from '../lib/prod/database-stack';
+import { LCRedisStack } from '../lib/prod/redis-stack';
 import { LCProdVpcStack } from '../lib/prod/vpc-stack';
 import { envCheck } from '../util/env-check';
 
@@ -63,7 +64,7 @@ const prodAppStack = new LCProdAppStack(app, 'LC-PROD-APP', {
 });
 
 // 레디스 캐시 스택
-new LCDevRedisStack(app, 'LC-PROD-REDIS', {
+new LCRedisStack(app, 'LC-PROD-REDIS', {
   vpc: devVpcStack.vpc,
   redisSecGrp: devVpcStack.redisSecGrp,
 });
