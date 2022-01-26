@@ -13,10 +13,10 @@ export class JwtHelperService {
   ) {}
 
   /** 액세스 토큰 생성 */
-  createAccessToken(userPayload: UserPayload): string {
+  createAccessToken(userPayload: UserPayload, expiresIn?: string | number): string {
     const _userPayload = this.castUserPayload(userPayload);
     return this.jwtService.sign(_userPayload, {
-      expiresIn: authConstants.ACCESS_TOKEN_EXPIRE_TIME,
+      expiresIn: expiresIn ?? authConstants.ACCESS_TOKEN_EXPIRE_TIME,
     });
   }
 
