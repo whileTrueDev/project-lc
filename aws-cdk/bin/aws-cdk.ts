@@ -65,8 +65,8 @@ const prodAppStack = new LCProdAppStack(app, 'LC-PROD-APP', {
 
 // 레디스 캐시 스택
 new LCRedisStack(app, 'LC-PROD-REDIS', {
-  vpc: devVpcStack.vpc,
-  redisSecGrp: devVpcStack.redisSecGrp,
+  vpc: prodVpcStack.vpc,
+  redisSecGrp: prodVpcStack.redisSecGrp,
 });
 
 // ************************************
