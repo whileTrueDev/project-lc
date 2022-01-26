@@ -6,7 +6,6 @@ ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY ./dist/apps/api-realtime .
-
 RUN yarn install --prod
 
 EXPOSE 3000
