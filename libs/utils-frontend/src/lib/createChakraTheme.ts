@@ -48,8 +48,8 @@ export const createChakraTheme = () =>
       }),
     },
     fonts: {
-      heading: 'Gmarket Sans',
-      body: "'Noto Sans KR', sans-serif;",
+      heading: '"Gmarket Sans", "Noto Sans KR", sans-serif',
+      body: '"Noto Sans KR", sans-serif;',
     },
     colors: {
       blue: blueColorPalette,
