@@ -18,8 +18,9 @@ export type s3KeyType =
   | 'vertical-banner'
   | 'donation-images'
   | 'broadcaster-id-card' // 방송인 신분증
-  | 'broadcaster-account-image'
-  | 'overlay-logo'; // 방송인 통장사본
+  | 'broadcaster-account-image' // 방송인 통장사본
+  | 'overlay-logo'
+  | 'horizontal-banner';
 
 export interface S3UploadImageOptions {
   filename: string | null;
@@ -221,7 +222,7 @@ export const s3 = (() => {
   async function getOverlayImagesFromS3(
     broadcasterId: string,
     liveShoppingId: number,
-    type: 'vertical-banner' | 'donation-images' | 'overlay-logo',
+    type: 'vertical-banner' | 'donation-images' | 'overlay-logo' | 'horizontal-banner',
   ): Promise<(string | undefined)[]> {
     const command = new ListObjectsCommand({
       Bucket: S3_BUCKET_NAME,
