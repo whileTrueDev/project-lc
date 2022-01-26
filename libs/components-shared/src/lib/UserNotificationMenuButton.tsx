@@ -98,10 +98,7 @@ export function UserNotificationMenuButton(): JSX.Element {
       status: 'info',
       position: 'top-right',
       containerStyle: {
-        position: 'absolute',
-        top: 60,
         maxWidth: 320,
-
         maxHeight: '200px',
         height: '100%',
       },
