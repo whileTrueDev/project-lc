@@ -3,6 +3,7 @@ on:
     branches: [dev]
     paths:
       - 'apps/api/**'
+      - 'apps/api-realtime/**'
       - 'apps/overlay/**'
       - 'apps/overlay-controller/**'
       - 'libs/firstmall-db/**'
