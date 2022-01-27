@@ -10,6 +10,7 @@ import {
   useProfile,
   useDisplaySize,
 } from '@project-lc/hooks';
+import { getLiveShoppingProgress } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
@@ -76,23 +77,29 @@ export function BroadcasterLiveShoppingList({
     },
     {
       headerName: '',
-      field: '실시간 현황',
+      field: '현황',
       width: 100,
       sortable: false,
       disableColumnMenu: true,
-      renderCell: ({ row }: GridRowData) => (
-        <Button
-          size="xs"
-          colorScheme="green"
-          onClick={() => {
-            const url = `${window.location.origin}/mypage/live/state/${row.id}`;
-            const windowFeatures = 'scrollbars,resizable,width=800, height=600';
-            window.open(url, '_blank', windowFeatures);
-          }}
-        >
-          실시간 현황
-        </Button>
-      ),
+      renderCell: ({ row }: GridRowData) => {
+        const shoppingProgress = getLiveShoppingProgress(row);
+        return (
+          <Button
+            size="xs"
+            colorScheme="green"
+            disabled={['조율중', '취소됨', '등록됨'].includes(shoppingProgress)}
+            onClick={() => {
+              const url = `${window.location.origin}/mypage/live/state/${row.id}`;
+              const windowFeatures = 'scrollbars,resizable,width=800, height=600';
+              window.open(url, '_blank', windowFeatures);
+            }}
+          >
+            {shoppingProgress === '방송진행중' && '실시간 '}
+            {['판매종료', '방송종료'].includes(shoppingProgress) && '지난 '}
+            현황
+          </Button>
+        );
+      },
     },
     {
       field: 'liveShoppingName',
