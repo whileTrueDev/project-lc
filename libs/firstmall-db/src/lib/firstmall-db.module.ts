@@ -12,7 +12,7 @@ import { FmSettlementController } from './fm-settlements/fm-settlements.controll
 import { FmSettlementService } from './fm-settlements/fm-settlements.service';
 
 @Module({
-  imports: [GoodsModule, LiveShoppingModule],
+  imports: [GoodsModule.withoutControllers(), LiveShoppingModule.withoutControllers()],
   controllers: [
     FmOrdersController,
     FmGoodsController,

@@ -28,6 +28,7 @@ interface LCProdAppStackProps extends cdk.StackProps {
   apiSecGrp: ec2.SecurityGroup;
   overlaySecGrp: ec2.SecurityGroup;
   overlayControllerSecGrp: ec2.SecurityGroup;
+  realtimeApiSecGrp: ec2.SecurityGroup;
 }
 
 export class LCProdAppStack extends cdk.Stack {
@@ -40,28 +41,41 @@ export class LCProdAppStack extends cdk.Stack {
   private readonly apiSecGrp: ec2.SecurityGroup;
   private readonly overlaySecGrp: ec2.SecurityGroup;
   private readonly overlayControllerSecGrp: ec2.SecurityGroup;
+  private readonly realtimeApiSecGrp: ec2.SecurityGroup;
+
   private readonly cluster: Cluster;
   private readonly parameters: ReturnType<LCProdAppStack['loadSsmParamters']>;
 
   public readonly apiService: FargateService;
   public readonly overlayService: FargateService;
   public readonly overlayControllerService: FargateService;
+  public readonly realtimeAPIService: FargateService;
+
   public readonly alb: ApplicationLoadBalancer;
 
   constructor(scope: cdk.Construct, id: string, props: LCProdAppStackProps) {
     super(scope, id, props);
-    const { vpc, albSecGrp, apiSecGrp, overlaySecGrp, overlayControllerSecGrp } = props;
+    const {
+      vpc,
+      albSecGrp,
+      apiSecGrp,
+      overlaySecGrp,
+      overlayControllerSecGrp,
+      realtimeApiSecGrp,
+    } = props;
     this.vpc = vpc;
     this.albSecGrp = albSecGrp;
     this.apiSecGrp = apiSecGrp;
     this.overlaySecGrp = overlaySecGrp;
     this.overlayControllerSecGrp = overlayControllerSecGrp;
+    this.realtimeApiSecGrp = realtimeApiSecGrp;
 
     this.parameters = this.loadSsmParamters();
     this.cluster = this.createEcsCluster();
     this.apiService = this.createApiService();
     this.overlayService = this.createOverlayService();
     this.overlayControllerService = this.createOverlayControllerAppService();
+    this.realtimeAPIService = this.createRealtimeAPIService();
 
     this.alb = this.createALB();
   }
@@ -76,7 +90,7 @@ export class LCProdAppStack extends cdk.Stack {
 
   /** ECR 레파지토리 생성 */
   private createEcrRepo(
-    type: 'Api' | 'Overlay' | 'OverlayController',
+    type: 'Api' | 'Overlay' | 'OverlayController' | 'RealtimeApi',
     repoName: string,
   ): Repository {
     return new Repository(this, `${this.PREFIX}${type}Repo`, {
@@ -257,6 +271,7 @@ export class LCProdAppStack extends cdk.Stack {
         S3_BUCKET_NAME: 'lc-project',
         OVERLAY_HOST: `https://${constants.PUNYCODE_라이브}.${constants.PUNYCODE_DOMAIN}`,
         OVERLAY_CONTROLLER_HOST: `https://overlay-controller.${constants.PUNYCODE_DOMAIN}`,
+        REALTIME_API_HOST: `https://realtime.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}OverlayControllerLogGroup`, {
@@ -279,6 +294,56 @@ export class LCProdAppStack extends cdk.Stack {
       securityGroups: [this.overlayControllerSecGrp],
       assignPublicIp: false,
     });
+  }
+
+  private createRealtimeAPIService(): FargateService {
+    // REDIS_URL
+    const repo = this.createEcrRepo(
+      'RealtimeApi',
+      constants.PROD.ECS_REALTIME_API_FAMILY_NAME,
+    );
+    const realtimeApiTaskDef = new FargateTaskDefinition(
+      this,
+      `${this.PREFIX}RealtimeApiTaskDef`,
+      {
+        family: constants.PROD.ECS_REALTIME_API_FAMILY_NAME,
+      },
+    );
+    const p = this.parameters;
+    realtimeApiTaskDef.addContainer(`${this.PREFIX}RealtimeApiContainer`, {
+      containerName: constants.PROD.ECS_REALTIME_API_FAMILY_NAME,
+      portMappings: [{ containerPort: constants.PROD.ECS_REALTIME_API_PORT }],
+      image: ContainerImage.fromEcrRepository(repo),
+      memoryLimitMiB: 512,
+      secrets: {
+        JWT_SECRET: Secret.fromSsmParameter(p.JWT_SECRET),
+        CIPHER_HASH: Secret.fromSsmParameter(p.CIPHER_HASH),
+        CIPHER_PASSWORD: Secret.fromSsmParameter(p.CIPHER_PASSWORD),
+        CIPHER_SALT: Secret.fromSsmParameter(p.CIPHER_SALT),
+        REDIS_URL: Secret.fromSsmParameter(p.REDIS_URL),
+      },
+      logging: new AwsLogDriver({
+        logGroup: new logs.LogGroup(this, `${this.PREFIX}RealtimeApiLogGroup`, {
+          logGroupName: constants.PROD.ECS_REALTIME_API_LOG_GLOUP_NAME,
+          removalPolicy: cdk.RemovalPolicy.DESTROY,
+        }),
+        streamPrefix: 'ecs',
+      }),
+    });
+
+    const service = new FargateService(this, `${this.PREFIX}RealtimeApiService`, {
+      cluster: this.cluster,
+      serviceName: constants.PROD.ECS_REALTIME_API_SERVICE_NAME,
+      taskDefinition: realtimeApiTaskDef,
+      vpcSubnets: {
+        subnetGroupName: constants.PROD.PRIVATE_SUBNET_GROUP_NAME,
+      },
+      platformVersion: FargatePlatformVersion.LATEST,
+      desiredCount: 1,
+      securityGroups: [this.realtimeApiSecGrp],
+      assignPublicIp: false,
+    });
+    return service;
   }
 
   private createALB(): ApplicationLoadBalancer {
@@ -377,6 +442,31 @@ export class LCProdAppStack extends cdk.Stack {
       targetGroups: [overlayControllerTargetGroup],
     });
 
+    // * Realtime API 타겟그룹 추가
+    const realtimeApiTargetGroup = new ApplicationTargetGroup(
+      this,
+      `${this.PREFIX}RealtimeApiTargetGroup`,
+      {
+        vpc: this.vpc,
+        targetGroupName: 'RealtimeApiTargetGroupProd',
+        port: constants.PROD.ECS_REALTIME_API_PORT,
+        protocol: ApplicationProtocol.HTTP,
+        healthCheck: {
+          enabled: true,
+          path: '/',
+          interval: cdk.Duration.minutes(1),
+        },
+        targets: [this.realtimeAPIService],
+      },
+    );
+    httpsListener.addTargetGroups(`${this.PREFIX}AddRealtimeApiTargetGroup`, {
+      priority: 4,
+      conditions: [
+        ListenerCondition.hostHeaders([`realtime.${constants.PUNYCODE_DOMAIN}`]),
+      ],
+      targetGroups: [realtimeApiTargetGroup],
+    });
+
     return alb;
   }
 
@@ -419,6 +509,7 @@ export class LCProdAppStack extends cdk.Stack {
         2,
       ),
       WHILETRUE_IP_ADDRESS: __loadSsmParmeter(c.WHILETRUE_IP_ADDRESS),
+      REDIS_URL: __loadSsmParmeter(c.REDIS_URL_KEY),
     };
   }
 }

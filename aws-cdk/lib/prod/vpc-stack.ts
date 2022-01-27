@@ -1,5 +1,5 @@
-import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
+import * as cdk from '@aws-cdk/core';
 import { constants } from '../../constants';
 
 // CONSTANTS
@@ -13,6 +13,8 @@ export class LCProdVpcStack extends cdk.Stack {
   public readonly apiSecGrp: ec2.SecurityGroup;
   public readonly overlaySecGrp: ec2.SecurityGroup;
   public readonly overlayControllerSecGrp: ec2.SecurityGroup;
+  public readonly realtimeApiSecGrp: ec2.SecurityGroup;
+  public readonly redisSecGrp: ec2.SecurityGroup;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -26,6 +28,10 @@ export class LCProdVpcStack extends cdk.Stack {
     this.apiSecGrp = this.createApiSecGrp(this.albSecGrp);
     this.overlaySecGrp = this.createOverlaySecGrp(this.albSecGrp);
     this.overlayControllerSecGrp = this.createOverlayControllerSecGrp(this.albSecGrp);
+    this.realtimeApiSecGrp = this.createRealtimeApiSecGrp(this.albSecGrp);
+    this.redisSecGrp = this.createRedisSecGrp({
+      realtimeApiSecGrp: this.realtimeApiSecGrp,
+    });
     this.dbSecGrp = this.createDbSecGrp({
       apiSecGrp: this.apiSecGrp,
       overlaySecGrp: this.overlaySecGrp,
@@ -44,11 +50,11 @@ export class LCProdVpcStack extends cdk.Stack {
           name: constants.PROD.INGRESS_SUBNET_GROUP_NAME,
         },
         {
-          subnetType: ec2.SubnetType.PRIVATE,
+          subnetType: ec2.SubnetType.PRIVATE_WITH_NAT,
           name: constants.PROD.PRIVATE_SUBNET_GROUP_NAME,
         },
         {
-          subnetType: ec2.SubnetType.ISOLATED,
+          subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
           name: constants.PROD.ISOLATED_SUBNET_GROUP_NAME,
         },
       ],
@@ -75,7 +81,11 @@ export class LCProdVpcStack extends cdk.Stack {
       description: 'api security grp for project-lc',
       allowAllOutbound: true,
     });
-    apiSecGrp.addIngressRule(albSecGrp, ec2.Port.tcp(3000), 'allow port 3000');
+    apiSecGrp.addIngressRule(
+      albSecGrp,
+      ec2.Port.tcp(constants.PROD.ECS_API_PORT),
+      'allow port 3000',
+    );
     return apiSecGrp;
   }
 
@@ -87,7 +97,11 @@ export class LCProdVpcStack extends cdk.Stack {
       allowAllOutbound: true,
     });
 
-    overlaySecGrp.addIngressRule(albSecGrp, ec2.Port.tcp(3002), 'allow port 3002');
+    overlaySecGrp.addIngressRule(
+      albSecGrp,
+      ec2.Port.tcp(constants.PROD.ECS_OVERLAY_PORT),
+      'allow port 3002',
+    );
     return overlaySecGrp;
   }
 
@@ -105,7 +119,7 @@ export class LCProdVpcStack extends cdk.Stack {
 
     overlayControllerSecGrp.addIngressRule(
       albSecGrp,
-      ec2.Port.tcp(3333),
+      ec2.Port.tcp(constants.PROD.ECS_OVERLAY_CONTROLLER_PORT),
       'allow port 3333 to alb',
     );
     return overlayControllerSecGrp;
@@ -170,5 +184,58 @@ export class LCProdVpcStack extends cdk.Stack {
       'Allow github actions builder',
     );
     return dbSecGrp;
+  }
+
+  /** realtime API 서버 보안그룹 생성 */
+  private createRealtimeApiSecGrp(albSecGrp: ec2.SecurityGroup): ec2.SecurityGroup {
+    const realtimeApiSecGrp = new ec2.SecurityGroup(
+      this,
+      `${ID_PREFIX}RealtimeApi-SecGrp`,
+      {
+        vpc: this.vpc,
+        description: 'Realtime api server security grp for project-lc',
+        allowAllOutbound: true,
+      },
+    );
+
+    realtimeApiSecGrp.addIngressRule(
+      albSecGrp,
+      ec2.Port.tcp(constants.PROD.ECS_REALTIME_API_PORT),
+      'Allow port 3001 to alb for kks realtime-api',
+    );
+
+    return realtimeApiSecGrp;
+  }
+
+  /** Redis 서버 (ElstiCache) 보안그룹 생성 */
+  private createRedisSecGrp({
+    realtimeApiSecGrp,
+  }: {
+    realtimeApiSecGrp: ec2.SecurityGroup;
+  }): ec2.SecurityGroup {
+    const redisPort = 6379;
+    const redisSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}Redis-SecGrp`, {
+      vpc: this.vpc,
+      description: 'Redis security grp for project-lc',
+      allowAllOutbound: false,
+    });
+
+    redisSecGrp.addIngressRule(
+      realtimeApiSecGrp,
+      ec2.Port.tcp(redisPort),
+      'Allow port 6379 from kks realtime-api',
+    );
+    redisSecGrp.addEgressRule(
+      realtimeApiSecGrp,
+      ec2.Port.tcp(redisPort),
+      'Allow port 6379 to kks realtime-api',
+    );
+
+    realtimeApiSecGrp.addIngressRule(
+      redisSecGrp,
+      ec2.Port.tcp(constants.PROD.ECS_REALTIME_API_PORT),
+      'Allow port 3001 to redis cluster',
+    );
+    return redisSecGrp;
   }
 }
