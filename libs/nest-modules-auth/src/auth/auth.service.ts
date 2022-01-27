@@ -33,7 +33,12 @@ export class AuthService {
     // token에 들어갈 데이터를 입력한다. -> 유저 타입 정도는 들어가는 것이 좋을 듯하다.
     return {
       token_type: 'bearer',
-      access_token: this.jwtHelper.createAccessToken(userPayload),
+      access_token: this.jwtHelper.createAccessToken(
+        userPayload,
+        userType === 'admin'
+          ? authConstants.ADMIN_ACCESS_TOKEN_EXPIRE_TIME_INT
+          : undefined,
+      ),
       expires_in:
         userType === 'admin'
           ? authConstants.ADMIN_ACCESS_TOKEN_EXPIRE_TIME_INT
