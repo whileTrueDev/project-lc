@@ -15,7 +15,11 @@ describe('FmExportsService', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [GoodsModule, PrismaModule, ConfigModule.forRoot({ isGlobal: true })],
+      imports: [
+        GoodsModule.withoutControllers(),
+        PrismaModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+      ],
       providers: [FmExportsService, FirstmallDbService, FMGoodsService, FmOrdersService],
     }).compile();
 

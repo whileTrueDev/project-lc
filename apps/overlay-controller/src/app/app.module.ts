@@ -10,7 +10,7 @@ import { validationSchema } from '../settings/config.validation';
   imports: [
     PrismaModule,
     OverlayControllerModule,
-    LiveShoppingModule,
+    LiveShoppingModule.withoutControllers(),
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
   ],
   controllers: [AppController],
