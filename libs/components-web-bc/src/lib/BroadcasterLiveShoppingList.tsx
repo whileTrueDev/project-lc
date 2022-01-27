@@ -7,10 +7,11 @@ import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveSho
 import {
   useBroadcasterFmOrdersDuringLiveShoppingSales,
   useBroadcasterLiveShoppingList,
-  useProfile,
   useDisplaySize,
+  useProfile,
 } from '@project-lc/hooks';
 import { getLiveShoppingProgress } from '@project-lc/shared-types';
+import { liveShoppingStateBoardWindowStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
@@ -56,6 +57,36 @@ export function BroadcasterLiveShoppingList({
     }
   }
 
+  function StateBoardWindowOpenButton({
+    shoppingProgress,
+    broadcastId,
+  }: {
+    shoppingProgress: string;
+    broadcastId: number;
+  }): JSX.Element {
+    const { addWindow } = liveShoppingStateBoardWindowStore();
+
+    return (
+      <Button
+        size="xs"
+        colorScheme="green"
+        disabled={['조율중', '취소됨', '등록됨'].includes(shoppingProgress)}
+        onClick={() => {
+          const url = `${window.location.origin}/mypage/live/state/${broadcastId}`;
+          const windowFeatures = 'scrollbars,resizable,width=800, height=600';
+          const w = window.open(url, '_blank', windowFeatures);
+          if (w) {
+            addWindow(w);
+          }
+        }}
+      >
+        {shoppingProgress === '방송진행중' && '실시간 '}
+        {['판매종료', '방송종료'].includes(shoppingProgress) && '지난 '}
+        현황
+      </Button>
+    );
+  }
+
   const columns: GridColumns = [
     {
       headerName: '',
@@ -84,20 +115,10 @@ export function BroadcasterLiveShoppingList({
       renderCell: ({ row }: GridRowData) => {
         const shoppingProgress = getLiveShoppingProgress(row);
         return (
-          <Button
-            size="xs"
-            colorScheme="green"
-            disabled={['조율중', '취소됨', '등록됨'].includes(shoppingProgress)}
-            onClick={() => {
-              const url = `${window.location.origin}/mypage/live/state/${row.id}`;
-              const windowFeatures = 'scrollbars,resizable,width=800, height=600';
-              window.open(url, '_blank', windowFeatures);
-            }}
-          >
-            {shoppingProgress === '방송진행중' && '실시간 '}
-            {['판매종료', '방송종료'].includes(shoppingProgress) && '지난 '}
-            현황
-          </Button>
+          <StateBoardWindowOpenButton
+            shoppingProgress={shoppingProgress}
+            broadcastId={row.id}
+          />
         );
       },
     },
