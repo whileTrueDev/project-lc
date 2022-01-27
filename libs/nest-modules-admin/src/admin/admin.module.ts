@@ -11,7 +11,7 @@ import { AdminService } from './admin.service';
 @Module({
   imports: [
     forwardRef(() => SellerModule),
-    forwardRef(() => BroadcasterModule),
+    forwardRef(() => BroadcasterModule.withoutControllers()),
     OrderCancelModule,
   ],
   providers: [AdminService, ConfigService, AdminSettlementService, AdminAccountService],

@@ -31,9 +31,9 @@ describe('FmOrdersController', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        GoodsModule,
         PrismaModule,
-        LiveShoppingModule,
+        GoodsModule.withoutControllers(),
+        LiveShoppingModule.withoutControllers(),
         ConfigModule.forRoot({ isGlobal: true }),
       ],
       controllers: [FmOrdersController],

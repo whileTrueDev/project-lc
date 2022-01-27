@@ -5,6 +5,7 @@ import { FirstmallDbModule } from '@project-lc/firstmall-db';
 import { mailerConfig } from '@project-lc/nest-core';
 import { AdminModule } from '@project-lc/nest-modules-admin';
 import { AuthModule, SocialModule } from '@project-lc/nest-modules-auth';
+import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { InquiryModule } from '@project-lc/nest-modules-inquiry';
@@ -24,21 +25,22 @@ import { AppService } from './app.service';
   imports: [
     MailerModule.forRoot(mailerConfig),
     FirstmallDbModule,
-    SellerModule,
     PrismaModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
     SocialModule,
-    GoodsModule,
     AdminModule,
     ShippingGroupModule,
-    LiveShoppingModule,
     NoticeModule,
     OrderCancelModule,
     NotificationModule,
     InquiryModule,
     CipherModule,
     JwtHelperModule,
+    SellerModule,
+    GoodsModule.withControllers(),
+    LiveShoppingModule.withControllers(),
+    BroadcasterModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [AppService],

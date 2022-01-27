@@ -12,7 +12,13 @@ import { LocalStrategy } from './strategies/local.strategy';
 
 @Global()
 @Module({
-  imports: [SellerModule, BroadcasterModule, AdminModule, PassportModule, MailModule],
+  imports: [
+    SellerModule,
+    BroadcasterModule.withoutControllers(),
+    AdminModule,
+    PassportModule,
+    MailModule,
+  ],
   providers: [AuthService, JwtStrategy, LocalStrategy, LoginHistoryService],
   controllers: [AuthController],
   exports: [AuthService, LoginHistoryService],
