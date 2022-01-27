@@ -1,4 +1,5 @@
 import { UserType } from '@project-lc/shared-types';
+import { liveShoppingStateBoardWindowStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
@@ -13,11 +14,13 @@ import { useProfile } from './queries/useProfile';
 export function useLogout(): { logout: () => void } {
   const queryClient = useQueryClient();
   const { mutateAsync } = useLogoutMutation();
+  const { closeWindows } = liveShoppingStateBoardWindowStore();
 
   const logout = useCallback(() => {
     mutateAsync()
       .then((res) => {
         if (res === 'OK') {
+          closeWindows();
           queryClient.clear();
           queryClient.removeQueries('Profile', { exact: true });
         }
@@ -25,7 +28,7 @@ export function useLogout(): { logout: () => void } {
       .catch((error) => {
         console.error(error);
       });
-  }, [mutateAsync, queryClient]);
+  }, [closeWindows, mutateAsync, queryClient]);
 
   return { logout };
 }
