@@ -235,6 +235,15 @@ $(document).ready(function ready() {
     });
   });
 
+  $('#product-name-send-button').click(function startTimeSendButtonClickEvent() {
+    const productName = $('#product-name').val().trim();
+    const streamerAndProduct = { streamerNickname, productName };
+    socket.emit('get product name from admin', {
+      roomName,
+      streamerAndProduct,
+    });
+  });
+
   $('#end-time-send-button').click(function endTimeSendButtonClickEvent() {
     const selectedTime = $('#end-time-picker').val();
     socket.emit('get d-day', { roomName, date: selectedTime });

@@ -613,7 +613,6 @@ socket.on('remove notification image from server', () => {
 
 socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
   $('.alive-check').css('background-color', 'yellow');
-  // liveShoppingId = liveShoppingIdAndProductName.liveShoppingId;
   streamerAndProduct = liveShoppingIdAndProductName.streamerAndProduct;
 
   const roomName = pageUrl.split('/').pop();
@@ -621,6 +620,11 @@ socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
     liveShoppingId,
     roomName,
   });
+});
+
+socket.on('get product name from server', (streamerAndProductName) => {
+  $('.alive-check').css('background-color', 'red');
+  streamerAndProduct = streamerAndProductName;
 });
 
 socket.on('get registered date from server', (registeredTime) => {
