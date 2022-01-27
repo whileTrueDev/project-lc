@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <script src='/socket.io/socket.io.js'></script>
+    <script src='https://code.jquery.com/jquery-3.4.0.min.js'></script>
+    <link href='/layout.css' rel='stylesheet' />
+    <script type='module' src='/nslOverlayClient.js'></script>
+    <script>
+      const exports = {};
+    </script>
+    <script
+      id='primary-info'
+      data-email={{email}}
+      data-number={{verticalImagesLength}}
+      data-liveshopping-id={{liveShoppingId.id}}
+    >
+    </script>
+    <title>
+      네쇼라-오버레이
+    </title>
+  </head>
+  <body>
+    <div class="container">
+    <div class='horizontal-banner-box'>
+      <img class='horizontal-banner' alt='horizontal-banner' />
+    </div>
+    <div class="nsl-ranking">
+      <div class='nsl-ranking-text'>
+        <p class='nsl-ranking-text-area' id='nsl-ranking-title'>
+          구매자 TOP4
+        </p>
+        <p class="nsl-ranking-text-area" id="nsl-rank-0">
+          <span class="nsl-ranking-id-wrapper">
+            <img src="/images/crown.png" id="ranking-icon" />
+            <span class="nsl-ranking-text-area-id" id="nsl-rank-0">
+            </span>
+          </span>
+          <span class="nsl-quantity" id="nsl-rank-0">
+          </span>
+        </p>
+        <p class="nsl-ranking-text-area" id="nsl-rank-1">
+          <span class="nsl-ranking-id-wrapper">
+            <img src="/images/first.png" id="ranking-icon" />
+            <span class="nsl-ranking-text-area-id" id="nsl-rank-1">
+            </span>
+          </span>
+          <span class="nsl-quantity" id="nsl-rank-1">
+          </span>
+        </p>
+        <p class="nsl-ranking-text-area" id="nsl-rank-2">
+          <span class="nsl-ranking-id-wrapper">
+            <img src="/images/second.png" id="ranking-icon" />
+            <span class="nsl-ranking-text-area-id" id="nsl-rank-2">
+            </span>
+          </span>
+          <span class="nsl-quantity" id="nsl-rank-2">
+          </span>
+          <p class="nsl-ranking-text-area" id="nsl-rank-3">
+          <span class="nsl-ranking-id-wrapper">
+            <img src="/images/third.png" id="ranking-icon" />
+            <span class="nsl-ranking-text-area-id" id="nsl-rank-3">
+            </span>
+          </span>
+          <span class="nsl-quantity" id="nsl-rank-3">
+          </span>
+        </p>
+      </div>
+    <img src="/images/nsl-ranking-medal.png" id="nsl-ranking-medal"/>
+    </div>
+    <div class="nsl-donation-message">
+    </div>
+    </div>
+  </body>
+</html>

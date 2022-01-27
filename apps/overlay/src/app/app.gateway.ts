@@ -12,7 +12,8 @@ import {
   PageUrlAndDevice,
   SocketIdandDevice,
   SocketInfo,
-  LiveShoppingIdWithProductNameAndRoomId,
+  LiveShoppingIdWithProductNameAndRoomName,
+  ProductNameAndRoomName,
 } from '@project-lc/shared-types';
 import { Server, Socket } from 'socket.io';
 
@@ -51,6 +52,7 @@ export class AppGateway
   @SubscribeMessage('new client')
   handleClient(socket: Socket, clientUrlDevice: PageUrlAndDevice): void {
     const { pageUrl } = clientUrlDevice;
+
     const roomName = pageUrl?.split('/').pop();
     if (roomName) {
       socket.join(roomName);
@@ -99,7 +101,7 @@ export class AppGateway
   @SubscribeMessage('liveshopping id from admin')
   getLiveShoppingId(
     @MessageBody()
-    roomAndLiveShoppingId: LiveShoppingIdWithProductNameAndRoomId,
+    roomAndLiveShoppingId: LiveShoppingIdWithProductNameAndRoomName,
   ): void {
     const { roomName } = roomAndLiveShoppingId;
     const { liveShoppingId } = roomAndLiveShoppingId;
@@ -107,5 +109,15 @@ export class AppGateway
     this.server
       .to(roomName)
       .emit('get liveshopping id from server', { liveShoppingId, streamerAndProduct });
+  }
+
+  @SubscribeMessage('get product name from admin')
+  getProductName(
+    @MessageBody()
+    roomNameAndStreamerAndProduct: ProductNameAndRoomName,
+  ): void {
+    const { roomName } = roomNameAndStreamerAndProduct;
+    const { streamerAndProduct } = roomNameAndStreamerAndProduct;
+    this.server.to(roomName).emit('get product name from server', streamerAndProduct);
   }
 }

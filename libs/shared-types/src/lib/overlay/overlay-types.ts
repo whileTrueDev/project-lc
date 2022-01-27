@@ -117,12 +117,21 @@ export interface StartSetting extends RoomAndDate {
   /** 스트리머명과 상품명 */
   streamerAndProduct: StreamerAndProduct;
 }
-/** 라이브쇼핑id 전송시 같이 전송될 값 : 룸이름, 라이브쇼핑id, 상품명, 스트리머 명 */
-export interface LiveShoppingIdWithProductNameAndRoomId {
-  /** 소켓 룸이름 */
+
+export interface ProductNameAndRoomName {
   roomName: string;
-  /** 라이브쇼핑 아이디 */
-  liveShoppingId: string;
-  /** 상품명과 스트리머명 */
   streamerAndProduct: StreamerAndProduct;
 }
+
+/** 라이브쇼핑id 전송시 같이 전송될 값 : 룸이름, 라이브쇼핑id, 상품명, 스트리머 명 */
+export interface LiveShoppingIdWithProductNameAndRoomName extends ProductNameAndRoomName {
+  /** 라이브쇼핑 아이디 */
+  liveShoppingId: string;
+}
+
+export type OverlayImageTypes =
+  | 'vertical-banner'
+  | 'donation-images-1'
+  | 'donation-images-2'
+  | 'overlay-logo'
+  | 'horizontal-banner';

@@ -12,3 +12,5 @@ export class BroadcasterDTO {
 }
 
 export type BroadcasterDTOWithoutUserId = Omit<BroadcasterDTO, 'userId'>;
+
+export type BroadcasterWithoutUserNickName = Omit<BroadcasterDTO, 'userNickname'>;

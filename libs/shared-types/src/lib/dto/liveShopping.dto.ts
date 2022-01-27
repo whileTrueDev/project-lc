@@ -112,3 +112,5 @@ export type LiveShoppingsWithBroadcasterAndGoodsName = Pick<
 };
 
 export type LiveShoppingFmGoodsSeq = Pick<LiveShopping, 'fmGoodsSeq'>;
+
+export type LiveShoppingId = Pick<LiveShopping, 'id'>;
