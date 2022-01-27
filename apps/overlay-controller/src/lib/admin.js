@@ -103,6 +103,7 @@ $(document).ready(function ready() {
             },
           ],
         });
+
         // hbs가 컴파일하여 파싱한 이후에, 이벤트 새로 등록해줘야 함.
         $('.delete-message-button').click(function deleteMessageButtonClick() {
           const messageId = $(this)
@@ -123,6 +124,10 @@ $(document).ready(function ready() {
             },
           });
         });
+        $('.delete-message-button').attr(
+          'disabled',
+          !$('#panel-activate-checkbox').prop('checked'),
+        );
       },
       error(error) {
         console.log(error);
