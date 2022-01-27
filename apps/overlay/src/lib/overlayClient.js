@@ -5,9 +5,9 @@ const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
 const iterateLimit = $('#primary-info').data('number') + 1;
+const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const email = $('#primary-info').data('email');
 let streamerAndProduct;
-let liveShoppingId;
 let startDate = new Date('2021-09-27T14:05:00+0900');
 let endDate = new Date('2021-09-04T15:00:00+0900');
 let feverDate = new Date('2021-09-27T14:05:00+0900');
@@ -259,6 +259,11 @@ const device = getOS();
 
 socket.emit('new client', { pageUrl, device });
 
+socket.emit('get date from registered liveshopping', {
+  liveShoppingId,
+  roomName: pageUrl.split('/').pop(),
+});
+
 socket.on('get top-left ranking', (data) => {
   const rankingArray = data;
   if ($('.ranking-text-area#title').css('display') === 'none') {
@@ -413,13 +418,16 @@ socket.on('get objective message', async (data) => {
   }, 5000);
 });
 
-// socket.on('toggle right-top onad logo from server', () => {
-//   if ($('#kks-logo').attr('src').includes('-')) {
-//     $('#kks-logo').attr('src', '/images/onadLogo.png');
-//   } else {
-//     $('#kks-logo').attr('src', '/images/onadLogo-gray.png');
-//   }
-// });
+socket.on('toggle right-top onad logo from server', () => {
+  if ($('#kks-logo').attr('src').includes('s3')) {
+    $('#kks-logo').attr('src', '/images/kks-default-logo.png');
+  } else {
+    $('#kks-logo').attr(
+      'src',
+      `https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-logo/${email}/${liveShoppingId}/kks-special-logo`,
+    );
+  }
+});
 
 // 하단 메세지 (단순 답변)
 socket.on('get bottom area message', (data) => {
@@ -605,7 +613,6 @@ socket.on('remove notification image from server', () => {
 
 socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
   $('.alive-check').css('background-color', 'yellow');
-  liveShoppingId = liveShoppingIdAndProductName.liveShoppingId;
   streamerAndProduct = liveShoppingIdAndProductName.streamerAndProduct;
 
   const roomName = pageUrl.split('/').pop();
@@ -613,6 +620,11 @@ socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
     liveShoppingId,
     roomName,
   });
+});
+
+socket.on('get product name from server', (streamerAndProductName) => {
+  $('.alive-check').css('background-color', 'red');
+  streamerAndProduct = streamerAndProductName;
 });
 
 socket.on('get registered date from server', (registeredTime) => {

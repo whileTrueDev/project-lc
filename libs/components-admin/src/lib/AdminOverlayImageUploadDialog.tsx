@@ -24,6 +24,7 @@ import {
   Preview,
   readAsDataURL,
 } from '@project-lc/components-seller/GoodsRegistPictures';
+import { OverlayImageTypes } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { useEffect, useState } from 'react';
 
@@ -43,7 +44,7 @@ export async function imageFileListToImageDto(
   imageFileList: { file: File; filename: string; id: number }[],
   userMail: string,
   liveShoppingId: number,
-  type: 'vertical-banner' | 'donation-images-1' | 'donation-images-2',
+  type: OverlayImageTypes,
 ): Promise<
   Array<{
     cut_number: number;
@@ -67,18 +68,34 @@ export async function imageFileListToImageDto(
   }));
 }
 
-// 상품 사진, 상세설명 이미지를 s3에 업로드 -> url 리턴
 export async function uploadImageToS3(
   imageFile: { file: File | Buffer; filename: string; id: number; contentType: string },
   userMail: string,
   liveShoppingId: number,
-  type: 'vertical-banner' | 'donation-images-1' | 'donation-images-2',
+  type: OverlayImageTypes,
 ): Promise<string> {
   const { file, filename, contentType } = imageFile;
-  let imageType: 'vertical-banner' | 'donation-images' = 'vertical-banner';
-
+  let imageType:
+    | 'vertical-banner'
+    | 'donation-images'
+    | 'overlay-logo'
+    | 'horizontal-banner' = 'vertical-banner';
+  const tagging: {
+    overlayImageType:
+      | 'vertical-banner-tag'
+      | 'donation-images-tag'
+      | 'overlay-logo-tag'
+      | 'horizontal-banner-tag';
+  } = { overlayImageType: 'vertical-banner-tag' };
   if (type === 'donation-images-1' || type === 'donation-images-2') {
     imageType = 'donation-images';
+    tagging.overlayImageType = 'donation-images-tag';
+  } else if (type === 'overlay-logo') {
+    imageType = 'overlay-logo';
+    tagging.overlayImageType = 'overlay-logo-tag';
+  } else if (type === 'horizontal-banner') {
+    imageType = 'horizontal-banner';
+    tagging.overlayImageType = 'horizontal-banner-tag';
   }
 
   return s3.s3uploadFile({
@@ -88,13 +105,14 @@ export async function uploadImageToS3(
     userMail,
     type: imageType,
     liveShoppingId,
+    tagging,
   });
 }
 
 export async function getSavedImages(
   broadcasterId: string,
   liveShoppingId: number,
-  type: 'vertical-banner' | 'donation-images',
+  type: 'vertical-banner' | 'donation-images' | 'overlay-logo' | 'horizontal-banner',
 ): Promise<(string | undefined)[]> {
   const imageList = await s3.getOverlayImagesFromS3(broadcasterId, liveShoppingId, type);
   return imageList;
@@ -104,33 +122,41 @@ export function AdminOverlayImageUploadDialog(
   props: AdminOverlayImageUpload,
 ): JSX.Element {
   const { isOpen, onClose, broadcasterEmail, liveShoppingId } = props;
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const S3_IMAGE_PREFIX = `https://lc-project.s3.ap-northeast-2.amazonaws.com`;
   const toast = useToast();
   const [verticalPreviews, setVerticalPreviews] = useState<Preview[]>([]);
+  const [horizontalPreviews, setHorizontalPreviews] = useState<Preview[]>([]);
   const [firstDonationPreviews, setFirstDonationPreviews] = useState<Preview[]>([]);
   const [secondDonationPreviews, setSecondDonationPreviews] = useState<Preview[]>([]);
+  const [logoPreviews, setLogoPreviews] = useState<Preview[]>([]);
   const goBackAlertDialog = useDisclosure();
   const [savedVerticalImages, setSavedVerticalImages] = useState<(string | undefined)[]>(
     [],
   );
+  const [savedHorizontalImages, setSavedHorizontalImages] = useState<
+    (string | undefined)[]
+  >([]);
   const [savedFirstDonationImages, setSavedFirstDonationImages] = useState<
     string | undefined
   >('');
   const [savedSecondDonationImages, setSavedSecondDonationImages] = useState<
     string | undefined
   >('');
-  const [selectedBannerType, setSelectedBannerType] = useState<
-    'vertical-banner' | 'donation-images-1' | 'donation-images-2'
-  >('vertical-banner');
+  const [savedLogoImages, setSavedLogoImages] = useState<string | undefined>('');
+  const [selectedBannerType, setSelectedBannerType] =
+    useState<OverlayImageTypes>('vertical-banner');
 
   const numberOfSavedVerticalImages = savedVerticalImages.length;
+  const numberOfSavedHorizontalImages = savedHorizontalImages.length;
   const numberOfSavedFirstDonationImages = savedFirstDonationImages ? 1 : 0;
   const numberOfSavedSecondDonationImages = savedSecondDonationImages ? 1 : 0;
+  const numberOfSavedLogoImages = savedLogoImages ? 1 : 0;
   // 사진 등록하기 다이얼로그 - 파일업로드 인풋 성공 핸들러 -> 미리보기 previews에 이미지 추가
   const handleSuccess = (
     fileName: string,
     file: File,
-    type?: 'vertical-banner' | 'donation-images-1' | 'donation-images-2',
+    type?: OverlayImageTypes,
   ): void => {
     readAsDataURL(file).then(({ data }) => {
       switch (type) {
@@ -147,6 +173,19 @@ export function AdminOverlayImageUploadDialog(
             return newList;
           });
           break;
+        case 'horizontal-banner':
+          setHorizontalPreviews((list) => {
+            const id =
+              list.length === 0
+                ? numberOfSavedHorizontalImages + 1
+                : list[list.length - 1].id + 1;
+            const newList = [
+              ...list,
+              { id, url: data, filename: `horizontal-banner-${id}`, file },
+            ];
+            return newList;
+          });
+          break;
         case 'donation-images-1':
           setFirstDonationPreviews((list) => {
             const id = list.length === 0 ? 1 : list[list.length - 1].id + 1;
@@ -158,6 +197,16 @@ export function AdminOverlayImageUploadDialog(
           setSecondDonationPreviews((list) => {
             const id = list.length === 0 ? 1 : list[list.length - 1].id + 1;
             const newList = [...list, { id, url: data, filename: 'donation-2', file }];
+            return newList;
+          });
+          break;
+        case 'overlay-logo':
+          setLogoPreviews((list) => {
+            const id = list.length === 0 ? 1 : list[list.length - 1].id + 1;
+            const newList = [
+              ...list,
+              { id, url: data, filename: 'kks-special-logo', file },
+            ];
             return newList;
           });
           break;
@@ -180,17 +229,45 @@ export function AdminOverlayImageUploadDialog(
       if (numberOfSavedVerticalImages + verticalPreviews.length > 15) {
         throw new Error('세로배너 이미지는 15개까지 등록가능합니다.');
       }
+      if (numberOfSavedHorizontalImages + horizontalPreviews.length > 15) {
+        throw new Error('가로배너 이미지는 15개까지 등록가능합니다.');
+      }
       if (numberOfSavedFirstDonationImages + firstDonationPreviews.length > 1) {
         throw new Error('응원메세지 이미지는 단계별 1개까지 등록가능합니다.');
       }
       if (numberOfSavedSecondDonationImages + secondDonationPreviews.length > 1) {
         throw new Error('응원메세지 이미지는 단계별 1개까지 등록가능합니다.');
       }
+      if (numberOfSavedLogoImages + logoPreviews.length > 1) {
+        throw new Error('로고는 1개까지 등록가능합니다.');
+      }
+
+      if (
+        !(
+          verticalPreviews.length +
+          horizontalPreviews.length +
+          firstDonationPreviews.length +
+          secondDonationPreviews.length +
+          logoPreviews.length
+        )
+      ) {
+        throw new Error('등록된 이미지가 없습니다');
+      }
+
+      setIsDisabled(true);
+
       await imageFileListToImageDto(
         verticalPreviews,
         broadcasterEmail,
         liveShoppingId,
         'vertical-banner',
+      );
+
+      await imageFileListToImageDto(
+        horizontalPreviews,
+        broadcasterEmail,
+        liveShoppingId,
+        'horizontal-banner',
       );
 
       await imageFileListToImageDto(
@@ -207,11 +284,19 @@ export function AdminOverlayImageUploadDialog(
         'donation-images-2',
       );
 
+      await imageFileListToImageDto(
+        logoPreviews,
+        broadcasterEmail,
+        liveShoppingId,
+        'overlay-logo',
+      );
+
       toast({ title: '이미지가 저장되었습니다', status: 'success' });
 
       handleClose();
     } catch (error: any) {
       if (error?.response && error?.response?.status === 400) {
+        setIsDisabled(false);
         // 파일명 너무 길어서 url 이 db  컬럼제한에 걸린 경우
         toast({
           title: '이미지 저장 중 오류가 발생했습니다',
@@ -224,10 +309,7 @@ export function AdminOverlayImageUploadDialog(
     }
   };
   // 사진 등록하기 다이얼로그 - 미리보기 이미지 삭제 핸들러
-  const deletePreview = (
-    id: number,
-    type: 'vertical-banner' | 'donation-images-1' | 'donation-images-2',
-  ): void => {
+  const deletePreview = (id: number, type: OverlayImageTypes): void => {
     switch (type) {
       case 'vertical-banner':
         setVerticalPreviews((list) => {
@@ -237,6 +319,20 @@ export function AdminOverlayImageUploadDialog(
               ...item,
               id: index + numberOfSavedVerticalImages + 1,
               filename: `vertical-banner-${index + numberOfSavedVerticalImages + 1}`,
+            };
+            return newImageList;
+          });
+          return idReassignImages;
+        });
+        break;
+      case 'horizontal-banner':
+        setHorizontalPreviews((list) => {
+          const filtered = list.filter((item) => item.id !== id);
+          const idReassignImages = filtered.map((item, index) => {
+            const newImageList = {
+              ...item,
+              id: index + numberOfSavedHorizontalImages + 1,
+              filename: `horizontal-banner-${index + numberOfSavedHorizontalImages + 1}`,
             };
             return newImageList;
           });
@@ -271,6 +367,20 @@ export function AdminOverlayImageUploadDialog(
           return idReassignImages;
         });
         break;
+      case 'overlay-logo':
+        setLogoPreviews((list) => {
+          const filtered = list.filter((item) => item.id !== id);
+          const idReassignImages = filtered.map((item, index) => {
+            const newImageList = {
+              ...item,
+              id: index,
+              filename: 'kks-special-logo',
+            };
+            return newImageList;
+          });
+          return idReassignImages;
+        });
+        break;
       default:
         break;
     }
@@ -278,9 +388,12 @@ export function AdminOverlayImageUploadDialog(
 
   // 사진 등록하기 다일얼로그 - 닫기 핸들러
   const handleClose = (): void => {
+    setIsDisabled(false);
     setVerticalPreviews([]);
+    setHorizontalPreviews([]);
     setFirstDonationPreviews([]);
     setSecondDonationPreviews([]);
+    setLogoPreviews([]);
     onClose();
   };
 
@@ -292,6 +405,15 @@ export function AdminOverlayImageUploadDialog(
         'vertical-banner',
       );
       setSavedVerticalImages(verticalImages);
+    };
+
+    const getHorizontalImageName = async (): Promise<void> => {
+      const horizontalImages = await getSavedImages(
+        broadcasterEmail,
+        liveShoppingId,
+        'horizontal-banner',
+      );
+      setSavedHorizontalImages(horizontalImages);
     };
 
     const getDonationImageName = async (): Promise<void> => {
@@ -309,14 +431,26 @@ export function AdminOverlayImageUploadDialog(
       setSavedFirstDonationImages(firstDonationImage);
       setSavedSecondDonationImages(secondDonationImage);
     };
+
+    const getLogoImageName = async (): Promise<void> => {
+      const logoImage = await getSavedImages(
+        broadcasterEmail,
+        liveShoppingId,
+        'overlay-logo',
+      );
+      setSavedLogoImages(logoImage.pop());
+    };
     getVerticalImageName();
+    getHorizontalImageName();
     getDonationImageName();
+    getLogoImageName();
   }, [
     broadcasterEmail,
     liveShoppingId,
     setSavedVerticalImages,
+    setSavedHorizontalImages,
     setSavedFirstDonationImages,
-    setSavedSecondDonationImages.length,
+    setSavedSecondDonationImages,
     isOpen,
   ]);
 
@@ -421,14 +555,92 @@ export function AdminOverlayImageUploadDialog(
             </Stack>
             <Divider mt={10} mb={10} />
             <Stack>
+              <Heading size="md">등록된 로고이미지</Heading>
+              <HStack mr={2} mb={2}>
+                {!savedLogoImages && <Text>등록된 이미지가 없습니다</Text>}
+                {savedLogoImages && (
+                  <VStack>
+                    <Link
+                      isTruncated
+                      href={`${S3_IMAGE_PREFIX}/${savedLogoImages}`}
+                      fontWeight="bold"
+                      colorScheme="blue"
+                      textDecoration="underline"
+                      isExternal
+                    >
+                      <ChakraNextImage
+                        layout="intrinsic"
+                        src={`${S3_IMAGE_PREFIX}/${savedLogoImages}`}
+                        width={130}
+                        height={54}
+                      />
+                    </Link>
+                  </VStack>
+                )}
+              </HStack>
+              {savedLogoImages && (
+                <Button
+                  onClick={() => {
+                    goBackAlertDialog.onOpen();
+                    setSelectedBannerType('overlay-logo');
+                  }}
+                >
+                  로고 모두 삭제
+                </Button>
+              )}
+            </Stack>
+            <Divider mt={10} mb={10} />
+            <Heading size="md">등록된 가로배너</Heading>
+            <Stack>
+              <HStack mr={2} mb={2}>
+                {savedHorizontalImages.length === 0 && (
+                  <Text>등록된 이미지가 없습니다</Text>
+                )}
+                {savedHorizontalImages.length !== 0 &&
+                  savedHorizontalImages.map((result) => {
+                    return (
+                      <VStack key={`saved-${result}`}>
+                        <Link
+                          isTruncated
+                          href={`${S3_IMAGE_PREFIX}/${result}`}
+                          fontWeight="bold"
+                          colorScheme="blue"
+                          textDecoration="underline"
+                          isExternal
+                        >
+                          <ChakraNextImage
+                            layout="intrinsic"
+                            src={`${S3_IMAGE_PREFIX}/${result}`}
+                            width={156}
+                            height={56}
+                          />
+                        </Link>
+                      </VStack>
+                    );
+                  })}
+              </HStack>
+              {savedHorizontalImages.length !== 0 && (
+                <Button
+                  onClick={() => {
+                    goBackAlertDialog.onOpen();
+                    setSelectedBannerType('horizontal-banner');
+                  }}
+                >
+                  가로배너 모두 삭제
+                </Button>
+              )}
+            </Stack>
+            <Divider mt={3} mb={3} />
+            <Stack>
               <Heading size="md">세로 배너 첨부</Heading>
               <Text>세로배너는 15장까지 등록가능합니다.</Text>
               <ImageInput
                 multiple
-                handleSuccess={handleSuccess}
+                handleSuccess={(fileName, file) =>
+                  handleSuccess(fileName, file, 'vertical-banner')
+                }
                 handleError={handleError}
                 variant="chakra"
-                type="vertical-banner"
               />
               <Divider />
               {/* 이미지 미리보기 목록 */}
@@ -458,11 +670,12 @@ export function AdminOverlayImageUploadDialog(
                   <Text>1단계 이미지</Text>
                   <ImageInput
                     multiple
-                    handleSuccess={handleSuccess}
+                    handleSuccess={(fileName, file) =>
+                      handleSuccess(fileName, file, 'donation-images-1')
+                    }
                     handleError={handleError}
                     imageSizeLimit={20 * 1024 * 1024}
                     variant="chakra"
-                    type="donation-images-1"
                   />
                   <Divider />
                   {/* 이미지 미리보기 목록 */}
@@ -488,11 +701,12 @@ export function AdminOverlayImageUploadDialog(
                   <Text>2단계 이미지</Text>
                   <ImageInput
                     multiple
-                    handleSuccess={handleSuccess}
+                    handleSuccess={(fileName, file) =>
+                      handleSuccess(fileName, file, 'donation-images-2')
+                    }
                     handleError={handleError}
                     imageSizeLimit={20 * 1024 * 1024}
                     variant="chakra"
-                    type="donation-images-2"
                   />
                   <Divider />
                   {/* 이미지 미리보기 목록 */}
@@ -515,6 +729,69 @@ export function AdminOverlayImageUploadDialog(
                   </Stack>
                 </Stack>
               </Stack>
+              <Stack>
+                <Heading size="md">로고 첨부</Heading>
+                <Text>로고는 1장까지 등록가능합니다.</Text>
+                <ImageInput
+                  multiple
+                  handleSuccess={(fileName, file) =>
+                    handleSuccess(fileName, file, 'overlay-logo')
+                  }
+                  handleError={handleError}
+                  imageSizeLimit={20 * 1024 * 1024}
+                  variant="chakra"
+                />
+                <Divider />
+                {/* 이미지 미리보기 목록 */}
+                <Stack direction="row" spacing={2} flexWrap="wrap">
+                  {logoPreviews.length !== 0 &&
+                    logoPreviews.map((preview) => {
+                      const { id, filename, url } = preview;
+                      return (
+                        <GoodsPreviewItem
+                          key={id}
+                          id={id}
+                          filename={filename}
+                          url={(url as string) || ''}
+                          width={130}
+                          height={54}
+                          onDelete={() => deletePreview(id, 'overlay-logo')}
+                        />
+                      );
+                    })}
+                </Stack>
+              </Stack>
+              <Stack>
+                <Heading size="md">가로 배너 첨부</Heading>
+                <Text>가로배너는 15장까지 등록가능합니다.</Text>
+                <ImageInput
+                  multiple
+                  handleSuccess={(fileName, file) =>
+                    handleSuccess(fileName, file, 'horizontal-banner')
+                  }
+                  handleError={handleError}
+                  variant="chakra"
+                />
+                <Divider />
+                {/* 이미지 미리보기 목록 */}
+                <Stack direction="row" spacing={2} flexWrap="wrap">
+                  {horizontalPreviews.length !== 0 &&
+                    horizontalPreviews.map((preview) => {
+                      const { id, filename, url } = preview;
+                      return (
+                        <GoodsPreviewItem
+                          key={id}
+                          id={id}
+                          filename={filename}
+                          url={(url as string) || ''}
+                          width={156}
+                          height={56}
+                          onDelete={() => deletePreview(id, 'horizontal-banner')}
+                        />
+                      );
+                    })}
+                </Stack>
+              </Stack>
             </Stack>
           </ModalBody>
 
@@ -522,7 +799,7 @@ export function AdminOverlayImageUploadDialog(
             <Button mr={3} onClick={handleClose}>
               닫기
             </Button>
-            <Button colorScheme="blue" onClick={uploadImage}>
+            <Button colorScheme="blue" onClick={uploadImage} isDisabled={isDisabled}>
               등록
             </Button>
           </ModalFooter>
@@ -537,6 +814,10 @@ export function AdminOverlayImageUploadDialog(
               await s3.s3DeleteImages(savedVerticalImages);
               setSavedVerticalImages([]);
             }
+            if (selectedBannerType === 'horizontal-banner') {
+              await s3.s3DeleteImages(savedHorizontalImages);
+              setSavedHorizontalImages([]);
+            }
             if (selectedBannerType === 'donation-images-1') {
               await s3.s3DeleteImages([savedFirstDonationImages]);
               setSavedFirstDonationImages('');
@@ -544,6 +825,10 @@ export function AdminOverlayImageUploadDialog(
             if (selectedBannerType === 'donation-images-2') {
               await s3.s3DeleteImages([savedSecondDonationImages]);
               setSavedSecondDonationImages('');
+            }
+            if (selectedBannerType === 'overlay-logo') {
+              await s3.s3DeleteImages([savedLogoImages]);
+              setSavedLogoImages('');
             }
           }}
         >

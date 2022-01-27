@@ -60,6 +60,7 @@ export class AppMessageGateway
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
     const rankings = await this.overlayService.getRanking(roomName);
+
     // const totalSold = await this.overlayService.getTotalSoldPrice();
     const messageAndNickname = await this.overlayService.getMessageAndNickname(roomName);
 
@@ -86,6 +87,10 @@ export class AppMessageGateway
     this.server
       .to(roomName)
       .emit('get bottom purchase message', bottomAreaTextAndNickname);
+    this.server.to(roomName).emit('get nsl donation message from server', {
+      nickname: purchase.nickname,
+      price: purchase.purchaseNum,
+    });
   }
 
   @SubscribeMessage('bottom area message')
@@ -99,6 +104,10 @@ export class AppMessageGateway
   getNonClientMessage(@MessageBody() data: PurchaseMessage): void {
     const { roomName } = data;
     this.server.to(roomName).emit('get non client purchase message', data);
+    this.server.to(roomName).emit('get nsl donation message from server', {
+      nickname: data.nickname,
+      price: data.purchaseNum,
+    });
   }
 
   @SubscribeMessage('get objective message from admin')

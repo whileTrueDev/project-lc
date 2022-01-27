@@ -18,8 +18,11 @@ export type s3KeyType =
   | 'vertical-banner'
   | 'donation-images'
   | 'broadcaster-id-card' // 방송인 신분증
-  | 'broadcaster-account-image'; // 방송인 통장사본
+  | 'broadcaster-account-image' // 방송인 통장사본
+  | 'overlay-logo'
+  | 'horizontal-banner';
 
+export type s3TaggingKeys = 'overlayImageType'; // s3 object 태그 객체 키
 export interface S3UploadImageOptions {
   filename: string | null;
   userMail: string | undefined;
@@ -27,6 +30,7 @@ export interface S3UploadImageOptions {
   file: File | Buffer | null;
   companyName?: string;
   liveShoppingId?: number;
+  tagging?: { [k in s3TaggingKeys]: string }; // s3 object 태그 key와 value
 }
 
 export type s3FileNameParams = {
@@ -128,17 +132,25 @@ export const s3 = (() => {
     type,
     userMail,
     liveShoppingId,
+    tagging,
   }: S3UploadImageOptions & {
     contentType: string;
   }): Promise<string> {
     if (!userMail || !file) throw new Error('file should be not null');
     const { key } = getS3Key({ userMail, type, filename, liveShoppingId });
+    const objectTagKey = tagging ? Object.keys(tagging).pop() : '';
+    const objectTagValue = tagging ? Object.values(tagging).pop() : '';
+
+    if (objectTagKey && !objectTagValue) {
+      throw new Error('No value Error');
+    }
 
     try {
       const command = new PutObjectCommand({
         Bucket: S3_BUCKET_NAME,
         Key: key,
         Body: file,
+        Tagging: tagging ? `${objectTagKey}=${objectTagValue}` : '',
         ContentType: contentType,
         ACL: 'public-read',
       });
@@ -220,7 +232,7 @@ export const s3 = (() => {
   async function getOverlayImagesFromS3(
     broadcasterId: string,
     liveShoppingId: number,
-    type: 'vertical-banner' | 'donation-images',
+    type: 'vertical-banner' | 'donation-images' | 'overlay-logo' | 'horizontal-banner',
   ): Promise<(string | undefined)[]> {
     const command = new ListObjectsCommand({
       Bucket: S3_BUCKET_NAME,

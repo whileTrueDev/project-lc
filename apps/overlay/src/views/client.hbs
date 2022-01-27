@@ -1,97 +1,109 @@
 <html>
 
-<head>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
-  <link href="/layout.css" rel='stylesheet'>
-  <script type='module' src="/overlayClient.js"></script>
-  <script>
-    const exports = {};
-  </script>
-  <script id="primary-info" data-email={{email.email}} data-number={{verticalImagesLength}}>
-  </script>
-</head>
+  <head>
+    <script src='/socket.io/socket.io.js'></script>
+    <script src='https://code.jquery.com/jquery-3.4.0.min.js'></script>
+    <link
+      rel='stylesheet'
+      href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css'
+    />
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js'></script>
+    <link href='/layout.css' rel='stylesheet' />
+    <script type='module' src='/overlayClient.js'></script>
+    <script>
+      const exports = {};
+    </script>
+    <script
+      id='primary-info'
+      data-email={{email}}
+      data-number={{verticalImagesLength}}
+      data-liveshopping-id={{liveShoppingId.id}}
+    >
+    </script>
+  </head>
 
-<body>
-  <div class="alive-check">
-  </div>
-  <div class="full-video">
-  </div>
-  <div class="live-commerce">
-    <div class="left-section">
-      <!--랭킹-->
-      <div class="ranking-area">
-        <p class="ranking-text-area" id="title">
-          TOP 구매자
-        </p> 
-        <div class="ranking-area-inner">
-          <img src="/images/podium.png" id="podium" style="width:25%;"/>
-        </div>
-      </div>
-      <!--세로 배너-->
-      <div class="left-banner-area">
-        <img src="/images/invisible.png" class="vertical-banner" alt="세로배너영역"/>
-        <img src="/images/soldout.png" class="vertical-soldout-banner" alt="세로매진영역"/>
-      </div>
+  <body>
+    <div class='alive-check'>
     </div>
-    <!-- 최상단 비회원 구매 메세지 -->
-    <div class="top-wrapper">
+    <div class='full-video'>
     </div>
-
-    <!--우측상단 응원메세지-->
-    <div class="top-right-logo">
-      <img src="/images/kks_seol_logo.png" id="kks-logo" alt="크크쇼로고" />
-    </div>
-    <div class="top-right">
-    </div>
-    <!--가상광고 영역-->
-    <div class="notification">
-    </div>
-    <!--하단 영역-->
-    <div class="bottom-area-wrapper">
-      <div class="bottom-area-left">
-        <div style="width:5%">
-        </div>
-        <div class="bottom-timer">
-          <img src="/images/clock.png" class="bottom-area-left-icon" id="clock" />
-          <span id="time-hour"></span>
-          <span id="hour-min-separator"> : </span>
-          <span id="time-min"></span>
-          <span id="min-sec-separator"> : </span>
-          <span id="time-sec"></span>
-        </div>
-        <div class="bottom-object">
-          <img src="/images/object.png" class="bottom-area-left-icon" />
-          <div class="bottom-object-quantity">
-            <span id="current-quantity">
-              0
-            </span>
-            <span>
-              /
-            </span>
-            <span id="quantity-object">
-              100
-            </span>
+    <div class='live-commerce'>
+      <div class='left-section'>
+        <!--랭킹-->
+        <div class='ranking-area'>
+          <p class='ranking-text-area' id='title'>
+            TOP 구매자
+          </p>
+          <div class='ranking-area-inner'>
+            <img src='/images/podium.png' id='podium' style='width:25%;' />
           </div>
         </div>
-      </div>
-      <div class="bottom-area-right">
-        <div class="bottom-fever-timer">
-          <span id="fever-time-min">00</span>
-          <span id="fever-min-sec-separator"> : </span>
-          <span id="fever-time-sec">00</span>
+        <!--세로 배너-->
+        <div class='left-banner-area'>
+          <img src='/images/invisible.png' class='vertical-banner' alt='세로배너영역' />
+          <img
+            src='/images/soldout.png'
+            class='vertical-soldout-banner'
+            alt='세로매진영역'
+          />
         </div>
-        <p class="bottom-admin" style="color:aqua">
-        </p>
-        {{!-- <p class="bottom-area-text">
-        </p> --}}
+      </div>
+      <!-- 최상단 비회원 구매 메세지 -->
+      <div class='top-wrapper'>
+      </div>
+
+      <!--우측상단 응원메세지-->
+      <div class='top-right-logo'>
+        <img src='/images/kks-default-logo.png' id='kks-logo' alt='크크쇼로고' />
+      </div>
+      <div class='top-right'>
+      </div>
+      <!--가상광고 영역-->
+      <div class='notification'>
+      </div>
+      <!--하단 영역-->
+      <div class='bottom-area-wrapper'>
+        <div class='bottom-area-left'>
+          <div style='width:5%'>
+          </div>
+          <div class='bottom-timer'>
+            <img src='/images/clock.png' class='bottom-area-left-icon' id='clock' />
+            <span id='time-hour'></span>
+            <span id='hour-min-separator'> : </span>
+            <span id='time-min'></span>
+            <span id='min-sec-separator'> : </span>
+            <span id='time-sec'></span>
+          </div>
+          <div class='bottom-object'>
+            <img src='/images/object.png' class='bottom-area-left-icon' />
+            <div class='bottom-object-quantity'>
+              <span id='current-quantity'>
+                0
+              </span>
+              <span>
+                /
+              </span>
+              <span id='quantity-object'>
+                100
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class='bottom-area-right'>
+          <div class='bottom-fever-timer'>
+            <span id='fever-time-min'>00</span>
+            <span id='fever-min-sec-separator'> : </span>
+            <span id='fever-time-sec'>00</span>
+          </div>
+          <p class='bottom-admin' style='color:aqua'>
+          </p>
+          {{! <p class="bottom-area-text">
+        </p> }}
+        </div>
+      </div>
+      <div class='objective-wrapper'>
       </div>
     </div>
-    <div class="objective-wrapper">
-    </div>
-  </div>
-</body>
+  </body>
 
 </html>
