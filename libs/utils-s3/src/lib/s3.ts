@@ -22,6 +22,7 @@ export type s3KeyType =
   | 'overlay-logo'
   | 'horizontal-banner';
 
+export type s3TaggingKeys = 'overlayImageType'; // s3 object 태그 객체 키
 export interface S3UploadImageOptions {
   filename: string | null;
   userMail: string | undefined;
@@ -29,7 +30,7 @@ export interface S3UploadImageOptions {
   file: File | Buffer | null;
   companyName?: string;
   liveShoppingId?: number;
-  tagging?: string;
+  tagging?: { [k in s3TaggingKeys]: string }; // s3 object 태그 key와 value
 }
 
 export type s3FileNameParams = {
@@ -137,13 +138,19 @@ export const s3 = (() => {
   }): Promise<string> {
     if (!userMail || !file) throw new Error('file should be not null');
     const { key } = getS3Key({ userMail, type, filename, liveShoppingId });
+    const objectTagKey = tagging ? Object.keys(tagging).pop() : '';
+    const objectTagValue = tagging ? Object.values(tagging).pop() : '';
+
+    if (objectTagKey && !objectTagValue) {
+      throw new Error('No value Error');
+    }
 
     try {
       const command = new PutObjectCommand({
         Bucket: S3_BUCKET_NAME,
         Key: key,
         Body: file,
-        Tagging: `overlayImageType=${tagging}`,
+        Tagging: tagging ? `${objectTagKey}=${objectTagValue}` : '',
         ContentType: contentType,
         ACL: 'public-read',
       });

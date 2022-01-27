@@ -80,20 +80,22 @@ export async function uploadImageToS3(
     | 'donation-images'
     | 'overlay-logo'
     | 'horizontal-banner' = 'vertical-banner';
-  let tagging:
-    | 'vertical-banner-tag'
-    | 'donation-images-tag'
-    | 'overlay-logo-tag'
-    | 'horizontal-banner-tag' = 'vertical-banner-tag';
+  const tagging: {
+    overlayImageType:
+      | 'vertical-banner-tag'
+      | 'donation-images-tag'
+      | 'overlay-logo-tag'
+      | 'horizontal-banner-tag';
+  } = { overlayImageType: 'vertical-banner-tag' };
   if (type === 'donation-images-1' || type === 'donation-images-2') {
     imageType = 'donation-images';
-    tagging = 'donation-images-tag';
+    tagging.overlayImageType = 'donation-images-tag';
   } else if (type === 'overlay-logo') {
     imageType = 'overlay-logo';
-    tagging = 'overlay-logo-tag';
+    tagging.overlayImageType = 'overlay-logo-tag';
   } else if (type === 'horizontal-banner') {
     imageType = 'horizontal-banner';
-    tagging = 'horizontal-banner-tag';
+    tagging.overlayImageType = 'horizontal-banner-tag';
   }
 
   return s3.s3uploadFile({
@@ -634,10 +636,11 @@ export function AdminOverlayImageUploadDialog(
               <Text>세로배너는 15장까지 등록가능합니다.</Text>
               <ImageInput
                 multiple
-                handleSuccess={handleSuccess}
+                handleSuccess={(fileName, file) =>
+                  handleSuccess(fileName, file, 'vertical-banner')
+                }
                 handleError={handleError}
                 variant="chakra"
-                type="vertical-banner"
               />
               <Divider />
               {/* 이미지 미리보기 목록 */}
@@ -667,11 +670,12 @@ export function AdminOverlayImageUploadDialog(
                   <Text>1단계 이미지</Text>
                   <ImageInput
                     multiple
-                    handleSuccess={handleSuccess}
+                    handleSuccess={(fileName, file) =>
+                      handleSuccess(fileName, file, 'donation-images-1')
+                    }
                     handleError={handleError}
                     imageSizeLimit={20 * 1024 * 1024}
                     variant="chakra"
-                    type="donation-images-1"
                   />
                   <Divider />
                   {/* 이미지 미리보기 목록 */}
@@ -697,11 +701,12 @@ export function AdminOverlayImageUploadDialog(
                   <Text>2단계 이미지</Text>
                   <ImageInput
                     multiple
-                    handleSuccess={handleSuccess}
+                    handleSuccess={(fileName, file) =>
+                      handleSuccess(fileName, file, 'donation-images-2')
+                    }
                     handleError={handleError}
                     imageSizeLimit={20 * 1024 * 1024}
                     variant="chakra"
-                    type="donation-images-2"
                   />
                   <Divider />
                   {/* 이미지 미리보기 목록 */}
@@ -729,11 +734,12 @@ export function AdminOverlayImageUploadDialog(
                 <Text>로고는 1장까지 등록가능합니다.</Text>
                 <ImageInput
                   multiple
-                  handleSuccess={handleSuccess}
+                  handleSuccess={(fileName, file) =>
+                    handleSuccess(fileName, file, 'overlay-logo')
+                  }
                   handleError={handleError}
                   imageSizeLimit={20 * 1024 * 1024}
                   variant="chakra"
-                  type="overlay-logo"
                 />
                 <Divider />
                 {/* 이미지 미리보기 목록 */}
@@ -760,10 +766,11 @@ export function AdminOverlayImageUploadDialog(
                 <Text>가로배너는 15장까지 등록가능합니다.</Text>
                 <ImageInput
                   multiple
-                  handleSuccess={handleSuccess}
+                  handleSuccess={(fileName, file) =>
+                    handleSuccess(fileName, file, 'horizontal-banner')
+                  }
                   handleError={handleError}
                   variant="chakra"
-                  type="horizontal-banner"
                 />
                 <Divider />
                 {/* 이미지 미리보기 목록 */}
