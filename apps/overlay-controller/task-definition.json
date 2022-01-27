@@ -37,6 +37,10 @@
         {
           "name": "OVERLAY_CONTROLLER_HOST",
           "value": "https://overlay-controller.xn--hp4b17xa.com"
+        },
+        {
+          "name": "REALTIME_API_HOST",
+          "value": "https://realtime.xn--hp4b17xa.com"
         }
       ],
       "resourceRequirements": null,
