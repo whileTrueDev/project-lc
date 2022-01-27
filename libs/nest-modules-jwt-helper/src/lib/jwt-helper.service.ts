@@ -96,7 +96,7 @@ export class JwtHelperService {
       httpOnly: true,
       maxAge: expiresIn,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'lax',
       domain:
         this.configService.get('NODE_ENV') === 'production'
           ? '.xn--hp4b17xa.com'
