@@ -29,6 +29,7 @@ export interface S3UploadImageOptions {
   file: File | Buffer | null;
   companyName?: string;
   liveShoppingId?: number;
+  tagging?: string;
 }
 
 export type s3FileNameParams = {
@@ -130,6 +131,7 @@ export const s3 = (() => {
     type,
     userMail,
     liveShoppingId,
+    tagging,
   }: S3UploadImageOptions & {
     contentType: string;
   }): Promise<string> {
@@ -141,6 +143,7 @@ export const s3 = (() => {
         Bucket: S3_BUCKET_NAME,
         Key: key,
         Body: file,
+        Tagging: `overlayImageType=${tagging}`,
         ContentType: contentType,
         ACL: 'public-read',
       });

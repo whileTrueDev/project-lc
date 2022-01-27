@@ -89,13 +89,20 @@ export async function uploadImageToS3(
     | 'donation-images'
     | 'overlay-logo'
     | 'horizontal-banner' = 'vertical-banner';
-
+  let tagging:
+    | 'vertical-banner-tag'
+    | 'donation-images-tag'
+    | 'overlay-logo-tag'
+    | 'horizontal-banner-tag' = 'vertical-banner-tag';
   if (type === 'donation-images-1' || type === 'donation-images-2') {
     imageType = 'donation-images';
+    tagging = 'donation-images-tag';
   } else if (type === 'overlay-logo') {
     imageType = 'overlay-logo';
+    tagging = 'overlay-logo-tag';
   } else if (type === 'horizontal-banner') {
     imageType = 'horizontal-banner';
+    tagging = 'horizontal-banner-tag';
   }
 
   return s3.s3uploadFile({
@@ -105,6 +112,7 @@ export async function uploadImageToS3(
     userMail,
     type: imageType,
     liveShoppingId,
+    tagging,
   });
 }
 
