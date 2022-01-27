@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { authConstants, UserPayload } from '@project-lc/nest-core';
 import { CipherService } from '@project-lc/nest-modules-cipher';
@@ -8,15 +9,16 @@ import { Socket } from 'socket.io';
 @Injectable()
 export class JwtHelperService {
   constructor(
+    private readonly configService: ConfigService,
     private readonly cipherService: CipherService,
     private readonly jwtService: JwtService,
   ) {}
 
   /** 액세스 토큰 생성 */
-  createAccessToken(userPayload: UserPayload): string {
+  createAccessToken(userPayload: UserPayload, expiresIn?: string | number): string {
     const _userPayload = this.castUserPayload(userPayload);
     return this.jwtService.sign(_userPayload, {
-      expiresIn: authConstants.ACCESS_TOKEN_EXPIRE_TIME,
+      expiresIn: expiresIn ?? authConstants.ACCESS_TOKEN_EXPIRE_TIME,
     });
   }
 
@@ -93,6 +95,12 @@ export class JwtHelperService {
     return res.cookie(authConstants.REFRESH_TOKEN_HEADER_KEY, refreshToken, {
       httpOnly: true,
       maxAge: expiresIn,
+      secure: true,
+      sameSite: 'none',
+      domain:
+        this.configService.get('NODE_ENV') === 'production'
+          ? '.xn--hp4b17xa.com'
+          : 'localhost',
     });
   }
 
