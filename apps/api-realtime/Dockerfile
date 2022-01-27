@@ -13,5 +13,4 @@ RUN yarn install --prod
 RUN prisma generate
 
 EXPOSE 3001
-
 CMD NODE_ENV=production node ./main.js
