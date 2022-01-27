@@ -37,7 +37,7 @@ const device = getOS();
 
 async function switchImage() {
   if (rankingVisible) {
-    $('.nsl-ranking').css('display', 'block');
+    $('.nsl-ranking').css('display', 'flex');
     rankingVisible = false;
     bannerId = 1;
     await setTimeout(() => {
@@ -87,8 +87,8 @@ socket.emit('new client', { pageUrl, device });
 socket.on('get top-left ranking', (data) => {
   const rankingArray = data;
   rankingArray.forEach((value, index) => {
-    $(`.ranking-text-area-id#rank-${index}`).text(value.nickname);
-    $(`.quantity#rank-${index}`).text(
+    $(`.nsl-ranking-text-area-id#nsl-rank-${index}`).text(value.nickname.substr(0, 8));
+    $(`.nsl-quantity#nsl-rank-${index}`).text(
       `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
     );
   });
@@ -114,6 +114,6 @@ socket.on('get nsl donation message from server', (data) => {
 });
 
 socket.on('refresh ranking from server', () => {
-  $('.ranking-text-area-id').text('');
-  $('.quantity').text('');
+  $('.nsl-ranking-text-area-id').text('');
+  $('.nsl-quantity').text('');
 });
