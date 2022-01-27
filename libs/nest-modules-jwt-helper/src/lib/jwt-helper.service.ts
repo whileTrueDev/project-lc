@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { authConstants, UserPayload } from '@project-lc/nest-core';
 import { CipherService } from '@project-lc/nest-modules-cipher';
@@ -8,6 +9,7 @@ import { Socket } from 'socket.io';
 @Injectable()
 export class JwtHelperService {
   constructor(
+    private readonly configService: ConfigService,
     private readonly cipherService: CipherService,
     private readonly jwtService: JwtService,
   ) {}
@@ -93,6 +95,12 @@ export class JwtHelperService {
     return res.cookie(authConstants.REFRESH_TOKEN_HEADER_KEY, refreshToken, {
       httpOnly: true,
       maxAge: expiresIn,
+      secure: true,
+      sameSite: 'none',
+      domain:
+        this.configService.get('NODE_ENV') === 'production'
+          ? '.xn--hp4b17xa.com'
+          : 'localhost',
     });
   }
 
