@@ -9,7 +9,11 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { mainNavItems } from '@project-lc/components-constants/navigation';
-import { useDisplaySize, useIsLoggedIn } from '@project-lc/hooks';
+import {
+  useCloseLiveShoppingStateBoardIfNotLoggedIn,
+  useDisplaySize,
+  useIsLoggedIn,
+} from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -27,6 +31,9 @@ export interface NavbarProps {
 export function Navbar({ appType = 'seller' }: NavbarProps): JSX.Element {
   const { isOpen, onClose, onToggle } = useDisclosure();
   const { isMobileSize } = useDisplaySize();
+
+  // 로그인 상태가 아닌경우 방송인 현황판 닫기 이펙트(Navbar가 전체 페이지에 공용으로 사용되는 컴포넌트여서 여기에 추가함)
+  useCloseLiveShoppingStateBoardIfNotLoggedIn();
 
   // 햄버거버튼(모바일화면에서만 표시)
   const hambergerButton = useMemo(() => {
