@@ -18,7 +18,7 @@ import { AppScreenGateway } from './app.screen.gateway';
     CipherModule,
     PrismaModule,
     OverlayModule,
-    LiveShoppingModule,
+    LiveShoppingModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
     MailerModule.forRoot(mailerConfig),
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
