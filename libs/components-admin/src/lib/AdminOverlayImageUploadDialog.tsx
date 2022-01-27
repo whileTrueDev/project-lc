@@ -24,6 +24,7 @@ import {
   Preview,
   readAsDataURL,
 } from '@project-lc/components-seller/GoodsRegistPictures';
+import { OverlayImageTypes } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { useEffect, useState } from 'react';
 
@@ -43,12 +44,7 @@ export async function imageFileListToImageDto(
   imageFileList: { file: File; filename: string; id: number }[],
   userMail: string,
   liveShoppingId: number,
-  type:
-    | 'vertical-banner'
-    | 'donation-images-1'
-    | 'donation-images-2'
-    | 'overlay-logo'
-    | 'horizontal-banner',
+  type: OverlayImageTypes,
 ): Promise<
   Array<{
     cut_number: number;
@@ -76,12 +72,7 @@ export async function uploadImageToS3(
   imageFile: { file: File | Buffer; filename: string; id: number; contentType: string },
   userMail: string,
   liveShoppingId: number,
-  type:
-    | 'vertical-banner'
-    | 'donation-images-1'
-    | 'donation-images-2'
-    | 'overlay-logo'
-    | 'horizontal-banner',
+  type: OverlayImageTypes,
 ): Promise<string> {
   const { file, filename, contentType } = imageFile;
   let imageType:
@@ -151,13 +142,8 @@ export function AdminOverlayImageUploadDialog(
     string | undefined
   >('');
   const [savedLogoImages, setSavedLogoImages] = useState<string | undefined>('');
-  const [selectedBannerType, setSelectedBannerType] = useState<
-    | 'vertical-banner'
-    | 'donation-images-1'
-    | 'donation-images-2'
-    | 'overlay-logo'
-    | 'horizontal-banner'
-  >('vertical-banner');
+  const [selectedBannerType, setSelectedBannerType] =
+    useState<OverlayImageTypes>('vertical-banner');
 
   const numberOfSavedVerticalImages = savedVerticalImages.length;
   const numberOfSavedHorizontalImages = savedHorizontalImages.length;
@@ -168,12 +154,7 @@ export function AdminOverlayImageUploadDialog(
   const handleSuccess = (
     fileName: string,
     file: File,
-    type?:
-      | 'vertical-banner'
-      | 'donation-images-1'
-      | 'donation-images-2'
-      | 'overlay-logo'
-      | 'horizontal-banner',
+    type?: OverlayImageTypes,
   ): void => {
     readAsDataURL(file).then(({ data }) => {
       switch (type) {
@@ -326,15 +307,7 @@ export function AdminOverlayImageUploadDialog(
     }
   };
   // 사진 등록하기 다이얼로그 - 미리보기 이미지 삭제 핸들러
-  const deletePreview = (
-    id: number,
-    type:
-      | 'vertical-banner'
-      | 'donation-images-1'
-      | 'donation-images-2'
-      | 'overlay-logo'
-      | 'horizontal-banner',
-  ): void => {
+  const deletePreview = (id: number, type: OverlayImageTypes): void => {
     switch (type) {
       case 'vertical-banner':
         setVerticalPreviews((list) => {

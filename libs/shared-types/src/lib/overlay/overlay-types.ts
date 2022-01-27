@@ -128,3 +128,10 @@ export interface LiveShoppingIdWithProductNameAndRoomName extends ProductNameAnd
   /** 라이브쇼핑 아이디 */
   liveShoppingId: string;
 }
+
+export type OverlayImageTypes =
+  | 'vertical-banner'
+  | 'donation-images-1'
+  | 'donation-images-2'
+  | 'overlay-logo'
+  | 'horizontal-banner';
