@@ -13,7 +13,7 @@ import {
 import { getLiveShoppingProgress } from '@project-lc/shared-types';
 import { liveShoppingStateBoardWindowStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export function BroadcasterLiveShoppingList({
   useSmallSize = false,
@@ -64,21 +64,20 @@ export function BroadcasterLiveShoppingList({
     shoppingProgress: string;
     broadcastId: number;
   }): JSX.Element {
-    const { addWindow } = liveShoppingStateBoardWindowStore();
+    const { openWindow } = liveShoppingStateBoardWindowStore();
+
+    const openLiveShoppingStateWindow = useCallback(() => {
+      const url = `${window.location.origin}/mypage/live/state/${broadcastId}`;
+      const windowFeatures = 'scrollbars,resizable,width=800, height=600';
+      openWindow(url, '_black', windowFeatures);
+    }, [broadcastId, openWindow]);
 
     return (
       <Button
         size="xs"
         colorScheme="green"
         disabled={['조율중', '취소됨', '등록됨'].includes(shoppingProgress)}
-        onClick={() => {
-          const url = `${window.location.origin}/mypage/live/state/${broadcastId}`;
-          const windowFeatures = 'scrollbars,resizable,width=800, height=600';
-          const w = window.open(url, '_blank', windowFeatures);
-          if (w) {
-            addWindow(w);
-          }
-        }}
+        onClick={openLiveShoppingStateWindow}
       >
         {shoppingProgress === '방송진행중' && '실시간 '}
         {['판매종료', '방송종료'].includes(shoppingProgress) && '지난 '}

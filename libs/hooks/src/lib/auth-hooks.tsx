@@ -15,13 +15,13 @@ import { useProfile } from './queries/useProfile';
 export function useLogout(): { logout: () => void } {
   const queryClient = useQueryClient();
   const { mutateAsync } = useLogoutMutation();
-  const { closeWindows } = liveShoppingStateBoardWindowStore();
+  const { closeWindow } = liveShoppingStateBoardWindowStore();
 
   const logout = useCallback(() => {
     mutateAsync()
       .then((res) => {
         if (res === 'OK') {
-          closeWindows();
+          closeWindow();
           queryClient.clear();
           queryClient.removeQueries('Profile', { exact: true });
         }
@@ -29,7 +29,7 @@ export function useLogout(): { logout: () => void } {
       .catch((error) => {
         console.error(error);
       });
-  }, [closeWindows, mutateAsync, queryClient]);
+  }, [closeWindow, mutateAsync, queryClient]);
 
   return { logout };
 }
@@ -71,14 +71,14 @@ export function useMoveToMainIfLoggedIn(): void {
 export function useCloseLiveShoppingStateBoardIfNotLoggedIn(): void {
   const bcRef = useRef<BroadcastChannel | null>();
   const { isLoggedIn, status } = useIsLoggedIn();
-  const { closeWindows } = liveShoppingStateBoardWindowStore();
+  const { closeWindow } = liveShoppingStateBoardWindowStore();
 
   // 마운트시 bc 객체 생성 & ev 메시지 핸들러 할당
   useEffect(() => {
     bcRef.current = new BroadcastChannel('LoginFlag');
     bcRef.current.onmessage = (ev) => {
       if (ev.data === 'not logged in') {
-        closeWindows();
+        closeWindow();
       }
     };
     return () => {
