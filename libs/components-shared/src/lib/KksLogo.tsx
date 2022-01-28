@@ -16,9 +16,7 @@ export const broadcasterDarkLogo = 'kkshow-broadcaster-darkmode.png';
 
 export interface KksLogoProps {
   appType?: UserType;
-  size: 'small' | 'mid' | 'big' | 'manual';
-  width?: number;
-  height?: number;
+  size?: 'small';
 }
 
 interface GetCorrectLogoOption {
@@ -46,7 +44,7 @@ function getCorrectLogoInfo({ appType, colorMode }: GetCorrectLogoOption): strin
  * 이미지 비율은 x:y = 1.6969 : 1
  */
 export function KksLogo(props: KksLogoProps): JSX.Element | null {
-  const { size, width, height, appType } = props;
+  const { appType } = props;
   const { colorMode } = useColorMode();
 
   const logoSrc = useMemo(
@@ -54,20 +52,11 @@ export function KksLogo(props: KksLogoProps): JSX.Element | null {
     [colorMode, appType],
   );
 
-  if (size === 'small') {
-    return <ChakraNextImage src={logoSrc} width="76.36" height="45" />;
-  }
-  if (size === 'mid') {
-    return <ChakraNextImage src={logoSrc} width="139.15" height="82" />;
-  }
-  if (size === 'big') {
-    return <ChakraNextImage src={logoSrc} width="254" height="150" />;
-  }
-  if (size === 'manual') {
-    return <ChakraNextImage src={logoSrc} width={width} height={height} />;
+  if (!appType) {
+    return <ChakraNextImage src={logoSrc} width="76.36" height="34" />;
   }
 
-  return null;
+  return <ChakraNextImage src={logoSrc} width="76.36" height="45" />;
 }
 
 export default KksLogo;
