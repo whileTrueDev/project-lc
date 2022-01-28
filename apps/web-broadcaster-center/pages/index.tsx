@@ -12,7 +12,10 @@ import { BroadcasterMainProcess } from '@project-lc/components-web-bc/main/Broad
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useRouter } from 'next/router';
-import { useIsLoggedIn } from '@project-lc/hooks';
+import {
+  useCloseLiveShoppingStateBoardIfNotLoggedIn,
+  useIsLoggedIn,
+} from '@project-lc/hooks';
 
 dayjs.extend(relativeTime);
 
@@ -20,6 +23,8 @@ export function Index(): JSX.Element {
   const router = useRouter();
   const inquiry = useDisclosure();
   const { isLoggedIn } = useIsLoggedIn();
+  // 로그인 상태가 아닌경우 방송인 현황판 닫기 이펙트
+  useCloseLiveShoppingStateBoardIfNotLoggedIn();
   return (
     <div>
       <Flex minH="100vh" justify="space-between" flexDirection="column">

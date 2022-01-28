@@ -24,6 +24,8 @@ export function LiveShoppingCurrentState(): JSX.Element {
     };
   }, [liveShoppingId, liveShoppingList]);
 
+  if (!liveShoppingId) return <p>loading...</p>;
+
   return <LiveShoppingCurrentStateBoard liveShoppingId={liveShoppingId} title={title} />;
 }
 

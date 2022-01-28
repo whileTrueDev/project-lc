@@ -458,10 +458,6 @@ class LiveShoppingStateBoardController {
 
     this.input.val('');
     this.displayingMessage.text(message);
-    $('#insert-dialog').fadeIn();
-    setTimeout(() => {
-      $('#insert-dialog').fadeOut();
-    }, 3000);
   }
 
   deleteMessage() {
