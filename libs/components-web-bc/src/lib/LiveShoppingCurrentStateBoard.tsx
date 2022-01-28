@@ -1,4 +1,12 @@
-import { Box, Grid, GridItem, Heading, Stack, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Grid,
+  GridItem,
+  Heading,
+  Stack,
+  Text,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import { LiveShoppingPurchaseMessage } from '@prisma/client';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
@@ -63,6 +71,9 @@ export function LiveShoppingCurrentStateBoard({
     [setAlert],
   );
 
+  const bg = useColorModeValue('white', 'gray.800');
+  const color = 'white';
+
   if (status === 'loading') return <Box>Loading...</Box>;
   if (status === 'error') {
     console.error(error);
@@ -78,7 +89,7 @@ export function LiveShoppingCurrentStateBoard({
       variants={variants}
       onAnimationComplete={onAminationCompleteHandler}
     >
-      <Stack h="100vh" p={4}>
+      <Stack h="100vh" p={4} bg={bg}>
         {/* 라이브쇼핑명 - 제목 */}
         <Heading textAlign="center">{title}</Heading>
 
@@ -101,7 +112,7 @@ export function LiveShoppingCurrentStateBoard({
           <Box maxH="400px" overflowY="auto">
             <MessageItemLayout
               bg="blue.500"
-              color="white"
+              color={color}
               item={{
                 index: '순서',
                 nickname: '닉네임',
@@ -163,6 +174,9 @@ export function PurchaseMessageItem({
   index: number;
 }): JSX.Element {
   const { nickname, text, price } = item;
+  const evenBg = useColorModeValue('teal.50', 'teal.800');
+  const oddBg = useColorModeValue('gray.50', 'gray.700');
+  const color = useColorModeValue('gray.800', 'white');
   return (
     <MessageItemLayout
       item={{
@@ -171,7 +185,8 @@ export function PurchaseMessageItem({
         message: text,
         price: `${price.toLocaleString()}원`,
       }}
-      bg={index % 2 === 0 ? 'teal.50' : 'gray.50'}
+      bg={index % 2 === 0 ? evenBg : oddBg}
+      color={color}
     />
   );
 }
