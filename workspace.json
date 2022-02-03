@@ -1222,6 +1222,19 @@
             "cwd": "libs/prisma-orm"
           }
         },
+        "local-push": {
+          "executor": "@nrwl/workspace:run-commands",
+          "outputs": [],
+          "options": {
+            "commands": [
+              {
+                "command": "prisma db push --schema ./prisma/schema.prisma",
+                "forwardAllArgs": false
+              }
+            ],
+            "cwd": "libs/prisma-orm"
+          }
+        },
         "studio": {
           "executor": "@nrwl/workspace:run-commands",
           "outputs": [],
