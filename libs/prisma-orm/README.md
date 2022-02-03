@@ -14,35 +14,45 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
 
 2. **데이터베이스에 스키마 반영하기**
 
-    데이터베이스에 schema.prisma 의 사항을 반영하기 위해서는 마이그레이션 작업이 필요합니다.
+    데이터베이스에 schema.prisma 의 사항을 반영하기 위한 작업은 크게 두 가지로 나눌 수 있습니다. 한 가지는 마이그레이션 파일을 생성하며 변경 사항을 반영하는 것과 다른 한 가지는 마이그레이션 파일을 생성하지 않은 채 변경사항을 반영하는 것입니다.
 
-    ```bash
-    yarn nx run prisma-orm:migrate-dev --name <MIGRATION_NAME>
-    ```
+    1. 마이그레이션 파일을 생성하지 않고 변경사항 반영하기
 
-    앞의 명령어는 SQL 마이그레이션 파일을 생성함과 동시에, 해당 마이그레이션 SQL 파일을 연결된 데이터베이스에 실행합니다. 이를 통해 데이터베이스 테이블을 생성하는 작업이 완료되었습니다.
+        ```bash
+        yarn nx run prisma-orm:local-push
+        ```
 
-    만약 데이터베이스에 마이그레이션 작업을 실행하지 않고, 마이그레이션 파일만 만들고 싶은 경우 다음 명령어를 사용할 수 있습니다.
+        앞의 명령어는 마이그레이션 파일을 생성하지 않고, schema.prisma 의 변경사항을 데이터베이스에 반영합니다. 이는 로컬개발환경에서 데이터베이스를 프로토타이핑하는 데에 도움을 줍니다. 주의할 점은 마이그레이션 파일이 생성되지 않으므로, 타 팀원이 해당 변경사항을 적용하지 못할 수 있다는 것입니다. 따라서 push 기능은 언제나 "로컬 환경에서 빠르게 개발하기 위함"임을 기억하고, 풀리퀘스트 이전에는 언제나 아래 2번의 방법으로 마이그레이션 파일을 생성해 주어야 합니다.
 
-    ```bash
-    yarn nx run prisma-orm:migrate-create-only
-    ```
+    2. 마이그레이션 파일을 생성하며 변경사항 반영하기
 
-    실행한 마이그레이션 작업을 취소하고자 한다면 다음 명령어를 실행시킬 수 있습니다.
+        ```bash
+        yarn nx run prisma-orm:migrate-dev --name <MIGRATION_NAME>
+        ```
 
-    ```bash
-    yarn nx run prisma-orm:migrate-reset
-    ```
+        앞의 명령어는 SQL 마이그레이션 파일을 생성함과 동시에, 해당 마이그레이션 SQL 파일을 연결된 데이터베이스에 실행합니다. 이를 통해 데이터베이스 테이블을 생성하는 작업이 완료되었습니다.
+
+        만약 데이터베이스에 마이그레이션 작업을 실행하지 않고, 마이그레이션 파일만 만들고 싶은 경우 다음 명령어를 사용할 수 있습니다.
+
+        ```bash
+        yarn nx run prisma-orm:migrate-create-only
+        ```
+
+        실행한 마이그레이션 작업을 취소하고자 한다면 다음 명령어를 실행시킬 수 있습니다.
+
+        ```bash
+        yarn nx run prisma-orm:migrate-reset
+        ```
 
     **주의**  
-    `yarn nx run prisma-orm:migrate-dev`, `yarn nx run prisma-orm:migrate-reset` 명령어는 개발환경에서만 사용합니다. 절대 프로덕션 마이그레이션 작업에 해당 명령어를 사용하지 않습니다.
+    `yarn nx run prisma-orm:migrate-dev`, `yarn nx run prisma-orm:migrate-reset`, `yarn nx run prisma-orm:local-push` 명령어는 개발환경에서만 사용합니다. 절대 프로덕션 마이그레이션 작업에 해당 명령어를 사용하지 않습니다.
 
     **참고**  
     prisma 공식문서와 다르게, yarn nx run 으로 실행시키는 이유는 사용될 수 있는 몇 가지 prisma 명령어를 개발 환경에서 사용될 수 있는 몇가지 명령어로 다시 정리해두었기 때문입니다. 또한 nx만의 구조 때문에 --schema 옵션을 통해 파일을 명시해주어야만 하므로, 해당 옵션까지 모두 포함시켜 정리해뒀습니다. 날것의 명령어를 보고싶은 분은 `workspace.json` 의 `project` -> `prisma-orm` -> `targets` 에서 각 명령어를 확인할 수 있습니다.
 
 3. **Prisma Client 생성하기**
 
-    개발환경에서 사용될 수 있는 위의 `yarn nx run prisma-orm:migrate-dev` 명령어는 마이그레이션 작업을 실행함과 동시에 자동적으로 Prisma Client를 생성하는 작업까지 실행합니다.
+    개발환경에서 사용될 수 있는 위의 `yarn nx run prisma-orm:local-push` 와 `yarn nx run prisma-orm:migrate-dev` 명령어는 마이그레이션 작업을 실행함과 동시에 자동적으로 Prisma Client를 생성하는 작업까지 실행합니다.
 
     위와 같은 상황이 아닌 경우, 다음 명령어로 Prisma Client를 생성합니다. Prisma Client는 데이터베이스에 접근할 수 있는 엔진을 탑재한 업격히 타입정의된 클래스입니다. 이 명령어의 작업은 Prisma Client를 함과 동시에 input과 arguments에 대한 타입정의도 함께 생성합니다.
 
@@ -54,29 +64,22 @@ Dev 환경 데이터베이스는 각자 로컬에 설치하여 사용하도록 �
 
 4. **Prisma Client를 통해 데이터 접근하기**
 
-    데이터베이스 접근을 위한 `/libs/src/lib/prisma-orm.service` 를 미리 정의해 두었습니다. API서버 또는 Overlay 서버와 같이 데이터베이스 접근이 필요한 경우, 해당 service를 가져와 사용합니다. `apps/api`, `apps/overlay`, `apps/overlay-controller` 등의 애플리케이션의 app.module에 PrismaModule(Global)을 import 하도록 작성하여 두었으므로, AppModule의 하위 모듈에서는 prismaService에 접근가능합니다.
+    1. `apps`의 `app.module.ts` 에서 전역모듈로 설정한 PrismaModule을 import합니다. 이 작업은 대개 이미 설정되어 있습니다.
+    2. 데이터베이스에 대한 접근은 service 레이어에서만 접근하도록 합니다. service 파일에서 데이터베이스 접근이 필요한 경우, Nestjs에 의해 디펜던시 인젝션된 PrismaService를 constructor 에서 가져와 사용합니다.
 
     ```ts
-    // apps/../some.module.ts
-    import { forwardRef, Module } from '@nestjs/common';
-    import { AppModule } from '../app.module';
-    import { SomeService } from './some.service';
+    // apps/../app.module.ts
+    import { Module } from '@nestjs/common';
 
     @Module({
-        imports: [forwardRef(() => AppModule)],
-        controllers: [...],
-        providers: [SomeService, ...],
-        exports: [...],
+        imports: [PrismaModule, ...,],
     })
-    export class SomeModule {}
+    export class AppModule {}
     ```
 
     ```ts
-    // apps/../some.service.ts
-
-    // DB 접근 객체 (dependency injection 통해 사용)
+    // nest-modules-*/../some.service.ts
     import { PrismaService } from '@project-lc/prisma-orm';
-    // InputTypes, OutputTypes, ModelTypes
     import { Prisma, Post } from '@prisma/client';
 
     @Injectable()
