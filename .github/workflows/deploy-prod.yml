@@ -260,5 +260,5 @@ jobs:
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: project-lc-realtimeapi-service
-          cluster: project-lc
+          cluster: project-lc-prod
           wait-for-service-stability: false
