@@ -10,6 +10,9 @@ import {
   createMuiTheme,
   createQueryClient,
 } from '@project-lc/utils-frontend';
+import dayjs from 'dayjs';
+import kolocale from 'dayjs/locale/ko';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';
 import NextNProgress from 'nextjs-progressbar';
@@ -20,6 +23,9 @@ import '../styles/global.font.css';
 const chakraTheme = createChakraTheme();
 const queryClient = createQueryClient();
 const muiTheme = createMuiTheme();
+
+dayjs.extend(relativeTime);
+dayjs.locale(kolocale);
 
 function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
   return (

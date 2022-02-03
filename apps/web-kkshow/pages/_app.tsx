@@ -1,22 +1,27 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { ThemeProvider } from '@material-ui/core';
 import {
-  LOGO_S3_PREFIX,
   lightBigLogo,
   lightLogo,
+  LOGO_S3_PREFIX,
 } from '@project-lc/components-shared/KksLogo';
 import {
   createChakraTheme,
   createMuiTheme,
   createQueryClient,
 } from '@project-lc/utils-frontend';
+import dayjs from 'dayjs';
+import kolocale from 'dayjs/locale/ko';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';
+import NextNProgress from 'nextjs-progressbar';
 import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import NextNProgress from 'nextjs-progressbar';
 import '../styles/global.font.css';
 
+dayjs.extend(relativeTime);
+dayjs.locale(kolocale);
 const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();
 const muiTheme = createMuiTheme();

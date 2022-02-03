@@ -4,9 +4,6 @@ import { GoodsConfirmStatusBadge } from '@project-lc/components-shared/GoodsConf
 import GoodsStatusBadge from '@project-lc/components-shared/GoodsStatusBadge';
 import { GoodsByIdRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import rel from 'dayjs/plugin/relativeTime';
-
-dayjs.extend(rel);
 
 export interface GoodsDetailTitleProps {
   goods: GoodsByIdRes;

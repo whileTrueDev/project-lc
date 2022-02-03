@@ -1,9 +1,5 @@
 import { Box, Flex } from '@chakra-ui/react';
 import { AdminLoginForm } from '@project-lc/components-admin/AdminLoginForm';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-
-dayjs.extend(relativeTime);
 
 export function Login(): JSX.Element {
   return (

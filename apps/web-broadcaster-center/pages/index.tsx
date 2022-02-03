@@ -2,22 +2,18 @@ import { Box, Flex, useDisclosure } from '@chakra-ui/react';
 import { broadcasterFooterLinkList } from '@project-lc/components-constants/footerLinks';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import { FloatingHelpButton } from '@project-lc/components-shared/FloatingHelpButton';
-import { KkshowTogether } from '@project-lc/components-shared/KkshowTogether';
 import { InquiryDialog } from '@project-lc/components-shared/InquiryForm';
+import { KkshowTogether } from '@project-lc/components-shared/KkshowTogether';
 import { BroadcasterNavbar } from '@project-lc/components-shared/Navbar';
 import { BroadcasterMainHero } from '@project-lc/components-web-bc/main/BroadcasterMainHero';
 import { BroadcasterMainHowToUse } from '@project-lc/components-web-bc/main/BroadcasterMainHowToUse';
 import { BroadcasterMainIntroduce } from '@project-lc/components-web-bc/main/BroadcasterMainIntroduce';
 import { BroadcasterMainProcess } from '@project-lc/components-web-bc/main/BroadcasterMainProcess';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import { useRouter } from 'next/router';
 import {
   useCloseLiveShoppingStateBoardIfNotLoggedIn,
   useIsLoggedIn,
 } from '@project-lc/hooks';
-
-dayjs.extend(relativeTime);
+import { useRouter } from 'next/router';
 
 export function Index(): JSX.Element {
   const router = useRouter();

@@ -6,11 +6,6 @@ import FmReturnStatusBadge from '@project-lc/components-shared/FmReturnStatusBad
 import { useOrderReturnOrRefundStatus } from '@project-lc/hooks';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
-import relativeTime from 'dayjs/plugin/relativeTime';
-
-dayjs.locale('ko');
-dayjs.extend(relativeTime);
 
 export interface OrderDetailTitleProps {
   order: FindFmOrderDetailRes;
