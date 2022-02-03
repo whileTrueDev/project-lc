@@ -252,7 +252,7 @@ jobs:
         with:
           task-definition: apps/api-realtime/task-definition.json
           container-name: project-lc-realtimeapi
-          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-realtimeapi:latest
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-realtimeapi:prod-${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition RealtimeAPI
         if: ${{ success() }}
