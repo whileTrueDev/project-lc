@@ -1,12 +1,16 @@
 import { Box, Flex } from '@chakra-ui/react';
-import { MypageLink, mypageNavLinks } from '@project-lc/components-constants/navigation';
+import {
+  broadcasterCenterMypageNavLinks,
+  MypageLink,
+  mypageNavLinks,
+} from '@project-lc/components-constants/navigation';
 import LoginRequireAlertDialog from '@project-lc/components-core/LoginRequireAlertDialog';
 import FullscreenLoading from '@project-lc/components-layout/FullscreenLoading';
 import MypageFooter from '@project-lc/components-layout/MypageFooter';
 import {
+  useCloseLiveShoppingStateBoardIfNotLoggedIn,
   useDisplaySize,
   useIsLoggedIn,
-  useCloseLiveShoppingStateBoardIfNotLoggedIn,
 } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import { FloatingHelpButton } from './FloatingHelpButton';
@@ -19,14 +23,14 @@ const FOOTER_HEIGHT = 60;
 
 interface MypageLayoutProps {
   children: React.ReactNode;
-  appType?: UserType;
+  appType?: Exclude<UserType, 'admin'>;
   navLinks?: Array<MypageLink>;
 }
 
 export function MypageLayout({
   children,
   appType = 'seller',
-  navLinks = mypageNavLinks,
+  navLinks = appType === 'seller' ? mypageNavLinks : broadcasterCenterMypageNavLinks,
 }: MypageLayoutProps): JSX.Element {
   const { status } = useIsLoggedIn();
   const { isMobileSize } = useDisplaySize();
