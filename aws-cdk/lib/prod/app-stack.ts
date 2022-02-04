@@ -508,7 +508,7 @@ export class LCProdAppStack extends cdk.Stack {
         c.GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY,
         2,
       ),
-      WHILETRUE_IP_ADDRESS: __loadSsmParmeter(c.WHILETRUE_IP_ADDRESS),
+      WHILETRUE_IP_ADDRESS: __loadSsmParmeter(c.WHILETRUE_IP_ADDRESS, 2),
       REDIS_URL: __loadSsmParmeter(c.REDIS_URL_KEY),
     };
   }

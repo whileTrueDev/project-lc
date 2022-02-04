@@ -642,7 +642,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}WHILETRUE_IP_ADDRESS`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.WHILETRUE_IP_ADDRESS,
       },
     );
