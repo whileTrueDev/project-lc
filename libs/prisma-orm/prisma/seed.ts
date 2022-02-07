@@ -1,6 +1,7 @@
 import {
   Administrator,
   Broadcaster,
+  BroadcasterPromotionPage,
   Goods,
   GoodsInfo,
   PrismaClient,
@@ -75,6 +76,33 @@ async function createBroadcaster(): Promise<Broadcaster> {
   });
 }
 
+/** 방송인홍보페이지 생성 */
+let kkmarketCatalogCode = 11;
+async function createBroadcasterPromotionPage(
+  broadcasterId: number,
+): Promise<BroadcasterPromotionPage> {
+  const tempCatalogUrl = `https://k-kmarket.com/goods/catalog?code=00${kkmarketCatalogCode}`;
+  kkmarketCatalogCode += 1;
+  return prisma.broadcasterPromotionPage.create({
+    data: {
+      broadcasterId,
+      url: tempCatalogUrl, // 임시로 크크마켓 카테고리 링크
+    },
+  });
+}
+
+/** 상품홍보아이템 생성 */
+async function createProductPromotion(
+  broadcasterPromotionPageId: number,
+  goodsId: number,
+): Promise<any> {
+  return prisma.productPromotion.create({
+    data: {
+      broadcasterPromotionPageId,
+      goodsId,
+    },
+  });
+}
 /** 판매 수수료 기본값 설정 */
 const generateDefaultSellCommission = async (): Promise<void> => {
   await prisma.sellCommission.upsert({
@@ -157,6 +185,11 @@ async function main(): Promise<void> {
 
   // 테스트상품4의 라이브쇼핑 생성
   await createDummyLiveShopping(seller, testbroadcaster, goods4);
+
+  // 더미 상품홍보페이지 생성
+  const promotionPage = await createBroadcasterPromotionPage(1);
+  // 더미 상품홍보 아이템 생성
+  await createProductPromotion(promotionPage.id, 4);
 }
 
 main()
