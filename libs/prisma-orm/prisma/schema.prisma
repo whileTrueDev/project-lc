@@ -607,7 +607,7 @@ enum TaxationType {
 // 방송인 상품홍보 페이지 - 방송인과 1:1이나 상품홍보를 하지 않는 방송인도 존재함(방송인 테이블에서는 nullable 값)
 model BroadcasterPromotionPage {
   id                Int                @id @default(autoincrement())
-  url               String? // 퍼스트몰 카테고리 url(관리자가 입력)
+  url               String?            @unique // 퍼스트몰 카테고리 url(관리자가 입력) 
   broadcaster       Broadcaster        @relation(fields: [broadcasterId], references: [id], onDelete: Cascade) // 방송인 삭제시 함께 삭제
   broadcasterId     Int                @unique
   productPromotions ProductPromotion[] //
@@ -623,8 +623,8 @@ model ProductPromotion {
   goodsId                    Int // project-lc 상품 id
   broadcasterPromotionPage   BroadcasterPromotionPage @relation(fields: [broadcasterPromotionPageId], references: [id], onDelete: Cascade) // 방송인 상품홍보페이지와 일대다 관계
   broadcasterPromotionPageId Int
-  broadcasterCommissionRate  Decimal                  @default("0.05") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
-  whiletrueCommissionRate    Decimal                  @default("0.05") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
+  broadcasterCommissionRate  Decimal                  @default("5") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
+  whiletrueCommissionRate    Decimal                  @default("5") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
 }
 
 // -------------------------------------------------
