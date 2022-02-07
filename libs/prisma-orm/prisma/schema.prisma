@@ -66,55 +66,54 @@ model BusinessRegistrationConfirmation {
 
 // 정산 내역
 model SellerSettlements {
-  id                   Int       @id @default(autoincrement()) // 정산 내역 고유 번호
-  state                Int       @default(0) @db.UnsignedTinyInt // 정산 상태
-  totalPrice           Int       @default(0) // 총 정산 대상 금액 (결제금액, 판매수량*판매금액 + 배송비)
-  totalEa              Int       @default(0) // 총 정산 상품 수량
-  totalAmount          Int       @default(0) // 총 정산 금액
+  id                   Int                     @id @default(autoincrement()) // 정산 내역 고유 번호
+  state                Int                     @default(0) @db.UnsignedTinyInt // 정산 상태
+  totalPrice           Int                     @default(0) // 총 정산 대상 금액 (결제금액, 판매수량*판매금액 + 배송비)
+  totalEa              Int                     @default(0) // 총 정산 상품 수량
+  totalAmount          Int                     @default(0) // 총 정산 금액
   round                String // 정산회차 연도/월/차수 (YYYY/MM/0차)
-  date                 DateTime  @default(now()) // 정산마감일: 정산이 마감된 날짜 = 정산 시점
+  date                 DateTime                @default(now()) // 정산마감일: 정산이 마감된 날짜 = 정산 시점
   startDate            DateTime // 발생일: 정산대상(결제/취소/환불/...)이 발생한 날짜
   doneDate             DateTime? // 완료일: 정산대상(구매확정/취소/환불/...)이 완료된 날짜
-  totalCommission      Int       @default(0) // 총 수수료 금액
-  pgCommission         Int       @default(0) // 전자결제 수수료
-  pgCommissionRate     Decimal   @default("0.00") @db.Decimal(10, 2) // 전자결제 수수료율
+  totalCommission      Int                     @default(0) // 총 수수료 금액
+  pgCommission         Int                     @default(0) // 전자결제 수수료
+  pgCommissionRate     Decimal                 @default("0.00") @db.Decimal(10, 2) // 전자결제 수수료율
   paymentMethod        String? // 결제수단
   pg                   String? // pg사
   sellerEmail          String // 등록한 판매자 ID
-  exportId             Int       @unique // 이 정산의 출고고유번호 (fm_goods_export.export_seq)
+  exportId             Int                     @unique // 이 정산의 출고고유번호 (fm_goods_export.export_seq)
   exportCode           String // 이 정산의 출고코드 (fm_goods_export.export_code)
   buyer                String // 구매자명
   recipient            String // 수령자명
   orderId              String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
   shippingId           Int // 주문 배송묶음 번호 (퍼스트몰 fm_order_item.shipping_seq)
-  shippingCost         Decimal   @default("0.00") @db.Decimal(10, 2) // 이 정산에 포함된  배송비
-  shippingCostIncluded Boolean   @default(false) // 이 출고 정산에 order_shipping 배송비에 대한 포함이 이루어졌는지 여부
-
-  seller          Seller                  @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
-  settlementItems SellerSettlementItems[]
+  shippingCost         Decimal                 @default("0.00") @db.Decimal(10, 2) // 이 정산에 포함된  배송비
+  shippingCostIncluded Boolean                 @default(false) // 이 출고 정산에 order_shipping 배송비에 대한 포함이 이루어졌는지 여부
+  seller               Seller                  @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  settlementItems      SellerSettlementItems[]
 
   @@index([sellerEmail, id], name: "SellerSettlementsIndex")
 }
 
 // 정산 아이템(주문 정보)
 model SellerSettlementItems {
-  id                        Int     @id @default(autoincrement())
+  id                        Int           @id @default(autoincrement())
   itemId                    Int? // 주문상품 고유번호 (퍼스트몰 fm_order_item.item_seq)
   optionId                  Int? // 주문상품옵션 고유번호 (퍼스트몰 fm_order_item_option.option_seq)
   goods_image               String? // 상품 대표이미지 url
   goods_name                String? // 상품명
   option_title              String? // 옵션명 fm_goods_options.option_title
   option1                   String? // 옵션값 fm_goods_options.option1
-  ea                        Int     @default(0) // 수량
-  pricePerPiece             Int     @default(0) // 1개당 가격
-  price                     Int     @default(0) // 1개당 가격 * 수량
-  broadcasterCommissionRate Decimal @default("0.00") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
-  whiletrueCommissionRate   Decimal @default("0.00") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
-  broadcasterCommission     Int     @default(0) // 방송인 수수료 금액
-  whiletrueCommission       Int     @default(0) // 와일트루 수수료 금액
-
-  liveShoppingId Int? // 라이브쇼핑 고유번호 (Relational)
-  liveShopping   LiveShopping? @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
+  ea                        Int           @default(0) // 수량
+  pricePerPiece             Int           @default(0) // 1개당 가격
+  price                     Int           @default(0) // 1개당 가격 * 수량
+  broadcasterCommissionRate Decimal       @default("0.00") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
+  whiletrueCommissionRate   Decimal       @default("0.00") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
+  broadcasterCommission     Int           @default(0) // 방송인 수수료 금액
+  whiletrueCommission       Int           @default(0) // 와일트루 수수료 금액
+  sellType                  SellType // 판매 유형
+  liveShoppingId            Int? // 라이브쇼핑 고유번호 (Relational)
+  liveShopping              LiveShopping? @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
 
   sellerSettlementsId Int?
   SellerSettlements   SellerSettlements? @relation(fields: [sellerSettlementsId], references: [id], onDelete: Cascade)
@@ -358,6 +357,11 @@ enum YesOrNo_UPPERCASE {
   N
 }
 
+enum SellType {
+  liveShopping
+  broadcasterPromotionPage
+}
+
 // ****************************
 // 배송비 정책 테이블 - fm_shipping_grouping 참고
 model ShippingGroup {
@@ -556,11 +560,11 @@ model BroadcasterSettlements {
 
 // 방송인 정산 내역 - 주문(출고)정보
 model BroadcasterSettlementItems {
-  id         Int    @id @default(autoincrement())
-  orderId    String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
-  exportCode String // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_code)
-  amount     Int    @default(0) // 총 정산 수익 금액
-
+  id                       Int                    @id @default(autoincrement())
+  orderId                  String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
+  exportCode               String // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_code)
+  amount                   Int                    @default(0) // 총 정산 수익 금액
+  sellType                 SellType // 판매 유형
   liveShoppingId           Int?
   liveShopping             LiveShopping?          @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
   broadcasterSettlementsId Int
