@@ -25,11 +25,9 @@ export class HttpCacheInterceptor extends CacheInterceptor {
       CACHE_KEY_METADATA,
       context.getHandler(),
     );
-
     const req = context.switchToHttp().getRequest<Request>();
     let result = '';
 
-    // @CacheWithoutAuth(true) 데코레이터로 auth 상관없이 캐싱하도록 하지 않은 경우
     // 인증정보와 함께 캐싱해야 하는 경우
     if (req.user) {
       const userIdentifier = `${req.user.type}:${req.user.id}`;
