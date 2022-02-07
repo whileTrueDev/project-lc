@@ -1,6 +1,11 @@
 import __multer from 'multer';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { Broadcaster, BroadcasterAddress, Prisma } from '@prisma/client';
+import {
+  Broadcaster,
+  BroadcasterAddress,
+  BroadcasterPromotionPage,
+  Prisma,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BroadcasterAddressDto,
@@ -70,9 +75,12 @@ export class BroadcasterService {
   /**
    * 유저 정보 조회
    */
-  async findOne(findInput: Prisma.BroadcasterWhereUniqueInput): Promise<Broadcaster> {
+  async findOne(
+    findInput: Prisma.BroadcasterWhereUniqueInput,
+  ): Promise<Broadcaster & { BroadcasterPromotionPage?: BroadcasterPromotionPage }> {
     const broadcaster = await this.prisma.broadcaster.findUnique({
       where: findInput,
+      include: { BroadcasterPromotionPage: true },
     });
     return broadcaster;
   }
