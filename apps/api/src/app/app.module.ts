@@ -1,8 +1,8 @@
 import { MailerModule } from '@nestjs-modules/mailer';
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { FirstmallDbModule } from '@project-lc/firstmall-db';
-import { mailerConfig } from '@project-lc/nest-core';
+import { cacheConfig, mailerConfig } from '@project-lc/nest-core';
 import { AdminModule } from '@project-lc/nest-modules-admin';
 import { AuthModule, SocialModule } from '@project-lc/nest-modules-auth';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
@@ -23,6 +23,7 @@ import { AppService } from './app.service';
 
 @Module({
   imports: [
+    CacheModule.register(cacheConfig),
     MailerModule.forRoot(mailerConfig),
     FirstmallDbModule,
     PrismaModule,
