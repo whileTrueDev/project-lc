@@ -111,7 +111,7 @@ model SellerSettlementItems {
   whiletrueCommissionRate   Decimal       @default("0.00") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
   broadcasterCommission     Int           @default(0) // 방송인 수수료 금액
   whiletrueCommission       Int           @default(0) // 와일트루 수수료 금액
-  sellType                  SellType // 판매 유형
+  sellType                  SellType? // 판매 유형
   liveShoppingId            Int? // 라이브쇼핑 고유번호 (Relational)
   liveShopping              LiveShopping? @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
 
@@ -564,7 +564,7 @@ model BroadcasterSettlementItems {
   orderId                  String // 주문 고유번호 (퍼스트몰 fm_order.order_seq)
   exportCode               String // 이 정산의 출고 고유번호 (퍼스트몰 fm_goods_export.export_code)
   amount                   Int                    @default(0) // 총 정산 수익 금액
-  sellType                 SellType // 판매 유형
+  sellType                 SellType? // 판매유형
   liveShoppingId           Int?
   liveShopping             LiveShopping?          @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
   broadcasterSettlementsId Int
