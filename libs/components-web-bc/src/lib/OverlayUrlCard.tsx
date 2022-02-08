@@ -1,8 +1,50 @@
-import { useState } from 'react';
-import { useToast, Text, Box, Button, Input } from '@chakra-ui/react';
+import { Box, Button, Input, Text, useToast } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
+import { useState } from 'react';
 
-export function UrlCard(): JSX.Element {
+export interface UrlCardProps {
+  inputValue: string;
+  inputDisabled: boolean;
+  buttonDisabled: boolean;
+  buttonHandler: () => void;
+  label: string;
+}
+
+/** url 표시, url 복사 컴포넌트
+ * 실제로 표시되는 label, input value, button onClick 핸들러 모두 props로 받아온다 */
+export function UrlCard(props: UrlCardProps): JSX.Element {
+  const { inputValue, inputDisabled, buttonDisabled, buttonHandler, label } = props;
+
+  return (
+    <Box
+      borderRadius="md"
+      borderWidth="1px"
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+      p={3}
+      width="100%"
+    >
+      <Text fontWeight="bold">{label}</Text>
+      <Input
+        maxW={300}
+        size="sm"
+        id="overlayUrl"
+        value={inputValue}
+        isReadOnly
+        variant="flushed"
+        disabled={inputDisabled}
+      />
+
+      <Button variant="solid" size="sm" disabled={buttonDisabled} onClick={buttonHandler}>
+        URL복사
+      </Button>
+    </Box>
+  );
+}
+
+/** useProfile 에서 "오버레이url" 값을 가져와서 표시하고, 클립보드에 복사하는 컴포넌트 */
+export function OverlayUrlCard(): JSX.Element {
   const toast = useToast();
   const { data: profileData } = useProfile();
 
@@ -26,38 +68,18 @@ export function UrlCard(): JSX.Element {
   };
 
   return (
-    <Box
-      borderRadius="md"
-      borderWidth="1px"
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      p={3}
-      width="100%"
-    >
-      <Text fontWeight="bold"> 라이브 쇼핑 화면 URL</Text>
-      <Input
-        maxW={300}
-        size="sm"
-        id="overlayUrl"
-        value={profileData?.agreementFlag ? overlayUrlValue : '이용 동의가 필요합니다.'}
-        isReadOnly
-        variant="flushed"
-        disabled={!overlayUrlValue}
-      />
-
-      <Button
-        variant="solid"
-        size="sm"
-        disabled={!profileData?.agreementFlag}
-        onClick={(): void => {
-          if (!(profileData?.overlayUrl === overlayUrlValue)) {
-            handleShowOverlayUrl();
-          }
-        }}
-      >
-        URL복사
-      </Button>
-    </Box>
+    <UrlCard
+      label="라이브 쇼핑 화면 URL"
+      inputValue={
+        profileData?.agreementFlag ? overlayUrlValue : '이용 동의가 필요합니다.'
+      }
+      inputDisabled={!overlayUrlValue}
+      buttonDisabled={!profileData?.agreementFlag}
+      buttonHandler={(): void => {
+        if (!(profileData?.overlayUrl === overlayUrlValue)) {
+          handleShowOverlayUrl();
+        }
+      }}
+    />
   );
 }
