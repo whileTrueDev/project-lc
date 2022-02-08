@@ -2,6 +2,7 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { MailModule } from '@project-lc/nest-modules-mail';
 import { S3Module } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
+import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-history.service';
@@ -9,6 +10,7 @@ import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterController } from './broadcaster.controller';
 import { BroadcasterService } from './broadcaster.service';
 import { BroadcasterPurchaseService } from './broadcaster-purchase.service';
+
 @Module({})
 export class BroadcasterModule {
   private static readonly providers = [
@@ -30,7 +32,7 @@ export class BroadcasterModule {
   ];
 
   private static readonly controllers = [BroadcasterController];
-  private static readonly imports = [PrismaModule, S3Module, MailModule];
+  private static readonly imports = [PrismaModule, S3Module, MailModule, CipherModule];
 
   static withoutControllers(): DynamicModule {
     return {
