@@ -1,4 +1,5 @@
 import { IsInt, IsString } from 'class-validator';
+import { SellType } from '@prisma/client';
 
 export class BroadcasterPurchaseDto {
   @IsInt() id: number;
@@ -12,6 +13,7 @@ export type BroacasterPurchaseWithDivdedMessageDto = Omit<
   BroadcasterPurchaseDto,
   'message'
 > & {
+  sellType: SellType;
   userNickname: string;
   userMessage: string;
 };

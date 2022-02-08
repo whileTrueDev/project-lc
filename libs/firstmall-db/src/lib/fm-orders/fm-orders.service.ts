@@ -28,6 +28,7 @@ import {
   OrderStatsRes,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import { SellType } from '@prisma/client';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { StatCounter } from './utills/statCounter';
 
@@ -910,9 +911,10 @@ export class FmOrdersService {
     return newMessageRow;
   }
 
-  public async getPurchaseDoneOrderDuringLiveShopping(
+  public async getPurchaseDoneOrders(
     goods: LiveShoppingFmGoodsSeq[],
-  ): Promise<BroacasterPurchaseWithDivdedMessageDto> {
+    sellType: SellType,
+  ): Promise<BroacasterPurchaseWithDivdedMessageDto[]> {
     const sql = `
     SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.regist_date, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
     FROM fm_order_item AS foi 
@@ -938,10 +940,13 @@ export class FmOrdersService {
       return a.concat(b);
     }, []);
 
-    const messageDividedflattenPurchaseList = flattenPurchaseList.map((row) => {
-      return this.getMessage(row);
-    });
+    const messageDividedflattenPurchaseListWithSellType = flattenPurchaseList.map(
+      (row) => {
+        Object.assign(row, { sellType });
+        return this.getMessage(row);
+      },
+    );
 
-    return messageDividedflattenPurchaseList;
+    return messageDividedflattenPurchaseListWithSellType;
   }
 }

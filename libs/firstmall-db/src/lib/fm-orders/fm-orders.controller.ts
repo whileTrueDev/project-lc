@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { GoodsService } from '@project-lc/nest-modules-goods';
+import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import {
@@ -37,6 +38,7 @@ export class FmOrdersController {
     private readonly projectLcGoodsService: GoodsService,
     private readonly fmOrdersService: FmOrdersService,
     private readonly liveShoppingService: LiveShoppingService,
+    private readonly broadcasterService: BroadcasterService,
   ) {}
 
   /** 주문 목록 조회 */
@@ -189,15 +191,23 @@ export class FmOrdersController {
   async getBroadcasterPurchases(
     @Query('broadcasterId', ParseIntPipe)
     broadcasterId: number,
-  ): Promise<BroacasterPurchaseWithDivdedMessageDto> {
-    const linkedLiveShoppingFmGoodsIds =
-      await this.liveShoppingService.getFmGoodsConnectionIdLinkedToLiveShoppings(
-        broadcasterId,
-      );
-    const purchasedList =
-      await this.fmOrdersService.getPurchaseDoneOrderDuringLiveShopping(
-        linkedLiveShoppingFmGoodsIds,
-      );
+  ): Promise<BroacasterPurchaseWithDivdedMessageDto[]> {
+    const liveShoppingFmGoodsSeqs =
+      await this.liveShoppingService.getFmGoodsSeqLinkedToLiveShoppings(broadcasterId);
+    const promotionFmGoodsSeqs =
+      await this.broadcasterService.getFmGoodsSeqLinkedToProductPromotions(broadcasterId);
+
+    const liveShoppingPurchasedList = await this.fmOrdersService.getPurchaseDoneOrders(
+      liveShoppingFmGoodsSeqs,
+      'liveShopping',
+    );
+    const promotionPagePurchasedList = await this.fmOrdersService.getPurchaseDoneOrders(
+      promotionFmGoodsSeqs,
+      'broadcasterPromotionPage',
+    );
+
+    const purchasedList = liveShoppingPurchasedList.concat(promotionPagePurchasedList);
+
     return purchasedList;
   }
 }
