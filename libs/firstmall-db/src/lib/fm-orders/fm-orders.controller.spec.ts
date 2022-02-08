@@ -9,6 +9,7 @@ import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import request from 'supertest';
+import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import {
   orderDetailExportsSample,
   orderDetailItemsSample,
@@ -34,6 +35,7 @@ describe('FmOrdersController', () => {
         PrismaModule,
         GoodsModule.withoutControllers(),
         LiveShoppingModule.withoutControllers(),
+        BroadcasterModule.withoutControllers(),
         ConfigModule.forRoot({ isGlobal: true }),
       ],
       controllers: [FmOrdersController],
