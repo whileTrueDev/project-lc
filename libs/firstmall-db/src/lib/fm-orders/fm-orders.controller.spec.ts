@@ -1,4 +1,4 @@
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -9,6 +9,7 @@ import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import request from 'supertest';
+import store from 'cache-manager-ioredis';
 import {
   orderDetailExportsSample,
   orderDetailItemsSample,
@@ -35,6 +36,7 @@ describe('FmOrdersController', () => {
         GoodsModule.withoutControllers(),
         LiveShoppingModule.withoutControllers(),
         ConfigModule.forRoot({ isGlobal: true }),
+        CacheModule.register({ isGlobal: true, store }),
       ],
       controllers: [FmOrdersController],
       providers: [FmOrdersService, FirstmallDbService, S3Service],

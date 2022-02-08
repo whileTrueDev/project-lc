@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Goods, GoodsView, PrismaClient } from '@prisma/client';
@@ -7,6 +8,7 @@ import {
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
+import redisCacheStore from 'cache-manager-ioredis';
 import { nanoid } from 'nanoid';
 import { GoodsService } from './goods.service';
 
@@ -22,7 +24,12 @@ describe('GoodsService', () => {
     __prisma = new PrismaClient();
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule, S3Module, ConfigModule.forRoot({ isGlobal: true })],
+      imports: [
+        PrismaModule,
+        S3Module,
+        ConfigModule.forRoot({ isGlobal: true }),
+        CacheModule.register({ isGlobal: true, store: redisCacheStore }),
+      ],
       providers: [GoodsService],
     }).compile();
 

@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { UserPayload } from '../interfaces/auth.interface';
 
 /**
@@ -16,7 +17,7 @@ import { UserPayload } from '../interfaces/auth.interface';
  */
 export const BroadcasterInfo = createParamDecorator(
   (_: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest<Express.Request>();
+    const request = ctx.switchToHttp().getRequest<Request>();
     if (request.user && ['broadcaster'].includes(request.user.type))
       return request.user as UserPayload;
     throw new UnauthorizedException();

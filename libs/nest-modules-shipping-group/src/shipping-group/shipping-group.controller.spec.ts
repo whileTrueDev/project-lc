@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/common';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from '@project-lc/prisma-orm';
@@ -11,7 +12,7 @@ describe('ShippingGroupController', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule],
+      imports: [PrismaModule, CacheModule.register({ isGlobal: true })],
       providers: [ShippingGroupService],
       controllers: [ShippingGroupController],
     }).compile();
@@ -24,7 +25,7 @@ describe('ShippingGroupController', () => {
   });
 
   afterAll(async () => {
-    if (app) app.close();
+    if (app) await app.close();
   });
 
   it('should be defined', () => {
