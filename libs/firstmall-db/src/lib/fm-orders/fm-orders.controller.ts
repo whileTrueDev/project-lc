@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { GoodsService } from '@project-lc/nest-modules-goods';
-import { BroadcasterPurchaseService } from '@project-lc/nest-modules-broadcaster';
+import { BroadcasterPromotionPageService } from '@project-lc/nest-modules-broadcaster';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import {
@@ -38,7 +38,7 @@ export class FmOrdersController {
     private readonly projectLcGoodsService: GoodsService,
     private readonly fmOrdersService: FmOrdersService,
     private readonly liveShoppingService: LiveShoppingService,
-    private readonly broadcasterPurchaseService: BroadcasterPurchaseService,
+    private readonly broadcasterPromotionPageService: BroadcasterPromotionPageService,
   ) {}
 
   /** 주문 목록 조회 */
@@ -195,7 +195,7 @@ export class FmOrdersController {
     const liveShoppingFmGoodsSeqs =
       await this.liveShoppingService.getFmGoodsSeqsLinkedToLiveShoppings(broadcasterId);
     const promotionFmGoodsSeqs =
-      await this.broadcasterPurchaseService.getFmGoodsSeqsLinkedToProductPromotions(
+      await this.broadcasterPromotionPageService.getFmGoodsSeqsLinkedToProductPromotions(
         broadcasterId,
       );
 

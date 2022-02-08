@@ -4,7 +4,7 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import { broadcasterProductPromotionDto } from '@project-lc/shared-types';
 
 @Injectable()
-export class BroadcasterPurchaseService {
+export class BroadcasterPromotionPageService {
   constructor(private readonly prisma: PrismaService) {}
 
   public async getFmGoodsSeqsLinkedToProductPromotions(

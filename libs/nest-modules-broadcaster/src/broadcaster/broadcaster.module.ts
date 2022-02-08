@@ -9,7 +9,7 @@ import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-hi
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterController } from './broadcaster.controller';
 import { BroadcasterService } from './broadcaster.service';
-import { BroadcasterPurchaseService } from './broadcaster-purchase.service';
+import { BroadcasterPromotionPageService } from './broadcaster-promotion-page.service';
 
 @Module({})
 export class BroadcasterModule {
@@ -19,7 +19,7 @@ export class BroadcasterModule {
     BroadcasterChannelService,
     BroadcasterSettlementHistoryService,
     BroadcasterSettlementService,
-    BroadcasterPurchaseService,
+    BroadcasterPromotionPageService,
   ];
 
   private static readonly exports = [
@@ -28,7 +28,7 @@ export class BroadcasterModule {
     BroadcasterSettlementHistoryService,
     BroadcasterSettlementService,
     BroadcasterSettlementHistoryService,
-    BroadcasterPurchaseService,
+    BroadcasterPromotionPageService,
   ];
 
   private static readonly controllers = [BroadcasterController];
