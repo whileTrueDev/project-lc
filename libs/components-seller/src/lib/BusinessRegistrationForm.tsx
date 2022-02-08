@@ -13,6 +13,7 @@ import {
   useDialogHeaderConfig,
   useDialogValueConfig,
 } from '@project-lc/components-layout/GridTableItem';
+import { emailRegisterOptions } from '@project-lc/shared-types';
 import { forwardRef, MutableRefObject } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { BusinessRegistrationFormDto } from './BusinessRegistrationDialog';
@@ -216,10 +217,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
             maxW={['inherit', 300, 300, 300]}
             {...register('taxInvoiceMail', {
               required: '전자계산서 발급을 위한 이메일을 입력해주세요.',
-              pattern: {
-                value: /^[\w]+@[\w]+\.[\w][\w]+$/,
-                message: '이메일 형식이 올바르지 않습니다.',
-              },
+              validate: emailRegisterOptions.validate,
             })}
           />
           <FormErrorMessage ml={3} mt={0}>
