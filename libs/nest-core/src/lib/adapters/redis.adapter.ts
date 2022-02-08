@@ -10,9 +10,16 @@ export class RedisIoAdapter extends IoAdapter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createIOServer(port: number, options?: ServerOptions): any {
     const server = super.createIOServer(port, options);
-    const pubClient = new Redis.Cluster([process.env.REDIS_URL || 'localhost:6379']);
+
+    let pubClient: Redis.Cluster | Redis.Redis;
+
+    if (['production', 'test'].includes(process.env.NODE_ENV)) {
+      pubClient = new Redis.Cluster([process.env.REDIS_URL]);
+    }
+    pubClient = new Redis('localhost:6379');
     const subClient = pubClient.duplicate();
     const redisAdapter = createAdapter(pubClient, subClient);
+
     server.adapter(redisAdapter);
     return server;
   }

@@ -1,14 +1,15 @@
 export * from './adapters/redis.adapter';
+export * from './classes/service-base-cache.class';
 export * as authConstants from './constants/auth';
 export * from './decorators/broadcasterInfo.decorator';
 export * from './decorators/sellerInfo.decorator';
 export * from './decorators/userInfo.decorator';
-export * from './interfaces/auth.interface';
 export * from './interceptors/http-cache.interceptor';
+export * from './interfaces/auth.interface';
 export * from './mail-templates/createVerificationTemplate';
 export * from './middlewares/colorizedMorgan.middleware';
 export * from './middlewares/socialLoginUserType.middleware';
+export * from './settings/cache.config';
 export * from './settings/cors.options';
 export * from './settings/jwt.setting';
 export * from './settings/mailer.config';
-export * from './settings/cache.config';

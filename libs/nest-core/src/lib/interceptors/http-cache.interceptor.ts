@@ -39,12 +39,8 @@ export class HttpCacheInterceptor extends CacheInterceptor {
       result = join(result, cacheKeyMetadata);
     }
 
-    const url = super.trackBy(context);
-    result = join(result, url);
-    if (!result) result = url;
-
-    // TODO: 커밋시 삭제
-    console.log('cacheKey result: ', result);
+    result = join(result, req.originalUrl);
+    if (!result) result = req.originalUrl;
 
     return result;
   }

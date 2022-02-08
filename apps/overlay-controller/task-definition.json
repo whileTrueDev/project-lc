@@ -41,6 +41,10 @@
         {
           "name": "REALTIME_API_HOST",
           "value": "https://realtime.xn--hp4b17xa.com"
+        },
+        {
+            "name": "NODE_ENV",
+            "value": "production"
         }
       ],
       "resourceRequirements": null,

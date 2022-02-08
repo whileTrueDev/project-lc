@@ -6,9 +6,11 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { UserNotification } from '@prisma/client';
+import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateMultipleNotificationDto,
@@ -20,6 +22,7 @@ import {
 import { NotificationService } from './notification.service';
 
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(HttpCacheInterceptor)
 @Controller('notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}

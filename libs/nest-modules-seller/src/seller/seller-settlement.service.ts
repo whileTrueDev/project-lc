@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import {
   BusinessRegistrationConfirmation,
   SellCommission,
   SellerBusinessRegistration,
   SellerSettlementAccount,
 } from '@prisma/client';
-import { UserPayload } from '@project-lc/nest-core';
+import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BusinessRegistrationDto,
@@ -20,6 +20,7 @@ import {
   CalcPgCommissionOptions,
   checkOrderDuringLiveShopping,
 } from '@project-lc/utils';
+import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 
 export type SellerSettlementInfo = {
@@ -35,8 +36,16 @@ export type SellerSettlementInfo = {
 };
 
 @Injectable()
-export class SellerSettlementService {
-  constructor(private readonly prisma: PrismaService) {}
+export class SellerSettlementService extends ServiceBaseWithCache {
+  #SELLER_SETTLEMENT_CACHE_KEY = 'seller/settlement';
+  #SELLER_SETTLEMENT_HISTORY_CACHE_KEY = 'seller/settlement-history';
+
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   // 사업자 등록증 번호 포맷만들기
   private makeRegistrationNumberFormat(num: string): string {
@@ -72,6 +81,7 @@ export class SellerSettlementService {
           mailOrderSalesNumber: dto.mailOrderSalesNumber,
         },
       });
+    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
     return sellerBusinessRegistration;
   }
 
@@ -89,7 +99,7 @@ export class SellerSettlementService {
           SellerBusinessRegistrationId: _sellerBusinessRegistration.id,
         },
       });
-
+    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
     return businessRegistrationConfirmation;
   }
 
@@ -113,6 +123,7 @@ export class SellerSettlementService {
       },
     });
 
+    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
     return settlementAccount;
   }
 
@@ -125,40 +136,22 @@ export class SellerSettlementService {
   ): Promise<SellerSettlementInfo> {
     const email = sellerInfo.sub;
     const settlementInfo = await this.prisma.seller.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
       select: {
         sellerBusinessRegistration: {
-          include: {
-            BusinessRegistrationConfirmation: true,
-          },
+          include: { BusinessRegistrationConfirmation: true },
           take: 1,
-          orderBy: {
-            id: 'desc',
-          },
+          orderBy: { id: 'desc' },
         },
         sellerSettlements: {
           take: 5,
-          orderBy: {
-            id: 'desc',
-          },
-          select: {
-            date: true,
-            state: true,
-            totalAmount: true,
-          },
+          orderBy: { id: 'desc' },
+          select: { date: true, state: true, totalAmount: true },
         },
         sellerSettlementAccount: {
           take: 1,
-          orderBy: {
-            id: 'desc',
-          },
-          select: {
-            bank: true,
-            number: true,
-            name: true,
-          },
+          orderBy: { id: 'desc' },
+          select: { bank: true, number: true, name: true },
         },
       },
     });
@@ -315,6 +308,8 @@ export class SellerSettlementService {
         totalCommission: totalInfo.commission + totalPgCommission.commission,
       },
     });
+
+    await this._clearCaches(this.#SELLER_SETTLEMENT_HISTORY_CACHE_KEY);
 
     return true;
   }

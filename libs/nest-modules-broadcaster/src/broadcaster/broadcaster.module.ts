@@ -3,8 +3,11 @@ import { MailModule } from '@project-lc/nest-modules-mail';
 import { S3Module } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
+import { BroadcasterContactsController } from './broadcaster-contacts.controller';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
+import { BroadcasterSettlementHistoryController } from './broadcaster-settlement-history.controller';
 import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-history.service';
+import { BroadcasterSettlementController } from './broadcaster-settlement.controller';
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterController } from './broadcaster.controller';
 import { BroadcasterService } from './broadcaster.service';
@@ -27,7 +30,13 @@ export class BroadcasterModule {
     BroadcasterSettlementHistoryService,
   ];
 
-  private static readonly controllers = [BroadcasterController];
+  private static readonly controllers = [
+    BroadcasterController,
+    BroadcasterContactsController,
+    BroadcasterSettlementController,
+    BroadcasterSettlementHistoryController,
+  ];
+
   private static readonly imports = [PrismaModule, S3Module, MailModule];
 
   static withoutControllers(): DynamicModule {
