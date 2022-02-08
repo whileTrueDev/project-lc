@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import {
-  BroacasterPurchaseWithDivdedMessageDto,
+  BroacasterPurchaseWithDividedMessageDto,
   BroadcasterPurchaseDto,
   ChangeReturnStatusDto,
   FindFmOrderDetailRes,
@@ -914,7 +914,7 @@ export class FmOrdersService {
   public async getPurchaseDoneOrders(
     goods: LiveShoppingFmGoodsSeq[],
     sellType: SellType,
-  ): Promise<BroacasterPurchaseWithDivdedMessageDto[]> {
+  ): Promise<BroacasterPurchaseWithDividedMessageDto[]> {
     const sql = `
     SELECT fo.order_seq as id, foi.goods_name, fo.settleprice, fo.regist_date, group_concat(distinct CONCAT_WS("&&",foii.title, foii.value) SEPARATOR "||") AS message
     FROM fm_order_item AS foi 

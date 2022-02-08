@@ -12,11 +12,11 @@ import {
 } from '@nestjs/common';
 import { SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { GoodsService } from '@project-lc/nest-modules-goods';
-import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
+import { BroadcasterPurchaseService } from '@project-lc/nest-modules-broadcaster';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import {
-  BroacasterPurchaseWithDivdedMessageDto,
+  BroacasterPurchaseWithDividedMessageDto,
   ChangeFmOrderStatusDto,
   ChangeReturnStatusDto,
   convertFmStatusStringToStatus,
@@ -38,7 +38,7 @@ export class FmOrdersController {
     private readonly projectLcGoodsService: GoodsService,
     private readonly fmOrdersService: FmOrdersService,
     private readonly liveShoppingService: LiveShoppingService,
-    private readonly broadcasterService: BroadcasterService,
+    private readonly broadcasterPurchaseService: BroadcasterPurchaseService,
   ) {}
 
   /** 주문 목록 조회 */
@@ -191,11 +191,11 @@ export class FmOrdersController {
   async getBroadcasterPurchases(
     @Query('broadcasterId', ParseIntPipe)
     broadcasterId: number,
-  ): Promise<BroacasterPurchaseWithDivdedMessageDto[]> {
+  ): Promise<BroacasterPurchaseWithDividedMessageDto[]> {
     const liveShoppingFmGoodsSeqs =
       await this.liveShoppingService.getFmGoodsSeqsLinkedToLiveShoppings(broadcasterId);
     const promotionFmGoodsSeqs =
-      await this.broadcasterService.getFmGoodsSeqsLinkedToProductPromotions(
+      await this.broadcasterPurchaseService.getFmGoodsSeqsLinkedToProductPromotions(
         broadcasterId,
       );
 

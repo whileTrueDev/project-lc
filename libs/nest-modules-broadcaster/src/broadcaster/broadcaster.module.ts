@@ -8,7 +8,7 @@ import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-hi
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterController } from './broadcaster.controller';
 import { BroadcasterService } from './broadcaster.service';
-
+import { BroadcasterPurchaseService } from './broadcaster-purchase.service';
 @Module({})
 export class BroadcasterModule {
   private static readonly providers = [
@@ -17,6 +17,7 @@ export class BroadcasterModule {
     BroadcasterChannelService,
     BroadcasterSettlementHistoryService,
     BroadcasterSettlementService,
+    BroadcasterPurchaseService,
   ];
 
   private static readonly exports = [
@@ -25,6 +26,7 @@ export class BroadcasterModule {
     BroadcasterSettlementHistoryService,
     BroadcasterSettlementService,
     BroadcasterSettlementHistoryService,
+    BroadcasterPurchaseService,
   ];
 
   private static readonly controllers = [BroadcasterController];

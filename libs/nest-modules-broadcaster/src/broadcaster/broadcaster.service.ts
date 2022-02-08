@@ -9,7 +9,6 @@ import {
   FindBroadcasterDto,
   BroadcasterWithoutUserNickName,
   SignUpDto,
-  broadcasterProductPromotionDto,
 } from '@project-lc/shared-types';
 import { hash, verify } from 'argon2';
 import { S3Service } from '@project-lc/nest-modules-s3';
@@ -260,25 +259,5 @@ export class BroadcasterService {
       data: { avatar: null },
     });
     return true;
-  }
-
-  public async getFmGoodsSeqsLinkedToProductPromotions(
-    id: Broadcaster['id'],
-  ): Promise<broadcasterProductPromotionDto[]> {
-    const productPromotionFmGoodsSeq =
-      await this.prisma.broadcasterPromotionPage.findMany({
-        where: {
-          broadcasterId: id,
-        },
-        select: {
-          productPromotions: {
-            select: {
-              fmGoodsSeq: true,
-            },
-          },
-        },
-      });
-    const fmGoodsSeqs = productPromotionFmGoodsSeq.pop().productPromotions;
-    return fmGoodsSeqs;
   }
 }

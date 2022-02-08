@@ -9,7 +9,7 @@ export class BroadcasterPurchaseDto {
   @IsString() message: string;
 }
 
-export type BroacasterPurchaseWithDivdedMessageDto = Omit<
+export type BroacasterPurchaseWithDividedMessageDto = Omit<
   BroadcasterPurchaseDto,
   'message'
 > & {
