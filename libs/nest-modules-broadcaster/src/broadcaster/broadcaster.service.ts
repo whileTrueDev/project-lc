@@ -262,7 +262,7 @@ export class BroadcasterService {
     return true;
   }
 
-  public async getFmGoodsSeqLinkedToProductPromotions(
+  public async getFmGoodsSeqsLinkedToProductPromotions(
     id: Broadcaster['id'],
   ): Promise<broadcasterProductPromotionDto[]> {
     const productPromotionFmGoodsSeq =
