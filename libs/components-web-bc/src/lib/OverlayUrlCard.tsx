@@ -7,7 +7,7 @@ export interface UrlCardProps {
   inputDisabled: boolean;
   buttonDisabled: boolean;
   buttonHandler: () => void;
-  label: string;
+  label: string | JSX.Element;
 }
 
 /** url 표시, url 복사 컴포넌트
@@ -25,7 +25,8 @@ export function UrlCard(props: UrlCardProps): JSX.Element {
       p={3}
       width="100%"
     >
-      <Text fontWeight="bold">{label}</Text>
+      {typeof label === 'string' ? <Text fontWeight="bold">{label}</Text> : label}
+
       <Input
         maxW={300}
         size="sm"
