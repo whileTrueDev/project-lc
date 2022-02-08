@@ -1,21 +1,19 @@
 import { QuestionIcon } from '@chakra-ui/icons';
 import {
   Box,
-  Button,
-  ButtonGroup,
   IconButton,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverFooter,
-  PopoverHeader,
-  PopoverTrigger,
-  useColorModeValue,
-  useToast,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
   Text,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
+import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useProfile } from '@project-lc/hooks';
 import { useState } from 'react';
 import { UrlCard } from './OverlayUrlCard';
@@ -24,6 +22,8 @@ import { UrlCard } from './OverlayUrlCard';
  * profileData.BroadcasterPromotionPage 값이 없는경우 아무것도 표시되지 않는다
  */
 export function PromotionPageUrlCard(): JSX.Element {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const toast = useToast();
   const { data: profileData } = useProfile();
 
@@ -60,8 +60,16 @@ export function PromotionPageUrlCard(): JSX.Element {
     <UrlCard
       label={
         <>
-          <Text fontWeight="bold">상품 홍보 페이지 URL</Text>
-          <PromotionPageUrlPopover />
+          <Text fontWeight="bold">
+            상품 홍보 페이지 URL
+            <IconButton
+              variant="ghost"
+              aria-label="도움말"
+              icon={<QuestionIcon />}
+              onClick={onOpen}
+            />
+          </Text>
+          <PromotionPageUrlInformationModal isOpen={isOpen} onClose={onClose} />
         </>
       }
       inputValue={!profileData?.agreementFlag ? '이용 동의가 필요합니다.' : urlValue}
@@ -72,40 +80,107 @@ export function PromotionPageUrlCard(): JSX.Element {
   );
 }
 
-/** 도움말 정보 받기 전 임시로 만든 팝오버 */
-export function PromotionPageUrlPopover(): JSX.Element {
+const BASE_BANNER_IMAGE_S3_PATH =
+  'https://lc-project.s3.ap-northeast-2.amazonaws.com/public/';
+const baseBannerImages = [
+  {
+    key: 'promotion-page-basic-image-1.png',
+    name: '트위치 기본 배너',
+    desc: '트위치 패널에 등록하세요!',
+    width: 400,
+    height: 130,
+  },
+  {
+    key: 'promotion-page-basic-image-2.png',
+    desc: '아프리카 방송국 플로팅 배너에 등록하세요!',
+    name: '아프리카 플로팅 기본 배너',
+    width: 120,
+    height: 300,
+  },
+  {
+    key: 'promotion-page-basic-image-3.png',
+    desc: '아프리카 방송국 하단 배너에 등록하세요!',
+    name: '아프리카 방송국 하단 기본 배너',
+    width: 400,
+    height: 120,
+  },
+];
+
+/** 도움말 정보 모달 */
+export function PromotionPageUrlInformationModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}): JSX.Element {
   return (
-    <Popover placement="bottom" closeOnBlur={false}>
-      <PopoverTrigger>
-        <IconButton variant="ghost" aria-label="도움말" icon={<QuestionIcon />} />
-      </PopoverTrigger>
-      <PopoverContent
-        bg={useColorModeValue('gray.200', 'blue.800')}
-        borderColor={useColorModeValue('gray.300', 'blue.800')}
-      >
-        <PopoverHeader pt={4} fontWeight="bold" border="0">
-          Manage Your Channels
-        </PopoverHeader>
-        <PopoverArrow />
-        <PopoverCloseButton />
-        <PopoverBody>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-          incididunt ut labore et dolore.
-        </PopoverBody>
-        <PopoverFooter
-          border="0"
-          d="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          pb={4}
-        >
-          <Box fontSize="sm">Step 2 of 4</Box>
-          <ButtonGroup size="sm">
-            <Button colorScheme="green">Setup Email</Button>
-            <Button colorScheme="blue">Next</Button>
-          </ButtonGroup>
-        </PopoverFooter>
-      </PopoverContent>
-    </Popover>
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} size="3xl" blockScrollOnMount>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>상품 홍보 페이지란?</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Stack spacing={10}>
+              <Box>
+                <ChakraNextImage
+                  layout="responsive"
+                  width="1000"
+                  height="1000"
+                  objectFit="fill"
+                  src="https://lc-project.s3.ap-northeast-2.amazonaws.com/public/promotion-page-example.png"
+                />
+                <Text>
+                  해당 페이지에서 판매가 발생하면 일정 수수료가 지급됩니다. <br />팬
+                  여러분들이 볼 수 있는 공간 (방송국 정보란, 개인 SNS 등)에 해당 URL을
+                  게시하고 상품을 홍보해보세요!
+                </Text>
+              </Box>
+
+              <Box>
+                <Text fontWeight="bold" mb={4}>
+                  기본 이미지(사용할 이미지가 없으시면 사용해주세요)
+                </Text>
+                <Stack spacing={4}>
+                  {baseBannerImages.map((img) => {
+                    const { key, desc, width, height, name } = img;
+                    return (
+                      <Box key={key}>
+                        <Box
+                          display="inline-block"
+                          cursor="pointer"
+                          onClick={() => {
+                            const url = `${BASE_BANNER_IMAGE_S3_PATH}${key}`;
+
+                            fetch(url)
+                              .then((response) => response.blob())
+                              .then((blob) => {
+                                const blobUrl = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = blobUrl;
+                                a.download = name;
+                                a.click();
+                                a.remove();
+                              });
+                          }}
+                        >
+                          <ChakraNextImage
+                            width={width}
+                            height={height}
+                            src={`${BASE_BANNER_IMAGE_S3_PATH}${key}`}
+                          />
+                        </Box>
+                        <Text>{desc}</Text>
+                      </Box>
+                    );
+                  })}
+                </Stack>
+              </Box>
+            </Stack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
