@@ -22,7 +22,7 @@ import {
   SellerSettlements,
   SellType,
 } from '@prisma/client';
-import { SellerInfo, UserPayload } from '@project-lc/nest-core';
+import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { MailVerificationService } from '@project-lc/nest-modules-mail';
 import {
@@ -33,12 +33,10 @@ import {
   FindSettlementHistoryDto,
   PasswordValidateDto,
   SellerBusinessRegistrationType,
-  SellerContactsDTO,
-  SellerContactsDTOWithoutIdDTO,
+  SellerContractionAgreementDto,
   SellerShopInfoDto,
   SettlementAccountDto,
   SignUpDto,
-  SellerContractionAgreementDto,
 } from '@project-lc/shared-types';
 import __multer from 'multer';
 import {
@@ -61,6 +59,7 @@ export class SellerController {
 
   // * 판매자 정보 조회
   @Get()
+  @UseInterceptors(HttpCacheInterceptor)
   public findOne(@Query(ValidationPipe) dto: FindSellerDto): Promise<FindSellerRes> {
     return this.sellerService.findOne({ email: dto.email });
   }
@@ -123,6 +122,7 @@ export class SellerController {
   // 본인의 정산정보 및 정산 검수 정보 조회
   @UseGuards(JwtAuthGuard)
   @Get('settlement')
+  @UseInterceptors(HttpCacheInterceptor)
   public async selectSellerSettlementInfo(
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerSettlementInfo> {
@@ -132,6 +132,7 @@ export class SellerController {
   // 본인의 정산 대상 목록 조회
   @UseGuards(JwtAuthGuard)
   @Get('settlement-history')
+  @UseInterceptors(HttpCacheInterceptor)
   public async findSettlementHistory(
     @SellerInfo() sellerInfo: UserPayload,
     @Query(ValidationPipe) dto: FindSettlementHistoryDto,
@@ -144,6 +145,7 @@ export class SellerController {
   // 본인의 정산 대상 년도 목록 조회
   @UseGuards(JwtAuthGuard)
   @Get('settlement-history-years')
+  @UseInterceptors(HttpCacheInterceptor)
   public async findSettlementHistoryYears(
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<string[]> {
@@ -153,6 +155,7 @@ export class SellerController {
   // 본인의 정산 대상 월 목록 조회
   @UseGuards(JwtAuthGuard)
   @Get('settlement-history-months')
+  @UseInterceptors(HttpCacheInterceptor)
   public async findSettlementHistoryMonths(
     @SellerInfo() sellerInfo: UserPayload,
     @Query('year') year: string,
@@ -163,6 +166,7 @@ export class SellerController {
   // 본인의 정산 대상 월 목록 조회
   @UseGuards(JwtAuthGuard)
   @Get('settlement-history-rounds')
+  @UseInterceptors(HttpCacheInterceptor)
   public async findSettlementHistoryRounds(
     @SellerInfo() sellerInfo: UserPayload,
     @Query('year') year: string,
@@ -232,24 +236,10 @@ export class SellerController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('contacts')
-  public findDefaultContacts(@Query('email') email: string): Promise<SellerContactsDTO> {
-    return this.sellerService.findDefaultContacts(email);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('contacts')
-  public createContacts(
-    @SellerInfo() seller: UserPayload,
-    @Body(ValidationPipe) dto: SellerContactsDTOWithoutIdDTO,
-  ): Promise<{ contactId: number }> {
-    const email = seller.sub;
-    return this.sellerService.registSellerContacts(email, dto);
-  }
-
+  /** 판매자 판매 수수료 조회 */
   @UseGuards(JwtAuthGuard)
   @Get('sell-commission')
+  @UseInterceptors(HttpCacheInterceptor)
   public findSellCommission(): Promise<SellCommission> {
     return this.sellerSettlementService.findSellCommission();
   }

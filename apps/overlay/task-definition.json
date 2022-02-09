@@ -29,6 +29,10 @@
         {
           "name": "S3_BUCKET_NAME",
           "value": "lc-project"
+        },
+        {
+          "name": "NODE_ENV",
+          "value": "production"
         }
       ],
       "resourceRequirements": null,

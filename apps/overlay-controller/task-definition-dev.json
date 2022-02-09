@@ -41,6 +41,10 @@
                 {
                     "name": "REALTIME_API_HOST",
                     "value": "https://dev-realtime.xn--hp4b17xa.com"
+                },
+                {
+                    "name": "NODE_ENV",
+                    "value": "test"
                 }
             ],
             "resourceRequirements": null,

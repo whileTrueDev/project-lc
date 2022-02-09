@@ -1,24 +1,30 @@
 import {
-  Controller,
-  Get,
-  Post,
-  ValidationPipe,
   Body,
-  Patch,
-  UseGuards,
+  CacheTTL,
+  Controller,
   Delete,
+  Get,
   Param,
   ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+  UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { Notice } from '@prisma/client';
-import { NoticePostDto, NoticePatchDto } from '@project-lc/shared-types';
-import { JwtAuthGuard, AdminGuard } from '@project-lc/nest-modules-authguard';
+import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { NoticePatchDto, NoticePostDto } from '@project-lc/shared-types';
 import { NoticeService } from './notice.service';
+
 @Controller('notice')
+@UseInterceptors(HttpCacheInterceptor)
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
   @Get()
+  @CacheTTL(60 * 60 * 60) // 1시간
   getNotice(): Promise<Notice[]> {
     return this.noticeService.getNotices();
   }

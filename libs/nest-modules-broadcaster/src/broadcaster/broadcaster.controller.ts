@@ -18,49 +18,41 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BroadcasterChannel } from '@prisma/client';
-import { BroadcasterInfo, UserPayload } from '@project-lc/nest-core';
+import {
+  BroadcasterInfo,
+  HttpCacheInterceptor,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { MailVerificationService } from '@project-lc/nest-modules-mail';
 import {
   BroadcasterAddressDto,
-  BroadcasterContactDto,
   BroadcasterContractionAgreementDto,
   BroadcasterRes,
-  BroadcasterSettlementInfoDto,
-  BroadcasterSettlementInfoRes,
   ChangeNicknameDto,
   CreateBroadcasterChannelDto,
   EmailDupCheckDto,
-  FindBcSettlementHistoriesRes,
   FindBroadcasterDto,
   PasswordValidateDto,
   SignUpDto,
 } from '@project-lc/shared-types';
-import {
-  Broadcaster,
-  BroadcasterAddress,
-  BroadcasterContacts,
-  BroadcasterSettlementInfo,
-} from '.prisma/client';
+import { Broadcaster, BroadcasterAddress } from '.prisma/client';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
-import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-history.service';
-import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterService } from './broadcaster.service';
 
 @Controller('broadcaster')
 export class BroadcasterController {
   constructor(
     private readonly broadcasterService: BroadcasterService,
-    private readonly contactsService: BroadcasterContactsService,
     private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
     private readonly settlementHistoryService: BroadcasterSettlementHistoryService,
-    private readonly broadcasterSettlementService: BroadcasterSettlementService,
   ) {}
 
   /** 방송인 정보 조회 */
   @Get()
+  @UseInterceptors(HttpCacheInterceptor)
   public async findBroadcaster(
     @Query(ValidationPipe) dto: FindBroadcasterDto,
   ): Promise<BroadcasterRes | null> {
@@ -111,6 +103,7 @@ export class BroadcasterController {
 
   /** 방송인 채널 목록 조회 */
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(HttpCacheInterceptor)
   @Get('/:broadcasterId/channel-list')
   getBroadcasterChannelList(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
@@ -118,7 +111,13 @@ export class BroadcasterController {
     return this.channelService.getBroadcasterChannelList(broadcasterId);
   }
 
-  /** 방송인 누적 정산 금액 조회 */
+  /**
+   * 방송인 누적 정산 금액 조회
+   * @deprecated
+   * TODO: 5차 스프린트 배포 이후 삭제
+   * - broadcaster/settlement-history:broadcasterId 로 이전.
+   * - 2022.02.08 by hwasurr(dan)
+   */
   @UseGuards(JwtAuthGuard)
   @Get('/:broadcasterId/accumulated-settlement-amount')
   public async findAccumulatedSettlementAmount(
@@ -140,43 +139,6 @@ export class BroadcasterController {
     return this.broadcasterService.updateNickname(bc.id, dto.nickname);
   }
 
-  /** 방송인 연락처 목록 조회 */
-  @UseGuards(JwtAuthGuard)
-  @Get('/contacts/:broadcasterId')
-  public async findBroadcasterContacts(
-    @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
-  ): Promise<BroadcasterContacts[]> {
-    return this.contactsService.findContacts(broadcasterId);
-  }
-
-  /** 방송인 연락처 생성 */
-  @UseGuards(JwtAuthGuard)
-  @Post('contacts')
-  public async createContact(
-    @Body(ValidationPipe) dto: BroadcasterContactDto,
-  ): Promise<BroadcasterContacts> {
-    return this.contactsService.createContact(dto.broadcasterId, dto);
-  }
-
-  /** 방송인 연락처 수정 */
-  @UseGuards(JwtAuthGuard)
-  @Put('contacts/:contactId')
-  public async updateContact(
-    @Param('contactId', ParseIntPipe) contactId: BroadcasterContacts['id'],
-    @Body(ValidationPipe) dto: BroadcasterContactDto,
-  ): Promise<boolean> {
-    return this.contactsService.updateContact(contactId, dto);
-  }
-
-  /** 방송인 연락처 삭제 */
-  @UseGuards(JwtAuthGuard)
-  @Delete('contacts/:contactId')
-  public async deleteContact(
-    @Param('contactId', ParseIntPipe) contactId: BroadcasterContacts['id'],
-  ): Promise<boolean> {
-    return this.contactsService.deleteContact(contactId);
-  }
-
   /** 방송인 주소 수정 */
   @UseGuards(JwtAuthGuard)
   @Put('address')
@@ -185,18 +147,6 @@ export class BroadcasterController {
     @Body(ValidationPipe) dto: BroadcasterAddressDto,
   ): Promise<BroadcasterAddress> {
     return this.broadcasterService.upsertAddress(bc.id, dto);
-  }
-
-  /** 방송인 정산 내역 조회 */
-  @UseGuards(JwtAuthGuard)
-  @Get('settlement-history/:broacasterId')
-  public async findSettlementHistories(
-    @BroadcasterInfo() bc: UserPayload,
-    @Param('broacasterId', ParseIntPipe) broadcasterId: Broadcaster['id'],
-  ): Promise<FindBcSettlementHistoriesRes> {
-    if (bc.id !== broadcasterId)
-      throw new UnauthorizedException('본인 계정의 정산 내역만 조회할 수 있습니다.');
-    return this.settlementHistoryService.findHistoriesByBroadcaster(broadcasterId);
   }
 
   // 로그인 한 사람이 본인인증을 위해 비밀번호 확인
@@ -225,26 +175,6 @@ export class BroadcasterController {
     return this.broadcasterService.changeContractionAgreement(
       dto.email,
       dto.agreementFlag,
-    );
-  }
-
-  /** 방송인 정산등록정보 등록 */
-  @UseGuards(JwtAuthGuard)
-  @Post('settlement-info')
-  public async insertSettlementInfo(
-    @Body(ValidationPipe) dto: BroadcasterSettlementInfoDto,
-  ): Promise<BroadcasterSettlementInfo> {
-    return this.broadcasterSettlementService.insertSettlementInfo(dto);
-  }
-
-  /** 방송인 정산등록정보 조회 */
-  @UseGuards(JwtAuthGuard)
-  @Get('settlement-info/:broadcasterId')
-  public async selectBroadcasterSettlementInfo(
-    @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
-  ): Promise<BroadcasterSettlementInfoRes> {
-    return this.broadcasterSettlementService.selectBroadcasterSettlementInfo(
-      broadcasterId,
     );
   }
 
