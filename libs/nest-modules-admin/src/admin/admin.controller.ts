@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   ForbiddenException,
   Get,
   Header,
@@ -314,5 +315,17 @@ export class AdminController {
   @Get('/promotion-page/duplicate')
   async checkPromotionPageUrlDuplicate(@Query('url') url: string): Promise<boolean> {
     return this.broadcasterPromotionPageService.checkPromotionPageUrlDuplicate(url);
+  }
+
+  /**
+   * 방송인 상품홍보페이지 삭제
+   * @param pageId 방송인 상품홍보페이지 id
+   * @returns 삭제 성공시 true
+   */
+  @Delete('/promotion-page/:pageId')
+  async deletePromotionPage(
+    @Param('pageId', ParseIntPipe) pageId: number,
+  ): Promise<boolean> {
+    return this.broadcasterPromotionPageService.deletePromotionPage(pageId);
   }
 }

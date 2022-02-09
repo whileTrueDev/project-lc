@@ -57,6 +57,12 @@ export class BroadcasterPromotionPageService {
   }
 
   /** 상품홍보페이지 삭제 */
+  public async deletePromotionPage(pageId: number): Promise<boolean> {
+    await this.prisma.broadcasterPromotionPage.delete({
+      where: { id: pageId },
+    });
+    return true;
+  }
 
   /** 상품홍보페이지 url 중복 확인
    * @return 중복 url이면 true, 중복이 아니면 false
