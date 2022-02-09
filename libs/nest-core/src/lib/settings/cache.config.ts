@@ -13,8 +13,9 @@ export class CacheConfig implements CacheOptionsFactory {
     if (['production', 'test'].includes(nodeEnv)) {
       const cacheClusterHost = this.configService.get('CACHE_REDIS_URL');
       redisCacheClient = new Redis.Cluster([cacheClusterHost]);
+    } else {
+      redisCacheClient = new Redis('127.0.0.1:6379');
     }
-    redisCacheClient = new Redis('127.0.0.1:6379');
 
     return {
       ttl: 5,

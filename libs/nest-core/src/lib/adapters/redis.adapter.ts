@@ -12,11 +12,11 @@ export class RedisIoAdapter extends IoAdapter {
     const server = super.createIOServer(port, options);
 
     let pubClient: Redis.Cluster | Redis.Redis;
-
     if (['production', 'test'].includes(process.env.NODE_ENV)) {
       pubClient = new Redis.Cluster([process.env.REDIS_URL]);
+    } else {
+      pubClient = new Redis('localhost:6379');
     }
-    pubClient = new Redis('localhost:6379');
     const subClient = pubClient.duplicate();
     const redisAdapter = createAdapter(pubClient, subClient);
 
