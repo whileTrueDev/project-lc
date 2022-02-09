@@ -11,9 +11,9 @@ export const emailRegisterOptions = {
       const schema = Joi.object({
         email: Joi.string().email({ tlds: { allow: false } }), // IANA 등록안된 top level domain 허용 => false로 안하면 오류남 https://github.com/sideway/joi/issues/2390
       });
-      const { error, value } = schema.validate({ email: v });
+      const { error } = schema.validate({ email: v });
       if (!error) return true;
-      return `유효하지 않은 이메일 형식입니다. ${JSON.stringify(value.email)}`;
+      return `유효하지 않은 이메일 형식입니다.`;
     },
   },
 };
