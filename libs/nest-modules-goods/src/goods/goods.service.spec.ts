@@ -105,7 +105,7 @@ describe('GoodsService', () => {
     });
   });
   describe('changeGoodsView', () => {
-    it('goos_view should be notLook', async () => {
+    it('goods_view should be notLook', async () => {
       await service.changeGoodsView(TEST_GOODS.id, GoodsView.notLook);
       const goodsListData = await service.getGoodsList({
         email: TEST_USER_EMAIL,
