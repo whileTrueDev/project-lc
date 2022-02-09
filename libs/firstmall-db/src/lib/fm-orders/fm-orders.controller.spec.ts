@@ -1,15 +1,16 @@
-import { ExecutionContext } from '@nestjs/common';
+import { CacheModule, ExecutionContext } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { GoodsModule, GoodsService } from '@project-lc/nest-modules-goods';
 import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
+import store from 'cache-manager-ioredis';
 import request from 'supertest';
-import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import {
   orderDetailExportsSample,
   orderDetailItemsSample,
@@ -37,6 +38,7 @@ describe('FmOrdersController', () => {
         LiveShoppingModule.withoutControllers(),
         BroadcasterModule.withoutControllers(),
         ConfigModule.forRoot({ isGlobal: true }),
+        CacheModule.register({ isGlobal: true, store }),
       ],
       controllers: [FmOrdersController],
       providers: [FmOrdersService, FirstmallDbService, S3Service],

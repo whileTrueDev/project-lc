@@ -8,6 +8,7 @@
     ],
     "emitDecoratorMetadata": true,
     "target": "es2015",
+    "lib": ["es2020"],
     "esModuleInterop": true,
   },
   "exclude": [

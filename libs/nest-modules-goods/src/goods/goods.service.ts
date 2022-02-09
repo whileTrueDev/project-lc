@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 import {
   BadRequestException,
+  CACHE_MANAGER,
+  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -25,13 +27,20 @@ import {
   getS3KeyListFromImgSrcList,
   S3Service,
 } from '@project-lc/nest-modules-s3';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
+import { Cache } from 'cache-manager';
 
 @Injectable()
-export class GoodsService {
+export class GoodsService extends ServiceBaseWithCache {
+  #GOODS_CACHE_KEY = 'goods';
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3service: S3Service,
-  ) {}
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
@@ -307,6 +316,8 @@ export class GoodsService {
         },
       });
 
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
+
       return true;
     } catch (error) {
       console.error(error);
@@ -374,10 +385,9 @@ export class GoodsService {
     try {
       await this.prisma.goods.update({
         where: { id },
-        data: {
-          goods_view: view,
-        },
+        data: { goods_view: view },
       });
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
       return true;
     } catch (error) {
       console.error(error);
@@ -450,6 +460,8 @@ export class GoodsService {
           confirmation: { create: { status: 'waiting' } },
         },
       });
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
+
       return { goodsId: goods.id };
     } catch (error) {
       console.error(error);
@@ -503,6 +515,9 @@ export class GoodsService {
       await this.prisma.goodsImages.delete({
         where: { id: imageId },
       });
+
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
+
       return true;
     } catch (e) {
       console.error(e);
@@ -606,6 +621,8 @@ export class GoodsService {
           }, // 상품 수정 후  (승인, 거절, 재검수 대기) 상태에서는 '재검수 대기' 상태로 변경, (대기) 상태에서는 그대로 '대기' 상태
         },
       });
+
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
       return { goodsId: id };
     } catch (error) {
       console.error(error);

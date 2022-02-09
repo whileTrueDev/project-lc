@@ -11,33 +11,30 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { GoodsImages, GoodsInfo } from '@prisma/client';
-import { SellerInfo, UserPayload } from '@project-lc/nest-core';
+import { GoodsImages } from '@prisma/client';
+import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   ChangeGoodsViewDto,
   DeleteGoodsDto,
   GoodsByIdRes,
   GoodsImageDto,
-  GoodsInfoDto,
   GoodsListRes,
   GoodsOptionWithStockInfo,
   RegistGoodsDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
-import { GoodsInfoService } from './goods-info.service';
 import { GoodsService } from './goods.service';
 
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(HttpCacheInterceptor)
 @Controller('goods')
 export class GoodsController {
-  constructor(
-    private readonly goodsService: GoodsService,
-    private readonly commonInfoService: GoodsInfoService,
-  ) {}
+  constructor(private readonly goodsService: GoodsService) {}
 
   /** 상품 이미지 생성 */
   @Post('/image')
@@ -86,39 +83,6 @@ export class GoodsController {
   changeGoodsView(@Body(ValidationPipe) dto: ChangeGoodsViewDto): Promise<boolean> {
     const { id, view } = dto;
     return this.goodsService.changeGoodsView(id, view);
-  }
-
-  /** 공통정보 생성 */
-  @Post('/common-info')
-  registGoodsCommonInfo(
-    @SellerInfo() seller: UserPayload,
-    @Body(ValidationPipe) dto: GoodsInfoDto,
-  ): Promise<{ id: number }> {
-    const email = seller.sub;
-    return this.commonInfoService.registGoodsCommonInfo(email, dto);
-  }
-
-  /** 공통정보 삭제  */
-  @Delete('/common-info')
-  deleteCommonInfo(@Body('id', ParseIntPipe) id: number): Promise<boolean> {
-    return this.commonInfoService.deleteGoodsCommonInfo(id);
-  }
-
-  /** 공통정보 목록 조회 */
-  @Get('/common-info/list')
-  getGoodsCommonInfoList(@SellerInfo() seller: UserPayload): Promise<
-    {
-      id: number;
-      info_name: string;
-    }[]
-  > {
-    return this.commonInfoService.getGoodsCommonInfoList(seller.sub);
-  }
-
-  /** 특정 공통정보 상세 조회 */
-  @Get('/common-info')
-  getOneGoodsCommonInfo(@Query('id', ParseIntPipe) id: number): Promise<GoodsInfo> {
-    return this.commonInfoService.getOneGoodsCommonInfo(id);
   }
 
   /** 특정 상품 삭제 */

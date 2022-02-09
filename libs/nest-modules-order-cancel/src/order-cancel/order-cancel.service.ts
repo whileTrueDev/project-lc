@@ -1,15 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { SellerOrderCancelRequest, SellerOrderCancelRequestStatus } from '@prisma/client';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   OrderCancelRequestDetailRes,
   OrderCancelRequestList,
   SellerOrderCancelRequestDto,
 } from '@project-lc/shared-types';
+import { Cache } from 'cache-manager';
 
 @Injectable()
-export class OrderCancelService {
-  constructor(private readonly prisma: PrismaService) {}
+export class OrderCancelService extends ServiceBaseWithCache {
+  #ORDER_CANCEL_CACHE_KEY = 'order-cancel';
+
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   /** 판매자 결제취소 요청 생성 */
   public async createOrderCancelRequst({
@@ -45,6 +54,7 @@ export class OrderCancelService {
           },
         },
       });
+      await this._clearCaches(this.#ORDER_CANCEL_CACHE_KEY);
       return updatedData;
     }
     const data = await this.prisma.sellerOrderCancelRequest.create({
@@ -58,6 +68,7 @@ export class OrderCancelService {
         },
       },
     });
+    await this._clearCaches(this.#ORDER_CANCEL_CACHE_KEY);
     return data;
   }
 
@@ -121,7 +132,7 @@ export class OrderCancelService {
       where: { id: requestId },
       data: { status: SellerOrderCancelRequestStatus.confirmed },
     });
-
+    await this._clearCaches(this.#ORDER_CANCEL_CACHE_KEY);
     return true;
   }
 }

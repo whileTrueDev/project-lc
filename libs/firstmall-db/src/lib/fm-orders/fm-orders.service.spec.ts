@@ -2,6 +2,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrdersDto } from '@project-lc/shared-types';
+import { CacheModule } from '@nestjs/common';
+import store from 'cache-manager-ioredis';
 import {
   orderDetailExportsSample,
   orderDetailOptionsSample,
@@ -20,7 +22,7 @@ describe('FmOrdersService', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule],
+      imports: [PrismaModule, CacheModule.register({ isGlobal: true, store })],
       providers: [FirstmallDbService, FmOrdersService],
     }).compile();
 
