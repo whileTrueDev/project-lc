@@ -25,6 +25,7 @@ export * from './lib/dto/broadcasterAddress.dto';
 export * from './lib/dto/broadcasterContact.dto';
 export * from './lib/dto/broadcasterContractionAgreement.dto';
 export * from './lib/dto/broadcasterProductPromotion.dto';
+export * from './lib/dto/broadcasterPromotionPage.dto';
 export * from './lib/dto/broadcasterPurchase.dto';
 export * from './lib/dto/broadcasterSettlementInfo.dto';
 export * from './lib/dto/broadcasterSettlementInfoConfirmation.dto';

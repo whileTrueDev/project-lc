@@ -28,6 +28,8 @@ import { MailVerificationService } from '@project-lc/nest-modules-mail';
 import {
   BroadcasterAddressDto,
   BroadcasterContractionAgreementDto,
+  BroadcasterPromotionPageDto,
+  BroadcasterPromotionPageUpdateDto,
   BroadcasterRes,
   ChangeNicknameDto,
   CreateBroadcasterChannelDto,
@@ -40,6 +42,7 @@ import { Broadcaster, BroadcasterAddress } from '.prisma/client';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-history.service';
 import { BroadcasterService } from './broadcaster.service';
+import { BroadcasterPromotionPageService } from './broadcaster-promotion-page.service';
 
 @Controller('broadcaster')
 export class BroadcasterController {
@@ -48,6 +51,7 @@ export class BroadcasterController {
     private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
     private readonly settlementHistoryService: BroadcasterSettlementHistoryService,
+    private readonly broadcasterPromotionPageService: BroadcasterPromotionPageService,
   ) {}
 
   /** 방송인 정보 조회 */
@@ -207,5 +211,35 @@ export class BroadcasterController {
   @Delete('/avatar')
   async deleteAvatar(@BroadcasterInfo() broadcaster: UserPayload): Promise<boolean> {
     return this.broadcasterService.removeBroadcasterAvatar(broadcaster.sub);
+  }
+
+  /** ================================= */
+  // 상품홍보페이지 BroadcasterPromotionPage
+  /** ================================= */
+
+  /** 방송인 상품홍보페이지 생성 */
+  @Post('/promotion-page')
+  // @UseGuards(JwtAuthGuard)
+  async createPromotionPage(
+    @Body(ValidationPipe) dto: BroadcasterPromotionPageDto,
+  ): Promise<any> {
+    return this.broadcasterPromotionPageService.createPromotionPage(dto);
+  }
+
+  /** 상품홍보페이지 수정 */
+  @Patch('/promotion-page')
+  async updatePromotionPage(
+    @Body(ValidationPipe) dto: BroadcasterPromotionPageUpdateDto,
+  ): Promise<any> {
+    return this.broadcasterPromotionPageService.updatePromotionPage(dto);
+  }
+
+  /** 방송인 상품홍보페이지 url 중복 확인
+   * @query url
+   * @return 중복 url이면 true, 중복이 아니면 false
+   */
+  @Get('/promotion-page/duplicate')
+  async checkPromotionPageUrlDuplicate(@Query('url') url: string): Promise<boolean> {
+    return this.broadcasterPromotionPageService.checkPromotionPageUrlDuplicate(url);
   }
 }
