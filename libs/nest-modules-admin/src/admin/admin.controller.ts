@@ -61,6 +61,7 @@ import {
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
+import { GoodsService } from '@project-lc/nest-modules-goods';
 import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
@@ -80,6 +81,7 @@ export class AdminController {
     private readonly sellerService: SellerService,
     private readonly broadcasterPromotionPageService: BroadcasterPromotionPageService,
     private readonly productPromotionService: ProductPromotionService,
+    private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
@@ -342,10 +344,22 @@ export class AdminController {
   /** ================================= */
   // 상품홍보 ProductPromotion
   /** ================================= */
+
+  /** 상품홍보 생성(특정 상품홍보 페이지에 상품홍보 등록) */
   @Post('/product-promotion')
   async createProductPromotion(
     @Body(ValidationPipe) dto: CreateProductPromotionDto,
   ): Promise<any> {
     return this.productPromotionService.createProductPromotion(dto);
+  }
+
+  /** 전체 상품목록 조회
+   * - 상품홍보에 연결하기 위한 상품(project-lc goods) 전체목록. 검수완료 & 정상판매중 일 것
+   * goodsConfirmation.status === confirmed && goods.status === normal
+   * goodsId, goodsName, sellerId, sellerEmail
+   * */
+  @Get('confirmed-goods-list')
+  async findAllConfirmedLcGoodsList(): Promise<any> {
+    return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
   }
 }
