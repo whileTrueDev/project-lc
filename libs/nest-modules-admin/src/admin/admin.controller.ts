@@ -46,6 +46,7 @@ import {
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
   CreateManyBroadcasterSettlementHistoryDto,
+  CreateProductPromotionDto,
   EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
@@ -59,6 +60,7 @@ import {
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
@@ -77,6 +79,7 @@ export class AdminController {
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
     private readonly sellerService: SellerService,
     private readonly broadcasterPromotionPageService: BroadcasterPromotionPageService,
+    private readonly productPromotionService: ProductPromotionService,
     private readonly config: ConfigService,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
@@ -334,5 +337,15 @@ export class AdminController {
   @Get('/promotion-pages')
   async getBroadcasterPromotionPageList(): Promise<BroadcasterPromotionPageListRes> {
     return this.broadcasterPromotionPageService.getBroadcasterPromotionPageList();
+  }
+
+  /** ================================= */
+  // 상품홍보 ProductPromotion
+  /** ================================= */
+  @Post('/product-promotion')
+  async createProductPromotion(
+    @Body(ValidationPipe) dto: CreateProductPromotionDto,
+  ): Promise<any> {
+    return this.productPromotionService.createProductPromotion(dto);
   }
 }
