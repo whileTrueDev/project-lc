@@ -7,7 +7,6 @@ import { ShippingGroupService } from './shipping-group.service';
 
 describe('ShippingGroupController', () => {
   let app: NestApplication;
-  let service: ShippingGroupService;
   let controller: ShippingGroupController;
 
   beforeAll(async () => {
@@ -18,7 +17,6 @@ describe('ShippingGroupController', () => {
     }).compile();
 
     controller = module.get<ShippingGroupController>(ShippingGroupController);
-    service = module.get<ShippingGroupService>(ShippingGroupService);
 
     app = module.createNestApplication();
     app.init();
