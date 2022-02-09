@@ -27,6 +27,7 @@ jobs:
       CIPHER_HASH: DUMMY_CIPHER_HAS
       CIPHER_PASSWORD: DUMMY_CIPHER_PASSWORD
       CIPHER_SALT: DUMMY_CIPHER_SALT
+      CACHE_REDIS_URL: redis
     services:
       redis:
         image: redis:6.2 # Docker Hub image
