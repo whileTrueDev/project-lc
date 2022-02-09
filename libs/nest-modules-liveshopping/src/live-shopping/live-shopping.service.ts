@@ -109,7 +109,7 @@ export class LiveShoppingService extends ServiceBaseWithCache {
    * @param broadcasterId
    * @returns fmGoodsSeq
    */
-  async getFmGoodsConnectionIdLinkedToLiveShoppings(
+  async getFmGoodsSeqsLinkedToLiveShoppings(
     broadcasterId: number,
   ): Promise<LiveShoppingFmGoodsSeq[]> {
     const fmGoodsSeqs = await this.prisma.liveShopping.findMany({

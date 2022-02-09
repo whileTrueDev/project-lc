@@ -2,6 +2,7 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { MailModule } from '@project-lc/nest-modules-mail';
 import { S3Module } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
+import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsController } from './broadcaster-contacts.controller';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
@@ -11,6 +12,7 @@ import { BroadcasterSettlementController } from './broadcaster-settlement.contro
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterController } from './broadcaster.controller';
 import { BroadcasterService } from './broadcaster.service';
+import { BroadcasterPromotionPageService } from './broadcaster-promotion-page.service';
 
 @Module({})
 export class BroadcasterModule {
@@ -20,6 +22,7 @@ export class BroadcasterModule {
     BroadcasterChannelService,
     BroadcasterSettlementHistoryService,
     BroadcasterSettlementService,
+    BroadcasterPromotionPageService,
   ];
 
   private static readonly exports = [
@@ -28,6 +31,7 @@ export class BroadcasterModule {
     BroadcasterSettlementHistoryService,
     BroadcasterSettlementService,
     BroadcasterSettlementHistoryService,
+    BroadcasterPromotionPageService,
   ];
 
   private static readonly controllers = [
@@ -37,7 +41,7 @@ export class BroadcasterModule {
     BroadcasterSettlementHistoryController,
   ];
 
-  private static readonly imports = [PrismaModule, S3Module, MailModule];
+  private static readonly imports = [PrismaModule, S3Module, MailModule, CipherModule];
 
   static withoutControllers(): DynamicModule {
     return {

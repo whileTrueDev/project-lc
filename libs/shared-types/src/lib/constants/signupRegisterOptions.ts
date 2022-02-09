@@ -1,16 +1,20 @@
-export const emailPattern = /^[\w]+@[\w]+\.[\w][\w]+$/;
+import * as Joi from 'joi';
 
 export const passwordPattern = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%^*+=-]).{8,20}$/;
 
 export const emailRegisterOptions = {
   required: '이메일을 작성해주세요.',
-  pattern: {
-    value: emailPattern,
-    message: '이메일 형식이 올바르지 않습니다.',
-  },
   validate: {
     noUppercase: (v: string) =>
       v.toLowerCase() === v || '영문 대문자는 사용할 수 없습니다.',
+    isValidEmail: (v: string) => {
+      const schema = Joi.object({
+        email: Joi.string().email({ tlds: { allow: false } }), // IANA 등록안된 top level domain 허용 => false로 안하면 오류남 https://github.com/sideway/joi/issues/2390
+      });
+      const { error } = schema.validate({ email: v });
+      if (!error) return true;
+      return `유효하지 않은 이메일 형식입니다.`;
+    },
   },
 };
 

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
+import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { FirstmallDbService } from './firstmall-db.service';
 import { FmExportsController } from './fm-exports/fm-exports.controller';
 import { FmExportsService } from './fm-exports/fm-exports.service';
@@ -12,7 +13,11 @@ import { FmSettlementController } from './fm-settlements/fm-settlements.controll
 import { FmSettlementService } from './fm-settlements/fm-settlements.service';
 
 @Module({
-  imports: [GoodsModule.withoutControllers(), LiveShoppingModule.withoutControllers()],
+  imports: [
+    GoodsModule.withoutControllers(),
+    LiveShoppingModule.withoutControllers(),
+    BroadcasterModule.withoutControllers(),
+  ],
   controllers: [
     FmOrdersController,
     FmGoodsController,
