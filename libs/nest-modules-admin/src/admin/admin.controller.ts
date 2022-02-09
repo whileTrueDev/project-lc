@@ -39,6 +39,7 @@ import {
   AdminSignUpDto,
   BroadcasterDTO,
   BroadcasterPromotionPageDto,
+  BroadcasterPromotionPageListRes,
   BroadcasterPromotionPageUpdateDto,
   BroadcasterSettlementInfoConfirmationDto,
   BusinessRegistrationConfirmationDto,
@@ -327,5 +328,11 @@ export class AdminController {
     @Param('pageId', ParseIntPipe) pageId: number,
   ): Promise<boolean> {
     return this.broadcasterPromotionPageService.deletePromotionPage(pageId);
+  }
+
+  /** 상품홍보페이지 목록 조회 */
+  @Get('/promotion-pages')
+  async getBroadcasterPromotionPageList(): Promise<BroadcasterPromotionPageListRes> {
+    return this.broadcasterPromotionPageService.getBroadcasterPromotionPageList();
   }
 }

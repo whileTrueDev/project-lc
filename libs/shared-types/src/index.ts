@@ -85,6 +85,7 @@ export * from './lib/front-type/liveShoppingInputType';
 export * from './lib/front-type/orderFilterFormType';
 export * from './lib/overlay-controller/overlay-controller-types';
 export * from './lib/overlay/overlay-types';
+export * from './lib/res-types/broadcasterPromotionPage.res';
 export * from './lib/res-types/broadcasterSettlementInfoList.res';
 export * from './lib/res-types/broadcasterSettlementReceivableAmount.res';
 export * from './lib/res-types/broadcasterSettlementTargets.res';

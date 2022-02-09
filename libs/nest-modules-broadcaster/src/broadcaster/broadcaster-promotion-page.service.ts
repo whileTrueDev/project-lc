@@ -4,6 +4,7 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import {
   broadcasterProductPromotionDto,
   BroadcasterPromotionPageDto,
+  BroadcasterPromotionPageListRes,
   BroadcasterPromotionPageUpdateDto,
 } from '@project-lc/shared-types';
 
@@ -73,5 +74,16 @@ export class BroadcasterPromotionPageService {
     });
     if (page) return true;
     return false;
+  }
+
+  /** 상품홍보페이지 전체 목록 조회 */
+  public async getBroadcasterPromotionPageList(): Promise<BroadcasterPromotionPageListRes> {
+    return this.prisma.broadcasterPromotionPage.findMany({
+      include: {
+        broadcaster: {
+          select: { userName: true, email: true },
+        },
+      },
+    });
   }
 }
