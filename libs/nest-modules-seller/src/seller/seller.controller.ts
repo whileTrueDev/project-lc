@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   Patch,
-  Param,
   Post,
   Query,
   Res,
@@ -21,6 +20,7 @@ import {
   Seller,
   SellerSettlementAccount,
   SellerSettlements,
+  SellType,
 } from '@prisma/client';
 import { SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
@@ -45,6 +45,7 @@ import {
   SellerSettlementInfo,
   SellerSettlementService,
 } from './seller-settlement.service';
+import { SellerProductPromotionService } from './seller-product-promotion.service';
 import { SellerShopService } from './seller-shop.service';
 import { SellerService } from './seller.service';
 
@@ -55,6 +56,7 @@ export class SellerController {
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly sellerShopService: SellerShopService,
     private readonly mailVerificationService: MailVerificationService,
+    private readonly sellerProductPromotionService: SellerProductPromotionService,
   ) {}
 
   // * 판매자 정보 조회
@@ -276,5 +278,19 @@ export class SellerController {
     @Body(ValidationPipe) dto: SellerContractionAgreementDto,
   ): Promise<Seller> {
     return this.sellerService.updateAgreementFlag(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('selltype')
+  async getFmGoodsSeq(@Query('fmGoodsSeq') fmGoodsSeq: number): Promise<SellType> {
+    const isProductionPromotion =
+      await this.sellerProductPromotionService.checkIsPromotionProductFmGoodsSeq(
+        fmGoodsSeq,
+      );
+    if (isProductionPromotion) return 'broadcasterPromotionPage';
+    const isLiveShopping =
+      await this.sellerProductPromotionService.checkIsLiveShoppingFmGoodsSeq(fmGoodsSeq);
+    if (isLiveShopping) return 'liveShopping';
+    return 'normal';
   }
 }

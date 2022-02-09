@@ -19,6 +19,12 @@ export function SellTypeBadge({ sellType }: SellTypeBadgeProps): JSX.Element {
           <Badge colorScheme="red">홍보페이지</Badge>
         </Box>
       );
+    case 'normal':
+      return (
+        <Box lineHeight={2}>
+          <Badge colorScheme="gray">일반판매</Badge>
+        </Box>
+      );
     default:
       return <></>;
   }

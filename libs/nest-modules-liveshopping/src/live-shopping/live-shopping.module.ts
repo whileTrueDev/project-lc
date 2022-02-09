@@ -9,6 +9,7 @@ import { PurchaseMessageService } from './purchase-message.service';
 export class LiveShoppingModule {
   private static imports = [S3Module, GoodsModule.withoutControllers()];
   private static providers = [LiveShoppingService, PurchaseMessageService];
+
   private static controllers = [LiveShoppingController];
   private static exports = [LiveShoppingService, PurchaseMessageService];
 

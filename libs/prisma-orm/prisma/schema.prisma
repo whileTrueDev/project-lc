@@ -361,6 +361,7 @@ enum YesOrNo_UPPERCASE {
 enum SellType {
   liveShopping
   broadcasterPromotionPage
+  normal
 }
 
 // ****************************
