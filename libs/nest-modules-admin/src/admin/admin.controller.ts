@@ -362,4 +362,12 @@ export class AdminController {
   async findAllConfirmedLcGoodsList(): Promise<any> {
     return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
   }
+
+  /** 상품홍보에 입력할 fmGoodsSeq가 다른 상품에 연결된 fmGoodsSeq와 중복인지 확인 */
+  @Get('product-promotion/duplicate')
+  async checkHasDuplicateFmGoodsSeq(
+    @Query('fmGoodsSeq', ParseIntPipe) fmGoodsSeq: number,
+  ): Promise<boolean> {
+    return this.adminService.checkHasDuplicateFmGoodsSeq(fmGoodsSeq);
+  }
 }
