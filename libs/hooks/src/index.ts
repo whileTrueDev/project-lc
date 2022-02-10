@@ -54,6 +54,7 @@ export * from './lib/mutation/useUpdateReturnStatusMutation';
 export * from './lib/mutation/useUpdateSellCommissionMutation';
 export * from './lib/mutation/useValidatePassword';
 export * from './lib/queries/useAdminBroadcaster';
+export * from './lib/queries/useAdminBroadcasterPromotionPage';
 export * from './lib/queries/useAdminBroadcasterSettlementHistoriesByRound';
 export * from './lib/queries/useAdminBroadcasterSettlementInfoList';
 export * from './lib/queries/useAdminFmOrderByGoods';

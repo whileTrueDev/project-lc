@@ -8,7 +8,7 @@ export type AdminBroadcasterPromotionPage = BroadcasterPromotionPageListRes;
 export const getAdminBroadcasterPromotionPage =
   async (): Promise<AdminBroadcasterPromotionPage> => {
     return axios
-      .get<AdminBroadcasterPromotionPage>('/admin.promotion-pages')
+      .get<AdminBroadcasterPromotionPage>('/admin/promotion-pages')
       .then((res) => res.data);
   };
 
