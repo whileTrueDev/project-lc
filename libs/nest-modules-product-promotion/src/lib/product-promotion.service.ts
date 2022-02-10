@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateProductPromotionDto,
+  ProductPromotionListData,
   UpdateProductPromotionDto,
 } from '@project-lc/shared-types';
 
@@ -48,7 +49,9 @@ export class ProductPromotionService {
   /** 특정 방송인홍보페이지에 등록된 상품홍보목록 조회
    * @param pageId: 방송인홍보페이지 id
    */
-  public async findProductPromotionListByPromotionPageId(pageId: number): Promise<any> {
+  public async findProductPromotionListByPromotionPageId(
+    pageId: number,
+  ): Promise<ProductPromotionListData> {
     const data = await this.prisma.productPromotion.findMany({
       where: { broadcasterPromotionPageId: pageId },
       include: { goods: { select: { goods_name: true } } },

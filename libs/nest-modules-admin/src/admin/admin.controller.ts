@@ -57,6 +57,7 @@ import {
   LiveShoppingDTO,
   OrderCancelRequestDetailRes,
   OrderCancelRequestList,
+  ProductPromotionListData,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
   UpdateProductPromotionDto,
@@ -393,7 +394,7 @@ export class AdminController {
   @Get('/product-promotion-list')
   async findProductPromotionListByPromotionPageId(
     @Query('promotionPageId', ParseIntPipe) promotionPageId: number,
-  ): Promise<any> {
+  ): Promise<ProductPromotionListData> {
     return this.productPromotionService.findProductPromotionListByPromotionPageId(
       promotionPageId,
     );
