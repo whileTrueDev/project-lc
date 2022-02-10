@@ -58,6 +58,7 @@ import {
   OrderCancelRequestList,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
+  UpdateProductPromotionDto,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
@@ -369,5 +370,13 @@ export class AdminController {
     @Query('fmGoodsSeq', ParseIntPipe) fmGoodsSeq: number,
   ): Promise<boolean> {
     return this.adminService.checkHasDuplicateFmGoodsSeq(fmGoodsSeq);
+  }
+
+  /** 상품홍보 수정 */
+  @Patch('product-promotion')
+  async updateProductPromotion(
+    @Body(ValidationPipe) dto: UpdateProductPromotionDto,
+  ): Promise<any> {
+    return this.productPromotionService.updateProductPromotion(dto);
   }
 }

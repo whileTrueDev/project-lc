@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { CreateProductPromotionDto } from '@project-lc/shared-types';
+import {
+  CreateProductPromotionDto,
+  UpdateProductPromotionDto,
+} from '@project-lc/shared-types';
 
 @Injectable()
 export class ProductPromotionService {
@@ -17,4 +20,24 @@ export class ProductPromotionService {
       },
     });
   }
+
+  /** 상품홍보 수정 */
+  public async updateProductPromotion(dto: UpdateProductPromotionDto): Promise<any> {
+    const { id, goodsId, broadcasterPromotionPageId, ...rest } = dto;
+
+    return this.prisma.productPromotion.update({
+      where: { id },
+      data: {
+        ...rest,
+        goods: { connect: goodsId ? { id: goodsId } : undefined },
+        broadcasterPromotionPage: {
+          connect: broadcasterPromotionPageId
+            ? { id: broadcasterPromotionPageId }
+            : undefined,
+        },
+      },
+    });
+  }
+
+  /** 상품홍보 삭제 */
 }
