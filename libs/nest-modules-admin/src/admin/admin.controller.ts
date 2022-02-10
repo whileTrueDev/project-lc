@@ -379,4 +379,12 @@ export class AdminController {
   ): Promise<any> {
     return this.productPromotionService.updateProductPromotion(dto);
   }
+
+  /** 상품홍보 삭제 */
+  @Delete('product-promotion/:promotionId')
+  async deleteProductPromotion(
+    @Param('promotionId', ParseIntPipe) promotionId: number,
+  ): Promise<boolean> {
+    return this.productPromotionService.deleteProductPromotion(promotionId);
+  }
 }

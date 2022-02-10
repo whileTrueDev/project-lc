@@ -40,4 +40,8 @@ export class ProductPromotionService {
   }
 
   /** 상품홍보 삭제 */
+  public async deleteProductPromotion(id: number): Promise<boolean> {
+    await this.prisma.productPromotion.delete({ where: { id } });
+    return true;
+  }
 }
