@@ -10,6 +10,7 @@ import { GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminAllLcGoodsList,
   ApprovedGoodsNameAndId,
   getLiveShoppingProgress,
   GoodsByIdRes,
@@ -667,7 +668,7 @@ export class GoodsService extends ServiceBaseWithCache {
    * goodsConfirmation.status === confirmed && goods.status === normal
    * goodsId, goodsName, sellerId, sellerEmail
    * */
-  public async findAllConfirmedLcGoodsList(): Promise<any> {
+  public async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
     return this.prisma.goods.findMany({
       where: {
         goods_status: 'normal',

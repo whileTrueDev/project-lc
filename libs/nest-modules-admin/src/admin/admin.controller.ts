@@ -33,6 +33,7 @@ import {
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
 import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
 import {
+  AdminAllLcGoodsList,
   AdminBroadcasterSettlementInfoList,
   AdminSellerListRes,
   AdminSettlementInfoType,
@@ -360,7 +361,7 @@ export class AdminController {
    * goodsId, goodsName, sellerId, sellerEmail
    * */
   @Get('confirmed-goods-list')
-  async findAllConfirmedLcGoodsList(): Promise<any> {
+  async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
     return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
   }
 
