@@ -387,4 +387,14 @@ export class AdminController {
   ): Promise<boolean> {
     return this.productPromotionService.deleteProductPromotion(promotionId);
   }
+
+  /** 특정 방송인홍보페이지에 등록된 상품홍보목록 조회 */
+  @Get('/product-promotion-list')
+  async findProductPromotionListByPromotionPageId(
+    @Query('promotionPageId', ParseIntPipe) promotionPageId: number,
+  ): Promise<any> {
+    return this.productPromotionService.findProductPromotionListByPromotionPageId(
+      promotionPageId,
+    );
+  }
 }

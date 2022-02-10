@@ -44,4 +44,17 @@ export class ProductPromotionService {
     await this.prisma.productPromotion.delete({ where: { id } });
     return true;
   }
+
+  /** 특정 방송인홍보페이지에 등록된 상품홍보목록 조회
+   * @param pageId: 방송인홍보페이지 id
+   */
+  public async findProductPromotionListByPromotionPageId(pageId: number): Promise<any> {
+    const data = await this.prisma.productPromotion.findMany({
+      where: { broadcasterPromotionPageId: pageId },
+      include: { goods: { select: { goods_name: true } } },
+      orderBy: { id: 'desc' },
+    });
+
+    return data;
+  }
 }
