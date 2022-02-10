@@ -67,6 +67,7 @@ export * from './lib/queries/useAdminInquiry';
 export * from './lib/queries/useAdminLiveShoppingList';
 export * from './lib/queries/useAdminNotifications';
 export * from './lib/queries/useAdminOrderCancelRequest';
+export * from './lib/queries/useAdminProductPromotion';
 export * from './lib/queries/useAdminSellerList';
 export * from './lib/queries/useAdminSettlementDoneList';
 export * from './lib/queries/useApprovedGoodsList';
