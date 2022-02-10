@@ -331,9 +331,9 @@ export class AdminController {
    * @param pageId 방송인 상품홍보페이지 id
    * @returns 삭제 성공시 true
    */
-  @Delete('/promotion-page/:pageId')
+  @Delete('/promotion-page')
   async deletePromotionPage(
-    @Param('pageId', ParseIntPipe) pageId: number,
+    @Body('pageId', ParseIntPipe) pageId: number,
   ): Promise<boolean> {
     return this.broadcasterPromotionPageService.deletePromotionPage(pageId);
   }
