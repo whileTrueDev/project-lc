@@ -22,7 +22,7 @@ const columns: GridColumns = [
     field: 'broadcaster',
     headerName: '방송인 활동명',
     renderCell: ({ row }: GridRowData) => {
-      return <Text>{row.broadcaster.userName}</Text>;
+      return <Text>{row.broadcaster.userNickname}</Text>;
     },
     width: 200,
   },
@@ -31,7 +31,7 @@ const columns: GridColumns = [
     headerName: '페이지 주소',
     renderCell: ({ row }: GridRowData) => {
       return (
-        <Link href={row.url} isExternal>
+        <Link href={row.url} isExternal color="blue.500">
           {row.url} <ExternalLinkIcon mx="2px" />
         </Link>
       );

@@ -31,13 +31,13 @@ export function BroadcasterPromotionPageDetail(): JSX.Element {
     );
 
   const { id, url, broadcaster } = pageData;
-  const { userName } = broadcaster;
+  const { userNickname } = broadcaster;
   return (
     <AdminPageLayout>
       <Box position="relative">
         <Button onClick={goBackToList}>돌아가기</Button>
         <Heading mt={4} size="lg">
-          {userName}의 상품홍보페이지
+          {userNickname}의 상품홍보페이지
         </Heading>
 
         <Stack direction="row">
@@ -47,7 +47,7 @@ export function BroadcasterPromotionPageDetail(): JSX.Element {
 
         <Stack direction="row">
           <Text>방송인명 : </Text>
-          <Text>{userName}</Text>
+          <Text>{userNickname}</Text>
         </Stack>
 
         <Stack direction="row">

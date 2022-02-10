@@ -81,7 +81,7 @@ export class BroadcasterPromotionPageService {
     return this.prisma.broadcasterPromotionPage.findMany({
       include: {
         broadcaster: {
-          select: { userName: true, email: true },
+          select: { userNickname: true, email: true },
         },
       },
     });
