@@ -16,6 +16,7 @@ import {
 import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
 import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import { AdminBroadcasterPromotionPageUpdateSection } from '@project-lc/components-admin/AdminBroadcasterPromotionPageUpdateSection';
 import {
   useAdminBroadcasterPromotionPage,
   useAdminBroadcasterPromotionPageDeleteMutation,
@@ -71,7 +72,6 @@ export function BroadcasterPromotionPageDetail(): JSX.Element {
 
         <Stack direction="row">
           <Button onClick={deleteDialog.onOpen}>삭제</Button>
-          <Button>수정</Button>
         </Stack>
 
         <Stack direction="row">
@@ -89,6 +89,7 @@ export function BroadcasterPromotionPageDetail(): JSX.Element {
           <Link href={url} isExternal color="blue.500">
             {url} <ExternalLinkIcon mx="2px" />
           </Link>
+          <AdminBroadcasterPromotionPageUpdateSection pageData={pageData} />
         </Stack>
 
         <hr />

@@ -20,5 +20,6 @@ export const useAdminProductPromotion = (
   return useQuery<ProductPromotionListData, AxiosError>(
     ['AdminProductPromotion', promotionPageId],
     () => getAdminProductPromotion(promotionPageId),
+    { enabled: !!promotionPageId },
   );
 };

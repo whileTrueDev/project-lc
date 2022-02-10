@@ -26,7 +26,7 @@ import { useMemo } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
 
-type BroadcasterPromotionPageFormDataType = {
+export type BroadcasterPromotionPageFormDataType = {
   url: string;
   broadcasterId: number | null;
   id?: number | null;
