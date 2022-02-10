@@ -383,9 +383,9 @@ export class AdminController {
   }
 
   /** 상품홍보 삭제 */
-  @Delete('product-promotion/:promotionId')
+  @Delete('product-promotion')
   async deleteProductPromotion(
-    @Param('promotionId', ParseIntPipe) promotionId: number,
+    @Body('promotionId', ParseIntPipe) promotionId: number,
   ): Promise<boolean> {
     return this.productPromotionService.deleteProductPromotion(promotionId);
   }
