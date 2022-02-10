@@ -14,9 +14,9 @@ export class BroadcasterPromotionPageUpdateDto {
 
   @IsOptional()
   @IsString()
-  url: string;
+  url?: string;
 
   @IsOptional()
   @IsInt()
-  broadcasterId: number;
+  broadcasterId?: number;
 }

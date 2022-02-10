@@ -91,6 +91,7 @@ export function BroadcasterPromotionPageDetail(): JSX.Element {
           </Link>
         </Stack>
 
+        <hr />
         <Stack direction="row">
           <Text>홍보중인 상품 : </Text>
           {productPromotionList && (
