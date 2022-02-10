@@ -66,6 +66,9 @@
     "hooks": {
       "tags": []
     },
+    "mailer": {
+      "tags": []
+    },
     "nest-core": {
       "tags": []
     },
@@ -162,5 +165,22 @@
     "web-seller": {
       "tags": []
     }
-  }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/next"
+  },
+  "generators": {
+    "@nrwl/react": {
+      "application": {
+        "babel": true
+      }
+    },
+    "@nrwl/next": {
+      "application": {
+        "style": "css",
+        "linter": "eslint"
+      }
+    }
+  },
+  "defaultProject": "web-seller"
 }
