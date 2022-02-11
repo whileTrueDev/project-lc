@@ -54,7 +54,16 @@ export class ProductPromotionService {
   ): Promise<ProductPromotionListData> {
     const data = await this.prisma.productPromotion.findMany({
       where: { broadcasterPromotionPageId: pageId },
-      include: { goods: { select: { goods_name: true } } },
+      include: {
+        goods: {
+          select: {
+            goods_name: true,
+            seller: {
+              select: { name: true, sellerShop: { select: { shopName: true } } },
+            },
+          },
+        },
+      },
       orderBy: { id: 'desc' },
     });
 

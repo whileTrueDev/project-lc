@@ -1,5 +1,10 @@
-import { Goods, ProductPromotion } from '@prisma/client';
+import { Goods, ProductPromotion, Seller, SellerShop } from '@prisma/client';
 
-export type ProductPromotionListData = (ProductPromotion & {
-  goods: Pick<Goods, 'goods_name'>;
-})[];
+export type ProductPromotionListItemData = ProductPromotion & {
+  goods: Pick<Goods, 'goods_name'> & {
+    seller: Pick<Seller, 'name'> & {
+      sellerShop: Pick<SellerShop, 'shopName'>;
+    };
+  };
+};
+export type ProductPromotionListData = ProductPromotionListItemData[];
