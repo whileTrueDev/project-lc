@@ -1,21 +1,20 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { createPreInactivateNoticeTemplate } from '@project-lc/nest-core';
-import { PrismaService } from '@project-lc/prisma-orm';
+import {
+  createPreInactivateNoticeTemplate,
+  createInactivateNoticeTemplate,
+} from './mail-templates/createInactivateNoticeTemplate';
 
 @Injectable()
 export class MailNoticeService {
-  constructor(
-    private readonly mailerService: MailerService,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly mailerService: MailerService) {}
 
-  public async sendPreInactivateMail(targetEmail: string): Promise<boolean> {
+  public async sendPreInactivateMail(targetDetails): Promise<boolean> {
     try {
       await this.mailerService.sendMail({
-        to: targetEmail,
+        to: targetDetails.userEmail,
         subject: `[크크쇼] 크크쇼 휴면 전환 예정 안내`,
-        html: createPreInactivateNoticeTemplate(targetEmail),
+        html: createPreInactivateNoticeTemplate(targetDetails),
       });
       return true;
     } catch (e) {
@@ -24,12 +23,12 @@ export class MailNoticeService {
     }
   }
 
-  public async sendInactivateMail(targetEmail: string): Promise<boolean> {
+  public async sendInactivateMail(targetDetails): Promise<boolean> {
     try {
       await this.mailerService.sendMail({
-        to: targetEmail,
+        to: targetDetails.userEmail,
         subject: `[크크쇼] 크크쇼 휴면 전환 안내`,
-        html: createPreInactivateNoticeTemplate(targetEmail),
+        html: createInactivateNoticeTemplate(targetDetails),
       });
       return true;
     } catch (e) {

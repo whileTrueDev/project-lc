@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '@project-lc/prisma-orm';
-import { MailModule } from '@project-lc/nest-modules-mail';
+import { MailModule } from '../lib/mail.module';
 import { AppService } from './app.service';
 
 @Module({
