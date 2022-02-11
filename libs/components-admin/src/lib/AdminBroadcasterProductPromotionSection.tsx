@@ -19,19 +19,27 @@ import {
   InputGroup,
   InputRightAddon,
   FormHelperText,
+  Divider,
+  CloseButton,
+  Alert,
+  AlertIcon,
+  AlertTitle,
 } from '@chakra-ui/react';
 import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import {
   getAdminDuplicateFmGoodsSeqFlagForProductPromotion,
   useAdminAllConfirmedLcGoodsList,
   useAdminProductPromotion,
   useAdminProductPromotionCreateMutation,
+  useAdminProductPromotionDeleteMutation,
 } from '@project-lc/hooks';
 import {
   CreateProductPromotionDto,
   ProductPromotionListItemData,
 } from '@project-lc/shared-types';
+import { useCallback } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 export interface AdminBroadcasterProductPromotionSectionProps {
@@ -276,19 +284,63 @@ export function ProductPromotionItemBox({
 }: {
   item: ProductPromotionListItemData;
 }): JSX.Element {
+  const toast = useToast();
+  const deleteDialog = useDisclosure();
+  const deleteRequest = useAdminProductPromotionDeleteMutation();
+  const onDeleteDialogConfirm = useCallback(async () => {
+    deleteRequest
+      .mutateAsync({
+        promotionId: item.id,
+        broadcasterPromotionPageId: item.broadcasterPromotionPageId,
+      })
+      .then((res) => {
+        deleteDialog.onClose();
+        toast({
+          title: '해당 상품 홍보를 삭제하였습니다',
+          status: 'success',
+        });
+      });
+  }, [deleteDialog, deleteRequest, item, toast]);
   return (
-    <Box key={item.id} {...boxStyle}>
-      <Link href={`/goods/${item.goodsId}`} color="blue.500">
-        상품명 : {item.goods.goods_name}
-      </Link>
-
-      <Stack>
+    <Stack key={item.id} {...boxStyle} minW="240px">
+      <Stack position="relative">
+        <CloseButton
+          size="sm"
+          position="absolute"
+          right="0"
+          top="0"
+          onClick={deleteDialog.onOpen}
+        />
+        {/* 상품홍보 삭제 모달창 */}
+        <ConfirmDialog
+          title="홍보 상품 삭제"
+          isOpen={deleteDialog.isOpen}
+          onClose={deleteDialog.onClose}
+          onConfirm={onDeleteDialogConfirm}
+        >
+          <Alert status="error">
+            <AlertIcon />
+            <Stack>
+              <AlertTitle mr={2}>해당 홍보 상품을 삭제하시겠습니까?</AlertTitle>
+            </Stack>
+          </Alert>
+        </ConfirmDialog>
+        <Link href={`/goods/${item.goodsId}`} color="blue.500">
+          상품명 : {item.goods.goods_name}
+        </Link>
         <Text>판매자 : {item.goods.seller.name}</Text>
         <Text>상점명 : {item.goods.seller?.sellerShop?.shopName}</Text>
+      </Stack>
+      <Divider />
+
+      <Stack position="relative">
+        <Button size="xs" position="absolute" right="0" top="0">
+          수정
+        </Button>
         <Text>와일트루 수수료 : {item.whiletrueCommissionRate} %</Text>
         <Text>방송인 수수료 : {item.broadcasterCommissionRate} %</Text>
       </Stack>
-    </Box>
+    </Stack>
   );
 }
 

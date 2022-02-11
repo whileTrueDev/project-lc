@@ -66,22 +66,26 @@ export const useAdminProductPromotionUpdateMutation = (): UseMutationResult<
 
 /** 상품홍보 삭제 뮤테이션 */
 export type useAdminProductPromotionDeleteMutationRes = boolean;
+type DeleteProductPromotionDto = {
+  promotionId: number;
+  broadcasterPromotionPageId: number;
+};
 
 export const useAdminProductPromotionDeleteMutation = (): UseMutationResult<
   useAdminProductPromotionDeleteMutationRes,
   AxiosError,
-  UpdateProductPromotionDto
+  DeleteProductPromotionDto
 > => {
   const queryClient = useQueryClient();
   return useMutation<
     useAdminProductPromotionDeleteMutationRes,
     AxiosError,
-    UpdateProductPromotionDto
+    DeleteProductPromotionDto
   >(
-    (dto: UpdateProductPromotionDto) =>
+    (dto: DeleteProductPromotionDto) =>
       axios
         .delete<useAdminProductPromotionDeleteMutationRes>('/admin/product-promotion', {
-          data: dto,
+          data: { promotionId: dto.promotionId },
         })
         .then((res) => res.data),
     {
