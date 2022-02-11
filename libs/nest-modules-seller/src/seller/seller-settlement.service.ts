@@ -271,7 +271,11 @@ export class SellerSettlementService extends ServiceBaseWithCache {
             });
             const productPromotion =
               opt.productPromotion.length > 0 ? opt.productPromotion[0] : null;
-
+            const sellType = liveShopping
+              ? 'liveShopping'
+              : productPromotion
+              ? 'broadcasterPromotionPage'
+              : 'normal';
             // 수수료율 정보
             const wtCommissionRate = liveShopping
               ? liveShopping.whiletrueCommissionRate
@@ -298,6 +302,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
               pricePerPiece: Number(opt.price),
               liveShoppingId: liveShopping ? liveShopping?.id : null,
               productPromotionId: productPromotion ? productPromotion.id : null,
+              sellType,
               whiletrueCommissionRate: wtCommissionRate,
               broadcasterCommissionRate: bcCommissionRate,
               whiletrueCommission: wtCommission,
