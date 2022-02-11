@@ -15,7 +15,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { SettlementDoneItem } from '@project-lc/hooks';
-import { FmOrder } from '@project-lc/shared-types';
+import { convertSellTypeToString, FmOrder } from '@project-lc/shared-types';
 import { calcPgCommission } from '@project-lc/utils';
 import { useMemo } from 'react';
 import { LiveShopping, SellerSettlementItems } from '.prisma/client';
@@ -157,11 +157,9 @@ export function SettlementInfoItem({
     settlementItem.price,
   ]);
 
-  const sellType = useMemo<'라이브쇼핑' | '상품홍보' | '기본판매'>(() => {
-    if (settlementItem.liveShoppingId) return '라이브쇼핑';
-    if (settlementItem.productPromotionId) return '상품홍보';
-    return '기본판매';
-  }, [settlementItem.liveShoppingId, settlementItem.productPromotionId]);
+  const sellType = useMemo<string>(() => {
+    return convertSellTypeToString(settlementItem.sellType);
+  }, [settlementItem.sellType]);
 
   return (
     <Grid
@@ -205,21 +203,7 @@ export function SettlementInfoItem({
       <GridItem>총 가격</GridItem>
       <GridItem>{settlementItem.price.toLocaleString()}</GridItem>
       <GridItem>판매 유형</GridItem>
-      <GridItem>
-        <Text
-          fontWeight="bold"
-          color={
-            // eslint-disable-next-line no-nested-ternary
-            settlementItem.liveShoppingId
-              ? 'green.500'
-              : settlementItem.productPromotionId
-              ? 'blue.500'
-              : undefined
-          }
-        >
-          {sellType}
-        </Text>
-      </GridItem>
+      <GridItem>{sellType}</GridItem>
 
       <GridItem>전자결제수수료</GridItem>
       <GridItem>{`${pgCommission.commission.toLocaleString()} (${
