@@ -88,6 +88,7 @@ export const useAdminBroadcasterPromotionPageDeleteMutation = (): UseMutationRes
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('AdminBroadcasterPromotionPageList');
+        queryClient.invalidateQueries('getBroadcaster', { refetchInactive: true });
       },
     },
   );
