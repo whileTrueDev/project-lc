@@ -1,11 +1,14 @@
 import {
   CacheInterceptor,
   CACHE_KEY_METADATA,
+  CACHE_TTL_METADATA,
+  CallHandler,
   ExecutionContext,
   Injectable,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { join } from 'path';
+import { Observable, of, tap } from 'rxjs';
 
 @Injectable()
 export class HttpCacheInterceptor extends CacheInterceptor {
@@ -43,5 +46,41 @@ export class HttpCacheInterceptor extends CacheInterceptor {
     if (!result) result = req.originalUrl;
 
     return result;
+  }
+
+  async intercept(
+    context: ExecutionContext,
+    next: CallHandler<any>,
+  ): Promise<Observable<any>> {
+    const key = this.trackBy(context);
+    const ttlValueOrFactory =
+      this.reflector.get(CACHE_TTL_METADATA, context.getHandler()) ?? null;
+
+    if (!key) {
+      return next.handle();
+    }
+    try {
+      const value = await this.cacheManager.get(key);
+      if (value === null || value === undefined) {
+        return of(value);
+      }
+      const ttl =
+        typeof ttlValueOrFactory === 'function'
+          ? await ttlValueOrFactory(context)
+          : ttlValueOrFactory;
+      return next.handle().pipe(
+        tap((response) => {
+          if (response) {
+            const args =
+              ttl === null || ttl === undefined
+                ? [key, response]
+                : [key, response, { ttl }];
+            this.cacheManager.set(...args);
+          }
+        }),
+      );
+    } catch {
+      return next.handle();
+    }
   }
 }
