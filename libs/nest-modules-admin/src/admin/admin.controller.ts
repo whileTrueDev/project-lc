@@ -349,6 +349,7 @@ export class AdminController {
   /** ================================= */
 
   /** 상품홍보 생성(특정 상품홍보 페이지에 상품홍보 등록) */
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/product-promotion')
   async createProductPromotion(
     @Body(ValidationPipe) dto: CreateProductPromotionDto,
@@ -361,12 +362,14 @@ export class AdminController {
    * goodsConfirmation.status === confirmed && goods.status === normal
    * goodsId, goodsName, sellerId, sellerEmail
    * */
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('confirmed-goods-list')
   async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
     return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
   }
 
   /** 상품홍보에 입력할 fmGoodsSeq가 다른 상품에 연결된 fmGoodsSeq와 중복인지 확인 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('product-promotion/duplicate')
   async checkHasDuplicateFmGoodsSeq(
     @Query('fmGoodsSeq', ParseIntPipe) fmGoodsSeq: number,
@@ -375,6 +378,7 @@ export class AdminController {
   }
 
   /** 상품홍보 수정 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch('product-promotion')
   async updateProductPromotion(
     @Body(ValidationPipe) dto: UpdateProductPromotionDto,
@@ -383,6 +387,7 @@ export class AdminController {
   }
 
   /** 상품홍보 삭제 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete('product-promotion')
   async deleteProductPromotion(
     @Body('promotionId', ParseIntPipe) promotionId: number,
@@ -391,6 +396,7 @@ export class AdminController {
   }
 
   /** 특정 방송인홍보페이지에 등록된 상품홍보목록 조회 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/product-promotion-list')
   async findProductPromotionListByPromotionPageId(
     @Query('promotionPageId', ParseIntPipe) promotionPageId: number,
