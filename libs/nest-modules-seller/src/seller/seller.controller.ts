@@ -39,6 +39,7 @@ import {
   SignUpDto,
 } from '@project-lc/shared-types';
 import __multer from 'multer';
+import { LiveShoppingGoodsService } from '@project-lc/nest-modules-liveshopping';
 import {
   SellerSettlementInfo,
   SellerSettlementService,
@@ -55,6 +56,7 @@ export class SellerController {
     private readonly sellerShopService: SellerShopService,
     private readonly mailVerificationService: MailVerificationService,
     private readonly sellerProductPromotionService: SellerProductPromotionService,
+    private readonly liveShoppingGoodsService: LiveShoppingGoodsService,
   ) {}
 
   // * 판매자 정보 조회
@@ -279,7 +281,7 @@ export class SellerController {
       );
     if (isProductionPromotion) return 'broadcasterPromotionPage';
     const isLiveShopping =
-      await this.sellerProductPromotionService.checkIsLiveShoppingFmGoodsSeq(fmGoodsSeq);
+      await this.liveShoppingGoodsService.checkIsLiveShoppingFmGoodsSeq(fmGoodsSeq);
     if (isLiveShopping) return 'liveShopping';
     return 'normal';
   }
