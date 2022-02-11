@@ -1,4 +1,9 @@
-import { LiveShopping, Seller, SellerSettlementAccount } from '.prisma/client';
+import {
+  LiveShopping,
+  ProductPromotion,
+  Seller,
+  SellerSettlementAccount,
+} from '.prisma/client';
 import { FmExport } from './fmExport.res';
 import { FmGoodsOption } from './fmGoods.res';
 import { FmOrder, FmOrderItem, FmOrderOption } from './fmOrder.res';
@@ -97,6 +102,7 @@ export type FmSettlementTarget = FmSettlementTargetBase & {
           })
         | null;
       LiveShopping: LiveShopping[];
+      productPromotion: ProductPromotion[];
     }
   >;
 };

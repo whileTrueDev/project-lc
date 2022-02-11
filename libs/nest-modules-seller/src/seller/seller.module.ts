@@ -3,6 +3,7 @@ import { MailModule } from '@project-lc/nest-modules-mail';
 import { S3Module } from '@project-lc/nest-modules-s3';
 import { SellerContactsController } from './seller-contacts.controller';
 import { SellerContactsService } from './seller-contacts.service';
+import { SellerSettlementHistoryController } from './seller-settlement-history.controller';
 import { SellerSettlementService } from './seller-settlement.service';
 import { SellerShopService } from './seller-shop.service';
 import { SellerController } from './seller.controller';
@@ -10,7 +11,11 @@ import { SellerService } from './seller.service';
 
 @Module({
   imports: [S3Module, MailModule],
-  controllers: [SellerController, SellerContactsController],
+  controllers: [
+    SellerController,
+    SellerContactsController,
+    SellerSettlementHistoryController,
+  ],
   providers: [
     SellerService,
     SellerSettlementService,

@@ -157,6 +157,12 @@ export function SettlementInfoItem({
     settlementItem.price,
   ]);
 
+  const sellType = useMemo<'라이브쇼핑' | '상품홍보' | '기본판매'>(() => {
+    if (settlementItem.liveShoppingId) return '라이브쇼핑';
+    if (settlementItem.productPromotionId) return '상품홍보';
+    return '기본판매';
+  }, [settlementItem.liveShoppingId, settlementItem.productPromotionId]);
+
   return (
     <Grid
       key={settlementItem.id}
@@ -198,22 +204,30 @@ export function SettlementInfoItem({
       <GridItem>{settlementItem.pricePerPiece.toLocaleString()}</GridItem>
       <GridItem>총 가격</GridItem>
       <GridItem>{settlementItem.price.toLocaleString()}</GridItem>
-      <GridItem>라이브쇼핑 주문 여부</GridItem>
+      <GridItem>판매 유형</GridItem>
       <GridItem>
         <Text
-          color={settlementItem.liveShoppingId ? 'green.500' : 'red.500'}
-          fontWeight={settlementItem.liveShoppingId ? 'bold' : undefined}
+          fontWeight="bold"
+          color={
+            // eslint-disable-next-line no-nested-ternary
+            settlementItem.liveShoppingId
+              ? 'green.500'
+              : settlementItem.productPromotionId
+              ? 'blue.500'
+              : undefined
+          }
         >
-          {settlementItem.liveShoppingId ? 'O' : 'X'}
+          {sellType}
         </Text>
       </GridItem>
+
       <GridItem>전자결제수수료</GridItem>
       <GridItem>{`${pgCommission.commission.toLocaleString()} (${
         pgCommission.rate === '0'
           ? pgCommission.description
           : pgCommission.rate + pgCommission.description
       })`}</GridItem>
-      {settlementItem.liveShoppingId ? (
+      {settlementItem.liveShoppingId || settlementItem.productPromotionId ? (
         <>
           <GridItem>방송인 수수료</GridItem>
           <GridItem>

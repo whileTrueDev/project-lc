@@ -63,33 +63,28 @@ export class FmSettlementService {
     // 각 출고아이템의 상품번호를 통해 project-lc seller 정보 조회 (goodsConfirmation)
     const goods_seq_arr = exportOptions.map((o) => o.goods_seq);
 
-    const lcGoodsList = await this.prisma.liveShopping.findMany({
+    // LC 상품 조회
+    const lcGoodsList = await this.prisma.goods.findMany({
       where: {
-        fmGoodsSeq: {
-          in: goods_seq_arr,
-        },
+        OR: [
+          { productPromotion: { some: { fmGoodsSeq: { in: goods_seq_arr } } } },
+          { LiveShopping: { some: { fmGoodsSeq: { in: goods_seq_arr } } } },
+          { confirmation: { firstmallGoodsConnectionId: { in: goods_seq_arr } } },
+        ],
       },
-      select: {
-        fmGoodsSeq: true,
-        goods: {
+      include: {
+        LiveShopping: { where: { fmGoodsSeq: { in: goods_seq_arr } } },
+        productPromotion: { where: { fmGoodsSeq: { in: goods_seq_arr } } },
+        seller: {
           include: {
-            LiveShopping: true,
-            seller: {
-              include: {
-                sellerShop: {
-                  select: {
-                    shopName: true,
-                  },
-                },
-                sellerSettlementAccount: {
-                  select: {
-                    id: true,
-                    bank: true,
-                    name: true,
-                    number: true,
-                    settlementAccountImageName: true,
-                  },
-                },
+            sellerShop: { select: { shopName: true } },
+            sellerSettlementAccount: {
+              select: {
+                id: true,
+                bank: true,
+                name: true,
+                number: true,
+                settlementAccountImageName: true,
               },
             },
           },
@@ -99,18 +94,24 @@ export class FmSettlementService {
 
     const exports = realResult.map((r) => ({
       ...r,
+      // 현재 출고의 출고옵션 정보를 붙임
       options: exportOptions
         .filter((o) => o.export_code === r.export_code)
         .map((o) => {
-          const lcgoods = lcGoodsList.find((g) => g.fmGoodsSeq === o.goods_seq);
+          const lcgoods = lcGoodsList.find(
+            (g) =>
+              g.LiveShopping.some((l) => l.fmGoodsSeq === o.goods_seq) ||
+              g.productPromotion.some((p) => p.fmGoodsSeq === o.goods_seq),
+          );
           if (lcgoods) {
             return {
               ...o,
-              seller: lcgoods.goods.seller,
-              LiveShopping: lcgoods.goods.LiveShopping,
+              seller: lcgoods.seller,
+              LiveShopping: lcgoods.LiveShopping,
+              productPromotion: lcgoods.productPromotion,
             };
           }
-          return { ...o, seller: null, LiveShopping: [] };
+          return { ...o, seller: null, LiveShopping: [], productPromotion: [] };
         }),
     }));
 
