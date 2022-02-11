@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Broadcaster } from '@prisma/client';
+import { Broadcaster, BroadcasterPromotionPage } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   broadcasterProductPromotionDto,
@@ -34,7 +34,9 @@ export class BroadcasterPromotionPageService {
   }
 
   /** 상품홍보페이지 BroadcasterPromotionPage 생성 */
-  public async createPromotionPage(dto: BroadcasterPromotionPageDto): Promise<any> {
+  public async createPromotionPage(
+    dto: BroadcasterPromotionPageDto,
+  ): Promise<BroadcasterPromotionPage> {
     const { url, broadcasterId } = dto;
     const promotionPage = await this.prisma.broadcasterPromotionPage.create({
       data: {
@@ -46,7 +48,9 @@ export class BroadcasterPromotionPageService {
   }
 
   /** 상품홍보페이지 수정 */
-  public async updatePromotionPage(dto: BroadcasterPromotionPageUpdateDto): Promise<any> {
+  public async updatePromotionPage(
+    dto: BroadcasterPromotionPageUpdateDto,
+  ): Promise<BroadcasterPromotionPage> {
     const { id, ...updateData } = dto;
     const page = await this.prisma.broadcasterPromotionPage.update({
       where: { id },

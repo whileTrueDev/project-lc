@@ -1,3 +1,4 @@
+import { ProductPromotion } from '@prisma/client';
 import {
   CreateProductPromotionDto,
   UpdateProductPromotionDto,
@@ -7,7 +8,7 @@ import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
 
 /** 상품홍보 생성 뮤테이션 */
-export type useAdminProductPromotionCreateMutationRes = any;
+export type useAdminProductPromotionCreateMutationRes = ProductPromotion;
 
 export const useAdminProductPromotionCreateMutation = (): UseMutationResult<
   useAdminProductPromotionCreateMutationRes,
@@ -36,7 +37,7 @@ export const useAdminProductPromotionCreateMutation = (): UseMutationResult<
 };
 
 /** 상품홍보 수정 뮤테이션 */
-export type useAdminProductPromotionUpdateMutationRes = any;
+export type useAdminProductPromotionUpdateMutationRes = ProductPromotion;
 
 export const useAdminProductPromotionUpdateMutation = (): UseMutationResult<
   useAdminProductPromotionUpdateMutationRes,

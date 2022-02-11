@@ -1,3 +1,4 @@
+import { BroadcasterPromotionPage } from '@prisma/client';
 import {
   BroadcasterPromotionPageDto,
   BroadcasterPromotionPageUpdateDto,
@@ -7,7 +8,7 @@ import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
 
 /** 방송인 상품홍보페이지 생성 */
-export type useAdminBroadcasterPromotionPageCreateMutationRes = any;
+export type useAdminBroadcasterPromotionPageCreateMutationRes = BroadcasterPromotionPage;
 type CreateDto = BroadcasterPromotionPageDto;
 export const useAdminBroadcasterPromotionPageCreateMutation = (): UseMutationResult<
   useAdminBroadcasterPromotionPageCreateMutationRes,
@@ -36,7 +37,7 @@ export const useAdminBroadcasterPromotionPageCreateMutation = (): UseMutationRes
 };
 
 /** 방송인 상품홍보페이지 수정 */
-export type useAdminBroadcasterPromotionPageUpdateMutationRes = any;
+export type useAdminBroadcasterPromotionPageUpdateMutationRes = BroadcasterPromotionPage;
 type UpdateDto = BroadcasterPromotionPageUpdateDto;
 export const useAdminBroadcasterPromotionPageUpdateMutation = (): UseMutationResult<
   useAdminBroadcasterPromotionPageUpdateMutationRes,

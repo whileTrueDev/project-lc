@@ -19,9 +19,11 @@ import {
 import { ConfigService } from '@nestjs/config';
 import {
   Administrator,
+  BroadcasterPromotionPage,
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
+  ProductPromotion,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -305,7 +307,7 @@ export class AdminController {
   @Post('/promotion-page')
   async createPromotionPage(
     @Body(ValidationPipe) dto: BroadcasterPromotionPageDto,
-  ): Promise<any> {
+  ): Promise<BroadcasterPromotionPage> {
     return this.broadcasterPromotionPageService.createPromotionPage(dto);
   }
 
@@ -313,7 +315,7 @@ export class AdminController {
   @Patch('/promotion-page')
   async updatePromotionPage(
     @Body(ValidationPipe) dto: BroadcasterPromotionPageUpdateDto,
-  ): Promise<any> {
+  ): Promise<BroadcasterPromotionPage> {
     return this.broadcasterPromotionPageService.updatePromotionPage(dto);
   }
 
@@ -353,7 +355,7 @@ export class AdminController {
   @Post('/product-promotion')
   async createProductPromotion(
     @Body(ValidationPipe) dto: CreateProductPromotionDto,
-  ): Promise<any> {
+  ): Promise<ProductPromotion> {
     return this.productPromotionService.createProductPromotion(dto);
   }
 
@@ -382,7 +384,7 @@ export class AdminController {
   @Patch('product-promotion')
   async updateProductPromotion(
     @Body(ValidationPipe) dto: UpdateProductPromotionDto,
-  ): Promise<any> {
+  ): Promise<ProductPromotion> {
     return this.productPromotionService.updateProductPromotion(dto);
   }
 
