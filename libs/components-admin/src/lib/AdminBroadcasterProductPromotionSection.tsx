@@ -1,7 +1,38 @@
-import { Stack, Button, Box, Link, Text } from '@chakra-ui/react';
+import {
+  Stack,
+  Button,
+  Box,
+  Link,
+  Text,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  useToast,
+  useDisclosure,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  InputGroup,
+  InputRightAddon,
+  FormHelperText,
+} from '@chakra-ui/react';
 import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
-import { useAdminProductPromotion } from '@project-lc/hooks';
-import { ProductPromotionListItemData } from '@project-lc/shared-types';
+import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
+import {
+  getAdminDuplicateFmGoodsSeqFlagForProductPromotion,
+  useAdminAllConfirmedLcGoodsList,
+  useAdminProductPromotion,
+  useAdminProductPromotionCreateMutation,
+} from '@project-lc/hooks';
+import {
+  CreateProductPromotionDto,
+  ProductPromotionListItemData,
+} from '@project-lc/shared-types';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
 export interface AdminBroadcasterProductPromotionSectionProps {
   promotionPageId: number;
@@ -10,11 +41,17 @@ export function AdminBroadcasterProductPromotionSection({
   promotionPageId,
 }: AdminBroadcasterProductPromotionSectionProps): JSX.Element {
   const { data: productPromotionList } = useAdminProductPromotion(promotionPageId);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <Stack>
       <Stack direction="row" alignItems="center">
         <Text>홍보중인 상품 </Text>
-        <Button>상품 추가하기</Button>
+        <Button onClick={onOpen}>상품 추가하기</Button>
+        <AdminProductPromotionCreateModal
+          isOpen={isOpen}
+          onClose={onClose}
+          promotionPageId={promotionPageId}
+        />
       </Stack>
 
       {productPromotionList && productPromotionList.length > 0 ? (
@@ -30,6 +67,210 @@ export function AdminBroadcasterProductPromotionSection({
   );
 }
 
+type ProductPromotionCreateFormData = {
+  promotionPageId: number;
+  goodsId: number | null;
+  fmGoodsSeq: number | null;
+  broadcasterCommissionRate?: number;
+  whiletrueCommissionRate?: number;
+};
+
+/** 상품홍보생성 폼 */
+export function AdminProductPromotionForm({
+  onSubmitHandler,
+  defaultValues,
+}: {
+  onSubmitHandler: SubmitHandler<ProductPromotionCreateFormData>;
+  defaultValues: ProductPromotionCreateFormData;
+}): JSX.Element {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ProductPromotionCreateFormData>({
+    defaultValues,
+  });
+
+  const { data: goods } = useAdminAllConfirmedLcGoodsList();
+  return (
+    <Stack as="form" onSubmit={handleSubmit(onSubmitHandler)}>
+      <Stack direction="row">
+        <Text>상품</Text>
+        <ChakraAutoComplete
+          options={goods || []}
+          getOptionLabel={(option) => option?.goods_name || ''}
+          onChange={(newV) => {
+            if (newV) {
+              setValue('goodsId', newV.id);
+            } else {
+              setValue('goodsId', null);
+            }
+          }}
+        />
+      </Stack>
+      <FormControl isInvalid={!!errors.broadcasterCommissionRate}>
+        <Stack direction="row">
+          <FormLabel htmlFor="broadcasterCommissionRate" width="50%">
+            방송인 수수료
+          </FormLabel>
+          <InputGroup>
+            <Input
+              id="broadcasterCommissionRate"
+              defaultValue={5}
+              autoComplete="off"
+              {...register('broadcasterCommissionRate', {
+                valueAsNumber: true,
+                validate: {
+                  min: (v) => (v && v >= 0) || '최소값은 0입니다',
+                  max: (v) => (v && v <= 100) || '최대값은 100입니다',
+                },
+                required: '방송인 수수료를 작성해주세요.',
+              })}
+            />
+            <InputRightAddon>%</InputRightAddon>
+          </InputGroup>
+        </Stack>
+        <FormErrorMessage>
+          {errors.broadcasterCommissionRate && errors.broadcasterCommissionRate.message}
+        </FormErrorMessage>
+      </FormControl>
+
+      <FormControl isInvalid={!!errors.whiletrueCommissionRate}>
+        <Stack direction="row">
+          <FormLabel htmlFor="whiletrueCommissionRate" width="50%">
+            와일트루 수수료
+          </FormLabel>
+          <InputGroup>
+            <Input
+              id="whiletrueCommissionRate"
+              defaultValue={5}
+              autoComplete="off"
+              {...register('whiletrueCommissionRate', {
+                valueAsNumber: true,
+                validate: {
+                  min: (v) => (v && v >= 0) || '최소값은 0입니다',
+                  max: (v) => (v && v <= 100) || '최대값은 100입니다',
+                },
+                required: '와일트루 수수료를 작성해주세요.',
+              })}
+            />
+            <InputRightAddon>%</InputRightAddon>
+          </InputGroup>
+        </Stack>
+
+        <FormErrorMessage>
+          {errors.whiletrueCommissionRate && errors.whiletrueCommissionRate.message}
+        </FormErrorMessage>
+      </FormControl>
+
+      <FormControl isInvalid={!!errors.fmGoodsSeq}>
+        <Stack direction="row">
+          <FormLabel htmlFor="fmGoodsSeq" width="70%">
+            퍼스트몰 상품 고유번호
+          </FormLabel>
+          <Input
+            id="fmGoodsSeq"
+            autoComplete="off"
+            type="number"
+            {...register('fmGoodsSeq', {
+              required: '퍼스트몰 상품 고유번호를 입력해주세요.',
+              valueAsNumber: true,
+              validate: async (_fmGoodsSeq) => {
+                if (!_fmGoodsSeq) return '상품 고유번호는 숫자여야 합니다';
+                const isDuplicateFmGoodsSeq =
+                  await getAdminDuplicateFmGoodsSeqFlagForProductPromotion(_fmGoodsSeq);
+                return (
+                  !isDuplicateFmGoodsSeq ||
+                  '입력하신 퍼스트몰 고유번호는 다른 상품과 연결되어 있습니다. 상품홍보용 제품의 퍼스트몰 고유 번호는 다른 제품의 고유번호와 중복될 수 없습니다. 고유번호를 다시 확인해주세요.'
+                );
+              },
+            })}
+          />
+        </Stack>
+        <FormErrorMessage>
+          {errors.fmGoodsSeq && errors.fmGoodsSeq.message}
+        </FormErrorMessage>
+        <FormHelperText>
+          퍼스트몰에 등록한 상품의 고유번호를
+          입력하세요.(http://whiletrue.firstmall.kr/goods/view?no=
+          <Text as="span" color="red">
+            41
+          </Text>
+          의&nbsp;
+          <Text as="span" color="red">
+            41
+          </Text>
+          을 입력)
+        </FormHelperText>
+      </FormControl>
+      <Button type="submit">생성</Button>
+    </Stack>
+  );
+}
+
+/** 상품홍보 아이템 생성 모달 */
+export function AdminProductPromotionCreateModal({
+  isOpen,
+  onClose,
+  promotionPageId,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  promotionPageId: number;
+}): JSX.Element {
+  const toast = useToast();
+
+  const createProductPromotion = useAdminProductPromotionCreateMutation();
+  const onSubmit: SubmitHandler<ProductPromotionCreateFormData> = async (data) => {
+    const {
+      goodsId,
+      fmGoodsSeq,
+      promotionPageId: broadcasterPromotionPageId,
+      ...rest
+    } = data;
+    if (!goodsId || !fmGoodsSeq) return;
+
+    const createDto: CreateProductPromotionDto = {
+      broadcasterPromotionPageId,
+      goodsId,
+      fmGoodsSeq,
+      ...rest,
+    };
+    createProductPromotion
+      .mutateAsync(createDto)
+      .then((res) => {
+        toast({ title: '생성 성공', status: 'success' });
+        onClose();
+      })
+      .catch((error) => {
+        toast({ title: `생성 실패 error - ${error}`, status: 'error' });
+      });
+  };
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>상품 홍보 아이템 생성</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <AdminProductPromotionForm
+            onSubmitHandler={onSubmit}
+            defaultValues={{
+              promotionPageId,
+              goodsId: null,
+              fmGoodsSeq: null,
+              broadcasterCommissionRate: 5,
+              whiletrueCommissionRate: 5,
+            }}
+          />
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  );
+}
+
+/** 상품홍보 아이템 표시 박스 */
 export function ProductPromotionItemBox({
   item,
 }: {

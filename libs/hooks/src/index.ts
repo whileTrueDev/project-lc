@@ -2,6 +2,7 @@ export * from './lib/auth-hooks';
 export * from './lib/mutation/useAdminBroadcasterPromotionPageMutation';
 export * from './lib/mutation/useAdminBroadcasterSettlementInfoConfirmMutation';
 export * from './lib/mutation/useAdminCreateNotification';
+export * from './lib/mutation/useAdminProductPromotionMutation';
 export * from './lib/mutation/useAvatarMutation';
 export * from './lib/mutation/useBroadcasterAddressMutation';
 export * from './lib/mutation/useBroadcasterChannelMutation';
