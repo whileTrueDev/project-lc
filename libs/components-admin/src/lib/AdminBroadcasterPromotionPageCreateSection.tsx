@@ -50,11 +50,13 @@ export function AdminBroadcasterPromotionPageForm({
   });
 
   /** 방송인 중 상품홍보페이지가 등록되지 않은 방송인만 표시 */
-  const { data: broadcasters } = useAdminBroadcaster();
+  const { data: broadcasters, isLoading } = useAdminBroadcaster();
   const validBroadcasters = useMemo(() => {
     if (!broadcasters) return [];
     return broadcasters.filter((b) => !b.BroadcasterPromotionPage);
   }, [broadcasters]);
+
+  if (isLoading) return <Text>로딩중...</Text>;
 
   if (validBroadcasters.length === 0) {
     return <Text>상품홍보페이지를 등록할 수 있는 방송인이 없습니다.</Text>;
