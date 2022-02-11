@@ -1,29 +1,28 @@
 import {
-  Stack,
+  Alert,
+  AlertIcon,
+  AlertTitle,
   Button,
-  Box,
+  CloseButton,
+  Divider,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
+  Input,
+  InputGroup,
+  InputRightAddon,
   Link,
-  Text,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  useToast,
+  Stack,
+  Text,
   useDisclosure,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  InputGroup,
-  InputRightAddon,
-  FormHelperText,
-  Divider,
-  CloseButton,
-  Alert,
-  AlertIcon,
-  AlertTitle,
+  useToast,
 } from '@chakra-ui/react';
 import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
@@ -42,7 +41,15 @@ import {
   UpdateProductPromotionDto,
 } from '@project-lc/shared-types';
 import { useCallback } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import {
+  FieldError,
+  FieldValues,
+  Path,
+  SubmitHandler,
+  useForm,
+  UseFormRegister,
+} from 'react-hook-form';
+import { FmGoodsSeqInputHelpText } from './AdminGoodsConfirmationDialog';
 
 export interface AdminBroadcasterProductPromotionSectionProps {
   promotionPageId: number;
@@ -202,16 +209,7 @@ export function AdminProductPromotionForm({
           {errors.fmGoodsSeq && errors.fmGoodsSeq.message}
         </FormErrorMessage>
         <FormHelperText>
-          퍼스트몰에 등록한 상품의 고유번호를
-          입력하세요.(http://whiletrue.firstmall.kr/goods/view?no=
-          <Text as="span" color="red">
-            41
-          </Text>
-          의&nbsp;
-          <Text as="span" color="red">
-            41
-          </Text>
-          을 입력)
+          <FmGoodsSeqInputHelpText />
         </FormHelperText>
       </FormControl>
       <Button type="submit">생성</Button>
@@ -369,6 +367,7 @@ export function ProductPromotionItemBox({
   );
 }
 
+/** 상품홍보 수정 모달 */
 export function AdminProductPromotionUpdateModal({
   isOpen,
   onClose,
@@ -516,16 +515,7 @@ export function AdminProductPromotionUpdateModal({
                 {errors.fmGoodsSeq && errors.fmGoodsSeq.message}
               </FormErrorMessage>
               <FormHelperText>
-                퍼스트몰에 등록한 상품의 고유번호를
-                입력하세요.(http://whiletrue.firstmall.kr/goods/view?no=
-                <Text as="span" color="red">
-                  41
-                </Text>
-                의&nbsp;
-                <Text as="span" color="red">
-                  41
-                </Text>
-                을 입력)
+                <FmGoodsSeqInputHelpText />
               </FormHelperText>
             </FormControl>
             <Stack direction="row">
