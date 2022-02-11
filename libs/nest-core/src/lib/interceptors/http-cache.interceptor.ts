@@ -59,22 +59,22 @@ export class HttpCacheInterceptor extends CacheInterceptor {
     if (!key) {
       return next.handle();
     }
+
+    const isNil = <T = any>(v: T): boolean => {
+      return v === null || v === undefined;
+    };
     try {
       const value = await this.cacheManager.get(key);
-      if (value === null || value === undefined) {
-        return of(value);
-      }
+      if (isNil(value)) return of(value);
+
       const ttl =
         typeof ttlValueOrFactory === 'function'
           ? await ttlValueOrFactory(context)
           : ttlValueOrFactory;
       return next.handle().pipe(
         tap((response) => {
-          if (response) {
-            const args =
-              ttl === null || ttl === undefined
-                ? [key, response]
-                : [key, response, { ttl }];
+          if (isNil(response)) {
+            const args = isNil(ttl) ? [key, response] : [key, response, { ttl }];
             this.cacheManager.set(...args);
           }
         }),
