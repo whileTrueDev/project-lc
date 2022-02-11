@@ -34,10 +34,12 @@ import {
   useAdminProductPromotion,
   useAdminProductPromotionCreateMutation,
   useAdminProductPromotionDeleteMutation,
+  useAdminProductPromotionUpdateMutation,
 } from '@project-lc/hooks';
 import {
   CreateProductPromotionDto,
   ProductPromotionListItemData,
+  UpdateProductPromotionDto,
 } from '@project-lc/shared-types';
 import { useCallback } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -286,6 +288,7 @@ export function ProductPromotionItemBox({
 }): JSX.Element {
   const toast = useToast();
   const deleteDialog = useDisclosure();
+  const updateDialog = useDisclosure();
   const deleteRequest = useAdminProductPromotionDeleteMutation();
   const onDeleteDialogConfirm = useCallback(async () => {
     deleteRequest
@@ -302,8 +305,8 @@ export function ProductPromotionItemBox({
       });
   }, [deleteDialog, deleteRequest, item, toast]);
   return (
-    <Stack key={item.id} {...boxStyle} minW="240px">
-      <Stack position="relative">
+    <Stack key={item.id} {...boxStyle} w="300px">
+      <Stack position="relative" pr={5}>
         <CloseButton
           size="sm"
           position="absolute"
@@ -321,12 +324,17 @@ export function ProductPromotionItemBox({
           <Alert status="error">
             <AlertIcon />
             <Stack>
-              <AlertTitle mr={2}>해당 홍보 상품을 삭제하시겠습니까?</AlertTitle>
+              <AlertTitle mr={2}>
+                해당 홍보 상품을 상품 홍보 페이지에서 삭제하시겠습니까?
+              </AlertTitle>
             </Stack>
           </Alert>
         </ConfirmDialog>
-        <Link href={`/goods/${item.goodsId}`} color="blue.500">
-          상품명 : {item.goods.goods_name}
+        <Link href={`/goods/${item.goodsId}`}>
+          상품명 :
+          <Text as="span" color="blue.500">
+            {item.goods.goods_name}
+          </Text>
         </Link>
         <Text>판매자 : {item.goods.seller.name}</Text>
         <Text>상점명 : {item.goods.seller?.sellerShop?.shopName}</Text>
@@ -334,13 +342,202 @@ export function ProductPromotionItemBox({
       <Divider />
 
       <Stack position="relative">
-        <Button size="xs" position="absolute" right="0" top="0">
+        <Button
+          size="xs"
+          position="absolute"
+          right="0"
+          top="0"
+          onClick={updateDialog.onOpen}
+        >
           수정
         </Button>
+        <AdminProductPromotionUpdateModal
+          isOpen={updateDialog.isOpen}
+          onClose={updateDialog.onClose}
+          item={item}
+        />
+        <Link href={`https://k-kmarket.com/goods/view?no=${item.fmGoodsSeq}`} isExternal>
+          퍼스트몰 상품 고유 번호 :
+          <Text as="span" color="blue.500">
+            {item.fmGoodsSeq}
+          </Text>
+        </Link>
         <Text>와일트루 수수료 : {item.whiletrueCommissionRate} %</Text>
         <Text>방송인 수수료 : {item.broadcasterCommissionRate} %</Text>
       </Stack>
     </Stack>
+  );
+}
+
+export function AdminProductPromotionUpdateModal({
+  isOpen,
+  onClose,
+  item,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  item: ProductPromotionListItemData;
+}): JSX.Element {
+  const toast = useToast();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<UpdateProductPromotionDto>({
+    defaultValues: {
+      id: item.id,
+      broadcasterPromotionPageId: item.broadcasterPromotionPageId,
+      fmGoodsSeq: item.fmGoodsSeq || undefined,
+      goodsId: item.goodsId || undefined,
+      broadcasterCommissionRate: Number(item.broadcasterCommissionRate),
+      whiletrueCommissionRate: Number(item.whiletrueCommissionRate),
+    },
+  });
+
+  const updateRequest = useAdminProductPromotionUpdateMutation();
+  const onSubmit: SubmitHandler<UpdateProductPromotionDto> = (data) => {
+    if (!data.id || !data.broadcasterPromotionPageId) return;
+
+    const { fmGoodsSeq, ...rest } = data;
+    let dto: UpdateProductPromotionDto = {
+      ...rest,
+    };
+    if (watch('fmGoodsSeq') !== fmGoodsSeq) {
+      dto = { ...dto, fmGoodsSeq };
+    }
+    updateRequest
+      .mutateAsync(dto)
+      .then((res) => {
+        toast({ title: '홍보 상품 정보를 수정하였습니다', status: 'success' });
+        onClose();
+      })
+      .catch((error) => {
+        toast({ title: `에러가 발생했습니다 ${error}`, status: 'error' });
+      });
+  };
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>홍보 상품 수정</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Stack as="form" onSubmit={handleSubmit(onSubmit)}>
+            <FormControl isInvalid={!!errors.broadcasterCommissionRate}>
+              <Stack direction="row">
+                <FormLabel htmlFor="broadcasterCommissionRate" width="50%">
+                  방송인 수수료
+                </FormLabel>
+                <InputGroup>
+                  <Input
+                    id="broadcasterCommissionRate"
+                    defaultValue={5}
+                    autoComplete="off"
+                    {...register('broadcasterCommissionRate', {
+                      valueAsNumber: true,
+                      validate: {
+                        min: (v) => (v && v >= 0) || '최소값은 0입니다',
+                        max: (v) => (v && v <= 100) || '최대값은 100입니다',
+                      },
+                      required: '방송인 수수료를 작성해주세요.',
+                    })}
+                  />
+                  <InputRightAddon>%</InputRightAddon>
+                </InputGroup>
+              </Stack>
+              <FormErrorMessage>
+                {errors.broadcasterCommissionRate &&
+                  errors.broadcasterCommissionRate.message}
+              </FormErrorMessage>
+            </FormControl>
+
+            <FormControl isInvalid={!!errors.whiletrueCommissionRate}>
+              <Stack direction="row">
+                <FormLabel htmlFor="whiletrueCommissionRate" width="50%">
+                  와일트루 수수료
+                </FormLabel>
+                <InputGroup>
+                  <Input
+                    id="whiletrueCommissionRate"
+                    defaultValue={5}
+                    autoComplete="off"
+                    {...register('whiletrueCommissionRate', {
+                      valueAsNumber: true,
+                      validate: {
+                        min: (v) => (v && v >= 0) || '최소값은 0입니다',
+                        max: (v) => (v && v <= 100) || '최대값은 100입니다',
+                      },
+                      required: '와일트루 수수료를 작성해주세요.',
+                    })}
+                  />
+                  <InputRightAddon>%</InputRightAddon>
+                </InputGroup>
+              </Stack>
+
+              <FormErrorMessage>
+                {errors.whiletrueCommissionRate && errors.whiletrueCommissionRate.message}
+              </FormErrorMessage>
+            </FormControl>
+
+            <FormControl isInvalid={!!errors.fmGoodsSeq}>
+              <Stack direction="row">
+                <FormLabel htmlFor="fmGoodsSeq" width="70%">
+                  퍼스트몰 상품 고유번호
+                </FormLabel>
+                <Input
+                  id="fmGoodsSeq"
+                  autoComplete="off"
+                  type="number"
+                  {...register('fmGoodsSeq', {
+                    required: '퍼스트몰 상품 고유번호를 입력해주세요.',
+                    valueAsNumber: true,
+                    validate: async (_fmGoodsSeq) => {
+                      if (!_fmGoodsSeq) return '상품 고유번호는 숫자여야 합니다';
+                      // 이전 퍼스트몰 고유번호와 동일한경우 중복검사 하지 않고 updateRequest의 dto에서 제외한다
+                      if (watch('fmGoodsSeq') === _fmGoodsSeq) {
+                        return true;
+                      }
+                      // 이전 입력한 퍼스트몰 고유번호화 다른 경우 중복검사
+                      const isDuplicateFmGoodsSeq =
+                        await getAdminDuplicateFmGoodsSeqFlagForProductPromotion(
+                          _fmGoodsSeq,
+                        );
+                      return (
+                        !isDuplicateFmGoodsSeq ||
+                        '입력하신 퍼스트몰 고유번호는 다른 상품과 연결되어 있습니다. 상품홍보용 제품의 퍼스트몰 고유 번호는 다른 제품의 고유번호와 중복될 수 없습니다. 고유번호를 다시 확인해주세요.'
+                      );
+                    },
+                  })}
+                />
+              </Stack>
+              <FormErrorMessage>
+                {errors.fmGoodsSeq && errors.fmGoodsSeq.message}
+              </FormErrorMessage>
+              <FormHelperText>
+                퍼스트몰에 등록한 상품의 고유번호를
+                입력하세요.(http://whiletrue.firstmall.kr/goods/view?no=
+                <Text as="span" color="red">
+                  41
+                </Text>
+                의&nbsp;
+                <Text as="span" color="red">
+                  41
+                </Text>
+                을 입력)
+              </FormHelperText>
+            </FormControl>
+            <Stack direction="row">
+              <Button type="submit" colorScheme="blue">
+                수정
+              </Button>
+              <Button onClick={onClose}>닫기</Button>
+            </Stack>
+          </Stack>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }
 

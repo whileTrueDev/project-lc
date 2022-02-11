@@ -48,11 +48,11 @@ export function AdminBroadcasterPromotionPageUpdateModal({
     },
   });
 
-  const updatePageUrl = useAdminBroadcasterPromotionPageUpdateMutation();
+  const updateRequest = useAdminBroadcasterPromotionPageUpdateMutation();
 
   const onSubmit: SubmitHandler<BroadcasterPromotionPageFormDataType> = (data) => {
     if (!data.id) return;
-    updatePageUrl
+    updateRequest
       .mutateAsync({
         id: data.id,
         broadcasterId: data.broadcasterId || undefined,
@@ -61,6 +61,9 @@ export function AdminBroadcasterPromotionPageUpdateModal({
       .then((res) => {
         toast({ title: '상품홍보페이지 url을 수정하였습니다', status: 'success' });
         onClose();
+      })
+      .catch((error) => {
+        toast({ title: `에러가 발생했습니다 ${error}`, status: 'error' });
       });
   };
 
@@ -90,9 +93,12 @@ export function AdminBroadcasterPromotionPageUpdateModal({
               />
               <FormErrorMessage>{errors.url && errors.url.message}</FormErrorMessage>
             </FormControl>
-            <Button type="submit" disabled={!watch('url')}>
-              수정
-            </Button>
+            <Stack direction="row">
+              <Button type="submit" colorScheme="blue" disabled={!watch('url')}>
+                수정
+              </Button>
+              <Button onClick={onClose}>닫기</Button>
+            </Stack>
           </Stack>
         </ModalBody>
       </ModalContent>
