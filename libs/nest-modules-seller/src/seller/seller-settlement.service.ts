@@ -368,9 +368,11 @@ export class SellerSettlementService extends ServiceBaseWithCache {
     month: string,
   ): Promise<string[]> {
     const result: { round: string }[] = await this.prisma.$queryRaw`
-    SELECT round FROM SellerSettlements
-    WHERE round LIKE ${`${year}/${month}%`} AND sellerEmail = ${email} GROUP BY round
-    `;
+      SELECT round FROM SellerSettlements
+      WHERE round LIKE ${`${year}/${
+        month.length === 1 ? `0${month}` : month
+      }%`} AND sellerEmail = ${email} GROUP BY round
+      `;
 
     return result.map((m) => m.round);
   }
