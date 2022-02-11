@@ -126,7 +126,13 @@ export class SellerController {
     return this.sellerSettlementService.selectSellerSettlementInfo(sellerInfo);
   }
 
-  // 본인의 정산 대상 목록 조회
+  /**
+   * @deprecated
+   * seller-settlement-history.controller로 이전
+   * by hwasurr(dan), 2022. 02. 09
+   * TODO: 5차스프린트 배포 후 이 라우트핸들러 삭제
+   * 본인의 정산 대상 목록 조회
+   */
   @UseGuards(JwtAuthGuard)
   @Get('settlement-history')
   @UseInterceptors(HttpCacheInterceptor)
@@ -139,7 +145,13 @@ export class SellerController {
     });
   }
 
-  // 본인의 정산 대상 년도 목록 조회
+  /**
+   * @deprecated
+   * seller-settlement-history.controller로 이전
+   * by hwasurr(dan), 2022. 02. 09
+   * TODO: 5차스프린트 배포 후 이 라우트핸들러 삭제
+   * 본인의 정산 대상 년도 목록 조회
+   */
   @UseGuards(JwtAuthGuard)
   @Get('settlement-history-years')
   @UseInterceptors(HttpCacheInterceptor)
@@ -149,7 +161,13 @@ export class SellerController {
     return this.sellerSettlementService.findSettlementHistoryYears(sellerInfo.sub);
   }
 
-  // 본인의 정산 대상 월 목록 조회
+  /**
+   * @deprecated
+   * seller-settlement-history.controller로 이전
+   * by hwasurr(dan), 2022. 02. 09
+   * TODO: 5차스프린트 배포 후 이 라우트핸들러 삭제
+   * 본인의 정산 대상 월 목록 조회
+   */
   @UseGuards(JwtAuthGuard)
   @Get('settlement-history-months')
   @UseInterceptors(HttpCacheInterceptor)
@@ -160,7 +178,13 @@ export class SellerController {
     return this.sellerSettlementService.findSettlementHistoryMonths(sellerInfo.sub, year);
   }
 
-  // 본인의 정산 대상 월 목록 조회
+  /**
+   * @deprecated
+   * seller-settlement-history.controller로 이전
+   * by hwasurr(dan), 2022. 02. 09
+   * TODO: 5차스프린트 배포 후 이 라우트핸들러 삭제
+   * 본인의 정산 대상 월 목록 조회
+   */
   @UseGuards(JwtAuthGuard)
   @Get('settlement-history-rounds')
   @UseInterceptors(HttpCacheInterceptor)
