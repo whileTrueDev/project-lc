@@ -373,12 +373,18 @@ export class AdminService {
 
     // 라이브쇼핑 테이블 fmGoodsSeq 와 중복값이 있는지 확인
     const duplicatedFmGoodsSeqLiveShopping = await this.prisma.liveShopping.findFirst({
-      where: {
-        fmGoodsSeq: goodsSeq,
-      },
+      where: { fmGoodsSeq: goodsSeq },
     });
 
     if (duplicatedFmGoodsSeqLiveShopping) return true;
+
+    // 상품홍보 테이블 fmGoodsSeq와 중복값 있는지 확인
+    const duplicateFmGoodsSeqProductPromotion =
+      await this.prisma.productPromotion.findFirst({
+        where: { fmGoodsSeq: goodsSeq },
+      });
+
+    if (duplicateFmGoodsSeqProductPromotion) return true;
 
     return false;
   }

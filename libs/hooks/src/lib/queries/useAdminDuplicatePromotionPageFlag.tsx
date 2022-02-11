@@ -28,7 +28,7 @@ export const getAdminDuplicateFmGoodsSeqFlagForProductPromotion = async (
   fmGoodsSeq: number,
 ): Promise<DuplicateFlag> => {
   return axios
-    .get<DuplicateFlag>('/admin/promotion-page/duplicate', { params: { fmGoodsSeq } })
+    .get<DuplicateFlag>('/admin/product-promotion/duplicate', { params: { fmGoodsSeq } })
     .then((res) => res.data);
 };
 
