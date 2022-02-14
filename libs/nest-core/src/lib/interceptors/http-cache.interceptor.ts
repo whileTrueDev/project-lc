@@ -73,7 +73,7 @@ export class HttpCacheInterceptor extends CacheInterceptor {
           : ttlValueOrFactory;
       return next.handle().pipe(
         tap((response) => {
-          if (isNil(response)) {
+          if (!isNil(response)) {
             const args = isNil(ttl) ? [key, response] : [key, response, { ttl }];
             this.cacheManager.set(...args);
           }
