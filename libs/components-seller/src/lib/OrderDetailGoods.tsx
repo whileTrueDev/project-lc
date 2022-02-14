@@ -37,24 +37,19 @@ export function OrderDetailGoods({
         />
       )}
       <Box ml={orderItem.image ? 4 : 0}>
-        <Stack direction="row" alignItems="center">
-          {!sellType.isLoading && sellType.data && (
-            <SellTypeBadge sellType={sellType.data} />
-          )}
-          <Text
-            fontWeight="bold"
-            color="blue.500"
-            textDecoration="underline"
-            cursor="pointer"
-            onClick={() =>
-              window.open(
-                `http://whiletrue.firstmall.kr/goods/view?no=${orderItem.goods_seq}`,
-              )
-            }
-          >
-            {orderItem.goods_name}
-          </Text>
-        </Stack>
+        <Text
+          fontWeight="bold"
+          color="blue.500"
+          textDecoration="underline"
+          cursor="pointer"
+          onClick={() =>
+            window.open(
+              `http://whiletrue.firstmall.kr/goods/view?no=${orderItem.goods_seq}`,
+            )
+          }
+        >
+          {orderItem.goods_name}
+        </Text>
 
         {!option ? (
           <Text>총 주문금액 {orderPrice}</Text>
@@ -65,6 +60,13 @@ export function OrderDetailGoods({
               {option.title} {option.value}
             </Text>
           </Text>
+        )}
+
+        {!sellType.isLoading && sellType.data && (
+          <Stack direction="row" align="center">
+            <Text>판매유형</Text>
+            <SellTypeBadge sellType={sellType.data} lineHeight="unset" />
+          </Stack>
         )}
       </Box>
     </Flex>
