@@ -1,19 +1,21 @@
 import { Badge, Box, Flex, Stack, Text } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
-import { useSellerSellType } from '@project-lc/hooks';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
+import { SellType } from '@prisma/client';
 import { useMemo } from 'react';
 
 export interface OrderDetailGoodsProps {
   orderItem: FindFmOrderDetailRes['items'][0];
   option?: { title: string; value: string };
+  sellType: SellType;
 }
 
 /** 주문 상품 정보 */
 export function OrderDetailGoods({
   orderItem,
   option,
+  sellType,
 }: OrderDetailGoodsProps): JSX.Element {
   const orderPrice = useMemo(() => {
     const reduced = orderItem.options.reduce(
@@ -22,8 +24,6 @@ export function OrderDetailGoods({
     );
     return `${reduced.toLocaleString()} 원`;
   }, [orderItem.options]);
-
-  const sellType = useSellerSellType(orderItem.goods_seq || '');
 
   return (
     <Flex>
@@ -62,10 +62,10 @@ export function OrderDetailGoods({
           </Text>
         )}
 
-        {!sellType.isLoading && sellType.data && (
+        {sellType && (
           <Stack direction="row" align="center">
             <Text>판매유형</Text>
-            <SellTypeBadge sellType={sellType.data} lineHeight="unset" />
+            <SellTypeBadge sellType={sellType} lineHeight="unset" />
           </Stack>
         )}
       </Box>

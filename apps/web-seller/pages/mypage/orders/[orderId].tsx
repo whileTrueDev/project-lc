@@ -246,15 +246,13 @@ function OrderDetailShippingItem({
       <Box mt={4}>
         {shipping.items.map((item) => (
           <Box key={item.item_seq} mt={2}>
-            {sellType && (
-              <SellTypeBadge
-                sellType={sellType
-                  .filter((d) => d.goodsId === item.goods_seq)
-                  .map((d) => d.sellType)
-                  .pop()}
-              />
-            )}
-            <OrderDetailGoods orderItem={item} />
+            <OrderDetailGoods
+              orderItem={item}
+              sellType={sellType
+                .filter((d) => d.goodsId === item.goods_seq)
+                .map((d) => d.sellType)
+                .pop()}
+            />
             <OrderDetailOptionList options={item.options} />
           </Box>
         ))}
