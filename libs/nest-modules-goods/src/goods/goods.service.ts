@@ -73,14 +73,19 @@ export class GoodsService extends ServiceBaseWithCache {
             fmGoodsSeq: true,
           },
         },
+        productPromotion: {
+          select: { fmGoodsSeq: true },
+        },
       },
     });
 
     const allMyGoodsIds = goodsIds.reduce((prev, goods) => {
       const lsGoodsIds = goods.LiveShopping.map((l) => l.fmGoodsSeq);
+      const productPromotionGoodsIds = goods.productPromotion.map((p) => p.fmGoodsSeq);
       return prev
         .concat(goods.confirmation.firstmallGoodsConnectionId)
-        .concat(lsGoodsIds);
+        .concat(lsGoodsIds)
+        .concat(productPromotionGoodsIds);
     }, []);
 
     return [...new Set(allMyGoodsIds)];

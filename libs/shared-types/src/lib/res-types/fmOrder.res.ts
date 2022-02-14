@@ -1,3 +1,4 @@
+import { SellType } from '@prisma/client';
 import { fmOrderStatuses } from '../constants/fmOrderStatuses';
 import { FmExport } from './fmExport.res';
 
@@ -777,7 +778,7 @@ export interface FmOrderShipping {
   /** 배송그룹 */
   shipping_group: string;
   /** 이 배송방법으로 주문된 상품 목록 */
-  items: Array<FmOrderItem & { options: FmOrderOption[] }>;
+  items: Array<FmOrderItem & { options: FmOrderOption[]; sellType: SellType }>;
 }
 
 /** 주문 상세 정보 (메타정보) */
@@ -1021,7 +1022,7 @@ export type FmOrderReturn = FmOrderReturnBase & {
  * 상품 상세 정보 반환 데이터 타입
  */
 export type FindFmOrderDetailRes = FmOrderMetaInfo & {
-  items: Array<FmOrderItem & { options: FmOrderOption[] }>;
+  items: Array<FmOrderItem & { options: FmOrderOption[]; sellType: SellType }>;
   exports?: FmOrderExport[];
   refunds?: FmOrderRefund[];
   returns?: FmOrderReturn[];

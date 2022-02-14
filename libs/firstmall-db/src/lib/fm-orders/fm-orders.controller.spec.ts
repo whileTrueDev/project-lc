@@ -5,12 +5,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { GoodsModule, GoodsService } from '@project-lc/nest-modules-goods';
-import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
+import {
+  LiveShoppingModule,
+  LiveShoppingService,
+} from '@project-lc/nest-modules-liveshopping';
 import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import store from 'cache-manager-ioredis';
 import request from 'supertest';
+import {
+  SellerModule,
+  SellerProductPromotionService,
+} from '@project-lc/nest-modules-seller';
 import {
   orderDetailExportsSample,
   orderDetailItemsSample,
@@ -39,9 +46,16 @@ describe('FmOrdersController', () => {
         BroadcasterModule.withoutControllers(),
         ConfigModule.forRoot({ isGlobal: true }),
         CacheModule.register({ isGlobal: true, store }),
+        SellerModule.withoutControllers(),
       ],
       controllers: [FmOrdersController],
-      providers: [FmOrdersService, FirstmallDbService, S3Service],
+      providers: [
+        FmOrdersService,
+        FirstmallDbService,
+        S3Service,
+        LiveShoppingService,
+        SellerProductPromotionService,
+      ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({
