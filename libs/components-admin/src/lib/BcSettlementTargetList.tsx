@@ -39,6 +39,7 @@ import {
 } from '@project-lc/shared-types';
 import { settlementHistoryStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
+import { join } from 'path';
 import { useCallback, useMemo, useState } from 'react';
 
 export function calcSettleAmount(
@@ -309,11 +310,13 @@ function BcSettlementTargetDetail({
         >
           <Grid templateColumns="repeat(4, 1fr)" gap={{ base: 1, sm: 2 }}>
             <GridItem colSpan={{ base: 4, sm: 1 }}>
-              <ChakraNextImage
-                src={`http://whiletrue.firstmall.kr${item.image}`}
-                width={75}
-                height={75}
-              />
+              {item.image && (
+                <ChakraNextImage
+                  src={`http://whiletrue.firstmall.kr${item.image}`}
+                  width={75}
+                  height={75}
+                />
+              )}
             </GridItem>
             <GridItem colSpan={{ base: 4, sm: 3 }}>
               <Text fontWeight="bold">{item.goods_name}</Text>
