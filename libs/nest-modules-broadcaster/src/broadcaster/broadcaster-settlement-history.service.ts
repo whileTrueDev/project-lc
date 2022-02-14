@@ -55,8 +55,8 @@ export class BroadcasterSettlementHistoryService extends ServiceBaseWithCache {
             sellType: i.liveShoppingId
               ? SellType.liveShopping
               : i.productPromotionId
-              ? SellType.broadcasterPromotionPage
-              : ('normal' as any), // TODO: SellType 기본판매 추가시 타입 수정 필요
+              ? SellType.productPromotion
+              : SellType.normal,
             orderId: i.orderId,
             broadcasterSettlementsId: _settlement.id,
             broadcasterCommissionRate: i.broadcasterCommissionRate,
