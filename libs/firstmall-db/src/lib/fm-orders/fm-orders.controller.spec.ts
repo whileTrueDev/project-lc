@@ -5,18 +5,26 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { GoodsModule, GoodsService } from '@project-lc/nest-modules-goods';
-import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
+import {
+  LiveShoppingModule,
+  LiveShoppingService,
+} from '@project-lc/nest-modules-liveshopping';
 import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import store from 'cache-manager-ioredis';
 import request from 'supertest';
 import {
+  SellerModule,
+  SellerProductPromotionService,
+} from '@project-lc/nest-modules-seller';
+import {
   orderDetailExportsSample,
   orderDetailItemsSample,
   orderDetailRefundsSample,
   orderDetailReturnsSample,
   orderMetaInfoSample,
+  sellTypeSample,
 } from '../../__tests__/orderDetailSample';
 import { ordersSample } from '../../__tests__/ordersSample';
 import { FirstmallDbService } from '../firstmall-db.service';
@@ -39,9 +47,16 @@ describe('FmOrdersController', () => {
         BroadcasterModule.withoutControllers(),
         ConfigModule.forRoot({ isGlobal: true }),
         CacheModule.register({ isGlobal: true, store }),
+        SellerModule,
       ],
       controllers: [FmOrdersController],
-      providers: [FmOrdersService, FirstmallDbService, S3Service],
+      providers: [
+        FmOrdersService,
+        FirstmallDbService,
+        S3Service,
+        LiveShoppingService,
+        SellerProductPromotionService,
+      ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({
@@ -104,6 +119,7 @@ describe('FmOrdersController', () => {
       totalPrice: '1000',
       totalEa: 1000,
       totalType: 10,
+      sellTypes: sellTypeSample,
     };
     it('should be return 200', async () => {
       jest.spyOn(service, 'findOneOrder').mockImplementation(async (id: string) => {

@@ -5,6 +5,7 @@ import {
   FmOrderOption,
   FmOrderRefund,
   FmOrderReturn,
+  GoodsIdAndSellType,
 } from '@project-lc/shared-types';
 
 export const orderDetailOptionsSample: FmOrderOption[] = [
@@ -238,4 +239,9 @@ export const orderDetailReturnsSample: FmOrderReturn[] = [
       },
     ],
   },
+];
+
+export const sellTypeSample: GoodsIdAndSellType[] = [
+  { goodsId: 4, sellType: 'liveShopping' },
+  { goodsId: 4, sellType: 'liveShopping' },
 ];
