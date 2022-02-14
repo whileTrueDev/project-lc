@@ -1,5 +1,7 @@
-import { Badge, Box, Flex, Text } from '@chakra-ui/react';
+import { Badge, Box, Flex, Stack, Text } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
+import { useSellerSellType } from '@project-lc/hooks';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import { useMemo } from 'react';
 
@@ -21,6 +23,8 @@ export function OrderDetailGoods({
     return `${reduced.toLocaleString()} 원`;
   }, [orderItem.options]);
 
+  const sellType = useSellerSellType(orderItem.goods_seq || '');
+
   return (
     <Flex>
       {orderItem.image && (
@@ -33,19 +37,24 @@ export function OrderDetailGoods({
         />
       )}
       <Box ml={orderItem.image ? 4 : 0}>
-        <Text
-          fontWeight="bold"
-          color="blue.500"
-          textDecoration="underline"
-          cursor="pointer"
-          onClick={() =>
-            window.open(
-              `http://whiletrue.firstmall.kr/goods/view?no=${orderItem.goods_seq}`,
-            )
-          }
-        >
-          {orderItem.goods_name}
-        </Text>
+        <Stack direction="row" alignItems="center">
+          {!sellType.isLoading && sellType.data && (
+            <SellTypeBadge sellType={sellType.data} />
+          )}
+          <Text
+            fontWeight="bold"
+            color="blue.500"
+            textDecoration="underline"
+            cursor="pointer"
+            onClick={() =>
+              window.open(
+                `http://whiletrue.firstmall.kr/goods/view?no=${orderItem.goods_seq}`,
+              )
+            }
+          >
+            {orderItem.goods_name}
+          </Text>
+        </Stack>
 
         {!option ? (
           <Text>총 주문금액 {orderPrice}</Text>
