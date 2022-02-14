@@ -228,4 +228,15 @@ export class LiveShoppingService extends ServiceBaseWithCache {
     if (liveShoppingFmGoodsSeq) return true;
     return false;
   }
+
+  /** 특정 라이브 쇼핑의 현황(응원메시지 데이터) 조회 - 생성일 내림차순 조회(최신순)
+   * @param liveShoppingId 라이브쇼핑 고유id
+   */
+  /** 해당 fmGoodsSeq가 라이브쇼핑에 등록되어 있으면 true를 반환 */
+  async findLiveShoppingsByGoodsIds(fmGoodsSeqs: number[]): Promise<LiveShopping[]> {
+    const _fmGoodsSeqs = fmGoodsSeqs.map((s) => Number(s)).filter((x) => !!x);
+    return this.prisma.liveShopping.findMany({
+      where: { fmGoodsSeq: { in: _fmGoodsSeqs } },
+    });
+  }
 }
