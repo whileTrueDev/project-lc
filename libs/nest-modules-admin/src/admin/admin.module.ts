@@ -12,7 +12,7 @@ import { AdminService } from './admin.service';
 
 @Module({
   imports: [
-    forwardRef(() => SellerModule),
+    forwardRef(() => SellerModule.withoutControllers()),
     forwardRef(() => BroadcasterModule.withoutControllers()),
     OrderCancelModule,
     ProductPromotionModule,

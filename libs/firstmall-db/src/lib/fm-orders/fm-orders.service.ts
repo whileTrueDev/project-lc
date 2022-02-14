@@ -29,12 +29,17 @@ import {
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { SellType } from '@prisma/client';
+import { SellerProductPromotionService } from '@project-lc/nest-modules-seller';
+import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { StatCounter } from './utills/statCounter';
-
 @Injectable()
 export class FmOrdersService {
-  constructor(private readonly db: FirstmallDbService) {}
+  constructor(
+    private readonly db: FirstmallDbService,
+    private readonly sellerProductPromotionService: SellerProductPromotionService,
+    private readonly liveShoppingService: LiveShoppingService,
+  ) {}
 
   // * **********************************
   // * 주문 목록 조회
@@ -217,6 +222,27 @@ export class FmOrdersService {
   // * **********************************
 
   /**
+   * 상품 정보에 판매 유형 정보를 추가하는 함수
+   */
+  private async attachSellType({
+    orderItems,
+    liveShoppingIds,
+    productPromotionIds,
+  }: {
+    orderItems: FmOrderItem[];
+    liveShoppingIds: number[];
+    productPromotionIds: number[];
+  }): Promise<Array<FmOrderItem & { sellType: SellType }>> {
+    return orderItems.map((item) => {
+      const id = Number(item.goods_seq);
+      let sellType: SellType = SellType.normal;
+      if (liveShoppingIds.includes(id)) sellType = SellType.liveShopping;
+      else if (productPromotionIds.includes(id)) sellType = SellType.productPromotion;
+      return { ...item, sellType };
+    });
+  }
+
+  /**
    * 주어진 주문 번호에 해당하는 주문 정보를 불러옵니다.
    * @param orderId 주문 번호
    */
@@ -248,16 +274,33 @@ export class FmOrdersService {
     // * 판매자 상품에 기반한 주문 상태 도출
     const realStep = this.getOrderRealStep(orderInfo.step, orderGoodsOptions);
 
-    // * 배송 관련 정보 추가를 위한 정보 조회
-    const shippingResult = await this.findOneOrderShippingInfo(
-      orderId,
-      orderInfo.shipping_seq,
+    // * 판매유형(라이브쇼핑, 홍보페이지, 일반)
+    const lvs = await this.liveShoppingService.findLiveShoppingsByGoodsIds(goodsIds);
+    const pps = await this.sellerProductPromotionService.findProductPromotionsByGoodsIds(
       goodsIds,
     );
+    const liveShoppingIds = lvs.map((x) => x.fmGoodsSeq);
+    const productPromotionIds = pps.map((x) => x.fmGoodsSeq);
+
+    // * 배송 관련 정보 추가를 위한 정보 조회
+    const shippingResult = await this.findOneOrderShippingInfo({
+      orderId,
+      shipping_seq: orderInfo.shipping_seq,
+      goodsIds,
+      liveShoppingIds,
+      productPromotionIds,
+    });
     const totalShippingCost = await this.findOrderTotalShippingCost(
       orderId,
       orderInfo.shipping_seq,
     );
+
+    // 개별 주문 상품 정보 - (판매유형정보가 포함된)
+    const _orderItems = await this.attachSellType({
+      orderItems,
+      liveShoppingIds,
+      productPromotionIds,
+    });
 
     // * 주문 중, 내 상품에 대한 총 주문 금액, 총 수량, 종 종류 정보
     const totalInfo = await this.findOneOrderTotalInfoPerMyGoods(itemSeqArray.join(','));
@@ -267,7 +310,7 @@ export class FmOrdersService {
       ...totalInfo,
       totalShippingCost,
       totalDeliveryCost: totalShippingCost,
-      items: orderItems.map((item) => ({
+      items: _orderItems.map((item) => ({
         ...item,
         options: orderGoodsOptions.filter((opt) => opt.item_seq === item.item_seq),
       })),
@@ -618,11 +661,19 @@ export class FmOrdersService {
   /**
    * 개별 주문 - 배송정보 (내 상품만)
    * @param shipping_seq 41, 42, 43 과 같이 "," 로 구분된 shipping_seq 문자열 */
-  private async findOneOrderShippingInfo(
-    orderId: number | string,
-    shipping_seq: string,
-    goodsIds: number[],
-  ): Promise<FmOrderShipping[]> {
+  private async findOneOrderShippingInfo({
+    orderId,
+    shipping_seq,
+    goodsIds,
+    liveShoppingIds,
+    productPromotionIds,
+  }: {
+    orderId: number | string;
+    shipping_seq: string;
+    goodsIds: number[];
+    liveShoppingIds?: number[];
+    productPromotionIds?: number[];
+  }): Promise<FmOrderShipping[]> {
     const shippingResult: FmOrderShipping[] = await this.db.query(
       `SELECT
       shipping_seq,
@@ -658,21 +709,22 @@ export class FmOrdersService {
           [sh.shipping_seq, orderId, goodsIds],
         );
 
+        const _shippingItems = await this.attachSellType({
+          orderItems: shippingItems,
+          liveShoppingIds,
+          productPromotionIds,
+        });
         // * 해당 item의 옵션 정보 조회
         const shippingItemsWithOptions = await Promise.all(
-          shippingItems.map(async (si) => ({
+          _shippingItems.map(async (si) => ({
             ...si,
             options: await this.findOneOrderOptions([si.item_seq]),
           })),
         );
 
-        return {
-          ...sh,
-          items: shippingItemsWithOptions,
-        };
+        return { ...sh, items: shippingItemsWithOptions };
       }),
     );
-
     return result;
   }
 
