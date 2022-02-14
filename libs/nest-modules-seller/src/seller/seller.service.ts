@@ -1,20 +1,34 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  CACHE_MANAGER,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Prisma, Seller } from '@prisma/client';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminSellerListRes,
   FindSellerRes,
-  SellerContactsDTO,
   SellerContractionAgreementDto,
 } from '@project-lc/shared-types';
 import { hash, verify } from 'argon2';
+import { Cache } from 'cache-manager';
+import __multer from 'multer';
+
 @Injectable()
-export class SellerService {
+export class SellerService extends ServiceBaseWithCache {
+  #SELLER_CACHE_KEY = 'seller';
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3service: S3Service,
-  ) {}
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   /**
    * 회원 가입
@@ -28,6 +42,7 @@ export class SellerService {
         password: hashedPw,
       },
     });
+    await this._clearCaches(this.#SELLER_CACHE_KEY);
     return seller;
   }
 
@@ -153,6 +168,7 @@ export class SellerService {
       where: { email },
     });
 
+    await this._clearCaches(this.#SELLER_CACHE_KEY);
     return true;
   }
 
@@ -189,43 +205,6 @@ export class SellerService {
     return seller;
   }
 
-  /** 판매자의 기본 연락처 */
-  async findDefaultContacts(email: string): Promise<SellerContactsDTO> {
-    const userId = await this.prisma.seller.findFirst({
-      where: { email },
-      select: {
-        id: true,
-      },
-    });
-
-    const sellerDefaultContacts = await this.prisma.sellerContacts.findFirst({
-      where: { sellerId: userId.id, isDefault: true },
-      select: {
-        id: true,
-        email: true,
-        phoneNumber: true,
-        isDefault: true,
-      },
-      orderBy: {
-        createDate: 'desc',
-      },
-    });
-
-    return sellerDefaultContacts;
-  }
-
-  async registSellerContacts(sellerEmail, dto): Promise<{ contactId: number }> {
-    const contact = await this.prisma.sellerContacts.create({
-      data: {
-        seller: { connect: { email: sellerEmail } },
-        email: dto.email,
-        phoneNumber: dto.phoneNumber,
-        isDefault: dto.isDefault ? true : undefined,
-      },
-    });
-    return { contactId: contact.id };
-  }
-
   /** 셀러 아바타 이미지 url 저장 */
   public async addSellerAvatar(
     email: Seller['email'],
@@ -241,6 +220,7 @@ export class SellerService {
       where: { email },
       data: { avatar: avatarUrl },
     });
+    await this._clearCaches(this.#SELLER_CACHE_KEY);
     return true;
   }
 
@@ -250,6 +230,7 @@ export class SellerService {
       where: { email },
       data: { avatar: null },
     });
+    await this._clearCaches(this.#SELLER_CACHE_KEY);
     return true;
   }
 
@@ -267,11 +248,13 @@ export class SellerService {
   }
 
   public async updateAgreementFlag(dto: SellerContractionAgreementDto): Promise<Seller> {
-    return this.prisma.seller.update({
+    const seller = await this.prisma.seller.update({
       where: { email: dto.email },
       data: {
         agreementFlag: dto.agreementFlag,
       },
     });
+    await this._clearCaches(this.#SELLER_CACHE_KEY);
+    return seller;
   }
 }

@@ -5,10 +5,11 @@ import {
   Param,
   Post,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { SellerOrderCancelRequest } from '@prisma/client';
-import { SellerInfo, UserPayload } from '@project-lc/nest-core';
+import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
 import {
   OrderCancelRequestDetailRes,
   SellerOrderCancelRequestDto,
@@ -17,6 +18,7 @@ import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { OrderCancelService } from './order-cancel.service';
 
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(HttpCacheInterceptor)
 @Controller('order-cancel')
 export class OrderCancelController {
   constructor(private readonly orderCancelService: OrderCancelService) {}

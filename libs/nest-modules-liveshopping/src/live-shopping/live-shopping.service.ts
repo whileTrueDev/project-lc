@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { UserPayload } from '@project-lc/nest-core';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   LiveShoppingParamsDto,
@@ -10,10 +10,19 @@ import {
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
 import { LiveShopping } from '@prisma/client';
+import { Cache } from 'cache-manager';
 @Injectable()
-export class LiveShoppingService {
-  constructor(private readonly prisma: PrismaService) {}
+export class LiveShoppingService extends ServiceBaseWithCache {
+  #LIVESHOPPING_CACHE_KEY = 'live-shoppings';
 
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
+
+  /** 라이브쇼핑 생성 */
   async createLiveShopping(
     email: UserPayload['sub'],
     dto: LiveShoppingRegistDTO,
@@ -32,9 +41,11 @@ export class LiveShoppingService {
         sellerContacts: { connect: { id: dto.contactId } },
       },
     });
+    await this._clearCaches(this.#LIVESHOPPING_CACHE_KEY);
     return { liveShoppingId: liveShopping.id };
   }
 
+  /** 라이브쇼핑 삭제 */
   async deleteLiveShopping(liveShoppingId: { liveShoppingId: number }): Promise<boolean> {
     const doDelete = await this.prisma.liveShopping.delete({
       where: {
@@ -45,6 +56,7 @@ export class LiveShoppingService {
     if (!doDelete) {
       throwError('라이브 쇼핑 삭제 실패');
     }
+    await this._clearCaches(this.#LIVESHOPPING_CACHE_KEY);
     return true;
   }
 
@@ -97,7 +109,7 @@ export class LiveShoppingService {
    * @param broadcasterId
    * @returns fmGoodsSeq
    */
-  async getFmGoodsConnectionIdLinkedToLiveShoppings(
+  async getFmGoodsSeqsLinkedToLiveShoppings(
     broadcasterId: number,
   ): Promise<LiveShoppingFmGoodsSeq[]> {
     const fmGoodsSeqs = await this.prisma.liveShopping.findMany({
@@ -115,7 +127,7 @@ export class LiveShoppingService {
   async getBroadcasterRegisteredLiveShoppings(
     broadcasterId: number,
   ): Promise<LiveShopping[]> {
-    // 자신의 id를 반환하는 쿼리 수행하기
+    // 자신의 id를 반환하는 쿼리 수행하기
     return this.prisma.liveShopping.findMany({
       where: {
         broadcasterId: Number(broadcasterId),

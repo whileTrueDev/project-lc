@@ -8,7 +8,9 @@ export const getBroadcasterAccumulatedSettlementAmount = async (
 ): Promise<number> => {
   if (!broadcasterId) return 0;
   return axios
-    .get<number>(`/broadcaster/${broadcasterId}/accumulated-settlement-amount`)
+    .get<number>(
+      `/broadcaster/settlement-history/accumulated-settlement-amount/${broadcasterId}`,
+    )
     .then((res) => res.data);
 };
 

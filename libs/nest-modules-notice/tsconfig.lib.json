@@ -14,6 +14,7 @@
     "**/*.spec.ts"
   ],
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "../nest-core/@types"
   ]
 }

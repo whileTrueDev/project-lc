@@ -1,8 +1,10 @@
+import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GoodsService } from '@project-lc/nest-modules-goods';
 import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaService } from '@project-lc/prisma-orm';
+import store from 'cache-manager-ioredis';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FmGoodsController } from './fm-goods.controller';
 import { FMGoodsService } from './fm-goods.service';
@@ -12,7 +14,10 @@ describe('FmGoodsController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true })],
+      imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
+        CacheModule.register({ isGlobal: true, store }),
+      ],
       providers: [
         FMGoodsService,
         FirstmallDbService,

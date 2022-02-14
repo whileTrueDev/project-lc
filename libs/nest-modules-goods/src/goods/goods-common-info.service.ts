@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { GoodsInfo } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { GoodsInfoDto } from '@project-lc/shared-types';
@@ -7,13 +12,21 @@ import {
   getS3KeyListFromImgSrcList,
   S3Service,
 } from '@project-lc/nest-modules-s3';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
+import { Cache } from 'cache-manager';
 
 @Injectable()
-export class GoodsInfoService {
+export class GoodsCommonInfoService extends ServiceBaseWithCache {
+  #GOODS_CACHE_KEY = 'goods';
+  #GOODS_COMMON_INFO_CACHE_KEY = 'goods/common-info';
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3service: S3Service,
-  ) {}
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   /** 상품 공통정보 생성 */
   async registGoodsCommonInfo(
@@ -24,11 +37,10 @@ export class GoodsInfoService {
   }> {
     try {
       const item = await this.prisma.goodsInfo.create({
-        data: {
-          ...dto,
-          seller: { connect: { email } },
-        },
+        data: { ...dto, seller: { connect: { email } } },
       });
+      await this._clearCaches(this.#GOODS_COMMON_INFO_CACHE_KEY);
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
       return { id: item.id };
     } catch (error) {
       console.error(error);
@@ -105,11 +117,9 @@ export class GoodsInfoService {
       }
 
       // 공통정보 내 포함된 s3이미지 파일 삭제요청 필요
-      await this.prisma.goodsInfo.delete({
-        where: {
-          id,
-        },
-      });
+      await this.prisma.goodsInfo.delete({ where: { id } });
+      await this._clearCaches(this.#GOODS_COMMON_INFO_CACHE_KEY);
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
       return true;
     } catch (error) {
       console.error(error);
