@@ -18,6 +18,7 @@ import { SettlementDoneItem } from '@project-lc/hooks';
 import { convertSellTypeToString, FmOrder } from '@project-lc/shared-types';
 import { calcPgCommission } from '@project-lc/utils';
 import { useMemo } from 'react';
+import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
 import { LiveShopping, SellerSettlementItems } from '.prisma/client';
 
 export interface SettlementInfoDialogProps {
@@ -157,16 +158,13 @@ export function SettlementInfoItem({
     settlementItem.price,
   ]);
 
-  const sellType = useMemo<string>(() => {
-    return convertSellTypeToString(settlementItem.sellType);
-  }, [settlementItem.sellType]);
-
   return (
     <Grid
       key={settlementItem.id}
       my={4}
       p={2}
       borderWidth="thin"
+      borderRadius="xl"
       gridColumnGap={2}
       gridRowGap={1}
       templateColumns="1fr 2fr"
@@ -203,7 +201,9 @@ export function SettlementInfoItem({
       <GridItem>총 가격</GridItem>
       <GridItem>{settlementItem.price.toLocaleString()}</GridItem>
       <GridItem>판매 유형</GridItem>
-      <GridItem>{sellType}</GridItem>
+      <GridItem>
+        <SellTypeBadge sellType={settlementItem.sellType} />
+      </GridItem>
 
       <GridItem>전자결제수수료</GridItem>
       <GridItem>{`${pgCommission.commission.toLocaleString()} (${
