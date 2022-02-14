@@ -60,5 +60,5 @@ export class UpdateProductPromotionDto {
   /** 와일트루 수수료 */
   @IsNumber()
   @IsOptional()
-  whiletrueCommissionRate;
+  whiletrueCommissionRate?: number;
 }
