@@ -27,11 +27,11 @@ export function PromotionPageUrlCard(): JSX.Element {
   const toast = useToast();
   const { data: profileData } = useProfile();
 
-  // 오버레이 주소 10초간만 보여주기 위한 기본값
+  // 상품홍보페이지url 10초간만 보여주기 위한 기본값
   const DEFAULT_URL = '[URL복사] 버튼을 눌러주세요.';
   const [urlValue, setUrlValue] = useState<string>(DEFAULT_URL);
 
-  // 10초간 overlayUrl을 보여주는 함수
+  // 10초간 상품홍보페이지url을 보여주는 함수
   const handleShowUrl = (): void => {
     if (
       !profileData?.BroadcasterPromotionPage ||
