@@ -5,14 +5,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import store from 'cache-manager-ioredis';
-import {
-  SellerProductPromotionService,
-  SellerModule,
-} from '@project-lc/nest-modules-seller';
+import { SellerModule } from '@project-lc/nest-modules-seller';
 import {
   LiveShoppingModule,
   LiveShoppingService,
 } from '@project-lc/nest-modules-liveshopping';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { exportItemSample, exportSample } from '../../__tests__/exportSample';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FMGoodsService } from '../fm-goods/fm-goods.service';
@@ -38,7 +36,7 @@ describe('FmExportsService', () => {
         FirstmallDbService,
         FMGoodsService,
         FmOrdersService,
-        SellerProductPromotionService,
+        ProductPromotionService,
         LiveShoppingService,
       ],
     }).compile();
