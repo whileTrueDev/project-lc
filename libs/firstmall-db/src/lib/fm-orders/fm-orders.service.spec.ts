@@ -1,19 +1,17 @@
 /* eslint-disable dot-notation */
-import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaModule } from '@project-lc/prisma-orm';
-import { FindFmOrdersDto } from '@project-lc/shared-types';
 import { CacheModule } from '@nestjs/common';
-import store from 'cache-manager-ioredis';
-import {
-  SellerModule,
-  SellerProductPromotionService,
-} from '@project-lc/nest-modules-seller';
+import { ConfigModule } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import {
   LiveShoppingModule,
   LiveShoppingService,
 } from '@project-lc/nest-modules-liveshopping';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { S3Module, S3Service } from '@project-lc/nest-modules-s3';
-import { ConfigModule } from '@nestjs/config';
+import { SellerModule } from '@project-lc/nest-modules-seller';
+import { PrismaModule } from '@project-lc/prisma-orm';
+import { FindFmOrdersDto } from '@project-lc/shared-types';
+import store from 'cache-manager-ioredis';
 import {
   orderDetailExportsSample,
   orderDetailOptionsSample,
@@ -43,7 +41,7 @@ describe('FmOrdersService', () => {
       providers: [
         FirstmallDbService,
         FmOrdersService,
-        SellerProductPromotionService,
+        ProductPromotionService,
         LiveShoppingService,
         S3Service,
       ],

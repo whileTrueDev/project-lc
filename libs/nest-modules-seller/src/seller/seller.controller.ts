@@ -38,12 +38,10 @@ import {
   SignUpDto,
 } from '@project-lc/shared-types';
 import __multer from 'multer';
-import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import {
   SellerSettlementInfo,
   SellerSettlementService,
 } from './seller-settlement.service';
-import { SellerProductPromotionService } from './seller-product-promotion.service';
 import { SellerShopService } from './seller-shop.service';
 import { SellerService } from './seller.service';
 @Controller('seller')
@@ -53,8 +51,6 @@ export class SellerController {
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly sellerShopService: SellerShopService,
     private readonly mailVerificationService: MailVerificationService,
-    private readonly sellerProductPromotionService: SellerProductPromotionService,
-    private readonly liveShoppingService: LiveShoppingService,
   ) {}
 
   // * 판매자 정보 조회

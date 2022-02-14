@@ -14,10 +14,8 @@ import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import store from 'cache-manager-ioredis';
 import request from 'supertest';
-import {
-  SellerModule,
-  SellerProductPromotionService,
-} from '@project-lc/nest-modules-seller';
+import { SellerModule } from '@project-lc/nest-modules-seller';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import {
   orderDetailExportsSample,
   orderDetailItemsSample,
@@ -54,7 +52,7 @@ describe('FmOrdersController', () => {
         FirstmallDbService,
         S3Service,
         LiveShoppingService,
-        SellerProductPromotionService,
+        ProductPromotionService,
       ],
     })
       .overrideGuard(JwtAuthGuard)

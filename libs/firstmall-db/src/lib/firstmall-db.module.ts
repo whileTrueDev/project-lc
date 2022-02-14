@@ -3,6 +3,7 @@ import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { SellerModule } from '@project-lc/nest-modules-seller';
+import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { FirstmallDbService } from './firstmall-db.service';
 import { FmExportsController } from './fm-exports/fm-exports.controller';
 import { FmExportsService } from './fm-exports/fm-exports.service';
@@ -19,6 +20,7 @@ import { FmSettlementService } from './fm-settlements/fm-settlements.service';
     LiveShoppingModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
     SellerModule.withoutControllers(),
+    ProductPromotionModule,
   ],
   controllers: [
     FmOrdersController,
