@@ -403,7 +403,7 @@ export function AdminProductPromotionUpdateModal({
     let dto: UpdateProductPromotionDto = {
       ...rest,
     };
-    if (watch('fmGoodsSeq') !== fmGoodsSeq) {
+    if (fmGoodsSeq !== item.fmGoodsSeq) {
       dto = { ...dto, fmGoodsSeq };
     }
     updateRequest
