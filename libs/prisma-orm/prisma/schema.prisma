@@ -97,23 +97,25 @@ model SellerSettlements {
 
 // 정산 아이템(주문 정보)
 model SellerSettlementItems {
-  id                        Int           @id @default(autoincrement())
+  id                        Int               @id @default(autoincrement())
   itemId                    Int? // 주문상품 고유번호 (퍼스트몰 fm_order_item.item_seq)
   optionId                  Int? // 주문상품옵션 고유번호 (퍼스트몰 fm_order_item_option.option_seq)
   goods_image               String? // 상품 대표이미지 url
   goods_name                String? // 상품명
   option_title              String? // 옵션명 fm_goods_options.option_title
   option1                   String? // 옵션값 fm_goods_options.option1
-  ea                        Int           @default(0) // 수량
-  pricePerPiece             Int           @default(0) // 1개당 가격
-  price                     Int           @default(0) // 1개당 가격 * 수량
-  broadcasterCommissionRate Decimal       @default("0.00") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
-  whiletrueCommissionRate   Decimal       @default("0.00") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
-  broadcasterCommission     Int           @default(0) // 방송인 수수료 금액
-  whiletrueCommission       Int           @default(0) // 와일트루 수수료 금액
+  ea                        Int               @default(0) // 수량
+  pricePerPiece             Int               @default(0) // 1개당 가격
+  price                     Int               @default(0) // 1개당 가격 * 수량
+  broadcasterCommissionRate Decimal           @default("0.00") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
+  whiletrueCommissionRate   Decimal           @default("0.00") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
+  broadcasterCommission     Int               @default(0) // 방송인 수수료 금액
+  whiletrueCommission       Int               @default(0) // 와일트루 수수료 금액
   sellType                  SellType? // 판매 유형
   liveShoppingId            Int? // 라이브쇼핑 고유번호 (Relational)
-  liveShopping              LiveShopping? @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
+  liveShopping              LiveShopping?     @relation(fields: [liveShoppingId], references: [id], onDelete: SetNull)
+  productPromotionId        Int?
+  productPromotion          ProductPromotion? @relation(fields: [productPromotionId], references: [id], onDelete: SetNull)
 
   sellerSettlementsId Int?
   SellerSettlements   SellerSettlements? @relation(fields: [sellerSettlementsId], references: [id], onDelete: Cascade)
@@ -630,6 +632,8 @@ model ProductPromotion {
   broadcasterPromotionPageId Int
   broadcasterCommissionRate  Decimal                  @default("5") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
   whiletrueCommissionRate    Decimal                  @default("5") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
+
+  SellerSettlementItems SellerSettlementItems[]
 }
 
 // -------------------------------------------------

@@ -3,7 +3,7 @@ import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export const getSettlementHistoryYears = async (): Promise<string[]> => {
-  return axios.get<string[]>('/seller/settlement-history-years').then((res) => res.data);
+  return axios.get<string[]>('/seller/settlement-history/years').then((res) => res.data);
 };
 
 export const useSettlementHistoryYears = (): UseQueryResult<string[], AxiosError> => {
@@ -17,7 +17,7 @@ export const getSettlementHistoryMonths = async (dto: {
   year?: string;
 }): Promise<string[]> => {
   return axios
-    .get<string[]>('/seller/settlement-history-months', { params: { ...dto } })
+    .get<string[]>('/seller/settlement-history/months', { params: { ...dto } })
     .then((res) => res.data);
 };
 
@@ -38,7 +38,7 @@ export const getSettlementHistoryRounds = async (dto: {
   month?: string;
 }): Promise<string[]> => {
   return axios
-    .get<string[]>('/seller/settlement-history-rounds', { params: { ...dto } })
+    .get<string[]>('/seller/settlement-history/rounds', { params: { ...dto } })
     .then((res) => res.data);
 };
 

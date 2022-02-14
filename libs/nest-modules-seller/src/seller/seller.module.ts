@@ -4,6 +4,7 @@ import { S3Module } from '@project-lc/nest-modules-s3';
 import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { SellerContactsController } from './seller-contacts.controller';
 import { SellerContactsService } from './seller-contacts.service';
+import { SellerSettlementHistoryController } from './seller-settlement-history.controller';
 import { SellerSettlementService } from './seller-settlement.service';
 import { SellerProductPromotionService } from './seller-product-promotion.service';
 import { SellerShopService } from './seller-shop.service';
@@ -26,7 +27,11 @@ export class SellerModule {
     SellerProductPromotionService,
   ];
 
-  private static readonly controllers = [SellerController, SellerContactsController];
+  private static readonly controllers = [
+    SellerController,
+    SellerContactsController,
+    SellerSettlementHistoryController,
+  ];
 
   private static readonly imports = [
     S3Module,

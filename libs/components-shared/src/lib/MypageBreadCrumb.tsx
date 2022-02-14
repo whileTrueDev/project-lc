@@ -19,7 +19,7 @@ export function MypageBreadcrumb(): JSX.Element | null {
   const [breadcrumbs, setBreadcrumbs] = useState<BreadCrumbItem[]>();
 
   useEffect(() => {
-    const linkPath = router.asPath.split('/');
+    const linkPath = router.asPath.replace('#', '').split('/');
     linkPath.shift();
 
     const pathArray = linkPath.map((path, i) => {
