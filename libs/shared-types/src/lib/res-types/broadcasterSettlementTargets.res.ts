@@ -1,4 +1,4 @@
-import { Broadcaster, LiveShopping, ProductPromotion } from '@prisma/client';
+import { Broadcaster, LiveShopping, ProductPromotion, SellType } from '@prisma/client';
 import { FmExportItem, FmExport } from './fmExport.res';
 
 type BroadcasterInfo = Pick<
@@ -14,6 +14,7 @@ export type ExportItemWithMarketingMethod = FmExportItem & {
       broadcaster: BroadcasterInfo;
     };
   };
+  sellType: SellType;
 };
 export type BroadcasterSettlementTarget = FmExport & {
   order_user_name: string;

@@ -26,6 +26,7 @@ import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
+import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
 import {
   useBcSettlementTargets,
   useBroadcasterSettlementTotalInfo,
@@ -323,8 +324,11 @@ function BcSettlementTargetDetail({
             </GridItem>
           </Grid>
           <Box mt={4}>
-            <Text fontWeight="semibold">라이브쇼핑정보</Text>
             <Grid mt={1} templateColumns="1fr 2fr">
+              <GridTableItem
+                title="판매유형"
+                value={<SellTypeBadge sellType={item.sellType} />}
+              />
               <GridTableItem
                 title="방송인 활동명"
                 value={

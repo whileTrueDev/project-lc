@@ -15,16 +15,14 @@ import { GridCellParams, GridColumns } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import TextWithPopperButton from '@project-lc/components-core/TextWithPopperButton';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
+import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
 import { YouCanHorizontalScrollText } from '@project-lc/components-shared/YouCanHorizontalScrollText';
 import {
   useBroadcasterSettlementHistory,
   useDisplaySize,
   useProfile,
 } from '@project-lc/hooks';
-import {
-  convertSellTypeToString,
-  FindBcSettlementHistoriesRes,
-} from '@project-lc/shared-types';
+import { FindBcSettlementHistoriesRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -258,7 +256,7 @@ export function SettlementHistoryDetail({
             <GridTableItem title="정산물품 출고번호" value={item.exportCode} />
             <GridTableItem
               title="판매유형"
-              value={convertSellTypeToString(item.sellType)}
+              value={<SellTypeBadge sellType={item.sellType} />}
             />
             {item.liveShopping && renderLiveShoppingInfo(item)}
             {item.productPromotion && renderProductPromotionInfo(item)}

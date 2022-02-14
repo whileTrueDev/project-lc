@@ -62,7 +62,7 @@ export function OrderDetailGoods({
         {orderItem.sellType && (
           <Stack direction="row" align="center">
             <Text>판매유형</Text>
-            <SellTypeBadge sellType={orderItem.sellType} lineHeight="unset" />
+            <SellTypeBadge sellType={orderItem.sellType} />
           </Stack>
         )}
       </Box>

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { SellType } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BroadcasterSettlementTargetRes,
@@ -187,20 +188,25 @@ export class FmSettlementService {
 
     const result: BroadcasterSettlementTargetRes = _exports
       .map((exp) => {
-        // * 라이브쇼핑에 연결된 상품에 대한 주문인 지 확인
+        // * 라이브쇼핑 또는 상품홍보에 연결된 상품에 대한 주문인 지 확인
         const expItems = items.filter(
           (i) =>
             i.export_code === exp.export_code && fmGoodsSeq.includes(Number(i.goods_seq)),
         );
 
-        // * 라이브쇼핑 정보 첨부
+        // * 라이브쇼핑 또는 상품홍보 정보 첨부
         const realExpItems = expItems
           .map((i) => {
             const ls = liveShoppings.find((l) => l.fmGoodsSeq === Number(i.goods_seq));
             const pp = productPromotions.find(
               (p) => p.fmGoodsSeq === Number(i.goods_seq),
             );
-            return { ...i, liveShopping: ls, productPromotion: pp };
+            let sellType: SellType = SellType.normal;
+            if (liveShoppingFmGoodsSeqs.includes(Number(i.goods_seq)))
+              sellType = SellType.liveShopping;
+            else if (productPromotionsFmGoodsSeqs.includes(Number(i.goods_seq)))
+              sellType = SellType.productPromotion;
+            return { ...i, liveShopping: ls, productPromotion: pp, sellType };
           })
           .filter((i) => !!i.liveShopping || !!i.productPromotion);
 
