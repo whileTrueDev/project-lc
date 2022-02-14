@@ -38,7 +38,7 @@ import { AppService } from './app.service';
     InquiryModule,
     CipherModule,
     JwtHelperModule,
-    SellerModule.withoutControllers(),
+    SellerModule.withControllers(),
     GoodsModule.withControllers(),
     LiveShoppingModule.withControllers(),
     BroadcasterModule.withControllers(),
