@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `BroadcasterSettlementItems` ADD COLUMN `sellType` ENUM('liveShopping', 'broadcasterPromotionPage', 'normal') NULL;
+ALTER TABLE `BroadcasterSettlementItems` ADD COLUMN `sellType` ENUM('liveShopping', 'productPromotion', 'normal') NULL;
 
 -- AlterTable
-ALTER TABLE `SellerSettlementItems` ADD COLUMN `sellType` ENUM('liveShopping', 'broadcasterPromotionPage', 'normal') NULL;
+ALTER TABLE `SellerSettlementItems` ADD COLUMN `sellType` ENUM('liveShopping', 'productPromotion', 'normal') NULL;
