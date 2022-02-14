@@ -359,4 +359,33 @@ export class AdminService {
     if (result) return true;
     return false;
   }
+
+  /** 상품홍보 fmGoodsSeq 등록전 다른 곳에 등록된 fmGoodsSeq(goodsConfirmation, liveShopping) 과 중복되는지 확인
+   * @return 중복되는 경우 true, 아니면 false
+   */
+  public async checkHasDuplicateFmGoodsSeq(goodsSeq: number): Promise<boolean> {
+    // 상품검수 테이블 fmGoodsConnectionId와 중복되는 값이 있는지 확인
+    const hasDuplicatedFmGoodsConnectionId = await this.checkDupFMGoodsConnectionId(
+      goodsSeq,
+    );
+
+    if (hasDuplicatedFmGoodsConnectionId) return true;
+
+    // 라이브쇼핑 테이블 fmGoodsSeq 와 중복값이 있는지 확인
+    const duplicatedFmGoodsSeqLiveShopping = await this.prisma.liveShopping.findFirst({
+      where: { fmGoodsSeq: goodsSeq },
+    });
+
+    if (duplicatedFmGoodsSeqLiveShopping) return true;
+
+    // 상품홍보 테이블 fmGoodsSeq와 중복값 있는지 확인
+    const duplicateFmGoodsSeqProductPromotion =
+      await this.prisma.productPromotion.findFirst({
+        where: { fmGoodsSeq: goodsSeq },
+      });
+
+    if (duplicateFmGoodsSeqProductPromotion) return true;
+
+    return false;
+  }
 }

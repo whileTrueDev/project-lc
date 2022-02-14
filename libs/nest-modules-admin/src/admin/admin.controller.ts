@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   ForbiddenException,
   Get,
   Header,
@@ -18,12 +19,15 @@ import {
 import { ConfigService } from '@nestjs/config';
 import {
   Administrator,
+  BroadcasterPromotionPage,
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
+  ProductPromotion,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
+  BroadcasterPromotionPageService,
   BroadcasterService,
   BroadcasterSettlementHistoryService,
   BroadcasterSettlementService,
@@ -31,16 +35,21 @@ import {
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
 import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
 import {
+  AdminAllLcGoodsList,
   AdminBroadcasterSettlementInfoList,
   AdminSellerListRes,
   AdminSettlementInfoType,
   AdminSignUpDto,
   BroadcasterDTO,
+  BroadcasterPromotionPageDto,
+  BroadcasterPromotionPageListRes,
+  BroadcasterPromotionPageUpdateDto,
   BroadcasterSettlementInfoConfirmationDto,
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
   CreateManyBroadcasterSettlementHistoryDto,
+  CreateProductPromotionDto,
   EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
@@ -50,10 +59,14 @@ import {
   LiveShoppingDTO,
   OrderCancelRequestDetailRes,
   OrderCancelRequestList,
+  ProductPromotionListData,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
+  UpdateProductPromotionDto,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
+import { GoodsService } from '@project-lc/nest-modules-goods';
 import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
@@ -71,6 +84,9 @@ export class AdminController {
     private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
     private readonly sellerService: SellerService,
+    private readonly broadcasterPromotionPageService: BroadcasterPromotionPageService,
+    private readonly productPromotionService: ProductPromotionService,
+    private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
@@ -281,5 +297,114 @@ export class AdminController {
   @Get('/sellers')
   getSellerList(): Promise<AdminSellerListRes> {
     return this.sellerService.getSellerList();
+  }
+
+  /** ================================= */
+  // 방송인 상품홍보페이지 BroadcasterPromotionPage
+  /** ================================= */
+
+  /** 방송인 상품홍보페이지 생성 */
+  @Post('/promotion-page')
+  async createPromotionPage(
+    @Body(ValidationPipe) dto: BroadcasterPromotionPageDto,
+  ): Promise<BroadcasterPromotionPage> {
+    return this.broadcasterPromotionPageService.createPromotionPage(dto);
+  }
+
+  /** 상품홍보페이지 수정 */
+  @Patch('/promotion-page')
+  async updatePromotionPage(
+    @Body(ValidationPipe) dto: BroadcasterPromotionPageUpdateDto,
+  ): Promise<BroadcasterPromotionPage> {
+    return this.broadcasterPromotionPageService.updatePromotionPage(dto);
+  }
+
+  /** 방송인 상품홍보페이지 url 중복 확인
+   * @query url
+   * @return 중복 url이면 true, 중복이 아니면 false
+   */
+  @Get('/promotion-page/duplicate')
+  async checkPromotionPageUrlDuplicate(@Query('url') url: string): Promise<boolean> {
+    return this.broadcasterPromotionPageService.checkPromotionPageUrlDuplicate(url);
+  }
+
+  /**
+   * 방송인 상품홍보페이지 삭제
+   * @param pageId 방송인 상품홍보페이지 id
+   * @returns 삭제 성공시 true
+   */
+  @Delete('/promotion-page')
+  async deletePromotionPage(
+    @Body('pageId', ParseIntPipe) pageId: number,
+  ): Promise<boolean> {
+    return this.broadcasterPromotionPageService.deletePromotionPage(pageId);
+  }
+
+  /** 상품홍보페이지 목록 조회 */
+  @Get('/promotion-pages')
+  async getBroadcasterPromotionPageList(): Promise<BroadcasterPromotionPageListRes> {
+    return this.broadcasterPromotionPageService.getBroadcasterPromotionPageList();
+  }
+
+  /** ================================= */
+  // 상품홍보 ProductPromotion
+  /** ================================= */
+
+  /** 상품홍보 생성(특정 상품홍보 페이지에 상품홍보 등록) */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('/product-promotion')
+  async createProductPromotion(
+    @Body(ValidationPipe) dto: CreateProductPromotionDto,
+  ): Promise<ProductPromotion> {
+    return this.productPromotionService.createProductPromotion(dto);
+  }
+
+  /** 전체 상품목록 조회
+   * - 상품홍보에 연결하기 위한 상품(project-lc goods) 전체목록. 검수완료 & 정상판매중 일 것
+   * goodsConfirmation.status === confirmed && goods.status === normal
+   * goodsId, goodsName, sellerId, sellerEmail
+   * */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('confirmed-goods-list')
+  async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
+    return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
+  }
+
+  /** 상품홍보에 입력할 fmGoodsSeq가 다른 상품에 연결된 fmGoodsSeq와 중복인지 확인 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('product-promotion/duplicate')
+  async checkHasDuplicateFmGoodsSeq(
+    @Query('fmGoodsSeq', ParseIntPipe) fmGoodsSeq: number,
+  ): Promise<boolean> {
+    return this.adminService.checkHasDuplicateFmGoodsSeq(fmGoodsSeq);
+  }
+
+  /** 상품홍보 수정 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch('product-promotion')
+  async updateProductPromotion(
+    @Body(ValidationPipe) dto: UpdateProductPromotionDto,
+  ): Promise<ProductPromotion> {
+    return this.productPromotionService.updateProductPromotion(dto);
+  }
+
+  /** 상품홍보 삭제 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Delete('product-promotion')
+  async deleteProductPromotion(
+    @Body('promotionId', ParseIntPipe) promotionId: number,
+  ): Promise<boolean> {
+    return this.productPromotionService.deleteProductPromotion(promotionId);
+  }
+
+  /** 특정 방송인홍보페이지에 등록된 상품홍보목록 조회 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('/product-promotion-list')
+  async findProductPromotionListByPromotionPageId(
+    @Query('promotionPageId', ParseIntPipe) promotionPageId: number,
+  ): Promise<ProductPromotionListData> {
+    return this.productPromotionService.findProductPromotionListByPromotionPageId(
+      promotionPageId,
+    );
   }
 }

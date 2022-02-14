@@ -32,6 +32,23 @@ import { AxiosError } from 'axios';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 
+export function FmGoodsSeqInputHelpText(): JSX.Element {
+  return (
+    <>
+      퍼스트몰에 등록한 상품의 고유번호를
+      입력하세요.(http://whiletrue.firstmall.kr/goods/view?no=
+      <Text as="span" color="red">
+        41
+      </Text>
+      의&nbsp;
+      <Text as="span" color="red">
+        41
+      </Text>
+      을 입력)
+    </>
+  );
+}
+
 // 검수 승인시에 필요한 최소한의 데이터
 export type GoodRowType = {
   id: number;
@@ -130,16 +147,7 @@ export function AdminGoodsConfirmationDialog(
           <FormControl isInvalid={!!errors.firstmallGoodsConnectionId} m={2} mt={6}>
             <FormLabel fontSize="md">상품 ID</FormLabel>
             <FormHelperText>
-              퍼스트몰에 등록한 상품의 고유번호를
-              입력하세요.(http://whiletrue.firstmall.kr/goods/view?no=
-              <Text as="span" color="red">
-                41
-              </Text>
-              의&nbsp;
-              <Text as="span" color="red">
-                41
-              </Text>
-              을 입력)
+              <FmGoodsSeqInputHelpText />
             </FormHelperText>
             <Input
               id="firstmallGoodsConnectionId"

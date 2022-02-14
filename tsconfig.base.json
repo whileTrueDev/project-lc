@@ -53,6 +53,9 @@
       "@project-lc/nest-modules-overlay-controller": [
         "libs/nest-modules-overlay-controller/src/index.ts"
       ],
+      "@project-lc/nest-modules-product-promotion": [
+        "libs/nest-modules-product-promotion/src/index.ts"
+      ],
       "@project-lc/nest-modules-s3": ["libs/nest-modules-s3/src/index.ts"],
       "@project-lc/nest-modules-seller": ["libs/nest-modules-seller/src/index.ts"],
       "@project-lc/nest-modules-shipping-group": [

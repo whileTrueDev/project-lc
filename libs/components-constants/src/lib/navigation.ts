@@ -210,6 +210,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     children: [
       { name: '정산정보 검수', href: '/broadcaster/settlement-info', icon: FcInspection },
       { name: '정산', href: '/broadcaster/settlement', icon: FcMoneyTransfer },
+      {
+        name: '상품 홍보 페이지',
+        href: '/broadcaster/promotion-page',
+        icon: FcList,
+      },
     ],
   },
   {
