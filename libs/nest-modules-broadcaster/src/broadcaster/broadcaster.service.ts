@@ -6,7 +6,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Broadcaster, BroadcasterAddress, Prisma } from '@prisma/client';
+import {
+  Broadcaster,
+  BroadcasterAddress,
+  BroadcasterPromotionPage,
+  Prisma,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BroadcasterAddressDto,
@@ -56,6 +61,7 @@ export class BroadcasterService extends ServiceBaseWithCache {
         id: true,
         email: true,
         userNickname: true,
+        BroadcasterPromotionPage: true,
       },
     });
   }
@@ -83,11 +89,16 @@ export class BroadcasterService extends ServiceBaseWithCache {
   /**
    * 유저 정보 조회
    */
-  async findOne(findInput: Prisma.BroadcasterWhereUniqueInput): Promise<Broadcaster> {
+  async findOne(
+    findInput: Prisma.BroadcasterWhereUniqueInput,
+  ): Promise<Broadcaster & { broadcasterPromotionPage?: BroadcasterPromotionPage }> {
     const broadcaster = await this.prisma.broadcaster.findUnique({
       where: findInput,
+      include: { BroadcasterPromotionPage: true },
     });
-    return broadcaster;
+    const { BroadcasterPromotionPage: broadcasterPromotionPage, ...broadcasterData } =
+      broadcaster;
+    return { ...broadcasterData, broadcasterPromotionPage };
   }
 
   /** 방송인 회원가입 서비스 핸들러 */
