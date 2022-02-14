@@ -1,8 +1,14 @@
 import { MailerModule } from '@nestjs-modules/mailer';
-import { CacheModule, Module } from '@nestjs/common';
+import {
+  CacheModule,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { FirstmallDbModule } from '@project-lc/firstmall-db';
-import { CacheConfig, mailerConfig } from '@project-lc/nest-core';
+import { CacheConfig, CsrfTokenMiddleware, mailerConfig } from '@project-lc/nest-core';
 import { AdminModule } from '@project-lc/nest-modules-admin';
 import { AuthModule, SocialModule } from '@project-lc/nest-modules-auth';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
@@ -38,7 +44,7 @@ import { AppService } from './app.service';
     InquiryModule,
     CipherModule,
     JwtHelperModule,
-    SellerModule,
+    SellerModule.withControllers(),
     GoodsModule.withControllers(),
     LiveShoppingModule.withControllers(),
     BroadcasterModule.withControllers(),
@@ -46,4 +52,10 @@ import { AppService } from './app.service';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer
+      .apply(CsrfTokenMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+}

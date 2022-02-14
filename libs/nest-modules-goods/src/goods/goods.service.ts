@@ -10,6 +10,7 @@ import { GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminAllLcGoodsList,
   ApprovedGoodsNameAndId,
   getLiveShoppingProgress,
   GoodsByIdRes,
@@ -72,14 +73,19 @@ export class GoodsService extends ServiceBaseWithCache {
             fmGoodsSeq: true,
           },
         },
+        productPromotion: {
+          select: { fmGoodsSeq: true },
+        },
       },
     });
 
     const allMyGoodsIds = goodsIds.reduce((prev, goods) => {
       const lsGoodsIds = goods.LiveShopping.map((l) => l.fmGoodsSeq);
+      const productPromotionGoodsIds = goods.productPromotion.map((p) => p.fmGoodsSeq);
       return prev
         .concat(goods.confirmation.firstmallGoodsConnectionId)
-        .concat(lsGoodsIds);
+        .concat(lsGoodsIds)
+        .concat(productPromotionGoodsIds);
     }, []);
 
     return [...new Set(allMyGoodsIds)];
@@ -660,5 +666,28 @@ export class GoodsService extends ServiceBaseWithCache {
       return flattenResult;
     });
     return result;
+  }
+
+  /** 전체 상품목록 조회 -
+   * 관리자에서 상품홍보에 연결하기 위한 상품(project-lc goods) 전체목록. 검수완료 & 정상판매중 일 것
+   * goodsConfirmation.status === confirmed && goods.status === normal
+   * goodsId, goodsName, sellerId, sellerEmail
+   * */
+  public async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
+    return this.prisma.goods.findMany({
+      where: {
+        goods_status: 'normal',
+        AND: {
+          confirmation: {
+            status: 'confirmed',
+          },
+        },
+      },
+      select: {
+        id: true,
+        goods_name: true,
+        seller: { select: { id: true, email: true } },
+      },
+    });
   }
 }

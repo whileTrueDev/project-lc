@@ -6,6 +6,7 @@ import {
   SellCommission,
   SellerBusinessRegistration,
   SellerSettlementAccount,
+  SellType,
 } from '@prisma/client';
 import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -272,10 +273,10 @@ export class SellerSettlementService extends ServiceBaseWithCache {
             const productPromotion =
               opt.productPromotion.length > 0 ? opt.productPromotion[0] : null;
             const sellType = liveShopping
-              ? 'liveShopping'
+              ? SellType.liveShopping
               : productPromotion
-              ? 'broadcasterPromotionPage'
-              : 'normal';
+              ? SellType.productPromotion
+              : SellType.normal;
             // 수수료율 정보
             const wtCommissionRate = liveShopping
               ? liveShopping.whiletrueCommissionRate
