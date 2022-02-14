@@ -65,7 +65,7 @@ export class HttpCacheInterceptor extends CacheInterceptor {
     };
     try {
       const value = await this.cacheManager.get(key);
-      if (isNil(value)) return of(value);
+      if (!isNil(value)) return of(value);
 
       const ttl =
         typeof ttlValueOrFactory === 'function'
