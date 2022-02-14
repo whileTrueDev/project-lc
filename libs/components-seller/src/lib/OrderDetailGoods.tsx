@@ -1,5 +1,7 @@
-import { Badge, Box, Flex, Text } from '@chakra-ui/react';
+import { Badge, Box, Flex, Stack, Text } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
+import { useSellerSellType } from '@project-lc/hooks';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import { useMemo } from 'react';
 
@@ -20,6 +22,8 @@ export function OrderDetailGoods({
     );
     return `${reduced.toLocaleString()} 원`;
   }, [orderItem.options]);
+
+  const sellType = useSellerSellType(orderItem.goods_seq || '');
 
   return (
     <Flex>
@@ -56,6 +60,13 @@ export function OrderDetailGoods({
               {option.title} {option.value}
             </Text>
           </Text>
+        )}
+
+        {!sellType.isLoading && sellType.data && (
+          <Stack direction="row" align="center">
+            <Text>판매유형</Text>
+            <SellTypeBadge sellType={sellType.data} lineHeight="unset" />
+          </Stack>
         )}
       </Box>
     </Flex>
