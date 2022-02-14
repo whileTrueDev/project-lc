@@ -16,6 +16,10 @@ export class SellerProductPromotionService {
     return false;
   }
 
+  /**
+   * 전달받은 fmGoodsSeq 배열에 해당하는 '상품홍보' 목록 조회
+   * @param fmGoodsSeqs 퍼스트몰 상품 고유번호 fmGoodsSeq 배열 (productPromotion.fmGoodsSeq)
+   */
   public async findProductPromotionsByGoodsIds(
     fmGoodsSeqs: number[],
   ): Promise<ProductPromotion[]> {
