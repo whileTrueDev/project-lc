@@ -1,7 +1,7 @@
-import { Stack, Center, Divider, VStack, Text } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { Center, Divider, Stack, Text, VStack } from '@chakra-ui/react';
 import { guideConditionStore } from '@project-lc/stores';
-import { UrlCard } from './OverlayUrlCard';
+import { useEffect } from 'react';
+import { OverlayUrlCard } from './OverlayUrlCard';
 
 export function OverayUrlSection(): JSX.Element {
   const { completeStep } = guideConditionStore();
@@ -21,7 +21,7 @@ export function OverayUrlSection(): JSX.Element {
       </Center>
       <Center>
         <VStack spacing={7} w={['6xl', 'xl']}>
-          <UrlCard />
+          <OverlayUrlCard />
         </VStack>
       </Center>
       <Center>

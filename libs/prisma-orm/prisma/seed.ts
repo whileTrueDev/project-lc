@@ -187,9 +187,9 @@ async function main(): Promise<void> {
   await createDummyLiveShopping(seller, testbroadcaster, goods4);
 
   // 더미 상품홍보페이지 생성
-  const promotionPage = await createBroadcasterPromotionPage(1);
+  const promotionPage = await createBroadcasterPromotionPage(testbroadcaster.id);
   // 더미 상품홍보 아이템 생성
-  await createProductPromotion(promotionPage.id, 4);
+  await createProductPromotion(promotionPage.id, goods4.id);
 }
 
 main()
