@@ -20,6 +20,6 @@ import { SellerService } from './seller.service';
     SellerProductPromotionService,
     SellerContactsService,
   ],
-  exports: [SellerService, SellerSettlementService],
+  exports: [SellerService, SellerSettlementService, SellerProductPromotionService],
 })
 export class SellerModule {}

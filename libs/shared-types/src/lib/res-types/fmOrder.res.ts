@@ -1,3 +1,4 @@
+import { SellType } from '@prisma/client';
 import { fmOrderStatuses } from '../constants/fmOrderStatuses';
 import { FmExport } from './fmExport.res';
 
@@ -1031,4 +1032,11 @@ export type FindFmOrderDetailRes = FmOrderMetaInfo & {
   totalEa: number;
   /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 종류 수 */
   totalType: number;
+  /** 이 주문에 포함된 상품들의 판매유형 */
+  sellTypes: GoodsIdAndSellType[];
 };
+
+export interface GoodsIdAndSellType {
+  goodsId: number;
+  sellType: SellType;
+}

@@ -26,15 +26,21 @@ import {
   LiveShoppingFmGoodsSeq,
   LiveShoppingWithSales,
   OrderStatsRes,
+  GoodsIdAndSellType,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { SellType } from '@prisma/client';
+import { SellerProductPromotionService } from '@project-lc/nest-modules-seller';
+import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { StatCounter } from './utills/statCounter';
-
 @Injectable()
 export class FmOrdersService {
-  constructor(private readonly db: FirstmallDbService) {}
+  constructor(
+    private readonly db: FirstmallDbService,
+    private readonly sellerProductPromotionService: SellerProductPromotionService,
+    private readonly liveShoppingService: LiveShoppingService,
+  ) {}
 
   // * **********************************
   // * 주문 목록 조회
@@ -217,6 +223,28 @@ export class FmOrdersService {
   // * **********************************
 
   /**
+   * 주어진 상품번호에 해당하는 판매유형을 리턴합니다
+   * @param goodsid
+   */
+
+  private async getSellType(orderItems): Promise<GoodsIdAndSellType[]> {
+    return Promise.all(
+      orderItems.map(async (item) => {
+        const isProductPromotion =
+          await this.sellerProductPromotionService.checkIsPromotionProductFmGoodsSeq(
+            item.goods_seq,
+          );
+        if (isProductPromotion)
+          return { goodsId: item.goods_seq, sellType: 'broadcasterPromotionPage' };
+        const isLiveShopping =
+          await this.liveShoppingService.checkIsLiveShoppingFmGoodsSeq(item.goods_seq);
+        if (isLiveShopping) return { goodsId: item.goods_seq, sellType: 'liveShopping' };
+        return { goodsId: item.goods_seq, sellType: 'normal' };
+      }),
+    );
+  }
+
+  /**
    * 주어진 주문 번호에 해당하는 주문 정보를 불러옵니다.
    * @param orderId 주문 번호
    */
@@ -231,7 +259,8 @@ export class FmOrdersService {
     // * 주문 상품
     const orderItems = await this.findOneOrderItems(orderId, goodsIds);
     if (orderItems.length === 0) return null;
-
+    // * 판매유형(라이브쇼핑, 홍보페이지, 일반)
+    const sellTypes = await this.getSellType(orderItems);
     // * 개별 주문 상품 - 상품 옵션 목록 정보
     const itemSeqArray = orderItems.map((x) => x.item_seq);
     const orderGoodsOptions = await this.findOneOrderOptions(itemSeqArray);
@@ -271,6 +300,7 @@ export class FmOrdersService {
         ...item,
         options: orderGoodsOptions.filter((opt) => opt.item_seq === item.item_seq),
       })),
+      sellTypes,
       exports: orderExports,
       refunds: orderRefunds,
       returns: orderReturns,
