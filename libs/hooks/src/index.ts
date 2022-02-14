@@ -96,7 +96,6 @@ export * from './lib/queries/useNotifications';
 export * from './lib/queries/useProfile';
 export * from './lib/queries/usePurchaseMessages';
 export * from './lib/queries/useSellCommission';
-export * from './lib/queries/useSellerFmGoodsSeqSellType';
 export * from './lib/queries/useSellerGoodsList';
 export * from './lib/queries/useSellerOrderCancelRequest';
 export * from './lib/queries/useSettlementHistory';

@@ -28,7 +28,6 @@ import { OrderDetailSummary } from '@project-lc/components-seller/OrderDetailSum
 import { OrderDetailTitle } from '@project-lc/components-seller/OrderDetailTitle';
 import { OrderRefundExistsAlert } from '@project-lc/components-seller/OrderRefundExistsAlert';
 import { OrderReturnExistsAlert } from '@project-lc/components-seller/OrderReturnExistsAlert';
-import { SellTypeBadge } from '@project-lc/components-shared/SellTypeBadge';
 import {
   useDisplaySize,
   useFmOrder,

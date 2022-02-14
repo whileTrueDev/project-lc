@@ -20,7 +20,6 @@ import {
   Seller,
   SellerSettlementAccount,
   SellerSettlements,
-  SellType,
 } from '@prisma/client';
 import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
@@ -269,20 +268,5 @@ export class SellerController {
     @Body(ValidationPipe) dto: SellerContractionAgreementDto,
   ): Promise<Seller> {
     return this.sellerService.updateAgreementFlag(dto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('selltype')
-  async getFmGoodsSeq(@Query('fmGoodsSeq') fmGoodsSeq: number): Promise<SellType> {
-    const isProductionPromotion =
-      await this.sellerProductPromotionService.checkIsPromotionProductFmGoodsSeq(
-        fmGoodsSeq,
-      );
-    if (isProductionPromotion) return 'broadcasterPromotionPage';
-    const isLiveShopping = await this.liveShoppingService.checkIsLiveShoppingFmGoodsSeq(
-      fmGoodsSeq,
-    );
-    if (isLiveShopping) return 'liveShopping';
-    return 'normal';
   }
 }
