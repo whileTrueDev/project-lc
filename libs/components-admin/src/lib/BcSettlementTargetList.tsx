@@ -39,7 +39,6 @@ import {
 } from '@project-lc/shared-types';
 import { settlementHistoryStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
-import { join } from 'path';
 import { useCallback, useMemo, useState } from 'react';
 
 export function calcSettleAmount(
