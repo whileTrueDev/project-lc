@@ -31,7 +31,7 @@ describe('FmExportsService', () => {
         PrismaModule,
         CacheModule.register({ isGlobal: true, store }),
         ConfigModule.forRoot({ isGlobal: true }),
-        SellerModule,
+        SellerModule.withoutControllers(),
       ],
       providers: [
         FmExportsService,

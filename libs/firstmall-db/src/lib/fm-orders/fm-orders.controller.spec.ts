@@ -47,7 +47,7 @@ describe('FmOrdersController', () => {
         BroadcasterModule.withoutControllers(),
         ConfigModule.forRoot({ isGlobal: true }),
         CacheModule.register({ isGlobal: true, store }),
-        SellerModule,
+        SellerModule.withoutControllers(),
       ],
       controllers: [FmOrdersController],
       providers: [

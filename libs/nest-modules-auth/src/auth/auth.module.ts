@@ -13,7 +13,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 @Global()
 @Module({
   imports: [
-    SellerModule,
+    SellerModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
     AdminModule,
     PassportModule,

@@ -18,7 +18,7 @@ import { FmSettlementService } from './fm-settlements/fm-settlements.service';
     GoodsModule.withoutControllers(),
     LiveShoppingModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
-    SellerModule,
+    SellerModule.withoutControllers(),
   ],
   controllers: [
     FmOrdersController,
