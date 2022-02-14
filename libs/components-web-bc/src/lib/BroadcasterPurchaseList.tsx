@@ -25,7 +25,7 @@ const columns: GridColumns = [
     headerName: '판매유형',
     width: 120,
     renderCell: ({ row }: GridRowData) => {
-      return <SellTypeBadge sellType={row.sellType as SellType} />;
+      return <SellTypeBadge sellType={row.sellType as SellType} lineHeight={2} />;
     },
   },
   {

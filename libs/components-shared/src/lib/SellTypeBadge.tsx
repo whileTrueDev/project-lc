@@ -2,14 +2,11 @@ import { Badge, BadgeProps, Box } from '@chakra-ui/react';
 import { SellType } from '@prisma/client';
 
 interface SellTypeBadgeProps {
-  sellType: SellType;
+  sellType: SellType | null;
   lineHeight?: BadgeProps['lineHeight'];
 }
 
-export function SellTypeBadge({
-  sellType,
-  lineHeight = 2,
-}: SellTypeBadgeProps): JSX.Element {
+export function SellTypeBadge({ sellType, lineHeight }: SellTypeBadgeProps): JSX.Element {
   switch (sellType) {
     case 'liveShopping':
       return (
@@ -24,13 +21,13 @@ export function SellTypeBadge({
         </Box>
       );
     case 'normal':
+    default:
       return (
         <Box lineHeight={lineHeight}>
           <Badge colorScheme="gray">일반판매</Badge>
         </Box>
       );
-    default:
-      return <></>;
   }
 }
+
 export default SellTypeBadge;

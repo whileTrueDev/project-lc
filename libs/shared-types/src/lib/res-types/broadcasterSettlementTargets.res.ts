@@ -1,18 +1,25 @@
-import { Broadcaster, LiveShopping } from '@prisma/client';
+import { Broadcaster, LiveShopping, ProductPromotion, SellType } from '@prisma/client';
 import { FmExportItem, FmExport } from './fmExport.res';
 
-export type ExportItemWithLiveShopping = FmExportItem & {
-  liveShopping: LiveShopping & {
-    broadcaster: Pick<
-      Broadcaster,
-      'email' | 'id' | 'userName' | 'userNickname' | 'avatar' | 'agreementFlag'
-    >;
+type BroadcasterInfo = Pick<
+  Broadcaster,
+  'email' | 'id' | 'userName' | 'userNickname' | 'avatar' | 'agreementFlag'
+>;
+export type ExportItemWithMarketingMethod = FmExportItem & {
+  liveShopping?: LiveShopping & {
+    broadcaster: BroadcasterInfo;
   };
+  productPromotion?: ProductPromotion & {
+    broadcasterPromotionPage: {
+      broadcaster: BroadcasterInfo;
+    };
+  };
+  sellType: SellType;
 };
 export type BroadcasterSettlementTarget = FmExport & {
   order_user_name: string;
   recipient_user_name: string;
 } & {
-  items: ExportItemWithLiveShopping[];
+  items: ExportItemWithMarketingMethod[];
 };
 export type BroadcasterSettlementTargetRes = Array<BroadcasterSettlementTarget>;

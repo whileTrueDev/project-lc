@@ -15,6 +15,7 @@ import { GridCellParams, GridColumns } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import TextWithPopperButton from '@project-lc/components-core/TextWithPopperButton';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
+import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
 import { YouCanHorizontalScrollText } from '@project-lc/components-shared/YouCanHorizontalScrollText';
 import {
   useBroadcasterSettlementHistory,
@@ -23,7 +24,7 @@ import {
 } from '@project-lc/hooks';
 import { FindBcSettlementHistoriesRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 /** 방송인 별 정산 완료 목록 */
 export function BcSettlementHistoryBox(): JSX.Element {
@@ -184,6 +185,55 @@ export function SettlementHistoryDetail({
     ],
     [data.date, data.round, totalAmount],
   );
+
+  // * 라이브쇼핑 정보 렌더 함수
+  type settlementItemType =
+    FindBcSettlementHistoriesRes[number]['broadcasterSettlementItems'][number];
+  const renderLiveShoppingInfo = useCallback(
+    (item: settlementItemType) => (
+      <>
+        <GridTableItem title="라이브쇼핑 고유번호" value={item.liveShopping.id} />
+        <GridTableItem
+          title="판매기간"
+          value={
+            <Box>
+              <Text>
+                {dayjs(item.liveShopping.sellStartDate).format('YYYY/MM/DD HH시 mm분')}{' '}
+                부터
+              </Text>
+              <Text>
+                {dayjs(item.liveShopping.sellEndDate).format('YYYY/MM/DD HH시 mm분')} 까지
+              </Text>
+            </Box>
+          }
+        />
+        <GridTableItem
+          title="정산액 및 수수료율"
+          value={`${Number(
+            item.amount,
+          ).toLocaleString()}원 (${item.liveShopping.broadcasterCommissionRate.toString()}%)`}
+        />
+      </>
+    ),
+    [],
+  );
+
+  // * 상품홍보 정보 렌더 함수
+  const renderProductPromotionInfo = useCallback(
+    (item: settlementItemType) => (
+      <>
+        <GridTableItem title="상품홍보 고유번호" value={item.productPromotion.id} />
+        <GridTableItem
+          title="정산액 및 수수료율"
+          value={`${Number(
+            item.amount,
+          ).toLocaleString()}원 (${item.productPromotion.broadcasterCommissionRate.toString()}%)`}
+        />
+      </>
+    ),
+    [],
+  );
+
   return (
     <Stack spacing={4} textAlign={{ base: 'center', sm: 'unset' }}>
       <Heading as="h6" fontSize="large">
@@ -203,31 +253,13 @@ export function SettlementHistoryDetail({
         <Box key={item.id} borderWidth="thin" borderRadius="md" p={{ base: 1, sm: 2 }}>
           <Grid mt={1} templateColumns="1fr 2fr">
             <GridTableItem title="정산번호" value={item.id} />
-            <GridTableItem title="라이브쇼핑 고유번호" value={item.liveShopping.id} />
             <GridTableItem title="정산물품 출고번호" value={item.exportCode} />
             <GridTableItem
-              title="판매기간"
-              value={
-                <Box>
-                  <Text>
-                    {dayjs(item.liveShopping.sellStartDate).format(
-                      'YYYY/MM/DD HH시 mm분',
-                    )}{' '}
-                    부터
-                  </Text>
-                  <Text>
-                    {dayjs(item.liveShopping.sellEndDate).format('YYYY/MM/DD HH시 mm분')}{' '}
-                    까지
-                  </Text>
-                </Box>
-              }
+              title="판매유형"
+              value={<SellTypeBadge sellType={item.sellType} />}
             />
-            <GridTableItem
-              title="정산액 및 수수료율"
-              value={`${Number(
-                item.amount,
-              ).toLocaleString()}원 (${item.liveShopping.broadcasterCommissionRate.toString()}%)`}
-            />
+            {item.liveShopping && renderLiveShoppingInfo(item)}
+            {item.productPromotion && renderProductPromotionInfo(item)}
           </Grid>
         </Box>
       ))}

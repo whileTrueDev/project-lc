@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { SellType } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BroadcasterSettlementTargetRes,
@@ -134,25 +135,37 @@ export class FmSettlementService {
     });
     const alreadySettledExportCodes = alreadySettled.map((s) => s.exportCode);
 
+    const bc = {
+      select: {
+        email: true,
+        id: true,
+        userName: true,
+        userNickname: true,
+        avatar: true,
+        agreementFlag: true,
+      },
+    };
     // * 라이브쇼핑 정보와 그것에 연결된 fm_goods 정보 조회
     const liveShoppings = await this.prisma.liveShopping.findMany({
       where: broadcasterId
         ? { progress: 'confirmed', broadcasterId }
         : { progress: 'confirmed', NOT: { broadcasterId: null } },
-      include: {
-        broadcaster: {
-          select: {
-            email: true,
-            id: true,
-            userName: true,
-            userNickname: true,
-            avatar: true,
-            agreementFlag: true,
-          },
-        },
-      },
+      include: { broadcaster: bc },
     });
     const liveShoppingFmGoodsSeqs = liveShoppings.map((x) => x.fmGoodsSeq);
+
+    // * 상품 홍보 정보와 그것에 연결된 fm_goods 정보 조회
+    const productPromotions = await this.prisma.productPromotion.findMany({
+      where: { broadcasterPromotionPage: { broadcasterId } },
+      include: {
+        broadcasterPromotionPage: { select: { broadcaster: bc } },
+      },
+    });
+    const productPromotionsFmGoodsSeqs = productPromotions.map((x) => x.fmGoodsSeq);
+
+    const fmGoodsSeq = Array.from(
+      new Set(productPromotionsFmGoodsSeqs.concat(liveShoppingFmGoodsSeqs)),
+    );
 
     // * 정산 완료되지 않은, 구매완료상태의 출고 내역 조회
     const sql = `
@@ -175,23 +188,30 @@ export class FmSettlementService {
 
     const result: BroadcasterSettlementTargetRes = _exports
       .map((exp) => {
-        // * 라이브쇼핑에 연결된 상품에 대한 주문인 지 확인
-        const expItems = items.filter((i) => {
-          return (
-            i.export_code === exp.export_code &&
-            liveShoppingFmGoodsSeqs.includes(Number(i.goods_seq))
-          );
-        });
+        // * 라이브쇼핑 또는 상품홍보에 연결된 상품에 대한 주문인 지 확인
+        const expItems = items.filter(
+          (i) =>
+            i.export_code === exp.export_code && fmGoodsSeq.includes(Number(i.goods_seq)),
+        );
 
-        // * 라이브쇼핑 정보 첨부
+        // * 라이브쇼핑 또는 상품홍보 정보 첨부
         const realExpItems = expItems
           .map((i) => {
             const ls = liveShoppings.find((l) => l.fmGoodsSeq === Number(i.goods_seq));
-            return { ...i, liveShopping: ls };
+            const pp = productPromotions.find(
+              (p) => p.fmGoodsSeq === Number(i.goods_seq),
+            );
+            let sellType: SellType = SellType.normal;
+            if (liveShoppingFmGoodsSeqs.includes(Number(i.goods_seq)))
+              sellType = SellType.liveShopping;
+            else if (productPromotionsFmGoodsSeqs.includes(Number(i.goods_seq)))
+              sellType = SellType.productPromotion;
+            return { ...i, liveShopping: ls, productPromotion: pp, sellType };
           })
-          .filter((i) => !!i.liveShopping);
+          .filter((i) => !!i.liveShopping || !!i.productPromotion);
 
         if (realExpItems.length === 0) return null;
+
         return { ...exp, items: realExpItems };
       })
       .filter((x) => !!x);
