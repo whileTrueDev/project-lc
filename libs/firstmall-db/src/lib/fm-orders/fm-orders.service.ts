@@ -237,7 +237,7 @@ export class FmOrdersService {
       const id = Number(item.goods_seq);
       let sellType: SellType = SellType.normal;
       if (liveShoppingIds.includes(id)) sellType = SellType.liveShopping;
-      else if (productPromotionIds.includes(id)) sellType = SellType.broadcasterPromotion;
+      else if (productPromotionIds.includes(id)) sellType = SellType.productPromotion;
       return { ...item, sellType };
     });
   }

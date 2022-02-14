@@ -24,7 +24,6 @@ import {
   orderDetailRefundsSample,
   orderDetailReturnsSample,
   orderMetaInfoSample,
-  sellTypeSample,
 } from '../../__tests__/orderDetailSample';
 import { ordersSample } from '../../__tests__/ordersSample';
 import { FirstmallDbService } from '../firstmall-db.service';
@@ -119,7 +118,6 @@ describe('FmOrdersController', () => {
       totalPrice: '1000',
       totalEa: 1000,
       totalType: 10,
-      sellTypes: sellTypeSample,
     };
     it('should be return 200', async () => {
       jest.spyOn(service, 'findOneOrder').mockImplementation(async (id: string) => {
