@@ -228,4 +228,15 @@ export class LiveShoppingService extends ServiceBaseWithCache {
     if (liveShoppingFmGoodsSeq) return true;
     return false;
   }
+
+  /**
+   * 전달된 fmGoodsSeq 배열에 해당하는 라이브쇼핑 목록 정보 조회
+   * @param fmGoodsSeqs 퍼스트몰 상품 고유번호 fmGoodsSeq 배열 (liveShopping.fmGoodsSeq)
+   */
+  async findLiveShoppingsByGoodsIds(fmGoodsSeqs: number[]): Promise<LiveShopping[]> {
+    const _fmGoodsSeqs = fmGoodsSeqs.map((s) => Number(s)).filter((x) => !!x);
+    return this.prisma.liveShopping.findMany({
+      where: { fmGoodsSeq: { in: _fmGoodsSeqs } },
+    });
+  }
 }

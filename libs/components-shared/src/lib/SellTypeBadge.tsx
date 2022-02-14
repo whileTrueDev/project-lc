@@ -17,7 +17,7 @@ export function SellTypeBadge({
           <Badge colorScheme="green">라이브쇼핑</Badge>
         </Box>
       );
-    case 'broadcasterPromotionPage':
+    case 'productPromotion':
       return (
         <Box lineHeight={lineHeight}>
           <Badge colorScheme="red">상품홍보</Badge>

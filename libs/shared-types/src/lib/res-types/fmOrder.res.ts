@@ -778,7 +778,7 @@ export interface FmOrderShipping {
   /** 배송그룹 */
   shipping_group: string;
   /** 이 배송방법으로 주문된 상품 목록 */
-  items: Array<FmOrderItem & { options: FmOrderOption[] }>;
+  items: Array<FmOrderItem & { options: FmOrderOption[]; sellType: SellType }>;
 }
 
 /** 주문 상세 정보 (메타정보) */
@@ -1022,7 +1022,7 @@ export type FmOrderReturn = FmOrderReturnBase & {
  * 상품 상세 정보 반환 데이터 타입
  */
 export type FindFmOrderDetailRes = FmOrderMetaInfo & {
-  items: Array<FmOrderItem & { options: FmOrderOption[] }>;
+  items: Array<FmOrderItem & { options: FmOrderOption[]; sellType: SellType }>;
   exports?: FmOrderExport[];
   refunds?: FmOrderRefund[];
   returns?: FmOrderReturn[];
@@ -1032,11 +1032,4 @@ export type FindFmOrderDetailRes = FmOrderMetaInfo & {
   totalEa: number;
   /** 이 주문에 포함된 내 모든 상품 및 상품옵션의 총 종류 수 */
   totalType: number;
-  /** 이 주문에 포함된 상품들의 판매유형 */
-  sellTypes: GoodsIdAndSellType[];
 };
-
-export interface GoodsIdAndSellType {
-  goodsId: number;
-  sellType: SellType;
-}

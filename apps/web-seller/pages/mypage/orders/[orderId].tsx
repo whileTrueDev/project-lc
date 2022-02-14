@@ -36,7 +36,6 @@ import {
 import {
   convertFmOrderShippingTypesToString,
   FmOrderShipping,
-  GoodsIdAndSellType,
 } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
@@ -135,11 +134,7 @@ export function OrderDetail(): JSX.Element {
         {/* 주문 상품 정보 */}
         <SectionWithTitle title="주문 상품 정보">
           {order.data.shippings.map((shipping) => (
-            <OrderDetailShippingItem
-              key={shipping.shipping_seq}
-              shipping={shipping}
-              sellType={order.data.sellTypes}
-            />
+            <OrderDetailShippingItem key={shipping.shipping_seq} shipping={shipping} />
           ))}
         </SectionWithTitle>
 
@@ -222,11 +217,9 @@ export function OrderDetailLoading(): JSX.Element {
 
 interface OrderDetailShippingItemProps {
   shipping: FmOrderShipping;
-  sellType: GoodsIdAndSellType[];
 }
 function OrderDetailShippingItem({
   shipping,
-  sellType,
 }: OrderDetailShippingItemProps): JSX.Element {
   return (
     <Box key={shipping.shipping_seq} mt={6} borderWidth="0.025rem" p={2} pl={4}>
@@ -245,13 +238,7 @@ function OrderDetailShippingItem({
       <Box mt={4}>
         {shipping.items.map((item) => (
           <Box key={item.item_seq} mt={2}>
-            <OrderDetailGoods
-              orderItem={item}
-              sellType={sellType
-                .filter((d) => d.goodsId === item.goods_seq)
-                .map((d) => d.sellType)
-                .pop()}
-            />
+            <OrderDetailGoods orderItem={item} />
             <OrderDetailOptionList options={item.options} />
           </Box>
         ))}
