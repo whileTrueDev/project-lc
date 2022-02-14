@@ -12,5 +12,5 @@ export interface UserProfileRes {
   avatar?: string;
   agreementFlag?: boolean;
   overlayUrl?: string;
-  BroadcasterPromotionPage?: BroadcasterPromotionPage;
+  broadcasterPromotionPage?: BroadcasterPromotionPage;
 }

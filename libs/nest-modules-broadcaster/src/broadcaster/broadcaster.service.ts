@@ -90,12 +90,14 @@ export class BroadcasterService extends ServiceBaseWithCache {
    */
   async findOne(
     findInput: Prisma.BroadcasterWhereUniqueInput,
-  ): Promise<Broadcaster & { BroadcasterPromotionPage?: BroadcasterPromotionPage }> {
+  ): Promise<Broadcaster & { broadcasterPromotionPage?: BroadcasterPromotionPage }> {
     const broadcaster = await this.prisma.broadcaster.findUnique({
       where: findInput,
       include: { BroadcasterPromotionPage: true },
     });
-    return broadcaster;
+    const { BroadcasterPromotionPage: broadcasterPromotionPage, ...broadcasterData } =
+      broadcaster;
+    return { ...broadcasterData, broadcasterPromotionPage };
   }
 
   /** 방송인 회원가입 서비스 핸들러 */
