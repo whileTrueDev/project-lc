@@ -19,7 +19,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import {
   Administrator,
-  BroadcasterPromotionPage,
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
@@ -27,7 +26,6 @@ import {
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
-  BroadcasterPromotionPageService,
   BroadcasterService,
   BroadcasterSettlementHistoryService,
   BroadcasterSettlementService,
@@ -43,9 +41,6 @@ import {
   AdminSettlementInfoType,
   AdminSignUpDto,
   BroadcasterDTO,
-  BroadcasterPromotionPageDto,
-  BroadcasterPromotionPageListRes,
-  BroadcasterPromotionPageUpdateDto,
   BroadcasterSettlementInfoConfirmationDto,
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
@@ -84,7 +79,6 @@ export class AdminController {
     private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
     private readonly sellerService: SellerService,
-    private readonly broadcasterPromotionPageService: BroadcasterPromotionPageService,
     private readonly productPromotionService: ProductPromotionService,
     private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
@@ -297,53 +291,6 @@ export class AdminController {
   @Get('/sellers')
   getSellerList(): Promise<AdminSellerListRes> {
     return this.sellerService.getSellerList();
-  }
-
-  /** ================================= */
-  // 방송인 상품홍보페이지 BroadcasterPromotionPage
-  /** ================================= */
-
-  /** 방송인 상품홍보페이지 생성 */
-  @Post('/promotion-page')
-  async createPromotionPage(
-    @Body(ValidationPipe) dto: BroadcasterPromotionPageDto,
-  ): Promise<BroadcasterPromotionPage> {
-    return this.broadcasterPromotionPageService.createPromotionPage(dto);
-  }
-
-  /** 상품홍보페이지 수정 */
-  @Patch('/promotion-page')
-  async updatePromotionPage(
-    @Body(ValidationPipe) dto: BroadcasterPromotionPageUpdateDto,
-  ): Promise<BroadcasterPromotionPage> {
-    return this.broadcasterPromotionPageService.updatePromotionPage(dto);
-  }
-
-  /** 방송인 상품홍보페이지 url 중복 확인
-   * @query url
-   * @return 중복 url이면 true, 중복이 아니면 false
-   */
-  @Get('/promotion-page/duplicate')
-  async checkPromotionPageUrlDuplicate(@Query('url') url: string): Promise<boolean> {
-    return this.broadcasterPromotionPageService.checkPromotionPageUrlDuplicate(url);
-  }
-
-  /**
-   * 방송인 상품홍보페이지 삭제
-   * @param pageId 방송인 상품홍보페이지 id
-   * @returns 삭제 성공시 true
-   */
-  @Delete('/promotion-page')
-  async deletePromotionPage(
-    @Body('pageId', ParseIntPipe) pageId: number,
-  ): Promise<boolean> {
-    return this.broadcasterPromotionPageService.deletePromotionPage(pageId);
-  }
-
-  /** 상품홍보페이지 목록 조회 */
-  @Get('/promotion-pages')
-  async getBroadcasterPromotionPageList(): Promise<BroadcasterPromotionPageListRes> {
-    return this.broadcasterPromotionPageService.getBroadcasterPromotionPageList();
   }
 
   /** ================================= */

@@ -11,6 +11,7 @@ import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { AdminPolicyController } from './admin-policy.controller';
+import { AdminPromotionPageController } from './admin-promotion-page.controller';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { AdminPolicyController } from './admin-policy.controller';
   ],
   providers: [AdminService, ConfigService, AdminSettlementService, AdminAccountService],
   exports: [AdminService, AdminSettlementService, AdminAccountService],
-  controllers: [AdminController, AdminPolicyController],
+  controllers: [AdminController, AdminPolicyController, AdminPromotionPageController],
 })
 export class AdminModule {}
