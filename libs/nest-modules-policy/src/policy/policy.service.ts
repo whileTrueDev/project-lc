@@ -1,9 +1,13 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
 import { Policy, PolicyCategory, PolicyTarget, Prisma } from '@prisma/client';
-import { CreatePolicyDto, GetPolicyListDto } from '@project-lc/shared-types';
+import {
+  CreatePolicyDto,
+  GetPolicyListDto,
+  UpdatePolicyDto,
+} from '@project-lc/shared-types';
 
 const POLICY_TARGET_USER: Record<PolicyTarget, string> = {
   seller: '판매자',
@@ -68,16 +72,38 @@ export class PolicyService extends ServiceBaseWithCache {
     return data;
   }
 
-  // 수정
-  public async updatePolicy(): Promise<any> {
-    //   await this._clearCaches(this.#POLICY_CACHE_KEY);
-    return 'update';
+  private async findPolicyById(id: number): Promise<Policy> {
+    const policy = await this.prisma.policy.findUnique({ where: { id } });
+    if (!policy) {
+      throw new BadRequestException(
+        `해당 고유번호를 가진 Policy 데이터가 존재하지 않습니다 id: ${id}`,
+      );
+    }
+    return policy;
   }
 
-  // 삭제
-  public async deletePolicy(): Promise<any> {
-    //   await this._clearCaches(this.#POLICY_CACHE_KEY);
-    return 'delete';
+  /** 수정 */
+  public async updatePolicy(policyId: number, dto: UpdatePolicyDto): Promise<Policy> {
+    const policy = await this.findPolicyById(policyId);
+
+    const data = await this.prisma.policy.update({
+      where: { id: policy.id },
+      data: { ...dto },
+    });
+    await this._clearCaches(this.#POLICY_CACHE_KEY);
+    return data;
+  }
+
+  /** 삭제 */
+  public async deletePolicy(policyId: number): Promise<boolean> {
+    const policy = await this.findPolicyById(policyId);
+
+    await this.prisma.policy.delete({
+      where: { id: policy.id },
+    });
+
+    await this._clearCaches(this.#POLICY_CACHE_KEY);
+    return true;
   }
 
   /**
