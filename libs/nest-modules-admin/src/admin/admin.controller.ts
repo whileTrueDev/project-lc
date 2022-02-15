@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
-  Delete,
   ForbiddenException,
   Get,
   Header,
@@ -22,7 +21,6 @@ import {
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
-  ProductPromotion,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -32,7 +30,6 @@ import {
 } from '@project-lc/nest-modules-broadcaster';
 import { GoodsService } from '@project-lc/nest-modules-goods';
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
-import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
 import {
   AdminAllLcGoodsList,
@@ -46,7 +43,6 @@ import {
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
   CreateManyBroadcasterSettlementHistoryDto,
-  CreateProductPromotionDto,
   EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
@@ -56,10 +52,8 @@ import {
   LiveShoppingDTO,
   OrderCancelRequestDetailRes,
   OrderCancelRequestList,
-  ProductPromotionListData,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
-  UpdateProductPromotionDto,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
@@ -79,7 +73,6 @@ export class AdminController {
     private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
     private readonly sellerService: SellerService,
-    private readonly productPromotionService: ProductPromotionService,
     private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
   ) {
@@ -297,15 +290,6 @@ export class AdminController {
   // 상품홍보 ProductPromotion
   /** ================================= */
 
-  /** 상품홍보 생성(특정 상품홍보 페이지에 상품홍보 등록) */
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  @Post('/product-promotion')
-  async createProductPromotion(
-    @Body(ValidationPipe) dto: CreateProductPromotionDto,
-  ): Promise<ProductPromotion> {
-    return this.productPromotionService.createProductPromotion(dto);
-  }
-
   /** 전체 상품목록 조회
    * - 상품홍보에 연결하기 위한 상품(project-lc goods) 전체목록. 검수완료 & 정상판매중 일 것
    * goodsConfirmation.status === confirmed && goods.status === normal
@@ -315,43 +299,5 @@ export class AdminController {
   @Get('confirmed-goods-list')
   async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
     return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
-  }
-
-  /** 상품홍보에 입력할 fmGoodsSeq가 다른 상품에 연결된 fmGoodsSeq와 중복인지 확인 */
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  @Get('product-promotion/duplicate')
-  async checkHasDuplicateFmGoodsSeq(
-    @Query('fmGoodsSeq', ParseIntPipe) fmGoodsSeq: number,
-  ): Promise<boolean> {
-    return this.adminService.checkHasDuplicateFmGoodsSeq(fmGoodsSeq);
-  }
-
-  /** 상품홍보 수정 */
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  @Patch('product-promotion')
-  async updateProductPromotion(
-    @Body(ValidationPipe) dto: UpdateProductPromotionDto,
-  ): Promise<ProductPromotion> {
-    return this.productPromotionService.updateProductPromotion(dto);
-  }
-
-  /** 상품홍보 삭제 */
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  @Delete('product-promotion')
-  async deleteProductPromotion(
-    @Body('promotionId', ParseIntPipe) promotionId: number,
-  ): Promise<boolean> {
-    return this.productPromotionService.deleteProductPromotion(promotionId);
-  }
-
-  /** 특정 방송인홍보페이지에 등록된 상품홍보목록 조회 */
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  @Get('/product-promotion-list')
-  async findProductPromotionListByPromotionPageId(
-    @Query('promotionPageId', ParseIntPipe) promotionPageId: number,
-  ): Promise<ProductPromotionListData> {
-    return this.productPromotionService.findProductPromotionListByPromotionPageId(
-      promotionPageId,
-    );
   }
 }

@@ -8,7 +8,7 @@ export const getAdminProductPromotion = async (
   promotionPageId: number,
 ): Promise<ProductPromotionListData> => {
   return axios
-    .get<ProductPromotionListData>('/admin/product-promotion-list', {
+    .get<ProductPromotionListData>('/admin/product-promotion/list', {
       params: { promotionPageId },
     })
     .then((res) => res.data);
