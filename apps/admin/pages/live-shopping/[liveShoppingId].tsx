@@ -53,6 +53,7 @@ import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { AxiosError } from 'axios';
 
 function getDuration(startDate: Date, endDate: Date): string {
   if (startDate && startDate) {
@@ -125,8 +126,12 @@ export function LiveShoppingDetail(): JSX.Element {
     toast({ title: '변경 완료', status: 'success' });
   };
 
-  const onFail = (): void => {
-    toast({ title: '변경 실패', status: 'error' });
+  const onFail = (err?: AxiosError): void => {
+    toast({
+      title: '변경 실패',
+      description: err.response.status === 400 ? err?.response?.data?.message : undefined,
+      status: 'error',
+    });
   };
 
   const { handleSubmit, register, watch, reset } = methods;
