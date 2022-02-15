@@ -80,6 +80,10 @@
         {
           "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/S3_ACCESS_KEY_SECRET",
           "name": "AWS_S3_ACCESS_KEY_SECRET"
+        },
+        {
+            "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/WHILETRUE_IP_ADDRESS",
+            "name": "CACHE_REDIS_URL"
         }
       ],
       "dockerSecurityOptions": [],
