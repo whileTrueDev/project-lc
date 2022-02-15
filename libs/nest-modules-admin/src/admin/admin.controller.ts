@@ -23,6 +23,7 @@ import {
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
+  Policy,
   ProductPromotion,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
@@ -49,6 +50,7 @@ import {
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
   CreateManyBroadcasterSettlementHistoryDto,
+  CreatePolicyDto,
   CreateProductPromotionDto,
   EmailDupCheckDto,
   ExecuteSettlementDto,
@@ -67,6 +69,7 @@ import {
 import { Request } from 'express';
 import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { GoodsService } from '@project-lc/nest-modules-goods';
+import { PolicyService } from '@project-lc/nest-modules-policy';
 import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
@@ -88,6 +91,7 @@ export class AdminController {
     private readonly productPromotionService: ProductPromotionService,
     private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
+    private readonly policyService: PolicyService,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
     if (wtIp) this.allowedIpAddresses.push(wtIp);
@@ -406,5 +410,19 @@ export class AdminController {
     return this.productPromotionService.findProductPromotionListByPromotionPageId(
       promotionPageId,
     );
+  }
+
+  /** ================================= */
+  // 정책(개인정보처리방침, 이용약관) Policy
+  /** ================================= */
+  /** 정책(개인정보처리방침, 이용약관) 목록 조회 */
+  // @Get('policy-list')
+  // async
+
+  /** 정책(개인정보처리방침, 이용약관) 생성 */
+  @Post('policy')
+  async createPolicy(@Body(ValidationPipe) dto: CreatePolicyDto): Promise<Policy> {
+    console.log(dto);
+    return this.policyService.createPolicy(dto);
   }
 }
