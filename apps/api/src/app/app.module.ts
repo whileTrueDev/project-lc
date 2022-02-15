@@ -25,16 +25,15 @@ import { ShippingGroupModule } from '@project-lc/nest-modules-shipping-group';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
     CacheModule.registerAsync({ isGlobal: true, useClass: CacheConfig }),
     MailerModule.forRoot(mailerConfig),
+    AuthModule,
     FirstmallDbModule,
     PrismaModule,
-    AuthModule,
     SocialModule,
     AdminModule,
     ShippingGroupModule,
@@ -50,7 +49,7 @@ import { AppService } from './app.service';
     BroadcasterModule.withControllers(),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

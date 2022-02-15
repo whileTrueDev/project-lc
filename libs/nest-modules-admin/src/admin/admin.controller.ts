@@ -32,7 +32,9 @@ import {
   BroadcasterSettlementHistoryService,
   BroadcasterSettlementService,
 } from '@project-lc/nest-modules-broadcaster';
+import { GoodsService } from '@project-lc/nest-modules-goods';
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
 import {
   AdminAllLcGoodsList,
@@ -65,8 +67,6 @@ import {
   UpdateProductPromotionDto,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
-import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
-import { GoodsService } from '@project-lc/nest-modules-goods';
 import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
