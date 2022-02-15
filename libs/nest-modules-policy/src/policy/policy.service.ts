@@ -2,8 +2,8 @@ import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
-import { Policy, PolicyCategory, PolicyTarget } from '@prisma/client';
-import { CreatePolicyDto } from '@project-lc/shared-types';
+import { Policy, PolicyCategory, PolicyTarget, Prisma } from '@prisma/client';
+import { CreatePolicyDto, GetPolicyListDto } from '@project-lc/shared-types';
 
 const POLICY_TARGET_USER: Record<PolicyTarget, string> = {
   seller: '판매자',
@@ -76,8 +76,28 @@ export class PolicyService extends ServiceBaseWithCache {
   }
 
   // 목록 조회
-  public async getPolicyList(): Promise<Policy[]> {
-    return this.prisma.policy.findMany();
+  public async getPolicyList(
+    dto: GetPolicyListDto,
+    publicOnly = false,
+  ): Promise<Omit<Policy, 'content'>[]> {
+    let where: Prisma.PolicyWhereInput = dto;
+    if (publicOnly) {
+      where = { ...where, publicFlag: true };
+    }
+    return this.prisma.policy.findMany({
+      where,
+      orderBy: [{ enforcementDate: 'desc' }, { createDate: 'desc' }],
+      select: {
+        id: true,
+        category: true,
+        targetUser: true,
+        createDate: true,
+        updateDate: true,
+        enforcementDate: true,
+        version: true,
+        publicFlag: true,
+      },
+    });
   }
 
   // 개별 조회

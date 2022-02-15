@@ -55,6 +55,7 @@ import {
   EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
+  GetPolicyListDto,
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
@@ -416,13 +417,19 @@ export class AdminController {
   // 정책(개인정보처리방침, 이용약관) Policy
   /** ================================= */
   /** 정책(개인정보처리방침, 이용약관) 목록 조회 */
-  // @Get('policy-list')
-  // async
+  // @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('policy/list')
+  async getPolicyList(
+    @Query() dto: GetPolicyListDto,
+  ): Promise<Omit<Policy, 'content'>[]> {
+    // 관리자페이지에서 조회하는 정책목록은 공개여부값 관계없이 전체 데이터 조회한다
+    return this.policyService.getPolicyList(dto);
+  }
 
   /** 정책(개인정보처리방침, 이용약관) 생성 */
+  // @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('policy')
   async createPolicy(@Body(ValidationPipe) dto: CreatePolicyDto): Promise<Policy> {
-    console.log(dto);
     return this.policyService.createPolicy(dto);
   }
 }
