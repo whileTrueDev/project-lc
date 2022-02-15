@@ -121,7 +121,7 @@ export const createPreInactivateNoticeTemplate = (targetDetails): string => `
                   </td>
                 </tr>
                 <tr>
-                  <td valign="top" style="padding:0 0 30px 30px;" width="120">
+                  <td valign="middle" style="padding:0 0 30px 30px;" width="120">
                     <img alt="크크쇼-로고" src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" loading="lazy" style="width:65px;height:27px" loading="lazy">
                   </td>
                   <td style="padding:0 30px 30px 0;" width="580">
@@ -253,7 +253,7 @@ export const createInactivateNoticeTemplate = (targetDetails): string => `
                   </td>
                 </tr>
                 <tr>
-                  <td valign="top" style="padding:0 0 30px 30px;" width="120">
+                  <td valign="middle" style="padding:0 0 30px 30px;" width="120">
                     <img alt="크크쇼-로고" src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" loading="lazy" style="width:65px;height:27px" loading="lazy">
                   </td>
                   <td style="padding:0 30px 30px 0;" width="580">
