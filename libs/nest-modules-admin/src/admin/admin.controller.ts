@@ -23,7 +23,6 @@ import {
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
-  Policy,
   ProductPromotion,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
@@ -33,7 +32,9 @@ import {
   BroadcasterSettlementHistoryService,
   BroadcasterSettlementService,
 } from '@project-lc/nest-modules-broadcaster';
+import { GoodsService } from '@project-lc/nest-modules-goods';
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
 import {
   AdminAllLcGoodsList,
@@ -50,12 +51,10 @@ import {
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
   CreateManyBroadcasterSettlementHistoryDto,
-  CreatePolicyDto,
   CreateProductPromotionDto,
   EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
-  GetPolicyListDto,
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
@@ -68,9 +67,6 @@ import {
   UpdateProductPromotionDto,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
-import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
-import { GoodsService } from '@project-lc/nest-modules-goods';
-import { PolicyService } from '@project-lc/nest-modules-policy';
 import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
@@ -92,7 +88,6 @@ export class AdminController {
     private readonly productPromotionService: ProductPromotionService,
     private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
-    private readonly policyService: PolicyService,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
     if (wtIp) this.allowedIpAddresses.push(wtIp);
@@ -411,30 +406,5 @@ export class AdminController {
     return this.productPromotionService.findProductPromotionListByPromotionPageId(
       promotionPageId,
     );
-  }
-
-  /** ================================= */
-  // 정책(개인정보처리방침, 이용약관) Policy
-  /** ================================= */
-  /** 정책(개인정보처리방침, 이용약관) 목록 조회 */
-  // @UseGuards(JwtAuthGuard, AdminGuard)
-  @Get('policy/list')
-  async getPolicyList(
-    @Query() dto: GetPolicyListDto,
-  ): Promise<Omit<Policy, 'content'>[]> {
-    return this.policyService.getPolicyList(dto, { isAdmin: true });
-  }
-
-  // * 개별조회
-  @Get('policy')
-  async getPolicy(@Query('id', ParseIntPipe) id: number): Promise<Policy | false> {
-    return this.policyService.getOnePolicy(id, { isAdmin: true });
-  }
-
-  /** 정책(개인정보처리방침, 이용약관) 생성 */
-  // @UseGuards(JwtAuthGuard, AdminGuard)
-  @Post('policy')
-  async createPolicy(@Body(ValidationPipe) dto: CreatePolicyDto): Promise<Policy> {
-    return this.policyService.createPolicy(dto);
   }
 }

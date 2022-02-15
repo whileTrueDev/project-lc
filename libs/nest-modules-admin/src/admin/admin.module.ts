@@ -10,6 +10,7 @@ import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
+import { AdminPolicyController } from './admin-policy.controller';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { AdminService } from './admin.service';
   ],
   providers: [AdminService, ConfigService, AdminSettlementService, AdminAccountService],
   exports: [AdminService, AdminSettlementService, AdminAccountService],
-  controllers: [AdminController],
+  controllers: [AdminController, AdminPolicyController],
 })
 export class AdminModule {}
