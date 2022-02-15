@@ -107,7 +107,7 @@ export class PolicyService extends ServiceBaseWithCache {
   }
 
   /**
-   * 목록 조회
+   * 특정 카테고리 & 타겟 정책 목록 조회
    * @param dto { category: PolicyCategory, targetUser: PolicyTarget} 카테고리와 타겟유저 명시 필요
    * @param options? {isAdmin: boolean} 관리자 요청인경우 {isAdmin:true}로 전달한다 => 공개여부 false인 데이터도 조회 가능
    * @return content를 제외한 Policy 목록
@@ -123,6 +123,23 @@ export class PolicyService extends ServiceBaseWithCache {
     }
     return this.prisma.policy.findMany({
       where,
+      orderBy: [{ enforcementDate: 'desc' }, { createDate: 'desc' }],
+      select: {
+        id: true,
+        category: true,
+        targetUser: true,
+        createDate: true,
+        updateDate: true,
+        enforcementDate: true,
+        version: true,
+        publicFlag: true,
+      },
+    });
+  }
+
+  /** 관리자용 목록 조회(전체) */
+  public async getAdminPolicyList(): Promise<Omit<Policy, 'content'>[]> {
+    return this.prisma.policy.findMany({
       orderBy: [{ enforcementDate: 'desc' }, { createDate: 'desc' }],
       select: {
         id: true,

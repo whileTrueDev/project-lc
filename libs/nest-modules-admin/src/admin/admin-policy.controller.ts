@@ -12,13 +12,9 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Policy } from '@prisma/client';
-import { JwtAuthGuard, AdminGuard } from '@project-lc/nest-modules-authguard';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { PolicyService } from '@project-lc/nest-modules-policy';
-import {
-  GetPolicyListDto,
-  CreatePolicyDto,
-  UpdatePolicyDto,
-} from '@project-lc/shared-types';
+import { CreatePolicyDto, UpdatePolicyDto } from '@project-lc/shared-types';
 
 /** ================================= */
 // 정책(개인정보처리방침, 이용약관) Policy
@@ -30,10 +26,8 @@ export class AdminPolicyController {
 
   /** 정책(개인정보처리방침, 이용약관) 목록 조회 */
   @Get('list')
-  async getPolicyList(
-    @Query() dto: GetPolicyListDto,
-  ): Promise<Omit<Policy, 'content'>[]> {
-    return this.policyService.getPolicyList(dto, { isAdmin: true });
+  async getPolicyList(): Promise<Omit<Policy, 'content'>[]> {
+    return this.policyService.getAdminPolicyList();
   }
 
   // * 개별조회
