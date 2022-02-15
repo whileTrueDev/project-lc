@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import * as dayjs from 'dayjs';
-import { MailNoticeService } from '../lib/mail-notice.service';
+import { MailNoticeService } from '../lib/mail/mail-notice.service';
+import { S3Service } from '../lib/s3/s3.service';
 @Injectable()
 export class AppService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailNoticeService: MailNoticeService,
+    private readonly s3Service: S3Service,
   ) {}
 
   getHello(): string {
@@ -49,8 +51,23 @@ export class AppService {
     );
   }
 
-  moveInactiveUserData(inactivateTarget): void {
-    console.log(inactivateTarget.userEmail);
-    // 휴면 계정 데이터들 옮기는 작업 여기서
+  async moveInactiveUserData(inactivateTarget): Promise<void> {
+    if (inactivateTarget.userType === 'seller') {
+      // s3 데이터 분리
+      Promise.all([
+        this.s3Service.moveObjects(
+          'broadcaster-account-image',
+          inactivateTarget.userEmail,
+        ),
+        this.s3Service.moveObjects('broadcaster-id-card', inactivateTarget.userEmail),
+      ]);
+    } else if (inactivateTarget.userType === 'broadcaster') {
+      // s3 데이터 분리
+      Promise.all([
+        this.s3Service.moveObjects('business-registration', inactivateTarget.userEmail),
+        this.s3Service.moveObjects('settlement-account', inactivateTarget.userEmail),
+        this.s3Service.moveObjects('mail-order', inactivateTarget.userEmail),
+      ]);
+    }
   }
 }

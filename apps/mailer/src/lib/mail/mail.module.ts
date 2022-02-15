@@ -1,6 +1,6 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
-import { mailerConfig } from '../settings/mailer.config';
+import { mailerConfig } from '../../settings/mailer.config';
 import { MailNoticeService } from './mail-notice.service';
 
 @Module({
