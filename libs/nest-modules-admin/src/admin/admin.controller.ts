@@ -422,8 +422,13 @@ export class AdminController {
   async getPolicyList(
     @Query() dto: GetPolicyListDto,
   ): Promise<Omit<Policy, 'content'>[]> {
-    // 관리자페이지에서 조회하는 정책목록은 공개여부값 관계없이 전체 데이터 조회한다
-    return this.policyService.getPolicyList(dto);
+    return this.policyService.getPolicyList(dto, { isAdmin: true });
+  }
+
+  // * 개별조회
+  @Get('policy')
+  async getPolicy(@Query('id', ParseIntPipe) id: number): Promise<Policy | false> {
+    return this.policyService.getOnePolicy(id, { isAdmin: true });
   }
 
   /** 정책(개인정보처리방침, 이용약관) 생성 */

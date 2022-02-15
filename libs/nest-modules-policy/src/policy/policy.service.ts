@@ -14,6 +14,10 @@ const POLICY_CATEGORY: Record<PolicyCategory, string> = {
   termsOfService: '이용약관',
   privacy: '개인정보처리방침',
 };
+
+type PolicyFindOption = {
+  isAdmin: boolean;
+};
 @Injectable()
 export class PolicyService extends ServiceBaseWithCache {
   #POLICY_CACHE_KEY = 'policy';
@@ -75,13 +79,19 @@ export class PolicyService extends ServiceBaseWithCache {
     return 'delete';
   }
 
-  // 목록 조회
+  /**
+   * 목록 조회
+   * @param dto { category: PolicyCategory, targetUser: PolicyTarget} 카테고리와 타겟유저 명시 필요
+   * @param options? {isAdmin: boolean} 관리자 요청인경우 {isAdmin:true}로 전달한다 => 공개여부 false인 데이터도 조회 가능
+   * @return content를 제외한 Policy 목록
+   */
   public async getPolicyList(
     dto: GetPolicyListDto,
-    publicOnly = false,
+    options?: PolicyFindOption,
   ): Promise<Omit<Policy, 'content'>[]> {
     let where: Prisma.PolicyWhereInput = dto;
-    if (publicOnly) {
+    // 관리자가 아닌경우 공개여부 true인 데이터만 조회
+    if (!options?.isAdmin) {
       where = { ...where, publicFlag: true };
     }
     return this.prisma.policy.findMany({
@@ -100,8 +110,26 @@ export class PolicyService extends ServiceBaseWithCache {
     });
   }
 
-  // 개별 조회
-  public async getOnePolicy(): Promise<any> {
-    return 'getOnePolicy';
+  /**
+   * 개별 조회
+   * @param policyId
+   * @param options? {isAdmin: boolean} 관리자 요청인경우 {isAdmin:true}로 전달한다 => 공개여부 false인 데이터도 조회 가능
+   * @returns 해당id를 가진 policy 존재하는 경우 Policy 반환
+   * 해당 policy가 존재하지 않거나 관리자 옵션 없이 공개되지 않은 policy 요청한경우 false반환
+   */
+  public async getOnePolicy(
+    policyId: number,
+    options?: PolicyFindOption,
+  ): Promise<Policy | false> {
+    let where: Prisma.PolicyWhereInput = { id: policyId };
+    // 관리자가 아닌경우 공개여부 true인 데이터만 조회
+    if (!options?.isAdmin) {
+      where = { ...where, publicFlag: true };
+    }
+    const data = await this.prisma.policy.findFirst({
+      where,
+    });
+    if (!data) return false;
+    return data;
   }
 }
