@@ -10,7 +10,7 @@ datasource db {
 
 model Seller {
   id                         Int                          @id @default(autoincrement())
-  email                      String                       @unique
+  email                      String?                      @unique
   name                       String?
   password                   String?
   goods                      Goods[]
@@ -26,6 +26,7 @@ model Seller {
   OrderCancelRequests        SellerOrderCancelRequest[] // 판매자의 결제취소요청
   avatar                     String?
   agreementFlag              Boolean                      @default(false) // 이용동의 
+  inactiveFlag               Boolean                      @default(false)
 }
 
 // 마케터의 상정정보
@@ -478,10 +479,10 @@ model ShippingCost {
 // -------------------------------------------------
 model Broadcaster {
   id                          Int                           @id @default(autoincrement())
-  email                       String                        @unique // 방송인 이메일(가입시 사용)
-  userName                    String                        @db.VarChar(20) // 유저의 실명
+  email                       String?                       @unique // 방송인 이메일(가입시 사용)
+  userName                    String?                       @db.VarChar(20) // 유저의 실명
   userNickname                String?                       @db.VarChar(20) // 유저의 활동명
-  overlayUrl                  String                        @unique // 라이브커머스 오버레이 URL 
+  overlayUrl                  String?                       @unique // 라이브커머스 오버레이 URL 
   createDate                  DateTime                      @default(now())
   deleteFlag                  Boolean                       @default(false) // 회원탈퇴 여부
   password                    String? // 비밀번호
@@ -496,6 +497,7 @@ model Broadcaster {
   BroadcasterSettlementInfo   BroadcasterSettlementInfo?
   BroadcasterSettlements      BroadcasterSettlements[]
   BroadcasterPromotionPage    BroadcasterPromotionPage? // 방송인 상품홍보
+  inactiveFlag                Boolean                       @default(false)
 }
 
 // 방송인 소셜로그인 계정
@@ -801,4 +803,22 @@ model Inquiry {
   readFlag    Boolean?    @default(false) // 관리자 처리 여부 
 }
 
-// 방송인 상품 홍보 아이템
+// 휴면 계정 테이블
+model InactiveBroadcaster {
+  id           Int      @id @default(autoincrement())
+  email        String?  @unique // 방송인 이메일(가입시 사용)
+  userName     String?  @db.VarChar(20) // 유저의 실명
+  userNickname String?  @db.VarChar(20) // 유저의 활동명
+  overlayUrl   String?  @unique // 라이브커머스 오버레이 URL 
+  createDate   DateTime @default(now())
+  password     String? // 비밀번호
+  avatar       String?
+}
+
+model InactiveSeller {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  password String?
+  avatar   String?
+}

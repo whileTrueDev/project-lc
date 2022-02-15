@@ -51,10 +51,64 @@ export class AppService {
     );
   }
 
+  private copyBroadcasterRow(targetMail): Promise<any> {
+    return this.prisma
+      .$executeRaw`INSERT INTO InactiveBroadcaster (id, email, userName, userNickname, overlayUrl, avatar, password)
+    SELECT 
+        id, email, userName, userNickname, overlayUrl,  avatar, password
+    FROM 
+        Broadcaster
+    WHERE 
+        email = ${targetMail};`;
+  }
+
+  private copySellerRow(targetMail): Promise<any> {
+    return this.prisma
+      .$executeRaw`INSERT INTO InactiveSeller (id, email, userName, avatar, password)
+    SELECT 
+      id, email, userName, avatar, password
+    FROM 
+        Broadcaster
+    WHERE 
+        email = ${targetMail};`;
+  }
+
+  private updateBroadcasterNull(targetMail): Promise<any> {
+    return this.prisma.broadcaster.update({
+      where: {
+        email: targetMail,
+      },
+      data: {
+        email: null,
+        userName: null,
+        overlayUrl: null,
+        avatar: null,
+        password: null,
+        inactiveFlag: true,
+      },
+    });
+  }
+
+  private updateSellerNull(targetMail): Promise<any> {
+    return this.prisma.seller.update({
+      where: {
+        email: targetMail,
+      },
+      data: {
+        email: null,
+        avatar: null,
+        password: null,
+        inactiveFlag: true,
+      },
+    });
+  }
+
   async moveInactiveUserData(inactivateTarget): Promise<void> {
     if (inactivateTarget.userType === 'seller') {
       // s3 데이터 분리
       Promise.all([
+        await this.copySellerRow(inactivateTarget.userEmail),
+        this.updateSellerNull(inactivateTarget.userEmail),
         this.s3Service.moveObjects(
           'broadcaster-account-image',
           inactivateTarget.userEmail,
@@ -64,6 +118,8 @@ export class AppService {
     } else if (inactivateTarget.userType === 'broadcaster') {
       // s3 데이터 분리
       Promise.all([
+        await this.copyBroadcasterRow(inactivateTarget.userEmail),
+        this.updateBroadcasterNull(inactivateTarget.userEmail),
         this.s3Service.moveObjects('business-registration', inactivateTarget.userEmail),
         this.s3Service.moveObjects('settlement-account', inactivateTarget.userEmail),
         this.s3Service.moveObjects('mail-order', inactivateTarget.userEmail),
