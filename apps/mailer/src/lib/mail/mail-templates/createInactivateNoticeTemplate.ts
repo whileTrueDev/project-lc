@@ -74,8 +74,8 @@ export const createPreInactivateNoticeTemplate = (targetDetails): string => `
                   <td style="padding:18px 15px; border-bottom:1px solid #e1e1e1;">
                     ${
                       targetDetails.userType === 'seller'
-                        ? '이름, 사업자등록증 사본, 사업자등록번호, 휴대전화번호, 사업장전화번호, 통장사본, 계좌번호'
-                        : '이름, 주소, 휴대전화번호, 통장사본, 계좌번호, 신분증 사본'
+                        ? '이름, 사업자등록증 사본, 사업자등록번호, 휴대전화번호, 통신판매업신고증 사본, 통장 사본, 계좌번호'
+                        : '이름, 주소, 휴대전화번호, 통장 사본, 계좌번호, 신분증 사본'
                     }
                   </td>
                 </tr>
@@ -204,7 +204,11 @@ export const createInactivateNoticeTemplate = (targetDetails): string => `
                   분리보관 개인정보
                   </th>
                   <td style="padding:18px 15px; border-bottom:1px solid #e1e1e1;">
-                    이름, 생년월일, 성별, 휴대전화번호, 이메일주소, 개인식별정보(DI)
+                    ${
+                      targetDetails.userType === 'seller'
+                        ? '이름, 사업자등록증 사본, 사업자등록번호, 휴대전화번호, 통신판매업신고증 사본, 통장 사본, 계좌번호'
+                        : '이름, 주소, 휴대전화번호, 통장 사본, 계좌번호, 신분증 사본'
+                    }
                   </td>
                 </tr>
               </tbody>
