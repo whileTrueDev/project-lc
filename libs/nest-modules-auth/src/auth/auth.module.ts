@@ -15,7 +15,7 @@ import { LocalStrategy } from './strategies/local.strategy';
   imports: [
     SellerModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
-    AdminModule,
+    AdminModule.withoutControllers(),
     PassportModule,
     MailModule,
   ],

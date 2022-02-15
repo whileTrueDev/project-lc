@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
@@ -9,16 +9,46 @@ import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 
-@Module({
-  imports: [
-    forwardRef(() => SellerModule.withoutControllers()),
-    forwardRef(() => BroadcasterModule.withoutControllers()),
+@Module({})
+export class AdminModule {
+  private static readonly providers = [
+    AdminService,
+    AdminSettlementService,
+    AdminAccountService,
+  ];
+
+  private static readonly exports = [
+    AdminService,
+    AdminSettlementService,
+    AdminAccountService,
+  ];
+
+  private static readonly controllers = [AdminController];
+
+  private static readonly imports = [
     OrderCancelModule,
     ProductPromotionModule,
+    SellerModule.withoutControllers(),
+    BroadcasterModule.withoutControllers(),
     GoodsModule.withoutControllers(),
-  ],
-  providers: [AdminService, AdminSettlementService, AdminAccountService],
-  exports: [AdminService, AdminSettlementService, AdminAccountService],
-  controllers: [AdminController],
-})
-export class AdminModule {}
+  ];
+
+  static withoutControllers(): DynamicModule {
+    return {
+      module: AdminModule,
+      imports: this.imports,
+      providers: this.providers,
+      exports: this.exports,
+    };
+  }
+
+  static withControllers(): DynamicModule {
+    return {
+      module: AdminModule,
+      controllers: this.controllers,
+      imports: this.imports,
+      providers: this.providers,
+      exports: this.exports,
+    };
+  }
+}
