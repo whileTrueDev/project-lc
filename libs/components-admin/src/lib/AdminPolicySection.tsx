@@ -1,22 +1,13 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Heading,
-  Link,
-  Spinner,
-  Stack,
-  Text,
-} from '@chakra-ui/react';
+import { Button, Heading, Link, Spinner, Stack, Text } from '@chakra-ui/react';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import { Policy } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { useAdminPolicy } from '@project-lc/hooks';
-import NextLink from 'next/link';
+import { useAdminPolicyList } from '@project-lc/hooks';
 import dayjs from 'dayjs';
+import NextLink from 'next/link';
 
 export function AdminPolicySection(): JSX.Element {
-  const policy = useAdminPolicy();
+  const policy = useAdminPolicyList();
   if (policy.isLoading) {
     return <Spinner />;
   }
@@ -44,17 +35,19 @@ export function AdminPolicySection(): JSX.Element {
   );
 
   return (
-    <Box>
-      <Heading size="md">이용약관</Heading>
-      <PolicyListContainer label="방송인" data={broadcasterTermsOfService} />
-      <PolicyListContainer label="판매자" data={sellerTermsOfService} />
+    <Stack spacing={8}>
+      <Stack>
+        <Heading size="lg">이용약관</Heading>
+        <PolicyListContainer label="방송인" data={broadcasterTermsOfService} />
+        <PolicyListContainer label="판매자" data={sellerTermsOfService} />
+      </Stack>
 
-      <Divider />
-
-      <Heading size="md">개인정보처리방침</Heading>
-      <PolicyListContainer label="방송인" data={broadcasterPrivacyList} />
-      <PolicyListContainer label="판매자" data={sellerPrivacyList} />
-    </Box>
+      <Stack>
+        <Heading size="lg">개인정보처리방침</Heading>
+        <PolicyListContainer label="방송인" data={broadcasterPrivacyList} />
+        <PolicyListContainer label="판매자" data={sellerPrivacyList} />
+      </Stack>
+    </Stack>
   );
 }
 
@@ -66,14 +59,14 @@ function PolicyListContainer({
   data: Omit<Policy, 'content'>[];
 }): JSX.Element {
   return (
-    <Box>
+    <Stack>
       <Stack direction="row" alignItems="center">
         <Heading size="sm">{label}</Heading>
         <Button size="sm">새로 작성</Button>
       </Stack>
 
       <AdminPolicyList data={data} />
-    </Box>
+    </Stack>
   );
 }
 
@@ -142,8 +135,6 @@ function AdminPolicyList({ data }: { data: Omit<Policy, 'content'>[] }): JSX.Ele
       density="compact"
       rows={data || []}
       columns={columns}
-      rowCount={5}
-      rowsPerPageOptions={[25, 50]}
       disableColumnMenu
       disableColumnFilter
       disableSelectionOnClick
