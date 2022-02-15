@@ -1,5 +1,12 @@
 import { PolicyCategory, PolicyTarget } from '@prisma/client';
-import { IsDateString, IsEnum, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreatePolicyDto {
   @IsEnum(PolicyCategory)
@@ -13,6 +20,14 @@ export class CreatePolicyDto {
 
   @IsDateString()
   enforcementDate: Date;
+
+  @IsString()
+  @IsOptional()
+  version?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  publicFag?: boolean;
 }
 
 export class GetPolicyListDto {

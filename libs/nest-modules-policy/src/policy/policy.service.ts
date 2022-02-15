@@ -55,8 +55,9 @@ export class PolicyService extends ServiceBaseWithCache {
 
   // 생성
   public async createPolicy(dto: CreatePolicyDto): Promise<Policy> {
-    const { category, targetUser } = dto;
-    const nextVersion = await this.createNextVersionName({ category, targetUser });
+    const { category, targetUser, version } = dto;
+    const nextVersion =
+      version || (await this.createNextVersionName({ category, targetUser }));
     const data = this.prisma.policy.create({
       data: {
         ...dto,
