@@ -29,7 +29,7 @@ const BROADCASTER_DISPLAY_TEXT_LIST = [
 ];
 
 export interface SignupProcessItemProps {
-  userType: UserType;
+  userType: 'seller' | 'broadcaster';
   moveToNext?: () => void;
   moveToPrev?: () => void;
 }
