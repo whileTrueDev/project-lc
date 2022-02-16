@@ -1,6 +1,8 @@
 import { Box, Button, Flex, SimpleGrid, Text, useColorModeValue } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 
 export function MypageFooter(): JSX.Element {
+  const router = useRouter();
   return (
     <Flex
       minH="60px"
@@ -33,9 +35,7 @@ export function MypageFooter(): JSX.Element {
           size="sm"
           fontSize="sm"
           variant="ghost"
-          onClick={() =>
-            window.open('https://whiletrue.notion.site/7f6758f5344246c4989ac22f3ee7532e')
-          }
+          onClick={() => router.push('/privacy')}
         >
           개인정보처리방침
         </Button>
@@ -43,9 +43,7 @@ export function MypageFooter(): JSX.Element {
           size="sm"
           fontSize="sm"
           variant="ghost"
-          onClick={() =>
-            window.open('https://whiletrue.notion.site/41561f284f754560a64f36bc7c292861')
-          }
+          onClick={() => router.push('/termsOfService')}
         >
           이용약관
         </Button>
