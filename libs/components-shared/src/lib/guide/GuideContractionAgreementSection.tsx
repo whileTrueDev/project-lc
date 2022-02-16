@@ -1,5 +1,6 @@
 import { CheckIcon } from '@chakra-ui/icons';
 import {
+  Box,
   Button,
   Center,
   Checkbox,
@@ -13,34 +14,31 @@ import {
   ModalHeader,
   ModalOverlay,
   SimpleGrid,
+  Spinner,
   Stack,
   Text,
   useDisclosure,
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import broadcasterTerms from '@project-lc/components-constants/broadcasterContractTerms';
-import sellerTerms from '@project-lc/components-constants/sellerContractTerms';
+import { Term } from '@project-lc/components-constants/termType';
 import { SettingSectionLayout } from '@project-lc/components-layout/SettingSectionLayout';
 import {
-  useProfile,
   useBroadcasterUpdateContractionAgreementMutation,
+  useProfile,
   useSellerUpdateContractionAgreementMutation,
+  useTerms,
 } from '@project-lc/hooks';
-import { useEffect, useMemo, useState } from 'react';
 import { guideConditionStore } from '@project-lc/stores';
-
-interface Term {
-  title: string;
-  state: string;
-  text: string;
-}
+import { useEffect, useMemo, useState } from 'react';
+import 'suneditor/dist/css/suneditor.min.css';
 
 export function GuideContractionAgreementSection({
   userType,
 }: {
   userType: 'seller' | 'broadcaster';
 }): JSX.Element {
+  const { broadcasterTerms, sellerTerms, isLoading } = useTerms({ userType });
   const { data } = useProfile();
   const toast = useToast();
   const dialog = useDisclosure();
@@ -111,6 +109,7 @@ export function GuideContractionAgreementSection({
         });
     }
   }
+  if (isLoading) return <Spinner />;
 
   return (
     <Stack pt={3} pb={3} spacing={10}>
@@ -304,7 +303,10 @@ export function GuideContractionAgreementSection({
             <ModalHeader>{selectedTerm.title}</ModalHeader>
             <ModalCloseButton />
             <ModalBody maxW="6xl" mx="auto">
-              <Text whiteSpace="pre-line">{selectedTerm.text}</Text>
+              <Box
+                className="sun-editor-editable"
+                dangerouslySetInnerHTML={{ __html: selectedTerm.text }}
+              />
               {!계약동의여부 && (
                 <Center m={2}>
                   <Checkbox
@@ -337,7 +339,10 @@ export function GuideContractionAgreementSection({
             <ModalHeader>{selectedTerm.title}</ModalHeader>
             <ModalCloseButton />
             <ModalBody maxW="6xl" mx="auto">
-              <Text whiteSpace="pre-line">{selectedTerm.text}</Text>
+              <Box
+                className="sun-editor-editable"
+                dangerouslySetInnerHTML={{ __html: selectedTerm.text }}
+              />
               {!계약동의여부 && (
                 <Center m={2}>
                   <Checkbox
