@@ -21,6 +21,7 @@ import {
   testsellerData,
   testsellerExtraData,
 } from './dummyData';
+import { termsData } from './terms';
 
 const prisma = new PrismaClient();
 
@@ -163,8 +164,18 @@ async function createDummyLiveShopping(
   });
 }
 
+// 초기 약관 데이터 저장(없으면 약관페이지에 표시될 데이터가 없어서)
+async function generateInitialTerms(): Promise<void> {
+  await prisma.policy.createMany({
+    data: termsData,
+  });
+}
+
 /** 시드 메인 함수 */
 async function main(): Promise<void> {
+  // 약관 데이터 저장
+  await generateInitialTerms();
+
   // 판매 수수료 기본값 설정
   await generateDefaultSellCommission();
 
