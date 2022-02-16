@@ -1,7 +1,7 @@
 import { Controller, Get, ParseIntPipe, Query, UseInterceptors } from '@nestjs/common';
 import { Policy } from '@prisma/client';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
-import { GetPolicyListDto } from '@project-lc/shared-types';
+import { GetPolicyDto } from '@project-lc/shared-types';
 import { PolicyService } from './policy.service';
 
 // @UseGuards(JwtAuthGuard)
@@ -12,15 +12,18 @@ export class PolicyController {
 
   // * 목록조회
   @Get('list')
-  async getPolicyList(
-    @Query() dto: GetPolicyListDto,
-  ): Promise<Omit<Policy, 'content'>[]> {
+  async getPolicyList(@Query() dto: GetPolicyDto): Promise<Omit<Policy, 'content'>[]> {
     return this.policyService.getPolicyList(dto, { isAdmin: false });
   }
 
-  // * 개별조회
+  // * 최신 데이터 1개 조회
   @Get()
-  async getPolicy(@Query('id', ParseIntPipe) id: number): Promise<Policy | false> {
-    return this.policyService.getOnePolicy(id, { isAdmin: false });
+  async getPolicy(@Query() dto: GetPolicyDto): Promise<any> {
+    return this.policyService.getLatestPolicy(dto);
   }
+
+  // @Get()
+  // async getPolicy(@Query('id', ParseIntPipe) id: number): Promise<Policy | false> {
+  //   return this.policyService.getOnePolicy(id, { isAdmin: false });
+  // }
 }

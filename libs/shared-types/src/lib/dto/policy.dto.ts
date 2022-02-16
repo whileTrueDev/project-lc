@@ -25,7 +25,7 @@ export class CreatePolicyDto {
   publicFlag?: boolean;
 }
 
-export class GetPolicyListDto {
+export class GetPolicyDto {
   @IsEnum(PolicyCategory)
   category: PolicyCategory;
 

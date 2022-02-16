@@ -4,7 +4,7 @@ import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreatePolicyDto,
-  GetPolicyListDto,
+  GetPolicyDto,
   POLICY_CATEGORY,
   POLICY_TARGET_USER,
   UpdatePolicyDto,
@@ -105,7 +105,7 @@ export class PolicyService extends ServiceBaseWithCache {
    * @return content를 제외한 Policy 목록
    */
   public async getPolicyList(
-    dto: GetPolicyListDto,
+    dto: GetPolicyDto,
     options?: PolicyFindOption,
   ): Promise<Omit<Policy, 'content'>[]> {
     let where: Prisma.PolicyWhereInput = dto;
@@ -147,7 +147,7 @@ export class PolicyService extends ServiceBaseWithCache {
   }
 
   /**
-   * 개별 조회
+   * 특정 정책 조회
    * @param policyId
    * @param options? {isAdmin: boolean} 관리자 요청인경우 {isAdmin:true}로 전달한다 => 공개여부 false인 데이터도 조회 가능
    * @returns 해당id를 가진 policy 존재하는 경우 Policy 반환
@@ -167,5 +167,22 @@ export class PolicyService extends ServiceBaseWithCache {
     });
     if (!data) return false;
     return data;
+  }
+
+  /** 최신정책 1개 조회 */
+  public async getLatestPolicy(dto: GetPolicyDto): Promise<Policy | null> {
+    const data = await this.prisma.policy.findMany({
+      where: {
+        category: dto.category,
+        targetUser: dto.targetUser,
+        publicFlag: true,
+      },
+      orderBy: [{ enforcementDate: 'desc' }, { createDate: 'desc' }],
+      take: 1,
+    });
+
+    if (!data.length) return null;
+
+    return data[0];
   }
 }
