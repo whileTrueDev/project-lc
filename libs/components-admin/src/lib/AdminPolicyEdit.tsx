@@ -5,6 +5,7 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  Heading,
   HStack,
   Input,
   Radio,
@@ -23,7 +24,11 @@ import {
   useAdminPolicyDeleteMutation,
   useAdminPolicyUpdateMutation,
 } from '@project-lc/hooks';
-import { UpdatePolicyDto } from '@project-lc/shared-types';
+import {
+  POLICY_CATEGORY,
+  POLICY_TARGET_USER,
+  UpdatePolicyDto,
+} from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -144,6 +149,9 @@ function EditForm({ data }: { data: Policy }): JSX.Element {
   };
   return (
     <Stack as="form" spacing={2} onSubmit={handleSubmit(onSubmitHandler)}>
+      <Heading size="md">{`${POLICY_TARGET_USER[data.targetUser]} ${
+        POLICY_CATEGORY[data.category]
+      } 수정`}</Heading>
       <Stack direction="row" alignItems="center" fontWeight="bold">
         <Text>id : </Text>
         <Text>{data.id}</Text>

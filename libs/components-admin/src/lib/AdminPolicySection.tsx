@@ -1,29 +1,28 @@
 import { Button, Heading, Link, Spinner, Stack, Text } from '@chakra-ui/react';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
-import { Policy } from '@prisma/client';
+import { Policy, PolicyCategory, PolicyTarget } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useAdminPolicyList } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
+const POLICY_WRITE_BASE = '/general/policy/write';
+function getPolicyWriteUrl(category: PolicyCategory, target: PolicyTarget): string {
+  return `${POLICY_WRITE_BASE}/${category}/${target}`;
+}
+
 export function AdminPolicySection(): JSX.Element {
   const policy = useAdminPolicyList();
   const router = useRouter();
 
-  // 방송인 개인정보처리방침 작성 페이지로 이동
-  const moveToWriteBroadcasterTermsOfServicePage = (): Promise<boolean> =>
-    router.push('/general/policy/write/termsOfService/broadcaster');
-  // 판매자 개인정보처리방침 작성 페이지로 이동
-  const moveToWriteSellerTermsOfServicePage = (): Promise<boolean> =>
-    router.push('/general/policy/write/termsOfService/seller');
-  // 방송인 이용약관 작성 페이지로 이동
-  const moveToWriteBroadcasterPrivacyPage = (): Promise<boolean> =>
-    router.push('/general/policy/write/privatcy/broadcaster');
-  // 판매자 이용약관 작성 페이지로 이동
-  const moveToWriteSellerPrivacyPage = (): Promise<boolean> =>
-    router.push('/general/policy/write/seller/broadcaster');
+  const { termsOfService, privacy } = PolicyCategory;
+  const { broadcaster, seller } = PolicyTarget;
 
+  // 작성 페이지로 이동
+  const moveToWrite = (category: PolicyCategory, target: PolicyTarget): void => {
+    router.push(getPolicyWriteUrl(category, target));
+  };
   if (policy.isLoading) {
     return <Spinner />;
   }
@@ -34,65 +33,55 @@ export function AdminPolicySection(): JSX.Element {
     return (
       <Stack>
         <Text>데이터가 없습니다</Text>;
-        <Button size="sm" onClick={moveToWriteBroadcasterTermsOfServicePage}>
+        <Button size="sm" onClick={() => moveToWrite(privacy, broadcaster)}>
           방송인 개인정보처리방침 작성하기
         </Button>
-        <Button size="sm" onClick={moveToWriteSellerTermsOfServicePage}>
+        <Button size="sm" onClick={() => moveToWrite(privacy, seller)}>
           판매자 개인정보처리방침 작성하기
         </Button>
-        <Button size="sm" onClick={moveToWriteBroadcasterPrivacyPage}>
+        <Button size="sm" onClick={() => moveToWrite(termsOfService, broadcaster)}>
           방송인 이용약관 작성하기
         </Button>
-        <Button size="sm" onClick={moveToWriteSellerPrivacyPage}>
+        <Button size="sm" onClick={() => moveToWrite(termsOfService, seller)}>
           판매자 이용약관 작성하기
         </Button>
       </Stack>
     );
   }
-  // 방송인 개인정보처리방침
-  const broadcasterPrivacyList = policy.data.filter(
-    (p) => p.category === 'privacy' && p.targetUser === 'broadcaster',
-  );
-  // 판매자 개인정보처리방침
-  const sellerPrivacyList = policy.data.filter(
-    (p) => p.category === 'privacy' && p.targetUser === 'seller',
-  );
-  // 방송인 이용약관
-  const broadcasterTermsOfService = policy.data.filter(
-    (p) => p.category === 'termsOfService' && p.targetUser === 'broadcaster',
-  );
-  // 판매자 이용약관
-  const sellerTermsOfService = policy.data.filter(
-    (p) => p.category === 'termsOfService' && p.targetUser === 'seller',
-  );
 
+  const filteredData = (
+    category: PolicyCategory,
+    target: PolicyTarget,
+  ): Omit<Policy, 'content'>[] => {
+    return policy.data.filter((p) => p.category === category && p.targetUser === target);
+  };
   return (
     <Stack spacing={8}>
-      <Stack>
-        <Heading size="lg">이용약관</Heading>
-        <PolicyListContainer
-          label="방송인"
-          data={broadcasterTermsOfService}
-          onClick={moveToWriteBroadcasterTermsOfServicePage}
-        />
-        <PolicyListContainer
-          label="판매자"
-          data={sellerTermsOfService}
-          onClick={moveToWriteSellerTermsOfServicePage}
-        />
-      </Stack>
-
       <Stack>
         <Heading size="lg">개인정보처리방침</Heading>
         <PolicyListContainer
           label="방송인"
-          data={broadcasterPrivacyList}
-          onClick={moveToWriteBroadcasterPrivacyPage}
+          data={filteredData(privacy, broadcaster)}
+          onClick={() => moveToWrite(privacy, broadcaster)}
         />
         <PolicyListContainer
           label="판매자"
-          data={sellerPrivacyList}
-          onClick={moveToWriteSellerPrivacyPage}
+          data={filteredData(privacy, seller)}
+          onClick={() => moveToWrite(privacy, seller)}
+        />
+      </Stack>
+
+      <Stack>
+        <Heading size="lg">이용약관</Heading>
+        <PolicyListContainer
+          label="방송인"
+          data={filteredData(termsOfService, broadcaster)}
+          onClick={() => moveToWrite(termsOfService, broadcaster)}
+        />
+        <PolicyListContainer
+          label="판매자"
+          data={filteredData(termsOfService, seller)}
+          onClick={() => moveToWrite(termsOfService, seller)}
         />
       </Stack>
     </Stack>
