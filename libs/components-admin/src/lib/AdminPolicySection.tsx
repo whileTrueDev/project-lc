@@ -5,9 +5,25 @@ import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useAdminPolicyList } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 
 export function AdminPolicySection(): JSX.Element {
   const policy = useAdminPolicyList();
+  const router = useRouter();
+
+  // 방송인 개인정보처리방침 작성 페이지로 이동
+  const moveToWriteBroadcasterTermsOfServicePage = (): Promise<boolean> =>
+    router.push('/general/policy/write/termsOfService/broadcaster');
+  // 판매자 개인정보처리방침 작성 페이지로 이동
+  const moveToWriteSellerTermsOfServicePage = (): Promise<boolean> =>
+    router.push('/general/policy/write/termsOfService/seller');
+  // 방송인 이용약관 작성 페이지로 이동
+  const moveToWriteBroadcasterPrivacyPage = (): Promise<boolean> =>
+    router.push('/general/policy/write/privatcy/broadcaster');
+  // 판매자 이용약관 작성 페이지로 이동
+  const moveToWriteSellerPrivacyPage = (): Promise<boolean> =>
+    router.push('/general/policy/write/seller/broadcaster');
+
   if (policy.isLoading) {
     return <Spinner />;
   }
@@ -15,7 +31,23 @@ export function AdminPolicySection(): JSX.Element {
     return <Text>에러 {JSON.stringify(policy.error)}</Text>;
   }
   if (!policy.data) {
-    return <Text>데이터가 없습니다, 생성버튼 있어야함</Text>;
+    return (
+      <Stack>
+        <Text>데이터가 없습니다</Text>;
+        <Button size="sm" onClick={moveToWriteBroadcasterTermsOfServicePage}>
+          방송인 개인정보처리방침 작성하기
+        </Button>
+        <Button size="sm" onClick={moveToWriteSellerTermsOfServicePage}>
+          판매자 개인정보처리방침 작성하기
+        </Button>
+        <Button size="sm" onClick={moveToWriteBroadcasterPrivacyPage}>
+          방송인 이용약관 작성하기
+        </Button>
+        <Button size="sm" onClick={moveToWriteSellerPrivacyPage}>
+          판매자 이용약관 작성하기
+        </Button>
+      </Stack>
+    );
   }
   // 방송인 개인정보처리방침
   const broadcasterPrivacyList = policy.data.filter(
@@ -38,14 +70,30 @@ export function AdminPolicySection(): JSX.Element {
     <Stack spacing={8}>
       <Stack>
         <Heading size="lg">이용약관</Heading>
-        <PolicyListContainer label="방송인" data={broadcasterTermsOfService} />
-        <PolicyListContainer label="판매자" data={sellerTermsOfService} />
+        <PolicyListContainer
+          label="방송인"
+          data={broadcasterTermsOfService}
+          onClick={moveToWriteBroadcasterTermsOfServicePage}
+        />
+        <PolicyListContainer
+          label="판매자"
+          data={sellerTermsOfService}
+          onClick={moveToWriteSellerTermsOfServicePage}
+        />
       </Stack>
 
       <Stack>
         <Heading size="lg">개인정보처리방침</Heading>
-        <PolicyListContainer label="방송인" data={broadcasterPrivacyList} />
-        <PolicyListContainer label="판매자" data={sellerPrivacyList} />
+        <PolicyListContainer
+          label="방송인"
+          data={broadcasterPrivacyList}
+          onClick={moveToWriteBroadcasterPrivacyPage}
+        />
+        <PolicyListContainer
+          label="판매자"
+          data={sellerPrivacyList}
+          onClick={moveToWriteSellerPrivacyPage}
+        />
       </Stack>
     </Stack>
   );
@@ -54,15 +102,19 @@ export function AdminPolicySection(): JSX.Element {
 function PolicyListContainer({
   label,
   data,
+  onClick,
 }: {
   label: string;
   data: Omit<Policy, 'content'>[];
+  onClick: () => any;
 }): JSX.Element {
   return (
     <Stack>
       <Stack direction="row" alignItems="center">
         <Heading size="sm">{label}</Heading>
-        <Button size="sm">새로 작성</Button>
+        <Button size="sm" onClick={onClick}>
+          새로 작성
+        </Button>
       </Stack>
 
       <AdminPolicyList data={data} />
