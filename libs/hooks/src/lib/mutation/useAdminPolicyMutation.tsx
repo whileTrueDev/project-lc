@@ -1,5 +1,5 @@
 import { Policy } from '@prisma/client';
-import { UpdatePolicyDto } from '@project-lc/shared-types';
+import { CreatePolicyDto, UpdatePolicyDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
@@ -50,6 +50,28 @@ export const useAdminPolicyDeleteMutation = (
       onSuccess: (data) => {
         queryClient.invalidateQueries('AdminPolicyList', { refetchInactive: true });
         queryClient.removeQueries(['AdminPolicy', id]);
+      },
+    },
+  );
+};
+
+// 생성 뮤테이션 훅
+export type useAdminPolicyCreateMutationRes = Policy;
+
+export const useAdminPolicyCreateMutation = (): UseMutationResult<
+  useAdminPolicyCreateMutationRes,
+  AxiosError,
+  CreatePolicyDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<useAdminPolicyCreateMutationRes, AxiosError, CreatePolicyDto>(
+    (dto: CreatePolicyDto) =>
+      axios
+        .post<useAdminPolicyCreateMutationRes>(`/admin/policy`, dto)
+        .then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('AdminPolicyList', { refetchInactive: true });
       },
     },
   );

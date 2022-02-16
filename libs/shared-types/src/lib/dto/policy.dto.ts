@@ -13,6 +13,7 @@ export class CreatePolicyDto {
   content: string;
 
   @IsDate()
+  @Type(() => Date)
   enforcementDate: Date;
 
   @IsString()
