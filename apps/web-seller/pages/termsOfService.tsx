@@ -1,4 +1,4 @@
-import { Box, Container, Flex } from '@chakra-ui/react';
+import { Box, Flex, Container } from '@chakra-ui/react';
 import { Policy, PolicyCategory, PolicyTarget } from '@prisma/client';
 import { sellerFooterLinkList } from '@project-lc/components-constants/footerLinks';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
@@ -7,26 +7,26 @@ import { SellerNavbar } from '@project-lc/components-shared/Navbar';
 import { getPolicy, usePolicy } from '@project-lc/hooks';
 import { GetStaticProps, GetStaticPropsContext, InferGetStaticPropsType } from 'next';
 
-interface PrivacyProps {
+interface TermsofserviceProps {
   policy: Policy;
 }
 
-export const getStaticProps: GetStaticProps<PrivacyProps> = async (
+export const getStaticProps: GetStaticProps<TermsofserviceProps> = async (
   context: GetStaticPropsContext,
 ) => {
   const policy = await getPolicy({
-    category: PolicyCategory.privacy,
+    category: PolicyCategory.termsOfService,
     targetUser: PolicyTarget.seller,
   });
   return { props: { policy } };
 };
 
-export function Privacy({
+export function Termsofservice({
   policy,
 }: InferGetStaticPropsType<typeof getStaticProps>): JSX.Element {
   const { data } = usePolicy(
     {
-      category: PolicyCategory.privacy,
+      category: PolicyCategory.termsOfService,
       targetUser: PolicyTarget.seller,
     },
     policy,
@@ -46,4 +46,4 @@ export function Privacy({
   );
 }
 
-export default Privacy;
+export default Termsofservice;
