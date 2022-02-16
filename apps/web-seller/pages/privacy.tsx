@@ -1,9 +1,5 @@
-import { Box, Container, Flex } from '@chakra-ui/react';
 import { Policy, PolicyCategory, PolicyTarget } from '@prisma/client';
-import { sellerFooterLinkList } from '@project-lc/components-constants/footerLinks';
-import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
-import FloatingHelpButton from '@project-lc/components-shared/FloatingHelpButton';
-import { SellerNavbar } from '@project-lc/components-shared/Navbar';
+import { PolicyWrapper } from '@project-lc/components-shared/PolicyWrapper';
 import { getPolicy, usePolicy } from '@project-lc/hooks';
 import { GetStaticProps, GetStaticPropsContext, InferGetStaticPropsType } from 'next';
 
@@ -31,19 +27,7 @@ export function Privacy({
     },
     policy,
   );
-  return (
-    <Box>
-      <SellerNavbar />
-      <Flex minH="100vh" justify="space-between" flexDirection="column">
-        <Container maxW="container.xl">
-          <Box dangerouslySetInnerHTML={{ __html: data.content }} p={10} />;
-        </Container>
-
-        <CommonFooter footerLinkList={sellerFooterLinkList} />
-      </Flex>
-      <FloatingHelpButton />
-    </Box>
-  );
+  return <PolicyWrapper appType={PolicyTarget.seller} content={data.content} />;
 }
 
 export default Privacy;
