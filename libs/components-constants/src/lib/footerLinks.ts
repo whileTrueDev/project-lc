@@ -14,7 +14,8 @@ export const sellerFooterLinkList: FooterLinkListItem[] = [
     items: [
       {
         title: '개인정보처리방침',
-        href: 'https://whiletrue.notion.site/7f6758f5344246c4989ac22f3ee7532e',
+        // href: 'https://whiletrue.notion.site/7f6758f5344246c4989ac22f3ee7532e',
+        href: '/privacy',
         isBold: true,
       },
       {
