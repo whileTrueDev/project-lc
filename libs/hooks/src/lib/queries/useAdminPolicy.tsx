@@ -14,10 +14,12 @@ export const useAdminPolicyList = (): UseQueryResult<AdminPolicyList, AxiosError
 };
 
 /** 관리자페이지에서 개별 정책 조회 */
-// export const getAdminPolicy = async (): Promise<AdminPolicyList> => {
-//   return axios.get<AdminPolicyList>('/admin/policy/list').then((res) => res.data);
-// };
+export const getAdminPolicy = async (id: number): Promise<Policy> => {
+  return axios.get<Policy>('/admin/policy', { params: { id } }).then((res) => res.data);
+};
 
-// export const useAdminPolicy = (): UseQueryResult<AdminPolicyList, AxiosError> => {
-//   return useQuery<AdminPolicyList, AxiosError>('AdminPolicyList', getAdminPolicy);
-// };
+export const useAdminPolicy = (id: number): UseQueryResult<Policy, AxiosError> => {
+  return useQuery<Policy, AxiosError>(['AdminPolicy', id], () => getAdminPolicy(id), {
+    enabled: !!id,
+  });
+};
