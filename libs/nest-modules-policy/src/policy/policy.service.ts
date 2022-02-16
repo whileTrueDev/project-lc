@@ -1,23 +1,15 @@
 import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { PrismaService } from '@project-lc/prisma-orm';
+import { Policy, Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { Cache } from 'cache-manager';
-import { Policy, PolicyCategory, PolicyTarget, Prisma } from '@prisma/client';
+import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreatePolicyDto,
   GetPolicyListDto,
+  POLICY_CATEGORY,
+  POLICY_TARGET_USER,
   UpdatePolicyDto,
 } from '@project-lc/shared-types';
-
-const POLICY_TARGET_USER: Record<PolicyTarget, string> = {
-  seller: '판매자',
-  broadcaster: '방송인',
-  all: '전체',
-};
-const POLICY_CATEGORY: Record<PolicyCategory, string> = {
-  termsOfService: '이용약관',
-  privacy: '개인정보처리방침',
-};
+import { Cache } from 'cache-manager';
 
 type PolicyFindOption = {
   isAdmin: boolean;
