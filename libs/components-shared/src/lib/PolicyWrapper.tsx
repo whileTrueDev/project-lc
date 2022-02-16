@@ -6,6 +6,7 @@ import {
   broadcasterFooterLinkList,
   sellerFooterLinkList,
 } from '@project-lc/components-constants/footerLinks';
+import 'suneditor/dist/css/suneditor.min.css';
 
 export interface PolicyWrapperProps {
   appType: 'seller' | 'broadcaster';
@@ -19,7 +20,11 @@ export function PolicyWrapper({ appType, content }: PolicyWrapperProps): JSX.Ele
       <Navbar appType={appType} />
       <Flex minH="100vh" justify="space-between" flexDirection="column">
         <Container maxW="container.xl">
-          <Box dangerouslySetInnerHTML={{ __html: content }} p={10} />;
+          <Box
+            className="sun-editor-editable"
+            dangerouslySetInnerHTML={{ __html: content }}
+            p={10}
+          />
         </Container>
 
         <CommonFooter footerLinkList={footerLink} />
