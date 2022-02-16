@@ -25,8 +25,11 @@ export class CacheConfig implements CacheOptionsFactory {
       const [host, port] = cacheClusterHost.split(':');
       cacheOptions.host = host;
       cacheOptions.port = port;
+      const clusterConfig = {
+        nodes: [{ host, port }],
+      };
+      cacheOptions.clusterConfig = clusterConfig;
     }
-
     return cacheOptions;
   }
 }
