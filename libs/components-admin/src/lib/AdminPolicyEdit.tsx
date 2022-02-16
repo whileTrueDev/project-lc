@@ -92,7 +92,7 @@ export function AdminPolicyEdit({ id }: AdminPolicyEditProps): JSX.Element {
 
 export default AdminPolicyEdit;
 
-type EditFormData = Omit<Policy, 'enforcementDate' | 'publicFlag'> & {
+export type PolicyFormData = Omit<Policy, 'enforcementDate' | 'publicFlag'> & {
   enforcementDate?: string;
   publicFlag: 'true' | 'false';
 };
@@ -109,7 +109,7 @@ function EditForm({ data }: { data: Policy }): JSX.Element {
     register,
     handleSubmit,
     control,
-  } = useForm<EditFormData>({
+  } = useForm<PolicyFormData>({
     defaultValues: {
       ...data,
       publicFlag: data.publicFlag ? 'true' : 'false',
@@ -121,7 +121,7 @@ function EditForm({ data }: { data: Policy }): JSX.Element {
 
   const toast = useToast();
   const updateRequest = useAdminPolicyUpdateMutation(data.id);
-  const onSubmitHandler = (d: EditFormData): void => {
+  const onSubmitHandler = (d: PolicyFormData): void => {
     if (!editor.current) return;
 
     const { enforcementDate, publicFlag, ...rest } = d;
@@ -149,7 +149,7 @@ function EditForm({ data }: { data: Policy }): JSX.Element {
         <Text>{data.id}</Text>
       </Stack>
 
-      <FormControl id="verpublicFlagsion" isInvalid={!!errors.publicFlag}>
+      <FormControl id="publicFlag" isInvalid={!!errors.publicFlag}>
         <Stack direction="row" alignItems="center">
           <FormLabel width="60px">공개여부</FormLabel>
           <RadioGroup value={watch('publicFlag').toString()}>
