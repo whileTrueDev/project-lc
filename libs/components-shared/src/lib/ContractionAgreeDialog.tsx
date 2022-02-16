@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   ButtonGroup,
   Center,
@@ -18,10 +17,10 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useState } from 'react';
 import { Term } from '@project-lc/components-constants/termType';
+import { HtmlStringBox } from '@project-lc/components-core/TermBox';
 import { useTerms } from '@project-lc/hooks';
-import 'suneditor/dist/css/suneditor.min.css';
+import { useState } from 'react';
 
 export function ContractionAgreeDialog({
   isOpen,
@@ -203,10 +202,7 @@ export function ContractionAgreeDialog({
                   <ModalHeader>{selectedTerm.title}</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody maxW="6xl" mx="auto">
-                    <Box
-                      className="sun-editor-editable"
-                      dangerouslySetInnerHTML={{ __html: selectedTerm.text }}
-                    />
+                    <HtmlStringBox htmlString={selectedTerm.text} />
                     {!agreementFlag && (
                       <Center m={2}>
                         <Checkbox

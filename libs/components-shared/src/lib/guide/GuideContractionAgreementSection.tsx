@@ -1,6 +1,5 @@
 import { CheckIcon } from '@chakra-ui/icons';
 import {
-  Box,
   Button,
   Center,
   Checkbox,
@@ -22,6 +21,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { Term } from '@project-lc/components-constants/termType';
+import { HtmlStringBox } from '@project-lc/components-core/TermBox';
 import { SettingSectionLayout } from '@project-lc/components-layout/SettingSectionLayout';
 import {
   useBroadcasterUpdateContractionAgreementMutation,
@@ -31,7 +31,6 @@ import {
 } from '@project-lc/hooks';
 import { guideConditionStore } from '@project-lc/stores';
 import { useEffect, useMemo, useState } from 'react';
-import 'suneditor/dist/css/suneditor.min.css';
 
 export function GuideContractionAgreementSection({
   userType,
@@ -303,10 +302,7 @@ export function GuideContractionAgreementSection({
             <ModalHeader>{selectedTerm.title}</ModalHeader>
             <ModalCloseButton />
             <ModalBody maxW="6xl" mx="auto">
-              <Box
-                className="sun-editor-editable"
-                dangerouslySetInnerHTML={{ __html: selectedTerm.text }}
-              />
+              <HtmlStringBox htmlString={selectedTerm.text} />
               {!계약동의여부 && (
                 <Center m={2}>
                   <Checkbox
@@ -339,10 +335,7 @@ export function GuideContractionAgreementSection({
             <ModalHeader>{selectedTerm.title}</ModalHeader>
             <ModalCloseButton />
             <ModalBody maxW="6xl" mx="auto">
-              <Box
-                className="sun-editor-editable"
-                dangerouslySetInnerHTML={{ __html: selectedTerm.text }}
-              />
+              <HtmlStringBox htmlString={selectedTerm.text} />
               {!계약동의여부 && (
                 <Center m={2}>
                   <Checkbox
