@@ -124,3 +124,4 @@ export * from './lib/useHorizontalScroll';
 export * from './lib/useOrderExportableCheck';
 export * from './lib/useOrderReturnOrRefundStatus';
 export * from './lib/useSocialLoginFailAlarm';
+export * from './lib/useTerms';
