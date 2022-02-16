@@ -12,16 +12,22 @@ import {
   Spinner,
   Stack,
   Text,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react';
 import TextField from '@material-ui/core/TextField';
 import { Policy } from '@prisma/client';
-import { useAdminPolicy, useAdminPolicyUpdateMutation } from '@project-lc/hooks';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import {
+  useAdminPolicy,
+  useAdminPolicyDeleteMutation,
+  useAdminPolicyUpdateMutation,
+} from '@project-lc/hooks';
 import { UpdatePolicyDto } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import 'suneditor/dist/css/suneditor.min.css';
 import SunEditorCore from 'suneditor/src/lib/core';
@@ -41,14 +47,46 @@ export function AdminPolicyEdit({ id }: AdminPolicyEditProps): JSX.Element {
   const router = useRouter();
   const { data, isLoading, isError } = useAdminPolicy(id);
 
+  const toast = useToast();
+  const goToList = useCallback(() => router.push('/general/policy'), [router]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const deleteRequest = useAdminPolicyDeleteMutation(id);
+
+  const onDelete = async (): Promise<void> => {
+    deleteRequest
+      .mutateAsync()
+      .then((res) => {
+        toast({ title: '삭제성공', status: 'success' });
+        goToList();
+      })
+      .catch((error) => {
+        toast({ title: `삭제실패 ${error}`, status: 'error' });
+      });
+  };
+
   if (isLoading) return <Spinner />;
   if (isError) return <Text>에러가 발생했습니다</Text>;
   if (!data) return <Text>데이터가 없습니다</Text>;
   return (
-    <Box>
-      <Button onClick={() => router.push('/general/policy')}>목록으로</Button>
+    <Stack>
+      <Stack direction="row" justify="space-between">
+        <Button onClick={goToList}>목록으로</Button>
+        <Button colorScheme="red" onClick={onOpen}>
+          데이터 삭제
+        </Button>
+      </Stack>
+
+      <ConfirmDialog
+        title="해당 데이터를 삭제하시겠습니까"
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={onDelete}
+      >
+        삭제시 복구가 불가능합니다
+      </ConfirmDialog>
+
       <EditForm data={data} />
-    </Box>
+    </Stack>
   );
 }
 
@@ -106,7 +144,7 @@ function EditForm({ data }: { data: Policy }): JSX.Element {
   };
   return (
     <Stack as="form" spacing={2} onSubmit={handleSubmit(onSubmitHandler)}>
-      <Stack direction="row" alignItems="center">
+      <Stack direction="row" alignItems="center" fontWeight="bold">
         <Text>id : </Text>
         <Text>{data.id}</Text>
       </Stack>
