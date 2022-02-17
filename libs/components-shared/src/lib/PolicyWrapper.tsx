@@ -1,12 +1,12 @@
 import { Box, Container, Flex } from '@chakra-ui/react';
-import FloatingHelpButton from '@project-lc/components-shared/FloatingHelpButton';
-import { Navbar } from '@project-lc/components-shared/Navbar';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import {
   broadcasterFooterLinkList,
   sellerFooterLinkList,
 } from '@project-lc/components-constants/footerLinks';
 import { HtmlStringBox } from '@project-lc/components-core/TermBox';
+import { Navbar } from './Navbar';
+import FloatingHelpButton from './FloatingHelpButton';
 
 export interface PolicyWrapperProps {
   appType: 'seller' | 'broadcaster';
