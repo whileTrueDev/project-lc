@@ -516,7 +516,7 @@ export class LCProdAppStack extends cdk.Stack {
         2,
       ),
       WHILETRUE_IP_ADDRESS: __loadSsmParmeter(c.WHILETRUE_IP_ADDRESS, 2),
-      REDIS_URL: __loadSsmParmeter(c.REDIS_URL_KEY),
+      REDIS_URL: __loadSsmParmeter(c.REDIS_URL_KEY, 2),
       CACHE_REDIS_URL_KEY: __loadSsmParmeter(c.CACHE_REDIS_URL_KEY),
     };
   }

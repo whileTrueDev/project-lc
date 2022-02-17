@@ -40,5 +40,20 @@ export class LCRedisStack extends cdk.Stack {
         numCacheNodes: 1,
       },
     );
+
+    new elasticache.CfnReplicationGroup(
+      this,
+      `${constants.PROD.ID_PREFIX}ElastiCacheClusterGroup`,
+      {
+        engine: 'redis',
+        replicationGroupId: 'KksProdRedis',
+        replicationGroupDescription: 'kkshow prod env cache cluster',
+        securityGroupIds: [redisSecGrp.securityGroupId],
+        cacheSubnetGroupName: redisSubnetGroup.cacheSubnetGroupName,
+        engineVersion: '6.2',
+        cacheNodeType: 'cache.t4g.micro',
+        numNodeGroups: 3,
+      },
+    );
   }
 }
