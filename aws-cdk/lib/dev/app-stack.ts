@@ -659,7 +659,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}REDIS_URL`,
       {
-        version: 1,
+        version: 4,
         parameterName: constants.DEV.REDIS_URL,
       },
     );
@@ -668,7 +668,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}CACHE_REDIS_URL`,
       {
-        version: 1,
+        version: 3,
         parameterName: constants.DEV.CACHE_REDIS_URL,
       },
     );
