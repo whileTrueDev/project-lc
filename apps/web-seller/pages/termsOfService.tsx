@@ -1,14 +1,18 @@
 import { Policy, PolicyCategory, PolicyTarget } from '@prisma/client';
 import PolicyWrapper from '@project-lc/components-shared/PolicyWrapper';
 import { getPolicy, usePolicy } from '@project-lc/hooks';
-import { GetStaticProps, GetStaticPropsContext, InferGetStaticPropsType } from 'next';
+import {
+  GetServerSideProps,
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from 'next';
 
 interface TermsofserviceProps {
   policy: Policy;
 }
 
-export const getStaticProps: GetStaticProps<TermsofserviceProps> = async (
-  context: GetStaticPropsContext,
+export const getServerSideProps: GetServerSideProps<TermsofserviceProps> = async (
+  context: GetServerSidePropsContext,
 ) => {
   const policy = await getPolicy({
     category: PolicyCategory.termsOfService,
@@ -19,7 +23,7 @@ export const getStaticProps: GetStaticProps<TermsofserviceProps> = async (
 
 export function Termsofservice({
   policy,
-}: InferGetStaticPropsType<typeof getStaticProps>): JSX.Element {
+}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element {
   const { data } = usePolicy(
     {
       category: PolicyCategory.termsOfService,
