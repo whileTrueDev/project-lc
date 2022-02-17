@@ -84,25 +84,25 @@ const BASE_BANNER_IMAGE_S3_PATH =
   'https://lc-project.s3.ap-northeast-2.amazonaws.com/public/';
 const baseBannerImages = [
   {
-    key: 'promotion-page-basic-image-1.png',
+    key: 'promotion-page-banner-twitch.png',
     name: '트위치 기본 배너',
     desc: '트위치 패널에 등록하세요!',
-    width: 400,
-    height: 130,
+    width: 320,
+    height: 96,
   },
   {
-    key: 'promotion-page-basic-image-2.png',
+    key: 'promotion-page-banner-afreeca-floating.png',
     desc: '아프리카 방송국 플로팅 배너에 등록하세요!',
     name: '아프리카 플로팅 기본 배너',
-    width: 120,
-    height: 300,
+    width: 126,
+    height: 329,
   },
   {
-    key: 'promotion-page-basic-image-3.png',
+    key: 'promotion-page-banner-afreeca-bottom.png',
     desc: '아프리카 방송국 하단 배너에 등록하세요!',
     name: '아프리카 방송국 하단 기본 배너',
-    width: 400,
-    height: 120,
+    width: 750,
+    height: 150,
   },
 ];
 
