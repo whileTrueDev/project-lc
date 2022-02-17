@@ -152,7 +152,11 @@ function EditForm({
       })
       .catch((e) => {
         console.error(e);
-        toast({ title: `수정 실패 - ${e}`, status: 'error' });
+        toast({
+          title: `수정 불가`,
+          description: e.response.data.message,
+          status: 'error',
+        });
       });
   };
   return (

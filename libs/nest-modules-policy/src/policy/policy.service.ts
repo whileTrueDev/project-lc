@@ -25,15 +25,9 @@ export class PolicyService extends ServiceBaseWithCache {
     super(cacheManager);
   }
 
-  private async countPolicy({
-    category,
-    targetUser,
-  }: Pick<CreatePolicyDto, 'category' | 'targetUser'>): Promise<number> {
+  private async countPolicy(where: Prisma.PolicyWhereInput): Promise<number> {
     const policyCount = await this.prisma.policy.count({
-      where: {
-        category,
-        targetUser,
-      },
+      where,
     });
     return policyCount;
   }
@@ -74,9 +68,28 @@ export class PolicyService extends ServiceBaseWithCache {
     return policy;
   }
 
+  /** 공개약관 최소 1개는 있도록 강제하기 위해 공개 약관 개수 확인하는 함수
+   * - 카테고리, 대상별 약관 목록 중 공개여부: true 인 데이터가 1개 이하인 경우 에러 */
+  private async throwErrorIfOnlyOnePublicPolicyExist({
+    category,
+    targetUser,
+  }: GetPolicyDto): Promise<void> {
+    const count = await this.countPolicy({ category, targetUser, publicFlag: true });
+    if (count <= 1) {
+      throw new BadRequestException(
+        `${POLICY_TARGET_USER[targetUser]} ${POLICY_CATEGORY[category]} 중 적어도 1개는 공개해야 합니다.`,
+      );
+    }
+  }
+
   /** 수정 */
   public async updatePolicy(policyId: number, dto: UpdatePolicyDto): Promise<Policy> {
     const policy = await this.findPolicyById(policyId);
+
+    // 수정요청 데이터에 공개여부:false 포함된 경우에만 확인
+    if ('publicFlag' in dto && dto.publicFlag === false) {
+      await this.throwErrorIfOnlyOnePublicPolicyExist(policy);
+    }
 
     const data = await this.prisma.policy.update({
       where: { id: policy.id },
