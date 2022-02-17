@@ -36,6 +36,7 @@ import { useCallback, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import 'suneditor/dist/css/suneditor.min.css';
 import SunEditorCore from 'suneditor/src/lib/core';
+import { policyEditorOptions } from './AdminPolicyWrite';
 
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,
@@ -205,21 +206,7 @@ function EditForm({ data }: { data: Policy }): JSX.Element {
       <SunEditor
         getSunEditorInstance={getSunEditorInstance}
         lang="ko"
-        setOptions={{
-          height: '300px',
-          buttonList: [
-            [
-              'font',
-              'fontSize',
-              'align',
-              'list',
-              'bold',
-              'underline',
-              'italic',
-              'strike',
-            ],
-          ],
-        }}
+        setOptions={policyEditorOptions}
         defaultValue={watch('content')}
       />
       <Button type="submit" isLoading={updateRequest.isLoading}>

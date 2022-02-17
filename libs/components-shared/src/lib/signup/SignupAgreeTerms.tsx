@@ -56,7 +56,7 @@ export function SignupAgreeTerms({
             </Text>
           </Checkbox>
           <HtmlStringBox
-            maxHeight={200}
+            maxHeight={120}
             {...boxStyle}
             mb={1}
             overflowY="auto"

@@ -25,6 +25,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import SetOptions from 'suneditor-react/dist/types/SetOptions';
 import 'suneditor/dist/css/suneditor.min.css';
 import SunEditorCore from 'suneditor/src/lib/core';
 
@@ -54,6 +55,26 @@ export function AdminPolicyWrite({
 }
 
 export default AdminPolicyWrite;
+
+export const policyEditorOptions: SetOptions = {
+  height: '300px',
+  buttonList: [
+    [
+      'undo',
+      'redo',
+      'font',
+      'fontSize',
+      'formatBlock',
+      'paragraphStyle',
+      'align',
+      'list',
+      'bold',
+      'underline',
+      'italic',
+      'strike',
+    ],
+  ],
+};
 
 type PolicyWriteFormData = Pick<
   CreatePolicyDto,
@@ -167,21 +188,7 @@ function WriteForm({ category, targetUser }: AdminPolicyWriteProps): JSX.Element
       <SunEditor
         getSunEditorInstance={getSunEditorInstance}
         lang="ko"
-        setOptions={{
-          height: '300px',
-          buttonList: [
-            [
-              'font',
-              'fontSize',
-              'align',
-              'list',
-              'bold',
-              'underline',
-              'italic',
-              'strike',
-            ],
-          ],
-        }}
+        setOptions={policyEditorOptions}
         defaultValue={watch('content')}
       />
       <Button type="submit" isLoading={createRequest.isLoading}>
