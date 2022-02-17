@@ -70,14 +70,14 @@ export class PolicyService extends ServiceBaseWithCache {
 
   /** 공개약관 최소 1개는 있도록 강제하기 위해 공개 약관 개수 확인하는 함수
    * - 카테고리, 대상별 약관 목록 중 공개여부: true 인 데이터가 1개 이하인 경우 에러 */
-  private async throwErrorIfOnlyOnePublicPolicyExist({
+  private async throwErrorIfPublicPolicyWillNotExist({
     category,
     targetUser,
   }: GetPolicyDto): Promise<void> {
     const count = await this.countPolicy({ category, targetUser, publicFlag: true });
     if (count <= 1) {
       throw new BadRequestException(
-        `${POLICY_TARGET_USER[targetUser]} ${POLICY_CATEGORY[category]} 중 적어도 1개는 공개해야 합니다.`,
+        `${POLICY_TARGET_USER[targetUser]} ${POLICY_CATEGORY[category]} 중 적어도 1개의 공개약관이 존재해야 합니다.`,
       );
     }
   }
@@ -88,7 +88,7 @@ export class PolicyService extends ServiceBaseWithCache {
 
     // 수정요청 데이터에 공개여부:false 포함된 경우에만 확인
     if ('publicFlag' in dto && dto.publicFlag === false) {
-      await this.throwErrorIfOnlyOnePublicPolicyExist(policy);
+      await this.throwErrorIfPublicPolicyWillNotExist(policy);
     }
 
     const data = await this.prisma.policy.update({
@@ -104,13 +104,20 @@ export class PolicyService extends ServiceBaseWithCache {
     const policy = await this.findPolicyById(policyId);
 
     const { category, targetUser } = policy;
-    const existPolicyCount = await this.countPolicy({ category, targetUser });
-    if (existPolicyCount <= 1) {
+    // 기존 공개약관 개수
+    const existPublicPolicyCount = await this.countPolicy({
+      category,
+      targetUser,
+      publicFlag: true,
+    });
+    // 삭제 후 남아있을 공개약관 개수 <= 0 인경우 에러발생
+    if (existPublicPolicyCount - Number(policy.publicFlag) <= 0) {
       throw new BadRequestException(
-        `${POLICY_TARGET_USER[targetUser]} ${POLICY_CATEGORY[category]} 중 적어도 1개는 존재해야 합니다.`,
+        `${POLICY_TARGET_USER[targetUser]} ${POLICY_CATEGORY[category]} 중 적어도 1개의 공개약관이 존재해야 합니다.`,
       );
     }
 
+    // 삭제해도 공개약관 남아 있을 경우에만 삭제 실행
     await this.prisma.policy.delete({
       where: { id: policy.id },
     });
