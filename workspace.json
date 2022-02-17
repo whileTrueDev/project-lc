@@ -64,7 +64,7 @@
             "commands": [
               "docker build -f ./apps/api/Dockerfile -t {args.registry}/project-lc-api:{args.tag} --platform=linux/amd64 .",
               "docker tag {args.registry}/project-lc-api:{args.tag} {args.registry}/project-lc-api:latest",
-              "docker push {args.registry}/project-lc-api:{args.tag}"
+              "docker push --all-tags {args.registry}/project-lc-api"
             ],
             "parallel": false
           }
@@ -136,7 +136,7 @@
             "commands": [
               "docker build -f ./apps/api-realtime/Dockerfile -t {args.registry}/project-lc-realtimeapi:{args.tag} --platform=linux/amd64 .",
               "docker tag {args.registry}/project-lc-realtimeapi:{args.tag} {args.registry}/project-lc-realtimeapi:latest",
-              "docker push {args.registry}/project-lc-realtimeapi:{args.tag}"
+              "docker push --all-tags {args.registry}/project-lc-realtimeapi"
             ],
             "parallel": false
           }
@@ -838,7 +838,7 @@
             "commands": [
               "docker build -f ./apps/overlay/Dockerfile -t {args.registry}/project-lc-overlay:{args.tag} --platform=linux/amd64 .",
               "docker tag {args.registry}/project-lc-overlay:{args.tag} {args.registry}/project-lc-overlay:latest",
-              "docker push {args.registry}/project-lc-overlay:{args.tag}"
+              "docker push --all-tags {args.registry}/project-lc-overlay"
             ],
             "parallel": false
           }
@@ -914,7 +914,7 @@
             "commands": [
               "docker build -f ./apps/overlay-controller/Dockerfile -t {args.registry}/project-lc-overlay-controller:{args.tag} --platform=linux/amd64 .",
               "docker tag {args.registry}/project-lc-overlay-controller:{args.tag} {args.registry}/project-lc-overlay-controller:latest",
-              "docker push {args.registry}/project-lc-overlay-controller:{args.tag}"
+              "docker push --all-tags {args.registry}/project-lc-overlay-controller"
             ],
             "parallel": false
           }
