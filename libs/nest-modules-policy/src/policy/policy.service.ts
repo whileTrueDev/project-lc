@@ -103,6 +103,14 @@ export class PolicyService extends ServiceBaseWithCache {
   public async deletePolicy(policyId: number): Promise<boolean> {
     const policy = await this.findPolicyById(policyId);
 
+    const { category, targetUser } = policy;
+    const existPolicyCount = await this.countPolicy({ category, targetUser });
+    if (existPolicyCount <= 1) {
+      throw new BadRequestException(
+        `${POLICY_TARGET_USER[targetUser]} ${POLICY_CATEGORY[category]} 중 적어도 1개는 존재해야 합니다.`,
+      );
+    }
+
     await this.prisma.policy.delete({
       where: { id: policy.id },
     });

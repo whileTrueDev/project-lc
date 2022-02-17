@@ -65,8 +65,13 @@ export function AdminPolicyEdit({ id }: AdminPolicyEditProps): JSX.Element {
         toast({ title: '삭제성공', status: 'success' });
         goToList();
       })
-      .catch((error) => {
-        toast({ title: `삭제실패 ${error}`, status: 'error' });
+      .catch((e) => {
+        console.error(e);
+        toast({
+          title: `삭제 불가`,
+          description: e.response.data.message,
+          status: 'error',
+        });
       });
   };
 
