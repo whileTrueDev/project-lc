@@ -1,4 +1,14 @@
-import { Button, Heading, Link, Spinner, Stack, Text } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Heading,
+  Link,
+  Spinner,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import { Policy, PolicyCategory, PolicyTarget } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
@@ -10,6 +20,24 @@ import { useRouter } from 'next/router';
 const POLICY_WRITE_BASE = '/general/policy/write';
 function getPolicyWriteUrl(category: PolicyCategory, target: PolicyTarget): string {
   return `${POLICY_WRITE_BASE}/${category}/${target}`;
+}
+
+/** 관리자, 운영자를 위한 약관 작성, 수정 시 주의사항 */
+export function AdminPolicyCaution(): JSX.Element {
+  return (
+    <Stack>
+      <Alert status="warning">
+        <AlertIcon />
+        정책 조항이 변경, 삭제, 생성되는 경우에는 &quot;작성&quot; 버튼을 눌러 새로운
+        버전을 작성해주세요.
+      </Alert>
+
+      <Alert status="warning">
+        <AlertIcon />
+        오타수정과 같이 정책 조항의 변화가 없는 경우에만 내용을 수정해주세요.
+      </Alert>
+    </Stack>
+  );
 }
 
 export function AdminPolicySection(): JSX.Element {
@@ -32,6 +60,7 @@ export function AdminPolicySection(): JSX.Element {
   if (!policy.data) {
     return (
       <Stack>
+        <AdminPolicyCaution />
         <Text>데이터가 없습니다</Text>;
         <Button size="sm" onClick={() => moveToWrite(privacy, broadcaster)}>
           방송인 개인정보처리방침 작성하기
@@ -57,6 +86,7 @@ export function AdminPolicySection(): JSX.Element {
   };
   return (
     <Stack spacing={8}>
+      <AdminPolicyCaution />
       <Stack>
         <Heading size="lg">개인정보처리방침</Heading>
         <PolicyListContainer
