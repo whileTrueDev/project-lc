@@ -98,21 +98,10 @@ export class PolicyService extends ServiceBaseWithCache {
     return true;
   }
 
-  /**
-   * 특정 카테고리 & 타겟 정책 목록 조회
-   * @param dto { category: PolicyCategory, targetUser: PolicyTarget} 카테고리와 타겟유저 명시 필요
-   * @param options? {isAdmin: boolean} 관리자 요청인경우 {isAdmin:true}로 전달한다 => 공개여부 false인 데이터도 조회 가능
-   * @return content를 제외한 Policy 목록
-   */
-  public async getPolicyList(
-    dto: GetPolicyDto,
-    options?: PolicyFindOption,
+  /** 정책,약관 목록조회(컨텐츠는 포함하지 않음) */
+  private async getPolicyListWithoutContent(
+    where?: Prisma.PolicyWhereInput,
   ): Promise<Omit<Policy, 'content'>[]> {
-    let where: Prisma.PolicyWhereInput = dto;
-    // 관리자가 아닌경우 공개여부 true인 데이터만 조회
-    if (!options?.isAdmin) {
-      where = { ...where, publicFlag: true };
-    }
     return this.prisma.policy.findMany({
       where,
       orderBy: [{ enforcementDate: 'desc' }, { createDate: 'desc' }],
@@ -129,21 +118,27 @@ export class PolicyService extends ServiceBaseWithCache {
     });
   }
 
-  /** 관리자용 목록 조회(전체) */
+  /**
+   * 특정 카테고리 & 타겟 정책 목록 조회 => 카테고리와 타겟유저에 해당하는 목록만 조회(컨텐츠 제외)
+   * @param dto { category: PolicyCategory, targetUser: PolicyTarget} 카테고리와 타겟유저 명시 필요
+   * @param options? {isAdmin: boolean} 관리자 요청인경우 {isAdmin:true}로 전달한다 => 공개여부 false인 데이터도 조회 가능
+   * @return content를 제외한 Policy 목록
+   */
+  public async getPolicyListByCategoryAndTarget(
+    dto: GetPolicyDto,
+    options?: PolicyFindOption,
+  ): Promise<Omit<Policy, 'content'>[]> {
+    let where: Prisma.PolicyWhereInput = dto;
+    // 관리자가 아닌경우 공개여부 true인 데이터만 조회
+    if (!options?.isAdmin) {
+      where = { ...where, publicFlag: true };
+    }
+    return this.getPolicyListWithoutContent(where);
+  }
+
+  /** 관리자용 목록 조회(카테고리, 타겟 무관하게 전체조회) */
   public async getAdminPolicyList(): Promise<Omit<Policy, 'content'>[]> {
-    return this.prisma.policy.findMany({
-      orderBy: [{ enforcementDate: 'desc' }, { createDate: 'desc' }],
-      select: {
-        id: true,
-        category: true,
-        targetUser: true,
-        createDate: true,
-        updateDate: true,
-        enforcementDate: true,
-        version: true,
-        publicFlag: true,
-      },
-    });
+    return this.getPolicyListWithoutContent();
   }
 
   /**
