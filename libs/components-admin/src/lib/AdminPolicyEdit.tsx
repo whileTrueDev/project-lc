@@ -91,7 +91,7 @@ export function AdminPolicyEdit({ id }: AdminPolicyEditProps): JSX.Element {
         삭제시 복구가 불가능합니다
       </ConfirmDialog>
 
-      <EditForm data={data} />
+      <EditForm data={data} onEditSuccessHandler={goToList} />
     </Stack>
   );
 }
@@ -103,7 +103,13 @@ export type PolicyFormData = Omit<Policy, 'enforcementDate' | 'publicFlag'> & {
   publicFlag: 'true' | 'false';
 };
 
-function EditForm({ data }: { data: Policy }): JSX.Element {
+function EditForm({
+  data,
+  onEditSuccessHandler,
+}: {
+  data: Policy;
+  onEditSuccessHandler?: () => void;
+}): JSX.Element {
   const editor = useRef<SunEditorCore>();
   const getSunEditorInstance = (sunEditor: SunEditorCore): void => {
     editor.current = sunEditor;
@@ -141,6 +147,7 @@ function EditForm({ data }: { data: Policy }): JSX.Element {
     updateRequest
       .mutateAsync(dto)
       .then((res) => {
+        if (onEditSuccessHandler) onEditSuccessHandler();
         toast({ title: '수정 성공', status: 'success' });
       })
       .catch((e) => {
