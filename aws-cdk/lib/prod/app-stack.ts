@@ -207,6 +207,7 @@ export class LCProdAppStack extends cdk.Stack {
         CIPHER_SALT: Secret.fromSsmParameter(p.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: Secret.fromSsmParameter(p.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: Secret.fromSsmParameter(p.S3_ACCESS_KEY_SECRET),
+        CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -269,6 +270,7 @@ export class LCProdAppStack extends cdk.Stack {
         CIPHER_SALT: Secret.fromSsmParameter(p.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: Secret.fromSsmParameter(p.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: Secret.fromSsmParameter(p.S3_ACCESS_KEY_SECRET),
+        CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -325,6 +327,7 @@ export class LCProdAppStack extends cdk.Stack {
         CIPHER_PASSWORD: Secret.fromSsmParameter(p.CIPHER_PASSWORD),
         CIPHER_SALT: Secret.fromSsmParameter(p.CIPHER_SALT),
         REDIS_URL: Secret.fromSsmParameter(p.REDIS_URL),
+        CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}RealtimeApiLogGroup`, {

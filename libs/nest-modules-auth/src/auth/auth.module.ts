@@ -1,5 +1,4 @@
 import { Global, Module } from '@nestjs/common';
-import { PassportModule } from '@nestjs/passport';
 import { AdminModule } from '@project-lc/nest-modules-admin';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { MailModule } from '@project-lc/nest-modules-mail';
@@ -15,8 +14,7 @@ import { LocalStrategy } from './strategies/local.strategy';
   imports: [
     SellerModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
-    AdminModule,
-    PassportModule,
+    AdminModule.withoutControllers(),
     MailModule,
   ],
   providers: [AuthService, JwtStrategy, LocalStrategy, LoginHistoryService],

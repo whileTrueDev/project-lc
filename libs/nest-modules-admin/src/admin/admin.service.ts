@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { GoodsConfirmation, LiveShopping } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -170,10 +174,13 @@ export class AdminService {
     const confirmData = await this.prisma.goodsConfirmation.findFirst({
       where: { firstmallGoodsConnectionId: fmGoodsId },
     });
-
-    if (confirmData) {
-      return true;
-    }
+    const lv = await this.prisma.liveShopping.findFirst({
+      where: { fmGoodsSeq: fmGoodsId },
+    });
+    const pp = await this.prisma.productPromotion.findFirst({
+      where: { fmGoodsSeq: fmGoodsId },
+    });
+    if (confirmData || lv || pp) return true;
     return false;
   }
 
@@ -188,10 +195,10 @@ export class AdminService {
 
     if (hasDuplicatedFmGoodsConnectionId) {
       throw new BadRequestException(
-        `이미 ( 퍼스트몰 상품 고유번호 : ${firstmallGoodsConnectionId} ) 로 검수된 상품이 존재합니다. 퍼스트몰 상품 고유번호를 다시 확인해주세요.`,
+        `이미 ( 퍼스트몰 상품 고유번호 : ${firstmallGoodsConnectionId} ) 로 검수된
+        상품or라이브쇼핑or상품홍보가 존재합니다. 퍼스트몰 상품 고유번호를 다시 확인해주세요.`,
       );
     }
-
     // 동일한 퍼스트몰 상품번호로 검수된 상품이 없다면(중복이 아닌 경우) 그대로 검수 확인 진행
     const goodsConfirmation = await this.prisma.goodsConfirmation.update({
       where: { goodsId: dto.goodsId },
@@ -201,11 +208,7 @@ export class AdminService {
         rejectionReason: null,
       },
     });
-
-    if (!goodsConfirmation) {
-      throw new Error(`승인 상태 변경불가`);
-    }
-
+    if (!goodsConfirmation) throw new InternalServerErrorException(`승인 상태 변경불가`);
     return goodsConfirmation;
   }
 
@@ -219,7 +222,7 @@ export class AdminService {
     });
 
     if (!goodsConfirmation) {
-      throw new Error(`승인 상태 변경불가`);
+      throw new InternalServerErrorException(`승인 상태 변경불가`);
     }
 
     return goodsConfirmation;
@@ -255,21 +258,11 @@ export class AdminService {
       where: { id: id ? Number(id) : undefined },
       include: {
         goods: {
-          select: {
-            goods_name: true,
-            summary: true,
-          },
+          select: { goods_name: true, summary: true },
         },
-        seller: {
-          select: {
-            sellerShop: true,
-          },
-        },
+        seller: { select: { sellerShop: true } },
         broadcaster: {
-          select: {
-            userNickname: true,
-            email: true,
-          },
+          select: { userNickname: true, email: true },
         },
         liveShoppingVideo: {
           select: { youtubeUrl: true },
@@ -283,10 +276,16 @@ export class AdminService {
     dto: LiveShoppingDTO,
     videoId?: number | null,
   ): Promise<boolean> {
+    if (dto.fmGoodsSeq) {
+      const isDuplicated = await this.checkDupFMGoodsConnectionId(Number(dto.fmGoodsSeq));
+      if (isDuplicated)
+        throw new BadRequestException(
+          `이미 다른 상품or라이브쇼핑or상품홍보에 연결된 퍼스트몰 상품번호입니다.
+          퍼스트몰 상품 고유번호를 다시 확인해주세요.`,
+        );
+    }
     const liveShoppingUpdate = await this.prisma.liveShopping.update({
-      where: {
-        id: Number(dto.id),
-      },
+      where: { id: Number(dto.id) },
       data: {
         progress: dto.progress || undefined,
         broadcasterId: dto.broadcasterId || undefined,
@@ -302,43 +301,28 @@ export class AdminService {
         videoId: videoId || undefined,
         whiletrueCommissionRate: dto.whiletrueCommissionRate || 0,
         broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
-        fmGoodsSeq: Number(dto.fmGoodsSeq) || undefined,
+        fmGoodsSeq: dto.fmGoodsSeq ? Number(dto.fmGoodsSeq) : undefined,
         liveShoppingName: dto.liveShoppingName || undefined,
       },
     });
-    if (!liveShoppingUpdate) {
-      throw new Error(`업데이트 실패`);
-    }
-
+    if (!liveShoppingUpdate) throw new InternalServerErrorException(`업데이트 실패`);
     return true;
   }
 
   public async registVideoUrl(url: string): Promise<number> {
     const videoUrl = await this.prisma.liveShoppingVideo.create({
-      data: {
-        youtubeUrl: url || undefined,
-      },
+      data: { youtubeUrl: url || undefined },
     });
-    if (!videoUrl) {
-      throw new Error(`비디오 등록 실패`);
-    }
+    if (!videoUrl) throw new InternalServerErrorException(`비디오 등록 실패`);
     return videoUrl.id;
   }
 
   public async deleteVideoUrl(liveShoppingId: number): Promise<boolean> {
     const videoUrl = await this.prisma.liveShopping.update({
-      where: {
-        id: Number(liveShoppingId),
-      },
-      data: {
-        liveShoppingVideo: {
-          delete: true,
-        },
-      },
+      where: { id: Number(liveShoppingId) },
+      data: { liveShoppingVideo: { delete: true } },
     });
-    if (!videoUrl) {
-      throw new Error(`비디오 삭제 실패`);
-    }
+    if (!videoUrl) throw new InternalServerErrorException(`비디오 삭제 실패`);
     return true;
   }
 

@@ -7,6 +7,7 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
 import { FirstmallDbModule } from '@project-lc/firstmall-db';
 import { CacheConfig, CsrfTokenMiddleware, mailerConfig } from '@project-lc/nest-core';
 import { AdminModule } from '@project-lc/nest-modules-admin';
@@ -26,25 +27,25 @@ import { ShippingGroupModule } from '@project-lc/nest-modules-shipping-group';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 
 @Module({
   imports: [
+    PassportModule,
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
     CacheModule.registerAsync({ isGlobal: true, useClass: CacheConfig }),
     MailerModule.forRoot(mailerConfig),
+    AuthModule,
     FirstmallDbModule,
     PrismaModule,
-    AuthModule,
     SocialModule,
-    AdminModule,
     ShippingGroupModule,
     NoticeModule,
-    OrderCancelModule,
     NotificationModule,
     InquiryModule,
     CipherModule,
     JwtHelperModule,
+    OrderCancelModule.withControllers(),
+    AdminModule.withControllers(),
     SellerModule.withControllers(),
     GoodsModule.withControllers(),
     LiveShoppingModule.withControllers(),
@@ -52,7 +53,7 @@ import { AppService } from './app.service';
     PolicyModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

@@ -1,13 +1,15 @@
-import { Module } from '@nestjs/common';
-import { PrismaModule } from '@project-lc/prisma-orm';
+import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { OverlayControllerModule } from '@project-lc/nest-modules-overlay-controller';
+import { CacheConfig } from '@project-lc/nest-core';
 import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
-import { AppController } from './app.controller';
+import { OverlayControllerModule } from '@project-lc/nest-modules-overlay-controller';
+import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
+    CacheModule.registerAsync({ isGlobal: true, useClass: CacheConfig }),
     PrismaModule,
     OverlayControllerModule,
     LiveShoppingModule.withoutControllers(),

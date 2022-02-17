@@ -108,8 +108,12 @@ export class FmSettlementService {
             return {
               ...o,
               seller: lcgoods.seller,
-              LiveShopping: lcgoods.LiveShopping,
-              productPromotion: lcgoods.productPromotion,
+              LiveShopping: lcgoods.LiveShopping.filter(
+                (x) => x.fmGoodsSeq === o.goods_seq,
+              ),
+              productPromotion: lcgoods.productPromotion.filter(
+                (x) => x.fmGoodsSeq === o.goods_seq,
+              ),
             };
           }
           return { ...o, seller: null, LiveShopping: [], productPromotion: [] };

@@ -13,18 +13,16 @@ export class CacheConfig implements CacheOptionsFactory {
     const cacheOptions: CacheModuleOptions = {
       isGlobal: true,
       store: redisCacheStore,
-      host: 'localhost',
-      ttl: 5,
+      ttl: 10,
+      clusterConfig: {
+        nodes: [{ host: 'localhost', port: 6379 }],
+      },
     };
-
-    if (
-      ['production', 'test'].includes(nodeEnv) &&
-      cacheClusterHost &&
-      cacheClusterHost.includes(':')
-    ) {
+    if (['production', 'test'].includes(nodeEnv)) {
+      // 테스트, 프로덕션 환경
       const [host, port] = cacheClusterHost.split(':');
-      cacheOptions.host = host;
-      cacheOptions.port = port;
+      const clusterConfig = { nodes: [{ host, port: port || 6379 }] };
+      cacheOptions.clusterConfig = clusterConfig;
     }
 
     return cacheOptions;
