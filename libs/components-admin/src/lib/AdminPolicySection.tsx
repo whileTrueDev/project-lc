@@ -31,11 +31,6 @@ export function AdminPolicyCaution(): JSX.Element {
         정책 조항이 변경, 삭제, 생성되는 경우에는 &quot;작성&quot; 버튼을 눌러 새로운
         버전을 작성해주세요.
       </Alert>
-
-      <Alert status="warning">
-        <AlertIcon />
-        오타수정과 같이 정책 조항의 변화가 없는 경우에만 내용을 수정해주세요.
-      </Alert>
     </Stack>
   );
 }

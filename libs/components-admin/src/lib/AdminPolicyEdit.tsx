@@ -1,5 +1,6 @@
 import {
-  Box,
+  Alert,
+  AlertIcon,
   Button,
   Center,
   FormControl,
@@ -95,7 +96,10 @@ export function AdminPolicyEdit({ id }: AdminPolicyEditProps): JSX.Element {
       >
         삭제시 복구가 불가능합니다
       </ConfirmDialog>
-
+      <Alert status="warning">
+        <AlertIcon />
+        오타수정과 같이 정책 조항의 변화가 없는 경우에만 내용을 수정해주세요.
+      </Alert>
       <EditForm data={data} onEditSuccessHandler={goToList} />
     </Stack>
   );
