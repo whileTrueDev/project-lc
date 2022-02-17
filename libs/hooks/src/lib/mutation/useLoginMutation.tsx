@@ -5,10 +5,10 @@ import axios from '../../axios';
 
 export const useLoginMutation = (
   type: UserType,
-): UseMutationResult<loginUserRes, AxiosError, LoginUserDto> => {
-  return useMutation<loginUserRes, AxiosError, LoginUserDto>((dto: LoginUserDto) =>
+): UseMutationResult<loginUserRes | any, AxiosError, LoginUserDto> => {
+  return useMutation<loginUserRes | any, AxiosError, LoginUserDto>((dto: LoginUserDto) =>
     axios
-      .post<loginUserRes>('/auth/login', dto, {
+      .post<loginUserRes | string>('/auth/login', dto, {
         params: {
           type,
         },

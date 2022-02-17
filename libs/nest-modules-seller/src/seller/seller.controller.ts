@@ -266,4 +266,9 @@ export class SellerController {
   ): Promise<Seller> {
     return this.sellerService.updateAgreementFlag(dto);
   }
+
+  @Patch('restore')
+  public async restoreInactiveBroadcaster(@Body(ValidationPipe) dto): Promise<any> {
+    return this.sellerService.restoreInactiveBroadcaster(dto.email);
+  }
 }

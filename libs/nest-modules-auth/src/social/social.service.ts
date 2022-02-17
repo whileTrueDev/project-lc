@@ -51,13 +51,14 @@ export class SocialService {
     const { user }: any = req;
     let userPayload: UserPayload;
     if (userType === 'broadcaster') {
-      const { email, userName: name, id, password, avatar } = user;
+      const { email, userName: name, id, password, avatar, inactiveFlag } = user;
       const broadcaster = {
         id,
         email,
         name,
         password,
         avatar,
+        inactiveFlag,
       };
       userPayload = this.authService.createUserPayload(broadcaster, userType);
     } else {

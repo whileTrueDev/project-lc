@@ -21,7 +21,7 @@ export class AppService {
     FROM LoginHistory AS t1 JOIN (
     SELECT userEmail, MAX(createDate) AS createDate
     FROM LoginHistory 
-    GROUP BY userEmail
+    GROUP BY userEmail, userType
     ) a
     ON t1.userEmail = a.userEmail 
     AND t1.createDate = a.createDate
@@ -64,11 +64,11 @@ export class AppService {
 
   private copySellerRow(targetMail): Promise<any> {
     return this.prisma
-      .$executeRaw`INSERT INTO InactiveSeller (id, email, userName, avatar, password)
+      .$executeRaw`INSERT INTO InactiveSeller (id, email, name, avatar, password)
     SELECT 
-      id, email, userName, avatar, password
+      id, email, name, avatar, password
     FROM 
-        Broadcaster
+        Seller
     WHERE 
         email = ${targetMail};`;
   }
@@ -96,6 +96,7 @@ export class AppService {
       },
       data: {
         email: null,
+        name: null,
         avatar: null,
         password: null,
         inactiveFlag: true,
@@ -104,7 +105,7 @@ export class AppService {
   }
 
   async moveInactiveUserData(inactivateTarget): Promise<void> {
-    if (inactivateTarget.userType === 'seller') {
+    if (inactivateTarget.userType === 'broadcaster') {
       // s3 데이터 분리
       Promise.all([
         await this.copySellerRow(inactivateTarget.userEmail),
@@ -115,7 +116,7 @@ export class AppService {
         ),
         this.s3Service.moveObjects('broadcaster-id-card', inactivateTarget.userEmail),
       ]);
-    } else if (inactivateTarget.userType === 'broadcaster') {
+    } else if (inactivateTarget.userType === 'seller') {
       // s3 데이터 분리
       Promise.all([
         await this.copyBroadcasterRow(inactivateTarget.userEmail),

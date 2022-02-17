@@ -6,7 +6,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Broadcaster, BroadcasterAddress, Prisma } from '@prisma/client';
+import {
+  Broadcaster,
+  BroadcasterAddress,
+  InactiveBroadcaster,
+  Prisma,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BroadcasterAddressDto,
@@ -64,18 +69,32 @@ export class BroadcasterService extends ServiceBaseWithCache {
   /**
    * 로그인
    */
-  async login(email: string, pwdInput: string): Promise<Broadcaster | null> {
+  async login(
+    email: string,
+    pwdInput: string,
+  ): Promise<Broadcaster | InactiveBroadcaster | null> {
     const user = await this.findOne({ email });
+    let inactiveUser;
     if (!user) {
-      throw new UnauthorizedException();
+      inactiveUser = await this.findInactiveOne({ email });
+      if (!inactiveUser) {
+        throw new UnauthorizedException();
+      }
     }
-    if (user.password === null) {
+    if (user?.password === null || inactiveUser?.password === null) {
       // 소셜로그인으로 가입된 회원
       throw new BadRequestException();
     }
-    const isCorrect = await this.validatePassword(pwdInput, user.password);
+    const isCorrect = await this.validatePassword(
+      pwdInput,
+      user?.password || inactiveUser?.password,
+    );
     if (!isCorrect) {
       throw new UnauthorizedException();
+    }
+
+    if (inactiveUser) {
+      return inactiveUser;
     }
     return user;
   }
@@ -87,6 +106,23 @@ export class BroadcasterService extends ServiceBaseWithCache {
     const broadcaster = await this.prisma.broadcaster.findUnique({
       where: findInput,
     });
+    return broadcaster;
+  }
+
+  /**
+   * 휴면 유저 정보 조회
+   */
+  async findInactiveOne(
+    findInput: Prisma.SellerWhereUniqueInput,
+  ): Promise<InactiveBroadcaster> {
+    const broadcaster = await this.prisma.inactiveBroadcaster.findUnique({
+      where: findInput,
+    });
+
+    if (!broadcaster) {
+      return broadcaster;
+    }
+
     return broadcaster;
   }
 
@@ -282,5 +318,40 @@ export class BroadcasterService extends ServiceBaseWithCache {
     });
     await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
     return true;
+  }
+
+  /** 휴면 계정 데이터 복구 */
+  public async restoreInactiveBroadcaster(
+    email: Broadcaster['email'],
+  ): Promise<Broadcaster> {
+    const restoreData = await this.prisma.inactiveBroadcaster.findFirst({
+      where: { email },
+    });
+
+    return this.prisma.broadcaster.update({
+      where: {
+        id: restoreData.id,
+      },
+      data: {
+        email: restoreData.email,
+        userName: restoreData.userName,
+        userNickname: restoreData.userNickname,
+        overlayUrl: restoreData.overlayUrl,
+        avatar: restoreData.avatar,
+        password: restoreData.password,
+        inactiveFlag: false,
+      },
+    });
+  }
+
+  /** 휴면 계정 데이터 복구 */
+  public async deleteInactiveBroadcaster(
+    email: Broadcaster['email'],
+  ): Promise<InactiveBroadcaster> {
+    return this.prisma.inactiveBroadcaster.delete({
+      where: {
+        email,
+      },
+    });
   }
 }

@@ -10,6 +10,7 @@ import {
   Res,
   UseGuards,
   ValidationPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   EmailCodeVerificationDto,
@@ -40,9 +41,13 @@ export class AuthController {
     @Query('type') userType: UserType,
     @Req() req: Request,
     @Res() res: Response,
-  ): Promise<void> {
+  ): Promise<Response> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
+    console.log('user', user);
+    if (user.inactiveFlag) {
+      return res.status(200).send({ user, userType });
+    }
     const loginToken: loginUserRes = this.authService.issueToken(
       user,
       stayLogedIn,
@@ -51,7 +56,7 @@ export class AuthController {
     this.authService.handleLogin(res, loginToken);
     // 로그인 히스토리 추가
     this.loginHistoryService.createLoginStamp(req, '이메일');
-    res.status(200).send(loginToken);
+    return res.status(200).send(loginToken);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -95,6 +100,19 @@ export class AuthController {
     );
     if (!matchingRecord) return false;
     await this.mailVerificationService.deleteSuccessedMailVerification(dto.email);
+    return true;
+  }
+
+  @Post('code-validation')
+  public async mailCodeValidation(@Body(ValidationPipe) dto): Promise<boolean> {
+    const checkResult = await this.mailVerificationService.checkMailVerification(
+      dto.email,
+      dto.code,
+    );
+
+    if (!checkResult) {
+      throw new BadRequestException('인증코드가 올바르지 않습니다.');
+    }
     return true;
   }
 }

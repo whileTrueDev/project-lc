@@ -778,9 +778,10 @@ model UserNotification {
 
 // 관리자 계정
 model Administrator {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
+  id           Int     @id @default(autoincrement())
+  email        String  @unique
+  password     String
+  inactiveFlag Boolean @default(false)
 }
 
 // 문의하기 주체
@@ -813,12 +814,14 @@ model InactiveBroadcaster {
   createDate   DateTime @default(now())
   password     String? // 비밀번호
   avatar       String?
+  inactiveFlag Boolean  @default(true)
 }
 
 model InactiveSeller {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  password String?
-  avatar   String?
+  id           Int     @id @default(autoincrement())
+  email        String  @unique
+  name         String?
+  password     String?
+  avatar       String?
+  inactiveFlag Boolean @default(true)
 }

@@ -75,6 +75,11 @@ export class BroadcasterController {
     return broadcaster;
   }
 
+  @Patch('restore')
+  public async restoreInactiveBroadcaster(@Body(ValidationPipe) dto): Promise<any> {
+    return this.broadcasterService.restoreInactiveBroadcaster(dto.email);
+  }
+
   /** 방송인 이메일 주소 중복 체크 */
   @Get('email-check')
   public async emailDupCheck(

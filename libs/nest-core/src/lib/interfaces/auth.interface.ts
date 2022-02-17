@@ -5,7 +5,12 @@ export interface UserPayload {
   id: number;
   sub: string;
   type: UserType;
+  inactiveFlag?: boolean;
 }
 
 // token에 들어가기 위해 필요한 데이터 추출. - 다른 종류 사용자에 대해서도 사용가능하도록
 export type User = Pick<Seller, 'email'>;
+
+export interface InactiveUserPayload extends UserPayload {
+  inactiveFlag: boolean;
+}

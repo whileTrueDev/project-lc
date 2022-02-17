@@ -22,6 +22,7 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { inactiveEmailStore } from '@project-lc/stores';
 import SocialButtonGroup from './SocialButtonGroup';
 
 export interface LoginFormProps {
@@ -42,7 +43,7 @@ export function LoginForm({
   } = useForm<LoginUserDto>({
     defaultValues: { stayLogedIn: true },
   });
-
+  const { setToActivateEmail } = inactiveEmailStore();
   // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
   const [formError, setFormError] = useState('');
   function resetFormError(): void {
@@ -57,11 +58,17 @@ export function LoginForm({
         setFormError(getMessage(err?.response.data?.status));
         setValue('password', '');
       });
+      console.log(user);
+      if (user.user.inactiveFlag) {
+        setToActivateEmail(user.user.sub);
+        router.push('/activate');
+        return;
+      }
       if (user) {
         router.push('/mypage');
       }
     },
-    [login, setValue, router],
+    [login, setValue, router, setToActivateEmail],
   );
 
   function getMessage(statusCode: number | undefined): string {
