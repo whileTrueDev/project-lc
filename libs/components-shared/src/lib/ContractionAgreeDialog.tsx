@@ -17,10 +17,10 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useState } from 'react';
-import broadcasterTerms from '@project-lc/components-constants/broadcasterContractTerms';
-import sellerTerms from '@project-lc/components-constants/sellerContractTerms';
 import { Term } from '@project-lc/components-constants/termType';
+import { HtmlStringBox } from '@project-lc/components-core/TermBox';
+import { useTerms } from '@project-lc/hooks';
+import { useState } from 'react';
 
 export function ContractionAgreeDialog({
   isOpen,
@@ -33,6 +33,7 @@ export function ContractionAgreeDialog({
   agreementFlag: boolean;
   userType: 'seller' | 'broadcaster';
 }): JSX.Element {
+  const { broadcasterTerms, sellerTerms } = useTerms({ userType });
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [checkedA, setCheckedA] = useState<boolean>(false);
   const [checkedB, setCheckedB] = useState<boolean>(false);
@@ -201,7 +202,7 @@ export function ContractionAgreeDialog({
                   <ModalHeader>{selectedTerm.title}</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody maxW="6xl" mx="auto">
-                    <Text whiteSpace="pre-line">{selectedTerm.text}</Text>
+                    <HtmlStringBox htmlString={selectedTerm.text} />
                     {!agreementFlag && (
                       <Center m={2}>
                         <Checkbox

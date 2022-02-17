@@ -811,4 +811,28 @@ model Inquiry {
   readFlag    Boolean?    @default(false) // 관리자 처리 여부 
 }
 
-// 방송인 상품 홍보 아이템
+// 정책 분류
+enum PolicyCategory {
+  termsOfService // 이용약관
+  privacy // 개인정보처리방침
+}
+
+// 정책 대상
+enum PolicyTarget {
+  seller // 판매자
+  broadcaster // 방송인
+  all // 전체
+}
+
+// 정책(개인정보처리방침, 이용약관) 테이블
+model Policy {
+  id              Int            @id @default(autoincrement())
+  category        PolicyCategory // 정책 분야 : 이용약관 | 개인정보처리방침
+  targetUser      PolicyTarget // 적용 대상 : 판매자 | 방송인 | 전체
+  createDate      DateTime       @default(now())
+  updateDate      DateTime       @default(now()) @updatedAt
+  enforcementDate DateTime? // 시행일
+  version         String // 버전
+  publicFlag      Boolean        @default(false) // 공개여부
+  content         String         @db.LongText // 내용
+}

@@ -2,9 +2,13 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
+import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { AdminAccountService } from './admin-account.service';
+import { AdminPolicyController } from './admin-policy.controller';
+import { AdminProductPromotionController } from './admin-product-promotion.controller';
+import { AdminPromotionPageController } from './admin-promotion-page.controller';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
@@ -23,7 +27,12 @@ export class AdminModule {
     AdminAccountService,
   ];
 
-  private static readonly controllers = [AdminController];
+  private static readonly controllers = [
+    AdminController,
+    AdminPolicyController,
+    AdminPromotionPageController,
+    AdminProductPromotionController,
+  ];
 
   private static readonly imports = [
     ProductPromotionModule,
@@ -31,6 +40,7 @@ export class AdminModule {
     SellerModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
     GoodsModule.withoutControllers(),
+    PolicyModule,
   ];
 
   static withoutControllers(): DynamicModule {

@@ -21,6 +21,7 @@ import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { NoticeModule } from '@project-lc/nest-modules-notice';
 import { NotificationModule } from '@project-lc/nest-modules-notification';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
+import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { ShippingGroupModule } from '@project-lc/nest-modules-shipping-group';
 import { PrismaModule } from '@project-lc/prisma-orm';
@@ -49,6 +50,7 @@ import { AppController } from './app.controller';
     GoodsModule.withControllers(),
     LiveShoppingModule.withControllers(),
     BroadcasterModule.withControllers(),
+    PolicyModule,
   ],
   controllers: [AppController],
   providers: [],

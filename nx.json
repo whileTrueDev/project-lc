@@ -114,6 +114,9 @@
     "nest-modules-overlay-controller": {
       "tags": []
     },
+    "nest-modules-policy": {
+      "tags": []
+    },
     "nest-modules-product-promotion": {
       "tags": []
     },

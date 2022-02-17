@@ -252,6 +252,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
       { name: '문의하기', href: '/general/inquiry', icon: FcFaq },
       { name: '알림메시지', href: '/general/notification', icon: FcSms },
       { name: '공지사항', href: '/general/notice', icon: FcAdvertising },
+      {
+        name: '이용정책, 개인정보처리방침',
+        href: '/general/policy',
+        icon: FcList,
+      },
     ],
   },
 ];

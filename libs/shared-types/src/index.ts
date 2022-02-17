@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 
+export * from './lib/constants/adminPolicy';
 export * from './lib/constants/banks';
 export * from './lib/constants/broadcasterContacts';
 export * from './lib/constants/csrfkey';
@@ -67,6 +68,7 @@ export * from './lib/dto/liveShoppingPurchaseMessage.dto';
 export * from './lib/dto/loginUser.dto';
 export * from './lib/dto/markNotificationReadState.dto';
 export * from './lib/dto/passwordValidate.dto';
+export * from './lib/dto/policy.dto';
 export * from './lib/dto/post.dto';
 export * from './lib/dto/registGoods.dto';
 export * from './lib/dto/sellerContacts.dto';
