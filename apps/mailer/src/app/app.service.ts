@@ -48,10 +48,10 @@ export class AppService {
     );
   }
 
-  private getBroadcasterId(broadcasterId): Promise<{ id: number }> {
+  private getBroadcasterId(email): Promise<{ id: number }> {
     return this.prisma.broadcaster.findFirst({
       where: {
-        id: broadcasterId,
+        email,
       },
       select: {
         id: true,
@@ -59,10 +59,10 @@ export class AppService {
     });
   }
 
-  private getSellerId(broadcasterId): Promise<{ id: number }> {
+  private getSellerId(email): Promise<{ id: number }> {
     return this.prisma.seller.findFirst({
       where: {
-        id: broadcasterId,
+        email,
       },
       select: {
         id: true,
@@ -216,11 +216,38 @@ export class AppService {
   private copySellerBusinessRegistration(sellerId): Promise<any> {
     return this.prisma.$executeRaw`
     INSERT INTO InactiveSellerBusinessRegistration
-      (id, sellerEmail, companyName, businessRegistrationNumber, representativeName, businessType, businessItem, businessAddress, taxInvoiceMail, businessRegistrationImageName, mailOrderSalesNumber, mailOrderSalesImageName, businessRegistrationConfirmationId )
+      (id, 
+        sellerEmail, 
+        companyName, 
+        businessRegistrationNumber, 
+        representativeName, 
+        businessType, 
+        businessItem, 
+        businessAddress, 
+        taxInvoiceMail, 
+        businessRegistrationImageName,
+        mailOrderSalesNumber, 
+        mailOrderSalesImageName, 
+        )
     SELECT 
-    id, sellerEmail, companyName, businessRegistrationNumber, representativeName, businessType, businessItem, businessAddress, taxInvoiceMail, businessRegistrationImageName, mailOrderSalesNumber, mailOrderSalesImageName, businessRegistrationConfirmationId 
+      id, 
+      sellerEmail, 
+      companyName, 
+      businessRegistrationNumber, 
+      representativeName, 
+      businessType, 
+      businessItem, 
+      businessAddress, 
+      taxInvoiceMail, 
+      businessRegistrationImageName, 
+      mailOrderSalesNumber, 
+      mailOrderSalesImageName,
     FROM 
       SellerBusinessRegistration
+    JOIN 
+        BusinessRegistrationConfirmation as brc
+    ON 
+        brc.SellerBusinessRegistrationId
     WHERE 
       id = ${sellerId}
     `;
@@ -252,6 +279,19 @@ export class AppService {
     `;
   }
 
+  private copyBusinessRegistrationConfirmation(sellerId): Promise<any> {
+    return this.prisma.$executeRaw`
+    INSERT INTO InactiveBusinessRegistrationConfirmation
+      (id, status, rejectionReason, InactiveSellerBusinessRegistrationId)
+    SELECT 
+    id, status, rejectionReason, sellerBusinessRegistrationId
+    FROM 
+      BusinessRegistrationConfirmation
+    WHERE 
+      id = ${sellerId}
+  `;
+  }
+
   private deleteBroadcasterAddress(broadcasterId): Promise<any> {
     return this.prisma.broadcasterAddress.delete({
       where: {
@@ -262,32 +302,32 @@ export class AppService {
 
   private deleteBroadcasterChannel(broadcasterId): Promise<any> {
     return this.prisma.$executeRaw`
-    DELETE FROM BroadcasterChannel WHERE broadcasterId=${broadcasterId}`;
+      DELETE FROM BroadcasterChannel WHERE broadcasterId=${broadcasterId}`;
   }
 
   private deleteBroadcasterContacts(broadcasterId): Promise<any> {
     return this.prisma.$executeRaw`
-    DELETE FROM BroadcasterContacts WHERE broadcasterId=${broadcasterId}`;
+      DELETE FROM BroadcasterContacts WHERE broadcasterId=${broadcasterId}`;
   }
 
   private deleteBroadcasterSettlementInfo(broadcasterId): Promise<any> {
     return this.prisma.$executeRaw`
-    DELETE FROM BroadcasterSettlementInfo WHERE broadcasterId=${broadcasterId}`;
+      DELETE FROM BroadcasterSettlementInfo WHERE broadcasterId=${broadcasterId}`;
   }
 
   private deleteSellerBusinessRegistration(sellerId): Promise<any> {
     return this.prisma.$executeRaw`
-    DELETE FROM SellerBusinessRegistration WHERE sellerId=${sellerId}`;
+      DELETE FROM SellerBusinessRegistration WHERE sellerId=${sellerId}`;
   }
 
   private deleteSellerContacts(sellerId): Promise<any> {
     return this.prisma.$executeRaw`
-    DELETE FROM SellerContacts WHERE sellerId=${sellerId}`;
+      DELETE FROM SellerContacts WHERE sellerId=${sellerId}`;
   }
 
   private deleteSellerSettlementAccount(sellerId): Promise<any> {
     return this.prisma.$executeRaw`
-    DELETE FROM SellerSettlementAccount WHERE sellerId=${sellerId}`;
+      DELETE FROM SellerSettlementAccount WHERE sellerId=${sellerId}`;
   }
 
   async moveInactiveUserData(inactivateTarget): Promise<void> {
@@ -302,6 +342,7 @@ export class AppService {
         this.copySellerBusinessRegistration(sellerId.id).then(() =>
           this.deleteSellerBusinessRegistration(sellerId.id),
         ),
+        this.copyBusinessRegistrationConfirmation(sellerId.id),
         this.copySellerContacts(sellerId.id).then(() =>
           this.deleteSellerContacts(sellerId.id),
         ),

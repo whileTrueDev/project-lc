@@ -58,12 +58,11 @@ model SellerBusinessRegistration {
 
 // 사업자등록정보 검수정보
 model BusinessRegistrationConfirmation {
-  id                                 Int                                  @id @default(autoincrement())
-  status                             BusinessRegistrationStatus           @default(waiting) // 검수 상태
-  rejectionReason                    String?                              @db.Text // 반려사유 - 관리자가 입력
-  SellerBusinessRegistrationId       Int                                  @unique
-  SellerBusinessRegistration         SellerBusinessRegistration           @relation(fields: [SellerBusinessRegistrationId], references: [id])
-  InactiveSellerBusinessRegistration InactiveSellerBusinessRegistration[]
+  id                           Int                        @id @default(autoincrement())
+  status                       BusinessRegistrationStatus @default(waiting) // 검수 상태
+  rejectionReason              String?                    @db.Text // 반려사유 - 관리자가 입력
+  SellerBusinessRegistrationId Int                        @unique
+  SellerBusinessRegistration   SellerBusinessRegistration @relation(fields: [SellerBusinessRegistrationId], references: [id])
 }
 
 // 정산 내역
@@ -925,22 +924,21 @@ model InactiveBroadcasterSettlementInfo {
 
 // 사업자등록정보
 model InactiveSellerBusinessRegistration {
-  id                               Int                               @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
-  sellerEmail                      String // 등록한 판매자 ID 
-  companyName                      String // 상호명
-  businessRegistrationNumber       String // 사업자등록증 등록번호
-  representativeName               String // 대표자명
-  businessType                     String // 업태
-  businessItem                     String // 종목
-  businessAddress                  String // 사업장 주소
-  taxInvoiceMail                   String // 세금계산서 전용 이메일
-  businessRegistrationImageName    String // 사업자등록증 이미지 파일명
-  mailOrderSalesNumber             String // 통신판매업 신고번호 
-  mailOrderSalesImageName          String // 통신판매업 이미지 파일명
-  BusinessRegistrationConfirmation BusinessRegistrationConfirmation? @relation(fields: [businessRegistrationConfirmationId], references: [id])
-  inactiveSeller                   InactiveSeller                    @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  id                                       Int                                       @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
+  sellerEmail                              String // 등록한 판매자 ID 
+  companyName                              String // 상호명
+  businessRegistrationNumber               String // 사업자등록증 등록번호
+  representativeName                       String // 대표자명
+  businessType                             String // 업태
+  businessItem                             String // 종목
+  businessAddress                          String // 사업장 주소
+  taxInvoiceMail                           String // 세금계산서 전용 이메일
+  businessRegistrationImageName            String // 사업자등록증 이미지 파일명
+  mailOrderSalesNumber                     String // 통신판매업 신고번호 
+  mailOrderSalesImageName                  String // 통신판매업 이미지 파일명
+  InactiveBusinessRegistrationConfirmation InactiveBusinessRegistrationConfirmation?
+  InactiveSeller                           InactiveSeller                            @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 
-  businessRegistrationConfirmationId Int?
   @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
 }
 
@@ -967,4 +965,13 @@ model InactiveSellerSettlementAccount {
   seller                     InactiveSeller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
 
   @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
+}
+
+// 사업자등록정보 검수정보
+model InactiveBusinessRegistrationConfirmation {
+  id                                   Int                                @id @default(autoincrement())
+  status                               BusinessRegistrationStatus         @default(waiting) // 검수 상태
+  rejectionReason                      String?                            @db.Text // 반려사유 - 관리자가 입력
+  InactiveSellerBusinessRegistrationId Int                                @unique
+  SellerBusinessRegistration           InactiveSellerBusinessRegistration @relation(fields: [InactiveSellerBusinessRegistrationId], references: [id])
 }
