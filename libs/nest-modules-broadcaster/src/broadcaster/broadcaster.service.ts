@@ -186,7 +186,10 @@ export class BroadcasterService extends ServiceBaseWithCache {
    */
   async isEmailDupCheckOk(email: string): Promise<boolean> {
     const user = await this.prisma.broadcaster.findFirst({ where: { email } });
-    if (user) return false;
+    const inactiveUser = await this.prisma.inactiveBroadcaster.findFirst({
+      where: { email },
+    });
+    if (user || inactiveUser) return false;
     return true;
   }
 

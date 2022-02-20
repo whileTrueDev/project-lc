@@ -141,7 +141,9 @@ export class SellerService extends ServiceBaseWithCache {
    */
   async isEmailDupCheckOk(email: string): Promise<boolean> {
     const user = await this.prisma.seller.findFirst({ where: { email } });
-    if (user) return false;
+    const inactiveUser = await this.prisma.inactiveSeller.findFirst({ where: { email } });
+    if (user || inactiveUser) return false;
+
     return true;
   }
 
