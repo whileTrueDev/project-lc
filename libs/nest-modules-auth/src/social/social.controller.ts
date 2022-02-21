@@ -55,7 +55,11 @@ export class SocialController {
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
     const userType: UserType = getUserTypeFromRequest(req);
-    this.socialService.login(userType, req, res);
+    const isLogin = this.socialService.login(userType, req, res);
+
+    if (isLogin === 'inactive') {
+      // 휴면계정 처리
+    }
 
     // 로그인 기록 추가 by @hwasurr
     this.loginHistoryService.createLoginStamp(req, '소셜/구글');

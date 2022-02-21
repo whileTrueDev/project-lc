@@ -72,9 +72,9 @@ export class AppService {
 
   private copyBroadcasterRow(broadcasterId): Promise<any> {
     return this.prisma
-      .$executeRaw`INSERT INTO InactiveBroadcaster (id, email, userName, userNickname, overlayUrl, avatar, password)
+      .$executeRaw`INSERT INTO InactiveBroadcaster (id, email, userName, userNickname, overlayUrl, avatar, password, deleteFlag, agreementFlag)
     SELECT 
-        id, email, userName, userNickname, overlayUrl,  avatar, password
+        id, email, userName, userNickname, overlayUrl,  avatar, password, deleteFlag, agreementFlag
     FROM 
         Broadcaster
     WHERE 
@@ -83,9 +83,9 @@ export class AppService {
 
   private copySellerRow(sellerId): Promise<any> {
     return this.prisma
-      .$executeRaw`INSERT INTO InactiveSeller (id, email, name, avatar, password)
+      .$executeRaw`INSERT INTO InactiveSeller (id, email, name, avatar, password, agreementFlag)
     SELECT 
-      id, email, name, avatar, password
+      id, email, name, avatar, password, agreementFlag
     FROM 
         Seller
     WHERE 
@@ -227,7 +227,7 @@ export class AppService {
         taxInvoiceMail, 
         businessRegistrationImageName,
         mailOrderSalesNumber, 
-        mailOrderSalesImageName, 
+        mailOrderSalesImageName 
         )
     SELECT 
       id, 
@@ -241,13 +241,9 @@ export class AppService {
       taxInvoiceMail, 
       businessRegistrationImageName, 
       mailOrderSalesNumber, 
-      mailOrderSalesImageName,
+      mailOrderSalesImageName
     FROM 
       SellerBusinessRegistration
-    JOIN 
-        BusinessRegistrationConfirmation as brc
-    ON 
-        brc.SellerBusinessRegistrationId
     WHERE 
       id = ${sellerId}
     `;

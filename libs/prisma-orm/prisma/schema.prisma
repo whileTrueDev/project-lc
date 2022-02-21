@@ -39,6 +39,7 @@ model SellerShop {
 // 사업자등록정보
 model SellerBusinessRegistration {
   id                               Int                               @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
+  sellerId                         Int
   sellerEmail                      String // 등록한 판매자 ID 
   companyName                      String // 상호명
   businessRegistrationNumber       String // 사업자등록증 등록번호
@@ -51,7 +52,7 @@ model SellerBusinessRegistration {
   mailOrderSalesNumber             String // 통신판매업 신고번호 
   mailOrderSalesImageName          String // 통신판매업 이미지 파일명
   BusinessRegistrationConfirmation BusinessRegistrationConfirmation?
-  seller                           Seller                            @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  seller                           Seller                            @relation(fields: [sellerEmail, sellerId], references: [email, id], onDelete: Cascade)
 
   @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
 }
@@ -123,12 +124,13 @@ model SellerSettlementItems {
 // 판매자 정산 계좌 정보
 model SellerSettlementAccount {
   id                         Int    @id @default(autoincrement())
+  sellerId                   Int
   sellerEmail                String
   bank                       String
   number                     String
   name                       String
   settlementAccountImageName String
-  seller                     Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  seller                     Seller @relation(fields: [sellerEmail, sellerId], references: [email, id], onDelete: Cascade)
 
   @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
 }
@@ -818,6 +820,8 @@ model InactiveBroadcaster {
   password                          String? // 비밀번호
   avatar                            String?
   inactiveFlag                      Boolean                             @default(true)
+  deleteFlag                        Boolean
+  agreementFlag                     Boolean
   InactiveBroadcasterSocialAccount  InactiveBroadcasterSocialAccount[]
   InactiveBroadcasterContacts       InactiveBroadcasterContacts[]
   InactiveBroadcasterAddress        InactiveBroadcasterAddress[]
@@ -832,6 +836,7 @@ model InactiveSeller {
   password                           String?
   avatar                             String?
   inactiveFlag                       Boolean                              @default(true)
+  agreementFlag                      Boolean
   InactiveSellerSocialAccount        InactiveSellerSocialAccount[]
   InactiveSellerBusinessRegistration InactiveSellerBusinessRegistration[]
   InactiveSellerContacts             InactiveSellerContacts[]
