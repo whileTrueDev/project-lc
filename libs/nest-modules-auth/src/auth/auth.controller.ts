@@ -44,7 +44,6 @@ export class AuthController {
   ): Promise<Response> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
-    console.log('user', user);
     if (user.inactiveFlag) {
       return res.status(200).send({ user, userType });
     }

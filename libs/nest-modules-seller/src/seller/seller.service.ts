@@ -5,7 +5,13 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Prisma, Seller, InactiveSeller } from '@prisma/client';
+import {
+  Prisma,
+  Seller,
+  InactiveSeller,
+  SellerSocialAccount,
+  InactiveSellerSocialAccount,
+} from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -125,6 +131,7 @@ export class SellerService extends ServiceBaseWithCache {
         password: true,
         avatar: true,
         inactiveFlag: true,
+        agreementFlag: true,
       },
     });
 
@@ -299,10 +306,18 @@ export class SellerService extends ServiceBaseWithCache {
   }
 
   /** 휴면 계정 데이터 복구 */
-  public async restoreInactiveBroadcaster(email: Seller['email']): Promise<Seller> {
+  public async restoreInactiveSeller(email: Seller['email']): Promise<Seller> {
     const restoreData = await this.prisma.inactiveSeller.findFirst({
       where: { email },
     });
+
+    const restoreSocialData = await this.prisma.inactiveSellerSocialAccount.findFirst({
+      where: { sellerId: restoreData.id },
+    });
+
+    if (restoreSocialData) {
+      await this.restoreInactiveSocialSeller(restoreSocialData);
+    }
 
     return this.prisma.seller.update({
       where: {
@@ -318,13 +333,28 @@ export class SellerService extends ServiceBaseWithCache {
     });
   }
 
+  private async restoreInactiveSocialSeller(
+    restoreSocialData: SellerSocialAccount,
+  ): Promise<SellerSocialAccount> {
+    return this.prisma.sellerSocialAccount.create({
+      data: {
+        serviceId: restoreSocialData.serviceId,
+        provider: restoreSocialData.provider,
+        name: restoreSocialData.name,
+        registDate: restoreSocialData.registDate,
+        profileImage: restoreSocialData.profileImage,
+        accessToken: restoreSocialData.accessToken,
+        refreshToken: restoreSocialData.refreshToken,
+        sellerId: restoreSocialData.sellerId,
+      },
+    });
+  }
+
   /** 휴면 계정 데이터 복구 */
-  public async deleteInactiveBroadcaster(
-    email: Seller['email'],
-  ): Promise<InactiveSeller> {
+  public async deleteInactiveSeller(sellerId: Seller['id']): Promise<InactiveSeller> {
     return this.prisma.inactiveSeller.delete({
       where: {
-        email,
+        id: sellerId,
       },
     });
   }

@@ -111,7 +111,6 @@ export class AuthService {
     user: Seller | Broadcaster | Administrator,
     type: UserType,
   ): UserPayload {
-    console.log('createUserPayload', user);
     return {
       id: user.id,
       sub: user.email,

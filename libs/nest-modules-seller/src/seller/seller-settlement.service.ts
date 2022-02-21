@@ -7,6 +7,7 @@ import {
   SellerBusinessRegistration,
   SellerSettlementAccount,
   SellType,
+  Seller,
 } from '@prisma/client';
 import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -25,6 +26,7 @@ import {
 } from '@project-lc/utils';
 import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
+import { SellerService } from './seller.service';
 
 export type SellerSettlementInfo = {
   sellerBusinessRegistration: SellerBusinessRegistrationType[];
@@ -45,6 +47,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly sellerService: SellerService,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);
@@ -66,6 +69,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
     sellerInfo: UserPayload,
   ): Promise<SellerBusinessRegistration> {
     const email = sellerInfo.sub;
+    const sellerId = sellerInfo.id;
     const sellerBusinessRegistration =
       await this.prisma.sellerBusinessRegistration.create({
         data: {
@@ -82,6 +86,43 @@ export class SellerSettlementService extends ServiceBaseWithCache {
           businessRegistrationImageName: dto.businessRegistrationImageName,
           mailOrderSalesImageName: dto.mailOrderSalesImageName,
           mailOrderSalesNumber: dto.mailOrderSalesNumber,
+          sellerId,
+        },
+      });
+    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
+    return sellerBusinessRegistration;
+  }
+
+  /**
+   * 휴면 사업자 등록증 복구
+   * @param dto 사업자 등록증 등록 정보
+   * @param sellerInfo 사용자 등록 정보
+   */
+  public async restoreInactiveBusinessRegistration(
+    sellerId: Seller['id'],
+  ): Promise<SellerBusinessRegistration> {
+    const restoreData = await this.prisma.inactiveSellerBusinessRegistration.findFirst({
+      where: {
+        sellerId,
+      },
+    });
+    const sellerBusinessRegistration =
+      await this.prisma.sellerBusinessRegistration.create({
+        data: {
+          companyName: restoreData.companyName,
+          sellerEmail: restoreData.sellerEmail,
+          businessRegistrationNumber: this.makeRegistrationNumberFormat(
+            restoreData.businessRegistrationNumber,
+          ),
+          representativeName: restoreData.representativeName,
+          businessType: restoreData.businessType,
+          businessItem: restoreData.businessItem,
+          businessAddress: restoreData.businessAddress,
+          taxInvoiceMail: restoreData.taxInvoiceMail,
+          businessRegistrationImageName: restoreData.businessRegistrationImageName,
+          mailOrderSalesImageName: restoreData.mailOrderSalesImageName,
+          mailOrderSalesNumber: restoreData.mailOrderSalesNumber,
+          sellerId,
         },
       });
     await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
@@ -116,13 +157,44 @@ export class SellerSettlementService extends ServiceBaseWithCache {
     sellerInfo: UserPayload,
   ): Promise<SellerSettlementAccount> {
     const email = sellerInfo.sub;
+    const sellerId = sellerInfo.id;
     const settlementAccount = await this.prisma.sellerSettlementAccount.create({
       data: {
         sellerEmail: email,
+        sellerId,
         name: dto.name,
         number: dto.number,
         bank: dto.bank,
         settlementAccountImageName: dto.settlementAccountImageName,
+      },
+    });
+
+    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
+    return settlementAccount;
+  }
+
+  /**
+   * 정산 계좌 등록
+   * @param dto 정산 계좌 정보
+   * @param sellerInfo 사용자 등록 정보
+   */
+  public async restoreSettlementAccount(
+    sellerId: Seller['id'],
+  ): Promise<SellerSettlementAccount> {
+    const restoreData = await this.prisma.inactiveSellerSettlementAccount.findFirst({
+      where: {
+        sellerId,
+      },
+    });
+
+    const settlementAccount = await this.prisma.sellerSettlementAccount.create({
+      data: {
+        sellerEmail: restoreData.sellerEmail,
+        sellerId: restoreData.sellerId,
+        name: restoreData.name,
+        number: restoreData.number,
+        bank: restoreData.bank,
+        settlementAccountImageName: restoreData.settlementAccountImageName,
       },
     });
 
@@ -264,6 +336,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
         pgCommission: totalPgCommission.commission,
         pgCommissionRate: totalPgCommission.rate,
         sellerEmail: target.options[0].seller.email,
+        sellerId: target.options[0].seller.id,
         settlementItems: {
           create: target.options.map((opt) => {
             const price = Number(opt.price) * opt.ea;

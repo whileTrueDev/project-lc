@@ -50,7 +50,7 @@ export class SocialService {
     private readonly google: GoogleApiService,
   ) {}
 
-  login(userType: UserType, req: Request, res: Response): 'inactive' | 'success' {
+  login(userType: UserType, req: Request, res: Response): UserPayload {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
     let userPayload: UserPayload;
@@ -70,7 +70,7 @@ export class SocialService {
     }
 
     if (userPayload.inactiveFlag) {
-      return 'inactive';
+      return userPayload;
     }
 
     // local stragety에서 반환되는 req.user의 타입은 UserPayload이나
@@ -84,7 +84,7 @@ export class SocialService {
       userType,
     );
     this.authService.handleLogin(res, loginToken);
-    return 'success';
+    return userPayload;
   }
 
   /** 유저타입에 따라 seller 나 broadcaster를 찾거나 생성하여 반환
@@ -205,7 +205,7 @@ export class SocialService {
     if (inactiveSocialAccountWithSeller) {
       // 복구코드
       return this.sellerService.findInactiveOne({
-        id: socialAccountWithSeller.seller.id,
+        id: inactiveSocialAccountWithSeller.seller.id,
       });
     }
     if (!socialAccountWithSeller) {

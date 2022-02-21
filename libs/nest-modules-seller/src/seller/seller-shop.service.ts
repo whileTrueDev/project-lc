@@ -18,10 +18,10 @@ export class SellerShopService extends ServiceBaseWithCache {
   // 상점에 대한 정보 변경
   async changeShopInfo(dto: SellerShopInfoDto, sellerInfo: UserPayload): Promise<void> {
     const sellerShop = await this.prisma.sellerShop.upsert({
-      where: { sellerEmail: sellerInfo.sub },
+      where: { sellerId: sellerInfo.id },
       update: { ...dto },
       create: {
-        sellerEmail: sellerInfo.sub,
+        sellerId: sellerInfo.id,
         shopName: dto.shopName,
       },
     });

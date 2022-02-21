@@ -1,4 +1,5 @@
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { SellerContacts } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { SellerContactsDTO } from '@project-lc/shared-types';
@@ -45,5 +46,32 @@ export class SellerContactsService extends ServiceBaseWithCache {
     });
     await this._clearCaches(this.#SELLER_CONTACTS_CACHE_KEY);
     return { contactId: contact.id };
+  }
+
+  /** 판매자 연락처 등록 */
+  public async restoreSellerContacts(sellerId): Promise<boolean> {
+    const restoreDatas = await this.prisma.inactiveSellerContacts.findMany({
+      where: {
+        sellerId,
+      },
+    });
+
+    Promise.all(
+      restoreDatas.map((restoreData) =>
+        this.prisma.sellerContacts.create({
+          data: {
+            id: restoreData.id,
+            sellerId: restoreData.sellerId,
+            email: restoreData.email,
+            phoneNumber: restoreData.phoneNumber,
+            isDefault: restoreData.isDefault,
+            createDate: restoreData.createDate,
+          },
+        }),
+      ),
+    );
+
+    await this._clearCaches(this.#SELLER_CONTACTS_CACHE_KEY);
+    return true;
   }
 }

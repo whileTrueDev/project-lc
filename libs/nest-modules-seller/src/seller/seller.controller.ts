@@ -44,6 +44,7 @@ import {
 } from './seller-settlement.service';
 import { SellerShopService } from './seller-shop.service';
 import { SellerService } from './seller.service';
+import { SellerContactsService } from './seller-contacts.service';
 @Controller('seller')
 export class SellerController {
   constructor(
@@ -51,6 +52,7 @@ export class SellerController {
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly sellerShopService: SellerShopService,
     private readonly mailVerificationService: MailVerificationService,
+    private readonly sellerContactsService: SellerContactsService,
   ) {}
 
   // * 판매자 정보 조회
@@ -292,6 +294,16 @@ export class SellerController {
 
   @Patch('restore')
   public async restoreInactiveBroadcaster(@Body(ValidationPipe) dto): Promise<any> {
-    return this.sellerService.restoreInactiveBroadcaster(dto.email);
+    const seller = await this.sellerService.restoreInactiveSeller(dto.email);
+
+    const businessRegistration =
+      await this.sellerSettlementService.restoreInactiveBusinessRegistration(seller.id);
+    const sellerContacts = await this.sellerContactsService.restoreSellerContacts(
+      seller.id,
+    );
+    const sellerSettlementAccount =
+      await this.sellerSettlementService.restoreSettlementAccount(seller.id);
+
+    return this.sellerService.deleteInactiveSeller(seller.id);
   }
 }

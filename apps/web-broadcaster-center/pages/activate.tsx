@@ -109,6 +109,8 @@ export function Activate(): JSX.Element {
     },
     [mailVerification, toast, isNotInitial, clearTimer, startCountdown],
   );
+  console.log(router.query?.social);
+  console.log('hello world');
   return (
     <Box>
       <BroadcasterNavbar />

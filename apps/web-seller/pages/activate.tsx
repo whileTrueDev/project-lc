@@ -11,7 +11,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { CenterBox } from '@project-lc/components-layout/CenterBox';
-import { BroadcasterNavbar } from '@project-lc/components-shared/Navbar';
+import { SellerNavbar } from '@project-lc/components-shared/Navbar';
 import { useRouter } from 'next/router';
 import React, { useCallback, useState } from 'react';
 import {
@@ -52,38 +52,57 @@ export function Activate(): JSX.Element {
   } = useForm();
 
   const onSubmit = useCallback(async () => {
-    console.log(getValues('code'));
-    await codeValidation
-      .mutateAsync({
-        email,
-        code: getValues('code'),
-      })
-      .catch(() => {
-        toast({
-          title: '인증 코드 불일치',
-          description: '인증 코드가 일치하지 않습니다. 다시 확인 해주세요',
-          status: 'error',
+    if (router.query?.type === 'social') {
+      await restoreMutation
+        .mutateAsync(String(router.query.email))
+        .then(() => {
+          toast({
+            title: '계정이 활성화 되었습니다. 다시 로그인을 해주세요',
+            status: 'success',
+          });
+          router.push('/login');
+        })
+        .catch(() => {
+          toast({
+            title: '활성화 오류',
+            description: '계정 활성화 중 오류가 발생했습니다. 잠시 후 다시 시도 해주세요',
+            status: 'error',
+          });
+          throw new Error('활성화 오류');
         });
-        throw new Error('인증 코드 불일치');
-      });
+    } else {
+      await codeValidation
+        .mutateAsync({
+          email,
+          code: getValues('code'),
+        })
+        .catch(() => {
+          toast({
+            title: '인증 코드 불일치',
+            description: '인증 코드가 일치하지 않습니다. 다시 확인 해주세요',
+            status: 'error',
+          });
+          throw new Error('인증 코드 불일치');
+        });
 
-    await restoreMutation
-      .mutateAsync(email)
-      .then(() => {
-        toast({
-          title: '계정이 활성화 되었습니다. 다시 로그인을 해주세요',
-          status: 'success',
+      await restoreMutation
+        .mutateAsync(email)
+        .then(() => {
+          toast({
+            title: '계정이 활성화 되었습니다. 다시 로그인을 해주세요',
+            status: 'success',
+          });
+          router.push('/login');
+        })
+        .catch(() => {
+          toast({
+            title: '활성화 오류',
+            description: '계정 활성화 중 오류가 발생했습니다. 잠시 후 다시 시도 해주세요',
+            status: 'error',
+          });
+          throw new Error('활성화 오류');
         });
-        router.push('/login');
-      })
-      .catch(() => {
-        toast({
-          title: '활성화 오류',
-          description: '계정 활성화 중 오류가 발생했습니다. 잠시 후 다시 시도 해주세요',
-          status: 'error',
-        });
-        throw new Error('활성화 오류');
-      });
+    }
   }, [email, router, codeValidation, getValues, restoreMutation, toast]);
 
   const startMailVerification = useCallback(
@@ -110,24 +129,27 @@ export function Activate(): JSX.Element {
     },
     [mailVerification, toast, isNotInitial, clearTimer, startCountdown],
   );
+
   return (
     <Box>
-      <BroadcasterNavbar />
+      <SellerNavbar />
       <CenterBox enableShadow header={{ title: '휴면해제', desc: '' }}>
         <VStack as="form" onSubmit={handleSubmit(onSubmit)}>
-          <Text>휴면 해제 ID : {email}</Text>
+          <Text>휴면 해제 ID : {email || router.query?.email}</Text>
           <Text>휴면 해제를 하시려면, 아래 버튼을 눌러서 본인인증을 완료 해주세요.</Text>
-          <Button
-            onClick={() =>
-              startMailVerification(email).then(() => {
-                setIsNotInitial(true);
-                setShowInputBox(true);
-              })
-            }
-            colorScheme="blue"
-          >
-            메일 인증하기
-          </Button>
+          {!router.query?.type && (
+            <Button
+              onClick={() =>
+                startMailVerification(email).then(() => {
+                  setIsNotInitial(true);
+                  setShowInputBox(true);
+                })
+              }
+              colorScheme="blue"
+            >
+              메일 인증하기
+            </Button>
+          )}
           {showInputBox && (
             <FormControl isInvalid={!!errors.code}>
               <FormLabel htmlFor="code">
@@ -179,7 +201,7 @@ export function Activate(): JSX.Element {
               </Flex>
             </FormControl>
           )}
-          {showInputBox && (
+          {!router.query?.type && showInputBox && (
             <Button
               bg="blue.400"
               color="white"
@@ -188,6 +210,12 @@ export function Activate(): JSX.Element {
               isLoading={isSubmitting}
             >
               인증완료
+            </Button>
+          )}
+
+          {router.query?.type && (
+            <Button isLoading={isSubmitting} type="submit">
+              휴면해제
             </Button>
           )}
         </VStack>

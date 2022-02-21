@@ -58,7 +58,6 @@ export function LoginForm({
         setFormError(getMessage(err?.response.data?.status));
         setValue('password', '');
       });
-      console.log(user);
       if (user.user?.inactiveFlag) {
         setToActivateEmail(user.user.sub);
         router.push('/activate');

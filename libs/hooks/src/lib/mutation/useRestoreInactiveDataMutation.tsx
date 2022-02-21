@@ -1,5 +1,4 @@
 import { useMutation, UseMutationResult } from 'react-query';
-import { InquiryDto } from '@project-lc/shared-types';
 import { Broadcaster } from '@prisma/client';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
