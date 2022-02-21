@@ -25,13 +25,14 @@ export function ProfileBox({
       >
         {allowAvatarChange ? <AvatarChangeButton /> : <Avatar src={data?.avatar} />}
       </GridItem>
-      <GridItem colSpan={3}>
+      <GridItem colSpan={3} isTruncated>
         <Text isTruncated fontWeight="bold">
+          {data?.email}
           {data?.email}
         </Text>
       </GridItem>
-      <GridItem colSpan={3}>
-        <Text>{data?.name}</Text>
+      <GridItem colSpan={3} isTruncated>
+        <Text isTruncated>{data?.name}</Text>
       </GridItem>
     </Grid>
   );
