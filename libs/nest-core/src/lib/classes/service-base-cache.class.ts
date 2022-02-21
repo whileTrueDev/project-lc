@@ -1,4 +1,6 @@
 import { Cache } from 'cache-manager';
+import { Cluster } from 'ioredis';
+import _ from 'lodash';
 
 export class ServiceBaseWithCache {
   constructor(protected readonly cacheManager: Cache) {}
@@ -8,7 +10,15 @@ export class ServiceBaseWithCache {
    * @param cacheKey 삭제할 캐시 키
    */
   protected async _clearCaches(cacheKey: string): Promise<boolean> {
-    const keys: string[] = await this.cacheManager.store.keys(`*${cacheKey}*`);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const client: Cluster = await this.cacheManager.store.getClient();
+    const redisNodes = client.nodes();
+    const _keys: string[][] = await Promise.all(
+      redisNodes.map((redis) => redis.keys(`*${cacheKey}*`)),
+    );
+    const keys = _.flatten(_keys);
+
     const result = await Promise.all(keys.map((key) => this.cacheManager.del(key))).catch(
       (err) => {
         console.error(`An error occurred during clear caches - ${cacheKey}`, err);

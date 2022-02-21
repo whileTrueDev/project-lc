@@ -42,6 +42,7 @@ export class BroadcasterChannelService extends ServiceBaseWithCache {
       await this._clearCaches(this.#BC_CHANNEL_CACHE_KEY);
       return channel;
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(
         `error in createBroadcasterChannel, dto : ${JSON.stringify(dto)}`,
       );
@@ -62,6 +63,7 @@ export class BroadcasterChannelService extends ServiceBaseWithCache {
       await this._clearCaches(this.#BC_CHANNEL_CACHE_KEY);
       return true;
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }
@@ -85,6 +87,7 @@ export class BroadcasterChannelService extends ServiceBaseWithCache {
 
       return broadcaster.channels;
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }
