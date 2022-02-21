@@ -97,6 +97,7 @@ export * from './lib/queries/useGoodsById';
 export * from './lib/queries/useGoodsCommonInfoItem';
 export * from './lib/queries/useGoodsCommonInfoList';
 export * from './lib/queries/useGoodsStock';
+export * from './lib/queries/useHealthCheck';
 export * from './lib/queries/useLiveShoppingList';
 export * from './lib/queries/useNotice';
 export * from './lib/queries/useNotifications';
