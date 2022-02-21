@@ -14,12 +14,12 @@ export const sellerFooterLinkList: FooterLinkListItem[] = [
     items: [
       {
         title: '개인정보처리방침',
-        href: 'https://whiletrue.notion.site/7f6758f5344246c4989ac22f3ee7532e',
+        href: '/privacy',
         isBold: true,
       },
       {
         title: '이용약관',
-        href: 'https://whiletrue.notion.site/41561f284f754560a64f36bc7c292861',
+        href: '/termsOfService',
       },
     ],
   },
@@ -41,12 +41,12 @@ export const broadcasterFooterLinkList: FooterLinkListItem[] = [
     items: [
       {
         title: '개인정보처리방침',
-        href: 'https://whiletrue.notion.site/7f6758f5344246c4989ac22f3ee7532e',
+        href: '/privacy',
         isBold: true,
       },
       {
         title: '이용약관',
-        href: 'https://whiletrue.notion.site/72546ba3dcec48eda9340e2b1d292d35',
+        href: '/termsOfService',
       },
     ],
   },

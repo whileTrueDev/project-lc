@@ -1,8 +1,16 @@
 /* eslint-disable dot-notation */
+import { CacheModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import {
+  LiveShoppingModule,
+  LiveShoppingService,
+} from '@project-lc/nest-modules-liveshopping';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
+import { S3Module, S3Service } from '@project-lc/nest-modules-s3';
+import { SellerModule } from '@project-lc/nest-modules-seller';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrdersDto } from '@project-lc/shared-types';
-import { CacheModule } from '@nestjs/common';
 import store from 'cache-manager-ioredis';
 import {
   orderDetailExportsSample,
@@ -22,8 +30,21 @@ describe('FmOrdersService', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule, CacheModule.register({ isGlobal: true, store })],
-      providers: [FirstmallDbService, FmOrdersService],
+      imports: [
+        PrismaModule,
+        CacheModule.register({ isGlobal: true, store }),
+        ConfigModule.forRoot({ isGlobal: true }),
+        SellerModule.withoutControllers(),
+        LiveShoppingModule.withoutControllers(),
+        S3Module,
+      ],
+      providers: [
+        FirstmallDbService,
+        FmOrdersService,
+        ProductPromotionService,
+        LiveShoppingService,
+        S3Service,
+      ],
     }).compile();
 
     service = module.get<FmOrdersService>(FmOrdersService);

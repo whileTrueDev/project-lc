@@ -15,9 +15,10 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { SettlementDoneItem } from '@project-lc/hooks';
-import { FmOrder } from '@project-lc/shared-types';
+import { convertSellTypeToString, FmOrder } from '@project-lc/shared-types';
 import { calcPgCommission } from '@project-lc/utils';
 import { useMemo } from 'react';
+import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
 import { LiveShopping, SellerSettlementItems } from '.prisma/client';
 
 export interface SettlementInfoDialogProps {
@@ -163,6 +164,7 @@ export function SettlementInfoItem({
       my={4}
       p={2}
       borderWidth="thin"
+      borderRadius="xl"
       gridColumnGap={2}
       gridRowGap={1}
       templateColumns="1fr 2fr"
@@ -198,22 +200,18 @@ export function SettlementInfoItem({
       <GridItem>{settlementItem.pricePerPiece.toLocaleString()}</GridItem>
       <GridItem>총 가격</GridItem>
       <GridItem>{settlementItem.price.toLocaleString()}</GridItem>
-      <GridItem>라이브쇼핑 주문 여부</GridItem>
+      <GridItem>판매 유형</GridItem>
       <GridItem>
-        <Text
-          color={settlementItem.liveShoppingId ? 'green.500' : 'red.500'}
-          fontWeight={settlementItem.liveShoppingId ? 'bold' : undefined}
-        >
-          {settlementItem.liveShoppingId ? 'O' : 'X'}
-        </Text>
+        <SellTypeBadge sellType={settlementItem.sellType} />
       </GridItem>
+
       <GridItem>전자결제수수료</GridItem>
       <GridItem>{`${pgCommission.commission.toLocaleString()} (${
         pgCommission.rate === '0'
           ? pgCommission.description
           : pgCommission.rate + pgCommission.description
       })`}</GridItem>
-      {settlementItem.liveShoppingId ? (
+      {settlementItem.liveShoppingId || settlementItem.productPromotionId ? (
         <>
           <GridItem>방송인 수수료</GridItem>
           <GridItem>

@@ -64,7 +64,7 @@
             "commands": [
               "docker build -f ./apps/api/Dockerfile -t {args.registry}/project-lc-api:{args.tag} --platform=linux/amd64 .",
               "docker tag {args.registry}/project-lc-api:{args.tag} {args.registry}/project-lc-api:latest",
-              "docker push {args.registry}/project-lc-api:{args.tag}"
+              "docker push --all-tags {args.registry}/project-lc-api"
             ],
             "parallel": false
           }
@@ -136,7 +136,7 @@
             "commands": [
               "docker build -f ./apps/api-realtime/Dockerfile -t {args.registry}/project-lc-realtimeapi:{args.tag} --platform=linux/amd64 .",
               "docker tag {args.registry}/project-lc-realtimeapi:{args.tag} {args.registry}/project-lc-realtimeapi:latest",
-              "docker push {args.registry}/project-lc-realtimeapi:{args.tag}"
+              "docker push --all-tags {args.registry}/project-lc-realtimeapi"
             ],
             "parallel": false
           }
@@ -793,6 +793,48 @@
         }
       }
     },
+    "nest-modules-policy": {
+      "root": "libs/nest-modules-policy",
+      "sourceRoot": "libs/nest-modules-policy/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/nest-modules-policy/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/nest-modules-policy"],
+          "options": {
+            "jestConfig": "libs/nest-modules-policy/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "nest-modules-product-promotion": {
+      "root": "libs/nest-modules-product-promotion",
+      "sourceRoot": "libs/nest-modules-product-promotion/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/nest-modules-product-promotion/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/nest-modules-product-promotion"],
+          "options": {
+            "jestConfig": "libs/nest-modules-product-promotion/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "nest-modules-s3": {
       "root": "libs/nest-modules-s3",
       "sourceRoot": "libs/nest-modules-s3/src",
@@ -867,7 +909,7 @@
             "commands": [
               "docker build -f ./apps/overlay/Dockerfile -t {args.registry}/project-lc-overlay:{args.tag} --platform=linux/amd64 .",
               "docker tag {args.registry}/project-lc-overlay:{args.tag} {args.registry}/project-lc-overlay:latest",
-              "docker push {args.registry}/project-lc-overlay:{args.tag}"
+              "docker push --all-tags {args.registry}/project-lc-overlay"
             ],
             "parallel": false
           }
@@ -943,7 +985,7 @@
             "commands": [
               "docker build -f ./apps/overlay-controller/Dockerfile -t {args.registry}/project-lc-overlay-controller:{args.tag} --platform=linux/amd64 .",
               "docker tag {args.registry}/project-lc-overlay-controller:{args.tag} {args.registry}/project-lc-overlay-controller:latest",
-              "docker push {args.registry}/project-lc-overlay-controller:{args.tag}"
+              "docker push --all-tags {args.registry}/project-lc-overlay-controller"
             ],
             "parallel": false
           }

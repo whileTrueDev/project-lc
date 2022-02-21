@@ -1,7 +1,8 @@
 import { CacheModuleOptions, CacheOptionsFactory, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as redisCacheStore from 'cache-manager-ioredis';
-import Redis from 'ioredis';
+
+export const defaultCacheTTL = 10;
 
 @Injectable()
 export class CacheConfig implements CacheOptionsFactory {
@@ -9,18 +10,26 @@ export class CacheConfig implements CacheOptionsFactory {
 
   createCacheOptions(): CacheModuleOptions | Promise<CacheModuleOptions> {
     const nodeEnv = this.configService.get('NODE_ENV');
-    let redisCacheClient: Redis.Cluster | Redis.Redis;
+    const cacheClusterHost = this.configService.get('CACHE_REDIS_URL');
+
+    const cacheOptions: CacheModuleOptions = {
+      isGlobal: true,
+      store: redisCacheStore,
+      clusterConfig: {
+        nodes: [{ host: 'localhost', port: 6379 }],
+        options: { ttl: defaultCacheTTL },
+      },
+    };
     if (['production', 'test'].includes(nodeEnv)) {
-      const cacheClusterHost = this.configService.get('CACHE_REDIS_URL');
-      redisCacheClient = new Redis.Cluster([cacheClusterHost]);
-    } else {
-      redisCacheClient = new Redis('localhost:6379');
+      // 테스트, 프로덕션 환경
+      const [host, port] = cacheClusterHost.split(':');
+      const clusterConfig = {
+        nodes: [{ host, port: port || 6379 }],
+        options: { ttl: defaultCacheTTL },
+      };
+      cacheOptions.clusterConfig = clusterConfig;
     }
 
-    return {
-      ttl: 5,
-      store: redisCacheStore,
-      redisInstance: redisCacheClient,
-    };
+    return cacheOptions;
   }
 }

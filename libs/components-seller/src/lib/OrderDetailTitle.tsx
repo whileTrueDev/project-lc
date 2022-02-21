@@ -6,6 +6,9 @@ import FmReturnStatusBadge from '@project-lc/components-shared/FmReturnStatusBad
 import { useOrderReturnOrRefundStatus } from '@project-lc/hooks';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 export interface OrderDetailTitleProps {
   order: FindFmOrderDetailRes;
@@ -15,7 +18,6 @@ export function OrderDetailTitle({ order }: OrderDetailTitleProps): JSX.Element 
   const refundStatus = useOrderReturnOrRefundStatus(order.refunds);
   // 이 주문의 여러 반품 상태 중, 최종 환불 상태 찾기
   const returnStatus = useOrderReturnOrRefundStatus(order.returns);
-
   return (
     <>
       <Heading>주문 {order.id}</Heading>

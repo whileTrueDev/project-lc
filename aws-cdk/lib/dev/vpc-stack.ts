@@ -133,7 +133,7 @@ export class LCDevVpcStack extends cdk.Stack {
 
     this.apiSecGrp.addIngressRule(
       this.albSecGrp,
-      ec2.Port.tcp(3000),
+      ec2.Port.tcp(constants.DEV.ECS_API_PORT),
       'allow port 3000 to anywhere',
     );
 
@@ -150,7 +150,7 @@ export class LCDevVpcStack extends cdk.Stack {
 
     this.overlaySecGrp.addIngressRule(
       this.albSecGrp,
-      ec2.Port.tcp(3002),
+      ec2.Port.tcp(constants.DEV.ECS_OVERLAY_PORT),
       'allow port 3002 to anywhere',
     );
 
@@ -171,7 +171,7 @@ export class LCDevVpcStack extends cdk.Stack {
 
     this.overlayControllerSecGrp.addIngressRule(
       this.albSecGrp,
-      ec2.Port.tcp(3333),
+      ec2.Port.tcp(constants.DEV.ECS_OVERLAY_CONTROLLER_PORT),
       'allow port 3333 to alb',
     );
 
@@ -192,7 +192,7 @@ export class LCDevVpcStack extends cdk.Stack {
 
     this.realtimeApiSecGrp.addIngressRule(
       this.albSecGrp,
-      ec2.Port.tcp(3001),
+      ec2.Port.tcp(constants.DEV.ECS_REALTIME_API_PORT),
       'allow port 3001 to alb for kks realtime-api',
     );
   }
@@ -205,21 +205,59 @@ export class LCDevVpcStack extends cdk.Stack {
       allowAllOutbound: false,
     });
 
-    // * Realtime API
-    this.redisSecGrp.addIngressRule(
-      this.realtimeApiSecGrp,
-      ec2.Port.tcp(6379),
-      'allow port 6379 from kks realtime-api',
-    );
-    this.redisSecGrp.addEgressRule(
-      this.realtimeApiSecGrp,
-      ec2.Port.tcp(6379),
-      'allow port 6379 to kks realtime-api',
-    );
-    this.realtimeApiSecGrp.addIngressRule(
-      this.redisSecGrp,
-      ec2.Port.tcp(3001),
-      'allow port 3001 to redis cluster',
-    );
+    type AllowServerOptions = {
+      serverName: string;
+      secGrp: ec2.SecurityGroup;
+      serverPort: number;
+      redisPort?: number;
+    };
+    const allowServer = ({
+      serverName,
+      secGrp,
+      redisPort = 6379,
+      serverPort,
+    }: AllowServerOptions) => {
+      // * API server
+      this.redisSecGrp.addIngressRule(
+        secGrp,
+        ec2.Port.tcp(redisPort),
+        `allow port ${redisPort} to ${serverName} server`,
+      );
+      this.redisSecGrp.addEgressRule(
+        secGrp,
+        ec2.Port.tcp(redisPort),
+        `allow port ${redisPort} to ${serverName} server`,
+      );
+      secGrp.addIngressRule(
+        this.redisSecGrp,
+        ec2.Port.tcp(serverPort),
+        `allow port ${serverPort} to redis cluster`,
+      );
+    };
+
+    // * Allow API Server
+    allowServer({
+      serverName: 'api',
+      secGrp: this.apiSecGrp,
+      serverPort: constants.DEV.ECS_API_PORT,
+    });
+    // * Allow Realtime API Server
+    allowServer({
+      serverName: 'realtime-api',
+      secGrp: this.realtimeApiSecGrp,
+      serverPort: constants.DEV.ECS_REALTIME_API_PORT,
+    });
+    // * Allow Overlay Server
+    allowServer({
+      serverName: 'overlay',
+      secGrp: this.overlaySecGrp,
+      serverPort: constants.DEV.ECS_OVERLAY_PORT,
+    });
+    // * Allow Overlay-controller Server
+    allowServer({
+      serverName: 'overlay-controller',
+      secGrp: this.overlayControllerSecGrp,
+      serverPort: constants.DEV.ECS_OVERLAY_CONTROLLER_PORT,
+    });
   }
 }

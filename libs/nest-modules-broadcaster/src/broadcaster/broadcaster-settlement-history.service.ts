@@ -1,5 +1,5 @@
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { Broadcaster } from '@prisma/client';
+import { Broadcaster, SellType } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -50,8 +50,16 @@ export class BroadcasterSettlementHistoryService extends ServiceBaseWithCache {
             amount: i.amount,
             exportCode: i.exportCode,
             liveShoppingId: i.liveShoppingId,
+            productPromotionId: i.productPromotionId,
+            // eslint-disable-next-line no-nested-ternary
+            sellType: i.liveShoppingId
+              ? SellType.liveShopping
+              : i.productPromotionId
+              ? SellType.productPromotion
+              : SellType.normal,
             orderId: i.orderId,
             broadcasterSettlementsId: _settlement.id,
+            broadcasterCommissionRate: i.broadcasterCommissionRate,
           };
         })
         .filter((x) => !!x),
@@ -70,16 +78,9 @@ export class BroadcasterSettlementHistoryService extends ServiceBaseWithCache {
       orderBy: [{ round: 'desc' }, { date: 'desc' }],
       include: {
         broadcasterSettlementItems: {
-          include: {
-            liveShopping: true,
-          },
+          include: { liveShopping: true, productPromotion: true },
         },
-        broadcaster: {
-          select: {
-            id: true,
-            userNickname: true,
-          },
-        },
+        broadcaster: { select: { id: true, userNickname: true } },
       },
     });
   }
@@ -90,15 +91,10 @@ export class BroadcasterSettlementHistoryService extends ServiceBaseWithCache {
       orderBy: [{ round: 'desc' }, { date: 'desc' }],
       include: {
         broadcasterSettlementItems: {
-          include: {
-            liveShopping: true,
-          },
+          include: { liveShopping: true, productPromotion: true },
         },
         broadcaster: {
-          select: {
-            id: true,
-            userNickname: true,
-          },
+          select: { id: true, userNickname: true },
         },
       },
     });

@@ -23,6 +23,7 @@ import {
   Stack,
   useMergeRefs,
   useToast,
+  HStack,
 } from '@chakra-ui/react';
 import { GridRowData } from '@material-ui/data-grid';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
@@ -31,6 +32,23 @@ import { GoodsConfirmationStatus } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
+
+export function FmGoodsSeqInputHelpText(): JSX.Element {
+  return (
+    <>
+      퍼스트몰에 등록한 상품의 고유번호를
+      입력하세요.(http://whiletrue.firstmall.kr/goods/view?no=
+      <Text as="span" color="red">
+        41
+      </Text>
+      의&nbsp;
+      <Text as="span" color="red">
+        41
+      </Text>
+      을 입력)
+    </>
+  );
+}
 
 // 검수 승인시에 필요한 최소한의 데이터
 export type GoodRowType = {
@@ -66,12 +84,6 @@ export function AdminGoodsConfirmationDialog(
   });
   const connectionIdRefs = useMergeRefs(initialRef, ref);
 
-  function useClose(): void {
-    reset();
-    onClose();
-    callback();
-  }
-
   const mutation = useGoodConfirmationMutation();
   async function useSubmit(submitData: {
     firstmallGoodsConnectionId: string;
@@ -86,14 +98,15 @@ export function AdminGoodsConfirmationDialog(
         title: '상품 검수 승인이 완료되었습니다.',
         status: 'success',
       });
+      reset();
+      onClose();
+      callback();
     } catch (error) {
       toast({
         title: '상품 검수 승인이 실패하였습니다.',
         description: (error as AxiosError).response?.data.message,
         status: 'error',
       });
-    } finally {
-      useClose();
     }
   }
 
@@ -116,10 +129,12 @@ export function AdminGoodsConfirmationDialog(
             <GridTableItem title="현재 상품명" value={row?.goods_name} />
           </Grid>
           {!row?.agreementFlag && (
-            <Alert status="error">
+            <Alert status="error" mt={2}>
               <Stack>
-                <AlertIcon />
-                <AlertTitle>이용동의를 하지 않은 사용자입니다</AlertTitle>
+                <HStack>
+                  <AlertIcon />
+                  <AlertTitle>이용동의를 하지 않은 사용자입니다</AlertTitle>
+                </HStack>
                 <AlertDescription>
                   해당 판매자(<b>{row?.name}</b>)는 이용 약관에 동의를 하지 않았으므로
                   상품 승인을 할 수 없습니다.
@@ -130,16 +145,7 @@ export function AdminGoodsConfirmationDialog(
           <FormControl isInvalid={!!errors.firstmallGoodsConnectionId} m={2} mt={6}>
             <FormLabel fontSize="md">상품 ID</FormLabel>
             <FormHelperText>
-              퍼스트몰에 등록한 상품의 고유번호를
-              입력하세요.(http://whiletrue.firstmall.kr/goods/view?no=
-              <Text as="span" color="red">
-                41
-              </Text>
-              의&nbsp;
-              <Text as="span" color="red">
-                41
-              </Text>
-              을 입력)
+              <FmGoodsSeqInputHelpText />
             </FormHelperText>
             <Input
               id="firstmallGoodsConnectionId"

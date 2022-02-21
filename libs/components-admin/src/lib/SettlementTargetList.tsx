@@ -27,6 +27,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import { CommissionInfo } from '@project-lc/components-shared/CommissionInfo';
 import {
   useCreateSettlementMutation,
   useSellCommission,
@@ -47,96 +48,134 @@ export function SettlementTargetList(): JSX.Element | null {
 
   const [selectedExport, setSelectedExport] = useState<FmSettlementTarget | null>(null);
 
+  const data = useMemo(
+    () => [
+      {
+        header: '출고번호',
+        render: (target: FmSettlementTarget) => <Td w="25px">{target.export_seq}</Td>,
+      },
+      {
+        header: '출고코드',
+        render: (target: FmSettlementTarget) => <Td w="20px">{target.export_code}</Td>,
+      },
+      {
+        header: '판매자명',
+        render: (target: FmSettlementTarget) => (
+          <Td w="100px">
+            {target.options[0].seller ? (
+              <Text isTruncated maxW="100px">
+                {target.options[0].seller.name}
+              </Text>
+            ) : (
+              <Text color="red.400">판매자 미상</Text>
+            )}
+          </Td>
+        ),
+      },
+      {
+        header: '구매자명',
+        render: (target: FmSettlementTarget) => <Td>{target.order_user_name}</Td>,
+      },
+      {
+        header: '수령자명',
+        render: (target: FmSettlementTarget) => <Td>{target.recipient_user_name}</Td>,
+      },
+      {
+        header: '결제방법',
+        render: (target: FmSettlementTarget) => <Td>{target.payment}</Td>,
+      },
+      {
+        header: '출고날짜',
+        render: (target: FmSettlementTarget) => (
+          <Td>{dayjs(target.export_date).format('YYYY/MM/DD HH:mm:ss')}</Td>
+        ),
+      },
+      {
+        header: '구매확정일',
+        render: (target: FmSettlementTarget) => (
+          <Td>
+            {target.buy_confirm && target.confirm_date
+              ? `${dayjs(target.confirm_date).format('YYYY/MM/DD')} by ${
+                  target.buy_confirm
+                }`
+              : '-'}
+          </Td>
+        ),
+      },
+      {
+        header: '출고에 포함된 상품 총금액',
+        render: (target: FmSettlementTarget) => {
+          const totalPrice = target.options.reduce((acc, curr) => {
+            if (!acc) return Number(curr.price) * curr.ea;
+            return acc + Number(curr.price) * curr.ea;
+          }, 0);
+          return <Td>{totalPrice.toLocaleString()}</Td>;
+        },
+      },
+      {
+        header: '배송비',
+        render: (target: FmSettlementTarget) => (
+          <Td width="120px">
+            {target.shippingCostAlreadyCalculated
+              ? '이미 다른출고에 의해 정산됨'
+              : target.shipping_cost}
+          </Td>
+        ),
+      },
+      {
+        header: '정산계좌등록여부',
+        render: (target: FmSettlementTarget) => {
+          // 정산 정보를 등록했는 지 여부
+          const isAbleToSettle = target.options.every((opt) => {
+            const ssa = opt.seller?.sellerSettlementAccount;
+            if (ssa && ssa.length > 0) return true;
+            return false;
+          });
+          return <Td>{isAbleToSettle ? '정산등록함' : 'X'}</Td>;
+        },
+      },
+      {
+        header: '자세히보기',
+        render: (target: FmSettlementTarget) => (
+          <Td>
+            <Button
+              size="xs"
+              onClick={() => {
+                dialog.onOpen();
+                setSelectedExport(target);
+              }}
+            >
+              자세히보기
+            </Button>
+          </Td>
+        ),
+      },
+    ],
+    [dialog],
+  );
+
   if (!targets.data) return null;
   return (
     <Box>
       <Table size="sm">
         <Thead>
           <Tr>
-            <Th>출고번호</Th>
-            <Th>출고코드</Th>
-            <Th>판매자명</Th>
-            <Th>구매자명</Th>
-            <Th>수령자명</Th>
-            <Th>결제방법</Th>
-            <Th>출고날짜</Th>
-            <Th>구매확정일</Th>
-            <Th>출고에 포함된 상품 총금액</Th>
-            <Th>배송비</Th>
-            <Th>정산계좌등록여부</Th>
-            <Th>자세히보기</Th>
+            {data.map((d) => (
+              <Th key={d.header}>{d.header}</Th>
+            ))}
           </Tr>
         </Thead>
         <Tbody>
           {targets.data.map((target) => {
-            const totalPrice = target.options.reduce((acc, curr) => {
-              if (!acc) return Number(curr.price) * curr.ea;
-              return acc + Number(curr.price) * curr.ea;
-            }, 0);
-
-            // 정산 정보를 등록했는 지 여부
-            const isAbleToSettle = target.options.every((opt) => {
-              const ssa = opt.seller?.sellerSettlementAccount;
-              if (ssa && ssa.length > 0) return true;
-              return false;
-            });
-            return (
-              <Tr key={target.export_seq}>
-                <Td w="25px">{target.export_seq}</Td>
-                <Td w="20px">{target.export_code}</Td>
-                <Td w="100px">
-                  {target.options[0].seller ? (
-                    <Text isTruncated maxW="100px">
-                      {target.options[0].seller.name}
-                    </Text>
-                  ) : (
-                    <Text color="red.400">판매자 미상</Text>
-                  )}
-                </Td>
-                <Td>{target.order_user_name}</Td>
-                <Td>{target.recipient_user_name}</Td>
-                <Td>{target.payment}</Td>
-                <Td>{dayjs(target.export_date).format('YYYY/MM/DD HH:mm:ss')}</Td>
-                <Td>
-                  {target.buy_confirm && target.confirm_date
-                    ? `${dayjs(target.confirm_date).format('YYYY/MM/DD')} by ${
-                        target.buy_confirm
-                      }`
-                    : '-'}
-                </Td>
-                <Td>{totalPrice.toLocaleString()}</Td>
-                <Td width="120px">
-                  {target.shippingCostAlreadyCalculated
-                    ? '이미 다른출고에 의해 정산됨'
-                    : target.shipping_cost}
-                </Td>
-                <Td>{isAbleToSettle ? '정산등록함' : 'X'}</Td>
-                <Td>
-                  <Button
-                    size="xs"
-                    onClick={() => {
-                      dialog.onOpen();
-                      setSelectedExport(target);
-                    }}
-                  >
-                    자세히보기
-                  </Button>
-                </Td>
-              </Tr>
-            );
+            return <Tr key={target.export_seq}>{data.map((d) => d.render(target))}</Tr>;
           })}
         </Tbody>
         {targets.data.length > 30 && (
           <Tfoot>
             <Tr>
-              <Th>출고번호</Th>
-              <Th>출고코드</Th>
-              <Th>판매자명</Th>
-              <Th>출고날짜</Th>
-              <Th>구매확정일</Th>
-              <Th>출고에 포함된 상품 총금액</Th>
-              <Th>정산계좌등록여부</Th>
-              <Th>자세히보기</Th>
+              {data.map((d) => (
+                <Th key={d.header}>{d.header}</Th>
+              ))}
             </Tr>
           </Tfoot>
         )}
@@ -278,6 +317,7 @@ function SettlementItemOptionDetail({
     return false;
   }, [opt.seller?.sellerSettlementAccount]);
 
+  // 라이브쇼핑을 통한 판매인지 확인
   const liveShopping = useMemo(() => {
     if (opt.LiveShopping.length === 0) return null;
     // 라이브쇼핑인지 여부
@@ -287,6 +327,19 @@ function SettlementItemOptionDetail({
     });
   }, [opt.LiveShopping, settlementTarget]);
 
+  // 상품홍보를 통한 판매인지 확인
+  const productPromotion = useMemo(() => {
+    if (opt.productPromotion.length === 0) return null;
+    return opt.productPromotion[0];
+  }, [opt.productPromotion]);
+
+  const sellType = useMemo<'라이브쇼핑' | '상품홍보' | '기본판매'>(() => {
+    if (liveShopping) return '라이브쇼핑';
+    if (productPromotion) return '상품홍보';
+    return '기본판매';
+  }, [liveShopping, productPromotion]);
+
+  // 수수료 금액
   const commissionPrice = useMemo(() => {
     if (!liveShopping) {
       if (commissionInfo.data) {
@@ -297,6 +350,7 @@ function SettlementItemOptionDetail({
     return 0;
   }, [commissionInfo.data, liveShopping, totalPrice]);
 
+  // 수수료 정보
   const pgCommission = useMemo(() => {
     return calcPgCommission({
       paymentMethod: settlementTarget.payment,
@@ -357,42 +411,38 @@ function SettlementItemOptionDetail({
       <GridItem>{settlementTarget.pg || '-'}</GridItem>
 
       <GridItem>전자결제수수료</GridItem>
-      <GridItem>{`${pgCommission.commission}(${
-        pgCommission.rate + pgCommission.description
-      }`}</GridItem>
+      <GridItem>{`${
+        pgCommission.commission
+      }(${`${pgCommission.rate} ${pgCommission.description}`})`}</GridItem>
 
-      <GridItem>라이브쇼핑 주문 여부</GridItem>
+      <GridItem>판매 유형</GridItem>
       <GridItem>
         <Text
-          fontWeight={liveShopping ? 'bold' : undefined}
-          color={liveShopping ? 'green.500' : undefined}
+          fontWeight={liveShopping || productPromotion ? 'bold' : undefined}
+          // eslint-disable-next-line no-nested-ternary
+          color={liveShopping ? 'green.500' : productPromotion ? 'blue.500' : undefined}
         >
-          {liveShopping ? 'O' : 'X'}
+          {sellType}
         </Text>
       </GridItem>
 
       <GridItem>판매 수수료</GridItem>
       <GridItem color="green.500">
-        {liveShopping ? (
-          <Box>
-            <Text>
-              방송인
-              {liveShopping.broadcasterCommissionRate}% (
-              {Math.floor(
-                Number(liveShopping.broadcasterCommissionRate) * 0.01 * totalPrice,
-              )}
-              ) 원
-            </Text>
-            <Text>
-              와일트루
-              {liveShopping.whiletrueCommissionRate}% (
-              {Math.floor(
-                Number(liveShopping.whiletrueCommissionRate) * 0.01 * totalPrice,
-              )}
-              ) 원
-            </Text>
-          </Box>
-        ) : (
+        {liveShopping && (
+          <CommissionInfo
+            totalPrice={totalPrice}
+            broadcasterCommissionRate={liveShopping.broadcasterCommissionRate}
+            whiletrueCommissionRate={liveShopping.whiletrueCommissionRate}
+          />
+        )}
+        {productPromotion && (
+          <CommissionInfo
+            totalPrice={totalPrice}
+            broadcasterCommissionRate={productPromotion.broadcasterCommissionRate}
+            whiletrueCommissionRate={productPromotion.whiletrueCommissionRate}
+          />
+        )}
+        {!liveShopping && !productPromotion && (
           <Box>
             <Text>
               {commissionInfo.data &&

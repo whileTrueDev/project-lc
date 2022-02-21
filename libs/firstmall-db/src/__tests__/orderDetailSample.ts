@@ -1,3 +1,4 @@
+import { SellType } from '@prisma/client';
 import {
   FmOrderExport,
   FmOrderItem,
@@ -46,7 +47,9 @@ export const orderDetailOptionsSample: FmOrderOption[] = [
   },
 ];
 
-export const orderDetailItemsSample: Array<FmOrderItem & { options: FmOrderOption[] }> = [
+export const orderDetailItemsSample: Array<
+  FmOrderItem & { options: FmOrderOption[]; sellType: SellType }
+> = [
   {
     goods_seq: 41,
     goods_name: 'test2',
@@ -58,6 +61,7 @@ export const orderDetailItemsSample: Array<FmOrderItem & { options: FmOrderOptio
     shipping_type: 'free',
     shipping_method: 'delivery',
     shipping_group: '43_123_delivery',
+    sellType: 'normal',
   },
 ];
 

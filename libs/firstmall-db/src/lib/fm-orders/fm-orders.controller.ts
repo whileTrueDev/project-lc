@@ -205,7 +205,7 @@ export class FmOrdersController {
     );
     const promotionPagePurchasedList = await this.fmOrdersService.getPurchaseDoneOrders(
       promotionFmGoodsSeqs,
-      'broadcasterPromotionPage',
+      'productPromotion',
     );
 
     const purchasedList = liveShoppingPurchasedList.concat(promotionPagePurchasedList);

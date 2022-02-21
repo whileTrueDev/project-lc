@@ -16,7 +16,12 @@ import { KakaoStrategy } from './strategy/kakao.strategy';
 import { NaverStrategy } from './strategy/naver.strategy';
 
 @Module({
-  imports: [AuthModule, BroadcasterModule.withoutControllers(), SellerModule, S3Module],
+  imports: [
+    AuthModule,
+    BroadcasterModule.withoutControllers(),
+    SellerModule.withoutControllers(),
+    S3Module,
+  ],
   controllers: [SocialController],
   providers: [
     NaverApiService,

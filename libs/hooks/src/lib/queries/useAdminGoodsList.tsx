@@ -1,8 +1,13 @@
-import { GoodsListDto, GoodsListRes } from '@project-lc/shared-types';
+import {
+  AdminAllLcGoodsList,
+  GoodsListDto,
+  GoodsListRes,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
+/** 검수가 필요한 상품목록 조회 */
 type SellerGoodsListRequestDto = GoodsListDto & { email?: string };
 
 export const getAdminGoodsList = async (
@@ -30,5 +35,21 @@ export const useAdminGoodsList = (
       retry: 1,
       ...options,
     },
+  );
+};
+
+/** 검수완료 & 판매상태 정상인 모든 상품 조회 */
+export const getAdminAllConfirmedLcGoodsList = async (): Promise<AdminAllLcGoodsList> => {
+  return axios
+    .get<AdminAllLcGoodsList>('/admin/confirmed-goods-list')
+    .then((res) => res.data);
+};
+export const useAdminAllConfirmedLcGoodsList = (): UseQueryResult<
+  AdminAllLcGoodsList,
+  AxiosError
+> => {
+  return useQuery<AdminAllLcGoodsList, AxiosError>(
+    'AdminAllConfirmedLcGoodsList',
+    getAdminAllConfirmedLcGoodsList,
   );
 };

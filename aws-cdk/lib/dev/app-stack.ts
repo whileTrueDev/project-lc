@@ -199,6 +199,7 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
+        CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -269,6 +270,7 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
+        CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -322,6 +324,7 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
         REDIS_URL: ecs.Secret.fromSsmParameter(this.REDIS_URL),
+        CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}RealtimeApiLogGroup`, {
@@ -656,7 +659,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}REDIS_URL`,
       {
-        version: 1,
+        version: 4,
         parameterName: constants.DEV.REDIS_URL,
       },
     );
@@ -665,7 +668,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}CACHE_REDIS_URL`,
       {
-        version: 1,
+        version: 3,
         parameterName: constants.DEV.CACHE_REDIS_URL,
       },
     );

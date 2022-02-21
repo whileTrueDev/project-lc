@@ -38,6 +38,47 @@ function formatDate(date: Date): string {
 // * 상품목록 datagrid 컬럼 ***********************************************
 const columns: GridColumns = [
   {
+    field: 'confirmation',
+    headerName: '검수승인',
+    width: 100,
+    renderCell: () => <Button size="xs">승인하기</Button>,
+    sortable: false,
+  },
+  {
+    field: 'rejection',
+    headerName: '검수반려',
+    width: 100,
+    renderCell: () => <Button size="xs">반려하기</Button>,
+    sortable: false,
+  },
+  {
+    field: 'goods_status',
+    headerName: '상품상태',
+    minWidth: 50,
+    valueGetter: ({ row }) => {
+      return GOODS_STATUS[row.goods_status as GoodsStatus];
+    },
+    sortable: false,
+  },
+  {
+    field: 'confirm_status',
+    headerName: '검수상태',
+    minWidth: 50,
+    renderCell: ({ row }) => {
+      const confirmStatus = row.confirmation.status as GoodsConfirmationStatuses;
+      return <Text>{GOODS_CONFIRMATION_STATUS[confirmStatus].label}</Text>;
+    },
+    sortable: false,
+  },
+  {
+    field: 'businessRegistrationStatus',
+    headerName: '사업자등록정보검수상태',
+    minWidth: 200,
+    renderCell: (params) => (
+      <ConfirmationBadge status={params.row.businessRegistrationStatus} />
+    ),
+  },
+  {
     field: 'name',
     headerName: '판매자 ID',
     minWidth: 110,
@@ -103,47 +144,6 @@ const columns: GridColumns = [
       );
     },
     sortable: false,
-  },
-  {
-    field: 'goods_status',
-    headerName: '상품상태',
-    minWidth: 50,
-    valueGetter: ({ row }) => {
-      return GOODS_STATUS[row.goods_status as GoodsStatus];
-    },
-    sortable: false,
-  },
-  {
-    field: 'confirm_status',
-    headerName: '검수상태',
-    minWidth: 50,
-    renderCell: ({ row }) => {
-      const confirmStatus = row.confirmation.status as GoodsConfirmationStatuses;
-      return <Text>{GOODS_CONFIRMATION_STATUS[confirmStatus].label}</Text>;
-    },
-    sortable: false,
-  },
-  {
-    field: 'confirmation',
-    headerName: '검수승인',
-    width: 100,
-    renderCell: () => <Button size="xs">승인하기</Button>,
-    sortable: false,
-  },
-  {
-    field: 'rejection',
-    headerName: '검수반려',
-    width: 100,
-    renderCell: () => <Button size="xs">반려하기</Button>,
-    sortable: false,
-  },
-  {
-    field: 'businessRegistrationStatus',
-    headerName: '사업자등록정보검수상태',
-    minWidth: 200,
-    renderCell: (params) => (
-      <ConfirmationBadge status={params.row.businessRegistrationStatus} />
-    ),
   },
 ];
 // * 상품목록 datagrid 컬럼 끝*********************************************
