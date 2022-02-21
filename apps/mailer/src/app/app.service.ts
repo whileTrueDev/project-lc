@@ -227,7 +227,8 @@ export class AppService {
         taxInvoiceMail, 
         businessRegistrationImageName,
         mailOrderSalesNumber, 
-        mailOrderSalesImageName 
+        mailOrderSalesImageName,
+        sellerId
         )
     SELECT 
       id, 
@@ -241,7 +242,8 @@ export class AppService {
       taxInvoiceMail, 
       businessRegistrationImageName, 
       mailOrderSalesNumber, 
-      mailOrderSalesImageName
+      mailOrderSalesImageName,
+      sellerId
     FROM 
       SellerBusinessRegistration
     WHERE 
@@ -265,9 +267,9 @@ export class AppService {
   private copySellerSettlementAccount(sellerId): Promise<any> {
     return this.prisma.$executeRaw`
     INSERT INTO InactiveSellerSettlementAccount
-      (id, sellerEmail, bank, number, name, settlementAccountImageName)
+      (id, sellerEmail, bank, number, name, settlementAccountImageName, sellerId)
     SELECT 
-      id, sellerEmail, bank, number, name, settlementAccountImageName
+      id, sellerEmail, bank, number, name, settlementAccountImageName, sellerId
     FROM 
       SellerSettlementAccount
     WHERE 
