@@ -2,6 +2,7 @@
 import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { CacheConfig } from '@project-lc/nest-core';
 import {
   LiveShoppingModule,
   LiveShoppingService,
@@ -11,7 +12,6 @@ import { S3Module, S3Service } from '@project-lc/nest-modules-s3';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrdersDto } from '@project-lc/shared-types';
-import store from 'cache-manager-ioredis';
 import {
   orderDetailExportsSample,
   orderDetailOptionsSample,
@@ -32,7 +32,10 @@ describe('FmOrdersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         PrismaModule,
-        CacheModule.register({ isGlobal: true, store }),
+        CacheModule.registerAsync({
+          isGlobal: true,
+          useClass: CacheConfig,
+        }),
         ConfigModule.forRoot({ isGlobal: true }),
         SellerModule.withoutControllers(),
         LiveShoppingModule.withoutControllers(),

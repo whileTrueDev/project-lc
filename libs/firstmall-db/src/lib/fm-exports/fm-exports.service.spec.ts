@@ -2,15 +2,15 @@
 import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { CacheConfig } from '@project-lc/nest-core';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
-import { PrismaModule } from '@project-lc/prisma-orm';
-import store from 'cache-manager-ioredis';
-import { SellerModule } from '@project-lc/nest-modules-seller';
 import {
   LiveShoppingModule,
   LiveShoppingService,
 } from '@project-lc/nest-modules-liveshopping';
 import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
+import { SellerModule } from '@project-lc/nest-modules-seller';
+import { PrismaModule } from '@project-lc/prisma-orm';
 import { exportItemSample, exportSample } from '../../__tests__/exportSample';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FMGoodsService } from '../fm-goods/fm-goods.service';
@@ -27,7 +27,10 @@ describe('FmExportsService', () => {
         GoodsModule.withoutControllers(),
         LiveShoppingModule.withoutControllers(),
         PrismaModule,
-        CacheModule.register({ isGlobal: true, store }),
+        CacheModule.registerAsync({
+          isGlobal: true,
+          useClass: CacheConfig,
+        }),
         ConfigModule.forRoot({ isGlobal: true }),
         SellerModule.withoutControllers(),
       ],

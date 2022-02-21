@@ -2,13 +2,13 @@ import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Goods, GoodsView, PrismaClient } from '@prisma/client';
+import { CacheConfig } from '@project-lc/nest-core';
 import { S3Module } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import {
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
-import redisCacheStore from 'cache-manager-ioredis';
 import { nanoid } from 'nanoid';
 import { GoodsService } from './goods.service';
 
@@ -25,7 +25,10 @@ describe('GoodsService', () => {
         PrismaModule,
         S3Module,
         ConfigModule.forRoot({ isGlobal: true }),
-        CacheModule.register({ isGlobal: true, store: redisCacheStore }),
+        CacheModule.registerAsync({
+          isGlobal: true,
+          useClass: CacheConfig,
+        }),
       ],
       providers: [GoodsService],
     }).compile();
