@@ -2,6 +2,8 @@ import { CacheModuleOptions, CacheOptionsFactory, Injectable } from '@nestjs/com
 import { ConfigService } from '@nestjs/config';
 import * as redisCacheStore from 'cache-manager-ioredis';
 
+export const defaultCacheTTL = 10;
+
 @Injectable()
 export class CacheConfig implements CacheOptionsFactory {
   constructor(private readonly configService: ConfigService) {}
@@ -13,15 +15,18 @@ export class CacheConfig implements CacheOptionsFactory {
     const cacheOptions: CacheModuleOptions = {
       isGlobal: true,
       store: redisCacheStore,
-      ttl: 10,
       clusterConfig: {
         nodes: [{ host: 'localhost', port: 6379 }],
+        options: { ttl: defaultCacheTTL },
       },
     };
     if (['production', 'test'].includes(nodeEnv)) {
       // 테스트, 프로덕션 환경
       const [host, port] = cacheClusterHost.split(':');
-      const clusterConfig = { nodes: [{ host, port: port || 6379 }] };
+      const clusterConfig = {
+        nodes: [{ host, port: port || 6379 }],
+        options: { ttl: defaultCacheTTL },
+      };
       cacheOptions.clusterConfig = clusterConfig;
     }
 
