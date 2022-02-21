@@ -1,6 +1,8 @@
+import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Goods, GoodsView, PrismaClient } from '@prisma/client';
+import { CacheConfig } from '@project-lc/nest-core';
 import { S3Module } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import {
@@ -13,21 +15,24 @@ import { GoodsService } from './goods.service';
 describe('GoodsService', () => {
   let __prisma: PrismaClient;
   let service: GoodsService;
-
   const TEST_USER_EMAIL = `${nanoid(2)}test@test.com`;
   const TEST_CONFIRMATION_GOODS_CONNECTION_ID = 999;
   let TEST_GOODS: Goods;
-
   beforeAll(async () => {
     __prisma = new PrismaClient();
-
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule, S3Module, ConfigModule.forRoot({ isGlobal: true })],
+      imports: [
+        PrismaModule,
+        S3Module,
+        ConfigModule.forRoot({ isGlobal: true }),
+        CacheModule.registerAsync({
+          isGlobal: true,
+          useClass: CacheConfig,
+        }),
+      ],
       providers: [GoodsService],
     }).compile();
-
     service = module.get<GoodsService>(GoodsService);
-
     // 테스트용 더미 판매자(seller) 생성
     await __prisma.seller.create({
       data: {
@@ -36,7 +41,6 @@ describe('GoodsService', () => {
         password: 'test',
       },
     });
-
     // 테스트용 더미 Goods, GoodsConfirmation 생성
     TEST_GOODS = await __prisma.goods.create({
       data: {
@@ -72,16 +76,13 @@ describe('GoodsService', () => {
       },
     });
   });
-
   afterAll(async () => {
     await __prisma.seller.delete({ where: { email: TEST_USER_EMAIL } });
     await __prisma.$disconnect();
   });
-
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-
   describe('findMyGoodsIds', () => {
     it('should return empty array', async () => {
       const goodsIds = await service.findMyGoodsIds('UNKOWN_EMAIL@asdf.com');
@@ -93,7 +94,6 @@ describe('GoodsService', () => {
       expect(goodsIds).toEqual([TEST_CONFIRMATION_GOODS_CONNECTION_ID]);
     });
   });
-
   describe('getGoodsList', () => {
     it('should have 1 item and totalItemCount : 1', async () => {
       const goodsListData = await service.getGoodsList({
@@ -103,14 +103,12 @@ describe('GoodsService', () => {
         sort: SellerGoodsSortColumn.REGIST_DATE,
         direction: SellerGoodsSortDirection.DESC,
       });
-
       expect(goodsListData.items).toHaveLength(1);
       expect(goodsListData.totalItemCount).toBe(1);
     });
   });
-
   describe('changeGoodsView', () => {
-    it('goos_view should be notLook', async () => {
+    it('goods_view should be notLook', async () => {
       await service.changeGoodsView(TEST_GOODS.id, GoodsView.notLook);
       const goodsListData = await service.getGoodsList({
         email: TEST_USER_EMAIL,
@@ -122,7 +120,6 @@ describe('GoodsService', () => {
       expect(goodsListData.items[0].goods_view).toBe(GoodsView.notLook);
     });
   });
-
   describe('getOneGoods', () => {
     it('should return goods', async () => {
       const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_EMAIL);
@@ -135,7 +132,6 @@ describe('GoodsService', () => {
       expect(goods.image[0].goodsId).toBe(TEST_GOODS.id);
     });
   });
-
   describe('deleteLcGoods', () => {
     it('goods should be deleted', async () => {
       const returnDeleteObjectsCommandOutput = (): Promise<void> => Promise.resolve();
@@ -145,9 +141,7 @@ describe('GoodsService', () => {
       jest
         .spyOn(service, 'deleteGoodsContentImagesFromS3')
         .mockImplementation(returnDeleteObjectsCommandOutput);
-
       await service.deleteLcGoods({ email: TEST_USER_EMAIL, ids: [TEST_GOODS.id] });
-
       const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_EMAIL);
       expect(goods).toBeNull();
     });

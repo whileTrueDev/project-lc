@@ -1,6 +1,7 @@
 import { Box, Container } from '@chakra-ui/react';
-import { GridColumns, GridSortModel } from '@material-ui/data-grid';
+import { GridColumns, GridSortModel, GridRowData } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
+import { SellTypeBadge } from '@project-lc/components-shared/SellTypeBadge';
 import {
   useFmOrdersDuringLiveShoppingSalesPurchaseDone,
   useProfile,
@@ -8,6 +9,7 @@ import {
 } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { SellType } from '@prisma/client';
 
 const columns: GridColumns = [
   {
@@ -16,6 +18,14 @@ const columns: GridColumns = [
     width: 140,
     valueFormatter: ({ row }) => {
       return dayjs(row.regist_date).format('YYYY/MM/DD HH:mm');
+    },
+  },
+  {
+    field: 'sellType',
+    headerName: '판매유형',
+    width: 120,
+    renderCell: ({ row }: GridRowData) => {
+      return <SellTypeBadge sellType={row.sellType as SellType} lineHeight={2} />;
     },
   },
   {
@@ -81,7 +91,6 @@ export function BroadcasterPurchaseList(): JSX.Element {
 
   const { data: purchaseData, isLoading } =
     useFmOrdersDuringLiveShoppingSalesPurchaseDone(profileData?.id);
-
   return (
     <Box>
       {purchaseData && !isLoading && (

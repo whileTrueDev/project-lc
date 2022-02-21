@@ -145,6 +145,7 @@ export class LCProdAppStack extends cdk.Stack {
         AWS_S3_ACCESS_KEY_ID: Secret.fromSsmParameter(p.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: Secret.fromSsmParameter(p.S3_ACCESS_KEY_SECRET),
         WHILETRUE_IP_ADDRESS: Secret.fromSsmParameter(p.WHILETRUE_IP_ADDRESS),
+        CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -152,6 +153,7 @@ export class LCProdAppStack extends cdk.Stack {
         SELLER_WEB_HOST: `https://${constants.PUNYCODE_판매자}.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://${constants.PUNYCODE_방송인}.${constants.PUNYCODE_DOMAIN}`,
         KKSHOW_WEB_HOST: `https://${constants.PUNYCODE_DOMAIN}`,
+        NODE_ENV: 'production',
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}ApiLogGroup`, {
@@ -205,9 +207,11 @@ export class LCProdAppStack extends cdk.Stack {
         CIPHER_SALT: Secret.fromSsmParameter(p.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: Secret.fromSsmParameter(p.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: Secret.fromSsmParameter(p.S3_ACCESS_KEY_SECRET),
+        CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
+        NODE_ENV: 'production',
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}OverlayLogGroup`, {
@@ -266,12 +270,14 @@ export class LCProdAppStack extends cdk.Stack {
         CIPHER_SALT: Secret.fromSsmParameter(p.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: Secret.fromSsmParameter(p.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: Secret.fromSsmParameter(p.S3_ACCESS_KEY_SECRET),
+        CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
         OVERLAY_HOST: `https://${constants.PUNYCODE_라이브}.${constants.PUNYCODE_DOMAIN}`,
         OVERLAY_CONTROLLER_HOST: `https://overlay-controller.${constants.PUNYCODE_DOMAIN}`,
         REALTIME_API_HOST: `https://realtime.${constants.PUNYCODE_DOMAIN}`,
+        NODE_ENV: 'production',
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}OverlayControllerLogGroup`, {
@@ -321,6 +327,7 @@ export class LCProdAppStack extends cdk.Stack {
         CIPHER_PASSWORD: Secret.fromSsmParameter(p.CIPHER_PASSWORD),
         CIPHER_SALT: Secret.fromSsmParameter(p.CIPHER_SALT),
         REDIS_URL: Secret.fromSsmParameter(p.REDIS_URL),
+        CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
       },
       logging: new AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${this.PREFIX}RealtimeApiLogGroup`, {
@@ -508,8 +515,9 @@ export class LCProdAppStack extends cdk.Stack {
         c.GOOGLE_CREDENTIALS_PRIVATE_KEY_KEY,
         2,
       ),
-      WHILETRUE_IP_ADDRESS: __loadSsmParmeter(c.WHILETRUE_IP_ADDRESS),
-      REDIS_URL: __loadSsmParmeter(c.REDIS_URL_KEY),
+      WHILETRUE_IP_ADDRESS: __loadSsmParmeter(c.WHILETRUE_IP_ADDRESS, 2),
+      REDIS_URL: __loadSsmParmeter(c.REDIS_URL_KEY, 2),
+      CACHE_REDIS_URL_KEY: __loadSsmParmeter(c.CACHE_REDIS_URL_KEY),
     };
   }
 }

@@ -1,18 +1,21 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  ValidationPipe,
-  Body,
-  UseGuards,
   Patch,
+  Post,
+  UseGuards,
+  UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
-import { InquiryDto } from '@project-lc/shared-types';
 import { Inquiry } from '@prisma/client';
-import { JwtAuthGuard, AdminGuard } from '@project-lc/nest-modules-authguard';
+import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { InquiryDto } from '@project-lc/shared-types';
 import { InquiryService } from './inquiry.service';
 
 @Controller('inquiry')
+@UseInterceptors(HttpCacheInterceptor)
 export class InquiryController {
   constructor(private readonly inquiryService: InquiryService) {}
 

@@ -1,11 +1,25 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Broadcaster, BroadcasterContacts } from '@prisma/client';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { BroadcasterContactDto, MAX_CONTACTS_COUNT } from '@project-lc/shared-types';
+import { Cache } from 'cache-manager';
 
 @Injectable()
-export class BroadcasterContactsService {
-  constructor(private readonly prisma: PrismaService) {}
+export class BroadcasterContactsService extends ServiceBaseWithCache {
+  #BROADCASTER_CONTACTS_CACHE_KEY = 'broadcaster/contacts';
+
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   /** 연락처 목록 조회 */
   public async findContacts(
@@ -41,6 +55,8 @@ export class BroadcasterContactsService {
         });
       }
     }
+
+    await this._clearCaches(this.#BROADCASTER_CONTACTS_CACHE_KEY);
     return this.prisma.broadcasterContacts.create({
       data: {
         broadcasterId,
@@ -77,6 +93,7 @@ export class BroadcasterContactsService {
         where: { id: contactId },
         data: dto,
       });
+      await this._clearCaches(this.#BROADCASTER_CONTACTS_CACHE_KEY);
       return true;
     } catch (err) {
       console.log(err);
@@ -89,11 +106,13 @@ export class BroadcasterContactsService {
     const deleteTarget = await this.prisma.broadcasterContacts.findFirst({
       where: { id: contactId },
     });
+    await this._clearCaches(this.#BROADCASTER_CONTACTS_CACHE_KEY);
     if (deleteTarget.isDefault) return false;
 
     const result = await this.prisma.broadcasterContacts.delete({
       where: { id: contactId },
     });
+    await this._clearCaches(this.#BROADCASTER_CONTACTS_CACHE_KEY);
     return !!result;
   }
 }

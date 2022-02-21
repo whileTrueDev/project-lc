@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { UserPayload } from '@project-lc/nest-core';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   LiveShoppingParamsDto,
@@ -10,10 +10,19 @@ import {
 } from '@project-lc/shared-types';
 import { throwError } from 'rxjs';
 import { LiveShopping } from '@prisma/client';
+import { Cache } from 'cache-manager';
 @Injectable()
-export class LiveShoppingService {
-  constructor(private readonly prisma: PrismaService) {}
+export class LiveShoppingService extends ServiceBaseWithCache {
+  #LIVESHOPPING_CACHE_KEY = 'live-shoppings';
 
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
+
+  /** 라이브쇼핑 생성 */
   async createLiveShopping(
     email: UserPayload['sub'],
     dto: LiveShoppingRegistDTO,
@@ -32,9 +41,11 @@ export class LiveShoppingService {
         sellerContacts: { connect: { id: dto.contactId } },
       },
     });
+    await this._clearCaches(this.#LIVESHOPPING_CACHE_KEY);
     return { liveShoppingId: liveShopping.id };
   }
 
+  /** 라이브쇼핑 삭제 */
   async deleteLiveShopping(liveShoppingId: { liveShoppingId: number }): Promise<boolean> {
     const doDelete = await this.prisma.liveShopping.delete({
       where: {
@@ -45,6 +56,7 @@ export class LiveShoppingService {
     if (!doDelete) {
       throwError('라이브 쇼핑 삭제 실패');
     }
+    await this._clearCaches(this.#LIVESHOPPING_CACHE_KEY);
     return true;
   }
 
@@ -97,7 +109,7 @@ export class LiveShoppingService {
    * @param broadcasterId
    * @returns fmGoodsSeq
    */
-  async getFmGoodsConnectionIdLinkedToLiveShoppings(
+  async getFmGoodsSeqsLinkedToLiveShoppings(
     broadcasterId: number,
   ): Promise<LiveShoppingFmGoodsSeq[]> {
     const fmGoodsSeqs = await this.prisma.liveShopping.findMany({
@@ -115,7 +127,7 @@ export class LiveShoppingService {
   async getBroadcasterRegisteredLiveShoppings(
     broadcasterId: number,
   ): Promise<LiveShopping[]> {
-    // 자신의 id를 반환하는 쿼리 수행하기
+    // 자신의 id를 반환하는 쿼리 수행하기
     return this.prisma.liveShopping.findMany({
       where: {
         broadcasterId: Number(broadcasterId),
@@ -200,6 +212,31 @@ export class LiveShoppingService {
       orderBy: {
         broadcastEndDate: 'asc',
       },
+    });
+  }
+
+  /** 특정 라이브 쇼핑의 현황(응원메시지 데이터) 조회 - 생성일 내림차순 조회(최신순)
+   * @param liveShoppingId 라이브쇼핑 고유id
+   */
+  /** 해당 fmGoodsSeq가 라이브쇼핑에 등록되어 있으면 true를 반환 */
+  async checkIsLiveShoppingFmGoodsSeq(fmGoodsSeq: number): Promise<boolean> {
+    const liveShoppingFmGoodsSeq = await this.prisma.liveShopping.findFirst({
+      where: {
+        fmGoodsSeq: Number(fmGoodsSeq),
+      },
+    });
+    if (liveShoppingFmGoodsSeq) return true;
+    return false;
+  }
+
+  /**
+   * 전달된 fmGoodsSeq 배열에 해당하는 라이브쇼핑 목록 정보 조회
+   * @param fmGoodsSeqs 퍼스트몰 상품 고유번호 fmGoodsSeq 배열 (liveShopping.fmGoodsSeq)
+   */
+  async findLiveShoppingsByGoodsIds(fmGoodsSeqs: number[]): Promise<LiveShopping[]> {
+    const _fmGoodsSeqs = fmGoodsSeqs.map((s) => Number(s)).filter((x) => !!x);
+    return this.prisma.liveShopping.findMany({
+      where: { fmGoodsSeq: { in: _fmGoodsSeqs } },
     });
   }
 }

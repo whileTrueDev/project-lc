@@ -1,5 +1,7 @@
+import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { CacheConfig } from '@project-lc/nest-core';
 import { GoodsService } from '@project-lc/nest-modules-goods';
 import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -12,7 +14,13 @@ describe('FmGoodsController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true })],
+      imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
+        CacheModule.registerAsync({
+          isGlobal: true,
+          useClass: CacheConfig,
+        }),
+      ],
       providers: [
         FMGoodsService,
         FirstmallDbService,

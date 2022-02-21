@@ -1,15 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import { Broadcaster } from '@prisma/client';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Broadcaster, SellType } from '@prisma/client';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateManyBroadcasterSettlementHistoryDto,
   FindBcSettlementHistoriesRes,
 } from '@project-lc/shared-types';
+import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 
 @Injectable()
-export class BroadcasterSettlementHistoryService {
-  constructor(private readonly prisma: PrismaService) {}
+export class BroadcasterSettlementHistoryService extends ServiceBaseWithCache {
+  #BC_SETTLEMENT_HISTORY_CACHE_KEY = 'settlement-history';
+
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   /** 정산 내역 일괄 생성 */
   public async executeSettleMany(
@@ -41,13 +50,22 @@ export class BroadcasterSettlementHistoryService {
             amount: i.amount,
             exportCode: i.exportCode,
             liveShoppingId: i.liveShoppingId,
+            productPromotionId: i.productPromotionId,
+            // eslint-disable-next-line no-nested-ternary
+            sellType: i.liveShoppingId
+              ? SellType.liveShopping
+              : i.productPromotionId
+              ? SellType.productPromotion
+              : SellType.normal,
             orderId: i.orderId,
             broadcasterSettlementsId: _settlement.id,
+            broadcasterCommissionRate: i.broadcasterCommissionRate,
           };
         })
         .filter((x) => !!x),
     });
 
+    this._clearCaches(this.#BC_SETTLEMENT_HISTORY_CACHE_KEY);
     return result.count;
   }
 
@@ -60,16 +78,9 @@ export class BroadcasterSettlementHistoryService {
       orderBy: [{ round: 'desc' }, { date: 'desc' }],
       include: {
         broadcasterSettlementItems: {
-          include: {
-            liveShopping: true,
-          },
+          include: { liveShopping: true, productPromotion: true },
         },
-        broadcaster: {
-          select: {
-            id: true,
-            userNickname: true,
-          },
-        },
+        broadcaster: { select: { id: true, userNickname: true } },
       },
     });
   }
@@ -80,15 +91,10 @@ export class BroadcasterSettlementHistoryService {
       orderBy: [{ round: 'desc' }, { date: 'desc' }],
       include: {
         broadcasterSettlementItems: {
-          include: {
-            liveShopping: true,
-          },
+          include: { liveShopping: true, productPromotion: true },
         },
         broadcaster: {
-          select: {
-            id: true,
-            userNickname: true,
-          },
+          select: { id: true, userNickname: true },
         },
       },
     });

@@ -25,7 +25,12 @@
             "command": null,
             "linuxParameters": null,
             "cpu": 0,
-            "environment": [],
+            "environment": [
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
+                }
+            ],
             "resourceRequirements": null,
             "ulimits": null,
             "dnsServers": null,
@@ -51,6 +56,10 @@
                 {
                     "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_REDIS_URL",
                     "name": "REDIS_URL"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_CACHE_REDIS_URL",
+                    "name": "CACHE_REDIS_URL"
                 }
             ],
             "dockerSecurityOptions": null,

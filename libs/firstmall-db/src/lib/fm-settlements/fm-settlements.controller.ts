@@ -1,37 +1,44 @@
-import { Controller, Get, Header, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   BroadcasterSettlementReceivableAmountRes,
   BroadcasterSettlementTargetRes,
+  FmSettlementTarget,
 } from '@project-lc/shared-types';
 import { calcBroadcasterSettlementTotalInfo } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import { FmSettlementService } from './fm-settlements.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('fm-settlements')
 export class FmSettlementController {
   constructor(private readonly fmSettleService: FmSettlementService) {}
 
   /** 정산 대상 조회 - 모든 판매자 */
-  @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Get('targets')
-  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getAllSettlementTargets(): Promise<any> {
+  @UseInterceptors(HttpCacheInterceptor)
+  getAllSettlementTargets(): Promise<FmSettlementTarget[]> {
     return this.fmSettleService.findAllSettleTargetList();
   }
 
   /** 정산 대상 조회 - 모든 방송인 */
-  @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   @Get('broadcaster/targets')
-  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @UseInterceptors(HttpCacheInterceptor)
   getBroadcasterSettlementTargets(): Promise<BroadcasterSettlementTargetRes> {
     return this.fmSettleService.findBcSettleTargetList();
   }
 
   /** 정산 대상 조회 - 특정 방송인 */
-  @UseGuards(JwtAuthGuard)
   @Get('broadcaster/:broadcasterId/targets')
   async getOneBcSettlementTargets(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
@@ -41,7 +48,6 @@ export class FmSettlementController {
   }
 
   /** 정산 예정 금액 조회 - 특정 방송인 */
-  @UseGuards(JwtAuthGuard)
   @Get('broadcaster/:broadcasterId/receivable-amount')
   async getAmount(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,

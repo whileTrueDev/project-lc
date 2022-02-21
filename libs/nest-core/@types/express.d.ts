@@ -2,6 +2,10 @@ import { UserPayload } from '../src/lib/interfaces/auth.interface';
 
 declare global {
   namespace Express {
+    export interface Request {
+      user: User;
+      csrfToken(): string;
+    }
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
     interface User extends UserPayload {
       email?: string;

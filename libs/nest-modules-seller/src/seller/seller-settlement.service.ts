@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+/* eslint-disable no-nested-ternary */
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import {
   BusinessRegistrationConfirmation,
+  Prisma,
   SellCommission,
   SellerBusinessRegistration,
   SellerSettlementAccount,
+  SellType,
 } from '@prisma/client';
-import { UserPayload } from '@project-lc/nest-core';
+import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BusinessRegistrationDto,
@@ -20,6 +23,7 @@ import {
   CalcPgCommissionOptions,
   checkOrderDuringLiveShopping,
 } from '@project-lc/utils';
+import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 
 export type SellerSettlementInfo = {
@@ -35,8 +39,16 @@ export type SellerSettlementInfo = {
 };
 
 @Injectable()
-export class SellerSettlementService {
-  constructor(private readonly prisma: PrismaService) {}
+export class SellerSettlementService extends ServiceBaseWithCache {
+  #SELLER_SETTLEMENT_CACHE_KEY = 'seller/settlement';
+  #SELLER_SETTLEMENT_HISTORY_CACHE_KEY = 'seller/settlement-history';
+
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   // 사업자 등록증 번호 포맷만들기
   private makeRegistrationNumberFormat(num: string): string {
@@ -72,6 +84,7 @@ export class SellerSettlementService {
           mailOrderSalesNumber: dto.mailOrderSalesNumber,
         },
       });
+    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
     return sellerBusinessRegistration;
   }
 
@@ -89,7 +102,7 @@ export class SellerSettlementService {
           SellerBusinessRegistrationId: _sellerBusinessRegistration.id,
         },
       });
-
+    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
     return businessRegistrationConfirmation;
   }
 
@@ -113,6 +126,7 @@ export class SellerSettlementService {
       },
     });
 
+    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
     return settlementAccount;
   }
 
@@ -125,40 +139,22 @@ export class SellerSettlementService {
   ): Promise<SellerSettlementInfo> {
     const email = sellerInfo.sub;
     const settlementInfo = await this.prisma.seller.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
       select: {
         sellerBusinessRegistration: {
-          include: {
-            BusinessRegistrationConfirmation: true,
-          },
+          include: { BusinessRegistrationConfirmation: true },
           take: 1,
-          orderBy: {
-            id: 'desc',
-          },
+          orderBy: { id: 'desc' },
         },
         sellerSettlements: {
           take: 5,
-          orderBy: {
-            id: 'desc',
-          },
-          select: {
-            date: true,
-            state: true,
-            totalAmount: true,
-          },
+          orderBy: { id: 'desc' },
+          select: { date: true, state: true, totalAmount: true },
         },
         sellerSettlementAccount: {
           take: 1,
-          orderBy: {
-            id: 'desc',
-          },
-          select: {
-            bank: true,
-            number: true,
-            name: true,
-          },
+          orderBy: { id: 'desc' },
+          select: { bank: true, number: true, name: true },
         },
       },
     });
@@ -212,17 +208,23 @@ export class SellerSettlementService {
         const liveShopping = curr.LiveShopping.find((lvs) => {
           return checkOrderDuringLiveShopping(target, lvs);
         });
+        // 상품홍보를 통한 정산대상인지 여부
+        const productPromotion =
+          curr.productPromotion.length > 0 ? curr.productPromotion[0] : null;
 
         let commission = Math.floor(price * Number(sellCommission.commissionDecimal));
-        if (liveShopping) {
-          const { whiletrueCommissionRate, broadcasterCommissionRate } = liveShopping;
-          const wtCommission = Math.floor(
-            price * (Number(whiletrueCommissionRate) * 0.01),
-          );
-          const brCommission = Math.floor(
-            price * (Number(broadcasterCommissionRate) * 0.01),
-          );
-
+        if (liveShopping || productPromotion) {
+          let wtCommissionRate: Prisma.Decimal;
+          let bcCommissionRate: Prisma.Decimal;
+          if (liveShopping) {
+            wtCommissionRate = liveShopping.whiletrueCommissionRate;
+            bcCommissionRate = liveShopping.broadcasterCommissionRate;
+          } else if (productPromotion) {
+            wtCommissionRate = productPromotion.whiletrueCommissionRate;
+            bcCommissionRate = productPromotion.broadcasterCommissionRate;
+          }
+          const wtCommission = Math.floor(price * (Number(wtCommissionRate) * 0.01));
+          const brCommission = Math.floor(price * (Number(bcCommissionRate) * 0.01));
           commission = wtCommission + brCommission;
         }
 
@@ -264,9 +266,30 @@ export class SellerSettlementService {
         sellerEmail: target.options[0].seller.email,
         settlementItems: {
           create: target.options.map((opt) => {
+            const price = Number(opt.price) * opt.ea;
             const liveShopping = opt.LiveShopping.find((lvs) => {
               return checkOrderDuringLiveShopping(target, lvs);
             });
+            const productPromotion =
+              opt.productPromotion.length > 0 ? opt.productPromotion[0] : null;
+            const sellType = liveShopping
+              ? SellType.liveShopping
+              : productPromotion
+              ? SellType.productPromotion
+              : SellType.normal;
+            // 수수료율 정보
+            const wtCommissionRate = liveShopping
+              ? liveShopping.whiletrueCommissionRate
+              : productPromotion
+              ? productPromotion.whiletrueCommissionRate
+              : sellCommission.commissionRate;
+            const wtCommission = Math.floor(0.01 * Number(wtCommissionRate) * price);
+            const bcCommissionRate = liveShopping
+              ? liveShopping.broadcasterCommissionRate
+              : productPromotion
+              ? productPromotion.broadcasterCommissionRate
+              : 0;
+            const bcCommission = Math.floor(0.01 * Number(bcCommissionRate) * price);
 
             return {
               itemId: opt.item_seq,
@@ -276,31 +299,15 @@ export class SellerSettlementService {
               option1: opt.option1,
               optionId: opt.item_option_seq,
               ea: opt.ea,
-              price: Number(opt.price) * opt.ea,
+              price,
               pricePerPiece: Number(opt.price),
               liveShoppingId: liveShopping ? liveShopping?.id : null,
-              whiletrueCommissionRate: liveShopping
-                ? liveShopping?.whiletrueCommissionRate
-                : sellCommission.commissionRate,
-              broadcasterCommissionRate: liveShopping
-                ? liveShopping?.broadcasterCommissionRate
-                : 0,
-              whiletrueCommission: liveShopping
-                ? Math.floor(
-                    0.01 *
-                      Number(liveShopping?.whiletrueCommissionRate) *
-                      (Number(opt.price) * opt.ea),
-                  )
-                : Math.floor(
-                    Number(opt.price) * opt.ea * Number(sellCommission.commissionDecimal),
-                  ),
-              broadcasterCommission: liveShopping
-                ? Math.floor(
-                    0.01 *
-                      Number(liveShopping?.broadcasterCommissionRate) *
-                      (Number(opt.price) * opt.ea),
-                  )
-                : 0,
+              productPromotionId: productPromotion ? productPromotion.id : null,
+              sellType,
+              whiletrueCommissionRate: wtCommissionRate,
+              broadcasterCommissionRate: bcCommissionRate,
+              whiletrueCommission: wtCommission,
+              broadcasterCommission: bcCommission,
             };
           }),
         },
@@ -315,6 +322,8 @@ export class SellerSettlementService {
         totalCommission: totalInfo.commission + totalPgCommission.commission,
       },
     });
+
+    await this._clearCaches(this.#SELLER_SETTLEMENT_HISTORY_CACHE_KEY);
 
     return true;
   }
@@ -360,9 +369,11 @@ export class SellerSettlementService {
     month: string,
   ): Promise<string[]> {
     const result: { round: string }[] = await this.prisma.$queryRaw`
-    SELECT round FROM SellerSettlements
-    WHERE round LIKE ${`${year}/${month}%`} AND sellerEmail = ${email} GROUP BY round
-    `;
+      SELECT round FROM SellerSettlements
+      WHERE round LIKE ${`${year}/${
+        month.length === 1 ? `0${month}` : month
+      }%`} AND sellerEmail = ${email} GROUP BY round
+      `;
 
     return result.map((m) => m.round);
   }
@@ -408,16 +419,8 @@ export class SellerSettlementService {
         round: options?.round ? options.round : undefined,
       },
       include: {
-        seller: {
-          include: {
-            sellerShop: true,
-          },
-        },
-        settlementItems: {
-          include: {
-            liveShopping: true,
-          },
-        },
+        seller: { include: { sellerShop: true } },
+        settlementItems: { include: { liveShopping: true } },
       },
     });
   }

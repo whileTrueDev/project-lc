@@ -1,15 +1,26 @@
 import {
   BadRequestException,
+  CACHE_MANAGER,
+  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { BroadcasterChannel } from '@prisma/client';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { CreateBroadcasterChannelDto } from '@project-lc/shared-types';
+import { Cache } from 'cache-manager';
 
 @Injectable()
-export class BroadcasterChannelService {
-  constructor(private readonly prisma: PrismaService) {}
+export class BroadcasterChannelService extends ServiceBaseWithCache {
+  #BC_CHANNEL_CACHE_KEY = 'channel-list';
+
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   /** 방송인 채널 생성,
    * @param dto = {
@@ -28,8 +39,10 @@ export class BroadcasterChannelService {
           broadcaster: { connect: { id: broadcasterId } },
         },
       });
+      await this._clearCaches(this.#BC_CHANNEL_CACHE_KEY);
       return channel;
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(
         `error in createBroadcasterChannel, dto : ${JSON.stringify(dto)}`,
       );
@@ -47,8 +60,10 @@ export class BroadcasterChannelService {
           id: channelId,
         },
       });
+      await this._clearCaches(this.#BC_CHANNEL_CACHE_KEY);
       return true;
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }
@@ -72,6 +87,7 @@ export class BroadcasterChannelService {
 
       return broadcaster.channels;
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }

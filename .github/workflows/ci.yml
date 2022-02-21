@@ -18,6 +18,7 @@ jobs:
     name: Test Job
     runs-on: ubuntu-latest
     env:
+      NODE_ENV: development
       MYSQL_DATABASE: test_db
       MYSQL_USER: root
       MYSQL_PASSWORD: root
@@ -26,6 +27,11 @@ jobs:
       CIPHER_HASH: DUMMY_CIPHER_HAS
       CIPHER_PASSWORD: DUMMY_CIPHER_PASSWORD
       CIPHER_SALT: DUMMY_CIPHER_SALT
+    services:
+      redis:
+        image: redis:6.2 # Docker Hub image
+        ports:
+          - 6379:6379
     steps:
       - name: Setup MySQL
         run: |
@@ -34,23 +40,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install Dependencies
-        uses: bahmutov/npm-install@v1 
+        uses: bahmutov/npm-install@v1
       - name: Primsa generate # Generate Prisma Client
         run: yarn nx run prisma-orm:prisma-generate
       - name: Prisma Migrate # Migrate Prisma Schema to DB
         run: yarn nx run prisma-orm:migrate-dev
       - name: Run tests all affected apps and libs
         run: yarn affected:test --base="origin/${GITHUB_BASE_REF}"
-  # e2eTest:
-  #   name: E2ETest Job
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v1
-  #     - name: Install Dependencies
-  #       uses: bahmutov/npm-install@v1
-  #     - name: Run e2e tests all affected apps and libs
-  #       run: yarn affected:e2e --base="origin/${GITHUB_BASE_REF}"
   Build:
     name: Build Job
     runs-on: ubuntu-latest
@@ -63,5 +59,3 @@ jobs:
         run: yarn nx run prisma-orm:prisma-generate
       - name: Run Build all affected apps and libs
         run: yarn affected:build --base="origin/${GITHUB_BASE_REF}"
-
-

@@ -26,6 +26,7 @@ import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
+import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
 import {
   useBcSettlementTargets,
   useBroadcasterSettlementTotalInfo,
@@ -145,24 +146,31 @@ export function BcSettlementTargetList(): JSX.Element {
   };
 
   const roundStore = settlementHistoryStore();
+
   async function onExecuteSettleMany(): Promise<void> {
     const round = roundStore.selectedRound; // 'YYYY년MM월/1회차'
     if (!round) toast({ title: '회차를 설정해 주세요.' });
     else {
-      const _export = rows.filter((r) => selectedRows.includes(r.id));
+      const _exports = rows.filter((r) => selectedRows.includes(r.id));
       const dtoItems: Array<CreateBroadcasterSettlementHistoryItem> = [];
-      _export.forEach((exp) => {
+      _exports.forEach((exp) => {
         exp.items.forEach((i) => {
-          const amount = calcSettleAmount(
-            Number(i.price),
-            i.liveShopping.broadcasterCommissionRate,
-          );
+          if (!(i.liveShopping || i.productPromotion)) return;
+          const commissionRate =
+            i.liveShopping?.broadcasterCommissionRate ||
+            i.productPromotion?.broadcasterCommissionRate ||
+            '0';
+          const amount = calcSettleAmount(Number(i.price), commissionRate);
           dtoItems.push({
             amount,
             exportCode: exp.export_code,
-            liveShoppingId: i.liveShopping.id,
-            broadcasterId: i.liveShopping.broadcaster.id,
+            liveShoppingId: i.liveShopping?.id,
+            productPromotionId: i.productPromotion?.id,
+            broadcasterId:
+              i.liveShopping?.broadcaster.id ||
+              i.productPromotion?.broadcasterPromotionPage.broadcaster.id,
             orderId: exp.order_seq.toString(),
+            broadcasterCommissionRate: commissionRate,
           });
         });
       });
@@ -301,11 +309,13 @@ function BcSettlementTargetDetail({
         >
           <Grid templateColumns="repeat(4, 1fr)" gap={{ base: 1, sm: 2 }}>
             <GridItem colSpan={{ base: 4, sm: 1 }}>
-              <ChakraNextImage
-                src={`http://whiletrue.firstmall.kr${item.image}`}
-                width={75}
-                height={75}
-              />
+              {item.image && (
+                <ChakraNextImage
+                  src={`http://whiletrue.firstmall.kr${item.image}`}
+                  width={75}
+                  height={75}
+                />
+              )}
             </GridItem>
             <GridItem colSpan={{ base: 4, sm: 3 }}>
               <Text fontWeight="bold">{item.goods_name}</Text>
@@ -316,43 +326,68 @@ function BcSettlementTargetDetail({
             </GridItem>
           </Grid>
           <Box mt={4}>
-            <Text fontWeight="semibold">라이브쇼핑정보</Text>
             <Grid mt={1} templateColumns="1fr 2fr">
               <GridTableItem
+                title="판매유형"
+                value={<SellTypeBadge sellType={item.sellType} />}
+              />
+              <GridTableItem
                 title="방송인 활동명"
-                value={item.liveShopping.broadcaster.userNickname}
-              />
-              <GridTableItem
-                title="퍼스트몰 상품번호"
-                value={item.liveShopping.fmGoodsSeq}
-              />
-              <GridTableItem
-                title="판매기간"
                 value={
-                  <Box>
-                    <Text>
-                      {dayjs(item.liveShopping.sellStartDate).format(
-                        'YYYY/MM/DD HH시 mm분',
-                      )}{' '}
-                      부터
-                    </Text>
-
-                    <Text>
-                      {dayjs(item.liveShopping.sellEndDate).format(
-                        'YYYY/MM/DD HH시 mm분',
-                      )}{' '}
-                      까지
-                    </Text>
-                  </Box>
+                  item.liveShopping?.broadcaster.userNickname ||
+                  item.productPromotion?.broadcasterPromotionPage.broadcaster
+                    .userNickname ||
+                  ''
                 }
               />
               <GridTableItem
-                title="정산액 및 수수료율"
-                value={`${calcSettleAmount(
-                  Number(item.price),
-                  item.liveShopping.broadcasterCommissionRate,
-                ).toLocaleString()}원 (${item.liveShopping.broadcasterCommissionRate.toString()}%)`}
+                title="퍼스트몰 상품번호"
+                value={
+                  item.liveShopping?.fmGoodsSeq ||
+                  item.productPromotion?.fmGoodsSeq ||
+                  '-'
+                }
               />
+              {item.liveShopping && (
+                <GridTableItem
+                  title="판매기간"
+                  value={
+                    <Box>
+                      <Text>
+                        {dayjs(item.liveShopping.sellStartDate).format(
+                          'YYYY/MM/DD HH시 mm분',
+                        )}{' '}
+                        부터
+                      </Text>
+
+                      <Text>
+                        {dayjs(item.liveShopping.sellEndDate).format(
+                          'YYYY/MM/DD HH시 mm분',
+                        )}{' '}
+                        까지
+                      </Text>
+                    </Box>
+                  }
+                />
+              )}
+              {item.liveShopping && (
+                <GridTableItem
+                  title="정산액 및 수수료율"
+                  value={`${calcSettleAmount(
+                    Number(item.price),
+                    item.liveShopping.broadcasterCommissionRate,
+                  ).toLocaleString()}원 (${item.liveShopping.broadcasterCommissionRate.toString()}%)`}
+                />
+              )}
+              {item.productPromotion && (
+                <GridTableItem
+                  title="정산액 및 수수료율"
+                  value={`${calcSettleAmount(
+                    Number(item.price),
+                    item.productPromotion.broadcasterCommissionRate,
+                  ).toLocaleString()}원 (${item.productPromotion.broadcasterCommissionRate.toString()}%)`}
+                />
+              )}
             </Grid>
           </Box>
         </Box>

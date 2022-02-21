@@ -10,7 +10,7 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2017", "dom"],
+    "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
@@ -52,6 +52,10 @@
       "@project-lc/nest-modules-overlay": ["libs/nest-modules-overlay/src/index.ts"],
       "@project-lc/nest-modules-overlay-controller": [
         "libs/nest-modules-overlay-controller/src/index.ts"
+      ],
+      "@project-lc/nest-modules-policy": ["libs/nest-modules-policy/src/index.ts"],
+      "@project-lc/nest-modules-product-promotion": [
+        "libs/nest-modules-product-promotion/src/index.ts"
       ],
       "@project-lc/nest-modules-s3": ["libs/nest-modules-s3/src/index.ts"],
       "@project-lc/nest-modules-seller": ["libs/nest-modules-seller/src/index.ts"],

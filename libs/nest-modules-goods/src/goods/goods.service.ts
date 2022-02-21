@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 import {
   BadRequestException,
+  CACHE_MANAGER,
+  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -8,6 +10,7 @@ import { GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminAllLcGoodsList,
   ApprovedGoodsNameAndId,
   getLiveShoppingProgress,
   GoodsByIdRes,
@@ -25,13 +28,20 @@ import {
   getS3KeyListFromImgSrcList,
   S3Service,
 } from '@project-lc/nest-modules-s3';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
+import { Cache } from 'cache-manager';
 
 @Injectable()
-export class GoodsService {
+export class GoodsService extends ServiceBaseWithCache {
+  #GOODS_CACHE_KEY = 'goods';
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3service: S3Service,
-  ) {}
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
@@ -63,14 +73,19 @@ export class GoodsService {
             fmGoodsSeq: true,
           },
         },
+        productPromotion: {
+          select: { fmGoodsSeq: true },
+        },
       },
     });
 
     const allMyGoodsIds = goodsIds.reduce((prev, goods) => {
       const lsGoodsIds = goods.LiveShopping.map((l) => l.fmGoodsSeq);
+      const productPromotionGoodsIds = goods.productPromotion.map((p) => p.fmGoodsSeq);
       return prev
         .concat(goods.confirmation.firstmallGoodsConnectionId)
-        .concat(lsGoodsIds);
+        .concat(lsGoodsIds)
+        .concat(productPromotionGoodsIds);
     }, []);
 
     return [...new Set(allMyGoodsIds)];
@@ -307,6 +322,8 @@ export class GoodsService {
         },
       });
 
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
+
       return true;
     } catch (error) {
       console.error(error);
@@ -374,10 +391,9 @@ export class GoodsService {
     try {
       await this.prisma.goods.update({
         where: { id },
-        data: {
-          goods_view: view,
-        },
+        data: { goods_view: view },
       });
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
       return true;
     } catch (error) {
       console.error(error);
@@ -450,6 +466,8 @@ export class GoodsService {
           confirmation: { create: { status: 'waiting' } },
         },
       });
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
+
       return { goodsId: goods.id };
     } catch (error) {
       console.error(error);
@@ -503,6 +521,9 @@ export class GoodsService {
       await this.prisma.goodsImages.delete({
         where: { id: imageId },
       });
+
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
+
       return true;
     } catch (e) {
       console.error(e);
@@ -606,6 +627,8 @@ export class GoodsService {
           }, // 상품 수정 후  (승인, 거절, 재검수 대기) 상태에서는 '재검수 대기' 상태로 변경, (대기) 상태에서는 그대로 '대기' 상태
         },
       });
+
+      await this._clearCaches(this.#GOODS_CACHE_KEY);
       return { goodsId: id };
     } catch (error) {
       console.error(error);
@@ -643,5 +666,28 @@ export class GoodsService {
       return flattenResult;
     });
     return result;
+  }
+
+  /** 전체 상품목록 조회 -
+   * 관리자에서 상품홍보에 연결하기 위한 상품(project-lc goods) 전체목록. 검수완료 & 정상판매중 일 것
+   * goodsConfirmation.status === confirmed && goods.status === normal
+   * goodsId, goodsName, sellerId, sellerEmail
+   * */
+  public async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
+    return this.prisma.goods.findMany({
+      where: {
+        goods_status: 'normal',
+        AND: {
+          confirmation: {
+            status: 'confirmed',
+          },
+        },
+      },
+      select: {
+        id: true,
+        goods_name: true,
+        seller: { select: { id: true, email: true } },
+      },
+    });
   }
 }

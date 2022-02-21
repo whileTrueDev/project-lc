@@ -45,6 +45,10 @@
                 {
                     "name": "KKSHOW_WEB_HOST",
                     "value": "https://xn--hp4b17xa.com"
+                },
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
                 }
             ],
             "resourceRequirements": null,
@@ -116,6 +120,10 @@
                 {
                     "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/WHILETRUE_IP_ADDRESS",
                     "name": "WHILETRUE_IP_ADDRESS"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_CACHE_REDIS_URL",
+                    "name": "CACHE_REDIS_URL"
                 }
             ],
             "dockerSecurityOptions": null,

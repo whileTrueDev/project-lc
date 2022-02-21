@@ -1,9 +1,8 @@
+import NextLink from 'next/link';
 import {
   Box,
-  Center,
   Container,
   Flex,
-  Grid,
   GridItem,
   Link,
   SimpleGrid,
@@ -73,13 +72,14 @@ export function CommonFooter({ footerLinkList }: CommonFooterProps): JSX.Element
             <Stack key={linkList.title} align="flex-start">
               <ListHeader>{linkList.title}</ListHeader>
               {linkList.items.map((linkItem) => (
-                <Link
-                  key={linkItem.title}
-                  href={linkItem.href}
-                  fontWeight={linkItem.isBold ? 'bold' : 'normal'}
-                >
-                  {linkItem.title}
-                </Link>
+                <NextLink key={linkItem.title} href={linkItem.href} passHref>
+                  <Link
+                    href={linkItem.href}
+                    fontWeight={linkItem.isBold ? 'bold' : 'normal'}
+                  >
+                    {linkItem.title}
+                  </Link>
+                </NextLink>
               ))}
             </Stack>
           ))}

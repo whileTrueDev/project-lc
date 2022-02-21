@@ -1,12 +1,11 @@
 import { Flex } from '@chakra-ui/react';
-import { UserType } from '@project-lc/shared-types';
 import { useState } from 'react';
 import SignupAgreeTerms from './signup/SignupAgreeTerms';
 import { SignupForm } from './signup/SignupForm';
 import SignupStart from './signup/SignupStart';
 
 export interface SignupProcessProps {
-  appType: UserType;
+  appType: 'seller' | 'broadcaster';
 }
 export function SignupProcess({ appType }: SignupProcessProps): JSX.Element {
   const [step, setStep] = useState(0);

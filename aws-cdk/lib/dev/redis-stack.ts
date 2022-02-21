@@ -28,17 +28,18 @@ export class LCDevRedisStack extends cdk.Stack {
       },
     );
 
-    new elasticache.CfnCacheCluster(
+    new elasticache.CfnReplicationGroup(
       this,
-      `${constants.DEV.ID_PREFIX}ElastiCacheCluster`,
+      `${constants.DEV.ID_PREFIX}ElastiCacheClusterGroup`,
       {
-        vpcSecurityGroupIds: [redisSecGrp.securityGroupId],
-        clusterName: 'KksDevRedisCluster',
-        cacheSubnetGroupName: redisSubnetGroup.cacheSubnetGroupName,
         engine: 'redis',
+        replicationGroupId: 'KksDevRedis',
+        replicationGroupDescription: 'kkshow test env cache cluster',
+        securityGroupIds: [redisSecGrp.securityGroupId],
+        cacheSubnetGroupName: redisSubnetGroup.cacheSubnetGroupName,
         engineVersion: '6.2',
         cacheNodeType: 'cache.t4g.micro',
-        numCacheNodes: 1,
+        numNodeGroups: 2,
       },
     );
   }

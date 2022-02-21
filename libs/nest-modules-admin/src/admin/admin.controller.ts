@@ -22,15 +22,18 @@ import {
   GoodsConfirmation,
   LiveShopping,
 } from '@prisma/client';
-import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   BroadcasterService,
   BroadcasterSettlementHistoryService,
   BroadcasterSettlementService,
 } from '@project-lc/nest-modules-broadcaster';
+import { GoodsService } from '@project-lc/nest-modules-goods';
+import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
 import {
+  AdminAllLcGoodsList,
   AdminBroadcasterSettlementInfoList,
   AdminSellerListRes,
   AdminSettlementInfoType,
@@ -71,6 +74,7 @@ export class AdminController {
     private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
     private readonly sellerService: SellerService,
+    private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
@@ -281,5 +285,20 @@ export class AdminController {
   @Get('/sellers')
   getSellerList(): Promise<AdminSellerListRes> {
     return this.sellerService.getSellerList();
+  }
+
+  /** ================================= */
+  // 상품홍보 ProductPromotion
+  /** ================================= */
+
+  /** 전체 상품목록 조회
+   * - 상품홍보에 연결하기 위한 상품(project-lc goods) 전체목록. 검수완료 & 정상판매중 일 것
+   * goodsConfirmation.status === confirmed && goods.status === normal
+   * goodsId, goodsName, sellerId, sellerEmail
+   * */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('confirmed-goods-list')
+  async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
+    return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
   }
 }

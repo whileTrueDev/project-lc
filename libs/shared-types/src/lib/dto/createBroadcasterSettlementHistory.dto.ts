@@ -2,16 +2,29 @@ import {
   Broadcaster,
   BroadcasterSettlementItems,
   BroadcasterSettlements,
+  ProductPromotion,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class CreateBroadcasterSettlementHistoryItem {
   @IsString() orderId: BroadcasterSettlementItems['orderId'];
   @IsString() exportCode: BroadcasterSettlementItems['exportCode'];
-  @IsNumber() liveShoppingId: BroadcasterSettlementItems['liveShoppingId'];
-  @IsNumber() broadcasterId: Broadcaster['id'];
+  @IsNumber() @IsOptional() liveShoppingId?: BroadcasterSettlementItems['liveShoppingId'];
+  @IsNumber() @IsOptional() productPromotionId?: ProductPromotion['id'];
+  @IsNumber() broadcasterId?: Broadcaster['id'];
   @IsNumber() amount: BroadcasterSettlementItems['amount'];
+  @IsNotEmpty()
+  broadcasterCommissionRate:
+    | BroadcasterSettlementItems['broadcasterCommissionRate']
+    | string;
 }
 
 export class CreateManyBroadcasterSettlementHistoryDto {

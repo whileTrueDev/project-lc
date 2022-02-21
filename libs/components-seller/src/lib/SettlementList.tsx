@@ -106,13 +106,6 @@ export function SettlementList(): JSX.Element | null {
       sortable: false,
       valueFormatter: ({ value }) => (value ? value.toLocaleString() : value),
     },
-    {
-      field: 'seller.sellerShop.shopName',
-      headerName: '판매자',
-      valueFormatter: (param) =>
-        param.row.seller?.sellerShop?.shopName || param.row.sellerEmail,
-      sortable: false,
-    },
   ];
 
   if (!data) return null;

@@ -1,5 +1,8 @@
+import { CacheModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient, Seller, ShippingGroup } from '@prisma/client';
+import { CacheConfig } from '@project-lc/nest-core';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { ShippingGroupDto } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
@@ -31,7 +34,14 @@ describe('ShippingGroupService', () => {
     __prisma = new PrismaClient();
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule],
+      imports: [
+        PrismaModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+        CacheModule.registerAsync({
+          isGlobal: true,
+          useClass: CacheConfig,
+        }),
+      ],
       providers: [ShippingGroupService],
     }).compile();
 

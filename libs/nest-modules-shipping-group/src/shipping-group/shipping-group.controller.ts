@@ -7,9 +7,10 @@ import {
   ParseIntPipe,
   Post,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { SellerInfo, UserPayload } from '@project-lc/nest-core';
+import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { ShippingGroupDto } from '@project-lc/shared-types';
 import { Seller, ShippingGroup } from '.prisma/client';
@@ -20,6 +21,7 @@ import {
 } from './shipping-group.service';
 
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(HttpCacheInterceptor)
 @Controller('shipping-group')
 export class ShippingGroupController {
   constructor(private readonly shippingGroupService: ShippingGroupService) {}

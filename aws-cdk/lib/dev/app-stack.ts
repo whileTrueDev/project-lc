@@ -43,6 +43,7 @@ export class LCDevAppStack extends cdk.Stack {
   private S3_ACCESS_KEY_SECRET: ssm.IStringParameter;
   private WHILETRUE_IP_ADDRESS: ssm.IStringParameter;
   private REDIS_URL: ssm.IStringParameter;
+  private CACHE_REDIS_URL: ssm.IStringParameter;
 
   public readonly alb: elbv2.ApplicationLoadBalancer;
 
@@ -130,6 +131,7 @@ export class LCDevAppStack extends cdk.Stack {
         AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
         WHILETRUE_IP_ADDRESS: ecs.Secret.fromSsmParameter(this.WHILETRUE_IP_ADDRESS),
+        CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -137,6 +139,7 @@ export class LCDevAppStack extends cdk.Stack {
         SELLER_WEB_HOST: `https://dev-seller.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://dev-broadcaster.${constants.PUNYCODE_DOMAIN}`,
         KKSHOW_WEB_HOST: `https://dev.${constants.PUNYCODE_DOMAIN}`,
+        NODE_ENV: 'test',
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}LogGroup`, {
@@ -196,9 +199,11 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
+        CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
+        NODE_ENV: 'test',
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayLogGroup`, {
@@ -265,12 +270,14 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
         AWS_S3_ACCESS_KEY_ID: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_ID),
         AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
+        CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
         OVERLAY_HOST: `https://dev-live.${constants.PUNYCODE_DOMAIN}`,
         OVERLAY_CONTROLLER_HOST: `https://dev-overlay-controller.${constants.PUNYCODE_DOMAIN}`,
         REALTIME_API_HOST: `https://dev-realtime.${constants.PUNYCODE_DOMAIN}`,
+        NODE_ENV: 'test',
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}OverlayControllerLogGroup`, {
@@ -317,6 +324,7 @@ export class LCDevAppStack extends cdk.Stack {
         CIPHER_PASSWORD: ecs.Secret.fromSsmParameter(this.CIPHER_PASSWORD),
         CIPHER_SALT: ecs.Secret.fromSsmParameter(this.CIPHER_SALT),
         REDIS_URL: ecs.Secret.fromSsmParameter(this.REDIS_URL),
+        CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
       },
       logging: new ecs.AwsLogDriver({
         logGroup: new logs.LogGroup(this, `${PREFIX}RealtimeApiLogGroup`, {
@@ -642,7 +650,7 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}WHILETRUE_IP_ADDRESS`,
       {
-        version: 1,
+        version: 2,
         parameterName: constants.DEV.WHILETRUE_IP_ADDRESS,
       },
     );
@@ -651,8 +659,17 @@ export class LCDevAppStack extends cdk.Stack {
       this,
       `${PREFIX}REDIS_URL`,
       {
-        version: 1,
+        version: 4,
         parameterName: constants.DEV.REDIS_URL,
+      },
+    );
+
+    this.CACHE_REDIS_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}CACHE_REDIS_URL`,
+      {
+        version: 3,
+        parameterName: constants.DEV.CACHE_REDIS_URL,
       },
     );
 
@@ -674,6 +691,8 @@ export class LCDevAppStack extends cdk.Stack {
       S3_ACCESS_KEY_ID: this.S3_ACCESS_KEY_ID,
       S3_ACCESS_KEY_SECRET: this.S3_ACCESS_KEY_SECRET,
       WHILETRUE_IP_ADDRESS: this.WHILETRUE_IP_ADDRESS,
+      REDIS_URL: this.REDIS_URL,
+      CACHE_REDIS_URL: this.CACHE_REDIS_URL,
     };
   }
 }

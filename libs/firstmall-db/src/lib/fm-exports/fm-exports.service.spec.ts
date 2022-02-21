@@ -1,7 +1,15 @@
 /* eslint-disable dot-notation */
+import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { CacheConfig } from '@project-lc/nest-core';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
+import {
+  LiveShoppingModule,
+  LiveShoppingService,
+} from '@project-lc/nest-modules-liveshopping';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
+import { SellerModule } from '@project-lc/nest-modules-seller';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { exportItemSample, exportSample } from '../../__tests__/exportSample';
 import { FirstmallDbService } from '../firstmall-db.service';
@@ -17,10 +25,23 @@ describe('FmExportsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         GoodsModule.withoutControllers(),
+        LiveShoppingModule.withoutControllers(),
         PrismaModule,
+        CacheModule.registerAsync({
+          isGlobal: true,
+          useClass: CacheConfig,
+        }),
         ConfigModule.forRoot({ isGlobal: true }),
+        SellerModule.withoutControllers(),
       ],
-      providers: [FmExportsService, FirstmallDbService, FMGoodsService, FmOrdersService],
+      providers: [
+        FmExportsService,
+        FirstmallDbService,
+        FMGoodsService,
+        FmOrdersService,
+        ProductPromotionService,
+        LiveShoppingService,
+      ],
     }).compile();
 
     service = module.get<FmExportsService>(FmExportsService);

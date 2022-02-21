@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   ShippingGroupDto,
   ShippingOptionDto,
   ShippingSetDto,
 } from '@project-lc/shared-types';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
+import { Cache } from 'cache-manager';
 import {
   Seller,
   ShippingCost,
@@ -24,8 +26,15 @@ export type ShippingGroupResult = ShippingGroup & {
 export type ShippingGroupListResult = (ShippingGroup & { _count: { goods: number } })[];
 
 @Injectable()
-export class ShippingGroupService {
-  constructor(private readonly prisma: PrismaService) {}
+export class ShippingGroupService extends ServiceBaseWithCache {
+  #SHIPPING_GROUP_CACHE_KEY = 'shipping-group';
+
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   // 특정 배송비그룹 정보 조회
   async getOneShippingGroup(groupId: number): Promise<ShippingGroupResult> {
@@ -48,15 +57,9 @@ export class ShippingGroupService {
   // 해당 유저의 배송비정책 목록 조회
   async getShippingGroupList(email: string): Promise<ShippingGroupListResult> {
     return this.prisma.shippingGroup.findMany({
-      where: {
-        seller: {
-          email,
-        },
-      },
+      where: { seller: { email } },
       include: {
-        _count: {
-          select: { goods: true },
-        },
+        _count: { select: { goods: true } },
       },
     });
   }
@@ -77,6 +80,7 @@ export class ShippingGroupService {
         },
       },
     });
+    await this._clearCaches(this.#SHIPPING_GROUP_CACHE_KEY);
     return option;
   }
 
@@ -110,6 +114,7 @@ export class ShippingGroupService {
     });
 
     await this.createShippingOptions(set.id, options);
+    await this._clearCaches(this.#SHIPPING_GROUP_CACHE_KEY);
 
     return set;
   }
@@ -155,12 +160,14 @@ export class ShippingGroupService {
     });
 
     await this.createShippingSets(group.id, sets);
+    await this._clearCaches(this.#SHIPPING_GROUP_CACHE_KEY);
     return group;
   }
 
   // 배송그룹 삭제
   async deleteShippingGroup(groupId: number): Promise<boolean> {
     await this.prisma.shippingGroup.delete({ where: { id: groupId } });
+    await this._clearCaches(this.#SHIPPING_GROUP_CACHE_KEY);
     return true;
   }
 }

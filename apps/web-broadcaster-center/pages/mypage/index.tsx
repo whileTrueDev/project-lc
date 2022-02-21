@@ -1,21 +1,22 @@
-import { useEffect, useMemo } from 'react';
-import { Container, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
+import { Container, Grid, GridItem, Stack, useDisclosure } from '@chakra-ui/react';
 import { broadcasterCenterMypageNavLinks } from '@project-lc/components-constants/navigation';
 import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAlertBox';
+import { GuideContractionAgreementSection } from '@project-lc/components-shared/guide/GuideContractionAgreementSection';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { MypageNoticeSection } from '@project-lc/components-shared/MypageNoticeSection';
-import { BroadcasterStatusSection } from '@project-lc/components-web-bc/BroadcasterStatusSection';
-import { UrlCard } from '@project-lc/components-web-bc/OverlayUrlCard';
-import { MypageLiveShoppingSection } from '@project-lc/components-web-bc/MypageLiveShoppingSection';
-import { StartGuideCard } from '@project-lc/components-web-bc/StartGuideCard';
+import { StartGuide } from '@project-lc/components-shared/StartGuide';
 import { AddressSection } from '@project-lc/components-web-bc/AddressSection';
+import { BroadcasterStatusSection } from '@project-lc/components-web-bc/BroadcasterStatusSection';
 import { ChannelSection } from '@project-lc/components-web-bc/ChannelSection';
 import { LiveShoppingMonitorSection } from '@project-lc/components-web-bc/LiveShoppingMonitorSection';
+import { MypageLiveShoppingSection } from '@project-lc/components-web-bc/MypageLiveShoppingSection';
 import { OverayUrlSection } from '@project-lc/components-web-bc/OverayUrlSection';
+import { OverlayUrlCard } from '@project-lc/components-web-bc/OverlayUrlCard';
+import { PromotionPageUrlCard } from '@project-lc/components-web-bc/PromotionPageUrlCard';
 import { SettlementsSection } from '@project-lc/components-web-bc/SettlementsSection';
-import { StartGuide } from '@project-lc/components-shared/StartGuide';
+import { StartGuideCard } from '@project-lc/components-web-bc/StartGuideCard';
 import { useBroadcasterContacts, useProfile } from '@project-lc/hooks';
-import { GuideContractionAgreementSection } from '@project-lc/components-shared/guide/GuideContractionAgreementSection';
+import { useEffect, useMemo } from 'react';
 
 export function Index(): JSX.Element {
   const { data: broadcasterProfileData } = useProfile();
@@ -105,8 +106,12 @@ export function Index(): JSX.Element {
             <StartGuideCard onOpen={onOpen} />
           </GridItem>
           <GridItem colSpan={{ base: 2, lg: 1 }}>
-            {/* 오버레이 URL 영역 */}
-            <UrlCard />
+            <Stack>
+              {/* 오버레이 URL 영역 */}
+              <OverlayUrlCard />
+              {/* 상품홍보 페이지 URL 영역 */}
+              <PromotionPageUrlCard />
+            </Stack>
           </GridItem>
         </Grid>
 

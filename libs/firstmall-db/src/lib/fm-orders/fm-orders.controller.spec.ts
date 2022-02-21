@@ -1,11 +1,18 @@
-import { ExecutionContext } from '@nestjs/common';
+import { CacheModule, ExecutionContext } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
+import { CacheConfig } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { GoodsModule, GoodsService } from '@project-lc/nest-modules-goods';
-import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
+import {
+  LiveShoppingModule,
+  LiveShoppingService,
+} from '@project-lc/nest-modules-liveshopping';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { S3Service } from '@project-lc/nest-modules-s3';
+import { SellerModule } from '@project-lc/nest-modules-seller';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
 import request from 'supertest';
@@ -34,10 +41,22 @@ describe('FmOrdersController', () => {
         PrismaModule,
         GoodsModule.withoutControllers(),
         LiveShoppingModule.withoutControllers(),
+        BroadcasterModule.withoutControllers(),
         ConfigModule.forRoot({ isGlobal: true }),
+        CacheModule.registerAsync({
+          isGlobal: true,
+          useClass: CacheConfig,
+        }),
+        SellerModule.withoutControllers(),
       ],
       controllers: [FmOrdersController],
-      providers: [FmOrdersService, FirstmallDbService, S3Service],
+      providers: [
+        FmOrdersService,
+        FirstmallDbService,
+        S3Service,
+        LiveShoppingService,
+        ProductPromotionService,
+      ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({

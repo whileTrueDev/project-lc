@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { UserNotification } from '@prisma/client';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateMultipleNotificationDto,
@@ -8,11 +9,19 @@ import {
   MarkNotificationReadStateDto,
   UserType,
 } from '@project-lc/shared-types';
+import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 
 @Injectable()
-export class NotificationService {
-  constructor(private readonly prisma: PrismaService) {}
+export class NotificationService extends ServiceBaseWithCache {
+  #NOTIFICATION_CACHE_KEY = 'notification';
+
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
+  ) {
+    super(cacheManager);
+  }
 
   /** 특정 유저 1명에 대한 알림 생성 */
   async createNotification(dto: CreateNotificationDto): Promise<UserNotification> {
@@ -20,6 +29,7 @@ export class NotificationService {
       data: dto,
     });
 
+    await this._clearCaches(this.#NOTIFICATION_CACHE_KEY);
     return newNoti;
   }
 
@@ -31,6 +41,8 @@ export class NotificationService {
       data,
       skipDuplicates: true,
     });
+
+    await this._clearCaches(this.#NOTIFICATION_CACHE_KEY);
     return true;
   }
 
@@ -66,6 +78,8 @@ export class NotificationService {
         readFlag: true,
       },
     });
+
+    await this._clearCaches(this.#NOTIFICATION_CACHE_KEY);
     return true;
   }
 
@@ -85,6 +99,7 @@ export class NotificationService {
       },
       data: { readFlag: true },
     });
+    await this._clearCaches(this.#NOTIFICATION_CACHE_KEY);
     return true;
   }
 }
