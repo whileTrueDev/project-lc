@@ -992,8 +992,10 @@ model InactiveBusinessRegistrationConfirmation {
   rejectionReason                      String?                            @db.Text // 반려사유 - 관리자가 입력
   InactiveSellerBusinessRegistrationId Int                                @unique
   SellerBusinessRegistration           InactiveSellerBusinessRegistration @relation(fields: [InactiveSellerBusinessRegistrationId], references: [id])
-  // 정책 분류
-  enum PolicyCategory {
+}
+
+// 정책 분류
+enum PolicyCategory {
   termsOfService // 이용약관
   privacy // 개인정보처리방침
 }
