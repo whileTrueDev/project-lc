@@ -1,14 +1,16 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   HttpCode,
-  NotFoundException,
   Param,
-  Render,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import { OverlayService } from '@project-lc/nest-modules-overlay';
+import { Request, Response } from 'express';
 
 interface ImagesLengthAndUserId {
   verticalImagesLength: number;
@@ -34,10 +36,13 @@ export class AppController {
     return 'No-content';
   }
 
-  @Get(':id')
-  @Render('client')
-  async getRender(@Param('id') id: string): Promise<ImagesLengthAndUserId> {
-    const overlayUrl = `/${id}`;
+  @Get([':id', '/nsl/:id'])
+  async getRender(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<ImagesLengthAndUserId> {
+    const overlayUrl = id.startsWith('/') ? id : `/${id}`;
     try {
       const broadcasterIdAndEmail = await this.broadcasterService.getBroadcasterEmail(
         overlayUrl,
@@ -55,36 +60,16 @@ export class AppController {
         'vertical-banner',
       );
 
-      return { verticalImagesLength, email, liveShoppingId };
+      const data = { verticalImagesLength, email, liveShoppingId };
+
+      if (req.path.includes('/nsl')) {
+        res.render('nsl-client', data);
+      } else {
+        res.render('client', data);
+      }
+      return data;
     } catch {
-      throw new NotFoundException('user not found');
-    }
-  }
-
-  @Get('/nsl/:id')
-  @Render('nsl-client')
-  async renderNaverShoppingLive(@Param('id') id: string): Promise<ImagesLengthAndUserId> {
-    const overlayUrl = `/${id}`;
-    try {
-      const broadcasterIdAndEmail = await this.broadcasterService.getBroadcasterEmail(
-        overlayUrl,
-      );
-
-      const { email } = broadcasterIdAndEmail;
-
-      const liveShoppingId = await this.liveShoppingService.getLiveShoppingForOverlay(
-        broadcasterIdAndEmail.id,
-      );
-
-      const verticalImagesLength = await this.overlayService.getBannerImagesFromS3(
-        { email },
-        liveShoppingId.id,
-        'horizontal-banner',
-      );
-
-      return { verticalImagesLength, email, liveShoppingId };
-    } catch {
-      throw new NotFoundException('user not found');
+      throw new BadRequestException(`user ${id} not found`);
     }
   }
 }

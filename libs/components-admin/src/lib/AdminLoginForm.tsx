@@ -14,7 +14,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { CenterBox } from '@project-lc/components-layout/CenterBox';
-import { useLoginMutation } from '@project-lc/hooks';
+import { useHealthCheck, useLoginMutation } from '@project-lc/hooks';
 import { LoginUserDto } from '@project-lc/shared-types';
 import { getAdminHost } from '@project-lc/utils';
 import NextLink from 'next/link';
@@ -27,6 +27,8 @@ interface LoginFormProps {
 }
 
 export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.Element {
+  useHealthCheck(); // for getting csrftoken
+
   const router = useRouter();
   const {
     handleSubmit,

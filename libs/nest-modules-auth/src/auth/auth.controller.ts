@@ -11,6 +11,8 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { JwtAuthGuard, LocalAuthGuard } from '@project-lc/nest-modules-authguard';
+import { MailVerificationService } from '@project-lc/nest-modules-mail';
 import {
   EmailCodeVerificationDto,
   loginUserRes,
@@ -19,8 +21,6 @@ import {
   UserType,
 } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
-import { JwtAuthGuard, LocalAuthGuard } from '@project-lc/nest-modules-authguard';
-import { MailVerificationService } from '@project-lc/nest-modules-mail';
 import { AuthService } from './auth.service';
 import { LoginHistoryService } from './login-history/login-history.service';
 
