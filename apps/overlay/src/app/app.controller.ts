@@ -60,10 +60,18 @@ export class AppController {
         'vertical-banner',
       );
 
+      const horizontalImagesLength = await this.overlayService.getBannerImagesFromS3(
+        { email },
+        liveShoppingId.id,
+        'horizontal-banner',
+      );
+
       const data = { verticalImagesLength, email, liveShoppingId };
 
+      const nslData = { horizontalImagesLength, email, liveShoppingId };
+
       if (req.path.includes('/nsl')) {
-        res.render('nsl-client', data);
+        res.render('nsl-client', nslData);
       } else {
         res.render('client', data);
       }
