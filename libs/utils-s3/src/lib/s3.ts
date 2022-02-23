@@ -4,6 +4,8 @@ import {
   GetObjectCommand,
   ListObjectsCommand,
   DeleteObjectsCommand,
+  CopyObjectCommand,
+  DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import dayjs from 'dayjs';
@@ -281,6 +283,44 @@ export const s3 = (() => {
     return imageUrl;
   }
 
+  /** 폴더 이름 전달 받아서 이동시키는 함수 */
+  async function moveObjects(
+    rootFolder: string,
+    destinationFolder: string,
+    userEmail: string,
+  ): Promise<void> {
+    const prefix = `${rootFolder}/${userEmail}`;
+
+    const targetObjects = await s3Client.send(
+      new ListObjectsCommand({
+        Bucket: S3_BUCKET_NAME,
+        Prefix: prefix,
+      }),
+    );
+
+    if (targetObjects.Contents) {
+      Promise.all([
+        targetObjects.Contents.map(async (fileInfo) => {
+          await s3Client.send(
+            new CopyObjectCommand({
+              Bucket: S3_BUCKET_NAME,
+              CopySource: encodeURI(`${S3_BUCKET_NAME}/${fileInfo.Key}`),
+              Key: `${destinationFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`,
+            }),
+          );
+          await s3Client.send(
+            new DeleteObjectCommand({
+              Bucket: S3_BUCKET_NAME,
+              Key: `${rootFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`,
+            }),
+          );
+        }),
+      ]);
+    } else {
+      console.log(`${userEmail}: 삭제할 ${rootFolder}이 없습니다.`);
+    }
+  }
+
   return {
     s3UploadImage,
     getS3Key,
@@ -289,5 +329,6 @@ export const s3 = (() => {
     getOverlayImagesFromS3,
     s3DeleteImages,
     getS3GuideImage,
+    moveObjects,
   };
 })();

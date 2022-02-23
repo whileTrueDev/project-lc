@@ -101,7 +101,7 @@ export class AppService {
     FROM 
       BroadcasterSocialAccount
     WHERE 
-      id = ${broadcasterId};`;
+      broadcasterId = ${broadcasterId};`;
   }
 
   private copySocialSellerRow(sellerId): Promise<any> {
@@ -170,7 +170,7 @@ export class AppService {
     FROM 
       BroadcasterAddress
     WHERE 
-      id = ${broadcasterId}
+      broadcasterId = ${broadcasterId}
     `;
   }
 
@@ -183,7 +183,7 @@ export class AppService {
     FROM 
       BroadcasterChannel
     WHERE 
-      id = ${broadcasterId}
+      broadcasterId = ${broadcasterId}
     `;
   }
 
@@ -194,9 +194,9 @@ export class AppService {
     SELECT 
       id, name, email, phoneNumber, isDefault, createDate, broadcasterId
     FROM 
-      BroadcasterChannel
+      BroadcasterContacts
     WHERE 
-      id = ${broadcasterId}
+      broadcasterId = ${broadcasterId}
     `;
   }
 
@@ -209,7 +209,24 @@ export class AppService {
     FROM 
       BroadcasterSettlementInfo
     WHERE 
-      id = ${broadcasterId}
+      broadcasterId = ${broadcasterId}
+    `;
+  }
+
+  private copyBroadcasterSettlementInfoConfirmation(broadcasterId): Promise<any> {
+    return this.prisma.$executeRaw`
+    INSERT INTO InactiveBroadcasterSettlementInfoConfirmation
+      (id, status, rejectionReason, settlementInfoId)
+    SELECT 
+      bsic.id, status, rejectionReason, settlementInfoId
+    FROM 
+      BroadcasterSettlementInfoConfirmation as bsic
+    JOIN 
+      BroadcasterSettlementInfo as bsi
+    ON
+      bsi.id = bsic.settlementInfoId
+    WHERE 
+      bsi.broadcasterId = ${broadcasterId}
     `;
   }
 
@@ -247,7 +264,7 @@ export class AppService {
     FROM 
       SellerBusinessRegistration
     WHERE 
-      id = ${sellerId}
+      sellerId = ${sellerId}
     `;
   }
 
@@ -256,11 +273,11 @@ export class AppService {
     INSERT INTO InactiveSellerContacts
       (id, sellerId, email, phoneNumber, isDefault, createDate)
     SELECT 
-    id, sellerId, email, phoneNumber, isDefault, createDate
+      id, sellerId, email, phoneNumber, isDefault, createDate
     FROM 
       SellerContacts
     WHERE 
-      id = ${sellerId}
+      sellerId = ${sellerId}
     `;
   }
 
@@ -273,29 +290,30 @@ export class AppService {
     FROM 
       SellerSettlementAccount
     WHERE 
-      id = ${sellerId}
+      sellerId = ${sellerId}
     `;
   }
 
   private copyBusinessRegistrationConfirmation(sellerId): Promise<any> {
     return this.prisma.$executeRaw`
     INSERT INTO InactiveBusinessRegistrationConfirmation
-      (id, status, rejectionReason, InactiveSellerBusinessRegistrationId)
+      (id, STATUS, rejectionReason, InactiveSellerBusinessRegistrationId)
     SELECT 
-    id, status, rejectionReason, sellerBusinessRegistrationId
+      brc.id, status, rejectionReason, sellerBusinessRegistrationId
     FROM 
-      BusinessRegistrationConfirmation
+      BusinessRegistrationConfirmation as brc
+    JOIN
+      SellerBusinessRegistration as sbr
+    ON 
+      sbr.id = brc.SellerBusinessRegistrationId
     WHERE 
-      id = ${sellerId}
+      sbr.sellerId = ${sellerId}
   `;
   }
 
   private deleteBroadcasterAddress(broadcasterId): Promise<any> {
-    return this.prisma.broadcasterAddress.delete({
-      where: {
-        broadcasterId,
-      },
-    });
+    return this.prisma.$executeRaw`
+    DELETE FROM BroadcasterAddress WHERE broadcasterId=${broadcasterId}`;
   }
 
   private deleteBroadcasterChannel(broadcasterId): Promise<any> {
@@ -323,6 +341,18 @@ export class AppService {
       DELETE FROM SellerContacts WHERE sellerId=${sellerId}`;
   }
 
+  private deleteBusinessRegistrationConfirmation(sellerId): Promise<any> {
+    return this.prisma.$executeRaw`
+    DELETE BusinessRegistrationConfirmation FROM 
+      BusinessRegistrationConfirmation
+    INNER JOIN 
+      SellerBusinessRegistration 
+    ON 
+      SellerBusinessRegistration.id = BusinessRegistrationConfirmation.SellerBusinessRegistrationId 
+    WHERE 
+      SellerBusinessRegistration.sellerId = ${sellerId}`;
+  }
+
   private deleteSellerSettlementAccount(sellerId): Promise<any> {
     return this.prisma.$executeRaw`
       DELETE FROM SellerSettlementAccount WHERE sellerId=${sellerId}`;
@@ -332,15 +362,14 @@ export class AppService {
     if (inactivateTarget.userType === 'seller') {
       // s3 데이터 분리
       const sellerId = await this.getSellerId(inactivateTarget.userEmail);
-      Promise.all([
+      await Promise.all([
         await this.copySellerRow(sellerId.id),
         await this.copySocialSellerRow(sellerId.id),
-        this.updateSellerNull(sellerId.id),
-        this.deleteSellerSocialAccountNull(sellerId.id),
-        this.copySellerBusinessRegistration(sellerId.id).then(() =>
-          this.deleteSellerBusinessRegistration(sellerId.id),
-        ),
-        this.copyBusinessRegistrationConfirmation(sellerId.id),
+        this.copySellerBusinessRegistration(sellerId.id).then(async () => {
+          await this.copyBusinessRegistrationConfirmation(sellerId.id);
+          await this.deleteBusinessRegistrationConfirmation(sellerId.id);
+          await this.deleteSellerBusinessRegistration(sellerId.id);
+        }),
         this.copySellerContacts(sellerId.id).then(() =>
           this.deleteSellerContacts(sellerId.id),
         ),
@@ -351,6 +380,8 @@ export class AppService {
         this.s3Service.moveObjects('settlement-account', inactivateTarget.userEmail),
         this.s3Service.moveObjects('mail-order', inactivateTarget.userEmail),
       ]);
+      await this.deleteSellerSocialAccountNull(sellerId.id);
+      await this.updateSellerNull(sellerId.id);
     } else if (inactivateTarget.userType === 'broadcaster') {
       const broadcasterId = await this.getBroadcasterId(inactivateTarget.userEmail);
       // s3 데이터 분리
@@ -368,6 +399,7 @@ export class AppService {
         this.copyBroadcasterContacts(broadcasterId.id).then(() =>
           this.deleteBroadcasterContacts(broadcasterId.id),
         ),
+        this.copyBroadcasterSettlementInfoConfirmation(broadcasterId.id),
         this.copyBroadcasterSettlementInfo(broadcasterId.id).then(() =>
           this.deleteBroadcasterSettlementInfo(broadcasterId.id),
         ),

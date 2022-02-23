@@ -15,7 +15,7 @@ import {
 import { CipherService } from '@project-lc/nest-modules-cipher';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
-import { BroadcasterSettlementInfo } from '.prisma/client';
+import { BroadcasterSettlementInfo, Broadcaster } from '.prisma/client';
 import { BroadcasterService } from './broadcaster.service';
 
 @Injectable()
@@ -68,6 +68,39 @@ export class BroadcasterSettlementService extends ServiceBaseWithCache {
       return result;
     } catch (error) {
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  async restoreBroadcasterSettlement(
+    broadcasterId: Broadcaster['id'],
+  ): Promise<null | BroadcasterSettlementInfo> {
+    const restoreData = await this.prisma.inactiveBroadcasterSettlementInfo.findFirst({
+      where: {
+        broadcasterId,
+      },
+    });
+
+    if (restoreData) {
+      return this.prisma.broadcasterSettlementInfo.create({
+        data: restoreData || undefined,
+      });
+    }
+    return null;
+  }
+
+  async restoreBroadcasterSettlementConfirmation(
+    settlementInfoId: number,
+  ): Promise<void> {
+    const restoreData =
+      await this.prisma.inactiveBroadcasterSettlementInfoConfirmation.findFirst({
+        where: {
+          settlementInfoId,
+        },
+      });
+    if (restoreData) {
+      await this.prisma.broadcasterSettlementInfoConfirmation.create({
+        data: restoreData || undefined,
+      });
     }
   }
 

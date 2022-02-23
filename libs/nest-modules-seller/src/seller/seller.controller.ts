@@ -38,6 +38,7 @@ import {
   SignUpDto,
 } from '@project-lc/shared-types';
 import __multer from 'multer';
+import { s3 } from '@project-lc/utils-s3';
 import {
   SellerSettlementInfo,
   SellerSettlementService,
@@ -293,16 +294,26 @@ export class SellerController {
   }
 
   @Patch('restore')
-  public async restoreInactiveBroadcaster(@Body(ValidationPipe) dto): Promise<any> {
+  public async restoreInactiveSeller(@Body(ValidationPipe) dto): Promise<any> {
     const seller = await this.sellerService.restoreInactiveSeller(dto.email);
-
-    const businessRegistration =
-      await this.sellerSettlementService.restoreInactiveBusinessRegistration(seller.id);
-    const sellerContacts = await this.sellerContactsService.restoreSellerContacts(
-      seller.id,
-    );
-    const sellerSettlementAccount =
-      await this.sellerSettlementService.restoreSettlementAccount(seller.id);
+    Promise.all([
+      await this.sellerSettlementService.restoreInactiveBusinessRegistration(seller.id),
+      await this.sellerSettlementService
+        .restoreInactiveBusinessRegistrationConfirmation(seller.id)
+        .then((data) => {
+          this.sellerSettlementService.deleteInactiveBusinessRegistrationConfirmation(
+            data.SellerBusinessRegistrationId,
+          );
+        }),
+      this.sellerContactsService.restoreSellerContacts(seller.id),
+      this.sellerSettlementService.restoreSettlementAccount(seller.id),
+      s3.moveObjects(
+        'inactive-business-registration',
+        'business-registration',
+        dto.email,
+      ),
+      s3.moveObjects('inactive-settlement-account', 'settlement-account', dto.email),
+    ]);
 
     return this.sellerService.deleteInactiveSeller(seller.id);
   }

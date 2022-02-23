@@ -16,6 +16,7 @@ import {
 } from '@prisma/client';
 import { UserPayload } from '@project-lc/nest-core';
 import { SellerService } from '@project-lc/nest-modules-seller';
+import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { loginUserRes, SocialAccounts, UserType } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
@@ -48,6 +49,7 @@ export class SocialService {
     private readonly kakao: KakaoApiService,
     private readonly naver: NaverApiService,
     private readonly google: GoogleApiService,
+    private readonly broadcasterService: BroadcasterService,
   ) {}
 
   login(userType: UserType, req: Request, res: Response): UserPayload {
@@ -118,7 +120,9 @@ export class SocialService {
       await this.selectInactiveBroadcasterSocialAccountRecord(userData);
 
     if (inActiveSocialAccountWithBroadcaster) {
-      // 소셜 계정 복구코드
+      return this.broadcasterService.findInactiveOne({
+        id: inActiveSocialAccountWithBroadcaster.broadcaster.id,
+      });
     }
 
     if (!socialAccountWithBroadcaster) {

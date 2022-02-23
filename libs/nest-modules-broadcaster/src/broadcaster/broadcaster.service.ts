@@ -12,6 +12,7 @@ import {
   InactiveBroadcaster,
   BroadcasterPromotionPage,
   Prisma,
+  BroadcasterSocialAccount,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -258,6 +259,22 @@ export class BroadcasterService extends ServiceBaseWithCache {
     return result;
   }
 
+  /** 휴면 방송인 선물/샘플 수령 주소 복구 */
+  public async restoreBroadcasterAddress(
+    broadcasterId: Broadcaster['id'],
+  ): Promise<void> {
+    const restoreData = await this.prisma.inactiveBroadcasterAddress.findFirst({
+      where: { broadcasterId },
+    });
+
+    if (restoreData) {
+      await this.prisma.broadcasterAddress.create({
+        data: restoreData,
+      });
+    }
+    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
+  }
+
   /**
    * 비밀번호 변경
    * @param email 비밀번호 변경할 셀러의 email
@@ -338,6 +355,15 @@ export class BroadcasterService extends ServiceBaseWithCache {
       where: { email },
     });
 
+    const restoreSocialData =
+      await this.prisma.inactiveBroadcasterSocialAccount.findFirst({
+        where: { broadcasterId: restoreData.id },
+      });
+
+    if (restoreSocialData) {
+      await this.restoreInactiveSocialSeller(restoreSocialData);
+    }
+
     return this.prisma.broadcaster.update({
       where: {
         id: restoreData.id,
@@ -354,14 +380,22 @@ export class BroadcasterService extends ServiceBaseWithCache {
     });
   }
 
-  /** 휴면 계정 데이터 복구 */
+  /** 휴면 계정 데이터 삭제 */
   public async deleteInactiveBroadcaster(
-    email: Broadcaster['email'],
+    broadcasterId: Broadcaster['id'],
   ): Promise<InactiveBroadcaster> {
     return this.prisma.inactiveBroadcaster.delete({
       where: {
-        email,
+        id: broadcasterId,
       },
+    });
+  }
+
+  private async restoreInactiveSocialSeller(
+    restoreSocialData: BroadcasterSocialAccount,
+  ): Promise<BroadcasterSocialAccount> {
+    return this.prisma.broadcasterSocialAccount.create({
+      data: restoreSocialData,
     });
   }
 }

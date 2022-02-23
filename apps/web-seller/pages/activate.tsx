@@ -214,7 +214,7 @@ export function Activate(): JSX.Element {
           )}
 
           {router.query?.type && (
-            <Button isLoading={isSubmitting} type="submit">
+            <Button isLoading={isSubmitting} type="submit" colorScheme="blue">
               휴면해제
             </Button>
           )}

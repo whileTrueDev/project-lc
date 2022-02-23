@@ -8,6 +8,7 @@ import {
   SellerSettlementAccount,
   SellType,
   Seller,
+  InactiveBusinessRegistrationConfirmation,
 } from '@prisma/client';
 import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -94,19 +95,74 @@ export class SellerSettlementService extends ServiceBaseWithCache {
   }
 
   /**
+   * 휴면 사업자 등록증 confirmation 상태 복구
+   * @param sellerId
+   */
+
+  public async restoreInactiveBusinessRegistrationConfirmation(
+    sellerId: Seller['id'],
+  ): Promise<BusinessRegistrationConfirmation | null> {
+    const restoreData = await this.prisma.inactiveSellerBusinessRegistration.findFirst({
+      where: {
+        sellerId,
+      },
+      select: {
+        InactiveBusinessRegistrationConfirmation: {
+          select: {
+            id: true,
+            status: true,
+            rejectionReason: true,
+            InactiveSellerBusinessRegistrationId: true,
+          },
+        },
+      },
+    });
+
+    if (restoreData?.InactiveBusinessRegistrationConfirmation) {
+      return this.prisma.businessRegistrationConfirmation.create({
+        data: {
+          id: restoreData.InactiveBusinessRegistrationConfirmation.id,
+          status: restoreData.InactiveBusinessRegistrationConfirmation.status,
+          rejectionReason:
+            restoreData.InactiveBusinessRegistrationConfirmation.rejectionReason,
+          SellerBusinessRegistrationId:
+            restoreData.InactiveBusinessRegistrationConfirmation
+              .InactiveSellerBusinessRegistrationId,
+        },
+      });
+    }
+    return null;
+  }
+
+  /**
+   * 휴면 사업자 등록증 confirmation 삭제
+   * @param sellerId
+   */
+
+  public async deleteInactiveBusinessRegistrationConfirmation(
+    registrationId: number,
+  ): Promise<InactiveBusinessRegistrationConfirmation> {
+    return this.prisma.inactiveBusinessRegistrationConfirmation.delete({
+      where: {
+        InactiveSellerBusinessRegistrationId: registrationId,
+      },
+    });
+  }
+
+  /**
    * 휴면 사업자 등록증 복구
    * @param dto 사업자 등록증 등록 정보
    * @param sellerInfo 사용자 등록 정보
    */
   public async restoreInactiveBusinessRegistration(
     sellerId: Seller['id'],
-  ): Promise<SellerBusinessRegistration> {
+  ): Promise<void> {
     const restoreData = await this.prisma.inactiveSellerBusinessRegistration.findFirst({
       where: {
         sellerId,
       },
     });
-    const sellerBusinessRegistration =
+    if (restoreData) {
       await this.prisma.sellerBusinessRegistration.create({
         data: {
           companyName: restoreData.companyName,
@@ -125,8 +181,9 @@ export class SellerSettlementService extends ServiceBaseWithCache {
           sellerId,
         },
       });
+    }
+
     await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
-    return sellerBusinessRegistration;
   }
 
   /**
@@ -178,28 +235,26 @@ export class SellerSettlementService extends ServiceBaseWithCache {
    * @param dto 정산 계좌 정보
    * @param sellerInfo 사용자 등록 정보
    */
-  public async restoreSettlementAccount(
-    sellerId: Seller['id'],
-  ): Promise<SellerSettlementAccount> {
+  public async restoreSettlementAccount(sellerId: Seller['id']): Promise<void> {
     const restoreData = await this.prisma.inactiveSellerSettlementAccount.findFirst({
       where: {
         sellerId,
       },
     });
 
-    const settlementAccount = await this.prisma.sellerSettlementAccount.create({
-      data: {
-        sellerEmail: restoreData.sellerEmail,
-        sellerId: restoreData.sellerId,
-        name: restoreData.name,
-        number: restoreData.number,
-        bank: restoreData.bank,
-        settlementAccountImageName: restoreData.settlementAccountImageName,
-      },
-    });
+    if (restoreData) {
+      await this.prisma.sellerSettlementAccount.create({
+        data: {
+          sellerId: restoreData.sellerId,
+          name: restoreData.name,
+          number: restoreData.number,
+          bank: restoreData.bank,
+          settlementAccountImageName: restoreData.settlementAccountImageName,
+        },
+      });
+    }
 
     await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
-    return settlementAccount;
   }
 
   /**

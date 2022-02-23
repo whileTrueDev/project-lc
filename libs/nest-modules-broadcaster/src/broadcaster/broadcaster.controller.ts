@@ -36,10 +36,13 @@ import {
   PasswordValidateDto,
   SignUpDto,
 } from '@project-lc/shared-types';
-import { Broadcaster, BroadcasterAddress } from '.prisma/client';
+import { s3 } from '@project-lc/utils-s3';
+import { Broadcaster, BroadcasterAddress, InactiveBroadcaster } from '.prisma/client';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-history.service';
 import { BroadcasterService } from './broadcaster.service';
+import { BroadcasterContactsService } from './broadcaster-contacts.service';
+import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 
 @Controller('broadcaster')
 export class BroadcasterController {
@@ -48,6 +51,8 @@ export class BroadcasterController {
     private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
     private readonly settlementHistoryService: BroadcasterSettlementHistoryService,
+    private readonly broadcasterContactsService: BroadcasterContactsService,
+    private readonly broadcasterSettlementService: BroadcasterSettlementService,
   ) {}
 
   /** 방송인 정보 조회 */
@@ -76,8 +81,34 @@ export class BroadcasterController {
   }
 
   @Patch('restore')
-  public async restoreInactiveBroadcaster(@Body(ValidationPipe) dto): Promise<any> {
-    return this.broadcasterService.restoreInactiveBroadcaster(dto.email);
+  public async restoreInactiveBroadcaster(
+    @Body(ValidationPipe) dto,
+  ): Promise<InactiveBroadcaster> {
+    const broadcaster = await this.broadcasterService.restoreInactiveBroadcaster(
+      dto.email,
+    );
+
+    await Promise.all([
+      this.broadcasterContactsService.restoreBroadcasterContacts(broadcaster.id),
+      this.broadcasterService.restoreBroadcasterAddress(broadcaster.id),
+      this.channelService.restoreBroadcasterChannel(broadcaster.id),
+      this.broadcasterSettlementService
+        .restoreBroadcasterSettlement(broadcaster.id)
+        .then((settlementInfo) => {
+          if (settlementInfo) {
+            this.broadcasterSettlementService.restoreBroadcasterSettlementConfirmation(
+              settlementInfo.id,
+            );
+          }
+        }),
+      s3.moveObjects(
+        'inactive-broadcaster-account-image',
+        'broadcaster-account-image',
+        dto.email,
+      ),
+      s3.moveObjects('inactive-broadcaster-id-card', 'broadcaster-id-card', dto.email),
+    ]);
+    return this.broadcasterService.deleteInactiveBroadcaster(broadcaster.id);
   }
 
   /** 방송인 이메일 주소 중복 체크 */

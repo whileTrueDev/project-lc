@@ -29,6 +29,7 @@ export class AdminService {
             seller: {
               select: {
                 agreementFlag: true,
+                inactiveFlag: false,
               },
             },
           },
@@ -82,6 +83,9 @@ export class AdminService {
    */
   public async getConfirmedSellers(): Promise<Map<number, string>> {
     const sellers = await this.prisma.seller.findMany({
+      where: {
+        inactiveFlag: false,
+      },
       include: {
         sellerBusinessRegistration: {
           include: {
