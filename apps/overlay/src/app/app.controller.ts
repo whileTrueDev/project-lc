@@ -1,8 +1,8 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   HttpCode,
-  NotFoundException,
   Param,
   Render,
 } from '@nestjs/common';
@@ -57,7 +57,7 @@ export class AppController {
 
       return { verticalImagesLength, email, liveShoppingId };
     } catch {
-      throw new NotFoundException('user not found');
+      throw new BadRequestException(`user ${id} not found`);
     }
   }
 
@@ -84,7 +84,7 @@ export class AppController {
 
       return { verticalImagesLength, email, liveShoppingId };
     } catch {
-      throw new NotFoundException('user not found');
+      throw new BadRequestException(`user ${id} not found`);
     }
   }
 }
