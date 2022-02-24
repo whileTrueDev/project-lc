@@ -147,24 +147,6 @@ export class BroadcasterController {
     return this.channelService.getBroadcasterChannelList(broadcasterId);
   }
 
-  /**
-   * 방송인 누적 정산 금액 조회
-   * @deprecated
-   * TODO: 5차 스프린트 배포 이후 삭제
-   * - broadcaster/settlement-history:broadcasterId 로 이전.
-   * - 2022.02.08 by hwasurr(dan)
-   */
-  @UseGuards(JwtAuthGuard)
-  @Get('/:broadcasterId/accumulated-settlement-amount')
-  public async findAccumulatedSettlementAmount(
-    @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
-  ): Promise<number> {
-    const acc = await this.settlementHistoryService.findAccumulatedSettlementAmount(
-      broadcasterId,
-    );
-    return acc._sum.amount;
-  }
-
   /** 방송인 활동명 수정 */
   @UseGuards(JwtAuthGuard)
   @Put('nickname')

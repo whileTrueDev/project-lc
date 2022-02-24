@@ -19,7 +19,6 @@ import {
   SellCommission,
   Seller,
   SellerSettlementAccount,
-  SellerSettlements,
   InactiveSeller,
 } from '@prisma/client';
 import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
@@ -30,7 +29,6 @@ import {
   EmailDupCheckDto,
   FindSellerDto,
   FindSellerRes,
-  FindSettlementHistoryDto,
   PasswordValidateDto,
   SellerBusinessRegistrationType,
   SellerContractionAgreementDto,
@@ -127,80 +125,6 @@ export class SellerController {
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerSettlementInfo> {
     return this.sellerSettlementService.selectSellerSettlementInfo(sellerInfo);
-  }
-
-  /**
-   * @deprecated
-   * seller-settlement-history.controller로 이전
-   * by hwasurr(dan), 2022. 02. 09
-   * TODO: 5차스프린트 배포 후 이 라우트핸들러 삭제
-   * 본인의 정산 대상 목록 조회
-   */
-  @UseGuards(JwtAuthGuard)
-  @Get('settlement-history')
-  @UseInterceptors(HttpCacheInterceptor)
-  public async findSettlementHistory(
-    @SellerInfo() sellerInfo: UserPayload,
-    @Query(ValidationPipe) dto: FindSettlementHistoryDto,
-  ): Promise<SellerSettlements[]> {
-    return this.sellerSettlementService.findSettlementHistory(sellerInfo.sub, {
-      round: dto.round,
-    });
-  }
-
-  /**
-   * @deprecated
-   * seller-settlement-history.controller로 이전
-   * by hwasurr(dan), 2022. 02. 09
-   * TODO: 5차스프린트 배포 후 이 라우트핸들러 삭제
-   * 본인의 정산 대상 년도 목록 조회
-   */
-  @UseGuards(JwtAuthGuard)
-  @Get('settlement-history-years')
-  @UseInterceptors(HttpCacheInterceptor)
-  public async findSettlementHistoryYears(
-    @SellerInfo() sellerInfo: UserPayload,
-  ): Promise<string[]> {
-    return this.sellerSettlementService.findSettlementHistoryYears(sellerInfo.sub);
-  }
-
-  /**
-   * @deprecated
-   * seller-settlement-history.controller로 이전
-   * by hwasurr(dan), 2022. 02. 09
-   * TODO: 5차스프린트 배포 후 이 라우트핸들러 삭제
-   * 본인의 정산 대상 월 목록 조회
-   */
-  @UseGuards(JwtAuthGuard)
-  @Get('settlement-history-months')
-  @UseInterceptors(HttpCacheInterceptor)
-  public async findSettlementHistoryMonths(
-    @SellerInfo() sellerInfo: UserPayload,
-    @Query('year') year: string,
-  ): Promise<string[]> {
-    return this.sellerSettlementService.findSettlementHistoryMonths(sellerInfo.sub, year);
-  }
-
-  /**
-   * @deprecated
-   * seller-settlement-history.controller로 이전
-   * by hwasurr(dan), 2022. 02. 09
-   * TODO: 5차스프린트 배포 후 이 라우트핸들러 삭제
-   * 본인의 정산 대상 월 목록 조회
-   */
-  @UseGuards(JwtAuthGuard)
-  @Get('settlement-history-rounds')
-  @UseInterceptors(HttpCacheInterceptor)
-  public async findSettlementHistoryRounds(
-    @SellerInfo() sellerInfo: UserPayload,
-    @Query('year') year: string,
-    @Query('month') month: string,
-  ): Promise<string[]> {
-    return this.sellerSettlementService.findSettlementHistoryRounds(
-      sellerInfo.sub,
-      year,
-      month,
-    );
   }
 
   // 본인의 사업자 등록정보 등록
