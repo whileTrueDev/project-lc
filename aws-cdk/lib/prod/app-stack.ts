@@ -14,6 +14,7 @@ import {
   ApplicationProtocol,
   ApplicationTargetGroup,
   ListenerCondition,
+  ListenerAction,
   SslPolicy,
 } from '@aws-cdk/aws-elasticloadbalancingv2';
 import * as logs from '@aws-cdk/aws-logs';
@@ -274,7 +275,7 @@ export class LCProdAppStack extends cdk.Stack {
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
-        OVERLAY_HOST: `https://${constants.PUNYCODE_라이브}.${constants.PUNYCODE_DOMAIN}`,
+        OVERLAY_HOST: `https://live.${constants.PUNYCODE_DOMAIN}`,
         OVERLAY_CONTROLLER_HOST: `https://overlay-controller.${constants.PUNYCODE_DOMAIN}`,
         REALTIME_API_HOST: `https://realtime.${constants.PUNYCODE_DOMAIN}`,
         NODE_ENV: 'production',
@@ -417,10 +418,20 @@ export class LCProdAppStack extends cdk.Stack {
         targets: [this.overlayService],
       },
     );
+    const overlayDomain = `live.${constants.PUNYCODE_DOMAIN}`;
     httpsListener.addTargetGroups(`${this.PREFIX}AddOverlayTargetGroup`, {
       priority: 2,
-      conditions: [ListenerCondition.hostHeaders([`live.${constants.PUNYCODE_DOMAIN}`])],
+      conditions: [ListenerCondition.hostHeaders([overlayDomain])],
       targetGroups: [overlayTargetGroup],
+    });
+    httpsListener.addAction(`${this.PREFIX}RedirectOverlayTargetGroup`, {
+      priority: 5,
+      conditions: [
+        ListenerCondition.hostHeaders([
+          `${constants.PUNYCODE_라이브}.${constants.PUNYCODE_DOMAIN}`,
+        ]),
+      ],
+      action: ListenerAction.redirect({ host: overlayDomain }),
     });
     const overlayControllerTargetGroup = new ApplicationTargetGroup(
       this,
