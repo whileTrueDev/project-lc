@@ -76,7 +76,13 @@ export class LCDomainStack extends cdk.Stack {
     new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_realtimeapi_controller`, {
       recordName: `realtime.${this.PUNYCODE_DOMAIN}`,
       zone: this.hostedzone,
-      target: route53.RecordTarget.fromAlias(this.devALBTarget),
+      target: route53.RecordTarget.fromAlias(this.prodALBTarget),
+    });
+    // 프로덕션용 ALB로 라우팅하는 overlay-controller.크크쇼.com 레코드 생성
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_overlay_controller`, {
+      recordName: `overlay-controller.${this.PUNYCODE_DOMAIN}`,
+      zone: this.hostedzone,
+      target: route53.RecordTarget.fromAlias(this.prodALBTarget),
     });
   }
 

@@ -274,7 +274,7 @@ export class LCProdAppStack extends cdk.Stack {
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
-        OVERLAY_HOST: `https://${constants.PUNYCODE_라이브}.${constants.PUNYCODE_DOMAIN}`,
+        OVERLAY_HOST: `https://live.${constants.PUNYCODE_DOMAIN}`,
         OVERLAY_CONTROLLER_HOST: `https://overlay-controller.${constants.PUNYCODE_DOMAIN}`,
         REALTIME_API_HOST: `https://realtime.${constants.PUNYCODE_DOMAIN}`,
         NODE_ENV: 'production',
@@ -419,7 +419,12 @@ export class LCProdAppStack extends cdk.Stack {
     );
     httpsListener.addTargetGroups(`${this.PREFIX}AddOverlayTargetGroup`, {
       priority: 2,
-      conditions: [ListenerCondition.hostHeaders([`live.${constants.PUNYCODE_DOMAIN}`])],
+      conditions: [
+        ListenerCondition.hostHeaders([
+          `live.${constants.PUNYCODE_DOMAIN}`,
+          `${constants.PUNYCODE_라이브}.${constants.PUNYCODE_DOMAIN}`,
+        ]),
+      ],
       targetGroups: [overlayTargetGroup],
     });
     const overlayControllerTargetGroup = new ApplicationTargetGroup(
