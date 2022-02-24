@@ -77,7 +77,6 @@ export class SellerService extends ServiceBaseWithCache {
     }
 
     if (inactiveUser) {
-      console.log('INACTIVE', inactiveUser);
       return inactiveUser;
     }
     return user;

@@ -20,6 +20,7 @@ import {
   Seller,
   SellerSettlementAccount,
   SellerSettlements,
+  InactiveSeller,
 } from '@prisma/client';
 import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
@@ -294,16 +295,18 @@ export class SellerController {
   }
 
   @Patch('restore')
-  public async restoreInactiveSeller(@Body(ValidationPipe) dto): Promise<any> {
+  public async restoreInactiveSeller(@Body(ValidationPipe) dto): Promise<InactiveSeller> {
     const seller = await this.sellerService.restoreInactiveSeller(dto.email);
     Promise.all([
       await this.sellerSettlementService.restoreInactiveBusinessRegistration(seller.id),
       await this.sellerSettlementService
         .restoreInactiveBusinessRegistrationConfirmation(seller.id)
         .then((data) => {
-          this.sellerSettlementService.deleteInactiveBusinessRegistrationConfirmation(
-            data.SellerBusinessRegistrationId,
-          );
+          if (data) {
+            this.sellerSettlementService.deleteInactiveBusinessRegistrationConfirmation(
+              data.SellerBusinessRegistrationId,
+            );
+          }
         }),
       this.sellerContactsService.restoreSellerContacts(seller.id),
       this.sellerSettlementService.restoreSettlementAccount(seller.id),

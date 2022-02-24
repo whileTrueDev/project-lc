@@ -16,7 +16,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { CenterBox } from '@project-lc/components-layout/CenterBox';
-import { useLoginMutation } from '@project-lc/hooks';
+import { useLoginMutation, InactiveUserPayload } from '@project-lc/hooks';
 import { LoginUserDto, UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -52,14 +52,15 @@ export function LoginForm({
 
   // * 로그인 핸들러
   const login = useLoginMutation(userType);
+
   const onSubmit = useCallback(
     async (data: LoginUserDto) => {
       const user = await login.mutateAsync(data).catch((err) => {
         setFormError(getMessage(err?.response.data?.status));
         setValue('password', '');
       });
-      if (user.user?.inactiveFlag) {
-        setToActivateEmail(user.user.sub);
+      if ((user as InactiveUserPayload).inactiveFlag) {
+        setToActivateEmail((user as InactiveUserPayload).sub);
         router.push('/activate');
         return;
       }

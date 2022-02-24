@@ -7,7 +7,7 @@ import {
   InactiveSeller,
 } from '@prisma/client';
 import { JwtHelperService } from '@project-lc/nest-modules-jwt-helper';
-import { UserPayload, authConstants, InactiveUserPayload } from '@project-lc/nest-core';
+import { UserPayload, authConstants } from '@project-lc/nest-core';
 import { AdminAccountService } from '@project-lc/nest-modules-admin';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { SellerService } from '@project-lc/nest-modules-seller';
@@ -67,7 +67,7 @@ export class AuthService {
     type: UserType,
     email: string,
     pwdInput: string,
-  ): Promise<UserPayload | InactiveUserPayload | null> {
+  ): Promise<UserPayload | null> {
     let user: Seller | Broadcaster | Administrator | InactiveBroadcaster | InactiveSeller;
     if (['seller'].includes(type)) {
       user = await this.sellerService.login(email, pwdInput);

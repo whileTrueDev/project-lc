@@ -657,7 +657,7 @@ model LiveShopping {
   goodsId                     Int // 상품 ID (project-lc goods Id)
   fmGoodsSeq                  Int?                          @unique // 퍼스트몰 상품 ID 라이브쇼핑진행을 위해 생성한 퍼스트몰 상품의 고유번호 (fm_goods.goods_seq)
   videoId                     Int?
-  contactId                   Int // 판매자 등록된 연락처 ID
+  contactId                   Int? // 판매자 등록된 연락처 ID
   requests                    String?                       @db.LongText // 요청사항
   progress                    LiveShopppingProgressType     @default(registered) // 진행상태
   broadcastStartDate          DateTime? // 라이브 방송 시작 시간
@@ -670,7 +670,7 @@ model LiveShopping {
   whiletrueCommissionRate     Decimal                       @default("0") @db.Decimal(10, 2) // 판매금 중, project-lc(와일트루)가 가져가는 수수료 (0%~100% 사이값)
   desiredCommission           Decimal?                      @default("0") @db.Decimal(10, 2) // 희망판매수수료
   desiredPeriod               String?                       @default("무관") // 희망 진행 기간
-  sellerContacts              SellerContacts                @relation(fields: [contactId], references: [id])
+  sellerContacts              SellerContacts?               @relation(fields: [contactId], references: [id])
   seller                      Seller                        @relation(fields: [sellerId], references: [id])
   goods                       Goods                         @relation(fields: [goodsId], references: [id])
   broadcaster                 Broadcaster?                  @relation(fields: [broadcasterId], references: [id])
@@ -678,8 +678,6 @@ model LiveShopping {
   SellerSettlementItems       SellerSettlementItems[]
   liveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
   BroadcasterSettlementItems  BroadcasterSettlementItems[]
-  InactiveSellerContacts      InactiveSellerContacts?       @relation(fields: [inactiveSellerContactsId], references: [id])
-  inactiveSellerContactsId    Int?
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -969,14 +967,13 @@ model InactiveSellerBusinessRegistration {
 
 // 판매자가 등록한 라이브 쇼핑 담당자 연락처들
 model InactiveSellerContacts {
-  id           Int            @id @default(autoincrement())
-  sellerId     Int // 판매자 아이디
-  email        String         @default("") //등���한 이메일
-  phoneNumber  String         @default("") // 등록한 전화번호
-  isDefault    Boolean        @default(false) // 기본 연락처 설정 여부
-  seller       InactiveSeller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  LiveShopping LiveShopping[]
-  createDate   DateTime       @default(now())
+  id          Int            @id @default(autoincrement())
+  sellerId    Int // 판매자 아이디
+  email       String         @default("") //등���한 이메일
+  phoneNumber String         @default("") // 등록한 전화번호
+  isDefault   Boolean        @default(false) // 기본 연락처 설정 여부
+  seller      InactiveSeller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  createDate  DateTime       @default(now())
 }
 
 // 판매자 정산 계좌 정보

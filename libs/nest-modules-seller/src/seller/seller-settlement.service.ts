@@ -165,6 +165,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
     if (restoreData) {
       await this.prisma.sellerBusinessRegistration.create({
         data: {
+          id: restoreData.id,
           companyName: restoreData.companyName,
           sellerEmail: restoreData.sellerEmail,
           businessRegistrationNumber: this.makeRegistrationNumberFormat(
@@ -250,6 +251,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
           number: restoreData.number,
           bank: restoreData.bank,
           settlementAccountImageName: restoreData.settlementAccountImageName,
+          sellerEmail: restoreData.sellerEmail,
         },
       });
     }
