@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { MailNoticeService } from '../lib/mail/mail-notice.service';
 import { AppSellerService } from './app-seller.service';
 import { AppBroadcasterService } from './app-broadcaster.service';
