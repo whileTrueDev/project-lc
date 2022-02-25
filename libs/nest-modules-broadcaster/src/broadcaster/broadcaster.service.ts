@@ -112,9 +112,12 @@ export class BroadcasterService extends ServiceBaseWithCache {
       where: findInput,
       include: { BroadcasterPromotionPage: true },
     });
-    const { BroadcasterPromotionPage: broadcasterPromotionPage, ...broadcasterData } =
-      broadcaster;
-    return { ...broadcasterData, broadcasterPromotionPage };
+    if (broadcaster) {
+      const { BroadcasterPromotionPage: broadcasterPromotionPage, ...broadcasterData } =
+        broadcaster;
+      return { ...broadcasterData, broadcasterPromotionPage };
+    }
+    return null;
   }
 
   /**
