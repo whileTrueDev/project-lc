@@ -8,6 +8,7 @@ import {
   Seller,
   SellerContacts,
   ShippingGroup,
+  Prisma,
 } from '@prisma/client';
 import {
   defaultOption,
@@ -20,6 +21,9 @@ import {
   testBroadcasterData,
   testsellerData,
   testsellerExtraData,
+  dummyBroadcasterAddress,
+  dummyBroadcasterChannel,
+  dummyBroadcasterContacts,
 } from './dummyData';
 import { termsData } from './terms';
 
@@ -164,6 +168,44 @@ async function createDummyLiveShopping(
   });
 }
 
+/** 더미 방송인 주소 생성 */
+async function createDummyBroadcasterAddress(broadcaster: Broadcaster): Promise<void> {
+  await prisma.broadcasterAddress.create({
+    data: {
+      address: dummyBroadcasterAddress.address,
+      detailAddress: dummyBroadcasterAddress.detailAddress,
+      postalCode: dummyBroadcasterAddress.postalCode,
+      broadcaster: { connect: { id: broadcaster.id } },
+    },
+  });
+}
+
+/** 더미 방송인 채널 생성 */
+async function createDummyBroadcasterChannel(broadcaster: Broadcaster): Promise<void> {
+  await prisma.broadcasterChannel.create({
+    data: {
+      url: dummyBroadcasterChannel.url,
+      broadcaster: { connect: { id: broadcaster.id } },
+    },
+  });
+}
+
+/** 더미 방송인 연락처 생성 */
+async function createDummyBroadcasterContacts(
+  dummyData: Prisma.BroadcasterContactsCreateInput,
+  broadcaster: Broadcaster,
+): Promise<void> {
+  await prisma.broadcasterContacts.create({
+    data: {
+      name: dummyData.name,
+      email: dummyData.email,
+      phoneNumber: dummyData.phoneNumber,
+      isDefault: dummyData.isDefault,
+      broadcaster: { connect: { id: broadcaster.id } },
+    },
+  });
+}
+
 // 초기 약관 데이터 저장(없으면 약관페이지에 표시될 데이터가 없어서)
 async function generateInitialTerms(): Promise<void> {
   await prisma.policy.createMany({
@@ -187,6 +229,14 @@ async function main(): Promise<void> {
 
   // 테스트방송인 데이터 생성
   const testbroadcaster = await createBroadcaster();
+
+  // 테스트방송인 주소 생성
+  await createDummyBroadcasterAddress(testbroadcaster);
+  // 테스트방송인 채널 생성
+  await createDummyBroadcasterChannel(testbroadcaster);
+  // 테스트 방송인 연락처 생성
+  await createDummyBroadcasterContacts(dummyBroadcasterContacts[0], testbroadcaster);
+  await createDummyBroadcasterContacts(dummyBroadcasterContacts[1], testbroadcaster);
 
   // 더미 상품 데이터 생성
   await createDummyGoods(seller, dummyGoodsList[0]);

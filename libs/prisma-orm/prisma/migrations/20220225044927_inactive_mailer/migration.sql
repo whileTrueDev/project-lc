@@ -10,6 +10,9 @@
 
 */
 -- DropForeignKey
+ALTER TABLE `LiveShopping` DROP FOREIGN KEY `LiveShopping_contactId_fkey`;
+
+-- DropForeignKey
 ALTER TABLE `SellerBusinessRegistration` DROP FOREIGN KEY `SellerBusinessRegistration_sellerEmail_fkey`;
 
 -- DropForeignKey
@@ -31,7 +34,7 @@ ALTER TABLE `Broadcaster` ADD COLUMN `inactiveFlag` BOOLEAN NOT NULL DEFAULT fal
     MODIFY `overlayUrl` VARCHAR(191) NULL;
 
 -- AlterTable
-ALTER TABLE `LiveShopping` ADD COLUMN `inactiveSellerContactsId` INTEGER NULL;
+ALTER TABLE `LiveShopping` MODIFY `contactId` INTEGER NULL;
 
 -- AlterTable
 ALTER TABLE `Seller` ADD COLUMN `inactiveFlag` BOOLEAN NOT NULL DEFAULT false,
@@ -165,9 +168,19 @@ CREATE TABLE `InactiveBroadcasterSettlementInfo` (
     `personalInfoAgreement` BOOLEAN NOT NULL DEFAULT false,
     `settlementAgreement` BOOLEAN NULL,
     `broadcasterId` INTEGER NOT NULL,
-    `broadcasterSettlementInfoConfirmationId` INTEGER NULL,
 
     UNIQUE INDEX `InactiveBroadcasterSettlementInfo_broadcasterId_key`(`broadcasterId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `InactiveBroadcasterSettlementInfoConfirmation` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `status` ENUM('waiting', 'confirmed', 'rejected') NOT NULL DEFAULT 'waiting',
+    `rejectionReason` TEXT NULL,
+    `settlementInfoId` INTEGER NOT NULL,
+
+    UNIQUE INDEX `InactiveBroadcasterSettlementInfoConfirmation_settlementInfo_key`(`settlementInfoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -244,7 +257,7 @@ ALTER TABLE `SellerSettlements` ADD CONSTRAINT `SellerSettlements_sellerEmail_se
 ALTER TABLE `SellerSettlementAccount` ADD CONSTRAINT `SellerSettlementAccount_sellerEmail_sellerId_fkey` FOREIGN KEY (`sellerEmail`, `sellerId`) REFERENCES `Seller`(`email`, `id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `LiveShopping` ADD CONSTRAINT `LiveShopping_inactiveSellerContactsId_fkey` FOREIGN KEY (`inactiveSellerContactsId`) REFERENCES `InactiveSellerContacts`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `LiveShopping` ADD CONSTRAINT `LiveShopping_contactId_fkey` FOREIGN KEY (`contactId`) REFERENCES `SellerContacts`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InactiveBroadcasterSocialAccount` ADD CONSTRAINT `InactiveBroadcasterSocialAccount_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `InactiveBroadcaster`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -262,10 +275,10 @@ ALTER TABLE `InactiveBroadcasterChannel` ADD CONSTRAINT `InactiveBroadcasterChan
 ALTER TABLE `InactiveBroadcasterContacts` ADD CONSTRAINT `InactiveBroadcasterContacts_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `InactiveBroadcaster`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `InactiveBroadcasterSettlementInfo` ADD CONSTRAINT `InactiveBroadcasterSettlementInfo_broadcasterSettlementInfo_fkey` FOREIGN KEY (`broadcasterSettlementInfoConfirmationId`) REFERENCES `BroadcasterSettlementInfoConfirmation`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `InactiveBroadcasterSettlementInfo` ADD CONSTRAINT `InactiveBroadcasterSettlementInfo_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `InactiveBroadcaster`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `InactiveBroadcasterSettlementInfo` ADD CONSTRAINT `InactiveBroadcasterSettlementInfo_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `InactiveBroadcaster`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `InactiveBroadcasterSettlementInfoConfirmation` ADD CONSTRAINT `InactiveBroadcasterSettlementInfoConfirmation_settlementInf_fkey` FOREIGN KEY (`settlementInfoId`) REFERENCES `InactiveBroadcasterSettlementInfo`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InactiveSellerBusinessRegistration` ADD CONSTRAINT `InactiveSellerBusinessRegistration_sellerEmail_sellerId_fkey` FOREIGN KEY (`sellerEmail`, `sellerId`) REFERENCES `InactiveSeller`(`email`, `id`) ON DELETE CASCADE ON UPDATE CASCADE;

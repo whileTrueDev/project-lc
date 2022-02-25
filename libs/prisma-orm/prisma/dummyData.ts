@@ -174,3 +174,31 @@ export const dummyLiveShoppingData: Omit<
   broadcasterCommissionRate: '10',
   progress: 'confirmed',
 };
+
+export const dummyBroadcasterAddress: Prisma.BroadcasterAddressCreateInput = {
+  address: '부산 금정구 장전온천천로 51 (테라스파크)',
+  detailAddress: '313호',
+  postalCode: '46291',
+};
+
+export const dummyBroadcasterChannel: Omit<
+  Prisma.BroadcasterChannelCreateInput,
+  'broadcaster'
+> = {
+  url: 'http://twitch.com',
+};
+
+export const dummyBroadcasterContacts: Prisma.BroadcasterContactsCreateInput[] = [
+  {
+    name: '나다',
+    email: 'iamironman@onad.io',
+    phoneNumber: '010-1234-1234',
+    isDefault: true,
+  },
+  {
+    name: '나아니다',
+    email: 'youareironman@onad.io',
+    phoneNumber: '010-9876-9876',
+    isDefault: false,
+  },
+];
