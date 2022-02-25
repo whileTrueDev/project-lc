@@ -24,6 +24,7 @@ import {
   dummyBroadcasterAddress,
   dummyBroadcasterChannel,
   dummyBroadcasterContacts,
+  dummyLoginHistory,
 } from './dummyData';
 import { termsData } from './terms';
 
@@ -206,6 +207,24 @@ async function createDummyBroadcasterContacts(
   });
 }
 
+async function createDummyLoginHistory(
+  dummyData: Prisma.LoginHistoryCreateInput,
+): Promise<void> {
+  await prisma.loginHistory.create({
+    data: {
+      userEmail: dummyData.userEmail,
+      userType: dummyData.userType,
+      method: dummyData.method,
+      ip: dummyData.ip,
+      country: dummyData.country,
+      city: dummyData.city,
+      device: dummyData.device,
+      ua: dummyData.ua,
+      createDate: dummyData.createDate,
+    },
+  });
+}
+
 // 초기 약관 데이터 저장(없으면 약관페이지에 표시될 데이터가 없어서)
 async function generateInitialTerms(): Promise<void> {
   await prisma.policy.createMany({
@@ -237,6 +256,11 @@ async function main(): Promise<void> {
   // 테스트 방송인 연락처 생성
   await createDummyBroadcasterContacts(dummyBroadcasterContacts[0], testbroadcaster);
   await createDummyBroadcasterContacts(dummyBroadcasterContacts[1], testbroadcaster);
+
+  // 더미 로그인 기록 생성 (판매자-휴면)
+  await createDummyLoginHistory(dummyLoginHistory[0]);
+  // 더미 로그인 기록 생성 (방송인-휴면예정)
+  await createDummyLoginHistory(dummyLoginHistory[1]);
 
   // 더미 상품 데이터 생성
   await createDummyGoods(seller, dummyGoodsList[0]);

@@ -1,3 +1,4 @@
+import * as dayjs from 'dayjs';
 import { Goods, Prisma } from '.prisma/client';
 
 /** 상품 공통정보 */
@@ -200,5 +201,33 @@ export const dummyBroadcasterContacts: Prisma.BroadcasterContactsCreateInput[] =
     email: 'youareironman@onad.io',
     phoneNumber: '010-9876-9876',
     isDefault: false,
+  },
+];
+
+const sellerLastLoginDate = dayjs().add(-366, 'day').toDate();
+const broadcasterLastLoginDate = dayjs().add(-335, 'day').toDate();
+
+export const dummyLoginHistory: Prisma.LoginHistoryCreateInput[] = [
+  {
+    userEmail: 'testseller@gmail.com',
+    userType: 'seller',
+    method: 'PC',
+    ip: '::1',
+    country: 'ROK',
+    city: 'Busan',
+    device: 'Windows',
+    ua: 'Mozilla/5.0 (Windows; U; Win98; en-US; rv:0.9.2) Gecko/20010725 Netscape6/6.1',
+    createDate: sellerLastLoginDate,
+  },
+  {
+    userEmail: 'testbc@gmail.com',
+    userType: 'broadcaster',
+    method: 'MOBILE',
+    ip: '::1',
+    country: 'ROK',
+    city: 'Seoul',
+    device: 'iPhone',
+    ua: 'Mozilla/5.0 (Windows; U; Win98; en-US; rv:0.9.2) Gecko/20010725 Netscape6/6.1',
+    createDate: broadcasterLastLoginDate,
   },
 ];
