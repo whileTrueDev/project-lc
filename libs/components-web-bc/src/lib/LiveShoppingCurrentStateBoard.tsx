@@ -83,13 +83,19 @@ export function LiveShoppingCurrentStateBoard({
   }
 
   return (
-    <MotionBox
-      initial="default"
-      animate={hasAlert ? 'visible' : 'default'}
-      variants={variants}
-      onAnimationComplete={onAminationCompleteHandler}
-    >
-      <Stack h="100vh" p={4} bg={bg}>
+    <Stack h="100vh" p={4} bg={bg} position="relative">
+      <MotionBox
+        position="absolute"
+        left={0}
+        right={0}
+        top={0}
+        bottom={0}
+        p={4}
+        initial="visible"
+        animate={hasAlert ? 'visible' : 'default'}
+        variants={variants}
+        onAnimationComplete={onAminationCompleteHandler}
+      >
         {/* 라이브쇼핑명 - 제목 */}
         <Heading textAlign="center">{title}</Heading>
 
@@ -127,8 +133,8 @@ export function LiveShoppingCurrentStateBoard({
               ))}
           </Box>
         </SectionWithTitle>
-      </Stack>
-    </MotionBox>
+      </MotionBox>
+    </Stack>
   );
 }
 export default LiveShoppingCurrentStateBoard;
