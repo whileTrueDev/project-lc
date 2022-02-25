@@ -6,15 +6,14 @@
     "types": [
       "node"
     ],
-    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
-    "target": "es2015"
+    "esModuleInterop": true,
+    "target": "es2015",
   },
   "exclude": [
     "**/*.spec.ts"
   ],
   "include": [
     "**/*.ts",
-    "../../libs/nest-core/@types"
   ]
 }
