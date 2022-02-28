@@ -14,26 +14,6 @@ import { useLiveShoppingStateSubscription, usePurchaseMessages } from '@project-
 import { AnimationDefinition } from 'framer-motion/types/render/utils/animation';
 import { useCallback, useMemo } from 'react';
 
-// 관리자 알림 있는경우 애니메이션 위한 variants
-const variants = {
-  default: {
-    backgroundColor: 'rgba(255,255,255,1)',
-  },
-  visible: {
-    backgroundColor: [
-      'rgba(255,0,0,1)',
-      'rgba(255,255,255,1)',
-      'rgba(255,0,0,1)',
-      'rgba(255,255,255,1)',
-      'rgba(255,0,0,1)',
-      'rgba(255,255,255,1)',
-    ],
-    transition: {
-      duration: 2,
-    },
-  },
-};
-
 export interface LiveShoppingCurrentStateBoardProps {
   liveShoppingId: number;
   title: string;
@@ -71,8 +51,22 @@ export function LiveShoppingCurrentStateBoard({
     [setAlert],
   );
 
-  const bg = useColorModeValue('white', 'gray.800');
-  const color = 'white';
+  const bg = useColorModeValue('rgba(255,255,255,1)', '#1A202C');
+  const alertColor = 'rgba(255,0,0,1)';
+  const fontColor = 'white';
+
+  // 관리자 알림 있는경우 애니메이션 위한 variants
+  const variants = {
+    default: {
+      backgroundColor: bg,
+    },
+    visible: {
+      backgroundColor: [alertColor, bg, alertColor, bg, alertColor, bg],
+      transition: {
+        duration: 2,
+      },
+    },
+  };
 
   if (status === 'loading') return <Box>Loading...</Box>;
   if (status === 'error') {
@@ -89,7 +83,7 @@ export function LiveShoppingCurrentStateBoard({
       variants={variants}
       onAnimationComplete={onAminationCompleteHandler}
     >
-      <Stack h="100vh" p={4} bg={bg}>
+      <Stack h="100vh" p={4}>
         {/* 라이브쇼핑명 - 제목 */}
         <Heading textAlign="center">{title}</Heading>
 
@@ -112,7 +106,7 @@ export function LiveShoppingCurrentStateBoard({
           <Box maxH="400px" overflowY="auto">
             <MessageItemLayout
               bg="blue.500"
-              color={color}
+              color={fontColor}
               item={{
                 index: '순서',
                 nickname: '닉네임',
