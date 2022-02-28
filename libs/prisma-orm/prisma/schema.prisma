@@ -836,3 +836,12 @@ model Policy {
   publicFlag      Boolean        @default(false) // 공개여부
   content         String         @db.LongText // 내용
 }
+
+// 크크쇼 메인페이지 데이터
+model KkshowMain {
+  id              Int  @id @default(autoincrement())
+  carousel        Json // 메인캐러셀 영역 아이템[]
+  trailer         Json // 라이브예고 영역 
+  bestLive        Json // 베스트라이브 영역 아이템[]
+  bestBroadcaster Json // 베스트방송인 영역 아이템[]
+}
