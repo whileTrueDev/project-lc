@@ -30,7 +30,6 @@ import {
 } from '@project-lc/nest-modules-broadcaster';
 import { GoodsService } from '@project-lc/nest-modules-goods';
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
-import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
 import {
   AdminAllLcGoodsList,
@@ -50,6 +49,8 @@ import {
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
+  KkshowMainResData,
+  KkshowMainDto,
   LiveShoppingDTO,
   OrderCancelRequestDetailRes,
   OrderCancelRequestList,
@@ -58,6 +59,7 @@ import {
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
+import { AdminKkshowMainService } from './admin-kkshow-main.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
 
@@ -76,6 +78,7 @@ export class AdminController {
     private readonly sellerService: SellerService,
     private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
+    private readonly adminKkshowMainService: AdminKkshowMainService,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
     if (wtIp) this.allowedIpAddresses.push(wtIp);
@@ -300,5 +303,18 @@ export class AdminController {
   @Get('confirmed-goods-list')
   async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
     return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
+  }
+
+  /** ================================= */
+  // 크크쇼메인페이지 관리
+  /** ================================= */
+  @Get('kkshow-main')
+  async getMainPageData(): Promise<KkshowMainResData | null> {
+    return this.adminKkshowMainService.read();
+  }
+
+  @Post('kkshow-main')
+  async upsertMainPageData(@Body() data: KkshowMainDto): Promise<KkshowMainResData> {
+    return this.adminKkshowMainService.upsert(data);
   }
 }

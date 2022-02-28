@@ -6,6 +6,7 @@ import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { AdminAccountService } from './admin-account.service';
+import { AdminKkshowMainService } from './admin-kkshow-main.service';
 import { AdminPolicyController } from './admin-policy.controller';
 import { AdminProductPromotionController } from './admin-product-promotion.controller';
 import { AdminPromotionPageController } from './admin-promotion-page.controller';
@@ -19,12 +20,14 @@ export class AdminModule {
     AdminService,
     AdminSettlementService,
     AdminAccountService,
+    AdminKkshowMainService,
   ];
 
   private static readonly exports = [
     AdminService,
     AdminSettlementService,
     AdminAccountService,
+    AdminKkshowMainService,
   ];
 
   private static readonly controllers = [
