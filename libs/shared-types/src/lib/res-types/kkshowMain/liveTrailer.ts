@@ -2,6 +2,7 @@
 export interface KkShowMainLiveTrailer {
   imageUrl: string; // 홍보용이미지 url
   productLinkUrl: string; // 판매상품링크 url
+  broadcasterProfileImageUrl: string;
   broadcasterNickname: string; // 방송인 활동명
   broadcasterDescription: string; // 방송인 설명(해시태그)
   liveShoppingName: string; // 라이브쇼핑명
