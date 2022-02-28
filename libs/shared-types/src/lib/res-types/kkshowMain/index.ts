@@ -8,7 +8,7 @@ export * from './liveTrailer';
 export * from './bestLive';
 export * from './bestBroadcaster';
 
-export interface KkshowMainData {
+export interface KkshowMainResData {
   carousel: KkshowMainCarouselItem[];
   trailer: KkShowMainLiveTrailer;
   bestLive: KkshowMainBestLiveItem[];
