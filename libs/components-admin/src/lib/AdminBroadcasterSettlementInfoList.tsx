@@ -101,6 +101,7 @@ const columns: GridColumns = [
 export function AdminBroadcasterSettlementInfoList(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { data, isLoading } = useAdminBroadcasterSettlementInfoList();
+
   const [selectedRow, setSelectedRow] = useState({});
   const {
     isOpen: isConfirmationOpen,

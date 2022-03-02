@@ -1,11 +1,19 @@
+import { useEffect } from 'react';
 import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
 import { Box, Heading, Text } from '@chakra-ui/react';
 import AdminBroadcasterSettlementInfoList from '@project-lc/components-admin/AdminBroadcasterSettlementInfoList';
+import { useAdminPrivacyApproachHistoryMutation } from '@project-lc/hooks';
 
 export interface SettlementInfoProps {
   propname: any;
 }
 export function SettlementInfo({ propname }: SettlementInfoProps): JSX.Element {
+  const { mutateAsync } = useAdminPrivacyApproachHistoryMutation();
+
+  useEffect(() => {
+    mutateAsync({ infoType: 'broadcasterSettlementAccount', actionType: 'view' });
+  }, []);
+
   return (
     <AdminPageLayout>
       <Box position="relative">

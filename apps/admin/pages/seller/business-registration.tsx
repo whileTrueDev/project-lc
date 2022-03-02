@@ -1,8 +1,16 @@
+import { useEffect } from 'react';
 import { Box, Heading, Text } from '@chakra-ui/react';
 import { AdminBusinessRegistrationList } from '@project-lc/components-admin/AdminBusinessRegistrationList';
 import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
+import { useAdminPrivacyApproachHistoryMutation } from '@project-lc/hooks';
 
 export function SellerBusinessRegistration(): JSX.Element {
+  const { mutateAsync } = useAdminPrivacyApproachHistoryMutation();
+
+  useEffect(() => {
+    mutateAsync({ infoType: 'sellerSettlementAccount', actionType: 'view' });
+  }, []);
+
   return (
     <AdminPageLayout>
       <Box position="relative">

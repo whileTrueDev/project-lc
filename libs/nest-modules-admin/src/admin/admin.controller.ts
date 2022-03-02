@@ -21,6 +21,7 @@ import {
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
+  PrivacyApproachHistory,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -30,7 +31,6 @@ import {
 } from '@project-lc/nest-modules-broadcaster';
 import { GoodsService } from '@project-lc/nest-modules-goods';
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
-import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
 import {
   AdminAllLcGoodsList,
@@ -60,7 +60,7 @@ import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
-
+import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 @Controller('admin')
 export class AdminController {
   private allowedIpAddresses: string[] = ['::1'];
@@ -76,6 +76,7 @@ export class AdminController {
     private readonly sellerService: SellerService,
     private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
+    private readonly adminPrivacyApproachSevice: AdminPrivacyApproachSevice,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
     if (wtIp) this.allowedIpAddresses.push(wtIp);
@@ -300,5 +301,14 @@ export class AdminController {
   @Get('confirmed-goods-list')
   async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
     return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('privacy-approach-history')
+  async createPrivacyApproachHistory(
+    @Req() req: Request,
+    @Body() dto,
+  ): Promise<PrivacyApproachHistory> {
+    return this.adminPrivacyApproachSevice.createPrivacyApproachHistory(req, dto);
   }
 }

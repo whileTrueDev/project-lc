@@ -1,10 +1,19 @@
+import { useEffect } from 'react';
 import { Box, Heading, Text } from '@chakra-ui/react';
 import { AdminAccountList } from '@project-lc/components-admin/AdminAccountList';
 import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
-import { useAdminSettlementInfo } from '@project-lc/hooks';
+import {
+  useAdminSettlementInfo,
+  useAdminPrivacyApproachHistoryMutation,
+} from '@project-lc/hooks';
 
 export function SellerAccountList(): JSX.Element {
   const { data: settlementData } = useAdminSettlementInfo();
+  const { mutateAsync } = useAdminPrivacyApproachHistoryMutation();
+
+  useEffect(() => {
+    mutateAsync({ infoType: 'sellerSettlementAccount', actionType: 'view' });
+  }, []);
 
   return (
     <AdminPageLayout>
