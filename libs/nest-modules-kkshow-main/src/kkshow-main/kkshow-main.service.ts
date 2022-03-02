@@ -1,38 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { KkshowMain, Prisma } from '@prisma/client';
+import { KkshowMain } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import {
-  KkshowMainBestBroadcasterItem,
-  KkshowMainBestLiveItem,
-  KkshowMainCarouselItem,
-  KkshowMainResData,
-  KkshowMainDto,
-  KkShowMainLiveTrailer,
-} from '@project-lc/shared-types';
+import { KkshowMainDto, KkshowMainResData } from '@project-lc/shared-types';
+import { jsonToResType } from '@project-lc/utils';
 
 @Injectable()
 export class KkshowMainService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** JSON데이터인 value를 특정 타입으로 캐스팅하여 반환 */
-  private parse<T>(value: Prisma.JsonValue): T {
-    return JSON.parse(JSON.stringify(value));
-  }
-
-  /** 크크쇼메인데이터(JSON타입) 을 KkshowMainResData 반환타입으로 캐스팅 */
+  // /** 크크쇼메인데이터(JSON타입) 을 KkshowMainResData 반환타입으로 캐스팅 */
   private jsonToResType(data: KkshowMain): KkshowMainResData {
-    const carousel = this.parse<KkshowMainCarouselItem[]>(data.carousel);
-    const trailer = this.parse<KkShowMainLiveTrailer>(data.trailer);
-    const bestLive = this.parse<KkshowMainBestLiveItem[]>(data.bestLive);
-    const bestBroadcaster = this.parse<KkshowMainBestBroadcasterItem[]>(
-      data.bestBroadcaster,
-    );
-    return {
-      carousel,
-      trailer,
-      bestLive,
-      bestBroadcaster,
-    };
+    return jsonToResType(data);
   }
 
   private async findFirst(): Promise<KkshowMain> {
