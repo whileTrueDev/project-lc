@@ -1,10 +1,7 @@
+import { KkshowMain } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
-
-export interface KkshowMain {
-  _field: 'default field';
-}
 
 export const getKkshowMain = async (): Promise<KkshowMain> => {
   const url =

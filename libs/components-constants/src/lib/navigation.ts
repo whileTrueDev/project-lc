@@ -259,4 +259,9 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
       },
     ],
   },
+  {
+    name: '크크쇼 메인',
+    href: '/kkshow-main',
+    children: [{ name: '크크쇼 메인페이지', href: '/kkshow-main', icon: FcList }],
+  },
 ];
