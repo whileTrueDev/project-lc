@@ -1,9 +1,10 @@
-import { Button, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Button, Divider, Spinner, Stack, Text } from '@chakra-ui/react';
 import { useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainResData } from '@project-lc/shared-types';
 import { jsonToResType } from '@project-lc/utils';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import AdminKkshowMainCarouselSection from './AdminKkshowMainCarouselData';
 
 export function AdminKkshowMain(): JSX.Element {
   const { data: kkshowMainData, isLoading, isError, error } = useKkshowMain();
@@ -31,9 +32,12 @@ export function AdminKkshowMain(): JSX.Element {
   return (
     <FormProvider {...methods}>
       <Stack as="form" onSubmit={methods.handleSubmit(onSubmit)}>
-        <Button type="submit">submit</Button>
         <Text>크크쇼 메인</Text>
-        <Text>{JSON.stringify(methods.watch())}</Text>
+        <Divider variant="dashed" />
+        <AdminKkshowMainCarouselSection />
+        <Divider variant="dashed" />
+
+        <Button type="submit">submit</Button>
       </Stack>
     </FormProvider>
   );
