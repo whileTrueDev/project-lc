@@ -93,6 +93,9 @@
     "nest-modules-jwt-helper": {
       "tags": []
     },
+    "nest-modules-kkshow-main": {
+      "tags": []
+    },
     "nest-modules-liveshopping": {
       "tags": []
     },
