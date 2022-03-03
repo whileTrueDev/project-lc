@@ -1,4 +1,4 @@
-import { Button, Divider, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Divider, Spinner, Stack, Text } from '@chakra-ui/react';
 import { useAdminKkshowMainMutation, useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainResData } from '@project-lc/shared-types';
 import { kkshowDataToDto, kkshowMainJsonToResType } from '@project-lc/utils';
@@ -30,6 +30,7 @@ export function AdminKkshowMain(): JSX.Element {
       .mutateAsync(dto)
       .then((res) => {
         console.log(res);
+        methods.reset(data); // 저장 후 리셋하여 isDirty값을 false로 되돌림
       })
       .catch((e) => console.error(e));
   };
@@ -40,12 +41,25 @@ export function AdminKkshowMain(): JSX.Element {
   return (
     <FormProvider {...methods}>
       <Stack as="form" onSubmit={methods.handleSubmit(onSubmit)}>
-        <Text>크크쇼 메인</Text>
+        <Text fontWeight="bold">크크쇼 메인 데이터 관리</Text>
+        <Text>
+          캐러셀 아이템 추가하기, 데이터 수정, 삭제 등 작업 후 반드시 저장버튼을
+          눌러주세요!
+        </Text>
+        <Stack direction="row" spacing={4}>
+          <Button type="submit" colorScheme={methods.formState.isDirty ? 'red' : 'blue'}>
+            저장
+          </Button>
+          {methods.formState.isDirty && (
+            <Text as="span" color="red">
+              데이터 변경사항이 있습니다. 저장버튼을 눌러주세요!!!!
+            </Text>
+          )}
+        </Stack>
+
         <Divider variant="dashed" />
         <AdminKkshowMainCarouselSection />
         <Divider variant="dashed" />
-
-        <Button type="submit">submit</Button>
       </Stack>
     </FormProvider>
   );

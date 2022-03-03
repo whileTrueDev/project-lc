@@ -65,6 +65,7 @@ export function AdminKkshowMainCarouselItemView({
             <Box>
               <Text>기존가격</Text>
               <Input
+                type="number"
                 {...register(`carousel.${index}.normalPrice` as const, {
                   valueAsNumber: true,
                 })}
@@ -74,6 +75,7 @@ export function AdminKkshowMainCarouselItemView({
             <Box>
               <Text>할인가격</Text>
               <Input
+                type="number"
                 color="red"
                 {...register(`carousel.${index}.discountedPrice` as const, {
                   valueAsNumber: true,
