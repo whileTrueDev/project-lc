@@ -673,6 +673,8 @@ model LiveShopping {
   SellerSettlementItems       SellerSettlementItems[]
   liveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
   BroadcasterSettlementItems  BroadcasterSettlementItems[]
+  thumbnailId                 Int?
+  thumbnail                   LiveShoppingImage?            @relation(fields: [thumbnailId], references: [id])
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -701,6 +703,13 @@ enum LiveShopppingProgressType {
 model LiveShoppingVideo {
   id           Int            @id @default(autoincrement())
   youtubeUrl   String?        @unique
+  createDate   DateTime       @default(now())
+  LiveShopping LiveShopping[]
+}
+
+model LiveShoppingImage {
+  id           Int            @id @default(autoincrement())
+  imageUrl     String?        @unique
   createDate   DateTime       @default(now())
   LiveShopping LiveShopping[]
 }
