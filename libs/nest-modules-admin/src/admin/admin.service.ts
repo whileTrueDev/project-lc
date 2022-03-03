@@ -258,11 +258,16 @@ export class AdminService {
       where: { id: id ? Number(id) : undefined },
       include: {
         goods: {
-          select: { goods_name: true, summary: true },
+          select: { goods_name: true, summary: true, image: true, options: true },
         },
         seller: { select: { sellerShop: true } },
         broadcaster: {
-          select: { userNickname: true, email: true },
+          select: {
+            userNickname: true,
+            email: true,
+            avatar: true,
+            BroadcasterPromotionPage: true,
+          },
         },
         liveShoppingVideo: {
           select: { youtubeUrl: true },
