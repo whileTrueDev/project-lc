@@ -259,4 +259,9 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
       },
     ],
   },
+  {
+    name: '관리자',
+    href: '/admin-manage',
+    children: [{ name: '계정 권한관리', href: '/admin-manage', icon: FcList }],
+  },
 ];

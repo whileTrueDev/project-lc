@@ -3,7 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { GoodsConfirmation, LiveShopping } from '@prisma/client';
+import { Administrator, GoodsConfirmation, LiveShopping } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsByIdRes,
@@ -12,6 +12,7 @@ import {
   BusinessRegistrationStatus,
   AdminSettlementInfoType,
   LiveShoppingDTO,
+  AdminClassDto,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -370,6 +371,37 @@ export class AdminService {
 
     if (duplicateFmGoodsSeqProductPromotion) return true;
 
+    return false;
+  }
+
+  public async getAdminUserList(): Promise<AdminClassDto[]> {
+    return this.prisma.administrator.findMany({
+      select: {
+        id: true,
+        email: true,
+        adminClass: true,
+      },
+    });
+  }
+
+  public async updateAdminClass(dto: AdminClassDto): Promise<Administrator> {
+    return this.prisma.administrator.update({
+      where: {
+        email: dto.email,
+      },
+      data: {
+        adminClass: dto.adminClass,
+      },
+    });
+  }
+
+  public async deleteAdminUser(id: number): Promise<boolean> {
+    const doDelete = await this.prisma.administrator.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+    if (doDelete) return true;
     return false;
   }
 }

@@ -14,6 +14,7 @@ import {
   Req,
   UseGuards,
   ValidationPipe,
+  Delete,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -55,6 +56,7 @@ import {
   OrderCancelRequestList,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
+  AdminClassDto,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
@@ -310,5 +312,23 @@ export class AdminController {
     @Body() dto,
   ): Promise<PrivacyApproachHistory> {
     return this.adminPrivacyApproachSevice.createPrivacyApproachHistory(req, dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('/admin-managers')
+  async getAdminUserList(): Promise<AdminClassDto[]> {
+    return this.adminService.getAdminUserList();
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch('/admin-class')
+  async updateAdminClass(@Body() dto: AdminClassDto): Promise<Administrator> {
+    return this.adminService.updateAdminClass(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Delete('/user/:userId')
+  async deleteAdminUser(@Param('userId') userId: number): Promise<boolean> {
+    return this.adminService.deleteAdminUser(userId);
   }
 }

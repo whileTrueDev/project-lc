@@ -21,6 +21,7 @@ export * from './lib/constants/sellType';
 export * from './lib/constants/shippingTypes';
 export * from './lib/constants/signupRegisterOptions';
 export * from './lib/constants/socialLoginUserTypeKey';
+export * from './lib/dto/AdminClassDto.dto';
 export * from './lib/dto/adminSettlementInfo.dto';
 export * from './lib/dto/adminSignUpDto.dto';
 export * from './lib/dto/broadcaster.dto';
