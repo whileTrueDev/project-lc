@@ -272,6 +272,7 @@ export class AdminService {
         liveShoppingVideo: {
           select: { youtubeUrl: true },
         },
+        images: true,
       },
       orderBy: { createDate: 'desc' },
     });

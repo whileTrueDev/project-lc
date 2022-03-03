@@ -1,4 +1,9 @@
-import { GoodsImages, GoodsOptions, LiveShopping } from '@prisma/client';
+import {
+  GoodsImages,
+  GoodsOptions,
+  LiveShopping,
+  LiveShoppingImage,
+} from '@prisma/client';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import { BroadcasterDTO } from '@project-lc/shared-types';
@@ -19,6 +24,7 @@ export interface LiveShoppingWithGoods extends LiveShopping {
   };
   broadcaster: BroadcasterDTO & { avatar?: string | null };
   liveShoppingVideo: { youtubeUrl: string };
+  images: LiveShoppingImage[];
 }
 
 export const getAdminLiveShoppingList = async (

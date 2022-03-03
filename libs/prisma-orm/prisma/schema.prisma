@@ -673,8 +673,7 @@ model LiveShopping {
   SellerSettlementItems       SellerSettlementItems[]
   liveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
   BroadcasterSettlementItems  BroadcasterSettlementItems[]
-  thumbnailId                 Int?
-  thumbnail                   LiveShoppingImage?            @relation(fields: [thumbnailId], references: [id])
+  images                      LiveShoppingImage[]
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -707,11 +706,18 @@ model LiveShoppingVideo {
   LiveShopping LiveShopping[]
 }
 
+enum LiveShoppingImageType {
+  carousel //메인 캐러셀 이미지
+  trailer //라이브예고용 이미지(인스타게시물) 
+}
+
 model LiveShoppingImage {
-  id           Int            @id @default(autoincrement())
-  imageUrl     String?        @unique
-  createDate   DateTime       @default(now())
-  LiveShopping LiveShopping[]
+  id             Int                   @id @default(autoincrement())
+  imageUrl       String?
+  type           LiveShoppingImageType
+  createDate     DateTime              @default(now())
+  liveShopping   LiveShopping          @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
+  liveShoppingId Int
 }
 
 // 판매 수수료
