@@ -1,7 +1,7 @@
 import { Button, Divider, Spinner, Stack, Text } from '@chakra-ui/react';
-import { useKkshowMain } from '@project-lc/hooks';
+import { useAdminKkshowMainMutation, useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainResData } from '@project-lc/shared-types';
-import { jsonToResType } from '@project-lc/utils';
+import { kkshowDataToDto, kkshowMainJsonToResType } from '@project-lc/utils';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import AdminKkshowMainCarouselSection from './AdminKkshowMainCarouselData';
@@ -14,16 +14,24 @@ export function AdminKkshowMain(): JSX.Element {
   useEffect(() => {
     if (!kkshowMainData) return;
     // kkshowMainData는 json 형태이므로 타입 명시되어있는 defaultValue로 설정하려면 타입 변경 필요
-    const obj = jsonToResType(kkshowMainData);
+    const obj = kkshowMainJsonToResType(kkshowMainData);
     methods.setValue('carousel', obj.carousel);
     methods.setValue('trailer', obj.trailer);
     methods.setValue('bestLive', obj.bestLive);
     methods.setValue('bestBroadcaster', obj.bestBroadcaster);
   }, [kkshowMainData, methods]);
 
-  const onSubmit = (data: any): void => {
+  const postRequest = useAdminKkshowMainMutation();
+  const onSubmit = (data: KkshowMainResData): void => {
     // KkshowMainResData -> KkshowMainDto 로 변환하여 요청할것
-    console.log(data);
+    const dto = kkshowDataToDto(data);
+
+    postRequest
+      .mutateAsync(dto)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => console.error(e));
   };
 
   if (isLoading) return <Spinner />;
