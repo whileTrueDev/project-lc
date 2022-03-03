@@ -205,14 +205,12 @@ function ThumbnailCarouselItem({
           size={isMobileSize ? 'md' : 'xs'}
           left={-7}
           direction="left"
-          isVisible
           onClick={onLeftIconClick}
         />
         <ChevronIconButton
           size={isMobileSize ? 'md' : 'xs'}
           right={-7}
           direction="right"
-          isVisible
           onClick={onRightIconClick}
         />
       </MotionBox>

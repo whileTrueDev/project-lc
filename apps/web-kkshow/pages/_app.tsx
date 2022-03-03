@@ -18,7 +18,9 @@ import { AppProps } from 'next/app';
 import NextNProgress from 'nextjs-progressbar';
 import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import 'swiper/css/bundle';
 import '../styles/global.font.css';
+import '../styles/swiper.override.css';
 
 dayjs.extend(relativeTime);
 dayjs.locale(kolocale);
