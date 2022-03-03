@@ -4,8 +4,11 @@ import {
   GetObjectCommand,
   ListObjectsCommand,
   DeleteObjectsCommand,
+  PutObjectCommandInput,
+  PutObjectCommandOutput,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { getExtension } from '@project-lc/utils';
 import dayjs from 'dayjs';
 import path from 'path';
 
@@ -20,7 +23,9 @@ export type s3KeyType =
   | 'broadcaster-id-card' // 방송인 신분증
   | 'broadcaster-account-image' // 방송인 통장사본
   | 'overlay-logo'
-  | 'horizontal-banner';
+  | 'horizontal-banner'
+  | 'kkshow-main-carousel-images' // 크크쇼 메인 캐러셀 배너 이미지
+  | 'live-shopping-images'; // 라이브 쇼핑 섬네일
 
 export type s3TaggingKeys = 'overlayImageType'; // s3 object 태그 객체 키
 export interface S3UploadImageOptions {
@@ -56,16 +61,6 @@ export const s3 = (() => {
       secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET!,
     },
   });
-
-  // 파일명에서 확장자를 추출하는 과정
-  function getExtension(fileName: string | null): string {
-    if (!fileName) {
-      return '';
-    }
-    const location = fileName.lastIndexOf('.');
-    const result = fileName.substring(location);
-    return result;
-  }
 
   function getS3Key({
     userMail,
@@ -159,6 +154,23 @@ export const s3 = (() => {
     } catch (error) {
       throw new Error('error in s3publicUploadFile');
     }
+  }
+
+  /** s3.send(putObjectCommand) 래핑함수. 버킷 제외한 Key, Body, ContentType, ACL등 기입할것
+   * @return output : PutObjectCommandOutput
+   * @return savedKey : S3 도메인과 key 합친것으로 이미지의 경우 저장된 url
+   */
+  async function sendPutObjectCommand(
+    commandInput: Omit<PutObjectCommandInput, 'Bucket'>,
+  ): Promise<{ output: PutObjectCommandOutput; savedKey: string }> {
+    const command = new PutObjectCommand({
+      ...commandInput,
+      Bucket: S3_BUCKET_NAME,
+    });
+    return {
+      output: await s3Client.send(command),
+      savedKey: S3_DOMIAN + commandInput.Key,
+    };
   }
 
   /**
@@ -289,5 +301,6 @@ export const s3 = (() => {
     getOverlayImagesFromS3,
     s3DeleteImages,
     getS3GuideImage,
+    sendPutObjectCommand,
   };
 })();
