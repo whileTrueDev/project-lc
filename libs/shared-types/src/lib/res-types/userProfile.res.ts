@@ -1,4 +1,4 @@
-import { BroadcasterPromotionPage } from '@prisma/client';
+import { BroadcasterPromotionPage, AdminType } from '@prisma/client';
 
 export type UserType = 'seller' | 'broadcaster' | 'admin';
 
@@ -13,4 +13,5 @@ export interface UserProfileRes {
   agreementFlag?: boolean;
   overlayUrl?: string;
   broadcasterPromotionPage?: BroadcasterPromotionPage;
+  adminClass?: AdminType;
 }

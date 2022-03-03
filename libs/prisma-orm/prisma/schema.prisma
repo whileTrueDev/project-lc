@@ -786,10 +786,10 @@ model UserNotification {
 
 // 관리자 계정
 model Administrator {
-  id       Int        @id @default(autoincrement())
-  email    String     @unique
-  password String
-  type     AdminType?
+  id         Int        @id @default(autoincrement())
+  email      String     @unique
+  password   String
+  adminClass AdminType?
 }
 
 enum AdminType {

@@ -1,14 +1,25 @@
 import { useEffect } from 'react';
-import { Box, Heading, Text } from '@chakra-ui/react';
+import { Box, Heading, Text, useToast } from '@chakra-ui/react';
 import { AdminBusinessRegistrationList } from '@project-lc/components-admin/AdminBusinessRegistrationList';
 import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
-import { useAdminPrivacyApproachHistoryMutation } from '@project-lc/hooks';
+import { useAdminPrivacyApproachHistoryMutation, useProfile } from '@project-lc/hooks';
+import { useRouter } from 'next/router';
 
 export function SellerBusinessRegistration(): JSX.Element {
   const { mutateAsync } = useAdminPrivacyApproachHistoryMutation();
-
+  const { data: profile, isLoading } = useProfile();
+  const router = useRouter();
+  const toast = useToast();
   useEffect(() => {
-    mutateAsync({ infoType: 'sellerSettlementAccount', actionType: 'view' });
+    if (!isLoading && !['super', 'full'].includes(profile.adminClass)) {
+      toast({
+        title: '권한없는 계정',
+        status: 'error',
+      });
+      router.push('/admin');
+    } else if (!isLoading && ['super', 'full'].includes(profile.adminClass)) {
+      mutateAsync({ infoType: 'sellerBusinessRegistration', actionType: 'view' });
+    }
   }, []);
 
   return (

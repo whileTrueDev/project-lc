@@ -145,6 +145,7 @@ export class AuthService {
         name: _user.userName,
         type,
         hasPassword,
+        adminClass: type === 'admin' ? _user.adminClass : null,
       };
     }
     return {
