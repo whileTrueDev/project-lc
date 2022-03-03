@@ -12,12 +12,11 @@ import {
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { AdminClassBadge } from '@project-lc/components-admin/AdminClassBadge';
 import { useQueryClient } from 'react-query';
-import { useRouter } from 'next/router';
 
 // 가입된 모든 관리자 계정
 export function AdminManagerList(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
-  const { data: profile, isLoading: profileIsLoading } = useProfile();
+  const { data: profile } = useProfile();
   const { data, isLoading } = useAdminManagerList();
 
   const toast = useToast();
@@ -25,8 +24,6 @@ export function AdminManagerList(): JSX.Element {
 
   const { mutateAsync } = useChangeAdminClassMutation();
   const { mutateAsync: deleteMutateAsync } = useDeleteAdminUserMutation();
-
-  const router = useRouter();
 
   async function handleSelectBox(adminClass: AdminType): Promise<void> {
     mutateAsync({ email: profile?.email || '', adminClass }).then(() => {
@@ -98,14 +95,6 @@ export function AdminManagerList(): JSX.Element {
       },
     },
   ];
-
-  if (!profileIsLoading && profile?.adminClass !== 'super') {
-    toast({
-      title: '권한없는 계정',
-      status: 'error',
-    });
-    router.push('/admin');
-  }
 
   if (isLoading) return <Box>로딩중...</Box>;
 

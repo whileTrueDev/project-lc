@@ -10,14 +10,17 @@ export function SellerBusinessRegistration(): JSX.Element {
   const { data: profile, isLoading } = useProfile();
   const router = useRouter();
   const toast = useToast();
+
+  if (!isLoading && !['super', 'full'].includes(profile.adminClass)) {
+    toast({
+      title: '권한없는 계정',
+      status: 'error',
+    });
+    router.push('/admin');
+  }
+
   useEffect(() => {
-    if (!isLoading && !['super', 'full'].includes(profile.adminClass)) {
-      toast({
-        title: '권한없는 계정',
-        status: 'error',
-      });
-      router.push('/admin');
-    } else if (!isLoading && ['super', 'full'].includes(profile.adminClass)) {
+    if (!isLoading && ['super', 'full'].includes(profile.adminClass)) {
       mutateAsync({ infoType: 'sellerBusinessRegistration', actionType: 'view' });
     }
   }, []);

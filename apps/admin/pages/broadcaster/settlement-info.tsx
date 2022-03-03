@@ -23,7 +23,9 @@ export function SettlementInfo({ propname }: SettlementInfoProps): JSX.Element {
   }
 
   useEffect(() => {
-    mutateAsync({ infoType: 'sellerBusinessRegistration', actionType: 'view' });
+    if (!isLoading && ['super', 'full'].includes(profile.adminClass)) {
+      mutateAsync({ infoType: 'broadcasterSettlementAccount', actionType: 'view' });
+    }
   }, []);
 
   return (
