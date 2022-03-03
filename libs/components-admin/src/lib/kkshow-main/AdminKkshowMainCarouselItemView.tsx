@@ -1,4 +1,13 @@
-import { Box, HStack, Input, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
+import {
+  Avatar,
+  Box,
+  HStack,
+  Input,
+  Radio,
+  RadioGroup,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
 import { KkshowMainCarouselItem } from '@project-lc/shared-types';
 import { getAdminHost } from '@project-lc/utils';
 import React from 'react';
@@ -46,6 +55,29 @@ export function AdminKkshowMainCarouselItemView({
               <Text>상품링크</Text>
               <Input
                 {...register(`carousel.${index}.productLinkUrl` as const)}
+                size="sm"
+              />
+            </Box>
+            <Box>
+              <Text>상품명</Text>
+              <Input {...register(`carousel.${index}.productName` as const)} size="sm" />
+            </Box>
+            <Box>
+              <Text>기존가격</Text>
+              <Input
+                {...register(`carousel.${index}.normalPrice` as const, {
+                  valueAsNumber: true,
+                })}
+                size="sm"
+              />
+            </Box>
+            <Box>
+              <Text>할인가격</Text>
+              <Input
+                color="red"
+                {...register(`carousel.${index}.discountedPrice` as const, {
+                  valueAsNumber: true,
+                })}
                 size="sm"
               />
             </Box>
@@ -118,8 +150,8 @@ export function AdminKkshowMainCarouselItemView({
 export function ImageBanner({ imageUrl }: { imageUrl: string }): JSX.Element {
   return (
     <Box>
-      <Text>배너이미지</Text>
-      <img src={imageUrl} width="200" height="200" alt="" />
+      <Text>이미지</Text>
+      <img src={imageUrl} width="100" height="100" alt="" />
     </Box>
   );
 }
@@ -148,7 +180,7 @@ export function BroadcasterProfile({
   return (
     <Box>
       <Text>방송인 프로필 이미지</Text>
-      <img src={profileImageUrl} alt="" width="80" height="80" />
+      <Avatar src={profileImageUrl} />
     </Box>
   );
 }
@@ -161,7 +193,7 @@ export function ProductImage({
   return (
     <Box>
       <Text>상품이미지</Text>
-      <img src={productImageUrl} alt="" width="100" height="100" />
+      <img src={productImageUrl} alt="" width="50" height="50" />
     </Box>
   );
 }

@@ -15,7 +15,7 @@ export interface SimpleBannerItem extends KkshowMainCarouselItemBase, Image {
 export interface UpComingLiveItem
   extends KkshowMainCarouselItemBase,
     Image,
-    Partial<ProductBanner>,
+    Partial<ProductInfo>,
     BroadcasterInfo {
   type: 'upcoming';
 }
@@ -24,7 +24,7 @@ export interface UpComingLiveItem
 export interface NowPlayingLiveItem
   extends KkshowMainCarouselItemBase,
     Video,
-    ProductBanner,
+    ProductInfo,
     BroadcasterInfo {
   type: 'nowPlaying';
   platform: LivePlatform;
@@ -34,7 +34,7 @@ export interface NowPlayingLiveItem
 export interface PreviousLiveItem
   extends KkshowMainCarouselItemBase,
     Video,
-    Partial<ProductBanner>,
+    Partial<ProductInfo>,
     BroadcasterInfo {
   type: 'previous';
 }
@@ -45,14 +45,17 @@ export type KkshowMainCarouselItemType =
   | 'nowPlaying'
   | 'previous';
 
-type LivePlatform = 'twitch' | 'youtube';
+export type LivePlatform = 'twitch' | 'youtube';
 
 interface KkshowMainCarouselItemBase {
   type: KkshowMainCarouselItemType;
 }
 
-interface ProductBanner {
+interface ProductInfo {
+  productName: string;
   productImageUrl: string;
+  normalPrice: number;
+  discountedPrice: number;
   productLinkUrl: string;
 }
 
@@ -66,4 +69,6 @@ interface Image {
 
 interface BroadcasterInfo {
   profileImageUrl: string;
+  broadcasterNickname: string;
+  promotionPageLinkUrl: string;
 }
