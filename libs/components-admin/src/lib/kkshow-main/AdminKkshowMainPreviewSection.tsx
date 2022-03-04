@@ -1,10 +1,7 @@
 import { Avatar, Box, Grid, GridItem, Input, Stack, Text } from '@chakra-ui/react';
 import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
-import {
-  Preview,
-  readAsDataURL,
-} from '@project-lc/components-seller/GoodsRegistPictures';
 import { LiveShoppingWithGoods } from '@project-lc/hooks';
+import { Preview, readAsDataURL } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
 import dayjs from 'dayjs';
 import path from 'path';
@@ -20,7 +17,7 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
   const handleSuccess = async (fileName: string, file: File): Promise<void> => {
     readAsDataURL(file).then(async ({ data }) => {
       const imageData = { url: data, filename: fileName, file };
-      // setImagePreview(imageData);
+      // setImagePrPeview(imageData);
 
       // 홍보용이미지
       const timestamp = new Date().getTime();

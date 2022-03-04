@@ -23,10 +23,7 @@ import {
   Radio,
 } from '@chakra-ui/react';
 import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
-import {
-  Preview,
-  readAsDataURL,
-} from '@project-lc/components-seller/GoodsRegistPictures';
+
 import {
   KkshowMainCarouselItem,
   KkshowMainCarouselItemType,
@@ -37,6 +34,7 @@ import path from 'path';
 import { s3 } from '@project-lc/utils-s3';
 import { LiveShoppingWithGoods, useAdminLiveShoppingList } from '@project-lc/hooks';
 import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
+import { Preview, readAsDataURL } from '@project-lc/utils';
 
 /** 크크쇼메인데이터 중 라이브방송정보(라이브방송,판매상품,방송인) 조회하기 위한 autocomplete컴포넌트 */
 export function LiveShoppingListAutoComplete({

@@ -24,6 +24,7 @@ import {
   useGoodsImageMutation,
   useProfile,
 } from '@project-lc/hooks';
+import { Preview, readAsDataURL } from '@project-lc/utils';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
@@ -51,15 +52,6 @@ export async function imageFileListToImageDto(
   }));
 }
 
-export type FileReaderResultType = string | ArrayBuffer | null;
-
-export type Preview = {
-  id: number;
-  filename: string;
-  url: FileReaderResultType;
-  file: File;
-};
-
 export function GoodsPreviewItem(
   props: Pick<Preview, 'id' | 'filename'> & {
     onDelete: () => void;
@@ -84,26 +76,6 @@ const PREVIEW_SIZE = {
   width: 60,
   height: 60,
 };
-
-export function readAsDataURL(file: File): Promise<{
-  data: FileReaderResultType;
-  name: string;
-  size: number;
-  type: string;
-}> {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.onload = function () {
-      return resolve({
-        data: fileReader.result,
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      });
-    };
-    fileReader.readAsDataURL(file);
-  });
-}
 
 /** 상품사진 섹션 컨테이너 */
 export function GoodsRegistPictures(): JSX.Element {
