@@ -41,7 +41,7 @@ export function AdminKkshowMainCarouselSection(): JSX.Element {
         {fields.map((field, index) => {
           return (
             <Stack key={field.id} w="100%" maxH="200px">
-              <AdminKkshowMainCarouselItemBoxLayout
+              <AdminKkshowMainFieldArrayItemContainer
                 moveUp={() => {
                   if (index > 0) move(index, index - 1);
                 }}
@@ -54,7 +54,7 @@ export function AdminKkshowMainCarouselSection(): JSX.Element {
                   index={index}
                   item={field as unknown as KkshowMainCarouselItem}
                 />
-              </AdminKkshowMainCarouselItemBoxLayout>
+              </AdminKkshowMainFieldArrayItemContainer>
             </Stack>
           );
         })}
@@ -65,7 +65,7 @@ export function AdminKkshowMainCarouselSection(): JSX.Element {
 
 export default AdminKkshowMainCarouselSection;
 
-export function AdminKkshowMainCarouselItemBoxLayout({
+export function AdminKkshowMainFieldArrayItemContainer({
   children,
   removeHandler,
   moveUp,
