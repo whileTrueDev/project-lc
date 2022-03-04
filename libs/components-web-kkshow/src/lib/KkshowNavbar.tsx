@@ -1,5 +1,4 @@
-import { SearchIcon } from '@chakra-ui/icons';
-import { Box, Flex, IconButton, Image, Link, Stack, Tooltip } from '@chakra-ui/react';
+import { Box, Flex, Image, Link, Stack } from '@chakra-ui/react';
 import { kkshowNavLinks, NavItem } from '@project-lc/components-constants/navigation';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import NextLink from 'next/link';
@@ -20,7 +19,7 @@ export function KkshowNavbar(): JSX.Element {
         maxW="5xl"
         m="auto"
         justify="space-between"
-        align="end"
+        align={{ base: 'center', md: 'end' }}
         minH="60px"
         py={4}
         px={4}
@@ -43,16 +42,8 @@ export function KkshowNavbar(): JSX.Element {
         {/* 우측 */}
         <Flex alignItems="center">
           <ColorModeSwitcher _hover={{}} />
-          <Tooltip label="검색" fontSize="xs">
-            <IconButton
-              size="md"
-              fontSize="lg"
-              variant="ghost"
-              color="current"
-              icon={<SearchIcon />}
-              aria-label="toggle search"
-            />
-          </Tooltip>
+          {/* // TODO: 검색 기능 추가 이후 주석 해제 */}
+          {/* <GlobalSearcher /> */}
         </Flex>
       </Flex>
 
@@ -114,5 +105,4 @@ const MobileNavItem = ({ label, href, isExternal }: NavItem): JSX.Element => {
     </NextLink>
   );
 };
-
 export default KkshowNavbar;

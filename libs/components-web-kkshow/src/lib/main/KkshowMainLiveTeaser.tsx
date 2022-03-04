@@ -85,7 +85,7 @@ export function KkshowLiveTeaser(): JSX.Element {
         <MotionBox
           as={Stack}
           justifyContent="space-around"
-          h={300}
+          h={{ base: 200, md: 300 }}
           ml={4}
           textAlign={{ base: 'center', lg: 'unset' }}
           initial={{ opacity: 0, y: 20 }}
@@ -93,20 +93,20 @@ export function KkshowLiveTeaser(): JSX.Element {
           viewport={{ once: true }}
         >
           <Box>
-            <Heading color="blue.500" fontSize="2xl">
-              민결희 X 예스닭강정 민결희 X 예스닭강정
+            <Heading color="blue.500" fontSize={{ base: 'lg', md: '2xl' }}>
+              민결희 X 예스 예스 예스 X3 닭강정
             </Heading>
-            <Heading fontSize={{ base: 'xl', lg: '2xl' }} fontWeight="medium">
+            <Heading fontSize={{ base: 'md', lg: '2xl' }} fontWeight="medium">
               2022. 02. 20 (일) 오후 1시
             </Heading>
           </Box>
 
           <Stack spacing={4}>
             <Box>
-              <Heading fontSize="2xl" fontWeight="medium">
+              <Heading fontSize={{ base: 'lg', md: '2xl' }} fontWeight="medium">
                 라이브 특가
               </Heading>
-              <Heading fontSize="2xl">
+              <Heading fontSize={{ base: 'lg', md: '2xl' }}>
                 <Text as="span" color="red">
                   20%
                 </Text>{' '}
