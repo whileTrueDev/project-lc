@@ -9,4 +9,5 @@ export interface KkShowMainLiveTrailer {
   broadcastStartDate: Date; // 방송시작일시
   normalPrice: number; // 원래 판매가격
   discountedPrice: number; // 할인된 판매가격
+  liveShoppingId: number; // 라이브쇼핑 아이디
 }

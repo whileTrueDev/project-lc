@@ -1,40 +1,42 @@
-import { Avatar, Box, Grid, GridItem, Input, Stack, Text } from '@chakra-ui/react';
-import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
+import {
+  Avatar,
+  Box,
+  Button,
+  Grid,
+  GridItem,
+  Input,
+  Stack,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react';
+import ImageInputDialog, {
+  ImageInputFileReadData,
+} from '@project-lc/components-core/ImageInputDialog';
 import { LiveShoppingWithGoods } from '@project-lc/hooks';
-import { Preview, readAsDataURL } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
 import dayjs from 'dayjs';
 import path from 'path';
-import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { LiveShoppingListAutoComplete } from './KkshowMainCarouselItemDialog';
 
 export function AdminKkshowMainPreviewSection(): JSX.Element {
   const { register, watch, setValue } = useFormContext();
-  const [liveShoppingId, setLiveShoppingId] = useState<number | null>(null);
-  const [imagePreview, setImagePreview] = useState<Omit<Preview, 'id'> | null>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const handleSuccess = async (fileName: string, file: File): Promise<void> => {
-    readAsDataURL(file).then(async ({ data }) => {
-      const imageData = { url: data, filename: fileName, file };
-      // setImagePrPeview(imageData);
-
-      // 홍보용이미지
-      const timestamp = new Date().getTime();
-      const s3KeyType = `live-shopping-images/${liveShoppingId}/preview`;
-      const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
-      const { savedKey } = await s3.sendPutObjectCommand({
-        Key: key,
-        Body: imageData.file,
-        ContentType: imageData.file.type,
-        ACL: 'public-read',
-      });
-      setValue('trailer.imageUrl', savedKey, { shouldDirty: true });
+  const imageDataHandler = async (imageData: ImageInputFileReadData): Promise<void> => {
+    // 홍보용이미지
+    const timestamp = new Date().getTime();
+    const s3KeyType = `live-shopping-images/${watch('trailer.liveShoppingId')}/preview`;
+    const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
+    const { savedKey } = await s3.sendPutObjectCommand({
+      Key: key,
+      Body: imageData.file,
+      ContentType: imageData.file.type,
+      ACL: 'public-read',
     });
-  };
+    setValue('trailer.imageUrl', savedKey, { shouldDirty: true });
 
-  const handleError = (error: ImageInputErrorTypes): void => {
-    console.log(error);
+    return Promise.resolve();
   };
 
   const onAutocompleteChange = (item: LiveShoppingWithGoods | null): void => {
@@ -42,10 +44,10 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
     const { broadcastStartDate, broadcaster, fmGoodsSeq, liveShoppingName, goods, id } =
       item;
 
-    setLiveShoppingId(id);
-
     const { userNickname, avatar } = broadcaster;
     const option = goods.options[0];
+
+    setValue('trailer.liveShoppingId', id, { shouldDirty: true });
 
     if (fmGoodsSeq) {
       setValue(
@@ -127,16 +129,27 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
           </Stack>
         </GridItem>
         <GridItem height="100%" w="100%">
-          <Text>라이브 예고 썸네일(인스타 게시물 이미지)</Text>
-          {watch('trailer.imageUrl') ? (
-            <img alt="썸네일" src={watch('trailer.imageUrl')} width="100" height="100" />
-          ) : (
-            <ImageInput
-              required={false}
-              handleSuccess={handleSuccess}
-              handleError={handleError}
+          <Stack>
+            <Text>라이브 예고 썸네일(인스타 게시물 이미지)</Text>
+
+            {watch('trailer.imageUrl') && (
+              <img
+                alt="썸네일"
+                src={watch('trailer.imageUrl')}
+                width="100"
+                height="100"
+              />
+            )}
+            <Button onClick={onOpen} disabled={!watch('trailer.liveShoppingId')}>
+              썸네일 {watch('trailer.imageUrl') ? '수정' : '등록'}하기
+            </Button>
+            <ImageInputDialog
+              modalTitle="라이브 예고 썸네일 등록하기"
+              isOpen={isOpen}
+              onClose={onClose}
+              onConfirm={imageDataHandler}
             />
-          )}
+          </Stack>
         </GridItem>
       </Grid>
     </Stack>
