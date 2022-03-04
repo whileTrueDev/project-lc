@@ -7,7 +7,7 @@ export const MB = 1024 * 1024; // 1Mbytes
 
 export type ImageInputErrorTypes = 'over-size' | 'invalid-format' | undefined;
 
-type ImageInputProps = {
+export type ImageInputProps = {
   handleSuccess: (fileName: string, file: File, type?: OverlayImageTypes) => void;
   handleError: (errorType?: ImageInputErrorTypes) => void;
   variant?: 'unstyle' | 'chakra';

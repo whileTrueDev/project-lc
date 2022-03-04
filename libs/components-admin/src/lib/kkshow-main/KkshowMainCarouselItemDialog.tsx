@@ -38,6 +38,32 @@ import { s3 } from '@project-lc/utils-s3';
 import { LiveShoppingWithGoods, useAdminLiveShoppingList } from '@project-lc/hooks';
 import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
 
+/** 크크쇼메인데이터 중 라이브방송정보(라이브방송,판매상품,방송인) 조회하기 위한 autocomplete컴포넌트 */
+export function LiveShoppingListAutoComplete({
+  onChange,
+}: {
+  onChange: (item: LiveShoppingWithGoods | null) => void;
+}): JSX.Element {
+  const { data: liveShoppingList } = useAdminLiveShoppingList({
+    enabled: true,
+  });
+  return (
+    <ChakraAutoComplete
+      options={
+        liveShoppingList
+          ? liveShoppingList.filter((l) =>
+              ['adjusting', 'confirmed'].includes(l.progress),
+            )
+          : []
+      }
+      getOptionLabel={(option) => option?.liveShoppingName || ''}
+      onChange={(newItem) => {
+        onChange(newItem || null);
+      }}
+    />
+  );
+}
+
 export function KkshowMainCarouselItemDialog({
   isOpen,
   onClose,
@@ -47,9 +73,6 @@ export function KkshowMainCarouselItemDialog({
   onClose: () => void;
   createCallback: (data: KkshowMainCarouselItem) => void;
 }): JSX.Element {
-  const { data: liveShoppingList } = useAdminLiveShoppingList({
-    enabled: true,
-  });
   const [selectedLiveShopping, setSelectedLiveShopping] =
     useState<LiveShoppingWithGoods | null>(null);
   const [imagePreview, setImagePreview] = useState<Omit<Preview, 'id'> | null>(null);
@@ -262,22 +285,10 @@ export function KkshowMainCarouselItemDialog({
     return (
       <Box>
         <Text>라이브 방송 정보 선택</Text>
-        <ChakraAutoComplete
-          options={
-            liveShoppingList
-              ? liveShoppingList.filter((l) =>
-                  ['adjusting', 'confirmed'].includes(l.progress),
-                )
-              : []
-          }
-          getOptionLabel={(option) => option?.liveShoppingName || ''}
-          onChange={(newItem) => {
-            setSelectedLiveShopping(newItem || null);
-          }}
-        />
+        <LiveShoppingListAutoComplete onChange={setSelectedLiveShopping} />
       </Box>
     );
-  }, [liveShoppingList]);
+  }, []);
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="4xl">
       <ModalOverlay />
