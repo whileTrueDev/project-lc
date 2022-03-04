@@ -61,10 +61,10 @@ export function ShopNameDialog(props: ShopNameDialogType): JSX.Element {
     }
   }, [data, onOpen, autoCheck]);
 
-  function useClose(): void {
+  const useClose = (): void => {
     reset();
     onClose();
-  }
+  };
 
   const mutation = useShopInfoMutation();
   async function useSubmit(submitData: SellerShopInfoDto): Promise<void> {

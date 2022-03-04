@@ -5,9 +5,9 @@ import { useRouter } from 'next/router';
 
 export function Custom404(): JSX.Element {
   const router = useRouter();
-  function toHome(): void {
+  const toHome = (): void => {
     router.push('/');
-  }
+  };
 
   // 로그인 상태가 아닌경우 방송인 현황판 닫기 이펙트
   useCloseLiveShoppingStateBoardIfNotLoggedIn();

@@ -55,6 +55,7 @@
         "class-methods-use-this": "off",
         "no-underscore-dangle": 0,
         "no-shadow": "off",
+        "import/newline-after-import": "error",
         "import/extensions": [
           "error",
           "ignorePackages",
