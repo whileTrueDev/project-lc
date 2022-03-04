@@ -1,13 +1,27 @@
-import { Button, Divider, Spinner, Stack, Text } from '@chakra-ui/react';
+import {
+  Button,
+  Spinner,
+  Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+} from '@chakra-ui/react';
 import { useAdminKkshowMainMutation, useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainResData } from '@project-lc/shared-types';
 import { kkshowDataToDto, kkshowMainJsonToResType } from '@project-lc/utils';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import AdminKkshowMainCarouselSection from './AdminKkshowMainCarouselSection';
 import AdminKkshowMainPreviewSection from './AdminKkshowMainPreviewSection';
 
 export function AdminKkshowMain(): JSX.Element {
+  const [tabIndex, setTabIndex] = useState<number>(0);
+  const handleTabChange = (index: number): void => {
+    setTabIndex(index);
+  };
   const { data: kkshowMainData, isLoading, isError, error } = useKkshowMain();
 
   const methods = useForm<KkshowMainResData>();
@@ -68,10 +82,24 @@ export function AdminKkshowMain(): JSX.Element {
         </Text>
         {saveButton}
 
-        <Divider variant="dashed" />
-        <AdminKkshowMainCarouselSection />
-        <Divider variant="dashed" />
-        <AdminKkshowMainPreviewSection />
+        <Tabs index={tabIndex} onChange={handleTabChange}>
+          <TabList>
+            <Tab>캐러셀</Tab>
+            <Tab>라이브예고</Tab>
+            <Tab>베스트 라이브</Tab>
+            <Tab>베스트 방송인</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <AdminKkshowMainCarouselSection />
+            </TabPanel>
+            <TabPanel>
+              <AdminKkshowMainPreviewSection />
+            </TabPanel>
+            <TabPanel>베스트 라이브 섹션</TabPanel>
+            <TabPanel>베스트 방송인 섹션</TabPanel>
+          </TabPanels>
+        </Tabs>
 
         {saveButton}
       </Stack>
