@@ -37,7 +37,7 @@ export function AdminKkshowMainCarouselSection(): JSX.Element {
         </Stack>
       </Stack>
 
-      <Stack>
+      <Stack px={4}>
         {fields.map((field, index) => {
           return (
             <Stack key={field.id} w="100%" maxH="200px">
