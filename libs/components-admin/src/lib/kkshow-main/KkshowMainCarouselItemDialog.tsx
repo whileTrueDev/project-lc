@@ -172,6 +172,25 @@ export function KkshowMainCarouselItemDialog({
       });
     }
 
+    if (currentTab === 'previous') {
+      if (!selectedLiveShopping || !normalPriceRef.current || !discountPriceRef.current)
+        return;
+
+      createCallback({
+        type: 'previous',
+        videoUrl: selectedLiveShopping.liveShoppingVideo?.youtubeUrl,
+        productName: selectedLiveShopping.liveShoppingName || '',
+        productImageUrl: selectedLiveShopping.goods.image[0].image,
+        normalPrice: Number(normalPriceRef.current.value),
+        discountedPrice: Number(discountPriceRef.current.value),
+        productLinkUrl: `https://k-kmarket.com/goods/view?no=${selectedLiveShopping.fmGoodsSeq}`,
+        profileImageUrl: selectedLiveShopping.broadcaster.avatar || '',
+        broadcasterNickname: selectedLiveShopping.broadcaster.userNickname,
+        promotionPageLinkUrl:
+          selectedLiveShopping.broadcaster.BroadcasterPromotionPage?.url || '',
+      });
+    }
+
     handleClose();
   };
 
@@ -356,7 +375,31 @@ export function KkshowMainCarouselItemDialog({
                   </Box>
                 </Stack>
               </TabPanel>
-              <TabPanel>이전라이브</TabPanel>
+              <TabPanel>
+                <Stack>
+                  <Text>
+                    이전라이브 - 진행했던 라이브쇼핑을 선택하여 유튜브 동영상을 표시합니다
+                  </Text>
+                  {liveShoppingAutocomplete}
+                  <Divider />
+                  {selectedLiveShopping && (
+                    <Box>
+                      {broadcasterAndProductInfo}
+                      {selectedLiveShopping?.liveShoppingVideo?.youtubeUrl ? (
+                        <Text>
+                          등록한 영상 URL :{' '}
+                          {selectedLiveShopping?.liveShoppingVideo?.youtubeUrl}
+                        </Text>
+                      ) : (
+                        <Text>
+                          등록된 영상 URL이 없습니다. 라이브 쇼핑 목록 탭에서 해당
+                          라이브쇼핑에 대한 유튜브 영상 url을 등록해주세요
+                        </Text>
+                      )}
+                    </Box>
+                  )}
+                </Stack>
+              </TabPanel>
             </TabPanels>
           </Tabs>
         </ModalBody>

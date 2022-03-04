@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { KkshowMainCarouselItem } from '@project-lc/shared-types';
 import { getAdminHost } from '@project-lc/utils';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 export function AdminKkshowMainCarouselItemView({
@@ -22,6 +22,42 @@ export function AdminKkshowMainCarouselItemView({
 }): JSX.Element {
   const { type } = item;
   const { register, watch } = useFormContext();
+
+  const productInfo = useMemo(() => {
+    return (
+      <>
+        <Box>
+          <Text>상품링크</Text>
+          <Input {...register(`carousel.${index}.productLinkUrl` as const)} size="sm" />
+        </Box>
+        <Box>
+          <Text>상품명</Text>
+          <Input {...register(`carousel.${index}.productName` as const)} size="sm" />
+        </Box>
+        <Box>
+          <Text>기존가격</Text>
+          <Input
+            type="number"
+            {...register(`carousel.${index}.normalPrice` as const, {
+              valueAsNumber: true,
+            })}
+            size="sm"
+          />
+        </Box>
+        <Box>
+          <Text>할인가격</Text>
+          <Input
+            type="number"
+            color="red"
+            {...register(`carousel.${index}.discountedPrice` as const, {
+              valueAsNumber: true,
+            })}
+            size="sm"
+          />
+        </Box>
+      </>
+    );
+  }, [index, register]);
 
   switch (type) {
     case 'simpleBanner':
@@ -51,38 +87,7 @@ export function AdminKkshowMainCarouselItemView({
             {item.productImageUrl && (
               <ProductImage productImageUrl={item.productImageUrl} />
             )}
-            <Box>
-              <Text>상품링크</Text>
-              <Input
-                {...register(`carousel.${index}.productLinkUrl` as const)}
-                size="sm"
-              />
-            </Box>
-            <Box>
-              <Text>상품명</Text>
-              <Input {...register(`carousel.${index}.productName` as const)} size="sm" />
-            </Box>
-            <Box>
-              <Text>기존가격</Text>
-              <Input
-                type="number"
-                {...register(`carousel.${index}.normalPrice` as const, {
-                  valueAsNumber: true,
-                })}
-                size="sm"
-              />
-            </Box>
-            <Box>
-              <Text>할인가격</Text>
-              <Input
-                type="number"
-                color="red"
-                {...register(`carousel.${index}.discountedPrice` as const, {
-                  valueAsNumber: true,
-                })}
-                size="sm"
-              />
-            </Box>
+            {productInfo}
           </Stack>
         </>
       );
@@ -128,38 +133,7 @@ export function AdminKkshowMainCarouselItemView({
             {item.productImageUrl && (
               <ProductImage productImageUrl={item.productImageUrl} />
             )}
-            <Box>
-              <Text>상품링크</Text>
-              <Input
-                {...register(`carousel.${index}.productLinkUrl` as const)}
-                size="sm"
-              />
-            </Box>
-            <Box>
-              <Text>상품명</Text>
-              <Input {...register(`carousel.${index}.productName` as const)} size="sm" />
-            </Box>
-            <Box>
-              <Text>기존가격</Text>
-              <Input
-                type="number"
-                {...register(`carousel.${index}.normalPrice` as const, {
-                  valueAsNumber: true,
-                })}
-                size="sm"
-              />
-            </Box>
-            <Box>
-              <Text>할인가격</Text>
-              <Input
-                type="number"
-                color="red"
-                {...register(`carousel.${index}.discountedPrice` as const, {
-                  valueAsNumber: true,
-                })}
-                size="sm"
-              />
-            </Box>
+            {productInfo}
           </Stack>
         </>
       );
@@ -167,7 +141,20 @@ export function AdminKkshowMainCarouselItemView({
       return (
         <>
           <Text fontWeight="bold">이전라이브</Text>
-          <VideoImbed videoUrl={`https://www.youtube.com/embed/${item.videoUrl}`} />
+          <VideoImbed
+            videoUrl={`https://www.youtube.com/embed/${item.videoUrl.replace(
+              'https://youtu.be/',
+              '',
+            )}`}
+          />
+          <Stack direction="row">
+            <BroadcasterProfile profileImageUrl={item.profileImageUrl} />
+
+            {item.productImageUrl && (
+              <ProductImage productImageUrl={item.productImageUrl} />
+            )}
+            {productInfo}
+          </Stack>
         </>
       );
 
@@ -208,7 +195,7 @@ export function BroadcasterProfile({
 }): JSX.Element {
   return (
     <Box>
-      <Text>방송인 프로필 이미지</Text>
+      <Text>방송인</Text>
       <Avatar src={profileImageUrl} />
     </Box>
   );
@@ -221,7 +208,7 @@ export function ProductImage({
 }): JSX.Element {
   return (
     <Box>
-      <Text>상품이미지</Text>
+      <Text>상품</Text>
       <img src={productImageUrl} alt="" width="50" height="50" />
     </Box>
   );
