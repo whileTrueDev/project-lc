@@ -14,6 +14,7 @@ export interface SimpleBannerItem extends KkshowMainCarouselItemBase, Image {
 // 라이브예고 아이템 : 이미지url + 상품정보(상품링크) + 방송인정보
 export interface UpComingLiveItem
   extends KkshowMainCarouselItemBase,
+    LiveShoppingInfo,
     Image,
     Partial<ProductInfo>,
     BroadcasterInfo {
@@ -23,6 +24,7 @@ export interface UpComingLiveItem
 // 현재라이브 아이템: 플랫폼 + 영상url + 상품정보(상품링크) + 방송인정보
 export interface NowPlayingLiveItem
   extends KkshowMainCarouselItemBase,
+    LiveShoppingInfo,
     Video,
     ProductInfo,
     BroadcasterInfo {
@@ -33,6 +35,7 @@ export interface NowPlayingLiveItem
 // 이전라이브 아이템: 영상url + 상품정보(상품링크) + 방송인정보
 export interface PreviousLiveItem
   extends KkshowMainCarouselItemBase,
+    LiveShoppingInfo,
     Video,
     Partial<ProductInfo>,
     BroadcasterInfo {
@@ -57,6 +60,10 @@ interface ProductInfo {
   normalPrice: number;
   discountedPrice: number;
   productLinkUrl: string;
+}
+
+interface LiveShoppingInfo {
+  liveShoppingId: number;
 }
 
 interface Video {

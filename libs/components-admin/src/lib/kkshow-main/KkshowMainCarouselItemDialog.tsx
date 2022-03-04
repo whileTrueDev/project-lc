@@ -165,6 +165,7 @@ export function KkshowMainCarouselItemDialog({
         broadcasterNickname: selectedLiveShopping.broadcaster.userNickname,
         promotionPageLinkUrl:
           selectedLiveShopping.broadcaster.BroadcasterPromotionPage?.url || '',
+        liveShoppingId: selectedLiveShopping.id,
       });
     }
 
@@ -190,6 +191,7 @@ export function KkshowMainCarouselItemDialog({
         broadcasterNickname: selectedLiveShopping.broadcaster.userNickname,
         promotionPageLinkUrl:
           selectedLiveShopping.broadcaster.BroadcasterPromotionPage?.url || '',
+        liveShoppingId: selectedLiveShopping.id,
       });
     }
 
@@ -209,6 +211,7 @@ export function KkshowMainCarouselItemDialog({
         broadcasterNickname: selectedLiveShopping.broadcaster.userNickname,
         promotionPageLinkUrl:
           selectedLiveShopping.broadcaster.BroadcasterPromotionPage?.url || '',
+        liveShoppingId: selectedLiveShopping.id,
       });
     }
 
