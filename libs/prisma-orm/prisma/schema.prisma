@@ -866,3 +866,12 @@ enum PrivacyApproachHistoryActionType {
   download // 다운로드
   view // 조회
 }
+
+model AdminClassChangeHistory {
+  id                 Int       @id @default(autoincrement())
+  adminEmail         String // 접근한 관리자 이메일
+  targetEmail        String // 대상 메일 
+  originalAdminClass AdminType
+  newAdminClass      AdminType
+  createDate         DateTime  @default(now())
+}

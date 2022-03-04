@@ -8,10 +8,11 @@ import {
   useProfile,
   useDeleteAdminUserMutation,
   AdminClassDtoId,
+  useAdminClassChangeHistoryMutation,
 } from '@project-lc/hooks';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { AdminClassBadge } from '@project-lc/components-admin/AdminClassBadge';
 import { useQueryClient } from 'react-query';
+import { AdminClassBadge } from './AdminClassBadge';
 
 // 가입된 모든 관리자 계정
 export function AdminManagerList(): JSX.Element {
@@ -23,15 +24,28 @@ export function AdminManagerList(): JSX.Element {
   const queryClient = useQueryClient();
 
   const { mutateAsync } = useChangeAdminClassMutation();
+  const { mutateAsync: historyMutation } = useAdminClassChangeHistoryMutation();
   const { mutateAsync: deleteMutateAsync } = useDeleteAdminUserMutation();
 
-  async function handleSelectBox(adminClass: AdminType): Promise<void> {
-    mutateAsync({ email: profile?.email || '', adminClass }).then(() => {
-      queryClient.invalidateQueries('getAdminManagerList');
-      toast({
-        title: '변경완료',
-      });
-    });
+  async function handleSelectBox(
+    targetEmail: string,
+    originalAdminClass: AdminType,
+    newAdminClass: AdminType,
+  ): Promise<void> {
+    mutateAsync({ email: targetEmail || '', adminClass: newAdminClass }).then(
+      async () => {
+        historyMutation({
+          adminEmail: profile ? profile.email : '',
+          targetEmail,
+          originalAdminClass,
+          newAdminClass,
+        });
+        queryClient.invalidateQueries('getAdminManagerList');
+        toast({
+          title: '변경완료',
+        });
+      },
+    );
   }
 
   async function handleDeleteButton(userId: AdminClassDtoId): Promise<void> {
@@ -64,8 +78,8 @@ export function AdminManagerList(): JSX.Element {
             size="sm"
             onChange={(e) => {
               if (e.target.value) {
-                const value = e.target.value as AdminType;
-                handleSelectBox(value);
+                const toBe = e.target.value as AdminType;
+                handleSelectBox(row.email, row.adminClass, toBe);
               }
             }}
             disabled={profile?.id === row.id}

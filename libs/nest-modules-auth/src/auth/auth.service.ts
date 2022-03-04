@@ -145,13 +145,13 @@ export class AuthService {
         name: _user.userName,
         type,
         hasPassword,
-        adminClass: type === 'admin' ? _user.adminClass : null,
       };
     }
     return {
       ..._user,
       type,
       hasPassword,
+      adminClass: type === 'admin' ? (_user as Administrator).adminClass : null,
     };
   }
 }

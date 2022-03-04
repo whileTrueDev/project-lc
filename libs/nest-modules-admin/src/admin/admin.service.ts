@@ -3,7 +3,12 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { Administrator, GoodsConfirmation, LiveShopping } from '@prisma/client';
+import {
+  Administrator,
+  GoodsConfirmation,
+  LiveShopping,
+  AdminClassChangeHistory,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsByIdRes,
@@ -403,5 +408,16 @@ export class AdminService {
     });
     if (doDelete) return true;
     return false;
+  }
+
+  public async createAdminClassChangeHistory(dto): Promise<AdminClassChangeHistory> {
+    return this.prisma.adminClassChangeHistory.create({
+      data: {
+        adminEmail: dto.adminEmail,
+        targetEmail: dto.targetEmail,
+        originalAdminClass: dto.originalAdminClass,
+        newAdminClass: dto.newAdminClass,
+      },
+    });
   }
 }

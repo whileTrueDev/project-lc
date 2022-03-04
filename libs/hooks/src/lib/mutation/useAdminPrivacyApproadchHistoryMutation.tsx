@@ -1,29 +1,18 @@
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult } from 'react-query';
-import {
-  PrivacyApproachHistory,
-  PrivacyApproachHistoryActionType,
-  PrivacyApproachHistoryInfoType,
-} from '@prisma/client';
+import { PrivacyApproachHistory } from '@prisma/client';
+import { PrivacyApproachHistoryDto } from '@project-lc/shared-types';
 import axios from '../../axios';
-
-export type CreateAdminPrivacyApproachHistoryType = {
-  infoType: PrivacyApproachHistoryInfoType;
-  actionType: PrivacyApproachHistoryActionType;
-};
 
 export const useAdminPrivacyApproachHistoryMutation = (): UseMutationResult<
   PrivacyApproachHistory,
   AxiosError,
-  CreateAdminPrivacyApproachHistoryType
+  PrivacyApproachHistoryDto
 > => {
-  return useMutation<
-    PrivacyApproachHistory,
-    AxiosError,
-    CreateAdminPrivacyApproachHistoryType
-  >((dto: CreateAdminPrivacyApproachHistoryType) =>
-    axios
-      .post<PrivacyApproachHistory>('/admin/privacy-approach-history', dto)
-      .then((res) => res.data),
+  return useMutation<PrivacyApproachHistory, AxiosError, PrivacyApproachHistoryDto>(
+    (dto: PrivacyApproachHistoryDto) =>
+      axios
+        .post<PrivacyApproachHistory>('/admin/privacy-approach-history', dto)
+        .then((res) => res.data),
   );
 };

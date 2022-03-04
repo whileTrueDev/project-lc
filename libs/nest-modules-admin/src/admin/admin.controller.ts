@@ -23,6 +23,7 @@ import {
   GoodsConfirmation,
   LiveShopping,
   PrivacyApproachHistory,
+  AdminClassChangeHistory,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -57,6 +58,8 @@ import {
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
   AdminClassDto,
+  PrivacyApproachHistoryDto,
+  AdminClassChangeHistoryDtoWithoutId,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
@@ -309,9 +312,17 @@ export class AdminController {
   @Post('privacy-approach-history')
   async createPrivacyApproachHistory(
     @Req() req: Request,
-    @Body() dto,
+    @Body() dto: PrivacyApproachHistoryDto,
   ): Promise<PrivacyApproachHistory> {
     return this.adminPrivacyApproachSevice.createPrivacyApproachHistory(req, dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('class-change-history')
+  async createClassChangeHistory(
+    @Body() dto: AdminClassChangeHistoryDtoWithoutId,
+  ): Promise<AdminClassChangeHistory> {
+    return this.adminService.createAdminClassChangeHistory(dto);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
