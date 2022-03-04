@@ -12,8 +12,9 @@ import {
 import { useAdminKkshowMainMutation, useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainResData } from '@project-lc/shared-types';
 import { kkshowDataToDto, kkshowMainJsonToResType } from '@project-lc/utils';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import AdminKkshowMainBestLiveSection from './AdminKkshowMainBestLiveSection';
 import AdminKkshowMainCarouselSection from './AdminKkshowMainCarouselSection';
 import AdminKkshowMainPreviewSection from './AdminKkshowMainPreviewSection';
 
@@ -26,15 +27,17 @@ export function AdminKkshowMain(): JSX.Element {
 
   const methods = useForm<KkshowMainResData>();
 
-  useEffect(() => {
+  const restoreData = useCallback(() => {
     if (!kkshowMainData) return;
     // kkshowMainData는 json 형태이므로 타입 명시되어있는 defaultValue로 설정하려면 타입 변경 필요
     const obj = kkshowMainJsonToResType(kkshowMainData);
-    methods.setValue('carousel', obj.carousel);
-    methods.setValue('trailer', obj.trailer);
-    methods.setValue('bestLive', obj.bestLive);
-    methods.setValue('bestBroadcaster', obj.bestBroadcaster);
+    methods.reset(obj);
   }, [kkshowMainData, methods]);
+
+  useEffect(() => {
+    if (!kkshowMainData) return;
+    restoreData();
+  }, [kkshowMainData, restoreData]);
 
   const postRequest = useAdminKkshowMainMutation();
   const onSubmit = (data: KkshowMainResData): void => {
@@ -44,7 +47,6 @@ export function AdminKkshowMain(): JSX.Element {
     postRequest
       .mutateAsync(dto)
       .then((res) => {
-        console.log(res);
         methods.reset(data); // 저장 후 리셋하여 isDirty값을 false로 되돌림
       })
       .catch((e) => console.error(e));
@@ -81,6 +83,9 @@ export function AdminKkshowMain(): JSX.Element {
           눌러주세요!
         </Text>
         {saveButton}
+        <Button disabled={!kkshowMainData} onClick={restoreData}>
+          저장하지 않은 수정사항 모두 되돌리기
+        </Button>
 
         <Tabs index={tabIndex} onChange={handleTabChange}>
           <TabList>
@@ -96,7 +101,9 @@ export function AdminKkshowMain(): JSX.Element {
             <TabPanel>
               <AdminKkshowMainPreviewSection />
             </TabPanel>
-            <TabPanel>베스트 라이브 섹션</TabPanel>
+            <TabPanel>
+              <AdminKkshowMainBestLiveSection />
+            </TabPanel>
             <TabPanel>베스트 방송인 섹션</TabPanel>
           </TabPanels>
         </Tabs>
