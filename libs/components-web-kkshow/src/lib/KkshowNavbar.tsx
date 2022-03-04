@@ -1,6 +1,7 @@
-import { Box, Flex, Image, Link, Stack } from '@chakra-ui/react';
+import { Box, Flex, Link, Stack } from '@chakra-ui/react';
 import { kkshowNavLinks, NavItem } from '@project-lc/components-constants/navigation';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
+import { KksLogo } from '@project-lc/components-shared/KksLogo';
 import NextLink from 'next/link';
 
 export function KkshowNavbar(): JSX.Element {
@@ -27,7 +28,7 @@ export function KkshowNavbar(): JSX.Element {
         <Box>
           <NextLink href="/" passHref>
             <Link>
-              <Image src="images/logo/white-kkshow-logo.png" h={{ base: 30, md: 50 }} />
+              <KksLogo variant="white" h={{ base: 30, md: 50 }} />
             </Link>
           </NextLink>
         </Box>
