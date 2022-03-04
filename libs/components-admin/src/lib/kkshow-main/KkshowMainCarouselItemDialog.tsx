@@ -18,6 +18,9 @@ import {
   Avatar,
   Stack,
   Divider,
+  RadioGroup,
+  HStack,
+  Radio,
 } from '@chakra-ui/react';
 import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
 import {
@@ -27,8 +30,9 @@ import {
 import {
   KkshowMainCarouselItem,
   KkshowMainCarouselItemType,
+  LivePlatform,
 } from '@project-lc/shared-types';
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import path from 'path';
 import { s3 } from '@project-lc/utils-s3';
 import { LiveShoppingWithGoods, useAdminLiveShoppingList } from '@project-lc/hooks';
@@ -49,9 +53,11 @@ export function KkshowMainCarouselItemDialog({
   const [selectedLiveShopping, setSelectedLiveShopping] =
     useState<LiveShoppingWithGoods | null>(null);
   const [imagePreview, setImagePreview] = useState<Omit<Preview, 'id'> | null>(null);
+  const [platform, setPlatform] = useState<LivePlatform>('twitch');
   const linkUrlRef = useRef<HTMLInputElement>(null);
   const normalPriceRef = useRef<HTMLInputElement>(null);
   const discountPriceRef = useRef<HTMLInputElement>(null);
+  const videoUrlRef = useRef<HTMLInputElement>(null);
   const tabList = useRef<{ key: KkshowMainCarouselItemType; label: string }[]>([
     { key: 'simpleBanner', label: '이미지배너' },
     { key: 'upcoming', label: '라이브예고' },
@@ -141,8 +147,118 @@ export function KkshowMainCarouselItemDialog({
       });
     }
 
+    if (currentTab === 'nowPlaying') {
+      if (
+        !selectedLiveShopping ||
+        !normalPriceRef.current ||
+        !discountPriceRef.current ||
+        !videoUrlRef.current
+      )
+        return;
+
+      createCallback({
+        type: 'nowPlaying',
+        platform,
+        videoUrl: videoUrlRef.current.value,
+        productName: selectedLiveShopping.liveShoppingName || '',
+        productImageUrl: selectedLiveShopping.goods.image[0].image,
+        normalPrice: Number(normalPriceRef.current.value),
+        discountedPrice: Number(discountPriceRef.current.value),
+        productLinkUrl: `https://k-kmarket.com/goods/view?no=${selectedLiveShopping.fmGoodsSeq}`,
+        profileImageUrl: selectedLiveShopping.broadcaster.avatar || '',
+        broadcasterNickname: selectedLiveShopping.broadcaster.userNickname,
+        promotionPageLinkUrl:
+          selectedLiveShopping.broadcaster.BroadcasterPromotionPage?.url || '',
+      });
+    }
+
     handleClose();
   };
+
+  const imagePreviewComponent = useMemo(() => {
+    return (
+      <>
+        <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
+        {imagePreview && (
+          <img src={imagePreview.url as string} alt={imagePreview.filename} />
+        )}
+      </>
+    );
+  }, [imagePreview]);
+
+  const broadcasterAndProductInfo = useMemo(() => {
+    return (
+      selectedLiveShopping && (
+        <Stack direction="row" spacing={8}>
+          <Stack>
+            <Text>방송인</Text>
+            <Avatar
+              src={selectedLiveShopping.broadcaster.avatar || ''}
+              name={selectedLiveShopping.broadcaster.userNickname}
+            />
+          </Stack>
+          <Stack>
+            <Text>라이브 쇼핑 제목</Text>
+            <Text>{selectedLiveShopping.liveShoppingName}</Text>
+          </Stack>
+          <Stack>
+            <Text>상품 사진</Text>
+            <img
+              width="50"
+              height="50"
+              src={selectedLiveShopping.goods.image[0].image}
+              alt="상품이미지"
+            />
+          </Stack>
+          <Stack>
+            <Text>가격</Text>
+            <Stack direction="row">
+              <Text>원가</Text>
+              <Input
+                ref={normalPriceRef}
+                type="number"
+                width="100px"
+                defaultValue={Number(selectedLiveShopping.goods.options[0].price)}
+              />
+            </Stack>
+            <Stack direction="row">
+              <Text>할인가</Text>
+              <Input
+                ref={discountPriceRef}
+                type="number"
+                width="100px"
+                color="red"
+                defaultValue={Number(
+                  selectedLiveShopping.goods.options[0].consumer_price,
+                )}
+              />
+            </Stack>
+          </Stack>
+        </Stack>
+      )
+    );
+  }, [selectedLiveShopping]);
+
+  const liveShoppingAutocomplete = useMemo(() => {
+    return (
+      <Box>
+        <Text>라이브 방송 정보 선택</Text>
+        <ChakraAutoComplete
+          options={
+            liveShoppingList
+              ? liveShoppingList.filter((l) =>
+                  ['adjusting', 'confirmed'].includes(l.progress),
+                )
+              : []
+          }
+          getOptionLabel={(option) => option?.liveShoppingName || ''}
+          onChange={(newItem) => {
+            setSelectedLiveShopping(newItem || null);
+          }}
+        />
+      </Box>
+    );
+  }, [liveShoppingList]);
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="4xl">
       <ModalOverlay />
@@ -157,99 +273,89 @@ export function KkshowMainCarouselItemDialog({
               ))}
             </TabList>
             <TabPanels>
+              {/* 이미지배너 */}
               <TabPanel>
-                이미지배너
-                <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
-                {imagePreview && (
-                  <img src={imagePreview.url as string} alt={imagePreview.filename} />
-                )}
-                <Text>링크</Text>
+                <Text>
+                  이미지배너 - 캐러셀에 표시될 이미지와 클릭하여 이동할 링크를 등록합니다.
+                </Text>
+
+                {imagePreviewComponent}
+                <Text>연결할 링크</Text>
                 <Input ref={linkUrlRef} />
               </TabPanel>
+
+              {/* 라이브예고 */}
               <TabPanel>
-                라이브예고
-                <ChakraAutoComplete
-                  options={
-                    liveShoppingList
-                      ? liveShoppingList.filter((l) =>
-                          ['adjusting', 'confirmed'].includes(l.progress),
-                        )
-                      : []
-                  }
-                  getOptionLabel={(option) => option?.liveShoppingName || ''}
-                  onChange={(newItem) => {
-                    setSelectedLiveShopping(newItem || null);
-                  }}
-                />
+                <Text>
+                  라이브예고 - 진행 예정인 라이브쇼핑을 선택하여 홍보이미지를 등록합니다.
+                </Text>
+                {liveShoppingAutocomplete}
                 {selectedLiveShopping && (
                   <Stack mt={4}>
                     <Divider />
                     <Box>
                       <Text>라이브쇼핑 홍보용 이미지 등록</Text>
-                      <ImageInput
-                        handleSuccess={handleSuccess}
-                        handleError={handleError}
-                      />
-                      {imagePreview && (
-                        <img
-                          src={imagePreview.url as string}
-                          alt={imagePreview.filename}
-                        />
-                      )}
+                      {imagePreviewComponent}
                     </Box>
                     <Divider />
-                    <Stack direction="row" spacing={8}>
-                      <Stack>
-                        <Text>방송인</Text>
-                        <Avatar
-                          src={selectedLiveShopping.broadcaster.avatar || ''}
-                          name={selectedLiveShopping.broadcaster.userNickname}
-                        />
-                      </Stack>
-                      <Stack>
-                        <Text>라이브 쇼핑 제목</Text>
-                        <Text>{selectedLiveShopping.liveShoppingName}</Text>
-                      </Stack>
-                      <Stack>
-                        <Text>상품 사진</Text>
-                        <img
-                          width="50"
-                          height="50"
-                          src={selectedLiveShopping.goods.image[0].image}
-                          alt="상품이미지"
-                        />
-                      </Stack>
-                      <Stack>
-                        <Text>가격</Text>
-                        <Stack direction="row">
-                          <Text>원가</Text>
-                          <Input
-                            ref={normalPriceRef}
-                            type="number"
-                            width="100px"
-                            defaultValue={Number(
-                              selectedLiveShopping.goods.options[0].price,
-                            )}
-                          />
-                        </Stack>
-                        <Stack direction="row">
-                          <Text>할인가</Text>
-                          <Input
-                            ref={discountPriceRef}
-                            type="number"
-                            width="100px"
-                            color="red"
-                            defaultValue={Number(
-                              selectedLiveShopping.goods.options[0].consumer_price,
-                            )}
-                          />
-                        </Stack>
-                      </Stack>
-                    </Stack>
+                    {broadcasterAndProductInfo}
                   </Stack>
                 )}
               </TabPanel>
-              <TabPanel>현재라이브</TabPanel>
+              <TabPanel>
+                <Text>현재라이브 - 라이브커머스 진행중인 영상 임베드용</Text>
+                <Stack mt={4}>
+                  {liveShoppingAutocomplete}
+
+                  {selectedLiveShopping && <Box>{broadcasterAndProductInfo}</Box>}
+                  <Divider />
+                  <Box>
+                    <Text>라이브 송출 플랫폼</Text>
+                    <RadioGroup
+                      mb={1}
+                      value={platform}
+                      onChange={(value) => setPlatform(value as LivePlatform)}
+                    >
+                      <HStack>
+                        <Radio value="twitch">트위치</Radio>
+                        <Radio value="youtube">유튜브</Radio>
+                      </HStack>
+                    </RadioGroup>
+                  </Box>
+                  <Divider />
+                  <Box>
+                    <Text>동영상 코드</Text>
+                    {platform === 'twitch' && (
+                      <Text>
+                        www.twitch.tv/
+                        <Text as="span" color="red">
+                          chodan_
+                        </Text>
+                        에서{' '}
+                        <Text as="span" color="red">
+                          chodan_
+                        </Text>{' '}
+                        부분만 입력
+                      </Text>
+                    )}
+                    {platform === 'youtube' && (
+                      <Text>
+                        https://youtu.be/
+                        <Text as="span" color="red">
+                          cseb1WG15ZA
+                        </Text>
+                        에서{' '}
+                        <Text as="span" color="red">
+                          cseb1WG15ZA
+                        </Text>{' '}
+                        부분만 입력
+                      </Text>
+                    )}
+
+                    <Input ref={videoUrlRef} />
+                  </Box>
+                </Stack>
+              </TabPanel>
               <TabPanel>이전라이브</TabPanel>
             </TabPanels>
           </Tabs>

@@ -125,11 +125,38 @@ export function AdminKkshowMainCarouselItemView({
           <Stack direction="row">
             <BroadcasterProfile profileImageUrl={item.profileImageUrl} />
 
-            <ProductImage productImageUrl={item.productImageUrl} />
+            {item.productImageUrl && (
+              <ProductImage productImageUrl={item.productImageUrl} />
+            )}
             <Box>
               <Text>상품링크</Text>
               <Input
                 {...register(`carousel.${index}.productLinkUrl` as const)}
+                size="sm"
+              />
+            </Box>
+            <Box>
+              <Text>상품명</Text>
+              <Input {...register(`carousel.${index}.productName` as const)} size="sm" />
+            </Box>
+            <Box>
+              <Text>기존가격</Text>
+              <Input
+                type="number"
+                {...register(`carousel.${index}.normalPrice` as const, {
+                  valueAsNumber: true,
+                })}
+                size="sm"
+              />
+            </Box>
+            <Box>
+              <Text>할인가격</Text>
+              <Input
+                type="number"
+                color="red"
+                {...register(`carousel.${index}.discountedPrice` as const, {
+                  valueAsNumber: true,
+                })}
                 size="sm"
               />
             </Box>
