@@ -27,13 +27,13 @@ export function SettlementAccountForm(): JSX.Element {
   } = useFormContext<SettlementAccountFormDto>();
 
   // 통장사본 제출
-  function handleSuccess(fileName: string, file: File): void {
+  const handleSuccess = (fileName: string, file: File): void => {
     setValue('settlementAccountImage', file);
     setValue('settlementAccountImageName', fileName);
     clearErrors(['settlementAccountImage', 'settlementAccountImageName']);
-  }
+  };
 
-  function handleError(errorType?: ImageInputErrorTypes): void {
+  const handleError = (errorType?: ImageInputErrorTypes): void => {
     switch (errorType) {
       case 'over-size': {
         setError('settlementAccountImage', {
@@ -56,7 +56,7 @@ export function SettlementAccountForm(): JSX.Element {
         clearErrors(['settlementAccountImage', 'settlementAccountImageName']);
       }
     }
-  }
+  };
 
   return (
     <Grid templateColumns="2fr 3fr" borderTopColor="gray.100" borderTopWidth={1.5}>

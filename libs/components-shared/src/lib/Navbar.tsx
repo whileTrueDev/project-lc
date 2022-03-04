@@ -82,7 +82,7 @@ export function NavbarLinkLogo({ appType }: { appType: UserType }): JSX.Element 
         textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
         color={useColorModeValue('gray.800', 'white')}
       >
-        <KksLogo appType={appType} size="small" />
+        <KksLogo appType={appType} />
       </Link>
     </NextLink>
   );

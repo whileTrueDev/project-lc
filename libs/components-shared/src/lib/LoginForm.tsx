@@ -45,9 +45,9 @@ export function LoginForm({
 
   // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
   const [formError, setFormError] = useState('');
-  function resetFormError(): void {
+  const resetFormError = (): void => {
     setFormError('');
-  }
+  };
 
   // * 로그인 핸들러
   const login = useLoginMutation(userType);

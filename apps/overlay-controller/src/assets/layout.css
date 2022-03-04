@@ -14,9 +14,14 @@ div.dashboard {
   height: 30%;
 }
 
+div.dashborad-inner {
+  display: flex;
+  justify-content: space-around;
+}
+
 div.upper-area {
   display: flex;
-  direction: row;
+  flex-direction: row;
 }
 
 div.mid-area {
@@ -193,16 +198,15 @@ label {
   top: 20px;
 }
 
-
 .admin-to-bc-live-state-board__send-button {
-  background-color: lightblue;
+  background-color: #45a049;
 }
 .admin-to-bc-live-state-board__delete-button {
-  background-color: rosybrown;
+  background-color: red;
 }
 .admin-to-bc-live-state-board__alert-button {
-  background-color: sandybrown;
+  background-color: blue;
 }
-.admin-to-bc-live-state-board__displaying-message{
+.admin-to-bc-live-state-board__displaying-message {
   font-weight: bold;
 }
