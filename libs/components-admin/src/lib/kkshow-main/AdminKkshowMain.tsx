@@ -1,10 +1,11 @@
-import { Box, Button, Divider, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Button, Divider, Spinner, Stack, Text } from '@chakra-ui/react';
 import { useAdminKkshowMainMutation, useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainResData } from '@project-lc/shared-types';
 import { kkshowDataToDto, kkshowMainJsonToResType } from '@project-lc/utils';
 import { useEffect, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import AdminKkshowMainCarouselSection from './AdminKkshowMainCarouselData';
+import AdminKkshowMainCarouselSection from './AdminKkshowMainCarouselSection';
+import AdminKkshowMainPreviewSection from './AdminKkshowMainPreviewSection';
 
 export function AdminKkshowMain(): JSX.Element {
   const { data: kkshowMainData, isLoading, isError, error } = useKkshowMain();
@@ -70,6 +71,7 @@ export function AdminKkshowMain(): JSX.Element {
         <Divider variant="dashed" />
         <AdminKkshowMainCarouselSection />
         <Divider variant="dashed" />
+        <AdminKkshowMainPreviewSection />
 
         {saveButton}
       </Stack>
