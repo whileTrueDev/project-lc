@@ -69,7 +69,7 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
         라이브 예고 영역
       </Text>
 
-      <Grid templateColumns="repeat(3, 1fr)" gap={6} height="450px">
+      <Grid templateColumns="repeat(3, 1fr)" gap={6} minHeight="450px">
         <GridItem height="100%" w="100%">
           <Stack>
             <Text>라이브쇼핑 정보 불러오기</Text>
