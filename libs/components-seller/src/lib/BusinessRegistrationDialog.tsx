@@ -60,10 +60,10 @@ export function BusinessRegistrationDialog(
     reset,
   } = methods;
 
-  function useClose(): void {
+  const useClose = (): void => {
     onClose();
     reset();
-  }
+  };
 
   async function regist(data: BusinessRegistrationFormDto): Promise<void> {
     const {

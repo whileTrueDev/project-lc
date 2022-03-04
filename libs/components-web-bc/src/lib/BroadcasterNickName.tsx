@@ -78,9 +78,9 @@ export function BroadcasterNicknameForm(): JSX.Element {
   const mergedRef = useMergeRefs(registeredNicknameField.ref, inputRef);
 
   const [editMode, setEditMode] = useState(false);
-  function onEditModeToggle(): void {
+  const onEditModeToggle = (): void => {
     setEditMode(!editMode);
-  }
+  };
 
   const isBeginner = useMemo(
     () => !broadcaster.data?.userNickname,

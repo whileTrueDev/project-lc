@@ -16,7 +16,6 @@ export const broadcasterDarkLogo = 'kkshow-broadcaster-darkmode.png';
 
 export interface KksLogoProps {
   appType?: UserType;
-  size?: 'small';
 }
 
 interface GetCorrectLogoOption {

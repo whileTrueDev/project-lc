@@ -70,7 +70,7 @@ export function GuideContractionAgreementSection({
     }
   }, [계약동의여부, completeStep]);
 
-  function onSubmit(): void {
+  const onSubmit = (): void => {
     const onSuccess = (): void => {
       // 성공시
       toast({ title: '약관동의가 완료되었습니다.', status: 'success' });
@@ -107,7 +107,7 @@ export function GuideContractionAgreementSection({
           onError();
         });
     }
-  }
+  };
   if (isLoading) return <Spinner />;
 
   return (
