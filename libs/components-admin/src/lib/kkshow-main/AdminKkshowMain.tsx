@@ -14,6 +14,7 @@ import { KkshowMainResData } from '@project-lc/shared-types';
 import { kkshowDataToDto, kkshowMainJsonToResType } from '@project-lc/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import AdminKkshowMainBestBroadcasterSection from './AdminKkshowMainBestBroadcasterSection';
 import AdminKkshowMainBestLiveSection from './AdminKkshowMainBestLiveSection';
 import AdminKkshowMainCarouselSection from './AdminKkshowMainCarouselSection';
 import AdminKkshowMainPreviewSection from './AdminKkshowMainPreviewSection';
@@ -27,6 +28,7 @@ export function AdminKkshowMain(): JSX.Element {
 
   const methods = useForm<KkshowMainResData>();
 
+  // db에 저장된 데이터 불러오기
   const restoreData = useCallback(() => {
     if (!kkshowMainData) return;
     // kkshowMainData는 json 형태이므로 타입 명시되어있는 defaultValue로 설정하려면 타입 변경 필요
@@ -104,7 +106,9 @@ export function AdminKkshowMain(): JSX.Element {
             <TabPanel>
               <AdminKkshowMainBestLiveSection />
             </TabPanel>
-            <TabPanel>베스트 방송인 섹션</TabPanel>
+            <TabPanel>
+              <AdminKkshowMainBestBroadcasterSection />
+            </TabPanel>
           </TabPanels>
         </Tabs>
 
