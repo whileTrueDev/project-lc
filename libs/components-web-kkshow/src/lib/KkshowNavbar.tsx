@@ -50,7 +50,7 @@ export function KkshowNavbar(): JSX.Element {
               textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
               color={useColorModeValue('gray.800', 'white')}
             >
-              <KksLogo size="small" />
+              <KksLogo />
             </Link>
           </NextLink>
 
