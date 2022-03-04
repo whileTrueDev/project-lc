@@ -2,7 +2,7 @@ import { Box, Button, Divider, Spinner, Stack, Text } from '@chakra-ui/react';
 import { useAdminKkshowMainMutation, useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainResData } from '@project-lc/shared-types';
 import { kkshowDataToDto, kkshowMainJsonToResType } from '@project-lc/utils';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import AdminKkshowMainCarouselSection from './AdminKkshowMainCarouselData';
 
@@ -35,6 +35,25 @@ export function AdminKkshowMain(): JSX.Element {
       .catch((e) => console.error(e));
   };
 
+  const saveButton = useMemo(() => {
+    return (
+      <Stack>
+        <Button
+          width="100%"
+          type="submit"
+          colorScheme={methods.formState.isDirty ? 'red' : 'blue'}
+        >
+          저장
+        </Button>
+        {methods.formState.isDirty && (
+          <Text as="span" color="red">
+            데이터 변경사항이 있습니다. 저장버튼을 눌러주세요!!!!
+          </Text>
+        )}
+      </Stack>
+    );
+  }, [methods.formState.isDirty]);
+
   if (isLoading) return <Spinner />;
   if (isError) return <Text>에러가 발생하였습니다 {JSON.stringify(error)}</Text>;
 
@@ -46,20 +65,13 @@ export function AdminKkshowMain(): JSX.Element {
           캐러셀 아이템 추가하기, 데이터 수정, 삭제 등 작업 후 반드시 저장버튼을
           눌러주세요!
         </Text>
-        <Stack direction="row" spacing={4}>
-          <Button type="submit" colorScheme={methods.formState.isDirty ? 'red' : 'blue'}>
-            저장
-          </Button>
-          {methods.formState.isDirty && (
-            <Text as="span" color="red">
-              데이터 변경사항이 있습니다. 저장버튼을 눌러주세요!!!!
-            </Text>
-          )}
-        </Stack>
+        {saveButton}
 
         <Divider variant="dashed" />
         <AdminKkshowMainCarouselSection />
         <Divider variant="dashed" />
+
+        {saveButton}
       </Stack>
     </FormProvider>
   );

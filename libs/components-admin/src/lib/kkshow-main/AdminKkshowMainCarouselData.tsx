@@ -7,8 +7,8 @@ import { KkshowMainCarouselItemDialog } from './KkshowMainCarouselItemDialog';
 
 export function AdminKkshowMainCarouselSection(): JSX.Element {
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const { control, register } = useFormContext();
-  const { fields, append, remove, swap, move, insert } = useFieldArray({
+  const { control } = useFormContext();
+  const { fields, append, remove, move } = useFieldArray({
     control,
     name: 'carousel' as const,
   });
@@ -17,11 +17,6 @@ export function AdminKkshowMainCarouselSection(): JSX.Element {
     field: Record<'id', string>,
     index: number,
   ): Promise<void> => {
-    // const item = { ...field } as unknown as KkshowMainCarouselItem;
-    // if (item.type === 'simpleBanner') {
-    // TODO: 키 조회 필요
-    // await s3.s3DeleteImages([item.imageUrl]);
-    // }
     remove(index);
   };
   return (
@@ -47,6 +42,12 @@ export function AdminKkshowMainCarouselSection(): JSX.Element {
           return (
             <Stack key={field.id} w="100%" maxH="200px">
               <AdminKkshowMainCarouselItemBoxLayout
+                moveUp={() => {
+                  if (index > 0) move(index, index - 1);
+                }}
+                moveDown={() => {
+                  if (index < fields.length - 1) move(index, index + 1);
+                }}
                 removeHandler={() => itemRemoveHandler(field, index)}
               >
                 <AdminKkshowMainCarouselItemView
@@ -67,14 +68,31 @@ export default AdminKkshowMainCarouselSection;
 export function AdminKkshowMainCarouselItemBoxLayout({
   children,
   removeHandler,
+  moveUp,
+  moveDown,
 }: {
   children: React.ReactNode;
   removeHandler?: () => void;
+  moveUp?: () => void;
+  moveDown?: () => void;
 }): JSX.Element {
   return (
-    <Stack direction="row" border="1px" w="100%" p={1} alignItems="center" mb={1}>
-      {children}
-      <Button onClick={removeHandler}>delete</Button>
+    <Stack
+      direction="row"
+      border="1px"
+      w="100%"
+      p={1}
+      alignItems="center"
+      mb={1}
+      justifyContent="space-between"
+    >
+      <Stack direction="row">{children}</Stack>
+
+      <Stack>
+        <Button onClick={moveUp}>위로</Button>
+        <Button onClick={moveDown}>아래로</Button>
+        <Button onClick={removeHandler}>delete</Button>
+      </Stack>
     </Stack>
   );
 }
