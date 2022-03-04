@@ -19,12 +19,12 @@ import {
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
+import { Preview, readAsDataURL } from '@project-lc/components-core/ImageInputDialog';
 import {
   useDeleteGoodsImageMutation,
   useGoodsImageMutation,
   useProfile,
 } from '@project-lc/hooks';
-import { Preview, readAsDataURL } from '@project-lc/utils';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';

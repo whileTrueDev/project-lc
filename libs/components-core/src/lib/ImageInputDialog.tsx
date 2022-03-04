@@ -11,9 +11,37 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import { FileReaderResultType, readAsDataURL } from '@project-lc/utils';
 import { useState } from 'react';
 import { ImageInput, ImageInputErrorTypes, ImageInputProps } from './ImageInput';
+
+export type FileReaderResultType = string | ArrayBuffer | null;
+
+export type Preview = {
+  id: number;
+  filename: string;
+  url: FileReaderResultType;
+  file: File;
+};
+/** File 데이터를 FileReader.readAsDataUrl로 변환 */
+export function readAsDataURL(file: File): Promise<{
+  data: FileReaderResultType;
+  name: string;
+  size: number;
+  type: string;
+}> {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+    fileReader.onload = function () {
+      return resolve({
+        data: fileReader.result,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+      });
+    };
+    fileReader.readAsDataURL(file);
+  });
+}
 
 export type ImageInputFileReadData = {
   url: FileReaderResultType;
