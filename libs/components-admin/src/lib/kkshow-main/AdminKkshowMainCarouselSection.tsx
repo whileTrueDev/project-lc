@@ -1,24 +1,92 @@
+import { AddIcon } from '@chakra-ui/icons';
 import { Button, Stack, Text, useDisclosure } from '@chakra-ui/react';
-import { KkshowMainCarouselItem } from '@project-lc/shared-types';
+import {
+  KkshowMainCarouselItem,
+  KkshowMainCarouselItemType,
+  KkshowMainResData,
+  ProductAndBroadcasterInfo,
+} from '@project-lc/shared-types';
 import React from 'react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
-import { AdminKkshowMainCarouselItemView } from './AdminKkshowMainCarouselItemView';
+import { FieldArrayWithId, useFieldArray, useFormContext } from 'react-hook-form';
+import {
+  CarouselItemNowPlayingLive,
+  CarouselItemPreviousLive,
+  CarouselItemSimpleBanner,
+  CarouselItemUpcomingLive,
+} from './AdminKkshowMainCarouselItemView';
 import { KkshowMainCarouselItemDialog } from './KkshowMainCarouselItemDialog';
+
+const carouselItemProductAndBroadcasterDefaultValue: ProductAndBroadcasterInfo = {
+  productName: '',
+  productImageUrl: '',
+  normalPrice: 0,
+  discountedPrice: 0,
+  productLinkUrl: '',
+  profileImageUrl: '',
+  broadcasterNickname: '',
+  promotionPageLinkUrl: '',
+  liveShoppingId: null,
+};
+
+const carouselItemAddButtons: {
+  type: KkshowMainCarouselItemType;
+  label: string;
+  defaultValue: KkshowMainCarouselItem;
+}[] = [
+  {
+    type: 'simpleBanner',
+    label: '이미지 배너',
+    defaultValue: {
+      type: 'simpleBanner',
+      linkUrl: '',
+      imageUrl: '',
+    },
+  },
+  {
+    type: 'upcoming',
+    label: '라이브 예고',
+    defaultValue: {
+      type: 'upcoming',
+      imageUrl: '',
+      ...carouselItemProductAndBroadcasterDefaultValue,
+    },
+  },
+  {
+    type: 'nowPlaying',
+    label: '현재 라이브',
+    defaultValue: {
+      type: 'nowPlaying',
+      platform: 'twitch',
+      videoUrl: '',
+      ...carouselItemProductAndBroadcasterDefaultValue,
+    },
+  },
+  {
+    type: 'previous',
+    label: '이전 라이브',
+    defaultValue: {
+      type: 'previous',
+      videoUrl: '',
+      ...carouselItemProductAndBroadcasterDefaultValue,
+    },
+  },
+];
 
 export function AdminKkshowMainCarouselSection(): JSX.Element {
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const { control } = useFormContext();
+  const { control } = useFormContext<KkshowMainResData>();
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: 'carousel' as const,
   });
 
   const itemRemoveHandler = async (
-    field: Record<'id', string>,
+    field: FieldArrayWithId<KkshowMainResData, 'carousel', 'id'>,
     index: number,
   ): Promise<void> => {
     remove(index);
   };
+
   return (
     <Stack>
       <Stack direction="row" alignItems="center">
@@ -27,6 +95,16 @@ export function AdminKkshowMainCarouselSection(): JSX.Element {
         </Text>
         <Stack direction="row">
           <Button onClick={onOpen}>캐러셀 아이템 추가하기</Button>
+          {carouselItemAddButtons.map((button) => (
+            <Button
+              key={button.type}
+              leftIcon={<AddIcon />}
+              onClick={() => append(button.defaultValue)}
+            >
+              {button.label}
+            </Button>
+          ))}
+
           <KkshowMainCarouselItemDialog
             isOpen={isOpen}
             onClose={onClose}
@@ -38,26 +116,36 @@ export function AdminKkshowMainCarouselSection(): JSX.Element {
       </Stack>
 
       <Stack px={4}>
-        {fields.map((field, index) => {
-          return (
-            <Stack key={field.id} w="100%" maxH="200px">
-              <AdminKkshowMainFieldArrayItemContainer
-                moveUp={() => {
-                  if (index > 0) move(index, index - 1);
-                }}
-                moveDown={() => {
-                  if (index < fields.length - 1) move(index, index + 1);
-                }}
-                removeHandler={() => itemRemoveHandler(field, index)}
-              >
-                <AdminKkshowMainCarouselItemView
-                  index={index}
-                  item={field as unknown as KkshowMainCarouselItem}
-                />
-              </AdminKkshowMainFieldArrayItemContainer>
-            </Stack>
-          );
-        })}
+        {fields.map(
+          (field: FieldArrayWithId<KkshowMainResData, 'carousel', 'id'>, index) => {
+            return (
+              <Stack key={field.id} w="100%" maxH="200px">
+                <AdminKkshowMainFieldArrayItemContainer
+                  moveUp={() => {
+                    if (index > 0) move(index, index - 1);
+                  }}
+                  moveDown={() => {
+                    if (index < fields.length - 1) move(index, index + 1);
+                  }}
+                  removeHandler={() => itemRemoveHandler(field, index)}
+                >
+                  {field.type === 'simpleBanner' && (
+                    <CarouselItemSimpleBanner index={index} item={field} />
+                  )}
+                  {field.type === 'upcoming' && (
+                    <CarouselItemUpcomingLive index={index} item={field} />
+                  )}
+                  {field.type === 'nowPlaying' && (
+                    <CarouselItemNowPlayingLive index={index} item={field} />
+                  )}
+                  {field.type === 'previous' && (
+                    <CarouselItemPreviousLive index={index} item={field} />
+                  )}
+                </AdminKkshowMainFieldArrayItemContainer>
+              </Stack>
+            );
+          },
+        )}
       </Stack>
     </Stack>
   );

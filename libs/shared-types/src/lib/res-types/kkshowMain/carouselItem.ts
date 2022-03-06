@@ -1,7 +1,7 @@
 // 크크쇼 메인 캐러셀 아이템 타입
 export type KkshowMainCarouselItem =
   | SimpleBannerItem
-  | UpComingLiveItem
+  | UpcomingLiveItem
   | NowPlayingLiveItem
   | PreviousLiveItem;
 
@@ -12,12 +12,11 @@ export interface SimpleBannerItem extends KkshowMainCarouselItemBase, Image {
 }
 
 // 라이브예고 아이템 : 이미지url + 상품정보(상품링크) + 방송인정보
-export interface UpComingLiveItem
+export interface UpcomingLiveItem
   extends KkshowMainCarouselItemBase,
     LiveShoppingInfo,
     Image,
-    Partial<ProductInfo>,
-    BroadcasterInfo {
+    ProductAndBroadcasterInfo {
   type: 'upcoming';
 }
 
@@ -26,8 +25,7 @@ export interface NowPlayingLiveItem
   extends KkshowMainCarouselItemBase,
     LiveShoppingInfo,
     Video,
-    ProductInfo,
-    BroadcasterInfo {
+    ProductAndBroadcasterInfo {
   type: 'nowPlaying';
   platform: LivePlatform;
 }
@@ -37,8 +35,7 @@ export interface PreviousLiveItem
   extends KkshowMainCarouselItemBase,
     LiveShoppingInfo,
     Video,
-    Partial<ProductInfo>,
-    BroadcasterInfo {
+    ProductAndBroadcasterInfo {
   type: 'previous';
 }
 
@@ -54,6 +51,10 @@ interface KkshowMainCarouselItemBase {
   type: KkshowMainCarouselItemType;
 }
 
+export interface ProductAndBroadcasterInfo
+  extends ProductInfo,
+    BroadcasterInfo,
+    LiveShoppingInfo {}
 interface ProductInfo {
   productName: string;
   productImageUrl: string;
@@ -62,8 +63,14 @@ interface ProductInfo {
   productLinkUrl: string;
 }
 
+interface BroadcasterInfo {
+  profileImageUrl: string;
+  broadcasterNickname: string;
+  promotionPageLinkUrl: string;
+}
+
 interface LiveShoppingInfo {
-  liveShoppingId: number;
+  liveShoppingId: number | null;
 }
 
 interface Video {
@@ -72,10 +79,4 @@ interface Video {
 
 interface Image {
   imageUrl: string;
-}
-
-interface BroadcasterInfo {
-  profileImageUrl: string;
-  broadcasterNickname: string;
-  promotionPageLinkUrl: string;
 }

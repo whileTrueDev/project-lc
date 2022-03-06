@@ -221,7 +221,11 @@ export function KkshowMainCarouselItemDialog({
   const imagePreviewComponent = useMemo(() => {
     return (
       <>
-        <ImageInput handleSuccess={handleSuccess} handleError={handleError} />
+        <ImageInput
+          required={false}
+          handleSuccess={handleSuccess}
+          handleError={handleError}
+        />
         {imagePreview && (
           <img src={imagePreview.url as string} alt={imagePreview.filename} />
         )}
