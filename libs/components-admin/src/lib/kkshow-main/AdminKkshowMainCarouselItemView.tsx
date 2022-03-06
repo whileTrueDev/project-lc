@@ -23,6 +23,7 @@ import ImageInputDialog, {
 import { LiveShoppingWithGoods } from '@project-lc/hooks';
 import {
   KkshowMainResData,
+  LivePlatform,
   NowPlayingLiveItem,
   PreviousLiveItem,
   ProductAndBroadcasterInfo,
@@ -32,7 +33,7 @@ import {
 import { getAdminHost } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
 import path from 'path';
-import React, { useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { LiveShoppingListAutoComplete } from './LiveShoppingListAutoComplete';
 
@@ -141,38 +142,132 @@ export function CarouselItemNowPlayingLive({
   index,
   item,
 }: CarouselItemProps & { item: NowPlayingLiveItem }): JSX.Element {
-  const { register, watch } = useFormContext<KkshowMainResData>();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { watch } = useFormContext<KkshowMainResData>();
+  const videoUrl = watch(`carousel.${index}.videoUrl`);
+  const platform = watch(`carousel.${index}.platform` as const);
+  const embedUrl = useMemo(() => {
+    if (!videoUrl) return '';
+    if (platform === 'twitch') {
+      return `https://player.twitch.tv/?channel=${videoUrl}&parent=${
+        getAdminHost().includes('localhost') ? 'localhost' : getAdminHost()
+      }`;
+    }
+    return `https://www.youtube.com/embed/${videoUrl}`;
+  }, [platform, videoUrl]);
   return (
     <>
       <Text fontWeight="bold">현재라이브</Text>
-      <Box>
-        <Stack direction="row">
-          <Text>플랫폼 </Text>
-          <RadioGroup mb={1} value={watch(`carousel.${index}.platform` as const)}>
-            <HStack>
-              <Radio {...register(`carousel.${index}.platform` as const)} value="twitch">
-                트위치
-              </Radio>
-              <Radio {...register(`carousel.${index}.platform` as const)} value="youtube">
-                유튜브
-              </Radio>
-            </HStack>
-          </RadioGroup>
-        </Stack>
-
-        <VideoImbed
-          videoUrl={
-            item.platform === 'twitch'
-              ? `https://player.twitch.tv/?channel=${item.videoUrl}&parent=${
-                  getAdminHost().includes('localhost') ? 'localhost' : getAdminHost()
-                }`
-              : `https://www.youtube.com/embed/${item.videoUrl}`
-          }
-        />
-      </Box>
+      <Stack>
+        {embedUrl ? (
+          <>
+            <Text>플랫폼 :{platform}</Text>
+            <VideoImbed videoUrl={embedUrl} />
+          </>
+        ) : (
+          <Text>등록된 라이브 송출 채널이 없습니다.</Text>
+        )}
+        <Button onClick={onOpen}>라이브 송출 채널 등록</Button>
+        <LiveStreamingPlatformDialog isOpen={isOpen} onClose={onClose} index={index} />
+      </Stack>
 
       <CarouselItemProductAndBroadcasterInfo index={index} {...item} />
     </>
+  );
+}
+
+export function LiveStreamingPlatformDialog({
+  isOpen,
+  onClose,
+  index,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  index: number;
+}): JSX.Element {
+  const { setValue, getValues } = useFormContext<KkshowMainResData>();
+  const [platform, setPlatform] = useState<LivePlatform>(
+    getValues(`carousel.${index}.platform`) || 'twitch',
+  );
+  const inputRef = useRef<HTMLInputElement>(null);
+  const closeHandler = (): void => {
+    onClose();
+  };
+
+  const confirmHandler = (): void => {
+    if (!inputRef.current) return;
+    setValue(`carousel.${index}.videoUrl`, inputRef.current.value, { shouldDirty: true });
+    setValue(`carousel.${index}.platform`, platform, { shouldDirty: true });
+    closeHandler();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={closeHandler}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>라이브 송출 채널 등록</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Box>
+            <Text>라이브 송출 플랫폼 선택</Text>
+            <RadioGroup
+              mb={1}
+              value={platform}
+              onChange={(value) => setPlatform(value as LivePlatform)}
+            >
+              <HStack>
+                <Radio value="twitch">트위치</Radio>
+                <Radio value="youtube">유튜브</Radio>
+              </HStack>
+            </RadioGroup>
+            <Box>
+              <Text>동영상 코드</Text>
+              {platform === 'twitch' && (
+                <Text>
+                  www.twitch.tv/
+                  <Text as="span" color="red">
+                    chodan_
+                  </Text>
+                  에서{' '}
+                  <Text as="span" color="red">
+                    chodan_
+                  </Text>{' '}
+                  부분만 입력
+                </Text>
+              )}
+              {platform === 'youtube' && (
+                <Text>
+                  https://youtu.be/
+                  <Text as="span" color="red">
+                    cseb1WG15ZA
+                  </Text>
+                  에서{' '}
+                  <Text as="span" color="red">
+                    cseb1WG15ZA
+                  </Text>{' '}
+                  부분만 입력
+                </Text>
+              )}
+
+              <Input
+                ref={inputRef}
+                defaultValue={getValues(`carousel.${index}.videoUrl`)}
+              />
+            </Box>
+          </Box>
+        </ModalBody>
+
+        <ModalFooter>
+          <Button colorScheme="blue" mr={3} onClick={confirmHandler}>
+            저장
+          </Button>
+
+          <Button variant="ghost" onClick={closeHandler}>
+            닫기
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
 
@@ -181,15 +276,27 @@ export function CarouselItemPreviousLive({
   index,
   item,
 }: CarouselItemProps & { item: PreviousLiveItem }): JSX.Element {
+  const { watch } = useFormContext<KkshowMainResData>();
+  const videoUrl = watch(`carousel.${index}.videoUrl`);
+  const embedUrl = useMemo(() => {
+    if (!videoUrl) {
+      return '';
+    }
+    return `https://www.youtube.com/embed/${videoUrl.replace('https://youtu.be/', '')}`;
+  }, [videoUrl]);
   return (
     <>
       <Text fontWeight="bold">이전라이브</Text>
-      <VideoImbed
-        videoUrl={`https://www.youtube.com/embed/${item.videoUrl.replace(
-          'https://youtu.be/',
-          '',
-        )}`}
-      />
+      {embedUrl ? (
+        <VideoImbed videoUrl={embedUrl} />
+      ) : (
+        <Text>
+          등록된 유튜브 영상이 없습니다.
+          <br />
+          라이브 쇼핑 목록에서 유튜브 영상 주소를 입력해주세요
+        </Text>
+      )}
+
       <CarouselItemProductAndBroadcasterInfo index={index} {...item} />
     </>
   );
@@ -288,6 +395,11 @@ export function CarouselItemProductAndBroadcasterInfo(
       setValue(`carousel.${index}.imageUrl`, carouselImage.imageUrl, {
         shouldDirty: true,
       });
+    }
+
+    const videoUrl = data.liveShoppingVideo?.youtubeUrl;
+    if (videoUrl) {
+      setValue(`carousel.${index}.videoUrl`, videoUrl, { shouldDirty: true });
     }
   };
   return (
