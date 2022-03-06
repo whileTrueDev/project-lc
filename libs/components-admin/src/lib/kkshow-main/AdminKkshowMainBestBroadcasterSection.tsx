@@ -11,8 +11,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Avatar,
 } from '@chakra-ui/react';
-import { KkshowMainBestBroadcasterItem } from '@project-lc/shared-types';
+import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
+import { useAdminBroadcaster } from '@project-lc/hooks';
+import { BroadcasterDTO, KkshowMainBestBroadcasterItem } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { BroadcasterProfile } from './AdminKkshowMainCarouselItemView';
@@ -83,7 +86,17 @@ export function KkshowMainBestBroadcasterItemDialog({
   onClose: () => void;
   createCallback: (data: KkshowMainBestBroadcasterItem) => void;
 }): JSX.Element {
-  const [selectedBroadcaster, setSelectedBroadcaster] = useState<any | null>(null);
+  const { data } = useAdminBroadcaster();
+
+  const [selectedBroadcaster, setSelectedBroadcaster] = useState<BroadcasterDTO | null>(
+    null,
+  );
+
+  const handleClose = (): void => {
+    setSelectedBroadcaster(null);
+    onClose();
+  };
+
   const handleCreate = (): void => {
     if (!selectedBroadcaster) return;
     createCallback({
@@ -91,11 +104,10 @@ export function KkshowMainBestBroadcasterItemDialog({
       nickname: selectedBroadcaster.userNickname || '',
       broadcasterId: selectedBroadcaster.id,
     });
-    setSelectedBroadcaster(null);
-    onClose();
+    handleClose();
   };
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>베스트 방송인 추가하기</ModalHeader>
@@ -104,18 +116,26 @@ export function KkshowMainBestBroadcasterItemDialog({
           <Stack>
             <Box>
               <Text>방송인 선택</Text>
+              <ChakraAutoComplete
+                options={data || []}
+                getOptionLabel={(option) => option?.userNickname || ''}
+                onChange={(newV) => {
+                  setSelectedBroadcaster(newV || null);
+                }}
+              />
             </Box>
 
-            <Box>
-              <Text>선택한 방송인 정보</Text>
-              {selectedBroadcaster ? (
-                <Stack direction="row">
-                  <Text>선택된 데이터 있음</Text>
-                </Stack>
-              ) : (
-                <Text>선택된 데이터 없음</Text>
-              )}
-            </Box>
+            {selectedBroadcaster ? (
+              <AdminKkshowMainBestBroadcasterItem
+                item={{
+                  broadcasterId: selectedBroadcaster.id,
+                  nickname: selectedBroadcaster.userNickname,
+                  profileImageUrl: selectedBroadcaster.avatar || '',
+                }}
+              />
+            ) : (
+              <Text>선택한 방송인 없음</Text>
+            )}
           </Stack>
         </ModalBody>
 
@@ -128,7 +148,7 @@ export function KkshowMainBestBroadcasterItemDialog({
           >
             추가
           </Button>
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="ghost" onClick={handleClose}>
             닫기
           </Button>
         </ModalFooter>
