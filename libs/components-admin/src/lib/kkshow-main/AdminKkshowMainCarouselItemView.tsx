@@ -1,13 +1,18 @@
 import {
   Avatar,
   Box,
+  Button,
   HStack,
   Input,
   Radio,
   RadioGroup,
   Stack,
   Text,
+  useDisclosure,
 } from '@chakra-ui/react';
+import ImageInputDialog, {
+  ImageInputFileReadData,
+} from '@project-lc/components-core/ImageInputDialog';
 import {
   KkshowMainResData,
   NowPlayingLiveItem,
@@ -17,6 +22,8 @@ import {
   UpcomingLiveItem,
 } from '@project-lc/shared-types';
 import { getAdminHost } from '@project-lc/utils';
+import { s3 } from '@project-lc/utils-s3';
+import path from 'path';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -29,11 +36,39 @@ export function CarouselItemSimpleBanner({
   index,
   item,
 }: CarouselItemProps & { item: SimpleBannerItem }): JSX.Element {
-  const { register } = useFormContext<KkshowMainResData>();
+  const { register, setValue, watch } = useFormContext<KkshowMainResData>();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const imageUrl = watch(`carousel.${index}.imageUrl`);
+
+  const handleConfirm = async (imageData: ImageInputFileReadData): Promise<void> => {
+    const timestamp = new Date().getTime();
+    const s3KeyType = 'kkshow-main-carousel-images';
+    const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
+
+    const { savedKey } = await s3.sendPutObjectCommand({
+      Key: key,
+      Body: imageData.file,
+      ContentType: imageData.file.type,
+      ACL: 'public-read',
+    });
+
+    setValue(`carousel.${index}.imageUrl`, savedKey);
+  };
   return (
     <>
       <Text fontWeight="bold">이미지배너</Text>
-      <ImageBanner imageUrl={item.imageUrl} />
+      <ImageBanner imageUrl={imageUrl} />
+      <Box>
+        <Button onClick={onOpen}>배너 {imageUrl ? '수정' : '추가'}</Button>
+        <ImageInputDialog
+          modalTitle={`배너 이미지 ${imageUrl ? '수정' : '추가'}`}
+          isOpen={isOpen}
+          onClose={onClose}
+          onConfirm={handleConfirm}
+        />
+      </Box>
+
       <Box>
         <Text>배너 링크 주소</Text>
         <Input {...register(`carousel.${index}.linkUrl` as const)} size="sm" />
@@ -116,6 +151,7 @@ export function CarouselItemPreviousLive({
 }
 
 export function ImageBanner({ imageUrl }: { imageUrl: string }): JSX.Element {
+  if (!imageUrl) return <Text>이미지가 없습니다</Text>;
   return (
     <Box>
       <Text>이미지</Text>
