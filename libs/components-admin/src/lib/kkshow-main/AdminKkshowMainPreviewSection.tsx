@@ -17,7 +17,7 @@ import { s3 } from '@project-lc/utils-s3';
 import dayjs from 'dayjs';
 import path from 'path';
 import { useFormContext } from 'react-hook-form';
-import { LiveShoppingListAutoComplete } from './KkshowMainCarouselItemDialog';
+import { LiveShoppingListAutoComplete } from './LiveShoppingListAutoComplete';
 
 export function AdminKkshowMainPreviewSection(): JSX.Element {
   const { register, watch, setValue } = useFormContext();

@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { BroadcasterProfile, VideoImbed } from './AdminKkshowMainCarouselItemView';
 import { AdminKkshowMainFieldArrayItemContainer } from './AdminKkshowMainCarouselSection';
-import { LiveShoppingListAutoComplete } from './KkshowMainCarouselItemDialog';
+import { LiveShoppingListAutoComplete } from './LiveShoppingListAutoComplete';
 
 export function AdminKkshowMainBestLiveSection(): JSX.Element {
   const { isOpen, onClose, onOpen } = useDisclosure();

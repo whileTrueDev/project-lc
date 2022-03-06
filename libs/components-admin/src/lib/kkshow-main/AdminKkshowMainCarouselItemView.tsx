@@ -34,7 +34,7 @@ import { s3 } from '@project-lc/utils-s3';
 import path from 'path';
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { LiveShoppingListAutoComplete } from './KkshowMainCarouselItemDialog';
+import { LiveShoppingListAutoComplete } from './LiveShoppingListAutoComplete';
 
 interface CarouselItemProps {
   index: number;
