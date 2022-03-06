@@ -14,7 +14,6 @@ import {
   CarouselItemSimpleBanner,
   CarouselItemUpcomingLive,
 } from './AdminKkshowMainCarouselItemView';
-import { KkshowMainCarouselItemDialog } from './KkshowMainCarouselItemDialog';
 
 const carouselItemProductAndBroadcasterDefaultValue: ProductAndBroadcasterInfo = {
   liveShoppingName: '',
@@ -94,7 +93,6 @@ export function AdminKkshowMainCarouselSection(): JSX.Element {
           캐러셀 영역
         </Text>
         <Stack direction="row">
-          <Button onClick={onOpen}>캐러셀 아이템 추가하기</Button>
           {carouselItemAddButtons.map((button) => (
             <Button
               key={button.type}
@@ -104,14 +102,6 @@ export function AdminKkshowMainCarouselSection(): JSX.Element {
               {button.label}
             </Button>
           ))}
-
-          <KkshowMainCarouselItemDialog
-            isOpen={isOpen}
-            onClose={onClose}
-            createCallback={(itemData) => {
-              append(itemData);
-            }}
-          />
         </Stack>
       </Stack>
 
