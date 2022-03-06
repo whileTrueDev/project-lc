@@ -389,6 +389,14 @@ export function CarouselItemProductAndBroadcasterInfo(
       { shouldDirty: true },
     );
     setValue(`carousel.${index}.liveShoppingId`, Number(data.id), { shouldDirty: true });
+    setValue(`carousel.${index}.broadcasterNickname`, data.broadcaster.userNickname, {
+      shouldDirty: true,
+    });
+    setValue(
+      `carousel.${index}.promotionPageLinkUrl`,
+      data.broadcaster.BroadcasterPromotionPage?.url || '',
+      { shouldDirty: true },
+    );
 
     const carouselImage = data.images.find((i) => i.type === 'carousel');
     if (carouselImage && carouselImage.imageUrl) {
