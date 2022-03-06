@@ -56,7 +56,7 @@ export interface ProductAndBroadcasterInfo
     BroadcasterInfo,
     LiveShoppingInfo {}
 interface ProductInfo {
-  productName: string;
+  liveShoppingName: string;
   productImageUrl: string;
   normalPrice: number;
   discountedPrice: number;

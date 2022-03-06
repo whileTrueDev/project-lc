@@ -156,7 +156,7 @@ export function KkshowMainCarouselItemDialog({
       createCallback({
         type: 'upcoming',
         imageUrl: savedKey,
-        productName: selectedLiveShopping.liveShoppingName || '',
+        liveShoppingName: selectedLiveShopping.liveShoppingName || '',
         productImageUrl: selectedLiveShopping.goods.image[0].image,
         normalPrice: Number(normalPriceRef.current.value),
         discountedPrice: Number(discountPriceRef.current.value),
@@ -182,7 +182,7 @@ export function KkshowMainCarouselItemDialog({
         type: 'nowPlaying',
         platform,
         videoUrl: videoUrlRef.current.value,
-        productName: selectedLiveShopping.liveShoppingName || '',
+        liveShoppingName: selectedLiveShopping.liveShoppingName || '',
         productImageUrl: selectedLiveShopping.goods.image[0].image,
         normalPrice: Number(normalPriceRef.current.value),
         discountedPrice: Number(discountPriceRef.current.value),
@@ -202,7 +202,7 @@ export function KkshowMainCarouselItemDialog({
       createCallback({
         type: 'previous',
         videoUrl: selectedLiveShopping.liveShoppingVideo?.youtubeUrl,
-        productName: selectedLiveShopping.liveShoppingName || '',
+        liveShoppingName: selectedLiveShopping.liveShoppingName || '',
         productImageUrl: selectedLiveShopping.goods.image[0].image,
         normalPrice: Number(normalPriceRef.current.value),
         discountedPrice: Number(discountPriceRef.current.value),

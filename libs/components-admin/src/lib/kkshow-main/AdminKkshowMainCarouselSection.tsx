@@ -17,7 +17,7 @@ import {
 import { KkshowMainCarouselItemDialog } from './KkshowMainCarouselItemDialog';
 
 const carouselItemProductAndBroadcasterDefaultValue: ProductAndBroadcasterInfo = {
-  productName: '',
+  liveShoppingName: '',
   productImageUrl: '',
   normalPrice: 0,
   discountedPrice: 0,

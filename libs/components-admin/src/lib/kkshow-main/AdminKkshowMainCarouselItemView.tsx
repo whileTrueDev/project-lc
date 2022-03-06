@@ -4,6 +4,13 @@ import {
   Button,
   HStack,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Radio,
   RadioGroup,
   Stack,
@@ -13,6 +20,7 @@ import {
 import ImageInputDialog, {
   ImageInputFileReadData,
 } from '@project-lc/components-core/ImageInputDialog';
+import { LiveShoppingWithGoods } from '@project-lc/hooks';
 import {
   KkshowMainResData,
   NowPlayingLiveItem,
@@ -24,8 +32,9 @@ import {
 import { getAdminHost } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
 import path from 'path';
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { LiveShoppingListAutoComplete } from './KkshowMainCarouselItemDialog';
 
 interface CarouselItemProps {
   index: number;
@@ -53,7 +62,7 @@ export function CarouselItemSimpleBanner({
       ACL: 'public-read',
     });
 
-    setValue(`carousel.${index}.imageUrl`, savedKey);
+    setValue(`carousel.${index}.imageUrl`, savedKey, { shouldDirty: true });
   };
   return (
     <>
@@ -151,7 +160,7 @@ export function CarouselItemPreviousLive({
 }
 
 export function ImageBanner({ imageUrl }: { imageUrl: string }): JSX.Element {
-  if (!imageUrl) return <Text>이미지가 없습니다</Text>;
+  if (!imageUrl) return <Text>배너 이미지가 없습니다</Text>;
   return (
     <Box>
       <Text>이미지</Text>
@@ -194,6 +203,7 @@ export function ProductImage({
 }: {
   productImageUrl: string;
 }): JSX.Element {
+  if (!productImageUrl) return <Text>상품 이미지가 없습니다</Text>;
   return (
     <Box>
       <Text>상품</Text>
@@ -205,41 +215,142 @@ export function ProductImage({
 export function CarouselItemProductAndBroadcasterInfo(
   props: ProductAndBroadcasterInfo & { index: number },
 ): JSX.Element {
-  const { index, profileImageUrl, productImageUrl } = props;
-  const { register } = useFormContext<KkshowMainResData>();
+  const { index } = props;
+  const { register, setValue, watch } = useFormContext<KkshowMainResData>();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const profileImageUrl = watch(`carousel.${index}.profileImageUrl`);
+  const productImageUrl = watch(`carousel.${index}.productImageUrl`);
+
+  const setItemValue = (data: LiveShoppingWithGoods): void => {
+    setValue(`carousel.${index}.profileImageUrl`, data.goods.image[0].image, {
+      shouldDirty: true,
+    });
+    setValue(`carousel.${index}.productImageUrl`, data.goods.image[0].image, {
+      shouldDirty: true,
+    });
+    setValue(`carousel.${index}.liveShoppingName`, data.liveShoppingName || '', {
+      shouldDirty: true,
+    });
+    setValue(
+      `carousel.${index}.productLinkUrl`,
+      data.fmGoodsSeq ? `https://k-kmarket.com/goods/view?no=${data.fmGoodsSeq}` : '',
+      { shouldDirty: true },
+    );
+    setValue(`carousel.${index}.normalPrice`, Number(data.goods.options[0].price), {
+      shouldDirty: true,
+    });
+    setValue(
+      `carousel.${index}.discountedPrice`,
+      Number(data.goods.options[0].consumer_price),
+      { shouldDirty: true },
+    );
+  };
   return (
     <Stack direction="row">
       <BroadcasterProfile profileImageUrl={profileImageUrl} />
       <ProductImage productImageUrl={productImageUrl || ''} />
-      <Box>
-        <Text>상품링크</Text>
-        <Input {...register(`carousel.${index}.productLinkUrl` as const)} size="sm" />
-      </Box>
-      <Box>
-        <Text>상품명</Text>
-        <Input {...register(`carousel.${index}.productName` as const)} size="sm" />
-      </Box>
-      <Box>
-        <Text>기존가격</Text>
-        <Input
-          type="number"
-          {...register(`carousel.${index}.normalPrice` as const, {
-            valueAsNumber: true,
-          })}
-          size="sm"
+
+      <Stack>
+        {/* 라이브쇼핑명, 상품링크, 가격 */}
+        <Stack direction="row">
+          <Stack>
+            <Box>
+              <Text>라이브쇼핑명</Text>
+              <Input
+                {...register(`carousel.${index}.liveShoppingName` as const)}
+                size="sm"
+              />
+            </Box>
+            <Box>
+              <Text>상품링크</Text>
+              <Input
+                {...register(`carousel.${index}.productLinkUrl` as const)}
+                size="sm"
+              />
+            </Box>
+          </Stack>
+          <Stack>
+            <Box>
+              <Text>기존가격</Text>
+              <Input
+                type="number"
+                {...register(`carousel.${index}.normalPrice` as const, {
+                  valueAsNumber: true,
+                })}
+                size="sm"
+              />
+            </Box>
+            <Box>
+              <Text>할인가격</Text>
+              <Input
+                type="number"
+                color="red"
+                {...register(`carousel.${index}.discountedPrice` as const, {
+                  valueAsNumber: true,
+                })}
+                size="sm"
+              />
+            </Box>
+          </Stack>
+        </Stack>
+        <Button onClick={onOpen}>라이브 쇼핑에서 정보 가져오기</Button>
+        <LoadLiveShoppingDataDialog
+          onClose={onClose}
+          isOpen={isOpen}
+          onLoad={setItemValue}
         />
-      </Box>
-      <Box>
-        <Text>할인가격</Text>
-        <Input
-          type="number"
-          color="red"
-          {...register(`carousel.${index}.discountedPrice` as const, {
-            valueAsNumber: true,
-          })}
-          size="sm"
-        />
-      </Box>
+      </Stack>
     </Stack>
+  );
+}
+
+export function LoadLiveShoppingDataDialog({
+  isOpen,
+  onClose,
+  onLoad,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onLoad: (data: LiveShoppingWithGoods) => void;
+}): JSX.Element {
+  const [selectedLiveShopping, setSelectedLiveShopping] =
+    useState<LiveShoppingWithGoods | null>(null);
+
+  const closeHandler = (): void => {
+    setSelectedLiveShopping(null);
+    onClose();
+  };
+
+  const loadHandler = (): void => {
+    if (!selectedLiveShopping) return;
+    onLoad(selectedLiveShopping);
+    closeHandler();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={closeHandler}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>라이브쇼핑 정보 불러오기</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Box>
+            <Text>라이브 방송 정보 선택</Text>
+            <LiveShoppingListAutoComplete onChange={setSelectedLiveShopping} />
+          </Box>
+        </ModalBody>
+
+        <ModalFooter>
+          <Button colorScheme="blue" mr={3} onClick={loadHandler}>
+            가져오기
+          </Button>
+
+          <Button variant="ghost" onClick={closeHandler}>
+            닫기
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
