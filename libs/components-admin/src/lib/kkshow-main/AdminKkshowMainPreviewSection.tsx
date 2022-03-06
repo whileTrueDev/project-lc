@@ -34,6 +34,7 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
       ContentType: imageData.file.type,
       ACL: 'public-read',
     });
+    // TODO : 해당 liveShoppingId의 liveShoppingImage preview 타입 upsert필요
     setValue('trailer.imageUrl', savedKey, { shouldDirty: true });
 
     return Promise.resolve();

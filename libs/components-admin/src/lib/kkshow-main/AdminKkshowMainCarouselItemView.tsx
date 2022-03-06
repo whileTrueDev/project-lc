@@ -91,10 +91,46 @@ export function CarouselItemUpcomingLive({
   index,
   item,
 }: CarouselItemProps & { item: UpcomingLiveItem }): JSX.Element {
+  const { setValue, watch } = useFormContext<KkshowMainResData>();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const imageUrl = watch(`carousel.${index}.imageUrl`);
+
+  const handleConfirm = async (imageData: ImageInputFileReadData): Promise<void> => {
+    const timestamp = new Date().getTime();
+    const s3KeyType = `live-shopping-images/${
+      item.liveShoppingId ? item.liveShoppingId : 'unknown'
+    }/carousel`;
+    const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
+
+    const { savedKey } = await s3.sendPutObjectCommand({
+      Key: key,
+      Body: imageData.file,
+      ContentType: imageData.file.type,
+      ACL: 'public-read',
+    });
+
+    // TODO : 라이브 쇼핑 id가 있는경우 해당 liveShoppingImages에 type; carousel로 저장(upsert)
+
+    setValue(`carousel.${index}.imageUrl`, savedKey, { shouldDirty: true });
+  };
+
   return (
     <>
       <Text fontWeight="bold">라이브예고</Text>
-      <ImageBanner imageUrl={item.imageUrl} />
+      <Stack>
+        <ImageBanner imageUrl={imageUrl} />
+        <Box>
+          <Button onClick={onOpen}>이미지{imageUrl ? '수정' : '추가'}</Button>
+          <ImageInputDialog
+            modalTitle={`이미지 ${imageUrl ? '수정' : '추가'}`}
+            isOpen={isOpen}
+            onClose={onClose}
+            onConfirm={handleConfirm}
+          />
+        </Box>
+      </Stack>
+
       <CarouselItemProductAndBroadcasterInfo index={index} {...item} />
     </>
   );
@@ -160,7 +196,7 @@ export function CarouselItemPreviousLive({
 }
 
 export function ImageBanner({ imageUrl }: { imageUrl: string }): JSX.Element {
-  if (!imageUrl) return <Text>배너 이미지가 없습니다</Text>;
+  if (!imageUrl) return <Text>이미지가 없습니다</Text>;
   return (
     <Box>
       <Text>이미지</Text>
@@ -245,6 +281,14 @@ export function CarouselItemProductAndBroadcasterInfo(
       Number(data.goods.options[0].consumer_price),
       { shouldDirty: true },
     );
+    setValue(`carousel.${index}.liveShoppingId`, Number(data.id), { shouldDirty: true });
+
+    const carouselImage = data.images.find((i) => i.type === 'carousel');
+    if (carouselImage && carouselImage.imageUrl) {
+      setValue(`carousel.${index}.imageUrl`, carouselImage.imageUrl, {
+        shouldDirty: true,
+      });
+    }
   };
   return (
     <Stack direction="row">
