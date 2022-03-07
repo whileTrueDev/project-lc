@@ -1,13 +1,34 @@
 import { Box } from '@chakra-ui/react';
 import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
+import { KkshowNavbar } from '@project-lc/components-web-kkshow/KkshowNavbar';
 import { KkshowMainBestBroadcaster } from '@project-lc/components-web-kkshow/main/KkshowMainBestBroadcaster';
 import { KkshowMainBestLive } from '@project-lc/components-web-kkshow/main/KkshowMainBestLive';
 import { KkshowMainCarousel } from '@project-lc/components-web-kkshow/main/KkshowMainCarousel';
 import { KKshowMainExternLinks } from '@project-lc/components-web-kkshow/main/KKshowMainExternLinks';
 import { KkshowLiveTeaser } from '@project-lc/components-web-kkshow/main/KkshowMainLiveTeaser';
 import { KkshowMainPlusFriend } from '@project-lc/components-web-kkshow/main/KkshowMainPlusFriend';
-import { KkshowNavbar } from '@project-lc/components-web-kkshow/KkshowNavbar';
+import { getMainDataTest, mainDataTestQueryKey } from '@project-lc/hooks';
+import { createQueryClient } from '@project-lc/utils-frontend';
+import { GetStaticProps } from 'next';
+import { dehydrate, DehydratedState } from 'react-query';
+
+interface KkshowIndexProps {
+  dehydratedState: DehydratedState;
+}
+export const getStaticProps: GetStaticProps<KkshowIndexProps> = async () => {
+  const queryClient = createQueryClient();
+  await queryClient.prefetchQuery(mainDataTestQueryKey, getMainDataTest);
+
+  // You can access data like this in child components.
+  // import { useMainDataTest } from '@project-lc/hooks';
+  // useMainDataTest();
+
+  return {
+    props: { dehydratedState: dehydrate(queryClient) },
+    revalidate: 60,
+  };
+};
 
 export function Index(): JSX.Element {
   return (

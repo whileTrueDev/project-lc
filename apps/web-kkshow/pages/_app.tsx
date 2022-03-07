@@ -16,7 +16,8 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';
 import NextNProgress from 'nextjs-progressbar';
-import { QueryClientProvider } from 'react-query';
+import { useState } from 'react';
+import { Hydrate, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import 'swiper/css/bundle';
 import '../styles/global.font.css';
@@ -29,6 +30,7 @@ const chakraTheme = createChakraTheme();
 const muiTheme = createMuiTheme();
 
 function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
+  const [_queryClient] = useState(queryClient);
   return (
     <>
       <DefaultSeo
@@ -47,16 +49,18 @@ function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
       />
 
       <div className="app">
-        <QueryClientProvider client={queryClient}>
-          <ChakraProvider theme={chakraTheme}>
-            <ThemeProvider theme={muiTheme}>
-              <main>
-                <NextNProgress options={{ showSpinner: false }} />
-                <Component {...pageProps} />
-              </main>
-            </ThemeProvider>
-          </ChakraProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
+        <QueryClientProvider client={_queryClient}>
+          <Hydrate state={pageProps.dehydratedState}>
+            <ChakraProvider theme={chakraTheme}>
+              <ThemeProvider theme={muiTheme}>
+                <main>
+                  <NextNProgress options={{ showSpinner: false }} />
+                  <Component {...pageProps} />
+                </main>
+              </ThemeProvider>
+            </ChakraProvider>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </Hydrate>
         </QueryClientProvider>
       </div>
     </>

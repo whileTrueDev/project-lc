@@ -67,11 +67,12 @@ function CustomSwipper(): JSX.Element {
     >
       {swipeItems.map((item) => (
         <SwiperSlide
-          key={item.image}
           style={{ minWidth: 320, width: 720, margin: '0 auto' }}
+          key={item.avatar}
         >
           {(slideProps) => (
             <SwipperItem
+              key={item.image}
               image={item.image}
               title={item.item.title}
               avatar={item.avatar}
