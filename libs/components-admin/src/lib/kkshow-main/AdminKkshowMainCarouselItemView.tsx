@@ -20,7 +20,10 @@ import {
 import ImageInputDialog, {
   ImageInputFileReadData,
 } from '@project-lc/components-core/ImageInputDialog';
-import { LiveShoppingWithGoods } from '@project-lc/hooks';
+import {
+  LiveShoppingWithGoods,
+  useAdminLiveShoppingImageMutation,
+} from '@project-lc/hooks';
 import {
   KkshowMainResData,
   LivePlatform,
@@ -44,7 +47,6 @@ interface CarouselItemProps {
 /** 크크쇼 메인 캐러셀 아이템 컴포넌트 - 이미지 배너 */
 export function CarouselItemSimpleBanner({
   index,
-  item,
 }: CarouselItemProps & { item: SimpleBannerItem }): JSX.Element {
   const { register, setValue, watch } = useFormContext<KkshowMainResData>();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -96,12 +98,13 @@ export function CarouselItemUpcomingLive({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const imageUrl = watch(`carousel.${index}.imageUrl`);
+  const liveShoppingId = watch(`carousel.${index}.liveShoppingId`);
 
+  const { mutateAsync } = useAdminLiveShoppingImageMutation();
   const handleConfirm = async (imageData: ImageInputFileReadData): Promise<void> => {
     const timestamp = new Date().getTime();
-    const s3KeyType = `live-shopping-images/${
-      item.liveShoppingId ? item.liveShoppingId : 'unknown'
-    }/carousel`;
+    // liveshoppingId 가 없는경우 해당값은 null로 들어감
+    const s3KeyType = `live-shopping-images/${liveShoppingId}/carousel`;
     const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
 
     const { savedKey } = await s3.sendPutObjectCommand({
@@ -111,7 +114,13 @@ export function CarouselItemUpcomingLive({
       ACL: 'public-read',
     });
 
-    // TODO : 라이브 쇼핑 id가 있는경우 해당 liveShoppingImages에 type; carousel로 저장(upsert)
+    if (liveShoppingId) {
+      await mutateAsync({
+        liveShoppingId,
+        imageType: 'carousel',
+        imageUrl: savedKey,
+      }).catch((e) => console.error(e));
+    }
 
     setValue(`carousel.${index}.imageUrl`, savedKey, { shouldDirty: true });
   };
@@ -366,6 +375,7 @@ export function CarouselItemProductAndBroadcasterInfo(
   const productImageUrl = watch(`carousel.${index}.productImageUrl`);
 
   const setItemValue = (data: LiveShoppingWithGoods): void => {
+    console.log(data);
     setValue(`carousel.${index}.profileImageUrl`, data.goods.image[0].image, {
       shouldDirty: true,
     });
@@ -388,7 +398,7 @@ export function CarouselItemProductAndBroadcasterInfo(
       Number(data.goods.options[0].consumer_price),
       { shouldDirty: true },
     );
-    setValue(`carousel.${index}.liveShoppingId`, Number(data.id), { shouldDirty: true });
+    setValue(`carousel.${index}.liveShoppingId`, data.id, { shouldDirty: true });
     setValue(`carousel.${index}.broadcasterNickname`, data.broadcaster.userNickname, {
       shouldDirty: true,
     });
