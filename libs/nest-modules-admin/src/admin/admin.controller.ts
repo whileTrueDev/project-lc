@@ -50,6 +50,7 @@ import {
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingDTO,
+  LiveShoppingImageDto,
   OrderCancelRequestDetailRes,
   OrderCancelRequestList,
   SellerGoodsSortColumn,
@@ -217,6 +218,13 @@ export class AdminController {
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getAllBroadcasters(): Promise<BroadcasterDTO[]> {
     return this.broadcasterService.getAllBroadcasterIdAndNickname();
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('/live-shopping/images')
+  upsertLiveShoppingImage(@Body() dto: LiveShoppingImageDto): Promise<boolean> {
+    console.log('hit upsert', dto);
+    return this.adminService.upsertLiveShoppingImage(dto);
   }
 
   // 상품 검수 승인을 수행

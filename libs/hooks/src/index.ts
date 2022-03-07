@@ -3,6 +3,7 @@ export * from './lib/mutation/useAdminBroadcasterPromotionPageMutation';
 export * from './lib/mutation/useAdminBroadcasterSettlementInfoConfirmMutation';
 export * from './lib/mutation/useAdminCreateNotification';
 export * from './lib/mutation/useAdminKkshowMainMutation';
+export * from './lib/mutation/useAdminLiveShoppingImageMutation';
 export * from './lib/mutation/useAdminPolicyMutation';
 export * from './lib/mutation/useAdminProductPromotionMutation';
 export * from './lib/mutation/useAvatarMutation';

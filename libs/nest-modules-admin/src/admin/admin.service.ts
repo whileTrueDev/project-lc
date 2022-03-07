@@ -3,7 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { GoodsConfirmation, LiveShopping } from '@prisma/client';
+import { GoodsConfirmation, LiveShopping, LiveShoppingImageType } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsByIdRes,
@@ -12,6 +12,7 @@ import {
   BusinessRegistrationStatus,
   AdminSettlementInfoType,
   LiveShoppingDTO,
+  LiveShoppingImageDto,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -311,7 +312,41 @@ export class AdminService {
         liveShoppingName: dto.liveShoppingName || undefined,
       },
     });
+
     if (!liveShoppingUpdate) throw new InternalServerErrorException(`업데이트 실패`);
+    return true;
+  }
+
+  async upsertLiveShoppingImage({
+    liveShoppingId,
+    imageType,
+    imageUrl,
+  }: LiveShoppingImageDto): Promise<boolean> {
+    if (liveShoppingId) {
+      const existImage = await this.prisma.liveShoppingImage.findFirst({
+        where: {
+          liveShoppingId,
+          type: imageType,
+        },
+      });
+
+      if (existImage) {
+        await this.prisma.liveShoppingImage.update({
+          where: { id: existImage.id },
+          data: {
+            imageUrl,
+          },
+        });
+      } else {
+        await this.prisma.liveShoppingImage.create({
+          data: {
+            type: imageType,
+            imageUrl,
+            liveShopping: { connect: { id: liveShoppingId } },
+          },
+        });
+      }
+    }
     return true;
   }
 
