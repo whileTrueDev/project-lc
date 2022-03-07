@@ -1,3 +1,5 @@
+import { LiveShopppingProgressType } from '@prisma/client';
+
 // 크크쇼 메인 캐러셀 아이템 타입
 export type KkshowMainCarouselItem =
   | SimpleBannerItem
@@ -71,6 +73,9 @@ interface BroadcasterInfo {
 
 interface LiveShoppingInfo {
   liveShoppingId: number | null;
+  liveShoppingProgress: LiveShopppingProgressType | null;
+  broadcastStartDate: Date | null;
+  broadcastEndDate: Date | null;
 }
 
 interface Video {

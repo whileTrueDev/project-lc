@@ -25,6 +25,9 @@ const carouselItemProductAndBroadcasterDefaultValue: ProductAndBroadcasterInfo =
   broadcasterNickname: '',
   promotionPageLinkUrl: '',
   liveShoppingId: null,
+  liveShoppingProgress: null,
+  broadcastStartDate: null,
+  broadcastEndDate: null,
 };
 
 const carouselItemAddButtons: {

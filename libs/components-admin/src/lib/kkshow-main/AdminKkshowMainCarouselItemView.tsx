@@ -390,6 +390,9 @@ export function CarouselItemProductAndBroadcasterInfo(
 
   const setItemValue = (data: LiveShoppingWithGoods): void => {
     setValue(`carousel.${index}.liveShoppingId`, data.id, { shouldDirty: true });
+    setValue(`carousel.${index}.liveShoppingProgress`, data.progress);
+    setValue(`carousel.${index}.broadcastStartDate`, data.broadcastStartDate);
+    setValue(`carousel.${index}.broadcastEndDate`, data.broadcastEndDate);
     setValue(`carousel.${index}.profileImageUrl`, data.goods.image[0].image);
     setValue(`carousel.${index}.productImageUrl`, data.goods.image[0].image);
     setValue(`carousel.${index}.liveShoppingName`, data.liveShoppingName || '');
