@@ -9,6 +9,7 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
+import { LiveShoppingImageType } from '@prisma/client';
 import ImageInputDialog, {
   ImageInputFileReadData,
 } from '@project-lc/components-core/ImageInputDialog';
@@ -19,6 +20,7 @@ import {
 import { s3 } from '@project-lc/utils-s3';
 import dayjs from 'dayjs';
 import path from 'path';
+import { useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { LiveShoppingListAutoComplete } from './LiveShoppingListAutoComplete';
 
@@ -26,11 +28,13 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
   const { register, watch, setValue } = useFormContext();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const liveShoppingId = watch('trailer.liveShoppingId');
+  const broadcastStartDate = watch('trailer.broadcastStartDate');
+  const dateRef = useRef<HTMLInputElement>(null);
 
   const { mutateAsync } = useAdminLiveShoppingImageMutation();
   const imageDataHandler = async (imageData: ImageInputFileReadData): Promise<void> => {
     const timestamp = new Date().getTime();
-    const imageType = 'trailer';
+    const imageType: LiveShoppingImageType = 'trailer';
     // liveshoppingId 가 없는경우 해당값은 null로 들어감
     const s3KeyType = `live-shopping-images/${liveShoppingId}/${imageType}`;
     const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
@@ -55,11 +59,25 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
 
   const onAutocompleteChange = (item: LiveShoppingWithGoods | null): void => {
     if (!item) return;
-    const { broadcastStartDate, broadcaster, fmGoodsSeq, liveShoppingName, goods, id } =
-      item;
+    const {
+      broadcastStartDate: _broadcastStartDate,
+      broadcaster,
+      fmGoodsSeq,
+      liveShoppingName,
+      goods,
+      id,
+      images,
+    } = item;
 
     const { userNickname, avatar } = broadcaster;
     const option = goods.options[0];
+    const trailerImage = images.find((i) => i.type === 'trailer');
+
+    if (trailerImage) {
+      setValue('trailer.imageUrl', trailerImage.imageUrl, { shouldDirty: true });
+    } else {
+      setValue('trailer.imageUrl', '', { shouldDirty: true });
+    }
 
     setValue('trailer.liveShoppingId', id, { shouldDirty: true });
 
@@ -69,7 +87,10 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
         `https://k-kmarket.com/goods/view?no=${fmGoodsSeq}`,
       );
     }
-    setValue('trailer.broadcastStartDate', broadcastStartDate);
+    setValue('trailer.broadcastStartDate', _broadcastStartDate);
+    if (_broadcastStartDate && dateRef.current) {
+      dateRef.current.value = '';
+    }
     setValue('trailer.liveShoppingName', liveShoppingName);
     setValue('trailer.broadcasterProfileImageUrl', avatar);
     setValue('trailer.broadcasterNickname', userNickname);
@@ -99,12 +120,26 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
             <Text>라이브 쇼핑 제목</Text>
             <Input {...register('trailer.liveShoppingName')} />
 
-            <Text>방송일</Text>
             <Text>
-              {dayjs(watch('trailer.broadcastStartDate')).format(
-                'YYYY.MM.DD (dd) a hh:mm',
+              방송일 :{' '}
+              {broadcastStartDate ? (
+                <Text as="span">
+                  {dayjs(broadcastStartDate).format('YYYY.MM.DD (dd) a hh:mm')}
+                </Text>
+              ) : (
+                <Text as="span">라이브쇼핑 정보를 불러오거나 방송일을 선택해주세요</Text>
               )}
             </Text>
+
+            <Text>방송일 선택</Text>
+            <Input
+              type="datetime-local"
+              ref={dateRef}
+              onChange={(e) => {
+                const { value } = e.currentTarget;
+                setValue('trailer.broadcastStartDate', new Date(value));
+              }}
+            />
 
             <Stack direction="row">
               <Box>
@@ -117,9 +152,12 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
               </Box>
             </Stack>
 
-            <Text>설명글</Text>
+            <Text>
+              방송인 해시태그 ( 콤마로 구분하여 작성해주세요. 특수문자 입력x, 띄어쓰기는
+              가능)
+            </Text>
             <Input
-              placeholder="#방송에 대한 설명글 #혹은 #관련 해시태그를 입력해주세요"
+              placeholder="버츄얼,라방,트위치,유튜브"
               {...register('trailer.broadcasterDescription')}
             />
 
