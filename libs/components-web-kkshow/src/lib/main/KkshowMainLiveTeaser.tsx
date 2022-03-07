@@ -129,10 +129,10 @@ export function KkshowLiveTeaser(): JSX.Element | null {
                 <Text as="span" color="red">
                   {discountRate}%
                 </Text>{' '}
-                {data.trailer.discountedPrice}원
+                {data.trailer.discountedPrice.toLocaleString()}원
                 <RedLinedText fontSize="md" as="span" fontWeight="normal">
                   {' '}
-                  ({data.trailer.normalPrice}원)
+                  ({data.trailer.normalPrice.toLocaleString()}원)
                 </RedLinedText>
               </Heading>
             </Box>
