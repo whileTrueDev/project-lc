@@ -1,16 +1,22 @@
 import {
-  IsString,
-  IsDate,
+  LiveShopping,
+  LiveShoppingImage,
+  LiveShoppingImageType,
+  LiveShopppingProgressType,
+} from '@prisma/client';
+import {
   IsArray,
+  IsDate,
+  IsEnum,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsString,
   ValidateIf,
-  IsInt,
 } from 'class-validator';
-import { LiveShopping, LiveShopppingProgressType } from '@prisma/client';
-import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
 import { LiveShoppingInput } from '../..';
+import { LIVE_SHOPPING_PROGRESS } from '../constants/liveShoppingProgress';
 
 export class LiveShoppingDTO {
   @IsNumber()
@@ -76,6 +82,10 @@ export class LiveShoppingDTO {
   @IsOptional() @IsInt() fmGoodsSeq?: LiveShopping['fmGoodsSeq'];
 
   @IsOptional() @IsString() liveShoppingName?: LiveShopping['liveShoppingName'];
+
+  @IsOptional()
+  @IsString()
+  liveShoppingImage?: Pick<LiveShoppingImage, 'imageUrl' | 'type'>;
 }
 
 export type LiveShoppingRegistDTO = Pick<
@@ -114,3 +124,14 @@ export type LiveShoppingsWithBroadcasterAndGoodsName = Pick<
 export type LiveShoppingFmGoodsSeq = Pick<LiveShopping, 'fmGoodsSeq'>;
 
 export type LiveShoppingId = Pick<LiveShopping, 'id'>;
+
+export class LiveShoppingImageDto {
+  @IsNumber()
+  liveShoppingId: number;
+
+  @IsEnum(LiveShoppingImageType)
+  imageType: LiveShoppingImageType;
+
+  @IsString()
+  imageUrl: string;
+}

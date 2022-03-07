@@ -19,6 +19,7 @@ import {
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
+import { Preview, readAsDataURL } from '@project-lc/components-core/ImageInputDialog';
 import {
   useDeleteGoodsImageMutation,
   useGoodsImageMutation,
@@ -51,15 +52,6 @@ export async function imageFileListToImageDto(
   }));
 }
 
-export type FileReaderResultType = string | ArrayBuffer | null;
-
-export type Preview = {
-  id: number;
-  filename: string;
-  url: FileReaderResultType;
-  file: File;
-};
-
 export function GoodsPreviewItem(
   props: Pick<Preview, 'id' | 'filename'> & {
     onDelete: () => void;
@@ -84,26 +76,6 @@ const PREVIEW_SIZE = {
   width: 60,
   height: 60,
 };
-
-export function readAsDataURL(file: File): Promise<{
-  data: FileReaderResultType;
-  name: string;
-  size: number;
-  type: string;
-}> {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.onload = function () {
-      return resolve({
-        data: fileReader.result,
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      });
-    };
-    fileReader.readAsDataURL(file);
-  });
-}
 
 /** 상품사진 섹션 컨테이너 */
 export function GoodsRegistPictures(): JSX.Element {
