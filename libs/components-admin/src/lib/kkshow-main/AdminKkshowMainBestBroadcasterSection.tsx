@@ -22,6 +22,7 @@ export function AdminKkshowMainBestBroadcasterSection(): JSX.Element {
       profileImageUrl: '',
       nickname: '',
       broadcasterId: null,
+      promotionPageLinkUrl: '',
     });
   };
 
@@ -83,21 +84,22 @@ export function AdminKkshowMainBestBroadcasterItem({
   const onBroadcasterSelectChange = (
     selectedBroadcaster: BroadcasterDTO | null,
   ): void => {
-    if (selectedBroadcaster) {
-      setValue(
-        `bestBroadcaster.${index}.profileImageUrl`,
-        selectedBroadcaster.avatar || '',
-        { shouldDirty: true },
-      );
-      setValue(
-        `bestBroadcaster.${index}.nickname`,
-        selectedBroadcaster.userNickname || '',
-        { shouldDirty: true },
-      );
-      setValue(`bestBroadcaster.${index}.broadcasterId`, selectedBroadcaster.id, {
-        shouldDirty: true,
-      });
-    }
+    if (!selectedBroadcaster) return;
+    setValue(`bestBroadcaster.${index}.broadcasterId`, selectedBroadcaster.id, {
+      shouldDirty: true,
+    });
+    setValue(
+      `bestBroadcaster.${index}.profileImageUrl`,
+      selectedBroadcaster.avatar || '',
+    );
+    setValue(`bestBroadcaster.${index}.nickname`, selectedBroadcaster.userNickname || '');
+
+    if (!selectedBroadcaster.BroadcasterPromotionPage) return;
+
+    setValue(
+      `bestBroadcaster.${index}.promotionPageLinkUrl`,
+      selectedBroadcaster.BroadcasterPromotionPage.url,
+    );
   };
 
   return (
@@ -113,7 +115,11 @@ export function AdminKkshowMainBestBroadcasterItem({
         <Input {...register(`bestBroadcaster.${index}.nickname` as const)} />
       </Box>
       <Box>
-        <Text>방송인 선택</Text>
+        <Text>상품홍보페이지 url</Text>
+        <Input {...register(`bestBroadcaster.${index}.promotionPageLinkUrl` as const)} />
+      </Box>
+      <Box>
+        <Text>방송인 정보 불러오기</Text>
         <ChakraAutoComplete
           options={data || []}
           getOptionLabel={(option) => option?.userNickname || ''}
