@@ -1,8 +1,8 @@
 import { Box, Button, Input, Stack, Text, useDisclosure } from '@chakra-ui/react';
 import { LiveShoppingWithGoods } from '@project-lc/hooks';
-import { KkshowMainBestLiveItem } from '@project-lc/shared-types';
+import { KkshowMainBestLiveItem, KkshowMainResData } from '@project-lc/shared-types';
 import { useMemo } from 'react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import { FieldArrayWithId, useFieldArray, useFormContext } from 'react-hook-form';
 import {
   BroadcasterProfile,
   LoadLiveShoppingDataDialog,
@@ -11,11 +11,19 @@ import {
 import { AdminKkshowMainFieldArrayItemContainer } from './AdminKkshowMainCarouselSection';
 
 export function AdminKkshowMainBestLiveSection(): JSX.Element {
-  const { control } = useFormContext();
+  const { control } = useFormContext<KkshowMainResData>();
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: 'bestLive' as const,
   });
+
+  const itemRemoveHandler = async (
+    field: FieldArrayWithId<KkshowMainResData, 'bestLive', 'id'>,
+    index: number,
+  ): Promise<void> => {
+    remove(index);
+  };
+
   const appendItem = (): void => {
     append({
       videoUrl: '',
@@ -48,7 +56,7 @@ export function AdminKkshowMainBestLiveSection(): JSX.Element {
                 moveDown={() => {
                   if (index < fields.length - 1) move(index, index + 1);
                 }}
-                removeHandler={() => remove(index)}
+                removeHandler={() => itemRemoveHandler(field, index)}
               >
                 <AdminKkshowMainBestLiveItem index={index} item={item} />
               </AdminKkshowMainFieldArrayItemContainer>
