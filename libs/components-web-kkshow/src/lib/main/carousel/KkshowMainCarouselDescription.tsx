@@ -1,10 +1,10 @@
 import { Box, BoxProps, Heading } from '@chakra-ui/react';
-import { KkshowMainCarousel as TKkshowMainCarousel } from '@project-lc/shared-types';
+import { KkshowMainCarouselItem } from '@project-lc/shared-types';
 import { memo } from 'react';
 import LiveShoppingPreviewBox from '../LiveShoppingPreviewBox';
 
 export interface KkshowMainCarouselDescriptionProps {
-  item: TKkshowMainCarousel;
+  item: KkshowMainCarouselItem;
 }
 export function KkshowMainCarouselDescription({
   item,

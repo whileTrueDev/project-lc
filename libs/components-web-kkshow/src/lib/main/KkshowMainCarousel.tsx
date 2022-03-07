@@ -1,8 +1,8 @@
 import { Box, Flex, ScaleFade, SlideFade, useBreakpointValue } from '@chakra-ui/react';
 import { ChevronIconButton } from '@project-lc/components-core/HorizontalImageGallery';
 import { WaveBox } from '@project-lc/components-core/WaveBox';
-import { useMainDataTest } from '@project-lc/hooks';
-import { KkshowMainCarousel as TKkshowMainCarousel } from '@project-lc/shared-types';
+import { useKkshowMain } from '@project-lc/hooks';
+import { KkshowMainCarouselItem } from '@project-lc/shared-types';
 import { Autoplay, Navigation, Pagination } from 'swiper';
 import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 import KkshowMainCarouselContents from './carousel/KkshowMainCarouselContents';
@@ -20,7 +20,7 @@ export function KkshowMainCarousel(): JSX.Element {
 }
 
 function MainCarousel(): JSX.Element | null {
-  const { data } = useMainDataTest();
+  const { data } = useKkshowMain();
   const slidesPerView = useBreakpointValue<'auto' | number>({ base: 1, md: 'auto' });
   if (!data) return null;
 
@@ -32,26 +32,18 @@ function MainCarousel(): JSX.Element | null {
       centeredSlides
       loop
       grabCursor
-      loopedSlides={data.carousel.length}
+      loopedSlides={data ? data.carousel.length : undefined}
       pagination={{ clickable: true }}
       modules={[Pagination, Autoplay, Navigation]}
       style={{ height: '100%' }}
       autoplay={{ delay: 5 * 1000, disableOnInteraction: false }}
     >
       {data &&
-        data.carousel.map((item) => (
-          <SwiperSlide
-            style={{ minWidth: 320, width: 720, margin: '0 auto' }}
-            key={item.imageUrl}
-          >
+        data.carousel.map((item, idx) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <SwiperSlide style={{ minWidth: 320, width: 720, margin: '0 auto' }} key={idx}>
             {(slideProps) => {
-              return (
-                <MainCarouselItem
-                  key={item.imageUrl}
-                  item={item}
-                  isActive={slideProps.isActive}
-                />
-              );
+              return <MainCarouselItem item={item} isActive={slideProps.isActive} />;
             }}
           </SwiperSlide>
         ))}
@@ -60,7 +52,7 @@ function MainCarousel(): JSX.Element | null {
 }
 
 interface MainCarouselItemProps {
-  item: TKkshowMainCarousel;
+  item: KkshowMainCarouselItem;
   isActive: boolean;
 }
 function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Element {

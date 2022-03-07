@@ -8,15 +8,16 @@ import {
   Stack,
 } from '@chakra-ui/react';
 import MotionBox from '@project-lc/components-core/MotionBox';
-import { useMainDataTest } from '@project-lc/hooks';
+import { useKkshowMain } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { Pagination } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import KkshowMainTitle from './KkshowMainTitle';
 
 export function KkshowMainBestBroadcaster(): JSX.Element | null {
-  const { data } = useMainDataTest();
+  const { data } = useKkshowMain();
   if (!data) return null;
+
   return (
     <MotionBox
       py={20}
@@ -36,7 +37,7 @@ export function KkshowMainBestBroadcaster(): JSX.Element | null {
           pagination
           modules={[Pagination]}
         >
-          {data?.bestBroadcaster.map((x) => (
+          {data.bestBroadcaster.map((x) => (
             <SwiperSlide
               key={x.broadcasterId}
               style={{ maxWidth: 190, paddingBottom: 24 }}
@@ -44,7 +45,7 @@ export function KkshowMainBestBroadcaster(): JSX.Element | null {
               <BestBroadcasterItem
                 avatarUrl={x.profileImageUrl}
                 broadcasterName={x.nickname}
-                href={x.productPromotionUrl}
+                href={x.promotionPageLinkUrl}
               />
             </SwiperSlide>
           ))}

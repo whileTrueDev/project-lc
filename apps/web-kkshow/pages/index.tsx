@@ -8,7 +8,7 @@ import { KkshowMainCarousel } from '@project-lc/components-web-kkshow/main/Kksho
 import { KKshowMainExternLinks } from '@project-lc/components-web-kkshow/main/KKshowMainExternLinks';
 import { KkshowLiveTeaser } from '@project-lc/components-web-kkshow/main/KkshowMainLiveTeaser';
 import { KkshowMainPlusFriend } from '@project-lc/components-web-kkshow/main/KkshowMainPlusFriend';
-import { getMainDataTest, mainDataTestQueryKey } from '@project-lc/hooks';
+import { getKkshowMain, kkshowMainQueryKey } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
 import { dehydrate, DehydratedState } from 'react-query';
@@ -18,11 +18,7 @@ interface KkshowIndexProps {
 }
 export const getStaticProps: GetStaticProps<KkshowIndexProps> = async () => {
   const queryClient = createQueryClient();
-  await queryClient.prefetchQuery(mainDataTestQueryKey, getMainDataTest);
-
-  // You can access data like this in child components.
-  // import { useMainDataTest } from '@project-lc/hooks';
-  // useMainDataTest();
+  await queryClient.prefetchQuery(kkshowMainQueryKey, getKkshowMain);
 
   return {
     props: { dehydratedState: dehydrate(queryClient) },

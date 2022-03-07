@@ -1,8 +1,8 @@
 import { Box, BoxProps, Heading } from '@chakra-ui/layout';
-import { KkshowMainCarousel as TKkshowMainCarousel } from '@project-lc/shared-types';
+import { KkshowMainCarouselItem } from '@project-lc/shared-types';
 
 export interface KkshowMainCarouselHeaderProps {
-  type: TKkshowMainCarousel['type'];
+  type: KkshowMainCarouselItem['type'];
 }
 export function KkshowMainCarouselHeader({
   type,

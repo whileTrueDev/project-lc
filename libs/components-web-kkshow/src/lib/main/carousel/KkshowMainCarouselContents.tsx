@@ -1,9 +1,9 @@
 import { AspectRatio, Box, BoxProps, Image } from '@chakra-ui/react';
-import { KkshowMainCarousel as TKkshowMainCarousel } from '@project-lc/shared-types';
+import { KkshowMainCarouselItem } from '@project-lc/shared-types';
 import { memo } from 'react';
 
 export interface KkshowMainCarouselContentsProps {
-  item: TKkshowMainCarousel;
+  item: KkshowMainCarouselItem;
 }
 export function KkshowMainCarouselContents({
   item,
@@ -12,7 +12,16 @@ export function KkshowMainCarouselContents({
     <Box position="relative" h="100%" w="100%" {...props} />
   );
 
-  if (['upcoming', 'simpleBanner'].includes(item.type))
+  if (item.type === 'upcoming')
+    return (
+      <KkshowMainCarouselContentsContainer>
+        <AspectRatio ratio={1} maxH="100%">
+          <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />
+        </AspectRatio>
+      </KkshowMainCarouselContentsContainer>
+    );
+
+  if (item.type === 'simpleBanner')
     return (
       <KkshowMainCarouselContentsContainer>
         <AspectRatio ratio={1} maxH="100%">

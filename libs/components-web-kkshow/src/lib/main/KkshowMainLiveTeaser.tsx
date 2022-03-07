@@ -11,13 +11,14 @@ import {
 import BorderedAvatar from '@project-lc/components-core/BorderedAvatar';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import RedLinedText from '@project-lc/components-core/RedLinedText';
-import { useMainDataTest } from '@project-lc/hooks';
+import { useKkshowMain } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { MdOutlineNotificationsActive } from 'react-icons/md';
 import KkshowMainTitle from './KkshowMainTitle';
 
 export function KkshowLiveTeaser(): JSX.Element | null {
-  const { data } = useMainDataTest();
+  const { data } = useKkshowMain();
+
   if (!data) return null;
 
   const discountRate =

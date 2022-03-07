@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import BorderedAvatar from '@project-lc/components-core/BorderedAvatar';
 import MotionBox from '@project-lc/components-core/MotionBox';
-import { useMainDataTest } from '@project-lc/hooks';
+import { useKkshowMain } from '@project-lc/hooks';
 import { Scrollbar } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import KkshowMainTitle from './KkshowMainTitle';
@@ -30,7 +30,7 @@ export function KkshowMainBestLive(): JSX.Element {
 }
 
 function BestLiveList(): JSX.Element | null {
-  const { data } = useMainDataTest();
+  const { data } = useKkshowMain();
 
   const BestLiveListMobile = (
     <Box p={2} pos="relative">
