@@ -147,8 +147,10 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
                 <Input {...register('trailer.broadcasterNickname')} />
               </Box>
               <Box>
-                <Text>방송인 프로필 이미지</Text>
+                <Text>프로필 이미지</Text>
                 <Avatar src={watch('trailer.broadcasterProfileImageUrl')} />
+                <Text>이미지 주소 입력</Text>
+                <Input {...register('trailer.broadcasterProfileImageUrl')} />
               </Box>
             </Stack>
 
