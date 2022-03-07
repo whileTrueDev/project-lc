@@ -286,8 +286,9 @@ export function CarouselItemPreviousLive({
   index,
   item,
 }: CarouselItemProps & { item: PreviousLiveItem }): JSX.Element {
-  const { watch } = useFormContext<KkshowMainResData>();
+  const { watch, register } = useFormContext<KkshowMainResData>();
   const videoUrl = watch(`carousel.${index}.videoUrl`);
+  const liveShoppingId = watch(`carousel.${index}.liveShoppingId`);
   const embedUrl = useMemo(() => {
     if (!videoUrl) {
       return '';
@@ -297,15 +298,27 @@ export function CarouselItemPreviousLive({
   return (
     <>
       <Text fontWeight="bold">이전라이브</Text>
-      {embedUrl ? (
-        <VideoImbed videoUrl={embedUrl} />
-      ) : (
-        <Text>
-          등록된 유튜브 영상이 없습니다.
-          <br />
-          라이브 쇼핑 목록에서 유튜브 영상 주소를 입력해주세요
-        </Text>
-      )}
+
+      <Box>
+        {embedUrl && <VideoImbed videoUrl={embedUrl} />}
+        {!embedUrl && !liveShoppingId && (
+          <Box>
+            <Text>
+              유튜브 영상 주소 ( https://youtu.be/4pIuCJTMXQU ) 같은 형태로 입력
+            </Text>
+            <Input {...register(`carousel.${index}.videoUrl` as const)} />
+          </Box>
+        )}
+        {!embedUrl && liveShoppingId && (
+          <Text>
+            등록된 유튜브 영상이 없습니다.
+            <br />
+            라이브 쇼핑 목록에서 유튜브 영상 주소를 저장한 후
+            <br />
+            다시 정보를 가져와주세요
+          </Text>
+        )}
+      </Box>
 
       <CarouselItemProductAndBroadcasterInfo index={index} {...item} />
     </>
