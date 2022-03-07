@@ -52,10 +52,10 @@ export function HorizontalImageGallery({
 export interface ChevronIconButtonProps {
   direction: 'left' | 'right';
   size?: ButtonProps['size'];
-  right?: number | string;
-  left?: number | string;
-  bottom?: number | string;
-  top?: number | string;
+  right?: ButtonProps['right'];
+  left?: ButtonProps['left'];
+  bottom?: ButtonProps['bottom'];
+  top?: ButtonProps['top'];
   isInVisible?: boolean;
   variant?: 'filled' | 'outlined';
   onClick: () => void;

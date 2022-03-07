@@ -105,6 +105,7 @@ export * from './lib/res-types/fmOrder.res';
 export * from './lib/res-types/fmSettlements.res';
 export * from './lib/res-types/goodsById.res';
 export * from './lib/res-types/goodsList.res';
+export * from './lib/res-types/kkshowMain.res';
 export * from './lib/res-types/loginUserRes';
 export * from './lib/res-types/orderCancelRequest.res';
 export * from './lib/res-types/overlayControllerMain.res';

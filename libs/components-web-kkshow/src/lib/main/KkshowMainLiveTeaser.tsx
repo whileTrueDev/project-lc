@@ -10,10 +10,21 @@ import {
 } from '@chakra-ui/react';
 import BorderedAvatar from '@project-lc/components-core/BorderedAvatar';
 import MotionBox from '@project-lc/components-core/MotionBox';
+import RedLinedText from '@project-lc/components-core/RedLinedText';
+import { useMainDataTest } from '@project-lc/hooks';
+import dayjs from 'dayjs';
 import { MdOutlineNotificationsActive } from 'react-icons/md';
 import KkshowMainTitle from './KkshowMainTitle';
 
-export function KkshowLiveTeaser(): JSX.Element {
+export function KkshowLiveTeaser(): JSX.Element | null {
+  const { data } = useMainDataTest();
+  if (!data) return null;
+
+  const discountRate =
+    ((data.trailer.normalPrice - data.trailer.discountedPrice) /
+      data.trailer.normalPrice) *
+    100;
+
   return (
     <Box pt={20} overflow="hidden" pos="relative">
       <KkshowMainTitle color="red">라이브 예고</KkshowMainTitle>
@@ -36,14 +47,14 @@ export function KkshowLiveTeaser(): JSX.Element {
           viewport={{ once: true }}
         >
           <Flex w={300} h={300} boxShadow="xl" borderRadius="2xl" position="relative">
-            <Image borderRadius="2xl" w="100%" h="100%" src="images/main/th-3.png" />
+            <Image borderRadius="2xl" w="100%" h="100%" src={data.trailer.imageUrl} />
             <BorderedAvatar
               display={{ base: 'flex', lg: 'none' }}
               position="absolute"
               top="-25px"
               right="-25px"
               size="xl"
-              src="https://static-cdn.jtvnw.net/jtv_user_pictures/04ace7cf-1f09-439a-af6f-dc8d878d814b-profile_image-300x300.png"
+              src={data.trailer.broadcasterProfileImageUrl}
             />
           </Flex>
 
@@ -60,23 +71,28 @@ export function KkshowLiveTeaser(): JSX.Element {
             color="blackAlpha.900"
           >
             <Flex flexDir="column" align="center" justify="center" gap={2}>
-              <BorderedAvatar
-                size="xl"
-                src="https://static-cdn.jtvnw.net/jtv_user_pictures/04ace7cf-1f09-439a-af6f-dc8d878d814b-profile_image-300x300.png"
-              />
+              <BorderedAvatar size="xl" src={data.trailer.broadcasterProfileImageUrl} />
               <Box textAlign="center">
                 <Heading fontSize="md" fontWeight="medium">
                   방송인
                 </Heading>
-                <Heading fontSize="2xl">민결희</Heading>
+                <Heading fontSize="2xl">{data.trailer.broadcasterNickname}</Heading>
               </Box>
             </Flex>
             <Box>
-              <Heading fontSize="md" fontWeight="medium">
-                #버츄얼 #라방
-              </Heading>
-              <Heading fontSize="md" fontWeight="medium">
-                #트위치 #유튜브
+              <Heading fontSize="md" fontWeight="medium" whiteSpace="break-spaces">
+                {data.trailer.broadcasterDescription
+                  .split(',')
+                  .slice(0, 4)
+                  .map((tag, idx) => {
+                    const _tag = tag.startsWith('#') ? tag : `#${tag}`;
+                    return (
+                      <span key={_tag}>
+                        {_tag}
+                        {idx === 1 ? '\n' : ' '}
+                      </span>
+                    );
+                  })}
               </Heading>
             </Box>
           </Stack>
@@ -94,10 +110,10 @@ export function KkshowLiveTeaser(): JSX.Element {
         >
           <Box>
             <Heading color="blue.500" fontSize={{ base: 'lg', md: '2xl' }}>
-              민결희 X 예스 예스 예스 X3 닭강정
+              {data.trailer.liveShoppingName}
             </Heading>
             <Heading fontSize={{ base: 'md', lg: '2xl' }} fontWeight="medium">
-              2022. 02. 20 (일) 오후 1시
+              {dayjs(data.trailer.broadcastStartDate).format('YYYY. MM. DD (dd) a h시')}
             </Heading>
           </Box>
 
@@ -108,9 +124,13 @@ export function KkshowLiveTeaser(): JSX.Element {
               </Heading>
               <Heading fontSize={{ base: 'lg', md: '2xl' }}>
                 <Text as="span" color="red">
-                  20%
+                  {discountRate}%
                 </Text>{' '}
-                14,900원
+                {data.trailer.discountedPrice}원
+                <RedLinedText fontSize="md" as="span" fontWeight="normal">
+                  {' '}
+                  ({data.trailer.normalPrice}원)
+                </RedLinedText>
               </Heading>
             </Box>
             <Box>
