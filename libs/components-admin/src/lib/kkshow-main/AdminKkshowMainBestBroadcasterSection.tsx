@@ -1,36 +1,32 @@
-import {
-  Stack,
-  Text,
-  Button,
-  useDisclosure,
-  Box,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Avatar,
-} from '@chakra-ui/react';
+import { Box, Button, Input, Stack, Text } from '@chakra-ui/react';
 import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
 import { useAdminBroadcaster } from '@project-lc/hooks';
-import { BroadcasterDTO, KkshowMainBestBroadcasterItem } from '@project-lc/shared-types';
-import { useState } from 'react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import {
+  BroadcasterDTO,
+  KkshowMainBestBroadcasterItem,
+  KkshowMainResData,
+} from '@project-lc/shared-types';
+import { FieldArrayWithId, useFieldArray, useFormContext } from 'react-hook-form';
 import { BroadcasterProfile } from './AdminKkshowMainCarouselItemView';
 import { AdminKkshowMainFieldArrayItemContainer } from './AdminKkshowMainCarouselSection';
 
 export function AdminKkshowMainBestBroadcasterSection(): JSX.Element {
-  const { isOpen, onClose, onOpen } = useDisclosure();
-  const { control } = useFormContext();
+  const { control } = useFormContext<KkshowMainResData>();
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: 'bestBroadcaster' as const,
   });
 
+  const appendItem = (): void => {
+    append({
+      profileImageUrl: '',
+      nickname: '',
+      broadcasterId: null,
+    });
+  };
+
   const itemRemoveHandler = async (
-    field: Record<'id', string>,
+    field: FieldArrayWithId<KkshowMainResData, 'bestBroadcaster', 'id'>,
     index: number,
   ): Promise<void> => {
     remove(index);
@@ -42,16 +38,11 @@ export function AdminKkshowMainBestBroadcasterSection(): JSX.Element {
           베스트 방송인 영역
         </Text>
         <Stack direction="row">
-          <Button onClick={onOpen}>베스트 방송인 추가하기</Button>
-          <KkshowMainBestBroadcasterItemDialog
-            isOpen={isOpen}
-            onClose={onClose}
-            createCallback={(item) => append(item)}
-          />
+          <Button onClick={appendItem}>베스트 방송인 추가하기</Button>
         </Stack>
       </Stack>
 
-      <Stack px={4} direction="row">
+      <Stack px={4}>
         {fields.map((field, index) => {
           const item = field as unknown as KkshowMainBestBroadcasterItem;
           return (
@@ -65,7 +56,7 @@ export function AdminKkshowMainBestBroadcasterSection(): JSX.Element {
                 }}
                 removeHandler={() => itemRemoveHandler(field, index)}
               >
-                <AdminKkshowMainBestBroadcasterItem item={item} />
+                <AdminKkshowMainBestBroadcasterItem index={index} item={item} />
               </AdminKkshowMainFieldArrayItemContainer>
             </Stack>
           );
@@ -77,95 +68,58 @@ export function AdminKkshowMainBestBroadcasterSection(): JSX.Element {
 
 export default AdminKkshowMainBestBroadcasterSection;
 
-export function KkshowMainBestBroadcasterItemDialog({
-  isOpen,
-  onClose,
-  createCallback,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  createCallback: (data: KkshowMainBestBroadcasterItem) => void;
-}): JSX.Element {
-  const { data } = useAdminBroadcaster();
-
-  const [selectedBroadcaster, setSelectedBroadcaster] = useState<BroadcasterDTO | null>(
-    null,
-  );
-
-  const handleClose = (): void => {
-    setSelectedBroadcaster(null);
-    onClose();
-  };
-
-  const handleCreate = (): void => {
-    if (!selectedBroadcaster) return;
-    createCallback({
-      profileImageUrl: selectedBroadcaster.avatar || '',
-      nickname: selectedBroadcaster.userNickname || '',
-      broadcasterId: selectedBroadcaster.id,
-    });
-    handleClose();
-  };
-  return (
-    <Modal isOpen={isOpen} onClose={handleClose}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>베스트 방송인 추가하기</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Stack>
-            <Box>
-              <Text>방송인 선택</Text>
-              <ChakraAutoComplete
-                options={data || []}
-                getOptionLabel={(option) => option?.userNickname || ''}
-                onChange={(newV) => {
-                  setSelectedBroadcaster(newV || null);
-                }}
-              />
-            </Box>
-
-            {selectedBroadcaster ? (
-              <AdminKkshowMainBestBroadcasterItem
-                item={{
-                  broadcasterId: selectedBroadcaster.id,
-                  nickname: selectedBroadcaster.userNickname,
-                  profileImageUrl: selectedBroadcaster.avatar || '',
-                }}
-              />
-            ) : (
-              <Text>선택한 방송인 없음</Text>
-            )}
-          </Stack>
-        </ModalBody>
-
-        <ModalFooter>
-          <Button
-            colorScheme="blue"
-            mr={3}
-            onClick={handleCreate}
-            disabled={!selectedBroadcaster}
-          >
-            추가
-          </Button>
-          <Button variant="ghost" onClick={handleClose}>
-            닫기
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
-  );
-}
-
 export function AdminKkshowMainBestBroadcasterItem({
   item,
+  index,
 }: {
   item: KkshowMainBestBroadcasterItem;
+  index: number;
 }): JSX.Element {
+  const { register, setValue, watch } = useFormContext();
+  const profileImageUrl = watch(`bestBroadcaster.${index}.profileImageUrl`);
+
+  const { data } = useAdminBroadcaster();
+
+  const onBroadcasterSelectChange = (
+    selectedBroadcaster: BroadcasterDTO | null,
+  ): void => {
+    if (selectedBroadcaster) {
+      setValue(
+        `bestBroadcaster.${index}.profileImageUrl`,
+        selectedBroadcaster.avatar || '',
+        { shouldDirty: true },
+      );
+      setValue(
+        `bestBroadcaster.${index}.nickname`,
+        selectedBroadcaster.userNickname || '',
+        { shouldDirty: true },
+      );
+      setValue(`bestBroadcaster.${index}.broadcasterId`, selectedBroadcaster.id, {
+        shouldDirty: true,
+      });
+    }
+  };
+
   return (
-    <Stack alignItems="center">
-      <BroadcasterProfile profileImageUrl={item.profileImageUrl} />
-      <Text>{item.nickname}</Text>
+    <Stack direction="row" alignItems="center">
+      <Text>순서 : {index + 1}</Text>
+      <BroadcasterProfile profileImageUrl={profileImageUrl} />
+      <Box>
+        <Text>방송인 이미지 주소</Text>
+        <Input {...register(`bestBroadcaster.${index}.profileImageUrl` as const)} />
+      </Box>
+      <Box>
+        <Text>활동명</Text>
+        <Input {...register(`bestBroadcaster.${index}.nickname` as const)} />
+      </Box>
+      <Box>
+        <Text>방송인 선택</Text>
+        <ChakraAutoComplete
+          options={data || []}
+          getOptionLabel={(option) => option?.userNickname || ''}
+          onChange={onBroadcasterSelectChange}
+        />
+      </Box>
     </Stack>
   );
 }

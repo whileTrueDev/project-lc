@@ -2,5 +2,5 @@
 export interface KkshowMainBestBroadcasterItem {
   profileImageUrl: string;
   nickname: string;
-  broadcasterId: number;
+  broadcasterId?: number | null;
 }
