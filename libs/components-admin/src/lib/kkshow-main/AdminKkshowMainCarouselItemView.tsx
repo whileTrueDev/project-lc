@@ -85,6 +85,10 @@ export function CarouselItemSimpleBanner({
         <Text>배너 링크 주소</Text>
         <Input {...register(`carousel.${index}.linkUrl` as const)} size="sm" />
       </Box>
+      <Box>
+        <Text>배너 설명</Text>
+        <Input {...register(`carousel.${index}.description` as const)} size="sm" />
+      </Box>
     </>
   );
 }

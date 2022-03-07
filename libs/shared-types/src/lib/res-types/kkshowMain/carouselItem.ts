@@ -11,6 +11,7 @@ export type KkshowMainCarouselItem =
 export interface SimpleBannerItem extends KkshowMainCarouselItemBase, Image {
   type: 'simpleBanner';
   linkUrl?: string;
+  description?: string;
 }
 
 // 라이브예고 아이템 : 이미지url + 상품정보(상품링크) + 방송인정보
