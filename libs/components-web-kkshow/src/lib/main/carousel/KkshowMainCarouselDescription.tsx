@@ -24,6 +24,7 @@ export function KkshowMainCarouselDescription({
           productImageUrl={item.productImageUrl}
           productLinkUrl={item.productLinkUrl}
           isExternal // item.isExternal}
+          liveShoppingStatus="upcoming"
         />
       </KkshowMainCarouselDescriptionContainer>
     );
@@ -40,7 +41,7 @@ export function KkshowMainCarouselDescription({
           productImageUrl={item.productImageUrl}
           productLinkUrl={item.productLinkUrl}
           isExternal // item.isExternal}
-          isOnLive
+          liveShoppingStatus="live"
         />
       </KkshowMainCarouselDescriptionContainer>
     );
@@ -57,6 +58,7 @@ export function KkshowMainCarouselDescription({
           productImageUrl={item.productImageUrl}
           productLinkUrl={item.productLinkUrl}
           isExternal // item.isExternal}
+          liveShoppingStatus="ended"
         />
       </KkshowMainCarouselDescriptionContainer>
     );

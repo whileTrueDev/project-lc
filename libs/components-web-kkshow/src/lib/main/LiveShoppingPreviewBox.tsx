@@ -20,7 +20,7 @@ export interface LiveShoppingPreviewBoxProps {
   productImageUrl: string;
   profileImageUrl: string;
   productLinkUrl: string;
-  isOnLive?: boolean;
+  liveShoppingStatus?: 'live' | 'upcoming' | 'ended';
   isExternal?: boolean;
 }
 export function LiveShoppingPreviewBox({
@@ -30,10 +30,22 @@ export function LiveShoppingPreviewBox({
   productImageUrl,
   profileImageUrl,
   productLinkUrl,
-  isOnLive = false,
+  liveShoppingStatus,
   isExternal = false,
 }: LiveShoppingPreviewBoxProps): JSX.Element {
   const avatarSize = useBreakpointValue({ base: 'xl', md: 'xl' });
+  let badgeColor = 'gray';
+  let badgeText = '';
+  if (liveShoppingStatus === 'live') {
+    badgeColor = 'red';
+    badgeText = 'LIVE';
+  } else if (liveShoppingStatus === 'upcoming') {
+    badgeColor = 'green';
+    badgeText = 'upcoming';
+  } else if (liveShoppingStatus === 'ended') {
+    badgeColor = 'gray';
+    badgeText = '완료';
+  }
   return (
     <HStack maxH={100} alignItems="center" spacing={{ base: 2, sm: 4 }}>
       <BorderedAvatar size={avatarSize} src={profileImageUrl} />
@@ -53,17 +65,18 @@ export function LiveShoppingPreviewBox({
             <Link passHref href={productLinkUrl}>
               <LinkOverlay isExternal={isExternal}>
                 <Heading fontSize="lg" fontWeight="medium" noOfLines={2} maxW={280}>
-                  <Badge
-                    mr={1}
-                    p={1}
-                    variant="solid"
-                    bgColor={isOnLive ? 'red' : 'green'}
-                    color="whiteAlpha.900"
-                    rounded="md"
-                  >
-                    {/* // TODO 라이브쇼핑 상태 조회 필요 */}
-                    {isOnLive ? 'live' : 'upcoming'}
-                  </Badge>
+                  {badgeText && (
+                    <Badge
+                      mr={1}
+                      p={1}
+                      variant="solid"
+                      bgColor={badgeColor}
+                      color="whiteAlpha.900"
+                      rounded="md"
+                    >
+                      {badgeText}
+                    </Badge>
+                  )}
                   {title}
                 </Heading>
               </LinkOverlay>

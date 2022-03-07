@@ -37,7 +37,10 @@ export function KkshowMainCarouselContents({
           style={{ borderRadius: '8px' }}
           width="100%"
           height="100%"
-          src={`https://www.youtube.com/embed/${item.videoUrl}?controls=0`}
+          src={`https://www.youtube.com/embed/${item.videoUrl.replace(
+            'https://youtu.be/',
+            '',
+          )}?controls=0`}
           title="YouTube video player"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -48,9 +51,10 @@ export function KkshowMainCarouselContents({
   }
 
   if (item.type === 'previous') {
-    const youtubeSrc = item.videoUrl.includes('https://www.youtube.com/embed')
-      ? item.videoUrl
-      : `https://www.youtube.com/embed/${item.videoUrl}`;
+    const youtubeSrc = `https://www.youtube.com/embed/${item.videoUrl.replace(
+      'https://youtu.be/',
+      '',
+    )}?controls=0`;
     return (
       <KkshowMainCarouselContentsContainer>
         <iframe

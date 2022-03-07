@@ -118,14 +118,20 @@ interface LiveCardProps {
   videoUrl: string;
   liveShoppingTitle: string;
   liveShoppingDescription: string;
-  broadcasterProfileImageUrl: string;
+  profileImageUrl: string;
 }
 function LiveCard({
   videoUrl,
   liveShoppingTitle,
   liveShoppingDescription,
-  broadcasterProfileImageUrl,
+  profileImageUrl,
 }: LiveCardProps): JSX.Element {
+  const youtubeSrc = `https://www.youtube.com/embed/${videoUrl.replace(
+    'https://youtu.be/',
+    '',
+  )}?controls=0`;
+
+  const profileImage = profileImageUrl.replace('70x70', '300x300');
   return (
     <Box
       rounded="2xl"
@@ -140,7 +146,7 @@ function LiveCard({
           style={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
           width="100%"
           height="100%"
-          src={videoUrl}
+          src={youtubeSrc}
           title="YouTube video player"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -159,7 +165,7 @@ function LiveCard({
         </Stack>
 
         <Box>
-          <BorderedAvatar src={broadcasterProfileImageUrl} size="lg" />
+          <BorderedAvatar src={profileImage} size="lg" />
         </Box>
       </Flex>
     </Box>

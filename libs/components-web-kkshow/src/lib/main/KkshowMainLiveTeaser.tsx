@@ -12,6 +12,7 @@ import BorderedAvatar from '@project-lc/components-core/BorderedAvatar';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import RedLinedText from '@project-lc/components-core/RedLinedText';
 import { useKkshowMain } from '@project-lc/hooks';
+import { openKakaoChannel } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { MdOutlineNotificationsActive } from 'react-icons/md';
 import KkshowMainTitle from './KkshowMainTitle';
@@ -21,10 +22,11 @@ export function KkshowLiveTeaser(): JSX.Element | null {
 
   if (!data) return null;
 
-  const discountRate =
+  const discountRate = (
     ((data.trailer.normalPrice - data.trailer.discountedPrice) /
       data.trailer.normalPrice) *
-    100;
+    100
+  ).toFixed(0);
 
   return (
     <Box pt={20} overflow="hidden" pos="relative">
@@ -134,8 +136,10 @@ export function KkshowLiveTeaser(): JSX.Element | null {
                 </RedLinedText>
               </Heading>
             </Box>
+            {/* // TODO 알림 기능 추가 이후 알림 추가로 변경 */}
             <Box>
               <Button
+                onClick={openKakaoChannel}
                 borderColor="red"
                 color="red"
                 variant="outline"
