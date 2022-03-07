@@ -28,6 +28,7 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
   const { register, watch, setValue } = useFormContext();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const liveShoppingId = watch('trailer.liveShoppingId');
+  const profileImageUrl = watch('trailer.broadcasterProfileImageUrl');
   const broadcastStartDate = watch('trailer.broadcastStartDate');
   const dateRef = useRef<HTMLInputElement>(null);
 
@@ -148,7 +149,7 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
               </Box>
               <Box>
                 <Text>프로필 이미지</Text>
-                <Avatar src={watch('trailer.broadcasterProfileImageUrl')} />
+                <Avatar src={profileImageUrl} />
                 <Text>이미지 주소 입력</Text>
                 <Input {...register('trailer.broadcasterProfileImageUrl')} />
               </Box>

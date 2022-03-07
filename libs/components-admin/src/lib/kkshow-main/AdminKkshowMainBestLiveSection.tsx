@@ -107,16 +107,7 @@ export function AdminKkshowMainBestLiveItem({
       </Stack>
 
       <Box>
-        {embedUrl && <VideoImbed videoUrl={embedUrl} />}
-        {!embedUrl && !liveShoppingId && (
-          <Box>
-            <Text>
-              유튜브 영상 주소 ( https://youtu.be/4pIuCJTMXQU ) 같은 형태로 입력
-            </Text>
-            <Input {...register(`bestLive.${index}.videoUrl` as const)} />
-          </Box>
-        )}
-        {!embedUrl && liveShoppingId && (
+        {!embedUrl && liveShoppingId ? (
           <Text>
             등록된 유튜브 영상이 없습니다.
             <br />
@@ -124,6 +115,14 @@ export function AdminKkshowMainBestLiveItem({
             <br />
             다시 정보를 가져와주세요
           </Text>
+        ) : (
+          <Box>
+            <VideoImbed videoUrl={embedUrl} />
+            <Text>
+              유튜브 영상 주소 ( https://youtu.be/4pIuCJTMXQU ) 같은 형태로 입력
+            </Text>
+            <Input {...register(`bestLive.${index}.videoUrl` as const)} />
+          </Box>
         )}
       </Box>
 
