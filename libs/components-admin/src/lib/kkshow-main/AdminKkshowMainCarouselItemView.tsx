@@ -356,7 +356,7 @@ export function ProductImage({
 }: {
   productImageUrl: string;
 }): JSX.Element {
-  if (!productImageUrl) return <Text>상품 이미지가 없습니다</Text>;
+  if (!productImageUrl) return <Text>상품 이미지 없음</Text>;
   return (
     <Box>
       <Text>상품</Text>
@@ -376,37 +376,24 @@ export function CarouselItemProductAndBroadcasterInfo(
   const productImageUrl = watch(`carousel.${index}.productImageUrl`);
 
   const setItemValue = (data: LiveShoppingWithGoods): void => {
-    console.log(data);
-    setValue(`carousel.${index}.profileImageUrl`, data.goods.image[0].image, {
-      shouldDirty: true,
-    });
-    setValue(`carousel.${index}.productImageUrl`, data.goods.image[0].image, {
-      shouldDirty: true,
-    });
-    setValue(`carousel.${index}.liveShoppingName`, data.liveShoppingName || '', {
-      shouldDirty: true,
-    });
+    setValue(`carousel.${index}.liveShoppingId`, data.id, { shouldDirty: true });
+    setValue(`carousel.${index}.profileImageUrl`, data.goods.image[0].image);
+    setValue(`carousel.${index}.productImageUrl`, data.goods.image[0].image);
+    setValue(`carousel.${index}.liveShoppingName`, data.liveShoppingName || '');
     setValue(
       `carousel.${index}.productLinkUrl`,
       data.fmGoodsSeq ? `https://k-kmarket.com/goods/view?no=${data.fmGoodsSeq}` : '',
-      { shouldDirty: true },
     );
-    setValue(`carousel.${index}.normalPrice`, Number(data.goods.options[0].price), {
-      shouldDirty: true,
-    });
+    setValue(`carousel.${index}.normalPrice`, Number(data.goods.options[0].price));
     setValue(
       `carousel.${index}.discountedPrice`,
       Number(data.goods.options[0].consumer_price),
-      { shouldDirty: true },
     );
-    setValue(`carousel.${index}.liveShoppingId`, data.id, { shouldDirty: true });
-    setValue(`carousel.${index}.broadcasterNickname`, data.broadcaster.userNickname, {
-      shouldDirty: true,
-    });
+
+    setValue(`carousel.${index}.broadcasterNickname`, data.broadcaster.userNickname);
     setValue(
       `carousel.${index}.promotionPageLinkUrl`,
       data.broadcaster.BroadcasterPromotionPage?.url || '',
-      { shouldDirty: true },
     );
 
     const carouselImage = data.images.find((i) => i.type === 'carousel');
@@ -423,8 +410,23 @@ export function CarouselItemProductAndBroadcasterInfo(
   };
   return (
     <Stack direction="row">
-      <BroadcasterProfile profileImageUrl={profileImageUrl} />
-      <ProductImage productImageUrl={productImageUrl || ''} />
+      <Box>
+        <Stack direction="row">
+          <BroadcasterProfile profileImageUrl={profileImageUrl} />
+          <Box>
+            <Text>프로필 이미지 주소</Text>
+            <Input {...register(`carousel.${index}.profileImageUrl` as const)} />
+          </Box>
+        </Stack>
+
+        <Stack direction="row">
+          <ProductImage productImageUrl={productImageUrl} />
+          <Box>
+            <Text>상품 이미지 주소</Text>
+            <Input {...register(`carousel.${index}.productImageUrl` as const)} />
+          </Box>
+        </Stack>
+      </Box>
 
       <Stack>
         {/* 라이브쇼핑명, 상품링크, 가격 */}
