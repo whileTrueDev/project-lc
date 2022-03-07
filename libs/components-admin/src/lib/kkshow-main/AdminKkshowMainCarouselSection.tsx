@@ -42,6 +42,7 @@ const carouselItemAddButtons: {
       type: 'simpleBanner',
       linkUrl: '',
       imageUrl: '',
+      description: '',
     },
   },
   {
