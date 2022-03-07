@@ -12,7 +12,10 @@ import {
 import ImageInputDialog, {
   ImageInputFileReadData,
 } from '@project-lc/components-core/ImageInputDialog';
-import { LiveShoppingWithGoods } from '@project-lc/hooks';
+import {
+  LiveShoppingWithGoods,
+  useAdminLiveShoppingImageMutation,
+} from '@project-lc/hooks';
 import { s3 } from '@project-lc/utils-s3';
 import dayjs from 'dayjs';
 import path from 'path';
@@ -22,19 +25,29 @@ import { LiveShoppingListAutoComplete } from './LiveShoppingListAutoComplete';
 export function AdminKkshowMainPreviewSection(): JSX.Element {
   const { register, watch, setValue } = useFormContext();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const liveShoppingId = watch('trailer.liveShoppingId');
 
+  const { mutateAsync } = useAdminLiveShoppingImageMutation();
   const imageDataHandler = async (imageData: ImageInputFileReadData): Promise<void> => {
-    // 홍보용이미지
     const timestamp = new Date().getTime();
-    const s3KeyType = `live-shopping-images/${watch('trailer.liveShoppingId')}/preview`;
+    const imageType = 'trailer';
+    // liveshoppingId 가 없는경우 해당값은 null로 들어감
+    const s3KeyType = `live-shopping-images/${liveShoppingId}/${imageType}`;
     const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
+
     const { savedKey } = await s3.sendPutObjectCommand({
       Key: key,
       Body: imageData.file,
       ContentType: imageData.file.type,
       ACL: 'public-read',
     });
-    // TODO : 해당 liveShoppingId의 liveShoppingImage preview 타입 upsert필요
+    if (liveShoppingId) {
+      await mutateAsync({
+        liveShoppingId,
+        imageType,
+        imageUrl: savedKey,
+      }).catch((e) => console.error(e));
+    }
     setValue('trailer.imageUrl', savedKey, { shouldDirty: true });
 
     return Promise.resolve();
@@ -141,7 +154,7 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
                 height="100"
               />
             )}
-            <Button onClick={onOpen} disabled={!watch('trailer.liveShoppingId')}>
+            <Button onClick={onOpen}>
               썸네일 {watch('trailer.imageUrl') ? '수정' : '등록'}하기
             </Button>
             <ImageInputDialog

@@ -103,8 +103,9 @@ export function CarouselItemUpcomingLive({
   const { mutateAsync } = useAdminLiveShoppingImageMutation();
   const handleConfirm = async (imageData: ImageInputFileReadData): Promise<void> => {
     const timestamp = new Date().getTime();
+    const imageType = 'carousel';
     // liveshoppingId 가 없는경우 해당값은 null로 들어감
-    const s3KeyType = `live-shopping-images/${liveShoppingId}/carousel`;
+    const s3KeyType = `live-shopping-images/${liveShoppingId}/${imageType}`;
     const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
 
     const { savedKey } = await s3.sendPutObjectCommand({
@@ -117,7 +118,7 @@ export function CarouselItemUpcomingLive({
     if (liveShoppingId) {
       await mutateAsync({
         liveShoppingId,
-        imageType: 'carousel',
+        imageType,
         imageUrl: savedKey,
       }).catch((e) => console.error(e));
     }
