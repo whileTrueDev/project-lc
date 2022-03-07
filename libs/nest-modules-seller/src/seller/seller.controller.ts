@@ -37,6 +37,7 @@ import {
 } from './seller-settlement.service';
 import { SellerShopService } from './seller-shop.service';
 import { SellerService } from './seller.service';
+
 @Controller('seller')
 export class SellerController {
   constructor(

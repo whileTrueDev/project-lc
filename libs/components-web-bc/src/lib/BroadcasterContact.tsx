@@ -106,7 +106,7 @@ export function BroadcasterContactItem({
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { mutateAsync: deleteContact } = useDeleteBroadcasterContactsMutation();
-  async function onDelete(): Promise<void> {
+  const onDelete = async (): Promise<void> => {
     if (contactData.isDefault) {
       toast({ title: '기본 연락처는 삭제할 수 없습니다.', status: 'warning' });
     } else {
@@ -127,7 +127,7 @@ export function BroadcasterContactItem({
           });
         });
     }
-  }
+  };
 
   const updateSection = useDisclosure();
   const update = useUpdateBroadcasterContactsMutation(contactData.id);

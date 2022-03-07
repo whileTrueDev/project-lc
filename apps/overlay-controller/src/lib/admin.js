@@ -63,6 +63,27 @@ $(document).ready(function ready() {
   $('#end-time-picker').val(localISOTime);
   $('#fever-time-picker').val(localISOTime);
 
+  function calculateSaleForDashboard(data) {
+    const totalPrice = data.reduce((acc, d) => acc + d.price, 0);
+    const totalPurchaseCount = data.length;
+    const totalGiftNumber = data.filter((d) => !!d.giftFlag).length;
+
+    const isLoginMessages = data.filter((item) => item.loginFlag === true);
+
+    const uniqueValues = new Set(isLoginMessages.map((item) => item.nickname));
+
+    // 중복주문 계산
+    if (uniqueValues.size < isLoginMessages.length) {
+      $('.addtional-sales').text(isLoginMessages.length - uniqueValues.size);
+    } else if (uniqueValues.size === isLoginMessages.length) {
+      $('.addtional-sales').text('0');
+    }
+
+    $('.total-sales-price').text(Number(totalPrice).toLocaleString());
+    $('.total-sales-number').text(totalPurchaseCount);
+    $('.total-gift-sales').text(totalGiftNumber);
+  }
+
   // 구입 메세지 목록 받아오는 재귀 ajax
   function getPurchaseMessage() {
     // 현황판 업데이트를 위한 이벤트 송출
@@ -73,6 +94,8 @@ $(document).ready(function ready() {
       dataType: 'json',
       data: { liveShoppingId },
       success(data) {
+        // 대시보드 지표 계산
+        calculateSaleForDashboard(data);
         $('table#message-table').DataTable().destroy();
         const source = $('#purchase-message-list').html(); // 템플릿으로 만든 text를 불러옴
         const template = Handlebars.compile(source);
@@ -149,6 +172,7 @@ $(document).ready(function ready() {
     });
 
     roomName = url.split('/').pop();
+    // 대시보드 지표 계산
     getPurchaseMessage();
 
     if (liveShoppingStateBoardController) {

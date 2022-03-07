@@ -161,12 +161,12 @@ export function AdminGiftList(props: {
   }, [orders.data]);
 
   // 퍼스트몰 주문정보로 이동하기
-  function handleRowClick(param: GridRowParams): void {
+  const handleRowClick = (param: GridRowParams): void => {
     if (param.row?.order_seq) {
       const url = `http://whiletrue.firstmall.kr/admin/order/view?query_string=&no=${param.row?.order_seq}`;
       window.open(url, '_blank');
     }
-  }
+  };
 
   return (
     <Box minHeight={{ base: 300, md: 600 }} mt={3}>

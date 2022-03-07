@@ -1,4 +1,4 @@
-import { Box, Button, Input, Text, useToast } from '@chakra-ui/react';
+import { Button, Flex, Input, Text, useToast } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
 import { useState } from 'react';
 
@@ -16,18 +16,19 @@ export function UrlCard(props: UrlCardProps): JSX.Element {
   const { inputValue, inputDisabled, buttonDisabled, buttonHandler, label } = props;
 
   return (
-    <Box
+    <Flex
       borderRadius="md"
       borderWidth="1px"
-      display="flex"
+      flexDir="column"
       alignItems="center"
       justifyContent="space-between"
       p={3}
-      width="100%"
+      h={150}
     >
       {typeof label === 'string' ? <Text fontWeight="bold">{label}</Text> : label}
 
       <Input
+        textAlign="center"
         maxW={300}
         size="sm"
         id="overlayUrl"
@@ -37,10 +38,10 @@ export function UrlCard(props: UrlCardProps): JSX.Element {
         disabled={inputDisabled}
       />
 
-      <Button variant="solid" size="sm" disabled={buttonDisabled} onClick={buttonHandler}>
+      <Button variant="solid" disabled={buttonDisabled} onClick={buttonHandler}>
         URL복사
       </Button>
-    </Box>
+    </Flex>
   );
 }
 

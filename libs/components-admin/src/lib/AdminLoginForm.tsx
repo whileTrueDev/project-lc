@@ -38,9 +38,9 @@ export function AdminLoginForm({ enableShadow = false }: LoginFormProps): JSX.El
 
   // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
   const [formError, setFormError] = useState('');
-  function resetFormError(): void {
+  const resetFormError = (): void => {
     setFormError('');
-  }
+  };
 
   const login = useLoginMutation('admin');
   const onSubmit = useCallback(

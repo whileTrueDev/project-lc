@@ -175,7 +175,7 @@ export function AdminGoodsList(): JSX.Element {
       enabled: !!profileData?.email,
     },
   );
-  async function handleClick(param: GridCellParams): Promise<void> {
+  const handleClick = async (param: GridCellParams): Promise<void> => {
     if (param.field === 'confirmation') {
       setSelectedRow(param.row);
       onOpen();
@@ -185,7 +185,7 @@ export function AdminGoodsList(): JSX.Element {
       onRejectionOpen();
     }
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
-  }
+  };
 
   return (
     <>

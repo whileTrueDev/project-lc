@@ -11,11 +11,12 @@ export function SellerStatusSection(): JSX.Element {
 
   const sellerStatus = useMemo<string>(() => {
     if (
-      settlementData?.sellerBusinessRegistration &&
-      settlementData?.sellerBusinessRegistration.length > 0
+      settlementData &&
+      settlementData.sellerBusinessRegistration &&
+      settlementData.sellerBusinessRegistration.length > 0
     ) {
       const { BusinessRegistrationConfirmation } =
-        settlementData?.sellerBusinessRegistration[0];
+        settlementData.sellerBusinessRegistration[0];
       const result =
         BusinessRegistrationConfirmation?.status === BusinessRegistrationStatus.CONFIRMED
           ? '정상'
@@ -23,7 +24,7 @@ export function SellerStatusSection(): JSX.Element {
       return result;
     }
     return '판매중지';
-  }, [settlementData?.sellerBusinessRegistration]);
+  }, [settlementData]);
 
   return (
     <Flex direction="row" maxW="600" m={2}>
