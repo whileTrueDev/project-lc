@@ -53,7 +53,10 @@ function BestLiveList(): JSX.Element | null {
       >
         {data &&
           data.bestLive.map((item) => (
-            <SwiperSlide key={item.liveShoppingId} style={{ width: 320 - 16 }}>
+            <SwiperSlide
+              key={`${item.liveShoppingTitle}_${item.liveShoppingId}`}
+              style={{ width: 320 - 16 }}
+            >
               <LiveCard {...item} />
             </SwiperSlide>
           ))}
@@ -81,9 +84,8 @@ function BestLiveList(): JSX.Element | null {
       />
       {data &&
         data.bestLive.map((item, index) => (
-          <GridItem colSpan={2} key={item.liveShoppingId}>
+          <GridItem colSpan={2} key={`${item.liveShoppingTitle}_${item.liveShoppingId}`}>
             <MotionBox
-              key={item.liveShoppingId}
               pos="relative"
               variants={itemVariants}
               initial="hidden"

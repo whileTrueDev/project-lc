@@ -39,7 +39,7 @@ export function KkshowMainBestBroadcaster(): JSX.Element | null {
         >
           {data.bestBroadcaster.map((x) => (
             <SwiperSlide
-              key={x.broadcasterId}
+              key={`${x.nickname}_${x.broadcasterId}`}
               style={{ maxWidth: 190, paddingBottom: 24 }}
             >
               <BestBroadcasterItem
@@ -85,7 +85,7 @@ function BestBroadcasterItem(props: BestBroadcasterItemProps): JSX.Element {
           }}
         />
 
-        <NextLink passHref href={props.href}>
+        <NextLink passHref href={props.href || '/'}>
           <LinkOverlay isExternal>
             <Heading noOfLines={2} fontSize="xl">
               {props.broadcasterName}

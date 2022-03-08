@@ -37,7 +37,7 @@ export function EmbededVideo({
     );
   }
 
-  if (provider === 'twitch') {
+  if (provider === 'twitch' && myLocaitonOrigin) {
     return (
       <iframe
         style={style}
