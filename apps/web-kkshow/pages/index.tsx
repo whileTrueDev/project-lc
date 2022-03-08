@@ -18,7 +18,9 @@ interface KkshowIndexProps {
 }
 export const getStaticProps: GetStaticProps<KkshowIndexProps> = async () => {
   const queryClient = createQueryClient();
-  await queryClient.prefetchQuery(kkshowMainQueryKey, getKkshowMain);
+  await queryClient.prefetchQuery(kkshowMainQueryKey, getKkshowMain).catch((err) => {
+    throw new Error(`Failed to fetch KkshowMain data - ${err}`);
+  });
 
   return {
     props: { dehydratedState: dehydrate(queryClient) },
