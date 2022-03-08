@@ -16,14 +16,14 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
+  InactiveSeller,
   SellCommission,
   Seller,
   SellerSettlementAccount,
-  InactiveSeller,
 } from '@prisma/client';
 import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
+import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { MailVerificationService } from '@project-lc/nest-modules-mail';
 import {
   BusinessRegistrationDto,
   EmailDupCheckDto,
@@ -36,15 +36,15 @@ import {
   SettlementAccountDto,
   SignUpDto,
 } from '@project-lc/shared-types';
-import __multer from 'multer';
 import { s3 } from '@project-lc/utils-s3';
+import { SellerContactsService } from './seller-contacts.service';
 import {
   SellerSettlementInfo,
   SellerSettlementService,
 } from './seller-settlement.service';
 import { SellerShopService } from './seller-shop.service';
 import { SellerService } from './seller.service';
-import { SellerContactsService } from './seller-contacts.service';
+
 @Controller('seller')
 export class SellerController {
   constructor(

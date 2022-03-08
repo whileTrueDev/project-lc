@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -10,10 +11,9 @@ import {
   Res,
   UseGuards,
   ValidationPipe,
-  BadRequestException,
 } from '@nestjs/common';
 import { JwtAuthGuard, LocalAuthGuard } from '@project-lc/nest-modules-authguard';
-import { MailVerificationService } from '@project-lc/nest-modules-mail';
+import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import {
   EmailCodeVerificationDto,
   loginUserRes,

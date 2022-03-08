@@ -24,7 +24,7 @@ import {
   UserPayload,
 } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { MailVerificationService } from '@project-lc/nest-modules-mail';
+import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import {
   BroadcasterAddressDto,
   BroadcasterContractionAgreementDto,
@@ -39,10 +39,9 @@ import {
 import { s3 } from '@project-lc/utils-s3';
 import { Broadcaster, BroadcasterAddress, InactiveBroadcaster } from '.prisma/client';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
-import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-history.service';
-import { BroadcasterService } from './broadcaster.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
+import { BroadcasterService } from './broadcaster.service';
 
 @Controller('broadcaster')
 export class BroadcasterController {
@@ -50,7 +49,6 @@ export class BroadcasterController {
     private readonly broadcasterService: BroadcasterService,
     private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
-    private readonly settlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterContactsService: BroadcasterContactsService,
     private readonly broadcasterSettlementService: BroadcasterSettlementService,
   ) {}
