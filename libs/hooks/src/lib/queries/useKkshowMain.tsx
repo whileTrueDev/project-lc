@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
+export const kkshowMainQueryKey = 'KkshowMain';
 export const getKkshowMain = async (): Promise<KkshowMainResData> => {
   const url =
     process.env.NEXT_PUBLIC_APP_TYPE === 'admin' ? '/admin/kkshow-main' : 'kkshow-main';
@@ -10,5 +11,5 @@ export const getKkshowMain = async (): Promise<KkshowMainResData> => {
 };
 
 export const useKkshowMain = (): UseQueryResult<KkshowMainResData, AxiosError> => {
-  return useQuery<KkshowMainResData, AxiosError>('KkshowMain', getKkshowMain);
+  return useQuery<KkshowMainResData, AxiosError>(kkshowMainQueryKey, getKkshowMain);
 };

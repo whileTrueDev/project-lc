@@ -47,7 +47,7 @@ export const kkshowMainSeedData = {
     },
     {
       type: 'previous',
-      videoUrl: 'https://youtu.be/vFv6ZUOEnAo',
+      videoUrl: 'vFv6ZUOEnAo',
       normalPrice: 20000,
       liveShoppingId: null,
       productLinkUrl: 'https://k-kmarket.com/goods/view?no=180',
@@ -65,7 +65,7 @@ export const kkshowMainSeedData = {
     },
     {
       type: 'previous',
-      videoUrl: 'https://youtu.be/TutKdpA-JRw',
+      videoUrl: 'TutKdpA-JRw',
       normalPrice: 20000,
       liveShoppingId: null,
       productLinkUrl: 'https://k-kmarket.com/goods/catalog?code=0012',
@@ -97,7 +97,7 @@ export const kkshowMainSeedData = {
   },
   bestLive: [
     {
-      videoUrl: 'https://youtu.be/4Bkuhi7i7Mk',
+      videoUrl: '4Bkuhi7i7Mk',
       liveShoppingId: null,
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/2067380c-6c8f-4a4d-9f68-65c13572a59b-profile_image-70x70.png',
@@ -106,7 +106,7 @@ export const kkshowMainSeedData = {
       broadcasterProfileImageUrl: '',
     },
     {
-      videoUrl: 'https://youtu.be/3TLj00xYR-k',
+      videoUrl: '3TLj00xYR-k',
       liveShoppingId: null,
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/45570b84-1206-4c6a-8d6c-d7700204b7b3-profile_image-150x150.png',
@@ -115,7 +115,7 @@ export const kkshowMainSeedData = {
       broadcasterProfileImageUrl: '',
     },
     {
-      videoUrl: 'https://youtu.be/TutKdpA-JRw',
+      videoUrl: 'TutKdpA-JRw',
       liveShoppingId: null,
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/ec949373-7065-423c-afad-08f9504c8034-profile_image-150x150.png',
@@ -124,7 +124,7 @@ export const kkshowMainSeedData = {
       broadcasterProfileImageUrl: '',
     },
     {
-      videoUrl: 'https://youtu.be/ISVt_Bu61vU',
+      videoUrl: 'ISVt_Bu61vU',
       liveShoppingId: null,
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/24d7c181-ca61-4297-a276-ccc80a923b47-profile_image-150x150.png',

@@ -1,3 +1,5 @@
+export const kakaoChannel = 'https://pf.kakao.com/_xcdxgub/chat';
+
 export function openKakaoChannel(): void {
-  window.open('https://pf.kakao.com/_xcdxgub/chat', '_blank');
+  window.open(kakaoChannel, '_blank');
 }
