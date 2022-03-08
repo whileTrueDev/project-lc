@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { TargetUser } from '@project-lc/shared-types';
-import { MailNoticeService } from '../lib/mail/mail-notice.service';
+import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly mailNoticeService: MailNoticeService) {}
+  constructor(private readonly appService: AppService) {}
   @Get()
   healthCheck(): string {
     return 'alive';
@@ -12,11 +12,11 @@ export class AppController {
 
   @Post('/inactive-pre')
   sendPreInactiveMail(@Body() user: TargetUser[]): Promise<boolean> {
-    return this.mailNoticeService.sendPreInactivateMail(user);
+    return this.appService.sendPreInactivateMail(user);
   }
 
   @Post('/inactive')
   sendInactiveMail(@Body() user: TargetUser[]): Promise<boolean> {
-    return this.mailNoticeService.sendInactivateMail(user);
+    return this.appService.sendInactivateMail(user);
   }
 }

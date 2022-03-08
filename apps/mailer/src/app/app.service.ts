@@ -4,10 +4,10 @@ import { TargetUser } from '@project-lc/shared-types';
 import {
   createPreInactivateNoticeTemplate,
   createInactivateNoticeTemplate,
-} from './mail-templates/createInactivateNoticeTemplate';
+} from '../lib/mail-templates/createInactivateNoticeTemplate';
 
 @Injectable()
-export class MailNoticeService {
+export class AppService {
   constructor(private readonly mailerService: MailerService) {}
 
   public async sendPreInactivateMail(users: TargetUser[]): Promise<boolean> {

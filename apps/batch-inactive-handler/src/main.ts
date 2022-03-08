@@ -19,7 +19,7 @@ async function bootstrap(): Promise<void> {
   const mailTargets = await appService.getLastLoginDate();
   logger.log('Finish: Searching Login History');
 
-  Promise.all([
+  await Promise.all([
     mailTargets.forEach((user) => {
       if (user.timeDiff === 366) {
         appService.moveInactiveUserData(user);
