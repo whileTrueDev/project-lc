@@ -404,8 +404,13 @@ export function LiveShoppingDetail(): JSX.Element {
               <Divider />
 
               <Stack>
-                <Text>영상 URL</Text>
-                <Input {...register('videoUrl')} />
+                <Text>
+                  영상 URL (https://youtu.be/4pIuCJTMXQU 와 같은 형태로 입력해주세요)
+                </Text>
+                <Input
+                  placeholder="https://youtu.be/4pIuCJTMXQU"
+                  {...register('videoUrl')}
+                />
               </Stack>
               <Divider />
 

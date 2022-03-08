@@ -88,13 +88,13 @@ export function AdminNoticeSection(): JSX.Element {
   const { data: notices, isLoading } = useNoticeInfo({}, 'admin');
   const mutation = useNoticeFlagMutation();
 
-  async function handleClick(param: GridCellParams): Promise<void> {
+  const handleClick = async (param: GridCellParams): Promise<void> => {
     if (param.field === 'title') {
       if (param.row.url) {
         window.open(param.row.url, '_blank');
       }
     }
-  }
+  };
 
   // 포스팅 버튼을 눌렀을 때,
   const handleFlagChange =

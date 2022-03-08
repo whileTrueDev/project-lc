@@ -21,7 +21,7 @@ export function ContractionAgreeSection({
   const broadcasterMutation = useBroadcasterUpdateContractionAgreementMutation();
   const sellerMutation = useSellerUpdateContractionAgreementMutation();
 
-  function onSubmit(): void {
+  const onSubmit = (): void => {
     const onSuccess = (): void => {
       // 성공시
       onClose();
@@ -61,7 +61,7 @@ export function ContractionAgreeSection({
           onError();
         });
     }
-  }
+  };
 
   return (
     <SettingSectionLayout title="크크쇼 이용동의">

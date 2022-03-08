@@ -64,6 +64,7 @@ export class BroadcasterService extends ServiceBaseWithCache {
         email: true,
         userNickname: true,
         BroadcasterPromotionPage: true,
+        avatar: true,
       },
     });
   }

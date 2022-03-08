@@ -678,6 +678,7 @@ model LiveShopping {
   SellerSettlementItems       SellerSettlementItems[]
   liveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
   BroadcasterSettlementItems  BroadcasterSettlementItems[]
+  images                      LiveShoppingImage[]
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -708,6 +709,20 @@ model LiveShoppingVideo {
   youtubeUrl   String?        @unique
   createDate   DateTime       @default(now())
   LiveShopping LiveShopping[]
+}
+
+enum LiveShoppingImageType {
+  carousel //메인 캐러셀 이미지
+  trailer //라이브예고용 이미지(인스타게시물) 
+}
+
+model LiveShoppingImage {
+  id             Int                   @id @default(autoincrement())
+  imageUrl       String?
+  type           LiveShoppingImageType
+  createDate     DateTime              @default(now())
+  liveShopping   LiveShopping          @relation(fields: [liveShoppingId], references: [id], onDelete: Cascade)
+  liveShoppingId Int
 }
 
 // 판매 수수료
@@ -1023,4 +1038,13 @@ model Policy {
   version         String // 버전
   publicFlag      Boolean        @default(false) // 공개여부
   content         String         @db.LongText // 내용
+}
+
+// 크크쇼 메인페이지 데이터
+model KkshowMain {
+  id              Int  @id @default(autoincrement())
+  carousel        Json // 메인캐러셀 영역 아이템[]
+  trailer         Json // 라이브예고 영역 
+  bestLive        Json // 베스트라이브 영역 아이템[]
+  bestBroadcaster Json // 베스트방송인 영역 아이템[]
 }

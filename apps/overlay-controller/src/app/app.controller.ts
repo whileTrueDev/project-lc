@@ -8,8 +8,10 @@ import {
   Query,
   Render,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
+import {
+  LiveShoppingService,
+  PurchaseMessageService,
+} from '@project-lc/nest-modules-liveshopping';
 import { OverlayControllerService } from '@project-lc/nest-modules-overlay-controller';
 import {
   liveShoppingPurchaseMessageDto,
@@ -21,12 +23,13 @@ import {
   getOverlayHost,
   getRealtimeApiHost,
 } from '@project-lc/utils';
+
 @Controller()
 export class AppController {
   constructor(
     private readonly overlayControllerService: OverlayControllerService,
     private readonly liveShoppingService: LiveShoppingService,
-    private readonly configService: ConfigService,
+    private readonly purchaseMessageService: PurchaseMessageService,
   ) {}
 
   @Get()
@@ -51,7 +54,7 @@ export class AppController {
   async getMessage(
     @Query('liveShoppingId') liveShoppingId: number,
   ): Promise<liveShoppingPurchaseMessageDto[]> {
-    return this.overlayControllerService.getPurchaseMessage(liveShoppingId);
+    return this.purchaseMessageService.getAllMessagesAndPrice(Number(liveShoppingId));
   }
 
   @Post('/purchase-message')

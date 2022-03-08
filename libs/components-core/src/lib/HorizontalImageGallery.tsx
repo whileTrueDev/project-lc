@@ -20,7 +20,7 @@ export function HorizontalImageGallery({
       {!isMobileSize && (
         <ChevronIconButton
           direction="left"
-          isVisible={!isEndOfLeft}
+          isInVisible={isEndOfLeft}
           onClick={scrollLeft}
         />
       )}
@@ -41,7 +41,7 @@ export function HorizontalImageGallery({
       {!isMobileSize && (
         <ChevronIconButton
           direction="right"
-          isVisible={images.length > 2 && !isEndOfRight}
+          isInVisible={!(images.length > 2 && !isEndOfRight)}
           onClick={scrollRight}
         />
       )}
@@ -52,12 +52,12 @@ export function HorizontalImageGallery({
 export interface ChevronIconButtonProps {
   direction: 'left' | 'right';
   size?: ButtonProps['size'];
-  right?: number | string;
-  left?: number | string;
-  bottom?: number | string;
-  top?: number | string;
-  isVisible?: boolean;
-  disableTransparent?: boolean;
+  right?: ButtonProps['right'];
+  left?: ButtonProps['left'];
+  bottom?: ButtonProps['bottom'];
+  top?: ButtonProps['top'];
+  isInVisible?: boolean;
+  variant?: 'filled' | 'outlined';
   onClick: () => void;
 }
 export function ChevronIconButton({
@@ -67,22 +67,28 @@ export function ChevronIconButton({
   bottom,
   top,
   size,
-  isVisible,
-  disableTransparent,
+  isInVisible = false,
+  variant = 'filled',
   onClick,
 }: ChevronIconButtonProps): JSX.Element {
   const icon =
     direction === 'right' ? (
-      <ChevronRightIcon color="black" />
+      <ChevronRightIcon
+        color={variant === 'filled' ? 'black' : 'white'}
+        fontSize={variant === 'filled' ? 'unset' : 'xl'}
+      />
     ) : (
-      <ChevronLeftIcon color="black" />
+      <ChevronLeftIcon
+        color={variant === 'filled' ? 'black' : 'white'}
+        fontSize={variant === 'filled' ? 'unset' : 'xl'}
+      />
     );
-  const bgColor = disableTransparent ? 'white' : 'whiteAlpha.900';
+  const bgColor = variant === 'filled' ? 'white' : 'whiteAlpha.500';
   return (
     <IconButton
       size={size}
       zIndex={theme.zIndices.banner}
-      display={isVisible ? 'flex' : 'none'}
+      display={isInVisible ? 'none' : 'flex'}
       right={direction === 'right' ? right : undefined}
       left={direction === 'left' ? left : undefined}
       bottom={bottom}
@@ -92,10 +98,11 @@ export function ChevronIconButton({
       _hover={{ bgColor }}
       _active={{ bgColor }}
       icon={icon}
-      bgColor={bgColor}
       isRound
-      boxShadow="dark-lg"
       onClick={onClick}
+      bgColor={variant === 'filled' ? bgColor : 'transparent'}
+      border={variant === 'filled' ? undefined : `solid 2px white`}
+      boxShadow={variant === 'filled' ? 'dark-lg' : undefined}
     />
   );
 }

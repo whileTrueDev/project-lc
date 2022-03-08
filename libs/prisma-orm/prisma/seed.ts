@@ -25,8 +25,9 @@ import {
   dummyBroadcasterChannel,
   dummyBroadcasterContacts,
   dummyLoginHistory,
-} from './dummyData';
-import { termsData } from './terms';
+} from './seedData/dummyData';
+import { termsData } from './seedData/terms';
+import { kkshowMainSeedData } from './seedData/kkshowMain';
 
 const prisma = new PrismaClient();
 
@@ -232,10 +233,36 @@ async function generateInitialTerms(): Promise<void> {
   });
 }
 
+// 크크쇼 메인 초기데이터 저장
+async function generateInitialKkshowMainData(): Promise<void> {
+  const kkshowMainData = await prisma.kkshowMain.findFirst();
+
+  const dto = {
+    carousel: kkshowMainSeedData.carousel.map((c) => JSON.parse(JSON.stringify(c))),
+    trailer: JSON.parse(JSON.stringify(kkshowMainSeedData.trailer)),
+    bestLive: kkshowMainSeedData.bestLive.map((l) => JSON.parse(JSON.stringify(l))),
+    bestBroadcaster: kkshowMainSeedData.bestBroadcaster.map((b) =>
+      JSON.parse(JSON.stringify(b)),
+    ),
+  };
+  if (!kkshowMainData) {
+    await prisma.kkshowMain.create({
+      data: dto,
+    });
+  } else {
+    await prisma.kkshowMain.update({
+      where: { id: kkshowMainData.id },
+      data: dto,
+    });
+  }
+}
+
 /** 시드 메인 함수 */
 async function main(): Promise<void> {
   // 약관 데이터 저장
   await generateInitialTerms();
+  // 크크쇼 메인 데이터 저장
+  await generateInitialKkshowMainData();
 
   // 판매 수수료 기본값 설정
   await generateDefaultSellCommission();

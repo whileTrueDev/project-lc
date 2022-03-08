@@ -1,100 +1,75 @@
-import { CloseIcon, HamburgerIcon } from '@chakra-ui/icons';
-import {
-  Box,
-  Collapse,
-  Flex,
-  IconButton,
-  Link,
-  Stack,
-  useBreakpointValue,
-  useColorModeValue,
-  useDisclosure,
-} from '@chakra-ui/react';
-import { kkshowNavLinks } from '@project-lc/components-constants/navigation';
+import { Box, Flex, Link, Stack } from '@chakra-ui/react';
+import { kkshowNavLinks, NavItem } from '@project-lc/components-constants/navigation';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { KksLogo } from '@project-lc/components-shared/KksLogo';
 import NextLink from 'next/link';
 
 export function KkshowNavbar(): JSX.Element {
-  // 햄버거 버튼 -> 사이드바
-  const { isOpen, onToggle } = useDisclosure();
+  const navHeight = 120;
+
   return (
-    <Box>
+    <Box
+      bg="blue.500"
+      color="whiteAlpha.900"
+      pt={{ base: 0, md: 6 }}
+      minH={navHeight}
+      w="100%"
+      zIndex="sticky"
+    >
       <Flex
-        bg={useColorModeValue('white', 'gray.800')}
-        color={useColorModeValue('gray.600', 'white')}
+        maxW="5xl"
+        m="auto"
+        justify="space-between"
+        align={{ base: 'center', md: 'end' }}
         minH="60px"
-        py={{ base: 2 }}
-        px={{ base: 4 }}
-        borderBottom={1}
-        borderStyle="solid"
-        borderColor={useColorModeValue('gray.200', 'gray.900')}
-        align="center"
+        py={4}
+        px={4}
       >
-        <Flex
-          flex={{ base: 1, md: 'auto' }}
-          ml={{ base: -2 }}
-          display={{ base: 'flex', md: 'none' }}
-        >
-          <IconButton
-            onClick={onToggle}
-            icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
-            variant="ghost"
-            aria-label="Toggle Navigation"
-          />
-        </Flex>
-        <Flex flex={{ base: 1 }} justify={{ md: 'start' }} alignItems="center">
-          {/* 로고 */}
+        <Box>
           <NextLink href="/" passHref>
-            <Link
-              textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-              color={useColorModeValue('gray.800', 'white')}
-            >
-              <KksLogo size="small" />
+            <Link>
+              <KksLogo variant="white" h={{ base: 30, md: 45 }} />
             </Link>
           </NextLink>
+        </Box>
 
-          {/* 센터 */}
-          <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
+        {/* 센터 */}
+        <Box flex={1}>
+          <Flex alignItems="end" display={{ base: 'none', md: 'flex' }} ml={10}>
             <DesktopNav />
           </Flex>
-        </Flex>
+        </Box>
+
         {/* 우측 */}
         <Flex alignItems="center">
-          <ColorModeSwitcher />
+          <ColorModeSwitcher _hover={{}} />
+          {/* // TODO: 검색 기능 추가 이후 주석 해제 */}
+          {/* <GlobalSearcher /> */}
         </Flex>
       </Flex>
-      <Collapse in={isOpen} animateOpacity>
-        <MobileNav />
-      </Collapse>
+
+      <MobileNav />
     </Box>
   );
 }
 
 const DesktopNav = (): JSX.Element => {
-  const linkColor = useColorModeValue('gray.600', 'gray.200');
-  const linkHoverColor = useColorModeValue('gray.800', 'white');
-
   return (
     <Stack direction="row" spacing={4}>
       {kkshowNavLinks.map((navItem) => (
-        <Box key={navItem.label}>
+        <Flex key={navItem.label} alignItems="stretch">
           <NextLink href={navItem.href ?? '#'} passHref>
             <Link
               p={2}
-              fontSize="sm"
-              fontWeight={500}
-              color={linkColor}
-              _hover={{
-                textDecoration: 'none',
-                color: linkHoverColor,
-              }}
+              fontSize="lg"
+              fontWeight="bold"
+              _hover={{ textDecoration: 'none' }}
               isExternal={navItem.isExternal}
             >
               {navItem.label}
             </Link>
           </NextLink>
-        </Box>
+        </Flex>
       ))}
     </Stack>
   );
@@ -102,30 +77,33 @@ const DesktopNav = (): JSX.Element => {
 
 const MobileNav = (): JSX.Element => {
   return (
-    <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
+    <Flex
+      display={{ base: 'flex', md: 'none' }}
+      px={4}
+      py={2}
+      gap={4}
+      flexWrap="wrap"
+      overflowX="auto"
+    >
       {kkshowNavLinks.map((navItem) => (
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
-    </Stack>
-  );
-};
-
-const MobileNavItem = ({ label, href }: any): JSX.Element => {
-  const navItemTextColor = useColorModeValue('gray.600', 'gray.200');
-  return (
-    <Flex
-      py={1}
-      justify="space-between"
-      align="center"
-      _hover={{ textDecoration: 'none' }}
-    >
-      <NextLink href={href ?? '#'} passHref>
-        <Link fontSize="sm" fontWeight={500} color={navItemTextColor}>
-          {label}
-        </Link>
-      </NextLink>
     </Flex>
   );
 };
 
+const MobileNavItem = ({ label, href, isExternal }: NavItem): JSX.Element => {
+  return (
+    <NextLink href={href ?? '#'} passHref>
+      <Link
+        fontSize={{ base: 'md', sm: 'lg' }}
+        fontWeight="bold"
+        isExternal={isExternal}
+        _hover={{ textDecoration: 'none' }}
+      >
+        {label}
+      </Link>
+    </NextLink>
+  );
+};
 export default KkshowNavbar;

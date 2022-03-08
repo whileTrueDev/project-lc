@@ -22,13 +22,13 @@ export function BusinessRegistrationMailOrderNumerSection(): JSX.Element {
     clearErrors,
   } = useFormContext<BusinessRegistrationFormDto>();
 
-  function handleSuccess(fileName: string, file: File): void {
+  const handleSuccess = (fileName: string, file: File): void => {
     setValue('mailOrderSalesImage', file);
     setValue('mailOrderSalesImageName', fileName);
     clearErrors(['mailOrderSalesImage', 'mailOrderSalesImageName']);
-  }
+  };
 
-  function handleError(errorType?: ImageInputErrorTypes): void {
+  const handleError = (errorType?: ImageInputErrorTypes): void => {
     switch (errorType) {
       case 'over-size': {
         setError('mailOrderSalesImage', {
@@ -51,7 +51,7 @@ export function BusinessRegistrationMailOrderNumerSection(): JSX.Element {
         clearErrors(['mailOrderSalesImage', 'mailOrderSalesImageName']);
       }
     }
-  }
+  };
 
   return (
     <>

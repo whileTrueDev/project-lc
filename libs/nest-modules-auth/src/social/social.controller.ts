@@ -17,6 +17,7 @@ import { Request, Response } from 'express';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { LoginHistoryService } from '../auth/login-history/login-history.service';
 import { SocialService } from './social.service';
+
 @Controller('social')
 export class SocialController {
   constructor(

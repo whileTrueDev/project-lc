@@ -4,44 +4,31 @@
     "../../.eslintrc.json",
     "plugin:@next/next/recommended"
   ],
-  "ignorePatterns": [
-    "!**/*"
-  ],
+  "ignorePatterns": ["!**/*"],
   "overrides": [
     {
-      "files": [
-        "*.ts",
-        "*.tsx",
-        "*.js",
-        "*.jsx"
-      ],
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
-        "@next/next/google-font-display": "error", // Enforce optional or swap font-display behavior with Google Fonts
-        "@next/next/google-font-preconnect": "error", // Enforce preconnect usage with Google Fonts
-        "@next/next/link-passhref": "error", // Enforce passHref prop usage with custom Link components
-        "@next/next/no-css-tags": "error", // Prevent manual stylesheet tags
-        "@next/next/no-document-import-in-page": "error", // Disallow importing next/document outside of pages/document.js
-        "@next/next/no-head-import-in-document": "error", // Disallow importing next/head in pages/document.js
-        "@next/next/no-html-link-for-pages": "error", // Prohibit HTML anchor links to pages without a Link component
-        "@next/next/no-img-element": "error", // Prohibit usage of HTML <img> element
-        "@next/next/no-page-custom-font": "error", // Prevent page-only custom fonts
-        "@next/next/no-sync-scripts": "error", // Forbid synchronous scripts
-        "@next/next/no-title-in-document-head": "error", // Disallow using <title> with Head from next/document
+        "@next/next/google-font-display": "error",
+        "@next/next/google-font-preconnect": "error",
+        "@next/next/link-passhref": "error",
+        "@next/next/no-css-tags": "error",
+        "@next/next/no-document-import-in-page": "error",
+        "@next/next/no-head-import-in-document": "error",
+        "@next/next/no-html-link-for-pages": "error",
+        "@next/next/no-img-element": "error",
+        "@next/next/no-page-custom-font": "error",
+        "@next/next/no-sync-scripts": "error",
+        "@next/next/no-title-in-document-head": "error",
         "@next/next/no-unwanted-polyfillio": "error"
       }
     },
     {
-      "files": [
-        "*.ts",
-        "*.tsx"
-      ],
+      "files": ["*.ts", "*.tsx"],
       "rules": {}
     },
     {
-      "files": [
-        "*.js",
-        "*.jsx"
-      ],
+      "files": ["*.js", "*.jsx"],
       "rules": {}
     }
   ],
