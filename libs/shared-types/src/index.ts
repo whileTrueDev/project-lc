@@ -17,6 +17,7 @@ export * from './lib/constants/fmOrderSitetypes';
 export * from './lib/constants/fmOrderStatuses';
 export * from './lib/constants/liveShoppingProgress';
 export * from './lib/constants/orderStats';
+export * from './lib/constants/publicImageS3Key';
 export * from './lib/constants/sellType';
 export * from './lib/constants/shippingTypes';
 export * from './lib/constants/signupRegisterOptions';

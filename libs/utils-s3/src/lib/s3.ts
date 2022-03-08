@@ -6,6 +6,7 @@ import {
   DeleteObjectsCommand,
   PutObjectCommandInput,
   PutObjectCommandOutput,
+  GetObjectCommandInput,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getExtension } from '@project-lc/utils';
@@ -286,16 +287,21 @@ export const s3 = (() => {
     }
   }
 
-  // 단일 이미지 조회
-  async function getS3GuideImage(): Promise<string> {
-    const signedUrlExpireSeconds = 3600;
-    const key = 'public/banner-guide.png';
+
+  /**
+   *  private 객체 url 조회
+   * @param getObjectCommandInput {Key: 객체 key 입력}
+   * @param options? {expiresIn: 3600} url 유효시간 입력(초), 기본 15분
+   * */ 
+  async function getPresignedUrl(
+    getObjectCommandInput:Omit<GetObjectCommandInput,'Bucket'>,
+    options?:{expiresIn: number}): Promise<string> {
     const command = new GetObjectCommand({
+      ...getObjectCommandInput,
       Bucket: S3_BUCKET_NAME,
-      Key: key,
     });
     const imageUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: signedUrlExpireSeconds,
+      ...options
     });
     return imageUrl;
   }
@@ -307,7 +313,7 @@ export const s3 = (() => {
     s3uploadFile: s3publicUploadFile,
     getOverlayImagesFromS3,
     s3DeleteImages,
-    getS3GuideImage,
     sendPutObjectCommand,
+    getPresignedUrl
   };
 })();
