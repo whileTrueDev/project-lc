@@ -8,6 +8,7 @@ export const corsOptions: CorsOptions = {
     'http://localhost:3011',
     'http://localhost:3333', // 오버레이 컨트롤러
     'https://xn--hp4b17xa.com', // 크크쇼.com
+    'https://www.xn--hp4b17xa.com', // 크크쇼.com
 
     // 판매자
     'https://seller.xn--hp4b17xa.com', // seller.크크쇼.com
