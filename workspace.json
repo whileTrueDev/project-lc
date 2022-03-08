@@ -197,6 +197,56 @@
         }
       }
     },
+    "batch-inactive-handler": {
+      "root": "apps/batch-inactive-handler",
+      "sourceRoot": "apps/batch-inactive-handler/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/batch-inactive-handler",
+            "main": "apps/batch-inactive-handler/src/main.ts",
+            "tsConfig": "apps/batch-inactive-handler/tsconfig.app.json",
+            "assets": ["apps/batch-inactive-handler/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/batch-inactive-handler/src/environments/environment.ts",
+                  "with": "apps/batch-inactive-handler/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "batch-inactive-handler:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/batch-inactive-handler/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/batch-inactive-handler"],
+          "options": {
+            "jestConfig": "apps/batch-inactive-handler/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "components-admin": {
       "root": "libs/components-admin",
       "sourceRoot": "libs/components-admin/src",

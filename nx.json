@@ -36,6 +36,9 @@
     "api-realtime": {
       "tags": []
     },
+    "batch-inactive-handler": {
+      "tags": []
+    },
     "components-admin": {
       "tags": []
     },

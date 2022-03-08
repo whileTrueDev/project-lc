@@ -76,3 +76,14 @@ export const getOverlayControllerHost = (): string => {
       return 'http://localhost:3333';
   }
 };
+
+export const getMailerHost = (): string => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+    case 'test':
+      return process.env.MAILER_HOST_NAME;
+    case 'development':
+    default:
+      return 'http://localhost:3003';
+  }
+};
