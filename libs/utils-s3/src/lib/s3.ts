@@ -224,30 +224,6 @@ export const s3 = (() => {
     }
   }
 
-  /**
-   * S3에서 사업자등록증 또는 통신판매업신고증 다운로드
-   *
-   * @param fileName     다운로드할 이미지의 이름
-   * @param sellerEmail  다운로드할 사용자의 이메일
-   * @param type         'business-registration' | 'mail-order'
-   * @returns 해당 이미지 파일을 다운받을 수 있는 URL
-   */
-  async function s3DownloadImageUrl(
-    fileName: string,
-    sellerEmail: string,
-    type: s3KeyType,
-  ): Promise<string> {
-    const signedUrlExpireSeconds = 60;
-    const command = new GetObjectCommand({
-      Bucket: S3_BUCKET_NAME,
-      Key: `${type}/${sellerEmail}/${fileName}`,
-    });
-
-    const imageUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: signedUrlExpireSeconds,
-    });
-    return imageUrl;
-  }
 
   async function getOverlayImagesFromS3(
     broadcasterId: string,
@@ -309,7 +285,6 @@ export const s3 = (() => {
   return {
     s3UploadImage,
     getS3Key,
-    s3DownloadImageUrl,
     s3uploadFile: s3publicUploadFile,
     getOverlayImagesFromS3,
     s3DeleteImages,
