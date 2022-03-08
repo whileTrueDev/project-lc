@@ -1,8 +1,6 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { HttpService } from '@nestjs/axios';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { MailVerificationCode, Prisma, PrismaPromise } from '@prisma/client';
-import { createVerificationTemplate } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { getMailerHost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
@@ -41,7 +39,7 @@ export class MailVerificationService {
     const code = await this.createEmailCode(targetEmail);
 
     return this.httpService
-      .post<boolean>(this.MAILER_HOST, {
+      .post<boolean>(`${this.MAILER_HOST}/mail-verification`, {
         targetEmail,
         code,
       })

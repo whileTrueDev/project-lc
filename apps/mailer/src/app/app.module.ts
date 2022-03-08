@@ -7,7 +7,6 @@ import { AppController } from './app.controller';
 
 @Module({
   imports: [PrismaModule, MailerModule.forRoot(mailerConfig), MailModule],
-  providers: [],
   controllers: [AppController],
 })
 export class AppModule {}

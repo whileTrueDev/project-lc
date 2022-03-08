@@ -22,6 +22,7 @@ import {
   UserType,
 } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
+import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { LoginHistoryService } from './login-history/login-history.service';
 
@@ -80,7 +81,7 @@ export class AuthController {
   @Post('mail-verification')
   async sendMailVerification(
     @Body(ValidationPipe) dto: SendMailVerificationDto,
-  ): Promise<boolean> {
+  ): Promise<Observable<boolean>> {
     if (dto.isNotInitial) {
       await this.mailVerificationService.deleteSuccessedMailVerification(dto.email);
     }

@@ -6,8 +6,6 @@ export * from './decorators/sellerInfo.decorator';
 export * from './decorators/userInfo.decorator';
 export * from './interceptors/http-cache.interceptor';
 export * from './interfaces/auth.interface';
-export * from './mail-templates/createPreInactivateNoticeTemplate';
-export * from './mail-templates/createVerificationTemplate';
 export * from './middlewares/colorizedMorgan.middleware';
 export * from './middlewares/csrfToken.middleware';
 export * from './middlewares/socialLoginUserType.middleware';

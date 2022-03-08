@@ -14,7 +14,12 @@
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"],
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "test",
+          "e2e"
+        ],
         "parallel": 3
       }
     }
@@ -26,152 +31,6 @@
         "projects": "dependencies"
       }
     ]
-  },
-  "projects": {
-    "admin": {
-      "tags": []
-    },
-    "api": {
-      "tags": []
-    },
-    "api-realtime": {
-      "tags": []
-    },
-    "batch-inactive-handler": {
-      "tags": []
-    },
-    "components-admin": {
-      "tags": []
-    },
-    "components-constants": {
-      "tags": []
-    },
-    "components-core": {
-      "tags": []
-    },
-    "components-layout": {
-      "tags": []
-    },
-    "components-seller": {
-      "tags": []
-    },
-    "components-shared": {
-      "tags": []
-    },
-    "components-web-bc": {
-      "tags": []
-    },
-    "components-web-kkshow": {
-      "tags": []
-    },
-    "firstmall-db": {
-      "tags": []
-    },
-    "hooks": {
-      "tags": []
-    },
-    "mailer": {
-      "tags": []
-    },
-    "nest-core": {
-      "tags": []
-    },
-    "nest-modules-admin": {
-      "tags": []
-    },
-    "nest-modules-auth": {
-      "tags": []
-    },
-    "nest-modules-authguard": {
-      "tags": []
-    },
-    "nest-modules-broadcaster": {
-      "tags": []
-    },
-    "nest-modules-cipher": {
-      "tags": []
-    },
-    "nest-modules-goods": {
-      "tags": []
-    },
-    "nest-modules-inquiry": {
-      "tags": []
-    },
-    "nest-modules-jwt-helper": {
-      "tags": []
-    },
-    "nest-modules-liveshopping": {
-      "tags": []
-    },
-    "nest-modules-mail": {
-      "tags": []
-    },
-    "nest-modules-notice": {
-      "tags": []
-    },
-    "nest-modules-notification": {
-      "tags": []
-    },
-    "nest-modules-order-cancel": {
-      "tags": []
-    },
-    "nest-modules-overlay": {
-      "tags": []
-    },
-    "nest-modules-overlay-controller": {
-      "tags": []
-    },
-    "nest-modules-policy": {
-      "tags": []
-    },
-    "nest-modules-product-promotion": {
-      "tags": []
-    },
-    "nest-modules-s3": {
-      "tags": []
-    },
-    "nest-modules-seller": {
-      "tags": []
-    },
-    "nest-modules-shipping-group": {
-      "tags": []
-    },
-    "overlay": {
-      "tags": []
-    },
-    "overlay-controller": {
-      "tags": []
-    },
-    "prisma-orm": {
-      "tags": []
-    },
-    "shared-types": {
-      "tags": []
-    },
-    "shreadsheet": {
-      "tags": []
-    },
-    "stores": {
-      "tags": []
-    },
-    "utils": {
-      "tags": []
-    },
-    "utils-backend": {
-      "tags": []
-    },
-    "utils-frontend": {
-      "tags": []
-    },
-    "utils-s3": {
-      "tags": []
-    },
-    "web-broadcaster-center": {
-      "tags": []
-    },
-    "web-kkshow": {
-      "tags": []
-    }
   },
   "cli": {
     "defaultCollection": "@nrwl/next"
