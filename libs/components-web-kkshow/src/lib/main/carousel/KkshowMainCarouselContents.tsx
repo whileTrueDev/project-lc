@@ -1,7 +1,15 @@
-import { AspectRatio, Box, BoxProps, Image } from '@chakra-ui/react';
+import {
+  AspectRatio,
+  Box,
+  BoxProps,
+  Image,
+  LinkBox,
+  LinkOverlay,
+} from '@chakra-ui/react';
 import { KkshowMainCarouselItem } from '@project-lc/shared-types';
 import { EmbededVideo } from '@project-lc/components-shared/EmbededVideo';
 import { memo } from 'react';
+import Link from 'next/link';
 
 export interface KkshowMainCarouselContentsProps {
   item: KkshowMainCarouselItem;
@@ -17,7 +25,13 @@ export function KkshowMainCarouselContents({
     return (
       <KkshowMainCarouselContentsContainer>
         <AspectRatio ratio={1} maxH="100%">
-          <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />
+          <LinkBox>
+            <Link href={item.productLinkUrl} passHref>
+              <LinkOverlay isExternal={item.productLinkUrl.includes('http')}>
+                <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />
+              </LinkOverlay>
+            </Link>
+          </LinkBox>
         </AspectRatio>
       </KkshowMainCarouselContentsContainer>
     );
@@ -26,7 +40,13 @@ export function KkshowMainCarouselContents({
     return (
       <KkshowMainCarouselContentsContainer>
         <AspectRatio ratio={1} maxH="100%">
-          <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />
+          <LinkBox>
+            <Link href={item.linkUrl || '#'} passHref>
+              <LinkOverlay isExternal={!!(item.linkUrl && item.linkUrl.includes('http'))}>
+                <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />
+              </LinkOverlay>
+            </Link>
+          </LinkBox>
         </AspectRatio>
       </KkshowMainCarouselContentsContainer>
     );
