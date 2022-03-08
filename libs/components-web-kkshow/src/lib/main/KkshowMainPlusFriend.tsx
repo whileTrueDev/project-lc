@@ -22,7 +22,7 @@ export function KkshowMainPlusFriend(): JSX.Element {
             align="center"
           >
             <NextLink href={kakaoChannel} passHref>
-              <LinkOverlay>
+              <LinkOverlay isExternal>
                 <Heading fontSize={{ base: 'lg', md: '2xl' }}>
                   크크쇼랑 플친 맺고 다양한 혜택과 소식 받아보세요!
                 </Heading>
