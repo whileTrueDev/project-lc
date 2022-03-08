@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import BorderedAvatar from '@project-lc/components-core/BorderedAvatar';
 import MotionBox from '@project-lc/components-core/MotionBox';
+import EmbededVideo from '@project-lc/components-shared/EmbededVideo';
 import { useKkshowMain } from '@project-lc/hooks';
 import { Scrollbar } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -126,10 +127,7 @@ function LiveCard({
   liveShoppingDescription,
   profileImageUrl,
 }: LiveCardProps): JSX.Element {
-  const youtubeSrc = `https://www.youtube.com/embed/${videoUrl.replace(
-    'https://youtu.be/',
-    '',
-  )}?controls=0`;
+  const youtubeSrc = videoUrl.replace('https://youtu.be/', '');
 
   const profileImage = profileImageUrl.replace('70x70', '300x300');
   return (
@@ -142,15 +140,10 @@ function LiveCard({
       boxShadow="lg"
     >
       <Box h={{ base: 180, md: 300 }}>
-        <iframe
+        <EmbededVideo
+          provider="youtube"
+          identifier={youtubeSrc}
           style={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
-          width="100%"
-          height="100%"
-          src={youtubeSrc}
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
         />
       </Box>
 

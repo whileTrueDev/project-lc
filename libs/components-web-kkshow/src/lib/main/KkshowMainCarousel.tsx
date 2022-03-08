@@ -12,7 +12,7 @@ import KkshowMainCarouselHeader from './carousel/KkshowMainCarouselHeader';
 export function KkshowMainCarousel(): JSX.Element {
   return (
     <WaveBox position="relative" bgColor="blue.500">
-      <Flex h={{ base: 530, md: 700 }}>
+      <Flex h={{ base: 530, md: 650 }}>
         <MainCarousel />
       </Flex>
     </WaveBox>
@@ -64,7 +64,7 @@ function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Elemen
       mx={{ base: 2, md: 4 }}
       gap={4}
       flexDir="column"
-      justify={{ base: 'flex-start', md: 'center' }}
+      justify="flex-start"
       position="relative"
     >
       <ScaleFade in={isActive} transition={{ enter: { duration: 0.5 } }}>

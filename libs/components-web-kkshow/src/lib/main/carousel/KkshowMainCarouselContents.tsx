@@ -1,5 +1,6 @@
 import { AspectRatio, Box, BoxProps, Image } from '@chakra-ui/react';
 import { KkshowMainCarouselItem } from '@project-lc/shared-types';
+import { EmbededVideo } from '@project-lc/components-shared/EmbededVideo';
 import { memo } from 'react';
 
 export interface KkshowMainCarouselContentsProps {
@@ -33,40 +34,16 @@ export function KkshowMainCarouselContents({
   if (item.type === 'nowPlaying') {
     return (
       <KkshowMainCarouselContentsContainer>
-        <iframe
-          style={{ borderRadius: '8px' }}
-          width="100%"
-          height="100%"
-          src={`https://www.youtube.com/embed/${item.videoUrl.replace(
-            'https://youtu.be/',
-            '',
-          )}?controls=0`}
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
+        <EmbededVideo provider={item.platform} identifier={item.videoUrl} />
       </KkshowMainCarouselContentsContainer>
     );
   }
 
   if (item.type === 'previous') {
-    const youtubeSrc = `https://www.youtube.com/embed/${item.videoUrl.replace(
-      'https://youtu.be/',
-      '',
-    )}?controls=0`;
+    const youtubeSrc = item.videoUrl.replace('https://youtu.be/', '');
     return (
       <KkshowMainCarouselContentsContainer>
-        <iframe
-          style={{ borderRadius: '8px' }}
-          width="100%"
-          height="100%"
-          src={youtubeSrc}
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
+        <EmbededVideo provider="youtube" identifier={youtubeSrc} />
       </KkshowMainCarouselContentsContainer>
     );
   }

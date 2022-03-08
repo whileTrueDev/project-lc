@@ -28,7 +28,7 @@ export function KkshowNavbar(): JSX.Element {
         <Box>
           <NextLink href="/" passHref>
             <Link>
-              <KksLogo variant="white" h={{ base: 30, md: 50 }} />
+              <KksLogo variant="white" h={{ base: 30, md: 45 }} />
             </Link>
           </NextLink>
         </Box>
