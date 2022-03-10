@@ -35,20 +35,28 @@ export const s3 = (() => {
   });
 
 
-  /** s3.send(putObjectCommand) 래핑함수. 버킷 제외한 Key, Body, ContentType, ACL등 기입할것
+  /** 파일 업로드
+   *  Bucket 제외한 Key, Body, ContentType, ACL 등 putObjectCommandInput 기입하여 사용
+   * 
    * @return output : PutObjectCommandOutput
-   * @return savedKey : S3 도메인과 key 합친것으로 이미지의 경우 저장된 url
+   * @return savedKey : 객체 키 (prefix + 파일명)
+   * @return objectUrl : 객체 url (s3도메인 + 객체키)
    */
   async function sendPutObjectCommand(
     commandInput: Omit<PutObjectCommandInput, 'Bucket'>,
-  ): Promise<{ output: PutObjectCommandOutput; savedKey: string }> {
+  ): Promise<{ 
+    output: PutObjectCommandOutput; 
+    savedKey: string; 
+    objectUrl: string }
+    > {
     const command = new PutObjectCommand({
       ...commandInput,
       Bucket: S3_BUCKET_NAME,
     });
     return {
       output: await s3Client.send(command),
-      savedKey: S3_DOMIAN + commandInput.Key,
+      savedKey: commandInput.Key,
+      objectUrl: getSavedObjectUrl(commandInput.Key)
     };
   }
 
@@ -70,6 +78,8 @@ export const s3 = (() => {
    * @param 기타 Tagging, ContentType, ACL 등 putObjectCommandInput props 전달 가능
 
    * @returns 파일명(privater 객체인 경우) 혹은 객체url(public-read 객체인 경우)
+              file 이 없는경우 빈 문자열 '' 리턴,
+              
    * 
    */
   async function s3UploadImage({
@@ -82,7 +92,7 @@ export const s3 = (() => {
     isPublic = false,
     ...putObjectCommandInput
   }: S3UploadImageOptions): Promise<string> {
-    if (!userMail || !file) throw new Error('file should be not null');
+    if (!userMail || !file) return '';
     const { key, fileName } = generateS3Key({
       userMail,
       type,
@@ -90,10 +100,9 @@ export const s3 = (() => {
       companyName,
       liveShoppingId,
     });
-    console.log({key,fileName});
 
     try {
-      await sendPutObjectCommand({
+      const {objectUrl} = await sendPutObjectCommand({
         ACL: isPublic ? 'public-read' : undefined,
         ...putObjectCommandInput,
         Key: key,
@@ -103,7 +112,7 @@ export const s3 = (() => {
       
       if (isPublic) {
         // public 인 경우 객체 url을 리턴함
-        return getSavedObjectUrl(key);
+        return objectUrl;
       } else {
         // public 이 아닌 경우 객체 url로 접근하지 못하므로 그냥 파일명만 리턴함
         return fileName;
@@ -113,15 +122,6 @@ export const s3 = (() => {
     }
   }
 
-  /**
-   * 해당 key 가진 객체가 public-read인 경우에만 이 url로 접근이 가능함
-   * private 객체는 getPresignedUrl 함수 사용
-   * @param key s3에 저장된 객체 키 (prefix + 파일명 형태)
-   * @returns 객체 url
-   */
-  function getSavedObjectUrl(key: string): string {
-    return S3_DOMIAN + key;
-  }
 
 
   async function getOverlayImagesFromS3(
@@ -162,9 +162,20 @@ export const s3 = (() => {
     }
   }
 
+  /**
+   * 객체 url 조회
+   * 해당 key 가진 객체가 public-read인 경우에만 이 url로 접근이 가능함
+   * private 객체는 getPresignedUrl 함수 사용
+   * @param key s3에 저장된 객체 키 (prefix + 파일명 형태)
+   * @returns 객체 url
+   */
+     function getSavedObjectUrl(key: string): string {
+      return S3_DOMIAN + key;
+    }
 
   /**
-   *  private 객체 url 조회
+   * 객체 url 조회
+   * private인 객체 조회 위해 expiresIn 으로 넘어온 시간동안 유효한 url 리턴
    * @param getObjectCommandInput {Key: 객체 key 입력}
    * @param options? {expiresIn: 3600} url 유효시간 입력(초), 기본 15분
    * */ 

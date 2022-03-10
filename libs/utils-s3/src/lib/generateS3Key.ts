@@ -34,7 +34,7 @@ export type s3FileNameParams = {
 };
 
 /**
- * type에 따라 s3 에 저장할 객체키(prefix + 파일명)를 생성
+ * type에 따라 project-lc 버킷에 저장할 객체키(prefix + 파일명)를 생성
  * @param 
  * @returns 
  */
