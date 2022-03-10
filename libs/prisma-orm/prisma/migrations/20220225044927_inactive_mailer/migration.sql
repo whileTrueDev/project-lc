@@ -49,9 +49,16 @@ ALTER TABLE `SellerSettlementAccount` ADD COLUMN `sellerId` INTEGER NOT NULL;
 -- AlterTable
 ALTER TABLE `SellerSettlements` ADD COLUMN `sellerId` INTEGER NOT NULL;
 
--- AlterTable
-ALTER TABLE `SellerShop` DROP COLUMN `sellerEmail`,
-    ADD COLUMN `sellerId` INTEGER NOT NULL;
+-- Create sellerId column to SellerShop Table
+ALTER TABLE `SellerShop` ADD COLUMN `sellerId` INTEGER NOT NULL;
+
+-- SellerShop 컬럼 삭제 이전 foreign key 연결을 위한 작업
+UPDATE `SellerShop`, `Seller`
+SET `SellerShop`.`sellerId` = `Seller`.`id`
+WHERE`SellerShop`.`sellerEmail` = `Seller`.`email`;
+
+-- DROP COLUMN `sellerEmail`
+ALTER TABLE `SellerShop` DROP COLUMN `sellerEmail`;
 
 -- CreateTable
 CREATE TABLE `InactiveBroadcaster` (
