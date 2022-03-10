@@ -72,11 +72,13 @@ export async function uploadImageToS3(
   type: OverlayImageTypes,
 ): Promise<string> {
   const { file, filename, contentType } = imageFile;
+
   let imageType:
     | 'vertical-banner'
     | 'donation-images'
     | 'overlay-logo'
     | 'horizontal-banner' = 'vertical-banner';
+
   const tagging: {
     overlayImageType:
       | 'vertical-banner-tag'
@@ -95,14 +97,22 @@ export async function uploadImageToS3(
     tagging.overlayImageType = 'horizontal-banner-tag';
   }
 
-  return s3.s3uploadFile({
+  const objectTagKey = 'overlayImageType';
+  const objectTagValue = tagging[objectTagKey];
+
+  if (objectTagKey && !objectTagValue) {
+    throw new Error('No value Error');
+  }
+
+  return s3.s3UploadImage({
     file,
     filename,
-    contentType,
     userMail,
     type: imageType,
     liveShoppingId,
-    tagging,
+    isPublic: true,
+    ContentType: contentType,
+    Tagging: `${objectTagKey}=${objectTagValue}`
   });
 }
 
