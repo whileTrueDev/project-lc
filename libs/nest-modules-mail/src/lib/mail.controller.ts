@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { TargetUser } from '@project-lc/shared-types';
 import { MailVerificationDto } from './mail-dto/mail-verifications.dto';
 import { MailNoticeService } from './mail-notice.service';
@@ -22,7 +22,9 @@ export class MailController {
   }
 
   @Post('mail-verification')
-  sendMailVerificationMail(@Body() dto: MailVerificationDto): Promise<boolean> {
+  sendMailVerificationMail(
+    @Body(ValidationPipe) dto: MailVerificationDto,
+  ): Promise<boolean> {
     return this.mailService.sendCodeVerificationMail(dto.targetEmail, dto.code);
   }
 }

@@ -37,7 +37,6 @@ export class MailVerificationService {
    */
   public async sendVerificationMail(targetEmail: string): Promise<Observable<boolean>> {
     const code = await this.createEmailCode(targetEmail);
-
     return this.httpService
       .post<boolean>(`${this.MAILER_HOST}/mail-verification`, {
         targetEmail,

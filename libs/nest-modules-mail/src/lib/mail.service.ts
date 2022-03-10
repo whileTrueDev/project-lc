@@ -1,5 +1,5 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { createVerificationTemplate } from './templates/createVerificationTemplate';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class MailService {
       });
       return true;
     } catch (e) {
-      console.error(e);
+      Logger.error(e);
       throw new InternalServerErrorException(e, 'error in send email');
     }
   }

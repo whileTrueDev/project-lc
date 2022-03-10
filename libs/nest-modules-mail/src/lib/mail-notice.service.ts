@@ -22,7 +22,10 @@ export class MailNoticeService {
       return true;
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException(error, 'error in send email');
+      throw new InternalServerErrorException(
+        error,
+        `Failed to send email - sendPreInactivateMail`,
+      );
     }
   }
 
@@ -38,7 +41,10 @@ export class MailNoticeService {
       return true;
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException(error, 'error in send email');
+      throw new InternalServerErrorException(
+        error,
+        `Failed to send email - sendInactivateMail`,
+      );
     }
   }
 }
