@@ -1,7 +1,7 @@
 export * from './lib/auth-hooks';
-export * from './lib/mutation/useAdminClassChangeHistoryMutation';
 export * from './lib/mutation/useAdminBroadcasterPromotionPageMutation';
 export * from './lib/mutation/useAdminBroadcasterSettlementInfoConfirmMutation';
+export * from './lib/mutation/useAdminClassChangeHistoryMutation';
 export * from './lib/mutation/useAdminCreateNotification';
 export * from './lib/mutation/useAdminPolicyMutation';
 export * from './lib/mutation/useAdminPrivacyApproadchHistoryMutation';
@@ -123,6 +123,7 @@ export * from './lib/shipping-group-hooks';
 export * from './lib/subscription/useLiveShoppingStateSubscription';
 export * from './lib/subscription/useNotificationSubscription';
 export * from './lib/useBroadcasterSettlementTotalInfo';
+export * from './lib/useCheckAdminClass';
 export * from './lib/useCountdown';
 export * from './lib/useDisplaySize';
 export * from './lib/useGoodsOnLive';

@@ -1,32 +1,14 @@
-import { useEffect } from 'react';
 import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
-import { Box, Heading, Text, useToast } from '@chakra-ui/react';
+import { Box, Heading, Text } from '@chakra-ui/react';
 import AdminBroadcasterSettlementInfoList from '@project-lc/components-admin/AdminBroadcasterSettlementInfoList';
-import { useAdminPrivacyApproachHistoryMutation, useProfile } from '@project-lc/hooks';
-import { useRouter } from 'next/router';
+import { useCheckAdminClass } from '@project-lc/hooks';
 
-export interface SettlementInfoProps {
-  propname: any;
-}
-export function SettlementInfo({ propname }: SettlementInfoProps): JSX.Element {
-  const { mutateAsync } = useAdminPrivacyApproachHistoryMutation();
-  const { data: profile, isLoading } = useProfile();
-  const router = useRouter();
-  const toast = useToast();
-
-  if (!isLoading && !['super', 'full'].includes(profile.adminClass)) {
-    toast({
-      title: '권한없는 계정',
-      status: 'error',
-    });
-    router.push('/admin');
-  }
-
-  useEffect(() => {
-    if (!isLoading && ['super', 'full'].includes(profile.adminClass)) {
-      mutateAsync({ infoType: 'broadcasterSettlementAccount', actionType: 'view' });
-    }
-  }, []);
+export function SettlementInfo(): JSX.Element {
+  useCheckAdminClass({
+    adminClasses: ['super', 'full'],
+    infoType: 'broadcasterSettlementAccount',
+    actionType: 'view',
+  });
 
   return (
     <AdminPageLayout>
