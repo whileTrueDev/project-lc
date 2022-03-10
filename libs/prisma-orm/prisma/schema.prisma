@@ -40,7 +40,6 @@ model SellerShop {
 model SellerBusinessRegistration {
   id                               Int                               @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
   sellerId                         Int
-  sellerEmail                      String // 등록한 판매자 ID 
   companyName                      String // 상호명
   businessRegistrationNumber       String // 사업자등록증 등록번호
   representativeName               String // 대표자명
@@ -52,9 +51,9 @@ model SellerBusinessRegistration {
   mailOrderSalesNumber             String // 통신판매업 신고번호 
   mailOrderSalesImageName          String // 통신판매업 이미지 파일명
   BusinessRegistrationConfirmation BusinessRegistrationConfirmation?
-  seller                           Seller                            @relation(fields: [sellerEmail, sellerId], references: [email, id], onDelete: Cascade)
+  seller                           Seller                            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
+  @@index(name: "BusinessRegistrationIndex", fields: [id])
 }
 
 // 사업자등록정보 검수정보
@@ -83,7 +82,6 @@ model SellerSettlements {
   paymentMethod        String? // 결제수단
   pg                   String? // pg사
   sellerId             Int
-  sellerEmail          String // 등록한 판매자 ID
   exportId             Int                     @unique // 이 정산의 출고고유번호 (fm_goods_export.export_seq)
   exportCode           String // 이 정산의 출고코드 (fm_goods_export.export_code)
   buyer                String // 구매자명
@@ -92,10 +90,10 @@ model SellerSettlements {
   shippingId           Int // 주문 배송묶음 번호 (퍼스트몰 fm_order_item.shipping_seq)
   shippingCost         Decimal                 @default("0.00") @db.Decimal(10, 2) // 이 정산에 포함된  배송비
   shippingCostIncluded Boolean                 @default(false) // 이 출고 정산에 order_shipping 배송비에 대한 포함이 이루어졌는지 여부
-  seller               Seller                  @relation(fields: [sellerEmail, sellerId], references: [email, id], onDelete: Cascade)
+  seller               Seller                  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   settlementItems      SellerSettlementItems[]
 
-  @@index([sellerEmail, id], name: "SellerSettlementsIndex")
+  @@index([id], name: "SellerSettlementsIndex")
 }
 
 // 정산 아이템(주문 정보)
@@ -128,14 +126,13 @@ model SellerSettlementItems {
 model SellerSettlementAccount {
   id                         Int    @id @default(autoincrement())
   sellerId                   Int
-  sellerEmail                String
   bank                       String
   number                     String
   name                       String
   settlementAccountImageName String
-  seller                     Seller @relation(fields: [sellerEmail, sellerId], references: [email, id], onDelete: Cascade)
+  seller                     Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
+  @@index([id], name: "SellerSettlementAccountIndex")
 }
 
 model MailVerificationCode {
@@ -163,7 +160,7 @@ model SellerSocialAccount {
 model SellerContacts {
   id           Int            @id @default(autoincrement())
   sellerId     Int // 판매자 아이디
-  email        String         @default("") //등���한 이메일
+  email        String         @default("") //등록한 이메일
   phoneNumber  String         @default("") // 등록한 전화번호
   isDefault    Boolean        @default(false) // 기본 연락처 설정 여부
   seller       Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
@@ -963,7 +960,6 @@ model InactiveSellerBusinessRegistration {
   id       Int @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
   sellerId Int
 
-  sellerEmail                              String // 등록한 판매자 ID 
   companyName                              String // 상호명
   businessRegistrationNumber               String // 사업자등록증 등록번호
   representativeName                       String // 대표자명
@@ -975,9 +971,9 @@ model InactiveSellerBusinessRegistration {
   mailOrderSalesNumber                     String // 통신판매업 신고번호 
   mailOrderSalesImageName                  String // 통신판매업 이미지 파일명
   InactiveBusinessRegistrationConfirmation InactiveBusinessRegistrationConfirmation?
-  InactiveSeller                           InactiveSeller                            @relation(fields: [sellerEmail, sellerId], references: [email, id], onDelete: Cascade)
+  InactiveSeller                           InactiveSeller                            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
+  @@index(name: "BusinessRegistrationIndex", fields: [id])
 }
 
 // 판매자가 등록한 라이브 쇼핑 담당자 연락처들
@@ -995,14 +991,13 @@ model InactiveSellerContacts {
 model InactiveSellerSettlementAccount {
   id                         Int            @id @default(autoincrement())
   sellerId                   Int
-  sellerEmail                String
   bank                       String
   number                     String
   name                       String
   settlementAccountImageName String
-  seller                     InactiveSeller @relation(fields: [sellerEmail, sellerId], references: [email, id], onDelete: Cascade)
+  seller                     InactiveSeller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
+  @@index([id], name: "SellerSettlementAccountIndex")
 }
 
 // 사업자등록정보 검수정보
