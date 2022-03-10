@@ -24,19 +24,10 @@ DROP INDEX `SellerSettlementAccountIndex` ON `InactiveSellerSettlementAccount`;
 DROP INDEX `BusinessRegistrationIndex` ON `SellerBusinessRegistration`;
 
 -- DropIndex
-DROP INDEX `SellerBusinessRegistration_sellerEmail_sellerId_fkey` ON `SellerBusinessRegistration`;
-
--- DropIndex
 DROP INDEX `SellerSettlementAccountIndex` ON `SellerSettlementAccount`;
 
 -- DropIndex
-DROP INDEX `SellerSettlementAccount_sellerEmail_sellerId_fkey` ON `SellerSettlementAccount`;
-
--- DropIndex
 DROP INDEX `SellerSettlementsIndex` ON `SellerSettlements`;
-
--- DropIndex
-DROP INDEX `SellerSettlements_sellerEmail_sellerId_fkey` ON `SellerSettlements`;
 
 -- AlterTable
 ALTER TABLE `InactiveSellerBusinessRegistration` DROP COLUMN `sellerEmail`;
