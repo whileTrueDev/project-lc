@@ -116,7 +116,7 @@ export class AdminController {
   @Post('/settlement')
   executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
     if (dto.target.options.length === 0) return null;
-    return this.sellerSettlementService.executeSettle(dto.sellerEmail, dto);
+    return this.sellerSettlementService.executeSettle(dto.sellerId, dto);
   }
 
   /** 판매자 정산 완료 목록 */

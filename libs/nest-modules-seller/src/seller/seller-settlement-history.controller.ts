@@ -24,7 +24,7 @@ export class SellerSettlementHistoryController {
     @SellerInfo() sellerInfo: UserPayload,
     @Query(ValidationPipe) dto: FindSettlementHistoryDto,
   ): Promise<SellerSettlements[]> {
-    return this.sellerSettlementService.findSettlementHistory(sellerInfo.sub, {
+    return this.sellerSettlementService.findSettlementHistory(sellerInfo.id, {
       round: dto.round,
     });
   }

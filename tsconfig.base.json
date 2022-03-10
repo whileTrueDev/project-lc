@@ -45,6 +45,9 @@
         "libs/nest-modules-liveshopping/src/index.ts"
       ],
       "@project-lc/nest-modules-mail": ["libs/nest-modules-mail/src/index.ts"],
+      "@project-lc/nest-modules-mail-verification": [
+        "libs/nest-modules-mail-verification/src/index.ts"
+      ],
       "@project-lc/nest-modules-notice": ["libs/nest-modules-notice/src/index.ts"],
       "@project-lc/nest-modules-notification": [
         "libs/nest-modules-notification/src/index.ts"

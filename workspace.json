@@ -237,13 +237,17 @@
       "projectType": "application",
       "targets": {
         "build": {
-          "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
+          "executor": "@nrwl/node:webpack",
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/apps/batch-inactive-handler",
             "main": "apps/batch-inactive-handler/src/main.ts",
             "tsConfig": "apps/batch-inactive-handler/tsconfig.app.json",
-            "assets": ["apps/batch-inactive-handler/src/assets"]
+            "assets": [
+              "apps/batch-inactive-handler/src/assets"
+            ]
           },
           "configurations": {
             "production": {
@@ -260,7 +264,7 @@
           }
         },
         "serve": {
-          "executor": "@nrwl/node:execute",
+          "executor": "@nrwl/node:node",
           "options": {
             "buildTarget": "batch-inactive-handler:build"
           }
@@ -268,12 +272,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/batch-inactive-handler/**/*.ts"]
+            "lintFilePatterns": [
+              "apps/batch-inactive-handler/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/batch-inactive-handler"],
+          "outputs": [
+            "coverage/apps/batch-inactive-handler"
+          ],
           "options": {
             "jestConfig": "apps/batch-inactive-handler/jest.config.js",
             "passWithNoTests": true
@@ -577,13 +585,17 @@
       "projectType": "application",
       "targets": {
         "build": {
-          "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
+          "executor": "@nrwl/node:webpack",
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/apps/mailer",
             "main": "apps/mailer/src/main.ts",
             "tsConfig": "apps/mailer/tsconfig.app.json",
-            "assets": ["apps/mailer/src/assets"]
+            "assets": [
+              "apps/mailer/src/assets"
+            ]
           },
           "configurations": {
             "production": {
@@ -600,7 +612,7 @@
           }
         },
         "serve": {
-          "executor": "@nrwl/node:execute",
+          "executor": "@nrwl/node:node",
           "options": {
             "buildTarget": "mailer:build"
           }
@@ -608,12 +620,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/mailer/**/*.ts"]
+            "lintFilePatterns": [
+              "apps/mailer/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/mailer"],
+          "outputs": [
+            "coverage/apps/mailer"
+          ],
           "options": {
             "jestConfig": "apps/mailer/jest.config.js",
             "passWithNoTests": true
@@ -890,12 +906,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/nest-modules-kkshow-main/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/nest-modules-kkshow-main/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/nest-modules-kkshow-main"],
+          "outputs": [
+            "coverage/libs/nest-modules-kkshow-main"
+          ],
           "options": {
             "jestConfig": "libs/nest-modules-kkshow-main/jest.config.js",
             "passWithNoTests": true
@@ -955,6 +975,35 @@
           ],
           "options": {
             "jestConfig": "libs/nest-modules-mail/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
+    "nest-modules-mail-verification": {
+      "root": "libs/nest-modules-mail-verification",
+      "sourceRoot": "libs/nest-modules-mail-verification/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": [
+            "{options.outputFile}"
+          ],
+          "options": {
+            "lintFilePatterns": [
+              "libs/nest-modules-mail-verification/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/nest-modules-mail-verification"
+          ],
+          "options": {
+            "jestConfig": "libs/nest-modules-mail-verification/jest.config.js",
             "passWithNoTests": true
           }
         }

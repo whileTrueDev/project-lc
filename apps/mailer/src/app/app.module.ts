@@ -1,13 +1,9 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '@project-lc/prisma-orm';
-import { MailerModule } from '@nestjs-modules/mailer';
+import { MailModule } from '@project-lc/nest-modules-mail';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { mailerConfig } from '../settings/mailer.config';
 
 @Module({
-  imports: [PrismaModule, MailerModule.forRoot(mailerConfig)],
-  providers: [AppService],
+  imports: [MailModule],
   controllers: [AppController],
 })
 export class AppModule {}

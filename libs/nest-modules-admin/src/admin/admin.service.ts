@@ -3,16 +3,17 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { GoodsConfirmation, LiveShopping, LiveShoppingImageType } from '@prisma/client';
+import { GoodsConfirmation } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminSettlementInfoType,
+  BusinessRegistrationStatus,
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
-  BusinessRegistrationStatus,
-  AdminSettlementInfoType,
   LiveShoppingDTO,
   LiveShoppingImageDto,
+  LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -258,7 +259,7 @@ export class AdminService {
     });
   }
 
-  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
+  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShoppingWithGoods[]> {
     return this.prisma.liveShopping.findMany({
       where: { id: id ? Number(id) : undefined },
       include: {
@@ -268,6 +269,8 @@ export class AdminService {
         seller: { select: { sellerShop: true } },
         broadcaster: {
           select: {
+            id: true,
+            userName: true,
             userNickname: true,
             email: true,
             avatar: true,

@@ -1,17 +1,29 @@
-import { LiveShopping } from '@prisma/client';
-import { BroadcasterDTO } from '../dto/broadcaster.dto';
+import {
+  Broadcaster,
+  BroadcasterPromotionPage,
+  GoodsImages,
+  GoodsOptions,
+  LiveShopping,
+  LiveShoppingImage,
+  SellerShop,
+} from '@prisma/client';
 
 export interface LiveShoppingWithGoods extends LiveShopping {
   goods: {
     goods_name: string;
     summary: string;
+    image: GoodsImages[];
+    options: GoodsOptions[];
   };
   seller: {
-    sellerShop: {
-      sellerId: number;
-      shopName: string;
-    };
+    sellerShop: SellerShop;
   };
-  broadcaster: BroadcasterDTO;
+  broadcaster: Pick<
+    Broadcaster,
+    'id' | 'userName' | 'userNickname' | 'email' | 'avatar'
+  > & {
+    BroadcasterPromotionPage: BroadcasterPromotionPage | null;
+  };
   liveShoppingVideo: { youtubeUrl: string };
+  images: LiveShoppingImage[];
 }

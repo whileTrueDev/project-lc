@@ -1,11 +1,14 @@
-import { useMutation, UseMutationResult } from 'react-query';
 import { LoginUserDto, loginUserRes, UserType } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { UserPayload } from '@project-lc/nest-core';
+import { useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
 
-export interface InactiveUserPayload extends UserPayload {
+export interface InactiveUserPayload {
   userType: UserType;
+  id: number;
+  sub: string;
+  type: UserType;
+  inactiveFlag?: boolean;
 }
 
 export const useLoginMutation = (

@@ -15,9 +15,12 @@ export function AdminLiveShoppingList({
 }): JSX.Element {
   const { data: profileData } = useProfile();
 
-  const { data, isLoading } = useAdminLiveShoppingList({
-    enabled: !!profileData?.email,
-  });
+  const { data, isLoading } = useAdminLiveShoppingList(
+    {},
+    {
+      enabled: !!profileData?.email,
+    },
+  );
 
   function handleClick(row: LiveShoppingWithGoods): void {
     setSelectedGoods({

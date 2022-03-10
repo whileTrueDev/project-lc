@@ -7,6 +7,7 @@ import { AppSellerService } from './app-seller.service';
 import { AppBroadcasterService } from './app-broadcaster.service';
 import { AppShutdownService } from './app-shutdown.service';
 import { AppMailService } from './app-mail.service';
+
 @Module({
   imports: [PrismaModule, S3Module, HttpModule],
   providers: [

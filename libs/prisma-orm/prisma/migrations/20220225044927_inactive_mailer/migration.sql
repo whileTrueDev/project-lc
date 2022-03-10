@@ -91,8 +91,34 @@ ALTER TABLE `Broadcaster` ADD COLUMN `inactiveFlag` BOOLEAN NOT NULL DEFAULT fal
 ALTER TABLE `LiveShopping` MODIFY `contactId` INTEGER NULL;
 
 -- AlterTable
-ALTER TABLE `Seller` ADD COLUMN `inactiveFlag` BOOLEAN NOT NULL DEFAULT false,
+ALTER TABLE `Seller`
+    ADD COLUMN `inactiveFlag` BOOLEAN NOT NULL DEFAULT false,
     MODIFY `email` VARCHAR(191) NULL;
+
+-- SellerBusinessRegistration foreign key 연결을 위한 작업 + sellerId 컬럼 추가
+ALTER TABLE `SellerBusinessRegistration` ADD COLUMN `sellerId` INTEGER NOT NULL;
+UPDATE `SellerBusinessRegistration`, `Seller`
+SET `SellerBusinessRegistration`.`sellerId` = `Seller`.`id`
+WHERE `SellerBusinessRegistration`.`sellerEmail` = `Seller`.`email`;
+
+-- SellerSettlementAccount foreign key 연결을 위한 작업 + sellerId 컬럼 추가
+ALTER TABLE `SellerSettlementAccount` ADD COLUMN `sellerId` INTEGER NOT NULL;
+UPDATE `SellerSettlementAccount`, `Seller`
+SET `SellerSettlementAccount`.`sellerId` = `Seller`.`id`
+WHERE `SellerSettlementAccount`.`sellerEmail` = `Seller`.`email`;
+
+-- SellerSettlements foreign key 연결을 위한 작업 + sellerId 컬럼 추가
+ALTER TABLE `SellerSettlements` ADD COLUMN `sellerId` INTEGER NOT NULL;
+UPDATE `SellerSettlements`, `Seller`
+SET `SellerSettlements`.`sellerId` = `Seller`.`id`
+WHERE `SellerSettlements`.`sellerEmail` = `Seller`.`email`;
+
+-- SellerShop 컬럼 삭제 이전 foreign key 연결을 위한 작업
+ALTER TABLE `SellerShop` ADD COLUMN `sellerId` INTEGER NOT NULL; -- Create sellerId column to SellerShop Table
+UPDATE `SellerShop`, `Seller`
+SET `SellerShop`.`sellerId` = `Seller`.`id`
+WHERE`SellerShop`.`sellerEmail` = `Seller`.`email`;
+ALTER TABLE `SellerShop` DROP COLUMN `sellerEmail`; -- DROP COLUMN `sellerEmail`
 
 -- CreateTable
 CREATE TABLE `InactiveBroadcaster` (

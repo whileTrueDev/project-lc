@@ -1,14 +1,17 @@
-import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import { MailVerificationCode, Prisma, PrismaPromise } from '@prisma/client';
-import { createVerificationTemplate } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
+import { getMailerHost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
+import { map, Observable } from 'rxjs';
 
 @Injectable()
 export class MailVerificationService {
+  private MAILER_HOST: string = getMailerHost();
+
   constructor(
-    private readonly mailerService: MailerService,
+    private readonly httpService: HttpService,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -32,20 +35,14 @@ export class MailVerificationService {
    * 이메일 인증을 위해, 인증코드를 포함한 메일을 타겟 이메일에 보냅니다.
    * @returns {boolean} 성공여부 or 500 에러
    */
-  public async sendVerificationMail(targetEmail: string): Promise<boolean> {
+  public async sendVerificationMail(targetEmail: string): Promise<Observable<boolean>> {
     const code = await this.createEmailCode(targetEmail);
-
-    try {
-      await this.mailerService.sendMail({
-        to: targetEmail,
-        subject: `[크크쇼] ${code}은(는) 이메일 확인을 완료할 코드입니다.`,
-        html: createVerificationTemplate(code),
-      });
-      return true;
-    } catch (e) {
-      console.error(e);
-      throw new InternalServerErrorException(e, 'error in send email');
-    }
+    return this.httpService
+      .post<boolean>(`${this.MAILER_HOST}/mail-verification`, {
+        targetEmail,
+        code,
+      })
+      .pipe(map((res) => res.data));
   }
 
   /**
