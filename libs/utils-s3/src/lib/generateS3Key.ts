@@ -1,6 +1,6 @@
-import { getExtension } from "@project-lc/utils";
-import dayjs from "dayjs";
-import path from "path";
+import { getExtension } from '@project-lc/utils';
+import dayjs from 'dayjs';
+import path from 'path';
 
 // 추후에 S3에 저장할 데이터 종류가 더해지는 경우 추가
 export type s3KeyType =
@@ -22,8 +22,7 @@ export type s3KeyType =
   | 'overlay-logo'
   | 'public' // 예시이미지, 가이드이미지 등 공개이미지
   | 'settlement-account' // 판매자 통장사본 settlement-account/:email/:filename.ext
-  | 'vertical-banner' // 세로배너
-;
+  | 'vertical-banner'; // 세로배너
 
 export type s3FileNameParams = {
   userMail: string;
@@ -35,8 +34,8 @@ export type s3FileNameParams = {
 
 /**
  * type에 따라 project-lc 버킷에 저장할 객체키(prefix + 파일명)를 생성
- * @param 
- * @returns 
+ * @param
+ * @returns
  */
 export function generateS3Key({
   userMail,

@@ -75,7 +75,3 @@ export class S3Service {
       .map((src) => src.replace(this.S3_DOMIAN, ''));
   }
 }
-
-
-
-

@@ -16,8 +16,7 @@ export function LiveShoppingMonitorSection(): JSX.Element {
   useEffect(() => {
     completeStep();
     const setImageSrc = async (): Promise<void> => {
-
-      const imageString = await s3.getPresignedUrl({Key: s3ImageKey},{expiresIn});
+      const imageString = await s3.getPresignedUrl({ Key: s3ImageKey }, { expiresIn });
       setSrc(imageString);
     };
     setImageSrc();

@@ -40,13 +40,12 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
     const s3KeyType = `live-shopping-images/${liveShoppingId}/${imageType}`;
     const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
 
-    const {objectUrl} = await s3.sendPutObjectCommand({
+    const { objectUrl } = await s3.sendPutObjectCommand({
       Key: key,
       Body: imageData.file,
       ContentType: imageData.file.type,
       ACL: 'public-read',
     });
-
 
     if (liveShoppingId) {
       await mutateAsync({

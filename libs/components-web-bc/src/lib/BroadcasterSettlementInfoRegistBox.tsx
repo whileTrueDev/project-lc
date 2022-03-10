@@ -79,7 +79,7 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
     if (!profileData || !settlementInfoData) return;
     const Key = `broadcaster-id-card/${profileData.email}/${settlementInfoData.idCardImageName}`;
     const expiresIn = 60;
-    const imageUrl = await s3.getPresignedUrl({Key},{expiresIn});
+    const imageUrl = await s3.getPresignedUrl({ Key }, { expiresIn });
     window.open(imageUrl, '_blank');
   };
 
@@ -87,7 +87,7 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
     if (!profileData || !settlementInfoData) return;
     const Key = `broadcaster-account-image/${profileData.email}/${settlementInfoData.accountImageName}`;
     const expiresIn = 60;
-    const imageUrl = await s3.getPresignedUrl({Key},{expiresIn});
+    const imageUrl = await s3.getPresignedUrl({ Key }, { expiresIn });
     window.open(imageUrl, '_blank');
   };
 

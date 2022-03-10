@@ -1,13 +1,24 @@
 import {
-  DeleteObjectsCommand, DeleteObjectsRequest, GetObjectCommand, GetObjectCommandInput, ListObjectsCommand, ListObjectsCommandInput, ListObjectsOutput, ObjectIdentifier, PutObjectCommand, PutObjectCommandInput,
-  PutObjectCommandOutput, S3Client, _Object
+  DeleteObjectsCommand,
+  DeleteObjectsRequest,
+  GetObjectCommand,
+  GetObjectCommandInput,
+  ListObjectsCommand,
+  ListObjectsCommandInput,
+  ListObjectsOutput,
+  ObjectIdentifier,
+  PutObjectCommand,
+  PutObjectCommandInput,
+  PutObjectCommandOutput,
+  S3Client,
+  _Object,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { generateS3Key, s3KeyType } from './generateS3Key';
 
-
 export type s3TaggingKeys = 'overlayImageType'; // s3 object 태그 객체 키
-export interface S3UploadImageOptions extends  Partial<Omit<PutObjectCommandInput, 'Bucket'>>{
+export interface S3UploadImageOptions
+  extends Partial<Omit<PutObjectCommandInput, 'Bucket'>> {
   filename: string | null;
   userMail: string | undefined;
   type: s3KeyType;
@@ -16,7 +27,6 @@ export interface S3UploadImageOptions extends  Partial<Omit<PutObjectCommandInpu
   liveShoppingId?: number;
   isPublic?: boolean; // 공개 이미지로 업로드 할 경우 true 전달 필요
 }
-
 
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
@@ -34,21 +44,31 @@ export const s3 = (() => {
     },
   });
 
+  /**
+   * 객체 url 조회
+   * 해당 key 가진 객체가 public-read인 경우에만 이 url로 접근이 가능함
+   * private 객체는 getPresignedUrl 함수 사용
+   * @param key s3에 저장된 객체 키 (prefix + 파일명 형태)
+   * @returns 객체 url
+   */
+  function getSavedObjectUrl(key: string): string {
+    return S3_DOMIAN + key;
+  }
 
   /** 파일 업로드
    *  Bucket 제외한 Key, Body, ContentType, ACL 등 putObjectCommandInput 기입하여 사용
-   * 
+   *
    * @return output : PutObjectCommandOutput
    * @return savedKey : 객체 키 (prefix + 파일명)
    * @return objectUrl : 객체 url (s3도메인 + 객체키)
    */
   async function sendPutObjectCommand(
     commandInput: Omit<PutObjectCommandInput, 'Bucket'>,
-  ): Promise<{ 
-    output: PutObjectCommandOutput; 
-    savedKey: string; 
-    objectUrl: string }
-    > {
+  ): Promise<{
+    output: PutObjectCommandOutput;
+    savedKey: string;
+    objectUrl: string;
+  }> {
     const command = new PutObjectCommand({
       ...commandInput,
       Bucket: S3_BUCKET_NAME,
@@ -56,7 +76,7 @@ export const s3 = (() => {
     return {
       output: await s3Client.send(command),
       savedKey: commandInput.Key,
-      objectUrl: getSavedObjectUrl(commandInput.Key)
+      objectUrl: getSavedObjectUrl(commandInput.Key),
     };
   }
 
@@ -91,55 +111,57 @@ export const s3 = (() => {
     isPublic = false,
     ...putObjectCommandInput
   }: S3UploadImageOptions): Promise<string> {
-    if (!userMail || !file) return '';
-    const { key, fileName } = generateS3Key({
-      userMail,
-      type,
-      filename,
-      companyName,
-      liveShoppingId,
-    });
+    if (!userMail || !file) throw new Error('file and userMail should have value');
 
     try {
-      const {objectUrl} = await sendPutObjectCommand({
+      const { key, fileName } = generateS3Key({
+        userMail,
+        type,
+        filename,
+        companyName,
+        liveShoppingId,
+      });
+
+      const { objectUrl } = await sendPutObjectCommand({
         ACL: isPublic ? 'public-read' : undefined,
         ...putObjectCommandInput,
         Key: key,
         Body: file,
       });
 
-      
       if (isPublic) {
         // public 인 경우 객체 url을 리턴함
         return objectUrl;
-      } else {
-        // public 이 아닌 경우 객체 url로 접근하지 못하므로 그냥 파일명만 리턴함
-        return fileName;
       }
+      // public 이 아닌 경우 객체 url로 접근하지 못하므로 그냥 파일명만 리턴함
+      return fileName;
     } catch (error) {
       console.error(error);
+      return '';
     }
   }
 
-
   /**
-   * 버킷 내 객체목록 조회 
+   * 버킷 내 객체목록 조회
    * @param commandInput {Prefix: s3에 저장된 폴더경로}
-   * @return response: ListObjectsCommandOutput, 
+   * @return response: ListObjectsCommandOutput,
    * @return contents: 해당 경로 내 저장된 객체 목록 | null
    */
-  async function sendListObjectCommand(commandInput: Omit<ListObjectsCommandInput,'Bucket'>): Promise<{
-    response:ListObjectsOutput, contents: _Object[] | null}> {
+  async function sendListObjectCommand(
+    commandInput: Omit<ListObjectsCommandInput, 'Bucket'>,
+  ): Promise<{
+    response: ListObjectsOutput;
+    contents: _Object[] | null;
+  }> {
     const command = new ListObjectsCommand({
       ...commandInput,
       Bucket: S3_BUCKET_NAME,
     });
 
     const response = await s3Client.send(command);
-    
-    return {response, contents: response.Contents || null }
-  }
 
+    return { response, contents: response.Contents || null };
+  }
 
   /**
    * 여러 객체 삭제
@@ -147,17 +169,19 @@ export const s3 = (() => {
    * @param quite?: boolean
    * @returns 성공시 true, 에러발생시 false
    */
-  async function sendDeleteObjectsCommand(input: {
-    deleteObjects: ObjectIdentifier[],
-    quite?: boolean
-  } & Omit<DeleteObjectsRequest,'Bucket' | 'Delete'>): Promise<boolean> {
-    const {deleteObjects, quite, ...rest} = input;
+  async function sendDeleteObjectsCommand(
+    input: {
+      deleteObjects: ObjectIdentifier[];
+      quite?: boolean;
+    } & Omit<DeleteObjectsRequest, 'Bucket' | 'Delete'>,
+  ): Promise<boolean> {
+    const { deleteObjects, quite, ...rest } = input;
     try {
       const command = new DeleteObjectsCommand({
         ...rest,
         Delete: {
           Objects: deleteObjects,
-          Quiet: quite
+          Quiet: quite,
         },
         Bucket: S3_BUCKET_NAME,
       });
@@ -170,33 +194,22 @@ export const s3 = (() => {
     }
   }
 
-
-  /**
-   * 객체 url 조회
-   * 해당 key 가진 객체가 public-read인 경우에만 이 url로 접근이 가능함
-   * private 객체는 getPresignedUrl 함수 사용
-   * @param key s3에 저장된 객체 키 (prefix + 파일명 형태)
-   * @returns 객체 url
-   */
-     function getSavedObjectUrl(key: string): string {
-      return S3_DOMIAN + key;
-    }
-
   /**
    * 객체 url 조회
    * private인 객체 조회 위해 expiresIn 으로 넘어온 시간동안 유효한 url 리턴
    * @param getObjectCommandInput {Key: 객체 key 입력}
    * @param options? {expiresIn: 3600} url 유효시간 입력(초), 기본 15분
-   * */ 
+   * */
   async function getPresignedUrl(
-    getObjectCommandInput:Omit<GetObjectCommandInput,'Bucket'>,
-    options?:{expiresIn: number}): Promise<string> {
+    getObjectCommandInput: Omit<GetObjectCommandInput, 'Bucket'>,
+    options?: { expiresIn: number },
+  ): Promise<string> {
     const command = new GetObjectCommand({
       ...getObjectCommandInput,
       Bucket: S3_BUCKET_NAME,
     });
     const imageUrl = await getSignedUrl(s3Client, command, {
-      ...options
+      ...options,
     });
     return imageUrl;
   }
@@ -207,6 +220,6 @@ export const s3 = (() => {
     getSavedObjectUrl,
     sendPutObjectCommand,
     sendListObjectCommand,
-    sendDeleteObjectsCommand
+    sendDeleteObjectsCommand,
   };
 })();

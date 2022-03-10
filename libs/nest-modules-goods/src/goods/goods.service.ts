@@ -23,11 +23,10 @@ import {
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
-import {
-  S3Service,
-} from '@project-lc/nest-modules-s3';
+import { S3Service } from '@project-lc/nest-modules-s3';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
+import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
 
 @Injectable()
 export class GoodsService extends ServiceBaseWithCache {
@@ -689,7 +688,3 @@ export class GoodsService extends ServiceBaseWithCache {
     });
   }
 }
-function getImgSrcListFromHtmlStringList(contentList: string[]): string[] {
-  throw new Error('Function not implemented.');
-}
-

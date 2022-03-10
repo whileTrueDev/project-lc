@@ -56,7 +56,14 @@ export async function uploadGoodsImageToS3(
   userMail: string,
 ): Promise<string> {
   const { file, filename, contentType } = imageFile;
-  return s3.s3UploadImage({isPublic: true, file, filename, ContentType:contentType, userMail, type: 'goods' });
+  return s3.s3UploadImage({
+    isPublic: true,
+    file,
+    filename,
+    ContentType: contentType,
+    userMail,
+    type: 'goods',
+  });
 }
 
 // options 에 default_option설정

@@ -7,11 +7,10 @@ import {
 import { GoodsInfo } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { GoodsInfoDto } from '@project-lc/shared-types';
-import {
-  S3Service,
-} from '@project-lc/nest-modules-s3';
+import { S3Service } from '@project-lc/nest-modules-s3';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
+import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
 
 @Injectable()
 export class GoodsCommonInfoService extends ServiceBaseWithCache {
@@ -128,7 +127,3 @@ export class GoodsCommonInfoService extends ServiceBaseWithCache {
     }
   }
 }
-function getImgSrcListFromHtmlStringList(contentList: string[]): string[] {
-  throw new Error('Function not implemented.');
-}
-
