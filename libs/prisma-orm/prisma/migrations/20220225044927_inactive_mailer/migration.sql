@@ -26,6 +26,8 @@ ALTER TABLE `SellerBusinessRegistration` ADD CONSTRAINT `SellerBusinessRegistrat
 
 ALTER TABLE `SellerBusinessRegistration` DROP FOREIGN KEY `SellerBusinessRegistration_sellerEmail_fkey`;
 
+ALTER TABLE `SellerBusinessRegistration` MODIFY COLUMN `sellerId` INTEGER AFTER `id`;
+
 -- SellerSettlementAccount
 ALTER TABLE `SellerSettlementAccount` ADD `sellerId` INTEGER;
 
@@ -40,6 +42,8 @@ ALTER TABLE `SellerSettlementAccount` ADD CONSTRAINT `SellerSettlementAccount_se
 
 ALTER TABLE `SellerSettlementAccount` DROP FOREIGN KEY `SellerSettlementAccount_sellerEmail_fkey`;
 
+ALTER TABLE `SellerSettlementAccount` MODIFY COLUMN `sellerId` INTEGER AFTER `id`;
+
 -- SellerSettlementAccount
 ALTER TABLE `SellerSettlements` ADD `sellerId` INTEGER;
 
@@ -53,6 +57,8 @@ ALTER TABLE `SellerSettlements` MODIFY COLUMN `sellerId` INTEGER NOT NULL;
 ALTER TABLE `SellerSettlements` ADD CONSTRAINT `SellerSettlements_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `SellerSettlements` DROP FOREIGN KEY `SellerSettlements_sellerEmail_fkey`;
+
+ALTER TABLE `SellerSettlements` MODIFY COLUMN `sellerId` INTEGER AFTER `id`;
 
 -- SellerShop
 ALTER TABLE `SellerShop` ADD `sellerId` INTEGER;
@@ -69,6 +75,8 @@ ALTER TABLE `SellerShop` ADD CONSTRAINT `SellerShop_sellerId_fkey` FOREIGN KEY (
 ALTER TABLE `SellerShop` DROP FOREIGN KEY `SellerShop_sellerEmail_fkey`;
 
 ALTER TABLE `SellerShop` DROP `sellerEmail`;
+
+ALTER TABLE `SellerShop` MODIFY COLUMN `sellerId` INTEGER FIRST;
 
 -- AlterTable
 ALTER TABLE `Administrator` ADD COLUMN `inactiveFlag` BOOLEAN NOT NULL DEFAULT false;
