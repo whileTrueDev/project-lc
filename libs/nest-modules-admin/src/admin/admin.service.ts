@@ -8,8 +8,6 @@ import {
   GoodsConfirmation,
   LiveShopping,
   AdminClassChangeHistory,
-  GoodsConfirmation,
-  LiveShopping,
   LiveShoppingImageType,
 } from '@prisma/client';
 
