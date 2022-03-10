@@ -1,20 +1,7 @@
-import { LiveShopping, SellerShop } from '@prisma/client';
+import { LiveShoppingParamsDto, LiveShoppingWithGoods } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useQuery, UseQueryResult, UseQueryOptions } from 'react-query';
-import { BroadcasterDTO, LiveShoppingParamsDto } from '@project-lc/shared-types';
+import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
-
-interface LiveShoppingWithGoods extends LiveShopping {
-  goods: {
-    goods_name: string;
-    summary: string;
-  };
-  seller: {
-    sellerShop: SellerShop;
-  };
-  broadcaster: BroadcasterDTO;
-  liveShoppingVideo: { youtubeUrl: string };
-}
 
 export const getAdminLiveShoppingList = async (
   dto: LiveShoppingParamsDto,

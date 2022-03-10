@@ -18,7 +18,10 @@ export interface LiveShoppingWithGoods extends LiveShopping {
   seller: {
     sellerShop: SellerShop;
   };
-  broadcaster: Pick<Broadcaster, 'userName' | 'userNickname' | 'email' | 'avatar'> & {
+  broadcaster: Pick<
+    Broadcaster,
+    'id' | 'userName' | 'userNickname' | 'email' | 'avatar'
+  > & {
     BroadcasterPromotionPage: BroadcasterPromotionPage | null;
   };
   liveShoppingVideo: { youtubeUrl: string };

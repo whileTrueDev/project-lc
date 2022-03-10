@@ -269,6 +269,7 @@ export class AdminService {
         seller: { select: { sellerShop: true } },
         broadcaster: {
           select: {
+            id: true,
             userName: true,
             userNickname: true,
             email: true,
