@@ -24,3 +24,7 @@ CREATE TABLE `AdminClassChangeHistory` (
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+UPDATE `Administrator` SET `adminClass`='super' WHERE `email`='alsrhks1994@naver.com';
+
+INSERT INTO `AdminClassChangeHistory`(`adminEmail`,`targetEmail`,`originalAdminClass`,`newAdminClass`) VALUES ('alsrhks1994@naver.com', 'alsrhks1994@naver.com', 'normal', 'super');
