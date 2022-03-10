@@ -1,3 +1,4 @@
+import { ObjectIdentifier } from '@aws-sdk/client-s3';
 import {
   Button,
   Divider,
@@ -121,8 +122,14 @@ export async function getSavedImages(
   liveShoppingId: number,
   type: 'vertical-banner' | 'donation-images' | 'overlay-logo' | 'horizontal-banner',
 ): Promise<(string | undefined)[]> {
-  const imageList = await s3.getOverlayImagesFromS3(broadcasterId, liveShoppingId, type);
-  return imageList;
+  // 오버레이 이미지 저장된 폴더
+  const overlayImagePrefix = `${type}/${broadcasterId}/${liveShoppingId}`;
+  const {contents} = await s3.sendListObjectCommand({Prefix: overlayImagePrefix});
+  const imagesKeyList = contents?.map((item) => {
+    return item.Key;
+  });
+
+  return imagesKeyList || [];
 }
 
 export function AdminOverlayImageUploadDialog(
@@ -817,24 +824,30 @@ export function AdminOverlayImageUploadDialog(
           isOpen={goBackAlertDialog.isOpen}
           onClose={goBackAlertDialog.onClose}
           onConfirm={async () => {
+            let deleteObjectIdentifiers:ObjectIdentifier[] = [];
             if (selectedBannerType === 'vertical-banner') {
-              await s3.s3DeleteImages(savedVerticalImages);
+              deleteObjectIdentifiers =  savedVerticalImages.map(i =>{ return {Key: i}});
+              await s3.sendDeleteObjectsCommand({deleteObjects: deleteObjectIdentifiers})
               setSavedVerticalImages([]);
             }
             if (selectedBannerType === 'horizontal-banner') {
-              await s3.s3DeleteImages(savedHorizontalImages);
+              deleteObjectIdentifiers =  savedHorizontalImages.map(i =>{ return {Key: i}});
+              await s3.sendDeleteObjectsCommand({deleteObjects: deleteObjectIdentifiers})
               setSavedHorizontalImages([]);
             }
             if (selectedBannerType === 'donation-images-1') {
-              await s3.s3DeleteImages([savedFirstDonationImages]);
+              deleteObjectIdentifiers =  [{Key: savedFirstDonationImages}];
+              await s3.sendDeleteObjectsCommand({deleteObjects: deleteObjectIdentifiers})
               setSavedFirstDonationImages('');
             }
             if (selectedBannerType === 'donation-images-2') {
-              await s3.s3DeleteImages([savedSecondDonationImages]);
+              deleteObjectIdentifiers =  [{Key: savedSecondDonationImages}];
+              await s3.sendDeleteObjectsCommand({deleteObjects: deleteObjectIdentifiers})
               setSavedSecondDonationImages('');
             }
             if (selectedBannerType === 'overlay-logo') {
-              await s3.s3DeleteImages([savedLogoImages]);
+              deleteObjectIdentifiers =  [{Key: savedLogoImages}];
+              await s3.sendDeleteObjectsCommand({deleteObjects: deleteObjectIdentifiers})
               setSavedLogoImages('');
             }
           }}

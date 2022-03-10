@@ -1,6 +1,6 @@
 import {
-  DeleteObjectsCommand, GetObjectCommand, GetObjectCommandInput, ListObjectsCommand, PutObjectCommand, PutObjectCommandInput,
-  PutObjectCommandOutput, S3Client
+  DeleteObjectsCommand, DeleteObjectsRequest, GetObjectCommand, GetObjectCommandInput, ListObjectsCommand, ListObjectsCommandInput, ListObjectsOutput, ObjectIdentifier, PutObjectCommand, PutObjectCommandInput,
+  PutObjectCommandOutput, S3Client, _Object
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { generateS3Key, s3KeyType } from './generateS3Key';
@@ -78,8 +78,7 @@ export const s3 = (() => {
    * @param 기타 Tagging, ContentType, ACL 등 putObjectCommandInput props 전달 가능
 
    * @returns 파일명(privater 객체인 경우) 혹은 객체url(public-read 객체인 경우)
-              file 이 없는경우 빈 문자열 '' 리턴,
-              
+              file 이 없는경우 빈 문자열 '' 리턴,         
    * 
    */
   async function s3UploadImage({
@@ -123,37 +122,46 @@ export const s3 = (() => {
   }
 
 
-
-  async function getOverlayImagesFromS3(
-    broadcasterId: string,
-    liveShoppingId: number,
-    type: 'vertical-banner' | 'donation-images' | 'overlay-logo' | 'horizontal-banner',
-  ): Promise<(string | undefined)[]> {
+  /**
+   * 버킷 내 객체목록 조회 
+   * @param commandInput {Prefix: s3에 저장된 폴더경로}
+   * @return response: ListObjectsCommandOutput, 
+   * @return contents: 해당 경로 내 저장된 객체 목록 | null
+   */
+  async function sendListObjectCommand(commandInput: Omit<ListObjectsCommandInput,'Bucket'>): Promise<{
+    response:ListObjectsOutput, contents: _Object[] | null}> {
     const command = new ListObjectsCommand({
+      ...commandInput,
       Bucket: S3_BUCKET_NAME,
-      Prefix: `${type}/${broadcasterId}/${liveShoppingId}`,
     });
+
     const response = await s3Client.send(command);
-    const imagesLength = response.Contents || null;
-    const imagesKey = imagesLength?.map((item) => {
-      return item.Key;
-    });
-    return imagesKey || [];
+    
+    return {response, contents: response.Contents || null }
   }
 
-  async function s3DeleteImages(
-    toDeleteImages: (string | undefined)[],
-  ): Promise<boolean> {
-    const toDeleteObject: { Key: string }[] = [];
-    toDeleteImages.forEach((imageName) => {
-      toDeleteObject.push({ Key: `${imageName}` });
-    });
-    const command = new DeleteObjectsCommand({
-      Bucket: S3_BUCKET_NAME,
-      Delete: { Objects: toDeleteObject },
-    });
 
+  /**
+   * 여러 객체 삭제
+   * @param deleteObjects : { Key: string | undefined , VersionId?: string}[] 형태의 객체키 목록
+   * @param quite?: boolean
+   * @returns 성공시 true, 에러발생시 false
+   */
+  async function sendDeleteObjectsCommand(input: {
+    deleteObjects: ObjectIdentifier[],
+    quite?: boolean
+  } & Omit<DeleteObjectsRequest,'Bucket' | 'Delete'>): Promise<boolean> {
+    const {deleteObjects, quite, ...rest} = input;
     try {
+      const command = new DeleteObjectsCommand({
+        ...rest,
+        Delete: {
+          Objects: deleteObjects,
+          Quiet: quite
+        },
+        Bucket: S3_BUCKET_NAME,
+      });
+
       await s3Client.send(command);
       return true;
     } catch (error) {
@@ -161,6 +169,7 @@ export const s3 = (() => {
       return false;
     }
   }
+
 
   /**
    * 객체 url 조회
@@ -194,10 +203,10 @@ export const s3 = (() => {
 
   return {
     s3UploadImage,
-    getOverlayImagesFromS3,
-    s3DeleteImages,
-    sendPutObjectCommand,
     getPresignedUrl,
-    getSavedObjectUrl
+    getSavedObjectUrl,
+    sendPutObjectCommand,
+    sendListObjectCommand,
+    sendDeleteObjectsCommand
   };
 })();
