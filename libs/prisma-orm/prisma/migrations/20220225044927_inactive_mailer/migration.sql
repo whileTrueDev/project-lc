@@ -12,17 +12,63 @@
 -- DropForeignKey
 ALTER TABLE `LiveShopping` DROP FOREIGN KEY `LiveShopping_contactId_fkey`;
 
--- DropForeignKey
+-- SellerBusinessRegistration
+ALTER TABLE `SellerBusinessRegistration` ADD `sellerId` INTEGER;
+
+UPDATE `SellerBusinessRegistration`
+INNER JOIN `Seller`
+  ON `SellerBusinessRegistration`.`sellerEmail` = `Seller`.`email`
+SET `SellerBusinessRegistration`.`sellerId` = `Seller`.`id`;
+
+ALTER TABLE `SellerBusinessRegistration` MODIFY COLUMN `sellerId` INTEGER NOT NULL;
+
+ALTER TABLE `SellerBusinessRegistration` ADD CONSTRAINT `SellerBusinessRegistration_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE `SellerBusinessRegistration` DROP FOREIGN KEY `SellerBusinessRegistration_sellerEmail_fkey`;
 
--- DropForeignKey
+-- SellerSettlementAccount
+ALTER TABLE `SellerSettlementAccount` ADD `sellerId` INTEGER;
+
+UPDATE `SellerSettlementAccount`
+INNER JOIN `Seller`
+  ON `SellerSettlementAccount`.`sellerEmail` = `Seller`.`email`
+SET `SellerSettlementAccount`.`sellerId` = `Seller`.`id`;
+
+ALTER TABLE `SellerSettlementAccount` MODIFY COLUMN `sellerId` INTEGER NOT NULL;
+
+ALTER TABLE `SellerSettlementAccount` ADD CONSTRAINT `SellerSettlementAccount_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE `SellerSettlementAccount` DROP FOREIGN KEY `SellerSettlementAccount_sellerEmail_fkey`;
 
--- DropForeignKey
+-- SellerSettlementAccount
+ALTER TABLE `SellerSettlements` ADD `sellerId` INTEGER;
+
+UPDATE `SellerSettlements`
+INNER JOIN `Seller`
+  ON `SellerSettlements`.`sellerEmail` = `Seller`.`email`
+SET `SellerSettlements`.`sellerId` = `Seller`.`id`;
+
+ALTER TABLE `SellerSettlements` MODIFY COLUMN `sellerId` INTEGER NOT NULL;
+
+ALTER TABLE `SellerSettlements` ADD CONSTRAINT `SellerSettlements_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE `SellerSettlements` DROP FOREIGN KEY `SellerSettlements_sellerEmail_fkey`;
 
--- DropForeignKey
+-- SellerShop
+ALTER TABLE `SellerShop` ADD `sellerId` INTEGER;
+
+UPDATE `SellerShop`
+INNER JOIN `Seller`
+  ON `SellerShop`.`sellerEmail` = `Seller`.`email`
+SET `SellerShop`.`sellerId` = `Seller`.`id`;
+
+ALTER TABLE `SellerShop` MODIFY COLUMN `sellerId` INTEGER NOT NULL;
+
+ALTER TABLE `SellerShop` ADD CONSTRAINT `SellerShop_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE `SellerShop` DROP FOREIGN KEY `SellerShop_sellerEmail_fkey`;
+
+ALTER TABLE `SellerShop` DROP `sellerEmail`;
 
 -- AlterTable
 ALTER TABLE `Administrator` ADD COLUMN `inactiveFlag` BOOLEAN NOT NULL DEFAULT false;
@@ -39,19 +85,6 @@ ALTER TABLE `LiveShopping` MODIFY `contactId` INTEGER NULL;
 -- AlterTable
 ALTER TABLE `Seller` ADD COLUMN `inactiveFlag` BOOLEAN NOT NULL DEFAULT false,
     MODIFY `email` VARCHAR(191) NULL;
-
--- AlterTable
-ALTER TABLE `SellerBusinessRegistration` ADD COLUMN `sellerId` INTEGER NOT NULL;
-
--- AlterTable
-ALTER TABLE `SellerSettlementAccount` ADD COLUMN `sellerId` INTEGER NOT NULL;
-
--- AlterTable
-ALTER TABLE `SellerSettlements` ADD COLUMN `sellerId` INTEGER NOT NULL;
-
--- AlterTable
-ALTER TABLE `SellerShop` DROP COLUMN `sellerEmail`,
-    ADD COLUMN `sellerId` INTEGER NOT NULL;
 
 -- CreateTable
 CREATE TABLE `InactiveBroadcaster` (
@@ -243,18 +276,6 @@ CREATE TABLE `InactiveBusinessRegistrationConfirmation` (
 
 -- CreateIndex
 CREATE UNIQUE INDEX `SellerShop_sellerId_key` ON `SellerShop`(`sellerId`);
-
--- AddForeignKey
-ALTER TABLE `SellerShop` ADD CONSTRAINT `SellerShop_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `SellerBusinessRegistration` ADD CONSTRAINT `SellerBusinessRegistration_sellerEmail_sellerId_fkey` FOREIGN KEY (`sellerEmail`, `sellerId`) REFERENCES `Seller`(`email`, `id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `SellerSettlements` ADD CONSTRAINT `SellerSettlements_sellerEmail_sellerId_fkey` FOREIGN KEY (`sellerEmail`, `sellerId`) REFERENCES `Seller`(`email`, `id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `SellerSettlementAccount` ADD CONSTRAINT `SellerSettlementAccount_sellerEmail_sellerId_fkey` FOREIGN KEY (`sellerEmail`, `sellerId`) REFERENCES `Seller`(`email`, `id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `LiveShopping` ADD CONSTRAINT `LiveShopping_contactId_fkey` FOREIGN KEY (`contactId`) REFERENCES `SellerContacts`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
