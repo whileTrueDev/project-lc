@@ -13,6 +13,10 @@ export class BroadcasterDTO {
 
   @IsOptional()
   BroadcasterPromotionPage?: BroadcasterPromotionPage | null;
+
+  @IsOptional()
+  @IsString()
+  avatar?: string;
 }
 
 export type BroadcasterDTOWithoutUserId = Omit<BroadcasterDTO, 'userId'>;

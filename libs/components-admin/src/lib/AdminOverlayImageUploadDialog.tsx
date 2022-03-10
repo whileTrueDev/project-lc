@@ -19,11 +19,8 @@ import {
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { ImageInput } from '@project-lc/components-core/ImageInput';
-import {
-  GoodsPreviewItem,
-  Preview,
-  readAsDataURL,
-} from '@project-lc/components-seller/GoodsRegistPictures';
+import { Preview, readAsDataURL } from '@project-lc/components-core/ImageInputDialog';
+import { GoodsPreviewItem } from '@project-lc/components-seller/GoodsRegistPictures';
 import { OverlayImageTypes } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { useEffect, useState } from 'react';

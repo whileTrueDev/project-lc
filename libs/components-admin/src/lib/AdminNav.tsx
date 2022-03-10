@@ -38,10 +38,10 @@ export function AdminLogOutButton(): JSX.Element | null {
   const router = useRouter();
   const { isLoggedIn } = useIsLoggedIn();
   const { logout } = useLogout();
-  function adminLogout(): void {
+  const adminLogout = (): void => {
     logout();
     router.push('/');
-  }
+  };
 
   if (!isLoggedIn) return null;
   return (

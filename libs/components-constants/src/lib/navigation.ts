@@ -40,9 +40,13 @@ export const mainNavItems: Array<NavItem> = [
 /** 크크쇼 상단 네비바 링크 */
 export const kkshowNavLinks: Array<NavItem> = [
   {
-    label: '크크마켓',
+    label: '쇼핑',
     href: 'https://k-kmarket.com/',
     isExternal: true,
+  },
+  {
+    label: '방송인',
+    href: '/broadcasters',
   },
   // { label: '방송편성표', href: '/' },
   // { label: '방송인', href: '/' },
@@ -263,5 +267,10 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '관리자',
     href: '/admin-manage',
     children: [{ name: '계정 권한관리', href: '/admin-manage', icon: FcList }],
+  },
+  {
+    name: '크크쇼 메인',
+    href: '/kkshow-main',
+    children: [{ name: '크크쇼 메인페이지', href: '/kkshow-main', icon: FcList }],
   },
 ];

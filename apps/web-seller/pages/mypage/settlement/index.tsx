@@ -18,15 +18,15 @@ export function Index(): JSX.Element {
   }, [settlementData?.sellerSettlementAccount]);
 
   const hasRegistration = useMemo<boolean>(() => {
-    if (settlementData?.sellerBusinessRegistration.length > 0) {
+    if (settlementData && settlementData.sellerBusinessRegistration.length > 0) {
       const { status } =
-        settlementData?.sellerBusinessRegistration[0].BusinessRegistrationConfirmation;
+        settlementData.sellerBusinessRegistration[0].BusinessRegistrationConfirmation;
       if (status === BusinessRegistrationStatus.CONFIRMED) {
         return true;
       }
     }
     return false;
-  }, [settlementData?.sellerBusinessRegistration]);
+  }, [settlementData]);
 
   return (
     <MypageLayout>

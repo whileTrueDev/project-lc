@@ -69,10 +69,10 @@ export function BcSettlementTargetList(): JSX.Element {
     },
     [detailDialog],
   );
-  function onDetailClose(): void {
+  const onDetailClose = (): void => {
     detailDialog.onClose();
     setDetailSelected(null);
-  }
+  };
 
   // * datagrid columns
   const columns = useMemo<GridColumns>(() => {
@@ -147,7 +147,7 @@ export function BcSettlementTargetList(): JSX.Element {
 
   const roundStore = settlementHistoryStore();
 
-  async function onExecuteSettleMany(): Promise<void> {
+  const onExecuteSettleMany = async (): Promise<void> => {
     const round = roundStore.selectedRound; // 'YYYY년MM월/1회차'
     if (!round) toast({ title: '회차를 설정해 주세요.' });
     else {
@@ -177,7 +177,7 @@ export function BcSettlementTargetList(): JSX.Element {
 
       await mutateAsync({ round, items: dtoItems }).then(onSuccess).catch(onFail);
     }
-  }
+  };
 
   return (
     <Box minHeight={{ base: 300, md: 400 }} mt={3}>
