@@ -75,7 +75,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
       await this.prisma.sellerBusinessRegistration.create({
         data: {
           companyName: dto.companyName,
-          sellerEmail: email,
           businessRegistrationNumber: this.makeRegistrationNumberFormat(
             dto.businessRegistrationNumber,
           ),
@@ -167,7 +166,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
         data: {
           id: restoreData.id,
           companyName: restoreData.companyName,
-          sellerEmail: restoreData.sellerEmail,
           businessRegistrationNumber: this.makeRegistrationNumberFormat(
             restoreData.businessRegistrationNumber,
           ),
@@ -214,11 +212,9 @@ export class SellerSettlementService extends ServiceBaseWithCache {
     dto: SettlementAccountDto,
     sellerInfo: UserPayload,
   ): Promise<SellerSettlementAccount> {
-    const email = sellerInfo.sub;
     const sellerId = sellerInfo.id;
     const settlementAccount = await this.prisma.sellerSettlementAccount.create({
       data: {
-        sellerEmail: email,
         sellerId,
         name: dto.name,
         number: dto.number,
@@ -251,7 +247,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
           number: restoreData.number,
           bank: restoreData.bank,
           settlementAccountImageName: restoreData.settlementAccountImageName,
-          sellerEmail: restoreData.sellerEmail,
         },
       });
     }
@@ -300,14 +295,14 @@ export class SellerSettlementService extends ServiceBaseWithCache {
    * @author hwasurr(dan)
    * */
   public async executeSettle(
-    email: UserPayload['sub'],
+    id: UserPayload['id'],
     dto: ExecuteSettlementDto,
   ): Promise<boolean> {
     const { target, round } = dto;
     const { order_seq, shipping_cost } = target;
 
     // 출고가 발생한 주문을 통해 해당 주문에 대한 이전 정산 처리를 조회
-    const settlementHistories = await this.findSettlementHistory(email, {
+    const settlementHistories = await this.findSettlementHistory(id, {
       order_seq,
     });
 
@@ -392,7 +387,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
         pg: target.pg,
         pgCommission: totalPgCommission.commission,
         pgCommissionRate: totalPgCommission.rate,
-        sellerEmail: target.options[0].seller.email,
         sellerId: target.options[0].seller.id,
         settlementItems: {
           create: target.options.map((opt) => {
@@ -508,33 +502,13 @@ export class SellerSettlementService extends ServiceBaseWithCache {
     return result.map((m) => m.round);
   }
 
-  /** 정산 완료 목록의 round를 기준으로 groupby 조회를 실시합니다. */
-  public async findSettlementHistoryPerRound(
-    email: UserPayload['sub'],
-  ): Promise<FindSettlementHistoryRoundRes> {
-    const result = await this.prisma.sellerSettlements.groupBy({
-      by: ['round'],
-      where: { sellerEmail: email },
-      _sum: {
-        totalPrice: true,
-        totalAmount: true,
-        totalCommission: true,
-        pgCommission: true,
-        totalEa: true,
-        shippingCost: true,
-      },
-    });
-
-    return result;
-  }
-
   /**
    * 정산 완료 목록을 조회합니다.
    * @author hwasurr(dan)
    */
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   public async findSettlementHistory(
-    email?: UserPayload['sub'],
+    id?: UserPayload['id'],
     options?: {
       round?: string;
       export_seq?: FmExport['export_seq'];
@@ -543,7 +517,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
   ) {
     return this.prisma.sellerSettlements.findMany({
       where: {
-        sellerEmail: email || undefined,
+        sellerId: id || undefined,
         exportId: options && options.export_seq ? options.export_seq : undefined,
         orderId: options && options.order_seq ? String(options.order_seq) : undefined,
         round: options?.round ? options.round : undefined,

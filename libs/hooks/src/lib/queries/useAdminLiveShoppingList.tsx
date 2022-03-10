@@ -1,4 +1,4 @@
-import { LiveShopping } from '@prisma/client';
+import { LiveShopping, SellerShop } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult, UseQueryOptions } from 'react-query';
 import { BroadcasterDTO, LiveShoppingParamsDto } from '@project-lc/shared-types';
@@ -10,16 +10,13 @@ interface LiveShoppingWithGoods extends LiveShopping {
     summary: string;
   };
   seller: {
-    sellerShop: {
-      sellerEmail: string;
-      shopName: string;
-    };
+    sellerShop: SellerShop;
   };
   broadcaster: BroadcasterDTO;
   liveShoppingVideo: { youtubeUrl: string };
 }
 
-export const getLiveShoppingList = async (
+export const getAdminLiveShoppingList = async (
   dto: LiveShoppingParamsDto,
 ): Promise<LiveShoppingWithGoods[]> => {
   return axios
@@ -32,14 +29,14 @@ export const getLiveShoppingList = async (
     .then((res) => res.data);
 };
 
-export const useLiveShoppingList = (
+export const useAdminLiveShoppingList = (
   dto: LiveShoppingParamsDto,
   options?: UseQueryOptions<LiveShoppingWithGoods[], AxiosError>,
 ): UseQueryResult<LiveShoppingWithGoods[], AxiosError> => {
-  const queryKey = ['LiveShoppingList', dto];
+  const queryKey = ['AdminLiveShoppingList', dto];
   return useQuery<LiveShoppingWithGoods[], AxiosError>(
     queryKey,
-    () => getLiveShoppingList(dto || null),
+    () => getAdminLiveShoppingList(dto || null),
     options,
   );
 };

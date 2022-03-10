@@ -1,5 +1,6 @@
 import { Seller } from '@prisma/client';
 import { UserType } from '@project-lc/shared-types';
+
 // token에 들어갈 공통의 데이터 - 로그인 유지시 필요한 데이터
 export interface UserPayload {
   id: number;
