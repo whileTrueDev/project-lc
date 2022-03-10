@@ -1,58 +1,22 @@
 import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  ListObjectsCommand,
-  DeleteObjectsCommand,
-  PutObjectCommandInput,
-  PutObjectCommandOutput,
-  GetObjectCommandInput,
+  DeleteObjectsCommand, GetObjectCommand, GetObjectCommandInput, ListObjectsCommand, PutObjectCommand, PutObjectCommandInput,
+  PutObjectCommandOutput, S3Client
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { getExtension } from '@project-lc/utils';
-import dayjs from 'dayjs';
-import path from 'path';
+import { generateS3Key, s3KeyType } from './generateS3Key';
 
-// 추후에 S3에 저장할 데이터 종류가 더해지는 경우 추가
-export type s3KeyType =
-  | 'avatar' // 프로필 이미지 avatar/:userType/:email/:filename.ext
-  | 'broadcaster-account-image' // 방송인 통장사본 broadcaster-account-image/:email/:filename.ext
-  | 'broadcaster-id-card' // 방송인 신분증 broadcaster-id-card/:email/:filename.ext
-  | 'business-registration' // 사업자등록증 business-registration/:email/:filename.ext
-  | 'donation-images' // 도네이션 이미지
-  | 'goods' // 상품 이미지 goods/:email/:filename.ext
-  | 'horizontal-banner' // 가로배너
-  // | 'inactive-broadcaster-account-image' // 비활성 방송인 통장사본
-  // | 'inactive-broadcaster-id-card' // 비활성 방송인 신분증
-  // | 'inactive-business-registration' // 비활성 판매자 사업자등록증
-  // | 'inactive-mail-order' // 비활성 판매자 통신판매업신고증
-  // | 'inactive-settlement-account' // 비활성 판매자 통장사본
-  | 'kkshow-main-carousel-images' // 크크쇼 메인 캐러셀 배너이미지 kkshow-main-carousel-images/:filename.ext
-  | 'live-shopping-images' // 크크쇼 메인 라이브 쇼핑 섬네일 이미지 live-shopping-images/:liveShoppingId/:type/:filename.ext
-  | 'mail-order' // 판매자 통신판매업신고증 mail-order/:email/:filename.ext
-  | 'overlay-logo'
-  | 'public' // 예시이미지, 가이드이미지 등 공개이미지
-  | 'settlement-account' // 판매자 통장사본 settlement-account/:email/:filename.ext
-  | 'vertical-banner' // 세로배너
-;
+
 export type s3TaggingKeys = 'overlayImageType'; // s3 object 태그 객체 키
-export interface S3UploadImageOptions {
+export interface S3UploadImageOptions extends  Partial<Omit<PutObjectCommandInput, 'Bucket'>>{
   filename: string | null;
   userMail: string | undefined;
   type: s3KeyType;
   file: File | Buffer | null;
   companyName?: string;
   liveShoppingId?: number;
-  tagging?: { [k in s3TaggingKeys]: string }; // s3 object 태그 key와 value
+  isPublic?: boolean;
 }
 
-export type s3FileNameParams = {
-  userMail: string;
-  type: s3KeyType;
-  filename: string | null;
-  companyName?: string;
-  liveShoppingId?: number;
-};
 
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
@@ -70,94 +34,30 @@ export const s3 = (() => {
     },
   });
 
-  function getS3Key({
-    userMail,
-    type,
-    filename,
-    companyName,
-    liveShoppingId,
-  }: s3FileNameParams): {
-    key: string;
-    fileName: string;
-  } {
-    const extension = getExtension(filename);
-
-    // 등록된 파일 구별을 위한 등록시간을 통한 접두사 추가
-    const prefix = dayjs().format('YYMMDDHHmmss').toString();
-
-    let fileFullName;
-    switch (type) {
-      case 'business-registration': {
-        fileFullName = `${prefix}_${companyName}_사업자등록증${extension}`;
-        break;
-      }
-      case 'mail-order': {
-        fileFullName = `${prefix}_${companyName}_통신판매업신고증${extension}`;
-        break;
-      }
-      case 'settlement-account': {
-        fileFullName = `${prefix}_통장사본${extension}`;
-        break;
-      }
-      case 'goods': {
-        fileFullName = `${prefix}_${filename}`;
-        break;
-      }
-      case 'broadcaster-id-card': {
-        // 방송인 신분증
-        fileFullName = `${prefix}_신분증${extension}`;
-        break;
-      }
-      case 'broadcaster-account-image': {
-        // 방송인 통장사본
-        fileFullName = `${prefix}_통장사본${extension}`;
-        break;
-      }
-
-      default: {
-        fileFullName = `${filename}`;
-      }
-    }
-    const pathList = liveShoppingId
-      ? [type, userMail, String(liveShoppingId), fileFullName]
-      : [type, userMail, fileFullName];
-    return {
-      key: path.join(...pathList),
-      fileName: fileFullName,
-    };
-  }
 
   /** public-read 로 s3 업로드 */
   async function s3publicUploadFile({
     file,
-    contentType,
     filename,
     type,
     userMail,
     liveShoppingId,
-    tagging,
-  }: S3UploadImageOptions & {
-    contentType: string;
-  }): Promise<string> {
+    ContentType,
+    Tagging,
+    isPublic
+  }: S3UploadImageOptions): Promise<string> {
     if (!userMail || !file) throw new Error('file should be not null');
-    const { key } = getS3Key({ userMail, type, filename, liveShoppingId });
-    const objectTagKey = tagging ? Object.keys(tagging).pop() : '';
-    const objectTagValue = tagging ? Object.values(tagging).pop() : '';
+    const { key } = generateS3Key({ userMail, type, filename, liveShoppingId });
 
-    if (objectTagKey && !objectTagValue) {
-      throw new Error('No value Error');
-    }
 
     try {
-      const command = new PutObjectCommand({
-        Bucket: S3_BUCKET_NAME,
+      await sendPutObjectCommand({
         Key: key,
         Body: file,
-        Tagging: tagging ? `${objectTagKey}=${objectTagValue}` : '',
-        ContentType: contentType,
-        ACL: 'public-read',
-      });
-      await s3Client.send(command);
+        ContentType,
+        Tagging,
+        ACL: isPublic && 'public-read',
+      })
       return S3_DOMIAN + key;
     } catch (error) {
       throw new Error('error in s3publicUploadFile');
@@ -186,23 +86,24 @@ export const s3 = (() => {
    *
    * @param file        저장할 이미지 파일
    * @param filename    저장할 이미지의 이름, 주로 확장자 추출을 위함
-   * @param type         'business-registration' | 'mail-order'
+   * @param type        s3KeyType
    * @param userMail     업로드할 사용자의 이메일
    * @param companyName? (optional) 사업자 등록증에 등록하는 사업자명
    * @returns null 또는 파일명
+   * 
    */
   async function s3UploadImage({
-    file,
     filename,
-    type,
     userMail,
+    type,
+    file,
     companyName,
     liveShoppingId,
+    isPublic = false,
+    ...putObjectCommandInput
   }: S3UploadImageOptions): Promise<string | null> {
-    if (!userMail || !file) {
-      return null;
-    }
-    const { key, fileName } = getS3Key({
+    if (!userMail || !file) {return null;}
+    const { key, fileName } = generateS3Key({
       userMail,
       type,
       filename,
@@ -211,13 +112,21 @@ export const s3 = (() => {
     });
 
     try {
-      const command = new PutObjectCommand({
-        Bucket: S3_BUCKET_NAME,
+      await sendPutObjectCommand({
+        ACL: isPublic && 'public-read',
+        ...putObjectCommandInput,
         Key: key,
         Body: file,
       });
-      await s3Client.send(command);
-      return fileName;
+
+      
+      if (isPublic) {
+        // public 인 경우 객체 url을 리턴함
+        return S3_DOMIAN + key;
+      } else {
+        // public 이 아닌 경우 객체 url로 접근하지 못하므로 그냥 파일명만 리턴함
+        return fileName;
+      }
     } catch (error) {
       console.log(error);
       return null;
@@ -284,7 +193,6 @@ export const s3 = (() => {
 
   return {
     s3UploadImage,
-    getS3Key,
     s3uploadFile: s3publicUploadFile,
     getOverlayImagesFromS3,
     s3DeleteImages,
