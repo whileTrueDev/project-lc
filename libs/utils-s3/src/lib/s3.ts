@@ -42,9 +42,8 @@ export const s3 = (() => {
     type,
     userMail,
     liveShoppingId,
-    ContentType,
-    Tagging,
-    isPublic
+    isPublic,
+    ...putObjectCommandInput
   }: S3UploadImageOptions): Promise<string> {
     if (!userMail || !file) throw new Error('file should be not null');
     const { key } = generateS3Key({ userMail, type, filename, liveShoppingId });
@@ -52,11 +51,11 @@ export const s3 = (() => {
 
     try {
       await sendPutObjectCommand({
+        ACL: isPublic && 'public-read',
+        ...putObjectCommandInput,
         Key: key,
         Body: file,
-        ContentType,
-        Tagging,
-        ACL: isPublic && 'public-read',
+        
       })
       return S3_DOMIAN + key;
     } catch (error) {
@@ -102,7 +101,9 @@ export const s3 = (() => {
     isPublic = false,
     ...putObjectCommandInput
   }: S3UploadImageOptions): Promise<string | null> {
-    if (!userMail || !file) {return null;}
+    if (!userMail || !file) {
+      return null;
+    }
     const { key, fileName } = generateS3Key({
       userMail,
       type,
@@ -122,7 +123,7 @@ export const s3 = (() => {
       
       if (isPublic) {
         // public 인 경우 객체 url을 리턴함
-        return S3_DOMIAN + key;
+        return getSavedObjectUrl(key);
       } else {
         // public 이 아닌 경우 객체 url로 접근하지 못하므로 그냥 파일명만 리턴함
         return fileName;
@@ -131,6 +132,16 @@ export const s3 = (() => {
       console.log(error);
       return null;
     }
+  }
+
+  /**
+   * 해당 key 가진 객체가 public-read인 경우에만 이 url로 접근이 가능함
+   * private 객체는 getPresignedUrl 함수 사용
+   * @param key s3에 저장된 객체 키 (prefix + 파일명 형태)
+   * @returns 객체 url
+   */
+  function getSavedObjectUrl(key: string): string {
+    return S3_DOMIAN + key;
   }
 
 
@@ -197,6 +208,7 @@ export const s3 = (() => {
     getOverlayImagesFromS3,
     s3DeleteImages,
     sendPutObjectCommand,
-    getPresignedUrl
+    getPresignedUrl,
+    getSavedObjectUrl
   };
 })();
