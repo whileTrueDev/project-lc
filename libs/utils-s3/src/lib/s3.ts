@@ -14,7 +14,7 @@ export interface S3UploadImageOptions extends  Partial<Omit<PutObjectCommandInpu
   file: File | Buffer | null;
   companyName?: string;
   liveShoppingId?: number;
-  isPublic?: boolean;
+  isPublic?: boolean; // 공개 이미지로 업로드 할 경우 true 전달 필요
 }
 
 
@@ -35,34 +35,6 @@ export const s3 = (() => {
   });
 
 
-  /** public-read 로 s3 업로드 */
-  async function s3publicUploadFile({
-    file,
-    filename,
-    type,
-    userMail,
-    liveShoppingId,
-    isPublic,
-    ...putObjectCommandInput
-  }: S3UploadImageOptions): Promise<string> {
-    if (!userMail || !file) throw new Error('file should be not null');
-    const { key } = generateS3Key({ userMail, type, filename, liveShoppingId });
-
-
-    try {
-      await sendPutObjectCommand({
-        ACL: isPublic && 'public-read',
-        ...putObjectCommandInput,
-        Key: key,
-        Body: file,
-        
-      })
-      return S3_DOMIAN + key;
-    } catch (error) {
-      throw new Error('error in s3publicUploadFile');
-    }
-  }
-
   /** s3.send(putObjectCommand) 래핑함수. 버킷 제외한 Key, Body, ContentType, ACL등 기입할것
    * @return output : PutObjectCommandOutput
    * @return savedKey : S3 도메인과 key 합친것으로 이미지의 경우 저장된 url
@@ -81,14 +53,23 @@ export const s3 = (() => {
   }
 
   /**
-   * S3에 이미지를 저장하는 함수
-   *
-   * @param file        저장할 이미지 파일
-   * @param filename    저장할 이미지의 이름, 주로 확장자 추출을 위함
-   * @param type        s3KeyType
-   * @param userMail     업로드할 사용자의 이메일
+   * s3KeyType에 따라 s3 특정 경로에 이미지를 저장하는 함수
+   * public 이미지로 업로드할 경우 isPublic: true 전달해야함
+   * 
+   * 해당 함수 내부에서 사용하는 generateS3Key에서 userMail 값을 필요로 하므로
+   * 특정 유저와 관계없는 이미지 저장 시(객체 prefix에 유저메일을 포함하지 않는 경우)에는 
+   * sendPutObjectCommand 함수 사용을 권함
+   * 
+   * @param type: s3KeyType;
+   * @param file: 저장할 이미지 파일 File | Buffer | null;
+   * @param filename: 저장할 이미지의 이름, 주로 확장자 추출을 위함
+   * @param userMail: 업로드할 사용자의 이메일 string | undefined;
    * @param companyName? (optional) 사업자 등록증에 등록하는 사업자명
-   * @returns null 또는 파일명
+   * @param liveShoppingId?: (optional) 라이브쇼핑 id
+   * @param isPublic?: public-read 이미지의 경우 true를 전달해야함. 기본값 false
+   * @param 기타 Tagging, ContentType, ACL 등 putObjectCommandInput props 전달 가능
+
+   * @returns 파일명(privater 객체인 경우) 혹은 객체url(public-read 객체인 경우)
    * 
    */
   async function s3UploadImage({
@@ -100,10 +81,8 @@ export const s3 = (() => {
     liveShoppingId,
     isPublic = false,
     ...putObjectCommandInput
-  }: S3UploadImageOptions): Promise<string | null> {
-    if (!userMail || !file) {
-      return null;
-    }
+  }: S3UploadImageOptions): Promise<string> {
+    if (!userMail || !file) throw new Error('file should be not null');
     const { key, fileName } = generateS3Key({
       userMail,
       type,
@@ -111,10 +90,11 @@ export const s3 = (() => {
       companyName,
       liveShoppingId,
     });
+    console.log({key,fileName});
 
     try {
       await sendPutObjectCommand({
-        ACL: isPublic && 'public-read',
+        ACL: isPublic ? 'public-read' : undefined,
         ...putObjectCommandInput,
         Key: key,
         Body: file,
@@ -129,8 +109,7 @@ export const s3 = (() => {
         return fileName;
       }
     } catch (error) {
-      console.log(error);
-      return null;
+      console.error(error);
     }
   }
 
@@ -204,7 +183,6 @@ export const s3 = (() => {
 
   return {
     s3UploadImage,
-    s3uploadFile: s3publicUploadFile,
     getOverlayImagesFromS3,
     s3DeleteImages,
     sendPutObjectCommand,
