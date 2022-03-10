@@ -85,7 +85,6 @@ export class AuthController {
     if (dto.isNotInitial) {
       await this.mailVerificationService.deleteSuccessedMailVerification(dto.email);
     }
-
     return this.mailVerificationService.sendVerificationMail(dto.email);
   }
 

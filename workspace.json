@@ -614,8 +614,7 @@
         "serve": {
           "executor": "@nrwl/node:node",
           "options": {
-            "buildTarget": "mailer:build",
-            "port": 3003
+            "buildTarget": "mailer:build"
           }
         },
         "lint": {
