@@ -37,7 +37,7 @@ import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
  * @param _crop x,y,height,width 값 가지고 있다
  * @param blobCallback 클롭된 이미지 처리할 함수, blob으로 변환된 이미지를 받아 원하는 작업을 하는 콜백함수
  */
-const getCroppedImage = (
+export const getCroppedImage = (
   image: HTMLImageElement,
   _crop: Crop,
   blobCallback: BlobCallback,
