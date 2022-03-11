@@ -365,7 +365,7 @@ export class BroadcasterService extends ServiceBaseWithCache {
       });
 
     if (restoreSocialData) {
-      await this.restoreInactiveSocialSeller(restoreSocialData);
+      await this.restoreInactiveSocialBroadcaster(restoreSocialData);
     }
 
     return this.prisma.broadcaster.update({
@@ -395,7 +395,7 @@ export class BroadcasterService extends ServiceBaseWithCache {
     });
   }
 
-  private async restoreInactiveSocialSeller(
+  private async restoreInactiveSocialBroadcaster(
     restoreSocialData: BroadcasterSocialAccount,
   ): Promise<BroadcasterSocialAccount> {
     return this.prisma.broadcasterSocialAccount.create({

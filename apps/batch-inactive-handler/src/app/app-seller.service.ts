@@ -75,8 +75,8 @@ export class AppSellerService {
   private copySellerBusinessRegistration(sellerId: number): Promise<number> {
     return this.prisma.$executeRaw`
       INSERT INTO InactiveSellerBusinessRegistration
-        (id, 
-          sellerEmail, 
+        (id,  
+          sellerId,
           companyName, 
           businessRegistrationNumber, 
           representativeName, 
@@ -86,12 +86,11 @@ export class AppSellerService {
           taxInvoiceMail, 
           businessRegistrationImageName,
           mailOrderSalesNumber, 
-          mailOrderSalesImageName,
-          sellerId
+          mailOrderSalesImageName
           )
       SELECT 
-        id, 
-        sellerEmail, 
+        id,
+        sellerId,
         companyName, 
         businessRegistrationNumber, 
         representativeName, 
@@ -101,8 +100,7 @@ export class AppSellerService {
         taxInvoiceMail, 
         businessRegistrationImageName, 
         mailOrderSalesNumber, 
-        mailOrderSalesImageName,
-        sellerId
+        mailOrderSalesImageName        
       FROM 
         SellerBusinessRegistration
       WHERE 
@@ -126,9 +124,9 @@ export class AppSellerService {
   private copySellerSettlementAccount(sellerId: number): Promise<number> {
     return this.prisma.$executeRaw`
       INSERT INTO InactiveSellerSettlementAccount
-        (id, sellerEmail, bank, number, name, settlementAccountImageName, sellerId)
+        (id, sellerId, bank, number, name, settlementAccountImageName)
       SELECT 
-        id, sellerEmail, bank, number, name, settlementAccountImageName, sellerId
+        id, sellerId, bank, number, name, settlementAccountImageName 
       FROM 
         SellerSettlementAccount
       WHERE 
