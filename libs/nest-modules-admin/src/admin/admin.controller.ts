@@ -67,6 +67,7 @@ import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
 import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
+
 @Controller('admin')
 export class AdminController {
   private allowedIpAddresses: string[] = ['::1'];
