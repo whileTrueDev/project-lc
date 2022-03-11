@@ -595,7 +595,8 @@
             "tsConfig": "apps/mailer/tsconfig.app.json",
             "assets": [
               "apps/mailer/src/assets"
-            ]
+            ],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
