@@ -77,21 +77,17 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
 
   const downloadIdCardImage = async (): Promise<void> => {
     if (!profileData || !settlementInfoData) return;
-    const imageUrl = await s3.s3DownloadImageUrl(
-      settlementInfoData.idCardImageName,
-      profileData.email,
-      'broadcaster-id-card',
-    );
+    const Key = `broadcaster-id-card/${profileData.email}/${settlementInfoData.idCardImageName}`;
+    const expiresIn = 60;
+    const imageUrl = await s3.getPresignedUrl({ Key }, { expiresIn });
     window.open(imageUrl, '_blank');
   };
 
   const downloadAccountImage = async (): Promise<void> => {
     if (!profileData || !settlementInfoData) return;
-    const imageUrl = await s3.s3DownloadImageUrl(
-      settlementInfoData.accountImageName,
-      profileData.email,
-      'broadcaster-account-image',
-    );
+    const Key = `broadcaster-account-image/${profileData.email}/${settlementInfoData.accountImageName}`;
+    const expiresIn = 60;
+    const imageUrl = await s3.getPresignedUrl({ Key }, { expiresIn });
     window.open(imageUrl, '_blank');
   };
 
