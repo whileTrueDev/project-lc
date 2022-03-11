@@ -10,12 +10,14 @@ const ID_PREFIX = 'LC-DEV-';
 export class LCDevVpcStack extends cdk.Stack {
   public readonly vpc: ec2.Vpc;
   public albSecGrp: ec2.SecurityGroup;
+  public privateAlbSecGrp: ec2.SecurityGroup;
   public dbSecGrp: ec2.SecurityGroup;
   public apiSecGrp: ec2.SecurityGroup;
   public realtimeApiSecGrp: ec2.SecurityGroup;
   public overlaySecGrp: ec2.SecurityGroup;
   public overlayControllerSecGrp: ec2.SecurityGroup;
   public redisSecGrp: ec2.SecurityGroup;
+  public mailerSecGrp: ec2.SecurityGroup;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -41,6 +43,7 @@ export class LCDevVpcStack extends cdk.Stack {
     });
 
     this.createAlbSecGrp();
+    this.createPrivateAlbSecGrp();
     const apiSecGrp = this.createApiSecGrp();
     const overlaySecGrp = this.createOverlaySecGrp();
     const overlayControllerSecGrp = this.createOverlayControllerSecGrp();
@@ -48,9 +51,10 @@ export class LCDevVpcStack extends cdk.Stack {
 
     this.createRealtimeApiSecGrp();
     this.createRedisSecGrp();
+    this.createMailerSecGrp();
   }
 
-  /** 로드밸런서(ALB) 보안 그룹 생성 */
+  /** 퍼블릭 로드밸런서(ALB) 보안 그룹 생성 */
   private createAlbSecGrp() {
     this.albSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}ALB-SecGrp`, {
       vpc: this.vpc,
@@ -70,6 +74,32 @@ export class LCDevVpcStack extends cdk.Stack {
     );
 
     return this.albSecGrp;
+  }
+
+  /** 프라이빗 로드밸런서(ALB) 보안 그룹 생성 */
+  private createPrivateAlbSecGrp() {
+    this.privateAlbSecGrp = new ec2.SecurityGroup(
+      this,
+      `${ID_PREFIX}Private-ALB-SecGrp`,
+      {
+        vpc: this.vpc,
+        description: 'private ALB security group for project-lc',
+        allowAllOutbound: true,
+      },
+    );
+
+    this.privateAlbSecGrp.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(80),
+      'Allow 80 to all',
+    );
+    this.privateAlbSecGrp.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(443),
+      'Allow 443 to all',
+    );
+
+    return this.privateAlbSecGrp;
   }
 
   /** 데이터베이스 보안 그룹 생성 */
@@ -259,5 +289,20 @@ export class LCDevVpcStack extends cdk.Stack {
       secGrp: this.overlayControllerSecGrp,
       serverPort: constants.DEV.ECS_OVERLAY_CONTROLLER_PORT,
     });
+  }
+
+  /** Mailer 서버 보안그룹 생성 */
+  private createMailerSecGrp() {
+    this.mailerSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}Mailer-SecGrp`, {
+      vpc: this.vpc,
+      description: 'mailer sec grp for project-lc (private)',
+      allowAllOutbound: true,
+    });
+
+    this.mailerSecGrp.addIngressRule(
+      this.albSecGrp,
+      ec2.Port.tcp(constants.DEV.ECS_MAILER_PORT),
+      'Allow port 3003 to public alb',
+    );
   }
 }

@@ -8,6 +8,7 @@ interface ProjectLcCdkEnv {
 const envSchema = joi
   .object<ProjectLcCdkEnv>({
     WHILETRUE_IP_ADDRESS: joi.string().required(),
+    ACM_CERTIFICATE_ARN: joi.string().required(),
   })
   .unknown();
 

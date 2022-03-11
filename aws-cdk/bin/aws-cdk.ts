@@ -4,9 +4,11 @@ import * as dotenv from 'dotenv';
 import 'source-map-support/register';
 import { LCDevAppStack } from '../lib/dev/app-stack';
 import { LCDevDatabaseStack } from '../lib/dev/database-stack';
+import { LCDevPrivateAppStack } from '../lib/dev/private-app-stack';
 import { LCDevRedisStack } from '../lib/dev/redis-stack';
 import { LCDevVpcStack } from '../lib/dev/vpc-stack';
 import { LCDomainStack } from '../lib/env-agnostic/domain-stack';
+import { LCPrivateDomainStack } from '../lib/env-agnostic/private-domain-stack';
 import { LCProdAppStack } from '../lib/prod/app-stack';
 import { LCProdDatabaseStack } from '../lib/prod/database-stack';
 import { LCRedisStack } from '../lib/prod/redis-stack';
@@ -41,6 +43,19 @@ new LCDevRedisStack(app, 'LC-DEV-REDIS', {
   vpc: devVpcStack.vpc,
   redisSecGrp: devVpcStack.redisSecGrp,
 });
+// Dev 프라이빗 앱 (메일러, 배치프로그램, ...)
+const devPrivateAppStack = new LCDevPrivateAppStack(app, 'LC-DEV-PRIVATE-APP', {
+  vpc: devVpcStack.vpc,
+  cluster: devAppStack.cluster,
+  albSecGrp: devVpcStack.privateAlbSecGrp,
+  mailerSecGrp: devVpcStack.mailerSecGrp,
+});
+// Dev 프라이빗 도메인
+new LCPrivateDomainStack(app, 'LC-DEV-PRIVATE-DOMAIN', {
+  vpc: devVpcStack.vpc,
+  domainName: 'kkshow-dev-dns.com',
+  privateAlb: devPrivateAppStack.privateAlb,
+});
 
 // ************************************
 // * Production 환경
@@ -70,7 +85,7 @@ new LCRedisStack(app, 'LC-PROD-REDIS', {
 });
 
 // ************************************
-// * 도메인
+// * 퍼블릭 도메인
 new LCDomainStack(app, 'LC-DOMAIN', {
   devALB: devAppStack.alb,
   prodALB: prodAppStack.alb,

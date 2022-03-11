@@ -33,8 +33,7 @@ interface LCProdAppStackProps extends cdk.StackProps {
 }
 
 export class LCProdAppStack extends cdk.Stack {
-  private readonly ACM_ARN =
-    'arn:aws:acm:ap-northeast-2:803609402610:certificate/763681b4-a8c3-47e0-998a-24754351b499';
+  private readonly ACM_ARN = process.env.ACM_CERTIFICATE_ARN!;
 
   private readonly PREFIX = constants.PROD.ID_PREFIX;
   private readonly vpc: ec2.Vpc;

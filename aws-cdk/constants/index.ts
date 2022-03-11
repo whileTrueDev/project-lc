@@ -12,6 +12,8 @@ export const constants = {
   PUNYCODE_방송인: 'xn--vh3b23hfsf',
   WHILETRUE_IP_ADDRESS: process.env.WHILETRUE_IP_ADDRESS!,
   DEV: {
+    /** Dev 환경용 프라이빗 도메인 */
+    PRIVATE_DOMAIN: 'kkshow-dev-dns.com',
     ID_PREFIX: 'LC-DEV-',
     /** 개발환경의 ECS 클러스터명 */
     ECS_CLUSTER: 'project-lc-dev',
@@ -58,7 +60,11 @@ export const constants = {
     ECS_REALTIME_API_FAMILY_NAME: 'project-lc-realtimeapi-dev',
     ECS_REALTIME_API_LOG_GROUP_NAME: '/ecs/project-lc-realtimeapi-dev',
     ECS_REALTIME_API_PORT: 3001,
-
+    // * ECS Mailer
+    ECS_MAILER_SERVICE_NAME: 'project-lc-mailer-dev-service',
+    ECS_MAILER_FAMILY_NAME: 'project-lc-mailer-dev',
+    ECS_MAILER_LOG_GROUP_NAME: '/ecs/project-lc-mailer-dev',
+    ECS_MAILER_PORT: 3003,
     // * ************************
     // * SSM Parameter Store Keys
     // * ************************
@@ -83,6 +89,8 @@ export const constants = {
     CACHE_REDIS_URL: 'PROJECT_LC_DEV_CACHE_REDIS_URL',
   },
   PROD: {
+    /** Production 환경용 프라이빗 도메인 */
+    PRIVATE_DOMAIN: 'kkshow-dns.com',
     ID_PREFIX: 'LC-PROD-',
     INGRESS_SUBNET_GROUP_NAME: 'PROD Ingress Subnet',
     PRIVATE_SUBNET_GROUP_NAME: 'PROD Private Subnet for Apps',

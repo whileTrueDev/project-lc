@@ -28,7 +28,6 @@ export class LCDomainStack extends cdk.Stack {
 
     // 호스팅영역 생성
     this.createPublicHostedZone();
-
     this.prodALBTarget = new route53Targets.LoadBalancerTarget(prodALB);
     this.devALBTarget = new route53Targets.LoadBalancerTarget(devALB);
 
