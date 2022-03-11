@@ -1,11 +1,15 @@
 import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
 import { Box, Heading, Text } from '@chakra-ui/react';
 import AdminBroadcasterSettlementInfoList from '@project-lc/components-admin/AdminBroadcasterSettlementInfoList';
+import { useCheckAdminClass } from '@project-lc/hooks';
 
-export interface SettlementInfoProps {
-  propname: any;
-}
-export function SettlementInfo({ propname }: SettlementInfoProps): JSX.Element {
+export function SettlementInfo(): JSX.Element {
+  useCheckAdminClass({
+    adminClasses: ['super', 'full'],
+    infoType: 'broadcasterSettlementAccount',
+    actionType: 'view',
+  });
+
   return (
     <AdminPageLayout>
       <Box position="relative">

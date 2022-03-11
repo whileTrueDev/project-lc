@@ -59,7 +59,7 @@ export class SocialService {
         password,
         avatar,
       };
-      userPayload = this.authService.createUserPayload(broadcaster, userType);
+      userPayload = this.authService.createUserPayload(broadcaster as any, userType);
     } else {
       userPayload = this.authService.createUserPayload(user, userType);
     }
