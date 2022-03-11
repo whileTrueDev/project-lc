@@ -40,7 +40,7 @@ export function EmbededVideo({
   if (provider === 'twitch' && myLocaitonOrigin) {
     return (
       <iframe
-        style={style}
+        style={style || { borderRadius: '8px' }}
         title={`Twitch video player - ${identifier}`}
         src={`https://player.twitch.tv/?channel=${identifier}&parent=${myLocaitonOrigin}`}
         frameBorder="0"
