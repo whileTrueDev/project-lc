@@ -8,7 +8,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY ./dist/apps/api .
 COPY ./libs/prisma-orm/prisma ./prisma
 
-RUN yarn global add prisma
+RUN yarn global add prisma@3.1.1
 RUN yarn install --prod
 RUN prisma generate
 RUN yarn add argon2@0.28.2
