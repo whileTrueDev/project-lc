@@ -138,7 +138,7 @@ export function CarouselItemUpcomingLive({
         <ImageBanner imageUrl={imageUrl} />
         <Box>
           <Button onClick={onOpen}>이미지{imageUrl ? '수정' : '추가'}</Button>
-          <ImageInputDialog
+          <AdminKkshowMainCarouselImageBannerDialog
             modalTitle={`이미지 ${imageUrl ? '수정' : '추가'}`}
             isOpen={isOpen}
             onClose={onClose}

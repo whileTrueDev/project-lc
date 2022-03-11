@@ -40,7 +40,7 @@ export function AdminKkshowMainCarouselImageBannerDialog(props: ImageBannerDialo
   // 이미지 크롭 영역 state
   // aspect(비율) 값이 있으면 비율 고정
   // unit : px 인경우 wight: 100 = 100px 로 계산, % 인 경우  width : 100 => 100%로 계산됨
-  const [crop, setCrop] = useState<Partial<Crop>>(CROP.default);
+  const [crop, setCrop] = useState<Partial<Crop>>(CROP.recommend);
 
   const imageRef = useRef<HTMLImageElement | null>(null);
 
@@ -126,7 +126,7 @@ export function AdminKkshowMainCarouselImageBannerDialog(props: ImageBannerDialo
   }, [crop.aspect, crop.width, crop.height]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="full">
+    <Modal isOpen={isOpen} onClose={onClose} size="6xl">
       <ModalOverlay />
       <ModalContent>
         {modalTitle && <ModalHeader>{modalTitle}</ModalHeader>}
@@ -169,6 +169,7 @@ export function AdminKkshowMainCarouselImageBannerDialog(props: ImageBannerDialo
                       권장비율 {crop.aspect ? '해제' : '고정'}
                     </Button>
                   </Box>
+                  <Text>{crop.aspect ? '자유롭게 영역 선택 가능' : '선택영역 비율 고정'}</Text>
                 </Stack>
 
                 <Box>
