@@ -32,7 +32,9 @@ const CROP: Record<cropType, Partial<Crop>> = {
 /** 크크쇼 메인 캐러셀에 표시될 단일 이미지 등록 컴포넌트
  * 이미지 크롭기능
  */
-export function AdminKkshowMainCarouselImageBannerDialog(props: ImageBannerDialogProps): JSX.Element {
+export function AdminKkshowMainCarouselImageBannerDialog(
+  props: ImageBannerDialogProps,
+): JSX.Element {
   const { modalTitle, isOpen, onClose, onConfirm, onError, ...restProps } = props;
 
   const [imagePreview, setImagePreview] = useState<ImageInputFileReadData | null>(null);
@@ -169,7 +171,9 @@ export function AdminKkshowMainCarouselImageBannerDialog(props: ImageBannerDialo
                       권장비율 {crop.aspect ? '해제' : '고정'}
                     </Button>
                   </Box>
-                  <Text>{crop.aspect ? '자유롭게 영역 선택 가능' : '선택영역 비율 고정'}</Text>
+                  <Text>
+                    {crop.aspect ? '자유롭게 영역 선택 가능' : '선택영역 비율 고정'}
+                  </Text>
                 </Stack>
 
                 <Box>
