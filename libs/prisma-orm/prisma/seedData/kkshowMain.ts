@@ -4,13 +4,13 @@ export const kkshowMainSeedData = {
       type: 'simpleBanner',
       linkUrl: 'https://k-kmarket.com/goods/catalog?code=0012',
       imageUrl:
-        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-main-carousel-images/1646639036261_배너이미지.jpeg',
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-main-carousel-images/1646985653016_배너이미지.jpeg',
       description: '크크쇼 3월 기획전',
     },
     {
       type: 'upcoming',
       imageUrl:
-        'https://lc-project.s3.ap-northeast-2.amazonaws.com/live-shopping-images/null/carousel/1646639107720_나무늘봉순홍보물.jpeg',
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/live-shopping-images/null/carousel/1646985708035_나무늘봉순홍보물.jpeg',
       normalPrice: 12300,
       liveShoppingId: null,
       productLinkUrl: 'https://smartstore.naver.com/mideun/products/4867304181',
@@ -84,7 +84,7 @@ export const kkshowMainSeedData = {
   ],
   trailer: {
     imageUrl:
-      'https://lc-project.s3.ap-northeast-2.amazonaws.com/live-shopping-images/undefined/trailer/1646640038178_민결희.jpeg',
+      'https://lc-project.s3.ap-northeast-2.amazonaws.com/live-shopping-images/undefined/trailer/1646985740614_민결희.jpeg',
     normalPrice: 19000,
     productLinkUrl: 'https://k-kmarket.com/goods/view?no=181',
     discountedPrice: 14900,
