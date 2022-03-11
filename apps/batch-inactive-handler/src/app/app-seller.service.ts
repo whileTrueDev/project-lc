@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { Seller } from '@prisma/client';
-import { S3Service } from '../lib/s3/s3.service';
+import { S3Service } from '@project-lc/nest-modules-s3';
 
 export type BatchPayload = {
   count: number;
