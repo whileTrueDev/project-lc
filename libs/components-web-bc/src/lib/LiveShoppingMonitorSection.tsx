@@ -3,16 +3,20 @@ import { useDisplaySize } from '@project-lc/hooks';
 import { s3 } from '@project-lc/utils-s3';
 import { useEffect, useState } from 'react';
 import { guideConditionStore } from '@project-lc/stores';
+import { BROADCASTER_GUIDE_IMAGE_KEY } from '@project-lc/shared-types';
 
 export function LiveShoppingMonitorSection(): JSX.Element {
   const { isMobileSize } = useDisplaySize();
   const [src, setSrc] = useState<string>('');
   const { completeStep } = guideConditionStore();
 
+  const s3ImageKey = BROADCASTER_GUIDE_IMAGE_KEY;
+  const expiresIn = 3600; // 이미지 url 유효 시간
+
   useEffect(() => {
     completeStep();
     const setImageSrc = async (): Promise<void> => {
-      const imageString = await s3.getS3GuideImage();
+      const imageString = await s3.getPresignedUrl({ Key: s3ImageKey }, { expiresIn });
       setSrc(imageString);
     };
     setImageSrc();

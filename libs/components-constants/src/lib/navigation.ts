@@ -264,6 +264,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     ],
   },
   {
+    name: '관리자',
+    href: '/admin-manage',
+    children: [{ name: '계정 권한관리', href: '/admin-manage', icon: FcList }],
+  },
+  {
     name: '크크쇼 메인',
     href: '/kkshow-main',
     children: [{ name: '크크쇼 메인페이지', href: '/kkshow-main', icon: FcList }],

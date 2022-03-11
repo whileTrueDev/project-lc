@@ -14,6 +14,7 @@ import {
   Req,
   UseGuards,
   ValidationPipe,
+  Delete,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -21,6 +22,8 @@ import {
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
+  PrivacyApproachHistory,
+  AdminClassChangeHistory,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -55,11 +58,15 @@ import {
   OrderCancelRequestList,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
+  AdminClassDto,
+  PrivacyApproachHistoryDto,
+  AdminClassChangeHistoryDtoWithoutId,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
+import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 
 @Controller('admin')
 export class AdminController {
@@ -76,6 +83,7 @@ export class AdminController {
     private readonly sellerService: SellerService,
     private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
+    private readonly adminPrivacyApproachSevice: AdminPrivacyApproachSevice,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
     if (wtIp) this.allowedIpAddresses.push(wtIp);
@@ -307,5 +315,40 @@ export class AdminController {
   @Get('confirmed-goods-list')
   async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
     return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('privacy-approach-history')
+  async createPrivacyApproachHistory(
+    @Req() req: Request,
+    @Body() dto: PrivacyApproachHistoryDto,
+  ): Promise<PrivacyApproachHistory> {
+    return this.adminPrivacyApproachSevice.createPrivacyApproachHistory(req, dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('class-change-history')
+  async createClassChangeHistory(
+    @Body() dto: AdminClassChangeHistoryDtoWithoutId,
+  ): Promise<AdminClassChangeHistory> {
+    return this.adminService.createAdminClassChangeHistory(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('/admin-managers')
+  async getAdminUserList(): Promise<AdminClassDto[]> {
+    return this.adminService.getAdminUserList();
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch('/admin-class')
+  async updateAdminClass(@Body() dto: AdminClassDto): Promise<Administrator> {
+    return this.adminService.updateAdminClass(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Delete('/user/:userId')
+  async deleteAdminUser(@Param('userId') userId: number): Promise<boolean> {
+    return this.adminService.deleteAdminUser(userId);
   }
 }

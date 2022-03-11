@@ -4,6 +4,7 @@ import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher
 import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import { AdminClassBadge } from './AdminClassBadge';
 
 export function AdminDesktopNav(): JSX.Element {
   const linkColor = useColorModeValue('gray.600', 'gray.200');
@@ -65,12 +66,16 @@ export function AdminMainLinkButton(): JSX.Element {
   );
 }
 
-/** 로그인한 관리자 프로필 표시 - 지금은 단순히 이메일만 표시 */
+/** 로그인한 관리자 프로필 표시 - 이메일/접근가능 권한 표시 */
 export function AdminProfile(): JSX.Element | null {
   const { data: profileData, isLoading } = useProfile();
-
   if (!isLoading && profileData) {
-    return <Text>{profileData.email}</Text>;
+    return (
+      <Box>
+        <AdminClassBadge adminClass={profileData.adminClass} />
+        <Text>{profileData.email}</Text>
+      </Box>
+    );
   }
 
   return null;

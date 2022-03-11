@@ -59,14 +59,14 @@ export function CarouselItemSimpleBanner({
     const s3KeyType = 'kkshow-main-carousel-images';
     const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
 
-    const { savedKey } = await s3.sendPutObjectCommand({
+    const { objectUrl } = await s3.sendPutObjectCommand({
       Key: key,
       Body: imageData.file,
       ContentType: imageData.file.type,
       ACL: 'public-read',
     });
 
-    setValue(`carousel.${index}.imageUrl`, savedKey, { shouldDirty: true });
+    setValue(`carousel.${index}.imageUrl`, objectUrl, { shouldDirty: true });
   };
   return (
     <>
@@ -113,7 +113,7 @@ export function CarouselItemUpcomingLive({
     const s3KeyType = `live-shopping-images/${liveShoppingId}/${imageType}`;
     const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
 
-    const { savedKey } = await s3.sendPutObjectCommand({
+    const { objectUrl } = await s3.sendPutObjectCommand({
       Key: key,
       Body: imageData.file,
       ContentType: imageData.file.type,
@@ -124,11 +124,11 @@ export function CarouselItemUpcomingLive({
       await mutateAsync({
         liveShoppingId,
         imageType,
-        imageUrl: savedKey,
+        imageUrl: objectUrl,
       }).catch((e) => console.error(e));
     }
 
-    setValue(`carousel.${index}.imageUrl`, savedKey, { shouldDirty: true });
+    setValue(`carousel.${index}.imageUrl`, objectUrl, { shouldDirty: true });
   };
 
   return (

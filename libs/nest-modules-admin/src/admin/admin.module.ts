@@ -14,6 +14,7 @@ import { AdminPromotionPageController } from './admin-promotion-page.controller'
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
+import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 
 @Module({})
 export class AdminModule {
@@ -21,6 +22,7 @@ export class AdminModule {
     AdminService,
     AdminSettlementService,
     AdminAccountService,
+    AdminPrivacyApproachSevice,
   ];
 
   private static readonly exports = [

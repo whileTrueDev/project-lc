@@ -23,13 +23,10 @@ import {
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
-import {
-  getImgSrcListFromHtmlStringList,
-  getS3KeyListFromImgSrcList,
-  S3Service,
-} from '@project-lc/nest-modules-s3';
+import { S3Service } from '@project-lc/nest-modules-s3';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
+import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
 
 @Injectable()
 export class GoodsService extends ServiceBaseWithCache {
@@ -351,7 +348,7 @@ export class GoodsService extends ServiceBaseWithCache {
     const imgSrcList: string[] = getImgSrcListFromHtmlStringList(contentList);
 
     // img src에서 s3에 저장된 이미지만 찾기
-    const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
+    const s3ImageKeys = this.s3service.getGoodsImageS3KeyListFromImgSrcList(imgSrcList);
 
     if (s3ImageKeys.length > 0) {
       await this.s3service.deleteMultipleObjects(
@@ -377,7 +374,7 @@ export class GoodsService extends ServiceBaseWithCache {
     const imageList = images.map(({ image }) => image);
 
     // 이미지 중 s3에 업로드된 이미지 찾기
-    const s3ImageKeys = getS3KeyListFromImgSrcList(imageList);
+    const s3ImageKeys = this.s3service.getGoodsImageS3KeyListFromImgSrcList(imageList);
 
     if (s3ImageKeys.length > 0) {
       await this.s3service.deleteMultipleObjects(
