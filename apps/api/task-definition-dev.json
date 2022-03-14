@@ -48,7 +48,7 @@
                 },
                 {
                     "name": "MAILER_HOST",
-                    "value": "https://mailer.kkshow-dev-dns.com"
+                    "value": "https://dev-mailer.xn--hp4b17xa.com"
                 },
                 {
                     "name": "NODE_ENV",
