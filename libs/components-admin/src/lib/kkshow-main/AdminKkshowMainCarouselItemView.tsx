@@ -38,6 +38,7 @@ import { s3 } from '@project-lc/utils-s3';
 import path from 'path';
 import React, { useMemo, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import AdminKkshowMainCarouselImageBannerDialog from './AdminKkshowMainCarouselImageBannerDialog';
 import { LiveShoppingListAutoComplete } from './LiveShoppingListAutoComplete';
 
 interface CarouselItemProps {
@@ -73,7 +74,7 @@ export function CarouselItemSimpleBanner({
       <ImageBanner imageUrl={imageUrl} />
       <Box>
         <Button onClick={onOpen}>배너 {imageUrl ? '수정' : '추가'}</Button>
-        <ImageInputDialog
+        <AdminKkshowMainCarouselImageBannerDialog
           modalTitle={`배너 이미지 ${imageUrl ? '수정' : '추가'}`}
           isOpen={isOpen}
           onClose={onClose}
@@ -137,7 +138,7 @@ export function CarouselItemUpcomingLive({
         <ImageBanner imageUrl={imageUrl} />
         <Box>
           <Button onClick={onOpen}>이미지{imageUrl ? '수정' : '추가'}</Button>
-          <ImageInputDialog
+          <AdminKkshowMainCarouselImageBannerDialog
             modalTitle={`이미지 ${imageUrl ? '수정' : '추가'}`}
             isOpen={isOpen}
             onClose={onClose}
