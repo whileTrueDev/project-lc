@@ -34,8 +34,8 @@ const CROP: Record<cropType, Partial<Crop>> = {
 
 const RECOMMEND_IMAGE_SIZE = {
   width: 720,
-  height: 400
-}
+  height: 400,
+};
 
 /** 크크쇼 메인 캐러셀에 표시될 단일 이미지 등록 컴포넌트
  * 이미지 크롭기능
@@ -73,7 +73,6 @@ export function AdminKkshowMainCarouselImageBannerDialog(
     if (onError) onError(error);
     console.log(error);
   };
-
 
   // 크롭영역 선택 핸들러 -> 크롭된 이미지 state에 저장
   const onCropComplete = (_crop: Crop): void => {
@@ -128,7 +127,8 @@ export function AdminKkshowMainCarouselImageBannerDialog(
               권장 사이즈를 벗어나면 이미지가 잘리거나 작게 표시됩니다!
             </Text>
             <Text color="blue.500" fontWeight="bold">
-              권장 사이즈: 가로 {RECOMMEND_IMAGE_SIZE.width}px, 세로 {RECOMMEND_IMAGE_SIZE.height}px 
+              권장 사이즈: 가로 {RECOMMEND_IMAGE_SIZE.width}px, 세로{' '}
+              {RECOMMEND_IMAGE_SIZE.height}px
             </Text>
             <ImageInput
               {...restProps}
