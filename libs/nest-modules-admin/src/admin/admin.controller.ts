@@ -223,7 +223,6 @@ export class AdminController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/live-shopping/images')
   upsertLiveShoppingImage(@Body() dto: LiveShoppingImageDto): Promise<boolean> {
-    console.log('hit upsert', dto);
     return this.adminService.upsertLiveShoppingImage(dto);
   }
 

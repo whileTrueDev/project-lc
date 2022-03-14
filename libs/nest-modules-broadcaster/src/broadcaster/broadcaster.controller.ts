@@ -199,10 +199,7 @@ export class BroadcasterController {
   public async changeContractionAgreement(
     @Body(ValidationPipe) dto: BroadcasterContractionAgreementDto,
   ): Promise<Broadcaster> {
-    return this.broadcasterService.changeContractionAgreement(
-      dto.email,
-      dto.agreementFlag,
-    );
+    return this.broadcasterService.changeContractionAgreement(dto);
   }
 
   /** 방송인 계정 삭제 */

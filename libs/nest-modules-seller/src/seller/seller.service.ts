@@ -289,7 +289,7 @@ export class SellerService extends ServiceBaseWithCache {
 
   public async updateAgreementFlag(dto: SellerContractionAgreementDto): Promise<Seller> {
     const seller = await this.prisma.seller.update({
-      where: { email: dto.email },
+      where: { id: dto.id },
       data: {
         agreementFlag: dto.agreementFlag,
       },

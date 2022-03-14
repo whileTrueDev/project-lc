@@ -62,7 +62,7 @@ export function LiveShoppingList(): JSX.Element {
   const [pageSize, setPageSize] = useState<number>(5);
   const { data } = useLiveShoppingList({});
   const { data: sales, isLoading: isSalesLoading } = useFmOrdersDuringLiveShoppingSales({
-    enabled: !!profileData?.email,
+    enabled: !!profileData?.id,
   });
   const { isMobileSize } = useDisplaySize();
 

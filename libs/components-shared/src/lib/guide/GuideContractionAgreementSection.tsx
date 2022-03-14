@@ -82,12 +82,12 @@ export function GuideContractionAgreementSection({
       });
     };
 
-    if (!data?.email) {
+    if (!data?.id) {
       return;
     }
     if (userType === 'broadcaster') {
       broadcasterMutation
-        .mutateAsync({ email: data?.email, agreementFlag: true })
+        .mutateAsync({ id: data?.id, agreementFlag: true })
         .then((result) => {
           if (result) onSuccess();
           else onError();
@@ -98,7 +98,7 @@ export function GuideContractionAgreementSection({
     }
     if (userType === 'seller') {
       sellerMutation
-        .mutateAsync({ email: data?.email, agreementFlag: true })
+        .mutateAsync({ id: data?.id, agreementFlag: true })
         .then((result) => {
           if (result) onSuccess();
           else onError();

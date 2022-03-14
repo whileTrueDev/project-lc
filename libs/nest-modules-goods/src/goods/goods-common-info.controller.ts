@@ -30,7 +30,7 @@ export class GoodsCommonInfoController {
       info_name: string;
     }[]
   > {
-    return this.commonInfoService.getGoodsCommonInfoList(seller.sub);
+    return this.commonInfoService.getGoodsCommonInfoList(seller.id);
   }
 
   /** 특정 공통정보 상세 조회 */
@@ -45,8 +45,8 @@ export class GoodsCommonInfoController {
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: GoodsInfoDto,
   ): Promise<{ id: number }> {
-    const email = seller.sub;
-    return this.commonInfoService.registGoodsCommonInfo(email, dto);
+    const sellerId = seller.id;
+    return this.commonInfoService.registGoodsCommonInfo(sellerId, dto);
   }
 
   /** 공통정보 삭제  */

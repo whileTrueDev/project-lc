@@ -18,7 +18,7 @@ export function AdminLiveShoppingList({
   const { data, isLoading } = useAdminLiveShoppingList(
     {},
     {
-      enabled: !!profileData?.email,
+      enabled: !!profileData?.id,
     },
   );
 

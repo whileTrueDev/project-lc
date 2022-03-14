@@ -30,7 +30,7 @@ export class OrderCancelController {
     @Body(ValidationPipe) dto: SellerOrderCancelRequestDto,
   ): Promise<SellerOrderCancelRequest> {
     return this.orderCancelService.createOrderCancelRequst({
-      sellerEmail: seller.sub,
+      sellerId: seller.id,
       ...dto,
     });
   }

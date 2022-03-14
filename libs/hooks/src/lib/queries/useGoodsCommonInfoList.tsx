@@ -12,16 +12,16 @@ export const getGoodsCommonInfoList = async (): Promise<GoodsCommonInfo[]> => {
 };
 
 export const useGoodsCommonInfoList = ({
-  email,
+  sellerId,
   enabled,
   onSuccess,
 }: {
-  email: string;
+  sellerId: number;
   enabled: boolean;
   onSuccess: (data: GoodsCommonInfo[]) => void;
 }): UseQueryResult<GoodsCommonInfo[], AxiosError> => {
   return useQuery<GoodsCommonInfo[], AxiosError>(
-    ['GoodsCommonInfoList', email],
+    ['GoodsCommonInfoList', sellerId],
     getGoodsCommonInfoList,
     {
       enabled,
