@@ -1,5 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { Administrator, Broadcaster, Seller } from '@prisma/client';
+import {
+  Administrator,
+  Broadcaster,
+  Seller,
+  InactiveBroadcaster,
+  InactiveSeller,
+} from '@prisma/client';
 import { JwtHelperService } from '@project-lc/nest-modules-jwt-helper';
 import { UserPayload, authConstants } from '@project-lc/nest-core';
 import { AdminAccountService } from '@project-lc/nest-modules-admin';
@@ -62,7 +68,7 @@ export class AuthService {
     email: string,
     pwdInput: string,
   ): Promise<UserPayload | null> {
-    let user: Seller | Broadcaster | Administrator;
+    let user: Seller | Broadcaster | Administrator | InactiveBroadcaster | InactiveSeller;
     if (['seller'].includes(type)) {
       user = await this.sellerService.login(email, pwdInput);
     }
@@ -72,6 +78,7 @@ export class AuthService {
     if (['broadcaster'].includes(type)) {
       user = await this.broadcasterService.login(email, pwdInput);
     }
+
     return this.createUserPayload(user, type);
   }
 
@@ -108,6 +115,7 @@ export class AuthService {
       id: user.id,
       sub: user.email,
       type,
+      inactiveFlag: user.inactiveFlag,
     };
   }
 

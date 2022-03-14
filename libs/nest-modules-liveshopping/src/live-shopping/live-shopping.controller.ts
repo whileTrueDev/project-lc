@@ -37,7 +37,7 @@ export class LiveShoppingController {
     @SellerInfo() seller: UserPayload,
     @Query(ValidationPipe) dto?: LiveShoppingParamsDto,
   ): Promise<LiveShopping[]> {
-    return this.liveShoppingService.getRegisteredLiveShoppings(seller.sub, dto);
+    return this.liveShoppingService.getRegisteredLiveShoppings(seller.id, dto);
   }
 
   /** 라이브쇼핑 등록 */
@@ -46,7 +46,7 @@ export class LiveShoppingController {
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: LiveShoppingRegistDTO,
   ): Promise<{ liveShoppingId: number }> {
-    return this.liveShoppingService.createLiveShopping(seller.sub, dto);
+    return this.liveShoppingService.createLiveShopping(seller.id, dto);
   }
 
   @Delete()
@@ -58,9 +58,10 @@ export class LiveShoppingController {
 
   @Get('/confirmed-goods')
   async getApprovedGoodsList(
-    @Query('email') email: string,
+    @SellerInfo() seller: UserPayload,
   ): Promise<ApprovedGoodsNameAndId[]> {
-    const goodsList = await this.goodsService.findMyGoodsNames(email);
+    const sellerId = seller.id;
+    const goodsList = await this.goodsService.findMyGoodsNames(sellerId);
     return goodsList;
   }
 

@@ -13,10 +13,8 @@ import { LiveShoppingImageType } from '@prisma/client';
 import ImageInputDialog, {
   ImageInputFileReadData,
 } from '@project-lc/components-core/ImageInputDialog';
-import {
-  LiveShoppingWithGoods,
-  useAdminLiveShoppingImageMutation,
-} from '@project-lc/hooks';
+import { useAdminLiveShoppingImageMutation } from '@project-lc/hooks';
+import { LiveShoppingWithGoods } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import dayjs from 'dayjs';
 import path from 'path';

@@ -1,6 +1,7 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native"]
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native"]
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -10,7 +11,7 @@ datasource db {
 
 model Seller {
   id                         Int                          @id @default(autoincrement())
-  email                      String                       @unique
+  email                      String?                      @unique
   name                       String?
   password                   String?
   goods                      Goods[]
@@ -26,19 +27,20 @@ model Seller {
   OrderCancelRequests        SellerOrderCancelRequest[] // 판매자의 결제취소요청
   avatar                     String?
   agreementFlag              Boolean                      @default(false) // 이용동의 
+  inactiveFlag               Boolean                      @default(false)
 }
 
 // 마케터의 상정정보
 model SellerShop {
-  sellerEmail String @unique // 등록한 판매자 ID 
-  shopName    String
-  seller      Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  sellerId Int    @unique
+  shopName String
+  seller   Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 }
 
 // 사업자등록정보
 model SellerBusinessRegistration {
   id                               Int                               @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
-  sellerEmail                      String // 등록한 판매자 ID 
+  sellerId                         Int
   companyName                      String // 상호명
   businessRegistrationNumber       String // 사업자등록증 등록번호
   representativeName               String // 대표자명
@@ -50,9 +52,9 @@ model SellerBusinessRegistration {
   mailOrderSalesNumber             String // 통신판매업 신고번호 
   mailOrderSalesImageName          String // 통신판매업 이미지 파일명
   BusinessRegistrationConfirmation BusinessRegistrationConfirmation?
-  seller                           Seller                            @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  seller                           Seller                            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  @@index(name: "BusinessRegistrationIndex", fields: [sellerEmail, id])
+  @@index(name: "BusinessRegistrationIndex", fields: [id])
 }
 
 // 사업자등록정보 검수정보
@@ -80,7 +82,7 @@ model SellerSettlements {
   pgCommissionRate     Decimal                 @default("0.00") @db.Decimal(10, 2) // 전자결제 수수료율
   paymentMethod        String? // 결제수단
   pg                   String? // pg사
-  sellerEmail          String // 등록한 판매자 ID
+  sellerId             Int
   exportId             Int                     @unique // 이 정산의 출고고유번호 (fm_goods_export.export_seq)
   exportCode           String // 이 정산의 출고코드 (fm_goods_export.export_code)
   buyer                String // 구매자명
@@ -89,10 +91,10 @@ model SellerSettlements {
   shippingId           Int // 주문 배송묶음 번호 (퍼스트몰 fm_order_item.shipping_seq)
   shippingCost         Decimal                 @default("0.00") @db.Decimal(10, 2) // 이 정산에 포함된  배송비
   shippingCostIncluded Boolean                 @default(false) // 이 출고 정산에 order_shipping 배송비에 대한 포함이 이루어졌는지 여부
-  seller               Seller                  @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  seller               Seller                  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   settlementItems      SellerSettlementItems[]
 
-  @@index([sellerEmail, id], name: "SellerSettlementsIndex")
+  @@index([id], name: "SellerSettlementsIndex")
 }
 
 // 정산 아이템(주문 정보)
@@ -124,14 +126,14 @@ model SellerSettlementItems {
 // 판매자 정산 계좌 정보
 model SellerSettlementAccount {
   id                         Int    @id @default(autoincrement())
-  sellerEmail                String
+  sellerId                   Int
   bank                       String
   number                     String
   name                       String
   settlementAccountImageName String
-  seller                     Seller @relation(fields: [sellerEmail], references: [email], onDelete: Cascade)
+  seller                     Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
-  @@index([sellerEmail, id], name: "SellerSettlementAccountIndex")
+  @@index([id], name: "SellerSettlementAccountIndex")
 }
 
 model MailVerificationCode {
@@ -159,7 +161,7 @@ model SellerSocialAccount {
 model SellerContacts {
   id           Int            @id @default(autoincrement())
   sellerId     Int // 판매자 아이디
-  email        String         @default("") //등���한 이메일
+  email        String         @default("") //등록한 이메일
   phoneNumber  String         @default("") // 등록한 전화번호
   isDefault    Boolean        @default(false) // 기본 연락처 설정 여부
   seller       Seller         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
@@ -481,10 +483,10 @@ model ShippingCost {
 // -------------------------------------------------
 model Broadcaster {
   id                          Int                           @id @default(autoincrement())
-  email                       String                        @unique // 방송인 이메일(가입시 사용)
-  userName                    String                        @db.VarChar(20) // 유저의 실명
+  email                       String?                       @unique // 방송인 이메일(가입시 사용)
+  userName                    String?                       @db.VarChar(20) // 유저의 실명
   userNickname                String?                       @db.VarChar(20) // 유저의 활동명
-  overlayUrl                  String                        @unique // 라이브커머스 오버레이 URL 
+  overlayUrl                  String?                       @unique // 라이브커머스 오버레이 URL 
   createDate                  DateTime                      @default(now())
   deleteFlag                  Boolean                       @default(false) // 회원탈퇴 여부
   password                    String? // 비밀번호
@@ -499,6 +501,7 @@ model Broadcaster {
   BroadcasterSettlementInfo   BroadcasterSettlementInfo?
   BroadcasterSettlements      BroadcasterSettlements[]
   BroadcasterPromotionPage    BroadcasterPromotionPage? // 방송인 상품홍보
+  inactiveFlag                Boolean                       @default(false)
 }
 
 // 방송인 소셜로그인 계정
@@ -652,7 +655,7 @@ model LiveShopping {
   goodsId                     Int // 상품 ID (project-lc goods Id)
   fmGoodsSeq                  Int?                          @unique // 퍼스트몰 상품 ID 라이브쇼핑진행을 위해 생성한 퍼스트몰 상품의 고유번호 (fm_goods.goods_seq)
   videoId                     Int?
-  contactId                   Int // 판매자 등록된 연락처 ID
+  contactId                   Int? // 판매자 등록된 연락처 ID
   requests                    String?                       @db.LongText // 요청사항
   progress                    LiveShopppingProgressType     @default(registered) // 진행상태
   broadcastStartDate          DateTime? // 라이브 방송 시작 시간
@@ -665,7 +668,7 @@ model LiveShopping {
   whiletrueCommissionRate     Decimal                       @default("0") @db.Decimal(10, 2) // 판매금 중, project-lc(와일트루)가 가져가는 수수료 (0%~100% 사이값)
   desiredCommission           Decimal?                      @default("0") @db.Decimal(10, 2) // 희망판매수수료
   desiredPeriod               String?                       @default("무관") // 희망 진행 기간
-  sellerContacts              SellerContacts                @relation(fields: [contactId], references: [id])
+  sellerContacts              SellerContacts?               @relation(fields: [contactId], references: [id])
   seller                      Seller                        @relation(fields: [sellerId], references: [id])
   goods                       Goods                         @relation(fields: [goodsId], references: [id])
   broadcaster                 Broadcaster?                  @relation(fields: [broadcasterId], references: [id])
@@ -801,10 +804,11 @@ model UserNotification {
 
 // 관리자 계정
 model Administrator {
-  id         Int       @id @default(autoincrement())
-  email      String    @unique
-  password   String
-  adminClass AdminType @default(normal)
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  password     String
+  inactiveFlag Boolean   @default(false)
+  adminClass   AdminType @default(normal)
 }
 
 enum AdminType {
@@ -831,6 +835,186 @@ model Inquiry {
   type        InquiryType
   createDate  DateTime    @default(now())
   readFlag    Boolean?    @default(false) // 관리자 처리 여부 
+}
+
+// 휴면 계정 테이블
+model InactiveBroadcaster {
+  id                                Int                                 @id @default(autoincrement())
+  email                             String?                             @unique // 방송인 이메일(가입시 사용)
+  userName                          String?                             @db.VarChar(20) // 유저의 실명
+  userNickname                      String?                             @db.VarChar(20) // 유저의 활동명
+  overlayUrl                        String?                             @unique // 라이브커머스 오버레이 URL 
+  createDate                        DateTime                            @default(now())
+  password                          String? // 비밀번호
+  avatar                            String?
+  inactiveFlag                      Boolean                             @default(true)
+  deleteFlag                        Boolean
+  agreementFlag                     Boolean
+  InactiveBroadcasterSocialAccount  InactiveBroadcasterSocialAccount[]
+  InactiveBroadcasterContacts       InactiveBroadcasterContacts[]
+  InactiveBroadcasterAddress        InactiveBroadcasterAddress[]
+  InactiveBroadcasterChannel        InactiveBroadcasterChannel[]
+  InactiveBroadcasterSettlementInfo InactiveBroadcasterSettlementInfo[]
+}
+
+model InactiveSeller {
+  id                                 Int                                  @id @default(autoincrement())
+  email                              String                               @unique
+  name                               String?
+  password                           String?
+  avatar                             String?
+  inactiveFlag                       Boolean                              @default(true)
+  agreementFlag                      Boolean
+  InactiveSellerSocialAccount        InactiveSellerSocialAccount[]
+  InactiveSellerBusinessRegistration InactiveSellerBusinessRegistration[]
+  InactiveSellerContacts             InactiveSellerContacts[]
+  InactiveSellerSettlementAccount    InactiveSellerSettlementAccount[]
+}
+
+// 방송인 소셜로그인 계정
+model InactiveBroadcasterSocialAccount {
+  serviceId     String              @id // 인증 결과로 해당 서비스에서 받은 고유 식별자
+  provider      String // 'google' | 'kakao' | 'naver'
+  name          String
+  registDate    DateTime            @default(now())
+  profileImage  String?
+  accessToken   String?
+  refreshToken  String?
+  broadcasterId Int
+  broadcaster   InactiveBroadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+
+  @@index([broadcasterId], name: "broadcasterId")
+}
+
+model InactiveSellerSocialAccount {
+  serviceId    String         @id // 인증 결과로 해당 서비스에서 받은 고유 식별자
+  provider     String // 'google' | 'kakao' | 'naver'
+  name         String
+  registDate   DateTime       @default(now())
+  profileImage String?
+  accessToken  String?
+  refreshToken String?
+  sellerId     Int
+  seller       InactiveSeller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@index([sellerId], name: "sellerId")
+}
+
+// 방송인 선물/샘플 수령 주소 정보
+model InactiveBroadcasterAddress {
+  id            Int      @id @default(autoincrement())
+  address       String // 주소 (도로명)
+  detailAddress String // 주소 상세
+  postalCode    String // 우편 번호
+  createDate    DateTime @default(now())
+
+  broadcasterId       Int?                 @unique
+  inactiveBroadcaster InactiveBroadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+}
+
+// 방송인 활동 플랫폼 채널정보(url)
+model InactiveBroadcasterChannel {
+  id                  Int                 @id @default(autoincrement())
+  url                 String // 채널 url (아프리카, 트위치, 유투브, 인스타그램 ...)
+  createDate          DateTime            @default(now())
+  inactiveBroadcaster InactiveBroadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+  broadcasterId       Int
+}
+
+// 방송인 연락처 정보
+model InactiveBroadcasterContacts {
+  id          Int      @id @default(autoincrement())
+  name        String   @default("")
+  email       String   @default("")
+  phoneNumber String   @default("")
+  isDefault   Boolean  @default(false)
+  createDate  DateTime @default(now())
+
+  broadcasterId       Int?
+  inactiveBroadcaster InactiveBroadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+}
+
+// 방송인 정산을 위한 계약자, 계좌정보(방송인 정산등록정보)
+model InactiveBroadcasterSettlementInfo {
+  id                    Int                                            @id @default(autoincrement())
+  type                  TaxationType                                   @default(naturalPerson) // 과세유형 (개인 | 개인사업자) 
+  name                  String // 개인 이름 혹은 개인사업자명
+  idCardNumber          String // 암호화된 주민등록번호
+  phoneNumber           String // 암호화된 휴대전화번호
+  bank                  String // 은행이름
+  accountNumber         String // 계좌번호
+  accountHolder         String // 예금주
+  idCardImageName       String // 주민등록번호 파일 s3에 저장된 파일명(s3)
+  accountImageName      String // 통장사본 파일 s3에 저장된 파일명(s3)
+  taxManageAgreement    Boolean                                        @default(false) //세무처리 관련 동의(개인사업자에만 해당)
+  personalInfoAgreement Boolean                                        @default(false) //정산정보 등록에 따른 개인정보 수집 및 이용동의(필수)
+  settlementAgreement   Boolean? //정산등록 신청서 제출에 대한 확인여부(과세유형이 개인사업자 경우만 필수)
+  inactiveBroadcaster   InactiveBroadcaster                            @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+  broadcasterId         Int                                            @unique
+  confirmation          InactiveBroadcasterSettlementInfoConfirmation?
+}
+
+// 방송인 정산 등록 정보 검수여부
+model InactiveBroadcasterSettlementInfoConfirmation {
+  id               Int                               @id @default(autoincrement())
+  status           BusinessRegistrationStatus        @default(waiting)
+  rejectionReason  String?                           @db.Text // 반려사유 - 관리자가 입력
+  settlementInfo   InactiveBroadcasterSettlementInfo @relation(fields: [settlementInfoId], references: [id], onDelete: Cascade)
+  settlementInfoId Int                               @unique
+}
+
+// 사업자등록정보
+model InactiveSellerBusinessRegistration {
+  id       Int @id @default(autoincrement()) // 사업자 등록증 DB 고유 번호
+  sellerId Int
+
+  companyName                              String // 상호명
+  businessRegistrationNumber               String // 사업자등록증 등록번호
+  representativeName                       String // 대표자명
+  businessType                             String // 업태
+  businessItem                             String // 종목
+  businessAddress                          String // 사업장 주소
+  taxInvoiceMail                           String // 세금계산서 전용 이메일
+  businessRegistrationImageName            String // 사업자등록증 이미지 파일명
+  mailOrderSalesNumber                     String // 통신판매업 신고번호 
+  mailOrderSalesImageName                  String // 통신판매업 이미지 파일명
+  InactiveBusinessRegistrationConfirmation InactiveBusinessRegistrationConfirmation?
+  InactiveSeller                           InactiveSeller                            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@index(name: "BusinessRegistrationIndex", fields: [id])
+}
+
+// 판매자가 등록한 라이브 쇼핑 담당자 연락처들
+model InactiveSellerContacts {
+  id          Int            @id @default(autoincrement())
+  sellerId    Int // 판매자 아이디
+  email       String         @default("") //등���한 이메일
+  phoneNumber String         @default("") // 등록한 전화번호
+  isDefault   Boolean        @default(false) // 기본 연락처 설정 여부
+  seller      InactiveSeller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  createDate  DateTime       @default(now())
+}
+
+// 판매자 정산 계좌 정보
+model InactiveSellerSettlementAccount {
+  id                         Int            @id @default(autoincrement())
+  sellerId                   Int
+  bank                       String
+  number                     String
+  name                       String
+  settlementAccountImageName String
+  seller                     InactiveSeller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@index([id], name: "SellerSettlementAccountIndex")
+}
+
+// 사업자등록정보 검수정보
+model InactiveBusinessRegistrationConfirmation {
+  id                                   Int                                @id @default(autoincrement())
+  status                               BusinessRegistrationStatus         @default(waiting) // 검수 상태
+  rejectionReason                      String?                            @db.Text // 반려사유 - 관리자가 입력
+  InactiveSellerBusinessRegistrationId Int                                @unique
+  SellerBusinessRegistration           InactiveSellerBusinessRegistration @relation(fields: [InactiveSellerBusinessRegistrationId], references: [id])
 }
 
 // 정책 분류

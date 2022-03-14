@@ -6,20 +6,19 @@ import {
 import {
   Administrator,
   GoodsConfirmation,
-  LiveShopping,
   AdminClassChangeHistory,
-  LiveShoppingImageType,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminSettlementInfoType,
+  BusinessRegistrationStatus,
   GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
-  BusinessRegistrationStatus,
-  AdminSettlementInfoType,
   LiveShoppingDTO,
   AdminClassDto,
   LiveShoppingImageDto,
+  LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -37,6 +36,7 @@ export class AdminService {
             seller: {
               select: {
                 agreementFlag: true,
+                inactiveFlag: false,
               },
             },
           },
@@ -90,6 +90,9 @@ export class AdminService {
    */
   public async getConfirmedSellers(): Promise<Map<number, string>> {
     const sellers = await this.prisma.seller.findMany({
+      where: {
+        inactiveFlag: false,
+      },
       include: {
         sellerBusinessRegistration: {
           include: {
@@ -261,7 +264,7 @@ export class AdminService {
     });
   }
 
-  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
+  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShoppingWithGoods[]> {
     return this.prisma.liveShopping.findMany({
       where: { id: id ? Number(id) : undefined },
       include: {
@@ -271,6 +274,8 @@ export class AdminService {
         seller: { select: { sellerShop: true } },
         broadcaster: {
           select: {
+            id: true,
+            userName: true,
             userNickname: true,
             email: true,
             avatar: true,

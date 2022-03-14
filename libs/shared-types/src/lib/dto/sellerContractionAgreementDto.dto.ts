@@ -1,6 +1,6 @@
-import { IsBoolean, IsString } from 'class-validator';
+import { IsBoolean, IsNumber } from 'class-validator';
 
 export class SellerContractionAgreementDto {
-  @IsString() email: string;
+  @IsNumber() id: number;
   @IsBoolean() agreementFlag: boolean;
 }

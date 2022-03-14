@@ -16,11 +16,11 @@ export const getShippingGroupList = async (): Promise<ShippingGroupList> => {
 };
 
 export const useShippingGroupList = (
-  sellerEmail: string,
+  sellerId: number,
   enabled: boolean,
 ): UseQueryResult<ShippingGroupList, AxiosError> => {
   return useQuery<ShippingGroupList, AxiosError>(
-    ['ShippingGroupList', sellerEmail],
+    ['ShippingGroupList', sellerId],
     getShippingGroupList,
     {
       enabled,

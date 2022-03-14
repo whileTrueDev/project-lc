@@ -72,10 +72,12 @@ export function LiveShoppingDetail(): JSX.Element {
   const liveShoppingId = router.query.liveShoppingId as string;
   const { data: profileData } = useProfile();
   const { data: liveShopping, isLoading: liveShoppingIsLoading } =
-    useAdminLiveShoppingList({
-      enabled: !!profileData?.email,
-      id: liveShoppingId,
-    });
+    useAdminLiveShoppingList(
+      {
+        id: liveShoppingId,
+      },
+      { enabled: !!profileData?.id },
+    );
 
   const goodsId = liveShopping ? liveShopping[0].goodsId : '';
   const goods = useAdminGoodsById(goodsId);
