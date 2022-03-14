@@ -2,6 +2,7 @@
 import * as cdk from '@aws-cdk/core';
 import * as dotenv from 'dotenv';
 import 'source-map-support/register';
+import { constants } from '../constants';
 import { LCDevAppStack } from '../lib/dev/app-stack';
 import { LCDevDatabaseStack } from '../lib/dev/database-stack';
 import { LCDevPrivateAppStack } from '../lib/dev/private-app-stack';
@@ -10,7 +11,9 @@ import { LCDevVpcStack } from '../lib/dev/vpc-stack';
 import { LCDomainStack } from '../lib/env-agnostic/domain-stack';
 import { LCPrivateDomainStack } from '../lib/env-agnostic/private-domain-stack';
 import { LCProdAppStack } from '../lib/prod/app-stack';
+import { LCBatchAppStack } from '../lib/prod/batch-app-stack';
 import { LCProdDatabaseStack } from '../lib/prod/database-stack';
+import { LCProdPrivateAppStack } from '../lib/prod/private-app-stack';
 import { LCRedisStack } from '../lib/prod/redis-stack';
 import { LCProdVpcStack } from '../lib/prod/vpc-stack';
 import { envCheck } from '../util/env-check';
@@ -43,7 +46,7 @@ new LCDevRedisStack(app, 'LC-DEV-REDIS', {
   vpc: devVpcStack.vpc,
   redisSecGrp: devVpcStack.redisSecGrp,
 });
-// Dev 프라이빗 앱 (메일러, 배치프로그램, ...)
+// Dev 프라이빗 앱 (메일러, ...)
 const devPrivateAppStack = new LCDevPrivateAppStack(app, 'LC-DEV-PRIVATE-APP', {
   vpc: devVpcStack.vpc,
   cluster: devAppStack.cluster,
@@ -53,7 +56,7 @@ const devPrivateAppStack = new LCDevPrivateAppStack(app, 'LC-DEV-PRIVATE-APP', {
 // Dev 프라이빗 도메인
 new LCPrivateDomainStack(app, 'LC-DEV-PRIVATE-DOMAIN', {
   vpc: devVpcStack.vpc,
-  domainName: 'kkshow-dev-dns.com',
+  domainName: constants.DEV.PRIVATE_DOMAIN,
   privateAlb: devPrivateAppStack.privateAlb,
 });
 
@@ -84,9 +87,29 @@ new LCRedisStack(app, 'LC-PROD-REDIS', {
   redisSecGrp: prodVpcStack.redisSecGrp,
 });
 
+new LCProdPrivateAppStack(app, 'LC-PROD-PRIVATE-APP', {
+  vpc: prodVpcStack.vpc,
+  cluster: prodAppStack.cluster,
+  albSecGrp: prodVpcStack.privateAlbSecGrp,
+  mailerSecGrp: prodVpcStack.mailerSecGrp,
+});
+
+// Prod 배치 앱 (휴면배치, ...)
+new LCBatchAppStack(app, 'LC-PROD-BATCH-APP', {
+  vpc: prodVpcStack.vpc,
+  cluster: prodAppStack.cluster,
+});
+
 // ************************************
 // * 퍼블릭 도메인
 new LCDomainStack(app, 'LC-DOMAIN', {
   devALB: devAppStack.alb,
   prodALB: prodAppStack.alb,
+});
+
+// Dev 프라이빗 도메인
+new LCPrivateDomainStack(app, 'LC-PROD-PRIVATE-DOMAIN', {
+  vpc: prodVpcStack.vpc,
+  domainName: constants.PROD.PRIVATE_DOMAIN,
+  privateAlb: devPrivateAppStack.privateAlb,
 });

@@ -115,6 +115,14 @@ export const constants = {
     ECS_REALTIME_API_SERVICE_NAME: 'project-lc-realtimeapi-service',
     ECS_REALTIME_API_LOG_GLOUP_NAME: '/ecs/project-lc-realtimeapi',
     ECS_REALTIME_API_PORT: 3001,
+    // * ECS Mailer
+    ECS_MAILER_SERVICE_NAME: 'project-lc-mailer-service',
+    ECS_MAILER_FAMILY_NAME: 'project-lc-mailer',
+    ECS_MAILER_LOG_GROUP_NAME: '/ecs/project-lc-mailer',
+    ECS_MAILER_PORT: 3003,
+    // * ECS Inactive Batch
+    ECS_INACTIVE_BATCH_FAMILY_NAME: 'project-lc-inactive-batch',
+    ECS_INACTIVE_BATCH_LOG_GROUP_NAME: '/ecs/project-lc-inactive-batch',
     // * ************************
     // * SSM Parameter Store Keys
     // * ************************

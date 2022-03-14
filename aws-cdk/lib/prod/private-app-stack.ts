@@ -10,8 +10,6 @@ import {
   FargateTaskDefinition,
   Secret,
 } from '@aws-cdk/aws-ecs';
-import { ScheduledFargateTask } from '@aws-cdk/aws-ecs-patterns';
-import { Schedule } from '@aws-cdk/aws-applicationautoscaling';
 import {
   ApplicationListener,
   ApplicationLoadBalancer,
@@ -26,19 +24,19 @@ import { Construct, Duration, RemovalPolicy, Stack, StackProps } from '@aws-cdk/
 import { constants } from '../../constants';
 import { loadSsmParam } from '../../util/loadSsmParam';
 
-interface LCDevPrivateAppStackProps extends StackProps {
+interface LCProdPrivateAppStackProps extends StackProps {
   albSecGrp: SecurityGroup;
   mailerSecGrp: SecurityGroup;
   cluster: Cluster;
   vpc: Vpc;
 }
-export class LCDevPrivateAppStack extends Stack {
-  private readonly ID_PREFIX = `${constants.DEV.ID_PREFIX}PRIVATE-`;
+export class LCProdPrivateAppStack extends Stack {
+  private readonly ID_PREFIX = `${constants.PROD.ID_PREFIX}PRIVATE-`;
   private readonly ACM_ARN = process.env.ACM_CERTIFICATE_ARN!;
 
   public privateAlb: ApplicationLoadBalancer;
 
-  constructor(scope: Construct, id: string, props: LCDevPrivateAppStackProps) {
+  constructor(scope: Construct, id: string, props: LCProdPrivateAppStackProps) {
     super(scope, id, props);
     const { vpc, cluster, mailerSecGrp, albSecGrp } = props;
 
@@ -58,7 +56,7 @@ export class LCDevPrivateAppStack extends Stack {
       internetFacing: false,
       loadBalancerName: `${this.ID_PREFIX}ALB`,
       vpcSubnets: {
-        subnetGroupName: constants.DEV.PRIVATE_SUBNET_GROUP_NAME,
+        subnetGroupName: constants.PROD.PRIVATE_SUBNET_GROUP_NAME,
       },
       securityGroup: albSecGrp,
     });
@@ -90,7 +88,7 @@ export class LCDevPrivateAppStack extends Stack {
     const servicePrefix = 'Mailer';
     const prefix = `${this.ID_PREFIX}${servicePrefix}`;
     const repo = new Repository(this, `${prefix}Repo`, {
-      repositoryName: constants.DEV.ECS_MAILER_FAMILY_NAME,
+      repositoryName: constants.PROD.ECS_MAILER_FAMILY_NAME,
       lifecycleRules: [
         { maxImageCount: 1, tagStatus: TagStatus.ANY },
         {
@@ -101,22 +99,22 @@ export class LCDevPrivateAppStack extends Stack {
     });
 
     const taskDef = new FargateTaskDefinition(this, `${prefix}EcsTaskDef`, {
-      family: constants.DEV.ECS_MAILER_FAMILY_NAME,
+      family: constants.PROD.ECS_MAILER_FAMILY_NAME,
     });
 
     const MAILER_USER = loadSsmParam(this, `${prefix}MAILER_USER`, {
       version: 3,
-      parameterName: constants.DEV.MAILER_USER,
+      parameterName: constants.PROD.MAILER_USER_KEY,
     });
     const MAILER_PASS = loadSsmParam(this, `${prefix}MAILER_PASS`, {
       version: 5,
-      parameterName: constants.DEV.MAILER_PASS,
+      parameterName: constants.PROD.MAILER_PASS_KEY,
     });
 
     taskDef.addContainer(`${prefix}Container`, {
       image: ContainerImage.fromEcrRepository(repo),
-      containerName: constants.DEV.ECS_MAILER_FAMILY_NAME,
-      portMappings: [{ containerPort: constants.DEV.ECS_MAILER_PORT }],
+      containerName: constants.PROD.ECS_MAILER_FAMILY_NAME,
+      portMappings: [{ containerPort: constants.PROD.ECS_MAILER_PORT }],
       memoryLimitMiB: 512,
       secrets: {
         MAILER_USER: Secret.fromSsmParameter(MAILER_USER),
@@ -127,7 +125,7 @@ export class LCDevPrivateAppStack extends Stack {
       },
       logging: new AwsLogDriver({
         logGroup: new LogGroup(this, `${prefix}LogGroup`, {
-          logGroupName: constants.DEV.ECS_MAILER_LOG_GROUP_NAME,
+          logGroupName: constants.PROD.ECS_MAILER_LOG_GROUP_NAME,
           removalPolicy: RemovalPolicy.DESTROY,
         }),
         streamPrefix: 'ecs',
@@ -137,9 +135,9 @@ export class LCDevPrivateAppStack extends Stack {
     const service = new FargateService(this, `${prefix}Service`, {
       cluster,
       taskDefinition: taskDef,
-      serviceName: constants.DEV.ECS_MAILER_SERVICE_NAME,
+      serviceName: constants.PROD.ECS_MAILER_SERVICE_NAME,
       vpcSubnets: {
-        subnetGroupName: constants.DEV.PRIVATE_SUBNET_GROUP_NAME,
+        subnetGroupName: constants.PROD.PRIVATE_SUBNET_GROUP_NAME,
       },
       platformVersion: FargatePlatformVersion.LATEST,
       desiredCount: 1,
@@ -150,7 +148,7 @@ export class LCDevPrivateAppStack extends Stack {
     const targetGroup = new ApplicationTargetGroup(this, `${prefix}TargetGroup`, {
       vpc,
       targetGroupName: `${prefix}TargetGroup`,
-      port: constants.DEV.ECS_MAILER_PORT,
+      port: constants.PROD.ECS_MAILER_PORT,
       protocol: ApplicationProtocol.HTTP,
       healthCheck: {
         enabled: true,
@@ -163,67 +161,11 @@ export class LCDevPrivateAppStack extends Stack {
     listener.addTargetGroups(`${prefix}HTTPSTargetGroup`, {
       priority: 1,
       conditions: [
-        ListenerCondition.hostHeaders([`mailer.${constants.DEV.PRIVATE_DOMAIN}`]),
+        ListenerCondition.hostHeaders([`mailer.${constants.PROD.PRIVATE_DOMAIN}`]),
       ],
       targetGroups: [targetGroup],
     });
 
     return service;
-  }
-
-  private createInactiveBatchService(
-    vpc: Vpc,
-    cluster: Cluster,
-    secGrp: SecurityGroup,
-  ): ScheduledFargateTask {
-    const servicePrefix = 'InactiveBatch';
-    const prefix = `${this.ID_PREFIX}${servicePrefix}`;
-
-    const repo = new Repository(this, `${prefix}Repo`, {
-      repositoryName: constants.PROD.ECS_INACTIVE_BATCH_FAMILY_NAME,
-      lifecycleRules: [
-        { maxImageCount: 1, tagStatus: TagStatus.ANY },
-        {
-          maxImageAge: Duration.days(1),
-          tagStatus: TagStatus.UNTAGGED,
-        },
-      ],
-    });
-
-    const task = new ScheduledFargateTask(this, `${prefix}Task`, {
-      vpc,
-      cluster,
-      desiredTaskCount: 1,
-      enabled: true,
-      subnetSelection: {
-        subnetGroupName: constants.PROD.PRIVATE_SUBNET_GROUP_NAME,
-      },
-      securityGroups: [secGrp],
-      scheduledFargateTaskImageOptions: {
-        image: ContainerImage.fromEcrRepository(repo),
-        environment: {
-          NODE_ENV: 'test',
-          S3_BUCKET_NAME: 'lc-project',
-          MAILER_HOST: `https://mailer.${constants.DEV.PRIVATE_DOMAIN}`,
-        },
-        logDriver: new AwsLogDriver({
-          logGroup: new LogGroup(this, `${prefix}LogGroup`, {
-            logGroupName: constants.PROD.ECS_INACTIVE_BATCH_LOG_GROUP_NAME,
-            removalPolicy: RemovalPolicy.DESTROY,
-          }),
-          streamPrefix: 'ecs',
-        }),
-      },
-      scheduledFargateTaskDefinitionOptions: {
-        taskDefinition: new FargateTaskDefinition(this, `${prefix}EcsTaskDef`, {
-          family: constants.PROD.ECS_INACTIVE_BATCH_FAMILY_NAME,
-        }),
-      },
-      // 매일 1시 0 분
-      schedule: Schedule.cron({ hour: '1', minute: '0' }),
-      platformVersion: FargatePlatformVersion.LATEST,
-    });
-
-    return task;
   }
 }
