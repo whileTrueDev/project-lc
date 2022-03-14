@@ -141,7 +141,7 @@ export class LCDevAppStack extends cdk.Stack {
         SELLER_WEB_HOST: `https://dev-seller.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://dev-broadcaster.${constants.PUNYCODE_DOMAIN}`,
         KKSHOW_WEB_HOST: `https://dev.${constants.PUNYCODE_DOMAIN}`,
-        MAILER_HOST: `https://mailer.${constants.DEV.PRIVATE_DOMAIN}`,
+        MAILER_HOST: `https://dev-mailer.${constants.PUNYCODE_DOMAIN}`,
         NODE_ENV: 'test',
       },
       logging: new ecs.AwsLogDriver({

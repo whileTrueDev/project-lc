@@ -2,16 +2,13 @@
 import * as cdk from '@aws-cdk/core';
 import * as dotenv from 'dotenv';
 import 'source-map-support/register';
-import { constants } from '../constants';
 import { LCDevAppStack } from '../lib/dev/app-stack';
 import { LCDevDatabaseStack } from '../lib/dev/database-stack';
 import { LCDevPrivateAppStack } from '../lib/dev/private-app-stack';
 import { LCDevRedisStack } from '../lib/dev/redis-stack';
 import { LCDevVpcStack } from '../lib/dev/vpc-stack';
 import { LCDomainStack } from '../lib/env-agnostic/domain-stack';
-import { LCPrivateDomainStack } from '../lib/env-agnostic/private-domain-stack';
 import { LCProdAppStack } from '../lib/prod/app-stack';
-import { LCBatchAppStack } from '../lib/prod/batch-app-stack';
 import { LCProdDatabaseStack } from '../lib/prod/database-stack';
 import { LCProdPrivateAppStack } from '../lib/prod/private-app-stack';
 import { LCRedisStack } from '../lib/prod/redis-stack';
@@ -53,13 +50,6 @@ const devPrivateAppStack = new LCDevPrivateAppStack(app, 'LC-DEV-PRIVATE-APP', {
   albSecGrp: devVpcStack.privateAlbSecGrp,
   mailerSecGrp: devVpcStack.mailerSecGrp,
 });
-// Dev 프라이빗 도메인
-new LCPrivateDomainStack(app, 'LC-DEV-PRIVATE-DOMAIN', {
-  vpc: devVpcStack.vpc,
-  domainName: constants.DEV.PRIVATE_DOMAIN,
-  privateAlb: devPrivateAppStack.privateAlb,
-});
-
 // ************************************
 // * Production 환경
 // VPC
@@ -87,6 +77,7 @@ new LCRedisStack(app, 'LC-PROD-REDIS', {
   redisSecGrp: prodVpcStack.redisSecGrp,
 });
 
+// 프라이빗 앱 (mailer)
 new LCProdPrivateAppStack(app, 'LC-PROD-PRIVATE-APP', {
   vpc: prodVpcStack.vpc,
   cluster: prodAppStack.cluster,
@@ -95,21 +86,15 @@ new LCProdPrivateAppStack(app, 'LC-PROD-PRIVATE-APP', {
 });
 
 // Prod 배치 앱 (휴면배치, ...)
-new LCBatchAppStack(app, 'LC-PROD-BATCH-APP', {
-  vpc: prodVpcStack.vpc,
-  cluster: prodAppStack.cluster,
-});
+// new LCBatchAppStack(app, 'LC-PROD-BATCH-APP', {
+//   vpc: prodVpcStack.vpc,
+//   cluster: prodAppStack.cluster,
+// });
 
 // ************************************
 // * 퍼블릭 도메인
 new LCDomainStack(app, 'LC-DOMAIN', {
   devALB: devAppStack.alb,
   prodALB: prodAppStack.alb,
-});
-
-// Dev 프라이빗 도메인
-new LCPrivateDomainStack(app, 'LC-PROD-PRIVATE-DOMAIN', {
-  vpc: prodVpcStack.vpc,
-  domainName: constants.PROD.PRIVATE_DOMAIN,
-  privateAlb: devPrivateAppStack.privateAlb,
+  devPrivateAlb: devPrivateAppStack.privateAlb,
 });

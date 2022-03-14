@@ -43,10 +43,10 @@ export class LCDevVpcStack extends cdk.Stack {
     });
 
     this.createAlbSecGrp();
-    this.createPrivateAlbSecGrp();
     const apiSecGrp = this.createApiSecGrp();
     const overlaySecGrp = this.createOverlaySecGrp();
     const overlayControllerSecGrp = this.createOverlayControllerSecGrp();
+    this.createPrivateAlbSecGrp();
     this.createDbSecGrp({ apiSecGrp, overlaySecGrp, overlayControllerSecGrp });
 
     this.createRealtimeApiSecGrp();
@@ -87,18 +87,16 @@ export class LCDevVpcStack extends cdk.Stack {
         allowAllOutbound: true,
       },
     );
-
     this.privateAlbSecGrp.addIngressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(80),
-      'Allow 80 to all',
+      'Allow 80 to API',
     );
     this.privateAlbSecGrp.addIngressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(443),
-      'Allow 443 to all',
+      'Allow443 to api',
     );
-
     return this.privateAlbSecGrp;
   }
 

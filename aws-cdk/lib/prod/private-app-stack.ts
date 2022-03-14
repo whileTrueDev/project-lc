@@ -53,10 +53,10 @@ export class LCProdPrivateAppStack extends Stack {
   private createPrivateAlb(vpc: Vpc, albSecGrp: SecurityGroup): ApplicationLoadBalancer {
     return new ApplicationLoadBalancer(this, `${this.ID_PREFIX}ALB`, {
       vpc,
-      internetFacing: false,
+      internetFacing: true,
       loadBalancerName: `${this.ID_PREFIX}ALB`,
       vpcSubnets: {
-        subnetGroupName: constants.PROD.PRIVATE_SUBNET_GROUP_NAME,
+        subnetGroupName: constants.PROD.INGRESS_SUBNET_GROUP_NAME,
       },
       securityGroup: albSecGrp,
     });
