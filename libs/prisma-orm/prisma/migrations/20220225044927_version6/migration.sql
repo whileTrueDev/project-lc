@@ -321,3 +321,138 @@ ALTER TABLE `InactiveSellerSettlementAccount` ADD CONSTRAINT `InactiveSellerSett
 
 -- AddForeignKey
 ALTER TABLE `InactiveBusinessRegistrationConfirmation` ADD CONSTRAINT `InactiveBusinessRegistrationConfirmation_InactiveSellerBusi_fkey` FOREIGN KEY (`InactiveSellerBusinessRegistrationId`) REFERENCES `InactiveSellerBusinessRegistration`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AlterTable
+ALTER TABLE `Administrator` ADD COLUMN `adminClass` ENUM('super', 'full', 'normal') NOT NULL DEFAULT 'normal';
+
+-- CreateTable
+CREATE TABLE `PrivacyApproachHistory` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `adminEmail` VARCHAR(191) NOT NULL,
+    `ip` VARCHAR(191) NOT NULL,
+    `infoType` ENUM('broadcasterSettlementAccount', 'broadcasterIdCard', 'sellerSettlementAccount', 'sellerBusinessRegistration', 'sellerMailOrderCertificate') NOT NULL,
+    `actionType` ENUM('download', 'view') NOT NULL,
+    `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `AdminClassChangeHistory` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `adminEmail` VARCHAR(191) NOT NULL,
+    `targetEmail` VARCHAR(191) NOT NULL,
+    `originalAdminClass` ENUM('super', 'full', 'normal') NOT NULL,
+    `newAdminClass` ENUM('super', 'full', 'normal') NOT NULL,
+    `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+UPDATE `Administrator` SET `adminClass`='super' WHERE `email`='alsrhks1994@naver.com';
+
+INSERT INTO `AdminClassChangeHistory`(`adminEmail`,`targetEmail`,`originalAdminClass`,`newAdminClass`) VALUES ('alsrhks1994@naver.com', 'alsrhks1994@naver.com', 'normal', 'super');
+
+-- CreateTable
+CREATE TABLE `LiveShoppingImage` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `imageUrl` VARCHAR(191) NULL,
+    `type` ENUM('carousel', 'trailer') NOT NULL,
+    `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `liveShoppingId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `KkshowMain` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `carousel` JSON NOT NULL,
+    `trailer` JSON NOT NULL,
+    `bestLive` JSON NOT NULL,
+    `bestBroadcaster` JSON NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `LiveShoppingImage` ADD CONSTRAINT `LiveShoppingImage_liveShoppingId_fkey` FOREIGN KEY (`liveShoppingId`) REFERENCES `LiveShopping`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- 초기 데이터 추가(20220307 @joni 입력)
+INSERT INTO `KkshowMain` (`id`, `carousel`, `trailer`, `bestLive`, `bestBroadcaster`)
+VALUES
+	(1, '[{\"type\": \"simpleBanner\", \"linkUrl\": \"https://k-kmarket.com/goods/catalog?code=0012\", \"imageUrl\": \"https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-main-carousel-images/1646985653016_배너이미지.jpeg\", \"description\": \"크크쇼 3월 기획전\"}, {\"type\": \"upcoming\", \"imageUrl\": \"https://lc-project.s3.ap-northeast-2.amazonaws.com/live-shopping-images/null/carousel/1646985708035_나무늘봉순홍보물.jpeg\", \"normalPrice\": 12300, \"liveShoppingId\": null, \"productLinkUrl\": \"https://smartstore.naver.com/mideun/products/4867304181\", \"discountedPrice\": 9900, \"productImageUrl\": \"https://shop-phinf.pstatic.net/20220208_193/1644309112479hUb9L_JPEG/45444896009789141_685505840.jpg?type=m510\", \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/5f179460-761b-404e-afc6-9ec9ea26df1a-profile_image-70x70.png\", \"broadcastEndDate\": null, \"liveShoppingName\": \"봉순늘치킨데이\", \"broadcastStartDate\": null, \"broadcasterNickname\": \"\", \"liveShoppingProgress\": null, \"promotionPageLinkUrl\": \"\"}, {\"type\": \"nowPlaying\", \"platform\": \"twitch\", \"videoUrl\": \"chodan_\", \"normalPrice\": 39900, \"liveShoppingId\": null, \"productLinkUrl\": \"https://k-kmarket.com/goods/view?no=144\", \"discountedPrice\": 29900, \"productImageUrl\": \"https://k-kmarket.com/data/goods/1/2022/01/_temp_16418020129358view.jpg\", \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/2067380c-6c8f-4a4d-9f68-65c13572a59b-profile_image-70x70.png\", \"broadcastEndDate\": null, \"liveShoppingName\": \"해피쵸이어\", \"broadcastStartDate\": null, \"broadcasterNickname\": \"\", \"liveShoppingProgress\": null, \"promotionPageLinkUrl\": \"\"}, {\"type\": \"previous\", \"videoUrl\": \"vFv6ZUOEnAo\", \"normalPrice\": 20000, \"liveShoppingId\": null, \"productLinkUrl\": \"https://k-kmarket.com/goods/view?no=180\", \"discountedPrice\": 10000, \"productImageUrl\": \"https://k-kmarket.com/data/goods/1/2021/12/_temp_16385033431082large.png\", \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/a27144c9-0c62-46e4-a7a8-9b51b394567a-profile_image-70x70.png\", \"broadcastEndDate\": null, \"liveShoppingName\": \" 수련수련 x 크크쇼 라이브\", \"broadcastStartDate\": null, \"broadcasterNickname\": \"\", \"liveShoppingProgress\": null, \"promotionPageLinkUrl\": \"\"}, {\"type\": \"previous\", \"videoUrl\": \"TutKdpA-JRw\", \"normalPrice\": 20000, \"liveShoppingId\": null, \"productLinkUrl\": \"https://k-kmarket.com/goods/catalog?code=0012\", \"discountedPrice\": 10000, \"productImageUrl\": \"https://k-kmarket.com/data/goods/1/2022/02/_temp_16449174261446view.jpg\", \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/ec949373-7065-423c-afad-08f9504c8034-profile_image-150x150.png\", \"broadcastEndDate\": null, \"liveShoppingName\": \"연나비 x 크크쇼 라이브\", \"broadcastStartDate\": null, \"broadcasterNickname\": \"\", \"liveShoppingProgress\": null, \"promotionPageLinkUrl\": \"\"}]', '{\"imageUrl\": \"https://lc-project.s3.ap-northeast-2.amazonaws.com/live-shopping-images/undefined/trailer/1646985740614_민결희.jpeg\", \"normalPrice\": 19000, \"productLinkUrl\": \"https://k-kmarket.com/goods/view?no=181\", \"discountedPrice\": 14900, \"liveShoppingName\": \"민결희 x 예스닭강정\", \"broadcastStartDate\": \"2022-02-20T04:00:00.000Z\", \"broadcasterNickname\": \"민결희\", \"broadcasterDescription\": \"버츄얼,라방,트위치,유튜브\", \"broadcasterProfileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/d156ff24-5b64-4ffa-83a8-1ecf0d1e71d2-profile_image-150x150.png\"}', '[{\"videoUrl\": \"4Bkuhi7i7Mk\", \"liveShoppingId\": null, \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/2067380c-6c8f-4a4d-9f68-65c13572a59b-profile_image-70x70.png\", \"liveShoppingTitle\": \"해피쵸이어\", \"liveShoppingDescription\": \"쵸단 x 귀빈정\", \"broadcasterProfileImageUrl\": \"\"}, {\"videoUrl\": \"3TLj00xYR-k\", \"liveShoppingId\": null, \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/45570b84-1206-4c6a-8d6c-d7700204b7b3-profile_image-150x150.png\", \"liveShoppingTitle\": \"메리크크쇼마스\", \"liveShoppingDescription\": \"나는야꼬등어 x 동래아들\", \"broadcasterProfileImageUrl\": \"\"}, {\"videoUrl\": \"TutKdpA-JRw\", \"liveShoppingId\": null, \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/ec949373-7065-423c-afad-08f9504c8034-profile_image-150x150.png\", \"liveShoppingTitle\": \"신맛의 오늘의 맛 \", \"liveShoppingDescription\": \"연나비 X 홍봉자굴림치즈만두\", \"broadcasterProfileImageUrl\": \"\"}, {\"videoUrl\": \"ISVt_Bu61vU\", \"liveShoppingId\": null, \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/24d7c181-ca61-4297-a276-ccc80a923b47-profile_image-150x150.png\", \"liveShoppingTitle\": \"토여니의 토요일은 즐거워!\", \"liveShoppingDescription\": \"유은 X 먹고집\", \"broadcasterProfileImageUrl\": \"\"}]', '[{\"nickname\": \"쵸단\", \"broadcasterId\": null, \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/2067380c-6c8f-4a4d-9f68-65c13572a59b-profile_image-150x150.png\", \"promotionPageLinkUrl\": \"https://k-kmarket.com/goods/catalog?code=00160001\"}, {\"nickname\": \"민결희\", \"broadcasterId\": null, \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/d156ff24-5b64-4ffa-83a8-1ecf0d1e71d2-profile_image-150x150.png\", \"promotionPageLinkUrl\": \"https://k-kmarket.com/goods/catalog?code=00160003\"}, {\"nickname\": \"나무늘봉순\", \"broadcasterId\": null, \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/5f179460-761b-404e-afc6-9ec9ea26df1a-profile_image-150x150.png\", \"promotionPageLinkUrl\": \"https://k-kmarket.com/goods/catalog?code=00160002\"}, {\"nickname\": \"신맛\", \"broadcasterId\": null, \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/f0c609d9-1a37-4896-9024-230488a283fe-profile_image-150x150.png\", \"promotionPageLinkUrl\": \"\"}, {\"nickname\": \"유은\", \"broadcasterId\": null, \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/24d7c181-ca61-4297-a276-ccc80a923b47-profile_image-150x150.png\", \"promotionPageLinkUrl\": \"\"}, {\"nickname\": \"수련수련\", \"broadcasterId\": null, \"profileImageUrl\": \"https://static-cdn.jtvnw.net/jtv_user_pictures/a27144c9-0c62-46e4-a7a8-9b51b394567a-profile_image-150x150.png\", \"promotionPageLinkUrl\": \"\"}]');
+
+-- DropForeignKey
+ALTER TABLE `InactiveSellerBusinessRegistration` DROP FOREIGN KEY `InactiveSellerBusinessRegistration_sellerEmail_sellerId_fkey`;
+
+-- DropForeignKey
+ALTER TABLE `InactiveSellerSettlementAccount` DROP FOREIGN KEY `InactiveSellerSettlementAccount_sellerEmail_sellerId_fkey`;
+
+-- AddForeignKey
+ALTER TABLE `InactiveSellerBusinessRegistration` ADD CONSTRAINT `InactiveSellerBusinessRegistration_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `InactiveSeller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InactiveSellerSettlementAccount` ADD CONSTRAINT `InactiveSellerSettlementAccount_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `InactiveSeller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+/*
+  Warnings:
+
+  - You are about to drop the column `sellerEmail` on the `InactiveSellerBusinessRegistration` table. All the data in the column will be lost.
+  - You are about to drop the column `sellerEmail` on the `InactiveSellerSettlementAccount` table. All the data in the column will be lost.
+  - You are about to drop the column `sellerEmail` on the `SellerBusinessRegistration` table. All the data in the column will be lost.
+  - You are about to drop the column `sellerEmail` on the `SellerSettlementAccount` table. All the data in the column will be lost.
+  - You are about to drop the column `sellerEmail` on the `SellerSettlements` table. All the data in the column will be lost.
+
+*/
+-- DropIndex
+DROP INDEX `BusinessRegistrationIndex` ON `InactiveSellerBusinessRegistration`;
+
+-- DropIndex
+DROP INDEX `InactiveSellerBusinessRegistration_sellerEmail_sellerId_fkey` ON `InactiveSellerBusinessRegistration`;
+
+-- DropIndex
+DROP INDEX `InactiveSellerSettlementAccount_sellerEmail_sellerId_fkey` ON `InactiveSellerSettlementAccount`;
+
+-- DropIndex
+DROP INDEX `SellerSettlementAccountIndex` ON `InactiveSellerSettlementAccount`;
+
+-- DropIndex
+DROP INDEX `BusinessRegistrationIndex` ON `SellerBusinessRegistration`;
+
+-- DropIndex
+DROP INDEX `SellerSettlementAccountIndex` ON `SellerSettlementAccount`;
+
+-- DropIndex
+DROP INDEX `SellerSettlementsIndex` ON `SellerSettlements`;
+
+-- AlterTable
+ALTER TABLE `InactiveSellerBusinessRegistration` DROP COLUMN `sellerEmail`;
+
+-- AlterTable
+ALTER TABLE `InactiveSellerSettlementAccount` DROP COLUMN `sellerEmail`;
+
+-- AlterTable
+ALTER TABLE `SellerBusinessRegistration` DROP COLUMN `sellerEmail`;
+
+-- AlterTable
+ALTER TABLE `SellerSettlementAccount` DROP COLUMN `sellerEmail`;
+
+-- AlterTable
+ALTER TABLE `SellerSettlements` DROP COLUMN `sellerEmail`;
+
+-- CreateIndex
+CREATE INDEX `BusinessRegistrationIndex` ON `InactiveSellerBusinessRegistration`(`id`);
+
+-- CreateIndex
+CREATE INDEX `SellerSettlementAccountIndex` ON `InactiveSellerSettlementAccount`(`id`);
+
+-- CreateIndex
+CREATE INDEX `BusinessRegistrationIndex` ON `SellerBusinessRegistration`(`id`);
+
+-- CreateIndex
+CREATE INDEX `SellerSettlementAccountIndex` ON `SellerSettlementAccount`(`id`);
+
+-- CreateIndex
+CREATE INDEX `SellerSettlementsIndex` ON `SellerSettlements`(`id`);
