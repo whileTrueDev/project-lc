@@ -73,9 +73,9 @@ function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Elemen
 
       <Box
         borderRadius="xl"
-        bgColor="white"
         h={{ base: 300, md: 400 }}
         p={1}
+        bgColor="white"
         filter={isActive ? 'none' : 'brightness(50%)'}
         boxShadow={isActive ? '2x' : 'none'}
         transitionDuration="0.5s"
