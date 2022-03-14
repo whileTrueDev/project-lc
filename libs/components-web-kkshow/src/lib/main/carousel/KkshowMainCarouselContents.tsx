@@ -25,7 +25,7 @@ export function KkshowMainCarouselContents({
     return (
       <KkshowMainCarouselContentsContainer>
         <AspectRatio ratio={1} maxH="100%">
-          <LinkBox>
+          <LinkBox rounded="xl">
             <Link href={item.productLinkUrl} passHref>
               <LinkOverlay isExternal={item.productLinkUrl.includes('http')}>
                 <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />
@@ -40,7 +40,7 @@ export function KkshowMainCarouselContents({
     return (
       <KkshowMainCarouselContentsContainer>
         <AspectRatio ratio={1} maxH="100%">
-          <LinkBox>
+          <LinkBox rounded="xl">
             <Link href={item.linkUrl || '#'} passHref>
               <LinkOverlay isExternal={!!(item.linkUrl && item.linkUrl.includes('http'))}>
                 <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />

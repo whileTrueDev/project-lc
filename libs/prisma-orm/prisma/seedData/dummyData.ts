@@ -42,6 +42,7 @@ export const COMMON_DUMMY_PASSWORD =
 export const testadminData: Prisma.AdministratorCreateInput = {
   email: TEST_ADMIN_EMAIL,
   password: COMMON_DUMMY_PASSWORD,
+  adminClass: 'super',
 };
 
 /** 테스트판매자 생성 데이터 */

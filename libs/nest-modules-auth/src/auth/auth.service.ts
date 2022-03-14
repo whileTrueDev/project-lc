@@ -159,6 +159,7 @@ export class AuthService {
       ..._user,
       type,
       hasPassword,
+      adminClass: type === 'admin' ? (_user as Administrator).adminClass : null,
     };
   }
 }

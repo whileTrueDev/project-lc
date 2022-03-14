@@ -1,6 +1,7 @@
 import * as Joi from 'joi';
 
 export const passwordPattern = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%^*+=-]).{8,20}$/;
+export const adminPasswordPattern = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%^*+=-]).{10,20}$/;
 
 export const emailRegisterOptions = {
   required: '이메일을 작성해주세요.',
@@ -24,6 +25,16 @@ export const passwordRegisterOptions = {
   maxLength: { value: 20, message: '비밀번호는 20자 이하여야 합니다.' },
   pattern: {
     value: passwordPattern,
+    message: '형식이 올바르지 않습니다.',
+  },
+};
+
+export const adminPasswordRegisterOptions = {
+  required: '암호를 작성해주세요.',
+  minLength: { value: 8, message: '비밀번호는 10자 이상이어야 합니다.' },
+  maxLength: { value: 20, message: '비밀번호는 20자 이하여야 합니다.' },
+  pattern: {
+    value: adminPasswordPattern,
     message: '형식이 올바르지 않습니다.',
   },
 };

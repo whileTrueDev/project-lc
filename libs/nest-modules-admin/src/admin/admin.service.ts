@@ -3,7 +3,11 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { GoodsConfirmation } from '@prisma/client';
+import {
+  Administrator,
+  GoodsConfirmation,
+  AdminClassChangeHistory,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminSettlementInfoType,
@@ -12,6 +16,7 @@ import {
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingDTO,
+  AdminClassDto,
   LiveShoppingImageDto,
   LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
@@ -419,5 +424,47 @@ export class AdminService {
     if (duplicateFmGoodsSeqProductPromotion) return true;
 
     return false;
+  }
+
+  public async getAdminUserList(): Promise<AdminClassDto[]> {
+    return this.prisma.administrator.findMany({
+      select: {
+        id: true,
+        email: true,
+        adminClass: true,
+      },
+    });
+  }
+
+  public async updateAdminClass(dto: AdminClassDto): Promise<Administrator> {
+    return this.prisma.administrator.update({
+      where: {
+        email: dto.email,
+      },
+      data: {
+        adminClass: dto.adminClass,
+      },
+    });
+  }
+
+  public async deleteAdminUser(id: number): Promise<boolean> {
+    const doDelete = await this.prisma.administrator.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+    if (doDelete) return true;
+    return false;
+  }
+
+  public async createAdminClassChangeHistory(dto): Promise<AdminClassChangeHistory> {
+    return this.prisma.adminClassChangeHistory.create({
+      data: {
+        adminEmail: dto.adminEmail,
+        targetEmail: dto.targetEmail,
+        originalAdminClass: dto.originalAdminClass,
+        newAdminClass: dto.newAdminClass,
+      },
+    });
   }
 }

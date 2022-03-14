@@ -17,7 +17,7 @@ import {
 import {
   AdminSignUpDto,
   emailRegisterOptions,
-  passwordRegisterOptions,
+  adminPasswordRegisterOptions,
 } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
@@ -98,14 +98,14 @@ export function AdminSignUp(): JSX.Element {
               color={useColorModeValue('gray.500', 'gray.400')}
               as="span"
             >
-              (문자,숫자,특수문자 포함 8자 이상)
+              (문자,숫자,특수문자 포함 10자 이상)
             </Text>
           </FormLabel>
           <Input
             id="password"
             type="password"
             placeholder="********"
-            {...register('password', { ...passwordRegisterOptions })}
+            {...register('password', { ...adminPasswordRegisterOptions })}
           />
           <FormErrorMessage>
             {errors.password && errors.password.message}

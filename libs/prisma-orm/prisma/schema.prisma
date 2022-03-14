@@ -804,10 +804,17 @@ model UserNotification {
 
 // 관리자 계정
 model Administrator {
-  id           Int     @id @default(autoincrement())
-  email        String  @unique
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
   password     String
-  inactiveFlag Boolean @default(false)
+  inactiveFlag Boolean   @default(false)
+  adminClass   AdminType @default(normal)
+}
+
+enum AdminType {
+  super // 슈퍼계정
+  full // 개인정보 접근가능 계정
+  normal // 일반계정
 }
 
 // 문의하기 주체
@@ -1034,6 +1041,38 @@ model Policy {
   version         String // 버전
   publicFlag      Boolean        @default(false) // 공개여부
   content         String         @db.LongText // 내용
+}
+
+// 개인정보접근기록
+model PrivacyApproachHistory {
+  id         Int                              @id @default(autoincrement())
+  adminEmail String // 접근한 관리자 이메일
+  ip         String // 접근한 ip주소
+  infoType   PrivacyApproachHistoryInfoType
+  actionType PrivacyApproachHistoryActionType
+  createDate DateTime                         @default(now())
+}
+
+enum PrivacyApproachHistoryInfoType {
+  broadcasterSettlementAccount // 방송인 계좌
+  broadcasterIdCard // 방송인 주민등록증
+  sellerSettlementAccount // 판매자 계좌
+  sellerBusinessRegistration // 판매자 사업자 등록증
+  sellerMailOrderCertificate // 판매자 통신판매신고증
+}
+
+enum PrivacyApproachHistoryActionType {
+  download // 다운로드
+  view // 조회
+}
+
+model AdminClassChangeHistory {
+  id                 Int       @id @default(autoincrement())
+  adminEmail         String // 접근한 관리자 이메일
+  targetEmail        String // 대상 메일 
+  originalAdminClass AdminType
+  newAdminClass      AdminType
+  createDate         DateTime  @default(now())
 }
 
 // 크크쇼 메인페이지 데이터

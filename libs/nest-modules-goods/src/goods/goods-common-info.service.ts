@@ -7,13 +7,10 @@ import {
 import { GoodsInfo } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { GoodsInfoDto } from '@project-lc/shared-types';
-import {
-  getImgSrcListFromHtmlStringList,
-  getS3KeyListFromImgSrcList,
-  S3Service,
-} from '@project-lc/nest-modules-s3';
+import { S3Service } from '@project-lc/nest-modules-s3';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
+import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
 
 @Injectable()
 export class GoodsCommonInfoService extends ServiceBaseWithCache {
@@ -107,7 +104,7 @@ export class GoodsCommonInfoService extends ServiceBaseWithCache {
       const imgSrcList: string[] = getImgSrcListFromHtmlStringList(contentList);
 
       // img src에서 s3에 저장된 이미지만 찾기
-      const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
+      const s3ImageKeys = this.s3service.getGoodsImageS3KeyListFromImgSrcList(imgSrcList);
 
       // s3저장된 이미지 있는경우
       if (s3ImageKeys.length > 0) {
