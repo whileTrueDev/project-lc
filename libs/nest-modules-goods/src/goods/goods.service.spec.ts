@@ -110,14 +110,8 @@ describe('GoodsService', () => {
   describe('changeGoodsView', () => {
     it('goods_view should be notLook', async () => {
       await service.changeGoodsView(TEST_GOODS.id, GoodsView.notLook);
-      const goodsListData = await service.getGoodsList({
-        email: TEST_USER_EMAIL,
-        page: 0,
-        itemPerPage: 10,
-        sort: SellerGoodsSortColumn.REGIST_DATE,
-        direction: SellerGoodsSortDirection.DESC,
-      });
-      expect(goodsListData.items[0].goods_view).toBe(GoodsView.notLook);
+      const testGoods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_EMAIL);
+      expect(testGoods.goods_view).toBe(GoodsView.notLook);
     });
   });
   describe('getOneGoods', () => {
