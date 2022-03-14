@@ -112,7 +112,11 @@ export class AppMessageGateway
 
   @SubscribeMessage('get objective message from admin')
   getObjectiveMessage(
-    @MessageBody() data: { roomName: string; objective: number },
+    @MessageBody()
+    data: {
+      roomName: string;
+      objective: { nickname: string; price: number };
+    },
   ): void {
     const { roomName } = data;
     this.server.to(roomName).emit('get objective message', data);

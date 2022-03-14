@@ -106,6 +106,36 @@ export class OverlayService {
     return false;
   }
 
+  async streamObjectiveNotification(text: string): Promise<string | false | Uint8Array> {
+    const client = new textToSpeech.TextToSpeechClient(this.options);
+
+    const message = `
+    <speak>
+      ${text}
+    </speak>
+    `;
+
+    const audioConfig: AudioEncoding = { speakingRate: 1.1, audioEncoding: 'MP3' };
+    const voice: Voice = {
+      languageCode: 'ko-KR',
+      name: 'ko-KR-Wavenet-D',
+      ssmlGender: 'MALE',
+    };
+
+    const params = {
+      input: { ssml: message },
+      voice, // ssmlGender: 'NEUTRAL'
+      audioConfig,
+    };
+
+    const [response] = await client.synthesizeSpeech(params);
+
+    if (response && response.audioContent) {
+      return response.audioContent;
+    }
+    return false;
+  }
+
   async getRanking(overlayUrl): Promise<NicknameAndPrice[]> {
     const topRanks = await this.prisma.liveShoppingPurchaseMessage.groupBy({
       by: ['nickname'],

@@ -325,8 +325,12 @@ $(document).ready(function ready() {
   });
 
   $('#objective-button').click(function objectiveButtonClickEvent() {
-    const objective = $('#objective-message').val();
-    socket.emit('get objective message from admin', { roomName, objective });
+    const nickname = $('#objective-nickname').val();
+    const price = $('#objective-price').val();
+    socket.emit('get objective message from admin', {
+      roomName,
+      objective: { nickname, price },
+    });
     $('#objective-message').val(null);
   });
 

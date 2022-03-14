@@ -33,6 +33,11 @@
   src: url('/fonts/GmarketSansTTFBold.ttf');
 }
 
+@font-face {
+  font-family: 'Nyuseusokbo';
+  src: url('/fonts/THE_Nyuseusokbo');
+}
+
 body {
   width: 100%;
   height: 100%;
@@ -53,7 +58,7 @@ body {
 }
 
 .live-commerce {
-  display: none;
+  /* display: none; */
   left: 0px;
   bottom: 0px;
   width: 1920px;
@@ -661,4 +666,28 @@ div.bottom-fever-timer {
 
 .nsl-quantity {
   color: black;
+}
+
+.news-banner {
+  display: none;
+  position: absolute;
+  bottom: 90;
+  right: 0;
+  width: 1500px;
+  height: 200px;
+}
+
+#new-banner-image {
+  width: inherit;
+  height: inherit;
+}
+
+.news-banner p {
+  position: absolute;
+  bottom: 0;
+  left: 90;
+  font-family: 'Nyuseusokbo';
+  font-size: xxx-large;
+  font-weight: 900;
+  color: white;
 }

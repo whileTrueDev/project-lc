@@ -393,28 +393,48 @@ socket.on('get non client purchase message', async (data) => {
   topMessages.push({ messageHtml });
 });
 
+// socket.on('get objective message', async (data) => {
+//   const price = data.objective;
+
+//   const objectiveHtml = `
+//   <div class="objective-inner-wrapper">
+//     <iframe src="/audio/mid.mp3"
+//     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+//     <div class="objective-message">
+//       <span class="objective-text">판매금액</span>
+//       <span class="objective-value">${price
+//         .toString()
+//         .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
+//       <span class="objective-text">원 돌파!!!</span>
+//     </div>
+//   </div>
+//   `;
+
+//   $('.objective-wrapper').html(objectiveHtml);
+//   $('.objective-wrapper').slideToggle();
+
+//   await setTimeout(() => {
+//     $('.objective-wrapper').slideToggle();
+//   }, 5000);
+// });
+
 socket.on('get objective message', async (data) => {
-  const price = data.objective;
+  const { nickname } = data.objective;
+  const { price } = data.objective;
 
-  const objectiveHtml = `
-  <div class="objective-inner-wrapper">
-    <iframe src="/audio/mid.mp3"
-    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
-    <div class="objective-message">
-      <span class="objective-text">판매금액</span>
-      <span class="objective-value">${price
-        .toString()
-        .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
-      <span class="objective-text">원 돌파!!!</span>
-    </div>
-  </div>
-  `;
+  $('.news-banner').slideToggle();
+  $('.news-banner p').html(
+    `<span>${nickname}</span> 
+    <span>님의 구매로 </span> 
+    <span>${price}</span>
+    <span>원 돌파!</span>`,
+  );
 
-  $('.objective-wrapper').html(objectiveHtml);
-  $('.objective-wrapper').slideToggle();
+  socket.emit('send objective notification signal', data);
 
   await setTimeout(() => {
-    $('.objective-wrapper').slideToggle();
+    $('.news-banner p').empty();
+    $('.news-banner').slideToggle();
   }, 5000);
 });
 
@@ -532,6 +552,17 @@ socket.on('get start time from server', (startSetting) => {
 });
 
 socket.once('get stream start notification tts', (audioBuffer) => {
+  if (audioBuffer) {
+    const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
+    const streamStartNotificationAudioBlob = window.URL.createObjectURL(blob);
+    const sound = new Audio(streamStartNotificationAudioBlob);
+    setTimeout(() => {
+      sound.play();
+    }, 1000);
+  }
+});
+
+socket.on('get objective notification tts', (audioBuffer) => {
   if (audioBuffer) {
     const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
     const streamStartNotificationAudioBlob = window.URL.createObjectURL(blob);

@@ -154,6 +154,22 @@ export class AppScreenGateway
     this.server.to(roomName).emit('clear full video from server');
   }
 
+  @SubscribeMessage('send objective notification signal')
+  async sendObjectiveNotificationSignal(
+    @MessageBody()
+    data: {
+      roomName: string;
+      objective: {
+        nickname: string;
+        price: number;
+      };
+    },
+  ): Promise<void> {
+    const text = `${data.objective.nickname}님의 구매로 ${data.objective.price}원 돌파했습니다`;
+    const audioBuffer = await this.overlayService.streamObjectiveNotification(text);
+    this.server.to(data.roomName).emit('get objective notification tts', audioBuffer);
+  }
+
   @SubscribeMessage('send notification signal')
   async sendNotificationSignal(
     @MessageBody()
