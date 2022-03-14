@@ -1,7 +1,7 @@
 import {
   AdminAllLcGoodsList,
-  GoodsListDto,
-  GoodsListRes,
+  AdminGoodsListRes,
+  GoodsListDto
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
@@ -10,11 +10,13 @@ import axios from '../../axios';
 /** 검수가 필요한 상품목록 조회 */
 type SellerGoodsListRequestDto = GoodsListDto & { email?: string };
 
+
+
 export const getAdminGoodsList = async (
   dto: Pick<GoodsListDto, 'sort' | 'direction'>,
-): Promise<GoodsListRes> => {
+): Promise<AdminGoodsListRes> => {
   return axios
-    .get<GoodsListRes>('/admin/goods', {
+    .get<AdminGoodsListRes>('/admin/goods', {
       params: {
         ...dto,
       },
@@ -24,11 +26,11 @@ export const getAdminGoodsList = async (
 
 export const useAdminGoodsList = (
   dto: Pick<SellerGoodsListRequestDto, 'sort' | 'direction'>,
-  options?: UseQueryOptions<GoodsListRes, AxiosError>,
-): UseQueryResult<GoodsListRes, AxiosError> => {
+  options?: UseQueryOptions<AdminGoodsListRes, AxiosError>,
+): UseQueryResult<AdminGoodsListRes, AxiosError> => {
   const { sort, direction } = dto;
   const queryKey = ['AdminGoodsList', dto];
-  return useQuery<GoodsListRes, AxiosError>(
+  return useQuery<AdminGoodsListRes, AxiosError>(
     queryKey,
     () => getAdminGoodsList({ sort, direction }),
     {
