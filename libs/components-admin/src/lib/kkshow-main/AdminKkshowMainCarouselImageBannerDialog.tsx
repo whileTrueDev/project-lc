@@ -25,10 +25,18 @@ export type ImageBannerDialogProps = ImageInputDialogProps;
 
 type cropType = 'default' | 'recommend';
 // 크롭영역
+// aspect(비율) 값이 있으면 비율 고정
+// unit : px 인경우 wight: 100 = 100px 로 계산, % 인 경우  width : 100 => 100%로 계산됨
 const CROP: Record<cropType, Partial<Crop>> = {
-  default: { unit: '%' as const, width: 100, height: 56 }, // 기본값
+  default: { unit: '%' as const, width: 100, height: 56 }, // 기본값 -> 관리자에서 캐러셀 이미지 16/9 비율로만 입력할 수 있도록 고정하기 위해 지금은 사용안함
   recommend: { aspect: 16 / 9, unit: '%' as const, width: 100 }, // 권장값
 };
+
+const RECOMMEND_IMAGE_SIZE = {
+  width: 720,
+  height: 400
+}
+
 /** 크크쇼 메인 캐러셀에 표시될 단일 이미지 등록 컴포넌트
  * 이미지 크롭기능
  */
@@ -40,8 +48,6 @@ export function AdminKkshowMainCarouselImageBannerDialog(
   const [imagePreview, setImagePreview] = useState<ImageInputFileReadData | null>(null);
 
   // 이미지 크롭 영역 state
-  // aspect(비율) 값이 있으면 비율 고정
-  // unit : px 인경우 wight: 100 = 100px 로 계산, % 인 경우  width : 100 => 100%로 계산됨
   const [crop, setCrop] = useState<Partial<Crop>>(CROP.recommend);
 
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -68,18 +74,6 @@ export function AdminKkshowMainCarouselImageBannerDialog(
     console.log(error);
   };
 
-  // 크롭영역 비율 고정-자율 토글 핸들러
-  const toggleAspect = (): void => {
-    const { aspect, ...currentCrop } = crop;
-
-    // aspect 값이 존재하면 aspect 삭제
-    // aspect 값이 없으면 aspect 추가
-    if (aspect) {
-      setCrop({ ...currentCrop });
-    } else {
-      setCrop(CROP.recommend);
-    }
-  };
 
   // 크롭영역 선택 핸들러 -> 크롭된 이미지 state에 저장
   const onCropComplete = (_crop: Crop): void => {
@@ -117,15 +111,9 @@ export function AdminKkshowMainCarouselImageBannerDialog(
   const handleClose = (): void => {
     setCroppedBlob(null);
     setImagePreview(null);
-    setCrop(CROP.default);
+    setCrop(CROP.recommend);
     onClose();
   };
-
-  const ratio = useMemo(() => {
-    if (crop.aspect) return crop.aspect.toFixed(2);
-    if (crop.width && crop.height) return (crop.width / crop.height).toFixed(2);
-    return null;
-  }, [crop.aspect, crop.width, crop.height]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="6xl">
@@ -137,10 +125,10 @@ export function AdminKkshowMainCarouselImageBannerDialog(
         <ModalBody>
           <Stack>
             <Text color="blue.500" fontWeight="bold">
-              권장 사이즈나 권장 비율을 벗어나면 이미지가 잘리거나 작게 표시됩니다!
+              권장 사이즈를 벗어나면 이미지가 잘리거나 작게 표시됩니다!
             </Text>
             <Text color="blue.500" fontWeight="bold">
-              권장 사이즈: 가로 720px, 세로 300px, 가로/세로 비율: 1.78
+              권장 사이즈: 가로 {RECOMMEND_IMAGE_SIZE.width}px, 세로 {RECOMMEND_IMAGE_SIZE.height}px 
             </Text>
             <ImageInput
               {...restProps}
@@ -154,7 +142,7 @@ export function AdminKkshowMainCarouselImageBannerDialog(
                     <Text>선택 영역 이미지 크기</Text>
                     <Text fontWeight="bold">
                       가로 : {crop.width?.toFixed(2)}px, 세로 : {crop.height?.toFixed(2)}
-                      px, 가로/세로 비율: {ratio}
+                      px
                     </Text>
                   </Box>
                 )}
@@ -162,17 +150,6 @@ export function AdminKkshowMainCarouselImageBannerDialog(
                 <Stack direction="row">
                   <Text>
                     이미지를 드래그하여 배너 이미지로 사용할 영역을 선택해주세요
-                  </Text>
-                  <Box>
-                    <Button
-                      onClick={toggleAspect}
-                      colorScheme={crop.aspect ? undefined : 'blue'}
-                    >
-                      권장비율 {crop.aspect ? '해제' : '고정'}
-                    </Button>
-                  </Box>
-                  <Text>
-                    {crop.aspect ? '자유롭게 영역 선택 가능' : '선택영역 비율 고정'}
                   </Text>
                 </Stack>
 
