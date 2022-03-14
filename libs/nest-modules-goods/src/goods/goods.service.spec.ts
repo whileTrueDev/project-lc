@@ -12,10 +12,10 @@ import {
 import { nanoid } from 'nanoid';
 import { GoodsService } from './goods.service';
 
+const TEST_USER_EMAIL = `${nanoid(2)}test@test.com`;
 describe('GoodsService', () => {
   let __prisma: PrismaClient;
   let service: GoodsService;
-  const TEST_USER_EMAIL = `${nanoid(2)}test@test.com`;
   const TEST_CONFIRMATION_GOODS_CONNECTION_ID = 999;
   let TEST_GOODS: Goods;
   beforeAll(async () => {
