@@ -37,7 +37,7 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
     const timestamp = new Date().getTime();
     const imageType: LiveShoppingImageType = 'trailer';
     // liveshoppingId 가 없는경우 해당값은 null로 들어감
-    const s3KeyType = `live-shopping-images/${liveShoppingId}/${imageType}`;
+    const s3KeyType = `live-shopping-images/${liveShoppingId ? liveShoppingId : null}/${imageType}`;
     const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
 
     const { objectUrl } = await s3.sendPutObjectCommand({
