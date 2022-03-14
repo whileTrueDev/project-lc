@@ -9,13 +9,12 @@ import {
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
-import { nanoid } from 'nanoid';
 import { GoodsService } from './goods.service';
 
 describe('GoodsService', () => {
   let __prisma: PrismaClient;
   let service: GoodsService;
-  const TEST_USER_EMAIL = `${nanoid(2)}test@test.com`;
+  const TEST_USER_ID = 3;
   const TEST_CONFIRMATION_GOODS_CONNECTION_ID = 999;
   let TEST_GOODS: Goods;
   beforeAll(async () => {
@@ -36,7 +35,7 @@ describe('GoodsService', () => {
     // 테스트용 더미 판매자(seller) 생성
     await __prisma.seller.create({
       data: {
-        email: TEST_USER_EMAIL,
+        id: TEST_USER_ID,
         name: 'test',
         password: 'test',
       },
@@ -46,7 +45,7 @@ describe('GoodsService', () => {
       data: {
         seller: {
           connect: {
-            email: TEST_USER_EMAIL,
+            id: TEST_USER_ID,
           },
         },
         image: {
@@ -77,7 +76,7 @@ describe('GoodsService', () => {
     });
   });
   afterAll(async () => {
-    await __prisma.seller.delete({ where: { email: TEST_USER_EMAIL } });
+    await __prisma.seller.delete({ where: { id: TEST_USER_ID } });
     await __prisma.$disconnect();
   });
   it('should be defined', () => {
@@ -85,19 +84,19 @@ describe('GoodsService', () => {
   });
   describe('findMyGoodsIds', () => {
     it('should return empty array', async () => {
-      const goodsIds = await service.findMyGoodsIds('UNKOWN_EMAIL@asdf.com');
+      const goodsIds = await service.findMyGoodsIds(5);
       expect(goodsIds.length).toBe(0);
       expect(goodsIds).toEqual([]);
     });
     it('should return array of goods ids (numbers)', async () => {
-      const goodsIds = await service.findMyGoodsIds(TEST_USER_EMAIL);
+      const goodsIds = await service.findMyGoodsIds(TEST_USER_ID);
       expect(goodsIds).toEqual([TEST_CONFIRMATION_GOODS_CONNECTION_ID]);
     });
   });
   describe('getGoodsList', () => {
     it('should have 1 item and totalItemCount : 1', async () => {
       const goodsListData = await service.getGoodsList({
-        email: TEST_USER_EMAIL,
+        sellerId: TEST_USER_ID,
         page: 0,
         itemPerPage: 10,
         sort: SellerGoodsSortColumn.REGIST_DATE,
@@ -111,7 +110,7 @@ describe('GoodsService', () => {
     it('goods_view should be notLook', async () => {
       await service.changeGoodsView(TEST_GOODS.id, GoodsView.notLook);
       const goodsListData = await service.getGoodsList({
-        email: TEST_USER_EMAIL,
+        sellerId: TEST_USER_ID,
         page: 0,
         itemPerPage: 10,
         sort: SellerGoodsSortColumn.REGIST_DATE,
@@ -122,7 +121,7 @@ describe('GoodsService', () => {
   });
   describe('getOneGoods', () => {
     it('should return goods', async () => {
-      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_EMAIL);
+      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_ID);
       expect(goods).toBeDefined();
       expect(goods.confirmation).toBeDefined();
       expect(goods.confirmation.goodsId).toBe(TEST_GOODS.id);
@@ -141,8 +140,8 @@ describe('GoodsService', () => {
       jest
         .spyOn(service, 'deleteGoodsContentImagesFromS3')
         .mockImplementation(returnDeleteObjectsCommandOutput);
-      await service.deleteLcGoods({ email: TEST_USER_EMAIL, ids: [TEST_GOODS.id] });
-      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_EMAIL);
+      await service.deleteLcGoods({ sellerId: TEST_USER_ID, ids: [TEST_GOODS.id] });
+      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_ID);
       expect(goods).toBeNull();
     });
   });

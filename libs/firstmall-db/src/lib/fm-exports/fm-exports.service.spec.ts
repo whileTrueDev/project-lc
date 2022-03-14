@@ -258,7 +258,7 @@ describe('FmExportsService', () => {
   describe('createOrderExportLogQuery', () => {
     it('return sql and sqlParams', () => {
       const params: Parameters<typeof service['createOrderExportLogQuery']>[0] = {
-        actor: 'test@test.com',
+        actor: 3,
         exportCode: 'D12345',
         orderSeq: 1,
         registDate: new Date(),

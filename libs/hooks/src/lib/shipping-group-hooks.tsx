@@ -150,5 +150,5 @@ export const useSellerShippingGroupList = (): UseQueryResult<
   AxiosError<any>
 > => {
   const { data: ProfileData } = useProfile();
-  return useShippingGroupList(ProfileData?.email || '', !!ProfileData);
+  return useShippingGroupList(ProfileData?.id || 0, !!ProfileData);
 };

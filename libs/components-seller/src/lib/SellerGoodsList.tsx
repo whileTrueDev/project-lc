@@ -328,7 +328,7 @@ export function SellerGoodsList(): JSX.Element {
       sort,
       direction,
       groupId,
-      email: profileData?.email || '',
+      sellerId: profileData?.id || 0,
     },
     {
       enabled: !!profileData?.email,
