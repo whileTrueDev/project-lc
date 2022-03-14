@@ -21,10 +21,10 @@ export class SellerSettlementHistoryController {
   // 본인의 정산 대상 목록 조회
   @Get()
   public async findSettlementHistory(
-    @SellerInfo() sellerInfo: UserPayload,
+    @SellerInfo() seller: UserPayload,
     @Query(ValidationPipe) dto: FindSettlementHistoryDto,
   ): Promise<SellerSettlements[]> {
-    return this.sellerSettlementService.findSettlementHistory(sellerInfo.id, {
+    return this.sellerSettlementService.findSettlementHistory(seller.id, {
       round: dto.round,
     });
   }
@@ -32,29 +32,29 @@ export class SellerSettlementHistoryController {
   // 본인의 정산 대상 년도 목록 조회
   @Get('years')
   public async findSettlementHistoryYears(
-    @SellerInfo() sellerInfo: UserPayload,
+    @SellerInfo() seller: UserPayload,
   ): Promise<string[]> {
-    return this.sellerSettlementService.findSettlementHistoryYears(sellerInfo.sub);
+    return this.sellerSettlementService.findSettlementHistoryYears(seller.id);
   }
 
   // 본인의 정산 대상 월 목록 조회
   @Get('months')
   public async findSettlementHistoryMonths(
-    @SellerInfo() sellerInfo: UserPayload,
+    @SellerInfo() seller: UserPayload,
     @Query('year') year: string,
   ): Promise<string[]> {
-    return this.sellerSettlementService.findSettlementHistoryMonths(sellerInfo.sub, year);
+    return this.sellerSettlementService.findSettlementHistoryMonths(seller.id, year);
   }
 
   // 본인의 정산 대상 월 목록 조회
   @Get('rounds')
   public async findSettlementHistoryRounds(
-    @SellerInfo() sellerInfo: UserPayload,
+    @SellerInfo() seller: UserPayload,
     @Query('year') year: string,
     @Query('month') month: string,
   ): Promise<string[]> {
     return this.sellerSettlementService.findSettlementHistoryRounds(
-      sellerInfo.sub,
+      seller.id,
       year,
       month,
     );

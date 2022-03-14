@@ -5,13 +5,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import {
-  Prisma,
-  Seller,
-  InactiveSeller,
-  SellerSocialAccount,
-  InactiveSellerSocialAccount,
-} from '@prisma/client';
+import { Prisma, Seller, InactiveSeller, SellerSocialAccount } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -295,7 +289,7 @@ export class SellerService extends ServiceBaseWithCache {
 
   public async updateAgreementFlag(dto: SellerContractionAgreementDto): Promise<Seller> {
     const seller = await this.prisma.seller.update({
-      where: { email: dto.email },
+      where: { id: dto.id },
       data: {
         agreementFlag: dto.agreementFlag,
       },

@@ -22,6 +22,7 @@ import {
   FindBroadcasterDto,
   BroadcasterWithoutUserNickName,
   SignUpDto,
+  BroadcasterContractionAgreementDto,
 } from '@project-lc/shared-types';
 import { hash, verify } from 'argon2';
 import { S3Service } from '@project-lc/nest-modules-s3';
@@ -309,13 +310,12 @@ export class BroadcasterService extends ServiceBaseWithCache {
 
   /** 이용동의 상태 변경 */
   async changeContractionAgreement(
-    email: string,
-    agreementFlag: boolean,
+    dto: BroadcasterContractionAgreementDto,
   ): Promise<Broadcaster> {
     const broadcaster = await this.prisma.broadcaster.update({
-      where: { email },
+      where: { id: dto.id },
       data: {
-        agreementFlag,
+        agreementFlag: dto.agreementFlag,
       },
     });
     await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
@@ -365,7 +365,7 @@ export class BroadcasterService extends ServiceBaseWithCache {
       });
 
     if (restoreSocialData) {
-      await this.restoreInactiveSocialSeller(restoreSocialData);
+      await this.restoreInactiveSocialBroadcaster(restoreSocialData);
     }
 
     return this.prisma.broadcaster.update({
@@ -395,7 +395,7 @@ export class BroadcasterService extends ServiceBaseWithCache {
     });
   }
 
-  private async restoreInactiveSocialSeller(
+  private async restoreInactiveSocialBroadcaster(
     restoreSocialData: BroadcasterSocialAccount,
   ): Promise<BroadcasterSocialAccount> {
     return this.prisma.broadcasterSocialAccount.create({

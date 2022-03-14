@@ -69,7 +69,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
     dto: BusinessRegistrationDto,
     sellerInfo: UserPayload,
   ): Promise<SellerBusinessRegistration> {
-    const email = sellerInfo.sub;
     const sellerId = sellerInfo.id;
     const sellerBusinessRegistration =
       await this.prisma.sellerBusinessRegistration.create({
@@ -261,9 +260,9 @@ export class SellerSettlementService extends ServiceBaseWithCache {
   async selectSellerSettlementInfo(
     sellerInfo: UserPayload,
   ): Promise<SellerSettlementInfo> {
-    const email = sellerInfo.sub;
+    const sellerId = sellerInfo.id;
     const settlementInfo = await this.prisma.seller.findUnique({
-      where: { email },
+      where: { id: sellerId },
       select: {
         sellerBusinessRegistration: {
           include: { BusinessRegistrationConfirmation: true },
@@ -465,9 +464,11 @@ export class SellerSettlementService extends ServiceBaseWithCache {
   }
 
   /** 정산완료 데이터의 년도 목록 조회 */
-  public async findSettlementHistoryYears(email: UserPayload['sub']): Promise<string[]> {
+  public async findSettlementHistoryYears(
+    sellerId: UserPayload['id'],
+  ): Promise<string[]> {
     const result: { year: string }[] = await this.prisma.$queryRaw`
-    SELECT YEAR(round) AS year FROM SellerSettlements WHERE sellerEmail = ${email} GROUP BY YEAR(round)
+    SELECT YEAR(round) AS year FROM SellerSettlements WHERE sellerId = ${sellerId} GROUP BY YEAR(round)
     `;
 
     return result.map((m) => m.year);
@@ -475,12 +476,12 @@ export class SellerSettlementService extends ServiceBaseWithCache {
 
   /** 정산완료 데이터의 월 목록 조회 */
   public async findSettlementHistoryMonths(
-    email: UserPayload['sub'],
+    sellerId: UserPayload['id'],
     year: string,
   ): Promise<string[]> {
     const result: { month: string }[] = await this.prisma.$queryRaw`
     SELECT MONTH(round) AS month FROM SellerSettlements
-    WHERE round LIKE ${`${year}/%`} AND sellerEmail = ${email} GROUP BY MONTH(round)
+    WHERE round LIKE ${`${year}/%`} AND sellerId = ${sellerId} GROUP BY MONTH(round)
     `;
 
     return result.map((m) => m.month);
@@ -488,7 +489,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
 
   /** 정산완료 데이터의 회차 목록 조회 */
   public async findSettlementHistoryRounds(
-    email: UserPayload['sub'],
+    sellerId: UserPayload['id'],
     year: string,
     month: string,
   ): Promise<string[]> {
@@ -496,7 +497,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
       SELECT round FROM SellerSettlements
       WHERE round LIKE ${`${year}/${
         month.length === 1 ? `0${month}` : month
-      }%`} AND sellerEmail = ${email} GROUP BY round
+      }%`} AND sellerId = ${sellerId} GROUP BY round
       `;
 
     return result.map((m) => m.round);

@@ -61,7 +61,7 @@ export class GoodsController {
     @Query('groupId') groupId?: number,
   ): Promise<GoodsListRes> {
     return this.goodsService.getGoodsList({
-      email: seller.sub, // seller.email
+      sellerId: seller.id,
       page,
       itemPerPage,
       sort,
@@ -91,9 +91,9 @@ export class GoodsController {
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: DeleteGoodsDto,
   ): Promise<boolean> {
-    const email = seller.sub;
+    const sellerId = seller.id;
     return this.goodsService.deleteLcGoods({
-      email,
+      sellerId,
       ids: dto.ids,
     });
   }
@@ -104,8 +104,8 @@ export class GoodsController {
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: RegistGoodsDto,
   ): Promise<{ goodsId: number }> {
-    const email = seller.sub;
-    return this.goodsService.registGoods(email, dto);
+    const sellerId = seller.id;
+    return this.goodsService.registGoods(sellerId, dto);
   }
 
   /** 상품 개별 조회 */
@@ -114,7 +114,7 @@ export class GoodsController {
     @SellerInfo() seller: UserPayload,
     @Param('goodsId', ParseIntPipe) goodsId: number,
   ): Promise<GoodsByIdRes> {
-    return this.goodsService.getOneGoods(goodsId, seller.sub);
+    return this.goodsService.getOneGoods(goodsId, seller.id);
   }
 
   /** 상품 수정 */

@@ -34,10 +34,10 @@ export class SellerContactsService extends ServiceBaseWithCache {
   }
 
   /** 판매자 연락처 등록 */
-  async registSellerContacts(sellerEmail, dto): Promise<{ contactId: number }> {
+  async registSellerContacts(sellerId, dto): Promise<{ contactId: number }> {
     const contact = await this.prisma.sellerContacts.create({
       data: {
-        seller: { connect: { email: sellerEmail } },
+        seller: { connect: { id: sellerId } },
         email: dto.email,
         phoneNumber: dto.phoneNumber,
         isDefault: dto.isDefault ? true : undefined,

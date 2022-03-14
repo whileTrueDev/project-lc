@@ -114,7 +114,7 @@ export class FmExportsService {
   /** 단일 주문 출고 처리 진행 */
   public async exportOrder(
     dto: ExportOrderDto,
-    actor: string,
+    actor: number,
     index?: number, // 다중 일괄 출고처리시 중복되지 않는 출고코드 생성을 위한 인덱스값
   ): Promise<{ orderId: string; exportCode: string }> {
     // 출고 코드 생성
@@ -158,7 +158,7 @@ export class FmExportsService {
   }
 
   /** 일괄 출고 처리 진행 */
-  public async exportOrders(dto: ExportOrdersDto, actor: string): Promise<boolean> {
+  public async exportOrders(dto: ExportOrdersDto, actor: number): Promise<boolean> {
     // * 일괄 출고 처리
     const res = await Promise.all(
       dto.exportOrders.map((eo, index) => this.exportOrder(eo, actor, index)),
@@ -169,7 +169,7 @@ export class FmExportsService {
   /** 일괄 합포장 처리 진행 */
   public async exportBundledOrders(
     dto: ExportBundledOrdersDto,
-    actor: string,
+    actor: number,
   ): Promise<boolean> {
     const _exportTargets: ExportOrderDto[] = [];
     dto.exportOrders.forEach((eo) => {
@@ -220,7 +220,7 @@ export class FmExportsService {
   // * ******************************************
   private async createExportOrderQueries(
     orderExportInfo: ExportOrderDto,
-    actor: string,
+    actor: number,
     exportCode: string,
   ): Promise<ExportQueries> {
     const { orderId, deliveryCompanyCode, deliveryNumber, exportOptions, shippingSeq } =
@@ -230,8 +230,8 @@ export class FmExportsService {
     let targetOrderStatus: OrderAndOrderItemOptionExportStatuses = targetStatus;
     // 주문 정보 조회
     const myGoodsIds = await this.projectLcGoodsService.findMyGoodsIds(actor);
-
     const myOrderInfo = await this.fmOrdersService.findOneOrder(orderId, myGoodsIds);
+
     if (!myOrderInfo) return null;
 
     // 주문 배송 묶음의 모든 상품.옵션이 모두 요청에 포함되었는 지 확인
@@ -546,7 +546,7 @@ export class FmExportsService {
   }: {
     orderSeq: string | number;
     exportCode: string;
-    actor: string;
+    actor: number;
     title: string;
     registDate: Date;
   }): DbQueryParams {

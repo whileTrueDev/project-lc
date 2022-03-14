@@ -2,7 +2,8 @@
 import { Button } from '@chakra-ui/react';
 import { s3, s3KeyType } from '@project-lc/utils-s3';
 import { GridRowData } from '@material-ui/data-grid';
-
+import { useAdminPrivacyApproachHistoryMutation } from '@project-lc/hooks';
+import { PrivacyApproachHistoryInfoType } from '@prisma/client';
 /**
  * 버킷의 경로에 따라 이미지를 다운로드하는 버튼 컴포넌트
  * @param props.row datagrid table의 row
@@ -18,18 +19,24 @@ export function AdminImageDownloadButton({
 }): JSX.Element {
   // 해당 링크로 들어가는 버튼
   let fileName = '';
+  let infoType: PrivacyApproachHistoryInfoType;
   let disabled = false;
+  const { mutateAsync } = useAdminPrivacyApproachHistoryMutation();
+
   switch (type) {
     case 'business-registration': {
       fileName = row.businessRegistrationImageName;
+      infoType = 'sellerBusinessRegistration';
       break;
     }
     case 'settlement-account': {
       fileName = row.settlementAccountImageName;
+      infoType = 'sellerSettlementAccount';
       break;
     }
     case 'mail-order': {
       fileName = row.mailOrderSalesImageName;
+      infoType = 'sellerMailOrderCertificate';
       if (!row?.mailOrderSalesImageName) {
         disabled = true;
       }
@@ -38,11 +45,13 @@ export function AdminImageDownloadButton({
     case 'broadcaster-id-card': {
       // 방송인 신분증
       fileName = row.idCardImageName;
+      infoType = 'broadcasterIdCard';
       break;
     }
     case 'broadcaster-account-image': {
       // 방송인 통장사본
       fileName = row.accountImageName;
+      infoType = 'broadcasterSettlementAccount';
       break;
     }
     default: {
@@ -62,12 +71,26 @@ export function AdminImageDownloadButton({
   }
 
   async function downloadFromS3(sellerEmail: string): Promise<void> {
-    const imageUrl = await s3.s3DownloadImageUrl(fileName, sellerEmail, type);
+    const Key = `${type}/${sellerEmail}/${fileName}`;
+    const imageUrl = await s3.getPresignedUrl({ Key }, { expiresIn: 60 });
     window.open(imageUrl, '_blank');
   }
 
+  async function createPrivacyHistory(): Promise<void> {
+    mutateAsync({ actionType: 'download', infoType });
+  }
+
   return (
-    <Button size="xs" onClick={() => downloadFromS3(userEmail)} disabled={disabled}>
+    <Button
+      size="xs"
+      onClick={() => {
+        downloadFromS3(userEmail);
+        if (infoType) {
+          createPrivacyHistory();
+        }
+      }}
+      disabled={disabled}
+    >
       이미지 다운로드
     </Button>
   );

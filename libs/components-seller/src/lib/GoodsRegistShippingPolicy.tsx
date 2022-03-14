@@ -85,10 +85,10 @@ function RelatedGoodsList({ groupId }: { groupId: number | null }): JSX.Element 
       sort: SellerGoodsSortColumn.REGIST_DATE,
       direction: SellerGoodsSortDirection.DESC,
       groupId: groupId || undefined,
-      email: profileData?.email || '',
+      sellerId: profileData?.id || 0,
     },
     {
-      enabled: !!profileData?.email && !!groupId,
+      enabled: !!profileData?.id && !!groupId,
     },
   );
 

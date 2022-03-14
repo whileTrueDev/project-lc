@@ -1,5 +1,4 @@
 import { useMutation, UseMutationResult } from 'react-query';
-import { LoginUserDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
 

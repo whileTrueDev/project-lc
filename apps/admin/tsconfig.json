@@ -22,8 +22,7 @@
     "**/*.tsx",
     "**/*.js",
     "**/*.jsx",
-    "next-env.d.ts",
-    "../../libs/nest-core/@types"
+    "next-env.d.ts"
   ],
   "exclude": [
     "node_modules"

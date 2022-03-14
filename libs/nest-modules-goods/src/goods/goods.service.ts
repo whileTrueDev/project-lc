@@ -23,13 +23,10 @@ import {
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
-import {
-  getImgSrcListFromHtmlStringList,
-  getS3KeyListFromImgSrcList,
-  S3Service,
-} from '@project-lc/nest-modules-s3';
+import { S3Service } from '@project-lc/nest-modules-s3';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
+import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
 
 @Injectable()
 export class GoodsService extends ServiceBaseWithCache {
@@ -45,16 +42,16 @@ export class GoodsService extends ServiceBaseWithCache {
 
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
-   * @param email seller.sub 로그인된 판매자 정보
+   * @param sellerId seller.id 로그인된 판매자 정보
    * @param ids? 특정 상품의 firstMallGoodsId만 조회하고 싶을 때
    */
   public async findMyGoodsIds(
-    email?: Seller['email'],
+    sellerId?: Seller['id'],
     ids?: number[],
   ): Promise<number[]> {
     const goodsIds = await this.prisma.goods.findMany({
       where: {
-        seller: email ? { email } : undefined,
+        seller: sellerId ? { id: sellerId } : undefined,
         id: ids ? { in: ids } : undefined,
         AND: {
           confirmation: {
@@ -131,22 +128,22 @@ export class GoodsService extends ServiceBaseWithCache {
 
   /**
    * 모든 상품 목록 조회
-   * email 이 주어지면 해당 판매자의 상품만 조회
-   * dto : email, page, itemPerPage, sort, direction
+   * sellerId 이 주어지면 해당 판매자의 상품만 조회
+   * dto : sellerId, page, itemPerPage, sort, direction
    * return : maxPage, totalItemCount, currentPage, prevPage, nextPage, items
    */
   public async getGoodsList({
-    email,
+    sellerId,
     page,
     itemPerPage,
     sort,
     direction,
     groupId,
-  }: GoodsListDto & { email?: string }): Promise<GoodsListRes> {
+  }: GoodsListDto & { sellerId?: number }): Promise<GoodsListRes> {
     const items = await this.prisma.goods.findMany({
       skip: page * itemPerPage,
       take: itemPerPage,
-      where: { seller: { email }, shippingGroupId: groupId },
+      where: { seller: { id: sellerId }, shippingGroupId: groupId },
       orderBy: [{ [sort]: direction }],
       include: {
         options: {
@@ -204,7 +201,7 @@ export class GoodsService extends ServiceBaseWithCache {
 
     // 해당 판매자가 등록한 전체 아이템 개수
     const totalItemCount = await this.prisma.goods.count({
-      where: { seller: { email } },
+      where: { seller: { id: sellerId } },
     });
     const maxPage = Math.ceil(totalItemCount / itemPerPage); // 마지막페이지
     const currentPage = page; // 현재페이지
@@ -297,12 +294,12 @@ export class GoodsService extends ServiceBaseWithCache {
   }
 
   // 유저가 등록한 상품 삭제
-  // dto: email, [itemId, itemId, ...]
+  // dto: sellerId, [itemId, itemId, ...]
   public async deleteLcGoods({
-    email,
+    sellerId,
     ids,
   }: {
-    email: string;
+    sellerId: number;
     ids: number[];
   }): Promise<boolean> {
     try {
@@ -315,7 +312,7 @@ export class GoodsService extends ServiceBaseWithCache {
       // 상품삭제
       await this.prisma.goods.deleteMany({
         where: {
-          seller: { email },
+          seller: { id: sellerId },
           id: {
             in: ids,
           },
@@ -351,7 +348,7 @@ export class GoodsService extends ServiceBaseWithCache {
     const imgSrcList: string[] = getImgSrcListFromHtmlStringList(contentList);
 
     // img src에서 s3에 저장된 이미지만 찾기
-    const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
+    const s3ImageKeys = this.s3service.getGoodsImageS3KeyListFromImgSrcList(imgSrcList);
 
     if (s3ImageKeys.length > 0) {
       await this.s3service.deleteMultipleObjects(
@@ -377,7 +374,7 @@ export class GoodsService extends ServiceBaseWithCache {
     const imageList = images.map(({ image }) => image);
 
     // 이미지 중 s3에 업로드된 이미지 찾기
-    const s3ImageKeys = getS3KeyListFromImgSrcList(imageList);
+    const s3ImageKeys = this.s3service.getGoodsImageS3KeyListFromImgSrcList(imageList);
 
     if (s3ImageKeys.length > 0) {
       await this.s3service.deleteMultipleObjects(
@@ -402,12 +399,12 @@ export class GoodsService extends ServiceBaseWithCache {
   }
 
   /** 상품 개별 정보 조회 */
-  public async getOneGoods(goodsId: number, email: string): Promise<GoodsByIdRes> {
+  public async getOneGoods(goodsId: number, sellerId: number): Promise<GoodsByIdRes> {
     return this.prisma.goods.findFirst({
       where: {
         id: goodsId,
         seller: {
-          email,
+          id: sellerId,
         },
       },
       include: {
@@ -433,7 +430,7 @@ export class GoodsService extends ServiceBaseWithCache {
 
   // 상품 등록
   public async registGoods(
-    email: string,
+    sellerId: number,
     dto: RegistGoodsDto,
   ): Promise<{
     goodsId: number;
@@ -451,7 +448,7 @@ export class GoodsService extends ServiceBaseWithCache {
       });
       const goods = await this.prisma.goods.create({
         data: {
-          seller: { connect: { email } },
+          seller: { connect: { id: sellerId } },
           ...goodsData,
           options: {
             create: optionsData,
@@ -636,10 +633,10 @@ export class GoodsService extends ServiceBaseWithCache {
     }
   }
 
-  public async findMyGoodsNames(email: string): Promise<ApprovedGoodsNameAndId[]> {
+  public async findMyGoodsNames(sellerId: number): Promise<ApprovedGoodsNameAndId[]> {
     const goodsIds = await this.prisma.goods.findMany({
       where: {
-        seller: { email },
+        seller: { id: sellerId },
         AND: {
           confirmation: {
             status: 'confirmed',

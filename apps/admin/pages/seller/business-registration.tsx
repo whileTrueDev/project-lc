@@ -1,8 +1,15 @@
 import { Box, Heading, Text } from '@chakra-ui/react';
 import { AdminBusinessRegistrationList } from '@project-lc/components-admin/AdminBusinessRegistrationList';
 import { AdminPageLayout } from '@project-lc/components-admin/AdminPageLayout';
+import { useCheckAdminClass } from '@project-lc/hooks';
 
 export function SellerBusinessRegistration(): JSX.Element {
+  useCheckAdminClass({
+    adminClasses: ['super', 'full'],
+    infoType: 'sellerBusinessRegistration',
+    actionType: 'view',
+  });
+
   return (
     <AdminPageLayout>
       <Box position="relative">

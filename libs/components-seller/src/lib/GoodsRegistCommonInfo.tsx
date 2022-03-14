@@ -65,8 +65,8 @@ function GoodsCommonInfoList({
 
   // 공통정보 목록 불러오기
   const { data: infoList, isLoading } = useGoodsCommonInfoList({
-    email: profileData?.email || '',
-    enabled: !!profileData?.email,
+    sellerId: profileData?.id || 0,
+    enabled: !!profileData?.id,
     onSuccess: (data: GoodsCommonInfo[]) => {
       // 공통정보 불러온 후 goodsIdInfo 값이 있으면(수정) 해당 goodsInfo를 기본값으로 설정
       if (goodsInfoId) {
@@ -95,7 +95,7 @@ function GoodsCommonInfoList({
     if (goodsInfoId || !profileData) return;
     const list = queryClient.getQueryData<GoodsCommonInfo[]>([
       'GoodsCommonInfoList',
-      profileData.email,
+      profileData.id,
     ]);
 
     if (list && list.length > 0) {

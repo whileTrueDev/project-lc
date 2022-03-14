@@ -76,7 +76,7 @@ export function LiveShoppingDetail(): JSX.Element {
       {
         id: liveShoppingId,
       },
-      { enabled: !!profileData?.email },
+      { enabled: !!profileData?.id },
     );
 
   const goodsId = liveShopping ? liveShopping[0].goodsId : '';
