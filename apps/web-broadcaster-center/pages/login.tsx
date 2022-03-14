@@ -14,6 +14,7 @@ export function Login(): JSX.Element {
     message: router.query.message,
     provider: router.query.provider,
   });
+
   return (
     <Box>
       <BroadcasterNavbar />

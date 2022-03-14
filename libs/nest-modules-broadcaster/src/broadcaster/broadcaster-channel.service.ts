@@ -5,7 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { BroadcasterChannel } from '@prisma/client';
+import { BroadcasterChannel, Broadcaster } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { CreateBroadcasterChannelDto } from '@project-lc/shared-types';
@@ -65,6 +65,23 @@ export class BroadcasterChannelService extends ServiceBaseWithCache {
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  async restoreBroadcasterChannel(broadcasterId: Broadcaster['id']): Promise<void> {
+    const restoreDatas = await this.prisma.inactiveBroadcasterChannel.findMany({
+      where: {
+        broadcasterId,
+      },
+    });
+    if (restoreDatas) {
+      Promise.all(
+        restoreDatas.map((restoreData) =>
+          this.prisma.broadcasterChannel.create({
+            data: restoreData || undefined,
+          }),
+        ),
+      );
     }
   }
 

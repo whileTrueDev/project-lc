@@ -1,5 +1,6 @@
+import { Seller } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsEmail, IsIn, IsString } from 'class-validator';
+import { IsIn, IsNumber, IsString } from 'class-validator';
 import { FmSettlementTarget } from '../..';
 
 class FmSettlementTargetClass {
@@ -19,8 +20,8 @@ class FmSettlementTargetClass {
 }
 
 export class ExecuteSettlementDto {
-  @IsEmail()
-  sellerEmail: string;
+  @IsNumber()
+  sellerId: Seller['id'];
 
   @Type(() => FmSettlementTargetClass)
   target: FmSettlementTarget;

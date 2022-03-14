@@ -7,6 +7,8 @@ import {
   SellerBusinessRegistration,
   SellerSettlementAccount,
   SellType,
+  Seller,
+  InactiveBusinessRegistrationConfirmation,
 } from '@prisma/client';
 import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -25,6 +27,7 @@ import {
 } from '@project-lc/utils';
 import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
+import { SellerService } from './seller.service';
 
 export type SellerSettlementInfo = {
   sellerBusinessRegistration: SellerBusinessRegistrationType[];
@@ -45,6 +48,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly sellerService: SellerService,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);
@@ -65,12 +69,11 @@ export class SellerSettlementService extends ServiceBaseWithCache {
     dto: BusinessRegistrationDto,
     sellerInfo: UserPayload,
   ): Promise<SellerBusinessRegistration> {
-    const email = sellerInfo.sub;
+    const sellerId = sellerInfo.id;
     const sellerBusinessRegistration =
       await this.prisma.sellerBusinessRegistration.create({
         data: {
           companyName: dto.companyName,
-          sellerEmail: email,
           businessRegistrationNumber: this.makeRegistrationNumberFormat(
             dto.businessRegistrationNumber,
           ),
@@ -82,10 +85,103 @@ export class SellerSettlementService extends ServiceBaseWithCache {
           businessRegistrationImageName: dto.businessRegistrationImageName,
           mailOrderSalesImageName: dto.mailOrderSalesImageName,
           mailOrderSalesNumber: dto.mailOrderSalesNumber,
+          sellerId,
         },
       });
     await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
     return sellerBusinessRegistration;
+  }
+
+  /**
+   * 휴면 사업자 등록증 confirmation 상태 복구
+   * @param sellerId
+   */
+
+  public async restoreInactiveBusinessRegistrationConfirmation(
+    sellerId: Seller['id'],
+  ): Promise<BusinessRegistrationConfirmation | null> {
+    const restoreData = await this.prisma.inactiveSellerBusinessRegistration.findFirst({
+      where: {
+        sellerId,
+      },
+      select: {
+        InactiveBusinessRegistrationConfirmation: {
+          select: {
+            id: true,
+            status: true,
+            rejectionReason: true,
+            InactiveSellerBusinessRegistrationId: true,
+          },
+        },
+      },
+    });
+
+    if (restoreData?.InactiveBusinessRegistrationConfirmation) {
+      return this.prisma.businessRegistrationConfirmation.create({
+        data: {
+          id: restoreData.InactiveBusinessRegistrationConfirmation.id,
+          status: restoreData.InactiveBusinessRegistrationConfirmation.status,
+          rejectionReason:
+            restoreData.InactiveBusinessRegistrationConfirmation.rejectionReason,
+          SellerBusinessRegistrationId:
+            restoreData.InactiveBusinessRegistrationConfirmation
+              .InactiveSellerBusinessRegistrationId,
+        },
+      });
+    }
+    return null;
+  }
+
+  /**
+   * 휴면 사업자 등록증 confirmation 삭제
+   * @param sellerId
+   */
+
+  public async deleteInactiveBusinessRegistrationConfirmation(
+    registrationId: number,
+  ): Promise<InactiveBusinessRegistrationConfirmation> {
+    return this.prisma.inactiveBusinessRegistrationConfirmation.delete({
+      where: {
+        InactiveSellerBusinessRegistrationId: registrationId,
+      },
+    });
+  }
+
+  /**
+   * 휴면 사업자 등록증 복구
+   * @param dto 사업자 등록증 등록 정보
+   * @param sellerInfo 사용자 등록 정보
+   */
+  public async restoreInactiveBusinessRegistration(
+    sellerId: Seller['id'],
+  ): Promise<void> {
+    const restoreData = await this.prisma.inactiveSellerBusinessRegistration.findFirst({
+      where: {
+        sellerId,
+      },
+    });
+    if (restoreData) {
+      await this.prisma.sellerBusinessRegistration.create({
+        data: {
+          id: restoreData.id,
+          companyName: restoreData.companyName,
+          businessRegistrationNumber: this.makeRegistrationNumberFormat(
+            restoreData.businessRegistrationNumber,
+          ),
+          representativeName: restoreData.representativeName,
+          businessType: restoreData.businessType,
+          businessItem: restoreData.businessItem,
+          businessAddress: restoreData.businessAddress,
+          taxInvoiceMail: restoreData.taxInvoiceMail,
+          businessRegistrationImageName: restoreData.businessRegistrationImageName,
+          mailOrderSalesImageName: restoreData.mailOrderSalesImageName,
+          mailOrderSalesNumber: restoreData.mailOrderSalesNumber,
+          sellerId,
+        },
+      });
+    }
+
+    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
   }
 
   /**
@@ -115,10 +211,10 @@ export class SellerSettlementService extends ServiceBaseWithCache {
     dto: SettlementAccountDto,
     sellerInfo: UserPayload,
   ): Promise<SellerSettlementAccount> {
-    const email = sellerInfo.sub;
+    const sellerId = sellerInfo.id;
     const settlementAccount = await this.prisma.sellerSettlementAccount.create({
       data: {
-        sellerEmail: email,
+        sellerId,
         name: dto.name,
         number: dto.number,
         bank: dto.bank,
@@ -131,15 +227,42 @@ export class SellerSettlementService extends ServiceBaseWithCache {
   }
 
   /**
+   * 정산 계좌 등록
+   * @param dto 정산 계좌 정보
+   * @param sellerInfo 사용자 등록 정보
+   */
+  public async restoreSettlementAccount(sellerId: Seller['id']): Promise<void> {
+    const restoreData = await this.prisma.inactiveSellerSettlementAccount.findFirst({
+      where: {
+        sellerId,
+      },
+    });
+
+    if (restoreData) {
+      await this.prisma.sellerSettlementAccount.create({
+        data: {
+          sellerId: restoreData.sellerId,
+          name: restoreData.name,
+          number: restoreData.number,
+          bank: restoreData.bank,
+          settlementAccountImageName: restoreData.settlementAccountImageName,
+        },
+      });
+    }
+
+    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
+  }
+
+  /**
    * 정산 정보 조회
    * @param sellerInfo 사용자 등록 정보
    */
   async selectSellerSettlementInfo(
     sellerInfo: UserPayload,
   ): Promise<SellerSettlementInfo> {
-    const email = sellerInfo.sub;
+    const sellerId = sellerInfo.id;
     const settlementInfo = await this.prisma.seller.findUnique({
-      where: { email },
+      where: { id: sellerId },
       select: {
         sellerBusinessRegistration: {
           include: { BusinessRegistrationConfirmation: true },
@@ -171,14 +294,14 @@ export class SellerSettlementService extends ServiceBaseWithCache {
    * @author hwasurr(dan)
    * */
   public async executeSettle(
-    email: UserPayload['sub'],
+    id: UserPayload['id'],
     dto: ExecuteSettlementDto,
   ): Promise<boolean> {
     const { target, round } = dto;
     const { order_seq, shipping_cost } = target;
 
     // 출고가 발생한 주문을 통해 해당 주문에 대한 이전 정산 처리를 조회
-    const settlementHistories = await this.findSettlementHistory(email, {
+    const settlementHistories = await this.findSettlementHistory(id, {
       order_seq,
     });
 
@@ -263,7 +386,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
         pg: target.pg,
         pgCommission: totalPgCommission.commission,
         pgCommissionRate: totalPgCommission.rate,
-        sellerEmail: target.options[0].seller.email,
+        sellerId: target.options[0].seller.id,
         settlementItems: {
           create: target.options.map((opt) => {
             const price = Number(opt.price) * opt.ea;
@@ -341,9 +464,11 @@ export class SellerSettlementService extends ServiceBaseWithCache {
   }
 
   /** 정산완료 데이터의 년도 목록 조회 */
-  public async findSettlementHistoryYears(email: UserPayload['sub']): Promise<string[]> {
+  public async findSettlementHistoryYears(
+    sellerId: UserPayload['id'],
+  ): Promise<string[]> {
     const result: { year: string }[] = await this.prisma.$queryRaw`
-    SELECT YEAR(round) AS year FROM SellerSettlements WHERE sellerEmail = ${email} GROUP BY YEAR(round)
+    SELECT YEAR(round) AS year FROM SellerSettlements WHERE sellerId = ${sellerId} GROUP BY YEAR(round)
     `;
 
     return result.map((m) => m.year);
@@ -351,12 +476,12 @@ export class SellerSettlementService extends ServiceBaseWithCache {
 
   /** 정산완료 데이터의 월 목록 조회 */
   public async findSettlementHistoryMonths(
-    email: UserPayload['sub'],
+    sellerId: UserPayload['id'],
     year: string,
   ): Promise<string[]> {
     const result: { month: string }[] = await this.prisma.$queryRaw`
     SELECT MONTH(round) AS month FROM SellerSettlements
-    WHERE round LIKE ${`${year}/%`} AND sellerEmail = ${email} GROUP BY MONTH(round)
+    WHERE round LIKE ${`${year}/%`} AND sellerId = ${sellerId} GROUP BY MONTH(round)
     `;
 
     return result.map((m) => m.month);
@@ -364,7 +489,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
 
   /** 정산완료 데이터의 회차 목록 조회 */
   public async findSettlementHistoryRounds(
-    email: UserPayload['sub'],
+    sellerId: UserPayload['id'],
     year: string,
     month: string,
   ): Promise<string[]> {
@@ -372,30 +497,10 @@ export class SellerSettlementService extends ServiceBaseWithCache {
       SELECT round FROM SellerSettlements
       WHERE round LIKE ${`${year}/${
         month.length === 1 ? `0${month}` : month
-      }%`} AND sellerEmail = ${email} GROUP BY round
+      }%`} AND sellerId = ${sellerId} GROUP BY round
       `;
 
     return result.map((m) => m.round);
-  }
-
-  /** 정산 완료 목록의 round를 기준으로 groupby 조회를 실시합니다. */
-  public async findSettlementHistoryPerRound(
-    email: UserPayload['sub'],
-  ): Promise<FindSettlementHistoryRoundRes> {
-    const result = await this.prisma.sellerSettlements.groupBy({
-      by: ['round'],
-      where: { sellerEmail: email },
-      _sum: {
-        totalPrice: true,
-        totalAmount: true,
-        totalCommission: true,
-        pgCommission: true,
-        totalEa: true,
-        shippingCost: true,
-      },
-    });
-
-    return result;
   }
 
   /**
@@ -404,7 +509,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
    */
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   public async findSettlementHistory(
-    email?: UserPayload['sub'],
+    id?: UserPayload['id'],
     options?: {
       round?: string;
       export_seq?: FmExport['export_seq'];
@@ -413,7 +518,7 @@ export class SellerSettlementService extends ServiceBaseWithCache {
   ) {
     return this.prisma.sellerSettlements.findMany({
       where: {
-        sellerEmail: email || undefined,
+        sellerId: id || undefined,
         exportId: options && options.export_seq ? options.export_seq : undefined,
         orderId: options && options.order_seq ? String(options.order_seq) : undefined,
         round: options?.round ? options.round : undefined,

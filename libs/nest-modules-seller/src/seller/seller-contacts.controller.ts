@@ -33,7 +33,7 @@ export class SellerContactsController {
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: SellerContactsDTOWithoutIdDTO,
   ): Promise<{ contactId: number }> {
-    const email = seller.sub;
-    return this.sellerContactsService.registSellerContacts(email, dto);
+    const sellerId = seller.id;
+    return this.sellerContactsService.registSellerContacts(sellerId, dto);
   }
 }

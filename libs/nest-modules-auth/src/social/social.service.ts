@@ -9,9 +9,14 @@ import {
   BroadcasterSocialAccount,
   Seller,
   SellerSocialAccount,
+  InactiveSeller,
+  InactiveSellerSocialAccount,
+  InactiveBroadcaster,
+  InactiveBroadcasterSocialAccount,
 } from '@prisma/client';
 import { UserPayload } from '@project-lc/nest-core';
 import { SellerService } from '@project-lc/nest-modules-seller';
+import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { loginUserRes, SocialAccounts, UserType } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
@@ -44,24 +49,30 @@ export class SocialService {
     private readonly kakao: KakaoApiService,
     private readonly naver: NaverApiService,
     private readonly google: GoogleApiService,
+    private readonly broadcasterService: BroadcasterService,
   ) {}
 
-  login(userType: UserType, req: Request, res: Response): void {
+  login(userType: UserType, req: Request, res: Response): UserPayload {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
     let userPayload: UserPayload;
     if (userType === 'broadcaster') {
-      const { email, userName: name, id, password, avatar } = user;
+      const { email, userName: name, id, password, avatar, inactiveFlag } = user;
       const broadcaster = {
         id,
         email,
         name,
         password,
         avatar,
+        inactiveFlag,
       };
       userPayload = this.authService.createUserPayload(broadcaster as any, userType);
     } else {
       userPayload = this.authService.createUserPayload(user, userType);
+    }
+
+    if (userPayload.inactiveFlag) {
+      return userPayload;
     }
 
     // local stragety에서 반환되는 req.user의 타입은 UserPayload이나
@@ -75,6 +86,7 @@ export class SocialService {
       userType,
     );
     this.authService.handleLogin(res, loginToken);
+    return userPayload;
   }
 
   /** 유저타입에 따라 seller 나 broadcaster를 찾거나 생성하여 반환
@@ -83,7 +95,7 @@ export class SocialService {
   async findOrCreateUser(
     userType: UserType,
     data: UserDataInterface,
-  ): Promise<Seller | Broadcaster> {
+  ): Promise<Seller | Broadcaster | InactiveBroadcaster | InactiveSeller> {
     // 전달된 유저타입이 방송인인 경우 -> Broadcaster, BroadcasterSocialAccounts 테이블에서 작업
     if (userType === 'broadcaster') {
       const broadcaster = await this.findOrCreateBroadcaster(data);
@@ -104,6 +116,15 @@ export class SocialService {
       userData,
     );
 
+    const inActiveSocialAccountWithBroadcaster =
+      await this.selectInactiveBroadcasterSocialAccountRecord(userData);
+
+    if (inActiveSocialAccountWithBroadcaster) {
+      return this.broadcasterService.findInactiveOne({
+        id: inActiveSocialAccountWithBroadcaster.broadcaster.id,
+      });
+    }
+
     if (!socialAccountWithBroadcaster) {
       const createdBroadcaster = await this.createBroadcasterSocialAccountRecord(
         userData,
@@ -123,6 +144,17 @@ export class SocialService {
   ): Promise<BroadcasterSocialAccount & { broadcaster: Broadcaster }> {
     const { id, provider } = userData;
     return this.prisma.broadcasterSocialAccount.findFirst({
+      where: { serviceId: id, provider },
+      include: { broadcaster: true },
+    });
+  }
+
+  /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 휴면 방송인 계정정보 찾기 */
+  private async selectInactiveBroadcasterSocialAccountRecord(
+    userData: Partial<UserDataInterface>,
+  ): Promise<InactiveBroadcasterSocialAccount & { broadcaster: InactiveBroadcaster }> {
+    const { id, provider } = userData;
+    return this.prisma.inactiveBroadcasterSocialAccount.findFirst({
       where: { serviceId: id, provider },
       include: { broadcaster: true },
     });
@@ -166,11 +198,20 @@ export class SocialService {
   // 판매자
   // -------------------------
   /** 해당 소셜서비스 계정 소유하는 판매자 찾거나 생성하여 반환 */
-  async findOrCreateSeller(sellerData: UserDataInterface): Promise<Seller> {
+  async findOrCreateSeller(
+    sellerData: UserDataInterface,
+  ): Promise<Seller | InactiveSeller> {
     const socialAccountWithSeller = await this.selectSellerSocialAccountRecord(
       sellerData,
     );
-
+    const inactiveSocialAccountWithSeller =
+      await this.selectInactiveSellerSocialAccountRecord(sellerData);
+    if (inactiveSocialAccountWithSeller) {
+      // 복구코드
+      return this.sellerService.findInactiveOne({
+        id: inactiveSocialAccountWithSeller.seller.id,
+      });
+    }
     if (!socialAccountWithSeller) {
       const createdSeller = await this.createSellerSocialAccountRecord(sellerData);
       return createdSeller;
@@ -190,6 +231,21 @@ export class SocialService {
   > {
     const { id, provider } = sellerData;
     return this.prisma.sellerSocialAccount.findFirst({
+      where: { serviceId: id, provider },
+      include: { seller: true },
+    });
+  }
+
+  /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 판매자 휴면 계정정보 찾기 */
+  private async selectInactiveSellerSocialAccountRecord(
+    sellerData: Partial<UserDataInterface>,
+  ): Promise<
+    InactiveSellerSocialAccount & {
+      seller: InactiveSeller;
+    }
+  > {
+    const { id, provider } = sellerData;
+    return this.prisma.inactiveSellerSocialAccount.findFirst({
       where: { serviceId: id, provider },
       include: { seller: true },
     });

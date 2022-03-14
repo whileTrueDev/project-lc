@@ -36,7 +36,7 @@ export class FmExportsController {
     orderId: string;
     exportCode: string;
   }> {
-    return this.exportsService.exportOrder(dto, seller.sub);
+    return this.exportsService.exportOrder(dto, seller.id);
   }
 
   @Post('many')
@@ -44,7 +44,7 @@ export class FmExportsController {
     @Body(ValidationPipe) dto: ExportOrdersDto,
     @SellerInfo() seller: UserPayload,
   ): Promise<boolean> {
-    return this.exportsService.exportOrders(dto, seller.sub);
+    return this.exportsService.exportOrders(dto, seller.id);
   }
 
   @Post('bundle')
@@ -52,6 +52,6 @@ export class FmExportsController {
     @Body(ValidationPipe) dto: ExportBundledOrdersDto,
     @SellerInfo() seller: UserPayload,
   ): Promise<boolean> {
-    return this.exportsService.exportBundledOrders(dto, seller.sub);
+    return this.exportsService.exportBundledOrders(dto, seller.id);
   }
 }

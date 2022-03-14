@@ -39,7 +39,7 @@ export class ShippingGroupController {
   getShippingGroupList(
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<ShippingGroupListResult> {
-    return this.shippingGroupService.getShippingGroupList(sellerInfo.sub);
+    return this.shippingGroupService.getShippingGroupList(sellerInfo.id);
   }
 
   // 배송그룹 생성
@@ -52,7 +52,7 @@ export class ShippingGroupController {
       seller: Seller;
     }
   > {
-    return this.shippingGroupService.createShippingGroup(sellerInfo.sub, dto);
+    return this.shippingGroupService.createShippingGroup(sellerInfo.id, dto);
   }
 
   // 배송그룹 삭제

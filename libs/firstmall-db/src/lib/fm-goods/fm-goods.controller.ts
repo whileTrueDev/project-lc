@@ -55,11 +55,11 @@ export class FmGoodsController {
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: DeleteGoodsDto,
   ): Promise<boolean> {
-    const email = seller.sub;
+    const sellerId = seller.id;
     // const email = 'a1919361@gmail.com';
 
     const confirmedFmGoodsIds = await this.projectLcGoodsService.findMyGoodsIds(
-      email,
+      sellerId,
       dto.ids,
     );
 

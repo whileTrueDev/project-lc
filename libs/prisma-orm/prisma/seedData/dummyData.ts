@@ -1,3 +1,4 @@
+import * as dayjs from 'dayjs';
 import { Goods, Prisma } from '.prisma/client';
 
 /** 상품 공통정보 */
@@ -175,3 +176,59 @@ export const dummyLiveShoppingData: Omit<
   broadcasterCommissionRate: '10',
   progress: 'confirmed',
 };
+
+export const dummyBroadcasterAddress: Prisma.BroadcasterAddressCreateInput = {
+  address: '부산 금정구 장전온천천로 51 (테라스파크)',
+  detailAddress: '313호',
+  postalCode: '46291',
+};
+
+export const dummyBroadcasterChannel: Omit<
+  Prisma.BroadcasterChannelCreateInput,
+  'broadcaster'
+> = {
+  url: 'http://twitch.com',
+};
+
+export const dummyBroadcasterContacts: Prisma.BroadcasterContactsCreateInput[] = [
+  {
+    name: '나다',
+    email: 'iamironman@onad.io',
+    phoneNumber: '010-1234-1234',
+    isDefault: true,
+  },
+  {
+    name: '나아니다',
+    email: 'youareironman@onad.io',
+    phoneNumber: '010-9876-9876',
+    isDefault: false,
+  },
+];
+
+const sellerLastLoginDate = dayjs().add(-366, 'day').toDate();
+const broadcasterLastLoginDate = dayjs().add(-335, 'day').toDate();
+
+export const dummyLoginHistory: Prisma.LoginHistoryCreateInput[] = [
+  {
+    userEmail: 'testseller@gmail.com',
+    userType: 'seller',
+    method: 'PC',
+    ip: '::1',
+    country: 'ROK',
+    city: 'Busan',
+    device: 'Windows',
+    ua: 'Mozilla/5.0 (Windows; U; Win98; en-US; rv:0.9.2) Gecko/20010725 Netscape6/6.1',
+    createDate: sellerLastLoginDate,
+  },
+  {
+    userEmail: 'testbc@gmail.com',
+    userType: 'broadcaster',
+    method: 'MOBILE',
+    ip: '::1',
+    country: 'ROK',
+    city: 'Seoul',
+    device: 'iPhone',
+    ua: 'Mozilla/5.0 (Windows; U; Win98; en-US; rv:0.9.2) Gecko/20010725 Netscape6/6.1',
+    createDate: broadcasterLastLoginDate,
+  },
+];

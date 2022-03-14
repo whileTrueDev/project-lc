@@ -54,9 +54,7 @@ export function LiveShoppingRegistForm(): JSX.Element {
   const toast = useToast();
   const router = useRouter();
 
-  const goodsList = useApprovedGoodsList({
-    email: profileData?.email || '',
-  });
+  const goodsList = useApprovedGoodsList();
 
   const contacts = useDefaultContacts({ email: profileData?.email });
 

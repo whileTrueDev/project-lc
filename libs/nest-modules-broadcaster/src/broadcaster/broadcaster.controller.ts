@@ -24,7 +24,7 @@ import {
   UserPayload,
 } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { MailVerificationService } from '@project-lc/nest-modules-mail';
+import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import {
   BroadcasterAddressDto,
   BroadcasterContractionAgreementDto,
@@ -36,9 +36,12 @@ import {
   PasswordValidateDto,
   SignUpDto,
 } from '@project-lc/shared-types';
+import { s3 } from '@project-lc/utils-s3';
+import { PrismaService } from '@project-lc/prisma-orm';
 import { Broadcaster, BroadcasterAddress } from '.prisma/client';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
-import { BroadcasterSettlementHistoryService } from './broadcaster-settlement-history.service';
+import { BroadcasterContactsService } from './broadcaster-contacts.service';
+import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterService } from './broadcaster.service';
 
 @Controller('broadcaster')
@@ -47,7 +50,9 @@ export class BroadcasterController {
     private readonly broadcasterService: BroadcasterService,
     private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
-    private readonly settlementHistoryService: BroadcasterSettlementHistoryService,
+    private readonly broadcasterContactsService: BroadcasterContactsService,
+    private readonly broadcasterSettlementService: BroadcasterSettlementService,
+    private readonly prismaService: PrismaService,
   ) {}
 
   /** 방송인 정보 조회 */
@@ -73,6 +78,46 @@ export class BroadcasterController {
     const broadcaster = await this.broadcasterService.signUp(dto);
     await this.mailVerificationService.deleteSuccessedMailVerification(dto.email);
     return broadcaster;
+  }
+
+  @Patch('restore')
+  public async restoreInactiveBroadcaster(@Body(ValidationPipe) dto): Promise<void> {
+    const broadcaster = await this.broadcasterService.restoreInactiveBroadcaster(
+      dto.email,
+    );
+
+    try {
+      await this.prismaService.$transaction(async (): Promise<void> => {
+        Promise.all([
+          this.broadcasterContactsService.restoreBroadcasterContacts(broadcaster.id),
+          this.broadcasterService.restoreBroadcasterAddress(broadcaster.id),
+          this.channelService.restoreBroadcasterChannel(broadcaster.id),
+          this.broadcasterSettlementService
+            .restoreBroadcasterSettlement(broadcaster.id)
+            .then((settlementInfo) => {
+              if (settlementInfo) {
+                this.broadcasterSettlementService.restoreBroadcasterSettlementConfirmation(
+                  settlementInfo.id,
+                );
+              }
+            }),
+          s3.moveObjects(
+            'inactive-broadcaster-account-image',
+            'broadcaster-account-image',
+            dto.email,
+          ),
+          s3.moveObjects(
+            'inactive-broadcaster-id-card',
+            'broadcaster-id-card',
+            dto.email,
+          ),
+        ]).then(async () => {
+          await this.broadcasterService.deleteInactiveBroadcaster(broadcaster.id);
+        });
+      });
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
   /** 방송인 이메일 주소 중복 체크 */
@@ -154,10 +199,7 @@ export class BroadcasterController {
   public async changeContractionAgreement(
     @Body(ValidationPipe) dto: BroadcasterContractionAgreementDto,
   ): Promise<Broadcaster> {
-    return this.broadcasterService.changeContractionAgreement(
-      dto.email,
-      dto.agreementFlag,
-    );
+    return this.broadcasterService.changeContractionAgreement(dto);
   }
 
   /** 방송인 계정 삭제 */

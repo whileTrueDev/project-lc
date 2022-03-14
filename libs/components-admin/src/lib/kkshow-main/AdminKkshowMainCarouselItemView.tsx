@@ -20,13 +20,11 @@ import {
 import ImageInputDialog, {
   ImageInputFileReadData,
 } from '@project-lc/components-core/ImageInputDialog';
-import {
-  LiveShoppingWithGoods,
-  useAdminLiveShoppingImageMutation,
-} from '@project-lc/hooks';
+import { useAdminLiveShoppingImageMutation } from '@project-lc/hooks';
 import {
   KkshowMainResData,
   LivePlatform,
+  LiveShoppingWithGoods,
   NowPlayingLiveItem,
   PreviousLiveItem,
   ProductAndBroadcasterInfo,
@@ -36,7 +34,7 @@ import {
 import { getAdminHost } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
 import path from 'path';
-import React, { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import AdminKkshowMainCarouselImageBannerDialog from './AdminKkshowMainCarouselImageBannerDialog';
 import { LiveShoppingListAutoComplete } from './LiveShoppingListAutoComplete';
@@ -411,7 +409,10 @@ export function CarouselItemProductAndBroadcasterInfo(
       Number(data.goods.options[0].consumer_price),
     );
 
-    setValue(`carousel.${index}.broadcasterNickname`, data.broadcaster.userNickname);
+    setValue(
+      `carousel.${index}.broadcasterNickname`,
+      data.broadcaster.userNickname || data.broadcaster.userName || '',
+    );
     setValue(
       `carousel.${index}.promotionPageLinkUrl`,
       data.broadcaster.BroadcasterPromotionPage?.url || '',

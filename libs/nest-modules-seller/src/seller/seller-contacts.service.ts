@@ -34,10 +34,10 @@ export class SellerContactsService extends ServiceBaseWithCache {
   }
 
   /** 판매자 연락처 등록 */
-  async registSellerContacts(sellerEmail, dto): Promise<{ contactId: number }> {
+  async registSellerContacts(sellerId, dto): Promise<{ contactId: number }> {
     const contact = await this.prisma.sellerContacts.create({
       data: {
-        seller: { connect: { email: sellerEmail } },
+        seller: { connect: { id: sellerId } },
         email: dto.email,
         phoneNumber: dto.phoneNumber,
         isDefault: dto.isDefault ? true : undefined,
@@ -45,5 +45,26 @@ export class SellerContactsService extends ServiceBaseWithCache {
     });
     await this._clearCaches(this.#SELLER_CONTACTS_CACHE_KEY);
     return { contactId: contact.id };
+  }
+
+  /** 판매자 연락처 등록 */
+  public async restoreSellerContacts(sellerId): Promise<void> {
+    const restoreDatas = await this.prisma.inactiveSellerContacts.findMany({
+      where: {
+        sellerId,
+      },
+    });
+
+    if (restoreDatas) {
+      Promise.all(
+        restoreDatas.map((restoreData) =>
+          this.prisma.sellerContacts.create({
+            data: restoreData,
+          }),
+        ),
+      );
+    }
+
+    await this._clearCaches(this.#SELLER_CONTACTS_CACHE_KEY);
   }
 }

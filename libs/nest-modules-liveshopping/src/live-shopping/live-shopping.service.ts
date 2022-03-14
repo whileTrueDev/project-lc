@@ -25,11 +25,11 @@ export class LiveShoppingService extends ServiceBaseWithCache {
 
   /** 라이브쇼핑 생성 */
   async createLiveShopping(
-    email: UserPayload['sub'],
+    sellerId: UserPayload['id'],
     dto: LiveShoppingRegistDTO,
   ): Promise<{ liveShoppingId: number }> {
     const userId = await this.prisma.seller.findFirst({
-      where: { email },
+      where: { id: sellerId },
       select: { id: true },
     });
     const liveShopping = await this.prisma.liveShopping.create({
@@ -62,7 +62,7 @@ export class LiveShoppingService extends ServiceBaseWithCache {
   }
 
   async getRegisteredLiveShoppings(
-    email: UserPayload['sub'],
+    sellerId: UserPayload['id'],
     dto: LiveShoppingParamsDto,
   ): Promise<LiveShopping[]> {
     // 자신의 id를 반환하는 쿼리 수행하기
@@ -75,7 +75,7 @@ export class LiveShoppingService extends ServiceBaseWithCache {
             ? { in: goodsIds.map((goodsid) => Number(goodsid)) }
             : undefined,
         seller: {
-          email,
+          id: sellerId,
         },
       },
       include: {

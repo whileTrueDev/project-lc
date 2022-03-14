@@ -5,11 +5,10 @@ import { PrismaClient, Seller, ShippingGroup } from '@prisma/client';
 import { CacheConfig } from '@project-lc/nest-core';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { ShippingGroupDto } from '@project-lc/shared-types';
-import { nanoid } from 'nanoid';
 import { ShippingGroupService } from './shipping-group.service';
 
 const TEST_USER = {
-  email: `${nanoid(2)}test@test.com`,
+  id: 3,
   name: 'test',
   password: 'test',
 };
@@ -54,7 +53,7 @@ describe('ShippingGroupService', () => {
   });
 
   afterAll(async () => {
-    await __prisma.seller.delete({ where: { email: TEST_USER.email } });
+    await __prisma.seller.delete({ where: { id: TEST_USER.id } });
     await __prisma.$disconnect();
   });
 
@@ -68,7 +67,7 @@ describe('ShippingGroupService', () => {
     };
     it('should create shippingGroup', async () => {
       shippingGroup = await service.createShippingGroup(
-        TEST_USER.email,
+        TEST_USER.id,
         testShippingGroupData,
       );
 

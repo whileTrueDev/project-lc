@@ -172,7 +172,7 @@ export function AdminGoodsList(): JSX.Element {
       direction,
     },
     {
-      enabled: !!profileData?.email,
+      enabled: !!profileData?.id,
     },
   );
   const handleClick = async (param: GridCellParams): Promise<void> => {

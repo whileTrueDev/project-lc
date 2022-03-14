@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { AdminModule } from '@project-lc/nest-modules-admin';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
-import { MailModule } from '@project-lc/nest-modules-mail';
+import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -15,7 +15,7 @@ import { LocalStrategy } from './strategies/local.strategy';
     SellerModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
     AdminModule.withoutControllers(),
-    MailModule,
+    MailVerificationModule,
   ],
   providers: [AuthService, JwtStrategy, LocalStrategy, LoginHistoryService],
   controllers: [AuthController],
