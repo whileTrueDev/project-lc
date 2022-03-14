@@ -232,6 +232,10 @@ body {
   border-radius: 0px 15px 15px 15px;
 }
 
+.bottom-area-right-fever-wrapper {
+  opacity: 0;
+}
+
 .bottom-area-right p:after {
   content: '';
   white-space: nowrap;

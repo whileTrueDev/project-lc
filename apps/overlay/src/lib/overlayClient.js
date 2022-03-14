@@ -429,6 +429,9 @@ socket.on('get objective message', async (data) => {
     <span>${price}</span>
     <span>원 돌파!</span>`,
   );
+  $('.bottom-area-text').text();
+  $('.bottom-area-right').css({ opacity: 1 });
+  $('.bottom-area-text').css({ opacity: 1 });
 
   socket.emit('send objective notification signal', data);
 
@@ -621,6 +624,7 @@ socket.on('remove soldout banner from server', () => {
 
 socket.on('get fever signal from server', (text) => {
   $('.bottom-area-right').css({ opacity: 1 });
+  $('.bottom-area-right-fever-wrapper').css({ opacity: 1 });
   $('.bottom-admin').text(`${text}`);
   $('body').append(`
     <iframe src="/audio/fever.mp3" id="fever-alarm" allow="autoplay" style="display:none"></iframe>
