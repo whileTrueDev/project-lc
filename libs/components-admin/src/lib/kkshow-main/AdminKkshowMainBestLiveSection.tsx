@@ -1,6 +1,9 @@
 import { Box, Button, Input, Stack, Text, useDisclosure } from '@chakra-ui/react';
-import { LiveShoppingWithGoods } from '@project-lc/hooks';
-import { KkshowMainBestLiveItem, KkshowMainResData } from '@project-lc/shared-types';
+import {
+  KkshowMainBestLiveItem,
+  KkshowMainResData,
+  LiveShoppingWithGoods,
+} from '@project-lc/shared-types';
 import { useMemo } from 'react';
 import { FieldArrayWithId, useFieldArray, useFormContext } from 'react-hook-form';
 import {

@@ -115,4 +115,25 @@ export class BroadcasterContactsService extends ServiceBaseWithCache {
     await this._clearCaches(this.#BROADCASTER_CONTACTS_CACHE_KEY);
     return !!result;
   }
+
+  public async restoreBroadcasterContacts(
+    broadcasterId: Broadcaster['id'],
+  ): Promise<void> {
+    const restoreDatas = await this.prisma.inactiveBroadcasterContacts.findMany({
+      where: {
+        broadcasterId,
+      },
+    });
+    if (restoreDatas) {
+      Promise.all(
+        restoreDatas.map((restoreData) =>
+          this.prisma.broadcasterContacts.create({
+            data: restoreData || undefined,
+          }),
+        ),
+      );
+    }
+
+    await this._clearCaches(this.#BROADCASTER_CONTACTS_CACHE_KEY);
+  }
 }

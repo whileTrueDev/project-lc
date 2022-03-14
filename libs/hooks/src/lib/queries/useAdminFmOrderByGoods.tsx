@@ -7,29 +7,29 @@ export type AdminFmOrderByGoods = FindFmOrderDetailRes;
 
 export const getAdminFmOrderByGoods = async ({
   orderId,
-  sellerEmail,
+  sellerId,
 }: {
   orderId: string;
-  sellerEmail: string;
+  sellerId: number;
 }): Promise<AdminFmOrderByGoods> => {
   return axios
-    .get<AdminFmOrderByGoods>(`/fm-orders/admin/${orderId}`, { params: { sellerEmail } })
+    .get<AdminFmOrderByGoods>(`/fm-orders/admin/${orderId}`, { params: { sellerId } })
     .then((res) => res.data);
 };
 
 /** 관리자페이지에서 결제취소 요청에 대한 주문정보 조회 쿼리 */
 export const useAdminFmOrderByGoods = ({
   orderId,
-  sellerEmail,
+  sellerId,
 }: {
   orderId: string;
-  sellerEmail: string;
+  sellerId: number;
 }): UseQueryResult<AdminFmOrderByGoods, AxiosError> => {
   return useQuery<AdminFmOrderByGoods, AxiosError>(
     ['AdminFmOrderByGoods', orderId],
-    () => getAdminFmOrderByGoods({ orderId, sellerEmail }),
+    () => getAdminFmOrderByGoods({ orderId, sellerId }),
     {
-      enabled: !!orderId && !!sellerEmail,
+      enabled: !!orderId && !!sellerId,
     },
   );
 };

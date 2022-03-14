@@ -9,8 +9,10 @@ import {
 import {
   Broadcaster,
   BroadcasterAddress,
+  InactiveBroadcaster,
   BroadcasterPromotionPage,
   Prisma,
+  BroadcasterSocialAccount,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -20,6 +22,7 @@ import {
   FindBroadcasterDto,
   BroadcasterWithoutUserNickName,
   SignUpDto,
+  BroadcasterContractionAgreementDto,
 } from '@project-lc/shared-types';
 import { hash, verify } from 'argon2';
 import { S3Service } from '@project-lc/nest-modules-s3';
@@ -71,18 +74,32 @@ export class BroadcasterService extends ServiceBaseWithCache {
   /**
    * 로그인
    */
-  async login(email: string, pwdInput: string): Promise<Broadcaster | null> {
+  async login(
+    email: string,
+    pwdInput: string,
+  ): Promise<Broadcaster | InactiveBroadcaster | null> {
     const user = await this.findOne({ email });
+    let inactiveUser;
     if (!user) {
-      throw new UnauthorizedException();
+      inactiveUser = await this.findInactiveOne({ email });
+      if (!inactiveUser) {
+        throw new UnauthorizedException();
+      }
     }
-    if (user.password === null) {
+    if (user?.password === null || inactiveUser?.password === null) {
       // 소셜로그인으로 가입된 회원
       throw new BadRequestException();
     }
-    const isCorrect = await this.validatePassword(pwdInput, user.password);
+    const isCorrect = await this.validatePassword(
+      pwdInput,
+      user?.password || inactiveUser?.password,
+    );
     if (!isCorrect) {
       throw new UnauthorizedException();
+    }
+
+    if (inactiveUser) {
+      return inactiveUser;
     }
     return user;
   }
@@ -97,9 +114,29 @@ export class BroadcasterService extends ServiceBaseWithCache {
       where: findInput,
       include: { BroadcasterPromotionPage: true },
     });
-    const { BroadcasterPromotionPage: broadcasterPromotionPage, ...broadcasterData } =
-      broadcaster;
-    return { ...broadcasterData, broadcasterPromotionPage };
+    if (broadcaster) {
+      const { BroadcasterPromotionPage: broadcasterPromotionPage, ...broadcasterData } =
+        broadcaster;
+      return { ...broadcasterData, broadcasterPromotionPage };
+    }
+    return null;
+  }
+
+  /**
+   * 휴면 유저 정보 조회
+   */
+  async findInactiveOne(
+    findInput: Prisma.SellerWhereUniqueInput,
+  ): Promise<InactiveBroadcaster> {
+    const broadcaster = await this.prisma.inactiveBroadcaster.findUnique({
+      where: findInput,
+    });
+
+    if (!broadcaster) {
+      return broadcaster;
+    }
+
+    return broadcaster;
   }
 
   /** 방송인 회원가입 서비스 핸들러 */
@@ -162,7 +199,10 @@ export class BroadcasterService extends ServiceBaseWithCache {
    */
   async isEmailDupCheckOk(email: string): Promise<boolean> {
     const user = await this.prisma.broadcaster.findFirst({ where: { email } });
-    if (user) return false;
+    const inactiveUser = await this.prisma.inactiveBroadcaster.findFirst({
+      where: { email },
+    });
+    if (user || inactiveUser) return false;
     return true;
   }
 
@@ -224,6 +264,22 @@ export class BroadcasterService extends ServiceBaseWithCache {
     return result;
   }
 
+  /** 휴면 방송인 선물/샘플 수령 주소 복구 */
+  public async restoreBroadcasterAddress(
+    broadcasterId: Broadcaster['id'],
+  ): Promise<void> {
+    const restoreData = await this.prisma.inactiveBroadcasterAddress.findFirst({
+      where: { broadcasterId },
+    });
+
+    if (restoreData) {
+      await this.prisma.broadcasterAddress.create({
+        data: restoreData,
+      });
+    }
+    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
+  }
+
   /**
    * 비밀번호 변경
    * @param email 비밀번호 변경할 셀러의 email
@@ -254,13 +310,12 @@ export class BroadcasterService extends ServiceBaseWithCache {
 
   /** 이용동의 상태 변경 */
   async changeContractionAgreement(
-    email: string,
-    agreementFlag: boolean,
+    dto: BroadcasterContractionAgreementDto,
   ): Promise<Broadcaster> {
     const broadcaster = await this.prisma.broadcaster.update({
-      where: { email },
+      where: { id: dto.id },
       data: {
-        agreementFlag,
+        agreementFlag: dto.agreementFlag,
       },
     });
     await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
@@ -294,5 +349,57 @@ export class BroadcasterService extends ServiceBaseWithCache {
     });
     await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
     return true;
+  }
+
+  /** 휴면 계정 데이터 복구 */
+  public async restoreInactiveBroadcaster(
+    email: Broadcaster['email'],
+  ): Promise<Broadcaster> {
+    const restoreData = await this.prisma.inactiveBroadcaster.findFirst({
+      where: { email },
+    });
+
+    const restoreSocialData =
+      await this.prisma.inactiveBroadcasterSocialAccount.findFirst({
+        where: { broadcasterId: restoreData.id },
+      });
+
+    if (restoreSocialData) {
+      await this.restoreInactiveSocialBroadcaster(restoreSocialData);
+    }
+
+    return this.prisma.broadcaster.update({
+      where: {
+        id: restoreData.id,
+      },
+      data: {
+        email: restoreData.email,
+        userName: restoreData.userName,
+        userNickname: restoreData.userNickname,
+        overlayUrl: restoreData.overlayUrl,
+        avatar: restoreData.avatar,
+        password: restoreData.password,
+        inactiveFlag: false,
+      },
+    });
+  }
+
+  /** 휴면 계정 데이터 삭제 */
+  public async deleteInactiveBroadcaster(
+    broadcasterId: Broadcaster['id'],
+  ): Promise<InactiveBroadcaster> {
+    return this.prisma.inactiveBroadcaster.delete({
+      where: {
+        id: broadcasterId,
+      },
+    });
+  }
+
+  private async restoreInactiveSocialBroadcaster(
+    restoreSocialData: BroadcasterSocialAccount,
+  ): Promise<BroadcasterSocialAccount> {
+    return this.prisma.broadcasterSocialAccount.create({
+      data: restoreSocialData,
+    });
   }
 }

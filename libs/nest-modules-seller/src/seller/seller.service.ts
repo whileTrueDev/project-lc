@@ -5,7 +5,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Prisma, Seller } from '@prisma/client';
+import { Prisma, Seller, InactiveSeller, SellerSocialAccount } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -49,18 +49,29 @@ export class SellerService extends ServiceBaseWithCache {
   /**
    * 로그인
    */
-  async login(email: string, pwdInput: string): Promise<Seller | null> {
+  async login(email: string, pwdInput: string): Promise<Seller | InactiveSeller | null> {
     const user = await this.findOne({ email });
+    let inactiveUser;
     if (!user) {
-      throw new UnauthorizedException();
+      inactiveUser = await this.findInactiveOne({ email });
+      if (!inactiveUser) {
+        throw new UnauthorizedException();
+      }
     }
-    if (user.password === null) {
+    if (user?.password === null || inactiveUser?.password === null) {
       // 소셜로그인으로 가입된 회원
       throw new BadRequestException();
     }
-    const isCorrect = await this.validatePassword(pwdInput, user.password);
+    const isCorrect = await this.validatePassword(
+      pwdInput,
+      user?.password || inactiveUser?.password,
+    );
     if (!isCorrect) {
       throw new UnauthorizedException();
+    }
+
+    if (inactiveUser) {
+      return inactiveUser;
     }
     return user;
   }
@@ -78,6 +89,7 @@ export class SellerService extends ServiceBaseWithCache {
         password: true,
         avatar: true,
         agreementFlag: true,
+        inactiveFlag: true,
         sellerShop: {
           select: {
             shopName: true,
@@ -98,13 +110,40 @@ export class SellerService extends ServiceBaseWithCache {
   }
 
   /**
+   * 휴면 유저 정보 조회
+   */
+  async findInactiveOne(
+    findInput: Prisma.SellerWhereUniqueInput,
+  ): Promise<InactiveSeller> {
+    const seller = await this.prisma.inactiveSeller.findUnique({
+      where: findInput,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        password: true,
+        avatar: true,
+        inactiveFlag: true,
+        agreementFlag: true,
+      },
+    });
+
+    if (!seller) {
+      return seller;
+    }
+    return seller;
+  }
+
+  /**
    * 이메일 주소가 중복되는 지 체크합니다.
    * @param email 중복체크할 이메일 주소
    * @returns {boolean} 중복되지않아 괜찮은 경우 true, 중복된 경우 false
    */
   async isEmailDupCheckOk(email: string): Promise<boolean> {
     const user = await this.prisma.seller.findFirst({ where: { email } });
-    if (user) return false;
+    const inactiveUser = await this.prisma.inactiveSeller.findFirst({ where: { email } });
+    if (user || inactiveUser) return false;
+
     return true;
   }
 
@@ -243,18 +282,73 @@ export class SellerService extends ServiceBaseWithCache {
         email: true,
         name: true,
         avatar: true,
+        inactiveFlag: true,
       },
     });
   }
 
   public async updateAgreementFlag(dto: SellerContractionAgreementDto): Promise<Seller> {
     const seller = await this.prisma.seller.update({
-      where: { email: dto.email },
+      where: { id: dto.id },
       data: {
         agreementFlag: dto.agreementFlag,
       },
     });
     await this._clearCaches(this.#SELLER_CACHE_KEY);
     return seller;
+  }
+
+  /** 휴면 계정 데이터 복구 */
+  public async restoreInactiveSeller(email: Seller['email']): Promise<Seller> {
+    const restoreData = await this.prisma.inactiveSeller.findFirst({
+      where: { email },
+    });
+
+    const restoreSocialData = await this.prisma.inactiveSellerSocialAccount.findFirst({
+      where: { sellerId: restoreData.id },
+    });
+
+    if (restoreSocialData) {
+      await this.restoreInactiveSocialSeller(restoreSocialData);
+    }
+
+    return this.prisma.seller.update({
+      where: {
+        id: restoreData.id,
+      },
+      data: {
+        email: restoreData.email,
+        name: restoreData.name,
+        avatar: restoreData.avatar,
+        password: restoreData.password,
+        inactiveFlag: false,
+      },
+    });
+  }
+
+  private async restoreInactiveSocialSeller(
+    restoreSocialData: SellerSocialAccount,
+  ): Promise<SellerSocialAccount> {
+    return this.prisma.sellerSocialAccount.create({
+      data: {
+        serviceId: restoreSocialData.serviceId,
+        provider: restoreSocialData.provider,
+        name: restoreSocialData.name,
+        registDate: restoreSocialData.registDate,
+        profileImage: restoreSocialData.profileImage,
+        accessToken: restoreSocialData.accessToken,
+        refreshToken: restoreSocialData.refreshToken,
+        sellerId: restoreSocialData.sellerId,
+      },
+    });
+  }
+
+  /** 휴면 계정 데이터 복구 */
+  public async deleteInactiveSeller(sellerId: Seller['id']): Promise<InactiveSeller> {
+    return this.prisma.inactiveSeller.delete({
+      where: {
+        id: sellerId,
+      },
+    });
   }
 }

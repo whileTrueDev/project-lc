@@ -33,7 +33,7 @@ export function OrderCancelRequestDetail(): JSX.Element {
   const orderCancelRequest = useAdminOneOrderCancelRequest(orderId);
   const fmOrder = useAdminFmOrderByGoods({
     orderId,
-    sellerEmail: orderCancelRequest.data?.seller.email,
+    sellerId: orderCancelRequest.data?.seller.id,
   });
 
   const changeDoneFlag = useSellerOrderCancelDoneFlagMutation();

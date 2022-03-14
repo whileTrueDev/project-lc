@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
-type SellerGoodsListRequestDto = GoodsListDto & { email: string };
+type SellerGoodsListRequestDto = GoodsListDto & { sellerId: number };
 
 export const getSellerGoodsList = async (dto: GoodsListDto): Promise<GoodsListRes> => {
   return axios

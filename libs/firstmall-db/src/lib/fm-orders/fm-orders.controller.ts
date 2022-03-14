@@ -52,7 +52,7 @@ export class FmOrdersController {
       gids = dto.goodsIds.map((x) => Number(x));
     }
     // 판매자의 승인된 상품 ID 목록 조회
-    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub, gids);
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.id, gids);
     if (ids.length === 0) return [];
     return this.fmOrdersService.findOrders(ids, dto);
   }
@@ -69,10 +69,10 @@ export class FmOrdersController {
   @Get('/admin/:orderId')
   async findAdminOneOrder(
     @Param('orderId') orderId: string,
-    @Query('sellerEmail') sellerEmail: string,
+    @Query('sellerId') sellerId: number,
   ): Promise<FindFmOrderDetailRes | null> {
     // 판매자의 승인된 상품 ID 목록 조회
-    const ids = await this.projectLcGoodsService.findMyGoodsIds(sellerEmail);
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(sellerId);
     return this.fmOrdersService.findOneOrder(orderId, ids);
   }
 
@@ -95,7 +95,7 @@ export class FmOrdersController {
   @Get('/stats')
   async getOrdersStats(@SellerInfo() seller: UserPayload): Promise<OrderStatsRes> {
     // 판매자의 승인된 상품 ID 목록 조회
-    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.id);
     if (ids.length === 0)
       return {
         sales: new SalesStats(),
@@ -109,7 +109,7 @@ export class FmOrdersController {
     @SellerInfo() seller: UserPayload,
   ): Promise<{ id: number; sales: string }[]> {
     let liveShoppingList = await this.liveShoppingService
-      .getRegisteredLiveShoppings(seller.sub, {})
+      .getRegisteredLiveShoppings(seller.id, {})
       .then((result) => {
         return result.map((val) => {
           if (val.sellStartDate && val.sellEndDate) {
@@ -158,7 +158,7 @@ export class FmOrdersController {
     @Query(ValidationPipe) dto: FindFmOrderDetailsDto,
   ): Promise<FindFmOrderDetailRes[]> {
     // 판매자의 승인된 상품 ID 목록 조회
-    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.id);
     const result = await Promise.all(
       dto.orderIds.map((orderId) => {
         return this.fmOrdersService.findOneOrder(orderId, ids);
@@ -174,7 +174,7 @@ export class FmOrdersController {
     @Param('orderId') orderId: string,
   ): Promise<FindFmOrderDetailRes | null> {
     // 판매자의 승인된 상품 ID 목록 조회
-    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.sub);
+    const ids = await this.projectLcGoodsService.findMyGoodsIds(seller.id);
     return this.fmOrdersService.findOneOrder(orderId, ids);
   }
 

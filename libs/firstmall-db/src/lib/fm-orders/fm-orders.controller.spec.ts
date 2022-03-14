@@ -34,7 +34,7 @@ describe('FmOrdersController', () => {
   let service: FmOrdersService;
   let goodsService: GoodsService;
 
-  const TEST_EMAIL = 'test11@test.com';
+  const TEST_ID = 3;
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
@@ -62,7 +62,7 @@ describe('FmOrdersController', () => {
       .useValue({
         canActivate: (context: ExecutionContext) => {
           const req = context.switchToHttp().getRequest();
-          req.user = { sub: TEST_EMAIL, type: 'seller' };
+          req.user = { id: TEST_ID, type: 'seller' };
           return true;
         },
       })
@@ -78,8 +78,8 @@ describe('FmOrdersController', () => {
 
     jest
       .spyOn(goodsService, 'findMyGoodsIds')
-      .mockImplementation(async (email: string) => {
-        if (email !== TEST_EMAIL) return [];
+      .mockImplementation(async (sellerId: number) => {
+        if (sellerId !== TEST_ID) return [];
         return [999999];
       });
     jest.spyOn(service, 'findOrders').mockImplementation(async (ids: number[]) => {
