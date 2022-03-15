@@ -26,7 +26,7 @@ ALTER TABLE `SellerBusinessRegistration` ADD CONSTRAINT `SellerBusinessRegistrat
 
 ALTER TABLE `SellerBusinessRegistration` DROP FOREIGN KEY `SellerBusinessRegistration_sellerEmail_fkey`;
 
-ALTER TABLE `SellerBusinessRegistration` MODIFY COLUMN `sellerId` INTEGER AFTER `id`;
+ALTER TABLE `SellerBusinessRegistration` MODIFY COLUMN `sellerId` INTEGER NOT NULL AFTER `id`;
 
 -- SellerSettlementAccount
 ALTER TABLE `SellerSettlementAccount` ADD `sellerId` INTEGER;
@@ -37,12 +37,9 @@ INNER JOIN `Seller`
 SET `SellerSettlementAccount`.`sellerId` = `Seller`.`id`;
 
 ALTER TABLE `SellerSettlementAccount` MODIFY COLUMN `sellerId` INTEGER NOT NULL;
-
 ALTER TABLE `SellerSettlementAccount` ADD CONSTRAINT `SellerSettlementAccount_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
 ALTER TABLE `SellerSettlementAccount` DROP FOREIGN KEY `SellerSettlementAccount_sellerEmail_fkey`;
-
-ALTER TABLE `SellerSettlementAccount` MODIFY COLUMN `sellerId` INTEGER AFTER `id`;
+ALTER TABLE `SellerSettlementAccount` MODIFY COLUMN `sellerId` INTEGER NOT NULL AFTER `id`;
 
 -- SellerSettlementAccount
 ALTER TABLE `SellerSettlements` ADD `sellerId` INTEGER;
@@ -53,12 +50,9 @@ INNER JOIN `Seller`
 SET `SellerSettlements`.`sellerId` = `Seller`.`id`;
 
 ALTER TABLE `SellerSettlements` MODIFY COLUMN `sellerId` INTEGER NOT NULL;
-
 ALTER TABLE `SellerSettlements` ADD CONSTRAINT `SellerSettlements_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
 ALTER TABLE `SellerSettlements` DROP FOREIGN KEY `SellerSettlements_sellerEmail_fkey`;
-
-ALTER TABLE `SellerSettlements` MODIFY COLUMN `sellerId` INTEGER AFTER `id`;
+ALTER TABLE `SellerSettlements` MODIFY COLUMN `sellerId` INTEGER NOT NULL AFTER `id`;
 
 -- SellerShop
 ALTER TABLE `SellerShop` ADD `sellerId` INTEGER;
@@ -69,14 +63,10 @@ INNER JOIN `Seller`
 SET `SellerShop`.`sellerId` = `Seller`.`id`;
 
 ALTER TABLE `SellerShop` MODIFY COLUMN `sellerId` INTEGER NOT NULL;
-
 ALTER TABLE `SellerShop` ADD CONSTRAINT `SellerShop_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
 ALTER TABLE `SellerShop` DROP FOREIGN KEY `SellerShop_sellerEmail_fkey`;
-
 ALTER TABLE `SellerShop` DROP `sellerEmail`;
-
-ALTER TABLE `SellerShop` MODIFY COLUMN `sellerId` INTEGER FIRST;
+ALTER TABLE `SellerShop` MODIFY COLUMN `sellerId` INTEGER NOT NULL FIRST;
 
 -- AlterTable
 ALTER TABLE `Administrator` ADD COLUMN `inactiveFlag` BOOLEAN NOT NULL DEFAULT false;
