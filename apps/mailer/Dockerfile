@@ -1,21 +1,20 @@
-FROM node:14
+FROM node:14-slim
+
+RUN apt-get update
+RUN apt-get install -y openssl
 
 ENV NODE_ENV production
 # timezone 설정
 ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-COPY ./dist/apps/overlay .
+COPY ./dist/apps/mailer .
 COPY ./libs/prisma-orm/prisma ./prisma
 
-RUN yarn install --prod
 RUN yarn global add prisma@3.1.1
+RUN yarn install --prod
 RUN prisma generate
-RUN yarn add hbs
 
-RUN yarn add argon2@0.28.2
-RUN npx node-pre-gyp rebuild -C ./node_modules/argon2
-
-EXPOSE 3002
+EXPOSE 3003
 
 CMD NODE_ENV=production node ./main.js

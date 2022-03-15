@@ -8,6 +8,7 @@ import * as ssm from '@aws-cdk/aws-ssm';
 import * as cdk from '@aws-cdk/core';
 import * as ecr from '@aws-cdk/aws-ecr';
 import { constants } from '../../constants';
+import { loadSsmParam } from '../../util/loadSsmParam';
 
 interface LCDevAppStackProps extends cdk.StackProps {
   vpc: ec2.Vpc;
@@ -21,8 +22,7 @@ interface LCDevAppStackProps extends cdk.StackProps {
 const PREFIX = 'LC-DEV-APP';
 
 export class LCDevAppStack extends cdk.Stack {
-  private readonly ACM_ARN =
-    'arn:aws:acm:ap-northeast-2:803609402610:certificate/763681b4-a8c3-47e0-998a-24754351b499';
+  private readonly ACM_ARN = process.env.ACM_CERTIFICATE_ARN!;
 
   private DBURL_PARAMETER: ssm.IStringParameter;
   private FIRSTMALL_DATABASE_URL: ssm.IStringParameter;
@@ -46,6 +46,7 @@ export class LCDevAppStack extends cdk.Stack {
   private CACHE_REDIS_URL: ssm.IStringParameter;
 
   public readonly alb: elbv2.ApplicationLoadBalancer;
+  public readonly cluster: ecs.Cluster;
 
   constructor(scope: cdk.Construct, id: string, props: LCDevAppStackProps) {
     super(scope, id, props);
@@ -65,6 +66,7 @@ export class LCDevAppStack extends cdk.Stack {
       clusterName: constants.DEV.ECS_CLUSTER,
       containerInsights: true,
     });
+    this.cluster = cluster;
 
     // * 환경변수 주입을 위한 파라미터 로딩
     this.loadSsmParameters();
@@ -84,7 +86,7 @@ export class LCDevAppStack extends cdk.Stack {
       realtimeApiSecGrp,
     );
 
-    this.alb = this.createALB({
+    this.alb = this.createPublicALB({
       vpc,
       apiService,
       overlayService,
@@ -139,6 +141,7 @@ export class LCDevAppStack extends cdk.Stack {
         SELLER_WEB_HOST: `https://dev-seller.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://dev-broadcaster.${constants.PUNYCODE_DOMAIN}`,
         KKSHOW_WEB_HOST: `https://dev.${constants.PUNYCODE_DOMAIN}`,
+        MAILER_HOST: `https://dev-mailer.${constants.PUNYCODE_DOMAIN}`,
         NODE_ENV: 'test',
       },
       logging: new ecs.AwsLogDriver({
@@ -350,7 +353,7 @@ export class LCDevAppStack extends cdk.Stack {
   }
 
   /** ALB 생성 */
-  private createALB({
+  private createPublicALB({
     vpc,
     apiService,
     overlayService,
@@ -498,14 +501,10 @@ export class LCDevAppStack extends cdk.Stack {
   }
 
   private loadSsmParameters() {
-    this.DBURL_PARAMETER = ssm.StringParameter.fromSecureStringParameterAttributes(
-      this,
-      `${PREFIX}DBUrlSecret`,
-      {
-        parameterName: constants.DEV.ECS_DATABASE_URL_KEY,
-        version: 4,
-      },
-    );
+    this.DBURL_PARAMETER = loadSsmParam(this, `${PREFIX}DBUrlSecret`, {
+      parameterName: constants.DEV.ECS_DATABASE_URL_KEY,
+      version: 4,
+    });
 
     this.FIRSTMALL_DATABASE_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
       this,

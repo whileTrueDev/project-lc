@@ -20,18 +20,15 @@ export class CacheConfig implements CacheOptionsFactory {
         options: { ttl: defaultCacheTTL },
       },
     };
-    if (['production', 'test'].includes(nodeEnv)) {
+
+    if (['production'].includes(nodeEnv)) {
       // 테스트, 프로덕션 환경
       let host = '';
       let port: number | null = null;
-      if (nodeEnv === 'test' && !cacheClusterHost) {
-        host = 'localhost';
-        port = 6379;
-      } else {
-        const [_host, _port] = cacheClusterHost.split(':');
-        host = _host;
-        port = _port;
-      }
+
+      const [_host, _port] = cacheClusterHost.split(':');
+      host = _host;
+      port = _port;
 
       const clusterConfig = {
         nodes: [{ host, port: port || 6379 }],

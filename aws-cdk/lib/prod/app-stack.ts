@@ -33,8 +33,7 @@ interface LCProdAppStackProps extends cdk.StackProps {
 }
 
 export class LCProdAppStack extends cdk.Stack {
-  private readonly ACM_ARN =
-    'arn:aws:acm:ap-northeast-2:803609402610:certificate/763681b4-a8c3-47e0-998a-24754351b499';
+  private readonly ACM_ARN = process.env.ACM_CERTIFICATE_ARN!;
 
   private readonly PREFIX = constants.PROD.ID_PREFIX;
   private readonly vpc: ec2.Vpc;
@@ -44,9 +43,9 @@ export class LCProdAppStack extends cdk.Stack {
   private readonly overlayControllerSecGrp: ec2.SecurityGroup;
   private readonly realtimeApiSecGrp: ec2.SecurityGroup;
 
-  private readonly cluster: Cluster;
   private readonly parameters: ReturnType<LCProdAppStack['loadSsmParamters']>;
 
+  public readonly cluster: Cluster;
   public readonly apiService: FargateService;
   public readonly overlayService: FargateService;
   public readonly overlayControllerService: FargateService;
@@ -154,6 +153,7 @@ export class LCProdAppStack extends cdk.Stack {
         SELLER_WEB_HOST: `https://${constants.PUNYCODE_판매자}.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://${constants.PUNYCODE_방송인}.${constants.PUNYCODE_DOMAIN}`,
         KKSHOW_WEB_HOST: `https://${constants.PUNYCODE_DOMAIN}`,
+        MAILER_HOST: `https://mailer.${constants.PUNYCODE_DOMAIN}`,
         NODE_ENV: 'production',
       },
       logging: new AwsLogDriver({
