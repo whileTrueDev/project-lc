@@ -363,6 +363,7 @@ $(document).ready(function ready() {
     socket.emit('get objective message from admin', {
       roomName,
       objective: { nickname, price },
+      liveShoppingId,
     });
     $('#objective-message').val(null);
   });

@@ -229,11 +229,11 @@ setInterval(async () => {
   }
 }, 2000);
 
-function makeRain(ids, delay) {
+function makeRain(users, delay) {
   let i = 0;
   const interval = setInterval(function () {
     const span = document.createElement('span');
-    span.appendChild(document.createTextNode(ids[i].nickname));
+    span.appendChild(document.createTextNode(users[i].nickname));
     const div = document.createElement('div');
     div.appendChild(span);
     div.style.position = 'absolute';
@@ -243,7 +243,7 @@ function makeRain(ids, delay) {
     div.style.opacity = '0';
     $('.letters').append(div);
 
-    if (i++ >= ids.length - 1) clearInterval(interval);
+    if (i++ >= users.length - 1) clearInterval(interval);
   }, delay);
 }
 
@@ -446,11 +446,11 @@ socket.on('get objective message', async (data) => {
     <span>님의 구매로 </span> 
     <span>${price}</span>
     <span>만원 돌파!</span>
-    <iframe src="/audio/pangpare.wav"
+    <iframe src="/audio/news.mp3"
     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     `,
   );
-  $('.bottom-area-text').text();
+  $('.bottom-area-text').text(`${data.users} 구매 감사합니다!`);
   $('.bottom-area-right').css({ opacity: 1 });
   $('.bottom-area-text').css({ opacity: 1 });
 
@@ -480,13 +480,17 @@ socket.on('get objective firework from server', async (data) => {
   $('.objective-wrapper').attr('id', 'soldout');
   $('.objective-wrapper').html(fireworkHtml);
   $('.objective-wrapper').fadeIn();
-  makeRain(data.ids, 1000);
+  makeRain(data.users, 200);
 
   await setTimeout(() => {
     $('body').remove('#soldout-alarm');
     $('.objective-wrapper').fadeOut();
-    $('.letters').empty().hide();
+    $('.letters').empty().fadeOut(1000);
   }, 10000);
+
+  // await setTimeout(() => {
+  //   $('.letters').empty().fadeOut(1000);
+  // }, 15000);
 });
 
 socket.on('toggle right-top onad logo from server', () => {
@@ -538,7 +542,9 @@ socket.on('get bottom fever message', (data) => {
 
 socket.on('handle bottom area to client', () => {
   if ($('.bottom-area-right').css('opacity') === '1') {
+    $('.bottom-area-text').text('');
     $('.bottom-area-right').css({ opacity: 0 });
+    $('.bottom-area-right-fever-wrapper').hide();
   } else {
     $('.bottom-area-right').css({ opacity: 1 }).fadeIn(2000);
   }
@@ -620,7 +626,7 @@ socket.on('get objective notification tts', (audioBuffer) => {
     const sound = new Audio(streamStartNotificationAudioBlob);
     setTimeout(() => {
       sound.play();
-    }, 2500);
+    }, 6000);
   }
 });
 
@@ -672,8 +678,8 @@ socket.on('remove soldout banner from server', () => {
 
 socket.on('get fever signal from server', (text) => {
   $('.bottom-area-right').css({ opacity: 1 });
-  $('.bottom-area-right-fever-wrapper').css({ opacity: 1 });
-  $('.bottom-admin').text(`${text}`);
+  $('.bottom-area-right-fever-wrapper').show();
+  $('.bottom-fever-message').text(`${text}`);
   $('body').append(`
     <iframe src="/audio/fever.mp3" id="fever-alarm" allow="autoplay" style="display:none"></iframe>
     `);
