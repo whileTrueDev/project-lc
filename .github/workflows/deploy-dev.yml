@@ -28,7 +28,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        uses: bahmutov/npm-install@v1.8.0 # install dependencies using cache
 
       # Generate Prisma Client
       - name: Primsa generate
@@ -71,7 +71,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        uses: bahmutov/npm-install@v1.8.0 # install dependencies using cache
 
       - name: Check api affected
         run: tools/check-need-deploy.sh api
@@ -123,7 +123,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        uses: bahmutov/npm-install@v1.8.0 # install dependencies using cache
 
       - name: Check Overlay affected
         run: tools/check-need-deploy.sh overlay
@@ -175,7 +175,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        uses: bahmutov/npm-install@v1.8.0 # install dependencies using cache
 
       - name: Check Overlay affected
         run: tools/check-need-deploy.sh overlay-controller
@@ -227,7 +227,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        uses: bahmutov/npm-install@v1.8.0 # install dependencies using cache
 
       - name: Check RealtimeAPI affected
         run: tools/check-need-deploy.sh realtimeapi
@@ -273,7 +273,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        uses: bahmutov/npm-install@v1.8.0 # install dependencies using cache
 
       - name: Check Mailer affected
         run: tools/check-need-deploy.sh mailer
