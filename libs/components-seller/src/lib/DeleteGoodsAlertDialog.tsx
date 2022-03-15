@@ -1,34 +1,36 @@
 import { Icon, WarningTwoIcon } from '@chakra-ui/icons';
 import {
-  Center,
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
-  Button,
-  useToast,
   Alert,
-  AlertIcon,
   AlertDescription,
-  Text,
-  Stack,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  AlertIcon,
+  Button,
+  Center,
   Spinner,
+  Stack,
+  Text,
+  useToast,
 } from '@chakra-ui/react';
 import { GridSelectionModel } from '@material-ui/data-grid';
+import PasswordCheckForm from '@project-lc/components-shared/PasswordCheckForm';
 import {
   useDeleteFmGoods,
   useDeleteLcGoods,
   useFmOrdersByGoods,
   useLiveShoppingList,
+  useProfile,
 } from '@project-lc/hooks';
 import {
   getFmOrderStatusByNames,
-  SellerGoodsListItem,
   getLiveShoppingProgress,
+  SellerGoodsListItem,
 } from '@project-lc/shared-types';
-import { useRef, useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useQueryClient } from 'react-query';
 
 export function DeleteGoodsAlertDialog({
@@ -42,6 +44,12 @@ export function DeleteGoodsAlertDialog({
   items?: SellerGoodsListItem[];
   selectedGoodsIds: GridSelectionModel;
 }): JSX.Element {
+  const [step, setStep] = useState<'alert' | 'checkPassword'>('alert');
+  const { data: profileData } = useProfile();
+  const handleClose = (): void => {
+    setStep('alert');
+    onClose();
+  };
   const queryClient = useQueryClient();
   const toast = useToast();
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -159,7 +167,7 @@ export function DeleteGoodsAlertDialog({
         isClosable: true,
       });
     } finally {
-      onClose();
+      handleClose();
     }
   };
 
@@ -168,7 +176,7 @@ export function DeleteGoodsAlertDialog({
       isCentered
       isOpen={isOpen}
       leastDestructiveRef={cancelRef}
-      onClose={onClose}
+      onClose={handleClose}
     >
       <AlertDialogOverlay>
         <AlertDialogContent>
@@ -179,60 +187,79 @@ export function DeleteGoodsAlertDialog({
             </Text>
           </AlertDialogHeader>
 
-          <AlertDialogBody>
-            상품 삭제시 복구가 불가합니다. 선택한 상품을 삭제하시겠습니까?
-            {orders.isLoading && (
-              <Center>
-                <Spinner />
-              </Center>
-            )}
-            {!orders.isLoading && !isDeletable && (
-              <Alert status="error" mt={4}>
-                <AlertIcon />
-                <AlertDescription>
-                  <Stack>
-                    <Text>
-                      선택된 상품 목록에 주문 처리가 완료되지 않은 상품이 포함되어 있어
-                      상품 삭제가 불가능합니다.
-                    </Text>
-                    <Text>
-                      상품을 삭제하지 않고 미노출처리를 통해 상품이 전시되지 않도록 변경할
-                      수 있습니다.
-                    </Text>
-                  </Stack>
-                </AlertDescription>
-              </Alert>
-            )}
-            {!liveShoppings.isLoading && hasliveShoppingList.length > 0 && (
-              <Alert status="error" mt={4}>
-                <AlertIcon />
-                <AlertDescription>
-                  <Stack spacing={1}>
-                    <Text>
-                      선택된 상품 목록에 라이브 쇼핑에 등록된 상품이 포함되어 있어 상품
-                      삭제가 불가능합니다.
-                    </Text>
-                    <Text as="u">등록된 상품 : {hasliveShoppingList.join(', ')}</Text>
-                  </Stack>
-                </AlertDescription>
-              </Alert>
-            )}
-          </AlertDialogBody>
+          {/* 상품삭제 다이얼로그 초기 화면(step === 'alert') */}
+          {step === 'alert' && (
+            <>
+              <AlertDialogBody>
+                상품 삭제시 복구가 불가합니다. 선택한 상품을 삭제하시겠습니까?
+                {orders.isLoading && (
+                  <Center>
+                    <Spinner />
+                  </Center>
+                )}
+                {!orders.isLoading && !isDeletable && (
+                  <Alert status="error" mt={4}>
+                    <AlertIcon />
+                    <AlertDescription>
+                      <Stack>
+                        <Text>
+                          선택된 상품 목록에 주문 처리가 완료되지 않은 상품이 포함되어
+                          있어 상품 삭제가 불가능합니다.
+                        </Text>
+                        <Text>
+                          상품을 삭제하지 않고 미노출처리를 통해 상품이 전시되지 않도록
+                          변경할 수 있습니다.
+                        </Text>
+                      </Stack>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {!liveShoppings.isLoading && hasliveShoppingList.length > 0 && (
+                  <Alert status="error" mt={4}>
+                    <AlertIcon />
+                    <AlertDescription>
+                      <Stack spacing={1}>
+                        <Text>
+                          선택된 상품 목록에 라이브 쇼핑에 등록된 상품이 포함되어 있어
+                          상품 삭제가 불가능합니다.
+                        </Text>
+                        <Text as="u">등록된 상품 : {hasliveShoppingList.join(', ')}</Text>
+                      </Stack>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </AlertDialogBody>
 
-          <AlertDialogFooter>
-            <Button onClick={onClose}>취소</Button>
-            <Button
-              onClick={handleDelete}
-              ml={3}
-              colorScheme="red"
-              isDisabled={!isDeletable || !(hasliveShoppingList.length === 0)}
-              isLoading={
-                deleteLcGoods.isLoading || deleteFmGoods.isLoading || orders.isLoading
-              }
-            >
-              확인
-            </Button>
-          </AlertDialogFooter>
+              <AlertDialogFooter>
+                <Button onClick={handleClose}>취소</Button>
+                <Button
+                  onClick={() => setStep('checkPassword')}
+                  ml={3}
+                  colorScheme="red"
+                  isDisabled={!isDeletable || !(hasliveShoppingList.length === 0)}
+                  isLoading={
+                    deleteLcGoods.isLoading || deleteFmGoods.isLoading || orders.isLoading
+                  }
+                >
+                  확인
+                </Button>
+              </AlertDialogFooter>
+            </>
+          )}
+
+          {/* 상품삭제 다이얼로그 비밀번호 확인 화면(step === 'checkPassword') */}
+          {step === 'checkPassword' && (
+            <AlertDialogBody>
+              <Stack>
+                <Text>상품 삭제 전 본인 확인을 위하여 비밀번호를 입력해주세요.</Text>
+                <PasswordCheckForm
+                  email={profileData?.email}
+                  onCancel={handleClose}
+                  onConfirm={handleDelete}
+                />
+              </Stack>
+            </AlertDialogBody>
+          )}
         </AlertDialogContent>
       </AlertDialogOverlay>
     </AlertDialog>
