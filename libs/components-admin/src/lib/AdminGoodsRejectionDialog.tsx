@@ -77,7 +77,8 @@ export function AdminGoodsRejectionDialog({
         title: '상품이 반려되었습니다.',
         status: 'success',
       });
-      router.push('/goods');
+      router.push('/goods/confirmation');
+      onClose();
     } catch (error) {
       toast({
         title: '상품 반려가 실패하였습니다.',
