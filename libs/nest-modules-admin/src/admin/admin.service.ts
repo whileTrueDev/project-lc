@@ -4,22 +4,22 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import {
+  AdminClassChangeHistory,
   Administrator,
   GoodsConfirmation,
-  AdminClassChangeHistory,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  AdminClassDto,
+  AdminGoodsByIdRes,
+  AdminGoodsListRes,
   AdminSettlementInfoType,
   BusinessRegistrationStatus,
-  GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingDTO,
-  AdminClassDto,
   LiveShoppingImageDto,
   LiveShoppingWithGoods,
-  AdminGoodsByIdRes,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -119,8 +119,7 @@ export class AdminService {
   }
 
   // 관리자 페이지 상품검수 데이터, 상품검수가 완료되지 않은 상태일 경우,
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  public async getGoodsInfo({ sort, direction }) {
+  public async getGoodsInfo({ sort, direction }): Promise<AdminGoodsListRes> {
     const items = await this.prisma.goods.findMany({
       orderBy: [{ [sort]: direction }],
       where: {
