@@ -1,3 +1,4 @@
+import { Schedule } from '@aws-cdk/aws-applicationautoscaling';
 import { Certificate } from '@aws-cdk/aws-certificatemanager';
 import { SecurityGroup, Vpc } from '@aws-cdk/aws-ec2';
 import { Repository, TagStatus } from '@aws-cdk/aws-ecr';
@@ -10,6 +11,7 @@ import {
   FargateTaskDefinition,
   Secret,
 } from '@aws-cdk/aws-ecs';
+import { ScheduledFargateTask } from '@aws-cdk/aws-ecs-patterns';
 import {
   ApplicationListener,
   ApplicationLoadBalancer,
@@ -27,6 +29,7 @@ import { loadSsmParam } from '../../util/loadSsmParam';
 interface LCDevPrivateAppStackProps extends StackProps {
   albSecGrp: SecurityGroup;
   mailerSecGrp: SecurityGroup;
+  inactiveBatchSecGrp: SecurityGroup;
   cluster: Cluster;
   vpc: Vpc;
 }
@@ -38,7 +41,7 @@ export class LCDevPrivateAppStack extends Stack {
 
   constructor(scope: Construct, id: string, props: LCDevPrivateAppStackProps) {
     super(scope, id, props);
-    const { vpc, cluster, mailerSecGrp, albSecGrp } = props;
+    const { vpc, cluster, mailerSecGrp, albSecGrp, inactiveBatchSecGrp } = props;
 
     // * ALB
     const alb = this.createPrivateAlb(vpc, albSecGrp);
@@ -47,6 +50,9 @@ export class LCDevPrivateAppStack extends Stack {
 
     // * Fargate services
     this.createMailerService(vpc, cluster, mailerSecGrp, albHttpsListener);
+
+    // * 휴면 배치 작업
+    this.createInactiveBatchService(vpc, cluster, inactiveBatchSecGrp);
   }
 
   /** Private 용 로드밸런서를 구성합니다. */
@@ -167,5 +173,73 @@ export class LCDevPrivateAppStack extends Stack {
     });
 
     return service;
+  }
+
+  /** 매 일 1시 0분마다 실행되는 휴면처리 배치프로그램 Service를 생성합니다. */
+  private createInactiveBatchService(
+    vpc: Vpc,
+    cluster: Cluster,
+    secGrp: SecurityGroup,
+  ): ScheduledFargateTask {
+    const servicePrefix = 'InactiveBatch';
+    const prefix = `${this.ID_PREFIX}${servicePrefix}`;
+
+    const repo = new Repository(this, `${prefix}Repo`, {
+      repositoryName: constants.DEV.ECS_INACTIVE_BATCH_FAMILY_NAME,
+      lifecycleRules: [
+        { maxImageCount: 1, tagStatus: TagStatus.ANY },
+        {
+          maxImageAge: Duration.days(1),
+          tagStatus: TagStatus.UNTAGGED,
+        },
+      ],
+    });
+
+    const taskDefinition = new FargateTaskDefinition(this, `${prefix}EcsTaskDef`, {
+      family: constants.DEV.ECS_INACTIVE_BATCH_FAMILY_NAME,
+    });
+
+    taskDefinition.addContainer(`${prefix}EcsContainer`, {
+      containerName: constants.DEV.ECS_INACTIVE_BATCH_FAMILY_NAME,
+      image: ContainerImage.fromEcrRepository(repo),
+      secrets: {
+        DATABASE_URL: Secret.fromSsmParameter(
+          loadSsmParam(this, `${prefix}ParamDBUrl`, {
+            parameterName: constants.DEV.ECS_DATABASE_URL_KEY,
+          }),
+        ),
+      },
+      environment: {
+        NODE_ENV: 'test',
+        S3_BUCKET_NAME: 'lc-project',
+        MAILER_HOST: `https://dev-mailer.${constants.PUNYCODE_DOMAIN}`,
+      },
+      logging: new AwsLogDriver({
+        logGroup: new LogGroup(this, `${prefix}LogGroup`, {
+          logGroupName: constants.DEV.ECS_INACTIVE_BATCH_LOG_GROUP_NAME,
+          removalPolicy: RemovalPolicy.DESTROY,
+        }),
+        streamPrefix: 'ecs',
+      }),
+    });
+
+    const task = new ScheduledFargateTask(this, `${prefix}Task`, {
+      vpc,
+      cluster,
+      desiredTaskCount: 1,
+      enabled: true,
+      subnetSelection: {
+        subnetGroupName: constants.DEV.PRIVATE_SUBNET_GROUP_NAME,
+      },
+      securityGroups: [secGrp],
+      scheduledFargateTaskDefinitionOptions: {
+        taskDefinition,
+      },
+      // 매일 5분 마다
+      schedule: Schedule.rate(Duration.days(365)),
+      platformVersion: FargatePlatformVersion.LATEST,
+    });
+
+    return task;
   }
 }

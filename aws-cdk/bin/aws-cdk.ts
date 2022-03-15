@@ -9,6 +9,7 @@ import { LCDevRedisStack } from '../lib/dev/redis-stack';
 import { LCDevVpcStack } from '../lib/dev/vpc-stack';
 import { LCDomainStack } from '../lib/env-agnostic/domain-stack';
 import { LCProdAppStack } from '../lib/prod/app-stack';
+import { LCBatchAppStack } from '../lib/prod/batch-app-stack';
 import { LCProdDatabaseStack } from '../lib/prod/database-stack';
 import { LCProdPrivateAppStack } from '../lib/prod/private-app-stack';
 import { LCRedisStack } from '../lib/prod/redis-stack';
@@ -49,6 +50,7 @@ const devPrivateAppStack = new LCDevPrivateAppStack(app, 'LC-DEV-PRIVATE-APP', {
   cluster: devAppStack.cluster,
   albSecGrp: devVpcStack.privateAlbSecGrp,
   mailerSecGrp: devVpcStack.mailerSecGrp,
+  inactiveBatchSecGrp: devVpcStack.inactiveBatchSecGrp,
 });
 // ************************************
 // * Production 환경
@@ -78,7 +80,7 @@ new LCRedisStack(app, 'LC-PROD-REDIS', {
 });
 
 // 프라이빗 앱 (mailer)
-new LCProdPrivateAppStack(app, 'LC-PROD-PRIVATE-APP', {
+const prodPrivateAppStack = new LCProdPrivateAppStack(app, 'LC-PROD-PRIVATE-APP', {
   vpc: prodVpcStack.vpc,
   cluster: prodAppStack.cluster,
   albSecGrp: prodVpcStack.privateAlbSecGrp,
@@ -86,15 +88,17 @@ new LCProdPrivateAppStack(app, 'LC-PROD-PRIVATE-APP', {
 });
 
 // Prod 배치 앱 (휴면배치, ...)
-// new LCBatchAppStack(app, 'LC-PROD-BATCH-APP', {
-//   vpc: prodVpcStack.vpc,
-//   cluster: prodAppStack.cluster,
-// });
+new LCBatchAppStack(app, 'LC-PROD-BATCH-APP', {
+  vpc: prodVpcStack.vpc,
+  cluster: prodAppStack.cluster,
+  inactiveBatchSecGrp: prodVpcStack.inactiveBatchSecGrp,
+});
 
 // ************************************
 // * 퍼블릭 도메인
 new LCDomainStack(app, 'LC-DOMAIN', {
   devALB: devAppStack.alb,
-  prodALB: prodAppStack.alb,
   devPrivateAlb: devPrivateAppStack.privateAlb,
+  prodALB: prodAppStack.alb,
+  prodPrivateAlb: prodPrivateAppStack.privateAlb,
 });

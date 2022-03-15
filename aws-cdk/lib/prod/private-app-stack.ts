@@ -145,9 +145,9 @@ export class LCProdPrivateAppStack extends Stack {
       assignPublicIp: false,
     });
 
-    const targetGroup = new ApplicationTargetGroup(this, `${prefix}TargetGroup`, {
+    const targetGroup = new ApplicationTargetGroup(this, `${prefix}TG`, {
       vpc,
-      targetGroupName: `${prefix}TargetGroup`,
+      targetGroupName: `${prefix}TG`,
       port: constants.PROD.ECS_MAILER_PORT,
       protocol: ApplicationProtocol.HTTP,
       healthCheck: {
@@ -158,7 +158,7 @@ export class LCProdPrivateAppStack extends Stack {
       targets: [service],
     });
 
-    listener.addTargetGroups(`${prefix}HTTPSTargetGroup`, {
+    listener.addTargetGroups(`${prefix}HTTPSTG`, {
       priority: 1,
       conditions: [
         ListenerCondition.hostHeaders([`mailer.${constants.PROD.PRIVATE_DOMAIN}`]),

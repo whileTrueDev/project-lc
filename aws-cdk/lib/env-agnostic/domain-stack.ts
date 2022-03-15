@@ -8,6 +8,7 @@ interface LCDomainStackProps extends cdk.StackProps {
   prodALB: elbv2.ApplicationLoadBalancer;
   devALB?: elbv2.ApplicationLoadBalancer;
   devPrivateAlb: elbv2.ApplicationLoadBalancer;
+  prodPrivateAlb: elbv2.ApplicationLoadBalancer;
 }
 
 export class LCDomainStack extends cdk.Stack {
@@ -17,13 +18,14 @@ export class LCDomainStack extends cdk.Stack {
   private readonly prodALBTarget: route53Targets.LoadBalancerTarget;
   private readonly devALBTarget: route53Targets.LoadBalancerTarget;
   private readonly devPrivateAlbTarget: route53Targets.LoadBalancerTarget;
+  private readonly prodPrivateAlbTarget: route53Targets.LoadBalancerTarget;
 
   public hostedzone: route53.PublicHostedZone;
 
   constructor(scope: cdk.Construct, id: string, props: LCDomainStackProps) {
     super(scope, id, props);
 
-    const { prodALB, devALB, devPrivateAlb } = props;
+    const { prodALB, devALB, devPrivateAlb, prodPrivateAlb } = props;
     if (!devALB) {
       throw new Error('dev ALB is not defined - from LCDomainStack');
     }
@@ -33,6 +35,7 @@ export class LCDomainStack extends cdk.Stack {
     this.prodALBTarget = new route53Targets.LoadBalancerTarget(prodALB);
     this.devALBTarget = new route53Targets.LoadBalancerTarget(devALB);
     this.devPrivateAlbTarget = new route53Targets.LoadBalancerTarget(devPrivateAlb);
+    this.prodPrivateAlbTarget = new route53Targets.LoadBalancerTarget(prodPrivateAlb);
 
     this.createProdRecords();
     this.createDevRecords();
@@ -86,12 +89,12 @@ export class LCDomainStack extends cdk.Stack {
       zone: this.hostedzone,
       target: route53.RecordTarget.fromAlias(this.prodALBTarget),
     });
-    // // mailer.크크쇼.com
-    // new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_mailer`, {
-    //   zone: this.hostedzone,
-    //   recordName: `mailer.${this.PUNYCODE_DOMAIN}`,
-    //   target: route53.RecordTarget.fromAlias(this.prodPrivateALBTarget),
-    // });
+    // mailer.크크쇼.com
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_mailer`, {
+      zone: this.hostedzone,
+      recordName: `mailer.${this.PUNYCODE_DOMAIN}`,
+      target: route53.RecordTarget.fromAlias(this.prodPrivateAlbTarget),
+    });
   }
 
   private createDevRecords(): void {

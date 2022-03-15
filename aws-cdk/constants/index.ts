@@ -65,6 +65,9 @@ export const constants = {
     ECS_MAILER_FAMILY_NAME: 'project-lc-mailer-dev',
     ECS_MAILER_LOG_GROUP_NAME: '/ecs/project-lc-mailer-dev',
     ECS_MAILER_PORT: 3003,
+    // * ECS Inactive Batch
+    ECS_INACTIVE_BATCH_FAMILY_NAME: 'project-lc-inactive-batch-dev',
+    ECS_INACTIVE_BATCH_LOG_GROUP_NAME: '/ecs/project-lc-inactive-batch-dev',
     // * ************************
     // * SSM Parameter Store Keys
     // * ************************
