@@ -21,7 +21,7 @@ export class CacheConfig implements CacheOptionsFactory {
       },
     };
 
-    if (['production', 'test'].includes(nodeEnv)) {
+    if (['production'].includes(nodeEnv)) {
       // 테스트, 프로덕션 환경
       let host = '';
       let port: number | null = null;
