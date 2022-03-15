@@ -242,6 +242,7 @@
             "{options.outputPath}"
           ],
           "options": {
+            "generatePackageJson": true,
             "outputPath": "dist/apps/batch-inactive-handler",
             "main": "apps/batch-inactive-handler/src/main.ts",
             "tsConfig": "apps/batch-inactive-handler/tsconfig.app.json",
@@ -595,7 +596,8 @@
             "tsConfig": "apps/mailer/tsconfig.app.json",
             "assets": [
               "apps/mailer/src/assets"
-            ]
+            ],
+            "generatePackageJson": true
           },
           "configurations": {
             "production": {
