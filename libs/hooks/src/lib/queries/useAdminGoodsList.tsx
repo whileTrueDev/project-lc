@@ -1,7 +1,7 @@
 import {
   AdminAllLcGoodsList,
   AdminGoodsListRes,
-  GoodsListDto
+  GoodsListDto,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
@@ -9,8 +9,6 @@ import axios from '../../axios';
 
 /** 검수가 필요한 상품목록 조회 */
 type SellerGoodsListRequestDto = GoodsListDto & { email?: string };
-
-
 
 export const getAdminGoodsList = async (
   dto: Pick<GoodsListDto, 'sort' | 'direction'>,

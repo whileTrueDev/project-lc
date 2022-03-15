@@ -227,7 +227,6 @@ function useAdminGoodsConfirmList({
   };
 }
 
-
 // * 관리자 상품검수목록 필터링 위한 판매자 select 컴포넌트
 function SellerFilterSelect({
   uniqueSellerList,
@@ -242,7 +241,9 @@ function SellerFilterSelect({
   const selectValue = filterSellerId ? filterSellerId.toString() : ALL_VALUE;
   return (
     <Stack direction="row" alignItems="center">
-      <Text width="200px" textAlign="right">판매자별 보기</Text>
+      <Text width="200px" textAlign="right">
+        판매자별 보기
+      </Text>
       <Select
         size="sm"
         value={selectValue}

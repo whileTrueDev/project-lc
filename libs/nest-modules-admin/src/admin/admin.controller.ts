@@ -181,7 +181,9 @@ export class AdminController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/goods/:goodsId')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getAdminGoodsById(@Param('goodsId') goodsId: string | number): Promise<AdminGoodsByIdRes> {
+  getAdminGoodsById(
+    @Param('goodsId') goodsId: string | number,
+  ): Promise<AdminGoodsByIdRes> {
     return this.adminService.getOneGoods(goodsId);
   }
 

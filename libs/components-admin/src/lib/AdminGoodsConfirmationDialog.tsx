@@ -56,7 +56,7 @@ export interface GoodRowType extends GridRowData {
   goods_name: string;
   name: string;
   agreementFlag: boolean;
-};
+}
 
 type GoodsConfirmationDialogType = {
   isOpen: boolean;

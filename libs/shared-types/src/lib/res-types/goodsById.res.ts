@@ -33,5 +33,5 @@ export type GoodsByIdRes = Goods & {
 };
 
 export type AdminGoodsByIdRes = GoodsByIdRes & {
-  seller: Seller
-}
+  seller: Seller;
+};

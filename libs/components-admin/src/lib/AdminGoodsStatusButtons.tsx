@@ -8,7 +8,9 @@ import { useMemo } from 'react';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
 
-export function AdminGoodsStatusButtons(props: { goods: AdminGoodsByIdRes }): JSX.Element {
+export function AdminGoodsStatusButtons(props: {
+  goods: AdminGoodsByIdRes;
+}): JSX.Element {
   const { goods } = props;
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -19,7 +21,12 @@ export function AdminGoodsStatusButtons(props: { goods: AdminGoodsByIdRes }): JS
   } = useDisclosure();
 
   const goodsRowData = useMemo(
-    () => ({ id: goods.id, goods_name: goods.goods_name,name: goods.seller.name || '', agreementFlag: goods.seller.agreementFlag  }),
+    () => ({
+      id: goods.id,
+      goods_name: goods.goods_name,
+      name: goods.seller.name || '',
+      agreementFlag: goods.seller.agreementFlag,
+    }),
     [goods],
   );
 
