@@ -34,8 +34,8 @@ export class GoodsCommonInfoController {
   }
 
   /** 특정 공통정보 상세 조회 */
-  @Get()
-  getOneGoodsCommonInfo(@Query('id', ParseIntPipe) id: number): Promise<GoodsInfo> {
+  @Get('/detail')
+  async getOneGoodsCommonInfo(@Query('id', ParseIntPipe) id: number): Promise<GoodsInfo> {
     return this.commonInfoService.getOneGoodsCommonInfo(id);
   }
 

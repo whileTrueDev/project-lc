@@ -14,7 +14,7 @@ import { GoodsService } from './goods.service';
 describe('GoodsService', () => {
   let __prisma: PrismaClient;
   let service: GoodsService;
-  const TEST_USER_ID = 3;
+  let TEST_USER_ID: number;
   const TEST_CONFIRMATION_GOODS_CONNECTION_ID = 999;
   let TEST_GOODS: Goods;
   beforeAll(async () => {
@@ -33,13 +33,14 @@ describe('GoodsService', () => {
     }).compile();
     service = module.get<GoodsService>(GoodsService);
     // 테스트용 더미 판매자(seller) 생성
-    await __prisma.seller.create({
+    const testSeller = await __prisma.seller.create({
       data: {
-        id: TEST_USER_ID,
+        email: null,
         name: 'test',
         password: 'test',
       },
     });
+    TEST_USER_ID = testSeller.id;
     // 테스트용 더미 Goods, GoodsConfirmation 생성
     TEST_GOODS = await __prisma.goods.create({
       data: {
