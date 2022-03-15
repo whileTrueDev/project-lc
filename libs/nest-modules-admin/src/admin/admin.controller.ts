@@ -61,6 +61,7 @@ import {
   AdminClassDto,
   PrivacyApproachHistoryDto,
   AdminClassChangeHistoryDtoWithoutId,
+  AdminGoodsByIdRes,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
@@ -176,11 +177,11 @@ export class AdminController {
     });
   }
 
-  // 상품검수를 위한 상품 리스트
+  // 상품검수를 위한 상품 상세 정보
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/goods/:goodsId')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getAdminGoodsById(@Param('goodsId') goodsId: string | number): Promise<GoodsByIdRes> {
+  getAdminGoodsById(@Param('goodsId') goodsId: string | number): Promise<AdminGoodsByIdRes> {
     return this.adminService.getOneGoods(goodsId);
   }
 

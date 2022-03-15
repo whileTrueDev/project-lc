@@ -19,6 +19,7 @@ import {
   AdminClassDto,
   LiveShoppingImageDto,
   LiveShoppingWithGoods,
+  AdminGoodsByIdRes,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -239,7 +240,7 @@ export class AdminService {
     return goodsConfirmation;
   }
 
-  public async getOneGoods(goodsId: string | number): Promise<GoodsByIdRes> {
+  public async getOneGoods(goodsId: string | number): Promise<AdminGoodsByIdRes> {
     return this.prisma.goods.findFirst({
       where: {
         id: Number(goodsId),
@@ -260,6 +261,7 @@ export class AdminService {
         confirmation: true,
         image: true,
         GoodsInfo: true,
+        seller: true,
       },
     });
   }
