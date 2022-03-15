@@ -21,7 +21,7 @@ import { SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ConfirmationBadge } from './AdminBusinessRegistrationList';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
@@ -80,7 +80,7 @@ const columns: GridColumns = [
   },
   {
     field: 'name',
-    headerName: '판매자 ID',
+    headerName: '판매자명',
     minWidth: 110,
     sortable: false,
     valueGetter: ({ row }) => row.name,
@@ -187,12 +187,44 @@ export function AdminGoodsList(): JSX.Element {
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
   };
 
+  // 상품의 판매자와 고유번호만 추려내서 필터로 쓰기
+  const sellerList = !data
+    ? []
+    : data.items.map((g) => ({ sellerId: g.sellerId, sellerName: g.name }));
+
+  const uniqueSellerList = sellerList.reduce((unique, i) => {
+    if (
+      unique.findIndex(
+        (u) => u.sellerId === i.sellerId && u.sellerName === i.sellerName,
+      ) > -1
+    ) {
+      return unique;
+    }
+    return [...unique, i];
+  }, [] as Array<{ sellerId: number; sellerName: string }>);
+
+  const [filterSellerId, setFilterSellerId] = useState<null | number>(null);
+
+  const rows = useMemo(() => {
+    if (!data?.items) return [];
+    if (filterSellerId) {
+      return data.items.filter((i) => i.sellerId === filterSellerId);
+    }
+    return data.items;
+  }, [data, filterSellerId]);
+
+  const rowCount = useMemo(() => {
+    if (filterSellerId) {
+      return data?.items.filter((i) => i.sellerId === filterSellerId).length;
+    }
+    return data?.totalItemCount;
+  }, [data, filterSellerId]);
   return (
     <>
       <ChakraDataGrid
         bg={useColorModeValue('inherit', 'gray.300')}
         loading={isLoading}
-        rows={data?.items || []}
+        rows={rows}
         autoHeight
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
         disableMultipleSelection
@@ -200,7 +232,7 @@ export function AdminGoodsList(): JSX.Element {
         disableColumnMenu
         paginationMode="server"
         pageSize={itemPerPage}
-        rowCount={data?.totalItemCount}
+        rowCount={rowCount}
         onPageChange={changePage}
         onCellClick={handleClick}
         components={{
@@ -221,6 +253,31 @@ export function AdminGoodsList(): JSX.Element {
                 <Select value={sort} onChange={handleSortChange} size="sm">
                   <option value={SellerGoodsSortColumn.REGIST_DATE}>최근 등록 순</option>
                   <option value={SellerGoodsSortColumn.GOODS_NAME}>상품명 순</option>
+                </Select>
+                <Text width="200px">판매자별 보기</Text>
+                <Select
+                  size="sm"
+                  value={filterSellerId  ? filterSellerId.toString() : '전체'}
+                  onChange={(e) => {
+                    // sellerId 값을 전달함
+                    const { value } = e.target;
+                    // '전체' 인경우 => 필터해제
+                    if (value === '전체') {
+                      setFilterSellerId(null);
+                    } else {
+                      // sellerId 값이 경우 => 해당 아이디로 item 필터
+                      setFilterSellerId(Number(value));
+                    }
+                  }}
+                >
+                  <option value={'전체'}>-- 모든 판매자 --</option>
+                  {uniqueSellerList.map((us) => {
+                    return (
+                      <option value={us.sellerId} key={us.sellerId}>
+                        {us.sellerName}
+                      </option>
+                    );
+                  })}
                 </Select>
               </Stack>
               <Button
