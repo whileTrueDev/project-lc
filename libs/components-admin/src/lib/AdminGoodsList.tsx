@@ -298,15 +298,15 @@ export function AdminGoodsList(): JSX.Element {
     onOpen: onRejectionOpen,
     onClose: onRejectionClose,
   } = useDisclosure();
-  const [selectedRow, setSelectedRow] = useState({});
+  const [selectedRow, setSelectedRow] = useState<null | AdminGoodsData>(null);
 
   const handleClick = async (param: GridCellParams): Promise<void> => {
     if (param.field === 'confirmation') {
-      setSelectedRow(param.row);
+      setSelectedRow(param.row as AdminGoodsData);
       onOpen();
     }
     if (param.field === 'rejection') {
-      setSelectedRow(param.row);
+      setSelectedRow(param.row as AdminGoodsData);
       onRejectionOpen();
     }
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기

@@ -17,7 +17,6 @@ import {
   Textarea,
   useToast,
 } from '@chakra-ui/react';
-import { GridRowData } from '@material-ui/data-grid';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
 import { useGoodRejectionMutation } from '@project-lc/hooks';
 import { GoodsConfirmationStatus } from '@project-lc/shared-types';
@@ -29,7 +28,7 @@ import { GoodRowType } from './AdminGoodsConfirmationDialog';
 export interface AdminGoodsRejectionDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  row: GoodRowType | GridRowData;
+  row: GoodRowType | null;
 }
 
 type rejectionFormData = {
@@ -88,6 +87,7 @@ export function AdminGoodsRejectionDialog({
   }
 
   const useSubmit = (data: rejectionFormData): void => {
+    if (!row) return;
     const { rejectionReason } = data;
     handleRejectionGood({ goodsId: row.id, rejectionReason });
   };
@@ -99,7 +99,7 @@ export function AdminGoodsRejectionDialog({
         <ModalCloseButton />
         <ModalBody>
           <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
-            <GridTableItem title="현재 상품명" value={row?.goods_name} />
+            <GridTableItem title="현재 상품명" value={row?.goods_name || ''} />
           </Grid>
           <FormControl m={2} mt={6} isInvalid={!!errors.rejectionReason}>
             <FormLabel fontSize="md">반려사유</FormLabel>
@@ -130,7 +130,7 @@ export function AdminGoodsRejectionDialog({
           <Button
             type="submit"
             isLoading={isSubmitting}
-            isDisabled={!watch('rejectionReason') || !!errors.rejectionReason}
+            isDisabled={!watch('rejectionReason') || !!errors.rejectionReason || !row}
           >
             반려하기
           </Button>

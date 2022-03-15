@@ -61,7 +61,7 @@ export interface GoodRowType extends GridRowData {
 type GoodsConfirmationDialogType = {
   isOpen: boolean;
   onClose: () => void;
-  row: GoodRowType;
+  row: GoodRowType | null;
   callback: () => void;
 };
 
@@ -88,6 +88,7 @@ export function AdminGoodsConfirmationDialog(
   async function useSubmit(submitData: {
     firstmallGoodsConnectionId: string;
   }): Promise<void> {
+    if (!row) return;
     try {
       await mutation.mutateAsync({
         goodsId: row.id,
@@ -126,7 +127,7 @@ export function AdminGoodsConfirmationDialog(
         <ModalCloseButton />
         <ModalBody>
           <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
-            <GridTableItem title="현재 상품명" value={row?.goods_name} />
+            <GridTableItem title="현재 상품명" value={row?.goods_name || ''} />
           </Grid>
           {!row?.agreementFlag && (
             <Alert status="error" mt={2}>
@@ -169,7 +170,9 @@ export function AdminGoodsConfirmationDialog(
           <Button
             type="submit"
             isLoading={isSubmitting}
-            isDisabled={!watch('firstmallGoodsConnectionId') || !row?.agreementFlag}
+            isDisabled={
+              !watch('firstmallGoodsConnectionId') || !row?.agreementFlag || !row
+            }
           >
             승인하기
           </Button>
