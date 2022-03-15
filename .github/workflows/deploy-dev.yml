@@ -74,7 +74,7 @@ jobs:
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check api affected
-        run: tools/check-need-api-deploy.sh
+        run: tools/check-need-deploy.sh api
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -126,7 +126,7 @@ jobs:
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check Overlay affected
-        run: tools/check-need-overlay-deploy.sh
+        run: tools/check-need-deploy.sh overlay
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -178,7 +178,7 @@ jobs:
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check Overlay affected
-        run: tools/check-need-overlay-controller-deploy.sh
+        run: tools/check-need-deploy.sh overlay-controller
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -230,7 +230,7 @@ jobs:
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check RealtimeAPI affected
-        run: tools/check-need-realtimeapi-deploy.sh
+        run: tools/check-need-deploy.sh realtimeapi
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -276,7 +276,7 @@ jobs:
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check Mailer affected
-        run: tools/check-need-mailer-deploy.sh
+        run: tools/check-need-deploy.sh mailer
 
       - name: Configure AWS credentials
         if: ${{ success() }}

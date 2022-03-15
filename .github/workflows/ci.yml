@@ -18,7 +18,7 @@ jobs:
     name: Test Job
     runs-on: ubuntu-latest
     env:
-      NODE_ENV: development
+      NODE_ENV: ci
       MYSQL_DATABASE: test_db
       MYSQL_USER: root
       MYSQL_PASSWORD: root

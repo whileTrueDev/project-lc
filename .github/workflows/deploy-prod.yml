@@ -74,7 +74,7 @@ jobs:
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check api affected
-        run: tools/check-need-api-deploy.sh
+        run: tools/check-need-deploy.sh api
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -126,7 +126,7 @@ jobs:
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check Overlay affected
-        run: tools/check-need-overlay-deploy.sh
+        run: tools/check-need-deploy.sh overlay
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -178,7 +178,7 @@ jobs:
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check Overlay affected
-        run: tools/check-need-overlay-controller-deploy.sh
+        run: tools/check-need-deploy.sh overlay-controller
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -230,7 +230,7 @@ jobs:
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check RealtimeAPI affected
-        run: tools/check-need-realtimeapi-deploy.sh
+        run: tools/check-need-deploy.sh realtimeapi
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -276,7 +276,7 @@ jobs:
         uses: bahmutov/npm-install@v1 # install dependencies using cache
 
       - name: Check Mailer affected
-        run: tools/check-need-mailer-deploy.sh
+        run: tools/check-need-deploy.sh mailer
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -306,5 +306,49 @@ jobs:
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: project-lc-mailer-service
+          cluster: project-lc-prod
+          wait-for-service-stability: false
+
+  DeployInactiveBatch:
+    name: Deploy Inactive Batch Job
+    runs-on: [self-hosted, linux, project-lc]
+    needs: [Build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      #  Install All Dependencies
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1 # install dependencies using cache
+
+      - name: Check InactiveBatch affected
+        run: tools/check-need-deploy.sh batch-inactive-handler
+
+      - name: Configure AWS credentials
+        if: ${{ success() }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROJECT_LC }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROJECT_LC }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        if: ${{ success() }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Fill in the new image ID in the Amazon ECS task definition InactiveBatch
+        if: ${{ success() }}
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: apps/batch-inactive-handler/task-definition.json
+          container-name: project-lc-inactive-batch
+          image: ${{ steps.login-ecr.outputs.registry }}/project-lc-inactive-batch:prod-${{ github.sha }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: airfordable/ecs-deploy-task-definition-to-scheduled-task@v2.0.0
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
           cluster: project-lc-prod
           wait-for-service-stability: false
