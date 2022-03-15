@@ -20,9 +20,6 @@ export class CacheConfig implements CacheOptionsFactory {
         options: { ttl: defaultCacheTTL },
       },
     };
-    if (nodeEnv === 'ci' && !cacheClusterHost) {
-      return { host: 'localhost', port: 6379, isGlobal: true, store: redisCacheStore };
-    }
 
     if (['production', 'test'].includes(nodeEnv)) {
       // 테스트, 프로덕션 환경

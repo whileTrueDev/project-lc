@@ -28,16 +28,9 @@ jobs:
       CIPHER_HASH: DUMMY_CIPHER_HAS
       CIPHER_PASSWORD: DUMMY_CIPHER_PASSWORD
       CIPHER_SALT: DUMMY_CIPHER_SALT
-    services:
-      redis:
-        image: redis:6.2 # Docker Hub image
-        ports:
-          - 6379:6379
     steps:
-      - name: Setup MySQL
-        run: |
-          sudo systemctl start mysql.service
-          mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
+      - name: Setup Dependency Containers
+        run: docker-compose up -d
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install Dependencies

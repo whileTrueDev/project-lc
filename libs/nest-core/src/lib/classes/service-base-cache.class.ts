@@ -13,7 +13,6 @@ export class ServiceBaseWithCache {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const client: Cluster = await this.cacheManager.store.getClient();
-    if (process.env.NODE_ENV === 'ci') return false;
     const redisNodes = client.nodes();
     const _keys: string[][] = await Promise.all(
       redisNodes.map((redis) => redis.keys(`*${cacheKey}*`)),
