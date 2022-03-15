@@ -2,13 +2,13 @@
 
 import { Grid, useDisclosure, Button } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
-import { GoodsByIdRes } from '@project-lc/shared-types';
+import { AdminGoodsByIdRes } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
 
-export function AdminGoodsStatusButtons(props: { goods: GoodsByIdRes }): JSX.Element {
+export function AdminGoodsStatusButtons(props: { goods: AdminGoodsByIdRes }): JSX.Element {
   const { goods } = props;
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -19,7 +19,7 @@ export function AdminGoodsStatusButtons(props: { goods: GoodsByIdRes }): JSX.Ele
   } = useDisclosure();
 
   const goodsRowData = useMemo(
-    () => ({ id: goods.id, goods_name: goods.goods_name }),
+    () => ({ id: goods.id, goods_name: goods.goods_name,name: goods.seller.name || '', agreementFlag: goods.seller.agreementFlag  }),
     [goods],
   );
 

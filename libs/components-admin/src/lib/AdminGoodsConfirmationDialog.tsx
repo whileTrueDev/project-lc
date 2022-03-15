@@ -51,7 +51,7 @@ export function FmGoodsSeqInputHelpText(): JSX.Element {
 }
 
 // 검수 승인시에 필요한 최소한의 데이터
-export type GoodRowType = {
+export interface GoodRowType extends GridRowData {
   id: number;
   goods_name: string;
   name: string;
@@ -61,7 +61,7 @@ export type GoodRowType = {
 type GoodsConfirmationDialogType = {
   isOpen: boolean;
   onClose: () => void;
-  row: GoodRowType | GridRowData;
+  row: GoodRowType;
   callback: () => void;
 };
 
