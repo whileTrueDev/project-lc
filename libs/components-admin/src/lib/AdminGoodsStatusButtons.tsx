@@ -55,7 +55,7 @@ export function AdminGoodsStatusButtons(props: {
         isOpen={isOpen}
         onClose={onClose}
         row={goodsRowData}
-        callback={() => router.push('/goods')}
+        callback={() => router.push('/goods/confirmation')}
       />
       {/* 검수 반려 다이얼로그 - 반려사유 입력 */}
       <AdminGoodsRejectionDialog
