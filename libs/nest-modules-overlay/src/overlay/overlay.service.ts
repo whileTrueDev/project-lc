@@ -11,6 +11,7 @@ import {
   BroadcasterEmail,
   Voice,
   LiveShoppingBroadcastDate,
+  liveShoppingPurchaseMessageNickname,
 } from '@project-lc/shared-types';
 import { S3 } from '@aws-sdk/client-s3';
 import { throwError } from 'rxjs';
@@ -220,6 +221,20 @@ export class OverlayService {
       select: {
         broadcastStartDate: true,
         broadcastEndDate: true,
+      },
+    });
+  }
+
+  async getCustomerIds(
+    liveShoppingId: number,
+  ): Promise<liveShoppingPurchaseMessageNickname[]> {
+    return this.prisma.liveShoppingPurchaseMessage.findMany({
+      select: {
+        nickname: true,
+      },
+      where: {
+        liveShoppingId: Number(liveShoppingId),
+        loginFlag: true,
       },
     });
   }

@@ -229,6 +229,24 @@ setInterval(async () => {
   }
 }, 2000);
 
+function makeRain(ids, delay) {
+  let i = 0;
+  const interval = setInterval(function () {
+    const span = document.createElement('span');
+    span.appendChild(document.createTextNode(ids[i].nickname));
+    const div = document.createElement('div');
+    div.appendChild(span);
+    div.style.position = 'absolute';
+    div.style.top = `${Math.floor(Math.random() * 0)}px`;
+    div.style.left = `${Math.floor(Math.random() * 1920)}px`;
+    div.className = 'rain';
+    div.style.opacity = '0';
+    $('.letters').append(div);
+
+    if (i++ >= ids.length - 1) clearInterval(interval);
+  }, delay);
+}
+
 // async function switchBottomText() {
 //   if (bottomTextIndex >= bottomMessages.length) {
 //     bottomTextIndex = 0;
@@ -337,7 +355,7 @@ socket.on('get right-top purchase message', async (data) => {
   messageHtml = `
   <div class="donation-wrapper">
     <iframe src="/audio/${
-      alarmType === '2' ? 'alarm-type-2.wav' : 'alarm-type-1.wav'
+      alarmType === '2' ? 'alarm-type-2.mp3' : 'alarm-type-1.wav'
     }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="item">
       <div class="centered">
@@ -398,15 +416,15 @@ socket.on('get non client purchase message', async (data) => {
 
 //   const objectiveHtml = `
 //   <div class="objective-inner-wrapper">
-//     <iframe src="/audio/mid.mp3"
-//     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
-//     <div class="objective-message">
-//       <span class="objective-text">판매금액</span>
-//       <span class="objective-value">${price
-//         .toString()
-//         .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
-//       <span class="objective-text">원 돌파!!!</span>
-//     </div>
+// <iframe src="/audio/mid.mp3"
+// id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+// <div class="objective-message">
+//   <span class="objective-text">판매금액</span>
+//   <span class="objective-value">${price
+//     .toString()
+//     .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
+//   <span class="objective-text">원 돌파!!!</span>
+// </div>
 //   </div>
 //   `;
 
@@ -427,7 +445,10 @@ socket.on('get objective message', async (data) => {
     `<span>${nickname}</span> 
     <span>님의 구매로 </span> 
     <span>${price}</span>
-    <span>원 돌파!</span>`,
+    <span>만원 돌파!</span>
+    <iframe src="/audio/pangpare.wav"
+    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    `,
   );
   $('.bottom-area-text').text();
   $('.bottom-area-right').css({ opacity: 1 });
@@ -439,6 +460,33 @@ socket.on('get objective message', async (data) => {
     $('.news-banner p').empty();
     $('.news-banner').slideToggle();
   }, 5000);
+});
+
+socket.on('get objective firework from server', async (data) => {
+  const fireworkHtml = `
+  <img src="/images/firework.gif" id="firework" alt="firework"/>
+  <div class="objective-inner-wrapper">
+    <iframe src="/audio/firework.mp3"
+    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    <div class="objective-message">
+      <span class="objective-text">판매금액</span>
+      <span class="objective-value">${data.price
+        .toString()
+        .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
+      <span class="objective-text">원 돌파!!!</span>
+    </div>
+  </div>`;
+
+  $('.objective-wrapper').attr('id', 'soldout');
+  $('.objective-wrapper').html(fireworkHtml);
+  $('.objective-wrapper').fadeIn();
+  makeRain(data.ids, 1000);
+
+  await setTimeout(() => {
+    $('body').remove('#soldout-alarm');
+    $('.objective-wrapper').fadeOut();
+    $('.letters').empty().hide();
+  }, 10000);
 });
 
 socket.on('toggle right-top onad logo from server', () => {
@@ -572,7 +620,7 @@ socket.on('get objective notification tts', (audioBuffer) => {
     const sound = new Audio(streamStartNotificationAudioBlob);
     setTimeout(() => {
       sound.play();
-    }, 1000);
+    }, 2500);
   }
 });
 

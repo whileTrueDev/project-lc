@@ -122,6 +122,22 @@ export class AppMessageGateway
     this.server.to(roomName).emit('get objective message', data);
   }
 
+  @SubscribeMessage('get objective firework from admin')
+  async getObjectiveFirework(
+    @MessageBody()
+    data: {
+      roomName: string;
+      objective: { price: number };
+      liveShoppingId: number;
+    },
+  ): Promise<void> {
+    const { roomName } = data;
+    const ids = await this.overlayService.getCustomerIds(data.liveShoppingId);
+    this.server
+      .to(roomName)
+      .emit('get objective firework from server', { price: data.objective.price, ids });
+  }
+
   @SubscribeMessage('get fever signal from admin')
   getFeverMessage(@MessageBody() data: RoomAndText): void {
     const { roomName } = data;

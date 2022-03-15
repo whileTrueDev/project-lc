@@ -84,6 +84,39 @@ $(document).ready(function ready() {
     $('.total-gift-sales').text(totalGiftNumber);
   }
 
+  function numberToKorean(num) {
+    const hanA = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구', '십'];
+    const danA = [
+      '',
+      '십',
+      '백',
+      '천',
+      '',
+      '십',
+      '백',
+      '천',
+      '',
+      '십',
+      '백',
+      '천',
+      '',
+      '십',
+      '백',
+      '천',
+    ];
+    let result = '';
+    for (let i = 0; i < num.length; i++) {
+      let str = '';
+      const han = hanA[num.charAt(num.length - (i + 1))];
+      if (han !== '') str += han + danA[i];
+      if (i === 4) str += '만';
+      if (i === 8) str += '억';
+      if (i === 12) str += '조';
+      result = str + result;
+    }
+    if (num !== 0) result += '원';
+    return result;
+  }
   // 구입 메세지 목록 받아오는 재귀 ajax
   function getPurchaseMessage() {
     // 현황판 업데이트를 위한 이벤트 송출
@@ -324,12 +357,22 @@ $(document).ready(function ready() {
     $('#admin-message').val(null);
   });
 
-  $('#objective-button').click(function objectiveButtonClickEvent() {
-    const nickname = $('#objective-nickname').val();
-    const price = $('#objective-price').val();
+  $('#objective-message-button').click(function objectiveMessageButtonClickEvent() {
+    const nickname = $('#objective-message-nickname').val();
+    const price = $('#objective-message-price').val();
     socket.emit('get objective message from admin', {
       roomName,
       objective: { nickname, price },
+    });
+    $('#objective-message').val(null);
+  });
+
+  $('#objective-button').click(function objectiveButtonClickEvent() {
+    const price = $('#objective-price').val();
+    socket.emit('get objective firework from admin', {
+      roomName,
+      objective: { price },
+      liveShoppingId,
     });
     $('#objective-message').val(null);
   });

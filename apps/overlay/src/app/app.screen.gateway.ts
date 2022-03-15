@@ -165,7 +165,7 @@ export class AppScreenGateway
       };
     },
   ): Promise<void> {
-    const text = `${data.objective.nickname}님의 구매로 ${data.objective.price}원 돌파했습니다`;
+    const text = `${data.objective.nickname}님의 구매로 ${data.objective.price}만원 돌파했습니다`;
     const audioBuffer = await this.overlayService.streamObjectiveNotification(text);
     this.server.to(data.roomName).emit('get objective notification tts', audioBuffer);
   }
