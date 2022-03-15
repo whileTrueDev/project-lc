@@ -223,6 +223,7 @@ export function AvatarChangeButton(): JSX.Element {
                         imageRef.current = image;
                       }}
                       onComplete={onCropComplete}
+                      circularCrop
                     />
                   </Box>
                 )}
