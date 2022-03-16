@@ -385,7 +385,7 @@ $(document).ready(function ready() {
     if (nickname.length === 9) {
       nickname = `${nickname.slice(0, 8)}...`;
     } else {
-      nickname = `${nickname.slice(0, 7)}`;
+      nickname = `${nickname.slice(0, 8)}`;
     }
 
     const price = $('#objective-message-price').val();
