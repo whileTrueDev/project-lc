@@ -19,7 +19,7 @@ export function KkshowMainTitle({
       mb={{ base: 6, md: 10 }}
       initial={{ opacity: 0, x: -20 }}
       whileInView={{ opacity: 1, x: 0, transition: { duration: 0.6 } }}
-      viewport={{ once: true }}
+      viewport={{ once: true, amount: 0.9 }}
     >
       <Heading fontSize="3xl" position="relative">
         <Box

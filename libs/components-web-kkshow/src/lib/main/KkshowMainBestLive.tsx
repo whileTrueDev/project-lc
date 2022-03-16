@@ -1,23 +1,14 @@
-import {
-  Box,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  Stack,
-  Text,
-  useBreakpointValue,
-} from '@chakra-ui/react';
+import { Box, Flex, Heading, Stack, Text, useBreakpointValue } from '@chakra-ui/react';
 import BorderedAvatar from '@project-lc/components-core/BorderedAvatar';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import EmbededVideo from '@project-lc/components-shared/EmbededVideo';
 import { useKkshowMain } from '@project-lc/hooks';
-import { Scrollbar } from 'swiper';
+import { Grid as SwiperGrid, Scrollbar } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import KkshowMainTitle from './KkshowMainTitle';
 
 const itemVariants = {
-  hidden: { opacity: 0, y: -20 },
+  hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
@@ -65,51 +56,32 @@ function BestLiveList(): JSX.Element | null {
   );
 
   const BestLiveListDesktop = (
-    <Grid
+    <MotionBox
       maxW="5xl"
       mx="auto"
-      templateColumns="repeat(4, 1fr)"
-      gap={6}
       px={2}
-      pos="relative"
+      variants={itemVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
     >
-      <Box
-        pos="absolute"
-        backgroundImage="images/main/bg-circle-4.png"
-        backgroundSize="contain"
-        w={300}
-        h={300}
-        left={-100}
-        top={-100}
-      />
-      {data &&
-        data.bestLive.map((item, index) => (
-          <GridItem colSpan={2} key={`${item.liveShoppingTitle}_${item.liveShoppingId}`}>
-            <MotionBox
-              pos="relative"
-              variants={itemVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <Box
-                pos="absolute"
-                bgColor="blue.500"
-                py={2}
-                px={4}
-                top={3}
-                left={3}
-                rounded="lg"
-              >
-                <Heading fontSize="lg" color="whiteAlpha.900">
-                  {index + 1}
-                </Heading>
-              </Box>
+      <Swiper
+        style={{ paddingTop: 24, paddingBottom: 24 }}
+        spaceBetween={24}
+        slidesPerView={2}
+        scrollbar
+        grabCursor
+        grid={{ rows: 2, fill: 'row' }}
+        modules={[Scrollbar, SwiperGrid]}
+      >
+        {data &&
+          data.bestLive.map((item) => (
+            <SwiperSlide key={`${item.liveShoppingTitle}_${item.liveShoppingId}`}>
               <LiveCard {...item} />
-            </MotionBox>
-          </GridItem>
-        ))}
-    </Grid>
+            </SwiperSlide>
+          ))}
+      </Swiper>
+    </MotionBox>
   );
 
   const v = useBreakpointValue({ base: BestLiveListMobile, md: BestLiveListDesktop });
@@ -142,11 +114,7 @@ function LiveCard({
       boxShadow="lg"
     >
       <Box h={{ base: 180, md: 300 }}>
-        <EmbededVideo
-          provider="youtube"
-          identifier={youtubeSrc}
-          style={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
-        />
+        <EmbededVideo provider="youtube" identifier={youtubeSrc} />
       </Box>
 
       <Flex align="center" justify="space-between" py={2} px={4} gap={4}>

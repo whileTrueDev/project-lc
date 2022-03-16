@@ -1,5 +1,5 @@
 import { LivePlatform } from '@project-lc/shared-types';
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Youtube from 'react-youtube';
 import { YouTubePlayer } from 'youtube-player/dist/types';
 

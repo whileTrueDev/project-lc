@@ -9,7 +9,7 @@ export function KkshowMainPlusFriend(): JSX.Element {
       py={{ base: 12, md: 20 }}
       initial={{ y: 20, opacity: 0 }}
       whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
-      viewport={{ once: true }}
+      viewport={{ once: true, amount: 0.5 }}
     >
       <Box maxW="5xl" m="0 auto">
         <LinkBox>
