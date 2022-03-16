@@ -113,7 +113,7 @@ function LiveCard({
       color="blackAlpha.900"
       boxShadow="lg"
     >
-      <Box h={{ base: 180, md: 300 }}>
+      <Box h={{ base: 180, md: 300 }} className="livecard-embed-container">
         <EmbededVideo provider="youtube" identifier={youtubeSrc} />
       </Box>
 

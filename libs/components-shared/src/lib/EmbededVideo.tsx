@@ -15,7 +15,7 @@ export interface EmbededVideoProps {
     identifier: string,
     e: {
       youtubePlayer: YouTubePlayer;
-      data: 0 | 1 | 2 | 3 | 5 | -1;
+      data: YoutubeStates;
     },
   ) => void;
 }
