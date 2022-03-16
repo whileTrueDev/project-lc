@@ -1,3 +1,12 @@
 .swiper-scrollbar-drag {
   background-color: var(--chakra-colors-blue-500);
 }
+
+.main-carousel-youtube-container {
+  width: 100%;
+  height: 100%;
+}
+
+.main-carousel-youtube-video {
+  border-radius: var(--chakra-radii-xl);
+}

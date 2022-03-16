@@ -8,8 +8,10 @@ import {
 } from '@chakra-ui/react';
 import { KkshowMainCarouselItem } from '@project-lc/shared-types';
 import { EmbededVideo } from '@project-lc/components-shared/EmbededVideo';
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import Link from 'next/link';
+import { YouTubePlayer } from 'youtube-player/dist/types';
+import { carouselYoutubeStore } from '@project-lc/stores';
 
 export interface KkshowMainCarouselContentsProps {
   item: KkshowMainCarouselItem;
@@ -19,6 +21,25 @@ export function KkshowMainCarouselContents({
 }: KkshowMainCarouselContentsProps): JSX.Element | null {
   const KkshowMainCarouselContentsContainer = (props: BoxProps): JSX.Element => (
     <Box position="relative" h="100%" w="100%" {...props} />
+  );
+
+  const setYoutubePlayFlag = carouselYoutubeStore((s) => s.setIsPlaying);
+
+  const handleYoutubeStateChange = useCallback(
+    (
+      __identifier: string,
+      event: { youtubePlayer: YouTubePlayer; data: 0 | 1 | 2 | 3 | 5 | -1 },
+    ): void => {
+      if (event.data === 1) {
+        // 재생상태로 전환시
+        setYoutubePlayFlag(true);
+      }
+      if (event.data === 2 || event.data === 0) {
+        // 일시정지(2)시 or 동영상 종료시 (0)
+        setYoutubePlayFlag(false);
+      }
+    },
+    [setYoutubePlayFlag],
   );
 
   if (item.type === 'upcoming')
@@ -54,7 +75,11 @@ export function KkshowMainCarouselContents({
   if (item.type === 'nowPlaying') {
     return (
       <KkshowMainCarouselContentsContainer>
-        <EmbededVideo provider={item.platform} identifier={item.videoUrl} />
+        <EmbededVideo
+          provider={item.platform}
+          identifier={item.videoUrl}
+          onYoutubeStateChange={handleYoutubeStateChange}
+        />
       </KkshowMainCarouselContentsContainer>
     );
   }
@@ -63,7 +88,11 @@ export function KkshowMainCarouselContents({
     const youtubeSrc = item.videoUrl.replace('https://youtu.be/', '');
     return (
       <KkshowMainCarouselContentsContainer>
-        <EmbededVideo provider="youtube" identifier={youtubeSrc} />
+        <EmbededVideo
+          provider="youtube"
+          identifier={youtubeSrc}
+          onYoutubeStateChange={handleYoutubeStateChange}
+        />
       </KkshowMainCarouselContentsContainer>
     );
   }
