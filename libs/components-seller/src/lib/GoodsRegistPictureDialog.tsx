@@ -227,7 +227,7 @@ export function GoodsRegistPictureDialog({
               </Stack>
 
               {/* 미리보기 영역 - 이미지 목록 */}
-              <Stack direction="row">
+              <Stack direction="row" overflowX="auto" p={1}>
                 {previews.length !== 0 &&
                   previews.map((preview, index) => {
                     const { id, filename, url } = preview;
@@ -238,8 +238,6 @@ export function GoodsRegistPictureDialog({
                         filename={filename}
                         url={(url as string) || ''}
                         {...PREVIEW_SIZE}
-                        width={80}
-                        height={80}
                         onDelete={() => deletePreview(id)}
                         onImageClick={() => onImageClick(preview)}
                         selected={currentPreview?.id === preview.id}

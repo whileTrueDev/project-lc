@@ -1,13 +1,17 @@
+import { CloseIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
   CloseButton,
+  Divider,
+  IconButton,
   Stack,
   Text,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { Preview } from '@project-lc/components-core/ImageInputDialog';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import {
@@ -16,9 +20,11 @@ import {
   useProfile,
 } from '@project-lc/hooks';
 import { GoodsImageDto } from '@project-lc/shared-types';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
 import { GoodsRegistPictureDialog } from './GoodsRegistPictureDialog';
+import { GoodsRegistPictureOrderChangeDialog } from './GoodsRegistPictureOrderChangeDialog';
 
 // 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
 // 상품사진은 file 로 들어옴
@@ -68,7 +74,12 @@ export function GoodsPreviewItem(
       borderRadius="lg"
       p={1}
     >
-      <Box onClick={onImageClick} cursor={onImageClick ? 'pointer' : undefined}>
+      <Box
+        onClick={onImageClick}
+        cursor={onImageClick ? 'pointer' : undefined}
+        minW="80px"
+        minH="80px"
+      >
         <ChakraNextImage layout="intrinsic" alt={fileName} src={url} {...rest} />
       </Box>
 
@@ -92,6 +103,8 @@ export function GoodsRegistPictures(): JSX.Element {
   const toast = useToast();
   const { data: profileData } = useProfile();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const imageOrderChangeDialog = useDisclosure();
+  const imageDeleteConfirmDialog = useDisclosure();
   const { setValue, getValues, watch } = useFormContext<GoodsFormValues>();
 
   /** 사진 등록 다이얼로그에서 저장 눌렀을때 - 이미지 저장하는 핸들러 */
@@ -155,19 +168,25 @@ export function GoodsRegistPictures(): JSX.Element {
 
   // * 삭제 다이얼로그에서
   // 등록된 이미지 목록에서 이미지 삭제 핸들러 - db 에서 goodsImage 삭제
+  const [deleteImageId, setDeleteImageId] = useState<number | null>(null);
   const deleteImage = useDeleteGoodsImageMutation();
-  const deletePicture = async (imageId: number): Promise<void> => {
-    try {
-      const prevImages = getValues('image');
-      const newImages = prevImages ? prevImages.filter((img) => img.id !== imageId) : [];
+  const deletePicture = async (): Promise<void> => {
+    if (deleteImageId) {
+      try {
+        const prevImages = getValues('image');
+        const newImages = prevImages
+          ? prevImages.filter((img) => img.id !== deleteImageId)
+          : [];
 
-      await deleteImage.mutateAsync(imageId);
-      setValue('image', newImages);
+        await deleteImage.mutateAsync(deleteImageId);
+        setValue('image', newImages);
+        setDeleteImageId(null);
 
-      toast({ title: '이미지가 삭제되었습니다', status: 'success' });
-    } catch (error) {
-      console.error(error);
-      toast({ title: '이미지 삭제 중 오류가 발생했습니다', status: 'error' });
+        toast({ title: '이미지가 삭제되었습니다', status: 'success' });
+      } catch (error) {
+        console.error(error);
+        toast({ title: '이미지 삭제 중 오류가 발생했습니다', status: 'error' });
+      }
     }
   };
 
@@ -176,29 +195,55 @@ export function GoodsRegistPictures(): JSX.Element {
   return (
     <SectionWithTitle title="상품사진 *" variant="outlined">
       <Stack spacing={4}>
-        <Text>썸네일 이미지로 사용됩니다. 가로세로 1:1 비율인 이미지를 추천합니다.</Text>
+        <Text>
+          썸네일 이미지로 사용됩니다. 가로세로 1:1 비율인 이미지를 추천합니다. (최대 8개
+          등록 가능)
+        </Text>
         <Box>
           <Button onClick={onOpen}>사진 등록하기</Button>
         </Box>
+        <Divider />
 
         {/* 등록된 이미지 목록 */}
-        {savedImages && (
-          <Stack>
+        <Stack>
+          <Stack direction="row" alignItems="center">
             <Text>등록된 이미지</Text>
+            {savedImages.length > 0 && (
+              <Button size="sm" onClick={imageOrderChangeDialog.onOpen}>
+                순서 변경하기
+              </Button>
+            )}
+          </Stack>
+
+          {savedImages.length > 0 ? (
             <Stack direction="row" flexWrap="wrap" spacing={2}>
               {savedImages.map((i) => (
-                <Box key={i.id}>
+                <Box key={i.id} position="relative">
                   <ChakraNextImage
                     layout="intrinsic"
                     alt={i.image}
                     src={i.image || ''}
                     {...PREVIEW_SIZE}
                   />
+                  <IconButton
+                    aria-label="등록된 이미지 삭제"
+                    icon={<CloseIcon />}
+                    size="xs"
+                    position="absolute"
+                    right={1}
+                    top={1}
+                    onClick={() => {
+                      setDeleteImageId(i.id || null);
+                      imageDeleteConfirmDialog.onOpen();
+                    }}
+                  />
                 </Box>
               ))}
             </Stack>
-          </Stack>
-        )}
+          ) : (
+            <Text>없음</Text>
+          )}
+        </Stack>
       </Stack>
 
       <GoodsRegistPictureDialog
@@ -207,6 +252,20 @@ export function GoodsRegistPictures(): JSX.Element {
         onSave={savePictures}
         isLoading={registImage.isLoading}
       />
+
+      <GoodsRegistPictureOrderChangeDialog
+        isOpen={imageOrderChangeDialog.isOpen}
+        onClose={imageOrderChangeDialog.onClose}
+      />
+
+      <ConfirmDialog
+        isOpen={imageDeleteConfirmDialog.isOpen}
+        onClose={imageDeleteConfirmDialog.onClose}
+        title="이미지 삭제"
+        onConfirm={deletePicture}
+      >
+        <Text>{deleteImageId} 해당 이미지를 삭제하시겠습니까?</Text>
+      </ConfirmDialog>
     </SectionWithTitle>
   );
 }
