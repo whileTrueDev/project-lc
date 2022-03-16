@@ -11,6 +11,7 @@ import {
   BroadcasterEmail,
   Voice,
   LiveShoppingBroadcastDate,
+  liveShoppingPurchaseMessageNickname,
 } from '@project-lc/shared-types';
 import { S3 } from '@aws-sdk/client-s3';
 import { throwError } from 'rxjs';
@@ -46,14 +47,13 @@ export class OverlayService {
   ): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
     const { nickname } = purchaseData;
-    const { productName } = purchaseData;
-    const quantity = purchaseData.purchaseNum;
+    const price = purchaseData.purchaseNum;
     const { message } = purchaseData;
 
     // 추후 선택기능 넣을 예정
     const messageWithAppreciate = `
     <speak>
-      ${nickname}님 ${productName} ${quantity}원 구매 감사합니다 <break time="0.4s"/> ${message}
+      ${nickname}님 ${price}원 구매하셨습니다 <break time='500ms'/> ${message}
     </speak>
     `;
 
@@ -94,7 +94,40 @@ export class OverlayService {
 
     const params = {
       input: { ssml: message },
-      voice, // ssmlGender: 'NEUTRAL'
+      voice,
+      audioConfig,
+    };
+
+    const [response] = await client.synthesizeSpeech(params);
+
+    if (response && response.audioContent) {
+      return response.audioContent;
+    }
+    return false;
+  }
+
+  async streamObjectiveNotification(text: string): Promise<string | false | Uint8Array> {
+    const client = new textToSpeech.TextToSpeechClient(this.options);
+
+    const message = `
+
+    <speak>
+      <prosody pitch="+3st">
+        ${text}
+      </prosody>
+    </speak>
+    `;
+
+    const audioConfig: AudioEncoding = { speakingRate: 1.1, audioEncoding: 'MP3' };
+    const voice: Voice = {
+      languageCode: 'ko-KR',
+      name: 'ko-KR-Wavenet-D',
+      ssmlGender: 'MALE',
+    };
+
+    const params = {
+      input: { ssml: message },
+      voice,
       audioConfig,
     };
 
@@ -190,6 +223,20 @@ export class OverlayService {
       select: {
         broadcastStartDate: true,
         broadcastEndDate: true,
+      },
+    });
+  }
+
+  async getCustomerIds(
+    liveShoppingId: number,
+  ): Promise<liveShoppingPurchaseMessageNickname[]> {
+    return this.prisma.liveShoppingPurchaseMessage.findMany({
+      select: {
+        nickname: true,
+      },
+      where: {
+        liveShoppingId: Number(liveShoppingId),
+        loginFlag: true,
       },
     });
   }

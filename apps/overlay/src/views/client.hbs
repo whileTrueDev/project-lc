@@ -28,6 +28,7 @@
     <div class='full-video'>
     </div>
     <div class='live-commerce'>
+      <div class='letters'></div>
       <div class='left-section'>
         <!--랭킹-->
         <div class='ranking-area'>
@@ -61,6 +62,10 @@
       <!--가상광고 영역-->
       <div class='notification'>
       </div>
+      <div class='news-banner'>
+        <img src='/images/news-banner.png' id='new-banner-image' />
+        <p></p>
+      </div>
       <!--하단 영역-->
       <div class='bottom-area-wrapper'>
         <div class='bottom-area-left'>
@@ -90,15 +95,19 @@
           </div>
         </div>
         <div class='bottom-area-right'>
-          <div class='bottom-fever-timer'>
-            <span id='fever-time-min'>00</span>
-            <span id='fever-min-sec-separator'> : </span>
-            <span id='fever-time-sec'>00</span>
+          <div class='bottom-area-right-fever-wrapper'>
+            <div class='bottom-fever-timer'>
+              <span id='fever-time-min'>00</span>
+              <span id='fever-min-sec-separator'> : </span>
+              <span id='fever-time-sec'>00</span>
+            </div>
+            <p class='bottom-fever-message' style='color:aqua'>
+            </p>
           </div>
-          <p class='bottom-admin' style='color:aqua'>
-          </p>
-          {{! <p class="bottom-area-text">
-        </p> }}
+          <div class='marquee'>
+            <p class='bottom-area-text'>
+            </p>
+          </div>
         </div>
       </div>
       <div class='objective-wrapper'>

@@ -11,3 +11,8 @@ export class liveShoppingPurchaseMessageDto {
 
   @IsDate() createDate: Date;
 }
+
+export type liveShoppingPurchaseMessageNickname = Pick<
+  liveShoppingPurchaseMessageDto,
+  'nickname'
+>;

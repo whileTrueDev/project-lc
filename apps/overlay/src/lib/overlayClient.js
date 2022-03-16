@@ -20,7 +20,7 @@ const bottomTextIndex = 0;
 
 function getOS() {
   const { userAgent } = window.navigator;
-  const { platform } = window.navigator;
+  const { platform } = navigator.userAgent;
   const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
   const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
   const iosPlatforms = ['iPhone', 'iPad', 'iPod'];
@@ -209,7 +209,7 @@ setInterval(async () => {
       const sound = new Audio(messageArray[0].audioBlob);
       sound.play();
       messageArray.splice(0, 1);
-    }, 3000);
+    }, 1500);
     await setTimeout(() => {
       $('.top-right').fadeOut(800);
       $('.donation-image').attr('src', '/images/invisible.png');
@@ -228,6 +228,25 @@ setInterval(async () => {
     }, 5000);
   }
 }, 2000);
+
+function makeRain(users, delay) {
+  let i = 0;
+  $('.letters').show();
+  const interval = setInterval(function () {
+    const span = document.createElement('span');
+    span.appendChild(document.createTextNode(users[i].nickname));
+    const div = document.createElement('div');
+    div.appendChild(span);
+    div.style.position = 'absolute';
+    div.style.top = `${Math.floor(Math.random() * 0)}px`;
+    div.style.left = `${Math.floor(Math.random() * 1920)}px`;
+    div.className = 'rain';
+    div.style.opacity = '0';
+    $('.letters').append(div);
+
+    if (i++ >= users.length - 1) clearInterval(interval);
+  }, delay);
+}
 
 // async function switchBottomText() {
 //   if (bottomTextIndex >= bottomMessages.length) {
@@ -337,7 +356,7 @@ socket.on('get right-top purchase message', async (data) => {
   messageHtml = `
   <div class="donation-wrapper">
     <iframe src="/audio/${
-      alarmType === '2' ? 'alarm-type-2.wav' : 'alarm-type-1.wav'
+      alarmType === '2' ? 'alarm-type-2.mp3' : 'alarm-type-1.wav'
     }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="item">
       <div class="centered">
@@ -394,28 +413,69 @@ socket.on('get non client purchase message', async (data) => {
 });
 
 socket.on('get objective message', async (data) => {
-  const price = data.objective;
+  const { nickname } = data.objective;
+  const { price } = data.objective;
+  let stringifiedPrice = '엄청난금액';
+  if (price.length === 7) {
+    // 백만
+    stringifiedPrice = String(price).slice(0, 3);
+  } else if (price.length === 8) {
+    // 천만
+    stringifiedPrice = String(price).slice(0, 4);
+  } else if (price.length === 6) {
+    // 십만
+    stringifiedPrice = String(price).slice(0, 2);
+  }
 
-  const objectiveHtml = `
+  $('.news-banner p').html(
+    `<span>${nickname}</span> 
+    <span>님의 구매로 </span> 
+    <span>${stringifiedPrice}</span>
+    <span>만원 돌파!</span>
+    <iframe src="/audio/news_sound.mp3"
+    id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    `,
+  );
+  $('.news-banner').show();
+  $('.bottom-area-text').text(`${data.users} 구매 감사합니다!`);
+  $('.bottom-area-right').css({ opacity: 1 });
+  $('.bottom-area-text').css({ opacity: 1 });
+
+  socket.emit('send objective notification signal', data);
+
+  await setTimeout(() => {
+    $('.news-banner p').empty();
+    $('.news-banner').hide();
+  }, 7000);
+});
+
+socket.on('get objective firework from server', async (data) => {
+  const fireworkHtml = `
+  <img src="/images/firework.gif" id="firework" alt="firework"/>
   <div class="objective-inner-wrapper">
-    <iframe src="/audio/mid.mp3"
+    <iframe src="/audio/firework.mp3"
     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="objective-message">
       <span class="objective-text">판매금액</span>
-      <span class="objective-value">${price
+      <span class="objective-value">${data.objective.price
         .toString()
         .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
       <span class="objective-text">원 돌파!!!</span>
     </div>
-  </div>
-  `;
+  </div>`;
 
-  $('.objective-wrapper').html(objectiveHtml);
-  $('.objective-wrapper').slideToggle();
+  socket.emit('send objective notification signal', data);
+
+  $('.objective-wrapper').attr('id', 'soldout');
+  $('.objective-wrapper').html(fireworkHtml);
+  $('.objective-wrapper').fadeIn();
+  makeRain(data.users, 200);
 
   await setTimeout(() => {
-    $('.objective-wrapper').slideToggle();
-  }, 5000);
+    $('body').remove('#soldout-alarm');
+    $('.objective-wrapper').fadeOut();
+    $('.letters').empty().fadeOut(1000);
+  }, 10000);
 });
 
 socket.on('toggle right-top onad logo from server', () => {
@@ -431,19 +491,19 @@ socket.on('toggle right-top onad logo from server', () => {
 
 // 하단 메세지 (단순 답변)
 socket.on('get bottom area message', (data) => {
-  $('.bottom-area-text').css({ opacity: 0 });
+  $('.bottom-area-right').css({ opacity: 1 });
   $('.bottom-area-right')
     .prepend(
       `
-    <p class="bottom-admin">
-      ${data}
-    </p>
+      <p class="bottom-admin">
+        ${data}
+      </p>
   `,
     )
     .fadeIn(1000);
   setTimeout(() => {
     $('.bottom-admin').remove();
-    $('.bottom-area-text').css({ opacity: 1 });
+    $('.bottom-area-right').css({ opacity: 0 });
   }, 10000);
 });
 
@@ -467,7 +527,9 @@ socket.on('get bottom fever message', (data) => {
 
 socket.on('handle bottom area to client', () => {
   if ($('.bottom-area-right').css('opacity') === '1') {
+    $('.bottom-area-text').text('');
     $('.bottom-area-right').css({ opacity: 0 });
+    $('.bottom-area-right-fever-wrapper').hide();
   } else {
     $('.bottom-area-right').css({ opacity: 1 }).fadeIn(2000);
   }
@@ -542,6 +604,17 @@ socket.once('get stream start notification tts', (audioBuffer) => {
   }
 });
 
+socket.on('get objective notification tts', (audioBuffer) => {
+  if (audioBuffer) {
+    const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
+    const streamStartNotificationAudioBlob = window.URL.createObjectURL(blob);
+    const sound = new Audio(streamStartNotificationAudioBlob);
+    setTimeout(() => {
+      sound.play();
+    }, 2000);
+  }
+});
+
 socket.on('get stream end notification tts', (audioBuffer) => {
   if (audioBuffer) {
     const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
@@ -590,7 +663,8 @@ socket.on('remove soldout banner from server', () => {
 
 socket.on('get fever signal from server', (text) => {
   $('.bottom-area-right').css({ opacity: 1 });
-  $('.bottom-admin').text(`${text}`);
+  $('.bottom-area-right-fever-wrapper').show();
+  $('.bottom-fever-message').text(`${text}`);
   $('body').append(`
     <iframe src="/audio/fever.mp3" id="fever-alarm" allow="autoplay" style="display:none"></iframe>
     `);
@@ -623,7 +697,7 @@ socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
 });
 
 socket.on('get product name from server', (streamerAndProductName) => {
-  $('.alive-check').css('background-color', 'red');
+  $('.alive-check').css('background-color', 'burlywood');
   streamerAndProduct = streamerAndProductName;
 });
 
