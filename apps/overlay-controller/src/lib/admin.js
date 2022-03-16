@@ -117,6 +117,29 @@ $(document).ready(function ready() {
     if (num !== 0) result += '원';
     return result;
   }
+
+  $('#objective-message-price').on('input', function obejctMessagePriceStringfy(e) {
+    const convertedText = numberToKorean(e.target.value);
+    $('#korean-number-display-1').text(convertedText);
+  });
+
+  $('#objective-price').on('input', function obejectivePriceStringfy(e) {
+    const convertedText = numberToKorean(e.target.value);
+    $('#korean-number-display-2').text(convertedText);
+  });
+
+  $('#objective-select-box').change(function onObjectiveSelectBoxChange(e) {
+    $('#objective-message-price').val(e.target.value);
+    $('#objective-price').val(e.target.value);
+    const convertedText = numberToKorean(e.target.value);
+    $('#korean-number-display-1, #korean-number-display-2').text(convertedText);
+  });
+
+  $('#sold-price').on('input', function soldPriceStringfy(e) {
+    const stringifiedNumber = numberToKorean(e.target.value);
+    $('#stringified-sold-price').text(stringifiedNumber);
+  });
+
   // 구입 메세지 목록 받아오는 재귀 ajax
   function getPurchaseMessage() {
     // 현황판 업데이트를 위한 이벤트 송출

@@ -20,7 +20,7 @@ const bottomTextIndex = 0;
 
 function getOS() {
   const { userAgent } = window.navigator;
-  const { platform } = window.navigator;
+  const { platform } = navigator.userAgent;
   const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
   const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
   const iosPlatforms = ['iPhone', 'iPad', 'iPod'];
@@ -209,7 +209,7 @@ setInterval(async () => {
       const sound = new Audio(messageArray[0].audioBlob);
       sound.play();
       messageArray.splice(0, 1);
-    }, 3000);
+    }, 1500);
     await setTimeout(() => {
       $('.top-right').fadeOut(800);
       $('.donation-image').attr('src', '/images/invisible.png');
@@ -231,6 +231,7 @@ setInterval(async () => {
 
 function makeRain(users, delay) {
   let i = 0;
+  $('.letters').show();
   const interval = setInterval(function () {
     const span = document.createElement('span');
     span.appendChild(document.createTextNode(users[i].nickname));
@@ -411,42 +412,28 @@ socket.on('get non client purchase message', async (data) => {
   topMessages.push({ messageHtml });
 });
 
-// socket.on('get objective message', async (data) => {
-//   const price = data.objective;
-
-//   const objectiveHtml = `
-//   <div class="objective-inner-wrapper">
-// <iframe src="/audio/mid.mp3"
-// id="iframeAudio" allow="autoplay" style="display:none"></iframe>
-// <div class="objective-message">
-//   <span class="objective-text">판매금액</span>
-//   <span class="objective-value">${price
-//     .toString()
-//     .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
-//   <span class="objective-text">원 돌파!!!</span>
-// </div>
-//   </div>
-//   `;
-
-//   $('.objective-wrapper').html(objectiveHtml);
-//   $('.objective-wrapper').slideToggle();
-
-//   await setTimeout(() => {
-//     $('.objective-wrapper').slideToggle();
-//   }, 5000);
-// });
-
 socket.on('get objective message', async (data) => {
   const { nickname } = data.objective;
   const { price } = data.objective;
+  let stringifiedPrice = '엄청난금액';
+  if (price.length === 7) {
+    // 백만
+    stringifiedPrice = String(price).slice(0, 3);
+  } else if (price.length === 8) {
+    // 천만
+    stringifiedPrice = String(price).slice(0, 4);
+  } else if (price.length === 6) {
+    // 십만
+    stringifiedPrice = String(price).slice(0, 2);
+  }
 
   $('.news-banner').slideToggle();
   $('.news-banner p').html(
     `<span>${nickname}</span> 
     <span>님의 구매로 </span> 
-    <span>${price}</span>
+    <span>${stringifiedPrice}</span>
     <span>만원 돌파!</span>
-    <iframe src="/audio/news.mp3"
+    <iframe src="/audio/news_sound.mp3"
     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     `,
   );
@@ -470,12 +457,14 @@ socket.on('get objective firework from server', async (data) => {
     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="objective-message">
       <span class="objective-text">판매금액</span>
-      <span class="objective-value">${data.price
+      <span class="objective-value">${data.objective.price
         .toString()
         .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}</span>
       <span class="objective-text">원 돌파!!!</span>
     </div>
   </div>`;
+
+  socket.emit('send objective notification signal', data);
 
   $('.objective-wrapper').attr('id', 'soldout');
   $('.objective-wrapper').html(fireworkHtml);
@@ -487,10 +476,6 @@ socket.on('get objective firework from server', async (data) => {
     $('.objective-wrapper').fadeOut();
     $('.letters').empty().fadeOut(1000);
   }, 10000);
-
-  // await setTimeout(() => {
-  //   $('.letters').empty().fadeOut(1000);
-  // }, 15000);
 });
 
 socket.on('toggle right-top onad logo from server', () => {
@@ -506,19 +491,19 @@ socket.on('toggle right-top onad logo from server', () => {
 
 // 하단 메세지 (단순 답변)
 socket.on('get bottom area message', (data) => {
-  $('.bottom-area-text').css({ opacity: 0 });
+  $('.bottom-area-right').css({ opacity: 1 });
   $('.bottom-area-right')
     .prepend(
       `
-    <p class="bottom-admin">
-      ${data}
-    </p>
+      <p class="bottom-admin">
+        ${data}
+      </p>
   `,
     )
     .fadeIn(1000);
   setTimeout(() => {
     $('.bottom-admin').remove();
-    $('.bottom-area-text').css({ opacity: 1 });
+    $('.bottom-area-right').css({ opacity: 0 });
   }, 10000);
 });
 
@@ -626,7 +611,7 @@ socket.on('get objective notification tts', (audioBuffer) => {
     const sound = new Audio(streamStartNotificationAudioBlob);
     setTimeout(() => {
       sound.play();
-    }, 6000);
+    }, 2000);
   }
 });
 
@@ -712,7 +697,7 @@ socket.on('get liveshopping id from server', (liveShoppingIdAndProductName) => {
 });
 
 socket.on('get product name from server', (streamerAndProductName) => {
-  $('.alive-check').css('background-color', 'red');
+  $('.alive-check').css('background-color', 'burlywood');
   streamerAndProduct = streamerAndProductName;
 });
 

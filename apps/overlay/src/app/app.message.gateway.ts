@@ -14,6 +14,7 @@ import {
   PurchaseMessage,
   RoomAndText,
   SocketIdandDevice,
+  ObjectiveMessage,
 } from '@project-lc/shared-types';
 import { OverlayService } from '@project-lc/nest-modules-overlay';
 
@@ -113,11 +114,7 @@ export class AppMessageGateway
   @SubscribeMessage('get objective message from admin')
   async getObjectiveMessage(
     @MessageBody()
-    data: {
-      roomName: string;
-      objective: { nickname: string; price: number };
-      liveShoppingId: number;
-    },
+    data: ObjectiveMessage,
   ): Promise<void> {
     const { roomName } = data;
     const users = await this.overlayService.getCustomerIds(data.liveShoppingId);
@@ -129,17 +126,12 @@ export class AppMessageGateway
   @SubscribeMessage('get objective firework from admin')
   async getObjectiveFirework(
     @MessageBody()
-    data: {
-      roomName: string;
-      objective: { price: number };
-      liveShoppingId: number;
-    },
+    data: ObjectiveMessage,
   ): Promise<void> {
     const { roomName } = data;
     const users = await this.overlayService.getCustomerIds(data.liveShoppingId);
-    this.server
-      .to(roomName)
-      .emit('get objective firework from server', { price: data.objective.price, users });
+    const toClient = Object.assign(data, { users });
+    this.server.to(roomName).emit('get objective firework from server', toClient);
   }
 
   @SubscribeMessage('get fever signal from admin')

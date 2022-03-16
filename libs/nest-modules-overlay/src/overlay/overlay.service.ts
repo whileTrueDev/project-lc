@@ -47,14 +47,13 @@ export class OverlayService {
   ): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
     const { nickname } = purchaseData;
-    const { productName } = purchaseData;
-    const quantity = purchaseData.purchaseNum;
+    const price = purchaseData.purchaseNum;
     const { message } = purchaseData;
 
     // 추후 선택기능 넣을 예정
     const messageWithAppreciate = `
     <speak>
-      ${message}
+      ${nickname}님 ${price}원 구매하셨습니다 <break time='500ms'/> ${message}
     </speak>
     `;
 
@@ -95,7 +94,7 @@ export class OverlayService {
 
     const params = {
       input: { ssml: message },
-      voice, // ssmlGender: 'NEUTRAL'
+      voice,
       audioConfig,
     };
 
@@ -111,8 +110,11 @@ export class OverlayService {
     const client = new textToSpeech.TextToSpeechClient(this.options);
 
     const message = `
+
     <speak>
-      ${text}
+      <prosody pitch="+3st">
+        ${text}
+      </prosody>
     </speak>
     `;
 
@@ -125,7 +127,7 @@ export class OverlayService {
 
     const params = {
       input: { ssml: message },
-      voice, // ssmlGender: 'NEUTRAL'
+      voice,
       audioConfig,
     };
 

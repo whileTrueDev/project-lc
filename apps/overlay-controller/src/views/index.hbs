@@ -344,8 +344,6 @@
                 <form>
                     <fieldset>
                         <legend>메세지 입력</legend>
-                        <span>구매액</span>
-                        <input type="number" id="sold-price">
                         <span>구매자</span>
                         <div class="customer-nickname-box">
                             <input type="text" id="customer-nickname">
@@ -354,7 +352,11 @@
                                 비회원
                             </label>
                         </div>
-                        
+                        <span>구매액</span>
+                        <div>
+                            <input type="number" id="sold-price">
+                            <span id="stringified-sold-price"></span>
+                        </div>
                         <span>메세지</span>
                         <input type="text" id="customer-message">
                         <span>선물하기 여부</span>
@@ -384,16 +386,28 @@
                     </fieldset>
                 </form>
                 <div class="objective-box">
+                    <div>
+                        <select id="objective-select-box">
+                            <option value="">금액선택</option>
+                            <option value=1000000>100만원</option>
+                            <option value=1500000>150만원</option>
+                            <option value=2000000>200만원</option>
+                            <option value=2500000>250만원</option>
+                            <option value=3000000>300만원</option>
+                        </select>
+                    </div>
                     [닉네임 최대 7글자 8글자부터는 ...넣어서 전송]
                     <div>
                         <input type="text" id="objective-message-nickname" style="width:20%">
                         <span>님의 구매로</span>
                         <input type="number" id="objective-message-price" style="width:20%">
-                        <span>만원 돌파!</span>
+                        <span id="korean-number-display-1"></span>
+                        <span>원 돌파!</span>
                         <button id="objective-message-button" type="submit" style="width:inherit">메세지 전송</button>   
                     </div>
                     <div>
                         <input type="number" id="objective-price"/>
+                        <span id="korean-number-display-2"></span>
                         <button type="submit" id="objective-button" style="width:inherit">중간금액 전송 [폭죽효과]</button> 
                     </div>
                 </div>
