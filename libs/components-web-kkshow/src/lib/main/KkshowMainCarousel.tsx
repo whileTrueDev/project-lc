@@ -1,4 +1,3 @@
-import shallow from 'zustand/shallow';
 import {
   Box,
   Fade,
@@ -11,9 +10,7 @@ import { ChevronIconButton } from '@project-lc/components-core/HorizontalImageGa
 import { WaveBox } from '@project-lc/components-core/WaveBox';
 import { useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainCarouselItem } from '@project-lc/shared-types';
-import { carouselVideoStore } from '@project-lc/stores';
-import { useEffect, useState } from 'react';
-import SwiperObj, { Autoplay, Navigation, Pagination } from 'swiper';
+import { Autoplay, Navigation, Pagination } from 'swiper';
 import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 import KkshowMainCarouselContents from './carousel/KkshowMainCarouselContents';
 import { KkshowMainCarouselDescription } from './carousel/KkshowMainCarouselDescription';
@@ -32,26 +29,10 @@ export function KkshowMainCarousel(): JSX.Element {
 function MainCarousel(): JSX.Element | null {
   const { data } = useKkshowMain();
   const slidesPerView = useBreakpointValue<'auto' | number>({ base: 1, md: 'auto' });
-
-  const youtubeState = carouselVideoStore(
-    (s) => ({
-      isVideoPlaying: s.isPlaying,
-      isFirstRender: s.isFirstRender,
-    }),
-    shallow,
-  );
-  const [swiperObj, setSwiperObj] = useState<SwiperObj>();
-  useEffect(() => {
-    if (youtubeState.isFirstRender) return;
-    if (youtubeState.isVideoPlaying) swiperObj?.autoplay.stop();
-    else if (!youtubeState.isVideoPlaying) swiperObj?.autoplay.start();
-  }, [youtubeState.isVideoPlaying, swiperObj?.autoplay, youtubeState.isFirstRender]);
-
   if (!data) return null;
 
   return (
     <Swiper
-      onSwiper={(swiper) => setSwiperObj(swiper)}
       updateOnWindowResize
       spaceBetween={120}
       slidesPerView={slidesPerView}

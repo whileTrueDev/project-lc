@@ -11,7 +11,7 @@ import { EmbededVideo } from '@project-lc/components-shared/EmbededVideo';
 import { memo, useCallback } from 'react';
 import Link from 'next/link';
 import { YouTubePlayer } from 'youtube-player/dist/types';
-import { carouselVideoStore } from '@project-lc/stores';
+import { useSwiper } from 'swiper/react';
 
 export interface KkshowMainCarouselContentsProps {
   item: KkshowMainCarouselItem;
@@ -23,7 +23,7 @@ export function KkshowMainCarouselContents({
     <Box position="relative" h="100%" w="100%" {...props} />
   );
 
-  const setVideoPlayingFlag = carouselVideoStore((s) => s.setIsPlaying);
+  const swiper = useSwiper();
 
   const handleYoutubeStateChange = useCallback(
     (
@@ -32,14 +32,14 @@ export function KkshowMainCarouselContents({
     ): void => {
       if (event.data === 1) {
         // 재생상태로 전환시
-        setVideoPlayingFlag(true);
+        swiper.autoplay.stop();
       }
       if (event.data === 2 || event.data === 0) {
         // 일시정지(2)시 or 동영상 종료시 (0)
-        setVideoPlayingFlag(false);
+        swiper.autoplay.start();
       }
     },
-    [setVideoPlayingFlag],
+    [swiper.autoplay],
   );
 
   if (item.type === 'upcoming')
