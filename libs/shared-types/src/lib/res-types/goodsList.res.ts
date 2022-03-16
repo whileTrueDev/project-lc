@@ -3,6 +3,7 @@ import {
   GoodsConfirmation,
   GoodsOptions,
   GoodsOptionsSupplies,
+  GoodsStatus,
   ShippingGroup,
   YesOrNo,
   YesOrNo_UPPERCASE,
@@ -36,7 +37,7 @@ export type TotalStockInfo = {
   b_stock: number; // 가용재고 0개 이하인 옵션의 재고
 };
 
-export type SellerGoodsListItem = Pick<
+export type GoodsDefaultData = Pick<
   Goods,
   | 'id'
   | 'sellerId'
@@ -46,12 +47,16 @@ export type SellerGoodsListItem = Pick<
   | 'regist_date'
   | 'update_date'
   | 'goods_view'
-> &
+> & {
+  default_price: Decimal; // 판매가(할인가) - GoodsOptions중 default_option의 판매가
+  default_consumer_price: Decimal; // 소비자가(미할인가) - GoodsOptions중 default_option의 소비자가}
+  shippingGroup?: Pick<ShippingGroup, 'id' | 'shipping_group_name'>;
+};
+
+export type SellerGoodsListItem = GoodsDefaultData &
   TotalStockInfo & {
     confirmation?: GoodsConfirmation;
-    default_price: Decimal; // 판매가(할인가) - GoodsOptions중 default_option의 판매가
-    default_consumer_price: Decimal; // 소비자가(미할인가) - GoodsOptions중 default_option의 소비자가
-    shippingGroup?: Pick<ShippingGroup, 'id' | 'shipping_group_name'>;
+
     businessRegistrationStatus?: string;
     onLiveShopping?: boolean;
   };
@@ -68,4 +73,18 @@ export type GoodsListRes = {
 export type ApprovedGoodsNameAndId = {
   firstmallGoodsConnectionId: number;
   goods_name: string;
+};
+
+// GET /admin/goods 관리자 페이지 상품검수목록 리턴타입
+export type AdminGoodsListRes = {
+  items: AdminGoodsData[];
+  totalItemCount: number;
+};
+
+export type AdminGoodsData = GoodsDefaultData & {
+  goods_status: GoodsStatus;
+  confirmation: GoodsConfirmation;
+  name: string; // 판매자명
+  agreementFlag: boolean; // 판매자 약관동의여부
+  businessRegistrationStatus: string; // 사업자등록정보검수상태
 };

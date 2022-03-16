@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   ForbiddenException,
   Get,
   Header,
@@ -14,16 +15,15 @@ import {
   Req,
   UseGuards,
   ValidationPipe,
-  Delete,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+  AdminClassChangeHistory,
   Administrator,
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
   PrivacyApproachHistory,
-  AdminClassChangeHistory,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -37,6 +37,10 @@ import { SellerService, SellerSettlementService } from '@project-lc/nest-modules
 import {
   AdminAllLcGoodsList,
   AdminBroadcasterSettlementInfoList,
+  AdminClassChangeHistoryDtoWithoutId,
+  AdminClassDto,
+  AdminGoodsByIdRes,
+  AdminGoodsListRes,
   AdminSellerListRes,
   AdminSettlementInfoType,
   AdminSignUpDto,
@@ -49,24 +53,21 @@ import {
   EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
-  GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingDTO,
   LiveShoppingImageDto,
   OrderCancelRequestDetailRes,
   OrderCancelRequestList,
+  PrivacyApproachHistoryDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
-  AdminClassDto,
-  PrivacyApproachHistoryDto,
-  AdminClassChangeHistoryDtoWithoutId,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
+import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
-import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 
 @Controller('admin')
 export class AdminController {
@@ -163,24 +164,25 @@ export class AdminController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/goods')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   getGoodsInfo(
     @Query('sort', new DefaultValuePipe(SellerGoodsSortColumn.REGIST_DATE))
     sort: SellerGoodsSortColumn,
     @Query('direction', new DefaultValuePipe(SellerGoodsSortDirection.DESC))
     direction: SellerGoodsSortDirection,
-  ) {
+  ): Promise<AdminGoodsListRes> {
     return this.adminService.getGoodsInfo({
       sort,
       direction,
     });
   }
 
-  // 상품검수를 위한 상품 리스트
+  // 상품검수를 위한 상품 상세 정보
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/goods/:goodsId')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getAdminGoodsById(@Param('goodsId') goodsId: string | number): Promise<GoodsByIdRes> {
+  getAdminGoodsById(
+    @Param('goodsId') goodsId: string | number,
+  ): Promise<AdminGoodsByIdRes> {
     return this.adminService.getOneGoods(goodsId);
   }
 
