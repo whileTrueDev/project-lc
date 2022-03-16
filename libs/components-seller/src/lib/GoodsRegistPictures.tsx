@@ -63,7 +63,8 @@ export function GoodsPreviewItem(
     onImageClick,
     actionButtons,
     selected,
-    ...rest
+    width,
+    height
   } = props;
 
   return (
@@ -77,10 +78,10 @@ export function GoodsPreviewItem(
       <Box
         onClick={onImageClick}
         cursor={onImageClick ? 'pointer' : undefined}
-        minW="80px"
-        minH="80px"
+        minW={`${width}px`}
+        minH={`${height}px`}
       >
-        <ChakraNextImage layout="intrinsic" alt={fileName} src={url} {...rest} />
+        <ChakraNextImage layout="intrinsic" alt={fileName} src={url} width={width} height={height} />
       </Box>
 
       <Stack m={0}>
