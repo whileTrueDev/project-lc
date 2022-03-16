@@ -144,6 +144,8 @@ export function KkshowLiveTeaser(): JSX.Element | null {
                 color="red"
                 variant="outline"
                 rounded="3xl"
+                _active={{ bgColor: 'red', color: 'white' }}
+                _hover={{ bgColor: 'red', color: 'white' }}
                 leftIcon={<MdOutlineNotificationsActive fontSize="24px" />}
               >
                 알림받기

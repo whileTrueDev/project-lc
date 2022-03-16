@@ -10,7 +10,7 @@ import {
 import MotionBox from '@project-lc/components-core/MotionBox';
 import { useKkshowMain } from '@project-lc/hooks';
 import NextLink from 'next/link';
-import { Pagination } from 'swiper';
+import { Pagination, Scrollbar } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import KkshowMainTitle from './KkshowMainTitle';
 
@@ -33,9 +33,8 @@ export function KkshowMainBestBroadcaster(): JSX.Element | null {
           style={{ paddingTop: 24, paddingBottom: 24, width: '100%' }}
           spaceBetween={16}
           slidesPerView="auto"
-          // scrollbar
-          pagination
-          modules={[Pagination]}
+          scrollbar
+          modules={[Pagination, Scrollbar]}
         >
           {data.bestBroadcaster.map((x) => (
             <SwiperSlide

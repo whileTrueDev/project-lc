@@ -41,7 +41,7 @@ export function LiveShoppingPreviewBox({
     badgeText = 'LIVE';
   } else if (liveShoppingStatus === 'upcoming') {
     badgeColor = 'green';
-    badgeText = 'upcoming';
+    badgeText = '예정';
   } else if (liveShoppingStatus === 'ended') {
     badgeColor = 'gray';
     badgeText = '완료';
@@ -56,19 +56,25 @@ export function LiveShoppingPreviewBox({
           borderRadius="xl"
           justify="space-around"
           alignItems="center"
-          p={[2, 4]}
-          px={[2, 6]}
+          p={{ base: 4, lg: 2 }}
+          px={{ base: 2, sm: 4, lg: 6 }}
           textAlign={['center', 'unset']}
           spacing={4}
         >
           <Box>
             <Link passHref href={productLinkUrl}>
               <LinkOverlay isExternal={isExternal}>
-                <Heading fontSize="lg" fontWeight="medium" noOfLines={2} maxW={280}>
+                <Heading
+                  fontSize={{ base: 'lg', lg: 'xl' }}
+                  fontWeight="medium"
+                  noOfLines={{ base: 1, sm: 2 }}
+                  maxW={280}
+                >
                   {badgeText && (
                     <Badge
                       mr={1}
-                      p={1}
+                      py={{ base: 1, md: 1.5 }}
+                      px={2}
                       variant="solid"
                       bgColor={badgeColor}
                       color="whiteAlpha.900"
@@ -82,17 +88,31 @@ export function LiveShoppingPreviewBox({
               </LinkOverlay>
             </Link>
             <Heading lineHeight={1}>
-              <RedLinedText as="span" fontSize="sm" fontWeight="medium">
+              <RedLinedText
+                as="span"
+                fontSize={{ base: 'sm', lg: 'md' }}
+                fontWeight="medium"
+              >
                 {normalPrice.toLocaleString()}원
               </RedLinedText>{' '}
-              <Text as="span" fontSize="md" color="red" fontWeight="bold">
+              <Text
+                as="span"
+                fontSize={{ base: 'md', lg: 'lg' }}
+                color="red"
+                fontWeight="bold"
+              >
                 {discountedPrice.toLocaleString()}원
               </Text>
             </Heading>
           </Box>
 
           <Box display={{ base: 'none', sm: 'block' }}>
-            <Image src={productImageUrl} w="65px" h="65px" />
+            <Image
+              src={productImageUrl}
+              w={{ base: '65px', lg: '85px' }}
+              h={{ base: '65px', lg: '85px' }}
+              rounded="md"
+            />
           </Box>
         </HStack>
       </LinkBox>
