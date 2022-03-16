@@ -381,7 +381,13 @@ $(document).ready(function ready() {
   });
 
   $('#objective-message-button').click(function objectiveMessageButtonClickEvent() {
-    const nickname = $('#objective-message-nickname').val();
+    let nickname = $('#objective-message-nickname').val();
+    if (nickname.length === 9) {
+      nickname = `${nickname.slice(0, 8)}...`;
+    } else {
+      nickname = `${nickname.slice(0, 7)}`;
+    }
+
     const price = $('#objective-message-price').val();
     socket.emit('get objective message from admin', {
       roomName,

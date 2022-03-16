@@ -427,7 +427,6 @@ socket.on('get objective message', async (data) => {
     stringifiedPrice = String(price).slice(0, 2);
   }
 
-  $('.news-banner').slideToggle();
   $('.news-banner p').html(
     `<span>${nickname}</span> 
     <span>님의 구매로 </span> 
@@ -437,6 +436,7 @@ socket.on('get objective message', async (data) => {
     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     `,
   );
+  $('.news-banner').show();
   $('.bottom-area-text').text(`${data.users} 구매 감사합니다!`);
   $('.bottom-area-right').css({ opacity: 1 });
   $('.bottom-area-text').css({ opacity: 1 });
@@ -445,8 +445,8 @@ socket.on('get objective message', async (data) => {
 
   await setTimeout(() => {
     $('.news-banner p').empty();
-    $('.news-banner').slideToggle();
-  }, 5000);
+    $('.news-banner').hide();
+  }, 7000);
 });
 
 socket.on('get objective firework from server', async (data) => {
