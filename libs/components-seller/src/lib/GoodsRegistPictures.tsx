@@ -64,7 +64,7 @@ export function GoodsPreviewItem(
     actionButtons,
     selected,
     width,
-    height
+    height,
   } = props;
 
   return (
@@ -81,7 +81,13 @@ export function GoodsPreviewItem(
         minW={`${width}px`}
         minH={`${height}px`}
       >
-        <ChakraNextImage layout="intrinsic" alt={fileName} src={url} width={width} height={height} />
+        <ChakraNextImage
+          layout="intrinsic"
+          alt={fileName}
+          src={url}
+          width={width}
+          height={height}
+        />
       </Box>
 
       <Stack m={0}>
