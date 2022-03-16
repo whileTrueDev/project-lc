@@ -5,7 +5,7 @@ import {
   Stack,
   Text,
   useDisclosure,
-  useToast
+  useToast,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { Preview } from '@project-lc/components-core/ImageInputDialog';
@@ -13,7 +13,7 @@ import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import {
   useDeleteGoodsImageMutation,
   useGoodsImageMutation,
-  useProfile
+  useProfile,
 } from '@project-lc/hooks';
 import { GoodsImageDto } from '@project-lc/shared-types';
 import { useFormContext } from 'react-hook-form';
@@ -96,7 +96,10 @@ export function GoodsRegistPictures(): JSX.Element {
 
   /** 사진 등록 다이얼로그에서 저장 눌렀을때 - 이미지 저장하는 핸들러 */
   const registImage = useGoodsImageMutation();
-  const savePictures = async (previews: Preview[], onSuccess?: () => void): Promise<void> => {
+  const savePictures = async (
+    previews: Preview[],
+    onSuccess?: () => void,
+  ): Promise<void> => {
     if (!profileData) return;
 
     // 사진 개수 제한 - 저장된 이미지 + 등록할 이미지 개수가 8개 넘어가면 저장 안되도록
@@ -127,14 +130,11 @@ export function GoodsRegistPictures(): JSX.Element {
         })),
       );
 
-      console.log({result});
-
       // formState에 image에 저장
       setValue('image', prevImages ? [...prevImages, ...result] : [...result]);
 
       toast({ title: '이미지가 저장되었습니다', status: 'success' });
       if (onSuccess) onSuccess();
-
     } catch (error: any) {
       console.error(error);
       if (error?.response && error?.response?.status === 400) {
@@ -212,5 +212,3 @@ export function GoodsRegistPictures(): JSX.Element {
 }
 
 export default GoodsRegistPictures;
-
-

@@ -1,28 +1,32 @@
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import {
-  Box,
-  Button, Divider, IconButton,
+  Button,
+  Divider,
+  IconButton,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
   Stack,
-  Text, useToast
+  Text,
+  useToast,
 } from '@chakra-ui/react';
 import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
 import { Preview, readAsDataURL } from '@project-lc/components-core/ImageInputDialog';
 import { drawImageOnCanvas } from '@project-lc/components-shared/AvatarChangeButton';
 import { useEffect, useRef, useState } from 'react';
 import ReactCrop, { Crop } from 'react-image-crop';
-import { MAX_PICTURE_COUNT, GoodsPreviewItem, PREVIEW_SIZE } from './GoodsRegistPictures';
+import { GoodsPreviewItem, MAX_PICTURE_COUNT, PREVIEW_SIZE } from './GoodsRegistPictures';
 
 // * 상품사진 등록 모달 다이얼로그
 
 export function GoodsRegistPictureDialog({
-  isOpen, onClose, onSave, isLoading,
+  isOpen,
+  onClose,
+  onSave,
+  isLoading,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -32,7 +36,7 @@ export function GoodsRegistPictureDialog({
   const toast = useToast();
   const [previews, setPreviews] = useState<Preview[]>([]);
   const [currentPreview, setCurrentPreview] = useState<Preview | null>(
-    previews[0] || null
+    previews[0] || null,
   );
 
   // 잘린 이미지
@@ -116,34 +120,32 @@ export function GoodsRegistPictureDialog({
     aspect: 1,
   });
 
-  const canvasRef = useRef<HTMLCanvasElement|null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
     if (document) {
       // 마운트 된 후 (document 존재할 때) 1회만 진행
       canvasRef.current = document.createElement('canvas');
     }
-    
-  },[]);
+  }, []);
 
   const imageRef = useRef<HTMLImageElement | null>(null);
   // 이미지파일 불러왔을때 핸들러
   const onImageLoadedHandler = (imgElem: HTMLImageElement): void => {
     imageRef.current = imgElem;
-   
   };
 
   // 크롭영역 선택 핸들러 -> 크롭된 이미지 state에 저장
   const onCropComplete = (_crop: Crop): void => {
     if (imageRef.current && canvasRef.current && _crop.width && _crop.height) {
-      setCrop((crop) => ({ ...crop, height: _crop.height, width: _crop.width }));
-      
+      setCrop((exCrop) => ({ ...exCrop, height: _crop.height, width: _crop.width }));
+
       // 캔버스 요소에 크롭된 영역 이미지를 저장
       drawImageOnCanvas({ canvas: canvasRef.current, image: imageRef.current, _crop });
 
       // 크롭된 이미지를 dataURL형태로 저장
       const url = canvasRef.current.toDataURL();
       setCroppedImageBase64Url(url);
-    };
+    }
   };
 
   const saveCroppedCurrentPreview = (): void => {
@@ -152,30 +154,28 @@ export function GoodsRegistPictureDialog({
     // 크롭된 영역 이미지를 파일로 저장하기 위해 blob으로 변경
     canvasRef.current.toBlob((blob) => {
       if (!blob) {
-        console.error('canvas empty'); 
+        console.error('canvas empty');
         return;
       }
       setPreviews((list) => {
-        return list.map((item) => (
-          item.id === currentPreview.id 
+        return list.map((item) =>
+          item.id === currentPreview.id
             ? {
-              ...item, 
-              url: croppedImageBase64Url, 
-              file: new File(
-                [blob], 
-                item.filename, 
-                { lastModified: new Date().getTime(), type: blob.type }
-                ) // s3에 저장할때는 잘린 이미지의 파일이 필요
-            } 
-            : item
-        ));
+                ...item,
+                url: croppedImageBase64Url,
+                file: new File([blob], item.filename, {
+                  lastModified: new Date().getTime(),
+                  type: blob.type,
+                }), // s3에 저장할때는 잘린 이미지의 파일이 필요
+              }
+            : item,
+        );
       });
     });
   };
 
   const revertCurrentPreview = (): void => {
-    if (!currentPreview || !croppedImageBase64Url)
-      return;
+    if (!currentPreview || !croppedImageBase64Url) return;
     setPreviews((list) => {
       return list.map((item) => {
         if (item.id === currentPreview.id) {
@@ -188,8 +188,8 @@ export function GoodsRegistPictureDialog({
 
   const onImageClick = (preview: Preview): void => {
     setCurrentPreview(preview);
-    setCrop({ unit: '%', width: 100, aspect: 1, x: 0, y: 0});
-  }
+    setCrop({ unit: '%', width: 100, aspect: 1, x: 0, y: 0 });
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="6xl">
@@ -204,16 +204,30 @@ export function GoodsRegistPictureDialog({
                 multiple
                 handleSuccess={handleSuccess}
                 handleError={handleError}
-                variant="chakra" />
+                variant="chakra"
+              />
             </Stack>
 
             <Divider />
 
-
-            <Stack direction="row">
-              {/* 이미지 미리보기 목록 */}
-              <Stack spacing={2} minW="140px">
+            {/* 미리보기 영역 */}
+            <Stack spacing={2} minH="150px">
+              <Stack direction="row" alignItems="center">
                 <Text>등록할 상품 사진 미리보기</Text>
+                {previews.length > 0 && (
+                  <Button
+                    mr={3}
+                    onClick={() => onSave(previews, handleClose)}
+                    isLoading={isLoading}
+                    colorScheme="blue"
+                  >
+                    모두 등록하기
+                  </Button>
+                )}
+              </Stack>
+
+              {/* 미리보기 영역 - 이미지 목록 */}
+              <Stack direction="row">
                 {previews.length !== 0 &&
                   previews.map((preview, index) => {
                     const { id, filename, url } = preview;
@@ -228,62 +242,69 @@ export function GoodsRegistPictureDialog({
                         height={80}
                         onDelete={() => deletePreview(id)}
                         onImageClick={() => onImageClick(preview)}
-                        selected={currentPreview === preview}
-                        actionButtons={<>
-                          <IconButton
-                            icon={<ChevronUpIcon />}
-                            size="sm"
-                            disabled={index === 0}
-                            onClick={() => {
-                              swap(index - 1, index);
-                            }}
-                            aria-label="위" />
-                          <IconButton
-                            icon={<ChevronDownIcon />}
-                            size="sm"
-                            disabled={index >= previews.length - 1}
-                            onClick={() => {
-                              swap(index + 1, index);
-                            }}
-                            aria-label="아래" />
-                        </>} />
+                        selected={currentPreview?.id === preview.id}
+                        actionButtons={
+                          <>
+                            <IconButton
+                              icon={<ChevronLeftIcon />}
+                              size="sm"
+                              disabled={index === 0}
+                              onClick={() => {
+                                swap(index - 1, index);
+                              }}
+                              aria-label="위"
+                            />
+                            <IconButton
+                              icon={<ChevronRightIcon />}
+                              size="sm"
+                              disabled={index >= previews.length - 1}
+                              onClick={() => {
+                                swap(index + 1, index);
+                              }}
+                              aria-label="아래"
+                            />
+                          </>
+                        }
+                      />
                     );
                   })}
               </Stack>
-              {/* 크롭 */}
-              <Box flexGrow={0}>
-                <Text textAlign="center">크롭영역</Text>
-                {currentPreview && (
-                  <Stack>
-                    <ReactCrop
-                      src={currentPreview.url as string}
-                      crop={crop}
-                      onChange={(newCrop) => setCrop(newCrop)}
-                      onImageLoaded={onImageLoadedHandler}
-                      onComplete={onCropComplete} 
-                    />
-                    <Stack direction="row">
-                      <Button
-                        disabled={!croppedImageBase64Url}
-                        onClick={saveCroppedCurrentPreview}
-                      >
-                        적용하기
-                      </Button>
-                      <Button onClick={revertCurrentPreview}>원래 이미지로 되돌리기</Button>
-                    </Stack>
 
-                  </Stack>
-                )}
-              </Box>
+              {previews.length > 0 && (
+                <Text>이미지를 클릭하여 1:1비율로 자를 수 있습니다</Text>
+              )}
             </Stack>
+
+            <Divider />
+
+            {/* 크롭 영역 */}
+
+            {currentPreview && (
+              <Stack alignItems="center">
+                <Text textAlign="center">
+                  원하는 부분을 선택한 후 적용하기 버튼을 누르면 미리보기 영역에
+                  반영됩니다
+                </Text>
+                <Stack direction="row">
+                  <Button
+                    disabled={!croppedImageBase64Url}
+                    onClick={saveCroppedCurrentPreview}
+                  >
+                    적용하기
+                  </Button>
+                  <Button onClick={revertCurrentPreview}>원래 이미지로 되돌리기</Button>
+                </Stack>
+                <ReactCrop
+                  src={currentPreview.url as string}
+                  crop={crop}
+                  onChange={(newCrop) => setCrop(newCrop)}
+                  onImageLoaded={onImageLoadedHandler}
+                  onComplete={onCropComplete}
+                />
+              </Stack>
+            )}
           </Stack>
         </ModalBody>
-        <ModalFooter>
-          <Button mr={3} onClick={() => onSave(previews, handleClose)} isLoading={isLoading}>
-            저장
-          </Button>
-          <Button onClick={handleClose}>취소</Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );

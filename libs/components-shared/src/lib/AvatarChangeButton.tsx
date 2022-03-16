@@ -30,27 +30,29 @@ import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 
-
 export type DrawImageOnCanvasProp = {
-  canvas: HTMLCanvasElement,
-  image: HTMLImageElement,
-  _crop: Crop,
-}
+  canvas: HTMLCanvasElement;
+  image: HTMLImageElement;
+  _crop: Crop;
+};
 // img 태그에 표시된 이미지를 canvas에 표시하고 crop 의 크기만큼 잘라냄
 // 이미지 그린 캔버스 리턴
-export const drawImageOnCanvas = ({canvas, image, _crop}:DrawImageOnCanvasProp): HTMLCanvasElement => {
-  
+export const drawImageOnCanvas = ({
+  canvas,
+  image,
+  _crop,
+}: DrawImageOnCanvasProp): HTMLCanvasElement => {
+  const _canvas = canvas;
   const pixelRatio = window.devicePixelRatio;
   const scaleX = image.naturalWidth / image.width;
   const scaleY = image.naturalHeight / image.height;
-  const ctx = canvas.getContext('2d');
+  const ctx = _canvas.getContext('2d');
 
-  canvas.width = _crop.width * pixelRatio * scaleX;
-  canvas.height = _crop.height * pixelRatio * scaleY;
+  _canvas.width = _crop.width * pixelRatio * scaleX;
+  _canvas.height = _crop.height * pixelRatio * scaleY;
 
- 
   if (!ctx) {
-    throw new Error('No 2d context')
+    throw new Error('No 2d context');
   }
 
   ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
@@ -68,8 +70,8 @@ export const drawImageOnCanvas = ({canvas, image, _crop}:DrawImageOnCanvasProp):
     _crop.height * scaleY,
   );
 
-  return canvas;
-}
+  return _canvas;
+};
 
 /**
  * 이미지 잘라내어 "blob"으로 변환하는 함수
@@ -84,7 +86,7 @@ export const getCroppedImage = (
   blobCallback: BlobCallback,
 ): void => {
   const canvas = document.createElement('canvas');
-  drawImageOnCanvas({canvas, image,_crop}).toBlob(blobCallback, 'image/jpeg', 1);
+  drawImageOnCanvas({ canvas, image, _crop }).toBlob(blobCallback, 'image/jpeg', 1);
 };
 
 export function AvatarChangeButton(): JSX.Element {
