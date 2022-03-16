@@ -1,5 +1,5 @@
 import { LivePlatform } from '@project-lc/shared-types';
-import { HTMLAttributes, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import Youtube from 'react-youtube';
 import { YouTubePlayer } from 'youtube-player/dist/types';
 
@@ -11,7 +11,6 @@ export interface EmbededVideoProps {
    * if provider is youtube, identifier means youtube's video-id
    * */
   identifier: string;
-  style?: HTMLAttributes<HTMLIFrameElement>['style'];
   onYoutubeStateChange?: (
     identifier: string,
     e: {
@@ -23,10 +22,9 @@ export interface EmbededVideoProps {
 export function EmbededVideo({
   provider,
   identifier,
-  style,
   onYoutubeStateChange,
 }: EmbededVideoProps): JSX.Element | null {
-  const [myLocaitonOrigin, setMyLocationHost] = useState('');
+  const [myLocationOrigin, setMyLocationHost] = useState('');
   useEffect(() => {
     if (typeof window !== undefined) {
       setMyLocationHost(window.location.hostname);
@@ -38,6 +36,7 @@ export function EmbededVideo({
       <Youtube
         containerClassName="main-carousel-youtube-container"
         className="main-carousel-youtube-video"
+        loading="eager"
         opts={{
           height: '100%',
           width: '100%',
@@ -66,12 +65,12 @@ export function EmbededVideo({
     );
   }
 
-  if (provider === 'twitch' && myLocaitonOrigin) {
+  if (provider === 'twitch' && myLocationOrigin) {
     return (
       <iframe
-        style={style || { borderRadius: '8px' }}
+        style={{ borderRadius: '8px' }}
         title={`Twitch video player - ${identifier}`}
-        src={`https://player.twitch.tv/?channel=${identifier}&parent=${myLocaitonOrigin}`}
+        src={`https://player.twitch.tv/?channel=${identifier}&parent=${myLocationOrigin}`}
         frameBorder="0"
         allowFullScreen
         scrolling="no"

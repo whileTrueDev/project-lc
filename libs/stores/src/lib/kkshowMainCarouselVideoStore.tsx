@@ -1,12 +1,12 @@
 import create from 'zustand';
 
-export interface CarouselYoutubeStore {
+export interface CarouselVideoStore {
   isPlaying: boolean;
   isFirstRender: boolean;
   setIsPlaying(state: boolean): void;
 }
 
-export const carouselYoutubeStore = create<CarouselYoutubeStore>((set) => ({
+export const carouselVideoStore = create<CarouselVideoStore>((set) => ({
   isPlaying: false,
   isFirstRender: true,
   setIsPlaying: (state: boolean) => {

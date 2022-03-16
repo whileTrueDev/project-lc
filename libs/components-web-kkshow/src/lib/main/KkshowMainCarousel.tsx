@@ -1,10 +1,17 @@
 import shallow from 'zustand/shallow';
-import { Box, Flex, ScaleFade, SlideFade, useBreakpointValue } from '@chakra-ui/react';
+import {
+  Box,
+  Fade,
+  Flex,
+  ScaleFade,
+  SlideFade,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import { ChevronIconButton } from '@project-lc/components-core/HorizontalImageGallery';
 import { WaveBox } from '@project-lc/components-core/WaveBox';
 import { useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainCarouselItem } from '@project-lc/shared-types';
-import { carouselYoutubeStore } from '@project-lc/stores';
+import { carouselVideoStore } from '@project-lc/stores';
 import { useEffect, useState } from 'react';
 import SwiperObj, { Autoplay, Navigation, Pagination } from 'swiper';
 import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
@@ -26,9 +33,9 @@ function MainCarousel(): JSX.Element | null {
   const { data } = useKkshowMain();
   const slidesPerView = useBreakpointValue<'auto' | number>({ base: 1, md: 'auto' });
 
-  const youtubeState = carouselYoutubeStore(
+  const youtubeState = carouselVideoStore(
     (s) => ({
-      isYoutubePlaying: s.isPlaying,
+      isVideoPlaying: s.isPlaying,
       isFirstRender: s.isFirstRender,
     }),
     shallow,
@@ -36,9 +43,9 @@ function MainCarousel(): JSX.Element | null {
   const [swiperObj, setSwiperObj] = useState<SwiperObj>();
   useEffect(() => {
     if (youtubeState.isFirstRender) return;
-    if (youtubeState.isYoutubePlaying) swiperObj?.autoplay.stop();
-    else if (!youtubeState.isYoutubePlaying) swiperObj?.autoplay.start();
-  }, [youtubeState.isYoutubePlaying, swiperObj?.autoplay, youtubeState.isFirstRender]);
+    if (youtubeState.isVideoPlaying) swiperObj?.autoplay.stop();
+    else if (!youtubeState.isVideoPlaying) swiperObj?.autoplay.start();
+  }, [youtubeState.isVideoPlaying, swiperObj?.autoplay, youtubeState.isFirstRender]);
 
   if (!data) return null;
 
@@ -51,7 +58,7 @@ function MainCarousel(): JSX.Element | null {
       centeredSlides
       loop
       grabCursor
-      loopedSlides={data ? data.carousel.length : undefined}
+      loopedSlides={data.carousel.length}
       pagination={{ clickable: true }}
       modules={[Pagination, Autoplay, Navigation]}
       style={{ height: '100%' }}
@@ -110,8 +117,8 @@ function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Elemen
         <KkshowMainCarouselDescription item={item} />
       </SlideFade>
 
-      {isActive && (
-        <Box display={{ base: 'none', md: 'contents' }}>
+      <Fade in={isActive}>
+        <Box display={{ base: 'none', md: 'contents' }} transition="display 0.2s">
           <ChevronIconButton
             variant="outlined"
             direction="left"
@@ -128,7 +135,7 @@ function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Elemen
             onClick={() => swiper.slideNext()}
           />
         </Box>
-      )}
+      </Fade>
     </Flex>
   );
 }
