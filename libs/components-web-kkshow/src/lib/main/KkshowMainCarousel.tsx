@@ -1,4 +1,11 @@
-import { Box, Flex, ScaleFade, SlideFade, useBreakpointValue } from '@chakra-ui/react';
+import {
+  Box,
+  Fade,
+  Flex,
+  ScaleFade,
+  SlideFade,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import { ChevronIconButton } from '@project-lc/components-core/HorizontalImageGallery';
 import { WaveBox } from '@project-lc/components-core/WaveBox';
 import { useKkshowMain } from '@project-lc/hooks';
@@ -32,7 +39,7 @@ function MainCarousel(): JSX.Element | null {
       centeredSlides
       loop
       grabCursor
-      loopedSlides={data ? data.carousel.length : undefined}
+      loopedSlides={data.carousel.length}
       pagination={{ clickable: true }}
       modules={[Pagination, Autoplay, Navigation]}
       style={{ height: '100%' }}
@@ -91,8 +98,8 @@ function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Elemen
         <KkshowMainCarouselDescription item={item} />
       </SlideFade>
 
-      {isActive && (
-        <Box display={{ base: 'none', md: 'contents' }}>
+      <Fade in={isActive}>
+        <Box display={{ base: 'none', md: 'contents' }} transition="display 0.2s">
           <ChevronIconButton
             variant="outlined"
             direction="left"
@@ -109,7 +116,7 @@ function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Elemen
             onClick={() => swiper.slideNext()}
           />
         </Box>
-      )}
+      </Fade>
     </Flex>
   );
 }

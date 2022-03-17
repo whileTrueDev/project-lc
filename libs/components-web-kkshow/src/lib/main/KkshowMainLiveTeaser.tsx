@@ -47,7 +47,7 @@ export function KkshowLiveTeaser(): JSX.Element | null {
           justifyContent="center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.5 }}
         >
           <Flex w={300} h={300} boxShadow="xl" borderRadius="2xl" position="relative">
             <Image borderRadius="2xl" w="100%" h="100%" src={data.trailer.imageUrl} />
@@ -109,7 +109,7 @@ export function KkshowLiveTeaser(): JSX.Element | null {
           textAlign={{ base: 'center', lg: 'unset' }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.5 }}
         >
           <Box>
             <Heading color="blue.500" fontSize={{ base: 'lg', md: '2xl' }}>
@@ -144,6 +144,8 @@ export function KkshowLiveTeaser(): JSX.Element | null {
                 color="red"
                 variant="outline"
                 rounded="3xl"
+                _active={{ bgColor: 'red', color: 'white' }}
+                _hover={{ bgColor: 'red', color: 'white' }}
                 leftIcon={<MdOutlineNotificationsActive fontSize="24px" />}
               >
                 알림받기

@@ -119,7 +119,7 @@ export const kkshowMainSeedData = {
       liveShoppingId: null,
       profileImageUrl:
         'https://static-cdn.jtvnw.net/jtv_user_pictures/ec949373-7065-423c-afad-08f9504c8034-profile_image-150x150.png',
-      liveShoppingTitle: '신맛의 오늘의 맛 ',
+      liveShoppingTitle: '신맛의 오늘의 맛',
       liveShoppingDescription: '연나비 X 홍봉자굴림치즈만두',
       broadcasterProfileImageUrl: '',
     },
@@ -130,6 +130,15 @@ export const kkshowMainSeedData = {
         'https://static-cdn.jtvnw.net/jtv_user_pictures/24d7c181-ca61-4297-a276-ccc80a923b47-profile_image-150x150.png',
       liveShoppingTitle: '토여니의 토요일은 즐거워!',
       liveShoppingDescription: '유은 X 먹고집',
+      broadcasterProfileImageUrl: '',
+    },
+    {
+      videoUrl: 'tL0_5cmlnbo',
+      liveShoppingId: null,
+      profileImageUrl:
+        'https://static-cdn.jtvnw.net/jtv_user_pictures/ec11a121-f980-4256-a94f-775bfd7d4410-profile_image-70x70.png',
+      liveShoppingTitle: '나 오늘 취하지 않을거야ㅎ',
+      liveShoppingDescription: '듀라나 x 진국보감',
       broadcasterProfileImageUrl: '',
     },
   ],

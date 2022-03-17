@@ -9,7 +9,7 @@ export function KkshowMainCarouselHeader({
 }: KkshowMainCarouselHeaderProps): JSX.Element | null {
   const KkshowMainCarouselHeaderContainer = (props: BoxProps): JSX.Element => (
     <Box
-      h={50}
+      h={{ base: 35, md: 50 }}
       textAlign="center"
       color="whiteAlpha.900"
       visibility="visible"

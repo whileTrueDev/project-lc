@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Box,
   Container,
   Flex,
   Heading,
@@ -10,7 +11,7 @@ import {
 import MotionBox from '@project-lc/components-core/MotionBox';
 import { useKkshowMain } from '@project-lc/hooks';
 import NextLink from 'next/link';
-import { Pagination } from 'swiper';
+import { Pagination, Scrollbar } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import KkshowMainTitle from './KkshowMainTitle';
 
@@ -19,39 +20,37 @@ export function KkshowMainBestBroadcaster(): JSX.Element | null {
   if (!data) return null;
 
   return (
-    <MotionBox
-      py={20}
-      id="kkshow-blue-scroll"
-      position="relative"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
-      viewport={{ once: true }}
-    >
+    <Box py={20} position="relative">
       <KkshowMainTitle>BEST 방송인</KkshowMainTitle>
-      <Container as={Flex} maxW="5xl" py={10} gap={6}>
-        <Swiper
-          style={{ paddingTop: 24, paddingBottom: 24, width: '100%' }}
-          spaceBetween={16}
-          slidesPerView="auto"
-          // scrollbar
-          pagination
-          modules={[Pagination]}
-        >
-          {data.bestBroadcaster.map((x) => (
-            <SwiperSlide
-              key={`${x.nickname}_${x.broadcasterId}`}
-              style={{ maxWidth: 190, paddingBottom: 24 }}
-            >
-              <BestBroadcasterItem
-                avatarUrl={x.profileImageUrl}
-                broadcasterName={x.nickname}
-                href={x.promotionPageLinkUrl}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </Container>
-    </MotionBox>
+      <MotionBox
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+        viewport={{ once: true, amount: 0.5 }}
+      >
+        <Container as={Flex} maxW="5xl" py={10} gap={6}>
+          <Swiper
+            style={{ paddingTop: 24, paddingBottom: 24, width: '100%' }}
+            spaceBetween={16}
+            slidesPerView="auto"
+            scrollbar
+            modules={[Pagination, Scrollbar]}
+          >
+            {data.bestBroadcaster.map((x) => (
+              <SwiperSlide
+                key={`${x.nickname}_${x.broadcasterId}`}
+                style={{ maxWidth: 190, paddingBottom: 24 }}
+              >
+                <BestBroadcasterItem
+                  avatarUrl={x.profileImageUrl}
+                  broadcasterName={x.nickname}
+                  href={x.promotionPageLinkUrl}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </Container>
+      </MotionBox>
+    </Box>
   );
 }
 
