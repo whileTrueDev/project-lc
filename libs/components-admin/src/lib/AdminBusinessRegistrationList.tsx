@@ -48,7 +48,7 @@ const columns: GridColumns = [
   {
     field: 'businessAddress',
     headerName: '사업장 주소',
-    minWidth: 1000,
+    minWidth: 300,
   },
   {
     field: 'taxInvoiceMail',
