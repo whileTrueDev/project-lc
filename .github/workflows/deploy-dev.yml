@@ -3,9 +3,11 @@ on:
     branches: [dev]
     paths:
       - 'apps/api/**'
-      - 'apps/api-realtime/**'
       - 'apps/overlay/**'
       - 'apps/overlay-controller/**'
+      - 'apps/api-realtime/**'
+      - 'apps/batch-inactive-handler/**'
+      - 'apps/mailer/**'
       - 'libs/firstmall-db/**'
       - 'libs/nest-core/**'
       - 'libs/nest-modules-*/**'
