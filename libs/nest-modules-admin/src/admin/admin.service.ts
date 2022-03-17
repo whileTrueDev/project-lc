@@ -36,6 +36,7 @@ export class AdminService {
             BusinessRegistrationConfirmation: true,
             seller: {
               select: {
+                email: true,
                 agreementFlag: true,
                 inactiveFlag: false,
               },
@@ -49,6 +50,11 @@ export class AdminService {
         sellerSettlementAccount: {
           orderBy: {
             id: 'desc',
+          },
+          include: {
+            seller: {
+              select: { email: true },
+            },
           },
           take: 1,
         },

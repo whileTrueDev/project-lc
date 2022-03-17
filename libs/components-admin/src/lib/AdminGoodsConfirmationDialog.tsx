@@ -82,6 +82,7 @@ export function AdminGoodsConfirmationDialog(
   const { ref, ...firstmallGoodsConnectionId } = register('firstmallGoodsConnectionId', {
     required: '상품 ID를 반드시 입력해주세요.',
   });
+
   const connectionIdRefs = useMergeRefs(initialRef, ref);
 
   const mutation = useGoodConfirmationMutation();

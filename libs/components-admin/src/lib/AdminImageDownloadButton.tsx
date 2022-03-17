@@ -67,11 +67,10 @@ export function AdminImageDownloadButton({
       break;
 
     default:
-      userEmail = row.sellerEmail;
+      userEmail = row.seller.email;
   }
-
-  async function downloadFromS3(sellerEmail: string): Promise<void> {
-    const Key = `${type}/${sellerEmail}/${fileName}`;
+  async function downloadFromS3(email: string): Promise<void> {
+    const Key = `${type}/${email}/${fileName}`;
     const imageUrl = await s3.getPresignedUrl({ Key }, { expiresIn: 60 });
     window.open(imageUrl, '_blank');
   }

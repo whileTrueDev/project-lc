@@ -6,8 +6,9 @@ import { AdminImageDownloadButton } from './AdminImageDownloadButton';
 
 const columns: GridColumns = [
   {
-    field: 'sellerEmail',
+    field: 'seller.email',
     headerName: '광고주 이메일',
+    valueGetter: ({ row }) => row.seller.email,
     minWidth: 230,
   },
   {

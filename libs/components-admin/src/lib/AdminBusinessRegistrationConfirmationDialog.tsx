@@ -62,7 +62,7 @@ export function AdminBusinessRegistrationConfirmationDialog({
           <Grid templateColumns="2fr 3fr" borderTopWidth={1.5} width={['100%', '70%']}>
             <GridTableItem title="회사명" value={row?.companyName} />
           </Grid>
-          {!row?.agreementFlag && (
+          {!row?.seller?.agreementFlag && (
             <Alert status="error">
               <Stack>
                 <AlertIcon />
@@ -76,7 +76,7 @@ export function AdminBusinessRegistrationConfirmationDialog({
           )}
         </ModalBody>
         <ModalFooter>
-          <Button isDisabled={!row?.agreementFlag} onClick={useSubmit}>
+          <Button isDisabled={!row?.seller?.agreementFlag} onClick={useSubmit}>
             승인하기
           </Button>
         </ModalFooter>

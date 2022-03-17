@@ -831,6 +831,12 @@ export class FmOrdersService {
   // * **********************************
   public async getOrdersStats(goodsIds: number[]): Promise<OrderStatsRes> {
     const nullFilteredGoodsIds = goodsIds.filter((g) => !!g);
+    if (nullFilteredGoodsIds.length === 0) {
+      return {
+        orders: { 배송완료: 0, 배송준비중: 0, 배송중: 0 },
+        sales: { 주문: { count: 0, sum: 0 }, 환불: { count: 0, sum: 0 } },
+      };
+    }
     const sql = `
     SELECT 
       order_seq, 
