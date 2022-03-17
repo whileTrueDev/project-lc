@@ -10,8 +10,10 @@ import {
   ModalOverlay,
   Box,
   Stack,
+  useToast,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import { useGoodsImageOrderMutation } from '@project-lc/hooks';
 import { GoodsImageDto } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -25,6 +27,7 @@ export function GoodsRegistPictureOrderChangeDialog({
   isOpen: boolean;
   onClose: () => void;
 }): JSX.Element {
+  const toast = useToast();
   const { setValue, getValues } = useFormContext<GoodsFormValues>();
   const imageList = getValues('image');
   const [draggingItem, setDraggingItem] = useState<null | HTMLElement>(null);
@@ -32,18 +35,23 @@ export function GoodsRegistPictureOrderChangeDialog({
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>): void => {
     const dragTarget = event.currentTarget;
-    const imageIndex = dragTarget.dataset.imageIndex;
+    const { imageIndex } = dragTarget.dataset;
     setDraggingItem(dragTarget);
     event.dataTransfer.setData('imageIndex', imageIndex || '');
-    event.dataTransfer.dropEffect = 'move';
-  }
+  };
 
-  const moveDraggingItemFromTo = (draggingItemIndex: number, dropPositionIndex: number): void => {
+  const moveDraggingItemFromTo = (
+    draggingItemIndex: number,
+    dropPositionIndex: number,
+  ): void => {
     const _imageList = [...imageListCopy];
     const _moving = _imageList.splice(draggingItemIndex, 1)[0];
     _imageList.splice(dropPositionIndex, 0, _moving);
-    setImageListCopy(_imageList);
-  }
+    // 이미지 순서(cut_number)를 index 값으로 수정한다
+    setImageListCopy(
+      _imageList.map((_image, index) => ({ ..._image, cut_number: index })),
+    );
+  };
 
   const onDrop = (event: React.DragEvent<HTMLDivElement>): void => {
     event.preventDefault();
@@ -53,10 +61,11 @@ export function GoodsRegistPictureOrderChangeDialog({
     const dropTargetImageIndex = Number(dropTarget.dataset.imageIndex);
     const dragTargetImageIndex = Number(event.dataTransfer.getData('imageIndex'));
 
-    if (dropTargetImageIndex === dragTargetImageIndex) {return;} // 동일 위치에 둔거면 종료
+    if (dropTargetImageIndex === dragTargetImageIndex) {
+      return;
+    } // 동일 위치에 둔거면 종료
 
     moveDraggingItemFromTo(dragTargetImageIndex, dropTargetImageIndex);
-
   };
 
   // This makes the third box become droppable
@@ -66,16 +75,28 @@ export function GoodsRegistPictureOrderChangeDialog({
 
   const onDragEnd = (event: React.DragEvent<HTMLDivElement>): void => {
     setDraggingItem(null);
-  }
+  };
 
   const handleClose = (): void => {
     onClose();
-  }
+  };
 
+  const { mutateAsync, isLoading } = useGoodsImageOrderMutation();
   const saveChangedOrder = (): void => {
-
-    // 이미지 
-  }
+    console.log(imageListCopy);
+    // 이미지 순서(cut_number) 변경 요청
+    mutateAsync(imageListCopy)
+      .then(() => {
+        toast({ title: '상품 사진 순서 변경 적용 성공', status: 'success' });
+        console.log('image order change success');
+        handleClose();
+        setValue('image', imageListCopy);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({ title: '상품 사진 순서 변경 적용 실패', status: 'error' });
+      });
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
@@ -90,33 +111,36 @@ export function GoodsRegistPictureOrderChangeDialog({
               <Box
                 key={i.id}
                 position="relative"
-                draggable
+                draggable={!isLoading}
                 data-image-index={index}
                 onDragStart={onDragStart}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
                 onDragEnd={onDragEnd}
               >
-                <Text direction="row">
-                  {index}
-                </Text>
                 <ChakraNextImage
                   layout="intrinsic"
                   alt={i.image}
                   src={i.image || ''}
                   {...PREVIEW_SIZE}
                 />
-                
               </Box>
             ))}
           </Stack>
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={saveChangedOrder}>
+          <Button
+            colorScheme="blue"
+            mr={3}
+            onClick={saveChangedOrder}
+            isLoading={isLoading}
+          >
             변경하기
           </Button>
-          <Button variant="ghost" onClick={handleClose}>닫기</Button>
+          <Button variant="ghost" onClick={handleClose}>
+            닫기
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

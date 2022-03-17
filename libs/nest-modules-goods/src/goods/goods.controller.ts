@@ -48,6 +48,12 @@ export class GoodsController {
     return this.goodsService.deleteGoodsImage(imageId);
   }
 
+  /** 여러 상품 이미지 데이터 수정 */
+  @Patch('/image')
+  updateGoodsImages(@Body(ValidationPipe) dto: GoodsImageDto[]): Promise<boolean> {
+    return this.goodsService.updateGoodsImages(dto);
+  }
+
   /** 상품 목록 조회 */
   @Get('/list')
   getGoodsList(

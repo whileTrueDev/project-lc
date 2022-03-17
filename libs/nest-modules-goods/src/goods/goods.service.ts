@@ -421,7 +421,7 @@ export class GoodsService extends ServiceBaseWithCache {
           },
         },
         confirmation: true,
-        image: true,
+        image: { orderBy: { cut_number: 'asc' } },
         GoodsInfo: true,
         LiveShopping: true,
       },
@@ -526,6 +526,21 @@ export class GoodsService extends ServiceBaseWithCache {
       console.error(e);
       throw new InternalServerErrorException(e);
     }
+  }
+
+  /** 여러 상품 이미지 데이터 수정 */
+  public async updateGoodsImages(dto: GoodsImageDto[]): Promise<boolean> {
+    console.log('update images', dto);
+    await Promise.all(
+      dto.map((image) => {
+        const { id, ...data } = image;
+        return this.prisma.goodsImages.update({
+          where: { id },
+          data,
+        });
+      }),
+    );
+    return true;
   }
 
   /** 상품 수정시 상품 옵션 데이터 구분하는 함수(삭제, 수정, 생성) 
