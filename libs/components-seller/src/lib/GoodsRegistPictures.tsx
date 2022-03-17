@@ -232,7 +232,14 @@ export function GoodsRegistPictures(): JSX.Element {
                     src={i.image || ''}
                     {...PREVIEW_SIZE}
                   />
-                  <Box bg="rgba(0,0,0,0.3)" width="100%" height={`${PREVIEW_SIZE.height / 3}px`} position="absolute" left={0} top={0}/>
+                  <Box
+                    bg="rgba(0,0,0,0.3)"
+                    width="100%"
+                    height={`${PREVIEW_SIZE.height / 3}px`}
+                    position="absolute"
+                    left={0}
+                    top={0}
+                  />
                   <IconButton
                     aria-label="등록된 이미지 삭제"
                     icon={<CloseIcon />}

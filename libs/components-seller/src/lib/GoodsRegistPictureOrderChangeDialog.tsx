@@ -1,6 +1,7 @@
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import {
-  Text,
   Button,
+  IconButton,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -8,8 +9,8 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Box,
   Stack,
+  Text,
   useToast,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
@@ -30,20 +31,12 @@ export function GoodsRegistPictureOrderChangeDialog({
   savedImages: GoodsImageDto[];
 }): JSX.Element {
   const toast = useToast();
-  const { setValue, getValues } = useFormContext<GoodsFormValues>();
-  const [draggingItem, setDraggingItem] = useState<null | HTMLElement>(null);
+  const { setValue } = useFormContext<GoodsFormValues>();
   const [imageListCopy, setImageListCopy] = useState<GoodsImageDto[]>([]);
 
   useEffect(() => {
     setImageListCopy([...savedImages]);
-  },[savedImages]);
-
-  const onDragStart = (event: React.DragEvent<HTMLDivElement>): void => {
-    const dragTarget = event.currentTarget;
-    const { imageIndex } = dragTarget.dataset;
-    setDraggingItem(dragTarget);
-    event.dataTransfer.setData('imageIndex', imageIndex || '');
-  };
+  }, [savedImages]);
 
   const moveDraggingItemFromTo = (
     draggingItemIndex: number,
@@ -56,30 +49,6 @@ export function GoodsRegistPictureOrderChangeDialog({
     setImageListCopy(
       _imageList.map((_image, index) => ({ ..._image, cut_number: index })),
     );
-  };
-
-  const onDrop = (event: React.DragEvent<HTMLDivElement>): void => {
-    event.preventDefault();
-    if (!draggingItem) return;
-    const dropTarget = event.currentTarget;
-
-    const dropTargetImageIndex = Number(dropTarget.dataset.imageIndex);
-    const dragTargetImageIndex = Number(event.dataTransfer.getData('imageIndex'));
-
-    if (dropTargetImageIndex === dragTargetImageIndex) {
-      return;
-    } // 동일 위치에 둔거면 종료
-
-    moveDraggingItemFromTo(dragTargetImageIndex, dropTargetImageIndex);
-  };
-
-  // This makes the third box become droppable
-  const onDragOver = (event: React.DragEvent<HTMLDivElement>): void => {
-    event.preventDefault();
-  };
-
-  const onDragEnd = (event: React.DragEvent<HTMLDivElement>): void => {
-    setDraggingItem(null);
   };
 
   const handleClose = (): void => {
@@ -113,15 +82,11 @@ export function GoodsRegistPictureOrderChangeDialog({
           <Text>이미지 순서를 변경해주세요</Text>
           <Stack>
             {imageListCopy.map((i, index) => (
-              <Box
+              <Stack
+                direction="row"
                 key={i.id}
                 position="relative"
-                draggable={!isLoading}
                 data-image-index={index}
-                onDragStart={onDragStart}
-                onDragOver={onDragOver}
-                onDrop={onDrop}
-                onDragEnd={onDragEnd}
               >
                 <ChakraNextImage
                   layout="intrinsic"
@@ -129,7 +94,27 @@ export function GoodsRegistPictureOrderChangeDialog({
                   src={i.image || ''}
                   {...PREVIEW_SIZE}
                 />
-              </Box>
+                <Stack justifyContent="center">
+                  <IconButton
+                    icon={<ChevronUpIcon />}
+                    size="xs"
+                    disabled={index === 0}
+                    onClick={() => {
+                      moveDraggingItemFromTo(index, index - 1);
+                    }}
+                    aria-label="위"
+                  />
+                  <IconButton
+                    icon={<ChevronDownIcon />}
+                    size="xs"
+                    disabled={index >= imageListCopy.length - 1}
+                    onClick={() => {
+                      moveDraggingItemFromTo(index, index + 1);
+                    }}
+                    aria-label="아래"
+                  />
+                </Stack>
+              </Stack>
             ))}
           </Stack>
         </ModalBody>
