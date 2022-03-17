@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   ForbiddenException,
   Get,
   Header,
@@ -17,10 +18,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+  AdminClassChangeHistory,
   Administrator,
   BusinessRegistrationConfirmation,
   GoodsConfirmation,
   LiveShopping,
+  PrivacyApproachHistory,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -30,11 +33,14 @@ import {
 } from '@project-lc/nest-modules-broadcaster';
 import { GoodsService } from '@project-lc/nest-modules-goods';
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
-import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
 import {
   AdminAllLcGoodsList,
   AdminBroadcasterSettlementInfoList,
+  AdminClassChangeHistoryDtoWithoutId,
+  AdminClassDto,
+  AdminGoodsByIdRes,
+  AdminGoodsListRes,
   AdminSellerListRes,
   AdminSettlementInfoType,
   AdminSignUpDto,
@@ -47,17 +53,19 @@ import {
   EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
-  GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingDTO,
+  LiveShoppingImageDto,
   OrderCancelRequestDetailRes,
   OrderCancelRequestList,
+  PrivacyApproachHistoryDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
+import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminService } from './admin.service';
 
@@ -76,6 +84,7 @@ export class AdminController {
     private readonly sellerService: SellerService,
     private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
+    private readonly adminPrivacyApproachSevice: AdminPrivacyApproachSevice,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
     if (wtIp) this.allowedIpAddresses.push(wtIp);
@@ -116,7 +125,7 @@ export class AdminController {
   @Post('/settlement')
   executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
     if (dto.target.options.length === 0) return null;
-    return this.sellerSettlementService.executeSettle(dto.sellerEmail, dto);
+    return this.sellerSettlementService.executeSettle(dto.sellerId, dto);
   }
 
   /** 판매자 정산 완료 목록 */
@@ -155,24 +164,25 @@ export class AdminController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/goods')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   getGoodsInfo(
     @Query('sort', new DefaultValuePipe(SellerGoodsSortColumn.REGIST_DATE))
     sort: SellerGoodsSortColumn,
     @Query('direction', new DefaultValuePipe(SellerGoodsSortDirection.DESC))
     direction: SellerGoodsSortDirection,
-  ) {
+  ): Promise<AdminGoodsListRes> {
     return this.adminService.getGoodsInfo({
       sort,
       direction,
     });
   }
 
-  // 상품검수를 위한 상품 리스트
+  // 상품검수를 위한 상품 상세 정보
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/goods/:goodsId')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getAdminGoodsById(@Param('goodsId') goodsId: string | number): Promise<GoodsByIdRes> {
+  getAdminGoodsById(
+    @Param('goodsId') goodsId: string | number,
+  ): Promise<AdminGoodsByIdRes> {
     return this.adminService.getOneGoods(goodsId);
   }
 
@@ -218,6 +228,12 @@ export class AdminController {
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getAllBroadcasters(): Promise<BroadcasterDTO[]> {
     return this.broadcasterService.getAllBroadcasterIdAndNickname();
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('/live-shopping/images')
+  upsertLiveShoppingImage(@Body() dto: LiveShoppingImageDto): Promise<boolean> {
+    return this.adminService.upsertLiveShoppingImage(dto);
   }
 
   // 상품 검수 승인을 수행
@@ -300,5 +316,40 @@ export class AdminController {
   @Get('confirmed-goods-list')
   async findAllConfirmedLcGoodsList(): Promise<AdminAllLcGoodsList> {
     return this.projectLcGoodsService.findAllConfirmedLcGoodsList();
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('privacy-approach-history')
+  async createPrivacyApproachHistory(
+    @Req() req: Request,
+    @Body() dto: PrivacyApproachHistoryDto,
+  ): Promise<PrivacyApproachHistory> {
+    return this.adminPrivacyApproachSevice.createPrivacyApproachHistory(req, dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('class-change-history')
+  async createClassChangeHistory(
+    @Body() dto: AdminClassChangeHistoryDtoWithoutId,
+  ): Promise<AdminClassChangeHistory> {
+    return this.adminService.createAdminClassChangeHistory(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('/admin-managers')
+  async getAdminUserList(): Promise<AdminClassDto[]> {
+    return this.adminService.getAdminUserList();
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch('/admin-class')
+  async updateAdminClass(@Body() dto: AdminClassDto): Promise<Administrator> {
+    return this.adminService.updateAdminClass(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Delete('/user/:userId')
+  async deleteAdminUser(@Param('userId') userId: number): Promise<boolean> {
+    return this.adminService.deleteAdminUser(userId);
   }
 }

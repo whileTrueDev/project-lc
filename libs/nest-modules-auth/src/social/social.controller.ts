@@ -17,6 +17,7 @@ import { Request, Response } from 'express';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { LoginHistoryService } from '../auth/login-history/login-history.service';
 import { SocialService } from './social.service';
+
 @Controller('social')
 export class SocialController {
   constructor(
@@ -55,7 +56,19 @@ export class SocialController {
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
     const userType: UserType = getUserTypeFromRequest(req);
-    this.socialService.login(userType, req, res);
+    const userPayload = this.socialService.login(userType, req, res);
+
+    if (userPayload.inactiveFlag) {
+      // 휴면계정 처리
+      let hostUrl: string;
+
+      if (userType === 'broadcaster') {
+        hostUrl = getBroadcasterWebHost();
+      } else {
+        hostUrl = getWebHost();
+      }
+      return res.redirect(`${hostUrl}/activate?type=social&email=${userPayload.sub}`);
+    }
 
     // 로그인 기록 추가 by @hwasurr
     this.loginHistoryService.createLoginStamp(req, '소셜/구글');
@@ -83,7 +96,19 @@ export class SocialController {
   @UseGuards(AuthGuard('naver'))
   async naverAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
     const userType: UserType = getUserTypeFromRequest(req);
-    this.socialService.login(userType, req, res);
+    const userPayload = this.socialService.login(userType, req, res);
+
+    if (userPayload.inactiveFlag) {
+      // 휴면계정 처리
+      let hostUrl: string;
+
+      if (userType === 'broadcaster') {
+        hostUrl = getBroadcasterWebHost();
+      } else {
+        hostUrl = getWebHost();
+      }
+      return res.redirect(`${hostUrl}/activate?type=social&email=${userPayload.sub}`);
+    }
 
     // 로그인 기록 추가 by @hwasurr
     this.loginHistoryService.createLoginStamp(req, '소셜/네이버');
@@ -111,8 +136,19 @@ export class SocialController {
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuthCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
     const userType: UserType = getUserTypeFromRequest(req);
-    this.socialService.login(userType, req, res);
+    const userPayload = this.socialService.login(userType, req, res);
 
+    if (userPayload.inactiveFlag) {
+      // 휴면계정 처리
+      let hostUrl: string;
+
+      if (userType === 'broadcaster') {
+        hostUrl = getBroadcasterWebHost();
+      } else {
+        hostUrl = getWebHost();
+      }
+      return res.redirect(`${hostUrl}/activate?type=social&email=${userPayload.sub}`);
+    }
     // 로그인 기록 추가 by @hwasurr
     this.loginHistoryService.createLoginStamp(req, '소셜/카카오');
 

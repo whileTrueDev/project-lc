@@ -17,11 +17,15 @@ import {
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { ShippingGroupDetailButton } from '@project-lc/components-seller/SellerGoodsList';
 import { useAdminGoodsList, useDisplaySize, useProfile } from '@project-lc/hooks';
-import { SellerGoodsSortColumn } from '@project-lc/shared-types';
+import {
+  AdminGoodsData,
+  SellerGoodsSortColumn,
+  SellerGoodsSortDirection,
+} from '@project-lc/shared-types';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { ConfirmationBadge } from './AdminBusinessRegistrationList';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
@@ -80,10 +84,10 @@ const columns: GridColumns = [
   },
   {
     field: 'name',
-    headerName: '판매자 ID',
-    minWidth: 110,
+    headerName: '판매자명(고유번호)',
+    minWidth: 140,
     sortable: false,
-    valueGetter: ({ row }) => row.name,
+    valueGetter: ({ row }) => `${row.name} (${row.sellerId})`,
   },
   {
     field: 'goods_name',
@@ -148,8 +152,127 @@ const columns: GridColumns = [
 ];
 // * 상품목록 datagrid 컬럼 끝*********************************************
 
-export function AdminGoodsList(): JSX.Element {
+type UniqueSellerType = {
+  sellerId: number;
+  sellerName: string;
+};
+type AdminGoodsConfirmListData = {
+  isLoading: boolean;
+  refetch: () => Promise<any>;
+  uniqueSellerList: UniqueSellerType[];
+  rows: AdminGoodsData[];
+  rowCount: number | undefined;
+  filterSellerId: number | null;
+  setFilterSellerId: Dispatch<SetStateAction<number | null>>;
+};
+
+// * 관리자 상품검수 목록 데이터 처리 로직 분리
+function useAdminGoodsConfirmList({
+  sort,
+  direction,
+}: {
+  sort: SellerGoodsSortColumn;
+  direction: SellerGoodsSortDirection;
+}): AdminGoodsConfirmListData {
   const { data: profileData } = useProfile();
+  const { data, isLoading, refetch } = useAdminGoodsList(
+    { sort, direction },
+    { enabled: !!profileData?.id },
+  );
+  // 판매자 목록 - 상품의 판매자와 고유번호만 추려내서 필터로 사용
+  const sellerList = !data
+    ? []
+    : data.items.map((g) => ({ sellerId: g.sellerId, sellerName: g.name }));
+
+  // 판매자목록 중복 제거
+  const uniqueSellerList = sellerList.reduce((unique, i) => {
+    if (
+      unique.findIndex(
+        (u) => u.sellerId === i.sellerId && u.sellerName === i.sellerName,
+      ) > -1
+    ) {
+      return unique;
+    }
+    return [...unique, i];
+  }, [] as Array<{ sellerId: number; sellerName: string }>);
+
+  // 선택된 판매자 id
+  const [filterSellerId, setFilterSellerId] = useState<null | number>(null);
+
+  // 선택된 판매자 id로 필터링 된 상품검수목록
+  const rows = useMemo(() => {
+    if (!data?.items) return [];
+    if (filterSellerId) {
+      return data.items.filter((i) => i.sellerId === filterSellerId);
+    }
+    return data.items;
+  }, [data, filterSellerId]);
+
+  // 선택된 판매자 id로 필터링 된 상품검수목록 길이
+  const rowCount = useMemo(() => {
+    if (filterSellerId) {
+      return data?.items.filter((i) => i.sellerId === filterSellerId).length;
+    }
+    return data?.totalItemCount;
+  }, [data, filterSellerId]);
+
+  return {
+    isLoading,
+    refetch,
+    uniqueSellerList,
+    rows,
+    rowCount,
+    filterSellerId,
+    setFilterSellerId,
+  };
+}
+
+// * 관리자 상품검수목록 필터링 위한 판매자 select 컴포넌트
+function SellerFilterSelect({
+  uniqueSellerList,
+  filterSellerId,
+  setFilterSellerId,
+}: Pick<
+  AdminGoodsConfirmListData,
+  'uniqueSellerList' | 'filterSellerId' | 'setFilterSellerId'
+>): JSX.Element {
+  const ALL_VALUE = '전체';
+  const ALL_OPTION_LABEL = '-- 모든 판매자 --';
+  const selectValue = filterSellerId ? filterSellerId.toString() : ALL_VALUE;
+  return (
+    <Stack direction="row" alignItems="center">
+      <Text width="200px" textAlign="right">
+        판매자별 보기
+      </Text>
+      <Select
+        size="sm"
+        value={selectValue}
+        onChange={(e) => {
+          // value는 sellerId 값을 전달함
+          const { value } = e.target;
+          // value 값이 '전체' 인경우 => 필터해제. sellerId 값이 있는 경우 => 해당 아이디로 item 필터
+          if (value === ALL_VALUE) {
+            setFilterSellerId(null);
+          } else {
+            setFilterSellerId(Number(value));
+          }
+        }}
+      >
+        <option value={ALL_VALUE}>{ALL_OPTION_LABEL}</option>
+        {uniqueSellerList.map((us) => {
+          return (
+            <option value={us.sellerId} key={us.sellerId}>
+              {us.sellerName} {`(${us.sellerId})`}
+            </option>
+          );
+        })}
+      </Select>
+    </Stack>
+  );
+}
+
+// * 상품 검수를 위한 미승인 상품 목록
+export function AdminGoodsList(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const {
     itemPerPage,
@@ -159,48 +282,49 @@ export function AdminGoodsList(): JSX.Element {
     handlePageSizeChange,
     handleSortChange,
   } = useSellerGoodsListPanelStore();
+  const {
+    isLoading,
+    refetch,
+    rows,
+    rowCount,
+    uniqueSellerList,
+    filterSellerId,
+    setFilterSellerId,
+  } = useAdminGoodsConfirmList({ sort, direction });
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isRejectionOpen,
     onOpen: onRejectionOpen,
     onClose: onRejectionClose,
   } = useDisclosure();
-  const [selectedRow, setSelectedRow] = useState({});
-  const { data, isLoading, refetch } = useAdminGoodsList(
-    {
-      sort,
-      direction,
-    },
-    {
-      enabled: !!profileData?.email,
-    },
-  );
-  async function handleClick(param: GridCellParams): Promise<void> {
+  const [selectedRow, setSelectedRow] = useState<null | AdminGoodsData>(null);
+
+  const handleClick = async (param: GridCellParams): Promise<void> => {
     if (param.field === 'confirmation') {
-      setSelectedRow(param.row);
+      setSelectedRow(param.row as AdminGoodsData);
       onOpen();
     }
     if (param.field === 'rejection') {
-      setSelectedRow(param.row);
+      setSelectedRow(param.row as AdminGoodsData);
       onRejectionOpen();
     }
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
-  }
+  };
 
   return (
     <>
       <ChakraDataGrid
         bg={useColorModeValue('inherit', 'gray.300')}
         loading={isLoading}
-        rows={data?.items || []}
+        rows={rows}
         autoHeight
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
         disableMultipleSelection
         disableSelectionOnClick
         disableColumnMenu
-        paginationMode="server"
         pageSize={itemPerPage}
-        rowCount={data?.totalItemCount}
+        rowCount={rowCount}
         onPageChange={changePage}
         onCellClick={handleClick}
         components={{
@@ -222,6 +346,11 @@ export function AdminGoodsList(): JSX.Element {
                   <option value={SellerGoodsSortColumn.REGIST_DATE}>최근 등록 순</option>
                   <option value={SellerGoodsSortColumn.GOODS_NAME}>상품명 순</option>
                 </Select>
+                <SellerFilterSelect
+                  uniqueSellerList={uniqueSellerList}
+                  filterSellerId={filterSellerId}
+                  setFilterSellerId={setFilterSellerId}
+                />
               </Stack>
               <Button
                 size="xs"

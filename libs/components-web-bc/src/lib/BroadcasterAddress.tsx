@@ -135,14 +135,14 @@ export function BroadcasterAddressForm({
       });
   }
 
-  function handleAddressSelected(addressData: AddressData): void {
+  const handleAddressSelected = (addressData: AddressData): void => {
     const { zonecode, address, buildingName } = addressData;
     const addr = buildingName ? `${address} (${buildingName})` : address;
     setValue('address', addr);
     clearErrors('address');
     setValue('postalCode', zonecode);
     daumOpen.onClose();
-  }
+  };
 
   return (
     <Stack as="form" onSubmit={handleSubmit(onSubmit)} w="100%">

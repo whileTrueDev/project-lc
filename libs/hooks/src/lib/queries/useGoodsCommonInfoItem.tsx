@@ -9,7 +9,7 @@ export const getGoodsCommonInfoItem = async (
   id: number,
 ): Promise<GoodsCommonInfoItem> => {
   return axios
-    .get<GoodsCommonInfoItem>('/goods/common-info', { params: { id } })
+    .get<GoodsCommonInfoItem>('/goods/common-info/detail', { params: { id } })
     .then((res) => res.data);
 };
 

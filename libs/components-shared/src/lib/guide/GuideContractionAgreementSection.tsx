@@ -70,7 +70,7 @@ export function GuideContractionAgreementSection({
     }
   }, [계약동의여부, completeStep]);
 
-  function onSubmit(): void {
+  const onSubmit = (): void => {
     const onSuccess = (): void => {
       // 성공시
       toast({ title: '약관동의가 완료되었습니다.', status: 'success' });
@@ -82,12 +82,12 @@ export function GuideContractionAgreementSection({
       });
     };
 
-    if (!data?.email) {
+    if (!data?.id) {
       return;
     }
     if (userType === 'broadcaster') {
       broadcasterMutation
-        .mutateAsync({ email: data?.email, agreementFlag: true })
+        .mutateAsync({ id: data?.id, agreementFlag: true })
         .then((result) => {
           if (result) onSuccess();
           else onError();
@@ -98,7 +98,7 @@ export function GuideContractionAgreementSection({
     }
     if (userType === 'seller') {
       sellerMutation
-        .mutateAsync({ email: data?.email, agreementFlag: true })
+        .mutateAsync({ id: data?.id, agreementFlag: true })
         .then((result) => {
           if (result) onSuccess();
           else onError();
@@ -107,7 +107,7 @@ export function GuideContractionAgreementSection({
           onError();
         });
     }
-  }
+  };
   if (isLoading) return <Spinner />;
 
   return (

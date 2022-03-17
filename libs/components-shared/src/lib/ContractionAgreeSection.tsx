@@ -21,7 +21,7 @@ export function ContractionAgreeSection({
   const broadcasterMutation = useBroadcasterUpdateContractionAgreementMutation();
   const sellerMutation = useSellerUpdateContractionAgreementMutation();
 
-  function onSubmit(): void {
+  const onSubmit = (): void => {
     const onSuccess = (): void => {
       // 성공시
       onClose();
@@ -35,13 +35,13 @@ export function ContractionAgreeSection({
       });
     };
 
-    if (!data?.email) {
+    if (!data?.id) {
       return;
     }
 
     if (userType === 'seller') {
       sellerMutation
-        .mutateAsync({ email: data?.email, agreementFlag: true })
+        .mutateAsync({ id: data?.id, agreementFlag: true })
         .then((result) => {
           if (result) onSuccess();
           else onError();
@@ -52,7 +52,7 @@ export function ContractionAgreeSection({
     }
     if (userType === 'broadcaster') {
       broadcasterMutation
-        .mutateAsync({ email: data?.email, agreementFlag: true })
+        .mutateAsync({ id: data?.id, agreementFlag: true })
         .then((result) => {
           if (result) onSuccess();
           else onError();
@@ -61,7 +61,7 @@ export function ContractionAgreeSection({
           onError();
         });
     }
-  }
+  };
 
   return (
     <SettingSectionLayout title="크크쇼 이용동의">

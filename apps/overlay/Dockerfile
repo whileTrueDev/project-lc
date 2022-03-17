@@ -9,7 +9,7 @@ COPY ./dist/apps/overlay .
 COPY ./libs/prisma-orm/prisma ./prisma
 
 RUN yarn install --prod
-RUN yarn global add prisma
+RUN yarn global add prisma@3.1.1
 RUN prisma generate
 RUN yarn add hbs
 

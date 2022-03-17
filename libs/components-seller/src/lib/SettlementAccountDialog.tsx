@@ -45,10 +45,10 @@ export function SettlementAccountDialog(
     reset,
   } = methods;
 
-  function useClose(): void {
+  const useClose = (): void => {
     onClose();
     reset();
-  }
+  };
 
   async function regist(data: SettlementAccountFormDto): Promise<void> {
     const { settlementAccountImageName, settlementAccountImage } = data;

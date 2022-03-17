@@ -4,16 +4,19 @@ import {
   ObjectIdentifier,
   PutObjectCommand,
   S3Client,
+  ListObjectsCommand,
+  CopyObjectCommand,
+  DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UserType } from '@project-lc/shared-types';
-import { parse } from 'node-html-parser';
 
 @Injectable()
 export class S3Service {
   private readonly s3Client: S3Client;
   private readonly S3_BUCKET_REGION = 'ap-northeast-2';
+  private readonly S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
 
   constructor(private readonly configService: ConfigService) {
     this.s3Client = new S3Client({
@@ -64,27 +67,47 @@ export class S3Service {
     )}.s3.ap-northeast-2.amazonaws.com/${avatarPath}`;
     return avatar;
   }
-}
 
-/** htmlString[] 에서 <img> 태그 src[] 리턴  */
-export function getImgSrcListFromHtmlStringList(htmlContentsList: string[]): string[] {
-  return [].concat(
-    ...htmlContentsList.map((content) => {
-      const dom = parse(content);
-      return Array.from(dom.querySelectorAll('img')).map((elem) =>
-        elem.getAttribute('src'),
-      );
-    }),
-  );
-}
+  async moveObjects(folderName: string, userEmail: string): Promise<void> {
+    const bucket = this.configService.get('S3_BUCKET_NAME');
+    const prefix = `${folderName}/${userEmail}`;
+    const targetObjects = await this.s3Client.send(
+      new ListObjectsCommand({
+        Bucket: bucket,
+        Prefix: prefix,
+      }),
+    );
 
-/** imgSrc 에서 s3에 업로드 된 url의 key[] 리턴 */
-export function getS3KeyListFromImgSrcList(srcList: string[]): string[] {
-  const S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
-  const GOODS_DIRECTORY = 'goods/';
-  const GOODS_IMAGE_URL_DOMAIN = `${S3_DOMIAN}${GOODS_DIRECTORY}`;
+    if (targetObjects.Contents) {
+      Promise.all([
+        targetObjects.Contents.map(async (fileInfo) => {
+          await this.s3Client.send(
+            new CopyObjectCommand({
+              Bucket: this.configService.get('S3_BUCKET_NAME'),
+              CopySource: encodeURI(`${bucket}/${fileInfo.Key}`),
+              Key: `inactive-${folderName}/${userEmail}/${fileInfo.Key.split('/').pop()}`,
+            }),
+          );
+          await this.s3Client.send(
+            new DeleteObjectCommand({
+              Bucket: this.configService.get('S3_BUCKET_NAME'),
+              Key: `${folderName}/${userEmail}/${fileInfo.Key.split('/').pop()}`,
+            }),
+          );
+        }),
+      ]);
+    } else {
+      console.log(`${userEmail}: 삭제할 ${folderName}이 없습니다.`);
+    }
+  }
 
-  return srcList
-    .filter((src) => src.startsWith(GOODS_IMAGE_URL_DOMAIN))
-    .map((src) => src.replace(S3_DOMIAN, ''));
+  /** imgSrc[] 에서 s3에 업로드 된 상품이미지 url의 key[] 리턴 */
+  getGoodsImageS3KeyListFromImgSrcList(srcList: string[]): string[] {
+    const GOODS_DIRECTORY = 'goods/';
+    const GOODS_IMAGE_URL_DOMAIN = `${this.S3_DOMIAN}${GOODS_DIRECTORY}`;
+
+    return srcList
+      .filter((src) => src.startsWith(GOODS_IMAGE_URL_DOMAIN))
+      .map((src) => src.replace(this.S3_DOMIAN, ''));
+  }
 }

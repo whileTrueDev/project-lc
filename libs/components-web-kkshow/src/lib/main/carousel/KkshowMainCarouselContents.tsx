@@ -1,0 +1,103 @@
+import {
+  AspectRatio,
+  Box,
+  BoxProps,
+  Image,
+  LinkBox,
+  LinkOverlay,
+} from '@chakra-ui/react';
+import { KkshowMainCarouselItem } from '@project-lc/shared-types';
+import { EmbededVideo } from '@project-lc/components-shared/EmbededVideo';
+import { memo, useCallback } from 'react';
+import Link from 'next/link';
+import { YouTubePlayer } from 'youtube-player/dist/types';
+import { useSwiper } from 'swiper/react';
+
+export interface KkshowMainCarouselContentsProps {
+  item: KkshowMainCarouselItem;
+}
+export function KkshowMainCarouselContents({
+  item,
+}: KkshowMainCarouselContentsProps): JSX.Element | null {
+  const KkshowMainCarouselContentsContainer = (props: BoxProps): JSX.Element => (
+    <Box position="relative" h="100%" w="100%" {...props} />
+  );
+
+  const swiper = useSwiper();
+
+  const handleYoutubeStateChange = useCallback(
+    (
+      __identifier: string,
+      event: { youtubePlayer: YouTubePlayer; data: 0 | 1 | 2 | 3 | 5 | -1 },
+    ): void => {
+      if (event.data === 1) {
+        // 재생상태로 전환시
+        swiper.autoplay.stop();
+      }
+      if (event.data === 2 || event.data === 0) {
+        // 일시정지(2)시 or 동영상 종료시 (0)
+        swiper.autoplay.start();
+      }
+    },
+    [swiper.autoplay],
+  );
+
+  if (item.type === 'upcoming')
+    return (
+      <KkshowMainCarouselContentsContainer>
+        <AspectRatio ratio={1} maxH="100%">
+          <LinkBox rounded="xl">
+            <Link href={item.productLinkUrl} passHref>
+              <LinkOverlay isExternal={item.productLinkUrl.includes('http')}>
+                <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />
+              </LinkOverlay>
+            </Link>
+          </LinkBox>
+        </AspectRatio>
+      </KkshowMainCarouselContentsContainer>
+    );
+
+  if (item.type === 'simpleBanner')
+    return (
+      <KkshowMainCarouselContentsContainer>
+        <AspectRatio ratio={1} maxH="100%">
+          <LinkBox rounded="xl">
+            <Link href={item.linkUrl || '#'} passHref>
+              <LinkOverlay isExternal={!!(item.linkUrl && item.linkUrl.includes('http'))}>
+                <Image src={item.imageUrl} rounded="xl" w="100%" h="100%" />
+              </LinkOverlay>
+            </Link>
+          </LinkBox>
+        </AspectRatio>
+      </KkshowMainCarouselContentsContainer>
+    );
+
+  if (item.type === 'nowPlaying') {
+    return (
+      <KkshowMainCarouselContentsContainer>
+        <EmbededVideo
+          provider={item.platform}
+          identifier={item.videoUrl}
+          onYoutubeStateChange={handleYoutubeStateChange}
+        />
+      </KkshowMainCarouselContentsContainer>
+    );
+  }
+
+  if (item.type === 'previous') {
+    const youtubeSrc = item.videoUrl.replace('https://youtu.be/', '');
+    return (
+      <KkshowMainCarouselContentsContainer>
+        <EmbededVideo
+          provider="youtube"
+          identifier={youtubeSrc}
+          onYoutubeStateChange={handleYoutubeStateChange}
+        />
+      </KkshowMainCarouselContentsContainer>
+    );
+  }
+
+  return <KkshowMainCarouselContentsContainer> </KkshowMainCarouselContentsContainer>;
+}
+
+export default memo(KkshowMainCarouselContents);

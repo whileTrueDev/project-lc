@@ -16,12 +16,13 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { CenterBox } from '@project-lc/components-layout/CenterBox';
-import { useLoginMutation } from '@project-lc/hooks';
+import { useLoginMutation, InactiveUserPayload } from '@project-lc/hooks';
 import { LoginUserDto, UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { inactiveEmailStore } from '@project-lc/stores';
 import SocialButtonGroup from './SocialButtonGroup';
 
 export interface LoginFormProps {
@@ -42,26 +43,32 @@ export function LoginForm({
   } = useForm<LoginUserDto>({
     defaultValues: { stayLogedIn: true },
   });
-
+  const { setToActivateEmail } = inactiveEmailStore();
   // * 로그인 오류 상태 (전체 form 오류. not 필드 오류)
   const [formError, setFormError] = useState('');
-  function resetFormError(): void {
+  const resetFormError = (): void => {
     setFormError('');
-  }
+  };
 
   // * 로그인 핸들러
   const login = useLoginMutation(userType);
+
   const onSubmit = useCallback(
     async (data: LoginUserDto) => {
       const user = await login.mutateAsync(data).catch((err) => {
         setFormError(getMessage(err?.response.data?.status));
         setValue('password', '');
       });
+      if ((user as InactiveUserPayload).inactiveFlag) {
+        setToActivateEmail((user as InactiveUserPayload).sub);
+        router.push('/activate');
+        return;
+      }
       if (user) {
         router.push('/mypage');
       }
     },
-    [login, setValue, router],
+    [login, setValue, router, setToActivateEmail],
   );
 
   function getMessage(statusCode: number | undefined): string {

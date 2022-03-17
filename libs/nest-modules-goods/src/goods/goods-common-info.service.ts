@@ -7,13 +7,10 @@ import {
 import { GoodsInfo } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { GoodsInfoDto } from '@project-lc/shared-types';
-import {
-  getImgSrcListFromHtmlStringList,
-  getS3KeyListFromImgSrcList,
-  S3Service,
-} from '@project-lc/nest-modules-s3';
+import { S3Service } from '@project-lc/nest-modules-s3';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
+import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
 
 @Injectable()
 export class GoodsCommonInfoService extends ServiceBaseWithCache {
@@ -30,14 +27,14 @@ export class GoodsCommonInfoService extends ServiceBaseWithCache {
 
   /** 상품 공통정보 생성 */
   async registGoodsCommonInfo(
-    email: string,
+    sellerId: number,
     dto: GoodsInfoDto,
   ): Promise<{
     id: number;
   }> {
     try {
       const item = await this.prisma.goodsInfo.create({
-        data: { ...dto, seller: { connect: { email } } },
+        data: { ...dto, seller: { connect: { id: sellerId } } },
       });
       await this._clearCaches(this.#GOODS_COMMON_INFO_CACHE_KEY);
       await this._clearCaches(this.#GOODS_CACHE_KEY);
@@ -49,7 +46,7 @@ export class GoodsCommonInfoService extends ServiceBaseWithCache {
   }
 
   /** 상품 공통정보 목록 조회 */
-  async getGoodsCommonInfoList(email: string): Promise<
+  async getGoodsCommonInfoList(sellerId: number): Promise<
     {
       info_name: string;
       id: number;
@@ -58,7 +55,7 @@ export class GoodsCommonInfoService extends ServiceBaseWithCache {
     try {
       const data = await this.prisma.goodsInfo.findMany({
         where: {
-          seller: { email },
+          seller: { id: sellerId },
         },
         select: {
           id: true,
@@ -70,7 +67,7 @@ export class GoodsCommonInfoService extends ServiceBaseWithCache {
       console.error(error);
       throw new InternalServerErrorException(
         error,
-        `error in getGoodsCommonInfoList, sellerEmail: ${email}`,
+        `error in getGoodsCommonInfoList, sellerId: ${sellerId}`,
       );
     }
   }
@@ -107,7 +104,7 @@ export class GoodsCommonInfoService extends ServiceBaseWithCache {
       const imgSrcList: string[] = getImgSrcListFromHtmlStringList(contentList);
 
       // img src에서 s3에 저장된 이미지만 찾기
-      const s3ImageKeys = getS3KeyListFromImgSrcList(imgSrcList);
+      const s3ImageKeys = this.s3service.getGoodsImageS3KeyListFromImgSrcList(imgSrcList);
 
       // s3저장된 이미지 있는경우
       if (s3ImageKeys.length > 0) {

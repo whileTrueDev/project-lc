@@ -5,9 +5,9 @@ import { useRouter } from 'next/router';
 
 export function Custom404(): JSX.Element {
   const router = useRouter();
-  function toHome(): void {
+  const toHome = (): void => {
     router.push('/');
-  }
+  };
   return (
     <>
       <NextSeo title="페이지를 찾을 수 없습니다." description="" />

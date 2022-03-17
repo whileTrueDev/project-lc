@@ -49,7 +49,7 @@ export function PasswordCheckForm(props: PasswordCheckFormProps): JSX.Element {
   return (
     <Box as="form" onSubmit={handleSubmit(checkPassword)}>
       <Input type="password" mb={2} {...register('password', { required: true })} />
-      <ButtonGroup>
+      <ButtonGroup width="100%" justifyContent="flex-end">
         <Button onClick={onCancel}>취소</Button>
         <Button type="submit" disabled={!watch('password')}>
           비밀번호 확인

@@ -16,9 +16,10 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SellCommission, Seller, SellerSettlementAccount } from '@prisma/client';
+import { PrismaService } from '@project-lc/prisma-orm';
 import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
+import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { MailVerificationService } from '@project-lc/nest-modules-mail';
 import {
   BusinessRegistrationDto,
   EmailDupCheckDto,
@@ -31,12 +32,15 @@ import {
   SettlementAccountDto,
   SignUpDto,
 } from '@project-lc/shared-types';
+import { s3 } from '@project-lc/utils-s3';
+import { SellerContactsService } from './seller-contacts.service';
 import {
   SellerSettlementInfo,
   SellerSettlementService,
 } from './seller-settlement.service';
 import { SellerShopService } from './seller-shop.service';
 import { SellerService } from './seller.service';
+
 @Controller('seller')
 export class SellerController {
   constructor(
@@ -44,6 +48,8 @@ export class SellerController {
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly sellerShopService: SellerShopService,
     private readonly mailVerificationService: MailVerificationService,
+    private readonly sellerContactsService: SellerContactsService,
+    private readonly prismaService: PrismaService,
   ) {}
 
   // * 판매자 정보 조회
@@ -207,5 +213,42 @@ export class SellerController {
     @Body(ValidationPipe) dto: SellerContractionAgreementDto,
   ): Promise<Seller> {
     return this.sellerService.updateAgreementFlag(dto);
+  }
+
+  @Patch('restore')
+  public async restoreInactiveSeller(@Body(ValidationPipe) dto): Promise<void> {
+    try {
+      await this.prismaService.$transaction(async (): Promise<void> => {
+        const seller = await this.sellerService.restoreInactiveSeller(dto.email);
+        Promise.all([
+          await this.sellerSettlementService.restoreInactiveBusinessRegistration(
+            seller.id,
+          ),
+
+          await this.sellerSettlementService
+            .restoreInactiveBusinessRegistrationConfirmation(seller.id)
+            .then((data) => {
+              if (data) {
+                this.sellerSettlementService.deleteInactiveBusinessRegistrationConfirmation(
+                  data.SellerBusinessRegistrationId,
+                );
+              }
+            }),
+          this.sellerContactsService.restoreSellerContacts(seller.id),
+          this.sellerSettlementService.restoreSettlementAccount(seller.id),
+
+          s3.moveObjects(
+            'inactive-business-registration',
+            'business-registration',
+            dto.email,
+          ),
+          s3.moveObjects('inactive-settlement-account', 'settlement-account', dto.email),
+        ]).then(async () => {
+          await this.sellerService.deleteInactiveSeller(seller.id);
+        });
+      });
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 }

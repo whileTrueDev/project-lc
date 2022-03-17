@@ -8,6 +8,7 @@ import {
   Seller,
   SellerContacts,
   ShippingGroup,
+  Prisma,
 } from '@prisma/client';
 import {
   defaultOption,
@@ -20,8 +21,13 @@ import {
   testBroadcasterData,
   testsellerData,
   testsellerExtraData,
-} from './dummyData';
-import { termsData } from './terms';
+  dummyBroadcasterAddress,
+  dummyBroadcasterChannel,
+  dummyBroadcasterContacts,
+  dummyLoginHistory,
+} from './seedData/dummyData';
+import { termsData } from './seedData/terms';
+import { kkshowMainSeedData } from './seedData/kkshowMain';
 
 const prisma = new PrismaClient();
 
@@ -164,6 +170,62 @@ async function createDummyLiveShopping(
   });
 }
 
+/** 더미 방송인 주소 생성 */
+async function createDummyBroadcasterAddress(broadcaster: Broadcaster): Promise<void> {
+  await prisma.broadcasterAddress.create({
+    data: {
+      address: dummyBroadcasterAddress.address,
+      detailAddress: dummyBroadcasterAddress.detailAddress,
+      postalCode: dummyBroadcasterAddress.postalCode,
+      broadcaster: { connect: { id: broadcaster.id } },
+    },
+  });
+}
+
+/** 더미 방송인 채널 생성 */
+async function createDummyBroadcasterChannel(broadcaster: Broadcaster): Promise<void> {
+  await prisma.broadcasterChannel.create({
+    data: {
+      url: dummyBroadcasterChannel.url,
+      broadcaster: { connect: { id: broadcaster.id } },
+    },
+  });
+}
+
+/** 더미 방송인 연락처 생성 */
+async function createDummyBroadcasterContacts(
+  dummyData: Prisma.BroadcasterContactsCreateInput,
+  broadcaster: Broadcaster,
+): Promise<void> {
+  await prisma.broadcasterContacts.create({
+    data: {
+      name: dummyData.name,
+      email: dummyData.email,
+      phoneNumber: dummyData.phoneNumber,
+      isDefault: dummyData.isDefault,
+      broadcaster: { connect: { id: broadcaster.id } },
+    },
+  });
+}
+
+async function createDummyLoginHistory(
+  dummyData: Prisma.LoginHistoryCreateInput,
+): Promise<void> {
+  await prisma.loginHistory.create({
+    data: {
+      userEmail: dummyData.userEmail,
+      userType: dummyData.userType,
+      method: dummyData.method,
+      ip: dummyData.ip,
+      country: dummyData.country,
+      city: dummyData.city,
+      device: dummyData.device,
+      ua: dummyData.ua,
+      createDate: dummyData.createDate,
+    },
+  });
+}
+
 // 초기 약관 데이터 저장(없으면 약관페이지에 표시될 데이터가 없어서)
 async function generateInitialTerms(): Promise<void> {
   await prisma.policy.createMany({
@@ -171,10 +233,36 @@ async function generateInitialTerms(): Promise<void> {
   });
 }
 
+// 크크쇼 메인 초기데이터 저장
+async function generateInitialKkshowMainData(): Promise<void> {
+  const kkshowMainData = await prisma.kkshowMain.findFirst();
+
+  const dto = {
+    carousel: kkshowMainSeedData.carousel.map((c) => JSON.parse(JSON.stringify(c))),
+    trailer: JSON.parse(JSON.stringify(kkshowMainSeedData.trailer)),
+    bestLive: kkshowMainSeedData.bestLive.map((l) => JSON.parse(JSON.stringify(l))),
+    bestBroadcaster: kkshowMainSeedData.bestBroadcaster.map((b) =>
+      JSON.parse(JSON.stringify(b)),
+    ),
+  };
+  if (!kkshowMainData) {
+    await prisma.kkshowMain.create({
+      data: dto,
+    });
+  } else {
+    await prisma.kkshowMain.update({
+      where: { id: kkshowMainData.id },
+      data: dto,
+    });
+  }
+}
+
 /** 시드 메인 함수 */
 async function main(): Promise<void> {
   // 약관 데이터 저장
   await generateInitialTerms();
+  // 크크쇼 메인 데이터 저장
+  await generateInitialKkshowMainData();
 
   // 판매 수수료 기본값 설정
   await generateDefaultSellCommission();
@@ -187,6 +275,19 @@ async function main(): Promise<void> {
 
   // 테스트방송인 데이터 생성
   const testbroadcaster = await createBroadcaster();
+
+  // 테스트방송인 주소 생성
+  await createDummyBroadcasterAddress(testbroadcaster);
+  // 테스트방송인 채널 생성
+  await createDummyBroadcasterChannel(testbroadcaster);
+  // 테스트 방송인 연락처 생성
+  await createDummyBroadcasterContacts(dummyBroadcasterContacts[0], testbroadcaster);
+  await createDummyBroadcasterContacts(dummyBroadcasterContacts[1], testbroadcaster);
+
+  // 더미 로그인 기록 생성 (판매자-휴면)
+  await createDummyLoginHistory(dummyLoginHistory[0]);
+  // 더미 로그인 기록 생성 (방송인-휴면예정)
+  await createDummyLoginHistory(dummyLoginHistory[1]);
 
   // 더미 상품 데이터 생성
   await createDummyGoods(seller, dummyGoodsList[0]);

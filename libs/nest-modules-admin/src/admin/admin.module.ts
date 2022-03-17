@@ -1,17 +1,20 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
+import { KkshowMainModule } from '@project-lc/nest-modules-kkshow-main';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { AdminAccountService } from './admin-account.service';
+import { AdminKkshowMainController } from './admin-kkshow-main.controller';
 import { AdminPolicyController } from './admin-policy.controller';
 import { AdminProductPromotionController } from './admin-product-promotion.controller';
 import { AdminPromotionPageController } from './admin-promotion-page.controller';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
+import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 
 @Module({})
 export class AdminModule {
@@ -19,6 +22,7 @@ export class AdminModule {
     AdminService,
     AdminSettlementService,
     AdminAccountService,
+    AdminPrivacyApproachSevice,
   ];
 
   private static readonly exports = [
@@ -32,6 +36,7 @@ export class AdminModule {
     AdminPolicyController,
     AdminPromotionPageController,
     AdminProductPromotionController,
+    AdminKkshowMainController,
   ];
 
   private static readonly imports = [
@@ -41,6 +46,7 @@ export class AdminModule {
     BroadcasterModule.withoutControllers(),
     GoodsModule.withoutControllers(),
     PolicyModule,
+    KkshowMainModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {

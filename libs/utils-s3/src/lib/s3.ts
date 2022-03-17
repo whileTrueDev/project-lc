@@ -1,45 +1,34 @@
 import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  ListObjectsCommand,
   DeleteObjectsCommand,
+  DeleteObjectsRequest,
+  GetObjectCommand,
+  GetObjectCommandInput,
+  ListObjectsCommand,
+  CopyObjectCommand,
+  DeleteObjectCommand,
+  ListObjectsCommandInput,
+  ListObjectsOutput,
+  ObjectIdentifier,
+  PutObjectCommand,
+  PutObjectCommandInput,
+  PutObjectCommandOutput,
+  S3Client,
+  _Object,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import dayjs from 'dayjs';
-import path from 'path';
-
-// 추후에 S3에 저장할 데이터 종류가 더해지는 경우 추가
-export type s3KeyType =
-  | 'business-registration'
-  | 'goods'
-  | 'mail-order'
-  | 'settlement-account'
-  | 'vertical-banner'
-  | 'donation-images'
-  | 'broadcaster-id-card' // 방송인 신분증
-  | 'broadcaster-account-image' // 방송인 통장사본
-  | 'overlay-logo'
-  | 'horizontal-banner';
+import { generateS3Key, s3KeyType } from './generateS3Key';
 
 export type s3TaggingKeys = 'overlayImageType'; // s3 object 태그 객체 키
-export interface S3UploadImageOptions {
+export interface S3UploadImageOptions
+  extends Partial<Omit<PutObjectCommandInput, 'Bucket'>> {
   filename: string | null;
   userMail: string | undefined;
   type: s3KeyType;
   file: File | Buffer | null;
   companyName?: string;
   liveShoppingId?: number;
-  tagging?: { [k in s3TaggingKeys]: string }; // s3 object 태그 key와 value
+  isPublic?: boolean; // 공개 이미지로 업로드 할 경우 true 전달 필요
 }
-
-export type s3FileNameParams = {
-  userMail: string;
-  type: s3KeyType;
-  filename: string | null;
-  companyName?: string;
-  liveShoppingId?: number;
-};
 
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
@@ -57,208 +46,148 @@ export const s3 = (() => {
     },
   });
 
-  // 파일명에서 확장자를 추출하는 과정
-  function getExtension(fileName: string | null): string {
-    if (!fileName) {
-      return '';
-    }
-    const location = fileName.lastIndexOf('.');
-    const result = fileName.substring(location);
-    return result;
+  /**
+   * 객체 url 조회
+   * 해당 key 가진 객체가 public-read인 경우에만 이 url로 접근이 가능함
+   * private 객체는 getPresignedUrl 함수 사용
+   * @param key s3에 저장된 객체 키 (prefix + 파일명 형태)
+   * @returns 객체 url
+   */
+  function getSavedObjectUrl(key: string): string {
+    return S3_DOMIAN + key;
   }
 
-  function getS3Key({
-    userMail,
-    type,
-    filename,
-    companyName,
-    liveShoppingId,
-  }: s3FileNameParams): {
-    key: string;
-    fileName: string;
-  } {
-    const extension = getExtension(filename);
-
-    // 등록된 파일 구별을 위한 등록시간을 통한 접두사 추가
-    const prefix = dayjs().format('YYMMDDHHmmss').toString();
-
-    let fileFullName;
-    switch (type) {
-      case 'business-registration': {
-        fileFullName = `${prefix}_${companyName}_사업자등록증${extension}`;
-        break;
-      }
-      case 'mail-order': {
-        fileFullName = `${prefix}_${companyName}_통신판매업신고증${extension}`;
-        break;
-      }
-      case 'settlement-account': {
-        fileFullName = `${prefix}_통장사본${extension}`;
-        break;
-      }
-      case 'goods': {
-        fileFullName = `${prefix}_${filename}`;
-        break;
-      }
-      case 'broadcaster-id-card': {
-        // 방송인 신분증
-        fileFullName = `${prefix}_신분증${extension}`;
-        break;
-      }
-      case 'broadcaster-account-image': {
-        // 방송인 통장사본
-        fileFullName = `${prefix}_통장사본${extension}`;
-        break;
-      }
-
-      default: {
-        fileFullName = `${filename}`;
-      }
-    }
-    const pathList = liveShoppingId
-      ? [type, userMail, String(liveShoppingId), fileFullName]
-      : [type, userMail, fileFullName];
+  /** 파일 업로드
+   *  Bucket 제외한 Key, Body, ContentType, ACL 등 putObjectCommandInput 기입하여 사용
+   *
+   * @return output : PutObjectCommandOutput
+   * @return savedKey : 객체 키 (prefix + 파일명)
+   * @return objectUrl : 객체 url (s3도메인 + 객체키)
+   */
+  async function sendPutObjectCommand(
+    commandInput: Omit<PutObjectCommandInput, 'Bucket'>,
+  ): Promise<{
+    output: PutObjectCommandOutput;
+    savedKey: string;
+    objectUrl: string;
+  }> {
+    const command = new PutObjectCommand({
+      ...commandInput,
+      Bucket: S3_BUCKET_NAME,
+    });
     return {
-      key: path.join(...pathList),
-      fileName: fileFullName,
+      output: await s3Client.send(command),
+      savedKey: commandInput.Key,
+      objectUrl: getSavedObjectUrl(commandInput.Key),
     };
   }
 
-  /** public-read 로 s3 업로드 */
-  async function s3publicUploadFile({
-    file,
-    contentType,
-    filename,
-    type,
-    userMail,
-    liveShoppingId,
-    tagging,
-  }: S3UploadImageOptions & {
-    contentType: string;
-  }): Promise<string> {
-    if (!userMail || !file) throw new Error('file should be not null');
-    const { key } = getS3Key({ userMail, type, filename, liveShoppingId });
-    const objectTagKey = tagging ? Object.keys(tagging).pop() : '';
-    const objectTagValue = tagging ? Object.values(tagging).pop() : '';
-
-    if (objectTagKey && !objectTagValue) {
-      throw new Error('No value Error');
-    }
-
-    try {
-      const command = new PutObjectCommand({
-        Bucket: S3_BUCKET_NAME,
-        Key: key,
-        Body: file,
-        Tagging: tagging ? `${objectTagKey}=${objectTagValue}` : '',
-        ContentType: contentType,
-        ACL: 'public-read',
-      });
-      await s3Client.send(command);
-      return S3_DOMIAN + key;
-    } catch (error) {
-      throw new Error('error in s3publicUploadFile');
-    }
-  }
-
   /**
-   * S3에 이미지를 저장하는 함수
-   *
-   * @param file        저장할 이미지 파일
-   * @param filename    저장할 이미지의 이름, 주로 확장자 추출을 위함
-   * @param type         'business-registration' | 'mail-order'
-   * @param userMail     업로드할 사용자의 이메일
+   * s3KeyType에 따라 s3 특정 경로에 이미지를 저장하는 함수
+   * public 이미지로 업로드할 경우 isPublic: true 전달해야함
+   * 
+   * 해당 함수 내부에서 사용하는 generateS3Key에서 userMail 값을 필요로 하므로
+   * 특정 유저와 관계없는 이미지 저장 시(객체 prefix에 유저메일을 포함하지 않는 경우)에는 
+   * sendPutObjectCommand 함수 사용을 권함
+   * 
+   * @param type: s3KeyType;
+   * @param file: 저장할 이미지 파일 File | Buffer | null;
+   * @param filename: 저장할 이미지의 이름, 주로 확장자 추출을 위함
+   * @param userMail: 업로드할 사용자의 이메일 string | undefined;
    * @param companyName? (optional) 사업자 등록증에 등록하는 사업자명
-   * @returns null 또는 파일명
+   * @param liveShoppingId?: (optional) 라이브쇼핑 id
+   * @param isPublic?: public-read 이미지의 경우 true를 전달해야함. 기본값 false
+   * @param 기타 Tagging, ContentType, ACL 등 putObjectCommandInput props 전달 가능
+
+   * @returns 파일명(privater 객체인 경우) 혹은 객체url(public-read 객체인 경우)
+              file 이 없는경우 빈 문자열 '' 리턴,         
+   * 
    */
   async function s3UploadImage({
-    file,
     filename,
-    type,
     userMail,
+    type,
+    file,
     companyName,
     liveShoppingId,
-  }: S3UploadImageOptions): Promise<string | null> {
-    if (!userMail || !file) {
-      return null;
-    }
-    const { key, fileName } = getS3Key({
-      userMail,
-      type,
-      filename,
-      companyName,
-      liveShoppingId,
-    });
+    isPublic = false,
+    ...putObjectCommandInput
+  }: S3UploadImageOptions): Promise<string> {
+    if (!userMail || !file) throw new Error('file and userMail should have value');
 
     try {
-      const command = new PutObjectCommand({
-        Bucket: S3_BUCKET_NAME,
+      const { key, fileName } = generateS3Key({
+        userMail,
+        type,
+        filename,
+        companyName,
+        liveShoppingId,
+      });
+
+      const { objectUrl } = await sendPutObjectCommand({
+        ACL: isPublic ? 'public-read' : undefined,
+        ...putObjectCommandInput,
         Key: key,
         Body: file,
       });
-      await s3Client.send(command);
+
+      if (isPublic) {
+        // public 인 경우 객체 url을 리턴함
+        return objectUrl;
+      }
+      // public 이 아닌 경우 객체 url로 접근하지 못하므로 그냥 파일명만 리턴함
       return fileName;
     } catch (error) {
-      console.log(error);
-      return null;
+      console.error(error);
+      return '';
     }
   }
 
   /**
-   * S3에서 사업자등록증 또는 통신판매업신고증 다운로드
-   *
-   * @param fileName     다운로드할 이미지의 이름
-   * @param sellerEmail  다운로드할 사용자의 이메일
-   * @param type         'business-registration' | 'mail-order'
-   * @returns 해당 이미지 파일을 다운받을 수 있는 URL
+   * 버킷 내 객체목록 조회
+   * @param commandInput {Prefix: s3에 저장된 폴더경로}
+   * @return response: ListObjectsCommandOutput,
+   * @return contents: 해당 경로 내 저장된 객체 목록 | null
    */
-  async function s3DownloadImageUrl(
-    fileName: string,
-    sellerEmail: string,
-    type: s3KeyType,
-  ): Promise<string> {
-    const signedUrlExpireSeconds = 60;
-    const command = new GetObjectCommand({
-      Bucket: S3_BUCKET_NAME,
-      Key: `${type}/${sellerEmail}/${fileName}`,
-    });
-
-    const imageUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: signedUrlExpireSeconds,
-    });
-    return imageUrl;
-  }
-
-  async function getOverlayImagesFromS3(
-    broadcasterId: string,
-    liveShoppingId: number,
-    type: 'vertical-banner' | 'donation-images' | 'overlay-logo' | 'horizontal-banner',
-  ): Promise<(string | undefined)[]> {
+  async function sendListObjectCommand(
+    commandInput: Omit<ListObjectsCommandInput, 'Bucket'>,
+  ): Promise<{
+    response: ListObjectsOutput;
+    contents: _Object[] | null;
+  }> {
     const command = new ListObjectsCommand({
+      ...commandInput,
       Bucket: S3_BUCKET_NAME,
-      Prefix: `${type}/${broadcasterId}/${liveShoppingId}`,
     });
+
     const response = await s3Client.send(command);
-    const imagesLength = response.Contents || null;
-    const imagesKey = imagesLength?.map((item) => {
-      return item.Key;
-    });
-    return imagesKey || [];
+
+    return { response, contents: response.Contents || null };
   }
 
-  async function s3DeleteImages(
-    toDeleteImages: (string | undefined)[],
+  /**
+   * 여러 객체 삭제
+   * @param deleteObjects : { Key: string | undefined , VersionId?: string}[] 형태의 객체키 목록
+   * @param quite?: boolean
+   * @returns 성공시 true, 에러발생시 false
+   */
+  async function sendDeleteObjectsCommand(
+    input: {
+      deleteObjects: ObjectIdentifier[];
+      quite?: boolean;
+    } & Omit<DeleteObjectsRequest, 'Bucket' | 'Delete'>,
   ): Promise<boolean> {
-    const toDeleteObject: { Key: string }[] = [];
-    toDeleteImages.forEach((imageName) => {
-      toDeleteObject.push({ Key: `${imageName}` });
-    });
-    const command = new DeleteObjectsCommand({
-      Bucket: S3_BUCKET_NAME,
-      Delete: { Objects: toDeleteObject },
-    });
-
+    const { deleteObjects, quite, ...rest } = input;
     try {
+      const command = new DeleteObjectsCommand({
+        ...rest,
+        Delete: {
+          Objects: deleteObjects,
+          Quiet: quite,
+        },
+        Bucket: S3_BUCKET_NAME,
+      });
+
       await s3Client.send(command);
       return true;
     } catch (error) {
@@ -267,27 +196,71 @@ export const s3 = (() => {
     }
   }
 
-  // 단일 이미지 조회
-  async function getS3GuideImage(): Promise<string> {
-    const signedUrlExpireSeconds = 3600;
-    const key = 'public/banner-guide.png';
+  /**
+   * 객체 url 조회
+   * private인 객체 조회 위해 expiresIn 으로 넘어온 시간동안 유효한 url 리턴
+   * @param getObjectCommandInput {Key: 객체 key 입력}
+   * @param options? {expiresIn: 3600} url 유효시간 입력(초), 기본 15분
+   * */
+  async function getPresignedUrl(
+    getObjectCommandInput: Omit<GetObjectCommandInput, 'Bucket'>,
+    options?: { expiresIn: number },
+  ): Promise<string> {
     const command = new GetObjectCommand({
+      ...getObjectCommandInput,
       Bucket: S3_BUCKET_NAME,
-      Key: key,
     });
     const imageUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: signedUrlExpireSeconds,
+      ...options,
     });
     return imageUrl;
   }
 
+  /** 폴더 이름 전달 받아서 이동시키는 함수 */
+  async function moveObjects(
+    rootFolder: string,
+    destinationFolder: string,
+    userEmail: string,
+  ): Promise<void> {
+    const prefix = `${rootFolder}/${userEmail}`;
+
+    const targetObjects = await s3Client.send(
+      new ListObjectsCommand({
+        Bucket: S3_BUCKET_NAME,
+        Prefix: prefix,
+      }),
+    );
+
+    if (targetObjects.Contents) {
+      Promise.all([
+        targetObjects.Contents.map(async (fileInfo) => {
+          await s3Client.send(
+            new CopyObjectCommand({
+              Bucket: S3_BUCKET_NAME,
+              CopySource: encodeURI(`${S3_BUCKET_NAME}/${fileInfo.Key}`),
+              Key: `${destinationFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`,
+            }),
+          );
+          await s3Client.send(
+            new DeleteObjectCommand({
+              Bucket: S3_BUCKET_NAME,
+              Key: `${rootFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`,
+            }),
+          );
+        }),
+      ]);
+    } else {
+      console.log(`${userEmail}: 삭제할 ${rootFolder}이 없습니다.`);
+    }
+  }
+
   return {
     s3UploadImage,
-    getS3Key,
-    s3DownloadImageUrl,
-    s3uploadFile: s3publicUploadFile,
-    getOverlayImagesFromS3,
-    s3DeleteImages,
-    getS3GuideImage,
+    moveObjects,
+    getPresignedUrl,
+    getSavedObjectUrl,
+    sendPutObjectCommand,
+    sendListObjectCommand,
+    sendDeleteObjectsCommand,
   };
 })();

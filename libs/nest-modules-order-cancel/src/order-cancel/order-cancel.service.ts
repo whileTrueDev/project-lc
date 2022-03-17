@@ -22,15 +22,15 @@ export class OrderCancelService extends ServiceBaseWithCache {
 
   /** 판매자 결제취소 요청 생성 */
   public async createOrderCancelRequst({
-    sellerEmail,
+    sellerId,
     ...dto
   }: {
-    sellerEmail: string;
+    sellerId: number;
   } & SellerOrderCancelRequestDto): Promise<SellerOrderCancelRequest> {
     const { orderSeq, reason, orderCancelItems } = dto;
 
     const existCancelRequst = await this.prisma.sellerOrderCancelRequest.findFirst({
-      where: { seller: { email: sellerEmail }, orderSeq },
+      where: { seller: { id: sellerId }, orderSeq },
       include: { orderCancelItems: true },
     });
 
@@ -59,7 +59,7 @@ export class OrderCancelService extends ServiceBaseWithCache {
     }
     const data = await this.prisma.sellerOrderCancelRequest.create({
       data: {
-        seller: { connect: { email: sellerEmail } },
+        seller: { connect: { id: sellerId } },
         status: SellerOrderCancelRequestStatus.waiting,
         orderSeq,
         reason,
@@ -75,14 +75,14 @@ export class OrderCancelService extends ServiceBaseWithCache {
   /** 판매자 결제취소 요청 상세 조회 */
   public async findOneOrderCancelRequst({
     orderSeq,
-    sellerEmail,
+    sellerId,
   }: {
-    sellerEmail: string;
+    sellerId: number;
     orderSeq: string;
   }): Promise<SellerOrderCancelRequest> {
     const data = await this.prisma.sellerOrderCancelRequest.findFirst({
       where: {
-        seller: { email: sellerEmail },
+        seller: { id: sellerId },
         orderSeq,
         status: SellerOrderCancelRequestStatus.waiting,
       },

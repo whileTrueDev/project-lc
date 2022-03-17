@@ -55,9 +55,9 @@ export class ShippingGroupService extends ServiceBaseWithCache {
   }
 
   // 해당 유저의 배송비정책 목록 조회
-  async getShippingGroupList(email: string): Promise<ShippingGroupListResult> {
+  async getShippingGroupList(sellerId: number): Promise<ShippingGroupListResult> {
     return this.prisma.shippingGroup.findMany({
-      where: { seller: { email } },
+      where: { seller: { id: sellerId } },
       include: {
         _count: { select: { goods: true } },
       },
@@ -134,7 +134,7 @@ export class ShippingGroupService extends ServiceBaseWithCache {
   // 배송그룹 생성
   // 해당 함수 내부에서 배송설정 생성 -> 배송옵션 생성 -> 배송가격 생성을 순차적으로 호출함
   async createShippingGroup(
-    sellerEmail: string,
+    sellerId: number,
     dto: ShippingGroupDto,
   ): Promise<
     ShippingGroup & {
@@ -148,7 +148,7 @@ export class ShippingGroupService extends ServiceBaseWithCache {
         seller: true,
       },
       data: {
-        seller: { connect: { email: sellerEmail } },
+        seller: { connect: { id: sellerId } },
         ...shippingGroup,
       },
     });

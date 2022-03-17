@@ -1,4 +1,4 @@
-import { Container, Grid, GridItem, Stack, useDisclosure } from '@chakra-ui/react';
+import { Container, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
 import { broadcasterCenterMypageNavLinks } from '@project-lc/components-constants/navigation';
 import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAlertBox';
 import { GuideContractionAgreementSection } from '@project-lc/components-shared/guide/GuideContractionAgreementSection';
@@ -88,7 +88,9 @@ export function Index(): JSX.Element {
         {/* 방송인 기본 정보 영역 */}
         {기본연락처존재여부 ? (
           <Grid m={2} templateColumns="1fr 1fr">
-            <BroadcasterStatusSection status={기본연락처} />
+            <GridItem colSpan={{ base: 2, xl: 1 }}>
+              <BroadcasterStatusSection status={기본연락처} />
+            </GridItem>
           </Grid>
         ) : (
           <Grid m={2} templateColumns="1fr">
@@ -100,18 +102,27 @@ export function Index(): JSX.Element {
             </GridItem>
           </Grid>
         )}
-        <Grid m={2} templateColumns="repeat(2, 1fr)" gap={2}>
-          <GridItem colSpan={{ base: 2, lg: 1 }}>
+
+        <Grid
+          m={2}
+          templateColumns={
+            !broadcasterProfileData?.broadcasterPromotionPage
+              ? 'repeat(4, 1fr)'
+              : 'repeat(6, 1fr)'
+          }
+          gap={2}
+        >
+          <GridItem colSpan={{ base: 6, lg: 2 }}>
             {/* 시작 가이드 영역 */}
             <StartGuideCard onOpen={onOpen} />
           </GridItem>
-          <GridItem colSpan={{ base: 2, lg: 1 }}>
-            <Stack>
-              {/* 오버레이 URL 영역 */}
-              <OverlayUrlCard />
-              {/* 상품홍보 페이지 URL 영역 */}
-              <PromotionPageUrlCard />
-            </Stack>
+          <GridItem colSpan={{ base: 6, lg: 2 }}>
+            {/* 오버레이 URL 영역 */}
+            <OverlayUrlCard />
+          </GridItem>
+          {/* 상품홍보 페이지 URL 영역 */}
+          <GridItem colSpan={{ base: 6, lg: 2 }}>
+            <PromotionPageUrlCard />
           </GridItem>
         </Grid>
 

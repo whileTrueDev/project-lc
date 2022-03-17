@@ -101,6 +101,7 @@ const columns: GridColumns = [
 export function AdminBroadcasterSettlementInfoList(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { data, isLoading } = useAdminBroadcasterSettlementInfoList();
+
   const [selectedRow, setSelectedRow] = useState({});
   const {
     isOpen: isConfirmationOpen,
@@ -114,7 +115,7 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
     onClose: onRejectionClose,
   } = useDisclosure();
 
-  async function handleClick(param: GridCellParams): Promise<void> {
+  const handleClick = async (param: GridCellParams): Promise<void> => {
     if (param.field === 'confirmation') {
       setSelectedRow(param.row);
       onConfirmationOpen();
@@ -123,7 +124,7 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
       setSelectedRow(param.row);
       onRejectionOpen();
     }
-  }
+  };
   return (
     <>
       <ChakraDataGrid

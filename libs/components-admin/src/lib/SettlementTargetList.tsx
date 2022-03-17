@@ -221,7 +221,7 @@ function SettlementItemInfoDialog({
     } else {
       executeSettlement
         .mutateAsync({
-          sellerEmail: selectedSettleItem.options[0].seller?.email,
+          sellerId: selectedSettleItem.options[0].seller?.id,
           target: selectedSettleItem,
           round,
         })

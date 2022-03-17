@@ -72,10 +72,12 @@ export function LiveShoppingDetail(): JSX.Element {
   const liveShoppingId = router.query.liveShoppingId as string;
   const { data: profileData } = useProfile();
   const { data: liveShopping, isLoading: liveShoppingIsLoading } =
-    useAdminLiveShoppingList({
-      enabled: !!profileData?.email,
-      id: liveShoppingId,
-    });
+    useAdminLiveShoppingList(
+      {
+        id: liveShoppingId,
+      },
+      { enabled: !!profileData?.id },
+    );
 
   const goodsId = liveShopping ? liveShopping[0].goodsId : '';
   const goods = useAdminGoodsById(goodsId);
@@ -404,8 +406,13 @@ export function LiveShoppingDetail(): JSX.Element {
               <Divider />
 
               <Stack>
-                <Text>영상 URL</Text>
-                <Input {...register('videoUrl')} />
+                <Text>
+                  영상 URL (https://youtu.be/4pIuCJTMXQU 와 같은 형태로 입력해주세요)
+                </Text>
+                <Input
+                  placeholder="https://youtu.be/4pIuCJTMXQU"
+                  {...register('videoUrl')}
+                />
               </Stack>
               <Divider />
 

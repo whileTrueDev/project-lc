@@ -7,6 +7,8 @@ import { constants } from '../../constants';
 interface LCDomainStackProps extends cdk.StackProps {
   prodALB: elbv2.ApplicationLoadBalancer;
   devALB?: elbv2.ApplicationLoadBalancer;
+  devPrivateAlb: elbv2.ApplicationLoadBalancer;
+  prodPrivateAlb: elbv2.ApplicationLoadBalancer;
 }
 
 export class LCDomainStack extends cdk.Stack {
@@ -15,22 +17,25 @@ export class LCDomainStack extends cdk.Stack {
 
   private readonly prodALBTarget: route53Targets.LoadBalancerTarget;
   private readonly devALBTarget: route53Targets.LoadBalancerTarget;
+  private readonly devPrivateAlbTarget: route53Targets.LoadBalancerTarget;
+  private readonly prodPrivateAlbTarget: route53Targets.LoadBalancerTarget;
 
   public hostedzone: route53.PublicHostedZone;
 
   constructor(scope: cdk.Construct, id: string, props: LCDomainStackProps) {
     super(scope, id, props);
 
-    const { prodALB, devALB } = props;
+    const { prodALB, devALB, devPrivateAlb, prodPrivateAlb } = props;
     if (!devALB) {
       throw new Error('dev ALB is not defined - from LCDomainStack');
     }
 
     // 호스팅영역 생성
     this.createPublicHostedZone();
-
     this.prodALBTarget = new route53Targets.LoadBalancerTarget(prodALB);
     this.devALBTarget = new route53Targets.LoadBalancerTarget(devALB);
+    this.devPrivateAlbTarget = new route53Targets.LoadBalancerTarget(devPrivateAlb);
+    this.prodPrivateAlbTarget = new route53Targets.LoadBalancerTarget(prodPrivateAlb);
 
     this.createProdRecords();
     this.createDevRecords();
@@ -76,7 +81,19 @@ export class LCDomainStack extends cdk.Stack {
     new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_realtimeapi_controller`, {
       recordName: `realtime.${this.PUNYCODE_DOMAIN}`,
       zone: this.hostedzone,
-      target: route53.RecordTarget.fromAlias(this.devALBTarget),
+      target: route53.RecordTarget.fromAlias(this.prodALBTarget),
+    });
+    // 프로덕션용 ALB로 라우팅하는 overlay-controller.크크쇼.com 레코드 생성
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_overlay_controller`, {
+      recordName: `overlay-controller.${this.PUNYCODE_DOMAIN}`,
+      zone: this.hostedzone,
+      target: route53.RecordTarget.fromAlias(this.prodALBTarget),
+    });
+    // mailer.크크쇼.com
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_mailer`, {
+      zone: this.hostedzone,
+      recordName: `mailer.${this.PUNYCODE_DOMAIN}`,
+      target: route53.RecordTarget.fromAlias(this.prodPrivateAlbTarget),
     });
   }
 
@@ -109,5 +126,10 @@ export class LCDomainStack extends cdk.Stack {
         target: route53.RecordTarget.fromAlias(this.devALBTarget),
       },
     );
+    new route53.ARecord(this, `${this.PUNYCODE_DOMAIN}_ARecord_mailer_dev`, {
+      zone: this.hostedzone,
+      recordName: `dev-mailer.${this.PUNYCODE_DOMAIN}`,
+      target: route53.RecordTarget.fromAlias(this.devPrivateAlbTarget),
+    });
   }
 }

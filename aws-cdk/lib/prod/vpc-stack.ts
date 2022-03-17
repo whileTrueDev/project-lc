@@ -4,17 +4,20 @@ import { constants } from '../../constants';
 
 // CONSTANTS
 const ID_PREFIX = 'LC-PROD-';
-// const DATABASE_PORT = 3306;
+const DATABASE_PORT = 3306;
 
 export class LCProdVpcStack extends cdk.Stack {
   public readonly vpc: ec2.Vpc;
   public readonly albSecGrp: ec2.SecurityGroup;
+  public readonly privateAlbSecGrp: ec2.SecurityGroup;
   public readonly dbSecGrp: ec2.SecurityGroup;
   public readonly apiSecGrp: ec2.SecurityGroup;
   public readonly overlaySecGrp: ec2.SecurityGroup;
   public readonly overlayControllerSecGrp: ec2.SecurityGroup;
   public readonly realtimeApiSecGrp: ec2.SecurityGroup;
   public readonly redisSecGrp: ec2.SecurityGroup;
+  public readonly mailerSecGrp: ec2.SecurityGroup;
+  public readonly inactiveBatchSecGrp: ec2.SecurityGroup;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -25,10 +28,13 @@ export class LCProdVpcStack extends cdk.Stack {
     // * vpc
     this.vpc = this.createVpc();
     this.albSecGrp = this.createAlbSecGrp();
+    this.privateAlbSecGrp = this.createPrivateAlbSecGrp();
     this.apiSecGrp = this.createApiSecGrp(this.albSecGrp);
     this.overlaySecGrp = this.createOverlaySecGrp(this.albSecGrp);
     this.overlayControllerSecGrp = this.createOverlayControllerSecGrp(this.albSecGrp);
     this.realtimeApiSecGrp = this.createRealtimeApiSecGrp(this.albSecGrp);
+    this.mailerSecGrp = this.createMailerSecGrp(this.albSecGrp);
+    this.inactiveBatchSecGrp = this.createInactiveBatchSecGrp();
     this.redisSecGrp = this.createRedisSecGrp({
       realtimeApiSecGrp: this.realtimeApiSecGrp,
       apiSecGrp: this.apiSecGrp,
@@ -39,6 +45,7 @@ export class LCProdVpcStack extends cdk.Stack {
       apiSecGrp: this.apiSecGrp,
       overlaySecGrp: this.overlaySecGrp,
       overlayControllerSecGrp: this.overlayControllerSecGrp,
+      inactiveBatchSecGrp: this.inactiveBatchSecGrp,
     });
   }
 
@@ -64,7 +71,7 @@ export class LCProdVpcStack extends cdk.Stack {
     });
   }
 
-  /** 로드밸런서 보안그룹 생성 */
+  /** 퍼블릭 로드밸런서 보안그룹 생성 */
   private createAlbSecGrp(): ec2.SecurityGroup {
     const albSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}ALB-SecGrp`, {
       vpc: this.vpc,
@@ -75,6 +82,32 @@ export class LCProdVpcStack extends cdk.Stack {
     albSecGrp.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443), 'Allow 443 to all');
 
     return albSecGrp;
+  }
+
+  /** 프라이빗 로드밸런서(ALB) 보안 그룹 생성 */
+  private createPrivateAlbSecGrp(): ec2.SecurityGroup {
+    const privateAlbSecGrp = new ec2.SecurityGroup(
+      this,
+      `${ID_PREFIX}Private-ALB-SecGrp`,
+      {
+        vpc: this.vpc,
+        description: 'private ALB security group for project-lc',
+        allowAllOutbound: true,
+      },
+    );
+
+    privateAlbSecGrp.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(80),
+      'Allow 80 to all',
+    );
+    privateAlbSecGrp.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(443),
+      'Allow 443 to all',
+    );
+
+    return privateAlbSecGrp;
   }
 
   /** API서버 보안그룹 생성 */
@@ -133,8 +166,9 @@ export class LCProdVpcStack extends cdk.Stack {
     apiSecGrp,
     overlaySecGrp,
     overlayControllerSecGrp,
+    inactiveBatchSecGrp,
   }: Record<
-    'apiSecGrp' | 'overlaySecGrp' | 'overlayControllerSecGrp',
+    'apiSecGrp' | 'overlaySecGrp' | 'overlayControllerSecGrp' | 'inactiveBatchSecGrp',
     ec2.SecurityGroup
   >): ec2.SecurityGroup {
     // * 보안그룹
@@ -147,22 +181,22 @@ export class LCProdVpcStack extends cdk.Stack {
     // * 보안그룹 룰 지정
     dbSecGrp.addIngressRule(
       ec2.Peer.ipv4(constants.WHILETRUE_IP_ADDRESS),
-      ec2.Port.tcp(3306),
+      ec2.Port.tcp(DATABASE_PORT),
       'Allow port 3306 for outbound traffics to the whiletrue developers',
     );
     dbSecGrp.addIngressRule(
       apiSecGrp ?? this.apiSecGrp,
-      ec2.Port.tcp(3306),
+      ec2.Port.tcp(DATABASE_PORT),
       'Allow port 3306 only to traffic from api security group',
     );
     dbSecGrp.addIngressRule(
       overlaySecGrp ?? this.overlaySecGrp,
-      ec2.Port.tcp(3306),
+      ec2.Port.tcp(DATABASE_PORT),
       'Allow port 3306 only to traffic from overlay security group',
     );
     dbSecGrp.addIngressRule(
       overlayControllerSecGrp ?? this.overlayControllerSecGrp,
-      ec2.Port.tcp(3306),
+      ec2.Port.tcp(DATABASE_PORT),
       'Allow port 3306 only to traffic from overlay controller security group',
     );
 
@@ -183,8 +217,14 @@ export class LCProdVpcStack extends cdk.Stack {
 
     dbSecGrp.addIngressRule(
       githubActionsRunnerSecGrp,
-      ec2.Port.tcp(3306),
+      ec2.Port.tcp(DATABASE_PORT),
       'Allow github actions builder',
+    );
+
+    dbSecGrp.addIngressRule(
+      inactiveBatchSecGrp || this.inactiveBatchSecGrp,
+      ec2.Port.tcp(DATABASE_PORT),
+      'Allow inactive batch',
     );
     return dbSecGrp;
   }
@@ -295,4 +335,35 @@ export class LCProdVpcStack extends cdk.Stack {
       `allow port ${serverPort} to redis cluster`,
     );
   };
+
+  /** Mailer 서버 보안그룹 생성 */
+  private createMailerSecGrp(albSecGrp: ec2.SecurityGroup): ec2.SecurityGroup {
+    const mailerSecGrp = new ec2.SecurityGroup(this, `${ID_PREFIX}Mailer-SecGrp`, {
+      vpc: this.vpc,
+      description: 'mailer sec grp for project-lc (private)',
+      allowAllOutbound: true,
+    });
+
+    mailerSecGrp.addIngressRule(
+      albSecGrp,
+      ec2.Port.tcp(constants.PROD.ECS_MAILER_PORT),
+      'Allow port 3003 to public alb',
+    );
+
+    return mailerSecGrp;
+  }
+
+  /** 휴면처리 배치 프로그램 보안그룹 생성 */
+  private createInactiveBatchSecGrp(): ec2.SecurityGroup {
+    const inactiveBatchSecGrp = new ec2.SecurityGroup(
+      this,
+      `${ID_PREFIX}Inactive-batch-SecGrp`,
+      {
+        vpc: this.vpc,
+        description: 'inactive batch sec grp for project-lc (private)',
+        allowAllOutbound: true,
+      },
+    );
+    return inactiveBatchSecGrp;
+  }
 }

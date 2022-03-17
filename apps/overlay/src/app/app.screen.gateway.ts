@@ -15,6 +15,7 @@ import {
   RoomAndVideoType,
   SocketIdandDevice,
   StartSetting,
+  ObjectiveMessage,
 } from '@project-lc/shared-types';
 import { OverlayService } from '@project-lc/nest-modules-overlay';
 
@@ -152,6 +153,18 @@ export class AppScreenGateway
   @SubscribeMessage('clear full video')
   clearVideo(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('clear full video from server');
+  }
+
+  @SubscribeMessage('send objective notification signal')
+  async sendObjectiveNotificationSignal(
+    @MessageBody()
+    data: ObjectiveMessage,
+  ): Promise<void> {
+    const text = data.objective.nickname
+      ? `${data.objective.nickname}님의 구매로 ${data.objective.price}원 돌파했습니다`
+      : `판매금액 ${data.objective.price}원 돌파!`;
+    const audioBuffer = await this.overlayService.streamObjectiveNotification(text);
+    this.server.to(data.roomName).emit('get objective notification tts', audioBuffer);
   }
 
   @SubscribeMessage('send notification signal')

@@ -3,15 +3,23 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { GoodsConfirmation, LiveShopping } from '@prisma/client';
+import {
+  AdminClassChangeHistory,
+  Administrator,
+  GoodsConfirmation,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  GoodsByIdRes,
+  AdminClassDto,
+  AdminGoodsByIdRes,
+  AdminGoodsListRes,
+  AdminSettlementInfoType,
+  BusinessRegistrationStatus,
   GoodsConfirmationDto,
   GoodsRejectionDto,
-  BusinessRegistrationStatus,
-  AdminSettlementInfoType,
   LiveShoppingDTO,
+  LiveShoppingImageDto,
+  LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -29,6 +37,7 @@ export class AdminService {
             seller: {
               select: {
                 agreementFlag: true,
+                inactiveFlag: false,
               },
             },
           },
@@ -82,6 +91,9 @@ export class AdminService {
    */
   public async getConfirmedSellers(): Promise<Map<number, string>> {
     const sellers = await this.prisma.seller.findMany({
+      where: {
+        inactiveFlag: false,
+      },
       include: {
         sellerBusinessRegistration: {
           include: {
@@ -107,8 +119,7 @@ export class AdminService {
   }
 
   // 관리자 페이지 상품검수 데이터, 상품검수가 완료되지 않은 상태일 경우,
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  public async getGoodsInfo({ sort, direction }) {
+  public async getGoodsInfo({ sort, direction }): Promise<AdminGoodsListRes> {
     const items = await this.prisma.goods.findMany({
       orderBy: [{ [sort]: direction }],
       where: {
@@ -228,7 +239,7 @@ export class AdminService {
     return goodsConfirmation;
   }
 
-  public async getOneGoods(goodsId: string | number): Promise<GoodsByIdRes> {
+  public async getOneGoods(goodsId: string | number): Promise<AdminGoodsByIdRes> {
     return this.prisma.goods.findFirst({
       where: {
         id: Number(goodsId),
@@ -249,24 +260,33 @@ export class AdminService {
         confirmation: true,
         image: true,
         GoodsInfo: true,
+        seller: true,
       },
     });
   }
 
-  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShopping[]> {
+  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShoppingWithGoods[]> {
     return this.prisma.liveShopping.findMany({
       where: { id: id ? Number(id) : undefined },
       include: {
         goods: {
-          select: { goods_name: true, summary: true },
+          select: { goods_name: true, summary: true, image: true, options: true },
         },
         seller: { select: { sellerShop: true } },
         broadcaster: {
-          select: { userNickname: true, email: true },
+          select: {
+            id: true,
+            userName: true,
+            userNickname: true,
+            email: true,
+            avatar: true,
+            BroadcasterPromotionPage: true,
+          },
         },
         liveShoppingVideo: {
           select: { youtubeUrl: true },
         },
+        images: true,
       },
       orderBy: { createDate: 'desc' },
     });
@@ -305,7 +325,41 @@ export class AdminService {
         liveShoppingName: dto.liveShoppingName || undefined,
       },
     });
+
     if (!liveShoppingUpdate) throw new InternalServerErrorException(`업데이트 실패`);
+    return true;
+  }
+
+  async upsertLiveShoppingImage({
+    liveShoppingId,
+    imageType,
+    imageUrl,
+  }: LiveShoppingImageDto): Promise<boolean> {
+    if (liveShoppingId) {
+      const existImage = await this.prisma.liveShoppingImage.findFirst({
+        where: {
+          liveShoppingId,
+          type: imageType,
+        },
+      });
+
+      if (existImage) {
+        await this.prisma.liveShoppingImage.update({
+          where: { id: existImage.id },
+          data: {
+            imageUrl,
+          },
+        });
+      } else {
+        await this.prisma.liveShoppingImage.create({
+          data: {
+            type: imageType,
+            imageUrl,
+            liveShopping: { connect: { id: liveShoppingId } },
+          },
+        });
+      }
+    }
     return true;
   }
 
@@ -371,5 +425,47 @@ export class AdminService {
     if (duplicateFmGoodsSeqProductPromotion) return true;
 
     return false;
+  }
+
+  public async getAdminUserList(): Promise<AdminClassDto[]> {
+    return this.prisma.administrator.findMany({
+      select: {
+        id: true,
+        email: true,
+        adminClass: true,
+      },
+    });
+  }
+
+  public async updateAdminClass(dto: AdminClassDto): Promise<Administrator> {
+    return this.prisma.administrator.update({
+      where: {
+        email: dto.email,
+      },
+      data: {
+        adminClass: dto.adminClass,
+      },
+    });
+  }
+
+  public async deleteAdminUser(id: number): Promise<boolean> {
+    const doDelete = await this.prisma.administrator.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+    if (doDelete) return true;
+    return false;
+  }
+
+  public async createAdminClassChangeHistory(dto): Promise<AdminClassChangeHistory> {
+    return this.prisma.adminClassChangeHistory.create({
+      data: {
+        adminEmail: dto.adminEmail,
+        targetEmail: dto.targetEmail,
+        originalAdminClass: dto.originalAdminClass,
+        newAdminClass: dto.newAdminClass,
+      },
+    });
   }
 }

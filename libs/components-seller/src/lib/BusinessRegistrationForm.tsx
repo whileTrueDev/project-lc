@@ -34,13 +34,13 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
     clearErrors,
   } = useFormContext<BusinessRegistrationFormDto>();
 
-  function handleSuccess(fileName: string, file: File): void {
+  const handleSuccess = (fileName: string, file: File): void => {
     setValue('businessRegistrationImage', file);
     setValue('businessRegistrationImageName', fileName);
     clearErrors(['businessRegistrationImage', 'businessRegistrationImageName']);
-  }
+  };
 
-  function handleError(errorType?: ImageInputErrorTypes): void {
+  const handleError = (errorType?: ImageInputErrorTypes): void => {
     switch (errorType) {
       case 'over-size': {
         setError('businessRegistrationImage', {
@@ -63,7 +63,7 @@ function BusinessRegistrationFormTag(props: BusinessRegistrationFormProps): JSX.
         clearErrors(['businessRegistrationImage', 'businessRegistrationImageName']);
       }
     }
-  }
+  };
 
   const { ref, ...companyName } = register('companyName', {
     required: '회사명을 입력해주세요.',

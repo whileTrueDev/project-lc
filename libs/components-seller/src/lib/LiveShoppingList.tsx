@@ -11,7 +11,14 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
-import { Goods, GoodsConfirmation, LiveShopping, SellerShop } from '@prisma/client';
+import {
+  Broadcaster,
+  BroadcasterPromotionPage,
+  Goods,
+  GoodsConfirmation,
+  LiveShopping,
+  SellerShop,
+} from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import BroadcasterChannelButton from '@project-lc/components-shared/BroadcasterChannelButton';
@@ -25,7 +32,6 @@ import {
   useProfile,
   useDisplaySize,
 } from '@project-lc/hooks';
-import { BroadcasterDTOWithoutUserId } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
@@ -39,7 +45,12 @@ export interface LiveShoppingWithSalesFrontType extends LiveShoppingWithoutDate 
   sellStartDate: string | Date | undefined | null;
   sellEndDate: string | Date | undefined | null;
   sales?: string | null;
-  broadcaster: BroadcasterDTOWithoutUserId;
+  broadcaster: Pick<
+    Broadcaster,
+    'id' | 'userName' | 'userNickname' | 'email' | 'avatar'
+  > & {
+    BroadcasterPromotionPage: BroadcasterPromotionPage | null;
+  };
   goods: Pick<GoodsWithConfirmation, 'goods_name' | 'summary'>;
   seller: { sellerShop: SellerShop };
   liveShoppingVideo: { youtubeUrl: string } | null;
@@ -51,7 +62,7 @@ export function LiveShoppingList(): JSX.Element {
   const [pageSize, setPageSize] = useState<number>(5);
   const { data } = useLiveShoppingList({});
   const { data: sales, isLoading: isSalesLoading } = useFmOrdersDuringLiveShoppingSales({
-    enabled: !!profileData?.email,
+    enabled: !!profileData?.id,
   });
   const { isMobileSize } = useDisplaySize();
 

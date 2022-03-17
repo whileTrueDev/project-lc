@@ -135,3 +135,12 @@ export type OverlayImageTypes =
   | 'donation-images-2'
   | 'overlay-logo'
   | 'horizontal-banner';
+
+export interface ObjectiveMessage {
+  roomName: string;
+  objective: {
+    price: number;
+    nickname?: string;
+  };
+  liveShoppingId?: number;
+}
