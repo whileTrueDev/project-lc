@@ -15,7 +15,7 @@ import {
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useGoodsImageOrderMutation } from '@project-lc/hooks';
 import { GoodsImageDto } from '@project-lc/shared-types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { GoodsFormValues } from './GoodsRegistForm';
 import { PREVIEW_SIZE } from './GoodsRegistPictures';
@@ -23,15 +23,20 @@ import { PREVIEW_SIZE } from './GoodsRegistPictures';
 export function GoodsRegistPictureOrderChangeDialog({
   isOpen,
   onClose,
+  savedImages,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  savedImages: GoodsImageDto[];
 }): JSX.Element {
   const toast = useToast();
   const { setValue, getValues } = useFormContext<GoodsFormValues>();
-  const imageList = getValues('image');
   const [draggingItem, setDraggingItem] = useState<null | HTMLElement>(null);
-  const [imageListCopy, setImageListCopy] = useState<GoodsImageDto[]>(imageList);
+  const [imageListCopy, setImageListCopy] = useState<GoodsImageDto[]>([]);
+
+  useEffect(() => {
+    setImageListCopy([...savedImages]);
+  },[savedImages]);
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>): void => {
     const dragTarget = event.currentTarget;
@@ -83,7 +88,7 @@ export function GoodsRegistPictureOrderChangeDialog({
 
   const { mutateAsync, isLoading } = useGoodsImageOrderMutation();
   const saveChangedOrder = (): void => {
-    console.log(imageListCopy);
+    if (!imageListCopy.length) return;
     // 이미지 순서(cut_number) 변경 요청
     mutateAsync(imageListCopy)
       .then(() => {

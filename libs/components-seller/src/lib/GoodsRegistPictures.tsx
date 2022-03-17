@@ -261,6 +261,7 @@ export function GoodsRegistPictures(): JSX.Element {
       />
 
       <GoodsRegistPictureOrderChangeDialog
+        savedImages={savedImages}
         isOpen={imageOrderChangeDialog.isOpen}
         onClose={imageOrderChangeDialog.onClose}
       />
@@ -271,7 +272,7 @@ export function GoodsRegistPictures(): JSX.Element {
         title="이미지 삭제"
         onConfirm={deletePicture}
       >
-        <Text>{deleteImageId} 해당 이미지를 삭제하시겠습니까?</Text>
+        <Text>해당 이미지를 삭제하시겠습니까?</Text>
       </ConfirmDialog>
     </SectionWithTitle>
   );
