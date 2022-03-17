@@ -1,5 +1,11 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
   Button,
   Divider,
   IconButton,
@@ -273,33 +279,42 @@ export function GoodsRegistPictureDialog({
               )}
             </Stack>
 
-            <Divider />
-
             {/* 크롭 영역 */}
 
             {currentPreview && (
-              <Stack alignItems="center">
-                <Text textAlign="center">
-                  원하는 부분을 선택한 후 적용하기 버튼을 누르면 미리보기 영역에
-                  반영됩니다
-                </Text>
-                <Stack direction="row">
-                  <Button
-                    disabled={!croppedImageBase64Url}
-                    onClick={saveCroppedCurrentPreview}
-                  >
-                    적용하기
-                  </Button>
-                  <Button onClick={revertCurrentPreview}>원래 이미지로 되돌리기</Button>
-                </Stack>
-                <ReactCrop
-                  src={currentPreview.url as string}
-                  crop={crop}
-                  onChange={(newCrop) => setCrop(newCrop)}
-                  onImageLoaded={onImageLoadedHandler}
-                  onComplete={onCropComplete}
-                />
-              </Stack>
+              <Accordion allowToggle defaultIndex={0}>
+                <AccordionItem>
+                  <AccordionButton>
+                    <Box flex="1" textAlign="center">
+                      <AccordionIcon mr={1} />
+                      원하는 부분을 선택한 후 적용하기 버튼을 누르면 미리보기 영역에
+                      반영됩니다
+                    </Box>
+                  </AccordionButton>
+                  <AccordionPanel pb={4}>
+                    <Stack alignItems="center">
+                      <Stack direction="row">
+                        <Button
+                          disabled={!croppedImageBase64Url}
+                          onClick={saveCroppedCurrentPreview}
+                        >
+                          적용하기
+                        </Button>
+                        <Button onClick={revertCurrentPreview}>
+                          원래 이미지로 되돌리기
+                        </Button>
+                      </Stack>
+                      <ReactCrop
+                        src={currentPreview.url as string}
+                        crop={crop}
+                        onChange={(newCrop) => setCrop(newCrop)}
+                        onImageLoaded={onImageLoadedHandler}
+                        onComplete={onCropComplete}
+                      />
+                    </Stack>
+                  </AccordionPanel>
+                </AccordionItem>
+              </Accordion>
             )}
           </Stack>
         </ModalBody>
