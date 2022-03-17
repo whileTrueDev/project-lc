@@ -28,54 +28,57 @@ export function GoodsRegistPictureOrderChangeDialog({
   const { setValue, getValues } = useFormContext<GoodsFormValues>();
   const imageList = getValues('image');
   const [draggingItem, setDraggingItem] = useState<null | HTMLElement>(null);
+  const [imageListCopy, setImageListCopy] = useState<GoodsImageDto[]>(imageList);
 
-  const dragStartHandler = (event: React.DragEvent<HTMLDivElement>): void => {
+  const onDragStart = (event: React.DragEvent<HTMLDivElement>): void => {
     const dragTarget = event.currentTarget;
     const imageIndex = dragTarget.dataset.imageIndex;
-    console.log('drag start', {imageIndex});
     setDraggingItem(dragTarget);
     event.dataTransfer.setData('imageIndex', imageIndex || '');
     event.dataTransfer.dropEffect = 'move';
   }
 
-  // This function will be triggered when dropping
-  const dropHandler = (event: React.DragEvent<HTMLDivElement>): void => {
+  const moveDraggingItemFromTo = (draggingItemIndex: number, dropPositionIndex: number): void => {
+    const _imageList = [...imageListCopy];
+    const _moving = _imageList.splice(draggingItemIndex, 1)[0];
+    _imageList.splice(dropPositionIndex, 0, _moving);
+    setImageListCopy(_imageList);
+  }
+
+  const onDrop = (event: React.DragEvent<HTMLDivElement>): void => {
     event.preventDefault();
     if (!draggingItem) return;
     const dropTarget = event.currentTarget;
-    const dropY = event.clientY; // 드롭할 y 포지션
-    const draggingItemY = draggingItem.getBoundingClientRect().y; // 드래그하고 있는 ㄴ아이템의 기존 y위치
-    console.log({dropY, draggingItemY}); 
-    const dropTargetImageIndex = dropTarget.dataset.imageIndex;
-    const dragTargetImageIndex = event.dataTransfer.getData('imageIndex');
 
-    if (dropY > draggingItemY) {
+    const dropTargetImageIndex = Number(dropTarget.dataset.imageIndex);
+    const dragTargetImageIndex = Number(event.dataTransfer.getData('imageIndex'));
 
-    }
-    if (dropY < draggingItemY) {
+    if (dropTargetImageIndex === dragTargetImageIndex) {return;} // 동일 위치에 둔거면 종료
 
-    }
-    // dropY < draggingItemY 이면 위로 드래그한거 -> 드래깅 아이템을 dropTargetIndex -1 으로 위치
-    // dropY > draggingItemY 이면 아래로 드래그한거 -> 드래깅 아이템을 dropTargetIndex + 1 으로 위치
-    // set
-    
-    console.log('drop', { dropTargetImageIndex, dragTargetImageIndex, draggingItemY, dropY });
+    moveDraggingItemFromTo(dragTargetImageIndex, dropTargetImageIndex);
 
-    // setContent(data);
   };
 
   // This makes the third box become droppable
-  const allowDrop = (event: React.DragEvent<HTMLDivElement>): void => {
+  const onDragOver = (event: React.DragEvent<HTMLDivElement>): void => {
     event.preventDefault();
   };
 
-  const dragEndHandler = (event: React.DragEvent<HTMLDivElement>): void => {
+  const onDragEnd = (event: React.DragEvent<HTMLDivElement>): void => {
     setDraggingItem(null);
-    console.log('drag end!!');
+  }
+
+  const handleClose = (): void => {
+    onClose();
+  }
+
+  const saveChangedOrder = (): void => {
+
+    // 이미지 
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>등록된 상품 사진 순서 변경</ModalHeader>
@@ -83,33 +86,37 @@ export function GoodsRegistPictureOrderChangeDialog({
         <ModalBody>
           <Text>이미지 순서를 변경해주세요</Text>
           <Stack>
-            {imageList.map((i, index) => (
+            {imageListCopy.map((i, index) => (
               <Box
                 key={i.id}
                 position="relative"
                 draggable
                 data-image-index={index}
-                onDragStart={dragStartHandler}
-                onDragOver={allowDrop}
-                onDrop={dropHandler}
-                onDragEnd={dragEndHandler}
+                onDragStart={onDragStart}
+                onDragOver={onDragOver}
+                onDrop={onDrop}
+                onDragEnd={onDragEnd}
               >
+                <Text direction="row">
+                  {index}
+                </Text>
                 <ChakraNextImage
                   layout="intrinsic"
                   alt={i.image}
                   src={i.image || ''}
                   {...PREVIEW_SIZE}
                 />
+                
               </Box>
             ))}
           </Stack>
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={onClose}>
-            Close
+          <Button colorScheme="blue" mr={3} onClick={saveChangedOrder}>
+            변경하기
           </Button>
-          <Button variant="ghost">Secondary Action</Button>
+          <Button variant="ghost" onClick={handleClose}>닫기</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
