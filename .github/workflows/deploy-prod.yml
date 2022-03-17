@@ -74,7 +74,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        run: yarn install
 
       - name: Check api affected
         run: tools/check-need-deploy.sh api
@@ -126,7 +126,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        run: yarn install
 
       - name: Check Overlay affected
         run: tools/check-need-deploy.sh overlay
@@ -178,7 +178,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        run: yarn install
 
       - name: Check Overlay affected
         run: tools/check-need-deploy.sh overlay-controller
@@ -230,7 +230,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        run: yarn install
 
       - name: Check RealtimeAPI affected
         run: tools/check-need-deploy.sh realtimeapi
@@ -276,7 +276,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        run: yarn install
 
       - name: Check Mailer affected
         run: tools/check-need-deploy.sh mailer
@@ -322,7 +322,7 @@ jobs:
 
       #  Install All Dependencies
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1 # install dependencies using cache
+        run: yarn install
 
       - name: Check InactiveBatch affected
         run: tools/check-need-deploy.sh batch-inactive-handler
