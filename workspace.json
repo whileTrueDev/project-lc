@@ -1506,11 +1506,10 @@
           "options": {
             "commands": [
               {
-                "command": "prisma generate",
+                "command": "prisma generate --schema libs/prisma-orm/prisma/schema.prisma",
                 "forwardAllArgs": false
               }
-            ],
-            "cwd": "libs/prisma-orm"
+            ]
           }
         },
         "migrate-create-only": {
