@@ -245,7 +245,7 @@ export function GoodsRegistPictureDialog({
                           <>
                             <IconButton
                               icon={<ChevronLeftIcon />}
-                              size="sm"
+                              size="xs"
                               disabled={index === 0}
                               onClick={() => {
                                 swap(index - 1, index);
@@ -254,7 +254,7 @@ export function GoodsRegistPictureDialog({
                             />
                             <IconButton
                               icon={<ChevronRightIcon />}
-                              size="sm"
+                              size="xs"
                               disabled={index >= previews.length - 1}
                               onClick={() => {
                                 swap(index + 1, index);

@@ -1,5 +1,6 @@
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import {
+  Box,
   Button,
   IconButton,
   Modal,
@@ -87,13 +88,18 @@ export function GoodsRegistPictureOrderChangeDialog({
                 key={i.id}
                 position="relative"
                 data-image-index={index}
+                spacing={1}
               >
-                <ChakraNextImage
-                  layout="intrinsic"
-                  alt={i.image}
-                  src={i.image || ''}
-                  {...PREVIEW_SIZE}
-                />
+                <Text>{index + 1}</Text>
+                <Box>
+                  <ChakraNextImage
+                    layout="intrinsic"
+                    alt={i.image}
+                    src={i.image || ''}
+                    {...PREVIEW_SIZE}
+                  />
+                </Box>
+
                 <Stack justifyContent="center">
                   <IconButton
                     icon={<ChevronUpIcon />}
