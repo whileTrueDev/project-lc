@@ -192,7 +192,7 @@ export function GoodsRegistPictureDialog({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} size="6xl">
+    <Modal isOpen={isOpen} onClose={handleClose} size="4xl">
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>등록할 상품 사진을 선택해주세요</ModalHeader>
