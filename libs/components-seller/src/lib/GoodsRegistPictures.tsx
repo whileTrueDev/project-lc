@@ -71,7 +71,9 @@ export function GoodsPreviewItem(
     <Stack
       direction="row"
       alignItems="center"
-      borderWidth={selected ? '3px' : '1px'}
+      borderWidth="1px"
+      outline={selected ? 'auto' : undefined}
+      outlineColor={selected ? 'blue' : undefined}
       borderRadius="lg"
       p={1}
     >
