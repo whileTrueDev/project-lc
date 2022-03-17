@@ -15,4 +15,5 @@ RUN yarn install --prod
 RUN yarn global add prisma@3.1.1
 RUN prisma generate
 
+
 CMD NODE_ENV=production node ./main.js

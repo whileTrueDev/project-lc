@@ -17,5 +17,4 @@ RUN prisma generate
 RUN yarn add hbs
 
 EXPOSE 3333
-
 CMD NODE_ENV=production node ./main.js
