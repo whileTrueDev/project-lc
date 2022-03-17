@@ -23,9 +23,10 @@ const columns: GridColumns = [
     headerName: '회사명',
   },
   {
-    field: 'sellerEmail',
+    field: 'seller.email',
     headerName: '광고주 이메일',
     minWidth: 230,
+    valueGetter: ({ row }) => row.seller.email,
   },
   {
     field: 'businessRegistrationNumber',
@@ -47,7 +48,7 @@ const columns: GridColumns = [
   {
     field: 'businessAddress',
     headerName: '사업장 주소',
-    minWidth: 1000,
+    minWidth: 300,
   },
   {
     field: 'taxInvoiceMail',
