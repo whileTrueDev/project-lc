@@ -63,8 +63,8 @@ jobs:
             --base=$BEFORE_SHA \
             --args="--registry=$ECR_REGISTRY"
 
-  InstallDependency:
-    name: Install Dependencies to self-hosted machine
+  DeployAPI:
+    name: Deploy API Job
     runs-on: [self-hosted, linux, project-lc-dev]
     needs: [Build]
     steps:
@@ -72,14 +72,6 @@ jobs:
         uses: actions/checkout@v1
       - name: Install dependencies #  Install All Dependencies
         run: yarn install
-
-  DeployAPI:
-    name: Deploy API Job
-    runs-on: [self-hosted, linux, project-lc-dev]
-    needs: [Build, InstallDependency]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
 
       - name: Check api affected
         run: tools/check-need-deploy.sh api
@@ -124,10 +116,12 @@ jobs:
   DeployOverlay:
     name: Deploy Overlay Job
     runs-on: [self-hosted, linux, project-lc-dev]
-    needs: [Build, InstallDependency]
+    needs: [Build]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Install dependencies #  Install All Dependencies
+        run: yarn install
 
       - name: Check Overlay affected
         run: tools/check-need-deploy.sh overlay
@@ -172,10 +166,12 @@ jobs:
   DeployOverlayController:
     name: Deploy OverlayController Job
     runs-on: [self-hosted, linux, project-lc-dev]
-    needs: [Build, InstallDependency]
+    needs: [Build]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Install dependencies #  Install All Dependencies
+        run: yarn install
 
       - name: Check Overlay affected
         run: tools/check-need-deploy.sh overlay-controller
@@ -220,10 +216,12 @@ jobs:
   DeployRealtimeAPI:
     name: Deploy RealtimeAPI Job
     runs-on: [self-hosted, linux, project-lc-dev]
-    needs: [Build, InstallDependency]
+    needs: [Build]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Install dependencies #  Install All Dependencies
+        run: yarn install
 
       - name: Check RealtimeAPI affected
         run: tools/check-need-deploy.sh realtimeapi
@@ -262,10 +260,12 @@ jobs:
   DeployMailer:
     name: Deploy Mailer Job
     runs-on: [self-hosted, linux, project-lc-dev]
-    needs: [Build, InstallDependency]
+    needs: [Build]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Install dependencies #  Install All Dependencies
+        run: yarn install
 
       - name: Check Mailer affected
         run: tools/check-need-deploy.sh mailer
