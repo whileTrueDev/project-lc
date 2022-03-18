@@ -30,28 +30,30 @@ import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 
-/**
- * 이미지 잘라내어 blob으로 변환하는 함수
- * img 태그에 표시된 이미지를 canvas에 표시 -> crop 의 크기만큼 잘라 blob으로 변환 -> blobcallback 적용
- * @param image HTMLImageElement 잘라낼 이미지
- * @param _crop x,y,height,width 값 가지고 있다
- * @param blobCallback 클롭된 이미지 처리할 함수, blob으로 변환된 이미지를 받아 원하는 작업을 하는 콜백함수
- */
-export const getCroppedImage = (
-  image: HTMLImageElement,
-  _crop: Crop,
-  blobCallback: BlobCallback,
-): void => {
-  const canvas = document.createElement('canvas');
+export type DrawImageOnCanvasProp = {
+  canvas: HTMLCanvasElement;
+  image: HTMLImageElement;
+  _crop: Crop;
+};
+// img 태그에 표시된 이미지를 canvas에 표시하고 crop 의 크기만큼 잘라냄
+// 이미지 그린 캔버스 리턴
+export const drawImageOnCanvas = ({
+  canvas,
+  image,
+  _crop,
+}: DrawImageOnCanvasProp): HTMLCanvasElement => {
+  const _canvas = canvas;
   const pixelRatio = window.devicePixelRatio;
   const scaleX = image.naturalWidth / image.width;
   const scaleY = image.naturalHeight / image.height;
-  const ctx = canvas.getContext('2d');
+  const ctx = _canvas.getContext('2d');
 
-  canvas.width = _crop.width * pixelRatio * scaleX;
-  canvas.height = _crop.height * pixelRatio * scaleY;
+  _canvas.width = _crop.width * pixelRatio * scaleX;
+  _canvas.height = _crop.height * pixelRatio * scaleY;
 
-  if (!ctx) return;
+  if (!ctx) {
+    throw new Error('No 2d context');
+  }
 
   ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   ctx.imageSmoothingQuality = 'high';
@@ -68,7 +70,23 @@ export const getCroppedImage = (
     _crop.height * scaleY,
   );
 
-  canvas.toBlob(blobCallback, 'image/jpeg', 1);
+  return _canvas;
+};
+
+/**
+ * 이미지 잘라내어 "blob"으로 변환하는 함수
+ * img 태그에 표시된 이미지를 blob으로 변환 -> blobcallback 적용
+ * @param image HTMLImageElement 잘라낼 이미지
+ * @param _crop x,y,height,width 값 가지고 있다
+ * @param blobCallback 클롭된 이미지 처리할 함수, blob으로 변환된 이미지를 받아 원하는 작업을 하는 콜백함수
+ */
+export const getCroppedImage = (
+  image: HTMLImageElement,
+  _crop: Crop,
+  blobCallback: BlobCallback,
+): void => {
+  const canvas = document.createElement('canvas');
+  drawImageOnCanvas({ canvas, image, _crop }).toBlob(blobCallback, 'image/jpeg', 1);
 };
 
 export function AvatarChangeButton(): JSX.Element {
@@ -223,6 +241,7 @@ export function AvatarChangeButton(): JSX.Element {
                         imageRef.current = image;
                       }}
                       onComplete={onCropComplete}
+                      circularCrop
                     />
                   </Box>
                 )}

@@ -1,45 +1,37 @@
+import { CloseIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
   CloseButton,
   Divider,
-  HStack,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  IconButton,
   Stack,
   Text,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
-import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import { Preview } from '@project-lc/components-core/ImageInputDialog';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
-import { Preview, readAsDataURL } from '@project-lc/components-core/ImageInputDialog';
 import {
   useDeleteGoodsImageMutation,
   useGoodsImageMutation,
   useProfile,
 } from '@project-lc/hooks';
+import { GoodsImageDto } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
+import { GoodsRegistPictureDialog } from './GoodsRegistPictureDialog';
+import { GoodsRegistPictureOrderChangeDialog } from './GoodsRegistPictureOrderChangeDialog';
 
 // 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
 // 상품사진은 file 로 들어옴
-export async function imageFileListToImageDto(
+export async function saveImageFileListToS3AndReturnImageDto(
   imageFileList: { file: File; filename: string; id: number }[],
   userMail: string,
-): Promise<
-  Array<{
-    cut_number: number;
-    image: string;
-  }>
-> {
+): Promise<GoodsImageDto[]> {
   const savedImages = await Promise.all(
     imageFileList.map((item) => {
       const { file } = item;
@@ -58,23 +50,61 @@ export function GoodsPreviewItem(
     width: number;
     height: number;
     url: string;
+    onImageClick?: () => void;
+    actionButtons?: React.ReactNode;
+    selected?: boolean;
   },
 ): JSX.Element {
-  const { id, filename: fileName, url, onDelete, ...rest } = props;
+  const {
+    id,
+    filename: fileName,
+    url,
+    onDelete,
+    onImageClick,
+    actionButtons,
+    selected,
+    width,
+    height,
+  } = props;
 
   return (
-    <HStack mr={2} mb={2}>
-      <ChakraNextImage layout="intrinsic" alt={fileName} src={url} {...rest} />
-      <CloseButton onClick={onDelete} />
-    </HStack>
+    <Stack
+      direction="row"
+      alignItems="center"
+      borderWidth="1px"
+      outline={selected ? 'auto' : undefined}
+      outlineColor={selected ? 'blue' : undefined}
+      borderRadius="lg"
+      p={1}
+    >
+      <Box
+        onClick={onImageClick}
+        cursor={onImageClick ? 'pointer' : undefined}
+        minW={`${width}px`}
+        minH={`${height}px`}
+      >
+        <ChakraNextImage
+          layout="intrinsic"
+          alt={fileName}
+          src={url}
+          width={width}
+          height={height}
+        />
+      </Box>
+
+      <Stack m={0}>
+        <CloseButton onClick={onDelete} m={0} size="sm" />
+        {actionButtons}
+      </Stack>
+    </Stack>
   );
 }
 
 /** 상품 사진 등록 개수 제한 */
-const MAX_PICTURE_COUNT = 8;
-const PREVIEW_SIZE = {
-  width: 60,
-  height: 60,
+export const MAX_PICTURE_COUNT = 8;
+export const PREVIEW_SIZE = {
+  width: 80,
+  height: 80,
 };
 
 /** 상품사진 섹션 컨테이너 */
@@ -82,72 +112,16 @@ export function GoodsRegistPictures(): JSX.Element {
   const toast = useToast();
   const { data: profileData } = useProfile();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const imageOrderChangeDialog = useDisclosure();
+  const imageDeleteConfirmDialog = useDisclosure();
   const { setValue, getValues, watch } = useFormContext<GoodsFormValues>();
-  const [previews, setPreviews] = useState<Preview[]>([]);
-
-  // 사진 등록하기 다이얼로그 - 미리보기 이미지 삭제 핸들러
-  const deletePreview = (id: number): void => {
-    setPreviews((list) => {
-      const filtered = list.filter((item) => item.id !== id);
-      return [...filtered];
-    });
-  };
-
-  // 사진 등록하기 다이얼로그 - 파일업로드 인풋 성공 핸들러 -> 미리보기 previews에 이미지 추가
-  const handleSuccess = (fileName: string, file: File): void => {
-    // 이미지 최대 8개 등록 가능
-    if (previews.length >= MAX_PICTURE_COUNT) {
-      toast({
-        title: `이미지는 최대 ${MAX_PICTURE_COUNT}개 등록 가능`,
-        status: 'warning',
-      });
-      return;
-    }
-
-    readAsDataURL(file).then(({ data }) => {
-      setPreviews((list) => {
-        const id = list.length === 0 ? 0 : list[list.length - 1].id + 1;
-        const newList = [...list, { id, url: data, filename: fileName, file }];
-        return newList;
-      });
-    });
-  };
-
-  // 사진 등록하기 다일얼로그 - 파일업로드 인풋 에러 핸들러
-  const handleError = (errorType?: ImageInputErrorTypes): void => {
-    switch (errorType) {
-      case 'invalid-format': {
-        toast({
-          title: `이미지 파일을 선택해주세요`,
-          status: 'warning',
-        });
-        return;
-      }
-      case 'over-size': {
-        toast({
-          title: `이미지 파일은 10MB 이하여야 합니다`,
-          status: 'warning',
-        });
-        return;
-      }
-      default: {
-        toast({
-          title: `이미지 파일을 선택해주세요`,
-          status: 'warning',
-        });
-      }
-    }
-  };
-
-  // 사진 등록하기 다일얼로그 - 닫기 핸들러
-  const handleClose = (): void => {
-    setPreviews([]);
-    onClose();
-  };
 
   /** 사진 등록 다이얼로그에서 저장 눌렀을때 - 이미지 저장하는 핸들러 */
   const registImage = useGoodsImageMutation();
-  const savePictures = async (): Promise<void> => {
+  const savePictures = async (
+    previews: Preview[],
+    onSuccess?: () => void,
+  ): Promise<void> => {
     if (!profileData) return;
 
     // 사진 개수 제한 - 저장된 이미지 + 등록할 이미지 개수가 8개 넘어가면 저장 안되도록
@@ -165,7 +139,10 @@ export function GoodsRegistPictures(): JSX.Element {
         prevImages.length > 0 ? prevImages[prevImages.length - 1].cut_number : -1;
 
       // s3에 업로드, images에는 image(url)과 cut_number(previews에서 인덱스값) 이 들어있다
-      const imageUrls = await imageFileListToImageDto(previews, profileData.email);
+      const imageUrls = await saveImageFileListToS3AndReturnImageDto(
+        previews,
+        profileData.email,
+      );
 
       // 이미지record 생성
       const result = await registImage.mutateAsync(
@@ -179,8 +156,7 @@ export function GoodsRegistPictures(): JSX.Element {
       setValue('image', prevImages ? [...prevImages, ...result] : [...result]);
 
       toast({ title: '이미지가 저장되었습니다', status: 'success' });
-
-      handleClose();
+      if (onSuccess) onSuccess();
     } catch (error: any) {
       console.error(error);
       if (error?.response && error?.response?.status === 400) {
@@ -199,20 +175,27 @@ export function GoodsRegistPictures(): JSX.Element {
   // formState에 연결된 imageDto[]
   const savedImages = watch('image');
 
+  // * 삭제 다이얼로그에서
   // 등록된 이미지 목록에서 이미지 삭제 핸들러 - db 에서 goodsImage 삭제
+  const [deleteImageId, setDeleteImageId] = useState<number | null>(null);
   const deleteImage = useDeleteGoodsImageMutation();
-  const deletePicture = async (imageId: number): Promise<void> => {
-    try {
-      const prevImages = getValues('image');
-      const newImages = prevImages ? prevImages.filter((img) => img.id !== imageId) : [];
+  const deletePicture = async (): Promise<void> => {
+    if (deleteImageId) {
+      try {
+        const prevImages = getValues('image');
+        const newImages = prevImages
+          ? prevImages.filter((img) => img.id !== deleteImageId)
+          : [];
 
-      await deleteImage.mutateAsync(imageId);
-      setValue('image', newImages);
+        await deleteImage.mutateAsync(deleteImageId);
+        setValue('image', newImages);
+        setDeleteImageId(null);
 
-      toast({ title: '이미지가 삭제되었습니다', status: 'success' });
-    } catch (error) {
-      console.error(error);
-      toast({ title: '이미지 삭제 중 오류가 발생했습니다', status: 'error' });
+        toast({ title: '이미지가 삭제되었습니다', status: 'success' });
+      } catch (error) {
+        console.error(error);
+        toast({ title: '이미지 삭제 중 오류가 발생했습니다', status: 'error' });
+      }
     }
   };
 
@@ -221,77 +204,86 @@ export function GoodsRegistPictures(): JSX.Element {
   return (
     <SectionWithTitle title="상품사진 *" variant="outlined">
       <Stack spacing={4}>
-        <Text>썸네일 이미지로 사용됩니다. 가로세로 1:1 비율인 이미지를 추천합니다.</Text>
+        <Text>
+          썸네일 이미지로 사용됩니다. 가로세로 1:1 비율인 이미지를 추천합니다. (최대 8개
+          등록 가능)
+        </Text>
         <Box>
           <Button onClick={onOpen}>사진 등록하기</Button>
         </Box>
-
-        {!!goodsId && (
-          <Text>
-            등록된 이미지 (등록된 이미지 삭제시 &apos;수정&apos; 버튼을 누르지 않아도 바로
-            상품에 반영됩니다)
-          </Text>
-        )}
+        <Divider />
 
         {/* 등록된 이미지 목록 */}
-        <Stack direction="row" flexWrap="wrap" spacing={2}>
-          {savedImages &&
-            savedImages.map((i) => (
-              <GoodsPreviewItem
-                key={i.id}
-                id={i.id as number}
-                filename={i.image}
-                url={i.image || ''}
-                {...PREVIEW_SIZE}
-                onDelete={() => deletePicture(i.id as number)}
-              />
-            ))}
+        <Stack>
+          <Stack direction="row" alignItems="center">
+            <Text>등록된 이미지</Text>
+            {savedImages.length > 0 && (
+              <Button size="sm" onClick={imageOrderChangeDialog.onOpen}>
+                순서 변경하기
+              </Button>
+            )}
+          </Stack>
+
+          {savedImages.length > 0 ? (
+            <Stack direction="row" flexWrap="wrap" spacing={2}>
+              {savedImages.map((i) => (
+                <Box key={i.id} position="relative">
+                  <ChakraNextImage
+                    layout="intrinsic"
+                    alt={i.image}
+                    src={i.image || ''}
+                    {...PREVIEW_SIZE}
+                  />
+                  <Box
+                    bg="rgba(0,0,0,0.3)"
+                    width="100%"
+                    height={`${PREVIEW_SIZE.height / 3}px`}
+                    position="absolute"
+                    left={0}
+                    top={0}
+                  />
+                  <IconButton
+                    aria-label="등록된 이미지 삭제"
+                    icon={<CloseIcon />}
+                    size="xs"
+                    position="absolute"
+                    right={0}
+                    top={0}
+                    onClick={() => {
+                      setDeleteImageId(i.id || null);
+                      imageDeleteConfirmDialog.onOpen();
+                    }}
+                  />
+                </Box>
+              ))}
+            </Stack>
+          ) : (
+            <Text>없음</Text>
+          )}
         </Stack>
       </Stack>
 
-      <Modal isOpen={isOpen} onClose={handleClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>등록할 상품 사진을 선택해주세요</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack>
-              <Text>사진첨부</Text>
-              <ImageInput
-                multiple
-                handleSuccess={handleSuccess}
-                handleError={handleError}
-                variant="chakra"
-              />
-              <Divider />
-              <Text>등록할 상품 사진 미리보기</Text>
-              {/* 이미지 미리보기 목록 */}
-              <Stack direction="row" spacing={2} flexWrap="wrap">
-                {previews.length !== 0 &&
-                  previews.map((preview) => {
-                    const { id, filename, url } = preview;
-                    return (
-                      <GoodsPreviewItem
-                        key={id}
-                        id={id}
-                        filename={filename}
-                        url={(url as string) || ''}
-                        {...PREVIEW_SIZE}
-                        onDelete={() => deletePreview(id)}
-                      />
-                    );
-                  })}
-              </Stack>
-            </Stack>
-          </ModalBody>
-          <ModalFooter>
-            <Button mr={3} onClick={savePictures} isLoading={registImage.isLoading}>
-              저장
-            </Button>
-            <Button onClick={handleClose}>취소</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <GoodsRegistPictureDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        onSave={savePictures}
+        isLoading={registImage.isLoading}
+      />
+
+      <GoodsRegistPictureOrderChangeDialog
+        savedImages={savedImages}
+        isOpen={imageOrderChangeDialog.isOpen}
+        onClose={imageOrderChangeDialog.onClose}
+      />
+
+      <ConfirmDialog
+        isOpen={imageDeleteConfirmDialog.isOpen}
+        onClose={imageDeleteConfirmDialog.onClose}
+        title="이미지 삭제"
+        onConfirm={deletePicture}
+      >
+        <Text>해당 이미지를 삭제하시겠습니까?</Text>
+      </ConfirmDialog>
     </SectionWithTitle>
   );
 }
