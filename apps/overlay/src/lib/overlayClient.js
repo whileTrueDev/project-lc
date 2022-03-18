@@ -432,7 +432,7 @@ socket.on('get objective message', async (data) => {
     <span>님의 구매로 </span> 
     <span>${stringifiedPrice}</span>
     <span>만원 돌파!</span>
-    <iframe src="/audio/news_sound.mp3"
+    <iframe src="/audio/news_alarm.mp3"
     id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     `,
   );
