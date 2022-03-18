@@ -1,8 +1,6 @@
 # Name of the app to check. Change this to your application name!
 APP=$1
 
-yarn install
-
 # Run the affected command, comparing latest commit to the one before that
 yarn nx affected:apps --plain --base HEAD~1 --head HEAD | grep $APP -q
 
