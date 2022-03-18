@@ -23,3 +23,13 @@ export const useDeleteGoodsImageMutation = (): UseMutationResult<
     axios.delete<boolean>('/goods/image', { data: { imageId } }).then((res) => res.data),
   );
 };
+
+export const useGoodsImageOrderMutation = (): UseMutationResult<
+  boolean,
+  AxiosError,
+  GoodsImageDto[]
+> => {
+  return useMutation<boolean, AxiosError, GoodsImageDto[]>((dto: GoodsImageDto[]) =>
+    axios.patch<boolean>('/goods/image', dto).then((res) => res.data),
+  );
+};
