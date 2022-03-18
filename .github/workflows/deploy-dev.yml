@@ -81,6 +81,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
       - name: Check api affected
         run: tools/check-need-deploy.sh api
 
@@ -128,6 +132,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
       - name: Check Overlay affected
         run: tools/check-need-deploy.sh overlay
@@ -177,6 +185,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
       - name: Check Overlay affected
         run: tools/check-need-deploy.sh overlay-controller
 
@@ -225,6 +237,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
       - name: Check RealtimeAPI affected
         run: tools/check-need-deploy.sh realtimeapi
 
@@ -266,6 +282,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
       - name: Check Mailer affected
         run: tools/check-need-deploy.sh mailer
