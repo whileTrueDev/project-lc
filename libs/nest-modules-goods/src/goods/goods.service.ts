@@ -528,17 +528,15 @@ export class GoodsService extends ServiceBaseWithCache {
     }
   }
 
-  /** 여러 상품 이미지 데이터 수정 */
+  /** 여러 상품 이미지 데이터 순서 수정 */
   public async updateGoodsImages(dto: GoodsImageDto[]): Promise<boolean> {
-    console.log('update images', dto);
-    await Promise.all(
-      dto.map((image) => {
-        const { id, ...data } = image;
-        return this.prisma.goodsImages.update({
-          where: { id },
-          data,
-        });
-      }),
+    await this.prisma.$transaction(
+      dto.map((image) =>
+        this.prisma.goodsImages.update({
+          where: { id: image.id },
+          data: { cut_number: image.cut_number },
+        }),
+      ),
     );
     return true;
   }
