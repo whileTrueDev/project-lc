@@ -63,16 +63,6 @@ jobs:
             --base=$BEFORE_SHA \
             --args="--registry=$ECR_REGISTRY"
 
-  InstallDependency:
-    name: Install Dependencies to self-hosted machine
-    runs-on: [self-hosted, linux, project-lc-dev]
-    needs: [Build]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Install dependencies #  Install All Dependencies
-        run: yarn install
-
   DeployAPI:
     name: Deploy API Job
     runs-on: [self-hosted, linux, project-lc-dev]
@@ -80,10 +70,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+      - name: Install dependencies #  Install All Dependencies
+        run: yarn install
 
       - name: Check api affected
         run: tools/check-need-deploy.sh api
@@ -132,10 +120,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+      - name: Install dependencies #  Install All Dependencies
+        run: yarn install
 
       - name: Check Overlay affected
         run: tools/check-need-deploy.sh overlay
@@ -184,10 +170,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+      - name: Install dependencies #  Install All Dependencies
+        run: yarn install
 
       - name: Check Overlay affected
         run: tools/check-need-deploy.sh overlay-controller
@@ -236,10 +220,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+      - name: Install dependencies #  Install All Dependencies
+        run: yarn install
 
       - name: Check RealtimeAPI affected
         run: tools/check-need-deploy.sh realtimeapi
@@ -282,10 +264,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+      - name: Install dependencies #  Install All Dependencies
+        run: yarn install
 
       - name: Check Mailer affected
         run: tools/check-need-deploy.sh mailer
