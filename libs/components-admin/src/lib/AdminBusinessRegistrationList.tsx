@@ -1,10 +1,18 @@
-import { Badge, Button, useDisclosure } from '@chakra-ui/react';
-import { GridCellParams, GridColumns } from '@material-ui/data-grid';
+import { Badge, Button, useDisclosure, Box, Select } from '@chakra-ui/react';
+import {
+  GridCellParams,
+  GridColumns,
+  GridToolbarContainer,
+  GridToolbarFilterButton,
+  GridFilterInputValueProps,
+  GridFilterModel,
+  getGridStringOperators,
+} from '@material-ui/data-grid';
 import { SellerBusinessRegistration } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useDisplaySize, useAdminSettlementInfo } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { AdminBusinessRegistrationConfirmationDialog } from './AdminBusinessRegistrationConfirmationDialog';
 import { AdminBusinessRegistrationRejectionDialog } from './AdminBusinessRegistrationRejectionDialog';
 import { AdminImageDownloadButton } from './AdminImageDownloadButton';
@@ -13,6 +21,7 @@ const columns: GridColumns = [
   {
     field: 'businessRegistrationStatus',
     headerName: '검수상태',
+    valueGetter: (params) => params.row.BusinessRegistrationConfirmation.status,
     renderCell: (params) => (
       <ConfirmationBadge status={params.row.BusinessRegistrationConfirmation.status} />
     ),
@@ -157,26 +166,82 @@ export function AdminBusinessRegistrationList(): JSX.Element {
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
   };
 
+  function CustomToolbar(): JSX.Element {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarFilterButton />
+      </GridToolbarContainer>
+    );
+  }
+
+  function RegistrationStatusValue(props: GridFilterInputValueProps): JSX.Element {
+    const { item, applyValue } = props;
+
+    const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>): void => {
+      applyValue({ ...item, value: event.target.value });
+    };
+
+    return (
+      <Box mt={2}>
+        <Select onChange={handleFilterChange} value={item.value}>
+          <option value="">전체</option>
+          <option value="confirmed">승인됨</option>
+          <option value="rejected">반려됨</option>
+          <option value="waiting">대기중</option>
+        </Select>
+      </Box>
+    );
+  }
+
+  const [filterModel, setFilterModel] = useState<GridFilterModel>({
+    items: [],
+  });
+
+  if (columns.length > 0) {
+    const statusColumn = columns.find(
+      (column) => column.field === 'businessRegistrationStatus',
+    );
+    const statusColIndex = columns.findIndex(
+      (col) => col.field === 'businessRegistrationStatus',
+    );
+
+    const statusFilterOperators = getGridStringOperators().map((operator) => ({
+      ...operator,
+      InputComponent: RegistrationStatusValue,
+    }));
+    columns[statusColIndex] = {
+      ...statusColumn,
+      field: 'businessRegistrationStatus',
+      filterOperators: statusFilterOperators,
+    };
+  }
+
   return (
     <>
       {settlementData && (
-        <ChakraDataGrid
-          borderWidth={0}
-          hideFooter
-          headerHeight={50}
-          minH={300}
-          density="compact"
-          columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
-          rows={makeListRow<SellerBusinessRegistration>(
-            settlementData.sellerBusinessRegistration,
-          )}
-          rowCount={5}
-          rowsPerPageOptions={[25, 50]}
-          onCellClick={handleClick}
-          disableColumnMenu
-          disableColumnFilter
-          disableSelectionOnClick
-        />
+        <>
+          <ChakraDataGrid
+            borderWidth={0}
+            hideFooter
+            headerHeight={50}
+            minH={300}
+            density="compact"
+            columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
+            rows={makeListRow<SellerBusinessRegistration>(
+              settlementData.sellerBusinessRegistration,
+            )}
+            components={{
+              Toolbar: CustomToolbar,
+            }}
+            filterModel={filterModel}
+            onFilterModelChange={(model) => setFilterModel(model)}
+            rowCount={5}
+            rowsPerPageOptions={[25, 50]}
+            onCellClick={handleClick}
+            disableSelectionOnClick
+            disableColumnMenu
+          />
+        </>
       )}
       <AdminBusinessRegistrationRejectionDialog
         isOpen={isRejectionOpen}
