@@ -17,10 +17,10 @@ export interface KkshowShoppingTabGoodsData extends ImageCard {
 
 // 후기 정보 타입
 export interface KkshowShoppingTabReviewData extends ImageCard {
-  title: string;
-  contents: string;
-  createDate: Date;
-  rating: number;
+  title: string; // 후기 제목
+  contents: string; // 후기 내용
+  createDate: Date; // 후기 작성일
+  rating: number; // 후기 별점
 }
 
 // 테마 키워드 타입
@@ -30,9 +30,9 @@ export type KkshowShoppingTabKeyword = {
   linkUrl: string; // 링크주소
 };
 export interface KkshowShoppingTabThemeData {
-  theme: KkshowShopingTabTheme;
-  keywords: KkshowShoppingTabKeyword[];
-  imageUrl: string;
+  theme: KkshowShopingTabTheme; // 테마
+  keywords: KkshowShoppingTabKeyword[]; // 키워드 목록
+  imageUrl: string; // 테마 이미지 url
 }
 
 // 크크쇼 쇼핑탭 데이터 리턴타입
