@@ -143,6 +143,7 @@ export function SettlementList(): JSX.Element | null {
                     csvOptions={{
                       allColumns: true,
                       fileName: `크크쇼_정산내역_${selectedRound}`,
+                      utf8WithBom: true,
                     }}
                   />
                 </Button>
