@@ -1083,3 +1083,15 @@ model KkshowMain {
   bestLive        Json // 베스트라이브 영역 아이템[]
   bestBroadcaster Json // 베스트방송인 영역 아이템[]
 }
+
+// 크크쇼 쇼핑탭 데이터
+model KkshowShoppingTab {
+  id              Int  @id @default(autoincrement())
+  carousel        Json // 쇼팽탭 캐러셀 영역 아이템[]
+  goodsOfTheWeek  Json // 쇼팽탭 금주의 상품 영역 아이템[]
+  newLineUp       Json // 쇼팽탭 신상 라인업 영역 아이템[]
+  popularGoods    Json // 쇼팽탭 많이 찾는 상품 영역 아이템[]
+  recommendations Json // 쇼팽탭 크크마켓 추천상품 영역 아이템[]
+  reviews         Json // 쇼팽탭 생생후기 영역 아이템[]
+  keywords        Json // 쇼팽탭 테마별 키워드 영역 아이템[]
+}
