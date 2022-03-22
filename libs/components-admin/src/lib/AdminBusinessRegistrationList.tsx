@@ -137,6 +137,33 @@ export function ConfirmationBadge({ status }: { status: string }): JSX.Element {
   );
 }
 
+function CustomToolbar(): JSX.Element {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarFilterButton />
+    </GridToolbarContainer>
+  );
+}
+
+function RegistrationStatusValue(props: GridFilterInputValueProps): JSX.Element {
+  const { item, applyValue } = props;
+
+  const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>): void => {
+    applyValue({ ...item, value: event.target.value });
+  };
+
+  return (
+    <Box mt={2}>
+      <Select onChange={handleFilterChange} value={item.value}>
+        <option value="">전체</option>
+        <option value="confirmed">승인됨</option>
+        <option value="rejected">반려됨</option>
+        <option value="waiting">대기중</option>
+      </Select>
+    </Box>
+  );
+}
+
 // 관리자가 볼 계좌번호 등록 리스트
 export function AdminBusinessRegistrationList(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
@@ -165,33 +192,6 @@ export function AdminBusinessRegistrationList(): JSX.Element {
     }
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
   };
-
-  function CustomToolbar(): JSX.Element {
-    return (
-      <GridToolbarContainer>
-        <GridToolbarFilterButton />
-      </GridToolbarContainer>
-    );
-  }
-
-  function RegistrationStatusValue(props: GridFilterInputValueProps): JSX.Element {
-    const { item, applyValue } = props;
-
-    const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-      applyValue({ ...item, value: event.target.value });
-    };
-
-    return (
-      <Box mt={2}>
-        <Select onChange={handleFilterChange} value={item.value}>
-          <option value="">전체</option>
-          <option value="confirmed">승인됨</option>
-          <option value="rejected">반려됨</option>
-          <option value="waiting">대기중</option>
-        </Select>
-      </Box>
-    );
-  }
 
   const [filterModel, setFilterModel] = useState<GridFilterModel>({
     items: [],
