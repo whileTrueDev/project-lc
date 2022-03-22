@@ -25,7 +25,10 @@ export interface KkshowShoppingTabReviewData extends ImageCard {
 
 // 테마 키워드 타입
 export type KkshowShopingTabTheme = string;
-export type KkshowShoppingTabKeyword = string;
+export type KkshowShoppingTabKeyword = {
+  keyword: string; // 키워드
+  linkUrl: string; // 링크주소
+};
 export interface KkshowShoppingTabThemeData {
   theme: KkshowShopingTabTheme;
   keywords: KkshowShoppingTabKeyword[];
