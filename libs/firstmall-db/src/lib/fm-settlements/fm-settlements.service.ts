@@ -62,7 +62,8 @@ export class FmSettlementService {
     const exportOptions: FmSettlementTargetOptions[] = await this.db.query(sql2);
 
     // 각 출고아이템의 상품번호를 통해 project-lc seller 정보 조회 (goodsConfirmation)
-    const goods_seq_arr = exportOptions.map((o) => o.goods_seq);
+    const _goods_seq_arr = exportOptions.map((o) => o.goods_seq);
+    const goods_seq_arr = Array.from(new Set(_goods_seq_arr));
 
     // LC 상품 조회
     const lcGoodsList = await this.prisma.goods.findMany({
