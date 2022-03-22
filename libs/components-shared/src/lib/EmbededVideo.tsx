@@ -63,7 +63,7 @@ export function EmbededVideo({
   if (provider === 'twitch') {
     return (
       <TwitchLiveEmbed
-        channel="zilioner"
+        channel={identifier}
         width="100%"
         height="100%"
         onTwitchStateChange={onTwitchStateChange}
