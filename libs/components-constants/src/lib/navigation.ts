@@ -41,8 +41,7 @@ export const mainNavItems: Array<NavItem> = [
 export const kkshowNavLinks: Array<NavItem> = [
   {
     label: '쇼핑',
-    href: 'https://k-kmarket.com/',
-    isExternal: true,
+    href: '/market',
   },
   {
     label: '방송인',
