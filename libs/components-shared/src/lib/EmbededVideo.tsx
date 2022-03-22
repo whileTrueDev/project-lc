@@ -1,7 +1,7 @@
 import { LivePlatform } from '@project-lc/shared-types';
-import { useEffect, useState } from 'react';
 import Youtube from 'react-youtube';
 import { YouTubePlayer } from 'youtube-player/dist/types';
+import { TwitchLiveEmbed } from './TwitchLiveEmbed';
 
 type YoutubeStates = 0 | 1 | 2 | 3 | 5 | -1;
 export interface EmbededVideoProps {
@@ -18,19 +18,14 @@ export interface EmbededVideoProps {
       data: YoutubeStates;
     },
   ) => void;
+  onTwitchStateChange?: (status: 'play' | 'pause' | 'ready' | 'ended') => void;
 }
 export function EmbededVideo({
   provider,
   identifier,
   onYoutubeStateChange,
+  onTwitchStateChange,
 }: EmbededVideoProps): JSX.Element | null {
-  const [myLocationOrigin, setMyLocationHost] = useState('');
-  useEffect(() => {
-    if (typeof window !== undefined) {
-      setMyLocationHost(window.location.hostname);
-    }
-  }, []);
-
   if (provider === 'youtube') {
     return (
       <Youtube
@@ -65,17 +60,13 @@ export function EmbededVideo({
     );
   }
 
-  if (provider === 'twitch' && myLocationOrigin) {
+  if (provider === 'twitch') {
     return (
-      <iframe
-        style={{ borderRadius: '8px' }}
-        title={`Twitch video player - ${identifier}`}
-        src={`https://player.twitch.tv/?channel=${identifier}&parent=${myLocationOrigin}`}
-        frameBorder="0"
-        allowFullScreen
-        scrolling="no"
-        height="100%"
+      <TwitchLiveEmbed
+        channel="zilioner"
         width="100%"
+        height="100%"
+        onTwitchStateChange={onTwitchStateChange}
       />
     );
   }
