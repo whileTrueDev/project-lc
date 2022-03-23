@@ -4,4 +4,8 @@ export interface SearchResultItem {
   title: string;
 }
 
-export type SearchResult = SearchResultItem[];
+export interface SearchResult {
+  goods: SearchResultItem[];
+  liveContents: SearchResultItem[];
+  broadcasters: SearchResultItem[];
+}
