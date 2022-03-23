@@ -9,16 +9,10 @@ import { KKshowMainExternLinks } from '@project-lc/components-web-kkshow/main/KK
 import { KkshowLiveTeaser } from '@project-lc/components-web-kkshow/main/KkshowMainLiveTeaser';
 import { KkshowMainPlusFriend } from '@project-lc/components-web-kkshow/main/KkshowMainPlusFriend';
 import { KksshowBottomQuickMenu } from '@project-lc/components-shared/KksshowBottomQuickMenu';
-import { getKkshowMain, kkshowMainQueryKey, useDisplaySize } from '@project-lc/hooks';
+import { getKkshowMain, kkshowMainQueryKey } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
 import { dehydrate, DehydratedState } from 'react-query';
-import dynamic from 'next/dynamic';
-
-const TwitchLiveEmbed = dynamic(
-  () => import('@project-lc/components-shared/TwitchLiveEmbed'),
-  { ssr: false },
-);
 
 interface KkshowIndexProps {
   dehydratedState: DehydratedState;
@@ -37,7 +31,7 @@ export const getStaticProps: GetStaticProps<KkshowIndexProps> = async () => {
 
 export default function Index(): JSX.Element {
   return (
-    <Box overflow="hidden">
+    <Box overflow="hidden" position="relative">
       <Box
         display={{ base: 'none', md: 'block' }}
         pos="absolute"

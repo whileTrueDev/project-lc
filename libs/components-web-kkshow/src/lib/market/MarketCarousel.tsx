@@ -11,7 +11,7 @@ export function MarketCarousel(): JSX.Element {
     'images/test/banner-3.png',
   ];
   return (
-    <Flex h={{ base: 'calc(100% + 45px)', lg: 550 }} bgColor="blue.500">
+    <Flex h="100%" bgColor="blue.500">
       <Swiper
         updateOnWindowResize
         spaceBetween={120}
@@ -22,12 +22,19 @@ export function MarketCarousel(): JSX.Element {
         loopedSlides={3}
         pagination={{ clickable: true }}
         modules={[Autoplay, Pagination, Navigation]}
-        style={{ height: '100%' }}
+        style={{ height: '100%', paddingBottom: '40px' }} // spacing 5
         autoplay={{ delay: 5 * 1000, disableOnInteraction: false }}
       >
         {contents.map((item, idx) => (
           // eslint-disable-next-line react/no-array-index-key
-          <SwiperSlide style={{ width: 960, margin: '0 auto' }} key={item}>
+          <SwiperSlide
+            style={{
+              margin: '0 auto',
+              width: 1000,
+              maxHeight: 500,
+            }}
+            key={item}
+          >
             {(slideProps) => {
               return <MarketCarouselItem isActive={slideProps.isActive} item={item} />;
             }}
