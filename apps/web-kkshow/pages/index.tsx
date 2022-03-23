@@ -8,10 +8,17 @@ import { KkshowMainCarousel } from '@project-lc/components-web-kkshow/main/Kksho
 import { KKshowMainExternLinks } from '@project-lc/components-web-kkshow/main/KKshowMainExternLinks';
 import { KkshowLiveTeaser } from '@project-lc/components-web-kkshow/main/KkshowMainLiveTeaser';
 import { KkshowMainPlusFriend } from '@project-lc/components-web-kkshow/main/KkshowMainPlusFriend';
-import { getKkshowMain, kkshowMainQueryKey } from '@project-lc/hooks';
+import { KksshowBottomQuickMenu } from '@project-lc/components-shared/KksshowBottomQuickMenu';
+import { getKkshowMain, kkshowMainQueryKey, useDisplaySize } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
 import { dehydrate, DehydratedState } from 'react-query';
+import dynamic from 'next/dynamic';
+
+const TwitchLiveEmbed = dynamic(
+  () => import('@project-lc/components-shared/TwitchLiveEmbed'),
+  { ssr: false },
+);
 
 interface KkshowIndexProps {
   dehydratedState: DehydratedState;
@@ -28,9 +35,9 @@ export const getStaticProps: GetStaticProps<KkshowIndexProps> = async () => {
   };
 };
 
-export function Index(): JSX.Element {
+export default function Index(): JSX.Element {
   return (
-    <Box pos="relative" overflow="hidden">
+    <Box overflow="hidden">
       <Box
         display={{ base: 'none', md: 'block' }}
         pos="absolute"
@@ -42,7 +49,6 @@ export function Index(): JSX.Element {
         right={0}
         zIndex={1}
       />
-
       <Box
         pos="absolute"
         backgroundImage="images/main/bg-circle-2.png"
@@ -53,7 +59,6 @@ export function Index(): JSX.Element {
         left={-75}
         zIndex={1}
       />
-
       <Box
         pos="absolute"
         backgroundImage="images/main/bg-circle-3.png"
@@ -66,22 +71,16 @@ export function Index(): JSX.Element {
       />
 
       <KkshowNavbar />
-
       <KkshowMainCarousel />
-
       <KkshowLiveTeaser />
-
       <KkshowMainBestLive />
-
       <KkshowMainPlusFriend />
-
       <KkshowMainBestBroadcaster />
 
-      <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
+      <KksshowBottomQuickMenu />
 
+      <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />
     </Box>
   );
 }
-
-export default Index;
