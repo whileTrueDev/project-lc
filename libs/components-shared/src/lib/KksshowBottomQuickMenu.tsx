@@ -7,6 +7,7 @@ export function KksshowBottomQuickMenu(): JSX.Element {
   const router = useRouter();
   return (
     <Flex
+      display={{ base: 'flex', md: 'none' }}
       justifyContent="space-around"
       position="fixed"
       bottom="0"

@@ -30,8 +30,6 @@ export const getStaticProps: GetStaticProps<KkshowIndexProps> = async () => {
 };
 
 export function Index(): JSX.Element {
-  const { isMobileSize } = useDisplaySize();
-
   return (
     <Box pos="relative" overflow="hidden">
       <Box
@@ -80,7 +78,7 @@ export function Index(): JSX.Element {
 
       <KkshowMainBestBroadcaster />
 
-      {isMobileSize && <KksshowBottomQuickMenu />}
+      <KksshowBottomQuickMenu />
 
       <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
 
