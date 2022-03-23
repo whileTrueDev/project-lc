@@ -78,13 +78,7 @@ export class AdminService {
         result.sellerSettlementAccount.push(sellerSettlementAccount[0]);
       }
       if (sellerBusinessRegistration.length > 0) {
-        // 사업자등록정보의 상태가 대기 및 반려인 경우에만 보여준다.
-        if (
-          sellerBusinessRegistration[0].BusinessRegistrationConfirmation.status !==
-          BusinessRegistrationStatus.CONFIRMED
-        ) {
-          result.sellerBusinessRegistration.push(sellerBusinessRegistration[0]);
-        }
+        result.sellerBusinessRegistration.push(sellerBusinessRegistration[0]);
       }
     });
 
