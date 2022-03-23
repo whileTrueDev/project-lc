@@ -38,7 +38,7 @@ export function Search(): JSX.Element {
       <Divider />
       <SearchResultContentsSection />
       <Divider />
-      <SearchResultBroadcasterSection />
+      <SearchResultBroadcasterSection data={data.broadcasters} />
     </SearchPageLayout>
   );
 }

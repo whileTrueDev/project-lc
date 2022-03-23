@@ -59,7 +59,7 @@ interface BestBroadcasterItemProps {
   avatarUrl: string;
   href: string;
 }
-function BestBroadcasterItem(props: BestBroadcasterItemProps): JSX.Element {
+export function BestBroadcasterItem(props: BestBroadcasterItemProps): JSX.Element {
   return (
     <LinkBox>
       <Stack
