@@ -13,9 +13,7 @@ export function SearchPageLayout({ children }: SearchPageLayoutProps): JSX.Eleme
     <Box overflow="hidden">
       {/* 검색페이지 네비바는 라이트모드에서 흰색배경이라 variant="white" 적용함 */}
       <KkshowNavbar variant="white" />
-
-      {/* //TODO: 최소높이 지정을 어떻게 하지?? */}
-      <Box minHeight={{ base: '500px', sm: '800px' }}>{children}</Box>
+      {children}
 
       <BottomQuickMenu />
 
