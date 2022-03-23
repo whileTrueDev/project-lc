@@ -27,7 +27,7 @@ export function BottomQuickMenu(): JSX.Element {
             </VStack>
           </Center>
         ) : (
-          <Center w="100%">
+          <Center w="100%" key={link.name}>
             <VStack as="button" width="80%" onClick={link.onClick}>
               <Icon as={link.icon} width={5} height={5} />
               <Text>{link.name}</Text>
