@@ -37,7 +37,7 @@ export const getStaticProps: GetStaticProps<KkshowIndexProps> = async () => {
 
 export default function Index(): JSX.Element {
   return (
-    <Box overflow="hidden">
+    <Box overflow="hidden" position="relative">
       <Box
         display={{ base: 'none', md: 'block' }}
         pos="absolute"
