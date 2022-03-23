@@ -26,3 +26,7 @@ export function SearchResultSectionContainer({
     </Box>
   );
 }
+
+export function SearchResultEmptyText(): JSX.Element {
+  return <Text>검색 결과가 없습니다</Text>;
+}
