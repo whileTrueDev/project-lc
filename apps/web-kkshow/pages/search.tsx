@@ -34,7 +34,7 @@ export function Search(): JSX.Element {
     <SearchPageLayout>
       <SearchKeywordSection keyword={searchKeyword} result={data} />
       <Divider />
-      <SearchResultGoodsSection />
+      <SearchResultGoodsSection data={data.goods} />
       <Divider />
       <SearchResultContentsSection />
       <Divider />
