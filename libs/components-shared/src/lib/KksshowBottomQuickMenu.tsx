@@ -12,10 +12,11 @@ export function KksshowBottomQuickMenu(): JSX.Element {
       position="fixed"
       bottom="0"
       right="0"
-      bgColor={useColorModeValue('gray.100', 'gray.700')}
-      borderTop="1px solid #d2d2d2"
+      bgColor={useColorModeValue('white', 'gray.700')}
+      borderTop="1px solid"
+      borderColor={useColorModeValue('gray.300', 'gray.600')}
       width="100%"
-      height="10vh"
+      height="7vh"
       zIndex="docked"
     >
       {quickMenuLinks.map((link) =>
