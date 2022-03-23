@@ -30,14 +30,18 @@ export function KkshowMainCarouselContents({
       __identifier: string,
       event: { youtubePlayer: YouTubePlayer; data: 0 | 1 | 2 | 3 | 5 | -1 },
     ): void => {
-      if (event.data === 1) {
-        // 재생상태로 전환시
-        swiper.autoplay.stop();
-      }
-      if (event.data === 2 || event.data === 0) {
-        // 일시정지(2)시 or 동영상 종료시 (0)
-        swiper.autoplay.start();
-      }
+      // 재생상태로 전환시
+      if (event.data === 1) swiper.autoplay.stop();
+      // 일시정지(2)시 or 동영상 종료시 (0)
+      if (event.data === 2 || event.data === 0) swiper.autoplay.start();
+    },
+    [swiper.autoplay],
+  );
+
+  const handleTwitchStateChange = useCallback(
+    (status: 'play' | 'pause' | 'ready' | 'ended'): void => {
+      if (status === 'play') swiper.autoplay.stop();
+      else swiper.autoplay.start();
     },
     [swiper.autoplay],
   );
@@ -79,6 +83,7 @@ export function KkshowMainCarouselContents({
           provider={item.platform}
           identifier={item.videoUrl}
           onYoutubeStateChange={handleYoutubeStateChange}
+          onTwitchStateChange={handleTwitchStateChange}
         />
       </KkshowMainCarouselContentsContainer>
     );
