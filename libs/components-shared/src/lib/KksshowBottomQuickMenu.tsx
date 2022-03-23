@@ -1,4 +1,4 @@
-import { VStack, Center, SimpleGrid, Text } from '@chakra-ui/react';
+import { VStack, Center, Text, useColorModeValue, Flex } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { quickMenuLinks } from '@project-lc/components-constants/quickMenu';
 import { Icon } from '@chakra-ui/icons';
@@ -6,16 +6,16 @@ import { Icon } from '@chakra-ui/icons';
 export function KksshowBottomQuickMenu(): JSX.Element {
   const router = useRouter();
   return (
-    <SimpleGrid
-      columns={3}
+    <Flex
+      justifyContent="space-around"
       position="fixed"
       bottom="0"
       right="0"
-      bgColor="gray.100"
+      bgColor={useColorModeValue('gray.100', 'gray.700')}
       borderTop="1px solid #d2d2d2"
       width="100%"
       height="10vh"
-      zIndex="9999"
+      zIndex="docked"
     >
       {quickMenuLinks.map((link) =>
         link.type === 'link' ? (
@@ -27,14 +27,14 @@ export function KksshowBottomQuickMenu(): JSX.Element {
           </Center>
         ) : (
           <Center w="100%">
-            <VStack as="button" width="80%" onClick={link.onClickFunction}>
+            <VStack as="button" width="80%" onClick={link.onClick}>
               <Icon as={link.icon} width={5} height={5} />
               <Text>{link.name}</Text>
             </VStack>
           </Center>
         ),
       )}
-    </SimpleGrid>
+    </Flex>
   );
 }
 
