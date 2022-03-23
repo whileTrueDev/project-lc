@@ -3,6 +3,8 @@ import { kkshowNavLinks, NavItem } from '@project-lc/components-constants/naviga
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { KksLogo } from '@project-lc/components-shared/KksLogo';
 import NextLink from 'next/link';
+import { SearchButton } from './SearchButton';
+import { GlobalSearcher } from './GlobalSearcher';
 
 export function KkshowNavbar(): JSX.Element {
   const navHeight = 120;
@@ -44,7 +46,8 @@ export function KkshowNavbar(): JSX.Element {
         <Flex alignItems="center">
           <ColorModeSwitcher _hover={{}} />
           {/* // TODO: 검색 기능 추가 이후 주석 해제 */}
-          {/* <GlobalSearcher /> */}
+          <SearchButton />
+          <GlobalSearcher />
         </Flex>
       </Flex>
 
