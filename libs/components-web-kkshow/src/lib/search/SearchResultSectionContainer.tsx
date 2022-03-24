@@ -1,16 +1,16 @@
-import { Box, Text, Heading, Stack, Container, Button } from '@chakra-ui/react';
+import { Box, Container, Heading, Stack, Text } from '@chakra-ui/react';
 
 /** 상품, 라이브컨텐츠, 크리에이터 영역 레이아웃 컴포넌트 */
 export function SearchResultSectionContainer({
   title,
   resultCount,
   children,
-  seeMoreButtonHandler,
+  actionButton,
 }: {
   title: string;
   resultCount?: number;
   children: React.ReactNode;
-  seeMoreButtonHandler?: () => void;
+  actionButton?: React.ReactNode;
 }): JSX.Element {
   return (
     <Box>
@@ -24,13 +24,7 @@ export function SearchResultSectionContainer({
               {resultCount && <Text>{resultCount}개의 검색결과</Text>}
             </Stack>
 
-            {seeMoreButtonHandler && (
-              <Box alignSelf="flex-end">
-                <Button colorScheme="blue" variant="link" onClick={seeMoreButtonHandler}>
-                  더보기
-                </Button>
-              </Box>
-            )}
+            {actionButton && <Box alignSelf="flex-end">{actionButton}</Box>}
           </Stack>
           <Box>{children}</Box>
         </Stack>
