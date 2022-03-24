@@ -240,4 +240,14 @@ export class AppScreenGateway
   getVirtualCharacter(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('get virtual character from server');
   }
+
+  @SubscribeMessage('get virtual character audio from admin')
+  getVirtualCharacterAudio(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('get virtual character audio from server');
+  }
+
+  @SubscribeMessage('delete virtual character audio from admin')
+  deleteVirtualCharacterAudio(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('delete virtual character audio from server');
+  }
 }

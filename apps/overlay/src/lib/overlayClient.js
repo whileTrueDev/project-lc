@@ -658,11 +658,18 @@ socket.on('get soldout signal from server', async () => {
 });
 
 socket.on('get virtual character from server', async () => {
-  $('.virtual-background').css({ opacity: 1 });
+  $('.virtual-background').toggle();
+});
+
+socket.on('get virtual character audio from server', async () => {
   $('body').append(`
-    <iframe src="https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-audio/testbc%40gmail.com/1/01+Itchin'+on+a+Photograph.mp3"
+    <iframe src="https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-audio/testbc%40gmail.com/1/voice"
      id="virtual-voice" allow="autoplay" style="display:none"></iframe>
     `);
+});
+
+socket.on('delete virtual character audio from server', async () => {
+  $('#virtual-voice').remove();
 });
 
 socket.on('remove soldout banner from server', () => {
