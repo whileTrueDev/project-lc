@@ -1,21 +1,15 @@
-import { Box, useBreakpointValue, Button } from '@chakra-ui/react';
+import { Box, useBreakpointValue } from '@chakra-ui/react';
 import { SearchResultItem } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
-import { Pagination, Scrollbar, Grid as SwiperGrid } from 'swiper';
+import { Grid as SwiperGrid, Pagination, Scrollbar } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { GoodsCard } from './GoodsCard';
 import {
   SearchResultEmptyText,
   SearchResultSectionContainer,
+  SeeMoreButton,
 } from './SearchResultSectionContainer';
 
-function SeeMoreButton({ onClick }: { onClick: () => void }): JSX.Element {
-  return (
-    <Button variant="link" colorScheme="blue" onClick={onClick}>
-      더보기
-    </Button>
-  );
-}
 export interface SearchResultGoodsSectionProps {
   data: SearchResultItem[];
   keyword?: string;

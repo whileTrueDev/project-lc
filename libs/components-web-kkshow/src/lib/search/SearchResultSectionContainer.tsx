@@ -1,4 +1,4 @@
-import { Box, Container, Heading, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Container, Heading, Stack, Text } from '@chakra-ui/react';
 
 /** 상품, 라이브컨텐츠, 크리에이터 영역 레이아웃 컴포넌트 */
 export function SearchResultSectionContainer({
@@ -35,4 +35,12 @@ export function SearchResultSectionContainer({
 
 export function SearchResultEmptyText(): JSX.Element {
   return <Text>검색 결과가 없습니다</Text>;
+}
+
+export function SeeMoreButton({ onClick }: { onClick: () => void }): JSX.Element {
+  return (
+    <Button variant="link" colorScheme="blue" onClick={onClick}>
+      더보기
+    </Button>
+  );
 }
