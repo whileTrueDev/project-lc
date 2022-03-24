@@ -1,7 +1,10 @@
 import { Box, LinkBox, LinkOverlay, Stack, Text, useBoolean } from '@chakra-ui/react';
 import { SearchResultItem } from '@project-lc/shared-types';
 import { motion } from 'framer-motion';
+import { Pagination, Scrollbar } from 'swiper';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import NextLink from 'next/link';
+import { ArrowForwardIcon, Icon } from '@chakra-ui/icons';
 import {
   SearchResultEmptyText,
   SearchResultSectionContainer,
@@ -20,14 +23,25 @@ function GoodsCard({ item }: { item: SearchResultItem }): JSX.Element {
     <LinkBox onMouseOver={setMouseOver.on} onMouseOut={setMouseOver.off}>
       <NextLink href={item.linkUrl} passHref>
         <LinkOverlay isExternal={item.linkUrl.includes('http')}>
-          <Stack w={{ base: '132px', sm: '260px' }}>
-            <Box rounded="xl" overflow="hidden">
+          <Stack minW="132px">
+            <Box rounded="xl" overflow="hidden" position="relative">
               <motion.img
                 src={item.imageUrl}
                 initial="normal"
                 animate={mouseOver ? 'scale' : 'normal'}
                 variants={variants}
                 style={{ objectFit: 'cover' }}
+              />
+              <Icon
+                as={ArrowForwardIcon}
+                position="absolute"
+                right={2}
+                bottom={2}
+                color="white"
+                rounded="full"
+                bg="rgba(0,0,0,0.4)"
+                p={1}
+                boxSize="2em"
               />
             </Box>
             <Text fontFamily="Gmarket Sans" textAlign="center">
@@ -49,11 +63,28 @@ export function SearchResultGoodsSection({
   return (
     <SearchResultSectionContainer title="상품" resultCount={data.length}>
       {data.length > 0 ? (
-        <Stack direction="row" flexWrap="wrap">
-          {data.map((item) => (
-            <GoodsCard key={item.title} item={item} />
-          ))}
-        </Stack>
+        <>
+          {/* (breakpoint: md 이상 기준) 상품 검색결과 목록 */}
+          <Box display={{ base: 'none', md: 'block' }}>
+            <Swiper
+              scrollbar
+              modules={[Pagination, Scrollbar]}
+              slidesPerView="auto"
+              spaceBetween={30}
+            >
+              {data.map((item, index) => {
+                const key = `${item.title}_${index}`;
+                return (
+                  <SwiperSlide key={key} style={{ width: '20%', paddingBottom: '32px' }}>
+                    <GoodsCard key={key} item={item} />
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+          </Box>
+          {/* (breakpoint: md 미만 기준) 상품 검색결과 목록 - 그리드 */}
+          <Box display={{ base: 'block', md: 'none' }} />
+        </>
       ) : (
         <SearchResultEmptyText />
       )}

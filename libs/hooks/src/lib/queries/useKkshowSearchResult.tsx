@@ -29,6 +29,36 @@ const dummyData: KkshowSearchResult = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=178',
       title: '돼지 등뼈와 우거지가 가득한 뼈해장국',
     },
+    {
+      imageUrl: 'https://k-kmarket.com/data/goods/1/2022/02/_temp_16449174261446view.jpg',
+      linkUrl: 'https://k-kmarket.com/goods/view?no=181',
+      title: '백종원의 3대천왕 출연 속초 닭강정 (더 매운 맛)',
+    },
+    {
+      imageUrl: 'https://k-kmarket.com/data/goods/1/2022/02/_temp_16448938223899view.png',
+      linkUrl: 'https://k-kmarket.com/goods/view?no=178',
+      title: '돼지 등뼈와 우거지가 가득한 뼈해장국',
+    },
+    {
+      imageUrl: 'https://k-kmarket.com/data/goods/1/2022/02/_temp_16449174261446view.jpg',
+      linkUrl: 'https://k-kmarket.com/goods/view?no=181',
+      title: '백종원의 3대천왕 출연 속초 닭강정 (더 매운 맛)',
+    },
+    {
+      imageUrl: 'https://k-kmarket.com/data/goods/1/2022/02/_temp_16448938223899view.png',
+      linkUrl: 'https://k-kmarket.com/goods/view?no=178',
+      title: '돼지 등뼈와 우거지가 가득한 뼈해장국',
+    },
+    {
+      imageUrl: 'https://k-kmarket.com/data/goods/1/2022/02/_temp_16449174261446view.jpg',
+      linkUrl: 'https://k-kmarket.com/goods/view?no=181',
+      title: '백종원의 3대천왕 출연 속초 닭강정 (더 매운 맛)',
+    },
+    {
+      imageUrl: 'https://k-kmarket.com/data/goods/1/2022/02/_temp_16448938223899view.png',
+      linkUrl: 'https://k-kmarket.com/goods/view?no=178',
+      title: '돼지 등뼈와 우거지가 가득한 뼈해장국',
+    },
   ],
   liveContents: [
     {
