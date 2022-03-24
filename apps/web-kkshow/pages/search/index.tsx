@@ -40,7 +40,7 @@ export function Search(): JSX.Element {
       <Divider />
       <SearchResultGoodsSection keyword={searchKeyword} data={data.goods} />
       <Divider />
-      <SearchResultLiveContentsSection />
+      <SearchResultLiveContentsSection keyword={searchKeyword} data={data.liveContents} />
       <Divider />
       <SearchResultBroadcasterSection data={data.broadcasters} />
     </SearchPageLayout>
