@@ -41,7 +41,7 @@ export function SearchResultBroadcasterSection({
           {/* (breakpoint: md 이상 기준) */}
           <Box display={{ base: 'none', md: 'block' }}>
             <Swiper
-              style={{ paddingTop: 24, paddingBottom: 24, width: '100%' }}
+              style={{ paddingTop: 16, paddingBottom: 16, width: '100%' }}
               modules={[Pagination, Scrollbar]}
               slidesPerView="auto"
               spaceBetween={16}
@@ -63,7 +63,7 @@ export function SearchResultBroadcasterSection({
           {/* (breakpoint: md 미만 기준) - 그리드 */}
           <Box display={{ base: 'block', md: 'none' }}>
             <Swiper
-              style={{ paddingTop: 24, paddingBottom: 24, width: '100%' }}
+              style={{ paddingTop: 16, paddingBottom: 16, width: '100%' }}
               modules={[SwiperGrid]}
               slidesPerView={2}
               grid={{ rows: 2, fill: 'row' }}

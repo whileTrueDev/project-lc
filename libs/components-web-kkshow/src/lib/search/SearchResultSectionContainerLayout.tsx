@@ -16,7 +16,7 @@ export function SearchResultSectionContainerLayout({
   return (
     <Box>
       <Container maxW="6xl">
-        <Stack py={{ base: 12, md: 16 }}>
+        <Stack py={{ base: 6, md: 10 }} spacing={8}>
           <Stack direction="row" justify="space-between" fontWeight="bold" width="100%">
             <Stack direction="row" alignItems="flex-end">
               <Heading color="blue.500" fontSize="3xl">
