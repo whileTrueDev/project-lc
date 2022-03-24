@@ -1,17 +1,18 @@
 import { Box, Button, Container, Heading, Stack, Text } from '@chakra-ui/react';
 
+export interface SearchResultSectionContainerProps {
+  title: string;
+  resultCount?: number;
+  children: React.ReactNode;
+  actionButton?: React.ReactNode;
+}
 /** 상품, 라이브컨텐츠, 크리에이터 영역 레이아웃 컴포넌트 */
 export function SearchResultSectionContainer({
   title,
   resultCount,
   children,
   actionButton,
-}: {
-  title: string;
-  resultCount?: number;
-  children: React.ReactNode;
-  actionButton?: React.ReactNode;
-}): JSX.Element {
+}: SearchResultSectionContainerProps): JSX.Element {
   return (
     <Box>
       <Container maxW="6xl">

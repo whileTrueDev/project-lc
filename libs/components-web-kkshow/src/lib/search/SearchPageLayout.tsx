@@ -2,12 +2,17 @@ import { Box } from '@chakra-ui/react';
 import BottomQuickMenu from '@project-lc/components-shared/BottomQuickMenu';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
-import KKshowMainExternLinks from '../main/KKshowMainExternLinks';
+import { useKkshowSearchResult } from '@project-lc/hooks';
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import { SearchResult } from '@project-lc/shared-types';
 import KkshowNavbar from '../KkshowNavbar';
+import KKshowMainExternLinks from '../main/KKshowMainExternLinks';
 
 export interface SearchPageLayoutProps {
   children?: React.ReactNode;
 }
+/** search 페이지 기본 레이아웃(네비바, 하단 퀵메뉴, 푸터) */
 export function SearchPageLayout({ children }: SearchPageLayoutProps): JSX.Element {
   return (
     <Box overflow="hidden">
@@ -24,3 +29,29 @@ export function SearchPageLayout({ children }: SearchPageLayoutProps): JSX.Eleme
 }
 
 export default SearchPageLayout;
+
+/** search 페이지에서 사용하는 keyword, 검색 결과 데이터 state */
+export function useSearchPageState(): {
+  data?: SearchResult;
+  isLoading: boolean;
+  searchKeyword?: string;
+} {
+  const router = useRouter();
+  const { keyword } = router.query;
+
+  const searchKeyword = keyword ? (keyword as string) : undefined;
+
+  const [query, setQuery] = useState<string | undefined>(searchKeyword);
+
+  const { data, isLoading } = useKkshowSearchResult(query);
+
+  useEffect(() => {
+    setQuery(keyword ? (keyword as string) : undefined);
+  }, [keyword]);
+
+  return {
+    data,
+    isLoading,
+    searchKeyword,
+  };
+}

@@ -17,8 +17,8 @@ const images = {
     'https://k-kmarket.com/data/goods/1/2022/02/_temp_16448938223899view.png',
   ],
   liveContents: [
-    'https://s3.us-west-2.amazonaws.com/secure.notion-static.com/c841296a-b1a7-48ee-9133-f35a413ec33d/%EC%8D%B8%EB%84%A4%EC%9D%BC_2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220323%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220323T063516Z&X-Amz-Expires=86400&X-Amz-Signature=7341efd919a95bbbf26e04d25a8ac88ed989d231eb635de96b1203e6e4b0ca91&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22%25EC%258D%25B8%25EB%2584%25A4%25EC%259D%25BC_2.jpg%22&x-id=GetObject',
-    'https://s3.us-west-2.amazonaws.com/secure.notion-static.com/bed12326-1680-4c7b-bafc-9f03eed8e9f6/%EC%8D%B8%EB%84%A4%EC%9D%BC.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220323%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220323T063536Z&X-Amz-Expires=86400&X-Amz-Signature=4838e1b0d1bf5581a88acbf2dc1bba92b88b27c65dc8e3db5de3a0fc5de4065e&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22%25EC%258D%25B8%25EB%2584%25A4%25EC%259D%25BC.jpg%22&x-id=GetObject',
+    'https://cdn.zeplin.io/614c03ad63951cb7d7158fbb/assets/352f5a75-5e31-4aad-b0f5-83ab618cec0b.png',
+    'https://cdn.zeplin.io/614c03ad63951cb7d7158fbb/assets/e6a8d3fd-a0d0-43d2-8e0b-842984c015d2.png',
   ],
   broadcasters: [
     'https://static-cdn.jtvnw.net/jtv_user_pictures/2067380c-6c8f-4a4d-9f68-65c13572a59b-profile_image-150x150.png',
