@@ -1,6 +1,6 @@
 import { Box, useBreakpointValue } from '@chakra-ui/react';
 import { SearchResultItem } from '@project-lc/shared-types';
-import { Pagination, Scrollbar } from 'swiper';
+import { Pagination, Scrollbar, Grid as SwiperGrid } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { GoodsCard } from './GoodsCard';
 import {
@@ -40,7 +40,23 @@ export function SearchResultGoodsSection({
             </Swiper>
           </Box>
           {/* (breakpoint: md 미만 기준) - 그리드 */}
-          <Box display={{ base: 'block', md: 'none' }} />
+          <Box display={{ base: 'block', md: 'none' }}>
+            <Swiper
+              modules={[SwiperGrid]}
+              slidesPerView={2}
+              grid={{ rows: 2, fill: 'row' }}
+              spaceBetween={30}
+            >
+              {data.slice(0, displayLimitOnSearchResultPage).map((item, index) => {
+                const key = `${item.title}_${index}`;
+                return (
+                  <SwiperSlide key={key} style={{ width: '50%' }}>
+                    <GoodsCard key={key} item={item} />
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+          </Box>
         </>
       ) : (
         <SearchResultEmptyText />
