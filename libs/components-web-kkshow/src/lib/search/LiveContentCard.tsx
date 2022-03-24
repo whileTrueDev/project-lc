@@ -1,4 +1,13 @@
-import { Box, Icon, Image, LinkBox, LinkOverlay, Stack, Text } from '@chakra-ui/react';
+import {
+  AspectRatio,
+  Box,
+  Icon,
+  Image,
+  LinkBox,
+  LinkOverlay,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import { SearchResultItem } from '@project-lc/shared-types';
 import NextLink from 'next/link';
@@ -28,9 +37,12 @@ export function LiveContentCard({ item }: { item: SearchResultItem }): JSX.Eleme
       <LinkBox>
         <NextLink href={item.linkUrl} passHref>
           <LinkOverlay isExternal={item.linkUrl.includes('http')}>
-            <Stack minW="270px">
+            <Stack>
               <Box rounded="xl" overflow="hidden" position="relative">
-                <Image src={item.imageUrl} objectFit="cover" />
+                <AspectRatio ratio={16 / 9}>
+                  <Image src={item.imageUrl} objectFit="cover" />
+                </AspectRatio>
+
                 <MotionBox
                   variants={overlay}
                   position="absolute"

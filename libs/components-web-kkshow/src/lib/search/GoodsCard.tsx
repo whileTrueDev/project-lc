@@ -1,5 +1,5 @@
 import { ArrowForwardIcon, Icon } from '@chakra-ui/icons';
-import { Box, LinkBox, LinkOverlay, Stack, Text } from '@chakra-ui/react';
+import { AspectRatio, Box, LinkBox, LinkOverlay, Stack, Text } from '@chakra-ui/react';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import { SearchResultItem } from '@project-lc/shared-types';
 import { motion } from 'framer-motion';
@@ -18,13 +18,16 @@ export function GoodsCard({ item }: { item: SearchResultItem }): JSX.Element {
       <LinkBox>
         <NextLink href={item.linkUrl} passHref>
           <LinkOverlay isExternal={item.linkUrl.includes('http')}>
-            <Stack minW="132px">
+            <Stack>
               <Box rounded="xl" overflow="hidden" position="relative">
-                <motion.img
-                  src={item.imageUrl}
-                  variants={variants}
-                  style={{ objectFit: 'cover' }}
-                />
+                <AspectRatio ratio={1}>
+                  <motion.img
+                    src={item.imageUrl}
+                    variants={variants}
+                    style={{ objectFit: 'cover' }}
+                  />
+                </AspectRatio>
+
                 <Icon
                   as={ArrowForwardIcon}
                   position="absolute"
