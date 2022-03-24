@@ -45,7 +45,9 @@ export function LiveContentCard({ item }: { item: SearchResultItem }): JSX.Eleme
                   <Icon as={FaPlayCircle} color="white" fontSize="6xl" />
                 </MotionBox>
               </Box>
-              <Text fontFamily="Gmarket Sans">{item.title}</Text>
+              <Text fontFamily="Gmarket Sans" fontWeight="bold">
+                {item.title}
+              </Text>
             </Stack>
           </LinkOverlay>
         </NextLink>
