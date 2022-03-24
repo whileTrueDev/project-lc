@@ -663,7 +663,7 @@ socket.on('get virtual character from server', async () => {
 
 socket.on('get virtual character audio from server', async () => {
   $('body').append(`
-    <iframe src="https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-audio/testbc%40gmail.com/1/voice"
+    <iframe src="https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-audio/${email}/${liveShoppingId}/voice"
      id="virtual-voice" allow="autoplay" style="display:none"></iframe>
     `);
 });
@@ -678,7 +678,7 @@ socket.on('remove soldout banner from server', () => {
 
 socket.on('get fever signal from server', (text) => {
   $('.bottom-area-right').css({ opacity: 1 });
-  $('.bottom- area-right-fever-wrapper').show();
+  $('.bottom-area-right-fever-wrapper').show();
   $('.bottom-fever-message').text(`${text}`);
   $('body').append(`
     <iframe src="/audio/fever.mp3" id="fever-alarm" allow="autoplay" style="display:none"></iframe>
