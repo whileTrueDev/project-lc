@@ -1,7 +1,7 @@
-import { Grid, GridItem } from '@chakra-ui/react';
+import { Grid, GridItem, useBreakpointValue } from '@chakra-ui/react';
 import { SearchResultItem } from '@project-lc/shared-types';
 import LiveContentCard from './LiveContentCard';
-import { SearchResultEmptyText } from './SearchResultSectionContainer';
+import { SearchResultEmptyText } from './SearchResultSectionContainerLayout';
 import SeeMorePageLayout, { useSeeMorePageState } from './SeeMorePageLayout';
 
 export interface SeeMoreLiveContentsProps {
@@ -13,17 +13,22 @@ export function SeeMoreLiveContents({ data }: SeeMoreLiveContentsProps): JSX.Ele
     itemPerPage: 9,
   });
 
+  const itemPerRow = {
+    base: 1, // 모바일화면에서 한줄에 1개씩 표시
+    md: 3, // md이상 화면에서 한줄에 3개씩 표시
+  };
+  const templateColumns = useBreakpointValue({
+    base: `repeat(${itemPerRow.base}, 1fr)`,
+    md: `repeat(${itemPerRow.md}, 1fr)`,
+  });
+
   return (
     <SeeMorePageLayout
       title="라이브 컨텐츠"
       resultCount={data.length}
       handleLoadMore={handleLoadMore}
     >
-      <Grid
-        templateColumns={{ base: 'repeat(1, 1fr)', md: 'repeat(3, 1fr)' }}
-        gap={6}
-        mb={8}
-      >
+      <Grid templateColumns={templateColumns} gap={6} mb={8}>
         {dataToDisplay.length > 0 ? (
           dataToDisplay.map((item, index) => {
             const key = `${item.title}_${index}`;
