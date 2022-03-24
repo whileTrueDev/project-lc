@@ -1,6 +1,7 @@
 import { Grid, GridItem } from '@chakra-ui/react';
 import { SearchResultItem } from '@project-lc/shared-types';
 import LiveContentCard from './LiveContentCard';
+import { SearchResultEmptyText } from './SearchResultSectionContainer';
 import SeeMorePageLayout, { useSeeMorePageState } from './SeeMorePageLayout';
 
 export interface SeeMoreLiveContentsProps {
@@ -23,14 +24,18 @@ export function SeeMoreLiveContents({ data }: SeeMoreLiveContentsProps): JSX.Ele
         gap={6}
         mb={8}
       >
-        {dataToDisplay.map((item, index) => {
-          const key = `${item.title}_${index}`;
-          return (
-            <GridItem w="100%" h="100%" key={key}>
-              <LiveContentCard item={item} />
-            </GridItem>
-          );
-        })}
+        {dataToDisplay.length > 0 ? (
+          dataToDisplay.map((item, index) => {
+            const key = `${item.title}_${index}`;
+            return (
+              <GridItem w="100%" h="100%" key={key}>
+                <LiveContentCard item={item} />
+              </GridItem>
+            );
+          })
+        ) : (
+          <SearchResultEmptyText />
+        )}
       </Grid>
     </SeeMorePageLayout>
   );
