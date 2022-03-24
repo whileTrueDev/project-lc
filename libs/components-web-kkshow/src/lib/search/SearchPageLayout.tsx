@@ -1,4 +1,4 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import BottomQuickMenu from '@project-lc/components-shared/BottomQuickMenu';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
@@ -15,16 +15,16 @@ export interface SearchPageLayoutProps {
 /** search 페이지 기본 레이아웃(네비바, 하단 퀵메뉴, 푸터) */
 export function SearchPageLayout({ children }: SearchPageLayoutProps): JSX.Element {
   return (
-    <Box overflow="hidden">
+    <Flex direction="column" overflow="hidden" minHeight="100vh">
       {/* 검색페이지 네비바는 라이트모드에서 흰색배경이라 variant="white" 적용함 */}
       <KkshowNavbar variant="white" />
-      {children}
+      <Box flexGrow={1}>{children}</Box>
 
       <BottomQuickMenu />
 
       <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />
-    </Box>
+    </Flex>
   );
 }
 
