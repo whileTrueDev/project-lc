@@ -1,5 +1,6 @@
 import { Box, useBreakpointValue } from '@chakra-ui/react';
 import { SearchResultItem } from '@project-lc/shared-types';
+import { useRouter } from 'next/router';
 import { Pagination, Scrollbar, Grid as SwiperGrid } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { GoodsCard } from './GoodsCard';
@@ -10,15 +11,27 @@ import {
 
 export interface SearchResultGoodsSectionProps {
   data: SearchResultItem[];
+  keyword?: string;
 }
 export function SearchResultGoodsSection({
   data,
+  keyword,
 }: SearchResultGoodsSectionProps): JSX.Element {
+  const router = useRouter();
   // 모바일에서는 4개, 데스트탑에서는 최대 6개 표시 -> 나머지는 더보기 눌러서 별도 페이지에서 확인하도록
-
   const displayLimitOnSearchResultPage = useBreakpointValue({ base: 4, md: 6 });
   return (
-    <SearchResultSectionContainer title="상품" resultCount={data.length}>
+    <SearchResultSectionContainer
+      title="상품"
+      resultCount={data.length}
+      seeMoreButtonHandler={
+        keyword
+          ? () => {
+              router.push(`/search/goods?keyword=${keyword}`);
+            }
+          : undefined
+      }
+    >
       {data.length > 0 ? (
         <>
           {/* (breakpoint: md 이상 기준) */}

@@ -24,11 +24,13 @@ export function SearchResultSectionContainer({
               {resultCount && <Text>{resultCount}개의 검색결과</Text>}
             </Stack>
 
-            <Box alignSelf="flex-end">
-              <Button colorScheme="blue" variant="link" onClick={seeMoreButtonHandler}>
-                더보기
-              </Button>
-            </Box>
+            {seeMoreButtonHandler && (
+              <Box alignSelf="flex-end">
+                <Button colorScheme="blue" variant="link" onClick={seeMoreButtonHandler}>
+                  더보기
+                </Button>
+              </Box>
+            )}
           </Stack>
           <Box>{children}</Box>
         </Stack>

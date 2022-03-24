@@ -2,8 +2,8 @@ import { Divider, Spinner } from '@chakra-ui/react';
 import SearchKeywordSection from '@project-lc/components-web-kkshow/search/SearchKeywordSection';
 import SearchPageLayout from '@project-lc/components-web-kkshow/search/SearchPageLayout';
 import SearchResultGoodsSection from '@project-lc/components-web-kkshow/search/SearchResultGoodsSection';
-import SearchResultContentsSection from '@project-lc/components-web-kkshow/search/SearchResultContentsSection';
 import SearchResultBroadcasterSection from '@project-lc/components-web-kkshow/search/SearchResultBroadcasterSection';
+import SearchResultLiveContentsSection from '@project-lc/components-web-kkshow/search/SearchResultLiveContentsSection';
 import { useRouter } from 'next/router';
 import { useKkshowSearchResult } from '@project-lc/hooks';
 import { useEffect, useState } from 'react';
@@ -22,6 +22,10 @@ export function Search(): JSX.Element {
     setQuery(keyword ? (keyword as string) : undefined);
   }, [keyword]);
 
+  const resultCount = data
+    ? data.broadcasters.length + data.goods.length + data.liveContents.length
+    : 0;
+
   if (isLoading) {
     return (
       <SearchPageLayout>
@@ -32,11 +36,11 @@ export function Search(): JSX.Element {
 
   return (
     <SearchPageLayout>
-      <SearchKeywordSection keyword={searchKeyword} result={data} />
+      <SearchKeywordSection keyword={searchKeyword} resultCount={resultCount} />
       <Divider />
-      <SearchResultGoodsSection data={data.goods} />
+      <SearchResultGoodsSection keyword={searchKeyword} data={data.goods} />
       <Divider />
-      <SearchResultContentsSection />
+      <SearchResultLiveContentsSection />
       <Divider />
       <SearchResultBroadcasterSection data={data.broadcasters} />
     </SearchPageLayout>

@@ -6,7 +6,7 @@ import NextLink from 'next/link';
 
 const variants = {
   scale: { scale: 1.1 },
-  normal: { scale: 1.0 },
+  normal: { scale: 1.0, minHeight: '132px', minWidth: '132px' },
 };
 
 /** 검색결과 - 상품아이템 => 쇼핑탭에서 작성한 상품컴포넌트와 비슷할듯하다 => 확인 후 수정필요

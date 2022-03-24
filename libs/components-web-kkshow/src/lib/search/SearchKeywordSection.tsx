@@ -1,5 +1,4 @@
 import { Box, Center, Container, Heading, Stack, Text } from '@chakra-ui/react';
-import { SearchResult } from '@project-lc/shared-types';
 import React from 'react';
 
 function SearchKeywordSectionContainer({
@@ -18,15 +17,12 @@ function SearchKeywordSectionContainer({
 
 export interface SearchKeywordSectionProps {
   keyword?: string;
-  result: SearchResult;
+  resultCount?: number;
 }
 export function SearchKeywordSection({
   keyword,
-  result,
+  resultCount,
 }: SearchKeywordSectionProps): JSX.Element {
-  const resultCount =
-    result.broadcasters.length + result.goods.length + result.liveContents.length;
-
   if (!keyword || !resultCount) {
     return (
       <SearchKeywordSectionContainer>
