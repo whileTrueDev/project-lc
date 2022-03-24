@@ -41,7 +41,6 @@ export function SearchResultGoodsSection({
           {/* (breakpoint: md 이상 기준) */}
           <Box display={{ base: 'none', md: 'block' }}>
             <Swiper
-              scrollbar
               modules={[Pagination, Scrollbar]}
               slidesPerView="auto"
               spaceBetween={30}
@@ -68,7 +67,7 @@ export function SearchResultGoodsSection({
                 const key = `${item.title}_${index}`;
                 return (
                   <SwiperSlide key={key} style={{ width: '50%' }}>
-                    <GoodsCard key={key} item={item} />
+                    <GoodsCard item={item} />
                   </SwiperSlide>
                 );
               })}

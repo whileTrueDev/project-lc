@@ -20,7 +20,6 @@ export function SearchResultBroadcasterSection({
           style={{ paddingTop: 24, paddingBottom: 24, width: '100%' }}
           spaceBetween={16}
           slidesPerView="auto"
-          scrollbar
           modules={[Pagination, Scrollbar]}
         >
           {data.map((x) => (
