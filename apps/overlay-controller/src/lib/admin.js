@@ -423,6 +423,10 @@ $(document).ready(function ready() {
     socket.emit('refresh ranking from admin', roomName);
   });
 
+  $('#show-virtual-character').click(function showVirtualCharacterButtonClickEvent() {
+    socket.emit('get virtual character from admin', roomName);
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
     let level;

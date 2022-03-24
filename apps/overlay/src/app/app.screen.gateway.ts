@@ -235,4 +235,9 @@ export class AppScreenGateway
   refreshRanking(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('refresh ranking from server');
   }
+
+  @SubscribeMessage('get virtual character from admin')
+  getVirtualCharacter(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('get virtual character from server');
+  }
 }

@@ -657,13 +657,21 @@ socket.on('get soldout signal from server', async () => {
   }, 10000);
 });
 
+socket.on('get virtual character from server', async () => {
+  $('.virtual-background').css({ opacity: 1 });
+  $('body').append(`
+    <iframe src="https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-audio/testbc%40gmail.com/1/01+Itchin'+on+a+Photograph.mp3"
+     id="virtual-voice" allow="autoplay" style="display:none"></iframe>
+    `);
+});
+
 socket.on('remove soldout banner from server', () => {
   $('.vertical-soldout-banner').css({ opacity: 0 });
 });
 
 socket.on('get fever signal from server', (text) => {
   $('.bottom-area-right').css({ opacity: 1 });
-  $('.bottom-area-right-fever-wrapper').show();
+  $('.bottom- area-right-fever-wrapper').show();
   $('.bottom-fever-message').text(`${text}`);
   $('body').append(`
     <iframe src="/audio/fever.mp3" id="fever-alarm" allow="autoplay" style="display:none"></iframe>
