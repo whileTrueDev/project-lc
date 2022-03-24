@@ -26,7 +26,8 @@ export function SearchResultGoodsSection({
 }: SearchResultGoodsSectionProps): JSX.Element {
   const router = useRouter();
   // 모바일에서는 4개, 데스트탑에서는 최대 6개 표시 -> 나머지는 더보기 눌러서 별도 페이지에서 확인하도록
-  const displayLimitOnSearchResultPage = useBreakpointValue({ base: 4, md: 6 });
+  const displayItemCountOnSearchResultPage = useBreakpointValue({ base: 4, md: 6 });
+  const dataToDisplay = data.slice(0, displayItemCountOnSearchResultPage);
   return (
     <SearchResultSectionContainer
       title="상품"
@@ -51,7 +52,7 @@ export function SearchResultGoodsSection({
               slidesPerView="auto"
               spaceBetween={30}
             >
-              {data.slice(0, displayLimitOnSearchResultPage).map((item, index) => {
+              {dataToDisplay.map((item, index) => {
                 const key = `${item.title}_${index}`;
                 return (
                   <SwiperSlide key={key} style={{ width: '20%', paddingBottom: '32px' }}>
@@ -69,7 +70,7 @@ export function SearchResultGoodsSection({
               grid={{ rows: 2, fill: 'row' }}
               spaceBetween={30}
             >
-              {data.slice(0, displayLimitOnSearchResultPage).map((item, index) => {
+              {dataToDisplay.map((item, index) => {
                 const key = `${item.title}_${index}`;
                 return (
                   <SwiperSlide key={key} style={{ width: '50%' }}>
