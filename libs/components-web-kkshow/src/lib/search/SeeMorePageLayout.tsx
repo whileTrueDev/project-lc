@@ -2,9 +2,9 @@ import { Button, Center, Stack } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
-  SearchResultSectionContainer,
+  SearchResultSectionContainerLayout,
   SearchResultSectionContainerProps,
-} from './SearchResultSectionContainer';
+} from './SearchResultSectionContainerLayout';
 
 /** 더보기 페이지에서 사용하는 페이지네이션 state */
 export function useSeeMorePageState<T>({
@@ -47,7 +47,7 @@ export function SeeMorePageLayout({
 }: SeeMorePageLayoutProps): JSX.Element {
   const router = useRouter();
   return (
-    <SearchResultSectionContainer
+    <SearchResultSectionContainerLayout
       title={title}
       resultCount={resultCount || 0}
       actionButton={
@@ -64,7 +64,7 @@ export function SeeMorePageLayout({
           </Center>
         )}
       </Stack>
-    </SearchResultSectionContainer>
+    </SearchResultSectionContainerLayout>
   );
 }
 

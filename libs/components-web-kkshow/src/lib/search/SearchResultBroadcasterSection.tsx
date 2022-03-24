@@ -6,9 +6,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { BestBroadcasterItem } from '../main/KkshowMainBestBroadcaster';
 import {
   SearchResultEmptyText,
-  SearchResultSectionContainer,
+  SearchResultSectionContainerLayout,
   SeeMoreButton,
-} from './SearchResultSectionContainer';
+} from './SearchResultSectionContainerLayout';
 
 export interface SearchResultBroadcasterSectionProps {
   data: SearchResultItem[];
@@ -23,7 +23,7 @@ export function SearchResultBroadcasterSection({
   const displayItemCountOnSearchResultPage = useBreakpointValue({ base: 4, md: 6 });
   const dataToDisplay = data.slice(0, displayItemCountOnSearchResultPage);
   return (
-    <SearchResultSectionContainer
+    <SearchResultSectionContainerLayout
       title="방송인"
       resultCount={data.length}
       actionButton={
@@ -87,7 +87,7 @@ export function SearchResultBroadcasterSection({
       ) : (
         <SearchResultEmptyText />
       )}
-    </SearchResultSectionContainer>
+    </SearchResultSectionContainerLayout>
   );
 }
 

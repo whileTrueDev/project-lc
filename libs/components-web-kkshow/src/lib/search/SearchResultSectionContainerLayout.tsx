@@ -7,7 +7,7 @@ export interface SearchResultSectionContainerProps {
   actionButton?: React.ReactNode;
 }
 /** 상품, 라이브컨텐츠, 크리에이터 영역 레이아웃 컴포넌트 */
-export function SearchResultSectionContainer({
+export function SearchResultSectionContainerLayout({
   title,
   resultCount,
   children,

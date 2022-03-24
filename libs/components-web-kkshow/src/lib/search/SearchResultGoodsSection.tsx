@@ -6,9 +6,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { GoodsCard } from './GoodsCard';
 import {
   SearchResultEmptyText,
-  SearchResultSectionContainer,
+  SearchResultSectionContainerLayout,
   SeeMoreButton,
-} from './SearchResultSectionContainer';
+} from './SearchResultSectionContainerLayout';
 
 export interface SearchResultGoodsSectionProps {
   data: SearchResultItem[];
@@ -23,7 +23,7 @@ export function SearchResultGoodsSection({
   const displayItemCountOnSearchResultPage = useBreakpointValue({ base: 4, md: 6 });
   const dataToDisplay = data.slice(0, displayItemCountOnSearchResultPage);
   return (
-    <SearchResultSectionContainer
+    <SearchResultSectionContainerLayout
       title="상품"
       resultCount={data.length}
       actionButton={
@@ -77,7 +77,7 @@ export function SearchResultGoodsSection({
       ) : (
         <SearchResultEmptyText />
       )}
-    </SearchResultSectionContainer>
+    </SearchResultSectionContainerLayout>
   );
 }
 

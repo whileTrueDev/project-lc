@@ -6,9 +6,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import LiveContentCard from './LiveContentCard';
 import {
   SearchResultEmptyText,
-  SearchResultSectionContainer,
+  SearchResultSectionContainerLayout,
   SeeMoreButton,
-} from './SearchResultSectionContainer';
+} from './SearchResultSectionContainerLayout';
 
 export interface SearchResultLiveContentsSectionProps {
   data: SearchResultItem[];
@@ -22,7 +22,7 @@ export function SearchResultLiveContentsSection({
   const displayItemCountOnSearchResultPage = useBreakpointValue({ base: 2, md: 4 });
   const dataToDisplay = data.slice(0, displayItemCountOnSearchResultPage);
   return (
-    <SearchResultSectionContainer
+    <SearchResultSectionContainerLayout
       title="라이브 컨텐츠"
       resultCount={data.length}
       actionButton={
@@ -76,7 +76,7 @@ export function SearchResultLiveContentsSection({
       ) : (
         <SearchResultEmptyText />
       )}
-    </SearchResultSectionContainer>
+    </SearchResultSectionContainerLayout>
   );
 }
 
