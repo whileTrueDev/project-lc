@@ -27,8 +27,9 @@ export function SearchKeywordSection({
     return (
       <SearchKeywordSectionContainer>
         <Stack fontSize="lg" fontWeight="bold" textAlign="center">
+          {keyword && <Heading fontSize="4xl">{`‘${keyword}’`}</Heading>}
           <Text>검색 결과가 없습니다.</Text>
-          <Text>제품이나 방송인을 검색해보세요.</Text>
+          <Text>{keyword && '다른 '}제품이나 방송인을 검색해보세요.</Text>
         </Stack>
       </SearchKeywordSectionContainer>
     );
