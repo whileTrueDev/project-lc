@@ -84,13 +84,19 @@ export function BestBroadcasterItem(props: BestBroadcasterItemProps): JSX.Elemen
           }}
         />
 
-        <NextLink passHref href={props.href || '#'}>
-          <LinkOverlay isExternal={props.href.includes('http')}>
-            <Heading noOfLines={2} fontSize="xl">
-              {props.broadcasterName}
-            </Heading>
-          </LinkOverlay>
-        </NextLink>
+        {props.href ? (
+          <NextLink passHref href={props.href || '#'}>
+            <LinkOverlay isExternal={props.href.includes('http')}>
+              <Heading noOfLines={2} fontSize="xl">
+                {props.broadcasterName}
+              </Heading>
+            </LinkOverlay>
+          </NextLink>
+        ) : (
+          <Heading noOfLines={2} fontSize="xl">
+            {props.broadcasterName}
+          </Heading>
+        )}
       </Stack>
     </LinkBox>
   );
