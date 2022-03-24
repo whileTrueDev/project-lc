@@ -29,7 +29,7 @@ export function Search(): JSX.Element {
       <Divider />
       <SearchResultLiveContentsSection keyword={searchKeyword} data={data.liveContents} />
       <Divider />
-      <SearchResultBroadcasterSection data={data.broadcasters} />
+      <SearchResultBroadcasterSection keyword={searchKeyword} data={data.broadcasters} />
     </SearchPageLayout>
   );
 }
