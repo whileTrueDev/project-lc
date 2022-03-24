@@ -36,7 +36,7 @@ export function SearchKeywordSection({
   }
   return (
     <SearchKeywordSectionContainer>
-      <Stack textAlign="center">
+      <Stack textAlign="center" fontWeight="bold">
         <Heading fontSize="4xl">{`‘${keyword}’`}</Heading>
         <Text>{resultCount} 개의 결과</Text>
       </Stack>

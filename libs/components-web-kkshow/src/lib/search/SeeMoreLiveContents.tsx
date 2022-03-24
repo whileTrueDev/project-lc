@@ -28,7 +28,7 @@ export function SeeMoreLiveContents({ data }: SeeMoreLiveContentsProps): JSX.Ele
       resultCount={data.length}
       handleLoadMore={handleLoadMore}
     >
-      <Grid templateColumns={templateColumns} gap={6} mb={8}>
+      <Grid templateColumns={templateColumns} gap={16} mb={8}>
         {dataToDisplay.length > 0 ? (
           dataToDisplay.map((item, index) => {
             const key = `${item.title}_${index}`;

@@ -15,11 +15,11 @@ export function SearchResultSectionContainerLayout({
 }: SearchResultSectionContainerProps): JSX.Element {
   return (
     <Box>
-      <Container maxW="6xl">
-        <Stack py={{ base: 6, md: 10 }} spacing={8}>
+      <Container maxW="6xl" px={6}>
+        <Stack py={12} spacing={8}>
           <Stack direction="row" justify="space-between" fontWeight="bold" width="100%">
             <Stack direction="row" alignItems="flex-end">
-              <Heading color="blue.500" fontSize="3xl">
+              <Heading color="blue.500" fontSize={{ base: '2xl', md: '3xl' }}>
                 {title}
               </Heading>
               {resultCount && <Text>{resultCount}개의 검색결과</Text>}

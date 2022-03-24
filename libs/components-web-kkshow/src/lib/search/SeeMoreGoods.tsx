@@ -26,7 +26,7 @@ export function SeeMoreGoods({ data }: SeeMoreGoodsProps): JSX.Element {
       resultCount={data.length}
       handleLoadMore={handleLoadMore}
     >
-      <Grid templateColumns={templateColumns} gap={6} mb={8}>
+      <Grid templateColumns={templateColumns} gap={{ base: 6, md: 16 }} mb={8}>
         {dataToDisplay.length > 0 ? (
           dataToDisplay.map((item, index) => {
             const key = `${item.title}_${index}`;

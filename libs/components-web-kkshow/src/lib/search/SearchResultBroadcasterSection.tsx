@@ -44,12 +44,11 @@ export function SearchResultBroadcasterSection({
               style={{ paddingTop: 16, paddingBottom: 16, width: '100%' }}
               modules={[Pagination, Scrollbar]}
               slidesPerView="auto"
-              spaceBetween={16}
             >
               {dataToDisplay.map((item, index) => {
                 const key = `${item.title}_${index}`;
                 return (
-                  <SwiperSlide key={key} style={{ width: '20%', paddingBottom: '32px' }}>
+                  <SwiperSlide key={key} style={{ width: '18%', paddingBottom: '32px' }}>
                     <BestBroadcasterItem
                       avatarUrl={item.imageUrl}
                       broadcasterName={item.title}
@@ -67,12 +66,11 @@ export function SearchResultBroadcasterSection({
               modules={[SwiperGrid]}
               slidesPerView={2}
               grid={{ rows: 2, fill: 'row' }}
-              spaceBetween={16}
             >
               {dataToDisplay.map((item, index) => {
                 const key = `${item.title}_${index}`;
                 return (
-                  <SwiperSlide key={key} style={{ width: '50%' }}>
+                  <SwiperSlide key={key} style={{ width: '50%', paddingBottom: '32px' }}>
                     <BestBroadcasterItem
                       avatarUrl={item.imageUrl}
                       broadcasterName={item.title}

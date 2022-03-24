@@ -61,9 +61,9 @@ function generateDummyList(
 
 // TODO: 백엔드 요청 연결 후 삭제 요망
 const dummyData: KkshowSearchResult = {
-  goods: generateDummyList('goods', 20),
-  liveContents: generateDummyList('liveContents', 20),
-  broadcasters: generateDummyList('broadcasters', 10),
+  goods: generateDummyList('goods', 33),
+  liveContents: generateDummyList('liveContents', 12),
+  broadcasters: generateDummyList('broadcasters', 16),
 };
 
 export const getKkshowSearchResult = async (
