@@ -925,6 +925,28 @@
         }
       }
     },
+    "nest-modules-kkshow-search" : {
+      "root": "libs/nest-modules-kkshow-search",
+      "sourceRoot": "libs/nest-modules-kkshow-search/src",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/nest-modules-kkshow-search/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/nest-modules-kkshow-search"],
+          "options": {
+            "jestConfig": "libs/nest-modules-kkshow-search/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "nest-modules-liveshopping": {
       "root": "libs/nest-modules-liveshopping",
       "sourceRoot": "libs/nest-modules-liveshopping/src",
