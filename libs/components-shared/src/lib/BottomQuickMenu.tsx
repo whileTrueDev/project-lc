@@ -21,6 +21,7 @@ export function BottomQuickMenu(): JSX.Element {
         borderTopColor={useColorModeValue('gray.200', 'gray.700')}
         width="100%"
         height="7vh"
+        minHeight="65px"
         zIndex="docked"
       >
         {quickMenuLinks.map((link) => (
@@ -60,7 +61,9 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
         onClick={onQuickMenuClick}
       >
         <Icon as={link.icon} width={5} height={5} />
-        <Text fontWeight={isMatched ? 'bold' : 'unset'}>{link.name}</Text>
+        <Text fontSize={['sm', 'md']} fontWeight={isMatched ? 'bold' : 'unset'}>
+          {link.name}
+        </Text>
       </VStack>
     </Center>
   );
