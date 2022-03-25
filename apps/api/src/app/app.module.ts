@@ -25,6 +25,7 @@ import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { ShippingGroupModule } from '@project-lc/nest-modules-shipping-group';
+import { ManualModule } from '@project-lc/nest-modules-manual';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
@@ -53,6 +54,7 @@ import { AppController } from './app.controller';
     BroadcasterModule.withControllers(),
     PolicyModule,
     KkshowMainModule.withControllers(),
+    ManualModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],
