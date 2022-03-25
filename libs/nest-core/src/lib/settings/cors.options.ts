@@ -2,6 +2,7 @@ import { CorsOptions } from 'cors';
 
 export const corsOptions: CorsOptions = {
   origin: [
+    'http://localhost:4000', // kkshow
     'http://localhost:4200',
     'http://localhost:4250',
     'http://localhost:4300',

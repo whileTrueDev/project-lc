@@ -10,9 +10,11 @@ import {
 } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { useRouter } from 'next/router';
+import { useKkshowSearchStore } from '@project-lc/stores';
 import { SearchBox } from './SearchBox';
 
 export function SearchPageSearcher(): JSX.Element {
+  // const setKeyword = useKkshowSearchStore((s) => s.setKeyword);
   const initialRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   return (

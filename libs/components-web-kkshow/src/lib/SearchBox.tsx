@@ -1,33 +1,43 @@
 import { Flex, Input, IconButton, useColorModeValue } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
-import { useSearchResults } from '@project-lc/hooks';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
+import { useKkshowSearchStore } from '@project-lc/stores';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { useRouter } from 'next/router';
 
 export function SearchBox(): JSX.Element {
   const initialRef = useRef<HTMLInputElement>(null);
-  const [keyword, setKeyword] = useState('');
+  const { keyword } = useKkshowSearchStore();
+  const setKeyword = useKkshowSearchStore((s) => s.setKeyword);
+  const router = useRouter();
 
-  // const handleSearchResults = useSearchResults(keyword);
-  // function handleKeyword(value: string): void {
-  //   console.log(value);
-  //   setKeyword(value);
-  // }
+  const inputPrefix = (router.query.keyword as string) || '';
+
+  const { handleSubmit, control, register, watch, setValue, getValues } = useForm<any>();
+  // * 필터/검색 폼 제출
+  const onSubmit: SubmitHandler<any> = (data) => {
+    router.push(`/search?keyword=${getValues('keyword')}`);
+  };
 
   return (
-    <Flex w="100%">
+    <Flex w="100%" as="form" onSubmit={handleSubmit(onSubmit)}>
       <Input
+        defaultValue={inputPrefix}
         ref={initialRef}
         variant="outline"
         placeholder="검색어를 입력하세요"
         rounded="md"
-        bgColor={useColorModeValue('white', 'gray.600')}
-        onChange={(e) => handleKeyword(e.target.value)}
+        bgColor={useColorModeValue('blue.400', 'gray.600')}
+        onChange={(e) => {
+          setValue('keyword', e.target.value);
+          setKeyword(e.target.value);
+        }}
       />
       <IconButton
         variant="fill"
         aria-label="search-button-icon"
-        onClick={() => console.log(keyword)}
         icon={<SearchIcon fontSize="lg" />}
+        type="submit"
       />
     </Flex>
   );

@@ -1,5 +1,4 @@
-import { SearchIcon } from '@chakra-ui/icons';
-import { IconButton, Input, InputGroup, InputRightElement } from '@chakra-ui/react';
+import { InputGroup } from '@chakra-ui/react';
 import { SearchBox } from './SearchBox';
 
 export function GlobalSearcher(): JSX.Element {
