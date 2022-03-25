@@ -29,7 +29,7 @@ export class KkshowShoppingService {
       recommendations: parseJsonToGenericType<
         KkshowShoppingTabResData['recommendations']
       >(data.recommendations),
-      reviews: parseJsonToGenericType<KkshowShoppingTabResData['reviews']>(data.carousel),
+      reviews: parseJsonToGenericType<KkshowShoppingTabResData['reviews']>(data.reviews),
       keywords: parseJsonToGenericType<KkshowShoppingTabResData['keywords']>(
         data.keywords,
       ),

@@ -124,6 +124,7 @@ export * from './lib/queries/useSettlementTargets';
 export * from './lib/queries/useShippingGroupItem';
 export * from './lib/queries/useShippingGroupList';
 export * from './lib/queries/useSocialAccounts';
+export * from './lib/queries/useKkshowShopping';
 export * from './lib/shipping-group-hooks';
 export * from './lib/subscription/useLiveShoppingStateSubscription';
 export * from './lib/subscription/useNotificationSubscription';

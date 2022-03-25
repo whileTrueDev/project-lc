@@ -10,37 +10,13 @@ import {
 } from '@chakra-ui/react';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import FadeUp from '@project-lc/components-layout/motion/FadeUp';
+import { useKkshowShopping } from '@project-lc/hooks';
 import { KkshowShoppingTabThemeData } from '@project-lc/shared-types';
 import { useEffect, useState } from 'react';
 import KkshowMainTitle from '../main/KkshowMainTitle';
 
-const themeAndKeywords: KkshowShoppingTabThemeData[] = [
-  {
-    theme: '테마1',
-    imageUrl: 'images/shopping/keyword.png',
-    keywords: [
-      { keyword: '키워드1', linkUrl: '#' },
-      { keyword: '키워드2', linkUrl: '#' },
-      { keyword: '키워드3', linkUrl: '#' },
-      { keyword: '키워드4', linkUrl: '#' },
-      { keyword: '키워드5', linkUrl: '#' },
-      { keyword: '키워드6', linkUrl: '#' },
-    ],
-  },
-  {
-    theme: '테마2',
-    imageUrl: 'images/shopping/keyword.png',
-    keywords: [
-      { keyword: '키워드6', linkUrl: '#' },
-      { keyword: '키워드7', linkUrl: '#' },
-      { keyword: '키워드8', linkUrl: '#' },
-      { keyword: '키워드9', linkUrl: '#' },
-      { keyword: '키워드10', linkUrl: '#' },
-      { keyword: '키워드11', linkUrl: '#' },
-    ],
-  },
-];
 export function ShoppingKeywords(): JSX.Element {
+  const { data } = useKkshowShopping();
   const [selectedTheme, setSelectedTheme] = useState<KkshowShoppingTabThemeData | null>(
     null,
   );
@@ -49,10 +25,10 @@ export function ShoppingKeywords(): JSX.Element {
   };
 
   useEffect(() => {
-    if (themeAndKeywords) {
-      handleThemeSelect(themeAndKeywords[0]);
+    if (data) {
+      handleThemeSelect(data.keywords[0]);
     }
-  }, []);
+  }, [data]);
 
   const handleKeywordSelect = (clickedKeyword: string): void => {
     alert(`키워드 클릭: ${clickedKeyword}`);
@@ -68,11 +44,15 @@ export function ShoppingKeywords(): JSX.Element {
 
       <FadeUp boxProps={{ as: Center }}>
         <ButtonGroup variant="ghost">
-          {themeAndKeywords.map((goodsTheme) => (
-            <Button key={goodsTheme.theme} onClick={() => handleThemeSelect(goodsTheme)}>
-              <Heading fontSize="xl">{goodsTheme.theme}</Heading>
-            </Button>
-          ))}
+          {data &&
+            data.keywords.map((goodsTheme) => (
+              <Button
+                key={goodsTheme.theme}
+                onClick={() => handleThemeSelect(goodsTheme)}
+              >
+                <Heading fontSize="xl">{goodsTheme.theme}</Heading>
+              </Button>
+            ))}
         </ButtonGroup>
       </FadeUp>
 

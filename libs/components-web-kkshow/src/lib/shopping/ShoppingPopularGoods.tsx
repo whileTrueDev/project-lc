@@ -9,54 +9,17 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react';
 import FadeUp from '@project-lc/components-layout/motion/FadeUp';
-import { KkshowShoppingTabGoodsData } from '@project-lc/shared-types';
+import { useKkshowShopping } from '@project-lc/hooks';
 import { Fragment, memo, useMemo } from 'react';
 import GoodsDisplay from '../GoodsDisplay';
 import KkshowMainTitle from '../main/KkshowMainTitle';
 
-const items: Array<KkshowShoppingTabGoodsData> = [
-  {
-    imageUrl: 'images/test/thum-4.png',
-    linkUrl: '#',
-    discountedPrice: 9000,
-    name: '텐카이치멘 돈코츠라멘',
-    normalPrice: 12300,
-  },
-  {
-    imageUrl: 'images/test/thum-5.png',
-    linkUrl: '#',
-    discountedPrice: 12900,
-    name: '예스닭강정 순한맛2',
-    normalPrice: 19900,
-  },
-  {
-    imageUrl: 'images/test/thum-6.png',
-    linkUrl: '#',
-    discountedPrice: 8900,
-    name: '삼형제고기 양념쭈꾸미',
-    normalPrice: 10900,
-  },
-  {
-    imageUrl: 'images/test/thum-7.png',
-    linkUrl: '#',
-    discountedPrice: 14900,
-    name: '진국보감 갈비전골',
-    normalPrice: 16900,
-  },
-  {
-    imageUrl: 'images/test/thum-8.png',
-    linkUrl: '#',
-    discountedPrice: 5400,
-    name: '미드운 닭불고기',
-    normalPrice: 6000,
-  },
-];
-
 export function ShoppingPopularGoods(): JSX.Element {
+  const { data } = useKkshowShopping();
   const howMuchItemsToShow = useBreakpointValue({ base: 4, md: 5 });
   const displayingItems = useMemo(
-    () => items.slice(0, howMuchItemsToShow),
-    [howMuchItemsToShow],
+    () => data?.popularGoods.slice(0, howMuchItemsToShow),
+    [data?.popularGoods, howMuchItemsToShow],
   );
   const PopularGoodsTitle = memo(
     (): JSX.Element => (
@@ -104,7 +67,7 @@ export function ShoppingPopularGoods(): JSX.Element {
       </Box>
 
       <SimpleGrid columns={{ base: 2, md: 3 }} gap={4}>
-        {displayingItems.map((item, idx) => {
+        {displayingItems?.map((item, idx) => {
           const component = (
             <FadeUp key={item.name} isChild boxProps={{ as: GridItem }}>
               <GoodsDisplay variant={componentVariant} goods={item} />
