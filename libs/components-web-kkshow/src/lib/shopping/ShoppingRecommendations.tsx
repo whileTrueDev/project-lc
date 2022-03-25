@@ -59,7 +59,7 @@ export function ShoppingRecommendations(): JSX.Element {
             slidesPerView={useBreakpointValue({ base: 'auto', md: 3 })}
           >
             {items.map((item) => (
-              <SwiperSlide key={`${item.name}`} style={{ width: '80%', maxWidth: 400 }}>
+              <SwiperSlide key={item.name} style={{ width: '80%', maxWidth: 360 }}>
                 <FadeUp isChild boxProps={{ as: GridItem }} key={item.name}>
                   <GoodsDisplay variant="card" goods={item} />
                 </FadeUp>

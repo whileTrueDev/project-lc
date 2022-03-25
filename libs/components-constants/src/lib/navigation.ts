@@ -41,12 +41,12 @@ export const mainNavItems: Array<NavItem> = [
 export const kkshowNavLinks: Array<NavItem> = [
   {
     label: '쇼핑',
-    href: '/market',
+    href: '/shopping',
   },
-  {
-    label: '방송인',
-    href: '/broadcasters',
-  },
+  // {
+  //   label: '방송인',
+  //   href: '/broadcasters',
+  // },
   // { label: '방송편성표', href: '/' },
   // { label: '방송인', href: '/' },
   // { label: 'SNS', href: '/' },
