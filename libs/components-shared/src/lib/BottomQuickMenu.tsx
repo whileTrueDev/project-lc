@@ -28,7 +28,7 @@ export function BottomQuickMenu(): JSX.Element {
           <BottomQuickMenuItem key={link.name} link={link} />
         ))}
       </Flex>
-      <Box h="7vh" />
+      <Box h="7vh" display={{ base: 'flex', md: 'none' }} />
     </>
   );
 }
