@@ -70,6 +70,7 @@ export * from './lib/dto/kkshowMain.dto';
 export * from './lib/dto/liveShopping.dto';
 export * from './lib/dto/liveShoppingPurchaseMessage.dto';
 export * from './lib/dto/loginUser.dto';
+export * from './lib/dto/manual.dto';
 export * from './lib/dto/markNotificationReadState.dto';
 export * from './lib/dto/passwordValidate.dto';
 export * from './lib/dto/policy.dto';
