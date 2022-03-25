@@ -3,7 +3,7 @@ import { Autoplay, Navigation, Pagination } from 'swiper';
 import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 import SwiperSlideItem from '../SwiperSlideItem';
 
-export function MarketCarousel(): JSX.Element {
+export function ShoppingCarousel(): JSX.Element {
   const slidesPerView = useBreakpointValue<'auto' | number>({ base: 1, lg: 'auto' });
   const contents = [
     'images/test/banner-1.png',
@@ -36,7 +36,7 @@ export function MarketCarousel(): JSX.Element {
             key={item}
           >
             {(slideProps) => {
-              return <MarketCarouselItem isActive={slideProps.isActive} item={item} />;
+              return <ShoppingCarouselItem isActive={slideProps.isActive} item={item} />;
             }}
           </SwiperSlide>
         ))}
@@ -45,11 +45,14 @@ export function MarketCarousel(): JSX.Element {
   );
 }
 
-interface MarketCarouselItemProps {
+interface ShoppingCarouselItemProps {
   isActive: boolean;
   item: string;
 }
-const MarketCarouselItem = ({ isActive, item }: MarketCarouselItemProps): JSX.Element => {
+const ShoppingCarouselItem = ({
+  isActive,
+  item,
+}: ShoppingCarouselItemProps): JSX.Element => {
   const swiper = useSwiper();
   const onSlideNext = (): void => swiper.slideNext();
   const onSlidePrev = (): void => swiper.slidePrev();
@@ -65,4 +68,4 @@ const MarketCarouselItem = ({ isActive, item }: MarketCarouselItemProps): JSX.El
   );
 };
 
-export default MarketCarousel;
+export default ShoppingCarousel;

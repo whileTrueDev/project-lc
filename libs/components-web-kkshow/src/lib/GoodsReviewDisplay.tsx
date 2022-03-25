@@ -1,7 +1,17 @@
-import { Box, BoxProps, Flex, Heading, Image, Text } from '@chakra-ui/react';
+import {
+  Box,
+  BoxProps,
+  Flex,
+  Heading,
+  Image,
+  LinkBox,
+  LinkOverlay,
+  Text,
+} from '@chakra-ui/react';
 import { StarRating } from '@project-lc/components-core/StarRating';
 import { KkshowShoppingTabReviewData } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
+import Link from 'next/link';
 
 interface GoodsReviewDisplayProps {
   review: KkshowShoppingTabReviewData;
@@ -27,7 +37,7 @@ export function GoodsReviewDisplay({
     return <Box {...props} />;
   };
   return (
-    <Box position="relative">
+    <LinkBox>
       <Image borderRadius="xl" src={review.imageUrl} />
       <GoodsReviewDisplayContainer
         maxH={150}
@@ -41,14 +51,18 @@ export function GoodsReviewDisplay({
           <StarRating rating={review.rating} />
           <Text fontSize="xs">{dayjs(review.createDate).format('YYYY.MM.DD')}</Text>
         </Flex>
-        <Heading mb={3} fontSize="md">
-          {review.title}
-        </Heading>
+        <Link href={review.linkUrl} passHref>
+          <LinkOverlay href={review.linkUrl}>
+            <Heading mb={3} fontSize="md">
+              {review.title}
+            </Heading>
+          </LinkOverlay>
+        </Link>
         <Text fontSize="xs" noOfLines={3}>
           {review.contents}
         </Text>
       </GoodsReviewDisplayContainer>
-    </Box>
+    </LinkBox>
   );
 }
 

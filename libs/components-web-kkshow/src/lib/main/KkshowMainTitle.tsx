@@ -5,9 +5,9 @@ export interface KkshowMainTitleProps {
   color?: BoxProps['bgColor'];
   children: React.ReactChild | React.ReactChild[];
   bulletPosition?: 'left-top' | 'top' | 'left';
-  bulletSize?: number;
-  bulletVariant?: 'fill' | 'outline';
-  distance?: number;
+  bulletSize?: BoxProps['w'];
+  bulletVariant?: 'fill' | 'outline' | 'none';
+  distance?: BoxProps['left'];
   centered?: boolean;
 }
 export function KkshowMainTitle({
@@ -28,17 +28,19 @@ export function KkshowMainTitle({
       viewport={{ once: true, amount: 0.9 }}
     >
       <Heading fontSize="3xl" position="relative">
-        <Box
-          position="absolute"
-          w={bulletSize}
-          h={bulletSize}
-          left={bulletPosition.includes('left') ? -distance : 0}
-          top={bulletPosition.includes('top') ? -distance : 0}
-          bgColor={bulletVariant === 'fill' ? color : 'transparent'}
-          borderWidth={bulletVariant === 'outline' ? 'thin' : 'unset'}
-          borderColor={color}
-          borderRadius="full"
-        />
+        {bulletVariant === 'none' ? null : (
+          <Box
+            position="absolute"
+            w={bulletSize}
+            h={bulletSize}
+            left={bulletPosition.includes('left') ? -distance : 0}
+            top={bulletPosition.includes('top') ? -distance : 0}
+            bgColor={bulletVariant === 'fill' ? color : 'transparent'}
+            borderWidth={bulletVariant === 'outline' ? 'thin' : 'unset'}
+            borderColor={color}
+            borderRadius="full"
+          />
+        )}
         {children}
       </Heading>
     </MotionBox>

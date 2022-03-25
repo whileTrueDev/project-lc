@@ -3,17 +3,43 @@ import {
   Box,
   BoxProps,
   Heading,
+  HeadingProps,
   Image,
   LinkBox,
   LinkOverlay,
   Text,
 } from '@chakra-ui/react';
 import { KkshowShoppingTabGoodsData } from '@project-lc/shared-types';
+import { getDiscountedRate } from '@project-lc/utils-frontend';
 import Link from 'next/link';
-import { useMemo } from 'react';
 
-export interface GoodsDisplayProps {
+interface GoodsDisplayDetailProps {
   goods: KkshowShoppingTabGoodsData;
+  fontSize?: HeadingProps['fontSize'];
+  noOfLines?: HeadingProps['noOfLines'];
+}
+export const GoodsDisplayDetail = ({
+  goods,
+  fontSize = { base: 'md', md: 'lg' },
+  noOfLines = 1,
+}: GoodsDisplayDetailProps): JSX.Element => (
+  <Box>
+    <Heading fontSize={fontSize} fontWeight="medium" noOfLines={noOfLines}>
+      {goods.name}
+    </Heading>
+    <Text textDecor="line-through" color="gray.500" fontSize={{ base: 'sm', md: 'md' }}>
+      {goods.normalPrice.toLocaleString()}
+    </Text>
+    <Heading fontSize={{ base: 'md', md: 'xl' }}>
+      <Heading as="span" color="red" fontSize={{ base: 'md', md: 'xl' }}>
+        {getDiscountedRate(goods.normalPrice, goods.discountedPrice)}%
+      </Heading>{' '}
+      {goods.discountedPrice.toLocaleString()}원
+    </Heading>
+  </Box>
+);
+
+export interface GoodsDisplayProps extends GoodsDisplayDetailProps {
   variant?: 'small' | 'middle' | 'card';
 }
 export function GoodsDisplay({
@@ -21,12 +47,6 @@ export function GoodsDisplay({
   variant = 'small',
 }: GoodsDisplayProps): JSX.Element {
   const borderRadius = '2xl';
-  const discountRate = useMemo((): string => {
-    return (
-      ((goods.normalPrice - goods.discountedPrice) / goods.normalPrice) *
-      100
-    ).toFixed(0);
-  }, [goods.discountedPrice, goods.normalPrice]);
 
   let ratio = 1;
   switch (variant) {
@@ -49,7 +69,7 @@ export function GoodsDisplay({
           borderBottomRadius={borderRadius}
           py={6}
           px={4}
-          shadow="xl"
+          shadow="lg"
         />
       );
     return <Box {...props} />;
@@ -74,20 +94,9 @@ export function GoodsDisplay({
       >
         <Link href={goods.linkUrl} passHref>
           <LinkOverlay href={goods.linkUrl}>
-            <Heading fontSize="lg" fontWeight="medium" noOfLines={1}>
-              {goods.name}
-            </Heading>
+            <GoodsDisplayDetail goods={goods} />
           </LinkOverlay>
         </Link>
-        <Text textDecor="line-through" color="gray.500">
-          {goods.normalPrice.toLocaleString()}
-        </Text>
-        <Heading fontSize="xl">
-          <Heading as="span" color="red" fontSize="xl">
-            {discountRate}%
-          </Heading>{' '}
-          {goods.discountedPrice.toLocaleString()}원
-        </Heading>
       </GoodsDisplayContainer>
     </LinkBox>
   );
