@@ -1,0 +1,12 @@
+import { AdminManualListRes } from '@project-lc/shared-types';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryResult } from 'react-query';
+import axios from '../../axios';
+
+export const getAdminManualList = async (): Promise<AdminManualListRes> => {
+  return axios.get<AdminManualListRes>('/admin/manual').then((res) => res.data);
+};
+
+export const useAdminManualList = (): UseQueryResult<AdminManualListRes, AxiosError> => {
+  return useQuery<AdminManualListRes, AxiosError>('AdminManualList', getAdminManualList);
+};
