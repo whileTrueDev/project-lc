@@ -8,7 +8,7 @@ import { KkshowMainCarousel } from '@project-lc/components-web-kkshow/main/Kksho
 import { KKshowMainExternLinks } from '@project-lc/components-web-kkshow/main/KKshowMainExternLinks';
 import { KkshowLiveTeaser } from '@project-lc/components-web-kkshow/main/KkshowMainLiveTeaser';
 import { KkshowMainPlusFriend } from '@project-lc/components-web-kkshow/main/KkshowMainPlusFriend';
-import { KksshowBottomQuickMenu } from '@project-lc/components-shared/KksshowBottomQuickMenu';
+import { BottomQuickMenu } from '@project-lc/components-shared/BottomQuickMenu';
 import { getKkshowMain, kkshowMainQueryKey } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
@@ -71,7 +71,7 @@ export default function Index(): JSX.Element {
       <KkshowMainPlusFriend />
       <KkshowMainBestBroadcaster />
 
-      <KksshowBottomQuickMenu />
+      <BottomQuickMenu />
 
       <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />
