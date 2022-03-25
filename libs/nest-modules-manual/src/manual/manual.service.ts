@@ -1,5 +1,5 @@
 import { Injectable, CACHE_MANAGER, Inject, BadRequestException } from '@nestjs/common';
-import { Manual } from '@prisma/client';
+import { Manual, UserType } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { EditManualDto, PostManualDto } from '@project-lc/shared-types';
@@ -24,9 +24,18 @@ export class ManualService extends ServiceBaseWithCache {
     return manual;
   }
 
-  /** 이용안내 목록 조회 */
-  async getManualList(): Promise<Manual[]> {
-    return this.prisma.manual.findMany();
+  /** 이용안내 목록 조회
+   * @param target? seller | broadcaster 유저타입 명시하면 해당 타입에 해당하는 이용안내 데이터만 조회(order 오름차순, 이름 오름차순 정렬)
+   */
+  async getManualList(target?: UserType): Promise<Manual[]> {
+    if (!target) return this.prisma.manual.findMany();
+
+    return this.prisma.manual.findMany({
+      where: {
+        target,
+      },
+      orderBy: [{ order: 'asc' }, { title: 'asc' }],
+    });
   }
 
   /** 이용안내 개별 조회(id로 조회) */

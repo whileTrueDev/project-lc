@@ -13,7 +13,11 @@ import {
 import { Manual } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { ManualService } from '@project-lc/nest-modules-manual';
-import { EditManualDto, PostManualDto } from '@project-lc/shared-types';
+import {
+  AdminManualListRes,
+  EditManualDto,
+  PostManualDto,
+} from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin/manual')
@@ -28,8 +32,13 @@ export class AdminManualController {
 
   /** 이용안내 목록 조회 */
   @Get('list')
-  getManualList(): Promise<Manual[]> {
-    return this.manualService.getManualList();
+  async getManualList(): Promise<AdminManualListRes> {
+    const sellerManualList = await this.manualService.getManualList('seller');
+    const broadcasterManualList = await this.manualService.getManualList('broadcaster');
+    return {
+      seller: sellerManualList,
+      broadcaster: broadcasterManualList,
+    };
   }
 
   /** 이용안내 수정 */
