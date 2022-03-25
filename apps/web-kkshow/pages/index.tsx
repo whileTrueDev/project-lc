@@ -71,10 +71,9 @@ export default function Index(): JSX.Element {
       <KkshowMainPlusFriend />
       <KkshowMainBestBroadcaster />
 
-      <BottomQuickMenu />
-
       <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />
+      <BottomQuickMenu />
     </Box>
   );
 }

@@ -1,41 +1,68 @@
-import { VStack, Center, Text, useColorModeValue, Flex } from '@chakra-ui/react';
-import { useRouter } from 'next/router';
-import { quickMenuLinks } from '@project-lc/components-constants/quickMenu';
 import { Icon } from '@chakra-ui/icons';
+import { Box, Center, Flex, Text, useColorModeValue, VStack } from '@chakra-ui/react';
+import {
+  QuickMenuLink,
+  quickMenuLinks,
+} from '@project-lc/components-constants/quickMenu';
+import { useRouter } from 'next/router';
+import { useMemo } from 'react';
 
 export function BottomQuickMenu(): JSX.Element {
-  const router = useRouter();
   return (
-    <Flex
-      display={{ base: 'flex', md: 'none' }}
-      justifyContent="space-around"
-      position="fixed"
-      bottom="0"
-      right="0"
-      bgColor={useColorModeValue('gray.100', 'gray.700')}
-      borderTop="1px solid #d2d2d2"
-      width="100%"
-      height="10vh"
-      zIndex="docked"
-    >
-      {quickMenuLinks.map((link) =>
-        link.type === 'link' ? (
-          <Center w="100%" key={link.name}>
-            <VStack as="button" width="80%" onClick={() => router.push(link.href || '')}>
-              <Icon as={link.icon} width={5} height={5} />
-              <Text>{link.name}</Text>
-            </VStack>
-          </Center>
-        ) : (
-          <Center w="100%" key={link.name}>
-            <VStack as="button" width="80%" onClick={link.onClick}>
-              <Icon as={link.icon} width={5} height={5} />
-              <Text>{link.name}</Text>
-            </VStack>
-          </Center>
-        ),
-      )}
-    </Flex>
+    <>
+      <Flex
+        display={{ base: 'flex', md: 'none' }}
+        justifyContent="space-around"
+        position="fixed"
+        bottom="0"
+        right="0"
+        bgColor={useColorModeValue('white', 'gray.900')}
+        borderTopWidth="thin"
+        borderTopColor={useColorModeValue('gray.200', 'gray.700')}
+        width="100%"
+        height="7vh"
+        zIndex="docked"
+      >
+        {quickMenuLinks.map((link) => (
+          <BottomQuickMenuItem key={link.name} link={link} />
+        ))}
+      </Flex>
+      <Box h="7vh" />
+    </>
+  );
+}
+
+interface BottomQuickMenuItemProps {
+  link: QuickMenuLink;
+}
+function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
+  const router = useRouter();
+  const isMatched = useMemo((): boolean => {
+    if (link.type === 'function') return false;
+    if (!link.href) return false;
+    if (link.href === '/') return router.pathname === link.href;
+    return router.pathname.includes(link.href);
+  }, [link, router.pathname]);
+
+  const onQuickMenuClick = (): void => {
+    if (link.type === 'link') {
+      router.push(link.href || '#');
+    } else if (link.type === 'function') {
+      link.onClick();
+    }
+  };
+  return (
+    <Center w="100%">
+      <VStack
+        color={isMatched ? 'unset' : 'gray.500'}
+        as="button"
+        width="80%"
+        onClick={onQuickMenuClick}
+      >
+        <Icon as={link.icon} width={5} height={5} />
+        <Text fontWeight={isMatched ? 'bold' : 'unset'}>{link.name}</Text>
+      </VStack>
+    </Center>
   );
 }
 

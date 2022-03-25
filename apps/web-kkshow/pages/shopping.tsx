@@ -1,6 +1,7 @@
 import { Box } from '@chakra-ui/react';
 import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
+import BottomQuickMenu from '@project-lc/components-shared/BottomQuickMenu';
 import KkshowNavbar from '@project-lc/components-web-kkshow/KkshowNavbar';
 import KKshowMainExternLinks from '@project-lc/components-web-kkshow/main/KKshowMainExternLinks';
 import { ShoppingCarousel } from '@project-lc/components-web-kkshow/shopping/ShoppingCarousel';
@@ -27,6 +28,7 @@ export default function Shopping(): JSX.Element {
 
       <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />
+      <BottomQuickMenu />
     </Box>
   );
 }
