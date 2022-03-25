@@ -13,6 +13,8 @@ export type ImageInputProps = {
   variant?: 'unstyle' | 'chakra';
   size?: ButtonProps['size'];
   imageSizeLimit?: number; // 업로드 파일 용량 제한
+  title?: string;
+  isDisabled?: boolean;
 } & Pick<React.HTMLProps<HTMLButtonElement>, 'required' | 'multiple'>;
 
 export function ImageInput({
@@ -23,6 +25,8 @@ export function ImageInput({
   multiple = false,
   imageSizeLimit = 10 * MB, // 이미지 파일 크기 제한 기본 10mb
   size,
+  title = '사진 업로드',
+  isDisabled = false,
 }: ImageInputProps): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -79,11 +83,12 @@ export function ImageInput({
           style={{ display: 'none' }}
         />
         <Button
+          isDisabled={isDisabled}
           size={size}
           leftIcon={<FiFile />}
           onClick={() => inputRef.current?.click()}
         >
-          사진 업로드
+          {title}
         </Button>
       </InputGroup>
     );
@@ -96,6 +101,7 @@ export function ImageInput({
       multiple={multiple}
       type="file"
       required={required}
+      disabled={isDisabled}
       onChange={(e): void => {
         readImage(e);
       }}
