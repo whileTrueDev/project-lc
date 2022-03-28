@@ -3,7 +3,7 @@ import { EditManualDto, PostManualDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
-import { ADMIN_MANUAL_QUERY_KEY } from '../queries/useAdminManualList';
+import { ADMIN_MANUAL_LIST_QUERY_KEY } from '../queries/useAdminManualList';
 
 /** 관리자 이용안내 생성 뮤테이션 훅 */
 export const useAdminManualPostMutation = (): UseMutationResult<
@@ -17,7 +17,9 @@ export const useAdminManualPostMutation = (): UseMutationResult<
       axios.post<Manual>('/admin/manual', dto).then((res) => res.data),
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries(ADMIN_MANUAL_QUERY_KEY);
+        queryClient.invalidateQueries(ADMIN_MANUAL_LIST_QUERY_KEY, {
+          refetchInactive: true,
+        });
       },
     },
   );
@@ -37,7 +39,7 @@ export const useAdminManualEditMutation = (): UseMutationResult<
     },
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries(ADMIN_MANUAL_QUERY_KEY);
+        queryClient.invalidateQueries(ADMIN_MANUAL_LIST_QUERY_KEY);
       },
     },
   );
@@ -56,7 +58,7 @@ export const useAdminManualDeleteMutation = (): UseMutationResult<
     },
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries(ADMIN_MANUAL_QUERY_KEY);
+        queryClient.invalidateQueries(ADMIN_MANUAL_LIST_QUERY_KEY);
       },
     },
   );
