@@ -21,7 +21,7 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=97',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2021/12/_temp_16385092718881large.jpg',
-      normalPrice: 17000,
+      normalPrice: 18000,
       discountedPrice: 10000,
     },
     {
@@ -45,15 +45,15 @@ export const kkshowShoppingTabDummyData = {
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16426670960515large.png',
       normalPrice: 18000,
-      discountedPrice: '14000',
+      discountedPrice: 14000,
     },
     {
       name: '식스레시피 감자전 부침개',
       linkUrl: 'https://k-kmarket.com/goods/view?no=146',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16424958510161large.jpg',
-      normalPrice: '22000',
-      discountedPrice: '8900',
+      normalPrice: 22000,
+      discountedPrice: 8900,
     },
   ],
   // newLineUp ; 신상 라인업
@@ -63,15 +63,15 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=96',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16415361246260large.jpg',
-      normalPrice: '12000',
-      discountedPrice: '11990',
+      normalPrice: 12000,
+      discountedPrice: 11990,
     },
     {
       name: '진국보감 얼큰 칼칼 전주식 갈비전골',
       linkUrl: 'https://k-kmarket.com/goods/view?no=97',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/92_temp_16425790437819large.jpg',
-      normalPrice: '20000',
+      normalPrice: 20000,
       discountedPrice: 10000,
     },
     {
@@ -79,8 +79,8 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=97',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16415357317356large.jpg',
-      normalPrice: '32000',
-      discountedPrice: '30000',
+      normalPrice: 32000,
+      discountedPrice: 30000,
     },
     {
       name: '싸움의고수 보쌈 150g x 2팩',
@@ -95,8 +95,7 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=97',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2021/12/_temp_16405271386492large.jpg',
-      normalPrice: '8900',
-      discountedPrice: '8900',
+      normalPrice: 8900,
     },
   ],
   // popularGoods ; 많이 찾는 상품
@@ -139,7 +138,7 @@ export const kkshowShoppingTabDummyData = {
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2021/12/_temp_16385092718881large.jpg',
       normalPrice: 17000,
-      discountedPrice: '11000',
+      discountedPrice: 11000,
     },
   ],
   // recommendations; 크크마켓 추천상품

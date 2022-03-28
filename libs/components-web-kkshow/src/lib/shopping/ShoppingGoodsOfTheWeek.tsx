@@ -1,8 +1,9 @@
-import { Box, Flex, Heading, Image } from '@chakra-ui/react';
+import { Box, Flex, Heading, Image, LinkBox, LinkOverlay } from '@chakra-ui/react';
 import FadeUp from '@project-lc/components-layout/motion/FadeUp';
 import SlideCustom from '@project-lc/components-layout/motion/SlideCustom';
 import { useKkshowShopping } from '@project-lc/hooks';
 import { KkshowShoppingTabGoodsData } from '@project-lc/shared-types';
+import Link from 'next/link';
 import { useState } from 'react';
 import { Autoplay, Swiper as _Swiper } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -35,7 +36,17 @@ export function ShoppingGoodsOfTheWeek(): JSX.Element {
 
   const detail = active ? (
     <SlideCustom>
-      <GoodsDisplayDetail goods={active} fontSize={['xl', 'xl', '2xl']} noOfLines={2} />
+      <LinkBox>
+        <Link href={active.linkUrl} passHref>
+          <LinkOverlay href={active.linkUrl}>
+            <GoodsDisplayDetail
+              goods={active}
+              fontSize={['xl', 'xl', '2xl']}
+              noOfLines={2}
+            />
+          </LinkOverlay>
+        </Link>
+      </LinkBox>
     </SlideCustom>
   ) : null;
 

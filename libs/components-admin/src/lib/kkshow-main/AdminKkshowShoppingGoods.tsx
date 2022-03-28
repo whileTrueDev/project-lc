@@ -105,14 +105,11 @@ export function AdminKkshowShoppingGoods({
               type="number"
             />
           </FormControl>
-          <FormControl as={Flex} align="center" isRequired>
+          <FormControl as={Flex} align="center">
             <FormLabel minW={42} m={0} htmlFor="할인가" fontSize="xs">
               할인가
             </FormLabel>
-            <Input
-              {...register(`${type}.${index}.discountedPrice`, { required: true })}
-              type="number"
-            />
+            <Input {...register(`${type}.${index}.discountedPrice`)} type="number" />
           </FormControl>
         </Stack>
       </Flex>

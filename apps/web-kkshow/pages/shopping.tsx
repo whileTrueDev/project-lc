@@ -12,7 +12,7 @@ import { ShoppingNewLineUp } from '@project-lc/components-web-kkshow/shopping/Sh
 import { ShoppingPopularGoods } from '@project-lc/components-web-kkshow/shopping/ShoppingPopularGoods';
 import { ShoppingRecommendations } from '@project-lc/components-web-kkshow/shopping/ShoppingRecommendations';
 import { ShoppingReviews } from '@project-lc/components-web-kkshow/shopping/ShoppingReviews';
-import { kkshowShoppingQueryKey, getKkshowShopping } from '@project-lc/hooks';
+import { getKkshowShopping, kkshowShoppingQueryKey } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
 import { dehydrate, DehydratedState } from 'react-query';
