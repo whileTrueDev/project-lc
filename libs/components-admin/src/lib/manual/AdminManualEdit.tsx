@@ -1,4 +1,4 @@
-import { Text, Stack, useToast, Button, Box, useDisclosure } from '@chakra-ui/react';
+import { Button, Stack, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import {
   useAdminManualDeleteMutation,
@@ -68,7 +68,7 @@ export function AdminManualEdit({ id }: AdminManualEditProps): JSX.Element {
         </Button>
       </Stack>
       <AdminManualForm
-        title="이용안내 작성페이지"
+        title="이용안내 수정페이지"
         defaultValues={manual}
         onConfirm={onEditConfirm}
       />

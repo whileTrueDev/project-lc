@@ -10,10 +10,10 @@ import {
 import { UserType } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { SunEditorWrapper, useSunEditorRef } from '@project-lc/components-core/SunEditor';
-import { EditManualDto } from '@project-lc/shared-types';
+import { EditManualDto, PostManualDto } from '@project-lc/shared-types';
 import { FormProvider, useForm } from 'react-hook-form';
 
-export type ManualFormData = EditManualDto;
+export type ManualFormData = PostManualDto;
 
 export function AdminManualForm({
   title,
