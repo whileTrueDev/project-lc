@@ -2,7 +2,7 @@ import { Box, Flex } from '@chakra-ui/react';
 import BottomQuickMenu from '@project-lc/components-shared/BottomQuickMenu';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
-import { useKkshowSearchResult } from '@project-lc/hooks';
+import { useKkshowSearchResults } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { SearchResult } from '@project-lc/shared-types';
@@ -43,7 +43,7 @@ export function useSearchPageState(): {
 
   const [query, setQuery] = useState<string | undefined>(searchKeyword);
 
-  const { data, isLoading } = useKkshowSearchResult(query);
+  const { data, isLoading } = useKkshowSearchResults(query);
 
   useEffect(() => {
     setQuery(keyword ? (keyword as string) : undefined);

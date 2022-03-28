@@ -14,7 +14,6 @@ import { useKkshowSearchStore } from '@project-lc/stores';
 import { SearchBox } from './SearchBox';
 
 export function SearchPageSearcher(): JSX.Element {
-  // const setKeyword = useKkshowSearchStore((s) => s.setKeyword);
   const initialRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   return (
@@ -22,9 +21,9 @@ export function SearchPageSearcher(): JSX.Element {
       <InputGroup
         size="md"
         mt={3}
-        w={{ base: '360px', md: '560px' }}
         display={{ base: 'flex', md: 'none' }}
         alignItems="center"
+        ref={initialRef}
       >
         <Box
           as="button"

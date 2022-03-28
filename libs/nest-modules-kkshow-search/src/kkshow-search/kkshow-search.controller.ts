@@ -7,7 +7,6 @@ export class KkshowSearchController {
 
   @Get()
   getSearchResults(@Query('keyword') keyword: any): Promise<any> {
-    console.log('receive', keyword);
-    return this.kkshowSearchService.search(keyword);
+    return this.kkshowSearchService.searchResultPreprocessing(keyword);
   }
 }
