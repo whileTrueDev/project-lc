@@ -7,6 +7,7 @@ import {
   FcFaq,
   FcSms,
   FcAdvertising,
+  FcCloseUpMode,
 } from 'react-icons/fc';
 
 import { AiOutlineShop, AiOutlineHome, AiOutlineSetting } from 'react-icons/ai';
@@ -260,6 +261,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
         name: '이용정책, 개인정보처리방침',
         href: '/general/policy',
         icon: FcList,
+      },
+      {
+        name: '이용안내',
+        href: '/general/manual',
+        icon: FcCloseUpMode,
       },
     ],
   },
