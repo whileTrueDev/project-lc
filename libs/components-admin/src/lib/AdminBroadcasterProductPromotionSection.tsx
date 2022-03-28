@@ -41,14 +41,7 @@ import {
   UpdateProductPromotionDto,
 } from '@project-lc/shared-types';
 import { useCallback } from 'react';
-import {
-  FieldError,
-  FieldValues,
-  Path,
-  SubmitHandler,
-  useForm,
-  UseFormRegister,
-} from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { FmGoodsSeqInputHelpText } from './AdminGoodsConfirmationDialog';
 
 export interface AdminBroadcasterProductPromotionSectionProps {
@@ -83,6 +76,11 @@ export function AdminBroadcasterProductPromotionSection({
     </Stack>
   );
 }
+
+const commissionRateMinMax = {
+  max: { value: 100, message: '최대값은 100입니다' },
+  min: { value: 0, message: '최소값은 0입니다' },
+};
 
 type ProductPromotionCreateFormData = {
   promotionPageId: number;
@@ -138,10 +136,7 @@ export function AdminProductPromotionForm({
               autoComplete="off"
               {...register('broadcasterCommissionRate', {
                 valueAsNumber: true,
-                validate: {
-                  min: (v) => (v && v >= 0) || '최소값은 0입니다',
-                  max: (v) => (v && v <= 100) || '최대값은 100입니다',
-                },
+                ...commissionRateMinMax,
                 required: '방송인 수수료를 작성해주세요.',
               })}
             />
@@ -165,10 +160,7 @@ export function AdminProductPromotionForm({
               autoComplete="off"
               {...register('whiletrueCommissionRate', {
                 valueAsNumber: true,
-                validate: {
-                  min: (v) => (v && v >= 0) || '최소값은 0입니다',
-                  max: (v) => (v && v <= 100) || '최대값은 100입니다',
-                },
+                ...commissionRateMinMax,
                 required: '와일트루 수수료를 작성해주세요.',
               })}
             />
@@ -436,10 +428,7 @@ export function AdminProductPromotionUpdateModal({
                     autoComplete="off"
                     {...register('broadcasterCommissionRate', {
                       valueAsNumber: true,
-                      validate: {
-                        min: (v) => (v && v >= 0) || '최소값은 0입니다',
-                        max: (v) => (v && v <= 100) || '최대값은 100입니다',
-                      },
+                      ...commissionRateMinMax,
                       required: '방송인 수수료를 작성해주세요.',
                     })}
                   />
@@ -464,10 +453,7 @@ export function AdminProductPromotionUpdateModal({
                     autoComplete="off"
                     {...register('whiletrueCommissionRate', {
                       valueAsNumber: true,
-                      validate: {
-                        min: (v) => (v && v >= 0) || '최소값은 0입니다',
-                        max: (v) => (v && v <= 100) || '최대값은 100입니다',
-                      },
+                      ...commissionRateMinMax,
                       required: '와일트루 수수료를 작성해주세요.',
                     })}
                   />

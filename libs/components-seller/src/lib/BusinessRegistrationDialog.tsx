@@ -84,19 +84,19 @@ export function BusinessRegistrationDialog(
         companyName,
       });
 
-      const savedMailOrderSalesImageName = await s3.s3UploadImage({
-        filename: mailOrderSalesImageName,
-        file: mailOrderSalesImage,
-        type: 'mail-order',
-        userMail: profileData?.email,
-        companyName,
-      });
+      let savedMailOrderSalesImageName = '';
+      // 통신판매업신고증(필수 아님)
+      if (mailOrderSalesImage && mailOrderSalesImageName) {
+        savedMailOrderSalesImageName = await s3.s3UploadImage({
+          filename: mailOrderSalesImageName,
+          file: mailOrderSalesImage,
+          type: 'mail-order',
+          userMail: profileData?.email,
+          companyName,
+        });
+      }
 
-      // 통신판매업 신고증의 경우, 선택이기 때문에 파일은 존재하나, 이미지 저장후의 이름이 존재하지 않는경우에만 에러
-      if (
-        !savedBusinessRegistrationImageName ||
-        (mailOrderSalesImageName && !savedMailOrderSalesImageName)
-      ) {
+      if (!savedBusinessRegistrationImageName) {
         throw new Error('S3 ERROR');
       }
 
@@ -104,7 +104,7 @@ export function BusinessRegistrationDialog(
       await mutation.mutateAsync({
         ...data,
         businessRegistrationImageName: savedBusinessRegistrationImageName,
-        mailOrderSalesImageName: savedMailOrderSalesImageName || '',
+        mailOrderSalesImageName: savedMailOrderSalesImageName,
       });
 
       toast({
