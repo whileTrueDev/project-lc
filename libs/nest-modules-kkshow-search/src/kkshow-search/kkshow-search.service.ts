@@ -5,11 +5,11 @@ import { PrismaService } from '@project-lc/prisma-orm';
 export class KkshowSearchService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async search(keyword: string): Promise<any> {
+  async search(keyword: any): Promise<any> {
     const productSearch = await this.prisma.goods.findMany({
       where: {
         goods_name: {
-          search: keyword,
+          search: keyword.trim(),
         },
       },
       select: {
@@ -39,7 +39,7 @@ export class KkshowSearchService {
     const broadcasterSearch = await this.prisma.broadcaster.findMany({
       where: {
         userNickname: {
-          search: keyword,
+          search: keyword.trim(),
         },
       },
       select: {
@@ -65,9 +65,6 @@ export class KkshowSearchService {
         },
       },
     });
-
-    console.log(productSearch);
-    console.log(broadcasterSearch);
-    return true;
+    return { productSearch, broadcasterSearch };
   }
 }

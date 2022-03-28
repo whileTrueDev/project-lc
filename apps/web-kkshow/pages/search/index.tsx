@@ -7,8 +7,8 @@ import { useRouter } from 'next/router';
 
 export function Search(): JSX.Element {
   const router = useRouter();
-
   const keyword = router.query.keyword as string;
+  console.log('키워드', keyword);
   const { data } = useKkshowSearchResults(keyword);
   console.log(data);
   return (

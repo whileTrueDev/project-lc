@@ -15,9 +15,7 @@ export const getKkshowSearchResults = async (keyword: string): Promise<any> => {
 export const useKkshowSearchResults = (
   keyword: string,
 ): UseQueryResult<any, AxiosError> => {
-  return useQuery<any, AxiosError>(
-    'getSearchResults',
-    () => getKkshowSearchResults(keyword),
-    {},
-  );
+  console.log('훅 내부', keyword);
+  const queryKey = ['getSearchResults', keyword];
+  return useQuery<any, AxiosError>(queryKey, () => getKkshowSearchResults(keyword));
 };

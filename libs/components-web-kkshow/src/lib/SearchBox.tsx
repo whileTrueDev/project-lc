@@ -1,22 +1,25 @@
-import { Flex, Input, IconButton, useColorModeValue } from '@chakra-ui/react';
+import { Flex, Input, IconButton, useColorModeValue, Link } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import { useRef } from 'react';
 import { useKkshowSearchStore } from '@project-lc/stores';
+import { useQueryClient } from 'react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 
 export function SearchBox(): JSX.Element {
   const initialRef = useRef<HTMLInputElement>(null);
+
   const { keyword } = useKkshowSearchStore();
   const setKeyword = useKkshowSearchStore((s) => s.setKeyword);
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   const inputPrefix = (router.query.keyword as string) || '';
 
-  const { handleSubmit, control, register, watch, setValue, getValues } = useForm<any>();
-  // * 필터/검색 폼 제출
+  const { handleSubmit, setValue } = useForm<any>();
+  //* 필터/검색 폼 제출
   const onSubmit: SubmitHandler<any> = (data) => {
-    router.push(`/search?keyword=${getValues('keyword')}`);
+    router.push({ pathname: '/search', query: { keyword } });
+    queryClient.invalidateQueries('getSearchResults');
   };
 
   return (
@@ -29,8 +32,8 @@ export function SearchBox(): JSX.Element {
         rounded="md"
         bgColor={useColorModeValue('blue.400', 'gray.600')}
         onChange={(e) => {
-          setValue('keyword', e.target.value);
           setKeyword(e.target.value);
+          setValue('keyword', e.target.value);
         }}
       />
       <IconButton
