@@ -52,7 +52,7 @@ export function PageManagerTabs({
   }, [formState.isDirty]);
 
   return (
-    <Stack minWidth="6xl">
+    <Stack minWidth="6xl" w="100%">
       <Text fontWeight="bold">{title}</Text>
       <Text>{subtitle}</Text>
       {saveButton}

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, AdminGuard } from '@project-lc/nest-modules-authguard';
 import {
   KkshowMainService,
@@ -8,6 +8,7 @@ import {
   KkshowMainResData,
   KkshowMainDto,
   KkshowShoppingTabResData,
+  KkshowShoppingDto,
 } from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
@@ -32,15 +33,17 @@ export class AdminKkshowMainController {
   }
 
   /** ================================= */
-  // 크크쇼메인페이지 관리
+  // 크크쇼 쇼핑페이지 관리
   /** ================================= */
   @Get('kkshow-shopping')
   async getShoppingPageData(): Promise<KkshowShoppingTabResData | null> {
     return this.kkshowShoppingService.read();
   }
 
-  // @Post('kkshow-shopping')
-  // async upsertShoppingPageData(@Body() data: KkshowMainDto): Promise<KkshowMainResData> {
-  //   return this.kkshowShoppingService.upsert(data);
-  // }
+  @Put('kkshow-shopping')
+  async upsertShoppingPageData(
+    @Body() data: KkshowShoppingDto,
+  ): Promise<KkshowShoppingTabResData> {
+    return this.kkshowShoppingService.upsert(data);
+  }
 }

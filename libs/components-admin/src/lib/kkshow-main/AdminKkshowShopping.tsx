@@ -1,14 +1,150 @@
 import { AddIcon } from '@chakra-ui/icons';
-import { Box, Spinner, Text } from '@chakra-ui/react';
-import { useKkshowShopping } from '@project-lc/hooks';
-import { KkshowMainResData, KkshowShoppingTabResData } from '@project-lc/shared-types';
+import { Box, Spinner, Text, useToast } from '@chakra-ui/react';
+import { useAdminKkshowShoppingMutation, useKkshowShopping } from '@project-lc/hooks';
+import { KkshowShoppingTabResData } from '@project-lc/shared-types';
+import { kkshowShoppingToDto } from '@project-lc/utils';
 import { useCallback, useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import AdminKkshowShoppingCarousel from './AdminKkshowShoppingCarousel';
+import AdminKkshowShoppingGoods from './AdminKkshowShoppingGoods';
+import AdminKkshowShoppingKeywords from './AdminKkshowShoppingKeywords';
+import AdminKkshowShoppingReviews from './AdminKkshowShoppingReviews';
 import PageManagerContainer from './PageManagerContainer';
 import PageManagerTabs from './PageManagerTabs';
 
+const tabs: { title: string; component: JSX.Element }[] = [
+  {
+    title: '캐러셀',
+    component: (
+      <PageManagerContainer
+        title="쇼핑탭 캐러셀"
+        fieldName="carousel"
+        buttons={[
+          {
+            label: '캐러셀 이미지 추가',
+            icon: <AddIcon />,
+            onClick: ({ append }) =>
+              append({ description: '', imageUrl: '', linkUrl: '' }),
+          },
+        ]}
+        Component={({ index }) => <AdminKkshowShoppingCarousel index={index} />}
+      />
+    ),
+  },
+  {
+    title: '금주의상품',
+    component: (
+      <PageManagerContainer
+        title="금주의 상품"
+        fieldName="goodsOfTheWeek"
+        buttons={[
+          {
+            label: '금주의 상품 추가',
+            icon: <AddIcon />,
+            onClick: ({ append }) => append({}),
+          },
+        ]}
+        Component={({ index }) => (
+          <AdminKkshowShoppingGoods index={index} type="goodsOfTheWeek" />
+        )}
+      />
+    ),
+  },
+  {
+    title: '신상라인업',
+    component: (
+      <PageManagerContainer
+        title="신상라인업"
+        fieldName="newLineUp"
+        buttons={[
+          {
+            label: '신상라인업 추가(최대 5개까지만 보여짐)',
+            icon: <AddIcon />,
+            onClick: ({ append }) => append({}),
+          },
+        ]}
+        Component={({ index }) => (
+          <AdminKkshowShoppingGoods index={index} type="newLineUp" />
+        )}
+      />
+    ),
+  },
+  {
+    title: '많이찾은상품',
+    component: (
+      <PageManagerContainer
+        title="많이찾은상품"
+        fieldName="popularGoods"
+        buttons={[
+          {
+            label: '많이찾은상품 추가(최대 개까지만 보여짐)',
+            icon: <AddIcon />,
+            onClick: ({ append }) => append({}),
+          },
+        ]}
+        Component={({ index }) => (
+          <AdminKkshowShoppingGoods index={index} type="popularGoods" />
+        )}
+      />
+    ),
+  },
+  {
+    title: '추천상품',
+    component: (
+      <PageManagerContainer
+        title="추천상품"
+        fieldName="recommendations"
+        buttons={[
+          {
+            label: '추천상품 추가(최대 3개까지만 보여짐)',
+            icon: <AddIcon />,
+            onClick: ({ append }) => append({}),
+          },
+        ]}
+        Component={({ index }) => (
+          <AdminKkshowShoppingGoods index={index} type="recommendations" />
+        )}
+      />
+    ),
+  },
+  {
+    title: '생생후기',
+    component: (
+      <PageManagerContainer
+        title="생생후기"
+        fieldName="reviews"
+        buttons={[
+          {
+            label: '생생후기 추가(최대 4개까지만 보여짐)',
+            icon: <AddIcon />,
+            onClick: ({ append }) => append({}),
+          },
+        ]}
+        Component={({ index }) => <AdminKkshowShoppingReviews index={index} />}
+      />
+    ),
+  },
+  {
+    title: '키워드검색',
+    component: (
+      <PageManagerContainer
+        title="키워드검색"
+        fieldName="keywords"
+        buttons={[
+          {
+            label: '키워드검색 추가',
+            icon: <AddIcon />,
+            onClick: ({ append }) => append({}),
+          },
+        ]}
+        Component={({ index }) => <AdminKkshowShoppingKeywords index={index} />}
+      />
+    ),
+  },
+];
+
 export function AdminKkshowShopping(): JSX.Element {
+  const toast = useToast();
   const { data: kkshowShoppingData, isLoading, isError, error } = useKkshowShopping();
 
   const methods = useForm<KkshowShoppingTabResData>();
@@ -23,16 +159,16 @@ export function AdminKkshowShopping(): JSX.Element {
     restoreData();
   }, [kkshowShoppingData, restoreData]);
 
-  // const postRequest = useAdminKkshowMainMutation();
-  const onSubmit = (data: KkshowMainResData): void => {
-    // KkshowMainResData -> KkshowMainDto 로 변환하여 요청할것
-    // const dto = kkshowDataToDto(data);
-    // postRequest
-    //   .mutateAsync(dto)
-    //   .then((res) => {
-    //     methods.reset(data); // 저장 후 리셋하여 isDirty값을 false로 되돌림
-    //   })
-    //   .catch((e) => console.error(e));
+  const putRequest = useAdminKkshowShoppingMutation();
+  const onSubmit = (data: KkshowShoppingTabResData): void => {
+    const dto = kkshowShoppingToDto(data);
+    putRequest
+      .mutateAsync(dto)
+      .then(() => methods.reset(data))
+      .catch((e) => {
+        toast({ title: '쇼핑탭 데이터 등록 중 에러발생', status: 'error' });
+        console.error(e);
+      });
   };
 
   if (isLoading) return <Spinner />;
@@ -49,31 +185,7 @@ export function AdminKkshowShopping(): JSX.Element {
             reset: restoreData,
             isResetButtonDisabled: !kkshowShoppingData,
           }}
-          tabs={[
-            {
-              title: '캐러셀',
-              component: (
-                <PageManagerContainer
-                  title="쇼핑탭 캐러셀"
-                  fieldName="carousel"
-                  buttons={[
-                    {
-                      label: '캐러셀 이미지 추가',
-                      icon: <AddIcon />,
-                      onClick: ({ append }) =>
-                        append({ description: '', imageUrl: '', linkUrl: '' }),
-                    },
-                  ]}
-                  Component={({ index }) => <AdminKkshowShoppingCarousel index={index} />}
-                />
-              ),
-            },
-            { title: '금주의상품', component: <div>금주의상품</div> },
-            { title: '신상라인업', component: <div>신상라인업</div> },
-            { title: '많이찾은상품', component: <div>많이찾은상품</div> },
-            { title: '생생후기', component: <div>생생후기</div> },
-            { title: '키워드검색', component: <div>키워드검색</div> },
-          ]}
+          tabs={tabs}
         />
       </Box>
     </FormProvider>

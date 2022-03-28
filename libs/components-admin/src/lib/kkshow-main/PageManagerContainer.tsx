@@ -1,7 +1,7 @@
 import { ChevronDownIcon, ChevronUpIcon, DeleteIcon } from '@chakra-ui/icons';
-import { Button, ButtonGroup, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Flex, Stack, Text } from '@chakra-ui/react';
 import { KkshowShoppingTabResData } from '@project-lc/shared-types';
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
 interface PageManagerButtonOpt {
@@ -28,12 +28,18 @@ export function PageManagerContainer({
   const { control } = useFormContext<KkshowShoppingTabResData>();
   const { fields, append, remove, move } = useFieldArray({ control, name: fieldName });
 
-  const moveUp = (idx: number): void => {
-    if (idx > 0) move(idx, idx - 1);
-  };
-  const moveDown = (idx: number): void => {
-    if (idx < fields.length - 1) move(idx, idx + 1);
-  };
+  const moveUp = useCallback(
+    (idx: number): void => {
+      if (idx > 0) move(idx, idx - 1);
+    },
+    [move],
+  );
+  const moveDown = useCallback(
+    (idx: number): void => {
+      if (idx < fields.length - 1) move(idx, idx + 1);
+    },
+    [fields.length, move],
+  );
 
   return (
     <Stack>
@@ -56,21 +62,19 @@ export function PageManagerContainer({
         </Stack>
       </Stack>
 
-      <Stack>
-        {fields.map((field, index) => (
-          <Stack key={field.id} w="100%" minH={150}>
-            <PageManagerFieldItem
-              isMoveUpDisabled={index === 0}
-              isMoveDownDisabled={index === fields.length - 1}
-              moveUp={() => moveUp(index)}
-              moveDown={() => moveDown(index)}
-              removeHandler={() => remove(index)}
-            >
-              <Component index={index} />
-            </PageManagerFieldItem>
-          </Stack>
-        ))}
-      </Stack>
+      {fields.map((field, index) => (
+        <Stack key={field.id} w="100%" minH={150}>
+          <PageManagerFieldItem
+            isMoveUpDisabled={index === 0}
+            isMoveDownDisabled={index === fields.length - 1}
+            moveUp={() => moveUp(index)}
+            moveDown={() => moveDown(index)}
+            removeHandler={() => remove(index)}
+          >
+            <Component index={index} />
+          </PageManagerFieldItem>
+        </Stack>
+      ))}
     </Stack>
   );
 }
@@ -91,18 +95,18 @@ export function PageManagerFieldItem({
   moveDown?: () => void;
 }): JSX.Element {
   return (
-    <Stack
+    <Flex
       rounded="lg"
       direction="row"
       border="1px"
-      w="100%"
       p={2}
       px={4}
-      alignItems="center"
       mb={1}
+      flexWrap="wrap"
+      alignItems="center"
       justifyContent="space-between"
     >
-      <Stack direction="row">{children}</Stack>
+      <Box>{children}</Box>
 
       <Stack>
         <Button
@@ -123,8 +127,8 @@ export function PageManagerFieldItem({
           삭제
         </Button>
       </Stack>
-    </Stack>
+    </Flex>
   );
 }
 
-export default PageManagerContainer;
+export default memo(PageManagerContainer);
