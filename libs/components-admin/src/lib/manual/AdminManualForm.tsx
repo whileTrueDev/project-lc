@@ -8,10 +8,41 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { UserType } from '@prisma/client';
+import { AdminManualEditorSetOptions } from '@project-lc/components-constants/adminManualEditorSetOptions';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { SunEditorWrapper, useSunEditorRef } from '@project-lc/components-core/SunEditor';
-import { EditManualDto, PostManualDto } from '@project-lc/shared-types';
+import { PostManualDto } from '@project-lc/shared-types';
+import { s3 } from '@project-lc/utils-s3';
 import { FormProvider, useForm } from 'react-hook-form';
+
+// 에디터에 이미지 표시하기 전 이용안내에 포함된 이미지 s3에 저장 -> s3에 저장된 url을 표시
+const onImageUploadBefore = (
+  files: File[],
+  info: object,
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  uploadHandler: Function,
+): void => {
+  Promise.all(
+    files.map(async (file) => {
+      const { objectUrl } = await s3.sendPutObjectCommand({
+        Key: `manual/${file.name}_${new Date().getTime()}`,
+        Body: file,
+        ContentType: file.type,
+        ACL: 'public-read',
+      });
+      return {
+        url: objectUrl,
+        name: file.name,
+        size: file.size,
+      };
+    }),
+  ).then((data) => {
+    const response = {
+      result: data,
+    };
+    uploadHandler(response);
+  });
+};
 
 export type ManualFormData = PostManualDto;
 
@@ -81,9 +112,8 @@ export function AdminManualForm({
 
         <SunEditorWrapper
           sunEditorRef={sunEditorRef}
-          setOptions={{
-            height: '300px',
-          }}
+          onImageUploadBefore={onImageUploadBefore}
+          setOptions={AdminManualEditorSetOptions}
           defaultValue={getValues('contents')}
         />
         <Button type="submit" isLoading={isProcessing}>

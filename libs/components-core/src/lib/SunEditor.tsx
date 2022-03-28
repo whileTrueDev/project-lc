@@ -16,6 +16,7 @@ const SunEditor = dynamic(() => import('suneditor-react'), {
 export function useSunEditorRef(): MutableRefObject<SunEditorCore | null> {
   return useRef<SunEditorCore | null>(null);
 }
+
 export function SunEditorWrapper(
   props: SunEditorReactProps & { sunEditorRef: MutableRefObject<SunEditorCore | null> },
 ): JSX.Element {
@@ -23,5 +24,6 @@ export function SunEditorWrapper(
   const getSunEditorInstance = (sunEditor: SunEditorCore): void => {
     sunEditorRef.current = sunEditor;
   };
+
   return <SunEditor getSunEditorInstance={getSunEditorInstance} lang="ko" {...rest} />;
 }
