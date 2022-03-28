@@ -33,12 +33,7 @@ export class AdminManualController {
   /** 이용안내 목록 조회 */
   @Get('list')
   async getManualList(): Promise<AdminManualListRes> {
-    const sellerManualList = await this.manualService.getManualList('seller');
-    const broadcasterManualList = await this.manualService.getManualList('broadcaster');
-    return {
-      seller: sellerManualList,
-      broadcaster: broadcasterManualList,
-    };
+    return this.manualService.getManualList();
   }
 
   /** 이용안내 수정 */

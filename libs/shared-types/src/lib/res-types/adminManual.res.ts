@@ -1,3 +1,3 @@
-import { Manual, UserType } from '@prisma/client';
+import { Manual } from '@prisma/client';
 
-export type AdminManualListRes = Record<UserType, Manual[]>;
+export type AdminManualListRes = Manual[];
