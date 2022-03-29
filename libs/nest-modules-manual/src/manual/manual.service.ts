@@ -30,7 +30,7 @@ export class ManualService extends ServiceBaseWithCache {
     if (!target) return this.prisma.manual.findMany();
     return this.prisma.manual.findMany({
       where: { target },
-      orderBy: [{ order: 'asc', title: 'asc' }],
+      orderBy: [{ order: 'asc' }, { title: 'asc' }],
     });
   }
 
