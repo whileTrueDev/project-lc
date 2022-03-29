@@ -1,4 +1,13 @@
-import { Box, Button, Center, Container, Spinner, Stack, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Center,
+  Container,
+  Heading,
+  Spinner,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
 import { Manual, UserType } from '@prisma/client';
 import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
 import { useManualList } from '@project-lc/hooks';
@@ -45,7 +54,6 @@ export function UserManual({ userType }: UserManualProps): JSX.Element {
   return (
     <Container maxW="container.xl">
       <SettingSectionLayout title="이용안내">
-        <Text>항목을 눌러 내용을 확인해보세요!</Text>
         <UserManualHeader
           data={data}
           selectedManual={selectedManual}
@@ -83,6 +91,7 @@ function UserManualHeader({
         return (
           <Box key={item.id}>
             <Button
+              size="sm"
               my={1}
               rounded="3xl"
               onClick={() => onClick(item)}
@@ -99,13 +108,20 @@ function UserManualHeader({
 
 function UserManualDisplay({ data }: { data: Manual }): JSX.Element {
   return (
-    <Box
-      width="100%"
-      rounded="md"
-      className="sun-editor-editable"
-      minH="100px"
-      overflowY="auto"
-      dangerouslySetInnerHTML={{ __html: data.contents }}
-    />
+    <Stack>
+      <Stack px={4}>
+        <Heading size="sm">{data.title}</Heading>
+        <Text>{data.description}</Text>
+      </Stack>
+
+      <Box
+        width="100%"
+        rounded="md"
+        className="sun-editor-editable"
+        minH="100px"
+        overflowY="auto"
+        dangerouslySetInnerHTML={{ __html: data.contents }}
+      />
+    </Stack>
   );
 }
