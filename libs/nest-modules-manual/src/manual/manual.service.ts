@@ -26,17 +26,12 @@ export class ManualService extends ServiceBaseWithCache {
 
   /** 이용안내 목록 조회
    */
-  async getManualList(): Promise<Manual[]> {
-    return this.prisma.manual.findMany();
-  }
-
-  /** 이용안내 개별 조회(id로 조회) */
-  async getOneManualById(id: number): Promise<Manual> {
-    const manual = await this.prisma.manual.findUnique({ where: { id } });
-    if (!manual) {
-      throw new BadRequestException(`해당 이용안내 데이터가 없습니다 id: ${id}`);
-    }
-    return manual;
+  async getManualList(target?: UserType): Promise<Manual[]> {
+    if (!target) return this.prisma.manual.findMany();
+    return this.prisma.manual.findMany({
+      where: { target },
+      orderBy: [{ order: 'asc', title: 'asc' }],
+    });
   }
 
   /** 이용안내 수정 */
