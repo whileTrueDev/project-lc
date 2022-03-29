@@ -10,7 +10,12 @@ import {
   FcCloseUpMode,
 } from 'react-icons/fc';
 
-import { AiOutlineShop, AiOutlineHome, AiOutlineSetting } from 'react-icons/ai';
+import {
+  AiOutlineShop,
+  AiOutlineHome,
+  AiOutlineSetting,
+  AiOutlineContainer,
+} from 'react-icons/ai';
 import { BsBox } from 'react-icons/bs';
 import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
 import { IconType } from 'react-icons/lib';
@@ -125,6 +130,12 @@ export const mypageNavLinks: MypageLink[] = [
     icon: AiOutlineShop,
     name: '상점설정',
     href: '/mypage/shopinfo',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    icon: AiOutlineContainer,
+    name: '이용안내',
+    href: '/mypage/manual',
     checkIsActive: defaultIsActiveChecker,
   },
   {
