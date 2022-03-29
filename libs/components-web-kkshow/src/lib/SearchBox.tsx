@@ -1,10 +1,11 @@
-import { Flex, Input, IconButton, useColorModeValue, Link } from '@chakra-ui/react';
+import { Flex, Input, IconButton, useColorModeValue } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { useQueryClient } from 'react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
+import { useDisplaySize } from '@project-lc/hooks';
 
 export function SearchBox(): JSX.Element {
   const initialRef = useRef<HTMLInputElement>(null);
@@ -14,13 +15,19 @@ export function SearchBox(): JSX.Element {
   const router = useRouter();
   const queryClient = useQueryClient();
   const inputPrefix = (router.query.keyword as string) || '';
-
+  const { isMobileSize } = useDisplaySize();
   const { handleSubmit, setValue } = useForm<any>();
   //* 필터/검색 폼 제출
-  const onSubmit: SubmitHandler<any> = (data) => {
+  const onSubmit: SubmitHandler<any> = () => {
     router.push({ pathname: '/search', query: { keyword } });
     queryClient.invalidateQueries('getSearchResults');
   };
+
+  useEffect(() => {
+    if (isMobileSize) {
+      initialRef?.current?.focus();
+    }
+  }, [isMobileSize]);
 
   return (
     <Flex w="100%" as="form" onSubmit={handleSubmit(onSubmit)}>

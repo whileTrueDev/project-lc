@@ -4,18 +4,12 @@ import {
   Spinner,
   Drawer,
   DrawerBody,
-  DrawerFooter,
-  DrawerHeader,
   DrawerOverlay,
   DrawerContent,
-  DrawerCloseButton,
   useDisclosure,
 } from '@chakra-ui/react';
-import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
-import { GlobalSearcher } from '@project-lc/components-web-kkshow/GlobalSearcher';
 import { SearchPageSearcher } from '@project-lc/components-web-kkshow/SearchPageSearcher';
-import { useKkshowSearchResults, useDisplaySize } from '@project-lc/hooks';
-import { useRouter } from 'next/router';
+import { useDisplaySize } from '@project-lc/hooks';
 import SearchKeywordSection from '@project-lc/components-web-kkshow/search/SearchKeywordSection';
 import SearchPageLayout, {
   useSearchPageState,
@@ -23,18 +17,8 @@ import SearchPageLayout, {
 import SearchResultBroadcasterSection from '@project-lc/components-web-kkshow/search/SearchResultBroadcasterSection';
 import SearchResultGoodsSection from '@project-lc/components-web-kkshow/search/SearchResultGoodsSection';
 import SearchResultLiveContentsSection from '@project-lc/components-web-kkshow/search/SearchResultLiveContentsSection';
-// export function Search1(): JSX.Element {
-//   const router = useRouter();
-//   const keyword = router.query.keyword as string;
-//   const { data } = useKkshowSearchResults(keyword);
-//   return (
-//     <KkshowLayout>
-//       <SearchPageSearcher />
-//     </KkshowLayout>
-//   );
-// }
 
-export function BasicUsage(): JSX.Element {
+export function MobileSearchDrawer(): JSX.Element {
   const { onClose } = useDisclosure();
   const { isMobileSize } = useDisplaySize();
   return (
@@ -53,7 +37,6 @@ export function BasicUsage(): JSX.Element {
 }
 export function Search(): JSX.Element {
   const { data, isLoading, searchKeyword } = useSearchPageState();
-  console.log(data);
   const resultCount = data
     ? data.broadcasters.length + data.goods.length + data.liveContents.length
     : 0;
@@ -70,7 +53,7 @@ export function Search(): JSX.Element {
     <SearchPageLayout>
       {!data && (
         <Box>
-          <BasicUsage />
+          <MobileSearchDrawer />
           <SearchKeywordSection keyword="" resultCount={0} />
         </Box>
       )}

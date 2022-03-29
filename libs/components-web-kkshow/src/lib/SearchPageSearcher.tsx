@@ -1,20 +1,9 @@
-import { SearchIcon, ChevronLeftIcon, SmallCloseIcon } from '@chakra-ui/icons';
-import {
-  IconButton,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Box,
-  useColorModeValue,
-  HStack,
-} from '@chakra-ui/react';
-import { useRef } from 'react';
+import { ChevronLeftIcon } from '@chakra-ui/icons';
+import { InputGroup, Box, useColorModeValue } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import { useKkshowSearchStore } from '@project-lc/stores';
 import { SearchBox } from './SearchBox';
 
 export function SearchPageSearcher(): JSX.Element {
-  const initialRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   return (
     <>
@@ -23,7 +12,6 @@ export function SearchPageSearcher(): JSX.Element {
         mt={3}
         display={{ base: 'flex', md: 'none' }}
         alignItems="center"
-        ref={initialRef}
       >
         <Box
           as="button"
