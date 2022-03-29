@@ -182,7 +182,7 @@ export const kkshowShoppingTabDummyData = {
     },
     {
       title: '양도 많고 맛있어요',
-      rating: '5',
+      rating: 5,
       linkUrl: 'https://k-kmarket.com/board/view?id=goods_review&seq=9',
       contents:
         '그래요 난 널 사랑해 언제나 믿어 꿈도 열정도 다주고 싶어 난 그대 소원을 이뤄주고 싶은 행운의 여신~~ 소원을 말해봐',
@@ -201,7 +201,7 @@ export const kkshowShoppingTabDummyData = {
     },
     {
       title: '맛있어요 리뷰',
-      rating: '3.5',
+      rating: 3.5,
       linkUrl: 'https://k-kmarket.com/board/view?id=goods_review&seq=8',
       contents:
         '어쩌고 저쩌고 이러쿵 저러쿵 리뷰 씁니다.어쩌고 저쩌고 이러쿵 저러쿵 리뷰 씁니다.어쩌고 저쩌고 이러쿵 저러쿵 리뷰 씁니다.어쩌고 저쩌고 이러쿵 저러쿵 리뷰 씁니다.어쩌고 저쩌고 이러쿵 저러쿵 리뷰 씁니다.어쩌고 저쩌고 이러쿵 저러쿵 리뷰 씁니다.',
@@ -275,4 +275,9 @@ export const kkshowShoppingTabDummyData = {
       ],
     },
   ],
+  banner: {
+    imageUrl: '',
+    linkUrl: 'https://k-kmarket.com/board/?id=event',
+    message: '신규가입하고 3000원 쿠폰 받아가세요!',
+  },
 };

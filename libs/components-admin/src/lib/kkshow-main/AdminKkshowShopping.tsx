@@ -5,6 +5,7 @@ import { KkshowShoppingTabResData } from '@project-lc/shared-types';
 import { kkshowShoppingToDto } from '@project-lc/utils';
 import { useCallback, useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { AdminKkshowShoppingBanner } from './AdminKkshowShoppingBanner';
 import AdminKkshowShoppingCarousel from './AdminKkshowShoppingCarousel';
 import AdminKkshowShoppingGoods from './AdminKkshowShoppingGoods';
 import AdminKkshowShoppingKeywords from './AdminKkshowShoppingKeywords';
@@ -106,6 +107,10 @@ const tabs: { title: string; component: JSX.Element }[] = [
         )}
       />
     ),
+  },
+  {
+    title: '배너',
+    component: <AdminKkshowShoppingBanner />,
   },
   {
     title: '생생후기',

@@ -12,5 +12,6 @@ export const kkshowShoppingToDto = (
     popularGoods: data.popularGoods.map((c) => JSON.parse(JSON.stringify(c))),
     recommendations: data.recommendations.map((c) => JSON.parse(JSON.stringify(c))),
     reviews: data.reviews.map((c) => JSON.parse(JSON.stringify(c))),
+    banner: JSON.parse(JSON.stringify(data.banner)),
   };
 };

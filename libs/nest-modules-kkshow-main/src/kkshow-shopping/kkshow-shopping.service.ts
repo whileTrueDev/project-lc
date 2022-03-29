@@ -33,6 +33,7 @@ export class KkshowShoppingService {
       keywords: parseJsonToGenericType<KkshowShoppingTabResData['keywords']>(
         data.keywords,
       ),
+      banner: parseJsonToGenericType<KkshowShoppingTabResData['banner']>(data.banner),
     };
   }
 

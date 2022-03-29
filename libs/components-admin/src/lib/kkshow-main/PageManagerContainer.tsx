@@ -4,6 +4,58 @@ import { KkshowShoppingTabResData } from '@project-lc/shared-types';
 import React, { memo, useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
+export function PageManagerFieldItem({
+  children,
+  isMoveUpDisabled = false,
+  isMoveDownDisabled = false,
+  removeHandler,
+  moveUp,
+  moveDown,
+}: {
+  children: React.ReactNode;
+  isMoveUpDisabled?: boolean;
+  isMoveDownDisabled?: boolean;
+  removeHandler?: () => void;
+  moveUp?: () => void;
+  moveDown?: () => void;
+}): JSX.Element {
+  return (
+    <Flex
+      rounded="lg"
+      direction="row"
+      border="1px"
+      p={2}
+      px={4}
+      mb={1}
+      flexWrap="wrap"
+      alignItems="center"
+      justifyContent="space-between"
+    >
+      <Box>{children}</Box>
+
+      <Stack>
+        <Button
+          leftIcon={<ChevronUpIcon />}
+          isDisabled={isMoveUpDisabled}
+          onClick={moveUp}
+        >
+          위 로
+        </Button>
+        <Button
+          leftIcon={<ChevronDownIcon />}
+          isDisabled={isMoveDownDisabled}
+          onClick={moveDown}
+        >
+          아래로
+        </Button>
+        <Button leftIcon={<DeleteIcon />} onClick={removeHandler}>
+          삭제
+        </Button>
+      </Stack>
+    </Flex>
+  );
+}
+
 interface PageManagerButtonOpt {
   icon?: JSX.Element;
   onClick: (operators: {
@@ -14,7 +66,7 @@ interface PageManagerButtonOpt {
   label: string;
 }
 export interface PageManagerContainerProps {
-  fieldName: keyof KkshowShoppingTabResData;
+  fieldName: Exclude<keyof KkshowShoppingTabResData, 'banner'>;
   title: string;
   buttons: PageManagerButtonOpt[];
   Component: (props: { index: number; [key: string]: any }) => JSX.Element;
@@ -76,58 +128,6 @@ export function PageManagerContainer({
         </Stack>
       ))}
     </Stack>
-  );
-}
-
-export function PageManagerFieldItem({
-  children,
-  isMoveUpDisabled = false,
-  isMoveDownDisabled = false,
-  removeHandler,
-  moveUp,
-  moveDown,
-}: {
-  children: React.ReactNode;
-  isMoveUpDisabled?: boolean;
-  isMoveDownDisabled?: boolean;
-  removeHandler?: () => void;
-  moveUp?: () => void;
-  moveDown?: () => void;
-}): JSX.Element {
-  return (
-    <Flex
-      rounded="lg"
-      direction="row"
-      border="1px"
-      p={2}
-      px={4}
-      mb={1}
-      flexWrap="wrap"
-      alignItems="center"
-      justifyContent="space-between"
-    >
-      <Box>{children}</Box>
-
-      <Stack>
-        <Button
-          leftIcon={<ChevronUpIcon />}
-          isDisabled={isMoveUpDisabled}
-          onClick={moveUp}
-        >
-          위 로
-        </Button>
-        <Button
-          leftIcon={<ChevronDownIcon />}
-          isDisabled={isMoveDownDisabled}
-          onClick={moveDown}
-        >
-          아래로
-        </Button>
-        <Button leftIcon={<DeleteIcon />} onClick={removeHandler}>
-          삭제
-        </Button>
-      </Stack>
-    </Flex>
   );
 }
 

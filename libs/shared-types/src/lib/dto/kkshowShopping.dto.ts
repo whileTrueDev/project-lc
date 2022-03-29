@@ -13,4 +13,5 @@ export class KkshowShoppingDto implements IKkshowShoppingDto {
   @IsJSON() recommendations: Prisma.JsonArray;
   @IsJSON() reviews: Prisma.JsonArray;
   @IsJSON() keywords: Prisma.JsonArray;
+  @IsJSON() banner: Prisma.JsonObject;
 }

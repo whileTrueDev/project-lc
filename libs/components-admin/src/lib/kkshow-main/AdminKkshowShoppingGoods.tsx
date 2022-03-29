@@ -15,7 +15,10 @@ import { useFormContext } from 'react-hook-form';
 
 export interface AdminKkshowShoppingGoodsProps {
   index: number;
-  type: Exclude<keyof KkshowShoppingTabResData, 'carousel' | 'reviews' | 'keywords'>;
+  type: Exclude<
+    keyof KkshowShoppingTabResData,
+    'carousel' | 'reviews' | 'keywords' | 'banner'
+  >;
 }
 
 export function AdminKkshowShoppingGoods({
