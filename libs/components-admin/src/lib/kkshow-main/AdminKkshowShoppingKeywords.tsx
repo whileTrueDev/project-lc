@@ -148,19 +148,21 @@ export function AdminKkshowShoppingKeywords({
 
           <Table w={600} size="sm">
             <Thead>
-              <Th flex={1}>
-                키워드명
-                <Text as="span" color="red">
-                  *
-                </Text>
-              </Th>
-              <Th flex={2}>
-                키워드 링크
-                <Text as="span" color="red">
-                  *
-                </Text>
-              </Th>
-              <Th flex={1} />
+              <Tr>
+                <Th flex={1}>
+                  키워드명
+                  <Text as="span" color="red">
+                    *
+                  </Text>
+                </Th>
+                <Th flex={2}>
+                  키워드 링크
+                  <Text as="span" color="red">
+                    *
+                  </Text>
+                </Th>
+                <Th flex={1} />
+              </Tr>
             </Thead>
 
             <Tbody>
