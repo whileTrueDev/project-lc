@@ -1,7 +1,10 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
-import { KkshowMainModule } from '@project-lc/nest-modules-kkshow-main';
+import {
+  KkshowMainModule,
+  KkshowShoppingModule,
+} from '@project-lc/nest-modules-kkshow-main';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
@@ -47,6 +50,7 @@ export class AdminModule {
     GoodsModule.withoutControllers(),
     PolicyModule,
     KkshowMainModule.withoutControllers(),
+    KkshowShoppingModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {

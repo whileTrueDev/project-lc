@@ -1,7 +1,9 @@
-import { Box, Flex, Heading, Image } from '@chakra-ui/react';
+import { Box, Flex, Heading, Image, LinkBox, LinkOverlay } from '@chakra-ui/react';
 import FadeUp from '@project-lc/components-layout/motion/FadeUp';
 import SlideCustom from '@project-lc/components-layout/motion/SlideCustom';
+import { useKkshowShopping } from '@project-lc/hooks';
 import { KkshowShoppingTabGoodsData } from '@project-lc/shared-types';
+import Link from 'next/link';
 import { useState } from 'react';
 import { Autoplay, Swiper as _Swiper } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -9,46 +11,11 @@ import { GoodsDisplayDetail } from '../GoodsDisplay';
 import KkshowMainTitle from '../main/KkshowMainTitle';
 
 export function ShoppingGoodsOfTheWeek(): JSX.Element {
-  const items: Array<KkshowShoppingTabGoodsData> = [
-    {
-      imageUrl: 'images/test/thum-4.png',
-      linkUrl: '#',
-      discountedPrice: 333000,
-      name: '길고길고길고길고길고길고긴 이름',
-      normalPrice: 555000,
-    },
-    {
-      imageUrl: 'images/test/thum-3.png',
-      linkUrl: '#',
-      discountedPrice: 333000,
-      name: '길고길고길고길고길고길고긴길고길고길고길고길고길고긴 이름2',
-      normalPrice: 555000,
-    },
-    {
-      imageUrl: 'images/test/thum-2.png',
-      linkUrl: '#',
-      discountedPrice: 333000,
-      name: '길고길고길고길고길고길고긴 이름3',
-      normalPrice: 555000,
-    },
-    {
-      imageUrl: 'images/test/thum-20.png',
-      linkUrl: '#',
-      discountedPrice: 43000,
-      name: '닭강정1',
-      normalPrice: 50000,
-    },
-    {
-      imageUrl: 'images/test/thum-18.png',
-      linkUrl: '#',
-      discountedPrice: 3000,
-      name: '미드운 닭불갈비',
-      normalPrice: 5000,
-    },
-  ];
-  const [active, setActive] = useState<KkshowShoppingTabGoodsData>(items[0]);
+  const { data } = useKkshowShopping();
+
+  const [active, setActive] = useState<KkshowShoppingTabGoodsData | undefined>();
   const onSlideChange = (swiper: _Swiper): void => {
-    setActive(items[swiper.activeIndex]);
+    setActive(data?.goodsOfTheWeek[swiper.activeIndex]);
   };
 
   const title = (
@@ -67,11 +34,21 @@ export function ShoppingGoodsOfTheWeek(): JSX.Element {
     </KkshowMainTitle>
   );
 
-  const detail = (
+  const detail = active ? (
     <SlideCustom>
-      <GoodsDisplayDetail goods={active} fontSize={['xl', 'xl', '2xl']} noOfLines={2} />
+      <LinkBox>
+        <Link href={active.linkUrl} passHref>
+          <LinkOverlay href={active.linkUrl}>
+            <GoodsDisplayDetail
+              goods={active}
+              fontSize={['xl', 'xl', '2xl']}
+              noOfLines={2}
+            />
+          </LinkOverlay>
+        </Link>
+      </LinkBox>
     </SlideCustom>
-  );
+  ) : null;
 
   return (
     <Flex
@@ -109,23 +86,25 @@ export function ShoppingGoodsOfTheWeek(): JSX.Element {
           autoplay={{ delay: 5 * 1000, disableOnInteraction: false }}
           modules={[Autoplay]}
           onSlideChange={onSlideChange}
+          onImagesReady={onSlideChange}
         >
-          {items.map((item) => (
-            <SwiperSlide key={item.name} style={{ width: '70%', maxWidth: 340 }}>
-              {({ isActive }) => (
-                <Image
-                  w="100%"
-                  h="100%"
-                  transform={isActive ? 'scale(1)' : 'scale(0.8)'}
-                  src={item.imageUrl}
-                  transition="all 0.3s"
-                  rounded="3xl"
-                  boxShadow="xl"
-                  draggable={false}
-                />
-              )}
-            </SwiperSlide>
-          ))}
+          {data &&
+            data.goodsOfTheWeek.map((item) => (
+              <SwiperSlide key={item.name} style={{ width: '70%', maxWidth: 340 }}>
+                {({ isActive }) => (
+                  <Image
+                    w="100%"
+                    h="100%"
+                    transform={isActive ? 'scale(1)' : 'scale(0.8)'}
+                    src={item.imageUrl}
+                    transition="all 0.3s"
+                    rounded="3xl"
+                    boxShadow="xl"
+                    draggable={false}
+                  />
+                )}
+              </SwiperSlide>
+            ))}
         </Swiper>
       </FadeUp>
 

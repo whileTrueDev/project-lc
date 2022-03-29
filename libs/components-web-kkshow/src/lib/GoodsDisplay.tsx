@@ -23,18 +23,30 @@ export const GoodsDisplayDetail = ({
   fontSize = { base: 'md', md: 'lg' },
   noOfLines = 1,
 }: GoodsDisplayDetailProps): JSX.Element => (
-  <Box>
-    <Heading fontSize={fontSize} fontWeight="medium" noOfLines={noOfLines}>
+  <Box minH={20}>
+    <Heading
+      fontSize={fontSize}
+      fontWeight="medium"
+      noOfLines={goods.discountedPrice ? noOfLines : 2}
+    >
       {goods.name}
     </Heading>
-    <Text textDecor="line-through" color="gray.500" fontSize={{ base: 'sm', md: 'md' }}>
-      {goods.normalPrice.toLocaleString()}
-    </Text>
+    {goods.discountedPrice ? (
+      <Text textDecor="line-through" color="gray.500" fontSize={{ base: 'sm', md: 'md' }}>
+        {goods.normalPrice.toLocaleString()}
+      </Text>
+    ) : null}
+
     <Heading fontSize={{ base: 'md', md: 'xl' }}>
-      <Heading as="span" color="red" fontSize={{ base: 'md', md: 'xl' }}>
-        {getDiscountedRate(goods.normalPrice, goods.discountedPrice)}%
-      </Heading>{' '}
-      {goods.discountedPrice.toLocaleString()}원
+      {goods.discountedPrice && (
+        <Heading as="span" color="red" fontSize={{ base: 'md', md: 'xl' }}>
+          {getDiscountedRate(goods.normalPrice, goods.discountedPrice)}%
+        </Heading>
+      )}{' '}
+      {goods.discountedPrice
+        ? goods.discountedPrice.toLocaleString()
+        : goods.normalPrice.toLocaleString()}
+      원
     </Heading>
   </Box>
 );
