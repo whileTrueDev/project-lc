@@ -4,6 +4,8 @@ import { createVerificationTemplate } from './templates/createVerificationTempla
 
 @Injectable()
 export class MailService {
+  private readonly logger = new Logger(MailService.name);
+
   constructor(private readonly mailerService: MailerService) {}
 
   /**
@@ -15,11 +17,13 @@ export class MailService {
     code: string,
   ): Promise<boolean> {
     try {
+      this.logger.debug(`START: sendCodeVerificationMail - ${targetEmail}`);
       await this.mailerService.sendMail({
         to: targetEmail,
         subject: `[크크쇼] ${code}은(는) 이메일 확인을 완료할 코드입니다.`,
         html: createVerificationTemplate(code),
       });
+      this.logger.debug(`DONE: sendCodeVerificationMail - ${targetEmail}`);
       return true;
     } catch (e) {
       Logger.error(e);

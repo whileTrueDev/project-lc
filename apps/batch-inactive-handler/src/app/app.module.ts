@@ -1,20 +1,26 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '@project-lc/prisma-orm';
-import { HttpModule } from '@nestjs/axios';
-import { S3Module } from '@project-lc/nest-modules-s3';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppService } from './app.service';
-import { AppSellerService } from './app-seller.service';
-import { AppBroadcasterService } from './app-broadcaster.service';
-import { AppShutdownService } from './app-shutdown.service';
-import { AppMailService } from './app-mail.service';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { S3Module } from '@project-lc/nest-modules-s3';
+import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
+import { AppBroadcasterService } from './app-broadcaster.service';
+import { AppMailService } from './app-mail.service';
+import { AppSellerService } from './app-seller.service';
+import { AppShutdownService } from './app-shutdown.service';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
     PrismaModule,
     S3Module,
-    HttpModule,
+    ClientsModule.register([
+      {
+        name: 'MAILER_MQ',
+        transport: Transport.REDIS,
+        options: { url: 'redis://localhost:6399' },
+      },
+    ]),
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
   ],
   providers: [

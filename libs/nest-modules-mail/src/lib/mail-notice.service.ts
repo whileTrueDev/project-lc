@@ -1,5 +1,5 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { TargetUser } from '@project-lc/shared-types';
 import {
   createPreInactivateNoticeTemplate,
@@ -8,10 +8,12 @@ import {
 
 @Injectable()
 export class MailNoticeService {
+  private readonly logger = new Logger(MailNoticeService.name);
   constructor(private readonly mailerService: MailerService) {}
 
   public async sendPreInactivateMail(users: TargetUser[]): Promise<boolean> {
     try {
+      this.logger.debug(`START: sendPreInactivateMail - ${users.join(',')}`);
       users.forEach(async (user) => {
         await this.mailerService.sendMail({
           to: user.userEmail,
@@ -19,6 +21,7 @@ export class MailNoticeService {
           html: createPreInactivateNoticeTemplate(user),
         });
       });
+      this.logger.debug(`DONE: sendPreInactivateMail - ${users.join(',')}`);
       return true;
     } catch (error) {
       console.error(error);
@@ -31,6 +34,7 @@ export class MailNoticeService {
 
   public async sendInactivateMail(users: TargetUser[]): Promise<boolean> {
     try {
+      this.logger.debug(`START: sendInactivateMail - ${users.join(',')}`);
       users.forEach(async (user) => {
         await this.mailerService.sendMail({
           to: user.userEmail,
@@ -38,6 +42,7 @@ export class MailNoticeService {
           html: createInactivateNoticeTemplate(user),
         });
       });
+      this.logger.debug(`DONE: sendInactivateMail - ${users.join(',')}`);
       return true;
     } catch (error) {
       console.error(error);
