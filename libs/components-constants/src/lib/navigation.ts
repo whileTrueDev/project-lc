@@ -202,6 +202,12 @@ export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
     checkIsActive: defaultIsActiveChecker,
   },
   {
+    icon: AiOutlineContainer,
+    name: '이용안내',
+    href: '/mypage/manual',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
     name: '알림',
     href: 'notifications',
     isInvisible: true,
