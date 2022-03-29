@@ -87,7 +87,7 @@ export function Index(): JSX.Element {
       <Container maxW="7xl" p={[1, 6, 6, 6]}>
         {/* 방송인 기본 정보 영역 */}
         {기본연락처존재여부 ? (
-          <Grid m={2} templateColumns="1fr 1fr">
+          <Grid m={2} templateColumns="1fr">
             <GridItem colSpan={{ base: 2, xl: 1 }}>
               <BroadcasterStatusSection status={기본연락처} />
             </GridItem>
