@@ -35,7 +35,7 @@ export function UserManual({ userType }: UserManualProps): JSX.Element {
     );
   }
 
-  if (!data) {
+  if (!data || !data.length) {
     return (
       <Container maxW="container.xl">
         <Text>데이터가 없습니다</Text>
@@ -70,6 +70,7 @@ function UserManualHeader({
 }): JSX.Element {
   return (
     <Stack
+      width="100%"
       direction="row"
       spacing={2}
       boxShadow="base"
@@ -82,7 +83,7 @@ function UserManualHeader({
         return (
           <Box key={item.id}>
             <Button
-              mb={2}
+              my={1}
               rounded="3xl"
               onClick={() => onClick(item)}
               colorScheme={selected ? 'blue' : undefined}
