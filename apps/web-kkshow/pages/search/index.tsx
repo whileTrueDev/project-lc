@@ -20,10 +20,10 @@ import SearchResultLiveContentsSection from '@project-lc/components-web-kkshow/s
 
 export function MobileSearchDrawer(): JSX.Element {
   const { onClose } = useDisclosure();
-  const { isMobileSize } = useDisplaySize();
+  const { isDesktopSize } = useDisplaySize();
   return (
     <>
-      <Drawer onClose={onClose} isOpen={Boolean(isMobileSize)} size="full">
+      <Drawer onClose={onClose} isOpen={Boolean(!isDesktopSize)} size="full">
         <DrawerOverlay>
           <DrawerContent>
             <DrawerBody>
@@ -51,7 +51,7 @@ export function Search(): JSX.Element {
 
   return (
     <SearchPageLayout>
-      {!data && (
+      {!data && ( // /search 페이지
         <Box>
           <MobileSearchDrawer />
           <SearchKeywordSection keyword="" resultCount={0} />
