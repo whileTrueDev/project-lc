@@ -36,12 +36,17 @@ const onImageUploadBefore = (
         size: file.size,
       };
     }),
-  ).then((data) => {
-    const response = {
-      result: data,
-    };
-    uploadHandler(response);
-  });
+  )
+    .then((data) => {
+      const response = {
+        result: data,
+      };
+      uploadHandler(response);
+    })
+    .catch((error) => {
+      // insertBefore 에러 발생
+      console.error(error);
+    });
 };
 
 export type ManualFormData = PostManualDto;
@@ -113,6 +118,7 @@ export function AdminManualForm({
         <SunEditorWrapper
           sunEditorRef={sunEditorRef}
           onImageUploadBefore={onImageUploadBefore}
+          // onPaste={handlePaste}
           setOptions={AdminManualEditorSetOptions}
           defaultValue={getValues('contents')}
         />

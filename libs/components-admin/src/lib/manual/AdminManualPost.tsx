@@ -1,5 +1,4 @@
 import { Button, Stack, useToast } from '@chakra-ui/react';
-import { stepTemplate } from '@project-lc/components-constants/adminManualEditorSetOptions';
 import { useAdminManualPostMutation } from '@project-lc/hooks';
 import { PostManualDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
@@ -10,7 +9,7 @@ const defaultValues: PostManualDto = {
   title: '', // 이용안내 주제(예: 상품 등록, 라이브커머스 등록)
   description: '', // 주제에 대한 짧은 설명 (예: 크크쇼에 상품을 등록하는 방법입니다.)
   order: 1, // 이용안내 표시될 순서
-  contents: stepTemplate.html, // 이용안내 내용
+  contents: '', // 이용안내 내용
 };
 export function AdminManualPost(): JSX.Element {
   const toast = useToast();
