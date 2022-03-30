@@ -15,9 +15,15 @@ export class ManualController {
     return this.manualService.getManualListPartial(target);
   }
 
-  /** 이용안내 id로 조회 */
+  /** id로 이용안내 데이터 조회 */
   @Get()
   getManualById(@Query('id', ParseIntPipe) id: number): Promise<Manual> {
     return this.manualService.getManualById(id);
+  }
+
+  /** 특정 페이지 routerPath로 이용안내 id 조회 -> 각 페이지별 매뉴얼 링크 사용 위함 */
+  @Get('id')
+  getManualByRouterPath(@Query('routerPath') routerPath: string): Promise<number | null> {
+    return this.manualService.getManualByRouterPath(routerPath);
   }
 }

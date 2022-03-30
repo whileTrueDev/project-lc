@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex, Stack, Link, Button } from '@chakra-ui/react';
 import {
   broadcasterCenterMypageNavLinks,
   MypageLink,
@@ -11,8 +11,12 @@ import {
   useCloseLiveShoppingStateBoardIfNotLoggedIn,
   useDisplaySize,
   useIsLoggedIn,
+  useManualLinkPageId,
 } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
+import { useRouter } from 'next/router';
+import React from 'react';
+import NextLink from 'next/link';
 import { FloatingHelpButton } from './FloatingHelpButton';
 import MypageBreadcrumb from './MypageBreadCrumb';
 import { Navbar } from './Navbar';
@@ -25,6 +29,21 @@ interface MypageLayoutProps {
   children: React.ReactNode;
   appType?: Exclude<UserType, 'admin'>;
   navLinks?: Array<MypageLink>;
+}
+
+/** 해당 페이지 routerPath에 맞는 이용안내로 이동하는 링크버튼 */
+export function ManualLinkButton(): JSX.Element | null {
+  const router = useRouter();
+  const { data: manualId } = useManualLinkPageId(router.pathname);
+
+  if (!manualId) return null;
+  return (
+    <NextLink href={`/mypage/manual/${manualId}`} passHref>
+      <Button as={Link} size="sm" isExternal colorScheme="blue">
+        이용안내
+      </Button>
+    </NextLink>
+  );
 }
 
 export function MypageLayout({
@@ -73,7 +92,11 @@ export function MypageLayout({
               className="content-wrapper"
               minHeight={`calc(100vh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`}
             >
-              <MypageBreadcrumb />
+              <Stack direction="row" spacing={4} alignItems="center">
+                <MypageBreadcrumb />
+                <ManualLinkButton />
+              </Stack>
+
               {children}
             </Box>
             {/* 하단 푸터 */}

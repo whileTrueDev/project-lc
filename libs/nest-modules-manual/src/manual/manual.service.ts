@@ -75,4 +75,14 @@ export class ManualService extends ServiceBaseWithCache {
     });
     return true;
   }
+
+  /** routerPath(이용안내 연결할 routerPath)로 조회 */
+  async getManualByRouterPath(routerPath: string): Promise<number | null> {
+    const manual = await this.prisma.manual.findFirst({
+      where: { linkPageRouterPath: routerPath },
+    });
+
+    if (!manual) return null;
+    return manual.id;
+  }
 }
