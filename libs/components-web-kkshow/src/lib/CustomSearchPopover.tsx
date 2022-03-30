@@ -71,7 +71,7 @@ export function CustomSearchPopover(): JSX.Element {
 
   useEffect(() => {
     setLocalStorage(JSON.parse(window.localStorage.getItem('searchKeyword') || '[]'));
-  }, [setLocalStorage, isOpen]);
+  }, [setLocalStorage, router]);
 
   return (
     <Box
