@@ -1,16 +1,9 @@
 import { Button, Stack, useToast } from '@chakra-ui/react';
-import { useAdminManualPostMutation } from '@project-lc/hooks';
+import { useAdminManualPostMutation, useManualMainCategories } from '@project-lc/hooks';
 import { PostManualDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import AdminManualForm from './AdminManualForm';
 
-const defaultValues: PostManualDto = {
-  target: 'seller', // seller | broadcaster
-  title: '', // 이용안내 주제(예: 상품 등록, 라이브커머스 등록)
-  description: '', // 주제에 대한 짧은 설명 (예: 크크쇼에 상품을 등록하는 방법입니다.)
-  order: 1, // 이용안내 표시될 순서
-  contents: '', // 이용안내 내용
-};
 export function AdminManualPost(): JSX.Element {
   const toast = useToast();
   const router = useRouter();
@@ -28,6 +21,18 @@ export function AdminManualPost(): JSX.Element {
   const postManual = useAdminManualPostMutation();
   const onConfirm = async (dto: PostManualDto): Promise<void> => {
     postManual.mutateAsync(dto).then(handleSuccess).catch(handleError);
+  };
+
+  const defaultTarget = 'seller';
+  const { mainCategories } = useManualMainCategories(defaultTarget);
+
+  const defaultValues: PostManualDto = {
+    target: defaultTarget, // seller | broadcaster
+    title: '', // 이용안내 주제(예: 상품 등록, 라이브커머스 등록)
+    description: '', // 주제에 대한 짧은 설명 (예: 크크쇼에 상품을 등록하는 방법입니다.)
+    order: 1, // 이용안내 표시될 순서
+    contents: '', // 이용안내 내용,
+    mainCategory: mainCategories[0].href,
   };
 
   return (
