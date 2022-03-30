@@ -46,7 +46,6 @@ export class ManualService extends ServiceBaseWithCache {
         title: true,
         description: true,
         order: true,
-        linkPageRouterPath: true,
       },
     });
   }
