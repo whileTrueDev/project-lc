@@ -20,3 +20,13 @@ export const useManualList = (
     },
   );
 };
+
+export const getManualDetail = async (id: number): Promise<Manual> => {
+  return axios.get<Manual>('manual', { params: { id } }).then((res) => res.data);
+};
+
+export const useManualDetail = (id: number): UseQueryResult<Manual, AxiosError> => {
+  return useQuery<Manual, AxiosError>(['ManualDetail', id], () => getManualDetail(id), {
+    enabled: !!id,
+  });
+};

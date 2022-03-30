@@ -8,24 +8,18 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import { Manual, UserType } from '@prisma/client';
+import { Manual } from '@prisma/client';
 import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
-import { useManualList } from '@project-lc/hooks';
-import React, { useEffect, useState } from 'react';
+import { useManualDetail, useManualMainCategories } from '@project-lc/hooks';
+import { useRouter } from 'next/router';
+import React from 'react';
 import 'suneditor/dist/css/suneditor.min.css';
 
 export interface UserManualProps {
-  userType: UserType;
+  id: number;
 }
-export function UserManual({ userType }: UserManualProps): JSX.Element {
-  const { data, isLoading, isError } = useManualList(userType);
-  const [selectedManual, setSelectedManual] = useState<Manual | null>(null);
-
-  useEffect(() => {
-    if (!data || !!selectedManual) return;
-    setSelectedManual(data[0]);
-  }, [data, selectedManual]);
-
+export function UserManual({ id }: UserManualProps): JSX.Element {
+  const { data, isLoading, isError } = useManualDetail(id);
   if (isLoading) {
     return (
       <Container maxW="container.xl">
@@ -44,7 +38,7 @@ export function UserManual({ userType }: UserManualProps): JSX.Element {
     );
   }
 
-  if (!data || !data.length) {
+  if (!data) {
     return (
       <Container maxW="container.xl">
         <Text>데이터가 없습니다</Text>
@@ -54,12 +48,7 @@ export function UserManual({ userType }: UserManualProps): JSX.Element {
   return (
     <Container maxW="container.xl">
       <SettingSectionLayout title="이용안내">
-        <UserManualHeader
-          data={data}
-          selectedManual={selectedManual}
-          onClick={(manual: Manual) => setSelectedManual(manual)}
-        />
-        {selectedManual && <UserManualDisplay data={selectedManual} />}
+        <UserManualDisplay data={data} />
       </SettingSectionLayout>
     </Container>
   );
@@ -67,52 +56,29 @@ export function UserManual({ userType }: UserManualProps): JSX.Element {
 
 export default UserManual;
 
-function UserManualHeader({
-  data,
-  onClick,
-  selectedManual,
-}: {
-  data: Manual[];
-  onClick: (manual: Manual) => void;
-  selectedManual: Manual | null;
-}): JSX.Element {
-  return (
-    <Stack
-      width="100%"
-      direction="row"
-      spacing={2}
-      boxShadow="base"
-      p={4}
-      rounded="md"
-      flexWrap="wrap"
-    >
-      {data.map((item) => {
-        const selected = selectedManual && selectedManual.id === item.id;
-        return (
-          <Box key={item.id}>
-            <Button
-              size="sm"
-              my={1}
-              rounded="3xl"
-              onClick={() => onClick(item)}
-              colorScheme={selected ? 'blue' : undefined}
-            >
-              {item.title}
-            </Button>
-          </Box>
-        );
-      })}
-    </Stack>
-  );
-}
-
 function UserManualDisplay({ data }: { data: Manual }): JSX.Element {
+  const router = useRouter();
+  const { mainCategories } = useManualMainCategories(data.target);
+
+  const mainCategoryName =
+    mainCategories.find((cat) => cat.href === data.mainCategory)?.name || '';
+
   return (
-    <Stack>
-      <Stack px={4}>
-        <Heading size="sm">{data.title}</Heading>
-        <Text>{data.description}</Text>
+    <Stack spacing={4}>
+      <Stack px={4} direction="row" alignItems="center">
+        {mainCategoryName && (
+          <Box>
+            <Button
+              size="md"
+              variant="link"
+              onClick={() => router.push('/mypage/manual')}
+            >{`${mainCategoryName} >`}</Button>
+          </Box>
+        )}
+        <Heading size="md">{data.title}</Heading>
       </Stack>
+
+      {data.description.trim() && <Text>{data.description}</Text>}
 
       <Box
         width="100%"
