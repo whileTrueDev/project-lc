@@ -1,6 +1,6 @@
 import { LiveShopping } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime';
-import { checkOrderDuringLiveShopping } from './checkOrderDuringLiveShopping';
+import { checkOrderDuringLiveShopping } from '../lib/checkOrderDuringLiveShopping';
 
 const startDate = new Date('2021-10-21 17:29:00');
 const endDate = new Date('2021-10-21 17:30:00');
