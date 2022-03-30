@@ -33,18 +33,31 @@ export const useManualDetail = (id: number): UseQueryResult<Manual, AxiosError> 
   });
 };
 
-/** 페이지에 연결된 이용안내 id조회 훅 */
-export const getManualLinkPageId = async (routerPath: string): Promise<number | null> => {
+/** 페이지에 연결된 이용안내 id조회 훅
+ * routerPath : 해당 페이지에서 router.pathName
+ * userType: 해당 페이지의 appType
+ */
+export const getManualLinkPageId = async ({
+  routerPath,
+  userType,
+}: {
+  routerPath: string;
+  userType: UserType;
+}): Promise<number | null> => {
   return axios
-    .get<number | null>('manual/id', { params: { routerPath } })
+    .get<number | null>('manual/id', { params: { routerPath, userType } })
     .then((res) => res.data);
 };
-export const useManualLinkPageId = (
-  routerPath: string,
-): UseQueryResult<number | null, AxiosError> => {
+export const useManualLinkPageId = ({
+  routerPath,
+  userType,
+}: {
+  routerPath: string;
+  userType: UserType;
+}): UseQueryResult<number | null, AxiosError> => {
   return useQuery<number | null, AxiosError>(
-    ['ManualLinkPageId', routerPath],
-    () => getManualLinkPageId(routerPath),
+    ['ManualLinkPageId', { routerPath, userType }],
+    () => getManualLinkPageId({ routerPath, userType }),
     {
       enabled: !!routerPath,
     },

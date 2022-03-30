@@ -13,10 +13,10 @@ import {
   useIsLoggedIn,
   useManualLinkPageId,
 } from '@project-lc/hooks';
-import { UserType } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import React from 'react';
 import NextLink from 'next/link';
+import { UserType } from '@prisma/client';
 import { FloatingHelpButton } from './FloatingHelpButton';
 import MypageBreadcrumb from './MypageBreadCrumb';
 import { Navbar } from './Navbar';
@@ -27,14 +27,21 @@ const FOOTER_HEIGHT = 60;
 
 interface MypageLayoutProps {
   children: React.ReactNode;
-  appType?: Exclude<UserType, 'admin'>;
+  appType?: UserType;
   navLinks?: Array<MypageLink>;
 }
 
 /** 해당 페이지 routerPath에 맞는 이용안내로 이동하는 링크버튼 */
-export function ManualLinkButton(): JSX.Element | null {
+export function ManualLinkButton({
+  userType,
+}: {
+  userType: UserType;
+}): JSX.Element | null {
   const router = useRouter();
-  const { data: manualId } = useManualLinkPageId(router.pathname);
+  const { data: manualId } = useManualLinkPageId({
+    routerPath: router.pathname,
+    userType,
+  });
 
   if (!manualId) return null;
   return (
@@ -94,7 +101,7 @@ export function MypageLayout({
             >
               <Stack direction="row" spacing={4} alignItems="center">
                 <MypageBreadcrumb />
-                <ManualLinkButton />
+                <ManualLinkButton userType={appType} />
               </Stack>
 
               {children}

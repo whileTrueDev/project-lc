@@ -1,10 +1,10 @@
 import MypageLayout from '@project-lc/components-shared/MypageLayout';
-import UserManual from '@project-lc/components-shared/UserManual';
+import UserManualCategoryList from '@project-lc/components-shared/UserManualCategoryList';
 
 export function Index(): JSX.Element {
   return (
     <MypageLayout appType="broadcaster">
-      <UserManual userType="broadcaster" />
+      <UserManualCategoryList userType="broadcaster" />
     </MypageLayout>
   );
 }

@@ -1,22 +1,22 @@
 import {
-  Box,
   Center,
   Container,
   Divider,
   Grid,
   GridItem,
-  Heading,
+  Icon,
   Link,
   Spinner,
   Stack,
   Text,
 } from '@chakra-ui/react';
-import { Manual, UserType } from '@prisma/client';
+import { UserType } from '@prisma/client';
 import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
 import { useManualList, useManualMainCategories } from '@project-lc/hooks';
 import { ManualWithoutContents } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import React from 'react';
+import { FaRegGrinBeamSweat } from 'react-icons/fa';
 import 'suneditor/dist/css/suneditor.min.css';
 
 export interface UserManualProps {
@@ -46,7 +46,11 @@ export function UserManualCategoryList({ userType }: UserManualProps): JSX.Eleme
   if (!data || !data.length) {
     return (
       <Container maxW="container.xl">
-        <Text>데이터가 없습니다</Text>
+        <Stack direction="row" alignItems="center">
+          <Text>준비중입니다</Text>
+          <Icon as={FaRegGrinBeamSweat} fontSize="2xl" />
+        </Stack>
+        <Text>문의사항이 있으시면 실시간 상담을 이용해주세요!</Text>
       </Container>
     );
   }
@@ -96,33 +100,13 @@ function ManualCategoryBox(props: ManualCategoryBoxProps): JSX.Element {
         {mainCategoryName}
       </Text>
       <Divider />
-      <Stack height={{ base: 150, sm: 200 }} pl={2} overflowY="auto">
+      <Stack height={150} pl={2} overflowY="auto">
         {list.map((item) => (
           <NextLink key={item.id} href={`/mypage/manual/${item.id}`} passHref>
             <Link color="blue.500">{item.title}</Link>
           </NextLink>
         ))}
       </Stack>
-    </Stack>
-  );
-}
-
-function UserManualDisplay({ data }: { data: Manual }): JSX.Element {
-  return (
-    <Stack>
-      <Stack px={4}>
-        <Heading size="sm">{data.title}</Heading>
-        <Text>{data.description}</Text>
-      </Stack>
-
-      <Box
-        width="100%"
-        rounded="md"
-        className="sun-editor-editable"
-        minH="100px"
-        overflowY="auto"
-        dangerouslySetInnerHTML={{ __html: data.contents }}
-      />
     </Stack>
   );
 }

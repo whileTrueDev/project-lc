@@ -76,10 +76,16 @@ export class ManualService extends ServiceBaseWithCache {
     return true;
   }
 
-  /** routerPath(이용안내 연결할 routerPath)로 조회 */
-  async getManualByRouterPath(routerPath: string): Promise<number | null> {
+  /** routerPath(이용안내 연결할 routerPath)와 target으로 조회 */
+  async getManualByRouterPath({
+    routerPath,
+    userType,
+  }: {
+    routerPath: string;
+    userType: UserType;
+  }): Promise<number | null> {
     const manual = await this.prisma.manual.findFirst({
-      where: { linkPageRouterPath: routerPath },
+      where: { linkPageRouterPath: routerPath, target: userType },
     });
 
     if (!manual) return null;

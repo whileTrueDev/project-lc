@@ -21,9 +21,12 @@ export class ManualController {
     return this.manualService.getManualById(id);
   }
 
-  /** 특정 페이지 routerPath로 이용안내 id 조회 -> 각 페이지별 매뉴얼 링크 사용 위함 */
+  /** 특정 페이지의 routerPath와 userType으로 이용안내 id 조회 -> 각 페이지별 매뉴얼 링크 사용 위함 */
   @Get('id')
-  getManualByRouterPath(@Query('routerPath') routerPath: string): Promise<number | null> {
-    return this.manualService.getManualByRouterPath(routerPath);
+  getManualByRouterPath(
+    @Query('routerPath') routerPath: string,
+    @Query('userType') userType: UserType,
+  ): Promise<number | null> {
+    return this.manualService.getManualByRouterPath({ routerPath, userType });
   }
 }
