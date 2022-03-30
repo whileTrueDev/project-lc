@@ -69,7 +69,6 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
         {/* 우측 */}
         <Flex alignItems="center">
           <ColorModeSwitcher _hover={{}} />
-          {/* // TODO: 검색 기능 추가 이후 주석 해제 */}
           <SearchButton />
           <GlobalSearcher />
         </Flex>

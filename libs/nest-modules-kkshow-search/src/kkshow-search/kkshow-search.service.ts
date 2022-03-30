@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
+import {
+  ProductSearch,
+  BroadcasterSearch,
+  Keyword,
+  SearchResult,
+} from '@project-lc/shared-types';
 
 @Injectable()
 export class KkshowSearchService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async search(keyword: any): Promise<{
-    productSearch: any;
-    broadcasterSearch: any;
+  private async search(keyword: string): Promise<{
+    productSearch: ProductSearch[];
+    broadcasterSearch: BroadcasterSearch[];
   }> {
     const productSearch = await this.prisma.goods.findMany({
       where: {
@@ -96,8 +102,8 @@ export class KkshowSearchService {
     return { productSearch, broadcasterSearch };
   }
 
-  async searchResultPreprocessing(keyword: any): Promise<any> {
-    const data = await this.search(keyword);
+  async searchResultPreprocessing(keyword: Keyword): Promise<SearchResult> {
+    const data = await this.search(keyword.keyword);
 
     const goods = [];
     const broadcasters = [];

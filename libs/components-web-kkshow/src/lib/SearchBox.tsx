@@ -5,11 +5,9 @@ import {
   useColorModeValue,
   InputRightElement,
   useToast,
-  Text,
-  Box,
 } from '@chakra-ui/react';
-import { SearchIcon, SmallCloseIcon } from '@chakra-ui/icons';
-import { useRef, useEffect, useState } from 'react';
+import { SearchIcon } from '@chakra-ui/icons';
+import { useRef, useEffect } from 'react';
 import { useKkshowSearchStore, useSearchPopoverStore } from '@project-lc/stores';
 import { useQueryClient } from 'react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -22,26 +20,29 @@ export interface SearchInput {
 }
 
 export function SearchBox(): JSX.Element {
-  const { handlePopover } = useSearchPopoverStore();
-
-  const initialRef = useRef<any>(null);
   const toast = useToast();
-
-  const { keyword } = useKkshowSearchStore();
-  const setKeyword = useKkshowSearchStore((s) => s.setKeyword);
   const router = useRouter();
   const queryClient = useQueryClient();
-  const inputPrefix = (router.query.keyword as string) || keyword;
+
   const { isMobileSize } = useDisplaySize();
-  const { handleSubmit, setValue } = useForm<SearchInput>();
+
+  const initialRef = useRef<any>(null);
+
+  const { isOpen, handlePopover } = useSearchPopoverStore();
+  const { keyword } = useKkshowSearchStore();
+  const setKeyword = useKkshowSearchStore((s) => s.setKeyword);
+
+  const { handleSubmit } = useForm<SearchInput>();
   //* 필터/검색 폼 제출
-  const onSubmit: SubmitHandler<SearchInput> = () => {
+  const onSubmit: SubmitHandler<SearchInput> = (): void => {
     if (keyword) {
       let localDataArray: string[] = JSON.parse(
         window.localStorage.getItem('searchKeyword') || '[]',
       );
+
       localDataArray.unshift(keyword);
       localDataArray = [...new Set(localDataArray)];
+
       if (localDataArray.length > 3) {
         localDataArray = localDataArray.splice(0, 3);
       }
@@ -49,6 +50,7 @@ export function SearchBox(): JSX.Element {
       window.localStorage.setItem('searchKeyword', JSON.stringify(localDataArray));
       router.push({ pathname: '/search', query: { keyword } });
       queryClient.invalidateQueries('getSearchResults');
+      handlePopover(false);
     } else {
       toast({
         title: '검색어를 입력해주세요',
@@ -57,41 +59,37 @@ export function SearchBox(): JSX.Element {
     }
   };
 
-  function setSearchKeyword(value: string): void {
-    setKeyword(value);
-    setValue('keyword', value);
-  }
-
   useEffect(() => {
+    setKeyword((router.query.keyword as string) || '');
     if (isMobileSize) {
       initialRef.current.focus();
     }
-  }, [isMobileSize]);
+  }, [isMobileSize, router.query.keyword, setKeyword]);
+
   return (
     <Flex w="100%" h="100%" as="form" onSubmit={handleSubmit(onSubmit)}>
       <Input
-        defaultValue={inputPrefix}
+        value={keyword}
         ref={initialRef}
         variant="outline"
         placeholder="검색어를 입력하세요"
         rounded="md"
-        bgColor={useColorModeValue('white.400', 'gray.600')}
+        bgColor={useColorModeValue('white', 'gray.600')}
         onChange={(e) => {
-          setSearchKeyword(e.target.value);
+          setKeyword(e.target.value);
         }}
-        onFocus={() => handlePopover(true)}
+        onMouseDown={() => handlePopover(!isOpen)}
         onBlur={() => handlePopover(false)}
       />
-      {initialRef?.current?.value && (
+      {isMobileSize && initialRef?.current?.value && (
         <InputRightElement>
           <IconButton
-            display={{ base: 'flex', xl: 'none' }}
             variant="fill"
             aria-label="erase-button-icon"
             icon={<MdCancel color="gray" />}
             onClick={() => {
               initialRef.current.value = '';
-              setSearchKeyword('');
+              setKeyword('');
             }}
           />
         </InputRightElement>
@@ -100,7 +98,7 @@ export function SearchBox(): JSX.Element {
         display={{ base: 'none', xl: 'flex' }}
         variant="fill"
         aria-label="search-button-icon"
-        icon={<SearchIcon fontSize="lg" />}
+        icon={<SearchIcon />}
         type="submit"
       />
     </Flex>

@@ -1,31 +1,47 @@
-import { useToast, Text, Flex, IconButton, Box } from '@chakra-ui/react';
+import {
+  useToast,
+  Text,
+  Flex,
+  IconButton,
+  Box,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import { useKkshowSearchStore, useSearchPopoverStore } from '@project-lc/stores';
 import { SmallCloseIcon } from '@chakra-ui/icons';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
 import { SearchInput } from './SearchBox';
 
-export interface SearchPopoverProps {
-  children?: React.ReactNode;
-  onSubmit: SubmitHandler<SearchInput>;
+export function deleteLocalStorageSearchKeyword(
+  toDeleteKeyword: string,
+  setLocalStorage: (value: string[]) => void,
+): void {
+  const localDataArray: string[] = JSON.parse(
+    window.localStorage.getItem('searchKeyword') || '[]',
+  );
+
+  const index = localDataArray.indexOf(toDeleteKeyword);
+  if (index !== -1) {
+    localDataArray.splice(index, 1);
+    window.localStorage.setItem('searchKeyword', JSON.stringify(localDataArray));
+    setLocalStorage(JSON.parse(window.localStorage.getItem('searchKeyword') || '[]'));
+  }
 }
-export function SearchPopper({ ref }: any): JSX.Element {
+
+export function CustomSearchPopover(): JSX.Element {
   const toast = useToast();
-  const { isOpen, handlePopover } = useSearchPopoverStore();
-  console.log(isOpen);
-  const [localStorage, setLocalStorage] = useState([]);
-  const { handleSubmit, setValue } = useForm<SearchInput>();
-  const setKeyword = useKkshowSearchStore((s) => s.setKeyword);
-  const { keyword } = useKkshowSearchStore();
   const router = useRouter();
   const queryClient = useQueryClient();
+
   const initialRef = useRef<any>(null);
-  function setSearchKeyword(value: string): void {
-    setKeyword(value);
-    setValue('keyword', value);
-  }
+
+  const { keyword, localStorage, setLocalStorage } = useKkshowSearchStore();
+  const { isOpen, handlePopover } = useSearchPopoverStore();
+  const setKeyword = useKkshowSearchStore((s) => s.setKeyword);
+
+  const { handleSubmit } = useForm<SearchInput>();
 
   const onSubmit: SubmitHandler<SearchInput> = () => {
     if (keyword) {
@@ -42,6 +58,7 @@ export function SearchPopper({ ref }: any): JSX.Element {
       window.localStorage.setItem('searchKeyword', JSON.stringify(localDataArray));
       router.push({ pathname: '/search', query: { keyword } });
       queryClient.invalidateQueries('getSearchResults');
+      handlePopover(false);
     } else {
       toast({
         title: '검색어를 입력해주세요',
@@ -52,25 +69,37 @@ export function SearchPopper({ ref }: any): JSX.Element {
 
   useEffect(() => {
     setLocalStorage(JSON.parse(window.localStorage.getItem('searchKeyword') || '[]'));
-  }, []);
+  }, [setLocalStorage]);
 
   return (
     <Box
       display={isOpen ? 'block' : 'none'}
       position="absolute"
       width="100%"
+      height="fit-content"
       insetY="4vh"
-      bg="white"
       as="form"
+      flex={1}
       onSubmit={handleSubmit(onSubmit)}
+      bgColor={useColorModeValue('white', 'gray.600')}
+      color={useColorModeValue('black', 'white')}
       zIndex="docked"
+      borderRadius={10}
+      pl={3}
     >
+      <Text as="sub" color="gray.400">
+        최근 검색어
+      </Text>
       {localStorage?.map((item: string) => (
-        <Flex key={item} justifyContent="space-between" alignItems="center">
+        <Flex key={item} justifyContent="space-between" alignItems="center" flex={1}>
           <Text
             ref={initialRef}
             as="button"
-            onClick={() => setSearchKeyword(item)}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              setKeyword(item);
+              handlePopover(false);
+            }}
             type="submit"
             cursor="pointer"
           >
@@ -82,6 +111,8 @@ export function SearchPopper({ ref }: any): JSX.Element {
             aria-label="search-button-icon"
             icon={<SmallCloseIcon />}
             color="gray"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => deleteLocalStorageSearchKeyword(item, setLocalStorage)}
           />
         </Flex>
       ))}
@@ -89,4 +120,4 @@ export function SearchPopper({ ref }: any): JSX.Element {
   );
 }
 
-export default SearchPopper;
+export default CustomSearchPopover;
