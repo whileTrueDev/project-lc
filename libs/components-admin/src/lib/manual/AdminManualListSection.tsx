@@ -2,7 +2,8 @@ import { Button, Heading, Link, Stack, Text } from '@chakra-ui/react';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import { Manual, UserType } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { useAdminManualList } from '@project-lc/hooks';
+import { useAdminManualList, useManualMainCategories } from '@project-lc/hooks';
+import dayjs from 'dayjs';
 import NextLink from 'next/link';
 
 export function AdminManualListHeader(): JSX.Element {
@@ -55,6 +56,18 @@ export function AdminManualListSection(): JSX.Element {
 
 export default AdminManualListSection;
 
+function MainCategory({
+  target,
+  value,
+}: {
+  target: UserType;
+  value: string;
+}): JSX.Element {
+  const { mainCategories } = useManualMainCategories(target);
+  const category = mainCategories.find((item) => item.href === value);
+  return <Text isTruncated>{category?.name}</Text>;
+}
+
 const columns: GridColumns = [
   {
     field: 'id',
@@ -68,11 +81,33 @@ const columns: GridColumns = [
       );
     },
   },
-  { field: 'title', headerName: '주제', flex: 1 },
+  {
+    field: 'mainCategory',
+    headerName: '대분류',
+    flex: 1,
+    renderCell: ({ row }: GridRowData) => {
+      return <MainCategory target={row.target} value={row.mainCategory} />;
+    },
+  },
+  { field: 'title', headerName: '제목', flex: 1 },
   { field: 'description', headerName: '간략 설명', flex: 1 },
   { field: 'order', headerName: '순서' },
-  { field: 'createDate', headerName: '생성일', flex: 1 },
-  { field: 'updateDate', headerName: '수정일', flex: 1 },
+  {
+    field: 'createDate',
+    headerName: '생성일',
+    flex: 1,
+    renderCell: ({ row }: GridRowData) => {
+      return <Text>{dayjs(row.createDate).format('YYYY-MM-DD HH:mm:ss')}</Text>;
+    },
+  },
+  {
+    field: 'updateDate',
+    headerName: '수정일',
+    flex: 1,
+    renderCell: ({ row }: GridRowData) => {
+      return <Text>{dayjs(row.updateDate).format('YYYY-MM-DD HH:mm:ss')}</Text>;
+    },
+  },
 ];
 
 export function ManualList({ data }: { data: Manual[] }): JSX.Element {
