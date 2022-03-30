@@ -136,6 +136,7 @@ export * from './lib/useCountdown';
 export * from './lib/useDisplaySize';
 export * from './lib/useGoodsOnLive';
 export * from './lib/useHorizontalScroll';
+export * from './lib/useManualMainCategories';
 export * from './lib/useMyLocationOrigin';
 export * from './lib/useOrderExportableCheck';
 export * from './lib/useOrderReturnOrRefundStatus';
