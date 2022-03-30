@@ -6,6 +6,9 @@ export class PostManualDto {
   target: UserType; // seller | broadcaster
 
   @IsString()
+  mainCategory: string; // 해당 항목이 속하는 대분류 - 마이페이지/페이지 구분과 유사 (예: 상품, 라이브커머스)
+
+  @IsString()
   title: string; // 이용안내 주제(예: 상품 등록, 라이브커머스 등록)
 
   @IsString()
@@ -16,12 +19,20 @@ export class PostManualDto {
 
   @IsString()
   contents: string; // 이용안내 내용
+
+  @IsString()
+  @IsOptional()
+  linkPageRouterPath?: string; // 연결될 마이페이지 routerPath (MypageLink의 href)
 }
 
 export class EditManualDto {
   @IsEnum(UserType)
   @IsOptional()
   target?: UserType; // seller | broadcaster
+
+  @IsString()
+  @IsOptional()
+  mainCategory: string; // 해당 항목이 속하는 대분류 - 마이페이지/페이지 구분과 유사 (예: 상품, 라이브커머스)
 
   @IsString()
   @IsOptional()
@@ -38,4 +49,8 @@ export class EditManualDto {
   @IsString()
   @IsOptional()
   contents?: string; // 이용안내 내용
+
+  @IsString()
+  @IsOptional()
+  linkPageRouterPath?: string; // 연결될 마이페이지 routerPath (MypageLink의 href)
 }
