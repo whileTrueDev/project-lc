@@ -1,7 +1,7 @@
 import { Controller, ValidationPipe } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { TargetUser } from '@project-lc/shared-types';
-import { MailVerificationDto } from './mail-dto/mail-verifications.dto';
+import { MailVerificationDto, TargetUser } from '@project-lc/shared-types';
+
 import { MailNoticeService } from './mail-notice.service';
 import { MailService } from './mail.service';
 

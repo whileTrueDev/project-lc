@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { MICROSERVICE_MAILER_TOKEN } from '@project-lc/nest-core';
 import { LastLoginDate, TargetUser } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { Observable } from 'rxjs';
@@ -8,22 +9,16 @@ import { Observable } from 'rxjs';
 export class AppMailService {
   private logger: Logger = new Logger('MailerTaskService');
 
-  constructor(@Inject('MAILER_MQ') private readonly mailerClient: ClientProxy) {}
+  constructor(
+    @Inject(MICROSERVICE_MAILER_TOKEN) private readonly mailerClient: ClientProxy,
+  ) {}
 
   private sendPreInactiveMail(user: TargetUser[]): Observable<void> {
     return this.mailerClient.send<void, TargetUser[]>('inactive-pre', user);
-    // await lastValueFrom(
-    //   this.httpService
-    //     .post(`${this.HOST}/inactive-pre`, user)
-    //     .pipe(map((res) => res.data)),
-    // );
   }
 
   private sendInactiveMail(user: TargetUser[]): Observable<void> {
     return this.mailerClient.send<void, TargetUser[]>('inactive', user);
-    // await lastValueFrom(
-    //   this.httpService.post(`${this.HOST}/inactive`, user).pipe(map((res) => res.data)),
-    // );
   }
 
   sendMail(mailTargets: LastLoginDate[]): void {

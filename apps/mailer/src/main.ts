@@ -7,7 +7,7 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
     transport: Transport.REDIS,
     options: {
-      url: 'redis://localhost:6399',
+      url: process.env.MQ_REDIS_URL || 'redis://localhost:6399',
     },
   });
   await app.listen().then(() => Logger.log(`Mailer listening..`));

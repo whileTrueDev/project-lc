@@ -116,6 +116,9 @@ export class LCDevPrivateAppStack extends Stack {
       version: 5,
       parameterName: constants.DEV.MAILER_PASS,
     });
+    const MQ_REDIS_URL = loadSsmParam(this, `${prefix}MQ_REDIS_URL`, {
+      parameterName: constants.DEV.MQ_REDIS_URL,
+    });
 
     taskDef.addContainer(`${prefix}Container`, {
       image: ContainerImage.fromEcrRepository(repo),
@@ -125,6 +128,7 @@ export class LCDevPrivateAppStack extends Stack {
       secrets: {
         MAILER_USER: Secret.fromSsmParameter(MAILER_USER),
         MAILER_PASS: Secret.fromSsmParameter(MAILER_PASS),
+        MQ_REDIS_URL: Secret.fromSsmParameter(MQ_REDIS_URL),
       },
       environment: {
         NODE_ENV: 'test',
@@ -206,6 +210,11 @@ export class LCDevPrivateAppStack extends Stack {
         DATABASE_URL: Secret.fromSsmParameter(
           loadSsmParam(this, `${prefix}ParamDBUrl`, {
             parameterName: constants.DEV.ECS_DATABASE_URL_KEY,
+          }),
+        ),
+        MQ_REDIS_URL: Secret.fromSsmParameter(
+          loadSsmParam(this, `${prefix}MQ_REDIS_URL`, {
+            parameterName: constants.DEV.MQ_REDIS_URL,
           }),
         ),
       },

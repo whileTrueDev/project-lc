@@ -1,7 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { MailVerificationCode, Prisma, PrismaPromise } from '@prisma/client';
+import { MICROSERVICE_MAILER_TOKEN } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
+import { MailVerificationDto } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import { Observable } from 'rxjs';
 
@@ -9,7 +11,7 @@ import { Observable } from 'rxjs';
 export class MailVerificationService {
   private readonly logger = new Logger(MailVerificationService.name);
   constructor(
-    @Inject('MAILER_MQ') private readonly microService: ClientProxy,
+    @Inject(MICROSERVICE_MAILER_TOKEN) private readonly microService: ClientProxy,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -36,10 +38,10 @@ export class MailVerificationService {
   public async sendVerificationMail(targetEmail: string): Promise<Observable<boolean>> {
     const code = await this.createEmailCode(targetEmail);
     this.logger.debug(`Send verification email to - ${targetEmail}`);
-    const obs = this.microService.send<boolean>('mail-verification', {
-      targetEmail,
-      code,
-    });
+    const obs = this.microService.send<boolean, MailVerificationDto>(
+      'mail-verification',
+      { targetEmail, code },
+    );
     return obs;
   }
 

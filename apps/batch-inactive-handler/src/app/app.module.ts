@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MICROSERVICE_MAILER_TOKEN } from '@project-lc/nest-core';
 import { S3Module } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
@@ -16,9 +17,9 @@ import { AppService } from './app.service';
     S3Module,
     ClientsModule.register([
       {
-        name: 'MAILER_MQ',
+        name: MICROSERVICE_MAILER_TOKEN,
         transport: Transport.REDIS,
-        options: { url: 'redis://localhost:6399' },
+        options: { url: process.env.MQ_REDIS_URL || 'redis://localhost:6399' },
       },
     ]),
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),

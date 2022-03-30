@@ -39,4 +39,7 @@ export const validationSchema = Joi.object({
 
   // 와트 IP
   WHILETRUE_IP_ADDRESS: Joi.string(),
+
+  // Redis as Message Queue host url
+  MQ_REDIS_URL: Joi.string().required(),
 });

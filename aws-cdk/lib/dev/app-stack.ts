@@ -44,6 +44,7 @@ export class LCDevAppStack extends cdk.Stack {
   private WHILETRUE_IP_ADDRESS: ssm.IStringParameter;
   private REDIS_URL: ssm.IStringParameter;
   private CACHE_REDIS_URL: ssm.IStringParameter;
+  private MQ_REDIS_URL: ssm.IStringParameter;
 
   public readonly alb: elbv2.ApplicationLoadBalancer;
   public readonly cluster: ecs.Cluster;
@@ -134,6 +135,7 @@ export class LCDevAppStack extends cdk.Stack {
         AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
         WHILETRUE_IP_ADDRESS: ecs.Secret.fromSsmParameter(this.WHILETRUE_IP_ADDRESS),
         CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
+        MQ_REDIS_URL: ecs.Secret.fromSsmParameter(this.MQ_REDIS_URL),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -670,6 +672,12 @@ export class LCDevAppStack extends cdk.Stack {
         version: 3,
         parameterName: constants.DEV.CACHE_REDIS_URL,
       },
+    );
+
+    this.CACHE_REDIS_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}MQ_REDIS_URL`,
+      { parameterName: constants.DEV.MQ_REDIS_URL },
     );
 
     return {
