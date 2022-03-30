@@ -12,14 +12,14 @@ export interface KkshowShoppingTabCarouselItem extends ImageCard {
 export interface KkshowShoppingTabGoodsData extends ImageCard {
   name: string; // 상품명
   normalPrice: number; // 정가
-  discountedPrice: number; // 할인가
+  discountedPrice?: number; // 할인가
 }
 
 // 후기 정보 타입
 export interface KkshowShoppingTabReviewData extends ImageCard {
   title: string; // 후기 제목
   contents: string; // 후기 내용
-  createDate: Date; // 후기 작성일
+  createDate: Date | string; // 후기 작성일
   rating: number; // 후기 별점
 }
 
@@ -33,6 +33,10 @@ export interface KkshowShoppingTabThemeData {
   theme: KkshowShopingTabTheme; // 테마
   keywords: KkshowShoppingTabKeyword[]; // 키워드 목록
   imageUrl: string; // 테마 이미지 url
+}
+
+export interface KkshowShoppingTab extends ImageCard {
+  message: string;
 }
 
 // 크크쇼 쇼핑탭 데이터 리턴타입
@@ -51,6 +55,8 @@ export interface KkshowShoppingTabResData {
   reviews: KkshowShoppingTabReviewData[];
   // keywords; 테마별 키워드
   keywords: KkshowShoppingTabThemeData[];
+  // banner: 이벤트 등 알림 배너
+  banner: KkshowShoppingTab;
 }
 
 export default KkshowShoppingTabResData;

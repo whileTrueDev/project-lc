@@ -13,12 +13,6 @@ import { getKkshowMain, kkshowMainQueryKey } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
 import { dehydrate, DehydratedState } from 'react-query';
-import dynamic from 'next/dynamic';
-
-const TwitchLiveEmbed = dynamic(
-  () => import('@project-lc/components-shared/TwitchLiveEmbed'),
-  { ssr: false },
-);
 
 interface KkshowIndexProps {
   dehydratedState: DehydratedState;
@@ -77,10 +71,9 @@ export default function Index(): JSX.Element {
       <KkshowMainPlusFriend />
       <KkshowMainBestBroadcaster />
 
-      <BottomQuickMenu />
-
       <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />
+      <BottomQuickMenu />
     </Box>
   );
 }

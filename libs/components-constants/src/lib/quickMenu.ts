@@ -21,7 +21,7 @@ interface FunctionMenuItem extends QuickMenuBase {
   onClick?: any;
 }
 
-type QuickMenuLink = LinkMenuItem | FunctionMenuItem;
+export type QuickMenuLink = LinkMenuItem | FunctionMenuItem;
 
 /** 판매자 마이페이지 링크 */
 export const quickMenuLinks: QuickMenuLink[] = [
@@ -40,7 +40,7 @@ export const quickMenuLinks: QuickMenuLink[] = [
   {
     icon: RiShoppingCart2Line,
     name: '쇼핑',
-    href: 'https://m.k-kmarket.com/', // 추후 자체 크크쇼몰 생기면 그 주소로 변경
+    href: '/shopping',
     type: 'link',
   },
 ];

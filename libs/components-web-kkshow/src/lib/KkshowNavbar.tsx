@@ -1,8 +1,13 @@
 import { Box, Flex, Link, Stack, useColorModeValue } from '@chakra-ui/react';
-import { kkshowNavLinks, NavItem } from '@project-lc/components-constants/navigation';
+import {
+  kkshowNavLinks,
+  NavItem as NavItemType,
+} from '@project-lc/components-constants/navigation';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { KkshowLogoVariant, KksLogo } from '@project-lc/components-shared/KksLogo';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import { useMemo } from 'react';
 import { SearchButton } from './SearchButton';
 import { GlobalSearcher } from './GlobalSearcher';
 
@@ -84,17 +89,7 @@ const DesktopNav = (): JSX.Element => {
     <Stack direction="row" spacing={4}>
       {kkshowNavLinks.map((navItem) => (
         <Flex key={navItem.label} alignItems="stretch">
-          <NextLink href={navItem.href ?? '#'} passHref>
-            <Link
-              p={2}
-              fontSize="lg"
-              fontWeight="bold"
-              _hover={{ textDecoration: 'none' }}
-              isExternal={navItem.isExternal}
-            >
-              {navItem.label}
-            </Link>
-          </NextLink>
+          <NavItem {...navItem} />
         </Flex>
       ))}
     </Stack>
@@ -112,18 +107,25 @@ const MobileNav = (): JSX.Element => {
       overflowX="auto"
     >
       {kkshowNavLinks.map((navItem) => (
-        <MobileNavItem key={navItem.label} {...navItem} />
+        <NavItem key={navItem.label} {...navItem} />
       ))}
     </Flex>
   );
 };
 
-const MobileNavItem = ({ label, href, isExternal }: NavItem): JSX.Element => {
+const NavItem = ({ label, href, isExternal }: NavItemType): JSX.Element => {
+  const router = useRouter();
+  const isMathced = useMemo(() => {
+    if (href === '/') return router.pathname === href;
+    return router.pathname.includes(href);
+  }, [href, router.pathname]);
   return (
     <NextLink href={href ?? '#'} passHref>
       <Link
-        fontSize={{ base: 'md', sm: 'lg' }}
+        p={{ base: 0, md: 2 }}
+        color={isMathced ? 'unset' : 'whiteAlpha.800'}
         fontWeight="bold"
+        fontSize={{ base: 'md', sm: 'lg' }}
         isExternal={isExternal}
         _hover={{ textDecoration: 'none' }}
       >
