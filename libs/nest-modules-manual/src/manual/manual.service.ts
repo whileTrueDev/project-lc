@@ -63,7 +63,7 @@ export class ManualService extends ServiceBaseWithCache {
   async updateOneManual(id: number, dto: EditManualDto): Promise<boolean> {
     await this.prisma.manual.update({
       where: { id },
-      data: dto,
+      data: { ...dto, updateDate: new Date() },
     });
     return true;
   }
