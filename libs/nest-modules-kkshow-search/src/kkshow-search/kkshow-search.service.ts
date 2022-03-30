@@ -3,8 +3,8 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import {
   ProductSearch,
   BroadcasterSearch,
-  Keyword,
   SearchResult,
+  SearchKeyword,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -102,7 +102,7 @@ export class KkshowSearchService {
     return { productSearch, broadcasterSearch };
   }
 
-  async searchResultPreprocessing(keyword: Keyword): Promise<SearchResult> {
+  async searchResultPreprocessing(keyword: SearchKeyword): Promise<SearchResult> {
     const data = await this.search(keyword.keyword);
 
     const goods = [];

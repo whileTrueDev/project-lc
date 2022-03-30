@@ -7,10 +7,6 @@ import {
   Goods,
 } from '@prisma/client';
 
-export interface Keyword {
-  keyword: string;
-}
-
 export type SearchBroadcasterType = Pick<Broadcaster, 'userNickname' | 'avatar'>;
 
 export type OptionalBroadcasterChannelType = Partial<BroadcasterChannel>;

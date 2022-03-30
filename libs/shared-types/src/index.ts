@@ -76,6 +76,7 @@ export * from './lib/dto/policy.dto';
 export * from './lib/dto/post.dto';
 export * from './lib/dto/privacyApproachDto.dto';
 export * from './lib/dto/registGoods.dto';
+export * from './lib/dto/searchKeyword.dto';
 export * from './lib/dto/sellerContacts.dto';
 export * from './lib/dto/sellerContractionAgreementDto.dto';
 export * from './lib/dto/sellerOrderCancel.dto';
