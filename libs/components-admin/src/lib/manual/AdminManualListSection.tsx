@@ -22,6 +22,17 @@ export function AdminManualListHeader(): JSX.Element {
   );
 }
 
+function sortManualFn(a: Manual, b: Manual): number {
+  // 1. 대분류별 정렬
+  if (a.mainCategory !== b.mainCategory) {
+    return a.mainCategory.localeCompare(b.mainCategory);
+  }
+  // 2. 대분류 같으면 순서order순 정렬
+  // 3. 순서 같으면 제목 title순 정렬
+  if (a.order === b.order) return a.title.localeCompare(b.title);
+  return a.order - b.order;
+}
+
 export function AdminManualListSection(): JSX.Element {
   const { data, isLoading, isError } = useAdminManualList();
   if (isLoading) return <Text>로딩중...</Text>;
@@ -30,16 +41,10 @@ export function AdminManualListSection(): JSX.Element {
 
   const sellerManualList = data
     .filter((item) => item.target === UserType.seller)
-    .sort((a, b) => {
-      if (a.order === b.order) return a.title.localeCompare(b.title);
-      return a.order - b.order;
-    });
+    .sort(sortManualFn);
   const broadcasterManualList = data
     .filter((item) => item.target === UserType.broadcaster)
-    .sort((a, b) => {
-      if (a.order === b.order) return a.title.localeCompare(b.title);
-      return a.order - b.order;
-    });
+    .sort(sortManualFn);
   return (
     <Stack spacing={16}>
       <Stack>
