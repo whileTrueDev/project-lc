@@ -64,7 +64,6 @@ export function SearchPageSearcher(): JSX.Element {
         <Box
           as="button"
           color={useColorModeValue('gray.600', 'gray.200')}
-          display={{ base: 'flex' }}
           onClick={() => router.back()}
         >
           <ChevronLeftIcon w="30px" h="35px" />
@@ -74,6 +73,7 @@ export function SearchPageSearcher(): JSX.Element {
       <Flex m={2} flexDirection="column" as="form" onSubmit={handleSubmit(onSubmit)}>
         <Text fontWeight="bold">최근 검색어</Text>
         <Flex mt={2} spacing={2} direction="column">
+          {localStorage?.length === 0 && <Text>최근 검색어가 없습니다.</Text>}
           {localStorage?.map((item: string) => (
             <Flex key={item} justifyContent="space-between" alignItems="center">
               <Text as="button" onClick={() => setKeyword(item)} type="submit">

@@ -87,9 +87,10 @@ export function CustomSearchPopover(): JSX.Element {
       borderRadius={10}
       pl={3}
     >
-      <Text as="sub" color="gray.400">
+      <Text mt={2} as="sup" color="gray.400">
         최근 검색어
       </Text>
+
       {localStorage?.map((item: string) => (
         <Flex key={item} justifyContent="space-between" alignItems="center" flex={1}>
           <Text

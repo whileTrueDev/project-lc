@@ -75,6 +75,7 @@ export function SearchBox(): JSX.Element {
         placeholder="검색어를 입력하세요"
         rounded="md"
         bgColor={useColorModeValue('white', 'gray.600')}
+        color={useColorModeValue('black', 'white')}
         onChange={(e) => {
           setKeyword(e.target.value);
         }}
