@@ -1,8 +1,8 @@
-import { ChevronDownIcon, ChevronUpIcon, DeleteIcon } from '@chakra-ui/icons';
 import { Box, Button, ButtonGroup, Flex, Stack, Text } from '@chakra-ui/react';
 import { KkshowShoppingTabResData } from '@project-lc/shared-types';
 import React, { memo, useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { PageManagerContainerButtonSet } from './PageManagerContainerButtonSet';
 
 export function PageManagerFieldItem({
   children,
@@ -33,25 +33,13 @@ export function PageManagerFieldItem({
     >
       <Box>{children}</Box>
 
-      <Stack>
-        <Button
-          leftIcon={<ChevronUpIcon />}
-          isDisabled={isMoveUpDisabled}
-          onClick={moveUp}
-        >
-          위 로
-        </Button>
-        <Button
-          leftIcon={<ChevronDownIcon />}
-          isDisabled={isMoveDownDisabled}
-          onClick={moveDown}
-        >
-          아래로
-        </Button>
-        <Button leftIcon={<DeleteIcon />} onClick={removeHandler}>
-          삭제
-        </Button>
-      </Stack>
+      <PageManagerContainerButtonSet
+        isMoveUpDisabled={isMoveUpDisabled}
+        isMoveDownDisabled={isMoveDownDisabled}
+        removeHandler={removeHandler}
+        moveUp={moveUp}
+        moveDown={moveDown}
+      />
     </Flex>
   );
 }

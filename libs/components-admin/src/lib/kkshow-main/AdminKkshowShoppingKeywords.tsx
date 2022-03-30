@@ -25,8 +25,9 @@ import ImageInputDialog, {
 import { KkshowShoppingTabResData } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import path from 'path';
-import { memo, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { memo, useCallback } from 'react';
+import { useFieldArray, useFormContext } from 'react-hook-form';
+import PageManagerContainerButtonSet from './PageManagerContainerButtonSet';
 
 export interface AdminKkshowShoppingKeywordsProps {
   index: number;
@@ -37,8 +38,7 @@ export function AdminKkshowShoppingKeywords({
 }: AdminKkshowShoppingKeywordsProps): JSX.Element {
   const dialog = useDisclosure();
   const fieldWidth = 55;
-  const { register, watch, setValue, getValues } =
-    useFormContext<KkshowShoppingTabResData>();
+  const { register, watch, setValue } = useFormContext<KkshowShoppingTabResData>();
 
   const FieldHeader = memo(
     ({ header, isRequired }: { header: string; isRequired?: boolean }): JSX.Element => (
@@ -55,7 +55,7 @@ export function AdminKkshowShoppingKeywords({
 
   const handleConfirm = async (imageData: ImageInputFileReadData): Promise<void> => {
     const timestamp = new Date().getTime();
-    const s3KeyType = 'kkshow-shopping-keywords-theme-iamges';
+    const s3KeyType = 'kkshow-shopping-keywords-theme-images';
     const key = path.join(s3KeyType, `${timestamp}_${imageData.filename}`);
 
     const { objectUrl } = await s3.sendPutObjectCommand({
@@ -65,25 +65,6 @@ export function AdminKkshowShoppingKeywords({
       ACL: 'public-read',
     });
     setValue(`keywords.${index}.imageUrl`, objectUrl, { shouldDirty: true });
-  };
-
-  const [targetIdx, setTargetIdx] = useState(
-    getValues(`keywords.${index}.keywords`).length,
-  );
-  const onKeywordAppend = (): void => {
-    setValue(
-      `keywords.${index}.keywords.${targetIdx}`,
-      { keyword: '', linkUrl: '' },
-      { shouldDirty: true },
-    );
-    setTargetIdx((prev) => prev + 1);
-  };
-  const onKeywordDelete = (_keyword: string): void => {
-    setValue(
-      `keywords.${index}.keywords`,
-      watch(`keywords.${index}.keywords`).filter((k) => k.keyword !== _keyword),
-      { shouldDirty: true },
-    );
   };
 
   return (
@@ -144,65 +125,7 @@ export function AdminKkshowShoppingKeywords({
             </Text>
           </Box>
 
-          <Button onClick={onKeywordAppend}>키워드 추가</Button>
-
-          <Table w={600} size="sm">
-            <Thead>
-              <Tr>
-                <Th flex={1}>
-                  키워드명
-                  <Text as="span" color="red">
-                    *
-                  </Text>
-                </Th>
-                <Th flex={2}>
-                  키워드 링크
-                  <Text as="span" color="red">
-                    *
-                  </Text>
-                </Th>
-                <Th flex={1} />
-              </Tr>
-            </Thead>
-
-            <Tbody>
-              {watch(`keywords.${index}.keywords`).map((keyword, keywordIdx) => {
-                return (
-                  <Tr key={keyword.keyword + keywordIdx}>
-                    <Td>
-                      <Input
-                        m={0}
-                        p={0}
-                        {...register(`keywords.${index}.keywords.${keywordIdx}.keyword`, {
-                          required: true,
-                        })}
-                      />
-                    </Td>
-                    <Td>
-                      <Input
-                        m={0}
-                        p={0}
-                        {...register(`keywords.${index}.keywords.${keywordIdx}.linkUrl`, {
-                          required: true,
-                        })}
-                      />
-                    </Td>
-                    <Td>
-                      <Button
-                        size="xs"
-                        leftIcon={<DeleteIcon />}
-                        onClick={() => {
-                          onKeywordDelete(keyword.keyword);
-                        }}
-                      >
-                        삭제
-                      </Button>
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
+          <AdminKkshowShoppingKeywordTable index={index} />
         </Stack>
       </Flex>
 
@@ -211,6 +134,94 @@ export function AdminKkshowShoppingKeywords({
         onClose={dialog.onClose}
         onConfirm={handleConfirm}
       />
+    </Box>
+  );
+}
+
+type AdminKkshowShoppingKeywordTableProps = AdminKkshowShoppingKeywordsProps;
+function AdminKkshowShoppingKeywordTable({
+  index,
+}: AdminKkshowShoppingKeywordTableProps): JSX.Element {
+  const { register, control } = useFormContext<KkshowShoppingTabResData>();
+
+  const { fields, append, move, remove } = useFieldArray({
+    control,
+    name: `keywords.${index}.keywords`,
+  });
+
+  const moveUp = useCallback(
+    (idx: number): void => {
+      if (idx > 0) move(idx, idx - 1);
+    },
+    [move],
+  );
+  const moveDown = useCallback(
+    (idx: number): void => {
+      if (idx < fields.length - 1) move(idx, idx + 1);
+    },
+    [fields.length, move],
+  );
+
+  return (
+    <Box>
+      <Button onClick={() => append({ keyword: '', linkUrl: '' })}>키워드 추가</Button>
+      <Table w={600} size="sm">
+        <Thead>
+          <Tr>
+            <Th flex={1}>
+              키워드명
+              <Text as="span" color="red">
+                *
+              </Text>
+            </Th>
+            <Th flex={2}>
+              키워드 링크
+              <Text as="span" color="red">
+                *
+              </Text>
+            </Th>
+            <Th flex={1} />
+          </Tr>
+        </Thead>
+
+        <Tbody>
+          {fields.map((keyword, keywordIdx) => {
+            return (
+              <Tr key={keyword.id}>
+                <Td>
+                  <Input
+                    m={0}
+                    p={0}
+                    {...register(`keywords.${index}.keywords.${keywordIdx}.keyword`, {
+                      required: true,
+                    })}
+                  />
+                </Td>
+                <Td>
+                  <Input
+                    m={0}
+                    p={0}
+                    {...register(`keywords.${index}.keywords.${keywordIdx}.linkUrl`, {
+                      required: true,
+                    })}
+                  />
+                </Td>
+                <Td>
+                  <PageManagerContainerButtonSet
+                    variant="only-icon"
+                    buttonSize="xs"
+                    isMoveUpDisabled={keywordIdx === 0}
+                    isMoveDownDisabled={keywordIdx === fields.length - 1}
+                    removeHandler={() => remove(keywordIdx)}
+                    moveUp={() => moveUp(keywordIdx)}
+                    moveDown={() => moveDown(keywordIdx)}
+                  />
+                </Td>
+              </Tr>
+            );
+          })}
+        </Tbody>
+      </Table>
     </Box>
   );
 }

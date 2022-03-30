@@ -215,7 +215,7 @@ export const kkshowShoppingTabDummyData = {
     {
       theme: '한식',
       imageUrl:
-        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-iamges/1648450101822_keyword.png',
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-images/1648450101822_keyword.png',
       keywords: [
         {
           keyword: '순두부찌개',
@@ -246,7 +246,7 @@ export const kkshowShoppingTabDummyData = {
     {
       theme: '양식',
       imageUrl:
-        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-iamges/1648450101822_keyword.png',
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-images/1648450101822_keyword.png',
       keywords: [
         {
           keyword: '파스타',
@@ -276,7 +276,8 @@ export const kkshowShoppingTabDummyData = {
     },
   ],
   banner: {
-    imageUrl: '',
+    imageUrl:
+      'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-banner-images/1648512619378_coupon.png',
     linkUrl: 'https://k-kmarket.com/board/?id=event',
     message: '신규가입하고 3000원 쿠폰 받아가세요!',
   },
