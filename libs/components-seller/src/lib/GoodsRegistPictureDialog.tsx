@@ -21,7 +21,8 @@ import {
 } from '@chakra-ui/react';
 import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
 import { Preview, readAsDataURL } from '@project-lc/components-core/ImageInputDialog';
-import { drawImageOnCanvas } from '@project-lc/components-shared/AvatarChangeButton';
+import { drawImageOnCanvas } from '@project-lc/utils-frontend';
+
 import { useEffect, useRef, useState } from 'react';
 import ReactCrop, { Crop } from 'react-image-crop';
 import { GoodsPreviewItem, MAX_PICTURE_COUNT, PREVIEW_SIZE } from './GoodsRegistPictures';

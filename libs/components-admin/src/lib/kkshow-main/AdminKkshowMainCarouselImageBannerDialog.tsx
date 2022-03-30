@@ -17,9 +17,10 @@ import {
   ImageInputFileReadData,
   readAsDataURL,
 } from '@project-lc/components-core/ImageInputDialog';
-import { getCroppedImage } from '@project-lc/components-shared/AvatarChangeButton';
-import { useMemo, useRef, useState } from 'react';
+import { getCroppedImage } from '@project-lc/utils-frontend';
+import { useRef, useState } from 'react';
 import ReactCrop, { Crop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 export type ImageBannerDialogProps = ImageInputDialogProps;
 
