@@ -19,7 +19,9 @@ export const useKkshowSearchResults = (
   keyword: string | undefined,
 ): UseQueryResult<SearchResult, AxiosError> => {
   const queryKey = ['getSearchResults', keyword];
-  return useQuery<SearchResult, AxiosError>(queryKey, () =>
-    getKkshowSearchResults(keyword),
+  return useQuery<SearchResult, AxiosError>(
+    queryKey,
+    () => getKkshowSearchResults(keyword),
+    { enabled: !!keyword },
   );
 };
