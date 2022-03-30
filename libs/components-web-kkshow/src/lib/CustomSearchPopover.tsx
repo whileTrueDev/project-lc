@@ -43,6 +43,8 @@ export function CustomSearchPopover(): JSX.Element {
 
   const { handleSubmit } = useForm<SearchInput>();
 
+  const hoverColor = useColorModeValue('gray.50', 'gray.700');
+
   const onSubmit: SubmitHandler<SearchInput> = () => {
     if (keyword) {
       let localDataArray: string[] = JSON.parse(
@@ -85,14 +87,22 @@ export function CustomSearchPopover(): JSX.Element {
       color={useColorModeValue('black', 'white')}
       zIndex="docked"
       borderRadius={10}
-      pl={3}
+      pt={3}
+      pb={3}
     >
-      <Text mt={2} as="sup" color="gray.400">
+      <Text mt={2} ml={2} as="sup" color="gray.400">
         최근 검색어
       </Text>
-
+      {localStorage?.length === 0 && <Text ml={3}>최근 검색어가 없습니다</Text>}
       {localStorage?.map((item: string) => (
-        <Flex key={item} justifyContent="space-between" alignItems="center" flex={1}>
+        <Flex
+          key={item}
+          justifyContent="space-between"
+          alignItems="center"
+          flex={1}
+          _hover={{ backgroundColor: hoverColor }}
+          pl={3}
+        >
           <Text
             ref={initialRef}
             as="button"
