@@ -28,7 +28,7 @@
       "environment": [
         {
           "name": "S3_BUCKET_NAME",
-          "value": "lc-project"
+          "value": "project-lc-dev-test"
         },
         {
           "name": "NODE_ENV",

@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@project-lc/prisma-orm';
 import { Broadcaster } from '@prisma/client';
+import { PrismaService } from '@project-lc/prisma-orm';
 import { s3 } from '@project-lc/utils-s3';
-import { S3Client } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class AppBroadcasterService {
