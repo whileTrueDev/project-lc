@@ -77,7 +77,6 @@ export interface MypageLink extends LinkItemProps {
   children?: Omit<MypageLink, 'icon'>[];
   checkIsActive: (pathname: string, linkHref: string) => boolean;
   isInvisible?: boolean;
-  isMainCategory?: boolean;
 }
 
 const defaultIsActiveChecker = (pathname: string, linkHref: string): boolean =>
@@ -96,14 +95,12 @@ export const mypageNavLinks: MypageLink[] = [
     name: '상품',
     href: '/mypage/goods',
     checkIsActive: defaultIsActiveChecker,
-    isMainCategory: true, // 관리자 페이지 이용안내 등록시 대분류로 사용됨
   },
   {
     icon: MdLiveTv,
     name: '라이브쇼핑',
     href: '/mypage/live',
     checkIsActive: defaultIsActiveChecker,
-    isMainCategory: true,
     // children: [
     // {
     //   name: '내 라이브 쇼핑 관리',
@@ -122,21 +119,18 @@ export const mypageNavLinks: MypageLink[] = [
     name: '주문',
     href: '/mypage/orders',
     checkIsActive: defaultIsActiveChecker,
-    isMainCategory: true,
   },
   {
     icon: MdPayment,
     name: '정산',
     href: '/mypage/settlement',
     checkIsActive: defaultIsActiveChecker,
-    isMainCategory: true,
   },
   {
     icon: AiOutlineShop,
     name: '상점설정',
     href: '/mypage/shopinfo',
     checkIsActive: defaultIsActiveChecker,
-    isMainCategory: true,
   },
   {
     icon: AiOutlineContainer,
@@ -149,35 +143,28 @@ export const mypageNavLinks: MypageLink[] = [
     href: '/mypage/setting',
     checkIsActive: defaultIsActiveChecker,
     isInvisible: true,
-    isMainCategory: true,
   },
   {
-    name: '상품 등록',
-    href: '/mypage/goods/regist', // 관리자 페이지 이용안내 연결시 사용
+    name: '등록',
+    href: 'regist',
     isInvisible: true,
     checkIsActive: defaultIsActiveChecker,
   },
   {
-    name: '라이브쇼핑 등록',
-    href: '/mypage/live/regist', // 관리자 페이지 이용안내 연결시 사용
+    name: '수정',
+    href: 'edit',
     isInvisible: true,
     checkIsActive: defaultIsActiveChecker,
   },
-  // {
-  //   name: '수정',
-  //   href: 'edit',
-  //   isInvisible: true,
-  //   checkIsActive: defaultIsActiveChecker,
-  // },
   {
-    name: '주문 출고',
-    href: '/mypage/orders/exports', // 관리자 페이지 이용안내 연결시 사용
+    name: '출고',
+    href: 'exports',
     isInvisible: true,
     checkIsActive: defaultIsActiveChecker,
   },
   {
     name: '알림',
-    href: '/notifications',
+    href: 'notifications',
     isInvisible: true,
     checkIsActive: defaultIsActiveChecker,
   },
@@ -195,28 +182,24 @@ export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
     name: '라이브쇼핑',
     href: '/mypage/live',
     checkIsActive: defaultIsActiveChecker,
-    isMainCategory: true,
   },
   {
     icon: MdOutlineShoppingCart,
     name: '구입현황',
     href: '/mypage/purchase',
     checkIsActive: defaultIsActiveChecker,
-    isMainCategory: true,
   },
   {
     icon: MdPayment,
     name: '정산',
     href: '/mypage/settlement',
     checkIsActive: defaultIsActiveChecker,
-    isMainCategory: true,
   },
   {
     icon: AiOutlineSetting,
     name: '계정설정',
     href: '/mypage/setting',
     checkIsActive: defaultIsActiveChecker,
-    isMainCategory: true,
   },
   {
     icon: AiOutlineContainer,
