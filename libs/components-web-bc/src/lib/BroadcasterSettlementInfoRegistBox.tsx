@@ -88,6 +88,7 @@ export function BroadcasterSettlementInfoRegistBox(): JSX.Element {
     const Key = `broadcaster-account-image/${profileData.email}/${settlementInfoData.accountImageName}`;
     const expiresIn = 60;
     const imageUrl = await s3.getPresignedUrl({ Key }, { expiresIn });
+    console.log(imageUrl);
     window.open(imageUrl, '_blank');
   };
 

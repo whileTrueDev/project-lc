@@ -38,11 +38,12 @@ export const s3 = (() => {
   const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME;
   const S3_BUCKET_REGION = 'ap-northeast-2';
   const S3_DOMAIN = `https://${S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/`;
+
   const s3Client = new S3Client({
     region: S3_BUCKET_REGION,
     credentials: {
-      accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET!,
+      accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET,
     },
   });
 
@@ -235,6 +236,7 @@ export const s3 = (() => {
       ...getObjectCommandInput,
       Bucket: S3_BUCKET_NAME,
     });
+
     const imageUrl = await getSignedUrl(s3Client, command, {
       ...options,
     });

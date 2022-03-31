@@ -23,7 +23,6 @@ import {
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
-import { S3Service } from '@project-lc/nest-modules-s3';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
 import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
@@ -36,7 +35,6 @@ export class GoodsService extends ServiceBaseWithCache {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly s3service: S3Service,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);

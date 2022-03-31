@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { Prisma, Seller, InactiveSeller, SellerSocialAccount } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminSellerListRes,
@@ -25,7 +24,6 @@ export class SellerService extends ServiceBaseWithCache {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly s3service: S3Service,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);

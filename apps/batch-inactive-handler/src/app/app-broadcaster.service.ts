@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { Broadcaster } from '@prisma/client';
-import { S3Service } from '@project-lc/nest-modules-s3';
+import { s3 } from '@project-lc/utils-s3';
+import { S3Client } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class AppBroadcasterService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly s3Service: S3Service,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   private getBroadcasterId(email: string): Promise<{ id: number }> {
     return this.prisma.broadcaster.findFirst({
@@ -193,8 +191,12 @@ export class AppBroadcasterService {
       this.copyBroadcasterSettlementInfo(broadcasterId.id).then(() =>
         this.deleteBroadcasterSettlementInfo(broadcasterId.id),
       ),
-      this.s3Service.moveObjects('broadcaster-account-image', userEmail),
-      this.s3Service.moveObjects('broadcaster-id-card', userEmail),
+      s3.moveObjects(
+        'broadcaster-account-image',
+        'inactive-broadcaster-account-image',
+        userEmail,
+      ),
+      s3.moveObjects('broadcaster-id-card', 'inactive-broadcaster-id-card', userEmail),
     ]);
   }
 }
