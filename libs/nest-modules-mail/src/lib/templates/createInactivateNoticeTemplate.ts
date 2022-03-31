@@ -13,9 +13,7 @@ export const createPreInactivateNoticeTemplate = (targetDetails): string => `
                 ? 'https://xn--9z2b23wk2i.xn--hp4b17xa.com'
                 : 'https://xn--vh3b23hfsf.xn--hp4b17xa.com'
             }" style="border:0" rel="noreferrer noopener" target="_blank">
-              <img alt="크크쇼-로고" src="https://${
-                process.env.S3_BUCKET_NAME
-              }.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" loading="lazy" style="width:130px;height:54px" loading="lazy">
+              <img alt="크크쇼-로고" src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" loading="lazy" style="width:130px;height:54px" loading="lazy">
             </a>
           </td>
         </tr>
@@ -124,9 +122,7 @@ export const createPreInactivateNoticeTemplate = (targetDetails): string => `
                 </tr>
                 <tr>
                   <td valign="middle" style="padding:0 0 30px 30px;" width="120">
-                    <img alt="크크쇼-로고" src="https://${
-                      process.env.S3_BUCKET_NAME
-                    }.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" loading="lazy" style="width:65px;height:27px" loading="lazy">
+                    <img alt="크크쇼-로고" src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" loading="lazy" style="width:65px;height:27px" loading="lazy">
                   </td>
                   <td style="padding:0 30px 30px 0;" width="580">
                     <p style="margin:0; word-break:keep-all; font-size:11px;">대표이사. 강동기  |  사업자등록번호. 659-03-01549 <br> 사업장소재지. 부산광역시 금정구 장전온천천로 51 (테라스파크) 313호<br>
@@ -158,9 +154,7 @@ export const createInactivateNoticeTemplate = (targetDetails): string => `
                 ? 'https://xn--9z2b23wk2i.xn--hp4b17xa.com'
                 : 'https://xn--vh3b23hfsf.xn--hp4b17xa.com'
             }" style="border:0" rel="noreferrer noopener" target="_blank">
-              <img alt="크크쇼-로고" src="https://${
-                process.env.S3_BUCKET_NAME
-              }.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" loading="lazy" style="width:130px;height:54px" loading="lazy">
+              <img alt="크크쇼-로고" src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" loading="lazy" style="width:130px;height:54px" loading="lazy">
             </a>
           </td>
         </tr>
@@ -260,9 +254,7 @@ export const createInactivateNoticeTemplate = (targetDetails): string => `
                 </tr>
                 <tr>
                   <td valign="middle" style="padding:0 0 30px 30px;" width="120">
-                    <img alt="크크쇼-로고" src="https://${
-                      process.env.S3_BUCKET_NAME
-                    }.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" loading="lazy" style="width:65px;height:27px" loading="lazy">
+                    <img alt="크크쇼-로고" src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" loading="lazy" style="width:65px;height:27px" loading="lazy">
                   </td>
                   <td style="padding:0 30px 30px 0;" width="580">
                     <p style="margin:0; word-break:keep-all; font-size:11px;">대표이사. 강동기  |  사업자등록번호. 659-03-01549 <br> 사업장소재지. 부산광역시 금정구 장전온천천로 51 (테라스파크) 313호<br>

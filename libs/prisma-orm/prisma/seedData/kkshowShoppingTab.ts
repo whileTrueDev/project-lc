@@ -3,12 +3,14 @@ export const kkshowShoppingTabDummyData = {
   carousel: [
     {
       linkUrl: 'https://k-kmarket.com/',
-      imageUrl: `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1648450169387_banner-1.png`,
+      imageUrl:
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1648450169387_banner-1.png',
       description: '',
     },
     {
       linkUrl: 'https://k-kmarket.com/',
-      imageUrl: `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1648450177223_banner-2.png`,
+      imageUrl:
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1648450177223_banner-2.png',
       description: '',
     },
   ],
@@ -212,7 +214,8 @@ export const kkshowShoppingTabDummyData = {
   keywords: [
     {
       theme: '한식',
-      imageUrl: `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-images/1648450101822_keyword.png`,
+      imageUrl:
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-images/1648450101822_keyword.png',
       keywords: [
         {
           keyword: '순두부찌개',
@@ -242,7 +245,8 @@ export const kkshowShoppingTabDummyData = {
     },
     {
       theme: '양식',
-      imageUrl: `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-images/1648450101822_keyword.png`,
+      imageUrl:
+        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-images/1648450101822_keyword.png',
       keywords: [
         {
           keyword: '파스타',
@@ -272,7 +276,8 @@ export const kkshowShoppingTabDummyData = {
     },
   ],
   banner: {
-    imageUrl: `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-banner-images/1648512619378_coupon.png`,
+    imageUrl:
+      'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-banner-images/1648512619378_coupon.png',
     linkUrl: 'https://k-kmarket.com/board/?id=event',
     message: '신규가입하고 3000원 쿠폰 받아가세요!',
   },
