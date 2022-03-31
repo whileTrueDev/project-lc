@@ -146,6 +146,7 @@ export class LCProdAppStack extends cdk.Stack {
         AWS_S3_ACCESS_KEY_SECRET: Secret.fromSsmParameter(p.S3_ACCESS_KEY_SECRET),
         WHILETRUE_IP_ADDRESS: Secret.fromSsmParameter(p.WHILETRUE_IP_ADDRESS),
         CACHE_REDIS_URL: Secret.fromSsmParameter(p.CACHE_REDIS_URL_KEY),
+        MQ_REDIS_URL: Secret.fromSsmParameter(p.MQ_REDIS_URL_KEY),
       },
       environment: {
         S3_BUCKET_NAME: 'lc-project',
@@ -153,7 +154,6 @@ export class LCProdAppStack extends cdk.Stack {
         SELLER_WEB_HOST: `https://${constants.PUNYCODE_판매자}.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://${constants.PUNYCODE_방송인}.${constants.PUNYCODE_DOMAIN}`,
         KKSHOW_WEB_HOST: `https://${constants.PUNYCODE_DOMAIN}`,
-        MAILER_HOST: `https://mailer.${constants.PUNYCODE_DOMAIN}`,
         NODE_ENV: 'production',
       },
       logging: new AwsLogDriver({
@@ -529,6 +529,7 @@ export class LCProdAppStack extends cdk.Stack {
       WHILETRUE_IP_ADDRESS: __loadSsmParmeter(c.WHILETRUE_IP_ADDRESS, 2),
       REDIS_URL: __loadSsmParmeter(c.REDIS_URL_KEY, 2),
       CACHE_REDIS_URL_KEY: __loadSsmParmeter(c.CACHE_REDIS_URL_KEY),
+      MQ_REDIS_URL_KEY: __loadSsmParmeter(c.MQ_REDIS_URL_KEY),
     };
   }
 }
