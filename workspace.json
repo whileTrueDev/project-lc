@@ -1215,35 +1215,6 @@
       },
       "tags": []
     },
-    "nest-modules-s3": {
-      "root": "libs/nest-modules-s3",
-      "sourceRoot": "libs/nest-modules-s3/src",
-      "projectType": "library",
-      "targets": {
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": [
-              "libs/nest-modules-s3/**/*.ts"
-            ]
-          },
-          "outputs": [
-            "{options.outputFile}"
-          ]
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/nest-modules-s3"
-          ],
-          "options": {
-            "jestConfig": "libs/nest-modules-s3/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      },
-      "tags": []
-    },
     "nest-modules-seller": {
       "root": "libs/nest-modules-seller",
       "sourceRoot": "libs/nest-modules-seller/src",
