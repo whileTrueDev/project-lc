@@ -20,7 +20,7 @@ export function Goods(): JSX.Element {
   return (
     <SearchPageLayout>
       <SearchKeywordSection keyword={searchKeyword} resultCount={resultCount} />
-      <SeeMoreGoods data={data.goods} />
+      <SeeMoreGoods data={data.goods || []} />
     </SearchPageLayout>
   );
 }

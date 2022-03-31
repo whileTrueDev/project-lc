@@ -19,7 +19,7 @@ export function Broadcaster(): JSX.Element {
   return (
     <SearchPageLayout>
       <SearchKeywordSection keyword={searchKeyword} resultCount={resultCount} />
-      <SeeMoreBroadcasters data={data.broadcasters} />
+      <SeeMoreBroadcasters data={data?.broadcasters || []} />
     </SearchPageLayout>
   );
 }

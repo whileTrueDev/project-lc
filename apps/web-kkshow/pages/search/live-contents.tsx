@@ -19,7 +19,7 @@ export function LiveContents(): JSX.Element {
   return (
     <SearchPageLayout>
       <SearchKeywordSection keyword={searchKeyword} resultCount={resultCount} />
-      <SeeMoreLiveContents data={data.liveContents} />
+      <SeeMoreLiveContents data={data.liveContents || []} />
     </SearchPageLayout>
   );
 }
