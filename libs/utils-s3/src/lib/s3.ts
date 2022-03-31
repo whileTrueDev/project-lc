@@ -247,7 +247,7 @@ export const s3 = (() => {
   async function moveObjects(
     rootFolder: string,
     destinationFolder: string,
-    userEmail: string,
+    userEmail?: string,
   ): Promise<void> {
     const prefix = `${rootFolder}/${userEmail}`;
 
@@ -265,19 +265,23 @@ export const s3 = (() => {
             new CopyObjectCommand({
               Bucket: S3_BUCKET_NAME,
               CopySource: encodeURI(`${S3_BUCKET_NAME}/${fileInfo.Key}`),
-              Key: `${destinationFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`,
+              Key: userEmail
+                ? `${destinationFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`
+                : `${destinationFolder}/${fileInfo.Key.split('/').pop()}`,
             }),
           );
           await s3Client.send(
             new DeleteObjectCommand({
               Bucket: S3_BUCKET_NAME,
-              Key: `${rootFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`,
+              Key: userEmail
+                ? `${rootFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`
+                : `${rootFolder}/${fileInfo.Key.split('/').pop()}`,
             }),
           );
         }),
       ]);
     } else {
-      console.log(`${userEmail}: 삭제할 ${rootFolder}이 없습니다.`);
+      console.log(`${userEmail}: 이동할 ${rootFolder}이 없습니다.`);
     }
   }
 
