@@ -12,6 +12,7 @@ import {
   UnorderedList,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import { s3 } from '@project-lc/utils-s3';
 
 const SERVICE_NAME = '크크쇼';
 
@@ -27,7 +28,7 @@ export function IdCardImageUploadGuide(): JSX.Element {
         <ChakraNextImage
           width="300"
           height="200"
-          src="https://lc-project.s3.ap-northeast-2.amazonaws.com/public/idcard.png"
+          src={`${s3.fullDomain}public/idcard.png`}
         />
       </Box>
 
@@ -69,7 +70,7 @@ export function AccountImageUploadGuide(): JSX.Element {
         <ChakraNextImage
           width="400"
           height="400"
-          src="https://lc-project.s3.ap-northeast-2.amazonaws.com/public/real-account.png"
+          src={`${s3.fullDomain}real-account.png`}
         />
       </Box>
       <Text>
@@ -82,7 +83,7 @@ export function AccountImageUploadGuide(): JSX.Element {
         <ChakraNextImage
           width="400"
           height="400"
-          src="https://lc-project.s3.ap-northeast-2.amazonaws.com/public/internet-account.png"
+          src={`${s3.fullDomain}public/internet-account.png`}
         />
       </Box>
       <Text>

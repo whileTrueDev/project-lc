@@ -211,7 +211,7 @@ export class LCDevPrivateAppStack extends Stack {
       },
       environment: {
         NODE_ENV: 'test',
-        S3_BUCKET_NAME: 'lc-project',
+        S3_BUCKET_NAME: 'project-lc-dev-test',
         MAILER_HOST: `https://dev-mailer.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new AwsLogDriver({

@@ -136,7 +136,7 @@ export class LCDevAppStack extends cdk.Stack {
         CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
       },
       environment: {
-        S3_BUCKET_NAME: 'lc-project',
+        S3_BUCKET_NAME: 'project-lc-dev-test',
         API_HOST: `https://dev-api.${constants.PUNYCODE_DOMAIN}`,
         SELLER_WEB_HOST: `https://dev-seller.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://dev-broadcaster.${constants.PUNYCODE_DOMAIN}`,
@@ -205,7 +205,7 @@ export class LCDevAppStack extends cdk.Stack {
         CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
       },
       environment: {
-        S3_BUCKET_NAME: 'lc-project',
+        S3_BUCKET_NAME: 'project-lc-dev-test',
         NODE_ENV: 'test',
       },
       logging: new ecs.AwsLogDriver({
@@ -276,7 +276,7 @@ export class LCDevAppStack extends cdk.Stack {
         CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
       },
       environment: {
-        S3_BUCKET_NAME: 'lc-project',
+        S3_BUCKET_NAME: 'project-lc-dev-test',
         OVERLAY_HOST: `https://dev-live.${constants.PUNYCODE_DOMAIN}`,
         OVERLAY_CONTROLLER_HOST: `https://dev-overlay-controller.${constants.PUNYCODE_DOMAIN}`,
         REALTIME_API_HOST: `https://dev-realtime.${constants.PUNYCODE_DOMAIN}`,
