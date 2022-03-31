@@ -16,6 +16,7 @@ import {
   _Object,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { UserType } from '@project-lc/shared-types';
 import { generateS3Key, s3KeyType } from './generateS3Key';
 
 export type s3TaggingKeys = 'overlayImageType'; // s3 object 태그 객체 키
@@ -36,7 +37,7 @@ export const s3 = (() => {
   // bucket 이름
   const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME!;
   const S3_BUCKET_REGION = 'ap-northeast-2';
-  const S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
+  const S3_DOMAIN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
 
   const s3Client = new S3Client({
     region: S3_BUCKET_REGION,
@@ -54,7 +55,7 @@ export const s3 = (() => {
    * @returns 객체 url
    */
   function getSavedObjectUrl(key: string): string {
-    return S3_DOMIAN + key;
+    return S3_DOMAIN + key;
   }
 
   /** 파일 업로드
@@ -141,6 +142,31 @@ export const s3 = (() => {
       console.error(error);
       return '';
     }
+  }
+
+  /** 프로필 이미지 업로드 */
+  async function uploadProfileImage({
+    key,
+    file,
+    email,
+    userType,
+  }: {
+    key: string;
+    file: Buffer;
+    email: string;
+    userType: UserType;
+  }): Promise<string> {
+    const avatarPath = `avatar/${userType}/${email}/${key}`;
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: S3_BUCKET_NAME,
+        Key: avatarPath,
+        Body: file,
+        ACL: 'public-read',
+      }),
+    );
+    const avatar = `https://${S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/${avatarPath}`;
+    return avatar;
   }
 
   /**
@@ -254,6 +280,15 @@ export const s3 = (() => {
     }
   }
 
+  function getGoodsImageS3KeyListFromImgSrcList(srcList: string[]): string[] {
+    const GOODS_DIRECTORY = 'goods/';
+    const GOODS_IMAGE_URL_DOMAIN = `${S3_DOMAIN}${GOODS_DIRECTORY}`;
+
+    return srcList
+      .filter((src) => src.startsWith(GOODS_IMAGE_URL_DOMAIN))
+      .map((src) => src.replace(S3_DOMAIN, ''));
+  }
+
   return {
     s3UploadImage,
     moveObjects,
@@ -262,5 +297,7 @@ export const s3 = (() => {
     sendPutObjectCommand,
     sendListObjectCommand,
     sendDeleteObjectsCommand,
+    uploadProfileImage,
+    getGoodsImageS3KeyListFromImgSrcList,
   };
 })();

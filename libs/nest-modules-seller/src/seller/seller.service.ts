@@ -17,6 +17,7 @@ import {
 import { hash, verify } from 'argon2';
 import { Cache } from 'cache-manager';
 import __multer from 'multer';
+import { s3 } from '@project-lc/utils-s3';
 
 @Injectable()
 export class SellerService extends ServiceBaseWithCache {
@@ -249,7 +250,7 @@ export class SellerService extends ServiceBaseWithCache {
     email: Seller['email'],
     file: Express.Multer.File,
   ): Promise<boolean> {
-    const avatarUrl = await this.s3service.uploadProfileImage({
+    const avatarUrl = await s3.uploadProfileImage({
       key: file.originalname,
       file: file.buffer,
       email,

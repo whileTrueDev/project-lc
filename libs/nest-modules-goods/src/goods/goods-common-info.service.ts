@@ -11,6 +11,8 @@ import { S3Service } from '@project-lc/nest-modules-s3';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
 import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
+import { s3 } from '@project-lc/utils-s3';
+import { ObjectIdentifier } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class GoodsCommonInfoService extends ServiceBaseWithCache {
@@ -104,13 +106,16 @@ export class GoodsCommonInfoService extends ServiceBaseWithCache {
       const imgSrcList: string[] = getImgSrcListFromHtmlStringList(contentList);
 
       // img src에서 s3에 저장된 이미지만 찾기
-      const s3ImageKeys = this.s3service.getGoodsImageS3KeyListFromImgSrcList(imgSrcList);
+      const s3ImageKeys = s3.getGoodsImageS3KeyListFromImgSrcList(imgSrcList);
 
       // s3저장된 이미지 있는경우
       if (s3ImageKeys.length > 0) {
-        await this.s3service.deleteMultipleObjects(
-          s3ImageKeys.map((key) => ({ Key: key })),
-        );
+        let deleteObjectIdentifiers: ObjectIdentifier[] = [];
+
+        deleteObjectIdentifiers = s3ImageKeys.map((key) => {
+          return { Key: key };
+        });
+        s3.sendDeleteObjectsCommand({ deleteObjects: deleteObjectIdentifiers });
       }
 
       // 공통정보 내 포함된 s3이미지 파일 삭제요청 필요
