@@ -1,5 +1,5 @@
 import { AddIcon } from '@chakra-ui/icons';
-import { Button, Stack, Text, useDisclosure } from '@chakra-ui/react';
+import { Button, Stack, Text } from '@chakra-ui/react';
 import {
   KkshowMainCarouselItem,
   KkshowMainCarouselItemType,
@@ -76,7 +76,6 @@ const carouselItemAddButtons: {
 ];
 
 export function AdminKkshowMainCarouselSection(): JSX.Element {
-  const { isOpen, onClose, onOpen } = useDisclosure();
   const { control } = useFormContext<KkshowMainResData>();
   const { fields, append, remove, move } = useFieldArray({
     control,
