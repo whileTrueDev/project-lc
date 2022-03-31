@@ -1,5 +1,4 @@
 import { Schedule } from '@aws-cdk/aws-applicationautoscaling';
-import { Certificate } from '@aws-cdk/aws-certificatemanager';
 import { SecurityGroup, Vpc } from '@aws-cdk/aws-ec2';
 import { Repository, TagStatus } from '@aws-cdk/aws-ecr';
 import {
@@ -12,22 +11,12 @@ import {
   Secret,
 } from '@aws-cdk/aws-ecs';
 import { ScheduledFargateTask } from '@aws-cdk/aws-ecs-patterns';
-import {
-  ApplicationListener,
-  ApplicationLoadBalancer,
-  ApplicationProtocol,
-  ApplicationTargetGroup,
-  ListenerAction,
-  ListenerCondition,
-  SslPolicy,
-} from '@aws-cdk/aws-elasticloadbalancingv2';
 import { LogGroup } from '@aws-cdk/aws-logs';
 import { Construct, Duration, RemovalPolicy, Stack, StackProps } from '@aws-cdk/core';
 import { constants } from '../../constants';
 import { loadSsmParam } from '../../util/loadSsmParam';
 
 interface LCDevPrivateAppStackProps extends StackProps {
-  albSecGrp: SecurityGroup;
   mailerSecGrp: SecurityGroup;
   inactiveBatchSecGrp: SecurityGroup;
   cluster: Cluster;
@@ -37,87 +26,31 @@ export class LCDevPrivateAppStack extends Stack {
   private readonly ID_PREFIX = `${constants.DEV.ID_PREFIX}PRIVATE-`;
   private readonly ACM_ARN = process.env.ACM_CERTIFICATE_ARN!;
 
-  public privateAlb: ApplicationLoadBalancer;
-
   constructor(scope: Construct, id: string, props: LCDevPrivateAppStackProps) {
     super(scope, id, props);
-    const { vpc, cluster, mailerSecGrp, albSecGrp, inactiveBatchSecGrp } = props;
-
-    // * ALB
-    const alb = this.createPrivateAlb(vpc, albSecGrp);
-    this.privateAlb = alb;
-    const albHttpsListener = this.createPrivateAlbListener(alb);
+    const { vpc, cluster, mailerSecGrp, inactiveBatchSecGrp } = props;
 
     // * Fargate services
-    this.createMailerService(vpc, cluster, mailerSecGrp, albHttpsListener);
+    this.createMailerService(cluster, mailerSecGrp);
 
     // * 휴면 배치 작업
     this.createInactiveBatchService(vpc, cluster, inactiveBatchSecGrp);
   }
 
-  /** Private 용 로드밸런서를 구성합니다. */
-  private createPrivateAlb(vpc: Vpc, albSecGrp: SecurityGroup): ApplicationLoadBalancer {
-    return new ApplicationLoadBalancer(this, `${this.ID_PREFIX}ALB`, {
-      vpc,
-      internetFacing: true,
-      loadBalancerName: `${this.ID_PREFIX}Alb`,
-      vpcSubnets: {
-        subnetGroupName: constants.DEV.INGRESS_SUBNET_GROUP_NAME,
-      },
-      securityGroup: albSecGrp,
-    });
-  }
-
-  /** Private 용 로드밸런서에 HTTPS 리스너를 구성합니다 */
-  private createPrivateAlbListener(alb: ApplicationLoadBalancer): ApplicationListener {
-    const sslCert = Certificate.fromCertificateArn(this, 'DnsCertificates', this.ACM_ARN);
-    alb.addRedirect();
-    const httpsListener = alb.addListener(`${this.ID_PREFIX}ALBHTTPListener`, {
-      port: 443,
-      sslPolicy: SslPolicy.RECOMMENDED,
-      certificates: [sslCert],
-      defaultAction: ListenerAction.fixedResponse(200, {
-        messageBody: 'hello world',
-      }),
-    });
-    httpsListener.connections.allowDefaultPortFromAnyIpv4('HTTPS ALB Open to the world');
-    return httpsListener;
-  }
-
   /** 메일러 Fargate 서비스를 생성합니다. */
-  private createMailerService(
-    vpc: Vpc,
-    cluster: Cluster,
-    secGrp: SecurityGroup,
-    listener: ApplicationListener,
-  ): FargateService {
+  private createMailerService(cluster: Cluster, secGrp: SecurityGroup): FargateService {
     const servicePrefix = 'Mailer';
     const prefix = `${this.ID_PREFIX}${servicePrefix}`;
     const repo = new Repository(this, `${prefix}Repo`, {
       repositoryName: constants.DEV.ECS_MAILER_FAMILY_NAME,
       lifecycleRules: [
         { maxImageCount: 1, tagStatus: TagStatus.ANY },
-        {
-          maxImageAge: Duration.days(1),
-          tagStatus: TagStatus.UNTAGGED,
-        },
+        { maxImageAge: Duration.days(1), tagStatus: TagStatus.UNTAGGED },
       ],
     });
 
     const taskDef = new FargateTaskDefinition(this, `${prefix}EcsTaskDef`, {
       family: constants.DEV.ECS_MAILER_FAMILY_NAME,
-    });
-
-    const MAILER_USER = loadSsmParam(this, `${prefix}MAILER_USER`, {
-      version: 3,
-      parameterName: constants.DEV.MAILER_USER,
-    });
-    const MAILER_PASS = loadSsmParam(this, `${prefix}MAILER_PASS`, {
-      version: 5,
-      parameterName: constants.DEV.MAILER_PASS,
-    });
-    const MQ_REDIS_URL = loadSsmParam(this, `${prefix}MQ_REDIS_URL`, {
-      parameterName: constants.DEV.MQ_REDIS_URL,
     });
 
     taskDef.addContainer(`${prefix}Container`, {
@@ -126,9 +59,21 @@ export class LCDevPrivateAppStack extends Stack {
       portMappings: [{ containerPort: constants.DEV.ECS_MAILER_PORT }],
       memoryLimitMiB: 512,
       secrets: {
-        MAILER_USER: Secret.fromSsmParameter(MAILER_USER),
-        MAILER_PASS: Secret.fromSsmParameter(MAILER_PASS),
-        MQ_REDIS_URL: Secret.fromSsmParameter(MQ_REDIS_URL),
+        MAILER_USER: Secret.fromSsmParameter(
+          loadSsmParam(this, `${prefix}MAILER_USER`, {
+            parameterName: constants.DEV.MAILER_USER,
+          }),
+        ),
+        MAILER_PASS: Secret.fromSsmParameter(
+          loadSsmParam(this, `${prefix}MAILER_PASS`, {
+            parameterName: constants.DEV.MAILER_PASS,
+          }),
+        ),
+        MQ_REDIS_URL: Secret.fromSsmParameter(
+          loadSsmParam(this, `${prefix}MQ_REDIS_URL`, {
+            parameterName: constants.DEV.MQ_REDIS_URL,
+          }),
+        ),
       },
       environment: {
         NODE_ENV: 'test',
@@ -153,27 +98,6 @@ export class LCDevPrivateAppStack extends Stack {
       desiredCount: 1,
       securityGroups: [secGrp],
       assignPublicIp: false,
-    });
-
-    const targetGroup = new ApplicationTargetGroup(this, `${prefix}TargetGroup`, {
-      vpc,
-      targetGroupName: `${prefix}TargetGroup`,
-      port: constants.DEV.ECS_MAILER_PORT,
-      protocol: ApplicationProtocol.HTTP,
-      healthCheck: {
-        enabled: true,
-        path: '/',
-        interval: Duration.minutes(1),
-      },
-      targets: [service],
-    });
-
-    listener.addTargetGroups(`${prefix}HTTPSTargetGroup`, {
-      priority: 1,
-      conditions: [
-        ListenerCondition.hostHeaders([`dev-mailer.${constants.PUNYCODE_DOMAIN}`]),
-      ],
-      targetGroups: [targetGroup],
     });
 
     return service;
@@ -221,7 +145,6 @@ export class LCDevPrivateAppStack extends Stack {
       environment: {
         NODE_ENV: 'test',
         S3_BUCKET_NAME: 'lc-project',
-        MAILER_HOST: `https://dev-mailer.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new AwsLogDriver({
         logGroup: new LogGroup(this, `${prefix}LogGroup`, {

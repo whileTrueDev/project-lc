@@ -143,7 +143,6 @@ export class LCDevAppStack extends cdk.Stack {
         SELLER_WEB_HOST: `https://dev-seller.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://dev-broadcaster.${constants.PUNYCODE_DOMAIN}`,
         KKSHOW_WEB_HOST: `https://dev.${constants.PUNYCODE_DOMAIN}`,
-        MAILER_HOST: `https://dev-mailer.${constants.PUNYCODE_DOMAIN}`,
         NODE_ENV: 'test',
       },
       logging: new ecs.AwsLogDriver({
@@ -674,7 +673,7 @@ export class LCDevAppStack extends cdk.Stack {
       },
     );
 
-    this.CACHE_REDIS_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
+    this.MQ_REDIS_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
       this,
       `${PREFIX}MQ_REDIS_URL`,
       { parameterName: constants.DEV.MQ_REDIS_URL },
@@ -700,6 +699,7 @@ export class LCDevAppStack extends cdk.Stack {
       WHILETRUE_IP_ADDRESS: this.WHILETRUE_IP_ADDRESS,
       REDIS_URL: this.REDIS_URL,
       CACHE_REDIS_URL: this.CACHE_REDIS_URL,
+      MQ_REDIS_URL: this.MQ_REDIS_URL,
     };
   }
 }

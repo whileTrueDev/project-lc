@@ -47,7 +47,7 @@ export class LCDevRedisStack extends cdk.Stack {
     // * Redis cluster used as Message Queue in Microservices architecture
     new elasticache.CfnCacheCluster(this, `${constants.DEV.ID_PREFIX}RedisMQCluster`, {
       engine: 'redis',
-      numCacheNodes: 2,
+      numCacheNodes: 1,
       engineVersion: '6.2',
       cacheNodeType: 'cache.t4g.micro',
       clusterName: 'KksDevRedisMQ',
