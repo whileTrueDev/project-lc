@@ -61,7 +61,7 @@ function UserManualDisplay({ data }: { data: Manual }): JSX.Element {
   const { mainCategories } = useManualMainCategories(data.target);
 
   const mainCategoryName =
-    mainCategories.find((cat) => cat.href === data.mainCategory)?.name || '';
+    mainCategories.find((cat) => cat.key === data.mainCategory)?.label || '';
 
   return (
     <Stack spacing={4}>
@@ -75,7 +75,7 @@ function UserManualDisplay({ data }: { data: Manual }): JSX.Element {
             >{`${mainCategoryName} >`}</Button>
           </Box>
         )}
-        <Heading size="md">{data.title}</Heading>
+        <Heading size="sm">{data.title}</Heading>
       </Stack>
 
       {data.description.trim() && <Text>{data.description}</Text>}
@@ -87,6 +87,10 @@ function UserManualDisplay({ data }: { data: Manual }): JSX.Element {
         minH="100px"
         overflowY="auto"
         dangerouslySetInnerHTML={{ __html: data.contents }}
+        style={{
+          fontSize: '1rem',
+          fontFamily: 'Noto Sans KR, sans-serif',
+        }}
       />
     </Stack>
   );
