@@ -58,9 +58,9 @@ export function UserManualCategoryList({ userType }: UserManualProps): JSX.Eleme
   const categoryList: ManualCategoryBoxProps[] = mainCategories
     .map((cat) => {
       return {
-        mainCategoryName: cat.name,
-        id: cat.href,
-        list: data.filter((d) => d.mainCategory === cat.href),
+        mainCategoryName: cat.label,
+        id: cat.key,
+        list: data.filter((d) => d.mainCategory === cat.key),
       };
     })
     .filter((item) => item.list.length > 0);

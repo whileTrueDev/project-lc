@@ -32,7 +32,7 @@ export function AdminManualPost(): JSX.Element {
     description: '', // 주제에 대한 짧은 설명 (예: 크크쇼에 상품을 등록하는 방법입니다.)
     order: 1, // 이용안내 표시될 순서
     contents: '', // 이용안내 내용,
-    mainCategory: mainCategories[0].href,
+    mainCategory: mainCategories[0].key,
   };
 
   return (

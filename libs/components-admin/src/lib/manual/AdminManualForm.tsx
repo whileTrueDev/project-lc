@@ -82,7 +82,7 @@ export function AdminManualForm({
     });
   };
 
-  const { mypageNav, mainCategories } = useManualMainCategories(watch('target'));
+  const { linkPages, mainCategories } = useManualMainCategories(watch('target'));
 
   return (
     <FormProvider {...methods}>
@@ -98,10 +98,10 @@ export function AdminManualForm({
           </ManualInputLayout>
           <ManualInputLayout label="대분류">
             <Select {...register('mainCategory', { required: true })}>
-              {mainCategories.map((nav) => {
+              {mainCategories.map((cat) => {
                 return (
-                  <option key={nav.href} value={nav.href}>
-                    {nav.name}
+                  <option key={cat.key} value={cat.key}>
+                    {cat.label}
                   </option>
                 );
               })}
@@ -133,7 +133,7 @@ export function AdminManualForm({
         <ManualInputLayout label="해당 이용안내 연결 페이지">
           <Select {...register('linkPageRouterPath')}>
             <option value="">없음</option>
-            {mypageNav.map((nav) => {
+            {linkPages.map((nav) => {
               return (
                 <option key={nav.href} value={nav.href}>
                   {nav.name} {nav.href}
@@ -164,7 +164,7 @@ export function AdminManualForm({
         <Text>이용안내 대상 : {getValues('target')}</Text>
         <Text>
           대분류 :
-          {mainCategories.find((item) => item.href === getValues('mainCategory'))?.name}
+          {mainCategories.find((item) => item.key === getValues('mainCategory'))?.label}
         </Text>
         <Text>제목 : {getValues('title')}</Text>
         <Text>간략설명 : {getValues('description')}</Text>
@@ -173,11 +173,11 @@ export function AdminManualForm({
           <Text>
             연결 페이지 :
             {
-              mypageNav.find((item) => item.href === getValues('linkPageRouterPath'))
+              linkPages.find((item) => item.href === getValues('linkPageRouterPath'))
                 ?.name
             }
             {
-              mypageNav.find((item) => item.href === getValues('linkPageRouterPath'))
+              linkPages.find((item) => item.href === getValues('linkPageRouterPath'))
                 ?.href
             }
           </Text>

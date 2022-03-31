@@ -69,8 +69,8 @@ function MainCategory({
   value: string;
 }): JSX.Element {
   const { mainCategories } = useManualMainCategories(target);
-  const category = mainCategories.find((item) => item.href === value);
-  return <Text isTruncated>{category?.name}</Text>;
+  const category = mainCategories.find((item) => item.key === value);
+  return <Text isTruncated>{category?.label}</Text>;
 }
 
 const columns: GridColumns = [
