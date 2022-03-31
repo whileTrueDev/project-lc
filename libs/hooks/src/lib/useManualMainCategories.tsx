@@ -12,11 +12,13 @@ export function useManualMainCategories(userType: UserType): {
   mypageNav: MypageLink[];
   mainCategories: MypageLink[];
 } {
-  const mypageNav = (
-    userType === UserType.seller ? mypageNavLinks : broadcasterCenterMypageNavLinks
-  ).sort((a, b) => a.name.localeCompare(b.name));
+  const mypageNav =
+    userType === UserType.seller ? mypageNavLinks : broadcasterCenterMypageNavLinks;
 
-  const mainCategories = mypageNav.filter((nav) => nav.isMainCategory);
+  const mypageNavCopy = [...mypageNav];
+  const sortedMyPageNavCopy = mypageNavCopy.sort((a, b) => a.name.localeCompare(b.name));
+
+  const mainCategories = sortedMyPageNavCopy.filter((nav) => nav.isMainCategory);
 
   return {
     mypageNav,
