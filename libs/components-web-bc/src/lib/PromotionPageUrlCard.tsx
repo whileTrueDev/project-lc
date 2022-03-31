@@ -80,8 +80,7 @@ export function PromotionPageUrlCard(): JSX.Element {
   );
 }
 
-const BASE_BANNER_IMAGE_S3_PATH =
-  'https://lc-project.s3.ap-northeast-2.amazonaws.com/public/';
+const BASE_BANNER_IMAGE_S3_PATH = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/public/`;
 const baseBannerImages = [
   {
     key: 'promotion-page-banner-twitch.png',
@@ -129,7 +128,7 @@ export function PromotionPageUrlInformationModal({
                   width="1000"
                   height="1000"
                   objectFit="fill"
-                  src="https://lc-project.s3.ap-northeast-2.amazonaws.com/public/promotion-page-example.png"
+                  src={`https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/public/promotion-page-example.png`}
                 />
                 <Text>
                   해당 페이지에서 판매가 발생하면 일정 수수료가 지급됩니다. <br />팬

@@ -3,8 +3,7 @@ import { Image, ImageProps } from '@chakra-ui/react';
 import { UserType } from '@project-lc/shared-types';
 import { useMemo } from 'react';
 
-export const LOGO_S3_PREFIX =
-  'https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/';
+export const LOGO_S3_PREFIX = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/kksLogo/`;
 export const darkLogo = 'kksMainLogoDarkMode.png';
 export const darkBigLogo = 'kksMainLogoDarkModeBig.png';
 export const lightLogo = 'kksMainLogoLightMode.png';

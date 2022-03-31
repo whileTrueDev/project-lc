@@ -2,7 +2,7 @@ export const createPreInactivateNoticeTemplate = (userEmail: string): string => 
 <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
   <div style="text-align: center;">
 
-    <img width="200px" height="75px" src="https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" alt="kks-logo" />
+    <img width="200px" height="75px" src="https://${process.env.S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/kksLogo/kksMainLogoLightMode.png" alt="kks-logo" />
 
     <h1 style="padding-top:32px;font-weight:800;">휴면 예정 메일 : ${userEmail}</h1>
 

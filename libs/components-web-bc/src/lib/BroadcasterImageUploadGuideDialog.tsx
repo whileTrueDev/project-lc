@@ -27,7 +27,7 @@ export function IdCardImageUploadGuide(): JSX.Element {
         <ChakraNextImage
           width="300"
           height="200"
-          src="https://lc-project.s3.ap-northeast-2.amazonaws.com/public/idcard.png"
+          src={`https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/public/idcard.png`}
         />
       </Box>
 
@@ -69,7 +69,7 @@ export function AccountImageUploadGuide(): JSX.Element {
         <ChakraNextImage
           width="400"
           height="400"
-          src="https://lc-project.s3.ap-northeast-2.amazonaws.com/public/real-account.png"
+          src={`https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/public/real-account.png`}
         />
       </Box>
       <Text>
@@ -82,7 +82,7 @@ export function AccountImageUploadGuide(): JSX.Element {
         <ChakraNextImage
           width="400"
           height="400"
-          src="https://lc-project.s3.ap-northeast-2.amazonaws.com/public/internet-account.png"
+          src={`https:/${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/public/internet-account.png`}
         />
       </Box>
       <Text>

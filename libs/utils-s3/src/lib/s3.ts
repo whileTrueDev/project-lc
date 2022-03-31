@@ -35,10 +35,9 @@ export interface S3UploadImageOptions
 export const s3 = (() => {
   // 해당 네임 스페이스에서의 객체선언
   // bucket 이름
-  const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME!;
+  const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME;
   const S3_BUCKET_REGION = 'ap-northeast-2';
-  const S3_DOMAIN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
-
+  const S3_DOMAIN = `https://${S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/`;
   const s3Client = new S3Client({
     region: S3_BUCKET_REGION,
     credentials: {

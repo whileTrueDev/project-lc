@@ -517,7 +517,7 @@ export class GoodsService extends ServiceBaseWithCache {
 
     try {
       const url = imageToDeleted.image;
-      const S3_DOMAIN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
+      const S3_DOMAIN = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/`;
       if (url.includes(S3_DOMAIN)) {
         const Key = url.replace(S3_DOMAIN, '');
 

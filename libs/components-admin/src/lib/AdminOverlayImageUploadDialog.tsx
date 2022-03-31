@@ -137,7 +137,7 @@ export function AdminOverlayImageUploadDialog(
 ): JSX.Element {
   const { isOpen, onClose, broadcasterEmail, liveShoppingId } = props;
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
-  const S3_IMAGE_PREFIX = `https://lc-project.s3.ap-northeast-2.amazonaws.com`;
+  const S3_IMAGE_PREFIX = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com`;
   const toast = useToast();
   const [verticalPreviews, setVerticalPreviews] = useState<Preview[]>([]);
   const [horizontalPreviews, setHorizontalPreviews] = useState<Preview[]>([]);
