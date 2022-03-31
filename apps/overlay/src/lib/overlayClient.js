@@ -7,6 +7,8 @@ const messageArray = [];
 const iterateLimit = $('#primary-info').data('number') + 1;
 const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const email = $('#primary-info').data('email');
+const bucketName = $('#primary-info').data('bucket-name');
+
 let streamerAndProduct;
 let startDate = new Date('2021-09-27T14:05:00+0900');
 let endDate = new Date('2021-09-04T15:00:00+0900');
@@ -189,7 +191,7 @@ async function switchImage() {
     $('.vertical-banner')
       .attr(
         'src',
-        `https://lc-project.s3.ap-northeast-2.amazonaws.com/vertical-banner/${email}/${liveShoppingId}/vertical-banner-${bannerId}`,
+        `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/vertical-banner/${email}/${liveShoppingId}/vertical-banner-${bannerId}`,
       )
       .fadeIn(1000);
   }, 1000);
@@ -360,7 +362,7 @@ socket.on('get right-top purchase message', async (data) => {
     }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
     <div class="item">
       <div class="centered">
-        <img src="https://lc-project.s3.ap-northeast-2.amazonaws.com/donation-images/${email}/${liveShoppingId}/${
+        <img src="https://${bucketName}.s3.ap-northeast-2.amazonaws.com/donation-images/${email}/${liveShoppingId}/${
     alarmType === '2' ? 'donation-2' : 'donation-1'
   }" class="donation-image" />  
         <div class ="animated heartbeat" id="donation-top">
@@ -484,7 +486,7 @@ socket.on('toggle right-top onad logo from server', () => {
   } else {
     $('#kks-logo').attr(
       'src',
-      `https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-logo/${email}/${liveShoppingId}/kks-special-logo`,
+      `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/overlay-logo/${email}/${liveShoppingId}/kks-special-logo`,
     );
   }
 });
