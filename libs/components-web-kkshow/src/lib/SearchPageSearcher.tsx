@@ -14,7 +14,7 @@ import { useQueryClient } from 'react-query';
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { SearchBox, SearchInput } from './SearchBox';
-import { deleteLocalStorageSearchKeyword } from './CustomSearchPopover';
+import { deleteLocalStorageSearchKeyword } from './SearchPopover';
 
 export function SearchPageSearcher(): JSX.Element {
   const router = useRouter();

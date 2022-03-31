@@ -1,5 +1,5 @@
 import { InputGroup } from '@chakra-ui/react';
-import { CustomSearchPopover } from './CustomSearchPopover';
+import { SearchPopover } from './SearchPopover';
 import { SearchBox } from './SearchBox';
 
 export function GlobalSearcher(): JSX.Element {
@@ -12,7 +12,7 @@ export function GlobalSearcher(): JSX.Element {
         display={{ base: 'none', xl: 'flex' }}
       >
         <SearchBox />
-        <CustomSearchPopover />
+        <SearchPopover />
       </InputGroup>
     </>
   );

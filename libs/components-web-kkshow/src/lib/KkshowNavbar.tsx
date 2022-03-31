@@ -123,7 +123,7 @@ const NavItem = ({ label, href, isExternal }: NavItemType): JSX.Element => {
     <NextLink href={href ?? '#'} passHref>
       <Link
         p={{ base: 0, md: 2 }}
-        color={isMathced ? 'unset' : 'whiteAlpha.800'}
+        color={isMathced ? 'unset' : 'inherit'}
         fontWeight="bold"
         fontSize={{ base: 'md', sm: 'lg' }}
         isExternal={isExternal}

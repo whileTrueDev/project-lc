@@ -30,7 +30,7 @@ export function deleteLocalStorageSearchKeyword(
   }
 }
 
-export function CustomSearchPopover(): JSX.Element {
+export function SearchPopover(): JSX.Element {
   const toast = useToast();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -131,4 +131,4 @@ export function CustomSearchPopover(): JSX.Element {
   );
 }
 
-export default CustomSearchPopover;
+export default SearchPopover;
