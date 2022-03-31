@@ -161,7 +161,7 @@ export class LCProdPrivateAppStack extends Stack {
     listener.addTargetGroups(`${prefix}HTTPSTG`, {
       priority: 1,
       conditions: [
-        ListenerCondition.hostHeaders([`mailer.${constants.PROD.PRIVATE_DOMAIN}`]),
+        ListenerCondition.hostHeaders([`mailer.${constants.PUNYCODE_DOMAIN}`]),
       ],
       targetGroups: [targetGroup],
     });
