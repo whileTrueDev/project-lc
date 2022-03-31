@@ -137,7 +137,6 @@ export function AdminOverlayImageUploadDialog(
 ): JSX.Element {
   const { isOpen, onClose, broadcasterEmail, liveShoppingId } = props;
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
-  const S3_IMAGE_PREFIX = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com`;
   const toast = useToast();
   const [verticalPreviews, setVerticalPreviews] = useState<Preview[]>([]);
   const [horizontalPreviews, setHorizontalPreviews] = useState<Preview[]>([]);
@@ -491,7 +490,7 @@ export function AdminOverlayImageUploadDialog(
                       <VStack key={`saved-${result}`}>
                         <Link
                           isTruncated
-                          href={`${S3_IMAGE_PREFIX}/${result}`}
+                          href={`${s3.fullDomain}${result}`}
                           fontWeight="bold"
                           colorScheme="blue"
                           textDecoration="underline"
@@ -499,7 +498,7 @@ export function AdminOverlayImageUploadDialog(
                         >
                           <ChakraNextImage
                             layout="intrinsic"
-                            src={`${S3_IMAGE_PREFIX}/${result}`}
+                            src={`${s3.fullDomain}${result}`}
                             width={80}
                             height={160}
                           />
@@ -534,7 +533,7 @@ export function AdminOverlayImageUploadDialog(
                           <VStack>
                             <Link
                               isTruncated
-                              href={`${S3_IMAGE_PREFIX}/${donationImage}`}
+                              href={`${s3.fullDomain}${donationImage}`}
                               fontWeight="bold"
                               colorScheme="blue"
                               textDecoration="underline"
@@ -542,7 +541,7 @@ export function AdminOverlayImageUploadDialog(
                             >
                               <ChakraNextImage
                                 layout="intrinsic"
-                                src={`${S3_IMAGE_PREFIX}/${donationImage}`}
+                                src={`${s3.fullDomain}${donationImage}`}
                                 width={120}
                                 height={70}
                               />
@@ -576,7 +575,7 @@ export function AdminOverlayImageUploadDialog(
                   <VStack>
                     <Link
                       isTruncated
-                      href={`${S3_IMAGE_PREFIX}/${savedLogoImages}`}
+                      href={`${s3.fullDomain}${savedLogoImages}`}
                       fontWeight="bold"
                       colorScheme="blue"
                       textDecoration="underline"
@@ -584,7 +583,7 @@ export function AdminOverlayImageUploadDialog(
                     >
                       <ChakraNextImage
                         layout="intrinsic"
-                        src={`${S3_IMAGE_PREFIX}/${savedLogoImages}`}
+                        src={`${s3.fullDomain}${savedLogoImages}`}
                         width={130}
                         height={54}
                       />
@@ -616,7 +615,7 @@ export function AdminOverlayImageUploadDialog(
                       <VStack key={`saved-${result}`}>
                         <Link
                           isTruncated
-                          href={`${S3_IMAGE_PREFIX}/${result}`}
+                          href={`${s3.fullDomain}${result}`}
                           fontWeight="bold"
                           colorScheme="blue"
                           textDecoration="underline"
@@ -624,7 +623,7 @@ export function AdminOverlayImageUploadDialog(
                         >
                           <ChakraNextImage
                             layout="intrinsic"
-                            src={`${S3_IMAGE_PREFIX}/${result}`}
+                            src={`${s3.fullDomain}${result}`}
                             width={156}
                             height={56}
                           />

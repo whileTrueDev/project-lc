@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { useProfile } from '@project-lc/hooks';
+import { s3 } from '@project-lc/utils-s3';
 import { useState } from 'react';
 import { UrlCard } from './OverlayUrlCard';
 
@@ -80,7 +81,7 @@ export function PromotionPageUrlCard(): JSX.Element {
   );
 }
 
-const BASE_BANNER_IMAGE_S3_PATH = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/public/`;
+const BASE_BANNER_IMAGE_S3_PATH = `${s3.fullDomain}public/`;
 const baseBannerImages = [
   {
     key: 'promotion-page-banner-twitch.png',
@@ -128,7 +129,7 @@ export function PromotionPageUrlInformationModal({
                   width="1000"
                   height="1000"
                   objectFit="fill"
-                  src={`https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/public/promotion-page-example.png`}
+                  src={`${BASE_BANNER_IMAGE_S3_PATH}promotion-page-example.png`}
                 />
                 <Text>
                   해당 페이지에서 판매가 발생하면 일정 수수료가 지급됩니다. <br />팬
