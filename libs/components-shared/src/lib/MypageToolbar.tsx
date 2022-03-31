@@ -1,4 +1,5 @@
 import { Button, Link, Stack } from '@chakra-ui/react';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { UserType } from '@prisma/client';
 import { useManualLinkPageId } from '@project-lc/hooks';
 import NextLink from 'next/link';
@@ -22,7 +23,13 @@ export function ManualLinkButton({
   if (!manualId) return null;
   return (
     <NextLink href={`/mypage/manual/${manualId}`} passHref>
-      <Button as={Link} size="sm" isExternal colorScheme="blue">
+      <Button
+        as={Link}
+        size="xs"
+        isExternal
+        colorScheme="blue"
+        leftIcon={<ExternalLinkIcon />}
+      >
         이용안내
       </Button>
     </NextLink>

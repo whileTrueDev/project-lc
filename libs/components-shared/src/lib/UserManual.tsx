@@ -1,17 +1,9 @@
-import {
-  Box,
-  Button,
-  Center,
-  Container,
-  Heading,
-  Spinner,
-  Stack,
-  Text,
-} from '@chakra-ui/react';
+import { ChevronRightIcon } from '@chakra-ui/icons';
+import { Box, Center, Container, Link, Spinner, Stack, Text } from '@chakra-ui/react';
 import { Manual } from '@prisma/client';
 import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
 import { useManualDetail, useManualMainCategories } from '@project-lc/hooks';
-import { useRouter } from 'next/router';
+import NextLink from 'next/link';
 import React from 'react';
 import 'suneditor/dist/css/suneditor.min.css';
 
@@ -57,7 +49,6 @@ export function UserManual({ id }: UserManualProps): JSX.Element {
 export default UserManual;
 
 function UserManualDisplay({ data }: { data: Manual }): JSX.Element {
-  const router = useRouter();
   const { mainCategories } = useManualMainCategories(data.target);
 
   const mainCategoryName =
@@ -65,17 +56,20 @@ function UserManualDisplay({ data }: { data: Manual }): JSX.Element {
 
   return (
     <Stack spacing={4}>
-      <Stack px={4} direction="row" alignItems="center">
+      <Stack direction="row" alignItems="center">
         {mainCategoryName && (
-          <Box>
-            <Button
-              size="md"
-              variant="link"
-              onClick={() => router.push('/mypage/manual')}
-            >{`${mainCategoryName} >`}</Button>
-          </Box>
+          <>
+            <NextLink href="/mypage/manual" passHref>
+              <Link color="blue.500" fontWeight="bold">
+                {mainCategoryName}
+              </Link>
+            </NextLink>
+            <ChevronRightIcon />
+          </>
         )}
-        <Heading size="sm">{data.title}</Heading>
+        <Text fontWeight="bold" size="sm">
+          {data.title}
+        </Text>
       </Stack>
 
       {data.description.trim() && <Text>{data.description}</Text>}
