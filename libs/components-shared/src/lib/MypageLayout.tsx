@@ -7,11 +7,7 @@ import {
 import LoginRequireAlertDialog from '@project-lc/components-core/LoginRequireAlertDialog';
 import FullscreenLoading from '@project-lc/components-layout/FullscreenLoading';
 import MypageFooter from '@project-lc/components-layout/MypageFooter';
-import {
-  useCloseLiveShoppingStateBoardIfNotLoggedIn,
-  useDisplaySize,
-  useIsLoggedIn,
-} from '@project-lc/hooks';
+import { useDisplaySize, useIsLoggedIn } from '@project-lc/hooks';
 import { UserType } from '@project-lc/shared-types';
 import { FloatingHelpButton } from './FloatingHelpButton';
 import MypageBreadcrumb from './MypageBreadCrumb';
@@ -34,9 +30,6 @@ export function MypageLayout({
 }: MypageLayoutProps): JSX.Element {
   const { status } = useIsLoggedIn();
   const { isMobileSize } = useDisplaySize();
-
-  // 로그인 상태가 아닌경우 방송인 현황판 닫기 이펙트
-  useCloseLiveShoppingStateBoardIfNotLoggedIn();
 
   return (
     <Flex
