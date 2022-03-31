@@ -75,12 +75,16 @@ export function useCloseLiveShoppingStateBoardIfNotLoggedIn(): void {
 
   // 마운트시 bc 객체 생성 & ev 메시지 핸들러 할당
   useEffect(() => {
-    bcRef.current = new BroadcastChannel('LoginFlag');
-    bcRef.current.onmessage = (ev) => {
-      if (ev.data === 'not logged in') {
-        closeWindow();
-      }
-    };
+    try {
+      bcRef.current = new BroadcastChannel('LoginFlag');
+      bcRef.current.onmessage = (ev) => {
+        if (ev.data === 'not logged in') {
+          closeWindow();
+        }
+      };
+    } catch (e) {
+      console.log(e);
+    }
     return () => {
       if (bcRef.current) {
         bcRef.current = null;
