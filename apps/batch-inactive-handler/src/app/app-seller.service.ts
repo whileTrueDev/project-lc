@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { Seller } from '@prisma/client';
-import { S3Service } from '@project-lc/nest-modules-s3';
+import { s3 } from '@project-lc/utils-s3';
 
 export type BatchPayload = {
   count: number;
@@ -9,10 +9,7 @@ export type BatchPayload = {
 
 @Injectable()
 export class AppSellerService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly s3Service: S3Service,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   private getSellerId(email: string): Promise<{ id: number }> {
     return this.prisma.seller.findFirst({
@@ -204,9 +201,13 @@ export class AppSellerService {
       this.copySellerSettlementAccount(sellerId.id).then(() =>
         this.deleteSellerSettlementAccount(sellerId.id),
       ),
-      this.s3Service.moveObjects('business-registration', userEmail),
-      this.s3Service.moveObjects('settlement-account', userEmail),
-      this.s3Service.moveObjects('mail-order', userEmail),
+      s3.moveObjects(
+        'business-registration',
+        'inactive-business-registration',
+        userEmail,
+      ),
+      s3.moveObjects('settlement-account', 'inactive-settlement-account', userEmail),
+      s3.moveObjects('mail-order', 'inactive-mail-order', userEmail),
     ]);
     await this.deleteSellerSocialAccountNull(sellerId.id);
     await this.updateSellerNull(sellerId.id);

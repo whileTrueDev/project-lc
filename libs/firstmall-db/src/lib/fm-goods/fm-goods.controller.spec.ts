@@ -3,7 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CacheConfig } from '@project-lc/nest-core';
 import { GoodsService } from '@project-lc/nest-modules-goods';
-import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FmGoodsController } from './fm-goods.controller';
@@ -21,13 +20,7 @@ describe('FmGoodsController', () => {
           useClass: CacheConfig,
         }),
       ],
-      providers: [
-        FMGoodsService,
-        FirstmallDbService,
-        GoodsService,
-        PrismaService,
-        S3Service,
-      ],
+      providers: [FMGoodsService, FirstmallDbService, GoodsService, PrismaService],
       controllers: [FmGoodsController],
     }).compile();
 

@@ -3,7 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Goods, GoodsView, PrismaClient } from '@prisma/client';
 import { CacheConfig } from '@project-lc/nest-core';
-import { S3Module } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import {
   SellerGoodsSortColumn,
@@ -22,7 +21,6 @@ describe('GoodsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         PrismaModule,
-        S3Module,
         ConfigModule.forRoot({ isGlobal: true }),
         CacheModule.registerAsync({
           isGlobal: true,
