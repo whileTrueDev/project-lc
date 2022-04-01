@@ -47,10 +47,6 @@
                     "value": "https://dev.xn--hp4b17xa.com"
                 },
                 {
-                    "name": "MAILER_HOST",
-                    "value": "https://dev-mailer.xn--hp4b17xa.com"
-                },
-                {
                     "name": "NODE_ENV",
                     "value": "test"
                 }
