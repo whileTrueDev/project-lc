@@ -373,7 +373,7 @@ socket.on('get right-top purchase message', async (data) => {
         <img src="https://${bucketName}.s3.ap-northeast-2.amazonaws.com/donation-images/${email}/${liveShoppingId}/${
     alarmType === '2' ? 'donation-2' : 'donation-1'
   }" class="donation-image" />  
-        <div class ="animated heartbeat" id="donation-top">
+        <div class="animated heartbeat" id="donation-top">
           <span id="nickname">
             <span class="animated heartbeat" id="donation-user-id">${nickname}</span>
             <span class="donation-sub">님 ${productName}</span>
