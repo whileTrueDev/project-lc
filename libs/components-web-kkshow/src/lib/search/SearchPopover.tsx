@@ -5,11 +5,12 @@ import {
   IconButton,
   Box,
   useColorModeValue,
+  Button,
 } from '@chakra-ui/react';
 import { useKkshowSearchStore, useSearchPopoverStore } from '@project-lc/stores';
 import { SmallCloseIcon } from '@chakra-ui/icons';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, MouseEvent } from 'react';
 import { useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
 import { SearchInput } from './SearchBox';
@@ -44,6 +45,7 @@ export function SearchPopover(): JSX.Element {
   const { handleSubmit } = useForm<SearchInput>();
 
   const hoverColor = useColorModeValue('gray.50', 'gray.700');
+  const deleteButtonhoverColor = useColorModeValue('gray.200', 'gray.800');
 
   const onSubmit: SubmitHandler<SearchInput> = () => {
     if (keyword) {
@@ -96,35 +98,37 @@ export function SearchPopover(): JSX.Element {
       </Text>
       {localStorage?.length === 0 && <Text ml={3}>최근 검색어가 없습니다</Text>}
       {localStorage?.map((item: string) => (
-        <Flex
-          key={item}
-          justifyContent="space-between"
-          alignItems="center"
-          flex={1}
-          _hover={{ backgroundColor: hoverColor }}
-          pl={3}
-        >
-          <Text
-            ref={initialRef}
+        <Flex key={item} _hover={{ backgroundColor: hoverColor }}>
+          <Flex
+            width="100%"
+            justifyContent="space-between"
+            alignItems="center"
+            flex={1}
+            pl={3}
             as="button"
-            onMouseDown={(e) => e.preventDefault()}
+            type="submit"
+            cursor="pointer"
+            onMouseDown={(e: MouseEvent<HTMLElement>) => e.preventDefault()}
             onClick={() => {
               setKeyword(item);
               handlePopover(false);
             }}
-            type="submit"
-            cursor="pointer"
           >
-            {item}
-          </Text>
+            <Text ref={initialRef}>{item}</Text>
+          </Flex>
           <IconButton
+            _hover={{ backgroundColor: deleteButtonhoverColor }}
             m={1}
             variant="fill"
             aria-label="search-button-icon"
             icon={<SmallCloseIcon />}
             color="gray"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => deleteLocalStorageSearchKeyword(item, setLocalStorage)}
+            onMouseDown={(e) => {
+              e.preventDefault();
+            }}
+            onClick={() => {
+              deleteLocalStorageSearchKeyword(item, setLocalStorage);
+            }}
           />
         </Flex>
       ))}
