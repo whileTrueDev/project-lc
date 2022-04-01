@@ -9,18 +9,13 @@ import { BroadcasterMainHero } from '@project-lc/components-web-bc/main/Broadcas
 import { BroadcasterMainHowToUse } from '@project-lc/components-web-bc/main/BroadcasterMainHowToUse';
 import { BroadcasterMainIntroduce } from '@project-lc/components-web-bc/main/BroadcasterMainIntroduce';
 import { BroadcasterMainProcess } from '@project-lc/components-web-bc/main/BroadcasterMainProcess';
-import {
-  useCloseLiveShoppingStateBoardIfNotLoggedIn,
-  useIsLoggedIn,
-} from '@project-lc/hooks';
+import { useIsLoggedIn } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 
 export function Index(): JSX.Element {
   const router = useRouter();
   const inquiry = useDisclosure();
   const { isLoggedIn } = useIsLoggedIn();
-  // 로그인 상태가 아닌경우 방송인 현황판 닫기 이펙트
-  useCloseLiveShoppingStateBoardIfNotLoggedIn();
   return (
     <div>
       <Flex minH="100vh" justify="space-between" flexDirection="column">

@@ -16,6 +16,7 @@ import {
   _Object,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { UserType } from '@project-lc/shared-types';
 import { generateS3Key, s3KeyType } from './generateS3Key';
 
 export type s3TaggingKeys = 'overlayImageType'; // s3 object 태그 객체 키
@@ -34,15 +35,18 @@ export interface S3UploadImageOptions
 export const s3 = (() => {
   // 해당 네임 스페이스에서의 객체선언
   // bucket 이름
-  const S3_BUCKET_NAME = process.env.NEXT_PUBLIC_S3_BUCKET_NAME!;
+  const S3_BUCKET_NAME =
+    process.env.NEXT_PUBLIC_S3_BUCKET_NAME ||
+    process.env.S3_BUCKET_NAME ||
+    'project-lc-dev-test';
   const S3_BUCKET_REGION = 'ap-northeast-2';
-  const S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
+  const S3_DOMAIN = `https://${S3_BUCKET_NAME}.s3.${S3_BUCKET_REGION}.amazonaws.com/`;
 
   const s3Client = new S3Client({
     region: S3_BUCKET_REGION,
     credentials: {
-      accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET!,
+      accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET,
     },
   });
 
@@ -54,7 +58,7 @@ export const s3 = (() => {
    * @returns 객체 url
    */
   function getSavedObjectUrl(key: string): string {
-    return S3_DOMIAN + key;
+    return S3_DOMAIN + key;
   }
 
   /** 파일 업로드
@@ -143,6 +147,31 @@ export const s3 = (() => {
     }
   }
 
+  /** 프로필 이미지 업로드 */
+  async function uploadProfileImage({
+    key,
+    file,
+    email,
+    userType,
+  }: {
+    key: string;
+    file: Buffer;
+    email: string;
+    userType: UserType;
+  }): Promise<string> {
+    const avatarPath = `avatar/${userType}/${email}/${key}`;
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: S3_BUCKET_NAME,
+        Key: avatarPath,
+        Body: file,
+        ACL: 'public-read',
+      }),
+    );
+    const avatar = `https://${S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/${avatarPath}`;
+    return avatar;
+  }
+
   /**
    * 버킷 내 객체목록 조회
    * @param commandInput {Prefix: s3에 저장된 폴더경로}
@@ -210,6 +239,7 @@ export const s3 = (() => {
       ...getObjectCommandInput,
       Bucket: S3_BUCKET_NAME,
     });
+
     const imageUrl = await getSignedUrl(s3Client, command, {
       ...options,
     });
@@ -220,7 +250,7 @@ export const s3 = (() => {
   async function moveObjects(
     rootFolder: string,
     destinationFolder: string,
-    userEmail: string,
+    userEmail?: string,
   ): Promise<void> {
     const prefix = `${rootFolder}/${userEmail}`;
 
@@ -238,20 +268,33 @@ export const s3 = (() => {
             new CopyObjectCommand({
               Bucket: S3_BUCKET_NAME,
               CopySource: encodeURI(`${S3_BUCKET_NAME}/${fileInfo.Key}`),
-              Key: `${destinationFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`,
+              Key: userEmail
+                ? `${destinationFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`
+                : `${destinationFolder}/${fileInfo.Key.split('/').pop()}`,
             }),
           );
           await s3Client.send(
             new DeleteObjectCommand({
               Bucket: S3_BUCKET_NAME,
-              Key: `${rootFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`,
+              Key: userEmail
+                ? `${rootFolder}/${userEmail}/${fileInfo.Key.split('/').pop()}`
+                : `${rootFolder}/${fileInfo.Key.split('/').pop()}`,
             }),
           );
         }),
       ]);
     } else {
-      console.log(`${userEmail}: 삭제할 ${rootFolder}이 없습니다.`);
+      console.log(`${userEmail}: 이동할 ${rootFolder}이 없습니다.`);
     }
+  }
+
+  function getGoodsImageS3KeyListFromImgSrcList(srcList: string[]): string[] {
+    const GOODS_DIRECTORY = 'goods/';
+    const GOODS_IMAGE_URL_DOMAIN = `${S3_DOMAIN}${GOODS_DIRECTORY}`;
+
+    return srcList
+      .filter((src) => src.startsWith(GOODS_IMAGE_URL_DOMAIN))
+      .map((src) => src.replace(S3_DOMAIN, ''));
   }
 
   return {
@@ -262,5 +305,11 @@ export const s3 = (() => {
     sendPutObjectCommand,
     sendListObjectCommand,
     sendDeleteObjectsCommand,
+    uploadProfileImage,
+    getGoodsImageS3KeyListFromImgSrcList,
+    /** 버킷의 도메인명입니다. 마지막 / 를 포함합니다. */
+    fullDomain: S3_DOMAIN,
+    bucketName: S3_BUCKET_NAME,
+    bucketRegion: S3_BUCKET_REGION,
   };
 })();

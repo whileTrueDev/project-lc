@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { Prisma, Seller, InactiveSeller, SellerSocialAccount } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { S3Service } from '@project-lc/nest-modules-s3';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminSellerListRes,
@@ -17,6 +16,7 @@ import {
 import { hash, verify } from 'argon2';
 import { Cache } from 'cache-manager';
 import __multer from 'multer';
+import { s3 } from '@project-lc/utils-s3';
 
 @Injectable()
 export class SellerService extends ServiceBaseWithCache {
@@ -24,7 +24,6 @@ export class SellerService extends ServiceBaseWithCache {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly s3service: S3Service,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);
@@ -249,7 +248,7 @@ export class SellerService extends ServiceBaseWithCache {
     email: Seller['email'],
     file: Express.Multer.File,
   ): Promise<boolean> {
-    const avatarUrl = await this.s3service.uploadProfileImage({
+    const avatarUrl = await s3.uploadProfileImage({
       key: file.originalname,
       file: file.buffer,
       email,

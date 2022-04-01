@@ -12,10 +12,12 @@ import MotionBox from '@project-lc/components-core/MotionBox';
 import FadeUp from '@project-lc/components-layout/motion/FadeUp';
 import { useKkshowShopping } from '@project-lc/hooks';
 import { KkshowShoppingTabThemeData } from '@project-lc/shared-types';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import KkshowMainTitle from '../main/KkshowMainTitle';
 
 export function ShoppingKeywords(): JSX.Element {
+  const router = useRouter();
   const { data } = useKkshowShopping();
   const [selectedTheme, setSelectedTheme] = useState<KkshowShoppingTabThemeData | null>(
     null,
@@ -31,7 +33,7 @@ export function ShoppingKeywords(): JSX.Element {
   }, [data]);
 
   const handleKeywordSelect = (clickedKeyword: string): void => {
-    alert(`키워드 클릭: ${clickedKeyword}`);
+    router.push({ pathname: 'search', query: { keyword: clickedKeyword } });
   };
 
   return (

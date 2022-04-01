@@ -67,6 +67,7 @@ export function BroadcasterLiveShoppingList({
     const { openWindow } = liveShoppingStateBoardWindowStore();
 
     const openLiveShoppingStateWindow = useCallback(() => {
+      if (isMobileSize) return;
       const url = `${window.location.origin}/mypage/live/state/${broadcastId}`;
       const windowFeatures = 'scrollbars,resizable,width=800, height=600';
       openWindow(url, '_black', windowFeatures);
@@ -76,7 +77,10 @@ export function BroadcasterLiveShoppingList({
       <Button
         size="xs"
         colorScheme="green"
-        disabled={['조율중', '취소됨', '등록됨'].includes(shoppingProgress)}
+        disabled={
+          ['조율중', '취소됨', '등록됨'].includes(shoppingProgress) ||
+          Boolean(isMobileSize)
+        }
         onClick={openLiveShoppingStateWindow}
       >
         {shoppingProgress === '방송진행중' && '실시간 '}
@@ -269,7 +273,6 @@ export function BroadcasterLiveShoppingList({
               disableSelectionOnClick
               disableColumnMenu
               disableColumnSelector
-              loading={isSalesLoading}
               columns={isMobileSize ? mobileColumns : columns}
               rows={liveShoppingWithSales}
             />

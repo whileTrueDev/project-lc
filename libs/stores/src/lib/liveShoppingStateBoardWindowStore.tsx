@@ -2,7 +2,6 @@ import create from 'zustand';
 
 export interface LiveShoppingStateBoardWindowStore {
   _window: Window | null;
-  // windows: Window[];
   openWindow: (url: string, target: string, features: string) => void;
   closeWindow: () => void;
 }
@@ -14,7 +13,6 @@ export const liveShoppingStateBoardWindowStore =
       const { _window } = get();
       if (_window && !_window.closed) {
         // 윈도우 객체가 존재하고 열려있는 경우
-        _window.location.href = url;
         _window.focus();
       } else {
         // 윈도우 객체가 없거나, 객체는 있지만 닫힌 경우(x 버튼 눌러서 현황창 닫는경우 _window 객체는 존재하나 _window내부 값이 null이 된 경우)
@@ -25,6 +23,9 @@ export const liveShoppingStateBoardWindowStore =
     },
     closeWindow: () => {
       const { _window } = get();
-      if (_window) _window.close();
+      if (_window) {
+        _window.close();
+        set((state) => ({ ...state, _window: null }));
+      }
     },
   }));

@@ -1,6 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
-import { S3Module } from '@project-lc/nest-modules-s3';
 import { SellerContactsController } from './seller-contacts.controller';
 import { SellerContactsService } from './seller-contacts.service';
 import { SellerSettlementHistoryController } from './seller-settlement-history.controller';
@@ -26,7 +25,7 @@ export class SellerModule {
     SellerSettlementHistoryController,
   ];
 
-  private static readonly imports = [S3Module, MailVerificationModule];
+  private static readonly imports = [MailVerificationModule];
 
   static withoutControllers(): DynamicModule {
     return {

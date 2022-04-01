@@ -14,3 +14,4 @@ export * from './settings/cors.options';
 export * from './settings/csrf.config';
 export * from './settings/jwt.setting';
 export * from './settings/mailer.config';
+export * from './token/mailer';

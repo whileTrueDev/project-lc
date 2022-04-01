@@ -11,7 +11,6 @@ import {
   LiveShoppingService,
 } from '@project-lc/nest-modules-liveshopping';
 import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
-import { S3Service } from '@project-lc/nest-modules-s3';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
@@ -53,7 +52,6 @@ describe('FmOrdersController', () => {
       providers: [
         FmOrdersService,
         FirstmallDbService,
-        S3Service,
         LiveShoppingService,
         ProductPromotionService,
       ],
