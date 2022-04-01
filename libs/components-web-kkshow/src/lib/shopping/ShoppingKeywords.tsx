@@ -59,7 +59,7 @@ export function ShoppingKeywords(): JSX.Element {
       </FadeUp>
 
       <Grid
-        gridTemplateColumns={{ base: '1fr 1fr 1fr', md: 'repeat(6, 1fr)' }}
+        gridTemplateColumns={{ base: '1fr 1fr', sm: '1fr 1fr 1fr', md: 'repeat(6, 1fr)' }}
         gap={[2, 4]}
         mt={4}
       >
