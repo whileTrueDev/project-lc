@@ -9,7 +9,7 @@ export function GlobalSearcher(): JSX.Element {
         direction="column"
         size="sm"
         xl={240}
-        display={{ base: 'none', xl: 'flex' }}
+        display={{ base: 'none', md: 'flex' }}
       >
         <SearchBox />
         <SearchPopover />

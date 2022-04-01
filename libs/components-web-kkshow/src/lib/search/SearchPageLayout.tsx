@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { SearchResult } from '@project-lc/shared-types';
 import KkshowNavbar from '../KkshowNavbar';
 import KKshowMainExternLinks from '../main/KKshowMainExternLinks';
+import { MobileSearchDrawer } from './MobileSearchDrawer';
 
 export interface SearchPageLayoutProps {
   children?: React.ReactNode;
@@ -21,6 +22,7 @@ export function SearchPageLayout({ children }: SearchPageLayoutProps): JSX.Eleme
       <Box flexGrow={1}>{children}</Box>
 
       <BottomQuickMenu />
+      <MobileSearchDrawer />
 
       <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />

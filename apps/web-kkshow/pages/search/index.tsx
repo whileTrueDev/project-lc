@@ -6,7 +6,6 @@ import SearchPageLayout, {
 import SearchResultBroadcasterSection from '@project-lc/components-web-kkshow/search/SearchResultBroadcasterSection';
 import SearchResultGoodsSection from '@project-lc/components-web-kkshow/search/SearchResultGoodsSection';
 import SearchResultLiveContentsSection from '@project-lc/components-web-kkshow/search/SearchResultLiveContentsSection';
-import { MobileSearchDrawer } from '@project-lc/components-web-kkshow/search/MobileSearchDrawer';
 
 export function Search(): JSX.Element {
   const { data, isLoading, searchKeyword } = useSearchPageState();
@@ -46,7 +45,6 @@ export function Search(): JSX.Element {
           />
         </>
       )}
-      <MobileSearchDrawer />
     </SearchPageLayout>
   );
 }

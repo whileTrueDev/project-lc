@@ -1,8 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
-import BottomQuickMenu from '@project-lc/components-shared/BottomQuickMenu';
-import KkshowNavbar from '@project-lc/components-web-kkshow/KkshowNavbar';
 import KKshowMainExternLinks from '@project-lc/components-web-kkshow/main/KKshowMainExternLinks';
 import { ShoppingCarousel } from '@project-lc/components-web-kkshow/shopping/ShoppingCarousel';
 import { ShoppingEventBanner } from '@project-lc/components-web-kkshow/shopping/ShoppingEventBanner';
@@ -16,6 +14,7 @@ import { getKkshowShopping, kkshowShoppingQueryKey } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
 import { dehydrate, DehydratedState } from 'react-query';
+import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 
 interface KkshowShippingProps {
   dehydratedState: DehydratedState;
@@ -37,19 +36,19 @@ export const getStaticProps: GetStaticProps<KkshowShippingProps> = async () => {
 export default function Shopping(): JSX.Element {
   return (
     <Box overflow="hidden" position="relative">
-      <KkshowNavbar />
-      <ShoppingCarousel />
-      <ShoppingGoodsOfTheWeek />
-      <ShoppingNewLineUp />
-      <ShoppingPopularGoods />
-      <ShoppingEventBanner />
-      <ShoppingRecommendations />
-      <ShoppingReviews />
-      <ShoppingKeywords />
+      <KkshowLayout>
+        <ShoppingCarousel />
+        <ShoppingGoodsOfTheWeek />
+        <ShoppingNewLineUp />
+        <ShoppingPopularGoods />
+        <ShoppingEventBanner />
+        <ShoppingRecommendations />
+        <ShoppingReviews />
+        <ShoppingKeywords />
 
-      <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
-      <CommonFooter footerLinkList={kkshowFooterLinkList} />
-      <BottomQuickMenu />
+        <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
+        <CommonFooter footerLinkList={kkshowFooterLinkList} />
+      </KkshowLayout>
     </Box>
   );
 }

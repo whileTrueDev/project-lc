@@ -16,7 +16,7 @@ export function SearchButton(): JSX.Element {
         onClick={() => {
           setIsOpen(true);
         }}
-        display={{ base: 'flex', xl: 'none' }}
+        display={{ base: 'flex', md: 'none' }}
       />
     </Tooltip>
   );

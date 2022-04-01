@@ -8,8 +8,8 @@ import { KkshowLogoVariant, KksLogo } from '@project-lc/components-shared/KksLog
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import { SearchButton } from './SearchButton';
-import { GlobalSearcher } from './GlobalSearcher';
+import { SearchButton } from './search/SearchButton';
+import { GlobalSearcher } from './search/GlobalSearcher';
 
 type KkshowNavbarVariant = 'blue' | 'white';
 interface KkshowNavbar {

@@ -6,7 +6,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { useSearchDrawer } from '@project-lc/stores';
-import { SearchPageSearcher } from '../SearchPageSearcher';
+import { SearchPageSearcher } from './SearchPageSearcher';
 
 export function MobileSearchDrawer(): JSX.Element {
   const { onClose } = useDisclosure();
@@ -14,7 +14,7 @@ export function MobileSearchDrawer(): JSX.Element {
   return (
     <>
       <Drawer onClose={onClose} isOpen={isOpen} size="full">
-        <DrawerOverlay>
+        <DrawerOverlay display={{ base: 'flex', md: 'none' }}>
           <DrawerContent>
             <DrawerBody>
               <SearchPageSearcher />

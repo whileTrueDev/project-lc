@@ -51,6 +51,7 @@ export function SearchBox(): JSX.Element {
       queryClient.invalidateQueries('getSearchResults');
       handlePopover(false);
     } else {
+      initialRef.current.focus();
       toast({
         title: '검색어를 입력해주세요',
         status: 'error',
@@ -95,7 +96,7 @@ export function SearchBox(): JSX.Element {
         </InputRightElement>
       )}
       <IconButton
-        display={{ base: 'none', xl: 'flex' }}
+        display={{ base: 'none', md: 'flex' }}
         variant="fill"
         aria-label="search-button-icon"
         icon={<SearchIcon />}
