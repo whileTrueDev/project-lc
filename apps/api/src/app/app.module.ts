@@ -17,7 +17,10 @@ import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { InquiryModule } from '@project-lc/nest-modules-inquiry';
 import { JwtHelperModule } from '@project-lc/nest-modules-jwt-helper';
-import { KkshowMainModule } from '@project-lc/nest-modules-kkshow-main';
+import {
+  KkshowMainModule,
+  KkshowShoppingModule,
+} from '@project-lc/nest-modules-kkshow-main';
 import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { NoticeModule } from '@project-lc/nest-modules-notice';
 import { NotificationModule } from '@project-lc/nest-modules-notification';
@@ -53,6 +56,7 @@ import { AppController } from './app.controller';
     BroadcasterModule.withControllers(),
     PolicyModule,
     KkshowMainModule.withControllers(),
+    KkshowShoppingModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],

@@ -1,29 +1,16 @@
-import {
-  Button,
-  Spinner,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Spinner, Text } from '@chakra-ui/react';
 import { useAdminKkshowMainMutation, useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainResData } from '@project-lc/shared-types';
 import { kkshowDataToDto } from '@project-lc/utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import AdminKkshowMainBestBroadcasterSection from './AdminKkshowMainBestBroadcasterSection';
 import AdminKkshowMainBestLiveSection from './AdminKkshowMainBestLiveSection';
 import AdminKkshowMainCarouselSection from './AdminKkshowMainCarouselSection';
 import AdminKkshowMainPreviewSection from './AdminKkshowMainPreviewSection';
+import PageManagerTabs from './PageManagerTabs';
 
 export function AdminKkshowMain(): JSX.Element {
-  const [tabIndex, setTabIndex] = useState<number>(0);
-  const handleTabChange = (index: number): void => {
-    setTabIndex(index);
-  };
   const { data: kkshowMainData, isLoading, isError, error } = useKkshowMain();
 
   const methods = useForm<KkshowMainResData>();
@@ -52,66 +39,31 @@ export function AdminKkshowMain(): JSX.Element {
       .catch((e) => console.error(e));
   };
 
-  const saveButton = useMemo(() => {
-    return (
-      <Stack>
-        <Button
-          width="100%"
-          type="submit"
-          colorScheme={methods.formState.isDirty ? 'red' : 'blue'}
-        >
-          저장
-        </Button>
-        {methods.formState.isDirty && (
-          <Text as="span" color="red">
-            데이터 변경사항이 있습니다. 저장버튼을 눌러주세요!!!!
-          </Text>
-        )}
-      </Stack>
-    );
-  }, [methods.formState.isDirty]);
-
   if (isLoading) return <Spinner />;
   if (isError) return <Text>에러가 발생하였습니다 {JSON.stringify(error)}</Text>;
 
   return (
     <FormProvider {...methods}>
-      <Stack as="form" onSubmit={methods.handleSubmit(onSubmit)}>
-        <Text fontWeight="bold">크크쇼 메인 데이터 관리</Text>
-        <Text>
-          캐러셀 아이템 추가하기, 데이터 수정, 삭제 등 작업 후 반드시 저장버튼을
-          눌러주세요!
-        </Text>
-        {saveButton}
-        <Button disabled={!kkshowMainData} onClick={restoreData}>
-          저장하지 않은 수정사항 모두 되돌리기
-        </Button>
-
-        <Tabs index={tabIndex} onChange={handleTabChange}>
-          <TabList>
-            <Tab>캐러셀</Tab>
-            <Tab>라이브예고</Tab>
-            <Tab>베스트 라이브</Tab>
-            <Tab>베스트 방송인</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <AdminKkshowMainCarouselSection />
-            </TabPanel>
-            <TabPanel>
-              <AdminKkshowMainPreviewSection />
-            </TabPanel>
-            <TabPanel>
-              <AdminKkshowMainBestLiveSection />
-            </TabPanel>
-            <TabPanel>
-              <AdminKkshowMainBestBroadcasterSection />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-
-        {saveButton}
-      </Stack>
+      <Box as="form" onSubmit={methods.handleSubmit(onSubmit)}>
+        <PageManagerTabs
+          title="크크쇼 메인 데이터 관리"
+          subtitle="캐러셀 아이템 추가하기, 데이터 수정, 삭제 등 작업 후 반드시 저장버튼을
+      눌러주세요!"
+          tabs={[
+            { title: '캐러셀', component: <AdminKkshowMainCarouselSection /> },
+            { title: '라이브예고', component: <AdminKkshowMainPreviewSection /> },
+            { title: '베스트 라이브', component: <AdminKkshowMainBestLiveSection /> },
+            {
+              title: '베스트 방송인',
+              component: <AdminKkshowMainBestBroadcasterSection />,
+            },
+          ]}
+          formProps={{
+            reset: restoreData,
+            isResetButtonDisabled: !kkshowMainData,
+          }}
+        />
+      </Box>
     </FormProvider>
   );
 }

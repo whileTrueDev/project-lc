@@ -28,7 +28,7 @@
             "environment": [
                 {
                     "name": "S3_BUCKET_NAME",
-                    "value": "lc-project"
+                    "value": "project-lc-dev-test"
                 },
                 {
                     "name": "API_HOST",
@@ -45,10 +45,6 @@
                 {
                     "name": "KKSHOW_WEB_HOST",
                     "value": "https://dev.xn--hp4b17xa.com"
-                },
-                {
-                    "name": "MAILER_HOST",
-                    "value": "https://dev-mailer.xn--hp4b17xa.com"
                 },
                 {
                     "name": "NODE_ENV",

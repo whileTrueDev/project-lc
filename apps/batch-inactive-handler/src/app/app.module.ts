@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_MAILER_TOKEN } from '@project-lc/nest-core';
-import { S3Module } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
 import { AppBroadcasterService } from './app-broadcaster.service';
@@ -14,7 +13,6 @@ import { AppService } from './app.service';
 @Module({
   imports: [
     PrismaModule,
-    S3Module,
     ClientsModule.register([
       {
         name: MICROSERVICE_MAILER_TOKEN,

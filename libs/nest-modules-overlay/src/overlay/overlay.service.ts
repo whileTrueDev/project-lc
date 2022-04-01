@@ -13,14 +13,13 @@ import {
   LiveShoppingBroadcastDate,
   liveShoppingPurchaseMessageNickname,
 } from '@project-lc/shared-types';
-import { S3 } from '@aws-sdk/client-s3';
 import { throwError } from 'rxjs';
+import { s3 } from '@project-lc/utils-s3';
 
 @Injectable()
 export class OverlayService {
   privateKey: string;
   options: GoogleTTSCredentials;
-  s3: S3;
 
   constructor(private readonly prisma: PrismaService) {
     this.privateKey =
@@ -32,14 +31,6 @@ export class OverlayService {
         client_email: process.env.GOOGLE_CREDENTIALS_EMAIL,
       },
     };
-
-    this.s3 = new S3({
-      region: 'ap-northeast-2',
-      credentials: {
-        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET,
-      },
-    });
   }
 
   async googleTextToSpeech(
@@ -188,20 +179,15 @@ export class OverlayService {
     liveShoppingId: number,
     bannerType: 'vertical-banner' | 'horizontal-banner',
   ): Promise<number> {
-    const { S3_BUCKET_NAME } = process.env;
-
     const broadcasterEmail = email.email;
     let imagesUrls = 0;
 
-    const listingParams = {
-      Bucket: S3_BUCKET_NAME,
-      Prefix: `${bannerType}/${broadcasterEmail}/${liveShoppingId}`,
-    };
-
-    await this.s3
-      .listObjects(listingParams)
+    await s3
+      .sendListObjectCommand({
+        Prefix: `${bannerType}/${broadcasterEmail}/${liveShoppingId}`,
+      })
       .then(async (data) => {
-        await data.Contents.forEach((object) => {
+        await data.contents.forEach((object) => {
           const imageName = object.Key.split('/').slice(-1)[0];
           if (imageName.includes(bannerType)) {
             imagesUrls += 1;
