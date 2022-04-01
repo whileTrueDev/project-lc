@@ -22,6 +22,13 @@ export const useKkshowSearchResults = (
   return useQuery<SearchResult, AxiosError>(
     queryKey,
     () => getKkshowSearchResults(keyword),
-    { enabled: !!keyword },
+    {
+      enabled: !!keyword,
+      initialData: {
+        goods: [],
+        liveContents: [],
+        broadcasters: [],
+      },
+    },
   );
 };
