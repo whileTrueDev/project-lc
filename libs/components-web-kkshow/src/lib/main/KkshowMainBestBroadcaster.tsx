@@ -61,7 +61,7 @@ interface BestBroadcasterItemProps {
 }
 export function BestBroadcasterItem(props: BestBroadcasterItemProps): JSX.Element {
   return (
-    <LinkBox>
+    <LinkBox outline="none">
       <Stack
         textAlign="center"
         justify="center"
