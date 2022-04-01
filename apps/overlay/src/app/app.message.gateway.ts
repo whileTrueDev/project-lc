@@ -60,8 +60,9 @@ export class AppMessageGateway
     const { roomName } = purchase;
     const nicknameAndPrice = [];
     const bottomAreaTextAndNickname: string[] = [];
+    const { ttsSetting } = purchase;
     const rankings = await this.overlayService.getRanking(roomName);
-
+    let audioBuffer;
     // const totalSold = await this.overlayService.getTotalSoldPrice();
     const messageAndNickname = await this.overlayService.getMessageAndNickname(roomName);
 
@@ -78,11 +79,18 @@ export class AppMessageGateway
       bottomAreaTextAndNickname.push(`${d.text} - [${d.nickname}]`);
     });
 
-    const audioBuffer = await this.overlayService.googleTextToSpeech(purchase);
+    if (
+      ttsSetting === 'full' ||
+      ttsSetting === 'nick-purchase' ||
+      ttsSetting === 'nick-purchase-price' ||
+      ttsSetting === 'only-message'
+    ) {
+      audioBuffer = await this.overlayService.googleTextToSpeech(purchase);
+    }
 
     this.server
       .to(roomName)
-      .emit('get right-top purchase message', [purchase, audioBuffer]);
+      .emit('get right-top purchase message', { purchase, audioBuffer });
     this.server.to(roomName).emit('get top-left ranking', nicknameAndPrice);
     // this.server.to(roomName).emit('get current quantity', totalSold);
     this.server

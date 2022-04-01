@@ -39,6 +39,17 @@ div.message-box-fixed-area {
   flex-direction: column;
 }
 
+div.message-box-fixed-area-inner-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+div.message-box-fixed-area-inner {
+  display: flex;
+  flex-direction: column;
+}
+
 div.video-controller {
   width: 45%;
   display: flex;

@@ -208,8 +208,10 @@ setInterval(async () => {
     $('.top-right').css({ display: 'flex' });
     $('.top-right').html(messageArray[0].messageHtml);
     await setTimeout(() => {
-      const sound = new Audio(messageArray[0].audioBlob);
-      sound.play();
+      if (messageArray[0].audioBlob) {
+        const sound = new Audio(messageArray[0].audioBlob);
+        sound.play();
+      }
       messageArray.splice(0, 1);
     }, 1500);
     await setTimeout(() => {
@@ -344,22 +346,28 @@ socket.on('get top-left ranking', (data) => {
 });
 
 socket.on('get right-top purchase message', async (data) => {
-  const alarmType = data[0].level;
-  const { nickname } = data[0];
-  const { productName } = data[0];
-  const { message } = data[0];
-  const num = data[0].purchaseNum;
+  const alarmType = data.purchase.level;
+  const { nickname } = data.purchase;
+  const { productName } = data.purchase;
+  const { message } = data.purchase;
+  const { ttsSetting } = data.purchase;
+  const { audioBuffer } = data;
+  const num = data.purchase.purchaseNum;
   let audioBlob;
 
-  if (data) {
-    const blob = new Blob([data[1]], { type: 'audio/mp3' });
+  if (audioBuffer) {
+    const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
     audioBlob = window.URL.createObjectURL(blob);
   }
   messageHtml = `
   <div class="donation-wrapper">
-    <iframe src="/audio/${
-      alarmType === '2' ? 'alarm-type-2.mp3' : 'alarm-type-1.wav'
-    }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    ${
+      ttsSetting !== 'no-sound'
+        ? `<iframe src="/audio/${
+            alarmType === '2' ? 'alarm-type-2.mp3' : 'alarm-type-1.wav'
+          }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>`
+        : ''
+    }  
     <div class="item">
       <div class="centered">
         <img src="https://${bucketName}.s3.ap-northeast-2.amazonaws.com/donation-images/${email}/${liveShoppingId}/${

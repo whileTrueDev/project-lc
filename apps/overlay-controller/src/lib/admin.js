@@ -388,12 +388,14 @@ $(document).ready(function ready() {
       $('#standard-price').attr('disabled', false);
       $('#product-name').attr('disabled', false);
       $('#fan-nickname').attr('disabled', false);
+      $('input[name="tts-type"]').attr('disabled', false);
       $('.message-box-lock-button').toggleClass('locked');
       $('.message-box-lock-button').text('잠금');
     } else {
       $('#standard-price').attr('disabled', true);
       $('#product-name').attr('disabled', true);
       $('#fan-nickname').attr('disabled', true);
+      $('input[name="tts-type"]').attr('disabled', true);
       $('.message-box-lock-button').toggleClass('locked');
       $('.message-box-lock-button').text('해제');
     }
@@ -483,6 +485,7 @@ $(document).ready(function ready() {
     event.preventDefault();
     let level;
 
+    const ttsSetting = $('input[name="tts-type"]:checked').val();
     const standardPrice = Number($('#standard-price').val());
     const productName = $('#product-name').val().trim();
     const soldPrice = Number($('#sold-price').val());
@@ -492,6 +495,10 @@ $(document).ready(function ready() {
     const giftFlag = $('input[name="gift"]:checked').val() === 'yes';
     const isOnlyDb = $('#insert-only-db-checkbox').is(':checked');
 
+    if (!ttsSetting) {
+      alert('TTS 타입을 설정해주세요');
+      return;
+    }
     isLogin = !$('input[name=client-checkbox]').is(':checked');
 
     if (giftFlag) {
@@ -539,6 +546,7 @@ $(document).ready(function ready() {
             purchaseNum: soldPrice,
             nickname: customerNickname,
             message: customerMessage,
+            ttsSetting,
           });
         } else {
           socket.emit('get non client purchase message from admin', {

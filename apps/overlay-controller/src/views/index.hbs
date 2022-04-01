@@ -350,12 +350,49 @@
                     메세지 제어
                 </h2>
                 <div class="message-box-fixed-area">
-                    <span>기준 금액</span>
-                    <input type="number" id="standard-price">
-                    <span>상품명</span>
-                    <input type="text" id="product-name">
-                    <span>팬닉</span>
-                    <input type="text" id="fan-nickname">
+                    <div class="message-box-fixed-area-inner-wrapper">
+                        <div class="message-box-fixed-area-inner">
+                            <span>기준 금액</span>
+                            <input type="number" id="standard-price">
+                        </div>
+                        <div class="message-box-fixed-area-inner">
+                            <span>상품명</span>
+                            <input type="text" id="product-name">
+                        </div>
+                        <div class="message-box-fixed-area-inner">
+                            <span>팬닉</span>
+                            <input type="text" id="fan-nickname">
+                        </div>
+                    </div>
+                    <div>
+                        <span>TTS 설정</span>
+                        <div class="tts-setting-box">
+                            <label>
+                            <input type="radio" name="tts-type" value="full">
+                                전체
+                            </label>
+                            <label>
+                            <input type="radio" name="tts-type" value="nick-purchase">
+                                닉, 구매감사
+                            </label>
+                            <label>
+                            <input type="radio" name="tts-type" value="nick-purchase-price">
+                                닉, 금액, 구매감사
+                            </label>
+                            <label>
+                            <input type="radio" name="tts-type" value="only-message">
+                                메세지만
+                            </label>
+                            <label>
+                            <input type="radio" name="tts-type" value="no-tts">
+                                TTS 없음
+                            </label>
+                            <label>
+                            <input type="radio" name="tts-type" value="no-sound">
+                                소리 없음
+                            </label>
+                        </div>
+                    </div>
                     <button class="message-box-lock-button">
                         잠금
                     </button>
