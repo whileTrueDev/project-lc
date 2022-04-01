@@ -21,10 +21,18 @@ socket.on('creator list from server', (data) => {
     $('#connection-status').text('✔️ 정상');
     $('.admin-to-bc-live-state-board-box button').attr('disabled', false);
     $('#panel-activate-checkbox').attr('disabled', false);
+    $('#screen-control-activate-checkbox').attr('disabled', false);
+    $('#action-control-activate-checkbox').attr('disabled', false);
+    $('#objective-control-activate-checkbox').attr('disabled', false);
+    $('#bottom-message-activate-checkbox').attr('disabled', false);
   } else {
     $('#connection-status').text('❌ 연결되지 않음');
     $('.mid-area button').attr('disabled', true);
     $('#panel-activate-checkbox').attr('disabled', true);
+    $('#screen-control-activate-checkbox').attr('disabled', true);
+    $('#action-control-activate-checkbox').attr('disabled', true);
+    $('#objective-control-activate-checkbox').attr('disabled', true);
+    $('#bottom-message-activate-checkbox').attr('disabled', true);
   }
 });
 
@@ -33,6 +41,10 @@ $(document).ready(function ready() {
 
   $('.mid-area button').attr('disabled', true);
   $('#panel-activate-checkbox').attr('disabled', true);
+  $('#screen-control-activate-checkbox').attr('disabled', true);
+  $('#action-control-activate-checkbox').attr('disabled', true);
+  $('#objective-control-activate-checkbox').attr('disabled', true);
+  $('#bottom-message-activate-checkbox').attr('disabled', true);
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
   const localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
   $('table#liveshopping-table').DataTable({
@@ -298,6 +310,30 @@ $(document).ready(function ready() {
       .prop('disabled', (_, val) => !val);
   });
 
+  $('#screen-control-activate-checkbox').click(function screenControlActivateButton() {
+    $('.screen-control-box')
+      .find('button')
+      .prop('disabled', (_, val) => !val);
+  });
+
+  $('#action-control-activate-checkbox').click(function actionControlActivateButton() {
+    $('.action-control-box')
+      .find('button')
+      .prop('disabled', (_, val) => !val);
+  });
+
+  $('#objective-control-activate-checkbox').click(function objecectiveActivateButton() {
+    $('.objective-box')
+      .find('button')
+      .prop('disabled', (_, val) => !val);
+  });
+
+  $('#bottom-message-activate-checkbox').click(function bottomMessageActivateButton() {
+    $('.bottom-message-box')
+      .find('button')
+      .prop('disabled', (_, val) => !val);
+  });
+
   $('#liveshopping-id-button').click(function liveShoppingIdButtonClickEvent() {
     const productName = $('#product-name').val().trim();
     const streamerAndProduct = { streamerNickname, productName };
@@ -322,6 +358,10 @@ $(document).ready(function ready() {
 
   $('#product-name-send-button').click(function startTimeSendButtonClickEvent() {
     const productName = $('#product-name').val().trim();
+    if (productName.length === 0) {
+      alert('상품명을 작성해주세요');
+      return;
+    }
     const streamerAndProduct = { streamerNickname, productName };
     socket.emit('get product name from admin', {
       roomName,

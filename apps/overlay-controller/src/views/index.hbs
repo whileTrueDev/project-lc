@@ -157,6 +157,11 @@
                 <h2>
                     화면 제어
                 </h2>
+                <label>
+                    <input type="checkbox" id="screen-control-activate-checkbox">
+                        화면 제어 활성화
+                    </input>
+                </label>
                 <div class="screen-control-box">
                     <button id="screen-show-button" value="화면 띄우기" style="background-color:blue;">
                         화면 띄우기
@@ -201,6 +206,11 @@
                 <h2>
                     동작 제어
                 </h2>
+                <label>
+                    <input type="checkbox" id="action-control-activate-checkbox">
+                        동작 제어 활성화
+                    </input>
+                </label>
                 <div class="action-control-box">
                     <div class="video-controller">
                         <h6>
@@ -223,6 +233,9 @@
                         <h6>
                             기타 컨트롤러
                         </h6>
+                        <button id="product-name-send-button" value="상품명 전송" style="background-color:burlywood">
+                            상품명 전송
+                        </button>
                         <button id="data-send-all" style="background-color:blue">
                             데이터 재송출
                         </button>
@@ -234,9 +247,6 @@
                         </button>
                         <button id="liveshopping-id-button" value="라이브쇼핑ID" style="background-color:blueviolet">
                             라이브쇼핑ID
-                        </button>
-                        <button id="product-name-send-button" value="상품명 전송" style="background-color:burlywood">
-                            상품명 전송
                         </button>
                     </div>
                 </div>
@@ -394,6 +404,14 @@
                         <button id="message-button" type="submit">응원메세지 전송</button>   
                     </fieldset>
                 </form>
+                <h2>
+                    중간금액 알림
+                </h2>
+                <label>
+                    <input type="checkbox" id="objective-control-activate-checkbox">
+                        중간금액 활성화
+                    </input>
+                </label>
                 <div class="objective-box">
                     <div>
                         <select id="objective-select-box">
@@ -420,6 +438,11 @@
                         <button type="submit" id="objective-button" style="width:inherit">중간금액 전송 [폭죽효과]</button> 
                     </div>
                 </div>
+                <label>
+                    <input type="checkbox" id="bottom-message-activate-checkbox">
+                        하단메세지 활성화
+                    </input>
+                </label>
                 <div class="bottom-message-box">    
                     <input type="text" id="admin-message" style="width:40%">
                     <button id="fever-message-button" style="background-color:red;">피버메세지 전송</button>

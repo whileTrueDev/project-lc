@@ -210,3 +210,7 @@ label {
 .admin-to-bc-live-state-board__displaying-message {
   font-weight: bold;
 }
+
+.objective-box {
+  margin-top: 10px;
+}
