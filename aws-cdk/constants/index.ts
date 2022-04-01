@@ -90,6 +90,7 @@ export const constants = {
     WHILETRUE_IP_ADDRESS: 'WHILETRUE_IP_ADDRESS',
     REDIS_URL: 'PROJECT_LC_DEV_REDIS_URL',
     CACHE_REDIS_URL: 'PROJECT_LC_DEV_CACHE_REDIS_URL',
+    MQ_REDIS_URL: 'PROJECT_LC_DEV_MQ_REDIS_URL',
   },
   PROD: {
     /** Production 환경용 프라이빗 도메인 */

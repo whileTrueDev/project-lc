@@ -34,9 +34,10 @@ export const validationSchema = Joi.object({
   BROADCASTER_WEB_HOST: Joi.string().required(),
   // 크크쇼 호스트명
   KKSHOW_WEB_HOST: Joi.string().required(),
-  // 메일러 호스트명
-  MAILER_HOST: Joi.string().required(),
 
   // 와트 IP
   WHILETRUE_IP_ADDRESS: Joi.string(),
+
+  // Redis as Message Queue host url
+  MQ_REDIS_URL: Joi.string().required(),
 });

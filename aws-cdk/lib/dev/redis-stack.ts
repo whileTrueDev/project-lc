@@ -28,6 +28,7 @@ export class LCDevRedisStack extends cdk.Stack {
       },
     );
 
+    // * Redis cluster used as caching and realtime websocket-adapter instance
     new elasticache.CfnReplicationGroup(
       this,
       `${constants.DEV.ID_PREFIX}ElastiCacheClusterGroup`,
@@ -42,5 +43,16 @@ export class LCDevRedisStack extends cdk.Stack {
         numNodeGroups: 2,
       },
     );
+
+    // * Redis cluster used as Message Queue in Microservices architecture
+    new elasticache.CfnCacheCluster(this, `${constants.DEV.ID_PREFIX}RedisMQCluster`, {
+      engine: 'redis',
+      numCacheNodes: 1,
+      engineVersion: '6.2',
+      cacheNodeType: 'cache.t4g.micro',
+      clusterName: 'KksDevRedisMQ',
+      vpcSecurityGroupIds: [redisSecGrp.securityGroupId],
+      cacheSubnetGroupName: redisSubnetGroup.cacheSubnetGroupName,
+    });
   }
 }

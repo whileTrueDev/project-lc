@@ -235,4 +235,19 @@ export class AppScreenGateway
   refreshRanking(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('refresh ranking from server');
   }
+
+  @SubscribeMessage('get virtual character from admin')
+  getVirtualCharacter(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('get virtual character from server');
+  }
+
+  @SubscribeMessage('get virtual character audio from admin')
+  getVirtualCharacterAudio(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('get virtual character audio from server');
+  }
+
+  @SubscribeMessage('delete virtual character audio from admin')
+  deleteVirtualCharacterAudio(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('delete virtual character audio from server');
+  }
 }

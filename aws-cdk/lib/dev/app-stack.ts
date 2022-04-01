@@ -44,6 +44,7 @@ export class LCDevAppStack extends cdk.Stack {
   private WHILETRUE_IP_ADDRESS: ssm.IStringParameter;
   private REDIS_URL: ssm.IStringParameter;
   private CACHE_REDIS_URL: ssm.IStringParameter;
+  private MQ_REDIS_URL: ssm.IStringParameter;
 
   public readonly alb: elbv2.ApplicationLoadBalancer;
   public readonly cluster: ecs.Cluster;
@@ -134,6 +135,7 @@ export class LCDevAppStack extends cdk.Stack {
         AWS_S3_ACCESS_KEY_SECRET: ecs.Secret.fromSsmParameter(this.S3_ACCESS_KEY_SECRET),
         WHILETRUE_IP_ADDRESS: ecs.Secret.fromSsmParameter(this.WHILETRUE_IP_ADDRESS),
         CACHE_REDIS_URL: ecs.Secret.fromSsmParameter(this.CACHE_REDIS_URL),
+        MQ_REDIS_URL: ecs.Secret.fromSsmParameter(this.MQ_REDIS_URL),
       },
       environment: {
         S3_BUCKET_NAME: 'project-lc-dev-test',
@@ -141,7 +143,6 @@ export class LCDevAppStack extends cdk.Stack {
         SELLER_WEB_HOST: `https://dev-seller.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://dev-broadcaster.${constants.PUNYCODE_DOMAIN}`,
         KKSHOW_WEB_HOST: `https://dev.${constants.PUNYCODE_DOMAIN}`,
-        MAILER_HOST: `https://dev-mailer.${constants.PUNYCODE_DOMAIN}`,
         NODE_ENV: 'test',
       },
       logging: new ecs.AwsLogDriver({
@@ -672,6 +673,12 @@ export class LCDevAppStack extends cdk.Stack {
       },
     );
 
+    this.MQ_REDIS_URL = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      `${PREFIX}MQ_REDIS_URL`,
+      { parameterName: constants.DEV.MQ_REDIS_URL },
+    );
+
     return {
       DATABASE_URL: this.DBURL_PARAMETER,
       FIRSTMALL_DATABASE_URL: this.FIRSTMALL_DATABASE_URL,
@@ -692,6 +699,7 @@ export class LCDevAppStack extends cdk.Stack {
       WHILETRUE_IP_ADDRESS: this.WHILETRUE_IP_ADDRESS,
       REDIS_URL: this.REDIS_URL,
       CACHE_REDIS_URL: this.CACHE_REDIS_URL,
+      MQ_REDIS_URL: this.MQ_REDIS_URL,
     };
   }
 }

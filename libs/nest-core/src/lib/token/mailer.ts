@@ -1,0 +1,1 @@
+export const MICROSERVICE_MAILER_TOKEN = Symbol('MAILER_MQ');

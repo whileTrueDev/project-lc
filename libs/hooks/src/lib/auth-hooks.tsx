@@ -1,7 +1,7 @@
 import { UserType } from '@project-lc/shared-types';
 import { liveShoppingStateBoardWindowStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useLogoutMutation } from './mutation/useLogoutMutation';
 import { useProfile } from './queries/useProfile';

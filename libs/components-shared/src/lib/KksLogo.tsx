@@ -4,7 +4,7 @@ import { UserType } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { useMemo } from 'react';
 
-export const LOGO_S3_PREFIX = `${s3.fullDomain}/kksLogo/`;
+export const LOGO_S3_PREFIX = `${s3.fullDomain}kksLogo/`;
 export const darkLogo = 'kksMainLogoDarkMode.png';
 export const darkBigLogo = 'kksMainLogoDarkModeBig.png';
 export const lightLogo = 'kksMainLogoLightMode.png';

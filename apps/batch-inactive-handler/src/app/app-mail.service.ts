@@ -1,31 +1,27 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { MICROSERVICE_MAILER_TOKEN } from '@project-lc/nest-core';
+import { LastLoginDate, TargetUser } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { lastValueFrom, map } from 'rxjs';
-import { HttpService } from '@nestjs/axios';
-import { getMailerHost } from '@project-lc/utils';
-import { TargetUser, LastLoginDate } from '@project-lc/shared-types';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class AppMailService {
-  constructor(private readonly httpService: HttpService) {}
   private logger: Logger = new Logger('MailerTaskService');
-  private HOST: string = getMailerHost();
 
-  private async sendPreInactiveMail(user: TargetUser[]): Promise<void> {
-    await lastValueFrom(
-      this.httpService
-        .post(`${this.HOST}/inactive-pre`, user)
-        .pipe(map((res) => res.data)),
-    );
+  constructor(
+    @Inject(MICROSERVICE_MAILER_TOKEN) private readonly mailerClient: ClientProxy,
+  ) {}
+
+  private sendPreInactiveMail(user: TargetUser[]): Observable<void> {
+    return this.mailerClient.send<void, TargetUser[]>('inactive-pre', user);
   }
 
-  private async sendInactiveMail(user: TargetUser[]): Promise<void> {
-    await lastValueFrom(
-      this.httpService.post(`${this.HOST}/inactive`, user).pipe(map((res) => res.data)),
-    );
+  private sendInactiveMail(user: TargetUser[]): Observable<void> {
+    return this.mailerClient.send<void, TargetUser[]>('inactive', user);
   }
 
-  async sendMail(mailTargets: LastLoginDate[]): Promise<void> {
+  sendMail(mailTargets: LastLoginDate[]): void {
     const daysInKorean = ['일', '월', '화', '수', '목', '금', '토'];
     const inactivateDate = dayjs().add(31, 'day');
     const inactivateDateWithDayInKorean = `${inactivateDate.format('YYYY-MM-DD')} (${
@@ -50,12 +46,12 @@ export class AppMailService {
     }
 
     if (preInactiveList.length !== 0) {
-      await this.sendPreInactiveMail(preInactiveList);
+      this.sendPreInactiveMail(preInactiveList);
       this.logger.log(`예정 메일 발송 완료 ${preInactiveList.length}명`);
     }
 
     if (inactiveList.length !== 0) {
-      await this.sendInactiveMail(inactiveList);
+      this.sendInactiveMail(inactiveList);
       this.logger.log(`휴면 메일 발송 완료 ${inactiveList.length}명`);
     }
   }
