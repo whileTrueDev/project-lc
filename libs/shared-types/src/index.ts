@@ -71,6 +71,7 @@ export * from './lib/dto/kkshowShopping.dto';
 export * from './lib/dto/liveShopping.dto';
 export * from './lib/dto/liveShoppingPurchaseMessage.dto';
 export * from './lib/dto/loginUser.dto';
+export * from './lib/dto/mail/mail-verifications.dto';
 export * from './lib/dto/markNotificationReadState.dto';
 export * from './lib/dto/passwordValidate.dto';
 export * from './lib/dto/policy.dto';

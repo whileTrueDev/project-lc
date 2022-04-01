@@ -1,7 +1,7 @@
 import { UserType } from '@project-lc/shared-types';
 import { liveShoppingStateBoardWindowStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useLogoutMutation } from './mutation/useLogoutMutation';
 import { useProfile } from './queries/useProfile';
@@ -60,39 +60,4 @@ export function useMoveToMainIfLoggedIn(): void {
       router.push('/');
     }
   }, [isLoggedIn, router]);
-}
-
-/**
- * 로그인 상태가 아닌 경우 방송인센터 라이브 방송 현황판 윈도우 닫기 이펙트
- BroadcastChannel : 동일 origin 에 있는 window, tab, iframe 사이에서 통신 할 수 있게 하는 api
- 방송인센터 탭 여러개 켜놓고 한곳에서 로그아웃 한 경우 
- 다른 탭에서 열린 현황판 window 종료하기 위해 사용
- */
-export function useCloseLiveShoppingStateBoardIfNotLoggedIn(): void {
-  const bcRef = useRef<BroadcastChannel | null>();
-  const { isLoggedIn, status } = useIsLoggedIn();
-  const { closeWindow } = liveShoppingStateBoardWindowStore();
-
-  // 마운트시 bc 객체 생성 & ev 메시지 핸들러 할당
-  useEffect(() => {
-    bcRef.current = new BroadcastChannel('LoginFlag');
-    bcRef.current.onmessage = (ev) => {
-      if (ev.data === 'not logged in') {
-        closeWindow();
-      }
-    };
-    return () => {
-      if (bcRef.current) {
-        bcRef.current = null;
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // 로그인 상태가 아닌경우 'not logged in' 메시지 발송
-  useEffect(() => {
-    if (!isLoggedIn || status === 'error') {
-      bcRef.current?.postMessage('not logged in');
-    }
-  }, [isLoggedIn, status]);
 }

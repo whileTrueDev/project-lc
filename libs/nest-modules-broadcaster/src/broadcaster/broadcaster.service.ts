@@ -25,7 +25,7 @@ import {
   BroadcasterContractionAgreementDto,
 } from '@project-lc/shared-types';
 import { hash, verify } from 'argon2';
-import { S3Service } from '@project-lc/nest-modules-s3';
+import { s3 } from '@project-lc/utils-s3';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
 
@@ -36,7 +36,6 @@ export class BroadcasterService extends ServiceBaseWithCache {
   constructor(
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
     private readonly prisma: PrismaService,
-    private readonly s3service: S3Service,
   ) {
     super(cacheManager);
   }
@@ -327,7 +326,7 @@ export class BroadcasterService extends ServiceBaseWithCache {
     email: Broadcaster['email'],
     file: Express.Multer.File,
   ): Promise<boolean> {
-    const avatarUrl = await this.s3service.uploadProfileImage({
+    const avatarUrl = await s3.uploadProfileImage({
       key: file.originalname,
       file: file.buffer,
       email,

@@ -15,5 +15,6 @@
   ],
   "include": [
     "**/*.ts",
+    "../../libs/nest-core/@types"
   ]
 }
