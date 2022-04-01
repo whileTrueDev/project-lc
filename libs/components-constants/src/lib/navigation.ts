@@ -7,6 +7,7 @@ import {
   FcFaq,
   FcSms,
   FcAdvertising,
+  FcBiohazard,
 } from 'react-icons/fc';
 
 import { AiOutlineShop, AiOutlineHome, AiOutlineSetting } from 'react-icons/ai';
@@ -41,13 +42,12 @@ export const mainNavItems: Array<NavItem> = [
 export const kkshowNavLinks: Array<NavItem> = [
   {
     label: '쇼핑',
-    href: 'https://k-kmarket.com/',
-    isExternal: true,
+    href: '/shopping',
   },
-  {
-    label: '방송인',
-    href: '/broadcasters',
-  },
+  // {
+  //   label: '방송인',
+  //   href: '/broadcasters',
+  // },
   // { label: '방송편성표', href: '/' },
   // { label: '방송인', href: '/' },
   // { label: 'SNS', href: '/' },
@@ -271,6 +271,13 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '크크쇼 메인',
     href: '/kkshow-main',
-    children: [{ name: '크크쇼 메인페이지', href: '/kkshow-main', icon: FcList }],
+    children: [
+      { name: '크크쇼 메인페이지', href: '/kkshow-main', icon: FcList },
+      {
+        name: '크크쇼 쇼핑페이지',
+        href: '/kkshow-main/kkshow-shopping',
+        icon: FcBiohazard,
+      },
+    ],
   },
 ];

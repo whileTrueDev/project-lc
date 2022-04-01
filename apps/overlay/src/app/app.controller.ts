@@ -10,6 +10,7 @@ import {
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import { OverlayService } from '@project-lc/nest-modules-overlay';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 
 interface ImagesLengthAndUserId {
@@ -23,6 +24,7 @@ export class AppController {
     private readonly overlayService: OverlayService,
     private readonly broadcasterService: BroadcasterService,
     private readonly liveShoppingService: LiveShoppingService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Get()
@@ -66,9 +68,11 @@ export class AppController {
         'horizontal-banner',
       );
 
-      const data = { verticalImagesLength, email, liveShoppingId };
+      const bucketName = this.configService.get('S3_BUCKET_NAME');
 
-      const nslData = { horizontalImagesLength, email, liveShoppingId };
+      const data = { verticalImagesLength, email, liveShoppingId, bucketName };
+
+      const nslData = { horizontalImagesLength, email, liveShoppingId, bucketName };
 
       if (req.path.includes('/nsl')) {
         res.render('nsl-client', nslData);

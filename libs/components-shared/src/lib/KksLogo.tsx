@@ -1,10 +1,10 @@
 import { ColorMode, useColorMode } from '@chakra-ui/color-mode';
 import { Image, ImageProps } from '@chakra-ui/react';
 import { UserType } from '@project-lc/shared-types';
+import { s3 } from '@project-lc/utils-s3';
 import { useMemo } from 'react';
 
-export const LOGO_S3_PREFIX =
-  'https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/';
+export const LOGO_S3_PREFIX = `${s3.fullDomain}/kksLogo/`;
 export const darkLogo = 'kksMainLogoDarkMode.png';
 export const darkBigLogo = 'kksMainLogoDarkModeBig.png';
 export const lightLogo = 'kksMainLogoLightMode.png';
