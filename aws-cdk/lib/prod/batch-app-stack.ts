@@ -70,6 +70,7 @@ export class LCBatchAppStack extends Stack {
       environment: {
         NODE_ENV: 'production',
         S3_BUCKET_NAME: 'lc-project',
+        MAILER_HOST: `https://mailer.${constants.PUNYCODE_DOMAIN}`,
       },
       logging: new AwsLogDriver({
         logGroup: new LogGroup(this, `${prefix}LogGroup`, {

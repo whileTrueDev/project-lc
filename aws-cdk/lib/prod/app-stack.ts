@@ -154,6 +154,7 @@ export class LCProdAppStack extends cdk.Stack {
         SELLER_WEB_HOST: `https://${constants.PUNYCODE_판매자}.${constants.PUNYCODE_DOMAIN}`,
         BROADCASTER_WEB_HOST: `https://${constants.PUNYCODE_방송인}.${constants.PUNYCODE_DOMAIN}`,
         KKSHOW_WEB_HOST: `https://${constants.PUNYCODE_DOMAIN}`,
+        MAILER_HOST: `https://mailer.${constants.PUNYCODE_DOMAIN}`,
         NODE_ENV: 'production',
       },
       logging: new AwsLogDriver({
