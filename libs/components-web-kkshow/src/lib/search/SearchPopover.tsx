@@ -79,7 +79,7 @@ export function SearchPopover(): JSX.Element {
       position="absolute"
       width="100%"
       height="fit-content"
-      insetY="4vh"
+      insetY="42px"
       as="form"
       flex={1}
       onSubmit={handleSubmit(onSubmit)}
@@ -87,6 +87,7 @@ export function SearchPopover(): JSX.Element {
       color={useColorModeValue('black', 'white')}
       zIndex="docked"
       borderRadius={10}
+      boxShadow="md"
       pt={3}
       pb={3}
     >
