@@ -13,6 +13,7 @@ services:
     ports:
       - "3306:3306"
     command: --innodb_ft_min_token_size=1
+
   
   ###############
   # REDIS as message broker
@@ -23,6 +24,7 @@ services:
     container_name: redis-message-broker
     ports:
       - 6399:6379
+
 
   ###############
   # REDIS
