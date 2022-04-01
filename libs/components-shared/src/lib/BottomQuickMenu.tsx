@@ -6,6 +6,7 @@ import {
 } from '@project-lc/components-constants/quickMenu';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
+import { useSearchDrawer } from '@project-lc/stores';
 
 export function BottomQuickMenu(): JSX.Element {
   return (
@@ -38,6 +39,7 @@ interface BottomQuickMenuItemProps {
 }
 function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
   const router = useRouter();
+  const setIsOpen = useSearchDrawer((s) => s.setIsOpen);
   const isMatched = useMemo((): boolean => {
     if (link.type === 'function') return false;
     if (!link.href) return false;
@@ -48,6 +50,8 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
   const onQuickMenuClick = (): void => {
     if (link.type === 'link') {
       router.push(link.href || '#');
+    } else if (link.type === 'function' && link.name === '검색') {
+      link.onClick(setIsOpen);
     } else if (link.type === 'function') {
       link.onClick();
     }

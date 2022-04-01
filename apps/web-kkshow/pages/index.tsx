@@ -13,6 +13,7 @@ import { getKkshowMain, kkshowMainQueryKey } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
 import { dehydrate, DehydratedState } from 'react-query';
+import { MobileSearchDrawer } from '@project-lc/components-web-kkshow/search/MobileSearchDrawer';
 
 interface KkshowIndexProps {
   dehydratedState: DehydratedState;
@@ -74,6 +75,7 @@ export default function Index(): JSX.Element {
       <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />
       <BottomQuickMenu />
+      <MobileSearchDrawer />
     </Box>
   );
 }

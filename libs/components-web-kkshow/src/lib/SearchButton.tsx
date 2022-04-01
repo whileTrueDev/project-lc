@@ -1,9 +1,9 @@
 import { IconButton, Tooltip } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
-import { useRouter } from 'next/router';
+import { useSearchDrawer } from '@project-lc/stores';
 
 export function SearchButton(): JSX.Element {
-  const router = useRouter();
+  const setIsOpen = useSearchDrawer((s) => s.setIsOpen);
   return (
     <Tooltip label="검색" fontSize="xs">
       <IconButton
@@ -14,9 +14,8 @@ export function SearchButton(): JSX.Element {
         icon={<SearchIcon />}
         aria-label="toggle search"
         onClick={() => {
-          router.push('/search');
+          setIsOpen(true);
         }}
-        _hover={{}}
         display={{ base: 'flex', xl: 'none' }}
       />
     </Tooltip>

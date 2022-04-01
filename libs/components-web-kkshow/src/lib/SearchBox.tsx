@@ -23,7 +23,6 @@ export function SearchBox(): JSX.Element {
   const toast = useToast();
   const router = useRouter();
   const queryClient = useQueryClient();
-
   const { isMobileSize } = useDisplaySize();
 
   const initialRef = useRef<any>(null);

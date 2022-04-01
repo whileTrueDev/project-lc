@@ -11,7 +11,7 @@ import {
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
-import { useKkshowSearchStore } from '@project-lc/stores';
+import { useKkshowSearchStore, useSearchDrawer } from '@project-lc/stores';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { SearchBox, SearchInput } from './SearchBox';
 import { deleteLocalStorageSearchKeyword } from './SearchPopover';
@@ -25,6 +25,8 @@ export function SearchPageSearcher(): JSX.Element {
   const setKeyword = useKkshowSearchStore((s) => s.setKeyword);
 
   const { handleSubmit } = useForm<SearchInput>();
+
+  const setIsOpen = useSearchDrawer((s) => s.setIsOpen);
 
   const onSubmit: SubmitHandler<SearchInput> = () => {
     if (keyword) {
@@ -41,6 +43,7 @@ export function SearchPageSearcher(): JSX.Element {
       window.localStorage.setItem('searchKeyword', JSON.stringify(localDataArray));
       router.push({ pathname: '/search', query: { keyword } });
       queryClient.invalidateQueries('getSearchResults');
+      setIsOpen(false);
     } else {
       toast({
         title: '검색어를 입력해주세요',
@@ -64,7 +67,7 @@ export function SearchPageSearcher(): JSX.Element {
         <Box
           as="button"
           color={useColorModeValue('gray.600', 'gray.200')}
-          onClick={() => router.back()}
+          onClick={() => setIsOpen(false)}
         >
           <ChevronLeftIcon w="30px" h="35px" />
         </Box>

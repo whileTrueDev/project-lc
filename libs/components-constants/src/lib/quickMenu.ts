@@ -23,13 +23,17 @@ interface FunctionMenuItem extends QuickMenuBase {
 
 export type QuickMenuLink = LinkMenuItem | FunctionMenuItem;
 
+export const handleSearchDrawer = (setIsOpen): void => {
+  setIsOpen(true);
+};
+
 /** 판매자 마이페이지 링크 */
 export const quickMenuLinks: QuickMenuLink[] = [
   {
     icon: FaSearch,
     name: '검색',
-    href: '/search',
-    type: 'link',
+    type: 'function',
+    onClick: (setIsOpen) => handleSearchDrawer(setIsOpen),
   },
   {
     icon: HiHome,

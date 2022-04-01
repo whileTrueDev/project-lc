@@ -8,7 +8,6 @@ export * from './lib/liveShoppingRegist';
 export * from './lib/liveShoppingStateBoardWindowStore';
 export * from './lib/mypageDesktopSidebarStore';
 export * from './lib/orderListDownloadStore';
-export * from './lib/searchPopoverStore';
 export * from './lib/sellerGoodsListPanelStore';
 export * from './lib/settlementHistoryStore';
 export * from './lib/shippingGroupItemStore';

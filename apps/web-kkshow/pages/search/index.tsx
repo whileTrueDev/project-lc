@@ -1,15 +1,4 @@
-import {
-  Box,
-  Divider,
-  Spinner,
-  Drawer,
-  DrawerBody,
-  DrawerOverlay,
-  DrawerContent,
-  useDisclosure,
-} from '@chakra-ui/react';
-import { SearchPageSearcher } from '@project-lc/components-web-kkshow/SearchPageSearcher';
-import { useDisplaySize } from '@project-lc/hooks';
+import { Box, Divider, Spinner } from '@chakra-ui/react';
 import SearchKeywordSection from '@project-lc/components-web-kkshow/search/SearchKeywordSection';
 import SearchPageLayout, {
   useSearchPageState,
@@ -17,24 +6,8 @@ import SearchPageLayout, {
 import SearchResultBroadcasterSection from '@project-lc/components-web-kkshow/search/SearchResultBroadcasterSection';
 import SearchResultGoodsSection from '@project-lc/components-web-kkshow/search/SearchResultGoodsSection';
 import SearchResultLiveContentsSection from '@project-lc/components-web-kkshow/search/SearchResultLiveContentsSection';
+import { MobileSearchDrawer } from '@project-lc/components-web-kkshow/search/MobileSearchDrawer';
 
-export function MobileSearchDrawer(): JSX.Element {
-  const { onClose } = useDisclosure();
-  const { isDesktopSize } = useDisplaySize();
-  return (
-    <>
-      <Drawer onClose={onClose} isOpen={Boolean(!isDesktopSize)} size="full">
-        <DrawerOverlay>
-          <DrawerContent>
-            <DrawerBody>
-              <SearchPageSearcher />
-            </DrawerBody>
-          </DrawerContent>
-        </DrawerOverlay>
-      </Drawer>
-    </>
-  );
-}
 export function Search(): JSX.Element {
   const { data, isLoading, searchKeyword } = useSearchPageState();
   const resultCount = data
@@ -53,7 +26,6 @@ export function Search(): JSX.Element {
     <SearchPageLayout>
       {!data && ( // /search 페이지
         <Box>
-          <MobileSearchDrawer />
           <SearchKeywordSection keyword="" resultCount={0} />
         </Box>
       )}
@@ -74,6 +46,7 @@ export function Search(): JSX.Element {
           />
         </>
       )}
+      <MobileSearchDrawer />
     </SearchPageLayout>
   );
 }
