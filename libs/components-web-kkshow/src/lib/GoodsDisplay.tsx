@@ -1,16 +1,19 @@
+import { ArrowForwardIcon } from '@chakra-ui/icons';
 import {
   AspectRatio,
   Box,
   BoxProps,
   Heading,
   HeadingProps,
-  Image,
+  Icon,
   LinkBox,
   LinkOverlay,
   Text,
 } from '@chakra-ui/react';
+import MotionBox from '@project-lc/components-core/MotionBox';
 import { KkshowShoppingTabGoodsData } from '@project-lc/shared-types';
 import { getDiscountedRate } from '@project-lc/utils-frontend';
+import { HTMLMotionProps, motion } from 'framer-motion';
 import Link from 'next/link';
 
 interface GoodsDisplayDetailProps {
@@ -51,6 +54,62 @@ export const GoodsDisplayDetail = ({
   </Box>
 );
 
+export const GoodsDisplayArrowIcon = (): JSX.Element => (
+  <Icon
+    as={ArrowForwardIcon}
+    position="absolute"
+    right={2}
+    bottom={2}
+    color="white"
+    rounded="full"
+    bg="blackAlpha.400"
+    p={1}
+    boxSize="2em"
+  />
+);
+
+interface GoodsDisplayImageProps extends BoxProps {
+  src: string;
+  ratio?: number;
+  alt?: string;
+  hasShadow?: boolean;
+  withArrowIcon?: boolean;
+  imageProps?: HTMLMotionProps<'img'>;
+}
+export const GoodsDisplayImage = ({
+  src,
+  alt,
+  ratio = 1,
+  hasShadow,
+  withArrowIcon = true,
+  imageProps,
+  ...rest
+}: GoodsDisplayImageProps): JSX.Element => (
+  <AspectRatio ratio={ratio}>
+    <Box
+      position="relative"
+      maxWidth={340}
+      borderRadius={rest.borderRadius || 'xl'}
+      {...rest}
+    >
+      <motion.img
+        style={{
+          shadow: hasShadow ? 'md' : 'none',
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }}
+        alt={alt}
+        src={src}
+        draggable={false}
+        {...imageProps}
+      />
+
+      {withArrowIcon && <GoodsDisplayArrowIcon />}
+    </Box>
+  </AspectRatio>
+);
+
 export interface GoodsDisplayProps extends GoodsDisplayDetailProps {
   variant?: 'small' | 'middle' | 'card';
 }
@@ -58,7 +117,7 @@ export function GoodsDisplay({
   goods,
   variant = 'small',
 }: GoodsDisplayProps): JSX.Element {
-  const borderRadius = '2xl';
+  const borderRadius = 'xl';
 
   let ratio = 1;
   switch (variant) {
@@ -89,27 +148,28 @@ export function GoodsDisplay({
 
   return (
     <LinkBox>
-      <AspectRatio ratio={ratio}>
-        <Image
-          borderRadius={borderRadius}
-          borderBottomRadius={variant === 'card' ? 'none' : undefined}
-          shadow={variant === 'card' ? 'none' : 'md'}
-          w="100%"
-          h="100%"
+      <MotionBox whileHover="hover">
+        <GoodsDisplayImage
+          alt={goods.name}
           src={goods.imageUrl}
+          ratio={ratio}
+          borderBottomRadius={variant === 'card' ? 'none' : undefined}
+          imageProps={{
+            variants: { hover: { scale: 1.05 } },
+          }}
         />
-      </AspectRatio>
 
-      <GoodsDisplayContainer
-        p={2}
-        color={variant === 'card' ? 'blackAlpha.900' : undefined}
-      >
-        <Link href={goods.linkUrl} passHref>
-          <LinkOverlay href={goods.linkUrl}>
-            <GoodsDisplayDetail goods={goods} />
-          </LinkOverlay>
-        </Link>
-      </GoodsDisplayContainer>
+        <GoodsDisplayContainer
+          p={2}
+          color={variant === 'card' ? 'blackAlpha.900' : undefined}
+        >
+          <Link href={goods.linkUrl} passHref>
+            <LinkOverlay href={goods.linkUrl}>
+              <GoodsDisplayDetail goods={goods} />
+            </LinkOverlay>
+          </Link>
+        </GoodsDisplayContainer>
+      </MotionBox>
     </LinkBox>
   );
 }

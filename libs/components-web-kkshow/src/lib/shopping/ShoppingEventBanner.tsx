@@ -34,6 +34,7 @@ export function ShoppingEventBanner(): JSX.Element | null {
             </Link>
             <Link href={data.banner.linkUrl}>
               <Image
+                draggable={false}
                 cursor="pointer"
                 zIndex={1}
                 position="absolute"
