@@ -8,7 +8,6 @@ import {
   LiveShoppingService,
 } from '@project-lc/nest-modules-liveshopping';
 import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
-import { S3Module, S3Service } from '@project-lc/nest-modules-s3';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { FindFmOrdersDto } from '@project-lc/shared-types';
@@ -39,14 +38,12 @@ describe('FmOrdersService', () => {
         ConfigModule.forRoot({ isGlobal: true }),
         SellerModule.withoutControllers(),
         LiveShoppingModule.withoutControllers(),
-        S3Module,
       ],
       providers: [
         FirstmallDbService,
         FmOrdersService,
         ProductPromotionService,
         LiveShoppingService,
-        S3Service,
       ],
     }).compile();
 

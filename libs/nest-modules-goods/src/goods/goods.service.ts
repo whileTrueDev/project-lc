@@ -23,10 +23,11 @@ import {
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
-import { S3Service } from '@project-lc/nest-modules-s3';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
 import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
+import { ObjectIdentifier } from '@aws-sdk/client-s3';
+import { s3 } from '@project-lc/utils-s3';
 
 @Injectable()
 export class GoodsService extends ServiceBaseWithCache {
@@ -34,7 +35,6 @@ export class GoodsService extends ServiceBaseWithCache {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly s3service: S3Service,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);
@@ -348,12 +348,15 @@ export class GoodsService extends ServiceBaseWithCache {
     const imgSrcList: string[] = getImgSrcListFromHtmlStringList(contentList);
 
     // img src에서 s3에 저장된 이미지만 찾기
-    const s3ImageKeys = this.s3service.getGoodsImageS3KeyListFromImgSrcList(imgSrcList);
+    const s3ImageKeys = s3.getGoodsImageS3KeyListFromImgSrcList(imgSrcList);
 
     if (s3ImageKeys.length > 0) {
-      await this.s3service.deleteMultipleObjects(
-        s3ImageKeys.map((key) => ({ Key: key })),
-      );
+      let deleteObjectIdentifiers: ObjectIdentifier[] = [];
+
+      deleteObjectIdentifiers = s3ImageKeys.map((key) => {
+        return { Key: key };
+      });
+      s3.sendDeleteObjectsCommand({ deleteObjects: deleteObjectIdentifiers });
     }
   }
 
@@ -374,12 +377,15 @@ export class GoodsService extends ServiceBaseWithCache {
     const imageList = images.map(({ image }) => image);
 
     // 이미지 중 s3에 업로드된 이미지 찾기
-    const s3ImageKeys = this.s3service.getGoodsImageS3KeyListFromImgSrcList(imageList);
+    const s3ImageKeys = s3.getGoodsImageS3KeyListFromImgSrcList(imageList);
 
     if (s3ImageKeys.length > 0) {
-      await this.s3service.deleteMultipleObjects(
-        s3ImageKeys.map((key) => ({ Key: key })),
-      );
+      let deleteObjectIdentifiers: ObjectIdentifier[] = [];
+
+      deleteObjectIdentifiers = s3ImageKeys.map((key) => {
+        return { Key: key };
+      });
+      s3.sendDeleteObjectsCommand({ deleteObjects: deleteObjectIdentifiers });
     }
   }
 
@@ -509,10 +515,10 @@ export class GoodsService extends ServiceBaseWithCache {
 
     try {
       const url = imageToDeleted.image;
-      const S3_DOMIAN = 'https://lc-project.s3.ap-northeast-2.amazonaws.com/';
-      if (url.includes(S3_DOMIAN)) {
-        const Key = url.replace(S3_DOMIAN, '');
-        await this.s3service.deleteMultipleObjects([{ Key }]);
+      if (url.includes(s3.fullDomain)) {
+        const Key = url.replace(s3.fullDomain, '');
+
+        s3.sendDeleteObjectsCommand({ deleteObjects: [{ Key }] });
       }
 
       await this.prisma.goodsImages.delete({
