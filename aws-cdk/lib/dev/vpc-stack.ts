@@ -10,7 +10,6 @@ const DATABASE_PORT = 3306;
 export class LCDevVpcStack extends cdk.Stack {
   public readonly vpc: ec2.Vpc;
   public albSecGrp: ec2.SecurityGroup;
-  public privateAlbSecGrp: ec2.SecurityGroup;
   public dbSecGrp: ec2.SecurityGroup;
   public apiSecGrp: ec2.SecurityGroup;
   public realtimeApiSecGrp: ec2.SecurityGroup;
@@ -44,11 +43,11 @@ export class LCDevVpcStack extends cdk.Stack {
     });
 
     this.createAlbSecGrp();
+    this.createRedisSecGrp();
     const apiSecGrp = this.createApiSecGrp();
     const overlaySecGrp = this.createOverlaySecGrp();
     const overlayControllerSecGrp = this.createOverlayControllerSecGrp();
     const inactiveBatchSecGrp = this.createInactiveBatchSecGrp();
-    this.createPrivateAlbSecGrp();
     this.createDbSecGrp({
       apiSecGrp,
       overlaySecGrp,
@@ -56,7 +55,6 @@ export class LCDevVpcStack extends cdk.Stack {
       inactiveBatchSecGrp,
     });
     this.createRealtimeApiSecGrp();
-    this.createRedisSecGrp();
     this.createMailerSecGrp();
   }
 
@@ -80,30 +78,6 @@ export class LCDevVpcStack extends cdk.Stack {
     );
 
     return this.albSecGrp;
-  }
-
-  /** 프라이빗 로드밸런서(ALB) 보안 그룹 생성 */
-  private createPrivateAlbSecGrp() {
-    this.privateAlbSecGrp = new ec2.SecurityGroup(
-      this,
-      `${ID_PREFIX}Private-ALB-SecGrp`,
-      {
-        vpc: this.vpc,
-        description: 'private ALB security group for project-lc',
-        allowAllOutbound: true,
-      },
-    );
-    this.privateAlbSecGrp.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.tcp(80),
-      'Allow 80 to API',
-    );
-    this.privateAlbSecGrp.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.tcp(443),
-      'Allow443 to api',
-    );
-    return this.privateAlbSecGrp;
   }
 
   /** 데이터베이스 보안 그룹 생성 */
@@ -177,6 +151,8 @@ export class LCDevVpcStack extends cdk.Stack {
       'allow port 3000 to anywhere',
     );
 
+    this.allowRedisToServer(this.apiSecGrp, constants.DEV.ECS_API_PORT);
+
     return this.apiSecGrp;
   }
 
@@ -193,7 +169,7 @@ export class LCDevVpcStack extends cdk.Stack {
       ec2.Port.tcp(constants.DEV.ECS_OVERLAY_PORT),
       'allow port 3002 to anywhere',
     );
-
+    this.allowRedisToServer(this.overlaySecGrp, constants.DEV.ECS_OVERLAY_PORT);
     return this.overlaySecGrp;
   }
 
@@ -213,6 +189,10 @@ export class LCDevVpcStack extends cdk.Stack {
       this.albSecGrp,
       ec2.Port.tcp(constants.DEV.ECS_OVERLAY_CONTROLLER_PORT),
       'allow port 3333 to alb',
+    );
+    this.allowRedisToServer(
+      this.overlayControllerSecGrp,
+      constants.DEV.ECS_OVERLAY_CONTROLLER_PORT,
     );
 
     return this.overlayControllerSecGrp;
@@ -235,6 +215,7 @@ export class LCDevVpcStack extends cdk.Stack {
       ec2.Port.tcp(constants.DEV.ECS_REALTIME_API_PORT),
       'allow port 3001 to alb for kks realtime-api',
     );
+    this.allowRedisToServer(this.realtimeApiSecGrp, constants.DEV.ECS_REALTIME_API_PORT);
   }
 
   /** 레디스 서버 보안그룹 생성 */
@@ -245,60 +226,19 @@ export class LCDevVpcStack extends cdk.Stack {
       allowAllOutbound: false,
     });
 
-    type AllowServerOptions = {
-      serverName: string;
-      secGrp: ec2.SecurityGroup;
-      serverPort: number;
-      redisPort?: number;
-    };
-    const allowServer = ({
-      serverName,
-      secGrp,
-      redisPort = 6379,
-      serverPort,
-    }: AllowServerOptions) => {
-      // * API server
-      this.redisSecGrp.addIngressRule(
-        secGrp,
-        ec2.Port.tcp(redisPort),
-        `allow port ${redisPort} to ${serverName} server`,
-      );
-      this.redisSecGrp.addEgressRule(
-        secGrp,
-        ec2.Port.tcp(redisPort),
-        `allow port ${redisPort} to ${serverName} server`,
-      );
-      secGrp.addIngressRule(
-        this.redisSecGrp,
-        ec2.Port.tcp(serverPort),
-        `allow port ${serverPort} to redis cluster`,
-      );
-    };
+    this.redisSecGrp.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(6379),
+      'allow port 6379 to anyIpv4',
+    );
+  }
 
-    // * Allow API Server
-    allowServer({
-      serverName: 'api',
-      secGrp: this.apiSecGrp,
-      serverPort: constants.DEV.ECS_API_PORT,
-    });
-    // * Allow Realtime API Server
-    allowServer({
-      serverName: 'realtime-api',
-      secGrp: this.realtimeApiSecGrp,
-      serverPort: constants.DEV.ECS_REALTIME_API_PORT,
-    });
-    // * Allow Overlay Server
-    allowServer({
-      serverName: 'overlay',
-      secGrp: this.overlaySecGrp,
-      serverPort: constants.DEV.ECS_OVERLAY_PORT,
-    });
-    // * Allow Overlay-controller Server
-    allowServer({
-      serverName: 'overlay-controller',
-      secGrp: this.overlayControllerSecGrp,
-      serverPort: constants.DEV.ECS_OVERLAY_CONTROLLER_PORT,
-    });
+  private allowRedisToServer(secGrp: ec2.SecurityGroup, serverPort: number) {
+    secGrp.addIngressRule(
+      this.redisSecGrp,
+      ec2.Port.tcp(serverPort),
+      `allow port ${serverPort} to redis cluster`,
+    );
   }
 
   /** Mailer 서버 보안그룹 생성 */
@@ -314,6 +254,8 @@ export class LCDevVpcStack extends cdk.Stack {
       ec2.Port.tcp(constants.DEV.ECS_MAILER_PORT),
       'Allow port 3003 to public alb',
     );
+    this.allowRedisToServer(this.mailerSecGrp, constants.DEV.ECS_MAILER_PORT);
+    return this.mailerSecGrp;
   }
 
   /** 휴면처리 배치 프로그램 보안그룹 생성 */

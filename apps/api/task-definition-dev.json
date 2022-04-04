@@ -47,10 +47,6 @@
                     "value": "https://dev.xn--hp4b17xa.com"
                 },
                 {
-                    "name": "MAILER_HOST",
-                    "value": "https://dev-mailer.xn--hp4b17xa.com"
-                },
-                {
                     "name": "NODE_ENV",
                     "value": "test"
                 }
@@ -128,6 +124,10 @@
                 {
                     "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_DEV_CACHE_REDIS_URL",
                     "name": "CACHE_REDIS_URL"
+                },
+                {
+                    "valueFrom": "arn:aws:ssm:ap-northeast-2:803609402610:parameter/PROJECT_LC_DEV_MQ_REDIS_URL",
+                    "name": "MQ_REDIS_URL"
                 }
             ],
             "dockerSecurityOptions": null,

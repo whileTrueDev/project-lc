@@ -659,6 +659,21 @@ socket.on('get soldout signal from server', async () => {
   }, 10000);
 });
 
+socket.on('get virtual character from server', async () => {
+  $('.virtual-background').toggle();
+});
+
+socket.on('get virtual character audio from server', async () => {
+  $('body').append(`
+    <iframe src="https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-audio/${email}/${liveShoppingId}/voice"
+     id="virtual-voice" allow="autoplay" style="display:none"></iframe>
+    `);
+});
+
+socket.on('delete virtual character audio from server', async () => {
+  $('#virtual-voice').remove();
+});
+
 socket.on('remove soldout banner from server', () => {
   $('.vertical-soldout-banner').css({ opacity: 0 });
 });
