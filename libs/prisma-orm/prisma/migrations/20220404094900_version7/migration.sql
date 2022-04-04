@@ -34,3 +34,9 @@ INSERT INTO `KkshowShoppingTab` (
     '[{"theme":"한식","imageUrl":"https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-images/1648450101822_keyword.png","keywords":[{"keyword":"쵸단"},{"keyword":"만두"},{"keyword":"굴림만두"},{"keyword":"오꾸밥"},{"keyword":"닭불갈비"},{"keyword":"홍봉자만두"}]},{"theme":"양식","imageUrl":"https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-images/1648450101822_keyword.png","keywords":[{"keyword":"파스타"},{"keyword":"곰"},{"keyword":"호랑이"},{"keyword":"이름대로"},{"keyword":"김광석"},{"keyword":"명예"}]}]',
     '{"linkUrl":"https://k-kmarket.com/board/?id=event","message":"신규가입하고 3000원","imageUrl":"https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-banner-images/1648512619378_coupon.png"}'
 );
+
+-- CreateIndex
+CREATE FULLTEXT INDEX `Broadcaster_userNickname_idx` ON `Broadcaster`(`userNickname`);
+
+-- CreateIndex
+CREATE FULLTEXT INDEX `Goods_goods_name_idx` ON `Goods`(`goods_name`);
