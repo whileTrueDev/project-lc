@@ -250,4 +250,13 @@ export class AppScreenGateway
   deleteVirtualCharacterAudio(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('delete virtual character audio from server');
   }
+
+  @SubscribeMessage('change theme from admin')
+  changeTheme(
+    @MessageBody() roomNameAndThemeType: { roomName: string; themeType: string },
+  ): void {
+    const { roomName } = roomNameAndThemeType;
+    const { themeType } = roomNameAndThemeType;
+    this.server.to(roomName).emit('change theme from server', themeType);
+  }
 }

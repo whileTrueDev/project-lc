@@ -481,6 +481,10 @@ $(document).ready(function ready() {
     },
   );
 
+  $('.theme-selction-box-button').click(function themeButtonOnclick() {
+    socket.emit('change theme from admin', { roomName, themeType: this.id });
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
     let level;

@@ -8,6 +8,7 @@ const iterateLimit = $('#primary-info').data('number') + 1;
 const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const email = $('#primary-info').data('email');
 const bucketName = $('#primary-info').data('bucket-name');
+let currentThemeType = '';
 
 let streamerAndProduct;
 let startDate = new Date('2021-09-27T14:05:00+0900');
@@ -737,5 +738,41 @@ socket.on('refresh ranking from server', () => {
     `<img src="/images/podium.png" id="podium" style="width:25%;"/>`,
   );
 });
+
+socket.on('change theme from server', (themeType) => {
+  currentThemeType = themeType;
+  switch (themeType) {
+    case 'spring':
+      $(`.${themeType}`)
+        .removeClass(currentThemeType)
+        .delay(1000)
+        .queue(function (next) {
+          $(
+            '.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left',
+          ).addClass(themeType);
+          $('#podium').attr('src', '/images/cherry-blossom-tree.png');
+        });
+      break;
+    case 'summer':
+      $(`.${themeType}`)
+        .removeClass(currentThemeType)
+        .delay(1000)
+        .queue(function (next) {
+          $(
+            '.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left',
+          ).addClass(themeType);
+          $('#podium').attr('src', '/images/cherry-blossom-tree.png');
+        });
+      break;
+    default:
+      console.log('default');
+  }
+});
+
+// socket.on('reset theme from server', () => {
+//   $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').removeClass(
+//     currentThemeType,
+//   );
+// });
 
 export {};

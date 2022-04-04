@@ -58,7 +58,7 @@ body {
 }
 
 .live-commerce {
-  display: none;
+  display: block;
   left: 0px;
   bottom: 0px;
   width: 1920px;
