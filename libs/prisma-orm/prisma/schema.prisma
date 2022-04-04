@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["native"]
-  previewFeatures = ["interactiveTransactions"]
+  previewFeatures = ["interactiveTransactions", "fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -215,6 +215,7 @@ model Goods {
   LiveShopping     LiveShopping[]
   productPromotion ProductPromotion[] // 하나의 상품이 여러개 홍보아이템 등록될 수 있음
   @@index([sellerId], name: "sellerId")
+  @@fulltext([goods_name])
 }
 
 model GoodsConfirmation {
@@ -502,6 +503,8 @@ model Broadcaster {
   BroadcasterSettlements      BroadcasterSettlements[]
   BroadcasterPromotionPage    BroadcasterPromotionPage? // 방송인 상품홍보
   inactiveFlag                Boolean                       @default(false)
+
+  @@fulltext([userNickname])
 }
 
 // 방송인 소셜로그인 계정

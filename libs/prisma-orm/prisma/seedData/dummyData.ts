@@ -100,8 +100,8 @@ export const testBroadcasterData: Prisma.BroadcasterCreateInput = {
   email: TEST_BROADCASTER_EMAIL,
   password: COMMON_DUMMY_PASSWORD,
   overlayUrl: `/${TEST_BROADCASTER_EMAIL}`,
-  userName: '테스트방송인이름',
-  userNickname: '테스트방송인활동명',
+  userName: '음바쿠',
+  userNickname: '음바쿠',
 };
 
 /** 판매 수수료 기본값 설정 */
@@ -137,22 +137,22 @@ export type DummyGoodsDataType = Pick<Goods, 'goods_name' | 'summary'> & {
 /** 더미상품목록 */
 export const dummyGoodsList: DummyGoodsDataType[] = [
   {
-    goods_name: 'testGoods1',
+    goods_name: '[음바쿠 - 김치찌개] 김치 김치찌개 김치찜 ',
     summary: '테스트상품1',
     confirmation: { status: 'confirmed', firstmallGoodsConnectionId: 41 },
   },
   {
-    goods_name: 'testGoods2',
+    goods_name: '[크크쇼X루야나] 떡 찹쌀떡 망개떡 ',
     summary: '테스트상품2',
     confirmation: { status: 'waiting' },
   },
   {
-    goods_name: 'testGoods3',
+    goods_name: '[다이어트] 다이어트 다이어트식품 다이어트빵',
     summary: '테스트상품3',
     confirmation: { status: 'confirmed', firstmallGoodsConnectionId: 42 },
   },
   {
-    goods_name: 'testGoods4 - 선물상품 조회 테스트 83번',
+    goods_name: '[음바쿠 - 만두] 김치만두 고기만두 왕만두',
     summary: '라이브쇼핑 연결',
     confirmation: { status: 'confirmed', firstmallGoodsConnectionId: 83 },
   },

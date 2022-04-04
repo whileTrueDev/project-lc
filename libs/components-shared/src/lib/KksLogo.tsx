@@ -17,9 +17,10 @@ export const sellerDarkLogo = 'kkshow-seller-darkmode.png';
 export const broadcasterLogo = 'kkshow-broadcaster-lightmode.png';
 export const broadcasterDarkLogo = 'kkshow-broadcaster-darkmode.png';
 
+export type KkshowLogoVariant = 'white' | 'dark' | 'light';
 export interface KksLogoProps extends ImageProps {
   appType?: UserType;
-  variant?: 'white' | 'dark';
+  variant?: KkshowLogoVariant;
 }
 
 interface GetCorrectLogoOption {
@@ -33,6 +34,7 @@ function getCorrectLogoInfo({
   variant,
 }: GetCorrectLogoOption): string {
   if (variant === 'white') return LOGO_S3_PREFIX + whiteLogo;
+  if (variant === 'light') return LOGO_S3_PREFIX + lightLogo;
   if (variant === 'dark') return LOGO_S3_PREFIX + darkLogo;
   switch (appType) {
     case 'broadcaster':
