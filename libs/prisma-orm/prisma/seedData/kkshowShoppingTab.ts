@@ -217,30 +217,12 @@ export const kkshowShoppingTabDummyData = {
       imageUrl:
         'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-images/1648450101822_keyword.png',
       keywords: [
-        {
-          keyword: '순두부찌개',
-          linkUrl: 'https://k-kmarket.com/goods/view?no=179',
-        },
-        {
-          keyword: '짜장면',
-          linkUrl: 'https://k-kmarket.com/goods/view?no=178',
-        },
-        {
-          keyword: '돈가스',
-          linkUrl: 'https://k-kmarket.com/goods/view?no=178',
-        },
-        {
-          keyword: '밀키트',
-          linkUrl: 'https://k-kmarket.com/goods/view?no=178',
-        },
-        {
-          keyword: '이상해꽃',
-          linkUrl: 'https://namu.wiki/w/%EC%9D%B4%EC%83%81%ED%95%B4%EA%BD%83',
-        },
-        {
-          keyword: '파이리',
-          linkUrl: 'https://namu.wiki/w/%ED%8C%8C%EC%9D%B4%EB%A6%AC',
-        },
+        { keyword: '순두부찌개' },
+        { keyword: '짜장면' },
+        { keyword: '돈가스' },
+        { keyword: '밀키트' },
+        { keyword: '이상해꽃' },
+        { keyword: '파이리' },
       ],
     },
     {
@@ -248,30 +230,12 @@ export const kkshowShoppingTabDummyData = {
       imageUrl:
         'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-keywords-theme-images/1648450101822_keyword.png',
       keywords: [
-        {
-          keyword: '파스타',
-          linkUrl: 'https://k-kmarket.com/goods/view?no=178',
-        },
-        {
-          keyword: '곰',
-          linkUrl: 'https://k-kmarket.com/goods/view?no=179',
-        },
-        {
-          keyword: '\b호랑이',
-          linkUrl: 'https://k-kmarket.com/goods/view?no=178',
-        },
-        {
-          keyword: '이름대로',
-          linkUrl: 'https://k-kmarket.com/goods/view?no=179',
-        },
-        {
-          keyword: '김광석',
-          linkUrl: 'https://k-kmarket.com/goods/view?no=178',
-        },
-        {
-          keyword: '명예',
-          linkUrl: 'https://k-kmarket.com/goods/view?no=179',
-        },
+        { keyword: '파스타' },
+        { keyword: '곰' },
+        { keyword: '\b호랑이' },
+        { keyword: '이름대로' },
+        { keyword: '김광석' },
+        { keyword: '명예' },
       ],
     },
   ],
