@@ -1,5 +1,4 @@
 /* eslint-disable react/no-array-index-key */
-import { DeleteIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -164,18 +163,12 @@ function AdminKkshowShoppingKeywordTable({
 
   return (
     <Box>
-      <Button onClick={() => append({ keyword: '', linkUrl: '' })}>키워드 추가</Button>
-      <Table w={600} size="sm">
+      <Button onClick={() => append({ keyword: '' })}>키워드 추가</Button>
+      <Table w={300} size="sm">
         <Thead>
           <Tr>
             <Th flex={1}>
               키워드명
-              <Text as="span" color="red">
-                *
-              </Text>
-            </Th>
-            <Th flex={2}>
-              키워드 링크
               <Text as="span" color="red">
                 *
               </Text>
@@ -197,15 +190,7 @@ function AdminKkshowShoppingKeywordTable({
                     })}
                   />
                 </Td>
-                <Td>
-                  <Input
-                    m={0}
-                    p={0}
-                    {...register(`keywords.${index}.keywords.${keywordIdx}.linkUrl`, {
-                      required: true,
-                    })}
-                  />
-                </Td>
+
                 <Td>
                   <PageManagerContainerButtonSet
                     variant="only-icon"
