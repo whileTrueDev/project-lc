@@ -11,7 +11,11 @@ export function BroadcasterStatusSection({
   };
 }): JSX.Element {
   return (
-    <Flex direction="row" borderWidth="thin" borderBottom="none">
+    <Flex
+      direction={{ base: 'column', sm: 'row' }}
+      borderWidth="thin"
+      borderBottom="none"
+    >
       <Grid templateColumns="2fr 3fr" width={['100%', '70%']}>
         <GridTableItem title="이메일" value={status.email} />
       </Grid>
