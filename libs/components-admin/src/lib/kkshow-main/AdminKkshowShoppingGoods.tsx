@@ -84,6 +84,7 @@ export function AdminKkshowShoppingGoods({
           <Input
             {...register(`${type}.${index}.linkUrl`, { required: true })}
             isRequired
+            type="url"
           />
         </Stack>
         <Stack minW={300}>

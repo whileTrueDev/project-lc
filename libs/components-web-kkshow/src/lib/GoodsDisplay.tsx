@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import { KkshowShoppingTabGoodsData } from '@project-lc/shared-types';
-import { getDiscountedRate } from '@project-lc/utils-frontend';
+import { getDiscountedRate, getLocaleNumber } from '@project-lc/utils-frontend';
 import { HTMLMotionProps, motion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -36,7 +36,7 @@ export const GoodsDisplayDetail = ({
     </Heading>
     {goods.discountedPrice ? (
       <Text textDecor="line-through" color="gray.500" fontSize={{ base: 'sm', md: 'md' }}>
-        {goods.normalPrice.toLocaleString()}
+        {getLocaleNumber(goods.normalPrice)}
       </Text>
     ) : null}
 
@@ -47,8 +47,8 @@ export const GoodsDisplayDetail = ({
         </Heading>
       )}{' '}
       {goods.discountedPrice
-        ? goods.discountedPrice.toLocaleString()
-        : goods.normalPrice.toLocaleString()}
+        ? getLocaleNumber(goods.discountedPrice)
+        : getLocaleNumber(goods.normalPrice)}
       원
     </Heading>
   </Box>

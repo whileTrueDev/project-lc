@@ -38,6 +38,7 @@ import {
   CreateBroadcasterSettlementHistoryItem,
 } from '@project-lc/shared-types';
 import { settlementHistoryStore } from '@project-lc/stores';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -51,7 +52,7 @@ export function calcSettleAmount(
 /** 총 주문금액 셀 */
 function TotalAmountCell({ row }: GridCellParams): JSX.Element {
   const total = useBroadcasterSettlementTotalInfo(row as BroadcasterSettlementTarget);
-  return <Text>{!total.price ? '-' : total.price.toLocaleString()}</Text>;
+  return <Text>{!total.price ? '-' : getLocaleNumber(total.price)}</Text>;
 }
 
 /** 방송인 수익 정산 대상 목록 */
@@ -269,11 +270,11 @@ function BcSettlementTargetDetail({
       { title: '운송장번호', value: settlementTarget.delivery_number },
       {
         title: '총 출고 가격',
-        value: total.price ? `${total.price.toLocaleString()}원` : '-',
+        value: total.price ? `${getLocaleNumber(total.price)}원` : '-',
       },
       {
         title: '총 정산액',
-        value: total.settleAmount ? `${total.settleAmount.toLocaleString()}원` : '-',
+        value: total.settleAmount ? `${getLocaleNumber(total.settleAmount)}원` : '-',
       },
     ],
     [
@@ -322,7 +323,7 @@ function BcSettlementTargetDetail({
               {item.title1 && item.option1 && (
                 <Text fontSize="sm">{`${item.title1}: ${item.option1}`}</Text>
               )}
-              <Text fontSize="sm">{Number(item.price).toLocaleString()} 원</Text>
+              <Text fontSize="sm">{getLocaleNumber(item.price)} 원</Text>
             </GridItem>
           </Grid>
           <Box mt={4}>
