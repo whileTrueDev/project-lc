@@ -90,19 +90,19 @@ export function ShoppingGoodsOfTheWeek(): JSX.Element {
         >
           {data &&
             data.goodsOfTheWeek.map((item) => (
-              <SwiperSlide key={item.name} style={{ width: '70%', maxWidth: 340 }}>
+              <SwiperSlide key={item.name} style={{ width: '75%', maxWidth: 340 }}>
                 {({ isActive }) => (
                   <Image
                     objectFit="cover"
-                    minH={340}
+                    h={{ base: 240, md: 340 }}
                     w="100%"
-                    h="100%"
+                    // h="100%"
                     src={item.imageUrl}
                     alt={item.name}
                     transform={isActive ? 'scale(1)' : 'scale(0.8)'}
                     transition="all 0.3s"
                     borderRadius="2xl"
-                    boxShadow="xl"
+                    boxShadow="lg"
                     draggable={false}
                   />
                 )}
