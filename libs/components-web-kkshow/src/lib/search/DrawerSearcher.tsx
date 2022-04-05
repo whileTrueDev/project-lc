@@ -13,10 +13,13 @@ import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useKkshowSearchStore, useSearchDrawer } from '@project-lc/stores';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { SearchBox, SearchInput } from './SearchBox';
+import { SearchBox, SearchBoxProps, SearchInput } from './SearchBox';
 import { deleteLocalStorageSearchKeyword } from './SearchPopover';
 
-export function DrawerSearcher(): JSX.Element {
+interface DrawerSearcherProps {
+  searchBoxInputRef?: SearchBoxProps['inputRef'];
+}
+export function DrawerSearcher({ searchBoxInputRef }: DrawerSearcherProps): JSX.Element {
   const router = useRouter();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -72,7 +75,7 @@ export function DrawerSearcher(): JSX.Element {
           variant="unstyle"
           icon={<ChevronLeftIcon w="30px" h="35px" />}
         />
-        <SearchBox />
+        <SearchBox inputRef={searchBoxInputRef} />
       </InputGroup>
       {/* 최근검색어 */}
       <Flex m={2} flexDirection="column" as="form" onSubmit={handleSubmit(onSubmit)}>

@@ -7,7 +7,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, RefObject, useCallback } from 'react';
 import { useKkshowSearchStore, useSearchPopoverStore } from '@project-lc/stores';
 import { useQueryClient } from 'react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -19,13 +19,20 @@ export interface SearchInput {
   keyword: string;
 }
 
-export function SearchBox(): JSX.Element {
+export interface SearchBoxProps {
+  inputRef?: RefObject<HTMLInputElement>;
+}
+export function SearchBox({ inputRef }: SearchBoxProps): JSX.Element {
   const toast = useToast();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { isMobileSize } = useDisplaySize();
 
-  const initialRef = useRef<any>(null);
+  const initialRef = useRef<HTMLInputElement>(null);
+  const focusOnInput = useCallback((): void => {
+    if (inputRef && inputRef.current) inputRef.current.focus();
+    if (initialRef && initialRef.current) initialRef.current.focus();
+  }, [inputRef]);
 
   const { isOpen, handlePopover } = useSearchPopoverStore();
   const { keyword } = useKkshowSearchStore();
@@ -51,7 +58,7 @@ export function SearchBox(): JSX.Element {
       queryClient.invalidateQueries('getSearchResults');
       handlePopover(false);
     } else {
-      initialRef.current.focus();
+      focusOnInput();
       toast({
         title: '검색어를 입력해주세요',
         status: 'error',
@@ -61,16 +68,13 @@ export function SearchBox(): JSX.Element {
 
   useEffect(() => {
     setKeyword((router.query.keyword as string) || '');
-    if (isMobileSize) {
-      initialRef.current.focus();
-    }
-  }, [isMobileSize, router.query.keyword, setKeyword]);
+  }, [router.query.keyword, setKeyword]);
 
   return (
     <Flex w="100%" h="100%" as="form" onSubmit={handleSubmit(onSubmit)}>
       <Input
         value={keyword}
-        ref={initialRef}
+        ref={inputRef || initialRef}
         autoFocus
         variant="outline"
         placeholder="검색어를 입력하세요"
@@ -90,7 +94,9 @@ export function SearchBox(): JSX.Element {
             aria-label="erase-button-icon"
             icon={<MdCancel color="gray" />}
             onClick={() => {
-              initialRef.current.value = '';
+              // eslint-disable-next-line no-param-reassign
+              if (inputRef && inputRef.current) inputRef.current.value = '';
+              if (initialRef && initialRef.current) initialRef.current.value = '';
               setKeyword('');
             }}
           />
