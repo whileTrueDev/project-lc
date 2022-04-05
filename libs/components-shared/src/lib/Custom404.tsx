@@ -1,7 +1,7 @@
 import { Button, Flex, Heading, Text, VStack } from '@chakra-ui/react';
 import { NextSeo } from 'next-seo';
 import { useRouter } from 'next/router';
-import KksLogo from '@project-lc/components-shared/KksLogo';
+import KksLogo from './KksLogo';
 
 export function Custom404(): JSX.Element {
   const router = useRouter();
@@ -13,7 +13,7 @@ export function Custom404(): JSX.Element {
     <>
       <NextSeo title="페이지를 찾을 수 없습니다." description="" />
 
-      <Flex h="100vh" flexDirection="column" justify="center" alignItems="center">
+      <Flex minH="60vh" flexDirection="column" justify="center" alignItems="center">
         <VStack>
           <KksLogo />
           <Heading fontSize={{ base: 'xl', sm: '2xl' }}>
