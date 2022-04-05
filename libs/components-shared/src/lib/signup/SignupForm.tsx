@@ -250,6 +250,7 @@ export function SignupForm({
                 type="code"
                 placeholder="이메일 인증코드"
                 maxWidth="sm"
+                mr={1}
                 {...register('code', { ...emailCodeRegisterOptions })}
               />
               {seconds > 0 ? (
@@ -287,9 +288,7 @@ export function SignupForm({
 
         {phase === 1 && (
           <Button
-            bg="blue.400"
-            color="white"
-            _hover={{ bg: 'blue.500' }}
+            colorScheme="blue"
             onClick={checkValidation}
             isLoading={mailVerification.isLoading}
           >
@@ -297,13 +296,7 @@ export function SignupForm({
           </Button>
         )}
         {phase === 2 && (
-          <Button
-            bg="blue.400"
-            color="white"
-            _hover={{ bg: 'blue.500' }}
-            type="submit"
-            isLoading={isSubmitting}
-          >
+          <Button colorScheme="blue" type="submit" isLoading={isSubmitting}>
             인증완료
           </Button>
         )}
