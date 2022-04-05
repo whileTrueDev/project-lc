@@ -20,12 +20,14 @@ async function bootstrap(): Promise<void> {
   logger.log('Finish: Searching Login History');
 
   await Promise.all([
-    mailTargets.map((user) => {
-      if (user.timeDiff === 366) {
-        return appService.moveInactiveUserData(user);
-      }
-      return null;
-    }),
+    Promise.all(
+      mailTargets.map((user) => {
+        if (user.timeDiff === 366) {
+          return appService.moveInactiveUserData(user);
+        }
+        return null;
+      }),
+    ),
     appMailService.sendMail(mailTargets),
   ]);
 
