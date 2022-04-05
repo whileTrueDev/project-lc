@@ -13,10 +13,13 @@ import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useKkshowSearchStore, useSearchDrawer } from '@project-lc/stores';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { SearchBox, SearchInput } from './SearchBox';
+import { SearchBox, SearchBoxProps, SearchInput } from './SearchBox';
 import { deleteLocalStorageSearchKeyword } from './SearchPopover';
 
-export function SearchPageSearcher(): JSX.Element {
+interface DrawerSearcherProps {
+  searchBoxInputRef?: SearchBoxProps['inputRef'];
+}
+export function DrawerSearcher({ searchBoxInputRef }: DrawerSearcherProps): JSX.Element {
   const router = useRouter();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -64,15 +67,17 @@ export function SearchPageSearcher(): JSX.Element {
         display={{ base: 'flex', xl: 'none' }}
         alignItems="center"
       >
-        <Box
-          as="button"
+        <IconButton
+          aria-label="exit-search-drawer"
           color={useColorModeValue('gray.600', 'gray.200')}
           onClick={() => setIsOpen(false)}
-        >
-          <ChevronLeftIcon w="30px" h="35px" />
-        </Box>
-        <SearchBox />
+          mr={2}
+          variant="unstyle"
+          icon={<ChevronLeftIcon w="30px" h="35px" />}
+        />
+        <SearchBox inputRef={searchBoxInputRef} />
       </InputGroup>
+      {/* 최근검색어 */}
       <Flex m={2} flexDirection="column" as="form" onSubmit={handleSubmit(onSubmit)}>
         <Text fontWeight="bold">최근 검색어</Text>
         <Flex mt={2} spacing={2} direction="column">
@@ -99,4 +104,4 @@ export function SearchPageSearcher(): JSX.Element {
     </Box>
   );
 }
-export default SearchPageSearcher;
+export default DrawerSearcher;

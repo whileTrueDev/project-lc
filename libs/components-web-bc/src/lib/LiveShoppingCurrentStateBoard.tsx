@@ -11,6 +11,7 @@ import { LiveShoppingPurchaseMessage } from '@prisma/client';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 import { useLiveShoppingStateSubscription, usePurchaseMessages } from '@project-lc/hooks';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { AnimationDefinition } from 'framer-motion/types/render/utils/animation';
 import { useCallback, useMemo } from 'react';
 
@@ -95,7 +96,7 @@ export function LiveShoppingCurrentStateBoard({
         {/* 라이브 상황판 */}
         <SectionWithTitle variant="outlined" title="라이브 상황판">
           <Stack direction="row" justifyContent="space-around">
-            <StateItem name="결제금액" value={`${totalPrice.toLocaleString()} 원`} />
+            <StateItem name="결제금액" value={`${getLocaleNumber(totalPrice)} 원`} />
             <StateItem name="주문건수" value={`${totalPurchaseCount} 건`} />
             <StateItem name="선물건수" value={`${totalGiftCount} 건`} />
           </Stack>
@@ -177,7 +178,7 @@ export function PurchaseMessageItem({
         index: index.toString(),
         nickname,
         message: text,
-        price: `${price.toLocaleString()}원`,
+        price: `${getLocaleNumber(price)}원`,
       }}
       bg={index % 2 === 0 ? evenBg : oddBg}
       color={color}

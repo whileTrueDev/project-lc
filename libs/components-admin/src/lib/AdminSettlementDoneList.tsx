@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { SettlementInfoDialog } from '@project-lc/components-seller/SettlementInfoDialog';
 import { IAdminSettlementDoneList, useAdminSettlementDoneList } from '@project-lc/hooks';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
@@ -52,13 +53,13 @@ export function AdminSettlementDoneList(): JSX.Element | null {
             <Td>{history.exportId}</Td>
             <Td>{history.exportCode}</Td>
             <Td>{history.totalEa}</Td>
-            <Td>{history.totalPrice.toLocaleString()}</Td>
-            <Td>{history.pgCommission.toLocaleString()}</Td>
+            <Td>{getLocaleNumber(history.totalPrice)}</Td>
+            <Td>{getLocaleNumber(history.pgCommission)}</Td>
             <Td>{history.paymentMethod}</Td>
             <Td>{history.pg}</Td>
             <Td>{history.shippingCost}</Td>
-            <Td>{history.totalCommission.toLocaleString()}</Td>
-            <Td>{history.totalAmount.toLocaleString()}</Td>
+            <Td>{getLocaleNumber(history.totalCommission)}</Td>
+            <Td>{getLocaleNumber(history.totalAmount)}</Td>
             <Td>
               <Button
                 size="xs"

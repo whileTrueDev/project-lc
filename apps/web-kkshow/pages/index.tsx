@@ -48,7 +48,7 @@ export default function Index(): JSX.Element {
         backgroundSize="contain"
         w={{ base: 150, md: 250 }}
         h={{ base: 150, md: 250 }}
-        top={{ base: 470, md: 550 }}
+        top={{ base: 300, sm: 470, md: 550 }}
         left={-75}
         zIndex={1}
       />
@@ -58,7 +58,7 @@ export default function Index(): JSX.Element {
         backgroundSize="contain"
         w={{ base: 150, md: 300 }}
         h={{ base: 150, md: 300 }}
-        top={{ base: 600, md: 700 }}
+        top={{ base: 440, sm: 600, md: 700 }}
         right={{ base: -75, md: -150 }}
         zIndex={1}
       />

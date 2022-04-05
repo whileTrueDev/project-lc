@@ -27,7 +27,7 @@ export function KkshowMainTitle({
       whileInView={{ opacity: 1, x: 0, transition: { duration: 0.6 } }}
       viewport={{ once: true, amount: 0.9 }}
     >
-      <Heading fontSize="3xl" position="relative">
+      <Heading fontSize={{ base: '2xl', sm: '3xl' }} position="relative">
         {bulletVariant === 'none' ? null : (
           <Box
             position="absolute"

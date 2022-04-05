@@ -1,6 +1,7 @@
 import { chakra, theme, useColorModeValue } from '@chakra-ui/react';
 import { makeStyles } from '@material-ui/core';
 import { DataGrid, DataGridProps } from '@material-ui/data-grid';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 
 function CustomDataGrid(props: DataGridProps): JSX.Element {
   const useStyle = makeStyles({
@@ -105,8 +106,8 @@ function CustomDataGrid(props: DataGridProps): JSX.Element {
         // Rows selected footer text
         footerRowSelected: (count) =>
           count !== 1
-            ? `${count.toLocaleString()} 행 선택됨`
-            : `${count.toLocaleString()} 행 선택됨`,
+            ? `${getLocaleNumber(count)} 행 선택됨`
+            : `${getLocaleNumber(count)} 행 선택됨`,
 
         // Total rows footer text
         footerTotalRows: '총 행:',

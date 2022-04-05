@@ -15,7 +15,6 @@ import {
 import { SellerOrderCancelRequestStatus } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
-import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { OrderCancelRequestExistAlert } from '@project-lc/components-seller/OrderCancelRequestExistAlert';
 import { OrderDetailActions } from '@project-lc/components-seller/OrderDetailActions';
 import { OrderDetailDeliveryInfo } from '@project-lc/components-seller/OrderDetailDeliveryInfo';
@@ -28,6 +27,7 @@ import { OrderDetailSummary } from '@project-lc/components-seller/OrderDetailSum
 import { OrderDetailTitle } from '@project-lc/components-seller/OrderDetailTitle';
 import { OrderRefundExistsAlert } from '@project-lc/components-seller/OrderRefundExistsAlert';
 import { OrderReturnExistsAlert } from '@project-lc/components-seller/OrderReturnExistsAlert';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import {
   useDisplaySize,
   useFmOrder,
@@ -37,6 +37,7 @@ import {
   convertFmOrderShippingTypesToString,
   FmOrderShipping,
 } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 
@@ -229,7 +230,7 @@ function OrderDetailShippingItem({
         {shipping.shipping_type === 'free' ? null : (
           <>
             <TextDotConnector />
-            <Text>배송비: {Number(shipping.shipping_cost).toLocaleString()} 원</Text>
+            <Text>배송비: {getLocaleNumber(shipping.shipping_cost)} 원</Text>
           </>
         )}
       </Stack>

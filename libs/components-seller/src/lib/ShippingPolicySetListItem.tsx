@@ -8,7 +8,7 @@ import {
   shippingSelectOptions,
   TempShippingSet,
 } from '@project-lc/shared-types';
-import { getShippingOptionLabel } from '@project-lc/utils-frontend';
+import { getLocaleNumber, getShippingOptionLabel } from '@project-lc/utils-frontend';
 import { FaTruck } from 'react-icons/fa';
 
 function OptionItemDisplay({ item }: { item: ShippingOptionDto }): JSX.Element {
@@ -18,7 +18,7 @@ function OptionItemDisplay({ item }: { item: ShippingOptionDto }): JSX.Element {
   );
   const suffix = selectOption ? selectOption.suffix : '';
   const { shipping_area_name: areaName, shipping_cost: cost } = costItem;
-  const costText = shippingOptType === 'free' ? '무료' : `${cost.toLocaleString()} 원`;
+  const costText = shippingOptType === 'free' ? '무료' : `${getLocaleNumber(cost)} 원`;
 
   return (
     <Stack direction={{ base: 'column', sm: 'row' }}>
@@ -74,19 +74,19 @@ export function ShippingPolicySetListItem({
             <Stack direction={{ base: 'column', sm: 'row' }}>
               <Text>
                 반품 - 편도 :&nbsp;
-                {refund_shiping_cost ? refund_shiping_cost.toLocaleString() : 0} ₩
+                {refund_shiping_cost ? getLocaleNumber(refund_shiping_cost) : 0} ₩
               </Text>
               {shiping_free_yn === 'Y' && refund_shiping_cost && (
                 <Text>
                   ( 배송비가 무료인 경우, 왕복&nbsp;
-                  {(refund_shiping_cost * 2).toLocaleString()} ₩ 받음 )
+                  {getLocaleNumber(refund_shiping_cost * 2)} ₩ 받음 )
                 </Text>
               )}
             </Stack>
             <Stack direction="row">
               <Text>
                 (맞)교환 - 왕복 :&nbsp;
-                {swap_shiping_cost ? swap_shiping_cost.toLocaleString() : 0} ₩
+                {swap_shiping_cost ? getLocaleNumber(swap_shiping_cost) : 0} ₩
               </Text>
             </Stack>
           </Stack>

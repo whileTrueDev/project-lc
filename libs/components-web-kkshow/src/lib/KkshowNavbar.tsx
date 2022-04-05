@@ -8,8 +8,8 @@ import { KkshowLogoVariant, KksLogo } from '@project-lc/components-shared/KksLog
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import { SearchButton } from './search/SearchButton';
-import { GlobalSearcher } from './search/GlobalSearcher';
+import { MobileSearchDrawerButton } from './search/MobileSearchDrawerButton';
+import { DefaultSearcher } from './search/DefaultSearcher';
 
 type KkshowNavbarVariant = 'blue' | 'white';
 interface KkshowNavbar {
@@ -74,8 +74,8 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
         {/* 우측 */}
         <Flex alignItems="center">
           <ColorModeSwitcher _hover={{}} />
-          <SearchButton />
-          <GlobalSearcher />
+          <MobileSearchDrawerButton />
+          <DefaultSearcher />
         </Flex>
       </Flex>
 

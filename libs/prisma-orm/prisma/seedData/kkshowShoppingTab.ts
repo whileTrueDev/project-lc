@@ -22,38 +22,38 @@ export const kkshowShoppingTabDummyData = {
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2021/12/_temp_16385092718881large.jpg',
       normalPrice: 18000,
-      discountedPrice: '17000',
+      discountedPrice: 17000,
     },
     {
       name: '오늘한끼 다이어트 도시락 시즌1 6팩',
       linkUrl: 'https://k-kmarket.com/goods/view?no=163',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16426661552946large.png',
-      normalPrice: '27000',
-      discountedPrice: '26900',
+      normalPrice: 27000,
+      discountedPrice: 26900,
     },
     {
       name: '진국보감 양념이 맛있는 한돈 갈비찜',
       linkUrl: 'https://k-kmarket.com/goods/view?no=93',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/93_temp_16425785866489view.jpg?1648788341602',
-      normalPrice: '15000',
-      discountedPrice: '14000',
+      normalPrice: 15000,
+      discountedPrice: 14000,
     },
     {
       name: '경기 고양시 삼부자 수제만두 모음전',
       linkUrl: 'https://k-kmarket.com/goods/view?no=66',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2021/09/_temp_16324652408352view.png?1648788535953',
-      normalPrice: '20000',
-      discountedPrice: '17000',
+      normalPrice: 20000,
+      discountedPrice: 17000,
     },
     {
       name: '맛있게 매운 삼형제 양념 쭈꾸미',
       linkUrl: 'https://k-kmarket.com/goods/view?no=137',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2021/12/_temp_16405271386492view.jpg?1648788689164',
-      normalPrice: '9000',
+      normalPrice: 9000,
       discountedPrice: 8900,
     },
   ],
@@ -64,40 +64,40 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=179',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/02/_temp_16449135102313view.jpg?1648788776517',
-      normalPrice: '12200',
-      discountedPrice: '8200',
+      normalPrice: 12200,
+      discountedPrice: 8200,
     },
     {
       name: '돼지 등뼈와 우거지가 가득한 뼈해장국',
       linkUrl: 'https://k-kmarket.com/goods/view?no=178',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/02/_temp_16448938223899view.png?1648788833581',
-      normalPrice: '9000',
-      discountedPrice: '8000',
+      normalPrice: 9000,
+      discountedPrice: 8000,
     },
     {
       name: '술 안주로 딱인 양념닭불고기 350g',
       linkUrl: 'https://k-kmarket.com/goods/view?no=173',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/02/172_temp_16445574046693view.png?1648788901902',
-      normalPrice: '6000',
-      discountedPrice: '5000',
+      normalPrice: 6000,
+      discountedPrice: 5000,
     },
     {
       name: '곱창, 닭발, 불고기 토핑의 신개념 떡볶이',
       linkUrl: 'https://k-kmarket.com/goods/view?no=96',
       imageUrl:
         'https://k-kmarket.com\t/data/goods/1/2022/02/_temp_16445577295678view.png?1648788956061',
-      normalPrice: '28000',
-      discountedPrice: '21900',
+      normalPrice: 28000,
+      discountedPrice: 21900,
     },
     {
       name: '국물이 끝내주는 가마솥 돈코츠 라멘 3종 (3인분)',
       linkUrl: 'https://k-kmarket.com/goods/view?no=174',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/02/_temp_16445600385895view.jpg?1648789045790',
-      normalPrice: '11000',
-      discountedPrice: '9900',
+      normalPrice: 11000,
+      discountedPrice: 9900,
     },
   ],
   // popularGoods ; 많이 찾는 상품
@@ -108,39 +108,39 @@ export const kkshowShoppingTabDummyData = {
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16425756271098view.jpg?1648789112287',
       normalPrice: 17000,
-      discountedPrice: '14900',
+      discountedPrice: 14900,
     },
     {
       name: '오동통한 100% 한돈 수제 소세지',
       linkUrl: 'https://k-kmarket.com/goods/view?no=138',
       imageUrl:
         'https://k-kmarket.com\t/data/goods/1/2021/12/_temp_16405277754983view.jpg?1648789180126',
-      normalPrice: '4000',
-      discountedPrice: '3900',
+      normalPrice: 4000,
+      discountedPrice: 3900,
     },
     {
       name: '맛있게 매콤한 닭꼬치 중꼬지 200g',
       linkUrl: 'https://k-kmarket.com/goods/view?no=170',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/02/_temp_16444793818531view.jpg?1648789317857',
-      normalPrice: '5000',
-      discountedPrice: '4900',
+      normalPrice: 5000,
+      discountedPrice: 4900,
     },
     {
       name: '오늘한끼 부산 초량 시장 불백 돼지불고기',
       linkUrl: 'https://k-kmarket.com/goods/view?no=168',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/168_2022012017444012.png?1648789354867',
-      normalPrice: '8000',
-      discountedPrice: '7900',
+      normalPrice: 8000,
+      discountedPrice: 7900,
     },
     {
       name: '내조국국밥 술 안주로 탁월한 모듬순대',
       linkUrl: 'https://k-kmarket.com/goods/view?no=143',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16415379643705view.jpg?1648789411842',
-      normalPrice: '11000',
-      discountedPrice: '10000',
+      normalPrice: 11000,
+      discountedPrice: 10000,
     },
   ],
   banner: {
@@ -156,24 +156,24 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=153',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16425729124837view.jpg?1648789493046',
-      normalPrice: '14900',
-      discountedPrice: '11170',
+      normalPrice: 14900,
+      discountedPrice: 11170,
     },
     {
       name: '몽모랑시 타트체리 저분자 콜라겐 스틱 20g x 30포',
       linkUrl: 'https://k-kmarket.com/goods/view?no=88',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2021/12/_temp_16385029186483view.png?1648789550534',
-      normalPrice: '25000',
-      discountedPrice: '24900',
+      normalPrice: 25000,
+      discountedPrice: 24900,
     },
     {
       name: '오늘한끼 다이어트 한돈 소시지 (저칼로리)',
       linkUrl: 'https://k-kmarket.com/goods/view?no=167',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16426670960515view.png?1648789608183',
-      normalPrice: '40000',
-      discountedPrice: '3900',
+      normalPrice: 40000,
+      discountedPrice: 3900,
     },
   ],
   // reviews; 생생후기
