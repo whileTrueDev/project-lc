@@ -15,7 +15,12 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { SellCommission, Seller, SellerSettlementAccount } from '@prisma/client';
+import {
+  SellCommission,
+  Seller,
+  SellerSettlementAccount,
+  SellerSettlementConfirmHistory,
+} from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
@@ -31,6 +36,7 @@ import {
   SellerShopInfoDto,
   SettlementAccountDto,
   SignUpDto,
+  SellerSettlementConfirmHistoryDto,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { SellerContactsService } from './seller-contacts.service';
@@ -158,6 +164,28 @@ export class SellerController {
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerSettlementAccount> {
     return this.sellerSettlementService.insertSettlementAccount(dto, sellerInfo);
+  }
+
+  // 본인의 정산정보 및 정산 검수 히스토리 조회
+  @UseGuards(JwtAuthGuard)
+  @Get('settlement/history')
+  @UseInterceptors(HttpCacheInterceptor)
+  public async selectSellerSettlementHistory(
+    @SellerInfo() sellerInfo: UserPayload,
+  ): Promise<SellerSettlementConfirmHistory[]> {
+    return this.sellerSettlementService.getSettlementConfirmHistory(sellerInfo);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('settlement/history')
+  public async InsertSettlementHistory(
+    @Body(ValidationPipe) dto: SellerSettlementConfirmHistoryDto,
+    @SellerInfo() sellerInfo: UserPayload,
+  ): Promise<SellerSettlementConfirmHistory> {
+    return this.sellerSettlementService.createSettlementConfirmHistory(
+      dto,
+      sellerInfo.id,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

@@ -5,6 +5,7 @@ import { SettlementAccountBox } from '@project-lc/components-seller/SettlementAc
 import { SettlementList } from '@project-lc/components-seller/SettlementList';
 import { SettlementRoundHistory } from '@project-lc/components-seller/SettlementRoundHistory';
 import { SettlementStateBox } from '@project-lc/components-seller/SettlementStateBox';
+import { SettlementConfirmationHistoryBox } from '@project-lc/components-seller/SettlementConfirmationHistoryBox';
 import { useSettlementInfo } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import React, { useMemo } from 'react';
@@ -45,7 +46,7 @@ export function Index(): JSX.Element {
                 sellerBusinessRegistration={settlementData?.sellerBusinessRegistration[0]}
               />
             </GridItem>
-            <GridItem colSpan={[6, 6, 6, 3]} rowSpan={2} alignItems="stretch">
+            <GridItem colSpan={[6, 6, 6, 3]} rowSpan={1} alignItems="stretch">
               {/* 계좌번호 BOX */}
               <SettlementAccountBox
                 settlementAccount={settlementData?.sellerSettlementAccount[0]}
@@ -58,6 +59,9 @@ export function Index(): JSX.Element {
                 sellerBusinessRegistration={settlementData?.sellerBusinessRegistration[0]}
                 refetch={refetch}
               />
+            </GridItem>
+            <GridItem colSpan={[6, 6, 6, 3]} rowSpan={2} alignItems="stretch">
+              <SettlementConfirmationHistoryBox />
             </GridItem>
           </Grid>
           <Divider />

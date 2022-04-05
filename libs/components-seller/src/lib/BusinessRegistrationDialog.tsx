@@ -13,6 +13,7 @@ import {
   SettlementInfoRefetchType,
   useBusinessRegistrationMutation,
   useProfile,
+  useSellerSettlementHistoryMutation,
 } from '@project-lc/hooks';
 import { BusinessRegistrationDto } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
@@ -52,6 +53,7 @@ export function BusinessRegistrationDialog(
   const { data: profileData } = useProfile();
   const toast = useToast();
   const mutation = useBusinessRegistrationMutation();
+  const { mutateAsync: historyMutation } = useSellerSettlementHistoryMutation();
 
   const methods = useForm<BusinessRegistrationFormDto>();
   const {
@@ -94,6 +96,10 @@ export function BusinessRegistrationDialog(
           userMail: profileData?.email,
           companyName,
         });
+        await historyMutation({
+          type: 'mailOrder',
+          status: 'waiting',
+        });
       }
 
       if (!savedBusinessRegistrationImageName) {
@@ -105,6 +111,11 @@ export function BusinessRegistrationDialog(
         ...data,
         businessRegistrationImageName: savedBusinessRegistrationImageName,
         mailOrderSalesImageName: savedMailOrderSalesImageName,
+      });
+
+      await historyMutation({
+        type: 'businessRegistration',
+        status: 'waiting',
       });
 
       toast({

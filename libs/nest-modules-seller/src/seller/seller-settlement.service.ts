@@ -9,13 +9,14 @@ import {
   SellType,
   Seller,
   InactiveBusinessRegistrationConfirmation,
+  SellerSettlementConfirmHistory,
 } from '@prisma/client';
 import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BusinessRegistrationDto,
   ExecuteSettlementDto,
-  FindSettlementHistoryRoundRes,
+  SellerSettlementConfirmHistoryDto,
   FmExport,
   SellerBusinessRegistrationType,
   SettlementAccountDto,
@@ -527,6 +528,33 @@ export class SellerSettlementService extends ServiceBaseWithCache {
         seller: { include: { sellerShop: true } },
         settlementItems: { include: { liveShopping: true } },
       },
+    });
+  }
+
+  public createSettlementConfirmHistory(
+    dto: SellerSettlementConfirmHistoryDto,
+    sellerId?: UserPayload['id'],
+  ): Promise<SellerSettlementConfirmHistory> {
+    return this.prisma.sellerSettlementConfirmHistory.create({
+      data: {
+        sellerId,
+        type: dto.type,
+        status: dto.status,
+      },
+    });
+  }
+
+  public getSettlementConfirmHistory(
+    sellerInfo: UserPayload,
+  ): Promise<SellerSettlementConfirmHistory[]> {
+    return this.prisma.sellerSettlementConfirmHistory.findMany({
+      where: {
+        sellerId: sellerInfo.id,
+      },
+      orderBy: {
+        createDate: 'desc',
+      },
+      take: 7,
     });
   }
 }

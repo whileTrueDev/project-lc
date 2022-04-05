@@ -24,6 +24,7 @@ import {
   GoodsConfirmation,
   LiveShopping,
   PrivacyApproachHistory,
+  SellerSettlementConfirmHistory,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -289,11 +290,23 @@ export class AdminController {
   /** 방송인 정산정보 검수상태, 사유 수정 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch('/settlement-info/broadcaster/confirmation')
-  setBroadcasterSettlementInfoConfirmation(
+  async setBroadcasterSettlementInfoConfirmation(
     @Body()
     dto: BroadcasterSettlementInfoConfirmationDto,
   ): Promise<boolean> {
     return this.adminSettlementService.setBroadcasterSettlementInfoConfirmation(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('/settlement-info/confirmation/history')
+  createSettlementConfirmHistory(@Body() dto): Promise<SellerSettlementConfirmHistory> {
+    return this.sellerSettlementService.createSettlementConfirmHistory(
+      {
+        type: dto.type,
+        status: dto.status,
+      },
+      dto.sellerId,
+    );
   }
 
   /** 전체 판매자 계정 목록 조회 */

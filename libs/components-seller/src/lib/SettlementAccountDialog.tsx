@@ -13,6 +13,7 @@ import {
   SettlementInfoRefetchType,
   useProfile,
   useSettlementAccountMutation,
+  useSellerSettlementHistoryMutation,
 } from '@project-lc/hooks';
 import { SettlementAccountDto } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
@@ -37,6 +38,7 @@ export function SettlementAccountDialog(
   const { data: profileData } = useProfile();
   const toast = useToast();
   const mutation = useSettlementAccountMutation();
+  const { mutateAsync: historyMutation } = useSellerSettlementHistoryMutation();
 
   const methods = useForm<SettlementAccountFormDto>();
   const {
@@ -70,6 +72,13 @@ export function SettlementAccountDialog(
         ...data,
         settlementAccountImageName: savedSettlementAccountImageName,
       });
+
+      if (profileData?.type === 'seller') {
+        await historyMutation({
+          type: 'settlementAccount',
+          status: 'waiting',
+        });
+      }
 
       if (!settlementAccount) {
         throw Error('정산 계좌 등록 실패');

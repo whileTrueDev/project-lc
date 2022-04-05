@@ -10,24 +10,25 @@ datasource db {
 }
 
 model Seller {
-  id                         Int                          @id @default(autoincrement())
-  email                      String?                      @unique
-  name                       String?
-  password                   String?
-  goods                      Goods[]
-  goodsCommonInfo            GoodsInfo[] // 상품공통정보
-  sellerBusinessRegistration SellerBusinessRegistration[]
-  sellerSettlementAccount    SellerSettlementAccount[]
-  sellerShop                 SellerShop?
-  sellerSettlements          SellerSettlements[]
-  socialAccounts             SellerSocialAccount[]
-  shippingGroups             ShippingGroup[]
-  SellerContacts             SellerContacts[]
-  LiveShopping               LiveShopping[]
-  OrderCancelRequests        SellerOrderCancelRequest[] // 판매자의 결제취소요청
-  avatar                     String?
-  agreementFlag              Boolean                      @default(false) // 이용동의 
-  inactiveFlag               Boolean                      @default(false)
+  id                             Int                              @id @default(autoincrement())
+  email                          String?                          @unique
+  name                           String?
+  password                       String?
+  goods                          Goods[]
+  goodsCommonInfo                GoodsInfo[] // 상품공통정보
+  sellerBusinessRegistration     SellerBusinessRegistration[]
+  sellerSettlementAccount        SellerSettlementAccount[]
+  sellerShop                     SellerShop?
+  sellerSettlements              SellerSettlements[]
+  socialAccounts                 SellerSocialAccount[]
+  shippingGroups                 ShippingGroup[]
+  SellerContacts                 SellerContacts[]
+  LiveShopping                   LiveShopping[]
+  OrderCancelRequests            SellerOrderCancelRequest[] // 판매자의 결제취소요청
+  SellerSettlementConfirmHistory SellerSettlementConfirmHistory[] // 판매자 서류 승인/반려 히스토리
+  avatar                         String?
+  agreementFlag                  Boolean                          @default(false) // 이용동의 
+  inactiveFlag                   Boolean                          @default(false)
 }
 
 // 마케터의 상정정보
@@ -1117,4 +1118,19 @@ model Manual {
   linkPageRouterPath String? // 연결될 마이페이지 routerPath (MypageLink의 href)
   createDate         DateTime @default(now())
   updateDate         DateTime @default(now()) @updatedAt
+}
+
+enum SellerPaperType {
+  settlementAccount
+  businessRegistration
+  mailOrder
+}
+
+model SellerSettlementConfirmHistory {
+  id         Int                        @id @default(autoincrement())
+  sellerId   Int
+  type       SellerPaperType
+  status     BusinessRegistrationStatus
+  createDate DateTime                   @default(now())
+  seller     Seller                     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 }
