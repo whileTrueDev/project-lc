@@ -15,6 +15,7 @@ import { KkshowShoppingTabGoodsData } from '@project-lc/shared-types';
 import { getDiscountedRate, getLocaleNumber } from '@project-lc/utils-frontend';
 import { HTMLMotionProps, motion } from 'framer-motion';
 import Link from 'next/link';
+import { useMemo } from 'react';
 
 interface GoodsDisplayDetailProps {
   goods: KkshowShoppingTabGoodsData;
@@ -25,34 +26,41 @@ export const GoodsDisplayDetail = ({
   goods,
   fontSize = { base: 'md', md: 'lg' },
   noOfLines = 1,
-}: GoodsDisplayDetailProps): JSX.Element => (
-  <Box minH={20}>
-    <Heading
-      fontSize={fontSize}
-      fontWeight="medium"
-      noOfLines={goods.discountedPrice ? noOfLines : 2}
-    >
-      {goods.name}
-    </Heading>
-    {goods.discountedPrice ? (
-      <Text textDecor="line-through" color="gray.500" fontSize={{ base: 'sm', md: 'md' }}>
-        {getLocaleNumber(goods.normalPrice)}
-      </Text>
-    ) : null}
+}: GoodsDisplayDetailProps): JSX.Element => {
+  const isDiscounted = useMemo(() => goods.discountedPrice, [goods.discountedPrice]);
+  return (
+    <Box minH={20}>
+      <Heading
+        fontSize={fontSize}
+        fontWeight="medium"
+        noOfLines={isDiscounted ? noOfLines : 2}
+      >
+        {goods.name}
+      </Heading>
+      {isDiscounted ? (
+        <Text
+          textDecor="line-through"
+          color="gray.500"
+          fontSize={{ base: 'sm', md: 'md' }}
+        >
+          {getLocaleNumber(goods.normalPrice)}
+        </Text>
+      ) : null}
 
-    <Heading fontSize={{ base: 'md', md: 'xl' }}>
-      {goods.discountedPrice && (
-        <Heading as="span" color="red" fontSize={{ base: 'md', md: 'xl' }}>
-          {getDiscountedRate(goods.normalPrice, goods.discountedPrice)}%
-        </Heading>
-      )}{' '}
-      {goods.discountedPrice
-        ? getLocaleNumber(goods.discountedPrice)
-        : getLocaleNumber(goods.normalPrice)}
-      원
-    </Heading>
-  </Box>
-);
+      <Heading fontSize={{ base: 'md', md: 'xl' }}>
+        {isDiscounted && goods.discountedPrice ? (
+          <Heading as="span" color="red" fontSize={{ base: 'md', md: 'xl' }}>
+            {getDiscountedRate(goods.normalPrice, goods.discountedPrice)}%
+          </Heading>
+        ) : null}{' '}
+        {isDiscounted
+          ? getLocaleNumber(goods.discountedPrice)
+          : getLocaleNumber(goods.normalPrice)}
+        원
+      </Heading>
+    </Box>
+  );
+};
 
 export const GoodsDisplayArrowIcon = (): JSX.Element => (
   <Icon

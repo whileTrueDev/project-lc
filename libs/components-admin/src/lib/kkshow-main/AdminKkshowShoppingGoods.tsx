@@ -113,7 +113,11 @@ export function AdminKkshowShoppingGoods({
             <FormLabel minW={42} m={0} htmlFor="할인가" fontSize="xs">
               할인가
             </FormLabel>
-            <Input {...register(`${type}.${index}.discountedPrice`)} type="number" />
+            <Input
+              {...register(`${type}.${index}.discountedPrice`)}
+              type="number"
+              placeholder="할인하지 않는 경우 비워두세요"
+            />
           </FormControl>
         </Stack>
       </Flex>
