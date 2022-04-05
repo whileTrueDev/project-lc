@@ -71,6 +71,7 @@ export function SearchBox(): JSX.Element {
       <Input
         value={keyword}
         ref={initialRef}
+        autoFocus
         variant="outline"
         placeholder="검색어를 입력하세요"
         rounded="md"

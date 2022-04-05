@@ -2,7 +2,7 @@ import { InputGroup } from '@chakra-ui/react';
 import { SearchPopover } from './SearchPopover';
 import { SearchBox } from './SearchBox';
 
-export function GlobalSearcher(): JSX.Element {
+export function DefaultSearcher(): JSX.Element {
   return (
     <>
       <InputGroup
@@ -17,4 +17,4 @@ export function GlobalSearcher(): JSX.Element {
     </>
   );
 }
-export default GlobalSearcher;
+export default DefaultSearcher;
