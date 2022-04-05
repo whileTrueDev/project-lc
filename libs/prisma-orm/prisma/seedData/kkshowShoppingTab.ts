@@ -4,13 +4,19 @@ export const kkshowShoppingTabDummyData = {
     {
       linkUrl: 'https://k-kmarket.com/',
       imageUrl:
-        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1648450169387_banner-1.png',
+        'https://project-lc-dev-test.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1649138023040_banner-1.png',
       description: '',
     },
     {
       linkUrl: 'https://k-kmarket.com/',
       imageUrl:
-        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1648450177223_banner-2.png',
+        'https://project-lc-dev-test.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1649138031589_banner-2.png',
+      description: '',
+    },
+    {
+      linkUrl: 'https://k-kmarket.com/',
+      imageUrl:
+        'https://project-lc-dev-test.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1649138041072_banner-3.png',
       description: '',
     },
   ],
