@@ -1,8 +1,8 @@
-import { NestFactory } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { AppMailService } from './app/app-mail.service';
 import { AppModule } from './app/app.module';
 import { AppService } from './app/app.service';
-import { AppMailService } from './app/app-mail.service';
 
 async function bootstrap(): Promise<void> {
   const logger: Logger = new Logger('MailerTaskService');
@@ -20,13 +20,15 @@ async function bootstrap(): Promise<void> {
   logger.log('Finish: Searching Login History');
 
   await Promise.all([
-    mailTargets.forEach((user) => {
+    mailTargets.map((user) => {
       if (user.timeDiff === 366) {
-        appService.moveInactiveUserData(user);
+        return appService.moveInactiveUserData(user);
       }
+      return null;
     }),
     appMailService.sendMail(mailTargets),
   ]);
+
   logger.log('Job Done');
 
   await app.close();
