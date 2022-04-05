@@ -38,7 +38,7 @@ export function KkshowMainBestBroadcaster(): JSX.Element | null {
             {data.bestBroadcaster.map((x) => (
               <SwiperSlide
                 key={`${x.nickname}_${x.broadcasterId}`}
-                style={{ maxWidth: 190, paddingBottom: 24 }}
+                style={{ maxWidth: 190, width: '45%', paddingBottom: 24 }}
               >
                 <BestBroadcasterItem
                   avatarUrl={x.profileImageUrl}
@@ -63,6 +63,7 @@ export function BestBroadcasterItem(props: BestBroadcasterItemProps): JSX.Elemen
   return (
     <LinkBox outline="none">
       <Stack
+        outline="none"
         textAlign="center"
         justify="center"
         align="center"

@@ -49,7 +49,15 @@ export function KkshowLiveTeaser(): JSX.Element | null {
           whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
           viewport={{ once: true, amount: 0.5 }}
         >
-          <Flex w={300} h={300} boxShadow="xl" borderRadius="2xl" position="relative">
+          <Flex
+            maxW={300}
+            maxH={300}
+            w="90%"
+            h="90%"
+            boxShadow="xl"
+            borderRadius="2xl"
+            position="relative"
+          >
             <Image borderRadius="2xl" w="100%" h="100%" src={data.trailer.imageUrl} />
             <BorderedAvatar
               display={{ base: 'flex', lg: 'none' }}
