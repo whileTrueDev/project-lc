@@ -1054,6 +1054,7 @@ model PrivacyApproachHistory {
   ip         String // 접근한 ip주소
   infoType   PrivacyApproachHistoryInfoType
   actionType PrivacyApproachHistoryActionType
+  reason     String? // 다운로드 사유
   createDate DateTime                         @default(now())
 }
 
@@ -1121,16 +1122,16 @@ model Manual {
 }
 
 enum SellerPaperType {
-  settlementAccount
-  businessRegistration
-  mailOrder
+  settlementAccount // 계좌
+  businessRegistration //사업자등록증
+  mailOrder // 통신판매업증
 }
 
 model SellerSettlementConfirmHistory {
   id         Int                        @id @default(autoincrement())
   sellerId   Int
-  type       SellerPaperType
-  status     BusinessRegistrationStatus
+  type       SellerPaperType // 서류 종류
+  status     BusinessRegistrationStatus // 검수상태
   createDate DateTime                   @default(now())
   seller     Seller                     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 }

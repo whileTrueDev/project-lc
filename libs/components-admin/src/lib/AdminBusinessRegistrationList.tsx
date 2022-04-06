@@ -13,9 +13,10 @@ import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useDisplaySize, useAdminSettlementInfo } from '@project-lc/hooks';
 import { BusinessRegistrationStatus } from '@project-lc/shared-types';
 import { useState, ChangeEvent } from 'react';
+import { s3KeyType } from '@project-lc/utils-s3';
 import { AdminBusinessRegistrationConfirmationDialog } from './AdminBusinessRegistrationConfirmationDialog';
 import { AdminBusinessRegistrationRejectionDialog } from './AdminBusinessRegistrationRejectionDialog';
-import { AdminImageDownloadButton } from './AdminImageDownloadButton';
+import { AdminImageDownloadModal } from './AdminImageDownloadModal';
 
 const columns: GridColumns = [
   {
@@ -67,9 +68,7 @@ const columns: GridColumns = [
   {
     field: 'businessRegistrationImageName',
     headerName: '사업자등록증',
-    renderCell: (params) => (
-      <AdminImageDownloadButton row={params.row} type="business-registration" />
-    ),
+    renderCell: () => <Button size="xs">다운로드</Button>,
     minWidth: 150,
   },
   {
@@ -80,9 +79,7 @@ const columns: GridColumns = [
   {
     field: 'mailOrderSalesImageName',
     headerName: '통신판매업등록증',
-    renderCell: (params) => (
-      <AdminImageDownloadButton row={params.row} type="mail-order" />
-    ),
+    renderCell: () => <Button size="xs">다운로드</Button>,
     minWidth: 160,
   },
   {
@@ -169,6 +166,7 @@ export function AdminBusinessRegistrationList(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { data: settlementData } = useAdminSettlementInfo();
   const [selectedRow, setSelectedRow] = useState({});
+  const [selectedType, setSelectedType] = useState<s3KeyType>('business-registration');
   const {
     isOpen: isConfirmationOpen,
     onOpen: onConfirmationOpen,
@@ -181,6 +179,12 @@ export function AdminBusinessRegistrationList(): JSX.Element {
     onClose: onRejectionClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isDownloadOpen,
+    onClose: onDownloadClose,
+    onOpen: onDownloadOpen,
+  } = useDisclosure();
+
   const handleClick = async (param: GridCellParams): Promise<void> => {
     if (param.field === 'confirmation') {
       setSelectedRow(param.row);
@@ -189,6 +193,16 @@ export function AdminBusinessRegistrationList(): JSX.Element {
     if (param.field === 'rejection') {
       setSelectedRow(param.row);
       onRejectionOpen();
+    }
+    if (param.field === 'businessRegistrationImageName') {
+      setSelectedRow(param.row);
+      setSelectedType('business-registration');
+      onDownloadOpen();
+    }
+    if (param.field === 'mailOrderSalesImageName') {
+      setSelectedRow(param.row);
+      setSelectedType('mail-order');
+      onDownloadOpen();
     }
     // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
   };
@@ -251,6 +265,12 @@ export function AdminBusinessRegistrationList(): JSX.Element {
       <AdminBusinessRegistrationConfirmationDialog
         isOpen={isConfirmationOpen}
         onClose={onConfirmationClose}
+        row={selectedRow}
+      />
+      <AdminImageDownloadModal
+        isOpen={isDownloadOpen}
+        onClose={onDownloadClose}
+        type={selectedType}
         row={selectedRow}
       />
     </>

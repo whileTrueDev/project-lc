@@ -1,4 +1,4 @@
-import { IsEnum } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import {
   PrivacyApproachHistoryActionType,
   PrivacyApproachHistoryInfoType,
@@ -10,4 +10,8 @@ export class PrivacyApproachHistoryDto {
 
   @IsEnum(PrivacyApproachHistoryActionType)
   actionType: PrivacyApproachHistoryActionType;
+
+  @IsOptional()
+  @IsString()
+  reason?: string;
 }

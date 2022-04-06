@@ -6,10 +6,11 @@ import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useAdminBroadcasterSettlementInfoList, useDisplaySize } from '@project-lc/hooks';
 import { BroadcasterSettlementInfoListRes } from '@project-lc/shared-types';
 import { useState } from 'react';
+import { s3KeyType } from '@project-lc/utils-s3';
 import AdminBroadcasterSettlementInfoConfirmationDialog from './AdminBroadcasterSettlementInfoConfirmationDialog';
 import AdminBroadcasterSettlementInfoRejectionDialog from './AdminBroadcasterSettlementInfoRejectionDialog';
 import { ConfirmationBadge, makeListRow } from './AdminBusinessRegistrationList';
-import { AdminImageDownloadButton } from './AdminImageDownloadButton';
+import { AdminImageDownloadModal } from './AdminImageDownloadModal';
 
 const columns: GridColumns = [
   {
@@ -54,9 +55,7 @@ const columns: GridColumns = [
   {
     field: 'idCardImageName',
     headerName: '주민등록증',
-    renderCell: (params) => (
-      <AdminImageDownloadButton row={params.row} type="broadcaster-id-card" />
-    ),
+    renderCell: () => <Button size="xs">다운로드</Button>,
     minWidth: 150,
   },
   {
@@ -77,9 +76,7 @@ const columns: GridColumns = [
   {
     field: 'accountImageName',
     headerName: '통장사본',
-    renderCell: (params) => (
-      <AdminImageDownloadButton row={params.row} type="broadcaster-account-image" />
-    ),
+    renderCell: () => <Button size="xs">다운로드</Button>,
     minWidth: 150,
   },
   {
@@ -103,6 +100,8 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
   const { data, isLoading } = useAdminBroadcasterSettlementInfoList();
 
   const [selectedRow, setSelectedRow] = useState({});
+  const [selectedType, setSelectedType] = useState<s3KeyType>('broadcaster-id-card');
+
   const {
     isOpen: isConfirmationOpen,
     onOpen: onConfirmationOpen,
@@ -115,6 +114,12 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
     onClose: onRejectionClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isDownloadOpen,
+    onClose: onDownloadClose,
+    onOpen: onDownloadOpen,
+  } = useDisclosure();
+
   const handleClick = async (param: GridCellParams): Promise<void> => {
     if (param.field === 'confirmation') {
       setSelectedRow(param.row);
@@ -123,6 +128,16 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
     if (param.field === 'rejection') {
       setSelectedRow(param.row);
       onRejectionOpen();
+    }
+    if (param.field === 'idCardImageName') {
+      setSelectedRow(param.row);
+      setSelectedType('broadcaster-id-card');
+      onDownloadOpen();
+    }
+    if (param.field === 'accountImageName') {
+      setSelectedRow(param.row);
+      setSelectedType('broadcaster-account-image');
+      onDownloadOpen();
     }
   };
   return (
@@ -151,6 +166,12 @@ export function AdminBroadcasterSettlementInfoList(): JSX.Element {
       <AdminBroadcasterSettlementInfoConfirmationDialog
         isOpen={isConfirmationOpen}
         onClose={onConfirmationClose}
+        row={selectedRow}
+      />
+      <AdminImageDownloadModal
+        isOpen={isDownloadOpen}
+        onClose={onDownloadClose}
+        type={selectedType}
         row={selectedRow}
       />
     </>

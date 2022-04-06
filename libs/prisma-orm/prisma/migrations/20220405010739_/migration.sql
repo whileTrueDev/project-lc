@@ -11,3 +11,6 @@ CREATE TABLE `SellerSettlementConfirmHistory` (
 
 -- AddForeignKey
 ALTER TABLE `SellerSettlementConfirmHistory` ADD CONSTRAINT `SellerSettlementConfirmHistory_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AlterTable
+ALTER TABLE `PrivacyApproachHistory` ADD COLUMN `reason` VARCHAR(191) NULL;
