@@ -1,5 +1,5 @@
 /* 좌측 상단 랭킹 */
-.ranking-area.spring {
+.ranking-area.chicken {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -7,13 +7,13 @@
   position: absolute;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 211, 225, 0.5);
+  background-color: rgba(38, 147, 66, 0.5);
   z-index: 1;
   border-radius: 10px;
 }
 
 /*랭킹 타이틀*/
-.ranking-text-area.spring#title {
+.ranking-text-area.chicken#title {
   font-family: 'BLACK-GOTHIC';
   height: 15%;
   justify-content: center;
@@ -22,22 +22,22 @@
   margin-bottom: 0;
   font-size: 45px;
   color: #ffffff;
-  text-shadow: 5px 5px 10px #ea4867;
+  text-shadow: 5px 5px 10px rgba(80, 100, 66, 0.5);;
   -webkit-text-stroke: 1px rgb(85, 85, 83);
 }
 /* 좌측 하단 타이머 영역*/
-.bottom-area-left.spring {
+.bottom-area-left.chicken {
   width: 400px;
   height: 100%;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  background-color: rgba(255, 211, 225, 0.5);
+  background-color: rgba(38, 147, 66, 0.5);
   border-radius: 10px;
 }
 
-.bottom-timer.spring {
+.bottom-timer.chicken {
   width: 50%;
   margin-right: 8%;
   display: flex;

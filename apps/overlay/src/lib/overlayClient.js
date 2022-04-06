@@ -8,7 +8,6 @@ const iterateLimit = $('#primary-info').data('number') + 1;
 const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const email = $('#primary-info').data('email');
 const bucketName = $('#primary-info').data('bucket-name');
-let currentThemeType = '';
 
 let streamerAndProduct;
 let startDate = new Date('2021-09-27T14:05:00+0900');
@@ -740,29 +739,30 @@ socket.on('refresh ranking from server', () => {
 });
 
 socket.on('change theme from server', (themeType) => {
-  currentThemeType = themeType;
   switch (themeType) {
     case 'spring':
-      $(`.${themeType}`)
-        .removeClass(currentThemeType)
-        .delay(1000)
-        .queue(function (next) {
-          $(
-            '.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left',
-          ).addClass(themeType);
-          $('#podium').attr('src', '/images/cherry-blossom-tree.png');
-        });
+      $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
+        themeType,
+      );
+      $('#podium').attr('src', '/images/cherry-blossom-tree.png');
+      $('#kks-logo').attr('src', '/images/kks-spring-logo.png');
+      $('.live-commerce').append(
+        `<img src="/images/top-left-cherry-blossom.png" style="position:absolute;top:0px;left:0px;" alt="top-left"/>`,
+        `<img src="/images/bottom-right-cherry-blossom.png" style="position:absolute;bottom:0px;right:0px;" alt="right-bottom"/>`,
+      );
       break;
     case 'summer':
-      $(`.${themeType}`)
-        .removeClass(currentThemeType)
-        .delay(1000)
-        .queue(function (next) {
-          $(
-            '.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left',
-          ).addClass(themeType);
-          $('#podium').attr('src', '/images/cherry-blossom-tree.png');
-        });
+      $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
+        themeType,
+      );
+      // $('#podium').attr('src', '/images/cherry-blossom-tree.png');
+      break;
+    case 'chicken':
+      $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
+        themeType,
+      );
+      $('#podium').attr('src', '/images/chicken-head.png');
+      $('.bottom-area-left-icon').attr('src', '/images/egg.png');
       break;
     default:
       console.log('default');
