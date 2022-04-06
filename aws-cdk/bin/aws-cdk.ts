@@ -79,10 +79,8 @@ new LCRedisStack(app, 'LC-PROD-REDIS', {
 });
 
 // 프라이빗 앱 (mailer)
-const prodPrivateAppStack = new LCProdPrivateAppStack(app, 'LC-PROD-PRIVATE-APP', {
-  vpc: prodVpcStack.vpc,
+new LCProdPrivateAppStack(app, 'LC-PROD-PRIVATE-APP', {
   cluster: prodAppStack.cluster,
-  albSecGrp: prodVpcStack.privateAlbSecGrp,
   mailerSecGrp: prodVpcStack.mailerSecGrp,
 });
 
@@ -98,5 +96,4 @@ new LCBatchAppStack(app, 'LC-PROD-BATCH-APP', {
 new LCDomainStack(app, 'LC-DOMAIN', {
   devALB: devAppStack.alb,
   prodALB: prodAppStack.alb,
-  prodPrivateAlb: prodPrivateAppStack.privateAlb,
 });
