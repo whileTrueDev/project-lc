@@ -15,10 +15,10 @@ export function KkshowLayout({ children }: KkshowLayoutProps): JSX.Element {
     <Box>
       <KkshowNavbar />
       {children}
-      <BottomQuickMenu />
       <MobileSearchDrawer />
       <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />
+      <BottomQuickMenu />
     </Box>
   );
 }
