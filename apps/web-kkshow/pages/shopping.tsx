@@ -1,6 +1,5 @@
 import { Box } from '@chakra-ui/react';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
-import KKshowMainExternLinks from '@project-lc/components-web-kkshow/main/KKshowMainExternLinks';
 import { ShoppingCarousel } from '@project-lc/components-web-kkshow/shopping/ShoppingCarousel';
 import { ShoppingEventBanner } from '@project-lc/components-web-kkshow/shopping/ShoppingEventBanner';
 import { ShoppingGoodsOfTheWeek } from '@project-lc/components-web-kkshow/shopping/ShoppingGoodsOfTheWeek';
@@ -43,8 +42,6 @@ export default function Shopping(): JSX.Element {
         <ShoppingRecommendations />
         <ShoppingReviews />
         <ShoppingKeywords />
-
-        <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       </KkshowLayout>
     </Box>
   );
