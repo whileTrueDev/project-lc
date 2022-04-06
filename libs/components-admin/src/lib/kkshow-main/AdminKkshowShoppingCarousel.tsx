@@ -52,6 +52,10 @@ export function AdminKkshowShoppingCarousel({
 
   return (
     <Box>
+      <Text>
+        Tip. 캐러셀 이미지의 크기는 가로 1000px, 세로 500px 으로 구성하는 것이
+        바람직합니다.
+      </Text>
       <Flex gap={3} mt={3}>
         <Box textAlign="center">
           <FieldHeader header="순서" />

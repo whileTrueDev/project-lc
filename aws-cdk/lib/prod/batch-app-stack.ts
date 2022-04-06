@@ -44,10 +44,7 @@ export class LCBatchAppStack extends Stack {
       repositoryName: constants.PROD.ECS_INACTIVE_BATCH_FAMILY_NAME,
       lifecycleRules: [
         { maxImageCount: 1, tagStatus: TagStatus.ANY },
-        {
-          maxImageAge: Duration.days(1),
-          tagStatus: TagStatus.UNTAGGED,
-        },
+        { maxImageAge: Duration.days(1), tagStatus: TagStatus.UNTAGGED },
       ],
     });
 
@@ -62,6 +59,11 @@ export class LCBatchAppStack extends Stack {
         DATABASE_URL: Secret.fromSsmParameter(
           loadSsmParam(this, `${prefix}ParamDBUrl`, {
             parameterName: constants.PROD.DATABASE_URL_KEY,
+          }),
+        ),
+        MQ_REDIS_URL: Secret.fromSsmParameter(
+          loadSsmParam(this, `${prefix}MQ_REDIS_URL`, {
+            parameterName: constants.PROD.MQ_REDIS_URL_KEY,
           }),
         ),
       },

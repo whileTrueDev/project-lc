@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["native"]
-  previewFeatures = ["interactiveTransactions"]
+  previewFeatures = ["interactiveTransactions", "fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -215,6 +215,7 @@ model Goods {
   LiveShopping     LiveShopping[]
   productPromotion ProductPromotion[] // 하나의 상품이 여러개 홍보아이템 등록될 수 있음
   @@index([sellerId], name: "sellerId")
+  @@fulltext([goods_name])
 }
 
 model GoodsConfirmation {
@@ -502,6 +503,8 @@ model Broadcaster {
   BroadcasterSettlements      BroadcasterSettlements[]
   BroadcasterPromotionPage    BroadcasterPromotionPage? // 방송인 상품홍보
   inactiveFlag                Boolean                       @default(false)
+
+  @@fulltext([userNickname])
 }
 
 // 방송인 소셜로그인 계정
@@ -1095,4 +1098,23 @@ model KkshowShoppingTab {
   recommendations Json // 쇼핑탭 크크마켓 추천상품 영역 아이템[]
   reviews         Json // 쇼핑탭 생생후기 영역 아이템[]
   keywords        Json // 쇼핑탭 테마별 키워드 영역 아이템[]
+}
+
+enum UserType {
+  seller // 판매자
+  broadcaster // 방송인
+}
+
+// 이용안내
+model Manual {
+  id                 Int      @id @default(autoincrement())
+  target             UserType // seller | broadcaster
+  mainCategory       String // 해당 항목이 속하는 대분류 - 마이페이지/페이지 구분과 유사 (예: 상품, 라이브커머스)
+  title              String // 이용안내 제목(예: 상품 등록, 라이브커머스 등록)
+  description        String // 해당 항목에 대한 짧은 설명 (예: 크크쇼에 상품을 등록하는 방법입니다.)
+  order              Int // 항목 내에서 이용안내 표시될 순서
+  contents           String   @db.Text // 이용안내 내용
+  linkPageRouterPath String? // 연결될 마이페이지 routerPath (MypageLink의 href)
+  createDate         DateTime @default(now())
+  updateDate         DateTime @default(now()) @updatedAt
 }

@@ -7,10 +7,16 @@ import {
   FcFaq,
   FcSms,
   FcAdvertising,
+  FcCloseUpMode,
   FcBiohazard,
 } from 'react-icons/fc';
 
-import { AiOutlineShop, AiOutlineHome, AiOutlineSetting } from 'react-icons/ai';
+import {
+  AiOutlineShop,
+  AiOutlineHome,
+  AiOutlineSetting,
+  AiOutlineContainer,
+} from 'react-icons/ai';
 import { BsBox } from 'react-icons/bs';
 import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
 import { IconType } from 'react-icons/lib';
@@ -121,16 +127,22 @@ export const mypageNavLinks: MypageLink[] = [
     checkIsActive: defaultIsActiveChecker,
   },
   {
+    icon: AiOutlineContainer,
+    name: '이용안내',
+    href: '/mypage/manual',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
     icon: AiOutlineShop,
     name: '상점설정',
     href: '/mypage/shopinfo',
     checkIsActive: defaultIsActiveChecker,
   },
   {
-    name: '계정 설정',
+    icon: AiOutlineSetting,
+    name: '계정설정',
     href: '/mypage/setting',
     checkIsActive: defaultIsActiveChecker,
-    isInvisible: true,
   },
   {
     name: '등록',
@@ -181,6 +193,12 @@ export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
     icon: MdPayment,
     name: '정산',
     href: '/mypage/settlement',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    icon: AiOutlineContainer,
+    name: '이용안내',
+    href: '/mypage/manual',
     checkIsActive: defaultIsActiveChecker,
   },
   {
@@ -260,6 +278,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
         name: '이용정책, 개인정보처리방침',
         href: '/general/policy',
         icon: FcList,
+      },
+      {
+        name: '이용안내',
+        href: '/general/manual',
+        icon: FcCloseUpMode,
       },
     ],
   },

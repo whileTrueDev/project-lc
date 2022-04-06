@@ -21,6 +21,7 @@ import TextWithPopperButton from '@project-lc/components-core/TextWithPopperButt
 import { useProfile, useSellerGoodsList } from '@project-lc/hooks';
 import { GoodsByIdRes, SellerGoodsSortColumn } from '@project-lc/shared-types';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useState } from 'react';
@@ -29,10 +30,6 @@ import GoodsEditButton from './GoodsEditButton';
 import { GoodsExposeSwitch } from './GoodsExposeSwitch';
 import { ShippingGroupDetailModal } from './ShippingGroupDetailModal';
 
-function formatPrice(price: number): string {
-  const formattedPrice = price.toLocaleString();
-  return `${formattedPrice}원`;
-}
 function formatDate(date: Date): string {
   return dayjs(date).format('YYYY/MM/DD HH:mm');
 }
@@ -104,14 +101,14 @@ const columns: GridColumns = [
     field: 'default_price',
     headerName: '판매가',
     type: 'number',
-    valueFormatter: ({ row }) => formatPrice(Number(row.default_price)),
+    valueFormatter: ({ row }) => `${getLocaleNumber(row.default_price)}원`,
     sortable: false,
   },
   {
     field: 'default_consumer_price',
     headerName: '정가',
     type: 'number',
-    valueFormatter: ({ row }) => formatPrice(Number(row.default_consumer_price)),
+    valueFormatter: ({ row }) => `${getLocaleNumber(row.default_consumer_price)}원`,
     sortable: false,
   },
   /* [상품 옵션] 재고 기능 임시 제거 */

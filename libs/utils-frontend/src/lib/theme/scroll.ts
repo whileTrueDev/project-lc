@@ -3,7 +3,8 @@ import { mode } from '@chakra-ui/theme-tools';
 export const scrollStyle = (props: any): Record<string, any> => ({
   '@media only screen and (max-width: 768px)': {
     '::-webkit-scrollbar': {
-      width: '0px',
+      width: '0px', // vertical
+      height: '7px', // horizontal
       background: 'transparent',
     },
   },

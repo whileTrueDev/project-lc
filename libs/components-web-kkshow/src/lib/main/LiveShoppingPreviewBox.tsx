@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { BorderedAvatar } from '@project-lc/components-core/BorderedAvatar';
 import { RedLinedText } from '@project-lc/components-core/RedLinedText';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import Link from 'next/link';
 
 export interface LiveShoppingPreviewBoxProps {
@@ -93,7 +94,7 @@ export function LiveShoppingPreviewBox({
                 fontSize={{ base: 'sm', lg: 'md' }}
                 fontWeight="medium"
               >
-                {normalPrice.toLocaleString()}원
+                {getLocaleNumber(normalPrice)}원
               </RedLinedText>{' '}
               <Text
                 as="span"
@@ -101,7 +102,7 @@ export function LiveShoppingPreviewBox({
                 color="red"
                 fontWeight="bold"
               >
-                {discountedPrice.toLocaleString()}원
+                {getLocaleNumber(discountedPrice)}원
               </Text>
             </Heading>
           </Box>

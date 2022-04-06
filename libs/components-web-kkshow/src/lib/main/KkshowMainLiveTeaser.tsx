@@ -12,7 +12,7 @@ import BorderedAvatar from '@project-lc/components-core/BorderedAvatar';
 import MotionBox from '@project-lc/components-core/MotionBox';
 import RedLinedText from '@project-lc/components-core/RedLinedText';
 import { useKkshowMain } from '@project-lc/hooks';
-import { openKakaoChannel } from '@project-lc/utils-frontend';
+import { getLocaleNumber, openKakaoChannel } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { MdOutlineNotificationsActive } from 'react-icons/md';
 import KkshowMainTitle from './KkshowMainTitle';
@@ -49,7 +49,15 @@ export function KkshowLiveTeaser(): JSX.Element | null {
           whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
           viewport={{ once: true, amount: 0.5 }}
         >
-          <Flex w={300} h={300} boxShadow="xl" borderRadius="2xl" position="relative">
+          <Flex
+            maxW={300}
+            maxH={300}
+            w="90%"
+            h="90%"
+            boxShadow="xl"
+            borderRadius="2xl"
+            position="relative"
+          >
             <Image borderRadius="2xl" w="100%" h="100%" src={data.trailer.imageUrl} />
             <BorderedAvatar
               display={{ base: 'flex', lg: 'none' }}
@@ -129,10 +137,10 @@ export function KkshowLiveTeaser(): JSX.Element | null {
                 <Text as="span" color="red">
                   {discountRate}%
                 </Text>{' '}
-                {data.trailer.discountedPrice.toLocaleString()}원
+                {getLocaleNumber(data.trailer.discountedPrice)}원
                 <RedLinedText fontSize="md" as="span" fontWeight="normal">
                   {' '}
-                  ({data.trailer.normalPrice.toLocaleString()}원)
+                  ({getLocaleNumber(data.trailer.normalPrice)}원)
                 </RedLinedText>
               </Heading>
             </Box>

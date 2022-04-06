@@ -125,7 +125,8 @@ export function SidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element 
   return (
     <AccordionItem key={link.name} border="none" px={1}>
       <AccordionButton
-        py={3}
+        py={2.5}
+        my={0.5}
         textAlign="left"
         borderRadius="md"
         bg={isMatched ? 'blue.500' : 'none'}
@@ -185,6 +186,7 @@ function SidebarChildItem({
         pl={leftSpacing ? '44px' : 2}
         pr={2}
         py={3}
+        my={0.5}
         transition="all .3s ease"
       >
         {link.name}

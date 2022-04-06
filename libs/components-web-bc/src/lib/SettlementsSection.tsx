@@ -1,7 +1,7 @@
-import { Stack, Center, Link, VStack, Text } from '@chakra-ui/react';
-import { useEffect } from 'react';
-import NextLink from 'next/link';
+import { Center, Link, Stack, Text, VStack } from '@chakra-ui/react';
 import { guideConditionStore } from '@project-lc/stores';
+import NextLink from 'next/link';
+import { useEffect } from 'react';
 
 export function SettlementsSection(): JSX.Element {
   const { completeStep } = guideConditionStore();
@@ -40,13 +40,9 @@ export function SettlementsSection(): JSX.Element {
         </VStack>
       </Center>
       <Center>
-        <VStack spacing={1}>
-          <Text colorScheme="gray" fontWeight="thin">
-            가이드의 모든 과정을 완수하셨습니다.
-          </Text>
-          <Text colorScheme="gray" fontWeight="thin">
-            아래의 다음 버튼을 클릭하여 가이드를 완료해주세요.
-          </Text>
+        <VStack spacing={1} color="GrayText" textAlign="center">
+          <Text>가이드의 모든 과정을 완수하셨습니다.</Text>
+          <Text>아래의 다음 버튼을 클릭하여 가이드를 완료해주세요.</Text>
         </VStack>
       </Center>
     </Stack>

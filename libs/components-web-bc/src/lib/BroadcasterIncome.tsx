@@ -6,6 +6,7 @@ import {
   useBroadcasterReceivableSettlementAmount,
   useProfile,
 } from '@project-lc/hooks';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 
 /** 방송인 수익금 */
@@ -36,7 +37,7 @@ function BroadcasterReceivableAmountStat(): JSX.Element {
           <StatNumber>
             {!receivable.data?.amount
               ? '0 원'
-              : `${receivable.data?.amount.toLocaleString()} 원`}
+              : `${getLocaleNumber(receivable.data?.amount)} 원`}
           </StatNumber>
           {receivable.data?.startedAt && receivable.data?.endedAt && (
             <StatHelpText>
@@ -63,7 +64,7 @@ function BroadcasterAccumulatedSettlementAmountStat(): JSX.Element {
       {!acc.isLoading ? (
         <Box>
           <StatNumber>
-            {!acc.data ? '0 원' : `${acc.data?.toLocaleString()} 원`}
+            {!acc.data ? '0 원' : `${getLocaleNumber(acc.data)} 원`}
           </StatNumber>
         </Box>
       ) : (

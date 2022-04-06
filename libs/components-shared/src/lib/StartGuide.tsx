@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Box,
   Button,
   ButtonGroup,
   Modal,
@@ -74,25 +75,28 @@ export function StartGuide({
       <ModalContent>
         <ModalHeader>크크쇼 시작가이드</ModalHeader>
         <ModalCloseButton />
-        <ModalBody mx="5">
+        <ModalBody mx="5" position="relative" pt={0}>
           {/* 가이드 Stepper */}
           {introduction ? (
             <IntroSection />
           ) : (
             <>
-              <ChakraStepper
-                activeStep={activeStep}
-                alternativeLabel
-                style={{ paddingLeft: 0, paddingRight: 0 }}
-              >
-                {steps.map((step) => (
-                  <Step key={step.label}>
-                    <StepLabel>
-                      <Text fontSize="sm">{step.label}</Text>
-                    </StepLabel>
-                  </Step>
-                ))}
-              </ChakraStepper>
+              <Box position="sticky" top={0} bg="white" zIndex="docked">
+                <ChakraStepper
+                  activeStep={activeStep}
+                  alternativeLabel
+                  style={{ paddingLeft: 0, paddingRight: 0 }}
+                >
+                  {steps.map((step) => (
+                    <Step key={step.label}>
+                      <StepLabel>
+                        <Text fontSize="sm">{step.label}</Text>
+                      </StepLabel>
+                    </Step>
+                  ))}
+                </ChakraStepper>
+              </Box>
+
               {/* 단계별 컴포넌트 */}
               {getStepComponent(activeStep)}
             </>
