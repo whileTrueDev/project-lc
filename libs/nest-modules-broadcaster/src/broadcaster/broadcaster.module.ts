@@ -1,7 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
-import { S3Module } from '@project-lc/nest-modules-s3';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsController } from './broadcaster-contacts.controller';
@@ -41,12 +40,7 @@ export class BroadcasterModule {
     BroadcasterSettlementHistoryController,
   ];
 
-  private static readonly imports = [
-    PrismaModule,
-    S3Module,
-    CipherModule,
-    MailVerificationModule,
-  ];
+  private static readonly imports = [PrismaModule, CipherModule, MailVerificationModule];
 
   static withoutControllers(): DynamicModule {
     return {

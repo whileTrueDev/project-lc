@@ -7,9 +7,16 @@ import {
   FcFaq,
   FcSms,
   FcAdvertising,
+  FcCloseUpMode,
+  FcBiohazard,
 } from 'react-icons/fc';
 
-import { AiOutlineShop, AiOutlineHome, AiOutlineSetting } from 'react-icons/ai';
+import {
+  AiOutlineShop,
+  AiOutlineHome,
+  AiOutlineSetting,
+  AiOutlineContainer,
+} from 'react-icons/ai';
 import { BsBox } from 'react-icons/bs';
 import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
 import { IconType } from 'react-icons/lib';
@@ -41,13 +48,12 @@ export const mainNavItems: Array<NavItem> = [
 export const kkshowNavLinks: Array<NavItem> = [
   {
     label: '쇼핑',
-    href: 'https://k-kmarket.com/',
-    isExternal: true,
+    href: '/shopping',
   },
-  {
-    label: '방송인',
-    href: '/broadcasters',
-  },
+  // {
+  //   label: '방송인',
+  //   href: '/broadcasters',
+  // },
   // { label: '방송편성표', href: '/' },
   // { label: '방송인', href: '/' },
   // { label: 'SNS', href: '/' },
@@ -121,16 +127,22 @@ export const mypageNavLinks: MypageLink[] = [
     checkIsActive: defaultIsActiveChecker,
   },
   {
+    icon: AiOutlineContainer,
+    name: '이용안내',
+    href: '/mypage/manual',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
     icon: AiOutlineShop,
     name: '상점설정',
     href: '/mypage/shopinfo',
     checkIsActive: defaultIsActiveChecker,
   },
   {
-    name: '계정 설정',
+    icon: AiOutlineSetting,
+    name: '계정설정',
     href: '/mypage/setting',
     checkIsActive: defaultIsActiveChecker,
-    isInvisible: true,
   },
   {
     name: '등록',
@@ -181,6 +193,12 @@ export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
     icon: MdPayment,
     name: '정산',
     href: '/mypage/settlement',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    icon: AiOutlineContainer,
+    name: '이용안내',
+    href: '/mypage/manual',
     checkIsActive: defaultIsActiveChecker,
   },
   {
@@ -261,6 +279,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
         href: '/general/policy',
         icon: FcList,
       },
+      {
+        name: '이용안내',
+        href: '/general/manual',
+        icon: FcCloseUpMode,
+      },
     ],
   },
   {
@@ -271,6 +294,13 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '크크쇼 메인',
     href: '/kkshow-main',
-    children: [{ name: '크크쇼 메인페이지', href: '/kkshow-main', icon: FcList }],
+    children: [
+      { name: '크크쇼 메인페이지', href: '/kkshow-main', icon: FcList },
+      {
+        name: '크크쇼 쇼핑페이지',
+        href: '/kkshow-main/kkshow-shopping',
+        icon: FcBiohazard,
+      },
+    ],
   },
 ];

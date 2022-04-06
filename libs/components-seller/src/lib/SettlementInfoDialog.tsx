@@ -14,11 +14,12 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import { SettlementDoneItem } from '@project-lc/hooks';
-import { convertSellTypeToString, FmOrder } from '@project-lc/shared-types';
-import { calcPgCommission } from '@project-lc/utils';
-import { useMemo } from 'react';
 import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
+import { SettlementDoneItem } from '@project-lc/hooks';
+import { FmOrder } from '@project-lc/shared-types';
+import { calcPgCommission } from '@project-lc/utils';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
+import { useMemo } from 'react';
 import { LiveShopping, SellerSettlementItems } from '.prisma/client';
 
 export interface SettlementInfoDialogProps {
@@ -84,7 +85,7 @@ export function SettlementInfoDialog({
             <GridItem>
               <Stack>
                 <Text>총금액</Text>
-                <Text>{settlementInfo.totalPrice.toLocaleString()}</Text>
+                <Text>{getLocaleNumber(settlementInfo.totalPrice)}</Text>
               </Stack>
             </GridItem>
 
@@ -92,24 +93,24 @@ export function SettlementInfoDialog({
               <Stack spacing={1}>
                 <Text>수수료</Text>
                 <Text fontSize="sm">
-                  총수수료: {settlementInfo.totalCommission.toLocaleString()}
+                  총수수료: {getLocaleNumber(settlementInfo.totalCommission)}
                 </Text>
                 <Text fontSize="sm">
-                  전자결제수수료: {settlementInfo.pgCommission.toLocaleString()}
+                  전자결제수수료: {getLocaleNumber(settlementInfo.pgCommission)}
                 </Text>
                 {broadcasterCommission !== 0 && (
                   <Text fontSize="sm">
-                    방송인수수료: {broadcasterCommission.toLocaleString()}
+                    방송인수수료: {getLocaleNumber(broadcasterCommission)}
                   </Text>
                 )}
-                <Text fontSize="sm">크크쇼수수료: {wtCommission.toLocaleString()}</Text>
+                <Text fontSize="sm">크크쇼수수료: {getLocaleNumber(wtCommission)}</Text>
               </Stack>
             </GridItem>
 
             <GridItem>
               <Stack>
                 <Text>총 정산금액</Text>
-                <Text>{settlementInfo.totalAmount.toLocaleString()}</Text>
+                <Text>{getLocaleNumber(settlementInfo.totalAmount)}</Text>
               </Stack>
             </GridItem>
           </Grid>
@@ -197,16 +198,16 @@ export function SettlementInfoItem({
       <GridItem>개수</GridItem>
       <GridItem>{settlementItem.ea}</GridItem>
       <GridItem>개당 가격</GridItem>
-      <GridItem>{settlementItem.pricePerPiece.toLocaleString()}</GridItem>
+      <GridItem>{getLocaleNumber(settlementItem.pricePerPiece)}</GridItem>
       <GridItem>총 가격</GridItem>
-      <GridItem>{settlementItem.price.toLocaleString()}</GridItem>
+      <GridItem>{getLocaleNumber(settlementItem.price)}</GridItem>
       <GridItem>판매 유형</GridItem>
       <GridItem>
         <SellTypeBadge sellType={settlementItem.sellType} />
       </GridItem>
 
       <GridItem>전자결제수수료</GridItem>
-      <GridItem>{`${pgCommission.commission.toLocaleString()} (${
+      <GridItem>{`${getLocaleNumber(pgCommission.commission)} (${
         pgCommission.rate === '0'
           ? pgCommission.description
           : pgCommission.rate + pgCommission.description
@@ -215,7 +216,7 @@ export function SettlementInfoItem({
         <>
           <GridItem>방송인 수수료</GridItem>
           <GridItem>
-            {settlementItem.broadcasterCommission.toLocaleString()} (
+            {getLocaleNumber(settlementItem.broadcasterCommission)} (
             {settlementItem.broadcasterCommissionRate}
             %)
           </GridItem>
@@ -223,7 +224,7 @@ export function SettlementInfoItem({
       ) : null}
       <GridItem>크크쇼 수수료</GridItem>
       <GridItem>
-        {settlementItem.whiletrueCommission.toLocaleString()} (
+        {getLocaleNumber(settlementItem.whiletrueCommission)} (
         {settlementItem.whiletrueCommissionRate}
         %)
       </GridItem>

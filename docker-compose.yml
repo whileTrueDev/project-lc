@@ -12,6 +12,19 @@ services:
       - MYSQL_DATABASE=public
     ports:
       - "3306:3306"
+    command: --innodb_ft_min_token_size=1
+
+  
+  ###############
+  # REDIS as message broker
+  ###############
+  redis-message-broker:
+    platform: linux/x86_64
+    image: redis:6.2
+    container_name: redis-message-broker
+    ports:
+      - 6399:6379
+
 
   ###############
   # REDIS

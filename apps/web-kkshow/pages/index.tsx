@@ -1,11 +1,8 @@
 import { Box } from '@chakra-ui/react';
-import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
-import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
-import { KkshowNavbar } from '@project-lc/components-web-kkshow/KkshowNavbar';
+import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { KkshowMainBestBroadcaster } from '@project-lc/components-web-kkshow/main/KkshowMainBestBroadcaster';
 import { KkshowMainBestLive } from '@project-lc/components-web-kkshow/main/KkshowMainBestLive';
 import { KkshowMainCarousel } from '@project-lc/components-web-kkshow/main/KkshowMainCarousel';
-import { KKshowMainExternLinks } from '@project-lc/components-web-kkshow/main/KKshowMainExternLinks';
 import { KkshowLiveTeaser } from '@project-lc/components-web-kkshow/main/KkshowMainLiveTeaser';
 import { KkshowMainPlusFriend } from '@project-lc/components-web-kkshow/main/KkshowMainPlusFriend';
 import { getKkshowMain, kkshowMainQueryKey } from '@project-lc/hooks';
@@ -28,9 +25,9 @@ export const getStaticProps: GetStaticProps<KkshowIndexProps> = async () => {
   };
 };
 
-export function Index(): JSX.Element {
+export default function Index(): JSX.Element {
   return (
-    <Box pos="relative" overflow="hidden">
+    <Box overflow="hidden" position="relative">
       <Box
         display={{ base: 'none', md: 'block' }}
         pos="absolute"
@@ -42,46 +39,34 @@ export function Index(): JSX.Element {
         right={0}
         zIndex={1}
       />
-
       <Box
         pos="absolute"
         backgroundImage="images/main/bg-circle-2.png"
         backgroundSize="contain"
         w={{ base: 150, md: 250 }}
         h={{ base: 150, md: 250 }}
-        top={{ base: 470, md: 550 }}
+        top={{ base: 300, sm: 470, md: 550 }}
         left={-75}
         zIndex={1}
       />
-
       <Box
         pos="absolute"
         backgroundImage="images/main/bg-circle-3.png"
         backgroundSize="contain"
         w={{ base: 150, md: 300 }}
         h={{ base: 150, md: 300 }}
-        top={{ base: 600, md: 700 }}
+        top={{ base: 440, sm: 600, md: 700 }}
         right={{ base: -75, md: -150 }}
         zIndex={1}
       />
 
-      <KkshowNavbar />
-
-      <KkshowMainCarousel />
-
-      <KkshowLiveTeaser />
-
-      <KkshowMainBestLive />
-
-      <KkshowMainPlusFriend />
-
-      <KkshowMainBestBroadcaster />
-
-      <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
-
-      <CommonFooter footerLinkList={kkshowFooterLinkList} />
+      <KkshowLayout>
+        <KkshowMainCarousel />
+        <KkshowLiveTeaser />
+        <KkshowMainBestLive />
+        <KkshowMainPlusFriend />
+        <KkshowMainBestBroadcaster />
+      </KkshowLayout>
     </Box>
   );
 }
-
-export default Index;

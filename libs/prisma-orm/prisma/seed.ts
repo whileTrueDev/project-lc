@@ -28,6 +28,7 @@ import {
 } from './seedData/dummyData';
 import { termsData } from './seedData/terms';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
+import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
 
 const prisma = new PrismaClient();
 
@@ -257,12 +258,29 @@ async function generateInitialKkshowMainData(): Promise<void> {
   }
 }
 
+async function genereateInitialKkshowShoppingTabData(): Promise<void> {
+  const kkshowShoppingTabData = await prisma.kkshowShoppingTab.findFirst();
+
+  if (!kkshowShoppingTabData) {
+    await prisma.kkshowShoppingTab.create({
+      data: JSON.parse(JSON.stringify(kkshowShoppingTabDummyData)),
+    });
+  } else {
+    await prisma.kkshowShoppingTab.update({
+      where: { id: kkshowShoppingTabData.id },
+      data: JSON.parse(JSON.stringify(kkshowShoppingTabDummyData)),
+    });
+  }
+}
+
 /** 시드 메인 함수 */
 async function main(): Promise<void> {
   // 약관 데이터 저장
   await generateInitialTerms();
   // 크크쇼 메인 데이터 저장
   await generateInitialKkshowMainData();
+  // 크크쇼 쇼핑탭 데이터 저장
+  await genereateInitialKkshowShoppingTabData();
 
   // 판매 수수료 기본값 설정
   await generateDefaultSellCommission();

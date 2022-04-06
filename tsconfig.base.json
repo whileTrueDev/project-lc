@@ -41,6 +41,9 @@
       "@project-lc/nest-modules-kkshow-main": [
         "libs/nest-modules-kkshow-main/src/index.ts"
       ],
+      "@project-lc/nest-modules-kkshow-search": [
+        "libs/nest-modules-kkshow-search/src/index.ts"
+      ],
       "@project-lc/nest-modules-liveshopping": [
         "libs/nest-modules-liveshopping/src/index.ts"
       ],
@@ -48,6 +51,7 @@
       "@project-lc/nest-modules-mail-verification": [
         "libs/nest-modules-mail-verification/src/index.ts"
       ],
+      "@project-lc/nest-modules-manual": ["libs/nest-modules-manual/src/index.ts"],
       "@project-lc/nest-modules-notice": ["libs/nest-modules-notice/src/index.ts"],
       "@project-lc/nest-modules-notification": [
         "libs/nest-modules-notification/src/index.ts"
@@ -63,7 +67,6 @@
       "@project-lc/nest-modules-product-promotion": [
         "libs/nest-modules-product-promotion/src/index.ts"
       ],
-      "@project-lc/nest-modules-s3": ["libs/nest-modules-s3/src/index.ts"],
       "@project-lc/nest-modules-seller": ["libs/nest-modules-seller/src/index.ts"],
       "@project-lc/nest-modules-shipping-group": [
         "libs/nest-modules-shipping-group/src/index.ts"

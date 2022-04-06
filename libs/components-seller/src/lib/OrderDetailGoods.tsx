@@ -2,6 +2,7 @@ import { Badge, Box, Flex, Stack, Text } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
 import { FindFmOrderDetailRes } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
 
 export interface OrderDetailGoodsProps {
@@ -19,7 +20,7 @@ export function OrderDetailGoods({
       (p, c) => p + Number(c.price) * Number(c.ea),
       0,
     );
-    return `${reduced.toLocaleString()} 원`;
+    return `${getLocaleNumber(reduced)} 원`;
   }, [orderItem.options]);
 
   return (

@@ -1,10 +1,10 @@
 import { ColorMode, useColorMode } from '@chakra-ui/color-mode';
 import { Image, ImageProps } from '@chakra-ui/react';
 import { UserType } from '@project-lc/shared-types';
+import { s3 } from '@project-lc/utils-s3';
 import { useMemo } from 'react';
 
-export const LOGO_S3_PREFIX =
-  'https://lc-project.s3.ap-northeast-2.amazonaws.com/kksLogo/';
+export const LOGO_S3_PREFIX = `${s3.fullDomain}kksLogo/`;
 export const darkLogo = 'kksMainLogoDarkMode.png';
 export const darkBigLogo = 'kksMainLogoDarkModeBig.png';
 export const lightLogo = 'kksMainLogoLightMode.png';
@@ -17,9 +17,10 @@ export const sellerDarkLogo = 'kkshow-seller-darkmode.png';
 export const broadcasterLogo = 'kkshow-broadcaster-lightmode.png';
 export const broadcasterDarkLogo = 'kkshow-broadcaster-darkmode.png';
 
+export type KkshowLogoVariant = 'white' | 'dark' | 'light';
 export interface KksLogoProps extends ImageProps {
   appType?: UserType;
-  variant?: 'white' | 'dark';
+  variant?: KkshowLogoVariant;
 }
 
 interface GetCorrectLogoOption {
@@ -33,6 +34,7 @@ function getCorrectLogoInfo({
   variant,
 }: GetCorrectLogoOption): string {
   if (variant === 'white') return LOGO_S3_PREFIX + whiteLogo;
+  if (variant === 'light') return LOGO_S3_PREFIX + lightLogo;
   if (variant === 'dark') return LOGO_S3_PREFIX + darkLogo;
   switch (appType) {
     case 'broadcaster':

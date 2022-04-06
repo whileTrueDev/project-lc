@@ -45,10 +45,9 @@ new LCDevRedisStack(app, 'LC-DEV-REDIS', {
   redisSecGrp: devVpcStack.redisSecGrp,
 });
 // Dev 프라이빗 앱 (메일러, ...)
-const devPrivateAppStack = new LCDevPrivateAppStack(app, 'LC-DEV-PRIVATE-APP', {
+new LCDevPrivateAppStack(app, 'LC-DEV-PRIVATE-APP', {
   vpc: devVpcStack.vpc,
   cluster: devAppStack.cluster,
-  albSecGrp: devVpcStack.privateAlbSecGrp,
   mailerSecGrp: devVpcStack.mailerSecGrp,
   inactiveBatchSecGrp: devVpcStack.inactiveBatchSecGrp,
 });
@@ -80,10 +79,8 @@ new LCRedisStack(app, 'LC-PROD-REDIS', {
 });
 
 // 프라이빗 앱 (mailer)
-const prodPrivateAppStack = new LCProdPrivateAppStack(app, 'LC-PROD-PRIVATE-APP', {
-  vpc: prodVpcStack.vpc,
+new LCProdPrivateAppStack(app, 'LC-PROD-PRIVATE-APP', {
   cluster: prodAppStack.cluster,
-  albSecGrp: prodVpcStack.privateAlbSecGrp,
   mailerSecGrp: prodVpcStack.mailerSecGrp,
 });
 
@@ -98,7 +95,5 @@ new LCBatchAppStack(app, 'LC-PROD-BATCH-APP', {
 // * 퍼블릭 도메인
 new LCDomainStack(app, 'LC-DOMAIN', {
   devALB: devAppStack.alb,
-  devPrivateAlb: devPrivateAppStack.privateAlb,
   prodALB: prodAppStack.alb,
-  prodPrivateAlb: prodPrivateAppStack.privateAlb,
 });

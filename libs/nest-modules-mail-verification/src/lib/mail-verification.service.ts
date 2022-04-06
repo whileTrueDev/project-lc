@@ -1,17 +1,17 @@
-import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { MailVerificationCode, Prisma, PrismaPromise } from '@prisma/client';
+import { MICROSERVICE_MAILER_TOKEN } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { getMailerHost } from '@project-lc/utils';
+import { MailVerificationDto } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class MailVerificationService {
-  private MAILER_HOST: string = getMailerHost();
-
+  private readonly logger = new Logger(MailVerificationService.name);
   constructor(
-    private readonly httpService: HttpService,
+    @Inject(MICROSERVICE_MAILER_TOKEN) private readonly microService: ClientProxy,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -37,12 +37,12 @@ export class MailVerificationService {
    */
   public async sendVerificationMail(targetEmail: string): Promise<Observable<boolean>> {
     const code = await this.createEmailCode(targetEmail);
-    return this.httpService
-      .post<boolean>(`${this.MAILER_HOST}/mail-verification`, {
-        targetEmail,
-        code,
-      })
-      .pipe(map((res) => res.data));
+    this.logger.debug(`Send verification email to - ${targetEmail}`);
+    const obs = this.microService.send<boolean, MailVerificationDto>(
+      'mail-verification',
+      { targetEmail, code },
+    );
+    return obs;
   }
 
   /**

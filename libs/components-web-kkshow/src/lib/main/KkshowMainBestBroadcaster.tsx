@@ -38,7 +38,7 @@ export function KkshowMainBestBroadcaster(): JSX.Element | null {
             {data.bestBroadcaster.map((x) => (
               <SwiperSlide
                 key={`${x.nickname}_${x.broadcasterId}`}
-                style={{ maxWidth: 190, paddingBottom: 24 }}
+                style={{ maxWidth: 190, width: '45%', paddingBottom: 24 }}
               >
                 <BestBroadcasterItem
                   avatarUrl={x.profileImageUrl}
@@ -59,10 +59,11 @@ interface BestBroadcasterItemProps {
   avatarUrl: string;
   href: string;
 }
-function BestBroadcasterItem(props: BestBroadcasterItemProps): JSX.Element {
+export function BestBroadcasterItem(props: BestBroadcasterItemProps): JSX.Element {
   return (
-    <LinkBox>
+    <LinkBox outline="none">
       <Stack
+        outline="none"
         textAlign="center"
         justify="center"
         align="center"
@@ -84,13 +85,19 @@ function BestBroadcasterItem(props: BestBroadcasterItemProps): JSX.Element {
           }}
         />
 
-        <NextLink passHref href={props.href || '#'}>
-          <LinkOverlay isExternal={props.href.includes('http')}>
-            <Heading noOfLines={2} fontSize="xl">
-              {props.broadcasterName}
-            </Heading>
-          </LinkOverlay>
-        </NextLink>
+        {props.href ? (
+          <NextLink passHref href={props.href || '#'}>
+            <LinkOverlay isExternal={props.href.includes('http')}>
+              <Heading noOfLines={2} fontSize="xl">
+                {props.broadcasterName}
+              </Heading>
+            </LinkOverlay>
+          </NextLink>
+        ) : (
+          <Heading noOfLines={2} fontSize="xl">
+            {props.broadcasterName}
+          </Heading>
+        )}
       </Stack>
     </LinkBox>
   );

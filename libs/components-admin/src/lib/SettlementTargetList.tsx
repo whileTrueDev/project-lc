@@ -38,6 +38,7 @@ import {
   FmSettlementTarget,
 } from '@project-lc/shared-types';
 import { calcPgCommission, checkOrderDuringLiveShopping } from '@project-lc/utils';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 
@@ -109,7 +110,7 @@ export function SettlementTargetList(): JSX.Element | null {
             if (!acc) return Number(curr.price) * curr.ea;
             return acc + Number(curr.price) * curr.ea;
           }, 0);
-          return <Td>{totalPrice.toLocaleString()}</Td>;
+          return <Td>{getLocaleNumber(totalPrice)}</Td>;
         },
       },
       {
@@ -390,19 +391,19 @@ function SettlementItemOptionDetail({
           <Text>{opt.goods_name}</Text>
           {opt.title1 && opt.option1 ? (
             <Text fontSize="sm">
-              {opt.title1}: {opt.option1} ({`${Number(opt.price).toLocaleString()}원`})
+              {opt.title1}: {opt.option1} ({`${getLocaleNumber(opt.price)}원`})
             </Text>
           ) : (
-            <Text>{`${Number(opt.price).toLocaleString()}원`}</Text>
+            <Text>{`${getLocaleNumber(opt.price)}원`}</Text>
           )}
         </Stack>
       </GridItem>
 
       <GridItem>주문 개수</GridItem>
-      <Text>{opt.ea.toLocaleString()}</Text>
+      <Text>{getLocaleNumber(opt.ea)}</Text>
 
       <GridItem>상품 가격 * 주문 개수</GridItem>
-      <GridItem>{`${totalPrice.toLocaleString()}원`}</GridItem>
+      <GridItem>{`${getLocaleNumber(totalPrice)}원`}</GridItem>
 
       <GridItem>결제방법</GridItem>
       <GridItem>{convertFmOrderPaymentsToString(settlementTarget.payment)}</GridItem>

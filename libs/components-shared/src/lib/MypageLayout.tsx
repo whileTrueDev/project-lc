@@ -1,4 +1,5 @@
 import { Box, Flex } from '@chakra-ui/react';
+import { UserType } from '@prisma/client';
 import {
   broadcasterCenterMypageNavLinks,
   MypageLink,
@@ -7,23 +8,18 @@ import {
 import LoginRequireAlertDialog from '@project-lc/components-core/LoginRequireAlertDialog';
 import FullscreenLoading from '@project-lc/components-layout/FullscreenLoading';
 import MypageFooter from '@project-lc/components-layout/MypageFooter';
-import {
-  useCloseLiveShoppingStateBoardIfNotLoggedIn,
-  useDisplaySize,
-  useIsLoggedIn,
-} from '@project-lc/hooks';
-import { UserType } from '@project-lc/shared-types';
+import { useDisplaySize, useIsLoggedIn } from '@project-lc/hooks';
 import { FloatingHelpButton } from './FloatingHelpButton';
-import MypageBreadcrumb from './MypageBreadCrumb';
+import { MypageToolbar } from './MypageToolbar';
 import { Navbar } from './Navbar';
 import DesktopMypageSidebar from './navbar/DesktopMypageSidebar';
 
 const NAVBAR_HEIGHT = 67;
 const FOOTER_HEIGHT = 60;
 
-interface MypageLayoutProps {
+export interface MypageLayoutProps {
   children: React.ReactNode;
-  appType?: Exclude<UserType, 'admin'>;
+  appType?: UserType;
   navLinks?: Array<MypageLink>;
 }
 
@@ -34,9 +30,6 @@ export function MypageLayout({
 }: MypageLayoutProps): JSX.Element {
   const { status } = useIsLoggedIn();
   const { isMobileSize } = useDisplaySize();
-
-  // 로그인 상태가 아닌경우 방송인 현황판 닫기 이펙트
-  useCloseLiveShoppingStateBoardIfNotLoggedIn();
 
   return (
     <Flex
@@ -73,7 +66,7 @@ export function MypageLayout({
               className="content-wrapper"
               minHeight={`calc(100vh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`}
             >
-              <MypageBreadcrumb />
+              <MypageToolbar appType={appType} />
               {children}
             </Box>
             {/* 하단 푸터 */}

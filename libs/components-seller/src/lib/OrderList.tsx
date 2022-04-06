@@ -21,6 +21,7 @@ import {
   isOrderExportable,
 } from '@project-lc/shared-types';
 import { useFmOrderStore } from '@project-lc/stores';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useMemo } from 'react';
@@ -133,7 +134,7 @@ const columns: GridColumns = [
         } else {
           howMuch = totalPrice;
         }
-        text = `${howMuch.toLocaleString()}원`;
+        text = `${getLocaleNumber(howMuch)}원`;
       }
       return <TooltipedText text={text} />;
     },

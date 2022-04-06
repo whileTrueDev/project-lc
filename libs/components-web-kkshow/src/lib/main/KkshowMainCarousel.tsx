@@ -1,17 +1,10 @@
-import {
-  Box,
-  Fade,
-  Flex,
-  ScaleFade,
-  SlideFade,
-  useBreakpointValue,
-} from '@chakra-ui/react';
-import { ChevronIconButton } from '@project-lc/components-core/HorizontalImageGallery';
+import { Box, Flex, ScaleFade, SlideFade, useBreakpointValue } from '@chakra-ui/react';
 import { WaveBox } from '@project-lc/components-core/WaveBox';
 import { useKkshowMain } from '@project-lc/hooks';
 import { KkshowMainCarouselItem } from '@project-lc/shared-types';
 import { Autoplay, Navigation, Pagination } from 'swiper';
 import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
+import SwiperSlideItem from '../SwiperSlideItem';
 import KkshowMainCarouselContents from './carousel/KkshowMainCarouselContents';
 import { KkshowMainCarouselDescription } from './carousel/KkshowMainCarouselDescription';
 import KkshowMainCarouselHeader from './carousel/KkshowMainCarouselHeader';
@@ -19,7 +12,7 @@ import KkshowMainCarouselHeader from './carousel/KkshowMainCarouselHeader';
 export function KkshowMainCarousel(): JSX.Element {
   return (
     <WaveBox position="relative" bgColor="blue.500">
-      <Flex h={{ base: 530, md: 650 }}>
+      <Flex h={{ base: 400, sm: 530, md: 650 }}>
         <MainCarousel />
       </Flex>
     </WaveBox>
@@ -48,7 +41,7 @@ function MainCarousel(): JSX.Element | null {
       {data &&
         data.carousel.map((item, idx) => (
           // eslint-disable-next-line react/no-array-index-key
-          <SwiperSlide style={{ minWidth: 320, width: 720, margin: '0 auto' }} key={idx}>
+          <SwiperSlide style={{ width: 720, margin: '0 auto' }} key={idx}>
             {(slideProps) => {
               return <MainCarouselItem item={item} isActive={slideProps.isActive} />;
             }}
@@ -64,15 +57,14 @@ interface MainCarouselItemProps {
 }
 function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Element {
   const swiper = useSwiper();
+  const onSlidePrev = (): void => swiper.slidePrev();
+  const onSlideNext = (): void => swiper.slideNext();
 
   return (
-    <Flex
-      h="100%"
-      mx={{ base: 2, md: 4 }}
-      gap={4}
-      flexDir="column"
-      justify="flex-start"
-      position="relative"
+    <SwiperSlideItem
+      isActive={isActive}
+      onSlideNext={onSlideNext}
+      onSlidePrev={onSlidePrev}
     >
       <ScaleFade in={isActive} transition={{ enter: { duration: 0.5 } }}>
         <KkshowMainCarouselHeader type={item.type} />
@@ -80,7 +72,7 @@ function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Elemen
 
       <Box
         borderRadius="xl"
-        h={{ base: 300, md: 400 }}
+        h={{ base: 200, sm: 300, md: 400 }}
         p={1}
         bgColor="white"
         filter={isActive ? 'none' : 'brightness(50%)'}
@@ -97,27 +89,7 @@ function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Elemen
       >
         <KkshowMainCarouselDescription item={item} />
       </SlideFade>
-
-      <Fade in={isActive}>
-        <Box display={{ base: 'none', md: 'contents' }} transition="display 0.2s">
-          <ChevronIconButton
-            variant="outlined"
-            direction="left"
-            left={{ md: -55, xl: -100 }}
-            bottom="50%"
-            onClick={() => swiper.slidePrev()}
-          />
-
-          <ChevronIconButton
-            variant="outlined"
-            direction="right"
-            right={{ md: -55, xl: -100 }}
-            bottom="50%"
-            onClick={() => swiper.slideNext()}
-          />
-        </Box>
-      </Fade>
-    </Flex>
+    </SwiperSlideItem>
   );
 }
 export default KkshowMainCarousel;

@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Link,
-  Stack,
-  Text,
-  useColorModeValue,
-} from '@chakra-ui/react';
+import { Box, Flex, Link, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { FmOrderStatusBadge } from '@project-lc/components-shared/FmOrderStatusBadge';
@@ -17,6 +9,7 @@ import {
   FmOrderExportItemOption,
   FmOrderOption,
 } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useMemo } from 'react';
@@ -59,9 +52,9 @@ export function OrderDetailExportInfo({
         </NextLink>
         <FmOrderStatusBadge orderStatus={_exports.export_status} />
         <TextDotConnector />
-        <Text isTruncated>{totalExportedEa} 개</Text>
+        <Text isTruncated>{getLocaleNumber(totalExportedEa)} 개</Text>
         <TextDotConnector />
-        <Text isTruncated>{totalExportedPrice.toLocaleString()} 원</Text>
+        <Text isTruncated>{getLocaleNumber(totalExportedPrice)} 원</Text>
       </Stack>
 
       <Stack direction="row" flexWrap="wrap" spacing={1.5} alignItems="center">

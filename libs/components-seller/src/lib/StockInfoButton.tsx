@@ -12,18 +12,19 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  UnorderedList,
-  useDisclosure,
-  Text,
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
-  Tr,
   Theme,
+  Tr,
+  UnorderedList,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { useGoodsStock } from '@project-lc/hooks';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useState } from 'react';
 
 export function StockInfoButton({
@@ -90,8 +91,8 @@ export function StockInfoButton({
                       <Td>{option.default_option === 'y' ? '예' : '아니오'}</Td>
                       <Td>{option.option_title}</Td>
                       <Td>{option.option1}</Td>
-                      <Td>{Number(option.consumer_price).toLocaleString()}</Td>
-                      <Td>{Number(option.price).toLocaleString()}</Td>
+                      <Td>{getLocaleNumber(option.consumer_price)}</Td>
+                      <Td>{getLocaleNumber(option.price)}</Td>
                       <Td>{option.option_view === 'Y' ? '노출' : '미노출'}</Td>
                       {/* <Td>{option.stock}</Td>
                       <Td>{option.badstock}</Td>

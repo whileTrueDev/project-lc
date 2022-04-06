@@ -5,6 +5,8 @@ const pageUrl = window.location.href;
 const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const iterateLimit = $('#primary-info').data('number');
 const email = $('#primary-info').data('email');
+const bucketName = $('#primary-info').data('bucket-name');
+
 const topMessages = [];
 let messageHtml;
 let rankingVisible;
@@ -51,7 +53,7 @@ async function switchImage() {
 
     $('.horizontal-banner').attr(
       'src',
-      `https://lc-project.s3.ap-northeast-2.amazonaws.com/horizontal-banner/${email}/${liveShoppingId}/horizontal-banner-${bannerId}`,
+      `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/horizontal-banner/${email}/${liveShoppingId}/horizontal-banner-${bannerId}`,
     );
 
     if (bannerId === iterateLimit) {
