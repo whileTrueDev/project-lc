@@ -75,6 +75,7 @@ export function AdminBusinessRegistrationRejectionDialog({
       await historyMutation({
         type: 'businessRegistration',
         status: 'rejected',
+        sellerId: row.sellerId,
       });
       toast({
         title: '사업자등록정보가 반려되었습니다.',
