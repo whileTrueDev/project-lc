@@ -1,11 +1,17 @@
 import { useMutation, UseMutationResult } from 'react-query';
-import { SellerSettlementConfirmHistory, SellerPaperType } from '@prisma/client';
+import {
+  SellerSettlementConfirmHistory,
+  SellerPaperType,
+  BusinessRegistrationStatus,
+} from '@prisma/client';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
 
-export type SellerPaperTypeWithSellerId = SellerPaperType & {
+export interface SellerSettlementHistoryType {
+  type: SellerPaperType;
+  status: BusinessRegistrationStatus;
   sellerId: number;
-};
+}
 
 export const useSellerSettlementHistoryMutation = (): UseMutationResult<
   SellerSettlementConfirmHistory,
@@ -24,13 +30,13 @@ export const useSellerSettlementHistoryMutation = (): UseMutationResult<
 export const useAdminSellerSettlementHistoryMutation = (): UseMutationResult<
   SellerSettlementConfirmHistory,
   AxiosError,
-  SellerPaperTypeWithSellerId
+  SellerSettlementHistoryType
 > => {
   return useMutation<
     SellerSettlementConfirmHistory,
     AxiosError,
-    SellerPaperTypeWithSellerId
-  >(async (dto: SellerPaperTypeWithSellerId) => {
+    SellerSettlementHistoryType
+  >(async (dto: SellerSettlementHistoryType) => {
     return axios
       .post<SellerSettlementConfirmHistory>(
         '/admin/settlement-info/confirmation/history',
