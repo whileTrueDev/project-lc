@@ -1,4 +1,4 @@
-import { VStack, Heading } from '@chakra-ui/react';
+import { VStack, Text } from '@chakra-ui/react';
 
 interface SettingSectionLayoutProps {
   title?: string;
@@ -10,9 +10,9 @@ export function SettingSectionLayout(props: SettingSectionLayoutProps): JSX.Elem
   return (
     <VStack spacing={4} alignItems="flex-start" padding={2} width="100%">
       {title && (
-        <Heading as="h6" size="md">
+        <Text as="h6" fontSize="lg" fontWeight="bold">
           {title}
-        </Heading>
+        </Text>
       )}
       {children}
     </VStack>

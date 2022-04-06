@@ -127,22 +127,22 @@ export const mypageNavLinks: MypageLink[] = [
     checkIsActive: defaultIsActiveChecker,
   },
   {
-    icon: AiOutlineShop,
-    name: '상점설정',
-    href: '/mypage/shopinfo',
-    checkIsActive: defaultIsActiveChecker,
-  },
-  {
     icon: AiOutlineContainer,
     name: '이용안내',
     href: '/mypage/manual',
     checkIsActive: defaultIsActiveChecker,
   },
   {
-    name: '계정 설정',
+    icon: AiOutlineShop,
+    name: '상점설정',
+    href: '/mypage/shopinfo',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    icon: AiOutlineSetting,
+    name: '계정설정',
     href: '/mypage/setting',
     checkIsActive: defaultIsActiveChecker,
-    isInvisible: true,
   },
   {
     name: '등록',
@@ -196,15 +196,15 @@ export const broadcasterCenterMypageNavLinks: Array<MypageLink> = [
     checkIsActive: defaultIsActiveChecker,
   },
   {
-    icon: AiOutlineSetting,
-    name: '계정설정',
-    href: '/mypage/setting',
-    checkIsActive: defaultIsActiveChecker,
-  },
-  {
     icon: AiOutlineContainer,
     name: '이용안내',
     href: '/mypage/manual',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    icon: AiOutlineSetting,
+    name: '계정설정',
+    href: '/mypage/setting',
     checkIsActive: defaultIsActiveChecker,
   },
   {

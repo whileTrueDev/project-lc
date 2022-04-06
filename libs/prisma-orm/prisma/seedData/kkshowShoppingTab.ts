@@ -4,13 +4,19 @@ export const kkshowShoppingTabDummyData = {
     {
       linkUrl: 'https://k-kmarket.com/',
       imageUrl:
-        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1648450169387_banner-1.png',
+        'https://project-lc-dev-test.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1649138023040_banner-1.png',
       description: '',
     },
     {
       linkUrl: 'https://k-kmarket.com/',
       imageUrl:
-        'https://lc-project.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1648450177223_banner-2.png',
+        'https://project-lc-dev-test.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1649138031589_banner-2.png',
+      description: '',
+    },
+    {
+      linkUrl: 'https://k-kmarket.com/',
+      imageUrl:
+        'https://project-lc-dev-test.s3.ap-northeast-2.amazonaws.com/kkshow-shopping-carousel-images/1649138041072_banner-3.png',
       description: '',
     },
   ],
@@ -29,8 +35,8 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=163',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16426661552946large.png',
-      normalPrice: 27000,
-      discountedPrice: 26900,
+      normalPrice: 26900,
+      discountedPrice: '',
     },
     {
       name: '진국보감 양념이 맛있는 한돈 갈비찜',
@@ -53,8 +59,8 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=137',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2021/12/_temp_16405271386492view.jpg?1648788689164',
-      normalPrice: 9000,
-      discountedPrice: 8900,
+      normalPrice: 8900,
+      discountedPrice: '',
     },
   ],
   // newLineUp ; 신상 라인업
@@ -115,24 +121,24 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=138',
       imageUrl:
         'https://k-kmarket.com\t/data/goods/1/2021/12/_temp_16405277754983view.jpg?1648789180126',
-      normalPrice: 4000,
-      discountedPrice: 3900,
+      normalPrice: 3900,
+      discountedPrice: '',
     },
     {
       name: '맛있게 매콤한 닭꼬치 중꼬지 200g',
       linkUrl: 'https://k-kmarket.com/goods/view?no=170',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/02/_temp_16444793818531view.jpg?1648789317857',
-      normalPrice: 5000,
-      discountedPrice: 4900,
+      normalPrice: 4900,
+      discountedPrice: '',
     },
     {
       name: '오늘한끼 부산 초량 시장 불백 돼지불고기',
       linkUrl: 'https://k-kmarket.com/goods/view?no=168',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/168_2022012017444012.png?1648789354867',
-      normalPrice: 8000,
-      discountedPrice: 7900,
+      normalPrice: 7900,
+      discountedPrice: '',
     },
     {
       name: '내조국국밥 술 안주로 탁월한 모듬순대',
@@ -164,16 +170,16 @@ export const kkshowShoppingTabDummyData = {
       linkUrl: 'https://k-kmarket.com/goods/view?no=88',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2021/12/_temp_16385029186483view.png?1648789550534',
-      normalPrice: 25000,
-      discountedPrice: 24900,
+      normalPrice: 24900,
+      discountedPrice: '',
     },
     {
       name: '오늘한끼 다이어트 한돈 소시지 (저칼로리)',
       linkUrl: 'https://k-kmarket.com/goods/view?no=167',
       imageUrl:
         'https://k-kmarket.com/data/goods/1/2022/01/_temp_16426670960515view.png?1648789608183',
-      normalPrice: 40000,
-      discountedPrice: 3900,
+      normalPrice: 3900,
+      discountedPrice: '',
     },
   ],
   // reviews; 생생후기
