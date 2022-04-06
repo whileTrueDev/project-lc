@@ -1,4 +1,4 @@
-import { useMutation, UseMutationResult } from 'react-query';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import {
   SellerSettlementConfirmHistory,
   SellerPaperType,
@@ -10,19 +10,29 @@ import axios from '../../axios';
 export interface SellerSettlementHistoryType {
   type: SellerPaperType;
   status: BusinessRegistrationStatus;
-  sellerId: number;
+  sellerId?: number;
 }
 
 export const useSellerSettlementHistoryMutation = (): UseMutationResult<
   SellerSettlementConfirmHistory,
   AxiosError,
-  SellerPaperType
+  SellerSettlementHistoryType
 > => {
-  return useMutation<SellerSettlementConfirmHistory, AxiosError, SellerPaperType>(
-    async (dto: SellerPaperType) => {
-      return axios
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    SellerSettlementConfirmHistory,
+    AxiosError,
+    SellerSettlementHistoryType
+  >(
+    async (dto: SellerSettlementHistoryType) =>
+      axios
         .post<SellerSettlementConfirmHistory>('/seller/settlement/history', dto)
-        .then((res) => res.data);
+        .then((res) => res.data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('SellerSettlementHistory');
+      },
     },
   );
 };
