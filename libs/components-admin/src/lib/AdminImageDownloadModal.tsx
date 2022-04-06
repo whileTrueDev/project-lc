@@ -28,7 +28,7 @@ export function AdminImageDownloadModal(
       reason: '',
     },
   });
-  const { register } = methods;
+  const { register, watch } = methods;
 
   return (
     <>
@@ -38,11 +38,17 @@ export function AdminImageDownloadModal(
         <ModalContent>
           <FormProvider {...methods}>
             <ModalBody>
-              <Text>* 다운로드 사유를 간략히 입력해주세요</Text>
+              <Text>
+                * 다운로드 사유를 간략히 입력해주세요
+                <br />
+                (ex. 승인, 정산정보확인 등)
+              </Text>
               <Input {...register('reason', { maxLength: 10 })} />
             </ModalBody>
             <ModalFooter>
-              <AdminImageDownloadButton row={row} type={type} onClose={onClose} />
+              {watch('reason').trim() && (
+                <AdminImageDownloadButton row={row} type={type} onClose={onClose} />
+              )}
             </ModalFooter>
           </FormProvider>
         </ModalContent>
