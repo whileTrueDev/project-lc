@@ -28,13 +28,24 @@ model Seller {
   avatar                     String?
   agreementFlag              Boolean                      @default(false) // 이용동의 
   inactiveFlag               Boolean                      @default(false)
+  discountCodes              DiscountCode[] // 판매자가 생성한 할인코드
+  coupons                    Coupon[] // 판매자가 발급한 쿠폰
 }
 
 // 마케터의 상정정보
 model SellerShop {
-  sellerId Int    @unique
-  shopName String
-  seller   Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId              Int                   @unique
+  shopName              String
+  seller                Seller                @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  defaultMileagePercent Int                   @default(0) // 판매자 상품 구매시 결제금액의 몇퍼센트를 적립금으로 지금할지
+  mileageStrategy       SellerMileageStrategy @default(onPaymentPriceExceptMileageUsage) // 적립금 지급방식
+}
+
+// [enum] 적립금 지급 방식(결제시 적립금을 사용한 경우)
+enum SellerMileageStrategy {
+  onPaymentPriceExceptMileageUsage // (결제금액 - 사용한 적립금)기준으로 적립금 지급
+  onPaymentPrice // 전체 결제금액 기준으로 적립금 지급
+  noMileage // 적립금 사용시 적립금 지금안함
 }
 
 // 사업자등록정보
@@ -214,6 +225,11 @@ model Goods {
 
   LiveShopping     LiveShopping[]
   productPromotion ProductPromotion[] // 하나의 상품이 여러개 홍보아이템 등록될 수 있음
+  discountCodes    DiscountCode[] // 상품에 적용가능한 할인코드
+  coupons          Coupon[] // 상품에 적용가능한 쿠폰
+  searchKeyword    String? // ',' 구분자로 하는 검색키워드의 문자열
+  mileagePercent   Int? // 구매확정시 지급될 적립금 비율(없는경우 판매자 상점정보 기본적립금 비율에 따름)
+
   @@index([sellerId], name: "sellerId")
   @@fulltext([goods_name])
 }
@@ -746,18 +762,18 @@ model Notice {
 
 // 전자 결제 수수료 정보 (퍼스트몰의 fm_account_payment_fee와 유사함, 와일트루 정책에 따르기위해 따로 구현)
 model SellerPaymentCommission {
-  id             Int                   @id @default(autoincrement())
+  id             Int        @id @default(autoincrement())
   type           String // 수수료종류 pg, shop, npg, npay, kakaopay, toss, ...
   payment        String // 결제수단 bank, card, account, virtual, cellphone, escrow_account, escrow_virtual, point, ...
   paymentName    String // 결제수단 이름
-  commissionRate Decimal               @db.Decimal(10, 2) // 수수료율
-  commissionUnit PaymentCommissionUnit @default(P) // 수수료 부과 단위 (원 or 퍼센트)
+  commissionRate Decimal    @db.Decimal(10, 2) // 수수료율
+  commissionUnit AmountUnit @default(P) // 수수료 부과 단위 (원 or 퍼센트)
   min            Int? // 최소 수수료
   max            Int? // 최대수수료
 }
 
-// 전자결제 수수료
-enum PaymentCommissionUnit {
+// [enum]금액에 적용하는 단위
+enum AmountUnit {
   P // 퍼센트
   W // 원
 }
@@ -1117,4 +1133,263 @@ model Manual {
   linkPageRouterPath String? // 연결될 마이페이지 routerPath (MypageLink의 href)
   createDate         DateTime @default(now())
   updateDate         DateTime @default(now()) @updatedAt
+}
+
+// *********************************************************************************
+// 소비자
+// *********************************************************************************
+model Customer {
+  id                  Int                          @id @default(autoincrement()) // 소비자고유번호
+  name                String? // 이름
+  password            String? // 비밀번호
+  email               String? // 이메일
+  nickname            String? // 닉네임
+  phone               String? // 연락처
+  createDate          DateTime                     @default(now()) // 생성일
+  gender              String? // 성별
+  birthDate           DateTime? // 생년월일
+  agreementFlag       Boolean                      @default(false) // 개인정보    이용동의여부
+  inactiveFlag        Boolean                      @default(false)
+  socialAccount       CustomerSocialAccount[] // 연결된 소셜로그인 계정
+  address             CustomerAddress[] // 주소록
+  notificationSetting CustomerNotificationSetting? // 알림설정
+  mileage             CustomerMileage? // 보유 적립금
+  CustomerMileageLog  CustomerMileageLog[]
+  orders              Order[] // 주문
+  CustomerCoupon      CustomerCoupon[]
+}
+
+// 소비자 소셜로그인 계정정보
+model CustomerSocialAccount {
+  serviceId    String   @id // 인증 결과로 해당 서비스에서 받은 고유 식별자
+  provider     String // 'google' | 'kakao' | 'naver'
+  name         String // 이름
+  registDate   DateTime @default(now()) // 생성일
+  profileImage String? // 프로필사진
+  accessToken  String? // 액세스토큰
+  refreshToken String? // 리프레시토큰
+  customerId   Int // 소비자 고유번호
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId], name: "customerId")
+}
+
+// 소비자 주소록
+model CustomerAddress {
+  id            Int      @id @default(autoincrement()) // 주소록고유번호
+  title         String // 주소록 별칭
+  recipient     String? // 수령인
+  address       String? // 주소 (도로명)
+  detailAddress String? // 주소 상세
+  postalCode    String? // 우편 번호
+  isDefault     Boolean  @default(false) // 기본주소지 여부
+  memo          String? // 배송메모
+  phone         String? // 수령인 연락처
+  createDate    DateTime @default(now()) // 생성일
+  customerId    Int // 소비자 고유번호
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+// 소비자 알림설정
+model CustomerNotificationSetting {
+  id            Int     @id @default(autoincrement()) // 소비자 알림설정 고유번호
+  orderDelivery Boolean @default(true) // 주문,배송 알림여부
+  review        Boolean @default(true) // 리뷰 알림여부
+  restock       Boolean @default(true) // 재입고 알림여부 - 재입고 기능이 있나???
+  advertisement Boolean @default(true) // 광고성 알림여부
+
+  customerId Int      @unique // 소비자 고유번호
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+// 소비자 보유 적립금
+model CustomerMileage {
+  id         Int      @id @default(autoincrement()) // 소비자 보유 적립금 고유번호
+  customerId Int      @unique // 소비자 고유번호
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  mileage    Int      @default(0) // 보유적립금
+}
+
+// 소비자 적립금 변동 내역
+model CustomerMileageLog {
+  id         Int               @id @default(autoincrement()) // 소비자적립금 변동내역 고유번호
+  customerId Int               @unique // 소비자 고유번호
+  customer   Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  amount     Int // 변동된 적립금 양
+  actionType MileageActionType // 적립금 변동 유형(사용 | 적립)
+  createDate DateTime          @default(now()) // 생성일
+  reason     String // 변동사유(주문, 리뷰, 사용취소, 쿠폰 등등)
+  orderId    Int? // 주문ID (주문으로 인해 적립금 변동내역 생성된 경우. 적립금 사용금액 조회위해 연결)
+  order      Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  reviewId   Int? // 리뷰ID (리뷰로 인해 적립금 변동내역 생성된 경우.. 참조할 필요가 있나??)
+}
+
+// [enum]적립금 사용 유형
+enum MileageActionType {
+  consume // 사용
+  earn // 적립
+}
+
+// **************************************************************************
+// 주문
+// **************************************************************************
+model Order {
+  id                       Int                  @id @default(autoincrement()) // 주문 고유번호 => 비회원 주문조회시 주문번호로 조회할건데 주문번호 1이면 이상하겠다
+  customerId               Int                  @unique // 소비자 고유번호
+  // 연결된 소비자 삭제되는 경우 => 주문데이터는 유지, customerId는 null 이 됨
+  customer                 Customer             @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  payment                  OrderPayment? // 주문결제정보
+  step                     OrderStep            @default(orderReceived) // 주문상태
+  createDate               DateTime // 주문생성일시
+  orderPrice               Int // 주문금액 = 실제 주문 상품/상품옵션 의 금액 합
+  paymentPrice             Int // 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한 금액
+  recipientName            String // 받는사람명
+  recipientPhone           String // 받는사람 연락처
+  recipientEmail           String // 받는사람 이메일
+  ordererName              String // 주문자명
+  ordererPhone             String // 주문자 연락처
+  ordererEmail             String // 주문자 이메일
+  memo                     String // 배송메시지
+  nonMemberOrderFlag       Boolean              @default(false) // 비회원 주문 여부
+  nonMemberOrderPassword   String? // 비회원주문시 입력받는 비밀번호 - 비회원이 주문조회,취소시 사용할예정
+  giftFlag                 Boolean              @default(false) // 선물주문 여부
+  supportOrderIncludeFlag  Boolean              @default(false) // 후원상품 포함여부
+  bundleFlag               Boolean              @default(false) // 묶음배송여부
+  mileageLog               CustomerMileageLog[] // 사용 & 적립 마일리지 내역
+  purchaseConfirmationDate DateTime? // 구매확정일자
+  cashReceipts             String? // 현금영수증번호
+  discountCodeId           Int? // 적용한 할인코드 고유번호
+  discountCode             DiscountCode?        @relation(fields: [discountCodeId], references: [id], onDelete: SetNull)
+}
+
+// [enum] 주문상태
+// 퍼스트몰 테이블 사용하고있는 기존 코드 재활용 쉽게 하기 위해
+// 퍼스트몰 주문상태 코드에 대응하는 값으로 만들었음
+enum OrderStep {
+  orderReceived // 주문접수, 15
+  paymentConfirmed // 결제확인, 25
+  goodsReady // 상품준비, 35
+  partialExportReady // 부분출고준비, 40
+  exportReady // 출고준비, 45
+  partialExportDone // 부분출고완료, 50
+  exportDone // 출고완료, 55
+  partialShipping // 부분배송중, 60
+  shipping // 배송중, 65
+  partialShippingDone // 부분배송완료, 70
+  shippingDone // 배송완료, 75
+  paymentCanceled // 결제취소, 85
+  orderInvalidated // 주문무효, 95
+  paymentFailed // 결제실패, 99
+}
+
+// 주문결제정보 - 기타 전자결제관련 필요한 데이터 저장
+model OrderPayment {
+  id              Int           @id @default(autoincrement()) // 주문결제정보 고유번호
+  method          PaymentMethod // 결제수단
+  orderId         Int           @unique
+  // 연결된 주문데이터가 삭제되는 경우 결제정보 데이터는 유지되어야 하나??
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  depositDate     DateTime? // 입금일시
+  depositor       String? // 입금자명
+  depositDoneFlag Boolean       @default(false) // 입금완료여부
+  account         String? // 주문자가 결제한 금액이 입금될 계좌정보 
+}
+
+// [enum] 결제수단
+enum PaymentMethod {
+  card // 신용카드
+  bank // 무통장입금
+  account // 실시간 계좌이체
+}
+
+// ****************
+// 할인코드
+// ****************
+model DiscountCode {
+  id                   Int                @id @default(autoincrement()) // 할인코드 고유번호
+  orders               Order[] // 할인코드 적용한 주문
+  sellerId             Int
+  seller               Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  amount               Int                @default(0) // 할인금액 혹은 할인율
+  unit                 AmountUnit         @default(P) // 할인에 적용되는 단위 (퍼센트 P, 원 W)
+  maxDiscountAmountWon Int? // 최대할인금액(원단위)
+  minOrderAmountWon    Int                @default(0) // 할인코드 적용 가능한 최소주문금액
+  code                 String // 할인코드. 판매자가 작성(예: KKSHOWOPEN1123) 혹은 랜덤생성
+  memo                 String? // 할인코드 설명
+  createDate           DateTime           @default(now()) // 생성일시
+  startDate            DateTime // 유효시간 시작
+  endDate              DateTime? // 유효기간 끝
+  applyField           DiscountApplyField @default(goods) // 코드할인 적용 범위 - 상품 | 배송비
+  applyType            DiscountApplyType  @default(allGoods) // 코드적용가능 유형 - 모든상품에 적용가능 | 연결된상품에만 적용가능 | 연결된상품 제외하고 적용가능
+  goods                Goods[] // 연결된 상품
+}
+
+// [enum] 쿠폰, 코드 할인적용 대상
+enum DiscountApplyField {
+  goods // 상품
+  shipping // 배송비
+}
+
+// [enum] 적용 유형
+enum DiscountApplyType {
+  selectedGoods // 연결된 상품에만 적용가능
+  exceptSelectedGoods // 연결된 상품 제외하고 적용가능
+  allGoods // 모든 상품에 적용가능
+}
+
+// ****************
+// 쿠폰
+// ****************
+model Coupon {
+  id                   Int                @id @default(autoincrement()) // 쿠폰 고유번호
+  sellerId             Int
+  seller               Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  amount               Int                @default(0) // 할인금액 혹은 할인율
+  unit                 AmountUnit         @default(P) // 할인에 적용되는 단위 (퍼센트 P, 원 W)
+  maxDiscountAmountWon Int? // 최대할인금액(원단위)
+  minOrderAmountWon    Int                @default(0) // 할인코드 적용 가능한 최소주문금액
+  name                 String // 쿠폰명
+  createDate           DateTime           @default(now()) // 생성일시
+  startDate            DateTime // 유효시간 시작
+  endDate              DateTime? // 유효기간 끝
+  applyField           DiscountApplyField @default(goods) // 쿠폰할인 적용 범위 - 상품 | 배송비
+  applyType            DiscountApplyType  @default(allGoods) // 쿠폰적용가능 유형 - 모든상품에 적용가능 | 연결된상품에만 적용가능 | 연결된상품 제외하고 적용가능
+  memo                 String? // 쿠폰 설명
+  concurrentFlag       Boolean            @default(false) // 다른쿠폰과 동시에 사용 가능여부
+  goods                Goods[] // 연결된 상품
+  CustomerCoupon       CustomerCoupon[]
+}
+
+// 소비자가 발급받은 쿠폰
+model CustomerCoupon {
+  couponId   Int
+  coupon     Coupon              @relation(fields: [couponId], references: [id])
+  customerId Int
+  customer   Customer            @relation(fields: [customerId], references: [id])
+  issueDate  DateTime            @default(now()) // 발급일
+  issuer     CouponIssuer        @default(customer) // 쿠폰 발급 주체
+  logs       CustomerCouponLog[] // 쿠폰사용내역
+
+  @@id([couponId, customerId])
+}
+
+// [enum] 쿠폰 발급 주체
+enum CouponIssuer {
+  customer // 소비자
+  seller // 판매자
+}
+
+// 소비자의 쿠폰 사용 내역
+model CustomerCouponLog {
+  id               Int            @id @default(autoincrement()) // 쿠폰 사용내역 고유번호
+  customerCouponId Int
+  customerCoupon   CustomerCoupon @relation(fields: [customerCouponId], references: [couponId, customerId], onDelete: Cascade)
+  status           CouponStatus   @default(notUsed) // 쿠폰사용상태
+  createDate       DateTime       @default(now()) // 쿠폰사용내역 생성일
+}
+
+enum CouponStatus {
+  notUsed // 미사용
+  used // 사용
+  canceled // 사용취소
 }
