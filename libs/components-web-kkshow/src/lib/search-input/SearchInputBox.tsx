@@ -58,7 +58,8 @@ export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
           variant="outline"
           placeholder="검색어를 입력하세요"
           rounded="md"
-          type="saerch"
+          type="search"
+          autoComplete="off"
           bgColor={useColorModeValue('white', 'gray.600')}
           color={useColorModeValue('blackAlpha.900', 'whiteAlpha.900')}
           onKeyDown={(e) => {
