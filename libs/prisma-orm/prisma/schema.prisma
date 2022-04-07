@@ -30,6 +30,7 @@ model Seller {
   inactiveFlag               Boolean                      @default(false)
   discountCodes              DiscountCode[] // 판매자가 생성한 할인코드
   coupons                    Coupon[] // 판매자가 발급한 쿠폰
+  goodsReviewComments        GoodsReviewComment[] // 판매자가 작성한 상품리뷰댓글
 }
 
 // 마케터의 상정정보
@@ -132,6 +133,11 @@ model SellerSettlementItems {
 
   sellerSettlementsId Int?
   SellerSettlements   SellerSettlements? @relation(fields: [sellerSettlementsId], references: [id], onDelete: Cascade)
+
+  relatedOrderId Int? // (project-lc Order테이블의) 주문 고유번호 => 기존 퍼스트몰 fm_order.order_seq 저장하는 컬럼명이 orderId라서 relatedOrderId라고 씀
+  order          Order?  @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
+  exportId       Int?
+  export         Export? @relation(fields: [exportId], references: [id], onDelete: SetNull)
 }
 
 // 판매자 정산 계좌 정보
@@ -222,13 +228,22 @@ model Goods {
   shippingGroupId         Int?
   GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
   goodsInfoId             Int?
+  LiveShopping            LiveShopping[]
+  productPromotion        ProductPromotion[] // 하나의 상품이 여러개 홍보아이템 등록될 수 있음
 
-  LiveShopping     LiveShopping[]
-  productPromotion ProductPromotion[] // 하나의 상품이 여러개 홍보아이템 등록될 수 있음
-  discountCodes    DiscountCode[] // 상품에 적용가능한 할인코드
-  coupons          Coupon[] // 상품에 적용가능한 쿠폰
-  searchKeyword    String? // ',' 구분자로 하는 검색키워드의 문자열
-  mileagePercent   Int? // 구매확정시 지급될 적립금 비율(없는경우 판매자 상점정보 기본적립금 비율에 따름)
+  discountCodes        DiscountCode[] // 상품에 적용가능한 할인코드
+  coupons              Coupon[] // 상품에 적용가능한 쿠폰
+  searchKeyword        String? // ',' 구분자로 하는 검색키워드의 문자열
+  mileagePercent       Int? // 구매확정시 지급될 적립금 비율(없는경우 판매자 상점정보 기본적립금 비율에 따름)
+  cartItems            CartItem[] // 연결된 장바구니 상품
+  orrderItems          OrderItem[] // 연결된 주문상품
+  reviews              GoodsReview[] // 작성된 리뷰
+  informationSubjectId Int? // 정보제공고시 품목고유번호
+  informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
+  informationNoticeId  Int?                     @unique
+  informationNotice    GoodsInformationNotice?  @relation(fields: [informationNoticeId], references: [id]) // 연결된 상품정보제공 내용
+  categories           GoodsCategory[] // 상품이 해당하는 카테고리들
+
 
   @@index([sellerId], name: "sellerId")
   @@fulltext([goods_name])
@@ -379,10 +394,11 @@ enum YesOrNo_UPPERCASE {
   N
 }
 
+// [enum] 판매유형(=주문경로) (라이브쇼핑, 상품홍보, 기본판매, 향후 추가 가능한 어떠한 형태의 프로모션...)
 enum SellType {
-  liveShopping
-  productPromotion
-  normal
+  liveShopping // 라이브쇼핑
+  productPromotion // 상품홍보
+  normal // 기본판매
 }
 
 // ****************************
@@ -520,6 +536,10 @@ model Broadcaster {
   BroadcasterPromotionPage    BroadcasterPromotionPage? // 방송인 상품홍보
   inactiveFlag                Boolean                       @default(false)
 
+  cartItemSupport   CartItemSupport[] // 장바구니에 담긴 상품의 후원 정보(결제되지 않은 상태이므로 조회할 일 없을듯)
+  orderItemSupport  OrderItemSupport[] // 주문된 상품의 후원정보 => 방송인이 후원받은 내역 조회시 사용할듯
+  followers         CustomerFollowBroadcaster[] // 팔로우하는 소비자
+  productPromotions ProductPromotion[] // 홍보중인상품
   @@fulltext([userNickname])
 }
 
@@ -600,6 +620,11 @@ model BroadcasterSettlementItems {
   productPromotion         ProductPromotion?      @relation(fields: [productPromotionId], references: [id], onDelete: SetNull)
   broadcasterSettlementsId Int
   settlements              BroadcasterSettlements @relation(fields: [broadcasterSettlementsId], references: [id], onDelete: Cascade)
+
+  relatedOrderId Int? // (project-lc Order테이블의) 주문 고유번호 => 기존 퍼스트몰 fm_order.order_seq 저장하는 컬럼명이 orderId라서 relatedOrderId라고 씀
+  order          Order?  @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
+  exportId       Int?
+  export         Export? @relation(fields: [exportId], references: [id], onDelete: SetNull)
 }
 
 // 방송인 정산을 위한 계약자, 계좌정보(방송인 정산등록정보)
@@ -641,6 +666,7 @@ enum TaxationType {
 model BroadcasterPromotionPage {
   id                Int                @id @default(autoincrement())
   url               String?            @unique // 퍼스트몰 카테고리 url(관리자가 입력) 
+  comment           String? // 방송인 인사말
   broadcaster       Broadcaster        @relation(fields: [broadcasterId], references: [id], onDelete: Cascade) // 방송인 삭제시 함께 삭제
   broadcasterId     Int                @unique
   productPromotions ProductPromotion[] //
@@ -650,17 +676,20 @@ model BroadcasterPromotionPage {
 // 상품 홍보 아이템 (방송인 - 상품 간 "홍보" 관계 테이블)
 // -------------------------------------------------
 model ProductPromotion {
-  id                         Int                      @id @default(autoincrement())
+  id                         Int                          @id @default(autoincrement())
   fmGoodsSeq                 Int? // 퍼스트몰 상품 id(특정 방송인이 홍보하는 형태로 업로드된 상품 고유번호), 관리자가 입력
-  goods                      Goods                    @relation(fields: [goodsId], references: [id]) // project-lc 상품과 일대다 관계
+  goods                      Goods                        @relation(fields: [goodsId], references: [id]) // project-lc 상품과 일대다 관계
   goodsId                    Int // project-lc 상품 id
-  broadcasterPromotionPage   BroadcasterPromotionPage @relation(fields: [broadcasterPromotionPageId], references: [id], onDelete: Cascade) // 방송인 상품홍보페이지와 일대다 관계
+  broadcasterPromotionPage   BroadcasterPromotionPage     @relation(fields: [broadcasterPromotionPageId], references: [id], onDelete: Cascade) // 방송인 상품홍보페이지와 일대다 관계
   broadcasterPromotionPageId Int
-  broadcasterCommissionRate  Decimal                  @default("5") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
-  whiletrueCommissionRate    Decimal                  @default("5") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
-
+  broadcasterCommissionRate  Decimal                      @default("5") @db.Decimal(10, 2) // 방송인 수수료율 (0%~100% 사이값)
+  whiletrueCommissionRate    Decimal                      @default("5") @db.Decimal(10, 2) // 와일트루 수수료율 (0%~100% 사이값)
   sellerSettlementItems      SellerSettlementItems[]
   broadcasterSettlementItems BroadcasterSettlementItems[]
+
+  broadcasterId Int?
+  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+
 }
 
 // -------------------------------------------------
@@ -696,6 +725,7 @@ model LiveShopping {
   liveShoppingPurchaseMessage LiveShoppingPurchaseMessage[]
   BroadcasterSettlementItems  BroadcasterSettlementItems[]
   images                      LiveShoppingImage[]
+  followers                   Customer[]
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -1139,24 +1169,41 @@ model Manual {
 // 소비자
 // *********************************************************************************
 model Customer {
-  id                  Int                          @id @default(autoincrement()) // 소비자고유번호
-  name                String? // 이름
-  password            String? // 비밀번호
-  email               String? // 이메일
-  nickname            String? // 닉네임
-  phone               String? // 연락처
-  createDate          DateTime                     @default(now()) // 생성일
-  gender              String? // 성별
-  birthDate           DateTime? // 생년월일
-  agreementFlag       Boolean                      @default(false) // 개인정보    이용동의여부
-  inactiveFlag        Boolean                      @default(false)
-  socialAccount       CustomerSocialAccount[] // 연결된 소셜로그인 계정
-  address             CustomerAddress[] // 주소록
-  notificationSetting CustomerNotificationSetting? // 알림설정
-  mileage             CustomerMileage? // 보유 적립금
-  CustomerMileageLog  CustomerMileageLog[]
-  orders              Order[] // 주문
-  CustomerCoupon      CustomerCoupon[]
+  id                     Int                          @id @default(autoincrement()) // 소비자고유번호
+  name                   String? // 이름
+  password               String? // 비밀번호
+  email                  String?                      @unique // 이메일
+  nickname               String? // 닉네임
+  phone                  String? // 연락처
+  createDate             DateTime                     @default(now()) // 생성일
+  gender                 String? // 성별
+  birthDate              DateTime? // 생년월일
+  agreementFlag          Boolean                      @default(false) // 개인정보    이용동의여부
+  inactiveFlag           Boolean                      @default(false)
+  socialAccount          CustomerSocialAccount[] // 연결된 소셜로그인 계정
+  address                CustomerAddress[] // 주소록
+  notificationSetting    CustomerNotificationSetting? // 알림설정
+  mileage                CustomerMileage? // 보유 적립금
+  mileageLog             CustomerMileageLog[]
+  orders                 Order[] // 주문
+  coupons                CustomerCoupon[] // 발급받은 쿠폰
+  cartItems              CartItem[] // 장바구니에 넣은 상품
+  goodsReview            GoodsReview[]                @relation("WrittenReviews") // 작성한 리뷰
+  likedReviews           GoodsReview[]                @relation("LikedReviews") // 좋아요 누른 리뷰
+  goodsReviewComments    GoodsReviewComment[] // 소비자가 작성한 댓글
+  followingLiveShoppings LiveShopping[] // 팔로우하는 라이브쇼핑
+  followingBroadcasters  CustomerFollowBroadcaster[] // 팔로우하는 방송인
+}
+
+// 소비자-방송인팔로우  https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations#explicit-many-to-many-relations
+model CustomerFollowBroadcaster {
+  customerId    Int
+  customer      Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  broadcasterId Int
+  broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
+  createDate    DateTime    @default(now()) // 팔로우시작 날짜
+
+  @@id([customerId, broadcasterId])
 }
 
 // 소비자 소셜로그인 계정정보
@@ -1213,7 +1260,7 @@ model CustomerMileage {
 // 소비자 적립금 변동 내역
 model CustomerMileageLog {
   id         Int               @id @default(autoincrement()) // 소비자적립금 변동내역 고유번호
-  customerId Int               @unique // 소비자 고유번호
+  customerId Int // 소비자 고유번호
   customer   Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
   amount     Int // 변동된 적립금 양
   actionType MileageActionType // 적립금 변동 유형(사용 | 적립)
@@ -1228,78 +1275,6 @@ model CustomerMileageLog {
 enum MileageActionType {
   consume // 사용
   earn // 적립
-}
-
-// **************************************************************************
-// 주문
-// **************************************************************************
-model Order {
-  id                       Int                  @id @default(autoincrement()) // 주문 고유번호 => 비회원 주문조회시 주문번호로 조회할건데 주문번호 1이면 이상하겠다
-  customerId               Int                  @unique // 소비자 고유번호
-  // 연결된 소비자 삭제되는 경우 => 주문데이터는 유지, customerId는 null 이 됨
-  customer                 Customer             @relation(fields: [customerId], references: [id], onDelete: SetNull)
-  payment                  OrderPayment? // 주문결제정보
-  step                     OrderStep            @default(orderReceived) // 주문상태
-  createDate               DateTime // 주문생성일시
-  orderPrice               Int // 주문금액 = 실제 주문 상품/상품옵션 의 금액 합
-  paymentPrice             Int // 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한 금액
-  recipientName            String // 받는사람명
-  recipientPhone           String // 받는사람 연락처
-  recipientEmail           String // 받는사람 이메일
-  ordererName              String // 주문자명
-  ordererPhone             String // 주문자 연락처
-  ordererEmail             String // 주문자 이메일
-  memo                     String // 배송메시지
-  nonMemberOrderFlag       Boolean              @default(false) // 비회원 주문 여부
-  nonMemberOrderPassword   String? // 비회원주문시 입력받는 비밀번호 - 비회원이 주문조회,취소시 사용할예정
-  giftFlag                 Boolean              @default(false) // 선물주문 여부
-  supportOrderIncludeFlag  Boolean              @default(false) // 후원상품 포함여부
-  bundleFlag               Boolean              @default(false) // 묶음배송여부
-  mileageLog               CustomerMileageLog[] // 사용 & 적립 마일리지 내역
-  purchaseConfirmationDate DateTime? // 구매확정일자
-  cashReceipts             String? // 현금영수증번호
-  discountCodeId           Int? // 적용한 할인코드 고유번호
-  discountCode             DiscountCode?        @relation(fields: [discountCodeId], references: [id], onDelete: SetNull)
-}
-
-// [enum] 주문상태
-// 퍼스트몰 테이블 사용하고있는 기존 코드 재활용 쉽게 하기 위해
-// 퍼스트몰 주문상태 코드에 대응하는 값으로 만들었음
-enum OrderStep {
-  orderReceived // 주문접수, 15
-  paymentConfirmed // 결제확인, 25
-  goodsReady // 상품준비, 35
-  partialExportReady // 부분출고준비, 40
-  exportReady // 출고준비, 45
-  partialExportDone // 부분출고완료, 50
-  exportDone // 출고완료, 55
-  partialShipping // 부분배송중, 60
-  shipping // 배송중, 65
-  partialShippingDone // 부분배송완료, 70
-  shippingDone // 배송완료, 75
-  paymentCanceled // 결제취소, 85
-  orderInvalidated // 주문무효, 95
-  paymentFailed // 결제실패, 99
-}
-
-// 주문결제정보 - 기타 전자결제관련 필요한 데이터 저장
-model OrderPayment {
-  id              Int           @id @default(autoincrement()) // 주문결제정보 고유번호
-  method          PaymentMethod // 결제수단
-  orderId         Int           @unique
-  // 연결된 주문데이터가 삭제되는 경우 결제정보 데이터는 유지되어야 하나??
-  order           Order         @relation(fields: [orderId], references: [id], onDelete: SetNull)
-  depositDate     DateTime? // 입금일시
-  depositor       String? // 입금자명
-  depositDoneFlag Boolean       @default(false) // 입금완료여부
-  account         String? // 주문자가 결제한 금액이 입금될 계좌정보 
-}
-
-// [enum] 결제수단
-enum PaymentMethod {
-  card // 신용카드
-  bank // 무통장입금
-  account // 실시간 계좌이체
 }
 
 // ****************
@@ -1362,6 +1337,7 @@ model Coupon {
 
 // 소비자가 발급받은 쿠폰
 model CustomerCoupon {
+  id         Int                 @id @default(autoincrement()) // 소비자 발급쿠폰 고유번호
   couponId   Int
   coupon     Coupon              @relation(fields: [couponId], references: [id])
   customerId Int
@@ -1369,8 +1345,6 @@ model CustomerCoupon {
   issueDate  DateTime            @default(now()) // 발급일
   issuer     CouponIssuer        @default(customer) // 쿠폰 발급 주체
   logs       CustomerCouponLog[] // 쿠폰사용내역
-
-  @@id([couponId, customerId])
 }
 
 // [enum] 쿠폰 발급 주체
@@ -1383,7 +1357,7 @@ enum CouponIssuer {
 model CustomerCouponLog {
   id               Int            @id @default(autoincrement()) // 쿠폰 사용내역 고유번호
   customerCouponId Int
-  customerCoupon   CustomerCoupon @relation(fields: [customerCouponId], references: [couponId, customerId], onDelete: Cascade)
+  customerCoupon   CustomerCoupon @relation(fields: [customerCouponId], references: [id], onDelete: Cascade)
   status           CouponStatus   @default(notUsed) // 쿠폰사용상태
   createDate       DateTime       @default(now()) // 쿠폰사용내역 생성일
 }
@@ -1392,4 +1366,341 @@ enum CouponStatus {
   notUsed // 미사용
   used // 사용
   canceled // 사용취소
+}
+
+// *****************
+// 장바구니
+// *****************
+// 장바구니 상품
+model CartItem {
+  id         Int              @id @default(autoincrement()) // 장바구니 상품 고유번호
+  createDate DateTime         @default(now())
+  customerId Int? // 비로그인 상태로 장바구니에 담은것도 디비에 저장해야 하나? 쿠키에만 저장하면 되나??
+  customer   Customer?        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  goodsId    Int
+  goods      Goods            @relation(fields: [goodsId], references: [id], onDelete: SetNull)
+  options    CartItemOption[] // 선택된 장바구니 상품 옵션
+  support    CartItemSupport? // 연결된 후원정보
+}
+
+// 장바구니 상품옵션
+model CartItemOption {
+  id            Int      @id @default(autoincrement()) // 장바구니 상품 옵션 고유번호
+  cartItem      CartItem @relation(fields: [cartItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 장바구니 상품
+  cartItemId    Int // 옵션이 연결된 장바구니 상품 고유번호
+  name          String? // 장바구니에 담았을 당시 옵션명
+  value         String? // 장바구니에 담았을 당시 옵션값
+  quantity      Int // 옵션 선택 수량(개수)
+  normalPrice   Decimal  @db.Decimal(10, 2) // 장바구니에 담았을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
+  discountPrice Decimal  @db.Decimal(10, 2) // 장바구니에 담았을 당시 판매가 (할인가)
+  weight        Float? //장바구니에 담았을 당시 옵션 개당 무게 (단위 kg)
+}
+
+// 장바구니 상품 후원
+model CartItemSupport {
+  id            Int         @id @default(autoincrement()) // 장바구니 상품 후원 고유번호
+  message       String? // 후원메시지
+  nickname      String? // 후원한 사람 닉네임(필요없을거 같기는 한데 비회원의 경우 필요할거같아서 일단 넣어둠)
+  broadcasterId Int // 후원 대상 방송인 고유번호
+  broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
+  cartItemId    Int?        @unique // 후원이 연결된 장바구니 상품 고유번호
+  cartItem      CartItem?   @relation(fields: [cartItemId], references: [id], onDelete: Cascade) // 후원이 연결된 장바구니 상품
+}
+
+// *****************
+// 리뷰
+// *****************
+// 리뷰
+model GoodsReview {
+  id             Int                  @id @default(autoincrement()) // 리뷰고유번호
+  content        String               @db.Text // 리뷰내용
+  rating         Float // 별점
+  createDate     DateTime //생성일
+  writerId       Int // 리뷰 작성한 소비자 고유번호
+  writer         Customer             @relation("WrittenReviews", fields: [writerId], references: [id], onDelete: SetNull) // 리뷰작성자
+  likedCustomers Customer[]           @relation("LikedReviews") // 해당리뷰 좋아요 누른 소비자들
+  goodsId        Int // 리뷰 대상 상품 고유번호
+  goods          Goods                @relation(fields: [goodsId], references: [id], onDelete: SetNull) // 리뷰 대상 상품
+  images         GoodsReviewImage[] // 해당리뷰에 포함된 이미지
+  comments       GoodsReviewComment[] // 해당 리뷰에 달린 댓글
+}
+
+// 상품리뷰이미지
+model GoodsReviewImage {
+  id            Int         @id @default(autoincrement()) // 리뷰이미지 고유번호
+  imageUrl      String // 이미지 url
+  goodsReviewId Int // 이미지가 포함된 리뷰 고유번호
+  GoodsReview   GoodsReview @relation(fields: [goodsReviewId], references: [id], onDelete: Cascade) // 이미지가 포함된 리뷰
+}
+
+// 상품리뷰 댓글
+model GoodsReviewComment {
+  id                  Int         @id @default(autoincrement()) // 상품리뷰 댓글 고유번호
+  content             String // 내용
+  createDate          DateTime // 생성일
+  reviewId            Int // 댓글달린 리뷰 고유번호
+  review              GoodsReview @relation(fields: [reviewId], references: [id], onDelete: Cascade) // 댓글달린리뷰
+  customerId          Int? // 댓글 작성한 소비자 고유번호
+  customer            Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull) // 댓글작성한 소비자
+  writtenBySellerFlag Boolean     @default(false) // 댓글이 판매자에 의해 작성된 경우 해당 컬럼값은 true이고 연결된 소비자는 없다
+  sellerId            Int? // 댓글 작성한 판매자 고유번호(판매자에 의해 댓글이 작성된 경우)
+  seller              Seller?     @relation(fields: [sellerId], references: [id], onDelete: SetNull) // 댓글작성한 판매자(판매자에 의해 댓글이 작성된 경우)
+}
+
+// **************************************************************************
+// 주문
+// **************************************************************************
+model Order {
+  id                         Int                          @id @default(autoincrement()) // 주문 고유번호
+  orderCode                  String?                      @unique // 주문번호  => 주문자(회원이든 비회원이든)에게 노출될 고유번호. 주문일시+기타정보?? 조합해서 고유값 만들면 될듯
+  //주문고유번호id 가 있음에도 orderCode 컬럼을 만든 이유는 사용자에게 노출되어 주문 조회시 사용할 주문번호가 1,2 이러면 이상할거같아서...
+  customerId                 Int // 소비자 고유번호
+  // 연결된 소비자 삭제되는 경우 => 주문데이터는 유지, customerId는 null 이 됨
+  customer                   Customer                     @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  payment                    OrderPayment? // 주문결제정보
+  step                       OrderProcessStep             @default(orderReceived) // 주문상태
+  createDate                 DateTime // 주문생성일시
+  orderPrice                 Int // 주문금액 = 실제 주문 상품/상품옵션 의 금액 합
+  paymentPrice               Int // 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한 금액
+  recipientName              String // 받는사람명
+  recipientPhone             String // 받는사람 연락처
+  recipientEmail             String // 받는사람 이메일
+  ordererName                String // 주문자명
+  ordererPhone               String // 주문자 연락처
+  ordererEmail               String // 주문자 이메일
+  memo                       String // 배송메시지
+  nonMemberOrderFlag         Boolean                      @default(false) // 비회원 주문 여부
+  nonMemberOrderPassword     String? // 비회원주문시 입력받는 비밀번호 - 비회원이 주문조회,취소시 사용할예정
+  giftFlag                   Boolean                      @default(false) // 선물주문 여부
+  supportOrderIncludeFlag    Boolean                      @default(false) // 후원상품 포함여부
+  bundleFlag                 Boolean                      @default(false) // 묶음배송여부
+  mileageLog                 CustomerMileageLog[] // 사용 & 적립 마일리지 내역
+  purchaseConfirmationDate   DateTime? // 구매확정일자
+  cashReceipts               String? // 현금영수증번호
+  discountCodeId             Int? // 적용한 할인코드 고유번호
+  discountCode               DiscountCode?                @relation(fields: [discountCodeId], references: [id], onDelete: SetNull)
+  orderItems                 OrderItem[] // 주문에 연결된 주문상품들
+  refund                     Refund[] // 주문에 연결된 환불정보
+  return                     Return[] // 주문에 연결된 반품정보
+  export                     Export[] // 주문에 연결된 출고정보
+  broadcasterSettlementItems BroadcasterSettlementItems[]
+  sellerSettlementItems      SellerSettlementItems[]
+
+
+  @@index([orderCode])
+}
+
+// [enum] 주문처리상태
+// 퍼스트몰 테이블 사용하고있는 기존 코드 재활용 쉽게 하기 위해
+// 퍼스트몰 주문상태 코드에 대응하는 값으로 만들었음
+enum OrderProcessStep {
+  orderReceived // 주문접수, 15
+  paymentConfirmed // 결제확인, 25
+  goodsReady // 상품준비, 35
+  partialExportReady // 부분출고준비, 40
+  exportReady // 출고준비, 45
+  partialExportDone // 부분출고완료, 50
+  exportDone // 출고완료, 55
+  partialShipping // 부분배송중, 60
+  shipping // 배송중, 65
+  partialShippingDone // 부분배송완료, 70
+  shippingDone // 배송완료, 75
+  paymentCanceled // 결제취소, 85
+  orderInvalidated // 주문무효, 95
+  paymentFailed // 결제실패, 99
+}
+
+// 주문결제정보 - 기타 전자결제관련 필요한 데이터 저장
+model OrderPayment {
+  id              Int           @id @default(autoincrement()) // 주문결제정보 고유번호
+  method          PaymentMethod // 결제수단
+  orderId         Int           @unique
+  // 연결된 주문데이터가 삭제되는 경우 결제정보 데이터는 유지되어야 하나??
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  depositDate     DateTime? // 입금일시
+  depositor       String? // 입금자명
+  depositDoneFlag Boolean       @default(false) // 입금완료여부
+  account         String? // 주문자가 결제한 금액이 입금될 계좌정보 
+}
+
+// [enum] 결제수단
+enum PaymentMethod {
+  card // 신용카드
+  bank // 무통장입금
+  account // 실시간 계좌이체
+}
+
+// ****************
+// 주문상품
+// ****************
+// 주문상품
+model OrderItem {
+  id         Int               @id @default(autoincrement()) // 주문상품 고유번호
+  orderId    Int // 연결된 주문 고유번호
+  order      Order             @relation(fields: [orderId], references: [id], onDelete: Cascade) // 연결된 주문
+  goodsId    Int // 연결된 상품 고유번호
+  goods      Goods             @relation(fields: [goodsId], references: [id], onDelete: SetNull) // 연결된 상품
+  channel    SellType          @default(normal) // 판매유형(주문경로) - 주문테이블이 아닌 주문상품 테이블에 이 컬럼이 존재하는 이유 : 하나의 주문에 여러 경로로 선택된 상품이 포함될 수 있어서 상품별로 주문경로 저장함
+  options    OrderItemOption[] // 주문상품 옵션들
+  support    OrderItemSupport? // 주문상품에 연결된 후원정보
+  refundItem RefundItem[] // 환불상품
+  returnItem ReturnItem[] // 반품상품
+  exportItem ExportItem[] // 출고상품
+}
+
+// 주문상품옵션
+model OrderItemOption {
+  id            Int              @id @default(autoincrement()) // 주문 상품 옵션 고유번호
+  orderItemId   Int // 옵션이 연결된 주문 상품 고유번호
+  orderItem     OrderItem        @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
+  name          String? // 주문했을 당시 옵션명
+  value         String? // 주문했을 당시 옵션값
+  quantity      Int // 옵션 선택 수량(개수)
+  normalPrice   Decimal          @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
+  discountPrice Decimal          @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
+  weight        Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
+  step          OrderProcessStep @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
+  refundItem    RefundItem[] // 환불상품
+  returnItem    ReturnItem[] // 반품상품
+  exportItem    ExportItem[] // 출고상품
+}
+
+// 주문상품후원
+model OrderItemSupport {
+  id            Int         @id @default(autoincrement()) // 주문 상품 후원 고유번호
+  message       String? // 후원메시지
+  nickname      String? // 후원한 사람 닉네임(필요없을거 같기는 한데 비회원의 경우 필요할거같아서 일단 넣어둠)
+  broadcasterId Int // 후원 대상 방송인 고유번호
+  broadcaster   Broadcaster @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
+  orderItemId   Int?        @unique // 후원이 연결된 주문 상품 고유번호
+  orderItem     OrderItem?  @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 후원이 연결된 주문 상품
+}
+
+// ****************
+// 환불
+// ****************
+// 환불
+model Refund {
+  id                  Int           @id @default(autoincrement()) // 환불고유번호
+  refundCode          String?       @unique //환불코드 => 주문번호와 동일한 이유로 컬럼 만들었으나 환불코드도 사용자에게 노출이 되나???
+  orderId             Int // 주문 고유번호
+  order               Order         @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status              ProcessStatus @default(requested) // 환불처리상태
+  requestDate         DateTime      @default(now()) // 환불신청일시
+  completeDate        DateTime? // 처리완료일시
+  reason              String //환불사유
+  refundAccount       String // 환불계좌번호
+  refundAccountHolder String // 환불계좌예금주명
+  items               RefundItem[] // 환불상품들
+}
+
+// [enum] 처리상태
+enum ProcessStatus {
+  requested // 요청됨(초기 상태, 담당자 확인전)
+  processing // 처리진행중(담당자 확인 후 처리 중)
+  complete // 처리완료
+  canceled // 취소됨
+}
+
+// 환불상품
+model RefundItem {
+  id                Int             @id @default(autoincrement()) // 환불상품 고유번호
+  refundId          Int // 환불고유번호
+  refund            Refund          @relation(fields: [refundId], references: [id], onDelete: Cascade) // 연결된 환불정보
+  orderItemId       Int // 주문상품 고유번호
+  orderItem         OrderItem       @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
+  orderItemOptionId Int // 주문상품 옵션 고유번호
+  orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
+  amount            Int // 개수
+}
+
+// ****************
+// 반품
+// ****************
+// 반품
+model Return {
+  id            Int           @id @default(autoincrement()) // 반품고유번호
+  returnCode    String?       @unique //반품코드 => 주문번호와 동일한 이유로 컬럼 만들었으나 반품코드도 사용자에게 노출이 되나???
+  orderId       Int // 주문 고유번호
+  order         Order         @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status        ProcessStatus @default(requested) // 반품처리상태
+  requestDate   DateTime      @default(now()) // 반품신청일시
+  completeDate  DateTime? // 처리완료일시
+  reason        String // 반품사유
+  returnAddress String // 회수지 주소
+  items         ReturnItem[] // 반품상품들
+}
+
+// 반품상품
+model ReturnItem {
+  id                Int             @id @default(autoincrement()) // 반품상품 고유번호
+  returnId          Int // 반품고유번호
+  return            Return          @relation(fields: [returnId], references: [id], onDelete: Cascade) // 연결된 반품정보
+  orderItemId       Int // 주문상품 고유번호
+  orderItem         OrderItem       @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
+  orderItemOptionId Int // 주문상품 옵션 고유번호
+  orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
+  amount            Int // 개수
+}
+
+// ****************
+// 출고
+// ****************
+// 출고
+model Export {
+  id                         Int                          @id @default(autoincrement()) // 출고고유번호
+  exportCode                 String?                      @unique // 출고코드
+  orderId                    Int // 주문 고유번호
+  order                      Order                        @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status                     ProcessStatus                @default(requested) // 출고상태
+  deliveryCompany            String // 택배사
+  deliveryNumber             String // 운송장번호
+  bundleExportCode           String? // 합포장출고코드(합포장인경우)
+  exportDate                 DateTime //출고일시
+  broadcasterSettlementItems BroadcasterSettlementItems[]
+  sellerSettlementItems      SellerSettlementItems[]
+}
+
+// 출고상품
+model ExportItem {
+  id                Int             @id @default(autoincrement()) // 출고상품 고유번호
+  orderItemId       Int // 주문상품 고유번호
+  orderItem         OrderItem       @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
+  orderItemOptionId Int // 주문상품 옵션 고유번호
+  orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
+  amount            Int // 개수
+}
+
+// ****************
+// 상품 품목별 정보제공 - 전자상거래 등에서의 상품 등의 정보제공에 관한 고시
+// '상품정보제공고시'가 무엇인가요? https://m.help.naver.com/support/contents/contentsView.help?contentsNo=8785&lang=ko
+// ****************
+// 상품 품목
+model GoodsInformationSubject {
+  id      Int     @id @default(autoincrement()) // 상품품목 고유번호
+  subject String // 상품품목명 => 전자상거래 등에서의 상품 등의 정보제공에 관한 고시 Ⅲ. 상품 등의 정보의 내용 (1) 의류 (2) 구두/신발.... 에서 '의류', '구두/신발' 과 같은 품목명. 현재 대부분 상품은 '가공식품'에 해당할듯
+  items   Json // 상품품목별 필요한 정보를 key로 하는 JSON object 형태로 저장 (예: 가공식품의 경우 {"제품명": "", 식품유형: "", 생산자및소재지: "", 유통기한: "", 포장단위별내용물용량: "", 원재료및함량: "", ...})
+  goods   Goods[] // 상품품목에 해당하는 상품들
+}
+
+// 상품정보제공
+model GoodsInformationNotice {
+  id       Int    @id @default(autoincrement()) // 상품정보제공 고유번호
+  contents Json // 상품의 품목에 맞는 GoodsInformationSubject.items의 값을 채운 JSON object 형태로 저장 (예: {"제품명":"닭강정", "식품유형":"가열양념육", "유통기한":"제조일로부터3일", ...})
+  goodsId  Int?
+  goods    Goods? // 연결된 상품
+}
+
+// ****************
+// 상품 카테고리
+// ****************
+model GoodsCategory {
+  id               Int             @id @default(autoincrement())
+  categoryCode     String          @unique // 카테고리 코드
+  name             String // 카테고리명
+  mainCategoryFlag Boolean         @default(false) // 대표카테고리인지 여부 (카테고리 트리의 잎 여부)
+  parentCategoryId Int?
+  parentCategory   GoodsCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id]) // 상위 부모 카테고리
+  childrenCategory GoodsCategory[] @relation("CategoryHierarchy") // 하위 자식카테고리들
+  goods            Goods[] // 이 카테고리에 해당하는 상품들
 }
