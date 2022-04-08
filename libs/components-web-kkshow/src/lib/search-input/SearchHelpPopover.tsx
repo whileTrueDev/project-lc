@@ -1,5 +1,12 @@
 import { SmallCloseIcon } from '@chakra-ui/icons';
-import { Box, Flex, IconButton, Text, useColorModeValue } from '@chakra-ui/react';
+import {
+  Box,
+  BoxProps,
+  Flex,
+  IconButton,
+  Text,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { MouseEvent, useEffect } from 'react';
 
@@ -16,6 +23,8 @@ export function SearchHelpPopover({ onItemClick }: SearchHelpPopoverProps): JSX.
       height="fit-content"
       insetY={12}
       flex={1}
+      bgColor={useColorModeValue('white', 'gray.600')}
+      color={useColorModeValue('black', 'white')}
       zIndex="docked"
       rounded="md"
       boxShadow="md"
@@ -25,10 +34,15 @@ export function SearchHelpPopover({ onItemClick }: SearchHelpPopoverProps): JSX.
   );
 }
 
+interface SearchRecentKeywordsProps extends SearchHelpPopoverProps {
+  bgColor?: BoxProps['bgColor'];
+}
 export function SearchRecentKeywords({
   onItemClick,
-}: SearchHelpPopoverProps): JSX.Element {
+  bgColor,
+}: SearchRecentKeywordsProps): JSX.Element {
   const hoverColor = useColorModeValue('gray.50', 'gray.700');
+  const defaultBgColor = useColorModeValue('white', 'gray.600');
   const { keywords, deleteKeyword, loadKeywords } = useKkshowSearchStore();
 
   useEffect(() => {
@@ -38,26 +52,26 @@ export function SearchRecentKeywords({
     <Box
       p={{ base: 2, md: 0 }}
       my={3}
-      bgColor={useColorModeValue('white', 'gray.600')}
+      bgColor={bgColor || defaultBgColor}
       color={useColorModeValue('black', 'white')}
     >
       <Text
         ml={2}
         as="sup"
-        fontSize={{ base: 'md', md: 'xs' }}
+        fontSize={{ base: 'sm', md: 'xs' }}
         fontWeight={{ base: 'bold', md: 'unset' }}
         color={useColorModeValue('blue.400', 'gray.400')}
       >
         최근 검색어
       </Text>
       {keywords.length === 0 && <Text ml={3}>최근 검색어가 없습니다</Text>}
-      {keywords.map((item: string) => (
+      {keywords.map((item: string, idx) => (
         <Flex
           key={item}
           _hover={{ backgroundColor: hoverColor }}
           justifyContent="space-between"
           alignItems="center"
-          borderBottomWidth={{ base: 'thin', md: 0 }}
+          borderBottomWidth={{ base: idx !== keywords.length - 1 ? 'thin' : 0, md: 0 }}
           py={1}
         >
           <Flex

@@ -25,6 +25,10 @@ export function FullPageSearchBox({
   const closeSearchDrawer = useKkshowSearchStore((s) => s.closeSearchDrawer);
   const { setValue } = useFormContext<SearchForm>();
 
+  const onKeywordClick = (item: string): void => {
+    setValue('keyword', item);
+  };
+
   const iconColor = useColorModeValue('gray.600', 'gray.200');
   return (
     <Box>
@@ -46,11 +50,7 @@ export function FullPageSearchBox({
 
       {/* 최근검색어 */}
       <Flex my={4} flexDirection="column">
-        <SearchRecentKeywords
-          onItemClick={(item) => {
-            setValue('keyword', item);
-          }}
-        />
+        <SearchRecentKeywords bgColor="unset" onItemClick={onKeywordClick} />
       </Flex>
     </Box>
   );
