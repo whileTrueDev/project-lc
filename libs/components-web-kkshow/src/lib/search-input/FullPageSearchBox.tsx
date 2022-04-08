@@ -57,10 +57,9 @@ export function FullPageSearchBox({
 }
 
 interface FullPageSearchDrawerProps extends FullPageSearchBoxProps {
-  containerRef: RefObject<HTMLElement | null>;
+  containerRef?: RefObject<HTMLElement | null>;
 }
 export function FullPageSearchDrawer({
-  containerRef,
   searchBoxInputRef,
 }: FullPageSearchDrawerProps): JSX.Element {
   const { isSearchDrawerOpen, openSearchDrawer, closeSearchDrawer } =
@@ -86,7 +85,6 @@ export function FullPageSearchDrawer({
         initialFocusRef={searchBoxInputRef}
         closeOnEsc
         trapFocus
-        portalProps={{ containerRef }}
       >
         <DrawerOverlay display={{ base: 'flex', md: 'none' }} />
         <DrawerContent display={{ base: 'flex', md: 'none' }}>

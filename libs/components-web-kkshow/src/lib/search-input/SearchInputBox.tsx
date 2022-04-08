@@ -17,6 +17,7 @@ import { useFormContext } from 'react-hook-form';
 import { MdCancel } from 'react-icons/md';
 import SearchHelpPopover from './SearchHelpPopover';
 
+export const FORM_ID = 'keyword-search-form';
 export interface SearchForm {
   keyword: string;
 }
@@ -61,6 +62,7 @@ export function SearchInputBox({
           ref={realInputRef}
           autoFocus={!!isMobileSize}
           variant="outline"
+          form={FORM_ID}
           placeholder="검색어를 입력하세요"
           rounded="md"
           type="search"
@@ -103,6 +105,7 @@ export function SearchInputBox({
           icon={<SearchIcon />}
           {...searchButtonProps}
           type="submit"
+          form={FORM_ID}
         />
       </Tooltip>
 

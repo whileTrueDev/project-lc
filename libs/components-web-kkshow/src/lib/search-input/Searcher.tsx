@@ -24,7 +24,6 @@ export function Searcher(): JSX.Element {
     shallow,
   );
 
-  const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const methods = useForm<SearchForm>();
@@ -35,6 +34,7 @@ export function Searcher(): JSX.Element {
 
   //* 필터/검색 폼 제출
   const onSubmit: SubmitHandler<SearchForm> = (formData): void => {
+    console.log('on submit');
     if (formData.keyword) {
       searchStore.appendKeyword(formData.keyword);
       router.push({ pathname: '/search', query: { keyword: formData.keyword } });
@@ -49,7 +49,7 @@ export function Searcher(): JSX.Element {
 
   return (
     <FormProvider {...methods}>
-      <form ref={formRef} onSubmit={methods.handleSubmit(onSubmit)}>
+      <form id="keyword-search-form" onSubmit={methods.handleSubmit(onSubmit)}>
         {/* 데스크탑 검색 input */}
         <Flex display={{ base: 'none', md: 'flex' }} w={360}>
           <SearchInputBox inputRef={inputRef} />
@@ -57,7 +57,7 @@ export function Searcher(): JSX.Element {
 
         {/* 모바일 검색 full-page drawer */}
         <Flex display={{ base: 'flex', md: 'none' }}>
-          <FullPageSearchDrawer searchBoxInputRef={inputRef} containerRef={formRef} />
+          <FullPageSearchDrawer searchBoxInputRef={inputRef} />
         </Flex>
       </form>
     </FormProvider>
