@@ -50,7 +50,7 @@ export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
 
   return (
     <Flex w="100%" h="100%" pos="relative">
-      <InputGroup px={2} colorScheme="whiteAlpha">
+      <InputGroup colorScheme="whiteAlpha">
         <Input
           {...searchInputRegister}
           ref={realInputRef}
@@ -91,6 +91,8 @@ export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
       {/* 검색 버튼 */}
       <Tooltip label="검색" fontSize="xs">
         <IconButton
+          mr={2}
+          ml={1}
           variant="fill"
           aria-label="search-button-icon"
           icon={<SearchIcon />}

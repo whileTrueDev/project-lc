@@ -29,6 +29,8 @@ export function FullPageSearchBox({
     <Box>
       <Flex my={4} display={{ base: 'flex', xl: 'none' }} alignItems="center">
         <IconButton
+          ml={2}
+          mr={1}
           aria-label="exit-search-drawer"
           color={useColorModeValue('gray.600', 'gray.200')}
           onClick={() => closeSearchDrawer()}
