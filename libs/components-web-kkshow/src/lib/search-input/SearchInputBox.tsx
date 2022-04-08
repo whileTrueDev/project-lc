@@ -45,8 +45,8 @@ export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
   }, [inputRef]);
 
   useEffect(() => {
-    focusOnInput();
-  }, [focusOnInput]);
+    if (isMobileSize) focusOnInput();
+  }, [focusOnInput, isMobileSize]);
 
   return (
     <Flex w="100%" h="100%" pos="relative">
@@ -54,7 +54,7 @@ export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
         <Input
           {...searchInputRegister}
           ref={realInputRef}
-          autoFocus
+          autoFocus={!!isMobileSize}
           variant="outline"
           placeholder="검색어를 입력하세요"
           rounded="md"
