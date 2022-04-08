@@ -10,25 +10,24 @@ datasource db {
 }
 
 model Seller {
-  id                             Int                              @id @default(autoincrement())
-  email                          String?                          @unique
-  name                           String?
-  password                       String?
-  goods                          Goods[]
-  goodsCommonInfo                GoodsInfo[] // 상품공통정보
-  sellerBusinessRegistration     SellerBusinessRegistration[]
-  sellerSettlementAccount        SellerSettlementAccount[]
-  sellerShop                     SellerShop?
-  sellerSettlements              SellerSettlements[]
-  socialAccounts                 SellerSocialAccount[]
-  shippingGroups                 ShippingGroup[]
-  SellerContacts                 SellerContacts[]
-  LiveShopping                   LiveShopping[]
-  OrderCancelRequests            SellerOrderCancelRequest[] // 판매자의 결제취소요청
-  SellerSettlementConfirmHistory SellerSettlementConfirmHistory[] // 판매자 서류 승인/반려 히스토리
-  avatar                         String?
-  agreementFlag                  Boolean                          @default(false) // 이용동의 
-  inactiveFlag                   Boolean                          @default(false)
+  id                         Int                          @id @default(autoincrement())
+  email                      String?                      @unique
+  name                       String?
+  password                   String?
+  goods                      Goods[]
+  goodsCommonInfo            GoodsInfo[] // 상품공통정보
+  sellerBusinessRegistration SellerBusinessRegistration[]
+  sellerSettlementAccount    SellerSettlementAccount[]
+  sellerShop                 SellerShop?
+  sellerSettlements          SellerSettlements[]
+  socialAccounts             SellerSocialAccount[]
+  shippingGroups             ShippingGroup[]
+  SellerContacts             SellerContacts[]
+  LiveShopping               LiveShopping[]
+  OrderCancelRequests        SellerOrderCancelRequest[] // 판매자의 결제취소요청
+  avatar                     String?
+  agreementFlag              Boolean                      @default(false) // 이용동의 
+  inactiveFlag               Boolean                      @default(false)
 }
 
 // 마케터의 상정정보
@@ -55,6 +54,7 @@ model SellerBusinessRegistration {
   BusinessRegistrationConfirmation BusinessRegistrationConfirmation?
   seller                           Seller                            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
+  confirmHistory ConfirmHistory[]
   @@index(name: "BusinessRegistrationIndex", fields: [id])
 }
 
@@ -134,6 +134,7 @@ model SellerSettlementAccount {
   settlementAccountImageName String
   seller                     Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
+  confirmHistory ConfirmHistory[]
   @@index([id], name: "SellerSettlementAccountIndex")
 }
 
@@ -605,6 +606,7 @@ model BroadcasterSettlementInfo {
   broadcaster           Broadcaster                            @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
   broadcasterId         Int                                    @unique
   confirmation          BroadcasterSettlementInfoConfirmation?
+  confirmHistory        ConfirmHistory[]
 }
 
 // 방송인 정산 등록 정보 검수여부
@@ -1121,17 +1123,21 @@ model Manual {
   updateDate         DateTime @default(now()) @updatedAt
 }
 
-enum SellerPaperType {
+enum PaperType {
   settlementAccount // 계좌
   businessRegistration //사업자등록증
   mailOrder // 통신판매업증
 }
 
-model SellerSettlementConfirmHistory {
-  id         Int                        @id @default(autoincrement())
-  sellerId   Int
-  type       SellerPaperType // 서류 종류
-  status     BusinessRegistrationStatus // 검수상태
-  createDate DateTime                   @default(now())
-  seller     Seller                     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+model ConfirmHistory {
+  id                           Int                         @id @default(autoincrement())
+  sellerBusinessRegistrationId Int?
+  sellerSettlementAccountId    Int?
+  broadcasterSettlementInfoId  Int?
+  type                         PaperType // 서류 종류
+  status                       BusinessRegistrationStatus // 검수상태
+  createDate                   DateTime                    @default(now())
+  sellerSettlementAccount      SellerSettlementAccount?    @relation(fields: [sellerSettlementAccountId], references: [id])
+  sellerBusinessRegistration   SellerBusinessRegistration? @relation(fields: [sellerBusinessRegistrationId], references: [id])
+  broadcasterSettlementInfo    BroadcasterSettlementInfo?  @relation(fields: [broadcasterSettlementInfoId], references: [id])
 }

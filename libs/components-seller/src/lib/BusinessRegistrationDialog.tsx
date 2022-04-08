@@ -96,10 +96,6 @@ export function BusinessRegistrationDialog(
           userMail: profileData?.email,
           companyName,
         });
-        await historyMutation({
-          type: 'mailOrder',
-          status: 'waiting',
-        });
       }
 
       if (!savedBusinessRegistrationImageName) {
@@ -107,16 +103,32 @@ export function BusinessRegistrationDialog(
       }
 
       // 사업자 등록증 및 통신판매업 신고증 컬럼에 값 추가
-      await mutation.mutateAsync({
+      const businessRegistration = await mutation.mutateAsync({
         ...data,
         businessRegistrationImageName: savedBusinessRegistrationImageName,
         mailOrderSalesImageName: savedMailOrderSalesImageName,
       });
 
-      await historyMutation({
-        type: 'businessRegistration',
-        status: 'waiting',
-      });
+      if (mailOrderSalesImage && mailOrderSalesImageName && businessRegistration) {
+        Promise.all([
+          historyMutation({
+            type: 'mailOrder',
+            status: 'confirmed',
+            sellerBusinessRegistrationId: businessRegistration.id,
+          }),
+          historyMutation({
+            type: 'businessRegistration',
+            status: 'waiting',
+            sellerBusinessRegistrationId: businessRegistration.id,
+          }),
+        ]);
+      } else {
+        historyMutation({
+          type: 'businessRegistration',
+          status: 'waiting',
+          sellerBusinessRegistrationId: businessRegistration.id,
+        });
+      }
 
       toast({
         title: '사업자 등록정보 등록 완료',

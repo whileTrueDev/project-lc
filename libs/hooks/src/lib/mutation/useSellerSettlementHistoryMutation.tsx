@@ -1,36 +1,19 @@
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
-import {
-  SellerSettlementConfirmHistory,
-  SellerPaperType,
-  BusinessRegistrationStatus,
-} from '@prisma/client';
+import { ConfirmHistory, ConfirmHistoryDto } from '@prisma/client';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
 
-export interface SellerSettlementHistoryType {
-  type: SellerPaperType;
-  status: BusinessRegistrationStatus;
-  sellerId?: number;
-}
-
 export const useSellerSettlementHistoryMutation = (): UseMutationResult<
-  SellerSettlementConfirmHistory,
+  ConfirmHistory,
   AxiosError,
-  SellerSettlementHistoryType
+  ConfirmHistoryDto
 > => {
   const queryClient = useQueryClient();
 
-  return useMutation<
-    SellerSettlementConfirmHistory,
-    AxiosError,
-    SellerSettlementHistoryType
-  >(
-    async (dto: SellerSettlementHistoryType) =>
+  return useMutation<ConfirmHistory, AxiosError, ConfirmHistoryDto>(
+    async (dto: ConfirmHistoryDto) =>
       axios
-        .post<SellerSettlementConfirmHistory>(
-          '/seller/settlement/confirmation-history',
-          dto,
-        )
+        .post<ConfirmHistory>('/seller/settlement/confirmation-history', dto)
         .then((res) => res.data),
     {
       onSuccess: () => {
@@ -41,20 +24,15 @@ export const useSellerSettlementHistoryMutation = (): UseMutationResult<
 };
 
 export const useAdminSellerSettlementHistoryMutation = (): UseMutationResult<
-  SellerSettlementConfirmHistory,
+  ConfirmHistory,
   AxiosError,
-  SellerSettlementHistoryType
+  ConfirmHistoryDto
 > => {
-  return useMutation<
-    SellerSettlementConfirmHistory,
-    AxiosError,
-    SellerSettlementHistoryType
-  >(async (dto: SellerSettlementHistoryType) => {
-    return axios
-      .post<SellerSettlementConfirmHistory>(
-        '/admin/settlement-info/confirmation/history',
-        dto,
-      )
-      .then((res) => res.data);
-  });
+  return useMutation<ConfirmHistory, AxiosError, ConfirmHistoryDto>(
+    async (dto: ConfirmHistoryDto) => {
+      return axios
+        .post<ConfirmHistory>('/admin/settlement-info/confirmation/history', dto)
+        .then((res) => res.data);
+    },
+  );
 };

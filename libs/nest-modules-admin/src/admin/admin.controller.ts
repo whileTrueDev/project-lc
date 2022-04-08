@@ -24,7 +24,7 @@ import {
   GoodsConfirmation,
   LiveShopping,
   PrivacyApproachHistory,
-  SellerSettlementConfirmHistory,
+  ConfirmHistory,
 } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -63,6 +63,7 @@ import {
   PrivacyApproachHistoryDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
+  ConfirmHistoryDto,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
@@ -299,14 +300,10 @@ export class AdminController {
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/settlement-info/confirmation/history')
-  createSettlementConfirmHistory(@Body() dto): Promise<SellerSettlementConfirmHistory> {
-    return this.sellerSettlementService.createSettlementConfirmHistory(
-      {
-        type: dto.type,
-        status: dto.status,
-      },
-      dto.sellerId,
-    );
+  createSettlementConfirmHistory(
+    @Body() dto: ConfirmHistoryDto,
+  ): Promise<ConfirmHistory> {
+    return this.sellerSettlementService.createSettlementConfirmHistory(dto);
   }
 
   /** 전체 판매자 계정 목록 조회 */

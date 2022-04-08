@@ -49,19 +49,19 @@ export function AdminBusinessRegistrationConfirmationDialog({
           historyMutation({
             type: 'businessRegistration',
             status: 'confirmed',
-            sellerId: row.sellerId,
+            sellerBusinessRegistrationId: row.id,
           }),
           historyMutation({
             type: 'mailOrder',
             status: 'confirmed',
-            sellerId: row.sellerId,
+            sellerBusinessRegistrationId: row.id,
           }),
         ]);
       } else {
         await historyMutation({
           type: 'businessRegistration',
           status: 'confirmed',
-          sellerId: row.sellerId,
+          sellerBusinessRegistrationId: row.id,
         });
       }
       toast({

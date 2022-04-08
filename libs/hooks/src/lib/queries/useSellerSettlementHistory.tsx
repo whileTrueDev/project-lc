@@ -1,22 +1,20 @@
-import { SellerSettlementConfirmHistory } from '@prisma/client';
+import { ConfirmHistory } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
-export const getSellerSettlementHistory = async (): Promise<
-  SellerSettlementConfirmHistory[]
-> => {
+export const getSellerSettlementHistory = async (): Promise<ConfirmHistory[]> => {
   return axios
-    .get<SellerSettlementConfirmHistory[]>('/seller/settlement/confirmation-history', {})
+    .get<ConfirmHistory[]>('/seller/settlement/confirmation-history', {})
     .then((res) => res.data);
 };
 
 export const useSellerSettlementHistory = (): UseQueryResult<
-  SellerSettlementConfirmHistory[],
+  ConfirmHistory[],
   AxiosError
 > => {
   const queryKey = ['SellerSettlementHistory'];
-  return useQuery<SellerSettlementConfirmHistory[], AxiosError>(queryKey, () =>
+  return useQuery<ConfirmHistory[], AxiosError>(queryKey, () =>
     getSellerSettlementHistory(),
   );
 };

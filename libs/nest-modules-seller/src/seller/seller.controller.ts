@@ -19,7 +19,7 @@ import {
   SellCommission,
   Seller,
   SellerSettlementAccount,
-  SellerSettlementConfirmHistory,
+  ConfirmHistory,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
@@ -36,7 +36,7 @@ import {
   SellerShopInfoDto,
   SettlementAccountDto,
   SignUpDto,
-  SellerSettlementConfirmHistoryDto,
+  ConfirmHistoryDto,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { SellerContactsService } from './seller-contacts.service';
@@ -172,20 +172,16 @@ export class SellerController {
   @UseInterceptors(HttpCacheInterceptor)
   public async selectSellerSettlementHistory(
     @SellerInfo() sellerInfo: UserPayload,
-  ): Promise<SellerSettlementConfirmHistory[]> {
+  ): Promise<ConfirmHistory[]> {
     return this.sellerSettlementService.getSettlementConfirmHistory(sellerInfo);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('settlement/confirmation-history')
   public async InsertSettlementHistory(
-    @Body(ValidationPipe) dto: SellerSettlementConfirmHistoryDto,
-    @SellerInfo() sellerInfo: UserPayload,
-  ): Promise<SellerSettlementConfirmHistory> {
-    return this.sellerSettlementService.createSettlementConfirmHistory(
-      dto,
-      sellerInfo.id,
-    );
+    @Body(ValidationPipe) dto: ConfirmHistoryDto,
+  ): Promise<ConfirmHistory> {
+    return this.sellerSettlementService.createSettlementConfirmHistory(dto);
   }
 
   @UseGuards(JwtAuthGuard)

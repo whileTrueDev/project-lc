@@ -77,6 +77,7 @@ export function SettlementAccountDialog(
         await historyMutation({
           type: 'settlementAccount',
           status: 'confirmed',
+          sellerSettlementAccountId: settlementAccount.id,
         });
       }
 
