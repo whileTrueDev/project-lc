@@ -16,8 +16,6 @@ export function SearchHelpPopover({ onItemClick }: SearchHelpPopoverProps): JSX.
       height="fit-content"
       insetY={12}
       flex={1}
-      bgColor={useColorModeValue('white', 'gray.600')}
-      color={useColorModeValue('black', 'white')}
       zIndex="docked"
       rounded="md"
       boxShadow="md"
@@ -50,7 +48,12 @@ export function SearchRecentKeywords({
   };
 
   return (
-    <Box p={{ base: 2, md: 0 }} my={3}>
+    <Box
+      p={{ base: 2, md: 0 }}
+      my={3}
+      bgColor={useColorModeValue('white', 'gray.600')}
+      color={useColorModeValue('black', 'white')}
+    >
       <Text
         ml={2}
         as="sup"

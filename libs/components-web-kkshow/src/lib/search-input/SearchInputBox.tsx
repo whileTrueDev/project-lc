@@ -2,6 +2,7 @@ import { SearchIcon } from '@chakra-ui/icons';
 import {
   Flex,
   IconButton,
+  IconButtonProps,
   Input,
   InputGroup,
   InputRightElement,
@@ -21,9 +22,13 @@ export interface SearchForm {
 }
 export interface SearchInputBoxProps {
   inputRef?: RefObject<HTMLInputElement>;
+  searchButtonProps?: Omit<IconButtonProps, 'aria-label'>;
 }
 
-export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
+export function SearchInputBox({
+  inputRef,
+  searchButtonProps,
+}: SearchInputBoxProps): JSX.Element {
   const { isMobileSize } = useDisplaySize();
 
   const initialRef = useRef<HTMLInputElement>(null);
@@ -50,7 +55,7 @@ export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
 
   return (
     <Flex w="100%" h="100%" pos="relative">
-      <InputGroup colorScheme="whiteAlpha">
+      <InputGroup>
         <Input
           {...searchInputRegister}
           ref={realInputRef}
@@ -96,6 +101,7 @@ export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
           variant="fill"
           aria-label="search-button-icon"
           icon={<SearchIcon />}
+          {...searchButtonProps}
           type="submit"
         />
       </Tooltip>

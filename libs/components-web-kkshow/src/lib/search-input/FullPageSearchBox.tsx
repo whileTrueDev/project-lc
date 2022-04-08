@@ -25,6 +25,7 @@ export function FullPageSearchBox({
   const closeSearchDrawer = useKkshowSearchStore((s) => s.closeSearchDrawer);
   const { setValue } = useFormContext<SearchForm>();
 
+  const iconColor = useColorModeValue('gray.600', 'gray.200');
   return (
     <Box>
       <Flex my={4} display={{ base: 'flex', xl: 'none' }} alignItems="center">
@@ -32,12 +33,15 @@ export function FullPageSearchBox({
           ml={2}
           mr={1}
           aria-label="exit-search-drawer"
-          color={useColorModeValue('gray.600', 'gray.200')}
+          color={iconColor}
           onClick={() => closeSearchDrawer()}
           variant="unstyle"
           icon={<ChevronLeftIcon w="30px" h="35px" />}
         />
-        <SearchInputBox inputRef={searchBoxInputRef} />
+        <SearchInputBox
+          inputRef={searchBoxInputRef}
+          searchButtonProps={{ color: iconColor }}
+        />
       </Flex>
 
       {/* 최근검색어 */}
@@ -70,7 +74,6 @@ export function FullPageSearchDrawer({
           size="md"
           fontSize="lg"
           variant="unstyle"
-          color="current"
           icon={<SearchIcon />}
           aria-label="toggle search"
           onClick={openSearchDrawer}
