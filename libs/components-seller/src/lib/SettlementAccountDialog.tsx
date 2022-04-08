@@ -76,7 +76,7 @@ export function SettlementAccountDialog(
       if (profileData?.type === 'seller') {
         await historyMutation({
           type: 'settlementAccount',
-          status: 'waiting',
+          status: 'confirmed',
         });
       }
 
