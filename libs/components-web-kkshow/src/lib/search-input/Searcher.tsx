@@ -6,7 +6,7 @@ import { useCallback, useRef } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
 import { FullPageSearchDrawer } from './FullPageSearchBox';
-import { SearchInputBox } from './SearchInputBox';
+import { SearchInputBox, SEARCH_FORM_ID } from './SearchInputBox';
 
 interface SearchForm {
   keyword: string;
@@ -24,7 +24,6 @@ export function Searcher(): JSX.Element {
     shallow,
   );
 
-  const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const methods = useForm<SearchForm>();
@@ -49,7 +48,7 @@ export function Searcher(): JSX.Element {
 
   return (
     <FormProvider {...methods}>
-      <form ref={formRef} onSubmit={methods.handleSubmit(onSubmit)}>
+      <form id={SEARCH_FORM_ID} onSubmit={methods.handleSubmit(onSubmit)}>
         {/* 데스크탑 검색 input */}
         <Flex display={{ base: 'none', md: 'flex' }} w={360}>
           <SearchInputBox inputRef={inputRef} />
@@ -57,7 +56,7 @@ export function Searcher(): JSX.Element {
 
         {/* 모바일 검색 full-page drawer */}
         <Flex display={{ base: 'flex', md: 'none' }}>
-          <FullPageSearchDrawer searchBoxInputRef={inputRef} containerRef={formRef} />
+          <FullPageSearchDrawer searchBoxInputRef={inputRef} />
         </Flex>
       </form>
     </FormProvider>

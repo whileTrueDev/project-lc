@@ -2,7 +2,6 @@ import { SearchIcon } from '@chakra-ui/icons';
 import {
   Flex,
   IconButton,
-  IconButtonProps,
   Input,
   InputGroup,
   InputRightElement,
@@ -17,18 +16,15 @@ import { useFormContext } from 'react-hook-form';
 import { MdCancel } from 'react-icons/md';
 import SearchHelpPopover from './SearchHelpPopover';
 
+export const SEARCH_FORM_ID = 'kkshow-search-form';
 export interface SearchForm {
   keyword: string;
 }
 export interface SearchInputBoxProps {
   inputRef?: RefObject<HTMLInputElement>;
-  searchButtonProps?: Omit<IconButtonProps, 'aria-label'>;
 }
 
-export function SearchInputBox({
-  inputRef,
-  searchButtonProps,
-}: SearchInputBoxProps): JSX.Element {
+export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
   const { isMobileSize } = useDisplaySize();
 
   const initialRef = useRef<HTMLInputElement>(null);
@@ -43,6 +39,9 @@ export function SearchInputBox({
   const { register, watch, setValue } = useFormContext<SearchForm>();
   const searchInputRegister = register('keyword');
   const realInputRef = useMergeRefs(inputRef || initialRef, searchInputRegister.ref);
+  const clearSearchInput = (): void => {
+    setValue('keyword', '');
+  };
 
   const focusOnInput = useCallback((): void => {
     const ref = inputRef || initialRef;
@@ -67,6 +66,7 @@ export function SearchInputBox({
           autoComplete="off"
           bgColor={useColorModeValue('white', 'gray.600')}
           color={useColorModeValue('blackAlpha.900', 'whiteAlpha.900')}
+          form={SEARCH_FORM_ID}
           onKeyDown={(e) => {
             if (e.code === 'Escape') closeSearchRecommendPopover();
           }}
@@ -86,9 +86,7 @@ export function SearchInputBox({
               variant="fill"
               aria-label="erase-button-icon"
               icon={<MdCancel color="gray" />}
-              onClick={() => {
-                setValue('keyword', '');
-              }}
+              onClick={clearSearchInput}
             />
           </InputRightElement>
         )}
@@ -101,7 +99,7 @@ export function SearchInputBox({
           variant="fill"
           aria-label="search-button-icon"
           icon={<SearchIcon />}
-          {...searchButtonProps}
+          form={SEARCH_FORM_ID}
           type="submit"
         />
       </Tooltip>

@@ -8,7 +8,6 @@ import {
   Flex,
   IconButton,
   Tooltip,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { RefObject } from 'react';
@@ -29,7 +28,6 @@ export function FullPageSearchBox({
     setValue('keyword', item);
   };
 
-  const iconColor = useColorModeValue('gray.600', 'gray.200');
   return (
     <Box>
       <Flex my={4} display={{ base: 'flex', xl: 'none' }} alignItems="center">
@@ -37,15 +35,11 @@ export function FullPageSearchBox({
           ml={2}
           mr={1}
           aria-label="exit-search-drawer"
-          color={iconColor}
           onClick={() => closeSearchDrawer()}
           variant="unstyle"
           icon={<ChevronLeftIcon w="30px" h="35px" />}
         />
-        <SearchInputBox
-          inputRef={searchBoxInputRef}
-          searchButtonProps={{ color: iconColor }}
-        />
+        <SearchInputBox inputRef={searchBoxInputRef} />
       </Flex>
 
       {/* 최근검색어 */}
@@ -57,7 +51,7 @@ export function FullPageSearchBox({
 }
 
 interface FullPageSearchDrawerProps extends FullPageSearchBoxProps {
-  containerRef: RefObject<HTMLElement | null>;
+  containerRef?: RefObject<HTMLElement | null>;
 }
 export function FullPageSearchDrawer({
   containerRef,
