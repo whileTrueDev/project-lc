@@ -41,7 +41,7 @@ export function SearchRecentKeywords({
   onItemClick,
   bgColor,
 }: SearchRecentKeywordsProps): JSX.Element {
-  const hoverColor = useColorModeValue('gray.50', 'gray.700');
+  const hoverColor = useColorModeValue('gray.100', 'gray.500');
   const defaultBgColor = useColorModeValue('white', 'gray.600');
   const { keywords, deleteKeyword, loadKeywords } = useKkshowSearchStore();
 
