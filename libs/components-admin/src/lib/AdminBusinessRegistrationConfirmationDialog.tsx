@@ -43,11 +43,27 @@ export function AdminBusinessRegistrationConfirmationDialog({
   const useSubmit = async (): Promise<void> => {
     try {
       await confirmationMutation.mutateAsync({ id: row.id });
-      await historyMutation({
-        type: 'businessRegistration',
-        status: 'confirmed',
-        sellerId: row.sellerId,
-      });
+
+      if (row.mailOrderSalesImageName) {
+        await Promise.all([
+          historyMutation({
+            type: 'businessRegistration',
+            status: 'confirmed',
+            sellerId: row.sellerId,
+          }),
+          historyMutation({
+            type: 'mailOrder',
+            status: 'confirmed',
+            sellerId: row.sellerId,
+          }),
+        ]);
+      } else {
+        await historyMutation({
+          type: 'businessRegistration',
+          status: 'confirmed',
+          sellerId: row.sellerId,
+        });
+      }
       toast({
         title: '사업자등록정보가 승인되었습니다.',
         status: 'success',

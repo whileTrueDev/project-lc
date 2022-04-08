@@ -79,7 +79,11 @@ const columns: GridColumns = [
   {
     field: 'mailOrderSalesImageName',
     headerName: '통신판매업등록증',
-    renderCell: () => <Button size="xs">다운로드</Button>,
+    renderCell: ({ row }) => (
+      <Button size="xs" disabled={!row.mailOrderSalesImageName}>
+        다운로드
+      </Button>
+    ),
     minWidth: 160,
   },
   {

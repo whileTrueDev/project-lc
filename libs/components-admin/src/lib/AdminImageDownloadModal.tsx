@@ -9,7 +9,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { GridRowData } from '@material-ui/data-grid';
-import { s3KeyType } from '@project-lc/utils-s3';
+import { s3KeyType, s3 } from '@project-lc/utils-s3';
 import { useForm, FormProvider } from 'react-hook-form';
 import { AdminImageDownloadButton } from './AdminImageDownloadButton';
 
@@ -46,7 +46,7 @@ export function AdminImageDownloadModal(
               <Input {...register('reason', { maxLength: 10 })} />
             </ModalBody>
             <ModalFooter>
-              {watch('reason').trim() && (
+              {watch('reason')?.trim() && (
                 <AdminImageDownloadButton row={row} type={type} onClose={onClose} />
               )}
             </ModalFooter>
