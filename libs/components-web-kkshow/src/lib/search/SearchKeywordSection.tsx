@@ -9,7 +9,7 @@ function SearchKeywordSectionContainer({
   return (
     <Box bg="blue.500" color="whiteAlpha.900">
       <Container maxW="6xl">
-        <Center py={8}>{children}</Center>
+        <Center py={{ base: 4, md: 8 }}>{children}</Center>
       </Container>
     </Box>
   );
@@ -23,21 +23,27 @@ export function SearchKeywordSection({
   keyword,
   resultCount,
 }: SearchKeywordSectionProps): JSX.Element {
+  const renderKeyword = (
+    <Heading fontSize={{ base: 'lg', md: '4xl' }}>{`‘${keyword}’`}</Heading>
+  );
+
   if (!keyword || !resultCount) {
     return (
       <SearchKeywordSectionContainer>
-        <Stack fontSize="lg" fontWeight="bold" textAlign="center">
-          {keyword && <Heading fontSize="4xl">{`‘${keyword}’`}</Heading>}
-          <Text>검색 결과가 없습니다.</Text>
-          <Text>{keyword && '다른 '}제품이나 방송인을 검색해보세요.</Text>
+        <Stack fontWeight="medium" textAlign="center">
+          {keyword ? renderKeyword : null}
+          <Text fontSize={{ base: 'sm', sm: 'md' }}>검색 결과가 없습니다.</Text>
+          <Text fontSize={{ base: 'sm', sm: 'md' }}>
+            {keyword && '다른 '}제품이나 방송인을 검색해보세요.
+          </Text>
         </Stack>
       </SearchKeywordSectionContainer>
     );
   }
   return (
     <SearchKeywordSectionContainer>
-      <Stack textAlign="center" fontWeight="bold">
-        <Heading fontSize="4xl">{`‘${keyword}’`}</Heading>
+      <Stack textAlign="center" fontWeight="medium">
+        {renderKeyword}
         <Text>{resultCount} 개의 결과</Text>
       </Stack>
     </SearchKeywordSectionContainer>

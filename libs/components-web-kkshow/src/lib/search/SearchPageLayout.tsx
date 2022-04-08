@@ -6,9 +6,8 @@ import { useKkshowSearchResults } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { SearchResult } from '@project-lc/shared-types';
-import KkshowNavbar from '../KkshowNavbar';
+import KkshowNavbar, { kkshowNavHeight } from '../KkshowNavbar';
 import KKshowMainExternLinks from '../main/KKshowMainExternLinks';
-import { MobileSearchDrawer } from './MobileSearchDrawer';
 
 export interface SearchPageLayoutProps {
   children?: React.ReactNode;
@@ -19,13 +18,12 @@ export function SearchPageLayout({ children }: SearchPageLayoutProps): JSX.Eleme
     <Flex direction="column" overflow="hidden" minHeight="100vh">
       {/* 검색페이지 네비바는 라이트모드에서 흰색배경이라 variant="white" 적용함 */}
       <KkshowNavbar variant="white" />
-      <Box flexGrow={1}>{children}</Box>
-
-      <BottomQuickMenu />
-      <MobileSearchDrawer />
-
+      <Box flexGrow={1} minH={`calc(100vh - ${kkshowNavHeight}px)`}>
+        {children}
+      </Box>
       <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />
+      <BottomQuickMenu />
     </Flex>
   );
 }

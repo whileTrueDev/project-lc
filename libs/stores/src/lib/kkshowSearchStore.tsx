@@ -1,49 +1,74 @@
 import create from 'zustand';
 
-export interface kkshowSearch {
-  keyword: string;
-  localStorage: string[];
-  setKeyword(value: string): void;
-  setLocalStorage(value: string[]): void;
+export type KkshowSearchStore = SearchKeywordStore &
+  SearchDrawerStore &
+  SearchPopoverStore;
+
+export interface SearchKeywordStore {
+  keywords: string[];
+  appendKeyword: (value: string) => void;
+  setKeywords(keywords: string[]): void;
+  loadKeywords: () => void;
+  deleteKeyword: (value: string) => void;
 }
 
-export interface searchDrawer {
-  isOpen: boolean;
-  setIsOpen: (value: boolean) => void;
+export interface SearchDrawerStore {
+  isSearchDrawerOpen: boolean;
+  openSearchDrawer: () => void;
+  closeSearchDrawer: () => void;
 }
 
 export interface SearchPopoverStore {
-  isOpen: boolean;
-  handlePopover: (value: boolean) => void;
+  isSearchPopoverOpen: boolean;
+  openSearchRecommendPopover: () => void;
+  closeSearchRecommendPopover: () => void;
 }
 
-export const useKkshowSearchStore = create<kkshowSearch>((set, get) => ({
-  keyword: '',
-  localStorage: [],
-  setKeyword: (value: string) => {
-    set(() => ({
-      keyword: value,
-    }));
-  },
-  setLocalStorage: (value: string[]) => {
-    set(() => ({
-      localStorage: value,
-    }));
-  },
-}));
+export const KEYWORD_KEY = 'recentSearchKeyword';
 
-export const useSearchDrawer = create<searchDrawer>((set, get) => ({
-  isOpen: false,
-  setIsOpen: (value: boolean) => {
-    set(() => ({
-      isOpen: value,
-    }));
-  },
-}));
+export const useKkshowSearchStore = create<KkshowSearchStore>((set) => ({
+  // 검색어
+  keywords: [],
+  appendKeyword: (newKeyword: string) => {
+    const MAX_RECENT_KEYWORD = 5;
+    const storedKeywords = window.localStorage.getItem(KEYWORD_KEY);
 
-export const useSearchPopoverStore = create<SearchPopoverStore>((set, get) => ({
-  isOpen: false,
-  handlePopover: (value) => {
-    return set({ isOpen: value });
+    let _newKeywords: string[] = JSON.parse(storedKeywords || '[]');
+    _newKeywords.unshift(newKeyword);
+    _newKeywords = [...new Set(_newKeywords)];
+    if (_newKeywords.length > MAX_RECENT_KEYWORD)
+      _newKeywords = _newKeywords.splice(0, MAX_RECENT_KEYWORD);
+
+    const newKeywordsString = JSON.stringify(_newKeywords);
+    window.localStorage.setItem(KEYWORD_KEY, newKeywordsString);
+
+    set({ keywords: _newKeywords });
   },
+  setKeywords: (keywords: string[]) => {
+    set({ keywords });
+  },
+  loadKeywords: () =>
+    set({
+      keywords: JSON.parse(window.localStorage.getItem(KEYWORD_KEY) || '[]'),
+    }),
+
+  deleteKeyword: (targetKeyword: string) => {
+    const storedKeywords = window.localStorage.getItem(KEYWORD_KEY);
+    const keywords: string[] = JSON.parse(storedKeywords || '[]');
+    const index = keywords.indexOf(targetKeyword);
+    if (index !== -1) {
+      keywords.splice(index, 1);
+      window.localStorage.setItem(KEYWORD_KEY, JSON.stringify(keywords));
+      set({ keywords: JSON.parse(window.localStorage.getItem(KEYWORD_KEY) || '[]') });
+    }
+  },
+  // 모바일 검색 drawer 창
+  isSearchDrawerOpen: false,
+  openSearchDrawer: () => set({ isSearchDrawerOpen: true }),
+  closeSearchDrawer: () => set({ isSearchDrawerOpen: false }),
+
+  // 데스크탑 최근검색어, 추천검색어 popover 창
+  isSearchPopoverOpen: false,
+  openSearchRecommendPopover: () => set({ isSearchPopoverOpen: true }),
+  closeSearchRecommendPopover: () => set({ isSearchPopoverOpen: false }),
 }));
