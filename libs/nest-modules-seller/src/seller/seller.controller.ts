@@ -168,7 +168,7 @@ export class SellerController {
 
   // 본인의 정산정보 및 정산 검수 히스토리 조회
   @UseGuards(JwtAuthGuard)
-  @Get('settlement/history')
+  @Get('settlement/confirmation-history')
   @UseInterceptors(HttpCacheInterceptor)
   public async selectSellerSettlementHistory(
     @SellerInfo() sellerInfo: UserPayload,
@@ -177,7 +177,7 @@ export class SellerController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('settlement/history')
+  @Post('settlement/confirmation-history')
   public async InsertSettlementHistory(
     @Body(ValidationPipe) dto: SellerSettlementConfirmHistoryDto,
     @SellerInfo() sellerInfo: UserPayload,

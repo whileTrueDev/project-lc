@@ -7,7 +7,7 @@ export const getSellerSettlementHistory = async (): Promise<
   SellerSettlementConfirmHistory[]
 > => {
   return axios
-    .get<SellerSettlementConfirmHistory[]>('/seller/settlement/history', {})
+    .get<SellerSettlementConfirmHistory[]>('/seller/settlement/confirmation-history', {})
     .then((res) => res.data);
 };
 

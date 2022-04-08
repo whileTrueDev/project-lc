@@ -27,7 +27,10 @@ export const useSellerSettlementHistoryMutation = (): UseMutationResult<
   >(
     async (dto: SellerSettlementHistoryType) =>
       axios
-        .post<SellerSettlementConfirmHistory>('/seller/settlement/history', dto)
+        .post<SellerSettlementConfirmHistory>(
+          '/seller/settlement/confirmation-history',
+          dto,
+        )
         .then((res) => res.data),
     {
       onSuccess: () => {
