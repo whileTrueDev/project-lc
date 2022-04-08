@@ -29,24 +29,11 @@ export function SearchRecentKeywords({
   onItemClick,
 }: SearchHelpPopoverProps): JSX.Element {
   const hoverColor = useColorModeValue('gray.50', 'gray.700');
-  const { keywords, setKeywords, loadKeywords } = useKkshowSearchStore();
+  const { keywords, deleteKeyword, loadKeywords } = useKkshowSearchStore();
 
   useEffect(() => {
     loadKeywords();
   }, [loadKeywords]);
-
-  const deleteLocalStorageSearchKeyword = (toDeleteKeyword: string): void => {
-    const localDataArray: string[] = JSON.parse(
-      window.localStorage.getItem('searchKeyword') || '[]',
-    );
-    const index = localDataArray.indexOf(toDeleteKeyword);
-    if (index !== -1) {
-      localDataArray.splice(index, 1);
-      window.localStorage.setItem('searchKeyword', JSON.stringify(localDataArray));
-      setKeywords(JSON.parse(window.localStorage.getItem('searchKeyword') || '[]'));
-    }
-  };
-
   return (
     <Box
       p={{ base: 2, md: 0 }}
@@ -97,7 +84,7 @@ export function SearchRecentKeywords({
             aria-label="search-button-icon"
             icon={<SmallCloseIcon />}
             onMouseDown={(e) => e.preventDefault()}
-            onClick={() => deleteLocalStorageSearchKeyword(item)}
+            onClick={() => deleteKeyword(item)}
           />
         </Flex>
       ))}

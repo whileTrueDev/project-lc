@@ -9,6 +9,7 @@ export interface SearchKeywordStore {
   appendKeyword: (value: string) => void;
   setKeywords(keywords: string[]): void;
   loadKeywords: () => void;
+  deleteKeyword: (value: string) => void;
 }
 
 export interface SearchDrawerStore {
@@ -50,6 +51,17 @@ export const useKkshowSearchStore = create<KkshowSearchStore>((set) => ({
     set({
       keywords: JSON.parse(window.localStorage.getItem(KEYWORD_KEY) || '[]'),
     }),
+
+  deleteKeyword: (targetKeyword: string) => {
+    const storedKeywords = window.localStorage.getItem(KEYWORD_KEY);
+    const keywords: string[] = JSON.parse(storedKeywords || '[]');
+    const index = keywords.indexOf(targetKeyword);
+    if (index !== -1) {
+      keywords.splice(index, 1);
+      window.localStorage.setItem(KEYWORD_KEY, JSON.stringify(keywords));
+      set({ keywords: JSON.parse(window.localStorage.getItem(KEYWORD_KEY) || '[]') });
+    }
+  },
   // 모바일 검색 drawer 창
   isSearchDrawerOpen: false,
   openSearchDrawer: () => set({ isSearchDrawerOpen: true }),
