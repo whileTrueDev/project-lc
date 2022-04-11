@@ -40,8 +40,11 @@ function MainCarousel(): JSX.Element | null {
     >
       {data &&
         data.carousel.map((item, idx) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <SwiperSlide style={{ width: 720, margin: '0 auto' }} key={idx}>
+          <SwiperSlide
+            // eslint-disable-next-line react/no-array-index-key
+            key={idx}
+            style={{ maxWidth: 720, margin: '0 auto' }}
+          >
             {(slideProps) => {
               return <MainCarouselItem item={item} isActive={slideProps.isActive} />;
             }}

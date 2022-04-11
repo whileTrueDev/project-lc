@@ -30,7 +30,7 @@ export function ShoppingCarousel(): JSX.Element {
             <SwiperSlide
               style={{
                 margin: '0 auto',
-                width: 1000,
+                maxWidth: 1000,
                 maxHeight: 500,
               }}
               key={item.description + item.imageUrl}
