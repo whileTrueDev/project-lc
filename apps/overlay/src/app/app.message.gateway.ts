@@ -88,9 +88,14 @@ export class AppMessageGateway
       audioBuffer = await this.overlayService.googleTextToSpeech(purchase);
     }
 
-    this.server
-      .to(roomName)
-      .emit('get right-top purchase message', { purchase, audioBuffer });
+    if (ttsSetting === 'no-sound') {
+      this.server.to(roomName).emit('get right-top pop purchase message', { purchase });
+    } else {
+      this.server
+        .to(roomName)
+        .emit('get right-top purchase message', { purchase, audioBuffer });
+    }
+
     this.server.to(roomName).emit('get top-left ranking', nicknameAndPrice);
     // this.server.to(roomName).emit('get current quantity', totalSold);
     this.server

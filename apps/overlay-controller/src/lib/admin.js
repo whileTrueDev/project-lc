@@ -542,6 +542,7 @@ $(document).ready(function ready() {
           }, 3000);
           return;
         }
+
         if (isLogin) {
           socket.emit('right top purchase message', {
             roomName,

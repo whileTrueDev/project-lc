@@ -414,6 +414,7 @@ body {
   height: 450px;
   top: 119px;
   right: 15px;
+  align-items: center;
   position: fixed;
 }
 
@@ -440,6 +441,13 @@ body {
   color: rgb(255, 255, 255);
   font-weight: 600;
 }
+
+/* .donation-header {
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+  2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+  0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
+  color: rgb(255, 255, 255);
+} */
 
 #donation-user-id {
   font-size: 35px;
@@ -579,6 +587,7 @@ div.bottom-fever-timer {
   -webkit-animation-iteration-count: infinite;
   -webkit-animation-timing-function: linear;
 }
+
 
 #kks-logo {
   width: 130px;
@@ -873,5 +882,72 @@ div.bottom-fever-timer {
   99%,
   to {
     transform: translate(-100%);
+  }
+}
+
+.combo-mode {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+  2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+  0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
+  color:white;
+  font-family: 'NotoSansBold';
+}
+
+.pop-out {
+  display: flex;
+  color:yellow;
+  font-size:40px;
+  font-style: italic;
+  text-shadow: -2px -2px 0 rgb(0, 0, 0), 0 -2px 0 rgb(0, 0, 0)
+  2px -2px 0 rgb(0, 0, 0), 2px 0 0 rgb(0, 0, 0), 2px 2px 0 rgb(0, 0, 0),
+  0 2px 0 rgb(0, 0, 0), -2px 2px 0 rgb(0, 0, 0), -2px 0 0 rgb(0, 0, 0);
+  animation: 2s anim-popoutin ease;
+}
+
+@keyframes anim-popoutin {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.wave {
+  display: inline-flex;
+  position: relative;
+  -webkit-box-reflect: below -20px linear-gradient(transparent, rgba(0,0,0,.2));
+}
+.wave span {
+  position: relative;
+  display: inline-block;
+  color: rgb(0, 252, 255);
+  animation: waviy 1s infinite;
+  animation-delay: calc(.1s * var(--i));
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+  2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+  0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
+  font-family: 'NotoSansBold';
+}
+@keyframes waviy {
+  0%,40%,100% {
+    transform: translateY(0)
+  }
+  20% {
+    transform: translateY(-5px)
   }
 }

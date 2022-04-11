@@ -14,6 +14,7 @@ let startDate = new Date('2021-09-27T14:05:00+0900');
 let endDate = new Date('2021-09-04T15:00:00+0900');
 let feverDate = new Date('2021-09-27T14:05:00+0900');
 let bannerId = 1;
+let combo = 1;
 const bottomMessages = [];
 const topMessages = [];
 
@@ -205,8 +206,15 @@ async function switchImage() {
 // 우측상단 응원문구 이벤트
 setInterval(async () => {
   if (messageArray.length !== 0 && $('.top-right').css('display') === 'none') {
-    $('.top-right').css({ display: 'flex' });
-    $('.top-right').html(messageArray[0].messageHtml);
+    if (!messageArray[0].audioBlob) {
+      // $('.top-right').addClass('pop-out');
+      $('.top-right').html(messageArray[0].messageHtml);
+      $('.top-right').css({ display: 'flex' });
+    } else {
+      $('.top-right').html(messageArray[0].messageHtml);
+      $('.top-right').css({ display: 'flex' });
+    }
+
     await setTimeout(() => {
       if (messageArray[0].audioBlob) {
         const sound = new Audio(messageArray[0].audioBlob);
@@ -215,6 +223,7 @@ setInterval(async () => {
       messageArray.splice(0, 1);
     }, 1500);
     await setTimeout(() => {
+      // $('.top-right').removeClass('pop-out');
       $('.top-right').fadeOut(800);
       $('.donation-image').attr('src', '/images/invisible.png');
     }, 10000);
@@ -367,12 +376,12 @@ socket.on('get right-top purchase message', async (data) => {
             alarmType === '2' ? 'alarm-type-2.mp3' : 'alarm-type-1.wav'
           }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>`
         : ''
-    }  
+    }
     <div class="item">
       <div class="centered">
         <img src="https://${bucketName}.s3.ap-northeast-2.amazonaws.com/donation-images/${email}/${liveShoppingId}/${
     alarmType === '2' ? 'donation-2' : 'donation-1'
-  }" class="donation-image" />  
+  }" class="donation-image" />
         <div class="animated heartbeat" id="donation-top">
           <span id="nickname">
             <span class="animated heartbeat" id="donation-user-id">${nickname}</span>
@@ -420,6 +429,43 @@ socket.on('get non client purchase message', async (data) => {
   
   `;
   topMessages.push({ messageHtml });
+});
+
+socket.on('get right-top pop purchase message', async (data) => {
+  const { nickname } = data.purchase;
+  const { message } = data.purchase;
+  const price = data.purchase.purchaseNum
+    .toString()
+    .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+
+  messageHtml = `
+  <div class='combo-mode' style='height:unset'>
+    <p class='pop-out'>${combo} Combo!</p>
+    <div class='donation-header' id='donation-top'>
+      <span id='nickname'>
+        <span class='wave' id='donation-user-id'>
+        ${[...nickname]
+          .map((v, i) => `<span class='wave-inner' style='--i:${i}'>${v}</span>`)
+          .join('')}
+        </span>
+        <span class='donation-sub'>님</span>
+        <span class='wave' id='donation-num'>
+        ${[...price]
+          .map((v, i) => `<span class='wave-inner' style='--i:${i}'>${v}</span>`)
+          .join('')}
+        </span>
+        <span class='donation-sub'>원 구매!</span>
+      </span>
+    </div>
+    <div id='donation-message'>
+      <span id='message'>
+        ${message}
+      </span>
+    </div>
+  </div>
+  `;
+  combo += 1;
+  messageArray.push({ messageHtml });
 });
 
 socket.on('get objective message', async (data) => {
