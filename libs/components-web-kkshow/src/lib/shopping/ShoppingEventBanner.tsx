@@ -43,7 +43,6 @@ export function ShoppingEventBanner(): JSX.Element | null {
                 src={data.banner.imageUrl}
                 width={{ base: 120, md: 160, lg: 200 }}
                 height={{ base: '80px', md: 120, lg: 140 }}
-                layout="fixed"
               />
             </Link>
           </Flex>

@@ -46,7 +46,7 @@ function BestLiveList(): JSX.Element | null {
           data.bestLive.map((item) => (
             <SwiperSlide
               key={`${item.liveShoppingTitle}_${item.liveShoppingId}`}
-              style={{ width: 320 - 16 }}
+              style={{ width: '90%', maxWidth: 320 }}
             >
               <LiveCard {...item} />
             </SwiperSlide>

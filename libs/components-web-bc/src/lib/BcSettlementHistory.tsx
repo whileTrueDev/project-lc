@@ -23,6 +23,7 @@ import {
   useProfile,
 } from '@project-lc/hooks';
 import { FindBcSettlementHistoriesRes } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -163,7 +164,7 @@ function TotalAmountCell({ row }: GridCellParams): JSX.Element {
   const totalAmount = useBroadcasterSettlementTotalAmount(
     row as FindBcSettlementHistoriesRes[number],
   );
-  return <Text>{`${totalAmount.toLocaleString()}원`}</Text>;
+  return <Text>{`${getLocaleNumber(totalAmount)}원`}</Text>;
 }
 
 interface SettlementHistoryDetailProps {
@@ -180,7 +181,7 @@ export function SettlementHistoryDetail({
       { title: '정산일', value: dayjs(data.date).format('YYYY년MM월DD일 HH시') },
       {
         title: '총 정산액',
-        value: totalAmount ? `${totalAmount.toLocaleString()}원` : '-',
+        value: totalAmount ? `${getLocaleNumber(totalAmount)}원` : '-',
       },
     ],
     [data.date, data.round, totalAmount],
@@ -209,9 +210,9 @@ export function SettlementHistoryDetail({
         />
         <GridTableItem
           title="정산액 및 수수료율"
-          value={`${Number(
+          value={`${getLocaleNumber(
             item.amount,
-          ).toLocaleString()}원 (${item.liveShopping.broadcasterCommissionRate.toString()}%)`}
+          )}원 (${item.liveShopping.broadcasterCommissionRate.toString()}%)`}
         />
       </>
     ),
@@ -225,9 +226,9 @@ export function SettlementHistoryDetail({
         <GridTableItem title="상품홍보 고유번호" value={item.productPromotion.id} />
         <GridTableItem
           title="정산액 및 수수료율"
-          value={`${Number(
+          value={`${getLocaleNumber(
             item.amount,
-          ).toLocaleString()}원 (${item.productPromotion.broadcasterCommissionRate.toString()}%)`}
+          )}원 (${item.productPromotion.broadcasterCommissionRate.toString()}%)`}
         />
       </>
     ),

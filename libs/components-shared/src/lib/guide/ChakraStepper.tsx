@@ -10,6 +10,9 @@ function CustomStepper(props: StepperProps): JSX.Element {
       },
       '& .MuiStepIcon-active, .MuiStepIcon-completed': {
         color: theme.colors.blue['500'],
+        '& .MuiStepIcon-text': {
+          fill: 'white',
+        },
       },
       '& .MuiStepLabel-label': {
         color: useColorModeValue('inherit', theme.colors.whiteAlpha[800]),

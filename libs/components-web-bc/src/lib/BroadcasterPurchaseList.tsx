@@ -1,15 +1,16 @@
 import { Box, Container } from '@chakra-ui/react';
-import { GridColumns, GridSortModel, GridRowData } from '@material-ui/data-grid';
+import { GridColumns, GridRowData, GridSortModel } from '@material-ui/data-grid';
+import { SellType } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { SellTypeBadge } from '@project-lc/components-shared/SellTypeBadge';
 import {
+  useDisplaySize,
   useFmOrdersDuringLiveShoppingSalesPurchaseDone,
   useProfile,
-  useDisplaySize,
 } from '@project-lc/hooks';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { SellType } from '@prisma/client';
 
 const columns: GridColumns = [
   {
@@ -49,7 +50,7 @@ const columns: GridColumns = [
     headerName: '금액',
     width: 120,
     valueFormatter: ({ row }) => {
-      return `${Number(row.settleprice).toLocaleString()}원`;
+      return `${getLocaleNumber(row.settleprice)}원`;
     },
   },
 ];
@@ -73,7 +74,7 @@ const mobileColumn: GridColumns = [
     headerName: ' ',
     width: 80,
     valueFormatter: ({ row }) => {
-      return `${Number(row.settleprice).toLocaleString()}원`;
+      return `${getLocaleNumber(row.settleprice)}원`;
     },
   },
 ];
@@ -99,8 +100,6 @@ export function BroadcasterPurchaseList(): JSX.Element {
             autoHeight
             disableExtendRowFullWidth
             pagination
-            showFirstButton
-            showLastButton
             pageSize={pageSize}
             onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
             rowsPerPageOptions={[15, 20, 30]}

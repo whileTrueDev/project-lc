@@ -1,7 +1,7 @@
 import { Divider, Stack, Tag, TagCloseButton, TagLabel, Text } from '@chakra-ui/react';
 import { ShippingSelectOption, TempShippingOption } from '@project-lc/shared-types';
+import { getLocaleNumber, getShippingOptionLabel } from '@project-lc/utils-frontend';
 import { useCallback } from 'react';
-import { getShippingOptionLabel } from '@project-lc/utils-frontend';
 
 export function ShippingOptionAppliedItem({
   selectOption,
@@ -28,7 +28,7 @@ export function ShippingOptionAppliedItem({
   // costItem이 1개인 경우 **********************************************
   const { shipping_area_name: areaName, shipping_cost: cost } = costItem;
 
-  const costText = selectOption.key === 'free' ? '무료' : `${cost.toLocaleString()} 원`;
+  const costText = selectOption.key === 'free' ? '무료' : `${getLocaleNumber(cost)} 원`;
 
   return (
     <Tag p={1} pl={!onDelete ? '36px' : undefined}>

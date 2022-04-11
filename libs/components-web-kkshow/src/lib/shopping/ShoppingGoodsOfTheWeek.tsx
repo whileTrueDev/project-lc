@@ -1,13 +1,4 @@
-import {
-  AspectRatio,
-  Box,
-  Flex,
-  Heading,
-  Image,
-  LinkBox,
-  LinkOverlay,
-} from '@chakra-ui/react';
-import MotionBox from '@project-lc/components-core/MotionBox';
+import { Box, Flex, Heading, Image, LinkBox, LinkOverlay } from '@chakra-ui/react';
 import FadeUp from '@project-lc/components-layout/motion/FadeUp';
 import SlideCustom from '@project-lc/components-layout/motion/SlideCustom';
 import { useKkshowShopping } from '@project-lc/hooks';
@@ -16,7 +7,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Autoplay, Swiper as _Swiper } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { GoodsDisplayDetail, GoodsDisplayImage } from '../GoodsDisplay';
+import { GoodsDisplayDetail } from '../GoodsDisplay';
 import KkshowMainTitle from '../main/KkshowMainTitle';
 
 export function ShoppingGoodsOfTheWeek(): JSX.Element {
@@ -99,18 +90,19 @@ export function ShoppingGoodsOfTheWeek(): JSX.Element {
         >
           {data &&
             data.goodsOfTheWeek.map((item) => (
-              <SwiperSlide key={item.name} style={{ width: '70%', maxWidth: 340 }}>
+              <SwiperSlide key={item.name} style={{ width: '75%', maxWidth: 340 }}>
                 {({ isActive }) => (
                   <Image
                     objectFit="cover"
+                    h={{ base: 240, md: 340 }}
                     w="100%"
-                    h="100%"
+                    // h="100%"
                     src={item.imageUrl}
                     alt={item.name}
                     transform={isActive ? 'scale(1)' : 'scale(0.8)'}
                     transition="all 0.3s"
                     borderRadius="2xl"
-                    boxShadow="xl"
+                    boxShadow="lg"
                     draggable={false}
                   />
                 )}

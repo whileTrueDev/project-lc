@@ -13,6 +13,7 @@ import {
   useSettlementHistory,
 } from '@project-lc/hooks';
 import { settlementHistoryStore } from '@project-lc/stores';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useState } from 'react';
@@ -78,25 +79,25 @@ export function SettlementList(): JSX.Element | null {
       field: 'totalEa',
       headerName: '총판매수량',
       sortable: false,
-      valueFormatter: ({ value }) => (value ? value.toLocaleString() : value),
+      valueFormatter: ({ value }) => (value ? getLocaleNumber(value as string) : value),
     },
     {
       field: 'totalPrice',
       headerName: '총판매금',
       sortable: false,
-      valueFormatter: ({ value }) => (value ? value.toLocaleString() : value),
+      valueFormatter: ({ value }) => (value ? getLocaleNumber(value as string) : value),
     },
     {
       field: 'totalCommission',
       headerName: '총수수료',
       sortable: false,
-      valueFormatter: ({ value }) => (value ? value.toLocaleString() : value),
+      valueFormatter: ({ value }) => (value ? getLocaleNumber(value as string) : value),
     },
     {
       field: 'totalAmount',
       headerName: '총정산금액',
       sortable: false,
-      valueFormatter: ({ value }) => (value ? value.toLocaleString() : value),
+      valueFormatter: ({ value }) => (value ? getLocaleNumber(value as string) : value),
     },
     { field: 'paymentMethod', headerName: '결제수단', sortable: false },
     { field: 'pg', headerName: 'pg사', sortable: false },
@@ -104,7 +105,7 @@ export function SettlementList(): JSX.Element | null {
       field: 'pgCommission',
       headerName: '전자결제수수료',
       sortable: false,
-      valueFormatter: ({ value }) => (value ? value.toLocaleString() : value),
+      valueFormatter: ({ value }) => (value ? getLocaleNumber(value as string) : value),
     },
   ];
 

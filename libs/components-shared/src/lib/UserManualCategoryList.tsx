@@ -45,12 +45,16 @@ export function UserManualCategoryList({ userType }: UserManualProps): JSX.Eleme
 
   if (!data || !data.length) {
     return (
-      <Container maxW="container.xl">
-        <Stack direction="row" alignItems="center">
-          <Text>준비중입니다</Text>
-          <Icon as={FaRegGrinBeamSweat} fontSize="2xl" />
-        </Stack>
-        <Text>문의사항이 있으시면 실시간 상담을 이용해주세요!</Text>
+      <Container maxW="container.xl" mx="auto" mt={20}>
+        <Center>
+          <Stack direction="row" alignItems="center">
+            <Text>준비중입니다</Text>
+            <Icon as={FaRegGrinBeamSweat} fontSize="2xl" />
+          </Stack>
+        </Center>
+        <Center>
+          <Text>문의사항이 있으시면 실시간 상담을 이용해주세요!</Text>
+        </Center>
       </Container>
     );
   }

@@ -1,13 +1,13 @@
+import { SummaryList } from '@project-lc/components-core/SummaryList';
 import {
   convertOrderSitetypeToString,
   FindFmOrderDetailRes,
 } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { AiTwotoneEnvironment } from 'react-icons/ai';
 import { FaBoxOpen, FaShippingFast, FaShoppingBag, FaUser } from 'react-icons/fa';
-
 import { MdDateRange } from 'react-icons/md';
-import { SummaryList } from '@project-lc/components-core/SummaryList';
 
 export interface OrderDetailSummaryProps {
   order: FindFmOrderDetailRes;
@@ -55,9 +55,7 @@ export function OrderDetailSummary({ order }: OrderDetailSummaryProps): JSX.Elem
             if (order.shippings.length > 1) {
               costFieldName = '총 배송비';
             }
-            return `${costFieldName} ${Number(
-              order.totalShippingCost,
-            ).toLocaleString()}원`;
+            return `${costFieldName} ${getLocaleNumber(order.totalShippingCost)}원`;
           })(),
         },
       ]}

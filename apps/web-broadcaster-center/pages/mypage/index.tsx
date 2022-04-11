@@ -18,6 +18,33 @@ import { StartGuideCard } from '@project-lc/components-web-bc/StartGuideCard';
 import { useBroadcasterContacts, useProfile } from '@project-lc/hooks';
 import { useEffect, useMemo } from 'react';
 
+const steps = [
+  {
+    label: '이용약관 동의',
+    component: <GuideContractionAgreementSection userType="broadcaster" />,
+  },
+  {
+    label: '연락처 등록',
+    component: <AddressSection />,
+  },
+  {
+    label: '채널링크 등록',
+    component: <ChannelSection />,
+  },
+  {
+    label: '라이브 쇼핑 준비',
+    component: <OverayUrlSection />,
+  },
+  {
+    label: '라이브 쇼핑 화면',
+    component: <LiveShoppingMonitorSection />,
+  },
+  {
+    label: '수익금 출금',
+    component: <SettlementsSection />,
+  },
+];
+
 export function Index(): JSX.Element {
   const { data: broadcasterProfileData } = useProfile();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -44,37 +71,6 @@ export function Index(): JSX.Element {
       email: '미등록',
     };
   }, [broadcasterContacts]);
-
-  const steps = useMemo(
-    () => [
-      {
-        label: '이용약관 동의',
-        component: <GuideContractionAgreementSection userType="broadcaster" />,
-      },
-      {
-        label: '연락처 등록',
-        component: <AddressSection />,
-      },
-      {
-        label: '채널링크 등록',
-        component: <ChannelSection />,
-      },
-      {
-        label: '라이브 쇼핑 준비',
-        component: <OverayUrlSection />,
-      },
-      {
-        label: '라이브 쇼핑 화면',
-        component: <LiveShoppingMonitorSection />,
-      },
-      {
-        label: '수익금 출금',
-        component: <SettlementsSection />,
-      },
-    ],
-    [],
-  );
-
   // 기본 연락처 부재시에 시작가이드 실행영역
   useEffect(() => {
     if (!기본연락처존재여부) {

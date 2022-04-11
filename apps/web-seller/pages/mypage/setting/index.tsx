@@ -18,9 +18,9 @@ export function Setting(): JSX.Element {
           <Divider />
           <ContractionAgreeSection userType="seller" />
           <Divider />
-          <AccountRemoveSection />
-          <Divider />
           <SocialAccountUnlinkSection />
+          <Divider />
+          <AccountRemoveSection />
           <Divider />
         </VStack>
       </Container>

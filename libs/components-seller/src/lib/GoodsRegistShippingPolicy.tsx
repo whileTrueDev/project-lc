@@ -147,7 +147,7 @@ function ShippingGroupListItem({
 }): JSX.Element {
   const { register } = useFormContext<GoodsFormValues>();
   return (
-    <Flex key={group.id} spacing={2} alignItems="center">
+    <Flex key={group.id} gap={2} alignItems="center">
       {/* 라디오버튼 */}
       <Radio
         width="10%"

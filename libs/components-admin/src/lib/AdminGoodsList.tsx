@@ -23,17 +23,13 @@ import {
   SellerGoodsSortDirection,
 } from '@project-lc/shared-types';
 import { useSellerGoodsListPanelStore } from '@project-lc/stores';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { ConfirmationBadge } from './AdminBusinessRegistrationList';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
-
-function formatPrice(price: number): string {
-  const formattedPrice = price.toLocaleString();
-  return `${formattedPrice}원`;
-}
 
 function formatDate(date: Date): string {
   return dayjs(date).format('YYYY/MM/DD HH:mm');
@@ -110,14 +106,14 @@ const columns: GridColumns = [
     field: 'default_price',
     headerName: '판매가',
     type: 'number',
-    valueFormatter: ({ row }) => formatPrice(Number(row.default_price)),
+    valueFormatter: ({ row }) => `${getLocaleNumber(row.default_price)}원`,
     sortable: false,
   },
   {
     field: 'default_consumer_price',
     headerName: '정가',
     type: 'number',
-    valueFormatter: ({ row }) => formatPrice(Number(row.default_consumer_price)),
+    valueFormatter: ({ row }) => `${getLocaleNumber(row.default_consumer_price)}원`,
     sortable: false,
   },
   {
@@ -320,7 +316,6 @@ export function AdminGoodsList(): JSX.Element {
         rows={rows}
         autoHeight
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
-        disableMultipleSelection
         disableSelectionOnClick
         disableColumnMenu
         pageSize={itemPerPage}

@@ -12,7 +12,7 @@ import KkshowMainCarouselHeader from './carousel/KkshowMainCarouselHeader';
 export function KkshowMainCarousel(): JSX.Element {
   return (
     <WaveBox position="relative" bgColor="blue.500">
-      <Flex h={{ base: 530, md: 650 }}>
+      <Flex h={{ base: 400, sm: 530, md: 650 }}>
         <MainCarousel />
       </Flex>
     </WaveBox>
@@ -40,8 +40,11 @@ function MainCarousel(): JSX.Element | null {
     >
       {data &&
         data.carousel.map((item, idx) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <SwiperSlide style={{ minWidth: 320, width: 720, margin: '0 auto' }} key={idx}>
+          <SwiperSlide
+            // eslint-disable-next-line react/no-array-index-key
+            key={idx}
+            style={{ maxWidth: 720, margin: '0 auto' }}
+          >
             {(slideProps) => {
               return <MainCarouselItem item={item} isActive={slideProps.isActive} />;
             }}
@@ -72,7 +75,7 @@ function MainCarouselItem({ item, isActive }: MainCarouselItemProps): JSX.Elemen
 
       <Box
         borderRadius="xl"
-        h={{ base: 300, md: 400 }}
+        h={{ base: 200, sm: 300, md: 400 }}
         p={1}
         bgColor="white"
         filter={isActive ? 'none' : 'brightness(50%)'}

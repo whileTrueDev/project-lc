@@ -11,8 +11,9 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-import { GoodsByIdRes } from '@project-lc/shared-types';
 import { useDisplaySize } from '@project-lc/hooks';
+import { GoodsByIdRes } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 
 export interface GoodsDetailOptionsInfoProps {
   goods: GoodsByIdRes;
@@ -43,11 +44,11 @@ export function GoodsDetailOptionsInfo({
                 </Box>
                 <Box>
                   <Text fontWeight="bold">소비자가</Text>
-                  <Text>{Number(option.consumer_price).toLocaleString()}</Text>
+                  <Text>{getLocaleNumber(option.consumer_price)}</Text>
                 </Box>
                 <Box>
                   <Text fontWeight="bold">정가</Text>
-                  <Text>{Number(option.price).toLocaleString()}</Text>
+                  <Text>{getLocaleNumber(option.price)}</Text>
                 </Box>
                 <Box>
                   <Text fontWeight="bold">옵션노출여부</Text>
@@ -104,10 +105,8 @@ export function GoodsDetailOptionsInfo({
                   <Td borderBottom="none">
                     <Flex alignItems="center">{option.option1}</Flex>
                   </Td>
-                  <Td borderBottom="none">
-                    {Number(option.consumer_price).toLocaleString()}
-                  </Td>
-                  <Td borderBottom="none">{Number(option.price).toLocaleString()}</Td>
+                  <Td borderBottom="none">{getLocaleNumber(option.consumer_price)}</Td>
+                  <Td borderBottom="none">{getLocaleNumber(option.price)}</Td>
                   <Td borderBottom="none">
                     {option.option_view === 'Y' ? '노출' : '미노출'}
                   </Td>

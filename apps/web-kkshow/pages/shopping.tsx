@@ -1,7 +1,5 @@
 import { Box } from '@chakra-ui/react';
-import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
-import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
-import KKshowMainExternLinks from '@project-lc/components-web-kkshow/main/KKshowMainExternLinks';
+import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { ShoppingCarousel } from '@project-lc/components-web-kkshow/shopping/ShoppingCarousel';
 import { ShoppingEventBanner } from '@project-lc/components-web-kkshow/shopping/ShoppingEventBanner';
 import { ShoppingGoodsOfTheWeek } from '@project-lc/components-web-kkshow/shopping/ShoppingGoodsOfTheWeek';
@@ -14,7 +12,6 @@ import { getKkshowShopping, kkshowShoppingQueryKey } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
 import { dehydrate, DehydratedState } from 'react-query';
-import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 
 interface KkshowShippingProps {
   dehydratedState: DehydratedState;
@@ -45,9 +42,6 @@ export default function Shopping(): JSX.Element {
         <ShoppingRecommendations />
         <ShoppingReviews />
         <ShoppingKeywords />
-
-        <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
-        <CommonFooter footerLinkList={kkshowFooterLinkList} />
       </KkshowLayout>
     </Box>
   );

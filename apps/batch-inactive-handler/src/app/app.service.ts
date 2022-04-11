@@ -43,13 +43,13 @@ export class AppService {
   async moveInactiveUserData(inactivateTarget: LastLoginDate): Promise<void> {
     if (inactivateTarget.userType === 'seller') {
       try {
-        this.appSellerService.moveSellerData(inactivateTarget.userEmail);
+        await this.appSellerService.moveSellerData(inactivateTarget.userEmail);
       } catch (err) {
         this.logger.error(err);
       }
     } else if (inactivateTarget.userType === 'broadcaster') {
       try {
-        this.appBroadcasterService.moveBraodcasterData(inactivateTarget.userEmail);
+        await this.appBroadcasterService.moveBraodcasterData(inactivateTarget.userEmail);
       } catch (err) {
         this.logger.error(err);
       }

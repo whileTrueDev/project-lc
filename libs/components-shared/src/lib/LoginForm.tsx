@@ -59,7 +59,7 @@ export function LoginForm({
         setFormError(getMessage(err?.response.data?.status));
         setValue('password', '');
       });
-      if ((user as InactiveUserPayload).inactiveFlag) {
+      if (user && (user as InactiveUserPayload).inactiveFlag) {
         setToActivateEmail((user as InactiveUserPayload).sub);
         router.push('/activate');
         return;

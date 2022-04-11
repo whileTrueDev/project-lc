@@ -11,11 +11,12 @@ import {
   Tr,
   useDisclosure,
 } from '@chakra-ui/react';
-import ShowMoreTextButton from '@project-lc/components-shared/ShowMoreTextButton';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
+import ShowMoreTextButton from '@project-lc/components-shared/ShowMoreTextButton';
 import { useDisplaySize } from '@project-lc/hooks';
 import { FmOrderOption } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
 
 /** 주문 옵션 목록 */
@@ -46,7 +47,7 @@ export function OrderDetailOptionListItem({
 }): JSX.Element {
   const orderPrice = useMemo(() => {
     const price = Number(option.price) * Number(option.ea);
-    return `${price.toLocaleString()} 원`;
+    return `${getLocaleNumber(price)} 원`;
   }, [option.ea, option.price]);
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">

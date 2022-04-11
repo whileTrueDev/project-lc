@@ -1,17 +1,14 @@
 import { Box } from '@chakra-ui/react';
-import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
-import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
+import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { KkshowMainBestBroadcaster } from '@project-lc/components-web-kkshow/main/KkshowMainBestBroadcaster';
 import { KkshowMainBestLive } from '@project-lc/components-web-kkshow/main/KkshowMainBestLive';
 import { KkshowMainCarousel } from '@project-lc/components-web-kkshow/main/KkshowMainCarousel';
-import { KKshowMainExternLinks } from '@project-lc/components-web-kkshow/main/KKshowMainExternLinks';
 import { KkshowLiveTeaser } from '@project-lc/components-web-kkshow/main/KkshowMainLiveTeaser';
 import { KkshowMainPlusFriend } from '@project-lc/components-web-kkshow/main/KkshowMainPlusFriend';
 import { getKkshowMain, kkshowMainQueryKey } from '@project-lc/hooks';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { GetStaticProps } from 'next';
 import { dehydrate, DehydratedState } from 'react-query';
-import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 
 interface KkshowIndexProps {
   dehydratedState: DehydratedState;
@@ -48,7 +45,7 @@ export default function Index(): JSX.Element {
         backgroundSize="contain"
         w={{ base: 150, md: 250 }}
         h={{ base: 150, md: 250 }}
-        top={{ base: 470, md: 550 }}
+        top={{ base: 300, sm: 470, md: 550 }}
         left={-75}
         zIndex={1}
       />
@@ -58,7 +55,7 @@ export default function Index(): JSX.Element {
         backgroundSize="contain"
         w={{ base: 150, md: 300 }}
         h={{ base: 150, md: 300 }}
-        top={{ base: 600, md: 700 }}
+        top={{ base: 440, sm: 600, md: 700 }}
         right={{ base: -75, md: -150 }}
         zIndex={1}
       />
@@ -69,9 +66,6 @@ export default function Index(): JSX.Element {
         <KkshowMainBestLive />
         <KkshowMainPlusFriend />
         <KkshowMainBestBroadcaster />
-
-        <KKshowMainExternLinks mb={-4} bgColor="blue.900" color="whiteAlpha.900" />
-        <CommonFooter footerLinkList={kkshowFooterLinkList} />
       </KkshowLayout>
     </Box>
   );

@@ -20,6 +20,7 @@ import {
   ShippingSetCodes,
 } from '@project-lc/shared-types';
 import { useShippingSetItemStore } from '@project-lc/stores';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useEffect } from 'react';
 import ShippingOptionApplySection from './ShippingOptionApplySection';
 
@@ -125,7 +126,7 @@ export function ShippingPolicySetForm({
             </InputWrapperText>
             <Checkbox onChange={setShipingFreeFlag} isChecked={shiping_free_yn === 'Y'}>
               배송비가 무료인 경우, 반품배송비 왕복 &nbsp;
-              {((refund_shiping_cost || 0) * 2).toLocaleString()}₩ 받기
+              {getLocaleNumber((refund_shiping_cost || 0) * 2)}₩ 받기
             </Checkbox>
           </Box>
 

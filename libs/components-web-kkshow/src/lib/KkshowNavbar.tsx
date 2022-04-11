@@ -8,8 +8,9 @@ import { KkshowLogoVariant, KksLogo } from '@project-lc/components-shared/KksLog
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import { SearchButton } from './search/SearchButton';
-import { GlobalSearcher } from './search/GlobalSearcher';
+import { Searcher } from './search-input/Searcher';
+
+export const kkshowNavHeight = 120;
 
 type KkshowNavbarVariant = 'blue' | 'white';
 interface KkshowNavbar {
@@ -21,8 +22,6 @@ interface KkshowNavbar {
  *                             다크모드에서는 배경 검정, 글자 흰색인 네비바(검색페이지)
  */
 export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
-  const navHeight = 120;
-
   const palette = {
     bg: useColorModeValue('white', 'gray.800'),
     color: useColorModeValue('gray.700', 'whiteAlpha.900'),
@@ -40,7 +39,7 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
       bg={palette.bg}
       color={palette.color}
       pt={{ base: 0, md: 6 }}
-      minH={navHeight}
+      minH={kkshowNavHeight}
       w="100%"
       zIndex="sticky"
     >
@@ -74,8 +73,7 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
         {/* 우측 */}
         <Flex alignItems="center">
           <ColorModeSwitcher _hover={{}} />
-          <SearchButton />
-          <GlobalSearcher />
+          <Searcher />
         </Flex>
       </Flex>
 
