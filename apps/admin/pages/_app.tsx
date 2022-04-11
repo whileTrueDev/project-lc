@@ -18,6 +18,7 @@ dayjs.extend(relativeTime);
 const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();
 const muiTheme = createMuiTheme();
+
 function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <>
