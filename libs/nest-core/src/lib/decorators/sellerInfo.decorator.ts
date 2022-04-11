@@ -19,5 +19,7 @@ export const SellerInfo = createParamDecorator((_: unknown, ctx: ExecutionContex
   const request = ctx.switchToHttp().getRequest<Request>();
   if (request.user && ['seller'].includes(request.user.type))
     return request.user as UserPayload;
-  throw new UnauthorizedException();
+  throw new UnauthorizedException(
+    `no seller info in request, usertype : ${request.user.type}`,
+  );
 });
