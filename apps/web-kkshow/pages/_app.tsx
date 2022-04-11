@@ -21,6 +21,7 @@ import { Hydrate, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import 'swiper/css/bundle';
 import '../styles/global.font.css';
+import '../styles/global.input.css';
 import '../styles/swiper.override.css';
 
 dayjs.extend(relativeTime);

@@ -310,8 +310,6 @@ export function LiveShoppingList(): JSX.Element {
           autoHeight
           pagination
           autoPageSize
-          showFirstButton
-          showLastButton
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           rowsPerPageOptions={[5, 10, 15]}

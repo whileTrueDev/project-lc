@@ -159,8 +159,6 @@ export function AdminLiveShoppingList({
             autoHeight
             pagination
             autoPageSize
-            showFirstButton
-            showLastButton
             disableSelectionOnClick
             disableColumnMenu
             disableColumnSelector

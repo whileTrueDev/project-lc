@@ -1,7 +1,7 @@
-import { HiHome } from 'react-icons/hi';
-import { RiShoppingCart2Line } from 'react-icons/ri';
-import { IconType } from 'react-icons/lib';
 import { FaSearch } from 'react-icons/fa';
+import { HiHome } from 'react-icons/hi';
+import { IconType } from 'react-icons/lib';
+import { RiShoppingCart2Line } from 'react-icons/ri';
 
 type QuickMenuType = 'link' | 'function';
 
@@ -18,14 +18,11 @@ interface LinkMenuItem extends QuickMenuBase {
 
 interface FunctionMenuItem extends QuickMenuBase {
   type: 'function';
-  onClick?: any;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  onClick?: Function;
 }
 
 export type QuickMenuLink = LinkMenuItem | FunctionMenuItem;
-
-export const handleSearchDrawer = (setIsOpen): void => {
-  setIsOpen(true);
-};
 
 /** 판매자 마이페이지 링크 */
 export const quickMenuLinks: QuickMenuLink[] = [
@@ -33,7 +30,8 @@ export const quickMenuLinks: QuickMenuLink[] = [
     icon: FaSearch,
     name: '검색',
     type: 'function',
-    onClick: (setIsOpen) => handleSearchDrawer(setIsOpen),
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    onClick: (cb?: () => void) => cb(),
   },
   {
     icon: HiHome,

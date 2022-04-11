@@ -27,14 +27,13 @@ export function ShoppingCarousel(): JSX.Element {
       >
         {data &&
           data.carousel.map((item) => (
-            // eslint-disable-next-line react/no-array-index-key
             <SwiperSlide
               style={{
                 margin: '0 auto',
                 width: 1000,
                 maxHeight: 500,
               }}
-              key={item.description}
+              key={item.description + item.imageUrl}
             >
               {(slideProps) => {
                 return <ShoppingCarouselItem isActive={slideProps.isActive} {...item} />;

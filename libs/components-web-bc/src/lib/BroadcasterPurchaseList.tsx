@@ -100,8 +100,6 @@ export function BroadcasterPurchaseList(): JSX.Element {
             autoHeight
             disableExtendRowFullWidth
             pagination
-            showFirstButton
-            showLastButton
             pageSize={pageSize}
             onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
             rowsPerPageOptions={[15, 20, 30]}
