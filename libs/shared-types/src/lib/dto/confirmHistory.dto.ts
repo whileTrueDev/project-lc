@@ -10,15 +10,16 @@ import {
 export class ConfirmHistoryDto {
   @IsEnum(PaperType) type: PaperType;
   @IsEnum(BusinessRegistrationStatus) status: BusinessRegistrationStatus;
-  @IsOptional()
-  @IsNumber()
-  sellerBusinessRegistrationId: SellerBusinessRegistration['id'];
 
   @IsOptional()
   @IsNumber()
-  sellerSettlementAccountId: SellerSettlementAccount['id'];
+  sellerBusinessRegistrationId?: SellerBusinessRegistration['id'];
 
   @IsOptional()
   @IsNumber()
-  broadcasterSettlementInfoId: BroadcasterSettlementInfo['id'];
+  sellerSettlementAccountId?: SellerSettlementAccount['id'];
+
+  @IsOptional()
+  @IsNumber()
+  broadcasterSettlementInfoId?: BroadcasterSettlementInfo['id'];
 }
