@@ -58,13 +58,17 @@ const ShoppingCarouselItem = ({
   const onSlidePrev = (): void => swiper.slidePrev();
   return (
     <SwiperSlideItem
-      key={imageUrl}
       isActive={isActive}
       onSlideNext={onSlideNext}
       onSlidePrev={onSlidePrev}
     >
       <Link href={linkUrl}>
-        <Image src={imageUrl} />
+        <Image
+          src={imageUrl}
+          w={{ base: 'unset', lg: 1000 }}
+          h={{ base: 'unset', lg: 500 }}
+          objectFit="contain"
+        />
       </Link>
     </SwiperSlideItem>
   );
