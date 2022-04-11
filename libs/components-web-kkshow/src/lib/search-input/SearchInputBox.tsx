@@ -22,9 +22,13 @@ export interface SearchForm {
 }
 export interface SearchInputBoxProps {
   inputRef?: RefObject<HTMLInputElement>;
+  autoFocus?: boolean;
 }
 
-export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
+export function SearchInputBox({
+  inputRef,
+  autoFocus,
+}: SearchInputBoxProps): JSX.Element {
   const { isMobileSize } = useDisplaySize();
 
   const initialRef = useRef<HTMLInputElement>(null);
@@ -49,7 +53,7 @@ export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
         <Input
           {...searchInputRegister}
           ref={realInputRef}
-          autoFocus={!!isMobileSize}
+          autoFocus={autoFocus}
           variant="outline"
           placeholder="검색어를 입력하세요"
           rounded="md"
