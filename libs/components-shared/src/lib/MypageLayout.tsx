@@ -50,7 +50,7 @@ export function MypageLayout({
           direction="column"
           overflow="hidden"
           position="relative"
-          flexGrow="1"
+          flexGrow={1}
           height="100%"
           width="100%"
         >

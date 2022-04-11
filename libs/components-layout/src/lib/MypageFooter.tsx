@@ -18,7 +18,7 @@ export function MypageFooter(): JSX.Element {
       direction={{ base: 'column', md: 'row' }}
       display={{ base: 'none', md: 'flex' }}
     >
-      <SimpleGrid direction="row" columns={{ base: 2, md: 4 }}>
+      <SimpleGrid columns={{ base: 2, md: 4 }}>
         <Button
           size="sm"
           fontSize="sm"

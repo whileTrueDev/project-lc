@@ -41,7 +41,7 @@ export function OverayUrlSection(): JSX.Element {
       </Center>
 
       <Center>
-        <Box spacing={7} w={['6xl', 'xl']}>
+        <Box w={['6xl', 'xl']}>
           <OverlayUrlCard />
         </Box>
       </Center>

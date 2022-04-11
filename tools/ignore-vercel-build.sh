@@ -8,8 +8,12 @@ fi
 # Name of the app to check. Change this to your application name!
 APP=$1
 
+# Determine version of Nx installed
+NX_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@nrwl/workspace'])")
+TS_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@nrwl/workspace'])")
+
 # Install @nrwl/workspace in order to run the affected command
-yarn
+npm install -D @nrwl/workspace@$NX_VERSION @nrwl/cli@$NX_VERSION typescript@$TS_VERSION --prefer-offline 
 
 # Run the affected command, comparing latest commit to the one before that
 yarn nx affected:apps --plain --base HEAD~1 --head HEAD | grep $APP -q

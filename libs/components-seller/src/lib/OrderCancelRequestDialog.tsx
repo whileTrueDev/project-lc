@@ -80,7 +80,7 @@ function OrderCancelRequstItem({
 }): JSX.Element {
   const { goods_name, title1, option1, ea, image } = item;
   return (
-    <Tr direction="row" spacing={2} justifyContent="space-around">
+    <Tr justifyContent="space-around">
       <Td>
         <ChakraNextImage
           layout="intrinsic"

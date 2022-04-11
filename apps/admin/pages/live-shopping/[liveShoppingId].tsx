@@ -137,8 +137,10 @@ export function LiveShoppingDetail(): JSX.Element {
   };
 
   const { handleSubmit, register, watch, reset } = methods;
-  const regist = async (
-    data: Omit<LiveShoppingDTO, 'sellerId' | 'goods_id' | 'contactId' | 'requests'>,
+  const onSubmit = async (
+    // TODO: 타입 관련 정리 필요. build 실패로 any로 임시 처리 220411 hwasurr
+    data: any,
+    // data: Omit<LiveShoppingDTO, 'sellerId' | 'goods_id' | 'contactId' | 'requests'>,
   ): Promise<void> => {
     const videoUrlExist = Boolean(liveShopping[0]?.liveShoppingVideo?.youtubeUrl);
     const dto = Object.assign(data, { id: liveShoppingId });
@@ -449,7 +451,7 @@ export function LiveShoppingDetail(): JSX.Element {
             <AdminLiveShoppingUpdateConfirmModal
               isOpen={isOpen}
               onClose={onClose}
-              onConfirm={handleSubmit(regist)}
+              onConfirm={handleSubmit(onSubmit)}
             />
             {liveShopping[0].broadcaster && (
               <AdminOverlayImageUploadDialog

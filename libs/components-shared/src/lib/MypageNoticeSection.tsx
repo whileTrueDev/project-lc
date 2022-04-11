@@ -1,9 +1,9 @@
 import { Box, Link, Text } from '@chakra-ui/react';
 import { GridColumns } from '@material-ui/data-grid';
 import { Notice } from '@prisma/client';
+import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useNoticeInfo } from '@project-lc/hooks';
 import dayjs from 'dayjs';
-import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 
 const columns: GridColumns = [
   {
@@ -61,8 +61,6 @@ export function MypageNoticeSection(): JSX.Element {
         rowCount={5}
         pageSize={5}
         disableColumnMenu
-        disableColumnReorder
-        disableMultipleColumnsSorting
         disableColumnFilter
         disableSelectionOnClick
       />

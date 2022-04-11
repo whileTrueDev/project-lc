@@ -192,7 +192,7 @@ export function AvatarChangeButton(): JSX.Element {
                 {croppedImageUrl && (
                   <Box flex="1" textAlign="center">
                     <Text mb="2">미리보기</Text>
-                    <Avatar src={croppedImageUrl} alt="crop" />
+                    <Avatar src={croppedImageUrl} />
                   </Box>
                 )}
               </Stack>

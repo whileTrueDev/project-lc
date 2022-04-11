@@ -91,7 +91,7 @@ function SidebarMenuGroup({ menu }: { menu: SidebarMenuLink }): JSX.Element {
   const { children } = menu;
 
   return (
-    <Stack spading={2}>
+    <Stack spacing={2}>
       <Divider />
       {/* 그룹명 */}
       <Box fontWeight="bold">
