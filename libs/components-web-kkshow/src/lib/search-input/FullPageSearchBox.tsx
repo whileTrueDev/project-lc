@@ -39,7 +39,7 @@ export function FullPageSearchBox({
           variant="unstyle"
           icon={<ChevronLeftIcon w="30px" h="35px" />}
         />
-        <SearchInputBox inputRef={searchBoxInputRef} />
+        <SearchInputBox inputRef={searchBoxInputRef} autoFocus />
       </Flex>
 
       {/* 최근검색어 */}
