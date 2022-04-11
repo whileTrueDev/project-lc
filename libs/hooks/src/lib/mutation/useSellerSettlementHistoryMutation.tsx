@@ -1,6 +1,7 @@
-import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
-import { ConfirmHistory, ConfirmHistoryDto } from '@prisma/client';
+import { ConfirmHistory } from '@prisma/client';
+import { ConfirmHistoryDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import axios from '../../axios';
 
 export const useSellerSettlementHistoryMutation = (): UseMutationResult<
