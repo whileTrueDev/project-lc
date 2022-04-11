@@ -33,7 +33,12 @@ export interface S3UploadImageOptions
 
 // 클로저를 통한 모듈 생성
 export const s3 = (() => {
-  // 해당 네임 스페이스에서의 객체선언
+  const $SECRET_ACCESS_KEY =
+    process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID || process.env.AWS_S3_ACCESS_KEY_ID;
+  const $SECRET_ACCESS_SECRET =
+    process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET ||
+    process.env.AWS_S3_ACCESS_KEY_SECRET;
+
   // bucket 이름
   const S3_BUCKET_NAME =
     process.env.NEXT_PUBLIC_S3_BUCKET_NAME ||
@@ -45,8 +50,8 @@ export const s3 = (() => {
   const s3Client = new S3Client({
     region: S3_BUCKET_REGION,
     credentials: {
-      accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID,
-      secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_SECRET,
+      accessKeyId: $SECRET_ACCESS_KEY,
+      secretAccessKey: $SECRET_ACCESS_SECRET,
     },
   });
 
