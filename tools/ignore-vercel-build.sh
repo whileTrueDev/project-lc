@@ -10,7 +10,7 @@ APP=$1
 
 # Determine version of Nx installed
 NX_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@nrwl/workspace'])")
-TS_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@nrwl/workspace'])")
+TS_VERSION=$(node -e "console.log(require('./package.json').devDependencies['typescript'])")
 
 # Install @nrwl/workspace in order to run the affected command
 npm install -D @nrwl/workspace@$NX_VERSION @nrwl/cli@$NX_VERSION typescript@$TS_VERSION --prefer-offline 

@@ -29,7 +29,6 @@ dayjs.locale(kolocale);
 const queryClient = createQueryClient();
 const chakraTheme = createChakraTheme();
 const muiTheme = createMuiTheme();
-
 function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
   const [_queryClient] = useState(queryClient);
   return (

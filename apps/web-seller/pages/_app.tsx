@@ -23,10 +23,8 @@ import '../styles/global.font.css';
 const chakraTheme = createChakraTheme();
 const queryClient = createQueryClient();
 const muiTheme = createMuiTheme();
-
 dayjs.extend(relativeTime);
 dayjs.locale(kolocale);
-
 function CustomApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <>
