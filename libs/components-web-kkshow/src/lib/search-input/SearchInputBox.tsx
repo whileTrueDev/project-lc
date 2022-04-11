@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { useDisplaySize } from '@project-lc/hooks';
 import { useKkshowSearchStore } from '@project-lc/stores';
-import { RefObject, useCallback, useEffect, useRef } from 'react';
+import { RefObject, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { MdCancel } from 'react-icons/md';
 import SearchHelpPopover from './SearchHelpPopover';
@@ -42,15 +42,6 @@ export function SearchInputBox({ inputRef }: SearchInputBoxProps): JSX.Element {
   const clearSearchInput = (): void => {
     setValue('keyword', '');
   };
-
-  const focusOnInput = useCallback((): void => {
-    const ref = inputRef || initialRef;
-    if (ref && ref.current) ref.current.focus();
-  }, [inputRef]);
-
-  useEffect(() => {
-    if (isMobileSize) focusOnInput();
-  }, [focusOnInput, isMobileSize]);
 
   return (
     <Flex w="100%" h="100%" pos="relative">
