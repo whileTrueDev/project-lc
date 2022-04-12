@@ -31,6 +31,7 @@ model Seller {
   discountCodes              DiscountCode[] // 판매자가 생성한 할인코드
   coupons                    Coupon[] // 판매자가 발급한 쿠폰
   goodsReviewComments        GoodsReviewComment[] // 판매자가 작성한 상품리뷰댓글
+  goodsInquiryComments       GoodsInquiryComment[] // 판매자가 작성한 상품문의답변
 }
 
 // 마케터의 상정정보
@@ -1191,6 +1192,7 @@ model Customer {
   goodsReview            GoodsReview[]                @relation("WrittenReviews") // 작성한 리뷰
   likedReviews           GoodsReview[]                @relation("LikedReviews") // 좋아요 누른 리뷰
   goodsReviewComments    GoodsReviewComment[] // 소비자가 작성한 댓글
+  goodsInquiry           GoodsInquiry[] // 소비자가 작성한 문의
   followingLiveShoppings LiveShopping[] // 팔로우하는 라이브쇼핑
   followingBroadcasters  CustomerFollowBroadcaster[] // 팔로우하는 방송인
 }
@@ -1446,6 +1448,43 @@ model GoodsReviewComment {
   writtenBySellerFlag Boolean     @default(false) // 댓글이 판매자에 의해 작성된 경우 해당 컬럼값은 true이고 연결된 소비자는 없다
   sellerId            Int? // 댓글 작성한 판매자 고유번호(판매자에 의해 댓글이 작성된 경우)
   seller              Seller?     @relation(fields: [sellerId], references: [id], onDelete: SetNull) // 댓글작성한 판매자(판매자에 의해 댓글이 작성된 경우)
+}
+
+// *****************
+// 상품문의
+// *****************
+// 상품문의
+model GoodsInquiry {
+  id         Int      @id @default(autoincrement()) // 상품문의고유번호
+  content    String   @db.Text // 상품문의내용
+  createDate DateTime //생성일
+
+  writerId Int // 상품문의 작성한 소비자 고유번호
+  // 상품문의작성자
+  writer   Customer @relation("WrittenReviews", fields: [writerId], references: [id], onDelete: SetNull)
+
+  goodsId  Int // 상품문의 대상 상품 고유번호
+  // 상품문의 대상 상품
+  goods    Goods                 @relation(fields: [goodsId], references: [id], onDelete: SetNull)
+  comments GoodsInquiryComment[] // 상품문의에 달린 답변
+}
+
+// 상품문의 답변
+model GoodsInquiryComment {
+  id                  Int          @id @default(autoincrement()) // 상품문의답변 고유번호
+  content             String // 상품문의답변 내용
+  createDate          DateTime // 상품문의답변 생성일
+  goodsInquiryId      Int // 상품문의답변달린 문의 고유번호
+  goodsInquiry        GoodsInquiry @relation(fields: [reviewId], references: [id], onDelete: Cascade) // 상품문의답변 달린 문의
+  writtenBySellerFlag Boolean      @default(false) // 답변이 판매자에 의해 작성된 경우 해당 컬럼값은 true이고 연결된 관리자는 없다
+
+  adminId Int? // 답변 작성한 관리자 고유번호(판매자에 의해 답변이 작성된 경우)
+  // 답변 작성한 관리자(관리자에 의해 답변이 작성된 경우)
+  admin   Administrator? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  sellerId Int? // 답변 작성한 판매자 고유번호(판매자에 의해 답변이 작성된 경우)
+  // 답변 작성한 판매자(판매자에 의해 답변이 작성된 경우)
+  seller   Seller? @relation(fields: [sellerId], references: [id], onDelete: SetNull)
 }
 
 // **************************************************************************
