@@ -25,6 +25,7 @@ import {
   useBroadcasterChannels,
   useProfile,
 } from '@project-lc/hooks';
+import { parseErrorObject } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { AddButton } from './BroadcasterContact';
@@ -118,8 +119,10 @@ export function BroadcasterChannelSection(): JSX.Element {
       })
       .catch((error) => {
         console.error(error);
+        const { status, message } = parseErrorObject(error);
         toast({
           title: '채널url을 추가하는 중 오류가 발생했습니다.',
+          description: status ? `code: ${status} - message: ${message}` : undefined,
           status: 'error',
         });
       });

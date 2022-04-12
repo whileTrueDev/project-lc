@@ -17,6 +17,7 @@ import { SettingNeedAlertBox } from '@project-lc/components-core/SettingNeedAler
 import { useBroadcaster, useProfile, useUpdateNicknameMutation } from '@project-lc/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { parseErrorObject } from '@project-lc/utils-frontend';
 
 /** 방송인 활동명 컴포넌트. editable input */
 export function BroadcasterNickNameSection(): JSX.Element {
@@ -95,10 +96,12 @@ export function BroadcasterNicknameForm(): JSX.Element {
       setEditMode(false);
       toast({ title: '활동명이 변경되었습니다.', status: 'success' });
     };
-    const onError = (): void => {
+    const onError = (err?: any): void => {
+      const { status, message } = parseErrorObject(err);
       setEditMode(true);
       toast({
         title: '활동명 변경중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        description: status ? `code: ${status} - message: ${message}` : undefined,
         status: 'error',
       });
     };
@@ -111,7 +114,7 @@ export function BroadcasterNicknameForm(): JSX.Element {
       })
       .catch((err) => {
         console.log(err);
-        onError();
+        onError(err);
       });
   }
 
