@@ -1377,6 +1377,7 @@ model CartItem {
   createDate DateTime         @default(now())
   customerId Int? // 비로그인 상태로 장바구니에 담은것도 디비에 저장해야 하나? 쿠키에만 저장하면 되나??
   customer   Customer?        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  tempUserId String? // 비로그인한 유저 식별값(세션id?)
   goodsId    Int
   goods      Goods            @relation(fields: [goodsId], references: [id], onDelete: SetNull)
   options    CartItemOption[] // 선택된 장바구니 상품 옵션
