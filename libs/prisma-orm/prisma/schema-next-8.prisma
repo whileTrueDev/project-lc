@@ -1480,7 +1480,7 @@ model GoodsInquiryComment {
   goodsInquiry        GoodsInquiry @relation(fields: [goodsInquiryId], references: [id], onDelete: Cascade) // 상품문의답변 달린 문의
   writtenBySellerFlag Boolean      @default(false) // 답변이 판매자에 의해 작성된 경우 해당 컬럼값은 true이고 연결된 관리자는 없다
 
-  adminId Int? // 답변 작성한 관리자 고유번호(판매자에 의해 답변이 작성된 경우)
+  adminId Int? // 답변 작성한 관리자 고유번호(관리자에 의해 답변이 작성된 경우)
   // 답변 작성한 관리자(관리자에 의해 답변이 작성된 경우)
   admin   Administrator? @relation(fields: [adminId], references: [id], onDelete: SetNull)
 
@@ -1507,6 +1507,9 @@ model Order {
   recipientName              String // 받는사람명
   recipientPhone             String // 받는사람 연락처
   recipientEmail             String // 받는사람 이메일
+  recipientAddress           String // 받는사람 주소(배송지) 도로명
+  recipientDetailAddress     String // 받는사람 주소(배송지) 주소 상세
+  recipientPostalCode        String // 받는사람 주소(배송지) 우편 번호
   ordererName                String // 주문자명
   ordererPhone               String // 주문자 연락처
   ordererEmail               String // 주문자 이메일
