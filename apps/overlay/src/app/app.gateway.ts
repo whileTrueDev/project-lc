@@ -120,4 +120,14 @@ export class AppGateway
     const { streamerAndProduct } = roomNameAndStreamerAndProduct;
     this.server.to(roomName).emit('get product name from server', streamerAndProduct);
   }
+
+  @SubscribeMessage('start bgm from admin')
+  startBgm(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('start bgm from server', roomName);
+  }
+
+  @SubscribeMessage('off bgm from admin')
+  offBgm(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('off bgm from server', roomName);
+  }
 }

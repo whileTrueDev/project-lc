@@ -259,4 +259,9 @@ export class AppScreenGateway
     const { themeType } = roomNameAndThemeType;
     this.server.to(roomName).emit('change theme from server', themeType);
   }
+
+  @SubscribeMessage('get chicken move from admin')
+  getChickenMovement(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('get chicken move from server');
+  }
 }

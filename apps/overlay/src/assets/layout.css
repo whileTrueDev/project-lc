@@ -347,6 +347,7 @@ body {
   text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
     2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
     0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
+  z-index: 20
 }
 
 .ranking-text-area span {
@@ -483,8 +484,8 @@ body {
 }
 
 .full-video {
+  display:none;
   position: fixed;
-  opacity: 1;
   top: 0;
   left: 0;
   width: 100%;
@@ -730,6 +731,7 @@ div.bottom-fever-timer {
 }
 
 .letters {
+  display:none;
   font-size: xx-large;
   color: rgba(255, 255, 255, 0.8);
   font-family: NotoSansBold;

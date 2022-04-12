@@ -1,6 +1,9 @@
 /* eslint-env jquery */
 /* global io, */
 /* eslint no-undef: "error" */
+/* eslint import/extensions: "off" */
+import { chickenMovement } from './animation.js';
+
 const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
@@ -8,6 +11,7 @@ const iterateLimit = $('#primary-info').data('number') + 1;
 const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const email = $('#primary-info').data('email');
 const bucketName = $('#primary-info').data('bucket-name');
+// const { chickenMovement } = window;
 
 let streamerAndProduct;
 let startDate = new Date('2021-09-27T14:05:00+0900');
@@ -78,9 +82,10 @@ function dailyMissionTimer() {
           </video>
             `;
         $('.full-video').html(introHtml);
+        $('.full-video').fadeIn(500);
         $('.inner-video-area').on('ended', function () {
           $('.live-commerce').show();
-          $('.inner-video-area').fadeOut(500);
+          $('.full-video').fadeOut(500);
         });
       }
     }
@@ -619,10 +624,11 @@ socket.on('show video from server', (type) => {
     </video>
       `;
     $('.full-video').html(introHtml);
+    $('.full-video').fadeIn(500);
 
     $('.inner-video-area').on('ended', function () {
       $('.live-commerce').show();
-      $('.inner-video-area').fadeOut(500);
+      $('.full-video').fadeOut(500);
     });
   } else {
     const outroHtml = `
@@ -630,17 +636,18 @@ socket.on('show video from server', (type) => {
       <source src="/videos/outro.mp4" type="video/mp4">
     </video>
       `;
-    $('.full-video').hide().html(outroHtml).fadeIn(500);
+    $('.full-video').html(outroHtml);
+    $('.full-video').fadeIn(500);
 
     $('.inner-video-area').on('ended', function () {
       $('.live-commerce').hide();
-      $('.inner-video-area').fadeOut(500);
+      $('.full-video').fadeOut(500);
     });
   }
 });
 
 socket.on('clear full video from server', () => {
-  $('.inner-video-area').fadeOut(800);
+  $('.full-video').fadeOut(800);
 });
 
 socket.on('get start time from server', (startSetting) => {
@@ -807,12 +814,58 @@ socket.on('change theme from server', (themeType) => {
       $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
         themeType,
       );
+      $('#kks-logo').attr('src', '/images/kks-chicken-logo.png');
       $('#podium').attr('src', '/images/chicken-head.png');
       $('.bottom-area-left-icon').attr('src', '/images/egg.png');
+      $('.live-commerce').append(`
+      <div
+        class='chicken-move'
+      >
+        <img id='mother-chicken' src='/images/chicken.png' />
+        <img id='baby-1' src='/images/chic.png' />
+        <img id='baby-2' src='/images/chic.png' />
+        <img id='baby-3' src='/images/chic.png' />
+      </div>
+      `);
+      $('.live-commerce').append(`
+      <div class='confetti' id='left'>
+        <img src='/images/confetti_l.png' />
+      </div>
+      <div class='confetti' id='right'>
+        <img src='/images/confetti_r.png' />
+      </div>
+      `);
       break;
     default:
       console.log('default');
   }
+});
+
+socket.on('start bgm from server', () => {
+  $('body').append(`
+  <audio src="/audio/bgm.mp3"
+    id="bgm" autoplay loop ></audio>
+    `);
+  $('#bgm').prop('volume', 0.1);
+});
+
+socket.on('off bgm from server', () => {
+  $('#bgm').remove();
+});
+
+socket.on('get virtual character audio from server', async () => {
+  $('body').append(`
+    <iframe src="https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-audio/${email}/${liveShoppingId}/voice"
+     id="virtual-voice" allow="autoplay" style="display:none"></iframe>
+    `);
+});
+
+socket.on('get chicken move from server', async () => {
+  $('.chicken-move').show();
+  chickenMovement();
+  await setTimeout(() => {
+    $('.chicken-move').hide();
+  }, 15000);
 });
 
 // socket.on('reset theme from server', () => {

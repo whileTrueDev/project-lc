@@ -485,6 +485,18 @@ $(document).ready(function ready() {
     socket.emit('change theme from admin', { roomName, themeType: this.id });
   });
 
+  $('#chicken-movement-button').click(function chickenMovementButtonClickEvent() {
+    socket.emit('get chicken move from admin', roomName);
+  });
+
+  $('#start-bgm-button').click(function startBgmButton() {
+    socket.emit('start bgm from admin', roomName);
+  });
+
+  $('#off-bgm-button').click(function offBgmButton() {
+    socket.emit('off bgm from admin', roomName);
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
     let level;
