@@ -244,9 +244,8 @@ model Goods {
   informationNoticeId  Int?                     @unique
   informationNotice    GoodsInformationNotice?  @relation(fields: [informationNoticeId], references: [id]) // 연결된 상품정보제공 내용
   categories           GoodsCategory[] // 상품이 해당하는 카테고리들
+  goodsInquiry         GoodsInquiry[]
 
-
-  GoodsInquiry GoodsInquiry[]
   @@index([sellerId], name: "sellerId")
   @@fulltext([goods_name])
 }
