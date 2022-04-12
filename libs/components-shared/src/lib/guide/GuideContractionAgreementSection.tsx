@@ -42,6 +42,7 @@ export function GuideContractionAgreementSection({
   const { data } = useProfile();
   const toast = useToast();
   const dialog = useDisclosure();
+
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [checkedA, setCheckedA] = useState<boolean>(false);
   const [checkedB, setCheckedB] = useState<boolean>(false);
