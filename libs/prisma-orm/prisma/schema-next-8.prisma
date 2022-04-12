@@ -29,7 +29,6 @@ model Seller {
   agreementFlag              Boolean                      @default(false) // 이용동의 
   inactiveFlag               Boolean                      @default(false)
   discountCodes              DiscountCode[] // 판매자가 생성한 할인코드
-  coupons                    Coupon[] // 판매자가 발급한 쿠폰
   goodsReviewComments        GoodsReviewComment[] // 판매자가 작성한 상품리뷰댓글
   goodsInquiryComments       GoodsInquiryComment[] // 판매자가 작성한 상품문의답변
 }
@@ -1323,8 +1322,6 @@ enum DiscountApplyType {
 // ****************
 model Coupon {
   id                   Int                @id @default(autoincrement()) // 쿠폰 고유번호
-  sellerId             Int
-  seller               Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   amount               Int                @default(0) // 할인금액 혹은 할인율
   unit                 AmountUnit         @default(P) // 할인에 적용되는 단위 (퍼센트 P, 원 W)
   maxDiscountAmountWon Int? // 최대할인금액(원단위)
@@ -1338,7 +1335,7 @@ model Coupon {
   memo                 String? // 쿠폰 설명
   concurrentFlag       Boolean            @default(false) // 다른쿠폰과 동시에 사용 가능여부
   goods                Goods[] // 연결된 상품
-  CustomerCoupon       CustomerCoupon[]
+  customerCoupons      CustomerCoupon[] // 해당 쿠폰 발급받은 사용자 정보
 }
 
 // 소비자가 발급받은 쿠폰
@@ -1349,14 +1346,7 @@ model CustomerCoupon {
   customerId Int
   customer   Customer            @relation(fields: [customerId], references: [id])
   issueDate  DateTime            @default(now()) // 발급일
-  issuer     CouponIssuer        @default(customer) // 쿠폰 발급 주체
   logs       CustomerCouponLog[] // 쿠폰사용내역
-}
-
-// [enum] 쿠폰 발급 주체
-enum CouponIssuer {
-  customer // 소비자
-  seller // 판매자
 }
 
 // 소비자의 쿠폰 사용 내역
