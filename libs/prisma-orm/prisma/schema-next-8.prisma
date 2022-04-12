@@ -28,22 +28,27 @@ model Seller {
   avatar                     String?
   agreementFlag              Boolean                      @default(false) // 이용동의 
   inactiveFlag               Boolean                      @default(false)
-  discountCodes              DiscountCode[] // 판매자가 생성한 할인코드
   goodsReviewComments        GoodsReviewComment[] // 판매자가 작성한 상품리뷰댓글
   goodsInquiryComments       GoodsInquiryComment[] // 판매자가 작성한 상품문의답변
 }
 
 // 마케터의 상정정보
 model SellerShop {
-  sellerId              Int                   @unique
-  shopName              String
-  seller                Seller                @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  defaultMileagePercent Int                   @default(0) // 판매자 상품 구매시 결제금액의 몇퍼센트를 적립금으로 지금할지
-  mileageStrategy       SellerMileageStrategy @default(onPaymentPriceExceptMileageUsage) // 적립금 지급방식
+  sellerId Int    @unique
+  shopName String
+  seller   Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+}
+
+// 관리자가 설정할 마일리지 세팅
+model MileageSetting {
+  id                    Int             @id @default(autoincrement())
+  defaultMileagePercent Int             @default(0) // 상품 구매시 결제금액의 몇퍼센트를 적립금으로 지금할지
+  mileageStrategy       MileageStrategy @default(onPaymentPriceExceptMileageUsage) // 적립금 지급방식
 }
 
 // [enum] 적립금 지급 방식(결제시 적립금을 사용한 경우)
-enum SellerMileageStrategy {
+enum MileageStrategy {
   onPaymentPriceExceptMileageUsage // (결제금액 - 사용한 적립금)기준으로 적립금 지급
   onPaymentPrice // 전체 결제금액 기준으로 적립금 지급
   noMileage // 적립금 사용시 적립금 지금안함
@@ -190,60 +195,57 @@ model SellerContacts {
 // * firstmall과 동일한 상품 정보 (컬럼명도 동일하게 ��져갑니다.)
 // 상품 - fm_goods
 model Goods {
-  id                      Int                @id @default(autoincrement())
+  id                      Int                      @id @default(autoincrement())
   sellerId                Int
-  seller                  Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  seller                  Seller                   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   options                 GoodsOptions[]
   confirmation            GoodsConfirmation? // 상품 검수
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
   goods_name              String // 상품명
   summary                 String // 간략 설명
-  goods_status            GoodsStatus        @default(normal) // 상�� 상태
-  cancel_type             String             @default("0") // 청약철회 가능 여부, "0" or "1"
-  contents                String?            @db.LongText // 상세 설명 PC 화면
-  contents_mobile         String?            @db.LongText // 상세 설명 Mobile 화면
-  shipping_policy         ShopOrGoods        @default(shop) // 배송 정책 선택
-  goods_shipping_policy   LimitOrUnlimit     @default(unlimit) // 개별 배송비 선택
-  unlimit_shipping_price  Int?               @db.UnsignedInt // 배송비
-  limit_shipping_ea       Int?               @db.UnsignedTinyInt // 개별 배송 포장 단위
-  limit_shipping_price    Int?               @db.UnsignedInt // 개별 배송 단위별 배송비
-  limit_shipping_subprice Int?               @db.UnsignedTinyInt // 개별 배송 추가 배송비
-  shipping_weight_policy  ShopOrGoods        @default(shop) // 해외 배송 중량 정책
-  min_purchase_limit      LimitOrUnlimit     @default(unlimit) // 최소 구매 수량 사용 여부
-  min_purchase_ea         Int?               @db.UnsignedMediumInt // 최소 구매 수량
-  max_purchase_limit      LimitOrUnlimit     @default(unlimit) // 최대 구매 수량 사용 여부
-  max_purchase_ea         Int?               @db.UnsignedMediumInt // 최대 구매 수량
-  max_urchase_order_limit Int?               @db.UnsignedMediumInt // 최대 구매 수량 주문 횟수
-  admin_memo              String?            @db.Text // 관리자 메모
-  option_use              String             @default("0") // 옵션 사용 여부 "0" or "1"
-  option_view_type        OptionViewType     @default(divide) // 필수옵션-분리/합체형 구분
-  option_suboption_use    String             @default("0") // 추가 옵션 사용 여부 "0" or "1"
-  member_input_use        String             @default("0") // 추가 구성 옵션 사용 여부 "0" or "1"
+  goods_status            GoodsStatus              @default(normal) // 상�� 상태
+  cancel_type             String                   @default("0") // 청약철회 가능 여부, "0" or "1"
+  contents                String?                  @db.LongText // 상세 설명 PC 화면
+  contents_mobile         String?                  @db.LongText // 상세 설명 Mobile 화면
+  shipping_policy         ShopOrGoods              @default(shop) // 배송 정책 선택
+  goods_shipping_policy   LimitOrUnlimit           @default(unlimit) // 개별 배송비 선택
+  unlimit_shipping_price  Int?                     @db.UnsignedInt // 배송비
+  limit_shipping_ea       Int?                     @db.UnsignedTinyInt // 개별 배송 포장 단위
+  limit_shipping_price    Int?                     @db.UnsignedInt // 개별 배송 단위별 배송비
+  limit_shipping_subprice Int?                     @db.UnsignedTinyInt // 개별 배송 추가 배송비
+  shipping_weight_policy  ShopOrGoods              @default(shop) // 해외 배송 중량 정책
+  min_purchase_limit      LimitOrUnlimit           @default(unlimit) // 최소 구매 수량 사용 여부
+  min_purchase_ea         Int?                     @db.UnsignedMediumInt // 최소 구매 수량
+  max_purchase_limit      LimitOrUnlimit           @default(unlimit) // 최대 구매 수량 사용 여부
+  max_purchase_ea         Int?                     @db.UnsignedMediumInt // 최대 구매 수량
+  max_urchase_order_limit Int?                     @db.UnsignedMediumInt // 최대 구매 수량 주문 횟수
+  admin_memo              String?                  @db.Text // 관리자 메모
+  option_use              String                   @default("0") // 옵션 사용 여부 "0" or "1"
+  option_view_type        OptionViewType           @default(divide) // 필수옵션-분리/합체형 구분
+  option_suboption_use    String                   @default("0") // 추가 옵션 사용 여부 "0" or "1"
+  member_input_use        String                   @default("0") // 추가 구성 옵션 사용 여부 "0" or "1"
   image                   GoodsImages[] // 상품 이미지 - fm_goods_image
-  goods_view              GoodsView          @default(look) // 노출
-  regist_date             DateTime           @default(now()) // 상품등록일 (크크쇼에 판매자가 등록한 날짜)
-  update_date             DateTime           @default(now()) @updatedAt // 수정일 (�����스트몰에는 코멘트에 구매수량 이라고 되어있음, 크크쇼 에서수정한날짜)
-  runout_policy           RunoutPolicy?      @default(unlimited) // 재고 정책
-  ShippingGroup           ShippingGroup?     @relation(fields: [shippingGroupId], references: [id])
+  goods_view              GoodsView                @default(look) // 노출
+  regist_date             DateTime                 @default(now()) // 상품등록일 (크크쇼에 판매자가 등록한 날짜)
+  update_date             DateTime                 @default(now()) @updatedAt // 수정일 (�����스트몰에는 코멘트에 구매수량 이라고 되어있음, 크크쇼 에서수정한날짜)
+  runout_policy           RunoutPolicy?            @default(unlimited) // 재고 정책
+  ShippingGroup           ShippingGroup?           @relation(fields: [shippingGroupId], references: [id])
   shippingGroupId         Int?
-  GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
+  GoodsInfo               GoodsInfo?               @relation(fields: [goodsInfoId], references: [id])
   goodsInfoId             Int?
   LiveShopping            LiveShopping[]
   productPromotion        ProductPromotion[] // 하나의 상품이 여러개 홍보아이템 등록될 수 있음
-
-  discountCodes        DiscountCode[] // 상품에 적용가능한 할인코드
-  coupons              Coupon[] // 상품에 적용가능한 쿠폰
-  searchKeyword        String? // ',' 구분자로 하는 검색키워드의 문자열
-  mileagePercent       Int? // 구매확정시 지급될 적립금 비율(없는경우 판매자 상점정보 기본적립금 비율에 따름)
-  cartItems            CartItem[] // 연결된 장바구니 상품
-  orrderItems          OrderItem[] // 연결된 주문상품
-  reviews              GoodsReview[] // 작성된 리뷰
-  informationSubjectId Int? // 정보제공고시 품목고유번호
-  informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
-  informationNoticeId  Int?                     @unique
-  informationNotice    GoodsInformationNotice?  @relation(fields: [informationNoticeId], references: [id]) // 연결된 상품정보제공 내용
-  categories           GoodsCategory[] // 상품이 해당하는 카테고리들
-  goodsInquiry         GoodsInquiry[]
+  coupons                 Coupon[] // 상품에 적용가능한 쿠폰
+  searchKeyword           String? // ',' 구분자로 하는 검색키워드의 문자열
+  cartItems               CartItem[] // 연결된 장바구니 상품
+  orrderItems             OrderItem[] // 연결된 주문상품
+  reviews                 GoodsReview[] // 작성된 리뷰
+  informationSubjectId    Int? // 정보제공고시 품목고유번호
+  informationSubject      GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
+  informationNoticeId     Int?                     @unique
+  informationNotice       GoodsInformationNotice?  @relation(fields: [informationNoticeId], references: [id]) // 연결된 상품정보제공 내용
+  categories              GoodsCategory[] // 상품이 해당하는 카테고리들
+  goodsInquiry            GoodsInquiry[]
 
   @@index([sellerId], name: "sellerId")
   @@fulltext([goods_name])
@@ -1281,28 +1283,6 @@ enum MileageActionType {
   earn // 적립
 }
 
-// ****************
-// 할인코드
-// ****************
-model DiscountCode {
-  id                   Int                @id @default(autoincrement()) // 할인코드 고유번호
-  orders               Order[] // 할인코드 적용한 주문
-  sellerId             Int
-  seller               Seller             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  amount               Int                @default(0) // 할인금액 혹은 할인율
-  unit                 AmountUnit         @default(P) // 할인에 적용되는 단위 (퍼센트 P, 원 W)
-  maxDiscountAmountWon Int? // 최대할인금액(원단위)
-  minOrderAmountWon    Int                @default(0) // 할인코드 적용 가능한 최소주문금액
-  code                 String // 할인코드. 판매자가 작성(예: KKSHOWOPEN1123) 혹은 랜덤생성
-  memo                 String? // 할인코드 설명
-  createDate           DateTime           @default(now()) // 생성일시
-  startDate            DateTime // 유효시간 시작
-  endDate              DateTime? // 유효기간 끝
-  applyField           DiscountApplyField @default(goods) // 코드할인 적용 범위 - 상품 | 배송비
-  applyType            DiscountApplyType  @default(allGoods) // 코드적용가능 유형 - 모든상품에 적용가능 | 연결된상품에만 적용가능 | 연결된상품 제외하고 적용가능
-  goods                Goods[] // 연결된 상품
-}
-
 // [enum] 쿠폰, 코드 할인적용 대상
 enum DiscountApplyField {
   goods // 상품
@@ -1517,8 +1497,6 @@ model Order {
   mileageLog                 CustomerMileageLog[] // 사용 & 적립 마일리지 내역
   purchaseConfirmationDate   DateTime? // 구매확정일자
   cashReceipts               String? // 현금영수증번호
-  discountCodeId             Int? // 적용한 할인코드 고유번호
-  discountCode               DiscountCode?                @relation(fields: [discountCodeId], references: [id], onDelete: SetNull)
   orderItems                 OrderItem[] // 주문에 연결된 주문상품들
   refund                     Refund[] // 주문에 연결된 환불정보
   return                     Return[] // 주문에 연결된 반품정보
