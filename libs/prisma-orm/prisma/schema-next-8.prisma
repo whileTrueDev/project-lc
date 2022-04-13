@@ -1656,7 +1656,7 @@ model RefundItem {
 }
 
 // ****************
-// 반품, 교환
+// 반품
 // ****************
 // 반품
 model Return {
@@ -1674,7 +1674,7 @@ model Return {
   responsibility String // 책임소재(판매자귀책? 구매자귀책?)
 }
 
-// 반품, 교환 상품
+// 반품 상품
 model ReturnItem {
   id                Int             @id @default(autoincrement()) // 반품상품 고유번호
   returnId          Int // 반품고유번호
@@ -1685,10 +1685,12 @@ model ReturnItem {
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
   status            ProcessStatus   @default(requested) // 반품처리상태
-  Exchange          Exchange?       @relation(fields: [exchangeId], references: [id])
-  exchangeId        Int?
+  getBackFlag       Boolean         @default(false) // 회수(수거) 여부
 }
 
+// ****************
+// 교환
+// ****************
 // 교환상태 - 다른 요청 진행상태와 달리 상품수거를 포함.  교환출고 이후 진행상태는 해당 교환출고상태와 중복일거같아서 추가하지 않음
 enum ExchangeProcessStatus {
   requested // 요청됨(초기 상태, 담당자 확인전)
@@ -1710,7 +1712,6 @@ model Exchange {
   reason         String // 교환사유
   cancelReason   String? // 교환요청이 취소된 이유
   returnAddress  String // 회수지 주소
-  items          ReturnItem[] // 교환상품들
   responsibility String // 책임소재(판매자귀책? 구매자귀책?)
   exportId       Int?                  @unique // 교환 재출고시 연결된 출고
   export         Export?               @relation(fields: [exportId], references: [id], onDelete: SetNull) // 교환 재출고시 연결된 출고
@@ -1728,6 +1729,7 @@ model ExchangeItem {
   orderItemOption   OrderItemOption       @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
   status            ExchangeProcessStatus @default(requested) // 교환처리상태
+  getBackFlag       Boolean               @default(false) // 회수(수거) 여부
 }
 
 // ****************
