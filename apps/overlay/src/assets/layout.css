@@ -910,6 +910,51 @@ div.bottom-fever-timer {
   animation: 2s anim-popoutin ease;
 }
 
+.ranking-pop {
+  background-image: linear-gradient(
+    35deg,
+    #7a7a7a 0%,
+    #ffffff 29%,
+    #817e7e 67%,
+    #ffffff 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: 5s ranking-pop ease;
+  text-shadow: none;
+}
+
+@keyframes ranking-pop {
+  0% {
+    background-position: 0%;
+    transform: scale(0);
+    opacity: 0;
+  }
+  10% {
+    transform: scale(0) translate(20px,0px);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(2) translate(50px,0px);
+    opacity: 1;
+  }
+  90% {
+    transform: scale(2) translate(50px,0px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    background-position: 200%;
+  }
+}
+
 @keyframes anim-popoutin {
   0% {
     transform: scale(0);

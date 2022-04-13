@@ -7,6 +7,7 @@ import { chickenMovement } from './animation.js';
 const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
+let prevRankingArray = [];
 const iterateLimit = $('#primary-info').data('number') + 1;
 const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const email = $('#primary-info').data('email');
@@ -167,6 +168,16 @@ function dailyMissionTimer() {
       ) {
         $('.bottom-timer').removeClass('warning');
       }
+      //      $('.bottom-area-left-icon').attr('src', '/images/egg.png');
+
+      if (
+        $('.bottom-area-left-icon').attr('src') === '/images/egg.png' &&
+        Number(minutes) === 0 &&
+        Number(seconds) === 0
+      ) {
+        $('.bottom-area-left-icon').removeClass('urgent');
+        $('.bottom-area-left-icon').attr('src', '/images/softbank-chick.png');
+      }
     }
   }, 1000);
 }
@@ -303,14 +314,19 @@ socket.emit('get date from registered liveshopping', {
   roomName: pageUrl.split('/').pop(),
 });
 
-socket.on('get top-left ranking', (data) => {
-  const rankingArray = data;
+socket.on('get top-left ranking', (rankings) => {
   if ($('.ranking-text-area#title').css('display') === 'none') {
-    rankingArray.forEach((value, index) => {
+    rankings.forEach((value, index) => {
       $(`.ranking-text-area-id#rank-${index}`).text(value.nickname);
       $(`.quantity#rank-${index}`).text(
         `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
       );
+      if (index === 0 && prevRankingArray[index].nickname !== value.nickname) {
+        $('.ranking-text-area-id#rank-0').addClass('ranking-pop');
+        setTimeout(() => {
+          $('.ranking-text-area-id#rank-0').removeClass('ranking-pop');
+        }, 6000);
+      }
     });
   } else {
     $('.ranking-text-area#title').css({ display: 'none' });
@@ -352,13 +368,20 @@ socket.on('get top-left ranking', (data) => {
         </span>
       </p>`,
     );
-    rankingArray.forEach((value, index) => {
+    rankings.forEach((value, index) => {
       $(`.ranking-text-area-id#rank-${index}`).text(value.nickname);
       $(`.quantity#rank-${index}`).text(
         `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
       );
+      if (index === 0) {
+        $('.ranking-text-area-id#rank-0').addClass('ranking-pop');
+        setTimeout(() => {
+          $('.ranking-text-area-id#rank-0').removeClass('ranking-pop');
+        }, 6000);
+      }
     });
   }
+  prevRankingArray = rankings;
 });
 
 socket.on('get right-top purchase message', async (data) => {
@@ -814,7 +837,6 @@ socket.on('change theme from server', (themeType) => {
       $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
         themeType,
       );
-      // $('#podium').attr('src', '/images/cherry-blossom-tree.png');
       break;
     case 'chicken':
       $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
@@ -827,10 +849,13 @@ socket.on('change theme from server', (themeType) => {
       <div
         class='chicken-move'
       >
-        <img id='mother-chicken' src='/images/chicken.png' />
-        <img id='baby-1' src='/images/chic.png' />
-        <img id='baby-2' src='/images/chic.png' />
-        <img id='baby-3' src='/images/chic.png' />
+        <div id="mother-chicken">
+          <img src='/images/chicken.png' />
+          <span class="chicken-move-text">크크쇼 플친 <br> 이벤트 진행중</span>
+        </div>
+        <img class="chic" id='baby-1' src='/images/chic.png' />
+        <img class="chic" id='baby-2' src='/images/chic.png' />
+        <img class="chic" id='baby-3' src='/images/chic.png' />
       </div>
       `);
       $('.live-commerce').append(`
@@ -887,7 +912,7 @@ socket.on('get virtual character audio from server', async () => {
 });
 
 socket.on('get chicken move from server', async () => {
-  $('.chicken-move').show();
+  $('.chicken-move').css({ display: 'flex' });
   chickenMovement();
   await setTimeout(() => {
     $('.chicken-move').hide();
