@@ -19,3 +19,7 @@ ALTER TABLE `ConfirmHistory` ADD CONSTRAINT `ConfirmHistory_sellerSettlementAcco
 
 -- AddForeignKey
 ALTER TABLE `ConfirmHistory` ADD CONSTRAINT `ConfirmHistory_broadcasterSettlementInfoId_fkey` FOREIGN KEY (`broadcasterSettlementInfoId`) REFERENCES `BroadcasterSettlementInfo`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddColumn
+ALTER TABLE `PrivacyApproachHistory` ADD COLUMN `reason` VARCHAR(191) NULL;
+
