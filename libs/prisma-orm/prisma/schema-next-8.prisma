@@ -1501,6 +1501,7 @@ model Order {
   refunds                    Refund[] // 주문에 연결된 환불정보
   returns                    Return[] // 주문에 연결된 반품정보
   exports                    Export[] // 주문에 연결된 출고정보
+  orderCancellations         OrderCancellation[] // 주문에 연결된 주무취소정보
   broadcasterSettlementItems BroadcasterSettlementItems[]
   sellerSettlementItems      SellerSettlementItems[]
 
@@ -1554,38 +1555,40 @@ enum PaymentMethod {
 // ****************
 // 주문상품
 model OrderItem {
-  id                   Int               @id @default(autoincrement()) // 주문상품 고유번호
-  orderId              Int // 연결된 주문 고유번호
-  order                Order             @relation(fields: [orderId], references: [id], onDelete: Cascade) // 연결된 주문
-  goodsId              Int // 연결된 상품 고유번호
-  goods                Goods             @relation(fields: [goodsId], references: [id], onDelete: SetNull) // 연결된 상품
-  channel              SellType          @default(normal) // 판매유형(주문경로) - 주문테이블이 아닌 주문상품 테이블에 이 컬럼이 존재하는 이유 : 하나의 주문에 여러 경로로 선택된 상품이 포함될 수 있어서 상품별로 주문경로 저장함
-  options              OrderItemOption[] // 주문상품 옵션들
-  support              OrderItemSupport? // 주문상품에 연결된 후원정보
-  refundItems          RefundItem[] // 환불상품
-  returnItems          ReturnItem[] // 반품상품
-  exportItems          ExportItem[] // 출고상품
-  shippingCost         Decimal           @default("0.00") @db.Decimal(10, 2) // 주문당시 이 주문 상품에 포함된  배송비
-  shippingCostIncluded Boolean           @default(false) // 이 주문 상품에 동일 판매자의 배송비가 포함되었는지 여부
-  shippingGroupId      Int // 연결된 배송정책 id
-  shippingGroup        ShippingGroup     @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
+  id                     Int                     @id @default(autoincrement()) // 주문상품 고유번호
+  orderId                Int // 연결된 주문 고유번호
+  order                  Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade) // 연결된 주문
+  goodsId                Int // 연결된 상품 고유번호
+  goods                  Goods                   @relation(fields: [goodsId], references: [id], onDelete: SetNull) // 연결된 상품
+  channel                SellType                @default(normal) // 판매유형(주문경로) - 주문테이블이 아닌 주문상품 테이블에 이 컬럼이 존재하는 이유 : 하나의 주문에 여러 경로로 선택된 상품이 포함될 수 있어서 상품별로 주문경로 저장함
+  options                OrderItemOption[] // 주문상품 옵션들
+  support                OrderItemSupport? // 주문상품에 연결된 후원정보
+  refundItems            RefundItem[] // 환불상품
+  returnItems            ReturnItem[] // 반품상품
+  exportItems            ExportItem[] // 출고상품
+  orderCancellationItems OrderCancellationItem[] // 주문취소상품
+  shippingCost           Decimal                 @default("0.00") @db.Decimal(10, 2) // 주문당시 이 주문 상품에 포함된  배송비
+  shippingCostIncluded   Boolean                 @default(false) // 이 주문 상품에 동일 판매자의 배송비가 포함되었는지 여부
+  shippingGroupId        Int // 연결된 배송정책 id
+  shippingGroup          ShippingGroup           @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
 }
 
 // 주문상품옵션
 model OrderItemOption {
-  id            Int              @id @default(autoincrement()) // 주문 상품 옵션 고유번호
-  orderItemId   Int // 옵션이 연결된 주문 상품 고유번호
-  orderItem     OrderItem        @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
-  name          String? // 주문했을 당시 옵션명
-  value         String? // 주문했을 당시 옵션값
-  quantity      Int // 옵션 선택 수량(개수)
-  normalPrice   Decimal          @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
-  discountPrice Decimal          @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
-  weight        Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
-  step          OrderProcessStep @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
-  refundItems   RefundItem[] // 환불상품
-  returnItems   ReturnItem[] // 반품상품
-  exportItems   ExportItem[] // 출고상품
+  id                     Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
+  orderItemId            Int // 옵션이 연결된 주문 상품 고유번호
+  orderItem              OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
+  name                   String? // 주문했을 당시 옵션명
+  value                  String? // 주문했을 당시 옵션값
+  quantity               Int // 옵션 선택 수량(개수)
+  normalPrice            Decimal                 @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
+  discountPrice          Decimal                 @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
+  weight                 Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
+  step                   OrderProcessStep        @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
+  refundItems            RefundItem[] // 환불상품
+  returnItems            ReturnItem[] // 반품상품
+  exportItems            ExportItem[] // 출고상품
+  orderCancellationItems OrderCancellationItem[] // 주문취소상품
 }
 
 // 주문상품후원
@@ -1605,7 +1608,7 @@ model OrderItemSupport {
 // 환불
 model Refund {
   id                  Int           @id @default(autoincrement()) // 환불고유번호
-  refundCode          String?       @unique //환불코드 => 주문번호와 동일한 이유로 컬럼 만들었으나 환불코드도 사용자에게 노출이 되나???
+  refundCode          String?       @unique //환불코드
   orderId             Int // 주문 고유번호
   order               Order         @relation(fields: [orderId], references: [id]) // 연결된 주문
   status              ProcessStatus @default(requested) // 환불처리상태
@@ -1638,20 +1641,23 @@ model RefundItem {
 }
 
 // ****************
-// 반품
+// 반품, 교환
 // ****************
-// 반품
+// 반품, 교환
 model Return {
-  id            Int           @id @default(autoincrement()) // 반품고유번호
-  returnCode    String?       @unique //반품코드 => 주문번호와 동일한 이유로 컬럼 만들었으나 반품코드도 사용자에게 노출이 되나???
-  orderId       Int // 주문 고유번호
-  order         Order         @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status        ProcessStatus @default(requested) // 반품처리상태
-  requestDate   DateTime      @default(now()) // 반품신청일시
-  completeDate  DateTime? // 처리완료일시
-  reason        String // 반품사유
-  returnAddress String // 회수지 주소
-  items         ReturnItem[] // 반품상품들
+  id             Int           @id @default(autoincrement()) // 반품고유번호
+  returnCode     String?       @unique //반품코드
+  orderId        Int // 주문 고유번호
+  order          Order         @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status         ProcessStatus @default(requested) // 반품처리상태
+  requestDate    DateTime      @default(now()) // 반품신청일시
+  completeDate   DateTime? // 처리완료일시
+  reason         String // 반품사유
+  returnAddress  String // 회수지 주소
+  items          ReturnItem[] // 반품상품들
+  reExportedFlag Boolean       @default(false) // 재배송(재출고) 여부
+  exportId       Int?          @unique // 교환 재출고시 연결된 출고
+  export         Export?       @relation(fields: [exportId], references: [id], onDelete: SetNull) // 교환 재출고시 연결된 출고
 }
 
 // 반품상품
@@ -1664,6 +1670,34 @@ model ReturnItem {
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
+}
+
+// ****************
+// 주문취소
+// ****************
+// 주문취소
+model OrderCancellation {
+  id                    Int
+  cancelCode            String?
+  orderId               Int
+  order                 Order                   @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status                ProcessStatus           @default(requested) // 반품처리상태
+  requestDate           DateTime                @default(now()) // 반품신청일시
+  completeDate          DateTime? // 처리완료일시
+  reason                String? // 취소사유
+  OrderCancellationItem OrderCancellationItem[]
+}
+
+// 주문취소상품
+model OrderCancellationItem {
+  id                  Int               @id @default(autoincrement()) // 주문취소상품 고유번호
+  orderCancellationId Int // 취소고유번호
+  orderCancellation   OrderCancellation @relation(fields: [orderCancellationId], references: [id], onDelete: Cascade) // 연결된 주문취소정보
+  orderItemId         Int // 주문상품 고유번호
+  orderItem           OrderItem         @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
+  orderItemOptionId   Int // 주문상품 옵션 고유번호
+  orderItemOption     OrderItemOption   @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
+  amount              Int // 개수
 }
 
 // ****************
@@ -1682,6 +1716,8 @@ model Export {
   exportDate                 DateTime //출고일시
   broadcasterSettlementItems BroadcasterSettlementItems[]
   sellerSettlementItems      SellerSettlementItems[]
+  returnId                   Int?                         @unique // 교환을 위한 재출고시. 연결된 교환
+  return                     Return?                      @relation(fields: [returnId], references: [id], onDelete: SetNull) // 교환을 위한 재출고시. 연결된 교환
 }
 
 // 출고상품
