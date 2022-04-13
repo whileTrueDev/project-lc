@@ -1325,22 +1325,28 @@ model CustomerCoupon {
   customerId Int
   customer   Customer            @relation(fields: [customerId], references: [id])
   issueDate  DateTime            @default(now()) // 발급일
+  status     CouponStatus        @default(notUsed) // 쿠폰상태
   logs       CustomerCouponLog[] // 쿠폰사용내역
-}
-
-// 소비자의 쿠폰 사용 내역
-model CustomerCouponLog {
-  id               Int            @id @default(autoincrement()) // 쿠폰 사용내역 고유번호
-  customerCouponId Int
-  customerCoupon   CustomerCoupon @relation(fields: [customerCouponId], references: [id], onDelete: Cascade)
-  status           CouponStatus   @default(notUsed) // 쿠폰사용상태
-  createDate       DateTime       @default(now()) // 쿠폰사용내역 생성일
 }
 
 enum CouponStatus {
   notUsed // 미사용
   used // 사용
-  canceled // 사용취소
+}
+
+// 소비자의 쿠폰 발급/사용/복구 내역
+model CustomerCouponLog {
+  id               Int            @id @default(autoincrement()) // 쿠폰 사용내역 고유번호
+  customerCouponId Int
+  customerCoupon   CustomerCoupon @relation(fields: [customerCouponId], references: [id], onDelete: Cascade)
+  type             CouponLogType  @default(issue) // 쿠폰내역타입
+  createDate       DateTime       @default(now()) // 쿠폰사용내역 생성일
+}
+
+enum CouponLogType {
+  issue // 발급
+  use // 사용
+  restore // 복구
 }
 
 // *****************
@@ -1711,6 +1717,7 @@ model Exchange {
   exchangeItems  ExchangeItem[] // 교환요청에 포함된 상품들
 }
 
+// 교환상품
 model ExchangeItem {
   id                Int                   @id @default(autoincrement()) // 교환상품 고유번호
   exchangeId        Int // 교환고유번호
