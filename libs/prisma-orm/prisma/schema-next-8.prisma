@@ -1185,18 +1185,18 @@ model Customer {
   birthDate              DateTime? // 생년월일
   agreementFlag          Boolean                      @default(false) // 개인정보    이용동의여부
   inactiveFlag           Boolean                      @default(false)
-  socialAccount          CustomerSocialAccount[] // 연결된 소셜로그인 계정
-  address                CustomerAddress[] // 주소록
+  socialAccounts         CustomerSocialAccount[] // 연결된 소셜로그인 계정
+  addresses              CustomerAddress[] // 주소록
   notificationSetting    CustomerNotificationSetting? // 알림설정
   mileage                CustomerMileage? // 보유 적립금
-  mileageLog             CustomerMileageLog[]
+  mileageLogs            CustomerMileageLog[]
   orders                 Order[] // 주문
   coupons                CustomerCoupon[] // 발급받은 쿠폰
   cartItems              CartItem[] // 장바구니에 넣은 상품
   goodsReview            GoodsReview[]                @relation("WrittenReviews") // 작성한 리뷰
   likedReviews           GoodsReview[]                @relation("LikedReviews") // 좋아요 누른 리뷰
   goodsReviewComments    GoodsReviewComment[] // 소비자가 작성한 댓글
-  goodsInquiry           GoodsInquiry[]
+  goodsInquiries         GoodsInquiry[]
   followingLiveShoppings LiveShopping[] // 팔로우하는 라이브쇼핑
   followingBroadcasters  CustomerFollowBroadcaster[] // 팔로우하는 방송인
 }
@@ -1494,13 +1494,13 @@ model Order {
   giftFlag                   Boolean                      @default(false) // 선물주문 여부
   supportOrderIncludeFlag    Boolean                      @default(false) // 후원상품 포함여부
   bundleFlag                 Boolean                      @default(false) // 묶음배송여부
-  mileageLog                 CustomerMileageLog[] // 사용 & 적립 마일리지 내역
   purchaseConfirmationDate   DateTime? // 구매확정일자
   cashReceipts               String? // 현금영수증번호
+  mileageLogs                CustomerMileageLog[] // 사용 & 적립 마일리지 내역
   orderItems                 OrderItem[] // 주문에 연결된 주문상품들
-  refund                     Refund[] // 주문에 연결된 환불정보
-  return                     Return[] // 주문에 연결된 반품정보
-  export                     Export[] // 주문에 연결된 출고정보
+  refunds                    Refund[] // 주문에 연결된 환불정보
+  returns                    Return[] // 주문에 연결된 반품정보
+  exports                    Export[] // 주문에 연결된 출고정보
   broadcasterSettlementItems BroadcasterSettlementItems[]
   sellerSettlementItems      SellerSettlementItems[]
 
@@ -1535,6 +1535,7 @@ model OrderPayment {
   orderId         Int           @unique
   // 연결된 주문데이터가 삭제되는 경우 결제정보 데이터는 유지되어야 하나??
   order           Order         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  paymentKey      String // PG사(토스페이먼츠or...)에서 제공하는 결제 고유ID값
   depositDate     DateTime? // 입금일시
   depositor       String? // 입금자명
   depositDoneFlag Boolean       @default(false) // 입금완료여부
@@ -1561,9 +1562,9 @@ model OrderItem {
   channel              SellType          @default(normal) // 판매유형(주문경로) - 주문테이블이 아닌 주문상품 테이블에 이 컬럼이 존재하는 이유 : 하나의 주문에 여러 경로로 선택된 상품이 포함될 수 있어서 상품별로 주문경로 저장함
   options              OrderItemOption[] // 주문상품 옵션들
   support              OrderItemSupport? // 주문상품에 연결된 후원정보
-  refundItem           RefundItem[] // 환불상품
-  returnItem           ReturnItem[] // 반품상품
-  exportItem           ExportItem[] // 출고상품
+  refundItems          RefundItem[] // 환불상품
+  returnItems          ReturnItem[] // 반품상품
+  exportItems          ExportItem[] // 출고상품
   shippingCost         Decimal           @default("0.00") @db.Decimal(10, 2) // 주문당시 이 주문 상품에 포함된  배송비
   shippingCostIncluded Boolean           @default(false) // 이 주문 상품에 동일 판매자의 배송비가 포함되었는지 여부
   shippingGroupId      Int // 연결된 배송정책 id
@@ -1582,9 +1583,9 @@ model OrderItemOption {
   discountPrice Decimal          @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
   weight        Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
   step          OrderProcessStep @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
-  refundItem    RefundItem[] // 환불상품
-  returnItem    ReturnItem[] // 반품상품
-  exportItem    ExportItem[] // 출고상품
+  refundItems   RefundItem[] // 환불상품
+  returnItems   ReturnItem[] // 반품상품
+  exportItems   ExportItem[] // 출고상품
 }
 
 // 주문상품후원
@@ -1717,12 +1718,12 @@ model GoodsInformationNotice {
 // 상품 카테고리
 // ****************
 model GoodsCategory {
-  id               Int             @id @default(autoincrement())
-  categoryCode     String          @unique // 카테고리 코드
-  name             String // 카테고리명
-  mainCategoryFlag Boolean         @default(false) // 대표카테고리인지 여부 (카테고리 트리의 잎 여부)
-  parentCategoryId Int?
-  parentCategory   GoodsCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id]) // 상위 부모 카테고리
-  childrenCategory GoodsCategory[] @relation("CategoryHierarchy") // 하위 자식카테고리들
-  goods            Goods[] // 이 카테고리에 해당하는 상품들
+  id                 Int             @id @default(autoincrement())
+  categoryCode       String          @unique // 카테고리 코드
+  name               String // 카테고리명
+  mainCategoryFlag   Boolean         @default(false) // 대표카테고리인지 여부 (카테고리 트리의 잎 여부)
+  parentCategoryId   Int?
+  parentCategory     GoodsCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id]) // 상위 부모 카테고리
+  childrenCategories GoodsCategory[] @relation("CategoryHierarchy") // 하위 자식카테고리들
+  goods              Goods[] // 이 카테고리에 해당하는 상품들
 }
