@@ -1638,6 +1638,7 @@ model RefundItem {
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
+  status            ProcessStatus   @default(requested) // 환불처리상태
 }
 
 // ****************
@@ -1660,7 +1661,7 @@ model Return {
   export         Export?       @relation(fields: [exportId], references: [id], onDelete: SetNull) // 교환 재출고시 연결된 출고
 }
 
-// 반품상품
+// 반품, 교환 상품
 model ReturnItem {
   id                Int             @id @default(autoincrement()) // 반품상품 고유번호
   returnId          Int // 반품고유번호
@@ -1670,6 +1671,7 @@ model ReturnItem {
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
+  status            ProcessStatus   @default(requested) // 반품처리상태
 }
 
 // ****************
@@ -1677,15 +1679,15 @@ model ReturnItem {
 // ****************
 // 주문취소
 model OrderCancellation {
-  id                    Int
-  cancelCode            String?
-  orderId               Int
-  order                 Order                   @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status                ProcessStatus           @default(requested) // 반품처리상태
-  requestDate           DateTime                @default(now()) // 반품신청일시
-  completeDate          DateTime? // 처리완료일시
-  reason                String? // 취소사유
-  OrderCancellationItem OrderCancellationItem[]
+  id           Int                     @id @default(autoincrement()) // 주문취소 고유번호
+  cancelCode   String?                 @unique //주문취소코드
+  orderId      Int
+  order        Order                   @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status       ProcessStatus           @default(requested) // 주문취소 처리상태
+  requestDate  DateTime                @default(now()) // 주문취소 신청일시
+  completeDate DateTime? // 처리완료일시
+  reason       String? // 취소사유
+  items        OrderCancellationItem[]
 }
 
 // 주문취소상품
@@ -1698,6 +1700,7 @@ model OrderCancellationItem {
   orderItemOptionId   Int // 주문상품 옵션 고유번호
   orderItemOption     OrderItemOption   @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount              Int // 개수
+  status              ProcessStatus     @default(requested) // 주문취소 처리상태
 }
 
 // ****************
@@ -1716,8 +1719,7 @@ model Export {
   exportDate                 DateTime //출고일시
   broadcasterSettlementItems BroadcasterSettlementItems[]
   sellerSettlementItems      SellerSettlementItems[]
-  returnId                   Int?                         @unique // 교환을 위한 재출고시. 연결된 교환
-  return                     Return?                      @relation(fields: [returnId], references: [id], onDelete: SetNull) // 교환을 위한 재출고시. 연결된 교환
+  return                     Return?
 }
 
 // 출고상품
