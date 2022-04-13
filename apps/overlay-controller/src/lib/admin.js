@@ -431,22 +431,38 @@ $(document).ready(function ready() {
     }
 
     const price = $('#objective-message-price').val();
+    if (!nickname) {
+      alert('닉네임을 입력해주세요');
+      return;
+    }
+    if (!price) {
+      alert('가격을 입력해주세요');
+      return;
+    }
     socket.emit('get objective message from admin', {
       roomName,
       objective: { nickname, price },
       liveShoppingId,
     });
-    $('#objective-message').val(null);
+    $('#objective-message-nickname').val(null);
+    $('#objective-message-price').val(null);
+    $('#objective-price').val(null);
   });
 
   $('#objective-button').click(function objectiveButtonClickEvent() {
     const price = $('#objective-price').val();
+    if (!price) {
+      alert('가격을 입력해주세요');
+      return;
+    }
     socket.emit('get objective firework from admin', {
       roomName,
       objective: { price },
       liveShoppingId,
     });
-    $('#objective-message').val(null);
+    $('#objective-message-nickname').val(null);
+    $('#objective-message-price').val(null);
+    $('#objective-price').val(null);
   });
 
   $('#calling-button').click(function callingButtonClickEvent() {
@@ -489,16 +505,27 @@ $(document).ready(function ready() {
     socket.emit('get chicken move from admin', roomName);
   });
 
-  $('#start-bgm-button').click(function startBgmButton() {
-    socket.emit('start bgm from admin', roomName);
+  $('.start-bgm-button').click(function startBgmButton() {
+    const bgmNumber = $(this).val();
+    socket.emit('start bgm from admin', { roomName, bgmNumber });
   });
 
   $('#off-bgm-button').click(function offBgmButton() {
     socket.emit('off bgm from admin', roomName);
   });
 
+  $('.bgm-volume-button').click(function volumeButton() {
+    const volume = $(this).val();
+    socket.emit('bgm volume from admin', { roomName, volume });
+  });
+
+  $('#hide-vertical-banner').click(function hideVerticalBanner() {
+    socket.emit('hide vertical-banner from admin', roomName);
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
+
     let level;
 
     const ttsSetting = $('input[name="tts-type"]:checked').val();
@@ -513,6 +540,14 @@ $(document).ready(function ready() {
 
     if (!ttsSetting) {
       alert('TTS 타입을 설정해주세요');
+      return;
+    }
+    if (!customerNickname) {
+      alert('구매자를 입력해주세요');
+      return;
+    }
+    if (!soldPrice) {
+      alert('구매 금액을 입력해주세요');
       return;
     }
     isLogin = !$('input[name=client-checkbox]').is(':checked');

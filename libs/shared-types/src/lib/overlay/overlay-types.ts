@@ -152,3 +152,13 @@ export interface ObjectiveMessage {
   };
   liveShoppingId?: number;
 }
+
+export interface RoomNameAndBgmNumber {
+  roomName: string;
+  bgmNumber: number;
+}
+
+export interface RoomNameAndVolume {
+  roomName: string;
+  volume: 'up' | 'down';
+}

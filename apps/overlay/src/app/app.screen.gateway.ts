@@ -264,4 +264,9 @@ export class AppScreenGateway
   getChickenMovement(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('get chicken move from server');
   }
+
+  @SubscribeMessage('hide vertical-banner from admin')
+  hideVerticalBanner(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('hide vertical-banner from server');
+  }
 }

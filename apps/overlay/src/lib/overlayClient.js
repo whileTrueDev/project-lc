@@ -19,6 +19,8 @@ let endDate = new Date('2021-09-04T15:00:00+0900');
 let feverDate = new Date('2021-09-27T14:05:00+0900');
 let bannerId = 1;
 let combo = 1;
+let bgmVolume = 0.1;
+let isBgmPlaying = false;
 const bottomMessages = [];
 const topMessages = [];
 
@@ -604,6 +606,10 @@ socket.on('hide screen', () => {
   $('.live-commerce').fadeOut(500);
 });
 
+socket.on('hide vertical-banner from server', () => {
+  $('.left-banner-area').toggle();
+});
+
 socket.on('d-day from server', (date) => {
   endDate = new Date(date);
 });
@@ -841,16 +847,36 @@ socket.on('change theme from server', (themeType) => {
   }
 });
 
-socket.on('start bgm from server', () => {
-  $('body').append(`
-  <audio src="/audio/bgm.mp3"
+socket.on('start bgm from server', (data) => {
+  const bgmNumber = data;
+  if (isBgmPlaying) {
+    $('#bgm').attr('src', `/audio/bgm-${bgmNumber}.mp3`);
+  } else {
+    $('body').append(`
+  <audio src="/audio/bgm-${bgmNumber}.mp3"
     id="bgm" autoplay loop ></audio>
     `);
-  $('#bgm').prop('volume', 0.1);
+    $('#bgm').prop('volume', bgmVolume);
+    isBgmPlaying = true;
+  }
 });
 
 socket.on('off bgm from server', () => {
   $('#bgm').remove();
+  isBgmPlaying = false;
+});
+
+socket.on('bgm volume from server', (volume) => {
+  if (volume === 'up') {
+    bgmVolume += 0.01;
+    $('#bgm').prop('volume', bgmVolume);
+  } else {
+    bgmVolume -= 0.01;
+    if (bgmVolume < 0) {
+      bgmVolume = 0;
+    }
+    $('#bgm').prop('volume', bgmVolume);
+  }
 });
 
 socket.on('get virtual character audio from server', async () => {
