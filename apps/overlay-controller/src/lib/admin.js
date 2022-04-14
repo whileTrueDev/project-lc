@@ -19,20 +19,8 @@ const liveShoppingStateSocket = io(
 socket.on('creator list from server', (data) => {
   if (data && data.length !== 0) {
     $('#connection-status').text('✔️ 정상');
-    $('.admin-to-bc-live-state-board-box button').attr('disabled', false);
-    $('#panel-activate-checkbox').attr('disabled', false);
-    $('#screen-control-activate-checkbox').attr('disabled', false);
-    $('#action-control-activate-checkbox').attr('disabled', false);
-    $('#objective-control-activate-checkbox').attr('disabled', false);
-    $('#bottom-message-activate-checkbox').attr('disabled', false);
   } else {
     $('#connection-status').text('❌ 연결되지 않음');
-    $('.mid-area button').attr('disabled', true);
-    $('#panel-activate-checkbox').attr('disabled', true);
-    $('#screen-control-activate-checkbox').attr('disabled', true);
-    $('#action-control-activate-checkbox').attr('disabled', true);
-    $('#objective-control-activate-checkbox').attr('disabled', true);
-    $('#bottom-message-activate-checkbox').attr('disabled', true);
   }
 });
 
@@ -40,11 +28,7 @@ $(document).ready(function ready() {
   let liveShoppingStateBoardController; // 관리자 메시지 보내기(방송인 현황판 표시) 컨트롤러, liveShoppingId 할당될때 생성
 
   $('.mid-area button').attr('disabled', true);
-  $('#panel-activate-checkbox').attr('disabled', true);
-  $('#screen-control-activate-checkbox').attr('disabled', true);
-  $('#action-control-activate-checkbox').attr('disabled', true);
-  $('#objective-control-activate-checkbox').attr('disabled', true);
-  $('#bottom-message-activate-checkbox').attr('disabled', true);
+
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
   const localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
   $('table#liveshopping-table').DataTable({
@@ -195,36 +179,33 @@ $(document).ready(function ready() {
           ],
         });
 
-        // hbs가 컴파일하여 파싱한 이후에, 이벤트 새로 등록해줘야 함.
-        $('.delete-message-button').click(function deleteMessageButtonClick() {
-          const messageId = $(this)
-            .closest('tr')
-            .children('td.message-id-cell')
-            .attr('id');
-
-          $.ajax({
-            type: 'DELETE',
-            url: `${process.env.OVERLAY_CONTROLLER_HOST}/purchase-message`,
-            dataType: 'json',
-            data: { messageId },
-            success() {
-              getPurchaseMessage();
-            },
-            error(error) {
-              console.log(error);
-            },
-          });
-        });
         $('.delete-message-button').attr(
           'disabled',
           !$('#panel-activate-checkbox').prop('checked'),
         );
       },
+
       error(error) {
         console.log(error);
       },
     });
   }
+
+  $('#message-tbody').on('click', 'button', function deleteMessageButtonClick() {
+    const messageId = $(this).closest('tr').children('td.message-id-cell').attr('id');
+    $.ajax({
+      type: 'DELETE',
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/purchase-message`,
+      dataType: 'json',
+      data: { messageId },
+      success() {
+        getPurchaseMessage();
+      },
+      error(error) {
+        console.log(error);
+      },
+    });
+  });
 
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
     liveShoppingId = $(this).closest('tr').children('td.liveshopping-id-cell').attr('id');

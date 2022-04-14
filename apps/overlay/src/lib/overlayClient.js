@@ -12,7 +12,7 @@ const iterateLimit = $('#primary-info').data('number') + 1;
 const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const email = $('#primary-info').data('email');
 const bucketName = $('#primary-info').data('bucket-name');
-// const { chickenMovement } = window;
+const rankingToRenderArray = [];
 
 let streamerAndProduct;
 let startDate = new Date('2021-09-27T14:05:00+0900');
@@ -168,8 +168,6 @@ function dailyMissionTimer() {
       ) {
         $('.bottom-timer').removeClass('warning');
       }
-      //      $('.bottom-area-left-icon').attr('src', '/images/egg.png');
-
       if (
         $('.bottom-area-left-icon').attr('src') === '/images/egg.png' &&
         Number(minutes) === 0 &&
@@ -223,25 +221,42 @@ async function switchImage() {
 
 // 우측상단 응원문구 이벤트
 setInterval(async () => {
-  if (messageArray.length !== 0 && $('.top-right').css('display') === 'none') {
+  if (messageArray.length && $('.top-right').css('display') === 'none') {
+    if (rankingToRenderArray.length) {
+      rankingToRenderArray[0].new.forEach((value, index) => {
+        $(`.ranking-text-area-id#rank-${index}`).text(value.nickname);
+        $(`.quantity#rank-${index}`).text(
+          `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
+        );
+        if (
+          index === 0 &&
+          prevRankingArray[index].nickname !==
+            rankingToRenderArray[0].prev[index].nickname
+        ) {
+          $('.ranking-text-area-id#rank-0').addClass('ranking-pop');
+          setTimeout(() => {
+            $('.ranking-text-area-id#rank-0').removeClass('ranking-pop');
+          }, 6000);
+        }
+      });
+    }
+
     if (!messageArray[0].audioBlob) {
-      // $('.top-right').addClass('pop-out');
       $('.top-right').html(messageArray[0].messageHtml);
       $('.top-right').css({ display: 'flex' });
     } else {
       $('.top-right').html(messageArray[0].messageHtml);
       $('.top-right').css({ display: 'flex' });
     }
-
     await setTimeout(() => {
       if (messageArray[0].audioBlob) {
         const sound = new Audio(messageArray[0].audioBlob);
         sound.play();
       }
       messageArray.splice(0, 1);
+      rankingToRenderArray.splice(0, 1);
     }, 1500);
     await setTimeout(() => {
-      // $('.top-right').removeClass('pop-out');
       $('.top-right').fadeOut(800);
       $('.donation-image').attr('src', '/images/invisible.png');
     }, 10000);
@@ -316,18 +331,7 @@ socket.emit('get date from registered liveshopping', {
 
 socket.on('get top-left ranking', (rankings) => {
   if ($('.ranking-text-area#title').css('display') === 'none') {
-    rankings.forEach((value, index) => {
-      $(`.ranking-text-area-id#rank-${index}`).text(value.nickname);
-      $(`.quantity#rank-${index}`).text(
-        `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
-      );
-      if (index === 0 && prevRankingArray[index].nickname !== value.nickname) {
-        $('.ranking-text-area-id#rank-0').addClass('ranking-pop');
-        setTimeout(() => {
-          $('.ranking-text-area-id#rank-0').removeClass('ranking-pop');
-        }, 6000);
-      }
-    });
+    rankingToRenderArray.push({ new: rankings, prev: prevRankingArray });
   } else {
     $('.ranking-text-area#title').css({ display: 'none' });
     $('.ranking-area-inner').html(
@@ -340,7 +344,6 @@ socket.on('get top-left ranking', (rankings) => {
         <span class="quantity" id="rank-0">
         </span>
       </p>
-
       <p class="ranking-text-area" id="rank-1">
         <span class="ranking-id-wrapper">
           <img src="/images/first.png" id="ranking-icon" />
