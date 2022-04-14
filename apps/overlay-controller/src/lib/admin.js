@@ -523,6 +523,10 @@ $(document).ready(function ready() {
     socket.emit('hide vertical-banner from admin', roomName);
   });
 
+  $('#combo-reset-button').click(function resetCombo() {
+    socket.emit('combo reset from admin', roomName);
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
 

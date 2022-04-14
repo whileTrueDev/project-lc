@@ -38,6 +38,11 @@
   src: url('/fonts/THE_Nyuseusokbo.ttf');
 }
 
+@font-face {
+  font-family: 'Game';
+  src: url('/fonts/Game.ttf');
+}
+
 body {
   width: 100%;
   height: 100%;
@@ -901,21 +906,32 @@ div.bottom-fever-timer {
 
 .pop-out {
   display: flex;
-  color:yellow;
-  font-size:40px;
+  margin-bottom:0px;
+  font-size:45px;
   font-style: italic;
-  text-shadow: -2px -2px 0 rgb(0, 0, 0), 0 -2px 0 rgb(0, 0, 0)
-  2px -2px 0 rgb(0, 0, 0), 2px 0 0 rgb(0, 0, 0), 2px 2px 0 rgb(0, 0, 0),
-  0 2px 0 rgb(0, 0, 0), -2px 2px 0 rgb(0, 0, 0), -2px 0 0 rgb(0, 0, 0);
+  background-image: linear-gradient(
+    #ff2323,
+    #fcff3c 
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  color: #fff;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px #000;
   animation: 2s anim-popoutin ease;
+  text-shadow: none;
+  font-family: 'Game';
+  -webkit-box-reflect: below -20px linear-gradient(transparent, rgba(0,0,0,.2));
+
 }
 
 .ranking-pop {
   background-image: linear-gradient(
     35deg,
-    #7a7a7a 0%,
-    #ffffff 29%,
-    #817e7e 67%,
+    #deffb0 0%,
+    #fefd92 29%,
+    #b5d9ff 67%,
     #ffffff 100%
   );
   background-size: auto auto;
@@ -924,10 +940,10 @@ div.bottom-fever-timer {
   color: #fff;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   animation: 5s ranking-pop ease;
   text-shadow: none;
+  -webkit-text-stroke: 1px #000;
+  font-family:'KOTRA'
 }
 
 @keyframes ranking-pop {
@@ -977,7 +993,6 @@ div.bottom-fever-timer {
 .wave {
   display: inline-flex;
   position: relative;
-  -webkit-box-reflect: below -20px linear-gradient(transparent, rgba(0,0,0,.2));
 }
 .wave span {
   position: relative;

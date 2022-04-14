@@ -142,4 +142,9 @@ export class AppGateway
     const { volume } = roomNameAndVolume;
     this.server.to(roomName).emit('bgm volume from server', volume);
   }
+
+  @SubscribeMessage('combo reset from admin')
+  resetCombo(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('combo reset from server');
+  }
 }

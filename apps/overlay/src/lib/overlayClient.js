@@ -470,7 +470,7 @@ socket.on('get right-top pop purchase message', async (data) => {
 
   messageHtml = `
   <div class='combo-mode' style='height:unset'>
-    <p class='pop-out'>${combo} Combo!</p>
+    <p class='pop-out'>${combo} COMBO!</p>
     <div class='donation-header' id='donation-top'>
       <span id='nickname'>
         <span class='wave' id='donation-user-id'>
@@ -496,6 +496,10 @@ socket.on('get right-top pop purchase message', async (data) => {
   `;
   combo += 1;
   messageArray.push({ messageHtml });
+});
+
+socket.on('combo reset from server', async () => {
+  combo = 1;
 });
 
 socket.on('get objective message', async (data) => {
