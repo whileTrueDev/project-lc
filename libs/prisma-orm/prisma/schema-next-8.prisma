@@ -1640,7 +1640,7 @@ enum ProcessStatus {
   requested // 요청됨(초기 상태, 담당자 확인전)
   processing // 처리진행중(담당자 확인 후 처리 중)
   complete // 처리완료
-  canceled // 취소됨
+  canceled // 취소됨(거절됨 포함)
 }
 
 // 환불상품
@@ -1669,7 +1669,7 @@ model Return {
   requestDate    DateTime      @default(now()) // 반품신청일시
   completeDate   DateTime? // 처리완료일시
   reason         String // 소비자의 반품사유
-  cancelReason   String? // 반품요청이 취소된 이유
+  rejectReason   String? // 반품요청이 거절된 이유
   returnAddress  String // 회수지 주소
   items          ReturnItem[] // 반품상품들
   responsibility String // 책임소재(판매자귀책? 구매자귀책?)
@@ -1711,7 +1711,7 @@ model Exchange {
   requestDate    DateTime              @default(now()) // 교환신청일시
   completeDate   DateTime? // 처리완료일시
   reason         String // 교환사유
-  cancelReason   String? // 교환요청이 취소된 이유
+  rejectReason   String? // 교환요청이 거절된 이유
   returnAddress  String // 회수지 주소
   responsibility String // 책임소재(판매자귀책? 구매자귀책?)
   exportId       Int?                  @unique // 교환 재출고시 연결된 출고
@@ -1746,6 +1746,7 @@ model OrderCancellation {
   requestDate    DateTime                @default(now()) // 주문취소 신청일시
   completeDate   DateTime? // 처리완료일시
   reason         String? // 취소사유
+  rejectReason   String? // 취소요청이 거절된 이유
   responsibility String // 책임소재(판매자귀책? 구매자귀책?)
   items          OrderCancellationItem[]
 
