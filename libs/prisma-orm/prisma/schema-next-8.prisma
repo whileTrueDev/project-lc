@@ -1330,6 +1330,7 @@ model CustomerCoupon {
 }
 
 enum CouponStatus {
+  expired // 기간 만료
   notUsed // 미사용
   used // 사용
 }
