@@ -1,0 +1,6 @@
+/* 이용안내 이미지 흐리게 표시되는 문제 해결하기 위해 적용한 style */
+.se-component img, .se-image-container img {
+    image-rendering:-webkit-optimize-contrast;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
