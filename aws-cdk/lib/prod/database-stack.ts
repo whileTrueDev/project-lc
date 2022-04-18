@@ -44,6 +44,7 @@ export class LCProdDatabaseStack extends cdk.Stack {
           wait_timeout: '180',
           max_allowed_packet: '16777216',
           innodb_ft_min_token_size: '1', // for full-text search
+          ngram_token_size: '1', // for full-text search
         },
       }),
       publiclyAccessible: false,

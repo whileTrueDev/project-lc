@@ -19,7 +19,7 @@ import { FaInstagram, FaYoutube } from 'react-icons/fa';
 
 const ListHeader = ({ children }: { children: ReactNode }): JSX.Element => {
   return (
-    <Text fontWeight="500" fontSize="lg" mb={2}>
+    <Text fontWeight="medium" fontSize={{ base: 'md', md: 'lg' }} mb={2}>
       {children}
     </Text>
   );
@@ -76,6 +76,7 @@ export function CommonFooter({ footerLinkList }: CommonFooterProps): JSX.Element
                   <Link
                     href={linkItem.href}
                     fontWeight={linkItem.isBold ? 'bold' : 'normal'}
+                    fontSize={{ base: 'sm', md: 'md' }}
                   >
                     {linkItem.title}
                   </Link>

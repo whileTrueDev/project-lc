@@ -160,8 +160,6 @@ export function AdminNoticeSection(): JSX.Element {
         rowCount={5}
         pageSize={5}
         disableColumnMenu
-        disableColumnReorder
-        disableMultipleColumnsSorting
         disableColumnFilter
         disableSelectionOnClick
         components={{

@@ -316,7 +316,6 @@ export function AdminGoodsList(): JSX.Element {
         rows={rows}
         autoHeight
         columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
-        disableMultipleSelection
         disableSelectionOnClick
         disableColumnMenu
         pageSize={itemPerPage}
