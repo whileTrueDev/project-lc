@@ -14,7 +14,6 @@ import {
   AdminGoodsByIdRes,
   AdminGoodsListRes,
   AdminSettlementInfoType,
-  BusinessRegistrationStatus,
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingDTO,

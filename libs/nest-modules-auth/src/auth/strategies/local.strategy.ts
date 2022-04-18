@@ -26,7 +26,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       password,
     );
     if (!userPayload) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('no payload after validate user in local strategy');
     }
     return userPayload;
   }

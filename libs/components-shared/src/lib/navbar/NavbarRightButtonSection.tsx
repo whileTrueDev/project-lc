@@ -10,6 +10,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Portal,
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react';
@@ -99,45 +100,47 @@ export function PersonalPopoverMenu(): JSX.Element {
     <Menu>
       <MenuButton as={Avatar} size="sm" cursor="pointer" src={profileData?.avatar} />
 
-      <MenuList w={{ base: 280, sm: 300 }}>
-        {/* 프로필 표시 */}
-        <Box p={3}>
-          <ProfileBox allowAvatarChange />
-        </Box>
-        <Divider />
+      <Portal>
+        <MenuList w={{ base: 280, sm: 300 }} zIndex="popover">
+          {/* 프로필 표시 */}
+          <Box p={3}>
+            <ProfileBox allowAvatarChange />
+          </Box>
+          <Divider />
 
-        {/* 계정설정 버튼 */}
-        <MenuItem
-          my={1}
-          icon={<Icon fontSize="md" as={AiOutlineSetting} />}
-          onClick={handleAccountSettingClick}
-        >
-          계정 설정
-        </MenuItem>
+          {/* 계정설정 버튼 */}
+          <MenuItem
+            my={1}
+            icon={<Icon fontSize="md" as={AiOutlineSetting} />}
+            onClick={handleAccountSettingClick}
+          >
+            계정 설정
+          </MenuItem>
 
-        {/* 다크모드 버튼 */}
-        <MenuItem
-          my={1}
-          icon={<SwitchIcon />}
-          onClick={toggleColorMode}
-          closeOnSelect={false}
-        >
-          {colorMode === 'light' ? '다크모드' : '라이트모드'}
-        </MenuItem>
+          {/* 다크모드 버튼 */}
+          <MenuItem
+            my={1}
+            icon={<SwitchIcon />}
+            onClick={toggleColorMode}
+            closeOnSelect={false}
+          >
+            {colorMode === 'light' ? '다크모드' : '라이트모드'}
+          </MenuItem>
 
-        {/* 알림버튼 - 기존 알림버튼 누를시 팝오버로 알림을 표시했음. 별도 알림페이지 존재하지 않음
+          {/* 알림버튼 - 기존 알림버튼 누를시 팝오버로 알림을 표시했음. 별도 알림페이지 존재하지 않음
         알림을 메뉴에 포함시켰을 때 알림목록 표시할 방법이 떠오르지 않아 개인메뉴에 포함시키지 않음
         */}
 
-        {/* 로그아웃 버튼 */}
-        <MenuItem
-          my={1}
-          icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
-          onClick={logout}
-        >
-          로그아웃
-        </MenuItem>
-      </MenuList>
+          {/* 로그아웃 버튼 */}
+          <MenuItem
+            my={1}
+            icon={<Icon fontSize="md" as={ExternalLinkIcon} />}
+            onClick={logout}
+          >
+            로그아웃
+          </MenuItem>
+        </MenuList>
+      </Portal>
     </Menu>
   );
 }

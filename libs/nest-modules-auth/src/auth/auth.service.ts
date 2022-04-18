@@ -122,24 +122,25 @@ export class AuthService {
   async getProfile(userPayload: UserPayload, appType: UserType): Promise<UserProfileRes> {
     const { sub, type } = userPayload;
     let user: Seller | Broadcaster | Administrator;
+    const errorMessage = `appType and payloadType doesn't match, appType:${appType}, payloadType:${type}`;
     // 판매자 정보 조회
     if (['seller'].includes(type)) {
       if (appType !== 'seller') {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException(errorMessage);
       }
       user = await this.sellerService.findOne({ email: sub });
     }
     // 방송인 정보 조회
     if (['broadcaster'].includes(type)) {
       if (appType !== 'broadcaster') {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException(errorMessage);
       }
       user = await this.broadcasterService.findOne({ email: sub });
     }
     // 관리자 정보 조회
     if (['admin'].includes(type)) {
       if (appType !== 'admin') {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException(errorMessage);
       }
       user = await this.adminAccountService.findOne({ email: sub });
     }

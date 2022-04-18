@@ -19,7 +19,10 @@ import {
 } from '@chakra-ui/react';
 import { GridRowData } from '@material-ui/data-grid';
 import { GridTableItem } from '@project-lc/components-layout/GridTableItem';
-import { useBusinessRegistrationConfirmationMutation } from '@project-lc/hooks';
+import {
+  useBusinessRegistrationConfirmationMutation,
+  useAdminSellerSettlementHistoryMutation,
+} from '@project-lc/hooks';
 
 export interface AdminGoodsRejectionDialogProps {
   isOpen: boolean;
@@ -35,10 +38,32 @@ export function AdminBusinessRegistrationConfirmationDialog({
   const toast = useToast();
 
   const confirmationMutation = useBusinessRegistrationConfirmationMutation();
+  const { mutateAsync: historyMutation } = useAdminSellerSettlementHistoryMutation();
 
   const useSubmit = async (): Promise<void> => {
     try {
       await confirmationMutation.mutateAsync({ id: row.id });
+
+      if (row.mailOrderSalesImageName) {
+        await Promise.all([
+          historyMutation({
+            type: 'businessRegistration',
+            status: 'confirmed',
+            sellerBusinessRegistrationId: row.id,
+          }),
+          historyMutation({
+            type: 'mailOrder',
+            status: 'confirmed',
+            sellerBusinessRegistrationId: row.id,
+          }),
+        ]);
+      } else {
+        await historyMutation({
+          type: 'businessRegistration',
+          status: 'confirmed',
+          sellerBusinessRegistrationId: row.id,
+        });
+      }
       toast({
         title: '사업자등록정보가 승인되었습니다.',
         status: 'success',

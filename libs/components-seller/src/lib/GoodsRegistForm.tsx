@@ -2,13 +2,11 @@ import { ChevronLeftIcon } from '@chakra-ui/icons';
 import {
   Alert,
   AlertIcon,
-  Box,
   Button,
   Center,
   Spinner,
   Stack,
   Text,
-  theme,
   useColorModeValue,
   useDisclosure,
   useToast,
@@ -272,7 +270,7 @@ export function GoodsRegistForm(): JSX.Element {
           left="0px"
           right="0px"
           justifyContent="space-between"
-          zIndex={theme.zIndices.sticky}
+          zIndex="sticky"
         >
           <Button leftIcon={<ChevronLeftIcon />} onClick={goBackAlertDialog.onOpen}>
             상품목록 돌아가기

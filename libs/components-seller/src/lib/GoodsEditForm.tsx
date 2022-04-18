@@ -1,20 +1,19 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 import {
+  Box,
   Button,
   Center,
   Spinner,
   Stack,
   Text,
-  theme,
   useColorModeValue,
   useToast,
-  Box,
 } from '@chakra-ui/react';
 import {
   useCreateGoodsCommonInfo,
-  useProfile,
   useEditGoods,
   useGoodsOnLiveFlag,
+  useProfile,
 } from '@project-lc/hooks';
 import { GoodsByIdRes, RegistGoodsDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
@@ -249,7 +248,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
           left="0px"
           right="0px"
           justifyContent="space-between"
-          zIndex={theme.zIndices.sticky}
+          zIndex="sticky"
         >
           <Button leftIcon={<ChevronLeftIcon />} onClick={router.back}>
             돌아가기
