@@ -11,17 +11,17 @@ export interface IUserPwManager {
 export class UserPwManager implements IUserPwManager {
   /**
    * 입력된 이메일을 가진 유저가 본인 인증을 하기 위해 비밀번호를 확인함
-   * @param email 본인 이메일
-   * @param password 본인 비밀번호
+   * @param user 비밀번호 필드를 포함하는 유저 정보
+   * @param pwInput 본인 비밀번호
    * @returns boolean 비밀번호가 맞는지
    */
-  async checkPassword(user: { password: string }, password: string): Promise<boolean> {
+  async checkPassword(user: { password: string }, pwInput: string): Promise<boolean> {
     if (!user.password) {
       throw new BadRequestException(
         '소셜계정으로 가입된 회원입니다. 비밀번호를 등록해주세요.',
       );
     }
-    return this.validatePassword(password, user.password);
+    return this.validatePassword(pwInput, user.password);
   }
 
   /**
