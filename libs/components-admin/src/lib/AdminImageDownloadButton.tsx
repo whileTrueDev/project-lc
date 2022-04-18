@@ -4,6 +4,8 @@ import { s3, s3KeyType } from '@project-lc/utils-s3';
 import { GridRowData } from '@material-ui/data-grid';
 import { useAdminPrivacyApproachHistoryMutation } from '@project-lc/hooks';
 import { PrivacyApproachHistoryInfoType } from '@prisma/client';
+import { useFormContext } from 'react-hook-form';
+
 /**
  * 버킷의 경로에 따라 이미지를 다운로드하는 버튼 컴포넌트
  * @param props.row datagrid table의 row
@@ -13,15 +15,18 @@ import { PrivacyApproachHistoryInfoType } from '@prisma/client';
 export function AdminImageDownloadButton({
   row,
   type,
+  onClose,
 }: {
   row: GridRowData;
   type: s3KeyType;
+  onClose: () => void;
 }): JSX.Element {
   // 해당 링크로 들어가는 버튼
   let fileName = '';
   let infoType: PrivacyApproachHistoryInfoType;
   let disabled = false;
   const { mutateAsync } = useAdminPrivacyApproachHistoryMutation();
+  const { getValues, reset } = useFormContext();
 
   switch (type) {
     case 'business-registration': {
@@ -76,7 +81,7 @@ export function AdminImageDownloadButton({
   }
 
   async function createPrivacyHistory(): Promise<void> {
-    mutateAsync({ actionType: 'download', infoType });
+    mutateAsync({ actionType: 'download', infoType, reason: getValues('reason') });
   }
 
   return (
@@ -87,6 +92,8 @@ export function AdminImageDownloadButton({
         if (infoType) {
           createPrivacyHistory();
         }
+        reset({ resason: '' });
+        onClose();
       }}
       disabled={disabled}
     >

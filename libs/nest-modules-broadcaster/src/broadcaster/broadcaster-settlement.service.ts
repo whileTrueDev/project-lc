@@ -176,9 +176,6 @@ export class BroadcasterSettlementService extends ServiceBaseWithCache {
   public async getBroadcasterSettlementInfoList(): Promise<AdminBroadcasterSettlementInfoList> {
     // 방송인 email, userNickname, settlementInfo,
     const data = await this.prisma.broadcasterSettlementInfo.findMany({
-      where: {
-        confirmation: { isNot: { status: BusinessRegistrationStatus.CONFIRMED } },
-      },
       select: {
         id: true,
         type: true,
