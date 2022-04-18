@@ -219,20 +219,16 @@ async function switchImage() {
   }, 10000);
 }
 
-// 우측상단 응원문구 이벤트
+// 우측상단 응원문구 이벤트 및 랭킹
 setInterval(async () => {
   if (messageArray.length && $('.top-right').css('display') === 'none') {
     if (rankingToRenderArray.length) {
-      rankingToRenderArray[0].new.forEach((value, index) => {
+      rankingToRenderArray[0].rankings.forEach((value, index) => {
         $(`.ranking-text-area-id#rank-${index}`).text(value.nickname);
         $(`.quantity#rank-${index}`).text(
           `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
         );
-        if (
-          index === 0 &&
-          prevRankingArray[index].nickname !==
-            rankingToRenderArray[0].prev[index].nickname
-        ) {
+        if (index === 0 && rankingToRenderArray[0].animate) {
           $('.ranking-text-area-id#rank-0').addClass('ranking-pop');
           setTimeout(() => {
             $('.ranking-text-area-id#rank-0').removeClass('ranking-pop');
@@ -253,8 +249,8 @@ setInterval(async () => {
         const sound = new Audio(messageArray[0].audioBlob);
         sound.play();
       }
-      messageArray.splice(0, 1);
       rankingToRenderArray.splice(0, 1);
+      messageArray.splice(0, 1);
     }, 1500);
     await setTimeout(() => {
       $('.top-right').fadeOut(800);
@@ -331,7 +327,11 @@ socket.emit('get date from registered liveshopping', {
 
 socket.on('get top-left ranking', (rankings) => {
   if ($('.ranking-text-area#title').css('display') === 'none') {
-    rankingToRenderArray.push({ new: rankings, prev: prevRankingArray });
+    if (prevRankingArray[0].nickname !== rankings[0].nickname) {
+      rankingToRenderArray.push({ rankings, animate: true });
+    } else {
+      rankingToRenderArray.push({ rankings, animate: false });
+    }
   } else {
     $('.ranking-text-area#title').css({ display: 'none' });
     $('.ranking-area-inner').html(
@@ -830,9 +830,9 @@ socket.on('refresh ranking from server', () => {
 socket.on('change theme from server', (themeType) => {
   switch (themeType) {
     case 'spring':
-      $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
-        themeType,
-      );
+      $(
+        '.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left, .bottom-area-right, .bottom-fever-timer',
+      ).addClass(themeType);
       $('#podium').attr('src', '/images/cherry-blossom-tree.png');
       $('#kks-logo').attr('src', '/images/kks-spring-logo.png');
       $('.live-commerce').append(
@@ -846,9 +846,9 @@ socket.on('change theme from server', (themeType) => {
       );
       break;
     case 'chicken':
-      $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
-        themeType,
-      );
+      $(
+        '.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left, .bottom-area-right, .bottom-fever-timer',
+      ).addClass(themeType);
       $('#kks-logo').attr('src', '/images/kks-chicken-logo.png');
       $('#podium').attr('src', '/images/chicken-head.png');
       $('.bottom-area-left-icon').attr('src', '/images/egg.png');

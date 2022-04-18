@@ -49,6 +49,19 @@
   color: rgb(255, 255, 255);
 }
 
+.bottom-timer.chicken.urgent {
+  color: red;
+}
+
+.bottom-area-right.chicken {
+  background-color: rgba(225, 224, 0, 0.7);
+}
+
+.bottom-fever-timer.chicken{
+  background-color: rgba(225, 224, 0, 0.7);
+}
+
+
 .chicken-move {
   display:none;
   align-items: flex-end;

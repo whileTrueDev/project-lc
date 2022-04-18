@@ -19,6 +19,7 @@ const liveShoppingStateSocket = io(
 socket.on('creator list from server', (data) => {
   if (data && data.length !== 0) {
     $('#connection-status').text('✔️ 정상');
+    $('.admin-to-bc-live-state-board-box button').attr('disabled', false);
   } else {
     $('#connection-status').text('❌ 연결되지 않음');
   }

@@ -49,6 +49,18 @@
   color: rgb(255, 255, 255);
 }
 
+.bottom-area-right.spring {
+  background-color: rgba(255, 211, 225, 0.5);
+}
+
+.bottom-fever-timer.spring{
+  background-color: rgba(255, 211, 225, 0.5);
+}
+
+.bottom-timer.spring.urgent {
+  color: red;
+}
+
 .dot{
   width:35px;
   height:35px;

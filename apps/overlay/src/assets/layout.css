@@ -63,7 +63,7 @@ body {
 }
 
 .live-commerce {
-  display: block;
+  display: none;
   left: 0px;
   bottom: 0px;
   width: 1920px;
@@ -118,13 +118,13 @@ body {
 
 .bottom-area-left-icon.urgent#clock {
   /* Start the shake animation and make the animation last for 0.5 seconds */
-  animation: shake 0.5s;
+  animation: timer-shake 0.5s;
 
   /* When the animation is finished, start again */
   animation-iteration-count: infinite;
 }
 
-@keyframes shake {
+@keyframes timer-shake {
   0% {
     transform: translate(1px, 1px) rotate(0deg);
   }
@@ -132,10 +132,10 @@ body {
     transform: translate(-1px, -2px) rotate(-1deg);
   }
   20% {
-    transform: translate(-3px, 0px) rotate(1deg);
+    transform: translate(-1px, 0px) rotate(1deg);
   }
   30% {
-    transform: translate(3px, 2px) rotate(0deg);
+    transform: translate(1px, 2px) rotate(0deg);
   }
   40% {
     transform: translate(1px, -1px) rotate(1deg);
@@ -144,10 +144,10 @@ body {
     transform: translate(-1px, 2px) rotate(-1deg);
   }
   60% {
-    transform: translate(-3px, 1px) rotate(0deg);
+    transform: translate(-1px, 1px) rotate(0deg);
   }
   70% {
-    transform: translate(3px, 1px) rotate(-1deg);
+    transform: translate(1px, 1px) rotate(-1deg);
   }
   80% {
     transform: translate(-1px, -1px) rotate(1deg);
@@ -215,14 +215,20 @@ body {
 }
 
 .bottom-fever-timer {
+  bottom: 55px;
+  position: absolute;
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   font-family: 'JALNAN';
   font-size: 30px;
+  height: 55px;
+  width: 100px;
   color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.5);
   -webkit-text-stroke: 1px #000000;
+  border-radius: 10px 10px 0px 0px;
 }
 
 .bottom-area-right {
@@ -547,17 +553,7 @@ span.objective-value {
   color: rgb(0, 252, 255);
 }
 
-div.bottom-fever-timer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  bottom: 55px;
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.5);
-  height: 55px;
-  width: 100px;
-  border-radius: 10px 10px 0px 0px;
-}
+
 
 @keyframes seesaw {
   0% {
