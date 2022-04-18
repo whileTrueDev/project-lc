@@ -18,8 +18,12 @@ import { UserPayload } from '../interfaces/auth.interface';
 export const BroadcasterInfo = createParamDecorator(
   (_: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest<Request>();
-    if (request.user && ['broadcaster'].includes(request.user.type))
+    if (request.user && ['broadcaster'].includes(request.user.type)) {
       return request.user as UserPayload;
-    throw new UnauthorizedException();
+    }
+
+    throw new UnauthorizedException(
+      `no broadcaster info in request, usertype : ${request.user.type}`,
+    );
   },
 );

@@ -19,5 +19,7 @@ export const UserInfo = createParamDecorator((_: unknown, ctx: ExecutionContext)
   const request = ctx.switchToHttp().getRequest<Request>();
   if (request.user && ['broadcaster', 'admin', 'seller'].includes(request.user.type))
     return request.user as UserPayload;
-  throw new UnauthorizedException();
+  throw new UnauthorizedException(
+    `no user info in request, user type: ${request.user.type}`,
+  );
 });
