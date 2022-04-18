@@ -9,6 +9,7 @@ import {
   SellerContacts,
   ShippingGroup,
   Prisma,
+  Customer,
 } from '@prisma/client';
 import {
   defaultOption,
@@ -29,6 +30,7 @@ import {
 import { termsData } from './seedData/terms';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
+import { dummyCustomer } from './seedData/customer';
 
 const prisma = new PrismaClient();
 
@@ -82,6 +84,11 @@ async function createBroadcaster(): Promise<Broadcaster> {
   return prisma.broadcaster.create({
     data: testBroadcasterData,
   });
+}
+
+/** 테스트소비자 생성 */
+async function createCustomer(): Promise<Customer> {
+  return prisma.customer.create({ data: dummyCustomer });
 }
 
 /** 방송인홍보페이지 생성 */
@@ -290,6 +297,9 @@ async function main(): Promise<void> {
 
   // 판매자 계정 생성
   const seller = await createSellerAccount();
+
+  // 소비자 계정 생성
+  await createCustomer();
 
   // 테스트방송인 데이터 생성
   const testbroadcaster = await createBroadcaster();
