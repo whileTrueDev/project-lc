@@ -253,8 +253,9 @@ setInterval(async () => {
       messageArray.splice(0, 1);
     }, 1500);
     await setTimeout(() => {
-      $('.top-right').fadeOut(800);
-      $('.donation-image').attr('src', '/images/invisible.png');
+      $('.top-right').fadeOut(800, function () {
+        $('.donation-image').attr('src', '/images/invisible.png');
+      });
     }, 10000);
   }
 }, 2000);
