@@ -1,0 +1,22 @@
+{
+  "root": "libs/nest-modules-goods-category",
+  "sourceRoot": "libs/nest-modules-goods-category/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/nest-modules-goods-category/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/nest-modules-goods-category"],
+      "options": {
+        "jestConfig": "libs/nest-modules-goods-category/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

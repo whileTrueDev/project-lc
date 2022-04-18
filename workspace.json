@@ -696,6 +696,7 @@
       },
       "tags": []
     },
+    "nest-modules-goods-category": "libs/nest-modules-goods-category",
     "nest-modules-inquiry": {
       "root": "libs/nest-modules-inquiry",
       "sourceRoot": "libs/nest-modules-inquiry/src",
@@ -763,7 +764,7 @@
         }
       }
     },
-    "nest-modules-kkshow-search" : {
+    "nest-modules-kkshow-search": {
       "root": "libs/nest-modules-kkshow-search",
       "sourceRoot": "libs/nest-modules-kkshow-search/src",
       "targets": {
