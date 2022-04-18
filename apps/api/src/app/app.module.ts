@@ -14,6 +14,7 @@ import { AdminModule } from '@project-lc/nest-modules-admin';
 import { AuthModule, SocialModule } from '@project-lc/nest-modules-auth';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
+import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { InquiryModule } from '@project-lc/nest-modules-inquiry';
 import { JwtHelperModule } from '@project-lc/nest-modules-jwt-helper';
@@ -22,15 +23,14 @@ import {
   KkshowShoppingModule,
 } from '@project-lc/nest-modules-kkshow-main';
 import { KkshowSearchModule } from '@project-lc/nest-modules-kkshow-search';
-
 import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
+import { ManualModule } from '@project-lc/nest-modules-manual';
 import { NoticeModule } from '@project-lc/nest-modules-notice';
 import { NotificationModule } from '@project-lc/nest-modules-notification';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { ShippingGroupModule } from '@project-lc/nest-modules-shipping-group';
-import { ManualModule } from '@project-lc/nest-modules-manual';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
@@ -62,6 +62,7 @@ import { AppController } from './app.controller';
     ManualModule.withControllers(),
     KkshowSearchModule.withControllers(),
     KkshowShoppingModule.withControllers(),
+    CustomerModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],

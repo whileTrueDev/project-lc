@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { APP_FILTER } from '@nestjs/core';
 import { SocialLoginUserTypeMiddleware } from '@project-lc/nest-core';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
-import { SellerModule, SellerService } from '@project-lc/nest-modules-seller';
+import { SellerModule } from '@project-lc/nest-modules-seller';
 import { AuthModule } from '../auth/auth.module';
 import { GoogleApiService } from './platform-api/google-api.service';
 import { KakaoApiService } from './platform-api/kakao-api.service';
@@ -29,7 +29,6 @@ import { NaverStrategy } from './strategy/naver.strategy';
     NaverStrategy,
     GoogleStrategy,
     KakaoStrategy,
-    SellerService,
     {
       provide: APP_FILTER,
       useClass: SocialLoginExceptionFilter,

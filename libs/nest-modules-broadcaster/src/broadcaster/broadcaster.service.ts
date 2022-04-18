@@ -1,4 +1,3 @@
-import __multer from 'multer';
 import {
   BadRequestException,
   CACHE_MANAGER,
@@ -9,24 +8,23 @@ import {
 import {
   Broadcaster,
   BroadcasterAddress,
-  InactiveBroadcaster,
   BroadcasterPromotionPage,
-  Prisma,
   BroadcasterSocialAccount,
+  InactiveBroadcaster,
+  Prisma,
 } from '@prisma/client';
+import { ServiceBaseWithCache, UserPwManager } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BroadcasterAddressDto,
+  BroadcasterContractionAgreementDto,
   BroadcasterDTO,
   BroadcasterRes,
-  FindBroadcasterDto,
   BroadcasterWithoutUserNickName,
+  FindBroadcasterDto,
   SignUpDto,
-  BroadcasterContractionAgreementDto,
 } from '@project-lc/shared-types';
-import { hash, verify } from 'argon2';
 import { s3 } from '@project-lc/utils-s3';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -36,21 +34,16 @@ export class BroadcasterService extends ServiceBaseWithCache {
   constructor(
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
     private readonly prisma: PrismaService,
+    private readonly userPwManager: UserPwManager,
   ) {
     super(cacheManager);
   }
 
   async getBroadcasterEmail(overlayUrl: string): Promise<BroadcasterWithoutUserNickName> {
     const dto = await this.prisma.broadcaster.findUnique({
-      select: {
-        id: true,
-        email: true,
-      },
-      where: {
-        overlayUrl,
-      },
+      select: { id: true, email: true },
+      where: { overlayUrl },
     });
-
     return dto;
   }
 
@@ -89,7 +82,7 @@ export class BroadcasterService extends ServiceBaseWithCache {
       // 소셜로그인으로 가입된 회원
       throw new BadRequestException();
     }
-    const isCorrect = await this.validatePassword(
+    const isCorrect = await this.userPwManager.validatePassword(
       pwdInput,
       user?.password || inactiveUser?.password,
     );
@@ -140,7 +133,7 @@ export class BroadcasterService extends ServiceBaseWithCache {
 
   /** 방송인 회원가입 서비스 핸들러 */
   async signUp(dto: SignUpDto): Promise<Broadcaster> {
-    const hashedPw = await hash(dto.password);
+    const hashedPw = await this.userPwManager.hashPassword(dto.password);
     const broadcaster = await this.prisma.broadcaster.create({
       data: {
         email: dto.email,
@@ -155,40 +148,14 @@ export class BroadcasterService extends ServiceBaseWithCache {
   }
 
   /**
-   * 비밀번호를 단방향 암호화 합니다.
-   * @param purePw 비밀번호 문자열
-   * @returns {string} 비밀번호 해시값
-   */
-  private async hashPassword(purePw: string): Promise<string> {
-    const hashed = await hash(purePw);
-    return hashed;
-  }
-
-  /**
    * 입력된 이메일을 가진 유저가 본인 인증을 하기 위해 비밀번호를 확인함
    * @param email 본인 이메일
    * @param password 본인 비밀번호
    * @returns boolean 비밀번호가 맞는지
    */
   async checkPassword(email: string, password: string): Promise<boolean> {
-    const seller = await this.findOne({ email });
-    if (!seller.password) {
-      throw new BadRequestException(
-        '소셜계정으로 가입된 회원입니다. 비밀번호를 등록해주세요.',
-      );
-    }
-    return this.validatePassword(password, seller.password);
-  }
-
-  /**
-   * 입력한 비밀번호를 해시된 비밀번호와 비교합니다.
-   * @param pwInput 입력한 비밀번호 문자열
-   * @param hashedPw 해시된 비밀번호 값
-   * @returns {boolean} 올바른 비밀번호인지 여부
-   */
-  async validatePassword(pwInput: string, hashedPw: string): Promise<boolean> {
-    const isCorrect = await verify(hashedPw, pwInput);
-    return isCorrect;
+    const broadcaster = await this.findOne({ email });
+    return this.userPwManager.checkPassword(broadcaster, password);
   }
 
   /**
@@ -286,7 +253,7 @@ export class BroadcasterService extends ServiceBaseWithCache {
    * @returns
    */
   async changePassword(email: string, newPassword: string): Promise<Broadcaster> {
-    const hashedPw = await this.hashPassword(newPassword);
+    const hashedPw = await this.userPwManager.hashPassword(newPassword);
     const broadcaster = await this.prisma.broadcaster.update({
       where: { email },
       data: {
