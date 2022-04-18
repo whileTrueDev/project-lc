@@ -1171,6 +1171,12 @@ model Manual {
   updateDate         DateTime @default(now()) @updatedAt
 }
 
+enum Gender {
+  male // 남
+  female // 여
+  unknown // 선택 안함
+}
+
 // *********************************************************************************
 // 소비자
 // *********************************************************************************
@@ -1182,7 +1188,7 @@ model Customer {
   nickname               String? // 닉네임
   phone                  String? // 연락처
   createDate             DateTime                     @default(now()) // 생성일
-  gender                 String? // 성별
+  gender                 Gender?                      @default(unknown) // 성별(male, female)
   birthDate              DateTime? // 생년월일
   agreementFlag          Boolean                      @default(false) // 개인정보    이용동의여부
   inactiveFlag           Boolean                      @default(false)
