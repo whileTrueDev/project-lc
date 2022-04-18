@@ -1,5 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { Box, ButtonProps, Flex, HStack, IconButton, theme } from '@chakra-ui/react';
+import { Box, ButtonProps, Flex, HStack, IconButton } from '@chakra-ui/react';
 import { useDisplaySize, useHorizontalScroll } from '@project-lc/hooks';
 import { useRef } from 'react';
 import { ChakraNextImage } from './ChakraNextImage';
@@ -87,7 +87,7 @@ export function ChevronIconButton({
   return (
     <IconButton
       size={size}
-      zIndex={theme.zIndices.banner}
+      zIndex="banner"
       display={isInVisible ? 'none' : 'flex'}
       right={direction === 'right' ? right : undefined}
       left={direction === 'left' ? left : undefined}

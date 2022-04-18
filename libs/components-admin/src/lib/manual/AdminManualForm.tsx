@@ -24,9 +24,9 @@ const onImageUploadBefore = (
   uploadHandler: Function,
 ): void => {
   Promise.all(
-    files.map(async (file) => {
+    files.map(async (file: File) => {
       const { objectUrl } = await s3.sendPutObjectCommand({
-        Key: `manual/${file.name}_${new Date().getTime()}`,
+        Key: `manual/${new Date().getTime()}_${file.name}`,
         Body: file,
         ContentType: file.type,
         ACL: 'public-read',

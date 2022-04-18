@@ -62,6 +62,8 @@ export function MypageBreadcrumb(): JSX.Element | null {
     <Box p={4} pl={6}>
       <Breadcrumb separator={<ChevronRightIcon />}>
         {breadcrumbs.map((breadcrumb, i) => {
+          // 마이페이지 > 이용안내 예외처리 : 이용안내 화면에서 이용안내id 표시 안되도록
+          if (/manual\/[0-9]+/.test(breadcrumb.href)) return null;
           return (
             <BreadcrumbItem
               key={breadcrumb.href}
