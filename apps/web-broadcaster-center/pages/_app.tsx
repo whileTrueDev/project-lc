@@ -19,6 +19,7 @@ import NextNProgress from 'nextjs-progressbar';
 import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import '../styles/global.font.css';
+import '../styles/global.override.css';
 
 dayjs.extend(relativeTime);
 dayjs.locale(kolocale);

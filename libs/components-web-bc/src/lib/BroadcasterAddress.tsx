@@ -28,6 +28,7 @@ import {
   useProfile,
 } from '@project-lc/hooks';
 import { BroadcasterAddressDto } from '@project-lc/shared-types';
+import { parseErrorObject } from '@project-lc/utils-frontend';
 import { useMemo, useRef } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import { useForm } from 'react-hook-form';
@@ -118,10 +119,12 @@ export function BroadcasterAddressForm({
       editMode.onClose();
       toast({ status: 'success', description: '주소가 변경되었습니다.' });
     };
-    const onFail = (): void => {
+    const onFail = (err?: any): void => {
+      const { status, message } = parseErrorObject(err);
       toast({
         status: 'error',
-        description: '주소 변경중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        description: status ? `code: ${status} - message: ${message}` : undefined,
+        title: '주소 변경중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
       });
     };
     mutateAsync(formData)
@@ -131,7 +134,7 @@ export function BroadcasterAddressForm({
       })
       .catch((err) => {
         console.log(err);
-        onFail();
+        onFail(err);
       });
   }
 
