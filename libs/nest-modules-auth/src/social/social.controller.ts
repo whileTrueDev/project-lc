@@ -8,6 +8,7 @@ import {
   Query,
   Req,
   Res,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -22,8 +23,10 @@ import {
   LoginMethods,
 } from '../auth/login-history/login-history.service';
 import { SocialService } from './social.service';
+import { SocialLoginExceptionFilter } from './social-login-exception.filter';
 
 @Controller('social')
+@UseFilters(SocialLoginExceptionFilter)
 export class SocialController {
   constructor(
     private readonly loginHistoryService: LoginHistoryService,
