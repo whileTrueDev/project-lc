@@ -25,10 +25,10 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
   const [open, { toggle }] = useBoolean(false);
   const createDialog = useDisclosure();
   const { onClick, item, selectedCategoryId } = props;
-  const { id, name, childrenCategories, mainCategoryFlag, depth } = item;
+  const { id, name, childrenCategories, mainCategoryFlag, depth, goodsCount } = item;
   const hasChildren = childrenCategories && childrenCategories.length > 0;
   return (
-    <Stack borderWidth="1px" borderRadius="md" p={1}>
+    <Stack borderWidth="1px" borderRadius="md" px={1} spacing={0}>
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="row">
           {!mainCategoryFlag && (
@@ -48,6 +48,7 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
           >
             {name}
           </Text>
+          <Text as="span">({goodsCount})</Text>
           {hasChildren && (
             <IconButton
               aria-label={open ? '닫기' : '열기'}
@@ -77,7 +78,7 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
         )}
       </Stack>
       {open && (
-        <Stack pl={6}>
+        <Stack pl={6} spacing={0}>
           {hasChildren &&
             childrenCategories.map((child) => (
               <CategoryItem
