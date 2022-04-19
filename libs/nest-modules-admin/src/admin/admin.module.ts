@@ -10,6 +10,7 @@ import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { ManualModule } from '@project-lc/nest-modules-manual';
+import { GoodsCategoryModule } from '@project-lc/nest-modules-goods-category';
 import { AdminAccountService } from './admin-account.service';
 import { AdminKkshowMainController } from './admin-kkshow-main.controller';
 import { AdminPolicyController } from './admin-policy.controller';
@@ -20,6 +21,7 @@ import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 import { AdminManualController } from './admin-manual.controller';
+import { AdminGoodsCategoryController } from './admin-goods-category.controller';
 
 @Module({})
 export class AdminModule {
@@ -43,6 +45,7 @@ export class AdminModule {
     AdminProductPromotionController,
     AdminKkshowMainController,
     AdminManualController,
+    AdminGoodsCategoryController,
   ];
 
   private static readonly imports = [
@@ -55,6 +58,7 @@ export class AdminModule {
     KkshowMainModule.withoutControllers(),
     ManualModule.withoutControllers(),
     KkshowShoppingModule.withoutControllers(),
+    GoodsCategoryModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {
