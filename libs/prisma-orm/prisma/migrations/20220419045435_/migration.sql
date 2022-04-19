@@ -42,4 +42,5 @@ VALUES
 	(18, 'uknVdH_lwnmJrIOf4HIio', '견과류', 0, 14),
 	(19, 'LXKbWJQkQgQKGLeifzPTN', '신선과즙', 0, 14),
 	(20, 'bFJ7wnqOAuWfN3RmAfhAQ', '저칼로리', 0, 14),
-	(21, 'VP07hyfPH0ZwVINGG_94b', '다이어트', 1, NULL);
+	(21, 'VP07hyfPH0ZwVINGG_94b', '다이어트', 1, NULL),
+	(22, '기타', '기타', 1, NULL);
