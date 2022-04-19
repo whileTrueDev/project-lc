@@ -1,4 +1,4 @@
-import { Button, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react';
 import { useAdminCategory } from '@project-lc/hooks';
 import { useState } from 'react';
 import { CategoryCreateFormDialog } from './AdminCategoryCreateDialog';
@@ -64,9 +64,6 @@ export function AdminCategory(): JSX.Element {
     <Stack>
       <Stack direction="row">
         <Heading>상품 카테고리</Heading>
-        <Button size="sm" onClick={createDialog.onOpen}>
-          메인 카테고리 만들기
-        </Button>
       </Stack>
 
       <CategoryCreateFormDialog
@@ -80,8 +77,14 @@ export function AdminCategory(): JSX.Element {
       </Text>
       <Text>* 상품이 연결되어 있는 카테고리는 삭제할 수 없습니다</Text>
       <Text>* 상위 카테고리를 삭제하면 연결된 하위 카테고리도 함께 삭제됩니다</Text>
+      <Box>
+        <Button size="sm" onClick={createDialog.onOpen}>
+          메인 카테고리 만들기
+        </Button>
+      </Box>
+
       {/* 카테고리 목록 */}
-      <Stack w="400px" fontSize="sm">
+      <Stack w="400px" fontSize="sm" spacing={0}>
         {categoryTree.map((mainC) => (
           <CategoryItem
             key={mainC.id}
