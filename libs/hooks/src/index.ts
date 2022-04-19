@@ -1,6 +1,7 @@
 export * from './lib/auth-hooks';
 export * from './lib/mutation/useAdminBroadcasterPromotionPageMutation';
 export * from './lib/mutation/useAdminBroadcasterSettlementInfoConfirmMutation';
+export * from './lib/mutation/useAdminCategoryMutation';
 export * from './lib/mutation/useAdminClassChangeHistoryMutation';
 export * from './lib/mutation/useAdminCreateNotification';
 export * from './lib/mutation/useAdminKkshowMainMutation';
