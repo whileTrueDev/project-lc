@@ -13,6 +13,7 @@ import {
   SettlementInfoRefetchType,
   useBusinessRegistrationMutation,
   useProfile,
+  useSellerSettlementHistoryMutation,
 } from '@project-lc/hooks';
 import { BusinessRegistrationDto } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
@@ -52,6 +53,7 @@ export function BusinessRegistrationDialog(
   const { data: profileData } = useProfile();
   const toast = useToast();
   const mutation = useBusinessRegistrationMutation();
+  const { mutateAsync: historyMutation } = useSellerSettlementHistoryMutation();
 
   const methods = useForm<BusinessRegistrationFormDto>();
   const {
@@ -101,11 +103,32 @@ export function BusinessRegistrationDialog(
       }
 
       // 사업자 등록증 및 통신판매업 신고증 컬럼에 값 추가
-      await mutation.mutateAsync({
+      const businessRegistration = await mutation.mutateAsync({
         ...data,
         businessRegistrationImageName: savedBusinessRegistrationImageName,
         mailOrderSalesImageName: savedMailOrderSalesImageName,
       });
+
+      if (mailOrderSalesImage && mailOrderSalesImageName && businessRegistration) {
+        Promise.all([
+          historyMutation({
+            type: 'mailOrder',
+            status: 'confirmed',
+            sellerBusinessRegistrationId: businessRegistration.id,
+          }),
+          historyMutation({
+            type: 'businessRegistration',
+            status: 'waiting',
+            sellerBusinessRegistrationId: businessRegistration.id,
+          }),
+        ]);
+      } else {
+        historyMutation({
+          type: 'businessRegistration',
+          status: 'waiting',
+          sellerBusinessRegistrationId: businessRegistration.id,
+        });
+      }
 
       toast({
         title: '사업자 등록정보 등록 완료',

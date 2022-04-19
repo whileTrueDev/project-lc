@@ -71,6 +71,7 @@ model SellerBusinessRegistration {
   BusinessRegistrationConfirmation BusinessRegistrationConfirmation?
   seller                           Seller                            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
+  confirmHistory ConfirmHistory[]
   @@index(name: "BusinessRegistrationIndex", fields: [id])
 }
 
@@ -155,6 +156,7 @@ model SellerSettlementAccount {
   settlementAccountImageName String
   seller                     Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
+  confirmHistory ConfirmHistory[]
   @@index([id], name: "SellerSettlementAccountIndex")
 }
 
@@ -650,6 +652,7 @@ model BroadcasterSettlementInfo {
   broadcaster           Broadcaster                            @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
   broadcasterId         Int                                    @unique
   confirmation          BroadcasterSettlementInfoConfirmation?
+  confirmHistory        ConfirmHistory[]
 }
 
 // 방송인 정산 등록 정보 검수여부
@@ -1105,6 +1108,7 @@ model PrivacyApproachHistory {
   ip         String // 접근한 ip주소
   infoType   PrivacyApproachHistoryInfoType
   actionType PrivacyApproachHistoryActionType
+  reason     String? // 다운로드 사유
   createDate DateTime                         @default(now())
 }
 
@@ -1171,9 +1175,29 @@ model Manual {
   updateDate         DateTime @default(now()) @updatedAt
 }
 
+enum PaperType {
+  settlementAccount // 계좌
+  businessRegistration //사업자등록증
+  mailOrder // 통신판매업증
+}
+
+model ConfirmHistory {
+  id                           Int                         @id @default(autoincrement())
+  sellerBusinessRegistrationId Int?
+  sellerSettlementAccountId    Int?
+  broadcasterSettlementInfoId  Int?
+  type                         PaperType // 서류 종류
+  status                       BusinessRegistrationStatus // 검수상태
+  createDate                   DateTime                    @default(now())
+  sellerSettlementAccount      SellerSettlementAccount?    @relation(fields: [sellerSettlementAccountId], references: [id])
+  sellerBusinessRegistration   SellerBusinessRegistration? @relation(fields: [sellerBusinessRegistrationId], references: [id])
+  broadcasterSettlementInfo    BroadcasterSettlementInfo?  @relation(fields: [broadcasterSettlementInfoId], references: [id])
+}
+
 // *********************************************************************************
 // 소비자
 // *********************************************************************************
+
 model Customer {
   id                     Int                          @id @default(autoincrement()) // 소비자고유번호
   name                   String? // 이름
@@ -1182,7 +1206,7 @@ model Customer {
   nickname               String? // 닉네임
   phone                  String? // 연락처
   createDate             DateTime                     @default(now()) // 생성일
-  gender                 String? // 성별
+  gender                 Gender?                      @default(unknown) // 성별(male, female)
   birthDate              DateTime? // 생년월일
   agreementFlag          Boolean                      @default(false) // 개인정보    이용동의여부
   inactiveFlag           Boolean                      @default(false)
@@ -1200,6 +1224,12 @@ model Customer {
   goodsInquiries         GoodsInquiry[]
   followingLiveShoppings LiveShopping[] // 팔로우하는 라이브쇼핑
   followingBroadcasters  CustomerFollowBroadcaster[] // 팔로우하는 방송인
+}
+
+enum Gender {
+  male // 남
+  female // 여
+  unknown // 선택 안함
 }
 
 // 소비자-방송인팔로우  https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations#explicit-many-to-many-relations

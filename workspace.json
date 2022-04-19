@@ -673,6 +673,7 @@
       },
       "tags": []
     },
+    "nest-modules-customer": "libs/nest-modules-customer",
     "nest-modules-goods": {
       "root": "libs/nest-modules-goods",
       "sourceRoot": "libs/nest-modules-goods/src",

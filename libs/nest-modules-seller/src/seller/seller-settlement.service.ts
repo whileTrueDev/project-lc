@@ -9,13 +9,14 @@ import {
   SellType,
   Seller,
   InactiveBusinessRegistrationConfirmation,
+  ConfirmHistory,
 } from '@prisma/client';
 import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BusinessRegistrationDto,
   ExecuteSettlementDto,
-  FindSettlementHistoryRoundRes,
+  ConfirmHistoryDto,
   FmExport,
   SellerBusinessRegistrationType,
   SettlementAccountDto,
@@ -527,6 +528,86 @@ export class SellerSettlementService extends ServiceBaseWithCache {
         seller: { include: { sellerShop: true } },
         settlementItems: { include: { liveShopping: true } },
       },
+    });
+  }
+
+  public createSettlementConfirmHistory(dto: ConfirmHistoryDto): Promise<ConfirmHistory> {
+    const { type } = dto;
+    const { sellerSettlementAccountId } = dto;
+
+    if (type === 'settlementAccount' && sellerSettlementAccountId) {
+      return this.prisma.confirmHistory.create({
+        data: {
+          sellerSettlementAccountId,
+          type: dto.type,
+          status: dto.status,
+        },
+      });
+    }
+    if (type === 'businessRegistration') {
+      return this.prisma.confirmHistory.create({
+        data: {
+          sellerBusinessRegistrationId: dto.sellerBusinessRegistrationId,
+          type: dto.type,
+          status: dto.status,
+        },
+      });
+    }
+    if (type === 'mailOrder') {
+      return this.prisma.confirmHistory.create({
+        data: {
+          sellerBusinessRegistrationId: dto.sellerBusinessRegistrationId,
+          type: dto.type,
+          status: dto.status,
+        },
+      });
+    }
+    return this.prisma.confirmHistory.create({
+      data: {
+        broadcasterSettlementInfoId: dto.broadcasterSettlementInfoId,
+        type: dto.type,
+        status: dto.status,
+      },
+    });
+  }
+
+  public getSettlementConfirmHistory(user: UserPayload): Promise<ConfirmHistory[]> {
+    const { type } = user;
+    const { id } = user;
+
+    if (type === 'seller') {
+      return this.prisma.confirmHistory.findMany({
+        where: {
+          OR: [
+            {
+              sellerBusinessRegistration: {
+                sellerId: id,
+              },
+            },
+            {
+              sellerSettlementAccount: {
+                sellerId: id,
+              },
+            },
+          ],
+        },
+        orderBy: {
+          createDate: 'desc',
+        },
+        take: 7,
+      });
+    }
+
+    return this.prisma.confirmHistory.findMany({
+      where: {
+        broadcasterSettlementInfo: {
+          broadcasterId: id,
+        },
+      },
+      orderBy: {
+        createDate: 'desc',
+      },
+      take: 7,
     });
   }
 }
