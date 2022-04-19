@@ -7,14 +7,10 @@ import {
   useBoolean,
   useDisclosure,
 } from '@chakra-ui/react';
-import { CategoryWithGoodsCount } from '@project-lc/shared-types';
 import { CategoryCreateFormDialog } from './AdminCategoryCreateDialog';
+import { CategoryDeleteDiaglog, CategoryItemType } from './AdminCategoryDeleteDialog';
 import { CategoryUpdateFormDialog } from './AdminCategoryUpdateDialog';
 
-export type CategoryItemType = CategoryWithGoodsCount & {
-  childrenCategories?: CategoryItemType[];
-  depth: number;
-};
 export interface CategoryItemProps {
   item: CategoryItemType;
   onClick?: (id: number) => void;
@@ -26,6 +22,7 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
   const [open, { toggle }] = useBoolean(false);
   const createDialog = useDisclosure();
   const updateDialog = useDisclosure();
+  const deleteDialog = useDisclosure();
   const { onClick, item, selectedCategoryId } = props;
   const { id, name, childrenCategories, mainCategoryFlag, depth, goodsCount } = item;
   const hasChildren = childrenCategories && childrenCategories.length > 0;
@@ -82,7 +79,19 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
               onClose={updateDialog.onClose}
               category={item}
             />
-            <Button size="xs">삭제</Button>
+
+            <Button
+              size="xs"
+              onClick={deleteDialog.onOpen}
+              disabled={item.goodsCount > 0}
+            >
+              삭제
+            </Button>
+            <CategoryDeleteDiaglog
+              isOpen={deleteDialog.isOpen}
+              onClose={deleteDialog.onClose}
+              category={item}
+            />
           </Stack>
         )}
       </Stack>
