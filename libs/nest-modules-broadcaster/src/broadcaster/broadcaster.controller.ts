@@ -38,6 +38,7 @@ import {
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { PrismaService } from '@project-lc/prisma-orm';
+import __multer from 'multer';
 import { Broadcaster, BroadcasterAddress } from '.prisma/client';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';

@@ -1,4 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
+import { UserPwManager } from '@project-lc/nest-core';
 import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
 import { SellerContactsController } from './seller-contacts.controller';
 import { SellerContactsService } from './seller-contacts.service';
@@ -15,6 +16,7 @@ export class SellerModule {
     SellerSettlementService,
     SellerShopService,
     SellerContactsService,
+    UserPwManager,
   ];
 
   private static readonly exports = [SellerService, SellerSettlementService];

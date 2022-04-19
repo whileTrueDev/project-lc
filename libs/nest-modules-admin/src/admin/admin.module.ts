@@ -1,25 +1,27 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
+import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import {
   KkshowMainModule,
   KkshowShoppingModule,
 } from '@project-lc/nest-modules-kkshow-main';
+import { ManualModule } from '@project-lc/nest-modules-manual';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
-import { ManualModule } from '@project-lc/nest-modules-manual';
 import { AdminAccountService } from './admin-account.service';
+import { AdminCustomerController } from './admin-customer.controller';
 import { AdminKkshowMainController } from './admin-kkshow-main.controller';
+import { AdminManualController } from './admin-manual.controller';
 import { AdminPolicyController } from './admin-policy.controller';
+import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 import { AdminProductPromotionController } from './admin-product-promotion.controller';
 import { AdminPromotionPageController } from './admin-promotion-page.controller';
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
-import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
-import { AdminManualController } from './admin-manual.controller';
 
 @Module({})
 export class AdminModule {
@@ -43,6 +45,7 @@ export class AdminModule {
     AdminProductPromotionController,
     AdminKkshowMainController,
     AdminManualController,
+    AdminCustomerController,
   ];
 
   private static readonly imports = [
@@ -55,6 +58,7 @@ export class AdminModule {
     KkshowMainModule.withoutControllers(),
     ManualModule.withoutControllers(),
     KkshowShoppingModule.withoutControllers(),
+    CustomerModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {
