@@ -1,10 +1,11 @@
-import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
-import { CloseButton, IconButton, Stack, Text, useBoolean } from '@chakra-ui/react';
+import { Button, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react';
 import { useAdminCategory } from '@project-lc/hooks';
-import { CategoryWithGoodsCount } from '@project-lc/shared-types';
 import { useState } from 'react';
+import { CategoryCreateFormDialog } from './AdminCategoryCreateDialog';
+import { CategoryItem } from './AdminCategoryItem';
 
 export function AdminCategory(): JSX.Element {
+  const createDialog = useDisclosure();
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const { data, isLoading } = useAdminCategory();
   if (isLoading) return <Text>loading...</Text>;
@@ -42,87 +43,30 @@ export function AdminCategory(): JSX.Element {
   return (
     <Stack>
       <Stack direction="row">
-        <Text>선택된 카테고리 : </Text>
-        {selectedCategoryId && (
-          <>
-            <Text>{data.find((c) => c.id === selectedCategoryId)?.name}</Text>
-            <CloseButton size="sm" onClick={() => setSelectedCategoryId(null)} />
-          </>
-        )}
+        <Heading>상품 카테고리</Heading>
+        <Button size="sm" onClick={createDialog.onOpen}>
+          메인 카테고리 만들기
+        </Button>
       </Stack>
 
-      {categoryTree.map((mainC) => (
-        <CategoryItem
-          key={mainC.id}
-          item={mainC}
-          onClick={(id) => setSelectedCategoryId(id)}
-          selectedCategoryId={selectedCategoryId}
-        />
-      ))}
+      <CategoryCreateFormDialog
+        isOpen={createDialog.isOpen}
+        onClose={createDialog.onClose}
+      />
+
+      {/* 카테고리 목록 */}
+      <Stack w="400px">
+        {categoryTree.map((mainC) => (
+          <CategoryItem
+            key={mainC.id}
+            item={mainC}
+            onClick={(id) => setSelectedCategoryId(id)}
+            selectedCategoryId={selectedCategoryId}
+          />
+        ))}
+      </Stack>
     </Stack>
   );
 }
 
 export default AdminCategory;
-
-type CategoryItemType = CategoryWithGoodsCount & {
-  childrenCategories?: CategoryItemType[];
-};
-interface CategoryItemProps {
-  item: CategoryItemType;
-  onClick?: (id: number) => void;
-  selectedCategoryId: number | null;
-}
-
-function CategoryItem(props: CategoryItemProps): JSX.Element {
-  const [open, { toggle }] = useBoolean(false);
-  const { onClick, item, selectedCategoryId } = props;
-  const { id, name, childrenCategories, mainCategoryFlag } = item;
-  const hasChildren = childrenCategories && childrenCategories.length > 0;
-  return (
-    <Stack borderWidth="1px" borderRadius="md" p={1}>
-      <Stack direction="row">
-        <Text>
-          {!mainCategoryFlag && (
-            <Text as="span" color="gray.400">
-              ㄴ
-            </Text>
-          )}
-          {hasChildren && (
-            <IconButton
-              aria-label={open ? '닫기' : '열기'}
-              size="xs"
-              mr={1}
-              onClick={toggle}
-              icon={open ? <ChevronUpIcon /> : <ChevronDownIcon />}
-            />
-          )}
-          <Text
-            as="span"
-            onClick={() => {
-              if (onClick) onClick(id);
-              if (hasChildren) toggle();
-            }}
-            color={selectedCategoryId === id ? 'red' : undefined}
-            cursor="pointer"
-          >
-            {name}
-          </Text>
-        </Text>
-      </Stack>
-      {open && (
-        <Stack pl={6}>
-          {hasChildren &&
-            childrenCategories.map((child) => (
-              <CategoryItem
-                key={child.id}
-                item={child}
-                onClick={onClick}
-                selectedCategoryId={selectedCategoryId}
-              />
-            ))}
-        </Stack>
-      )}
-    </Stack>
-  );
-}
