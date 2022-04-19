@@ -14,9 +14,10 @@ import { CartItem, CartItemOption, Customer } from '@prisma/client';
 import {
   CartItemDto,
   CartItemOptionQuantityDto,
+  CartItemRes,
   CartMigrationDto,
 } from '@project-lc/shared-types';
-import { CartItemRes, CartService } from './cart.service';
+import { CartService } from './cart.service';
 
 @Controller('cart')
 export class CartController {

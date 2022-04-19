@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CartItem, CartItemOption, CartItemSupport, Customer } from '@prisma/client';
+import { CartItem, CartItemOption, Customer } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { CartItemDto } from '@project-lc/shared-types';
-
-export type CartItemRes = Array<
-  CartItem & { options: CartItemOption[]; support: CartItemSupport }
->;
+import { CartItemDto, CartItemRes } from '@project-lc/shared-types';
 
 @Injectable()
 export class CartService {
@@ -21,7 +17,17 @@ export class CartService {
   }): Promise<CartItemRes> {
     return this.prisma.cartItem.findMany({
       where: { OR: [{ customerId }, { tempUserId }] },
-      include: { options: true, support: true },
+      include: {
+        options: true,
+        support: true,
+        goods: {
+          select: {
+            goods_name: true,
+            seller: { select: { sellerShop: { select: { shopName: true } } } },
+          },
+        },
+        shippingGroup: true,
+      },
     });
   }
 

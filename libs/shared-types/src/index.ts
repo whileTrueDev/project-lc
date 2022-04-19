@@ -109,6 +109,7 @@ export * from './lib/res-types/broadcasterPromotionPage.res';
 export * from './lib/res-types/broadcasterSettlementInfoList.res';
 export * from './lib/res-types/broadcasterSettlementReceivableAmount.res';
 export * from './lib/res-types/broadcasterSettlementTargets.res';
+export * from './lib/res-types/cart.res';
 export * from './lib/res-types/findBCSettlementHistories.res';
 export * from './lib/res-types/findBroadcaster.res';
 export * from './lib/res-types/findBroadcasterSettlementInfo.res';
