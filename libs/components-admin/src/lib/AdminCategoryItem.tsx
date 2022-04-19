@@ -12,6 +12,7 @@ import { CategoryCreateFormDialog } from './AdminCategoryCreateDialog';
 
 export type CategoryItemType = CategoryWithGoodsCount & {
   childrenCategories?: CategoryItemType[];
+  depth: number;
 };
 export interface CategoryItemProps {
   item: CategoryItemType;
@@ -24,7 +25,7 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
   const [open, { toggle }] = useBoolean(false);
   const createDialog = useDisclosure();
   const { onClick, item, selectedCategoryId } = props;
-  const { id, name, childrenCategories, mainCategoryFlag } = item;
+  const { id, name, childrenCategories, mainCategoryFlag, depth } = item;
   const hasChildren = childrenCategories && childrenCategories.length > 0;
   return (
     <Stack borderWidth="1px" borderRadius="md" p={1}>
@@ -58,9 +59,13 @@ export function CategoryItem(props: CategoryItemProps): JSX.Element {
         </Stack>
         {selectedCategoryId === id && (
           <Stack direction="row">
-            <Button size="xs" onClick={createDialog.onOpen}>
-              하위 카테고리 생성
-            </Button>
+            {/* depth 2 미만일때만 하위 카테고리 생성 가능하도록 제한함 */}
+            {depth < 2 && (
+              <Button size="xs" onClick={createDialog.onOpen}>
+                하위 카테고리 생성
+              </Button>
+            )}
+
             <CategoryCreateFormDialog
               isOpen={createDialog.isOpen}
               onClose={createDialog.onClose}

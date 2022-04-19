@@ -25,17 +25,20 @@ export function AdminCategory(): JSX.Element {
   );
 
   // 각 카테고리 내에 childrenCategories 넣어서 트리구조로 만듦
+  // depth 2까지 (메인 > 1차 > 2차 까지만) 생성함 -> 디비조회시 raw 쿼리 재귀로 하는방법이 있을거같지만 지금은 모르겠음
   const categoryTree = mainCategories.map((mainC) => {
     return {
       ...mainC,
+      depth: 0,
       childrenCategories: subCategories
         .filter((c) => c.parentCategoryId && c.parentCategoryId === mainC.id)
         .map((subC) => {
           return {
             ...subC,
-            childrenCategories: subSubCategories.filter(
-              (c) => c.parentCategoryId && c.parentCategoryId === subC.id,
-            ),
+            depth: 1,
+            childrenCategories: subSubCategories
+              .filter((c) => c.parentCategoryId && c.parentCategoryId === subC.id)
+              .map((subSubC) => ({ ...subSubC, depth: 2 })),
           };
         }),
     };
