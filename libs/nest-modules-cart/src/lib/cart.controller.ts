@@ -11,7 +11,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CartItem, CartItemOption, Customer } from '@prisma/client';
-import { CartItemDto, CartItemOptionQuantityDto } from '@project-lc/shared-types';
+import {
+  CartItemDto,
+  CartItemOptionQuantityDto,
+  CartMigrationDto,
+} from '@project-lc/shared-types';
 import { CartItemRes, CartService } from './cart.service';
 
 @Controller('cart')
@@ -36,6 +40,14 @@ export class CartController {
     return this.cartService.create(dto);
   }
 
+  /** 특정 카트 상품 삭제 */
+  @Delete(':cartItemId')
+  delete(
+    @Param('cartItemId', ParseIntPipe) cartItemId: CartItem['id'],
+  ): Promise<boolean> {
+    return this.cartService.delete(cartItemId);
+  }
+
   /** 특정 카트 상품 개수 수정 */
   @Patch('option/:optionId')
   updateCartItemOptionQuantity(
@@ -45,11 +57,9 @@ export class CartController {
     return this.cartService.update(optionId, dto.quantity);
   }
 
-  /** 특정 카트 상품 삭제 */
-  @Delete(':cartItemId')
-  delete(
-    @Param('cartItemId', ParseIntPipe) cartItemId: CartItem['id'],
-  ): Promise<boolean> {
-    return this.cartService.delete(cartItemId);
+  /** temp유저의 카트 목록을 특정 소비자에게 이관 */
+  @Post('migration')
+  tempToCustomer(@Body(ValidationPipe) dto: CartMigrationDto): Promise<number> {
+    return this.cartService.tempToCustomer(dto.cartItemIds, dto.customerId);
   }
 }

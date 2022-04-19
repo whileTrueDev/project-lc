@@ -1,4 +1,4 @@
-import { CartItem, CartItemOption, CartItemSupport } from '@prisma/client';
+import { CartItem, CartItemOption, CartItemSupport, Customer } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -54,4 +54,11 @@ export class CartItemDto {
 
 export class CartItemOptionQuantityDto {
   @IsNumber() quantity: CartItemOption['quantity'];
+}
+
+export class CartMigrationDto {
+  @IsNumber({}, { each: true })
+  cartItemIds: CartItem['id'][];
+
+  @IsNumber() customerId: Customer['id'];
 }
