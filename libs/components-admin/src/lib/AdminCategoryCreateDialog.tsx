@@ -9,7 +9,9 @@ import {
   ModalOverlay,
   Stack,
   Text,
+  useToast,
 } from '@chakra-ui/react';
+import { useAdminCategoryCreateMutation } from '@project-lc/hooks';
 import { CategoryWithGoodsCount } from '@project-lc/shared-types';
 import { useForm } from 'react-hook-form';
 
@@ -30,6 +32,7 @@ export function CategoryCreateFormDialog(
   props: CategoryCreateFormDialogProps,
 ): JSX.Element {
   const { isOpen, onClose, parentCategory } = props;
+  const toast = useToast();
 
   const { register, handleSubmit, reset } = useForm<FormData>({
     defaultValues: {
@@ -38,12 +41,29 @@ export function CategoryCreateFormDialog(
       parentCategoryId: undefined,
     },
   });
+  const { mutateAsync } = useAdminCategoryCreateMutation();
   const onSubmit = async (data: FormData): Promise<void> => {
-    console.log({
+    const dto = {
       name: data.name,
       mainCategoryFlag: !parentCategory,
       parentCategoryId: parentCategory?.id,
-    });
+    };
+    mutateAsync(dto)
+      .then((res) => {
+        toast({
+          status: 'success',
+          title: '카테고리를 생성하였습니다',
+        });
+        handleClose();
+      })
+      .catch((e) => {
+        console.error(e);
+        toast({
+          status: 'error',
+          title: '카테고리를 생성하지 못했습니다',
+          description: e,
+        });
+      });
   };
   const handleClose = (): void => {
     reset();
