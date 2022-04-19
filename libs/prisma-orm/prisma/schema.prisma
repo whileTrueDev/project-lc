@@ -266,20 +266,21 @@ model GoodsConfirmation {
 }
 
 model GoodsOptions {
-  id             Int                   @id @default(autoincrement())
-  goods          Goods                 @relation(fields: [goodsId], references: [id], onDelete: Cascade)
-  goodsId        Int
-  supply         GoodsOptionsSupplies?
+  id              Int                   @id @default(autoincrement())
+  goods           Goods                 @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  goodsId         Int
+  supply          GoodsOptionsSupplies?
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
-  default_option YesOrNo               @default(n) // 옵션 필수 �������부
-  option_type    String                @default("direct") // 기본값인듯? 설명도 direct
-  option_title   String? // 옵션명 fm_goods_options.option_title
-  option1        String? // 옵션값 fm_goods_options.option1
-  option_code    String? // 옵션코드
-  consumer_price Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
-  price          Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
-  weight         Float? //옵션 개당 무게 (단위 kg)
-  option_view    YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
+  default_option  YesOrNo               @default(n) // 옵션 필수 �������부
+  option_type     String                @default("direct") // 기본값인듯? 설명도 direct
+  option_title    String? // 옵션명 fm_goods_options.option_title
+  option1         String? // 옵션값 fm_goods_options.option1
+  option_code     String? // 옵션코드
+  consumer_price  Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
+  price           Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
+  weight          Float? //옵션 개당 무게 (단위 kg)
+  option_view     YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
+  cartItemOptions CartItemOption[]
 
   @@index([goodsId], name: "goodsId")
 }
@@ -1412,6 +1413,10 @@ model CartItemOption {
   normalPrice   Decimal  @db.Decimal(10, 2) // 장바구니에 담았을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
   discountPrice Decimal  @db.Decimal(10, 2) // 장바구니에 담았을 당시 판매가 (할인가)
   weight        Float? //장바구니에 담았을 당시 옵션 개당 무게 (단위 kg)
+
+  // 장바구니 상품옵션 - 실제 상품옵션 연결정보
+  goodsOption    GoodsOptions? @relation(fields: [goodsOptionsId], references: [id])
+  goodsOptionsId Int?
 }
 
 // 장바구니 상품 후원

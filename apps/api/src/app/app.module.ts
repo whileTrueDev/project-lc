@@ -13,6 +13,7 @@ import { CacheConfig, CsrfTokenMiddleware, mailerConfig } from '@project-lc/nest
 import { AdminModule } from '@project-lc/nest-modules-admin';
 import { AuthModule, SocialModule } from '@project-lc/nest-modules-auth';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
+import { CartModule } from '@project-lc/nest-modules-cart';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
@@ -63,6 +64,7 @@ import { AppController } from './app.controller';
     KkshowSearchModule.withControllers(),
     KkshowShoppingModule.withControllers(),
     CustomerModule.withControllers(),
+    CartModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],
