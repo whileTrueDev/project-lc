@@ -26,7 +26,6 @@ export class CartService {
             seller: { select: { sellerShop: { select: { shopName: true } } } },
           },
         },
-        shippingGroup: true,
       },
     });
   }
