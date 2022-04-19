@@ -7,7 +7,7 @@ import { getApiHost } from '@project-lc/utils';
 import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { Request } from 'express';
 import { Profile, Strategy } from 'passport-naver';
-import { Seller } from '.prisma/client';
+import { Customer, Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
 const NAVER_PROVIDER = 'naver';
@@ -30,7 +30,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, NAVER_PROVIDER) {
     accessToken: string,
     refreshToken: null,
     profile: Profile,
-  ): Promise<Seller | Broadcaster> {
+  ): Promise<Seller | Broadcaster | Customer> {
     const { email, nickname, profile_image, id } = profile._json;
 
     if (!email) {

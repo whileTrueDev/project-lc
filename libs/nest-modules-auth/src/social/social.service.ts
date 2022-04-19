@@ -3,20 +3,22 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import {
   Broadcaster,
   BroadcasterSocialAccount,
-  Seller,
-  SellerSocialAccount,
-  InactiveSeller,
-  InactiveSellerSocialAccount,
+  Customer,
+  CustomerSocialAccount,
   InactiveBroadcaster,
   InactiveBroadcasterSocialAccount,
+  InactiveSeller,
+  InactiveSellerSocialAccount,
+  Seller,
+  SellerSocialAccount,
 } from '@prisma/client';
 import { UserPayload } from '@project-lc/nest-core';
-import { SellerService } from '@project-lc/nest-modules-seller';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
+import { CustomerService } from '@project-lc/nest-modules-customer';
+import { SellerService } from '@project-lc/nest-modules-seller';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { loginUserRes, SocialAccounts, UserType } from '@project-lc/shared-types';
 import { Request, Response } from 'express';
@@ -43,13 +45,13 @@ interface UserDataInterface {
 export class SocialService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly configService: ConfigService,
-    private readonly sellerService: SellerService,
     private readonly authService: AuthService,
     private readonly kakao: KakaoApiService,
     private readonly naver: NaverApiService,
     private readonly google: GoogleApiService,
+    private readonly sellerService: SellerService,
     private readonly broadcasterService: BroadcasterService,
+    private readonly customerService: CustomerService,
   ) {}
 
   login(userType: UserType, req: Request, res: Response): UserPayload {
@@ -95,11 +97,16 @@ export class SocialService {
   async findOrCreateUser(
     userType: UserType,
     data: UserDataInterface,
-  ): Promise<Seller | Broadcaster | InactiveBroadcaster | InactiveSeller> {
+  ): Promise<Seller | Broadcaster | Customer | InactiveBroadcaster | InactiveSeller> {
     // 전달된 유저타입이 방송인인 경우 -> Broadcaster, BroadcasterSocialAccounts 테이블에서 작업
     if (userType === 'broadcaster') {
       const broadcaster = await this.findOrCreateBroadcaster(data);
       return broadcaster;
+    }
+
+    if (userType === 'customer') {
+      const customer = await this.findOrCreateCustomer(data);
+      return customer;
     }
 
     // 전달된 유저타입이 판매자인 경우 -> Seller, SellerSocialAccounts 테이블에서 작업
@@ -133,8 +140,8 @@ export class SocialService {
     }
 
     await this.updateSocialAccountRecord('broadcaster', userData);
-    return this.prisma.broadcaster.findUnique({
-      where: { id: socialAccountWithBroadcaster.broadcaster.id },
+    return this.broadcasterService.findOne({
+      id: socialAccountWithBroadcaster.broadcaster.id,
     });
   }
 
@@ -192,6 +199,68 @@ export class SocialService {
     });
 
     return createdBroadcaster;
+  }
+
+  // -------------------------
+  // 소비자
+  // -------------------------
+
+  /** 해당 소셜서비스 계정 소유하는 소비자 찾거나 생성하여 반환 */
+  async findOrCreateCustomer(userData: UserDataInterface): Promise<Customer> {
+    const saWithCustomer = await this.selectCustomerSocialAccountRecord(userData);
+
+    // * 소비자 휴면 계정 로그인시
+    // const saWithCustomerinActive =
+    //   await this.selectInactiveCustomerSocialAccountRecord(userData);
+    // if (saWithCustomerinActive) {
+    //   return this.customerService.findInactiveOne({
+    //     id: saWithCustomerinActive.broadcaster.id,
+    //   });
+    // }
+
+    if (!saWithCustomer) {
+      const createdCustomer = await this.createCustomerSocialAccountRecrod(userData);
+      return createdCustomer;
+    }
+
+    await this.updateSocialAccountRecord('customer', userData);
+    return this.customerService.findOne({ id: saWithCustomer.customer.id });
+  }
+
+  /** 소셜서비스와 서비스고유아이디로 소셜계정이 등록된 소비자 계정정보 찾기 */
+  private async selectCustomerSocialAccountRecord(
+    userData: Partial<UserDataInterface>,
+  ): Promise<CustomerSocialAccount & { customer: Customer }> {
+    const { id, provider } = userData;
+    return this.prisma.customerSocialAccount.findFirst({
+      where: { serviceId: id, provider },
+      include: { customer: true },
+    });
+  }
+
+  /** 소비자 소셜계정 데이터 생성 */
+  private async createCustomerSocialAccountRecrod(
+    userData: UserDataInterface,
+  ): Promise<Customer> {
+    const { id, email, name, picture, ...rest } = userData;
+    const socialAccountCreateInput = {
+      serviceId: id,
+      profileImage: picture,
+      name,
+      ...rest,
+    };
+
+    const createdCustomer = await this.prisma.customer.upsert({
+      where: { email },
+      update: { socialAccounts: { create: socialAccountCreateInput } },
+      create: {
+        email,
+        name,
+        password: null,
+        socialAccounts: { create: socialAccountCreateInput },
+      },
+    });
+    return createdCustomer;
   }
 
   // -------------------------
@@ -294,20 +363,19 @@ export class SocialService {
     serviceId: string,
   ): Promise<boolean> {
     if (userType === 'seller' || userType === 'admin') {
-      await this.prisma.sellerSocialAccount.delete({
-        where: { serviceId },
-      });
+      await this.prisma.sellerSocialAccount.delete({ where: { serviceId } });
     }
     if (userType === 'broadcaster') {
-      await this.prisma.broadcasterSocialAccount.delete({
-        where: { serviceId },
-      });
+      await this.prisma.broadcasterSocialAccount.delete({ where: { serviceId } });
+    }
+    if (userType === 'customer') {
+      await this.prisma.customerSocialAccount.delete({ where: { serviceId } });
     }
     return true;
   }
 
   /** 소셜계정 데이터 업데이트(토큰)
-   * @param userType 'seller' | 'broadcaster'
+   * @param userType 'seller' | 'broadcaster' | 'customer'
    * @userData 소셜플랫폼에서 넘어온 정보(토큰 정보 포함)
    */
   private async updateSocialAccountRecord(
@@ -327,8 +395,13 @@ export class SocialService {
           where: { serviceId: id },
           data: updateData,
         });
-      } else {
+      } else if (userType === 'broadcaster') {
         await this.prisma.broadcasterSocialAccount.update({
+          where: { serviceId: id },
+          data: updateData,
+        });
+      } else if (userType === 'customer') {
+        await this.prisma.customerSocialAccount.update({
           where: { serviceId: id },
           data: updateData,
         });
@@ -356,6 +429,9 @@ export class SocialService {
         })
       | (BroadcasterSocialAccount & {
           broadcaster: Broadcaster;
+        })
+      | (CustomerSocialAccount & {
+          customer: Customer;
         });
 
     // 판매자
@@ -367,6 +443,12 @@ export class SocialService {
     } else if (userType === 'broadcaster') {
       // 방송인
       socialAccount = await this.selectBroadcasterSocialAccountRecord({
+        provider,
+        id: serviceId,
+      });
+    } else if (userType === 'customer') {
+      // 방송인
+      socialAccount = await this.selectCustomerSocialAccountRecord({
         provider,
         id: serviceId,
       });
@@ -518,22 +600,34 @@ export class SocialService {
 
   /** userType에 맞는 테이블에서 email로 유저 검색 후 해당 유저의 소셜계정 목록 반환 */
   async getSocialAccounts(userType: UserType, email: string): Promise<SocialAccounts> {
+    const selectFields = {
+      serviceId: true,
+      provider: true,
+      name: true,
+      registDate: true,
+      profileImage: false,
+      accessToken: false,
+      refreshToken: false,
+    };
     // userType === 'seller' 판매자인 경우
     if (userType === 'seller') {
       const seller = await this.prisma.seller.findUnique({
         where: { email },
         select: {
           socialAccounts: {
-            select: {
-              serviceId: true,
-              provider: true,
-              name: true,
-              registDate: true,
-              profileImage: false,
-              accessToken: false,
-              refreshToken: false,
-              sellerId: false,
-            },
+            select: { ...selectFields, sellerId: false },
+          },
+        },
+      });
+      return seller.socialAccounts;
+    }
+    // userType === 'customer' 소비자인 경우
+    if (userType === 'customer') {
+      const seller = await this.prisma.customer.findUnique({
+        where: { email },
+        select: {
+          socialAccounts: {
+            select: { ...selectFields, customerId: false },
           },
         },
       });
@@ -544,16 +638,7 @@ export class SocialService {
       where: { email },
       select: {
         socialAccounts: {
-          select: {
-            serviceId: true,
-            provider: true,
-            name: true,
-            registDate: true,
-            profileImage: false,
-            accessToken: false,
-            refreshToken: false,
-            broadcasterId: false,
-          },
+          select: { ...selectFields, broadcasterId: false },
         },
       },
     });

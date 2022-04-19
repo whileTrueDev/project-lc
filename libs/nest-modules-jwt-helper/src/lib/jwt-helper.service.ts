@@ -95,7 +95,7 @@ export class JwtHelperService {
     return res.cookie(authConstants.REFRESH_TOKEN_HEADER_KEY, refreshToken, {
       httpOnly: true,
       maxAge: expiresIn,
-      secure: true,
+      secure: !!(this.configService.get('NODE_ENV') === 'production'),
       sameSite: 'lax',
       domain:
         this.configService.get('NODE_ENV') === 'production'
