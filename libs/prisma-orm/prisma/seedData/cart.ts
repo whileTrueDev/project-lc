@@ -13,7 +13,11 @@ export const cartSample = {
       normalPrice: '2000',
       discountPrice: '2000',
       weight: 500,
-      // goodsOptionId: 1,
+      goodsOption: {
+        connect: {
+          id: 1,
+        },
+      },
     },
   },
   support: {
@@ -40,7 +44,11 @@ export const tempUserCartItemSample = {
       normalPrice: '3000',
       discountPrice: '2500',
       weight: 500,
-      // goodsOptionId: 1,
+      goodsOption: {
+        connect: {
+          id: 2,
+        },
+      },
     },
   },
   support: {
