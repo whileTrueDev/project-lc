@@ -1,10 +1,10 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { Customer } from '@prisma/client';
-import { AdminGuard } from '@project-lc/nest-modules-authguard';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CustomerService } from '@project-lc/nest-modules-customer';
 import { FindManyDto } from '@project-lc/shared-types';
 
-@UseGuards(AdminGuard)
+@UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin/customer')
 export class AdminCustomerController {
   constructor(private readonly customerService: CustomerService) {}

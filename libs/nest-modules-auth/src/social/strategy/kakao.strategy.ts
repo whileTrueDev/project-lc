@@ -6,7 +6,7 @@ import { getApiHost } from '@project-lc/utils';
 import { getUserTypeFromRequest } from '@project-lc/utils-backend';
 import { Request } from 'express';
 import { Profile, Strategy } from 'passport-kakao';
-import { Broadcaster, Seller } from '.prisma/client';
+import { Broadcaster, Customer, Seller } from '.prisma/client';
 import { SocialService } from '../social.service';
 
 const KAKAO_PROVIDER = 'kakao';
@@ -29,7 +29,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, KAKAO_PROVIDER) {
     accessToken: string,
     refreshToken: null,
     profile: Profile,
-  ): Promise<Seller | Broadcaster> {
+  ): Promise<Seller | Broadcaster | Customer> {
     const { id, username, _json } = profile;
     const { kakao_account } = _json;
     const { email, profile: kakaoProfile } = kakao_account;

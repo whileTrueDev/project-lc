@@ -5,13 +5,15 @@ import { Request } from 'express';
 import geoip from 'geoip-lite';
 import UAParser from 'ua-parser-js';
 
+export type LoginMethods = '이메일' | '소셜/카카오' | '소셜/네이버' | '소셜/구글';
+
 @Injectable()
 export class LoginHistoryService {
   constructor(private readonly prisma: PrismaService) {}
 
   public async createLoginStamp(
     req: Request,
-    loginMethod: '이메일' | '소셜/카카오' | '소셜/네이버' | '소셜/구글',
+    loginMethod: LoginMethods,
   ): Promise<LoginHistory> {
     const { ip, user } = req;
     const geo = geoip.lookup(ip);
