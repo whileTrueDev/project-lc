@@ -1,6 +1,8 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { UserPwManager } from '@project-lc/nest-core';
 import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
+import { CustomerAddressController } from './address/customer-address.controller';
+import { CustomerAddressService } from './address/customer-address.service';
 import { CustomerController } from './customer.controller';
 import { CustomerService } from './customer.service';
 
@@ -10,11 +12,15 @@ import { CustomerService } from './customer.service';
   exports: [CustomerService],
 })
 export class CustomerModule {
-  private static readonly providers = [UserPwManager, CustomerService];
+  private static readonly providers = [
+    UserPwManager,
+    CustomerService,
+    CustomerAddressService,
+  ];
 
   private static readonly exports = [CustomerService];
 
-  private static readonly controllers = [CustomerController];
+  private static readonly controllers = [CustomerController, CustomerAddressController];
 
   private static readonly imports = [MailVerificationModule];
 
