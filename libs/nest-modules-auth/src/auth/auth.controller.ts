@@ -46,9 +46,8 @@ export class AuthController {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user }: any = req;
     user.userType = userType;
-    if (user.inactiveFlag) {
-      return res.status(200).send(user);
-    }
+    if (user.inactiveFlag) return res.status(200).send(user);
+
     const loginToken: loginUserRes = this.authService.issueToken(
       user,
       stayLogedIn,

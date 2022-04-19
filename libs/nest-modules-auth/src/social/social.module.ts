@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { APP_FILTER } from '@nestjs/core';
 import { SocialLoginUserTypeMiddleware } from '@project-lc/nest-core';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
+import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { AuthModule } from '../auth/auth.module';
 import { GoogleApiService } from './platform-api/google-api.service';
@@ -19,6 +20,7 @@ import { NaverStrategy } from './strategy/naver.strategy';
     AuthModule,
     BroadcasterModule.withoutControllers(),
     SellerModule.withoutControllers(),
+    CustomerModule.withoutControllers(),
   ],
   controllers: [SocialController],
   providers: [

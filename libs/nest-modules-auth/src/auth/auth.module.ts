@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { AdminModule } from '@project-lc/nest-modules-admin';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
+import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { AuthController } from './auth.controller';
@@ -14,6 +15,7 @@ import { LocalStrategy } from './strategies/local.strategy';
   imports: [
     SellerModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
+    CustomerModule.withoutControllers(),
     AdminModule.withoutControllers(),
     MailVerificationModule,
   ],
