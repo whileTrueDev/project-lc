@@ -1,5 +1,5 @@
 export class CreateGoodsCategoryDto {
-  categoryCode: string;
+  categoryCode?: string;
   name: string;
   mainCategoryFlag: boolean;
   parentCategoryId?: number;

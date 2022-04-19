@@ -1,4 +1,10 @@
-import { Inject, Injectable, CACHE_MANAGER } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  CACHE_MANAGER,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -8,6 +14,7 @@ import {
   UpdateGoodsCategoryDto,
 } from '@project-lc/shared-types';
 import { GoodsCategory } from '@prisma/client';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class GoodsCategoryService extends ServiceBaseWithCache {
@@ -20,50 +27,42 @@ export class GoodsCategoryService extends ServiceBaseWithCache {
     super(cacheManager);
   }
 
-  // 카테고리 생성
-  async createCategory(createDto: CreateGoodsCategoryDto): Promise<GoodsCategory> {
-    const newCategory = await this.prisma.goodsCategory.create({
-      data: {
-        ...createDto,
-      },
-    });
-
-    await this._clearCaches(this.#GOODS_CATEGORY_CACHE_KEY);
-
-    return newCategory;
+  private createCategoryCode(): string {
+    return nanoid();
   }
 
-  // 카테고리 조회 -> 여기서 nested 형태로 조합해서 전달??
-  // TODO: 리턴타입 지정
-  async getCategories(): Promise<GoodsCategoryRes> {
-    const goodsCategorySelectOptions = {
-      _count: { select: { goods: true } },
-      id: true,
-      categoryCode: true,
-      name: true,
-      mainCategoryFlag: true,
-      parentCategoryId: true,
-      parentCategory: true,
-    };
-    const mainCategories = await this.prisma.goodsCategory.findMany({
-      where: { mainCategoryFlag: true },
-      select: {
-        ...goodsCategorySelectOptions,
-        // 메인 > 1차카테고리 포함
-        childrenCategories: {
-          select: {
-            ...goodsCategorySelectOptions,
-            // 1차 > 2차 카테고리 포함
-            childrenCategories: {
-              select: {
-                ...goodsCategorySelectOptions,
-              },
-            },
-          },
+  // 카테고리 생성
+  async createCategory(createDto: CreateGoodsCategoryDto): Promise<GoodsCategory> {
+    try {
+      const { categoryCode } = createDto; // categoryCode느ㄴ 옵셔널임
+      const newCategory = await this.prisma.goodsCategory.create({
+        data: {
+          categoryCode: categoryCode || this.createCategoryCode(),
+          ...createDto,
         },
-      },
+      });
+
+      await this._clearCaches(this.#GOODS_CATEGORY_CACHE_KEY);
+
+      return newCategory;
+    } catch (e) {
+      if (e.code && e.code === 'P2002') {
+        throw new BadRequestException('중복된 카테고리 코드 입력');
+      }
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  // 카테고리 조회
+  async getCategories(): Promise<GoodsCategoryRes> {
+    const categories = await this.prisma.goodsCategory.findMany({
+      include: { _count: { select: { goods: true } } },
     });
-    return mainCategories;
+
+    return categories.map((c) => {
+      const { _count, ...category } = c;
+      return { ...category, goodsCount: _count.goods };
+    });
   }
 
   // 카테고리 수정
