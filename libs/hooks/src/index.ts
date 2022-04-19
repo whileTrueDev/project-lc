@@ -71,6 +71,7 @@ export * from './lib/queries/useAdminBroadcaster';
 export * from './lib/queries/useAdminBroadcasterPromotionPage';
 export * from './lib/queries/useAdminBroadcasterSettlementHistoriesByRound';
 export * from './lib/queries/useAdminBroadcasterSettlementInfoList';
+export * from './lib/queries/useAdminCategory';
 export * from './lib/queries/useAdminDuplicatePromotionPageFlag';
 export * from './lib/queries/useAdminFmOrderByGoods';
 export * from './lib/queries/useAdminGoodsById';
