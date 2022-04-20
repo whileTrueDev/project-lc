@@ -38,15 +38,49 @@ export class OverlayService {
   ): Promise<string | false | Uint8Array> {
     const client = new textToSpeech.TextToSpeechClient(this.options);
     const { nickname } = purchaseData;
+    const { ttsSetting } = purchaseData;
     const price = purchaseData.purchaseNum;
     const { message } = purchaseData;
+    let messageWithAppreciate: string;
 
-    // 추후 선택기능 넣을 예정
-    const messageWithAppreciate = `
-    <speak>
-      ${nickname}님 ${price}원 구매하셨습니다 <break time='500ms'/> ${message}
-    </speak>
-    `;
+    switch (ttsSetting) {
+      case 'full':
+        messageWithAppreciate = `
+        <speak>
+          ${nickname}님 ${price}원 구매 감사합니다 <break time='500ms'/> 
+          ${message}
+        </speak>
+        `;
+        break;
+      case 'nick-purchase':
+        messageWithAppreciate = `
+        <speak>
+          ${nickname}님 구매 감사합니다 <break time='500ms'/>
+        </speak>
+        `;
+        break;
+      case 'nick-purchase-price':
+        messageWithAppreciate = `
+        <speak>
+          ${nickname}님 ${price}원 구매 감사합니다 <break time='500ms'/>
+        </speak>
+        `;
+        break;
+      case 'only-message':
+        messageWithAppreciate = `
+        <speak>
+          ${message}
+        </speak>
+        `;
+        break;
+      default:
+        messageWithAppreciate = `
+        <speak>
+          ${nickname}님 ${price}원 구매하셨습니다 <break time='500ms'/> ${message}
+        </speak>
+        `;
+        break;
+    }
 
     const audioConfig: AudioEncoding = { speakingRate: 1.3, audioEncoding: 'MP3' };
     const voice: Voice = {

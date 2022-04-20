@@ -1,19 +1,27 @@
 /* eslint-env jquery */
 /* global io, */
 /* eslint no-undef: "error" */
+/* eslint import/extensions: "off" */
+import { chickenMovement } from './animation.js';
+
 const socket = io({ transports: ['websocket'] });
 const pageUrl = window.location.href;
 const messageArray = [];
+let prevRankingArray = [];
 const iterateLimit = $('#primary-info').data('number') + 1;
 const liveShoppingId = $('#primary-info').data('liveshopping-id');
 const email = $('#primary-info').data('email');
 const bucketName = $('#primary-info').data('bucket-name');
+const rankingToRenderArray = [];
 
 let streamerAndProduct;
 let startDate = new Date('2021-09-27T14:05:00+0900');
 let endDate = new Date('2021-09-04T15:00:00+0900');
 let feverDate = new Date('2021-09-27T14:05:00+0900');
 let bannerId = 1;
+let combo = 1;
+let bgmVolume = 0.1;
+let isBgmPlaying = false;
 const bottomMessages = [];
 const topMessages = [];
 
@@ -77,9 +85,10 @@ function dailyMissionTimer() {
           </video>
             `;
         $('.full-video').html(introHtml);
+        $('.full-video').fadeIn(500);
         $('.inner-video-area').on('ended', function () {
           $('.live-commerce').show();
-          $('.inner-video-area').fadeOut(500);
+          $('.full-video').fadeOut(500);
         });
       }
     }
@@ -159,6 +168,14 @@ function dailyMissionTimer() {
       ) {
         $('.bottom-timer').removeClass('warning');
       }
+      if (
+        $('.bottom-area-left-icon').attr('src') === '/images/egg.png' &&
+        Number(minutes) === 0 &&
+        Number(seconds) === 0
+      ) {
+        $('.bottom-area-left-icon').removeClass('urgent');
+        $('.bottom-area-left-icon').attr('src', '/images/softbank-chick.png');
+      }
     }
   }, 1000);
 }
@@ -202,19 +219,43 @@ async function switchImage() {
   }, 10000);
 }
 
-// 우측상단 응원문구 이벤트
+// 우측상단 응원문구 이벤트 및 랭킹
 setInterval(async () => {
-  if (messageArray.length !== 0 && $('.top-right').css('display') === 'none') {
-    $('.top-right').css({ display: 'flex' });
-    $('.top-right').html(messageArray[0].messageHtml);
+  if (messageArray.length && $('.top-right').css('display') === 'none') {
+    if (rankingToRenderArray.length) {
+      rankingToRenderArray[0].rankings.forEach((value, index) => {
+        $(`.ranking-text-area-id#rank-${index}`).text(value.nickname);
+        $(`.quantity#rank-${index}`).text(
+          `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
+        );
+        if (index === 0 && rankingToRenderArray[0].animate) {
+          $('.ranking-text-area-id#rank-0').addClass('ranking-pop');
+          setTimeout(() => {
+            $('.ranking-text-area-id#rank-0').removeClass('ranking-pop');
+          }, 6000);
+        }
+      });
+    }
+
+    if (!messageArray[0].audioBlob) {
+      $('.top-right').html(messageArray[0].messageHtml);
+      $('.top-right').css({ display: 'flex' });
+    } else {
+      $('.top-right').html(messageArray[0].messageHtml);
+      $('.top-right').css({ display: 'flex' });
+    }
     await setTimeout(() => {
-      const sound = new Audio(messageArray[0].audioBlob);
-      sound.play();
+      if (messageArray[0].audioBlob) {
+        const sound = new Audio(messageArray[0].audioBlob);
+        sound.play();
+      }
+      rankingToRenderArray.splice(0, 1);
       messageArray.splice(0, 1);
     }, 1500);
     await setTimeout(() => {
-      $('.top-right').fadeOut(800);
-      $('.donation-image').attr('src', '/images/invisible.png');
+      $('.top-right').fadeOut(800, function () {
+        $('.donation-image').attr('src', '/images/invisible.png');
+      });
     }, 10000);
   }
 }, 2000);
@@ -285,15 +326,13 @@ socket.emit('get date from registered liveshopping', {
   roomName: pageUrl.split('/').pop(),
 });
 
-socket.on('get top-left ranking', (data) => {
-  const rankingArray = data;
+socket.on('get top-left ranking', (rankings) => {
   if ($('.ranking-text-area#title').css('display') === 'none') {
-    rankingArray.forEach((value, index) => {
-      $(`.ranking-text-area-id#rank-${index}`).text(value.nickname);
-      $(`.quantity#rank-${index}`).text(
-        `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
-      );
-    });
+    if (prevRankingArray[0].nickname !== rankings[0].nickname) {
+      rankingToRenderArray.push({ rankings, animate: true });
+    } else {
+      rankingToRenderArray.push({ rankings, animate: false });
+    }
   } else {
     $('.ranking-text-area#title').css({ display: 'none' });
     $('.ranking-area-inner').html(
@@ -306,7 +345,6 @@ socket.on('get top-left ranking', (data) => {
         <span class="quantity" id="rank-0">
         </span>
       </p>
-
       <p class="ranking-text-area" id="rank-1">
         <span class="ranking-id-wrapper">
           <img src="/images/first.png" id="ranking-icon" />
@@ -334,38 +372,51 @@ socket.on('get top-left ranking', (data) => {
         </span>
       </p>`,
     );
-    rankingArray.forEach((value, index) => {
+    rankings.forEach((value, index) => {
       $(`.ranking-text-area-id#rank-${index}`).text(value.nickname);
       $(`.quantity#rank-${index}`).text(
         `${value.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')}원`,
       );
+      if (index === 0) {
+        $('.ranking-text-area-id#rank-0').addClass('ranking-pop');
+        setTimeout(() => {
+          $('.ranking-text-area-id#rank-0').removeClass('ranking-pop');
+        }, 6000);
+      }
     });
   }
+  prevRankingArray = rankings;
 });
 
 socket.on('get right-top purchase message', async (data) => {
-  const alarmType = data[0].level;
-  const { nickname } = data[0];
-  const { productName } = data[0];
-  const { message } = data[0];
-  const num = data[0].purchaseNum;
+  const alarmType = data.purchase.level;
+  const { nickname } = data.purchase;
+  const { productName } = data.purchase;
+  const { message } = data.purchase;
+  const { ttsSetting } = data.purchase;
+  const { audioBuffer } = data;
+  const num = data.purchase.purchaseNum;
   let audioBlob;
 
-  if (data) {
-    const blob = new Blob([data[1]], { type: 'audio/mp3' });
+  if (audioBuffer) {
+    const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
     audioBlob = window.URL.createObjectURL(blob);
   }
   messageHtml = `
   <div class="donation-wrapper">
-    <iframe src="/audio/${
-      alarmType === '2' ? 'alarm-type-2.mp3' : 'alarm-type-1.wav'
-    }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>
+    ${
+      ttsSetting !== 'no-sound'
+        ? `<iframe src="/audio/${
+            alarmType === '2' ? 'alarm-type-2.mp3' : 'alarm-type-1.wav'
+          }" id="iframeAudio" allow="autoplay" style="display:none"></iframe>`
+        : ''
+    }
     <div class="item">
       <div class="centered">
         <img src="https://${bucketName}.s3.ap-northeast-2.amazonaws.com/donation-images/${email}/${liveShoppingId}/${
     alarmType === '2' ? 'donation-2' : 'donation-1'
-  }" class="donation-image" />  
-        <div class ="animated heartbeat" id="donation-top">
+  }" class="donation-image" />
+        <div class="animated heartbeat" id="donation-top">
           <span id="nickname">
             <span class="animated heartbeat" id="donation-user-id">${nickname}</span>
             <span class="donation-sub">님 ${productName}</span>
@@ -412,6 +463,47 @@ socket.on('get non client purchase message', async (data) => {
   
   `;
   topMessages.push({ messageHtml });
+});
+
+socket.on('get right-top pop purchase message', async (data) => {
+  const { nickname } = data.purchase;
+  const { message } = data.purchase;
+  const price = data.purchase.purchaseNum
+    .toString()
+    .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+
+  messageHtml = `
+  <div class='combo-mode' style='height:unset'>
+    <p class='pop-out'>${combo} COMBO!</p>
+    <div class='donation-header' id='donation-top'>
+      <span id='nickname'>
+        <span class='wave' id='donation-user-id'>
+        ${[...nickname]
+          .map((v, i) => `<span class='wave-inner' style='--i:${i}'>${v}</span>`)
+          .join('')}
+        </span>
+        <span class='donation-sub'>님</span>
+        <span class='wave' id='donation-num'>
+        ${[...price]
+          .map((v, i) => `<span class='wave-inner' style='--i:${i}'>${v}</span>`)
+          .join('')}
+        </span>
+        <span class='donation-sub'>원 구매!</span>
+      </span>
+    </div>
+    <div id='donation-message'>
+      <span id='message'>
+        ${message}
+      </span>
+    </div>
+  </div>
+  `;
+  combo += 1;
+  messageArray.push({ messageHtml });
+});
+
+socket.on('combo reset from server', async () => {
+  combo = 1;
 });
 
 socket.on('get objective message', async (data) => {
@@ -545,6 +637,10 @@ socket.on('hide screen', () => {
   $('.live-commerce').fadeOut(500);
 });
 
+socket.on('hide vertical-banner from server', () => {
+  $('.left-banner-area').toggle();
+});
+
 socket.on('d-day from server', (date) => {
   endDate = new Date(date);
 });
@@ -565,10 +661,11 @@ socket.on('show video from server', (type) => {
     </video>
       `;
     $('.full-video').html(introHtml);
+    $('.full-video').fadeIn(500);
 
     $('.inner-video-area').on('ended', function () {
       $('.live-commerce').show();
-      $('.inner-video-area').fadeOut(500);
+      $('.full-video').fadeOut(500);
     });
   } else {
     const outroHtml = `
@@ -576,17 +673,18 @@ socket.on('show video from server', (type) => {
       <source src="/videos/outro.mp4" type="video/mp4">
     </video>
       `;
-    $('.full-video').hide().html(outroHtml).fadeIn(500);
+    $('.full-video').html(outroHtml);
+    $('.full-video').fadeIn(500);
 
     $('.inner-video-area').on('ended', function () {
       $('.live-commerce').hide();
-      $('.inner-video-area').fadeOut(500);
+      $('.full-video').fadeOut(500);
     });
   }
 });
 
 socket.on('clear full video from server', () => {
-  $('.inner-video-area').fadeOut(800);
+  $('.full-video').fadeOut(800);
 });
 
 socket.on('get start time from server', (startSetting) => {
@@ -729,5 +827,110 @@ socket.on('refresh ranking from server', () => {
     `<img src="/images/podium.png" id="podium" style="width:25%;"/>`,
   );
 });
+
+socket.on('change theme from server', (themeType) => {
+  switch (themeType) {
+    case 'spring':
+      $(
+        '.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left, .bottom-area-right, .bottom-fever-timer',
+      ).addClass(themeType);
+      $('#podium').attr('src', '/images/cherry-blossom-tree.png');
+      $('#kks-logo').attr('src', '/images/kks-spring-logo.png');
+      $('.live-commerce').append(
+        `<img src="/images/top-left-cherry-blossom.png" style="position:absolute;top:0px;left:0px;" alt="top-left"/>`,
+        `<img src="/images/bottom-right-cherry-blossom.png" style="position:absolute;bottom:0px;right:0px;" alt="right-bottom"/>`,
+      );
+      break;
+    case 'summer':
+      $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').addClass(
+        themeType,
+      );
+      break;
+    case 'chicken':
+      $(
+        '.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left, .bottom-area-right, .bottom-fever-timer',
+      ).addClass(themeType);
+      $('#kks-logo').attr('src', '/images/kks-chicken-logo.png');
+      $('#podium').attr('src', '/images/chicken-head.png');
+      $('.bottom-area-left-icon').attr('src', '/images/egg.png');
+      $('.live-commerce').append(`
+      <div
+        class='chicken-move'
+      >
+        <div id="mother-chicken">
+          <img src='/images/chicken.png' />
+          <span class="chicken-move-text">크크쇼 플친 <br> 이벤트 진행중</span>
+        </div>
+        <img class="chic" id='baby-1' src='/images/chic.png' />
+        <img class="chic" id='baby-2' src='/images/chic.png' />
+        <img class="chic" id='baby-3' src='/images/chic.png' />
+      </div>
+      `);
+      $('.live-commerce').append(`
+      <div class='confetti' id='left'>
+        <img src='/images/confetti_l.png' />
+      </div>
+      <div class='confetti' id='right'>
+        <img src='/images/confetti_r.png' />
+      </div>
+      `);
+      break;
+    default:
+      console.log('default');
+  }
+});
+
+socket.on('start bgm from server', (data) => {
+  const bgmNumber = data;
+  if (isBgmPlaying) {
+    $('#bgm').attr('src', `/audio/bgm-${bgmNumber}.mp3`);
+  } else {
+    $('body').append(`
+  <audio src="/audio/bgm-${bgmNumber}.mp3"
+    id="bgm" autoplay loop ></audio>
+    `);
+    $('#bgm').prop('volume', bgmVolume);
+    isBgmPlaying = true;
+  }
+});
+
+socket.on('off bgm from server', () => {
+  $('#bgm').remove();
+  isBgmPlaying = false;
+});
+
+socket.on('bgm volume from server', (volume) => {
+  if (volume === 'up') {
+    bgmVolume += 0.01;
+    $('#bgm').prop('volume', bgmVolume);
+  } else {
+    bgmVolume -= 0.01;
+    if (bgmVolume < 0) {
+      bgmVolume = 0;
+    }
+    $('#bgm').prop('volume', bgmVolume);
+  }
+});
+
+socket.on('get virtual character audio from server', async () => {
+  $('body').append(`
+    <iframe src="https://lc-project.s3.ap-northeast-2.amazonaws.com/overlay-audio/${email}/${liveShoppingId}/voice"
+     id="virtual-voice" allow="autoplay" style="display:none"></iframe>
+    `);
+});
+
+socket.on('get chicken move from server', async () => {
+  $('.chicken-move').css({ display: 'flex' });
+  chickenMovement();
+  await setTimeout(() => {
+    $('.chicken-move').hide();
+  }, 15000);
+});
+
+// socket.on('reset theme from server', () => {
+//   $('.ranking-area, .ranking-text-area, .bottom-timer, .bottom-area-left').removeClass(
+//     currentThemeType,
+//   );
+// });
 
 export {};

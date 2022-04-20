@@ -20,11 +20,8 @@ socket.on('creator list from server', (data) => {
   if (data && data.length !== 0) {
     $('#connection-status').text('✔️ 정상');
     $('.admin-to-bc-live-state-board-box button').attr('disabled', false);
-    $('#panel-activate-checkbox').attr('disabled', false);
   } else {
     $('#connection-status').text('❌ 연결되지 않음');
-    $('.mid-area button').attr('disabled', true);
-    $('#panel-activate-checkbox').attr('disabled', true);
   }
 });
 
@@ -32,7 +29,7 @@ $(document).ready(function ready() {
   let liveShoppingStateBoardController; // 관리자 메시지 보내기(방송인 현황판 표시) 컨트롤러, liveShoppingId 할당될때 생성
 
   $('.mid-area button').attr('disabled', true);
-  $('#panel-activate-checkbox').attr('disabled', true);
+
   const tzoffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
   const localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
   $('table#liveshopping-table').DataTable({
@@ -183,36 +180,33 @@ $(document).ready(function ready() {
           ],
         });
 
-        // hbs가 컴파일하여 파싱한 이후에, 이벤트 새로 등록해줘야 함.
-        $('.delete-message-button').click(function deleteMessageButtonClick() {
-          const messageId = $(this)
-            .closest('tr')
-            .children('td.message-id-cell')
-            .attr('id');
-
-          $.ajax({
-            type: 'DELETE',
-            url: `${process.env.OVERLAY_CONTROLLER_HOST}/purchase-message`,
-            dataType: 'json',
-            data: { messageId },
-            success() {
-              getPurchaseMessage();
-            },
-            error(error) {
-              console.log(error);
-            },
-          });
-        });
         $('.delete-message-button').attr(
           'disabled',
           !$('#panel-activate-checkbox').prop('checked'),
         );
       },
+
       error(error) {
         console.log(error);
       },
     });
   }
+
+  $('#message-tbody').on('click', 'button', function deleteMessageButtonClick() {
+    const messageId = $(this).closest('tr').children('td.message-id-cell').attr('id');
+    $.ajax({
+      type: 'DELETE',
+      url: `${process.env.OVERLAY_CONTROLLER_HOST}/purchase-message`,
+      dataType: 'json',
+      data: { messageId },
+      success() {
+        getPurchaseMessage();
+      },
+      error(error) {
+        console.log(error);
+      },
+    });
+  });
 
   $('.socket-id-button').click(function socketIdButtonClickEvent() {
     liveShoppingId = $(this).closest('tr').children('td.liveshopping-id-cell').attr('id');
@@ -298,6 +292,30 @@ $(document).ready(function ready() {
       .prop('disabled', (_, val) => !val);
   });
 
+  $('#screen-control-activate-checkbox').click(function screenControlActivateButton() {
+    $('.screen-control-box')
+      .find('button')
+      .prop('disabled', (_, val) => !val);
+  });
+
+  $('#action-control-activate-checkbox').click(function actionControlActivateButton() {
+    $('.action-control-box')
+      .find('button')
+      .prop('disabled', (_, val) => !val);
+  });
+
+  $('#objective-control-activate-checkbox').click(function objecectiveActivateButton() {
+    $('.objective-box')
+      .find('button')
+      .prop('disabled', (_, val) => !val);
+  });
+
+  $('#bottom-message-activate-checkbox').click(function bottomMessageActivateButton() {
+    $('.bottom-message-box')
+      .find('button')
+      .prop('disabled', (_, val) => !val);
+  });
+
   $('#liveshopping-id-button').click(function liveShoppingIdButtonClickEvent() {
     const productName = $('#product-name').val().trim();
     const streamerAndProduct = { streamerNickname, productName };
@@ -322,6 +340,10 @@ $(document).ready(function ready() {
 
   $('#product-name-send-button').click(function startTimeSendButtonClickEvent() {
     const productName = $('#product-name').val().trim();
+    if (productName.length === 0) {
+      alert('상품명을 작성해주세요');
+      return;
+    }
     const streamerAndProduct = { streamerNickname, productName };
     socket.emit('get product name from admin', {
       roomName,
@@ -348,12 +370,14 @@ $(document).ready(function ready() {
       $('#standard-price').attr('disabled', false);
       $('#product-name').attr('disabled', false);
       $('#fan-nickname').attr('disabled', false);
+      $('input[name="tts-type"]').attr('disabled', false);
       $('.message-box-lock-button').toggleClass('locked');
       $('.message-box-lock-button').text('잠금');
     } else {
       $('#standard-price').attr('disabled', true);
       $('#product-name').attr('disabled', true);
       $('#fan-nickname').attr('disabled', true);
+      $('input[name="tts-type"]').attr('disabled', true);
       $('.message-box-lock-button').toggleClass('locked');
       $('.message-box-lock-button').text('해제');
     }
@@ -389,22 +413,38 @@ $(document).ready(function ready() {
     }
 
     const price = $('#objective-message-price').val();
+    if (!nickname) {
+      alert('닉네임을 입력해주세요');
+      return;
+    }
+    if (!price) {
+      alert('가격을 입력해주세요');
+      return;
+    }
     socket.emit('get objective message from admin', {
       roomName,
       objective: { nickname, price },
       liveShoppingId,
     });
-    $('#objective-message').val(null);
+    $('#objective-message-nickname').val(null);
+    $('#objective-message-price').val(null);
+    $('#objective-price').val(null);
   });
 
   $('#objective-button').click(function objectiveButtonClickEvent() {
     const price = $('#objective-price').val();
+    if (!price) {
+      alert('가격을 입력해주세요');
+      return;
+    }
     socket.emit('get objective firework from admin', {
       roomName,
       objective: { price },
       liveShoppingId,
     });
-    $('#objective-message').val(null);
+    $('#objective-message-nickname').val(null);
+    $('#objective-message-price').val(null);
+    $('#objective-price').val(null);
   });
 
   $('#calling-button').click(function callingButtonClickEvent() {
@@ -439,10 +479,42 @@ $(document).ready(function ready() {
     },
   );
 
+  $('.theme-selction-box-button').click(function themeButtonOnclick() {
+    socket.emit('change theme from admin', { roomName, themeType: this.id });
+  });
+
+  $('#chicken-movement-button').click(function chickenMovementButtonClickEvent() {
+    socket.emit('get chicken move from admin', roomName);
+  });
+
+  $('.start-bgm-button').click(function startBgmButton() {
+    const bgmNumber = $(this).val();
+    socket.emit('start bgm from admin', { roomName, bgmNumber });
+  });
+
+  $('#off-bgm-button').click(function offBgmButton() {
+    socket.emit('off bgm from admin', roomName);
+  });
+
+  $('.bgm-volume-button').click(function volumeButton() {
+    const volume = $(this).val();
+    socket.emit('bgm volume from admin', { roomName, volume });
+  });
+
+  $('#hide-vertical-banner').click(function hideVerticalBanner() {
+    socket.emit('hide vertical-banner from admin', roomName);
+  });
+
+  $('#combo-reset-button').click(function resetCombo() {
+    socket.emit('combo reset from admin', roomName);
+  });
+
   $('form').submit(function formSubmit(event) {
     event.preventDefault();
+
     let level;
 
+    const ttsSetting = $('input[name="tts-type"]:checked').val();
     const standardPrice = Number($('#standard-price').val());
     const productName = $('#product-name').val().trim();
     const soldPrice = Number($('#sold-price').val());
@@ -452,6 +524,18 @@ $(document).ready(function ready() {
     const giftFlag = $('input[name="gift"]:checked').val() === 'yes';
     const isOnlyDb = $('#insert-only-db-checkbox').is(':checked');
 
+    if (!ttsSetting) {
+      alert('TTS 타입을 설정해주세요');
+      return;
+    }
+    if (!customerNickname) {
+      alert('구매자를 입력해주세요');
+      return;
+    }
+    if (!soldPrice) {
+      alert('구매 금액을 입력해주세요');
+      return;
+    }
     isLogin = !$('input[name=client-checkbox]').is(':checked');
 
     if (giftFlag) {
@@ -491,6 +575,7 @@ $(document).ready(function ready() {
           }, 3000);
           return;
         }
+
         if (isLogin) {
           socket.emit('right top purchase message', {
             roomName,
@@ -499,6 +584,7 @@ $(document).ready(function ready() {
             purchaseNum: soldPrice,
             nickname: customerNickname,
             message: customerMessage,
+            ttsSetting,
           });
         } else {
           socket.emit('get non client purchase message from admin', {

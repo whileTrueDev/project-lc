@@ -250,4 +250,23 @@ export class AppScreenGateway
   deleteVirtualCharacterAudio(@MessageBody() roomName: string): void {
     this.server.to(roomName).emit('delete virtual character audio from server');
   }
+
+  @SubscribeMessage('change theme from admin')
+  changeTheme(
+    @MessageBody() roomNameAndThemeType: { roomName: string; themeType: string },
+  ): void {
+    const { roomName } = roomNameAndThemeType;
+    const { themeType } = roomNameAndThemeType;
+    this.server.to(roomName).emit('change theme from server', themeType);
+  }
+
+  @SubscribeMessage('get chicken move from admin')
+  getChickenMovement(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('get chicken move from server');
+  }
+
+  @SubscribeMessage('hide vertical-banner from admin')
+  hideVerticalBanner(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('hide vertical-banner from server');
+  }
 }
