@@ -241,7 +241,7 @@ model Goods {
   coupons              Coupon[] // 상품에 적용가능한 쿠폰
   searchKeyword        String? // ',' 구분자로 하는 검색키워드의 문자열
   cartItems            CartItem[] // 연결된 장바구니 상품
-  orrderItems          OrderItem[] // 연결된 주문상품
+  orderItems           OrderItem[] // 연결된 주문상품
   reviews              GoodsReview[] // 작성된 리뷰
   informationSubjectId Int? // 정보제공고시 품목고유번호
   informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
@@ -1514,7 +1514,7 @@ model Order {
   customer                   Customer?                    @relation(fields: [customerId], references: [id], onDelete: SetNull)
   payment                    OrderPayment? // 주문결제정보
   step                       OrderProcessStep             @default(orderReceived) // 주문상태
-  createDate                 DateTime // 주문생성일시
+  createDate                 DateTime                     @default(now()) // 주문생성일시
   orderPrice                 Int // 주문금액 = 실제 주문 상품/상품옵션 의 금액 합
   paymentPrice               Int // 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한 금액
   recipientName              String // 받는사람명
@@ -1534,6 +1534,7 @@ model Order {
   bundleFlag                 Boolean                      @default(false) // 묶음배송여부
   purchaseConfirmationDate   DateTime? // 구매확정일자
   cashReceipts               String? // 현금영수증번호
+  deleteFlag                 Boolean?                     @default(false) // 삭제여부
   mileageLogs                CustomerMileageLog[] // 사용 & 적립 마일리지 내역
   orderItems                 OrderItem[] // 주문에 연결된 주문상품들
   refunds                    Refund[] // 주문에 연결된 환불정보
@@ -1617,6 +1618,7 @@ model OrderItemOption {
   id                     Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
   orderItemId            Int // 옵션이 연결된 주문 상품 고유번호
   orderItem              OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
+  goodsOptionId          Int // 참조하는 상품옵션 고유번호
   name                   String? // 주문했을 당시 옵션명
   value                  String? // 주문했을 당시 옵션값
   quantity               Int // 옵션 선택 수량(개수)
