@@ -57,6 +57,7 @@
       "@project-lc/nest-modules-notification": [
         "libs/nest-modules-notification/src/index.ts"
       ],
+      "@project-lc/nest-modules-order": ["libs/nest-modules-order/src/index.ts"],
       "@project-lc/nest-modules-order-cancel": [
         "libs/nest-modules-order-cancel/src/index.ts"
       ],
