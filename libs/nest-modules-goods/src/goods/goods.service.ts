@@ -6,7 +6,14 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { GoodsImages, GoodsView, Seller } from '@prisma/client';
+import {
+  GoodsImages,
+  GoodsView,
+  Prisma,
+  Seller,
+  GoodsInformationNotice,
+  GoodsInformationSubject,
+} from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -22,6 +29,9 @@ import {
   GoodsOptionWithStockInfo,
   RegistGoodsDto,
   TotalStockInfo,
+  GoodsInformationSubjectDto,
+  GoodsInformationNoticeDto,
+  GoodsInformationSubjectItems,
 } from '@project-lc/shared-types';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
@@ -139,11 +149,28 @@ export class GoodsService extends ServiceBaseWithCache {
     sort,
     direction,
     groupId,
-  }: GoodsListDto & { sellerId?: number }): Promise<GoodsListRes> {
+    goodsName,
+    categoryId,
+  }: GoodsListDto & {
+    sellerId?: number;
+    goodsName?: string;
+    categoryId?: number;
+  }): Promise<GoodsListRes> {
     const items = await this.prisma.goods.findMany({
       skip: page * itemPerPage,
       take: itemPerPage,
-      where: { seller: { id: sellerId }, shippingGroupId: groupId },
+      where: {
+        seller: { id: sellerId },
+        shippingGroupId: groupId,
+        goods_name: {
+          search: goodsName ? goodsName.trim() : undefined,
+        },
+        categories: {
+          some: {
+            id: categoryId,
+          },
+        },
+      },
       orderBy: [{ [sort]: direction }],
       include: {
         options: {
@@ -442,7 +469,16 @@ export class GoodsService extends ServiceBaseWithCache {
     goodsId: number;
   }> {
     try {
-      const { options, image, shippingGroupId, goodsInfoId, ...goodsData } = dto;
+      const {
+        options,
+        image,
+        shippingGroupId,
+        goodsInfoId,
+        categoryId,
+        informationSubjectId,
+        informationNoticeId,
+        ...goodsData
+      } = dto;
       const optionsData = options.map((opt) => {
         const { supply, ...optData } = opt;
         return {
@@ -467,6 +503,21 @@ export class GoodsService extends ServiceBaseWithCache {
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
           confirmation: { create: { status: 'waiting' } },
+          informationSubject: {
+            connect: {
+              id: informationSubjectId,
+            },
+          },
+          informationNotice: {
+            connect: {
+              id: informationNoticeId,
+            },
+          },
+          categories: {
+            connect: {
+              id: categoryId,
+            },
+          },
         },
       });
       await this._clearCaches(this.#GOODS_CACHE_KEY);
@@ -476,6 +527,30 @@ export class GoodsService extends ServiceBaseWithCache {
       console.error(error);
       throw new InternalServerErrorException(error);
     }
+  }
+
+  /** 상품 제공 공시 */
+  async registGoodsInformationNotice(
+    dto: GoodsInformationNotice['contents'],
+  ): Promise<GoodsInformationNotice> {
+    const _json = dto as Prisma.JsonObject;
+    return this.prisma.goodsInformationNotice.create({
+      data: {
+        contents: _json,
+      },
+    });
+  }
+
+  /** 상품 품목 */
+  async registGoodsInformationSubject(
+    dto: GoodsInformationSubjectDto,
+  ): Promise<GoodsInformationSubject> {
+    return this.prisma.goodsInformationSubject.create({
+      data: {
+        subject: dto.subject,
+        items: dto.items,
+      },
+    });
   }
 
   /** 여러 상품이미지 등록 - 생성된 goodsImage[] 리턴 */
@@ -596,6 +671,8 @@ export class GoodsService extends ServiceBaseWithCache {
       image,
       shippingGroupId,
       goodsInfoId,
+      informationSubjectId,
+      informationNoticeId,
       ...goodsData
     } = dto;
 
@@ -636,6 +713,16 @@ export class GoodsService extends ServiceBaseWithCache {
             ? { connect: { id: shippingGroupId } }
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
+          informationSubject: {
+            connect: {
+              id: informationSubjectId,
+            },
+          },
+          informationNotice: {
+            connect: {
+              id: informationNoticeId,
+            },
+          },
           confirmation: {
             update: {
               status: prevStatus === 'waiting' ? 'waiting' : 'needReconfirmation',

@@ -113,4 +113,17 @@ export class RegistGoodsDto {
   @IsOptional()
   @IsNumber()
   goodsInfoId?: number;
+
+  @IsOptional()
+  @IsString()
+  searchKeyword?: string;
+
+  @IsNumber()
+  categoryId: number;
+
+  @IsNumber()
+  informationSubjectId: number;
+
+  @IsNumber()
+  informationNoticeId: number;
 }
