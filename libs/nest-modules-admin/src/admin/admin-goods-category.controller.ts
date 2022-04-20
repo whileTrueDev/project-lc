@@ -7,10 +7,11 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { GoodsCategory } from '@prisma/client';
-// import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { GoodsCategoryService } from '@project-lc/nest-modules-goods-category';
 import {
   CreateGoodsCategoryDto,
@@ -21,7 +22,7 @@ import {
 /** ================================= */
 // 카테고리 GoodsCaregory
 /** ================================= */
-// @UseGuards(JwtAuthGuard, AdminGuard)
+@UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin/goods-category')
 export class AdminGoodsCategoryController {
   constructor(private readonly categoryService: GoodsCategoryService) {}
