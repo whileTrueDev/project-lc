@@ -1,4 +1,4 @@
-import { IsJSON, IsString } from 'class-validator';
+import { IsJSON, IsNumber, IsString } from 'class-validator';
 import { Prisma } from '@prisma/client';
 
 export interface GoodsInformationSubjectItems {
@@ -7,6 +7,9 @@ export interface GoodsInformationSubjectItems {
 }
 
 export class GoodsInformationSubjectDto {
+  @IsNumber()
+  id: number;
+
   @IsString()
   subject: string;
 

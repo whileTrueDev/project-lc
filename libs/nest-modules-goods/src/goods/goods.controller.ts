@@ -14,7 +14,11 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { GoodsImages } from '@prisma/client';
+import {
+  GoodsImages,
+  GoodsInformationNotice,
+  GoodsInformationSubject,
+} from '@prisma/client';
 import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -27,10 +31,12 @@ import {
   RegistGoodsDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
+  GoodsInformationNoticeDto,
+  GoodsInformationSubjectDto,
 } from '@project-lc/shared-types';
 import { GoodsService } from './goods.service';
 
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @Controller('goods')
 export class GoodsController {
@@ -137,6 +143,22 @@ export class GoodsController {
     @Body() dto: RegistGoodsDto,
   ): Promise<{ goodsId: number }> {
     return this.goodsService.registGoods(seller.id, dto);
+  }
+
+  /** 상품제공고시 수정 */
+  @Put('/goods-information-notice')
+  updateGoodsInformationNotice(
+    @Body() dto: GoodsInformationNoticeDto,
+  ): Promise<GoodsInformationNotice> {
+    return this.goodsService.updateGoodsInformationNotice(dto);
+  }
+
+  /** 상품공고시 품목 수정 */
+  @Put('/goods-information-subject')
+  updateGoodsInformationSubject(
+    @Body() dto: GoodsInformationSubjectDto,
+  ): Promise<GoodsInformationSubject> {
+    return this.goodsService.updateGoodsInformationSubject(dto);
   }
 
   /** 상품 개별 조회 */

@@ -476,7 +476,7 @@ export class GoodsService extends ServiceBaseWithCache {
         goodsInfoId,
         categoryId,
         informationSubjectId,
-        informationNoticeId,
+        informationNoticeContents,
         ...goodsData
       } = dto;
       const optionsData = options.map((opt) => {
@@ -508,18 +508,19 @@ export class GoodsService extends ServiceBaseWithCache {
               id: informationSubjectId,
             },
           },
-          informationNotice: {
-            connect: {
-              id: informationNoticeId,
-            },
-          },
           categories: {
             connect: {
               id: categoryId,
             },
           },
+          informationNotice: {
+            create: {
+              contents: informationNoticeContents,
+            },
+          },
         },
       });
+
       await this._clearCaches(this.#GOODS_CACHE_KEY);
 
       return { goodsId: goods.id };
@@ -529,23 +530,53 @@ export class GoodsService extends ServiceBaseWithCache {
     }
   }
 
-  /** 상품 제공 공시 */
+  /** 상품 제공 공시 등록 */
   async registGoodsInformationNotice(
-    dto: GoodsInformationNotice['contents'],
+    dto: GoodsInformationNoticeDto,
   ): Promise<GoodsInformationNotice> {
-    const _json = dto as Prisma.JsonObject;
     return this.prisma.goodsInformationNotice.create({
       data: {
-        contents: _json,
+        goodsId: dto.goodsId,
+        contents: dto.contents,
       },
     });
   }
 
-  /** 상품 품목 */
+  /** 상품 품목 등록 */
   async registGoodsInformationSubject(
     dto: GoodsInformationSubjectDto,
   ): Promise<GoodsInformationSubject> {
     return this.prisma.goodsInformationSubject.create({
+      data: {
+        subject: dto.subject,
+        items: dto.items,
+      },
+    });
+  }
+
+  /** 상품 제공 공시 수정 */
+  async updateGoodsInformationNotice(
+    dto: GoodsInformationNoticeDto,
+  ): Promise<GoodsInformationNotice> {
+    return this.prisma.goodsInformationNotice.update({
+      where: {
+        id: dto.id,
+      },
+      data: {
+        goodsId: dto.goodsId,
+        contents: dto.contents,
+      },
+    });
+  }
+
+  /** 상품 품목 수정 */
+  async updateGoodsInformationSubject(
+    dto: GoodsInformationSubjectDto,
+  ): Promise<GoodsInformationSubject> {
+    return this.prisma.goodsInformationSubject.update({
+      where: {
+        id: dto.id,
+      },
       data: {
         subject: dto.subject,
         items: dto.items,
