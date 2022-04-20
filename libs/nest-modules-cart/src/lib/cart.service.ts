@@ -87,9 +87,39 @@ export class CartService {
     return result.count;
   }
 
-  /** 특정 카트 상품 삭제 */
-  public async delete(cartItemId: CartItem['id']): Promise<boolean> {
-    const result = await this.prisma.cartItem.delete({ where: { id: cartItemId } });
-    return !!result;
+  /** 특정 카트 상품 또는 상품옵션 삭제 */
+  public async delete({
+    cartItemId,
+    cartItemOptionId,
+  }: {
+    cartItemId?: CartItem['id'];
+    cartItemOptionId?: CartItemOption['id'];
+  }): Promise<boolean> {
+    if (!(cartItemId || cartItemOptionId)) return false;
+    // 상품 삭제
+    if (cartItemId) {
+      const result = await this.prisma.cartItem.delete({ where: { id: cartItemId } });
+      return !!result;
+    }
+    // 상품 옵션 삭제
+    if (cartItemOptionId) {
+      const result = await this.prisma.cartItemOption.delete({
+        where: { id: cartItemOptionId },
+      });
+      // 해당 카트상품옵션과 연결된 카트상품의 남은 옵션 개수 조회
+      const restOptionsCount = await this.prisma.cartItemOption.count({
+        where: { cartItemId: result.cartItemId },
+      });
+      // 해당 카트상품옵션과 연결된 카트상품에 연결된 옵션이 없는 경우
+      if (!(restOptionsCount > 0)) {
+        // 해당 카트상품 삭제
+        const result2 = await this.prisma.cartItem.delete({
+          where: { id: result.cartItemId },
+        });
+        return !!result2;
+      }
+      return !!result;
+    }
+    return false;
   }
 }

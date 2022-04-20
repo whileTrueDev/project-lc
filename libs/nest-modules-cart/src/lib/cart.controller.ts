@@ -41,14 +41,6 @@ export class CartController {
     return this.cartService.create(dto);
   }
 
-  /** 특정 카트 상품 삭제 */
-  @Delete(':cartItemId')
-  delete(
-    @Param('cartItemId', ParseIntPipe) cartItemId: CartItem['id'],
-  ): Promise<boolean> {
-    return this.cartService.delete(cartItemId);
-  }
-
   /** 특정 카트 상품 개수 수정 */
   @Patch('option/:optionId')
   updateCartItemOptionQuantity(
@@ -56,6 +48,14 @@ export class CartController {
     @Body(ValidationPipe) dto: CartItemOptionQuantityDto,
   ): Promise<CartItemOption> {
     return this.cartService.update(optionId, dto.quantity);
+  }
+
+  /** 특정 카트 상품 옵션 삭제 */
+  @Delete('option/:optionId')
+  delete(
+    @Param('optionId', ParseIntPipe) optionId: CartItemOption['id'],
+  ): Promise<boolean> {
+    return this.cartService.delete({ cartItemOptionId: optionId });
   }
 
   /** temp유저의 카트 목록을 특정 소비자에게 이관 */
