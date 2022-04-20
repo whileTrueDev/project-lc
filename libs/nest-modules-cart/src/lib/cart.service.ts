@@ -22,6 +22,7 @@ export class CartService {
         support: true,
         goods: {
           select: {
+            image: true,
             goods_name: true,
             seller: { select: { sellerShop: { select: { shopName: true } } } },
           },
@@ -32,6 +33,23 @@ export class CartService {
 
   /** 카트 상품 생성 */
   public async create(dto: CartItemDto): Promise<CartItem> {
+    // 이미 카트에 등록된 상품인지 확인
+    const alreadyInserted = await this.prisma.cartItem.findFirst({
+      where: {
+        OR: [{ customerId: dto.customerId }, { tempUserId: dto.tempUserId }],
+        AND: { goodsId: dto.goodsId },
+      },
+    });
+    // 이미 카트에 등록된 상품에 옵션을 추가할 때
+    if (alreadyInserted) {
+      await this.prisma.cartItemOption.createMany({
+        data: dto.options.map((o) => ({
+          ...o,
+          cartItemId: alreadyInserted.id,
+        })),
+      });
+      return alreadyInserted;
+    }
     return this.prisma.cartItem.create({
       data: {
         goodsId: dto.goodsId,
@@ -40,19 +58,7 @@ export class CartService {
         shippingCost: dto.shippingCost,
         shippingCostIncluded: dto.shippingCostIncluded,
         shippingGroupId: dto.shippingGroupId,
-        options: {
-          createMany: {
-            data: dto.options.map((o) => ({
-              discountPrice: o.discountPrice,
-              normalPrice: o.normalPrice,
-              quantity: o.quantity,
-              name: o.name,
-              value: o.value,
-              weight: o.weight,
-              goodsOptionsId: o.goodsOptionsId,
-            })),
-          },
-        },
+        options: { createMany: { data: dto.options } },
         support: {
           create: {
             broadcasterId: dto.support.broadcasterId,

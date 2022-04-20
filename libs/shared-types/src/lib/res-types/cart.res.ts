@@ -3,6 +3,7 @@ import {
   CartItemOption,
   CartItemSupport,
   Goods,
+  GoodsImages,
   SellerShop,
   // ShippingCost,
   // ShippingGroup,
@@ -22,6 +23,7 @@ export type CartItemRes = Array<
     // };
   } & {
     goods: {
+      image: GoodsImages[];
       goods_name: Goods['goods_name'];
       seller: {
         sellerShop: {
