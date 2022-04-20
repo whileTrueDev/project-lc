@@ -34,7 +34,7 @@ export class CartItemSupportDto {
 export class CartItemDto {
   @IsNumber() goodsId: CartItem['goodsId'];
   @IsOptional() @IsNumber() customerId?: CartItem['customerId'];
-  @IsOptional() @IsNumber() tempUserId?: CartItem['tempUserId'];
+  @IsOptional() @IsString() tempUserId?: CartItem['tempUserId'];
   @IsNumber() shippingGroupId: CartItem['shippingGroupId'];
   @IsDecimal() shippingCost: CartItem['shippingCost'];
   @IsBoolean() shippingCostIncluded: CartItem['shippingCostIncluded'];
