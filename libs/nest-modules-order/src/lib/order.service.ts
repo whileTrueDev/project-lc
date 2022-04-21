@@ -3,7 +3,7 @@ import { Order, Prisma } from '@prisma/client';
 import { ServiceBaseWithCache, UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { CreateOrderDto } from '@project-lc/shared-types';
+import { CreateOrderDto, GetOrderListDto } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
 import dayjs = require('dayjs');
 
@@ -82,6 +82,25 @@ export class OrderService extends ServiceBaseWithCache {
     );
   }
 
+  private removeNonmemberOrderPassword(order: Order): Order {
+    return {
+      ...order,
+      nonMemberOrderPassword: undefined,
+    };
+  }
+
+  private removerecipientInfo(order: Order): Order {
+    return {
+      ...order,
+      recipientName: '',
+      recipientPhone: '',
+      recipientEmail: '',
+      recipientAddress: '',
+      recipientDetailAddress: '',
+      recipientPostalCode: '',
+    };
+  }
+
   /** 주문생성 */
   async createOrder(dto: CreateOrderDto): Promise<Order> {
     const { customerId, ...data } = dto;
@@ -139,20 +158,58 @@ export class OrderService extends ServiceBaseWithCache {
 
     // 선물주문인경우 생성된 주문데이터에서 받는사람(방송인) 정보 삭제하고 리턴
     if (order.giftFlag) {
-      return {
-        ...order,
-        recipientName: '',
-        recipientPhone: '',
-        recipientEmail: '',
-        recipientAddress: '',
-        recipientDetailAddress: '',
-        recipientPostalCode: '',
-      };
+      return this.removerecipientInfo(order);
     }
     return order;
   }
 
-  /** 주문목록조회 */
+  // 주문목록조회시 findMany에 넘길 Object
+  private getOrderFindManyInput(take?: number, skip?: number): Prisma.OrderFindManyArgs {
+    return {
+      take,
+      skip,
+      include: {
+        orderItems: {
+          include: {
+            options: true,
+            goods: {
+              select: {
+                id: true,
+                goods_name: true,
+                image: true,
+              },
+            },
+          },
+        },
+        payment: true,
+      },
+    };
+  }
+
+  /** 특정 소비자의 주문목록 조회 - 선물주문인 경우 받는사람 정보 삭제 */
+  async getCustomerOrderList(dto: GetOrderListDto): Promise<Order[]> {
+    const { customerId, take, skip } = dto;
+
+    const orders = await this.prisma.order.findMany({
+      ...this.getOrderFindManyInput(take, skip),
+      where: {
+        customerId,
+        deleteFlag: false,
+      },
+    });
+
+    return orders.map((order) => {
+      if (order.giftFlag) return this.removerecipientInfo(order);
+      if (order.nonMemberOrderFlag) return this.removeNonmemberOrderPassword(order);
+      return order;
+    });
+  }
+
+  /** 전체 주문목록 조회 */
+  async getOrderList(dto: GetOrderListDto): Promise<Order[]> {
+    const { take, skip } = dto;
+    return this.prisma.order.findMany(this.getOrderFindManyInput(take, skip));
+  }
 
   /** 개별주문조회 */
 

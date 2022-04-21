@@ -20,6 +20,8 @@ import {
   ValidateNested,
 } from 'class-validator';
 
+// ------------------생성 dto--------------------
+
 /** 주문상품후원 OrderItemSupport 생성 dto */
 export class CreateOrderItemSupportDto {
   @IsString()
@@ -212,4 +214,20 @@ export class CreateOrderDto {
   // @IsNotEmptyObject()
   @IsOptional()
   payment?: OrderPayment;
+}
+
+// ------------------조회 dto--------------------
+
+export class GetOrderListDto {
+  @IsNumber()
+  readonly take: number = 10;
+
+  @IsNumber()
+  @IsOptional()
+  skip?: number;
+
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  customerId?: number;
 }
