@@ -30,4 +30,4 @@ ALTER TABLE `PrivacyApproachHistory` ADD COLUMN `reason` VARCHAR(191) NULL;
 CREATE UNIQUE INDEX `GoodsInformationNotice_goodsId_key` ON `GoodsInformationNotice`(`goodsId`);
 
 -- AddForeignKey
-ALTER TABLE `GoodsInformationNotice` ADD CONSTRAINT `GoodsInformationNotice_goodsId_fkey` FOREIGN KEY (`goodsId`) REFERENCES `Goods`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `GoodsInformationNotice` ADD CONSTRAINT `GoodsInformationNotice_goodsId_fkey` FOREIGN KEY (`goodsId`) REFERENCES `Goods`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
