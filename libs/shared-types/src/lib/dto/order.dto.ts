@@ -4,6 +4,7 @@ import {
   OrderItemOption,
   OrderItemSupport,
   OrderPayment,
+  OrderProcessStep,
   SellType,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
@@ -217,7 +218,7 @@ export class CreateOrderDto {
 }
 
 // ------------------조회 dto--------------------
-
+/** 주문 목록 조회 dto */
 export class GetOrderListDto {
   @IsNumber()
   readonly take: number = 10;
@@ -230,4 +231,116 @@ export class GetOrderListDto {
   @IsNumber()
   @IsOptional()
   customerId?: number;
+}
+
+/** 비회원 주문 조회 dto */
+export class GetNonMemberOrderDetailDto {
+  @IsString()
+  orderCode: string;
+
+  @IsString()
+  password: string;
+}
+
+// ------------------수정 dto--------------------
+/** 주문 수정 dto */
+export class UpdateOrderDto {
+  /** 소비자 고유번호 */
+  @IsNumber()
+  @IsOptional()
+  customerId?: Order['customerId'];
+
+  @IsEnum(OrderProcessStep)
+  @IsOptional()
+  step?: Order['step'];
+
+  /** 비회원 주문인 경우 true로 보냄. @default(false) */
+  @IsBoolean()
+  @IsOptional()
+  nonMemberOrderFlag?: Order['nonMemberOrderFlag'];
+
+  /** 비회원 주문인 경우 입력받는 비밀번호 - 비회원이 주문조회, 취소시 사용할예정, 비회원주문인경우에만 validate */
+  @IsString()
+  @IsOptional()
+  nonMemberOrderPassword?: Order['nonMemberOrderPassword'];
+
+  /** 주문금액 = 실제 주문 상품/상품옵션 의 금액 합 */
+  @IsNumber()
+  @IsOptional()
+  orderPrice?: Order['orderPrice'];
+
+  /** 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한 금액 */
+  @IsNumber()
+  @IsOptional()
+  paymentPrice?: Order['paymentPrice'];
+
+  /** 받는사람명 */
+  @IsString()
+  @IsOptional()
+  recipientName?: Order['recipientName'];
+
+  /** 받는사람 연락처 */
+  @IsString()
+  @IsOptional()
+  recipientPhone?: Order['recipientPhone'];
+
+  /** 받는사람 이메일 */
+  @IsEmail()
+  @IsOptional()
+  recipientEmail?: Order['recipientEmail'];
+
+  /** 받는사람 주소(배송지) 도로명 */
+  @IsString()
+  @IsOptional()
+  recipientAddress?: Order['recipientAddress'];
+
+  /** 받는사람 주소(배송지) 주소 상세 */
+  @IsString()
+  @IsOptional()
+  recipientDetailAddress?: Order['recipientDetailAddress'];
+
+  /** 받는사람 주소(배송지) 우편 번호 */
+  @IsString()
+  @IsOptional()
+  recipientPostalCode?: Order['recipientPostalCode'];
+
+  /** 주문자명 */
+  @IsString()
+  @IsOptional()
+  ordererName?: Order['ordererName'];
+
+  /** 주문자 연락처 */
+  @IsString()
+  @IsOptional()
+  ordererPhone?: Order['ordererPhone'];
+
+  /** 주문자 이메일 */
+  @IsEmail()
+  @IsOptional()
+  ordererEmail?: Order['ordererEmail'];
+
+  /** 배송메시지 */
+  @IsString()
+  @IsOptional()
+  memo?: Order['memo'];
+
+  /** 선물주문 여부/ @default(false) */
+  @IsBoolean()
+  @IsOptional()
+  giftFlag?: Order['giftFlag'];
+
+  /** 후원상품 포함여부 @default(false) */
+  @IsBoolean()
+  @IsOptional()
+  supportOrderIncludeFlag?: Order['supportOrderIncludeFlag'];
+
+  /** 묶음배송여부 @default(false) */
+  @IsBoolean()
+  @IsOptional()
+  bundleFlag?: Order['bundleFlag'];
+
+  /** String? // 현금영수증번호 */
+  @IsString()
+  @IsOptional()
+  cashReceipts?: Order['cashReceipts'];
 }
