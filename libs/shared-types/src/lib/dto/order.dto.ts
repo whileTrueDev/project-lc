@@ -1,9 +1,10 @@
 import {
-  SellType,
   Order,
   OrderItem,
   OrderItemOption,
   OrderItemSupport,
+  OrderPayment,
+  SellType,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
@@ -205,4 +206,11 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => CreateOrderItemDto)
   orderItems: CreateOrderItemDto[];
+
+  /** 주문에 연결된 결제정보 
+   // TODO: 결제api 작업 후 IsOptional(), optional? 삭제 하여 결제정보가 있는 주문만 생성 가능하도록 해야함
+   */
+  // @IsNotEmptyObject()
+  @IsOptional()
+  payment?: OrderPayment;
 }
