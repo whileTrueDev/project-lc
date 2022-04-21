@@ -29,11 +29,10 @@ export class OrderService extends ServiceBaseWithCache {
     dto: CreateOrderDto,
   ): Promise<Partial<Prisma.OrderCreateInput>> {
     const { nonMemberOrderFlag, nonMemberOrderPassword } = dto;
+    const hashedPassword = await this.hash(nonMemberOrderPassword);
     return {
       nonMemberOrderFlag,
-      nonMemberOrderPassword: nonMemberOrderFlag
-        ? await this.hash(nonMemberOrderPassword)
-        : undefined,
+      nonMemberOrderPassword: hashedPassword,
     };
   }
 
@@ -99,7 +98,7 @@ export class OrderService extends ServiceBaseWithCache {
 
     // 비회원 주문의 경우 비밀번호 해시처리
     if (nonMemberOrderFlag) {
-      createInput = { ...createInput, ...this.handleNonMemberOrder(dto) };
+      createInput = { ...createInput, ...(await this.handleNonMemberOrder(dto)) };
     }
 
     // 선물하기의 경우(주문상품은 1개, 후원데이터가 존재함)
@@ -137,6 +136,19 @@ export class OrderService extends ServiceBaseWithCache {
     });
 
     // TODO: 주문 생성 후 장바구니 비우기
+
+    // 선물주문인경우 생성된 주문데이터에서 받는사람(방송인) 정보 삭제하고 리턴
+    if (order.giftFlag) {
+      return {
+        ...order,
+        recipientName: '',
+        recipientPhone: '',
+        recipientEmail: '',
+        recipientAddress: '',
+        recipientDetailAddress: '',
+        recipientPostalCode: '',
+      };
+    }
     return order;
   }
 
