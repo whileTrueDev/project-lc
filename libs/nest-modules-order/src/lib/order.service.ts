@@ -1,9 +1,9 @@
 import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Order, Prisma } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
+import { ServiceBaseWithCache, UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { CreateOrderDto, CreateOrderItemDto } from '@project-lc/shared-types';
+import { CreateOrderDto } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -13,21 +13,24 @@ export class OrderService extends ServiceBaseWithCache {
   constructor(
     private readonly prisma: PrismaService,
     private readonly broadcasterService: BroadcasterService,
+    private readonly userPwManager: UserPwManager,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);
   }
 
-  private hash(pw: string): string {
-    return `${pw}hashed non member password`;
+  private async hash(pw: string): Promise<string> {
+    return this.userPwManager.hashPassword(pw);
   }
 
-  private handleNonMemberOrder(dto: CreateOrderDto): Partial<Prisma.OrderCreateInput> {
+  private async handleNonMemberOrder(
+    dto: CreateOrderDto,
+  ): Promise<Partial<Prisma.OrderCreateInput>> {
     const { nonMemberOrderFlag, nonMemberOrderPassword } = dto;
     return {
       nonMemberOrderFlag,
       nonMemberOrderPassword: nonMemberOrderFlag
-        ? this.hash(nonMemberOrderPassword)
+        ? await this.hash(nonMemberOrderPassword)
         : undefined,
     };
   }
@@ -64,30 +67,6 @@ export class OrderService extends ServiceBaseWithCache {
     };
   }
 
-  private async calculateOrderPrice(orderItems: CreateOrderItemDto[]): Promise<number> {
-    const goodsIdList = orderItems.map((item) => item.goodsId);
-    const orderedItemGoods = await this.prisma.goods.findMany({
-      where: { id: { in: goodsIdList } },
-      select: {
-        seller: {
-          // 동일 판매자의 상품 합포장 처리 가능한지 확인위해
-          select: { sellerShop: true },
-        },
-        options: { include: { supply: true } },
-        ShippingGroup: {
-          // 배송비 확인 위해
-          include: {
-            shippingSets: {
-              include: { shippingOptions: { include: { shippingCost: true } } },
-            },
-          },
-        },
-      },
-    });
-    // const orderedGoodsData =
-    return 0;
-  }
-
   /** 주문생성 */
   async createOrder(dto: CreateOrderDto): Promise<Order> {
     const { customerId, ...data } = dto;
@@ -109,11 +88,33 @@ export class OrderService extends ServiceBaseWithCache {
       createInput = { ...createInput, ...(await this.handleGiftOrder(dto)) };
     }
 
-    // 주문상품별 shippingCost + 주문상품옵션들의 discountPrice의 합 구해야함
-    const orderPrice = await this.calculateOrderPrice(orderItems);
-    createInput = { ...createInput, orderPrice };
-
-    const order = await this.prisma.order.create({ data: createInput });
+    // 주문에 연결된 주문상품, 주문상품옵션, 주문상품후원 생성
+    const order = await this.prisma.order.create({
+      data: {
+        ...createInput,
+        orderItems: {
+          // 주문에 연결된 주문상품 생성
+          create: orderItems.map((item) => {
+            const { options, support, ...rest } = item;
+            return {
+              ...rest,
+              // 주문상품옵션들 생성
+              options: { create: options },
+              // 주문상품에 후원정보가 있는경우 주문상품후원생성
+              support: support
+                ? {
+                    create: {
+                      message: support.message,
+                      nickname: support.nickname,
+                      broadcaster: { connect: { id: support.broadcasterId } },
+                    },
+                  }
+                : undefined,
+            };
+          }),
+        },
+      },
+    });
 
     return order;
   }
