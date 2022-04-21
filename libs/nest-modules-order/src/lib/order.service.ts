@@ -5,6 +5,7 @@ import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { CreateOrderDto } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
+import dayjs = require('dayjs');
 
 @Injectable()
 export class OrderService extends ServiceBaseWithCache {
@@ -23,6 +24,7 @@ export class OrderService extends ServiceBaseWithCache {
     return this.userPwManager.hashPassword(pw);
   }
 
+  /** 비회원주문생성시 처리 - 비회원주문비밀번호 암호화하여 리턴, nonMemberOrderFlag: true 설정 */
   private async handleNonMemberOrder(
     dto: CreateOrderDto,
   ): Promise<Partial<Prisma.OrderCreateInput>> {
@@ -35,6 +37,7 @@ export class OrderService extends ServiceBaseWithCache {
     };
   }
 
+  /** 선물주문생성시 처리 - 방송인 정보(받는사람 주소, 연락처) 리턴, giftFlag: true 설정 */
   private async handleGiftOrder(
     dto: CreateOrderDto,
   ): Promise<Partial<Prisma.OrderCreateInput>> {
@@ -57,6 +60,7 @@ export class OrderService extends ServiceBaseWithCache {
       (contact) => contact.isDefault === true,
     );
     return {
+      giftFlag: true,
       recipientName: defaultContact?.name || broadcaster.userNickname,
       recipientPhone:
         defaultContact?.phoneNumber || broadcasterContacts[0]?.phoneNumber || '',
@@ -67,14 +71,29 @@ export class OrderService extends ServiceBaseWithCache {
     };
   }
 
+  /** 주문코드 생성 - 날짜시분초 조합, 중복가능성이 있다면 다른 형태로 조합 필요 */
+  private createOrderCode(): string {
+    return dayjs().format('YYYYMMDDHHmmssSSS');
+  }
+
+  /** 주문에 포함된 주문상품에 후원정보가 포함되어 있는지 여부 리턴 */
+  private hasSupportOrderItem(dto: CreateOrderDto): boolean {
+    return (
+      dto.orderItems.map((item) => item.support).filter((support) => !!support).length > 0
+    );
+  }
+
   /** 주문생성 */
   async createOrder(dto: CreateOrderDto): Promise<Order> {
     const { customerId, ...data } = dto;
-    const { nonMemberOrderFlag, giftFlag, orderItems } = data;
+    const { nonMemberOrderFlag, giftFlag, orderItems, payment, supportOrderIncludeFlag } =
+      data;
 
     let createInput: Prisma.OrderCreateInput = {
       ...data,
       orderItems: undefined,
+      orderCode: this.createOrderCode(),
+      payment: payment ? { connect: { id: payment.id } } : undefined, // TODO: 결제api 작업 이후 CreateOrderDto에서 payment 값 필수로 바꾸고 이부분도 수정필요
       customer: !nonMemberOrderFlag ? { connect: { id: customerId } } : undefined,
     };
 
@@ -92,6 +111,7 @@ export class OrderService extends ServiceBaseWithCache {
     const order = await this.prisma.order.create({
       data: {
         ...createInput,
+        supportOrderIncludeFlag: supportOrderIncludeFlag || this.hasSupportOrderItem(dto),
         orderItems: {
           // 주문에 연결된 주문상품 생성
           create: orderItems.map((item) => {
@@ -116,6 +136,7 @@ export class OrderService extends ServiceBaseWithCache {
       },
     });
 
+    // TODO: 주문 생성 후 장바구니 비우기
     return order;
   }
 
