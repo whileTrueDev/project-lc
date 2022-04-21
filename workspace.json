@@ -971,6 +971,7 @@
       },
       "tags": []
     },
+    "nest-modules-payments": "libs/nest-modules-payments",
     "nest-modules-policy": {
       "root": "libs/nest-modules-policy",
       "sourceRoot": "libs/nest-modules-policy/src",
