@@ -118,6 +118,7 @@ export * from './lib/queries/useLiveShoppingList';
 export * from './lib/queries/useManual';
 export * from './lib/queries/useNotice';
 export * from './lib/queries/useNotifications';
+export * from './lib/queries/useOrderList';
 export * from './lib/queries/usePolicy';
 export * from './lib/queries/useProfile';
 export * from './lib/queries/usePurchaseMessages';
