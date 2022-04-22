@@ -175,14 +175,28 @@ export class OrderService extends ServiceBaseWithCache {
     return order;
   }
 
-  // 주문목록조회시 findMany에 넘길 Object
-  private getOrderFindManyInput(take?: number, skip?: number): Prisma.OrderFindManyArgs {
-    return {
+  /** 주문목록조회시 사용할 findMany 인자 리턴
+   * dto 에 포함된 값에 따라 where 절을 다르게 설정한다
+   */
+  private getOrderFindManyArgs(dto: GetOrderListDto): Prisma.OrderFindManyArgs {
+    const {
+      take,
+      skip,
+      customerId,
+      sellerId,
+      orderCode,
+      periodStart,
+      periodEnd,
+      supportIncluded,
+    } = dto;
+
+    const args: Prisma.OrderFindManyArgs = {
       take,
       skip,
       include: {
         orderItems: {
           include: {
+            support: true,
             options: true,
             goods: {
               select: {
@@ -196,20 +210,41 @@ export class OrderService extends ServiceBaseWithCache {
         payment: true,
       },
     };
+
+    let where: Prisma.OrderWhereInput = {
+      createDate: {
+        gte: periodStart ? new Date(periodStart) : undefined,
+        lte: periodEnd ? new Date(periodEnd) : undefined,
+      },
+    };
+
+    // 특정 소비자의 주문목록 조회시
+    if (customerId) {
+      where = { ...where, customerId, deleteFlag: false };
+    }
+
+    // 특정 판매자가 판매하는 물건들의 주문목록 조회시
+    if (sellerId) {
+      where = { ...where, orderItems: { some: { goods: { sellerId } } } };
+    }
+
+    // 특정 주문코드 조회시
+    if (orderCode) {
+      where = { ...where, orderCode };
+    }
+
+    // 후원주문만 조회시
+    if (supportIncluded) {
+      where = { ...where, supportOrderIncludeFlag: true };
+    }
+
+    return { ...args, where };
   }
 
-  /** 특정 소비자의 주문목록 조회 - 선물주문인 경우 받는사람 정보 삭제 */
-  async getCustomerOrderList(dto: GetOrderListDto): Promise<Order[]> {
-    const { customerId, take, skip } = dto;
-
-    const orders = await this.prisma.order.findMany({
-      ...this.getOrderFindManyInput(take, skip),
-      where: {
-        customerId,
-        deleteFlag: false,
-      },
-    });
-
+  /** 소비자 주문목록 후처리 =>  조회시 받는사람 정보 삭제 & 비회원비밀번호 정보 삭제
+   // TODO: 리턴타입 수정
+   */
+  private postProcessCustomerOrderList(orders: Order[]): Order[] {
     return orders.map((order) => {
       if (order.giftFlag) return this.removerecipientInfo(order);
       if (order.nonMemberOrderFlag) return this.removeNonmemberOrderPassword(order);
@@ -217,10 +252,15 @@ export class OrderService extends ServiceBaseWithCache {
     });
   }
 
+  /** 특정 소비자의 주문목록 조회 - 선물주문인 경우 받는사람 정보 삭제 후처리 추가 */
+  async getCustomerOrderList(dto: GetOrderListDto): Promise<Order[]> {
+    const orders = await this.getOrderList(dto);
+    return this.postProcessCustomerOrderList(orders);
+  }
+
   /** 전체 주문목록 조회 */
   async getOrderList(dto: GetOrderListDto): Promise<Order[]> {
-    const { take, skip } = dto;
-    return this.prisma.order.findMany(this.getOrderFindManyInput(take, skip));
+    return this.prisma.order.findMany(this.getOrderFindManyArgs(dto));
   }
 
   /** 주문 상세조회 데이터 - 리턴데이터에 포함될것들 */

@@ -14,6 +14,7 @@ import {
   IsBoolean,
   IsEmail,
   IsEnum,
+  IsISO8601,
   IsNumber,
   IsOptional,
   IsString,
@@ -220,24 +221,58 @@ export class CreateOrderDto {
 // ------------------조회 dto--------------------
 /** 주문 목록 조회 dto */
 export class GetOrderListDto {
+  /** 한 페이지에 몇개 표시할것인지 */
+  @Type(() => Number)
   @IsNumber()
-  readonly take: number = 10;
+  readonly take: number = 3; // take 값 없을때 기본값
 
+  /** 몇개 건너뛰고 조회할것인지 */
+  @Type(() => Number)
   @IsNumber()
   @IsOptional()
   skip?: number;
 
+  /** 특정 소비자의 구매내역 조회시 사용. 소비자고유번호 */
   @Type(() => Number)
   @IsNumber()
   @IsOptional()
   customerId?: number;
+
+  /** 특정 판매자의 상품 주문내역 조회시 사용. 판매자 고유번호 */
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  sellerId?: number;
+
+  /** 주문번호로 조회시 사용 */
+  @IsString()
+  @IsOptional()
+  orderCode?: string;
+
+  /** 특정 기간내 주문 조회시 사용. 조회할 기간 시작일자 2022-02-02 형태로 입력  https://github.com/typestack/class-validator/issues/407 */
+  @IsISO8601()
+  @IsOptional()
+  periodStart?: string;
+
+  /** 특정 기간내 주문 조회시 사용. 조회할 기간 마지막일자 2022-02-02 형태로 입력 */
+  @IsISO8601()
+  @IsOptional()
+  periodEnd?: string;
+
+  /** 후원 주문만 조회시 사용 */
+  @Type(() => Boolean)
+  @IsBoolean()
+  @IsOptional()
+  supportIncluded?: boolean;
 }
 
 /** 비회원 주문 조회 dto */
 export class GetNonMemberOrderDetailDto {
+  /** 주문코드 */
   @IsString()
   orderCode: string;
 
+  /** 비회원주문 비밀번호 */
   @IsString()
   password: string;
 }
@@ -250,6 +285,7 @@ export class UpdateOrderDto {
   @IsOptional()
   customerId?: Order['customerId'];
 
+  /** 주문상태 */
   @IsEnum(OrderProcessStep)
   @IsOptional()
   step?: Order['step'];
@@ -339,7 +375,7 @@ export class UpdateOrderDto {
   @IsOptional()
   bundleFlag?: Order['bundleFlag'];
 
-  /** String? // 현금영수증번호 */
+  /** 현금영수증번호 */
   @IsString()
   @IsOptional()
   cashReceipts?: Order['cashReceipts'];
