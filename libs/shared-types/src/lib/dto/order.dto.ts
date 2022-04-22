@@ -379,4 +379,9 @@ export class UpdateOrderDto {
   @IsString()
   @IsOptional()
   cashReceipts?: Order['cashReceipts'];
+
+  /** 삭제여부 */
+  @IsBoolean()
+  @IsOptional()
+  deleteFlag?: Order['deleteFlag'];
 }

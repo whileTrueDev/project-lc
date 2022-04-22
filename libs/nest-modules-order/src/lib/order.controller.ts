@@ -39,8 +39,9 @@ export class OrderController {
    * @Query skip?
    */
   @Get('list')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  getOrderList(@Query() dto: GetOrderListDto): Promise<Order[]> {
+  getOrderList(
+    @Query(new ValidationPipe({ transform: true })) dto: GetOrderListDto,
+  ): Promise<Order[]> {
     // 특정 소비자의 주문 조회
     if (dto.customerId) {
       return this.orderService.getCustomerOrderList(dto);

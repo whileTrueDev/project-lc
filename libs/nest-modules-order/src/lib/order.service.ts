@@ -263,41 +263,54 @@ export class OrderService extends ServiceBaseWithCache {
     return this.prisma.order.findMany(this.getOrderFindManyArgs(dto));
   }
 
-  /** 주문 상세조회 데이터 - 리턴데이터에 포함될것들 */
-  private readonly getOrderDetailInput: Partial<Prisma.OrderFindUniqueArgs> = {
-    include: {
-      payment: true,
-      orderItems: {
-        include: {
-          options: true,
-          support: true,
-          goods: {
-            select: {
-              id: true,
-              goods_name: true,
-              image: true,
+  /** 주문 상세조회시 사용할 findFirst 인자
+   *  */
+  private getOrderFindFirstArgs(
+    where: Prisma.OrderWhereInput,
+  ): Prisma.OrderFindFirstArgs {
+    const args: Prisma.OrderFindFirstArgs = {
+      include: {
+        payment: true,
+        orderItems: {
+          include: {
+            options: true,
+            support: true,
+            goods: {
+              select: {
+                id: true,
+                goods_name: true,
+                image: true,
+              },
             },
           },
         },
+        refunds: true,
+        returns: true,
+        exports: true,
+        exchanges: true,
+        orderCancellations: true,
       },
-      refunds: true,
-      returns: true,
-      exports: true,
-      exchanges: true,
-      orderCancellations: true,
-    },
-  };
+    };
+
+    return { ...args, where };
+  }
+
+  /** 주문 1개 조회, 없으면 400 에러 */
+  async findOneOrder(where: Prisma.OrderWhereInput): Promise<Order> {
+    const order = await this.prisma.order.findFirst(this.getOrderFindFirstArgs(where));
+    if (!order) {
+      let errorMessage = '해당 주문이 존재하지 않습니다. ';
+      if (where.orderCode) errorMessage += `주문코드 : ${where.orderCode}`;
+      if (where.id) errorMessage += `주문고유번호 : ${where.id}`;
+      throw new BadRequestException(errorMessage);
+    }
+
+    return order;
+  }
 
   /** 개별주문조회 */
   async getOrderDetail(orderId: number): Promise<Order> {
-    const order = await this.prisma.order.findFirst({
-      where: { id: orderId, deleteFlag: false },
-      ...this.getOrderDetailInput,
-    });
-    if (!order)
-      throw new BadRequestException(
-        `해당 주문이 존재하지 않습니다. 주문고유번호: ${orderId}`,
-      );
+    const order = await this.findOneOrder({ id: orderId, deleteFlag: false });
     return order;
   }
 
@@ -306,16 +319,10 @@ export class OrderService extends ServiceBaseWithCache {
     orderCode,
     password,
   }: GetNonMemberOrderDetailDto): Promise<Order> {
-    const order = await this.prisma.order.findFirst({
-      where: { orderCode, deleteFlag: false },
-      ...this.getOrderDetailInput,
-    });
+    // 주문찾기
+    const order = await this.findOneOrder({ orderCode, deleteFlag: false });
 
-    if (!order)
-      throw new BadRequestException(
-        `해당 주문이 존재하지 않습니다. 주문코드: ${orderCode}`,
-      );
-
+    // 비회원주문 비밀번호 확인
     const isPasswordCorrect = await this.userPwManager.validatePassword(
       password,
       order.nonMemberOrderPassword,
@@ -329,16 +336,7 @@ export class OrderService extends ServiceBaseWithCache {
   /** 주문수정 */
   async updateOrder(orderId: number, dto: UpdateOrderDto): Promise<boolean> {
     // 주문이 존재하는지 확인
-    const order = await this.prisma.order.findFirst({
-      where: { id: orderId },
-    });
-
-    // 해당 주문이 없는경우 400 에러
-    if (!order) {
-      throw new BadRequestException(
-        `해당 주문이 존재하지 않습니다. 주문고유번호 : ${orderId}`,
-      );
-    }
+    await this.findOneOrder({ id: orderId });
 
     const { customerId, nonMemberOrderPassword, ...rest } = dto;
 
@@ -370,30 +368,18 @@ export class OrderService extends ServiceBaseWithCache {
     return true;
   }
 
-  /** 주문 삭제 - 완료된 주문만 삭제 가능
-   * 데이터 삭제x, deleteFlag를 true로 설정함 */
+  /** 주문 삭제(숨김처리) - 완료된 주문만 삭제 가능
+   * 데이터 삭제x, deleteFlag를 true로 설정함) */
   async deleteOrder(orderId: number): Promise<boolean> {
     // 주문이 존재하는지 확인
-    const order = await this.prisma.order.findFirst({
-      where: { id: orderId, deleteFlag: false },
-    });
-
-    // 해당 주문이 없는경우 400 에러
-    if (!order) {
-      throw new BadRequestException(
-        `해당 주문이 존재하지 않습니다. 주문고유번호 : ${orderId}`,
-      );
-    }
+    const order = await this.findOneOrder({ id: orderId, deleteFlag: false });
 
     // 완료된 주문이 아닌경우 403 에러
     if (order.step !== OrderProcessStep.shippingDone) {
       throw new ForbiddenException(`완료된 주문만 삭제 가능합니다`);
     }
 
-    await this.prisma.order.update({
-      where: { id: orderId },
-      data: { deleteFlag: true },
-    });
+    await this.updateOrder(orderId, { deleteFlag: true });
 
     return true;
   }
