@@ -210,7 +210,7 @@ export class OrderService extends ServiceBaseWithCache {
 
   /** 특정 소비자의 주문목록 조회 - 선물주문인 경우 받는사람 정보 삭제 후처리 추가 */
   async getCustomerOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
-    const orders = await this.getOrderList(dto);
+    const { orders, count } = await this.getOrderList(dto);
 
     // 소비자 주문목록 후처리
     const postProcessed = orders.map((order) => {
@@ -228,13 +228,17 @@ export class OrderService extends ServiceBaseWithCache {
       }
       return _o;
     });
-    return postProcessed;
+    return {
+      orders: postProcessed,
+      count,
+    };
   }
 
   /** 전체 주문목록 조회 */
   async getOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
     const { take, skip } = dto;
     const where = this.getOrderListFilterWhere(dto);
+    const count = await this.prisma.order.count({ where });
     const orders = await this.prisma.order.findMany({
       where,
       take,
@@ -258,7 +262,10 @@ export class OrderService extends ServiceBaseWithCache {
         payment: true,
       },
     });
-    return orders;
+    return {
+      orders,
+      count,
+    };
   }
 
   /** 주문 상세 조회 */

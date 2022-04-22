@@ -39,7 +39,10 @@ export type OrderDataWithRelations = Order & {
 };
 
 /** 주문 목록 리턴 데이터 타입 */
-export type OrderListRes = OrderDataWithRelations[];
+export type OrderListRes = {
+  orders: OrderDataWithRelations[];
+  count: number;
+};
 
 /** 주문 상세 리턴데이터 타입
  * 주문 완료 페이지 혹은 주문 상세 페이지 작업하면서 수정 필요
