@@ -13,6 +13,8 @@ import {
   CreateOrderDto,
   GetNonMemberOrderDetailDto,
   GetOrderListDto,
+  OrderDetailRes,
+  OrderListRes,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
@@ -94,14 +96,8 @@ export class OrderService extends ServiceBaseWithCache {
     );
   }
 
-  private removeNonmemberOrderPassword(order: Order): Order {
-    return {
-      ...order,
-      nonMemberOrderPassword: undefined,
-    };
-  }
-
-  private removerecipientInfo(order: Order): Order {
+  /** 주문에서 주문자 정보 빈 문자열로 바꿔서 리턴 */
+  private removerecipientInfo<T extends Order>(order: T): T {
     return {
       ...order,
       recipientName: '',
@@ -175,41 +171,12 @@ export class OrderService extends ServiceBaseWithCache {
     return order;
   }
 
-  /** 주문목록조회시 사용할 findMany 인자 리턴
+  /** 주문목록조회시 사용할 where값 리턴
    * dto 에 포함된 값에 따라 where 절을 다르게 설정한다
    */
-  private getOrderFindManyArgs(dto: GetOrderListDto): Prisma.OrderFindManyArgs {
-    const {
-      take,
-      skip,
-      customerId,
-      sellerId,
-      orderCode,
-      periodStart,
-      periodEnd,
-      supportIncluded,
-    } = dto;
-
-    const args: Prisma.OrderFindManyArgs = {
-      take,
-      skip,
-      include: {
-        orderItems: {
-          include: {
-            support: true,
-            options: true,
-            goods: {
-              select: {
-                id: true,
-                goods_name: true,
-                image: true,
-              },
-            },
-          },
-        },
-        payment: true,
-      },
-    };
+  private getOrderListFilterWhere(dto: GetOrderListDto): Prisma.OrderWhereInput {
+    const { customerId, sellerId, orderCode, periodStart, periodEnd, supportIncluded } =
+      dto;
 
     let where: Prisma.OrderWhereInput = {
       createDate: {
@@ -238,32 +205,64 @@ export class OrderService extends ServiceBaseWithCache {
       where = { ...where, supportOrderIncludeFlag: true };
     }
 
-    return { ...args, where };
-  }
-
-  /** 소비자 주문목록 후처리 =>  조회시 받는사람 정보 삭제 & 비회원비밀번호 정보 삭제
-   // TODO: 리턴타입 수정
-   */
-  private postProcessCustomerOrderList(orders: Order[]): Order[] {
-    return orders.map((order) => {
-      if (order.giftFlag) return this.removerecipientInfo(order);
-      if (order.nonMemberOrderFlag) return this.removeNonmemberOrderPassword(order);
-      return order;
-    });
+    return where;
   }
 
   /** 특정 소비자의 주문목록 조회 - 선물주문인 경우 받는사람 정보 삭제 후처리 추가 */
-  async getCustomerOrderList(dto: GetOrderListDto): Promise<Order[]> {
+  async getCustomerOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
     const orders = await this.getOrderList(dto);
-    return this.postProcessCustomerOrderList(orders);
+
+    // 소비자 주문목록 후처리
+    const postProcessed = orders.map((order) => {
+      let _o = { ...order };
+      //  선물하기 주문일 시 받는사람 정보 삭제
+      if (_o.giftFlag) {
+        _o = this.removerecipientInfo(_o);
+      }
+      // 비회원 주문인 경우 - 비회원비밀번호 정보 삭제
+      if (_o.nonMemberOrderFlag) {
+        _o = {
+          ..._o,
+          nonMemberOrderPassword: undefined,
+        };
+      }
+      return _o;
+    });
+    return postProcessed;
   }
 
   /** 전체 주문목록 조회 */
-  async getOrderList(dto: GetOrderListDto): Promise<Order[]> {
-    return this.prisma.order.findMany(this.getOrderFindManyArgs(dto));
+  async getOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
+    const { take, skip } = dto;
+    const where = this.getOrderListFilterWhere(dto);
+    const orders = await this.prisma.order.findMany({
+      where,
+      take,
+      skip,
+      include: {
+        orderItems: {
+          include: {
+            support: {
+              include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+            },
+            options: true,
+            goods: {
+              select: {
+                id: true,
+                goods_name: true,
+                image: true,
+              },
+            },
+          },
+        },
+        payment: true,
+      },
+    });
+    return orders;
   }
 
   /** 주문 상세조회시 사용할 findFirst 인자
+   * include나 Select 값 수정시 order.res.ts 에서 OrderDetailRes 타입도 수정 필요
    *  */
   private getOrderFindFirstArgs(
     where: Prisma.OrderWhereInput,
@@ -295,8 +294,8 @@ export class OrderService extends ServiceBaseWithCache {
     return { ...args, where };
   }
 
-  /** 주문 1개 조회, 없으면 400 에러 */
-  async findOneOrder(where: Prisma.OrderWhereInput): Promise<Order> {
+  /** 주문 상세 1개 조회, 없으면 400 에러 */
+  async findOneOrder(where: Prisma.OrderWhereInput): Promise<OrderDetailRes> {
     const order = await this.prisma.order.findFirst(this.getOrderFindFirstArgs(where));
     if (!order) {
       let errorMessage = '해당 주문이 존재하지 않습니다. ';
@@ -309,7 +308,7 @@ export class OrderService extends ServiceBaseWithCache {
   }
 
   /** 개별주문조회 */
-  async getOrderDetail(orderId: number): Promise<Order> {
+  async getOrderDetail(orderId: number): Promise<OrderDetailRes> {
     const order = await this.findOneOrder({ id: orderId, deleteFlag: false });
     return order;
   }
@@ -318,7 +317,7 @@ export class OrderService extends ServiceBaseWithCache {
   async getNonMemberOrderDetail({
     orderCode,
     password,
-  }: GetNonMemberOrderDetailDto): Promise<Order> {
+  }: GetNonMemberOrderDetailDto): Promise<OrderDetailRes> {
     // 주문찾기
     const order = await this.findOneOrder({ orderCode, deleteFlag: false });
 

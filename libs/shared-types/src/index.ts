@@ -126,6 +126,7 @@ export * from './lib/res-types/kkshowShoppingTab.res';
 export * from './lib/res-types/liveShoppingWithGoods.res';
 export * from './lib/res-types/loginUserRes';
 export * from './lib/res-types/manual.res';
+export * from './lib/res-types/order.res';
 export * from './lib/res-types/orderCancelRequest.res';
 export * from './lib/res-types/overlayControllerMain.res';
 export * from './lib/res-types/productPromotion.res';

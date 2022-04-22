@@ -9,7 +9,6 @@ import {
   Post,
   Query,
   UseInterceptors,
-  UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { Order } from '@prisma/client';
@@ -18,6 +17,8 @@ import {
   CreateOrderDto,
   GetNonMemberOrderDetailDto,
   GetOrderListDto,
+  OrderDetailRes,
+  OrderListRes,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { OrderService } from './order.service';
@@ -41,7 +42,7 @@ export class OrderController {
   @Get('list')
   getOrderList(
     @Query(new ValidationPipe({ transform: true })) dto: GetOrderListDto,
-  ): Promise<Order[]> {
+  ): Promise<OrderListRes> {
     // 특정 소비자의 주문 조회
     if (dto.customerId) {
       return this.orderService.getCustomerOrderList(dto);
@@ -52,7 +53,9 @@ export class OrderController {
 
   /** 개별 주문 상세조회 */
   @Get(':orderId')
-  getOrderDetail(@Param('orderId', ParseIntPipe) orderId: number): Promise<Order> {
+  getOrderDetail(
+    @Param('orderId', ParseIntPipe) orderId: number,
+  ): Promise<OrderDetailRes> {
     return this.orderService.getOrderDetail(orderId);
   }
 
@@ -60,7 +63,7 @@ export class OrderController {
   @Get()
   getNonMemberOrderDetail(
     @Query(ValidationPipe) dto: GetNonMemberOrderDetailDto,
-  ): Promise<Order> {
+  ): Promise<OrderDetailRes> {
     return this.orderService.getNonMemberOrderDetail(dto);
   }
 
