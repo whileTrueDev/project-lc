@@ -112,6 +112,8 @@ export class CreateOrderItemDto {
 
 /** 주문 Order 생성 dto */
 export class CreateOrderDto {
+  // TODO : orderCode 추가? 주문(결제)페이지에서부터 고유한 orderCode 값이 필요하다고 함. order 데이터 생성 전 orderCode는 미리 생성하고 order 데이터 생성시 해당 코드값을 dto에 추가해야 할 수도 있다
+
   /** 소비자 고유번호(비회원 주문인경우 validate 안함) */
   @ValidateIf((o) => !o.nonMemberOrderFlag)
   @IsNumber()
@@ -211,7 +213,7 @@ export class CreateOrderDto {
   orderItems: CreateOrderItemDto[];
 
   /** 주문에 연결된 결제정보 
-   // TODO: 결제api 작업 후 IsOptional(), optional? 삭제 하여 결제정보가 있는 주문만 생성 가능하도록 해야함
+   // TODO: 결제api 작업 후 수정필요
    */
   // @IsNotEmptyObject()
   @IsOptional()

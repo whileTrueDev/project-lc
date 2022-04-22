@@ -261,19 +261,21 @@ export class OrderService extends ServiceBaseWithCache {
     return orders;
   }
 
-  /** 주문 상세조회시 사용할 findFirst 인자
-   * include나 Select 값 수정시 order.res.ts 에서 OrderDetailRes 타입도 수정 필요
-   *  */
-  private getOrderFindFirstArgs(
-    where: Prisma.OrderWhereInput,
-  ): Prisma.OrderFindFirstArgs {
-    const args: Prisma.OrderFindFirstArgs = {
+  /** 주문 상세 조회 */
+  async findOneOrderDetail(where: Prisma.OrderWhereInput): Promise<OrderDetailRes> {
+    // 주문이 있는지 확인
+    await this.findOneOrder(where);
+
+    return this.prisma.order.findFirst({
+      where,
       include: {
         payment: true,
         orderItems: {
           include: {
             options: true,
-            support: true,
+            support: {
+              include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+            },
             goods: {
               select: {
                 id: true,
@@ -289,14 +291,14 @@ export class OrderService extends ServiceBaseWithCache {
         exchanges: true,
         orderCancellations: true,
       },
-    };
-
-    return { ...args, where };
+    });
   }
 
-  /** 주문 상세 1개 조회, 없으면 400 에러 */
-  async findOneOrder(where: Prisma.OrderWhereInput): Promise<OrderDetailRes> {
-    const order = await this.prisma.order.findFirst(this.getOrderFindFirstArgs(where));
+  /** 주문 1개 리턴, 없으면 400 에러 */
+  async findOneOrder(where: Prisma.OrderWhereInput): Promise<Order> {
+    const order = await this.prisma.order.findFirst({
+      where,
+    });
     if (!order) {
       let errorMessage = '해당 주문이 존재하지 않습니다. ';
       if (where.orderCode) errorMessage += `주문코드 : ${where.orderCode}`;
@@ -307,19 +309,17 @@ export class OrderService extends ServiceBaseWithCache {
     return order;
   }
 
-  /** 개별주문조회 */
+  /** 개별 주문 상세 조회 */
   async getOrderDetail(orderId: number): Promise<OrderDetailRes> {
-    const order = await this.findOneOrder({ id: orderId, deleteFlag: false });
-    return order;
+    return this.findOneOrderDetail({ id: orderId, deleteFlag: false });
   }
 
-  /** 비회원 주문 조회 */
+  /** 비회원 주문 상세 조회 */
   async getNonMemberOrderDetail({
     orderCode,
     password,
   }: GetNonMemberOrderDetailDto): Promise<OrderDetailRes> {
-    // 주문찾기
-    const order = await this.findOneOrder({ orderCode, deleteFlag: false });
+    const order = await this.findOneOrderDetail({ orderCode, deleteFlag: false });
 
     // 비회원주문 비밀번호 확인
     const isPasswordCorrect = await this.userPwManager.validatePassword(
