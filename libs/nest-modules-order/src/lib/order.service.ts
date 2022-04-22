@@ -17,6 +17,7 @@ import {
 } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
 import dayjs = require('dayjs');
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class OrderService extends ServiceBaseWithCache {
@@ -81,9 +82,9 @@ export class OrderService extends ServiceBaseWithCache {
     };
   }
 
-  /** 주문코드 생성 - 날짜시분초 조합, 중복가능성이 있다면 다른 형태로 조합 필요 */
+  /** 주문코드 생성 - 날짜시분초 + nanoid로 생성한 임의의문자열 조합 */
   private createOrderCode(): string {
-    return dayjs().format('YYYYMMDDHHmmssSSS');
+    return dayjs().format('YYYYMMDDHHmmssSSS') + nanoid(6);
   }
 
   /** 주문에 포함된 주문상품에 후원정보가 포함되어 있는지 여부 리턴 */
