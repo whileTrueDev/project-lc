@@ -226,13 +226,14 @@ export class GetOrderListDto {
   /** 한 페이지에 몇개 표시할것인지 */
   @Type(() => Number)
   @IsNumber()
-  readonly take: number = 3; // take 값 없을때 기본값
+  @IsOptional()
+  take?: number = 10; // take 값 없을때 기본값
 
   /** 몇개 건너뛰고 조회할것인지 */
   @Type(() => Number)
   @IsNumber()
   @IsOptional()
-  skip?: number;
+  skip?: number = 0;
 
   /** 특정 소비자의 구매내역 조회시 사용. 소비자고유번호 */
   @Type(() => Number)

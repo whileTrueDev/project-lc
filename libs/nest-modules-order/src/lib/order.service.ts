@@ -210,7 +210,7 @@ export class OrderService extends ServiceBaseWithCache {
 
   /** 특정 소비자의 주문목록 조회 - 선물주문인 경우 받는사람 정보 삭제 후처리 추가 */
   async getCustomerOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
-    const { orders, count } = await this.getOrderList(dto);
+    const { orders, ...rest } = await this.getOrderList(dto);
 
     // 소비자 주문목록 후처리
     const postProcessed = orders.map((order) => {
@@ -230,7 +230,7 @@ export class OrderService extends ServiceBaseWithCache {
     });
     return {
       orders: postProcessed,
-      count,
+      ...rest,
     };
   }
 
@@ -262,9 +262,12 @@ export class OrderService extends ServiceBaseWithCache {
         payment: true,
       },
     });
+
+    const nextCursor = dto.skip + dto.take; // 다음 조회시 skip 값으로 사용
     return {
       orders,
       count,
+      nextCursor: nextCursor >= count ? undefined : nextCursor,
     };
   }
 

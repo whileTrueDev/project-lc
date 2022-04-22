@@ -42,6 +42,7 @@ export type OrderDataWithRelations = Order & {
 export type OrderListRes = {
   orders: OrderDataWithRelations[];
   count: number;
+  nextCursor?: number; // infinite Query 에서 사용하기 위한 다음 skip 값
 };
 
 /** 주문 상세 리턴데이터 타입
