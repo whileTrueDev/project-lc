@@ -58,6 +58,8 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
     }
   };
 
+  // TODO: 장바구니 작업 이후 장바구니 상품 개수 count 데이터 연동 추가 필요 by hwasurr
+
   return (
     <Center w="100%">
       <VStack
@@ -68,8 +70,8 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
         spacing={1}
       >
         {link.name === '장바구니' ? (
-          <Box>
-            <CountBadge count={6} top={0} right={3} />
+          <Box pos="relative">
+            <CountBadge count={6} top={-2} right={-2} />
             <Icon as={link.icon} width={5} height={5} />
           </Box>
         ) : (
