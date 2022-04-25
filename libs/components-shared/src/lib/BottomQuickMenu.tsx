@@ -7,6 +7,7 @@ import {
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
+import CountBadge from './CountBadge';
 
 export function BottomQuickMenu(): JSX.Element {
   return (
@@ -56,6 +57,7 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
       if (link.onClick) link.onClick();
     }
   };
+
   return (
     <Center w="100%">
       <VStack
@@ -63,9 +65,22 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
         as="button"
         width="80%"
         onClick={onQuickMenuClick}
+        spacing={1}
       >
-        <Icon as={link.icon} width={5} height={5} />
-        <Text fontSize={['sm', 'md']} fontWeight={isMatched ? 'bold' : 'unset'}>
+        {link.name === '장바구니' ? (
+          <Box>
+            <CountBadge count={6} top={0} right={3} />
+            <Icon as={link.icon} width={5} height={5} />
+          </Box>
+        ) : (
+          <Icon as={link.icon} width={5} height={5} />
+        )}
+        <Text
+          minW="60px"
+          fontSize={['xs', 'sm']}
+          fontWeight={isMatched ? 'bold' : 'unset'}
+          noOfLines={1}
+        >
           {link.name}
         </Text>
       </VStack>
