@@ -243,6 +243,7 @@ export class OrderService extends ServiceBaseWithCache {
       where,
       take,
       skip,
+      orderBy: [{ createDate: 'desc' }],
       include: {
         orderItems: {
           include: {
