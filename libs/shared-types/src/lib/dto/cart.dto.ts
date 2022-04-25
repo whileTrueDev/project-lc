@@ -57,8 +57,6 @@ export class CartItemOptionQuantityDto {
 }
 
 export class CartMigrationDto {
-  @IsNumber({}, { each: true })
-  cartItemIds: CartItem['id'][];
-
+  @IsString() tempUserId: CartItem['tempUserId'];
   @IsNumber() customerId: Customer['id'];
 }

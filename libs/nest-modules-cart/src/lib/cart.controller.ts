@@ -67,7 +67,7 @@ export class CartController {
     @Param('optionId', ParseIntPipe) optionId: CartItemOption['id'],
     @Body(ValidationPipe) dto: CartItemOptionQuantityDto,
   ): Promise<CartItemOption> {
-    return this.cartService.update(optionId, dto.quantity);
+    return this.cartService.updateQuantity(optionId, dto.quantity);
   }
 
   /** 특정 장바구니 상품 옵션 삭제 */
@@ -81,6 +81,6 @@ export class CartController {
   /** temp유저의 장바구니 목록을 특정 소비자에게 이관 */
   @Post('migration')
   tempToCustomer(@Body(ValidationPipe) dto: CartMigrationDto): Promise<number> {
-    return this.cartService.tempToCustomer(dto.cartItemIds, dto.customerId);
+    return this.cartService.tempToCustomer(dto.tempUserId, dto.customerId);
   }
 }
