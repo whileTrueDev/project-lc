@@ -1,19 +1,19 @@
 {
-  "root": "libs/nest-modules-payments",
-  "sourceRoot": "libs/nest-modules-payments/src",
+  "root": "libs/nest-modules-payment",
+  "sourceRoot": "libs/nest-modules-payment/src",
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/nest-modules-payments/**/*.ts"]
+        "lintFilePatterns": ["libs/nest-modules-payment/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/nest-modules-payments"],
+      "outputs": ["coverage/libs/nest-modules-payment"],
       "options": {
-        "jestConfig": "libs/nest-modules-payments/jest.config.js",
+        "jestConfig": "libs/nest-modules-payment/jest.config.js",
         "passWithNoTests": true
       }
     }

@@ -17,7 +17,7 @@ import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { InquiryModule } from '@project-lc/nest-modules-inquiry';
-import { PaymentsModule } from '@project-lc/nest-modules-payments';
+import { PaymentModule } from '@project-lc/nest-modules-payment';
 import { JwtHelperModule } from '@project-lc/nest-modules-jwt-helper';
 import {
   KkshowMainModule,
@@ -64,7 +64,7 @@ import { AppController } from './app.controller';
     KkshowSearchModule.withControllers(),
     KkshowShoppingModule.withControllers(),
     CustomerModule.withControllers(),
-    PaymentsModule.withControllers(),
+    PaymentModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],

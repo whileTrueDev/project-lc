@@ -1,17 +1,17 @@
 import { Module, DynamicModule } from '@nestjs/common';
-import { PaymentsController } from './payments.controller';
-import { PaymentsService } from './payments.service';
+import { PaymentController } from './payment.controller';
+import { PaymentService } from './payment.service';
 
 @Module({})
-export class PaymentsModule {
-  private static providers = [PaymentsService];
+export class PaymentModule {
+  private static providers = [PaymentService];
 
-  private static controllers = [PaymentsController];
+  private static controllers = [PaymentController];
   private static exports = [];
 
   static withoutControllers(): DynamicModule {
     return {
-      module: PaymentsModule,
+      module: PaymentModule,
       providers: this.providers,
       exports: this.exports,
     };
@@ -19,7 +19,7 @@ export class PaymentsModule {
 
   static withControllers(): DynamicModule {
     return {
-      module: PaymentsModule,
+      module: PaymentModule,
       controllers: this.controllers,
       providers: this.providers,
       exports: this.exports,
