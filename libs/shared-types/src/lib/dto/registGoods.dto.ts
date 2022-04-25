@@ -18,7 +18,6 @@ import { Type } from 'class-transformer';
 import { GoodsOptionDto } from './goodsOption.dto';
 import { GoodsImageDto } from './goodsImage.dto';
 import { GoodsInformationNoticeDto } from './goodsInformationNotice.dto';
-import { GoodsInformationSubjectItems } from './goodsInformationSubject.dto';
 
 export class RegistGoodsDto {
   @IsString()
@@ -139,6 +138,5 @@ export class RegistGoodsDto {
 
   @IsOptional()
   @IsObject()
-  @Type(() => GoodsInformationSubjectItems)
   informationNoticeContents?: GoodsInformationNoticeDto['contents'];
 }

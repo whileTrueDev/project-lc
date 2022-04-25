@@ -1,11 +1,9 @@
 import { IsNumber, IsString, IsOptional, IsObject } from 'class-validator';
-import { Prisma } from '@prisma/client';
-import { Type } from 'class-transformer';
 
-export class GoodsInformationSubjectItems {
+export type GoodsInformationSubjectItems = {
   name: string;
   value: string;
-}
+};
 
 export class GoodsInformationSubjectDto {
   @IsOptional()
@@ -16,6 +14,5 @@ export class GoodsInformationSubjectDto {
   subject: string;
 
   @IsObject()
-  @Type(() => GoodsInformationSubjectItems)
-  items: Prisma.JsonObject;
+  items: GoodsInformationSubjectItems;
 }

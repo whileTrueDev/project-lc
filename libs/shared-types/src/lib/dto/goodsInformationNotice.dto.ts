@@ -1,6 +1,4 @@
 import { IsNumber, IsObject, IsOptional } from 'class-validator';
-import { Prisma } from '@prisma/client';
-import { Type } from 'class-transformer';
 import { GoodsInformationSubjectItems } from './goodsInformationSubject.dto';
 
 export class GoodsInformationNoticeDto {
@@ -9,8 +7,7 @@ export class GoodsInformationNoticeDto {
   id?: number;
 
   @IsObject()
-  @Type(() => GoodsInformationSubjectItems)
-  contents: Prisma.JsonObject;
+  contents: GoodsInformationSubjectItems;
 
   @IsNumber()
   goodsId: number;
