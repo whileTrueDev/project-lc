@@ -6,14 +6,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import {
-  GoodsImages,
-  GoodsView,
-  Prisma,
-  Seller,
-  GoodsInformationNotice,
-  GoodsInformationSubject,
-} from '@prisma/client';
+import { GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -29,9 +22,6 @@ import {
   GoodsOptionWithStockInfo,
   RegistGoodsDto,
   TotalStockInfo,
-  GoodsInformationSubjectDto,
-  GoodsInformationNoticeDto,
-  GoodsInformationSubjectItems,
 } from '@project-lc/shared-types';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
@@ -530,60 +520,6 @@ export class GoodsService extends ServiceBaseWithCache {
     }
   }
 
-  /** 상품 제공 공시 등록 */
-  async registGoodsInformationNotice(
-    dto: GoodsInformationNoticeDto,
-  ): Promise<GoodsInformationNotice> {
-    return this.prisma.goodsInformationNotice.create({
-      data: {
-        goodsId: dto.goodsId,
-        contents: dto.contents,
-      },
-    });
-  }
-
-  /** 상품 품목 등록 */
-  async registGoodsInformationSubject(
-    dto: GoodsInformationSubjectDto,
-  ): Promise<GoodsInformationSubject> {
-    return this.prisma.goodsInformationSubject.create({
-      data: {
-        subject: dto.subject,
-        items: dto.items,
-      },
-    });
-  }
-
-  /** 상품 제공 공시 수정 */
-  async updateGoodsInformationNotice(
-    dto: GoodsInformationNoticeDto,
-  ): Promise<GoodsInformationNotice> {
-    return this.prisma.goodsInformationNotice.update({
-      where: {
-        id: dto.id,
-      },
-      data: {
-        goodsId: dto.goodsId,
-        contents: dto.contents,
-      },
-    });
-  }
-
-  /** 상품 품목 수정 */
-  async updateGoodsInformationSubject(
-    dto: GoodsInformationSubjectDto,
-  ): Promise<GoodsInformationSubject> {
-    return this.prisma.goodsInformationSubject.update({
-      where: {
-        id: dto.id,
-      },
-      data: {
-        subject: dto.subject,
-        items: dto.items,
-      },
-    });
-  }
-
   /** 여러 상품이미지 등록 - 생성된 goodsImage[] 리턴 */
   async registGoodsImages(dto: GoodsImageDto[]): Promise<GoodsImages[]> {
     try {
@@ -704,6 +640,7 @@ export class GoodsService extends ServiceBaseWithCache {
       goodsInfoId,
       informationSubjectId,
       informationNoticeId,
+      categoryId,
       ...goodsData
     } = dto;
 
@@ -752,6 +689,11 @@ export class GoodsService extends ServiceBaseWithCache {
           informationNotice: {
             connect: {
               id: informationNoticeId,
+            },
+          },
+          categories: {
+            connect: {
+              id: categoryId,
             },
           },
           confirmation: {
