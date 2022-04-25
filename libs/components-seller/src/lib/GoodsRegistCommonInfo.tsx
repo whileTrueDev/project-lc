@@ -217,7 +217,7 @@ export function GoodsRegistCommonInfo(): JSX.Element {
     setValue('goodsInfoId', undefined);
     setViewerContents('');
   };
-
+  // @ts-expect-error unidentified infinite type error
   const commonInfoId = watch('goodsInfoId');
   const commonContentsType = watch('common_contents_type');
 
