@@ -1441,6 +1441,7 @@ model GoodsReview {
   goods          Goods?               @relation(fields: [goodsId], references: [id], onDelete: SetNull) // 리뷰 대상 상품
   images         GoodsReviewImage[] // 해당리뷰에 포함된 이미지
   comments       GoodsReviewComment[] // 해당 리뷰에 달린 댓글
+  orderItem      OrderItem[] // 구매했던 주문상품정보
 }
 
 // 상품리뷰이미지
@@ -1611,26 +1612,29 @@ model OrderItem {
   shippingGroupId        Int // 연결된 배송정책 id
   shippingGroup          ShippingGroup           @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
   exchangeItems          ExchangeItem[] // 교환상품
+  reviewId               Int?
+  review                 GoodsReview?            @relation(fields: [reviewId], references: [id], onDelete: SetNull)
 }
 
 // 주문상품옵션
 model OrderItemOption {
-  id                     Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
-  orderItemId            Int // 옵션이 연결된 주문 상품 고유번호
-  orderItem              OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
-  goodsOptionId          Int // 참조하는 상품옵션 고유번호
-  name                   String? // 주문했을 당시 옵션명
-  value                  String? // 주문했을 당시 옵션값
-  quantity               Int // 옵션 선택 수량(개수)
-  normalPrice            Decimal                 @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
-  discountPrice          Decimal                 @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
-  weight                 Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
-  step                   OrderProcessStep        @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
-  refundItems            RefundItem[] // 환불상품
-  returnItems            ReturnItem[] // 반품상품
-  exportItems            ExportItem[] // 출고상품
-  orderCancellationItems OrderCancellationItem[] // 주문취소상품
-  exchangeItems          ExchangeItem[] // 교환상품
+  id                       Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
+  orderItemId              Int // 옵션이 연결된 주문 상품 고유번호
+  orderItem                OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
+  goodsOptionId            Int // 참조하는 상품옵션 고유번호
+  name                     String? // 주문했을 당시 옵션명
+  value                    String? // 주문했을 당시 옵션값
+  quantity                 Int // 옵션 선택 수량(개수)
+  normalPrice              Decimal                 @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
+  discountPrice            Decimal                 @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
+  weight                   Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
+  step                     OrderProcessStep        @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
+  purchaseConfirmationDate DateTime? // 구매확정일자
+  refundItems              RefundItem[] // 환불상품
+  returnItems              ReturnItem[] // 반품상품
+  exportItems              ExportItem[] // 출고상품
+  orderCancellationItems   OrderCancellationItem[] // 주문취소상품
+  exchangeItems            ExchangeItem[] // 교환상품
 }
 
 // 주문상품후원

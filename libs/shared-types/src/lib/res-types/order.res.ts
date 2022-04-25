@@ -4,6 +4,7 @@ import {
   Export,
   Goods,
   GoodsImages,
+  GoodsReview,
   Order,
   OrderCancellation,
   OrderItem,
@@ -29,6 +30,7 @@ export type OriginGoods = {
 
 export type OrderItemWithRelations = OrderItem & {
   support: OrderItemSupportWithBroadcasterInfo | null;
+  review?: { id: GoodsReview['id'] };
   options: OrderItemOption[];
   goods: OriginGoods;
 };

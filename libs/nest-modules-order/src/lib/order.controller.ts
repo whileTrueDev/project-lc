@@ -19,6 +19,7 @@ import {
   GetOrderListDto,
   OrderDetailRes,
   OrderListRes,
+  OrderPurchaseConfirmationDto,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { OrderService } from './order.service';
@@ -27,6 +28,14 @@ import { OrderService } from './order.service';
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
+
+  /** 구매확정 */
+  @Post('purchase-confirm')
+  purchaseConfirm(
+    @Body(ValidationPipe) dto: OrderPurchaseConfirmationDto,
+  ): Promise<boolean> {
+    return this.orderService.purchaseConfirm(dto);
+  }
 
   /** 주문생성 */
   @Post()

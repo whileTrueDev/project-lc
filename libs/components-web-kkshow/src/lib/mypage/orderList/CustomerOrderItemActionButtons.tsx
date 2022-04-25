@@ -1,14 +1,17 @@
-import { SimpleGrid, Button } from '@chakra-ui/react';
+import { SimpleGrid, Button, useDisclosure, Text } from '@chakra-ui/react';
 import { OrderItemOption } from '@prisma/client';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import { useOrderPurchaseConfirmMutation } from '@project-lc/hooks';
 
 export function OrderItemActionButtons({
   option,
-  orderConfirmed,
+  hasReview,
 }: {
   option: OrderItemOption;
-  orderConfirmed?: boolean;
+  hasReview?: boolean;
 }): JSX.Element {
-  const { step } = option;
+  const { step, purchaseConfirmationDate } = option;
+  const purchaseConfirmDialog = useDisclosure();
   const buttonSet: {
     label: string;
     onClick: () => void;
@@ -38,31 +41,25 @@ export function OrderItemActionButtons({
         // TODO : 모달창 연결
         console.log('교환,반품신청 모달 띄우기', option.id);
       },
-      display: [
-        'goodsReady',
-        'exportReady',
-        'exportDone',
-        'shipping',
-        'shippingDone',
-      ].includes(step), // 상품준비 이후 표시
-      disabled: !!orderConfirmed, // 구매확정 이후 disabled  -> orderConfirmed 값은 order.orderConfirmationDate 가 있는지 여부로 판단
+      display:
+        ['goodsReady', 'exportReady', 'exportDone', 'shipping', 'shippingDone'].includes(
+          step,
+        ) && !purchaseConfirmationDate, // 상품준비 이후 표시 && 구매확정 안했을 때
+      disabled: !!purchaseConfirmationDate, // 구매확정 이후 disabled
     },
     {
       label: '구매확정',
-      onClick: () => {
-        // TODO : 모달 & 구매확정 요청 연결
-        console.log('구매확정 모달 띄우기', option.id);
-      },
-      display: ['shippingDone'].includes(step), // 배송완료 이후 표시
-      disabled: !!orderConfirmed, // TODO: orderItemOption 스키마 수정 후 orderItemOption.purchaseConfirmationDate로 판단
+      onClick: purchaseConfirmDialog.onOpen,
+      display: ['shippingDone'].includes(step) && !purchaseConfirmationDate, // 배송완료 이후 표시 & 구매확정 하지 않았을때
+      disabled: !!purchaseConfirmationDate,
     },
     {
       label: '리뷰 작성하기',
       onClick: () => {
         console.log('리뷰작성 모달창 띄우기', option.id);
       },
-      display: ['shippingDone'].includes(step), // 배송완료 이후 표시
-      disabled: false, // TODO: orderItemOption 스키마 수정 후 orderItemOption.reivewId로 판단
+      display: ['shippingDone'].includes(step) && !!purchaseConfirmationDate, // 배송완료 이후 표시 & 리뷰 작성하지 않았을때
+      disabled: !!hasReview || !purchaseConfirmationDate, // 이미 리뷰 작성했거나, 구매확정 안한경우 비활성
     },
     {
       label: '문의하기',
@@ -73,6 +70,18 @@ export function OrderItemActionButtons({
       disabled: false,
     },
   ];
+
+  const orderPurchaseMutation = useOrderPurchaseConfirmMutation();
+  const purchaseConfirmRequest = async (): Promise<void> => {
+    orderPurchaseMutation
+      .mutateAsync({ orderItemOptionId: option.id })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  };
   return (
     <SimpleGrid columns={{ base: 2, sm: 1 }} spacing={2}>
       {buttonSet.map(
@@ -88,6 +97,17 @@ export function OrderItemActionButtons({
             </Button>
           ),
       )}
+      <ConfirmDialog
+        title="구매확정하기"
+        isOpen={purchaseConfirmDialog.isOpen}
+        onClose={purchaseConfirmDialog.onClose}
+        onConfirm={purchaseConfirmRequest}
+      >
+        <Text>
+          구매확정시 후원방송인에게 후원금이 적립되며 <br />
+          교환 및 환불이 어렵습니다.
+        </Text>
+      </ConfirmDialog>
     </SimpleGrid>
   );
 }

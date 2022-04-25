@@ -1,4 +1,4 @@
-import { Box, Stack, Text } from '@chakra-ui/react';
+import { Box, Stack, Text, Badge } from '@chakra-ui/react';
 import { Goods, GoodsImages, OrderItemOption, OrderProcessStep } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
@@ -27,8 +27,22 @@ export function orderProcessStepToFmOrderStatus(
 ): FmOrderStatusNumString {
   return orderProcessStepDict[step];
 }
-/** FmOrderStatusBadge 래핑한 컴포넌트 */
-export function OrderStatusBadge({ step }: { step: OrderProcessStep }): JSX.Element {
+/** FmOrderStatusBadge 래핑한 컴포넌트 => FmOrderStatusBadge에는 구매확정이 없어서 별도로 렌더링함 */
+export function OrderStatusBadge({
+  step,
+  purchaseConfirmed,
+}: {
+  step: OrderProcessStep;
+  purchaseConfirmed?: boolean;
+}): JSX.Element {
+  if (purchaseConfirmed)
+    return (
+      <Box>
+        <Badge colorScheme="orange" variant="solid">
+          구매확정
+        </Badge>
+      </Box>
+    );
   return (
     <Box>
       <FmOrderStatusBadge orderStatus={orderProcessStepToFmOrderStatus(step)} />
@@ -38,13 +52,12 @@ export function OrderStatusBadge({ step }: { step: OrderProcessStep }): JSX.Elem
 
 export function OrderItem({
   orderItem,
-  orderConfirmed,
 }: {
   orderItem: OrderItemWithRelations;
-  orderConfirmed?: boolean;
 }): JSX.Element {
   const goodsName = orderItem.goods.goods_name;
   const goodsImage = orderItem.goods.image[0].image;
+  const hasReview = !!orderItem.reviewId;
 
   return (
     <>
@@ -65,7 +78,7 @@ export function OrderItem({
             goodsName={goodsName}
           />
           {/* 기능버튼들 */}
-          <OrderItemActionButtons option={opt} orderConfirmed={orderConfirmed} />
+          <OrderItemActionButtons option={opt} hasReview={hasReview} />
         </Stack>
       ))}
     </>
@@ -89,7 +102,10 @@ export function OrderItemOptionInfo({
       </Box>
       {/* 주문상품 옵션 */}
       <Stack>
-        <OrderStatusBadge step={option.step} />
+        <OrderStatusBadge
+          step={option.step}
+          purchaseConfirmed={!!option.purchaseConfirmationDate}
+        />
         <Text fontWeight="bold">{goodsName}</Text>
         <Stack direction="row">
           <Text>

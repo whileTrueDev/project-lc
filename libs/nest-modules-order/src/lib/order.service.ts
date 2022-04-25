@@ -15,6 +15,7 @@ import {
   GetOrderListDto,
   OrderDetailRes,
   OrderListRes,
+  OrderPurchaseConfirmationDto,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
@@ -250,6 +251,7 @@ export class OrderService extends ServiceBaseWithCache {
             support: {
               include: { broadcaster: { select: { userNickname: true, avatar: true } } },
             },
+            review: { select: { id: true } },
             options: true,
             goods: {
               select: {
@@ -391,6 +393,56 @@ export class OrderService extends ServiceBaseWithCache {
 
     await this.updateOrder(orderId, { deleteFlag: true });
 
+    return true;
+  }
+
+  /** 주문확정 */
+  async purchaseConfirm(dto: OrderPurchaseConfirmationDto): Promise<boolean> {
+    const { orderItemOptionId } = dto;
+    const orderItemOption = await this.prisma.orderItemOption.findUnique({
+      where: { id: orderItemOptionId },
+    });
+
+    if (!orderItemOption) {
+      throw new BadRequestException(
+        `해당 주문상품옵션이 존재하지 않습니다. 주문상품옵션 고유번호 : ${orderItemOptionId}`,
+      );
+    }
+
+    // 주문상품옵션에 대해 구매확정
+    await this.prisma.orderItemOption.update({
+      where: { id: orderItemOptionId },
+      data: {
+        purchaseConfirmationDate: new Date(),
+      },
+    });
+
+    // 해당 주문상품옵션이 포함된 주문 찾기
+    const order = await this.prisma.order.findFirst({
+      where: { orderItems: { some: { options: { some: { id: orderItemOptionId } } } } },
+      select: {
+        id: true,
+        orderItems: { select: { options: true } },
+      },
+    });
+
+    if (!order) {
+      throw new BadRequestException(
+        `해당 주문상품옵션이 포함된 주문이 존재하지 않습니다. 주문상품옵션 고유번호 : ${orderItemOptionId}`,
+      );
+    }
+
+    // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 구매확정 값도 변경
+    const everyOrderItemOptionsPurchaseConfirmed = order.orderItems
+      .flatMap((item) => item.options)
+      .every((opt) => !!opt.purchaseConfirmationDate);
+
+    if (everyOrderItemOptionsPurchaseConfirmed) {
+      await this.prisma.order.update({
+        where: { id: order.id },
+        data: { purchaseConfirmationDate: new Date() },
+      });
+    }
     return true;
   }
 }

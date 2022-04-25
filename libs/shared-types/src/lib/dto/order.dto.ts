@@ -388,3 +388,10 @@ export class UpdateOrderDto {
   @IsOptional()
   deleteFlag?: Order['deleteFlag'];
 }
+
+/** 구매확정 dto */
+export class OrderPurchaseConfirmationDto {
+  /** 구매확정 할 주문상품옵션 고유번호 */
+  @IsNumber()
+  orderItemOptionId: OrderItemOption['id'];
+}

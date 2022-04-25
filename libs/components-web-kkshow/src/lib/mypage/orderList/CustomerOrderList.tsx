@@ -104,11 +104,7 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
 
       <Stack p={1}>
         {order.orderItems.map((item) => (
-          <OrderItem
-            key={item.id}
-            orderItem={item}
-            orderConfirmed={!!order.purchaseConfirmationDate}
-          />
+          <OrderItem key={item.id} orderItem={item} />
         ))}
       </Stack>
     </Stack>
