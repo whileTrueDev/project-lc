@@ -1,7 +1,11 @@
-import { Text } from '@chakra-ui/layout';
+import { Text, TextProps } from '@chakra-ui/layout';
 
-export function TextDotConnector(): JSX.Element {
-  return <Text as="span">{' · '}</Text>;
+export function TextDotConnector(props: TextProps): JSX.Element {
+  return (
+    <Text as="span" {...props}>
+      {' · '}
+    </Text>
+  );
 }
 
 export default TextDotConnector;

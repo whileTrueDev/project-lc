@@ -1,8 +1,11 @@
-import { Stack, Text, Button, Center } from '@chakra-ui/react';
+import { Button, Center, Stack, Text, useColorModeValue } from '@chakra-ui/react';
+import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { INFINITE_ORDER_LIST_QUERY_KEY, useInfiniteOrderList } from '@project-lc/hooks';
-import { GetOrderListDto } from '@project-lc/shared-types';
+import { GetOrderListDto, OrderDataWithRelations } from '@project-lc/shared-types';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
+import { OrderItem } from './CustomerOrderItem';
 import CustomerOrderPeriodFilter from './CustomerOrderPeriodFilter';
 
 export function CustomerOrderList({ customerId }: { customerId: number }): JSX.Element {
@@ -13,16 +16,8 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
     customerId,
   });
 
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
-    refetch,
-  } = useInfiniteOrderList(dto);
+  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, status, refetch } =
+    useInfiniteOrderList(dto);
 
   // 필터 적용으로 dto 가 변경되는 경우
   useEffect(() => {
@@ -35,12 +30,15 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
     refetch();
   }, [dto, queryClient, refetch]);
 
+  const orderListBgColor = useColorModeValue('gray.50', 'gray.900');
+
   if (status === 'loading') return <Text>loading...</Text>;
   if (status === 'error') return <Text>error... {error.message}</Text>;
   if (!data?.pages?.[0]?.count) return <Text>no data</Text>;
   return (
     <Stack>
-      <Text>주문/배송내역</Text>
+      <Text fontWeight="bold">주문/배송내역</Text>
+
       {/* 주문내역 조회 필터 - 기간 */}
       <CustomerOrderPeriodFilter
         changePeriod={({ periodStart, periodEnd }) => {
@@ -51,39 +49,68 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
           }));
         }}
       />
-      {/* 주문내역목록 */}
-      {data.pages.map((group, i) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Stack key={i}>
-          <Text fontWeight="bold"> group index : {i}</Text>
-          <Stack>
+
+      <Stack bg={orderListBgColor} px={1} py={4}>
+        {/* 주문내역목록 */}
+        {data.pages.map((group, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Stack key={`page-${i}`} spacing={4}>
             {group.orders.map((order) => (
-              <Text key={order.id}>
-                {order.orderCode} {order.createDate}
-              </Text>
+              <OrderData key={order.id} order={order} />
             ))}
           </Stack>
-        </Stack>
-      ))}
+        ))}
 
-      {/* 더보기 버튼 */}
-      {hasNextPage && (
-        <Center>
-          <Button
-            type="button"
-            size="sm"
-            isLoading={isFetchingNextPage}
-            onClick={() => fetchNextPage()}
-          >
-            더보기
-          </Button>
-        </Center>
-      )}
-      <Text>{JSON.stringify(dto)}</Text>
-
-      <Text>{isFetching && !isFetchingNextPage ? 'Fetching...' : null}</Text>
+        {/* 더보기 버튼 */}
+        {hasNextPage && (
+          <Center>
+            <Button
+              type="button"
+              size="sm"
+              isLoading={isFetchingNextPage}
+              onClick={() => fetchNextPage()}
+            >
+              더보기
+            </Button>
+          </Center>
+        )}
+      </Stack>
     </Stack>
   );
 }
 
 export default CustomerOrderList;
+
+function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
+  const orderDataBgColor = useColorModeValue('white', 'gray.800');
+  return (
+    <Stack borderWidth="1px" borderRadius="md" p={1} boxShadow="md" bg={orderDataBgColor}>
+      <Stack direction="row" justifyContent="space-between">
+        <Stack direction={{ base: 'column', sm: 'row' }}>
+          <Text>주문번호 : {order.orderCode}</Text>
+          <TextDotConnector display={{ base: 'none', sm: 'block' }} />
+          <Text>주문일자 : {dayjs(order.createDate).format('YYYY-MM-DD')}</Text>
+        </Stack>
+
+        <Button
+          size="sm"
+          onClick={() => {
+            console.log('주문 상세보기 페이지로 이동');
+          }}
+        >
+          상세보기
+        </Button>
+      </Stack>
+
+      <Stack p={1}>
+        {order.orderItems.map((item) => (
+          <OrderItem
+            key={item.id}
+            orderItem={item}
+            orderConfirmed={!!order.purchaseConfirmationDate}
+          />
+        ))}
+      </Stack>
+    </Stack>
+  );
+}

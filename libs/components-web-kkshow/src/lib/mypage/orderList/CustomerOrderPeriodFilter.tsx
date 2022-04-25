@@ -13,7 +13,7 @@ export function CustomerOrderPeriodFilter({
   return (
     <Stack>
       <Text>기간별 주문 조회</Text>
-      <Stack direction="row">
+      <Stack direction={{ base: 'column', md: 'row' }}>
         <PeriodButtonSet changePeriod={changePeriod} />
         <PeriodInputSet changePeriod={changePeriod} />
       </Stack>
@@ -71,7 +71,13 @@ export function PeriodInputSet({
     changePeriod(data);
   };
   return (
-    <Stack as="form" direction="row" onSubmit={handleSubmit(onSubmit)}>
+    <Stack
+      as="form"
+      direction="row"
+      onSubmit={handleSubmit(onSubmit)}
+      alignItems="center"
+      spacing={1}
+    >
       <Input type="date" size="sm" width="150px" {...register('periodStart')} />
       <Text>~</Text>
       <Input type="date" size="sm" width="150px" {...register('periodEnd')} />
