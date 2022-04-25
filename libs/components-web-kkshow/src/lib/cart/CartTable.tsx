@@ -1,4 +1,11 @@
-import { AddIcon, CheckIcon, CloseIcon, DeleteIcon, MinusIcon } from '@chakra-ui/icons';
+import {
+  AddIcon,
+  CheckIcon,
+  CloseIcon,
+  DeleteIcon,
+  Icon,
+  MinusIcon,
+} from '@chakra-ui/icons';
 import {
   Avatar,
   Badge,
@@ -39,6 +46,7 @@ import { useCartStore } from '@project-lc/stores';
 import { getCartKey, getLocaleNumber } from '@project-lc/utils-frontend';
 import NextLink from 'next/link';
 import { useCallback, useEffect, useMemo } from 'react';
+import { MdOutlineShoppingCart } from 'react-icons/md';
 import shallow from 'zustand/shallow';
 
 export function CartTable(): JSX.Element {
@@ -73,11 +81,14 @@ export function CartTable(): JSX.Element {
     );
   if (!isLoading && (!data || (data && data.length === 0)))
     return (
-      <Box my={12}>
-        <Center>
-          <Text fontSize="lg">아직 장바구니에 담은 상품이 없습니다.</Text>
-        </Center>
-      </Box>
+      <Center>
+        <Box my={12} textAlign="center">
+          <Icon as={MdOutlineShoppingCart} width={40} height={40} color="GrayText" />
+          <Text fontSize={{ base: 'md', lg: 'lg' }} whiteSpace="break-spaces">
+            {`아직 장바구니에 담은 상품이 없습니다.\n상품을 추가해보세요.`}
+          </Text>
+        </Box>
+      </Center>
     );
 
   return (
@@ -109,7 +120,7 @@ export function CartTable(): JSX.Element {
         </ButtonGroup>
 
         {/* PC화면 */}
-        <Table display={{ base: 'none', lg: 'block' }}>
+        <Table display={{ base: 'none', md: 'block' }}>
           <Thead>
             <Tr>
               <Th fontFamily="inherit">상품</Th>
@@ -126,7 +137,7 @@ export function CartTable(): JSX.Element {
         </Table>
 
         {/* 모바일 화면 */}
-        <Box display={{ base: 'block', lg: 'none' }}>
+        <Box display={{ base: 'block', md: 'none' }}>
           {data.map((cartItem) => (
             <CartItemListItem key={cartItem.id} cartItem={cartItem} />
           ))}
@@ -147,15 +158,15 @@ export function CartTableRow({ cartItem }: CartTableItemProps): JSX.Element {
   return (
     <Tr>
       {/* 상품정보 */}
-      <Td>
+      <Td w="58%">
         <CartItemDisplay cartItem={cartItem} />
       </Td>
 
-      <Td w="150px">
+      <Td w="200px">
         <CartItemPriceDisplay cartItem={cartItem} />
       </Td>
 
-      <Td w="160px" textAlign="center">
+      <Td w="200px" textAlign="center">
         <CartItemSellerInfoDisplay cartItem={cartItem} />
       </Td>
 
@@ -177,10 +188,20 @@ export function CartTableRow({ cartItem }: CartTableItemProps): JSX.Element {
 
 type CartItemListItemProps = CartItemDisplayProps;
 export function CartItemListItem({ cartItem }: CartItemListItemProps): JSX.Element {
+  // 카트 상품 삭제
+  const deleteCartItem = useCartItemDeleteMutation();
+  const handleCartItemDelete = (itemId: CartItemType['id']): void => {
+    deleteCartItem.mutateAsync(itemId);
+  };
   return (
     <Box mt={4}>
       <Box py={2}>
-        <CartItemDisplay cartItem={cartItem} displayPrice displaySellerInfo />
+        <CartItemDisplay
+          cartItem={cartItem}
+          displayPrice
+          displaySellerInfo
+          onClose={() => handleCartItemDelete(cartItem.id)}
+        />
       </Box>
       <Divider />
     </Box>
@@ -191,11 +212,13 @@ export interface CartItemDisplayProps {
   cartItem: CartItemRes[number];
   displayPrice?: boolean;
   displaySellerInfo?: boolean;
+  onClose?: () => void;
 }
 export function CartItemDisplay({
   cartItem,
   displayPrice = false,
   displaySellerInfo = false,
+  onClose,
 }: CartTableItemProps): JSX.Element {
   const selectedItems = useCartStore((s) => s.selectedItems);
   const handleToggle = useCartStore((s) => s.handleToggle);
@@ -214,7 +237,14 @@ export function CartItemDisplay({
 
   return (
     <>
-      <Box display={{ base: 'block', lg: 'none' }}>{checkbox}</Box>
+      <Flex display={{ base: 'flex', lg: 'none' }} justify="space-between">
+        {checkbox}
+        {onClose && (
+          <IconButton size="sm" aria-label="remove-this-cartitem" onClick={onClose}>
+            <DeleteIcon />
+          </IconButton>
+        )}
+      </Flex>
       <Flex gap={4} alignItems={{ base: 'flex-start', lg: 'center' }}>
         <Box display={{ base: 'none', lg: 'block' }}>{checkbox}</Box>
         <Image w="80px" rounded="md" src={cartItem.goods.image[0].image} alt="" />
@@ -222,12 +252,16 @@ export function CartItemDisplay({
           <Text fontSize="xs">{cartItem.goods.seller.sellerShop.shopName}</Text>
           {/* // TODO: 상품상세페이지 작업 이후 해당 상품상세페이지로 이동하도록 변경  */}
           <NextLink href="/shopping">
-            <Link fontSize={{ base: 'md', lg: 'lg' }} fontWeight="bold" noOfLines={2}>
+            <Link
+              fontSize={{ base: 'sm', sm: 'md', lg: 'lg' }}
+              fontWeight="bold"
+              noOfLines={2}
+            >
               {cartItem.goods.goods_name}
             </Link>
           </NextLink>
 
-          <Flex mt={2} gap={1} flexDir="column">
+          <Flex mt={2} gap={2} flexDir="column">
             {cartItem.options.map((opt, idx) => (
               <CartTableRowOption key={opt.id} index={idx} option={opt} />
             ))}
@@ -272,9 +306,8 @@ export function CartItemPriceDisplay({ cartItem }: CartTableItemProps): JSX.Elem
       </Text>
       {cartItem.options.map((opt, idx) => (
         <Flex key={opt.id} gap={2} mt={1}>
-          <Badge minW={9}>옵션{idx + 1}</Badge>
           <Text color="GrayText" fontSize="xs">
-            {getLocaleNumber(opt.discountPrice)} 원
+            옵션{idx + 1} {getLocaleNumber(opt.discountPrice)} 원
           </Text>
         </Flex>
       ))}
@@ -331,6 +364,7 @@ export function CartTableRowOption({
     () => (
       <Flex gap={1}>
         <IconButton
+          variant="outline"
           aria-label="decrease-cart-item-option-quantity"
           icon={<MinusIcon />}
           size="xs"
@@ -342,6 +376,7 @@ export function CartTableRowOption({
           {option.quantity}
         </Text>
         <IconButton
+          variant="outline"
           aria-label="increase-cart-item-option-quantity"
           icon={<AddIcon />}
           size="xs"
@@ -350,6 +385,7 @@ export function CartTableRowOption({
           onClick={handleQuantityIncrease}
         />
         <IconButton
+          variant="outline"
           ml={4}
           aria-label="delete-cartitem"
           size="xs"
@@ -371,21 +407,16 @@ export function CartTableRowOption({
   );
 
   return (
-    <Flex
-      key={option.id}
-      justifyContent="space-between"
-      flexDir={{ base: 'column', lg: 'row' }}
-    >
-      <Flex gap={1} alignItems="flex-start" flexDir={{ base: 'column', lg: 'row' }}>
-        <Flex gap={2} alignItems="center">
+    <Flex key={option.id} justifyContent="space-between" flexDir="column">
+      <Flex gap={1} alignItems="flex-start" flexDir={{ base: 'column', lg: 'column' }}>
+        <Flex gap={1} alignItems="center">
           <Badge>옵션{index + 1}</Badge>
-          <Flex display={{ lg: 'none' }}>{optionButtons}</Flex>
+          <Text fontSize={{ base: 'xs', lg: 'sm' }} color="GrayText" noOfLines={1}>
+            {option.name}: {option.value}
+          </Text>
         </Flex>
-        <Text fontSize={{ base: 'xs', lg: 'sm' }} color="GrayText" noOfLines={1}>
-          {option.name}: {option.value}
-        </Text>
+        {optionButtons}
       </Flex>
-      <Flex display={{ base: 'none', lg: 'flex' }}>{optionButtons}</Flex>
     </Flex>
   );
 }

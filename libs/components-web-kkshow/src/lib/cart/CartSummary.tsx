@@ -1,5 +1,5 @@
 import { AddIcon, MinusIcon } from '@chakra-ui/icons';
-import { Box, Flex, Icon, Text } from '@chakra-ui/react';
+import { Flex, Icon, Text } from '@chakra-ui/react';
 import { useCart } from '@project-lc/hooks';
 import { useCartStore } from '@project-lc/stores';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
@@ -48,40 +48,85 @@ export function CartSummary(): JSX.Element | null {
       borderWidth="thin"
       rounded="lg"
       flexDir={{ base: 'column', md: 'row' }}
+      gap={2}
     >
-      <Box textAlign="center">
+      <Flex
+        display={{ base: 'flex', md: 'block' }}
+        textAlign="center"
+        justify="space-between"
+        w="100%"
+      >
         <Text fontSize="sm">총 상품 금액</Text>
-        <Text fontSize="xl" fontWeight="bold">
-          {getLocaleNumber(calculated.totalGoodsPrice)}
+        <Text fontSize={{ base: 'md', md: 'xl' }} fontWeight="bold">
+          {getLocaleNumber(calculated.totalGoodsPrice)}원
         </Text>
-      </Box>
+      </Flex>
 
-      <MinusIcon />
+      <Flex
+        display={{ base: 'none', md: 'block' }}
+        textAlign="center"
+        flexDir="row-reverse"
+        w="100%"
+      >
+        <MinusIcon />
+      </Flex>
 
-      <Box textAlign="center">
+      <Flex
+        display={{ base: 'flex', md: 'block' }}
+        textAlign="center"
+        justify="space-between"
+        w="100%"
+      >
         <Text fontSize="sm">총 할인 금액</Text>
-        <Text fontSize="xl" fontWeight="bold">
-          {getLocaleNumber(calculated.totalDiscountAmount)}
+        <Text fontSize={{ base: 'md', md: 'xl' }} fontWeight="bold">
+          <Text as="span" visibility={{ base: 'visible', md: 'hidden' }}>
+            -
+          </Text>
+          {getLocaleNumber(calculated.totalDiscountAmount)}원
         </Text>
-      </Box>
+      </Flex>
 
-      <AddIcon />
+      <Flex
+        display={{ base: 'none', md: 'block' }}
+        textAlign="center"
+        flexDir="row-reverse"
+        w="100%"
+      >
+        <AddIcon />
+      </Flex>
 
-      <Box textAlign="center">
+      <Flex
+        display={{ base: 'flex', md: 'block' }}
+        textAlign="center"
+        justify="space-between"
+        w="100%"
+      >
         <Text fontSize="sm">총 배송비</Text>
-        <Text fontSize="xl" fontWeight="bold">
-          {getLocaleNumber(calculated.totalShippingCost)}
+        <Text fontSize={{ base: 'md', md: 'xl' }} fontWeight="bold">
+          {getLocaleNumber(calculated.totalShippingCost)}원
         </Text>
-      </Box>
+      </Flex>
 
-      <Icon as={FaEquals} />
+      <Flex
+        display={{ base: 'none', md: 'block' }}
+        textAlign="center"
+        flexDir="row-reverse"
+        w="100%"
+      >
+        <Icon as={FaEquals} />
+      </Flex>
 
-      <Box textAlign="center">
+      <Flex
+        display={{ base: 'flex', md: 'block' }}
+        textAlign="center"
+        justify="space-between"
+        w="100%"
+      >
         <Text fontSize="sm">총 주문 금액</Text>
         <Text fontSize="2xl" fontWeight="bold" color="blue.500">
-          {getLocaleNumber(calculated.totalOrderPrice + calculated.totalShippingCost)}
+          {getLocaleNumber(calculated.totalOrderPrice + calculated.totalShippingCost)}원
         </Text>
-      </Box>
+      </Flex>
     </Flex>
   );
 }
