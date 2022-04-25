@@ -59,6 +59,7 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
   };
 
   // TODO: 장바구니 작업 이후 장바구니 상품 개수 count 데이터 연동 추가 필요 by hwasurr
+  const cartItemsCount = useMemo(() => 6, []);
 
   return (
     <Center w="100%">
@@ -71,7 +72,7 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
       >
         {link.name === '장바구니' ? (
           <Box pos="relative">
-            <CountBadge count={6} top={-2} right={-2} />
+            <CountBadge count={cartItemsCount} top={-2} right={-2} />
             <Icon as={link.icon} width={5} height={5} />
           </Box>
         ) : (
