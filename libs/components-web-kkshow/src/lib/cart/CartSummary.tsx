@@ -39,16 +39,18 @@ export function CartSummary(): JSX.Element | null {
   if (!data || data.length === 0) return null;
   return (
     <Flex
-      my={6}
-      py={10}
-      px={6}
+      mt={{ base: 2, md: 6 }}
+      mb={6}
+      py={{ base: 4, md: 10 }}
+      px={{ base: 4, md: 6 }}
       justify="space-between"
       alignItems="center"
       borderWidth="thin"
       rounded="lg"
+      flexDir={{ base: 'column', md: 'row' }}
     >
       <Box textAlign="center">
-        <Text>총 상품 금액</Text>
+        <Text fontSize="sm">총 상품 금액</Text>
         <Text fontSize="xl" fontWeight="bold">
           {getLocaleNumber(calculated.totalGoodsPrice)}
         </Text>
@@ -57,7 +59,7 @@ export function CartSummary(): JSX.Element | null {
       <MinusIcon />
 
       <Box textAlign="center">
-        <Text>총 할인 금액</Text>
+        <Text fontSize="sm">총 할인 금액</Text>
         <Text fontSize="xl" fontWeight="bold">
           {getLocaleNumber(calculated.totalDiscountAmount)}
         </Text>
@@ -66,7 +68,7 @@ export function CartSummary(): JSX.Element | null {
       <AddIcon />
 
       <Box textAlign="center">
-        <Text>총 배송비</Text>
+        <Text fontSize="sm">총 배송비</Text>
         <Text fontSize="xl" fontWeight="bold">
           {getLocaleNumber(calculated.totalShippingCost)}
         </Text>
@@ -75,7 +77,7 @@ export function CartSummary(): JSX.Element | null {
       <Icon as={FaEquals} />
 
       <Box textAlign="center">
-        <Text>총 주문 금액</Text>
+        <Text fontSize="sm">총 주문 금액</Text>
         <Text fontSize="2xl" fontWeight="bold" color="blue.500">
           {getLocaleNumber(calculated.totalOrderPrice + calculated.totalShippingCost)}
         </Text>

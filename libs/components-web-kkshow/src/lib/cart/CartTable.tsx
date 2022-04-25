@@ -1,11 +1,13 @@
 import { AddIcon, CheckIcon, CloseIcon, DeleteIcon, MinusIcon } from '@chakra-ui/icons';
 import {
+  Avatar,
   Badge,
   Box,
   Button,
   ButtonGroup,
   Center,
   Checkbox,
+  Divider,
   Flex,
   IconButton,
   Image,
@@ -25,7 +27,6 @@ import {
   CartItemOption,
   CartItemOption as CartItemOptionType,
 } from '@prisma/client';
-import BorderedAvatar from '@project-lc/components-core/BorderedAvatar';
 import {
   useCart,
   useCartItemDeleteMutation,
@@ -37,7 +38,7 @@ import { CartItemRes } from '@project-lc/shared-types';
 import { useCartStore } from '@project-lc/stores';
 import { getCartKey, getLocaleNumber } from '@project-lc/utils-frontend';
 import NextLink from 'next/link';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import shallow from 'zustand/shallow';
 
 export function CartTable(): JSX.Element {
@@ -107,12 +108,13 @@ export function CartTable(): JSX.Element {
           </Button>
         </ButtonGroup>
 
-        <Table>
+        {/* PC화면 */}
+        <Table display={{ base: 'none', lg: 'block' }}>
           <Thead>
             <Tr>
               <Th fontFamily="inherit">상품</Th>
               <Th fontFamily="inherit">가격</Th>
-              <Th fontFamily="inherit">판매자</Th>
+              <Th fontFamily="inherit">배송비</Th>
               <Th />
             </Tr>
           </Thead>
@@ -122,91 +124,39 @@ export function CartTable(): JSX.Element {
             ))}
           </Tbody>
         </Table>
+
+        {/* 모바일 화면 */}
+        <Box display={{ base: 'block', lg: 'none' }}>
+          {data.map((cartItem) => (
+            <CartItemListItem key={cartItem.id} cartItem={cartItem} />
+          ))}
+        </Box>
       </Box>
     </Box>
   );
 }
 
-interface CartTableItemProps {
-  cartItem: CartItemRes[number];
-}
+type CartTableItemProps = CartItemDisplayProps;
 export function CartTableRow({ cartItem }: CartTableItemProps): JSX.Element {
-  const selectedItems = useCartStore((s) => s.selectedItems);
-  const handleToggle = useCartStore((s) => s.handleToggle);
-
   // 카트 상품 삭제
   const deleteCartItem = useCartItemDeleteMutation();
   const handleCartItemDelete = (itemId: CartItemType['id']): void => {
     deleteCartItem.mutateAsync(itemId);
   };
 
-  // 카트 상품 전체 금액
-  const totalPrice = useMemo(() => {
-    return cartItem.options.reduce((p, n) => p + Number(n.discountPrice) * n.quantity, 0);
-  }, [cartItem.options]);
-
   return (
     <Tr>
       {/* 상품정보 */}
       <Td>
-        <Flex gap={4} alignItems="center">
-          <Checkbox
-            size="lg"
-            colorScheme="blue"
-            isChecked={selectedItems.findIndex((x) => x.id === cartItem.id) > -1}
-            onChange={(e) => handleToggle(cartItem)}
-          />
-          <Image w="80px" rounded="md" src={cartItem.goods.image[0].image} alt="" />
-          <Box w="100%">
-            {/* // TODO: 상품상세페이지 작업 이후 해당 상품상세페이지로 이동하도록 변경  */}
-            <NextLink href="/shopping">
-              <Link fontSize="lg" fontWeight="bold" noOfLines={2}>
-                {cartItem.goods.goods_name}
-              </Link>
-            </NextLink>
-
-            <Flex mt={2} gap={1} flexDir="column">
-              {cartItem.options.map((opt, idx) => (
-                <CartTableRowOption key={opt.id} index={idx} option={opt} />
-              ))}
-
-              {cartItem.support && cartItem.support.broadcaster && (
-                <Flex alignItems="center" gap={1} color="GrayText">
-                  <Badge>후원방송인</Badge>
-                  <BorderedAvatar
-                    src={cartItem.support.broadcaster.avatar || undefined}
-                    size="sm"
-                  />
-                  <Text fontSize="sm">{cartItem.support.broadcaster.userNickname}</Text>
-                </Flex>
-              )}
-            </Flex>
-          </Box>
-        </Flex>
+        <CartItemDisplay cartItem={cartItem} />
       </Td>
 
       <Td w="150px">
-        <Text fontSize="xl">
-          {getLocaleNumber(totalPrice)}{' '}
-          <Text as="span" fontSize="md">
-            원
-          </Text>
-        </Text>
-        {cartItem.options.map((opt, idx) => (
-          <Flex key={opt.id} gap={2} mt={1}>
-            <Badge minW={9}>옵션{idx + 1}</Badge>
-            <Text color="GrayText" fontSize="xs">
-              {getLocaleNumber(opt.discountPrice)} 원
-            </Text>
-          </Flex>
-        ))}
+        <CartItemPriceDisplay cartItem={cartItem} />
       </Td>
 
       <Td w="160px" textAlign="center">
-        <Text>{cartItem.goods.seller.sellerShop.shopName}</Text>
-        {!cartItem.shippingCostIncluded && (
-          <Text>배송비 {getLocaleNumber(cartItem.shippingCost)} 원</Text>
-        )}
+        <CartItemSellerInfoDisplay cartItem={cartItem} />
       </Td>
 
       <Td>
@@ -224,6 +174,125 @@ export function CartTableRow({ cartItem }: CartTableItemProps): JSX.Element {
     </Tr>
   );
 }
+
+type CartItemListItemProps = CartItemDisplayProps;
+export function CartItemListItem({ cartItem }: CartItemListItemProps): JSX.Element {
+  return (
+    <Box mt={4}>
+      <Box py={2}>
+        <CartItemDisplay cartItem={cartItem} displayPrice displaySellerInfo />
+      </Box>
+      <Divider />
+    </Box>
+  );
+}
+
+export interface CartItemDisplayProps {
+  cartItem: CartItemRes[number];
+  displayPrice?: boolean;
+  displaySellerInfo?: boolean;
+}
+export function CartItemDisplay({
+  cartItem,
+  displayPrice = false,
+  displaySellerInfo = false,
+}: CartTableItemProps): JSX.Element {
+  const selectedItems = useCartStore((s) => s.selectedItems);
+  const handleToggle = useCartStore((s) => s.handleToggle);
+
+  const checkbox = useMemo(
+    () => (
+      <Checkbox
+        size="lg"
+        colorScheme="blue"
+        isChecked={selectedItems.findIndex((x) => x.id === cartItem.id) > -1}
+        onChange={() => handleToggle(cartItem)}
+      />
+    ),
+    [cartItem, handleToggle, selectedItems],
+  );
+
+  return (
+    <>
+      <Box display={{ base: 'block', lg: 'none' }}>{checkbox}</Box>
+      <Flex gap={4} alignItems={{ base: 'flex-start', lg: 'center' }}>
+        <Box display={{ base: 'none', lg: 'block' }}>{checkbox}</Box>
+        <Image w="80px" rounded="md" src={cartItem.goods.image[0].image} alt="" />
+        <Box w="100%">
+          <Text fontSize="xs">{cartItem.goods.seller.sellerShop.shopName}</Text>
+          {/* // TODO: 상품상세페이지 작업 이후 해당 상품상세페이지로 이동하도록 변경  */}
+          <NextLink href="/shopping">
+            <Link fontSize={{ base: 'md', lg: 'lg' }} fontWeight="bold" noOfLines={2}>
+              {cartItem.goods.goods_name}
+            </Link>
+          </NextLink>
+
+          <Flex mt={2} gap={1} flexDir="column">
+            {cartItem.options.map((opt, idx) => (
+              <CartTableRowOption key={opt.id} index={idx} option={opt} />
+            ))}
+
+            {cartItem.support && cartItem.support.broadcaster && (
+              <Flex alignItems="center" gap={1} color="GrayText">
+                <Badge>후원방송인</Badge>
+                <Avatar
+                  src={cartItem.support.broadcaster.avatar || undefined}
+                  size="sm"
+                />
+                <Text fontSize="sm" noOfLines={1}>
+                  {cartItem.support.broadcaster.userNickname}
+                </Text>
+              </Flex>
+            )}
+          </Flex>
+
+          {displayPrice && <CartItemPriceDisplay cartItem={cartItem} />}
+          {displaySellerInfo && <CartItemSellerInfoDisplay cartItem={cartItem} />}
+        </Box>
+      </Flex>
+    </>
+  );
+}
+
+export function CartItemPriceDisplay({ cartItem }: CartTableItemProps): JSX.Element {
+  // 카트 상품 전체 금액
+  const totalPrice = useMemo(() => {
+    return cartItem.options.reduce((p, n) => p + Number(n.discountPrice) * n.quantity, 0);
+  }, [cartItem.options]);
+
+  return (
+    <Box>
+      <Text fontSize="xl">
+        <Text as="span" fontWeight="bold">
+          {getLocaleNumber(totalPrice)}{' '}
+        </Text>
+        <Text as="span" fontSize="sm">
+          원
+        </Text>
+      </Text>
+      {cartItem.options.map((opt, idx) => (
+        <Flex key={opt.id} gap={2} mt={1}>
+          <Badge minW={9}>옵션{idx + 1}</Badge>
+          <Text color="GrayText" fontSize="xs">
+            {getLocaleNumber(opt.discountPrice)} 원
+          </Text>
+        </Flex>
+      ))}
+    </Box>
+  );
+}
+
+export function CartItemSellerInfoDisplay({ cartItem }: CartTableItemProps): JSX.Element {
+  return (
+    <Box color="GrayText" my={1}>
+      <Text fontSize={{ base: 'xs', md: 'sm' }}>
+        배송비{' '}
+        {!cartItem.shippingCostIncluded ? getLocaleNumber(cartItem.shippingCost) : 0} 원
+      </Text>
+    </Box>
+  );
+}
+
 interface CartTableRowOptionProps {
   option: CartItemOption;
   index: number;
@@ -236,32 +305,30 @@ export function CartTableRowOption({
 
   // 카트 옵션 개수 추가 제거
   const optionQuantity = useCartOptionQuantity();
-  const handleQuantityIncrease = async (): Promise<void> => {
+  // 옵션 개수 높이기
+  const handleQuantityIncrease = useCallback(async (): Promise<void> => {
     optionQuantity.mutateAsync({ optionId: option.id, quantity: option.quantity + 1 });
-  };
-  const handleQuantityDecrease = async (): Promise<void> => {
+  }, [option.id, option.quantity, optionQuantity]);
+  // 옵션 개수 낮추기
+  const handleQuantityDecrease = useCallback(async (): Promise<void> => {
     if (option.quantity > 1) {
       optionQuantity.mutateAsync({ optionId: option.id, quantity: option.quantity - 1 });
     } else {
       toast({ status: 'error', title: '최소 1개 이상 주문할 수 있습니다.' });
     }
-  };
+  }, [option.id, option.quantity, optionQuantity, toast]);
 
   // 카트 상품 특정 옵션 삭제
   const deleteCartItemOpt = useCartItemOptDeleteMutation();
-  const handleOptionDelete = (optId: CartItemOptionType['id']): void => {
-    deleteCartItemOpt.mutateAsync(optId);
-  };
+  const handleOptionDelete = useCallback(
+    (optId: CartItemOptionType['id']): void => {
+      deleteCartItemOpt.mutateAsync(optId);
+    },
+    [deleteCartItemOpt],
+  );
 
-  return (
-    <Flex key={option.id} justifyContent="space-between">
-      <Flex gap={1} alignItems="flex-start">
-        <Badge>옵션{index + 1}</Badge>
-        <Text fontSize="sm" color="GrayText">
-          {option.name}: {option.value}
-        </Text>
-      </Flex>
-
+  const optionButtons = useMemo(
+    () => (
       <Flex gap={1}>
         <IconButton
           aria-label="decrease-cart-item-option-quantity"
@@ -271,7 +338,7 @@ export function CartTableRowOption({
           onClick={handleQuantityDecrease}
           isDisabled={option.quantity <= 1 || optionQuantity.isLoading}
         />
-        <Text fontSize="lg" w={6} textAlign="center">
+        <Text fontSize={{ base: 'md', lg: 'lg' }} w={6} textAlign="center">
           {option.quantity}
         </Text>
         <IconButton
@@ -288,10 +355,37 @@ export function CartTableRowOption({
           size="xs"
           onClick={() => handleOptionDelete(option.id)}
           isLoading={deleteCartItemOpt.isLoading}
-        >
-          <DeleteIcon />
-        </IconButton>
+          icon={<DeleteIcon />}
+        />
       </Flex>
+    ),
+    [
+      deleteCartItemOpt.isLoading,
+      handleOptionDelete,
+      handleQuantityDecrease,
+      handleQuantityIncrease,
+      option.id,
+      option.quantity,
+      optionQuantity.isLoading,
+    ],
+  );
+
+  return (
+    <Flex
+      key={option.id}
+      justifyContent="space-between"
+      flexDir={{ base: 'column', lg: 'row' }}
+    >
+      <Flex gap={1} alignItems="flex-start" flexDir={{ base: 'column', lg: 'row' }}>
+        <Flex gap={2} alignItems="center">
+          <Badge>옵션{index + 1}</Badge>
+          <Flex display={{ lg: 'none' }}>{optionButtons}</Flex>
+        </Flex>
+        <Text fontSize={{ base: 'xs', lg: 'sm' }} color="GrayText" noOfLines={1}>
+          {option.name}: {option.value}
+        </Text>
+      </Flex>
+      <Flex display={{ base: 'none', lg: 'flex' }}>{optionButtons}</Flex>
     </Flex>
   );
 }
