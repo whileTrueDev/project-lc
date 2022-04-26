@@ -16,8 +16,16 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
     customerId,
   });
 
-  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, status, refetch } =
-    useInfiniteOrderList(dto);
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+    refetch,
+    isLoading,
+  } = useInfiniteOrderList(dto);
 
   // 필터 적용으로 dto 가 변경되는 경우
   useEffect(() => {
@@ -32,7 +40,6 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
 
   const orderListBgColor = useColorModeValue('gray.50', 'gray.900');
 
-  if (status === 'loading') return <Text>loading...</Text>;
   if (status === 'error') return <Text>error... {error.message}</Text>;
   if (!data?.pages?.[0]?.count) return <Text>no data</Text>;
   return (
@@ -60,7 +67,8 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
             ))}
           </Stack>
         ))}
-
+        {isLoading && <Text>loading...</Text>}
+        {!data?.pages?.[0]?.count && <Text>no data</Text>}
         {/* 더보기 버튼 */}
         {hasNextPage && (
           <Center>
