@@ -1866,7 +1866,7 @@ model GoodsCategory {
   name               String // 카테고리명
   mainCategoryFlag   Boolean         @default(false) // 대표카테고리인지 여부 (카테고리 트리의 잎 여부)
   parentCategoryId   Int?
-  parentCategory     GoodsCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id]) // 상위 부모 카테고리
+  parentCategory     GoodsCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id], onDelete: Cascade) // 상위 부모 카테고리
   childrenCategories GoodsCategory[] @relation("CategoryHierarchy") // 하위 자식카테고리들
   goods              Goods[] // 이 카테고리에 해당하는 상품들
 }

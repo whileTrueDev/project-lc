@@ -35,6 +35,9 @@
       "@project-lc/nest-modules-cipher": ["libs/nest-modules-cipher/src/index.ts"],
       "@project-lc/nest-modules-customer": ["libs/nest-modules-customer/src/index.ts"],
       "@project-lc/nest-modules-goods": ["libs/nest-modules-goods/src/index.ts"],
+      "@project-lc/nest-modules-goods-category": [
+        "libs/nest-modules-goods-category/src/index.ts"
+      ],
       "@project-lc/nest-modules-inquiry": ["libs/nest-modules-inquiry/src/index.ts"],
       "@project-lc/nest-modules-jwt-helper": [
         "libs/nest-modules-jwt-helper/src/index.ts"
