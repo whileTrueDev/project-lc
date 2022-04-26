@@ -69,12 +69,13 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
         width="80%"
         onClick={onQuickMenuClick}
         spacing={1}
+        position="relative"
       >
         {link.name === '장바구니' ? (
-          <Box pos="relative">
-            <CountBadge count={cartItemsCount} top={-2} right={-2} />
+          <>
+            <CountBadge count={cartItemsCount} right={2} />
             <Icon as={link.icon} width={5} height={5} />
-          </Box>
+          </>
         ) : (
           <Icon as={link.icon} width={5} height={5} />
         )}
