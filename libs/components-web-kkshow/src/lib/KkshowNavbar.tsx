@@ -1,13 +1,25 @@
-import { Box, Flex, Link, Stack, useColorModeValue } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  Icon,
+  Link,
+  Stack,
+  Tooltip,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import {
   kkshowNavLinks,
   NavItem as NavItemType,
 } from '@project-lc/components-constants/navigation';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { KkshowLogoVariant, KksLogo } from '@project-lc/components-shared/KksLogo';
+import { useIsLoggedIn } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
+import { MdAccountCircle, MdShoppingCart } from 'react-icons/md';
+import { PersonalPopoverMenu } from '@project-lc/components-shared/navbar/NavbarRightButtonSection';
 import { Searcher } from './search-input/Searcher';
 
 export const kkshowNavHeight = 120;
@@ -22,6 +34,7 @@ interface KkshowNavbar {
  *                             다크모드에서는 배경 검정, 글자 흰색인 네비바(검색페이지)
  */
 export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
+  const { isLoggedIn } = useIsLoggedIn();
   const palette = {
     bg: useColorModeValue('white', 'gray.800'),
     color: useColorModeValue('gray.700', 'whiteAlpha.900'),
@@ -72,8 +85,10 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
 
         {/* 우측 */}
         <Flex alignItems="center">
-          <ColorModeSwitcher _hover={{}} />
+          {!isLoggedIn && <ColorModeSwitcher _hover={{}} />}
           <Searcher />
+          <CartButton />
+          {isLoggedIn ? <PersonalPopoverMenu /> : <LoginButton />}
         </Flex>
       </Flex>
 
@@ -133,3 +148,38 @@ const NavItem = ({ label, href, isExternal }: NavItemType): JSX.Element => {
   );
 };
 export default KkshowNavbar;
+
+function CartButton(): JSX.Element {
+  const router = useRouter();
+  return (
+    <Tooltip label="장바구니" fontSize="xs">
+      <Button
+        w={10}
+        h={10}
+        variant="unstyle"
+        color="current"
+        onClick={() => router.push('/cart')}
+      >
+        <Icon as={MdShoppingCart} boxSize={6} />
+      </Button>
+    </Tooltip>
+  );
+}
+
+function LoginButton(): JSX.Element {
+  const router = useRouter();
+
+  return (
+    <Tooltip label="로그인하기" fontSize="xs">
+      <Button
+        w={10}
+        h={10}
+        variant="unstyle"
+        color="current"
+        onClick={() => router.push('/login')}
+      >
+        <Icon as={MdAccountCircle} boxSize={6} />
+      </Button>
+    </Tooltip>
+  );
+}
