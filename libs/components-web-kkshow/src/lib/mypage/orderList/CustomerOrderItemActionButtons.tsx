@@ -1,4 +1,14 @@
-import { SimpleGrid, Button, useDisclosure, Text, useToast } from '@chakra-ui/react';
+import {
+  SimpleGrid,
+  Button,
+  useDisclosure,
+  Text,
+  useToast,
+  Stack,
+  Input,
+  useBoolean,
+  Collapse,
+} from '@chakra-ui/react';
 import { OrderItemOption } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import {
@@ -6,16 +16,27 @@ import {
   useOrderPurchaseConfirmMutation,
 } from '@project-lc/hooks';
 import { useQueryClient } from 'react-query';
+import DaumPostcode, { AddressData } from 'react-daum-postcode';
+import { useState } from 'react';
+import { OrderItemOptionInfo, OrderItemOptionInfoProps } from './OrderItemOptionInfo';
 
 export function OrderItemActionButtons({
   option,
   hasReview,
+  goodsImage,
+  goodsName,
 }: {
   option: OrderItemOption;
   hasReview?: boolean;
+  goodsImage: string;
+  goodsName: string;
 }): JSX.Element {
   const { step, purchaseConfirmationDate } = option;
   const purchaseConfirmDialog = useDisclosure();
+  const returnExchangeDialog = useDisclosure();
+  const orderCancelDialog = useDisclosure();
+  const reviewDialog = useDisclosure();
+  const goodsInquireDialog = useDisclosure();
   const buttonSet: {
     label: string;
     onClick: () => void;
@@ -25,26 +46,20 @@ export function OrderItemActionButtons({
     {
       label: '배송조회',
       onClick: () => {
-        console.log('배송조회 페이지로 이동', option.id);
+        alert('배송조회 페이지로 이동');
       },
       display: ['exportDone', 'shipping', 'shippingDone'].includes(step), // 출고완료 이후 표시
       disabled: false,
     },
     {
-      label: '결제 취소 신청',
-      onClick: () => {
-        // TODO : 모달창 연결
-        console.log('결제취소 모달 띄우기', option.id);
-      },
+      label: '주문 취소 신청',
+      onClick: orderCancelDialog.onOpen,
       display: ['orderReceived', 'paymentConfirmed'].includes(step), // 상품준비 이전에만 표시
       disabled: false,
     },
     {
       label: '교환, 반품 신청',
-      onClick: () => {
-        // TODO : 모달창 연결
-        console.log('교환,반품신청 모달 띄우기', option.id);
-      },
+      onClick: returnExchangeDialog.onOpen,
       display:
         ['goodsReady', 'exportReady', 'exportDone', 'shipping', 'shippingDone'].includes(
           step,
@@ -59,17 +74,13 @@ export function OrderItemActionButtons({
     },
     {
       label: '리뷰 작성하기',
-      onClick: () => {
-        console.log('리뷰작성 모달창 띄우기', option.id);
-      },
+      onClick: reviewDialog.onOpen,
       display: ['shippingDone'].includes(step) && !!purchaseConfirmationDate, // 배송완료 이후 표시 & 리뷰 작성하지 않았을때
       disabled: !!hasReview || !purchaseConfirmationDate, // 이미 리뷰 작성했거나, 구매확정 안한경우 비활성
     },
     {
       label: '문의하기',
-      onClick: () => {
-        console.log('상품문의 모달창 띄우기', option.id);
-      },
+      onClick: goodsInquireDialog.onOpen,
       display: !['paymentCanceled', 'orderInvalidated', 'paymentFailed'].includes(step),
       disabled: false,
     },
@@ -83,6 +94,7 @@ export function OrderItemActionButtons({
       queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
     },
   });
+  // 구매확정 요청
   const purchaseConfirmRequest = async (): Promise<void> => {
     orderPurchaseMutation
       .mutateAsync({ orderItemOptionId: option.id })
@@ -112,6 +124,8 @@ export function OrderItemActionButtons({
             </Button>
           ),
       )}
+
+      {/* 구매확정 다이얼로그 */}
       <ConfirmDialog
         title="구매확정하기"
         isOpen={purchaseConfirmDialog.isOpen}
@@ -123,6 +137,89 @@ export function OrderItemActionButtons({
           교환 및 환불이 어렵습니다.
         </Text>
       </ConfirmDialog>
+
+      {/* 교환환불 다이얼로그 */}
+      <ConfirmDialog
+        title="교환, 반품 신청"
+        isOpen={returnExchangeDialog.isOpen}
+        onClose={returnExchangeDialog.onClose}
+        onConfirm={async () => {
+          console.log('교환반품 신청');
+        }}
+      >
+        <RefundExchangeForm
+          option={option}
+          goodsImage={goodsImage}
+          goodsName={goodsName}
+        />
+      </ConfirmDialog>
+
+      {/* 주문취소 다이얼로그 */}
+      <ConfirmDialog
+        title="주문 취소 신청"
+        isOpen={orderCancelDialog.isOpen}
+        onClose={orderCancelDialog.onClose}
+        onConfirm={async () => {
+          console.log('주문 취소 신청');
+        }}
+      >
+        <OrderCancelForm option={option} goodsImage={goodsImage} goodsName={goodsName} />
+      </ConfirmDialog>
     </SimpleGrid>
+  );
+}
+
+function RefundExchangeForm(props: OrderItemOptionInfoProps): JSX.Element {
+  // useForm, handleSubmit 등은 api 작업 후 dto에 맞게 처리필요
+  const [open, { off, toggle }] = useBoolean(false);
+
+  const [addr, setAddr] = useState<string>('');
+  const handleComplete = (data: AddressData): void => {
+    const { zonecode, address, buildingName } = data;
+    const fullAddress = buildingName
+      ? `${address} (${buildingName}), ${zonecode}`
+      : `${address}, ${zonecode}`; // 주소검색 결과 타입 참고 https://postcode.map.daum.net/guide
+    setAddr(fullAddress);
+    off();
+  };
+  return (
+    <Stack as="form">
+      <Stack>
+        <Text>교환/반품 요청 주문상품 정보</Text>
+        <OrderItemOptionInfo {...props} displayStatus={false} />
+      </Stack>
+      <Stack>
+        <Text>교환 / 반품 사유</Text>
+        <Input />
+      </Stack>
+      <Stack>
+        <Text>
+          회수지 주소
+          <Button size="sm" onClick={toggle}>
+            {open ? '닫기' : '찾기'}
+          </Button>
+          <Input value={addr} readOnly />
+        </Text>
+        <Collapse in={open} animateOpacity>
+          <DaumPostcode onComplete={handleComplete} />
+        </Collapse>
+      </Stack>
+    </Stack>
+  );
+}
+
+function OrderCancelForm(props: OrderItemOptionInfoProps): JSX.Element {
+  // useForm, handleSubmit 등은 api 작업 후 dto에 맞게 처리필요
+  return (
+    <Stack as="form">
+      <Stack>
+        <Text>주문 취소 요청 주문상품 정보</Text>
+        <OrderItemOptionInfo {...props} displayStatus={false} />
+      </Stack>
+      <Stack>
+        <Text>주문 취소 사유</Text>
+        <Input />
+      </Stack>
+    </Stack>
   );
 }
