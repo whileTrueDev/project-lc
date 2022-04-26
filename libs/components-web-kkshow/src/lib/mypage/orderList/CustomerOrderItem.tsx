@@ -1,10 +1,9 @@
-import { Box, Stack, Text, Badge } from '@chakra-ui/react';
-import { Goods, GoodsImages, OrderItemOption, OrderProcessStep } from '@prisma/client';
-import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
+import { Box, Stack, Badge } from '@chakra-ui/react';
+import { OrderProcessStep } from '@prisma/client';
 import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
 import { FmOrderStatusNumString, OrderItemWithRelations } from '@project-lc/shared-types';
-import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { OrderItemActionButtons } from './CustomerOrderItemActionButtons';
+import { OrderItemOptionInfo } from './OrderItemOptionInfo';
 
 export const orderProcessStepDict: Record<OrderProcessStep, FmOrderStatusNumString> = {
   orderReceived: '15', // 주문접수,
@@ -78,45 +77,14 @@ export function OrderItem({
             goodsName={goodsName}
           />
           {/* 기능버튼들 */}
-          <OrderItemActionButtons option={opt} hasReview={hasReview} />
+          <OrderItemActionButtons
+            option={opt}
+            goodsImage={goodsImage}
+            goodsName={goodsName}
+            hasReview={hasReview}
+          />
         </Stack>
       ))}
     </>
-  );
-}
-
-export function OrderItemOptionInfo({
-  option,
-  goodsName,
-  goodsImage,
-}: {
-  option: OrderItemOption;
-  goodsName: Goods['goods_name'];
-  goodsImage: GoodsImages['image'];
-}): JSX.Element {
-  return (
-    <Stack direction="row" alignItems="center">
-      <Box>
-        {/* 이미지 */}
-        <img width="40px" height="40px" src={goodsImage} alt="" />
-      </Box>
-      {/* 주문상품 옵션 */}
-      <Stack>
-        <OrderStatusBadge
-          step={option.step}
-          purchaseConfirmed={!!option.purchaseConfirmationDate}
-        />
-        <Text fontWeight="bold">{goodsName}</Text>
-        <Stack direction="row">
-          <Text>
-            {option.name} : {option.value}
-          </Text>
-          <TextDotConnector />
-          <Text>{option.quantity} 개 </Text>
-          <TextDotConnector />
-          <Text>{getLocaleNumber(option.discountPrice)}원</Text>
-        </Stack>
-      </Stack>
-    </Stack>
   );
 }
