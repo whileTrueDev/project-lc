@@ -54,8 +54,6 @@ export function OrderItem({
 }: {
   orderItem: OrderItemWithRelations;
 }): JSX.Element {
-  const goodsName = orderItem.goods.goods_name;
-  const goodsImage = orderItem.goods.image[0].image;
   const hasReview = !!orderItem.reviewId;
 
   return (
@@ -71,16 +69,11 @@ export function OrderItem({
           justifyContent="space-between"
         >
           {/* 주문상품정보 */}
-          <OrderItemOptionInfo
-            option={opt}
-            goodsImage={goodsImage}
-            goodsName={goodsName}
-          />
+          <OrderItemOptionInfo option={opt} goodsData={orderItem.goods} />
           {/* 기능버튼들 */}
           <OrderItemActionButtons
             option={opt}
-            goodsImage={goodsImage}
-            goodsName={goodsName}
+            goodsData={orderItem.goods}
             hasReview={hasReview}
           />
         </Stack>

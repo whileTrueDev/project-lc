@@ -41,7 +41,6 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
   const orderListBgColor = useColorModeValue('gray.50', 'gray.900');
 
   if (status === 'error') return <Text>error... {error.message}</Text>;
-  if (!data?.pages?.[0]?.count) return <Text>no data</Text>;
   return (
     <Stack>
       <Text fontWeight="bold">주문/배송내역</Text>
@@ -59,7 +58,7 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
 
       <Stack bg={orderListBgColor} px={1} py={4}>
         {/* 주문내역목록 */}
-        {data.pages.map((group, i) => (
+        {data?.pages.map((group, i) => (
           // eslint-disable-next-line react/no-array-index-key
           <Stack key={`page-${i}`} spacing={4}>
             {group.orders.map((order) => (

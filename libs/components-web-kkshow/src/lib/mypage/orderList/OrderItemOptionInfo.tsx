@@ -1,24 +1,31 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
-import { Goods, GoodsImages, OrderItemOption } from '@prisma/client';
+import { OrderItemOption } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
+import { OriginGoods } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { OrderStatusBadge } from './CustomerOrderItem';
 
 export interface OrderItemOptionInfoProps {
   option: OrderItemOption;
-  goodsName: Goods['goods_name'];
-  goodsImage: GoodsImages['image'];
+  goodsData: OriginGoods;
   displayStatus?: boolean;
 }
 export function OrderItemOptionInfo({
   option,
-  goodsName,
-  goodsImage,
+  goodsData,
   displayStatus = true,
 }: OrderItemOptionInfoProps): JSX.Element {
+  const { id, goods_name, image } = goodsData;
+  const goodsName = goods_name;
+  const goodsImage = image[0].image;
   return (
     <Stack direction="row" alignItems="center">
-      <Box>
+      <Box
+        cursor="pointer"
+        onClick={() => {
+          alert(`상품고유번호 ${id}의 상세페이지로 이동`);
+        }}
+      >
         {/* 이미지 */}
         <img width="40px" height="40px" src={goodsImage} alt="" />
       </Box>
@@ -31,7 +38,15 @@ export function OrderItemOptionInfo({
           />
         )}
 
-        <Text fontWeight="bold">{goodsName}</Text>
+        <Text
+          fontWeight="bold"
+          cursor="pointer"
+          onClick={() => {
+            alert(`상품고유번호 ${id}의 상세페이지로 이동`);
+          }}
+        >
+          {goodsName}
+        </Text>
         <Stack direction="row">
           <Text>
             {option.name} : {option.value}

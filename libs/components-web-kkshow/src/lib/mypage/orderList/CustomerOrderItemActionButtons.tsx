@@ -23,14 +23,11 @@ import { OrderItemOptionInfo, OrderItemOptionInfoProps } from './OrderItemOption
 export function OrderItemActionButtons({
   option,
   hasReview,
-  goodsImage,
-  goodsName,
+  goodsData,
 }: {
   option: OrderItemOption;
   hasReview?: boolean;
-  goodsImage: string;
-  goodsName: string;
-}): JSX.Element {
+} & OrderItemOptionInfoProps): JSX.Element {
   const { step, purchaseConfirmationDate } = option;
   const purchaseConfirmDialog = useDisclosure();
   const returnExchangeDialog = useDisclosure();
@@ -147,11 +144,7 @@ export function OrderItemActionButtons({
           console.log('교환반품 신청');
         }}
       >
-        <RefundExchangeForm
-          option={option}
-          goodsImage={goodsImage}
-          goodsName={goodsName}
-        />
+        <RefundExchangeForm option={option} goodsData={goodsData} />
       </ConfirmDialog>
 
       {/* 주문취소 다이얼로그 */}
@@ -163,7 +156,7 @@ export function OrderItemActionButtons({
           console.log('주문 취소 신청');
         }}
       >
-        <OrderCancelForm option={option} goodsImage={goodsImage} goodsName={goodsName} />
+        <OrderCancelForm option={option} goodsData={goodsData} />
       </ConfirmDialog>
     </SimpleGrid>
   );
