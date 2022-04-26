@@ -1,7 +1,11 @@
-import { SimpleGrid, Button, useDisclosure, Text } from '@chakra-ui/react';
+import { SimpleGrid, Button, useDisclosure, Text, useToast } from '@chakra-ui/react';
 import { OrderItemOption } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
-import { useOrderPurchaseConfirmMutation } from '@project-lc/hooks';
+import {
+  INFINITE_ORDER_LIST_QUERY_KEY,
+  useOrderPurchaseConfirmMutation,
+} from '@project-lc/hooks';
+import { useQueryClient } from 'react-query';
 
 export function OrderItemActionButtons({
   option,
@@ -71,15 +75,26 @@ export function OrderItemActionButtons({
     },
   ];
 
-  const orderPurchaseMutation = useOrderPurchaseConfirmMutation();
+  const toast = useToast();
+  // 구매확정이후 orderlist invalidate 처리
+  const queryClient = useQueryClient();
+  const orderPurchaseMutation = useOrderPurchaseConfirmMutation({
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
+    },
+  });
   const purchaseConfirmRequest = async (): Promise<void> => {
     orderPurchaseMutation
       .mutateAsync({ orderItemOptionId: option.id })
       .then((res) => {
-        console.log(res);
+        toast({ title: '구매 확정 완료', status: 'success' });
       })
       .catch((e) => {
-        console.error(e);
+        toast({
+          title: '구매 확정 중 오류가 발생하였습니다.',
+          status: 'error',
+          description: e.code,
+        });
       });
   };
   return (
