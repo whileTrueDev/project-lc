@@ -8,7 +8,11 @@ import {
 import { Customer, Prisma } from '@prisma/client';
 import { ServiceBaseWithCache, UserPwManager } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { SignUpDto, UpdateCustomerDto } from '@project-lc/shared-types';
+import {
+  CustomerStatusRes,
+  SignUpDto,
+  UpdateCustomerDto,
+} from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -131,5 +135,43 @@ export class CustomerService extends ServiceBaseWithCache {
       },
     });
     return customer;
+  }
+
+  /** 소비자 마이페이지 홈 상태(팔로잉, 라이브알림, 배송중)표시 위한 정보 리턴 */
+  async getCustomerStatus({
+    customerId,
+  }: {
+    customerId: number;
+  }): Promise<CustomerStatusRes> {
+    const customer = await this.prisma.customer.findFirst({
+      where: { id: customerId },
+      select: {
+        nickname: true,
+        _count: {
+          select: { followingBroadcasters: true, followingLiveShoppings: true },
+        },
+        orders: true,
+      },
+    });
+    if (!customer)
+      throw new BadRequestException(
+        `해당 소비자가 존재하지 않습니다 고유번호 : ${customerId}`,
+      );
+
+    // 닉네임
+    const nickname = customer.nickname || undefined;
+    // 팔로잉중인 방송인 수, 팔로잉중인 라이브쇼핑 개수
+    const { followingBroadcasters, followingLiveShoppings } = customer._count;
+    // 배송중인 주문 개수
+    const shippingOrders = customer.orders.filter((order) =>
+      ['shipping', 'partialShipping'].includes(order.step),
+    ).length;
+    return {
+      id: customerId,
+      nickname,
+      followingBroadcasters,
+      followingLiveShoppings,
+      shippingOrders,
+    };
   }
 }

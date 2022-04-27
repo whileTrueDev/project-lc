@@ -19,6 +19,7 @@ import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import {
+  CustomerStatusRes,
   EmailDupCheckDto,
   PasswordValidateDto,
   SignUpDto,
@@ -39,6 +40,14 @@ export class CustomerController {
     @Query(ValidationPipe) dto: EmailDupCheckDto,
   ): Promise<boolean> {
     return this.customerService.isEmailDupCheckOk(dto.email);
+  }
+
+  /** 소비자 마이페이지 홈에 표시될 정보(팔로잉, 배송중 상품 수 등) 조회 */
+  @Get('status')
+  async getCustomerStatus(
+    @Query('customerId', ParseIntPipe) customerId: number,
+  ): Promise<CustomerStatusRes> {
+    return this.customerService.getCustomerStatus({ customerId });
   }
 
   /** 소비자 생성 */
