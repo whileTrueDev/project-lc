@@ -424,7 +424,15 @@ export class GoodsService extends ServiceBaseWithCache {
         confirmation: true,
         image: { orderBy: { cut_number: 'asc' } },
         GoodsInfo: true,
-        LiveShopping: true,
+        LiveShopping: {
+          include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+        },
+        productPromotion: {
+          include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+        },
+        categories: true,
+        informationNotice: true,
+        informationSubject: true,
       },
     });
   }

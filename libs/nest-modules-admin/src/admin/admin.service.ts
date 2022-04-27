@@ -260,6 +260,15 @@ export class AdminService {
         image: true,
         GoodsInfo: true,
         seller: true,
+        LiveShopping: {
+          include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+        },
+        productPromotion: {
+          include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+        },
+        categories: true,
+        informationNotice: true,
+        informationSubject: true,
       },
     });
   }
