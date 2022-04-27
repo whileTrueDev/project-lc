@@ -15,7 +15,7 @@ import { GoodsByIdRes } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
-import { GoodsViewPurchaseForm } from './GoodsViewPurchaseForm';
+import { GoodsViewPurchaseBox } from './GoodsViewPurchaseBox';
 
 export function GoodsViewMeta(): JSX.Element | null {
   const router = useRouter();
@@ -54,7 +54,7 @@ export function GoodsViewMeta(): JSX.Element | null {
           />
 
           {/* 옵션 정보 및 후원 정보 */}
-          <GoodsViewPurchaseForm goods={goods.data} />
+          <GoodsViewPurchaseBox goods={goods.data} />
         </GridItem>
       </Grid>
     </Box>
@@ -110,8 +110,8 @@ export function GoodsViewImages({
 }: GoodsViewImagesProps): JSX.Element {
   const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   return (
-    <Flex gap={2} flexDir={{ base: 'column-reverse', sm: 'row' }}>
-      <Box display={{ base: 'flex', sm: 'block' }} gap={2} flexWrap="wrap">
+    <Flex gap={2} flexDir={{ base: 'column-reverse', md: 'row' }}>
+      <Box display={{ base: 'flex', md: 'block' }} gap={2} flexWrap="wrap">
         {images.map((i, idx) => (
           <Image
             cursor="pointer"

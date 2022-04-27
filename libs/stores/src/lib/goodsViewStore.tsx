@@ -1,12 +1,12 @@
 import create from 'zustand';
 
 interface GoodsViewStore {
-  selected: number;
+  selectedNavIdx: number;
   handleSelect: (num: number) => void;
 }
 export const useGoodsViewStore = create<GoodsViewStore>((set, get) => ({
-  selected: 0,
+  selectedNavIdx: 0,
   handleSelect: (num: number) => {
-    set({ selected: num });
+    set({ selectedNavIdx: num });
   },
 }));

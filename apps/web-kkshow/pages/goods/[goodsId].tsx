@@ -16,7 +16,7 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 const useGoodsScrollNavAutoChange = (): void => {
-  const selected = useGoodsViewStore((s) => s.selected);
+  const selected = useGoodsViewStore((s) => s.selectedNavIdx);
   const handleSelect = useGoodsViewStore((s) => s.handleSelect);
 
   useEffect(() => {
@@ -26,10 +26,12 @@ const useGoodsScrollNavAutoChange = (): void => {
       const goodsInquiries = document.getElementById('goods-inquiries');
       const goodsInfo = document.getElementById('goods-info');
 
-      if (selected !== 3 && window.scrollY > goodsInfo.offsetTop) {
+      if (goodsInfo && selected !== 3 && window.scrollY > goodsInfo.offsetTop) {
         handleSelect(3);
       }
       if (
+        goodsInfo &&
+        goodsInquiries &&
         selected !== 2 &&
         window.scrollY > goodsInquiries.offsetTop &&
         window.scrollY < goodsInfo.offsetTop
@@ -38,6 +40,8 @@ const useGoodsScrollNavAutoChange = (): void => {
       }
 
       if (
+        goodsReview &&
+        goodsInquiries &&
         selected !== 1 &&
         window.scrollY > goodsReview.offsetTop &&
         window.scrollY < goodsInquiries.offsetTop
@@ -46,6 +50,8 @@ const useGoodsScrollNavAutoChange = (): void => {
       }
 
       if (
+        goodsContents &&
+        goodsReview &&
         selected !== 0 &&
         window.scrollY > goodsContents.offsetTop &&
         window.scrollY < goodsReview.offsetTop

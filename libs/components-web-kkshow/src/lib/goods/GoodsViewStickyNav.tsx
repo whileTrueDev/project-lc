@@ -36,8 +36,8 @@ export function GoodsViewStickyNav(): JSX.Element {
             borderWidth="thin"
             borderRightWidth={0}
             _last={{ borderRightWidth: 'thin' }}
-            borderBottom={idx === store.selected ? '3px solid' : undefined}
-            borderBottomColor={idx === store.selected ? 'blue.400' : undefined}
+            borderBottom={idx === store.selectedNavIdx ? '3px solid' : undefined}
+            borderBottomColor={idx === store.selectedNavIdx ? 'blue.400' : undefined}
             onClick={() => {
               store.handleSelect(idx);
               onClick(nav.elementId);
