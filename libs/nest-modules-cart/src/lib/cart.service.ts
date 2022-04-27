@@ -51,13 +51,15 @@ export class CartService {
       shippingCostIncluded: dto.shippingCostIncluded,
       shippingGroupId: dto.shippingGroupId,
       options: { createMany: { data: dto.options } },
-      support: {
-        create: {
-          broadcasterId: dto.support.broadcasterId,
-          nickname: dto.support.nickname,
-          message: dto.support.message,
-        },
-      },
+      support: dto.support
+        ? {
+            create: {
+              broadcasterId: dto.support.broadcasterId,
+              nickname: dto.support.nickname,
+              message: dto.support.message,
+            },
+          }
+        : undefined,
     };
 
     if (items.length > 0) {
