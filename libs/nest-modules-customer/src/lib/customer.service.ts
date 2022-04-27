@@ -99,4 +99,20 @@ export class CustomerService extends ServiceBaseWithCache {
     // 올바른 이메일, 비밀번호 입력시
     return customer;
   }
+
+  /**
+   * 소비자 이메일 주소가 중복되는 지 체크합니다.
+   * @param email 중복체크할 이메일 주소
+   * @returns {boolean} 중복되지않아 괜찮은 경우 true, 중복된 경우 false
+   */
+  async isEmailDupCheckOk(email: string): Promise<boolean> {
+    const user = await this.prisma.customer.findFirst({ where: { email } });
+    // inactiveCustomer 테이블 생성 이후 작업
+    // const inactiveUser = await this.prisma.inactiveBroadcaster.findFirst({
+    //   where: { email },
+    // });
+    // if (user || inactiveUser) return false;
+    if (user) return false;
+    return true;
+  }
 }

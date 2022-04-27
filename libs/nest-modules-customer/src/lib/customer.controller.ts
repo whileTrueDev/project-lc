@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
@@ -17,7 +18,7 @@ import { Customer } from '@prisma/client';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
-import { SignUpDto, UpdateCustomerDto } from '@project-lc/shared-types';
+import { EmailDupCheckDto, SignUpDto, UpdateCustomerDto } from '@project-lc/shared-types';
 import { CustomerService } from './customer.service';
 
 @Controller('customer')
@@ -26,6 +27,14 @@ export class CustomerController {
     private readonly customerService: CustomerService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
+
+  // * 이메일 주소 중복 체크
+  @Get('email-check')
+  public async emailDupCheck(
+    @Query(ValidationPipe) dto: EmailDupCheckDto,
+  ): Promise<boolean> {
+    return this.customerService.isEmailDupCheckOk(dto.email);
+  }
 
   /** 소비자 생성 */
   @Post()
