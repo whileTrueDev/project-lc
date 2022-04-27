@@ -1,14 +1,13 @@
-import { Box } from '@chakra-ui/react';
-import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
-import { useProfile } from '@project-lc/hooks';
+import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
+import { CustomerMypageMobileSidebar } from '@project-lc/components-web-kkshow/mypage/CustomerMypageSidebar';
+import { CustomerStatusSection } from '@project-lc/components-web-kkshow/mypage/CustomerStatusSection';
 
 export function Index(): JSX.Element {
-  const { data } = useProfile();
   return (
-    <KkshowLayout>
-      <Box>크크쇼 소비자 마이페이지</Box>
-      {data && <Box>{JSON.stringify(data)}</Box>}
-    </KkshowLayout>
+    <CustomerMypageLayout>
+      <CustomerStatusSection />
+      <CustomerMypageMobileSidebar />
+    </CustomerMypageLayout>
   );
 }
 
