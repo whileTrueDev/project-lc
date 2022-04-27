@@ -82,7 +82,14 @@ export function GoodsRegistDescription(): JSX.Element {
         />
       </Stack>
       {/* 상세설명 작성 에디터 모달창 */}
-      <Modal isOpen={isOpen} onClose={onClose} size="6xl">
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        size="6xl"
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+        scrollBehavior="outside"
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>상세설명 작성하기</ModalHeader>
@@ -93,13 +100,15 @@ export function GoodsRegistDescription(): JSX.Element {
               getSunEditorInstance={getSunEditorInstance}
               lang="ko"
               setOptions={{
-                height: '500px',
+                height: '70vh',
                 imageUploadSizeLimit: 20 * MB, // 퍼스트몰 최대 20mb
                 buttonList: [['font', 'fontSize', 'align', 'list'], ['image']],
               }}
               defaultValue={watch('contents')}
             />
-            <Button onClick={onClick}>등록</Button>
+            <Button mt={2} onClick={onClick} colorScheme="blue">
+              등록
+            </Button>
           </ModalBody>
         </ModalContent>
       </Modal>

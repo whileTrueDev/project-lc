@@ -23,7 +23,7 @@ export function BottomQuickMenu(): JSX.Element {
         width="100%"
         height="7vh"
         minHeight="65px"
-        zIndex="docked"
+        zIndex="banner"
       >
         {quickMenuLinks.map((link) => (
           <BottomQuickMenuItem key={link.name} link={link} />
