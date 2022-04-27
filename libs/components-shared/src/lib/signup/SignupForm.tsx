@@ -19,6 +19,7 @@ import {
   useMailVerificationMutation,
   useSellerSignupMutation,
   useCountdown,
+  useCustomerSignupMutation,
 } from '@project-lc/hooks';
 import {
   emailCodeRegisterOptions,
@@ -30,7 +31,7 @@ import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Broadcaster, Seller } from '.prisma/client';
+import { Broadcaster, Customer, Seller } from '.prisma/client';
 import { SignupProcessItemProps } from './SignupStart';
 
 export type SignupFormProps = SignupProcessItemProps;
@@ -118,6 +119,7 @@ export function SignupForm({
   // * 회원가입 핸들러
   const sellerSignup = useSellerSignupMutation();
   const broadcasterSignup = useBroadcasterSignupMutation();
+  const customerSignup = useCustomerSignupMutation();
   const login = useLoginMutation(userType);
   const handleSignupError = useCallback(
     (err: AxiosError): void => {
@@ -132,12 +134,14 @@ export function SignupForm({
   );
   const onSubmit = useCallback(
     async (data: SignUpDto) => {
-      let user: void | Seller | Broadcaster;
+      let user: void | Seller | Broadcaster | Customer;
 
       if (userType === 'seller') {
         user = await sellerSignup.mutateAsync(data).catch(handleSignupError);
       } else if (userType === 'broadcaster') {
         user = await broadcasterSignup.mutateAsync(data).catch(handleSignupError);
+      } else if (userType === 'customer') {
+        user = await customerSignup.mutateAsync(data).catch(handleSignupError);
       }
 
       if (user) {
@@ -149,7 +153,15 @@ export function SignupForm({
         router.push('/mypage');
       }
     },
-    [broadcasterSignup, handleSignupError, login, router, sellerSignup, userType],
+    [
+      broadcasterSignup,
+      customerSignup,
+      handleSignupError,
+      login,
+      router,
+      sellerSignup,
+      userType,
+    ],
   );
   return (
     <CenterBox enableShadow header={{ title: '크크쇼 시작하기', desc: '' }}>
@@ -296,7 +308,11 @@ export function SignupForm({
           </Button>
         )}
         {phase === 2 && (
-          <Button colorScheme="blue" type="submit" isLoading={isSubmitting}>
+          <Button
+            colorScheme="blue"
+            type="submit"
+            isLoading={isSubmitting || login.isLoading}
+          >
             인증완료
           </Button>
         )}
