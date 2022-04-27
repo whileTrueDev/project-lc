@@ -99,6 +99,7 @@ export * from './lib/queries/useBroadcasterLiveShoppingList';
 export * from './lib/queries/useBroadcasterReceivableSettlementAmount';
 export * from './lib/queries/useBroadcasterSettlementHistory';
 export * from './lib/queries/useBroadcasterSettlementInfo';
+export * from './lib/queries/useCustomerStatus';
 export * from './lib/queries/useDefaultContacts';
 export * from './lib/queries/useEmailDupCheck';
 export * from './lib/queries/useFmExport';
