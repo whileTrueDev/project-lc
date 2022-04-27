@@ -45,7 +45,7 @@ import { CartItemRes } from '@project-lc/shared-types';
 import { useCartStore } from '@project-lc/stores';
 import { getCartKey, getLocaleNumber } from '@project-lc/utils-frontend';
 import NextLink from 'next/link';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { MdOutlineShoppingCart } from 'react-icons/md';
 import shallow from 'zustand/shallow';
 
@@ -67,9 +67,14 @@ export function CartTable(): JSX.Element {
     await truncate.mutateAsync(1);
   };
 
+  // 최초 렌더링 체크
+  const initialRenderRef = useRef<boolean>(true);
   // 렌더링시 장바구니 상품 모두 선택
   useEffect(() => {
-    if (data) handleSelectAll(data);
+    if (data && initialRenderRef.current) {
+      handleSelectAll(data);
+      initialRenderRef.current = false;
+    }
     getCartKey(); // 장바구니 식별 키 생성 (없는 경우에만 생성됨)
   }, [handleSelectAll, data]);
 
