@@ -19,7 +19,9 @@ export function SignupAgreeTerms({
 }: SignupAgreeTermsProps): JSX.Element {
   const { data: privacyTerm, isLoading } = usePolicy({
     category: 'privacy',
-    targetUser: userType,
+    // targetUser: userType,
+    targetUser: userType === 'customer' ? 'seller' : userType,
+    // TODO: userType으로 수정하여 customer인 경우 소비자의 개인정보처리방침 조회해야함 - 관리자페이지에 소비자 관련 정책, 이용방침 생성기능없어서 임시로
   });
   const { handleSubmit, register, watch } = useForm<AgreeTermsData>({
     defaultValues: { privacyPolicy: false },
