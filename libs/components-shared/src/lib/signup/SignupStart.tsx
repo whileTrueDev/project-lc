@@ -28,8 +28,9 @@ const BROADCASTER_DISPLAY_TEXT_LIST = [
 ];
 
 const CUSTOMER_DISPLAY_TEXT_LIST = [
-  '크리에이터와 함께하는 쇼핑',
-  '그래서 더욱 믿을 수 있는 방송!',
+  '영양가 있는 간편식',
+  '간단한 조리로도 맛있는 식탁',
+  '크리에이터와 함께하는 쇼핑!',
 ];
 
 const DISPLAY_TEXT: Record<SignupProcessItemProps['userType'], string[]> = {
