@@ -101,7 +101,8 @@ export const testBroadcasterData: Prisma.BroadcasterCreateInput = {
   password: COMMON_DUMMY_PASSWORD,
   overlayUrl: `/${TEST_BROADCASTER_EMAIL}`,
   userName: '음바쿠',
-  userNickname: '음바쿠',
+  userNickname: '음바쿠TV',
+  avatar: 'https://picsum.photos/302/301',
 };
 
 /** 판매 수수료 기본값 설정 */
@@ -112,11 +113,11 @@ export const defaultSellCommissionData = {
 
 /** 상품 사진 목록 */
 export const dummyImageUrlList: string[] = [
-  'https://picsum.photos/301/300',
-  'https://picsum.photos/300/300',
-  'https://picsum.photos/300/301',
-  'https://picsum.photos/301/301',
-  'https://picsum.photos/302/301',
+  'https://k-kmarket.com/data/goods/1/2022/01/_temp_16415357317356large.jpg',
+  'https://k-kmarket.com/data/goods/1/2022/01/_temp_16424958510161large.jpg',
+  'https://k-kmarket.com/data/goods/1/2022/01/_temp_16424958557441large.jpg',
+  'https://k-kmarket.com/data/goods/1/2022/01/_temp_16424958594854large.jpg',
+  'https://k-kmarket.com/data/goods/1/2022/01/_temp_16424958630476large.jpg',
 ];
 
 /** 상품기본옵션 */
