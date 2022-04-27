@@ -1,6 +1,7 @@
 export * from './lib/auth-hooks';
 export * from './lib/mutation/useAdminBroadcasterPromotionPageMutation';
 export * from './lib/mutation/useAdminBroadcasterSettlementInfoConfirmMutation';
+export * from './lib/mutation/useAdminCategoryMutation';
 export * from './lib/mutation/useAdminClassChangeHistoryMutation';
 export * from './lib/mutation/useAdminCreateNotification';
 export * from './lib/mutation/useAdminKkshowMainMutation';
@@ -72,6 +73,7 @@ export * from './lib/queries/useAdminBroadcaster';
 export * from './lib/queries/useAdminBroadcasterPromotionPage';
 export * from './lib/queries/useAdminBroadcasterSettlementHistoriesByRound';
 export * from './lib/queries/useAdminBroadcasterSettlementInfoList';
+export * from './lib/queries/useAdminCategory';
 export * from './lib/queries/useAdminDuplicatePromotionPageFlag';
 export * from './lib/queries/useAdminFmOrderByGoods';
 export * from './lib/queries/useAdminGoodsById';
