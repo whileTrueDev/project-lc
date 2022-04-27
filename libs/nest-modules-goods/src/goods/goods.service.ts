@@ -405,14 +405,9 @@ export class GoodsService extends ServiceBaseWithCache {
   }
 
   /** 상품 개별 정보 조회 */
-  public async getOneGoods(goodsId: number, sellerId: number): Promise<GoodsByIdRes> {
+  public async getOneGoods(goodsId: number): Promise<GoodsByIdRes> {
     return this.prisma.goods.findFirst({
-      where: {
-        id: goodsId,
-        seller: {
-          id: sellerId,
-        },
-      },
+      where: { id: goodsId },
       include: {
         options: { include: { supply: true } },
         ShippingGroup: {
