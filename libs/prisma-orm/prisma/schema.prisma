@@ -1085,6 +1085,7 @@ enum PolicyCategory {
 enum PolicyTarget {
   seller // 판매자
   broadcaster // 방송인
+  customer // 소비자
   all // 전체
 }
 
