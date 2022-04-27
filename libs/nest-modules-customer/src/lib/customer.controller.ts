@@ -18,7 +18,12 @@ import { Customer } from '@prisma/client';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
-import { EmailDupCheckDto, SignUpDto, UpdateCustomerDto } from '@project-lc/shared-types';
+import {
+  EmailDupCheckDto,
+  PasswordValidateDto,
+  SignUpDto,
+  UpdateCustomerDto,
+} from '@project-lc/shared-types';
 import { CustomerService } from './customer.service';
 
 @Controller('customer')
@@ -54,6 +59,14 @@ export class CustomerController {
   @UseInterceptors(HttpCacheInterceptor)
   findOne(@Param('customerId', ParseIntPipe) id: number): Promise<Customer> {
     return this.customerService.findOne({ id });
+  }
+
+  // 비밀번호 변경
+  @Patch('password')
+  public async changePassword(
+    @Body(ValidationPipe) dto: PasswordValidateDto,
+  ): Promise<Customer> {
+    return this.customerService.changePassword(dto.email, dto.password);
   }
 
   /** 소비자 수정 */

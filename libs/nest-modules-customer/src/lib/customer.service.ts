@@ -115,4 +115,21 @@ export class CustomerService extends ServiceBaseWithCache {
     if (user) return false;
     return true;
   }
+
+  /**
+   * 비밀번호 변경
+   * @param email 비밀번호 변경할 소비자의 email
+   * @param newPassword 새로운 비밀번호
+   * @returns
+   */
+  async changePassword(email: string, newPassword: string): Promise<Customer> {
+    const hashedPw = await this.pwManager.hashPassword(newPassword);
+    const customer = await this.prisma.customer.update({
+      where: { email },
+      data: {
+        password: hashedPw,
+      },
+    });
+    return customer;
+  }
 }
