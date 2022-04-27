@@ -7,6 +7,7 @@ import {
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
+import { useQueryClient } from 'react-query';
 import CountBadge from './CountBadge';
 
 export function BottomQuickMenu(): JSX.Element {
@@ -59,7 +60,11 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
   };
 
   // TODO: 장바구니 작업 이후 장바구니 상품 개수 count 데이터 연동 추가 필요 by hwasurr
-  const cartItemsCount = useMemo(() => 6, []);
+  const client = useQueryClient();
+  const cartItemsCount = useMemo(() => {
+    const c = client.getQueryData<any[]>('Cart');
+    return !c ? 0 : c.length;
+  }, [client]);
 
   return (
     <Center w="100%">
@@ -73,7 +78,7 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
       >
         {link.name === '장바구니' ? (
           <>
-            <CountBadge count={cartItemsCount} right={2} />
+            <CountBadge count={cartItemsCount} right={{ base: 2, sm: 5 }} />
             <Icon as={link.icon} width={5} height={5} />
           </>
         ) : (

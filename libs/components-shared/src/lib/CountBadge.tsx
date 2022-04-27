@@ -9,6 +9,7 @@ interface CountBadgeProps {
 export function CountBadge({ count, top = 0, right = 0 }: CountBadgeProps): JSX.Element {
   return (
     <Box
+      display={count === 0 ? 'none' : 'block'}
       as="span"
       color="white"
       position="absolute"
