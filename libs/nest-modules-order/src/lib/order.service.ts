@@ -112,7 +112,7 @@ export class OrderService extends ServiceBaseWithCache {
 
   /** 주문생성 */
   async createOrder(dto: CreateOrderDto): Promise<Order> {
-    const { customerId, ...data } = dto;
+    const { customerId, cartItemIdList, ...data } = dto;
     const { nonMemberOrderFlag, giftFlag, orderItems, payment, supportOrderIncludeFlag } =
       data;
 
@@ -163,7 +163,12 @@ export class OrderService extends ServiceBaseWithCache {
       },
     });
 
-    // TODO: 주문 생성 후 장바구니 비우기
+    // 주문 생성 후 장바구니 비우기
+    if (cartItemIdList) {
+      await this.prisma.cartItem.deleteMany({
+        where: { id: { in: cartItemIdList } },
+      });
+    }
 
     // 선물주문인경우 생성된 주문데이터에서 받는사람(방송인) 정보 삭제하고 리턴
     if (order.giftFlag) {

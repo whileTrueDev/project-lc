@@ -218,6 +218,12 @@ export class CreateOrderDto {
   // @IsNotEmptyObject()
   @IsOptional()
   payment?: OrderPayment;
+
+  /** 주문으로 생성될 장바구니 상품들 id */
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  cartItemIdList?: number[];
 }
 
 // ------------------조회 dto--------------------
