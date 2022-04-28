@@ -28,29 +28,11 @@ import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import { FaBell } from 'react-icons/fa';
+import CountBadge from './CountBadge';
 
 /** 안읽음표시 */
 export function UnreadNotification(): JSX.Element {
   return <Box width="4px" height="4px" borderRadius="full" bgColor="red" />;
-}
-
-/** 개수 표시 배지 */
-function CountBadge({ count }: { count: number }): JSX.Element {
-  return (
-    <Box
-      as="span"
-      color="white"
-      position="absolute"
-      top="0px"
-      right="0px"
-      fontSize="0.5rem"
-      bgColor="red"
-      borderRadius="full"
-      p="0.5"
-    >
-      {count > 5 ? `5+` : count}
-    </Box>
-  );
 }
 
 /** 개인알림 제목, 내용, 읽음여부 표시하는 컴포넌트 */
