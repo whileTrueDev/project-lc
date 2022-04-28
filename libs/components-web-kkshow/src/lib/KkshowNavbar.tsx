@@ -14,15 +14,16 @@ import {
   kkshowNavLinks,
   NavItem as NavItemType,
 } from '@project-lc/components-constants/navigation';
+import { quickMenuLinks } from '@project-lc/components-constants/quickMenu';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
+import CountBadge from '@project-lc/components-shared/CountBadge';
 import { KkshowLogoVariant, KksLogo } from '@project-lc/components-shared/KksLogo';
+import { PersonalPopoverMenu } from '@project-lc/components-shared/navbar/NavbarRightButtonSection';
 import { useCart, useIsLoggedIn } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import { PersonalPopoverMenu } from '@project-lc/components-shared/navbar/NavbarRightButtonSection';
-import CountBadge from '@project-lc/components-shared/CountBadge';
-import { quickMenuLinks } from '@project-lc/components-constants/quickMenu';
+import { MdAccountCircle } from 'react-icons/md';
 import { Searcher } from './search-input/Searcher';
 
 export const kkshowNavHeight = 120;
@@ -120,7 +121,20 @@ function KkshowNavbarRightButtonSection(): JSX.Element {
       {!isLoggedIn && <ColorModeSwitcher _hover={{}} />}
       <Searcher />
       <CartButton />
-      {isLoggedIn ? <PersonalPopoverMenu /> : <LoginButton />}
+      {isLoggedIn ? (
+        <PersonalPopoverMenu
+          menuItems={[
+            {
+              icon: MdAccountCircle,
+              name: '마이페이지',
+              href: '/mypage',
+              type: 'link',
+            },
+          ]}
+        />
+      ) : (
+        <LoginButton />
+      )}
     </Flex>
   );
 }
