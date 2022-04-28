@@ -8,7 +8,6 @@ import { useCart } from '@project-lc/hooks';
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import { useQueryClient } from 'react-query';
 import CountBadge from './CountBadge';
 
 export const QUICK_MENU_HEIGHT = '65px';
@@ -61,7 +60,6 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
     }
   };
 
-  // TODO: 장바구니 작업 이후 장바구니 상품 개수 count 데이터 연동 추가 필요 by hwasurr
   const { data: cartData } = useCart();
 
   return (

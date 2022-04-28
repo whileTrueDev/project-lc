@@ -16,12 +16,13 @@ import {
 } from '@project-lc/components-constants/navigation';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { KkshowLogoVariant, KksLogo } from '@project-lc/components-shared/KksLogo';
-import { useIsLoggedIn } from '@project-lc/hooks';
+import { useCart, useIsLoggedIn } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import { MdShoppingCart } from 'react-icons/md';
 import { PersonalPopoverMenu } from '@project-lc/components-shared/navbar/NavbarRightButtonSection';
+import CountBadge from '@project-lc/components-shared/CountBadge';
+import { quickMenuLinks } from '@project-lc/components-constants/quickMenu';
 import { Searcher } from './search-input/Searcher';
 
 export const kkshowNavHeight = 120;
@@ -171,6 +172,7 @@ export default KkshowNavbar;
 
 function CartButton(): JSX.Element {
   const router = useRouter();
+  const { data: cartData } = useCart();
   return (
     <Tooltip label="장바구니" fontSize="xs">
       <Button
@@ -179,8 +181,14 @@ function CartButton(): JSX.Element {
         variant="unstyle"
         color="current"
         onClick={() => router.push('/cart')}
+        position="relative"
+        mr={{ base: 1, md: 2 }}
       >
-        <Icon as={MdShoppingCart} boxSize={6} />
+        <CountBadge count={cartData?.length || 0} />
+        <Icon
+          as={quickMenuLinks.find((link) => link.name === '장바구니')?.icon}
+          boxSize={6}
+        />
       </Button>
     </Tooltip>
   );
