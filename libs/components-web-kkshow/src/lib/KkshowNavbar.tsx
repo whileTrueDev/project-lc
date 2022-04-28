@@ -1,7 +1,9 @@
 import {
   Box,
   Button,
+  Center,
   Flex,
+  Grid,
   Icon,
   Link,
   Stack,
@@ -18,7 +20,7 @@ import { useIsLoggedIn } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import { MdAccountCircle, MdShoppingCart } from 'react-icons/md';
+import { MdShoppingCart } from 'react-icons/md';
 import { PersonalPopoverMenu } from '@project-lc/components-shared/navbar/NavbarRightButtonSection';
 import { Searcher } from './search-input/Searcher';
 
@@ -34,7 +36,6 @@ interface KkshowNavbar {
  *                             다크모드에서는 배경 검정, 글자 흰색인 네비바(검색페이지)
  */
 export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
-  const { isLoggedIn } = useIsLoggedIn();
   const palette = {
     bg: useColorModeValue('white', 'gray.800'),
     color: useColorModeValue('gray.700', 'whiteAlpha.900'),
@@ -47,6 +48,13 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
     palette.logoVariant = 'white';
   }
 
+  const commonNavConatinerStyle = {
+    maxW: '5xl',
+    m: 'auto',
+    minH: '60px',
+    px: 4,
+  };
+
   return (
     <Box
       bg={palette.bg}
@@ -56,44 +64,63 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
       w="100%"
       zIndex="sticky"
     >
-      <Flex
-        maxW="5xl"
-        m="auto"
-        justify="space-between"
-        align={{ base: 'center', md: 'end' }}
-        minH="60px"
-        py={4}
-        px={4}
-      >
-        <Box>
-          <NextLink href="/" passHref>
-            <Link>
-              <KksLogo
-                variant={palette.logoVariant as KkshowLogoVariant}
-                h={{ base: 30, md: 45 }}
-              />
-            </Link>
-          </NextLink>
-        </Box>
+      {/* 모바일인 경우 */}
+      <Box display={{ base: 'block', md: 'none' }}>
+        <Grid {...commonNavConatinerStyle} templateColumns="repeat(3, 1fr)" gap={6}>
+          <Box />
+          <Center>
+            <KkshowNavbarLogo variant={palette.logoVariant as KkshowLogoVariant} />
+          </Center>
+          <Flex justifyContent="flex-end">
+            <KkshowNavbarRightButtonSection />
+          </Flex>
+        </Grid>
+        <MobileNav />
+      </Box>
 
+      {/* 데스크탑인 경우 */}
+      <Flex
+        display={{ base: 'none', md: 'flex' }}
+        {...commonNavConatinerStyle}
+        py={4}
+        justify="space-between"
+      >
+        <KkshowNavbarLogo variant={palette.logoVariant as KkshowLogoVariant} />
         {/* 센터 */}
         <Box flex={1}>
-          <Flex alignItems="end" display={{ base: 'none', md: 'flex' }} ml={10}>
+          <Flex alignItems="end" ml={10}>
             <DesktopNav />
           </Flex>
         </Box>
-
         {/* 우측 */}
-        <Flex alignItems="center">
-          {!isLoggedIn && <ColorModeSwitcher _hover={{}} />}
-          <Searcher />
-          <CartButton />
-          {isLoggedIn ? <PersonalPopoverMenu /> : <LoginButton />}
-        </Flex>
+        <KkshowNavbarRightButtonSection />
       </Flex>
-
-      <MobileNav />
     </Box>
+  );
+}
+
+/** 크크쇼 네비바 로고링크 */
+function KkshowNavbarLogo({ variant }: { variant: KkshowLogoVariant }): JSX.Element {
+  return (
+    <Box>
+      <NextLink href="/" passHref>
+        <Link>
+          <KksLogo variant={variant} h={{ base: 30, md: 45 }} />
+        </Link>
+      </NextLink>
+    </Box>
+  );
+}
+/** 크크쇼 네비바 우측 버튼모음 */
+function KkshowNavbarRightButtonSection(): JSX.Element {
+  const { isLoggedIn } = useIsLoggedIn();
+  return (
+    <Flex alignItems="center">
+      {!isLoggedIn && <ColorModeSwitcher _hover={{}} />}
+      <Searcher />
+      <CartButton />
+      {isLoggedIn ? <PersonalPopoverMenu /> : <LoginButton />}
+    </Flex>
   );
 }
 
@@ -111,14 +138,7 @@ const DesktopNav = (): JSX.Element => {
 
 const MobileNav = (): JSX.Element => {
   return (
-    <Flex
-      display={{ base: 'flex', md: 'none' }}
-      px={4}
-      py={2}
-      gap={4}
-      flexWrap="wrap"
-      overflowX="auto"
-    >
+    <Flex px={4} py={2} gap={4} flexWrap="wrap" overflowX="auto">
       {kkshowNavLinks.map((navItem) => (
         <NavItem key={navItem.label} {...navItem} />
       ))}
