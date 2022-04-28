@@ -8,6 +8,7 @@ import { useKkshowSearchStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 
+export const QUICK_MENU_HEIGHT = '65px';
 export function BottomQuickMenu(): JSX.Element {
   return (
     <>
@@ -22,14 +23,14 @@ export function BottomQuickMenu(): JSX.Element {
         borderTopColor={useColorModeValue('gray.200', 'gray.700')}
         width="100%"
         height="7vh"
-        minHeight="65px"
+        minHeight={QUICK_MENU_HEIGHT}
         zIndex="docked"
       >
         {quickMenuLinks.map((link) => (
           <BottomQuickMenuItem key={link.name} link={link} />
         ))}
       </Flex>
-      <Box h="7vh" display={{ base: 'flex', md: 'none' }} />
+      <Box h="7vh" minHeight={QUICK_MENU_HEIGHT} display={{ base: 'flex', md: 'none' }} />
     </>
   );
 }

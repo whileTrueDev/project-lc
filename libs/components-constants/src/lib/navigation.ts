@@ -312,7 +312,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
 const customerMypageShoppingChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
   {
     name: '장바구니',
-    href: '/mypage/cart',
+    href: '/cart',
     checkIsActive: defaultIsActiveChecker,
   },
   {
@@ -360,9 +360,9 @@ const customerMypageInfoChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
 export const customerMypageNavLinks: MypageLink[] = [
   {
     name: '쇼핑',
-    href: 'customerMypageShopping', // 링크로 사용할 용도x, key값으로 사용하기 위해 임의의 값 넣음
+    href: '',
     checkIsActive: (pathname: string, _: string) => {
-      // 쇼핑 하위탭 링크 중 하나라도 active해당되면 active처리
+      // 하위탭 링크 중 하나라도 active해당되면 active처리
       return customerMypageShoppingChildrenNavLinks.some((link) =>
         link.checkIsActive(pathname, link.href),
       );
@@ -371,7 +371,7 @@ export const customerMypageNavLinks: MypageLink[] = [
   },
   {
     name: '활동',
-    href: 'customerMypageActivity', // 링크로 사용할 용도x, key값으로 사용하기 위해 임의의 값 넣음
+    href: '',
     checkIsActive: (pathname: string, _: string) => {
       return customerMypageActivityChildrenNavLinks.some((link) =>
         link.checkIsActive(pathname, link.href),
@@ -381,7 +381,7 @@ export const customerMypageNavLinks: MypageLink[] = [
   },
   {
     name: '정보',
-    href: 'customerMypageInfo', // 링크로 사용할 용도x, key값으로 사용하기 위해 임의의 값 넣음
+    href: '',
     checkIsActive: (pathname: string, _: string) => {
       return customerMypageInfoChildrenNavLinks.some((link) =>
         link.checkIsActive(pathname, link.href),
