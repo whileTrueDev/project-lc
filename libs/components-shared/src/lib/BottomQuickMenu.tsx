@@ -4,9 +4,12 @@ import {
   QuickMenuLink,
   quickMenuLinks,
 } from '@project-lc/components-constants/quickMenu';
+import { useCart } from '@project-lc/hooks';
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
+import { useQueryClient } from 'react-query';
+import CountBadge from './CountBadge';
 
 export const QUICK_MENU_HEIGHT = '65px';
 export function BottomQuickMenu(): JSX.Element {
@@ -57,6 +60,10 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
       if (link.onClick) link.onClick();
     }
   };
+
+  // TODO: 장바구니 작업 이후 장바구니 상품 개수 count 데이터 연동 추가 필요 by hwasurr
+  const { data: cartData } = useCart();
+
   return (
     <Center w="100%">
       <VStack
@@ -64,9 +71,23 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
         as="button"
         width="80%"
         onClick={onQuickMenuClick}
+        spacing={1}
+        position="relative"
       >
-        <Icon as={link.icon} width={5} height={5} />
-        <Text fontSize={['sm', 'md']} fontWeight={isMatched ? 'bold' : 'unset'}>
+        {link.name === '장바구니' ? (
+          <>
+            <CountBadge count={cartData?.length || 0} right={{ base: 2, sm: 5 }} />
+            <Icon as={link.icon} width={5} height={5} />
+          </>
+        ) : (
+          <Icon as={link.icon} width={5} height={5} />
+        )}
+        <Text
+          minW="60px"
+          fontSize={['xs', 'sm']}
+          fontWeight={isMatched ? 'bold' : 'unset'}
+          noOfLines={1}
+        >
           {link.name}
         </Text>
       </VStack>
