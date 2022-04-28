@@ -2,30 +2,37 @@ import { Stack, Text } from '@chakra-ui/react';
 import { useCustomerStatus, useProfile } from '@project-lc/hooks';
 
 export function CustomerStatusSection(): JSX.Element {
-  const { data: profileData, isLoading } = useProfile();
+  const { data: profileData } = useProfile();
   const { data: customerStatus } = useCustomerStatus(profileData?.id);
 
   return (
-    <Stack direction={{ base: 'column', md: 'row' }}>
-      <Stack direction="row">
-        <Text>
-          {profileData?.email} ({customerStatus?.nickname})
+    <Stack
+      direction={{ base: 'column', md: 'row' }}
+      justifyContent={{ base: 'center', md: 'flex-start' }}
+      alignItems="center"
+      p={{ base: 4, md: 8 }}
+      spacing={{ base: 6, md: 10 }}
+    >
+      <Stack direction="row" alignItems="center">
+        <Text fontWeight="bold" fontSize="xl">
+          {profileData?.name} 님
         </Text>
+        <Text>({profileData?.email})</Text>
       </Stack>
-      <Stack direction="row">
-        <Stack>
-          <Text>팔로잉</Text>
-          <Text>{customerStatus?.followingBroadcasters}</Text>
-        </Stack>
-        <Stack>
-          <Text>라이브알림</Text>
-          <Text>{customerStatus?.followingLiveShoppings}</Text>
-        </Stack>
-        <Stack>
-          <Text>배송중</Text>
-          <Text>{customerStatus?.shippingOrders}</Text>
-        </Stack>
+      <Stack direction="row" spacing={8}>
+        <StatusBox label="팔로잉" value={customerStatus?.followingBroadcasters} />
+        <StatusBox label="라이브알림" value={customerStatus?.followingLiveShoppings} />
+        <StatusBox label="배송중" value={customerStatus?.shippingOrders} />
       </Stack>
+    </Stack>
+  );
+}
+
+function StatusBox({ label, value }: { label: string; value?: number }): JSX.Element {
+  return (
+    <Stack textAlign="center">
+      <Text>{label}</Text>
+      <Text>{value}</Text>
     </Stack>
   );
 }
