@@ -1,0 +1,22 @@
+{
+  "root": "libs/nest-modules-cart",
+  "sourceRoot": "libs/nest-modules-cart/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/nest-modules-cart/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/nest-modules-cart"],
+      "options": {
+        "jestConfig": "libs/nest-modules-cart/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
