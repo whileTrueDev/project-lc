@@ -1,24 +1,57 @@
-import { Box, Button } from '@chakra-ui/react';
-import { loadTossPayments } from '@tosspayments/payment-sdk';
+import { Box, Grid, GridItem, Flex } from '@chakra-ui/react';
+import { PaymentBox } from '@project-lc/components-web-kkshow/payment/PaymentButton';
+import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
+import { BuyerInfoSection } from '@project-lc/components-web-kkshow/payment/BuyerInfoSection';
+import { DestinationInfo } from '@project-lc/components-web-kkshow/payment/DestinationInfo';
+import { OrderItemInfo } from '@project-lc/components-web-kkshow/payment/OrderItemInfo';
+import { useDisplaySize } from '@project-lc/hooks';
 
 export function Payment(): JSX.Element {
-  const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY;
-  function doPayment(): void {
-    loadTossPayments(CLIENT_KEY).then((tossPayments) => {
-      tossPayments.requestPayment('카드', {
-        amount: 1000,
-        orderId: `sdfds12dfwesdffr2qwsdfe3s2dd2dewfwe`,
-        orderName: '토스 티셔츠',
-        customerName: '고객명',
-        successUrl: `http://localhost:4000/payment/success`,
-        failUrl: `http://localhost:4000/payment/fail`,
-      });
-    });
-  }
-
+  const { isDesktopSize } = useDisplaySize();
   return (
     <Box>
-      <Button onClick={() => doPayment()}>결제</Button>
+      <KkshowLayout>
+        {isDesktopSize ? (
+          <Flex m="auto" p={6} alignItems="center" justifyContent="center">
+            <Grid templateColumns="repeat(7, 4fr)" gap={6} w="70%">
+              <GridItem colSpan={5}>
+                <BuyerInfoSection />
+              </GridItem>
+              <GridItem rowSpan={4} colSpan={2} border="solid">
+                <PaymentBox />
+              </GridItem>
+              <GridItem colSpan={5}>
+                <DestinationInfo />
+              </GridItem>
+              <GridItem colSpan={5}>
+                <OrderItemInfo />
+              </GridItem>
+            </Grid>
+          </Flex>
+        ) : (
+          <Flex m="auto" p={6} alignItems="center" justifyContent="center">
+            <Grid templateColumns="repeat(7, 4fr)" gap={6} w="70%">
+              <GridItem colSpan={5}>
+                <BuyerInfoSection />
+              </GridItem>
+              <GridItem
+                rowSpan={4}
+                colSpan={2}
+                border="solid"
+                display={{ base: 'none', md: 'block' }}
+              >
+                <PaymentBox />
+              </GridItem>
+              <GridItem colSpan={5}>
+                <DestinationInfo />
+              </GridItem>
+              <GridItem colSpan={5}>
+                <OrderItemInfo />
+              </GridItem>
+            </Grid>
+          </Flex>
+        )}
+      </KkshowLayout>
     </Box>
   );
 }
