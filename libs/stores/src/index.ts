@@ -1,3 +1,4 @@
+export * from './lib/cartStore';
 export * from './lib/fmExportStore';
 export * from './lib/fmOrderStore';
 export * from './lib/goodsViewStore';
