@@ -650,6 +650,7 @@
       },
       "tags": []
     },
+    "nest-modules-cart": "libs/nest-modules-cart",
     "nest-modules-cipher": {
       "root": "libs/nest-modules-cipher",
       "sourceRoot": "libs/nest-modules-cipher/src",

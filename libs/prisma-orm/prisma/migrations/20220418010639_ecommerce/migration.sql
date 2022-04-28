@@ -41,7 +41,7 @@ CREATE TABLE `Customer` (
     `nickname` VARCHAR(191) NULL,
     `phone` VARCHAR(191) NULL,
     `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `gender` ENUM('male','female','unknown') NOT NULL DEFAULT 'unknown',
+    `gender` ENUM('male', 'female', 'unknown') NULL DEFAULT 'unknown',
     `birthDate` DATETIME(3) NULL,
     `agreementFlag` BOOLEAN NOT NULL DEFAULT false,
     `inactiveFlag` BOOLEAN NOT NULL DEFAULT false,
