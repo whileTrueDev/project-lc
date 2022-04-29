@@ -77,18 +77,25 @@ export class OrderCancellationService extends ServiceBaseWithCache {
       },
     });
 
-    // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트 // TODO: 주문 캐시데이터도 삭제 (주문모듈 작업한 브랜치 합친 이후 진행)
+    // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
     if (status === 'complete') {
-      await this.prisma.order.update({
-        where: { id: orderId },
-        data: {
-          step: 'orderInvalidated',
-        },
-      });
+      await this.updateOrderStateToOrderInvalidated(orderId);
     }
 
     await this._clearCaches(this.#ORDER_CANCELLATION_CACHE_KEY);
     return data;
+  }
+
+  /** 주문의 상태를 주문무효 로 변경(주문취소요청이 처리완료(승인)되었을 때 사용)
+   // TODO: 주문 캐시데이터도 삭제 (주문모듈 작업한 브랜치 합친 이후 주문서비스에서 가져오도록 수정)
+   */
+  private async updateOrderStateToOrderInvalidated(orderId: number): Promise<void> {
+    await this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        step: 'orderInvalidated',
+      },
+    });
   }
 
   /* 주문취소 내역 조회 */
@@ -141,22 +148,22 @@ export class OrderCancellationService extends ServiceBaseWithCache {
       },
     });
 
-    // 조회한 데이터를 필요한 형태로 처리
+    // 조회한 데이터를 필요한 형태로 처리 -> 프론트 작업시 필요한 형태로 수정필요
     const list = data.map((d) => {
       const { items, ...rest } = d;
 
       const _items = items.map((i) => ({
-        id: i.id,
-        amount: i.amount,
-        status: i.status,
-        goodsName: i.orderItem.goods.goods_name,
-        image: i.orderItem.goods.image[0]?.image,
-        shopName: i.orderItem.goods.seller.sellerShop?.shopName,
-        optionName: i.orderItemOption.name,
-        optionValue: i.orderItemOption.value,
-        price: Number(i.orderItemOption.discountPrice),
-        orderItemId: i.orderItem.id,
-        orderItemOptionId: i.orderItemOption.id,
+        id: i.id, // 주문취소상품 고유번호
+        amount: i.amount, // 주문취소상품 개수
+        status: i.status, // 주문취소상품 처리상태
+        goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
+        image: i.orderItem.goods.image[0]?.image, // 주문 상품 이미지
+        shopName: i.orderItem.goods.seller.sellerShop?.shopName, // 주문상품 판매상점명
+        optionName: i.orderItemOption.name, // 주문상품옵션명
+        optionValue: i.orderItemOption.value, // 주문상품옵션 값
+        price: Number(i.orderItemOption.discountPrice), // 주문상품옵션 가격
+        orderItemId: i.orderItem.id, // 연결된 주문상품고유번호
+        orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
       }));
 
       return { ...rest, items: _items };
@@ -177,7 +184,7 @@ export class OrderCancellationService extends ServiceBaseWithCache {
 
     await this.findOneOrderCancellation(id);
 
-    const result = await this.prisma.orderCancellation.update({
+    const orderCancellation = await this.prisma.orderCancellation.update({
       where: { id },
       data: {
         ...rest,
@@ -194,8 +201,13 @@ export class OrderCancellationService extends ServiceBaseWithCache {
       },
     });
 
+    // 주문취소요청이 처리완료(승인)되면 주문 상태를 주문무효상태로 업데이트
+    if (orderCancellation.status === 'complete') {
+      await this.updateOrderStateToOrderInvalidated(orderCancellation.orderId);
+    }
+
     await this._clearCaches(this.#ORDER_CANCELLATION_CACHE_KEY);
-    return result;
+    return orderCancellation;
   }
 
   /** 주문취소가 존재하는지 확인 */
