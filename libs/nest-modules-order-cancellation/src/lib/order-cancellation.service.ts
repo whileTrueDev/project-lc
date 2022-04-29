@@ -1,10 +1,12 @@
 import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { ProcessStatus } from '@prisma/client';
+import { Prisma, ProcessStatus } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
+  GetOrderCancellationListDto,
+  OrderCancellationListRes,
 } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
 import { nanoid } from 'nanoid';
@@ -81,6 +83,78 @@ export class OrderCancellationService extends ServiceBaseWithCache {
   }
 
   /* 주문취소 내역 조회 */
+  async getOrderCancellationList(
+    dto: GetOrderCancellationListDto,
+  ): Promise<OrderCancellationListRes> {
+    const { skip, take, customerId, sellerId } = dto;
+    let where: Prisma.OrderCancellationWhereInput;
+    // customerId가 주어진 경우 - 해당 소비자가 요청한 주문취소내역 조회
+    if (customerId) {
+      where = {
+        order: { customerId },
+      };
+    }
+    // sellerId가 주어진경우 - 주문취소상품에 해당 판매자가 판매하는 상품이 포함된 주문취소내역 조회
+    if (sellerId) {
+      where = {
+        items: { some: { orderItem: { goods: { sellerId } } } },
+      };
+    }
+
+    const totalCount = await this.prisma.orderCancellation.count({ where });
+
+    // 주문취소내역에 필요한 데이터 조회
+    const data = await this.prisma.orderCancellation.findMany({
+      where,
+      take,
+      skip,
+      include: {
+        order: { select: { orderCode: true } },
+        refund: true,
+        items: {
+          include: {
+            orderItem: {
+              select: {
+                goods: {
+                  select: {
+                    id: true,
+                    goods_name: true,
+                    image: true,
+                    seller: { select: { sellerShop: true } },
+                  },
+                },
+              },
+            },
+            orderItemOption: true,
+          },
+        },
+      },
+    });
+
+    // 조회한 데이터를 필요한 형태로 처리
+    const list = data.map((d) => {
+      const { items, ...rest } = d;
+
+      const _items = items.map((i) => ({
+        id: i.id,
+        amount: i.amount,
+        status: i.status,
+        goodsName: i.orderItem.goods.goods_name,
+        image: i.orderItem.goods.image[0]?.image,
+        shopName: i.orderItem.goods.seller.sellerShop?.shopName,
+        optionName: i.orderItemOption.name,
+        optionValue: i.orderItemOption.value,
+        price: Number(i.orderItemOption.discountPrice),
+      }));
+
+      return { ...rest, items: _items };
+    });
+
+    return {
+      list,
+      totalCount,
+    };
+  }
 
   /* 주문취소 수정(판매자, 관리자가 주문취소처리상태 수정 및 거절사유 입력 등) */
 

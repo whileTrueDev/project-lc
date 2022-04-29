@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
@@ -10,6 +11,8 @@ import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
+  GetOrderCancellationListDto,
+  OrderCancellationListRes,
 } from '@project-lc/shared-types';
 import { OrderCancellationService } from './order-cancellation.service';
 
@@ -27,6 +30,12 @@ export class OrderCancellationController {
   }
 
   /* 주문취소 내역 조회 */
+  @Get()
+  getOrderCancellationList(
+    @Query(new ValidationPipe({ transform: true })) dto: GetOrderCancellationListDto,
+  ): Promise<OrderCancellationListRes> {
+    return this.orderCancellationService.getOrderCancellationList(dto);
+  }
 
   /* 주문취소 수정(판매자, 관리자가 주문취소처리상태 수정 및 거절사유 입력 등) */
 
