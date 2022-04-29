@@ -928,7 +928,6 @@
       },
       "tags": []
     },
-    "nest-modules-order-cancellation": "libs/nest-modules-order-cancellation",
     "nest-modules-overlay": {
       "root": "libs/nest-modules-overlay",
       "sourceRoot": "libs/nest-modules-overlay/src",

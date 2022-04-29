@@ -1,6 +1,6 @@
 # nest-modules-order-cancel
 
-** nest-modules-order-cancellation 과 이름이 유사하여 헷갈릴 수 있음 **
+** order 모듈의 order-cancellation 과 이름이 유사하여 헷갈릴 수 있음 **
 
 판매자의 사정으로 구매자에게 주문취소를 요청해야 하는 경우 
 판매자가 크크쇼 관리자에게 주문취소요청 보냄 => 관리자는 판매자의 주문취소요청을 확인하여 퍼스트몰에서 주문취소처리를 진행함
