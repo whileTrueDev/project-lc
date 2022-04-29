@@ -7,6 +7,8 @@ import {
   CreateOrderCancellationRes,
   GetOrderCancellationListDto,
   OrderCancellationListRes,
+  OrderCancellationUpdateRes,
+  UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
 import { nanoid } from 'nanoid';
@@ -115,6 +117,7 @@ export class OrderCancellationService extends ServiceBaseWithCache {
           include: {
             orderItem: {
               select: {
+                id: true,
                 goods: {
                   select: {
                     id: true,
@@ -145,6 +148,8 @@ export class OrderCancellationService extends ServiceBaseWithCache {
         optionName: i.orderItemOption.name,
         optionValue: i.orderItemOption.value,
         price: Number(i.orderItemOption.discountPrice),
+        orderItemId: i.orderItem.id,
+        orderItemOptionId: i.orderItemOption.id,
       }));
 
       return { ...rest, items: _items };
@@ -157,6 +162,37 @@ export class OrderCancellationService extends ServiceBaseWithCache {
   }
 
   /* 주문취소 수정(판매자, 관리자가 주문취소처리상태 수정 및 거절사유 입력 등) */
+  async updateOrderCancellationStatus(
+    id: number,
+    dto: UpdateOrderCancellationStatusDto,
+  ): Promise<OrderCancellationUpdateRes> {
+    const { refundId, ...rest } = dto;
+    const orderCancellation = await this.prisma.orderCancellation.findUnique({
+      where: { id },
+    });
+    if (!orderCancellation) {
+      throw new BadRequestException(
+        `존재하지 않는 주문취소요청입니다. 주문취소 고유번호 ${id}`,
+      );
+    }
+    const result = await this.prisma.orderCancellation.update({
+      where: { id },
+      data: {
+        ...rest,
+        completeDate: ['complete', 'canceled'].includes(dto.status) // 완료 혹은 취소(거절)시 완료일시 저장
+          ? new Date()
+          : undefined,
+        items: {
+          updateMany: {
+            where: { orderCancellationId: id },
+            data: { status: dto.status },
+          },
+        },
+        refund: refundId ? { connect: { id: refundId } } : undefined,
+      },
+    });
+    return result;
+  }
 
   /* 주문취소 철회(소비자가 요청했던 주문취소 철회) */
 }

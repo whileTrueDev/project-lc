@@ -2,6 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseInterceptors,
@@ -13,6 +16,8 @@ import {
   CreateOrderCancellationRes,
   GetOrderCancellationListDto,
   OrderCancellationListRes,
+  OrderCancellationUpdateRes,
+  UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
 import { OrderCancellationService } from './order-cancellation.service';
 
@@ -38,6 +43,13 @@ export class OrderCancellationController {
   }
 
   /* 주문취소 수정(판매자, 관리자가 주문취소처리상태 수정 및 거절사유 입력 등) */
+  @Patch('/:orderCancellationId')
+  updateOrderCancellationStatus(
+    @Param('orderCancellationId', ParseIntPipe) id: number,
+    @Body(ValidationPipe) dto: UpdateOrderCancellationStatusDto,
+  ): Promise<OrderCancellationUpdateRes> {
+    return this.orderCancellationService.updateOrderCancellationStatus(id, dto);
+  }
 
   /* 주문취소 철회(소비자가 요청했던 주문취소 철회) */
 }

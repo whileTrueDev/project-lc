@@ -1,5 +1,14 @@
+import { ProcessStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsArray, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateIf,
+  ValidateNested,
+} from 'class-validator';
 
 // *------------ 주문취소 생성 dto ------------------
 /** 주문취소에 포함된 상품 dto */
@@ -64,4 +73,21 @@ export class GetOrderCancellationListDto {
   @IsNumber()
   @IsOptional()
   sellerId?: number;
+}
+
+// *------------ 주문취소 상태변경 dto ------------------
+export class UpdateOrderCancellationStatusDto {
+  /** 변경될 처리상태 */
+  @IsEnum(ProcessStatus)
+  status: ProcessStatus;
+
+  /* 거절시 거절사유 입력필요 */
+  @ValidateIf((o) => o.status === ProcessStatus.canceled)
+  @IsString()
+  rejectReason: string;
+
+  /** 주문취소요청에 대한 환불 완료시 환불고유번호 입력 */
+  @IsNumber()
+  @IsOptional()
+  refundId?: number;
 }
