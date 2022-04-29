@@ -34,6 +34,7 @@ import { SellerModule } from '@project-lc/nest-modules-seller';
 import { ShippingGroupModule } from '@project-lc/nest-modules-shipping-group';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { OrderCancellationModule } from '@project-lc/nest-modules-order-cancellation';
+import { OrderModule } from '@project-lc/nest-modules-order';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
 
@@ -67,6 +68,7 @@ import { AppController } from './app.controller';
     CustomerModule.withControllers(),
     CartModule.withControllers(),
     OrderCancellationModule.withControllers(),
+    OrderModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],
