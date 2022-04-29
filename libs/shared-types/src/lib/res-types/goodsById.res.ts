@@ -18,6 +18,7 @@ import {
   ShippingSet,
 } from '@prisma/client';
 
+export type GoodsRelatedBroadcaster = Pick<Broadcaster, 'id' | 'avatar' | 'userNickname'>;
 export type GoodsByIdRes = Goods & {
   options: (GoodsOptions & {
     supply: GoodsOptionsSupplies;
@@ -36,12 +37,12 @@ export type GoodsByIdRes = Goods & {
   GoodsInfo: GoodsInfo | null;
   LiveShopping?: Array<
     LiveShopping & {
-      broadcaster: Pick<Broadcaster, 'avatar' | 'userNickname'>;
+      broadcaster: GoodsRelatedBroadcaster;
     }
   >;
   productPromotion: Array<
     ProductPromotion & {
-      broadcaster: Pick<Broadcaster, 'avatar' | 'userNickname'>;
+      broadcaster: GoodsRelatedBroadcaster;
     }
   >;
   categories: GoodsCategory[];

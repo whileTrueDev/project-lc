@@ -1,4 +1,5 @@
 import { CloseIcon, Icon } from '@chakra-ui/icons';
+import NextLink from 'next/link';
 import {
   Accordion,
   AccordionButton,
@@ -14,21 +15,29 @@ import {
   GridItem,
   IconButton,
   Input,
+  Link,
   ListItem,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalOverlay,
   Select,
   Stack,
   Text,
   Tooltip,
   UnorderedList,
   useBreakpointValue,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { Broadcaster } from '@prisma/client';
-import { GoodsByIdRes } from '@project-lc/shared-types';
+import { Decimal } from '@prisma/client/runtime';
+import { useCartMutation, useDisplaySize } from '@project-lc/hooks';
+import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
 import { useGoodsViewStore } from '@project-lc/stores';
-import { useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 import { GoGift } from 'react-icons/go';
 import shallow from 'zustand/shallow';
+import { useRouter } from 'next/router';
 import OptionQuantity from '../OptionQuantity';
 
 interface GoodsViewPurchaseBoxProps {
@@ -36,16 +45,17 @@ interface GoodsViewPurchaseBoxProps {
 }
 /** 상품 상세 페이지 상품 옵션 및 후원 정보 입력 + 구매,장바구니 버튼 */
 export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
-  const toast = useToast();
+  const toast = useToast({ isClosable: true });
   const store = useGoodsViewStore();
 
+  // 기본 옵션 1개만 존재하는 상품 인지 판단
   const isOnlyDefaultOption = useMemo(
     () =>
       goods.options.length === 1 &&
       goods.options.filter((x) => x.default_option === 'y').length === 1,
     [goods.options],
   );
-
+  // 기본 옵션 1개만 존재하는 경우 기본 선택되도록
   useEffect(() => {
     if (isOnlyDefaultOption) {
       store.handleSelectOpt({ ...goods.options[0], quantity: 1 });
@@ -133,7 +143,7 @@ export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.
 
       {/* 총 구매 금액 및 구매,장바구니 버튼 */}
       <GridItem colSpan={3}>
-        <GoodsViewButtonSet />
+        <GoodsViewButtonSet goods={goods} />
       </GridItem>
     </Grid>
   );
@@ -142,17 +152,23 @@ export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.
 function GoodsViewBroadcasterSupportBox({
   goods,
 }: GoodsViewPurchaseBoxProps): JSX.Element | null {
-  const { selectedBc, handleSelectBc } = useGoodsViewStore(
-    (s) => ({ selectedBc: s.selectedBc, handleSelectBc: s.handleSelectBc }),
-    shallow,
-  );
+  const { selectedBc, handleSelectBc, supportMessage, onSupMsgChange } =
+    useGoodsViewStore(
+      (s) => ({
+        selectedBc: s.selectedBc,
+        handleSelectBc: s.handleSelectBc,
+        supportMessage: s.supportMessage,
+        onSupMsgChange: s.onSupMsgChange,
+      }),
+      shallow,
+    );
   const relatedBroadcasters = useMemo(() => {
     const livBcs =
       goods.LiveShopping?.map((liv) => liv.broadcaster).filter((x) => !!x) || [];
     const ppBcs =
       goods.productPromotion?.map((pp) => pp.broadcaster).filter((x) => !!x) || [];
     const result = livBcs.concat(ppBcs);
-    return result.reduce<Pick<Broadcaster, 'avatar' | 'userNickname'>[]>((prev, curr) => {
+    return result.reduce<GoodsRelatedBroadcaster[]>((prev, curr) => {
       if (prev.findIndex((x) => x.userNickname === curr.userNickname) > -1) {
         return prev;
       }
@@ -224,6 +240,8 @@ function GoodsViewBroadcasterSupportBox({
                   rounded="md"
                   size="sm"
                   placeholder="방송인 후원 메시지 도네이션 표시글"
+                  value={supportMessage}
+                  onChange={(e) => onSupMsgChange(e.target.value)}
                 />
               </Box>
             </Flex>
@@ -252,26 +270,93 @@ function GoodsViewBroadcasterSupportBox({
     </Accordion>
   );
 }
-
-function GoodsViewButtonSet(): JSX.Element {
-  const store = useGoodsViewStore();
+function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
+  const router = useRouter();
+  const toast = useToast();
+  const { isMobileSize } = useDisplaySize();
+  const selectedOpts = useGoodsViewStore((s) => s.selectedOpts);
+  const selectedBc = useGoodsViewStore((s) => s.selectedBc);
+  const supportMessage = useGoodsViewStore((s) => s.supportMessage);
   const buttonSize = useBreakpointValue({ base: 'md', md: 'lg' });
+
+  const cartDoneDialog = useDisclosure();
 
   /** 선택 상품 옵션 합계 정보 */
   const totalInfo = useMemo(() => {
-    return store.selectedOpts.reduce(
+    return selectedOpts.reduce(
       (prev, curr) => {
         let { quantity, price } = prev;
         if (curr.quantity) quantity += curr.quantity;
         if (curr.price) price += Number(curr.price) * curr.quantity;
         return { quantity, price };
       },
-      {
-        quantity: 0,
-        price: 0,
-      },
+      { quantity: 0, price: 0 },
     );
-  }, [store.selectedOpts]);
+  }, [selectedOpts]);
+
+  const onSuccess = (): void => {
+    if (isMobileSize) {
+      cartDoneDialog.onOpen();
+    } else {
+      toast({
+        title: (
+          <Text>
+            장바구니에 상품을 담았습니다.
+            <Text
+              ml={4}
+              as="span"
+              color="blue.600"
+              cursor="pointer"
+              textDecor="underline"
+              onClick={() => router.push('/cart')}
+            >
+              장바구니
+            </Text>
+          </Text>
+        ),
+        status: 'success',
+        isClosable: true,
+      });
+    }
+  };
+  // 장바구니 담기
+  const createCartItem = useCartMutation();
+
+  const handleCartClick = (): void => {
+    if (!(selectedOpts.length > 0)) {
+      toast({ title: '선택된 옵션이 없습니다.', status: 'warning' });
+      return;
+    }
+    createCartItem
+      .mutateAsync({
+        goodsId: goods.id,
+        options: selectedOpts.map((o) => ({
+          discountPrice: o.price,
+          normalPrice: o.consumer_price,
+          quantity: o.quantity,
+          goodsOptionsId: o.id,
+          name: o.option_title,
+          value: o.option1,
+        })),
+        shippingCost: 2500,
+        shippingCostIncluded: false,
+        shippingGroupId: goods.shippingGroupId,
+        support: selectedBc
+          ? {
+              broadcasterId: selectedBc.id,
+              nickname: selectedBc?.userNickname,
+              message: supportMessage,
+            }
+          : undefined,
+      })
+      .then(() => onSuccess())
+      .catch(() => {
+        toast({
+          status: 'error',
+          title: '장바구니에 담는 도중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        });
+      });
+  };
 
   return (
     <Stack>
@@ -295,7 +380,7 @@ function GoodsViewButtonSet(): JSX.Element {
 
       <ButtonGroup>
         {/* 방송인에게 선물 버튼 */}
-        {store.selectedBc && (
+        {selectedBc && (
           <Tooltip label="방송인에게 선물하기">
             <IconButton
               aria-label="방송인에게 선물하기 버튼"
@@ -326,13 +411,54 @@ function GoodsViewButtonSet(): JSX.Element {
           size={buttonSize}
           colorScheme="blue"
           variant="outline"
-          onClick={() => {
-            alert('장바구니 클릭');
-          }}
+          isLoading={createCartItem.isLoading}
+          onClick={handleCartClick}
         >
           장바구니 담기
         </Button>
       </ButtonGroup>
+
+      <CartCreateDoneDialog
+        isOpen={cartDoneDialog.isOpen}
+        onClose={cartDoneDialog.onClose}
+      />
     </Stack>
+  );
+}
+
+interface CartCreateDoneDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+function CartCreateDoneDialog({
+  isOpen,
+  onClose,
+}: CartCreateDoneDialogProps): JSX.Element {
+  const router = useRouter();
+  const { isMobileSize } = useDisplaySize();
+  return (
+    <Modal isOpen={!!isMobileSize && isOpen} onClose={onClose} isCentered size="xs">
+      <ModalOverlay />
+      <ModalContent maxW={280}>
+        <ModalBody my={4} textAlign="center">
+          <Box mb={4}>
+            <Text>장바구니에 상품을 담았습니다.</Text>
+          </Box>
+          <ButtonGroup>
+            <Button size="sm" colorScheme="blue" variant="solid" onClick={onClose}>
+              계속 쇼핑하기
+            </Button>
+            <Button
+              size="sm"
+              colorScheme="blue"
+              variant="outline"
+              onClick={() => router.push('/cart')}
+            >
+              장바구니 확인
+            </Button>
+          </ButtonGroup>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

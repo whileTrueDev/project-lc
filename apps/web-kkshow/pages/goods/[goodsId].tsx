@@ -11,13 +11,70 @@ import { GoodsViewMeta } from '@project-lc/components-web-kkshow/goods/GoodsView
 import { GoodsViewReviews } from '@project-lc/components-web-kkshow/goods/GoodsViewReviews';
 import { GoodsViewStickyNav } from '@project-lc/components-web-kkshow/goods/GoodsViewStickyNav';
 import { KkshowNavbar } from '@project-lc/components-web-kkshow/KkshowNavbar';
+import { getGoodsById, generateGoodsByIdKey, getAllGoodsIds } from '@project-lc/hooks';
 import { useGoodsViewStore } from '@project-lc/stores';
+import { createQueryClient } from '@project-lc/utils-frontend';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import { DehydratedState, dehydrate } from 'react-query';
 
+type KkshowGoodsProps = { dehydratedState: DehydratedState };
+type KkshowGoodsParams = { goodsId: string };
+export const getStaticPaths: GetStaticPaths<KkshowGoodsParams> = async () => {
+  const allGoodsIds = await getAllGoodsIds();
+  return {
+    paths: allGoodsIds.map((id) => ({ params: { goodsId: id.toString() } })),
+    fallback: true, // false or 'blocking'
+  };
+};
+
+export const getStaticProps: GetStaticProps<
+  KkshowGoodsProps,
+  KkshowGoodsParams
+> = async ({ params }) => {
+  const queryClient = createQueryClient();
+  await queryClient
+    .prefetchQuery(generateGoodsByIdKey(params.goodsId), () =>
+      getGoodsById(params.goodsId),
+    )
+    .catch((err) => {
+      throw new Error(`Failed to fetch KkshowShopping data - ${err}`);
+    });
+
+  return {
+    props: { dehydratedState: dehydrate(queryClient) },
+    revalidate: 60,
+  };
+};
+export default function GoodsView(): JSX.Element {
+  useGoodsScrollNavAutoChange();
+  const router = useRouter();
+  const goodsId = router.query.goodsId as string;
+
+  if (!goodsId) return <Box>hi goods id is required.</Box>;
+  return (
+    <Box>
+      <KkshowNavbar />
+      <GoodsViewBreadCrumb />
+      <GoodsViewMeta />
+      <GoodsViewStickyNav />
+      <GoodsViewDetail />
+      <GoodsViewReviews />
+      <GoodsViewInquiries />
+      <GoodsViewAdditionalInfo />
+      <GoodsViewFloatingButtons />
+      {/* <GoodsViewRelatedGoods /> */}
+      <GoodsViewBottomMenu />
+      <CommonFooter footerLinkList={kkshowFooterLinkList} />
+    </Box>
+  );
+}
+
+/** GoodsStickNav 선택된 nav 자동 변경 훅 */
 const useGoodsScrollNavAutoChange = (): void => {
   const selected = useGoodsViewStore((s) => s.selectedNavIdx);
-  const handleSelect = useGoodsViewStore((s) => s.handleSelect);
+  const handleSelect = useGoodsViewStore((s) => s.handleSelectNav);
 
   useEffect(() => {
     const scrollListener = (): void => {
@@ -66,27 +123,3 @@ const useGoodsScrollNavAutoChange = (): void => {
     };
   });
 };
-
-export default function GoodsView(): JSX.Element {
-  useGoodsScrollNavAutoChange();
-  const router = useRouter();
-  const goodsId = router.query.goodsId as string;
-
-  if (!goodsId) return <Box>hi goods id is required.</Box>;
-  return (
-    <Box>
-      <KkshowNavbar />
-      <GoodsViewBreadCrumb />
-      <GoodsViewMeta />
-      <GoodsViewStickyNav />
-      <GoodsViewDetail />
-      <GoodsViewReviews />
-      <GoodsViewInquiries />
-      <GoodsViewAdditionalInfo />
-      <GoodsViewFloatingButtons />
-      {/* <GoodsViewRelatedGoods /> */}
-      <GoodsViewBottomMenu />
-      <CommonFooter footerLinkList={kkshowFooterLinkList} />
-    </Box>
-  );
-}

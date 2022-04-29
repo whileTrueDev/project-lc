@@ -121,6 +121,11 @@ export class GoodsController {
     return this.goodsService.registGoods(sellerId, dto);
   }
 
+  @Get('all-ids')
+  getAllGoodsIds(): Promise<number[]> {
+    return this.goodsService.findAllGoodsIds();
+  }
+
   /** 상품 개별 조회 */
   @Get(':goodsId')
   getOneGoods(@Param('goodsId', ParseIntPipe) goodsId: number): Promise<GoodsByIdRes> {

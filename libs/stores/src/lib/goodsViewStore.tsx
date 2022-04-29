@@ -1,9 +1,8 @@
-import { Broadcaster } from '@prisma/client';
-import { GoodsByIdRes } from '@project-lc/shared-types';
+import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
 import create from 'zustand';
 
 type SelectedOpt = GoodsByIdRes['options'][number] & { quantity: number };
-type SelectedBc = Pick<Broadcaster, 'avatar' | 'userNickname'>;
+type SelectedBc = GoodsRelatedBroadcaster;
 interface GoodsViewStore {
   selectedNavIdx: number;
   handleSelectNav: (num: number) => void;
@@ -16,6 +15,8 @@ interface GoodsViewStore {
   // 선택된 방송인
   selectedBc: SelectedBc | null;
   handleSelectBc: (v: SelectedBc | null) => void;
+  supportMessage: string;
+  onSupMsgChange: (msg: string) => void;
 }
 export const useGoodsViewStore = create<GoodsViewStore>((set, get) => ({
   selectedNavIdx: 0,
@@ -68,4 +69,6 @@ export const useGoodsViewStore = create<GoodsViewStore>((set, get) => ({
   handleSelectBc: (v: SelectedBc | null) => {
     set({ selectedBc: v });
   },
+  supportMessage: '',
+  onSupMsgChange: (msg: string) => set({ supportMessage: msg }),
 }));

@@ -6,7 +6,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { GoodsImages, GoodsView, Seller } from '@prisma/client';
+import { Goods, GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -425,10 +425,14 @@ export class GoodsService extends ServiceBaseWithCache {
         image: { orderBy: { cut_number: 'asc' } },
         GoodsInfo: true,
         LiveShopping: {
-          include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+          include: {
+            broadcaster: { select: { id: true, userNickname: true, avatar: true } },
+          },
         },
         productPromotion: {
-          include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+          include: {
+            broadcaster: { select: { id: true, userNickname: true, avatar: true } },
+          },
         },
         categories: true,
         informationNotice: true,
@@ -708,5 +712,16 @@ export class GoodsService extends ServiceBaseWithCache {
         seller: { select: { id: true, email: true } },
       },
     });
+  }
+
+  /**
+   * 상품 노출 여부를 조절하여 보이지 않도록 설정하지 않은 모든 상품의 상품번호를 반환합니다.
+   */
+  public async findAllGoodsIds(): Promise<Goods['id'][]> {
+    const goodIds = await this.prisma.goods.findMany({
+      select: { id: true },
+      where: { goods_view: { not: 'notLook' } },
+    });
+    return goodIds.map((g) => g.id);
   }
 }

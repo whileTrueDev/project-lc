@@ -18,6 +18,7 @@ import { GoodsViewPurchaseBox } from './GoodsViewPurchaseBox';
 
 export function GoodsViewBottomMenu(): JSX.Element | null {
   const bgColor = useColorModeValue('white', 'gray.900');
+  const bgColor2 = useColorModeValue('white', 'gray.700');
   const borderTopColor = useColorModeValue('gray.200', 'gray.700');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef(null);
@@ -55,16 +56,17 @@ export function GoodsViewBottomMenu(): JSX.Element | null {
 
       <Drawer isOpen={isOpen} placement="bottom" onClose={onClose} finalFocusRef={btnRef}>
         <DrawerOverlay />
-        <DrawerContent borderTopRadius="lg">
+        <DrawerContent borderTopRadius="lg" borderTopWidth="thin">
           <DrawerBody p={2} fontSize="sm">
             {/* 닫기 버튼 */}
             <Box
+              bgColor={bgColor2}
               borderTopRadius="lg"
+              borderTopWidth="thin"
               w="40px"
               pos="absolute"
               top={-5}
               left="calc(50% - 20px)"
-              background="white"
               textAlign="center"
             >
               <IconButton

@@ -111,7 +111,9 @@ export const useCartMutation = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation<useCartMutationRes, AxiosError, CartItemDto>(
     (dto: CartItemDto) =>
-      axios.post<useCartMutationRes>('/cart', dto).then((res) => res.data),
+      axios
+        .post<useCartMutationRes>('/cart', { ...dto, tempUserId: getCartKey() })
+        .then((res) => res.data),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('Cart');

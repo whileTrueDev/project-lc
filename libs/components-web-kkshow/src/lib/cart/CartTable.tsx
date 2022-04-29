@@ -313,7 +313,7 @@ export function CartItemPriceDisplay({ cartItem }: CartTableItemProps): JSX.Elem
       {cartItem.options.map((opt, idx) => (
         <Flex key={opt.id} gap={2} mt={1}>
           <Text color="GrayText" fontSize="xs">
-            옵션{idx + 1} {getLocaleNumber(opt.discountPrice)} 원
+            옵션{idx + 1} {getLocaleNumber(Number(opt.discountPrice) * opt.quantity)} 원
           </Text>
         </Flex>
       ))}

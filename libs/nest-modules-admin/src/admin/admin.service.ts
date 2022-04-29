@@ -261,10 +261,14 @@ export class AdminService {
         GoodsInfo: true,
         seller: true,
         LiveShopping: {
-          include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+          include: {
+            broadcaster: { select: { id: true, userNickname: true, avatar: true } },
+          },
         },
         productPromotion: {
-          include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+          include: {
+            broadcaster: { select: { id: true, userNickname: true, avatar: true } },
+          },
         },
         categories: true,
         informationNotice: true,

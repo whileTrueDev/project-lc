@@ -208,7 +208,7 @@ export function GoodsViewPriceTag({
         <Text>배송비</Text>
       </GridItem>
       <GridItem>
-        {/* <Text>{getLocaleNumber(goods.data.ShippingGroup.)}원</Text> */}
+        {/* <Text>{getLocaleNumber(shippingGroup?.shippingSets.find((x) => x.delivery_nation === 'korea')?.shippingOptions[0].shippingCost[0].shipping_cost})원</Text> */}
         <Text fontWeight="medium">2,500원</Text>
       </GridItem>
     </Grid>
