@@ -1,4 +1,5 @@
 import { GoodsByIdRes } from '@project-lc/shared-types';
+import { getApiHost } from '@project-lc/utils';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
@@ -17,14 +18,6 @@ export const useGoodsById = (
   return useQuery<GoodsByIdRes, AxiosError>(
     generateGoodsByIdKey(goodsId),
     () => getGoodsById(goodsId),
-    {
-      initialData,
-      enabled: !!goodsId,
-    },
+    { initialData, enabled: !!goodsId },
   );
-};
-
-/** 모든 상품 ID 배열을 불러옵니다 */
-export const getAllGoodsIds = async (): Promise<number[]> => {
-  return axios.get<number[]>('/goods/all-ids').then((res) => res.data);
 };

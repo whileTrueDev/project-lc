@@ -1,5 +1,4 @@
 import { CloseIcon, Icon } from '@chakra-ui/icons';
-import NextLink from 'next/link';
 import {
   Accordion,
   AccordionButton,
@@ -15,7 +14,6 @@ import {
   GridItem,
   IconButton,
   Input,
-  Link,
   ListItem,
   Modal,
   ModalBody,
@@ -30,14 +28,13 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { Decimal } from '@prisma/client/runtime';
 import { useCartMutation, useDisplaySize } from '@project-lc/hooks';
 import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
 import { useGoodsViewStore } from '@project-lc/stores';
-import { memo, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useMemo } from 'react';
 import { GoGift } from 'react-icons/go';
 import shallow from 'zustand/shallow';
-import { useRouter } from 'next/router';
 import OptionQuantity from '../OptionQuantity';
 
 interface GoodsViewPurchaseBoxProps {
@@ -270,6 +267,7 @@ function GoodsViewBroadcasterSupportBox({
     </Accordion>
   );
 }
+
 function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
   const router = useRouter();
   const toast = useToast();
@@ -387,6 +385,7 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
               size={buttonSize}
               icon={<GoGift />}
               colorScheme="facebook"
+              isDisabled={goods.goods_status !== 'normal'}
               variant="outline"
               onClick={() => {
                 // TODO: 주문페이지 완료이후 선물 주문으로 이동 로직 구현 필요
@@ -399,6 +398,7 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
           isFullWidth
           size={buttonSize}
           colorScheme="blue"
+          isDisabled={goods.goods_status !== 'normal'}
           onClick={() => {
             // TODO: 주문페이지 완료이후 선물 주문으로 이동 로직 구현 필요
             alert('구매하기 클릭. 장바구니 구매하기와 동일한 로직 처리 필요');
@@ -410,6 +410,7 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
           isFullWidth
           size={buttonSize}
           colorScheme="blue"
+          isDisabled={goods.goods_status !== 'normal'}
           variant="outline"
           isLoading={createCartItem.isLoading}
           onClick={handleCartClick}

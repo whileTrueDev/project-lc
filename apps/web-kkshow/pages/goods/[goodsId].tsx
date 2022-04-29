@@ -11,18 +11,24 @@ import { GoodsViewMeta } from '@project-lc/components-web-kkshow/goods/GoodsView
 import { GoodsViewReviews } from '@project-lc/components-web-kkshow/goods/GoodsViewReviews';
 import { GoodsViewStickyNav } from '@project-lc/components-web-kkshow/goods/GoodsViewStickyNav';
 import { KkshowNavbar } from '@project-lc/components-web-kkshow/KkshowNavbar';
-import { getGoodsById, generateGoodsByIdKey, getAllGoodsIds } from '@project-lc/hooks';
+import { generateGoodsByIdKey, getGoodsById } from '@project-lc/hooks';
 import { useGoodsViewStore } from '@project-lc/stores';
+import { getApiHost } from '@project-lc/utils';
 import { createQueryClient } from '@project-lc/utils-frontend';
+import axios from 'axios';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { DehydratedState, dehydrate } from 'react-query';
+import { dehydrate, DehydratedState } from 'react-query';
 
 type KkshowGoodsProps = { dehydratedState: DehydratedState };
 type KkshowGoodsParams = { goodsId: string };
 export const getStaticPaths: GetStaticPaths<KkshowGoodsParams> = async () => {
-  const allGoodsIds = await getAllGoodsIds();
+  // 빌드 중 getStaticPaths 실행 시 axios의 baseUrl 찾지 못해
+  // 올바른 백엔드 엔드포인트 요청하지 못하는 현상으로 여기서 작성.
+  const allGoodsIds = await axios
+    .get<number[]>(`${getApiHost()}/goods/all-ids`)
+    .then((res) => res.data);
   return {
     paths: allGoodsIds.map((id) => ({ params: { goodsId: id.toString() } })),
     fallback: true, // false or 'blocking'
