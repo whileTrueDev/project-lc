@@ -9,13 +9,16 @@ const navs = [
 ];
 
 export function GoodsViewStickyNav(): JSX.Element {
-  const store = useGoodsViewStore();
+  const bgColor = useColorModeValue('white', 'gray.800');
+
+  const selectedNavIdx = useGoodsViewStore((s) => s.selectedNavIdx);
+  const handleSelectNav = useGoodsViewStore((s) => s.handleSelectNav);
+
+  // nav 클릭시 스크롤 이동
   const onClick = (elId: string): void => {
     const el = document.getElementById(elId);
     if (el) el.scrollIntoView();
   };
-
-  const bgColor = useColorModeValue('white', 'gray.800');
 
   return (
     <Flex
@@ -28,6 +31,7 @@ export function GoodsViewStickyNav(): JSX.Element {
       <HStack maxW="5xl" mx="auto" w="100%" justify="space-between" spacing={0}>
         {navs.map((nav, idx) => (
           <Box
+            as="button"
             key={nav.title}
             textAlign="center"
             py={3}
@@ -36,10 +40,10 @@ export function GoodsViewStickyNav(): JSX.Element {
             borderWidth="thin"
             borderRightWidth={0}
             _last={{ borderRightWidth: 'thin' }}
-            borderBottom={idx === store.selectedNavIdx ? '3px solid' : undefined}
-            borderBottomColor={idx === store.selectedNavIdx ? 'blue.400' : undefined}
+            borderBottom={idx === selectedNavIdx ? '3px solid' : undefined}
+            borderBottomColor={idx === selectedNavIdx ? 'blue.400' : undefined}
             onClick={() => {
-              store.handleSelect(idx);
+              handleSelectNav(idx);
               onClick(nav.elementId);
             }}
             cursor="pointer"

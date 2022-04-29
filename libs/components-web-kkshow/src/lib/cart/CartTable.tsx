@@ -48,6 +48,7 @@ import NextLink from 'next/link';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { MdOutlineShoppingCart } from 'react-icons/md';
 import shallow from 'zustand/shallow';
+import OptionQuantity from '../OptionQuantity';
 
 export function CartTable(): JSX.Element {
   const { data, isLoading } = useCart();
@@ -368,27 +369,14 @@ export function CartTableRowOption({
   const optionButtons = useMemo(
     () => (
       <Flex gap={1}>
-        <IconButton
-          variant="outline"
-          aria-label="decrease-cart-item-option-quantity"
-          icon={<MinusIcon />}
-          size="xs"
-          m={0}
-          onClick={handleQuantityDecrease}
-          isDisabled={option.quantity <= 1 || optionQuantity.isLoading}
+        <OptionQuantity
+          quantity={option.quantity}
+          handleDecrease={handleQuantityDecrease}
+          handleIncrease={handleQuantityIncrease}
+          decreaseDisabled={option.quantity <= 1 || optionQuantity.isLoading}
+          increaseDisabled={optionQuantity.isLoading}
         />
-        <Text fontSize={{ base: 'md', lg: 'lg' }} w={6} textAlign="center">
-          {option.quantity}
-        </Text>
-        <IconButton
-          variant="outline"
-          aria-label="increase-cart-item-option-quantity"
-          icon={<AddIcon />}
-          size="xs"
-          m={0}
-          isDisabled={optionQuantity.isLoading}
-          onClick={handleQuantityIncrease}
-        />
+
         <IconButton
           variant="outline"
           ml={4}

@@ -39,7 +39,7 @@ export function GoodsViewMeta(): JSX.Element | null {
         </GridItem>
 
         {/* 우 */}
-        <GridItem colSpan={{ base: 2, md: 1 }} fontWeight="medium" letterSpacing="tight">
+        <GridItem colSpan={{ base: 2, md: 1 }} letterSpacing="tight">
           {/* 상품명 및 상품 상태 정보 */}
           <GoodsViewNameAndStatus
             goodsName={goods.data.goods_name}
@@ -54,7 +54,9 @@ export function GoodsViewMeta(): JSX.Element | null {
           />
 
           {/* 옵션 정보 및 후원 정보 */}
-          <GoodsViewPurchaseBox goods={goods.data} />
+          <Box display={{ base: 'none', md: 'block' }}>
+            <GoodsViewPurchaseBox goods={goods.data} />
+          </Box>
         </GridItem>
       </Grid>
     </Box>
@@ -78,7 +80,7 @@ export function GoodsViewMetaLoading(): JSX.Element {
         </GridItem>
 
         {/* 우 */}
-        <GridItem colSpan={{ base: 2, md: 1 }} fontWeight="medium" letterSpacing="tight">
+        <GridItem colSpan={{ base: 2, md: 1 }} letterSpacing="tight">
           <Grid templateColumns="1fr 2fr" mt={6} mb={1} gap={2}>
             <Skeleton h={30} />
             <Skeleton h={30} />
@@ -156,7 +158,7 @@ export function GoodsViewNameAndStatus({
   return (
     <Box>
       <Text fontSize={{ base: 'sm', md: 'md' }}>와일트루</Text>
-      <Text fontSize={{ base: 'xl', md: '3xl' }} fontWeight="bold">
+      <Text fontSize={{ base: 'xl', md: '2xl' }} fontWeight="bold">
         {goodsName}
       </Text>
       <Text fontSize={{ base: 'sm', md: 'lg' }} color="GrayText">
@@ -190,14 +192,16 @@ export function GoodsViewPriceTag({
         <Text>정가</Text>
       </GridItem>
       <GridItem>
-        <Text>{getLocaleNumber(defaultOption?.consumer_price)}원</Text>
+        <Text fontWeight="medium">
+          {getLocaleNumber(defaultOption?.consumer_price)}원
+        </Text>
       </GridItem>
 
       <GridItem>
         <Text>판매가</Text>
       </GridItem>
       <GridItem>
-        <Text>{getLocaleNumber(defaultOption?.price)}원</Text>
+        <Text fontWeight="medium">{getLocaleNumber(defaultOption?.price)}원</Text>
       </GridItem>
 
       <GridItem>
@@ -205,7 +209,7 @@ export function GoodsViewPriceTag({
       </GridItem>
       <GridItem>
         {/* <Text>{getLocaleNumber(goods.data.ShippingGroup.)}원</Text> */}
-        <Text>2,500원</Text>
+        <Text fontWeight="medium">2,500원</Text>
       </GridItem>
     </Grid>
   );
