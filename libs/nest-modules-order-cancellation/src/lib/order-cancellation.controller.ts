@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -16,6 +17,7 @@ import {
   CreateOrderCancellationRes,
   GetOrderCancellationListDto,
   OrderCancellationListRes,
+  OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
   UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
@@ -51,5 +53,11 @@ export class OrderCancellationController {
     return this.orderCancellationService.updateOrderCancellationStatus(id, dto);
   }
 
-  /* 주문취소 철회(소비자가 요청했던 주문취소 철회) */
+  /* 주문취소 삭제(소비자가 자신이 요청했던 주문취소 철회 - 처리진행되기 이전에만 가능) */
+  @Delete('/:orderCancellationId')
+  deleteOrderCancellation(
+    @Param('orderCancellationId', ParseIntPipe) id: number,
+  ): Promise<OrderCancellationRemoveRes> {
+    return this.orderCancellationService.deleteOrderCancellation(id);
+  }
 }

@@ -1,5 +1,11 @@
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { Prisma, ProcessStatus } from '@prisma/client';
+import {
+  BadRequestException,
+  CACHE_MANAGER,
+  ForbiddenException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { OrderCancellation, Prisma, ProcessStatus } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -7,6 +13,7 @@ import {
   CreateOrderCancellationRes,
   GetOrderCancellationListDto,
   OrderCancellationListRes,
+  OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
   UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
@@ -167,14 +174,9 @@ export class OrderCancellationService extends ServiceBaseWithCache {
     dto: UpdateOrderCancellationStatusDto,
   ): Promise<OrderCancellationUpdateRes> {
     const { refundId, ...rest } = dto;
-    const orderCancellation = await this.prisma.orderCancellation.findUnique({
-      where: { id },
-    });
-    if (!orderCancellation) {
-      throw new BadRequestException(
-        `존재하지 않는 주문취소요청입니다. 주문취소 고유번호 ${id}`,
-      );
-    }
+
+    await this.findOneOrderCancellation(id);
+
     const result = await this.prisma.orderCancellation.update({
       where: { id },
       data: {
@@ -194,5 +196,31 @@ export class OrderCancellationService extends ServiceBaseWithCache {
     return result;
   }
 
-  /* 주문취소 철회(소비자가 요청했던 주문취소 철회) */
+  /** 주문취소가 존재하는지 확인 */
+  async findOneOrderCancellation(id: number): Promise<OrderCancellation> {
+    const orderCancellation = await this.prisma.orderCancellation.findUnique({
+      where: { id },
+    });
+    if (!orderCancellation) {
+      throw new BadRequestException(
+        `존재하지 않는 주문취소요청입니다. 주문취소 고유번호 ${id}`,
+      );
+    }
+    return orderCancellation;
+  }
+
+  /* 주문취소 삭제(소비자가 자신이 요청했던 주문취소 철회 - 처리진행되기 이전에만 가능) */
+  async deleteOrderCancellation(id: number): Promise<OrderCancellationRemoveRes> {
+    const orderCancellation = await this.findOneOrderCancellation(id);
+
+    // 주문취소 처리상태 확인
+    if (orderCancellation.status !== 'requested') {
+      throw new ForbiddenException(`상태가 '요청됨'인 주문취소만 삭제할 수 있습니다`);
+    }
+
+    const data = await this.prisma.orderCancellation.delete({
+      where: { id },
+    });
+    return !!data;
+  }
 }

@@ -10,9 +10,11 @@ import {
   SellerShop,
 } from '@prisma/client';
 
+// *------------ 주문취소 생성 리턴값 ------------------
 /** 주문취소요청 리턴데이터 타입 (프론트 작업시 필요한 형태로 수정하여 사용) */
 export type CreateOrderCancellationRes = OrderCancellation;
 
+// *------------ 주문취소 목록조회 리턴값 ------------------
 /** 주문취소 신청내역 리턴데이터 타입 (프론트 작업시 필요한 형태로 수정하여 사용) */
 export type OrderCancellationItemData = {
   /** 주문취소상품 고유번호 */
@@ -48,5 +50,10 @@ export type OrderCancellationListRes = {
   totalCount: number;
 };
 
+// *------------ 주문취소 상태변경 리턴값 ------------------
 /** 주문취소 수정 리턴타입 */
 export type OrderCancellationUpdateRes = OrderCancellation;
+
+// *------------ 주문취소 삭제 리턴값 ------------------
+/** 주문취소 삭제 리턴값 */
+export type OrderCancellationRemoveRes = boolean;
