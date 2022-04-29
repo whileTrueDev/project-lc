@@ -7,6 +7,7 @@ export interface FmOrderStoreState extends FindFmOrdersDto {
   selectedOrders: GridRowId[];
   handleOrderSelected: (s: GridSelectionModel) => void;
 }
+
 export const useFmOrderStore = create<FmOrderStoreState>((set, get) => ({
   search: '',
   searchDateType: '주문일',

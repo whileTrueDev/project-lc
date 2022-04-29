@@ -1,33 +1,8 @@
 import { Box, Heading, Grid, GridItem, Text, Link, Flex, Center } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
-import { time } from 'console';
 
-const dummyOrder = [
-  {
-    id: 1,
-    sellerId: 1,
-    shopName: '가게가게가',
-    goods_name: '[음바쿠 - 김치찌개] 김치 김치찌개 김치찜',
-    consumer_price: 19200,
-    image: 'https://picsum.photos/300/300',
-    option_title: '매운맛',
-    number: 1,
-    shipping_cost: 3000,
-  },
-  {
-    id: 2,
-    sellerId: 1,
-    shopName: '가게가게가',
-    goods_name: '[음바쿠 - 김치찌개] 된장찌개 김치찜',
-    consumer_price: 39200,
-    image: 'https://picsum.photos/300/301',
-    option_title: '간장맛',
-    number: 2,
-    shipping_cost: 3000,
-  },
-];
-
-export function OrderItemInfo(): JSX.Element {
+export function OrderItemInfo({ data }): JSX.Element {
+  const dummyOrder = data;
   return (
     <Box>
       <Heading>주문상품</Heading>

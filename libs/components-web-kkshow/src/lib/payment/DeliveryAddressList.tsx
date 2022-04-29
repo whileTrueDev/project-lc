@@ -4,10 +4,7 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
-  ModalCloseButton,
   Heading,
   Text,
   Flex,
@@ -63,13 +60,7 @@ export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX
   const { data, isLoading } = useCustomerAddress(1); // profile?.id || undefined
 
   const {
-    handleSubmit,
-    register,
     setValue,
-    clearErrors,
-    watch,
-    reset,
-    getValues,
     formState: { errors },
   } = useFormContext<any>();
 

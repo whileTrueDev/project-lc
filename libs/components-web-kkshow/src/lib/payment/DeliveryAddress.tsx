@@ -1,20 +1,12 @@
-import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Box,
   Button,
   ButtonGroup,
-  Collapse,
   FormControl,
   FormErrorMessage,
   HStack,
   Input,
-  InputGroup,
   InputLeftAddon,
-  Spinner,
   Stack,
   Text,
   useDisclosure,
@@ -23,11 +15,7 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
-  ModalCloseButton,
-  IconButton,
 } from '@chakra-ui/react';
 import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
 import {
@@ -111,7 +99,6 @@ export function DeliveryAddressDialog({
   };
 
   const handleModalOnClose = (): void => {
-    // reset();
     onClose();
   };
 
