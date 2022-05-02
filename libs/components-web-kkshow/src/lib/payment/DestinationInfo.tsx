@@ -74,7 +74,7 @@ export function DestinationInfo(): JSX.Element {
       setValue('postalCode', defaultAddress.postalCode);
       setValue('address', defaultAddress.address);
       setValue('detailAddress', defaultAddress.detailAddress);
-    } else if ()
+    }
   }, []);
 
   return (

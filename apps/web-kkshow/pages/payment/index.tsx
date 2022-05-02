@@ -1,12 +1,20 @@
+import { useEffect } from 'react';
 import { Box, Grid, GridItem, Flex, Text } from '@chakra-ui/react';
-import { PaymentBox } from '@project-lc/components-web-kkshow/payment/PaymentBox';
+import {
+  PaymentBox,
+  MobilePaymentBox,
+} from '@project-lc/components-web-kkshow/payment/PaymentBox';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { BuyerInfoSection } from '@project-lc/components-web-kkshow/payment/BuyerInfoSection';
 import { DestinationInfo } from '@project-lc/components-web-kkshow/payment/DestinationInfo';
-import { OrderItemInfo } from '@project-lc/components-web-kkshow/payment/OrderItemInfo';
+import {
+  OrderItemInfo,
+  MobileOrderItemInfo,
+} from '@project-lc/components-web-kkshow/payment/OrderItemInfo';
 import { useDisplaySize, useProfile } from '@project-lc/hooks';
 import { DiscountBox } from '@project-lc/components-web-kkshow/payment/DiscountBox';
 import { useForm, FormProvider } from 'react-hook-form';
+// import { MobilePaymentBox } from '@project-lc/components-web-kkshow/payment/MobilePaymentBox';
 
 const dummyOrder = [
   {
@@ -40,6 +48,7 @@ export function Payment(): JSX.Element {
     mode: 'onChange',
     defaultValues: {
       customerId: profile?.id,
+      name: profile?.name,
       recipient: '',
       phone: '',
       postalCode: '',
@@ -52,12 +61,19 @@ export function Payment(): JSX.Element {
       mileage: 0,
       coupon: 0,
       discount: 0,
+      orderPrice: 0,
+      paymentPrice: 0,
     },
   });
 
+  useEffect(() => {
+    methods.setValue('customerId', profile?.id);
+    methods.setValue('name', profile?.name);
+  }, [methods, profile?.id, profile?.name]);
+
   return (
-    <FormProvider {...methods}>
-      <KkshowLayout>
+    <KkshowLayout>
+      <FormProvider {...methods}>
         {isDesktopSize ? (
           <Flex m="auto" p={6} alignItems="center" justifyContent="center">
             <Grid templateColumns="repeat(7, 4fr)" gap={6} w="70%">
@@ -65,7 +81,7 @@ export function Payment(): JSX.Element {
                 <BuyerInfoSection />
               </GridItem>
               <GridItem rowSpan={4} colSpan={2} border="solid">
-                <PaymentBox />
+                <PaymentBox data={dummyOrder} />
               </GridItem>
               <GridItem colSpan={5}>
                 <DestinationInfo />
@@ -79,30 +95,28 @@ export function Payment(): JSX.Element {
             </Grid>
           </Flex>
         ) : (
-          <Flex m="auto" p={6} alignItems="center" justifyContent="center">
-            <Grid templateColumns="repeat(7, 4fr)" gap={6} w="70%">
-              <GridItem colSpan={5}>
+          <Flex m="auto" p={6}>
+            <Grid templateColumns="repeat(7, 4fr)" gap={6}>
+              <GridItem colSpan={7}>
                 <BuyerInfoSection />
               </GridItem>
-              <GridItem
-                rowSpan={4}
-                colSpan={2}
-                border="solid"
-                display={{ base: 'none', md: 'block' }}
-              >
-                <PaymentBox />
-              </GridItem>
-              <GridItem colSpan={5}>
+              <GridItem colSpan={7}>
                 <DestinationInfo />
               </GridItem>
-              <GridItem colSpan={5}>
-                <OrderItemInfo data={dummyOrder} />
+              <GridItem colSpan={7}>
+                <MobileOrderItemInfo data={dummyOrder} />
+              </GridItem>
+              <GridItem colSpan={7}>
+                <DiscountBox />
+              </GridItem>
+              <GridItem colSpan={7} rowSpan={1}>
+                <MobilePaymentBox />
               </GridItem>
             </Grid>
           </Flex>
         )}
-      </KkshowLayout>
-    </FormProvider>
+      </FormProvider>
+    </KkshowLayout>
   );
 }
 
