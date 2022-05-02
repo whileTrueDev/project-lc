@@ -51,6 +51,6 @@ jobs:
       - name: Setup Dependency Containers
         run: docker-compose up -d
       - name: Execute migration and Generate Prisma
-        run: yarn prisma migrate push
+        run: yarn nx run prisma-orm:migrate-dev
       - name: Run Build all affected apps and libs
         run: yarn affected:build --base="origin/${GITHUB_BASE_REF}"
