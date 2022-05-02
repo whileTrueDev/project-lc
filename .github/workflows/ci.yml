@@ -52,7 +52,5 @@ jobs:
         run: docker-compose up -d
       - name: Execute migrate reset and Generate Prisma
         run: yarn prisma migrate reset
-        env:
-          DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
       - name: Run Build all affected apps and libs
         run: yarn affected:build --base="origin/${GITHUB_BASE_REF}"
