@@ -1,7 +1,6 @@
 import {
   Alert,
   AlertIcon,
-  Box,
   Button,
   Heading,
   Link,
@@ -12,10 +11,11 @@ import {
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import { Policy, PolicyCategory, PolicyTarget } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { useAdminPolicyList } from '@project-lc/hooks';
+import { AdminPolicyListRes, useAdminPolicyList } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import { useCallback } from 'react';
 
 const POLICY_WRITE_BASE = '/general/policy/write';
 function getPolicyWriteUrl(category: PolicyCategory, target: PolicyTarget): string {
@@ -35,17 +35,36 @@ export function AdminPolicyCaution(): JSX.Element {
   );
 }
 
+const categoryList: { key: PolicyCategory; label: string }[] = [
+  { key: PolicyCategory.privacy, label: '개인정보처리방침' },
+  { key: PolicyCategory.termsOfService, label: '이용약관' },
+];
+const targetList: { key: PolicyTarget; label: string }[] = [
+  { key: PolicyTarget.broadcaster, label: '방송인' },
+  { key: PolicyTarget.seller, label: '판매자' },
+  { key: PolicyTarget.customer, label: '소비자' },
+];
+
+const getFilteredData = (
+  data: AdminPolicyListRes,
+  category: PolicyCategory,
+  target: PolicyTarget,
+): AdminPolicyListRes => {
+  return data.filter((p) => p.category === category && p.targetUser === target);
+};
+
 export function AdminPolicySection(): JSX.Element {
   const policy = useAdminPolicyList();
   const router = useRouter();
 
-  const { termsOfService, privacy } = PolicyCategory;
-  const { broadcaster, seller } = PolicyTarget;
-
   // 작성 페이지로 이동
-  const moveToWrite = (category: PolicyCategory, target: PolicyTarget): void => {
-    router.push(getPolicyWriteUrl(category, target));
-  };
+  const moveToWrite = useCallback(
+    (category: PolicyCategory, target: PolicyTarget): void => {
+      router.push(getPolicyWriteUrl(category, target));
+    },
+    [router],
+  );
+
   if (policy.isLoading) {
     return <Spinner />;
   }
@@ -53,62 +72,48 @@ export function AdminPolicySection(): JSX.Element {
     return <Text>에러 {JSON.stringify(policy.error)}</Text>;
   }
   if (!policy.data) {
+    const buttonData = categoryList.flatMap((cat) => {
+      return targetList.map((target) => ({
+        key: cat.key + target.key,
+        cat,
+        target,
+      }));
+    });
     return (
       <Stack>
         <AdminPolicyCaution />
-        <Text>데이터가 없습니다</Text>;
-        <Button size="sm" onClick={() => moveToWrite(privacy, broadcaster)}>
-          방송인 개인정보처리방침 작성하기
-        </Button>
-        <Button size="sm" onClick={() => moveToWrite(privacy, seller)}>
-          판매자 개인정보처리방침 작성하기
-        </Button>
-        <Button size="sm" onClick={() => moveToWrite(termsOfService, broadcaster)}>
-          방송인 이용약관 작성하기
-        </Button>
-        <Button size="sm" onClick={() => moveToWrite(termsOfService, seller)}>
-          판매자 이용약관 작성하기
-        </Button>
+        <Text>데이터가 없습니다</Text>
+        {buttonData.map((button) => (
+          <Button
+            key={button.key}
+            size="sm"
+            onClick={() => moveToWrite(button.cat.key, button.target.key)}
+          >
+            {button.target.label} {button.cat.label} 작성하기
+          </Button>
+        ))}
       </Stack>
     );
   }
 
-  const filteredData = (
-    category: PolicyCategory,
-    target: PolicyTarget,
-  ): Omit<Policy, 'content'>[] => {
-    return policy.data.filter((p) => p.category === category && p.targetUser === target);
-  };
   return (
     <Stack spacing={8}>
       <AdminPolicyCaution />
-      <Stack>
-        <Heading size="lg">개인정보처리방침</Heading>
-        <PolicyListContainer
-          label="방송인"
-          data={filteredData(privacy, broadcaster)}
-          onClick={() => moveToWrite(privacy, broadcaster)}
-        />
-        <PolicyListContainer
-          label="판매자"
-          data={filteredData(privacy, seller)}
-          onClick={() => moveToWrite(privacy, seller)}
-        />
-      </Stack>
-
-      <Stack>
-        <Heading size="lg">이용약관</Heading>
-        <PolicyListContainer
-          label="방송인"
-          data={filteredData(termsOfService, broadcaster)}
-          onClick={() => moveToWrite(termsOfService, broadcaster)}
-        />
-        <PolicyListContainer
-          label="판매자"
-          data={filteredData(termsOfService, seller)}
-          onClick={() => moveToWrite(termsOfService, seller)}
-        />
-      </Stack>
+      {categoryList.map((cat) => {
+        return (
+          <Stack key={cat.key}>
+            <Heading size="lg">{cat.label}</Heading>
+            {targetList.map((target) => (
+              <PolicyListContainer
+                key={target.key}
+                label={target.label}
+                data={getFilteredData(policy.data, cat.key, target.key)}
+                onClick={() => moveToWrite(cat.key, target.key)}
+              />
+            ))}
+          </Stack>
+        );
+      })}
     </Stack>
   );
 }
@@ -119,7 +124,7 @@ function PolicyListContainer({
   onClick,
 }: {
   label: string;
-  data: Omit<Policy, 'content'>[];
+  data: AdminPolicyListRes;
   onClick: () => any;
 }): JSX.Element {
   return (

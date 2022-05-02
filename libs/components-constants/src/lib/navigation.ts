@@ -307,3 +307,85 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     ],
   },
 ];
+
+/** 크크쇼 소비자 마이페이지 사이드바 - "쇼핑" 하위 탭 */
+const customerMypageShoppingChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
+  {
+    name: '장바구니',
+    href: '/cart',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '주문/배송 내역',
+    href: '/mypage/주문배송내역',
+    checkIsActive: (pathname: string, linkHref: string) => {
+      return pathname.includes(linkHref) || pathname === '/mypage'; // 소비자 데스크탑 마이페이지 홈에서 주문/배송내역이 표시됨
+    },
+  },
+  {
+    name: '반품/교환 내역',
+    href: '/mypage/반품교환',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  { name: '환불 내역', href: '/mypage/환불 내역', checkIsActive: defaultIsActiveChecker },
+  { name: '주문 내역', href: '/mypage/주문 내역', checkIsActive: defaultIsActiveChecker },
+  { name: '마일리지', href: '/mypage/마일리지', checkIsActive: defaultIsActiveChecker },
+];
+/** 크크쇼 소비자 마이페이지 사이드바 - "활동" 하위 탭 */
+const customerMypageActivityChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
+  { name: '후원내역', href: '/mypage/후원내역', checkIsActive: defaultIsActiveChecker },
+  {
+    name: '라이브 알림 내역',
+    href: '/mypage/내역',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  { name: '리뷰 관리', href: '/mypage/관리', checkIsActive: defaultIsActiveChecker },
+];
+/** 크크쇼 소비자 마이페이지 사이드바 - "정보" 하위 탭 */
+const customerMypageInfoChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
+  {
+    name: '회원 정보 수정',
+    href: '/mypage/회원 정보',
+    checkIsActive: defaultIsActiveChecker,
+  },
+  {
+    name: '배송지 관리',
+    href: '/mypage/배송지 관리',
+    checkIsActive: defaultIsActiveChecker,
+  },
+];
+
+/** 크크쇼 소비자 마이페이지 사이드바 메뉴 */
+export const customerMypageNavLinks: MypageLink[] = [
+  {
+    name: '쇼핑',
+    href: '',
+    checkIsActive: (pathname: string, _: string) => {
+      // 하위탭 링크 중 하나라도 active해당되면 active처리
+      return customerMypageShoppingChildrenNavLinks.some((link) =>
+        link.checkIsActive(pathname, link.href),
+      );
+    },
+    children: customerMypageShoppingChildrenNavLinks,
+  },
+  {
+    name: '활동',
+    href: '',
+    checkIsActive: (pathname: string, _: string) => {
+      return customerMypageActivityChildrenNavLinks.some((link) =>
+        link.checkIsActive(pathname, link.href),
+      );
+    },
+    children: customerMypageActivityChildrenNavLinks,
+  },
+  {
+    name: '정보',
+    href: '',
+    checkIsActive: (pathname: string, _: string) => {
+      return customerMypageInfoChildrenNavLinks.some((link) =>
+        link.checkIsActive(pathname, link.href),
+      );
+    },
+    children: customerMypageInfoChildrenNavLinks,
+  },
+];

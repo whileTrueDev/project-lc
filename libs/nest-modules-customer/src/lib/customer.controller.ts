@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
@@ -17,7 +18,13 @@ import { Customer } from '@prisma/client';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
-import { SignUpDto, UpdateCustomerDto } from '@project-lc/shared-types';
+import {
+  CustomerStatusRes,
+  EmailDupCheckDto,
+  PasswordValidateDto,
+  SignUpDto,
+  UpdateCustomerDto,
+} from '@project-lc/shared-types';
 import { CustomerService } from './customer.service';
 
 @Controller('customer')
@@ -26,6 +33,22 @@ export class CustomerController {
     private readonly customerService: CustomerService,
     private readonly mailVerificationService: MailVerificationService,
   ) {}
+
+  // * 이메일 주소 중복 체크
+  @Get('email-check')
+  public async emailDupCheck(
+    @Query(ValidationPipe) dto: EmailDupCheckDto,
+  ): Promise<boolean> {
+    return this.customerService.isEmailDupCheckOk(dto.email);
+  }
+
+  /** 소비자 마이페이지 홈에 표시될 정보(팔로잉, 배송중 상품 수 등) 조회 */
+  @Get('status')
+  async getCustomerStatus(
+    @Query('customerId', ParseIntPipe) customerId: number,
+  ): Promise<CustomerStatusRes> {
+    return this.customerService.getCustomerStatus({ customerId });
+  }
 
   /** 소비자 생성 */
   @Post()
@@ -45,6 +68,14 @@ export class CustomerController {
   @UseInterceptors(HttpCacheInterceptor)
   findOne(@Param('customerId', ParseIntPipe) id: number): Promise<Customer> {
     return this.customerService.findOne({ id });
+  }
+
+  // 비밀번호 변경
+  @Patch('password')
+  public async changePassword(
+    @Body(ValidationPipe) dto: PasswordValidateDto,
+  ): Promise<Customer> {
+    return this.customerService.changePassword(dto.email, dto.password);
   }
 
   /** 소비자 수정 */

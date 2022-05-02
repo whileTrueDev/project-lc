@@ -59,7 +59,7 @@ import { AppController } from './app.controller';
     GoodsModule.withControllers(),
     LiveShoppingModule.withControllers(),
     BroadcasterModule.withControllers(),
-    PolicyModule,
+    PolicyModule.withControllers(),
     KkshowMainModule.withControllers(),
     ManualModule.withControllers(),
     KkshowSearchModule.withControllers(),
