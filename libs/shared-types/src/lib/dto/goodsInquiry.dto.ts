@@ -1,3 +1,4 @@
+import { Customer, Goods, Seller } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 import { DefaultPaginationDto } from './pagination.dto';
@@ -23,4 +24,8 @@ export class GoodsInquiryCommentDto {
   @IsString() content: string;
 }
 
-export class FindManyGoodsInquiryDto extends DefaultPaginationDto {}
+export class FindManyGoodsInquiryDto extends DefaultPaginationDto {
+  @Type(() => Number) @IsOptional() @IsInt() goodsId?: Goods['id'];
+  @Type(() => Number) @IsOptional() @IsInt() customerId?: Customer['id'];
+  @Type(() => Number) @IsOptional() @IsInt() sellerId?: Seller['id'];
+}

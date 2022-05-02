@@ -40,8 +40,11 @@ export class GoodsInquiryController {
   findMany(
     @Query(new ValidationPipe({ transform: true })) dto: FindManyGoodsInquiryDto,
   ): Promise<FindGoodsInquiryRes> {
-    const { skip, take } = dto;
-    return this.goodsInquiryService.findMany(undefined, { skip, take });
+    const { goodsId, customerId, sellerId, skip, take } = dto;
+    return this.goodsInquiryService.findMany(
+      { goodsId, writerId: customerId, goods: { sellerId } },
+      { skip, take },
+    );
   }
 
   /** 상품문의 생성 */
