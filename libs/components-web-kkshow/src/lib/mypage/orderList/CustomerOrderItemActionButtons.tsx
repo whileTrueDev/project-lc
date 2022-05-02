@@ -58,9 +58,16 @@ export function OrderItemActionButtons({
       label: '교환, 반품 신청',
       onClick: returnExchangeDialog.onOpen,
       display:
-        ['goodsReady', 'exportReady', 'exportDone', 'shipping', 'shippingDone'].includes(
-          step,
-        ) && !purchaseConfirmationDate, // 상품준비 이후 표시 && 구매확정 안했을 때
+        [
+          'goodsReady',
+          'exportReady',
+          'partialExportDone',
+          'exportDone',
+          'partialShipping',
+          'shipping',
+          'partialShippingDone',
+          'shippingDone',
+        ].includes(step) && !purchaseConfirmationDate, // 상품준비 이후 표시 && 구매확정 안했을 때
       disabled: !!purchaseConfirmationDate, // 구매확정 이후 disabled
     },
     {
