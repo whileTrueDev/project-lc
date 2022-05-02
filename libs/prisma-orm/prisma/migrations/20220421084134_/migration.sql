@@ -5,10 +5,6 @@
 
 */
 
-
--- AlterTable
-ALTER TABLE `Customer` MODIFY `gender` ENUM('male', 'female', 'unknown') NULL DEFAULT 'unknown';
-
 -- AlterTable
 ALTER TABLE `Order` ADD COLUMN `deleteFlag` BOOLEAN NULL DEFAULT false,
     MODIFY `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
