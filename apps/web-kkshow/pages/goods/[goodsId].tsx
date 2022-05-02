@@ -1,4 +1,5 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Center, Spinner } from '@chakra-ui/react';
+import { PrismaClient } from '@prisma/client';
 import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import { GoodsViewAdditionalInfo } from '@project-lc/components-web-kkshow/goods/GoodsViewAdditionalInfo';
@@ -13,9 +14,7 @@ import { GoodsViewStickyNav } from '@project-lc/components-web-kkshow/goods/Good
 import { KkshowNavbar } from '@project-lc/components-web-kkshow/KkshowNavbar';
 import { generateGoodsByIdKey, getGoodsById } from '@project-lc/hooks';
 import { useGoodsViewStore } from '@project-lc/stores';
-import { getApiHost } from '@project-lc/utils';
 import { createQueryClient } from '@project-lc/utils-frontend';
-import axios from 'axios';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -26,13 +25,19 @@ type KkshowGoodsParams = { goodsId: string };
 export const getStaticPaths: GetStaticPaths<KkshowGoodsParams> = async () => {
   // 빌드 중 getStaticPaths 실행 시 axios의 baseUrl 찾지 못해
   // 올바른 백엔드 엔드포인트 요청하지 못하는 현상으로 여기서 작성.
-  const allGoodsIds = await axios
-    .get<number[]>(`${getApiHost()}/goods/all-ids`)
-    .then((res) => res.data);
-  return {
-    paths: allGoodsIds.map((id) => ({ params: { goodsId: id.toString() } })),
-    fallback: true, // false or 'blocking'
-  };
+  // const allGoodsIds = await axios
+  //   .get<number[]>(`${getApiHost()}/goods/all-ids`)
+  //   .then((res) => res.data);
+
+  // 빌드 환경에서는 API HOST를 찾을수 없으므로 여기서 곧바로 prisma 접근 처리
+  const prisma = new PrismaClient();
+  // DATABASE_URL=mysql://root:qwer1234@localhost:3306/public
+  const goodIds = await prisma.goods.findMany({
+    select: { id: true },
+    where: { goods_view: { not: 'notLook' } },
+  });
+  const paths = goodIds.map((g) => ({ params: { goodsId: g.id.toString() } }));
+  return { paths, fallback: true };
 };
 
 export const getStaticProps: GetStaticProps<
@@ -45,7 +50,9 @@ export const getStaticProps: GetStaticProps<
       getGoodsById(params.goodsId),
     )
     .catch((err) => {
-      throw new Error(`Failed to fetch KkshowShopping data - ${err}`);
+      throw new Error(
+        `Failed to fetch KkshowGoods data goodsId${params.goodsId} - ${err}`,
+      );
     });
 
   return {
@@ -57,8 +64,13 @@ export default function GoodsView(): JSX.Element {
   useGoodsScrollNavAutoChange();
   const router = useRouter();
   const goodsId = router.query.goodsId as string;
-
-  if (!goodsId) return <Box>hi goods id is required.</Box>;
+  if (!goodsId) return <Box>올바르지 않은 접근입니다.</Box>;
+  if (router.isFallback)
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
   return (
     <Box>
       <KkshowNavbar />
