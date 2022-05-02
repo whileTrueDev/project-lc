@@ -1791,7 +1791,7 @@ model OrderCancellation {
   completeDate   DateTime? // 처리완료일시
   reason         String? // 취소사유
   rejectReason   String? // 취소요청이 거절된 이유
-  responsibility String // 책임소재(판매자귀책? 구매자귀책?)
+  responsibility String? // 책임소재(판매자귀책? 구매자귀책?)
   items          OrderCancellationItem[]
 
   refundId Int? // 해당 주문 취소로 처리된 환불정보

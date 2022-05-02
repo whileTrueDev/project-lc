@@ -33,12 +33,14 @@ export class CreateOrderCancellationDto {
   orderId: number;
 
   /** 주문취소요청 사유 */
+  @IsOptional()
   @IsString()
-  reason: string;
+  reason?: string;
 
   /** 책임소재 */
   @IsString()
-  responsibility: string;
+  @IsOptional()
+  responsibility?: string;
 
   /** 취소할 주문상품옵션 목록 */
   @IsArray()
