@@ -20,7 +20,7 @@ on:
 name: Deploy to AWS ECS "Dev"
 env:
   BEFORE_SHA: ${{ github.event.before }}
-jobs:
+  DATABASE_URL: ${{ secrets.DEV_PRISMA_DATABASE_URL }}
   Build:
     name: Build Job
     runs-on: ubuntu-latest
