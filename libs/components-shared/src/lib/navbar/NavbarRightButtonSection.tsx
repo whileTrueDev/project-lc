@@ -14,10 +14,10 @@ import {
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { QuickMenuLink } from '@project-lc/components-constants/quickMenu';
 import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher';
 import { useIsLoggedIn, useLogout, useProfile } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
-import { useCallback } from 'react';
 import { AiOutlineSetting } from 'react-icons/ai';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import ProfileBox from '../ProfileBox';
@@ -55,7 +55,16 @@ export function NavbarRightButtonSection(): JSX.Element {
             <UserNotificationMenuButton />
           </Box>
 
-          <PersonalPopoverMenu />
+          <PersonalPopoverMenu
+            menuItems={[
+              {
+                name: '계정 설정',
+                icon: AiOutlineSetting,
+                href: '/mypage/setting',
+                type: 'link',
+              },
+            ]}
+          />
         </>
       ) : (
         // 로그인 안했을때
@@ -84,7 +93,11 @@ export function NavbarRightButtonSection(): JSX.Element {
 }
 
 /** 로그인 한 경우에 사용하는 네비바 우측 개인메뉴 팝오버 */
-export function PersonalPopoverMenu(): JSX.Element {
+export function PersonalPopoverMenu({
+  menuItems,
+}: {
+  menuItems: QuickMenuLink[];
+}): JSX.Element {
   const router = useRouter();
   const { logout } = useLogout();
   const { data: profileData } = useProfile();
@@ -92,10 +105,6 @@ export function PersonalPopoverMenu(): JSX.Element {
   const { colorMode, toggleColorMode } = useColorMode();
   const SwitchIcon = useColorModeValue(FaMoon, FaSun);
 
-  const handleAccountSettingClick = useCallback(
-    () => router.push('/mypage/setting'),
-    [router],
-  );
   return (
     <Menu>
       <MenuButton as={Avatar} size="sm" cursor="pointer" src={profileData?.avatar} />
@@ -108,14 +117,20 @@ export function PersonalPopoverMenu(): JSX.Element {
           </Box>
           <Divider />
 
-          {/* 계정설정 버튼 */}
-          <MenuItem
-            my={1}
-            icon={<Icon fontSize="md" as={AiOutlineSetting} />}
-            onClick={handleAccountSettingClick}
-          >
-            계정 설정
-          </MenuItem>
+          {menuItems.map((menuItem) => (
+            <MenuItem
+              key={menuItem.name}
+              my={1}
+              icon={<Icon fontSize="md" as={menuItem.icon} />}
+              onClick={() => {
+                if (menuItem.type === 'link' && !!menuItem.href) {
+                  router.push(menuItem.href);
+                }
+              }}
+            >
+              {menuItem.name}
+            </MenuItem>
+          ))}
 
           {/* 다크모드 버튼 */}
           <MenuItem

@@ -905,6 +905,7 @@
       },
       "tags": []
     },
+    "nest-modules-order": "libs/nest-modules-order",
     "nest-modules-order-cancel": {
       "root": "libs/nest-modules-order-cancel",
       "sourceRoot": "libs/nest-modules-order-cancel/src",

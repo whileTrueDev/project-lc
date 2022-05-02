@@ -57,7 +57,7 @@ export class AdminModule {
     SellerModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
     GoodsModule.withoutControllers(),
-    PolicyModule,
+    PolicyModule.withoutControllers(),
     KkshowMainModule.withoutControllers(),
     ManualModule.withoutControllers(),
     KkshowShoppingModule.withoutControllers(),

@@ -8,7 +8,11 @@ import {
 import { Customer, Prisma } from '@prisma/client';
 import { ServiceBaseWithCache, UserPwManager } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { SignUpDto, UpdateCustomerDto } from '@project-lc/shared-types';
+import {
+  CustomerStatusRes,
+  SignUpDto,
+  UpdateCustomerDto,
+} from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -98,5 +102,76 @@ export class CustomerService extends ServiceBaseWithCache {
     if (!isCorrect) throw new UnauthorizedException('incorrect password');
     // 올바른 이메일, 비밀번호 입력시
     return customer;
+  }
+
+  /**
+   * 소비자 이메일 주소가 중복되는 지 체크합니다.
+   * @param email 중복체크할 이메일 주소
+   * @returns {boolean} 중복되지않아 괜찮은 경우 true, 중복된 경우 false
+   */
+  async isEmailDupCheckOk(email: string): Promise<boolean> {
+    const user = await this.prisma.customer.findFirst({ where: { email } });
+    // inactiveCustomer 테이블 생성 이후 작업
+    // const inactiveUser = await this.prisma.inactiveBroadcaster.findFirst({
+    //   where: { email },
+    // });
+    // if (user || inactiveUser) return false;
+    if (user) return false;
+    return true;
+  }
+
+  /**
+   * 비밀번호 변경
+   * @param email 비밀번호 변경할 소비자의 email
+   * @param newPassword 새로운 비밀번호
+   * @returns
+   */
+  async changePassword(email: string, newPassword: string): Promise<Customer> {
+    const hashedPw = await this.pwManager.hashPassword(newPassword);
+    const customer = await this.prisma.customer.update({
+      where: { email },
+      data: {
+        password: hashedPw,
+      },
+    });
+    return customer;
+  }
+
+  /** 소비자 마이페이지 홈 상태(팔로잉, 라이브알림, 배송중)표시 위한 정보 리턴 */
+  async getCustomerStatus({
+    customerId,
+  }: {
+    customerId: number;
+  }): Promise<CustomerStatusRes> {
+    const customer = await this.prisma.customer.findFirst({
+      where: { id: customerId },
+      select: {
+        nickname: true,
+        _count: {
+          select: { followingBroadcasters: true, followingLiveShoppings: true },
+        },
+        orders: true,
+      },
+    });
+    if (!customer)
+      throw new BadRequestException(
+        `해당 소비자가 존재하지 않습니다 고유번호 : ${customerId}`,
+      );
+
+    // 닉네임
+    const nickname = customer.nickname || undefined;
+    // 팔로잉중인 방송인 수, 팔로잉중인 라이브쇼핑 개수
+    const { followingBroadcasters, followingLiveShoppings } = customer._count;
+    // 배송중인 주문 개수
+    const shippingOrders = customer.orders.filter((order) =>
+      ['shipping', 'partialShipping'].includes(order.step),
+    ).length;
+    return {
+      id: customerId,
+      nickname,
+      followingBroadcasters,
+      followingLiveShoppings,
+      shippingOrders,
+    };
   }
 }

@@ -5,7 +5,7 @@ import { SignupForm } from './signup/SignupForm';
 import SignupStart from './signup/SignupStart';
 
 export interface SignupProcessProps {
-  appType: 'seller' | 'broadcaster';
+  appType: 'seller' | 'broadcaster' | 'customer';
 }
 export function SignupProcess({ appType }: SignupProcessProps): JSX.Element {
   const [step, setStep] = useState(0);
