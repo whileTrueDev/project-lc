@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   FindGoodsInquiryItem,
   FindGoodsInquiryRes,
+  FindManyGoodsInquiryDto,
   GoodsInquiryCreateDto,
   GoodsInquiryUpdateDto,
 } from '@project-lc/shared-types';
@@ -35,8 +37,11 @@ export class GoodsInquiryController {
 
   /** 상품문의 전체 목록 조회 */
   @Get()
-  findMany(): Promise<FindGoodsInquiryRes> {
-    return this.goodsInquiryService.findMany();
+  findMany(
+    @Query(new ValidationPipe({ transform: true })) dto: FindManyGoodsInquiryDto,
+  ): Promise<FindGoodsInquiryRes> {
+    const { skip, take } = dto;
+    return this.goodsInquiryService.findMany(undefined, { skip, take });
   }
 
   /** 상품문의 생성 */

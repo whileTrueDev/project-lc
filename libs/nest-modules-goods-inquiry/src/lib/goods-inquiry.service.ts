@@ -39,9 +39,11 @@ export class GoodsInquiryService extends ServiceBaseWithCache {
 
   public async findMany(
     where?: Prisma.GoodsInquiryWhereInput,
+    opt?: { skip?: number; take?: number },
   ): Promise<FindGoodsInquiryRes> {
     return this.prisma.goodsInquiry.findMany({
       where,
+      ...opt,
       ...this.findParam,
     });
   }

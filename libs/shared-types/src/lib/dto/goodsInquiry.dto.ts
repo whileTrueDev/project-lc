@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString } from 'class-validator';
+import { DefaultPaginationDto } from './pagination.dto';
 
 /** 상품 문의 생성 DTO */
 export class GoodsInquiryCreateDto {
@@ -21,3 +22,5 @@ export class GoodsInquiryCommentDto {
   @IsOptional() @Type(() => Number) @IsInt() sellerId?: number;
   @IsString() content: string;
 }
+
+export class FindManyGoodsInquiryDto extends DefaultPaginationDto {}
