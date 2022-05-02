@@ -120,7 +120,7 @@ describe('GoodsService', () => {
   });
   describe('getOneGoods', () => {
     it('should return goods', async () => {
-      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_ID);
+      const goods = await service.getOneGoods(TEST_GOODS.id);
       expect(goods).toBeDefined();
       expect(goods.confirmation).toBeDefined();
       expect(goods.confirmation.goodsId).toBe(TEST_GOODS.id);
@@ -140,7 +140,7 @@ describe('GoodsService', () => {
         .spyOn(service, 'deleteGoodsContentImagesFromS3')
         .mockImplementation(returnDeleteObjectsCommandOutput);
       await service.deleteLcGoods({ sellerId: TEST_USER_ID, ids: [TEST_GOODS.id] });
-      const goods = await service.getOneGoods(TEST_GOODS.id, TEST_USER_ID);
+      const goods = await service.getOneGoods(TEST_GOODS.id);
       expect(goods).toBeNull();
     });
   });
