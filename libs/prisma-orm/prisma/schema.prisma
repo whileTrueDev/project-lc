@@ -1569,6 +1569,7 @@ enum OrderProcessStep {
   shipping // 배송중, 65
   partialShippingDone // 부분배송완료, 70
   shippingDone // 배송완료, 75
+  purchaseConfirmed // 구매확정(임의로 추가함)
   paymentCanceled // 결제취소, 85
   orderInvalidated // 주문무효, 95
   paymentFailed // 결제실패, 99
