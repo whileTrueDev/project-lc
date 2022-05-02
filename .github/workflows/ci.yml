@@ -48,6 +48,8 @@ jobs:
         uses: actions/checkout@v1
       - name: Install Dependencies
         uses: bahmutov/npm-install@v1
+      - name: Setup Dependency Containers
+        run: docker-compose up -d
       - name: Primsa generate # Generate Prisma Client
         run: yarn nx run prisma-orm:prisma-generate
       - name: Run Build all affected apps and libs
