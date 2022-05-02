@@ -33,6 +33,7 @@ import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { ShippingGroupModule } from '@project-lc/nest-modules-shipping-group';
 import { PrismaModule } from '@project-lc/prisma-orm';
+import { OrderModule } from '@project-lc/nest-modules-order';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
 
@@ -58,12 +59,13 @@ import { AppController } from './app.controller';
     GoodsModule.withControllers(),
     LiveShoppingModule.withControllers(),
     BroadcasterModule.withControllers(),
-    PolicyModule,
+    PolicyModule.withControllers(),
     KkshowMainModule.withControllers(),
     ManualModule.withControllers(),
     KkshowSearchModule.withControllers(),
     KkshowShoppingModule.withControllers(),
     CustomerModule.withControllers(),
+    OrderModule.withControllers(),
     CartModule.withControllers(),
   ],
   controllers: [AppController],

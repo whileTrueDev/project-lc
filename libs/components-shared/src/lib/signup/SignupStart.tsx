@@ -11,7 +11,6 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import CenterBox from '@project-lc/components-layout/CenterBox';
-import { UserType } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import NextLink from 'next/link';
 import SocialButtonGroup from '../SocialButtonGroup';
@@ -28,8 +27,20 @@ const BROADCASTER_DISPLAY_TEXT_LIST = [
   '누구나 쉽게 할 수 있는 화면 세팅으로 시작해 보세요.',
 ];
 
+const CUSTOMER_DISPLAY_TEXT_LIST = [
+  '영양가 있는 간편식',
+  '간단한 조리로도 맛있는 식탁',
+  '크리에이터와 함께하는 쇼핑!',
+];
+
+const DISPLAY_TEXT: Record<SignupProcessItemProps['userType'], string[]> = {
+  seller: SELLER_DISPLAY_TEXT_LIST,
+  broadcaster: BROADCASTER_DISPLAY_TEXT_LIST,
+  customer: CUSTOMER_DISPLAY_TEXT_LIST,
+};
+
 export interface SignupProcessItemProps {
-  userType: 'seller' | 'broadcaster';
+  userType: 'seller' | 'broadcaster' | 'customer';
   moveToNext?: () => void;
   moveToPrev?: () => void;
 }
@@ -39,8 +50,7 @@ export function SignupStart({
   userType = 'seller',
   moveToNext,
 }: SignupStartProps): JSX.Element {
-  const displayTextList =
-    userType === 'seller' ? SELLER_DISPLAY_TEXT_LIST : BROADCASTER_DISPLAY_TEXT_LIST;
+  const displayTextList = DISPLAY_TEXT[userType];
   return (
     <CenterBox
       enableShadow

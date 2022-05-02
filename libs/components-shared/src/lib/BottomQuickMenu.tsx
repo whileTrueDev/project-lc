@@ -8,9 +8,9 @@ import { useCart } from '@project-lc/hooks';
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import { useQueryClient } from 'react-query';
 import CountBadge from './CountBadge';
 
+export const QUICK_MENU_HEIGHT = '65px';
 export function BottomQuickMenu(): JSX.Element {
   return (
     <>
@@ -25,14 +25,14 @@ export function BottomQuickMenu(): JSX.Element {
         borderTopColor={useColorModeValue('gray.200', 'gray.700')}
         width="100%"
         height="7vh"
-        minHeight="65px"
-        zIndex="banner"
+        minHeight={QUICK_MENU_HEIGHT}
+        zIndex="docked"
       >
         {quickMenuLinks.map((link) => (
           <BottomQuickMenuItem key={link.name} link={link} />
         ))}
       </Flex>
-      <Box h="7vh" display={{ base: 'flex', md: 'none' }} />
+      <Box h="7vh" minHeight={QUICK_MENU_HEIGHT} display={{ base: 'flex', md: 'none' }} />
     </>
   );
 }
@@ -60,7 +60,6 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
     }
   };
 
-  // TODO: 장바구니 작업 이후 장바구니 상품 개수 count 데이터 연동 추가 필요 by hwasurr
   const { data: cartData } = useCart();
 
   return (

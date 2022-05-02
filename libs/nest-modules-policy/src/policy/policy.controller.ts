@@ -4,7 +4,6 @@ import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { GetPolicyDto } from '@project-lc/shared-types';
 import { PolicyService } from './policy.service';
 
-// @UseGuards(JwtAuthGuard)
 @Controller('policy')
 @UseInterceptors(HttpCacheInterceptor)
 export class PolicyController {
