@@ -353,7 +353,6 @@ const customerMypageInfoChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
     href: '/mypage/배송지 관리',
     checkIsActive: defaultIsActiveChecker,
   },
-  { name: '회원 탈퇴', href: '/mypage/회원 탈퇴', checkIsActive: defaultIsActiveChecker },
 ];
 
 /** 크크쇼 소비자 마이페이지 사이드바 메뉴 */
