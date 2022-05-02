@@ -419,6 +419,7 @@ export class OrderService extends ServiceBaseWithCache {
       where: { id: orderItemOptionId },
       data: {
         purchaseConfirmationDate: new Date(),
+        step: 'purchaseConfirmed',
       },
     });
 
@@ -440,12 +441,12 @@ export class OrderService extends ServiceBaseWithCache {
     // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 구매확정 값도 변경
     const everyOrderItemOptionsPurchaseConfirmed = order.orderItems
       .flatMap((item) => item.options)
-      .every((opt) => !!opt.purchaseConfirmationDate);
+      .every((opt) => !!opt.purchaseConfirmationDate && opt.step === 'purchaseConfirmed');
 
     if (everyOrderItemOptionsPurchaseConfirmed) {
       await this.prisma.order.update({
         where: { id: order.id },
-        data: { purchaseConfirmationDate: new Date() },
+        data: { purchaseConfirmationDate: new Date(), step: 'purchaseConfirmed' },
       });
     }
     return true;
