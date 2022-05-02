@@ -32,7 +32,7 @@ export class GoodsInquiryCommentController {
   @Post()
   create(
     @Param('goodsInquiryId', ParseIntPipe) id: GoodsInquiry['id'],
-    @Body(ValidationPipe) dto: GoodsInquiryCommentDto,
+    @Body(new ValidationPipe({ transform: true })) dto: GoodsInquiryCommentDto,
   ): Promise<GoodsInquiryComment> {
     return this.service.create(id, dto);
   }
@@ -41,7 +41,7 @@ export class GoodsInquiryCommentController {
   @Patch()
   update(
     @Param('commentId', ParseIntPipe) commentId: GoodsInquiryComment['id'],
-    @Body(ValidationPipe) dto: GoodsInquiryCommentDto,
+    @Body(new ValidationPipe({ transform: true })) dto: GoodsInquiryCommentDto,
   ): Promise<GoodsInquiryComment> {
     return this.service.update(commentId, dto);
   }

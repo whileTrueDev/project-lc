@@ -41,7 +41,9 @@ export class GoodsInquiryController {
 
   /** 상품문의 생성 */
   @Post()
-  create(@Body(ValidationPipe) dto: GoodsInquiryCreateDto): Promise<GoodsInquiry> {
+  create(
+    @Body(new ValidationPipe({ transform: true })) dto: GoodsInquiryCreateDto,
+  ): Promise<GoodsInquiry> {
     return this.goodsInquiryService.create(dto);
   }
 
@@ -49,7 +51,7 @@ export class GoodsInquiryController {
   @Patch(':goodsInquiryId')
   update(
     @Param('goodsInquiryId', ParseIntPipe) id: GoodsInquiry['id'],
-    @Body(ValidationPipe) dto: GoodsInquiryUpdateDto,
+    @Body(new ValidationPipe({ transform: true })) dto: GoodsInquiryUpdateDto,
   ): Promise<GoodsInquiry> {
     return this.goodsInquiryService.update(id, dto);
   }
