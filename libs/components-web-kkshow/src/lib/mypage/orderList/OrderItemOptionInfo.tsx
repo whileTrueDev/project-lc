@@ -31,12 +31,7 @@ export function OrderItemOptionInfo({
       </Box>
       {/* 주문상품 옵션 */}
       <Stack>
-        {displayStatus && (
-          <OrderStatusBadge
-            step={option.step}
-            purchaseConfirmed={!!option.purchaseConfirmationDate}
-          />
-        )}
+        {displayStatus && <OrderStatusBadge step={option.step} />}
 
         <Text
           fontWeight="bold"
