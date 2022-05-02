@@ -70,6 +70,7 @@ export * from './lib/dto/goodsInfo.dto';
 export * from './lib/dto/goodsList.dto';
 export * from './lib/dto/goodsOption.dto';
 export * from './lib/dto/goodsOptionSupply.dto';
+export * from './lib/dto/goodsReview.dto';
 export * from './lib/dto/inquiry.dto';
 export * from './lib/dto/kkshowMain.dto';
 export * from './lib/dto/kkshowShopping.dto';
