@@ -241,7 +241,7 @@ model Goods {
   coupons              Coupon[] // 상품에 적용가능한 쿠폰
   searchKeyword        String? // ',' 구분자로 하는 검색키워드의 문자열
   cartItems            CartItem[] // 연결된 장바구니 상품
-  orrderItems          OrderItem[] // 연결된 주문상품
+  orderItems           OrderItem[] // 연결된 주문상품
   reviews              GoodsReview[] // 작성된 리뷰
   informationSubjectId Int? // 정보제공고시 품목고유번호
   informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
@@ -1086,6 +1086,7 @@ enum PolicyCategory {
 enum PolicyTarget {
   seller // 판매자
   broadcaster // 방송인
+  customer // 소비자
   all // 전체
 }
 
@@ -1446,6 +1447,7 @@ model GoodsReview {
   goods          Goods?               @relation(fields: [goodsId], references: [id], onDelete: SetNull) // 리뷰 대상 상품
   images         GoodsReviewImage[] // 해당리뷰에 포함된 이미지
   comments       GoodsReviewComment[] // 해당 리뷰에 달린 댓글
+  orderItem      OrderItem[] // 구매했던 주문상품정보
 }
 
 // 상품리뷰이미지
@@ -1519,7 +1521,7 @@ model Order {
   customer                   Customer?                    @relation(fields: [customerId], references: [id], onDelete: SetNull)
   payment                    OrderPayment? // 주문결제정보
   step                       OrderProcessStep             @default(orderReceived) // 주문상태
-  createDate                 DateTime // 주문생성일시
+  createDate                 DateTime                     @default(now()) // 주문생성일시
   orderPrice                 Int // 주문금액 = 실제 주문 상품/상품옵션 의 금액 합
   paymentPrice               Int // 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한 금액
   recipientName              String // 받는사람명
@@ -1539,6 +1541,7 @@ model Order {
   bundleFlag                 Boolean                      @default(false) // 묶음배송여부
   purchaseConfirmationDate   DateTime? // 구매확정일자
   cashReceipts               String? // 현금영수증번호
+  deleteFlag                 Boolean?                     @default(false) // 삭제여부
   mileageLogs                CustomerMileageLog[] // 사용 & 적립 마일리지 내역
   orderItems                 OrderItem[] // 주문에 연결된 주문상품들
   refunds                    Refund[] // 주문에 연결된 환불정보
@@ -1567,6 +1570,7 @@ enum OrderProcessStep {
   shipping // 배송중, 65
   partialShippingDone // 부분배송완료, 70
   shippingDone // 배송완료, 75
+  purchaseConfirmed // 구매확정(임의로 추가함)
   paymentCanceled // 결제취소, 85
   orderInvalidated // 주문무효, 95
   paymentFailed // 결제실패, 99
@@ -1615,25 +1619,29 @@ model OrderItem {
   shippingGroupId        Int // 연결된 배송정책 id
   shippingGroup          ShippingGroup           @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
   exchangeItems          ExchangeItem[] // 교환상품
+  reviewId               Int?
+  review                 GoodsReview?            @relation(fields: [reviewId], references: [id], onDelete: SetNull)
 }
 
 // 주문상품옵션
 model OrderItemOption {
-  id                     Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
-  orderItemId            Int // 옵션이 연결된 주문 상품 고유번호
-  orderItem              OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
-  name                   String? // 주문했을 당시 옵션명
-  value                  String? // 주문했을 당시 옵션값
-  quantity               Int // 옵션 선택 수량(개수)
-  normalPrice            Decimal                 @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
-  discountPrice          Decimal                 @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
-  weight                 Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
-  step                   OrderProcessStep        @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
-  refundItems            RefundItem[] // 환불상품
-  returnItems            ReturnItem[] // 반품상품
-  exportItems            ExportItem[] // 출고상품
-  orderCancellationItems OrderCancellationItem[] // 주문취소상품
-  exchangeItems          ExchangeItem[] // 교환상품
+  id                       Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
+  orderItemId              Int // 옵션이 연결된 주문 상품 고유번호
+  orderItem                OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
+  goodsOptionId            Int // 참조하는 상품옵션 고유번호
+  name                     String? // 주문했을 당시 옵션명
+  value                    String? // 주문했을 당시 옵션값
+  quantity                 Int // 옵션 선택 수량(개수)
+  normalPrice              Decimal                 @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
+  discountPrice            Decimal                 @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
+  weight                   Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
+  step                     OrderProcessStep        @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
+  purchaseConfirmationDate DateTime? // 구매확정일자
+  refundItems              RefundItem[] // 환불상품
+  returnItems              ReturnItem[] // 반품상품
+  exportItems              ExportItem[] // 출고상품
+  orderCancellationItems   OrderCancellationItem[] // 주문취소상품
+  exchangeItems            ExchangeItem[] // 교환상품
 }
 
 // 주문상품후원
