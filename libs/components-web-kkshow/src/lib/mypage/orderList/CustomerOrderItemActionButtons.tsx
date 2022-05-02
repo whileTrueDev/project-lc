@@ -55,7 +55,7 @@ export function OrderItemActionButtons({
       disabled: false,
     },
     {
-      label: '교환, 반품 신청',
+      label: '교환, 반품 신청', // TODO: 교환 반품신청 페이지로 이동
       onClick: returnExchangeDialog.onOpen,
       display:
         [
@@ -78,8 +78,8 @@ export function OrderItemActionButtons({
     },
     {
       label: '리뷰 작성하기',
-      onClick: reviewDialog.onOpen,
-      display: ['shippingDone'].includes(step) && !!purchaseConfirmationDate, // 배송완료 이후 표시 & 리뷰 작성하지 않았을때
+      onClick: reviewDialog.onOpen, // TODO: 리뷰작성 페이지로 이동
+      display: ['shippingDone', 'purchaseConfirmed'].includes(step), // 배송완료 이후 표시 & 구매확정시 표시, 리뷰 작성하지 않았을때
       disabled: !!hasReview || !purchaseConfirmationDate, // 이미 리뷰 작성했거나, 구매확정 안한경우 비활성
     },
     {
