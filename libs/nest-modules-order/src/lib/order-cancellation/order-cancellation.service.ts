@@ -157,7 +157,7 @@ export class OrderCancellationService extends ServiceBaseWithCache {
         amount: i.amount, // 주문취소상품 개수
         status: i.status, // 주문취소상품 처리상태
         goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
-        image: i.orderItem.goods.image[0]?.image, // 주문 상품 이미지
+        image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지
         shopName: i.orderItem.goods.seller.sellerShop?.shopName, // 주문상품 판매상점명
         optionName: i.orderItemOption.name, // 주문상품옵션명
         optionValue: i.orderItemOption.value, // 주문상품옵션 값
