@@ -7,8 +7,14 @@ import {
   SellerShop,
 } from '@prisma/client';
 
-export type GoodsReviewItem = GoodsReview & { images: GoodsReviewImage[] };
-export type GoodsReviewRes = GoodsReviewItem[];
+export type GoodsReviewItem = GoodsReview & {
+  images: GoodsReviewImage[];
+  writer: Pick<Customer, 'id' | 'name' | 'nickname' | 'gender'>;
+};
+export type GoodsReviewRes = {
+  reviews: GoodsReviewItem[];
+  nextCursor?: number;
+};
 
 export type GoodsReviewCommentItem = GoodsReviewComment & {
   customer: Pick<Customer, 'id' | 'name' | 'nickname' | 'gender'>;

@@ -1,68 +1,199 @@
-import { Box, Button, Divider, Flex, Image, Text } from '@chakra-ui/react';
+/* eslint-disable react/no-array-index-key */
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import {
+  AspectRatio,
+  Box,
+  Button,
+  Center,
+  Divider,
+  Flex,
+  Image,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalOverlay,
+  Spinner,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react';
 import StarRating from '@project-lc/components-core/StarRating';
-import { useGoodsById } from '@project-lc/hooks';
+import { useGoodsById, useInfiniteReviews } from '@project-lc/hooks';
+import { GoodsReviewItem } from '@project-lc/shared-types';
+import { asteriskify } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import { Fragment } from 'react';
+import { useMemo, useState } from 'react';
 import 'suneditor/dist/css/suneditor.min.css';
-
-const dummyReviews = [
-  {
-    rating: 4.5,
-    createDate: new Date(),
-    content: `5살 첫째가 한글을 익히기 시작하면서 기존에 보던 핑크퐁 한글카드는
-    아쉬움이 있어 구매했어요 4살이 되면서 부터는 한글을 조금씩 배우기
-    시작했는데 핑크퐁카드에는 낱말옆에 그림이 있어 아이가 그 그림을 보고
-    단어를 맞히는거에요 매번 손으로 가리다가 귀찮던 참에 골드박스에 엄마랑
-    낱말카드 떠서 구매했는데 마감도 날카롭지않고 세이펜으로 소리도 들려줄수
-    있고 가독성도 좋아 만족스럽네요`,
-    goodsId: 1,
-    id: 1,
-    writer: '강호동',
-  },
-];
 
 export function GoodsViewReviews(): JSX.Element | null {
   const router = useRouter();
   const goodsId = router.query.goodsId as string;
   const goods = useGoodsById(goodsId);
-  if (!goods.data) return null;
+
+  const reviews = useInfiniteReviews({ skip: 0, take: 5, goodsId: goods.data?.id });
+
+  if (!reviews.data) return null;
+  if (reviews.isLoading) {
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+  }
   return (
     <Box maxW="5xl" m="auto" id="goods-reviews" minH="50vh" p={2} pt={20}>
-      <Text fontSize="2xl">후기 목록</Text>
+      <Text fontSize="2xl">상품 후기</Text>
       <Box>
-        {dummyReviews.length === 0 && (
-          <Box my={10}>
-            <Text>아직 이 상품에 대한 후기가 없습니다.</Text>
+        {reviews.data.pages.map((page, idx) => (
+          <Box key={idx}>
+            {page.reviews.length === 0 && (
+              <Box my={10}>
+                <Text>아직 이 상품에 대한 후기가 없습니다.</Text>
+              </Box>
+            )}
+
+            {page.reviews.map((review) => (
+              <ReviewDetail key={review.id} review={review} />
+            ))}
+
+            {reviews.hasNextPage && (
+              <Box mt={4} textAlign="center">
+                <Button
+                  isLoading={reviews.isFetching || reviews.isLoading}
+                  onClick={() => reviews.fetchNextPage()}
+                >
+                  더보기
+                </Button>
+              </Box>
+            )}
           </Box>
-        )}
-        {dummyReviews.map((review) => (
-          <Fragment key={review.id}>
-            <Box my={2}>
-              <StarRating rating={review.rating} color="orange.300" />
-              <Text color="GrayText" fontSize="sm">
-                {review.writer} / {dayjs(review.createDate).format('YYYY-MM-DD')}
-              </Text>
-              <Image
-                objectFit="cover"
-                h="150px"
-                w="150px"
-                src="https://k-kmarket.com/data/board/goods_review/_thumb_873dfd04f466d76f27e88e482633934c1310364.jpg"
-              />
-              <Flex gap={2}>
-                <Text noOfLines={3}>{review.content}</Text>
-              </Flex>
-            </Box>
-            <Divider />
-          </Fragment>
         ))}
 
-        {dummyReviews.length > 0 && (
-          <Box mt={4} textAlign="center">
-            <Button>더보기</Button>
-          </Box>
-        )}
+        <Box>
+          {reviews.isFetching && !reviews.isFetchingNextPage ? (
+            <Center>
+              <Spinner />
+            </Center>
+          ) : null}
+        </Box>
       </Box>
     </Box>
+  );
+}
+
+interface ReviewDetailProps {
+  review: GoodsReviewItem;
+}
+function ReviewDetail({ review }: ReviewDetailProps): JSX.Element {
+  const displayName = useMemo(() => {
+    if (!review.writer.nickname) return asteriskify(review.writer.name);
+    return review.writer.nickname;
+  }, [review.writer.name, review.writer.nickname]);
+
+  // 이미지 선택
+  const dialog = useDisclosure();
+  const [selectedImageIdx, setSelectedImageIdx] = useState<number | null>(null);
+  const handleImageClick = (idx: number): void => {
+    setSelectedImageIdx(idx);
+    dialog.onOpen();
+  };
+  const handleNextImage = (): void => {
+    if (selectedImageIdx === null) setSelectedImageIdx(1);
+    else if (selectedImageIdx === review.images.length - 1)
+      setSelectedImageIdx(review.images.length - 1);
+    else setSelectedImageIdx(selectedImageIdx + 1);
+  };
+  const handlePrevImage = (): void => {
+    if (selectedImageIdx === null) setSelectedImageIdx(0);
+    else if (selectedImageIdx === 0) setSelectedImageIdx(0);
+    else setSelectedImageIdx(selectedImageIdx - 1);
+  };
+
+  return (
+    <>
+      <Box my={2}>
+        <StarRating rating={review.rating} color="orange.300" />
+        <Text color="GrayText" fontSize="sm">
+          {displayName} / {dayjs(review.createDate).format('YYYY-MM-DD')}
+        </Text>
+
+        <Flex gap={1} my={2}>
+          {review.images.slice(0, 5).map((i, idx) => (
+            <Image
+              key={i.id}
+              h="100px"
+              w="100px"
+              objectFit="cover"
+              src={i.imageUrl}
+              draggable={false}
+              cursor="pointer"
+              onClick={() => handleImageClick(idx)}
+            />
+          ))}
+        </Flex>
+        <Flex>
+          <Text fontSize="sm" whiteSpace="break-spaces">
+            {review.content}
+          </Text>
+        </Flex>
+      </Box>
+      <Divider />
+
+      <Modal
+        isOpen={dialog.isOpen && selectedImageIdx !== null}
+        onClose={dialog.onClose}
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalBody p={0}>
+            {selectedImageIdx !== null && (
+              <Box pos="relative">
+                <AspectRatio maxH={600} maxW={600} textAlign="center">
+                  <Image
+                    w="100%"
+                    src={review.images[selectedImageIdx].imageUrl}
+                    objectFit="cover"
+                  />
+                </AspectRatio>
+
+                <Button
+                  pos="absolute"
+                  left={-16}
+                  bottom="calc(50% - 30px)"
+                  rounded="full"
+                  variant="solid"
+                  size="md"
+                  isDisabled={selectedImageIdx === 0}
+                  onClick={handlePrevImage}
+                >
+                  <ChevronLeftIcon />
+                </Button>
+
+                <Button
+                  pos="absolute"
+                  right={-16}
+                  bottom="calc(50% - 30px)"
+                  rounded="full"
+                  variant="solid"
+                  size="md"
+                  isDisabled={selectedImageIdx === review.images.length - 1}
+                  onClick={handleNextImage}
+                >
+                  <ChevronRightIcon />
+                </Button>
+              </Box>
+            )}
+          </ModalBody>
+          <ModalCloseButton
+            color="white"
+            bgColor="gray.800"
+            _focus={{ bgColor: 'gray.700' }}
+            _hover={{ bgColor: 'gray.700' }}
+          />
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
