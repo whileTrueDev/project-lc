@@ -8,11 +8,13 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { GoodsInquiry } from '@prisma/client';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   FindGoodsInquiryItem,
   FindGoodsInquiryRes,
@@ -48,6 +50,7 @@ export class GoodsInquiryController {
   }
 
   /** 상품문의 생성 */
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(
     @Body(new ValidationPipe({ transform: true })) dto: GoodsInquiryCreateDto,
@@ -56,6 +59,7 @@ export class GoodsInquiryController {
   }
 
   /** 특정 상품문의 수정 */
+  @UseGuards(JwtAuthGuard)
   @Patch(':goodsInquiryId')
   update(
     @Param('goodsInquiryId', ParseIntPipe) id: GoodsInquiry['id'],
@@ -65,6 +69,7 @@ export class GoodsInquiryController {
   }
 
   /** 특정 상품문의 삭제 */
+  @UseGuards(JwtAuthGuard)
   @Delete(':goodsInquiryId')
   remove(
     @Param('goodsInquiryId', ParseIntPipe) id: GoodsInquiry['id'],
