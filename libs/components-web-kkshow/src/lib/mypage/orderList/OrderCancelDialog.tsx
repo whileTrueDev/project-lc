@@ -20,11 +20,7 @@ export function OrderCancelDialog({
   const { data: orderDetailData } = useOrderDetail(orderId);
 
   const toast = useToast();
-  // 주문취소이후 orderlist invalidate 처리
-  const queryClient = useQueryClient();
-  const orderCancelMutation = useCustomerOrderCancelMutation({
-    onSuccess: () => queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY),
-  });
+  const orderCancelMutation = useCustomerOrderCancelMutation();
   // 주문취소 요청
   const purchaseConfirmRequest = async (): Promise<void> => {
     if (!orderDetailData) return;

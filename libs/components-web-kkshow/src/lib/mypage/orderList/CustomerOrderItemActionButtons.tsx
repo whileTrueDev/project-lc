@@ -94,13 +94,7 @@ export function OrderItemActionButtons({
   ];
 
   const toast = useToast();
-  // 구매확정이후 orderlist invalidate 처리
-  const queryClient = useQueryClient();
-  const orderPurchaseMutation = useOrderPurchaseConfirmMutation({
-    onSuccess: () => {
-      queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
-    },
-  });
+  const orderPurchaseMutation = useOrderPurchaseConfirmMutation();
   // 구매확정 요청
   const purchaseConfirmRequest = async (): Promise<void> => {
     orderPurchaseMutation

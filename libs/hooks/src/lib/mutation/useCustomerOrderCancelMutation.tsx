@@ -3,8 +3,14 @@ import {
   CreateOrderCancellationRes,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useMutation, UseMutationResult, UseMutationOptions } from 'react-query';
+import {
+  useMutation,
+  UseMutationResult,
+  UseMutationOptions,
+  useQueryClient,
+} from 'react-query';
 import axios from '../../axios';
+import { INFINITE_ORDER_LIST_QUERY_KEY } from '../queries/useOrderList';
 
 export type useCustomerOrderCancelMutationDto = CreateOrderCancellationDto;
 
@@ -19,6 +25,7 @@ export const useCustomerOrderCancelMutation = (
   AxiosError,
   useCustomerOrderCancelMutationDto
 > => {
+  const queryClient = useQueryClient();
   return useMutation<
     CreateOrderCancellationRes,
     AxiosError,
@@ -28,6 +35,9 @@ export const useCustomerOrderCancelMutation = (
       axios
         .post<CreateOrderCancellationRes>('order/cancellation', dto)
         .then((res) => res.data),
-    options,
+    {
+      onSuccess: () => queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY),
+      ...options,
+    },
   );
 };
