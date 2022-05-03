@@ -83,6 +83,8 @@ export class OrderCancellationService extends ServiceBaseWithCache {
     }
 
     await this._clearCaches(this.#ORDER_CANCELLATION_CACHE_KEY);
+    // 주문캐시도 삭제
+    await this._clearCaches('order');
     return data;
   }
 
@@ -104,9 +106,6 @@ export class OrderCancellationService extends ServiceBaseWithCache {
         step: 'orderInvalidated',
       },
     });
-
-    // 주문캐시 삭제
-    await this._clearCaches('order');
   }
 
   /* 주문취소 내역 조회 */
