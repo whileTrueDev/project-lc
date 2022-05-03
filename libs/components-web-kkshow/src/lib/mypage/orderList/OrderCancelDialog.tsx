@@ -22,7 +22,9 @@ export function OrderCancelDialog({
   const toast = useToast();
   // 주문취소이후 orderlist invalidate 처리
   const queryClient = useQueryClient();
-  const orderCancelMutation = useCustomerOrderCancelMutation();
+  const orderCancelMutation = useCustomerOrderCancelMutation({
+    onSuccess: () => queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY),
+  });
   // 주문취소 요청
   const purchaseConfirmRequest = async (): Promise<void> => {
     if (!orderDetailData) return;
@@ -41,7 +43,6 @@ export function OrderCancelDialog({
       .then((res) => {
         // 주문접수 단계에서 취소 신청하여 바로 주문취소가 완료된 경우
         if (res.status === 'complete') {
-          queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
           toast({ title: '주문 취소 완료', status: 'success' });
           return;
         }
@@ -73,7 +74,7 @@ export function OrderCancelDialog({
               <OrderItemOptionInfo
                 key={opt.id}
                 option={opt}
-                goodsData={item.goods}
+                orderItem={item}
                 displayStatus={false}
               />
             )),
