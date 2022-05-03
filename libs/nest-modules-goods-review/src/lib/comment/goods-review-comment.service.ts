@@ -48,7 +48,7 @@ export class GoodsReviewCommentService extends ServiceBaseWithCache {
     reviewId: GoodsReview['id'],
     dto: GoodsReviewCommentCreateDto,
   ): Promise<GoodsReviewComment> {
-    await this._clearCaches(this.#REVIEW_COMMENT_CACHE_KEY);
+    await this._clearCaches(this.getCacheKey(reviewId));
     return this.prisma.goodsReviewComment.create({
       data: {
         reviewId,
@@ -65,8 +65,7 @@ export class GoodsReviewCommentService extends ServiceBaseWithCache {
     reviewCommentId: GoodsReviewComment['id'],
     dto: GoodsReviewCommentUpdateDto,
   ): Promise<GoodsReviewComment> {
-    await this._clearCaches(this.#REVIEW_COMMENT_CACHE_KEY);
-    return this.prisma.goodsReviewComment.update({
+    const updated = await this.prisma.goodsReviewComment.update({
       where: { id: reviewCommentId },
       data: {
         content: dto.content,
@@ -75,6 +74,8 @@ export class GoodsReviewCommentService extends ServiceBaseWithCache {
         reviewId: dto.reviewId,
       },
     });
+    await this._clearCaches(this.getCacheKey(updated.reviewId));
+    return updated;
   }
 
   /** 리뷰 댓글 삭제 */
@@ -82,8 +83,11 @@ export class GoodsReviewCommentService extends ServiceBaseWithCache {
     const result = await this.prisma.goodsReviewComment.delete({
       where: { id: reviewCommentId },
     });
-    await this._clearCaches(this.#REVIEW_COMMENT_CACHE_KEY);
-
+    await this._clearCaches(this.getCacheKey(result.reviewId));
     return !!result;
+  }
+
+  private getCacheKey(reviewId: GoodsReview['id']): string {
+    return `${this.#REVIEW_COMMENT_CACHE_KEY}/${reviewId}`;
   }
 }
