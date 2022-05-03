@@ -258,6 +258,7 @@ export class OrderService extends ServiceBaseWithCache {
             },
             review: { select: { id: true } },
             options: true,
+            orderCancellationItems: true,
             goods: {
               select: {
                 id: true,
@@ -267,6 +268,7 @@ export class OrderService extends ServiceBaseWithCache {
             },
           },
         },
+        orderCancellations: true,
         payment: true,
       },
     });
@@ -294,6 +296,7 @@ export class OrderService extends ServiceBaseWithCache {
             support: {
               include: { broadcaster: { select: { userNickname: true, avatar: true } } },
             },
+            orderCancellationItems: true,
             goods: {
               select: {
                 id: true,
