@@ -1,12 +1,17 @@
 import { DynamicModule, Module } from '@nestjs/common';
+import { GoodsReviewCommentController } from './comment/goods-review-comment.controller';
+import { GoodsReviewCommentService } from './comment/goods-review-comment.service';
 import { GoodsReviewController } from './goods-review.controller';
 import { GoodsReviewService } from './goods-review.service';
 
 @Module({})
 export class GoodsReviewModule {
-  private static readonly providers = [GoodsReviewService];
-  private static readonly exports = [GoodsReviewService];
-  private static readonly controllers = [GoodsReviewController];
+  private static readonly providers = [GoodsReviewService, GoodsReviewCommentService];
+  private static readonly exports = [GoodsReviewService, GoodsReviewCommentService];
+  private static readonly controllers = [
+    GoodsReviewController,
+    GoodsReviewCommentController,
+  ];
 
   static withoutControllers(): DynamicModule {
     return {

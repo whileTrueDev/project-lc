@@ -2,6 +2,7 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
+import { GoodsCategoryModule } from '@project-lc/nest-modules-goods-category';
 import {
   KkshowMainModule,
   KkshowShoppingModule,
@@ -11,9 +12,9 @@ import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
-import { GoodsCategoryModule } from '@project-lc/nest-modules-goods-category';
 import { AdminAccountService } from './admin-account.service';
 import { AdminCustomerController } from './admin-customer.controller';
+import { AdminGoodsCategoryController } from './admin-goods-category.controller';
 import { AdminKkshowMainController } from './admin-kkshow-main.controller';
 import { AdminManualController } from './admin-manual.controller';
 import { AdminPolicyController } from './admin-policy.controller';
@@ -23,7 +24,6 @@ import { AdminPromotionPageController } from './admin-promotion-page.controller'
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
-import { AdminGoodsCategoryController } from './admin-goods-category.controller';
 
 @Module({})
 export class AdminModule {
