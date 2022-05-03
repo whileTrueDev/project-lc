@@ -10,19 +10,15 @@ import {
   Stack,
   Text,
   useDisclosure,
-  useMergeRefs,
-  useToast,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalBody,
 } from '@chakra-ui/react';
-import { useBroadcaster, useProfile } from '@project-lc/hooks';
-import { BroadcasterAddressDto, PaymentPageDto } from '@project-lc/shared-types';
-import { parseErrorObject } from '@project-lc/utils-frontend';
-import { useMemo, useRef } from 'react';
+import { PaymentPageDto } from '@project-lc/shared-types';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import { useFormContext } from 'react-hook-form';
+import { useState } from 'react';
 
 export function DeliveryAddressDialog({
   defaultOpen,
@@ -33,83 +29,60 @@ export function DeliveryAddressDialog({
   isOpen: boolean;
   onClose: () => void;
 }): JSX.Element {
-  const toast = useToast();
-  const profile = useProfile();
-  const broadcaster = useBroadcaster({ id: profile.data?.id });
-  const isBroadcasterAddressExists = useMemo(() => {
-    if (!broadcaster.data) return false;
-    if (!broadcaster.data.broadcasterAddress) return false;
-    return true;
-  }, [broadcaster.data]);
-  const editMode = useDisclosure({
-    defaultIsOpen: defaultOpen,
-  });
   const daumOpen = useDisclosure();
 
   const {
-    handleSubmit,
-    register,
     setValue,
     clearErrors,
     watch,
-    reset,
     formState: { errors },
   } = useFormContext<PaymentPageDto>();
-  const registered = register('address', {
-    required: {
-      value: true,
-      message: '주소를 선택해 주세요.',
-    },
-  });
-  const inputRef = useRef<HTMLInputElement>(null);
-  const mergedRef = useMergeRefs(registered.ref, inputRef);
-
-  function onSubmit(formData: BroadcasterAddressDto): void {
-    const onSuccess = (): void => {
-      // 성공시
-      reset();
-      editMode.onClose();
-      toast({ status: 'success', description: '주소가 변경되었습니다.' });
-    };
-    const onFail = (err?: any): void => {
-      const { status, message } = parseErrorObject(err);
-      toast({
-        status: 'error',
-        description: status ? `code: ${status} - message: ${message}` : undefined,
-        title: '주소 변경중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-      });
-    };
-    onClose();
-  }
 
   const handleAddressSelected = (addressData: AddressData): void => {
     const { zonecode, address, buildingName } = addressData;
     const addr = buildingName ? `${address} (${buildingName})` : address;
-    setValue('address', addr);
     clearErrors('address');
-    setValue('postalCode', zonecode);
+    setPostalCode(zonecode);
+    setAddress(addr);
     daumOpen.onClose();
   };
 
-  const handleModalOnClose = (): void => {
+  const handleModalOnSuccess = (): void => {
+    setValue('address', address);
+    setValue('postalCode', postalCode);
+    setValue('detailAddress', detailAddress);
+    setPostalCode('');
+    setAddress('');
+    setDetailAddress('');
     onClose();
   };
+
+  const handleModalOnClose = (): void => {
+    setPostalCode('');
+    setAddress('');
+    setDetailAddress('');
+    onClose();
+  };
+
+  const [postalCode, setPostalCode] = useState('');
+  const [address, setAddress] = useState('');
+  const [detailAddress, setDetailAddress] = useState('');
 
   return (
     <Modal isOpen={isOpen} onClose={handleModalOnClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalBody>
-          <Stack as="form" onSubmit={handleSubmit(onSubmit)} w="100%">
+          <Stack w="100%">
             <Stack spacing={3}>
               <DaumPostcode focusContent focusInput onComplete={handleAddressSelected} />
-              {watch('postalCode') && (
+              {postalCode && (
                 <HStack>
                   <Text>우편번호</Text>
                   <InputLeftAddon fontWeight="bold">{watch('postalCode')}</InputLeftAddon>
                 </HStack>
               )}
-              {watch('address') && (
+              {address && (
                 <FormControl isInvalid={!!errors.detailAddress}>
                   <HStack>
                     <Text>기본주소</Text>
@@ -120,12 +93,7 @@ export function DeliveryAddressDialog({
                     <Input
                       maxW="280px"
                       placeholder="상세주소"
-                      {...register('detailAddress', {
-                        maxLength: {
-                          value: 30,
-                          message: '30자 이상 작성할 수 없습니다.',
-                        },
-                      })}
+                      onChange={(e) => setDetailAddress(e.target.value)}
                     />
                   </HStack>
                   <FormErrorMessage>{errors.detailAddress?.message}</FormErrorMessage>
@@ -133,7 +101,7 @@ export function DeliveryAddressDialog({
               )}
 
               <ButtonGroup>
-                <Button colorScheme="blue" type="submit">
+                <Button colorScheme="blue" onClick={() => handleModalOnSuccess()}>
                   확인
                 </Button>
                 <Button
