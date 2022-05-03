@@ -13,6 +13,7 @@ import { useCustomerAddress, useProfile } from '@project-lc/hooks';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { GridRowData } from '@material-ui/data-grid';
 import { useFormContext } from 'react-hook-form';
+import { PaymentPageDto } from '@project-lc/shared-types';
 
 type DeliveryListProps = {
   onClose: () => void;
@@ -28,7 +29,7 @@ export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX
           size="sm"
           onClick={() => {
             setValue('recipient', row.recipient);
-            setValue('phone', row.phone);
+            setValue('recipientPhone', row.phone);
             setValue('postalCode', row.postalCode);
             setValue('address', row.address);
             setValue('detailAddress', row.detailAddress);
@@ -55,14 +56,10 @@ export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX
       ),
     },
   ];
-
   const { data: profile } = useProfile();
-  const { data, isLoading } = useCustomerAddress(1); // profile?.id || undefined
+  const { data, isLoading } = useCustomerAddress(profile?.id);
 
-  const {
-    setValue,
-    formState: { errors },
-  } = useFormContext<any>();
+  const { setValue } = useFormContext<PaymentPageDto>();
 
   return (
     <Modal onClose={onClose} isOpen={isOpen} size="2xl">

@@ -1,11 +1,9 @@
 import {
   Box,
   Heading,
-  VStack,
   Flex,
   HStack,
   Text,
-  Grid,
   Divider,
   Button,
   useDisclosure,
@@ -14,14 +12,12 @@ import {
   RadioGroup,
   Stack,
   FormErrorMessage,
-  Textarea,
-  Checkbox,
-  CheckboxGroup,
   FormControl,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
 import { useFormContext } from 'react-hook-form';
+import { PaymentPageDto } from '@project-lc/shared-types';
 import { DeliveryAddressDialog } from './DeliveryAddress';
 import { DeliveryAddressList } from './DeliveryAddressList';
 
@@ -47,11 +43,10 @@ export function DestinationInfo(): JSX.Element {
     register,
     setValue,
     watch,
-    reset,
     getValues,
     resetField,
     formState: { errors },
-  } = useFormContext<any>();
+  } = useFormContext<PaymentPageDto>();
 
   function handleRadio(value: string): void {
     setChecked(value);
@@ -60,20 +55,27 @@ export function DestinationInfo(): JSX.Element {
       resetField('postalCode');
       resetField('address');
       resetField('detailAddress');
-      resetField('phone1');
-      resetField('phone2');
-      resetField('phone3');
+      resetField('recipientPhone1');
+      resetField('recipientPhone2');
+      resetField('recipientPhone3');
     }
   }
+
+  const handleRecipientInfo = (): void => {
+    setValue('recipient', getValues('name'));
+    setValue('recipientPhone1', getValues('orderPhone1') || '');
+    setValue('recipientPhone2', getValues('orderPhone2') || '');
+    setValue('recipientPhone3', getValues('orderPhone3') || '');
+  };
 
   useEffect(() => {
     if (!isLoading && defaultAddress) {
       setChecked('default');
-      setValue('recipient', defaultAddress.recipient);
-      setValue('phone', defaultAddress.phone);
-      setValue('postalCode', defaultAddress.postalCode);
-      setValue('address', defaultAddress.address);
-      setValue('detailAddress', defaultAddress.detailAddress);
+      setValue('recipient', defaultAddress.recipient!);
+      setValue('recipientPhone', defaultAddress.phone!);
+      setValue('postalCode', defaultAddress.postalCode!);
+      setValue('address', defaultAddress.address!);
+      setValue('detailAddress', defaultAddress.detailAddress!);
     }
   }, []);
 
@@ -81,15 +83,19 @@ export function DestinationInfo(): JSX.Element {
     <Box>
       <HStack>
         <Heading>배송정보</Heading>
-        <Button onClick={addressListOnOpen} size="sm">
-          배송지 목록
-        </Button>
+        {profile && (
+          <Button onClick={addressListOnOpen} size="sm">
+            배송지 목록
+          </Button>
+        )}
       </HStack>
       <Divider m={2} />
       {!isLoading && (
         <RadioGroup onChange={(value) => handleRadio(value)} value={checked}>
           <Stack direction="row">
-            <Radio value="default">기본배송지</Radio>
+            <Radio value="default" isDisabled={!profile?.id}>
+              기본배송지
+            </Radio>
             <Radio value="manual">직접입력</Radio>
           </Stack>
         </RadioGroup>
@@ -124,18 +130,24 @@ export function DestinationInfo(): JSX.Element {
           <FormControl isInvalid={!!errors.recipient}>
             <Flex direction="column">
               <Text fontWeight="bold">수령인</Text>
-              <Input
-                w={{ base: '100%', md: '15%' }}
-                placeholder="수령인"
-                value={watch('recipient')}
-                {...register('recipient', {
-                  required: {
-                    value: true,
-                    message: '받는사람의 이름을 입력해주세요(2글자 이상)',
-                  },
-                  minLength: 2,
-                })}
-              />
+              <Box>
+                <Input
+                  w={{ base: '100%', md: '15%' }}
+                  placeholder="수령인"
+                  value={watch('recipient')}
+                  {...register('recipient', {
+                    required: {
+                      value: true,
+                      message: '받는사람의 이름을 입력해주세요(2글자 이상)',
+                    },
+                    minLength: 2,
+                  })}
+                  mr={1}
+                />
+                <Button size="xs" onClick={() => handleRecipientInfo()}>
+                  구매자와 동일
+                </Button>
+              </Box>
               <FormErrorMessage>
                 {errors.recipient && errors.recipient.message}
               </FormErrorMessage>
@@ -144,14 +156,18 @@ export function DestinationInfo(): JSX.Element {
           <Flex direction="column">
             <Text fontWeight="bold">연락처</Text>
             <FormControl
-              isInvalid={!!errors.phone1 || !!errors.phone2 || !!errors.phone3}
+              isInvalid={
+                !!errors.recipientPhone1 ||
+                !!errors.recipientPhone2 ||
+                !!errors.recipientPhone3
+              }
             >
               <HStack>
                 <Input
                   w={{ base: '20%', md: '15%' }}
                   type="number"
                   maxLength={3}
-                  {...register('phone1', {
+                  {...register('recipientPhone1', {
                     required: {
                       value: true,
                       message: '휴대전화를 올바르게 입력해주세요.',
@@ -165,7 +181,7 @@ export function DestinationInfo(): JSX.Element {
                   w={{ base: '20%', md: '15%' }}
                   type="number"
                   maxLength={4}
-                  {...register('phone2', {
+                  {...register('recipientPhone2', {
                     required: {
                       value: true,
                       message: '휴대전화를 올바르게 입력해주세요.',
@@ -179,7 +195,7 @@ export function DestinationInfo(): JSX.Element {
                   w={{ base: '20%', md: '15%' }}
                   type="number"
                   maxLength={4}
-                  {...register('phone3', {
+                  {...register('recipientPhone3', {
                     required: {
                       value: true,
                       message: '휴대전화를 올바르게 입력해주세요.',

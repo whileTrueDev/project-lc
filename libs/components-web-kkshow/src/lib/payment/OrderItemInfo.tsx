@@ -1,7 +1,19 @@
 import { Box, Heading, Grid, GridItem, Text, Link, Flex, Center } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 
-export function OrderItemInfo({ data }): JSX.Element {
+interface DummyOrder {
+  id: number;
+  sellerId: number;
+  shopName: string;
+  goods_name: string;
+  consumer_price: number;
+  image: string;
+  option_title: string;
+  number: number;
+  shipping_cost: number;
+}
+
+export function OrderItemInfo({ data }: { data: DummyOrder[] }): JSX.Element {
   const dummyOrder = data;
   return (
     <Box>
@@ -66,7 +78,7 @@ export function OrderItemInfo({ data }): JSX.Element {
   );
 }
 
-export function MobileOrderItemInfo({ data }): JSX.Element {
+export function MobileOrderItemInfo({ data }: { data: DummyOrder[] }): JSX.Element {
   const dummyOrder = data;
   return (
     <Box>

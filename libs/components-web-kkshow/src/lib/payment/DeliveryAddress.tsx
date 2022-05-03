@@ -17,17 +17,12 @@ import {
   ModalContent,
   ModalBody,
 } from '@chakra-ui/react';
-import SettingSectionLayout from '@project-lc/components-layout/SettingSectionLayout';
-import {
-  useBroadcaster,
-  useBroadcasterAddressMutation,
-  useProfile,
-} from '@project-lc/hooks';
-import { BroadcasterAddressDto } from '@project-lc/shared-types';
+import { useBroadcaster, useProfile } from '@project-lc/hooks';
+import { BroadcasterAddressDto, PaymentPageDto } from '@project-lc/shared-types';
 import { parseErrorObject } from '@project-lc/utils-frontend';
 import { useMemo, useRef } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
-import { useForm, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 
 export function DeliveryAddressDialog({
   defaultOpen,
@@ -58,9 +53,8 @@ export function DeliveryAddressDialog({
     clearErrors,
     watch,
     reset,
-    getValues,
     formState: { errors },
-  } = useFormContext<any>();
+  } = useFormContext<PaymentPageDto>();
   const registered = register('address', {
     required: {
       value: true,
@@ -85,7 +79,6 @@ export function DeliveryAddressDialog({
         title: '주소 변경중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
       });
     };
-    console.log(getValues('address'));
     onClose();
   }
 
@@ -159,16 +152,16 @@ export function DeliveryAddressDialog({
   );
 }
 
-export interface BroadcasterAddressPreviewProps {
+export interface DeliveryAddressPreviewProps {
   address?: {
     postalCode: string;
     address: string;
     detailAddress: string;
   };
 }
-export function BroadcasterAddressPreview({
+export function DeliveryAddressPreview({
   address,
-}: BroadcasterAddressPreviewProps): JSX.Element | null {
+}: DeliveryAddressPreviewProps): JSX.Element | null {
   if (!address) return null;
   return (
     <Box borderWidth="thin" p={2}>

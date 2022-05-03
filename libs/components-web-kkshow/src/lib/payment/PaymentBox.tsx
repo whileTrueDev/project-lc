@@ -14,10 +14,23 @@ import {
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import { HtmlStringBox } from '@project-lc/components-core/TermBox';
 import { useTerms } from '@project-lc/hooks';
-import { useKkshowOrderStore } from '@project-lc/stores';
+// import { useKkshowOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 import { useFormContext, SubmitHandler } from 'react-hook-form';
+import { PaymentPageDto } from '@project-lc/shared-types';
+
+interface DummyOrder {
+  id: number;
+  sellerId: number;
+  shopName: string;
+  goods_name: string;
+  consumer_price: number;
+  image: string;
+  option_title: string;
+  number: number;
+  shipping_cost: number;
+}
 
 function getOrderPrice(
   originalPrice: number,
@@ -29,7 +42,7 @@ function getOrderPrice(
   return originalPrice + shippingCost - discount - mileageDiscount - couponDiscount;
 }
 
-export function PaymentBox({ data }): JSX.Element {
+export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
   /** 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경 */
   const PRODUCT_PRICE = data
@@ -40,25 +53,16 @@ export function PaymentBox({ data }): JSX.Element {
     .reduce((prev: number, curr: number) => prev + curr, 0);
   const DISCOUNT = 3000;
 
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    clearErrors,
-    watch,
-    reset,
-    getValues,
-    formState: { errors },
-  } = useFormContext<any>();
+  const { handleSubmit, watch, getValues } = useFormContext<PaymentPageDto>();
 
-  const { coupon, mileage } = useKkshowOrderStore();
-
-  const onSubmit: SubmitHandler<any> = () => {
+  const onSubmit: SubmitHandler<PaymentPageDto> = () => {
     console.log(
       getValues('customerId'),
       getValues('name'),
       getValues('recipient'),
-      `${getValues('phone1')} - ${getValues('phone2')} - ${getValues('phone3')}`,
+      `${getValues('recipientPhone1')} - ${getValues('recipientPhone2')} - ${getValues(
+        'recipientPhone3',
+      )}`,
       getValues('postalCode'),
       getValues('address'),
       getValues('detailAddress'),
@@ -67,19 +71,26 @@ export function PaymentBox({ data }): JSX.Element {
       getValues('number'),
       getValues('shipping_cost'),
       getValues('mileage'),
-      getValues('coupon'),
+      getValues('couponId'),
+      getValues('couponAmount'),
       getValues('discount'),
     );
-    // loadTossPayments(CLIENT_KEY).then((tossPayments) => {
-    //   tossPayments.requestPayment('카드', {
-    //     amount: getOrderPrice(PRODUCT_PRICE, SHIPPING_COST, DISCOUNT, mileage, coupon),
-    //     orderId: `${(dayjs().format('YYYYMMDDHHmmssSSS'), nanoid(6))}`,
-    //     orderName: '토스 티셔츠',
-    //     customerName: getValues('name'),
-    //     successUrl: `http://localhost:4000/payment/success`,
-    //     failUrl: `http://localhost:4000/payment/fail`,
-    //   });
-    // });
+    loadTossPayments(CLIENT_KEY).then((tossPayments) => {
+      tossPayments.requestPayment('카드', {
+        amount: getOrderPrice(
+          PRODUCT_PRICE,
+          SHIPPING_COST,
+          DISCOUNT,
+          getValues('mileage'),
+          getValues('couponAmount'),
+        ),
+        orderId: `${(dayjs().format('YYYYMMDDHHmmssSSS'), nanoid(6))}`,
+        orderName: '토스 티셔츠',
+        customerName: getValues('name'),
+        successUrl: `http://localhost:4000/payment/success`,
+        failUrl: `http://localhost:4000/payment/fail`,
+      });
+    });
   };
 
   return (
@@ -140,7 +151,7 @@ export function PaymentBox({ data }): JSX.Element {
           <Text>쿠폰 사용</Text>
           <Box>
             <Text fontWeight="bold" color="red" fontSize="xl" as="span">
-              {`- ${watch('coupon').toLocaleString() || 0}`}
+              {`- ${watch('couponAmount').toLocaleString() || 0}`}
             </Text>
             <Text color="red" as="span">
               원
@@ -156,27 +167,27 @@ export function PaymentBox({ data }): JSX.Element {
               PRODUCT_PRICE,
               SHIPPING_COST,
               DISCOUNT,
-              watch('coupon') || 0,
-              mileage,
+              watch('couponAmount'),
+              watch('mileage'),
             ).toLocaleString()}
             원 결제하기
           </Button>
         </Center>
       </Box>
       <Text>개인정보 판매자 제공 동의</Text>
-      <Box overflow="scroll" h="200px" mb={3} border="solid">
+      <Box overflow="scroll" h="200px" mb={3} border="1px solid" borderColor="gray.300">
         <HtmlStringBox
           htmlString={useTerms({ userType: 'broadcaster' }).broadcasterTerms[0].text}
         />
       </Box>
       <Text>개인정보 수집 및 이용 동의</Text>
-      <Box overflow="scroll" h="200px" mb={3} border="solid">
+      <Box overflow="scroll" h="200px" mb={3} border="1px solid" borderColor="gray.300">
         <HtmlStringBox
           htmlString={useTerms({ userType: 'broadcaster' }).broadcasterTerms[0].text}
         />
       </Box>
       <Text>주문상품정보 동의</Text>
-      <Box overflow="scroll" h="200px" mb={3} border="solid">
+      <Box overflow="scroll" h="200px" mb={3} border="1px solid" borderColor="gray.300">
         <HtmlStringBox
           htmlString={useTerms({ userType: 'broadcaster' }).broadcasterTerms[0].text}
         />
@@ -186,26 +197,42 @@ export function PaymentBox({ data }): JSX.Element {
 }
 
 export function MobilePaymentBox(): JSX.Element {
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    clearErrors,
-    watch,
-    reset,
-    getValues,
-    formState: { errors },
-  } = useFormContext<any>();
-  const { coupon, mileage } = useKkshowOrderStore();
+  const { watch, getValues, handleSubmit } = useFormContext<PaymentPageDto>();
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
   /** 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경 */
   const PRODUCT_PRICE = 19000;
   const SHIPPING_COST = 3000;
   const DISCOUNT = 3000;
-  function doPayment(): void {
+
+  const onSubmit: SubmitHandler<PaymentPageDto> = () => {
+    console.log(
+      getValues('customerId'),
+      getValues('name'),
+      getValues('recipient'),
+      `${getValues('recipientPhone1')} - ${getValues('recipientPhone2')} - ${getValues(
+        'recipientPhone3',
+      )}`,
+      getValues('postalCode'),
+      getValues('address'),
+      getValues('detailAddress'),
+      getValues('goods_id'),
+      getValues('optionId'),
+      getValues('number'),
+      getValues('shipping_cost'),
+      getValues('mileage'),
+      getValues('couponId'),
+      getValues('couponAmount'),
+      getValues('discount'),
+    );
     loadTossPayments(CLIENT_KEY).then((tossPayments) => {
       tossPayments.requestPayment('카드', {
-        amount: getOrderPrice(PRODUCT_PRICE, SHIPPING_COST, DISCOUNT, mileage, coupon),
+        amount: getOrderPrice(
+          PRODUCT_PRICE,
+          SHIPPING_COST,
+          DISCOUNT,
+          getValues('mileage'),
+          getValues('couponAmount'),
+        ),
         orderId: `${(dayjs().format('YYYYMMDDHHmmssSSS'), nanoid(6))}`,
         orderName: '토스 티셔츠',
         customerName: getValues('name'),
@@ -213,16 +240,15 @@ export function MobilePaymentBox(): JSX.Element {
         failUrl: `http://localhost:4000/payment/fail`,
       });
     });
-  }
-
+  };
   return (
-    <Box w="100%">
+    <Box w="100%" as="form" onSubmit={handleSubmit(onSubmit)}>
       <Heading size="lg">결제 예정 금액</Heading>
       <Flex justifyContent="space-between" mt={2} mb={2}>
         <Text>상품금액</Text>
         <Box>
           <Text fontWeight="bold" fontSize="xl" as="span">
-            {PRODUCT_PRICE}
+            {PRODUCT_PRICE.toLocaleString()}
           </Text>
           <Text as="span">원</Text>
         </Box>
@@ -231,7 +257,7 @@ export function MobilePaymentBox(): JSX.Element {
         <Text>배송비 (선결제)</Text>
         <Box>
           <Text fontWeight="bold" fontSize="xl" as="span">
-            {`+ ${SHIPPING_COST}`}
+            {`+ ${SHIPPING_COST.toLocaleString()}`}
           </Text>
           <Text as="span">원</Text>
         </Box>
@@ -240,7 +266,7 @@ export function MobilePaymentBox(): JSX.Element {
         <Text>할인금액</Text>
         <Box>
           <Text fontWeight="bold" color="red" fontSize="xl" as="span">
-            {`- ${DISCOUNT}`}
+            {`- ${DISCOUNT.toLocaleString()}`}
           </Text>
           <Text color="red" as="span">
             원
@@ -251,7 +277,7 @@ export function MobilePaymentBox(): JSX.Element {
         <Text>적립금 사용</Text>
         <Box>
           <Text fontWeight="bold" color="red" fontSize="xl" as="span">
-            {`- ${mileage || 0}`}
+            {`- ${watch('mileage').toLocaleString()}`}
           </Text>
           <Text color="red" as="span">
             원
@@ -262,7 +288,7 @@ export function MobilePaymentBox(): JSX.Element {
         <Text>쿠폰 사용</Text>
         <Box>
           <Text fontWeight="bold" color="red" fontSize="xl" as="span">
-            {`- ${watch('coupon') || 0}`}
+            {`- ${watch('couponAmount').toLocaleString()}`}
           </Text>
           <Text color="red" as="span">
             원
@@ -308,13 +334,13 @@ export function MobilePaymentBox(): JSX.Element {
         </AccordionItem>
       </Accordion>
       <Flex justifyContent="space-evenly" alignItems="center" mt={3}>
-        <Button onClick={() => doPayment()} size="lg" colorScheme="blue">
+        <Button size="lg" colorScheme="blue" type="submit">
           {getOrderPrice(
             PRODUCT_PRICE,
             SHIPPING_COST,
             DISCOUNT,
-            watch('coupon') || 0,
-            mileage,
+            watch('couponAmount'),
+            watch('mileage'),
           ).toLocaleString()}
           원 결제하기
         </Button>

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Box, Grid, GridItem, Flex, Text } from '@chakra-ui/react';
+import { Grid, GridItem, Flex } from '@chakra-ui/react';
 import {
   PaymentBox,
   MobilePaymentBox,
@@ -14,7 +14,7 @@ import {
 import { useDisplaySize, useProfile } from '@project-lc/hooks';
 import { DiscountBox } from '@project-lc/components-web-kkshow/payment/DiscountBox';
 import { useForm, FormProvider } from 'react-hook-form';
-// import { MobilePaymentBox } from '@project-lc/components-web-kkshow/payment/MobilePaymentBox';
+import { PaymentPageDto } from '@project-lc/shared-types';
 
 const dummyOrder = [
   {
@@ -44,13 +44,18 @@ const dummyOrder = [
 export function Payment(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { data: profile } = useProfile();
-  const methods = useForm({
+  const methods = useForm<PaymentPageDto>({
     mode: 'onChange',
     defaultValues: {
-      customerId: profile?.id,
-      name: profile?.name,
+      customerId: 0,
+      email: '',
+      orderPhone: '',
+      orderPhone1: '',
+      orderPhone2: '',
+      orderPhone3: '',
+      name: '',
       recipient: '',
-      phone: '',
+      recipientPhone: '',
       postalCode: '',
       address: '',
       detailAddress: '',
@@ -59,7 +64,8 @@ export function Payment(): JSX.Element {
       number: 0,
       shipping_cost: 0,
       mileage: 0,
-      coupon: 0,
+      couponId: 0,
+      couponAmount: 0,
       discount: 0,
       orderPrice: 0,
       paymentPrice: 0,
@@ -80,7 +86,12 @@ export function Payment(): JSX.Element {
               <GridItem colSpan={5}>
                 <BuyerInfoSection />
               </GridItem>
-              <GridItem rowSpan={4} colSpan={2} border="solid">
+              <GridItem
+                rowSpan={4}
+                colSpan={2}
+                borderLeft="1px solid"
+                borderLeftColor="gray.300"
+              >
                 <PaymentBox data={dummyOrder} />
               </GridItem>
               <GridItem colSpan={5}>

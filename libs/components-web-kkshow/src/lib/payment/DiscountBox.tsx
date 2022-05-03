@@ -14,6 +14,8 @@ import {
 import { useFormContext } from 'react-hook-form';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { GridRowData } from '@material-ui/data-grid';
+import { useState } from 'react';
+import { PaymentPageDto } from '@project-lc/shared-types';
 
 const dummyCoupon = [
   { id: 1, name: '3000원 할인 쿠폰', amount: 3000 },
@@ -23,7 +25,8 @@ const dummyCoupon = [
 
 export function DiscountBox(): JSX.Element {
   const MAX_MILEAGE = 1100;
-  const { setValue, getValues, resetField, watch } = useFormContext<any>();
+  const [mileage, setMileage] = useState(0);
+  const { setValue, getValues, watch } = useFormContext<PaymentPageDto>();
 
   const columns = [
     { field: 'name', headerName: '쿠폰명', flex: 1 },
@@ -36,7 +39,8 @@ export function DiscountBox(): JSX.Element {
           size="xs"
           colorScheme="blue"
           onClick={() => {
-            setValue('coupon', row.amount);
+            setValue('couponId', row.id);
+            setValue('couponAmount', row.amount);
             onClose();
           }}
         >
@@ -51,10 +55,16 @@ export function DiscountBox(): JSX.Element {
 
   const resetDiscountUsage = (type: 'mileage' | 'coupon'): void => {
     if (type === 'mileage') {
-      resetField(type);
+      setValue('mileage', 0);
+      setMileage(0);
     } else {
-      resetField(type);
+      setValue('couponId', 0);
+      setValue('couponAmount', 0);
     }
+  };
+
+  const handleMileage = (value: number): void => {
+    setMileage(value);
   };
 
   return (
@@ -69,13 +79,13 @@ export function DiscountBox(): JSX.Element {
             variant="flushed"
             disabled
             size="xs"
-            value={getValues('coupon')}
+            value={getValues('couponAmount')}
           />
 
           <Button size="xs" onClick={onOpen} colorScheme="blue" mr={1}>
             쿠폰사용
           </Button>
-          {watch('coupon') ? (
+          {watch('couponId') ? (
             <Button size="xs" onClick={() => resetDiscountUsage('coupon')}>
               사용취소
             </Button>
@@ -101,10 +111,14 @@ export function DiscountBox(): JSX.Element {
             size="xs"
             w={{ base: '50%', md: '20%' }}
             type="number"
+            value={mileage}
+            onChange={(e) => handleMileage(Number(e.target.value))}
             onBlur={(e) => {
               if (Number(e.target.value) <= MAX_MILEAGE) {
+                handleMileage(Number(e.target.value));
                 setValue('mileage', Number(e.target.value));
               } else {
+                handleMileage(MAX_MILEAGE);
                 setValue('mileage', MAX_MILEAGE);
                 toast({
                   title: '보유 금액 이상 사용은 불가능 합니다.',
@@ -117,6 +131,7 @@ export function DiscountBox(): JSX.Element {
             size="xs"
             colorScheme="blue"
             onClick={() => {
+              handleMileage(MAX_MILEAGE);
               setValue('mileage', MAX_MILEAGE);
             }}
           >

@@ -12,7 +12,7 @@ export function Success(): JSX.Element {
   const { paymentKey } = router.query;
   const { amount } = router.query;
 
-  return <Box>주문에실패</Box>;
+  return <Box>결제실패</Box>;
 }
 
 export default Success;
