@@ -81,15 +81,21 @@ export class GetOrderCancellationListDto {
 export class UpdateOrderCancellationStatusDto {
   /** 변경될 처리상태 */
   @IsEnum(ProcessStatus)
-  status: ProcessStatus;
+  @IsOptional()
+  status?: ProcessStatus;
 
   /* 거절시 거절사유 입력필요 */
   @ValidateIf((o) => o.status === ProcessStatus.canceled)
   @IsString()
-  rejectReason: string;
+  rejectReason?: string;
 
   /** 주문취소요청에 대한 환불 완료시 환불고유번호 입력 */
   @IsNumber()
   @IsOptional()
   refundId?: number;
+
+  /** 책임소재 */
+  @IsString()
+  @IsOptional()
+  responsibility?: string;
 }
