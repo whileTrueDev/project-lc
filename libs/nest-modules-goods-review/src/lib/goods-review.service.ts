@@ -83,14 +83,18 @@ export class GoodsReviewService extends ServiceBaseWithCache {
         content: dto.content,
         goodsId: dto.goodsId,
         rating: dto.rating,
-        images: {
-          updateMany: {
-            where: { goodsReviewId: id },
-            data: dto.images,
-          },
-        },
       },
     });
+    if (dto.images && dto.images.length > 0) {
+      await Promise.all(
+        dto.images.map((image) =>
+          this.prisma.goodsReviewImage.update({
+            where: { id: image.id },
+            data: { imageUrl: image.imageUrl },
+          }),
+        ),
+      );
+    }
     await this._clearCaches(this.getCacheKey(updated.id));
     return updated;
   }
