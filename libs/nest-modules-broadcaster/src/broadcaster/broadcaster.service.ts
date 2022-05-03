@@ -23,6 +23,7 @@ import {
   BroadcasterWithoutUserNickName,
   FindBroadcasterDto,
   SignUpDto,
+  BroadcasterOnlyNickNameAndAvatar,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { Cache } from 'cache-manager';
@@ -190,6 +191,19 @@ export class BroadcasterService extends ServiceBaseWithCache {
         },
       });
     return null;
+  }
+
+  /** 방송인 정보 조회 */
+  public async getBroadcasterGiftPage(
+    id: number,
+  ): Promise<BroadcasterOnlyNickNameAndAvatar> {
+    return this.prisma.broadcaster.findUnique({
+      where: { id: Number(id) },
+      select: {
+        userNickname: true,
+        avatar: true,
+      },
+    });
   }
 
   /** 방송인 활동명 변경 */

@@ -87,9 +87,7 @@ export function BuyerInfoSection(): JSX.Element {
             <Text fontWeight="bold">휴대전화번호</Text>
             <FormControl
               isInvalid={
-                !!errors.recipientPhone1 ||
-                !!errors.recipientPhone2 ||
-                !!errors.recipientPhone3
+                !!errors.orderPhone1 || !!errors.orderPhone2 || !!errors.orderPhone3
               }
             >
               <HStack>

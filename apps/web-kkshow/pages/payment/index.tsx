@@ -7,6 +7,7 @@ import {
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { BuyerInfoSection } from '@project-lc/components-web-kkshow/payment/BuyerInfoSection';
 import { DestinationInfo } from '@project-lc/components-web-kkshow/payment/DestinationInfo';
+import { GiftBox } from '@project-lc/components-web-kkshow/payment/GiftBox';
 import {
   OrderItemInfo,
   MobileOrderItemInfo,
@@ -15,6 +16,7 @@ import { useDisplaySize, useProfile } from '@project-lc/hooks';
 import { DiscountBox } from '@project-lc/components-web-kkshow/payment/DiscountBox';
 import { useForm, FormProvider } from 'react-hook-form';
 import { PaymentPageDto } from '@project-lc/shared-types';
+import { useRouter } from 'next/router';
 
 const dummyOrder = [
   {
@@ -44,6 +46,9 @@ const dummyOrder = [
 export function Payment(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { data: profile } = useProfile();
+  const router = useRouter();
+  const purchaseType = router.query.type;
+
   const methods = useForm<PaymentPageDto>({
     mode: 'onChange',
     defaultValues: {
@@ -95,7 +100,7 @@ export function Payment(): JSX.Element {
                 <PaymentBox data={dummyOrder} />
               </GridItem>
               <GridItem colSpan={5}>
-                <DestinationInfo />
+                {purchaseType === 'gift' ? <GiftBox /> : <DestinationInfo />}
               </GridItem>
               <GridItem colSpan={5}>
                 <OrderItemInfo data={dummyOrder} />
@@ -112,7 +117,7 @@ export function Payment(): JSX.Element {
                 <BuyerInfoSection />
               </GridItem>
               <GridItem colSpan={7}>
-                <DestinationInfo />
+                {purchaseType === 'gift' ? <GiftBox /> : <DestinationInfo />}
               </GridItem>
               <GridItem colSpan={7}>
                 <MobileOrderItemInfo data={dummyOrder} />

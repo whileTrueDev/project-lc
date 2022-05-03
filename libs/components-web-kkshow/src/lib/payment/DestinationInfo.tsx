@@ -144,7 +144,7 @@ export function DestinationInfo(): JSX.Element {
                   })}
                   mr={1}
                 />
-                <Button size="xs" onClick={() => handleRecipientInfo()}>
+                <Button size="xs" onClick={() => handleRecipientInfo()} bg="gray.300">
                   구매자와 동일
                 </Button>
               </Box>
