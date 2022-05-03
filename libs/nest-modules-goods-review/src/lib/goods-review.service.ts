@@ -76,30 +76,39 @@ export class GoodsReviewService extends ServiceBaseWithCache {
     id: GoodsReview['id'],
     dto: GoodsReviewUpdateDto,
   ): Promise<GoodsReview> {
-    await this._clearCaches(this.#REVIEW_CACHE_KEY);
-    return this.prisma.goodsReview.update({
+    const updated = await this.prisma.goodsReview.update({
       where: { id },
       data: {
         writerId: dto.writerId,
         content: dto.content,
         goodsId: dto.goodsId,
         rating: dto.rating,
-        images: {
-          updateMany: {
-            where: { goodsReviewId: id },
-            data: dto.images,
-          },
-        },
       },
     });
+    if (dto.images && dto.images.length > 0) {
+      await Promise.all(
+        dto.images.map((image) =>
+          this.prisma.goodsReviewImage.update({
+            where: { id: image.id },
+            data: { imageUrl: image.imageUrl },
+          }),
+        ),
+      );
+    }
+    await this._clearCaches(this.getCacheKey(updated.id));
+    return updated;
   }
 
   /** 리뷰 삭제 */
   public async remove(id: GoodsReview['id']): Promise<boolean> {
-    await this._clearCaches(this.#REVIEW_CACHE_KEY);
     const result = await this.prisma.goodsReview.delete({
       where: { id },
     });
+    await this._clearCaches(this.getCacheKey(result.id));
     return !!result;
+  }
+
+  private getCacheKey(id: GoodsReview['id']): string {
+    return `${this.#REVIEW_CACHE_KEY}/${id}`;
   }
 }
