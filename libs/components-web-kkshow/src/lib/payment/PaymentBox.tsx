@@ -14,11 +14,11 @@ import {
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import { HtmlStringBox } from '@project-lc/components-core/TermBox';
 import { useTerms } from '@project-lc/hooks';
-// import { useKkshowOrderStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 import { useFormContext, SubmitHandler } from 'react-hook-form';
 import { PaymentPageDto } from '@project-lc/shared-types';
+import { TermBox } from './TermBox';
 
 interface DummyOrder {
   id: number;
@@ -53,6 +53,15 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
     .reduce((prev: number, curr: number) => prev + curr, 0);
   const DISCOUNT = 3000;
 
+  const productNameArray = data.map((item) => item.goods_name);
+  let productName = '';
+
+  if (productNameArray.length > 1) {
+    productName = `${productNameArray[0]} 외 ${productNameArray.length - 1}개`;
+  } else if (productNameArray.length === 1) {
+    [productName] = productNameArray;
+  }
+
   const { handleSubmit, watch, getValues } = useFormContext<PaymentPageDto>();
 
   const onSubmit: SubmitHandler<PaymentPageDto> = () => {
@@ -85,7 +94,7 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
           getValues('couponAmount'),
         ),
         orderId: `${(dayjs().format('YYYYMMDDHHmmssSSS'), nanoid(6))}`,
-        orderName: '토스 티셔츠',
+        orderName: `${productName}`,
         customerName: getValues('name'),
         successUrl: `http://localhost:4000/payment/success`,
         failUrl: `http://localhost:4000/payment/fail`,
@@ -174,35 +183,27 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
           </Button>
         </Center>
       </Box>
-      <Text>개인정보 판매자 제공 동의</Text>
-      <Box overflow="scroll" h="200px" mb={3} border="1px solid" borderColor="gray.300">
-        <HtmlStringBox
-          htmlString={useTerms({ userType: 'broadcaster' }).broadcasterTerms[0].text}
-        />
-      </Box>
-      <Text>개인정보 수집 및 이용 동의</Text>
-      <Box overflow="scroll" h="200px" mb={3} border="1px solid" borderColor="gray.300">
-        <HtmlStringBox
-          htmlString={useTerms({ userType: 'broadcaster' }).broadcasterTerms[0].text}
-        />
-      </Box>
-      <Text>주문상품정보 동의</Text>
-      <Box overflow="scroll" h="200px" mb={3} border="1px solid" borderColor="gray.300">
-        <HtmlStringBox
-          htmlString={useTerms({ userType: 'broadcaster' }).broadcasterTerms[0].text}
-        />
-      </Box>
+      <TermBox />
     </Box>
   );
 }
 
-export function MobilePaymentBox(): JSX.Element {
+export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   const { watch, getValues, handleSubmit } = useFormContext<PaymentPageDto>();
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
   /** 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경 */
   const PRODUCT_PRICE = 19000;
   const SHIPPING_COST = 3000;
   const DISCOUNT = 3000;
+
+  const productNameArray = data.map((item) => item.goods_name);
+  let productName = '';
+
+  if (productNameArray.length > 1) {
+    productName = `${productNameArray[0]} 외 ${productNameArray.length - 1}개`;
+  } else if (productNameArray.length === 1) {
+    [productName] = productNameArray;
+  }
 
   const onSubmit: SubmitHandler<PaymentPageDto> = () => {
     console.log(
@@ -234,7 +235,7 @@ export function MobilePaymentBox(): JSX.Element {
           getValues('couponAmount'),
         ),
         orderId: `${(dayjs().format('YYYYMMDDHHmmssSSS'), nanoid(6))}`,
-        orderName: '토스 티셔츠',
+        orderName: `${productName}`,
         customerName: getValues('name'),
         successUrl: `http://localhost:4000/payment/success`,
         failUrl: `http://localhost:4000/payment/fail`,
@@ -306,34 +307,14 @@ export function MobilePaymentBox(): JSX.Element {
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            <Text>개인정보 판매자 제공 동의</Text>
-            <Box overflow="scroll" h="200px" mb={3} border="solid">
-              <HtmlStringBox
-                htmlString={
-                  useTerms({ userType: 'broadcaster' }).broadcasterTerms[0].text
-                }
-              />
-            </Box>
-            <Text>개인정보 수집 및 이용 동의</Text>
-            <Box overflow="scroll" h="200px" mb={3} border="solid">
-              <HtmlStringBox
-                htmlString={
-                  useTerms({ userType: 'broadcaster' }).broadcasterTerms[0].text
-                }
-              />
-            </Box>
-            <Text>주문상품정보 동의</Text>
-            <Box overflow="scroll" h="200px" mb={3} border="solid">
-              <HtmlStringBox
-                htmlString={
-                  useTerms({ userType: 'broadcaster' }).broadcasterTerms[0].text
-                }
-              />
-            </Box>
+            <TermBox />
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
-      <Flex justifyContent="space-evenly" alignItems="center" mt={3}>
+      <Flex direction="column" justifyContent="space-evenly" alignItems="center" mt={3}>
+        <Text variant="sup" fontSize="xs" mb={1}>
+          상기 필수약관을 확인하였으며, 이에 동의합니다.
+        </Text>
         <Button size="lg" colorScheme="blue" type="submit">
           {getOrderPrice(
             PRODUCT_PRICE,

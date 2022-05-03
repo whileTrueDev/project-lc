@@ -126,7 +126,7 @@ export function Payment(): JSX.Element {
                 <DiscountBox />
               </GridItem>
               <GridItem colSpan={7} rowSpan={1}>
-                <MobilePaymentBox />
+                <MobilePaymentBox data={dummyOrder} />
               </GridItem>
             </Grid>
           </Flex>
