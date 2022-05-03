@@ -40,7 +40,10 @@ export class GoodsReviewService extends ServiceBaseWithCache {
   public async findOne(id: GoodsReview['id']): Promise<GoodsReviewItem> {
     return this.prisma.goodsReview.findUnique({
       where: { id },
-      include: { images: true },
+      include: {
+        images: true,
+        writer: { select: { nickname: true, name: true, id: true, gender: true } },
+      },
     });
   }
 
@@ -49,11 +52,23 @@ export class GoodsReviewService extends ServiceBaseWithCache {
     where?: Prisma.GoodsReviewWhereInput,
     paginationOpts?: DefaultPaginationDto,
   ): Promise<GoodsReviewRes> {
-    return this.prisma.goodsReview.findMany({
+    const { skip = 0, take = 5 } = paginationOpts;
+    const realTake = take + 1;
+    const result = await this.prisma.goodsReview.findMany({
       where,
-      ...paginationOpts,
-      include: { images: true },
+      skip,
+      take: realTake,
+      include: {
+        images: true,
+        writer: { select: { nickname: true, name: true, id: true, gender: true } },
+      },
     });
+
+    const nextCursor = skip + take; // 다음 조회시 skip 값으로 사용
+    if (result.length === realTake) {
+      return { nextCursor, reviews: result.slice(0, take) };
+    }
+    return { nextCursor: undefined, reviews: result };
   }
 
   /** 리뷰 수정 */
