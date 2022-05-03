@@ -9,7 +9,6 @@ import {
   useBoolean,
   Collapse,
 } from '@chakra-ui/react';
-import { OrderItemOption } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import {
   INFINITE_ORDER_LIST_QUERY_KEY,
@@ -23,21 +22,21 @@ import { OrderCancelDialog } from './OrderCancelDialog';
 
 export function OrderItemActionButtons({
   option,
-  hasReview,
-  goodsData,
-  orderId,
-}: {
-  option: OrderItemOption;
-  hasReview?: boolean;
-  orderId: number;
-} & OrderItemOptionInfoProps): JSX.Element {
+  orderItem,
+}: OrderItemOptionInfoProps): JSX.Element {
   const { step, purchaseConfirmationDate } = option;
+  const hasReview = !!orderItem.reviewId;
+  const { orderId } = orderItem;
+  const orderCancellation = orderItem.orderCancellationItems?.find(
+    (item) => item.orderItemOptionId === option.id,
+  );
 
   const purchaseConfirmDialog = useDisclosure();
   const returnExchangeDialog = useDisclosure();
   const orderCancelDialog = useDisclosure();
   const reviewDialog = useDisclosure();
   const goodsInquireDialog = useDisclosure();
+
   const buttonSet: {
     label: string;
     onClick: () => void;
@@ -56,7 +55,7 @@ export function OrderItemActionButtons({
       label: '주문 취소 신청',
       onClick: orderCancelDialog.onOpen,
       display: ['orderReceived', 'paymentConfirmed'].includes(step), // 상품준비 이전에만 표시
-      disabled: false,
+      disabled: !!orderCancellation,
     },
     {
       label: '교환, 반품 신청', // TODO: 교환 반품신청 페이지로 이동
@@ -155,7 +154,7 @@ export function OrderItemActionButtons({
           console.log('교환반품 신청');
         }}
       >
-        <RefundExchangeForm option={option} goodsData={goodsData} />
+        <RefundExchangeForm option={option} orderItem={orderItem} />
       </ConfirmDialog>
 
       {/* 주문취소 다이얼로그 */}

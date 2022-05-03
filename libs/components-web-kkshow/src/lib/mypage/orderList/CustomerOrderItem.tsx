@@ -41,8 +41,6 @@ export function OrderItem({
 }: {
   orderItem: OrderItemWithRelations;
 }): JSX.Element {
-  const hasReview = !!orderItem.reviewId;
-
   return (
     <>
       {/* 주문상품옵션 1개당 주문목록아이템 1개 생성 */}
@@ -56,14 +54,9 @@ export function OrderItem({
           justifyContent="space-between"
         >
           {/* 주문상품정보 */}
-          <OrderItemOptionInfo option={opt} goodsData={orderItem.goods} />
+          <OrderItemOptionInfo option={opt} orderItem={orderItem} />
           {/* 기능버튼들 */}
-          <OrderItemActionButtons
-            orderId={orderItem.orderId}
-            option={opt}
-            goodsData={orderItem.goods}
-            hasReview={hasReview}
-          />
+          <OrderItemActionButtons option={opt} orderItem={orderItem} />
         </Stack>
       ))}
     </>
