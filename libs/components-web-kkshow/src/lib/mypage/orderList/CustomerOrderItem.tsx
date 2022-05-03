@@ -59,6 +59,7 @@ export function OrderItem({
           <OrderItemOptionInfo option={opt} goodsData={orderItem.goods} />
           {/* 기능버튼들 */}
           <OrderItemActionButtons
+            orderId={orderItem.orderId}
             option={opt}
             goodsData={orderItem.goods}
             hasReview={hasReview}

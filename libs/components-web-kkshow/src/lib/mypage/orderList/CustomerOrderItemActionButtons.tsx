@@ -19,16 +19,20 @@ import { useQueryClient } from 'react-query';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import { useState } from 'react';
 import { OrderItemOptionInfo, OrderItemOptionInfoProps } from './OrderItemOptionInfo';
+import { OrderCancelDialog } from './OrderCancelDialog';
 
 export function OrderItemActionButtons({
   option,
   hasReview,
   goodsData,
+  orderId,
 }: {
   option: OrderItemOption;
   hasReview?: boolean;
+  orderId: number;
 } & OrderItemOptionInfoProps): JSX.Element {
   const { step, purchaseConfirmationDate } = option;
+
   const purchaseConfirmDialog = useDisclosure();
   const returnExchangeDialog = useDisclosure();
   const orderCancelDialog = useDisclosure();
@@ -94,7 +98,7 @@ export function OrderItemActionButtons({
   // 구매확정이후 orderlist invalidate 처리
   const queryClient = useQueryClient();
   const orderPurchaseMutation = useOrderPurchaseConfirmMutation({
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
     },
   });
@@ -102,7 +106,7 @@ export function OrderItemActionButtons({
   const purchaseConfirmRequest = async (): Promise<void> => {
     orderPurchaseMutation
       .mutateAsync({ orderItemOptionId: option.id })
-      .then((res) => {
+      .then(() => {
         toast({ title: '구매 확정 완료', status: 'success' });
       })
       .catch((e) => {
@@ -155,16 +159,11 @@ export function OrderItemActionButtons({
       </ConfirmDialog>
 
       {/* 주문취소 다이얼로그 */}
-      <ConfirmDialog
-        title="주문 취소 신청"
+      <OrderCancelDialog
         isOpen={orderCancelDialog.isOpen}
         onClose={orderCancelDialog.onClose}
-        onConfirm={async () => {
-          console.log('주문 취소 신청');
-        }}
-      >
-        <OrderCancelForm option={option} goodsData={goodsData} />
-      </ConfirmDialog>
+        orderId={orderId}
+      />
     </SimpleGrid>
   );
 }
@@ -203,22 +202,6 @@ function RefundExchangeForm(props: OrderItemOptionInfoProps): JSX.Element {
         <Collapse in={open} animateOpacity>
           <DaumPostcode onComplete={handleComplete} />
         </Collapse>
-      </Stack>
-    </Stack>
-  );
-}
-
-function OrderCancelForm(props: OrderItemOptionInfoProps): JSX.Element {
-  // useForm, handleSubmit 등은 api 작업 후 dto에 맞게 처리필요
-  return (
-    <Stack as="form">
-      <Stack>
-        <Text>주문 취소 요청 주문상품 정보</Text>
-        <OrderItemOptionInfo {...props} displayStatus={false} />
-      </Stack>
-      <Stack>
-        <Text>주문 취소 사유</Text>
-        <Input />
       </Stack>
     </Stack>
   );
