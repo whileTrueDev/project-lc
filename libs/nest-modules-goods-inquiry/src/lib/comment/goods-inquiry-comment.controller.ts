@@ -42,7 +42,7 @@ export class GoodsInquiryCommentController {
 
   /** 특정 상품 문의 답변 수정 */
   @UseGuards(JwtAuthGuard)
-  @Patch()
+  @Patch(':commentId')
   update(
     @Param('commentId', ParseIntPipe) commentId: GoodsInquiryComment['id'],
     @Body(new ValidationPipe({ transform: true })) dto: GoodsInquiryCommentDto,
@@ -52,7 +52,7 @@ export class GoodsInquiryCommentController {
 
   /** 특정 상품 문의 답변 삭제 */
   @UseGuards(JwtAuthGuard)
-  @Delete()
+  @Delete(':commentId')
   remove(
     @Param('commentId', ParseIntPipe) commentId: GoodsInquiryComment['id'],
   ): Promise<boolean> {

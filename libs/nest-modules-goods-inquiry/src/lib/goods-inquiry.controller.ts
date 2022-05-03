@@ -21,6 +21,7 @@ import {
   FindManyGoodsInquiryDto,
   GoodsInquiryCreateDto,
   GoodsInquiryUpdateDto,
+  PaginatedGoodsInquiryRes,
 } from '@project-lc/shared-types';
 import { GoodsInquiryService } from './goods-inquiry.service';
 
@@ -41,7 +42,7 @@ export class GoodsInquiryController {
   @Get()
   findMany(
     @Query(new ValidationPipe({ transform: true })) dto: FindManyGoodsInquiryDto,
-  ): Promise<FindGoodsInquiryRes> {
+  ): Promise<PaginatedGoodsInquiryRes> {
     const { goodsId, customerId, sellerId, skip, take } = dto;
     return this.goodsInquiryService.findMany(
       { goodsId, writerId: customerId, goods: { sellerId } },
