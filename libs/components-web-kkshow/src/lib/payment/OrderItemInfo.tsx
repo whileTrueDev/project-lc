@@ -13,7 +13,7 @@ import {
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { BsShopWindow } from 'react-icons/bs';
 
-interface DummyOrder {
+export interface DummyOrder {
   id: number;
   sellerId: number;
   shopName: string;

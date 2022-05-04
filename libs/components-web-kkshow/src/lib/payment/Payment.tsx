@@ -170,101 +170,101 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   };
 
   return (
-    <Box p={4}>
-      <Box
-        position="sticky"
-        top="0px"
-        left="0px"
-        right="0px"
-        pt={5}
-        backgroundColor="white"
-        h="xl"
-        as="form"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <Heading size="lg">적립혜택</Heading>
-        <Flex justifyContent="space-between" h="60px" alignItems="center">
-          {mileageSetting.mileageStrategy === 'noMileage' ? (
-            <Text>적립 혜택이 없습니다</Text>
-          ) : (
-            <>
-              <Box />
-              <MileageBenefit productPrice={PRODUCT_PRICE} mileage={watch('mileage')} />
-            </>
-          )}
-        </Flex>
-        <Divider mt={5} mb={5} />
-        <Heading size="lg">결제 예정 금액</Heading>
-        <Divider m={2} />
-        <Flex justifyContent="space-between" mt={2} mb={2}>
-          <Text>상품금액</Text>
-          <Box>
-            <Text fontWeight="bold" fontSize="xl" as="span">
-              {PRODUCT_PRICE.toLocaleString()}
-            </Text>
-            <Text as="span">원</Text>
-          </Box>
-        </Flex>
-        <Flex justifyContent="space-between" mt={2} mb={2}>
-          <Text>배송비 (선결제)</Text>
-          <Box>
-            <Text fontWeight="bold" fontSize="xl" as="span">
-              {`+ ${SHIPPING_COST.toLocaleString()}`}
-            </Text>
-            <Text as="span">원</Text>
-          </Box>
-        </Flex>
-        <Flex justifyContent="space-between" mt={2} mb={2}>
-          <Text>할인금액</Text>
-          <Box>
-            <Text fontWeight="bold" color="red" fontSize="xl" as="span">
-              {`- ${DISCOUNT.toLocaleString()}`}
-            </Text>
-            <Text color="red" as="span">
-              원
-            </Text>
-          </Box>
-        </Flex>
-        <Flex justifyContent="space-between" mt={2} mb={2}>
-          <Text>적립금 사용</Text>
-          <Box>
-            <Text fontWeight="bold" color="red" fontSize="xl" as="span">
-              {`- ${watch('mileage').toLocaleString() || 0}`}
-            </Text>
-            <Text color="red" as="span">
-              원
-            </Text>
-          </Box>
-        </Flex>
-        <Flex justifyContent="space-between" mt={2} mb={2}>
-          <Text>쿠폰 사용</Text>
-          <Box>
-            <Text fontWeight="bold" color="red" fontSize="xl" as="span">
-              {`- ${watch('couponAmount').toLocaleString() || 0}`}
-            </Text>
-            <Text color="red" as="span">
-              원
-            </Text>
-          </Box>
-        </Flex>
-        <Divider m={2} />
-        <Box mb={5}>
-          <Text as="sub">하기 필수약관을 확인하였으며, 이에 동의합니다.</Text>
+    <Box
+      p={4}
+      h="2xl"
+      position="sticky"
+      top="0px"
+      left="0px"
+      right="0px"
+      backgroundColor="white"
+      as="form"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Heading size="lg">적립혜택</Heading>
+      <Flex justifyContent="space-between" h="60px" alignItems="center">
+        {mileageSetting.mileageStrategy === 'noMileage' ? (
+          <Text>적립 혜택이 없습니다</Text>
+        ) : (
+          <>
+            <Box />
+            <MileageBenefit productPrice={PRODUCT_PRICE} mileage={watch('mileage')} />
+          </>
+        )}
+      </Flex>
+      <Divider mt={5} mb={5} />
+      <Heading size="lg">결제 예정 금액</Heading>
+      <Divider m={2} />
+      <Flex justifyContent="space-between" mt={2} mb={2}>
+        <Text>상품금액</Text>
+        <Box>
+          <Text fontWeight="bold" fontSize="xl" as="span">
+            {PRODUCT_PRICE.toLocaleString()}
+          </Text>
+          <Text as="span">원</Text>
         </Box>
-        <Center>
-          <Button type="submit" size="lg" colorScheme="blue">
-            {getOrderPrice(
-              PRODUCT_PRICE,
-              SHIPPING_COST,
-              DISCOUNT,
-              watch('couponAmount'),
-              watch('mileage'),
-            ).toLocaleString()}
-            원 결제하기
-          </Button>
-        </Center>
+      </Flex>
+      <Flex justifyContent="space-between" mt={2} mb={2}>
+        <Text>배송비 (선결제)</Text>
+        <Box>
+          <Text fontWeight="bold" fontSize="xl" as="span">
+            {`+ ${SHIPPING_COST.toLocaleString()}`}
+          </Text>
+          <Text as="span">원</Text>
+        </Box>
+      </Flex>
+      <Flex justifyContent="space-between" mt={2} mb={2}>
+        <Text>할인금액</Text>
+        <Box>
+          <Text fontWeight="bold" color="red" fontSize="xl" as="span">
+            {`- ${DISCOUNT.toLocaleString()}`}
+          </Text>
+          <Text color="red" as="span">
+            원
+          </Text>
+        </Box>
+      </Flex>
+      <Flex justifyContent="space-between" mt={2} mb={2}>
+        <Text>적립금 사용</Text>
+        <Box>
+          <Text fontWeight="bold" color="red" fontSize="xl" as="span">
+            {`- ${watch('mileage').toLocaleString() || 0}`}
+          </Text>
+          <Text color="red" as="span">
+            원
+          </Text>
+        </Box>
+      </Flex>
+      <Flex justifyContent="space-between" mt={2} mb={2}>
+        <Text>쿠폰 사용</Text>
+        <Box>
+          <Text fontWeight="bold" color="red" fontSize="xl" as="span">
+            {`- ${watch('couponAmount').toLocaleString() || 0}`}
+          </Text>
+          <Text color="red" as="span">
+            원
+          </Text>
+        </Box>
+      </Flex>
+      <Divider m={2} />
+      <Box mb={5}>
+        <Text as="sub">하기 필수약관을 확인하였으며, 이에 동의합니다.</Text>
       </Box>
-      <TermBox />
+      <Center>
+        <Button type="submit" size="lg" colorScheme="blue">
+          {getOrderPrice(
+            PRODUCT_PRICE,
+            SHIPPING_COST,
+            DISCOUNT,
+            watch('couponAmount'),
+            watch('mileage'),
+          ).toLocaleString()}
+          원 결제하기
+        </Button>
+      </Center>
+      <Box mt={6}>
+        <TermBox shopName={data[0].shopName} />
+      </Box>
     </Box>
   );
 }
@@ -404,7 +404,7 @@ export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element 
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            <TermBox />
+            <TermBox shopName={data[0].shopName} />
           </AccordionPanel>
         </AccordionItem>
       </Accordion>

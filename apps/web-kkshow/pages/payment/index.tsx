@@ -24,7 +24,7 @@ const dummyOrder = [
   {
     id: 1,
     sellerId: 1,
-    shopName: '가게가게가',
+    shopName: '가게가게가가게가게가',
     goods_name: '[음바쿠 - 김치찌개] 김치 김치찌개 김치찜 김피탕',
     consumer_price: 19200,
     image: 'https://picsum.photos/300/300',
@@ -35,7 +35,7 @@ const dummyOrder = [
   {
     id: 2,
     sellerId: 1,
-    shopName: '가게가게가',
+    shopName: '가게가게가가게가게가',
     goods_name: '[음바쿠 - 김치찌개] 된장찌개 김치찜',
     consumer_price: 39200,
     image: 'https://picsum.photos/300/301',
