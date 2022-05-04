@@ -174,6 +174,8 @@ export class OrderService extends ServiceBaseWithCache {
     if (order.giftFlag) {
       return this.removerecipientInfo(order);
     }
+
+    await this._clearCaches(this.#ORDER_CACHE_KEY);
     return order;
   }
 
@@ -385,6 +387,7 @@ export class OrderService extends ServiceBaseWithCache {
       data: updateInput,
     });
 
+    await this._clearCaches(this.#ORDER_CACHE_KEY);
     return true;
   }
 
@@ -452,6 +455,8 @@ export class OrderService extends ServiceBaseWithCache {
         data: { purchaseConfirmationDate: new Date(), step: 'purchaseConfirmed' },
       });
     }
+
+    await this._clearCaches(this.#ORDER_CACHE_KEY);
     return true;
   }
 }
