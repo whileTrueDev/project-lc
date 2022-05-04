@@ -1020,6 +1020,7 @@
       },
       "tags": []
     },
+    "nest-modules-return": "libs/nest-modules-return",
     "nest-modules-seller": {
       "root": "libs/nest-modules-seller",
       "sourceRoot": "libs/nest-modules-seller/src",
