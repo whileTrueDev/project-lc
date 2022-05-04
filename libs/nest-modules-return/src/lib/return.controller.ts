@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Query,
   UseInterceptors,
@@ -12,6 +14,7 @@ import {
   CreateReturnDto,
   CreateReturnRes,
   GetReturnListDto,
+  ReturnDetailRes,
   ReturnListRes,
 } from '@project-lc/shared-types';
 import { ReturnService } from './return.service';
@@ -25,6 +28,12 @@ export class ReturnController {
   @Post()
   createReturn(@Body(ValidationPipe) dto: CreateReturnDto): Promise<CreateReturnRes> {
     return this.returnService.createReturn(dto);
+  }
+
+  /** 특정 반품요청 상세 조회 */
+  @Get(':returnId')
+  getReturnDetail(@Param('returnId', ParseIntPipe) id: number): Promise<ReturnDetailRes> {
+    return this.returnService.getReturnDetail(id);
   }
 
   /** 반품요청 내역 조회 */

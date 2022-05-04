@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
@@ -6,10 +6,11 @@ import {
   CreateReturnDto,
   CreateReturnRes,
   GetReturnListDto,
+  ReturnDetailRes,
   ReturnListRes,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
-import { Prisma } from '@prisma/client';
+import { Prisma, Return } from '@prisma/client';
 
 @Injectable()
 export class ReturnService extends ServiceBaseWithCache {
@@ -74,7 +75,33 @@ export class ReturnService extends ServiceBaseWithCache {
     });
     return data;
   }
+
+  async findUnique(where: Prisma.ReturnWhereUniqueInput): Promise<Return> {
+    const data = await this.prisma.return.findUnique({
+      where,
+    });
+
+    if (!data)
+      throw new BadRequestException(
+        `해당 반품요청 정보가 없습니다. ${JSON.stringify(where)}`,
+      );
+    return data;
+  }
+
   /** 특정 반품요청 상세 조회 */
+  async getReturnDetail(id: number): Promise<ReturnDetailRes> {
+    await this.findUnique({ id });
+
+    return this.prisma.return.findUnique({
+      where: { id },
+      include: {
+        order: { select: { orderCode: true, id: true } },
+        items: true,
+        images: true,
+        refund: true,
+      },
+    });
+  }
   /** 반품요청 상태 변경 */
   /** 반품요청 삭제 */
 }
