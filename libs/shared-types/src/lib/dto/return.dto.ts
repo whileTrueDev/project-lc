@@ -66,10 +66,11 @@ export class CreateReturnDto {
   items: CreateReturnItemDto[];
 
   /** 반품요청시 첨부한 이미지 */
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateReturnImageDto)
-  images: CreateReturnImageDto[];
+  images?: CreateReturnImageDto[];
 }
 /** 반품요청 내역 조회 dto */
 /** 특정 반품요청 상세 조회 dto */
