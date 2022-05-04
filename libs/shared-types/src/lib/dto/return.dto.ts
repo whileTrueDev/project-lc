@@ -1,8 +1,17 @@
-import { Customer, Order, OrderItem, OrderItemOption, Seller } from '@prisma/client';
+import {
+  Customer,
+  Order,
+  OrderItem,
+  OrderItemOption,
+  ProcessStatus,
+  Refund,
+  Seller,
+} from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
@@ -100,6 +109,33 @@ export class GetReturnListDto {
   @IsOptional()
   sellerId?: Seller['id'];
 }
-/** 특정 반품요청 상세 조회 dto */
+
 /** 반품요청 상태 변경 dto */
+export class UpdateReturnDto {
+  /** 반품처리상태  */
+  @IsEnum(ProcessStatus)
+  @IsOptional()
+  status?: ProcessStatus;
+
+  /** 반품요청이 거절된 이유 */
+  @IsOptional()
+  @IsString()
+  rejectReason?: string;
+
+  /** 책임소재(판매자귀책? 구매자귀책?) */
+  @IsOptional()
+  @IsString()
+  responsibility?: string;
+
+  /** 반품메모 */
+  @IsOptional()
+  @IsString()
+  memo?: string;
+
+  /** 연결된 환불정보 고유번호 */
+  @IsNumber()
+  @IsOptional()
+  refundId?: Refund['id'];
+}
+
 /** 반품요청 삭제 dto */

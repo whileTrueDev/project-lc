@@ -6,3 +6,5 @@ export type CreateReturnRes = Return;
 export type ReturnListRes = any;
 
 export type ReturnDetailRes = any;
+
+export type UpdateReturnRes = boolean;

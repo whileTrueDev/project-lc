@@ -8,6 +8,8 @@ import {
   GetReturnListDto,
   ReturnDetailRes,
   ReturnListRes,
+  UpdateReturnDto,
+  UpdateReturnRes,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import { Prisma, Return } from '@prisma/client';
@@ -102,6 +104,21 @@ export class ReturnService extends ServiceBaseWithCache {
       },
     });
   }
-  /** 반품요청 상태 변경 */
+
+  /** 반품요청 상태 변경(판매자 혹은 관리자가 진행) */
+  async updateReturnStatus(id: number, dto: UpdateReturnDto): Promise<UpdateReturnRes> {
+    await this.findUnique({ id });
+
+    const { refundId, ...rest } = dto;
+    await this.prisma.return.update({
+      where: { id },
+      data: {
+        ...rest,
+        completeDate: dto.status && dto.status === 'complete' ? new Date() : undefined,
+        refund: refundId ? { connect: { id: refundId } } : undefined,
+      },
+    });
+    return true;
+  }
   /** 반품요청 삭제 */
 }

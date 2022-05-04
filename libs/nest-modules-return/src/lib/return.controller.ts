@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseInterceptors,
@@ -16,6 +17,8 @@ import {
   GetReturnListDto,
   ReturnDetailRes,
   ReturnListRes,
+  UpdateReturnDto,
+  UpdateReturnRes,
 } from '@project-lc/shared-types';
 import { ReturnService } from './return.service';
 
@@ -42,5 +45,14 @@ export class ReturnController {
     @Query(new ValidationPipe({ transform: true })) dto: GetReturnListDto,
   ): Promise<ReturnListRes> {
     return this.returnService.getReturnList(dto);
+  }
+
+  /** 반품요청 상태 변경(판매자 혹은 관리자가 진행) */
+  @Patch(':returnId')
+  updateReturnStatus(
+    @Param('returnId', ParseIntPipe) id: number,
+    @Body(ValidationPipe) dto: UpdateReturnDto,
+  ): Promise<UpdateReturnRes> {
+    return this.returnService.updateReturnStatus(id, dto);
   }
 }
