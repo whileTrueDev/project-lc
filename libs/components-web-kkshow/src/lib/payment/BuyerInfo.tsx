@@ -17,7 +17,7 @@ import { useFormContext } from 'react-hook-form';
 export function BuyerInfo(): JSX.Element {
   const { data: profile } = useProfile();
 
-  const { data } = useCustomerInfo(profile?.id); // profile?.id
+  const { data } = useCustomerInfo(profile?.id);
   const {
     register,
     setValue,
@@ -29,6 +29,9 @@ export function BuyerInfo(): JSX.Element {
       setValue('name', profile.name!);
       setValue('email', profile.email);
       setValue('orderPhone', data?.phone);
+      setValue('orderPhone1', data?.phone.split('-')[0]);
+      setValue('orderPhone2', data?.phone.split('-')[1]);
+      setValue('orderPhone3', data?.phone.split('-')[2]);
     }
   }, [profile, data, setValue]);
 
