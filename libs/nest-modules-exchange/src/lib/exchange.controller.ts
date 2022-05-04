@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Query,
   UseInterceptors,
@@ -11,6 +13,7 @@ import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateExchangeDto,
   CreateExchangeRes,
+  ExchangeDetailRes,
   ExchangeListRes,
   GetExchangeListDto,
 } from '@project-lc/shared-types';
@@ -27,6 +30,14 @@ export class ExchangeController {
     @Body(ValidationPipe) dto: CreateExchangeDto,
   ): Promise<CreateExchangeRes> {
     return this.exchangeService.createExchange(dto);
+  }
+
+  /** 특정 반품요청 상세 조회 */
+  @Get(':exchangeId')
+  getExchangeDetail(
+    @Param('exchangeId', ParseIntPipe) id: number,
+  ): Promise<ExchangeDetailRes> {
+    return this.exchangeService.getExchangeDetail(id);
   }
 
   /** 교환요청 내역 조회 */

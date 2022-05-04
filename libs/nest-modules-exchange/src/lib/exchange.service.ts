@@ -7,6 +7,7 @@ import {
   CreateExchangeRes,
   ExchangeListRes,
   GetExchangeListDto,
+  ReturnDetailRes,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import { Prisma } from '@prisma/client';
@@ -76,5 +77,18 @@ export class ExchangeService extends ServiceBaseWithCache {
       },
     });
     return data;
+  }
+
+  /** 특정 교환요청 상세 조회 */
+  async getExchangeDetail(id: number): Promise<ReturnDetailRes> {
+    return this.prisma.exchange.findUnique({
+      where: { id },
+      include: {
+        order: { select: { orderCode: true, id: true } },
+        exchangeItems: true,
+        images: true,
+        export: true,
+      },
+    });
   }
 }
