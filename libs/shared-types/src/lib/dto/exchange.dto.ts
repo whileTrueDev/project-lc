@@ -67,6 +67,11 @@ export class CreateExchangeDto {
   @IsOptional()
   recipientPostalCode?: string;
 
+  /** 재배송시 배송메시지 */
+  @IsString()
+  @IsOptional()
+  recipientShippingMemo?: string;
+
   /** 교환 상품들 */
   @IsArray()
   @ArrayNotEmpty()

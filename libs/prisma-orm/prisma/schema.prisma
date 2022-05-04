@@ -1784,11 +1784,12 @@ model Exchange {
   recipientAddress       String? // 재배송시 받는곳 주소 도로명
   recipientDetailAddress String? // 재배송시 주소 주소 상세
   recipientPostalCode    String? // 재배송시 주소 우편 번호
+  recipientShippingMemo  String? // 재배송시 배송메시지
   responsibility         String? // 책임소재(판매자귀책? 구매자귀책?)
   exportId               Int?                  @unique // 교환 재출고시 연결된 출고
   export                 Export?               @relation(fields: [exportId], references: [id], onDelete: SetNull) // 교환 재출고시 연결된 출고
   exchangeItems          ExchangeItem[] // 교환요청에 포함된 상품들
-  memo                   String? // 교환메모
+  memo                   String? // 교환 데이터에 대한 메모 - 관리자나 판매자가 입력한다
   images                 ExchangeImage[]
 }
 
