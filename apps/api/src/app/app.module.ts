@@ -13,9 +13,11 @@ import { CacheConfig, CsrfTokenMiddleware, mailerConfig } from '@project-lc/nest
 import { AdminModule } from '@project-lc/nest-modules-admin';
 import { AuthModule, SocialModule } from '@project-lc/nest-modules-auth';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
+import { CartModule } from '@project-lc/nest-modules-cart';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
+import { GoodsInquiryModule } from '@project-lc/nest-modules-goods-inquiry';
 import { InquiryModule } from '@project-lc/nest-modules-inquiry';
 import { PaymentModule } from '@project-lc/nest-modules-payment';
 import { JwtHelperModule } from '@project-lc/nest-modules-jwt-helper';
@@ -33,6 +35,8 @@ import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { ShippingGroupModule } from '@project-lc/nest-modules-shipping-group';
 import { PrismaModule } from '@project-lc/prisma-orm';
+import { OrderModule } from '@project-lc/nest-modules-order';
+import { GoodsReviewModule } from '@project-lc/nest-modules-goods-review';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
 
@@ -58,13 +62,17 @@ import { AppController } from './app.controller';
     GoodsModule.withControllers(),
     LiveShoppingModule.withControllers(),
     BroadcasterModule.withControllers(),
-    PolicyModule,
+    PolicyModule.withControllers(),
     KkshowMainModule.withControllers(),
     ManualModule.withControllers(),
     KkshowSearchModule.withControllers(),
     KkshowShoppingModule.withControllers(),
     CustomerModule.withControllers(),
     PaymentModule.withControllers(),
+    OrderModule.withControllers(),
+    CartModule.withControllers(),
+    GoodsInquiryModule.withControllers(),
+    GoodsReviewModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],

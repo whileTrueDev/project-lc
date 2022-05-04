@@ -11,6 +11,7 @@ export type FmOrderStatusNumString =
   | '65'
   | '70'
   | '75'
+  | '80' // '80' : 구매확정 - 임의로 추가함
   | '85'
   | '95'
   | '99';
@@ -28,6 +29,7 @@ export interface FmOrderStatus {
     | '배송중'
     | '부분배송완료'
     | '배송완료'
+    | '구매확정'
     | '결제취소'
     | '주문무효'
     | '결제실패';
@@ -46,6 +48,7 @@ export const fmOrderStatusNames = [
   '배송중',
   '부분배송완료',
   '배송완료',
+  '구매확정',
   '결제취소',
   '주문무효',
   '결제실패',
@@ -63,6 +66,7 @@ export const fmOrderStatuses: Record<FmOrderStatusNumString, FmOrderStatus> = {
   '65': { name: '배송중', chakraColor: 'purple' },
   '70': { name: '부분배송완료', chakraColor: 'messenger' },
   '75': { name: '배송완료', chakraColor: 'messenger' },
+  '80': { name: '구매확정', chakraColor: 'orange' }, // '80' : 구매확정 - 임의로 추가함
   '85': { name: '결제취소', chakraColor: 'gray' },
   '95': { name: '주문무효', chakraColor: 'gray' },
   '99': { name: '결제실패', chakraColor: 'gray' },

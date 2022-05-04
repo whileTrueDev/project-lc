@@ -31,6 +31,8 @@ import { termsData } from './seedData/terms';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
 import { dummyCustomer } from './seedData/customer';
+import { cartSample, tempUserCartItemSample } from './seedData/cart';
+import { nonMemberOrder, normalOrder } from './seedData/dummyOrder';
 
 const prisma = new PrismaClient();
 
@@ -280,6 +282,16 @@ async function genereateInitialKkshowShoppingTabData(): Promise<void> {
   }
 }
 
+async function createCartItems(): Promise<void> {
+  await prisma.cartItem.create({ data: cartSample });
+  await prisma.cartItem.create({ data: tempUserCartItemSample });
+}
+
+async function createDummyOrderData(): Promise<void> {
+  await prisma.order.create({ data: normalOrder });
+  await prisma.order.create({ data: nonMemberOrder });
+}
+
 /** 시드 메인 함수 */
 async function main(): Promise<void> {
   // 약관 데이터 저장
@@ -330,6 +342,12 @@ async function main(): Promise<void> {
   const promotionPage = await createBroadcasterPromotionPage(testbroadcaster.id);
   // 더미 상품홍보 아이템 생성
   await createProductPromotion(promotionPage.id, goods4.id);
+
+  // 더미 카트 상품 생성
+  await createCartItems();
+
+  // 더미 주문데이터 생성
+  await createDummyOrderData();
 }
 
 main()

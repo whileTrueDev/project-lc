@@ -1,6 +1,6 @@
 import { useMutation, UseMutationResult } from 'react-query';
 import { SignUpDto, AdminSignUpDto } from '@project-lc/shared-types';
-import { Broadcaster, Seller, Administrator } from '@prisma/client';
+import { Broadcaster, Seller, Administrator, Customer } from '@prisma/client';
 import { AxiosError } from 'axios';
 import axios from '../../axios';
 
@@ -34,5 +34,16 @@ export const useAdministratorSignupMutation = (): UseMutationResult<
 > => {
   return useMutation((dto: AdminSignUpDto) =>
     axios.post<Administrator>('/admin', dto).then((res) => res.data),
+  );
+};
+
+/** 소비자 생성 훅 */
+export const useCustomerSignupMutation = (): UseMutationResult<
+  Customer,
+  AxiosError,
+  SignUpDto
+> => {
+  return useMutation((dto: SignUpDto) =>
+    axios.post<Customer>('/customer', dto).then((res) => res.data),
   );
 };

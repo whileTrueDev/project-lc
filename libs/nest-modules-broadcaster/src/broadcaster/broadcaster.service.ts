@@ -176,19 +176,19 @@ export class BroadcasterService extends ServiceBaseWithCache {
   /** 방송인 정보 조회 */
   public async getBroadcaster(opt: FindBroadcasterDto): Promise<BroadcasterRes | null> {
     const { id, email } = opt;
+    const include = {
+      broadcasterAddress: true,
+      broadcasterContacts: true,
+    };
     if (id)
       return this.prisma.broadcaster.findUnique({
         where: { id: Number(id) },
-        include: {
-          broadcasterAddress: true,
-        },
+        include,
       });
     if (email)
       return this.prisma.broadcaster.findUnique({
         where: { email },
-        include: {
-          broadcasterAddress: true,
-        },
+        include,
       });
     return null;
   }
