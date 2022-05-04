@@ -26,6 +26,14 @@ export const termsData = [
     content: PRIVACY_TERMS,
   },
   {
+    version: '소비자 개인정보처리방침 1차',
+    targetUser: PolicyTarget.customer,
+    category: PolicyCategory.privacy,
+    publicFlag: true,
+    enforcementDate: new Date('2022-01-01'),
+    content: PRIVACY_TERMS,
+  },
+  {
     version: '판매자 이용약관 1차',
     targetUser: PolicyTarget.seller,
     category: PolicyCategory.termsOfService,
@@ -40,5 +48,13 @@ export const termsData = [
     publicFlag: true,
     enforcementDate: new Date('2022-01-01'),
     content: BROADCASTER_TERMS_OF_SERVICE,
+  },
+  {
+    version: '소비자 이용약관 1차',
+    targetUser: PolicyTarget.customer,
+    category: PolicyCategory.termsOfService,
+    publicFlag: true,
+    enforcementDate: new Date('2022-01-01'),
+    content: BROADCASTER_TERMS_OF_SERVICE, // 소비자용 이용약관 없어서 임의로 방송인 이용약관 넣음
   },
 ];

@@ -2,6 +2,7 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
 import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
+import { GoodsCategoryModule } from '@project-lc/nest-modules-goods-category';
 import {
   KkshowMainModule,
   KkshowShoppingModule,
@@ -13,6 +14,7 @@ import { ProductPromotionModule } from '@project-lc/nest-modules-product-promoti
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { AdminAccountService } from './admin-account.service';
 import { AdminCustomerController } from './admin-customer.controller';
+import { AdminGoodsCategoryController } from './admin-goods-category.controller';
 import { AdminKkshowMainController } from './admin-kkshow-main.controller';
 import { AdminManualController } from './admin-manual.controller';
 import { AdminPolicyController } from './admin-policy.controller';
@@ -45,6 +47,7 @@ export class AdminModule {
     AdminProductPromotionController,
     AdminKkshowMainController,
     AdminManualController,
+    AdminGoodsCategoryController,
     AdminCustomerController,
   ];
 
@@ -54,10 +57,11 @@ export class AdminModule {
     SellerModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
     GoodsModule.withoutControllers(),
-    PolicyModule,
+    PolicyModule.withoutControllers(),
     KkshowMainModule.withoutControllers(),
     ManualModule.withoutControllers(),
     KkshowShoppingModule.withoutControllers(),
+    GoodsCategoryModule.withoutControllers(),
     CustomerModule.withoutControllers(),
   ];
 
