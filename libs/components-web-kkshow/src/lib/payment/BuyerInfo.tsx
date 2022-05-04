@@ -14,14 +14,13 @@ import { PaymentPageDto } from '@project-lc/shared-types';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-export function BuyerInfoSection(): JSX.Element {
+export function BuyerInfo(): JSX.Element {
   const { data: profile } = useProfile();
 
   const { data } = useCustomerInfo(profile?.id); // profile?.id
   const {
     register,
     setValue,
-
     formState: { errors },
   } = useFormContext<PaymentPageDto>();
 
@@ -31,11 +30,11 @@ export function BuyerInfoSection(): JSX.Element {
       setValue('email', profile.email);
       setValue('orderPhone', data?.phone);
     }
-  }, []);
+  }, [profile, data, setValue]);
 
   return (
     <Box>
-      <Heading>구매자정보</Heading>
+      <Heading size="lg">구매자정보</Heading>
       <Divider m={2} />
       {data ? (
         <>
@@ -54,35 +53,45 @@ export function BuyerInfoSection(): JSX.Element {
         </>
       ) : (
         <>
-          <Flex direction="column">
-            <Text fontWeight="bold">이름</Text>
-            <Input
-              w={{ base: '100%', md: '25%' }}
-              placeholder="주문자명"
-              {...register('name', {
-                required: {
-                  value: true,
-                  message: '주문자의 이름을 입력해주세요(2글자 이상)',
-                },
-                minLength: 2,
-              })}
-            />
-          </Flex>
-          <Flex direction="column">
-            <Text fontWeight="bold">이메일</Text>
-            <Input
-              w={{ base: '100%', md: '35%' }}
-              type="email"
-              placeholder="minsu@example.com"
-              {...register('email', {
-                required: {
-                  value: true,
-                  message: '이메일을 작성해주세요',
-                },
-                minLength: 2,
-              })}
-            />
-          </Flex>
+          <FormControl isInvalid={!!errors.name}>
+            <Flex direction="column">
+              <Text fontWeight="bold">이름</Text>
+              <Input
+                w={{ base: '100%', md: '25%' }}
+                placeholder="주문자명"
+                {...register('name', {
+                  required: {
+                    value: true,
+                    message: '주문자의 이름을 입력해주세요(2글자 이상)',
+                  },
+                  minLength: 2,
+                })}
+              />
+              <FormErrorMessage mt={0}>
+                {errors.name && errors.name.message}
+              </FormErrorMessage>
+            </Flex>
+          </FormControl>
+          <FormControl isInvalid={!!errors.name}>
+            <Flex direction="column">
+              <Text fontWeight="bold">이메일</Text>
+              <Input
+                w={{ base: '100%', md: '35%' }}
+                type="email"
+                placeholder="minsu@example.com"
+                {...register('email', {
+                  required: {
+                    value: true,
+                    message: '이메일을 작성해주세요',
+                  },
+                  minLength: 2,
+                })}
+              />
+              <FormErrorMessage mt={0}>
+                {errors.email && errors.email.message}
+              </FormErrorMessage>
+            </Flex>
+          </FormControl>
           <Flex direction="column">
             <Text fontWeight="bold">휴대전화번호</Text>
             <FormControl

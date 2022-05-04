@@ -1,5 +1,17 @@
-import { Box, Heading, Grid, GridItem, Text, Link, Flex, Center } from '@chakra-ui/react';
+import {
+  Box,
+  Heading,
+  Grid,
+  GridItem,
+  Text,
+  Link,
+  Flex,
+  Center,
+  Divider,
+  HStack,
+} from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import { BsShopWindow } from 'react-icons/bs';
 
 interface DummyOrder {
   id: number;
@@ -17,13 +29,17 @@ export function OrderItemInfo({ data }: { data: DummyOrder[] }): JSX.Element {
   const dummyOrder = data;
   return (
     <Box>
-      <Heading>주문상품</Heading>
+      <Heading size="lg">주문상품</Heading>
+      <Divider m={2} />
 
       {dummyOrder.map((item) => (
         <Box key={item.id}>
           <Grid templateColumns="repeat(10, 1fr)">
             <GridItem colSpan={10}>
-              <Text>판매자 : {item.shopName}</Text>
+              <HStack>
+                <BsShopWindow />
+                <Text>{item.shopName}</Text>
+              </HStack>
             </GridItem>
             <GridItem colSpan={5} mb={4}>
               <Link
@@ -82,15 +98,18 @@ export function MobileOrderItemInfo({ data }: { data: DummyOrder[] }): JSX.Eleme
   const dummyOrder = data;
   return (
     <Box>
-      <Heading>주문상품</Heading>
-
+      <Heading size="lg">주문상품</Heading>
+      <Divider m={2} />
       {dummyOrder.map((item) => (
         <Box key={item.id}>
           <Grid templateColumns="repeat(10, 1fr)">
             <GridItem colSpan={10}>
-              <Text>판매자 : {item.shopName}</Text>
+              <HStack>
+                <BsShopWindow />
+                <Text>{item.shopName}</Text>
+              </HStack>
             </GridItem>
-            <GridItem colSpan={3} mb={4}>
+            <GridItem colSpan={2} mb={4}>
               <Link
                 w="100%"
                 isTruncated
@@ -108,7 +127,12 @@ export function MobileOrderItemInfo({ data }: { data: DummyOrder[] }): JSX.Eleme
               </Link>
               <Flex />
             </GridItem>
-            <GridItem colSpan={7}>
+            <GridItem
+              colSpan={8}
+              overflow="hidden"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+            >
               <Link
                 w="100%"
                 isTruncated
@@ -117,9 +141,11 @@ export function MobileOrderItemInfo({ data }: { data: DummyOrder[] }): JSX.Eleme
                 colorScheme="blue"
                 isExternal
               >
-                <Text fontSize="sm">{item.goods_name}</Text>
+                <Text fontSize="xs" ml={1}>
+                  {item.goods_name}
+                </Text>
               </Link>
-              <Flex direction="column" mt={3}>
+              <Flex direction="column" ml={1}>
                 <Flex fontSize="xs">
                   <Text>옵션:</Text>
                   <Text>{item.option_title}</Text>
@@ -128,7 +154,10 @@ export function MobileOrderItemInfo({ data }: { data: DummyOrder[] }): JSX.Eleme
                   <Text>구매수량:</Text>
                   <Text>{item.number}개</Text>
                 </Flex>
-                <Text fontWeight="bold">{item.consumer_price.toLocaleString()}원</Text>
+                <Flex justifyContent="space-between">
+                  <Box />
+                  <Text fontWeight="bold">{item.consumer_price.toLocaleString()}원</Text>
+                </Flex>
               </Flex>
             </GridItem>
           </Grid>

@@ -10,6 +10,7 @@ import {
   ModalContent,
   ModalBody,
   useDisclosure,
+  Divider,
 } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
@@ -23,7 +24,7 @@ const dummyCoupon = [
   { id: 3, name: '10000원 할인 쿠폰', amount: 10000 },
 ];
 
-export function DiscountBox(): JSX.Element {
+export function Discount(): JSX.Element {
   const MAX_MILEAGE = 1100;
   const [mileage, setMileage] = useState(0);
   const { setValue, getValues, watch } = useFormContext<PaymentPageDto>();
@@ -69,7 +70,7 @@ export function DiscountBox(): JSX.Element {
 
   return (
     <Flex direction="column" justifyContent="space-evenly" h="xs">
-      <Heading>할인/적립금</Heading>
+      <Heading size="lg">할인/적립금</Heading>
       <Flex direction="column">
         <Text mb={3}>쿠폰할인</Text>
         <Flex alignItems="center">

@@ -1,20 +1,21 @@
 import { useEffect } from 'react';
-import { Grid, GridItem, Flex } from '@chakra-ui/react';
+import { Grid, GridItem, Flex, Text } from '@chakra-ui/react';
 import {
   PaymentBox,
   MobilePaymentBox,
-} from '@project-lc/components-web-kkshow/payment/PaymentBox';
+} from '@project-lc/components-web-kkshow/payment/Payment';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
-import { BuyerInfoSection } from '@project-lc/components-web-kkshow/payment/BuyerInfoSection';
-import { DestinationInfo } from '@project-lc/components-web-kkshow/payment/DestinationInfo';
-import { GiftBox } from '@project-lc/components-web-kkshow/payment/GiftBox';
+import { BuyerInfo } from '@project-lc/components-web-kkshow/payment/BuyerInfo';
+import { DeliveryAddress } from '@project-lc/components-web-kkshow/payment/DeliveryAddress';
+import { GiftBox } from '@project-lc/components-web-kkshow/payment/Gift';
 import {
   OrderItemInfo,
   MobileOrderItemInfo,
 } from '@project-lc/components-web-kkshow/payment/OrderItemInfo';
 import { useDisplaySize, useProfile } from '@project-lc/hooks';
-import { DiscountBox } from '@project-lc/components-web-kkshow/payment/DiscountBox';
+import { Discount } from '@project-lc/components-web-kkshow/payment/Discount';
 import { useForm, FormProvider } from 'react-hook-form';
+import { PaymentSelection } from '@project-lc/components-web-kkshow/payment/PaymentSelection';
 import { PaymentPageDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 
@@ -23,7 +24,7 @@ const dummyOrder = [
     id: 1,
     sellerId: 1,
     shopName: '가게가게가',
-    goods_name: '[음바쿠 - 김치찌개] 김치 김치찌개 김치찜',
+    goods_name: '[음바쿠 - 김치찌개] 김치 김치찌개 김치찜 김피탕',
     consumer_price: 19200,
     image: 'https://picsum.photos/300/300',
     option_title: '매운맛',
@@ -87,9 +88,9 @@ export function Payment(): JSX.Element {
       <FormProvider {...methods}>
         {isDesktopSize ? (
           <Flex m="auto" p={6} alignItems="center" justifyContent="center">
-            <Grid templateColumns="repeat(7, 4fr)" gap={6} w="70%">
+            <Grid templateColumns="repeat(7, 6fr)" gap={6} w="70%">
               <GridItem colSpan={5}>
-                <BuyerInfoSection />
+                <BuyerInfo />
               </GridItem>
               <GridItem
                 rowSpan={4}
@@ -100,33 +101,53 @@ export function Payment(): JSX.Element {
                 <PaymentBox data={dummyOrder} />
               </GridItem>
               <GridItem colSpan={5}>
-                {purchaseType === 'gift' ? <GiftBox /> : <DestinationInfo />}
+                {purchaseType === 'gift' ? <GiftBox /> : <DeliveryAddress />}
               </GridItem>
               <GridItem colSpan={5}>
                 <OrderItemInfo data={dummyOrder} />
               </GridItem>
               <GridItem colSpan={5}>
-                <DiscountBox />
+                <Discount />
+              </GridItem>
+              <GridItem colSpan={5}>
+                <PaymentSelection />
+              </GridItem>
+              <GridItem colSpan={5}>
+                <Text variant="abbr" fontSize="sm">
+                  와일트루는 통신판매중개자로서 오픈마켓 크크쇼의 거래당사자가 아니며,
+                  입점판매자가 등록한 상품정보 및 거래에 대해 와일트루는 일체 책임을 지지
+                  않습니다.
+                </Text>
               </GridItem>
             </Grid>
           </Flex>
         ) : (
           <Flex m="auto" p={6}>
-            <Grid templateColumns="repeat(7, 4fr)" gap={6}>
+            <Grid templateColumns="repeat(7, 6fr)" gap={6}>
               <GridItem colSpan={7}>
-                <BuyerInfoSection />
+                <BuyerInfo />
               </GridItem>
               <GridItem colSpan={7}>
-                {purchaseType === 'gift' ? <GiftBox /> : <DestinationInfo />}
+                {purchaseType === 'gift' ? <GiftBox /> : <DeliveryAddress />}
               </GridItem>
               <GridItem colSpan={7}>
                 <MobileOrderItemInfo data={dummyOrder} />
               </GridItem>
               <GridItem colSpan={7}>
-                <DiscountBox />
+                <Discount />
+              </GridItem>
+              <GridItem colSpan={7}>
+                <PaymentSelection />
               </GridItem>
               <GridItem colSpan={7} rowSpan={1}>
                 <MobilePaymentBox data={dummyOrder} />
+              </GridItem>
+              <GridItem colSpan={7}>
+                <Text variant="abbr" fontSize="sm">
+                  와일트루는 통신판매중개자로서 오픈마켓 크크쇼의 거래당사자가 아니며,
+                  입점판매자가 등록한 상품정보 및 거래에 대해 와일트루는 일체 책임을 지지
+                  않습니다.
+                </Text>
               </GridItem>
             </Grid>
           </Flex>

@@ -10,7 +10,7 @@ export function GiftBox(): JSX.Element {
 
   return (
     <Box>
-      <Heading>선물정보</Heading>
+      <Heading size="lg">선물정보</Heading>
       <Box mb={3}>
         <Text>방송인에게 선물하기를 하시면</Text>
         <Text>배송지를 입력하지 않아도 방송인에게 배송이 됩니다.</Text>

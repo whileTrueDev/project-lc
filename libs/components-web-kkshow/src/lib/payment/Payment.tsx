@@ -10,14 +10,16 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Divider,
+  useToast,
 } from '@chakra-ui/react';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
-import { HtmlStringBox } from '@project-lc/components-core/TermBox';
-import { useTerms } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 import { useFormContext, SubmitHandler } from 'react-hook-form';
 import { PaymentPageDto } from '@project-lc/shared-types';
+import { useKkshowOrder } from '@project-lc/stores';
+import { getCustomerWebHost } from '@project-lc/utils';
 import { TermBox } from './TermBox';
 
 interface DummyOrder {
@@ -32,6 +34,11 @@ interface DummyOrder {
   shipping_cost: number;
 }
 
+const mileageSetting = {
+  defaultMileagePercent: 10,
+  mileageStrategy: 'onPaymentPrice',
+};
+
 function getOrderPrice(
   originalPrice: number,
   shippingCost: number,
@@ -42,8 +49,33 @@ function getOrderPrice(
   return originalPrice + shippingCost - discount - mileageDiscount - couponDiscount;
 }
 
+async function doPayment(
+  paymentType: '카드' | '계좌이체' | '가상계좌' | '미선택',
+  client_key: string,
+  price: number,
+  shipping_cost: number,
+  discount: number,
+  mileage: number,
+  coupon: number,
+  productName: string,
+  customerName: string,
+): Promise<void> {
+  loadTossPayments(client_key).then((tossPayments) => {
+    tossPayments.requestPayment(paymentType, {
+      amount: getOrderPrice(price, shipping_cost, discount, mileage, coupon),
+      orderId: `${dayjs().format('YYYYMMDDHHmmssSSS')}${nanoid(6)}`,
+      orderName: `${productName}`,
+      customerName,
+      successUrl: `${getCustomerWebHost()}/payment/success`,
+      failUrl: `${getCustomerWebHost()}/payment/fail`,
+    });
+  });
+}
+
 export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
+  const { paymentType } = useKkshowOrder();
+  const toast = useToast();
   /** 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경 */
   const PRODUCT_PRICE = data
     .map((item) => item.consumer_price)
@@ -52,7 +84,6 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
     .map((item) => item.shipping_cost)
     .reduce((prev: number, curr: number) => prev + curr, 0);
   const DISCOUNT = 3000;
-
   const productNameArray = data.map((item) => item.goods_name);
   let productName = '';
 
@@ -63,43 +94,46 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   }
 
   const { handleSubmit, watch, getValues } = useFormContext<PaymentPageDto>();
-
   const onSubmit: SubmitHandler<PaymentPageDto> = () => {
-    console.log(
-      getValues('customerId'),
-      getValues('name'),
-      getValues('recipient'),
-      `${getValues('recipientPhone1')} - ${getValues('recipientPhone2')} - ${getValues(
-        'recipientPhone3',
-      )}`,
-      getValues('postalCode'),
-      getValues('address'),
-      getValues('detailAddress'),
-      getValues('goods_id'),
-      getValues('optionId'),
-      getValues('number'),
-      getValues('shipping_cost'),
-      getValues('mileage'),
-      getValues('couponId'),
-      getValues('couponAmount'),
-      getValues('discount'),
-    );
-    loadTossPayments(CLIENT_KEY).then((tossPayments) => {
-      tossPayments.requestPayment('카드', {
-        amount: getOrderPrice(
-          PRODUCT_PRICE,
-          SHIPPING_COST,
-          DISCOUNT,
-          getValues('mileage'),
-          getValues('couponAmount'),
-        ),
-        orderId: `${(dayjs().format('YYYYMMDDHHmmssSSS'), nanoid(6))}`,
-        orderName: `${productName}`,
-        customerName: getValues('name'),
-        successUrl: `http://localhost:4000/payment/success`,
-        failUrl: `http://localhost:4000/payment/fail`,
+    if (paymentType === '미선택') {
+      toast({
+        title: '결제수단을 선택해주세요',
+        status: 'error',
+        position: 'top',
       });
-    });
+    } else {
+      // 주문연결이후 지우기
+      console.log(
+        getValues('customerId'),
+        getValues('name'),
+        getValues('recipient'),
+        `${getValues('recipientPhone1')} - ${getValues('recipientPhone2')} - ${getValues(
+          'recipientPhone3',
+        )}`,
+        getValues('postalCode'),
+        getValues('address'),
+        getValues('detailAddress'),
+        getValues('goods_id'),
+        getValues('optionId'),
+        getValues('number'),
+        getValues('shipping_cost'),
+        getValues('mileage'),
+        getValues('couponId'),
+        getValues('couponAmount'),
+        getValues('discount'),
+      );
+      doPayment(
+        paymentType,
+        CLIENT_KEY,
+        PRODUCT_PRICE,
+        SHIPPING_COST,
+        DISCOUNT,
+        getValues('mileage'),
+        getValues('couponAmount'),
+        productName,
+        getValues('name'),
+      );
+    }
   };
 
   return (
@@ -111,11 +145,39 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
         right="0px"
         pt={5}
         backgroundColor="white"
-        h="sm"
+        h="xl"
         as="form"
         onSubmit={handleSubmit(onSubmit)}
       >
+        <Heading size="lg">적립혜택</Heading>
+        <Flex justifyContent="space-between" h="60px" alignItems="center">
+          {mileageSetting.mileageStrategy === 'noMileage' ? (
+            <Text>적립 혜택이 없습니다</Text>
+          ) : (
+            <>
+              <Box />
+              <Box>
+                <Text as="span" fontWeight="bold">
+                  {mileageSetting.mileageStrategy === 'onPaymentPrice' &&
+                    (
+                      PRODUCT_PRICE *
+                      (mileageSetting.defaultMileagePercent * 0.01)
+                    ).toLocaleString()}
+                  {mileageSetting.mileageStrategy ===
+                    'onPaymentPriceExceptMileageUsage' &&
+                    (
+                      (PRODUCT_PRICE - watch('mileage')) *
+                      (mileageSetting.defaultMileagePercent * 0.01)
+                    ).toLocaleString()}
+                </Text>
+                <Text as="span">원</Text>
+              </Box>
+            </>
+          )}
+        </Flex>
+        <Divider mt={5} mb={5} />
         <Heading size="lg">결제 예정 금액</Heading>
+        <Divider m={2} />
         <Flex justifyContent="space-between" mt={2} mb={2}>
           <Text>상품금액</Text>
           <Box>
@@ -167,6 +229,7 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
             </Text>
           </Box>
         </Flex>
+        <Divider m={2} />
         <Box mb={5}>
           <Text as="sub">하기 필수약관을 확인하였으며, 이에 동의합니다.</Text>
         </Box>
@@ -191,6 +254,8 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
 export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   const { watch, getValues, handleSubmit } = useFormContext<PaymentPageDto>();
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
+  const { paymentType } = useKkshowOrder();
+  const toast = useToast();
   /** 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경 */
   const PRODUCT_PRICE = 19000;
   const SHIPPING_COST = 3000;
@@ -206,44 +271,72 @@ export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element 
   }
 
   const onSubmit: SubmitHandler<PaymentPageDto> = () => {
-    console.log(
-      getValues('customerId'),
-      getValues('name'),
-      getValues('recipient'),
-      `${getValues('recipientPhone1')} - ${getValues('recipientPhone2')} - ${getValues(
-        'recipientPhone3',
-      )}`,
-      getValues('postalCode'),
-      getValues('address'),
-      getValues('detailAddress'),
-      getValues('goods_id'),
-      getValues('optionId'),
-      getValues('number'),
-      getValues('shipping_cost'),
-      getValues('mileage'),
-      getValues('couponId'),
-      getValues('couponAmount'),
-      getValues('discount'),
-    );
-    loadTossPayments(CLIENT_KEY).then((tossPayments) => {
-      tossPayments.requestPayment('카드', {
-        amount: getOrderPrice(
-          PRODUCT_PRICE,
-          SHIPPING_COST,
-          DISCOUNT,
-          getValues('mileage'),
-          getValues('couponAmount'),
-        ),
-        orderId: `${(dayjs().format('YYYYMMDDHHmmssSSS'), nanoid(6))}`,
-        orderName: `${productName}`,
-        customerName: getValues('name'),
-        successUrl: `http://localhost:4000/payment/success`,
-        failUrl: `http://localhost:4000/payment/fail`,
+    if (paymentType === '미선택') {
+      toast({
+        title: '결제수단을 선택해주세요',
+        status: 'error',
       });
-    });
+    } else {
+      // 주문연결이후 지우기
+      console.log(
+        getValues('customerId'),
+        getValues('name'),
+        getValues('recipient'),
+        `${getValues('recipientPhone1')} - ${getValues('recipientPhone2')} - ${getValues(
+          'recipientPhone3',
+        )}`,
+        getValues('postalCode'),
+        getValues('address'),
+        getValues('detailAddress'),
+        getValues('goods_id'),
+        getValues('optionId'),
+        getValues('number'),
+        getValues('shipping_cost'),
+        getValues('mileage'),
+        getValues('couponId'),
+        getValues('couponAmount'),
+        getValues('discount'),
+      );
+      doPayment(
+        paymentType,
+        CLIENT_KEY,
+        PRODUCT_PRICE,
+        SHIPPING_COST,
+        DISCOUNT,
+        getValues('mileage'),
+        getValues('couponAmount'),
+        productName,
+        getValues('name'),
+      );
+    }
   };
   return (
     <Box w="100%" as="form" onSubmit={handleSubmit(onSubmit)}>
+      <Heading size="lg">적립혜택</Heading>
+      <Flex justifyContent="space-between" h="60px" alignItems="center">
+        {mileageSetting.mileageStrategy === 'noMileage' ? (
+          <Text>적립 혜택이 없습니다</Text>
+        ) : (
+          <>
+            <Box />
+            <Box>
+              <Text as="span" fontWeight="bold">
+                {mileageSetting.mileageStrategy === 'onPaymentPrice' &&
+                  (
+                    PRODUCT_PRICE *
+                    (mileageSetting.defaultMileagePercent * 0.01)
+                  ).toLocaleString()}
+                {mileageSetting.mileageStrategy === 'onPaymentPriceExceptMileageUsage' &&
+                  (
+                    (PRODUCT_PRICE - watch('mileage')) *
+                    (mileageSetting.defaultMileagePercent * 0.01)
+                  ).toLocaleString()}
+              </Text>
+              <Text as="span">원</Text>
+            </Box>
+          </>
+        )}
+      </Flex>
       <Heading size="lg">결제 예정 금액</Heading>
       <Flex justifyContent="space-between" mt={2} mb={2}>
         <Text>상품금액</Text>
@@ -329,5 +422,3 @@ export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element 
     </Box>
   );
 }
-
-export default PaymentBox;
