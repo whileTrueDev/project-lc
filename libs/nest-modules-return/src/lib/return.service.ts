@@ -5,6 +5,7 @@ import { Cache } from 'cache-manager';
 import {
   CreateReturnDto,
   CreateReturnRes,
+  DeleteReturnRes,
   GetReturnListDto,
   ReturnDetailRes,
   ReturnListRes,
@@ -13,6 +14,7 @@ import {
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import { Prisma, Return } from '@prisma/client';
+import { throwIfEmpty } from 'rxjs';
 
 @Injectable()
 export class ReturnService extends ServiceBaseWithCache {
@@ -120,5 +122,17 @@ export class ReturnService extends ServiceBaseWithCache {
     });
     return true;
   }
+
   /** 반품요청 삭제 */
+  async deleteReturn(id: number): Promise<DeleteReturnRes> {
+    const data = await this.findUnique({ id });
+    if (data.status !== 'requested') {
+      throw new BadRequestException(`처리되기 이전에만 삭제가 가능합니다`);
+    }
+
+    await this.prisma.return.delete({
+      where: { id },
+    });
+    return true;
+  }
 }

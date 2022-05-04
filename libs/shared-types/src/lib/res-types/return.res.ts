@@ -8,3 +8,5 @@ export type ReturnListRes = any;
 export type ReturnDetailRes = any;
 
 export type UpdateReturnRes = boolean;
+
+export type DeleteReturnRes = boolean;

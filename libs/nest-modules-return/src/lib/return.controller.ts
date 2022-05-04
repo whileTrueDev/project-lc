@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -14,6 +15,7 @@ import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateReturnDto,
   CreateReturnRes,
+  DeleteReturnRes,
   GetReturnListDto,
   ReturnDetailRes,
   ReturnListRes,
@@ -54,5 +56,11 @@ export class ReturnController {
     @Body(ValidationPipe) dto: UpdateReturnDto,
   ): Promise<UpdateReturnRes> {
     return this.returnService.updateReturnStatus(id, dto);
+  }
+
+  /** 반품요청 삭제 */
+  @Delete(':returnId')
+  deleteReturn(@Param('returnId', ParseIntPipe) id: number): Promise<DeleteReturnRes> {
+    return this.returnService.deleteReturn(id);
   }
 }

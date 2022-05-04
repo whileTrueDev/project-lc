@@ -137,5 +137,3 @@ export class UpdateReturnDto {
   @IsOptional()
   refundId?: Refund['id'];
 }
-
-/** 반품요청 삭제 dto */
