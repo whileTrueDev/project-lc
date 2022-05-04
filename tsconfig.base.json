@@ -42,6 +42,9 @@
       "@project-lc/nest-modules-goods-inquiry": [
         "libs/nest-modules-goods-inquiry/src/index.ts"
       ],
+      "@project-lc/nest-modules-goods-review": [
+        "libs/nest-modules-goods-review/src/index.ts"
+      ],
       "@project-lc/nest-modules-inquiry": ["libs/nest-modules-inquiry/src/index.ts"],
       "@project-lc/nest-modules-jwt-helper": [
         "libs/nest-modules-jwt-helper/src/index.ts"
