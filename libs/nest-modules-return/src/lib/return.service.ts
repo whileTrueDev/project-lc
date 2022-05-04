@@ -14,7 +14,6 @@ import {
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import { Prisma, Return } from '@prisma/client';
-import { throwIfEmpty } from 'rxjs';
 
 @Injectable()
 export class ReturnService extends ServiceBaseWithCache {
@@ -52,6 +51,7 @@ export class ReturnService extends ServiceBaseWithCache {
       },
     });
 
+    await this._clearCaches(this.#RETURN_CACHE_KEY);
     return data;
   }
 
@@ -120,6 +120,8 @@ export class ReturnService extends ServiceBaseWithCache {
         refund: refundId ? { connect: { id: refundId } } : undefined,
       },
     });
+
+    await this._clearCaches(this.#RETURN_CACHE_KEY);
     return true;
   }
 
@@ -133,6 +135,7 @@ export class ReturnService extends ServiceBaseWithCache {
     await this.prisma.return.delete({
       where: { id },
     });
+    await this._clearCaches(this.#RETURN_CACHE_KEY);
     return true;
   }
 }
