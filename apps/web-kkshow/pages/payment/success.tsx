@@ -1,9 +1,9 @@
-import { Box, Button } from '@chakra-ui/react';
-import { loadTossPayments } from '@tosspayments/payment-sdk';
+import { Box } from '@chakra-ui/react';
 import { usePaymentMutation } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
+// todo: 주문 연결
 export function Success(): JSX.Element {
   const router = useRouter();
 

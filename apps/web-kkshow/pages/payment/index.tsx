@@ -19,6 +19,7 @@ import { PaymentSelection } from '@project-lc/components-web-kkshow/payment/Paym
 import { PaymentPageDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 
+// todo: 주문 연결
 const dummyOrder = [
   {
     id: 1,

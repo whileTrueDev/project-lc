@@ -10,7 +10,6 @@ import {
   ModalContent,
   ModalBody,
   useDisclosure,
-  Divider,
   ModalFooter,
 } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
@@ -19,6 +18,7 @@ import { GridRowData } from '@material-ui/data-grid';
 import { useState } from 'react';
 import { PaymentPageDto } from '@project-lc/shared-types';
 
+// todo : 쿠폰 crud 이후 디비에서 가져오도록 변경
 const dummyCoupon = [
   { id: 1, name: '3000원 할인 쿠폰', amount: 3000 },
   { id: 2, name: '5000원 할인 쿠폰', amount: 5000 },
@@ -200,7 +200,7 @@ export function Discount(): JSX.Element {
             <Button colorScheme="blue" mr={3}>
               검색
             </Button>
-            {/** 검색하면, 쿠폰이 뜨고, 쿠폰을 선택하면 getValues('couponAmount') 되로록 구성 */}
+            {/** todo: 검색하면, 쿠폰이 뜨고, 쿠폰을 선택하면 getValues('couponAmount') 되로록 구성 */}
             <Button onClick={couponSearchOnClose}>취소</Button>
           </ModalFooter>
         </ModalContent>

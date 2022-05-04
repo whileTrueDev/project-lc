@@ -2,7 +2,8 @@ import { Box, Text } from '@chakra-ui/react';
 import { HtmlStringBox } from '@project-lc/components-core/TermBox';
 import { useTerms } from '@project-lc/hooks';
 
-/** 추후 약관 정의시 내용 변경 필요 */
+// TODO: 약관 정의 이후 내용 변경
+
 export function TermBox(): JSX.Element {
   return (
     <Box>

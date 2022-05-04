@@ -79,6 +79,7 @@ export function MileageBenefit({
   productPrice: number;
   mileage: number;
 }): JSX.Element {
+  // TODO: 마일리지 crud 일감 이후 디비에서 불러오도록 수정 필요
   return (
     <Flex justifyContent="space-between" h="60px" alignItems="center">
       {mileageSetting.mileageStrategy === 'noMileage' ? (
@@ -134,7 +135,7 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
         position: 'top',
       });
     } else {
-      // 주문연결이후 지우기
+      // ToDO: 주문연결이후 지우기
       console.log(
         getValues('customerId'),
         getValues('name'),
@@ -294,7 +295,7 @@ export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element 
         status: 'error',
       });
     } else {
-      // 주문연결이후 지우기
+      // todo: 주문연결이후 지우기
       console.log(
         getValues('customerId'),
         getValues('name'),
