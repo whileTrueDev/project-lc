@@ -72,6 +72,38 @@ async function doPayment(
   });
 }
 
+export function MileageBenefit({
+  productPrice,
+  mileage,
+}: {
+  productPrice: number;
+  mileage: number;
+}): JSX.Element {
+  return (
+    <Flex justifyContent="space-between" h="60px" alignItems="center">
+      {mileageSetting.mileageStrategy === 'noMileage' ? (
+        <Text>적립 혜택이 없습니다</Text>
+      ) : (
+        <Box>
+          <Text as="span" fontWeight="bold">
+            {mileageSetting.mileageStrategy === 'onPaymentPrice' &&
+              (
+                productPrice *
+                (mileageSetting.defaultMileagePercent * 0.01)
+              ).toLocaleString()}
+            {mileageSetting.mileageStrategy === 'onPaymentPriceExceptMileageUsage' &&
+              (
+                (productPrice - mileage) *
+                (mileageSetting.defaultMileagePercent * 0.01)
+              ).toLocaleString()}
+          </Text>
+          <Text as="span">원 적립예정</Text>
+        </Box>
+      )}
+    </Flex>
+  );
+}
+
 export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
   const { paymentType } = useKkshowOrder();
@@ -156,22 +188,7 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
           ) : (
             <>
               <Box />
-              <Box>
-                <Text as="span" fontWeight="bold">
-                  {mileageSetting.mileageStrategy === 'onPaymentPrice' &&
-                    (
-                      PRODUCT_PRICE *
-                      (mileageSetting.defaultMileagePercent * 0.01)
-                    ).toLocaleString()}
-                  {mileageSetting.mileageStrategy ===
-                    'onPaymentPriceExceptMileageUsage' &&
-                    (
-                      (PRODUCT_PRICE - watch('mileage')) *
-                      (mileageSetting.defaultMileagePercent * 0.01)
-                    ).toLocaleString()}
-                </Text>
-                <Text as="span">원</Text>
-              </Box>
+              <MileageBenefit productPrice={PRODUCT_PRICE} mileage={watch('mileage')} />
             </>
           )}
         </Flex>
@@ -319,21 +336,7 @@ export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element 
         ) : (
           <>
             <Box />
-            <Box>
-              <Text as="span" fontWeight="bold">
-                {mileageSetting.mileageStrategy === 'onPaymentPrice' &&
-                  (
-                    PRODUCT_PRICE *
-                    (mileageSetting.defaultMileagePercent * 0.01)
-                  ).toLocaleString()}
-                {mileageSetting.mileageStrategy === 'onPaymentPriceExceptMileageUsage' &&
-                  (
-                    (PRODUCT_PRICE - watch('mileage')) *
-                    (mileageSetting.defaultMileagePercent * 0.01)
-                  ).toLocaleString()}
-              </Text>
-              <Text as="span">원</Text>
-            </Box>
+            <MileageBenefit productPrice={PRODUCT_PRICE} mileage={watch('mileage')} />
           </>
         )}
       </Flex>
