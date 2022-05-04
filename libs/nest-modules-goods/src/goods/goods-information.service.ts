@@ -63,4 +63,13 @@ export class GoodsInformationService {
       },
     });
   }
+
+  /** 상품 제공 고시 품목 찾기 */
+  async findGoodsInformationSubject(id: number): Promise<GoodsInformationSubject> {
+    return this.prisma.goodsInformationSubject.findFirst({
+      where: {
+        id,
+      },
+    });
+  }
 }

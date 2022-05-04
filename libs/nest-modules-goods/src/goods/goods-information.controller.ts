@@ -2,10 +2,12 @@ import {
   Body,
   Controller,
   Post,
+  Get,
   Put,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
+  Query,
 } from '@nestjs/common';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
@@ -21,6 +23,18 @@ import { GoodsInformationService } from './goods-information.service';
 @Controller('goods-information')
 export class GoodsInformationController {
   constructor(private readonly goodsInformationService: GoodsInformationService) {}
+
+  @Get('/goods-information-subject')
+  findGoodsInformationSubjetct(
+    @Query('goodInformationSubjectId', ValidationPipe)
+    dto: {
+      goodInformationSubjectId: number;
+    },
+  ): Promise<GoodsInformationSubject> {
+    return this.goodsInformationService.findGoodsInformationSubject(
+      dto.goodInformationSubjectId,
+    );
+  }
 
   /** 상품제공고시 품목 등록 */
   @Post('/goods-information-subject')
