@@ -1439,7 +1439,7 @@ model GoodsReview {
   id             Int                  @id @default(autoincrement()) // 리뷰고유번호
   content        String               @db.Text // 리뷰내용
   rating         Float // 별점
-  createDate     DateTime //생성일
+  createDate     DateTime             @default(now()) //생성일
   writerId       Int // 리뷰 작성한 소비자 고유번호
   writer         Customer             @relation("WrittenReviews", fields: [writerId], references: [id], onDelete: Cascade) // 리뷰작성자
   likedCustomers Customer[]           @relation("LikedReviews") // 해당리뷰 좋아요 누른 소비자들
@@ -1462,7 +1462,7 @@ model GoodsReviewImage {
 model GoodsReviewComment {
   id                  Int         @id @default(autoincrement()) // 상품리뷰 댓글 고유번호
   content             String // 내용
-  createDate          DateTime // 생성일
+  createDate          DateTime    @default(now()) // 생성일
   reviewId            Int // 댓글달린 리뷰 고유번호
   review              GoodsReview @relation(fields: [reviewId], references: [id], onDelete: Cascade) // 댓글달린리뷰
   customerId          Int? // 댓글 작성한 소비자 고유번호
@@ -1479,7 +1479,7 @@ model GoodsReviewComment {
 model GoodsInquiry {
   id         Int      @id @default(autoincrement()) // 상품문의고유번호
   content    String   @db.Text // 상품문의내용
-  createDate DateTime //생성일
+  createDate DateTime @default(now()) //생성일
 
   writerId Int // 상품문의 작성한 소비자 고유번호
   // 상품문의작성자
@@ -1495,7 +1495,7 @@ model GoodsInquiry {
 model GoodsInquiryComment {
   id                  Int          @id @default(autoincrement()) // 상품문의답변 고유번호
   content             String // 상품문의답변 내용
-  createDate          DateTime // 상품문의답변 생성일
+  createDate          DateTime     @default(now()) // 상품문의답변 생성일
   goodsInquiryId      Int // 상품문의답변달린 문의 고유번호
   goodsInquiry        GoodsInquiry @relation(fields: [goodsInquiryId], references: [id], onDelete: Cascade) // 상품문의답변 달린 문의
   writtenBySellerFlag Boolean      @default(false) // 답변이 판매자에 의해 작성된 경우 해당 컬럼값은 true이고 연결된 관리자는 없다
