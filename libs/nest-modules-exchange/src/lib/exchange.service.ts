@@ -52,4 +52,29 @@ export class ExchangeService extends ServiceBaseWithCache {
     await this._clearCaches(this.#EXCHANGE_CACHE_KEY);
     return data;
   }
+
+  /** 교환요청 내역 조회 */
+  async getExchangeList(dto: GetExchangeListDto): Promise<ExchangeListRes> {
+    let where: Prisma.ExchangeWhereInput;
+    if (dto.customerId) {
+      where = {
+        order: { customerId: dto.customerId },
+      };
+    }
+    if (dto.sellerId) {
+      where = {
+        exchangeItems: { some: { orderItem: { goods: { sellerId: dto.sellerId } } } },
+      };
+    }
+    const data = await this.prisma.exchange.findMany({
+      take: dto.take,
+      skip: dto.skip,
+      where,
+      include: {
+        exchangeItems: true,
+        images: true,
+      },
+    });
+    return data;
+  }
 }
