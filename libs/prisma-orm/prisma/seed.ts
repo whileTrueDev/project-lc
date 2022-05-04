@@ -32,7 +32,7 @@ import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
 import { dummyCustomer } from './seedData/customer';
 import { cartSample, tempUserCartItemSample } from './seedData/cart';
-import { nonMemberOrder, normalOrder } from './seedData/dummyOrder';
+import { nonMemberOrder, normalOrder, orderExportReady } from './seedData/dummyOrder';
 
 const prisma = new PrismaClient();
 
@@ -290,6 +290,7 @@ async function createCartItems(): Promise<void> {
 async function createDummyOrderData(): Promise<void> {
   await prisma.order.create({ data: normalOrder });
   await prisma.order.create({ data: nonMemberOrder });
+  await prisma.order.create({ data: orderExportReady });
 }
 
 /** 시드 메인 함수 */
