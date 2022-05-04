@@ -11,6 +11,7 @@ import {
   ModalBody,
   useDisclosure,
   Divider,
+  ModalFooter,
 } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
@@ -53,6 +54,11 @@ export function Discount(): JSX.Element {
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: couponSearchIsOpen,
+    onOpen: couponSearchOnOpen,
+    onClose: couponSearchOnClose,
+  } = useDisclosure();
 
   const resetDiscountUsage = (type: 'mileage' | 'coupon'): void => {
     if (type === 'mileage') {
@@ -92,6 +98,25 @@ export function Discount(): JSX.Element {
             </Button>
           ) : null}
         </Flex>
+      </Flex>
+      <Flex alignItems="center">
+        <Text mr={5}>코드</Text>
+        <Input
+          w={{ base: '50%', md: '20%' }}
+          variant="flushed"
+          disabled
+          size="xs"
+          value={getValues('couponAmount')}
+        />
+
+        <Button size="xs" onClick={couponSearchOnOpen} colorScheme="blue" mr={1}>
+          검색
+        </Button>
+        {watch('couponId') ? (
+          <Button size="xs" onClick={() => resetDiscountUsage('coupon')}>
+            사용취소
+          </Button>
+        ) : null}
       </Flex>
       <Flex direction="column">
         <Text mb={3}>적립금</Text>
@@ -149,20 +174,35 @@ export function Discount(): JSX.Element {
         <ModalOverlay />
         <ModalContent>
           <ModalBody>
-            <>
-              <ChakraDataGrid
-                disableExtendRowFullWidth
-                autoHeight
-                pagination
-                autoPageSize
-                disableSelectionOnClick
-                disableColumnMenu
-                disableColumnSelector
-                columns={columns}
-                rows={dummyCoupon}
-              />
-            </>
+            <ChakraDataGrid
+              disableExtendRowFullWidth
+              autoHeight
+              pagination
+              autoPageSize
+              disableSelectionOnClick
+              disableColumnMenu
+              disableColumnSelector
+              columns={columns}
+              rows={dummyCoupon}
+            />
           </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={couponSearchIsOpen} onClose={couponSearchOnClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalBody>
+            <Heading>쿠폰 검색</Heading>
+            <Text>쿠폰번호를 입력해주세요</Text>
+            <Input />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3}>
+              검색
+            </Button>
+            {/** 검색하면, 쿠폰이 뜨고, 쿠폰을 선택하면 getValues('couponAmount') 되로록 구성 */}
+            <Button onClick={couponSearchOnClose}>취소</Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </Flex>
