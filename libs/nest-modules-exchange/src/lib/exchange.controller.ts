@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseInterceptors,
@@ -15,7 +16,9 @@ import {
   CreateExchangeRes,
   ExchangeDetailRes,
   ExchangeListRes,
+  ExchangeUpdateRes,
   GetExchangeListDto,
+  UpdateExchangeDto,
 } from '@project-lc/shared-types';
 import { ExchangeService } from './exchange.service';
 
@@ -46,5 +49,14 @@ export class ExchangeController {
     @Query(new ValidationPipe({ transform: true })) dto: GetExchangeListDto,
   ): Promise<ExchangeListRes> {
     return this.exchangeService.getExchangeList(dto);
+  }
+
+  /** 교환요청 상태 변경 */
+  @Patch(':exchangeId')
+  updateExchangeStatus(
+    @Param('exchangeId', ParseIntPipe) id: number,
+    @Body(ValidationPipe) dto: UpdateExchangeDto,
+  ): Promise<ExchangeUpdateRes> {
+    return this.exchangeService.updateExchangeStatus(id, dto);
   }
 }

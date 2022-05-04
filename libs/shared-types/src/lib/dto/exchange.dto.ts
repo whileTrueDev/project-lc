@@ -1,10 +1,19 @@
 //* ------- 생성 dto -------
 
-import { Customer, Order, OrderItem, OrderItemOption, Seller } from '@prisma/client';
+import {
+  Customer,
+  ExchangeProcessStatus,
+  Export,
+  Order,
+  OrderItem,
+  OrderItemOption,
+  Seller,
+} from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
@@ -99,4 +108,33 @@ export class GetExchangeListDto {
   @IsNumber()
   @IsOptional()
   sellerId?: Seller['id'];
+}
+
+//* -------- 수정 dto ----------
+/** 교환 상태 변경 dto  */
+export class UpdateExchangeDto {
+  /** 교환처리상태  */
+  @IsOptional()
+  @IsEnum(ExchangeProcessStatus)
+  status?: ExchangeProcessStatus;
+
+  /** 교환요청 거절 사유 */
+  @IsOptional()
+  @IsString()
+  rejectReason?: string;
+
+  /** 책임소재(판매자귀책? 구매자귀책?) */
+  @IsOptional()
+  @IsString()
+  responsibility?: string;
+
+  /** 교환메모 */
+  @IsOptional()
+  @IsString()
+  memo?: string;
+
+  /** 재배송시 출고 고유번호 */
+  @IsOptional()
+  @IsNumber()
+  exportId?: Export['id'];
 }

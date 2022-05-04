@@ -6,8 +6,10 @@ import {
   CreateExchangeDto,
   CreateExchangeRes,
   ExchangeListRes,
+  ExchangeUpdateRes,
   GetExchangeListDto,
   ReturnDetailRes,
+  UpdateExchangeDto,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import { Prisma } from '@prisma/client';
@@ -90,5 +92,24 @@ export class ExchangeService extends ServiceBaseWithCache {
         export: true,
       },
     });
+  }
+
+  /** 교환요청 상태 변경 */
+  async updateExchangeStatus(
+    id: number,
+    dto: UpdateExchangeDto,
+  ): Promise<ExchangeUpdateRes> {
+    const { exportId, ...rest } = dto;
+    await this.prisma.exchange.update({
+      where: { id },
+      data: {
+        ...rest,
+        completeDate: dto.status && dto.status === 'complete' ? new Date() : undefined,
+        export: exportId ? { connect: { id: exportId } } : undefined,
+      },
+    });
+
+    this._clearCaches(this.#EXCHANGE_CACHE_KEY);
+    return true;
   }
 }
