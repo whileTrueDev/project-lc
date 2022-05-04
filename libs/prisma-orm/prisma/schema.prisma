@@ -1771,22 +1771,25 @@ enum ExchangeProcessStatus {
 // 교환 기록은 남겨두도록 하나, 교환에서 상품회수 과정을 제외하고 재배송만 처리하도록 함(메모에 "상품수거없음" 기록)
 // 재배송/환불에서 소비자가 해결방법'재배송'요청한 내역 저장(=상품 수거과정 없는 교환)
 model Exchange {
-  id             Int                   @id @default(autoincrement()) // 교환고유번호
-  exchangeCode   String?               @unique //교환코드
-  orderId        Int // 주문 고유번호
-  order          Order                 @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status         ExchangeProcessStatus @default(requested) // 교환처리상태
-  requestDate    DateTime              @default(now()) // 교환신청일시
-  completeDate   DateTime? // 처리완료일시
-  reason         String // 교환사유
-  rejectReason   String? // 교환요청이 거절된 이유
-  returnAddress  String? // 회수지 주소
-  responsibility String? // 책임소재(판매자귀책? 구매자귀책?)
-  exportId       Int?                  @unique // 교환 재출고시 연결된 출고
-  export         Export?               @relation(fields: [exportId], references: [id], onDelete: SetNull) // 교환 재출고시 연결된 출고
-  exchangeItems  ExchangeItem[] // 교환요청에 포함된 상품들
-  memo           String? // 교환메모
-  images         ExchangeImage[]
+  id                     Int                   @id @default(autoincrement()) // 교환고유번호
+  exchangeCode           String?               @unique //교환코드
+  orderId                Int // 주문 고유번호
+  order                  Order                 @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status                 ExchangeProcessStatus @default(requested) // 교환처리상태
+  requestDate            DateTime              @default(now()) // 교환신청일시
+  completeDate           DateTime? // 처리완료일시
+  reason                 String // 교환사유
+  rejectReason           String? // 교환요청이 거절된 이유
+  returnAddress          String? // 회수지 주소
+  recipientAddress       String? // 재배송시 받는곳 주소 도로명
+  recipientDetailAddress String? // 재배송시 주소 주소 상세
+  recipientPostalCode    String? // 재배송시 주소 우편 번호
+  responsibility         String? // 책임소재(판매자귀책? 구매자귀책?)
+  exportId               Int?                  @unique // 교환 재출고시 연결된 출고
+  export                 Export?               @relation(fields: [exportId], references: [id], onDelete: SetNull) // 교환 재출고시 연결된 출고
+  exchangeItems          ExchangeItem[] // 교환요청에 포함된 상품들
+  memo                   String? // 교환메모
+  images                 ExchangeImage[]
 }
 
 model ExchangeImage {
