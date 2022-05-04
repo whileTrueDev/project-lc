@@ -5,6 +5,7 @@ import { Cache } from 'cache-manager';
 import {
   CreateExchangeDto,
   CreateExchangeRes,
+  ExchangeDeleteRes,
   ExchangeListRes,
   ExchangeUpdateRes,
   GetExchangeListDto,
@@ -12,7 +13,7 @@ import {
   UpdateExchangeDto,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
-import { Prisma } from '@prisma/client';
+import { Exchange, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ExchangeService extends ServiceBaseWithCache {
@@ -99,6 +100,8 @@ export class ExchangeService extends ServiceBaseWithCache {
     id: number,
     dto: UpdateExchangeDto,
   ): Promise<ExchangeUpdateRes> {
+    await this.findOneById(id);
+
     const { exportId, ...rest } = dto;
     await this.prisma.exchange.update({
       where: { id },
@@ -110,6 +113,25 @@ export class ExchangeService extends ServiceBaseWithCache {
     });
 
     this._clearCaches(this.#EXCHANGE_CACHE_KEY);
+    return true;
+  }
+
+  private async findOneById(id: number): Promise<Exchange> {
+    const data = await this.prisma.exchange.findUnique({ where: { id } });
+    if (!data)
+      throw new BadRequestException(`해당 교환요청이 존재하지 않습니다. 교유번호: ${id}`);
+    return data;
+  }
+
+  /** 교환요청 삭제 */
+  async deleteExchange(id: number): Promise<ExchangeDeleteRes> {
+    await this.findOneById(id);
+
+    await this.prisma.exchange.delete({
+      where: { id },
+    });
+
+    await this._clearCaches(this.#EXCHANGE_CACHE_KEY);
     return true;
   }
 }

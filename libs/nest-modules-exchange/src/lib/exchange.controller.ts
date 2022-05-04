@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -14,6 +15,7 @@ import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateExchangeDto,
   CreateExchangeRes,
+  ExchangeDeleteRes,
   ExchangeDetailRes,
   ExchangeListRes,
   ExchangeUpdateRes,
@@ -58,5 +60,13 @@ export class ExchangeController {
     @Body(ValidationPipe) dto: UpdateExchangeDto,
   ): Promise<ExchangeUpdateRes> {
     return this.exchangeService.updateExchangeStatus(id, dto);
+  }
+
+  /** 교환요청 삭제 */
+  @Delete(':exchangeId')
+  deleteExchange(
+    @Param('exchangeId', ParseIntPipe) id: number,
+  ): Promise<ExchangeDeleteRes> {
+    return this.exchangeService.deleteExchange(id);
   }
 }
