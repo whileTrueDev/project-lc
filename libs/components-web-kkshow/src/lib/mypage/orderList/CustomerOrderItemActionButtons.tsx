@@ -1,29 +1,15 @@
-import {
-  SimpleGrid,
-  Button,
-  useDisclosure,
-  Text,
-  useToast,
-  Stack,
-  Input,
-  useBoolean,
-  Collapse,
-} from '@chakra-ui/react';
+import { Button, SimpleGrid, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
-import {
-  INFINITE_ORDER_LIST_QUERY_KEY,
-  useOrderPurchaseConfirmMutation,
-} from '@project-lc/hooks';
-import { useQueryClient } from 'react-query';
-import DaumPostcode, { AddressData } from 'react-daum-postcode';
-import { useState } from 'react';
-import { OrderItemOptionInfo, OrderItemOptionInfoProps } from './OrderItemOptionInfo';
+import { useOrderPurchaseConfirmMutation } from '@project-lc/hooks';
+import { useRouter } from 'next/router';
 import { OrderCancelDialog } from './OrderCancelDialog';
+import { OrderItemOptionInfoProps } from './OrderItemOptionInfo';
 
 export function OrderItemActionButtons({
   option,
   orderItem,
 }: OrderItemOptionInfoProps): JSX.Element {
+  const router = useRouter();
   const { step, purchaseConfirmationDate } = option;
   const hasReview = !!orderItem.reviewId;
   const { orderId } = orderItem;
@@ -32,9 +18,7 @@ export function OrderItemActionButtons({
   );
 
   const purchaseConfirmDialog = useDisclosure();
-  const returnExchangeDialog = useDisclosure();
   const orderCancelDialog = useDisclosure();
-  const reviewDialog = useDisclosure();
   const goodsInquireDialog = useDisclosure();
 
   const buttonSet: {
@@ -58,8 +42,8 @@ export function OrderItemActionButtons({
       disabled: !!orderCancellation,
     },
     {
-      label: '교환, 반품 신청', // TODO: 교환 반품신청 페이지로 이동
-      onClick: returnExchangeDialog.onOpen,
+      label: '재배송/환불 신청', // TODO: 재배송/환불 신청 페이지로 이동
+      onClick: () => router.push(`mypage/exchange-return/write?orderId=${orderId}`),
       display:
         [
           'goodsReady',
@@ -81,7 +65,9 @@ export function OrderItemActionButtons({
     },
     {
       label: '리뷰 작성하기',
-      onClick: reviewDialog.onOpen, // TODO: 리뷰작성 페이지로 이동
+      onClick: () => {
+        alert('리뷰작성페이지로 이동');
+      }, // TODO: 리뷰작성 페이지로 이동
       display: ['shippingDone', 'purchaseConfirmed'].includes(step), // 배송완료 이후 표시 & 구매확정시 표시, 리뷰 작성하지 않았을때
       disabled: !!hasReview || !purchaseConfirmationDate, // 이미 리뷰 작성했거나, 구매확정 안한경우 비활성
     },
@@ -116,6 +102,7 @@ export function OrderItemActionButtons({
         (button) =>
           button.display && (
             <Button
+              minWidth={120}
               key={button.label}
               disabled={button.disabled}
               size="sm"
@@ -139,18 +126,6 @@ export function OrderItemActionButtons({
         </Text>
       </ConfirmDialog>
 
-      {/* 교환환불 다이얼로그 */}
-      <ConfirmDialog
-        title="교환, 반품 신청"
-        isOpen={returnExchangeDialog.isOpen}
-        onClose={returnExchangeDialog.onClose}
-        onConfirm={async () => {
-          console.log('교환반품 신청');
-        }}
-      >
-        <RefundExchangeForm option={option} orderItem={orderItem} />
-      </ConfirmDialog>
-
       {/* 주문취소 다이얼로그 */}
       <OrderCancelDialog
         isOpen={orderCancelDialog.isOpen}
@@ -158,44 +133,5 @@ export function OrderItemActionButtons({
         orderId={orderId}
       />
     </SimpleGrid>
-  );
-}
-
-function RefundExchangeForm(props: OrderItemOptionInfoProps): JSX.Element {
-  // useForm, handleSubmit 등은 api 작업 후 dto에 맞게 처리필요
-  const [open, { off, toggle }] = useBoolean(false);
-
-  const [addr, setAddr] = useState<string>('');
-  const handleComplete = (data: AddressData): void => {
-    const { zonecode, address, buildingName } = data;
-    const fullAddress = buildingName
-      ? `${address} (${buildingName}), ${zonecode}`
-      : `${address}, ${zonecode}`; // 주소검색 결과 타입 참고 https://postcode.map.daum.net/guide
-    setAddr(fullAddress);
-    off();
-  };
-  return (
-    <Stack as="form">
-      <Stack>
-        <Text>교환/반품 요청 주문상품 정보</Text>
-        <OrderItemOptionInfo {...props} displayStatus={false} />
-      </Stack>
-      <Stack>
-        <Text>교환 / 반품 사유</Text>
-        <Input />
-      </Stack>
-      <Stack>
-        <Text>
-          회수지 주소
-          <Button size="sm" onClick={toggle}>
-            {open ? '닫기' : '찾기'}
-          </Button>
-          <Input value={addr} readOnly />
-        </Text>
-        <Collapse in={open} animateOpacity>
-          <DaumPostcode onComplete={handleComplete} />
-        </Collapse>
-      </Stack>
-    </Stack>
   );
 }
