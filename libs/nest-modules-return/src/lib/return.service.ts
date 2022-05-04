@@ -2,8 +2,14 @@ import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { Cache } from 'cache-manager';
-import { CreateReturnDto, CreateReturnRes } from '@project-lc/shared-types';
+import {
+  CreateReturnDto,
+  CreateReturnRes,
+  GetReturnListDto,
+  ReturnListRes,
+} from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ReturnService extends ServiceBaseWithCache {
@@ -43,7 +49,31 @@ export class ReturnService extends ServiceBaseWithCache {
 
     return data;
   }
+
   /** 반품요청 내역 조회 */
+  async getReturnList(dto: GetReturnListDto): Promise<ReturnListRes> {
+    let where: Prisma.ReturnWhereInput;
+    if (dto.customerId) {
+      where = {
+        order: { customerId: dto.customerId },
+      };
+    }
+    if (dto.sellerId) {
+      where = {
+        items: { some: { orderItem: { goods: { sellerId: dto.sellerId } } } },
+      };
+    }
+    const data = await this.prisma.return.findMany({
+      take: dto.take,
+      skip: dto.skip,
+      where,
+      include: {
+        items: true,
+        images: true,
+      },
+    });
+    return data;
+  }
   /** 특정 반품요청 상세 조회 */
   /** 반품요청 상태 변경 */
   /** 반품요청 삭제 */
