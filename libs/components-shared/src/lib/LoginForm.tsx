@@ -65,7 +65,12 @@ export function LoginForm({
         return;
       }
       if (user) {
-        router.push('/mypage');
+        const nextPage = router.query.nextpage as string;
+        if (nextPage) {
+          router.push(nextPage.startsWith('/') ? nextPage : `/${nextPage}`);
+        } else {
+          router.push('/mypage');
+        }
       }
     },
     [login, setValue, router, setToActivateEmail],

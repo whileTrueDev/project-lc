@@ -18,13 +18,18 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import StarRating from '@project-lc/components-core/StarRating';
-import { useGoodsById, useInfiniteReviews } from '@project-lc/hooks';
+import {
+  useGoodsById,
+  useGoodsReviewComments,
+  useInfiniteReviews,
+} from '@project-lc/hooks';
 import { GoodsReviewItem } from '@project-lc/shared-types';
 import { asteriskify } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import 'suneditor/dist/css/suneditor.min.css';
+import { CommentList } from '../CommentList';
 
 export function GoodsViewReviews(): JSX.Element | null {
   const router = useRouter();
@@ -109,13 +114,13 @@ function ReviewDetail({ review }: ReviewDetailProps): JSX.Element {
     else if (selectedImageIdx === 0) setSelectedImageIdx(0);
     else setSelectedImageIdx(selectedImageIdx - 1);
   };
-
+  const comments = useGoodsReviewComments(review.id);
   return (
     <>
-      <Box my={2}>
+      <Box my={4}>
         <StarRating rating={review.rating} color="orange.300" />
-        <Text color="GrayText" fontSize="sm">
-          {displayName} / {dayjs(review.createDate).format('YYYY-MM-DD')}
+        <Text color="GrayText">
+          {displayName} | {dayjs(review.createDate).format('YYYY-MM-DD')}
         </Text>
 
         <Flex gap={1} my={2}>
@@ -137,6 +142,7 @@ function ReviewDetail({ review }: ReviewDetailProps): JSX.Element {
             {review.content}
           </Text>
         </Flex>
+        <Box mt={2}>{comments.data && <CommentList comments={comments.data} />}</Box>
       </Box>
       <Divider />
 

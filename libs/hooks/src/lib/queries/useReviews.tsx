@@ -1,4 +1,9 @@
-import { FindManyGoodsReviewDto, GoodsReviewRes } from '@project-lc/shared-types';
+import { GoodsReview } from '@prisma/client';
+import {
+  FindManyGoodsReviewDto,
+  GoodsReviewCommentRes,
+  GoodsReviewRes,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import {
   useInfiniteQuery,
@@ -27,17 +32,36 @@ export const useReviews = (
   });
 };
 
-export const INFINITE_REVIWS_KEY = 'InfiniteReviews';
+export const INFINITE_REVIEWS_KEY = 'InfiniteReviews';
 export const useInfiniteReviews = (
   dto: FindManyGoodsReviewDto,
 ): UseInfiniteQueryResult<GoodsReviewRes, AxiosError> => {
   return useInfiniteQuery(
-    INFINITE_REVIWS_KEY,
+    INFINITE_REVIEWS_KEY,
     ({ pageParam = 0 }) => getReviews({ ...dto, skip: pageParam }),
     {
       getNextPageParam(prev) {
         return prev.nextCursor;
       },
+    },
+  );
+};
+
+export const getReviewComments = async (
+  reviewId: GoodsReview['id'],
+): Promise<GoodsReviewCommentRes> => {
+  return axios
+    .get<GoodsReviewCommentRes>(`/goods-review/${reviewId}/comment`)
+    .then((res) => res.data);
+};
+export const useGoodsReviewComments = (
+  reviewId: GoodsReview['id'],
+): UseQueryResult<GoodsReviewCommentRes, AxiosError> => {
+  return useQuery<GoodsReviewCommentRes, AxiosError>(
+    ['GoodsReviewComment', reviewId],
+    () => getReviewComments(reviewId),
+    {
+      enabled: !!reviewId,
     },
   );
 };
