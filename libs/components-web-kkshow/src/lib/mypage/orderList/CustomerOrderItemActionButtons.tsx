@@ -43,7 +43,7 @@ export function OrderItemActionButtons({
     },
     {
       label: '재배송/환불 신청', // TODO: 재배송/환불 신청 페이지로 이동
-      onClick: () => router.push(`mypage/exchange-return/write?orderId=${orderId}`),
+      onClick: () => router.push(`exchange-return/write?orderId=${orderId}`),
       display:
         [
           'goodsReady',
