@@ -1,7 +1,7 @@
 import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Goods, GoodsView, PrismaClient } from '@prisma/client';
+import { Goods, GoodsCategory, GoodsView, PrismaClient } from '@prisma/client';
 import { CacheConfig } from '@project-lc/nest-core';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import {
@@ -14,6 +14,7 @@ describe('GoodsService', () => {
   let __prisma: PrismaClient;
   let service: GoodsService;
   let TEST_USER_ID: number;
+  let TEST_CATEGORY_ID: number;
   const TEST_CONFIRMATION_GOODS_CONNECTION_ID = 999;
   let TEST_GOODS: Goods;
   beforeAll(async () => {
@@ -39,6 +40,15 @@ describe('GoodsService', () => {
       },
     });
     TEST_USER_ID = testSeller.id;
+    const testCategory = await __prisma.goodsCategory.create({
+      data: {
+        categoryCode: '2',
+        name: 'test-category',
+        mainCategoryFlag: true,
+      },
+    });
+
+    TEST_CATEGORY_ID = testCategory.id;
     // 테스트용 더미 Goods, GoodsConfirmation 생성
     TEST_GOODS = await __prisma.goods.create({
       data: {
@@ -69,6 +79,16 @@ describe('GoodsService', () => {
           create: {
             status: 'confirmed',
             firstmallGoodsConnectionId: TEST_CONFIRMATION_GOODS_CONNECTION_ID,
+          },
+        },
+        categories: {
+          connect: {
+            id: TEST_CATEGORY_ID,
+          },
+        },
+        informationNotice: {
+          create: {
+            contents: { name: 'testContents', value: 'testContents' },
           },
         },
       },

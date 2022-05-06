@@ -67,6 +67,8 @@ export * from './lib/dto/goodsCategory.dto';
 export * from './lib/dto/goodsConfirmation.dto';
 export * from './lib/dto/goodsImage.dto';
 export * from './lib/dto/goodsInfo.dto';
+export * from './lib/dto/goodsInformationNotice.dto';
+export * from './lib/dto/goodsInformationSubject.dto';
 export * from './lib/dto/goodsInquiry.dto';
 export * from './lib/dto/goodsList.dto';
 export * from './lib/dto/goodsOption.dto';

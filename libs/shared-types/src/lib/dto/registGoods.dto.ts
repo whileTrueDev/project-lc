@@ -6,10 +6,18 @@ import {
   RunoutPolicy,
   ShopOrGoods,
 } from '@prisma/client';
-import { IsIn, IsString, IsOptional, ValidateNested, IsNumber } from 'class-validator';
+import {
+  IsIn,
+  IsString,
+  IsOptional,
+  ValidateNested,
+  IsNumber,
+  IsObject,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { GoodsOptionDto } from './goodsOption.dto';
 import { GoodsImageDto } from './goodsImage.dto';
+import { GoodsInformationNoticeDto } from './goodsInformationNotice.dto';
 
 export class RegistGoodsDto {
   @IsString()
@@ -113,4 +121,22 @@ export class RegistGoodsDto {
   @IsOptional()
   @IsNumber()
   goodsInfoId?: number;
+
+  @IsOptional()
+  @IsString()
+  searchKeyword?: string;
+
+  @IsNumber()
+  categoryId: number;
+
+  @IsNumber()
+  informationSubjectId: number;
+
+  @IsOptional()
+  @IsNumber()
+  informationNoticeId?: number;
+
+  @IsOptional()
+  @IsObject()
+  informationNoticeContents?: GoodsInformationNoticeDto['contents'];
 }

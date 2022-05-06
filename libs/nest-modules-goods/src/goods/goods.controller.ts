@@ -36,6 +36,32 @@ import { GoodsService } from './goods.service';
 export class GoodsController {
   constructor(private readonly goodsService: GoodsService) {}
 
+  /** 상품 목록 조회 - 특정 판매자 검색 가능 */
+  @Get()
+  getGoodsListWithExtraFeatures(
+    @Query('page', new DefaultValuePipe(0), ParseIntPipe) page: number,
+    @Query('itemPerPage', new DefaultValuePipe(10), ParseIntPipe) itemPerPage: number,
+    @Query('sort', new DefaultValuePipe(SellerGoodsSortColumn.REGIST_DATE))
+    sort: SellerGoodsSortColumn,
+    @Query('direction', new DefaultValuePipe(SellerGoodsSortDirection.DESC))
+    direction: SellerGoodsSortDirection,
+    @Query('groupId') groupId?: number,
+    @Query('goodsName') goodsName?: string,
+    @Query('categoryId') categoryId?: number,
+    @Query('sellerId') sellerId?: string,
+  ): Promise<GoodsListRes> {
+    return this.goodsService.getGoodsList({
+      sellerId: sellerId ? Number(sellerId) : undefined,
+      page,
+      itemPerPage,
+      sort,
+      direction,
+      groupId: groupId ? Number(groupId) : undefined,
+      goodsName: goodsName || undefined,
+      categoryId: categoryId ? Number(categoryId) : undefined,
+    });
+  }
+
   /** 상품 이미지 생성 */
   @Post('/image')
   registGoodsImages(@Body(ValidationPipe) dto: GoodsImageDto[]): Promise<GoodsImages[]> {
@@ -54,7 +80,7 @@ export class GoodsController {
     return this.goodsService.updateGoodsImages(dto);
   }
 
-  /** 상품 목록 조회 */
+  /** 상품 목록 조회 - 본인 판매상품만 확인가능 */
   @Get('/list')
   getGoodsList(
     @SellerInfo() seller: UserPayload,
@@ -110,8 +136,7 @@ export class GoodsController {
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: RegistGoodsDto,
   ): Promise<{ goodsId: number }> {
-    const sellerId = seller.id;
-    return this.goodsService.registGoods(sellerId, dto);
+    return this.goodsService.registGoods(seller.id, dto);
   }
 
   /** 상품 개별 조회 */
