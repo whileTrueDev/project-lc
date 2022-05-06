@@ -70,7 +70,6 @@ import { AppController } from './app.controller';
     OrderModule.withControllers(),
     CartModule.withControllers(),
     GoodsInquiryModule.withControllers(),
-    OrderModule.withControllers(),
     GoodsReviewModule.withControllers(),
   ],
   controllers: [AppController],
