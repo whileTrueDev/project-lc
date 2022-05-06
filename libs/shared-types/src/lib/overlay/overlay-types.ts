@@ -52,6 +52,14 @@ export interface PurchaseMessage {
   productName: string;
   /** 구매물품 가격 또는 수량 */
   purchaseNum: number;
+  /** tts 세팅 */
+  ttsSetting:
+    | 'full'
+    | 'nick-purchase'
+    | 'nick-purchase-price'
+    | 'only-message'
+    | 'no-tts'
+    | 'no-sound';
 }
 /** 시청자 닉네임과 닉네임별 구매금액 총액 */
 export interface NicknameAndPrice {
@@ -143,4 +151,14 @@ export interface ObjectiveMessage {
     nickname?: string;
   };
   liveShoppingId?: number;
+}
+
+export interface RoomNameAndBgmNumber {
+  roomName: string;
+  bgmNumber: number;
+}
+
+export interface RoomNameAndVolume {
+  roomName: string;
+  volume: 'up' | 'down';
 }
