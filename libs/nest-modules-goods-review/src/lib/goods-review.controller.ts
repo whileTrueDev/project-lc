@@ -12,7 +12,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { GoodsReview } from '@prisma/client';
+import { Goods, GoodsReview } from '@prisma/client';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -28,6 +28,11 @@ import { GoodsReviewService } from './goods-review.service';
 @UseInterceptors(HttpCacheInterceptor)
 export class GoodsReviewController {
   constructor(private readonly service: GoodsReviewService) {}
+
+  @Get('count')
+  getCount(@Query('goodsId', ParseIntPipe) goodsId: Goods['id']): Promise<number> {
+    return this.service.getCount(goodsId);
+  }
 
   /** 개별 리뷰 조회 */
   @Get(':reviewId')

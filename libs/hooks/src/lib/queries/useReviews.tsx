@@ -1,4 +1,4 @@
-import { GoodsReview } from '@prisma/client';
+import { Goods, GoodsReview } from '@prisma/client';
 import {
   FindManyGoodsReviewDto,
   GoodsReviewCommentRes,
@@ -23,6 +23,7 @@ export const getReviews = async (
     .then((res) => res.data);
 };
 
+// 상품의 모든 리뷰
 export const useReviews = (
   dto: FindManyGoodsReviewDto,
   enabled?: boolean,
@@ -32,6 +33,7 @@ export const useReviews = (
   });
 };
 
+// 상품 리뷰
 export const INFINITE_REVIEWS_KEY = 'InfiniteReviews';
 export const useInfiniteReviews = (
   dto: FindManyGoodsReviewDto,
@@ -47,6 +49,25 @@ export const useInfiniteReviews = (
   );
 };
 
+// 상품의 총 리뷰 개수
+export const getReviewCount = async (goodsId: Goods['id'] | string): Promise<number> => {
+  return axios
+    .get<number>('/goods-review/count', { params: { goodsId: Number(goodsId) } })
+    .then((res) => res.data);
+};
+export const useGoodsReviewCount = (
+  goodsId: Goods['id'] | string,
+): UseQueryResult<number, AxiosError> => {
+  return useQuery<number, AxiosError>(
+    ['GoodsReviewCount', goodsId],
+    () => getReviewCount(goodsId),
+    {
+      enabled: !!goodsId,
+    },
+  );
+};
+
+// 특정 리뷰의 모든 댓글
 export const getReviewComments = async (
   reviewId: GoodsReview['id'],
 ): Promise<GoodsReviewCommentRes> => {

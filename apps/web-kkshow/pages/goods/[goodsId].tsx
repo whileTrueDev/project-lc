@@ -25,7 +25,6 @@ type KkshowGoodsParams = { goodsId: string };
 export const getStaticPaths: GetStaticPaths<KkshowGoodsParams> = async () => {
   // 빌드 환경에서는 API HOST를 찾을수 없으므로 여기서 곧바로 prisma 접근 처리
   const prisma = new PrismaClient();
-  // DATABASE_URL=mysql://root:qwer1234@localhost:3306/public
   const goodIds = await prisma.goods.findMany({
     select: { id: true },
     where: { goods_view: { not: 'notLook' } },
@@ -76,7 +75,6 @@ export default function GoodsView(): JSX.Element {
       <GoodsViewInquiries />
       <GoodsViewAdditionalInfo />
       <GoodsViewFloatingButtons />
-      {/* <GoodsViewRelatedGoods /> */}
       <GoodsViewBottomMenu />
       <CommonFooter footerLinkList={kkshowFooterLinkList} />
     </Box>
@@ -95,7 +93,7 @@ const useGoodsScrollNavAutoChange = (): void => {
       const goodsInquiries = document.getElementById('goods-inquiries');
       const goodsInfo = document.getElementById('goods-info');
 
-      if (goodsInfo && selected !== 3 && window.scrollY > goodsInfo.offsetTop) {
+      if (goodsInfo && selected !== 3 && window.scrollY > goodsInfo.offsetTop - 30) {
         handleSelect(3);
       }
       if (
@@ -103,7 +101,7 @@ const useGoodsScrollNavAutoChange = (): void => {
         goodsInquiries &&
         selected !== 2 &&
         window.scrollY > goodsInquiries.offsetTop &&
-        window.scrollY < goodsInfo.offsetTop
+        window.scrollY < goodsInfo.offsetTop - 30
       ) {
         handleSelect(2);
       }
@@ -113,7 +111,7 @@ const useGoodsScrollNavAutoChange = (): void => {
         goodsInquiries &&
         selected !== 1 &&
         window.scrollY > goodsReview.offsetTop &&
-        window.scrollY < goodsInquiries.offsetTop
+        window.scrollY < goodsInquiries.offsetTop - 30
       ) {
         handleSelect(1);
       }
@@ -123,7 +121,7 @@ const useGoodsScrollNavAutoChange = (): void => {
         goodsReview &&
         selected !== 0 &&
         window.scrollY > goodsContents.offsetTop &&
-        window.scrollY < goodsReview.offsetTop
+        window.scrollY < goodsReview.offsetTop - 30
       ) {
         handleSelect(0);
       }

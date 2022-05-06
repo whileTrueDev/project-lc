@@ -1,5 +1,8 @@
 import { Box, Flex, HStack, Text, useColorModeValue } from '@chakra-ui/react';
+import { useGoodsReviewCount } from '@project-lc/hooks';
 import { useGoodsViewStore } from '@project-lc/stores';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
+import { useRouter } from 'next/router';
 
 const navs = [
   { title: '상세 설명', elementId: 'goods-contents' },
@@ -9,6 +12,10 @@ const navs = [
 ];
 
 export function GoodsViewStickyNav(): JSX.Element {
+  const router = useRouter();
+  const goodsId = router.query.goodsId as string;
+  const reviewsCount = useGoodsReviewCount(goodsId);
+
   const bgColor = useColorModeValue('white', 'gray.800');
 
   const selectedNavIdx = useGoodsViewStore((s) => s.selectedNavIdx);
@@ -50,9 +57,9 @@ export function GoodsViewStickyNav(): JSX.Element {
           >
             <Text fontSize={{ base: 'sm', md: 'xl' }}>
               {nav.title}
-              {/* {nav.title === '후기' && (
-                <Text as="span">{`(${(3403).toLocaleString()})`}</Text>
-              )} */}
+              {nav.title === '후기' && reviewsCount?.data ? (
+                <Text as="span">{`(${getLocaleNumber(reviewsCount.data)})`}</Text>
+              ) : null}
             </Text>
           </Box>
         ))}

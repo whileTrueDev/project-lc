@@ -6,11 +6,13 @@ import {
   Button,
   ButtonGroup,
   Center,
+  Collapse,
   Divider,
   Flex,
   FormControl,
   FormErrorMessage,
   IconButton,
+  ListItem,
   Modal,
   ModalBody,
   ModalContent,
@@ -19,6 +21,7 @@ import {
   Spinner,
   Text,
   Textarea,
+  UnorderedList,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
@@ -54,11 +57,15 @@ export function GoodsViewInquiries(): JSX.Element | null {
     <Box maxW="5xl" m="auto" id="goods-inquiries" minH="50vh" p={2} pt={20}>
       <Text fontSize="2xl">상품 문의 목록</Text>
 
-      <Box textAlign="right">
+      <Box textAlign="right" my={2}>
         <Button size="sm" onClick={formDialog.onOpen}>
           문의하기
         </Button>
       </Box>
+
+      <GoodsInquiryPolicy />
+
+      <Divider />
 
       {inquiries.data.pages.map((page, idx) => (
         <Box key={idx}>
@@ -184,7 +191,7 @@ function GoodsInquiryFormDialog({
     <FormProvider {...formMethods}>
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent mx={2}>
           <ModalHeader>상품 문의하기</ModalHeader>
           <ModalBody>
             <GoodsInquiryForm
@@ -251,7 +258,7 @@ function GoodsInquiryForm({
 
   if (!profile.data?.id) {
     return (
-      <Box textAlign="center" my={10}>
+      <Box textAlign="center" my={4}>
         <Text>문의를 남기기 위해 로그인이 필요합니다.</Text>
         <Button onClick={onLoginClick}>로그인</Button>
       </Box>
@@ -260,9 +267,13 @@ function GoodsInquiryForm({
 
   return (
     <Box id="goods-inquiry-form" as="form" onSubmit={handleSubmit(onSubmit)}>
-      <Box mb={4}>
+      <Box mb={2}>
+        <GoodsInquiryPolicy />
+      </Box>
+      <Box my={2}>
         {goods.data && <Text>문의하는 상품: {goods.data.goods_name}</Text>}
       </Box>
+
       <FormControl isInvalid={!!errors.content}>
         <Textarea
           maxH={350}
@@ -293,6 +304,48 @@ function GoodsInquiryForm({
           </Button>
         </ButtonGroup>
       </Box>
+    </Box>
+  );
+}
+
+export function GoodsInquiryPolicy(): JSX.Element {
+  const policyList = useDisclosure();
+  return (
+    <Box>
+      <Text
+        as="span"
+        textDecor="underline"
+        fontSize="sm"
+        cursor="pointer"
+        role="button"
+        onClick={policyList.onToggle}
+      >
+        상품 문의 원칙 {policyList.isOpen ? '숨기기' : '보기'}
+      </Text>
+
+      <Collapse in={policyList.isOpen}>
+        <UnorderedList fontSize="xs" my={2}>
+          {/* // TODO: 기획자에게 전달받아 수정 필요 현재 내용은 ㅁㅋㅋㄹ 문의 운영원칙임 */}
+          <ListItem>
+            구매한 상품의 취소/반품은 마이쿠팡 구매내역에서 신청 가능합니다.
+          </ListItem>
+          <ListItem>
+            상품문의 및 후기게시판을 통해 취소나 환불, 반품 등은 처리되지 않습니다.
+          </ListItem>
+          <ListItem>
+            가격, 판매자, 교환/환불 및 배송 등 해당 상품 자체와 관련 없는 문의는 고객센터
+            내 1:1문의하기를 이용해주세요.
+          </ListItem>
+          <ListItem>
+            해당 상품 자체와 관계없는 글, 양도, 광고성, 욕설, 비방, 도배 등의 글은 예고
+            없이 이동, 노출제한, 삭제 등의 조치가 취해질 수 있습니다.
+          </ListItem>
+          <ListItem>
+            공개 게시판이므로 전화번호, 메일 주소 등 고객님의 소중한 개인정보는절대 남기지
+            말아주세요.
+          </ListItem>
+        </UnorderedList>
+      </Collapse>
     </Box>
   );
 }

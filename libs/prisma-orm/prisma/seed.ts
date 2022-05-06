@@ -33,6 +33,7 @@ import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
 import { dummyCustomer } from './seedData/customer';
 import { cartSample, tempUserCartItemSample } from './seedData/cart';
 import { nonMemberOrder, normalOrder } from './seedData/dummyOrder';
+import { createGoodsReview } from './seedData/goods-review';
 
 const prisma = new PrismaClient();
 
@@ -349,6 +350,9 @@ async function main(): Promise<void> {
 
   // 더미 주문데이터 생성
   await createDummyOrderData();
+
+  // 더미 상품리뷰 생성
+  await createGoodsReview(prisma);
 }
 
 main()
