@@ -1,6 +1,6 @@
-import { Checkbox, Stack } from '@chakra-ui/react';
+import { Box, Button, Checkbox, Stack, Text } from '@chakra-ui/react';
 import { OrderDetailRes } from '@project-lc/shared-types';
-import { useEffect } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect } from 'react';
 import { OrderItemOptionInfo } from '../orderList/OrderItemOptionInfo';
 
 export type SelectedOrderItem = {
@@ -10,19 +10,17 @@ export type SelectedOrderItem = {
 };
 
 export interface ItemSelectSectionProps {
-  propname?: any;
   orderItems: OrderDetailRes['orderItems'];
   selectedItems: SelectedOrderItem[];
-  onChange: (items: SelectedOrderItem[]) => void;
+  setSelectedItems: Dispatch<SetStateAction<SelectedOrderItem[]>>;
 }
 
 export function ItemSelectSection({
-  propname,
   orderItems,
   selectedItems,
-  onChange,
+  setSelectedItems,
 }: ItemSelectSectionProps): JSX.Element {
-  useEffect(() => {
+  const selectAll = useCallback(() => {
     if (orderItems) {
       const all = orderItems.flatMap((item) =>
         item.options.map((opt) => ({
@@ -31,30 +29,60 @@ export function ItemSelectSection({
           amount: opt.quantity,
         })),
       );
-      onChange(all);
+      setSelectedItems(all);
     }
+  }, [orderItems, setSelectedItems]);
+
+  useEffect(() => {
+    selectAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
     <Stack>
-      주문상품목록 표시 및 체크박스로 선택된 상품 변경가능
+      <Text fontWeight="bold">재배송/환불 신청할 상품을 선택해주세요</Text>
+      <Box>
+        <Button size="xs" onClick={selectAll}>
+          전체선택
+        </Button>
+      </Box>
+
       {/* 주문상품옵션 1개당 주문목록아이템 1개 생성 */}
       {orderItems.flatMap((item) =>
-        item.options.map((opt) => (
-          <Checkbox
-            isChecked={!!selectedItems.find((item) => item.orderItemOptionId === opt.id)}
-            onChange={() => {
-              console.log(selectedItems);
-            }}
-          >
-            <OrderItemOptionInfo
+        item.options.map((opt) => {
+          const isChecked = !!selectedItems.find(
+            (selectedItem) => selectedItem.orderItemOptionId === opt.id,
+          );
+          return (
+            <Checkbox
               key={opt.id}
-              option={opt}
-              orderItem={item}
-              displayStatus={false}
-            />
-          </Checkbox>
-        )),
+              isChecked={isChecked}
+              onChange={() => {
+                if (isChecked) {
+                  setSelectedItems((state) =>
+                    state.filter((_item) => _item.orderItemOptionId !== opt.id),
+                  );
+                } else {
+                  setSelectedItems((state) => [
+                    ...state,
+                    {
+                      orderItemId: item.id,
+                      orderItemOptionId: opt.id,
+                      amount: opt.quantity,
+                    },
+                  ]);
+                }
+              }}
+            >
+              <OrderItemOptionInfo
+                key={opt.id}
+                option={opt}
+                orderItem={item}
+                displayStatus={false}
+              />
+            </Checkbox>
+          );
+        }),
       )}
     </Stack>
   );
