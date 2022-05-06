@@ -12,9 +12,6 @@
 ALTER TABLE `Goods` DROP FOREIGN KEY `Goods_informationNoticeId_fkey`;
 
 -- AlterTable
-ALTER TABLE `ConfirmHistory` DROP COLUMN `reason`;
-
--- AlterTable
 ALTER TABLE `Customer` MODIFY `gender` ENUM('male', 'female', 'unknown') NULL DEFAULT 'unknown';
 
 -- AlterTable
@@ -22,9 +19,6 @@ ALTER TABLE `Goods` DROP COLUMN `informationNoticeId`;
 
 -- AlterTable
 ALTER TABLE `GoodsInformationNotice` MODIFY `goodsId` INTEGER NOT NULL;
-
--- AlterTable
-ALTER TABLE `PrivacyApproachHistory` ADD COLUMN `reason` VARCHAR(191) NULL;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `GoodsInformationNotice_goodsId_key` ON `GoodsInformationNotice`(`goodsId`);
