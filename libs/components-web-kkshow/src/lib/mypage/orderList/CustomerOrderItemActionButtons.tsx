@@ -1,6 +1,14 @@
 import { Button, SimpleGrid, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { useOrderPurchaseConfirmMutation } from '@project-lc/hooks';
+import {
+  deliveryTrackingAbleSteps,
+  exchangeReturnAbleSteps,
+  inquireDisableSteps,
+  orderCancellationAbleSteps,
+  purchaseConfirmAbleSteps,
+  reviewAbleSteps,
+} from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { OrderCancelDialog } from './OrderCancelDialog';
 import { OrderItemOptionInfoProps } from './OrderItemOptionInfo';
@@ -32,35 +40,25 @@ export function OrderItemActionButtons({
       onClick: () => {
         alert('배송조회 페이지로 이동');
       },
-      display: ['exportDone', 'shipping', 'shippingDone'].includes(step), // 출고완료 이후 표시
+      display: deliveryTrackingAbleSteps.includes(step), // 출고완료 이후 표시
       disabled: false,
     },
     {
       label: '주문 취소 신청',
       onClick: orderCancelDialog.onOpen,
-      display: ['orderReceived', 'paymentConfirmed'].includes(step), // 상품준비 이전에만 표시
+      display: orderCancellationAbleSteps.includes(step), // 상품준비 이전에만 표시
       disabled: !!orderCancellation,
     },
     {
-      label: '재배송/환불 신청', // TODO: 재배송/환불 신청 페이지로 이동
+      label: '재배송/환불 신청',
       onClick: () => router.push(`exchange-return/write?orderId=${orderId}`),
-      display:
-        [
-          'goodsReady',
-          'exportReady',
-          'partialExportDone',
-          'exportDone',
-          'partialShipping',
-          'shipping',
-          'partialShippingDone',
-          'shippingDone',
-        ].includes(step) && !purchaseConfirmationDate, // 상품준비 이후 표시 && 구매확정 안했을 때
+      display: exchangeReturnAbleSteps.includes(step) && !purchaseConfirmationDate, // 상품준비 이후 표시 && 구매확정 안했을 때
       disabled: !!purchaseConfirmationDate, // 구매확정 이후 disabled
     },
     {
       label: '구매확정',
       onClick: purchaseConfirmDialog.onOpen,
-      display: ['shippingDone'].includes(step) && !purchaseConfirmationDate, // 배송완료 이후 표시 & 구매확정 하지 않았을때
+      display: purchaseConfirmAbleSteps.includes(step) && !purchaseConfirmationDate, // 배송완료 이후 표시 & 구매확정 하지 않았을때
       disabled: !!purchaseConfirmationDate,
     },
     {
@@ -68,13 +66,13 @@ export function OrderItemActionButtons({
       onClick: () => {
         alert('리뷰작성페이지로 이동');
       }, // TODO: 리뷰작성 페이지로 이동
-      display: ['shippingDone', 'purchaseConfirmed'].includes(step), // 배송완료 이후 표시 & 구매확정시 표시, 리뷰 작성하지 않았을때
+      display: reviewAbleSteps.includes(step), // 배송완료 이후 표시 & 구매확정시 표시, 리뷰 작성하지 않았을때
       disabled: !!hasReview || !purchaseConfirmationDate, // 이미 리뷰 작성했거나, 구매확정 안한경우 비활성
     },
     {
       label: '문의하기',
       onClick: goodsInquireDialog.onOpen,
-      display: !['paymentCanceled', 'orderInvalidated', 'paymentFailed'].includes(step),
+      display: !inquireDisableSteps.includes(step),
       disabled: false,
     },
   ];

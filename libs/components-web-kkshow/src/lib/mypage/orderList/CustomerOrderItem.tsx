@@ -1,27 +1,14 @@
 import { Box, Stack } from '@chakra-ui/react';
 import { OrderProcessStep } from '@prisma/client';
 import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
-import { FmOrderStatusNumString, OrderItemWithRelations } from '@project-lc/shared-types';
+import {
+  FmOrderStatusNumString,
+  OrderItemWithRelations,
+  orderProcessStepDict,
+} from '@project-lc/shared-types';
 import { OrderItemActionButtons } from './CustomerOrderItemActionButtons';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
 
-export const orderProcessStepDict: Record<OrderProcessStep, FmOrderStatusNumString> = {
-  orderReceived: '15', // 주문접수,
-  paymentConfirmed: '25', // 결제확인,
-  goodsReady: '35', // 상품준비,
-  partialExportReady: '40', // 부분출고준비,
-  exportReady: '45', // 출고준비,
-  partialExportDone: '50', // 부분출고완료,
-  exportDone: '55', // 출고완료,
-  partialShipping: '60', // 부분배송중,
-  shipping: '65', // 배송중,
-  partialShippingDone: '70', // 부분배송완료,
-  shippingDone: '75', // 배송완료,
-  purchaseConfirmed: '80', // 구매확정(임의로 추가함)
-  paymentCanceled: '85', // 결제취소,
-  orderInvalidated: '95', // 주문무효,
-  paymentFailed: '99', // 결제실패,
-};
 export function orderProcessStepToFmOrderStatus(
   step: OrderProcessStep,
 ): FmOrderStatusNumString {
