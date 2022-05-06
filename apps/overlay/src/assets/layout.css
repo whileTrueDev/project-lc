@@ -38,6 +38,11 @@
   src: url('/fonts/THE_Nyuseusokbo.ttf');
 }
 
+@font-face {
+  font-family: 'Game';
+  src: url('/fonts/Game.ttf');
+}
+
 body {
   width: 100%;
   height: 100%;
@@ -113,13 +118,13 @@ body {
 
 .bottom-area-left-icon.urgent#clock {
   /* Start the shake animation and make the animation last for 0.5 seconds */
-  animation: shake 0.5s;
+  animation: timer-shake 0.5s;
 
   /* When the animation is finished, start again */
   animation-iteration-count: infinite;
 }
 
-@keyframes shake {
+@keyframes timer-shake {
   0% {
     transform: translate(1px, 1px) rotate(0deg);
   }
@@ -127,10 +132,10 @@ body {
     transform: translate(-1px, -2px) rotate(-1deg);
   }
   20% {
-    transform: translate(-3px, 0px) rotate(1deg);
+    transform: translate(-1px, 0px) rotate(1deg);
   }
   30% {
-    transform: translate(3px, 2px) rotate(0deg);
+    transform: translate(1px, 2px) rotate(0deg);
   }
   40% {
     transform: translate(1px, -1px) rotate(1deg);
@@ -139,10 +144,10 @@ body {
     transform: translate(-1px, 2px) rotate(-1deg);
   }
   60% {
-    transform: translate(-3px, 1px) rotate(0deg);
+    transform: translate(-1px, 1px) rotate(0deg);
   }
   70% {
-    transform: translate(3px, 1px) rotate(-1deg);
+    transform: translate(1px, 1px) rotate(-1deg);
   }
   80% {
     transform: translate(-1px, -1px) rotate(1deg);
@@ -210,14 +215,20 @@ body {
 }
 
 .bottom-fever-timer {
+  bottom: 55px;
+  position: absolute;
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   font-family: 'JALNAN';
   font-size: 30px;
+  height: 55px;
+  width: 100px;
   color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.5);
   -webkit-text-stroke: 1px #000000;
+  border-radius: 10px 10px 0px 0px;
 }
 
 .bottom-area-right {
@@ -347,6 +358,7 @@ body {
   text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
     2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
     0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
+  z-index: 20
 }
 
 .ranking-text-area span {
@@ -414,6 +426,7 @@ body {
   height: 450px;
   top: 119px;
   right: 15px;
+  align-items: center;
   position: fixed;
 }
 
@@ -441,6 +454,13 @@ body {
   font-weight: 600;
 }
 
+/* .donation-header {
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+  2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+  0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
+  color: rgb(255, 255, 255);
+} */
+
 #donation-user-id {
   font-size: 35px;
   font-weight: bold;
@@ -466,6 +486,8 @@ body {
   width: 100%;
   height: 100%;
   margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 2px 1px 5px #000;
 }
 
 #donation-top {
@@ -473,8 +495,8 @@ body {
 }
 
 .full-video {
+  display:none;
   position: fixed;
-  opacity: 1;
   top: 0;
   left: 0;
   width: 100%;
@@ -531,17 +553,7 @@ span.objective-value {
   color: rgb(0, 252, 255);
 }
 
-div.bottom-fever-timer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  bottom: 55px;
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.5);
-  height: 55px;
-  width: 100px;
-  border-radius: 10px 10px 0px 0px;
-}
+
 
 @keyframes seesaw {
   0% {
@@ -577,6 +589,7 @@ div.bottom-fever-timer {
   -webkit-animation-iteration-count: infinite;
   -webkit-animation-timing-function: linear;
 }
+
 
 #kks-logo {
   width: 130px;
@@ -719,6 +732,7 @@ div.bottom-fever-timer {
 }
 
 .letters {
+  display:none;
   font-size: xx-large;
   color: rgba(255, 255, 255, 0.8);
   font-family: NotoSansBold;
@@ -871,5 +885,127 @@ div.bottom-fever-timer {
   99%,
   to {
     transform: translate(-100%);
+  }
+}
+
+.combo-mode {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+  2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+  0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
+  color:white;
+  font-family: 'NotoSansBold';
+}
+
+.pop-out {
+  display: flex;
+  margin-bottom:0px;
+  font-size:45px;
+  font-style: italic;
+  background-image: linear-gradient(
+    #ff2323,
+    #fcff3c 
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  color: #fff;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px #000;
+  animation: 2s anim-popoutin ease;
+  text-shadow: none;
+  font-family: 'Game';
+  -webkit-box-reflect: below -20px linear-gradient(transparent, rgba(0,0,0,.2));
+
+}
+
+.ranking-pop {
+  background-image: linear-gradient(
+    35deg,
+    #deffb0 0%,
+    #fefd92 29%,
+    #b5d9ff 67%,
+    #ffffff 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: 5s ranking-pop ease;
+  text-shadow: none;
+  -webkit-text-stroke: 1px #000;
+  font-family:'KOTRA'
+}
+
+@keyframes ranking-pop {
+  0% {
+    background-position: 0%;
+    transform: scale(0);
+    opacity: 0;
+  }
+  10% {
+    transform: scale(0) translate(20px,0px);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(2) translate(50px,0px);
+    opacity: 1;
+  }
+  90% {
+    transform: scale(2) translate(50px,0px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    background-position: 200%;
+  }
+}
+
+@keyframes anim-popoutin {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.wave {
+  display: inline-flex;
+  position: relative;
+}
+.wave span {
+  position: relative;
+  display: inline-block;
+  color: rgb(0, 252, 255);
+  animation: waviy 1s infinite;
+  animation-delay: calc(.1s * var(--i));
+  text-shadow: -2px -2px 0 rgb(85, 83, 83), 0 -2px 0 rgb(85, 83, 83),
+  2px -2px 0 rgb(85, 83, 83), 2px 0 0 rgb(85, 83, 83), 2px 2px 0 rgb(85, 83, 83),
+  0 2px 0 rgb(85, 83, 83), -2px 2px 0 rgb(85, 83, 83), -2px 0 0 rgb(85, 83, 83);
+  font-family: 'NotoSansBold';
+}
+@keyframes waviy {
+  0%,40%,100% {
+    transform: translateY(0)
+  }
+  20% {
+    transform: translateY(-5px)
   }
 }

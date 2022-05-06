@@ -1,437 +1,665 @@
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <script>
-            var global = global || window;
-            var Buffer = Buffer || [];
-            var process = process || {
-                env: { DEBUG: undefined,  OVERLAY_HOST:"{{OVERLAY_HOST}}", OVERLAY_CONTROLLER_HOST:"{{OVERLAY_CONTROLLER_HOST}}", REALTIME_API_HOST:"{{REALTIME_API_HOST}}" },
-                version: []
-            };
-        </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"></script>
-        <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
-        
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.1/css/jquery.dataTables.css">
-        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.js"></script>
-        <script type="module" src="/admin.js"></script>
-        <link href="/layout.css" rel='stylesheet'>
-        <title>Controller</title>
-        <script>
-            const exports = {};
-        </script>
-    </head>
-    <body>
-        <div class="upper-area">
-            <div class="search-box">
-                <table class="display compact" id="liveshopping-table">
-                    <thead>
-                        <tr>
-                            <th>id</th>
-                            <th>이름</th>
-                            <th>방송인MAIL</th>
-                            <th>URL</th>
-                            <th>상품명</th>
-                            <th>방송시작</th>
-                            <th>방송종료</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#liveShoppings}}
-                        <tr class="user-row" id={{broadcaster.userNickname}}>
-                            <td class="liveshopping-id-cell" id={{id}}>
-                                {{id}}
-                            </td>
-                            <td class="nickname-cell">
-                                {{broadcaster.userNickname}}
-                            </td>
-                            <td class="email-cell" id={{broadcaster.email}}>
-                                {{broadcaster.email}}
-                            </td>
-                            <td class="url-cell" id={{broadcaster.overlayUrl}}>
-                                {{broadcaster.overlayUrl}}
-                            </td>
-                            <td class="goods-cell">
-                                {{goods.goods_name}}
-                            </td>
-                            <td class="broadcast-start-cell">
-                                {{broadcastStartDate}}
-                            </td>
-                            <td class="broadcast-end-cell">
-                                {{broadcastEndDate}}
-                            </td>
-                            <td>
-                                <button
-                                    class="socket-id-button"
-                                >
-                                    선택
-                                </button>
-                            </td>
-                        </tr>
-                        {{/liveShoppings}}
-                    </tbody>
-                </table>
+  <head>
+    <meta charset='UTF-8' />
+    <script>
+      var global = global || window; var Buffer = Buffer || []; var process = process || {
+      env: { DEBUG: undefined, OVERLAY_HOST:"{{OVERLAY_HOST}}", OVERLAY_CONTROLLER_HOST:"{{OVERLAY_CONTROLLER_HOST}}",
+      REALTIME_API_HOST:"{{REALTIME_API_HOST}}" }, version: [] };
+    </script>
+    <script
+      src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js'
+    ></script>
+    <script src='https://code.jquery.com/jquery-3.4.0.min.js'></script>
+    <script
+      src='https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js'
+    ></script>
+
+    <link
+      rel='stylesheet'
+      type='text/css'
+      href='https://cdn.datatables.net/1.11.1/css/jquery.dataTables.css'
+    />
+    <script
+      type='text/javascript'
+      charset='utf8'
+      src='https://cdn.datatables.net/1.11.1/js/jquery.dataTables.js'
+    ></script>
+    <script type='module' src='/admin.js'></script>
+    <link href='/layout.css' rel='stylesheet' />
+    <title>Controller</title>
+    <script>
+      const exports = {};
+    </script>
+  </head>
+  <body>
+    <div class='upper-area'>
+      <div class='search-box'>
+        <table class='display compact' id='liveshopping-table'>
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>이름</th>
+              <th>방송인MAIL</th>
+              <th>URL</th>
+              <th>상품명</th>
+              <th>방송시작</th>
+              <th>방송종료</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#liveShoppings}}
+              <tr class='user-row' id={{broadcaster.userNickname}}>
+                <td class='liveshopping-id-cell' id={{id}}>
+                  {{id}}
+                </td>
+                <td class='nickname-cell'>
+                  {{broadcaster.userNickname}}
+                </td>
+                <td class='email-cell' id={{broadcaster.email}}>
+                  {{broadcaster.email}}
+                </td>
+                <td class='url-cell' id={{broadcaster.overlayUrl}}>
+                  {{broadcaster.overlayUrl}}
+                </td>
+                <td class='goods-cell'>
+                  {{goods.goods_name}}
+                </td>
+                <td class='broadcast-start-cell'>
+                  {{broadcastStartDate}}
+                </td>
+                <td class='broadcast-end-cell'>
+                  {{broadcastEndDate}}
+                </td>
+                <td>
+                  <button class='socket-id-button'>
+                    선택
+                  </button>
+                </td>
+              </tr>
+            {{/liveShoppings}}
+          </tbody>
+        </table>
+      </div>
+      <button id='toggle-table-button'>
+        ◀️
+      </button>
+      <div class='dashboard'>
+        <h2>
+          대시보드
+        </h2>
+        <div class='dashborad-inner'>
+          <div>
+            <h4>
+              총 주문금액
+            </h4>
+            <p>
+              <span class='total-sales-price'>0</span>
+              <span>원</span>
+            </p>
+          </div>
+          <div>
+            <h4>
+              주문건수
+            </h4>
+            <p>
+              <span class='total-sales-number'>0</span>
+              <span>건</span>
+            </p>
+          </div>
+          <div>
+            <h4>
+              선물 주문건수
+            </h4>
+            <p>
+              <span class='total-gift-sales'>0</span>
+              <span>건</span>
+            </p>
+          </div>
+          <div>
+            <h4>
+              추가주문(로그인 주문만 집계)
+            </h4>
+            <p>
+              <span class='addtional-sales'>0</span>
+              <span>건</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='mid-area'>
+      <div class='console-box'>
+        <h1 id='creator-name'>
+          ⚠️ 크리에이터를 선택해주세요
+        </h1>
+        <h4>
+          연결상태 :
+          <span id='connection-status'>
+            ⚠️ 크리에이터를 선택해주세요
+          </span>
+        </h4>
+        <label>
+          <input type='checkbox' id='panel-activate-checkbox' />
+          전체 활성화
+        </label>
+        <div class='admin-to-bc-live-state-board-box'>
+          <fieldset>
+            <legend><h3>관리자 메시지 보내기(방송인 현황판에 표시됨)</h3></legend>
+            <div>
+              <input
+                type='text'
+                maxlength='160'
+                class='admin-to-bc-live-state-board__input'
+              />
+              <button class='admin-to-bc-live-state-board__send-button'>입력</button>
             </div>
-            <button id="toggle-table-button">
-                ◀️
+
+            <div>
+              <span>현재 표시중인 메시지: </span>
+              <span class='admin-to-bc-live-state-board__displaying-message'></span>
+              <button class='admin-to-bc-live-state-board__delete-button'>삭제</button>
+            </div>
+
+            <button class='admin-to-bc-live-state-board__alert-button'>알림</button>
+          </fieldset>
+        </div>
+        <h2>
+          화면 제어
+        </h2>
+        <label>
+          <input type='checkbox' id='screen-control-activate-checkbox' />
+          화면 제어 활성화
+        </label>
+        <div class='screen-control-box'>
+          <button
+            id='screen-show-button'
+            value='화면 띄우기'
+            style='background-color:blue;'
+          >
+            화면 띄우기
+          </button>
+          <button
+            id='screen-hide-button'
+            value='화면 숨기기'
+            style='background-color:red;'
+          >
+            화면 숨기기
+          </button>
+          <button
+            id='logo-toggle-button'
+            value='로고 색상 변경'
+            style='background-color:dimgray;'
+          >
+            로고 색상 변경
+          </button>
+          <button
+            id='bottom-area-toggle-button'
+            value='하단 띠 토글'
+            style='background-color:dimgray;'
+          >
+            하단 띠 토글
+          </button>
+          <button id='hide-vertical-banner' style='background-color:black'>
+            세로배너 토글
+          </button>
+          <button
+            id='soldout-signal-button'
+            value='매진 알림 보내기'
+            style='background-color:purple;'
+          >
+            매진 알림 보내기
+          </button>
+          <button
+            id='soldout-remove-button'
+            value='매진 알림 없애기'
+            style='background-color:darksalmon'
+          >
+            매진 알림 없애기
+          </button>
+          <button
+            id='calling-button'
+            value='전화 이벤트'
+            style='background-color:cadetblue'
+          >
+            전화 이벤트
+          </button>
+          <button
+            id='quiz-button'
+            value='퀴즈 이벤트'
+            style='background-color:chartreuse'
+          >
+            퀴즈 이벤트
+          </button>
+          <button
+            id='remove-notification-button'
+            value='이벤트이미지제거'
+            style='background-color:darkcyan'
+          >
+            이벤트이미지제거
+          </button>
+          <button
+            id='refresh-ranking-button'
+            value='랭킹 새로고침'
+            style='background-color:red'
+          >
+            랭킹 새로고침
+          </button>
+          <button
+            id='show-virtual-character'
+            value=' 버추얼 캐릭터'
+            style='background-color:darkolivegreen'
+          >
+            버추얼캐릭터
+          </button>
+          <button
+            id='play-virtual-character-audio'
+            value=' 버추얼 캐릭터'
+            style='background-color:darkviolet'
+          >
+            오디오 재생
+          </button>
+          <button
+            id='delete-virtual-character-audio'
+            value=' 버추얼 캐릭터'
+            style='background-color:firebrick'
+          >
+            오디오 비우기
+          </button>
+          <button
+            id='chicken-movement-button'
+            value=' 닭 애니메이션'
+            style='background-color:firebrick'
+          >
+            닭 애니메이션
+          </button>
+          <button id='combo-reset-button' style='background-color:pink'>
+            콤보 리셋버튼
+          </button>
+        </div>
+        <h2>
+          동작 제어
+        </h2>
+        <label>
+          <input type='checkbox' id='action-control-activate-checkbox' />
+          동작 제어 활성화
+        </label>
+        <div class='action-control-box'>
+          <div class='video-controller'>
+            <h6>
+              동영상 컨트롤러
+            </h6>
+            <div class='play-controller'>
+              <button
+                id='show-intro-video-button'
+                value='Intro 송출'
+                style='background-color:blue;'
+              >
+                Intro 송출
+              </button>
+              <button
+                id='show-outro-video-button'
+                value='Outro 송출'
+                style='background-color:dodgerblue'
+              >
+                Outro 송출
+              </button>
+              <button
+                id='hide-video-button'
+                value='영상 비우기'
+                style='background-color:red;'
+              >
+                영상 비우기
+              </button>
+              <button class='start-bgm-button' value='1' style='background-color:blue'>
+                1번 BGM 틀기
+              </button>
+              <button class='start-bgm-button' value='2' style='background-color:blue'>
+                2번 BGM 틀기
+              </button>
+              <button class='start-bgm-button' value='3' style='background-color:blue'>
+                3번 BGM 틀기
+              </button>
+              <button class='start-bgm-button' value='4' style='background-color:blue'>
+                4번 BGM 틀기
+              </button>
+              <button id='off-bgm-button' value='bgm 종료' style='background-color:red'>
+                BGM 끄기
+              </button>
+              <button class='bgm-volume-button' value='up' style='background-color:green'>
+                BGM볼륨 ▲
+              </button>
+              <button class='bgm-volume-button' value='down' style='background-color:red'>
+                BGM볼륨 ▼
+              </button>
+            </div>
+          </div>
+          <div class='vertical-divider'></div>
+          <div class='etc-controller'>
+            <h6>
+              기타 컨트롤러
+            </h6>
+            <button
+              id='product-name-send-button'
+              value='상품명 전송'
+              style='background-color:burlywood'
+            >
+              상품명 전송
             </button>
-            <div class="dashboard">
-                <h2>
-                    대시보드
-                </h2>
-                <div class="dashborad-inner" >
-                    <div>
-                        <h4>
-                            총 주문금액
-                        </h4>
-                        <p>
-                            <span class="total-sales-price">0</span>
-                            <span>원</span>
-                        </p>
-                    </div>
-                    <div>
-                        <h4>
-                            주문건수
-                        </h4>
-                        <p>
-                            <span class="total-sales-number">0</span>
-                            <span>건</span>
-                        </p>
-                    </div>
-                    <div>
-                        <h4>
-                            선물 주문건수
-                        </h4>
-                        <p>
-                            <span class="total-gift-sales">0</span>
-                            <span>건</span>
-                        </p>
-                    </div>
-                    <div>
-                        <h4>
-                            추가주문(로그인 주문만 집계)
-                        </h4>
-                        <p>
-                            <span class="addtional-sales">0</span>
-                            <span>건</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <button id='data-send-all' style='background-color:blue'>
+              데이터 재송출
+            </button>
+            <button id='refresh-button' value='새로고침' style='background-color:red'>
+              새로고침
+            </button>
+            <button
+              id='alive-check-button'
+              value='연결체크'
+              style='background-color:dodgerblue'
+            >
+              연결 체크
+            </button>
+            <button
+              id='liveshopping-id-button'
+              value='라이브쇼핑ID'
+              style='background-color:blueviolet'
+            >
+              라이브쇼핑ID
+            </button>
+          </div>
         </div>
-        <div class="mid-area">
-            <div class="console-box">
-                <h1 id="creator-name"> 
-                    ⚠️ 크리에이터를 선택해주세요
-                </h1>
-                <h4>
-                    연결상태 : 
-                    <span id="connection-status">
-                        ⚠️ 크리에이터를 선택해주세요
-                    </span>
-                </h4>
-                <label>
-                    <input type="checkbox" id="panel-activate-checkbox">
-                        전체 활성화
-                    </input>
-                </label>    
-                <div class="admin-to-bc-live-state-board-box">
-                    <fieldset>
-                        <legend><h3>관리자 메시지 보내기(방송인 현황판에 표시됨)</h3></legend>
-                        <div>
-                            <input type="text" maxlength="160" class="admin-to-bc-live-state-board__input">
-                            <button class="admin-to-bc-live-state-board__send-button">입력</button>
-                        </div>
-                        
-                        <div>
-                            <span>현재 표시중인 메시지: </span>
-                            <span class="admin-to-bc-live-state-board__displaying-message"></span>
-                            <button class="admin-to-bc-live-state-board__delete-button">삭제</button>
-                        </div>
-                        
-                        <button class="admin-to-bc-live-state-board__alert-button">알림</button>
-                    </fieldset>
-                </div>
-                <h2>
-                    화면 제어
-                </h2>
-                <div class="screen-control-box">
-                    <button id="screen-show-button" value="화면 띄우기" style="background-color:blue;">
-                        화면 띄우기
-                    </button>
-                    <button id="screen-hide-button" value="화면 숨기기" style="background-color:red;">
-                        화면 숨기기
-                    </button>
-                    <button id="logo-toggle-button" value="로고 색상 변경" style="background-color:dimgray;">
-                        로고 색상 변경
-                    </button>
-                    <button id="bottom-area-toggle-button" value="하단 띠 토글" style="background-color:dimgray;">
-                        하단 띠 토글
-                    </button>
-                    <button id="soldout-signal-button" value="매진 알림 보내기" style="background-color:purple;">
-                        매진 알림 보내기
-                    </button>
-                    <button id="soldout-remove-button" value="매진 알림 없애기" style="background-color:darksalmon">
-                        매진 알림 없애기
-                    </button>
-                    <button id="calling-button" value="전화 이벤트" style="background-color:cadetblue">
-                        전화 이벤트
-                    </button>
-                    <button id="quiz-button" value="퀴즈 이벤트" style="background-color:chartreuse">
-                        퀴즈 이벤트
-                    </button>
-                    <button id="remove-notification-button" value="이벤트이미지제거" style="background-color:darkcyan">
-                        이벤트이미지제거
-                    </button>
-                    <button id="refresh-ranking-button" value="랭킹 새로고침" style="background-color:red">
-                        랭킹 새로고침
-                    </button>
-                    <button id="show-virtual-character" value=" 버추얼 캐릭터" style="background-color:darkolivegreen">
-                        버추얼캐릭터
-                    </button>
-                    <button id="play-virtual-character-audio" value=" 버추얼 캐릭터" style="background-color:darkviolet">
-                        오디오 재생
-                    </button>
-                    <button id="delete-virtual-character-audio" value=" 버추얼 캐릭터" style="background-color:firebrick">
-                        오디오 비우기
-                    </button>
-                </div>
-                <h2>
-                    동작 제어
-                </h2>
-                <div class="action-control-box">
-                    <div class="video-controller">
-                        <h6>
-                            동영상 컨트롤러
-                        </h6>
-                        <div class="play-controller">
-                            <button id="show-intro-video-button" value="Intro 송출" style="background-color:blue;">
-                                Intro 송출
-                            </button>
-                            <button id="show-outro-video-button" value="Outro 송출" style="background-color:dodgerblue">
-                                Outro 송출
-                            </button>
-                        </div>
-                        <button id="hide-video-button" value="영상 비우기" style="background-color:red;">
-                            영상 비우기
-                        </button>
-                    </div>
-                    <div class="vertical-divider"></div>
-                    <div class="etc-controller">
-                        <h6>
-                            기타 컨트롤러
-                        </h6>
-                        <button id="data-send-all" style="background-color:blue">
-                            데이터 재송출
-                        </button>
-                        <button id="refresh-button" value="새로고침" style="background-color:red">
-                            새로고침
-                        </button>
-                        <button id="alive-check-button" value="연결체크" style="background-color:dodgerblue">
-                            연결 체크
-                        </button>
-                        <button id="liveshopping-id-button" value="라이브쇼핑ID" style="background-color:blueviolet">
-                            라이브쇼핑ID
-                        </button>
-                        <button id="product-name-send-button" value="상품명 전송" style="background-color:burlywood">
-                            상품명 전송
-                        </button>
-                    </div>
-                </div>
 
-                <div class="purchase-message-box">
-                    <table class="display compact cell-border" id="message-table">
-                        <thead>
-                            <tr>
-                                <th>id</th>
-                                <th>이름</th>
-                                <th>내용</th>
-                                <th>가격</th>
-                                <th>생성일</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="message-tbody">
-                        </tbody>
-                    </table>
-                </div>
-
-                <script type="text/x-handlebars-template" id="purchase-message-list" >
-                    \{{#each .}}
-                        <tr class="message-row" id=\{{id}}>
-                            <td class="message-id-cell" id=\{{id}}>
-                                \{{id}}
-                            </td>
-                            <td class="message-nickname-cell">
-                                \{{nickname}}
-                            </td>
-                            <td class="text-cell">
-                                \{{text}}
-                            </td>
-                            <td class="price-cell">
-                                \{{price}}
-                            </td>
-                            <td class="date-cell">
-                                \{{createDate}}
-                            </td>
-                            <td>
-                                <button
-                                    class="delete-message-button"
-                                >
-                                    삭제
-                                </button>
-                            </td>
-                        </tr>
-                    \{{/each}} 
-                </script>
-                <h2>
-                    입력 기능
-                </h2>
-                <div class="etc-control-box">
-                    <div 
-                        class="datetime-picker"
-                    >
-                        <input 
-                            type="datetime-local" 
-                            id="start-time-picker"
-                            />
-                        <button
-                            id="start-time-send-button"
-                            style="background-color: blue;"
-                        >
-                            시작 시간 전송
-                        </button>
-                    </div>
-                    <div 
-                        class="datetime-picker"
-                    >
-                        <input 
-                            type="datetime-local" 
-                            id="end-time-picker"
-                            />
-                        <button
-                            id="end-time-send-button"
-                            style="background-color: red;"
-                        >
-                            종료 시간 전송
-                        </button>
-                    </div>
-                    <div 
-                        class="datetime-picker"
-                    >
-                        <input 
-                            type="datetime-local" 
-                            id="fever-time-picker"
-                            />
-                        <button
-                            id="fever-time-send-button"
-                            style="background-color: purple;"
-                        >
-                            피버 시간 전송
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="message-box">
-                <h2>
-                    메세지 제어
-                </h2>
-                <div class="message-box-fixed-area">
-                    <span>기준 금액</span>
-                    <input type="number" id="standard-price">
-                    <span>상품명</span>
-                    <input type="text" id="product-name">
-                    <span>팬닉</span>
-                    <input type="text" id="fan-nickname">
-                    <button class="message-box-lock-button">
-                        잠금
-                    </button>
-                </div>
-                <form>
-                    <fieldset>
-                        <legend>메세지 입력</legend>
-                        <span>구매자</span>
-                        <div class="customer-nickname-box">
-                            <input type="text" id="customer-nickname">
-                            <label>
-                            <input type="checkbox" id="is-client-checkbox" name="client-checkbox">
-                                비회원
-                            </label>
-                        </div>
-                        <span>구매액</span>
-                        <div>
-                            <input type="number" id="sold-price">
-                            <span id="stringified-sold-price"></span>
-                        </div>
-                        <span>메세지</span>
-                        <input type="text" id="customer-message">
-                        <span>선물하기 여부</span>
-                        <div class="checkbox-area">
-                            <input type="radio" id="gift-radio-no" name="gift" value="no" checked>
-                                <label for="gift-radio-no">NO</label>
-                            <input type="radio" id="gift-radio-yes" name="gift" value="yes">
-                                <label for="gift-radio-yes">YES</label>
-                        </div>
-                        <br>
-                        <span>전화 이벤트</span>
-                        <div class="checkbox-area">
-                            <input type="radio" id="event-radio-no" name="event" value="no" checked>
-                                <label for="event-radio-no">NO</label>
-                            <input type="radio" id="event-radio-yes" name="event" value="yes">
-                                <label for="event-radio-yes">YES</label>
-                        </div>
-                        <br>
-                        <div class="checkbox-area">
-                            <label>
-                                <input type="checkbox" id="insert-only-db-checkbox" name="db-insert-checkbox">
-                                    DB에만 삽입
-                                </input>
-                            </label>
-                        </div>
-                        <button id="message-button" type="submit">응원메세지 전송</button>   
-                    </fieldset>
-                </form>
-                <div class="objective-box">
-                    <div>
-                        <select id="objective-select-box">
-                            <option value="">금액선택</option>
-                            <option value="1000000">100만원</option>
-                            <option value="1500000">150만원</option>
-                            <option value="2000000">200만원</option>
-                            <option value="2500000">250만원</option>
-                            <option value="3000000">300만원</option>
-                        </select>
-                    </div>
-                    [닉네임 최대 8글자 9글자부터는 ...넣어서 전송됩니다]
-                    <div>
-                        <input type="text" id="objective-message-nickname" maxlength='9' style="width:20%">
-                        <span>님의 구매로</span>
-                        <input type="number" id="objective-message-price" style="width:20%">
-                        <span id="korean-number-display-1"></span>
-                        <span>돌파!</span>
-                        <button id="objective-message-button" type="submit" style="width:inherit">메세지 전송</button>   
-                    </div>
-                    <div>
-                        <input type="number" id="objective-price"/>
-                        <span id="korean-number-display-2"></span>
-                        <button type="submit" id="objective-button" style="width:inherit">중간금액 전송 [폭죽효과]</button> 
-                    </div>
-                </div>
-                <div class="bottom-message-box">    
-                    <input type="text" id="admin-message" style="width:40%">
-                    <button id="fever-message-button" style="background-color:red;">피버메세지 전송</button>
-                    <button id="bottom-message-button" style="background-color:gray;">하단메세지 전송</button>
-                </div>
-            </div>
+        <div class='purchase-message-box'>
+          <table class='display compact cell-border' id='message-table'>
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>이름</th>
+                <th>내용</th>
+                <th>가격</th>
+                <th>생성일</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id='message-tbody'>
+            </tbody>
+          </table>
         </div>
-        <dialog id="error-dialog" title="전송실패">
-            메세지 전송에 실패하였습니다. 서버 상태를 점검하거나, 입력값을 다시 확인해보세요
-        </dialog>
-        <dialog id="insert-dialog" title="삽입완료">
-            DB에 값을 입력하였습니다
-        </dialog>
-    </body>
+
+        <script type='text/x-handlebars-template' id='purchase-message-list'>
+          \{{#each .}} <tr class="message-row" id=\{{id}}> <td class="message-id-cell" id=\{{id}}>
+          \{{id}} </td> <td class="message-nickname-cell">
+          \{{nickname}} </td> <td class="text-cell">
+          \{{text}} </td> <td class="price-cell">
+          \{{price}} </td> <td class="date-cell">
+          \{{createDate}} </td> <td> <button class="delete-message-button" > 삭제
+          </button> </td> </tr>
+          \{{/each}}
+        </script>
+        <h2>
+          입력 기능
+        </h2>
+        <div class='etc-control-box'>
+          <div class='datetime-picker'>
+            <input type='datetime-local' id='start-time-picker' />
+            <button id='start-time-send-button' style='background-color: blue;'>
+              시작 시간 전송
+            </button>
+          </div>
+          <div class='datetime-picker'>
+            <input type='datetime-local' id='end-time-picker' />
+            <button id='end-time-send-button' style='background-color: red;'>
+              종료 시간 전송
+            </button>
+          </div>
+          <div class='datetime-picker'>
+            <input type='datetime-local' id='fever-time-picker' />
+            <button id='fever-time-send-button' style='background-color: purple;'>
+              피버 시간 전송
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class='message-box'>
+        <h2>
+          메세지 제어
+        </h2>
+        <div class='message-box-fixed-area'>
+          <div class='message-box-fixed-area-inner-wrapper'>
+            <div class='message-box-fixed-area-inner'>
+              <span>기준 금액</span>
+              <input type='number' id='standard-price' />
+            </div>
+            <div class='message-box-fixed-area-inner'>
+              <span>상품명</span>
+              <input type='text' id='product-name' />
+            </div>
+            <div class='message-box-fixed-area-inner'>
+              <span>팬닉</span>
+              <input type='text' id='fan-nickname' />
+            </div>
+          </div>
+          <div>
+            <h4>TTS 설정</h4>
+            <div class='tts-setting-box'>
+              <label>
+                <input type='radio' name='tts-type' value='full' />
+                전체
+              </label>
+              <label>
+                <input type='radio' name='tts-type' value='nick-purchase' />
+                닉, 구매감사
+              </label>
+              <label>
+                <input type='radio' name='tts-type' value='nick-purchase-price' />
+                닉, 금액, 구매감사
+              </label>
+              <label>
+                <input type='radio' name='tts-type' value='only-message' />
+                메세지만
+              </label>
+              <label>
+                <input type='radio' name='tts-type' value='no-tts' />
+                TTS 없음
+              </label>
+              <label>
+                <input type='radio' name='tts-type' value='no-sound' />
+                소리 없음(콤보모드)
+              </label>
+            </div>
+          </div>
+          <button class='message-box-lock-button'>
+            잠금
+          </button>
+        </div>
+        <form>
+          <fieldset>
+            <legend>메세지 입력</legend>
+            <span>구매자</span>
+            <div class='customer-nickname-box'>
+              <input type='text' id='customer-nickname' />
+              <label>
+                <input type='checkbox' id='is-client-checkbox' name='client-checkbox' />
+                비회원
+              </label>
+            </div>
+            <span>구매액</span>
+            <div>
+              <input type='number' id='sold-price' />
+              <span id='stringified-sold-price'></span>
+            </div>
+            <span>메세지</span>
+            <input type='text' id='customer-message' />
+            <span>선물하기 여부</span>
+            <div class='checkbox-area'>
+              <input type='radio' id='gift-radio-no' name='gift' value='no' checked />
+              <label for='gift-radio-no'>NO</label>
+              <input type='radio' id='gift-radio-yes' name='gift' value='yes' />
+              <label for='gift-radio-yes'>YES</label>
+            </div>
+            <br />
+            <span>전화 이벤트</span>
+            <div class='checkbox-area'>
+              <input type='radio' id='event-radio-no' name='event' value='no' checked />
+              <label for='event-radio-no'>NO</label>
+              <input type='radio' id='event-radio-yes' name='event' value='yes' />
+              <label for='event-radio-yes'>YES</label>
+            </div>
+            <br />
+            <div class='checkbox-area'>
+              <label>
+                <input
+                  type='checkbox'
+                  id='insert-only-db-checkbox'
+                  name='db-insert-checkbox'
+                />
+                DB에만 삽입
+              </label>
+            </div>
+            <button id='message-button' type='submit'>응원메세지 전송</button>
+          </fieldset>
+        </form>
+        <h2>
+          중간금액 알림
+        </h2>
+        <label>
+          <input type='checkbox' id='objective-control-activate-checkbox' />
+          중간금액 활성화
+        </label>
+        <div class='objective-box'>
+          <div>
+            <select id='objective-select-box'>
+              <option value=''>금액선택</option>
+              <option value='1000000'>100만원</option>
+              <option value='1500000'>150만원</option>
+              <option value='2000000'>200만원</option>
+              <option value='2500000'>250만원</option>
+              <option value='3000000'>300만원</option>
+            </select>
+          </div>
+          [닉네임 최대 8글자 9글자부터는 ...넣어서 전송됩니다]
+          <div>
+            <input
+              type='text'
+              id='objective-message-nickname'
+              maxlength='9'
+              style='width:20%'
+            />
+            <span>님의 구매로</span>
+            <input type='number' id='objective-message-price' style='width:20%' />
+            <span id='korean-number-display-1'></span>
+            <span>돌파!</span>
+            <button
+              id='objective-message-button'
+              type='submit'
+              style='width:inherit'
+            >메세지 전송</button>
+          </div>
+          <div>
+            <input type='number' id='objective-price' />
+            <span id='korean-number-display-2'></span>
+            <button type='submit' id='objective-button' style='width:inherit'>중간금액
+              전송 [폭죽효과]</button>
+          </div>
+        </div>
+        <label>
+          <input type='checkbox' id='bottom-message-activate-checkbox' />
+          하단메세지 활성화
+        </label>
+        <div class='bottom-message-box'>
+          <input type='text' id='admin-message' style='width:40%' />
+          <button id='fever-message-button' style='background-color:red;'>피버메세지 전송</button>
+          <button id='bottom-message-button' style='background-color:gray;'>하단메세지
+            전송</button>
+        </div>
+        <h2>
+          테마선택
+        </h2>
+        <div class='theme-selection-box'>
+          <h4>
+            계절
+          </h4>
+          <div class='theme-selction-box-season'>
+            <button
+              class='theme-selction-box-button'
+              id='spring'
+              style='background-color:green;'
+            >봄</button>
+            <button
+              class='theme-selction-box-button'
+              id='summer'
+              style='background-color:blue;'
+            >미사용</button>
+            <button
+              class='theme-selction-box-button'
+              id='autumn'
+              style='background-color:red;'
+            >미사용</button>
+            <button
+              class='theme-selction-box-button'
+              id='winter'
+              style='background-color:orange;'
+            >미사용</button>
+          </div>
+          <h4>
+            게임
+          </h4>
+          <div>
+            <button
+              class='theme-selction-box-button'
+              id='lol'
+              style='background-color:blue;'
+            >미사용</button>
+            <button
+              class='theme-selction-box-button'
+              id='elden-ring'
+              style='background-color:brown;'
+            >미사용</button>
+            <button
+              class='theme-selction-box-button'
+              id='over-watch'
+              style='background-color:white;'
+            >미사용</button>
+            <button
+              class='theme-selction-box-button'
+              id='maplestory'
+              style='background-color:orange;'
+            >미사용</button>
+          </div>
+          <h4>
+            음식
+          </h4>
+          <div>
+            <button
+              class='theme-selction-box-button'
+              id='chicken'
+              style='background-color:blue;'
+            >닭</button>
+            <button
+              class='theme-selction-box-button'
+              id='dumpling'
+              style='background-color:brown;'
+            >미사용</button>
+            <button
+              class='theme-selction-box-button'
+              id='some'
+              style='background-color:white;'
+            >미사용</button>
+            <button
+              class='theme-selction-box-button'
+              id='thing'
+              style='background-color:orange;'
+            >미사용</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dialog id='error-dialog' title='전송실패'>
+      메세지 전송에 실패하였습니다. 서버 상태를 점검하거나, 입력값을 다시 확인해보세요
+    </dialog>
+    <dialog id='insert-dialog' title='삽입완료'>
+      DB에 값을 입력하였습니다
+    </dialog>
+  </body>
 </html>

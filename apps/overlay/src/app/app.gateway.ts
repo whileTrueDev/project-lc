@@ -14,6 +14,8 @@ import {
   SocketInfo,
   LiveShoppingIdWithProductNameAndRoomName,
   ProductNameAndRoomName,
+  RoomNameAndBgmNumber,
+  RoomNameAndVolume,
 } from '@project-lc/shared-types';
 import { Server, Socket } from 'socket.io';
 
@@ -119,5 +121,30 @@ export class AppGateway
     const { roomName } = roomNameAndStreamerAndProduct;
     const { streamerAndProduct } = roomNameAndStreamerAndProduct;
     this.server.to(roomName).emit('get product name from server', streamerAndProduct);
+  }
+
+  @SubscribeMessage('start bgm from admin')
+  startBgm(@MessageBody() roomNameAndBgmNumber: RoomNameAndBgmNumber): void {
+    const { roomName } = roomNameAndBgmNumber;
+    const { bgmNumber } = roomNameAndBgmNumber;
+
+    this.server.to(roomName).emit('start bgm from server', bgmNumber);
+  }
+
+  @SubscribeMessage('off bgm from admin')
+  offBgm(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('off bgm from server', roomName);
+  }
+
+  @SubscribeMessage('bgm volume from admin')
+  bgmVolume(@MessageBody() roomNameAndVolume: RoomNameAndVolume): void {
+    const { roomName } = roomNameAndVolume;
+    const { volume } = roomNameAndVolume;
+    this.server.to(roomName).emit('bgm volume from server', volume);
+  }
+
+  @SubscribeMessage('combo reset from admin')
+  resetCombo(@MessageBody() roomName: string): void {
+    this.server.to(roomName).emit('combo reset from server');
   }
 }
