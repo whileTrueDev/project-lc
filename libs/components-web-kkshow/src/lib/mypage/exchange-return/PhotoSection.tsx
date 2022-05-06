@@ -1,15 +1,16 @@
-import { Box, CloseButton, Stack, Text, useToast } from '@chakra-ui/react';
-import { useCallback, useState } from 'react';
-import { Preview, readAsDataURL } from '@project-lc/components-core/ImageInputDialog';
-import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
-import { useFormContext } from 'react-hook-form';
+import { CloseButton, Stack, Text, useToast } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
+import { ImageInput, ImageInputErrorTypes } from '@project-lc/components-core/ImageInput';
+import { Preview, readAsDataURL } from '@project-lc/components-core/ImageInputDialog';
+import { useCallback } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 const MAX_PICTURE_COUNT = 5;
 type FormType = {
   previews: Preview[];
 } & Record<string, any>;
-export function PhotoSection(): JSX.Element {
+export function PhotoSection(props: { description?: string }): JSX.Element {
+  const { description } = props;
   const toast = useToast();
   const { setValue, watch, getValues } = useFormContext<FormType>();
   // const [previews, setPreviews] = useState<Preview[]>([]);
@@ -72,6 +73,7 @@ export function PhotoSection(): JSX.Element {
   return (
     <Stack>
       <Text fontWeight="bold">사진 첨부(최대5장)</Text>
+      {description && <Text>{description}</Text>}
       {/* <Stack direction="row"> */}
       <ImageInput
         multiple
