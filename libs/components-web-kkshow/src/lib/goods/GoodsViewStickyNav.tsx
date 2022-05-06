@@ -50,9 +50,9 @@ export function GoodsViewStickyNav(): JSX.Element {
           >
             <Text fontSize={{ base: 'sm', md: 'xl' }}>
               {nav.title}
-              {nav.title === '후기' && (
+              {/* {nav.title === '후기' && (
                 <Text as="span">{`(${(3403).toLocaleString()})`}</Text>
-              )}
+              )} */}
             </Text>
           </Box>
         ))}

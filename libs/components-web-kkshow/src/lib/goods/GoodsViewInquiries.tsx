@@ -1,17 +1,19 @@
 /* eslint-disable react/no-array-index-key */
+import { DeleteIcon } from '@chakra-ui/icons';
 import {
+  Badge,
   Box,
   Button,
   ButtonGroup,
   Center,
   Divider,
+  Flex,
   FormControl,
   FormErrorMessage,
-  Input,
+  IconButton,
   Modal,
   ModalBody,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
   Spinner,
@@ -21,9 +23,11 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Goods } from '@prisma/client';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import {
   useGoodsById,
   useGoodsInquiryComments,
+  useGoodsInquiryDeleteMutation,
   useGoodsInquiryMutation,
   useInfiniteGoodsInquiries,
   useProfile,
@@ -103,21 +107,40 @@ function GoodsViewInquiryItem({ inquiry }: GoodsViewInquiryItemProps): JSX.Eleme
   }, [inquiry.writer.name, inquiry.writer.nickname]);
 
   const comments = useGoodsInquiryComments(inquiry.id);
+  // 상품문의 삭제
+  const deleteConfirmDialog = useDisclosure();
+  const deleteMutation = useGoodsInquiryDeleteMutation();
 
   return (
     <>
       <Box my={4}>
-        <Text noOfLines={1}>
-          <Text color="GrayText" as="span">
-            {displayName}
+        <Flex alignItems="center" gap={2}>
+          {comments.data && comments.data.length > 0 && (
+            <Badge colorScheme="blue" variant="solid">
+              답변완료
+            </Badge>
+          )}
+          <Text noOfLines={1}>
+            <Text color="GrayText" as="span">
+              {displayName}
+            </Text>
+            <Text color="GrayText" as="span">
+              {' | '}
+            </Text>
+            <Text color="GrayText" as="span">
+              {dayjs(inquiry.createDate).format('YYYY-MM-DD')}
+            </Text>
           </Text>
-          <Text color="GrayText" as="span">
-            {' | '}
-          </Text>
-          <Text color="GrayText" as="span">
-            {dayjs(inquiry.createDate).format('YYYY-MM-DD')}
-          </Text>
-        </Text>
+
+          <Box>
+            <IconButton
+              aria-label="goods-inquiry-delete-button"
+              size="xs"
+              icon={<DeleteIcon />}
+              onClick={deleteConfirmDialog.onOpen}
+            />
+          </Box>
+        </Flex>
         <Box mt={2}>
           <Text fontSize="sm" whiteSpace="break-spaces">
             {inquiry.content}
@@ -127,6 +150,15 @@ function GoodsViewInquiryItem({ inquiry }: GoodsViewInquiryItemProps): JSX.Eleme
           {comments.data && <CommentList comments={comments.data} commentType="답변" />}
         </Box>
       </Box>
+
+      <ConfirmDialog
+        isOpen={deleteConfirmDialog.isOpen}
+        onClose={deleteConfirmDialog.onClose}
+        title="상품 문의 삭제"
+        onConfirm={async () => deleteMutation.mutateAsync(inquiry.id)}
+      >
+        상품문의를 삭제하시겠습니까?
+      </ConfirmDialog>
 
       <Divider />
     </>
@@ -141,7 +173,6 @@ function GoodsInquiryFormDialog({
   isOpen,
   onClose,
 }: GoodsInquiryFormDialogProps): JSX.Element {
-  const profile = useProfile();
   const router = useRouter();
   const goodsId = router.query.goodsId as string;
   const formMethods = useForm<GoodsInquiryCreateDto>();
@@ -152,21 +183,12 @@ function GoodsInquiryFormDialog({
         <ModalContent>
           <ModalHeader>상품 문의하기</ModalHeader>
           <ModalBody>
-            <GoodsInquiryForm goodsId={goodsId} />
+            <GoodsInquiryForm
+              goodsId={goodsId}
+              onCancel={onClose}
+              onSubmitSuccess={onClose}
+            />
           </ModalBody>
-          <ModalFooter>
-            <ButtonGroup>
-              <Button onClick={onClose}>취소</Button>
-              <Button
-                isDisabled={!profile.data?.id}
-                id="goods-inquiry-form"
-                type="submit"
-                colorScheme="blue"
-              >
-                등록
-              </Button>
-            </ButtonGroup>
-          </ModalFooter>
         </ModalContent>
       </Modal>
     </FormProvider>
@@ -175,8 +197,14 @@ function GoodsInquiryFormDialog({
 
 interface GoodsInquiryFormProps {
   goodsId: Goods['id'] | string;
+  onCancel: () => void;
+  onSubmitSuccess: () => void;
 }
-function GoodsInquiryForm({ goodsId }: GoodsInquiryFormProps): JSX.Element {
+function GoodsInquiryForm({
+  goodsId,
+  onCancel,
+  onSubmitSuccess,
+}: GoodsInquiryFormProps): JSX.Element {
   const router = useRouter();
   const toast = useToast();
   const profile = useProfile();
@@ -188,7 +216,8 @@ function GoodsInquiryForm({ goodsId }: GoodsInquiryFormProps): JSX.Element {
   } = useFormContext<GoodsInquiryCreateDto>();
 
   const onSuccess = (): void => {
-    toast({ status: 'error', title: '상품 문의가 작성되었습니다.' });
+    toast({ status: 'success', title: '상품 문의가 작성되었습니다.' });
+    onSubmitSuccess();
   };
   const onFail = (err: any): void => {
     console.log(err);
@@ -218,7 +247,7 @@ function GoodsInquiryForm({ goodsId }: GoodsInquiryFormProps): JSX.Element {
 
   if (!profile.data?.id) {
     return (
-      <Box textAlign="center">
+      <Box textAlign="center" my={10}>
         <Text>문의를 남기기 위해 로그인이 필요합니다.</Text>
         <Button onClick={onLoginClick}>로그인</Button>
       </Box>
@@ -246,6 +275,20 @@ function GoodsInquiryForm({ goodsId }: GoodsInquiryFormProps): JSX.Element {
           <FormErrorMessage>{errors.content?.message}</FormErrorMessage>
         )}
       </FormControl>
+
+      <Box textAlign="right">
+        <ButtonGroup mt={4}>
+          <Button onClick={onCancel}>취소</Button>
+          <Button
+            isDisabled={!profile.data?.id}
+            id="goods-inquiry-form"
+            type="submit"
+            colorScheme="blue"
+          >
+            등록
+          </Button>
+        </ButtonGroup>
+      </Box>
     </Box>
   );
 }

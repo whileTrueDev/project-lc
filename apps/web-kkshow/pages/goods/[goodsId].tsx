@@ -23,12 +23,6 @@ import { dehydrate, DehydratedState } from 'react-query';
 type KkshowGoodsProps = { dehydratedState: DehydratedState };
 type KkshowGoodsParams = { goodsId: string };
 export const getStaticPaths: GetStaticPaths<KkshowGoodsParams> = async () => {
-  // 빌드 중 getStaticPaths 실행 시 axios의 baseUrl 찾지 못해
-  // 올바른 백엔드 엔드포인트 요청하지 못하는 현상으로 여기서 작성.
-  // const allGoodsIds = await axios
-  //   .get<number[]>(`${getApiHost()}/goods/all-ids`)
-  //   .then((res) => res.data);
-
   // 빌드 환경에서는 API HOST를 찾을수 없으므로 여기서 곧바로 prisma 접근 처리
   const prisma = new PrismaClient();
   // DATABASE_URL=mysql://root:qwer1234@localhost:3306/public

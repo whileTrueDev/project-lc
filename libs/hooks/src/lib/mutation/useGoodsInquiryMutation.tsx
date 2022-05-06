@@ -24,3 +24,23 @@ export const useGoodsInquiryMutation = (): UseMutationResult<
     },
   );
 };
+
+export type useGoodsInquiryDeleteMutationRes = boolean;
+export const useGoodsInquiryDeleteMutation = (): UseMutationResult<
+  useGoodsInquiryDeleteMutationRes,
+  AxiosError,
+  GoodsInquiry['id']
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<useGoodsInquiryDeleteMutationRes, AxiosError, GoodsInquiry['id']>(
+    (goodsInquiryId: GoodsInquiry['id']) =>
+      axios
+        .delete<useGoodsInquiryDeleteMutationRes>(`/goods-inquiry/${goodsInquiryId}`)
+        .then((res) => res.data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('InfiniteInquiries');
+      },
+    },
+  );
+};
