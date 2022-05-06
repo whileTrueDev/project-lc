@@ -4,7 +4,7 @@ import {
   QuickMenuLink,
   quickMenuLinks,
 } from '@project-lc/components-constants/quickMenu';
-import { useCart, useProfile } from '@project-lc/hooks';
+import { useCart } from '@project-lc/hooks';
 import { useKkshowSearchStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
@@ -60,8 +60,7 @@ function BottomQuickMenuItem({ link }: BottomQuickMenuItemProps): JSX.Element {
     }
   };
 
-  const profile = useProfile();
-  const { data: cartData } = useCart(profile.data?.id);
+  const { data: cartData } = useCart();
 
   return (
     <Center w="100%">

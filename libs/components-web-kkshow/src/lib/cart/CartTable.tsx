@@ -33,7 +33,6 @@ import {
   useCartItemOptDeleteMutation,
   useCartOptionQuantity,
   useCartTruncateMutation,
-  useProfile,
 } from '@project-lc/hooks';
 import { CartItemRes } from '@project-lc/shared-types';
 import { useCartStore } from '@project-lc/stores';
@@ -45,8 +44,7 @@ import shallow from 'zustand/shallow';
 import OptionQuantity from '../OptionQuantity';
 
 export function CartTable(): JSX.Element {
-  const profile = useProfile();
-  const { data, isLoading } = useCart(profile.data?.id);
+  const { data, isLoading } = useCart();
   const { selectedItems, handleSelectAll, handleUnselectAll } = useCartStore(
     (s) => ({
       selectedItems: s.selectedItems,
@@ -59,7 +57,7 @@ export function CartTable(): JSX.Element {
   // 카트 모두 비우기 핸들러
   const truncate = useCartTruncateMutation();
   const handleTruncate = async (): Promise<void> => {
-    await truncate.mutateAsync(profile.data?.id);
+    await truncate.mutateAsync(undefined);
   };
 
   // 최초 렌더링 체크

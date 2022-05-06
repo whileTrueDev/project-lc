@@ -1,5 +1,9 @@
 import { CartItem, CartItemOption, Customer } from '@prisma/client';
-import { CartItemDto, CartItemOptionQuantityDto } from '@project-lc/shared-types';
+import {
+  CartItemDto,
+  CartItemOptionQuantityDto,
+  CartMigrationDto,
+} from '@project-lc/shared-types';
 import { getCartKey } from '@project-lc/utils-frontend';
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
@@ -52,15 +56,14 @@ export type useCartTruncateMutationRes = boolean;
 export const useCartTruncateMutation = (): UseMutationResult<
   useCartTruncateMutationRes,
   AxiosError,
-  Customer['id'] | undefined
+  undefined
 > => {
   const queryClient = useQueryClient();
-  return useMutation<useCartTruncateMutationRes, AxiosError, Customer['id'] | undefined>(
-    (customerId?: Customer['id']) =>
+  return useMutation<useCartTruncateMutationRes, AxiosError, undefined>(
+    () =>
       axios
         .delete<useCartTruncateMutationRes>(`/cart`, {
           params: {
-            customerId,
             tempUserId: getCartKey(),
           },
         })
@@ -113,6 +116,34 @@ export const useCartMutation = (): UseMutationResult<
     (dto: CartItemDto) =>
       axios
         .post<useCartMutationRes>('/cart', { ...dto, tempUserId: getCartKey() })
+        .then((res) => res.data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('Cart');
+      },
+    },
+  );
+};
+
+export type useCartMigrationMutationRes = number;
+/** 장바구니 temp -> 유저 연결 */
+export const useCartMigrationMutation = (): UseMutationResult<
+  useCartMigrationMutationRes,
+  AxiosError,
+  Pick<CartMigrationDto, 'customerId'>
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    useCartMigrationMutationRes,
+    AxiosError,
+    Pick<CartMigrationDto, 'customerId'>
+  >(
+    (dto: Pick<CartMigrationDto, 'customerId'>) =>
+      axios
+        .post<useCartMigrationMutationRes>('/cart/migration', {
+          ...dto,
+          tempUserId: getCartKey(),
+        })
         .then((res) => res.data),
     {
       onSuccess: () => {

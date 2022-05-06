@@ -16,7 +16,11 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { CenterBox } from '@project-lc/components-layout/CenterBox';
-import { useLoginMutation, InactiveUserPayload } from '@project-lc/hooks';
+import {
+  useLoginMutation,
+  InactiveUserPayload,
+  useCartMigrationMutation,
+} from '@project-lc/hooks';
 import { LoginUserDto, UserType } from '@project-lc/shared-types';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -52,7 +56,8 @@ export function LoginForm({
 
   // * 로그인 핸들러
   const login = useLoginMutation(userType);
-
+  // * 로그인시 카트 정보 소비자에 연결
+  const cartMutation = useCartMigrationMutation();
   const onSubmit = useCallback(
     async (data: LoginUserDto) => {
       const user = await login.mutateAsync(data).catch((err) => {
@@ -65,15 +70,16 @@ export function LoginForm({
         return;
       }
       if (user) {
+        cartMutation.mutateAsync({ customerId: user.id });
         const nextPage = router.query.nextpage as string;
         if (nextPage) {
           router.push(nextPage.startsWith('/') ? nextPage : `/${nextPage}`);
         } else {
-          router.push('/mypage');
+          router.push('/');
         }
       }
     },
-    [login, setValue, router, setToActivateEmail],
+    [login, setValue, setToActivateEmail, router, cartMutation],
   );
 
   function getMessage(statusCode: number | undefined): string {

@@ -1,14 +1,13 @@
 import { AddIcon, MinusIcon } from '@chakra-ui/icons';
 import { Flex, Icon, Text } from '@chakra-ui/react';
-import { useCart, useProfile } from '@project-lc/hooks';
+import { useCart } from '@project-lc/hooks';
 import { useCartStore } from '@project-lc/stores';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
 import { FaEquals } from 'react-icons/fa';
 
 export function CartSummary(): JSX.Element | null {
-  const profile = useProfile();
-  const { data } = useCart(profile.data?.id);
+  const { data } = useCart();
   const { selectedItems } = useCartStore();
   const calculated = useMemo(() => {
     return selectedItems.reduce(
