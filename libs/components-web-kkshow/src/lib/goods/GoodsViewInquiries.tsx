@@ -101,6 +101,7 @@ interface GoodsViewInquiryItemProps {
   inquiry: FindGoodsInquiryItem;
 }
 function GoodsViewInquiryItem({ inquiry }: GoodsViewInquiryItemProps): JSX.Element {
+  const profile = useProfile();
   const displayName = useMemo(() => {
     if (!inquiry.writer.nickname) return asteriskify(inquiry.writer.name);
     return inquiry.writer.nickname;
@@ -132,14 +133,17 @@ function GoodsViewInquiryItem({ inquiry }: GoodsViewInquiryItemProps): JSX.Eleme
             </Text>
           </Text>
 
-          <Box>
-            <IconButton
-              aria-label="goods-inquiry-delete-button"
-              size="xs"
-              icon={<DeleteIcon />}
-              onClick={deleteConfirmDialog.onOpen}
-            />
-          </Box>
+          {/* 소비자 자기자신이 작성한 글인 경우만 삭제버튼 렌더링 */}
+          {profile?.data?.type === 'customer' && profile?.data.id && inquiry.writerId && (
+            <Box>
+              <IconButton
+                aria-label="goods-inquiry-delete-button"
+                size="xs"
+                icon={<DeleteIcon />}
+                onClick={deleteConfirmDialog.onOpen}
+              />
+            </Box>
+          )}
         </Flex>
         <Box mt={2}>
           <Text fontSize="sm" whiteSpace="break-spaces">
