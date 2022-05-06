@@ -27,6 +27,7 @@ export class CartService {
         },
         goods: {
           select: {
+            id: true,
             image: true,
             goods_name: true,
             seller: { select: { sellerShop: { select: { shopName: true } } } },

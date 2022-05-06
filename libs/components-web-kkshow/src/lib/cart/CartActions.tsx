@@ -1,12 +1,13 @@
 import { Button, Stack } from '@chakra-ui/react';
-import { useCart } from '@project-lc/hooks';
+import { useCart, useProfile } from '@project-lc/hooks';
 import { useCartStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 
 export function CartActions(): JSX.Element {
+  const profile = useProfile();
   const router = useRouter();
   const { selectedItems } = useCartStore();
-  const { data } = useCart();
+  const { data } = useCart(profile.data?.id);
 
   return (
     <Stack>

@@ -52,11 +52,11 @@ export type useCartTruncateMutationRes = boolean;
 export const useCartTruncateMutation = (): UseMutationResult<
   useCartTruncateMutationRes,
   AxiosError,
-  Customer['id']
+  Customer['id'] | undefined
 > => {
   const queryClient = useQueryClient();
-  return useMutation<useCartTruncateMutationRes, AxiosError, Customer['id']>(
-    (customerId: Customer['id']) =>
+  return useMutation<useCartTruncateMutationRes, AxiosError, Customer['id'] | undefined>(
+    (customerId?: Customer['id']) =>
       axios
         .delete<useCartTruncateMutationRes>(`/cart`, {
           params: {

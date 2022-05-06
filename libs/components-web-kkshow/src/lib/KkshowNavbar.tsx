@@ -19,7 +19,7 @@ import { ColorModeSwitcher } from '@project-lc/components-core/ColorModeSwitcher
 import CountBadge from '@project-lc/components-shared/CountBadge';
 import { KkshowLogoVariant, KksLogo } from '@project-lc/components-shared/KksLogo';
 import { PersonalPopoverMenu } from '@project-lc/components-shared/navbar/NavbarRightButtonSection';
-import { useCart, useIsLoggedIn } from '@project-lc/hooks';
+import { useCart, useIsLoggedIn, useProfile } from '@project-lc/hooks';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
@@ -187,7 +187,8 @@ export default KkshowNavbar;
 
 function CartButton(): JSX.Element {
   const router = useRouter();
-  const { data: cartData } = useCart();
+  const profile = useProfile();
+  const { data: cartData } = useCart(profile.data?.id);
   return (
     <Tooltip label="장바구니" fontSize="xs">
       <Button

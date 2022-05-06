@@ -1,11 +1,4 @@
-import {
-  AddIcon,
-  CheckIcon,
-  CloseIcon,
-  DeleteIcon,
-  Icon,
-  MinusIcon,
-} from '@chakra-ui/icons';
+import { CheckIcon, CloseIcon, DeleteIcon, Icon } from '@chakra-ui/icons';
 import {
   Avatar,
   Badge,
@@ -40,6 +33,7 @@ import {
   useCartItemOptDeleteMutation,
   useCartOptionQuantity,
   useCartTruncateMutation,
+  useProfile,
 } from '@project-lc/hooks';
 import { CartItemRes } from '@project-lc/shared-types';
 import { useCartStore } from '@project-lc/stores';
@@ -51,7 +45,8 @@ import shallow from 'zustand/shallow';
 import OptionQuantity from '../OptionQuantity';
 
 export function CartTable(): JSX.Element {
-  const { data, isLoading } = useCart();
+  const profile = useProfile();
+  const { data, isLoading } = useCart(profile.data?.id);
   const { selectedItems, handleSelectAll, handleUnselectAll } = useCartStore(
     (s) => ({
       selectedItems: s.selectedItems,
@@ -64,8 +59,7 @@ export function CartTable(): JSX.Element {
   // 카트 모두 비우기 핸들러
   const truncate = useCartTruncateMutation();
   const handleTruncate = async (): Promise<void> => {
-    // TODO 소비자 로그인 구현 이후 profile 통해 올바른 customerId전달
-    await truncate.mutateAsync(1);
+    await truncate.mutateAsync(profile.data?.id);
   };
 
   // 최초 렌더링 체크
@@ -256,8 +250,7 @@ export function CartItemDisplay({
         <Image w="80px" rounded="md" src={cartItem.goods.image[0].image} alt="" />
         <Box w="100%">
           <Text fontSize="xs">{cartItem.goods.seller.sellerShop.shopName}</Text>
-          {/* // TODO: 상품상세페이지 작업 이후 해당 상품상세페이지로 이동하도록 변경  */}
-          <NextLink href="/shopping">
+          <NextLink href={`/goods/${cartItem.goods.id}`}>
             <Link
               fontSize={{ base: 'sm', sm: 'md', lg: 'lg' }}
               fontWeight="bold"
