@@ -76,7 +76,7 @@ jobs:
         run: yarn install
 
       - name: Check api affected
-        run: tools/check-need-deploy.sh api
+        run: tools/check-need-deploy.sh api $BEFORE_SHA
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -127,7 +127,7 @@ jobs:
         run: yarn install
 
       - name: Check Overlay affected
-        run: tools/check-need-deploy.sh overlay
+        run: tools/check-need-deploy.sh overlay $BEFORE_SHA
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -178,7 +178,7 @@ jobs:
         run: yarn install
 
       - name: Check Overlay affected
-        run: tools/check-need-deploy.sh overlay-controller
+        run: tools/check-need-deploy.sh overlay-controller $BEFORE_SHA
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -229,7 +229,7 @@ jobs:
         run: yarn install
 
       - name: Check RealtimeAPI affected
-        run: tools/check-need-deploy.sh realtimeapi
+        run: tools/check-need-deploy.sh realtimeapi $BEFORE_SHA
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -274,7 +274,7 @@ jobs:
         run: yarn install
 
       - name: Check Mailer affected
-        run: tools/check-need-deploy.sh mailer
+        run: tools/check-need-deploy.sh mailer $BEFORE_SHA
 
       - name: Configure AWS credentials
         if: ${{ success() }}
@@ -319,7 +319,7 @@ jobs:
         run: yarn install
 
       - name: Check InactiveBatch affected
-        run: tools/check-need-deploy.sh batch-inactive-handler
+        run: tools/check-need-deploy.sh batch-inactive-handler $BEFORE_SHA
 
       - name: Configure AWS credentials
         if: ${{ success() }}
