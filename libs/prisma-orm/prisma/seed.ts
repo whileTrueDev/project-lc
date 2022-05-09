@@ -90,7 +90,19 @@ async function createBroadcaster(): Promise<Broadcaster> {
 
 /** 테스트소비자 생성 */
 async function createCustomer(): Promise<Customer> {
-  return prisma.customer.create({ data: dummyCustomer });
+  const customer = await prisma.customer.create({ data: dummyCustomer });
+  await prisma.customerAddress.create({
+    data: {
+      title: '우리집',
+      recipient: '테스트소비자',
+      address: '부산',
+      detailAddress: '장전온천천로detailAddress',
+      postalCode: '12345',
+      isDefault: true,
+      customer: { connect: { id: customer.id } },
+    },
+  });
+  return customer;
 }
 
 /** 방송인홍보페이지 생성 */
