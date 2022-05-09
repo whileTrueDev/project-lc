@@ -1,0 +1,63 @@
+import {
+  Box,
+  Collapse,
+  ListItem,
+  Text,
+  UnorderedList,
+  useDisclosure,
+} from '@chakra-ui/react';
+
+export interface ReviewPolicyProps {
+  defaultOpen?: boolean;
+}
+export function ReviewPolicy({ defaultOpen }: ReviewPolicyProps): JSX.Element {
+  const policyList = useDisclosure({ defaultIsOpen: defaultOpen });
+  return (
+    <Box>
+      <Text
+        as="span"
+        textDecor="underline"
+        fontSize="sm"
+        cursor="pointer"
+        role="button"
+        onClick={policyList.onToggle}
+      >
+        상품 후기 원칙 {policyList.isOpen ? '숨기기' : '보기'}
+      </Text>
+      <Collapse in={policyList.isOpen}>
+        <UnorderedList fontSize="xs" my={2}>
+          {/* // TODO: 기획자에게 전달받아 수정 필요. 현재 내용은 ㅋㅍ 상품평 운영원칙임 */}
+          <ListItem>
+            작성된 글과 첨부도니 멀티미디어 파일등으로 이루어진 각 상품후기는 개인의
+            의견을 반영하므로 게시된 내용에 대한 모든 책임은 작성자에게 있습니다.
+          </ListItem>
+          <ListItem>
+            상품평은 상품의 사용 관련 후기인 바, 배송 주문취소 재배송 등에 관한 문의사항을
+            고객센터로 제기하기 바랍니다.
+          </ListItem>
+          <ListItem whiteSpace="break-spaces">
+            다음과 같은 내용은 상품 후기에 허용되지 않는 부류인 바, 상품평 작성시
+            주의하시기바랍니다.
+            {`\n- 주관적인 의견으로 인해 상품의 기능 및 효과에 대하여 오해의 소지가 있는 내용\n- 식품/건강식품과 관련하여 질병의 예방 및 치료, 체중감량에 효능/효과가 있다는 내용\n- 비방, 욕설, 도배 등의 게시물 또는 방복되는 동일 단어나 문장\n- 타인 또는 기타 기관이 작성, 공개한 정보를 복사하여 기재한 부분\n- 상업적 목적의 광고성 내용\n- 그 밖에 상품후기 운영원칙에 위배되거나 그러하다고 사료되는 내용`}
+          </ListItem>
+          <ListItem>
+            해당 상품 자체와 관계없는 글, 양도, 광고성, 욕설, 비방, 도배 등의 글은 예고
+            없이 이동, 노출제한, 삭제 등의 조치가 취해질 수 있습니다.
+          </ListItem>
+          <ListItem>
+            상품 후기로 인해 다른 회원 또는 제 3자에게 피해가 가해질 경우, 법적인 책임이
+            따를 수 있으며, 이에 대한 책임은 상품후기를 게시한 당사자에게 있습니다.
+          </ListItem>
+          <ListItem>
+            개인정보 보호와 관련된 피해를 방지하기 위해 주민번호, 전화번호, 이메일, 연락처
+            등의 내용 기입은 삽가주시기바랍니다. 해당 내용이 발견되는 경우, 제 3자 노출을
+            방지하기 위해 관리자에 의해 삭제 처리될 수 있습니다.
+          </ListItem>
+          <ListItem>
+            이 외 상품후기의 성격에 맞지 않는 내용은 관리자에 의해 삭제처리될 수 있습니다.
+          </ListItem>
+        </UnorderedList>
+      </Collapse>
+    </Box>
+  );
+}

@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Goods, GoodsReview, Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -91,14 +91,13 @@ export class GoodsReviewService extends ServiceBaseWithCache {
       },
     });
     if (dto.images && dto.images.length > 0) {
-      await Promise.all(
-        dto.images.map((image) =>
-          this.prisma.goodsReviewImage.update({
-            where: { id: image.id },
-            data: { imageUrl: image.imageUrl },
-          }),
-        ),
-      );
+      await this.prisma.goodsReviewImage.deleteMany({ where: { goodsReviewId: id } });
+      await this.prisma.goodsReviewImage.createMany({
+        data: dto.images.map((i) => ({
+          goodsReviewId: id,
+          imageUrl: i.imageUrl,
+        })),
+      });
     }
     await this._clearCaches(this.getCacheKey(updated.id));
     return updated;
@@ -106,11 +105,15 @@ export class GoodsReviewService extends ServiceBaseWithCache {
 
   /** 리뷰 삭제 */
   public async remove(id: GoodsReview['id']): Promise<boolean> {
-    const result = await this.prisma.goodsReview.delete({
-      where: { id },
-    });
-    await this._clearCaches(this.getCacheKey(result.id));
-    return !!result;
+    try {
+      const result = await this.prisma.goodsReview.delete({
+        where: { id },
+      });
+      await this._clearCaches(this.getCacheKey(result.id));
+      return !!result;
+    } catch (err) {
+      throw new BadRequestException(`GoodsReview ${id} not found`);
+    }
   }
 
   private getCacheKey(id: GoodsReview['id']): string {

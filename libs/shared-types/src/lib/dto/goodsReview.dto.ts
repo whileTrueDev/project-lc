@@ -1,4 +1,4 @@
-import { Customer, Goods, GoodsReview, GoodsReviewImage, Seller } from '@prisma/client';
+import { Customer, Goods, GoodsReview, Seller } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -28,20 +28,19 @@ export class GoodsReviewCreateDto {
 }
 
 export class GoodsReviewImageUpdateDto {
-  @Type(() => Number) @IsInt() id: GoodsReviewImage['id'];
   @IsString() imageUrl: string;
 }
 
 export class GoodsReviewUpdateDto {
-  @IsOptional() @IsString() content: string;
-  @IsOptional() @Type(() => Number) @IsNumber() goodsId: Goods['id'];
-  @IsOptional() @Type(() => Number) @IsNumber() writerId: Customer['id'];
-  @IsOptional() @Type(() => Number) @IsNumber() rating: number;
+  @IsOptional() @IsString() content?: string;
+  @IsOptional() @Type(() => Number) @IsNumber() goodsId?: Goods['id'];
+  @IsOptional() @Type(() => Number) @IsNumber() writerId?: Customer['id'];
+  @IsOptional() @Type(() => Number) @IsNumber() rating?: number;
 
   @IsOptional()
   @Type(() => GoodsReviewImageUpdateDto)
   @ValidateNested({ each: true })
-  images: GoodsReviewImageUpdateDto[];
+  images?: GoodsReviewImageUpdateDto[];
 }
 
 export class FindManyGoodsReviewDto extends DefaultPaginationDto {

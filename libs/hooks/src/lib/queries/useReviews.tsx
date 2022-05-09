@@ -34,9 +34,10 @@ export const useReviews = (
 };
 
 // 상품 리뷰
-export const INFINITE_REVIEWS_KEY = 'InfiniteReviews';
+export const INFINITE_REVIEWS_KEY = 'InfiniteGoodsReviews';
 export const useInfiniteReviews = (
   dto: FindManyGoodsReviewDto,
+  enabled = true,
 ): UseInfiniteQueryResult<GoodsReviewRes, AxiosError> => {
   return useInfiniteQuery(
     INFINITE_REVIEWS_KEY,
@@ -45,6 +46,7 @@ export const useInfiniteReviews = (
       getNextPageParam(prev) {
         return prev.nextCursor;
       },
+      enabled,
     },
   );
 };
