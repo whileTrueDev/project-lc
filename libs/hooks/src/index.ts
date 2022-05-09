@@ -105,6 +105,7 @@ export * from './lib/queries/useBroadcasterReceivableSettlementAmount';
 export * from './lib/queries/useBroadcasterSettlementHistory';
 export * from './lib/queries/useBroadcasterSettlementInfo';
 export * from './lib/queries/useCart';
+export * from './lib/queries/useCustomerAddress';
 export * from './lib/queries/useCustomerStatus';
 export * from './lib/queries/useDefaultContacts';
 export * from './lib/queries/useEmailDupCheck';
