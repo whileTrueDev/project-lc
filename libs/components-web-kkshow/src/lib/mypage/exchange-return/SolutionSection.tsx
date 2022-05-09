@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Collapse,
   Input,
@@ -10,7 +9,9 @@ import {
   Text,
   useBoolean,
 } from '@chakra-ui/react';
+import { useCustomerAddress, useProfile } from '@project-lc/hooks';
 import { banks } from '@project-lc/shared-types';
+import { useCallback, useEffect } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import { useFormContext } from 'react-hook-form';
 
@@ -48,15 +49,36 @@ export function ReExportRequestSection(): JSX.Element {
     const { address, zonecode } = data;
     setValue('recipientAddress', address);
     setValue('recipientPostalCode', zonecode);
-    // setAddress(zonecode, address);
+    setValue('recipientDetailAddress', '');
     toggle();
   };
+
+  const { data: profileData } = useProfile();
+  const { data: addresses } = useCustomerAddress(profileData?.id);
+
+  const setDefaultAddress = useCallback(() => {
+    if (addresses && addresses.length) {
+      const defaultAddress = addresses.find((address) => !!address.isDefault);
+      if (defaultAddress) {
+        const { address, detailAddress, postalCode } = defaultAddress;
+        setValue('recipientAddress', address);
+        setValue('recipientPostalCode', postalCode);
+        setValue('recipientDetailAddress', detailAddress);
+      }
+    }
+  }, [addresses, setValue]);
+
+  useEffect(() => {
+    setDefaultAddress();
+  }, [setDefaultAddress]);
+
   return (
     <Stack>
       <Text>상품을 재배송받을 주소를 입력해주세요</Text>
-      <Box>
-        <Button onClick={toggle}>주소찾기</Button>
-      </Box>
+      <Stack direction="row">
+        <Button onClick={toggle}>새 주소 입력</Button>
+        <Button onClick={setDefaultAddress}>기본주소사용</Button>
+      </Stack>
       <Collapse in={open} animateOpacity>
         <DaumPostcode onComplete={handleComplete} />
       </Collapse>
