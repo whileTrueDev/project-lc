@@ -12,6 +12,13 @@ export class CustomerAddressService {
     return this.prisma.customerAddress.findUnique({ where: { id: addressId } });
   }
 
+  /** 기본 배송지 조회 */
+  public async findDefaultAddress(customerId: Customer['id']): Promise<CustomerAddress> {
+    return this.prisma.customerAddress.findFirst({
+      where: { customerId, isDefault: true },
+    });
+  }
+
   /** 특정 소비자의 주소록 목록 조회 */
   public async findMany(customerId: Customer['id']): Promise<CustomerAddress[]> {
     return this.prisma.customerAddress.findMany({ where: { customerId } });

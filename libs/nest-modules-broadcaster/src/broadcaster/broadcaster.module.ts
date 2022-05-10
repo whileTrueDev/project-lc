@@ -13,6 +13,7 @@ import { BroadcasterSettlementController } from './broadcaster-settlement.contro
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterController } from './broadcaster.controller';
 import { BroadcasterService } from './broadcaster.service';
+import { BroadcasterGiftController } from './broadcaster-gift.controller';
 
 @Module({})
 export class BroadcasterModule {
@@ -40,6 +41,7 @@ export class BroadcasterModule {
     BroadcasterContactsController,
     BroadcasterSettlementController,
     BroadcasterSettlementHistoryController,
+    BroadcasterGiftController,
   ];
 
   private static readonly imports = [PrismaModule, CipherModule, MailVerificationModule];
