@@ -5,13 +5,16 @@ import {
   Body,
   Patch,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { HttpCacheInterceptor, UserInfo, UserPayload } from '@project-lc/nest-core';
 import { CustomerMileage, CustomerMileageLog } from '@prisma/client';
 import { UpsertDto } from '@project-lc/shared-types';
+import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { MileageService } from './mileage.service';
 import { MileageLogService } from './mileage-log.service';
 
+@UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @Controller('mileage')
 export class MileageController {
