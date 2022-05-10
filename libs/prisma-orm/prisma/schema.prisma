@@ -1592,8 +1592,8 @@ model OrderPayment {
 // [enum] 결제수단
 enum PaymentMethod {
   card // 신용카드
-  bank // 무통장입금
-  account // 실시간 계좌이체
+  transfer // 계좌이체
+  virtualAccount // 가상계좌
 }
 
 // ****************
@@ -1657,25 +1657,27 @@ model OrderItemSupport {
 // ****************
 // 환불
 // ****************
-// 환불
+// 환불 : 판매자 혹은 관리자가 환불한 결과 내역을 남기기 위한 테이블. 소비자의 환불요청은 반품Return테이블에 저장됨.
+// 환불기록생성하는 시점에 이미 실제 환불처리는 완료(소비자 계좌로 돈을 반환하든, 토스페이먼츠 결제취소 api를 사용하든)되었을거라 생각하여
+// 환불처리상태, 생성일자 컬럼 삭제
 model Refund {
   id                  Int                 @id @default(autoincrement()) // 환불고유번호
   refundCode          String?             @unique //환불코드
   orderId             Int // 주문 고유번호
   order               Order               @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status              ProcessStatus       @default(requested) // 환불처리상태
-  requestDate         DateTime            @default(now()) // 환불신청일시
-  completeDate        DateTime? // 처리완료일시
+  completeDate        DateTime?           @default(now()) // 처리완료일시
   reason              String // 환불사유
   refundAccount       String? // 환불계좌번호
   refundAccountHolder String? // 환불계좌예금주명
+  refundBank          String? // 환불계좌 은행
   items               RefundItem[] // 환불상품들
   orderCancellation   OrderCancellation[] // 연결된 주문취소
-  responsibility      String // 책임소재(판매자귀책? 구매자귀책?)
-  totalRefundAmount   Int // 총 환불금액
+  responsibility      String? // 책임소재(판매자귀책? 구매자귀책?)
+  refundAmount        Int // 환불금액
   paymentKey          String? // 토스페이먼츠 결제건에 대한 고유키(OrderPayment에서 지불했을 때 저장되는 paymentKey와 동일)
   transactionKey      String? // 취소 거래건에 대한 고유키. (동일 paymentKey 가지는)결제건에 대해 승인거래와 취소거래 구분 
-
+  memo                String? // 환불정보에 대한 메모(관리자나 판매자가 쓸듯)
+  return              Return[] // 연결된 반품
 }
 
 // [enum] 처리상태
@@ -1696,7 +1698,6 @@ model RefundItem {
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
-  status            ProcessStatus   @default(requested) // 환불처리상태
 }
 
 // ****************
@@ -1716,6 +1717,8 @@ model Return {
   returnAddress  String // 회수지 주소
   items          ReturnItem[] // 반품상품들
   responsibility String // 책임소재(판매자귀책? 구매자귀책?)
+  refundId       Int? // 해당 반품으로 처리된 환불정보
+  refund         Refund?       @relation(fields: [refundId], references: [id], onDelete: SetNull)
 }
 
 // 반품 상품

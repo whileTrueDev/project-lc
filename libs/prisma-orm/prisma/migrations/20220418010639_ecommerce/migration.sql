@@ -301,7 +301,7 @@ CREATE TABLE `Order` (
 -- CreateTable
 CREATE TABLE `OrderPayment` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `method` ENUM('card', 'bank', 'account') NOT NULL,
+    `method` ENUM('card', 'transfer', 'virtualAccount') NOT NULL,
     `orderId` INTEGER NULL,
     `paymentKey` VARCHAR(191) NOT NULL,
     `depositDate` DATETIME(3) NULL,
