@@ -106,6 +106,7 @@ export * from './lib/dto/shippingGroup.dto';
 export * from './lib/dto/shippingOption.dto';
 export * from './lib/dto/shippingSet.dto';
 export * from './lib/dto/signUp.dto';
+export * from './lib/dto/tosspayment.cancel.dto';
 export * from './lib/dto/updateCustomer.dto';
 export * from './lib/event-types/live-shopping-state.event-type';
 export * from './lib/event-types/notification.event-type';

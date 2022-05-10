@@ -1,27 +1,20 @@
-import {
-  BadRequestException,
-  CACHE_MANAGER,
-  HttpException,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
+import { PaymentService } from '@project-lc/nest-modules-payment';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateRefundDto,
   CreateRefundRes,
   GetRefundListDto,
+  PaymentCard,
+  PaymentTransfer,
+  PaymentVirtualAccount,
   RefundDetailRes,
   RefundListRes,
 } from '@project-lc/shared-types';
-import {
-  makeDummyTossPaymentData,
-  requestConfirmedTossPayment,
-  requestTossPaymentCancel,
-  TossPaymentCancelDto,
-} from '@project-lc/utils';
+import { makeDummyTossPaymentData } from '@project-lc/utils';
 import { Cache } from 'cache-manager';
 import { nanoid } from 'nanoid';
 
@@ -32,12 +25,13 @@ export class RefundService extends ServiceBaseWithCache {
   constructor(
     private readonly prisma: PrismaService,
     private readonly orderCancellationService: OrderCancellationService,
+    private readonly paymentService: PaymentService,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);
   }
 
-  /** 결제취소 테스트위해 결제데이터 필요하여 만들었음. // TODO: 결제요청 통해 OrderPayment 데이터 생성가능하거나 하여 필요없어지면 삭제하기 */
+  /** 결제취소 테스트위해 결제데이터 필요하여 만들었음. // TODO: 프론트 작업시 삭제 */
   async makeFakeOrderWithFakePayment(): Promise<any> {
     const paymentResultData = await makeDummyTossPaymentData();
 
@@ -72,7 +66,13 @@ export class RefundService extends ServiceBaseWithCache {
             cancelCode: nanoid(),
             responsibility: 'customer',
             items: {
-              create: [],
+              create: [
+                {
+                  orderItem: { connect: { id: 1 } },
+                  orderItemOption: { connect: { id: 1 } },
+                  amount: 1,
+                },
+              ],
             },
           },
         },
@@ -80,34 +80,6 @@ export class RefundService extends ServiceBaseWithCache {
     });
 
     return orderWithPayment;
-  }
-
-  /** 토스페이먼츠 결제취소 api 호출 */
-  async _requestTossPaymentCancel(dto: TossPaymentCancelDto): Promise<any> {
-    try {
-      const data = await requestTossPaymentCancel(dto);
-      return data;
-    } catch (error) {
-      console.error(error.response);
-      throw new HttpException(
-        error.response.message || 'error _requestTossPaymentCancel',
-        error.response.status || 500,
-      );
-    }
-  }
-
-  /** 토스페이먼츠 paymentKey로 승인된 결제 조회 */
-  async _requestConfirmedTossPayment(paymentKey: string): Promise<any> {
-    try {
-      const data = await requestConfirmedTossPayment(paymentKey);
-      return data;
-    } catch (error) {
-      console.error(error.response);
-      throw new HttpException(
-        error.response.data.message || 'error _requestTossPaymentCancel',
-        error.response.status || 500,
-      );
-    }
   }
 
   private createRefundCode(): string {
@@ -126,7 +98,7 @@ export class RefundService extends ServiceBaseWithCache {
     let transactionKey: string | undefined;
     // 1. 토스페이먼츠 결제취소 api 사용하는 경우 transaction키 받기
     if (rest.paymentKey) {
-      const cancelResult = await this._requestTossPaymentCancel({
+      const cancelResult = await this.paymentService.requestCancelTossPayment({
         paymentKey: rest.paymentKey,
         cancelReason: rest.reason,
         cancelAmount: rest.refundAmount,
@@ -287,12 +259,14 @@ export class RefundService extends ServiceBaseWithCache {
       };
     });
 
-    let card: any; // 카드로 결제하면 제공되는 카드 관련 정보입니다.
-    let virtualAccount: any; // 가상계좌로 결제하면 제공되는 가상계좌 관련 정보입니다.
-    let transfer: any; // 계좌이체로 결제했을 때 이체 정보가 담기는 객체입니다.
+    let card: PaymentCard | undefined; // 카드로 결제하면 제공되는 카드 관련 정보입니다.
+    let virtualAccount: PaymentVirtualAccount | undefined; // 가상계좌로 결제하면 제공되는 가상계좌 관련 정보입니다.
+    let transfer: PaymentTransfer | undefined; // 계좌이체로 결제했을 때 이체 정보가 담기는 객체입니다.
     // 토스페이먼츠로 결제 && 환불한 경우 -> 결제정보 조회
     if (data.transactionKey && data.paymentKey) {
-      const paymentData = await this._requestConfirmedTossPayment(data.paymentKey);
+      const paymentData = await this.paymentService.getPaymentByOrderId(
+        rest.order.orderCode,
+      );
 
       if (paymentData.card) {
         card = paymentData.card;

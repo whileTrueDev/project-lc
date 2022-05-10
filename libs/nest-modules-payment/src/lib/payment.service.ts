@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PaymentByOrderId, PaymentTransaction } from '@project-lc/shared-types';
-import axios from 'axios';
+import {
+  PaymentByOrderId,
+  PaymentTransaction,
+  TossPaymentCancelDto,
+} from '@project-lc/shared-types';
+import axios, { AxiosRequestConfig } from 'axios';
 
 type PaymentsByDateRequestType = {
   startDate: string;
@@ -14,8 +18,15 @@ type PaymentsByDateRequestType = {
 export class PaymentService {
   private BASE_URL = 'https://api.tosspayments.com/v1';
   private PAYMENTS_SECRET_KEY: string;
+  private axiosConfigHeaders: AxiosRequestConfig['headers'];
   constructor(private readonly configService: ConfigService) {
     this.PAYMENTS_SECRET_KEY = this.configService.get('PAYMENTS_SECRET_KEY');
+    this.axiosConfigHeaders = {
+      Authorization: `Basic ${Buffer.from(`${this.PAYMENTS_SECRET_KEY}:`).toString(
+        'base64',
+      )}`,
+      'Content-Type': 'application/json',
+    };
   }
 
   /** 결제승인 요청 API */
@@ -28,13 +39,8 @@ export class PaymentService {
           amount: dto.amount,
         },
         {
-          headers: {
-            Authorization: `Basic ${Buffer.from(`${this.PAYMENTS_SECRET_KEY}:`).toString(
-              'base64',
-            )}`,
-            'Content-Type': 'application/json',
-          },
           responseType: 'json',
+          headers: this.axiosConfigHeaders,
         },
       )
       .then(() => {
@@ -50,11 +56,7 @@ export class PaymentService {
   async getPaymentByOrderId(orderId: string): Promise<PaymentByOrderId> {
     return axios
       .get(`${this.BASE_URL}/payments/orders/${orderId}`, {
-        headers: {
-          Authorization: `Basic ${Buffer.from(`${this.PAYMENTS_SECRET_KEY}:`).toString(
-            'base64',
-          )}`,
-        },
+        headers: this.axiosConfigHeaders,
       })
       .then((v) => {
         return v.data;
@@ -75,12 +77,7 @@ export class PaymentService {
           startingAfter: dto.startingAfter,
           limit: dto.limit,
         },
-        headers: {
-          Authorization: `Basic ${Buffer.from(`${this.PAYMENTS_SECRET_KEY}:`).toString(
-            'base64',
-          )}`,
-          'Content-Type': 'application/json',
-        },
+        headers: this.axiosConfigHeaders,
         responseType: 'json',
       })
       .then((v) => {
@@ -90,5 +87,30 @@ export class PaymentService {
         console.error(err);
         return false;
       });
+  }
+
+  /** 토스페이먼츠 결제취소요청 */
+  async requestCancelTossPayment({
+    paymentKey,
+    cancelReason,
+    cancelAmount,
+  }: TossPaymentCancelDto): Promise<any> {
+    try {
+      const postData = {
+        cancelReason,
+        cancelAmount,
+      };
+      const url = `${this.BASE_URL}/payments/${paymentKey}/cancel`;
+      const response = await axios.post(url, postData, {
+        headers: this.axiosConfigHeaders,
+      });
+      return response.data;
+    } catch (error) {
+      console.error(error.response);
+      throw new HttpException(
+        error.response.message || 'error in requestCancelTossPayment',
+        error.response.status || 500,
+      );
+    }
   }
 }

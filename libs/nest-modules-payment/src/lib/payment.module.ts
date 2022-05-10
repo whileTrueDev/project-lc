@@ -7,7 +7,7 @@ export class PaymentModule {
   private static providers = [PaymentService];
 
   private static controllers = [PaymentController];
-  private static exports = [];
+  private static exports = [PaymentService];
 
   static withoutControllers(): DynamicModule {
     return {
