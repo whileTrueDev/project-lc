@@ -3,11 +3,17 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
-import { CreateRefundDto, CreateRefundRes } from '@project-lc/shared-types';
+import {
+  CreateRefundDto,
+  CreateRefundRes,
+  GetRefundListDto,
+  RefundListRes,
+} from '@project-lc/shared-types';
 import { RefundService } from './refund.service';
 
 @UseInterceptors(HttpCacheInterceptor)
@@ -25,5 +31,13 @@ export class RefundController {
   @Post()
   createRefund(@Body(ValidationPipe) dto: CreateRefundDto): Promise<CreateRefundRes> {
     return this.refundService.createRefund(dto);
+  }
+
+  @Get('list')
+  getRefundList(
+    @Query(new ValidationPipe({ transform: true }))
+    dto: GetRefundListDto,
+  ): Promise<RefundListRes> {
+    return this.refundService.getRefundList(dto);
   }
 }

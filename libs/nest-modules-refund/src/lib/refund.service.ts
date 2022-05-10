@@ -1,8 +1,15 @@
 import { CACHE_MANAGER, HttpException, Inject, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { CreateRefundDto, CreateRefundRes } from '@project-lc/shared-types';
+import {
+  CreateRefundDto,
+  CreateRefundRes,
+  GetRefundListDto,
+  RefundDetailRes,
+  RefundListRes,
+} from '@project-lc/shared-types';
 import {
   makeDummyTossPaymentData,
   requestTossPaymentCancel,
@@ -101,7 +108,7 @@ export class RefundService extends ServiceBaseWithCache {
         paymentKey: rest.paymentKey,
         cancelReason: rest.reason,
         cancelAmount: rest.refundAmount,
-        // 토스페이먼츠 가상계좌로 지불 && 환불계좌정보 있는 경우
+        // 토스페이먼츠 가상계좌로 지불하여 환불계좌정보 있는 경우
         refundReceiveAccount:
           rest.refundAccount && rest.refundAccount && rest.refundAccountHolder
             ? {
@@ -147,9 +154,59 @@ export class RefundService extends ServiceBaseWithCache {
   }
 
   /** 환불내역 목록 조회 - 소비자, 판매자 */
-  // async getRefundList(): RefundListRes {
+  async getRefundList({
+    take,
+    skip,
+    customerId,
+    sellerId,
+  }: GetRefundListDto): Promise<RefundListRes> {
+    let where: Prisma.RefundWhereInput;
+    if (customerId) {
+      // customerId가 주어진 경우 : 소비자의 주문에 연결된 환불내역만 조회
+      where = {
+        order: { customerId },
+      };
+    }
+    if (sellerId) {
+      // sellerId 주어진 경우 : 환불상품에 연결된 주문상품이 해당 판매자의 상품인경우만 조회
+      where = {
+        items: { some: { orderItem: { goods: { sellerId } } } },
+      };
+    }
+    const data = await this.prisma.refund.findMany({
+      where,
+      take,
+      skip,
+      include: {
+        order: {
+          select: {
+            orderCode: true,
+            customerId: true,
+            paymentPrice: true,
+            payment: true,
+          },
+        },
+        orderCancellation: true,
+        return: true,
+        items: true,
+      },
+    });
 
-  // }
+    const count = await this.prisma.refund.count({ where });
+    const nextCursor = (skip || 0) + take;
+    return {
+      count,
+      nextCursor: nextCursor >= count ? undefined : nextCursor,
+      list: data,
+    };
+  }
 
-  /** 특정 환불내역 상세 조회 */
+  /** 특정 환불내역 상세 조회 (환불 상세페이지에 필요한 데이터가 어떤건지 잘 모르겠음
+   * 주문번호, 주문일, 환불상품 이름과 이미지, 환불상품옵션가격), 결제취소인지 반품인지여부 결제취소코드 혹은 반품코드, 접수일자, 완료일, (환불수단 => 토스페이먼츠 결제조회 api로 결제수단 상세정보 확인가능), 금액 */
+  async getRefundDetail({
+    refundId,
+    refundCode,
+  }: {
+    refundId;
+  }): Promise<RefundDetailRes> {}
 }

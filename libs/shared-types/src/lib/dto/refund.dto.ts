@@ -1,12 +1,15 @@
 import {
+  Customer,
   Order,
   OrderCancellation,
   OrderItem,
   OrderItemOption,
   Return,
+  Seller,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsArray, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { DefaultPaginationDto } from './pagination.dto';
 
 /** 환불상품생성 dto */
 export class CreateRefundItemDto {
@@ -82,4 +85,19 @@ export class CreateRefundDto {
   @IsString()
   @IsOptional()
   transactionKey?: string;
+}
+
+/** 환불내역 목록 조회 dto */
+export class GetRefundListDto extends DefaultPaginationDto {
+  /** 환불내역 조회할 소비자의 고유번호 -> 해당 소비자의 환불내역 조회 */
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  customerId?: Customer['id'];
+
+  /** 환불내역 조회할 판매자의 고유번호 -> 해당 판매자가 판매하는 상품의 환불내역 조회 */
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  sellerId?: Seller['id'];
 }
