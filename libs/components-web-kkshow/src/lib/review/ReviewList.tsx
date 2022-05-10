@@ -22,9 +22,9 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import StarRating from '@project-lc/components-core/StarRating';
 import {
+  useGoodsById,
   useGoodsReviewComments,
   useInfiniteReviews,
   useProfile,
@@ -34,6 +34,7 @@ import { asteriskify } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { CommentList } from '../CommentList';
+import GoodsDisplay2 from '../GoodsDisplay2';
 import ReviewDeleteDialog from './ReviewDeleteDialog';
 import ReviewUpdateDialog from './ReviewUpdateDialog';
 
@@ -100,12 +101,14 @@ export interface ReviewDetailProps {
   defaultFolded?: boolean;
   editable?: boolean;
   removable?: boolean;
+  includeGoodsInfo?: boolean;
 }
 export function ReviewDetail({
   review,
   defaultFolded = false,
-  editable,
-  removable,
+  editable = false,
+  removable = false,
+  includeGoodsInfo = false,
 }: ReviewDetailProps): JSX.Element {
   const displayName = useMemo(() => {
     if (!review.writer.nickname) return asteriskify(review.writer.name);
@@ -147,6 +150,9 @@ export function ReviewDetail({
   // 리뷰 삭제 다이얼로그
   const deleteDialog = useDisclosure();
 
+  // 리뷰 상품 정보
+  const goods = useGoodsById(includeGoodsInfo ? review.goodsId : null);
+
   return (
     <>
       <Box my={4}>
@@ -165,6 +171,19 @@ export function ReviewDetail({
           </Flex>
         )}
 
+        {includeGoodsInfo && goods.data && (
+          <Box my={2}>
+            <GoodsDisplay2
+              size="xs"
+              goods={{
+                imageSrc: goods.data.image[0].image,
+                name: goods.data.goods_name,
+                seller: goods.data.seller,
+              }}
+            />
+          </Box>
+        )}
+
         <StarRating rating={review.rating} color="orange.300" />
         <Text color="GrayText">
           {displayName} | {dayjs(review.createDate).format('YYYY-MM-DD')}
@@ -173,6 +192,7 @@ export function ReviewDetail({
         <Flex gap={1} my={2} flexWrap="wrap">
           {review.images.slice(0, 5).map((i, idx) => (
             <Image
+              rounded="md"
               key={i.id}
               h="90px"
               w="90px"
@@ -192,7 +212,7 @@ export function ReviewDetail({
           >
             {review.content}
           </Text>
-          {folded && (
+          {folded && review.content.split('\n').length > 4 && (
             <Button
               my={2}
               variant="outline"

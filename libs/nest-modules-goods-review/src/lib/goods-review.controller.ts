@@ -29,6 +29,7 @@ import { GoodsReviewService } from './goods-review.service';
 export class GoodsReviewController {
   constructor(private readonly service: GoodsReviewService) {}
 
+  /** 특정 상품의 리뷰 개수 조회 */
   @Get('count')
   getCount(@Query('goodsId', ParseIntPipe) goodsId: Goods['id']): Promise<number> {
     return this.service.getCount(goodsId);

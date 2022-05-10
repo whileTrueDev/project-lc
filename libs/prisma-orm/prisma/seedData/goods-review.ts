@@ -85,3 +85,57 @@ export const createGoodsReview = async (prisma: PrismaClient): Promise<void> => 
     },
   });
 };
+
+export const createGoodsReview2 = async (prisma: PrismaClient): Promise<void> => {
+  await prisma.goodsReview.create({
+    data: {
+      content: `팥앙금이 너무 맛있어서 숟가락으로 그냥 퍼먹다가 갑자기 단팥빵이 생각이 나더라구요!! 근데 저랑 엄마는 밀가루가 소화가 잘 안 돼서 통밀로 선택하고 에어프라이어로 만들어봤어요 ㅎㅎ
+
+간단하니 저처럼 통밀과 팥을 좋아하시는 분들은 참고하세요!!
+일단 바오담 팥앙금과 함께 필요한 재료는...
+
+o 통밀가루 300g
+o 설탕 두스푼
+o 소금 반스푼
+o 드라이 이스트 한스푼
+
+o 위 재료에 물 반컵+우유 반컵 넣어주고 반죽했어요.
+
+o 어느정도 반죽 다 하고난뒤엔 1시간 발효시켜주기
+
+o 부풀어오른 반죽을 50g정도씩 떼서 동글동글하게 말아놓고 15분정도 발효 ---> 이때 미리 팥앙금을 반죽보다 작은 사이즈로 40g정도로 동글동글 말아놓으면 편해요!!
+
+o 이제 바오담 팥앙금 넣어줄 차례!! 쏙쏙 넣어주고 빵 반죽을 잘 다듬어주기
+
+o 잘 펴준 반죽 가운데를 꾹 볼같은 걸로 눌러서 참깨도 뿌려주고 바깥면쪽에 계란물을 슥슥 발라주면 모양이 더 좋아요 ㅎㅎ
+
+o 이제 에어프라이어로 180도 10분!!
+
+맛있는 통밀 단팥빵 완성 ㅎㅎ 따끈따끈한 상태로 먹어주면 너무 맛있는 단팥빵~!! 팥앙금이 맛있으니 모양은 엉성해도 맛은 너무 좋아요~~!
+`,
+      rating: 5,
+      writerId: 1,
+      goodsId: 1,
+      images: {
+        create: [
+          {
+            imageUrl:
+              'https://k-kmarket.com/data/goods/1/2022/01/92_temp_16425790437819large.jpg',
+          },
+          {
+            imageUrl:
+              'https://k-kmarket.com/data/goods/1/2022/01/92_temp_16425790495443large.jpg',
+          },
+        ],
+      },
+      comments: {
+        create: [
+          {
+            content: '리뷰 감사합니다. 언제나 노력하는 000 되겠습니다',
+            sellerId: 1,
+          },
+        ],
+      },
+    },
+  });
+};

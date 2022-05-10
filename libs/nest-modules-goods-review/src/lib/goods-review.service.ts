@@ -10,12 +10,15 @@ import {
   GoodsReviewUpdateDto,
 } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
+import { GoodsReviewImageService } from './goods-review-image.service';
 
 @Injectable()
 export class GoodsReviewService extends ServiceBaseWithCache {
   #REVIEW_CACHE_KEY = 'goods-review';
+  #REVIEW_NEEDED_ORDER_ITEM_CACHE_KEY = 'order-item/review-needed';
   constructor(
     private readonly prisma: PrismaService,
+    private readonly goodsReviewImageService: GoodsReviewImageService,
     @Inject(CACHE_MANAGER) cacheManager: Cache,
   ) {
     super(cacheManager);
@@ -23,7 +26,13 @@ export class GoodsReviewService extends ServiceBaseWithCache {
 
   /** 리뷰 생성 */
   public async create(dto: GoodsReviewCreateDto): Promise<GoodsReview> {
+    const alreadyCreated = await this.prisma.goodsReview.count({
+      where: { orderItem: { some: { id: dto.orderItemId } } },
+    });
+    if (alreadyCreated > 0) return null;
+
     await this._clearCaches(this.#REVIEW_CACHE_KEY);
+    await this._clearCaches(this.#REVIEW_NEEDED_ORDER_ITEM_CACHE_KEY); // 리뷰 작성가능한 orderItem 목록 초기화 위해
     return this.prisma.goodsReview.create({
       data: {
         content: dto.content,
@@ -31,7 +40,7 @@ export class GoodsReviewService extends ServiceBaseWithCache {
         goodsId: dto.goodsId,
         writerId: dto.writerId,
         orderItem: { connect: { id: dto.orderItemId } },
-        images: { createMany: { data: dto.images } },
+        images: dto.images ? { createMany: { data: dto.images } } : undefined,
       },
     });
   }
@@ -58,6 +67,7 @@ export class GoodsReviewService extends ServiceBaseWithCache {
       where,
       skip,
       take: realTake,
+      orderBy: { createDate: 'desc' },
       include: {
         images: true,
         writer: { select: { nickname: true, name: true, id: true, gender: true } },
@@ -91,32 +101,54 @@ export class GoodsReviewService extends ServiceBaseWithCache {
       },
     });
     if (dto.images && dto.images.length > 0) {
-      await this.prisma.goodsReviewImage.deleteMany({ where: { goodsReviewId: id } });
-      await this.prisma.goodsReviewImage.createMany({
-        data: dto.images.map((i) => ({
-          goodsReviewId: id,
-          imageUrl: i.imageUrl,
-        })),
-      });
+      await this.updateImages(id, dto.images);
     }
-    await this._clearCaches(this.getCacheKey(updated.id));
+    await this._clearCaches(this.#REVIEW_CACHE_KEY);
     return updated;
+  }
+
+  /** 이미지 수정 (삭제할 것 삭제, 등록할 것 등록) */
+  private async updateImages(
+    goodsReviewId: GoodsReview['id'],
+    images: GoodsReviewUpdateDto['images'],
+  ): Promise<boolean> {
+    const insertedImages = await this.prisma.goodsReviewImage.findMany({
+      where: { goodsReviewId },
+    });
+    // 새롭게 생성해야할 이미지
+    const newImages = images.filter(
+      (image) => !insertedImages.map(({ imageUrl }) => imageUrl).includes(image.imageUrl),
+    );
+    await this.prisma.goodsReviewImage.createMany({
+      data: newImages.map((i) => ({
+        goodsReviewId,
+        imageUrl: i.imageUrl,
+      })),
+    });
+
+    // 삭제해야할 이미지
+    const removeImages = insertedImages.filter(
+      (inserted) => !images.map(({ imageUrl }) => imageUrl).includes(inserted.imageUrl),
+    );
+    await this.goodsReviewImageService.removeImages(removeImages);
+
+    return true;
   }
 
   /** 리뷰 삭제 */
   public async remove(id: GoodsReview['id']): Promise<boolean> {
     try {
+      await this.goodsReviewImageService.removeAllImageByReviewId(id);
       const result = await this.prisma.goodsReview.delete({
         where: { id },
+        include: { images: true },
       });
-      await this._clearCaches(this.getCacheKey(result.id));
+
+      await this._clearCaches(this.#REVIEW_CACHE_KEY);
+      await this._clearCaches(this.#REVIEW_NEEDED_ORDER_ITEM_CACHE_KEY); // 리뷰 작성가능한 orderItem 목록 초기화 위해
       return !!result;
     } catch (err) {
       throw new BadRequestException(`GoodsReview ${id} not found`);
     }
-  }
-
-  private getCacheKey(id: GoodsReview['id']): string {
-    return `${this.#REVIEW_CACHE_KEY}/${id}`;
   }
 }

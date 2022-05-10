@@ -21,10 +21,11 @@ export class GoodsReviewCreateDto {
   @Type(() => Number) @IsNumber() rating: number;
   @Type(() => Number) @IsNumber() orderItemId: number;
 
+  @IsOptional()
   @Type(() => GoodsReviewImageDto)
   @ValidateNested({ each: true })
   @IsArray()
-  images: GoodsReviewImageDto[];
+  images?: GoodsReviewImageDto[];
 }
 
 export class GoodsReviewImageUpdateDto {

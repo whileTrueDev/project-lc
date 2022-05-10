@@ -32,8 +32,13 @@ import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
 import { dummyCustomer } from './seedData/customer';
 import { cartSample, tempUserCartItemSample } from './seedData/cart';
-import { nonMemberOrder, normalOrder } from './seedData/dummyOrder';
-import { createGoodsReview } from './seedData/goods-review';
+import {
+  nonMemberOrder,
+  normalOrder,
+  purchaseConfirmedOrder,
+  shippingDoneOrder,
+} from './seedData/dummyOrder';
+import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 
 const prisma = new PrismaClient();
 
@@ -292,6 +297,8 @@ async function createCartItems(): Promise<void> {
 async function createDummyOrderData(): Promise<void> {
   await prisma.order.create({ data: normalOrder });
   await prisma.order.create({ data: nonMemberOrder });
+  await prisma.order.create({ data: purchaseConfirmedOrder });
+  await prisma.order.create({ data: shippingDoneOrder });
 }
 
 /** 시드 메인 함수 */
@@ -353,6 +360,7 @@ async function main(): Promise<void> {
 
   // 더미 상품리뷰 생성
   await createGoodsReview(prisma);
+  await createGoodsReview2(prisma);
 }
 
 main()

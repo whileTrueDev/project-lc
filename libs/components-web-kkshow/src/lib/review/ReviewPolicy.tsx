@@ -6,12 +6,28 @@ import {
   UnorderedList,
   useDisclosure,
 } from '@chakra-ui/react';
+import { useDisplaySize } from '@project-lc/hooks';
+import { useEffect, useMemo, useRef } from 'react';
 
 export interface ReviewPolicyProps {
   defaultOpen?: boolean;
 }
-export function ReviewPolicy({ defaultOpen }: ReviewPolicyProps): JSX.Element {
-  const policyList = useDisclosure({ defaultIsOpen: defaultOpen });
+export function ReviewPolicy({ defaultOpen = false }: ReviewPolicyProps): JSX.Element {
+  const { isMobileSize } = useDisplaySize();
+  const policyList = useDisclosure();
+
+  const firstRender = useRef(true);
+  const defaultIsOpen = useMemo(
+    () => (isMobileSize ? false : defaultOpen),
+    [defaultOpen, isMobileSize],
+  );
+  useEffect(() => {
+    if (firstRender.current && defaultIsOpen) {
+      policyList.onOpen();
+      firstRender.current = false;
+    }
+  }, [defaultIsOpen, policyList]);
+
   return (
     <Box>
       <Text

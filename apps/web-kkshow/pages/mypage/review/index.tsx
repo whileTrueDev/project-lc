@@ -1,35 +1,56 @@
 /* eslint-disable react/no-array-index-key */
-import {
-  Box,
-  Heading,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react';
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
+import ReviewCreateList from '@project-lc/components-web-kkshow/review/ReviewCreateList';
 import ReviewList from '@project-lc/components-web-kkshow/review/ReviewList';
 import { ReviewPolicy } from '@project-lc/components-web-kkshow/review/ReviewPolicy';
-import { useProfile } from '@project-lc/hooks';
+import { useOrderItemReviewNeeded, useProfile } from '@project-lc/hooks';
+import { useMemo } from 'react';
 
 export function ReviewIndex(): JSX.Element {
-  const tabInfos = [
-    { title: '리뷰 관리', component: <MyReviewList /> },
-    { title: '리뷰 등록', component: <ReviewCreateList /> },
-  ];
+  const profile = useProfile();
+  const orderItem = useOrderItemReviewNeeded(profile.data?.id);
+
+  const tabInfos = useMemo(
+    () => [
+      {
+        title: '내 후기 관리',
+        component: (
+          <ReviewList
+            dto={{ customerId: profile.data?.id, skip: 0, take: 5 }}
+            enabled={!!profile.data?.id}
+            defaultFolded
+            editable
+            removable
+            includeGoodsInfo
+          />
+        ),
+      },
+      {
+        title: `후기 작성 ${
+          orderItem.data?.length > 0 ? `(${orderItem.data.length})` : ''
+        }`,
+        component: <ReviewCreateList />,
+      },
+    ],
+    [orderItem.data, profile.data?.id],
+  );
 
   return (
     <CustomerMypageLayout>
-      <Box p={4}>
-        <Heading>리뷰 관리</Heading>
+      <Box p={{ base: 2, md: 4 }}>
+        {/* 제목 */}
+        <Text fontSize="xl" fontWeight="bold">
+          상품 후기 관리
+        </Text>
 
-        <Box mt={6}>
+        {/* 리뷰 정책 */}
+        <Box>
           <ReviewPolicy defaultOpen />
         </Box>
 
-        <Box mt={6}>
+        {/* 탭 */}
+        <Box mt={{ base: 2, md: 6 }}>
           <Tabs>
             <TabList>
               {tabInfos.map((tab) => (
@@ -52,26 +73,3 @@ export function ReviewIndex(): JSX.Element {
 }
 
 export default ReviewIndex;
-
-function ReviewCreateList(): JSX.Element {
-  return (
-    <Box>
-      <Text>리뷰 생성 목록</Text>
-    </Box>
-  );
-}
-
-function MyReviewList(): JSX.Element {
-  const profile = useProfile();
-  return (
-    <>
-      <ReviewList
-        dto={{ customerId: profile.data?.id, skip: 0, take: 5 }}
-        enabled={!!profile.data?.id}
-        defaultFolded
-        editable
-        removable
-      />
-    </>
-  );
-}
