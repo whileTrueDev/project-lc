@@ -25,10 +25,6 @@ export class CreateRefundItemDto {
 
 /** 환불정보생성 dto */
 export class CreateRefundDto {
-  /** 환불코드 */
-  @IsString()
-  refundCode: string;
-
   /** 연결된 주문 고유번호 */
   @IsNumber()
   orderId: Order['id'];
@@ -71,6 +67,11 @@ export class CreateRefundDto {
   @IsString()
   @IsOptional()
   refundAccountHolder?: string;
+
+  /** 환불은행 */
+  @IsString()
+  @IsOptional()
+  refundBank?: string;
 
   /** 토스페이먼츠 결제취소 사용시 - 결제건에 대한 고유키(OrderPayment에서 지불했을 때 저장되는 paymentKey와 동일) */
   @IsString()
