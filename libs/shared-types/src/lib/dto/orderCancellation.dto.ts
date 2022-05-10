@@ -84,7 +84,7 @@ export class UpdateOrderCancellationStatusDto {
   /* 거절시 거절사유 입력필요 */
   @ValidateIf((o) => o.status === ProcessStatus.canceled)
   @IsString()
-  rejectReason: string;
+  rejectReason?: string;
 
   /** 주문취소요청에 대한 환불 완료시 환불고유번호 입력 */
   @IsNumber()
