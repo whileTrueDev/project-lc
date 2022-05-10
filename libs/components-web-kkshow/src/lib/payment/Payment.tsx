@@ -12,6 +12,7 @@ import {
   AccordionIcon,
   Divider,
   useToast,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import dayjs from 'dayjs';
@@ -177,7 +178,7 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
       top="0px"
       left="0px"
       right="0px"
-      backgroundColor="white"
+      backgroundColor={useColorModeValue('white', 'gray.800')}
       as="form"
       onSubmit={handleSubmit(onSubmit)}
     >

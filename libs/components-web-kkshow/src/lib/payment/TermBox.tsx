@@ -13,6 +13,7 @@ import {
   PopoverAnchor,
   HStack,
   Flex,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { HtmlStringBox } from '@project-lc/components-core/TermBox';
 import { useTerms } from '@project-lc/hooks';
@@ -44,6 +45,8 @@ export function TermBox({ shopName }: { shopName: string }): JSX.Element {
     },
   ];
 
+  const shopNameColor = useColorModeValue('blue', 'yellow');
+
   return (
     <Flex direction="column">
       {terms.map((item) => (
@@ -58,7 +61,7 @@ export function TermBox({ shopName }: { shopName: string }): JSX.Element {
                   <Text variant="span" fontSize="xs">
                     :
                   </Text>
-                  <Text variant="span" color="blue" fontSize="xs">
+                  <Text variant="span" color={shopNameColor} fontSize="xs">
                     {shopName}
                   </Text>
                 </>

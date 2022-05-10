@@ -176,7 +176,7 @@ export function DeliveryAddress(): JSX.Element {
                   })}
                   mr={1}
                 />
-                <Button size="xs" onClick={() => handleRecipientInfo()} bg="gray.300">
+                <Button size="xs" onClick={() => handleRecipientInfo()}>
                   구매자와 동일
                 </Button>
               </Box>

@@ -8,14 +8,19 @@ import {
   Param,
   Get,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { getCustomerWebHost } from '@project-lc/utils';
-import { PaymentByOrderId, PaymentTransaction } from '@project-lc/shared-types';
+import {
+  PaymentByOrderId,
+  PaymentTransaction,
+  PaymentRequestDto,
+} from '@project-lc/shared-types';
 import { PaymentService } from './payment.service';
 
-type PaymentsRequestType = { orderId: string; amount: number; paymentKey: string };
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('payment')
 @UseInterceptors(HttpCacheInterceptor)
 export class PaymentController {
@@ -38,7 +43,7 @@ export class PaymentController {
   @Post('/success')
   async requestPayments(
     @Res() res,
-    @Body(ValidationPipe) dto: PaymentsRequestType,
+    @Body(ValidationPipe) dto: PaymentRequestDto,
   ): Promise<boolean | void> {
     const hostUrl = getCustomerWebHost();
 
