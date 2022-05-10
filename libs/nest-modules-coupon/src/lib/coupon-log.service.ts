@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CustomerCouponLog } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
+import { CustomerCouponDto } from '@project-lc/shared-types';
 
 @Injectable()
 export class CouponLogService {
@@ -10,10 +11,12 @@ export class CouponLogService {
     return this.prismaService.customerCouponLog.findMany({});
   }
 
-  async findCouponLogs(dto): Promise<CustomerCouponLog[]> {
+  async findCouponLogs(
+    customerId: CustomerCouponDto['customerId'],
+  ): Promise<CustomerCouponLog[]> {
     const query = await this.prismaService.customerCoupon.findMany({
       where: {
-        customerId: dto.customerId,
+        customerId,
       },
       select: {
         logs: {

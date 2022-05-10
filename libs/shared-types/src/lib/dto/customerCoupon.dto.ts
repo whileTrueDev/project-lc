@@ -1,17 +1,5 @@
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsEnum,
-  IsDate,
-  IsBoolean,
-} from 'class-validator';
-import {
-  CouponStatus,
-  AmountUnit,
-  DiscountApplyField,
-  DiscountApplyType,
-} from '@prisma/client';
+import { IsNumber, IsOptional, IsEnum } from 'class-validator';
+import { CouponStatus } from '@prisma/client';
 
 export class CustomerCouponDto {
   @IsOptional()
@@ -28,3 +16,5 @@ export class CustomerCouponDto {
   @IsEnum(CouponStatus)
   status?: CouponStatus;
 }
+
+export type CustomerCouponIdAndStatus = Pick<CustomerCouponDto, 'id' | 'status'>;

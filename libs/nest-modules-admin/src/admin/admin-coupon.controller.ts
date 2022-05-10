@@ -4,7 +4,6 @@ import {
   Get,
   Patch,
   Post,
-  Query,
   UseGuards,
   ValidationPipe,
   ParseIntPipe,
@@ -19,7 +18,8 @@ import {
   CouponLogService,
 } from '@project-lc/nest-modules-coupon';
 import { CouponDto, CustomerCouponDto } from '@project-lc/shared-types';
-// @UseGuards(JwtAuthGuard, AdminGuard)
+
+@UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin/coupon')
 export class AdminCouponController {
   constructor(
@@ -69,7 +69,7 @@ export class AdminCouponController {
   async getCustomerCouponsByCustomerId(
     @Param('customerId', ParseIntPipe) customerId: number,
   ): Promise<CustomerCoupon[]> {
-    return this.customerCouponService.findCustomerCoupons({ customerId });
+    return this.customerCouponService.findCustomerCoupons(customerId);
   }
 
   @Patch('customer-coupon/:customerCouponId')
@@ -78,8 +78,8 @@ export class AdminCouponController {
     @Body('status', ValidationPipe) status: CouponStatus,
   ): Promise<CustomerCoupon> {
     return this.customerCouponService.updateCustomerCouponStatus({
+      id: customerCouponId,
       status,
-      customerCouponId,
     });
   }
 
@@ -87,6 +87,6 @@ export class AdminCouponController {
   async deleteCustomerCoupon(
     @Param('customerCouponId', ParseIntPipe) customerCouponId: number,
   ): Promise<CustomerCoupon> {
-    return this.customerCouponService.deleteCustomerCoupon({ customerCouponId });
+    return this.customerCouponService.deleteCustomerCoupon(customerCouponId);
   }
 }
