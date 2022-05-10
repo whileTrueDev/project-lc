@@ -79,6 +79,7 @@
       "@project-lc/nest-modules-product-promotion": [
         "libs/nest-modules-product-promotion/src/index.ts"
       ],
+      "@project-lc/nest-modules-refund": ["libs/nest-modules-refund/src/index.ts"],
       "@project-lc/nest-modules-seller": ["libs/nest-modules-seller/src/index.ts"],
       "@project-lc/nest-modules-shipping-group": [
         "libs/nest-modules-shipping-group/src/index.ts"
