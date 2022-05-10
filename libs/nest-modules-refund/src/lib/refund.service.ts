@@ -1,4 +1,10 @@
-import { CACHE_MANAGER, HttpException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  CACHE_MANAGER,
+  HttpException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
@@ -12,6 +18,7 @@ import {
 } from '@project-lc/shared-types';
 import {
   makeDummyTossPaymentData,
+  requestConfirmedTossPayment,
   requestTossPaymentCancel,
   TossPaymentCancelDto,
 } from '@project-lc/utils';
@@ -81,6 +88,21 @@ export class RefundService extends ServiceBaseWithCache {
       const data = await requestTossPaymentCancel(dto);
       return data;
     } catch (error) {
+      console.error(error.response);
+      throw new HttpException(
+        error.response.message || 'error _requestTossPaymentCancel',
+        error.response.status || 500,
+      );
+    }
+  }
+
+  /** 토스페이먼츠 paymentKey로 승인된 결제 조회 */
+  async _requestConfirmedTossPayment(paymentKey: string): Promise<any> {
+    try {
+      const data = await requestConfirmedTossPayment(paymentKey);
+      return data;
+    } catch (error) {
+      console.error(error.response);
       throw new HttpException(
         error.response.data.message || 'error _requestTossPaymentCancel',
         error.response.status || 500,
@@ -203,10 +225,92 @@ export class RefundService extends ServiceBaseWithCache {
 
   /** 특정 환불내역 상세 조회 (환불 상세페이지에 필요한 데이터가 어떤건지 잘 모르겠음
    * 주문번호, 주문일, 환불상품 이름과 이미지, 환불상품옵션가격), 결제취소인지 반품인지여부 결제취소코드 혹은 반품코드, 접수일자, 완료일, (환불수단 => 토스페이먼츠 결제조회 api로 결제수단 상세정보 확인가능), 금액 */
-  async getRefundDetail({
-    refundId,
-    refundCode,
-  }: {
-    refundId;
-  }): Promise<RefundDetailRes> {}
+  async getRefundDetail({ refundId }: { refundId: number }): Promise<RefundDetailRes> {
+    const refund = await this.prisma.refund.findFirst({
+      where: { id: refundId },
+    });
+    if (!refund) {
+      const identifier = refundId;
+      throw new BadRequestException(
+        `환불정보가 존재하지 않습니다 입력한 환불고유번호 : ${identifier}`,
+      );
+    }
+
+    const data = await this.prisma.refund.findUnique({
+      where: { id: refund.id },
+      include: {
+        order: {
+          select: {
+            orderCode: true,
+            createDate: true,
+            payment: { select: { method: true } },
+          },
+        },
+        items: {
+          select: {
+            orderItem: {
+              select: {
+                goods: { select: { id: true, goods_name: true, image: true } },
+                shippingCost: true,
+                shippingCostIncluded: true,
+              },
+            },
+            orderItemOption: {
+              select: {
+                name: true,
+                value: true,
+                quantity: true,
+                normalPrice: true,
+                discountPrice: true,
+              },
+            },
+          },
+        },
+        orderCancellation: true,
+        return: true,
+      },
+    });
+
+    const { items, ...rest } = data;
+
+    const refundItemList = items.map((item) => {
+      const { orderItem, orderItemOption } = item;
+      const { goods, ...orderItemRest } = orderItem;
+      const { id, goods_name, image } = goods;
+
+      return {
+        goodsId: id,
+        goodsName: goods_name,
+        image: image[0].image,
+        ...orderItemRest,
+        ...orderItemOption,
+      };
+    });
+
+    let card: any; // 카드로 결제하면 제공되는 카드 관련 정보입니다.
+    let virtualAccount: any; // 가상계좌로 결제하면 제공되는 가상계좌 관련 정보입니다.
+    let transfer: any; // 계좌이체로 결제했을 때 이체 정보가 담기는 객체입니다.
+    // 토스페이먼츠로 결제 && 환불한 경우 -> 결제정보 조회
+    if (data.transactionKey && data.paymentKey) {
+      const paymentData = await this._requestConfirmedTossPayment(data.paymentKey);
+
+      if (paymentData.card) {
+        card = paymentData.card;
+      }
+      if (paymentData.virtualAccount) {
+        virtualAccount = paymentData.virtualAccount;
+      }
+      if (paymentData.transfer) {
+        transfer = paymentData.transfer;
+      }
+    }
+
+    return {
+      ...rest,
+      items: refundItemList,
+      card,
+      virtualAccount,
+      transfer,
+    };
+  }
 }

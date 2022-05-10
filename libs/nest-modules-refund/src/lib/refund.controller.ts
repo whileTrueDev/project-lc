@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  ParseIntPipe,
   Post,
   Query,
   UseInterceptors,
@@ -12,6 +13,7 @@ import {
   CreateRefundDto,
   CreateRefundRes,
   GetRefundListDto,
+  RefundDetailRes,
   RefundListRes,
 } from '@project-lc/shared-types';
 import { RefundService } from './refund.service';
@@ -39,5 +41,12 @@ export class RefundController {
     dto: GetRefundListDto,
   ): Promise<RefundListRes> {
     return this.refundService.getRefundList(dto);
+  }
+
+  @Get()
+  getRefundDetail(
+    @Query('refundId', ParseIntPipe) refundId?: number,
+  ): Promise<RefundDetailRes> {
+    return this.refundService.getRefundDetail({ refundId });
   }
 }

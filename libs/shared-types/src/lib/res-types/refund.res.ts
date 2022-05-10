@@ -25,5 +25,7 @@ export type RefundListRes = {
   nextCursor?: number;
 };
 
-/** 환불내역 상세 리턴데이터 */
+/** 환불내역 상세 리턴데이터  => 프론트 작업하면서 필요한 형태로 수정
+ // TODO: 타입지정필요
+*/
 export type RefundDetailRes = any;

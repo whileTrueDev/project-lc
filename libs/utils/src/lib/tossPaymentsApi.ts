@@ -45,6 +45,13 @@ export const requestTossPaymentCancel = async ({
   return response.data;
 };
 
+/** 토스페이먼츠 paymentKey로 승인된 결제 조회 */
+export const requestConfirmedTossPayment = async (paymentKey: string): Promise<any> => {
+  const url = `https://api.tosspayments.com/v1/payments/${paymentKey}`;
+  const response = await axios.get(url, axiosConfig);
+  return response.data;
+};
+
 /** 토스페이먼츠 결제취소 위해 필요한 결제정보와 transactionKey 생성 위해 만들었음. 테스트용으로 만든거라 안쓰이는 경우 삭제필요
  */
 export const makeDummyTossPaymentData = async (): Promise<any> => {
