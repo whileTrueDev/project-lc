@@ -1,4 +1,4 @@
-import { UseInterceptors, Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, UseInterceptors } from '@nestjs/common';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { RefundService } from './refund.service';
 
@@ -10,5 +10,10 @@ export class RefundController {
   @Get()
   test(): string {
     return 'refund test';
+  }
+
+  @Post('fake-payment')
+  fakePayment(): Promise<any> {
+    return this.refundService.makeFakeOrderWithFakePayment();
   }
 }
