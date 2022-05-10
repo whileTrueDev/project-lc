@@ -90,6 +90,7 @@ export * from './lib/dto/passwordValidate.dto';
 export * from './lib/dto/policy.dto';
 export * from './lib/dto/post.dto';
 export * from './lib/dto/privacyApproachDto.dto';
+export * from './lib/dto/refund.dto';
 export * from './lib/dto/registGoods.dto';
 export * from './lib/dto/searchKeyword.dto';
 export * from './lib/dto/sellerContacts.dto';
