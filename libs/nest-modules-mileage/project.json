@@ -1,0 +1,22 @@
+{
+  "root": "libs/nest-modules-mileage",
+  "sourceRoot": "libs/nest-modules-mileage/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/nest-modules-mileage/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/nest-modules-mileage"],
+      "options": {
+        "jestConfig": "libs/nest-modules-mileage/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
