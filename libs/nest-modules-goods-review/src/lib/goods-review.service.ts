@@ -16,6 +16,7 @@ import { GoodsReviewImageService } from './goods-review-image.service';
 export class GoodsReviewService extends ServiceBaseWithCache {
   #REVIEW_CACHE_KEY = 'goods-review';
   #REVIEW_NEEDED_ORDER_ITEM_CACHE_KEY = 'order-item/review-needed';
+  #ORDER_LIST_CACHE_KEY = 'order/list';
   constructor(
     private readonly prisma: PrismaService,
     private readonly goodsReviewImageService: GoodsReviewImageService,
@@ -33,6 +34,7 @@ export class GoodsReviewService extends ServiceBaseWithCache {
 
     await this._clearCaches(this.#REVIEW_CACHE_KEY);
     await this._clearCaches(this.#REVIEW_NEEDED_ORDER_ITEM_CACHE_KEY); // 리뷰 작성가능한 orderItem 목록 초기화 위해
+    await this._clearCaches(this.#ORDER_LIST_CACHE_KEY); // 내 주문목록 캐시 초기화
     return this.prisma.goodsReview.create({
       data: {
         content: dto.content,
@@ -146,6 +148,7 @@ export class GoodsReviewService extends ServiceBaseWithCache {
 
       await this._clearCaches(this.#REVIEW_CACHE_KEY);
       await this._clearCaches(this.#REVIEW_NEEDED_ORDER_ITEM_CACHE_KEY); // 리뷰 작성가능한 orderItem 목록 초기화 위해
+      await this._clearCaches(this.#ORDER_LIST_CACHE_KEY); // 내 주문목록 캐시 초기화
       return !!result;
     } catch (err) {
       throw new BadRequestException(`GoodsReview ${id} not found`);

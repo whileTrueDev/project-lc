@@ -47,6 +47,7 @@ export const useInfiniteReviews = (
         return prev.nextCursor;
       },
       enabled,
+      refetchOnMount: true,
     },
   );
 };

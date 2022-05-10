@@ -1,13 +1,13 @@
 import {
-  SimpleGrid,
   Button,
-  useDisclosure,
-  Text,
-  useToast,
-  Stack,
-  Input,
-  useBoolean,
   Collapse,
+  Input,
+  SimpleGrid,
+  Stack,
+  Text,
+  useBoolean,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { OrderItemOption } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
@@ -15,9 +15,10 @@ import {
   INFINITE_ORDER_LIST_QUERY_KEY,
   useOrderPurchaseConfirmMutation,
 } from '@project-lc/hooks';
-import { useQueryClient } from 'react-query';
-import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import { useState } from 'react';
+import DaumPostcode, { AddressData } from 'react-daum-postcode';
+import { useQueryClient } from 'react-query';
+import ReviewCreateDialog from '../../review/ReviewCreateDialog';
 import { OrderItemOptionInfo, OrderItemOptionInfoProps } from './OrderItemOptionInfo';
 
 export function OrderItemActionButtons({
@@ -79,7 +80,9 @@ export function OrderItemActionButtons({
     {
       label: '리뷰 작성하기',
       onClick: reviewDialog.onOpen,
-      display: ['shippingDone'].includes(step) && !!purchaseConfirmationDate, // 배송완료 이후 표시 & 리뷰 작성하지 않았을때
+      display:
+        ['shippingDone', 'purchaseConfirmed'].includes(step) &&
+        !!purchaseConfirmationDate, // 배송완료 이후 표시 & 리뷰 작성하지 않았을때
       disabled: !!hasReview || !purchaseConfirmationDate, // 이미 리뷰 작성했거나, 구매확정 안한경우 비활성
     },
     {
@@ -165,6 +168,13 @@ export function OrderItemActionButtons({
       >
         <OrderCancelForm option={option} goodsData={goodsData} />
       </ConfirmDialog>
+
+      <ReviewCreateDialog
+        isOpen={reviewDialog.isOpen}
+        onClose={reviewDialog.onClose}
+        goodsId={goodsData.id}
+        orderItemId={option.orderItemId}
+      />
     </SimpleGrid>
   );
 }

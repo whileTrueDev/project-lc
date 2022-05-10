@@ -317,7 +317,7 @@ const customerMypageShoppingChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
   },
   {
     name: '주문/배송 내역',
-    href: '/mypage/주문배송내역',
+    href: '/mypage/order-list',
     checkIsActive: (pathname: string, linkHref: string) => {
       return pathname.includes(linkHref) || pathname === '/mypage'; // 소비자 데스크탑 마이페이지 홈에서 주문/배송내역이 표시됨
     },

@@ -48,7 +48,6 @@ export function ReviewList({
   ...rest
 }: ReviewListProps): JSX.Element | null {
   const reviews = useInfiniteReviews(dto, enabled);
-  if (!reviews.data) return null;
   if (reviews.isLoading) {
     return (
       <Center>
@@ -56,13 +55,15 @@ export function ReviewList({
       </Center>
     );
   }
+  if (!reviews.data) return null;
+
   return (
     <Box>
       {reviews.data.pages.map((page, idx) => (
         <Box key={idx}>
           {page.reviews.length === 0 && (
             <Box my={10}>
-              <Text>아직 후기가 없습니다.</Text>
+              <Text>아직 작성한 후기가 없습니다.</Text>
             </Box>
           )}
 

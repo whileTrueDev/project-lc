@@ -8,6 +8,7 @@ import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
 import { ORDERITEM_REVIEW_NEEDED_QUERY_KEY } from '../queries/useOrderItem';
+import { INFINITE_ORDER_LIST_QUERY_KEY } from '../queries/useOrderList';
 import { INFINITE_REVIEWS_KEY } from '../queries/useReviews';
 
 export interface useReviewUpdateMutationDto extends GoodsReviewUpdateDto {
@@ -69,7 +70,10 @@ export const useReviewCreateMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.invalidateQueries(INFINITE_REVIEWS_KEY);
-        queryClient.invalidateQueries('OrderItemReviewNeeded');
+        // 리뷰 작성 가능한 orderItem 목록 캐시 초기화
+        queryClient.invalidateQueries(ORDERITEM_REVIEW_NEEDED_QUERY_KEY);
+        // 내 주문목록 캐시 초기화
+        queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
       },
     },
   );
@@ -94,8 +98,10 @@ export const useReviewDeleteMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.invalidateQueries(INFINITE_REVIEWS_KEY);
-        // 리뷰 작성 가능한 orderItem 목록 캐시 제거
+        // 리뷰 작성 가능한 orderItem 목록 캐시 초기화
         queryClient.invalidateQueries(ORDERITEM_REVIEW_NEEDED_QUERY_KEY);
+        // 내 주문목록 캐시 초기화
+        queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
       },
     },
   );
