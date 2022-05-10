@@ -12,6 +12,11 @@ import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
+import {
+  CouponService,
+  CustomerCouponService,
+  CouponLogService,
+} from '@project-lc/nest-modules-coupon';
 import { AdminAccountService } from './admin-account.service';
 import { AdminCustomerController } from './admin-customer.controller';
 import { AdminGoodsCategoryController } from './admin-goods-category.controller';
@@ -24,6 +29,7 @@ import { AdminPromotionPageController } from './admin-promotion-page.controller'
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
+import { AdminCouponController } from './admin-coupon.controller';
 
 @Module({})
 export class AdminModule {
@@ -32,6 +38,9 @@ export class AdminModule {
     AdminSettlementService,
     AdminAccountService,
     AdminPrivacyApproachSevice,
+    CouponService,
+    CustomerCouponService,
+    CouponLogService,
   ];
 
   private static readonly exports = [
@@ -49,6 +58,7 @@ export class AdminModule {
     AdminManualController,
     AdminGoodsCategoryController,
     AdminCustomerController,
+    AdminCouponController,
   ];
 
   private static readonly imports = [

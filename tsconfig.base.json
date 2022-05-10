@@ -34,6 +34,7 @@
       ],
       "@project-lc/nest-modules-cart": ["libs/nest-modules-cart/src/index.ts"],
       "@project-lc/nest-modules-cipher": ["libs/nest-modules-cipher/src/index.ts"],
+      "@project-lc/nest-modules-coupon": ["libs/nest-modules-coupon/src/index.ts"],
       "@project-lc/nest-modules-customer": ["libs/nest-modules-customer/src/index.ts"],
       "@project-lc/nest-modules-goods": ["libs/nest-modules-goods/src/index.ts"],
       "@project-lc/nest-modules-goods-category": [
