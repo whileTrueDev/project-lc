@@ -14,8 +14,8 @@ import {
 
 /** 카트 상품 옵션 정보 DTO */
 export class CartItemOptionDto {
-  @IsNumber() discountPrice: CartItemOption['discountPrice'];
-  @IsNumber() normalPrice: CartItemOption['normalPrice'];
+  @IsDecimal() discountPrice: CartItemOption['discountPrice'];
+  @IsDecimal() normalPrice: CartItemOption['normalPrice'];
   @IsNumber() quantity: CartItemOption['quantity'];
   @IsNumber() goodsOptionsId: CartItemOption['goodsOptionsId'];
   @IsOptional() @IsString() name?: CartItemOption['name'];
@@ -35,8 +35,8 @@ export class CartItemDto {
   @IsNumber() goodsId: CartItem['goodsId'];
   @IsOptional() @IsNumber() customerId?: CartItem['customerId'];
   @IsOptional() @IsString() tempUserId?: CartItem['tempUserId'];
-  @IsNumber() shippingGroupId: CartItem['shippingGroupId'];
-  @IsDecimal() shippingCost: CartItem['shippingCost'];
+  @IsOptional() @IsNumber() shippingGroupId?: CartItem['shippingGroupId'];
+  @IsNumber() shippingCost: number;
   @IsBoolean() shippingCostIncluded: CartItem['shippingCostIncluded'];
 
   @ValidateNested({ each: true })
