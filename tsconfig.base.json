@@ -63,11 +63,21 @@
       "@project-lc/nest-modules-broadcaster": [
         "libs/nest-modules-broadcaster/src/index.ts"
       ],
-      "@project-lc/nest-modules-cart": ["libs/nest-modules-cart/src/index.ts"],
-      "@project-lc/nest-modules-cipher": ["libs/nest-modules-cipher/src/index.ts"],
-      "@project-lc/nest-modules-customer": ["libs/nest-modules-customer/src/index.ts"],
-      "@project-lc/nest-modules-exchange": ["libs/nest-modules-exchange/src/index.ts"],
-      "@project-lc/nest-modules-goods": ["libs/nest-modules-goods/src/index.ts"],
+      "@project-lc/nest-modules-cart": [
+        "libs/nest-modules-cart/src/index.ts"
+      ],
+      "@project-lc/nest-modules-cipher": [
+        "libs/nest-modules-cipher/src/index.ts"
+      ],
+      "@project-lc/nest-modules-customer": [
+        "libs/nest-modules-customer/src/index.ts"
+      ],
+      "@project-lc/nest-modules-exchange": [
+        "libs/nest-modules-exchange/src/index.ts"
+      ],
+      "@project-lc/nest-modules-goods": [
+        "libs/nest-modules-goods/src/index.ts"
+      ],
       "@project-lc/nest-modules-goods-category": [
         "libs/nest-modules-goods-category/src/index.ts"
       ],
@@ -126,8 +136,12 @@
       "@project-lc/nest-modules-product-promotion": [
         "libs/nest-modules-product-promotion/src/index.ts"
       ],
-      "@project-lc/nest-modules-return": ["libs/nest-modules-return/src/index.ts"],
-      "@project-lc/nest-modules-seller": ["libs/nest-modules-seller/src/index.ts"],
+      "@project-lc/nest-modules-return": [
+        "libs/nest-modules-return/src/index.ts"
+      ],
+      "@project-lc/nest-modules-seller": [
+        "libs/nest-modules-seller/src/index.ts"
+      ],
       "@project-lc/nest-modules-shipping-group": [
         "libs/nest-modules-shipping-group/src/index.ts"
       ],

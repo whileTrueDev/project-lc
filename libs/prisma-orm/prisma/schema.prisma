@@ -1729,6 +1729,7 @@ model Return {
   refund   Refund? @relation(fields: [refundId], references: [id], onDelete: SetNull)
 }
 
+// 소비자가 반품신청시 반품사유와 함께 업로드하는 사진 저장(반품신청시 사진입력은 필수가 아님) -> 반품신청 승인 혹은 거절을 위해 관리자 혹은 판매자가 확인
 model ReturnImage {
   id         Int      @id @default(autoincrement())
   createDate DateTime @default(now())
@@ -1792,6 +1793,7 @@ model Exchange {
   images                 ExchangeImage[]
 }
 
+// 소비자가 교환신청시 교환사유와 함께 업로드하는 사진 저장(교환신청시 사진입력은 필수가 아님) -> 교환신청 승인 혹은 거절을 위해 관리자 혹은 판매자가 확인
 model ExchangeImage {
   id         Int       @id @default(autoincrement())
   createDate DateTime  @default(now())
