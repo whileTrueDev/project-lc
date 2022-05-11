@@ -64,10 +64,10 @@ export function OrderItemActionButtons({
       disabled: !!purchaseConfirmationDate,
     },
     {
-      label: '리뷰 작성하기',
-      onClick: reviewDialog.onOpen,
+      label: !hasReview ? '리뷰 작성하기' : '작성한 리뷰 확인',
+      onClick: !hasReview ? reviewDialog.onOpen : () => router.push('/mypage/review'),
       display: reviewAbleSteps.includes(step), // 배송완료 이후 표시 & 구매확정시 표시, 리뷰 작성하지 않았을때
-      disabled: !!hasReview || !purchaseConfirmationDate, // 이미 리뷰 작성했거나, 구매확정 안한경우 비활성
+      disabled: false,
     },
     {
       label: '문의하기',
