@@ -1,4 +1,8 @@
-import { BroadcasterRes, FindBroadcasterDto } from '@project-lc/shared-types';
+import {
+  BroadcasterRes,
+  FindBroadcasterDto,
+  BroadcasterOnlyNickNameAndAvatar,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
@@ -18,5 +22,25 @@ export const useBroadcaster = (
     ['Broadcaster', dto.id, dto.email],
     () => getBroadcaster(dto),
     { enabled: !!(dto.id || dto.email) },
+  );
+};
+
+export const getBroadcasterGiftDisplay = async (
+  id?: number,
+): Promise<BroadcasterOnlyNickNameAndAvatar> => {
+  return axios
+    .get<BroadcasterOnlyNickNameAndAvatar>('/broadcaster/gift/display', {
+      params: { id },
+    })
+    .then((res) => res.data);
+};
+
+export const useBroadcasterGiftDisplay = (
+  id?: number,
+): UseQueryResult<BroadcasterOnlyNickNameAndAvatar, AxiosError> => {
+  return useQuery<BroadcasterOnlyNickNameAndAvatar, AxiosError>(
+    ['getBroadcasterGiftDisplay', id],
+    () => getBroadcasterGiftDisplay(id),
+    { enabled: !!id },
   );
 };

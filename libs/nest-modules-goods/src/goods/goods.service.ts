@@ -139,11 +139,28 @@ export class GoodsService extends ServiceBaseWithCache {
     sort,
     direction,
     groupId,
-  }: GoodsListDto & { sellerId?: number }): Promise<GoodsListRes> {
+    goodsName,
+    categoryId,
+  }: GoodsListDto & {
+    sellerId?: number;
+    goodsName?: string;
+    categoryId?: number;
+  }): Promise<GoodsListRes> {
     const items = await this.prisma.goods.findMany({
       skip: page * itemPerPage,
       take: itemPerPage,
-      where: { seller: { id: sellerId }, shippingGroupId: groupId },
+      where: {
+        seller: { id: sellerId },
+        shippingGroupId: groupId,
+        goods_name: {
+          search: goodsName ? goodsName.trim() : undefined,
+        },
+        categories: {
+          some: {
+            id: categoryId,
+          },
+        },
+      },
       orderBy: [{ [sort]: direction }],
       include: {
         options: {
@@ -449,7 +466,16 @@ export class GoodsService extends ServiceBaseWithCache {
     goodsId: number;
   }> {
     try {
-      const { options, image, shippingGroupId, goodsInfoId, ...goodsData } = dto;
+      const {
+        options,
+        image,
+        shippingGroupId,
+        goodsInfoId,
+        categoryId,
+        informationSubjectId,
+        informationNoticeContents,
+        ...goodsData
+      } = dto;
       const optionsData = options.map((opt) => {
         const { supply, ...optData } = opt;
         return {
@@ -474,8 +500,24 @@ export class GoodsService extends ServiceBaseWithCache {
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
           confirmation: { create: { status: 'waiting' } },
+          informationSubject: {
+            connect: {
+              id: informationSubjectId,
+            },
+          },
+          categories: {
+            connect: {
+              id: categoryId,
+            },
+          },
+          informationNotice: {
+            create: {
+              contents: informationNoticeContents,
+            },
+          },
         },
       });
+
       await this._clearCaches(this.#GOODS_CACHE_KEY);
 
       return { goodsId: goods.id };
@@ -603,6 +645,9 @@ export class GoodsService extends ServiceBaseWithCache {
       image,
       shippingGroupId,
       goodsInfoId,
+      informationSubjectId,
+      informationNoticeId,
+      categoryId,
       ...goodsData
     } = dto;
 
@@ -643,6 +688,21 @@ export class GoodsService extends ServiceBaseWithCache {
             ? { connect: { id: shippingGroupId } }
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
+          informationSubject: {
+            connect: {
+              id: informationSubjectId,
+            },
+          },
+          informationNotice: {
+            connect: {
+              id: informationNoticeId,
+            },
+          },
+          categories: {
+            connect: {
+              id: categoryId,
+            },
+          },
           confirmation: {
             update: {
               status: prevStatus === 'waiting' ? 'waiting' : 'needReconfirmation',
