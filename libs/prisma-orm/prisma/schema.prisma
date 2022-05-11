@@ -245,8 +245,7 @@ model Goods {
   reviews              GoodsReview[] // 작성된 리뷰
   informationSubjectId Int? // 정보제공고시 품목고유번호
   informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
-  informationNoticeId  Int?                     @unique
-  informationNotice    GoodsInformationNotice?  @relation(fields: [informationNoticeId], references: [id]) // 연결된 상품정보제공 내용
+  informationNotice    GoodsInformationNotice? // 연결된 상품정보제공 내용
   categories           GoodsCategory[] // 상품이 해당하는 카테고리들
   goodsInquiry         GoodsInquiry[]
 
@@ -1864,10 +1863,10 @@ model GoodsInformationSubject {
 
 // 상품정보제공
 model GoodsInformationNotice {
-  id       Int    @id @default(autoincrement()) // 상품정보제공 고유번호
+  id       Int   @id @default(autoincrement()) // 상품정보제공 고유번호
   contents Json // 상품의 품목에 맞는 GoodsInformationSubject.items의 값을 채운 JSON object 형태로 저장 (예: {"제품명":"닭강정", "식품유형":"가열양념육", "유통기한":"제조일로부터3일", ...})
-  goodsId  Int?
-  goods    Goods? // 연결된 상품
+  goodsId  Int   @unique
+  goods    Goods @relation(fields: [goodsId], references: [id], onDelete: Cascade) // 연결된 상품
 }
 
 // ****************
