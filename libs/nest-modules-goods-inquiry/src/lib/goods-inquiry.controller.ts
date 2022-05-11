@@ -17,7 +17,6 @@ import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   FindGoodsInquiryItem,
-  FindGoodsInquiryRes,
   FindManyGoodsInquiryDto,
   GoodsInquiryCreateDto,
   GoodsInquiryUpdateDto,
@@ -62,7 +61,7 @@ export class GoodsInquiryController {
   /** 특정 상품문의 수정 */
   @UseGuards(JwtAuthGuard)
   @Patch(':goodsInquiryId')
-  update(
+  async update(
     @Param('goodsInquiryId', ParseIntPipe) id: GoodsInquiry['id'],
     @Body(new ValidationPipe({ transform: true })) dto: GoodsInquiryUpdateDto,
   ): Promise<GoodsInquiry> {
@@ -72,7 +71,7 @@ export class GoodsInquiryController {
   /** 특정 상품문의 삭제 */
   @UseGuards(JwtAuthGuard)
   @Delete(':goodsInquiryId')
-  remove(
+  async remove(
     @Param('goodsInquiryId', ParseIntPipe) id: GoodsInquiry['id'],
   ): Promise<boolean> {
     return this.goodsInquiryService.remove(id);

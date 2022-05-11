@@ -3,6 +3,7 @@ export * from './classes/service-base-cache.class';
 export * from './classes/user-pw-manager.class';
 export * as authConstants from './constants/auth';
 export * from './decorators/broadcasterInfo.decorator';
+export * from './decorators/customerInfo.decorator';
 export * from './decorators/sellerInfo.decorator';
 export * from './decorators/userInfo.decorator';
 export * from './interceptors/http-cache.interceptor';

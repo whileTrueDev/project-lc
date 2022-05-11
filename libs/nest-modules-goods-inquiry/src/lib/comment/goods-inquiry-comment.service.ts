@@ -2,7 +2,7 @@ import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { GoodsInquiry, GoodsInquiryComment } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { GoodsInquiryCommentDto } from '@project-lc/shared-types';
+import { GoodsInquiryCommentDto, GoodsInquiryCommentRes } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -19,8 +19,16 @@ export class GoodsInquiryCommentService extends ServiceBaseWithCache {
   /** 특정 상품문의 답변 목록 조회 */
   public async findAll(
     goodsInquiryId: GoodsInquiry['id'],
-  ): Promise<GoodsInquiryComment[]> {
-    return this.prisma.goodsInquiryComment.findMany({ where: { goodsInquiryId } });
+  ): Promise<GoodsInquiryCommentRes> {
+    return this.prisma.goodsInquiryComment.findMany({
+      where: { goodsInquiryId },
+      include: {
+        seller: {
+          select: { id: true, avatar: true, sellerShop: { select: { shopName: true } } },
+        },
+        admin: { select: { id: true, email: true } },
+      },
+    });
   }
 
   /** 특정 상품문의 답변 생성 */

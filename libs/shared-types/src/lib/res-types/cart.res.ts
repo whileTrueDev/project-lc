@@ -28,6 +28,7 @@ export type CartItemRes = Array<
     // };
   } & {
     goods: {
+      id: Goods['id'];
       image: GoodsImages[];
       goods_name: Goods['goods_name'];
       seller: {

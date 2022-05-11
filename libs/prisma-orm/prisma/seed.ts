@@ -33,6 +33,7 @@ import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
 import { dummyCustomer } from './seedData/customer';
 import { cartSample, tempUserCartItemSample } from './seedData/cart';
 import { nonMemberOrder, normalOrder, orderExportReady } from './seedData/dummyOrder';
+import { createGoodsReview } from './seedData/goods-review';
 
 const prisma = new PrismaClient();
 
@@ -146,7 +147,7 @@ async function createDummyGoods(
   seller: SellerAccountType,
   goods: DummyGoodsDataType,
 ): Promise<Goods> {
-  const { goods_name, summary, confirmation } = goods;
+  const { goods_name, summary, confirmation, contents } = goods;
   const sellerDefaultShippingGroup = seller.shippingGroups[0];
   const sellerDefaultCommonInfo = seller.goodsCommonInfo[0];
   const createdGoods = await prisma.goods.create({
@@ -168,6 +169,7 @@ async function createDummyGoods(
       },
       options: { create: [defaultOption] },
       confirmation: { create: confirmation },
+      contents,
     },
   });
   return createdGoods;
@@ -361,6 +363,9 @@ async function main(): Promise<void> {
 
   // 더미 주문데이터 생성
   await createDummyOrderData();
+
+  // 더미 상품리뷰 생성
+  await createGoodsReview(prisma);
 }
 
 main()

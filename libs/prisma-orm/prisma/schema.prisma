@@ -1398,8 +1398,8 @@ model CartItem {
   support              CartItemSupport? // 연결된 후원정보
   shippingCost         Decimal          @default("0.00") @db.Decimal(10, 2) // 장바구니 담았을 당시 이 장바구니 상품에 포함된  배송비
   shippingCostIncluded Boolean          @default(false) // 이 장바구니 상품에 동일 판매자의 배송비가 포함되었는지 여부
-  shippingGroupId      Int // 연결된 배송정책 id
-  shippingGroup        ShippingGroup    @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
+  shippingGroupId      Int? // 연결된 배송정책 id
+  shippingGroup        ShippingGroup?   @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
 }
 
 // 장바구니 상품옵션
