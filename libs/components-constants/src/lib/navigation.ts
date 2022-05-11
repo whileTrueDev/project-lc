@@ -324,7 +324,7 @@ const customerMypageShoppingChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
   },
   {
     name: '반품/교환 내역',
-    href: '/mypage/반품교환',
+    href: '/mypage/exchange-return',
     checkIsActive: defaultIsActiveChecker,
   },
   { name: '환불 내역', href: '/mypage/환불 내역', checkIsActive: defaultIsActiveChecker },
