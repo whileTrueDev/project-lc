@@ -1,18 +1,6 @@
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsEnum,
-  IsDate,
-  IsBoolean,
-} from 'class-validator';
+import { AmountUnit, DiscountApplyField, DiscountApplyType } from '@prisma/client';
 import { Type } from 'class-transformer';
-import {
-  CouponStatus,
-  AmountUnit,
-  DiscountApplyField,
-  DiscountApplyType,
-} from '@prisma/client';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CouponDto {
   @IsOptional()
