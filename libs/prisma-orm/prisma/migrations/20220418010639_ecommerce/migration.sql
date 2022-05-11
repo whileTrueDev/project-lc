@@ -396,7 +396,7 @@ CREATE TABLE `Return` (
     `rejectReason` VARCHAR(191) NULL,
     `returnAddress` VARCHAR(191) NOT NULL,
     `responsibility` VARCHAR(191) NOT NULL,
-    `refundId` INTEGER NOT NULL,
+    `refundId` INTEGER NULL,
 
     UNIQUE INDEX `Return_returnCode_key`(`returnCode`),
     PRIMARY KEY (`id`)
