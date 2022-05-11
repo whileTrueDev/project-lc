@@ -1,8 +1,13 @@
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  CACHE_MANAGER,
+  HttpException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
-import { PaymentService } from '@project-lc/nest-modules-payment';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateRefundDto,
@@ -14,7 +19,7 @@ import {
   RefundDetailRes,
   RefundListRes,
 } from '@project-lc/shared-types';
-import { makeDummyTossPaymentData } from '@project-lc/utils';
+import { TossPaymentsApi } from '@project-lc/utils';
 import { Cache } from 'cache-manager';
 import { nanoid } from 'nanoid';
 
@@ -25,7 +30,6 @@ export class RefundService extends ServiceBaseWithCache {
   constructor(
     private readonly prisma: PrismaService,
     private readonly orderCancellationService: OrderCancellationService,
-    private readonly paymentService: PaymentService,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);
@@ -33,7 +37,7 @@ export class RefundService extends ServiceBaseWithCache {
 
   /** 결제취소 테스트위해 결제데이터 필요하여 만들었음. // TODO: 프론트 작업시 삭제 */
   async makeFakeOrderWithFakePayment(): Promise<any> {
-    const paymentResultData = await makeDummyTossPaymentData();
+    const paymentResultData = await TossPaymentsApi.makeDummyTossPaymentData();
 
     // 결제완료상태(orderPayment데이터 존재) + 주문취소요청 존재하는 주문 생성
     const orderWithPayment = await this.prisma.order.create({
@@ -86,6 +90,36 @@ export class RefundService extends ServiceBaseWithCache {
     return nanoid();
   }
 
+  /** 토스페이먼츠 결제취소 요청 래핑 & 에러핸들링 */
+  private async _requestCancelPayment(
+    dto: CreateRefundDto,
+  ): Promise<{ transactionKey: string }> {
+    try {
+      const cancelResult = await TossPaymentsApi.requestCancelPayment({
+        paymentKey: dto.paymentKey,
+        cancelReason: dto.reason,
+        cancelAmount: dto.refundAmount,
+        // 토스페이먼츠 가상계좌로 지불하여 환불계좌정보 있는 경우
+        refundReceiveAccount:
+          dto.refundAccount && dto.refundAccount && dto.refundAccountHolder
+            ? {
+                bank: dto.refundBank,
+                accountNumber: dto.refundAccount,
+                holderName: dto.refundAccountHolder,
+              }
+            : undefined,
+      });
+
+      return cancelResult;
+    } catch (error) {
+      console.error(error.response);
+      throw new HttpException(
+        error.response.message || 'error in requestCancelTossPayment',
+        error.response.status || 500,
+      );
+    }
+  }
+
   /** 환불데이터 생성
    * 1. (토스 결제취소 사용시)주문에 연결된 결제키로 토스페이먼츠 결제취소 요청하여 transactionKey 받기
    *   -> 이걸 여기서 실행해야 하는지 잘 모르겠음.. 프론트에서 호출하고 transaction 키 받아서, 환불정보 생성하는 요청을 한번 더 호출하는 방식으로 진행할 수 있을거같기는 함
@@ -98,20 +132,7 @@ export class RefundService extends ServiceBaseWithCache {
     let transactionKey: string | undefined;
     // 1. 토스페이먼츠 결제취소 api 사용하는 경우 transaction키 받기
     if (rest.paymentKey) {
-      const cancelResult = await this.paymentService.requestCancelTossPayment({
-        paymentKey: rest.paymentKey,
-        cancelReason: rest.reason,
-        cancelAmount: rest.refundAmount,
-        // 토스페이먼츠 가상계좌로 지불하여 환불계좌정보 있는 경우
-        refundReceiveAccount:
-          rest.refundAccount && rest.refundAccount && rest.refundAccountHolder
-            ? {
-                bank: rest.refundBank,
-                accountNumber: rest.refundAccount,
-                holderName: rest.refundAccountHolder,
-              }
-            : undefined,
-      });
+      const cancelResult = await this._requestCancelPayment(dto);
       transactionKey = cancelResult.transactionKey;
     }
 
@@ -264,9 +285,7 @@ export class RefundService extends ServiceBaseWithCache {
     let transfer: PaymentTransfer | undefined; // 계좌이체로 결제했을 때 이체 정보가 담기는 객체입니다.
     // 토스페이먼츠로 결제 && 환불한 경우 -> 결제정보 조회
     if (data.transactionKey && data.paymentKey) {
-      const paymentData = await this.paymentService.getPaymentByOrderId(
-        rest.order.orderCode,
-      );
+      const paymentData = await TossPaymentsApi.getPaymentByOrderId(rest.order.orderCode);
 
       if (paymentData.card) {
         card = paymentData.card;
