@@ -977,6 +977,29 @@
       },
       "tags": []
     },
+    "nest-modules-payment": {
+      "root": "libs/nest-modules-payment",
+      "sourceRoot": "libs/nest-modules-payment/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/nest-modules-payment/**/*.ts"]
+          },
+          "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/nest-modules-payment"],
+          "options": {
+            "jestConfig": "libs/nest-modules-payment/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "nest-modules-policy": {
       "root": "libs/nest-modules-policy",
       "sourceRoot": "libs/nest-modules-policy/src",

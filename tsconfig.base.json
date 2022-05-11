@@ -76,6 +76,7 @@
       "@project-lc/nest-modules-overlay-controller": [
         "libs/nest-modules-overlay-controller/src/index.ts"
       ],
+      "@project-lc/nest-modules-payment": ["libs/nest-modules-payment/src/index.ts"],
       "@project-lc/nest-modules-policy": ["libs/nest-modules-policy/src/index.ts"],
       "@project-lc/nest-modules-product-promotion": [
         "libs/nest-modules-product-promotion/src/index.ts"
