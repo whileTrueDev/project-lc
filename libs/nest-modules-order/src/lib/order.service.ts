@@ -174,6 +174,8 @@ export class OrderService extends ServiceBaseWithCache {
     if (order.giftFlag) {
       return this.removerecipientInfo(order);
     }
+
+    await this._clearCaches(this.#ORDER_CACHE_KEY);
     return order;
   }
 
@@ -258,6 +260,7 @@ export class OrderService extends ServiceBaseWithCache {
             },
             review: { select: { id: true } },
             options: true,
+            orderCancellationItems: true,
             goods: {
               select: {
                 id: true,
@@ -267,6 +270,7 @@ export class OrderService extends ServiceBaseWithCache {
             },
           },
         },
+        orderCancellations: true,
         payment: true,
       },
     });
@@ -294,6 +298,7 @@ export class OrderService extends ServiceBaseWithCache {
             support: {
               include: { broadcaster: { select: { userNickname: true, avatar: true } } },
             },
+            orderCancellationItems: true,
             goods: {
               select: {
                 id: true,
@@ -382,6 +387,7 @@ export class OrderService extends ServiceBaseWithCache {
       data: updateInput,
     });
 
+    await this._clearCaches(this.#ORDER_CACHE_KEY);
     return true;
   }
 
@@ -449,6 +455,8 @@ export class OrderService extends ServiceBaseWithCache {
         data: { purchaseConfirmationDate: new Date(), step: 'purchaseConfirmed' },
       });
     }
+
+    await this._clearCaches(this.#ORDER_CACHE_KEY);
     return true;
   }
 }
