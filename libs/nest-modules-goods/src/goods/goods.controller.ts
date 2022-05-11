@@ -30,7 +30,6 @@ import {
 } from '@project-lc/shared-types';
 import { GoodsService } from './goods.service';
 
-@UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @Controller('goods')
 export class GoodsController {
@@ -64,24 +63,28 @@ export class GoodsController {
 
   /** 상품 이미지 생성 */
   @Post('/image')
+  @UseGuards(JwtAuthGuard)
   registGoodsImages(@Body(ValidationPipe) dto: GoodsImageDto[]): Promise<GoodsImages[]> {
     return this.goodsService.registGoodsImages(dto);
   }
 
   /** 상품 이미지 삭제 */
   @Delete('/image')
+  @UseGuards(JwtAuthGuard)
   deleteGoodsImage(@Body('imageId', ParseIntPipe) imageId: number): Promise<boolean> {
     return this.goodsService.deleteGoodsImage(imageId);
   }
 
   /** 여러 상품 이미지 데이터 수정 */
   @Patch('/image')
+  @UseGuards(JwtAuthGuard)
   updateGoodsImages(@Body(ValidationPipe) dto: GoodsImageDto[]): Promise<boolean> {
     return this.goodsService.updateGoodsImages(dto);
   }
 
   /** 상품 목록 조회 - 본인 판매상품만 확인가능 */
   @Get('/list')
+  @UseGuards(JwtAuthGuard)
   getGoodsList(
     @SellerInfo() seller: UserPayload,
     @Query('page', new DefaultValuePipe(0), ParseIntPipe) page: number,
@@ -104,6 +107,7 @@ export class GoodsController {
 
   /** 특정 상품 재고 조회 */
   @Get('/stock')
+  @UseGuards(JwtAuthGuard)
   getStockInfo(
     @Query('id', ParseIntPipe) id: number,
   ): Promise<GoodsOptionWithStockInfo[]> {
@@ -112,6 +116,7 @@ export class GoodsController {
 
   /** 특정 상품 노출 여부 변경 */
   @Patch('/expose')
+  @UseGuards(JwtAuthGuard)
   changeGoodsView(@Body(ValidationPipe) dto: ChangeGoodsViewDto): Promise<boolean> {
     const { id, view } = dto;
     return this.goodsService.changeGoodsView(id, view);
@@ -119,6 +124,7 @@ export class GoodsController {
 
   /** 특정 상품 삭제 */
   @Delete()
+  @UseGuards(JwtAuthGuard)
   async deleteGoods(
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: DeleteGoodsDto,
@@ -132,6 +138,7 @@ export class GoodsController {
 
   /** 상품 등록 */
   @Post()
+  @UseGuards(JwtAuthGuard)
   registGoods(
     @SellerInfo() seller: UserPayload,
     @Body(ValidationPipe) dto: RegistGoodsDto,
@@ -139,17 +146,20 @@ export class GoodsController {
     return this.goodsService.registGoods(seller.id, dto);
   }
 
+  @Get('all-ids')
+  getAllGoodsIds(): Promise<number[]> {
+    return this.goodsService.findAllGoodsIds();
+  }
+
   /** 상품 개별 조회 */
   @Get(':goodsId')
-  getOneGoods(
-    @SellerInfo() seller: UserPayload,
-    @Param('goodsId', ParseIntPipe) goodsId: number,
-  ): Promise<GoodsByIdRes> {
-    return this.goodsService.getOneGoods(goodsId, seller.id);
+  getOneGoods(@Param('goodsId', ParseIntPipe) goodsId: number): Promise<GoodsByIdRes> {
+    return this.goodsService.getOneGoods(goodsId);
   }
 
   /** 상품 수정 */
   @Put(':goodsId')
+  @UseGuards(JwtAuthGuard)
   updateOneGoods(
     @Param('goodsId', ParseIntPipe) goodsId: number,
     @Body(ValidationPipe) dto: RegistGoodsDto,

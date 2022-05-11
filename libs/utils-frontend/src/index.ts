@@ -1,3 +1,4 @@
+export * from './lib/asteriskify';
 export * from './lib/createChakraTheme';
 export * from './lib/createMuiTheme';
 export * from './lib/createReactQueryClient';

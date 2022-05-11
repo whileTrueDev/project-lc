@@ -25,12 +25,8 @@ export class CartController {
 
   /** 특정 카트 상품 목록 조회 */
   @Get()
-  find(
-    @Query('customerId') customerId?: Customer['id'],
-    @Query('tempUserId') tempUserId?: CartItem['tempUserId'],
-  ): Promise<CartItemRes> {
+  find(@Query('tempUserId') tempUserId?: CartItem['tempUserId']): Promise<CartItemRes> {
     return this.cartService.find({
-      customerId: customerId ? Number(customerId) : undefined,
       tempUserId,
     });
   }
