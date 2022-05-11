@@ -9,7 +9,7 @@ import {
   Text,
   useBoolean,
 } from '@chakra-ui/react';
-import { useCustomerAddress, useProfile } from '@project-lc/hooks';
+import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
 import { banks } from '@project-lc/shared-types';
 import { useCallback, useEffect } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
@@ -54,19 +54,16 @@ export function ReExportRequestSection(): JSX.Element {
   };
 
   const { data: profileData } = useProfile();
-  const { data: addresses } = useCustomerAddress(profileData?.id);
+  const { data: defaultAddress } = useDefaultCustomerAddress(profileData?.id);
 
   const setDefaultAddress = useCallback(() => {
-    if (addresses && addresses.length) {
-      const defaultAddress = addresses.find((address) => !!address.isDefault);
-      if (defaultAddress) {
-        const { address, detailAddress, postalCode } = defaultAddress;
-        setValue('recipientAddress', address);
-        setValue('recipientPostalCode', postalCode);
-        setValue('recipientDetailAddress', detailAddress);
-      }
+    if (defaultAddress) {
+      const { address, detailAddress, postalCode } = defaultAddress;
+      setValue('recipientAddress', address);
+      setValue('recipientPostalCode', postalCode);
+      setValue('recipientDetailAddress', detailAddress);
     }
-  }, [addresses, setValue]);
+  }, [defaultAddress, setValue]);
 
   useEffect(() => {
     setDefaultAddress();
