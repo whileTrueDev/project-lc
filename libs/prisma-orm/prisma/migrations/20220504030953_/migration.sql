@@ -4,12 +4,6 @@ ALTER TABLE `Exchange` ADD COLUMN `memo` VARCHAR(191) NULL,
     MODIFY `responsibility` VARCHAR(191) NULL;
 
 -- AlterTable
-ALTER TABLE `GoodsInquiry` MODIFY `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
-
--- AlterTable
-ALTER TABLE `GoodsInquiryComment` MODIFY `createDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
-
--- AlterTable
 ALTER TABLE `Return` ADD COLUMN `memo` VARCHAR(191) NULL,
     ADD COLUMN `refundId` INTEGER NULL,
     ADD COLUMN `returnBank` VARCHAR(191) NULL,
