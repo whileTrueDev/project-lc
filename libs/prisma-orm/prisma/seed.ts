@@ -2,43 +2,44 @@ import {
   Administrator,
   Broadcaster,
   BroadcasterPromotionPage,
+  Customer,
   Goods,
   GoodsInfo,
+  Prisma,
   PrismaClient,
   Seller,
   SellerContacts,
   ShippingGroup,
-  Prisma,
-  Customer,
 } from '@prisma/client';
+import { cartSample, tempUserCartItemSample } from './seedData/cart';
+import { dummyCustomer } from './seedData/customer';
 import {
   defaultOption,
   defaultSellCommissionData,
+  dummyBroadcasterAddress,
+  dummyBroadcasterChannel,
+  dummyBroadcasterContacts,
   DummyGoodsDataType,
   dummyGoodsList,
   dummyImageUrlList,
   dummyLiveShoppingData,
+  dummyLoginHistory,
   testadminData,
   testBroadcasterData,
   testsellerData,
   testsellerExtraData,
-  dummyBroadcasterAddress,
-  dummyBroadcasterChannel,
-  dummyBroadcasterContacts,
-  dummyLoginHistory,
 } from './seedData/dummyData';
-import { termsData } from './seedData/terms';
-import { kkshowMainSeedData } from './seedData/kkshowMain';
-import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
-import { dummyCustomer } from './seedData/customer';
-import { cartSample, tempUserCartItemSample } from './seedData/cart';
 import {
   nonMemberOrder,
   normalOrder,
+  orderExportReady,
   purchaseConfirmedOrder,
   shippingDoneOrder,
 } from './seedData/dummyOrder';
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
+import { kkshowMainSeedData } from './seedData/kkshowMain';
+import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
+import { termsData } from './seedData/terms';
 
 const prisma = new PrismaClient();
 
@@ -96,7 +97,19 @@ async function createBroadcaster(): Promise<Broadcaster> {
 
 /** 테스트소비자 생성 */
 async function createCustomer(): Promise<Customer> {
-  return prisma.customer.create({ data: dummyCustomer });
+  const customer = await prisma.customer.create({ data: dummyCustomer });
+  await prisma.customerAddress.create({
+    data: {
+      title: '우리집',
+      recipient: '테스트소비자',
+      address: '부산',
+      detailAddress: '장전온천천로detailAddress',
+      postalCode: '12345',
+      isDefault: true,
+      customer: { connect: { id: customer.id } },
+    },
+  });
+  return customer;
 }
 
 /** 방송인홍보페이지 생성 */
@@ -299,6 +312,7 @@ async function createDummyOrderData(): Promise<void> {
   await prisma.order.create({ data: nonMemberOrder });
   await prisma.order.create({ data: purchaseConfirmedOrder });
   await prisma.order.create({ data: shippingDoneOrder });
+  await prisma.order.create({ data: orderExportReady });
 }
 
 /** 시드 메인 함수 */

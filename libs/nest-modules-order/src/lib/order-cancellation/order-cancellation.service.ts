@@ -83,15 +83,25 @@ export class OrderCancellationService extends ServiceBaseWithCache {
     }
 
     await this._clearCaches(this.#ORDER_CANCELLATION_CACHE_KEY);
+    // 주문캐시도 삭제
+    await this._clearCaches('order');
     return data;
   }
 
   /** 주문의 상태를 주문무효 로 변경(주문취소요청이 처리완료(승인)되었을 때 사용)
-   // TODO: 주문 캐시데이터도 삭제 (주문모듈 작업한 브랜치 합친 이후 주문서비스에서 가져오도록 수정)
    */
   private async updateOrderStateToOrderInvalidated(orderId: number): Promise<void> {
+    // 주문 상태 주문무효로 변경
     await this.prisma.order.update({
       where: { id: orderId },
+      data: {
+        step: 'orderInvalidated',
+      },
+    });
+
+    // 주문상품옵션 상태 주문무효로 변경
+    await this.prisma.orderItemOption.updateMany({
+      where: { orderItem: { orderId } },
       data: {
         step: 'orderInvalidated',
       },

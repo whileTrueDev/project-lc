@@ -72,6 +72,9 @@
       "@project-lc/nest-modules-customer": [
         "libs/nest-modules-customer/src/index.ts"
       ],
+      "@project-lc/nest-modules-exchange": [
+        "libs/nest-modules-exchange/src/index.ts"
+      ],
       "@project-lc/nest-modules-goods": [
         "libs/nest-modules-goods/src/index.ts"
       ],
@@ -132,6 +135,9 @@
       "@project-lc/nest-modules-payment": ["libs/nest-modules-payment/src/index.ts"],
       "@project-lc/nest-modules-product-promotion": [
         "libs/nest-modules-product-promotion/src/index.ts"
+      ],
+      "@project-lc/nest-modules-return": [
+        "libs/nest-modules-return/src/index.ts"
       ],
       "@project-lc/nest-modules-seller": [
         "libs/nest-modules-seller/src/index.ts"

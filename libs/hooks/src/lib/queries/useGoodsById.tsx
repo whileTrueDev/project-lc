@@ -6,6 +6,7 @@ import axios from '../../axios';
 export const generateGoodsByIdKey = (
   goodsId: number | string | null,
 ): [string, number | string | null] => ['GoodsById', goodsId];
+
 export const getGoodsById = async (
   goodsId: number | string | null,
 ): Promise<GoodsByIdRes> => {
@@ -21,4 +22,18 @@ export const useGoodsById = (
     () => getGoodsById(goodsId),
     { initialData, enabled: !!goodsId },
   );
+};
+
+export type AllGoodsIdsRes = number[];
+
+export const ALL_GOODS_IDS_KEY = 'AllGoodsIds';
+export const getAllGoodsIds = async (): Promise<AllGoodsIdsRes> => {
+  return axios
+    .get<AllGoodsIdsRes>('/goods/all-ids')
+    .then((res) => res.data)
+    .catch(() => []);
+};
+
+export const useAllGoodsIds = (): UseQueryResult<AllGoodsIdsRes, AxiosError> => {
+  return useQuery<AllGoodsIdsRes, AxiosError>(ALL_GOODS_IDS_KEY, getAllGoodsIds);
 };

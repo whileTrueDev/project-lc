@@ -5,6 +5,7 @@ import { GetOrderListDto, OrderDataWithRelations } from '@project-lc/shared-type
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
+import { useInView } from 'react-intersection-observer';
 import { OrderItem } from './CustomerOrderItem';
 import CustomerOrderPeriodFilter from './CustomerOrderPeriodFilter';
 
@@ -26,6 +27,15 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
     refetch,
     isLoading,
   } = useInfiniteOrderList(dto);
+
+  const { ref, inView } = useInView({ threshold: 1 });
+
+  // ref 전달한 더보기버튼이 화면에 들어왔는지 확인하여 다음목록 요청
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, inView]);
 
   // 필터 적용으로 dto 가 변경되는 경우
   useEffect(() => {
@@ -71,7 +81,20 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
         {/* 더보기 버튼 */}
         {hasNextPage && (
           <Center>
+            {/* 모바일 더보기 버튼 - inViewRef 연결하여 모바일 화면일때만 스크롤시 자동 불러오기 */}
             <Button
+              display={{ base: 'block', md: 'none' }}
+              type="button"
+              colorScheme="blue"
+              ref={ref}
+              isLoading={isFetchingNextPage}
+              onClick={() => fetchNextPage()}
+            >
+              더보기
+            </Button>
+            {/* 데스크탑 더보기 버튼 */}
+            <Button
+              display={{ base: 'none', md: 'block' }}
               type="button"
               size="sm"
               isLoading={isFetchingNextPage}
