@@ -1,5 +1,4 @@
 import { Box, Center, Spinner } from '@chakra-ui/react';
-import { PrismaClient } from '@prisma/client';
 import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
 import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import { GoodsViewAdditionalInfo } from '@project-lc/components-web-kkshow/goods/GoodsViewAdditionalInfo';
@@ -12,9 +11,16 @@ import { GoodsViewMeta } from '@project-lc/components-web-kkshow/goods/GoodsView
 import { GoodsViewReviews } from '@project-lc/components-web-kkshow/goods/GoodsViewReviews';
 import { GoodsViewStickyNav } from '@project-lc/components-web-kkshow/goods/GoodsViewStickyNav';
 import { KkshowNavbar } from '@project-lc/components-web-kkshow/KkshowNavbar';
-import { generateGoodsByIdKey, getGoodsById } from '@project-lc/hooks';
+import {
+  AllGoodsIdsRes,
+  ALL_GOODS_IDS_KEY,
+  generateGoodsByIdKey,
+  getAllGoodsIds,
+  getGoodsById,
+} from '@project-lc/hooks';
 import { useGoodsViewStore } from '@project-lc/stores';
 import { createQueryClient } from '@project-lc/utils-frontend';
+import { AxiosError } from 'axios';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -23,13 +29,12 @@ import { dehydrate, DehydratedState } from 'react-query';
 type KkshowGoodsProps = { dehydratedState: DehydratedState };
 type KkshowGoodsParams = { goodsId: string };
 export const getStaticPaths: GetStaticPaths<KkshowGoodsParams> = async () => {
-  // 빌드 환경에서는 API HOST를 찾을수 없으므로 여기서 곧바로 prisma 접근 처리
-  const prisma = new PrismaClient();
-  const goodIds = await prisma.goods.findMany({
-    select: { id: true },
-    where: { goods_view: { not: 'notLook' } },
-  });
-  const paths = goodIds.map((g) => ({ params: { goodsId: g.id.toString() } }));
+  const queryClient = createQueryClient();
+  const goodIds = await queryClient.fetchQuery<AllGoodsIdsRes, AxiosError>(
+    ALL_GOODS_IDS_KEY,
+    { queryFn: getAllGoodsIds },
+  );
+  const paths = goodIds.map((gid) => ({ params: { goodsId: gid.toString() } }));
   return { paths, fallback: true };
 };
 
