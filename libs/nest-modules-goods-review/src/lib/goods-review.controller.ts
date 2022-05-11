@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
@@ -13,7 +14,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Goods, GoodsReview } from '@prisma/client';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   FindManyGoodsReviewDto,
@@ -25,6 +26,7 @@ import {
 import { GoodsReviewService } from './goods-review.service';
 
 @Controller('goods-review')
+@CacheClearKeys('goods-review')
 @UseInterceptors(HttpCacheInterceptor)
 export class GoodsReviewController {
   constructor(private readonly service: GoodsReviewService) {}
@@ -58,6 +60,7 @@ export class GoodsReviewController {
   /** 리뷰 생성 */
   @UseGuards(JwtAuthGuard)
   @Post()
+  @CacheClearKeys('order-item/review-needed', 'order/list')
   create(
     @Body(new ValidationPipe({ transform: true })) dto: GoodsReviewCreateDto,
   ): Promise<GoodsReview> {
@@ -77,6 +80,7 @@ export class GoodsReviewController {
   /** 리뷰 식제 */
   @UseGuards(JwtAuthGuard)
   @Delete(':reviewId')
+  @CacheClearKeys('order-item/review-needed', 'order/list')
   remove(@Param('reviewId', ParseIntPipe) id: GoodsReview['id']): Promise<boolean> {
     return this.service.remove(id);
   }

@@ -1,6 +1,5 @@
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Goods, GoodsReview, Prisma } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   DefaultPaginationDto,
@@ -9,21 +8,14 @@ import {
   GoodsReviewRes,
   GoodsReviewUpdateDto,
 } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 import { GoodsReviewImageService } from './goods-review-image.service';
 
 @Injectable()
-export class GoodsReviewService extends ServiceBaseWithCache {
-  #REVIEW_CACHE_KEY = 'goods-review';
-  #REVIEW_NEEDED_ORDER_ITEM_CACHE_KEY = 'order-item/review-needed';
-  #ORDER_LIST_CACHE_KEY = 'order/list';
+export class GoodsReviewService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly goodsReviewImageService: GoodsReviewImageService,
-    @Inject(CACHE_MANAGER) cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+  ) {}
 
   /** 리뷰 생성 */
   public async create(dto: GoodsReviewCreateDto): Promise<GoodsReview> {
@@ -31,10 +23,6 @@ export class GoodsReviewService extends ServiceBaseWithCache {
       where: { orderItem: { some: { id: dto.orderItemId } } },
     });
     if (alreadyCreated > 0) return null;
-
-    await this._clearCaches(this.#REVIEW_CACHE_KEY);
-    await this._clearCaches(this.#REVIEW_NEEDED_ORDER_ITEM_CACHE_KEY); // 리뷰 작성가능한 orderItem 목록 초기화 위해
-    await this._clearCaches(this.#ORDER_LIST_CACHE_KEY); // 내 주문목록 캐시 초기화
     return this.prisma.goodsReview.create({
       data: {
         content: dto.content,
@@ -105,7 +93,6 @@ export class GoodsReviewService extends ServiceBaseWithCache {
     if (dto.images && dto.images.length > 0) {
       await this.updateImages(id, dto.images);
     }
-    await this._clearCaches(this.#REVIEW_CACHE_KEY);
     return updated;
   }
 
@@ -146,9 +133,6 @@ export class GoodsReviewService extends ServiceBaseWithCache {
         include: { images: true },
       });
 
-      await this._clearCaches(this.#REVIEW_CACHE_KEY);
-      await this._clearCaches(this.#REVIEW_NEEDED_ORDER_ITEM_CACHE_KEY); // 리뷰 작성가능한 orderItem 목록 초기화 위해
-      await this._clearCaches(this.#ORDER_LIST_CACHE_KEY); // 내 주문목록 캐시 초기화
       return !!result;
     } catch (err) {
       throw new BadRequestException(`GoodsReview ${id} not found`);
