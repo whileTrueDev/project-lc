@@ -1,6 +1,4 @@
 import { Box, Center, Spinner } from '@chakra-ui/react';
-import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
-import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import { GoodsViewAdditionalInfo } from '@project-lc/components-web-kkshow/goods/GoodsViewAdditionalInfo';
 import { GoodsViewBottomMenu } from '@project-lc/components-web-kkshow/goods/GoodsViewBottomMenu';
 import { GoodsViewBreadCrumb } from '@project-lc/components-web-kkshow/goods/GoodsViewBreadCrumb';
@@ -10,7 +8,7 @@ import { GoodsViewInquiries } from '@project-lc/components-web-kkshow/goods/Good
 import { GoodsViewMeta } from '@project-lc/components-web-kkshow/goods/GoodsViewMeta';
 import { GoodsViewReviews } from '@project-lc/components-web-kkshow/goods/GoodsViewReviews';
 import { GoodsViewStickyNav } from '@project-lc/components-web-kkshow/goods/GoodsViewStickyNav';
-import { KkshowNavbar } from '@project-lc/components-web-kkshow/KkshowNavbar';
+import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
 import {
   AllGoodsIdsRes,
   ALL_GOODS_IDS_KEY,
@@ -70,8 +68,7 @@ export default function GoodsView(): JSX.Element {
       </Center>
     );
   return (
-    <Box>
-      <KkshowNavbar />
+    <KkshowLayout disableQuickMenu>
       <GoodsViewBreadCrumb />
       <GoodsViewMeta />
       <GoodsViewStickyNav />
@@ -81,8 +78,7 @@ export default function GoodsView(): JSX.Element {
       <GoodsViewAdditionalInfo />
       <GoodsViewFloatingButtons />
       <GoodsViewBottomMenu />
-      <CommonFooter footerLinkList={kkshowFooterLinkList} />
-    </Box>
+    </KkshowLayout>
   );
 }
 

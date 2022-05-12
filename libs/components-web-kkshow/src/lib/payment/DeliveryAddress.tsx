@@ -19,6 +19,7 @@ import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
 import { useFormContext } from 'react-hook-form';
 import { PaymentPageDto } from '@project-lc/shared-types';
 import { useKkshowOrder } from '@project-lc/stores';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { DeliveryAddressDialog } from './DeliveryAddressDialog';
 import { DeliveryAddressList } from './DeliveryAddressList';
 
@@ -85,19 +86,15 @@ export function DeliveryAddress(): JSX.Element {
   }, [defaultAddress, isLoading]);
 
   return (
-    <Box>
-      <HStack>
-        <Heading size="lg">배송정보</Heading>
-        {profile && (
-          <Button onClick={addressListOnOpen} size="sm">
-            배송지 목록
-          </Button>
-        )}
-      </HStack>
-      <Divider m={2} />
+    <SectionWithTitle title="배송지 정보">
       {!isLoading && (
         <RadioGroup onChange={(value) => handleRadio(value)} value={addressType}>
           <Stack direction="row">
+            {profile && (
+              <Button onClick={addressListOnOpen} size="sm" variant="outline">
+                배송지 목록에서 선택
+              </Button>
+            )}
             <Radio value="default" isDisabled={!profile?.id}>
               기본배송지
             </Radio>
@@ -108,11 +105,11 @@ export function DeliveryAddress(): JSX.Element {
       {!isLoading && addressType === 'default' && (
         <>
           <Flex direction="column" mt={3}>
-            <Text fontWeight="bold">수령인</Text>
+            <Text fontWeight="semibold">수령인</Text>
             <Text>{`${defaultAddress?.recipient}`}</Text>
           </Flex>
           <Flex direction="column" mt={3}>
-            <Text fontWeight="bold">연락처</Text>
+            <Text fontWeight="semibold">연락처</Text>
             <HStack>
               <Text>
                 {`${defaultAddress?.phone?.slice(0, 3)} - ${defaultAddress?.phone?.slice(
@@ -123,7 +120,7 @@ export function DeliveryAddress(): JSX.Element {
             </HStack>
           </Flex>
           <Flex direction="column" alignItems="flex-start" mt={3}>
-            <Text fontWeight="bold">배송지주소</Text>
+            <Text fontWeight="semibold">배송지주소</Text>
             <Flex direction="column">
               <Text>{`(${defaultAddress?.postalCode}) ${defaultAddress?.address}`}</Text>
               <Text>{`${defaultAddress?.detailAddress}`}</Text>
@@ -134,11 +131,11 @@ export function DeliveryAddress(): JSX.Element {
       {!isLoading && addressType === 'list' && (
         <>
           <Flex direction="column" mt={3}>
-            <Text fontWeight="bold">수령인</Text>
+            <Text fontWeight="semibold">수령인</Text>
             <Text>{`${getValues('recipient')}`}</Text>
           </Flex>
           <Flex direction="column" mt={3}>
-            <Text fontWeight="bold">연락처</Text>
+            <Text fontWeight="semibold">연락처</Text>
             <HStack>
               <Text>
                 {`${getValues('recipientPhone').slice(0, 3)} - ${getValues(
@@ -148,7 +145,7 @@ export function DeliveryAddress(): JSX.Element {
             </HStack>
           </Flex>
           <Flex direction="column" alignItems="flex-start" mt={3}>
-            <Text fontWeight="bold">배송지주소</Text>
+            <Text fontWeight="semibold">배송지주소</Text>
             <Flex direction="column">
               <Text>{`(${getValues('postalCode')}) ${getValues('address')}`}</Text>
               <Text>{`${getValues('detailAddress')}`}</Text>
@@ -161,7 +158,7 @@ export function DeliveryAddress(): JSX.Element {
         <>
           <FormControl isInvalid={!!errors.recipient}>
             <Flex direction="column">
-              <Text fontWeight="bold">수령인</Text>
+              <Text fontWeight="semibold">수령인</Text>
               <Box>
                 <Input
                   w={{ base: '100%', md: '15%' }}
@@ -186,7 +183,7 @@ export function DeliveryAddress(): JSX.Element {
             </Flex>
           </FormControl>
           <Flex direction="column">
-            <Text fontWeight="bold">연락처</Text>
+            <Text fontWeight="semibold">연락처</Text>
             <FormControl
               isInvalid={
                 !!errors.recipientPhone1 ||
@@ -246,7 +243,7 @@ export function DeliveryAddress(): JSX.Element {
             isInvalid={!!errors.postalCode || !!errors.address || !!errors.detailAddress}
           >
             <Flex direction="column" alignItems="flex-start">
-              <Text fontWeight="bold">배송지주소</Text>
+              <Text fontWeight="semibold">배송지주소</Text>
               <Flex direction="column" mb={2}>
                 <HStack>
                   <Input
@@ -305,6 +302,6 @@ export function DeliveryAddress(): JSX.Element {
       )}
       <DeliveryAddressDialog isOpen={addressIsOpen} onClose={addressOnClose} />
       <DeliveryAddressList isOpen={addressListIsOpen} onClose={addressListOnClose} />
-    </Box>
+    </SectionWithTitle>
   );
 }

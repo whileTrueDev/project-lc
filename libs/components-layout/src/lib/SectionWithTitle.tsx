@@ -1,4 +1,4 @@
-import { Box, Divider, Heading } from '@chakra-ui/react';
+import { Box, BoxProps, Divider, Text } from '@chakra-ui/react';
 
 /** 주문 상세 섹션 */
 export function SectionWithTitle({
@@ -6,29 +6,32 @@ export function SectionWithTitle({
   children,
   disableDivider = false,
   variant = 'unstyle',
+  titleMarginY = 2,
 }: {
   children: React.ReactNode;
   title: string;
   disableDivider?: boolean;
   variant?: 'unstyle' | 'outlined';
+  titleMarginY?: BoxProps['my'];
 }): JSX.Element {
   if (variant === 'outlined') {
     return (
       <Box as="section" id={title} borderWidth="1px" borderRadius="lg" p={4}>
-        <Heading as="h4" size="md" isTruncated my={2}>
+        <Text as="h4" fontSize="xl" isTruncated my={titleMarginY} fontWeight="bold">
           {title}
-        </Heading>
+        </Text>
         {children}
       </Box>
     );
   }
+
   return (
     <>
       {disableDivider ? null : <Divider />}
       <Box as="section" id={title}>
-        <Heading as="h4" size="md" isTruncated my={2}>
+        <Text as="h4" fontSize="xl" isTruncated my={titleMarginY} fontWeight="bold">
           {title}
-        </Heading>
+        </Text>
         {children}
       </Box>
     </>

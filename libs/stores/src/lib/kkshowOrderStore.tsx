@@ -7,7 +7,7 @@ export interface KkshowOrder {
   addressType: 'default' | 'manual' | 'list';
 }
 export const useKkshowOrder = create<KkshowOrder>((set, get) => ({
-  paymentType: '미선택',
+  paymentType: '카드',
   addressType: 'manual',
   handlePaymentType(value: '카드' | '계좌이체' | '가상계좌' | '미선택') {
     set({

@@ -1,23 +1,18 @@
-import { useEffect } from 'react';
-import { Grid, GridItem, Flex, Text } from '@chakra-ui/react';
-import {
-  PaymentBox,
-  MobilePaymentBox,
-} from '@project-lc/components-web-kkshow/payment/Payment';
+import { Grid, GridItem, Heading, Stack } from '@chakra-ui/react';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { BuyerInfo } from '@project-lc/components-web-kkshow/payment/BuyerInfo';
 import { DeliveryAddress } from '@project-lc/components-web-kkshow/payment/DeliveryAddress';
-import { GiftBox } from '@project-lc/components-web-kkshow/payment/Gift';
-import {
-  OrderItemInfo,
-  MobileOrderItemInfo,
-} from '@project-lc/components-web-kkshow/payment/OrderItemInfo';
-import { useDisplaySize, useProfile } from '@project-lc/hooks';
 import { Discount } from '@project-lc/components-web-kkshow/payment/Discount';
-import { useForm, FormProvider } from 'react-hook-form';
+import { GiftBox } from '@project-lc/components-web-kkshow/payment/Gift';
+import { OrderItemInfo } from '@project-lc/components-web-kkshow/payment/OrderItemInfo';
+import { PaymentBox } from '@project-lc/components-web-kkshow/payment/Payment';
+import { PaymentNotice } from '@project-lc/components-web-kkshow/payment/PaymentNotice';
 import { PaymentSelection } from '@project-lc/components-web-kkshow/payment/PaymentSelection';
+import { useProfile } from '@project-lc/hooks';
 import { PaymentPageDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 
 // todo: 주문 연결
 const dummyOrder = [
@@ -45,8 +40,59 @@ const dummyOrder = [
   },
 ];
 
+// todo: 주문 연결
+const dummyOrderGoods = [
+  {
+    id: 1,
+    sellerId: 1,
+    shopName: '진국명가',
+    goods_name: '만두',
+    image: 'https://picsum.photos/300/300',
+    shipping_cost: 3000,
+    options: [
+      {
+        optionTitle: '만두 종류',
+        optionValue: '왕만두',
+        normalPrice: 3000,
+        discountPrice: 2500,
+        quantity: 3,
+      },
+      {
+        optionTitle: '만두 종류',
+        optionValue: '그냥 만두',
+        normalPrice: 2000,
+        discountPrice: 1500,
+        quantity: 1,
+      },
+    ],
+  },
+  {
+    id: 1,
+    sellerId: 1,
+    shopName: '진국명가',
+    goods_name: '푹 끓인 돼지 김치찌개 (500g)',
+    image: 'https://picsum.photos/300/300',
+    shipping_cost: 3000,
+    options: [
+      {
+        optionTitle: '맛',
+        optionValue: '매운맛',
+        normalPrice: 30000,
+        discountPrice: 25000,
+        quantity: 3,
+      },
+      {
+        optionTitle: '맛',
+        optionValue: '안매운맛',
+        normalPrice: 20000,
+        discountPrice: 15000,
+        quantity: 1,
+      },
+    ],
+  },
+];
+
 export function Payment(): JSX.Element {
-  const { isDesktopSize } = useDisplaySize();
   const { data: profile } = useProfile();
   const router = useRouter();
   const purchaseType = router.query.type;
@@ -71,7 +117,7 @@ export function Payment(): JSX.Element {
       number: 0,
       shipping_cost: 0,
       mileage: 0,
-      couponId: 0,
+      couponId: null,
       couponAmount: 0,
       discount: 0,
       orderPrice: 0,
@@ -87,72 +133,41 @@ export function Payment(): JSX.Element {
   return (
     <KkshowLayout>
       <FormProvider {...methods}>
-        {isDesktopSize ? (
-          <Flex m="auto" p={6} alignItems="center" justifyContent="center">
-            <Grid templateColumns="repeat(7, 6fr)" gap={6} w="70%">
-              <GridItem colSpan={5}>
-                <BuyerInfo />
-              </GridItem>
-              <GridItem
-                rowSpan={4}
-                colSpan={2}
-                borderLeft="1px solid"
-                borderLeftColor="gray.300"
-              >
-                <PaymentBox data={dummyOrder} />
-              </GridItem>
-              <GridItem colSpan={5}>
-                {purchaseType === 'gift' ? <GiftBox /> : <DeliveryAddress />}
-              </GridItem>
-              <GridItem colSpan={5}>
-                <OrderItemInfo data={dummyOrder} />
-              </GridItem>
-              <GridItem colSpan={5}>
-                <Discount />
-              </GridItem>
-              <GridItem colSpan={5}>
-                <PaymentSelection />
-              </GridItem>
-              <GridItem colSpan={5}>
-                <Text variant="abbr" fontSize="sm">
-                  와일트루는 통신판매중개자로서 오픈마켓 크크쇼의 거래당사자가 아니며,
-                  입점판매자가 등록한 상품정보 및 거래에 대해 와일트루는 일체 책임을 지지
-                  않습니다.
-                </Text>
-              </GridItem>
-            </Grid>
-          </Flex>
-        ) : (
-          <Flex m="auto" p={6}>
-            <Grid templateColumns="repeat(7, 6fr)" gap={6}>
-              <GridItem colSpan={7}>
-                <BuyerInfo />
-              </GridItem>
-              <GridItem colSpan={7}>
-                {purchaseType === 'gift' ? <GiftBox /> : <DeliveryAddress />}
-              </GridItem>
-              <GridItem colSpan={7}>
-                <MobileOrderItemInfo data={dummyOrder} />
-              </GridItem>
-              <GridItem colSpan={7}>
-                <Discount />
-              </GridItem>
-              <GridItem colSpan={7}>
-                <PaymentSelection />
-              </GridItem>
-              <GridItem colSpan={7} rowSpan={1}>
-                <MobilePaymentBox data={dummyOrder} />
-              </GridItem>
-              <GridItem colSpan={7}>
-                <Text variant="abbr" fontSize="sm">
-                  와일트루는 통신판매중개자로서 오픈마켓 크크쇼의 거래당사자가 아니며,
-                  입점판매자가 등록한 상품정보 및 거래에 대해 와일트루는 일체 책임을 지지
-                  않습니다.
-                </Text>
-              </GridItem>
-            </Grid>
-          </Flex>
-        )}
+        <Grid
+          maxW="5xl"
+          m="auto"
+          templateColumns="repeat(7, 1fr)"
+          gap={6}
+          px={4}
+          py={6}
+          mb={{ base: 0, lg: 20 }}
+        >
+          <GridItem colSpan={7}>
+            <Heading>주문서</Heading>
+          </GridItem>
+
+          <GridItem colSpan={{ base: 7, lg: 5 }}>
+            <Stack spacing={6}>
+              <BuyerInfo />
+              {purchaseType === 'gift' ? <GiftBox /> : <DeliveryAddress />}
+              {/* <CartTable /> */}
+              <OrderItemInfo data={dummyOrder} />
+              <Discount />
+              <PaymentSelection />
+            </Stack>
+          </GridItem>
+
+          <GridItem
+            colSpan={{ base: 7, lg: 2 }}
+            borderLeftWidth={{ base: 'none', lg: 'thin' }}
+          >
+            <PaymentBox data={dummyOrder} />
+          </GridItem>
+
+          <GridItem colSpan={{ base: 7, lg: 5 }}>
+            <PaymentNotice />
+          </GridItem>
+        </Grid>
       </FormProvider>
     </KkshowLayout>
   );
