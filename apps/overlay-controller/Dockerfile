@@ -16,6 +16,9 @@ RUN yarn global add prisma@3.11.0
 RUN prisma generate
 RUN yarn add hbs
 
+RUN yarn add argon2@0.28.2
+RUN npx node-pre-gyp rebuild -C ./node_modules/argon2
+
 EXPOSE 3333
 
 CMD NODE_ENV=production node ./main.js
