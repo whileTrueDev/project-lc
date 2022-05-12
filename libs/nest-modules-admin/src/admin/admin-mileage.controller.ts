@@ -16,7 +16,7 @@ import {
 } from '@project-lc/nest-modules-mileage';
 import { MileageSettingDto } from '@project-lc/shared-types';
 
-@UseGuards(JwtAuthGuard, AdminGuard)
+// @UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin/mileage')
 export class AdminMileageController {
   constructor(

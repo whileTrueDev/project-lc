@@ -8,9 +8,13 @@ export class MileageService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async upsertMileage(dto: UpsertDto): Promise<CustomerMileage> {
-    const { mileage } = await this.findMileage(dto.customerId);
+    const mileageData = await this.findMileage(dto.customerId);
 
-    if (dto.actionType === 'consume' && dto.mileage > mileage) {
+    if (
+      mileageData &&
+      dto.actionType === 'consume' &&
+      dto.mileage > mileageData.mileage
+    ) {
       throw new ForbiddenException(
         `사용하려는 적립금이 보유 적립금보다 더 큽니다. ${dto.customerId}`,
       );
