@@ -177,7 +177,12 @@ function CouponSelectDialog({
     { field: 'name', headerName: '쿠폰명', flex: 1 },
     { field: 'amount', headerName: '금액' },
     {
-      field: '_',
+      disableColumnMenu: true,
+      disableExport: true,
+      disableReorder: true,
+      sortable: false,
+      filterable: false,
+      field: '',
       width: 20,
       renderCell: ({ row }: GridRowData) => (
         <Button

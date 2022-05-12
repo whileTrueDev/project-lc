@@ -1,25 +1,23 @@
 import {
   Box,
-  Heading,
-  Flex,
-  HStack,
-  Text,
-  Divider,
   Button,
-  useDisclosure,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  HStack,
   Input,
   Radio,
   RadioGroup,
   Stack,
-  FormErrorMessage,
-  FormControl,
+  Text,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
-import { useFormContext } from 'react-hook-form';
 import { PaymentPageDto } from '@project-lc/shared-types';
 import { useKkshowOrder } from '@project-lc/stores';
-import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
+import { useEffect } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { DeliveryAddressDialog } from './DeliveryAddressDialog';
 import { DeliveryAddressList } from './DeliveryAddressList';
 
@@ -300,6 +298,7 @@ export function DeliveryAddress(): JSX.Element {
           </FormControl>
         </>
       )}
+
       <DeliveryAddressDialog isOpen={addressIsOpen} onClose={addressOnClose} />
       <DeliveryAddressList isOpen={addressListIsOpen} onClose={addressListOnClose} />
     </SectionWithTitle>
