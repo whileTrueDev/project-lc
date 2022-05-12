@@ -328,8 +328,8 @@ export class OrderService extends ServiceBaseWithCache {
   }
 
   /** 개별 주문 상세 조회 */
-  async getOrderDetail(orderId: number): Promise<OrderDetailRes> {
-    return this.findOneOrderDetail({ id: orderId, deleteFlag: false });
+  async getOrderDetail(orderCode: string): Promise<OrderDetailRes> {
+    return this.findOneOrderDetail({ orderCode, deleteFlag: false });
   }
 
   /** 비회원 주문 상세 조회 */

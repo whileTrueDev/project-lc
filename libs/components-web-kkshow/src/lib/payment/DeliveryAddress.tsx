@@ -18,7 +18,7 @@ import { useEffect } from 'react';
 import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
 import { useFormContext } from 'react-hook-form';
 import { PaymentPageDto } from '@project-lc/shared-types';
-import { useKkshowOrder } from '@project-lc/stores';
+import { useKkshowOrderStore } from '@project-lc/stores';
 import { DeliveryAddressDialog } from './DeliveryAddressDialog';
 import { DeliveryAddressList } from './DeliveryAddressList';
 
@@ -34,7 +34,7 @@ export function DeliveryAddress(): JSX.Element {
     onOpen: addressOnOpen,
   } = useDisclosure();
 
-  const { addressType, handleAddressType } = useKkshowOrder();
+  const { addressType, handleAddressType } = useKkshowOrderStore();
 
   const { data: profile } = useProfile();
   const { data: defaultAddress, isLoading } = useDefaultCustomerAddress(profile?.id);
@@ -306,5 +306,29 @@ export function DeliveryAddress(): JSX.Element {
       <DeliveryAddressDialog isOpen={addressIsOpen} onClose={addressOnClose} />
       <DeliveryAddressList isOpen={addressListIsOpen} onClose={addressListOnClose} />
     </Box>
+  );
+}
+
+export function SuccessDeliveryAddress(): JSX.Element {
+  return (
+    <>
+      <Flex direction="column" mt={3}>
+        <Text fontWeight="bold">수령인</Text>
+        <Text>이진은</Text>
+      </Flex>
+      <Flex direction="column" mt={3}>
+        <Text fontWeight="bold">연락처</Text>
+        <HStack>
+          <Text>010-1234-1234</Text>
+        </HStack>
+      </Flex>
+      <Flex direction="column" alignItems="flex-start" mt={3}>
+        <Text fontWeight="bold">배송지주소</Text>
+        <Flex direction="column">
+          <Text>(12345) 부산광역시 수영구 641 </Text>
+          <Text>힐탑더블시티 101동 1409호</Text>
+        </Flex>
+      </Flex>
+    </>
   );
 }

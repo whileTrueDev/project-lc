@@ -1374,6 +1374,8 @@ model CustomerCouponLog {
   customerCoupon   CustomerCoupon @relation(fields: [customerCouponId], references: [id], onDelete: Cascade)
   type             CouponLogType  @default(issue) // 쿠폰내역타입
   createDate       DateTime       @default(now()) // 쿠폰사용내역 생성일
+  orderId          Int?
+  order            Order?         @relation(fields: [orderId], references: [id])
 }
 
 enum CouponLogType {
@@ -1550,6 +1552,7 @@ model Order {
   orderCancellations         OrderCancellation[] // 주문에 연결된 주무취소정보
   broadcasterSettlementItems BroadcasterSettlementItems[]
   sellerSettlementItems      SellerSettlementItems[]
+  customerCouponLogs         CustomerCouponLog[]
 
   @@index([orderCode])
 }

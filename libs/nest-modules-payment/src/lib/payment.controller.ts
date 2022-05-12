@@ -42,15 +42,16 @@ export class PaymentController {
 
   @Post('/success')
   async requestPayments(
-    @Res() res,
+    // @Res() res,
     @Body(ValidationPipe) dto: PaymentRequestDto,
-  ): Promise<boolean | void> {
+  ): Promise<any | void> {
     const hostUrl = getCustomerWebHost();
 
     const payment = await this.paymentService.createPayment(dto);
-    if (!payment) {
-      return res.redirect(`${hostUrl}/payment/failure`);
-    }
+    // if (!payment) {
+    //   return res.redirect(`${hostUrl}/payment/failure`);
+    // }
+    console.log(payment);
     return payment;
   }
 

@@ -62,10 +62,8 @@ export class OrderController {
 
   /** 개별 주문 상세조회 */
   @Get(':orderId')
-  getOrderDetail(
-    @Param('orderId', ParseIntPipe) orderId: number,
-  ): Promise<OrderDetailRes> {
-    return this.orderService.getOrderDetail(orderId);
+  getOrderDetail(@Param('orderCode') orderCode: string): Promise<OrderDetailRes> {
+    return this.orderService.getOrderDetail(orderCode);
   }
 
   /** 비회원 주문 상세조회 - 가드 적용하지 않아야 함 */

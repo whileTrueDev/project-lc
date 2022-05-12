@@ -19,7 +19,7 @@ import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 import { useFormContext, SubmitHandler } from 'react-hook-form';
 import { PaymentPageDto } from '@project-lc/shared-types';
-import { useKkshowOrder } from '@project-lc/stores';
+import { useKkshowOrderStore } from '@project-lc/stores';
 import { getCustomerWebHost } from '@project-lc/utils';
 import { TermBox } from './TermBox';
 
@@ -108,7 +108,7 @@ export function MileageBenefit({
 
 export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
-  const { paymentType } = useKkshowOrder();
+  const { paymentType } = useKkshowOrderStore();
   const toast = useToast();
   /** 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경 */
   const PRODUCT_PRICE = data
@@ -273,7 +273,7 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
 export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   const { watch, getValues, handleSubmit } = useFormContext<PaymentPageDto>();
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
-  const { paymentType } = useKkshowOrder();
+  const { paymentType } = useKkshowOrderStore();
   const toast = useToast();
   /** 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경 */
   const PRODUCT_PRICE = 19000;

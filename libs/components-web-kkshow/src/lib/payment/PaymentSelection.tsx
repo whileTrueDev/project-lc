@@ -1,8 +1,8 @@
 import { Box, RadioGroup, Radio, Heading, Divider, HStack } from '@chakra-ui/react';
-import { useKkshowOrder } from '@project-lc/stores';
+import { useKkshowOrderStore } from '@project-lc/stores';
 
 export function PaymentSelection(): JSX.Element {
-  const { handlePaymentType } = useKkshowOrder();
+  const { handlePaymentType } = useKkshowOrderStore();
 
   function handleRadio(paymentType: string): void {
     handlePaymentType(paymentType);

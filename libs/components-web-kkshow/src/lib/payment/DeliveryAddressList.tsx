@@ -13,7 +13,7 @@ import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { GridRowData } from '@material-ui/data-grid';
 import { useFormContext } from 'react-hook-form';
 import { PaymentPageDto } from '@project-lc/shared-types';
-import { useKkshowOrder } from '@project-lc/stores';
+import { useKkshowOrderStore } from '@project-lc/stores';
 
 type DeliveryListProps = {
   onClose: () => void;
@@ -22,7 +22,7 @@ type DeliveryListProps = {
 
 export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
-  const { handleAddressType } = useKkshowOrder();
+  const { handleAddressType } = useKkshowOrderStore();
   const columns = [
     {
       field: '',

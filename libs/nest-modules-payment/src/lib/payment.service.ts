@@ -19,7 +19,7 @@ export class PaymentService {
   }
 
   /** 결제승인 요청 API */
-  async createPayment(dto): Promise<boolean> {
+  async createPayment(dto): Promise<any> {
     return axios
       .post(
         `${this.BASE_URL}/payments/${dto.paymentKey}`,
@@ -37,8 +37,8 @@ export class PaymentService {
           responseType: 'json',
         },
       )
-      .then(() => {
-        return true;
+      .then((res) => {
+        return res.data;
       })
       .catch((err) => {
         console.error(err);
