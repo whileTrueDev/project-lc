@@ -1398,8 +1398,8 @@ model CartItem {
   support              CartItemSupport? // 연결된 후원정보
   shippingCost         Decimal          @default("0.00") @db.Decimal(10, 2) // 장바구니 담았을 당시 이 장바구니 상품에 포함된  배송비
   shippingCostIncluded Boolean          @default(false) // 이 장바구니 상품에 동일 판매자의 배송비가 포함되었는지 여부
-  shippingGroupId      Int // 연결된 배송정책 id
-  shippingGroup        ShippingGroup    @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
+  shippingGroupId      Int? // 연결된 배송정책 id
+  shippingGroup        ShippingGroup?   @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
 }
 
 // 장바구니 상품옵션
@@ -1676,6 +1676,7 @@ model Refund {
   paymentKey          String? // 토스페이먼츠 결제건에 대한 고유키(OrderPayment에서 지불했을 때 저장되는 paymentKey와 동일)
   transactionKey      String? // 취소 거래건에 대한 고유키. (동일 paymentKey 가지는)결제건에 대해 승인거래와 취소거래 구분 
 
+  return Return[] // 연결된 반품
 }
 
 // [enum] 처리상태
@@ -1702,20 +1703,39 @@ model RefundItem {
 // ****************
 // 반품
 // ****************
-// 반품
+
+// 220503 수정 @joni 판매상품 대부분이 회수하기 어려운 형태의 식품임.
+// 반품 기록은 남겨두도록 하나, 상품회수 과정을 제외하고 환불만 처리하도록 함(메모에 "상품수거없음" 기록)
+// 재배송/환불에서 소비자가 해결방법'환불'요청한 내역 저장(=상품 수거과정 없는 반품)
 model Return {
-  id             Int           @id @default(autoincrement()) // 반품고유번호
-  returnCode     String?       @unique //반품코드
-  orderId        Int // 주문 고유번호
-  order          Order         @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status         ProcessStatus @default(requested) // 반품처리상태
-  requestDate    DateTime      @default(now()) // 반품신청일시
-  completeDate   DateTime? // 처리완료일시
-  reason         String // 소비자의 반품사유
-  rejectReason   String? // 반품요청이 거절된 이유
-  returnAddress  String // 회수지 주소
-  items          ReturnItem[] // 반품상품들
-  responsibility String // 책임소재(판매자귀책? 구매자귀책?)
+  id                Int           @id @default(autoincrement()) // 반품고유번호
+  returnCode        String?       @unique //반품코드
+  orderId           Int // 주문 고유번호
+  order             Order         @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status            ProcessStatus @default(requested) // 반품처리상태
+  requestDate       DateTime      @default(now()) // 반품신청일시
+  completeDate      DateTime? // 처리완료일시
+  reason            String // 소비자의 반품사유
+  rejectReason      String? // 반품요청이 거절된 이유
+  returnAddress     String? // 회수지 주소
+  returnBank        String? // 환불받을 은행
+  returnBankAccount String? // 환불받을 은행계좌
+  items             ReturnItem[] // 반품상품들
+  responsibility    String? // 책임소재(판매자귀책? 구매자귀책?)
+  memo              String? // 반품메모
+  images            ReturnImage[]
+
+  refundId Int? // 해당 반품으로 처리된 환불정보
+  refund   Refund? @relation(fields: [refundId], references: [id], onDelete: SetNull)
+}
+
+// 소비자가 반품신청시 반품사유와 함께 업로드하는 사진 저장(반품신청시 사진입력은 필수가 아님) -> 반품신청 승인 혹은 거절을 위해 관리자 혹은 판매자가 확인
+model ReturnImage {
+  id         Int      @id @default(autoincrement())
+  createDate DateTime @default(now())
+  imageUrl   String
+  return     Return?  @relation(fields: [returnId], references: [id], onDelete: Cascade)
+  returnId   Int?
 }
 
 // 반품 상품
@@ -1736,6 +1756,7 @@ model ReturnItem {
 // 교환
 // ****************
 // 교환상태 - 다른 요청 진행상태와 달리 상품수거를 포함.  교환출고 이후 진행상태는 해당 교환출고상태와 중복일거같아서 추가하지 않음
+
 enum ExchangeProcessStatus {
   requested // 요청됨(초기 상태, 담당자 확인전)
   colledted // 교환 요청 상품 수거됨
@@ -1744,22 +1765,41 @@ enum ExchangeProcessStatus {
   canceled // 취소됨
 }
 
-// 교환 - 환불과 다른 진행상태를 가짐, 출고데이터를 참조한다
+// 교환
+// 출고데이터를 참조한다
+// 220503 수정 @joni 판매상품 대부분이 회수하기 어려운 형태의 식품임.
+// 교환 기록은 남겨두도록 하나, 교환에서 상품회수 과정을 제외하고 재배송만 처리하도록 함(메모에 "상품수거없음" 기록)
+// 재배송/환불에서 소비자가 해결방법'재배송'요청한 내역 저장(=상품 수거과정 없는 교환)
 model Exchange {
-  id             Int                   @id @default(autoincrement()) // 교환고유번호
-  exchangeCode   String?               @unique //교환코드
-  orderId        Int // 주문 고유번호
-  order          Order                 @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status         ExchangeProcessStatus @default(requested) // 교환처리상태
-  requestDate    DateTime              @default(now()) // 교환신청일시
-  completeDate   DateTime? // 처리완료일시
-  reason         String // 교환사유
-  rejectReason   String? // 교환요청이 거절된 이유
-  returnAddress  String // 회수지 주소
-  responsibility String // 책임소재(판매자귀책? 구매자귀책?)
-  exportId       Int?                  @unique // 교환 재출고시 연결된 출고
-  export         Export?               @relation(fields: [exportId], references: [id], onDelete: SetNull) // 교환 재출고시 연결된 출고
-  exchangeItems  ExchangeItem[] // 교환요청에 포함된 상품들
+  id                     Int                   @id @default(autoincrement()) // 교환고유번호
+  exchangeCode           String?               @unique //교환코드
+  orderId                Int // 주문 고유번호
+  order                  Order                 @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status                 ExchangeProcessStatus @default(requested) // 교환처리상태
+  requestDate            DateTime              @default(now()) // 교환신청일시
+  completeDate           DateTime? // 처리완료일시
+  reason                 String // 교환사유
+  rejectReason           String? // 교환요청이 거절된 이유
+  returnAddress          String? // 회수지 주소
+  recipientAddress       String? // 재배송시 받는곳 주소 도로명
+  recipientDetailAddress String? // 재배송시 주소 주소 상세
+  recipientPostalCode    String? // 재배송시 주소 우편 번호
+  recipientShippingMemo  String? // 재배송시 배송메시지
+  responsibility         String? // 책임소재(판매자귀책? 구매자귀책?)
+  exportId               Int?                  @unique // 교환 재출고시 연결된 출고
+  export                 Export?               @relation(fields: [exportId], references: [id], onDelete: SetNull) // 교환 재출고시 연결된 출고
+  exchangeItems          ExchangeItem[] // 교환요청에 포함된 상품들
+  memo                   String? // 교환 데이터에 대한 메모 - 관리자나 판매자가 입력한다
+  images                 ExchangeImage[]
+}
+
+// 소비자가 교환신청시 교환사유와 함께 업로드하는 사진 저장(교환신청시 사진입력은 필수가 아님) -> 교환신청 승인 혹은 거절을 위해 관리자 혹은 판매자가 확인
+model ExchangeImage {
+  id         Int       @id @default(autoincrement())
+  createDate DateTime  @default(now())
+  imageUrl   String
+  exchange   Exchange? @relation(fields: [exchangeId], references: [id], onDelete: Cascade)
+  exchangeId Int?
 }
 
 // 교환상품
@@ -1790,7 +1830,7 @@ model OrderCancellation {
   completeDate   DateTime? // 처리완료일시
   reason         String? // 취소사유
   rejectReason   String? // 취소요청이 거절된 이유
-  responsibility String // 책임소재(판매자귀책? 구매자귀책?)
+  responsibility String? // 책임소재(판매자귀책? 구매자귀책?)
   items          OrderCancellationItem[]
 
   refundId Int? // 해당 주문 취소로 처리된 환불정보

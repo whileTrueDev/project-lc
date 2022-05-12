@@ -1,5 +1,5 @@
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { GoodsReview, Prisma } from '@prisma/client';
+import { Goods, GoodsReview, Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -69,6 +69,11 @@ export class GoodsReviewService extends ServiceBaseWithCache {
       return { nextCursor, reviews: result.slice(0, take) };
     }
     return { nextCursor: undefined, reviews: result };
+  }
+
+  /** 특정 상품의 리뷰 개수 조회 */
+  public async getCount(goodsId: Goods['id']): Promise<number> {
+    return this.prisma.goodsReview.count({ where: { goodsId } });
   }
 
   /** 리뷰 수정 */

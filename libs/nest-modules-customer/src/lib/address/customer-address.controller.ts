@@ -20,7 +20,7 @@ import { CustomerAddressService } from './customer-address.service';
 
 @Controller('customer/:customerId/address')
 @UseInterceptors(HttpCacheInterceptor)
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class CustomerAddressController {
   constructor(private readonly customerAddressService: CustomerAddressService) {}
 
@@ -28,10 +28,19 @@ export class CustomerAddressController {
   @Get()
   findMany(
     @Param('customerId', ParseIntPipe) customerId: CustomerAddress['id'],
-    @UserInfo() { id }: UserPayload, // TODO: Customer 로그인 구현 이후 CustomerInfo 로 수정
+    // @UserInfo() { id }: UserPayload, // TODO: Customer 로그인 구현 이후 CustomerInfo 로 수정
   ): Promise<CustomerAddress[]> {
-    this.checkId(id, customerId);
+    // this.checkId(id, customerId);
     return this.customerAddressService.findMany(customerId);
+  }
+
+  @Get('/default')
+  findDefaultAddress(
+    @Param('customerId', ParseIntPipe) customerId: CustomerAddress['id'],
+    // @UserInfo() { id }: UserPayload, // TODO: Customer 로그인 구현 이후 CustomerInfo 로 수정
+  ): Promise<CustomerAddress> {
+    // this.checkId(id, customerId);
+    return this.customerAddressService.findDefaultAddress(customerId);
   }
 
   /** 특정 소비자의 특정 주소록 조회 */

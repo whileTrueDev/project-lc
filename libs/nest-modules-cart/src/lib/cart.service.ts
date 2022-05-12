@@ -27,6 +27,7 @@ export class CartService {
         },
         goods: {
           select: {
+            id: true,
             image: true,
             goods_name: true,
             seller: { select: { sellerShop: { select: { shopName: true } } } },
@@ -151,15 +152,15 @@ export class CartService {
     tempUserId: CartItem['tempUserId'],
     customerId: Customer['id'],
   ): Promise<number> {
-    const tempCartItemCount = await this.prisma.cartItem.count({ where: { tempUserId } });
-    if (tempCartItemCount > 0) {
-      await this.prisma.cartItem.deleteMany({ where: { customerId } });
-    }
     const result = await this.prisma.cartItem.updateMany({
       where: { tempUserId },
       data: { customerId },
     });
-    return result.count;
+    const result2 = await this.prisma.cartItem.updateMany({
+      where: { customerId },
+      data: { tempUserId },
+    });
+    return result.count + result2.count;
   }
 
   /** 특정 카트 상품 또는 상품옵션 삭제 */

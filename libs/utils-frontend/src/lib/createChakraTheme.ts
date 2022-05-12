@@ -23,6 +23,7 @@ export const createChakraTheme = () =>
         body: {
           color: mode('gray.800', 'whiteAlpha.900')(props),
           bg: mode('white', 'gray.800')(props),
+          letterSpacing: 'tight',
         },
         ...scrollStyle(props),
       }),

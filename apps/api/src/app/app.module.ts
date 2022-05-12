@@ -19,6 +19,7 @@ import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { GoodsInquiryModule } from '@project-lc/nest-modules-goods-inquiry';
 import { InquiryModule } from '@project-lc/nest-modules-inquiry';
+import { PaymentModule } from '@project-lc/nest-modules-payment';
 import { JwtHelperModule } from '@project-lc/nest-modules-jwt-helper';
 import {
   KkshowMainModule,
@@ -35,8 +36,10 @@ import { SellerModule } from '@project-lc/nest-modules-seller';
 import { ShippingGroupModule } from '@project-lc/nest-modules-shipping-group';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import { OrderModule } from '@project-lc/nest-modules-order';
+import { ReturnModule } from '@project-lc/nest-modules-return';
 import { GoodsReviewModule } from '@project-lc/nest-modules-goods-review';
 import { MileageModule } from '@project-lc/nest-modules-mileage';
+import { ExchangeModule } from '@project-lc/nest-modules-exchange';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
 
@@ -68,11 +71,15 @@ import { AppController } from './app.controller';
     KkshowSearchModule.withControllers(),
     KkshowShoppingModule.withControllers(),
     CustomerModule.withControllers(),
+    PaymentModule.withControllers(),
     OrderModule.withControllers(),
     CartModule.withControllers(),
+    OrderModule.withControllers(),
+    ReturnModule.withControllers(),
     GoodsInquiryModule.withControllers(),
     GoodsReviewModule.withControllers(),
     MileageModule.withControllers(),
+    ExchangeModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],

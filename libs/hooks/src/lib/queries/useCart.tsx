@@ -7,10 +7,7 @@ import axios from '../../axios';
 export const getCart = async (): Promise<CartItemRes> => {
   return axios
     .get<CartItemRes>('/cart', {
-      params: {
-        customerId: 1, // TODO: 로그인 작업 완료 이후 로그인된 customerId를 활용하도록 수정 필요
-        tempUserId: getCartKey(),
-      },
+      params: { tempUserId: getCartKey() },
     })
     .then((res) => res.data);
 };

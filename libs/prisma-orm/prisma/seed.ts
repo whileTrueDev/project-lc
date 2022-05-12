@@ -32,7 +32,8 @@ import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
 import { dummyCustomer } from './seedData/customer';
 import { cartSample, tempUserCartItemSample } from './seedData/cart';
-import { nonMemberOrder, normalOrder } from './seedData/dummyOrder';
+import { nonMemberOrder, normalOrder, orderExportReady } from './seedData/dummyOrder';
+import { createGoodsReview } from './seedData/goods-review';
 
 const prisma = new PrismaClient();
 
@@ -90,7 +91,19 @@ async function createBroadcaster(): Promise<Broadcaster> {
 
 /** 테스트소비자 생성 */
 async function createCustomer(): Promise<Customer> {
-  return prisma.customer.create({ data: dummyCustomer });
+  const customer = await prisma.customer.create({ data: dummyCustomer });
+  await prisma.customerAddress.create({
+    data: {
+      title: '우리집',
+      recipient: '테스트소비자',
+      address: '부산',
+      detailAddress: '장전온천천로detailAddress',
+      postalCode: '12345',
+      isDefault: true,
+      customer: { connect: { id: customer.id } },
+    },
+  });
+  return customer;
 }
 
 /** 방송인홍보페이지 생성 */
@@ -134,7 +147,7 @@ async function createDummyGoods(
   seller: SellerAccountType,
   goods: DummyGoodsDataType,
 ): Promise<Goods> {
-  const { goods_name, summary, confirmation } = goods;
+  const { goods_name, summary, confirmation, contents } = goods;
   const sellerDefaultShippingGroup = seller.shippingGroups[0];
   const sellerDefaultCommonInfo = seller.goodsCommonInfo[0];
   const createdGoods = await prisma.goods.create({
@@ -156,6 +169,7 @@ async function createDummyGoods(
       },
       options: { create: [defaultOption] },
       confirmation: { create: confirmation },
+      contents,
     },
   });
   return createdGoods;
@@ -290,6 +304,7 @@ async function createCartItems(): Promise<void> {
 async function createDummyOrderData(): Promise<void> {
   await prisma.order.create({ data: normalOrder });
   await prisma.order.create({ data: nonMemberOrder });
+  await prisma.order.create({ data: orderExportReady });
 }
 
 /** 시드 메인 함수 */
@@ -348,6 +363,9 @@ async function main(): Promise<void> {
 
   // 더미 주문데이터 생성
   await createDummyOrderData();
+
+  // 더미 상품리뷰 생성
+  await createGoodsReview(prisma);
 }
 
 main()

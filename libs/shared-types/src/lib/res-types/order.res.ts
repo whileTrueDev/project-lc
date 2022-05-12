@@ -7,6 +7,7 @@ import {
   GoodsReview,
   Order,
   OrderCancellation,
+  OrderCancellationItem,
   OrderItem,
   OrderItemOption,
   OrderItemSupport,
@@ -33,11 +34,13 @@ export type OrderItemWithRelations = OrderItem & {
   review?: { id: GoodsReview['id'] };
   options: OrderItemOption[];
   goods: OriginGoods;
+  orderCancellationItems?: OrderCancellationItem[] | null;
 };
 
 export type OrderDataWithRelations = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: OrderPayment | null;
+  orderCancellations?: OrderCancellation[] | null;
 };
 
 /** 주문 목록 리턴 데이터 타입 */
@@ -55,5 +58,4 @@ export type OrderDetailRes = OrderDataWithRelations & {
   returns: Return[] | null;
   exports: Export[] | null;
   exchanges: Exchange[] | null;
-  orderCancellations: OrderCancellation[] | null;
 };

@@ -22,3 +22,8 @@ export class BroadcasterDTO {
 export type BroadcasterDTOWithoutUserId = Omit<BroadcasterDTO, 'userId'>;
 
 export type BroadcasterWithoutUserNickName = Omit<BroadcasterDTO, 'userNickname'>;
+
+export type BroadcasterOnlyNickNameAndAvatar = Pick<
+  BroadcasterDTO,
+  'userNickname' | 'avatar'
+>;
