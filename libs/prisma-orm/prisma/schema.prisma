@@ -1676,6 +1676,7 @@ model Refund {
   refundAmount        Int // 환불금액
   paymentKey          String? // 토스페이먼츠 결제건에 대한 고유키(OrderPayment에서 지불했을 때 저장되는 paymentKey와 동일)
   transactionKey      String? // 취소 거래건에 대한 고유키. (동일 paymentKey 가지는)결제건에 대해 승인거래와 취소거래 구분 
+  memo                String? // 환불메모
 
   return Return[] // 연결된 반품
 }
