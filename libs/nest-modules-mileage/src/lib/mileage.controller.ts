@@ -7,7 +7,7 @@ import {
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
-import { HttpCacheInterceptor, UserInfo, UserPayload } from '@project-lc/nest-core';
+import { HttpCacheInterceptor, CustomerInfo, UserPayload } from '@project-lc/nest-core';
 import { CustomerMileage, CustomerMileageLog } from '@prisma/client';
 import { UpsertDto } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
@@ -24,7 +24,7 @@ export class MileageController {
   ) {}
 
   @Get()
-  getOneMileage(@UserInfo() { id }: UserPayload): Promise<CustomerMileage> {
+  getOneMileage(@CustomerInfo() { id }: UserPayload): Promise<CustomerMileage> {
     return this.mileageService.findMileage(id);
   }
 
@@ -34,7 +34,7 @@ export class MileageController {
   }
 
   @Get('history')
-  getMileageLogs(@UserInfo() { id }: UserPayload): Promise<CustomerMileageLog[]> {
+  getMileageLogs(@CustomerInfo() { id }: UserPayload): Promise<CustomerMileageLog[]> {
     return this.mileageLogService.findMileageLogs(id);
   }
 }
