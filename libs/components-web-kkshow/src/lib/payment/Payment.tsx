@@ -21,6 +21,7 @@ import { useFormContext, SubmitHandler } from 'react-hook-form';
 import { PaymentPageDto } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
 import { getCustomerWebHost } from '@project-lc/utils';
+import { useEffect } from 'react';
 import { TermBox } from './TermBox';
 
 interface DummyOrder {
@@ -50,20 +51,29 @@ function getOrderPrice(
   return originalPrice + shippingCost - discount - mileageDiscount - couponDiscount;
 }
 
+function setCookie(value: number): void {
+  const date = new Date();
+  date.setTime(date.getTime() + 1 * 60 * 60 * 24 * 1000);
+  document.cookie = `amount=${value};expires=${date.toUTCString()};path=/`;
+}
+
+// cofs.tistory.com/363 [CofS]
+
 async function doPayment(
   paymentType: '카드' | '계좌이체' | '가상계좌' | '미선택',
   client_key: string,
-  price: number,
-  shipping_cost: number,
-  discount: number,
-  mileage: number,
-  coupon: number,
+  amount: number,
+  // price: number,
+  // shipping_cost: number,
+  // discount: number,
+  // mileage: number,
+  // coupon: number,
   productName: string,
   customerName: string,
 ): Promise<void> {
   loadTossPayments(client_key).then((tossPayments) => {
     tossPayments.requestPayment(paymentType, {
-      amount: getOrderPrice(price, shipping_cost, discount, mileage, coupon),
+      amount,
       orderId: `${dayjs().format('YYYYMMDDHHmmssSSS')}${nanoid(6)}`,
       orderName: `${productName}`,
       customerName,
@@ -108,9 +118,10 @@ export function MileageBenefit({
 
 export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
-  const { paymentType } = useKkshowOrderStore();
+  const paymentAmountToValidation = useKkshowOrderStore((s) => s.handlePaymentAmount);
+  const { paymentType, paymentAmount } = useKkshowOrderStore();
   const toast = useToast();
-  /** 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경 */
+  // todo: 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경
   const PRODUCT_PRICE = data
     .map((item) => item.consumer_price)
     .reduce((prev: number, curr: number) => prev + curr, 0);
@@ -156,17 +167,17 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
         getValues('couponAmount'),
         getValues('discount'),
       );
-      doPayment(
-        paymentType,
-        CLIENT_KEY,
+
+      const amount = getOrderPrice(
         PRODUCT_PRICE,
         SHIPPING_COST,
         DISCOUNT,
         getValues('mileage'),
         getValues('couponAmount'),
-        productName,
-        getValues('name'),
       );
+
+      setCookie(amount);
+      doPayment(paymentType, CLIENT_KEY, amount, productName, getValues('name'));
     }
   };
 
@@ -273,7 +284,7 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
 export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
   const { watch, getValues, handleSubmit } = useFormContext<PaymentPageDto>();
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
-  const { paymentType } = useKkshowOrderStore();
+  const { paymentType, handlePaymentAmount } = useKkshowOrderStore();
   const toast = useToast();
   /** 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경 */
   const PRODUCT_PRICE = 19000;
@@ -316,17 +327,16 @@ export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element 
         getValues('couponAmount'),
         getValues('discount'),
       );
-      doPayment(
-        paymentType,
-        CLIENT_KEY,
+
+      const amount = getOrderPrice(
         PRODUCT_PRICE,
         SHIPPING_COST,
         DISCOUNT,
         getValues('mileage'),
         getValues('couponAmount'),
-        productName,
-        getValues('name'),
       );
+      handlePaymentAmount(amount);
+      // doPayment(paymentType, CLIENT_KEY, amount, productName, getValues('name'));
     }
   };
   return (

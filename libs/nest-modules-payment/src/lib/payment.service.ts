@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PaymentByOrderId, PaymentTransaction } from '@project-lc/shared-types';
+import { Payment, PaymentTransaction } from '@project-lc/shared-types';
 import axios from 'axios';
 
 type PaymentsByDateRequestType = {
@@ -47,7 +47,7 @@ export class PaymentService {
   }
 
   /** 주문번호별 결제내역 */
-  async getPaymentByOrderId(orderId: string): Promise<PaymentByOrderId> {
+  async getPaymentByOrderId(orderId: string): Promise<Payment> {
     return axios
       .get(`${this.BASE_URL}/payments/orders/${orderId}`, {
         headers: {

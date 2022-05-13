@@ -1,11 +1,11 @@
 import { AxiosError } from 'axios';
-import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
+import { useMutation, UseMutationResult } from 'react-query';
+import { Payment } from '@project-lc/shared-types';
 import axios from '../../axios';
 
-export const usePaymentMutation = (): UseMutationResult<any, AxiosError, any> => {
+export const usePaymentMutation = (): UseMutationResult<Payment, AxiosError, any> => {
   return useMutation((dto) => {
     return axios.post('/payment/success', dto).then((res) => {
-      console.log(res.data);
       return res.data;
     });
   });

@@ -7,21 +7,19 @@ import {
   Text,
   Divider,
   Button,
-  Center,
+  Spinner,
 } from '@chakra-ui/react';
 import { usePaymentMutation, useKkshowOrder } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
-import { useEffect, useCallback, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { PaymentPageDto } from '@project-lc/shared-types';
+import { useEffect, useState } from 'react';
+import { Payment } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { SuccessDeliveryAddress } from '@project-lc/components-web-kkshow/payment/DeliveryAddress';
 import { OrderItemInfo } from '@project-lc/components-web-kkshow/payment/OrderItemInfo';
 import dayjs from 'dayjs';
-// todo: 주문 연결
 
-// todo: 주문 연결
+// todo: 주문 연결 이후 주문 데이터로 변경
 const dummyOrder = [
   {
     id: 1,
@@ -47,55 +45,7 @@ const dummyOrder = [
   },
 ];
 
-const dummyPaymentResult = {
-  mId: 'tvivarepublica',
-  version: '1.4',
-  transactionKey: '2784BE23D17ACB9E9EF1C9BC6B69A11C',
-  paymentKey: '6vdX0wJDpj5mBZ1gQ4YVXWG2kooyX3l2KPoqNbMGOkn9EW7y',
-  orderId: '20220512141044840Mhrqc3',
-  orderName: '[음바쿠 - 김치찌개] 김치 김치찌개 김치찜 김피탕 외 1개',
-  method: '카드',
-  status: 'DONE',
-  requestedAt: '2022-05-12T14:10:44+09:00',
-  approvedAt: '2022-05-12T14:11:07+09:00',
-  useEscrow: false,
-  cultureExpense: false,
-  card: {
-    company: '삼성',
-    number: '536648******7695',
-    installmentPlanMonths: 0,
-    isInterestFree: false,
-    interestPayer: null,
-    approveNo: '00000000',
-    useCardPoint: false,
-    cardType: '신용',
-    ownerType: '개인',
-    acquireStatus: 'READY',
-    receiptUrl:
-      'https://dashboard.tosspayments.com/sales-slip?transactionId=5LqI2RFJ3n8L7ZzpeSi6b6IYSKvcimRy%2F7hxllit1EGw%2BxgjOJpa4EetcSILgM4l&ref=PX',
-    provider: null,
-  },
-  virtualAccount: null,
-  transfer: null,
-  mobilePhone: null,
-  giftCertificate: null,
-  cashReceipt: null,
-  discount: null,
-  cancels: null,
-  secret: 'ps_5mBZ1gQ4YVXWG2xXQM13l2KPoqNb',
-  type: 'NORMAL',
-  easyPay: null,
-  country: 'KR',
-  failure: null,
-  isPartialCancelable: true,
-  currency: 'KRW',
-  totalAmount: 61400,
-  balanceAmount: 61400,
-  suppliedAmount: 55818,
-  vat: 5582,
-  taxFreeAmount: 0,
-};
-
+// todo: 주문 연결 이후 주문 데이터로 변경
 const dummyOrderResult = {
   id: 1,
   orderCode: '20220512100923053IMXrXw',
@@ -229,10 +179,26 @@ const dummyOrderResult = {
   exchanges: [],
   orderCancellations: [],
 };
+
+function getCookie(): number | null {
+  const value = document.cookie.match(`(^|;) ?amount=([^;]*)(;|$)`);
+  return value ? Number(value[2]) : null;
+}
+
+function deleteCookie(): void {
+  const date = new Date();
+  document.cookie = `amount= ; expires=${date.toUTCString()}; path=/`;
+}
+
+// cofs.tistory.com/363 [CofS]
+
+// cofs.tistory.com/363 [CofS]
 export function Success(): JSX.Element {
   const router = useRouter();
+  const { paymentAmount } = useKkshowOrderStore();
 
   const [isRequested, setIsRequested] = useState(false);
+  const [paymentData, setPaymentData] = useState<Payment>();
 
   const orderId = router.query.orderId as string;
   const paymentKey = router.query.paymentKey as string;
@@ -250,117 +216,145 @@ export function Success(): JSX.Element {
 
   const discount = productOriginPrice - productDiscountedPrice;
 
-  console.log(productOriginPrice);
-
   const { mutateAsync } = usePaymentMutation();
-  const { data } = useKkshowOrder(orderId || '');
-
-  console.log(data);
+  // todo: 주문 연결 이후, dummyOrderResult 대신 이 데이터로 사용
+  const { data: orderData } = useKkshowOrder(orderId || '');
 
   useEffect(() => {
-    if (orderId && paymentKey && redirectAmount && !isRequested) {
-      // requestPayment(orderId, paymentKey, Number(redirectAmount));
+    const tossPaymentsAmount = getCookie();
+
+    if (
+      orderId &&
+      paymentKey &&
+      redirectAmount &&
+      !isRequested &&
+      redirectAmount === tossPaymentsAmount
+    ) {
       mutateAsync({
         orderId,
         paymentKey,
         amount: redirectAmount,
-      }).then((res) => {
-        console.log(res);
+      }).then((item) => {
+        setPaymentData(item);
       });
+      deleteCookie();
       setIsRequested(true);
+    } else if (
+      orderId &&
+      paymentKey &&
+      redirectAmount &&
+      !isRequested &&
+      redirectAmount !== tossPaymentsAmount
+    ) {
+      router.push('/fail?message=결제금액 오류');
     }
   }, [orderId, paymentKey, redirectAmount]);
 
   return (
     <KkshowLayout>
       <Flex m="auto" alignItems="center" justifyContent="center" direction="column">
-        <Grid templateColumns="repeat(7, 4fr)" gap={6} w="45%" m={10}>
-          <GridItem colSpan={7}>
-            <Flex
-              direction="column"
-              alignItems="center"
-              justifyContent="center"
-              p={2}
-              m={10}
-            >
-              <Heading>주문이 정상적으로 완료되었습니다</Heading>
-            </Flex>
-          </GridItem>
-          <GridItem colSpan={4}>
-            <Heading size="lg">배송지 정보</Heading>
-            <SuccessDeliveryAddress />
-          </GridItem>
-          <GridItem colSpan={3} borderLeft="solid 1px" borderLeftColor="gray.300" pl={2}>
-            <Flex justifyContent="space-between" mb={5}>
-              <Text fontSize="xl">결제금액</Text>
-              <Text fontSize="xl" fontWeight="bold">
-                {dummyPaymentResult.totalAmount.toLocaleString()}
-              </Text>
-            </Flex>
-            <Divider />
-            <Flex justifyContent="space-between" color="gray.500">
-              <Text>상품금액</Text>
-              <Text>{productOriginPrice.toLocaleString()}</Text>
-            </Flex>
-            <Flex justifyContent="space-between" color="gray.500">
-              <Text>할인</Text>
-              <Text>- {discount.toLocaleString()}</Text>
-            </Flex>
-            <Flex justifyContent="space-between" color="gray.500">
-              <Text>배송비</Text>
-              <Text>
-                + {dummyOrderResult.orderItems[0].shippingCost.toLocaleString()}
-              </Text>
-            </Flex>
-            <Flex justifyContent="space-between" color="gray.500">
-              <Text>쿠폰사용</Text>
-              <Text>
-                -{' '}
-                {dummyOrderResult.customerCouponLogs.customerCoupon.coupon.amount.toLocaleString()}
-              </Text>
-            </Flex>
-            <Flex justifyContent="space-between" color="gray.500">
-              <Text>적립금사용</Text>
-              <Text>- {dummyOrderResult.customerMileageLog.amount.toLocaleString()}</Text>
-            </Flex>
-            <Divider mt={2} mb={2} />
-            <Flex justifyContent="space-between">
-              <Box fontSize="xs">
-                <Text>{dummyPaymentResult.card.company}</Text>
-                <Text>{dummyPaymentResult.card.number}</Text>
-                <Divider m={1} />
-                <Text>승인일시</Text>
-                <Text>
-                  {dayjs(dummyPaymentResult.approvedAt).format('YYYY-m-D HH:mm:ss')}
-                </Text>
-              </Box>
-              {dummyPaymentResult.card.installmentPlanMonths === 0 ? (
-                <Text>일시불</Text>
-              ) : (
-                <Text>{dummyPaymentResult.card.installmentPlanMonths}개월 할부</Text>
-              )}
-            </Flex>
-          </GridItem>
-          <GridItem colSpan={7}>
-            <OrderItemInfo data={dummyOrder} />
-          </GridItem>
-          <GridItem colSpan={7}>
-            <Flex alignContent="center" justifyContent="center" mt="10%" mb="10%">
-              <Flex justifyContent="space-around" w="40%">
-                <Button variant="outline">주문 상세보기</Button>
-                <Button
-                  variant="outline"
-                  colorScheme="blue"
-                  onClick={() => {
-                    router.push('/shopping');
-                  }}
-                >
-                  쇼핑 계속하기
-                </Button>
+        {!paymentData && (
+          <Flex alignItems="center" justifyContent="center" direction="column" h="2xl">
+            <Spinner mb={10} />
+            <Heading>주문 처리가 진행중입니다</Heading>
+          </Flex>
+        )}
+        {paymentData && (
+          <Grid templateColumns="repeat(7, 4fr)" gap={6} w="45%" m={10}>
+            <GridItem colSpan={7}>
+              <Flex
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+                p={2}
+                m={10}
+              >
+                <Heading>주문이 정상적으로 완료되었습니다</Heading>
               </Flex>
-            </Flex>
-          </GridItem>
-        </Grid>
+            </GridItem>
+            <GridItem colSpan={4}>
+              <Heading size="lg">배송지 정보</Heading>
+              <SuccessDeliveryAddress />
+            </GridItem>
+            <GridItem
+              colSpan={3}
+              borderLeft="solid 1px"
+              borderLeftColor="gray.300"
+              pl={2}
+            >
+              <Flex justifyContent="space-between" mb={5}>
+                <Text fontSize="xl">결제금액</Text>
+                <Text fontSize="xl" fontWeight="bold">
+                  {paymentData.totalAmount.toLocaleString()}
+                </Text>
+              </Flex>
+              <Divider />
+              <Flex justifyContent="space-between" color="gray.500">
+                <Text>상품금액</Text>
+                <Text>{productOriginPrice.toLocaleString()}</Text>
+              </Flex>
+              <Flex justifyContent="space-between" color="gray.500">
+                <Text>할인</Text>
+                <Text>- {discount.toLocaleString()}</Text>
+              </Flex>
+              <Flex justifyContent="space-between" color="gray.500">
+                <Text>배송비</Text>
+                <Text>
+                  + {dummyOrderResult.orderItems[0].shippingCost.toLocaleString()}
+                </Text>
+              </Flex>
+              <Flex justifyContent="space-between" color="gray.500">
+                <Text>쿠폰사용</Text>
+                <Text>
+                  -{' '}
+                  {dummyOrderResult.customerCouponLogs.customerCoupon.coupon.amount.toLocaleString()}
+                </Text>
+              </Flex>
+              <Flex justifyContent="space-between" color="gray.500">
+                <Text>적립금사용</Text>
+                <Text>
+                  - {dummyOrderResult.customerMileageLog.amount.toLocaleString()}
+                </Text>
+              </Flex>
+              <Divider mt={2} mb={2} />
+              <Flex justifyContent="space-between">
+                <Box fontSize="xs">
+                  <Text>{paymentData.card.company}</Text>
+                  <Text>{paymentData.card.number}</Text>
+                  <Divider m={1} />
+                  <Text>승인일시</Text>
+                  <Text>
+                    {dayjs(paymentData.approvedAt).format('YYYY-MM-DD HH:mm:ss')}
+                  </Text>
+                </Box>
+                {paymentData.card.installmentPlanMonths === 0 ? (
+                  <Text>일시불</Text>
+                ) : (
+                  <Text>{paymentData.card.installmentPlanMonths}개월 할부</Text>
+                )}
+              </Flex>
+            </GridItem>
+            <GridItem colSpan={7}>
+              <OrderItemInfo data={dummyOrder} />
+            </GridItem>
+            <GridItem colSpan={7}>
+              <Flex alignContent="center" justifyContent="center" mt="10%" mb="10%">
+                <Flex justifyContent="space-around" w="40%">
+                  <Button variant="outline">주문 상세보기</Button>
+                  <Button
+                    variant="outline"
+                    colorScheme="blue"
+                    onClick={() => {
+                      router.push('/shopping');
+                    }}
+                  >
+                    쇼핑 계속하기
+                  </Button>
+                </Flex>
+              </Flex>
+            </GridItem>
+          </Grid>
+        )}
       </Flex>
     </KkshowLayout>
   );

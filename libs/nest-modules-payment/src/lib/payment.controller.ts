@@ -13,11 +13,7 @@ import {
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import { getCustomerWebHost } from '@project-lc/utils';
-import {
-  PaymentByOrderId,
-  PaymentTransaction,
-  PaymentRequestDto,
-} from '@project-lc/shared-types';
+import { Payment, PaymentTransaction, PaymentRequestDto } from '@project-lc/shared-types';
 import { PaymentService } from './payment.service';
 
 @UseGuards(JwtAuthGuard)
@@ -56,9 +52,7 @@ export class PaymentController {
   }
 
   @Get('/:orderId')
-  async getPaymentByOrderId(
-    @Param('orderId') orderId: string,
-  ): Promise<PaymentByOrderId> {
+  async getPaymentByOrderId(@Param('orderId') orderId: string): Promise<Payment> {
     return this.paymentService.getPaymentByOrderId(orderId);
   }
 }

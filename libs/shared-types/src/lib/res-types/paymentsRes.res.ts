@@ -82,7 +82,7 @@ export type PaymentDiscount = {
   amount: number;
 };
 
-export interface PaymentByOrderId {
+export interface Payment {
   version: string;
   paymentKey: string;
   type: string;
