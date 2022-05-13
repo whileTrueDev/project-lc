@@ -1,13 +1,8 @@
-import {
-  BadRequestException,
-  CACHE_MANAGER,
-  HttpException,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
+import { PaymentService } from '@project-lc/nest-modules-payment';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateRefundDto,
@@ -18,6 +13,7 @@ import {
   PaymentVirtualAccount,
   RefundDetailRes,
   RefundListRes,
+  TossPaymentCancelDto,
 } from '@project-lc/shared-types';
 import { TossPaymentsApi } from '@project-lc/utils';
 import { Cache } from 'cache-manager';
@@ -30,6 +26,7 @@ export class RefundService extends ServiceBaseWithCache {
   constructor(
     private readonly prisma: PrismaService,
     private readonly orderCancellationService: OrderCancellationService,
+    private readonly paymentService: PaymentService,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);
@@ -90,34 +87,27 @@ export class RefundService extends ServiceBaseWithCache {
     return nanoid();
   }
 
-  /** 토스페이먼츠 결제취소 요청 래핑 & 에러핸들링 */
-  private async _requestCancelPayment(
-    dto: CreateRefundDto,
-  ): Promise<{ transactionKey: string }> {
-    try {
-      const cancelResult = await TossPaymentsApi.requestCancelPayment({
-        paymentKey: dto.paymentKey,
-        cancelReason: dto.reason,
-        cancelAmount: dto.refundAmount,
-        // 토스페이먼츠 가상계좌로 지불하여 환불계좌정보 있는 경우
-        refundReceiveAccount:
-          dto.refundAccount && dto.refundAccount && dto.refundAccountHolder
-            ? {
-                bank: dto.refundBank,
-                accountNumber: dto.refundAccount,
-                holderName: dto.refundAccountHolder,
-              }
-            : undefined,
-      });
+  /** createRefundDto 에서 토스페이먼츠 결제취소 요청 dto 생성 */
+  private makeTosspaymentCancelDtoFromCreateRefundDto(
+    createRefundDto: CreateRefundDto,
+  ): TossPaymentCancelDto {
+    const refundReceiveAccount = {
+      bank: createRefundDto.refundBank,
+      accountNumber: createRefundDto.refundAccount,
+      holderName: createRefundDto.refundAccountHolder,
+    };
+    const hasRefundAccountInfo =
+      createRefundDto.refundBank &&
+      createRefundDto.refundAccount &&
+      createRefundDto.refundAccountHolder;
 
-      return cancelResult;
-    } catch (error) {
-      console.error(error.response);
-      throw new HttpException(
-        error.response.message || 'error in requestCancelTossPayment',
-        error.response.status || 500,
-      );
-    }
+    const tossPaymentCancelDto = {
+      paymentKey: createRefundDto.paymentKey,
+      cancelReason: createRefundDto.reason,
+      cancelAmount: createRefundDto.refundAmount,
+      refundReceiveAccount: hasRefundAccountInfo ? refundReceiveAccount : undefined,
+    };
+    return tossPaymentCancelDto;
   }
 
   /** 환불데이터 생성
@@ -132,7 +122,9 @@ export class RefundService extends ServiceBaseWithCache {
     let transactionKey: string | undefined;
     // 1. 토스페이먼츠 결제취소 api 사용하는 경우 transaction키 받기
     if (rest.paymentKey) {
-      const cancelResult = await this._requestCancelPayment(dto);
+      const cancelResult = await this.paymentService.requestCancelTossPayment(
+        this.makeTosspaymentCancelDtoFromCreateRefundDto(dto),
+      );
       transactionKey = cancelResult.transactionKey;
     }
 

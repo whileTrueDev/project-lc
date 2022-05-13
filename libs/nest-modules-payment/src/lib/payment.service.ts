@@ -1,6 +1,10 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PaymentByOrderId, PaymentTransaction } from '@project-lc/shared-types';
+import {
+  PaymentByOrderId,
+  PaymentTransaction,
+  TossPaymentCancelDto,
+} from '@project-lc/shared-types';
 import { PaymentsByDateRequestType, TossPaymentsApi } from '@project-lc/utils';
 
 @Injectable()
@@ -42,6 +46,35 @@ export class PaymentService {
       console.error(error.response);
       throw new HttpException(
         error.response.message || 'error in getPaymentsByDate',
+        error.response.status || 500,
+      );
+    }
+  }
+
+  /** 토스페이먼츠 결제취소 요청 래핑 & 에러핸들링 */
+  async requestCancelTossPayment(
+    dto: TossPaymentCancelDto,
+  ): Promise<{ transactionKey: string } & Record<string, any>> {
+    try {
+      const cancelResult = await TossPaymentsApi.requestCancelPayment({
+        paymentKey: dto.paymentKey,
+        cancelReason: dto.cancelReason,
+        cancelAmount: dto.cancelAmount,
+        // 토스페이먼츠 가상계좌로 지불하여 환불계좌정보 있는 경우
+        refundReceiveAccount: dto.refundReceiveAccount
+          ? {
+              bank: dto.refundReceiveAccount.bank,
+              accountNumber: dto.refundReceiveAccount.accountNumber,
+              holderName: dto.refundReceiveAccount.holderName,
+            }
+          : undefined,
+      });
+
+      return cancelResult;
+    } catch (error) {
+      console.error(error.response);
+      throw new HttpException(
+        error.response.message || 'error in requestCancelTossPayment',
         error.response.status || 500,
       );
     }
