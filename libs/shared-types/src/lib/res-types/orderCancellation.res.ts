@@ -15,14 +15,9 @@ import {
 export type CreateOrderCancellationRes = OrderCancellation;
 
 // *------------ 주문취소 목록조회 리턴값 ------------------
-/** 주문취소 신청내역 리턴데이터 타입 (프론트 작업시 필요한 형태로 수정하여 사용) */
-export type OrderCancellationItemData = {
-  /** 주문취소상품 고유번호 */
-  id: OrderCancellationItem['id'];
-  /** 주문취소상품 개수 */
-  amount: OrderCancellationItem['amount'];
-  /** 주문취소상품 처리 상태 */
-  status: OrderCancellationItem['status'];
+
+/** 교환,환불,주문취소 아이템 공통 조회 데이터 */
+export interface ExchangeReturnCancelItemBase {
   /** 주문상품명 */
   goodsName: Goods['goods_name'];
   /** 주문상품이미지 */
@@ -39,6 +34,15 @@ export type OrderCancellationItemData = {
   orderItemId: OrderItem['id'];
   /** 주문취소상품이 연결된 주문상품옵션고유번호 - 환불처리시 필요한 데이터 */
   orderItemOptionId: OrderItemOption['id'];
+}
+/** 주문취소 신청내역 리턴데이터 타입 (프론트 작업시 필요한 형태로 수정하여 사용) */
+export type OrderCancellationItemData = ExchangeReturnCancelItemBase & {
+  /** 주문취소상품 고유번호 */
+  id: OrderCancellationItem['id'];
+  /** 주문취소상품 개수 */
+  amount: OrderCancellationItem['amount'];
+  /** 주문취소상품 처리 상태 */
+  status: OrderCancellationItem['status'];
 };
 export type OrderCancellationData = Omit<OrderCancellation, 'items'> & {
   refund: Refund;

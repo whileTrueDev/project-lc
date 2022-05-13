@@ -70,16 +70,61 @@ export class ExchangeService extends ServiceBaseWithCache {
         exchangeItems: { some: { orderItem: { goods: { sellerId: dto.sellerId } } } },
       };
     }
+
+    const totalCount = await this.prisma.exchange.count({ where });
     const data = await this.prisma.exchange.findMany({
       take: dto.take,
       skip: dto.skip,
       where,
       include: {
-        exchangeItems: true,
+        order: { select: { orderCode: true } },
+        export: true,
+        exchangeItems: {
+          include: {
+            orderItem: {
+              select: {
+                id: true,
+                goods: {
+                  select: {
+                    id: true,
+                    goods_name: true,
+                    image: true,
+                    seller: { select: { sellerShop: true } },
+                  },
+                },
+              },
+            },
+            orderItemOption: true,
+          },
+        },
         images: true,
       },
     });
-    return data;
+    // 조회한 데이터를 필요한 형태로 처리
+    const list = data.map((d) => {
+      const { exchangeItems, ...rest } = d;
+
+      const _items = exchangeItems.map((i) => ({
+        id: i.id, // 교환 상품 고유번호
+        amount: i.amount, // 교환 상품 개수
+        status: i.status, // 교환 상품 처리상태
+        goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
+        image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지
+        shopName: i.orderItem.goods.seller.sellerShop?.shopName, // 주문상품 판매상점명
+        optionName: i.orderItemOption.name, // 주문상품옵션명
+        optionValue: i.orderItemOption.value, // 주문상품옵션 값
+        price: Number(i.orderItemOption.discountPrice), // 주문상품옵션 가격
+        orderItemId: i.orderItem.id, // 연결된 주문상품고유번호
+        orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
+      }));
+
+      return { ...rest, items: _items };
+    });
+
+    return {
+      list,
+      totalCount,
+    };
   }
 
   /** 특정 교환요청 상세 조회 */
