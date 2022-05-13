@@ -130,6 +130,15 @@ export const defaultOption: Omit<Prisma.GoodsOptionsCreateInput, 'goods'> = {
   consumer_price: 3000,
   supply: { create: { stock: 40 } },
 };
+/** 상품기본옵션2 */
+export const secondOption: Omit<Prisma.GoodsOptionsCreateInput, 'goods'> = {
+  default_option: 'n',
+  option_title: '만두 종류',
+  option1: '매운 만두',
+  price: 2500,
+  consumer_price: 3000,
+  supply: { create: { stock: 40 } },
+};
 
 /** 더미상품 타입 */
 export type DummyGoodsDataType = Pick<Goods, 'goods_name' | 'summary' | 'contents'> & {

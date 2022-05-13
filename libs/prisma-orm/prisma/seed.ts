@@ -26,6 +26,7 @@ import {
   dummyBroadcasterChannel,
   dummyBroadcasterContacts,
   dummyLoginHistory,
+  secondOption,
 } from './seedData/dummyData';
 import { termsData } from './seedData/terms';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
@@ -167,7 +168,7 @@ async function createDummyGoods(
           image: url,
         })),
       },
-      options: { create: [defaultOption] },
+      options: { create: [defaultOption, secondOption] },
       confirmation: { create: confirmation },
       contents,
     },

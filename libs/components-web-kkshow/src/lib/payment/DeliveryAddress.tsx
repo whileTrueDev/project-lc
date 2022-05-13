@@ -83,6 +83,10 @@ export function DeliveryAddress(): JSX.Element {
     }
   }, [defaultAddress, isLoading]);
 
+  /**
+   * TODO: 배송 메모 작성 추가 필요 (최근 배송메모 조회 기능도 있으면 좋을 것)
+   * 최근 배송메모 조회 기능이 address에 포함되어 저장되어도 상관없을 듯. (수정가능하도록)
+   */
   return (
     <SectionWithTitle title="배송지 정보">
       {!isLoading && (

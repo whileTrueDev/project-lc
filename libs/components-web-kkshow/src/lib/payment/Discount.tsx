@@ -22,7 +22,7 @@ import {
 import { GridColDef, GridRowData } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
-import { PaymentPageDto } from '@project-lc/shared-types';
+import { CreateOrderForm } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useFormContext } from 'react-hook-form';
 
@@ -44,19 +44,21 @@ export function Discount(): JSX.Element {
     watch,
     register,
     formState: { errors },
-  } = useFormContext<PaymentPageDto>();
+  } = useFormContext<CreateOrderForm>();
+
+  const mileageAmount = watch('usedMileageAmount');
 
   const resetDiscountUsage = (type: 'mileage' | 'coupon'): void => {
     if (type === 'mileage') {
-      resetField('mileage');
+      resetField('usedMileageAmount');
     } else {
-      setValue('couponId', null);
-      resetField('couponAmount');
+      setValue('couponId', undefined);
+      resetField('usedCouponAmount');
     }
   };
 
   const handleUseMaxMileage = (): void => {
-    setValue('mileage', MAX_MILEAGE);
+    setValue('usedMileageAmount', MAX_MILEAGE);
   };
 
   return (
@@ -65,7 +67,7 @@ export function Discount(): JSX.Element {
         <Stack>
           <Text fontWeight="semibold">쿠폰할인</Text>
           <Flex alignItems="center" gap={2}>
-            <Input size="sm" maxW={150} isReadOnly {...register('couponAmount')} />
+            <Input size="sm" maxW={150} isReadOnly {...register('usedCouponAmount')} />
             {dummyCoupon && dummyCoupon.length > 0 && (
               <Button size="xs" colorScheme="blue" onClick={couponSelectDialog.onOpen}>
                 쿠폰사용
@@ -85,8 +87,9 @@ export function Discount(): JSX.Element {
         </Stack>
 
         <Stack>
+          {/* // TODO: 결제 금액이 0원 이상일때까지만 적용하도록 구성 */}
           <Text fontWeight="semibold">적립금</Text>
-          <FormControl isInvalid={!!errors.mileage}>
+          <FormControl isInvalid={!!errors.usedMileageAmount}>
             <Flex gap={2} alignItems="center">
               <Input
                 isReadOnly={MAX_MILEAGE <= 0}
@@ -94,7 +97,7 @@ export function Discount(): JSX.Element {
                 type="number"
                 size="sm"
                 onFocus={(e) => e.target.select()}
-                {...register('mileage', {
+                {...register('usedMileageAmount', {
                   max: {
                     value: MAX_MILEAGE,
                     message: '보유적립금 이상 사용할 수 없습니다.',
@@ -107,7 +110,7 @@ export function Discount(): JSX.Element {
                   전액사용
                 </Button>
               )}
-              {watch('mileage') > 0 ? (
+              {mileageAmount && mileageAmount > 0 ? (
                 <Button
                   variant="outline"
                   size="xs"
@@ -120,7 +123,7 @@ export function Discount(): JSX.Element {
             <FormHelperText color="GrayText">
               보유한 총 적립금 {getLocaleNumber(MAX_MILEAGE) || 0} 원
             </FormHelperText>
-            <FormErrorMessage>{errors.mileage?.message}</FormErrorMessage>
+            <FormErrorMessage>{errors.usedMileageAmount?.message}</FormErrorMessage>
           </FormControl>
         </Stack>
 
@@ -151,7 +154,7 @@ export function Discount(): JSX.Element {
         onClose={couponSelectDialog.onClose}
         onCouponSelect={(coupon) => {
           setValue('couponId', coupon.id);
-          setValue('couponAmount', coupon.amount);
+          setValue('usedCouponAmount', coupon.amount);
         }}
       />
 
@@ -173,6 +176,7 @@ function CouponSelectDialog({
   onClose,
   onCouponSelect,
 }: CouponSelectDialogProps): JSX.Element {
+  // TODO: 쿠폰 사용 가능여부 처리 필요 (최소 주문금액 등 적용 가능 여부 판단 이후 선택못하도록)
   const columns: GridColDef[] = [
     { field: 'name', headerName: '쿠폰명', flex: 1 },
     { field: 'amount', headerName: '금액' },

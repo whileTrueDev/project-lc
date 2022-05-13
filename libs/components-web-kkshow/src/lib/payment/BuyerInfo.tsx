@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 import { useCustomerInfo, useProfile } from '@project-lc/hooks';
-import { PaymentPageDto } from '@project-lc/shared-types';
+import { CreateOrderForm, emailRegisterOptions } from '@project-lc/shared-types';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -20,23 +20,25 @@ export function BuyerInfo(): JSX.Element {
 
   const {
     register,
-    setValue,
     formState: { errors },
-  } = useFormContext<PaymentPageDto>();
+    setValue,
+  } = useFormContext<CreateOrderForm>();
 
   useEffect(() => {
-    if (profile && data && data.name && data.phone) {
-      setValue('email', profile.email);
-      setValue('name', data.name);
-      setValue('orderPhone', data.phone);
-      setValue('orderPhone1', data.phone.split('-')[0]);
-      setValue('orderPhone2', data.phone.split('-')[1]);
-      setValue('orderPhone3', data.phone.split('-')[2]);
+    if (profile && data && data.name) {
+      setValue('ordererEmail', profile.email);
+      setValue('ordererName', data.name);
+    }
+    if (profile && data && data.phone) {
+      setValue('ordererPhone', data.phone);
+      setValue('ordererPhone1', data.phone.split('-')[0]);
+      setValue('ordererPhone2', data.phone.split('-')[1]);
+      setValue('ordererPhone3', data.phone.split('-')[2]);
     }
   }, [profile, data, setValue]);
 
   return (
-    <SectionWithTitle title="구매자 정보" disableDivider titleMarginY={4}>
+    <SectionWithTitle title="주문자 정보" disableDivider titleMarginY={4}>
       {data ? (
         <Box>
           <HStack>
@@ -60,36 +62,33 @@ export function BuyerInfo(): JSX.Element {
         </Box>
       ) : (
         <Stack>
-          <FormControl isInvalid={!!errors.name}>
+          <FormControl isInvalid={!!errors.ordererName}>
             <FormLabel fontWeight="semibold">이름</FormLabel>
             <Input
               maxW={250}
               placeholder="주문자명"
-              {...register('name', {
+              {...register('ordererName', {
                 required: '주문자의 이름을 입력해주세요(2글자 이상)',
                 minLength: 2,
               })}
             />
-            <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+            <FormErrorMessage>{errors.ordererName?.message}</FormErrorMessage>
           </FormControl>
 
-          <FormControl isInvalid={!!errors.name}>
+          <FormControl isInvalid={!!errors.ordererEmail}>
             <FormLabel fontWeight="semibold">이메일</FormLabel>
             <Input
               maxW={250}
               type="email"
               placeholder="minsu@example.com"
-              {...register('email', {
-                required: '이메일을 작성해주세요',
-                minLength: 2,
-              })}
+              {...register('ordererEmail', { ...emailRegisterOptions })}
             />
-            <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+            <FormErrorMessage>{errors.ordererEmail?.message}</FormErrorMessage>
           </FormControl>
 
           <FormControl
             isInvalid={
-              !!errors.orderPhone1 || !!errors.orderPhone2 || !!errors.orderPhone3
+              !!errors.ordererPhone1 || !!errors.ordererPhone2 || !!errors.ordererPhone3
             }
           >
             <FormLabel fontWeight="semibold">휴대전화</FormLabel>
@@ -98,11 +97,8 @@ export function BuyerInfo(): JSX.Element {
                 maxW="80px"
                 type="number"
                 maxLength={3}
-                {...register('orderPhone1', {
-                  required: {
-                    value: true,
-                    message: '휴대전화를 올바르게 입력해주세요.',
-                  },
+                {...register('ordererPhone1', {
+                  required: '휴대전화를 올바르게 입력해주세요.',
                   minLength: 2,
                   maxLength: 3,
                 })}
@@ -112,11 +108,8 @@ export function BuyerInfo(): JSX.Element {
                 maxW="80px"
                 type="number"
                 maxLength={4}
-                {...register('orderPhone2', {
-                  required: {
-                    value: true,
-                    message: '휴대전화를 올바르게 입력해주세요.',
-                  },
+                {...register('ordererPhone2', {
+                  required: '휴대전화를 올바르게 입력해주세요.',
                   minLength: 3,
                   maxLength: 4,
                 })}
@@ -126,11 +119,8 @@ export function BuyerInfo(): JSX.Element {
                 maxW="80px"
                 type="number"
                 maxLength={4}
-                {...register('orderPhone3', {
-                  required: {
-                    value: true,
-                    message: '휴대전화를 올바르게 입력해주세요.',
-                  },
+                {...register('ordererPhone3', {
+                  required: '휴대전화를 올바르게 입력해주세요.',
                   minLength: 3,
                   maxLength: 4,
                 })}

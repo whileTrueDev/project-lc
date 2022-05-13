@@ -28,11 +28,11 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useCartMutation, useDisplaySize } from '@project-lc/hooks';
+import { useCartMutation } from '@project-lc/hooks';
 import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
-import { useGoodsViewStore } from '@project-lc/stores';
+import { useGoodsViewStore, useKkshowOrder } from '@project-lc/stores';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { GoGift } from 'react-icons/go';
 import shallow from 'zustand/shallow';
 import OptionQuantity from '../OptionQuantity';
@@ -267,17 +267,15 @@ function GoodsViewBroadcasterSupportBox({
     </Accordion>
   );
 }
-
+/** 상품 상세 - 주문/선물주문/장바구니 버튼 컴포넌트 및 로직 */
 function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
+  const buttonSize = useBreakpointValue({ base: 'md', md: 'lg' });
   const router = useRouter();
   const toast = useToast();
-  const { isMobileSize } = useDisplaySize();
+  const cartDoneDialog = useDisclosure();
   const selectedOpts = useGoodsViewStore((s) => s.selectedOpts);
   const selectedBc = useGoodsViewStore((s) => s.selectedBc);
   const supportMessage = useGoodsViewStore((s) => s.supportMessage);
-  const buttonSize = useBreakpointValue({ base: 'md', md: 'lg' });
-
-  const cartDoneDialog = useDisclosure();
 
   /** 선택 상품 옵션 합계 정보 */
   const totalInfo = useMemo(() => {
@@ -292,34 +290,8 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
     );
   }, [selectedOpts]);
 
-  const onSuccess = (): void => {
-    if (isMobileSize) {
-      cartDoneDialog.onOpen();
-    } else {
-      toast({
-        title: (
-          <Text>
-            장바구니에 상품을 담았습니다.
-            <Text
-              ml={4}
-              as="span"
-              color="blue.600"
-              cursor="pointer"
-              textDecor="underline"
-              onClick={() => router.push('/cart')}
-            >
-              장바구니
-            </Text>
-          </Text>
-        ),
-        status: 'success',
-        isClosable: true,
-      });
-    }
-  };
   // 장바구니 담기
   const createCartItem = useCartMutation();
-
   const handleCartClick = (): void => {
     if (!(selectedOpts.length > 0)) {
       toast({ title: '선택된 옵션이 없습니다.', status: 'warning' });
@@ -347,7 +319,7 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
             }
           : undefined,
       })
-      .then(() => onSuccess())
+      .then(() => cartDoneDialog.onOpen())
       .catch(() => {
         toast({
           status: 'error',
@@ -355,6 +327,62 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
         });
       });
   };
+
+  const orderPrepare = useKkshowOrder((s) => s.handleOrderPrepare);
+  // 주문 클릭시
+  const handleOrderClick = useCallback(
+    (type: 'gift' | 'instant-order' = 'instant-order'): void => {
+      const isGiftOrder = type === 'gift';
+      orderPrepare({
+        orderPrice: totalInfo.price,
+        giftFlag: !!isGiftOrder, // 선물주문플래그
+        supportOrderIncludeFlag: isGiftOrder ? true : !!selectedBc, // 선물주문은 언제나 후원이 포함되므로 true 고정
+        // TODO: 비회원 주문 처리 작업 이후 수정 필요
+        nonMemberOrderFlag: false,
+        orderItems: [
+          {
+            goodsName: goods.goods_name,
+            goodsId: goods.id,
+            options: selectedOpts.map((o) => ({
+              goodsOptionId: o.id,
+              quantity: o.quantity,
+              name: o.option_title,
+              value: o.option1,
+              normalPrice: o.consumer_price,
+              discountPrice: o.price,
+              weight: o.weight,
+            })),
+            // TODO: 상품 배송비 판단 로직 이후 수정 필요
+            shippingCost: '2500',
+            shippingGroupId: goods.shippingGroupId || 1,
+            // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
+            channel: 'normal',
+            shippingCostIncluded: false, // 다른 상품에 이미 배송비가 포함되었는 지 여부
+            support: selectedBc
+              ? {
+                  broadcasterId: selectedBc.id,
+                  message: supportMessage,
+                  nickname: selectedBc.userNickname,
+                  avatar: selectedBc.avatar,
+                }
+              : undefined,
+          },
+        ],
+      });
+      router.push('/payment');
+    },
+    [
+      selectedBc,
+      orderPrepare,
+      totalInfo.price,
+      goods.goods_name,
+      goods.id,
+      goods.shippingGroupId,
+      selectedOpts,
+      supportMessage,
+      router,
+    ],
+  );
 
   return (
     <Stack>
@@ -387,10 +415,7 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
               colorScheme="facebook"
               isDisabled={goods.goods_status !== 'normal'}
               variant="outline"
-              onClick={() => {
-                // TODO: 주문페이지 완료이후 선물 주문으로 이동 로직 구현 필요
-                alert('방송인에게 선물하기 클릭. 선물 주문으로 이동 로직 구현 필요');
-              }}
+              onClick={() => handleOrderClick('gift')}
             />
           </Tooltip>
         )}
@@ -399,10 +424,7 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
           size={buttonSize}
           colorScheme="blue"
           isDisabled={goods.goods_status !== 'normal'}
-          onClick={() => {
-            // TODO: 주문페이지 완료이후 선물 주문으로 이동 로직 구현 필요
-            alert('구매하기 클릭. 장바구니 구매하기와 동일한 로직 처리 필요');
-          }}
+          onClick={() => handleOrderClick('instant-order')}
         >
           구매하기
         </Button>
@@ -431,14 +453,14 @@ interface CartCreateDoneDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
+/** 장바구니 담기 완료 알림 모달창 */
 function CartCreateDoneDialog({
   isOpen,
   onClose,
 }: CartCreateDoneDialogProps): JSX.Element {
   const router = useRouter();
-  const { isMobileSize } = useDisplaySize();
   return (
-    <Modal isOpen={!!isMobileSize && isOpen} onClose={onClose} isCentered size="xs">
+    <Modal isOpen={isOpen} onClose={onClose} isCentered size="xs">
       <ModalOverlay />
       <ModalContent maxW={280}>
         <ModalBody my={4} textAlign="center">
