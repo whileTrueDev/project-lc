@@ -33,12 +33,14 @@ export class CreateOrderCancellationDto {
   orderId: number;
 
   /** 주문취소요청 사유 */
+  @IsOptional()
   @IsString()
-  reason: string;
+  reason?: string;
 
   /** 책임소재 */
   @IsString()
-  responsibility: string;
+  @IsOptional()
+  responsibility?: string;
 
   /** 취소할 주문상품옵션 목록 */
   @IsArray()
@@ -79,7 +81,8 @@ export class GetOrderCancellationListDto {
 export class UpdateOrderCancellationStatusDto {
   /** 변경될 처리상태 */
   @IsEnum(ProcessStatus)
-  status: ProcessStatus;
+  @IsOptional()
+  status?: ProcessStatus;
 
   /* 거절시 거절사유 입력필요 */
   @ValidateIf((o) => o.status === ProcessStatus.canceled)
@@ -90,4 +93,9 @@ export class UpdateOrderCancellationStatusDto {
   @IsNumber()
   @IsOptional()
   refundId?: number;
+
+  /** 책임소재 */
+  @IsString()
+  @IsOptional()
+  responsibility?: string;
 }
