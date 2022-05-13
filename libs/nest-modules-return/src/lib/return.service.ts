@@ -74,6 +74,7 @@ export class ReturnService extends ServiceBaseWithCache {
       take: dto.take,
       skip: dto.skip,
       where,
+      orderBy: { requestDate: 'desc' },
       include: {
         order: { select: { orderCode: true } },
         refund: true,

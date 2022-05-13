@@ -76,6 +76,7 @@ export class ExchangeService extends ServiceBaseWithCache {
       take: dto.take,
       skip: dto.skip,
       where,
+      orderBy: { requestDate: 'desc' },
       include: {
         order: { select: { orderCode: true } },
         export: true,

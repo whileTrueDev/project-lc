@@ -134,6 +134,7 @@ export class OrderCancellationService extends ServiceBaseWithCache {
       where,
       take,
       skip,
+      orderBy: { requestDate: 'desc' },
       include: {
         order: { select: { orderCode: true } },
         refund: true,
