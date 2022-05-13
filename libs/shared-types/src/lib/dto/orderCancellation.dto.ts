@@ -1,4 +1,4 @@
-import { ProcessStatus } from '@prisma/client';
+import { Customer, ProcessStatus, Seller } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -56,7 +56,7 @@ export class GetOrderCancellationListDto {
   @Type(() => Number)
   @IsNumber()
   @IsOptional()
-  skip?: number;
+  skip?: number = 0;
 
   /** 목록조회시 조회 할 데이터 개수 */
   @Type(() => Number)
@@ -68,13 +68,13 @@ export class GetOrderCancellationListDto {
   @Type(() => Number)
   @IsNumber()
   @IsOptional()
-  customerId?: number;
+  customerId?: Customer['id'];
 
   /** 특정 판매자의 판매상품이 포함된 주문취소내역 조회시 판매자 고유번호 */
   @Type(() => Number)
   @IsNumber()
   @IsOptional()
-  sellerId?: number;
+  sellerId?: Seller['id'];
 }
 
 // *------------ 주문취소 상태변경 dto ------------------

@@ -37,7 +37,7 @@ export class OrderCancellationController {
   }
 
   /* 주문취소 내역 조회 */
-  @Get()
+  @Get('list')
   getOrderCancellationList(
     @Query(new ValidationPipe({ transform: true })) dto: GetOrderCancellationListDto,
   ): Promise<OrderCancellationListRes> {
