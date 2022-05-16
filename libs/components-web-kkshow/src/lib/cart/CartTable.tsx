@@ -9,7 +9,6 @@ import {
   Checkbox,
   Divider,
   Flex,
-  IconButton,
   Image,
   Link,
   Spinner,
@@ -113,7 +112,7 @@ export function CartTable(): JSX.Element {
             onClick={handleTruncate}
             isLoading={truncate.isLoading}
           >
-            모두삭제
+            선택상품 모두삭제
           </Button>
         </ButtonGroup>
 
@@ -170,14 +169,15 @@ export function CartTableRow({ cartItem }: CartTableItemProps): JSX.Element {
 
       <Td>
         <Box>
-          <IconButton
+          <Button
             size="sm"
             aria-label="delete-cart-item"
             onClick={() => handleCartItemDelete(cartItem.id)}
             isLoading={deleteCartItem.isLoading}
+            leftIcon={<DeleteIcon />}
           >
-            <DeleteIcon />
-          </IconButton>
+            상품삭제
+          </Button>
         </Box>
       </Td>
     </Tr>
@@ -226,7 +226,7 @@ export function CartItemDisplay({
       <Checkbox
         size="lg"
         colorScheme="blue"
-        isChecked={selectedItems.findIndex((x) => x.id === cartItem.id) > -1}
+        isChecked={selectedItems.findIndex((goodsId) => goodsId === cartItem.id) > -1}
         onChange={() => handleToggle(cartItem)}
       />
     ),
@@ -238,9 +238,14 @@ export function CartItemDisplay({
       <Flex display={{ base: 'flex', lg: 'none' }} justify="space-between">
         {checkbox}
         {onClose && (
-          <IconButton size="sm" aria-label="remove-this-cartitem" onClick={onClose}>
-            <DeleteIcon />
-          </IconButton>
+          <Button
+            size="sm"
+            aria-label="remove-this-cartitem"
+            onClick={onClose}
+            leftIcon={<DeleteIcon />}
+          >
+            상품삭제
+          </Button>
         )}
       </Flex>
       <Flex gap={4} alignItems={{ base: 'flex-start', lg: 'center' }}>
@@ -368,15 +373,17 @@ export function CartTableRowOption({
           increaseDisabled={optionQuantity.isLoading}
         />
 
-        <IconButton
+        <Button
           variant="outline"
           ml={4}
           aria-label="delete-cartitem"
           size="xs"
           onClick={() => handleOptionDelete(option.id)}
           isLoading={deleteCartItemOpt.isLoading}
-          icon={<DeleteIcon />}
-        />
+          leftIcon={<DeleteIcon />}
+        >
+          옵션삭제
+        </Button>
       </Flex>
     ),
     [

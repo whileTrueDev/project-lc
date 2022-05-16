@@ -38,7 +38,7 @@ export function OrderPaymentForm(): JSX.Element | null {
         px={4}
         py={6}
         mb={{ base: 0, lg: 20 }}
-        // TODO: form submit 처리를 여기서 진행하도록 수정
+        // TODO: form submit 처리를 여기서 진행하도록 수정 (PaymentBox가 아니라)
         // as="form"
         // onSubmit={methods.handleSubmit(onSubmit)}
       >
