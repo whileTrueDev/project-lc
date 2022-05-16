@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   PaymentByOrderId,
@@ -6,6 +6,11 @@ import {
   TossPaymentCancelDto,
 } from '@project-lc/shared-types';
 import { PaymentsByDateRequestType, TossPaymentsApi } from '@project-lc/utils';
+
+export enum KKsPaymentProviders {
+  TossPayments = 'TossPayments',
+  NaverPay = 'NaverPay', // 코드 이해를 위해 임시로 추가해둠. 현재 사용하지 않음 (220516 by hwasurr)
+}
 
 @Injectable()
 export class PaymentService {
@@ -52,25 +57,32 @@ export class PaymentService {
   }
 
   /** 토스페이먼츠 결제취소 요청 래핑 & 에러핸들링 */
-  async requestCancelTossPayment(
-    dto: TossPaymentCancelDto,
+  async requestCancel<P extends KKsPaymentProviders, DTO extends PaymentCancelDto<P>>(
+    provider: P,
+    _dto: DTO,
   ): Promise<{ transactionKey: string } & Record<string, any>> {
     try {
-      const cancelResult = await TossPaymentsApi.requestCancelPayment({
-        paymentKey: dto.paymentKey,
-        cancelReason: dto.cancelReason,
-        cancelAmount: dto.cancelAmount,
-        // 토스페이먼츠 가상계좌로 지불하여 환불계좌정보 있는 경우
-        refundReceiveAccount: dto.refundReceiveAccount
-          ? {
-              bank: dto.refundReceiveAccount.bank,
-              accountNumber: dto.refundReceiveAccount.accountNumber,
-              holderName: dto.refundReceiveAccount.holderName,
-            }
-          : undefined,
-      });
+      if (provider === KKsPaymentProviders.TossPayments) {
+        const dto = _dto as TossPaymentCancelDto;
+        const cancelResult = await TossPaymentsApi.requestCancelPayment({
+          paymentKey: dto.paymentKey,
+          cancelReason: dto.cancelReason,
+          cancelAmount: dto.cancelAmount,
+          // 토스페이먼츠 가상계좌로 지불하여 환불계좌정보 있는 경우
+          refundReceiveAccount: dto.refundReceiveAccount
+            ? {
+                bank: dto.refundReceiveAccount.bank,
+                accountNumber: dto.refundReceiveAccount.accountNumber,
+                holderName: dto.refundReceiveAccount.holderName,
+              }
+            : undefined,
+        });
 
-      return cancelResult;
+        return cancelResult;
+      }
+      throw new InternalServerErrorException(
+        'Failed to cancel. requestCancel - "provider" must be defined',
+      );
     } catch (error) {
       console.error(error.response);
       throw new HttpException(
@@ -80,3 +92,11 @@ export class PaymentService {
     }
   }
 }
+/** Payment프로바이더별 DTO 맵 { TossPayments:{ ...TossDto }, NaverPay: { ...NaverDto} } */
+type IPaymentCancelKeyMap = Record<
+  KKsPaymentProviders.TossPayments,
+  TossPaymentCancelDto
+> &
+  Record<KKsPaymentProviders.NaverPay, { dtoExampleField: unknown }>;
+/** Payment프로바이더별 결제 취소 DTO */
+type PaymentCancelDto<T extends KKsPaymentProviders> = IPaymentCancelKeyMap[T];

@@ -2,7 +2,7 @@ import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/
 import { Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
-import { PaymentService } from '@project-lc/nest-modules-payment';
+import { KKsPaymentProviders, PaymentService } from '@project-lc/nest-modules-payment';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateRefundDto,
@@ -122,7 +122,8 @@ export class RefundService extends ServiceBaseWithCache {
     let transactionKey: string | undefined;
     // 1. 토스페이먼츠 결제취소 api 사용하는 경우 transaction키 받기
     if (rest.paymentKey) {
-      const cancelResult = await this.paymentService.requestCancelTossPayment(
+      const cancelResult = await this.paymentService.requestCancel(
+        KKsPaymentProviders.TossPayments,
         this.makeTosspaymentCancelDtoFromCreateRefundDto(dto),
       );
       transactionKey = cancelResult.transactionKey;
