@@ -1,9 +1,6 @@
-import { Button, Center, Stack, Text } from '@chakra-ui/react';
+import { Button, Center, Stack } from '@chakra-ui/react';
 import { useCustomerInfiniteOrderCancellationList } from '@project-lc/hooks';
-import {
-  DesktopExchangeReturnCancelListHeader,
-  ExchangeReturnCancelListItem,
-} from './ExchangeReturnCancelListItem';
+import { ExchangeReturnCancelListItem } from './ExchangeReturnCancelListItem';
 
 export function CustomerOrderCancelList({
   customerId,
@@ -18,11 +15,6 @@ export function CustomerOrderCancelList({
 
   return (
     <Stack>
-      <Text>주문취소 요청 목록</Text>
-
-      <Stack display={{ base: 'none', md: 'block' }}>
-        <DesktopExchangeReturnCancelListHeader />
-      </Stack>
       {data?.pages.map((group, i) => (
         // eslint-disable-next-line react/no-array-index-key
         <Stack key={`page-${i}`} spacing={4}>
