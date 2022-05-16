@@ -12,6 +12,8 @@ import {
   ButtonGroup,
   Collapse,
   Flex,
+  FormControl,
+  FormErrorMessage,
   Grid,
   GridItem,
   IconButton,
@@ -241,15 +243,20 @@ function GoodsViewBroadcasterSupportBox({
                     (최대 30자)
                   </Text>
                 </Text>
-                <Textarea
-                  minH="55px"
-                  resize="none"
-                  rounded="md"
-                  size="sm"
-                  placeholder="방송인 후원 메시지 도네이션 표시글"
-                  value={supportMessage}
-                  onChange={(e) => onSupMsgChange(e.target.value)}
-                />
+                <FormControl isInvalid={supportMessage.length >= 30}>
+                  <Textarea
+                    minH="55px"
+                    resize="none"
+                    rounded="md"
+                    size="sm"
+                    placeholder="방송인 후원 메시지 도네이션 표시글"
+                    value={supportMessage}
+                    onChange={(e) => onSupMsgChange(e.target.value)}
+                  />
+                  <FormErrorMessage fontSize="xs">
+                    후원 메시지는 30자까지 작성가능합니다.
+                  </FormErrorMessage>
+                </FormControl>
               </Box>
             </Flex>
           )}
@@ -349,9 +356,12 @@ function GoodsViewButtonSet({
           name: o.option_title,
           value: o.option1,
         })),
+        // TODO: 상품 배송비 판단 로직 이후 수정 필요
         shippingCost: 2500,
         shippingCostIncluded: false,
         shippingGroupId: goods.shippingGroupId,
+        // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
+        channel: 'normal',
         support: selectedBc
           ? {
               broadcasterId: selectedBc.id,
@@ -373,6 +383,10 @@ function GoodsViewButtonSet({
   // 주문 클릭시
   const handleOrderClick = useCallback(
     (type: 'gift' | 'instant-order' = 'instant-order'): void => {
+      if (!(selectedOpts.length > 0)) {
+        toast({ title: '선택된 옵션이 없습니다.', status: 'warning' });
+        return;
+      }
       const isGiftOrder = type === 'gift';
       orderPrepare({
         orderPrice: totalInfo.price,
@@ -413,15 +427,16 @@ function GoodsViewButtonSet({
       router.push('/payment');
     },
     [
-      selectedBc,
+      selectedOpts,
       orderPrepare,
       totalInfo.price,
+      selectedBc,
       goods.goods_name,
       goods.id,
       goods.shippingGroupId,
-      selectedOpts,
       supportMessage,
       router,
+      toast,
     ],
   );
 

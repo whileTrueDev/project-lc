@@ -1,9 +1,17 @@
-import { CartItem, CartItemOption, CartItemSupport, Customer } from '@prisma/client';
+import {
+  CartItem,
+  CartItemOption,
+  CartItemSupport,
+  Customer,
+  Order,
+  SellType,
+} from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
   IsDecimal,
+  IsEnum,
   IsNotEmptyObject,
   IsNumber,
   IsObject,
@@ -38,6 +46,9 @@ export class CartItemDto {
   @IsOptional() @IsNumber() shippingGroupId?: CartItem['shippingGroupId'];
   @IsNumber() shippingCost: number;
   @IsBoolean() shippingCostIncluded: CartItem['shippingCostIncluded'];
+
+  // 유입 상품의 경로 정보
+  @IsEnum(SellType) channel: SellType;
 
   @ValidateNested({ each: true })
   @Type(() => CartItemOptionDto)

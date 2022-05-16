@@ -1400,6 +1400,8 @@ model CartItem {
   shippingCostIncluded Boolean          @default(false) // 이 장바구니 상품에 동일 판매자의 배송비가 포함되었는지 여부
   shippingGroupId      Int? // 연결된 배송정책 id
   shippingGroup        ShippingGroup?   @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
+
+  channel SellType @default(normal) // 판매유형(주문경로)
 }
 
 // 장바구니 상품옵션
