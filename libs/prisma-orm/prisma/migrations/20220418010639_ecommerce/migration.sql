@@ -301,7 +301,7 @@ CREATE TABLE `Order` (
 -- CreateTable
 CREATE TABLE `OrderPayment` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `method` ENUM('card', 'bank', 'account') NOT NULL,
+    `method` ENUM('card', 'transfer', 'virtualAccount') NOT NULL,
     `orderId` INTEGER NULL,
     `paymentKey` VARCHAR(191) NOT NULL,
     `depositDate` DATETIME(3) NULL,
@@ -358,14 +358,14 @@ CREATE TABLE `Refund` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `refundCode` VARCHAR(191) NULL,
     `orderId` INTEGER NOT NULL,
-    `status` ENUM('requested', 'processing', 'complete', 'canceled') NOT NULL DEFAULT 'requested',
-    `requestDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `completeDate` DATETIME(3) NULL,
+    `completeDate` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
     `reason` VARCHAR(191) NOT NULL,
+    `memo` VARCHAR(191) NOT NULL,
+    `refundBank` VARCHAR(191) NULL,
     `refundAccount` VARCHAR(191) NULL,
     `refundAccountHolder` VARCHAR(191) NULL,
-    `responsibility` VARCHAR(191) NOT NULL,
-    `totalRefundAmount` INTEGER NOT NULL,
+    `responsibility` VARCHAR(191) NULL,
+    `refundAmount` INTEGER NOT NULL,
     `paymentKey` VARCHAR(191) NULL,
     `transactionKey` VARCHAR(191) NULL,
 
@@ -380,7 +380,6 @@ CREATE TABLE `RefundItem` (
     `orderItemId` INTEGER NOT NULL,
     `orderItemOptionId` INTEGER NOT NULL,
     `amount` INTEGER NOT NULL,
-    `status` ENUM('requested', 'processing', 'complete', 'canceled') NOT NULL DEFAULT 'requested',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -397,6 +396,7 @@ CREATE TABLE `Return` (
     `rejectReason` VARCHAR(191) NULL,
     `returnAddress` VARCHAR(191) NOT NULL,
     `responsibility` VARCHAR(191) NOT NULL,
+    `refundId` INTEGER NULL,
 
     UNIQUE INDEX `Return_returnCode_key`(`returnCode`),
     PRIMARY KEY (`id`)
@@ -714,6 +714,10 @@ ALTER TABLE `RefundItem` ADD CONSTRAINT `RefundItem_refundId_fkey` FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE `Return` ADD CONSTRAINT `Return_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Return` ADD CONSTRAINT `Return_refundId_fkey` FOREIGN KEY (`refundId`) REFERENCES `Refund`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
 
 -- AddForeignKey
 ALTER TABLE `ReturnItem` ADD CONSTRAINT `ReturnItem_orderItemId_fkey` FOREIGN KEY (`orderItemId`) REFERENCES `OrderItem`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

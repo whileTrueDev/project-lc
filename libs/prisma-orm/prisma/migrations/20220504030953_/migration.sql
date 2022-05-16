@@ -5,7 +5,6 @@ ALTER TABLE `Exchange` ADD COLUMN `memo` VARCHAR(191) NULL,
 
 -- AlterTable
 ALTER TABLE `Return` ADD COLUMN `memo` VARCHAR(191) NULL,
-    ADD COLUMN `refundId` INTEGER NULL,
     ADD COLUMN `returnBank` VARCHAR(191) NULL,
     ADD COLUMN `returnBankAccount` VARCHAR(191) NULL,
     MODIFY `returnAddress` VARCHAR(191) NULL,
@@ -30,9 +29,6 @@ CREATE TABLE `ExchangeImage` (
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- AddForeignKey
-ALTER TABLE `Return` ADD CONSTRAINT `Return_refundId_fkey` FOREIGN KEY (`refundId`) REFERENCES `Refund`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ReturnImage` ADD CONSTRAINT `ReturnImage_returnId_fkey` FOREIGN KEY (`returnId`) REFERENCES `Return`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
