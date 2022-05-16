@@ -28,7 +28,7 @@ export function ExchangeReturnListSection(): JSX.Element {
   }
   if (!profileData) return <Text>로그인이 필요합니다</Text>;
   return (
-    <Stack>
+    <Stack p={2}>
       <Stack direction="row">
         {tabs.map((tab) => (
           <Button

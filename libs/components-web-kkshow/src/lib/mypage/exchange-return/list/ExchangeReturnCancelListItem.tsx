@@ -64,9 +64,13 @@ export function ExchangeReturnCancelListItem({
       {/* 모바일인 경우 */}
       <Box display={{ base: 'block', md: 'none' }}>
         <Stack>
-          <Stack direction="row">
-            <Text>{identifierCode}</Text>
-            <Button size="sm" onClick={showDetail}>
+          <Stack direction="row" justifyContent="space-between">
+            <Stack direction="row">
+              <Text>고유코드 : </Text>
+              <Text fontWeight="bold">{identifierCode}</Text>
+            </Stack>
+
+            <Button size="xs" onClick={showDetail}>
               상세보기
             </Button>
           </Stack>
@@ -76,11 +80,10 @@ export function ExchangeReturnCancelListItem({
               <RequestGoodsData key={item.id} {...item} />
             ))}
           </Stack>
-          <Text>주문코드 : {data.order.orderCode}</Text>
           <Box>
             <Text>상태 : {processText}</Text>
             <Text>요청일 : {requestDate}</Text>
-            <Text>완료일 : {completeDate}</Text>
+            {completeDate && <Text>완료일 : {completeDate}</Text>}
           </Box>
         </Stack>
       </Box>
@@ -99,7 +102,6 @@ export function ExchangeReturnCancelListItem({
             {data.items.map((item) => (
               <RequestGoodsData key={item.id} {...item} />
             ))}
-            <Text>주문코드 : {data.order.orderCode}</Text>
           </Box>
 
           <Box width="15%">

@@ -1,4 +1,4 @@
-import { Button, Center, Stack } from '@chakra-ui/react';
+import { Button, Center, Stack, Text } from '@chakra-ui/react';
 import { useCustomerInfiniteExchangeList } from '@project-lc/hooks';
 import { ExchangeReturnCancelListItem } from './ExchangeReturnCancelListItem';
 
@@ -14,6 +14,9 @@ export function CustomerExchangeList({
     });
   return (
     <Stack>
+      {data?.pages[0].totalCount === 0 && (
+        <Text textAlign="center">재배송 요청 내역이 없습니다</Text>
+      )}
       {data?.pages.map((group, i) => (
         // eslint-disable-next-line react/no-array-index-key
         <Stack key={`page-${i}`} spacing={4}>
