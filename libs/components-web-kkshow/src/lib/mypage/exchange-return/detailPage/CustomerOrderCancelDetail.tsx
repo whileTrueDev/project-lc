@@ -10,6 +10,7 @@ import {
   ExchangeReturnCancelRequestGoodsData,
   ExchangeReturnCancelRequestStatusBadge,
 } from '../list/ExchangeReturnCancelListItem';
+import RelatedRefundData from './RelatedRefundData';
 
 export interface CustomerOrderCancelDetailProps {
   cancelCode: string;
@@ -37,14 +38,13 @@ export function CustomerOrderCancelDetail({
 
 export default CustomerOrderCancelDetail;
 
-export interface Props {
+export function OrderCancelDetailData({
+  data,
+}: {
   data: OrderCancellationData;
-}
-
-export function OrderCancelDetailData(props: Props): JSX.Element {
+}): JSX.Element {
   const router = useRouter();
   const toast = useToast();
-  const { data } = props;
 
   const requestDate = dayjs(data.requestDate).format('YYYY-MM-DD');
   const completeDate = data.completeDate
@@ -122,28 +122,13 @@ export function OrderCancelDetailData(props: Props): JSX.Element {
         </Stack>
       </Stack>
 
-      <Stack>
-        <Text fontWeight="bold">환불안내</Text>
-        <Stack pl={4}>
-          {data.refund ? (
-            <Stack>
-              <Text>환불 완료 금액 :</Text>
-              <Text>{data.refund.refundAmount.toLocaleString()}원</Text>
-            </Stack>
-          ) : (
-            <Stack>
-              <Text>환불 예정 금액 :</Text>
-              <Text>
-                {data.items
-                  .map((item) => item.price)
-                  .reduce((sum, price) => sum + price)
-                  .toLocaleString()}
-                원
-              </Text>
-            </Stack>
-          )}
-        </Stack>
-      </Stack>
+      {/* 환불정보 */}
+      <RelatedRefundData
+        refund={data.refund}
+        estimatedRefundAmount={data.items
+          .map((item) => item.price)
+          .reduce((sum, price) => sum + price)}
+      />
     </Stack>
   );
 }
