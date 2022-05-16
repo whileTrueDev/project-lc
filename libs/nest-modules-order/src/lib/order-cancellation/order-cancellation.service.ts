@@ -180,9 +180,11 @@ export class OrderCancellationService extends ServiceBaseWithCache {
       return { ...rest, items: _items };
     });
 
+    const nextCursor = dto.skip + dto.take;
     return {
       list,
       totalCount,
+      nextCursor: nextCursor >= totalCount ? undefined : nextCursor,
     };
   }
 

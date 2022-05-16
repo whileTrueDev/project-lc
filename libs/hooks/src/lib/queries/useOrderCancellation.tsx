@@ -1,27 +1,26 @@
-import { GetOrderCancellationListDto } from '@project-lc/shared-types';
+import {
+  GetOrderCancellationListDto,
+  OrderCancellationListRes,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useQuery, UseQueryResult } from 'react-query';
+import { useInfiniteQuery, UseInfiniteQueryResult } from 'react-query';
 import axios from '../../axios';
-
-export interface OrderCancellation {
-  _field: 'default field';
-}
 
 export const getOrderCancellation = async (
   dto: GetOrderCancellationListDto,
-): Promise<OrderCancellation> => {
+): Promise<OrderCancellationListRes> => {
   return axios
-    .get<OrderCancellation>('/order/cancellation/list', { params: dto })
+    .get<OrderCancellationListRes>('/order/cancellation/list', { params: dto })
     .then((res) => res.data);
 };
 
 /** 소비자 주문취소요청 목록조회 훅 */
-export const useCustomerOrderCancellationList = (
+export const useCustomerInfiniteOrderCancellationList = (
   dto: GetOrderCancellationListDto,
-): UseQueryResult<OrderCancellation, AxiosError> => {
-  return useQuery<OrderCancellation, AxiosError>(
-    ['OrderCancellationList', dto.customerId],
-    () => getOrderCancellation(dto),
-    { enabled: !!dto.customerId },
+): UseInfiniteQueryResult<OrderCancellationListRes, AxiosError> => {
+  return useInfiniteQuery(
+    ['InfiniteCustomerOrderCancellation', dto.customerId],
+    ({ pageParam = 0 }) => getOrderCancellation({ ...dto, skip: pageParam }),
+    { getNextPageParam: (lastPage) => lastPage?.nextCursor },
   );
 };
