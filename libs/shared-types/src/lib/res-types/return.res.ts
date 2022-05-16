@@ -13,7 +13,7 @@ export type ReturnItemData = ExchangeReturnCancelItemBaseData & {
 };
 
 export type ReturnData = Omit<Return, 'items'> & {
-  refund: Refund;
+  refund: Refund | null;
   order: { orderCode: Order['orderCode'] };
   items: ReturnItemData[];
 };
@@ -23,7 +23,7 @@ export type ReturnListRes = {
   nextCursor?: number;
 };
 
-export type ReturnDetailRes = any;
+export type ReturnDetailRes = ReturnData;
 
 export type UpdateReturnRes = boolean;
 

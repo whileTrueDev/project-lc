@@ -1,9 +1,18 @@
-import { GetReturnListDto, ReturnListRes } from '@project-lc/shared-types';
+import {
+  GetReturnListDto,
+  ReturnDetailRes,
+  ReturnListRes,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useInfiniteQuery, UseInfiniteQueryResult } from 'react-query';
+import {
+  useInfiniteQuery,
+  UseInfiniteQueryResult,
+  UseQueryResult,
+  useQuery,
+} from 'react-query';
 import axios from '../../axios';
 
-export const getReturn = async (dto: GetReturnListDto): Promise<ReturnListRes> => {
+export const getReturnList = async (dto: GetReturnListDto): Promise<ReturnListRes> => {
   return axios.get<ReturnListRes>('/return', { params: dto }).then((res) => res.data);
 };
 
@@ -13,7 +22,22 @@ export const useCustomerInfiniteReturnList = (
 ): UseInfiniteQueryResult<ReturnListRes, AxiosError> => {
   return useInfiniteQuery(
     ['InfiniteCustomerReturnList', dto.customerId],
-    ({ pageParam = 0 }) => getReturn({ ...dto, skip: pageParam }),
+    ({ pageParam = 0 }) => getReturnList({ ...dto, skip: pageParam }),
     { getNextPageParam: (lastPage) => lastPage?.nextCursor },
+  );
+};
+
+/** 소비자 특정 반품요청 상세조회 */
+export const getReturnDetail = async (returnCode: string): Promise<ReturnDetailRes> => {
+  return axios.get(`/return/${returnCode}`).then((res) => res.data);
+};
+
+export const useReturnDetail = (
+  returnCode: string,
+): UseQueryResult<ReturnDetailRes, AxiosError> => {
+  return useQuery(
+    ['customerReturnDetail', returnCode],
+    () => getReturnDetail(returnCode),
+    { enabled: !!returnCode },
   );
 };

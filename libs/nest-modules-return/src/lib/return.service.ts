@@ -140,18 +140,54 @@ export class ReturnService extends ServiceBaseWithCache {
   }
 
   /** 특정 반품요청 상세 조회 */
-  async getReturnDetail(id: number): Promise<ReturnDetailRes> {
-    await this.findUnique({ id });
+  async getReturnDetail(returnCode: string): Promise<ReturnDetailRes> {
+    await this.findUnique({ returnCode });
 
-    return this.prisma.return.findUnique({
-      where: { id },
+    const data = await this.prisma.return.findUnique({
+      where: { returnCode },
       include: {
-        order: { select: { orderCode: true, id: true } },
-        items: true,
-        images: true,
+        order: { select: { orderCode: true } },
         refund: true,
+        items: {
+          include: {
+            orderItem: {
+              select: {
+                id: true,
+                goods: {
+                  select: {
+                    id: true,
+                    goods_name: true,
+                    image: true,
+                    seller: { select: { sellerShop: true } },
+                  },
+                },
+              },
+            },
+            orderItemOption: true,
+          },
+        },
+        images: true,
       },
     });
+    const { items, ...rest } = data;
+    const _items = items.map((i) => ({
+      id: i.id, // 반품 상품 고유번호
+      amount: i.amount, // 반품 상품 개수
+      status: i.status, // 반품 상품 처리상태
+      goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
+      image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지
+      shopName: i.orderItem.goods.seller.sellerShop?.shopName, // 주문상품 판매상점명
+      optionName: i.orderItemOption.name, // 주문상품옵션명
+      optionValue: i.orderItemOption.value, // 주문상품옵션 값
+      price: Number(i.orderItemOption.discountPrice), // 주문상품옵션 가격
+      orderItemId: i.orderItem.id, // 연결된 주문상품고유번호
+      orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
+    }));
+
+    return {
+      ...rest,
+      items: _items,
+    };
   }
 
   /** 반품요청 상태 변경(판매자 혹은 관리자가 진행) */
