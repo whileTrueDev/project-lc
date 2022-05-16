@@ -1,13 +1,11 @@
 import { Button, Center, Spinner, Stack, Text } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
+import { ExchangeReturnCancelType } from '@project-lc/shared-types';
 import { useState } from 'react';
 import CustomerExchangeList from './list/CustomerExchangeList';
 import CustomerOrderCancelList from './list/CustomerOrderCancelList';
 import CustomerReturnList from './list/CustomerReturnList';
-import {
-  DesktopExchangeReturnCancelListHeader,
-  ExchangeReturnCancelType,
-} from './list/ExchangeReturnCancelListItem';
+import { DesktopExchangeReturnCancelListHeader } from './list/ExchangeReturnCancelListItem';
 
 type Tab = { key: ExchangeReturnCancelType; text: string };
 const tabs: Tab[] = [

@@ -1,49 +1,27 @@
-import { Box, Button, Stack, Text } from '@chakra-ui/react';
+import { Badge, Box, Button, Stack, Text } from '@chakra-ui/react';
 import { ExchangeProcessStatus } from '@prisma/client';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
 import {
-  ExchangeData,
+  CancelListItem,
+  ExchangeListItem,
   ExchangeReturnCancelItemBaseData,
-  OrderCancellationData,
-  ReturnData,
+  processTextDict,
+  ReturnListItem,
 } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
-
-export type ExchangeReturnCancelType = 'exchange' | 'return' | 'cancel';
-export interface ExchangeReturnCancelListItemBase {
-  type: ExchangeReturnCancelType;
-}
-export interface ExchangeListItem extends ExchangeReturnCancelListItemBase {
-  type: 'exchange';
-  data: ExchangeData;
-}
-export interface ReturnListItem extends ExchangeReturnCancelListItemBase {
-  type: 'return';
-  data: ReturnData;
-}
-export interface CancelListItem extends ExchangeReturnCancelListItemBase {
-  type: 'cancel';
-  data: OrderCancellationData;
-}
+import { useRouter } from 'next/router';
 
 export type ExchangeReturnCancelListItemProps =
   | ExchangeListItem
   | ReturnListItem
   | CancelListItem;
 
-const processTextDict: Record<ExchangeProcessStatus, string> = {
-  requested: '요청됨',
-  collected: '수거됨',
-  processing: '처리진행중',
-  complete: '처리완료',
-  canceled: '취소됨',
-};
-
 export function ExchangeReturnCancelListItem({
   type,
   data,
 }: ExchangeReturnCancelListItemProps): JSX.Element {
+  const router = useRouter();
   let identifierCode: string | null = '';
   if (type === 'cancel') identifierCode = data.cancelCode;
   if (type === 'exchange') identifierCode = data.exchangeCode;
@@ -53,10 +31,9 @@ export function ExchangeReturnCancelListItem({
   const completeDate = data.completeDate
     ? dayjs(data.completeDate).format('YYYY-MM-DD')
     : '';
-  const processText = processTextDict[data.status];
 
   const showDetail = (): void => {
-    console.log({ type, identifierCode, id: data.id });
+    router.push(`/mypage/exchange-return/${type}/${identifierCode}`);
   };
 
   return (
@@ -77,11 +54,15 @@ export function ExchangeReturnCancelListItem({
 
           <Stack>
             {data.items.map((item) => (
-              <RequestGoodsData key={item.id} {...item} />
+              <ExchangeReturnCancelRequestGoodsData key={item.id} {...item} />
             ))}
           </Stack>
           <Box>
-            <Text>상태 : {processText}</Text>
+            <Stack direction="row">
+              <Text>상태 :</Text>
+              <ExchangeReturnCancelRequestStatusBadge status={data.status} />
+            </Stack>
+
             <Text>요청일 : {requestDate}</Text>
             {completeDate && <Text>완료일 : {completeDate}</Text>}
           </Box>
@@ -100,7 +81,7 @@ export function ExchangeReturnCancelListItem({
 
           <Box width="40%">
             {data.items.map((item) => (
-              <RequestGoodsData key={item.id} {...item} />
+              <ExchangeReturnCancelRequestGoodsData key={item.id} {...item} />
             ))}
           </Box>
 
@@ -109,8 +90,8 @@ export function ExchangeReturnCancelListItem({
           </Box>
 
           <Box width="15%">
-            <Text>{processText}</Text>
-            <Button size="sm" onClick={showDetail}>
+            <ExchangeReturnCancelRequestStatusBadge status={data.status} />
+            <Button size="xs" onClick={showDetail}>
               상세보기
             </Button>
           </Box>
@@ -144,10 +125,35 @@ export function DesktopExchangeReturnCancelListHeader(): JSX.Element {
     </Stack>
   );
 }
-interface RequestGoodsDataProps extends ExchangeReturnCancelItemBaseData {
+
+/** 교환,환불,주문취소 요청 처리상태 배지 */
+export function ExchangeReturnCancelRequestStatusBadge({
+  status,
+  prefix,
+  suffix,
+}: {
+  status: ExchangeProcessStatus;
+  prefix?: string;
+  suffix?: string;
+}): JSX.Element {
+  return (
+    <Box>
+      <Badge colorScheme={processTextDict[status].color} variant="solid">
+        {prefix}
+        {processTextDict[status].name}
+        {suffix}
+      </Badge>
+    </Box>
+  );
+}
+interface ExchangeReturnCancelRequestGoodsDataProps
+  extends ExchangeReturnCancelItemBaseData {
   amount: number;
 }
-export function RequestGoodsData(props: RequestGoodsDataProps): JSX.Element {
+/** 교환,환불,주문취소 상품 & 옵션 & 개수 표시 컴포넌트 */
+export function ExchangeReturnCancelRequestGoodsData(
+  props: ExchangeReturnCancelRequestGoodsDataProps,
+): JSX.Element {
   const { goodsName, image, optionName, optionValue, amount, price } = props;
   return (
     <Stack direction="row" alignItems="center">
