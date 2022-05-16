@@ -76,7 +76,7 @@ export function LoginForm({
         if (nextPage) {
           router.push(nextPage.startsWith('/') ? nextPage : `/${nextPage}`);
         } else {
-          router.push('/');
+          router.push('/mypage');
         }
       }
     },

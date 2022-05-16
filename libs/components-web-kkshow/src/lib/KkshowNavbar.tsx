@@ -214,7 +214,11 @@ function LoginButton(): JSX.Element {
 
   return (
     <Tooltip label="로그인하기" fontSize="xs">
-      <Button variant="unstyle" color="current" onClick={() => router.push('/login')}>
+      <Button
+        variant="unstyle"
+        color="current"
+        onClick={() => router.push('/login?nextpage=/')}
+      >
         로그인
       </Button>
     </Tooltip>
