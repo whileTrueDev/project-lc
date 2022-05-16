@@ -57,7 +57,7 @@ export function OrderCancelDetailData({
       .then((res) => {
         console.log(res);
         toast({ title: '주문취소 요청을 철회하였습니다', status: 'success' });
-        router.push('/mypage/exchange-return');
+        router.push('/mypage/exchange-return-cancel');
       })
       .catch((e) => {
         toast({

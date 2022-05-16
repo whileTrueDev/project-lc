@@ -1,5 +1,5 @@
 import { ProcessStatus } from '@prisma/client';
-import { ExchangeReturnCancelRequestStatusBadge } from '../exchange-return/list/ExchangeReturnCancelListItem';
+import { ExchangeReturnCancelRequestStatusBadge } from '../exchange-return-cancel/list/ExchangeReturnCancelListItem';
 
 export function OrderCancelStatusBadge({
   status,

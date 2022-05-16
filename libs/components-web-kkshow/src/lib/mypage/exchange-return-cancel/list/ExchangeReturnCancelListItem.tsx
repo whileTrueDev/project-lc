@@ -33,7 +33,7 @@ export function ExchangeReturnCancelListItem({
     : '';
 
   const showDetail = (): void => {
-    router.push(`/mypage/exchange-return/${type}/${identifierCode}`);
+    router.push(`/mypage/exchange-return-cancel/${type}/${identifierCode}`);
   };
 
   return (

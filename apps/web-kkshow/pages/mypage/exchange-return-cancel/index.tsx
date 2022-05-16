@@ -1,5 +1,5 @@
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
-import ExchangeReturnListSection from '@project-lc/components-web-kkshow/mypage/exchange-return/ExchangeReturnListSection';
+import ExchangeReturnListSection from '@project-lc/components-web-kkshow/mypage/exchange-return-cancel/ExchangeReturnListSection';
 
 export function ExchangeReturnIndex(): JSX.Element {
   return (

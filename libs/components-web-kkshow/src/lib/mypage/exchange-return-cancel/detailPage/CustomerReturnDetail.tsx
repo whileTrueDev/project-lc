@@ -48,7 +48,7 @@ export function ReturnDetailData({ data }: { data: ReturnData }): JSX.Element {
       .then((res) => {
         console.log(res);
         toast({ title: '환불요청을 철회하였습니다', status: 'success' });
-        router.push('/mypage/exchange-return');
+        router.push('/mypage/exchange-return-cancel');
       })
       .catch((e) => {
         toast({

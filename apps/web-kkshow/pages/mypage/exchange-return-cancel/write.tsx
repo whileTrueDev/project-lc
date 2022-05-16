@@ -1,5 +1,5 @@
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
-import { ExchangeReturnWriteSection } from '@project-lc/components-web-kkshow/mypage/exchange-return/ExchangeReturnWriteSection';
+import { ExchangeReturnWriteSection } from '@project-lc/components-web-kkshow/mypage/exchange-return-cancel/ExchangeReturnWriteSection';
 
 import { useRouter } from 'next/router';
 

@@ -51,7 +51,7 @@ export function OrderItemActionButtons({
     },
     {
       label: '재배송/환불 신청',
-      onClick: () => router.push(`/mypage/exchange-return/write?orderId=${orderId}`),
+      onClick: () => router.push(`/mypage/exchange-return-cancel/write?orderId=${orderId}`),
       display: exchangeReturnAbleSteps.includes(step) && !purchaseConfirmationDate, // 상품준비 이후 표시 && 구매확정 안했을 때
       disabled: !!purchaseConfirmationDate, // 구매확정 이후 disabled
     },
