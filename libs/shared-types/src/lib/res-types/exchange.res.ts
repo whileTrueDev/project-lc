@@ -1,9 +1,9 @@
 import { Exchange, ExchangeItem, Export, Order } from '@prisma/client';
-import { ExchangeReturnCancelItemBase } from './orderCancellation.res';
+import { ExchangeReturnCancelItemBaseData } from './orderCancellation.res';
 
 export type CreateExchangeRes = Exchange;
 
-export type ExchangeItemData = ExchangeReturnCancelItemBase & {
+export type ExchangeItemData = ExchangeReturnCancelItemBaseData & {
   /** 교환상품 고유번호 */
   id: ExchangeItem['id'];
   /** 교환상품 개수 */
@@ -19,6 +19,7 @@ export type ExchangeData = Omit<Exchange, 'exchangeItems'> & {
 export type ExchangeListRes = {
   list: ExchangeData[];
   totalCount: number;
+  nextCursor?: number;
 };
 
 export type ExchangeDetailRes = any;

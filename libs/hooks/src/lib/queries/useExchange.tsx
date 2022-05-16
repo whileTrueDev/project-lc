@@ -1,6 +1,6 @@
-import { GetExchangeListDto, ExchangeListRes } from '@project-lc/shared-types';
+import { ExchangeListRes, GetExchangeListDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useQuery, UseQueryResult } from 'react-query';
+import { useInfiniteQuery, UseInfiniteQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export const getExchange = async (dto: GetExchangeListDto): Promise<ExchangeListRes> => {
@@ -8,14 +8,12 @@ export const getExchange = async (dto: GetExchangeListDto): Promise<ExchangeList
 };
 
 /** 소비자 교환(재배송)내역 목록 조회 */
-export const useCustomerExchangeList = (
+export const useCustomerInfiniteExchangeList = (
   dto: GetExchangeListDto,
-): UseQueryResult<ExchangeListRes, AxiosError> => {
-  return useQuery<ExchangeListRes, AxiosError>(
-    ['customerExchangeList', dto.customerId],
-    () => getExchange(dto),
-    {
-      enabled: !!dto.customerId,
-    },
+): UseInfiniteQueryResult<ExchangeListRes, AxiosError> => {
+  return useInfiniteQuery(
+    ['InfiniteCustomerExchangeList', dto.customerId],
+    ({ pageParam = 0 }) => getExchange({ ...dto, skip: pageParam }),
+    { getNextPageParam: (lastPage) => lastPage?.nextCursor },
   );
 };

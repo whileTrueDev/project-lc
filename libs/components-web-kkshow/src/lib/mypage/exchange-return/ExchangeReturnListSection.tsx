@@ -4,12 +4,15 @@ import { useState } from 'react';
 import CustomerExchangeList from './list/CustomerExchangeList';
 import CustomerOrderCancelList from './list/CustomerOrderCancelList';
 import CustomerReturnList from './list/CustomerReturnList';
-import { DesktopExchangeReturnCancelListHeader } from './list/ExchangeReturnCancelListItem';
+import {
+  DesktopExchangeReturnCancelListHeader,
+  ExchangeReturnCancelType,
+} from './list/ExchangeReturnCancelListItem';
 
-type Tab = { key: string; text: string };
+type Tab = { key: ExchangeReturnCancelType; text: string };
 const tabs: Tab[] = [
-  { key: 'orderCancellation', text: '주문취소' },
-  { key: 'refund', text: '환불' },
+  { key: 'cancel', text: '주문취소' },
+  { key: 'return', text: '환불' },
   { key: 'exchange', text: '재배송' },
 ];
 /** 소비자의 재배송/환불 목록 표시 컴포넌트 */
@@ -43,12 +46,15 @@ export function ExchangeReturnListSection(): JSX.Element {
         <DesktopExchangeReturnCancelListHeader />
       </Stack>
 
-      {currentTab.key === 'orderCancellation' && (
+      {currentTab.key === 'cancel' && (
         <CustomerOrderCancelList customerId={profileData.id} />
       )}
 
+      {/* {currentTab.key === 'return' && <CustomerReturnList customerId={profileData.id} />} */}
       {/* <CustomerReturnList /> */}
-      {/* <CustomerExchangeList /> */}
+      {currentTab.key === 'exchange' && (
+        <CustomerExchangeList customerId={profileData.id} />
+      )}
     </Stack>
   );
 }
