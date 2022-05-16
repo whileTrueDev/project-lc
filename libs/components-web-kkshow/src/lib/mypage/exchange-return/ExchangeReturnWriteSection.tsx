@@ -1,4 +1,12 @@
-import { Button, Divider, Stack, Text, useToast } from '@chakra-ui/react';
+import {
+  Button,
+  Center,
+  Divider,
+  Spinner,
+  Stack,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
 import { Preview } from '@project-lc/components-core/ImageInputDialog';
 import {
   useCustomerExchangeMutation,
@@ -83,9 +91,20 @@ export function ExchangeReturnWriteSection({
   if (!isPossibleExchangeOrReturn) {
     return <ExchangeReturnNotAllowed />;
   }
-  if (isLoading) return <Text>loading</Text>;
-  if (isError) return <Text>error</Text>;
-  if (!data) return <Text>no data</Text>;
+  if (isLoading)
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+  if (isError)
+    return (
+      <Text>
+        주문정보 조회 중 오류가 발생하였습니다. 잠시 후 다시 시도해주세요. 문제가 반복되면
+        고객센터로 문의 부탁드립니다.
+      </Text>
+    );
+  if (!data) return <ExchangeReturnNotAllowed />;
 
   const onSubmit: SubmitHandler<ExchangeReturnFormData> = async (formData) => {
     const { solution, reason, previews, ...rest } = formData;
