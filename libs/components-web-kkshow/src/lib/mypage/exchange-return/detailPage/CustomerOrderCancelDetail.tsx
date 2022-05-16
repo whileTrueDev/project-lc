@@ -125,11 +125,10 @@ export function OrderCancelDetailData(props: Props): JSX.Element {
       <Stack>
         <Text fontWeight="bold">환불안내</Text>
         <Stack pl={4}>
-          {data.refund && data.refund.status === 'complete' ? (
+          {data.refund ? (
             <Stack>
               <Text>환불 완료 금액 :</Text>
-              {/* //TODO : 환불 api 작업 합쳐진 후 수정필요(환불스키마 변경되었음)  */}
-              <Text>{data.refund.totalRefundAmount.toLocaleString()}원</Text>
+              <Text>{data.refund.refundAmount.toLocaleString()}원</Text>
             </Stack>
           ) : (
             <Stack>

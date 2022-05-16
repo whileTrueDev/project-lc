@@ -165,6 +165,12 @@ export class ReturnService extends ServiceBaseWithCache {
         ...rest,
         completeDate: dto.status && dto.status === 'complete' ? new Date() : undefined,
         refund: refundId ? { connect: { id: refundId } } : undefined,
+        items: {
+          updateMany: {
+            where: { returnId: id },
+            data: { status: dto.status },
+          },
+        },
       },
     });
 

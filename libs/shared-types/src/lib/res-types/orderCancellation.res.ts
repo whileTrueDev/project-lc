@@ -55,7 +55,7 @@ export type OrderCancellationListRes = {
   nextCursor?: number;
 };
 
-export type OrderCancellationDetailRes = OrderCancellationData; // TODO : 환불 api 합쳐진 후(환불 스키마 수정됨) 토스 결제데이터 추가
+export type OrderCancellationDetailRes = OrderCancellationData;
 
 // *------------ 주문취소 상태변경 리턴값 ------------------
 /** 주문취소 수정 리턴타입 */

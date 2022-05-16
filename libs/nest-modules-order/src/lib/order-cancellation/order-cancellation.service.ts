@@ -254,7 +254,7 @@ export class OrderCancellationService extends ServiceBaseWithCache {
     return !!data;
   }
 
-  /** 주문취소 상세조회 // TODO : 환불 api 작업 합쳐진 후 (refund 스키마 수정됨 & 토스주문내역 조회 서비스함수 있음) 리턴값에 refund 관련 내용 추가
+  /** 주문취소 상세조회
    */
   async getOrderCancellationDetail({
     cancelCode,
