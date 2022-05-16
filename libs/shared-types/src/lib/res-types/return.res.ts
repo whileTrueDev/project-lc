@@ -1,9 +1,9 @@
 import { Order, Refund, Return, ReturnItem } from '@prisma/client';
-import { ExchangeReturnCancelItemBase } from './orderCancellation.res';
+import { ExchangeReturnCancelItemBaseData } from './orderCancellation.res';
 
 export type CreateReturnRes = Return;
 
-export type ReturnItemData = ExchangeReturnCancelItemBase & {
+export type ReturnItemData = ExchangeReturnCancelItemBaseData & {
   /** 주문취소상품 고유번호 */
   id: ReturnItem['id'];
   /** 주문취소상품 개수 */
@@ -20,6 +20,7 @@ export type ReturnData = Omit<Return, 'items'> & {
 export type ReturnListRes = {
   list: ReturnData[];
   totalCount: number;
+  nextCursor?: number;
 };
 
 export type ReturnDetailRes = any;

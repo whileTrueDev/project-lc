@@ -1,6 +1,6 @@
 import { GetReturnListDto, ReturnListRes } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useQuery, UseQueryResult } from 'react-query';
+import { useInfiniteQuery, UseInfiniteQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export const getReturn = async (dto: GetReturnListDto): Promise<ReturnListRes> => {
@@ -8,14 +8,12 @@ export const getReturn = async (dto: GetReturnListDto): Promise<ReturnListRes> =
 };
 
 /** 소비자 반품목록 조회 */
-export const useCustomerReturnList = (
+export const useCustomerInfiniteReturnList = (
   dto: GetReturnListDto,
-): UseQueryResult<ReturnListRes, AxiosError> => {
-  return useQuery<ReturnListRes, AxiosError>(
-    ['customerReturnList', dto.customerId],
-    () => getReturn(dto),
-    {
-      enabled: !!dto.customerId,
-    },
+): UseInfiniteQueryResult<ReturnListRes, AxiosError> => {
+  return useInfiniteQuery(
+    ['InfiniteCustomerReturnList', dto.customerId],
+    ({ pageParam = 0 }) => getReturn({ ...dto, skip: pageParam }),
+    { getNextPageParam: (lastPage) => lastPage?.nextCursor },
   );
 };

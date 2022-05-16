@@ -26,7 +26,7 @@ export function ExchangeReturnListSection(): JSX.Element {
       </Center>
     );
   }
-  if (!profileData) return <Text>데이터가 없습니다</Text>;
+  if (!profileData) return <Text>로그인이 필요합니다</Text>;
   return (
     <Stack>
       <Stack direction="row">
@@ -50,8 +50,8 @@ export function ExchangeReturnListSection(): JSX.Element {
         <CustomerOrderCancelList customerId={profileData.id} />
       )}
 
-      {/* {currentTab.key === 'return' && <CustomerReturnList customerId={profileData.id} />} */}
-      {/* <CustomerReturnList /> */}
+      {currentTab.key === 'return' && <CustomerReturnList customerId={profileData.id} />}
+
       {currentTab.key === 'exchange' && (
         <CustomerExchangeList customerId={profileData.id} />
       )}
