@@ -1,23 +1,19 @@
 import {
   Box,
-  Text,
-  Button,
+  Flex,
+  HStack,
   Popover,
-  PopoverTrigger,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
   PopoverContent,
   PopoverHeader,
-  PopoverBody,
-  PopoverFooter,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverAnchor,
-  HStack,
-  Flex,
+  PopoverTrigger,
+  Text,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { HtmlStringBox } from '@project-lc/components-core/TermBox';
 import { useTerms } from '@project-lc/hooks';
-import { DummyOrder } from './OrderItemInfo';
 // TODO: 약관 정의 이후 내용 변경
 export function TermBox({ shopName }: { shopName: string }): JSX.Element {
   const terms = [
