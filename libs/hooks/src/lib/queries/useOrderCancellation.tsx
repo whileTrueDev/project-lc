@@ -1,12 +1,18 @@
 import {
   GetOrderCancellationListDto,
+  OrderCancellationDetailRes,
   OrderCancellationListRes,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useInfiniteQuery, UseInfiniteQueryResult } from 'react-query';
+import {
+  useInfiniteQuery,
+  UseInfiniteQueryResult,
+  useQuery,
+  UseQueryResult,
+} from 'react-query';
 import axios from '../../axios';
 
-export const getOrderCancellation = async (
+export const getOrderCancellationList = async (
   dto: GetOrderCancellationListDto,
 ): Promise<OrderCancellationListRes> => {
   return axios
@@ -20,7 +26,28 @@ export const useCustomerInfiniteOrderCancellationList = (
 ): UseInfiniteQueryResult<OrderCancellationListRes, AxiosError> => {
   return useInfiniteQuery(
     ['InfiniteCustomerOrderCancellation', dto.customerId],
-    ({ pageParam = 0 }) => getOrderCancellation({ ...dto, skip: pageParam }),
+    ({ pageParam = 0 }) => getOrderCancellationList({ ...dto, skip: pageParam }),
     { getNextPageParam: (lastPage) => lastPage?.nextCursor },
+  );
+};
+
+export const getOrderCancellationDetail = async (
+  cancelCode: string,
+): Promise<OrderCancellationDetailRes> => {
+  return axios
+    .get('/order/cancellation/detail', { params: { cancelCode } })
+    .then((res) => res.data);
+};
+
+/** 소비자 특정 주문취소요청 상세조회 훅 */
+export const useCustomerOrderCancellationDetail = (
+  cancelCode: string,
+): UseQueryResult<OrderCancellationDetailRes, AxiosError> => {
+  return useQuery(
+    ['customerOrderCancellationDetail', cancelCode],
+    () => getOrderCancellationDetail(cancelCode),
+    {
+      enabled: !!cancelCode,
+    },
   );
 };

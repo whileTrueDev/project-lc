@@ -45,7 +45,7 @@ export type OrderCancellationItemData = ExchangeReturnCancelItemBaseData & {
   status: OrderCancellationItem['status'];
 };
 export type OrderCancellationData = Omit<OrderCancellation, 'items'> & {
-  refund: Refund;
+  refund?: Refund | null;
   order: { orderCode: Order['orderCode'] };
   items: OrderCancellationItemData[];
 };
@@ -54,6 +54,8 @@ export type OrderCancellationListRes = {
   totalCount: number;
   nextCursor?: number;
 };
+
+export type OrderCancellationDetailRes = OrderCancellationData; // TODO : 환불 api 합쳐진 후(환불 스키마 수정됨) 토스 결제데이터 추가
 
 // *------------ 주문취소 상태변경 리턴값 ------------------
 /** 주문취소 수정 리턴타입 */

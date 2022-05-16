@@ -12,6 +12,7 @@ import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
   GetOrderCancellationListDto,
+  OrderCancellationDetailRes,
   OrderCancellationListRes,
   OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
@@ -136,7 +137,7 @@ export class OrderCancellationService extends ServiceBaseWithCache {
       skip,
       orderBy: { requestDate: 'desc' },
       include: {
-        order: { select: { orderCode: true } },
+        order: { select: { orderCode: true, id: true } },
         refund: true,
         items: {
           include: {
@@ -251,5 +252,60 @@ export class OrderCancellationService extends ServiceBaseWithCache {
 
     await this._clearCaches(this.#ORDER_CANCELLATION_CACHE_KEY);
     return !!data;
+  }
+
+  /** 주문취소 상세조회 // TODO : 환불 api 작업 합쳐진 후 (refund 스키마 수정됨 & 토스주문내역 조회 서비스함수 있음) 리턴값에 refund 관련 내용 추가
+   */
+  async getOrderCancellationDetail({
+    cancelCode,
+  }: {
+    cancelCode: string;
+  }): Promise<OrderCancellationDetailRes> {
+    const orderCancel = await this.prisma.orderCancellation.findUnique({
+      where: { cancelCode },
+      include: {
+        order: { select: { orderCode: true, id: true } },
+        refund: true,
+        items: {
+          include: {
+            orderItem: {
+              select: {
+                id: true,
+                goods: {
+                  select: {
+                    id: true,
+                    goods_name: true,
+                    image: true,
+                    seller: { select: { sellerShop: true } },
+                  },
+                },
+              },
+            },
+            orderItemOption: true,
+          },
+        },
+      },
+    });
+
+    const { items, ...rest } = orderCancel;
+
+    const _items = items.map((i) => ({
+      id: i.id, // 주문취소상품 고유번호
+      amount: i.amount, // 주문취소상품 개수
+      status: i.status, // 주문취소상품 처리상태
+      goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
+      image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지
+      shopName: i.orderItem.goods.seller.sellerShop?.shopName, // 주문상품 판매상점명
+      optionName: i.orderItemOption.name, // 주문상품옵션명
+      optionValue: i.orderItemOption.value, // 주문상품옵션 값
+      price: Number(i.orderItemOption.discountPrice), // 주문상품옵션 가격
+      orderItemId: i.orderItem.id, // 연결된 주문상품고유번호
+      orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
+    }));
+
+    return {
+      ...rest,
+      items: _items,
+    };
   }
 }

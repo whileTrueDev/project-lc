@@ -16,6 +16,7 @@ import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
   GetOrderCancellationListDto,
+  OrderCancellationDetailRes,
   OrderCancellationListRes,
   OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
@@ -34,6 +35,14 @@ export class OrderCancellationController {
     @Body(ValidationPipe) dto: CreateOrderCancellationDto,
   ): Promise<CreateOrderCancellationRes> {
     return this.orderCancellationService.createOrderCancellation(dto);
+  }
+
+  /** 주문취소코드로 특정 주문취소 상세조회 */
+  @Get('detail')
+  getOrderCancellationDetail(
+    @Query('cancelCode') cancelCode: string,
+  ): Promise<OrderCancellationDetailRes> {
+    return this.orderCancellationService.getOrderCancellationDetail({ cancelCode });
   }
 
   /* 주문취소 내역 조회 */
