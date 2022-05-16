@@ -7,3 +7,4 @@ export * from './lib/getImgSrcListFromHtmlStringList';
 export * from './lib/kkshowMainDataJsonToObject';
 export * from './lib/kkshowShoppingDataJsonToObject';
 export * from './lib/parseJsonToGenericType';
+export * from './lib/tossPaymentsApi';
