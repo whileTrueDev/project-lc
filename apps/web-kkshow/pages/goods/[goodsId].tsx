@@ -1,4 +1,6 @@
 import { Box, Center, Spinner } from '@chakra-ui/react';
+import { kkshowFooterLinkList } from '@project-lc/components-constants/footerLinks';
+import { CommonFooter } from '@project-lc/components-layout/CommonFooter';
 import { GoodsViewAdditionalInfo } from '@project-lc/components-web-kkshow/goods/GoodsViewAdditionalInfo';
 import { GoodsViewBottomMenu } from '@project-lc/components-web-kkshow/goods/GoodsViewBottomMenu';
 import { GoodsViewBreadCrumb } from '@project-lc/components-web-kkshow/goods/GoodsViewBreadCrumb';
@@ -7,8 +9,9 @@ import { GoodsViewFloatingButtons } from '@project-lc/components-web-kkshow/good
 import { GoodsViewInquiries } from '@project-lc/components-web-kkshow/goods/GoodsViewInquiries';
 import { GoodsViewMeta } from '@project-lc/components-web-kkshow/goods/GoodsViewMeta';
 import { GoodsViewReviews } from '@project-lc/components-web-kkshow/goods/GoodsViewReviews';
-import { GoodsViewStickyNav } from '@project-lc/components-web-kkshow/goods/GoodsViewStickyNav';
-import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
+import { GoodsViewNavBar } from '@project-lc/components-web-kkshow/goods/nav/GoodsViewNavBar';
+import { GoodsViewStickyNav } from '@project-lc/components-web-kkshow/goods/nav/GoodsViewStickyNav';
+import { KkshowNavbar } from '@project-lc/components-web-kkshow/KkshowNavbar';
 import {
   AllGoodsIdsRes,
   ALL_GOODS_IDS_KEY,
@@ -23,6 +26,35 @@ import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { dehydrate, DehydratedState } from 'react-query';
+
+export default function GoodsView(): JSX.Element {
+  useGoodsScrollNavAutoChange();
+  const router = useRouter();
+  if (router.isFallback)
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+  return (
+    <Box>
+      <Box display={{ base: 'none', md: 'block' }}>
+        <KkshowNavbar />
+      </Box>
+      <GoodsViewNavBar />
+      <GoodsViewBreadCrumb />
+      <GoodsViewMeta />
+      <GoodsViewStickyNav />
+      <GoodsViewDetail />
+      <GoodsViewReviews />
+      <GoodsViewInquiries />
+      <GoodsViewAdditionalInfo />
+      <GoodsViewFloatingButtons />
+      <GoodsViewBottomMenu />
+      <CommonFooter footerLinkList={kkshowFooterLinkList} />
+    </Box>
+  );
+}
 
 type KkshowGoodsProps = { dehydratedState: DehydratedState };
 type KkshowGoodsParams = { goodsId: string };
@@ -56,31 +88,6 @@ export const getStaticProps: GetStaticProps<
     revalidate: 60,
   };
 };
-export default function GoodsView(): JSX.Element {
-  useGoodsScrollNavAutoChange();
-  const router = useRouter();
-  const goodsId = router.query.goodsId as string;
-  if (!goodsId) return <Box>올바르지 않은 접근입니다.</Box>;
-  if (router.isFallback)
-    return (
-      <Center>
-        <Spinner />
-      </Center>
-    );
-  return (
-    <KkshowLayout disableQuickMenu>
-      <GoodsViewBreadCrumb />
-      <GoodsViewMeta />
-      <GoodsViewStickyNav />
-      <GoodsViewDetail />
-      <GoodsViewReviews />
-      <GoodsViewInquiries />
-      <GoodsViewAdditionalInfo />
-      <GoodsViewFloatingButtons />
-      <GoodsViewBottomMenu />
-    </KkshowLayout>
-  );
-}
 
 /** GoodsStickNav 선택된 nav 자동 변경 훅 */
 const useGoodsScrollNavAutoChange = (): void => {

@@ -32,7 +32,7 @@ export function GoodsViewMeta(): JSX.Element | null {
       mb={{ base: 4, md: 20 }}
       p={{ base: 2, md: 0 }}
     >
-      <Grid templateColumns="1fr 1fr" gap={{ base: 2, md: 10 }}>
+      <Grid templateColumns="1fr 1fr" gap={{ base: 2, md: 10 }} px={2}>
         {/* 좌 */}
         <GridItem colSpan={{ base: 2, md: 1 }}>
           <GoodsViewImages goodsName={goods.data.goods_name} images={goods.data.image} />

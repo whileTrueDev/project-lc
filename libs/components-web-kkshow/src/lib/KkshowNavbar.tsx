@@ -140,7 +140,7 @@ function KkshowNavbarRightButtonSection(): JSX.Element {
   );
 }
 
-const DesktopNav = (): JSX.Element => {
+export const DesktopNav = (): JSX.Element => {
   return (
     <Stack direction="row" spacing={4}>
       {kkshowNavLinks.map((navItem) => (
@@ -152,7 +152,7 @@ const DesktopNav = (): JSX.Element => {
   );
 };
 
-const MobileNav = (): JSX.Element => {
+export const MobileNav = (): JSX.Element => {
   return (
     <Flex px={4} py={2} gap={4} flexWrap="wrap" overflowX="auto">
       {kkshowNavLinks.map((navItem) => (
@@ -185,7 +185,7 @@ const NavItem = ({ label, href, isExternal }: NavItemType): JSX.Element => {
 };
 export default KkshowNavbar;
 
-function CartButton(): JSX.Element {
+export function CartButton(): JSX.Element {
   const router = useRouter();
   const { data: cartData } = useCart();
   return (

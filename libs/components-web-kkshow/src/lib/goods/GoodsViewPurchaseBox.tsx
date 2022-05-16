@@ -1,4 +1,5 @@
 import { CloseIcon, Icon } from '@chakra-ui/icons';
+import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
 import {
   Accordion,
   AccordionButton,
@@ -9,11 +10,11 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Collapse,
   Flex,
   Grid,
   GridItem,
   IconButton,
-  Input,
   ListItem,
   Modal,
   ModalBody,
@@ -22,9 +23,11 @@ import {
   Select,
   Stack,
   Text,
+  Textarea,
   Tooltip,
   UnorderedList,
   useBreakpointValue,
+  useColorModeValue,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
@@ -39,9 +42,13 @@ import OptionQuantity from '../OptionQuantity';
 
 interface GoodsViewPurchaseBoxProps {
   goods: GoodsByIdRes;
+  isOnDrawer?: boolean;
 }
 /** 상품 상세 페이지 상품 옵션 및 후원 정보 입력 + 구매,장바구니 버튼 */
-export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
+export function GoodsViewPurchaseBox({
+  goods,
+  isOnDrawer = false,
+}: GoodsViewPurchaseBoxProps): JSX.Element {
   const toast = useToast({ isClosable: true });
   const store = useGoodsViewStore();
 
@@ -60,7 +67,7 @@ export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.
   }, [goods.options, isOnlyDefaultOption, store]);
 
   return (
-    <Grid templateColumns="1fr 2fr" mt={{ base: 2, md: 6 }} gridRowGap={2}>
+    <Grid templateColumns="1fr 2fr" mt={{ base: 2, md: 6 }} gridRowGap={2} maxH="75vh">
       {/* 옵션 */}
       {!isOnlyDefaultOption && (
         <>
@@ -93,11 +100,7 @@ export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.
 
       <GridItem colSpan={3} fontSize="sm">
         {/* 선택된 옵션 목록 */}
-        <Stack
-          mt={2}
-          maxH={{ base: 200, md: 'unset' }}
-          overflowY={{ base: 'scroll', md: 'unset' }}
-        >
+        <Stack mt={2}>
           {store.selectedOpts.map((opt) => (
             <Flex
               rounded="md"
@@ -139,8 +142,13 @@ export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.
       </GridItem>
 
       {/* 총 구매 금액 및 구매,장바구니 버튼 */}
-      <GridItem colSpan={3}>
-        <GoodsViewButtonSet goods={goods} />
+      <GridItem
+        colSpan={3}
+        position={isOnDrawer ? 'sticky' : 'static'}
+        bottom="0"
+        zIndex="sticky"
+      >
+        <GoodsViewButtonSet goods={goods} isOnDrawer={isOnDrawer} />
       </GridItem>
     </Grid>
   );
@@ -195,7 +203,7 @@ function GoodsViewBroadcasterSupportBox({
           </Flex>
         </AccordionButton>
 
-        <AccordionPanel px={0} fontSize="sm">
+        <AccordionPanel px={0} pb={1} fontSize="sm">
           {!selectedBc ? (
             <Box>
               <Text mb={2}>후원가능한 방송인</Text>
@@ -233,7 +241,9 @@ function GoodsViewBroadcasterSupportBox({
                     (최대 30자)
                   </Text>
                 </Text>
-                <Input
+                <Textarea
+                  minH="55px"
+                  resize="none"
                   rounded="md"
                   size="sm"
                   placeholder="방송인 후원 메시지 도네이션 표시글"
@@ -243,33 +253,64 @@ function GoodsViewBroadcasterSupportBox({
               </Box>
             </Flex>
           )}
-          <UnorderedList mt={2} color="GrayText" fontSize="xs">
-            <ListItem>
-              <Text>방송인 후원 시, 주문 금액의 일정량이 방송인에게 돌아갑니다.</Text>
-            </ListItem>
-            <ListItem>
-              <Text>
-                방송인이 라이브쇼핑 방송 중인 경우 후원메시지는 방송 화면에 전송됩니다.
-              </Text>
-            </ListItem>
-            <ListItem>
-              <Text>
-                방송인에게 선물하기 버튼{' '}
-                <Text as="span">
-                  <Icon as={GoGift} verticalAlign="middle" />
-                </Text>{' '}
-                을 클릭하여 이 상품을 후원 방송인에게 선물할 수 있습니다.
-              </Text>
-            </ListItem>
-          </UnorderedList>
+          <GoodsViewSupportNotice />
         </AccordionPanel>
       </AccordionItem>
     </Accordion>
   );
 }
+
+function GoodsViewSupportNotice(): JSX.Element {
+  const toggle = useDisclosure();
+  return (
+    <Box pt={2}>
+      <ClickableUnderlinedText onClick={toggle.onToggle}>
+        방송인 후원이란?
+      </ClickableUnderlinedText>
+
+      <Collapse in={toggle.isOpen}>
+        <UnorderedList mt={2} color="GrayText" fontSize="xs">
+          <ListItem>
+            <Text>
+              방송인 후원은 주문 금액의 일정량이 방송인에게 돌아가는 후원 형태입니다.
+            </Text>
+          </ListItem>
+          <ListItem>
+            <Text>후원 여부와 관계없이 주문 상품은 주문자에게 배송됩니다.</Text>
+          </ListItem>
+          <ListItem>
+            <Text>
+              방송인에게 이 상품을 선물하고 싶다면 아래 선물버튼을 클릭하여 선물 절차를
+              진행할 수 있습니다.
+            </Text>
+          </ListItem>
+          <ListItem>
+            <Text>
+              방송인이 라이브쇼핑 방송 중인 경우 후원메시지는 방송 화면에 전송됩니다.
+            </Text>
+          </ListItem>
+          <ListItem>
+            <Text>
+              방송인에게 선물하기 버튼{' '}
+              <Text as="span">
+                <Icon as={GoGift} verticalAlign="middle" />
+              </Text>{' '}
+              을 클릭하여 이 상품을 후원 방송인에게 선물할 수 있습니다.
+            </Text>
+          </ListItem>
+        </UnorderedList>
+      </Collapse>
+    </Box>
+  );
+}
+
 /** 상품 상세 - 주문/선물주문/장바구니 버튼 컴포넌트 및 로직 */
-function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
+function GoodsViewButtonSet({
+  goods,
+  isOnDrawer = false,
+}: GoodsViewPurchaseBoxProps): JSX.Element {
   const buttonSize = useBreakpointValue({ base: 'md', md: 'lg' });
+  const bgColor = useColorModeValue('white', 'gray.700');
   const router = useRouter();
   const toast = useToast();
   const cartDoneDialog = useDisclosure();
@@ -385,7 +426,7 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
   );
 
   return (
-    <Stack>
+    <Stack bgColor={isOnDrawer ? bgColor : 'unset'}>
       <Grid templateColumns="1fr 1fr" pt={4}>
         <GridItem>
           <Text>총 개수</Text>
