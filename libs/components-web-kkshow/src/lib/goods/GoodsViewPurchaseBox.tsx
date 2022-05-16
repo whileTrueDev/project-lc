@@ -1,5 +1,4 @@
 import { CloseIcon, Icon } from '@chakra-ui/icons';
-import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
 import {
   Accordion,
   AccordionButton,
@@ -33,7 +32,8 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useCartMutation } from '@project-lc/hooks';
+import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
+import { useCartMutation, useProfile } from '@project-lc/hooks';
 import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
 import { useGoodsViewStore, useKkshowOrder } from '@project-lc/stores';
 import { useRouter } from 'next/router';
@@ -316,6 +316,7 @@ function GoodsViewButtonSet({
   goods,
   isOnDrawer = false,
 }: GoodsViewPurchaseBoxProps): JSX.Element {
+  const profile = useProfile();
   const buttonSize = useBreakpointValue({ base: 'md', md: 'lg' });
   const bgColor = useColorModeValue('white', 'gray.700');
   const router = useRouter();
@@ -392,8 +393,7 @@ function GoodsViewButtonSet({
         orderPrice: totalInfo.price,
         giftFlag: !!isGiftOrder, // 선물주문플래그
         supportOrderIncludeFlag: isGiftOrder ? true : !!selectedBc, // 선물주문은 언제나 후원이 포함되므로 true 고정
-        // TODO: 비회원 주문 처리 작업 이후 수정 필요
-        nonMemberOrderFlag: false,
+        nonMemberOrderFlag: !profile.data?.id,
         orderItems: [
           {
             goodsName: goods.goods_name,
@@ -424,10 +424,17 @@ function GoodsViewButtonSet({
           },
         ],
       });
+
+      // 비회원 주문 로그인화면으로 이동, 로그인 이후 페이지를 주문페이지로
+      if (!profile.data?.id) {
+        router.push(`/login?from=purchase&nextpage=/payment`);
+        return;
+      }
       router.push('/payment');
     },
     [
       selectedOpts,
+      profile.data?.id,
       orderPrepare,
       totalInfo.price,
       selectedBc,

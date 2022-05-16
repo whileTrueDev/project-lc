@@ -29,7 +29,7 @@ import { Searcher } from './search-input/Searcher';
 export const kkshowNavHeight = 120;
 
 type KkshowNavbarVariant = 'blue' | 'white';
-interface KkshowNavbar {
+interface KkshowNavbarProps {
   variant?: KkshowNavbarVariant;
 }
 /**
@@ -37,7 +37,7 @@ interface KkshowNavbar {
  *                'white'인 경우 라이트모드에서는 배경색 흰색, 글자색 검정
  *                             다크모드에서는 배경 검정, 글자 흰색인 네비바(검색페이지)
  */
-export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
+export function KkshowNavbar({ variant = 'blue' }: KkshowNavbarProps): JSX.Element {
   const palette = {
     bg: useColorModeValue('white', 'gray.800'),
     color: useColorModeValue('gray.700', 'whiteAlpha.900'),
@@ -119,9 +119,9 @@ function KkshowNavbarRightButtonSection(): JSX.Element {
   const { isLoggedIn } = useIsLoggedIn();
   return (
     <Flex alignItems="center">
-      {!isLoggedIn && <ColorModeSwitcher _hover={{}} />}
       <Searcher />
       <CartButton />
+      {!isLoggedIn && <ColorModeSwitcher _hover={{}} />}
       {isLoggedIn ? (
         <PersonalPopoverMenu
           menuItems={[

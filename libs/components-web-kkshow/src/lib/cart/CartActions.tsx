@@ -1,10 +1,11 @@
 import { Button, Stack } from '@chakra-ui/react';
-import { useCart, useCartCalculatedMetrics } from '@project-lc/hooks';
+import { useCart, useCartCalculatedMetrics, useProfile } from '@project-lc/hooks';
 import { useCartStore, useKkshowOrder } from '@project-lc/stores';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 
 export function CartActions(): JSX.Element {
+  const profile = useProfile();
   const router = useRouter();
   const { data } = useCart();
   const selectedItems = useCartStore((s) => s.selectedItems);
@@ -17,13 +18,13 @@ export function CartActions(): JSX.Element {
     orderPrepare({
       orderPrice: calculated.totalOrderPrice,
       giftFlag: false,
+      nonMemberOrderFlag: !profile.data?.id,
       supportOrderIncludeFlag:
         data &&
         data
           .filter((cartItem) => selectedItems.includes(cartItem.id))
           .some((i) => i.support),
       // TODO: 비회원 주문 처리 작업 이후 수정 필요
-      nonMemberOrderFlag: false,
       orderItems: data
         .filter((cartItem) => selectedItems.includes(cartItem.id))
         .map((i) => ({
@@ -49,8 +50,21 @@ export function CartActions(): JSX.Element {
             : undefined,
         })),
     });
+
+    // 비회원 주문 로그인화면으로 이동, 로그인 이후 페이지를 주문페이지로
+    if (!profile.data?.id) {
+      router.push(`/login?from=purchase&nextpage=/payment`);
+      return;
+    }
     router.push('/payment');
-  }, [calculated.totalOrderPrice, data, orderPrepare, router, selectedItems]);
+  }, [
+    calculated.totalOrderPrice,
+    data,
+    orderPrepare,
+    profile.data?.id,
+    router,
+    selectedItems,
+  ]);
 
   return (
     <Stack>
