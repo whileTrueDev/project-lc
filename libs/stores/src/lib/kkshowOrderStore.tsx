@@ -3,7 +3,7 @@ import create from 'zustand';
 
 export const orderNeedToFillInDefault = {
   memo: '',
-  orderItems: [],
+  orderItems: [] as CreateOrderForm['orderItems'],
   orderPrice: 0,
   paymentPrice: 0,
   ordererEmail: '',
