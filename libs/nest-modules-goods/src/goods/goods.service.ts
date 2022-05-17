@@ -6,7 +6,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { GoodsImages, GoodsView, Seller } from '@prisma/client';
+import { Goods, GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -139,11 +139,28 @@ export class GoodsService extends ServiceBaseWithCache {
     sort,
     direction,
     groupId,
-  }: GoodsListDto & { sellerId?: number }): Promise<GoodsListRes> {
+    goodsName,
+    categoryId,
+  }: GoodsListDto & {
+    sellerId?: number;
+    goodsName?: string;
+    categoryId?: number;
+  }): Promise<GoodsListRes> {
     const items = await this.prisma.goods.findMany({
       skip: page * itemPerPage,
       take: itemPerPage,
-      where: { seller: { id: sellerId }, shippingGroupId: groupId },
+      where: {
+        seller: { id: sellerId },
+        shippingGroupId: groupId,
+        goods_name: {
+          search: goodsName ? goodsName.trim() : undefined,
+        },
+        categories: {
+          some: {
+            id: categoryId,
+          },
+        },
+      },
       orderBy: [{ [sort]: direction }],
       include: {
         options: {
@@ -405,14 +422,9 @@ export class GoodsService extends ServiceBaseWithCache {
   }
 
   /** 상품 개별 정보 조회 */
-  public async getOneGoods(goodsId: number, sellerId: number): Promise<GoodsByIdRes> {
+  public async getOneGoods(goodsId: number): Promise<GoodsByIdRes> {
     return this.prisma.goods.findFirst({
-      where: {
-        id: goodsId,
-        seller: {
-          id: sellerId,
-        },
-      },
+      where: { id: goodsId },
       include: {
         options: { include: { supply: true } },
         ShippingGroup: {
@@ -429,7 +441,19 @@ export class GoodsService extends ServiceBaseWithCache {
         confirmation: true,
         image: { orderBy: { cut_number: 'asc' } },
         GoodsInfo: true,
-        LiveShopping: true,
+        LiveShopping: {
+          include: {
+            broadcaster: { select: { id: true, userNickname: true, avatar: true } },
+          },
+        },
+        productPromotion: {
+          include: {
+            broadcaster: { select: { id: true, userNickname: true, avatar: true } },
+          },
+        },
+        categories: true,
+        informationNotice: true,
+        informationSubject: true,
       },
     });
   }
@@ -442,7 +466,16 @@ export class GoodsService extends ServiceBaseWithCache {
     goodsId: number;
   }> {
     try {
-      const { options, image, shippingGroupId, goodsInfoId, ...goodsData } = dto;
+      const {
+        options,
+        image,
+        shippingGroupId,
+        goodsInfoId,
+        categoryId,
+        informationSubjectId,
+        informationNoticeContents,
+        ...goodsData
+      } = dto;
       const optionsData = options.map((opt) => {
         const { supply, ...optData } = opt;
         return {
@@ -467,8 +500,24 @@ export class GoodsService extends ServiceBaseWithCache {
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
           confirmation: { create: { status: 'waiting' } },
+          informationSubject: {
+            connect: {
+              id: informationSubjectId,
+            },
+          },
+          categories: {
+            connect: {
+              id: categoryId,
+            },
+          },
+          informationNotice: {
+            create: {
+              contents: informationNoticeContents,
+            },
+          },
         },
       });
+
       await this._clearCaches(this.#GOODS_CACHE_KEY);
 
       return { goodsId: goods.id };
@@ -596,6 +645,9 @@ export class GoodsService extends ServiceBaseWithCache {
       image,
       shippingGroupId,
       goodsInfoId,
+      informationSubjectId,
+      informationNoticeId,
+      categoryId,
       ...goodsData
     } = dto;
 
@@ -636,6 +688,21 @@ export class GoodsService extends ServiceBaseWithCache {
             ? { connect: { id: shippingGroupId } }
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
+          informationSubject: {
+            connect: {
+              id: informationSubjectId,
+            },
+          },
+          informationNotice: {
+            connect: {
+              id: informationNoticeId,
+            },
+          },
+          categories: {
+            connect: {
+              id: categoryId,
+            },
+          },
           confirmation: {
             update: {
               status: prevStatus === 'waiting' ? 'waiting' : 'needReconfirmation',
@@ -705,5 +772,16 @@ export class GoodsService extends ServiceBaseWithCache {
         seller: { select: { id: true, email: true } },
       },
     });
+  }
+
+  /**
+   * 상품 노출 여부를 조절하여 보이지 않도록 설정하지 않은 모든 상품의 상품번호를 반환합니다.
+   */
+  public async findAllGoodsIds(): Promise<Goods['id'][]> {
+    const goodIds = await this.prisma.goods.findMany({
+      select: { id: true },
+      where: { goods_view: { not: 'notLook' } },
+    });
+    return goodIds.map((g) => g.id);
   }
 }

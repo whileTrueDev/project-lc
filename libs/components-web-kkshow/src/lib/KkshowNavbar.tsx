@@ -1,9 +1,9 @@
 import {
   Box,
   Button,
-  Center,
   Flex,
   Grid,
+  GridItem,
   Icon,
   Link,
   Stack,
@@ -69,10 +69,11 @@ export function KkshowNavbar({ variant = 'blue' }: KkshowNavbar): JSX.Element {
       {/* 모바일인 경우 */}
       <Box display={{ base: 'block', md: 'none' }}>
         <Grid {...commonNavConatinerStyle} templateColumns="repeat(3, 1fr)" gap={6}>
-          <Box />
-          <Center>
-            <KkshowNavbarLogo variant={palette.logoVariant as KkshowLogoVariant} />
-          </Center>
+          <GridItem colSpan={2}>
+            <Flex alignItems="center" h="100%">
+              <KkshowNavbarLogo variant={palette.logoVariant as KkshowLogoVariant} />
+            </Flex>
+          </GridItem>
           <Flex justifyContent="flex-end">
             <KkshowNavbarRightButtonSection />
           </Flex>

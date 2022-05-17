@@ -11,17 +11,23 @@ export interface InactiveUserPayload {
   inactiveFlag?: boolean;
 }
 
+interface AdditionalLoginInfo {
+  id: number;
+  userType: UserType;
+}
+
+type LoginPayload = (loginUserRes & AdditionalLoginInfo) | InactiveUserPayload;
+
 export const useLoginMutation = (
   type: UserType,
-): UseMutationResult<loginUserRes | InactiveUserPayload, AxiosError, LoginUserDto> => {
-  return useMutation<loginUserRes | InactiveUserPayload, AxiosError, LoginUserDto>(
-    (dto: LoginUserDto) =>
-      axios
-        .post<loginUserRes | InactiveUserPayload>('/auth/login', dto, {
-          params: {
-            type,
-          },
-        })
-        .then((res) => res.data),
+): UseMutationResult<LoginPayload, AxiosError, LoginUserDto> => {
+  return useMutation<LoginPayload, AxiosError, LoginUserDto>((dto: LoginUserDto) =>
+    axios
+      .post<LoginPayload>('/auth/login', dto, {
+        params: {
+          type,
+        },
+      })
+      .then((res) => res.data),
   );
 };

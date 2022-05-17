@@ -1,11 +1,4 @@
-import {
-  AddIcon,
-  CheckIcon,
-  CloseIcon,
-  DeleteIcon,
-  Icon,
-  MinusIcon,
-} from '@chakra-ui/icons';
+import { CheckIcon, CloseIcon, DeleteIcon, Icon } from '@chakra-ui/icons';
 import {
   Avatar,
   Badge,
@@ -48,6 +41,7 @@ import NextLink from 'next/link';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { MdOutlineShoppingCart } from 'react-icons/md';
 import shallow from 'zustand/shallow';
+import OptionQuantity from '../OptionQuantity';
 
 export function CartTable(): JSX.Element {
   const { data, isLoading } = useCart();
@@ -63,8 +57,7 @@ export function CartTable(): JSX.Element {
   // 카트 모두 비우기 핸들러
   const truncate = useCartTruncateMutation();
   const handleTruncate = async (): Promise<void> => {
-    // TODO 소비자 로그인 구현 이후 profile 통해 올바른 customerId전달
-    await truncate.mutateAsync(1);
+    await truncate.mutateAsync(undefined);
   };
 
   // 최초 렌더링 체크
@@ -255,8 +248,7 @@ export function CartItemDisplay({
         <Image w="80px" rounded="md" src={cartItem.goods.image[0].image} alt="" />
         <Box w="100%">
           <Text fontSize="xs">{cartItem.goods.seller.sellerShop.shopName}</Text>
-          {/* // TODO: 상품상세페이지 작업 이후 해당 상품상세페이지로 이동하도록 변경  */}
-          <NextLink href="/shopping">
+          <NextLink href={`/goods/${cartItem.goods.id}`}>
             <Link
               fontSize={{ base: 'sm', sm: 'md', lg: 'lg' }}
               fontWeight="bold"
@@ -312,7 +304,7 @@ export function CartItemPriceDisplay({ cartItem }: CartTableItemProps): JSX.Elem
       {cartItem.options.map((opt, idx) => (
         <Flex key={opt.id} gap={2} mt={1}>
           <Text color="GrayText" fontSize="xs">
-            옵션{idx + 1} {getLocaleNumber(opt.discountPrice)} 원
+            옵션{idx + 1} {getLocaleNumber(Number(opt.discountPrice) * opt.quantity)} 원
           </Text>
         </Flex>
       ))}
@@ -368,27 +360,14 @@ export function CartTableRowOption({
   const optionButtons = useMemo(
     () => (
       <Flex gap={1}>
-        <IconButton
-          variant="outline"
-          aria-label="decrease-cart-item-option-quantity"
-          icon={<MinusIcon />}
-          size="xs"
-          m={0}
-          onClick={handleQuantityDecrease}
-          isDisabled={option.quantity <= 1 || optionQuantity.isLoading}
+        <OptionQuantity
+          quantity={option.quantity}
+          handleDecrease={handleQuantityDecrease}
+          handleIncrease={handleQuantityIncrease}
+          decreaseDisabled={option.quantity <= 1 || optionQuantity.isLoading}
+          increaseDisabled={optionQuantity.isLoading}
         />
-        <Text fontSize={{ base: 'md', lg: 'lg' }} w={6} textAlign="center">
-          {option.quantity}
-        </Text>
-        <IconButton
-          variant="outline"
-          aria-label="increase-cart-item-option-quantity"
-          icon={<AddIcon />}
-          size="xs"
-          m={0}
-          isDisabled={optionQuantity.isLoading}
-          onClick={handleQuantityIncrease}
-        />
+
         <IconButton
           variant="outline"
           ml={4}

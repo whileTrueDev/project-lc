@@ -56,7 +56,7 @@ export class AuthController {
     this.authService.handleLogin(res, loginToken);
     // 로그인 히스토리 추가
     this.loginHistoryService.createLoginStamp(req, '이메일');
-    return res.status(200).send(loginToken);
+    return res.status(200).send({ ...loginToken, id: user.id, userType: user.type });
   }
 
   @UseGuards(JwtAuthGuard)

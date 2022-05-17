@@ -10,33 +10,74 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "lib": [
+      "es2020",
+      "dom"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@project-lc/components-admin/*": ["libs/components-admin/src/lib/*"],
-      "@project-lc/components-constants/*": ["libs/components-constants/src/lib/*"],
-      "@project-lc/components-core/*": ["libs/components-core/src/lib/*"],
-      "@project-lc/components-layout/*": ["libs/components-layout/src/lib/*"],
-      "@project-lc/components-seller/*": ["libs/components-seller/src/lib/*"],
-      "@project-lc/components-shared/*": ["libs/components-shared/src/lib/*"],
-      "@project-lc/components-web-bc/*": ["libs/components-web-bc/src/lib/*"],
-      "@project-lc/components-web-kkshow/*": ["libs/components-web-kkshow/src/lib/*"],
-      "@project-lc/firstmall-db": ["libs/firstmall-db/src/index.ts"],
-      "@project-lc/hooks": ["libs/hooks/src/index.ts"],
-      "@project-lc/nest-core": ["libs/nest-core/src/lib/index.ts"],
-      "@project-lc/nest-modules-admin": ["libs/nest-modules-admin/src/index.ts"],
-      "@project-lc/nest-modules-auth": ["libs/nest-modules-auth/src/index.ts"],
-      "@project-lc/nest-modules-authguard": ["libs/nest-modules-authguard/src/index.ts"],
+      "@project-lc/components-admin/*": [
+        "libs/components-admin/src/lib/*"
+      ],
+      "@project-lc/components-constants/*": [
+        "libs/components-constants/src/lib/*"
+      ],
+      "@project-lc/components-core/*": [
+        "libs/components-core/src/lib/*"
+      ],
+      "@project-lc/components-layout/*": [
+        "libs/components-layout/src/lib/*"
+      ],
+      "@project-lc/components-seller/*": [
+        "libs/components-seller/src/lib/*"
+      ],
+      "@project-lc/components-shared/*": [
+        "libs/components-shared/src/lib/*"
+      ],
+      "@project-lc/components-web-bc/*": [
+        "libs/components-web-bc/src/lib/*"
+      ],
+      "@project-lc/components-web-kkshow/*": [
+        "libs/components-web-kkshow/src/lib/*"
+      ],
+      "@project-lc/firstmall-db": [
+        "libs/firstmall-db/src/index.ts"
+      ],
+      "@project-lc/hooks": [
+        "libs/hooks/src/index.ts"
+      ],
+      "@project-lc/nest-core": [
+        "libs/nest-core/src/lib/index.ts"
+      ],
+      "@project-lc/nest-modules-admin": [
+        "libs/nest-modules-admin/src/index.ts"
+      ],
+      "@project-lc/nest-modules-auth": [
+        "libs/nest-modules-auth/src/index.ts"
+      ],
+      "@project-lc/nest-modules-authguard": [
+        "libs/nest-modules-authguard/src/index.ts"
+      ],
       "@project-lc/nest-modules-broadcaster": [
         "libs/nest-modules-broadcaster/src/index.ts"
       ],
-      "@project-lc/nest-modules-cart": ["libs/nest-modules-cart/src/index.ts"],
-      "@project-lc/nest-modules-cipher": ["libs/nest-modules-cipher/src/index.ts"],
-      "@project-lc/nest-modules-coupon": ["libs/nest-modules-coupon/src/index.ts"],
-      "@project-lc/nest-modules-customer": ["libs/nest-modules-customer/src/index.ts"],
-      "@project-lc/nest-modules-goods": ["libs/nest-modules-goods/src/index.ts"],
+      "@project-lc/nest-modules-cart": [
+        "libs/nest-modules-cart/src/index.ts"
+      ],
+      "@project-lc/nest-modules-cipher": [
+        "libs/nest-modules-cipher/src/index.ts"
+      ],
+      "@project-lc/nest-modules-customer": [
+        "libs/nest-modules-customer/src/index.ts"
+      ],
+      "@project-lc/nest-modules-exchange": [
+        "libs/nest-modules-exchange/src/index.ts"
+      ],
+      "@project-lc/nest-modules-goods": [
+        "libs/nest-modules-goods/src/index.ts"
+      ],
       "@project-lc/nest-modules-goods-category": [
         "libs/nest-modules-goods-category/src/index.ts"
       ],
@@ -46,7 +87,9 @@
       "@project-lc/nest-modules-goods-review": [
         "libs/nest-modules-goods-review/src/index.ts"
       ],
-      "@project-lc/nest-modules-inquiry": ["libs/nest-modules-inquiry/src/index.ts"],
+      "@project-lc/nest-modules-inquiry": [
+        "libs/nest-modules-inquiry/src/index.ts"
+      ],
       "@project-lc/nest-modules-jwt-helper": [
         "libs/nest-modules-jwt-helper/src/index.ts"
       ],
@@ -59,40 +102,80 @@
       "@project-lc/nest-modules-liveshopping": [
         "libs/nest-modules-liveshopping/src/index.ts"
       ],
-      "@project-lc/nest-modules-mail": ["libs/nest-modules-mail/src/index.ts"],
+      "@project-lc/nest-modules-mail": [
+        "libs/nest-modules-mail/src/index.ts"
+      ],
       "@project-lc/nest-modules-mail-verification": [
         "libs/nest-modules-mail-verification/src/index.ts"
       ],
-      "@project-lc/nest-modules-manual": ["libs/nest-modules-manual/src/index.ts"],
-      "@project-lc/nest-modules-notice": ["libs/nest-modules-notice/src/index.ts"],
+      "@project-lc/nest-modules-manual": [
+        "libs/nest-modules-manual/src/index.ts"
+      ],
+      "@project-lc/nest-modules-notice": [
+        "libs/nest-modules-notice/src/index.ts"
+      ],
       "@project-lc/nest-modules-notification": [
         "libs/nest-modules-notification/src/index.ts"
       ],
-      "@project-lc/nest-modules-order": ["libs/nest-modules-order/src/index.ts"],
+      "@project-lc/nest-modules-order": [
+        "libs/nest-modules-order/src/index.ts"
+      ],
       "@project-lc/nest-modules-order-cancel": [
         "libs/nest-modules-order-cancel/src/index.ts"
       ],
-      "@project-lc/nest-modules-overlay": ["libs/nest-modules-overlay/src/index.ts"],
+      "@project-lc/nest-modules-overlay": [
+        "libs/nest-modules-overlay/src/index.ts"
+      ],
       "@project-lc/nest-modules-overlay-controller": [
         "libs/nest-modules-overlay-controller/src/index.ts"
       ],
-      "@project-lc/nest-modules-policy": ["libs/nest-modules-policy/src/index.ts"],
+      "@project-lc/nest-modules-policy": [
+        "libs/nest-modules-policy/src/index.ts"
+      ],
+      "@project-lc/nest-modules-payment": ["libs/nest-modules-payment/src/index.ts"],
       "@project-lc/nest-modules-product-promotion": [
         "libs/nest-modules-product-promotion/src/index.ts"
       ],
-      "@project-lc/nest-modules-seller": ["libs/nest-modules-seller/src/index.ts"],
+      "@project-lc/nest-modules-refund": [
+        "libs/nest-modules-refund/src/index.ts"
+      ],
+      "@project-lc/nest-modules-return": [
+        "libs/nest-modules-return/src/index.ts"
+      ],
+      "@project-lc/nest-modules-seller": [
+        "libs/nest-modules-seller/src/index.ts"
+      ],
       "@project-lc/nest-modules-shipping-group": [
         "libs/nest-modules-shipping-group/src/index.ts"
       ],
-      "@project-lc/prisma-orm": ["libs/prisma-orm/src/index.ts"],
-      "@project-lc/shared-types": ["libs/shared-types/src/index.ts"],
-      "@project-lc/shreadsheet": ["libs/shreadsheet/src/index.ts"],
-      "@project-lc/stores": ["libs/stores/src/index.ts"],
-      "@project-lc/utils": ["libs/utils/src/index.ts"],
-      "@project-lc/utils-backend": ["libs/utils-backend/src/index.ts"],
-      "@project-lc/utils-frontend": ["libs/utils-frontend/src/index.ts"],
-      "@project-lc/utils-s3": ["libs/utils-s3/src/index.ts"]
+      "@project-lc/prisma-orm": [
+        "libs/prisma-orm/src/index.ts"
+      ],
+      "@project-lc/shared-types": [
+        "libs/shared-types/src/index.ts"
+      ],
+      "@project-lc/shreadsheet": [
+        "libs/shreadsheet/src/index.ts"
+      ],
+      "@project-lc/stores": [
+        "libs/stores/src/index.ts"
+      ],
+      "@project-lc/utils": [
+        "libs/utils/src/index.ts"
+      ],
+      "@project-lc/utils-backend": [
+        "libs/utils-backend/src/index.ts"
+      ],
+      "@project-lc/utils-frontend": [
+        "libs/utils-frontend/src/index.ts"
+      ],
+      "@project-lc/utils-s3": [
+        "libs/utils-s3/src/index.ts"
+      ]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }

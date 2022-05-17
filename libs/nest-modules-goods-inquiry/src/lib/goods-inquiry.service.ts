@@ -32,7 +32,13 @@ export class GoodsInquiryService extends ServiceBaseWithCache {
   /** 상품문의 생성 */
   public async create(dto: GoodsInquiryCreateDto): Promise<GoodsInquiry> {
     await this._clearCaches(this.#GOODS_INQUIRY_CACHE_KEY);
-    return this.prisma.goodsInquiry.create({ data: dto });
+    return this.prisma.goodsInquiry.create({
+      data: {
+        content: dto.content,
+        goodsId: dto.goodsId,
+        writerId: dto.writerId,
+      },
+    });
   }
 
   /** 상품문의 개별 조회 */

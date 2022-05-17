@@ -676,6 +676,7 @@
     },
     "nest-modules-coupon": "libs/nest-modules-coupon",
     "nest-modules-customer": "libs/nest-modules-customer",
+    "nest-modules-exchange": "libs/nest-modules-exchange",
     "nest-modules-goods": {
       "root": "libs/nest-modules-goods",
       "sourceRoot": "libs/nest-modules-goods/src",
@@ -977,6 +978,29 @@
       },
       "tags": []
     },
+    "nest-modules-payment": {
+      "root": "libs/nest-modules-payment",
+      "sourceRoot": "libs/nest-modules-payment/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/nest-modules-payment/**/*.ts"]
+          },
+          "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/nest-modules-payment"],
+          "options": {
+            "jestConfig": "libs/nest-modules-payment/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "nest-modules-policy": {
       "root": "libs/nest-modules-policy",
       "sourceRoot": "libs/nest-modules-policy/src",
@@ -1023,6 +1047,8 @@
       },
       "tags": []
     },
+    "nest-modules-refund": "libs/nest-modules-refund",
+    "nest-modules-return": "libs/nest-modules-return",
     "nest-modules-seller": {
       "root": "libs/nest-modules-seller",
       "sourceRoot": "libs/nest-modules-seller/src",

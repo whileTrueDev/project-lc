@@ -1,29 +1,33 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
 import { OrderItemOption } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
-import { OriginGoods } from '@project-lc/shared-types';
+import { OrderItemWithRelations } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { OrderStatusBadge } from './CustomerOrderItem';
+import OrderCancelStatusBadge from './OrderCancelStatusBadge';
 
 export interface OrderItemOptionInfoProps {
   option: OrderItemOption;
-  goodsData: OriginGoods;
+  orderItem: OrderItemWithRelations;
   displayStatus?: boolean;
 }
 export function OrderItemOptionInfo({
   option,
-  goodsData,
+  orderItem,
   displayStatus = true,
 }: OrderItemOptionInfoProps): JSX.Element {
-  const { id, goods_name, image } = goodsData;
-  const goodsName = goods_name;
-  const goodsImage = image[0].image;
+  const goodsId = orderItem.goods.id;
+  const goodsName = orderItem.goods.goods_name;
+  const goodsImage = orderItem.goods.image?.[0]?.image;
+  const orderCancellation = orderItem.orderCancellationItems?.find(
+    (item) => item.orderItemOptionId === option.id,
+  );
   return (
     <Stack direction="row" alignItems="center">
       <Box
         cursor="pointer"
         onClick={() => {
-          alert(`상품고유번호 ${id}의 상세페이지로 이동`);
+          alert(`상품고유번호 ${goodsId}의 상세페이지로 이동`);
         }}
       >
         {/* 이미지 */}
@@ -31,13 +35,20 @@ export function OrderItemOptionInfo({
       </Box>
       {/* 주문상품 옵션 */}
       <Stack>
-        {displayStatus && <OrderStatusBadge step={option.step} />}
+        {displayStatus && (
+          <Stack direction="row">
+            <OrderStatusBadge step={option.step} />
+            {orderCancellation && (
+              <OrderCancelStatusBadge status={orderCancellation.status} />
+            )}
+          </Stack>
+        )}
 
         <Text
           fontWeight="bold"
           cursor="pointer"
           onClick={() => {
-            alert(`상품고유번호 ${id}의 상세페이지로 이동`);
+            alert(`상품고유번호 ${goodsId}의 상세페이지로 이동`);
           }}
         >
           {goodsName}
