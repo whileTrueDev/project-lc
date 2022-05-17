@@ -3,7 +3,6 @@ import {
   CartItemOption,
   CartItemSupport,
   Customer,
-  Order,
   SellType,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
@@ -44,7 +43,7 @@ export class CartItemDto {
   @IsOptional() @IsNumber() customerId?: CartItem['customerId'];
   @IsOptional() @IsString() tempUserId?: CartItem['tempUserId'];
   @IsOptional() @IsNumber() shippingGroupId?: CartItem['shippingGroupId'];
-  @IsNumber() shippingCost: number;
+  @IsDecimal() shippingCost: CartItem['shippingCost'];
   @IsBoolean() shippingCostIncluded: CartItem['shippingCostIncluded'];
 
   // 유입 상품의 경로 정보

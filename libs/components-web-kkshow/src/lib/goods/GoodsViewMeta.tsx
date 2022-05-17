@@ -5,14 +5,18 @@ import {
   Grid,
   GridItem,
   Image,
+  ListItem,
   Skeleton,
   Text,
+  UnorderedList,
 } from '@chakra-ui/react';
-import { GoodsStatus } from '@prisma/client';
+import { Goods, GoodsStatus } from '@prisma/client';
+import TextWithPopperButton from '@project-lc/components-core/TextWithPopperButton';
 import { GoodsStatusBadge } from '@project-lc/components-shared/GoodsStatusBadge';
+import ShippingGroupSets from '@project-lc/components-shared/shipping/ShippingGroupSets';
 import { useGoodsById } from '@project-lc/hooks';
 import { GoodsByIdRes } from '@project-lc/shared-types';
-import { getLocaleNumber } from '@project-lc/utils-frontend';
+import { getLocaleNumber, getStandardShippingCost } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import { GoodsViewPurchaseBox } from './GoodsViewPurchaseBox';
@@ -57,6 +61,11 @@ export function GoodsViewMeta(): JSX.Element | null {
           <Box display={{ base: 'none', md: 'block' }}>
             <GoodsViewPurchaseBox goods={goods.data} />
           </Box>
+
+          {/* 상품 기타 정보 info */}
+          <Box>
+            <GoodsViewOtherInformation goodsOtherInformation={goods.data} />
+          </Box>
         </GridItem>
       </Grid>
     </Box>
@@ -100,6 +109,7 @@ export function GoodsViewMetaLoading(): JSX.Element {
     </Box>
   );
 }
+export default GoodsViewMeta;
 
 interface GoodsViewImagesProps {
   images: GoodsByIdRes['image'];
@@ -145,19 +155,21 @@ export function GoodsViewImages({
 }
 
 interface GoodsViewNameAndStatusProps {
+  shopName?: string | null;
   goodsName: string;
   summary: string;
   status: GoodsStatus;
 }
 /** 상품 상세 페이지 상품 이름 및 상태 */
 export function GoodsViewNameAndStatus({
+  shopName,
   goodsName,
   summary,
   status,
 }: GoodsViewNameAndStatusProps): JSX.Element {
   return (
     <Box>
-      <Text fontSize={{ base: 'sm', md: 'md' }}>와일트루</Text>
+      {shopName && <Text fontSize={{ base: 'sm', md: 'md' }}>{shopName}</Text>}
       <Text fontSize={{ base: 'xl', md: '2xl' }} fontWeight="bold">
         {goodsName}
       </Text>
@@ -186,6 +198,11 @@ export function GoodsViewPriceTag({
     return d;
   }, [goodsOptions]);
 
+  const standardShippingCost = useMemo(
+    () => getStandardShippingCost(shippingGroup),
+    [shippingGroup],
+  );
+
   return (
     <Grid templateColumns="1fr 2fr" mt={6} mb={1} gap={2}>
       <GridItem>
@@ -204,15 +221,52 @@ export function GoodsViewPriceTag({
         <Text fontWeight="medium">{getLocaleNumber(defaultOption?.price)}원</Text>
       </GridItem>
 
-      <GridItem>
-        <Text>배송비</Text>
-      </GridItem>
-      <GridItem>
-        {/* <Text>{getLocaleNumber(shippingGroup?.shippingSets.find((x) => x.delivery_nation === 'korea')?.shippingOptions[0].shippingCost[0].shipping_cost})원</Text> */}
-        <Text fontWeight="medium">2,500원</Text>
-      </GridItem>
+      {shippingGroup && (
+        <>
+          <GridItem>
+            <Text>배송비</Text>
+          </GridItem>
+          <GridItem>
+            <TextWithPopperButton
+              iconAriaLabel="shipping-cost"
+              title={`${getLocaleNumber(standardShippingCost)}원`}
+            >
+              <ShippingGroupSets shippingSets={shippingGroup.shippingSets} />
+            </TextWithPopperButton>
+          </GridItem>
+        </>
+      )}
     </Grid>
   );
 }
 
-export default GoodsViewMeta;
+interface GoodsViewOtherInformationProps {
+  goodsOtherInformation: {
+    max_purchase_limit: Goods['max_purchase_limit'];
+    max_purchase_ea: Goods['max_purchase_ea'];
+    max_urchase_order_limit: Goods['max_urchase_order_limit'];
+    min_purchase_ea: Goods['min_purchase_ea'];
+    min_purchase_limit: Goods['min_purchase_limit'];
+  };
+}
+function GoodsViewOtherInformation({
+  goodsOtherInformation: goi,
+}: GoodsViewOtherInformationProps): JSX.Element | null {
+  if (goi.max_purchase_limit === 'unlimit' && goi.min_purchase_limit === 'unlimit') {
+    return null;
+  }
+  return (
+    <UnorderedList fontSize="xs" mt={2}>
+      {goi.min_purchase_limit === 'limit' && (
+        <ListItem>
+          <Text>최소 구매 수량: {goi.min_purchase_ea} 개</Text>
+        </ListItem>
+      )}
+      {goi.max_purchase_limit === 'limit' && (
+        <ListItem>
+          <Text>최대 구매 가능 수량: {goi.max_purchase_ea} 개</Text>
+        </ListItem>
+      )}
+    </UnorderedList>
+  );
+}

@@ -1,30 +1,55 @@
-import { Button, Stack } from '@chakra-ui/react';
+import { Button, Stack, useToast } from '@chakra-ui/react';
 import { useCart, useCartCalculatedMetrics, useProfile } from '@project-lc/hooks';
 import { useCartStore, useKkshowOrder } from '@project-lc/stores';
+import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 
 export function CartActions(): JSX.Element {
+  const toast = useToast({ isClosable: true });
   const profile = useProfile();
   const router = useRouter();
   const { data } = useCart();
   const selectedItems = useCartStore((s) => s.selectedItems);
   const calculated = useCartCalculatedMetrics();
 
-  const orderPrepare = useKkshowOrder((s) => s.handleOrderPrepare);
+  // 장바구니 선택된 상품 주문하기 실행 전 올바른 주문인지 체크함수
+  const executePurchaseCheck = useCallback((): boolean => {
+    if (!data || data.length === 0 || selectedItems.length === 0) return false;
+    const selectedCartItems = data.filter((d) => selectedItems.includes(d.id));
+    return selectedCartItems.every((i) => {
+      // 최대/최소 주문 개수 제한 체크
+      const totalOptsQuantity = i.options.reduce((prev, curr) => prev + curr.quantity, 0);
+      return checkGoodsPurchasable(i.goods, totalOptsQuantity, {
+        onMaxLimitFail: () =>
+          toast({
+            title: `${i.goods.goods_name}`,
+            description: `최대 주문 수량(${i.goods.max_purchase_ea}개)까지 구매가능합니다.`,
+            status: 'warning',
+          }),
+        onMinLimitFail: () =>
+          toast({
+            title: `${i.goods.goods_name}`,
+            description: `최소 주문 수량(${i.goods.min_purchase_ea}개)이상 구매해야 합니다.`,
+            status: 'warning',
+          }),
+      });
+    });
+  }, [data, selectedItems, toast]);
+
   // 주문 클릭시
+  const orderPrepare = useKkshowOrder((s) => s.handleOrderPrepare);
   const handleOrderClick = useCallback((): void => {
     if (!data) return;
+    if (!executePurchaseCheck()) return;
+
     orderPrepare({
       orderPrice: calculated.totalOrderPrice,
       giftFlag: false,
       nonMemberOrderFlag: !profile.data?.id,
-      supportOrderIncludeFlag:
-        data &&
-        data
-          .filter((cartItem) => selectedItems.includes(cartItem.id))
-          .some((i) => i.support),
-      // TODO: 비회원 주문 처리 작업 이후 수정 필요
+      supportOrderIncludeFlag: data
+        .filter((cartItem) => selectedItems.includes(cartItem.id))
+        .some((i) => i.support),
       orderItems: data
         .filter((cartItem) => selectedItems.includes(cartItem.id))
         .map((i) => ({
@@ -34,12 +59,11 @@ export function CartActions(): JSX.Element {
             ...o,
             goodsOptionId: o.goodsOptionsId as number,
           })),
-          // TODO: 상품 배송비 판단 로직 이후 수정 필요
-          shippingCost: '2500',
+          shippingCost: i.shippingCost,
           shippingGroupId: i.shippingGroupId || 1,
           // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
           channel: 'normal',
-          shippingCostIncluded: false, // 다른 상품에 이미 배송비가 포함되었는 지 여부
+          shippingCostIncluded: i.shippingCostIncluded, // 다른 상품에 이미 배송비가 포함되었는 지 여부
           support: i.support
             ? {
                 broadcasterId: i.support.id,
@@ -60,6 +84,7 @@ export function CartActions(): JSX.Element {
   }, [
     calculated.totalOrderPrice,
     data,
+    executePurchaseCheck,
     orderPrepare,
     profile.data?.id,
     router,

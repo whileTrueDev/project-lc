@@ -36,6 +36,10 @@ import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUn
 import { useCartMutation, useProfile } from '@project-lc/hooks';
 import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
 import { useGoodsViewStore, useKkshowOrder } from '@project-lc/stores';
+import {
+  checkGoodsPurchasable,
+  getStandardShippingCost,
+} from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo } from 'react';
 import { GoGift } from 'react-icons/go';
@@ -148,7 +152,7 @@ export function GoodsViewPurchaseBox({
         colSpan={3}
         position={isOnDrawer ? 'sticky' : 'static'}
         bottom="0"
-        zIndex="sticky"
+        zIndex={isOnDrawer ? 'sticky' : undefined}
       >
         <GoodsViewButtonSet goods={goods} isOnDrawer={isOnDrawer} />
       </GridItem>
@@ -316,11 +320,11 @@ function GoodsViewButtonSet({
   goods,
   isOnDrawer = false,
 }: GoodsViewPurchaseBoxProps): JSX.Element {
+  const toast = useToast({ isClosable: true });
   const profile = useProfile();
   const buttonSize = useBreakpointValue({ base: 'md', md: 'lg' });
   const bgColor = useColorModeValue('white', 'gray.700');
   const router = useRouter();
-  const toast = useToast();
   const cartDoneDialog = useDisclosure();
   const selectedOpts = useGoodsViewStore((s) => s.selectedOpts);
   const selectedBc = useGoodsViewStore((s) => s.selectedBc);
@@ -339,13 +343,37 @@ function GoodsViewButtonSet({
     );
   }, [selectedOpts]);
 
-  // 장바구니 담기
-  const createCartItem = useCartMutation();
-  const handleCartClick = (): void => {
+  // 장바구니 담기 또는 바로 주문 이전 가능사항 체크
+  const executePurchaseCheck = useCallback((): boolean => {
+    // 옵션 선택 여부 체크
     if (!(selectedOpts.length > 0)) {
       toast({ title: '선택된 옵션이 없습니다.', status: 'warning' });
-      return;
+      return false;
     }
+
+    const totalOptsQuantity = selectedOpts.reduce(
+      (prev, curr) => prev + curr.quantity,
+      0,
+    );
+    // 최대/최소 주문 개수 제한 체크
+    return checkGoodsPurchasable(goods, totalOptsQuantity, {
+      onMaxLimitFail: () =>
+        toast({
+          description: `최대 주문 수량(${goods.max_purchase_ea}개)까지 구매가능합니다.`,
+          status: 'warning',
+        }),
+      onMinLimitFail: () =>
+        toast({
+          description: `최소 주문 수량(${goods.min_purchase_ea}개)이상 구매해야 합니다.`,
+          status: 'warning',
+        }),
+    });
+  }, [goods, selectedOpts, toast]);
+
+  // 장바구니 담기
+  const createCartItem = useCartMutation();
+  const handleCartClick = useCallback((): void => {
+    if (!executePurchaseCheck()) return;
     createCartItem
       .mutateAsync({
         goodsId: goods.id,
@@ -357,8 +385,7 @@ function GoodsViewButtonSet({
           name: o.option_title,
           value: o.option1,
         })),
-        // TODO: 상품 배송비 판단 로직 이후 수정 필요
-        shippingCost: 2500,
+        shippingCost: getStandardShippingCost(goods.ShippingGroup),
         shippingCostIncluded: false,
         shippingGroupId: goods.shippingGroupId,
         // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
@@ -378,16 +405,24 @@ function GoodsViewButtonSet({
           title: '장바구니에 담는 도중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
         });
       });
-  };
+  }, [
+    cartDoneDialog,
+    createCartItem,
+    executePurchaseCheck,
+    goods.ShippingGroup,
+    goods.id,
+    goods.shippingGroupId,
+    selectedBc,
+    selectedOpts,
+    supportMessage,
+    toast,
+  ]);
 
   const orderPrepare = useKkshowOrder((s) => s.handleOrderPrepare);
   // 주문 클릭시
   const handleOrderClick = useCallback(
     (type: 'gift' | 'instant-order' = 'instant-order'): void => {
-      if (!(selectedOpts.length > 0)) {
-        toast({ title: '선택된 옵션이 없습니다.', status: 'warning' });
-        return;
-      }
+      if (!executePurchaseCheck()) return;
       const isGiftOrder = type === 'gift';
       orderPrepare({
         orderPrice: totalInfo.price,
@@ -407,8 +442,7 @@ function GoodsViewButtonSet({
               discountPrice: o.price,
               weight: o.weight,
             })),
-            // TODO: 상품 배송비 판단 로직 이후 수정 필요
-            shippingCost: '2500',
+            shippingCost: getStandardShippingCost(goods.ShippingGroup),
             shippingGroupId: goods.shippingGroupId || 1,
             // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
             channel: 'normal',
@@ -433,17 +467,18 @@ function GoodsViewButtonSet({
       router.push('/payment');
     },
     [
-      selectedOpts,
-      profile.data?.id,
+      executePurchaseCheck,
       orderPrepare,
       totalInfo.price,
       selectedBc,
+      profile.data?.id,
       goods.goods_name,
       goods.id,
+      goods.ShippingGroup,
       goods.shippingGroupId,
+      selectedOpts,
       supportMessage,
       router,
-      toast,
     ],
   );
 
