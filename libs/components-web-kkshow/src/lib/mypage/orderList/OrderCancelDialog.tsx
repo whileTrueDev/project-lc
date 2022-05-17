@@ -64,6 +64,7 @@ export function OrderCancelDialog({
             item.options.map((opt) => (
               <OrderItemOptionInfo
                 key={opt.id}
+                order={orderDetailData}
                 option={opt}
                 orderItem={item}
                 displayStatus={false}

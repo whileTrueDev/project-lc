@@ -227,6 +227,7 @@ export function ExchangeReturnWriteSection({
       <Divider />
 
       <ItemSelectSection
+        order={data}
         orderItems={data.orderItems}
         selectedItems={selectedItems}
         setSelectedItems={setSelectedItems}
