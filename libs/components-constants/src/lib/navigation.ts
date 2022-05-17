@@ -327,8 +327,6 @@ const customerMypageShoppingChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
     href: '/mypage/exchange-return-cancel',
     checkIsActive: defaultIsActiveChecker,
   },
-  { name: '환불 내역', href: '/mypage/환불 내역', checkIsActive: defaultIsActiveChecker },
-  { name: '주문 내역', href: '/mypage/주문 내역', checkIsActive: defaultIsActiveChecker },
   { name: '마일리지', href: '/mypage/마일리지', checkIsActive: defaultIsActiveChecker },
 ];
 /** 크크쇼 소비자 마이페이지 사이드바 - "활동" 하위 탭 */
