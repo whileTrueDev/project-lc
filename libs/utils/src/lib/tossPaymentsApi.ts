@@ -1,5 +1,5 @@
 import {
-  PaymentByOrderId,
+  Payment,
   PaymentRequestDto,
   PaymentTransaction,
   TossPaymentCancelDto,
@@ -64,7 +64,7 @@ const requestCancelPayment = async ({
 };
 
 /** 토스페이먼츠 주문번호(order.orderCode)로 결제내역조회 */
-const getPaymentByOrderId = async (orderId: string): Promise<PaymentByOrderId> => {
+const getPaymentByOrderId = async (orderId: string): Promise<Payment> => {
   const url = `${BASE_URL}/payments/orders/${orderId}`;
   const response = await axios.get(url, axiosConfig);
   return response.data;
