@@ -138,7 +138,7 @@ export function ExchangeReturnCancelRequestStatusBadge({
 }): JSX.Element {
   return (
     <Box>
-      <Badge colorScheme={processTextDict[status].color} variant="solid">
+      <Badge colorScheme={processTextDict[status].color} variant="solid" fontSize="1rem">
         {prefix}
         {processTextDict[status].name}
         {suffix}
