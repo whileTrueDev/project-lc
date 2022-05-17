@@ -24,10 +24,26 @@ export function OrderItemActionButtons({
   const { orderId } = orderItem;
 
   // 해당 주문상품이 포함된 주문취소요청
-  const orderCancellationIncludingThisOrderItem = order.orderCancellations
-    ?.flatMap((o) => {
-      const { items, cancelCode } = o;
+  const cancelDataIncludingThisOrderItem = order.orderCancellations
+    ?.flatMap((c) => {
+      const { items, cancelCode } = c;
       return items.map((i) => ({ cancelCode, ...i }));
+    })
+    .find((oc) => oc.orderItemOptionId === option.id);
+
+  // 해당 주문상품이 포함된 교환(재배송)요청
+  const exchangeDataIncludingThisOrderItem = order.exchanges
+    ?.flatMap((e) => {
+      const { exchangeItems, exchangeCode } = e;
+      return exchangeItems.map((i) => ({ exchangeCode, ...i }));
+    })
+    .find((oc) => oc.orderItemOptionId === option.id);
+
+  // 해당 주문상품이 포함된 반품(환불)요청
+  const returnDataIncludingThisOrderItem = order.returns
+    ?.flatMap((r) => {
+      const { items, returnCode } = r;
+      return items.map((i) => ({ returnCode, ...i }));
     })
     .find((oc) => oc.orderItemOptionId === option.id);
 
@@ -52,12 +68,12 @@ export function OrderItemActionButtons({
     {
       label: '주문 취소 신청',
       onClick: () => {
-        if (!orderCancellationIncludingThisOrderItem) {
+        if (!cancelDataIncludingThisOrderItem) {
           orderCancelDialog.onOpen();
         } else {
           // 해당 주문상품이 포함된 주문취소요청이 있는경우 -> 그 주문요청 상세페이지로 이동
           router.push(
-            `/mypage/exchange-return-cancel/cancel/${orderCancellationIncludingThisOrderItem.cancelCode}`,
+            `/mypage/exchange-return-cancel/cancel/${cancelDataIncludingThisOrderItem.cancelCode}`,
           );
         }
       },
@@ -66,8 +82,24 @@ export function OrderItemActionButtons({
     },
     {
       label: '재배송/환불 신청',
-      onClick: () =>
-        router.push(`/mypage/exchange-return-cancel/write?orderId=${orderId}`),
+      onClick: () => {
+        // 재배송/환불신청 없으면 재배송/환불 작성페이지로 이동
+        if (!exchangeDataIncludingThisOrderItem && !returnDataIncludingThisOrderItem) {
+          router.push(`/mypage/exchange-return-cancel/write?orderId=${orderId}`);
+        }
+        // 해당 주문상품이 포함된 재배송(교환)요청 있으면 재배송요청 상세페이지로 이동
+        if (exchangeDataIncludingThisOrderItem) {
+          router.push(
+            `/mypage/exchange-return-cancel/exchange/${exchangeDataIncludingThisOrderItem.exchangeCode}`,
+          );
+        }
+        // 해당 주문상품이 포함된 환불(반품)요청 있으면 환불 상세페이지로 이동
+        if (returnDataIncludingThisOrderItem) {
+          router.push(
+            `/mypage/exchange-return-cancel/return/${returnDataIncludingThisOrderItem.returnCode}`,
+          );
+        }
+      },
       display: exchangeReturnAbleSteps.includes(step) && !purchaseConfirmationDate, // 상품준비 이후 표시 && 구매확정 안했을 때
       disabled: !!purchaseConfirmationDate, // 구매확정 이후 disabled
     },
