@@ -323,7 +323,7 @@ const customerMypageShoppingChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
     },
   },
   {
-    name: '반품/교환 내역',
+    name: '반품/교환/취소 내역',
     href: '/mypage/exchange-return-cancel',
     checkIsActive: defaultIsActiveChecker,
   },
