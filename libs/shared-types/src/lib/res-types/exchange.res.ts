@@ -1,4 +1,4 @@
-import { Exchange, ExchangeItem, Export, Order } from '@prisma/client';
+import { Exchange, ExchangeImage, ExchangeItem, Export, Order } from '@prisma/client';
 import { ExchangeReturnCancelItemBaseData } from './orderCancellation.res';
 
 export type CreateExchangeRes = Exchange;
@@ -22,7 +22,7 @@ export type ExchangeListRes = {
   nextCursor?: number;
 };
 
-export type ExchangeDetailRes = ExchangeData;
+export type ExchangeDetailRes = ExchangeData & { images: ExchangeImage[] };
 
 export type ExchangeUpdateRes = boolean;
 

@@ -1,4 +1,4 @@
-import { Order, Refund, Return, ReturnItem } from '@prisma/client';
+import { Order, Refund, Return, ReturnImage, ReturnItem } from '@prisma/client';
 import { ExchangeReturnCancelItemBaseData } from './orderCancellation.res';
 
 export type CreateReturnRes = Return;
@@ -23,7 +23,7 @@ export type ReturnListRes = {
   nextCursor?: number;
 };
 
-export type ReturnDetailRes = ReturnData;
+export type ReturnDetailRes = ReturnData & { images: ReturnImage[] };
 
 export type UpdateReturnRes = boolean;
 

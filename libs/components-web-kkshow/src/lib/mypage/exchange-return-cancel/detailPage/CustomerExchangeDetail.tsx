@@ -1,7 +1,7 @@
-import { Button, Center, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
+import { Button, Center, Image, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
 import { Export, ExportProcessStatus } from '@prisma/client';
 import { useDeleteCustomerExchange, useExchangeDetail } from '@project-lc/hooks';
-import { ExchangeData } from '@project-lc/shared-types';
+import { ExchangeDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import {
@@ -37,7 +37,7 @@ export function CustomerExchangeDetail({
 
 export default CustomerExchangeDetail;
 
-export function ExchangeDetialData({ data }: { data: ExchangeData }): JSX.Element {
+export function ExchangeDetialData({ data }: { data: ExchangeDetailRes }): JSX.Element {
   const router = useRouter();
   const toast = useToast();
 
@@ -102,6 +102,14 @@ export function ExchangeDetialData({ data }: { data: ExchangeData }): JSX.Elemen
           <Text>요청일 : {requestDate}</Text>
           <Stack pl={4}>
             <Text>재배송요청 사유 : {data.reason}</Text>
+            {data.images.length && (
+              <>
+                <Text>재배송요청 이미지 : </Text>
+                {data.images.map((img) => (
+                  <Image maxW="400px" maxH="300px" src={img.imageUrl} key={img.id} />
+                ))}
+              </>
+            )}
           </Stack>
 
           {completeDate && <Text>완료일 : {completeDate}</Text>}

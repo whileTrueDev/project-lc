@@ -1,11 +1,11 @@
-import { Button, Center, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
+import { Button, Center, Image, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
 import { useDeleteCustomerReturn, useReturnDetail } from '@project-lc/hooks';
-import { ReturnData } from '@project-lc/shared-types';
+import { ReturnDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import {
-  ExchangeReturnCancelRequestStatusBadge,
   ExchangeReturnCancelRequestGoodsData,
+  ExchangeReturnCancelRequestStatusBadge,
 } from '../list/ExchangeReturnCancelListItem';
 import RelatedRefundData from './RelatedRefundData';
 
@@ -33,7 +33,7 @@ export function CustomerReturnDetail({
 
 export default CustomerReturnDetail;
 
-export function ReturnDetailData({ data }: { data: ReturnData }): JSX.Element {
+export function ReturnDetailData({ data }: { data: ReturnDetailRes }): JSX.Element {
   const router = useRouter();
   const toast = useToast();
 
@@ -99,6 +99,14 @@ export function ReturnDetailData({ data }: { data: ReturnData }): JSX.Element {
           <Text>요청일 : {requestDate}</Text>
           <Stack pl={4}>
             <Text>환불요청 사유 : {data.reason}</Text>
+            {data.images.length && (
+              <>
+                <Text>환불요청 이미지 : </Text>
+                {data.images.map((img) => (
+                  <Image maxW="400px" maxH="300px" src={img.imageUrl} key={img.id} />
+                ))}
+              </>
+            )}
           </Stack>
 
           {completeDate && <Text>완료일 : {completeDate}</Text>}
@@ -119,7 +127,7 @@ export function ReturnDetailData({ data }: { data: ReturnData }): JSX.Element {
         refund={data.refund}
         estimatedRefundAmount={data.items
           .map((item) => item.price)
-          .reduce((sum, price) => sum + price)}
+          .reduce((sum, price) => sum + price, 0)}
       />
     </Stack>
   );
