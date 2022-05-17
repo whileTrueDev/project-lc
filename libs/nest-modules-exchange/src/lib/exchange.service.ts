@@ -130,6 +130,8 @@ export class ExchangeService extends ServiceBaseWithCache {
 
   /** 특정 교환요청 상세 조회 */
   async getExchangeDetail(exchangeCode: string): Promise<ExchangeDetailRes> {
+    await this.findUnique({ exchangeCode });
+
     const data = await this.prisma.exchange.findUnique({
       where: { exchangeCode },
       include: {
@@ -180,7 +182,7 @@ export class ExchangeService extends ServiceBaseWithCache {
     id: number,
     dto: UpdateExchangeDto,
   ): Promise<ExchangeUpdateRes> {
-    await this.findOneById(id);
+    await this.findUnique({ id });
 
     const { exportId, ...rest } = dto;
     await this.prisma.exchange.update({
@@ -196,16 +198,18 @@ export class ExchangeService extends ServiceBaseWithCache {
     return true;
   }
 
-  private async findOneById(id: number): Promise<Exchange> {
-    const data = await this.prisma.exchange.findUnique({ where: { id } });
+  private async findUnique(where: Prisma.ExchangeWhereUniqueInput): Promise<Exchange> {
+    const data = await this.prisma.exchange.findUnique({ where });
     if (!data)
-      throw new BadRequestException(`해당 교환요청이 존재하지 않습니다. 교유번호: ${id}`);
+      throw new BadRequestException(
+        `해당 교환요청이 존재하지 않습니다.  ${JSON.stringify(where)}`,
+      );
     return data;
   }
 
   /** 교환요청 삭제 */
   async deleteExchange(id: number): Promise<ExchangeDeleteRes> {
-    await this.findOneById(id);
+    await this.findUnique({ id });
 
     await this.prisma.exchange.delete({
       where: { id },
