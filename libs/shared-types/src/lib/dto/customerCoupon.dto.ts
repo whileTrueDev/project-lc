@@ -16,5 +16,12 @@ export class CustomerCouponDto {
   @IsEnum(CouponStatus)
   status?: CouponStatus;
 }
+export class CouponStatusDto {
+  @IsNumber()
+  id: number;
+
+  @IsEnum(CouponStatus)
+  status: CouponStatus;
+}
 
 export type CustomerCouponIdAndStatus = Pick<CustomerCouponDto, 'id' | 'status'>;

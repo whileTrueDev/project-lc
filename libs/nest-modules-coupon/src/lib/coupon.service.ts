@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Coupon } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
+import { CouponDto } from '@project-lc/shared-types';
 
 @Injectable()
 export class CouponService {
@@ -10,7 +11,7 @@ export class CouponService {
     return this.prismaService.coupon.findMany();
   }
 
-  createCoupon(dto): Promise<Coupon> {
+  createCoupon(dto: CouponDto): Promise<Coupon> {
     return this.prismaService.coupon.create({
       data: {
         ...dto,
@@ -18,7 +19,7 @@ export class CouponService {
     });
   }
 
-  updateCoupon(dto): Promise<Coupon> {
+  updateCoupon(dto: CouponDto & { id: number }): Promise<Coupon> {
     const { id, ...updateData } = dto;
     return this.prismaService.coupon.update({
       where: { id },
@@ -28,10 +29,10 @@ export class CouponService {
     });
   }
 
-  deleteCoupon(dto): Promise<Coupon> {
+  deleteCoupon(couponId: number): Promise<Coupon> {
     return this.prismaService.coupon.delete({
       where: {
-        id: dto.couponId,
+        id: couponId,
       },
     });
   }

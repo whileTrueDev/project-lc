@@ -30,6 +30,7 @@ import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { AdminCouponController } from './admin-coupon.controller';
+import { AdminCustomerCouponController } from './admin-customer-coupon.controller';
 
 @Module({})
 export class AdminModule {
@@ -59,6 +60,7 @@ export class AdminModule {
     AdminGoodsCategoryController,
     AdminCustomerController,
     AdminCouponController,
+    AdminCustomerCouponController,
   ];
 
   private static readonly imports = [

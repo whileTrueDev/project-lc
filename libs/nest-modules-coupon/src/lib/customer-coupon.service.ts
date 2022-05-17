@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CustomerCoupon, CouponLogType } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { CustomerCouponIdAndStatus, CustomerCouponDto } from '@project-lc/shared-types';
+import { CustomerCouponDto, CouponStatusDto } from '@project-lc/shared-types';
 
 @Injectable()
 export class CustomerCouponService {
@@ -38,9 +38,7 @@ export class CustomerCouponService {
     });
   }
 
-  async updateCustomerCouponStatus(
-    dto: CustomerCouponIdAndStatus,
-  ): Promise<CustomerCoupon> {
+  async updateCustomerCouponStatus(dto: CouponStatusDto): Promise<CustomerCoupon> {
     let couponLogType: CouponLogType;
     if (dto.status === 'used') {
       couponLogType = CouponLogType.use;

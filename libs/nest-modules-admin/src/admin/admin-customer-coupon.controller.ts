@@ -10,18 +10,18 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { Coupon, CustomerCoupon, CustomerCouponLog, CouponStatus } from '@prisma/client';
+import { CustomerCoupon } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CouponService,
   CustomerCouponService,
   CouponLogService,
 } from '@project-lc/nest-modules-coupon';
-import { CouponDto, CustomerCouponDto, CouponStatusDto } from '@project-lc/shared-types';
+import { CustomerCouponDto, CouponStatusDto } from '@project-lc/shared-types';
 
 // @UseGuards(JwtAuthGuard, AdminGuard)
-@Controller('admin/coupon')
-export class AdminCouponController {
+@Controller('admin/customer-coupon')
+export class AdminCustomerCouponController {
   constructor(
     private readonly couponService: CouponService,
     private readonly customerCouponService: CustomerCouponService,
@@ -29,52 +29,25 @@ export class AdminCouponController {
   ) {}
 
   @Get()
-  async getAllCoupons(): Promise<Coupon[]> {
-    return this.couponService.findCoupons();
-  }
-
-  @Post()
-  async createCoupon(@Body(ValidationPipe) dto: CouponDto): Promise<Coupon> {
-    return this.couponService.createCoupon(dto);
-  }
-
-  @Patch()
-  async updateCoupon(
-    @Body(ValidationPipe) dto: CouponDto & { id: number },
-  ): Promise<Coupon> {
-    return this.couponService.updateCoupon(dto);
-  }
-
-  @Get('history')
-  async getCouponLogs(): Promise<CustomerCouponLog[]> {
-    return this.couponLogService.adminFindCouponLogs();
-  }
-
-  @Delete(':couponId')
-  async deleteCoupon(@Param('couponId', ParseIntPipe) couponId: number): Promise<Coupon> {
-    return this.couponService.deleteCoupon(couponId);
-  }
-
-  @Get('customer-coupon')
   async getAllCustomerCoupons(): Promise<CustomerCoupon[]> {
     return this.customerCouponService.findCustomerCoupons();
   }
 
-  @Post('customer-coupon')
+  @Post()
   async createCustomerCoupon(
     @Body(ValidationPipe) dto: CustomerCouponDto,
   ): Promise<CustomerCoupon> {
     return this.customerCouponService.createCustomerCoupon(dto);
   }
 
-  @Get('customer-coupon/:customerId')
+  @Get('/:customerId')
   async getCustomerCouponsByCustomerId(
     @Param('customerId', ParseIntPipe) customerId: number,
   ): Promise<CustomerCoupon[]> {
     return this.customerCouponService.findCustomerCoupons(customerId);
   }
 
-  @Patch('customer-coupon/:customerCouponId')
+  @Patch('/:customerCouponId')
   async updateCustomerCouponStatus(
     @Param('customerCouponId', ParseIntPipe) customerCouponId: number,
     @Body('status', ValidationPipe) status: CouponStatusDto['status'],
@@ -85,7 +58,7 @@ export class AdminCouponController {
     });
   }
 
-  @Delete('customer-coupon/:customerCouponId')
+  @Delete('/:customerCouponId')
   async deleteCustomerCoupon(
     @Param('customerCouponId', ParseIntPipe) customerCouponId: number,
   ): Promise<CustomerCoupon> {

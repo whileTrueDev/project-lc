@@ -30,12 +30,7 @@ export class CouponLogService {
       },
     });
 
-    const result = query.map((item) => item.logs);
-
-    const flatResult = result.reduce((a, b) => {
-      return a.concat(b);
-    }, []);
-
-    return flatResult;
+    const result = query.flatMap((item) => item.logs);
+    return result;
   }
 }

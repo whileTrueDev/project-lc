@@ -5,17 +5,18 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  UseGuards,
   UseInterceptors,
   ValidationPipe,
-  UseGuards,
 } from '@nestjs/common';
+import { CustomerCoupon, CustomerCouponLog } from '@prisma/client';
 import { HttpCacheInterceptor, UserInfo, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { CustomerCoupon, CustomerCouponLog, CouponStatus } from '@prisma/client';
-import { CustomerCouponService } from './customer-coupon.service';
+import { CouponStatusDto } from '@project-lc/shared-types';
 import { CouponLogService } from './coupon-log.service';
+import { CustomerCouponService } from './customer-coupon.service';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @Controller('coupon')
 export class CouponController {
@@ -42,10 +43,10 @@ export class CouponController {
     return this.customerCouponService.findCustomerCoupon(customerCouponId);
   }
 
-  @Patch()
+  @Patch('/:customerCouponId')
   updateCustomerCouponStatus(
     @Param('customerCouponId', ParseIntPipe) customerCouponId: number,
-    @Body('status', ValidationPipe) status: CouponStatus,
+    @Body('status', ValidationPipe) status: CouponStatusDto['status'],
   ): Promise<CustomerCoupon> {
     return this.customerCouponService.updateCustomerCouponStatus({
       id: customerCouponId,
