@@ -675,6 +675,7 @@
       "tags": []
     },
     "nest-modules-customer": "libs/nest-modules-customer",
+    "nest-modules-exchange": "libs/nest-modules-exchange",
     "nest-modules-goods": {
       "root": "libs/nest-modules-goods",
       "sourceRoot": "libs/nest-modules-goods/src",
@@ -1045,6 +1046,8 @@
       },
       "tags": []
     },
+    "nest-modules-refund": "libs/nest-modules-refund",
+    "nest-modules-return": "libs/nest-modules-return",
     "nest-modules-seller": {
       "root": "libs/nest-modules-seller",
       "sourceRoot": "libs/nest-modules-seller/src",

@@ -1,18 +1,24 @@
 import {
+  Broadcaster,
   Goods,
-  GoodsOptions,
-  ShippingGroup,
+  GoodsCategory,
   GoodsConfirmation,
   GoodsImages,
   GoodsInfo,
+  GoodsInformationNotice,
+  GoodsInformationSubject,
+  GoodsOptions,
   GoodsOptionsSupplies,
-  ShippingSet,
-  ShippingOption,
-  ShippingCost,
   LiveShopping,
+  ProductPromotion,
   Seller,
+  ShippingCost,
+  ShippingGroup,
+  ShippingOption,
+  ShippingSet,
 } from '@prisma/client';
 
+export type GoodsRelatedBroadcaster = Pick<Broadcaster, 'id' | 'avatar' | 'userNickname'>;
 export type GoodsByIdRes = Goods & {
   options: (GoodsOptions & {
     supply: GoodsOptionsSupplies;
@@ -29,7 +35,19 @@ export type GoodsByIdRes = Goods & {
   confirmation: GoodsConfirmation;
   image: GoodsImages[];
   GoodsInfo: GoodsInfo | null;
-  LiveShopping?: LiveShopping[];
+  LiveShopping?: Array<
+    LiveShopping & {
+      broadcaster: GoodsRelatedBroadcaster;
+    }
+  >;
+  productPromotion: Array<
+    ProductPromotion & {
+      broadcaster: GoodsRelatedBroadcaster;
+    }
+  >;
+  categories: GoodsCategory[];
+  informationNotice: GoodsInformationNotice;
+  informationSubject: GoodsInformationSubject;
 };
 
 export type AdminGoodsByIdRes = GoodsByIdRes & {
