@@ -12,7 +12,7 @@ export type ExchangeItemData = ExchangeReturnCancelItemBaseData & {
   status: ExchangeItem['status'];
 };
 export type ExchangeData = Omit<Exchange, 'exchangeItems'> & {
-  export: Export;
+  export: Export | null;
   order: { orderCode: Order['orderCode'] };
   items: ExchangeItemData[];
 };
@@ -22,7 +22,7 @@ export type ExchangeListRes = {
   nextCursor?: number;
 };
 
-export type ExchangeDetailRes = any;
+export type ExchangeDetailRes = ExchangeData;
 
 export type ExchangeUpdateRes = boolean;
 

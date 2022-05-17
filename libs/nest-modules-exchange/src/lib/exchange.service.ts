@@ -1,19 +1,19 @@
 import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { PrismaService } from '@project-lc/prisma-orm';
+import { Exchange, Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { Cache } from 'cache-manager';
+import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateExchangeDto,
   CreateExchangeRes,
   ExchangeDeleteRes,
+  ExchangeDetailRes,
   ExchangeListRes,
   ExchangeUpdateRes,
   GetExchangeListDto,
-  ReturnDetailRes,
   UpdateExchangeDto,
 } from '@project-lc/shared-types';
+import { Cache } from 'cache-manager';
 import { nanoid } from 'nanoid';
-import { Exchange, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ExchangeService extends ServiceBaseWithCache {
@@ -129,16 +129,50 @@ export class ExchangeService extends ServiceBaseWithCache {
   }
 
   /** 특정 교환요청 상세 조회 */
-  async getExchangeDetail(id: number): Promise<ReturnDetailRes> {
-    return this.prisma.exchange.findUnique({
-      where: { id },
+  async getExchangeDetail(exchangeCode: string): Promise<ExchangeDetailRes> {
+    const data = await this.prisma.exchange.findUnique({
+      where: { exchangeCode },
       include: {
-        order: { select: { orderCode: true, id: true } },
-        exchangeItems: true,
-        images: true,
+        order: { select: { orderCode: true } },
         export: true,
+        exchangeItems: {
+          include: {
+            orderItem: {
+              select: {
+                id: true,
+                goods: {
+                  select: {
+                    id: true,
+                    goods_name: true,
+                    image: true,
+                    seller: { select: { sellerShop: true } },
+                  },
+                },
+              },
+            },
+            orderItemOption: true,
+          },
+        },
+        images: true,
       },
     });
+
+    const { exchangeItems, ...rest } = data;
+
+    const _items = exchangeItems.map((i) => ({
+      id: i.id, // 교환 상품 고유번호
+      amount: i.amount, // 교환 상품 개수
+      status: i.status, // 교환 상품 처리상태
+      goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
+      image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지
+      shopName: i.orderItem.goods.seller.sellerShop?.shopName, // 주문상품 판매상점명
+      optionName: i.orderItemOption.name, // 주문상품옵션명
+      optionValue: i.orderItemOption.value, // 주문상품옵션 값
+      price: Number(i.orderItemOption.discountPrice), // 주문상품옵션 가격
+      orderItemId: i.orderItem.id, // 연결된 주문상품고유번호
+      orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
+    }));
+    return { items: _items, ...rest };
   }
 
   /** 교환요청 상태 변경 */
