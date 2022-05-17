@@ -105,10 +105,6 @@ export function OrderCancelDetailData({
           )}
 
           <Text>요청일 : {requestDate}</Text>
-          <Stack pl={4}>
-            <Text>주문취소 사유 : {data.reason}</Text>
-          </Stack>
-
           {completeDate && <Text>완료일 : {completeDate}</Text>}
         </Stack>
       </Stack>
@@ -127,7 +123,7 @@ export function OrderCancelDetailData({
         refund={data.refund}
         estimatedRefundAmount={data.items
           .map((item) => item.price)
-          .reduce((sum, price) => sum + price)}
+          .reduce((sum, price) => sum + price, 0)}
       />
     </Stack>
   );
