@@ -1,9 +1,20 @@
-import { ExchangeListRes, GetExchangeListDto } from '@project-lc/shared-types';
+import {
+  ExchangeDetailRes,
+  ExchangeListRes,
+  GetExchangeListDto,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useInfiniteQuery, UseInfiniteQueryResult } from 'react-query';
+import {
+  useInfiniteQuery,
+  UseInfiniteQueryResult,
+  useQuery,
+  UseQueryResult,
+} from 'react-query';
 import axios from '../../axios';
 
-export const getExchange = async (dto: GetExchangeListDto): Promise<ExchangeListRes> => {
+export const getExchangeList = async (
+  dto: GetExchangeListDto,
+): Promise<ExchangeListRes> => {
   return axios.get<ExchangeListRes>('/exchange', { params: dto }).then((res) => res.data);
 };
 
@@ -13,7 +24,26 @@ export const useCustomerInfiniteExchangeList = (
 ): UseInfiniteQueryResult<ExchangeListRes, AxiosError> => {
   return useInfiniteQuery(
     ['InfiniteCustomerExchangeList', dto.customerId],
-    ({ pageParam = 0 }) => getExchange({ ...dto, skip: pageParam }),
+    ({ pageParam = 0 }) => getExchangeList({ ...dto, skip: pageParam }),
     { getNextPageParam: (lastPage) => lastPage?.nextCursor },
+  );
+};
+
+export const getExchangeDetail = async (
+  exchangeCode: string,
+): Promise<ExchangeDetailRes> => {
+  return axios
+    .get<ExchangeDetailRes>(`/exchange/${exchangeCode}`)
+    .then((res) => res.data);
+};
+
+/** 특정 교환(재배송) 상세조회 훅 */
+export const useExchangeDetail = (
+  exchangeCode: string,
+): UseQueryResult<ExchangeDetailRes, AxiosError> => {
+  return useQuery(
+    ['customerExchangeDetail', exchangeCode],
+    () => getExchangeDetail(exchangeCode),
+    { enabled: !!exchangeCode },
   );
 };
