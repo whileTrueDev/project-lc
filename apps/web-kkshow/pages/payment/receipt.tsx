@@ -193,7 +193,7 @@ function deleteCookie(): void {
   document.cookie = `amount= ; expires=${date.toUTCString()}; path=/`;
 }
 
-export function Success(): JSX.Element {
+export function Receipt(): JSX.Element {
   const router = useRouter();
   const { isDesktopSize } = useDisplaySize();
   const virtualAccountBoxBgColor = useColorModeValue('gray.100', 'gray.700');
@@ -438,4 +438,4 @@ export function Success(): JSX.Element {
   );
 }
 
-export default Success;
+export default Receipt;

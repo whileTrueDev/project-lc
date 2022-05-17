@@ -42,7 +42,7 @@ export class PaymentService {
       })
       .catch((err) => {
         console.error(err);
-        return false;
+        return { error: err.response.data.message };
       });
   }
 
