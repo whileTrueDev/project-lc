@@ -10,16 +10,16 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { Coupon, CustomerCoupon, CustomerCouponLog, CouponStatus } from '@prisma/client';
+import { Coupon, CustomerCouponLog } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CouponService,
   CustomerCouponService,
   CouponLogService,
 } from '@project-lc/nest-modules-coupon';
-import { CouponDto, CustomerCouponDto, CouponStatusDto } from '@project-lc/shared-types';
+import { CouponDto } from '@project-lc/shared-types';
 
-// @UseGuards(JwtAuthGuard, AdminGuard)
+@UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin/coupon')
 export class AdminCouponController {
   constructor(
@@ -53,42 +53,5 @@ export class AdminCouponController {
   @Delete(':couponId')
   async deleteCoupon(@Param('couponId', ParseIntPipe) couponId: number): Promise<Coupon> {
     return this.couponService.deleteCoupon(couponId);
-  }
-
-  @Get('customer-coupon')
-  async getAllCustomerCoupons(): Promise<CustomerCoupon[]> {
-    return this.customerCouponService.findCustomerCoupons();
-  }
-
-  @Post('customer-coupon')
-  async createCustomerCoupon(
-    @Body(ValidationPipe) dto: CustomerCouponDto,
-  ): Promise<CustomerCoupon> {
-    return this.customerCouponService.createCustomerCoupon(dto);
-  }
-
-  @Get('customer-coupon/:customerId')
-  async getCustomerCouponsByCustomerId(
-    @Param('customerId', ParseIntPipe) customerId: number,
-  ): Promise<CustomerCoupon[]> {
-    return this.customerCouponService.findCustomerCoupons(customerId);
-  }
-
-  @Patch('customer-coupon/:customerCouponId')
-  async updateCustomerCouponStatus(
-    @Param('customerCouponId', ParseIntPipe) customerCouponId: number,
-    @Body('status', ValidationPipe) status: CouponStatusDto['status'],
-  ): Promise<CustomerCoupon> {
-    return this.customerCouponService.updateCustomerCouponStatus({
-      id: customerCouponId,
-      status,
-    });
-  }
-
-  @Delete('customer-coupon/:customerCouponId')
-  async deleteCustomerCoupon(
-    @Param('customerCouponId', ParseIntPipe) customerCouponId: number,
-  ): Promise<CustomerCoupon> {
-    return this.customerCouponService.deleteCustomerCoupon(customerCouponId);
   }
 }

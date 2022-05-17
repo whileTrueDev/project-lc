@@ -10,13 +10,18 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CustomerCoupon, CustomerCouponLog } from '@prisma/client';
-import { HttpCacheInterceptor, UserInfo, UserPayload } from '@project-lc/nest-core';
+import {
+  HttpCacheInterceptor,
+  UserInfo,
+  UserPayload,
+  CustomerInfo,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CouponStatusDto } from '@project-lc/shared-types';
 import { CouponLogService } from './coupon-log.service';
 import { CustomerCouponService } from './customer-coupon.service';
 
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @Controller('coupon')
 export class CouponController {
@@ -26,13 +31,12 @@ export class CouponController {
   ) {}
 
   @Get()
-  getCustomerCoupons(@UserInfo() { id }: UserPayload): Promise<CustomerCoupon[]> {
+  getCustomerCoupons(@CustomerInfo() { id }: UserPayload): Promise<CustomerCoupon[]> {
     return this.customerCouponService.findCustomerCoupons(id);
   }
 
   @Get('history')
-  async getCouponLogs(): Promise<CustomerCouponLog[]> {
-    const id = 1;
+  async getCouponLogs(@CustomerInfo() { id }: UserPayload): Promise<CustomerCouponLog[]> {
     return this.couponLogService.findCouponLogs(id);
   }
 

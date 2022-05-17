@@ -19,7 +19,7 @@ import {
 } from '@project-lc/nest-modules-coupon';
 import { CustomerCouponDto, CouponStatusDto } from '@project-lc/shared-types';
 
-// @UseGuards(JwtAuthGuard, AdminGuard)
+@UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin/customer-coupon')
 export class AdminCustomerCouponController {
   constructor(
