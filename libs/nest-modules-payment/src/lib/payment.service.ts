@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Payment, PaymentTransaction } from '@project-lc/shared-types';
+import { Payment, PaymentTransaction, CreatePaymentRes } from '@project-lc/shared-types';
 import axios from 'axios';
 
 type PaymentsByDateRequestType = {
@@ -19,7 +19,7 @@ export class PaymentService {
   }
 
   /** 결제승인 요청 API */
-  async createPayment(dto): Promise<any> {
+  async createPayment(dto): Promise<CreatePaymentRes> {
     return axios
       .post(
         `${this.BASE_URL}/payments/${dto.paymentKey}`,
@@ -38,11 +38,15 @@ export class PaymentService {
         },
       )
       .then((res) => {
-        return res.data;
+        return { status: 'success', orderId: dto.orderId };
       })
       .catch((err) => {
         console.error(err);
-        return { error: err.response.data.message };
+        return {
+          status: 'error',
+          message: err.response.data.message,
+          orderId: dto.orderId,
+        };
       });
   }
 

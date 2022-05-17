@@ -8,12 +8,9 @@ import {
   Divider,
   Button,
   useColorModeValue,
-  Spinner,
 } from '@chakra-ui/react';
-import { usePaymentMutation, useKkshowOrder, useDisplaySize } from '@project-lc/hooks';
+import { useDisplaySize, usePaymentByOrderId } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { Payment } from '@project-lc/shared-types';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
 import { SuccessDeliveryAddress } from '@project-lc/components-web-kkshow/payment/DeliveryAddress';
 import {
@@ -183,26 +180,12 @@ const dummyOrderResult = {
   orderCancellations: [],
 };
 
-function getCookie(): number | null {
-  const value = document.cookie.match(`(^|;) ?amount=([^;]*)(;|$)`);
-  return value ? Number(value[2]) : null;
-}
-
-function deleteCookie(): void {
-  const date = new Date();
-  document.cookie = `amount= ; expires=${date.toUTCString()}; path=/`;
-}
-
 export function Receipt(): JSX.Element {
   const router = useRouter();
   const { isDesktopSize } = useDisplaySize();
-  const virtualAccountBoxBgColor = useColorModeValue('gray.100', 'gray.700');
-  const [isRequested, setIsRequested] = useState(false);
-  const [paymentData, setPaymentData] = useState<Payment>();
-
   const orderId = router.query.orderId as string;
-  const paymentKey = router.query.paymentKey as string;
-  const redirectAmount = Number(router.query.amount as string);
+  const { data: paymentData, isLoading } = usePaymentByOrderId(orderId);
+  const virtualAccountBoxBgColor = useColorModeValue('gray.100', 'gray.700');
 
   const productOriginPrice = dummyOrderResult.orderItems[0].options.reduce(
     (s, a) => s + Number(a.normalPrice),
@@ -216,51 +199,13 @@ export function Receipt(): JSX.Element {
 
   const discount = productOriginPrice - productDiscountedPrice;
 
-  const { mutateAsync } = usePaymentMutation();
   // todo: 주문 연결 이후, dummyOrderResult 대신 이 데이터로 사용
-  const { data: orderData } = useKkshowOrder(orderId || '');
-
-  useEffect(() => {
-    const tossPaymentsAmount = getCookie();
-    window.onbeforeunload = () => "If you leave this page, you'll also leave the call";
-    if (
-      orderId &&
-      paymentKey &&
-      redirectAmount &&
-      !isRequested &&
-      redirectAmount === tossPaymentsAmount
-    ) {
-      mutateAsync({
-        orderId,
-        paymentKey,
-        amount: redirectAmount,
-      }).then((item) => {
-        setPaymentData(item);
-      });
-      deleteCookie();
-      setIsRequested(true);
-    } else if (
-      orderId &&
-      paymentKey &&
-      redirectAmount &&
-      !isRequested &&
-      redirectAmount !== tossPaymentsAmount
-    ) {
-      deleteCookie();
-      router.push('/payment/fail?message=결제금액 오류');
-    }
-  }, [orderId, paymentKey, redirectAmount]);
+  // const { data: orderData } = useKkshowOrder(orderId || '');
 
   return (
     <KkshowLayout>
       <Flex m="auto" alignItems="center" justifyContent="center" direction="column" p={2}>
-        {!paymentData && (
-          <Flex alignItems="center" justifyContent="center" direction="column" h="2xl">
-            <Spinner mb={10} />
-            <Heading>주문 처리가 진행중입니다</Heading>
-          </Flex>
-        )}
-        {paymentData && (
+        {!isLoading && paymentData && (
           <Grid
             templateColumns="repeat(7, 5fr)"
             gap={6}
@@ -268,15 +213,9 @@ export function Receipt(): JSX.Element {
             m={10}
           >
             <GridItem colSpan={7}>
-              <Flex
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
-                p={2}
-                m={10}
-              >
+              <Flex direction="column" alignItems="center" justifyContent="center" p={2}>
                 {isDesktopSize ? (
-                  <Heading>주문이 정상적으로 완료되었습니다</Heading>
+                  <Heading m={10}>주문이 정상적으로 완료되었습니다</Heading>
                 ) : (
                   <Heading>주문 완료</Heading>
                 )}

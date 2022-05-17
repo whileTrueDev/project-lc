@@ -145,7 +145,6 @@ export * from './lib/res-types/order.res';
 export * from './lib/res-types/orderCancellation.res';
 export * from './lib/res-types/orderCancelRequest.res';
 export * from './lib/res-types/overlayControllerMain.res';
-export * from './lib/res-types/payment.res';
 export * from './lib/res-types/paymentsRes.res';
 export * from './lib/res-types/productPromotion.res';
 export * from './lib/res-types/searchResult.res';

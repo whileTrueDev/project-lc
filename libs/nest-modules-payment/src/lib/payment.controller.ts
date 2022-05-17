@@ -4,7 +4,6 @@ import {
   Body,
   UseInterceptors,
   ValidationPipe,
-  Res,
   Param,
   Get,
   Query,
@@ -12,9 +11,12 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { HttpCacheInterceptor } from '@project-lc/nest-core';
-import { getCustomerWebHost } from '@project-lc/utils';
-import { Payment, PaymentTransaction, PaymentRequestDto } from '@project-lc/shared-types';
-import { Response } from 'express';
+import {
+  Payment,
+  PaymentTransaction,
+  PaymentRequestDto,
+  CreatePaymentRes,
+} from '@project-lc/shared-types';
 import { PaymentService } from './payment.service';
 
 @UseGuards(JwtAuthGuard)
@@ -39,14 +41,9 @@ export class PaymentController {
 
   @Post('/success')
   async requestPayments(
-    @Res({ passthrough: true }) res: Response,
     @Body(ValidationPipe) dto: PaymentRequestDto,
-  ): Promise<Payment | void> {
-    const hostUrl = getCustomerWebHost();
+  ): Promise<CreatePaymentRes> {
     const payment = await this.paymentService.createPayment(dto);
-    if (payment.error) {
-      return res.redirect(`${hostUrl}/payment/fail?message=${payment.error.message}`);
-    }
     return payment;
   }
 

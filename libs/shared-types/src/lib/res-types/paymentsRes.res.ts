@@ -124,3 +124,9 @@ export interface Payment {
   cashReceipt: null | PaymentCashReceipt;
   discount: null | PaymentDiscount;
 }
+
+export interface CreatePaymentRes {
+  status: string;
+  message?: string;
+  orderId: string;
+}
