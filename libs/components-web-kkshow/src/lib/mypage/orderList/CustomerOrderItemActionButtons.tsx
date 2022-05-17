@@ -16,14 +16,20 @@ import { OrderItemOptionInfoProps } from './OrderItemOptionInfo';
 export function OrderItemActionButtons({
   option,
   orderItem,
+  order,
 }: OrderItemOptionInfoProps): JSX.Element {
   const router = useRouter();
   const { step, purchaseConfirmationDate } = option;
   const hasReview = !!orderItem.reviewId;
   const { orderId } = orderItem;
-  const orderCancellation = orderItem.orderCancellationItems?.find(
-    (item) => item.orderItemOptionId === option.id,
-  );
+
+  // 해당 주문상품이 포함된 주문취소요청
+  const orderCancellationIncludingThisOrderItem = order.orderCancellations
+    ?.flatMap((o) => {
+      const { items, cancelCode } = o;
+      return items.map((i) => ({ cancelCode, ...i }));
+    })
+    .find((oc) => oc.orderItemOptionId === option.id);
 
   const purchaseConfirmDialog = useDisclosure();
   const orderCancelDialog = useDisclosure();
@@ -45,13 +51,23 @@ export function OrderItemActionButtons({
     },
     {
       label: '주문 취소 신청',
-      onClick: orderCancelDialog.onOpen,
+      onClick: () => {
+        if (!orderCancellationIncludingThisOrderItem) {
+          orderCancelDialog.onOpen();
+        } else {
+          // 해당 주문상품이 포함된 주문취소요청이 있는경우 -> 그 주문요청 상세페이지로 이동
+          router.push(
+            `/mypage/exchange-return-cancel/cancel/${orderCancellationIncludingThisOrderItem.cancelCode}`,
+          );
+        }
+      },
       display: orderCancellationAbleSteps.includes(step), // 상품준비 이전에만 표시
-      disabled: !!orderCancellation,
+      disabled: false,
     },
     {
       label: '재배송/환불 신청',
-      onClick: () => router.push(`/mypage/exchange-return-cancel/write?orderId=${orderId}`),
+      onClick: () =>
+        router.push(`/mypage/exchange-return-cancel/write?orderId=${orderId}`),
       display: exchangeReturnAbleSteps.includes(step) && !purchaseConfirmationDate, // 상품준비 이후 표시 && 구매확정 안했을 때
       disabled: !!purchaseConfirmationDate, // 구매확정 이후 disabled
     },

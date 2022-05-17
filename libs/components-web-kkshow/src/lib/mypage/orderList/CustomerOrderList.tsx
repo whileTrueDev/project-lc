@@ -149,7 +149,7 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
 
       <Stack p={1}>
         {order.orderItems.map((item) => (
-          <OrderItem key={item.id} orderItem={item} />
+          <OrderItem key={item.id} orderItem={item} order={order} />
         ))}
       </Stack>
     </Stack>
