@@ -6,5 +6,5 @@ export const processTextDict: Record<ExchangeProcessStatus, StatusValues> = {
   collected: { name: '수거됨', color: 'yellow' },
   processing: { name: '처리진행중', color: 'pink' },
   complete: { name: '처리완료', color: 'green' },
-  canceled: { name: '취소됨', color: 'grey' },
+  canceled: { name: '취소됨', color: 'gray' },
 };
