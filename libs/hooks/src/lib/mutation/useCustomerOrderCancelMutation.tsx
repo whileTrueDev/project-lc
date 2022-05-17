@@ -6,11 +6,12 @@ import {
 import { AxiosError } from 'axios';
 import {
   useMutation,
-  UseMutationResult,
   UseMutationOptions,
+  UseMutationResult,
   useQueryClient,
 } from 'react-query';
 import axios from '../../axios';
+import { INFINITE_ORDER_CANCEL_LIST_QUERY_KEY } from '../queries/useOrderCancellation';
 import { INFINITE_ORDER_LIST_QUERY_KEY } from '../queries/useOrderList';
 
 export type useCustomerOrderCancelMutationDto = CreateOrderCancellationDto;
@@ -38,7 +39,14 @@ export const useCustomerOrderCancelMutation = (
         .post<CreateOrderCancellationRes>('order/cancellation', dto)
         .then((res) => res.data),
     {
-      onSuccess: () => queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY),
+      onSuccess: () => {
+        queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY, {
+          refetchInactive: true,
+        });
+        queryClient.invalidateQueries(INFINITE_ORDER_CANCEL_LIST_QUERY_KEY, {
+          refetchInactive: true,
+        });
+      },
       ...options,
     },
   );
@@ -58,7 +66,14 @@ export const useDeleteCustomerOrderCancel = (): UseMutationResult<
         .delete<OrderCancellationRemoveRes>(`order/cancellation/${orderCancellationId}`)
         .then((res) => res.data),
     {
-      onSuccess: () => queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY),
+      onSuccess: () => {
+        queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY, {
+          refetchInactive: true,
+        });
+        queryClient.invalidateQueries(INFINITE_ORDER_CANCEL_LIST_QUERY_KEY, {
+          refetchInactive: true,
+        });
+      },
     },
   );
 };

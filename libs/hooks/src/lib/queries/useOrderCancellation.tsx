@@ -20,12 +20,15 @@ export const getOrderCancellationList = async (
     .then((res) => res.data);
 };
 
+/** 소비자 주문취소요청 목록조회 쿼리키 */
+export const INFINITE_ORDER_CANCEL_LIST_QUERY_KEY = 'InfiniteCustomerOrderCancellation';
+
 /** 소비자 주문취소요청 목록조회 훅 */
 export const useCustomerInfiniteOrderCancellationList = (
   dto: GetOrderCancellationListDto,
 ): UseInfiniteQueryResult<OrderCancellationListRes, AxiosError> => {
   return useInfiniteQuery(
-    ['InfiniteCustomerOrderCancellation', dto.customerId],
+    [INFINITE_ORDER_CANCEL_LIST_QUERY_KEY, dto.customerId],
     ({ pageParam = 0 }) => getOrderCancellationList({ ...dto, skip: pageParam }),
     { getNextPageParam: (lastPage) => lastPage?.nextCursor },
   );
@@ -39,12 +42,15 @@ export const getOrderCancellationDetail = async (
     .then((res) => res.data);
 };
 
+/** 소비자 특정 주문취소요청 상세조회 쿼리키 */
+export const CUSTOMER_ORDER_CANCEL_DETAIL_QUERY_KEY = 'customerOrderCancellationDetail';
+
 /** 소비자 특정 주문취소요청 상세조회 훅 */
 export const useCustomerOrderCancellationDetail = (
   cancelCode: string,
 ): UseQueryResult<OrderCancellationDetailRes, AxiosError> => {
   return useQuery(
-    ['customerOrderCancellationDetail', cancelCode],
+    [CUSTOMER_ORDER_CANCEL_DETAIL_QUERY_KEY, cancelCode],
     () => getOrderCancellationDetail(cancelCode),
     {
       enabled: !!cancelCode,
