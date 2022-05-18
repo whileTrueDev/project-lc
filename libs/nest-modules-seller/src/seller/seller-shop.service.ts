@@ -1,21 +1,13 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { SellerShopInfoDto } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 
 @Injectable()
-export class SellerShopService extends ServiceBaseWithCache {
-  #SELLER_SHOP_CACHE_KEY = 'seller';
+export class SellerShopService {
+  constructor(private readonly prisma: PrismaService) {}
 
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
-
-  // 상점에 대한 정보 변경
+  /** 상점 대한 정보 변경 */
   async changeShopInfo(dto: SellerShopInfoDto, sellerInfo: UserPayload): Promise<void> {
     const sellerShop = await this.prisma.sellerShop.upsert({
       where: { sellerId: sellerInfo.id },
@@ -26,10 +18,8 @@ export class SellerShopService extends ServiceBaseWithCache {
       },
     });
 
-    await this._clearCaches(this.#SELLER_SHOP_CACHE_KEY);
-
     if (!sellerShop) {
-      throw new Error(`상점명 변경불가`);
+      throw new InternalServerErrorException(`상점명 변경불가`);
     }
   }
 }

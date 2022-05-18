@@ -196,13 +196,10 @@ export class SellerController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('shop-info')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async changeShopInfo(
-    @Body(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    )
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
     dto: SellerShopInfoDto,
     @SellerInfo() sellerInfo: UserPayload,
     @Res() res,
