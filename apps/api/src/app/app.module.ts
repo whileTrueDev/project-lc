@@ -38,6 +38,7 @@ import { PrismaModule } from '@project-lc/prisma-orm';
 import { OrderModule } from '@project-lc/nest-modules-order';
 import { ReturnModule } from '@project-lc/nest-modules-return';
 import { GoodsReviewModule } from '@project-lc/nest-modules-goods-review';
+import { RefundModule } from '@project-lc/nest-modules-refund';
 import { ExchangeModule } from '@project-lc/nest-modules-exchange';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
@@ -77,6 +78,7 @@ import { AppController } from './app.controller';
     ReturnModule.withControllers(),
     GoodsInquiryModule.withControllers(),
     GoodsReviewModule.withControllers(),
+    RefundModule.withControllers(),
     ExchangeModule.withControllers(),
   ],
   controllers: [AppController],
