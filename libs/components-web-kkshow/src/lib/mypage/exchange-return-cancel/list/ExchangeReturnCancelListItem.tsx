@@ -102,7 +102,7 @@ export function ExchangeReturnCancelListItem({
 }
 export function DesktopExchangeReturnCancelListHeader(): JSX.Element {
   return (
-    <Stack direction="row" px={4}>
+    <Stack direction="row" px={4} fontSize="sm">
       <Box width="10%">
         <Text>신청일</Text>
       </Box>

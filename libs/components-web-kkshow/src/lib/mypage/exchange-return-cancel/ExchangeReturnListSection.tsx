@@ -1,14 +1,23 @@
-import { Button, Center, Spinner, Stack, Text } from '@chakra-ui/react';
+import {
+  Center,
+  Spinner,
+  Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+} from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
 import { ExchangeReturnCancelType } from '@project-lc/shared-types';
-import { useState } from 'react';
 import CustomerExchangeList from './list/CustomerExchangeList';
 import CustomerOrderCancelList from './list/CustomerOrderCancelList';
 import CustomerReturnList from './list/CustomerReturnList';
 import { DesktopExchangeReturnCancelListHeader } from './list/ExchangeReturnCancelListItem';
 
-type Tab = { key: ExchangeReturnCancelType; text: string };
-const tabs: Tab[] = [
+type TabData = { key: ExchangeReturnCancelType; text: string };
+const tabs: TabData[] = [
   { key: 'cancel', text: '주문취소' },
   { key: 'return', text: '환불' },
   { key: 'exchange', text: '재배송' },
@@ -16,7 +25,6 @@ const tabs: Tab[] = [
 /** 소비자의 재배송/환불 목록 표시 컴포넌트 */
 export function ExchangeReturnListSection(): JSX.Element {
   const { data: profileData, isLoading } = useProfile();
-  const [currentTab, setCurrentTab] = useState<Tab>(tabs[0]);
   if (isLoading) {
     return (
       <Center>
@@ -26,34 +34,27 @@ export function ExchangeReturnListSection(): JSX.Element {
   }
   if (!profileData) return <Text>로그인이 필요합니다</Text>;
   return (
-    <Stack p={2}>
-      <Stack direction="row">
-        {tabs.map((tab) => (
-          <Button
-            key={tab.key}
-            size="sm"
-            variant="outline"
-            color={currentTab.key === tab.key ? 'blue.500' : undefined}
-            onClick={() => setCurrentTab(tab)}
-          >
-            {tab.text}
-          </Button>
+    <Tabs>
+      <TabList>
+        {tabs.map((t) => (
+          <Tab key={t.key}>{t.text}</Tab>
         ))}
-      </Stack>
-      <Stack display={{ base: 'none', md: 'block' }}>
+      </TabList>
+      <Stack mt={4} display={{ base: 'none', md: 'block' }}>
         <DesktopExchangeReturnCancelListHeader />
       </Stack>
-
-      {currentTab.key === 'cancel' && (
-        <CustomerOrderCancelList customerId={profileData.id} />
-      )}
-
-      {currentTab.key === 'return' && <CustomerReturnList customerId={profileData.id} />}
-
-      {currentTab.key === 'exchange' && (
-        <CustomerExchangeList customerId={profileData.id} />
-      )}
-    </Stack>
+      <TabPanels>
+        <TabPanel>
+          <CustomerOrderCancelList customerId={profileData.id} />
+        </TabPanel>
+        <TabPanel>
+          <CustomerReturnList customerId={profileData.id} />
+        </TabPanel>
+        <TabPanel>
+          <CustomerExchangeList customerId={profileData.id} />
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
   );
 }
 
