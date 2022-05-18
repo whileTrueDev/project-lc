@@ -20,6 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { BroadcasterChannel } from '@prisma/client';
 import {
   BroadcasterInfo,
+  CacheClearKeys,
   HttpCacheInterceptor,
   UserPayload,
 } from '@project-lc/nest-core';
@@ -81,6 +82,8 @@ export class BroadcasterController {
     return broadcaster;
   }
 
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('channel-list')
   @Patch('restore')
   public async restoreInactiveBroadcaster(@Body(ValidationPipe) dto): Promise<void> {
     const broadcaster = await this.broadcasterService.restoreInactiveBroadcaster(
@@ -130,6 +133,8 @@ export class BroadcasterController {
   }
 
   /** 방송인 채널 생성 */
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('channel-list')
   @UseGuards(JwtAuthGuard)
   @Post('/channel')
   createBroadcasterChannel(
@@ -139,6 +144,8 @@ export class BroadcasterController {
   }
 
   /** 방송인 채널 삭제 */
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('channel-list')
   @UseGuards(JwtAuthGuard)
   @Delete('/channel/:channelId')
   deleteBroadcasterChannel(
