@@ -15,7 +15,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Customer } from '@prisma/client';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import {
@@ -28,6 +28,7 @@ import {
 import { CustomerService } from './customer.service';
 
 @Controller('customer')
+@CacheClearKeys('customer')
 export class CustomerController {
   constructor(
     private readonly customerService: CustomerService,
@@ -72,6 +73,7 @@ export class CustomerController {
 
   // 비밀번호 변경
   @Patch('password')
+  @UseInterceptors(HttpCacheInterceptor)
   public async changePassword(
     @Body(ValidationPipe) dto: PasswordValidateDto,
   ): Promise<Customer> {
@@ -79,8 +81,8 @@ export class CustomerController {
   }
 
   /** 소비자 수정 */
+  @UseInterceptors(HttpCacheInterceptor)
   @Patch(':customerId')
-  @Put(':customerId')
   @UseGuards(JwtAuthGuard)
   updateOne(
     @Param('customerId', ParseIntPipe) id: number,
@@ -89,6 +91,7 @@ export class CustomerController {
     return this.customerService.update(id, dto);
   }
 
+  @UseInterceptors(HttpCacheInterceptor)
   @Delete(':customerId')
   @UseGuards(JwtAuthGuard)
   deleteOne(@Param('customerId', ParseIntPipe) id: number): Promise<boolean> {

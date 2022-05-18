@@ -33,7 +33,6 @@ export class CustomerService extends ServiceBaseWithCache {
     const created = await this.prisma.customer.create({
       data: { email: dto.email, password: hashedPw, nickname: '', name: dto.name },
     });
-    await this._clearCaches(this.#CUSTOMER_CACHE_KEY);
     return created;
   }
 
