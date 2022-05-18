@@ -21,6 +21,7 @@ import { useFormContext, SubmitHandler } from 'react-hook-form';
 import { PaymentPageDto } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
 import { getCustomerWebHost } from '@project-lc/utils';
+import { setCookie } from '@project-lc/utils-frontend';
 import { TermBox } from './TermBox';
 
 interface DummyOrder {
@@ -48,12 +49,6 @@ function getOrderPrice(
   couponDiscount: number,
 ): number {
   return originalPrice + shippingCost - discount - mileageDiscount - couponDiscount;
-}
-
-function setCookie(value: number): void {
-  const date = new Date();
-  date.setTime(date.getTime() + 60000); // 쿠키 만료시간 1분
-  document.cookie = `amount=${value};expires=${date.toUTCString()};path=/`;
 }
 
 async function doPayment(
@@ -166,8 +161,9 @@ export function PaymentBox({ data }: { data: DummyOrder[] }): JSX.Element {
         getValues('mileage'),
         getValues('couponAmount'),
       );
-
-      setCookie(amount);
+      const cookieExpire = new Date();
+      cookieExpire.setMinutes(cookieExpire.getMinutes() + 1);
+      setCookie('amount', amount, { expire: cookieExpire });
       doPayment(paymentType, CLIENT_KEY, amount, productName, getValues('name'));
     }
   };
@@ -329,7 +325,9 @@ export function MobilePaymentBox({ data }: { data: DummyOrder[] }): JSX.Element 
         getValues('mileage'),
         getValues('couponAmount'),
       );
-      setCookie(amount);
+      const cookieExpire = new Date();
+      cookieExpire.setMinutes(cookieExpire.getMinutes() + 1);
+      setCookie('amount', amount, { expire: cookieExpire });
       doPayment(paymentType, CLIENT_KEY, amount, productName, getValues('name'));
     }
   };

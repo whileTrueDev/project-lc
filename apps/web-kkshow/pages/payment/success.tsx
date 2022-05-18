@@ -3,16 +3,7 @@ import { usePaymentMutation } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { KkshowLayout } from '@project-lc/components-web-kkshow/KkshowLayout';
-
-function getCookie(): number | null {
-  const value = document.cookie.match(`(^|;) ?amount=([^;]*)(;|$)`);
-  return value ? Number(value[2]) : null;
-}
-
-function deleteCookie(): void {
-  const date = new Date();
-  document.cookie = `amount= ; expires=${date.toUTCString()}; path=/`;
-}
+import { getCookie, deleteCookie } from '@project-lc/utils-frontend';
 
 export function Success(): JSX.Element {
   const router = useRouter();
@@ -25,7 +16,7 @@ export function Success(): JSX.Element {
   const { mutateAsync } = usePaymentMutation();
 
   useEffect(() => {
-    const tossPaymentsAmount = getCookie();
+    const tossPaymentsAmount = Number(getCookie('amount'));
     if (
       orderId &&
       paymentKey &&
@@ -38,7 +29,7 @@ export function Success(): JSX.Element {
         paymentKey,
         amount: redirectAmount,
       }).then((item) => {
-        deleteCookie();
+        deleteCookie('amount');
         setIsRequested(true);
         if (item.status === 'error') {
           router.push(`/payment/fail?message=${item.message}`);
