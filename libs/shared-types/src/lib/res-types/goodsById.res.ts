@@ -53,3 +53,5 @@ export type GoodsByIdRes = Goods & {
 export type AdminGoodsByIdRes = GoodsByIdRes & {
   seller: Seller;
 };
+
+export type AllGoodsIdsRes = { goods_name: Goods['goods_name']; id: Goods['id'] }[];

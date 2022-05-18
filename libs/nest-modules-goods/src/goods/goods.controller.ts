@@ -18,6 +18,7 @@ import { GoodsImages } from '@prisma/client';
 import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
+  AllGoodsIdsRes,
   ChangeGoodsViewDto,
   DeleteGoodsDto,
   GoodsByIdRes,
@@ -147,7 +148,7 @@ export class GoodsController {
   }
 
   @Get('all-ids')
-  getAllGoodsIds(): Promise<number[]> {
+  getAllGoodsIds(): Promise<AllGoodsIdsRes> {
     return this.goodsService.findAllGoodsIds();
   }
 
