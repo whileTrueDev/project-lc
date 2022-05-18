@@ -44,6 +44,7 @@ import {
   ConfirmHistoryDto,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
+import __multer from 'multer';
 import { SellerContactsService } from './seller-contacts.service';
 import {
   SellerSettlementInfo,
