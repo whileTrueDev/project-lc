@@ -214,8 +214,10 @@ export class AdminController {
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
-  @Patch('/live-shopping')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('live-shoppings')
+  @Patch('/live-shopping')
   async updateLiveShoppings(
     @Body() data: { dto: LiveShoppingDTO; videoUrlExist?: boolean },
   ): Promise<boolean> {
