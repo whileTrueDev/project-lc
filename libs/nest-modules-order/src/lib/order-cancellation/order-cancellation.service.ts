@@ -11,6 +11,7 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
+  FindOrderCancelParams,
   GetOrderCancellationListDto,
   OrderCancellationDetailRes,
   OrderCancellationListRes,
@@ -196,7 +197,7 @@ export class OrderCancellationService extends ServiceBaseWithCache {
   ): Promise<OrderCancellationUpdateRes> {
     const { refundId, ...rest } = dto;
 
-    await this.findOneOrderCancellation(id);
+    await this.findOneOrderCancellation({ id });
 
     const orderCancellation = await this.prisma.orderCancellation.update({
       where: { id },
@@ -225,13 +226,15 @@ export class OrderCancellationService extends ServiceBaseWithCache {
   }
 
   /** 주문취소가 존재하는지 확인 */
-  async findOneOrderCancellation(id: number): Promise<OrderCancellation> {
+  async findOneOrderCancellation(
+    where: Prisma.OrderCancellationWhereUniqueInput,
+  ): Promise<OrderCancellation> {
     const orderCancellation = await this.prisma.orderCancellation.findUnique({
-      where: { id },
+      where,
     });
     if (!orderCancellation) {
       throw new BadRequestException(
-        `존재하지 않는 주문취소요청입니다. 주문취소 고유번호 ${id}`,
+        `존재하지 않는 주문취소요청입니다.  ${JSON.stringify(where)}`,
       );
     }
     return orderCancellation;
@@ -239,7 +242,7 @@ export class OrderCancellationService extends ServiceBaseWithCache {
 
   /* 주문취소 삭제(소비자가 자신이 요청했던 주문취소 철회 - 처리진행되기 이전에만 가능) */
   async deleteOrderCancellation(id: number): Promise<OrderCancellationRemoveRes> {
-    const orderCancellation = await this.findOneOrderCancellation(id);
+    const orderCancellation = await this.findOneOrderCancellation({ id });
 
     // 주문취소 처리상태 확인
     if (orderCancellation.status !== 'requested') {
@@ -258,9 +261,9 @@ export class OrderCancellationService extends ServiceBaseWithCache {
    */
   async getOrderCancellationDetail({
     cancelCode,
-  }: {
-    cancelCode: string;
-  }): Promise<OrderCancellationDetailRes> {
+  }: FindOrderCancelParams): Promise<OrderCancellationDetailRes> {
+    await this.findOneOrderCancellation({ cancelCode });
+
     const orderCancel = await this.prisma.orderCancellation.findUnique({
       where: { cancelCode },
       include: {

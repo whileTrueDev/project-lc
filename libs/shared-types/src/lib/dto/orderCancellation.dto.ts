@@ -99,3 +99,9 @@ export class UpdateOrderCancellationStatusDto {
   @IsOptional()
   responsibility?: string;
 }
+
+/** 주문취소 상세조회 파라미터 */
+export class FindOrderCancelParams {
+  @IsString()
+  cancelCode: string;
+}
