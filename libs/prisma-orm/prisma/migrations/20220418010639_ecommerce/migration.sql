@@ -421,7 +421,7 @@ CREATE TABLE `Exchange` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `exchangeCode` VARCHAR(191) NULL,
     `orderId` INTEGER NOT NULL,
-    `status` ENUM('requested', 'colledted', 'processing', 'complete', 'canceled') NOT NULL DEFAULT 'requested',
+    `status` ENUM('requested', 'collected', 'processing', 'complete', 'canceled') NOT NULL DEFAULT 'requested',
     `requestDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `completeDate` DATETIME(3) NULL,
     `reason` VARCHAR(191) NOT NULL,
@@ -442,7 +442,7 @@ CREATE TABLE `ExchangeItem` (
     `orderItemId` INTEGER NOT NULL,
     `orderItemOptionId` INTEGER NOT NULL,
     `amount` INTEGER NOT NULL,
-    `status` ENUM('requested', 'colledted', 'processing', 'complete', 'canceled') NOT NULL DEFAULT 'requested',
+    `status` ENUM('requested', 'collected', 'processing', 'complete', 'canceled') NOT NULL DEFAULT 'requested',
     `getBackFlag` BOOLEAN NOT NULL DEFAULT false,
 
     PRIMARY KEY (`id`)

@@ -19,8 +19,8 @@ export class OrderModule {
 
   private static readonly exports = [OrderCancellationService];
   private static readonly controllers = [
-    OrderController,
     OrderCancellationController,
+    OrderController,
     OrderItemController,
   ];
 

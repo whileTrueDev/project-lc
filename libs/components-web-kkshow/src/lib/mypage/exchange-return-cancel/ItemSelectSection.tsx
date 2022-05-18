@@ -10,12 +10,15 @@ export type SelectedOrderItem = {
 };
 
 export interface ItemSelectSectionProps {
+  order: OrderDetailRes;
   orderItems: OrderDetailRes['orderItems'];
   selectedItems: SelectedOrderItem[];
   setSelectedItems: Dispatch<SetStateAction<SelectedOrderItem[]>>;
 }
 
+/** 재배송/환불 요청시 주문에 포함된 상품중 재배송/환불 요청할 아이템 선택하는 부분 컴포넌트 */
 export function ItemSelectSection({
+  order,
   orderItems,
   selectedItems,
   setSelectedItems,
@@ -76,6 +79,7 @@ export function ItemSelectSection({
             >
               <OrderItemOptionInfo
                 key={opt.id}
+                order={order}
                 option={opt}
                 orderItem={item}
                 displayStatus={false}

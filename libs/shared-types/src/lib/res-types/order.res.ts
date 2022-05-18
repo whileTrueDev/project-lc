@@ -1,6 +1,7 @@
 import {
   Broadcaster,
   Exchange,
+  ExchangeItem,
   Export,
   Goods,
   GoodsImages,
@@ -14,6 +15,7 @@ import {
   OrderPayment,
   Refund,
   Return,
+  ReturnItem,
 } from '@prisma/client';
 
 export type OrderItemSupportWithBroadcasterInfo = OrderItemSupport & {
@@ -34,13 +36,22 @@ export type OrderItemWithRelations = OrderItem & {
   review?: { id: GoodsReview['id'] };
   options: OrderItemOption[];
   goods: OriginGoods;
-  orderCancellationItems?: OrderCancellationItem[] | null;
 };
 
 export type OrderDataWithRelations = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: OrderPayment | null;
-  orderCancellations?: OrderCancellation[] | null;
+  refunds: Refund[] | null;
+  exports: Export[] | null;
+  exchanges:
+    | (Pick<Exchange, 'id' | 'exchangeCode'> & { exchangeItems: ExchangeItem[] })[]
+    | null;
+  returns: (Pick<Return, 'id' | 'returnCode'> & { items: ReturnItem[] })[] | null;
+  orderCancellations?:
+    | (Pick<OrderCancellation, 'id' | 'cancelCode'> & {
+        items: OrderCancellationItem[];
+      })[]
+    | null;
 };
 
 /** 주문 목록 리턴 데이터 타입 */
@@ -53,9 +64,4 @@ export type OrderListRes = {
 /** 주문 상세 리턴데이터 타입
  * 주문 완료 페이지 혹은 주문 상세 페이지 작업하면서 수정 필요
  */
-export type OrderDetailRes = OrderDataWithRelations & {
-  refunds: Refund[] | null;
-  returns: Return[] | null;
-  exports: Export[] | null;
-  exchanges: Exchange[] | null;
-};
+export type OrderDetailRes = OrderDataWithRelations;

@@ -15,7 +15,9 @@ import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
+  FindOrderCancelParams,
   GetOrderCancellationListDto,
+  OrderCancellationDetailRes,
   OrderCancellationListRes,
   OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
@@ -36,8 +38,16 @@ export class OrderCancellationController {
     return this.orderCancellationService.createOrderCancellation(dto);
   }
 
+  /** 주문취소코드로 특정 주문취소 상세조회 */
+  @Get(':cancelCode')
+  getOrderCancellationDetail(
+    @Param() params: FindOrderCancelParams,
+  ): Promise<OrderCancellationDetailRes> {
+    return this.orderCancellationService.getOrderCancellationDetail(params);
+  }
+
   /* 주문취소 내역 조회 */
-  @Get()
+  @Get('')
   getOrderCancellationList(
     @Query(new ValidationPipe({ transform: true })) dto: GetOrderCancellationListDto,
   ): Promise<OrderCancellationListRes> {
