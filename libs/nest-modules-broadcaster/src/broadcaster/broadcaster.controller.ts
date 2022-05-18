@@ -46,6 +46,7 @@ import { BroadcasterContactsService } from './broadcaster-contacts.service';
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterService } from './broadcaster.service';
 
+@CacheClearKeys('broadcaster')
 @Controller('broadcaster')
 export class BroadcasterController {
   constructor(
@@ -59,6 +60,7 @@ export class BroadcasterController {
 
   /** 방송인 정보 조회 */
   @Get()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(HttpCacheInterceptor)
   public async findBroadcaster(
     @Query(ValidationPipe) dto: FindBroadcasterDto,
@@ -165,6 +167,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 활동명 수정 */
+  @UseInterceptors(HttpCacheInterceptor)
   @UseGuards(JwtAuthGuard)
   @Put('nickname')
   public async updateNickname(
@@ -175,6 +178,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 주소 수정 */
+  @UseInterceptors(HttpCacheInterceptor)
   @UseGuards(JwtAuthGuard)
   @Put('address')
   public async updateAddress(
@@ -185,6 +189,7 @@ export class BroadcasterController {
   }
 
   // 로그인 한 사람이 본인인증을 위해 비밀번호 확인
+  @UseInterceptors(HttpCacheInterceptor)
   @UseGuards(JwtAuthGuard)
   @Post('validate-password')
   public async validatePassword(
@@ -194,6 +199,7 @@ export class BroadcasterController {
   }
 
   // 비밀번호 변경
+  @UseInterceptors(HttpCacheInterceptor)
   @Patch('password')
   public async changePassword(
     @Body(ValidationPipe) dto: PasswordValidateDto,
@@ -202,6 +208,7 @@ export class BroadcasterController {
   }
 
   // 이용 동의 상태 변경
+  @UseInterceptors(HttpCacheInterceptor)
   @UseGuards(JwtAuthGuard)
   @Patch('agreement')
   public async changeContractionAgreement(
@@ -211,6 +218,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 계정 삭제 */
+  @UseInterceptors(HttpCacheInterceptor)
   @UseGuards(JwtAuthGuard)
   @Delete()
   public async deleteBroadcaster(
@@ -224,6 +232,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 아바타 이미지 s3업로드 후 url 저장 */
+  @UseInterceptors(HttpCacheInterceptor)
   @UseGuards(JwtAuthGuard)
   @Post('/avatar')
   @UseInterceptors(FileInterceptor('file'))
@@ -235,6 +244,7 @@ export class BroadcasterController {
   }
 
   /** 방송인 아바타 이미지 null로 저장 */
+  @UseInterceptors(HttpCacheInterceptor)
   @UseGuards(JwtAuthGuard)
   @Delete('/avatar')
   async deleteAvatar(@BroadcasterInfo() broadcaster: UserPayload): Promise<boolean> {
