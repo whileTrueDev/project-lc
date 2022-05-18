@@ -8,8 +8,10 @@ import {
   Patch,
   Param,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CustomerMileage, CustomerMileageLog, MileageSetting } from '@prisma/client';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   MileageService,
@@ -19,6 +21,8 @@ import {
 import { MileageSettingDto, CustomerMileageDto } from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
+@UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('mileage')
 @Controller('admin/mileage')
 export class AdminMileageController {
   constructor(

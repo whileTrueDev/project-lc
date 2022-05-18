@@ -7,10 +7,12 @@ import { MileageSettingDto } from '@project-lc/shared-types';
 export class MileageSettingService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  /** 마일리지 설정 조회 */
   getMileageSettings(): Promise<MileageSetting[]> {
     return this.prismaService.mileageSetting.findMany();
   }
 
+  /** 마일리지 설정 생성 */
   createMileageSetting(dto: MileageSettingDto): Promise<MileageSetting> {
     return this.prismaService.mileageSetting.create({
       data: {
@@ -20,11 +22,10 @@ export class MileageSettingService {
     });
   }
 
+  /** 마일리지 설정 수정 */
   updateMileageSetting(dto: MileageSettingDto & { id: number }): Promise<MileageSetting> {
     return this.prismaService.mileageSetting.update({
-      where: {
-        id: dto.id,
-      },
+      where: { id: dto.id },
       data: {
         defaultMileagePercent: dto.defaultMileagePercent || undefined,
         mileageStrategy: dto.mileageStrategy || undefined,

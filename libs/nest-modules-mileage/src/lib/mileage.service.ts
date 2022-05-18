@@ -7,6 +7,7 @@ import { CustomerMileageDto } from '@project-lc/shared-types';
 export class MileageService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  /** 마일리지 정보 수정 */
   async upsertMileage(
     dto: CustomerMileageDto & { customerId: number },
   ): Promise<CustomerMileage> {
@@ -50,14 +51,12 @@ export class MileageService {
     return result;
   }
 
+  /** 특정 소비자의 마일리지 조회 */
   findMileage(customerId: number): Promise<CustomerMileage> {
-    return this.prismaService.customerMileage.findFirst({
-      where: {
-        customerId,
-      },
-    });
+    return this.prismaService.customerMileage.findFirst({ where: { customerId } });
   }
 
+  /** 마일리지 모두 조회 */
   findAllMileage(): Promise<CustomerMileage[]> {
     return this.prismaService.customerMileage.findMany();
   }
