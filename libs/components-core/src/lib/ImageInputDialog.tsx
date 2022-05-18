@@ -10,6 +10,7 @@ import {
   ModalProps,
   Stack,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { ImageInput, ImageInputErrorTypes, ImageInputProps } from './ImageInput';
@@ -57,6 +58,7 @@ export interface ImageInputDialogProps
   modalTitle?: string;
 }
 export function ImageInputDialog(props: ImageInputDialogProps): JSX.Element {
+  const toast = useToast();
   const { modalTitle, isOpen, onClose, onConfirm, onError, ...restProps } = props;
 
   const [imagePreview, setImagePreview] = useState<ImageInputFileReadData | null>(null);
@@ -68,12 +70,20 @@ export function ImageInputDialog(props: ImageInputDialogProps): JSX.Element {
     });
   };
 
+  const [loading, setLoading] = useState<boolean>(false);
   const handleRegist = (): void => {
     if (!imagePreview) return;
-    onConfirm(imagePreview).then(() => {
-      setImagePreview(null);
-      onClose();
-    });
+    setLoading(true);
+    onConfirm(imagePreview)
+      .then(() => {
+        setLoading(false);
+        setImagePreview(null);
+        onClose();
+      })
+      .catch(() => {
+        setLoading(false);
+        toast({ status: 'error', description: '이미지 등록 중 오류가 발생했습니다.' });
+      });
   };
 
   const handleClose = (): void => {
@@ -108,7 +118,13 @@ export function ImageInputDialog(props: ImageInputDialogProps): JSX.Element {
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleRegist}>
+          <Button
+            isDisabled={!imagePreview}
+            isLoading={loading}
+            colorScheme="blue"
+            mr={3}
+            onClick={handleRegist}
+          >
             등록하기
           </Button>
           <Button variant="ghost" onClick={handleClose}>

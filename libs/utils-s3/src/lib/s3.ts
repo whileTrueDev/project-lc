@@ -313,7 +313,7 @@ export const s3 = (() => {
     uploadProfileImage,
     getGoodsImageS3KeyListFromImgSrcList,
     /** 버킷의 도메인명입니다. 마지막 / 를 포함합니다. */
-    fullDomain: S3_DOMAIN,
+    bucketDomain: S3_DOMAIN,
     bucketName: S3_BUCKET_NAME,
     bucketRegion: S3_BUCKET_REGION,
   };

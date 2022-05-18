@@ -45,6 +45,7 @@ export function GoodsViewMeta(): JSX.Element | null {
             goodsName={goods.data.goods_name}
             summary={goods.data.summary}
             status={goods.data.goods_status}
+            sellerShopName={goods.data.seller.sellerShop?.shopName}
           />
 
           {/* 가격정보 */}
@@ -148,16 +149,20 @@ interface GoodsViewNameAndStatusProps {
   goodsName: string;
   summary: string;
   status: GoodsStatus;
+  sellerShopName?: string | null;
 }
 /** 상품 상세 페이지 상품 이름 및 상태 */
 export function GoodsViewNameAndStatus({
   goodsName,
   summary,
   status,
+  sellerShopName,
 }: GoodsViewNameAndStatusProps): JSX.Element {
   return (
     <Box>
-      <Text fontSize={{ base: 'sm', md: 'md' }}>와일트루</Text>
+      {sellerShopName && (
+        <Text fontSize={{ base: 'sm', md: 'md' }}>{sellerShopName}</Text>
+      )}
       <Text fontSize={{ base: 'xl', md: '2xl' }} fontWeight="bold">
         {goodsName}
       </Text>

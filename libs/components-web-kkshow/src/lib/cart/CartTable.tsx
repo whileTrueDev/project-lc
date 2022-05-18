@@ -81,7 +81,7 @@ export function CartTable(): JSX.Element {
     return (
       <Center>
         <Box my={12} textAlign="center">
-          <Icon as={MdOutlineShoppingCart} width={40} height={40} color="GrayText" />
+          <Icon as={MdOutlineShoppingCart} width={20} height={20} color="GrayText" />
           <Text fontSize={{ base: 'md', lg: 'lg' }} whiteSpace="break-spaces">
             {`아직 장바구니에 담은 상품이 없습니다.\n상품을 추가해보세요.`}
           </Text>

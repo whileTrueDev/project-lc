@@ -10,6 +10,7 @@ import {
   reviewAbleSteps,
 } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
+import ReviewCreateDialog from '../../review/ReviewCreateDialog';
 import { OrderCancelDialog } from './OrderCancelDialog';
 import { OrderItemOptionInfoProps } from './OrderItemOptionInfo';
 
@@ -28,6 +29,7 @@ export function OrderItemActionButtons({
   const purchaseConfirmDialog = useDisclosure();
   const orderCancelDialog = useDisclosure();
   const goodsInquireDialog = useDisclosure();
+  const reviewDialog = useDisclosure();
 
   const buttonSet: {
     label: string;
@@ -62,12 +64,10 @@ export function OrderItemActionButtons({
       disabled: !!purchaseConfirmationDate,
     },
     {
-      label: '리뷰 작성하기',
-      onClick: () => {
-        alert('리뷰작성페이지로 이동');
-      }, // TODO: 리뷰작성 페이지로 이동
+      label: !hasReview ? '리뷰 작성하기' : '작성한 리뷰 확인',
+      onClick: !hasReview ? reviewDialog.onOpen : () => router.push('/mypage/review'),
       display: reviewAbleSteps.includes(step), // 배송완료 이후 표시 & 구매확정시 표시, 리뷰 작성하지 않았을때
-      disabled: !!hasReview || !purchaseConfirmationDate, // 이미 리뷰 작성했거나, 구매확정 안한경우 비활성
+      disabled: false,
     },
     {
       label: '문의하기',
@@ -130,6 +130,16 @@ export function OrderItemActionButtons({
         onClose={orderCancelDialog.onClose}
         orderId={orderId}
       />
+
+      {/* 리뷰 작성 다이얼로그 */}
+      {orderItem.goodsId && (
+        <ReviewCreateDialog
+          isOpen={reviewDialog.isOpen}
+          onClose={reviewDialog.onClose}
+          goodsId={orderItem.goodsId}
+          orderItemId={option.orderItemId}
+        />
+      )}
     </SimpleGrid>
   );
 }
