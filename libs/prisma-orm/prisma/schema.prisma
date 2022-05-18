@@ -1336,7 +1336,7 @@ model Coupon {
   amount               Int                @default(0) // 할인금액 혹은 할인율
   unit                 AmountUnit         @default(P) // 할인에 적용되는 단위 (퍼센트 P, 원 W)
   maxDiscountAmountWon Int? // 최대할인금액(원단위)
-  minOrderAmountWon    Int                @default(0) // 할인코드 적용 가능한 최소주문금액
+  minOrderAmountWon    Int                @default(0) // 쿠폰 적용 가능한 최소주문금액
   name                 String // 쿠폰명
   createDate           DateTime           @default(now()) // 생성일시
   startDate            DateTime // 유효시간 시작
@@ -1400,6 +1400,8 @@ model CartItem {
   shippingCostIncluded Boolean          @default(false) // 이 장바구니 상품에 동일 판매자의 배송비가 포함되었는지 여부
   shippingGroupId      Int? // 연결된 배송정책 id
   shippingGroup        ShippingGroup?   @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
+
+  channel SellType @default(normal) // 판매유형(주문경로)
 }
 
 // 장바구니 상품옵션

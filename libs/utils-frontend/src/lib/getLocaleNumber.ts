@@ -1,6 +1,6 @@
 import { Decimal } from '@prisma/client/runtime';
 
-export const getLocaleNumber = (num?: number | string | Decimal): string => {
+export const getLocaleNumber = (num?: number | string | Decimal | null): string => {
   if (num === 0) return '0';
   if (!num) return '';
   const converted = Number(num);

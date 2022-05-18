@@ -70,5 +70,8 @@ export const useGoodsViewStore = create<GoodsViewStore>((set, get) => ({
     set({ selectedBc: v });
   },
   supportMessage: '',
-  onSupMsgChange: (msg: string) => set({ supportMessage: msg }),
+  onSupMsgChange: (msg: string) => {
+    if (msg.length > 30) return;
+    set({ supportMessage: msg });
+  },
 }));

@@ -9,12 +9,12 @@ import {
   Stack,
   useDisclosure,
 } from '@chakra-ui/react';
+import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
+import ShippingPolicySetListItem from '@project-lc/components-shared/shipping/ShippingPolicySetListItem';
 import { TempShippingSet } from '@project-lc/shared-types';
 import { useShippingGroupItemStore, useShippingSetItemStore } from '@project-lc/stores';
 import { useCallback } from 'react';
-import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import ShippingPolicySetForm from './ShippingPolicySetForm';
-import ShippingPolicySetListItem from './ShippingPolicySetListItem';
 
 export function ShippingPolicySetList(): JSX.Element {
   const { shippingSets, removeShippingSet } = useShippingGroupItemStore();

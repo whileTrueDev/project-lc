@@ -31,6 +31,10 @@ export type CartItemRes = Array<
       id: Goods['id'];
       image: GoodsImages[];
       goods_name: Goods['goods_name'];
+      max_purchase_ea: Goods['max_purchase_ea'];
+      max_purchase_limit: Goods['max_purchase_limit'];
+      min_purchase_ea: Goods['min_purchase_ea'];
+      min_purchase_limit: Goods['min_purchase_limit'];
       seller: {
         sellerShop: {
           shopName: SellerShop['shopName'];
