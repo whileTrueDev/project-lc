@@ -10,12 +10,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CustomerCoupon, CustomerCouponLog } from '@prisma/client';
-import {
-  HttpCacheInterceptor,
-  UserInfo,
-  UserPayload,
-  CustomerInfo,
-} from '@project-lc/nest-core';
+import { HttpCacheInterceptor, UserPayload, CustomerInfo } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CouponStatusDto } from '@project-lc/shared-types';
 import { CouponLogService } from './coupon-log.service';

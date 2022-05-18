@@ -12,11 +12,7 @@ import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
-import {
-  CouponService,
-  CustomerCouponService,
-  CouponLogService,
-} from '@project-lc/nest-modules-coupon';
+import { CouponModule } from '@project-lc/nest-modules-coupon';
 import { AdminAccountService } from './admin-account.service';
 import { AdminCustomerController } from './admin-customer.controller';
 import { AdminGoodsCategoryController } from './admin-goods-category.controller';
@@ -39,9 +35,6 @@ export class AdminModule {
     AdminSettlementService,
     AdminAccountService,
     AdminPrivacyApproachSevice,
-    CouponService,
-    CustomerCouponService,
-    CouponLogService,
   ];
 
   private static readonly exports = [
@@ -75,6 +68,7 @@ export class AdminModule {
     KkshowShoppingModule.withoutControllers(),
     GoodsCategoryModule.withoutControllers(),
     CustomerModule.withoutControllers(),
+    CouponModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {

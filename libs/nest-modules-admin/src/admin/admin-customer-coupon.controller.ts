@@ -22,11 +22,7 @@ import { CustomerCouponDto, CouponStatusDto } from '@project-lc/shared-types';
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin/customer-coupon')
 export class AdminCustomerCouponController {
-  constructor(
-    private readonly couponService: CouponService,
-    private readonly customerCouponService: CustomerCouponService,
-    private readonly couponLogService: CouponLogService,
-  ) {}
+  constructor(private readonly customerCouponService: CustomerCouponService) {}
 
   @Get()
   async getAllCustomerCoupons(): Promise<CustomerCoupon[]> {

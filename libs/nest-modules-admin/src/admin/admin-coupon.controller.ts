@@ -24,7 +24,6 @@ import { CouponDto } from '@project-lc/shared-types';
 export class AdminCouponController {
   constructor(
     private readonly couponService: CouponService,
-    private readonly customerCouponService: CustomerCouponService,
     private readonly couponLogService: CouponLogService,
   ) {}
 
