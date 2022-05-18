@@ -1,20 +1,11 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { Inquiry } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { InquiryDtoWithoutReadFlag } from '@project-lc/shared-types';
-import { Inquiry } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { Cache } from 'cache-manager';
 
 @Injectable()
-export class InquiryService extends ServiceBaseWithCache {
-  #INQUIRY_CACHE_KEY = 'inquiry';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class InquiryService {
+  constructor(private readonly prisma: PrismaService) {}
 
   async registInquiry(dto: InquiryDtoWithoutReadFlag): Promise<boolean> {
     await this.prisma.inquiry.create({
@@ -29,7 +20,6 @@ export class InquiryService extends ServiceBaseWithCache {
         readFlag: false,
       },
     });
-    await this._clearCaches(this.#INQUIRY_CACHE_KEY);
     return true;
   }
 
@@ -44,7 +34,6 @@ export class InquiryService extends ServiceBaseWithCache {
       where: { id: id.inquiryId },
       data: { readFlag: true },
     });
-    await this._clearCaches(this.#INQUIRY_CACHE_KEY);
     return true;
   }
 }
