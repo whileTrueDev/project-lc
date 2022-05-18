@@ -1,4 +1,4 @@
-import { CheckIcon, CloseIcon, DeleteIcon, Icon } from '@chakra-ui/icons';
+import { CheckCircleIcon, DeleteIcon, Icon } from '@chakra-ui/icons';
 import {
   Avatar,
   Badge,
@@ -97,9 +97,14 @@ export function CartTable(): JSX.Element {
       </Box>
 
       <Box py={6}>
-        <ButtonGroup size="sm">
+        <ButtonGroup size="sm" display="flex" justifyContent="space-between">
           <Button
-            leftIcon={selectedItems.length === 0 ? <CheckIcon /> : <CloseIcon />}
+            variant="outline"
+            leftIcon={
+              <CheckCircleIcon
+                color={selectedItems.length === data.length ? 'blue' : 'gray'}
+              />
+            }
             onClick={() => {
               if (selectedItems.length > 0) handleUnselectAll();
               else handleSelectAll(data);
@@ -107,12 +112,13 @@ export function CartTable(): JSX.Element {
           >
             전체{selectedItems.length === 0 ? '선택' : '해제'}
           </Button>
+
           <Button
             leftIcon={<DeleteIcon />}
             onClick={handleTruncate}
             isLoading={truncate.isLoading}
           >
-            선택상품 모두삭제
+            장바구니 모두 비우기
           </Button>
         </ButtonGroup>
 
