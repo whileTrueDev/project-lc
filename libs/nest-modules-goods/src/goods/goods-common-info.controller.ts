@@ -11,13 +11,19 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { GoodsInfo } from '@prisma/client';
-import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
+import {
+  CacheClearKeys,
+  HttpCacheInterceptor,
+  SellerInfo,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { GoodsInfoDto } from '@project-lc/shared-types';
 import { GoodsCommonInfoService } from './goods-common-info.service';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('goods/common-info', 'goods')
 @Controller('goods/common-info')
 export class GoodsCommonInfoController {
   constructor(private readonly commonInfoService: GoodsCommonInfoService) {}
