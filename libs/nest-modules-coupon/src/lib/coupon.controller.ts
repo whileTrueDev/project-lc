@@ -10,7 +10,12 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CustomerCoupon, CustomerCouponLog } from '@prisma/client';
-import { HttpCacheInterceptor, UserPayload, CustomerInfo } from '@project-lc/nest-core';
+import {
+  HttpCacheInterceptor,
+  UserPayload,
+  CustomerInfo,
+  CacheClearKeys,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CouponStatusDto } from '@project-lc/shared-types';
 import { CouponLogService } from './coupon-log.service';
@@ -18,6 +23,7 @@ import { CustomerCouponService } from './customer-coupon.service';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('coupon', 'customer-coupon')
 @Controller('coupon')
 export class CouponController {
   constructor(

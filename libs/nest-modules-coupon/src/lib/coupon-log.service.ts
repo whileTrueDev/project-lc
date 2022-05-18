@@ -7,10 +7,12 @@ import { CustomerCouponDto } from '@project-lc/shared-types';
 export class CouponLogService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  /** 모든 쿠폰 사용 내역 조회 */
   adminFindCouponLogs(): Promise<CustomerCouponLog[]> {
     return this.prismaService.customerCouponLog.findMany({});
   }
 
+  /** 특정 소비자의 쿠폰 사용 내역 조회 */
   async findCouponLogs(
     customerId: CustomerCouponDto['customerId'],
   ): Promise<CustomerCouponLog[]> {

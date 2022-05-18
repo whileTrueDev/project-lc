@@ -7,10 +7,12 @@ import { CouponDto } from '@project-lc/shared-types';
 export class CouponService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  /** 쿠폰 목록 조회 */
   findCoupons(): Promise<Coupon[]> {
     return this.prismaService.coupon.findMany();
   }
 
+  /** 쿠폰 생성 */
   createCoupon(dto: CouponDto): Promise<Coupon> {
     return this.prismaService.coupon.create({
       data: {
@@ -19,21 +21,18 @@ export class CouponService {
     });
   }
 
-  updateCoupon(dto: CouponDto & { id: number }): Promise<Coupon> {
-    const { id, ...updateData } = dto;
+  /** 특정 쿠폰 수정 */
+  updateCoupon(id: number, dto: CouponDto): Promise<Coupon> {
     return this.prismaService.coupon.update({
       where: { id },
-      data: {
-        ...updateData,
-      },
+      data: { ...dto },
     });
   }
 
+  /** 특정 쿠폰 제거 */
   deleteCoupon(couponId: number): Promise<Coupon> {
     return this.prismaService.coupon.delete({
-      where: {
-        id: couponId,
-      },
+      where: { id: couponId },
     });
   }
 }
