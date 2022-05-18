@@ -280,6 +280,8 @@ export class AdminController {
 
   /** 특정 주문에 대한 결제취소 요청 상태 변경 */
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('order-cancel')
   @Put('/order-cancel/:requestId')
   setOrderCancelRequestDone(
     @Param('requestId', ParseIntPipe) requestId: number,
