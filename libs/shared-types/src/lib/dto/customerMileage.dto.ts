@@ -1,5 +1,5 @@
-import { IsNumber } from 'class-validator';
-import { CustomerMileageLogDto } from './customerMileageLog.dto';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { MileageActionType } from 'prisma/prisma-client';
 
 export class CustomerMileageDto {
   @IsNumber()
@@ -7,6 +7,18 @@ export class CustomerMileageDto {
 
   @IsNumber()
   mileage: number;
-}
 
-export type UpsertDto = CustomerMileageDto & CustomerMileageLogDto;
+  @IsEnum(MileageActionType)
+  actionType: MileageActionType;
+
+  @IsString()
+  reason: string;
+
+  @IsOptional()
+  @IsNumber()
+  orderId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  reviewId?: number;
+}

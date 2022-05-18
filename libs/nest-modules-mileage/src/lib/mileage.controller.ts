@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { HttpCacheInterceptor, CustomerInfo, UserPayload } from '@project-lc/nest-core';
 import { CustomerMileage, CustomerMileageLog } from '@prisma/client';
-import { UpsertDto } from '@project-lc/shared-types';
+import { CustomerMileageDto } from '@project-lc/shared-types';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { MileageService } from './mileage.service';
 import { MileageLogService } from './mileage-log.service';
@@ -28,9 +28,12 @@ export class MileageController {
     return this.mileageService.findMileage(id);
   }
 
-  @Patch()
-  upsertOneMileage(@Body(ValidationPipe) dto: UpsertDto): Promise<CustomerMileage> {
-    return this.mileageService.upsertMileage(dto);
+  @Patch('/:customerId')
+  upsertOneMileage(
+    @CustomerInfo() { id }: UserPayload,
+    @Body(ValidationPipe) dto: CustomerMileageDto,
+  ): Promise<CustomerMileage> {
+    return this.mileageService.upsertMileage({ customerId: id, ...dto });
   }
 
   @Get('history')

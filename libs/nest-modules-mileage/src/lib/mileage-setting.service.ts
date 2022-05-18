@@ -20,7 +20,7 @@ export class MileageSettingService {
     });
   }
 
-  updateMileageSetting(dto: MileageSettingDto): Promise<MileageSetting> {
+  updateMileageSetting(dto: MileageSettingDto & { id: number }): Promise<MileageSetting> {
     return this.prismaService.mileageSetting.update({
       where: {
         id: dto.id,

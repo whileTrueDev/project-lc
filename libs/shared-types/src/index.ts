@@ -50,7 +50,6 @@ export * from './lib/dto/createBroadcasterChannel.dto';
 export * from './lib/dto/createBroadcasterSettlementHistory.dto';
 export * from './lib/dto/customerAddress.dto';
 export * from './lib/dto/customerMileage.dto';
-export * from './lib/dto/customerMileageLog.dto';
 export * from './lib/dto/deleteGoods.dto';
 export * from './lib/dto/emailCodeVerification.dto';
 export * from './lib/dto/emailDupCheck.dto';

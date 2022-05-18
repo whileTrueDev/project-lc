@@ -1,13 +1,15 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { CustomerMileage } from '@prisma/client';
-import { UpsertDto } from '@project-lc/shared-types';
+import { CustomerMileageDto } from '@project-lc/shared-types';
 
 @Injectable()
 export class MileageService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async upsertMileage(dto: UpsertDto): Promise<CustomerMileage> {
+  async upsertMileage(
+    dto: CustomerMileageDto & { customerId: number },
+  ): Promise<CustomerMileage> {
     const mileageData = await this.findMileage(dto.customerId);
 
     if (
