@@ -339,7 +339,7 @@ const customerMypageActivityChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
     href: '/mypage/내역',
     checkIsActive: defaultIsActiveChecker,
   },
-  { name: '리뷰 관리', href: '/mypage/관리', checkIsActive: defaultIsActiveChecker },
+  { name: '후기 관리', href: '/mypage/review', checkIsActive: defaultIsActiveChecker },
 ];
 /** 크크쇼 소비자 마이페이지 사이드바 - "정보" 하위 탭 */
 const customerMypageInfoChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [

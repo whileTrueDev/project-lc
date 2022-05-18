@@ -1,10 +1,12 @@
 import {
+  Coupon,
   Order,
   OrderItem,
   OrderItemOption,
   OrderItemSupport,
   OrderPayment,
   OrderProcessStep,
+  PaymentMethod,
   SellType,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
@@ -39,6 +41,8 @@ export class CreateOrderItemSupportDto {
   @IsNumber()
   /** 후원 대상 방송인 고유번호 */
   broadcasterId: OrderItemSupport['broadcasterId'];
+
+  @IsOptional() avatar?: string | null;
 }
 
 /** 주문상품옵션 OrderItemOption 생성 dto */
@@ -98,7 +102,7 @@ export class CreateOrderItemDto {
 
   /** 주문당시 이 주문 상품에 포함된  배송비 Decimal @default("0.00") @db.Decimal(10, 2)  */
   @IsNumber()
-  shippingCost: OrderItem['shippingCost'];
+  shippingCost: OrderItem['shippingCost'] | string;
 
   /**  이 주문 상품에 동일 판매자의 배송비가 포함되었는지 여부 @default(false)  */
   @IsBoolean()
@@ -108,6 +112,9 @@ export class CreateOrderItemDto {
   /**  연결된 배송정책 id */
   @IsNumber()
   shippingGroupId: OrderItem['shippingGroupId'];
+
+  @IsOptional()
+  goodsName?: string;
 }
 
 /** 주문 Order 생성 dto */
@@ -224,7 +231,24 @@ export class CreateOrderDto {
   @IsArray()
   @IsNumber({}, { each: true })
   cartItemIdList?: number[];
+
+  /** 마일리지 사용량 */
+  @IsOptional() @IsNumber() usedMileageAmount?: number;
+  /** 사용된 쿠폰 */
+  @IsOptional() @IsNumber() couponId?: Coupon['id'];
+  /** 쿠폰으로 할인받은 금액 */
+  @IsOptional() @IsNumber() usedCouponAmount?: number;
+  /** 총 할인 금액 */
+  @IsOptional() @IsNumber() totalDiscount?: number;
 }
+
+/** 주문 Order 생성을 위한 react-hook-form 데이터 타입 */
+export type CreateOrderForm = CreateOrderDto & {
+  ordererPhone1?: string;
+  ordererPhone2?: string;
+  ordererPhone3?: string;
+  paymentType: PaymentMethod;
+};
 
 // ------------------조회 dto--------------------
 /** 주문 목록 조회 dto */

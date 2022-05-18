@@ -178,6 +178,7 @@ CREATE TABLE `CartItem` (
     `shippingCost` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     `shippingCostIncluded` BOOLEAN NOT NULL DEFAULT false,
     `shippingGroupId` INTEGER NOT NULL,
+    `channel` ENUM('liveShopping', 'productPromotion', 'normal') NOT NULL DEFAULT 'normal',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

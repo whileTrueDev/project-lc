@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CartItem, CartItemOption, Customer } from '@prisma/client';
+import { CartItem, CartItemOption, Customer, Prisma } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { CartItemDto, CartItemRes } from '@project-lc/shared-types';
 import { flatten } from 'lodash';
@@ -30,6 +30,10 @@ export class CartService {
             id: true,
             image: true,
             goods_name: true,
+            max_purchase_ea: true,
+            max_purchase_limit: true,
+            min_purchase_ea: true,
+            min_purchase_limit: true,
             seller: { select: { sellerShop: { select: { shopName: true } } } },
           },
         },
@@ -44,13 +48,14 @@ export class CartService {
       include: { goods: { select: { seller: true } } },
     });
 
-    const cartItemData = {
+    const cartItemData: Prisma.CartItemCreateArgs['data'] = {
       goodsId: dto.goodsId,
       customerId: dto.customerId,
       tempUserId: dto.tempUserId,
       shippingCost: dto.shippingCost,
       shippingCostIncluded: dto.shippingCostIncluded,
       shippingGroupId: dto.shippingGroupId,
+      channel: dto.channel,
       options: { createMany: { data: dto.options } },
       support: dto.support
         ? {

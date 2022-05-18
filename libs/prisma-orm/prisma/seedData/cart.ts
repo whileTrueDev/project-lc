@@ -1,3 +1,5 @@
+import { defaultOption, secondOption } from './dummyData';
+
 export const cartSample = {
   customerId: 1,
   tempUserId: null,
@@ -7,17 +9,13 @@ export const cartSample = {
   shippingGroupId: 1,
   options: {
     create: {
-      name: '맛',
-      value: '매운맛',
+      name: defaultOption.option_title,
+      value: defaultOption.option1,
       quantity: 1,
       normalPrice: '2000',
       discountPrice: '2000',
       weight: 500,
-      goodsOption: {
-        connect: {
-          id: 1,
-        },
-      },
+      goodsOption: { connect: { id: 1 } },
     },
   },
   support: {
@@ -37,19 +35,26 @@ export const tempUserCartItemSample = {
   shippingCostIncluded: false,
   shippingGroupId: 1,
   options: {
-    create: {
-      name: '맛',
-      value: '순한맛',
-      quantity: 1,
-      normalPrice: '3000',
-      discountPrice: '2500',
-      weight: 500,
-      goodsOption: {
-        connect: {
-          id: 2,
-        },
+    create: [
+      {
+        name: defaultOption.option_title,
+        value: defaultOption.option1,
+        quantity: 1,
+        normalPrice: '3000',
+        discountPrice: '2500',
+        weight: 500,
+        goodsOption: { connect: { id: 7 } },
       },
-    },
+      {
+        name: secondOption.option_title,
+        value: secondOption.option1,
+        quantity: 1,
+        normalPrice: '3000',
+        discountPrice: '2500',
+        weight: 500,
+        goodsOption: { connect: { id: 8 } },
+      },
+    ],
   },
   support: {
     create: {
