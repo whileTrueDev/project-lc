@@ -1,4 +1,5 @@
 import { Module, DynamicModule } from '@nestjs/common';
+import { ExportController } from './export.controller';
 
 @Module({
   controllers: [],
@@ -10,7 +11,7 @@ export class ExportModule {
 
   private static readonly exports = [];
 
-  private static readonly controllers = [];
+  private static readonly controllers = [ExportController];
 
   static withoutControllers(): DynamicModule {
     return {
