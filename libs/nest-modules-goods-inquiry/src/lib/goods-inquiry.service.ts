@@ -90,18 +90,14 @@ export class GoodsInquiryService extends ServiceBaseWithCache {
     dto: GoodsInquiryUpdateDto,
   ): Promise<GoodsInquiry> {
     const updated = await this.prisma.goodsInquiry.update({ where: { id }, data: dto });
-    await this._clearCaches(this.getCacheKey(updated.id));
+    await this._clearCaches(this.#GOODS_INQUIRY_CACHE_KEY);
     return updated;
   }
 
   /** 상품문의 삭제 */
   public async remove(id: GoodsInquiry['id']): Promise<boolean> {
     const result = await this.prisma.goodsInquiry.delete({ where: { id } });
-    await this._clearCaches(this.getCacheKey(result.id));
+    await this._clearCaches(this.#GOODS_INQUIRY_CACHE_KEY);
     return !!result;
-  }
-
-  private getCacheKey(id: GoodsInquiry['id']): string {
-    return `${this.#GOODS_INQUIRY_CACHE_KEY}/${id}`;
   }
 }

@@ -49,6 +49,7 @@ export function GoodsViewMeta(): JSX.Element | null {
             goodsName={goods.data.goods_name}
             summary={goods.data.summary}
             status={goods.data.goods_status}
+            shopName={goods.data.seller.sellerShop?.shopName}
           />
 
           {/* 가격정보 */}

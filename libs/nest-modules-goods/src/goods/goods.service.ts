@@ -454,6 +454,18 @@ export class GoodsService extends ServiceBaseWithCache {
         categories: true,
         informationNotice: true,
         informationSubject: true,
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            sellerShop: {
+              select: {
+                shopName: true,
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -564,8 +576,8 @@ export class GoodsService extends ServiceBaseWithCache {
 
     try {
       const url = imageToDeleted.image;
-      if (url.includes(s3.fullDomain)) {
-        const Key = url.replace(s3.fullDomain, '');
+      if (url.includes(s3.bucketDomain)) {
+        const Key = url.replace(s3.bucketDomain, '');
 
         s3.sendDeleteObjectsCommand({ deleteObjects: [{ Key }] });
       }
