@@ -11,7 +11,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateReturnDto,
   CreateReturnRes,
@@ -25,6 +25,7 @@ import {
 import { ReturnService } from './return.service';
 
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('return')
 @Controller('return')
 export class ReturnController {
   constructor(private readonly returnService: ReturnService) {}
