@@ -83,7 +83,7 @@ export class BroadcasterController {
   }
 
   @UseInterceptors(HttpCacheInterceptor)
-  @CacheClearKeys('channel-list', 'broadcaster/contacts')
+  @CacheClearKeys('channel-list', 'broadcaster/contacts', 'broadcaster/settlement-info')
   @Patch('restore')
   public async restoreInactiveBroadcaster(@Body(ValidationPipe) dto): Promise<void> {
     const broadcaster = await this.broadcasterService.restoreInactiveBroadcaster(
