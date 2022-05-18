@@ -13,13 +13,14 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Notice } from '@prisma/client';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { NoticePatchDto, NoticePostDto } from '@project-lc/shared-types';
 import { NoticeService } from './notice.service';
 
-@Controller('notice')
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('notice')
+@Controller('notice')
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
