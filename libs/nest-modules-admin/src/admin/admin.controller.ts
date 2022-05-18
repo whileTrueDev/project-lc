@@ -14,6 +14,7 @@ import {
   Query,
   Req,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -26,6 +27,7 @@ import {
   PrivacyApproachHistory,
   ConfirmHistory,
 } from '@prisma/client';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   BroadcasterService,
@@ -140,6 +142,8 @@ export class AdminController {
   /** 방송인 단일 정산처리 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/settlement/broadcaster')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('settlement-history')
   async executeBcSettle(
     @Body(ValidationPipe) dto: CreateManyBroadcasterSettlementHistoryDto,
   ): Promise<number> {
