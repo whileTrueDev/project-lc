@@ -15,7 +15,6 @@ import { nanoid } from 'nanoid';
 
 @Injectable()
 export class ExchangeService {
-  #EXCHANGE_CACHE_KEY = 'exchange';
   constructor(private readonly prisma: PrismaService) {}
 
   /** 교환코드 생성 */

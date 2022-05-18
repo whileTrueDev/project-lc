@@ -319,6 +319,7 @@ export class AdminController {
   /** 전체 판매자 계정 목록 조회 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/sellers')
+  @UseInterceptors(HttpCacheInterceptor)
   getSellerList(): Promise<AdminSellerListRes> {
     return this.sellerService.getSellerList();
   }

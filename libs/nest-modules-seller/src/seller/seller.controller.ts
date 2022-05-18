@@ -73,6 +73,8 @@ export class SellerController {
 
   // * 판매자 회원가입
   @Post()
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async signUp(@Body(ValidationPipe) dto: SignUpDto): Promise<Seller> {
     const checkResult = await this.mailVerificationService.checkMailVerification(
       dto.email,
@@ -99,6 +101,8 @@ export class SellerController {
   // 판매자 계정 삭제
   @UseGuards(JwtAuthGuard)
   @Delete()
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async deleteSeller(
     @Body('email') email: string,
     @SellerInfo() sellerInfo: UserPayload,
@@ -120,6 +124,8 @@ export class SellerController {
 
   // 비밀번호 변경
   @Patch('password')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async changePassword(
     @Body(ValidationPipe) dto: PasswordValidateDto,
   ): Promise<Seller> {
@@ -221,9 +227,11 @@ export class SellerController {
   }
 
   /** 셀러 아바타 이미지 s3업로드 후 url 저장 */
-  @UseGuards(JwtAuthGuard)
   @Post('/avatar')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   async addAvatar(
     @SellerInfo() seller: UserPayload,
     @UploadedFile() file: Express.Multer.File,
@@ -232,14 +240,18 @@ export class SellerController {
   }
 
   /** 셀러 아바타 이미지 null로 저장 */
-  @UseGuards(JwtAuthGuard)
   @Delete('/avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   async deleteAvatar(@SellerInfo() seller: UserPayload): Promise<boolean> {
     return this.sellerService.removeSellerAvatar(seller.sub);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch('agreement')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   async updateAgreement(
     @Body(ValidationPipe) dto: SellerContractionAgreementDto,
   ): Promise<Seller> {
