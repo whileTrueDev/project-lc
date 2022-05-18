@@ -36,7 +36,7 @@ export class GoodsInquiryCommentService extends ServiceBaseWithCache {
     goodsInquiryId: GoodsInquiry['id'],
     dto: GoodsInquiryCommentDto,
   ): Promise<GoodsInquiryComment> {
-    await this._clearCaches(this.getCacheKey(goodsInquiryId));
+    await this._clearCaches(this.#GOODS_INQUIRY_COMMENT_KEY);
     return this.prisma.goodsInquiryComment.create({
       data: {
         goodsInquiryId,
@@ -62,7 +62,7 @@ export class GoodsInquiryCommentService extends ServiceBaseWithCache {
         writtenBySellerFlag: !!dto.sellerId,
       },
     });
-    await this._clearCaches(this.getCacheKey(updated.goodsInquiryId));
+    await this._clearCaches(this.#GOODS_INQUIRY_COMMENT_KEY);
     return updated;
   }
 
@@ -71,11 +71,7 @@ export class GoodsInquiryCommentService extends ServiceBaseWithCache {
     const result = await this.prisma.goodsInquiryComment.delete({
       where: { id: commentId },
     });
-    await this._clearCaches(this.getCacheKey(result.goodsInquiryId));
+    await this._clearCaches(this.#GOODS_INQUIRY_COMMENT_KEY);
     return !!result;
-  }
-
-  private getCacheKey(inquiryId: GoodsInquiry['id']): string {
-    return `${this.#GOODS_INQUIRY_COMMENT_KEY}/${inquiryId}`;
   }
 }

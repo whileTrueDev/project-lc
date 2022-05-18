@@ -11,7 +11,7 @@ import {
 import { getLocaleNumber, getShippingOptionLabel } from '@project-lc/utils-frontend';
 import { FaTruck } from 'react-icons/fa';
 
-function OptionItemDisplay({ item }: { item: ShippingOptionDto }): JSX.Element {
+export function OptionItemDisplay({ item }: { item: ShippingOptionDto }): JSX.Element {
   const { shippingCost: costItem, shipping_opt_type: shippingOptType } = item;
   const selectOption = shippingSelectOptions.find(
     (select) => select.key === shippingOptType,
@@ -111,7 +111,7 @@ export function ShippingPolicySetListItem({
             {addOptions.length > 0 ? (
               addOptions.map((opt) => <OptionItemDisplay key={opt.tempId} item={opt} />)
             ) : (
-              <Text>미사용</Text>
+              <Text>X</Text>
             )}
           </Stack>
         </Stack>

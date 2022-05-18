@@ -1,11 +1,6 @@
-import { Text, useToast, Stack } from '@chakra-ui/react';
+import { Stack, Text, useToast } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
-import {
-  INFINITE_ORDER_LIST_QUERY_KEY,
-  useCustomerOrderCancelMutation,
-  useOrderDetail,
-} from '@project-lc/hooks';
-import { useQueryClient } from 'react-query';
+import { useCustomerOrderCancelMutation, useOrderDetail } from '@project-lc/hooks';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
 
 export function OrderCancelDialog({

@@ -1,4 +1,5 @@
 export * from './lib/asteriskify';
+export * from './lib/checkGoodsPurchasable';
 export * from './lib/createChakraTheme';
 export * from './lib/createMuiTheme';
 export * from './lib/createReactQueryClient';
@@ -7,5 +8,6 @@ export * from './lib/getCartKey';
 export * from './lib/getDiscountedRate';
 export * from './lib/getLocaleNumber';
 export * from './lib/getShippingOptionLabel';
+export * from './lib/getStandardShippingCost';
 export * from './lib/openKakaoChannel';
 export * from './lib/parseErrorObject';

@@ -39,6 +39,7 @@ import { OrderModule } from '@project-lc/nest-modules-order';
 import { ReturnModule } from '@project-lc/nest-modules-return';
 import { GoodsReviewModule } from '@project-lc/nest-modules-goods-review';
 import { MileageModule } from '@project-lc/nest-modules-mileage';
+import { RefundModule } from '@project-lc/nest-modules-refund';
 import { ExchangeModule } from '@project-lc/nest-modules-exchange';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
@@ -79,7 +80,8 @@ import { AppController } from './app.controller';
     GoodsInquiryModule.withControllers(),
     GoodsReviewModule.withControllers(),
     MileageModule.withControllers(),
-    ExchangeModule.withControllers(),
+    RefundModule.withControllers(),
+    ExchangeModule.withControllers()
   ],
   controllers: [AppController],
   providers: [],

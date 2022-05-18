@@ -1336,7 +1336,7 @@ model Coupon {
   amount               Int                @default(0) // 할인금액 혹은 할인율
   unit                 AmountUnit         @default(P) // 할인에 적용되는 단위 (퍼센트 P, 원 W)
   maxDiscountAmountWon Int? // 최대할인금액(원단위)
-  minOrderAmountWon    Int                @default(0) // 할인코드 적용 가능한 최소주문금액
+  minOrderAmountWon    Int                @default(0) // 쿠폰 적용 가능한 최소주문금액
   name                 String // 쿠폰명
   createDate           DateTime           @default(now()) // 생성일시
   startDate            DateTime // 유효시간 시작
@@ -1400,6 +1400,8 @@ model CartItem {
   shippingCostIncluded Boolean          @default(false) // 이 장바구니 상품에 동일 판매자의 배송비가 포함되었는지 여부
   shippingGroupId      Int? // 연결된 배송정책 id
   shippingGroup        ShippingGroup?   @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
+
+  channel SellType @default(normal) // 판매유형(주문경로)
 }
 
 // 장바구니 상품옵션
@@ -1592,8 +1594,8 @@ model OrderPayment {
 // [enum] 결제수단
 enum PaymentMethod {
   card // 신용카드
-  bank // 무통장입금
-  account // 실시간 계좌이체
+  transfer // 계좌이체
+  virtualAccount // 가상계좌
 }
 
 // ****************
@@ -1657,24 +1659,26 @@ model OrderItemSupport {
 // ****************
 // 환불
 // ****************
-// 환불
+// 환불 : 판매자 혹은 관리자가 환불한 결과 내역을 남기기 위한 테이블. 소비자의 환불요청은 반품Return테이블에 저장됨.
+// 환불기록생성하는 시점에 이미 실제 환불처리는 완료(소비자 계좌로 돈을 반환하든, 토스페이먼츠 결제취소 api를 사용하든)되었을거라 생각하여
+// 환불처리상태, 생성일자 컬럼 삭제
 model Refund {
   id                  Int                 @id @default(autoincrement()) // 환불고유번호
   refundCode          String?             @unique //환불코드
   orderId             Int // 주문 고유번호
   order               Order               @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status              ProcessStatus       @default(requested) // 환불처리상태
-  requestDate         DateTime            @default(now()) // 환불신청일시
-  completeDate        DateTime? // 처리완료일시
+  completeDate        DateTime?           @default(now()) // 처리완료일시
   reason              String // 환불사유
   refundAccount       String? // 환불계좌번호
   refundAccountHolder String? // 환불계좌예금주명
+  refundBank          String? // 환불계좌 은행
   items               RefundItem[] // 환불상품들
   orderCancellation   OrderCancellation[] // 연결된 주문취소
-  responsibility      String // 책임소재(판매자귀책? 구매자귀책?)
-  totalRefundAmount   Int // 총 환불금액
+  responsibility      String? // 책임소재(판매자귀책? 구매자귀책?)
+  refundAmount        Int // 환불금액
   paymentKey          String? // 토스페이먼츠 결제건에 대한 고유키(OrderPayment에서 지불했을 때 저장되는 paymentKey와 동일)
   transactionKey      String? // 취소 거래건에 대한 고유키. (동일 paymentKey 가지는)결제건에 대해 승인거래와 취소거래 구분 
+  memo                String? // 환불메모
 
   return Return[] // 연결된 반품
 }
@@ -1697,7 +1701,6 @@ model RefundItem {
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
-  status            ProcessStatus   @default(requested) // 환불처리상태
 }
 
 // ****************

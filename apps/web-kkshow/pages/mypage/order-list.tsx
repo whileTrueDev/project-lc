@@ -1,8 +1,8 @@
+import { Text } from '@chakra-ui/react';
+import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 import CustomerOrderList from '@project-lc/components-web-kkshow/mypage/orderList/CustomerOrderList';
 import { useProfile } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
-import { Text } from '@chakra-ui/react';
-import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 
 export function OrderList(): JSX.Element {
   const { data, isLoading } = useProfile();

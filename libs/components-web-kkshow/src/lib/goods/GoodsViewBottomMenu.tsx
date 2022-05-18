@@ -51,7 +51,7 @@ export function GoodsViewBottomMenu(): JSX.Element | null {
         구매
       </Button>
       <Button isFullWidth variant="outline" colorScheme="blue" onClick={onOpen}>
-        장바구니
+        장바구니담기
       </Button>
 
       <Drawer isOpen={isOpen} placement="bottom" onClose={onClose} finalFocusRef={btnRef}>
@@ -79,7 +79,7 @@ export function GoodsViewBottomMenu(): JSX.Element | null {
               />
             </Box>
             {/* 구매 박스 */}
-            <GoodsViewPurchaseBox goods={goods.data} />
+            <GoodsViewPurchaseBox goods={goods.data} isOnDrawer />
           </DrawerBody>
         </DrawerContent>
       </Drawer>

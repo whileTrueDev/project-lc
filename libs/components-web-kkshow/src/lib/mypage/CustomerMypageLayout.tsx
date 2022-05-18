@@ -19,21 +19,30 @@ export function CustomerMypageLayout({
       pointerEvents={status === 'loading' ? 'none' : 'auto'}
     >
       <KkshowNavbar variant="white" />
-      <Flex height="100%" overflow="hidden" position="relative">
-        {/* 데스크탑 화면일 때 표시하는 마이페이지 사이드바 */}
-        <Box
-          minWidth="200px"
+      <Box>
+        <Flex
           height="100%"
-          overflowY="auto"
-          display={{ base: 'none', md: 'block' }}
+          overflow="hidden"
+          position="relative"
+          m="auto"
+          maxW="5xl"
+          w="100%"
         >
-          <CustomerMypageDesktopSidebar />
-        </Box>
-        {/* 모바일 화면일때 마이페이지 사이드바는 마이페이지 홈에서 표시 (하단퀵메뉴 마이페이지 누르면 마이페이지 홈으로 이동) */}
-        <Box flexGrow={1} height="100%" overflowY="auto">
-          <Box minHeight="100%">{children}</Box>
-        </Box>
-      </Flex>
+          {/* 데스크탑 화면일 때 표시하는 마이페이지 사이드바 */}
+          <Box
+            minWidth="200px"
+            height="100%"
+            overflowY="auto"
+            display={{ base: 'none', md: 'block' }}
+          >
+            <CustomerMypageDesktopSidebar />
+          </Box>
+          {/* 모바일 화면일때 마이페이지 사이드바는 마이페이지 홈에서 표시 (하단퀵메뉴 마이페이지 누르면 마이페이지 홈으로 이동) */}
+          <Box flexGrow={1} height="100%" overflowY="auto">
+            <Box minHeight="100%">{children}</Box>
+          </Box>
+        </Flex>
+      </Box>
 
       {/* 로그인 필요 다이얼로그 */}
       <LoginRequireAlertDialog isOpen={status === 'error'} />

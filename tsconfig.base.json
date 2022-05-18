@@ -137,6 +137,9 @@
       "@project-lc/nest-modules-product-promotion": [
         "libs/nest-modules-product-promotion/src/index.ts"
       ],
+      "@project-lc/nest-modules-refund": [
+        "libs/nest-modules-refund/src/index.ts"
+      ],
       "@project-lc/nest-modules-return": [
         "libs/nest-modules-return/src/index.ts"
       ],
