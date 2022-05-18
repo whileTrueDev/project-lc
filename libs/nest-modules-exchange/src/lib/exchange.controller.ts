@@ -11,7 +11,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateExchangeDto,
   CreateExchangeRes,
@@ -25,6 +25,7 @@ import {
 import { ExchangeService } from './exchange.service';
 
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('exchange')
 @Controller('exchange')
 export class ExchangeController {
   constructor(private readonly exchangeService: ExchangeService) {}
