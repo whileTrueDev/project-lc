@@ -13,14 +13,14 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Customer, CustomerAddress } from '@prisma/client';
-import { HttpCacheInterceptor, UserInfo, UserPayload } from '@project-lc/nest-core';
+import { CustomerInfo, HttpCacheInterceptor, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CustomerAddressDto, CustomerAddressUpdateDto } from '@project-lc/shared-types';
 import { CustomerAddressService } from './customer-address.service';
 
 @Controller('customer/:customerId/address')
 @UseInterceptors(HttpCacheInterceptor)
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class CustomerAddressController {
   constructor(private readonly customerAddressService: CustomerAddressService) {}
 
@@ -28,18 +28,18 @@ export class CustomerAddressController {
   @Get()
   findMany(
     @Param('customerId', ParseIntPipe) customerId: CustomerAddress['id'],
-    // @UserInfo() { id }: UserPayload, // TODO: Customer 로그인 구현 이후 CustomerInfo 로 수정
+    @CustomerInfo() { id }: UserPayload,
   ): Promise<CustomerAddress[]> {
-    // this.checkId(id, customerId);
+    this.checkId(id, customerId);
     return this.customerAddressService.findMany(customerId);
   }
 
   @Get('/default')
   findDefaultAddress(
     @Param('customerId', ParseIntPipe) customerId: CustomerAddress['id'],
-    // @UserInfo() { id }: UserPayload, // TODO: Customer 로그인 구현 이후 CustomerInfo 로 수정
+    @CustomerInfo() { id }: UserPayload,
   ): Promise<CustomerAddress> {
-    // this.checkId(id, customerId);
+    this.checkId(id, customerId);
     return this.customerAddressService.findDefaultAddress(customerId);
   }
 
@@ -48,7 +48,7 @@ export class CustomerAddressController {
   findOne(
     @Param('customerId', ParseIntPipe) customerId: CustomerAddress['id'],
     @Param('addressId', ParseIntPipe) addressId: CustomerAddress['id'],
-    @UserInfo() { id }: UserPayload, // TODO: Customer 로그인 구현 이후 CustomerInfo 로 수정
+    @CustomerInfo() { id }: UserPayload,
   ): Promise<CustomerAddress> {
     this.checkId(id, customerId);
     return this.customerAddressService.findOne(addressId);
@@ -59,7 +59,7 @@ export class CustomerAddressController {
   create(
     @Param('customerId', ParseIntPipe) customerId: CustomerAddress['id'],
     @Body(ValidationPipe) dto: CustomerAddressDto,
-    @UserInfo() { id }: UserPayload, // TODO: Customer 로그인 구현 이후 CustomerInfo 로 수정
+    @CustomerInfo() { id }: UserPayload,
   ): Promise<CustomerAddress> {
     this.checkId(id, customerId);
     return this.customerAddressService.create(customerId, dto);
@@ -71,7 +71,7 @@ export class CustomerAddressController {
     @Param('customerId', ParseIntPipe) customerId: CustomerAddress['id'],
     @Param('addressId', ParseIntPipe) addressId: CustomerAddress['id'],
     @Body(ValidationPipe) dto: CustomerAddressUpdateDto,
-    @UserInfo() { id }: UserPayload, // TODO: Customer 로그인 구현 이후 CustomerInfo 로 수정
+    @CustomerInfo() { id }: UserPayload,
   ): Promise<CustomerAddress> {
     this.checkId(id, customerId);
     return this.customerAddressService.update(addressId, dto);
@@ -82,7 +82,7 @@ export class CustomerAddressController {
   delete(
     @Param('customerId', ParseIntPipe) customerId: CustomerAddress['id'],
     @Param('addressId', ParseIntPipe) addressId: CustomerAddress['id'],
-    @UserInfo() { id }: UserPayload, // TODO: Customer 로그인 구현 이후 CustomerInfo 로 수정
+    @CustomerInfo() { id }: UserPayload,
   ): Promise<boolean> {
     this.checkId(id, customerId);
     return this.customerAddressService.delete(addressId);
