@@ -9,11 +9,13 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Collapse,
   Flex,
+  FormControl,
+  FormErrorMessage,
   Grid,
   GridItem,
   IconButton,
-  Input,
   ListItem,
   Modal,
   ModalBody,
@@ -22,26 +24,37 @@ import {
   Select,
   Stack,
   Text,
+  Textarea,
   Tooltip,
   UnorderedList,
   useBreakpointValue,
+  useColorModeValue,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useCartMutation, useDisplaySize } from '@project-lc/hooks';
+import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
+import { useCartMutation, useProfile } from '@project-lc/hooks';
 import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
-import { useGoodsViewStore } from '@project-lc/stores';
+import { useGoodsViewStore, useKkshowOrder } from '@project-lc/stores';
+import {
+  checkGoodsPurchasable,
+  getStandardShippingCost,
+} from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { GoGift } from 'react-icons/go';
 import shallow from 'zustand/shallow';
 import OptionQuantity from '../OptionQuantity';
 
 interface GoodsViewPurchaseBoxProps {
   goods: GoodsByIdRes;
+  isOnDrawer?: boolean;
 }
 /** 상품 상세 페이지 상품 옵션 및 후원 정보 입력 + 구매,장바구니 버튼 */
-export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
+export function GoodsViewPurchaseBox({
+  goods,
+  isOnDrawer = false,
+}: GoodsViewPurchaseBoxProps): JSX.Element {
   const toast = useToast({ isClosable: true });
   const store = useGoodsViewStore();
 
@@ -60,7 +73,7 @@ export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.
   }, [goods.options, isOnlyDefaultOption, store]);
 
   return (
-    <Grid templateColumns="1fr 2fr" mt={{ base: 2, md: 6 }} gridRowGap={2}>
+    <Grid templateColumns="1fr 2fr" mt={{ base: 2, md: 6 }} gridRowGap={2} maxH="75vh">
       {/* 옵션 */}
       {!isOnlyDefaultOption && (
         <>
@@ -93,11 +106,7 @@ export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.
 
       <GridItem colSpan={3} fontSize="sm">
         {/* 선택된 옵션 목록 */}
-        <Stack
-          mt={2}
-          maxH={{ base: 200, md: 'unset' }}
-          overflowY={{ base: 'scroll', md: 'unset' }}
-        >
+        <Stack mt={2}>
           {store.selectedOpts.map((opt) => (
             <Flex
               rounded="md"
@@ -139,8 +148,13 @@ export function GoodsViewPurchaseBox({ goods }: GoodsViewPurchaseBoxProps): JSX.
       </GridItem>
 
       {/* 총 구매 금액 및 구매,장바구니 버튼 */}
-      <GridItem colSpan={3}>
-        <GoodsViewButtonSet goods={goods} />
+      <GridItem
+        colSpan={3}
+        position={isOnDrawer ? 'sticky' : 'static'}
+        bottom="0"
+        zIndex={isOnDrawer ? 'sticky' : undefined}
+      >
+        <GoodsViewButtonSet goods={goods} isOnDrawer={isOnDrawer} />
       </GridItem>
     </Grid>
   );
@@ -195,7 +209,7 @@ function GoodsViewBroadcasterSupportBox({
           </Flex>
         </AccordionButton>
 
-        <AccordionPanel px={0} fontSize="sm">
+        <AccordionPanel px={0} pb={1} fontSize="sm">
           {!selectedBc ? (
             <Box>
               <Text mb={2}>후원가능한 방송인</Text>
@@ -233,51 +247,88 @@ function GoodsViewBroadcasterSupportBox({
                     (최대 30자)
                   </Text>
                 </Text>
-                <Input
-                  rounded="md"
-                  size="sm"
-                  placeholder="방송인 후원 메시지 도네이션 표시글"
-                  value={supportMessage}
-                  onChange={(e) => onSupMsgChange(e.target.value)}
-                />
+                <FormControl isInvalid={supportMessage.length >= 30}>
+                  <Textarea
+                    minH="55px"
+                    resize="none"
+                    rounded="md"
+                    size="sm"
+                    placeholder="방송인 후원 메시지 도네이션 표시글"
+                    value={supportMessage}
+                    onChange={(e) => onSupMsgChange(e.target.value)}
+                  />
+                  <FormErrorMessage fontSize="xs">
+                    후원 메시지는 30자까지 작성가능합니다.
+                  </FormErrorMessage>
+                </FormControl>
               </Box>
             </Flex>
           )}
-          <UnorderedList mt={2} color="GrayText" fontSize="xs">
-            <ListItem>
-              <Text>방송인 후원 시, 주문 금액의 일정량이 방송인에게 돌아갑니다.</Text>
-            </ListItem>
-            <ListItem>
-              <Text>
-                방송인이 라이브쇼핑 방송 중인 경우 후원메시지는 방송 화면에 전송됩니다.
-              </Text>
-            </ListItem>
-            <ListItem>
-              <Text>
-                방송인에게 선물하기 버튼{' '}
-                <Text as="span">
-                  <Icon as={GoGift} verticalAlign="middle" />
-                </Text>{' '}
-                을 클릭하여 이 상품을 후원 방송인에게 선물할 수 있습니다.
-              </Text>
-            </ListItem>
-          </UnorderedList>
+          <GoodsViewSupportNotice />
         </AccordionPanel>
       </AccordionItem>
     </Accordion>
   );
 }
 
-function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
+function GoodsViewSupportNotice(): JSX.Element {
+  const toggle = useDisclosure();
+  return (
+    <Box pt={2}>
+      <ClickableUnderlinedText onClick={toggle.onToggle}>
+        방송인 후원이란?
+      </ClickableUnderlinedText>
+
+      <Collapse in={toggle.isOpen}>
+        <UnorderedList mt={2} color="GrayText" fontSize="xs">
+          <ListItem>
+            <Text>
+              방송인 후원은 주문 금액의 일정량이 방송인에게 돌아가는 후원 형태입니다.
+            </Text>
+          </ListItem>
+          <ListItem>
+            <Text>후원 여부와 관계없이 주문 상품은 주문자에게 배송됩니다.</Text>
+          </ListItem>
+          <ListItem>
+            <Text>
+              방송인에게 이 상품을 선물하고 싶다면 아래 선물버튼을 클릭하여 선물 절차를
+              진행할 수 있습니다.
+            </Text>
+          </ListItem>
+          <ListItem>
+            <Text>
+              방송인이 라이브쇼핑 방송 중인 경우 후원메시지는 방송 화면에 전송됩니다.
+            </Text>
+          </ListItem>
+          <ListItem>
+            <Text>
+              방송인에게 선물하기 버튼{' '}
+              <Text as="span">
+                <Icon as={GoGift} verticalAlign="middle" />
+              </Text>{' '}
+              을 클릭하여 이 상품을 후원 방송인에게 선물할 수 있습니다.
+            </Text>
+          </ListItem>
+        </UnorderedList>
+      </Collapse>
+    </Box>
+  );
+}
+
+/** 상품 상세 - 주문/선물주문/장바구니 버튼 컴포넌트 및 로직 */
+function GoodsViewButtonSet({
+  goods,
+  isOnDrawer = false,
+}: GoodsViewPurchaseBoxProps): JSX.Element {
+  const toast = useToast({ isClosable: true });
+  const profile = useProfile();
+  const buttonSize = useBreakpointValue({ base: 'md', md: 'lg' });
+  const bgColor = useColorModeValue('white', 'gray.700');
   const router = useRouter();
-  const toast = useToast();
-  const { isMobileSize } = useDisplaySize();
+  const cartDoneDialog = useDisclosure();
   const selectedOpts = useGoodsViewStore((s) => s.selectedOpts);
   const selectedBc = useGoodsViewStore((s) => s.selectedBc);
   const supportMessage = useGoodsViewStore((s) => s.supportMessage);
-  const buttonSize = useBreakpointValue({ base: 'md', md: 'lg' });
-
-  const cartDoneDialog = useDisclosure();
 
   /** 선택 상품 옵션 합계 정보 */
   const totalInfo = useMemo(() => {
@@ -292,39 +343,37 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
     );
   }, [selectedOpts]);
 
-  const onSuccess = (): void => {
-    if (isMobileSize) {
-      cartDoneDialog.onOpen();
-    } else {
-      toast({
-        title: (
-          <Text>
-            장바구니에 상품을 담았습니다.
-            <Text
-              ml={4}
-              as="span"
-              color="blue.600"
-              cursor="pointer"
-              textDecor="underline"
-              onClick={() => router.push('/cart')}
-            >
-              장바구니
-            </Text>
-          </Text>
-        ),
-        status: 'success',
-        isClosable: true,
-      });
-    }
-  };
-  // 장바구니 담기
-  const createCartItem = useCartMutation();
-
-  const handleCartClick = (): void => {
+  // 장바구니 담기 또는 바로 주문 이전 가능사항 체크
+  const executePurchaseCheck = useCallback((): boolean => {
+    // 옵션 선택 여부 체크
     if (!(selectedOpts.length > 0)) {
       toast({ title: '선택된 옵션이 없습니다.', status: 'warning' });
-      return;
+      return false;
     }
+
+    const totalOptsQuantity = selectedOpts.reduce(
+      (prev, curr) => prev + curr.quantity,
+      0,
+    );
+    // 최대/최소 주문 개수 제한 체크
+    return checkGoodsPurchasable(goods, totalOptsQuantity, {
+      onMaxLimitFail: () =>
+        toast({
+          description: `최대 주문 수량(${goods.max_purchase_ea}개)까지 구매가능합니다.`,
+          status: 'warning',
+        }),
+      onMinLimitFail: () =>
+        toast({
+          description: `최소 주문 수량(${goods.min_purchase_ea}개)이상 구매해야 합니다.`,
+          status: 'warning',
+        }),
+    });
+  }, [goods, selectedOpts, toast]);
+
+  // 장바구니 담기
+  const createCartItem = useCartMutation();
+  const handleCartClick = useCallback((): void => {
+    if (!executePurchaseCheck()) return;
     createCartItem
       .mutateAsync({
         goodsId: goods.id,
@@ -336,9 +385,11 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
           name: o.option_title,
           value: o.option1,
         })),
-        shippingCost: 2500,
+        shippingCost: getStandardShippingCost(goods.ShippingGroup),
         shippingCostIncluded: false,
         shippingGroupId: goods.shippingGroupId,
+        // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
+        channel: 'normal',
         support: selectedBc
           ? {
               broadcasterId: selectedBc.id,
@@ -347,17 +398,92 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
             }
           : undefined,
       })
-      .then(() => onSuccess())
+      .then(() => cartDoneDialog.onOpen())
       .catch(() => {
         toast({
           status: 'error',
           title: '장바구니에 담는 도중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
         });
       });
-  };
+  }, [
+    cartDoneDialog,
+    createCartItem,
+    executePurchaseCheck,
+    goods.ShippingGroup,
+    goods.id,
+    goods.shippingGroupId,
+    selectedBc,
+    selectedOpts,
+    supportMessage,
+    toast,
+  ]);
+
+  const orderPrepare = useKkshowOrder((s) => s.handleOrderPrepare);
+  // 주문 클릭시
+  const handleOrderClick = useCallback(
+    (type: 'gift' | 'instant-order' = 'instant-order'): void => {
+      if (!executePurchaseCheck()) return;
+      const isGiftOrder = type === 'gift';
+      orderPrepare({
+        orderPrice: totalInfo.price,
+        giftFlag: !!isGiftOrder, // 선물주문플래그
+        supportOrderIncludeFlag: isGiftOrder ? true : !!selectedBc, // 선물주문은 언제나 후원이 포함되므로 true 고정
+        nonMemberOrderFlag: !profile.data?.id,
+        orderItems: [
+          {
+            goodsName: goods.goods_name,
+            goodsId: goods.id,
+            options: selectedOpts.map((o) => ({
+              goodsOptionId: o.id,
+              quantity: o.quantity,
+              name: o.option_title,
+              value: o.option1,
+              normalPrice: o.consumer_price,
+              discountPrice: o.price,
+              weight: o.weight,
+            })),
+            shippingCost: getStandardShippingCost(goods.ShippingGroup),
+            shippingGroupId: goods.shippingGroupId || 1,
+            // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
+            channel: 'normal',
+            shippingCostIncluded: false, // 다른 상품에 이미 배송비가 포함되었는 지 여부
+            support: selectedBc
+              ? {
+                  broadcasterId: selectedBc.id,
+                  message: supportMessage,
+                  nickname: selectedBc.userNickname,
+                  avatar: selectedBc.avatar,
+                }
+              : undefined,
+          },
+        ],
+      });
+
+      // 비회원 주문 로그인화면으로 이동, 로그인 이후 페이지를 주문페이지로
+      if (!profile.data?.id) {
+        router.push(`/login?from=purchase&nextpage=/payment`);
+        return;
+      }
+      router.push('/payment');
+    },
+    [
+      executePurchaseCheck,
+      orderPrepare,
+      totalInfo.price,
+      selectedBc,
+      profile.data?.id,
+      goods.goods_name,
+      goods.id,
+      goods.ShippingGroup,
+      goods.shippingGroupId,
+      selectedOpts,
+      supportMessage,
+      router,
+    ],
+  );
 
   return (
-    <Stack>
+    <Stack bgColor={isOnDrawer ? bgColor : 'unset'}>
       <Grid templateColumns="1fr 1fr" pt={4}>
         <GridItem>
           <Text>총 개수</Text>
@@ -387,10 +513,7 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
               colorScheme="facebook"
               isDisabled={goods.goods_status !== 'normal'}
               variant="outline"
-              onClick={() => {
-                // TODO: 주문페이지 완료이후 선물 주문으로 이동 로직 구현 필요
-                alert('방송인에게 선물하기 클릭. 선물 주문으로 이동 로직 구현 필요');
-              }}
+              onClick={() => handleOrderClick('gift')}
             />
           </Tooltip>
         )}
@@ -399,10 +522,7 @@ function GoodsViewButtonSet({ goods }: GoodsViewPurchaseBoxProps): JSX.Element {
           size={buttonSize}
           colorScheme="blue"
           isDisabled={goods.goods_status !== 'normal'}
-          onClick={() => {
-            // TODO: 주문페이지 완료이후 선물 주문으로 이동 로직 구현 필요
-            alert('구매하기 클릭. 장바구니 구매하기와 동일한 로직 처리 필요');
-          }}
+          onClick={() => handleOrderClick('instant-order')}
         >
           구매하기
         </Button>
@@ -431,14 +551,14 @@ interface CartCreateDoneDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
+/** 장바구니 담기 완료 알림 모달창 */
 function CartCreateDoneDialog({
   isOpen,
   onClose,
 }: CartCreateDoneDialogProps): JSX.Element {
   const router = useRouter();
-  const { isMobileSize } = useDisplaySize();
   return (
-    <Modal isOpen={!!isMobileSize && isOpen} onClose={onClose} isCentered size="xs">
+    <Modal isOpen={isOpen} onClose={onClose} isCentered size="xs">
       <ModalOverlay />
       <ModalContent maxW={280}>
         <ModalBody my={4} textAlign="center">

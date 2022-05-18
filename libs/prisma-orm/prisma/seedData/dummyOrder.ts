@@ -147,6 +147,61 @@ export const nonMemberOrder = {
   },
 };
 
+export const purchaseConfirmedOrder = {
+  ...normalOrder,
+  orderCode: 'dummy-order-2-qwer',
+  step: 'purchaseConfirmed' as const,
+  purchaseConfirmationDate: new Date(),
+  orderItems: {
+    create: [
+      {
+        ...normalOrder.orderItems.create[0],
+        goodsId: 2,
+        options: {
+          create: [
+            {
+              ...normalOrder.orderItems.create[0].options.create[0],
+              step: 'purchaseConfirmed' as const,
+              purchaseConfirmationDate: new Date(),
+            },
+            {
+              ...normalOrder.orderItems.create[0].options.create[1],
+              step: 'purchaseConfirmed' as const,
+              purchaseConfirmationDate: new Date(),
+            },
+          ],
+        },
+      },
+    ],
+  },
+};
+
+export const shippingDoneOrder = {
+  ...normalOrder,
+  orderCode: 'dummy-order-3-zxcv',
+  step: 'shippingDone' as const,
+  orderItems: {
+    create: [
+      {
+        ...normalOrder.orderItems.create[0],
+        goodsId: 2,
+        options: {
+          create: [
+            {
+              ...normalOrder.orderItems.create[0].options.create[0],
+              step: 'shippingDone' as const,
+            },
+            {
+              ...normalOrder.orderItems.create[0].options.create[1],
+              step: 'shippingDone' as const,
+            },
+          ],
+        },
+      },
+    ],
+  },
+};
+
 export const orderExportReady = {
   customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({

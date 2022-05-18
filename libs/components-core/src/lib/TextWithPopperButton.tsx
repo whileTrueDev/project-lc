@@ -59,14 +59,14 @@ export default function TextWithPopperButton({
 
         {isOpen && portalBody ? (
           <Portal>
-            <PopoverContent p={5}>
+            <PopoverContent pt={5}>
               <PopoverArrow />
               <PopoverCloseButton />
               <PopoverBody>{children}</PopoverBody>
             </PopoverContent>
           </Portal>
         ) : (
-          <PopoverContent p={5}>
+          <PopoverContent pt={5}>
             <PopoverArrow />
             <PopoverCloseButton />
             <PopoverBody>{children}</PopoverBody>
