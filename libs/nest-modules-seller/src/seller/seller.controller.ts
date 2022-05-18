@@ -139,6 +139,8 @@ export class SellerController {
   // 본인의 사업자 등록정보 등록
   @UseGuards(JwtAuthGuard)
   @Post('business-registration')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement')
   public async InsertBusinessRegistration(
     @Body(ValidationPipe) dto: BusinessRegistrationDto,
     @SellerInfo() sellerInfo: UserPayload,
@@ -165,6 +167,8 @@ export class SellerController {
   // 본인의 계좌정보 등록
   @UseGuards(JwtAuthGuard)
   @Post('settlement-account')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement')
   public async InsertSettlementAccount(
     @Body(ValidationPipe) dto: SettlementAccountDto,
     @SellerInfo() sellerInfo: UserPayload,
@@ -247,6 +251,7 @@ export class SellerController {
 
   @Patch('restore')
   @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement')
   public async restoreInactiveSeller(@Body(ValidationPipe) dto): Promise<void> {
     try {
       await this.prismaService.$transaction(async (): Promise<void> => {

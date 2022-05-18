@@ -127,6 +127,8 @@ export class AdminController {
   /** 판매자 정산처리 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/settlement')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement', 'seller/settlement-history')
   executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
     if (dto.target.options.length === 0) return null;
     return this.sellerSettlementService.executeSettle(dto.sellerId, dto);
