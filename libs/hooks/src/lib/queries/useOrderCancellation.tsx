@@ -37,9 +37,7 @@ export const useCustomerInfiniteOrderCancellationList = (
 export const getOrderCancellationDetail = async (
   cancelCode: string,
 ): Promise<OrderCancellationDetailRes> => {
-  return axios
-    .get('/order/cancellation/detail', { params: { cancelCode } })
-    .then((res) => res.data);
+  return axios.get(`/order/cancellation/${cancelCode}`).then((res) => res.data);
 };
 
 /** 소비자 특정 주문취소요청 상세조회 쿼리키 */
