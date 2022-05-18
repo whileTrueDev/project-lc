@@ -22,7 +22,12 @@ import {
   ConfirmHistory,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
+import {
+  CacheClearKeys,
+  HttpCacheInterceptor,
+  SellerInfo,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -48,6 +53,7 @@ import { SellerShopService } from './seller-shop.service';
 import { SellerService } from './seller.service';
 
 @Controller('seller')
+@CacheClearKeys('seller')
 export class SellerController {
   constructor(
     private readonly sellerService: SellerService,
@@ -240,6 +246,7 @@ export class SellerController {
   }
 
   @Patch('restore')
+  @UseInterceptors(HttpCacheInterceptor)
   public async restoreInactiveSeller(@Body(ValidationPipe) dto): Promise<void> {
     try {
       await this.prismaService.$transaction(async (): Promise<void> => {

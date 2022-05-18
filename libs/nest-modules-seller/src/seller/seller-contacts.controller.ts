@@ -8,7 +8,12 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
+import {
+  CacheClearKeys,
+  HttpCacheInterceptor,
+  SellerInfo,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   SellerContactsDTO,
@@ -16,13 +21,14 @@ import {
 } from '@project-lc/shared-types';
 import { SellerContactsService } from './seller-contacts.service';
 
+@UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('seller/contacts')
 @Controller('seller/contacts')
 export class SellerContactsController {
   constructor(private readonly sellerContactsService: SellerContactsService) {}
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  @UseInterceptors(HttpCacheInterceptor)
   public findDefaultContacts(@Query('email') email: string): Promise<SellerContactsDTO> {
     return this.sellerContactsService.findDefaultContacts(email);
   }
