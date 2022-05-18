@@ -15,6 +15,7 @@ import { HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
+  FindOrderCancelParams,
   GetOrderCancellationListDto,
   OrderCancellationDetailRes,
   OrderCancellationListRes,
@@ -37,20 +38,20 @@ export class OrderCancellationController {
     return this.orderCancellationService.createOrderCancellation(dto);
   }
 
+  /** 주문취소코드로 특정 주문취소 상세조회 */
+  @Get(':cancelCode')
+  getOrderCancellationDetail(
+    @Param() params: FindOrderCancelParams,
+  ): Promise<OrderCancellationDetailRes> {
+    return this.orderCancellationService.getOrderCancellationDetail(params);
+  }
+
   /* 주문취소 내역 조회 */
-  @Get('list')
+  @Get('')
   getOrderCancellationList(
     @Query(new ValidationPipe({ transform: true })) dto: GetOrderCancellationListDto,
   ): Promise<OrderCancellationListRes> {
     return this.orderCancellationService.getOrderCancellationList(dto);
-  }
-
-  /** 주문취소코드로 특정 주문취소 상세조회 */
-  @Get(':cancelCode')
-  getOrderCancellationDetail(
-    @Param('cancelCode') cancelCode: string,
-  ): Promise<OrderCancellationDetailRes> {
-    return this.orderCancellationService.getOrderCancellationDetail({ cancelCode });
   }
 
   /* 주문취소 수정(판매자, 관리자가 주문취소처리상태 수정 및 거절사유 입력 등) */

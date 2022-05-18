@@ -15,7 +15,7 @@ export class OrderModule {
   ];
 
   private static readonly exports = [OrderCancellationService];
-  private static readonly controllers = [OrderController, OrderCancellationController];
+  private static readonly controllers = [OrderCancellationController, OrderController];
   private static readonly imports = [BroadcasterModule.withoutControllers()];
 
   static withoutControllers(): DynamicModule {

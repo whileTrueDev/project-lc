@@ -16,7 +16,7 @@ export const getOrderCancellationList = async (
   dto: GetOrderCancellationListDto,
 ): Promise<OrderCancellationListRes> => {
   return axios
-    .get<OrderCancellationListRes>('/order/cancellation/list', { params: dto })
+    .get<OrderCancellationListRes>('/order/cancellation', { params: dto })
     .then((res) => res.data);
 };
 
