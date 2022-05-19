@@ -51,8 +51,8 @@ export class AdminMileageController {
 
   /** 마일리지 세팅 불러오기 */
   @Get('setting')
-  getMileageSettings(): Promise<MileageSetting[]> {
-    return this.mileageSettingService.getMileageSettings();
+  getMileageSettings(): Promise<MileageSetting> {
+    return this.mileageSettingService.getMileageSetting();
   }
 
   /** 마일리지 세팅 생성 */

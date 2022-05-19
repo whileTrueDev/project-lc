@@ -8,8 +8,8 @@ export class MileageSettingService {
   constructor(private readonly prismaService: PrismaService) {}
 
   /** 마일리지 설정 조회 */
-  getMileageSettings(): Promise<MileageSetting[]> {
-    return this.prismaService.mileageSetting.findMany();
+  getMileageSetting(): Promise<MileageSetting> {
+    return this.prismaService.mileageSetting.findFirst();
   }
 
   /** 마일리지 설정 생성 */
