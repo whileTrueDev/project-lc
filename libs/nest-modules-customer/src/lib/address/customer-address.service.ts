@@ -39,6 +39,16 @@ export class CustomerAddressService {
     addressId: CustomerAddress['id'],
     dto: CustomerAddressUpdateDto,
   ): Promise<CustomerAddress> {
+    if (dto.isDefault) {
+      // 기본 배송지 변경시
+      const target = await this.prisma.customerAddress.findFirst({
+        where: { id: addressId },
+      });
+      await this.prisma.customerAddress.updateMany({
+        where: { customerId: target.customerId, isDefault: true },
+        data: { isDefault: false },
+      });
+    }
     return this.prisma.customerAddress.update({
       where: { id: addressId },
       data: dto,

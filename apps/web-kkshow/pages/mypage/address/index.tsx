@@ -1,5 +1,5 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
-import { CustomerAddressCreateButton } from '@project-lc/components-web-kkshow/address/CustomerAddressForm';
+import { CustomerAddressCreateButton } from '@project-lc/components-web-kkshow/address/CustomerAddressCreateDialog';
 import { CustomerAddressList } from '@project-lc/components-web-kkshow/address/CustomerAddressList';
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 
