@@ -1,7 +1,9 @@
 import { AddIcon } from '@chakra-ui/icons';
 import {
+  Box,
   Button,
   ButtonGroup,
+  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -9,6 +11,8 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Text,
+  UnorderedList,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
@@ -92,7 +96,7 @@ export function CustomerAddressCreateButton(): JSX.Element {
   const { data: addresses } = useCustomerAddress(profile?.id);
 
   return (
-    <>
+    <Box>
       <Button
         size="sm"
         leftIcon={<AddIcon />}
@@ -101,8 +105,18 @@ export function CustomerAddressCreateButton(): JSX.Element {
       >
         배송지 등록
       </Button>
+      <UnorderedList fontSize="xs">
+        <ListItem>
+          <Text color="red.400">현재 배송지를 최대로 등록했습니다.</Text>
+        </ListItem>
+        {addresses && addresses.length >= 3 && (
+          <ListItem>
+            <Text>배송지는 최대 3개 까지 등록 가능합니다.</Text>
+          </ListItem>
+        )}
+      </UnorderedList>
 
       <CustomerAddressCreateDialog isOpen={isOpen} onClose={onClose} />
-    </>
+    </Box>
   );
 }

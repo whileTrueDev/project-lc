@@ -10,7 +10,6 @@ import {
   Input,
   InputProps,
   Stack,
-  useDisclosure,
   useMergeRefs,
 } from '@chakra-ui/react';
 import { DaumAddressDialogButton } from '@project-lc/components-shared/DaumAddressDialog';
@@ -27,8 +26,6 @@ export function CustomerAddressForm({
   onSubmit,
   defaultValues,
 }: CustomerAddressFormProps): JSX.Element {
-  const daumOpen = useDisclosure();
-
   const {
     handleSubmit,
     register,
@@ -47,8 +44,6 @@ export function CustomerAddressForm({
     setValue('address', addr);
     clearErrors('address');
     setValue('postalCode', zonecode);
-    if (_detailAddressRef.current) _detailAddressRef.current.focus();
-    daumOpen.onClose();
   };
 
   const _onSubmit: SubmitHandler<CustomerAddressDto> = (formData): void => {
@@ -62,7 +57,7 @@ export function CustomerAddressForm({
       onSubmit={handleSubmit(_onSubmit)}
       alignItems="flex-start"
     >
-      <AddressFormField title="기본 배송지로 설정" errorMessage={errors.title?.message}>
+      <AddressFormField title="기본 배송지" errorMessage={errors.isDefault?.message}>
         <Checkbox size="lg" {...register('isDefault')} />
       </AddressFormField>
       <AddressFormField title="배송지 별칭" errorMessage={errors.title?.message}>
@@ -112,7 +107,10 @@ export function CustomerAddressForm({
         errorMessage={errors.postalCode?.message || errors.address?.message}
       >
         <Stack>
-          <DaumAddressDialogButton onAddressSelect={handleAddressSelected} />
+          <DaumAddressDialogButton
+            onAddressSelect={handleAddressSelected}
+            finalFocusRef={_detailAddressRef}
+          />
           <Flex gap={1}>
             <Input
               maxW={90}

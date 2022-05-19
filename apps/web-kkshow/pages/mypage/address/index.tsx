@@ -12,7 +12,7 @@ export function ContactsIndex(): JSX.Element {
           배송지 관리
         </Text>
 
-        <Stack mt={10} spacing={4} alignItems="flex-start">
+        <Stack mt={4} spacing={4} alignItems="flex-start">
           <CustomerAddressCreateButton />
           <CustomerAddressList />
         </Stack>
