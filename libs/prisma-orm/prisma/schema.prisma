@@ -1873,7 +1873,7 @@ model Export {
   exportCode                 String?                      @unique // 출고코드
   orderId                    Int // 주문 고유번호
   order                      Order                        @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status                     ExportProcessStatus          @default(preparing) // 출고상태
+  status                     ExportProcessStatus          @default(exportDone) // 출고상태
   deliveryCompany            String // 택배사
   deliveryNumber             String // 운송장번호
   bundleExportCode           String? // 합포장출고코드(합포장인경우)
@@ -1906,7 +1906,7 @@ model ExportItem {
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption     @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
-  status            ExportProcessStatus @default(preparing) // 출고상태
+  status            ExportProcessStatus @default(exportDone) // 출고상태
 }
 
 // ****************

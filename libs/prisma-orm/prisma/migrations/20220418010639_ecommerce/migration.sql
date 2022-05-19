@@ -337,7 +337,7 @@ CREATE TABLE `OrderItemOption` (
     `discountPrice` DECIMAL(10, 2) NOT NULL,
     `weight` DOUBLE NULL,
     `step` ENUM('orderReceived', 'paymentConfirmed', 'goodsReady', 'partialExportReady', 'exportReady', 'partialExportDone', 'exportDone', 'partialShipping', 'shipping', 'partialShippingDone', 'shippingDone', 'paymentCanceled', 'orderInvalidated', 'paymentFailed') NOT NULL DEFAULT 'orderReceived',
-    `goodsOptionId` INTEGER NULL
+    `goodsOptionId` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -482,7 +482,7 @@ CREATE TABLE `Export` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `exportCode` VARCHAR(191) NULL,
     `orderId` INTEGER NOT NULL,
-    `status` ENUM('preparing', 'exportDone', 'shipping', 'shippingDone') NOT NULL DEFAULT 'preparing',
+    `status` ENUM('preparing', 'exportDone', 'shipping', 'shippingDone') NOT NULL DEFAULT 'exportDone',
     `deliveryCompany` VARCHAR(191) NOT NULL,
     `deliveryNumber` VARCHAR(191) NOT NULL,
     `bundleExportCode` VARCHAR(191) NULL,
@@ -503,7 +503,7 @@ CREATE TABLE `ExportItem` (
     `orderItemOptionId` INTEGER NOT NULL,
     `amount` INTEGER NOT NULL,
     `exportId` INTEGER NOT NULL,
-    `status` ENUM('preparing', 'exportDone', 'shipping', 'shippingDone') NOT NULL DEFAULT 'preparing',
+    `status` ENUM('preparing', 'exportDone', 'shipping', 'shippingDone') NOT NULL DEFAULT 'exportDone',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
