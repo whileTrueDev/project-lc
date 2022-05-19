@@ -93,7 +93,7 @@ export const createDummyOrder = async ({
       quantity: 1,
       normalPrice: 5000,
       discountPrice: 4000,
-      goodsOptionId: 1,
+      goodsOption: { connect: { id: 1 } },
       step,
     },
   });

@@ -266,21 +266,23 @@ model GoodsConfirmation {
 }
 
 model GoodsOptions {
-  id              Int                   @id @default(autoincrement())
-  goods           Goods                 @relation(fields: [goodsId], references: [id], onDelete: Cascade)
-  goodsId         Int
-  supply          GoodsOptionsSupplies?
+  id               Int                   @id @default(autoincrement())
+  goods            Goods                 @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  goodsId          Int
+  supply           GoodsOptionsSupplies?
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
-  default_option  YesOrNo               @default(n) // 옵션 필수 �������부
-  option_type     String                @default("direct") // 기본값인듯? 설명도 direct
-  option_title    String? // 옵션명 fm_goods_options.option_title
-  option1         String? // 옵션값 fm_goods_options.option1
-  option_code     String? // 옵션코드
-  consumer_price  Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
-  price           Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
-  weight          Float? //옵션 개당 무게 (단위 kg)
-  option_view     YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
-  cartItemOptions CartItemOption[]
+  default_option   YesOrNo               @default(n) // 옵션 필수 �������부
+  option_type      String                @default("direct") // 기본값인듯? 설명도 direct
+  option_title     String? // 옵션명 fm_goods_options.option_title
+  option1          String? // 옵션값 fm_goods_options.option1
+  option_code      String? // 옵션코드
+  consumer_price   Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
+  price            Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
+  weight           Float? //옵션 개당 무게 (단위 kg)
+  option_view      YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
+  cartItemOptions  CartItemOption[]
+  orderItemOptions OrderItemOption[]
+
 
   @@index([goodsId], name: "goodsId")
 }
@@ -1629,7 +1631,8 @@ model OrderItemOption {
   id                     Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
   orderItemId            Int // 옵션이 연결된 주문 상품 고유번호
   orderItem              OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
-  goodsOptionId          Int // 참조하는 상품옵션 고유번호
+  goodsOptionId          Int? // 참조하는 상품옵션 고유번호
+  goodsOption            GoodsOptions?           @relation(fields: [goodsOptionId], references: [id], onDelete: SetNull) // 주문상품옵션이 연결된 상품옵션
   name                   String? // 주문했을 당시 옵션명
   value                  String? // 주문했을 당시 옵션값
   quantity               Int // 옵션 선택 수량(개수)
