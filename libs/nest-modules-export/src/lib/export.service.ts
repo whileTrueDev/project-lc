@@ -54,24 +54,29 @@ export class ExportService {
   async updateGoodsSupplies(dto: CreateKkshowExportDto): Promise<boolean> {
     const { items } = dto;
 
-    // orderItemOption에 연결된 goodsOption의 goodsOptionSupply(재고데이터)를 확인하고 amount만큼 차감
-    await Promise.all(
+    // orderItemOption에 연결된 상품재고정보 찾기
+    // { 상품재고 id, 출고상품개수 } 배열을 만듦
+    const goodsSupplyDataList = await Promise.all(
       items.map(async (item) => {
-        const { orderItemOptionId, amount } = item;
-        const goodsOptionsSupply = await this.prisma.goodsOptionsSupplies.findFirst({
-          where: {
-            goodsOptions: { orderItemOptions: { some: { id: orderItemOptionId } } },
-          },
-        });
-        const newStock =
-          goodsOptionsSupply.stock >= amount ? goodsOptionsSupply.stock - amount : 0;
+        const { amount: exportAmount, orderItemOptionId } = item;
+        const orderItemOptionWithgoodsSupply =
+          await this.prisma.orderItemOption.findUnique({
+            where: { id: orderItemOptionId },
+            select: { goodsOption: { select: { supply: { select: { id: true } } } } },
+          });
+        const goodsSupplyId = orderItemOptionWithgoodsSupply.goodsOption.supply.id;
+        return { goodsSupplyId, exportAmount };
+      }),
+    );
 
-        return this.prisma.goodsOptionsSupplies.update({
-          where: { id: goodsOptionsSupply.id },
-          data: {
-            stock: newStock,
-          },
-        });
+    // 재고차감실행
+    await this.prisma.$transaction(
+      goodsSupplyDataList.map(({ goodsSupplyId, exportAmount }) => {
+        return this.prisma.$executeRaw`
+          UPDATE GoodsOptionsSupplies SET
+          stock = stock - IF(stock >= ${exportAmount}, ${exportAmount}, stock)
+          WHERE id = ${goodsSupplyId}
+        `;
       }),
     );
 
@@ -87,19 +92,23 @@ export class ExportService {
     });
     // 주문상품옵션.quantity 가 총합(주문상품옵션.출고상품옵션.amount)보다 작으면 부분출고
     // 같으면 전체출고로 주문상품옵션의 상태 업데이트
-    await Promise.all(
+    const updateDataList = await Promise.all(
       orderItemOptions.map(async (orderItemOption) => {
         const { quantity: originOrderAmount, exportItems, id } = orderItemOption; // 주문상품옵션 원래 주문개수
         const totalExportedAmount = exportItems.reduce((sum, cur) => sum + cur.amount, 0); // 주문상품옵션에 연결된 출고상품의 출고개수 합
         const newOrderItemOptionStepAfterExport: OrderProcessStep =
           originOrderAmount === totalExportedAmount ? 'exportDone' : 'partialExportDone';
+        return { id, step: newOrderItemOptionStepAfterExport };
+      }),
+    );
+    await this.prisma.$transaction(
+      updateDataList.map(({ id, step }) => {
         return this.prisma.orderItemOption.update({
           where: { id },
-          data: { step: newOrderItemOptionStepAfterExport },
+          data: { step },
         });
       }),
     );
-
     return true;
   }
 
