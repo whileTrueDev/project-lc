@@ -84,8 +84,8 @@ export function ExchangeReturnWriteSection({
   // 주문의 상태가 재배송/환불이 가능한지 확인
   const isPossibleExchangeOrReturn = useMemo(() => {
     if (!data) return true;
-    const { step, purchaseConfirmationDate } = data;
-    return exchangeReturnAbleSteps.includes(step) && !purchaseConfirmationDate;
+    const { step } = data;
+    return exchangeReturnAbleSteps.includes(step);
   }, [data]);
   // 주문의 상태가 재배송/환불이 불가능하다면 목록으로 리다이렉트 시킴
   if (!isPossibleExchangeOrReturn) {
