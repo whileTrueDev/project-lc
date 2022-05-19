@@ -1,4 +1,4 @@
-import { CheckIcon, CloseIcon, DeleteIcon, Icon } from '@chakra-ui/icons';
+import { CheckCircleIcon, DeleteIcon, Icon } from '@chakra-ui/icons';
 import {
   Avatar,
   Badge,
@@ -9,7 +9,6 @@ import {
   Checkbox,
   Divider,
   Flex,
-  IconButton,
   Image,
   Link,
   Spinner,
@@ -81,7 +80,7 @@ export function CartTable(): JSX.Element {
     return (
       <Center>
         <Box my={12} textAlign="center">
-          <Icon as={MdOutlineShoppingCart} width={40} height={40} color="GrayText" />
+          <Icon as={MdOutlineShoppingCart} width={20} height={20} color="GrayText" />
           <Text fontSize={{ base: 'md', lg: 'lg' }} whiteSpace="break-spaces">
             {`아직 장바구니에 담은 상품이 없습니다.\n상품을 추가해보세요.`}
           </Text>
@@ -98,9 +97,14 @@ export function CartTable(): JSX.Element {
       </Box>
 
       <Box py={6}>
-        <ButtonGroup size="sm">
+        <ButtonGroup size="sm" display="flex" justifyContent="space-between">
           <Button
-            leftIcon={selectedItems.length === 0 ? <CheckIcon /> : <CloseIcon />}
+            variant="outline"
+            leftIcon={
+              <CheckCircleIcon
+                color={selectedItems.length === data.length ? 'blue' : 'gray'}
+              />
+            }
             onClick={() => {
               if (selectedItems.length > 0) handleUnselectAll();
               else handleSelectAll(data);
@@ -108,12 +112,13 @@ export function CartTable(): JSX.Element {
           >
             전체{selectedItems.length === 0 ? '선택' : '해제'}
           </Button>
+
           <Button
             leftIcon={<DeleteIcon />}
             onClick={handleTruncate}
             isLoading={truncate.isLoading}
           >
-            모두삭제
+            장바구니 모두 비우기
           </Button>
         </ButtonGroup>
 
@@ -170,14 +175,15 @@ export function CartTableRow({ cartItem }: CartTableItemProps): JSX.Element {
 
       <Td>
         <Box>
-          <IconButton
+          <Button
             size="sm"
             aria-label="delete-cart-item"
             onClick={() => handleCartItemDelete(cartItem.id)}
             isLoading={deleteCartItem.isLoading}
+            leftIcon={<DeleteIcon />}
           >
-            <DeleteIcon />
-          </IconButton>
+            상품삭제
+          </Button>
         </Box>
       </Td>
     </Tr>
@@ -226,7 +232,7 @@ export function CartItemDisplay({
       <Checkbox
         size="lg"
         colorScheme="blue"
-        isChecked={selectedItems.findIndex((x) => x.id === cartItem.id) > -1}
+        isChecked={selectedItems.findIndex((goodsId) => goodsId === cartItem.id) > -1}
         onChange={() => handleToggle(cartItem)}
       />
     ),
@@ -238,9 +244,14 @@ export function CartItemDisplay({
       <Flex display={{ base: 'flex', lg: 'none' }} justify="space-between">
         {checkbox}
         {onClose && (
-          <IconButton size="sm" aria-label="remove-this-cartitem" onClick={onClose}>
-            <DeleteIcon />
-          </IconButton>
+          <Button
+            size="sm"
+            aria-label="remove-this-cartitem"
+            onClick={onClose}
+            leftIcon={<DeleteIcon />}
+          >
+            상품삭제
+          </Button>
         )}
       </Flex>
       <Flex gap={4} alignItems={{ base: 'flex-start', lg: 'center' }}>
@@ -368,15 +379,17 @@ export function CartTableRowOption({
           increaseDisabled={optionQuantity.isLoading}
         />
 
-        <IconButton
+        <Button
           variant="outline"
           ml={4}
           aria-label="delete-cartitem"
           size="xs"
           onClick={() => handleOptionDelete(option.id)}
           isLoading={deleteCartItemOpt.isLoading}
-          icon={<DeleteIcon />}
-        />
+          leftIcon={<DeleteIcon />}
+        >
+          옵션삭제
+        </Button>
       </Flex>
     ),
     [

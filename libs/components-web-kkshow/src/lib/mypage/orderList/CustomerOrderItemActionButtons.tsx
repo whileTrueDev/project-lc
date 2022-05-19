@@ -10,24 +10,48 @@ import {
   reviewAbleSteps,
 } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
+import ReviewCreateDialog from '../../review/ReviewCreateDialog';
 import { OrderCancelDialog } from './OrderCancelDialog';
 import { OrderItemOptionInfoProps } from './OrderItemOptionInfo';
 
 export function OrderItemActionButtons({
   option,
   orderItem,
+  order,
 }: OrderItemOptionInfoProps): JSX.Element {
   const router = useRouter();
   const { step, purchaseConfirmationDate } = option;
   const hasReview = !!orderItem.reviewId;
   const { orderId } = orderItem;
-  const orderCancellation = orderItem.orderCancellationItems?.find(
-    (item) => item.orderItemOptionId === option.id,
-  );
+
+  // 해당 주문상품이 포함된 주문취소요청
+  const cancelDataIncludingThisOrderItem = order.orderCancellations
+    ?.flatMap((c) => {
+      const { items, cancelCode } = c;
+      return items.map((i) => ({ cancelCode, ...i }));
+    })
+    .find((oc) => oc.orderItemOptionId === option.id);
+
+  // 해당 주문상품이 포함된 교환(재배송)요청
+  const exchangeDataIncludingThisOrderItem = order.exchanges
+    ?.flatMap((e) => {
+      const { exchangeItems, exchangeCode } = e;
+      return exchangeItems.map((i) => ({ exchangeCode, ...i }));
+    })
+    .find((oc) => oc.orderItemOptionId === option.id);
+
+  // 해당 주문상품이 포함된 반품(환불)요청
+  const returnDataIncludingThisOrderItem = order.returns
+    ?.flatMap((r) => {
+      const { items, returnCode } = r;
+      return items.map((i) => ({ returnCode, ...i }));
+    })
+    .find((oc) => oc.orderItemOptionId === option.id);
 
   const purchaseConfirmDialog = useDisclosure();
   const orderCancelDialog = useDisclosure();
   const goodsInquireDialog = useDisclosure();
+  const reviewDialog = useDisclosure();
 
   const buttonSet: {
     label: string;
@@ -45,13 +69,39 @@ export function OrderItemActionButtons({
     },
     {
       label: '주문 취소 신청',
-      onClick: orderCancelDialog.onOpen,
+      onClick: () => {
+        if (!cancelDataIncludingThisOrderItem) {
+          orderCancelDialog.onOpen();
+        } else {
+          // 해당 주문상품이 포함된 주문취소요청이 있는경우 -> 그 주문요청 상세페이지로 이동
+          router.push(
+            `/mypage/exchange-return-cancel/cancel/${cancelDataIncludingThisOrderItem.cancelCode}`,
+          );
+        }
+      },
       display: orderCancellationAbleSteps.includes(step), // 상품준비 이전에만 표시
-      disabled: !!orderCancellation,
+      disabled: false,
     },
     {
       label: '재배송/환불 신청',
-      onClick: () => router.push(`/mypage/exchange-return/write?orderId=${orderId}`),
+      onClick: () => {
+        // 재배송/환불신청 없으면 재배송/환불 작성페이지로 이동
+        if (!exchangeDataIncludingThisOrderItem && !returnDataIncludingThisOrderItem) {
+          router.push(`/mypage/exchange-return-cancel/write?orderId=${orderId}`);
+        }
+        // 해당 주문상품이 포함된 재배송(교환)요청 있으면 재배송요청 상세페이지로 이동
+        if (exchangeDataIncludingThisOrderItem) {
+          router.push(
+            `/mypage/exchange-return-cancel/exchange/${exchangeDataIncludingThisOrderItem.exchangeCode}`,
+          );
+        }
+        // 해당 주문상품이 포함된 환불(반품)요청 있으면 환불 상세페이지로 이동
+        if (returnDataIncludingThisOrderItem) {
+          router.push(
+            `/mypage/exchange-return-cancel/return/${returnDataIncludingThisOrderItem.returnCode}`,
+          );
+        }
+      },
       display: exchangeReturnAbleSteps.includes(step) && !purchaseConfirmationDate, // 상품준비 이후 표시 && 구매확정 안했을 때
       disabled: !!purchaseConfirmationDate, // 구매확정 이후 disabled
     },
@@ -62,12 +112,10 @@ export function OrderItemActionButtons({
       disabled: !!purchaseConfirmationDate,
     },
     {
-      label: '리뷰 작성하기',
-      onClick: () => {
-        alert('리뷰작성페이지로 이동');
-      }, // TODO: 리뷰작성 페이지로 이동
+      label: !hasReview ? '리뷰 작성하기' : '작성한 리뷰 확인',
+      onClick: !hasReview ? reviewDialog.onOpen : () => router.push('/mypage/review'),
       display: reviewAbleSteps.includes(step), // 배송완료 이후 표시 & 구매확정시 표시, 리뷰 작성하지 않았을때
-      disabled: !!hasReview || !purchaseConfirmationDate, // 이미 리뷰 작성했거나, 구매확정 안한경우 비활성
+      disabled: false,
     },
     {
       label: '문의하기',
@@ -130,6 +178,16 @@ export function OrderItemActionButtons({
         onClose={orderCancelDialog.onClose}
         orderId={orderId}
       />
+
+      {/* 리뷰 작성 다이얼로그 */}
+      {orderItem.goodsId && (
+        <ReviewCreateDialog
+          isOpen={reviewDialog.isOpen}
+          onClose={reviewDialog.onClose}
+          goodsId={orderItem.goodsId}
+          orderItemId={option.orderItemId}
+        />
+      )}
     </SimpleGrid>
   );
 }

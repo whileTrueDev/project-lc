@@ -64,11 +64,13 @@ export class PaymentPageDto {
   @IsNumber()
   mileage: number;
 
+  @IsOptional()
   @IsNumber()
-  couponId: number;
+  couponId?: number | null;
 
+  @IsOptional()
   @IsNumber()
-  couponAmount: number;
+  couponAmount?: number | null;
 
   @IsNumber()
   discount: number;

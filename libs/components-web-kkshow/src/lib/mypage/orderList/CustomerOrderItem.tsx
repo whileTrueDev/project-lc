@@ -3,6 +3,7 @@ import { OrderProcessStep } from '@prisma/client';
 import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
 import {
   FmOrderStatusNumString,
+  OrderDataWithRelations,
   OrderItemWithRelations,
   orderProcessStepDict,
 } from '@project-lc/shared-types';
@@ -25,8 +26,10 @@ export function OrderStatusBadge({ step }: { step: OrderProcessStep }): JSX.Elem
 
 export function OrderItem({
   orderItem,
+  order,
 }: {
   orderItem: OrderItemWithRelations;
+  order: OrderDataWithRelations;
 }): JSX.Element {
   return (
     <>
@@ -41,9 +44,9 @@ export function OrderItem({
           justifyContent="space-between"
         >
           {/* 주문상품정보 */}
-          <OrderItemOptionInfo option={opt} orderItem={orderItem} />
+          <OrderItemOptionInfo option={opt} orderItem={orderItem} order={order} />
           {/* 기능버튼들 */}
-          <OrderItemActionButtons option={opt} orderItem={orderItem} />
+          <OrderItemActionButtons option={opt} orderItem={orderItem} order={order} />
         </Stack>
       ))}
     </>

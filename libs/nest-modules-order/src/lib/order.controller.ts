@@ -43,12 +43,28 @@ export class OrderController {
     return this.orderService.createOrder(dto);
   }
 
+  /** 비회원 주문 상세조회 - 가드 적용하지 않아야 함 */
+  @Get('nonmember')
+  getNonMemberOrderDetail(
+    @Query(ValidationPipe) dto: GetNonMemberOrderDetailDto,
+  ): Promise<OrderDetailRes> {
+    return this.orderService.getNonMemberOrderDetail(dto);
+  }
+
+  /** 개별 주문 상세조회 */
+  @Get(':orderId')
+  getOrderDetail(
+    @Param('orderId', ParseIntPipe) orderId: number,
+  ): Promise<OrderDetailRes> {
+    return this.orderService.getOrderDetail(orderId);
+  }
+
   /** 주문목록조회
    * @Query customerId? 해당 값이 있으면 특정 소비자의 삭제되지 않은 주문 목록 조회 & 선물주문인경우 받는사람관련정보 ''로 처리
    * @Query take 기본 10개
    * @Query skip?
    */
-  @Get('list')
+  @Get('')
   getOrderList(
     @Query(new ValidationPipe({ transform: true })) dto: GetOrderListDto,
   ): Promise<OrderListRes> {
@@ -60,21 +76,7 @@ export class OrderController {
     return this.orderService.getOrderList(dto);
   }
 
-  /** 개별 주문 상세조회 */
-  @Get(':orderId')
-  getOrderDetail(@Param('orderCode') orderCode: string): Promise<OrderDetailRes> {
-    return this.orderService.getOrderDetail(orderCode);
-  }
-
-  /** 비회원 주문 상세조회 - 가드 적용하지 않아야 함 */
-  @Get()
-  getNonMemberOrderDetail(
-    @Query(ValidationPipe) dto: GetNonMemberOrderDetailDto,
-  ): Promise<OrderDetailRes> {
-    return this.orderService.getNonMemberOrderDetail(dto);
-  }
-
-  /** 주문수정
+  /*
    * 관리자 | 판매자가 사용
    */
   @Patch(':orderId')

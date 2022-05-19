@@ -11,7 +11,9 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
+  FindOrderCancelParams,
   GetOrderCancellationListDto,
+  OrderCancellationDetailRes,
   OrderCancellationListRes,
   OrderCancellationRemoveRes,
   OrderCancellationUpdateRes,
@@ -134,8 +136,9 @@ export class OrderCancellationService extends ServiceBaseWithCache {
       where,
       take,
       skip,
+      orderBy: { requestDate: 'desc' },
       include: {
-        order: { select: { orderCode: true } },
+        order: { select: { orderCode: true, id: true } },
         refund: true,
         items: {
           include: {
@@ -179,9 +182,11 @@ export class OrderCancellationService extends ServiceBaseWithCache {
       return { ...rest, items: _items };
     });
 
+    const nextCursor = dto.skip + dto.take;
     return {
       list,
       totalCount,
+      nextCursor: nextCursor >= totalCount ? undefined : nextCursor,
     };
   }
 
@@ -192,7 +197,7 @@ export class OrderCancellationService extends ServiceBaseWithCache {
   ): Promise<OrderCancellationUpdateRes> {
     const { refundId, ...rest } = dto;
 
-    await this.findOneOrderCancellation(id);
+    await this.findOneOrderCancellation({ id });
 
     const orderCancellation = await this.prisma.orderCancellation.update({
       where: { id },
@@ -221,13 +226,15 @@ export class OrderCancellationService extends ServiceBaseWithCache {
   }
 
   /** 주문취소가 존재하는지 확인 */
-  async findOneOrderCancellation(id: number): Promise<OrderCancellation> {
+  async findOneOrderCancellation(
+    where: Prisma.OrderCancellationWhereUniqueInput,
+  ): Promise<OrderCancellation> {
     const orderCancellation = await this.prisma.orderCancellation.findUnique({
-      where: { id },
+      where,
     });
     if (!orderCancellation) {
       throw new BadRequestException(
-        `존재하지 않는 주문취소요청입니다. 주문취소 고유번호 ${id}`,
+        `존재하지 않는 주문취소요청입니다.  ${JSON.stringify(where)}`,
       );
     }
     return orderCancellation;
@@ -235,7 +242,7 @@ export class OrderCancellationService extends ServiceBaseWithCache {
 
   /* 주문취소 삭제(소비자가 자신이 요청했던 주문취소 철회 - 처리진행되기 이전에만 가능) */
   async deleteOrderCancellation(id: number): Promise<OrderCancellationRemoveRes> {
-    const orderCancellation = await this.findOneOrderCancellation(id);
+    const orderCancellation = await this.findOneOrderCancellation({ id });
 
     // 주문취소 처리상태 확인
     if (orderCancellation.status !== 'requested') {
@@ -248,5 +255,60 @@ export class OrderCancellationService extends ServiceBaseWithCache {
 
     await this._clearCaches(this.#ORDER_CANCELLATION_CACHE_KEY);
     return !!data;
+  }
+
+  /** 주문취소 상세조회
+   */
+  async getOrderCancellationDetail({
+    cancelCode,
+  }: FindOrderCancelParams): Promise<OrderCancellationDetailRes> {
+    await this.findOneOrderCancellation({ cancelCode });
+
+    const orderCancel = await this.prisma.orderCancellation.findUnique({
+      where: { cancelCode },
+      include: {
+        order: { select: { orderCode: true, id: true } },
+        refund: true,
+        items: {
+          include: {
+            orderItem: {
+              select: {
+                id: true,
+                goods: {
+                  select: {
+                    id: true,
+                    goods_name: true,
+                    image: true,
+                    seller: { select: { sellerShop: true } },
+                  },
+                },
+              },
+            },
+            orderItemOption: true,
+          },
+        },
+      },
+    });
+
+    const { items, ...rest } = orderCancel;
+
+    const _items = items.map((i) => ({
+      id: i.id, // 주문취소상품 고유번호
+      amount: i.amount, // 주문취소상품 개수
+      status: i.status, // 주문취소상품 처리상태
+      goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
+      image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지
+      shopName: i.orderItem.goods.seller.sellerShop?.shopName, // 주문상품 판매상점명
+      optionName: i.orderItemOption.name, // 주문상품옵션명
+      optionValue: i.orderItemOption.value, // 주문상품옵션 값
+      price: Number(i.orderItemOption.discountPrice), // 주문상품옵션 가격
+      orderItemId: i.orderItem.id, // 연결된 주문상품고유번호
+      orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
+    }));
+
+    return {
+      ...rest,
+      items: _items,
+    };
   }
 }

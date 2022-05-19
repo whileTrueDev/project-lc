@@ -2,38 +2,49 @@ import {
   Administrator,
   Broadcaster,
   BroadcasterPromotionPage,
+  Customer,
   Goods,
   GoodsInfo,
+  Prisma,
   PrismaClient,
   Seller,
   SellerContacts,
   ShippingGroup,
-  Prisma,
-  Customer,
 } from '@prisma/client';
+import { cartSample, tempUserCartItemSample } from './seedData/cart';
+import { dummyCustomer } from './seedData/customer';
 import {
   defaultOption,
   defaultSellCommissionData,
+  dummyBroadcasterAddress,
+  dummyBroadcasterChannel,
+  dummyBroadcasterContacts,
   DummyGoodsDataType,
   dummyGoodsList,
   dummyImageUrlList,
   dummyLiveShoppingData,
+  dummyLoginHistory,
+  secondOption,
   testadminData,
   testBroadcasterData,
   testsellerData,
   testsellerExtraData,
-  dummyBroadcasterAddress,
-  dummyBroadcasterChannel,
-  dummyBroadcasterContacts,
-  dummyLoginHistory,
 } from './seedData/dummyData';
-import { termsData } from './seedData/terms';
+import {
+  createDummyOrderWithCancellation,
+  createDummyOrderWithExchange,
+  createDummyOrderWithReturn,
+  nonMemberOrder,
+  normalOrder,
+  orderExportReady,
+  purchaseConfirmedOrder,
+  shippingDoneOrder,
+} from './seedData/dummyOrder';
+
+import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
-import { dummyCustomer } from './seedData/customer';
-import { cartSample, tempUserCartItemSample } from './seedData/cart';
-import { nonMemberOrder, normalOrder, orderExportReady } from './seedData/dummyOrder';
-import { createGoodsReview } from './seedData/goods-review';
+import { termsData } from './seedData/terms';
 
 const prisma = new PrismaClient();
 
@@ -167,7 +178,7 @@ async function createDummyGoods(
           image: url,
         })),
       },
-      options: { create: [defaultOption] },
+      options: { create: [defaultOption, secondOption] },
       confirmation: { create: confirmation },
       contents,
     },
@@ -304,7 +315,15 @@ async function createCartItems(): Promise<void> {
 async function createDummyOrderData(): Promise<void> {
   await prisma.order.create({ data: normalOrder });
   await prisma.order.create({ data: nonMemberOrder });
+  await prisma.order.create({ data: purchaseConfirmedOrder });
+  await prisma.order.create({ data: shippingDoneOrder });
   await prisma.order.create({ data: orderExportReady });
+}
+
+async function createDummyOrderCancelReturnExchange(): Promise<void> {
+  await createDummyOrderWithCancellation();
+  await createDummyOrderWithExchange();
+  await createDummyOrderWithReturn();
 }
 
 /** 시드 메인 함수 */
@@ -363,9 +382,11 @@ async function main(): Promise<void> {
 
   // 더미 주문데이터 생성
   await createDummyOrderData();
+  await createDummyOrderCancelReturnExchange();
 
   // 더미 상품리뷰 생성
   await createGoodsReview(prisma);
+  await createGoodsReview2(prisma);
 }
 
 main()

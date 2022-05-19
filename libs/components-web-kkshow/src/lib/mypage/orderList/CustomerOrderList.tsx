@@ -1,4 +1,11 @@
-import { Button, Center, Stack, Text, useColorModeValue } from '@chakra-ui/react';
+import {
+  Button,
+  Center,
+  Spinner,
+  Stack,
+  Text,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { INFINITE_ORDER_LIST_QUERY_KEY, useInfiniteOrderList } from '@project-lc/hooks';
 import { GetOrderListDto, OrderDataWithRelations } from '@project-lc/shared-types';
@@ -50,7 +57,8 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
 
   const orderListBgColor = useColorModeValue('gray.50', 'gray.900');
 
-  if (status === 'error') return <Text>error... {error.message}</Text>;
+  if (status === 'error')
+    return <Text>주문내역을 조회하던 중 오류가 발생하였습니다 {error.message}</Text>;
   return (
     <Stack>
       <Text fontWeight="bold">주문/배송내역</Text>
@@ -76,8 +84,14 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
             ))}
           </Stack>
         ))}
-        {isLoading && <Text>loading...</Text>}
-        {!data?.pages?.[0]?.count && <Text>no data</Text>}
+        {isLoading && (
+          <Center>
+            <Spinner />
+          </Center>
+        )}
+        {(data?.pages?.[0]?.count === 0 || !data?.pages?.[0]?.orders.length) && (
+          <Text textAlign="center">주문내역이 없습니다</Text>
+        )}
         {/* 더보기 버튼 */}
         {hasNextPage && (
           <Center>
@@ -125,6 +139,7 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
         <Button
           size="sm"
           onClick={() => {
+            // TODO: 주문 상세페이지와 연결
             console.log('주문 상세보기 페이지로 이동');
           }}
         >
@@ -134,7 +149,7 @@ function OrderData({ order }: { order: OrderDataWithRelations }): JSX.Element {
 
       <Stack p={1}>
         {order.orderItems.map((item) => (
-          <OrderItem key={item.id} orderItem={item} />
+          <OrderItem key={item.id} orderItem={item} order={order} />
         ))}
       </Stack>
     </Stack>

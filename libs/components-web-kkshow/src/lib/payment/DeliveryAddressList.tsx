@@ -1,19 +1,19 @@
 import {
-  Box,
   Button,
   Modal,
-  ModalOverlay,
-  ModalContent,
   ModalBody,
-  Heading,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Text,
 } from '@chakra-ui/react';
-import { useCustomerAddress, useProfile, useDisplaySize } from '@project-lc/hooks';
+import { GridColDef, GridRowData } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { GridRowData } from '@material-ui/data-grid';
-import { useFormContext } from 'react-hook-form';
+import { useCustomerAddress, useDisplaySize, useProfile } from '@project-lc/hooks';
 import { PaymentPageDto } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
+import { useFormContext } from 'react-hook-form';
 
 type DeliveryListProps = {
   onClose: () => void;
@@ -23,8 +23,13 @@ type DeliveryListProps = {
 export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const { handleAddressType } = useKkshowOrderStore();
-  const columns = [
+  const columns: GridColDef[] = [
     {
+      disableColumnMenu: true,
+      disableExport: true,
+      disableReorder: true,
+      sortable: false,
+      filterable: false,
       field: '',
       width: 40,
       renderCell: ({ row }: GridRowData) => (
@@ -65,7 +70,7 @@ export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX
 
   const mobileColumns = [
     {
-      field: '',
+      field: '_',
       width: 40,
       renderCell: ({ row }: GridRowData) => (
         <Button
@@ -105,30 +110,29 @@ export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX
   const { setValue } = useFormContext<PaymentPageDto>();
 
   return (
-    <Modal onClose={onClose} isOpen={isOpen} size="3xl">
+    <Modal onClose={onClose} isOpen={isOpen} size="3xl" isCentered>
       <ModalOverlay />
       <ModalContent>
+        <ModalCloseButton />
+        <ModalHeader>배송지목록</ModalHeader>
         <ModalBody>
-          <Box>
-            <Heading>배송지목록</Heading>
-            {data && (
-              <>
-                <ChakraDataGrid
-                  disableExtendRowFullWidth
-                  autoHeight
-                  pagination
-                  autoPageSize
-                  disableSelectionOnClick
-                  disableColumnMenu
-                  disableColumnSelector
-                  loading={isLoading}
-                  columns={isDesktopSize ? columns : mobileColumns}
-                  rows={data}
-                  rowHeight={100}
-                />
-              </>
-            )}
-          </Box>
+          {data && (
+            <>
+              <ChakraDataGrid
+                disableExtendRowFullWidth
+                autoHeight
+                pagination
+                autoPageSize
+                disableSelectionOnClick
+                disableColumnMenu
+                disableColumnSelector
+                loading={isLoading}
+                columns={isDesktopSize ? columns : mobileColumns}
+                rows={data}
+                rowHeight={100}
+              />
+            </>
+          )}
         </ModalBody>
       </ModalContent>
     </Modal>

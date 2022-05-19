@@ -81,7 +81,7 @@ export function PromotionPageUrlCard(): JSX.Element {
   );
 }
 
-const BASE_BANNER_IMAGE_S3_PATH = `${s3.fullDomain}public/`;
+const BASE_BANNER_IMAGE_S3_PATH = `${s3.bucketDomain}public/`;
 const baseBannerImages = [
   {
     key: 'promotion-page-banner-twitch.png',

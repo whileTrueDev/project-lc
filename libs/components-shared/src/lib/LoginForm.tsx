@@ -15,6 +15,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
 import { CenterBox } from '@project-lc/components-layout/CenterBox';
 import {
   useLoginMutation,
@@ -75,7 +76,7 @@ export function LoginForm({
         if (nextPage) {
           router.push(nextPage.startsWith('/') ? nextPage : `/${nextPage}`);
         } else {
-          router.push('/');
+          router.push('/mypage');
         }
       }
     },
@@ -145,6 +146,23 @@ export function LoginForm({
           >
             로그인
           </Button>
+
+          {/* 비회원 주문 링크 */}
+          {router.query.from === 'purchase' && router.query.nextpage && (
+            <Box mt={4}>
+              <Text>
+                비회원으로 구매하시겠습니까?{' '}
+                <ClickableUnderlinedText
+                  color="blue.500"
+                  fontSize="md"
+                  onClick={() => router.push(router.query.nextpage as string)}
+                  as="span"
+                >
+                  비회원 구매
+                </ClickableUnderlinedText>
+              </Text>
+            </Box>
+          )}
         </Box>
 
         <Box pb={2}>

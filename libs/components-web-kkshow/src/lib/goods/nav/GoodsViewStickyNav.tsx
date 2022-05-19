@@ -3,6 +3,7 @@ import { useGoodsReviewCount } from '@project-lc/hooks';
 import { useGoodsViewStore } from '@project-lc/stores';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
+import { GoodsViewNavBarHeight } from './GoodsViewNavBar';
 
 const navs = [
   { title: '상세 설명', elementId: 'goods-contents' },
@@ -30,9 +31,9 @@ export function GoodsViewStickyNav(): JSX.Element {
   return (
     <Flex
       position="sticky"
-      top={0}
       bgColor={bgColor}
       h={{ base: '50px', md: '60px' }}
+      top={{ base: GoodsViewNavBarHeight, md: 0 }}
       zIndex="sticky"
     >
       <HStack maxW="5xl" mx="auto" w="100%" justify="space-between" spacing={0}>
