@@ -29,7 +29,7 @@ export class ExportController {
     @Body(ValidationPipe) dto: ExportManyDto,
     // @SellerInfo() seller: UserPayload,
   ): Promise<boolean> {
-    return this.exportService.exportMany();
+    return this.exportService.exportMany(dto);
   }
 
   /** 단일 출고처리 */
@@ -38,7 +38,7 @@ export class ExportController {
     @Body(ValidationPipe) dto: CreateKkshowExportDto,
     // @SellerInfo() seller: UserPayload,
   ): Promise<ExportCreateRes> {
-    return this.exportService.exportOne();
+    return this.exportService.exportOne(dto);
   }
 
   /** 개별출고정보 조회 */

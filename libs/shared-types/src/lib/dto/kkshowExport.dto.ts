@@ -6,9 +6,9 @@
  * 크크쇼 스키마에 fm_order_shipping(주문과 연결된 배송비정책??)과 대응되는 테이블이 없어 추가하지 않음
  */
 
-import { Order } from '@prisma/client';
+import { Order, Seller } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsArray, IsDate, IsNumber, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class KkshowExportItem {
   @IsNumber()
@@ -31,10 +31,6 @@ export class CreateKkshowExportDto {
   orderId: Order['id'];
 
   @IsString()
-  /** 출고코드 */
-  exportCode: string;
-
-  @IsString()
   /** 택배사 : 택배사 코드(fmDeliveryCompanies)
    * 택배사명을 저장할지, 택배사 코드를 저장할지..?? 택배사 관련해서 회사명 이외에 저장해야 할 정보가 있을 수도 있어서 택배사 코드를 저장하는게 좋겠다
    */
@@ -44,15 +40,16 @@ export class CreateKkshowExportDto {
   /** 운송장번호 */
   deliveryNumber: string;
 
-  @IsDate()
-  /** 출고생성일 */
-  exportDate: Date;
-
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => KkshowExportItem)
   /** 출고 상품 정보 */
   items: KkshowExportItem[];
+
+  @IsNumber()
+  @IsOptional()
+  /** 출고 진행한 판매자 고유번호 */
+  sellerId?: Seller['id'];
 }
 
 /** 크크쇼 일괄출고처리, 합포장처리 dto */

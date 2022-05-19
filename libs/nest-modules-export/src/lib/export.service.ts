@@ -1,27 +1,155 @@
 import { Injectable } from '@nestjs/common';
+import { Export, Order, OrderProcessStep } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { ExportCreateRes, ExportListRes, ExportRes } from '@project-lc/shared-types';
+import {
+  CreateKkshowExportDto,
+  ExportCreateRes,
+  ExportListRes,
+  ExportManyDto,
+  ExportRes,
+} from '@project-lc/shared-types';
+import dayjs = require('dayjs');
+import { nanoid } from 'nanoid';
 
+type ExportCodeType = 'normal' | 'bundle'; // 일반출고코드 | 합포장출고코드
+const exportCodePrefix: Record<ExportCodeType, string> = {
+  normal: 'D', // 일반출고코드 접두사 (Export.exportCode 에 사용되는 출고코드)
+  bundle: 'B', // 합포장 코드 접두사 (Export.bundleExportCode 에 사용되는 합포장코드)
+};
 @Injectable()
 export class ExportService {
   constructor(private readonly prisma: PrismaService) {}
+
+  /** 출고코드 생성 */
+  private generateExportCode({ type = 'normal' }: { type: ExportCodeType }): string {
+    const prefix = exportCodePrefix[type];
+    return prefix + dayjs().format('YYYYMMDDHHmmssSSS') + nanoid(6);
+  }
+
+  /** 실물 출고처리 (Export 테이블에 데이터 생성) */
+  async createExportRecord(
+    dto: CreateKkshowExportDto,
+    exportCode: string,
+  ): Promise<Export> {
+    return this.prisma.export.create({
+      data: {
+        order: { connect: { id: dto.orderId } },
+        seller: dto.sellerId ? { connect: { id: dto.sellerId } } : undefined,
+        exportCode,
+        deliveryCompany: dto.deliveryCompany,
+        deliveryNumber: dto.deliveryNumber,
+        exportDate: new Date(),
+        items: {
+          create: dto.items.map((item) => ({
+            orderItem: { connect: { id: item.orderItemId } },
+            orderItemOption: { connect: { id: item.orderItemOptionId } },
+            amount: item.amount,
+          })),
+        },
+      },
+    });
+  }
+
+  /** 재고차감 */
+  async updateGoodsSupplies(dto: CreateKkshowExportDto): Promise<boolean> {
+    const { items } = dto;
+
+    // orderItemOption에 연결된 goodsOption의 goodsOptionSupply(재고데이터)를 확인하고 amount만큼 차감
+    await Promise.all(
+      items.map(async (item) => {
+        const { orderItemOptionId, amount } = item;
+        const goodsOptionsSupply = await this.prisma.goodsOptionsSupplies.findFirst({
+          where: {
+            goodsOptions: { orderItemOptions: { some: { id: orderItemOptionId } } },
+          },
+        });
+        const newStock =
+          goodsOptionsSupply.stock >= amount ? goodsOptionsSupply.stock - amount : 0;
+
+        return this.prisma.goodsOptionsSupplies.update({
+          where: { id: goodsOptionsSupply.id },
+          data: {
+            stock: newStock,
+          },
+        });
+      }),
+    );
+
+    return true;
+  }
+
+  /** 연결된 주문상품옵션 상태변경 */
+  async updateOrderItemOptionsStatus(dto: CreateKkshowExportDto): Promise<boolean> {
+    // 주문상품옵션
+    const orderItemOptions = await this.prisma.orderItemOption.findMany({
+      where: { id: { in: dto.items.map((item) => item.orderItemOptionId) } },
+      select: { id: true, quantity: true, exportItems: true },
+    });
+    // 주문상품옵션.quantity 가 총합(주문상품옵션.출고상품옵션.amount)보다 작으면 부분출고
+    // 같으면 전체출고로 주문상품옵션의 상태 업데이트
+    await Promise.all(
+      orderItemOptions.map(async (orderItemOption) => {
+        const { quantity: originOrderAmount, exportItems, id } = orderItemOption; // 주문상품옵션 원래 주문개수
+        const totalExportedAmount = exportItems.reduce((sum, cur) => sum + cur.amount, 0); // 주문상품옵션에 연결된 출고상품의 출고개수 합
+        const newOrderItemOptionStepAfterExport: OrderProcessStep =
+          originOrderAmount === totalExportedAmount ? 'exportDone' : 'partialExportDone';
+        return this.prisma.orderItemOption.update({
+          where: { id },
+          data: { step: newOrderItemOptionStepAfterExport },
+        });
+      }),
+    );
+
+    return true;
+  }
+
+  /** 연결된 주문 상태변경 */
+  async updateOrderStatus(dto: CreateKkshowExportDto): Promise<Order> {
+    // 주문과 연결된 주문상품옵션의 상태가 모두 출고완료이면 주문도 출고완료
+    // 아니면 부분출고로 업데이트
+    const orderItemOptions = await this.prisma.orderItemOption.findMany({
+      where: { orderItem: { order: { id: dto.orderId } } },
+    });
+
+    const isOrderItemAllExportDone = orderItemOptions.every(
+      (oi) => oi.step === 'exportDone',
+    );
+
+    return this.prisma.order.update({
+      where: { id: dto.orderId },
+      data: { step: isOrderItemAllExportDone ? 'exportDone' : 'partialExportDone' },
+    });
+  }
+
+  /** 단일 출고처리 */
+  public async exportOne(dto: CreateKkshowExportDto): Promise<ExportCreateRes> {
+    const exportCode = this.generateExportCode({ type: 'normal' });
+
+    /** 출고처리 (Export, ExportItem 테이블에 데이터 생성) */
+    await this.createExportRecord(dto, exportCode);
+    /** 재고차감 */
+    await this.updateGoodsSupplies(dto);
+    /** 주문상품옵션의 상태변경 -> 주문상태변경보다 먼저 진행 */
+    await this.updateOrderItemOptionsStatus(dto);
+    /** 주문의 상태변경 -> 주문상품옵션 상태변경 후 진행 */
+    const order = await this.updateOrderStatus(dto);
+
+    return { orderId: order.id, orderCode: order.orderCode, exportCode };
+  }
+
+  /** 일괄 출고처리 */
+  public async exportMany(dto: ExportManyDto): Promise<boolean> {
+    const res = await Promise.all(
+      dto.exportOrders.map((exportOrder) => this.exportOne(exportOrder)),
+    );
+
+    return res.every(({ exportCode }) => !!exportCode);
+  }
 
   /** 합포장 출고처리 */
   public async exportBundle(): Promise<boolean> {
     console.log('합포장 출고처리');
     return true;
-  }
-
-  /** 일괄 출고처리 */
-  public async exportMany(): Promise<boolean> {
-    console.log('일괄출고처리');
-    return true;
-  }
-
-  /** 단일 출고처리 */
-  public async exportOne(): Promise<ExportCreateRes> {
-    console.log('단일 출고처리');
-    return { orderId: 0, orderCode: ' 주문코드??', exportCode: '출고코드' };
   }
 
   /** 개별출고정보 조회 */
