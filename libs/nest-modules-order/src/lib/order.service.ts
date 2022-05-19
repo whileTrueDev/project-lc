@@ -265,10 +265,25 @@ export class OrderService extends ServiceBaseWithCache {
                 id: true,
                 goods_name: true,
                 image: true,
+                seller: {
+                  select: {
+                    sellerShop: {
+                      select: {
+                        shopName: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
         },
+        customerCouponLogs: {
+          include: {
+            customerCoupon: { include: { coupon: true } },
+          },
+        },
+        mileageLogs: true,
         payment: true,
         refunds: true,
         exports: true,
@@ -306,10 +321,25 @@ export class OrderService extends ServiceBaseWithCache {
                 id: true,
                 goods_name: true,
                 image: true,
+                seller: {
+                  select: {
+                    sellerShop: {
+                      select: {
+                        shopName: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
         },
+        customerCouponLogs: {
+          include: {
+            customerCoupon: { include: { coupon: true } },
+          },
+        },
+        mileageLogs: true,
         payment: true,
         refunds: true,
         exports: true,
@@ -336,8 +366,8 @@ export class OrderService extends ServiceBaseWithCache {
   }
 
   /** 개별 주문 상세 조회 */
-  async getOrderDetail(orderCode: string): Promise<OrderDetailRes> {
-    return this.findOneOrderDetail({ orderCode, deleteFlag: false });
+  async getOrderDetail(orderId: number): Promise<OrderDetailRes> {
+    return this.findOneOrderDetail({ id: orderId, deleteFlag: false });
   }
 
   /** 비회원 주문 상세 조회 */

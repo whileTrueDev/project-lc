@@ -9,7 +9,7 @@ export function Success(): JSX.Element {
   const router = useRouter();
   const [isRequested, setIsRequested] = useState(false);
 
-  const orderId = router.query.orderId as string;
+  const orderCode = router.query.orderId as string;
   const paymentKey = router.query.paymentKey as string;
   const redirectAmount = Number(router.query.amount as string);
 
@@ -18,14 +18,14 @@ export function Success(): JSX.Element {
   useEffect(() => {
     const tossPaymentsAmount = Number(getCookie('amount'));
     if (
-      orderId &&
+      orderCode &&
       paymentKey &&
       redirectAmount &&
       !isRequested &&
       redirectAmount === tossPaymentsAmount
     ) {
       mutateAsync({
-        orderId,
+        orderId: orderCode,
         paymentKey,
         amount: redirectAmount,
       }).then((item) => {
@@ -34,20 +34,21 @@ export function Success(): JSX.Element {
         if (item.status === 'error') {
           router.push(`/payment/fail?message=${item.message}`);
         } else {
-          router.push(`/payment/receipt?orderId=${item.orderId}`);
+          // TODO: 여기서 주문 생성 이후 orderId 받아오기
+          router.push(`/payment/receipt?orderId=${1}&orderCode=${orderCode}`); // todo : 1 들어간 자리에 orderId 넣기
         }
       });
     } else if (
-      orderId &&
+      orderCode &&
       paymentKey &&
       redirectAmount &&
       !isRequested &&
       redirectAmount !== tossPaymentsAmount
     ) {
-      deleteCookie();
+      deleteCookie('amount');
       router.push('/payment/fail?message=결제금액 오류');
     }
-  }, [orderId, paymentKey, redirectAmount]);
+  }, [orderCode, paymentKey, redirectAmount]);
 
   return (
     <KkshowLayout>

@@ -1,7 +1,7 @@
 import { Grid, GridItem, Heading, Stack } from '@chakra-ui/react';
 import { useProfile } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
-import { useKkshowOrder } from '@project-lc/stores';
+import { useKkshowOrderStore } from '@project-lc/stores';
 import { FormProvider, useForm } from 'react-hook-form';
 import { BuyerInfo } from './BuyerInfo';
 import { DeliveryAddress } from './DeliveryAddress';
@@ -14,7 +14,7 @@ import { PaymentSelection } from './PaymentSelection';
 
 export function OrderPaymentForm(): JSX.Element | null {
   const { data: profile } = useProfile();
-  const orderPrepareData = useKkshowOrder((s) => s.order);
+  const orderPrepareData = useKkshowOrderStore((s) => s.order);
 
   const methods = useForm<CreateOrderForm>({
     mode: 'onChange',
