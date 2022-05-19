@@ -131,6 +131,7 @@ export * from './lib/res-types/broadcasterSettlementTargets.res';
 export * from './lib/res-types/cart.res';
 export * from './lib/res-types/customer.res';
 export * from './lib/res-types/exchange.res';
+export * from './lib/res-types/export.res';
 export * from './lib/res-types/findBCSettlementHistories.res';
 export * from './lib/res-types/findBroadcaster.res';
 export * from './lib/res-types/findBroadcasterSettlementInfo.res';
