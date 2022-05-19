@@ -1,48 +1,55 @@
 import { Body, Controller, Get, Param, Post, ValidationPipe } from '@nestjs/common';
 import { SellerInfo, UserPayload } from '@project-lc/nest-core';
-import { CreateKkshowExportDto, ExportManyDto } from '@project-lc/shared-types';
+import {
+  CreateKkshowExportDto,
+  ExportCreateRes,
+  ExportListRes,
+  ExportManyDto,
+  ExportRes,
+} from '@project-lc/shared-types';
+import { ExportService } from './export.service';
 
 // @UseGuards(JwtAuthGuard)
 @Controller('export')
 export class ExportController {
-  // constructor() {}
+  constructor(private readonly exportService: ExportService) {}
 
   /** 합포장 출고처리 */
   @Post('bundle')
-  public exportBundledOrders(
+  public exportBundle(
     @Body(ValidationPipe) dto: ExportManyDto,
     // @SellerInfo() seller: UserPayload,
-  ): any {
-    return '합포장 출고처리';
+  ): Promise<boolean> {
+    return this.exportService.exportBundle();
   }
 
   /** 일괄 출고처리 */
   @Post('many')
-  public exportOrders(
+  public exportMany(
     @Body(ValidationPipe) dto: ExportManyDto,
     // @SellerInfo() seller: UserPayload,
-  ): any {
-    return '일괄출고처리';
+  ): Promise<boolean> {
+    return this.exportService.exportMany();
   }
 
   /** 단일 출고처리 */
   @Post()
-  public exportOrder(
+  public exportOne(
     @Body(ValidationPipe) dto: CreateKkshowExportDto,
     // @SellerInfo() seller: UserPayload,
-  ): any {
-    return '단일 출고처리';
+  ): Promise<ExportCreateRes> {
+    return this.exportService.exportOne();
   }
 
   /** 개별출고정보 조회 */
   @Get(':exportCode')
-  getExportDetail(@Param('exportCode') exportCode: string): any {
-    return `개별출고정보 조회 exportCode:${exportCode}`;
+  public getExportDetail(@Param('exportCode') exportCode: string): Promise<ExportRes> {
+    return this.exportService.getExportDetail(exportCode);
   }
 
   /** 출고목록조회 - 판매자, 관리자 용 */
   @Get()
-  getExportList(): any {
-    return '출고목록조회 - 판매자, 관리자 용';
+  public getExportList(): Promise<ExportListRes> {
+    return this.exportService.getExportList();
   }
 }
