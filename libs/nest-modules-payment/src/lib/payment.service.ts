@@ -32,7 +32,7 @@ export class PaymentService {
   }
 
   /** 주문번호별 결제내역 */
-  async getPaymentByOrderId(orderId: string): Promise<Payment> {
+  async getPaymentByOrderCode(orderId: string): Promise<Payment> {
     try {
       return TossPaymentsApi.getPaymentByOrderId(orderId);
     } catch (error) {
