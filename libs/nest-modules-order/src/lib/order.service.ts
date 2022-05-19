@@ -410,7 +410,8 @@ export class OrderService extends ServiceBaseWithCache {
     return true;
   }
 
-  /** 주문확정 */
+  /** 구매확정 - 모든 주문상품옵션이 배송완료 상태일때 구매확정이 가능
+   */
   async purchaseConfirm(dto: OrderPurchaseConfirmationDto): Promise<boolean> {
     const { orderItemOptionId } = dto;
     const orderItemOption = await this.prisma.orderItemOption.findUnique({
@@ -423,11 +424,26 @@ export class OrderService extends ServiceBaseWithCache {
       );
     }
 
-    // 주문상품옵션에 대해 구매확정
+    // 주문상품옵션이 연결된 출고 조회
+    const exportData = await this.prisma.export.findFirst({
+      where: { items: { some: { orderItemOptionId } } },
+    });
+    // 해당 출고데이터에 구매확정일자 저장
+    if (exportData && !exportData.buyConfirmDate) {
+      await this.prisma.export.update({
+        where: { id: exportData.id },
+        data: {
+          buyConfirmDate: new Date(),
+          buyConfirmSubject: 'customer',
+        },
+      });
+    }
+    //
+
+    // 주문상품옵션 구매확정으로 상태 변경
     await this.prisma.orderItemOption.update({
       where: { id: orderItemOptionId },
       data: {
-        purchaseConfirmationDate: new Date(),
         step: 'purchaseConfirmed',
       },
     });
@@ -447,15 +463,15 @@ export class OrderService extends ServiceBaseWithCache {
       );
     }
 
-    // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 구매확정 값도 변경
+    // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 상태도 구매확정으로 변경
     const everyOrderItemOptionsPurchaseConfirmed = order.orderItems
       .flatMap((item) => item.options)
-      .every((opt) => !!opt.purchaseConfirmationDate && opt.step === 'purchaseConfirmed');
+      .every((opt) => opt.step === 'purchaseConfirmed');
 
     if (everyOrderItemOptionsPurchaseConfirmed) {
       await this.prisma.order.update({
         where: { id: order.id },
-        data: { purchaseConfirmationDate: new Date(), step: 'purchaseConfirmed' },
+        data: { step: 'purchaseConfirmed' },
       });
     }
 
