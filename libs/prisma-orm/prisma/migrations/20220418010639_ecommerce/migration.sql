@@ -291,7 +291,6 @@ CREATE TABLE `Order` (
     `giftFlag` BOOLEAN NOT NULL DEFAULT false,
     `supportOrderIncludeFlag` BOOLEAN NOT NULL DEFAULT false,
     `bundleFlag` BOOLEAN NOT NULL DEFAULT false,
-    `purchaseConfirmationDate` DATETIME(3) NULL,
     `cashReceipts` VARCHAR(191) NULL,
 
     UNIQUE INDEX `Order_orderCode_key`(`orderCode`),
@@ -488,6 +487,9 @@ CREATE TABLE `Export` (
     `bundleExportCode` VARCHAR(191) NULL,
     `exportDate` DATETIME(3) NOT NULL,
     `exchangeExportedFlag` BOOLEAN NOT NULL DEFAULT false,
+    `buyConfirmDate` DATETIME(3) NULL,
+    `buyConfirmSubject` ENUM('admin', 'customer', 'system') NULL,
+    `sellerId` INTEGER NULL,
 
     UNIQUE INDEX `Export_exportCode_key`(`exportCode`),
     PRIMARY KEY (`id`)
@@ -499,6 +501,7 @@ CREATE TABLE `ExportItem` (
     `orderItemId` INTEGER NOT NULL,
     `orderItemOptionId` INTEGER NOT NULL,
     `amount` INTEGER NOT NULL,
+    `exportId` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -763,10 +766,16 @@ ALTER TABLE `OrderCancellationItem` ADD CONSTRAINT `OrderCancellationItem_orderC
 ALTER TABLE `Export` ADD CONSTRAINT `Export_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Export` ADD CONSTRAINT `Export_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `ExportItem` ADD CONSTRAINT `ExportItem_orderItemId_fkey` FOREIGN KEY (`orderItemId`) REFERENCES `OrderItem`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ExportItem` ADD CONSTRAINT `ExportItem_orderItemOptionId_fkey` FOREIGN KEY (`orderItemOptionId`) REFERENCES `OrderItemOption`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ExportItem` ADD CONSTRAINT `ExportItem_exportId_fkey` FOREIGN KEY (`exportId`) REFERENCES `Export`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `GoodsCategory` ADD CONSTRAINT `GoodsCategory_parentCategoryId_fkey` FOREIGN KEY (`parentCategoryId`) REFERENCES `GoodsCategory`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
