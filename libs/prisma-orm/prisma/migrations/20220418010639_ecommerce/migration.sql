@@ -502,6 +502,7 @@ CREATE TABLE `ExportItem` (
     `orderItemOptionId` INTEGER NOT NULL,
     `amount` INTEGER NOT NULL,
     `exportId` INTEGER NOT NULL,
+    `status` ENUM('preparing', 'exportDone', 'shipping', 'shippingDone') NOT NULL DEFAULT 'preparing',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

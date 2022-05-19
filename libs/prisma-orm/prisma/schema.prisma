@@ -1895,14 +1895,15 @@ enum BuyConfirmSubject {
 
 // 출고상품
 model ExportItem {
-  id                Int             @id @default(autoincrement()) // 출고상품 고유번호
+  id                Int                 @id @default(autoincrement()) // 출고상품 고유번호
   exportId          Int // 연결된 출고고유번호
-  export            Export          @relation(fields: [exportId], references: [id], onDelete: Cascade) // 연결된 출고정보
+  export            Export              @relation(fields: [exportId], references: [id], onDelete: Cascade) // 연결된 출고정보
   orderItemId       Int // 주문상품 고유번호
-  orderItem         OrderItem       @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
+  orderItem         OrderItem           @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
-  orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
+  orderItemOption   OrderItemOption     @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
+  status            ExportProcessStatus @default(preparing) // 출고상태
 }
 
 // ****************
