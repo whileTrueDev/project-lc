@@ -81,7 +81,7 @@ import { AppController } from './app.controller';
     GoodsReviewModule.withControllers(),
     MileageModule.withControllers(),
     RefundModule.withControllers(),
-    ExchangeModule.withControllers()
+    ExchangeModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],
