@@ -427,6 +427,9 @@ export class OrderService extends ServiceBaseWithCache {
     // 주문상품옵션이 연결된 출고 조회
     const exportData = await this.prisma.export.findFirst({
       where: { items: { some: { orderItemOptionId } } },
+      include: {
+        items: { select: { orderItemOptionId: true } },
+      },
     });
     // 해당 출고데이터에 구매확정일자 저장
     if (exportData && !exportData.buyConfirmDate) {
@@ -438,11 +441,16 @@ export class OrderService extends ServiceBaseWithCache {
         },
       });
     }
-    //
 
-    // 주문상품옵션 구매확정으로 상태 변경
-    await this.prisma.orderItemOption.update({
-      where: { id: orderItemOptionId },
+    // 해당 출고에 대한 구매확정처리 == 해당 출고에 포함된 주문상품옵션은 모두 구매확정처리
+    // 같이 구매확정 상태로 변경되어야 하는(동일한 출고에 포함된) 주문상품옵션id들
+    const batchExportedOrderOptionIds = exportData
+      ? exportData.items.map((i) => i.orderItemOptionId)
+      : [];
+
+    // 해당 주문상품옵션 & 연결된 출고에 포함된 모든 주문상품옵션을 구매확정으로 상태 변경
+    await this.prisma.orderItemOption.updateMany({
+      where: { id: { in: batchExportedOrderOptionIds.concat(orderItemOptionId) } },
       data: {
         step: 'purchaseConfirmed',
       },
