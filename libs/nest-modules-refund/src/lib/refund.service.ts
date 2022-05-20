@@ -24,8 +24,8 @@ export class RefundService {
     private readonly prisma: PrismaService,
     private readonly orderCancellationService: OrderCancellationService,
     private readonly paymentService: PaymentService,
+    private readonly returnService: ReturnService,
   ) {}
-
 
   /** 결제취소 테스트위해 결제데이터 필요하여 만들었음. // TODO: 프론트 작업시 삭제 */
   async makeFakeOrderWithFakePayment(): Promise<any> {
