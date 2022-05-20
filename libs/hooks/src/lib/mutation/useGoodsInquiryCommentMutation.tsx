@@ -29,7 +29,7 @@ export const useGoodsInquiryCommentMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries(['GoodsInquiryComment', data.id]);
+        queryClient.invalidateQueries(['GoodsInquiryComment', data.goodsInquiryId]);
       },
     },
   );
