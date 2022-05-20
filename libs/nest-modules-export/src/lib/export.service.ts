@@ -23,19 +23,25 @@ export class ExportService {
   /** 출고코드 생성 */
   private generateExportCode({ type = 'normal' }: { type: ExportCodeType }): string {
     const prefix = exportCodePrefix[type];
-    return prefix + dayjs().format('YYYYMMDDHHmmssSSS') + nanoid(6);
+    return prefix + dayjs().format('YYYYMMDDHHmm') + nanoid(6);
   }
 
   /** 실물 출고처리 (Export 테이블에 데이터 생성) */
-  async createExportRecord(
-    dto: CreateKkshowExportDto,
-    exportCode: string,
-  ): Promise<Export> {
+  async createExportRecord({
+    dto,
+    exportCode,
+    bundleExportCode,
+  }: {
+    dto: CreateKkshowExportDto;
+    exportCode: string;
+    bundleExportCode?: string;
+  }): Promise<Export> {
     return this.prisma.export.create({
       data: {
         order: { connect: { id: dto.orderId } },
         seller: dto.sellerId ? { connect: { id: dto.sellerId } } : undefined,
         exportCode,
+        bundleExportCode,
         deliveryCompany: dto.deliveryCompany,
         deliveryNumber: dto.deliveryNumber,
         exportDate: new Date(),
@@ -131,11 +137,17 @@ export class ExportService {
   }
 
   /** 단일 출고처리 */
-  public async exportOne(dto: CreateKkshowExportDto): Promise<ExportCreateRes> {
+  public async exportOne({
+    dto,
+    bundleExportCode,
+  }: {
+    dto: CreateKkshowExportDto;
+    bundleExportCode?: string;
+  }): Promise<ExportCreateRes> {
     const exportCode = this.generateExportCode({ type: 'normal' });
 
     /** 출고처리 (Export, ExportItem 테이블에 데이터 생성) */
-    await this.createExportRecord(dto, exportCode);
+    await this.createExportRecord({ dto, exportCode, bundleExportCode });
     /** 재고차감 */
     await this.updateGoodsSupplies(dto);
     /** 주문상품옵션의 상태변경 -> 주문상태변경보다 먼저 진행 */
@@ -149,15 +161,35 @@ export class ExportService {
   /** 일괄 출고처리 */
   public async exportMany(dto: ExportManyDto): Promise<boolean> {
     const res = await Promise.all(
-      dto.exportOrders.map((exportOrder) => this.exportOne(exportOrder)),
+      dto.exportOrders.map((exportOrder) => this.exportOne({ dto: exportOrder })),
     );
 
     return res.every(({ exportCode }) => !!exportCode);
   }
 
-  /** 합포장 출고처리 */
-  public async exportBundle(): Promise<boolean> {
-    console.log('합포장 출고처리');
+  /** 합포장 출고처리 -> 일괄출고처리와 비슷하나 출고에 합포장코드가 추가되고, 연결된 주문에 합포장플래그 true 설정 */
+  public async exportBundle(dto: ExportManyDto): Promise<boolean> {
+    const bundleExportCode = this.generateExportCode({ type: 'bundle' });
+
+    // 일괄출고생성 && 출고생성시 합포장코드 저장
+    const exports = await Promise.all(
+      dto.exportOrders.map((exportOrder) =>
+        this.exportOne({ dto: exportOrder, bundleExportCode }),
+      ),
+    );
+    // 출고가 연결될 주문 orderId 찾기
+    const orderIdList: number[] = [];
+    exports.forEach((e) => {
+      const { orderId } = e;
+      if (!orderIdList.includes(orderId)) orderIdList.push(orderId);
+    });
+
+    // 해당 주문 합포장플래그 수정
+    await this.prisma.order.updateMany({
+      where: { id: { in: orderIdList } },
+      data: { bundleFlag: true },
+    });
+
     return true;
   }
 
