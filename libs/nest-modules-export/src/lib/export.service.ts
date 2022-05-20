@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Export, ExportItem, GoodsImages, Order, OrderProcessStep } from '@prisma/client';
+import { Export, Order, OrderProcessStep, Prisma } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateKkshowExportDto,
@@ -9,9 +9,10 @@ import {
   ExportManyDto,
   ExportRes,
   findExportItemData,
+  findExportListDto,
 } from '@project-lc/shared-types';
-import dayjs = require('dayjs');
 import { nanoid } from 'nanoid';
+import dayjs = require('dayjs');
 
 type ExportCodeType = 'normal' | 'bundle'; // 일반출고코드 | 합포장출고코드
 const exportCodePrefix: Record<ExportCodeType, string> = {
@@ -41,7 +42,7 @@ export class ExportService {
     return this.prisma.export.create({
       data: {
         order: { connect: { id: dto.orderId } },
-        seller: dto.sellerId ? { connect: { id: dto.sellerId } } : undefined,
+        seller: dto.sellerId ? { connect: { id: dto.sellerId } } : undefined, // 출고시 출고 진행한 판매자의 고유번호로 연결한다
         exportCode,
         bundleExportCode,
         deliveryCompany: dto.deliveryCompany,
@@ -197,7 +198,6 @@ export class ExportService {
 
   /** 개별출고정보 조회 */
   public async getExportDetail(exportCode: string): Promise<ExportRes> {
-    console.log(`개별출고정보 조회 exportCode:${exportCode}`);
     const exportData = await this.prisma.export.findUnique({
       where: { exportCode },
       include: {
@@ -222,8 +222,8 @@ export class ExportService {
     const { items, ...rest } = exportData;
 
     return {
-      items: this.exportItemsToResDataType(items),
       ...rest,
+      items: this.exportItemsToResDataType(items),
     };
   }
 
@@ -233,20 +233,56 @@ export class ExportService {
       const { orderItem, orderItemOption, ...rest } = item;
 
       return {
+        ...rest,
         goodsId: orderItem.goods.id,
         goodsName: orderItem.goods.goods_name,
         image: orderItem.goods.image[0]?.image,
         price: orderItemOption.discountPrice.toString(), // numberstring 으로 보낸다
         title1: orderItemOption.name,
         option1: orderItemOption.value,
-        ...rest,
       };
     });
   }
 
-  /** 출고목록조회 - 판매자, 관리자 용 */
-  public async getExportList(): Promise<ExportListRes> {
-    console.log('출고목록조회 - 판매자, 관리자 용');
-    return [];
+  /** 출고목록조회 - 판매자, 관리자 용
+   * @param dto.sellerId 값이 없으면 전체 출고목록 조회
+   */
+  public async getExportList(dto: findExportListDto): Promise<ExportListRes> {
+    const { sellerId, skip, take } = dto;
+
+    const where: Prisma.ExportWhereInput = sellerId ? { sellerId } : undefined;
+
+    const totalCount = await this.prisma.export.count({ where });
+    const data = await this.prisma.export.findMany({
+      where,
+      skip,
+      take,
+      orderBy: { exportDate: 'desc' },
+      include: {
+        order: true,
+        items: {
+          include: {
+            orderItem: {
+              select: { goods: { select: { goods_name: true, image: true, id: true } } },
+            },
+            orderItemOption: { select: { name: true, value: true, discountPrice: true } },
+          },
+        },
+      },
+    });
+
+    // 리턴타입에 맞게 주문상품 형태 변경
+    const list = data.map((d) => {
+      const { items, ...rest } = d;
+
+      return {
+        ...rest,
+        items: this.exportItemsToResDataType(items),
+      };
+    });
+    return {
+      list,
+      totalCount,
+    };
   }
 }

@@ -9,7 +9,9 @@
 import { Order, Seller } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsArray, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { DefaultPaginationDto } from './pagination.dto';
 
+/** 출고상품 생성 dto */
 export class KkshowExportItem {
   @IsNumber()
   /**  출고할 주문상품 고유번호 */
@@ -24,7 +26,7 @@ export class KkshowExportItem {
   amount: number;
 }
 
-/** 크크쇼 단일출고처리 dto */
+/** 크크쇼 단일출고처리 생성 dto */
 export class CreateKkshowExportDto {
   @IsNumber()
   /** 출고와 연결된 주문의 고유번호 */
@@ -58,4 +60,13 @@ export class ExportManyDto {
   @ValidateNested()
   @Type(() => CreateKkshowExportDto)
   exportOrders: CreateKkshowExportDto[];
+}
+
+/** 출고목록조회 dto */
+export class findExportListDto extends DefaultPaginationDto {
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  /** 출고 진행한 판매자 고유번호 */
+  sellerId?: number;
 }

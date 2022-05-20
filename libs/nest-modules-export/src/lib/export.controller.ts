@@ -1,14 +1,24 @@
-import { Body, Controller, Get, Param, Post, ValidationPipe } from '@nestjs/common';
-import { SellerInfo, UserPayload } from '@project-lc/nest-core';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  ValidationPipe,
+} from '@nestjs/common';
+// import { SellerInfo, UserPayload } from '@project-lc/nest-core';
 import {
   CreateKkshowExportDto,
   ExportCreateRes,
   ExportListRes,
   ExportManyDto,
   ExportRes,
+  findExportListDto,
 } from '@project-lc/shared-types';
 import { ExportService } from './export.service';
 
+// TODO: 프론트에서 사용할 때 가드 주석 해제 & SellerInfo 주석 해제
 // @UseGuards(JwtAuthGuard)
 @Controller('export')
 export class ExportController {
@@ -49,7 +59,9 @@ export class ExportController {
 
   /** 출고목록조회 - 판매자, 관리자 용 */
   @Get()
-  public getExportList(): Promise<ExportListRes> {
-    return this.exportService.getExportList();
+  public getExportList(
+    @Query(new ValidationPipe({ transform: true })) dto: findExportListDto,
+  ): Promise<ExportListRes> {
+    return this.exportService.getExportList(dto);
   }
 }

@@ -42,7 +42,10 @@ export type ExportItemOption = ExportItem & {
 export type ExportRes = Export & { items: ExportItemOption[]; order: Order }; // order의 주문자정보, 받는사람정보, 배송메모 필요
 
 /** 출고 목록 조회 리턴값 */
-export type ExportListRes = ExportRes[];
+export type ExportListRes = {
+  list: ExportRes[];
+  totalCount: number;
+};
 
 /** 출고 생성 리턴값 */
 export type ExportCreateRes = {
