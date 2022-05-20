@@ -183,16 +183,19 @@ export class OrderService extends ServiceBaseWithCache {
    * dto 에 포함된 값에 따라 where 절을 다르게 설정한다
    */
   private getOrderListFilterWhere(dto: GetOrderListDto): Prisma.OrderWhereInput {
-    const { customerId, sellerId, orderCode, periodStart, periodEnd, supportIncluded } =
-      dto;
+    const {
+      customerId,
+      sellerId,
+      orderCode,
+      periodStart,
+      periodEnd,
+      supportIncluded,
+      search,
+      searchDateType,
+      searchStatuses,
+    } = dto;
 
-    let where: Prisma.OrderWhereInput = {
-      createDate: {
-        gte: periodStart ? new Date(periodStart) : undefined,
-        lte: periodEnd ? new Date(periodEnd) : undefined,
-      },
-    };
-
+    let where: Prisma.OrderWhereInput = {};
     // 특정 소비자의 주문목록 조회시
     if (customerId) {
       where = { ...where, customerId, deleteFlag: false };
@@ -211,6 +214,50 @@ export class OrderService extends ServiceBaseWithCache {
     // 후원주문만 조회시
     if (supportIncluded) {
       where = { ...where, supportOrderIncludeFlag: true };
+    }
+
+    // 특정 날짜로 조회시
+    if (searchDateType) {
+      const dateFilter = {
+        gte: periodStart ? new Date(periodStart) : undefined,
+        lte: periodEnd ? new Date(periodEnd) : undefined,
+      };
+      // 주문일 기준으로 조회시
+      if (searchDateType === '주문일') {
+        where = { ...where, createDate: dateFilter };
+      }
+
+      // 입금일 기준으로 조회시
+      if (searchDateType === '입금일') {
+        where = { ...where, payment: { depositDate: dateFilter } };
+      }
+    }
+
+    // 특정 주문상태로 조회시
+    if (searchStatuses) {
+      where = { ...where, step: { in: searchStatuses } };
+    }
+
+    // 검색어로 특정컬럼값 조회시
+    if (search) {
+      // search 텍스트 있는경우 특정컬럼에 search 텍스트가 포함되는지 확인
+      const searchTextOrderColumn: Array<keyof Order> = [
+        'orderCode',
+        'recipientName',
+        'recipientPhone',
+        'recipientEmail',
+        'ordererName',
+        'ordererPhone',
+        'ordererEmail',
+      ];
+      const searchTextList = search
+        ? [
+            { orderItems: { some: { goods: { goods_name: { contains: search } } } } },
+            { payment: { depositor: { contains: search } } },
+            ...searchTextOrderColumn.map((col) => ({ [col]: { contains: search } })),
+          ]
+        : undefined;
+      where = { ...where, OR: searchTextList };
     }
 
     return where;
