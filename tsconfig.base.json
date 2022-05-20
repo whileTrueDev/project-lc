@@ -47,6 +47,9 @@
       "@project-lc/nest-modules-exchange": [
         "libs/nest-modules-exchange/src/index.ts"
       ],
+      "@project-lc/nest-modules-export": [
+        "libs/nest-modules-export/src/index.ts"
+      ],
       "@project-lc/nest-modules-goods": [
         "libs/nest-modules-goods/src/index.ts"
       ],
