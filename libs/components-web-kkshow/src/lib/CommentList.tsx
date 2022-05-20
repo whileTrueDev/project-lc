@@ -14,10 +14,13 @@ import ReplyText from './ReplyText';
 export interface CommentListProps {
   comments: GoodsReviewCommentRes | GoodsInquiryCommentRes;
   commentType?: '댓글' | '답변';
+  /** 댓글 수정/삭제 등 버튼모음. 이름 위에 버튼이 표시됩니다. */
+  buttonSet?: (props: { comment: CommentListProps['comments'][number] }) => JSX.Element;
 }
 export function CommentList({
   comments,
   commentType = '댓글',
+  buttonSet,
 }: CommentListProps): JSX.Element | null {
   const [commentOpen, setCommentOpen] = useState(false);
   if (comments.length === 0) return null;
@@ -39,6 +42,7 @@ export function CommentList({
             <Flex key={comment.id} gap={2} my={2}>
               <Icon as={BsArrowReturnRight} mt={1} />
               <Box>
+                {buttonSet ? buttonSet({ comment }) : null}
                 {comment.seller && (
                   <ReplyText
                     avatar={comment.seller.avatar || ''}

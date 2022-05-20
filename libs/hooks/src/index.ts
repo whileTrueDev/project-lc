@@ -51,6 +51,7 @@ export * from './lib/mutation/useExportOrdersMutation';
 export * from './lib/mutation/useGoodConfirmationMutation';
 export * from './lib/mutation/useGoodRejectionMutation';
 export * from './lib/mutation/useGoodsImageMutation';
+export * from './lib/mutation/useGoodsInquiryCommentMutation';
 export * from './lib/mutation/useGoodsInquiryMutation';
 export * from './lib/mutation/useInquiryMutation';
 export * from './lib/mutation/useLoginMutation';

@@ -1,17 +1,43 @@
 /* eslint-disable react/no-array-index-key */
-import { EditIcon } from '@chakra-ui/icons';
-import { Badge, Box, Button, Center, Flex, Image, Spinner, Text } from '@chakra-ui/react';
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import {
+  Badge,
+  Box,
+  Button,
+  ButtonGroup,
+  Center,
+  Divider,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Image,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  Text,
+  Textarea,
+  useDisclosure,
+  useToast,
+} from '@chakra-ui/react';
 import MypageLayout from '@project-lc/components-shared/MypageLayout';
 import { CommentList } from '@project-lc/components-web-kkshow/CommentList';
 import {
+  useGoodsInquiryCommentMutation,
   useGoodsInquiryComments,
   useGoodsOutlineById,
   useInfiniteGoodsInquiries,
   useProfile,
 } from '@project-lc/hooks';
-import { FindGoodsInquiryItem } from '@project-lc/shared-types';
+import { FindGoodsInquiryItem, GoodsInquiryCommentDto } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
 export function GoodsInquiries(): JSX.Element {
   return (
@@ -35,7 +61,7 @@ function SellerGoodsInquiryList(): JSX.Element | null {
 
   if (!data) return null;
   return (
-    <Box>
+    <Box my={4}>
       {data?.pages[0].goodsInquiries.length === 0 && (
         <Text textAlign="center">문의 내역이 없습니다</Text>
       )}
@@ -71,6 +97,7 @@ interface SellerGoodsInquiryListItemProps {
 function SellerGoodsInquiryListItem({
   inquiry,
 }: SellerGoodsInquiryListItemProps): JSX.Element {
+  const createDialog = useDisclosure();
   const { data: profile } = useProfile();
   const goods = useGoodsOutlineById(inquiry.goodsId);
   const comment = useGoodsInquiryComments(inquiry.id);
@@ -109,9 +136,14 @@ function SellerGoodsInquiryListItem({
           <Text>{dayjs(inquiry.createDate).format('YYYY년 MM월 DD일 HH:mm:ss')}</Text>
         </Box>
 
-        <Button size="sm" leftIcon={<EditIcon />} onClick={() => alert('답변 생성')}>
+        <Button size="sm" leftIcon={<EditIcon />} onClick={createDialog.onOpen}>
           답변생성
         </Button>
+        <SellerGoodsInquiryCommentCreateDialog
+          inquiry={inquiry}
+          isOpen={createDialog.isOpen}
+          onClose={createDialog.onClose}
+        />
       </Flex>
 
       <Flex mt={3} gap={1} alignItems="center">
@@ -129,7 +161,122 @@ function SellerGoodsInquiryListItem({
         <Text>{inquiry.content}</Text>
       </Box>
 
-      <CommentList commentType="답변" comments={comment.data || []} />
+      <CommentList
+        commentType="답변"
+        comments={comment.data || []}
+        buttonSet={({ comment: c }): JSX.Element | null => {
+          if (profile?.id && c.sellerId)
+            return (
+              <ButtonGroup size="xs">
+                <Button onClick={() => alert(`수정 ${c.id}`)} leftIcon={<EditIcon />}>
+                  수정
+                </Button>
+                <Button onClick={() => alert(`삭제 ${c.id}`)} leftIcon={<DeleteIcon />}>
+                  삭제
+                </Button>
+              </ButtonGroup>
+            );
+          return null;
+        }}
+      />
+    </Box>
+  );
+}
+interface SellerGoodsInquiryCommentCreateDialogProps
+  extends SellerGoodsInquiryListItemProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+function SellerGoodsInquiryCommentCreateDialog({
+  inquiry,
+  isOpen,
+  onClose,
+}: SellerGoodsInquiryCommentCreateDialogProps): JSX.Element {
+  const formId = 'goods-inquiry-comment-form';
+  const toast = useToast();
+  const { data: profile } = useProfile();
+
+  const goodsInquiryCreate = useGoodsInquiryCommentMutation();
+  const handleSubmit: SubmitHandler<GoodsInquiryCommentDto> = (formData) => {
+    if (profile) {
+      goodsInquiryCreate
+        .mutateAsync({
+          goodsInquiryId: inquiry.id,
+          content: formData.content,
+          sellerId: profile.id,
+        })
+        .then(() => {
+          toast({ description: '상품 문의 답변을 작성하였습니다.', status: 'success' });
+          onClose();
+        })
+        .catch(() => {
+          toast({
+            description:
+              '상품 문의 답변을 작성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+            status: 'error',
+          });
+        });
+    }
+  };
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} isCentered size="md">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          상품 문의 답변 작성
+          <ModalCloseButton />
+        </ModalHeader>
+        <ModalBody>
+          <Box py={2}>
+            <FormLabel>문의 내용</FormLabel>
+            <Text fontSize="sm">{inquiry.writer.nickname}</Text>
+            <Text fontSize="sm">{inquiry.content}</Text>
+          </Box>
+          <Divider />
+          <GoodsInquiryCommentForm formId={formId} onSubmit={handleSubmit} />
+        </ModalBody>
+        <ModalFooter>
+          <ButtonGroup>
+            <Button onClick={onClose}>닫기</Button>
+            <Button form={formId} type="submit" colorScheme="blue">
+              생성
+            </Button>
+          </ButtonGroup>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
+
+interface GoodsInquiryCommentFormProps {
+  formId: string;
+  onSubmit: SubmitHandler<GoodsInquiryCommentDto>;
+}
+function GoodsInquiryCommentForm({
+  formId,
+  onSubmit,
+}: GoodsInquiryCommentFormProps): JSX.Element {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<GoodsInquiryCommentDto>();
+  return (
+    <Box as="form" id={formId} onSubmit={handleSubmit(onSubmit)}>
+      <FormControl isInvalid={!!errors.content}>
+        <FormLabel>문의 답변 내용</FormLabel>
+        <Textarea
+          size="sm"
+          {...register('content', {
+            required: '문의 답변 내용을 작성해주세요.',
+            maxLength: {
+              value: 500,
+              message: '문의 답변은 최대 500자까지 작성 가능합니다.',
+            },
+          })}
+        />
+        <FormErrorMessage>{errors.content?.message}</FormErrorMessage>
+      </FormControl>
     </Box>
   );
 }
