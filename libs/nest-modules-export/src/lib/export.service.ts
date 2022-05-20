@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { Export, Order, OrderProcessStep } from '@prisma/client';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Export, ExportItem, GoodsImages, Order, OrderProcessStep } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateKkshowExportDto,
   ExportCreateRes,
+  ExportItemOption,
   ExportListRes,
   ExportManyDto,
   ExportRes,
+  findExportItemData,
 } from '@project-lc/shared-types';
 import dayjs = require('dayjs');
 import { nanoid } from 'nanoid';
@@ -196,7 +198,50 @@ export class ExportService {
   /** 개별출고정보 조회 */
   public async getExportDetail(exportCode: string): Promise<ExportRes> {
     console.log(`개별출고정보 조회 exportCode:${exportCode}`);
-    return {} as ExportRes;
+    const exportData = await this.prisma.export.findUnique({
+      where: { exportCode },
+      include: {
+        order: true,
+        items: {
+          include: {
+            orderItem: {
+              select: { goods: { select: { goods_name: true, image: true, id: true } } },
+            },
+            orderItemOption: { select: { name: true, value: true, discountPrice: true } },
+          },
+        },
+      },
+    });
+
+    if (!exportData) {
+      throw new BadRequestException(
+        `해당 출고정보가 존재하지 않습니다. 출고코드 : ${exportCode}`,
+      );
+    }
+
+    const { items, ...rest } = exportData;
+
+    return {
+      items: this.exportItemsToResDataType(items),
+      ...rest,
+    };
+  }
+
+  /** getExportDetail에서 조회한 items 데이터를 리턴타입에 맞게 바꾸는 함수  */
+  private exportItemsToResDataType(items: findExportItemData[]): ExportItemOption[] {
+    return items.map((item) => {
+      const { orderItem, orderItemOption, ...rest } = item;
+
+      return {
+        goodsId: orderItem.goods.id,
+        goodsName: orderItem.goods.goods_name,
+        image: orderItem.goods.image[0]?.image,
+        price: orderItemOption.discountPrice.toString(), // numberstring 으로 보낸다
+        title1: orderItemOption.name,
+        option1: orderItemOption.value,
+        ...rest,
+      };
+    });
   }
 
   /** 출고목록조회 - 판매자, 관리자 용 */

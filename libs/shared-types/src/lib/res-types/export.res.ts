@@ -1,4 +1,27 @@
-import { Export, ExportItem, Goods, GoodsImages, Order } from '@prisma/client';
+import {
+  Export,
+  ExportItem,
+  Goods,
+  GoodsImages,
+  Order,
+  OrderItemOption,
+} from '@prisma/client';
+
+/** ExportItemOption 형태로 바꾸기 전 출고상세조회시 출고상품 형태 */
+export type findExportItemData = ExportItem & {
+  orderItem: {
+    goods: {
+      id: Goods['id'];
+      goods_name: Goods['goods_name'];
+      image: GoodsImages[];
+    };
+  };
+  orderItemOption: {
+    name: string;
+    value: string;
+    discountPrice: OrderItemOption['discountPrice'];
+  };
+};
 
 export type ExportItemOption = ExportItem & {
   /** 해당 옵션의 상품 고유 번호 */
@@ -16,7 +39,7 @@ export type ExportItemOption = ExportItem & {
 };
 
 /** 출고 상세 조회 리턴값 */
-export type ExportRes = Export & { items: ExportItemOption[] } & Order; // order의 주문자정보, 받는사람정보, 배송메모 필요
+export type ExportRes = Export & { items: ExportItemOption[]; order: Order }; // order의 주문자정보, 받는사람정보, 배송메모 필요
 
 /** 출고 목록 조회 리턴값 */
 export type ExportListRes = ExportRes[];
