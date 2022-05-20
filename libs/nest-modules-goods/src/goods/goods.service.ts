@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { ObjectIdentifier } from '@aws-sdk/client-s3';
 import {
   BadRequestException,
   CACHE_MANAGER,
@@ -8,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { Goods, GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminAllLcGoodsList,
@@ -20,14 +22,13 @@ import {
   GoodsOptionDto,
   GoodsOptionsWithSupplies,
   GoodsOptionWithStockInfo,
+  GoodsOutlineByIdRes,
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { Cache } from 'cache-manager';
 import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
-import { ObjectIdentifier } from '@aws-sdk/client-s3';
 import { s3 } from '@project-lc/utils-s3';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class GoodsService extends ServiceBaseWithCache {
@@ -466,6 +467,22 @@ export class GoodsService extends ServiceBaseWithCache {
             },
           },
         },
+      },
+    });
+  }
+
+  /** 상품 개별 간략 정보 조회 */
+  public async getOneGoodsOutline(goodsId: number): Promise<GoodsOutlineByIdRes> {
+    return this.prisma.goods.findFirst({
+      where: { id: goodsId },
+      select: {
+        id: true,
+        goods_name: true,
+        summary: true,
+        goods_status: true,
+        options: { include: { supply: true } },
+        confirmation: true,
+        image: { orderBy: { cut_number: 'asc' } },
       },
     });
   }

@@ -63,3 +63,13 @@ export type GoodsByIdRes = GoodsByIdResBase & GoodsByIdSellerInfo;
 export type AdminGoodsByIdRes = GoodsByIdResBase & {
   seller: Seller;
 };
+
+/** 상품 개별 조회 반환 타입 (반환 데이터가 간략함) */
+export interface GoodsOutlineByIdRes {
+  id: Goods['id'];
+  goods_name: Goods['goods_name'];
+  summary: Goods['summary'];
+  goods_status: Goods['goods_status'];
+  options: GoodsByIdResBase['options'];
+  image: GoodsImages[];
+}
