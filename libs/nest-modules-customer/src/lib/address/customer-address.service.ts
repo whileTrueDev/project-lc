@@ -31,6 +31,10 @@ export class CustomerAddressService {
   ): Promise<CustomerAddress> {
     const howMany = await this.prisma.customerAddress.count({ where: { customerId } });
     if (howMany >= 3) throw new BadRequestException("can't create more than 3 address");
+    if (dto.isDefault) {
+      // 기본 배송지로 생성시 기존 기본주소록을 기본이 아니도록 수정
+      await this.resetDefaultAddress(customerId);
+    }
     return this.prisma.customerAddress.create({ data: { customerId, ...dto } });
   }
 
@@ -44,10 +48,7 @@ export class CustomerAddressService {
       const target = await this.prisma.customerAddress.findFirst({
         where: { id: addressId },
       });
-      await this.prisma.customerAddress.updateMany({
-        where: { customerId: target.customerId, isDefault: true },
-        data: { isDefault: false },
-      });
+      await this.resetDefaultAddress(target.customerId);
     }
     return this.prisma.customerAddress.update({
       where: { id: addressId },
@@ -59,5 +60,14 @@ export class CustomerAddressService {
   public async delete(addressId: CustomerAddress['id']): Promise<boolean> {
     const result = await this.prisma.customerAddress.delete({ where: { id: addressId } });
     return !!result;
+  }
+
+  private async resetDefaultAddress(customerId: Customer['id']): Promise<boolean> {
+    // 기본 배송지 변경시
+    const result = await this.prisma.customerAddress.updateMany({
+      where: { customerId, isDefault: true },
+      data: { isDefault: false },
+    });
+    return !!result.count;
   }
 }

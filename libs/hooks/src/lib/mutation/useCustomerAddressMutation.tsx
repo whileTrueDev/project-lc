@@ -20,8 +20,14 @@ export const useCustomerAddressMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('CustomerAddress');
-        queryClient.invalidateQueries('DefaultCustomerAddress');
+        queryClient.invalidateQueries('CustomerAddress', {
+          refetchActive: true,
+          refetchInactive: true,
+        });
+        queryClient.invalidateQueries('DefaultCustomerAddress', {
+          refetchActive: true,
+          refetchInactive: true,
+        });
       },
     },
   );
@@ -52,8 +58,14 @@ export const useCustomerAddressDeleteMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('CustomerAddress');
-        queryClient.invalidateQueries('DefaultCustomerAddress');
+        queryClient.invalidateQueries('CustomerAddress', {
+          refetchActive: true,
+          refetchInactive: true,
+        });
+        queryClient.invalidateQueries('DefaultCustomerAddress', {
+          refetchActive: true,
+          refetchInactive: true,
+        });
       },
     },
   );
@@ -85,8 +97,14 @@ export const useCustomerAddressUpdateMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('CustomerAddress');
-        queryClient.invalidateQueries('DefaultCustomerAddress');
+        queryClient.invalidateQueries('CustomerAddress', {
+          refetchActive: true,
+          refetchInactive: true,
+        });
+        queryClient.invalidateQueries('DefaultCustomerAddress', {
+          refetchActive: true,
+          refetchInactive: true,
+        });
       },
     },
   );

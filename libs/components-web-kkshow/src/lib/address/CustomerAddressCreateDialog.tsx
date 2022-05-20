@@ -107,11 +107,11 @@ export function CustomerAddressCreateButton(): JSX.Element {
       </Button>
       <UnorderedList fontSize="xs">
         <ListItem>
-          <Text color="red.400">현재 배송지를 최대로 등록했습니다.</Text>
+          <Text>배송지는 최대 3개 까지 등록 가능합니다.</Text>
         </ListItem>
         {addresses && addresses.length >= 3 && (
           <ListItem>
-            <Text>배송지는 최대 3개 까지 등록 가능합니다.</Text>
+            <Text color="red.400">현재 배송지를 최대로 등록했습니다.</Text>
           </ListItem>
         )}
       </UnorderedList>
