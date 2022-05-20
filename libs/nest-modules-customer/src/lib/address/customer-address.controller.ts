@@ -13,13 +13,19 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Customer, CustomerAddress } from '@prisma/client';
-import { CustomerInfo, HttpCacheInterceptor, UserPayload } from '@project-lc/nest-core';
+import {
+  CacheClearKeys,
+  CustomerInfo,
+  HttpCacheInterceptor,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CustomerAddressDto, CustomerAddressUpdateDto } from '@project-lc/shared-types';
 import { CustomerAddressService } from './customer-address.service';
 
 @Controller('customer/:customerId/address')
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('/address')
 @UseGuards(JwtAuthGuard)
 export class CustomerAddressController {
   constructor(private readonly customerAddressService: CustomerAddressService) {}
