@@ -11,7 +11,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
@@ -26,12 +26,14 @@ import {
 import { OrderCancellationService } from './order-cancellation.service';
 
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('order/cancellation')
 @Controller('order/cancellation')
 export class OrderCancellationController {
   constructor(private readonly orderCancellationService: OrderCancellationService) {}
 
   /* 주문취소 생성(소비자가 주문취소 요청 생성) */
   @Post()
+  @CacheClearKeys('order')
   createOrderCancellation(
     @Body(ValidationPipe) dto: CreateOrderCancellationDto,
   ): Promise<CreateOrderCancellationRes> {

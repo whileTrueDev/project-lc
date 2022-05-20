@@ -1,24 +1,15 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Broadcaster, SellType } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateManyBroadcasterSettlementHistoryDto,
   FindBcSettlementHistoriesRes,
 } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 
 @Injectable()
-export class BroadcasterSettlementHistoryService extends ServiceBaseWithCache {
-  #BC_SETTLEMENT_HISTORY_CACHE_KEY = 'settlement-history';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class BroadcasterSettlementHistoryService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /** 정산 내역 일괄 생성 */
   public async executeSettleMany(
@@ -65,7 +56,6 @@ export class BroadcasterSettlementHistoryService extends ServiceBaseWithCache {
         .filter((x) => !!x),
     });
 
-    this._clearCaches(this.#BC_SETTLEMENT_HISTORY_CACHE_KEY);
     return result.count;
   }
 

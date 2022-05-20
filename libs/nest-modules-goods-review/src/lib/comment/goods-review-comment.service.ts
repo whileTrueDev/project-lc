@@ -1,23 +1,15 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { GoodsReview, GoodsReviewComment } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   GoodsReviewCommentCreateDto,
   GoodsReviewCommentRes,
   GoodsReviewCommentUpdateDto,
 } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 
 @Injectable()
-export class GoodsReviewCommentService extends ServiceBaseWithCache {
-  #REVIEW_COMMENT_CACHE_KEY = 'goods-review';
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class GoodsReviewCommentService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /** 리뷰 댓글 목록 조회 */
   public async findMany(reviewId: GoodsReview['id']): Promise<GoodsReviewCommentRes> {
@@ -48,7 +40,6 @@ export class GoodsReviewCommentService extends ServiceBaseWithCache {
     reviewId: GoodsReview['id'],
     dto: GoodsReviewCommentCreateDto,
   ): Promise<GoodsReviewComment> {
-    await this._clearCaches(this.getCacheKey(reviewId));
     return this.prisma.goodsReviewComment.create({
       data: {
         reviewId,
@@ -74,7 +65,6 @@ export class GoodsReviewCommentService extends ServiceBaseWithCache {
         reviewId: dto.reviewId,
       },
     });
-    await this._clearCaches(this.getCacheKey(updated.reviewId));
     return updated;
   }
 
@@ -83,11 +73,6 @@ export class GoodsReviewCommentService extends ServiceBaseWithCache {
     const result = await this.prisma.goodsReviewComment.delete({
       where: { id: reviewCommentId },
     });
-    await this._clearCaches(this.getCacheKey(result.reviewId));
     return !!result;
-  }
-
-  private getCacheKey(reviewId: GoodsReview['id']): string {
-    return `${this.#REVIEW_COMMENT_CACHE_KEY}/${reviewId}`;
   }
 }

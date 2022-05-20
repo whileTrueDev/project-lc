@@ -1,6 +1,5 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Goods, GoodsInquiry, Prisma } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   FindGoodsInquiryItem,
@@ -9,17 +8,10 @@ import {
   GoodsInquiryUpdateDto,
   PaginatedGoodsInquiryRes,
 } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 
 @Injectable()
-export class GoodsInquiryService extends ServiceBaseWithCache {
-  #GOODS_INQUIRY_CACHE_KEY = 'goods-inquiry';
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class GoodsInquiryService {
+  constructor(private readonly prisma: PrismaService) {}
 
   private readonly findParam = {
     include: {
@@ -31,7 +23,6 @@ export class GoodsInquiryService extends ServiceBaseWithCache {
 
   /** 상품문의 생성 */
   public async create(dto: GoodsInquiryCreateDto): Promise<GoodsInquiry> {
-    await this._clearCaches(this.#GOODS_INQUIRY_CACHE_KEY);
     return this.prisma.goodsInquiry.create({
       data: {
         content: dto.content,
@@ -91,14 +82,12 @@ export class GoodsInquiryService extends ServiceBaseWithCache {
     dto: GoodsInquiryUpdateDto,
   ): Promise<GoodsInquiry> {
     const updated = await this.prisma.goodsInquiry.update({ where: { id }, data: dto });
-    await this._clearCaches(this.#GOODS_INQUIRY_CACHE_KEY);
     return updated;
   }
 
   /** 상품문의 삭제 */
   public async remove(id: GoodsInquiry['id']): Promise<boolean> {
     const result = await this.prisma.goodsInquiry.delete({ where: { id } });
-    await this._clearCaches(this.#GOODS_INQUIRY_CACHE_KEY);
     return !!result;
   }
 }
