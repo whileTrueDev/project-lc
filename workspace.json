@@ -674,6 +674,7 @@
       },
       "tags": []
     },
+    "nest-modules-coupon": "libs/nest-modules-coupon",
     "nest-modules-customer": "libs/nest-modules-customer",
     "nest-modules-exchange": "libs/nest-modules-exchange",
     "nest-modules-export": "libs/nest-modules-export",
