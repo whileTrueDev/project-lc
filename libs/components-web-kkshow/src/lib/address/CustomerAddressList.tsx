@@ -45,17 +45,15 @@ export function CustomerAddressList({
     return <Box>아직 생성한 배송지가 없습니다.</Box>;
   }
   return (
-    <Stack alignItems="flex-start">
-      <Stack>
-        {addresses?.map((address) => (
-          <CustomerAddressListItem
-            key={address.id}
-            address={address}
-            editable={editable}
-            onSelect={selectable ? onItemSelect : undefined}
-          />
-        ))}
-      </Stack>
+    <Stack maxW={450} w="100%">
+      {addresses?.map((address) => (
+        <CustomerAddressListItem
+          key={address.id}
+          address={address}
+          editable={editable}
+          onSelect={selectable ? onItemSelect : undefined}
+        />
+      ))}
     </Stack>
   );
 }
@@ -95,7 +93,7 @@ export function CustomerAddressListItem({
   };
 
   return (
-    <Box p={2} rounded="md" borderWidth="thin" maxW={450} w="100%">
+    <Box p={2} rounded="md" borderWidth="thin">
       <Flex
         flexDir={address.isDefault ? 'row' : 'row-reverse'}
         alignItems="center"
