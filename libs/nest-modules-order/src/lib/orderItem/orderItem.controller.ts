@@ -11,6 +11,7 @@ import { OrderItemService } from './orderItem.service';
 export class OrderItemController {
   constructor(private readonly service: OrderItemService) {}
 
+  /** 리뷰 작성 가능한 상품 조회 */
   @Get('review-needed')
   findReviewNeededOrderItems(
     @Query(new ValidationPipe({ transform: true })) dto: FindReviewNeededOrderItemsDto,

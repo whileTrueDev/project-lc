@@ -23,7 +23,7 @@ export const getReviews = async (
     .then((res) => res.data);
 };
 
-// 상품의 모든 리뷰
+// 상품의 모든 후기
 export const useReviews = (
   dto: FindManyGoodsReviewDto,
   enabled?: boolean,
@@ -33,7 +33,7 @@ export const useReviews = (
   });
 };
 
-// 상품 리뷰
+// 상품 후기
 export const INFINITE_REVIEWS_KEY = 'InfiniteGoodsReviews';
 export const useInfiniteReviews = (
   dto: FindManyGoodsReviewDto,
@@ -52,7 +52,7 @@ export const useInfiniteReviews = (
   );
 };
 
-// 상품의 총 리뷰 개수
+// 상품의 총 후기 개수
 export const getReviewCount = async (goodsId: Goods['id'] | string): Promise<number> => {
   return axios
     .get<number>('/goods-review/count', { params: { goodsId: Number(goodsId) } })
@@ -70,7 +70,7 @@ export const useGoodsReviewCount = (
   );
 };
 
-// 특정 리뷰의 모든 댓글
+// 특정 후기의 모든 댓글
 export const getReviewComments = async (
   reviewId: GoodsReview['id'],
 ): Promise<GoodsReviewCommentRes> => {
