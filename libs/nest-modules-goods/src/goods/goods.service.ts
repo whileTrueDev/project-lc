@@ -1,8 +1,7 @@
 /* eslint-disable camelcase */
+import { ObjectIdentifier } from '@aws-sdk/client-s3';
 import {
   BadRequestException,
-  CACHE_MANAGER,
-  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -23,22 +22,12 @@ import {
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { Cache } from 'cache-manager';
 import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
-import { ObjectIdentifier } from '@aws-sdk/client-s3';
 import { s3 } from '@project-lc/utils-s3';
 
 @Injectable()
-export class GoodsService extends ServiceBaseWithCache {
-  #GOODS_CACHE_KEY = 'goods';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class GoodsService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * 판매자의 승인된 상품 ID 목록을 가져옵니다.
@@ -336,8 +325,6 @@ export class GoodsService extends ServiceBaseWithCache {
         },
       });
 
-      await this._clearCaches(this.#GOODS_CACHE_KEY);
-
       return true;
     } catch (error) {
       console.error(error);
@@ -413,7 +400,6 @@ export class GoodsService extends ServiceBaseWithCache {
         where: { id },
         data: { goods_view: view },
       });
-      await this._clearCaches(this.#GOODS_CACHE_KEY);
       return true;
     } catch (error) {
       console.error(error);
@@ -530,8 +516,6 @@ export class GoodsService extends ServiceBaseWithCache {
         },
       });
 
-      await this._clearCaches(this.#GOODS_CACHE_KEY);
-
       return { goodsId: goods.id };
     } catch (error) {
       console.error(error);
@@ -585,8 +569,6 @@ export class GoodsService extends ServiceBaseWithCache {
       await this.prisma.goodsImages.delete({
         where: { id: imageId },
       });
-
-      await this._clearCaches(this.#GOODS_CACHE_KEY);
 
       return true;
     } catch (e) {
@@ -722,8 +704,6 @@ export class GoodsService extends ServiceBaseWithCache {
           }, // 상품 수정 후  (승인, 거절, 재검수 대기) 상태에서는 '재검수 대기' 상태로 변경, (대기) 상태에서는 그대로 '대기' 상태
         },
       });
-
-      await this._clearCaches(this.#GOODS_CACHE_KEY);
       return { goodsId: id };
     } catch (error) {
       console.error(error);

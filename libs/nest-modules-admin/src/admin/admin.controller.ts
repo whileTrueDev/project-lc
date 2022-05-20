@@ -14,6 +14,7 @@ import {
   Query,
   Req,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -26,6 +27,7 @@ import {
   PrivacyApproachHistory,
   ConfirmHistory,
 } from '@prisma/client';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   BroadcasterService,
@@ -125,6 +127,8 @@ export class AdminController {
   /** 판매자 정산처리 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/settlement')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement', 'seller/settlement-history')
   executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
     if (dto.target.options.length === 0) return null;
     return this.sellerSettlementService.executeSettle(dto.sellerId, dto);
@@ -140,6 +144,8 @@ export class AdminController {
   /** 방송인 단일 정산처리 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/settlement/broadcaster')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('settlement-history')
   async executeBcSettle(
     @Body(ValidationPipe) dto: CreateManyBroadcasterSettlementHistoryDto,
   ): Promise<number> {
@@ -210,8 +216,10 @@ export class AdminController {
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
-  @Patch('/live-shopping')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('live-shoppings')
+  @Patch('/live-shopping')
   async updateLiveShoppings(
     @Body() data: { dto: LiveShoppingDTO; videoUrlExist?: boolean },
   ): Promise<boolean> {
@@ -274,6 +282,8 @@ export class AdminController {
 
   /** 특정 주문에 대한 결제취소 요청 상태 변경 */
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('order-cancel')
   @Put('/order-cancel/:requestId')
   setOrderCancelRequestDone(
     @Param('requestId', ParseIntPipe) requestId: number,
@@ -309,6 +319,7 @@ export class AdminController {
   /** 전체 판매자 계정 목록 조회 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/sellers')
+  @UseInterceptors(HttpCacheInterceptor)
   getSellerList(): Promise<AdminSellerListRes> {
     return this.sellerService.getSellerList();
   }

@@ -1,5 +1,6 @@
 import {
   Body,
+  CacheKey,
   Controller,
   Delete,
   Get,
@@ -9,9 +10,11 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { Policy } from '@prisma/client';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { PolicyService } from '@project-lc/nest-modules-policy';
 import { CreatePolicyDto, UpdatePolicyDto } from '@project-lc/shared-types';
@@ -20,18 +23,22 @@ import { CreatePolicyDto, UpdatePolicyDto } from '@project-lc/shared-types';
 // 정책(개인정보처리방침, 이용약관) Policy
 /** ================================= */
 @UseGuards(JwtAuthGuard, AdminGuard)
+@UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('admin/policy', 'policy')
 @Controller('admin/policy')
 export class AdminPolicyController {
   constructor(private readonly policyService: PolicyService) {}
 
   /** 정책(개인정보처리방침, 이용약관) 목록 조회 */
   @Get('list')
+  @CacheKey('admin/policy/list')
   async getPolicyList(): Promise<Omit<Policy, 'content'>[]> {
     return this.policyService.getAdminPolicyList();
   }
 
   // * 개별조회
   @Get()
+  @CacheKey('admin/policy')
   async getPolicy(@Query('id', ParseIntPipe) id: number): Promise<Policy | false> {
     return this.policyService.getOnePolicy(id, { isAdmin: true });
   }
