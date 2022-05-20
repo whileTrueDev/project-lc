@@ -1,15 +1,15 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
 import { OrderItemOption } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
-import { OrderItemWithRelations } from '@project-lc/shared-types';
+import { OrderDataWithRelations, OrderItemWithRelations } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { OrderStatusBadge } from './CustomerOrderItem';
-import OrderCancelStatusBadge from './OrderCancelStatusBadge';
 
 export interface OrderItemOptionInfoProps {
   option: OrderItemOption;
   orderItem: OrderItemWithRelations;
   displayStatus?: boolean;
+  order: OrderDataWithRelations;
 }
 export function OrderItemOptionInfo({
   option,
@@ -19,9 +19,6 @@ export function OrderItemOptionInfo({
   const goodsId = orderItem.goods.id;
   const goodsName = orderItem.goods.goods_name;
   const goodsImage = orderItem.goods.image?.[0]?.image;
-  const orderCancellation = orderItem.orderCancellationItems?.find(
-    (item) => item.orderItemOptionId === option.id,
-  );
   return (
     <Stack direction="row" alignItems="center">
       <Box
@@ -38,9 +35,6 @@ export function OrderItemOptionInfo({
         {displayStatus && (
           <Stack direction="row">
             <OrderStatusBadge step={option.step} />
-            {orderCancellation && (
-              <OrderCancelStatusBadge status={orderCancellation.status} />
-            )}
           </Stack>
         )}
 

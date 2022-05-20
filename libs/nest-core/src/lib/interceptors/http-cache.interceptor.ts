@@ -6,9 +6,12 @@ import {
   ExecutionContext,
   Injectable,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
+import _ from 'lodash';
 import { join } from 'path';
 import { Observable, of, tap } from 'rxjs';
+import { CACHE_CLEAR_KEY_METADATA } from '../constants/cache-clear-key';
 
 @Injectable()
 export class HttpCacheInterceptor extends CacheInterceptor {
@@ -52,20 +55,38 @@ export class HttpCacheInterceptor extends CacheInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Promise<Observable<any>> {
-    const key = this.trackBy(context);
-    const ttlValueOrFactory =
-      this.reflector.get(CACHE_TTL_METADATA, context.getHandler()) ?? null;
+    // eslint-disable-next-line prefer-destructuring
+    const reflector: Reflector = this.reflector;
+    // POST, PATCH, PUT, DELETE 메소드에 대해 @CacheClearKeys() 에 의한 캐시 해제 처리
+    const req = context.switchToHttp().getRequest<Request>();
+    if (['POST', 'PATCH', 'PUT', 'DELETE'].includes(req.method)) {
+      // 핸들러또는 클래스에 @CacheClearKeys() 데코레이터로 적용한 clear할 캐시키 목록 가져오기
+      const clearCacheKeys =
+        reflector.getAllAndMerge<string[]>(CACHE_CLEAR_KEY_METADATA, [
+          context.getHandler(),
+          context.getClass(),
+        ]) ?? null;
+      if (!clearCacheKeys) return next.handle();
 
-    if (!key) {
-      return next.handle();
+      return next.handle().pipe(
+        tap((resData) => {
+          if (this.isNil(resData)) return null;
+          const keys = [...new Set(clearCacheKeys)];
+          return keys.map((cachekey) => this._clearCaches(cachekey));
+        }),
+      );
     }
 
-    const isNil = <T = any>(v: T): boolean => {
-      return v === null || v === undefined;
-    };
+    const key = this.trackBy(context);
+    // 핸들러에 @CacheTTL() 데코레이터로 적용한 ttl 값 가져오기
+    const ttlValueOrFactory =
+      reflector.get(CACHE_TTL_METADATA, context.getHandler()) ?? null;
+
+    if (!key) return next.handle();
+
     try {
       const value = await this.cacheManager.get(key);
-      if (!isNil(value)) return of(value);
+      if (!this.isNil(value)) return of(value);
 
       const ttl =
         typeof ttlValueOrFactory === 'function'
@@ -73,8 +94,8 @@ export class HttpCacheInterceptor extends CacheInterceptor {
           : ttlValueOrFactory;
       return next.handle().pipe(
         tap((response) => {
-          if (!isNil(response)) {
-            const args = isNil(ttl) ? [key, response] : [key, response, { ttl }];
+          if (!this.isNil(response)) {
+            const args = this.isNil(ttl) ? [key, response] : [key, response, { ttl }];
             this.cacheManager.set(...args);
           }
         }),
@@ -82,5 +103,32 @@ export class HttpCacheInterceptor extends CacheInterceptor {
     } catch {
       return next.handle();
     }
+  }
+
+  private isNil = <T = any>(v: T): boolean => {
+    return v === null || v === undefined;
+  };
+
+  /**
+   * 받은 캐시키에 해당하는 캐시 데이터를 삭제합니다. 해당 캐시키가 포함되는 모든 key에 대해 삭제합니다.
+   * @param cacheKey 삭제할 캐시 키
+   */
+  private async _clearCaches(cacheKey: string): Promise<boolean> {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const client: Cluster = await this.cacheManager.store.getClient();
+    const redisNodes = client.nodes();
+    const _keys: string[][] = await Promise.all(
+      redisNodes.map((redis) => redis.keys(`*${cacheKey}*`)),
+    );
+    const keys = _.flatten(_keys);
+
+    const result = await Promise.all(keys.map((key) => this.cacheManager.del(key))).catch(
+      (err) => {
+        console.error(`An error occurred during clear caches - ${cacheKey}`, err);
+        return false;
+      },
+    );
+    return !!result;
   }
 }

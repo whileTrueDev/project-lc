@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
 import { KKsPaymentProviders, PaymentService } from '@project-lc/nest-modules-payment';
+import { ReturnService } from '@project-lc/nest-modules-return';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateRefundDto,
@@ -27,6 +28,7 @@ export class RefundService extends ServiceBaseWithCache {
     private readonly prisma: PrismaService,
     private readonly orderCancellationService: OrderCancellationService,
     private readonly paymentService: PaymentService,
+    private readonly returnService: ReturnService,
     @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
   ) {
     super(cacheManager);
@@ -154,7 +156,10 @@ export class RefundService extends ServiceBaseWithCache {
     // 연결된 반품요청 있는경우
     if (returnId) {
       // 환불정보와 연결
-      // TODO : 반품요청 상태를 완료로 업데이트(재배송/환불 일감 합친 후 진행)
+      await this.returnService.updateReturnStatus(returnId, {
+        status: 'complete',
+        refundId: data.id,
+      });
     }
 
     await this._clearCaches(this.#REFUND_CACHE_KEY);

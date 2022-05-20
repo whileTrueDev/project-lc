@@ -1,40 +1,12 @@
 import { AddIcon, MinusIcon } from '@chakra-ui/icons';
 import { Flex, Icon, Text } from '@chakra-ui/react';
-import { useCart } from '@project-lc/hooks';
-import { useCartStore } from '@project-lc/stores';
+import { useCart, useCartCalculatedMetrics } from '@project-lc/hooks';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
-import { useMemo } from 'react';
 import { FaEquals } from 'react-icons/fa';
 
 export function CartSummary(): JSX.Element | null {
   const { data } = useCart();
-  const { selectedItems } = useCartStore();
-  const calculated = useMemo(() => {
-    return selectedItems.reduce(
-      (prev, item) => {
-        const itemprice = item.options.reduce(
-          (p, n) => p + Number(n.normalPrice) * n.quantity,
-          0,
-        );
-        const orderPrice = item.options.reduce(
-          (p, n) => p + Number(n.discountPrice) * n.quantity,
-          0,
-        );
-        return {
-          totalGoodsPrice: prev.totalGoodsPrice + itemprice,
-          totalShippingCost: prev.totalShippingCost + Number(item.shippingCost),
-          totalOrderPrice: prev.totalOrderPrice + orderPrice,
-          totalDiscountAmount: prev.totalDiscountAmount + (itemprice - orderPrice),
-        };
-      },
-      {
-        totalGoodsPrice: 0,
-        totalDiscountAmount: 0,
-        totalShippingCost: 0,
-        totalOrderPrice: 0,
-      },
-    );
-  }, [selectedItems]);
+  const calculated = useCartCalculatedMetrics();
 
   if (!data || data.length === 0) return null;
   return (

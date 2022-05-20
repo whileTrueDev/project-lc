@@ -1,11 +1,6 @@
-import { Text, useToast, Stack } from '@chakra-ui/react';
+import { Center, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
-import {
-  INFINITE_ORDER_LIST_QUERY_KEY,
-  useCustomerOrderCancelMutation,
-  useOrderDetail,
-} from '@project-lc/hooks';
-import { useQueryClient } from 'react-query';
+import { useCustomerOrderCancelMutation, useOrderDetail } from '@project-lc/hooks';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
 
 export function OrderCancelDialog({
@@ -69,6 +64,7 @@ export function OrderCancelDialog({
             item.options.map((opt) => (
               <OrderItemOptionInfo
                 key={opt.id}
+                order={orderDetailData}
                 option={opt}
                 orderItem={item}
                 displayStatus={false}
@@ -77,7 +73,9 @@ export function OrderCancelDialog({
           )}
         </Stack>
       ) : (
-        <Text>loading...</Text>
+        <Center>
+          <Spinner />
+        </Center>
       )}
     </ConfirmDialog>
   );

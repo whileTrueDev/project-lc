@@ -255,12 +255,11 @@ export class OrderService extends ServiceBaseWithCache {
       include: {
         orderItems: {
           include: {
+            options: true,
             support: {
               include: { broadcaster: { select: { userNickname: true, avatar: true } } },
             },
             review: { select: { id: true } },
-            options: true,
-            orderCancellationItems: true,
             goods: {
               select: {
                 id: true,
@@ -270,8 +269,12 @@ export class OrderService extends ServiceBaseWithCache {
             },
           },
         },
-        orderCancellations: true,
         payment: true,
+        refunds: true,
+        exports: true,
+        exchanges: { select: { id: true, exchangeCode: true, exchangeItems: true } },
+        returns: { select: { id: true, returnCode: true, items: true } },
+        orderCancellations: { select: { id: true, cancelCode: true, items: true } },
       },
     });
 
@@ -291,14 +294,13 @@ export class OrderService extends ServiceBaseWithCache {
     return this.prisma.order.findFirst({
       where,
       include: {
-        payment: true,
         orderItems: {
           include: {
             options: true,
             support: {
               include: { broadcaster: { select: { userNickname: true, avatar: true } } },
             },
-            orderCancellationItems: true,
+            review: { select: { id: true } },
             goods: {
               select: {
                 id: true,
@@ -308,11 +310,12 @@ export class OrderService extends ServiceBaseWithCache {
             },
           },
         },
+        payment: true,
         refunds: true,
-        returns: true,
         exports: true,
-        exchanges: true,
-        orderCancellations: true,
+        exchanges: { select: { id: true, exchangeCode: true, exchangeItems: true } },
+        returns: { select: { id: true, returnCode: true, items: true } },
+        orderCancellations: { select: { id: true, cancelCode: true, items: true } },
       },
     });
   }

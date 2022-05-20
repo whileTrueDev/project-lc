@@ -28,7 +28,7 @@ export function IdCardImageUploadGuide(): JSX.Element {
         <ChakraNextImage
           width="300"
           height="200"
-          src={`${s3.fullDomain}public/idcard.png`}
+          src={`${s3.bucketDomain}public/idcard.png`}
         />
       </Box>
 
@@ -70,7 +70,7 @@ export function AccountImageUploadGuide(): JSX.Element {
         <ChakraNextImage
           width="400"
           height="400"
-          src={`${s3.fullDomain}real-account.png`}
+          src={`${s3.bucketDomain}real-account.png`}
         />
       </Box>
       <Text>
@@ -83,7 +83,7 @@ export function AccountImageUploadGuide(): JSX.Element {
         <ChakraNextImage
           width="400"
           height="400"
-          src={`${s3.fullDomain}public/internet-account.png`}
+          src={`${s3.bucketDomain}public/internet-account.png`}
         />
       </Box>
       <Text>

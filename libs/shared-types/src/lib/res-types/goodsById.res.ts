@@ -12,6 +12,7 @@ import {
   LiveShopping,
   ProductPromotion,
   Seller,
+  SellerShop,
   ShippingCost,
   ShippingGroup,
   ShippingOption,
@@ -19,7 +20,7 @@ import {
 } from '@prisma/client';
 
 export type GoodsRelatedBroadcaster = Pick<Broadcaster, 'id' | 'avatar' | 'userNickname'>;
-export type GoodsByIdRes = Goods & {
+export type GoodsByIdResBase = Goods & {
   options: (GoodsOptions & {
     supply: GoodsOptionsSupplies;
   })[];
@@ -50,7 +51,16 @@ export type GoodsByIdRes = Goods & {
   informationSubject: GoodsInformationSubject;
 };
 
-export type AdminGoodsByIdRes = GoodsByIdRes & {
+export type GoodsByIdSellerInfo = {
+  seller: Pick<Seller, 'avatar' | 'id' | 'name'> & {
+    sellerShop?: {
+      shopName: SellerShop['shopName'];
+    };
+  };
+};
+export type GoodsByIdRes = GoodsByIdResBase & GoodsByIdSellerInfo;
+
+export type AdminGoodsByIdRes = GoodsByIdResBase & {
   seller: Seller;
 };
 

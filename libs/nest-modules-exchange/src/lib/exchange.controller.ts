@@ -38,11 +38,11 @@ export class ExchangeController {
   }
 
   /** 특정 반품요청 상세 조회 */
-  @Get(':exchangeId')
+  @Get(':exchangeCode')
   getExchangeDetail(
-    @Param('exchangeId', ParseIntPipe) id: number,
+    @Param('exchangeCode') exchangeCode: string,
   ): Promise<ExchangeDetailRes> {
-    return this.exchangeService.getExchangeDetail(id);
+    return this.exchangeService.getExchangeDetail(exchangeCode);
   }
 
   /** 교환요청 내역 조회 */

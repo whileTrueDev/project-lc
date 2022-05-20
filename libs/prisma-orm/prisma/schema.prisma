@@ -1336,7 +1336,7 @@ model Coupon {
   amount               Int                @default(0) // 할인금액 혹은 할인율
   unit                 AmountUnit         @default(P) // 할인에 적용되는 단위 (퍼센트 P, 원 W)
   maxDiscountAmountWon Int? // 최대할인금액(원단위)
-  minOrderAmountWon    Int                @default(0) // 할인코드 적용 가능한 최소주문금액
+  minOrderAmountWon    Int                @default(0) // 쿠폰 적용 가능한 최소주문금액
   name                 String // 쿠폰명
   createDate           DateTime           @default(now()) // 생성일시
   startDate            DateTime // 유효시간 시작
@@ -1353,7 +1353,7 @@ model Coupon {
 model CustomerCoupon {
   id         Int                 @id @default(autoincrement()) // 소비자 발급쿠폰 고유번호
   couponId   Int
-  coupon     Coupon              @relation(fields: [couponId], references: [id])
+  coupon     Coupon              @relation(fields: [couponId], references: [id], onDelete: Cascade)
   customerId Int
   customer   Customer            @relation(fields: [customerId], references: [id])
   issueDate  DateTime            @default(now()) // 발급일
@@ -1400,6 +1400,8 @@ model CartItem {
   shippingCostIncluded Boolean          @default(false) // 이 장바구니 상품에 동일 판매자의 배송비가 포함되었는지 여부
   shippingGroupId      Int? // 연결된 배송정책 id
   shippingGroup        ShippingGroup?   @relation(fields: [shippingGroupId], references: [id]) // 연결된 배송정책
+
+  channel SellType @default(normal) // 판매유형(주문경로)
 }
 
 // 장바구니 상품옵션
@@ -1760,7 +1762,7 @@ model ReturnItem {
 
 enum ExchangeProcessStatus {
   requested // 요청됨(초기 상태, 담당자 확인전)
-  colledted // 교환 요청 상품 수거됨
+  collected // 교환 요청 상품 수거됨
   processing // 처리진행중 -> 연결된 교환출고가 없다면 교환출고대기를 의미함. 연결된 교환출고가 있다면 교환출고의 상태를 참조한다.
   complete // 처리완료
   canceled // 취소됨

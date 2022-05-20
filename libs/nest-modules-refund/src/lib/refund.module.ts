@@ -1,6 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { OrderModule } from '@project-lc/nest-modules-order';
 import { PaymentModule } from '@project-lc/nest-modules-payment';
+import { ReturnModule } from '@project-lc/nest-modules-return';
 import { RefundController } from './refund.controller';
 import { RefundService } from './refund.service';
 
@@ -13,6 +14,7 @@ export class RefundModule {
   private static readonly imports = [
     OrderModule.withoutControllers(),
     PaymentModule.withoutControllers(),
+    ReturnModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {
