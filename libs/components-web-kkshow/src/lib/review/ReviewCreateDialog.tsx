@@ -35,7 +35,7 @@ export function ReviewCreateDialog({
     if (!data.content || !data.rating) return null;
     if (!profile.data?.id) {
       toast({
-        description: '리뷰는 로그인 이후 작성 가능합니다. 로그인 정보를 확인해보세요.',
+        description: '후기는 로그인 이후 작성 가능합니다. 로그인 정보를 확인해보세요.',
         status: 'warning',
       });
       return null;
@@ -51,11 +51,11 @@ export function ReviewCreateDialog({
       })
       .then(() => {
         onClose();
-        toast({ description: '리뷰가 작성되었습니다.', status: 'success' });
+        toast({ description: '후기가 작성되었습니다.', status: 'success' });
       })
       .catch((err) => {
         console.log(err);
-        toast({ description: '리뷰 작성 중 오류가 발생했습니다.', status: 'error' });
+        toast({ description: '후기 작성 중 오류가 발생했습니다.', status: 'error' });
       });
   };
 
@@ -70,7 +70,7 @@ export function ReviewCreateDialog({
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>리뷰 작성</ModalHeader>
+        <ModalHeader>후기 작성</ModalHeader>
         <ModalBody>
           <ReviewCreateOrUpdateForm onSubmit={onSubmit} onCancel={onClose} />
         </ModalBody>
