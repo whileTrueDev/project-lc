@@ -1,0 +1,22 @@
+{
+  "root": "libs/nest-modules-coupon",
+  "sourceRoot": "libs/nest-modules-coupon/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/nest-modules-coupon/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/nest-modules-coupon"],
+      "options": {
+        "jestConfig": "libs/nest-modules-coupon/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
