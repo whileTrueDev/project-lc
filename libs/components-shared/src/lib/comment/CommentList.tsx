@@ -69,3 +69,5 @@ export function CommentList({
     </Box>
   );
 }
+
+export default CommentList;

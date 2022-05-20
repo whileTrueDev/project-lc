@@ -8,7 +8,7 @@ export interface useGoodsInquiryCommentMutationDto extends GoodsInquiryCommentDt
   goodsInquiryId: GoodsInquiry['id'];
 }
 export type useGoodsInquiryCommentMutationRes = GoodsInquiryComment;
-
+/** 상품 문의 답변 생성 */
 export const useGoodsInquiryCommentMutation = (): UseMutationResult<
   useGoodsInquiryCommentMutationRes,
   AxiosError,
@@ -30,6 +30,69 @@ export const useGoodsInquiryCommentMutation = (): UseMutationResult<
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries(['GoodsInquiryComment', data.goodsInquiryId]);
+      },
+    },
+  );
+};
+
+export interface useGoodsInquiryCommentUpdateMutationDto extends GoodsInquiryCommentDto {
+  goodsInquiryCommentId: GoodsInquiryComment['id'];
+  goodsInquiryId: GoodsInquiry['id'];
+}
+export type useGoodsInquiryCommentUpdateMutationRes = GoodsInquiryComment;
+/** 상품 문의 답변 수정 */
+export const useGoodsInquiryCommentUpdateMutation = (): UseMutationResult<
+  useGoodsInquiryCommentUpdateMutationRes,
+  AxiosError,
+  useGoodsInquiryCommentUpdateMutationDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    useGoodsInquiryCommentUpdateMutationRes,
+    AxiosError,
+    useGoodsInquiryCommentUpdateMutationDto
+  >(
+    (dto: useGoodsInquiryCommentUpdateMutationDto) =>
+      axios
+        .patch<useGoodsInquiryCommentUpdateMutationRes>(
+          `/goods-inquiry/${dto.goodsInquiryId}/comment/${dto.goodsInquiryCommentId}`,
+          { ...dto, goodsInquiryId: undefined, goodsInquiryCommentId: undefined },
+        )
+        .then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries(['GoodsInquiryComment', data.goodsInquiryId]);
+      },
+    },
+  );
+};
+
+export interface useGoodsInquiryCommentDeleteMutationDto {
+  goodsInquiryCommentId: GoodsInquiryComment['id'];
+  goodsInquiryId: GoodsInquiry['id'];
+}
+export type useGoodsInquiryCommentDeleteMutationRes = boolean;
+/** 상품 문의 답변 삭제 */
+export const useGoodsInquiryCommentDeleteMutation = (): UseMutationResult<
+  useGoodsInquiryCommentDeleteMutationRes,
+  AxiosError,
+  useGoodsInquiryCommentDeleteMutationDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    useGoodsInquiryCommentDeleteMutationRes,
+    AxiosError,
+    useGoodsInquiryCommentDeleteMutationDto
+  >(
+    (dto: useGoodsInquiryCommentDeleteMutationDto) =>
+      axios
+        .delete<useGoodsInquiryCommentDeleteMutationRes>(
+          `/goods-inquiry/${dto.goodsInquiryId}/comment/${dto.goodsInquiryCommentId}`,
+        )
+        .then((res) => res.data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['GoodsInquiryComment']);
       },
     },
   );
