@@ -15,7 +15,7 @@ export interface useReviewUpdateMutationDto extends GoodsReviewUpdateDto {
   reviewId: GoodsReview['id'];
 }
 export type useReviewUpdateMutationRes = GoodsReview;
-/** 리뷰 수정 */
+/** 후기 수정 */
 export const useReviewUpdateMutation = (): UseMutationResult<
   useReviewUpdateMutationRes,
   AxiosError,
@@ -48,7 +48,7 @@ export const useReviewUpdateMutation = (): UseMutationResult<
 
 export type useReviewCreateMutationDto = GoodsReviewCreateDto;
 export type useReviewCreateMutationRes = GoodsReview;
-/** 리뷰 수정 */
+/** 후기 수정 */
 export const useReviewCreateMutation = (): UseMutationResult<
   useReviewCreateMutationRes,
   AxiosError,
@@ -70,7 +70,7 @@ export const useReviewCreateMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.invalidateQueries(INFINITE_REVIEWS_KEY);
-        // 리뷰 작성 가능한 orderItem 목록 캐시 초기화
+        // 후기 작성 가능한 orderItem 목록 캐시 초기화
         queryClient.invalidateQueries(ORDERITEM_REVIEW_NEEDED_QUERY_KEY);
         // 내 주문목록 캐시 초기화
         queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
@@ -83,7 +83,7 @@ export interface useReviewDeleteMutationDto {
   reviewId: GoodsReview['id'];
 }
 export type useReviewDeleteMutationRes = boolean;
-/** 리뷰 삭제 */
+/** 후기 삭제 */
 export const useReviewDeleteMutation = (): UseMutationResult<
   useReviewDeleteMutationRes,
   AxiosError,
@@ -98,7 +98,7 @@ export const useReviewDeleteMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.invalidateQueries(INFINITE_REVIEWS_KEY);
-        // 리뷰 작성 가능한 orderItem 목록 캐시 초기화
+        // 후기 작성 가능한 orderItem 목록 캐시 초기화
         queryClient.invalidateQueries(ORDERITEM_REVIEW_NEEDED_QUERY_KEY);
         // 내 주문목록 캐시 초기화
         queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);

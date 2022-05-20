@@ -65,7 +65,7 @@ function ReviewCreateOrderItem({ item }: ReviewCreateOrderItemProps): JSX.Elemen
             isFullWidth={isFullWidth}
             onClick={onOpen}
           >
-            리뷰 작성하기
+            후기 작성하기
           </Button>
         </Box>
       </Flex>

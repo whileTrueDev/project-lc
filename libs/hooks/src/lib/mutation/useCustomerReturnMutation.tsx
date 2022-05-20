@@ -1,8 +1,13 @@
-import { CreateReturnRes, CreateReturnDto } from '@project-lc/shared-types';
+import {
+  CreateReturnDto,
+  CreateReturnRes,
+  DeleteReturnRes,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import axios from '../../axios';
 import { INFINITE_ORDER_LIST_QUERY_KEY } from '../queries/useOrderList';
+import { CUSTOMER_RETURN_LIST_QUERY_KEY } from '../queries/useReturn';
 
 /** 반품요청 생성 훅 */
 export const useCustomerReturnMutation = (): UseMutationResult<
@@ -16,7 +21,35 @@ export const useCustomerReturnMutation = (): UseMutationResult<
       axios.post<CreateReturnRes>('/return', dto).then((res) => res.data),
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY);
+        queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY, {
+          refetchInactive: true,
+        });
+        queryClient.invalidateQueries(CUSTOMER_RETURN_LIST_QUERY_KEY, {
+          refetchInactive: true,
+        });
+      },
+    },
+  );
+};
+
+/** 반품요청 삭제 훅 */
+export const useDeleteCustomerReturn = (): UseMutationResult<
+  DeleteReturnRes,
+  AxiosError,
+  number
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<DeleteReturnRes, AxiosError, number>(
+    (returnId: number) =>
+      axios.delete<DeleteReturnRes>(`/return/${returnId}`).then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries(INFINITE_ORDER_LIST_QUERY_KEY, {
+          refetchInactive: true,
+        });
+        queryClient.invalidateQueries(CUSTOMER_RETURN_LIST_QUERY_KEY, {
+          refetchInactive: true,
+        });
       },
     },
   );

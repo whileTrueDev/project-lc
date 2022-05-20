@@ -73,7 +73,9 @@ export function OrderItem({
           objectFit="cover"
         />
         <Box>
-          {/* // TODO: 마이페이지 리뷰관리 완료 이후 goods.seller.sellerShop.shopName 추가 */}
+          {goods.data.seller.sellerShop && (
+            <Text>{goods.data.seller.sellerShop?.shopName}</Text>
+          )}
           <Text>{goods.data.goods_name}</Text>
           {orderItem.options.map((option) => (
             <Stack direction="row" key={option.goodsOptionId} fontSize="sm" spacing={1}>

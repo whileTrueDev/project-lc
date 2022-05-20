@@ -124,9 +124,9 @@ export function ReviewCreateOrUpdateForm({
   return (
     <Box as="form" onSubmit={methods.handleSubmit(onSubmit)}>
       <Stack>
-        {/* 리뷰 평점 */}
+        {/* 후기 평점 */}
         <FormControl isInvalid={!!methods.formState.errors.rating} mb={2}>
-          <FormLabel>리뷰 평점</FormLabel>
+          <FormLabel>후기 평점</FormLabel>
           <Slider
             {...methods.register('rating')}
             onChange={(num) => methods.setValue('rating', num, { shouldDirty: true })}
@@ -154,9 +154,9 @@ export function ReviewCreateOrUpdateForm({
         </FormControl>
         <Divider />
 
-        {/* 리뷰 이미지 */}
+        {/* 후기 이미지 */}
         <FormControl isInvalid={!!methods.formState.errors.content} mb={2}>
-          <FormLabel>리뷰 이미지</FormLabel>
+          <FormLabel>후기 이미지</FormLabel>
           <Box mb={1}>
             <Button
               size="sm"
@@ -172,7 +172,7 @@ export function ReviewCreateOrUpdateForm({
               </Text>
             ) : null}
             <ImageInputDialog
-              modalTitle="리뷰 이미지 등록"
+              modalTitle="후기 이미지 등록"
               variant="chakra"
               isOpen={isOpen}
               onClose={onClose}
@@ -192,13 +192,13 @@ export function ReviewCreateOrUpdateForm({
         </FormControl>
         <Divider />
 
-        {/* 리뷰 내용 */}
+        {/* 후기 내용 */}
         <FormControl isInvalid={!!methods.formState.errors.content} mb={2}>
-          <FormLabel>리뷰 내용</FormLabel>
+          <FormLabel>후기 내용</FormLabel>
           <Textarea
             {...methods.register('content', {
-              required: '리뷰 내용을 작성해주세요.',
-              maxLength: { value: 1500, message: '리뷰는 최대 1500자까지 가능합니다.' },
+              required: '후기 내용을 작성해주세요.',
+              maxLength: { value: 1500, message: '후기는 최대 1500자까지 가능합니다.' },
             })}
             minH={300}
             maxH={450}

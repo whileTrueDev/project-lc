@@ -37,9 +37,9 @@ export class ReturnController {
   }
 
   /** 특정 반품요청 상세 조회 */
-  @Get(':returnId')
-  getReturnDetail(@Param('returnId', ParseIntPipe) id: number): Promise<ReturnDetailRes> {
-    return this.returnService.getReturnDetail(id);
+  @Get(':returnCode')
+  getReturnDetail(@Param('returnCode') returnCode: string): Promise<ReturnDetailRes> {
+    return this.returnService.getReturnDetail(returnCode);
   }
 
   /** 반품요청 내역 조회 */

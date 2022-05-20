@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { OrderCancellationService } from '@project-lc/nest-modules-order';
 import { KKsPaymentProviders, PaymentService } from '@project-lc/nest-modules-payment';
+import { ReturnService } from '@project-lc/nest-modules-return';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateRefundDto,
@@ -24,6 +25,7 @@ export class RefundService {
     private readonly orderCancellationService: OrderCancellationService,
     private readonly paymentService: PaymentService,
   ) {}
+
 
   /** 결제취소 테스트위해 결제데이터 필요하여 만들었음. // TODO: 프론트 작업시 삭제 */
   async makeFakeOrderWithFakePayment(): Promise<any> {
@@ -147,7 +149,10 @@ export class RefundService {
     // 연결된 반품요청 있는경우
     if (returnId) {
       // 환불정보와 연결
-      // TODO : 반품요청 상태를 완료로 업데이트(재배송/환불 일감 합친 후 진행)
+      await this.returnService.updateReturnStatus(returnId, {
+        status: 'complete',
+        refundId: data.id,
+      });
     }
 
     return data;

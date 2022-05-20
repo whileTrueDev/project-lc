@@ -9,7 +9,7 @@ import {
 import axios from '../../axios';
 
 export const getOrderList = async (dto: GetOrderListDto): Promise<OrderListRes> => {
-  return axios.get<OrderListRes>('/order/list', { params: dto }).then((res) => res.data);
+  return axios.get<OrderListRes>('/order', { params: dto }).then((res) => res.data);
 };
 
 export const useOrderList = (
