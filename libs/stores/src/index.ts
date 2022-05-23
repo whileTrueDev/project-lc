@@ -12,6 +12,7 @@ export * from './lib/liveShoppingStateBoardWindowStore';
 export * from './lib/mypageDesktopSidebarStore';
 export * from './lib/orderListDownloadStore';
 export * from './lib/sellerGoodsListPanelStore';
+export * from './lib/sellerOrderStore';
 export * from './lib/settlementHistoryStore';
 export * from './lib/shippingGroupItemStore';
 export * from './lib/shippingSetItemStore';
