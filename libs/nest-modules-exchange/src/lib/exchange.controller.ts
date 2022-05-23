@@ -11,7 +11,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateExchangeDto,
   CreateExchangeRes,
@@ -25,6 +25,7 @@ import {
 import { ExchangeService } from './exchange.service';
 
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('exchange')
 @Controller('exchange')
 export class ExchangeController {
   constructor(private readonly exchangeService: ExchangeService) {}
@@ -38,11 +39,11 @@ export class ExchangeController {
   }
 
   /** 특정 반품요청 상세 조회 */
-  @Get(':exchangeId')
+  @Get(':exchangeCode')
   getExchangeDetail(
-    @Param('exchangeId', ParseIntPipe) id: number,
+    @Param('exchangeCode') exchangeCode: string,
   ): Promise<ExchangeDetailRes> {
-    return this.exchangeService.getExchangeDetail(id);
+    return this.exchangeService.getExchangeDetail(exchangeCode);
   }
 
   /** 교환요청 내역 조회 */

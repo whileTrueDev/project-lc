@@ -11,7 +11,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateReturnDto,
   CreateReturnRes,
@@ -25,6 +25,7 @@ import {
 import { ReturnService } from './return.service';
 
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('return')
 @Controller('return')
 export class ReturnController {
   constructor(private readonly returnService: ReturnService) {}
@@ -36,9 +37,9 @@ export class ReturnController {
   }
 
   /** 특정 반품요청 상세 조회 */
-  @Get(':returnId')
-  getReturnDetail(@Param('returnId', ParseIntPipe) id: number): Promise<ReturnDetailRes> {
-    return this.returnService.getReturnDetail(id);
+  @Get(':returnCode')
+  getReturnDetail(@Param('returnCode') returnCode: string): Promise<ReturnDetailRes> {
+    return this.returnService.getReturnDetail(returnCode);
   }
 
   /** 반품요청 내역 조회 */

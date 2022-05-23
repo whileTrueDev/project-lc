@@ -8,9 +8,11 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { Manual } from '@prisma/client';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { ManualService } from '@project-lc/nest-modules-manual';
 import {
@@ -20,6 +22,8 @@ import {
 } from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
+@UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('manual')
 @Controller('admin/manual')
 export class AdminManualController {
   constructor(private readonly manualService: ManualService) {}

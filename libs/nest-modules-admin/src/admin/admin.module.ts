@@ -13,6 +13,7 @@ import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { MileageModule } from '@project-lc/nest-modules-mileage';
+import { CouponModule } from '@project-lc/nest-modules-coupon';
 import { AdminAccountService } from './admin-account.service';
 import { AdminCustomerController } from './admin-customer.controller';
 import { AdminGoodsCategoryController } from './admin-goods-category.controller';
@@ -26,6 +27,8 @@ import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { AdminMileageController } from './admin-mileage.controller';
+import { AdminCouponController } from './admin-coupon.controller';
+import { AdminCustomerCouponController } from './admin-customer-coupon.controller';
 
 @Module({})
 export class AdminModule {
@@ -52,6 +55,8 @@ export class AdminModule {
     AdminGoodsCategoryController,
     AdminCustomerController,
     AdminMileageController,
+    AdminCouponController,
+    AdminCustomerCouponController,
   ];
 
   private static readonly imports = [
@@ -67,6 +72,7 @@ export class AdminModule {
     GoodsCategoryModule.withoutControllers(),
     CustomerModule.withoutControllers(),
     MileageModule.withoutControllers(),
+    CouponModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {

@@ -1,4 +1,5 @@
-import { GoodsByIdRes } from '@project-lc/shared-types';
+import { Goods } from '@prisma/client';
+import { AllGoodsIdsRes, GoodsByIdRes } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
@@ -23,8 +24,6 @@ export const useGoodsById = (
     { initialData, enabled: !!goodsId },
   );
 };
-
-export type AllGoodsIdsRes = number[];
 
 export const ALL_GOODS_IDS_KEY = 'AllGoodsIds';
 export const getAllGoodsIds = async (): Promise<AllGoodsIdsRes> => {

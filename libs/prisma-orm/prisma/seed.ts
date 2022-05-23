@@ -31,12 +31,16 @@ import {
   testsellerExtraData,
 } from './seedData/dummyData';
 import {
+  createDummyOrderWithCancellation,
+  createDummyOrderWithExchange,
+  createDummyOrderWithReturn,
   nonMemberOrder,
   normalOrder,
   orderExportReady,
   purchaseConfirmedOrder,
   shippingDoneOrder,
 } from './seedData/dummyOrder';
+
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
@@ -101,10 +105,10 @@ async function createCustomer(): Promise<Customer> {
   const customer = await prisma.customer.create({ data: dummyCustomer });
   await prisma.customerAddress.create({
     data: {
-      title: '우리집',
-      recipient: '테스트소비자',
-      address: '부산',
-      detailAddress: '장전온천천로detailAddress',
+      title: '회사',
+      recipient: '크크쇼',
+      address: '부산 금정구 장전온천천로 51 ',
+      detailAddress: '313 호',
       postalCode: '12345',
       isDefault: true,
       customer: { connect: { id: customer.id } },
@@ -316,6 +320,12 @@ async function createDummyOrderData(): Promise<void> {
   await prisma.order.create({ data: orderExportReady });
 }
 
+async function createDummyOrderCancelReturnExchange(): Promise<void> {
+  await createDummyOrderWithCancellation();
+  await createDummyOrderWithExchange();
+  await createDummyOrderWithReturn();
+}
+
 /** 시드 메인 함수 */
 async function main(): Promise<void> {
   // 약관 데이터 저장
@@ -372,6 +382,7 @@ async function main(): Promise<void> {
 
   // 더미 주문데이터 생성
   await createDummyOrderData();
+  await createDummyOrderCancelReturnExchange();
 
   // 더미 상품리뷰 생성
   await createGoodsReview(prisma);

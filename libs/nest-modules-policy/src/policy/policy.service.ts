@@ -1,6 +1,5 @@
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Policy, Prisma } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreatePolicyDto,
@@ -9,26 +8,16 @@ import {
   POLICY_TARGET_USER,
   UpdatePolicyDto,
 } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 
 type PolicyFindOption = {
   isAdmin: boolean;
 };
 @Injectable()
-export class PolicyService extends ServiceBaseWithCache {
-  #POLICY_CACHE_KEY = 'policy';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class PolicyService {
+  constructor(private readonly prisma: PrismaService) {}
 
   private async countPolicy(where: Prisma.PolicyWhereInput): Promise<number> {
-    const policyCount = await this.prisma.policy.count({
-      where,
-    });
+    const policyCount = await this.prisma.policy.count({ where });
     return policyCount;
   }
 
@@ -54,7 +43,6 @@ export class PolicyService extends ServiceBaseWithCache {
         version: nextVersion,
       },
     });
-    await this._clearCaches(this.#POLICY_CACHE_KEY);
     return data;
   }
 
@@ -95,7 +83,6 @@ export class PolicyService extends ServiceBaseWithCache {
       where: { id: policy.id },
       data: { ...dto },
     });
-    await this._clearCaches(this.#POLICY_CACHE_KEY);
     return data;
   }
 
@@ -122,7 +109,6 @@ export class PolicyService extends ServiceBaseWithCache {
       where: { id: policy.id },
     });
 
-    await this._clearCaches(this.#POLICY_CACHE_KEY);
     return true;
   }
 

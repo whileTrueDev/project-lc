@@ -1,7 +1,6 @@
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma, Return } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { Cache } from 'cache-manager';
 import {
   CreateReturnDto,
   CreateReturnRes,
@@ -13,17 +12,10 @@ import {
   UpdateReturnRes,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
-import { Prisma, Return } from '@prisma/client';
 
 @Injectable()
-export class ReturnService extends ServiceBaseWithCache {
-  #RETURN_CACHE_KEY = 'return';
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class ReturnService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /** 반품코드 생성 */
   private createReturnCode(): string {
@@ -51,7 +43,6 @@ export class ReturnService extends ServiceBaseWithCache {
       },
     });
 
-    await this._clearCaches(this.#RETURN_CACHE_KEY);
     return data;
   }
 
@@ -68,16 +59,63 @@ export class ReturnService extends ServiceBaseWithCache {
         items: { some: { orderItem: { goods: { sellerId: dto.sellerId } } } },
       };
     }
+
+    const totalCount = await this.prisma.return.count({ where });
     const data = await this.prisma.return.findMany({
       take: dto.take,
       skip: dto.skip,
       where,
+      orderBy: { requestDate: 'desc' },
       include: {
-        items: true,
+        order: { select: { orderCode: true } },
+        refund: true,
+        items: {
+          include: {
+            orderItem: {
+              select: {
+                id: true,
+                goods: {
+                  select: {
+                    id: true,
+                    goods_name: true,
+                    image: true,
+                    seller: { select: { sellerShop: true } },
+                  },
+                },
+              },
+            },
+            orderItemOption: true,
+          },
+        },
         images: true,
       },
     });
-    return data;
+
+    // 조회한 데이터를 필요한 형태로 처리
+    const list = data.map((d) => {
+      const { items, ...rest } = d;
+
+      const _items = items.map((i) => ({
+        id: i.id, // 반품 상품 고유번호
+        amount: i.amount, // 반품 상품 개수
+        status: i.status, // 반품 상품 처리상태
+        goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
+        image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지
+        shopName: i.orderItem.goods.seller.sellerShop?.shopName, // 주문상품 판매상점명
+        optionName: i.orderItemOption.name, // 주문상품옵션명
+        optionValue: i.orderItemOption.value, // 주문상품옵션 값
+        price: Number(i.orderItemOption.discountPrice), // 주문상품옵션 가격
+        orderItemId: i.orderItem.id, // 연결된 주문상품고유번호
+        orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
+      }));
+
+      return { ...rest, items: _items };
+    });
+
+    return {
+      list,
+      totalCount,
+    };
   }
 
   async findUnique(where: Prisma.ReturnWhereUniqueInput): Promise<Return> {
@@ -93,18 +131,54 @@ export class ReturnService extends ServiceBaseWithCache {
   }
 
   /** 특정 반품요청 상세 조회 */
-  async getReturnDetail(id: number): Promise<ReturnDetailRes> {
-    await this.findUnique({ id });
+  async getReturnDetail(returnCode: string): Promise<ReturnDetailRes> {
+    await this.findUnique({ returnCode });
 
-    return this.prisma.return.findUnique({
-      where: { id },
+    const data = await this.prisma.return.findUnique({
+      where: { returnCode },
       include: {
-        order: { select: { orderCode: true, id: true } },
-        items: true,
-        images: true,
+        order: { select: { orderCode: true } },
         refund: true,
+        items: {
+          include: {
+            orderItem: {
+              select: {
+                id: true,
+                goods: {
+                  select: {
+                    id: true,
+                    goods_name: true,
+                    image: true,
+                    seller: { select: { sellerShop: true } },
+                  },
+                },
+              },
+            },
+            orderItemOption: true,
+          },
+        },
+        images: true,
       },
     });
+    const { items, ...rest } = data;
+    const _items = items.map((i) => ({
+      id: i.id, // 반품 상품 고유번호
+      amount: i.amount, // 반품 상품 개수
+      status: i.status, // 반품 상품 처리상태
+      goodsName: i.orderItem.goods.goods_name, // 원래 주문한 상품명
+      image: i.orderItem.goods.image?.[0]?.image, // 주문 상품 이미지
+      shopName: i.orderItem.goods.seller.sellerShop?.shopName, // 주문상품 판매상점명
+      optionName: i.orderItemOption.name, // 주문상품옵션명
+      optionValue: i.orderItemOption.value, // 주문상품옵션 값
+      price: Number(i.orderItemOption.discountPrice), // 주문상품옵션 가격
+      orderItemId: i.orderItem.id, // 연결된 주문상품고유번호
+      orderItemOptionId: i.orderItemOption.id, // 연결된 주문상품옵션 고유번호
+    }));
+
+    return {
+      ...rest,
+      items: _items,
+    };
   }
 
   /** 반품요청 상태 변경(판매자 혹은 관리자가 진행) */
@@ -118,10 +192,15 @@ export class ReturnService extends ServiceBaseWithCache {
         ...rest,
         completeDate: dto.status && dto.status === 'complete' ? new Date() : undefined,
         refund: refundId ? { connect: { id: refundId } } : undefined,
+        items: {
+          updateMany: {
+            where: { returnId: id },
+            data: { status: dto.status },
+          },
+        },
       },
     });
 
-    await this._clearCaches(this.#RETURN_CACHE_KEY);
     return true;
   }
 
@@ -132,10 +211,7 @@ export class ReturnService extends ServiceBaseWithCache {
       throw new BadRequestException(`처리되기 이전에만 삭제가 가능합니다`);
     }
 
-    await this.prisma.return.delete({
-      where: { id },
-    });
-    await this._clearCaches(this.#RETURN_CACHE_KEY);
+    await this.prisma.return.delete({ where: { id } });
     return true;
   }
 }

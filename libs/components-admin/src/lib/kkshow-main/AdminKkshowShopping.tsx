@@ -78,7 +78,7 @@ const tabs: { title: string; component: JSX.Element }[] = [
         fieldName="popularGoods"
         buttons={[
           {
-            label: '많이찾은상품 추가(최대 개까지만 보여짐)',
+            label: '많이찾은상품 추가(최대 5개까지만 보여짐)',
             icon: <AddIcon />,
             onClick: ({ append }) => append({}),
           },
