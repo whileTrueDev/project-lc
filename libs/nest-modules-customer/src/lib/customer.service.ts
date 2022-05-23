@@ -65,6 +65,11 @@ export class CustomerService extends ServiceBaseWithCache {
     customerId: Customer['id'],
     dto: UpdateCustomerDto,
   ): Promise<Customer> {
+    /* eslint no-param-reassign: "error" */
+    if (dto.birthDate) {
+      dto.birthDate = new Date(dto.birthDate);
+    }
+    await this._clearCaches(this.#CUSTOMER_CACHE_KEY);
     return this.prisma.customer.update({
       where: { id: customerId },
       data: dto,
@@ -76,6 +81,7 @@ export class CustomerService extends ServiceBaseWithCache {
     const result = await this.prisma.customer.delete({
       where: { id: customerId },
     });
+    await this._clearCaches(this.#CUSTOMER_CACHE_KEY);
     return !!result;
   }
 
