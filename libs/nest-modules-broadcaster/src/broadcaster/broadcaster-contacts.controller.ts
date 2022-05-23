@@ -11,7 +11,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { BroadcasterContactDto } from '@project-lc/shared-types';
 import { BroadcasterContacts } from '.prisma/client';
@@ -25,6 +25,7 @@ export class BroadcasterContactsController {
 
   /** 방송인 연락처 생성 */
   @Post()
+  @CacheClearKeys('broadcaster/contacts')
   public async createContact(
     @Body(ValidationPipe) dto: BroadcasterContactDto,
   ): Promise<BroadcasterContacts> {
@@ -41,6 +42,7 @@ export class BroadcasterContactsController {
 
   /** 방송인 연락처 수정 */
   @Put(':contactId')
+  @CacheClearKeys('broadcaster/contacts')
   public async updateContact(
     @Param('contactId', ParseIntPipe) contactId: BroadcasterContacts['id'],
     @Body(ValidationPipe) dto: BroadcasterContactDto,
@@ -50,6 +52,7 @@ export class BroadcasterContactsController {
 
   /** 방송인 연락처 삭제 */
   @Delete(':contactId')
+  @CacheClearKeys('broadcaster/contacts')
   public async deleteContact(
     @Param('contactId', ParseIntPipe) contactId: BroadcasterContacts['id'],
   ): Promise<boolean> {

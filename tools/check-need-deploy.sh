@@ -1,9 +1,8 @@
 # Name of the app to check. Change this to your application name!
 APP=$1
-HEAD_SHA=$2
 
 # Run the affected command, comparing latest commit to the one before that
-yarn nx affected:apps --plain --base HEAD~1 --head $HEAD_SHA | grep $APP -q
+yarn nx affected:apps --plain --base HEAD~1 | grep $APP
 
 # Store result of the previous command (grep)
 IS_AFFECTED=$?

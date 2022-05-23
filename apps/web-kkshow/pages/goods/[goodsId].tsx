@@ -13,12 +13,12 @@ import { GoodsViewNavBar } from '@project-lc/components-web-kkshow/goods/nav/Goo
 import { GoodsViewStickyNav } from '@project-lc/components-web-kkshow/goods/nav/GoodsViewStickyNav';
 import { KkshowNavbar } from '@project-lc/components-web-kkshow/KkshowNavbar';
 import {
-  AllGoodsIdsRes,
   ALL_GOODS_IDS_KEY,
   generateGoodsByIdKey,
   getAllGoodsIds,
   getGoodsById,
 } from '@project-lc/hooks';
+import { AllGoodsIdsRes } from '@project-lc/shared-types';
 import { useGoodsViewStore } from '@project-lc/stores';
 import { createQueryClient } from '@project-lc/utils-frontend';
 import { AxiosError } from 'axios';
@@ -64,7 +64,7 @@ export const getStaticPaths: GetStaticPaths<KkshowGoodsParams> = async () => {
     ALL_GOODS_IDS_KEY,
     { queryFn: getAllGoodsIds },
   );
-  const paths = goodIds.map((gid) => ({ params: { goodsId: gid.toString() } }));
+  const paths = goodIds.map((gid) => ({ params: { goodsId: gid.id.toString() } }));
   return { paths, fallback: true };
 };
 
