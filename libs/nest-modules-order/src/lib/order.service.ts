@@ -14,6 +14,7 @@ import {
   FmOrderStatusNumString,
   GetNonMemberOrderDetailDto,
   GetOrderListDto,
+  getOrderProcessStepNameByStringNumber,
   OrderDetailRes,
   OrderListRes,
   orderProcessStepDict,
@@ -295,10 +296,7 @@ export class OrderService extends ServiceBaseWithCache {
   private getStepNameByStringNumber(
     stringNumber: FmOrderStatusNumString,
   ): OrderProcessStep {
-    const stepKey = Object.keys(orderProcessStepDict).find(
-      (key) => orderProcessStepDict[key] === stringNumber,
-    );
-    return stepKey as OrderProcessStep;
+    return getOrderProcessStepNameByStringNumber(stringNumber);
   }
 
   /** 판매자의 주문조회시 주문에 포함된 판매자의 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 함수

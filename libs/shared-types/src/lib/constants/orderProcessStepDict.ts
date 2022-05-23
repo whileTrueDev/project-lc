@@ -19,6 +19,16 @@ export const orderProcessStepDict: Record<OrderProcessStep, FmOrderStatusNumStri
   paymentFailed: '99', // 결제실패,
 };
 
+/** '15' 와 같은 stringNumber로 orderReceived와 같은  OrderProcessStep 값 리턴 */
+export function getOrderProcessStepNameByStringNumber(
+  stringNumber: FmOrderStatusNumString,
+): OrderProcessStep {
+  const stepKey = Object.keys(orderProcessStepDict).find(
+    (key) => orderProcessStepDict[key] === stringNumber,
+  );
+  return stepKey as OrderProcessStep;
+}
+
 /** 배송조회가 가능한 주문상태목록 - 출고완료 이후 */
 export const deliveryTrackingAbleSteps: OrderProcessStep[] = [
   'exportDone',
