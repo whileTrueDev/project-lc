@@ -1,7 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import {
-  Badge,
   Box,
   Button,
   ButtonGroup,
@@ -12,8 +11,9 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { GoodsInquiry, GoodsInquiryComment } from '@prisma/client';
+import { GoodsInquiryComment } from '@prisma/client';
 import { CommentList } from '@project-lc/components-shared/comment/CommentList';
+import { GoodsInquiryStatusBadge } from '@project-lc/components-shared/GoodsInquiryStatusBadge';
 import {
   useGoodsInquiryComments,
   useGoodsOutlineById,
@@ -25,7 +25,7 @@ import {
   GoodsInquiryCommentResItem,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import SellerGoodsInquiryCommentCreateDialog from './SellerGoodsInquiryCommentCreateDialog';
 import SellerGoodsInquiryCommentDeleteDialog from './SellerGoodsInquiryCommentDeleteDialog';
 import SellerGoodsInquiryCommentUpdateDialog from './SellerGoodsInquiryCommentUpdateDialog';
@@ -35,18 +35,36 @@ export function SellerGoodsInquiryList(): JSX.Element | null {
   const { data, isFetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteGoodsInquiries({ sellerId: profile?.id }, { enabled: !!profile?.id });
 
+  const [onlyRequested, setOnlyRequested] = useState(false);
+  const handleFilterClick = (): void => {
+    setOnlyRequested(!onlyRequested);
+  };
+
   if (!data) return null;
   return (
     <Box my={4}>
-      {data?.pages[0].goodsInquiries.length === 0 && (
+      {data?.pages[0].goodsInquiries.length === 0 ? (
         <Text textAlign="center">문의 내역이 없습니다</Text>
+      ) : (
+        <ButtonGroup>
+          <Button
+            variant="outline"
+            size="sm"
+            colorScheme="blue"
+            onClick={handleFilterClick}
+          >
+            {!onlyRequested ? '답변 필요한 문의만 보기' : '상품 문의 모두 보기'}
+          </Button>
+        </ButtonGroup>
       )}
 
       {data?.pages.map((page, idx) => (
         <Box key={idx}>
-          {page.goodsInquiries.map((inq) => (
-            <SellerGoodsInquiryListItem key={inq.id} inquiry={inq} />
-          ))}
+          {page.goodsInquiries
+            .filter((iq) => (onlyRequested ? iq.status === 'requested' : true))
+            .map((inq) => (
+              <SellerGoodsInquiryListItem key={inq.id} inquiry={inq} />
+            ))}
         </Box>
       ))}
 
@@ -68,24 +86,6 @@ export function SellerGoodsInquiryList(): JSX.Element | null {
 }
 export default SellerGoodsInquiryList;
 
-type GoodsInquiryStatus = Array<'by-me' | 'by-admin'>;
-/** 상품문의 상태 조회 */
-const useGoodsInquiryStatus = (inquiryId: GoodsInquiry['id']): GoodsInquiryStatus => {
-  const comments = useGoodsInquiryComments(inquiryId);
-  const { data: profile } = useProfile();
-  /** 답변 상태 */
-  const commentStatus = useMemo(() => {
-    const result: GoodsInquiryStatus = [];
-    const byMe = comments.data?.some((comm) => comm.sellerId === profile?.id);
-    if (byMe) return result.concat('by-me');
-    const byAdmin = comments.data?.some((c) => !!c.adminId);
-    if (byAdmin) return result.concat('by-admin');
-    return result;
-  }, [comments.data, profile?.id]);
-
-  return commentStatus;
-};
-
 export interface SellerGoodsInquiryListItemProps {
   inquiry: FindGoodsInquiryItem;
 }
@@ -96,9 +96,6 @@ export function SellerGoodsInquiryListItem({
   const { data: profile } = useProfile();
   const goods = useGoodsOutlineById(inquiry.goodsId);
   const comments = useGoodsInquiryComments(inquiry.id);
-
-  /** 답변 달았는 지 상태 */
-  const status = useGoodsInquiryStatus(inquiry.id);
 
   // 수정/삭제 타겟 답변
   const [targetComment, setTargetComment] = useState<null | GoodsInquiryComment>(null);
@@ -122,23 +119,7 @@ export function SellerGoodsInquiryListItem({
     <Box p={[2, 4]} borderWidth="thin" rounded="md" my={2}>
       <Flex justify="space-between" fontSize="sm">
         <Box>
-          <Flex alignItems="center" gap={1} flexWrap="wrap">
-            {status.includes('by-me') && (
-              <Badge variant="solid" colorScheme="green">
-                답변 작성 완료
-              </Badge>
-            )}
-            {status.includes('by-admin') && (
-              <Badge variant="solid" colorScheme="orange">
-                크크쇼관리자 답변 완료
-              </Badge>
-            )}
-            {status.length === 0 && (
-              <Badge variant="outline" colorScheme="gray">
-                답변 필요
-              </Badge>
-            )}
-          </Flex>
+          <GoodsInquiryStatusBadge goodsInquiryStatus={inquiry.status} />
           <Flex mt={1} gap={1} alignItems="center" fontSize="sm">
             <Image
               draggable={false}

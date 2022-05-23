@@ -40,7 +40,7 @@ import {
   purchaseConfirmedOrder,
   shippingDoneOrder,
 } from './seedData/dummyOrder';
-import { createGoodsInquiry } from './seedData/goods-inquiry';
+import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquiry';
 
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
@@ -391,6 +391,7 @@ async function main(): Promise<void> {
 
   // 더미 상품문의 생성
   await createGoodsInquiry(prisma);
+  await createGoodsInquiry2(prisma);
 }
 
 main()
