@@ -105,10 +105,10 @@ async function createCustomer(): Promise<Customer> {
   const customer = await prisma.customer.create({ data: dummyCustomer });
   await prisma.customerAddress.create({
     data: {
-      title: '우리집',
-      recipient: '테스트소비자',
-      address: '부산',
-      detailAddress: '장전온천천로detailAddress',
+      title: '회사',
+      recipient: '크크쇼',
+      address: '부산 금정구 장전온천천로 51 ',
+      detailAddress: '313 호',
       postalCode: '12345',
       isDefault: true,
       customer: { connect: { id: customer.id } },
