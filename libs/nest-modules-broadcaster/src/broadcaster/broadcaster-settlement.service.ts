@@ -1,35 +1,25 @@
 import {
   BadRequestException,
-  CACHE_MANAGER,
-  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { CipherService } from '@project-lc/nest-modules-cipher';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminBroadcasterSettlementInfoList,
   BroadcasterSettlementInfoDto,
   BroadcasterSettlementInfoRes,
-  BusinessRegistrationStatus,
 } from '@project-lc/shared-types';
-import { CipherService } from '@project-lc/nest-modules-cipher';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { Cache } from 'cache-manager';
-import { BroadcasterSettlementInfo, Broadcaster } from '.prisma/client';
+import { Broadcaster, BroadcasterSettlementInfo } from '.prisma/client';
 import { BroadcasterService } from './broadcaster.service';
 
 @Injectable()
-export class BroadcasterSettlementService extends ServiceBaseWithCache {
-  #BROADCASTER_SETTLEMENT_CACHE_KEY = 'broadcaster/settlement-info';
-
+export class BroadcasterSettlementService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly broadcasterService: BroadcasterService,
     private readonly cipherService: CipherService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+  ) {}
 
   /** 방송인 정산정보 등록 및 수정 */
   async insertSettlementInfo(
@@ -64,7 +54,6 @@ export class BroadcasterSettlementService extends ServiceBaseWithCache {
           confirmation: { update: { status: 'waiting' } },
         },
       });
-      await this._clearCaches(this.#BROADCASTER_SETTLEMENT_CACHE_KEY);
       return result;
     } catch (error) {
       throw new InternalServerErrorException(error);

@@ -1,12 +1,5 @@
-import {
-  BadRequestException,
-  CACHE_MANAGER,
-  ForbiddenException,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { OrderCancellation, Prisma, ProcessStatus } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderCancellationDto,
@@ -19,19 +12,11 @@ import {
   OrderCancellationUpdateRes,
   UpdateOrderCancellationStatusDto,
 } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 import { nanoid } from 'nanoid';
 
 @Injectable()
-export class OrderCancellationService extends ServiceBaseWithCache {
-  #ORDER_CANCELLATION_CACHE_KEY = 'order-cancellation';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class OrderCancellationService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /* 주문취소 생성(소비자가 주문취소 요청 생성) */
   async createOrderCancellation(
@@ -83,10 +68,6 @@ export class OrderCancellationService extends ServiceBaseWithCache {
     if (status === 'complete') {
       await this.updateOrderStateToOrderInvalidated(orderId);
     }
-
-    await this._clearCaches(this.#ORDER_CANCELLATION_CACHE_KEY);
-    // 주문캐시도 삭제
-    await this._clearCaches('order');
     return data;
   }
 
@@ -221,7 +202,6 @@ export class OrderCancellationService extends ServiceBaseWithCache {
       await this.updateOrderStateToOrderInvalidated(orderCancellation.orderId);
     }
 
-    await this._clearCaches(this.#ORDER_CANCELLATION_CACHE_KEY);
     return orderCancellation;
   }
 
@@ -253,7 +233,6 @@ export class OrderCancellationService extends ServiceBaseWithCache {
       where: { id },
     });
 
-    await this._clearCaches(this.#ORDER_CANCELLATION_CACHE_KEY);
     return !!data;
   }
 

@@ -1,6 +1,6 @@
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Exchange, Prisma } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
+
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateExchangeDto,
@@ -16,14 +16,8 @@ import { Cache } from 'cache-manager';
 import { nanoid } from 'nanoid';
 
 @Injectable()
-export class ExchangeService extends ServiceBaseWithCache {
-  #EXCHANGE_CACHE_KEY = 'exchange';
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class ExchangeService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /** 교환코드 생성 */
   private createExchangeCode(): string {
@@ -53,7 +47,6 @@ export class ExchangeService extends ServiceBaseWithCache {
       },
     });
 
-    await this._clearCaches(this.#EXCHANGE_CACHE_KEY);
     return data;
   }
 
@@ -194,7 +187,6 @@ export class ExchangeService extends ServiceBaseWithCache {
       },
     });
 
-    this._clearCaches(this.#EXCHANGE_CACHE_KEY);
     return true;
   }
 
@@ -215,7 +207,6 @@ export class ExchangeService extends ServiceBaseWithCache {
       where: { id },
     });
 
-    await this._clearCaches(this.#EXCHANGE_CACHE_KEY);
     return true;
   }
 }

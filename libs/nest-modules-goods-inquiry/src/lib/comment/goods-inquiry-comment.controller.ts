@@ -12,13 +12,14 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { GoodsInquiry, GoodsInquiryComment } from '@prisma/client';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { GoodsInquiryCommentDto } from '@project-lc/shared-types';
 import { GoodsInquiryCommentService } from './goods-inquiry-comment.service';
 
-@Controller('goods-inquiry/:goodsInquiryId/comment')
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('goods-inquiry')
+@Controller('goods-inquiry/:goodsInquiryId/comment')
 export class GoodsInquiryCommentController {
   constructor(private readonly service: GoodsInquiryCommentService) {}
 

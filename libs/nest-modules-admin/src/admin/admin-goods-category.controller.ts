@@ -8,9 +8,11 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { GoodsCategory } from '@prisma/client';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { GoodsCategoryService } from '@project-lc/nest-modules-goods-category';
 import {
@@ -23,6 +25,8 @@ import {
 // 카테고리 GoodsCaregory
 /** ================================= */
 @UseGuards(JwtAuthGuard, AdminGuard)
+@UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('goods-category', 'goods')
 @Controller('admin/goods-category')
 export class AdminGoodsCategoryController {
   constructor(private readonly categoryService: GoodsCategoryService) {}
