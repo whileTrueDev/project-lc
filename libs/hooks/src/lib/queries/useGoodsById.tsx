@@ -47,8 +47,6 @@ export const useGoodsOutlineById = (
   );
 };
 
-export type AllGoodsIdsRes = number[];
-
 export const ALL_GOODS_IDS_KEY = 'AllGoodsIds';
 export const getAllGoodsIds = async (): Promise<AllGoodsIdsRes> => {
   return axios
