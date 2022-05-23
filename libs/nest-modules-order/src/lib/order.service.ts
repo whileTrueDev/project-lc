@@ -5,22 +5,24 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { Order, OrderProcessStep, Prisma } from '@prisma/client';
+import { Order, OrderItemOption, OrderProcessStep, Prisma } from '@prisma/client';
 import { ServiceBaseWithCache, UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
+  FmOrderStatusNumString,
   GetNonMemberOrderDetailDto,
   GetOrderListDto,
   OrderDetailRes,
   OrderListRes,
+  orderProcessStepDict,
   OrderPurchaseConfirmationDto,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { Cache } from 'cache-manager';
-import dayjs = require('dayjs');
 import { nanoid } from 'nanoid';
+import dayjs = require('dayjs');
 
 @Injectable()
 export class OrderService extends ServiceBaseWithCache {
@@ -289,6 +291,102 @@ export class OrderService extends ServiceBaseWithCache {
     };
   }
 
+  /** '15' 와 같은 stringNumber로 orderReceived와 같은  OrderProcessStep 값 리턴 */
+  private getStepNameByStringNumber(
+    stringNumber: FmOrderStatusNumString,
+  ): OrderProcessStep {
+    const stepKey = Object.keys(orderProcessStepDict).find(
+      (key) => orderProcessStepDict[key] === stringNumber,
+    );
+    return stepKey as OrderProcessStep;
+  }
+
+  /** 판매자의 주문조회시 주문에 포함된 판매자의 상품옵션의 상태에 따라 표시될 주문의 상태 구하는 함수
+   * (FmOrderService 의 getOrderRealStep와 같은 로직 )
+   */
+  private getOrderRealStep(
+    originOrderStep: OrderProcessStep,
+    sellerGoodsOrderItemOptions: OrderItemOption[],
+  ): OrderProcessStep {
+    // 주문상태가 partial000 인지 확인(부분000인지)
+    const isPartialStep = [
+      'partialExportReady',
+      'partialExportDone',
+      'partialShipping',
+      'partialShippingDone',
+    ].includes(originOrderStep);
+
+    const originOrderStepNum = Number(orderProcessStepDict[originOrderStep]);
+
+    // 원 주문 상태가 부분000 일때
+    if (isPartialStep) {
+      // 5를 더해 "부분" 상태를 제거한 상태
+      const nonPartialStep = String(originOrderStepNum + 5) as FmOrderStatusNumString;
+      // 옵션들 모두가 "부분" 상태를 제거한 상태만 있는 지 확인, 그렇다면 "부분" 상태를 제거한 상태를 반환
+      if (
+        sellerGoodsOrderItemOptions.every(
+          (io) => orderProcessStepDict[io.step] === nonPartialStep,
+        )
+      ) {
+        return this.getStepNameByStringNumber(nonPartialStep);
+      }
+    }
+
+    // 옵션들 모두가 "부분" 상태보다 작은지 확인, 그렇다면 옵션들 중 가장 높은 상태를 반환
+    if (
+      sellerGoodsOrderItemOptions.every(
+        (io) => Number(orderProcessStepDict[io.step]) < originOrderStepNum,
+      )
+    ) {
+      const maxOptionStepStrNum = Math.max(
+        ...sellerGoodsOrderItemOptions.map((io) => Number(orderProcessStepDict[io.step])),
+      ).toString() as FmOrderStatusNumString;
+
+      return this.getStepNameByStringNumber(maxOptionStepStrNum);
+    }
+    // 옵션 중 원래 주문상태보다 하나라도 낮거나 높은 상태가 있는 경우 그대로 반환
+
+    return originOrderStep;
+  }
+
+  /** 특정 판매자 주문목록 조회 - 주문상품 중 판매자의 상품만 추려냄 & 주문상태 표시는 판매자의 상품 상태에 따라 표시되는 후처리 추가  */
+  async getSellerOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
+    if (!dto.sellerId)
+      throw new BadRequestException('판매자 주문 목록 조회시 sellerId를 입력해야합니다');
+    const { orders, ...rest } = await this.getOrderList(dto);
+
+    // 판매자 주문목록 후처리
+    // 주문상품옵션 중 자기 상품옵션만 남기기
+    // 자기상품옵션 상태에 기반한 주문상태 표시
+    const ordersWithOnlySellerGoodsOrderItems = orders.map((o) => {
+      const { orderItems, ...orderRestData } = o;
+
+      // 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
+      const sellerGoodsOrderItems = orderItems.filter(
+        (oi) => oi.goods.sellerId === dto.sellerId,
+      );
+      // 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
+      let displaySellerOrderStep: OrderProcessStep = o.step;
+
+      if (sellerGoodsOrderItems.length > 0) {
+        displaySellerOrderStep = this.getOrderRealStep(
+          o.step,
+          sellerGoodsOrderItems.flatMap((oi) => oi.options),
+        );
+      }
+      return {
+        ...orderRestData,
+        step: displaySellerOrderStep,
+        orderItems: sellerGoodsOrderItems,
+      };
+    });
+
+    return {
+      orders: ordersWithOnlySellerGoodsOrderItems,
+      ...rest,
+    };
+  }
+
   /** 전체 주문목록 조회 */
   async getOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
     const { take, skip } = dto;
@@ -312,6 +410,7 @@ export class OrderService extends ServiceBaseWithCache {
                 id: true,
                 goods_name: true,
                 image: true,
+                sellerId: true,
               },
             },
           },
@@ -353,6 +452,7 @@ export class OrderService extends ServiceBaseWithCache {
                 id: true,
                 goods_name: true,
                 image: true,
+                sellerId: true,
               },
             },
           },

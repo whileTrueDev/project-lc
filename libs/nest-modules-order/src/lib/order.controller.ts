@@ -72,6 +72,10 @@ export class OrderController {
     if (dto.customerId) {
       return this.orderService.getCustomerOrderList(dto);
     }
+    // 특정 판매자의 주문 조회(해당 판매자의 판매상품만 표시 & 주문의 상태도 주문상품옵션의 상태에 따라 다르게 표시)
+    if (dto.sellerId) {
+      return this.orderService.getSellerOrderList(dto);
+    }
     // 전체 주문 조회(모든 주문 && 삭제된 주문도 조회)
     return this.orderService.getOrderList(dto);
   }

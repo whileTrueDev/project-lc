@@ -16,6 +16,7 @@ import {
   Refund,
   Return,
   ReturnItem,
+  Seller,
 } from '@prisma/client';
 
 export type OrderItemSupportWithBroadcasterInfo = OrderItemSupport & {
@@ -29,6 +30,7 @@ export type OriginGoods = {
   id: Goods['id'];
   goods_name: Goods['goods_name'];
   image: GoodsImages[];
+  sellerId: Seller['id'];
 };
 
 export type OrderItemWithRelations = OrderItem & {
