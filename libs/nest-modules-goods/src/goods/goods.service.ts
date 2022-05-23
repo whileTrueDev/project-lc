@@ -5,11 +5,13 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { Goods, GoodsImages, GoodsView, Seller } from '@prisma/client';
+import { GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminAllLcGoodsList,
+  AllGoodsIdsRes,
   ApprovedGoodsNameAndId,
   getLiveShoppingProgress,
   GoodsByIdRes,
@@ -24,6 +26,7 @@ import {
 } from '@project-lc/shared-types';
 import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class GoodsService {
@@ -769,11 +772,10 @@ export class GoodsService {
   /**
    * 상품 노출 여부를 조절하여 보이지 않도록 설정하지 않은 모든 상품의 상품번호를 반환합니다.
    */
-  public async findAllGoodsIds(): Promise<Goods['id'][]> {
-    const goodIds = await this.prisma.goods.findMany({
-      select: { id: true },
+  public async findAllGoodsIds(): Promise<AllGoodsIdsRes> {
+    return this.prisma.goods.findMany({
+      select: { id: true, goods_name: true },
       where: { goods_view: { not: 'notLook' } },
     });
-    return goodIds.map((g) => g.id);
   }
 }
