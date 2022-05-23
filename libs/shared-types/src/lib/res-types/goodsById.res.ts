@@ -73,3 +73,4 @@ export interface GoodsOutlineByIdRes {
   options: GoodsByIdResBase['options'];
   image: GoodsImages[];
 }
+export type AllGoodsIdsRes = { goods_name: Goods['goods_name']; id: Goods['id'] }[];

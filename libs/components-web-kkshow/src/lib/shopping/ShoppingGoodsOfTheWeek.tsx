@@ -95,8 +95,6 @@ export function ShoppingGoodsOfTheWeek(): JSX.Element {
                   <Image
                     objectFit="cover"
                     h={{ base: 240, md: 340 }}
-                    w="100%"
-                    // h="100%"
                     src={item.imageUrl}
                     alt={item.name}
                     transform={isActive ? 'scale(1)' : 'scale(0.8)'}

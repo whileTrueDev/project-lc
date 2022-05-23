@@ -80,4 +80,7 @@ export class PaymentPageDto {
 
   @IsNumber()
   paymentPrice: number;
+
+  @IsString()
+  deliveryMemo: string;
 }
