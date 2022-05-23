@@ -499,6 +499,7 @@ CREATE TABLE `ExportItem` (
     `orderItemId` INTEGER NOT NULL,
     `orderItemOptionId` INTEGER NOT NULL,
     `amount` INTEGER NOT NULL,
+    `exportId` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -767,6 +768,10 @@ ALTER TABLE `ExportItem` ADD CONSTRAINT `ExportItem_orderItemId_fkey` FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE `ExportItem` ADD CONSTRAINT `ExportItem_orderItemOptionId_fkey` FOREIGN KEY (`orderItemOptionId`) REFERENCES `OrderItemOption`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ExportItem` ADD CONSTRAINT `ExportItem_exportId_fkey` FOREIGN KEY (`exportId`) REFERENCES `Export`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 -- AddForeignKey
 ALTER TABLE `GoodsCategory` ADD CONSTRAINT `GoodsCategory_parentCategoryId_fkey` FOREIGN KEY (`parentCategoryId`) REFERENCES `GoodsCategory`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

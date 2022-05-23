@@ -1880,6 +1880,8 @@ model Export {
   sellerSettlementItems      SellerSettlementItems[]
   exchangeExportedFlag       Boolean                      @default(false) // 재배송(교환출고인지) 여부
   exchange                   Exchange? // 교환출고시 연결된 교환데이터
+  items                      ExportItem[]
+
 }
 
 // 출고상품
@@ -1890,6 +1892,8 @@ model ExportItem {
   orderItemOptionId Int // 주문상품 옵션 고유번호
   orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
+  export            Export?         @relation(fields: [exportId], references: [id], onDelete: Cascade)
+  exportId          Int?
 }
 
 // ****************
