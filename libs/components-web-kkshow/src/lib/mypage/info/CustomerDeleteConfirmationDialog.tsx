@@ -9,6 +9,8 @@ import {
   Text,
   Button,
   useToast,
+  Box,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { useCustomerDeleteMutation } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
@@ -47,7 +49,15 @@ export function CustomerDeleteConfirmationDialog(
         <ModalHeader>회원 탈퇴</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>삭제하시겠습니까?</Text>
+          <Box
+            bgColor={useColorModeValue('red.100', 'red.400')}
+            fontSize="sm"
+            p={3}
+            borderRadius="5px"
+          >
+            <Text>탈퇴 이후, 모든 데이터가 삭제되며 복구가 불가능합니다.</Text>
+            <Text>탈퇴하시겠습니까?</Text>
+          </Box>
         </ModalBody>
 
         <ModalFooter>

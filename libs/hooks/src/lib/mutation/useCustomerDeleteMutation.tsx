@@ -11,7 +11,8 @@ export const useCustomerDeleteMutation = (
     () => axios.delete<Customer>(`/customer/${id}`).then((res) => res.data),
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries(['CustomerInfo', id]);
+        queryClient.clear();
+        queryClient.removeQueries('Profile', { exact: true });
       },
     },
   );
