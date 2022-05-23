@@ -1,5 +1,5 @@
+import { MileageStrategy } from '@prisma/client';
 import { IsNumber, IsEnum } from 'class-validator';
-import { MileageStrategy } from 'prisma/prisma-client';
 
 export class MileageSettingDto {
   @IsNumber()

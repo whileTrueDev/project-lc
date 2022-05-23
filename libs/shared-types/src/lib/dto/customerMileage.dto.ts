@@ -1,5 +1,5 @@
+import { MileageActionType } from '@prisma/client';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { MileageActionType } from 'prisma/prisma-client';
 
 export class CustomerMileageDto {
   @IsNumber()
