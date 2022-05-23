@@ -19,8 +19,6 @@ export interface SellerOrderStoreState extends GetOrderListDto {
 export const useSellerOrderStore = create<SellerOrderStoreState>((set, get) => ({
   search: '',
   searchDateType: '주문일',
-  searchStartDate: null,
-  searchEndDate: null,
   searchStatuses: [],
   handleOrderSearchStates(dto: SellerOrderFilterFormType) {
     set({

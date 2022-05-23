@@ -3,6 +3,7 @@ import {
   Exchange,
   ExchangeItem,
   Export,
+  ExportItem,
   Goods,
   GoodsImages,
   GoodsReview,
@@ -44,7 +45,7 @@ export type OrderDataWithRelations = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: OrderPayment | null;
   refunds: Refund[] | null;
-  exports: Export[] | null;
+  exports: (Pick<Export, 'id' | 'exportCode'> & { items: ExportItem[] })[] | null;
   exchanges:
     | (Pick<Exchange, 'id' | 'exchangeCode'> & { exchangeItems: ExchangeItem[] })[]
     | null;

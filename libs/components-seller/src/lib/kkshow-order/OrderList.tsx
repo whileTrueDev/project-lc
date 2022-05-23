@@ -26,7 +26,7 @@ import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
-// import { ExportManyDialog } from './ExportManyDialog';
+import ExportManyDialog from './ExportManyDialog';
 // import { OrderListDownloadDialog } from './OrderListDownloadDialog';
 
 const columns: GridColumns = [
@@ -150,16 +150,27 @@ export function OrderList(): JSX.Element {
 
   // 판매자의 주문목록 조회위해 sellerId 필요
   const { data: profileData } = useProfile();
-  const orders = useSellerOrderList({
-    ...sellerOrderStates,
-    sellerId: profileData?.id,
-    take: pageSize,
-    skip: pageSize * page,
-  });
+
+  const sellerOrderListDto = useMemo(() => {
+    const { search, searchDateType, periodStart, periodEnd, searchStatuses } =
+      sellerOrderStates;
+
+    return {
+      search,
+      searchDateType,
+      periodStart,
+      periodEnd,
+      searchStatuses,
+      sellerId: profileData?.id,
+      take: pageSize,
+      skip: pageSize * page,
+    };
+  }, [page, pageSize, profileData?.id, sellerOrderStates]);
+  const orders = useSellerOrderList(sellerOrderListDto);
   const { isDesktopSize } = useDisplaySize();
 
   const isExportable = useMemo(() => {
-    if (!orders.data) return false;
+    if (!orders.data?.orders) return false;
     const _so = orders.data.orders.filter((o) =>
       sellerOrderStates.selectedOrders.includes(o.id),
     );
@@ -241,14 +252,14 @@ export function OrderList(): JSX.Element {
           ExportIcon: DownloadIcon,
         }}
       />
-      {/* 
-      {exportManyDialog.isOpen && orders.data && (
+
+      {exportManyDialog.isOpen && orders.data?.orders && (
         <ExportManyDialog
           isOpen={exportManyDialog.isOpen}
           onClose={exportManyDialog.onClose}
-          orders={orders.data}
+          orders={orders.data?.orders}
         />
-      )} */}
+      )}
     </Box>
   );
 }
