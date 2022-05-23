@@ -15,9 +15,15 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { GoodsImages } from '@prisma/client';
-import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
+import {
+  CacheClearKeys,
+  HttpCacheInterceptor,
+  SellerInfo,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
+  AllGoodsIdsRes,
   ChangeGoodsViewDto,
   DeleteGoodsDto,
   GoodsByIdRes,
@@ -31,6 +37,7 @@ import {
 import { GoodsService } from './goods.service';
 
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('goods')
 @Controller('goods')
 export class GoodsController {
   constructor(private readonly goodsService: GoodsService) {}
@@ -147,7 +154,7 @@ export class GoodsController {
   }
 
   @Get('all-ids')
-  getAllGoodsIds(): Promise<number[]> {
+  getAllGoodsIds(): Promise<AllGoodsIdsRes> {
     return this.goodsService.findAllGoodsIds();
   }
 
