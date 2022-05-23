@@ -33,6 +33,7 @@ export * from './lib/mutation/useCreateSellerContacts';
 export * from './lib/mutation/useCreateSettleBcManyMutation';
 export * from './lib/mutation/useCreateSettlementMutation';
 export * from './lib/mutation/useCreateShippingGroup';
+export * from './lib/mutation/useCustomerAddressMutation';
 export * from './lib/mutation/useCustomerExchangeMutation';
 export * from './lib/mutation/useCustomerOrderCancelMutation';
 export * from './lib/mutation/useCustomerReturnMutation';
