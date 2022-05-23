@@ -348,7 +348,7 @@ const customerMypageInfoChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
   },
   {
     name: '배송지 관리',
-    href: '/mypage/배송지 관리',
+    href: '/mypage/address',
     checkIsActive: defaultIsActiveChecker,
   },
 ];

@@ -1,31 +1,20 @@
 import {
-  Inject,
-  Injectable,
-  CACHE_MANAGER,
   BadRequestException,
+  Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
-import { Cache } from 'cache-manager';
+import { GoodsCategory } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateGoodsCategoryDto,
   GoodsCategoryRes,
   UpdateGoodsCategoryDto,
 } from '@project-lc/shared-types';
-import { GoodsCategory } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
 @Injectable()
-export class GoodsCategoryService extends ServiceBaseWithCache {
-  #GOODS_CATEGORY_CACHE_KEY = 'goods-category';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class GoodsCategoryService {
+  constructor(private readonly prisma: PrismaService) {}
 
   private createCategoryCode(): string {
     return nanoid();
@@ -41,8 +30,6 @@ export class GoodsCategoryService extends ServiceBaseWithCache {
           ...createDto,
         },
       });
-
-      await this._clearCaches(this.#GOODS_CATEGORY_CACHE_KEY);
 
       return newCategory;
     } catch (e) {
@@ -72,8 +59,6 @@ export class GoodsCategoryService extends ServiceBaseWithCache {
       data: { ...updateDto },
     });
 
-    await this._clearCaches(this.#GOODS_CATEGORY_CACHE_KEY);
-
     return true;
   }
 
@@ -82,8 +67,6 @@ export class GoodsCategoryService extends ServiceBaseWithCache {
     await this.prisma.goodsCategory.delete({
       where: { id },
     });
-
-    await this._clearCaches(this.#GOODS_CATEGORY_CACHE_KEY);
 
     return true;
   }

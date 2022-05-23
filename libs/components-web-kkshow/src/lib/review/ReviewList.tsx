@@ -134,7 +134,7 @@ export function ReviewDetail({
     else if (selectedImageIdx === 0) setSelectedImageIdx(0);
     else setSelectedImageIdx(selectedImageIdx - 1);
   };
-  // 리뷰 댓글
+  // 후기 댓글
   const comments = useGoodsReviewComments(review.id);
 
   // 접기 기능
@@ -143,15 +143,15 @@ export function ReviewDetail({
     setFolded(false);
   };
 
-  // 자기 리뷰인지 확인
+  // 자기 후기인지 확인
   const profile = useProfile();
 
-  // 리뷰 수정 다이얼로그
+  // 후기 수정 다이얼로그
   const updateDialog = useDisclosure();
-  // 리뷰 삭제 다이얼로그
+  // 후기 삭제 다이얼로그
   const deleteDialog = useDisclosure();
 
-  // 리뷰 상품 정보
+  // 후기 상품 정보
   const goods = useGoodsById(includeGoodsInfo ? review.goodsId : null);
 
   return (

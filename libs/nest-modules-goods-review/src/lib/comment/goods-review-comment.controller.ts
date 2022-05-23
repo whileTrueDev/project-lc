@@ -12,7 +12,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { GoodsReview, GoodsReviewComment } from '@prisma/client';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   GoodsReviewCommentCreateDto,
@@ -21,8 +21,9 @@ import {
 } from '@project-lc/shared-types';
 import { GoodsReviewCommentService } from './goods-review-comment.service';
 
-@Controller('goods-review/:reviewId/comment')
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('goods-review')
+@Controller('goods-review/:reviewId/comment')
 export class GoodsReviewCommentController {
   constructor(private readonly service: GoodsReviewCommentService) {}
 

@@ -9,7 +9,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   BroadcasterSettlementInfoDto,
@@ -20,6 +20,7 @@ import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('broadcaster/settlement-info')
 @Controller('broadcaster/settlement-info')
 export class BroadcasterSettlementController {
   constructor(

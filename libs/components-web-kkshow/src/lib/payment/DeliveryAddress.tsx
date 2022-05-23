@@ -47,7 +47,9 @@ export function DeliveryAddress(): JSX.Element {
     trigger,
     formState: { errors },
   } = useFormContext<PaymentPageDto>();
-
+  /**
+   * TODO: 배송지 정보 OrderCreateDto 사용하도록 수정 필요
+   */
   function handleRadio(value: string): void {
     handleAddressType(value);
     if (value === 'manual') {
@@ -83,23 +85,19 @@ export function DeliveryAddress(): JSX.Element {
     }
   }, [defaultAddress, isLoading]);
 
-  /**
-   * TODO: 배송 메모 작성 추가 필요 (최근 배송메모 조회 기능도 있으면 좋을 것)
-   * 최근 배송메모 조회 기능이 address에 포함되어 저장되어도 상관없을 듯. (수정가능하도록)
-   */
   return (
     <SectionWithTitle title="배송지 정보">
       {!isLoading && (
         <RadioGroup onChange={(value) => handleRadio(value)} value={addressType}>
           <Stack direction="row">
             {profile && (
-              <Button onClick={addressListOnOpen} size="sm" variant="outline">
-                배송지 목록에서 선택
-              </Button>
+              <>
+                <Button onClick={addressListOnOpen} size="sm" variant="outline">
+                  배송지 목록에서 선택
+                </Button>
+                <Radio value="default">기본배송지</Radio>
+              </>
             )}
-            <Radio value="default" isDisabled={!profile?.id}>
-              기본배송지
-            </Radio>
             <Radio value="manual">직접입력</Radio>
           </Stack>
         </RadioGroup>
@@ -128,6 +126,12 @@ export function DeliveryAddress(): JSX.Element {
               <Text>{`${defaultAddress?.detailAddress}`}</Text>
             </Flex>
           </Flex>
+          <Flex direction="column" mt={3}>
+            <Text fontWeight="semibold">배송메모</Text>
+            <HStack>
+              <Text>{defaultAddress?.memo}</Text>
+            </HStack>
+          </Flex>
         </>
       )}
       {!isLoading && addressType === 'list' && (
@@ -152,6 +156,12 @@ export function DeliveryAddress(): JSX.Element {
               <Text>{`(${getValues('postalCode')}) ${getValues('address')}`}</Text>
               <Text>{`${getValues('detailAddress')}`}</Text>
             </Flex>
+          </Flex>
+          <Flex direction="column" mt={3}>
+            <Text fontWeight="semibold">배송메모</Text>
+            <HStack>
+              <Text>{getValues('deliveryMemo')}</Text>
+            </HStack>
           </Flex>
         </>
       )}
@@ -299,6 +309,23 @@ export function DeliveryAddress(): JSX.Element {
                 </Flex>
               </Flex>
             </Flex>
+          </FormControl>
+
+          <FormControl isInvalid={!!errors.deliveryMemo}>
+            <Text fontWeight="semibold">배송메모</Text>
+
+            <Input
+              w={{ base: '100%', md: '50%' }}
+              placeholder="문 앞 / 직접 받고 부재 시 문 앞 / 경비실 / 택배함"
+              {...register('deliveryMemo', {
+                required: '배송메모를 입력해주세요.',
+                maxLength: {
+                  value: 30,
+                  message: '30자 이상 작성할 수 없습니다.',
+                },
+              })}
+            />
+            <FormErrorMessage mt={0}>{errors.deliveryMemo?.message}</FormErrorMessage>
           </FormControl>
         </>
       )}

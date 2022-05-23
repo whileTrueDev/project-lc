@@ -13,7 +13,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { GoodsInquiry } from '@prisma/client';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   FindGoodsInquiryItem,
@@ -24,8 +24,9 @@ import {
 } from '@project-lc/shared-types';
 import { GoodsInquiryService } from './goods-inquiry.service';
 
-@Controller('goods-inquiry')
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('goods-inquiry')
+@Controller('goods-inquiry')
 export class GoodsInquiryController {
   constructor(private readonly goodsInquiryService: GoodsInquiryService) {}
 

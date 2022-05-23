@@ -10,16 +10,14 @@ export const getCustomerAddress = async (
     .get<CustomerAddress[]>(`/customer/${customerId}/address`)
     .then((res) => res.data);
 };
-
+/** 배송지 목록 조회 */
 export const useCustomerAddress = (
   customerId?: number,
 ): UseQueryResult<CustomerAddress[], AxiosError> => {
   return useQuery<CustomerAddress[], AxiosError>(
-    ['getCustomerAddress', customerId],
+    ['CustomerAddress', customerId],
     () => getCustomerAddress(customerId),
-    {
-      enabled: !!customerId,
-    },
+    { enabled: !!customerId },
   );
 };
 
@@ -30,15 +28,13 @@ export const getDefaultCustomerAddress = async (
     .get<CustomerAddress>(`/customer/${customerId}/address/default`)
     .then((res) => res.data);
 };
-
+/** 기본 배송지 조회 */
 export const useDefaultCustomerAddress = (
   customerId?: number,
 ): UseQueryResult<CustomerAddress, AxiosError> => {
   return useQuery<CustomerAddress, AxiosError>(
-    ['getDefaultCustomerAddress', customerId],
+    ['DefaultCustomerAddress', customerId],
     () => getDefaultCustomerAddress(customerId),
-    {
-      enabled: !!customerId,
-    },
+    { enabled: !!customerId },
   );
 };
