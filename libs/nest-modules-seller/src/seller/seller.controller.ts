@@ -22,7 +22,12 @@ import {
   ConfirmHistory,
 } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
+import {
+  CacheClearKeys,
+  HttpCacheInterceptor,
+  SellerInfo,
+  UserPayload,
+} from '@project-lc/nest-core';
 import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
@@ -39,6 +44,7 @@ import {
   ConfirmHistoryDto,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
+import __multer from 'multer';
 import { SellerContactsService } from './seller-contacts.service';
 import {
   SellerSettlementInfo,
@@ -48,6 +54,7 @@ import { SellerShopService } from './seller-shop.service';
 import { SellerService } from './seller.service';
 
 @Controller('seller')
+@CacheClearKeys('seller')
 export class SellerController {
   constructor(
     private readonly sellerService: SellerService,
@@ -67,6 +74,8 @@ export class SellerController {
 
   // * 판매자 회원가입
   @Post()
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async signUp(@Body(ValidationPipe) dto: SignUpDto): Promise<Seller> {
     const checkResult = await this.mailVerificationService.checkMailVerification(
       dto.email,
@@ -93,6 +102,8 @@ export class SellerController {
   // 판매자 계정 삭제
   @UseGuards(JwtAuthGuard)
   @Delete()
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async deleteSeller(
     @Body('email') email: string,
     @SellerInfo() sellerInfo: UserPayload,
@@ -114,6 +125,8 @@ export class SellerController {
 
   // 비밀번호 변경
   @Patch('password')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async changePassword(
     @Body(ValidationPipe) dto: PasswordValidateDto,
   ): Promise<Seller> {
@@ -133,6 +146,8 @@ export class SellerController {
   // 본인의 사업자 등록정보 등록
   @UseGuards(JwtAuthGuard)
   @Post('business-registration')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement')
   public async InsertBusinessRegistration(
     @Body(ValidationPipe) dto: BusinessRegistrationDto,
     @SellerInfo() sellerInfo: UserPayload,
@@ -159,6 +174,8 @@ export class SellerController {
   // 본인의 계좌정보 등록
   @UseGuards(JwtAuthGuard)
   @Post('settlement-account')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement')
   public async InsertSettlementAccount(
     @Body(ValidationPipe) dto: SettlementAccountDto,
     @SellerInfo() sellerInfo: UserPayload,
@@ -186,13 +203,10 @@ export class SellerController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('shop-info')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   public async changeShopInfo(
-    @Body(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    )
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
     dto: SellerShopInfoDto,
     @SellerInfo() sellerInfo: UserPayload,
     @Res() res,
@@ -214,9 +228,11 @@ export class SellerController {
   }
 
   /** 셀러 아바타 이미지 s3업로드 후 url 저장 */
-  @UseGuards(JwtAuthGuard)
   @Post('/avatar')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   async addAvatar(
     @SellerInfo() seller: UserPayload,
     @UploadedFile() file: Express.Multer.File,
@@ -225,14 +241,18 @@ export class SellerController {
   }
 
   /** 셀러 아바타 이미지 null로 저장 */
-  @UseGuards(JwtAuthGuard)
   @Delete('/avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   async deleteAvatar(@SellerInfo() seller: UserPayload): Promise<boolean> {
     return this.sellerService.removeSellerAvatar(seller.sub);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch('agreement')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller')
   async updateAgreement(
     @Body(ValidationPipe) dto: SellerContractionAgreementDto,
   ): Promise<Seller> {
@@ -240,6 +260,8 @@ export class SellerController {
   }
 
   @Patch('restore')
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheClearKeys('seller/settlement')
   public async restoreInactiveSeller(@Body(ValidationPipe) dto): Promise<void> {
     try {
       await this.prismaService.$transaction(async (): Promise<void> => {

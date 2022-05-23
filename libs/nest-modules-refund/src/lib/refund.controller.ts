@@ -8,7 +8,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateRefundDto,
   CreateRefundRes,
@@ -19,6 +19,7 @@ import {
 import { RefundService } from './refund.service';
 
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('refund')
 @Controller('refund')
 export class RefundController {
   constructor(private readonly refundService: RefundService) {}

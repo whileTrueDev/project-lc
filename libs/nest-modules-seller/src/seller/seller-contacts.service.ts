@@ -1,27 +1,20 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
+import { Injectable } from '@nestjs/common';
+import { Seller } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { SellerContactsDTO } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
+import {
+  SellerContactsDTO,
+  SellerContactsDTOWithoutIdDTO,
+} from '@project-lc/shared-types';
 
 @Injectable()
-export class SellerContactsService extends ServiceBaseWithCache {
-  #SELLER_CONTACTS_CACHE_KEY = 'seller/contacts';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class SellerContactsService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /** 판매자의 기본 연락처 */
   async findDefaultContacts(email: string): Promise<SellerContactsDTO> {
     const userId = await this.prisma.seller.findFirst({
       where: { email },
-      select: {
-        id: true,
-      },
+      select: { id: true },
     });
 
     const sellerDefaultContacts = await this.prisma.sellerContacts.findFirst({
@@ -34,7 +27,10 @@ export class SellerContactsService extends ServiceBaseWithCache {
   }
 
   /** 판매자 연락처 등록 */
-  async registSellerContacts(sellerId, dto): Promise<{ contactId: number }> {
+  async registSellerContacts(
+    sellerId: Seller['id'],
+    dto: SellerContactsDTOWithoutIdDTO,
+  ): Promise<{ contactId: number }> {
     const contact = await this.prisma.sellerContacts.create({
       data: {
         seller: { connect: { id: sellerId } },
@@ -43,16 +39,13 @@ export class SellerContactsService extends ServiceBaseWithCache {
         isDefault: dto.isDefault ? true : undefined,
       },
     });
-    await this._clearCaches(this.#SELLER_CONTACTS_CACHE_KEY);
     return { contactId: contact.id };
   }
 
   /** 판매자 연락처 등록 */
   public async restoreSellerContacts(sellerId): Promise<void> {
     const restoreDatas = await this.prisma.inactiveSellerContacts.findMany({
-      where: {
-        sellerId,
-      },
+      where: { sellerId },
     });
 
     if (restoreDatas) {
@@ -64,7 +57,5 @@ export class SellerContactsService extends ServiceBaseWithCache {
         ),
       );
     }
-
-    await this._clearCaches(this.#SELLER_CONTACTS_CACHE_KEY);
   }
 }

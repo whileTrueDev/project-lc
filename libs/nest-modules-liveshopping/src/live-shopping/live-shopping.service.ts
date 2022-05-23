@@ -1,27 +1,18 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { LiveShopping } from '@prisma/client';
+import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
+  LiveShoppingFmGoodsSeq,
+  LiveShoppingId,
   LiveShoppingParamsDto,
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
-  LiveShoppingFmGoodsSeq,
-  LiveShoppingId,
 } from '@project-lc/shared-types';
-import { throwError } from 'rxjs';
-import { LiveShopping } from '@prisma/client';
-import { Cache } from 'cache-manager';
 
 @Injectable()
-export class LiveShoppingService extends ServiceBaseWithCache {
-  #LIVESHOPPING_CACHE_KEY = 'live-shoppings';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class LiveShoppingService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /** 라이브쇼핑 생성 */
   async createLiveShopping(
@@ -42,7 +33,6 @@ export class LiveShoppingService extends ServiceBaseWithCache {
         sellerContacts: { connect: { id: dto.contactId } },
       },
     });
-    await this._clearCaches(this.#LIVESHOPPING_CACHE_KEY);
     return { liveShoppingId: liveShopping.id };
   }
 
@@ -55,9 +45,8 @@ export class LiveShoppingService extends ServiceBaseWithCache {
     });
 
     if (!doDelete) {
-      throwError('라이브 쇼핑 삭제 실패');
+      throw new InternalServerErrorException('라이브 쇼핑 삭제 실패');
     }
-    await this._clearCaches(this.#LIVESHOPPING_CACHE_KEY);
     return true;
   }
 
@@ -80,25 +69,11 @@ export class LiveShoppingService extends ServiceBaseWithCache {
       },
       include: {
         goods: {
-          select: {
-            goods_name: true,
-            summary: true,
-          },
+          select: { goods_name: true, summary: true },
         },
-        seller: {
-          select: {
-            sellerShop: true,
-          },
-        },
-        broadcaster: {
-          select: {
-            userNickname: true,
-            channels: true,
-          },
-        },
-        liveShoppingVideo: {
-          select: { youtubeUrl: true },
-        },
+        seller: { select: { sellerShop: true } },
+        broadcaster: { select: { userNickname: true, channels: true } },
+        liveShoppingVideo: { select: { youtubeUrl: true } },
       },
     });
   }
@@ -117,9 +92,7 @@ export class LiveShoppingService extends ServiceBaseWithCache {
       where: {
         broadcasterId: broadcasterId ? Number(broadcasterId) : undefined,
       },
-      select: {
-        fmGoodsSeq: true,
-      },
+      select: { fmGoodsSeq: true },
     });
 
     return fmGoodsSeqs;
@@ -134,35 +107,14 @@ export class LiveShoppingService extends ServiceBaseWithCache {
         broadcasterId: Number(broadcasterId),
       },
       include: {
-        goods: {
-          select: {
-            goods_name: true,
-            summary: true,
-          },
-        },
-        seller: {
-          select: {
-            sellerShop: true,
-          },
-        },
+        goods: { select: { goods_name: true, summary: true } },
+        seller: { select: { sellerShop: true } },
         broadcaster: {
-          select: {
-            userNickname: true,
-            channels: true,
-          },
+          select: { userNickname: true, channels: true },
         },
-        liveShoppingVideo: {
-          select: { youtubeUrl: true },
-        },
+        liveShoppingVideo: { select: { youtubeUrl: true } },
       },
-      orderBy: [
-        {
-          sellStartDate: 'desc',
-        },
-        {
-          id: 'desc',
-        },
-      ],
+      orderBy: [{ sellStartDate: 'desc' }, { id: 'desc' }],
     });
   }
 
@@ -181,17 +133,9 @@ export class LiveShoppingService extends ServiceBaseWithCache {
       select: {
         id: true,
         broadcaster: {
-          select: {
-            email: true,
-            userNickname: true,
-            overlayUrl: true,
-          },
+          select: { email: true, userNickname: true, overlayUrl: true },
         },
-        goods: {
-          select: {
-            goods_name: true,
-          },
-        },
+        goods: { select: { goods_name: true } },
         broadcastStartDate: true,
         broadcastEndDate: true,
       },
@@ -207,12 +151,8 @@ export class LiveShoppingService extends ServiceBaseWithCache {
         progress: 'confirmed',
         broadcastEndDate: { gte: now },
       },
-      select: {
-        id: true,
-      },
-      orderBy: {
-        broadcastEndDate: 'asc',
-      },
+      select: { id: true },
+      orderBy: { broadcastEndDate: 'asc' },
     });
   }
 
@@ -222,9 +162,7 @@ export class LiveShoppingService extends ServiceBaseWithCache {
   /** 해당 fmGoodsSeq가 라이브쇼핑에 등록되어 있으면 true를 반환 */
   async checkIsLiveShoppingFmGoodsSeq(fmGoodsSeq: number): Promise<boolean> {
     const liveShoppingFmGoodsSeq = await this.prisma.liveShopping.findFirst({
-      where: {
-        fmGoodsSeq: Number(fmGoodsSeq),
-      },
+      where: { fmGoodsSeq: Number(fmGoodsSeq) },
     });
     if (liveShoppingFmGoodsSeq) return true;
     return false;

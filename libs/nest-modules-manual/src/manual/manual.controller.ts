@@ -1,10 +1,11 @@
 import { Controller, Get, ParseIntPipe, Query, UseInterceptors } from '@nestjs/common';
 import { Manual, UserType } from '@prisma/client';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { ManualListRes } from '@project-lc/shared-types';
 import { ManualService } from './manual.service';
 
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('manual')
 @Controller('manual')
 export class ManualController {
   constructor(private readonly manualService: ManualService) {}

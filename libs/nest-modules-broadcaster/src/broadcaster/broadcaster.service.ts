@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  CACHE_MANAGER,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   Broadcaster,
   BroadcasterAddress,
@@ -13,7 +7,7 @@ import {
   InactiveBroadcaster,
   Prisma,
 } from '@prisma/client';
-import { ServiceBaseWithCache, UserPwManager } from '@project-lc/nest-core';
+import { UserPwManager } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BroadcasterAddressDto,
@@ -23,22 +17,15 @@ import {
   BroadcasterWithoutUserNickName,
   FindBroadcasterDto,
   SignUpDto,
-  BroadcasterOnlyNickNameAndAvatar,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
-import { Cache } from 'cache-manager';
 
 @Injectable()
-export class BroadcasterService extends ServiceBaseWithCache {
-  #BROADCASTER_CACHE_KEY = 'broadcaster';
-
+export class BroadcasterService {
   constructor(
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
     private readonly prisma: PrismaService,
     private readonly userPwManager: UserPwManager,
-  ) {
-    super(cacheManager);
-  }
+  ) {}
 
   async getBroadcasterEmail(overlayUrl: string): Promise<BroadcasterWithoutUserNickName> {
     const dto = await this.prisma.broadcaster.findUnique({
@@ -144,7 +131,6 @@ export class BroadcasterService extends ServiceBaseWithCache {
         overlayUrl: `/${dto.email}`,
       },
     });
-    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
     return broadcaster;
   }
 
@@ -202,7 +188,6 @@ export class BroadcasterService extends ServiceBaseWithCache {
       where: { id },
       data: { userNickname: newNick },
     });
-    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
     return updated;
   }
 
@@ -227,7 +212,6 @@ export class BroadcasterService extends ServiceBaseWithCache {
         broadcasterId,
       },
     });
-    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
     return result;
   }
 
@@ -244,7 +228,6 @@ export class BroadcasterService extends ServiceBaseWithCache {
         data: restoreData,
       });
     }
-    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
   }
 
   /**
@@ -261,7 +244,6 @@ export class BroadcasterService extends ServiceBaseWithCache {
         password: hashedPw,
       },
     });
-    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
     return broadcaster;
   }
 
@@ -271,7 +253,6 @@ export class BroadcasterService extends ServiceBaseWithCache {
       where: { email },
     });
 
-    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
     return true;
   }
 
@@ -285,7 +266,6 @@ export class BroadcasterService extends ServiceBaseWithCache {
         agreementFlag: dto.agreementFlag,
       },
     });
-    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
     return broadcaster;
   }
 
@@ -304,7 +284,6 @@ export class BroadcasterService extends ServiceBaseWithCache {
       where: { email },
       data: { avatar: avatarUrl },
     });
-    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
     return true;
   }
 
@@ -314,7 +293,6 @@ export class BroadcasterService extends ServiceBaseWithCache {
       where: { email },
       data: { avatar: null },
     });
-    await this._clearCaches(this.#BROADCASTER_CACHE_KEY);
     return true;
   }
 

@@ -1,22 +1,22 @@
 /* eslint-disable no-nested-ternary */
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   BusinessRegistrationConfirmation,
+  ConfirmHistory,
+  InactiveBusinessRegistrationConfirmation,
   Prisma,
   SellCommission,
+  Seller,
   SellerBusinessRegistration,
   SellerSettlementAccount,
   SellType,
-  Seller,
-  InactiveBusinessRegistrationConfirmation,
-  ConfirmHistory,
 } from '@prisma/client';
-import { ServiceBaseWithCache, UserPayload } from '@project-lc/nest-core';
+import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BusinessRegistrationDto,
-  ExecuteSettlementDto,
   ConfirmHistoryDto,
+  ExecuteSettlementDto,
   FmExport,
   SellerBusinessRegistrationType,
   SettlementAccountDto,
@@ -26,9 +26,7 @@ import {
   CalcPgCommissionOptions,
   checkOrderDuringLiveShopping,
 } from '@project-lc/utils';
-import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
-import { SellerService } from './seller.service';
 
 export type SellerSettlementInfo = {
   sellerBusinessRegistration: SellerBusinessRegistrationType[];
@@ -43,17 +41,8 @@ export type SellerSettlementInfo = {
 };
 
 @Injectable()
-export class SellerSettlementService extends ServiceBaseWithCache {
-  #SELLER_SETTLEMENT_CACHE_KEY = 'seller/settlement';
-  #SELLER_SETTLEMENT_HISTORY_CACHE_KEY = 'seller/settlement-history';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly sellerService: SellerService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class SellerSettlementService {
+  constructor(private readonly prisma: PrismaService) {}
 
   // 사업자 등록증 번호 포맷만들기
   private makeRegistrationNumberFormat(num: string): string {
@@ -89,7 +78,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
           sellerId,
         },
       });
-    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
     return sellerBusinessRegistration;
   }
 
@@ -181,8 +169,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
         },
       });
     }
-
-    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
   }
 
   /**
@@ -199,7 +185,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
           SellerBusinessRegistrationId: _sellerBusinessRegistration.id,
         },
       });
-    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
     return businessRegistrationConfirmation;
   }
 
@@ -223,7 +208,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
       },
     });
 
-    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
     return settlementAccount;
   }
 
@@ -250,8 +234,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
         },
       });
     }
-
-    await this._clearCaches(this.#SELLER_SETTLEMENT_CACHE_KEY);
   }
 
   /**
@@ -446,8 +428,6 @@ export class SellerSettlementService extends ServiceBaseWithCache {
         totalCommission: totalInfo.commission + totalPgCommission.commission,
       },
     });
-
-    await this._clearCaches(this.#SELLER_SETTLEMENT_HISTORY_CACHE_KEY);
 
     return true;
   }
