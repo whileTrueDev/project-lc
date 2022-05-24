@@ -66,3 +66,12 @@ export const inquireDisableSteps = [
   'orderInvalidated',
   'paymentFailed',
 ];
+
+/** 출고 가능한 주문상태 목록 */
+export const exportableSteps: OrderProcessStep[] = [
+  'paymentConfirmed',
+  'goodsReady',
+  'partialExportReady',
+  'exportReady',
+  'partialExportDone',
+];
