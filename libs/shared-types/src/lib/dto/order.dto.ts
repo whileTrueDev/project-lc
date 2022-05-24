@@ -328,6 +328,13 @@ export class GetNonMemberOrderDetailDto {
   password: string;
 }
 
+/** 내보내기 위한 주문상세 여러개 조회 dto */
+export class GetOrderDetailsForSpreadsheetDto {
+  @IsNumber({}, { each: true })
+  @Type(() => Number)
+  orderIds: Order['id'][];
+}
+
 // ------------------수정 dto--------------------
 /** 주문 수정 dto */
 export class UpdateOrderDto {
