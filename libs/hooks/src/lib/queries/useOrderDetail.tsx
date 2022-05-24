@@ -1,4 +1,5 @@
 import {
+  GetOneOrderDetailDto,
   GetOrderDetailsForSpreadsheetDto,
   OrderDetailRes,
 } from '@project-lc/shared-types';
@@ -7,18 +8,22 @@ import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 /** 개별 주문 상세조회 요청 */
-export const getOrderDetail = async (id?: number): Promise<OrderDetailRes> => {
-  return axios.get<OrderDetailRes>(`/order/${id}`).then((res) => res.data);
+export const getOrderDetail = async (
+  dto: GetOneOrderDetailDto,
+): Promise<OrderDetailRes> => {
+  return axios
+    .get<OrderDetailRes>(`/order/detail`, { params: dto })
+    .then((res) => res.data);
 };
 /** 개별 주문 상세조회 훅 */
 export const useOrderDetail = (
-  id?: number,
+  dto: GetOneOrderDetailDto,
 ): UseQueryResult<OrderDetailRes, AxiosError> => {
   return useQuery<OrderDetailRes, AxiosError>(
-    ['OrderDetail', id],
-    () => getOrderDetail(id),
+    ['OrderDetail', dto],
+    () => getOrderDetail(dto),
     {
-      enabled: !!id,
+      enabled: !!dto.orderId || !!dto.orderCode,
     },
   );
 };

@@ -47,9 +47,13 @@ export type OrderDataWithRelations = Order & {
   refunds: Refund[] | null;
   exports: (Pick<Export, 'id' | 'exportCode'> & { items: ExportItem[] })[] | null;
   exchanges:
-    | (Pick<Exchange, 'id' | 'exchangeCode'> & { exchangeItems: ExchangeItem[] })[]
+    | (Pick<Exchange, 'id' | 'exchangeCode' | 'status'> & {
+        exchangeItems: ExchangeItem[];
+      })[]
     | null;
-  returns: (Pick<Return, 'id' | 'returnCode'> & { items: ReturnItem[] })[] | null;
+  returns:
+    | (Pick<Return, 'id' | 'returnCode' | 'status'> & { items: ReturnItem[] })[]
+    | null;
   orderCancellations?:
     | (Pick<OrderCancellation, 'id' | 'cancelCode'> & {
         items: OrderCancellationItem[];

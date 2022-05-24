@@ -7,6 +7,7 @@ import {
   CreateOrderDto,
   FmOrderStatusNumString,
   GetNonMemberOrderDetailDto,
+  GetOneOrderDetailDto,
   GetOrderListDto,
   getOrderProcessStepNameByStringNumber,
   OrderDetailRes,
@@ -403,8 +404,10 @@ export class OrderService {
         payment: true,
         refunds: true,
         exports: { select: { id: true, exportCode: true, items: true } },
-        exchanges: { select: { id: true, exchangeCode: true, exchangeItems: true } },
-        returns: { select: { id: true, returnCode: true, items: true } },
+        exchanges: {
+          select: { id: true, exchangeCode: true, status: true, exchangeItems: true },
+        },
+        returns: { select: { id: true, returnCode: true, status: true, items: true } },
         orderCancellations: { select: { id: true, cancelCode: true, items: true } },
       },
     });
@@ -445,8 +448,10 @@ export class OrderService {
         payment: true,
         refunds: true,
         exports: { select: { id: true, exportCode: true, items: true } },
-        exchanges: { select: { id: true, exchangeCode: true, exchangeItems: true } },
-        returns: { select: { id: true, returnCode: true, items: true } },
+        exchanges: {
+          select: { id: true, exchangeCode: true, status: true, exchangeItems: true },
+        },
+        returns: { select: { id: true, returnCode: true, status: true, items: true } },
         orderCancellations: { select: { id: true, cancelCode: true, items: true } },
       },
     });
@@ -468,8 +473,11 @@ export class OrderService {
   }
 
   /** 개별 주문 상세 조회 */
-  async getOrderDetail(orderId: number): Promise<OrderDetailRes> {
-    return this.findOneOrderDetail({ id: orderId, deleteFlag: false });
+  async getOrderDetail(dto: GetOneOrderDetailDto): Promise<OrderDetailRes> {
+    if (dto.orderId) {
+      return this.findOneOrderDetail({ id: dto.orderId, deleteFlag: false });
+    }
+    return this.findOneOrderDetail({ orderCode: dto.orderCode, deleteFlag: false });
   }
 
   /** 비회원 주문 상세 조회 */

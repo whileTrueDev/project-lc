@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateOrderDto,
   GetNonMemberOrderDetailDto,
+  GetOneOrderDetailDto,
   GetOrderDetailsForSpreadsheetDto,
   GetOrderListDto,
   OrderDetailRes,
@@ -63,18 +64,19 @@ export class OrderController {
   ): Promise<OrderDetailRes[]> {
     const result = await Promise.all(
       dto.orderIds.map((orderId) => {
-        return this.orderService.getOrderDetail(orderId);
+        return this.orderService.getOrderDetail({ orderId });
       }),
     );
     return result;
   }
 
   /** 개별 주문 상세조회 */
-  @Get(':orderId')
+  @UseGuards(JwtAuthGuard)
+  @Get('detail')
   getOrderDetail(
-    @Param('orderId', ParseIntPipe) orderId: number,
+    @Query(new ValidationPipe({ transform: true })) dto: GetOneOrderDetailDto,
   ): Promise<OrderDetailRes> {
-    return this.orderService.getOrderDetail(orderId);
+    return this.orderService.getOrderDetail(dto);
   }
 
   /** 주문목록조회

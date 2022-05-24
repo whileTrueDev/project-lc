@@ -335,6 +335,20 @@ export class GetOrderDetailsForSpreadsheetDto {
   orderIds: Order['id'][];
 }
 
+/** 개별 주문 1건 상세 조회 dto */
+export class GetOneOrderDetailDto {
+  /** 주문코드 */
+  @IsString()
+  @IsOptional()
+  orderCode?: string;
+
+  /** 주문고유번호 */
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  orderId?: Order['id'];
+}
+
 // ------------------수정 dto--------------------
 /** 주문 수정 dto */
 export class UpdateOrderDto {
