@@ -149,7 +149,7 @@ export class GoodsController {
   @UseGuards(JwtAuthGuard)
   registGoods(
     @SellerInfo() seller: UserPayload,
-    @Body(ValidationPipe) dto: RegistGoodsDto,
+    @Body(new ValidationPipe({ transform: true })) dto: RegistGoodsDto,
   ): Promise<{ goodsId: number }> {
     return this.goodsService.registGoods(seller.id, dto);
   }

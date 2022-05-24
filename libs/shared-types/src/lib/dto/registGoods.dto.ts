@@ -19,6 +19,12 @@ import { GoodsOptionDto } from './goodsOption.dto';
 import { GoodsImageDto } from './goodsImage.dto';
 import { GoodsInformationNoticeDto } from './goodsInformationNotice.dto';
 
+/** 상품 키워드 DTO */
+class GoodsSearchKeywordDto {
+  @IsString()
+  keyword: string;
+}
+
 export class RegistGoodsDto {
   @IsString()
   goods_name: string;
@@ -123,8 +129,9 @@ export class RegistGoodsDto {
   goodsInfoId?: number;
 
   @IsOptional()
-  @IsString()
-  searchKeyword?: string;
+  @ValidateNested({ each: true })
+  @Type(() => GoodsSearchKeywordDto)
+  searchKeywords?: GoodsSearchKeywordDto[] = [];
 
   @IsNumber()
   categoryId: number;
