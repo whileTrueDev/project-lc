@@ -1,11 +1,10 @@
-import { Badge, Box, Button, Stack, Text } from '@chakra-ui/react';
-import { ExchangeProcessStatus } from '@prisma/client';
+import { Box, Button, Stack, Text } from '@chakra-ui/react';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
+import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
 import {
   CancelListItem,
   ExchangeListItem,
   ExchangeReturnCancelItemBaseData,
-  processTextDict,
   ReturnListItem,
 } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
@@ -126,26 +125,6 @@ export function DesktopExchangeReturnCancelListHeader(): JSX.Element {
   );
 }
 
-/** 교환,환불,주문취소 요청 처리상태 배지 */
-export function ExchangeReturnCancelRequestStatusBadge({
-  status,
-  prefix,
-  suffix,
-}: {
-  status: ExchangeProcessStatus;
-  prefix?: string;
-  suffix?: string;
-}): JSX.Element {
-  return (
-    <Box>
-      <Badge colorScheme={processTextDict[status].color} variant="solid" fontSize="1rem">
-        {prefix}
-        {processTextDict[status].name}
-        {suffix}
-      </Badge>
-    </Box>
-  );
-}
 interface ExchangeReturnCancelRequestGoodsDataProps
   extends ExchangeReturnCancelItemBaseData {
   amount: number;
