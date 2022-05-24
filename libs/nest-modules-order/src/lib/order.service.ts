@@ -403,12 +403,10 @@ export class OrderService {
         },
         payment: true,
         refunds: true,
-        exports: { select: { id: true, exportCode: true, items: true } },
-        exchanges: {
-          select: { id: true, exchangeCode: true, status: true, exchangeItems: true },
-        },
-        returns: { select: { id: true, returnCode: true, status: true, items: true } },
-        orderCancellations: { select: { id: true, cancelCode: true, items: true } },
+        exports: { include: { items: true } },
+        exchanges: { include: { exchangeItems: true } },
+        returns: { include: { items: true } },
+        orderCancellations: { include: { items: true } },
       },
     });
 
@@ -447,12 +445,10 @@ export class OrderService {
         },
         payment: true,
         refunds: true,
-        exports: { select: { id: true, exportCode: true, items: true } },
-        exchanges: {
-          select: { id: true, exchangeCode: true, status: true, exchangeItems: true },
-        },
-        returns: { select: { id: true, returnCode: true, status: true, items: true } },
-        orderCancellations: { select: { id: true, cancelCode: true, items: true } },
+        exports: { include: { items: true } },
+        exchanges: { include: { exchangeItems: true } },
+        returns: { include: { items: true } },
+        orderCancellations: { include: { items: true } },
       },
     });
   }

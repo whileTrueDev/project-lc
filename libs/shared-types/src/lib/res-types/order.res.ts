@@ -45,20 +45,10 @@ export type OrderDataWithRelations = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: OrderPayment | null;
   refunds: Refund[] | null;
-  exports: (Pick<Export, 'id' | 'exportCode'> & { items: ExportItem[] })[] | null;
-  exchanges:
-    | (Pick<Exchange, 'id' | 'exchangeCode' | 'status'> & {
-        exchangeItems: ExchangeItem[];
-      })[]
-    | null;
-  returns:
-    | (Pick<Return, 'id' | 'returnCode' | 'status'> & { items: ReturnItem[] })[]
-    | null;
-  orderCancellations?:
-    | (Pick<OrderCancellation, 'id' | 'cancelCode'> & {
-        items: OrderCancellationItem[];
-      })[]
-    | null;
+  exports: (Export & { items: ExportItem[] })[] | null;
+  exchanges: (Exchange & { exchangeItems: ExchangeItem[] })[] | null;
+  returns: (Return & { items: ReturnItem[] })[] | null;
+  orderCancellations?: (OrderCancellation & { items: OrderCancellationItem[] })[] | null;
 };
 
 /** 주문 목록 리턴 데이터 타입 */
