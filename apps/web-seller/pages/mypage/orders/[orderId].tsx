@@ -12,27 +12,18 @@ import {
   useColorModeValue,
   VStack,
 } from '@chakra-ui/react';
-import { SellerOrderCancelRequestStatus } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
-import { OrderCancelRequestExistAlert } from '@project-lc/components-seller/OrderCancelRequestExistAlert';
-import { OrderDetailActions } from '@project-lc/components-seller/OrderDetailActions';
 import { OrderDetailDeliveryInfo } from '@project-lc/components-seller/OrderDetailDeliveryInfo';
 import { OrderDetailExportInfo } from '@project-lc/components-seller/OrderDetailExportInfo';
 import { OrderDetailGoods } from '@project-lc/components-seller/OrderDetailGoods';
 import { OrderDetailOptionList } from '@project-lc/components-seller/OrderDetailOptionList';
 import { OrderDetailRefundInfo } from '@project-lc/components-seller/OrderDetailRefundInfo';
 import { OrderDetailReturnInfo } from '@project-lc/components-seller/OrderDetailReturnInfo';
-import { OrderDetailSummary } from '@project-lc/components-seller/OrderDetailSummary';
-import { OrderDetailTitle } from '@project-lc/components-seller/OrderDetailTitle';
 import { OrderRefundExistsAlert } from '@project-lc/components-seller/OrderRefundExistsAlert';
 import { OrderReturnExistsAlert } from '@project-lc/components-seller/OrderReturnExistsAlert';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
-import {
-  useDisplaySize,
-  useFmOrder,
-  useSellerOrderCancelRequest,
-} from '@project-lc/hooks';
+import { useDisplaySize, useOrderDetail } from '@project-lc/hooks';
 import {
   convertFmOrderShippingTypesToString,
   FmOrderShipping,
@@ -40,6 +31,10 @@ import {
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
+import { OrderDetailTitle } from '@project-lc/components-seller/kkshow-order/OrderDetailTitle';
+import { OrderDetailActions } from '@project-lc/components-seller/kkshow-order/OrderDetailActions';
+import { OrderDetailSummary } from '@project-lc/components-seller/kkshow-order/OrderDetailSummary';
+import { OrderItemOptionInfo } from '@project-lc/components-shared/order/OrderItemOptionInfo';
 
 const refundSectionTitle = '환불 정보';
 const returnSectionTitle = '반품 정보';
@@ -47,18 +42,17 @@ const returnSectionTitle = '반품 정보';
 /** 주문 상세 보기 페이지 */
 export function OrderDetail(): JSX.Element {
   const router = useRouter();
-  const orderId = router.query.orderId as string;
 
-  const order = useFmOrder(orderId);
-  const orderCancel = useSellerOrderCancelRequest(orderId);
+  const orderCode = router.query.orderId as string; // 주문코드
+
+  const order = useOrderDetail({ orderCode });
 
   const { isMobileSize } = useDisplaySize();
 
   // 현재 주문이 조회 가능한 주문인지 확인
   const isViewableOrder = useMemo(() => {
     if (!order.data) return null;
-    // 주문이 선물용이 아닌 경우 조회 가능한 주문임.
-    return !order.data.giftFlag;
+    return true;
   }, [order.data]);
 
   if (order.isLoading) {
@@ -96,7 +90,6 @@ export function OrderDetail(): JSX.Element {
             목록으로
           </Button>
         </Box>
-
         {/* 주문 제목 */}
         <Box as="section">
           <OrderDetailTitle order={order.data} />
@@ -114,11 +107,11 @@ export function OrderDetail(): JSX.Element {
           </Stack>
         )}
 
-        {/* 결제취소요청 했을 경우 알림창 */}
-        {orderCancel.data &&
-          orderCancel.data.status !== SellerOrderCancelRequestStatus.confirmed && (
+        {/* 퍼스트몰 사용하지 않으면 판매자 -> 관리자로 결제취소 요청 필요없음  */}
+        {/* {orderCancel.data &&
+          orderCancel.data.status !== .confirmed && (
             <OrderCancelRequestExistAlert data={orderCancel.data} />
-          )}
+          )} */}
 
         {/* 주문 버튼 */}
         {isMobileSize ? null : (
@@ -133,19 +126,50 @@ export function OrderDetail(): JSX.Element {
         </Box>
 
         {/* 주문 상품 정보 */}
-        <SectionWithTitle title="주문 상품 정보">
+        {/*  // TODO: 주문-배송비 테이블 생성 후 주석 처리된 코드처럼 OrderDetailShippingItem 활용하여 주문상품 표시하도록 수정하기(임의로 주문상품정보 표시하도록 해둠) */}
+        {/* <SectionWithTitle title="주문 상품 정보">
           {order.data.shippings.map((shipping) => (
             <OrderDetailShippingItem key={shipping.shipping_seq} shipping={shipping} />
           ))}
+        </SectionWithTitle> */}
+        <SectionWithTitle title="주문 상품 정보">
+          {order.data.orderItems.flatMap((item) =>
+            item.options.map((opt) => (
+              <OrderItemOptionInfo
+                key={opt.id}
+                order={order.data}
+                option={opt}
+                orderItem={item}
+              />
+            )),
+          )}
         </SectionWithTitle>
 
         {/* 주문자 / 수령자 정보 */}
         <SectionWithTitle title="주문자 / 수령자 정보">
-          <OrderDetailDeliveryInfo orderDeliveryData={order.data} />
+          {/* OrderDetailDeliveryInfo는 기존 컴포넌트 그대로 사용함 */}
+          <OrderDetailDeliveryInfo
+            orderDeliveryData={{
+              order_phone: '', // 주문자전화
+              recipient_phone: '',
+              recipient_address_street: '',
+              recipient_address: order.data.recipientAddress,
+              recipient_address_detail: order.data.recipientDetailAddress,
+              order_user_name: order.data.ordererName,
+              order_email: order.data.ordererEmail,
+              order_cellphone: order.data.ordererPhone, // '주문자휴대폰',
+              recipient_user_name: order.data.recipientAddress,
+              recipient_zipcode: order.data.recipientPostalCode,
+              recipient_cellphone: order.data.recipientPhone,
+              recipient_email: order.data.recipientEmail,
+              memo: order.data.memo,
+            }}
+          />
         </SectionWithTitle>
 
         {/* 출고 정보 */}
-        {order.data.exports.length > 0 && (
+        {/* // TODO: 출고정보 연결 */}
+        {/* {order.data.exports.length > 0 && (
           <SectionWithTitle title="출고 정보">
             {order.data.exports.map((_exp) => (
               <Box key={_exp.export_code} mt={6} pb={4}>
@@ -157,21 +181,23 @@ export function OrderDetail(): JSX.Element {
               </Box>
             ))}
           </SectionWithTitle>
-        )}
+        )} */}
 
         {/* 반품 정보 */}
+        {/* // TODO: 반품 정보 연결 */}
         {order.data.returns.length > 0 && (
           <SectionWithTitle title={returnSectionTitle}>
             {order.data.returns.map((_ret) => (
-              <Box key={_ret.return_code} mt={6} pb={4}>
-                <OrderDetailReturnInfo returns={_ret} />
+              <Box key={_ret.returnCode} mt={6} pb={4}>
+                {/* <OrderDetailReturnInfo returns={_ret} /> */}
               </Box>
             ))}
           </SectionWithTitle>
         )}
 
         {/* 환불 정보 */}
-        {order.data.refunds.length > 0 && (
+        {/* // TODO: 환불 정보 연결 */}
+        {/* {order.data.refunds.length > 0 && (
           <SectionWithTitle title={refundSectionTitle}>
             {order.data.refunds.map((_ref) => (
               <Box key={_ref.refund_code} mt={6} pb={4}>
@@ -179,7 +205,7 @@ export function OrderDetail(): JSX.Element {
               </Box>
             ))}
           </SectionWithTitle>
-        )}
+        )} */}
       </Stack>
     </MypageLayout>
   );
