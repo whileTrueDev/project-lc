@@ -10,17 +10,17 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
+import CenterBox from '@project-lc/components-layout/CenterBox';
 import {
   getEmailDupCheck,
   useCodeVerifyMutation,
-  useMailVerificationMutation,
   useCountdown,
+  useMailVerificationMutation,
 } from '@project-lc/hooks';
 import { emailCodeRegisterOptions, emailRegisterOptions } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import CenterBox from '@project-lc/components-layout/CenterBox';
 import PasswordChangeForm from './PasswordChangeForm';
 
 const resetPasswordStepHeaders = [

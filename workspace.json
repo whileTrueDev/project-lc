@@ -862,6 +862,7 @@
       "tags": []
     },
     "nest-modules-manual": "libs/nest-modules-manual",
+    "nest-modules-mileage": "libs/nest-modules-mileage",
     "nest-modules-notice": {
       "root": "libs/nest-modules-notice",
       "sourceRoot": "libs/nest-modules-notice/src",

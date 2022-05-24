@@ -111,6 +111,7 @@
       "@project-lc/nest-modules-mail-verification": [
         "libs/nest-modules-mail-verification/src/index.ts"
       ],
+      "@project-lc/nest-modules-mileage": ["libs/nest-modules-mileage/src/index.ts"],
       "@project-lc/nest-modules-manual": [
         "libs/nest-modules-manual/src/index.ts"
       ],
