@@ -11,7 +11,7 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { GoodsInquiryComment } from '@prisma/client';
+import { Goods, GoodsInquiryComment } from '@prisma/client';
 import { CommentList } from '@project-lc/components-shared/comment/CommentList';
 import { GoodsInquiryStatusBadge } from '@project-lc/components-shared/GoodsInquiryStatusBadge';
 import {
@@ -30,10 +30,18 @@ import SellerGoodsInquiryCommentCreateDialog from './SellerGoodsInquiryCommentCr
 import SellerGoodsInquiryCommentDeleteDialog from './SellerGoodsInquiryCommentDeleteDialog';
 import SellerGoodsInquiryCommentUpdateDialog from './SellerGoodsInquiryCommentUpdateDialog';
 
-export function SellerGoodsInquiryList(): JSX.Element | null {
+interface SellerGoodsInquiryListProps {
+  goodsId?: Goods['id'];
+}
+export function SellerGoodsInquiryList({
+  goodsId,
+}: SellerGoodsInquiryListProps): JSX.Element | null {
   const { data: profile } = useProfile();
   const { data, isFetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteGoodsInquiries({ sellerId: profile?.id }, { enabled: !!profile?.id });
+    useInfiniteGoodsInquiries(
+      { sellerId: profile?.id, goodsId },
+      { enabled: !!profile?.id },
+    );
 
   const [onlyRequested, setOnlyRequested] = useState(false);
   const handleFilterClick = (): void => {

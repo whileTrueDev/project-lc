@@ -6,7 +6,8 @@ export interface GoodsInquiryStatusBadgeProps {
 }
 export function GoodsInquiryStatusBadge({
   goodsInquiryStatus,
-}: GoodsInquiryStatusBadgeProps): JSX.Element {
+}: GoodsInquiryStatusBadgeProps): JSX.Element | null {
+  if (!goodsInquiryStatus) return null;
   return (
     <Badge
       colorScheme={GOODS_INQUIRY_STATUS[goodsInquiryStatus].colorScheme}
