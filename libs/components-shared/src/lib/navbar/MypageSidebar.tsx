@@ -25,8 +25,13 @@ import { useCallback, useMemo } from 'react';
 export interface MypageSidebarPrpps {
   navLinks: Array<MypageLink>;
   isFolded?: boolean;
+  defaultAllOpen?: boolean; // 기본적으로 모든 사이드바네비 카테고리가 오픈되어있는 지 여부
 }
-export function MypageSidebar({ navLinks, isFolded }: MypageSidebarPrpps): JSX.Element {
+export function MypageSidebar({
+  navLinks,
+  isFolded,
+  defaultAllOpen = false,
+}: MypageSidebarPrpps): JSX.Element {
   const realNavLinks = navLinks.filter((l) => !l.isInvisible);
   const router = useRouter();
 
@@ -53,7 +58,14 @@ export function MypageSidebar({ navLinks, isFolded }: MypageSidebarPrpps): JSX.E
   }
 
   return (
-    <Accordion as="nav" allowMultiple allowToggle defaultIndex={[matchedLinkIndex]}>
+    <Accordion
+      as="nav"
+      allowMultiple
+      allowToggle
+      defaultIndex={
+        defaultAllOpen ? [...Array(realNavLinks.length).keys()] : [matchedLinkIndex]
+      }
+    >
       {realNavLinks.map((link) => (
         <SidebarItem key={link.name} link={link} isMatched={isMatched(link)} />
       ))}
@@ -134,7 +146,6 @@ export function SidebarItem({ link, isMatched }: SidebarItemProps): JSX.Element 
         fontWeight={isMatched ? 'bold' : 'medium'}
         fontSize={{ base: 'lg', sm: 'sm' }}
         _hover={{ bg: hoverColor, color: 'whiteAlpha.900' }}
-        _focus={{ bg: hoverColor, color: 'whiteAlpha.900' }}
         justifyContent="space-between"
         alignItems="center"
         onClick={() => {
@@ -178,7 +189,6 @@ function SidebarChildItem({
         role="group"
         rounded="md"
         _hover={{ bg: hoverColor, color: 'whiteAlpha.900' }}
-        _focus={{ bg: hoverColor, color: 'whiteAlpha.900' }}
         bg={isMatched ? 'blue.500' : 'none'}
         color={isMatched ? 'white' : 'inherit'}
         fontWeight={isMatched ? 'bold' : 'medium'}
