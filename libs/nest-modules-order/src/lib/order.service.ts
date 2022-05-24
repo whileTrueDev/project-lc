@@ -525,11 +525,19 @@ export class OrderService {
       };
     }
 
-    await this.prisma.order.update({
-      where: { id: orderId },
-      data: updateInput,
-    });
-
+    await this.prisma.$transaction([
+      this.prisma.order.update({
+        where: { id: orderId },
+        data: updateInput,
+      }),
+      // 주문 상태를 바꾸는 경우 -> 주문에 연결된 주문상품옵션 상태도 같이 변경
+      rest.step
+        ? this.prisma.orderItemOption.updateMany({
+            where: { orderItem: { orderId } },
+            data: { step: rest.step },
+          })
+        : undefined,
+    ]);
     return true;
   }
 

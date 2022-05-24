@@ -60,6 +60,7 @@ export * from './lib/mutation/useMailCodeValidationMutation';
 export * from './lib/mutation/useMailVerificationMutation';
 export * from './lib/mutation/useNoticeMutation';
 export * from './lib/mutation/useNotificationMutation';
+export * from './lib/mutation/useOrderMutation';
 export * from './lib/mutation/useOrderPurchaseConfirmMutation';
 export * from './lib/mutation/usePaymentMutation';
 export * from './lib/mutation/useRegistGoods';
