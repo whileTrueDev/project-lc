@@ -6,15 +6,17 @@ import {
   GridFilterModel,
   GridToolbar,
 } from '@material-ui/data-grid';
-import { useAdminMileageList } from '@project-lc/hooks';
+import { useAdminMileageLogList } from '@project-lc/hooks';
 import { adminMileageManageStore } from '@project-lc/stores';
 import { useState } from 'react';
-import { AdminMileageManageDialog } from './AdminMileageManageDialog';
+import dayjs from 'dayjs';
+import { AdminMileageLogDetailDialog } from './AdminMileageLogDetailDialog';
+import { MileageActionTypeBadge } from './MileageActionTypeBadge';
 
-export function AdminMileageList(): JSX.Element {
-  const { data } = useAdminMileageList();
+export function AdminMileageLogList(): JSX.Element {
+  const { data } = useAdminMileageLogList();
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const { setMileageDetail } = adminMileageManageStore();
+  const { setMileageLogDetail } = adminMileageManageStore();
 
   const [filterModel, setFilterModel] = useState<GridFilterModel>({
     items: [],
@@ -28,20 +30,34 @@ export function AdminMileageList(): JSX.Element {
       valueGetter: ({ row }: GridRowData) => row.customer.email,
       flex: 1,
     },
-    { field: 'mileage', headerName: '보유액' },
+    { field: 'amount', headerName: '변동액' },
     {
-      field: 'button',
-      headerName: '관리',
+      field: 'actionType',
+      headerName: '유형',
       renderCell: ({ row }: GridRowData) => (
+        <MileageActionTypeBadge actionType={row.actionType} lineHeight={2} />
+      ),
+    },
+    {
+      field: 'createDate',
+      headerName: '날짜',
+      valueFormatter: ({ row }: GridRowData) =>
+        dayjs(row.createDate).format('YYYY-MM-DD HH:mm:ss'),
+      flex: 1,
+    },
+    {
+      field: '상세',
+      headerName: '상세보기',
+      renderCell: ({ row }) => (
         <Button size="xs" onClick={() => handleButtonClick(row)}>
-          관리
+          상세보기
         </Button>
       ),
     },
   ];
 
   const handleButtonClick = (row: GridRowData): void => {
-    setMileageDetail(row);
+    setMileageLogDetail(row);
     onOpen();
   };
 
@@ -59,12 +75,11 @@ export function AdminMileageList(): JSX.Element {
         rowsPerPageOptions={[25, 50]}
         filterModel={filterModel}
         onFilterModelChange={(model) => setFilterModel(model)}
-        disableColumnMenu
         disableSelectionOnClick
       />
-      <AdminMileageManageDialog isOpen={isOpen} onClose={onClose} />
+      <AdminMileageLogDetailDialog isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 }
 
-export default AdminMileageList;
+export default AdminMileageLogList;

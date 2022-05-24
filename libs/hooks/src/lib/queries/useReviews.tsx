@@ -23,6 +23,11 @@ export const getReviews = async (
     .then((res) => res.data);
 };
 
+// 특정 리뷰 검색
+export const getOneReview = async (reviewId: GoodsReview['id']): Promise<GoodsReview> => {
+  return axios.get<GoodsReview>(`/goods-review/${reviewId}`, {}).then((res) => res.data);
+};
+
 // 상품의 모든 후기
 export const useReviews = (
   dto: FindManyGoodsReviewDto,
@@ -31,6 +36,15 @@ export const useReviews = (
   return useQuery<GoodsReviewRes, AxiosError>(['Reviews', dto], () => getReviews(dto), {
     enabled,
   });
+};
+
+// 특정 리뷰
+export const useOneReview = (
+  reviewId: GoodsReview['id'],
+): UseQueryResult<GoodsReview, AxiosError> => {
+  return useQuery<GoodsReview, AxiosError>(['OneReview', reviewId], () =>
+    getOneReview(reviewId),
+  );
 };
 
 // 상품 후기
