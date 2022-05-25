@@ -15,12 +15,8 @@ import {
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
 import { OrderDetailDeliveryInfo } from '@project-lc/components-seller/OrderDetailDeliveryInfo';
-import { OrderDetailExportInfo } from '@project-lc/components-seller/OrderDetailExportInfo';
 import { OrderDetailGoods } from '@project-lc/components-seller/OrderDetailGoods';
 import { OrderDetailOptionList } from '@project-lc/components-seller/OrderDetailOptionList';
-import { OrderDetailRefundInfo } from '@project-lc/components-seller/OrderDetailRefundInfo';
-import { OrderRefundExistsAlert } from '@project-lc/components-seller/OrderRefundExistsAlert';
-import { OrderReturnExistsAlert } from '@project-lc/components-seller/OrderReturnExistsAlert';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { useDisplaySize, useOrderDetail } from '@project-lc/hooks';
 import {
@@ -36,11 +32,12 @@ import { OrderDetailSummary } from '@project-lc/components-seller/kkshow-order/O
 import { OrderItemOptionInfo } from '@project-lc/components-shared/order/OrderItemOptionInfo';
 import { OrderDetailReturnInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailReturnInfo';
 import { OrderDetailExchangeInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExchangeInfo';
+import { OrderDetailCancelInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailCancelInfo';
 import { OrderExchangeReturnCancelExistsAlert } from '@project-lc/components-seller/kkshow-order/OrderExchangeReturnCancelExistsAlert';
 
-const refundSectionTitle = '환불 정보';
 const exchangeSectionTitle = '교환 정보';
 const returnSectionTitle = '반품 정보';
+const orderCancelSectionTitle = '주문취소 정보';
 
 /** 주문 상세 보기 페이지 */
 export function OrderDetail(): JSX.Element {
@@ -100,7 +97,7 @@ export function OrderDetail(): JSX.Element {
 
         {/* 환불(주문취소요청) , 반품, 교환 알림 문구 */}
         {(order.data.returns.length > 0 ||
-          order.data.refunds.length > 0 ||
+          order.data.orderCancellations.length > 0 ||
           order.data.exchanges.length > 0) && (
           <Stack as="section">
             {order.data.returns.length > 0 && (
@@ -118,7 +115,7 @@ export function OrderDetail(): JSX.Element {
             {order.data.orderCancellations.length > 0 && (
               <OrderExchangeReturnCancelExistsAlert
                 alertTypeKey="cancel"
-                targetSectionTitle={refundSectionTitle}
+                targetSectionTitle={orderCancelSectionTitle}
               />
             )}
           </Stack>
@@ -222,19 +219,17 @@ export function OrderDetail(): JSX.Element {
           </SectionWithTitle>
         )}
 
-        {/* 환불 정보 -> 크크쇼에는 환불요청 없음. 환불테이블은 환불내역 기록용
-          환불정보 대신 주문취소요청 연결
-        */}
-        {/* // TODO: 환불정보 대신 주문취소요청 연결 */}
-        {/* {order.data.refunds.length > 0 && (
-          <SectionWithTitle title={refundSectionTitle}>
-            {order.data.refunds.map((_ref) => (
-              <Box key={_ref.refund_code} mt={6} pb={4}>
-                <OrderDetailRefundInfo refund={_ref} />
+        {/* 환불 정보 -> 크크쇼에는 환불요청 = 반품임. 환불정보 대신 주문취소요청을 표시함
+         */}
+        {order.data.orderCancellations.length > 0 && (
+          <SectionWithTitle title={orderCancelSectionTitle}>
+            {order.data.orderCancellations.map((cancelData) => (
+              <Box key={cancelData.cancelCode} mt={6} pb={4}>
+                <OrderDetailCancelInfo cancelData={cancelData} />
               </Box>
             ))}
           </SectionWithTitle>
-        )} */}
+        )}
       </Stack>
     </MypageLayout>
   );
