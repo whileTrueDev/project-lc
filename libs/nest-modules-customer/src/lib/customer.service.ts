@@ -1,31 +1,19 @@
-import {
-  BadRequestException,
-  CACHE_MANAGER,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Customer, Prisma } from '@prisma/client';
-import { ServiceBaseWithCache, UserPwManager } from '@project-lc/nest-core';
+import { UserPwManager } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CustomerStatusRes,
   SignUpDto,
   UpdateCustomerDto,
 } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 
 @Injectable()
-export class CustomerService extends ServiceBaseWithCache {
-  #CUSTOMER_CACHE_KEY = 'customer';
-
+export class CustomerService {
   constructor(
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
     private readonly prisma: PrismaService,
     private readonly pwManager: UserPwManager,
-  ) {
-    super(cacheManager);
-  }
+  ) {}
 
   /** 소비자 생성 (회원가입) */
   public async signUp(dto: SignUpDto): Promise<Customer> {
@@ -33,7 +21,6 @@ export class CustomerService extends ServiceBaseWithCache {
     const created = await this.prisma.customer.create({
       data: { email: dto.email, password: hashedPw, nickname: '', name: dto.name },
     });
-    await this._clearCaches(this.#CUSTOMER_CACHE_KEY);
     return created;
   }
 

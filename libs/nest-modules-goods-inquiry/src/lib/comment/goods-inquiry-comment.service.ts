@@ -1,20 +1,11 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { GoodsInquiry, GoodsInquiryComment } from '@prisma/client';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { GoodsInquiryCommentDto, GoodsInquiryCommentRes } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
 
 @Injectable()
-export class GoodsInquiryCommentService extends ServiceBaseWithCache {
-  #GOODS_INQUIRY_COMMENT_KEY = 'goods-inquiry';
-
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+export class GoodsInquiryCommentService {
+  constructor(private readonly prisma: PrismaService) {}
 
   /** 특정 상품문의 답변 목록 조회 */
   public async findAll(
@@ -36,7 +27,6 @@ export class GoodsInquiryCommentService extends ServiceBaseWithCache {
     goodsInquiryId: GoodsInquiry['id'],
     dto: GoodsInquiryCommentDto,
   ): Promise<GoodsInquiryComment> {
-    await this._clearCaches(this.#GOODS_INQUIRY_COMMENT_KEY);
     return this.prisma.goodsInquiryComment.create({
       data: {
         goodsInquiryId,
@@ -62,7 +52,6 @@ export class GoodsInquiryCommentService extends ServiceBaseWithCache {
         writtenBySellerFlag: !!dto.sellerId,
       },
     });
-    await this._clearCaches(this.#GOODS_INQUIRY_COMMENT_KEY);
     return updated;
   }
 
@@ -71,7 +60,6 @@ export class GoodsInquiryCommentService extends ServiceBaseWithCache {
     const result = await this.prisma.goodsInquiryComment.delete({
       where: { id: commentId },
     });
-    await this._clearCaches(this.#GOODS_INQUIRY_COMMENT_KEY);
     return !!result;
   }
 }

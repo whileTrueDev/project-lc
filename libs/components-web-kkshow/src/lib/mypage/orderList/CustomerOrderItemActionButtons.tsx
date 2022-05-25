@@ -112,9 +112,9 @@ export function OrderItemActionButtons({
       disabled: step === 'purchaseConfirmed',
     },
     {
-      label: !hasReview ? '리뷰 작성하기' : '작성한 리뷰 확인',
+      label: !hasReview ? '후기 작성하기' : '작성한 후기 확인',
       onClick: !hasReview ? reviewDialog.onOpen : () => router.push('/mypage/review'),
-      display: reviewAbleSteps.includes(step), // 배송완료 이후 표시 & 구매확정시 표시, 리뷰 작성하지 않았을때
+      display: reviewAbleSteps.includes(step), // 배송완료 이후 표시 & 구매확정시 표시, 후기 작성하지 않았을때
       disabled: false,
     },
     {
@@ -179,7 +179,7 @@ export function OrderItemActionButtons({
         orderId={orderId}
       />
 
-      {/* 리뷰 작성 다이얼로그 */}
+      {/* 후기 작성 다이얼로그 */}
       {orderItem.goodsId && (
         <ReviewCreateDialog
           isOpen={reviewDialog.isOpen}

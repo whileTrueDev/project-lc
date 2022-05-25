@@ -1,12 +1,6 @@
-import {
-  BadRequestException,
-  CACHE_MANAGER,
-  ForbiddenException,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { Order, OrderProcessStep, Prisma } from '@prisma/client';
-import { ServiceBaseWithCache, UserPwManager } from '@project-lc/nest-core';
+import { UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -18,22 +12,16 @@ import {
   OrderPurchaseConfirmationDto,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
-import { Cache } from 'cache-manager';
-import dayjs = require('dayjs');
 import { nanoid } from 'nanoid';
+import dayjs = require('dayjs');
 
 @Injectable()
-export class OrderService extends ServiceBaseWithCache {
-  #ORDER_CACHE_KEY = 'order';
-
+export class OrderService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly broadcasterService: BroadcasterService,
     private readonly userPwManager: UserPwManager,
-    @Inject(CACHE_MANAGER) protected readonly cacheManager: Cache,
-  ) {
-    super(cacheManager);
-  }
+  ) {}
 
   private async hash(pw: string): Promise<string> {
     return this.userPwManager.hashPassword(pw);
@@ -175,7 +163,6 @@ export class OrderService extends ServiceBaseWithCache {
       return this.removerecipientInfo(order);
     }
 
-    await this._clearCaches(this.#ORDER_CACHE_KEY);
     return order;
   }
 
@@ -390,7 +377,6 @@ export class OrderService extends ServiceBaseWithCache {
       data: updateInput,
     });
 
-    await this._clearCaches(this.#ORDER_CACHE_KEY);
     return true;
   }
 
@@ -483,7 +469,6 @@ export class OrderService extends ServiceBaseWithCache {
       });
     }
 
-    await this._clearCaches(this.#ORDER_CACHE_KEY);
     return true;
   }
 }

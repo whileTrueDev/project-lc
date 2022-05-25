@@ -12,7 +12,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Order } from '@prisma/client';
-import { HttpCacheInterceptor } from '@project-lc/nest-core';
+import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateOrderDto,
   GetNonMemberOrderDetailDto,
@@ -25,6 +25,7 @@ import {
 import { OrderService } from './order.service';
 
 @UseInterceptors(HttpCacheInterceptor)
+@CacheClearKeys('order')
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}

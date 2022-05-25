@@ -38,11 +38,11 @@ export function ReviewUpdateDialog({
       })
       .then(() => {
         onClose();
-        toast({ description: '리뷰가 수정되었습니다.', status: 'success' });
+        toast({ description: '후기가 수정되었습니다.', status: 'success' });
       })
       .catch((err) => {
         console.log(err);
-        toast({ description: '리뷰 수정 중 오류가 발생했습니다.', status: 'error' });
+        toast({ description: '후기 수정 중 오류가 발생했습니다.', status: 'error' });
       });
   };
 
@@ -57,7 +57,7 @@ export function ReviewUpdateDialog({
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>리뷰 {reviewId} 수정하기</ModalHeader>
+        <ModalHeader>후기 {reviewId} 수정하기</ModalHeader>
         <ModalBody>
           <ReviewCreateOrUpdateForm
             onSubmit={onSubmit}
