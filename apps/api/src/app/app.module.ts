@@ -38,9 +38,11 @@ import { PrismaModule } from '@project-lc/prisma-orm';
 import { OrderModule } from '@project-lc/nest-modules-order';
 import { ReturnModule } from '@project-lc/nest-modules-return';
 import { GoodsReviewModule } from '@project-lc/nest-modules-goods-review';
+import { MileageModule } from '@project-lc/nest-modules-mileage';
 import { CouponModule } from '@project-lc/nest-modules-coupon';
 import { RefundModule } from '@project-lc/nest-modules-refund';
 import { ExchangeModule } from '@project-lc/nest-modules-exchange';
+import { ExportModule } from '@project-lc/nest-modules-export';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
 
@@ -79,9 +81,11 @@ import { AppController } from './app.controller';
     ReturnModule.withControllers(),
     GoodsInquiryModule.withControllers(),
     GoodsReviewModule.withControllers(),
+    MileageModule.withControllers(),
     CouponModule.withControllers(),
     RefundModule.withControllers(),
     ExchangeModule.withControllers(),
+    ExportModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],

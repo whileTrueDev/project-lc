@@ -1,4 +1,4 @@
-import { Avatar, Badge, Box, Flex, Image, Text } from '@chakra-ui/react';
+import { Avatar, Badge, Box, Flex, Image, Link, Text } from '@chakra-ui/react';
 import {
   Goods,
   GoodsImages,
@@ -7,10 +7,12 @@ import {
   Seller,
   SellerShop,
 } from '@prisma/client';
+import NextLink from 'next/link';
 import { OrderStatusBadge } from './mypage/orderList/CustomerOrderItem';
 
 export interface GoodsDisplay2Props {
   goods: {
+    id: Goods['id'];
     imageSrc: GoodsImages['image'];
     name: Goods['goods_name'];
     options?: {
@@ -63,7 +65,9 @@ export function GoodsDisplay2({ goods, size = 'md' }: GoodsDisplay2Props): JSX.E
         draggable={false}
       />
       <Box>
-        <Text fontWeight="bold">{goods.name}</Text>
+        <NextLink passHref href={`/goods/${goods.id}`}>
+          <Link fontWeight="bold">{goods.name}</Link>
+        </NextLink>
         {goods.options &&
           goods.options.map((opt) => (
             <Flex key={opt.id} align="center" gap={1}>

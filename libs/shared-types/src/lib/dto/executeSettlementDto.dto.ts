@@ -1,7 +1,7 @@
 import { Seller } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsIn, IsNumber, IsString } from 'class-validator';
-import { FmSettlementTarget } from '../..';
+import type { FmSettlementTarget } from '../res-types/fmSettlements.res';
 
 class FmSettlementTargetClass {
   account_date: Date;
