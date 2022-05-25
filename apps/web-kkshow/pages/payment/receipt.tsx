@@ -25,7 +25,6 @@ export function Receipt(): JSX.Element {
   const orderCode = router.query.orderCode as string;
   const orderId = Number(router.query.orderId);
   const { data: orderDetailData } = useOrderDetail(orderId);
-  console.log(orderDetailData);
   const { data: paymentData, isLoading } = usePaymentByOrderCode(orderCode);
   const virtualAccountBoxBgColor = useColorModeValue('gray.100', 'gray.700');
   const productOriginPrice = orderDetailData?.orderItems[0].options.reduce(
@@ -39,8 +38,6 @@ export function Receipt(): JSX.Element {
   );
 
   const discount = productOriginPrice - productDiscountedPrice;
-
-  // todo: 주문 연결 이후, dummyOrderResult 대신 이 데이터로 사용
 
   return (
     <KkshowLayout>

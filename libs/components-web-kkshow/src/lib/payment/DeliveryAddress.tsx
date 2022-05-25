@@ -37,7 +37,6 @@ export function DeliveryAddress(): JSX.Element {
 
   const { data: profile } = useProfile();
   const { data: defaultAddress, isLoading } = useDefaultCustomerAddress(profile?.id);
-
   const {
     register,
     setValue,
