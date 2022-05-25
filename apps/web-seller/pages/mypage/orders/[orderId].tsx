@@ -19,7 +19,6 @@ import { OrderDetailExportInfo } from '@project-lc/components-seller/OrderDetail
 import { OrderDetailGoods } from '@project-lc/components-seller/OrderDetailGoods';
 import { OrderDetailOptionList } from '@project-lc/components-seller/OrderDetailOptionList';
 import { OrderDetailRefundInfo } from '@project-lc/components-seller/OrderDetailRefundInfo';
-import { OrderDetailReturnInfo } from '@project-lc/components-seller/OrderDetailReturnInfo';
 import { OrderRefundExistsAlert } from '@project-lc/components-seller/OrderRefundExistsAlert';
 import { OrderReturnExistsAlert } from '@project-lc/components-seller/OrderReturnExistsAlert';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
@@ -35,6 +34,7 @@ import { OrderDetailTitle } from '@project-lc/components-seller/kkshow-order/Ord
 import { OrderDetailActions } from '@project-lc/components-seller/kkshow-order/OrderDetailActions';
 import { OrderDetailSummary } from '@project-lc/components-seller/kkshow-order/OrderDetailSummary';
 import { OrderItemOptionInfo } from '@project-lc/components-shared/order/OrderItemOptionInfo';
+import { OrderDetailReturnInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailReturnInfo';
 
 const refundSectionTitle = '환불 정보';
 const returnSectionTitle = '반품 정보';
@@ -120,6 +120,7 @@ export function OrderDetail(): JSX.Element {
           </Box>
         )}
 
+        {/* // TODO: 결제정보도 있으면 좋겠다 - 일단 나머지 주문정보 표시하고 진행 */}
         {/* 주문 요약 */}
         <Box as="section">
           <OrderDetailSummary order={order.data} />
@@ -147,7 +148,7 @@ export function OrderDetail(): JSX.Element {
 
         {/* 주문자 / 수령자 정보 */}
         <SectionWithTitle title="주문자 / 수령자 정보">
-          {/* OrderDetailDeliveryInfo는 기존 컴포넌트 그대로 사용함 */}
+          {/* OrderDetailDeliveryInfo 기존 컴포넌트 그대로 사용함 */}
           <OrderDetailDeliveryInfo
             orderDeliveryData={{
               order_phone: '', // 주문자전화
@@ -189,7 +190,7 @@ export function OrderDetail(): JSX.Element {
           <SectionWithTitle title={returnSectionTitle}>
             {order.data.returns.map((_ret) => (
               <Box key={_ret.returnCode} mt={6} pb={4}>
-                {/* <OrderDetailReturnInfo returns={_ret} /> */}
+                <OrderDetailReturnInfo returnData={_ret} />
               </Box>
             ))}
           </SectionWithTitle>
