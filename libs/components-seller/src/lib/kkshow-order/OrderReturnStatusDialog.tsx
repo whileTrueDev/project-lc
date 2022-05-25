@@ -30,6 +30,7 @@ import {
 import { Return } from '@prisma/client';
 import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
 import { ExchangeReturnCancelRequestGoodsData } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestGoodsData';
+import { RelatedRefundData } from '@project-lc/components-shared/order/RelatedRefundData';
 import { useReturnDetail, useUpdateReturnMutation } from '@project-lc/hooks';
 import { ReturnDataWithImages } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
@@ -170,6 +171,14 @@ export function OrderReturnStatusDialog({
                   ))}
                 </Stack>
               </Stack>
+
+              {/* 환불정보 */}
+              <RelatedRefundData
+                refund={returnDetail.refund}
+                estimatedRefundAmount={returnDetail.items
+                  .map((item) => item.price)
+                  .reduce((sum, price) => sum + price, 0)}
+              />
             </Stack>
 
             {/* 반품상태변경 */}
