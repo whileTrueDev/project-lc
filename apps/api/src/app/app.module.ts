@@ -42,6 +42,7 @@ import { MileageModule } from '@project-lc/nest-modules-mileage';
 import { CouponModule } from '@project-lc/nest-modules-coupon';
 import { RefundModule } from '@project-lc/nest-modules-refund';
 import { ExchangeModule } from '@project-lc/nest-modules-exchange';
+import { ExportModule } from '@project-lc/nest-modules-export';
 import { validationSchema } from '../settings/config.validation';
 import { AppController } from './app.controller';
 
@@ -84,6 +85,7 @@ import { AppController } from './app.controller';
     CouponModule.withControllers(),
     RefundModule.withControllers(),
     ExchangeModule.withControllers(),
+    ExportModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],

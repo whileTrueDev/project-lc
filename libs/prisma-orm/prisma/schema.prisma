@@ -30,6 +30,7 @@ model Seller {
   inactiveFlag               Boolean                      @default(false)
   goodsReviewComments        GoodsReviewComment[] // 판매자가 작성한 상품리뷰댓글
   goodsInquiryComments       GoodsInquiryComment[] // 판매자가 작성한 상품문의답변
+  Export                     Export[] // 판매자가 진행한 출고
 }
 
 // 마케터의 상정정보
@@ -265,21 +266,23 @@ model GoodsConfirmation {
 }
 
 model GoodsOptions {
-  id              Int                   @id @default(autoincrement())
-  goods           Goods                 @relation(fields: [goodsId], references: [id], onDelete: Cascade)
-  goodsId         Int
-  supply          GoodsOptionsSupplies?
+  id               Int                   @id @default(autoincrement())
+  goods            Goods                 @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+  goodsId          Int
+  supply           GoodsOptionsSupplies?
   // 여기서부터는 퍼스트몰 컬럼과 동일한 컬럼
-  default_option  YesOrNo               @default(n) // 옵션 필수 �������부
-  option_type     String                @default("direct") // 기본값인듯? 설명도 direct
-  option_title    String? // 옵션명 fm_goods_options.option_title
-  option1         String? // 옵션값 fm_goods_options.option1
-  option_code     String? // 옵션코드
-  consumer_price  Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
-  price           Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
-  weight          Float? //옵션 개당 무게 (단위 kg)
-  option_view     YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
-  cartItemOptions CartItemOption[]
+  default_option   YesOrNo               @default(n) // 옵션 필수 �������부
+  option_type      String                @default("direct") // 기본값인듯? 설명도 direct
+  option_title     String? // 옵션명 fm_goods_options.option_title
+  option1          String? // 옵션값 fm_goods_options.option1
+  option_code      String? // 옵션코드
+  consumer_price   Decimal               @db.Decimal(10, 2) // 소비자가 (미할인가)
+  price            Decimal               @db.Decimal(10, 2) // 판매가 (할인가)
+  weight           Float? //옵션 개당 무게 (단위 kg)
+  option_view      YesOrNo_UPPERCASE     @default(Y) // 옵션 노출 여부
+  cartItemOptions  CartItemOption[]
+  orderItemOptions OrderItemOption[]
+
 
   @@index([goodsId], name: "goodsId")
 }
@@ -1540,7 +1543,6 @@ model Order {
   giftFlag                   Boolean                      @default(false) // 선물주문 여부
   supportOrderIncludeFlag    Boolean                      @default(false) // 후원상품 포함여부
   bundleFlag                 Boolean                      @default(false) // 묶음배송여부
-  purchaseConfirmationDate   DateTime? // 구매확정일자
   cashReceipts               String? // 현금영수증번호
   deleteFlag                 Boolean?                     @default(false) // 삭제여부
   mileageLogs                CustomerMileageLog[] // 사용 & 적립 마일리지 내역
@@ -1626,23 +1628,23 @@ model OrderItem {
 
 // 주문상품옵션
 model OrderItemOption {
-  id                       Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
-  orderItemId              Int // 옵션이 연결된 주문 상품 고유번호
-  orderItem                OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
-  goodsOptionId            Int // 참조하는 상품옵션 고유번호
-  name                     String? // 주문했을 당시 옵션명
-  value                    String? // 주문했을 당시 옵션값
-  quantity                 Int // 옵션 선택 수량(개수)
-  normalPrice              Decimal                 @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
-  discountPrice            Decimal                 @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
-  weight                   Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
-  step                     OrderProcessStep        @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
-  purchaseConfirmationDate DateTime? // 구매확정일자
-  refundItems              RefundItem[] // 환불상품
-  returnItems              ReturnItem[] // 반품상품
-  exportItems              ExportItem[] // 출고상품
-  orderCancellationItems   OrderCancellationItem[] // 주문취소상품
-  exchangeItems            ExchangeItem[] // 교환상품
+  id                     Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
+  orderItemId            Int // 옵션이 연결된 주문 상품 고유번호
+  orderItem              OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
+  goodsOptionId          Int? // 참조하는 상품옵션 고유번호
+  goodsOption            GoodsOptions?           @relation(fields: [goodsOptionId], references: [id], onDelete: SetNull) // 주문상품옵션이 연결된 상품옵션
+  name                   String? // 주문했을 당시 옵션명
+  value                  String? // 주문했을 당시 옵션값
+  quantity               Int // 옵션 선택 수량(개수)
+  normalPrice            Decimal                 @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
+  discountPrice          Decimal                 @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
+  weight                 Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
+  step                   OrderProcessStep        @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
+  refundItems            RefundItem[] // 환불상품
+  returnItems            ReturnItem[] // 반품상품
+  exportItems            ExportItem[] // 출고상품
+  orderCancellationItems OrderCancellationItem[] // 주문취소상품
+  exchangeItems          ExchangeItem[] // 교환상품
 }
 
 // 주문상품후원
@@ -1871,25 +1873,40 @@ model Export {
   exportCode                 String?                      @unique // 출고코드
   orderId                    Int // 주문 고유번호
   order                      Order                        @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status                     ExportProcessStatus          @default(preparing) // 출고상태
+  status                     ExportProcessStatus          @default(exportDone) // 출고상태
   deliveryCompany            String // 택배사
   deliveryNumber             String // 운송장번호
   bundleExportCode           String? // 합포장출고코드(합포장인경우)
   exportDate                 DateTime //출고일시
+  buyConfirmDate             DateTime? // 구매확정일자(주문스키마에 있던것을 출고에 옮김)
+  buyConfirmSubject          BuyConfirmSubject? // 구매확정주체(null | 소비자, 관리자, 시스템)
   broadcasterSettlementItems BroadcasterSettlementItems[]
   sellerSettlementItems      SellerSettlementItems[]
   exchangeExportedFlag       Boolean                      @default(false) // 재배송(교환출고인지) 여부
   exchange                   Exchange? // 교환출고시 연결된 교환데이터
+  sellerId                   Int? // 출고 진행한 판매자
+  seller                     Seller?                      @relation(fields: [sellerId], references: [id])
+  items                      ExportItem[] // 출고상품
+}
+
+// 구매확정주체
+enum BuyConfirmSubject {
+  admin
+  customer
+  system
 }
 
 // 출고상품
 model ExportItem {
-  id                Int             @id @default(autoincrement()) // 출고상품 고유번호
+  id                Int                 @id @default(autoincrement()) // 출고상품 고유번호
+  exportId          Int // 연결된 출고고유번호
+  export            Export              @relation(fields: [exportId], references: [id], onDelete: Cascade) // 연결된 출고정보
   orderItemId       Int // 주문상품 고유번호
-  orderItem         OrderItem       @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
+  orderItem         OrderItem           @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
-  orderItemOption   OrderItemOption @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
+  orderItemOption   OrderItemOption     @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
+  status            ExportProcessStatus @default(exportDone) // 출고상태
 }
 
 // ****************
