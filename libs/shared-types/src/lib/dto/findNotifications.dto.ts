@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsNumber, IsString, IsIn, IsOptional } from 'class-validator';
-import { UserType } from '../res-types/userProfile.res';
+import type { UserType } from '../res-types/userProfile.res';
 
 export class FindNotificationsDto {
   @IsString()

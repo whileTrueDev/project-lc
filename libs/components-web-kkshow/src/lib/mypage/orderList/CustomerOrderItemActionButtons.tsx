@@ -20,7 +20,7 @@ export function OrderItemActionButtons({
   order,
 }: OrderItemOptionInfoProps): JSX.Element {
   const router = useRouter();
-  const { step, purchaseConfirmationDate } = option;
+  const { step } = option;
   const hasReview = !!orderItem.reviewId;
   const { orderId } = orderItem;
 
@@ -102,14 +102,14 @@ export function OrderItemActionButtons({
           );
         }
       },
-      display: exchangeReturnAbleSteps.includes(step) && !purchaseConfirmationDate, // 상품준비 이후 표시 && 구매확정 안했을 때
-      disabled: !!purchaseConfirmationDate, // 구매확정 이후 disabled
+      display: exchangeReturnAbleSteps.includes(step), // 상품준비 이후 표시
+      disabled: false,
     },
     {
       label: '구매확정',
       onClick: purchaseConfirmDialog.onOpen,
-      display: purchaseConfirmAbleSteps.includes(step) && !purchaseConfirmationDate, // 배송완료 이후 표시 & 구매확정 하지 않았을때
-      disabled: !!purchaseConfirmationDate,
+      display: purchaseConfirmAbleSteps.includes(step), // 배송완료 이후 표시
+      disabled: step === 'purchaseConfirmed',
     },
     {
       label: !hasReview ? '후기 작성하기' : '작성한 후기 확인',

@@ -93,7 +93,7 @@ export const createDummyOrder = async ({
       quantity: 1,
       normalPrice: 5000,
       discountPrice: 4000,
-      goodsOptionId: 1,
+      goodsOption: { connect: { id: 1 } },
       step,
     },
   });
@@ -151,7 +151,7 @@ export const purchaseConfirmedOrder = {
   ...normalOrder,
   orderCode: 'dummy-order-2-qwer',
   step: 'purchaseConfirmed' as const,
-  purchaseConfirmationDate: new Date(),
+
   orderItems: {
     create: [
       {
@@ -162,12 +162,10 @@ export const purchaseConfirmedOrder = {
             {
               ...normalOrder.orderItems.create[0].options.create[0],
               step: 'purchaseConfirmed' as const,
-              purchaseConfirmationDate: new Date(),
             },
             {
               ...normalOrder.orderItems.create[0].options.create[1],
               step: 'purchaseConfirmed' as const,
-              purchaseConfirmationDate: new Date(),
             },
           ],
         },

@@ -1,5 +1,5 @@
 import { IsNumber, IsObject, IsOptional } from 'class-validator';
-import { GoodsInformationSubjectItems } from './goodsInformationSubject.dto';
+import type { GoodsInformationSubjectItems } from './goodsInformationSubject.dto';
 
 export class GoodsInformationNoticeDto {
   @IsOptional()

@@ -1,0 +1,22 @@
+{
+  "root": "libs/nest-modules-export",
+  "sourceRoot": "libs/nest-modules-export/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/nest-modules-export/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/nest-modules-export"],
+      "options": {
+        "jestConfig": "libs/nest-modules-export/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

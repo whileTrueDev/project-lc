@@ -553,7 +553,8 @@ export class OrderService {
     return true;
   }
 
-  /** 주문확정 */
+  /** 구매확정 - 모든 주문상품옵션이 배송완료 상태일때 구매확정이 가능
+   */
   async purchaseConfirm(dto: OrderPurchaseConfirmationDto): Promise<boolean> {
     const { orderItemOptionId } = dto;
     const orderItemOption = await this.prisma.orderItemOption.findUnique({
@@ -566,11 +567,34 @@ export class OrderService {
       );
     }
 
-    // 주문상품옵션에 대해 구매확정
-    await this.prisma.orderItemOption.update({
-      where: { id: orderItemOptionId },
+    // 주문상품옵션이 연결된 출고 조회
+    const exportData = await this.prisma.export.findFirst({
+      where: { items: { some: { orderItemOptionId } } },
+      include: {
+        items: { select: { orderItemOptionId: true } },
+      },
+    });
+    // 해당 출고데이터에 구매확정일자 저장
+    if (exportData && !exportData.buyConfirmDate) {
+      await this.prisma.export.update({
+        where: { id: exportData.id },
+        data: {
+          buyConfirmDate: new Date(),
+          buyConfirmSubject: 'customer',
+        },
+      });
+    }
+
+    // 해당 출고에 대한 구매확정처리 == 해당 출고에 포함된 주문상품옵션은 모두 구매확정처리
+    // 같이 구매확정 상태로 변경되어야 하는(동일한 출고에 포함된) 주문상품옵션id들
+    const batchExportedOrderOptionIds = exportData
+      ? exportData.items.map((i) => i.orderItemOptionId)
+      : [];
+
+    // 해당 주문상품옵션 & 연결된 출고에 포함된 모든 주문상품옵션을 구매확정으로 상태 변경
+    await this.prisma.orderItemOption.updateMany({
+      where: { id: { in: batchExportedOrderOptionIds.concat(orderItemOptionId) } },
       data: {
-        purchaseConfirmationDate: new Date(),
         step: 'purchaseConfirmed',
       },
     });
@@ -590,15 +614,15 @@ export class OrderService {
       );
     }
 
-    // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 구매확정 값도 변경
+    // 주문에 포함된 모든 주문상품옵션이 구매확정 되었다면 주문의 상태도 구매확정으로 변경
     const everyOrderItemOptionsPurchaseConfirmed = order.orderItems
       .flatMap((item) => item.options)
-      .every((opt) => !!opt.purchaseConfirmationDate && opt.step === 'purchaseConfirmed');
+      .every((opt) => opt.step === 'purchaseConfirmed');
 
     if (everyOrderItemOptionsPurchaseConfirmed) {
       await this.prisma.order.update({
         where: { id: order.id },
-        data: { purchaseConfirmationDate: new Date(), step: 'purchaseConfirmed' },
+        data: { step: 'purchaseConfirmed' },
       });
     }
 

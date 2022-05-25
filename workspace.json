@@ -677,6 +677,7 @@
     "nest-modules-coupon": "libs/nest-modules-coupon",
     "nest-modules-customer": "libs/nest-modules-customer",
     "nest-modules-exchange": "libs/nest-modules-exchange",
+    "nest-modules-export": "libs/nest-modules-export",
     "nest-modules-goods": {
       "root": "libs/nest-modules-goods",
       "sourceRoot": "libs/nest-modules-goods/src",
@@ -862,6 +863,7 @@
       "tags": []
     },
     "nest-modules-manual": "libs/nest-modules-manual",
+    "nest-modules-mileage": "libs/nest-modules-mileage",
     "nest-modules-notice": {
       "root": "libs/nest-modules-notice",
       "sourceRoot": "libs/nest-modules-notice/src",
