@@ -428,6 +428,7 @@ model ShippingGroup {
   shipping_add_free_yn    YesOrNo_UPPERCASE? @default(N) // '추가배송비 무료화',
   orderItems              OrderItem[] // 해당 배송비정책 참조하는 주문 상품들
   cartItems               CartItem[] // 해당 배송비정책 참조하는 장바구니 상품들
+  orderShippings          OrderShipping[] // 해당 배송비정책 참조하는 주문에 부과된 배송비
 }
 
 // 배송비 계산 기준
@@ -454,6 +455,7 @@ model ShippingSet {
   swap_shiping_cost   Decimal?           @db.Decimal(11, 2) // '맞교환 배송비',
   prepay_info         PrepayInfo         @default(delivery) // 선불/착불 정보
   shiping_free_yn     YesOrNo_UPPERCASE  @default(N) //'무료배송시 반품왕복배송비',
+  orderShippings      OrderShipping[] // 해당 배송설정 참조하는 주문에 부과된 배송비정보
 }
 
 // 착불/선불 정보
@@ -1554,6 +1556,7 @@ model Order {
   orderCancellations         OrderCancellation[] // 주문에 연결된 주무취소정보
   broadcasterSettlementItems BroadcasterSettlementItems[]
   sellerSettlementItems      SellerSettlementItems[]
+  shippings                  OrderShipping[] // 주문에 포함된 배송비정보
 
   @@index([orderCode])
 }
@@ -1600,6 +1603,43 @@ enum PaymentMethod {
   virtualAccount // 가상계좌
 }
 
+// FmOrderShipping 테이블에 해당 (주문에 부과된 배송비정보 저장하는 테이블인듯 함)
+// 하나의 주문에 여러 배송비가 부과될 수 있다
+model OrderShipping {
+  id                  Int                 @id @default(autoincrement()) // 고유 식별 번호
+  shippingCostPayType ShippingCostPayType @default(prepay) // shipping_type 배송비 결제방식
+  shippingCost        String? // shipping_cost 실배송비
+  shippingMethod      ShippingMethod? // shipping_method 배송방법
+  shippingGroup       ShippingGroup?      @relation(fields: [shippingGroupId], references: [id], onDelete: SetNull)
+  shippingSet         ShippingSet?        @relation(fields: [shippingSetId], references: [id], onDelete: SetNull)
+  shippingGroupId     Int?
+  shippingSetId       Int?
+  items               OrderItemOption[] // 해당 배송비에 포함된 주문상품옵션들
+  order               Order?              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId             Int?
+}
+
+// 배송비 결제 방식
+enum ShippingCostPayType {
+  free // 무료
+  prepay //  선불 - 주문시결제
+  postpaid //착불
+}
+
+// 배송방법
+enum ShippingMethod {
+  delivery // 택배
+  postpaid // 택배착불
+  each_delivery // 택배
+  each_postpaid // 택배착불
+  quick // 퀵서비스
+  direct_delivery // 직접배송
+  direct_store // 매장수령
+  freight // 화물배송
+  direct // 직접수령
+  coupon // 티켓
+}
+
 // ****************
 // 주문상품
 // ****************
@@ -1628,23 +1668,33 @@ model OrderItem {
 
 // 주문상품옵션
 model OrderItemOption {
-  id                     Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
-  orderItemId            Int // 옵션이 연결된 주문 상품 고유번호
-  orderItem              OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
-  goodsOptionId          Int? // 참조하는 상품옵션 고유번호
-  goodsOption            GoodsOptions?           @relation(fields: [goodsOptionId], references: [id], onDelete: SetNull) // 주문상품옵션이 연결된 상품옵션
-  name                   String? // 주문했을 당시 옵션명
-  value                  String? // 주문했을 당시 옵션값
-  quantity               Int // 옵션 선택 수량(개수)
-  normalPrice            Decimal                 @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
-  discountPrice          Decimal                 @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
-  weight                 Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
-  step                   OrderProcessStep        @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
-  refundItems            RefundItem[] // 환불상품
-  returnItems            ReturnItem[] // 반품상품
-  exportItems            ExportItem[] // 출고상품
-  orderCancellationItems OrderCancellationItem[] // 주문취소상품
-  exchangeItems          ExchangeItem[] // 교환상품
+  id                      Int                     @id @default(autoincrement()) // 주문 상품 옵션 고유번호
+  orderItemId             Int // 옵션이 연결된 주문 상품 고유번호
+  orderItem               OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
+  goodsOptionId           Int? // 참조하는 상품옵션 고유번호
+  goodsOption             GoodsOptions?           @relation(fields: [goodsOptionId], references: [id], onDelete: SetNull) // 주문상품옵션이 연결된 상품옵션
+  goodsName               String? // 주문당시 상품명
+  imageUrl                String? // 상품대표이미지 url
+  name                    String? // 주문했을 당시 옵션명
+  value                   String? // 주문했을 당시 옵션값
+  quantity                Int // 옵션 선택 수량(개수)
+  normalPrice             Decimal                 @db.Decimal(10, 2) // 주문했을 당시 소비자가 (미할인가) => Int 아닌 Decimal인 이유: 상품옵션GoodsOption 테이블 만들때 가격Decimal로 설정해서(퍼스트몰 테이블 스키마 참고하였음)
+  discountPrice           Decimal                 @db.Decimal(10, 2) // 주문했을 당시 판매가 (할인가)
+  weight                  Float? //주문했을 당시 옵션 개당 무게 (단위 kg)
+  step                    OrderProcessStep        @default(orderReceived) // 주문상품의 처리상태(주문의 처리상태와는 별도임, 하나의 주문이지만 일부 상품의 특정 옵션만 먼저 발송되거나 취소될 수 있으므로..)
+  refundItems             RefundItem[] // 환불상품
+  returnItems             ReturnItem[] // 반품상품
+  exportItems             ExportItem[] // 출고상품
+  orderCancellationItems  OrderCancellationItem[] // 주문취소상품
+  exchangeItems           ExchangeItem[] // 교환상품
+  orderShipping           OrderShipping?          @relation(fields: [orderShippingId], references: [id], onDelete: SetNull)
+  orderShippingId         Int?
+  amountInGoodsReady      Int? //  상품준비("35") 상태 상품(옵션) 개수
+  amountInExportReady     Int? //  출고준비("45") 상태 상품(옵션) 개수
+  amountInExportDone      Int? //  출고완료("55") 상태 상품(옵션) 개수
+  amountInShipping        Int? //  배송중("65") 상태 상품(옵션) 개수
+  amountInShippingDone    Int? //  배송완료("75") 상태 상품(옵션) 개수
+  amountInPaymentCanceled Int? //  결제취소("85") 상태 상품(옵션) 개수
 }
 
 // 주문상품후원

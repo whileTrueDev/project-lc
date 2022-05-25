@@ -338,6 +338,15 @@ CREATE TABLE `OrderItemOption` (
     `weight` DOUBLE NULL,
     `step` ENUM('orderReceived', 'paymentConfirmed', 'goodsReady', 'partialExportReady', 'exportReady', 'partialExportDone', 'exportDone', 'partialShipping', 'shipping', 'partialShippingDone', 'shippingDone', 'paymentCanceled', 'orderInvalidated', 'paymentFailed') NOT NULL DEFAULT 'orderReceived',
     `goodsOptionId` INTEGER NULL,
+    `amountInExportDone` INTEGER NULL,
+    `amountInExportReady` INTEGER NULL,
+    `amountInGoodsReady` INTEGER NULL,
+    `amountInPaymentCanceled` INTEGER NULL,
+    `amountInShipping` INTEGER NULL,
+    `amountInShippingDone` INTEGER NULL,
+    `goodsName` VARCHAR(191) NULL,
+    `imageUrl` VARCHAR(191) NULL,
+    `orderShippingId` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -351,6 +360,19 @@ CREATE TABLE `OrderItemSupport` (
     `orderItemId` INTEGER NULL,
 
     UNIQUE INDEX `OrderItemSupport_orderItemId_key`(`orderItemId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `OrderShipping` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `shippingCostPayType` ENUM('free', 'prepay', 'postpaid') NOT NULL DEFAULT 'prepay',
+    `shippingCost` VARCHAR(191) NULL,
+    `shippingMethod` ENUM('delivery', 'postpaid', 'each_delivery', 'each_postpaid', 'quick', 'direct_delivery', 'direct_store', 'freight', 'direct', 'coupon') NULL,
+    `shippingGroupId` INTEGER NULL,
+    `shippingSetId` INTEGER NULL,
+    `orderId` INTEGER NULL,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -697,6 +719,18 @@ ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_shippingGroupId_fkey` FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderShipping` ADD CONSTRAINT `OrderShipping_shippingGroupId_fkey` FOREIGN KEY (`shippingGroupId`) REFERENCES `ShippingGroup`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderShipping` ADD CONSTRAINT `OrderShipping_shippingSetId_fkey` FOREIGN KEY (`shippingSetId`) REFERENCES `ShippingSet`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderShipping` ADD CONSTRAINT `OrderShipping_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderItemOption` ADD CONSTRAINT `OrderItemOption_orderShippingId_fkey` FOREIGN KEY (`orderShippingId`) REFERENCES `OrderShipping`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `OrderItemOption` ADD CONSTRAINT `OrderItemOption_orderItemId_fkey` FOREIGN KEY (`orderItemId`) REFERENCES `OrderItem`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
