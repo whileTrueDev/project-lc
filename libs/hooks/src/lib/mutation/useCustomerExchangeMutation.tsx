@@ -77,6 +77,7 @@ export const useUpdateExchangeMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.invalidateQueries('OrderDetail');
+        queryClient.invalidateQueries('customerExchangeDetail');
       },
     },
   );

@@ -76,6 +76,7 @@ export const useUpdateReturnMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.invalidateQueries('OrderDetail');
+        queryClient.invalidateQueries('customerReturnDetail');
       },
     },
   );
