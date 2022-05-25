@@ -105,7 +105,7 @@ export function CustomerAddressCreateButton(): JSX.Element {
       >
         배송지 등록
       </Button>
-      <UnorderedList fontSize="xs">
+      <UnorderedList fontSize="xs" mt={2}>
         <ListItem>
           <Text>배송지는 최대 3개 까지 등록 가능합니다.</Text>
         </ListItem>
