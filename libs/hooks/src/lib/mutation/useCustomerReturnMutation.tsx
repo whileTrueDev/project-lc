@@ -2,6 +2,8 @@ import {
   CreateReturnDto,
   CreateReturnRes,
   DeleteReturnRes,
+  UpdateReturnDto,
+  UpdateReturnRes,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
@@ -50,6 +52,30 @@ export const useDeleteCustomerReturn = (): UseMutationResult<
         queryClient.invalidateQueries(CUSTOMER_RETURN_LIST_QUERY_KEY, {
           refetchInactive: true,
         });
+      },
+    },
+  );
+};
+
+export type ReturnMutationDto = {
+  returnId: number;
+  dto: UpdateReturnDto;
+};
+/** 크크쇼 db 반품 업데이트 훅 */
+export const useUpdateReturnMutation = (): UseMutationResult<
+  UpdateReturnRes,
+  AxiosError,
+  ReturnMutationDto
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({ returnId, dto }: ReturnMutationDto) => {
+      return axios.patch(`/return/${returnId}`, dto);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('OrderDetail');
       },
     },
   );
