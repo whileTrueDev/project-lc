@@ -2,6 +2,8 @@ import {
   CreateExchangeDto,
   CreateExchangeRes,
   ExchangeDeleteRes,
+  ExchangeUpdateRes,
+  UpdateExchangeDto,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
@@ -50,6 +52,31 @@ export const useDeleteCustomerExchange = (): UseMutationResult<
         queryClient.invalidateQueries(CUSTOMER_EXCHANGE_LIST_QUERY_KEY, {
           refetchInactive: true,
         });
+      },
+    },
+  );
+};
+
+export type ExchangeMutationDto = {
+  exchangeId: number;
+  dto: UpdateExchangeDto;
+};
+
+/** 교환요청 상태 수정 훅 */
+export const useUpdateExchangeMutation = (): UseMutationResult<
+  ExchangeUpdateRes,
+  AxiosError,
+  ExchangeMutationDto
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({ exchangeId, dto }: ExchangeMutationDto) => {
+      return axios.patch(`/exchange/${exchangeId}`, dto);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('OrderDetail');
       },
     },
   );
