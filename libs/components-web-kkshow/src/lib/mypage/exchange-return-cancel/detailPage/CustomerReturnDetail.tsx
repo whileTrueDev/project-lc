@@ -1,12 +1,10 @@
 import { Button, Center, Image, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
+import { ExchangeReturnCancelRequestGoodsData } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestGoodsData';
+import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
 import { useDeleteCustomerReturn, useReturnDetail } from '@project-lc/hooks';
 import { ReturnDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import {
-  ExchangeReturnCancelRequestGoodsData,
-  ExchangeReturnCancelRequestStatusBadge,
-} from '../list/ExchangeReturnCancelListItem';
 import RelatedRefundData from './RelatedRefundData';
 
 export interface CustomerReturnDetailProps {

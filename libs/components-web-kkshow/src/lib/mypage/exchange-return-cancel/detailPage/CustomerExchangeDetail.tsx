@@ -1,13 +1,11 @@
 import { Button, Center, Image, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
 import { Export, ExportProcessStatus } from '@prisma/client';
+import { ExchangeReturnCancelRequestGoodsData } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestGoodsData';
+import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
 import { useDeleteCustomerExchange, useExchangeDetail } from '@project-lc/hooks';
 import { ExchangeDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import {
-  ExchangeReturnCancelRequestGoodsData,
-  ExchangeReturnCancelRequestStatusBadge,
-} from '../list/ExchangeReturnCancelListItem';
 
 export interface CustomerExchangeDetailProps {
   exchangeCode: string;
