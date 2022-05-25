@@ -5,7 +5,7 @@ import { useDeleteCustomerReturn, useReturnDetail } from '@project-lc/hooks';
 import { ReturnDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import RelatedRefundData from './RelatedRefundData';
+import { RelatedRefundData } from '@project-lc/components-shared/order/RelatedRefundData';
 
 export interface CustomerReturnDetailProps {
   returnCode: string;
