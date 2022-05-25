@@ -3,7 +3,6 @@ import {
   BoxProps,
   Flex,
   Heading,
-  Image,
   LinkBox,
   LinkOverlay,
   Text,
