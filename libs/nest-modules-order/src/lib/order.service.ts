@@ -446,8 +446,8 @@ export class OrderService {
         payment: true,
         refunds: true,
         exports: { include: { items: true } },
-        exchanges: { include: { exchangeItems: true } },
-        returns: { include: { items: true } },
+        exchanges: { include: { exchangeItems: true, images: true } },
+        returns: { include: { items: true, images: true } },
         orderCancellations: { include: { items: true } },
       },
     });

@@ -1,6 +1,7 @@
 import {
   Broadcaster,
   Exchange,
+  ExchangeImage,
   ExchangeItem,
   Export,
   ExportItem,
@@ -16,6 +17,7 @@ import {
   OrderPayment,
   Refund,
   Return,
+  ReturnImage,
   ReturnItem,
   Seller,
 } from '@prisma/client';
@@ -34,21 +36,35 @@ export type OriginGoods = {
   sellerId: Seller['id'];
 };
 
+type Nullable<T> = T | null;
+
 export type OrderItemWithRelations = OrderItem & {
-  support: OrderItemSupportWithBroadcasterInfo | null;
+  support: Nullable<OrderItemSupportWithBroadcasterInfo>;
   review?: { id: GoodsReview['id'] };
   options: OrderItemOption[];
   goods: OriginGoods;
 };
 
-export type OrderDataWithRelations = Order & {
+export type OrderCancellationBaseData = OrderCancellation & {
+  items: OrderCancellationItem[];
+};
+export type ExportBaseData = Export & { items: ExportItem[] };
+export type ExchangeBaseData = Exchange & { exchangeItems: ExchangeItem[] };
+export type ReturnBaseData = Return & { items: ReturnItem[] };
+export type ReturnDataWithImages = ReturnBaseData & { images: ReturnImage[] };
+export type ExchangeDataWithImages = ExchangeBaseData & { images: ExchangeImage[] };
+
+export type OrderBaseData = Order & {
   orderItems: OrderItemWithRelations[];
-  payment?: OrderPayment | null;
-  refunds: Refund[] | null;
-  exports: (Export & { items: ExportItem[] })[] | null;
-  exchanges: (Exchange & { exchangeItems: ExchangeItem[] })[] | null;
-  returns: (Return & { items: ReturnItem[] })[] | null;
-  orderCancellations?: (OrderCancellation & { items: OrderCancellationItem[] })[] | null;
+  payment?: Nullable<OrderPayment>;
+  refunds: Nullable<Refund[]>;
+};
+
+export type OrderDataWithRelations = OrderBaseData & {
+  orderCancellations?: Nullable<OrderCancellationBaseData[]>;
+  exports: Nullable<ExportBaseData[]>;
+  exchanges: Nullable<ExchangeBaseData[]>;
+  returns: Nullable<ReturnBaseData[]>;
 };
 
 /** 주문 목록 리턴 데이터 타입 */
@@ -58,7 +74,11 @@ export type OrderListRes = {
   nextCursor?: number; // infinite Query 에서 사용하기 위한 다음 skip 값
 };
 
-/** 주문 상세 리턴데이터 타입
- * 주문 완료 페이지 혹은 주문 상세 페이지 작업하면서 수정 필요
+/** 주문 상세 리턴데이터 타입 -> 주문 완료 페이지 혹은 주문 상세 페이지 작업하면서 수정 필요
  */
-export type OrderDetailRes = OrderDataWithRelations;
+export type OrderDetailRes = OrderBaseData & {
+  orderCancellations?: Nullable<OrderCancellationBaseData[]>;
+  exports: Nullable<ExportBaseData[]>;
+  exchanges: Nullable<ExchangeDataWithImages[]>;
+  returns: Nullable<ReturnDataWithImages[]>;
+};
