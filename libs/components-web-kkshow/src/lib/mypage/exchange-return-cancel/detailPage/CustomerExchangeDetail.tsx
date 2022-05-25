@@ -115,7 +115,7 @@ export function ExchangeDetialData({ data }: { data: ExchangeDetailRes }): JSX.E
       </Stack>
 
       <Stack>
-        <Text fontWeight="bold">취소요청한 주문상품</Text>
+        <Text fontWeight="bold">재배송요청 주문상품</Text>
         <Stack pl={4}>
           {data.items.map((item) => (
             <ExchangeReturnCancelRequestGoodsData key={item.id} {...item} />
