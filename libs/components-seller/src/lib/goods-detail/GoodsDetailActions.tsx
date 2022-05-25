@@ -1,7 +1,7 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
 import { useGoodsOnLiveFlag } from '@project-lc/hooks';
 import { GoodsByIdRes } from '@project-lc/shared-types';
-import { GoodsExposeSwitch } from './GoodsExposeSwitch';
+import { GoodsExposeSwitch } from '../GoodsExposeSwitch';
 
 export interface GoodsDetailActionsProps {
   goods: GoodsByIdRes;

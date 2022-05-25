@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { GoodsImages, GoodsView, Seller } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { ServiceBaseWithCache } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminAllLcGoodsList,
@@ -16,6 +15,7 @@ import {
   getLiveShoppingProgress,
   GoodsByIdRes,
   GoodsImageDto,
+  GoodsInformationNoticeRes,
   GoodsListDto,
   GoodsListRes,
   GoodsOptionDto,
@@ -27,7 +27,6 @@ import {
 } from '@project-lc/shared-types';
 import { getImgSrcListFromHtmlStringList } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
-import { Cache } from 'cache-manager';
 
 @Injectable()
 export class GoodsService {
@@ -413,7 +412,7 @@ export class GoodsService {
 
   /** 상품 개별 정보 조회 */
   public async getOneGoods(goodsId: number): Promise<GoodsByIdRes> {
-    return this.prisma.goods.findFirst({
+    const result = await this.prisma.goods.findFirst({
       where: { id: goodsId },
       include: {
         options: { include: { supply: true } },
@@ -442,8 +441,6 @@ export class GoodsService {
           },
         },
         categories: true,
-        informationNotice: true,
-        informationSubject: true,
         seller: {
           select: {
             id: true,
@@ -458,6 +455,10 @@ export class GoodsService {
         },
       },
     });
+    const infoNotice = (await this.prisma.goodsInformationNotice.findFirst({
+      where: { goodsId },
+    })) as GoodsInformationNoticeRes;
+    return { ...result, informationNotice: infoNotice };
   }
 
   /** 상품 개별 간략 정보 조회 */
@@ -490,7 +491,6 @@ export class GoodsService {
         shippingGroupId,
         goodsInfoId,
         categoryId,
-        informationSubjectId,
         informationNoticeContents,
         searchKeywords,
         ...goodsData
@@ -503,7 +503,7 @@ export class GoodsService {
         data: {
           seller: { connect: { id: sellerId } },
           ...goodsData,
-          searchKeyword: searchKeywords.map((k) => k.keyword).join(','),
+          searchKeyword: searchKeywords.map((k) => k.keyword).join(',') || undefined,
           options: { create: optionsData },
           image: { connect: image.map((img) => ({ id: img.id })) },
           ShippingGroup: shippingGroupId
@@ -511,12 +511,9 @@ export class GoodsService {
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
           confirmation: { create: { status: 'waiting' } },
-          informationSubject: { connect: { id: informationSubjectId } },
           categories: { connect: { id: categoryId } },
           informationNotice: {
-            create: {
-              contents: informationNoticeContents,
-            },
+            create: { contents: JSON.parse(informationNoticeContents) },
           },
         },
       });
@@ -644,9 +641,10 @@ export class GoodsService {
       image,
       shippingGroupId,
       goodsInfoId,
-      informationSubjectId,
       informationNoticeId,
+      informationNoticeContents,
       categoryId,
+      searchKeywords,
       ...goodsData
     } = dto;
 
@@ -663,6 +661,7 @@ export class GoodsService {
         where: { id },
         data: {
           ...goodsData,
+          searchKeyword: searchKeywords.map((k) => k.keyword).join(',') || undefined,
           options: {
             deleteMany: willBeDeletedOptIds.map((_id) => ({ id: _id })),
             create: willBeCreatedOptions.map((opt) => {
@@ -687,20 +686,13 @@ export class GoodsService {
             ? { connect: { id: shippingGroupId } }
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
-          informationSubject: {
-            connect: {
-              id: informationSubjectId,
-            },
-          },
           informationNotice: {
-            connect: {
-              id: informationNoticeId,
+            update: {
+              contents: JSON.parse(informationNoticeContents),
             },
           },
           categories: {
-            connect: {
-              id: categoryId,
-            },
+            connect: { id: categoryId },
           },
           confirmation: {
             update: {
