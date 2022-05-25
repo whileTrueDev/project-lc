@@ -15,7 +15,6 @@ export function OrderDetailReturnInfo({
   return (
     <Box>
       <Stack direction="row" alignItems="center" my={2} spacing={1.5}>
-        {/* returnCode클릭시 반품 상세정보 조회 다이얼로그? 새창 띄우기 */}
         <Link isTruncated fontWeight="bold" textDecoration="underline">
           {returnData.returnCode}
         </Link>
