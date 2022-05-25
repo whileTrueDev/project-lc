@@ -482,11 +482,12 @@ CREATE TABLE `Export` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `exportCode` VARCHAR(191) NULL,
     `orderId` INTEGER NOT NULL,
-    `status` ENUM('preparing', 'exportDone', 'shipping', 'shippingDone') NOT NULL DEFAULT 'exportDone',
+    `status` ENUM('orderReceived', 'paymentConfirmed', 'goodsReady', 'partialExportReady', 'exportReady', 'partialExportDone', 'exportDone', 'partialShipping', 'shipping', 'partialShippingDone', 'shippingDone', 'paymentCanceled', 'orderInvalidated', 'paymentFailed') NOT NULL DEFAULT 'exportDone',
     `deliveryCompany` VARCHAR(191) NOT NULL,
     `deliveryNumber` VARCHAR(191) NOT NULL,
     `bundleExportCode` VARCHAR(191) NULL,
-    `exportDate` DATETIME(3) NOT NULL,
+    `exportDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `shippingDoneDate` DATETIME(3) NULL,
     `exchangeExportedFlag` BOOLEAN NOT NULL DEFAULT false,
     `buyConfirmDate` DATETIME(3) NULL,
     `buyConfirmSubject` ENUM('admin', 'customer', 'system') NULL,
@@ -503,7 +504,7 @@ CREATE TABLE `ExportItem` (
     `orderItemOptionId` INTEGER NOT NULL,
     `amount` INTEGER NOT NULL,
     `exportId` INTEGER NOT NULL,
-    `status` ENUM('preparing', 'exportDone', 'shipping', 'shippingDone') NOT NULL DEFAULT 'exportDone',
+    `status` ENUM('orderReceived', 'paymentConfirmed', 'goodsReady', 'partialExportReady', 'exportReady', 'partialExportDone', 'exportDone', 'partialShipping', 'shipping', 'partialShippingDone', 'shippingDone', 'paymentCanceled', 'orderInvalidated', 'paymentFailed') NOT NULL DEFAULT 'exportDone',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

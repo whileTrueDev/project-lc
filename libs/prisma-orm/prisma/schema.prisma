@@ -1859,25 +1859,18 @@ model OrderCancellationItem {
 // 출고
 // ****************
 
-// 출고진행상태
-enum ExportProcessStatus {
-  preparing // 출고준비중
-  exportDone // 출고완료
-  shipping // 배송중
-  shippingDone // 배송완료
-}
-
 // 출고
 model Export {
   id                         Int                          @id @default(autoincrement()) // 출고고유번호
   exportCode                 String?                      @unique // 출고코드
   orderId                    Int // 주문 고유번호
   order                      Order                        @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status                     ExportProcessStatus          @default(exportDone) // 출고상태
+  status                     OrderProcessStep             @default(exportDone) // 출고상태 : 출고준비 | 출고완료(기본값) | 배송중 | 배송완료 -> 모두 OrderProcessStep 에 있어서 그대로 사용함
   deliveryCompany            String // 택배사
   deliveryNumber             String // 운송장번호
   bundleExportCode           String? // 합포장출고코드(합포장인경우)
-  exportDate                 DateTime //출고일시
+  exportDate                 DateTime                     @default(now()) //출고일시
+  shippingDoneDate           DateTime? // 배송완료일자
   buyConfirmDate             DateTime? // 구매확정일자(주문스키마에 있던것을 출고에 옮김)
   buyConfirmSubject          BuyConfirmSubject? // 구매확정주체(null | 소비자, 관리자, 시스템)
   broadcasterSettlementItems BroadcasterSettlementItems[]
@@ -1898,15 +1891,15 @@ enum BuyConfirmSubject {
 
 // 출고상품
 model ExportItem {
-  id                Int                 @id @default(autoincrement()) // 출고상품 고유번호
+  id                Int              @id @default(autoincrement()) // 출고상품 고유번호
   exportId          Int // 연결된 출고고유번호
-  export            Export              @relation(fields: [exportId], references: [id], onDelete: Cascade) // 연결된 출고정보
+  export            Export           @relation(fields: [exportId], references: [id], onDelete: Cascade) // 연결된 출고정보
   orderItemId       Int // 주문상품 고유번호
-  orderItem         OrderItem           @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
+  orderItem         OrderItem        @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
-  orderItemOption   OrderItemOption     @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
+  orderItemOption   OrderItemOption  @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
-  status            ExportProcessStatus @default(exportDone) // 출고상태
+  status            OrderProcessStep @default(exportDone) // 출고상태 : 출고준비 | 출고완료(기본값) | 배송중 | 배송완료 -> 모두 OrderProcessStep 에 있어서 그대로 사용함
 }
 
 // ****************
