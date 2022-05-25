@@ -33,6 +33,7 @@ import { OrderItemOptionInfo } from '@project-lc/components-shared/order/OrderIt
 import { OrderDetailReturnInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailReturnInfo';
 import { OrderDetailExchangeInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExchangeInfo';
 import { OrderDetailCancelInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailCancelInfo';
+import { OrderDetailExportInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExportInfo';
 import { OrderExchangeReturnCancelExistsAlert } from '@project-lc/components-seller/kkshow-order/OrderExchangeReturnCancelExistsAlert';
 
 const exchangeSectionTitle = '교환 정보';
@@ -121,12 +122,6 @@ export function OrderDetail(): JSX.Element {
           </Stack>
         )}
 
-        {/* 퍼스트몰 사용하지 않으면 판매자 -> 관리자로 결제취소 요청 필요없음  */}
-        {/* {orderCancel.data &&
-          orderCancel.data.status !== .confirmed && (
-            <OrderCancelRequestExistAlert data={orderCancel.data} />
-          )} */}
-
         {/* 주문 버튼 */}
         {isMobileSize ? null : (
           <Box as="section" mt={4}>
@@ -134,7 +129,6 @@ export function OrderDetail(): JSX.Element {
           </Box>
         )}
 
-        {/* // TODO: 결제정보도 있으면 좋겠다 - 일단 나머지 주문정보 표시하고 진행 */}
         {/* 주문 요약 */}
         <Box as="section">
           <OrderDetailSummary order={order.data} />
@@ -183,20 +177,15 @@ export function OrderDetail(): JSX.Element {
         </SectionWithTitle>
 
         {/* 출고 정보 */}
-        {/* // TODO: 출고정보 연결 */}
-        {/* {order.data.exports.length > 0 && (
+        {order.data.exports.length > 0 && (
           <SectionWithTitle title="출고 정보">
             {order.data.exports.map((_exp) => (
-              <Box key={_exp.export_code} mt={6} pb={4}>
-                <OrderDetailExportInfo
-                  key={_exp.export_code}
-                  exports={_exp}
-                  orderItems={order.data.items}
-                />
+              <Box key={_exp.exportCode} mt={6} pb={4}>
+                <OrderDetailExportInfo key={_exp.exportCode} exportData={_exp} />
               </Box>
             ))}
           </SectionWithTitle>
-        )} */}
+        )}
 
         {/* 반품 정보 */}
         {order.data.returns.length > 0 && (
