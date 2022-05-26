@@ -8,11 +8,12 @@ import {
   StatNumber,
   Text,
 } from '@chakra-ui/react';
-import { useFmOrdersStats } from '@project-lc/hooks';
+import { useProfile, useSellerOrderStats } from '@project-lc/hooks';
 import { orderKeys, OrderStatsKeyType } from '@project-lc/shared-types';
 
 export function MypageOrderStats(): JSX.Element {
-  const { data } = useFmOrdersStats();
+  const { data: profileData } = useProfile();
+  const { data } = useSellerOrderStats(profileData?.id);
 
   return (
     <Grid templateColumns={`repeat(${orderKeys.length}, 1fr)`}>

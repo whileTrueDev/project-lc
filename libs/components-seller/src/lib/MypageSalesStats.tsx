@@ -9,11 +9,12 @@ import {
   StatNumber,
   Text,
 } from '@chakra-ui/react';
-import { useFmOrdersStats } from '@project-lc/hooks';
+import { useProfile, useSellerOrderStats } from '@project-lc/hooks';
 import { AiFillInteraction, AiFillShopping } from 'react-icons/ai';
 
 export function MypageSalesStats(): JSX.Element {
-  const { data } = useFmOrdersStats();
+  const { data: profileData } = useProfile();
+  const { data } = useSellerOrderStats(profileData?.id);
 
   return (
     <Grid templateColumns="1fr 1fr">
