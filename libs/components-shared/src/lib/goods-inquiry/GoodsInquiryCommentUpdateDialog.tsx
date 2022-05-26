@@ -16,36 +16,38 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { GoodsInquiryComment } from '@prisma/client';
-import { GoodsInquiryCommentForm } from '@project-lc/components-shared/goods-inquiry/GoodsInquiryCommentForm';
+
 import { useGoodsInquiryCommentUpdateMutation, useProfile } from '@project-lc/hooks';
 import { FindGoodsInquiryItem, GoodsInquiryCommentDto } from '@project-lc/shared-types';
 import { SubmitHandler } from 'react-hook-form';
+import GoodsInquiryCommentForm from './GoodsInquiryCommentForm';
 
-export interface SellerGoodsInquiryCommentUpdateDialogProps {
+export interface GoodsInquiryCommentUpdateDialogProps {
   inquiry: FindGoodsInquiryItem;
   comment?: GoodsInquiryComment | null;
   isOpen: boolean;
   onClose: () => void;
 }
-export function SellerGoodsInquiryCommentUpdateDialog({
+export function GoodsInquiryCommentUpdateDialog({
   comment,
   inquiry,
   isOpen,
   onClose,
-}: SellerGoodsInquiryCommentUpdateDialogProps): JSX.Element {
+}: GoodsInquiryCommentUpdateDialogProps): JSX.Element {
   const formId = 'goods-inquiry-comment-form';
   const toast = useToast();
   const { data: profile } = useProfile();
 
   const goodsInquiryUpdate = useGoodsInquiryCommentUpdateMutation();
   const handleSubmit: SubmitHandler<GoodsInquiryCommentDto> = (formData) => {
-    if (profile && comment) {
+    if (profile && comment && ['admin', 'seller'].includes(profile.type)) {
       goodsInquiryUpdate
         .mutateAsync({
           goodsInquiryCommentId: comment.id,
           goodsInquiryId: inquiry.id,
           content: formData.content,
-          sellerId: profile.id,
+          sellerId: profile.type === 'seller' ? profile.id : undefined,
+          adminId: profile.type === 'admin' ? profile.id : undefined,
         })
         .then(() => {
           toast({ description: '문의 답변을 수정하였습니다.', status: 'success' });
@@ -84,8 +86,13 @@ export function SellerGoodsInquiryCommentUpdateDialog({
         <ModalFooter>
           <ButtonGroup>
             <Button onClick={onClose}>닫기</Button>
-            <Button form={formId} type="submit" colorScheme="blue">
-              생성
+            <Button
+              form={formId}
+              type="submit"
+              colorScheme="blue"
+              isLoading={goodsInquiryUpdate.isLoading}
+            >
+              수정
             </Button>
           </ButtonGroup>
         </ModalFooter>
@@ -94,4 +101,4 @@ export function SellerGoodsInquiryCommentUpdateDialog({
   );
 }
 
-export default SellerGoodsInquiryCommentUpdateDialog;
+export default GoodsInquiryCommentUpdateDialog;

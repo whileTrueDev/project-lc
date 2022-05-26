@@ -28,6 +28,7 @@ import {
 import { Goods } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { CommentList } from '@project-lc/components-shared/comment/CommentList';
+import { GoodsInquiryDeleteDialog } from '@project-lc/components-shared/goods-inquiry/GoodsInquiryDeleteDialog';
 import {
   useGoodsById,
   useGoodsInquiryComments,
@@ -162,14 +163,11 @@ function GoodsViewInquiryItem({ inquiry }: GoodsViewInquiryItemProps): JSX.Eleme
         </Box>
       </Box>
 
-      <ConfirmDialog
+      <GoodsInquiryDeleteDialog
+        inquiry={inquiry}
         isOpen={deleteConfirmDialog.isOpen}
         onClose={deleteConfirmDialog.onClose}
-        title="상품 문의 삭제"
-        onConfirm={async () => deleteMutation.mutateAsync(inquiry.id)}
-      >
-        상품문의를 삭제하시겠습니까?
-      </ConfirmDialog>
+      />
 
       <Divider />
     </>
