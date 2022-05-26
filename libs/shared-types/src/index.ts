@@ -52,7 +52,7 @@ export * from './lib/dto/createBroadcasterChannel.dto';
 export * from './lib/dto/createBroadcasterSettlementHistory.dto';
 export * from './lib/dto/customerAddress.dto';
 export * from './lib/dto/customerCoupon.dto';
-export * from './lib/dto/CustomerInclude.dto';
+export * from './lib/dto/customerInclude.dto';
 export * from './lib/dto/customerMileage.dto';
 export * from './lib/dto/deleteGoods.dto';
 export * from './lib/dto/emailCodeVerification.dto';
