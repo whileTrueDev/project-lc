@@ -27,6 +27,7 @@ import {
 } from '@chakra-ui/react';
 import { Goods } from '@prisma/client';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import { CommentList } from '@project-lc/components-shared/comment/CommentList';
 import {
   useGoodsById,
   useGoodsInquiryComments,
@@ -41,7 +42,6 @@ import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { Fragment, useMemo } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { CommentList } from '../CommentList';
 
 export function GoodsViewInquiries(): JSX.Element | null {
   const router = useRouter();

@@ -21,6 +21,7 @@ import {
   GoodsOptionDto,
   GoodsOptionsWithSupplies,
   GoodsOptionWithStockInfo,
+  GoodsOutlineByIdRes,
   RegistGoodsDto,
   TotalStockInfo,
 } from '@project-lc/shared-types';
@@ -459,6 +460,22 @@ export class GoodsService {
     });
   }
 
+  /** 상품 개별 간략 정보 조회 */
+  public async getOneGoodsOutline(goodsId: number): Promise<GoodsOutlineByIdRes> {
+    return this.prisma.goods.findFirst({
+      where: { id: goodsId },
+      select: {
+        id: true,
+        goods_name: true,
+        summary: true,
+        goods_status: true,
+        options: { include: { supply: true } },
+        confirmation: true,
+        image: { orderBy: { cut_number: 'asc' } },
+      },
+    });
+  }
+
   // 상품 등록
   public async registGoods(
     sellerId: number,
@@ -475,42 +492,27 @@ export class GoodsService {
         categoryId,
         informationSubjectId,
         informationNoticeContents,
+        searchKeywords,
         ...goodsData
       } = dto;
       const optionsData = options.map((opt) => {
         const { supply, ...optData } = opt;
-        return {
-          ...optData,
-          supply: {
-            create: supply,
-          },
-        };
+        return { ...optData, supply: { create: supply } };
       });
       const goods = await this.prisma.goods.create({
         data: {
           seller: { connect: { id: sellerId } },
           ...goodsData,
-          options: {
-            create: optionsData,
-          },
-          image: {
-            connect: image.map((img) => ({ id: img.id })),
-          },
+          searchKeyword: searchKeywords.map((k) => k.keyword).join(','),
+          options: { create: optionsData },
+          image: { connect: image.map((img) => ({ id: img.id })) },
           ShippingGroup: shippingGroupId
             ? { connect: { id: shippingGroupId } }
             : undefined,
           GoodsInfo: goodsInfoId ? { connect: { id: goodsInfoId } } : undefined,
           confirmation: { create: { status: 'waiting' } },
-          informationSubject: {
-            connect: {
-              id: informationSubjectId,
-            },
-          },
-          categories: {
-            connect: {
-              id: categoryId,
-            },
-          },
+          informationSubject: { connect: { id: informationSubjectId } },
+          categories: { connect: { id: categoryId } },
           informationNotice: {
             create: {
               contents: informationNoticeContents,

@@ -45,8 +45,8 @@ import NextLink from 'next/link';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { GoodsFormValues } from './GoodsRegistForm';
-import { ShippingGroupDetailModal } from './ShippingGroupDetailModal';
-import ShippingPolicyForm from './ShippingPolicyForm';
+import { ShippingGroupDetailModal } from '../ShippingGroupDetailModal';
+import ShippingPolicyForm from '../ShippingPolicyForm';
 
 // 컬럼 헤더와 목록으로 이뤄진 상자 스타일 컴포넌트 - 배송비그룹 컨테이너, 연결된상품 컨테이너에 사용할 예정
 export function OutlinedContainerBox({
