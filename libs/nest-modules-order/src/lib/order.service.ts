@@ -5,16 +5,21 @@ import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
+  FmOrderStatusNumString,
   GetNonMemberOrderDetailDto,
   GetOrderListDto,
   OrderDetailRes,
   OrderListRes,
+  orderProcessStepDict,
   OrderPurchaseConfirmationDto,
+  OrderStatsRes,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
+import isToday = require('dayjs/plugin/isToday');
 
+dayjs.extend(isToday);
 @Injectable()
 export class OrderService {
   constructor(
@@ -470,5 +475,154 @@ export class OrderService {
     }
 
     return true;
+  }
+
+  /**
+   * 판매자 본인의 상품에 의거한 실제 주문 상태를 조회합니다.
+   * 이는 여러 판매자의 상품이 하나의 주문에 포함될 수 있는 상황에 대한 처리 용도입니다.
+   */
+  private getOrderRealStep(
+    orderStep: OrderProcessStep,
+    orderItemOtions: { step: OrderProcessStep }[],
+  ): OrderProcessStep {
+    if (orderItemOtions.length === 0) return orderStep;
+    const isPartialStep = [
+      'partialExportReady',
+      'partialExportDone',
+      'partialShipping',
+      'partialShippingDone',
+    ].includes(orderStep);
+
+    // 주문의 상태가 "부분0000"일 때,
+    if (isPartialStep) {
+      // "부분" 상태를 제거한 상태
+      const nonPartialStepString = orderStep.replace('partial', '');
+      const nonPartialStep = (nonPartialStepString[0].toLocaleLowerCase() +
+        nonPartialStepString.slice(1)) as OrderProcessStep;
+      // 옵션들 모두가 "부분" 상태를 제거한 상태만 있는 지 확인, 그렇다면 "부분" 상태를 제거한 상태를 반환
+      if (orderItemOtions.every((o) => o.step === nonPartialStep)) {
+        console.log('non partial step', nonPartialStep, { orderStep });
+        return nonPartialStep;
+      }
+    }
+
+    // 옵션들 모두가 주문상태보다 작은지 확인, 그렇다면 옵션들 중 가장 높은 상태를 반환
+    if (
+      orderItemOtions.every(
+        (o) =>
+          Number(orderProcessStepDict[o.step]) < Number(orderProcessStepDict[orderStep]),
+      )
+    ) {
+      return orderItemOtions.reduce((acc, curr) => {
+        if (!acc) return curr.step;
+        if (Number(orderProcessStepDict[acc]) < Number(orderProcessStepDict[curr.step]))
+          return curr.step;
+        return acc;
+      }, orderItemOtions[0].step);
+    }
+
+    return orderStep;
+  }
+
+  /** 판매자센터 마이페이지 홈 오늘매출현황, 주문현황조회 */
+  public async getOrderStats(sellerId: number): Promise<any> {
+    // Promise<OrderStatsRes>
+    // * 판매자의 주문조회 1개월 내(판매자의 상품이 주문상품으로 포함된 주문)
+    const sellerOrders = await this.prisma.order.findMany({
+      where: {
+        orderItems: { some: { goods: { sellerId } } },
+        createDate: { gte: dayjs().subtract(1, 'month').toDate() },
+      },
+      include: {
+        orderItems: { include: { options: true, goods: { select: { sellerId: true } } } },
+      },
+    });
+    // 주문상품 중 판매자의 상품&상품옵션만 추려내기
+    const ordersWithFilteredItems = sellerOrders.map((order) => {
+      const { orderItems, ...orderData } = order;
+
+      const sellerGoodsOrderItems = orderItems.filter((oi) => {
+        return oi.goods.sellerId === sellerId;
+      });
+      return { ...orderData, orderItems: sellerGoodsOrderItems };
+    });
+    // 판매자 상품인 주문상품옵션의 상태에 기반한 주문상태 표시
+    const ordersWithRealStep = ordersWithFilteredItems.map((order) => {
+      const { orderItems, step, ...orderData } = order;
+      const newStep = this.getOrderRealStep(
+        step,
+        orderItems.flatMap((item) => item.options),
+      );
+      return {
+        ...orderData,
+        step: newStep,
+        orderItems,
+      };
+    });
+    // 주문상태별 개수 카운트
+    const orderStats = {
+      shippingReady: 0, // 상품준비 + 부분출고준비 + 출고준비 + 부분출고완료 + 출고완료
+      shipping: 0, // 부분배송중 + 배송중 + 부분배송완료
+      shippingDone: 0, //  배송완료
+    };
+    ordersWithRealStep.forEach((order) => {
+      if (
+        [
+          'goodsReady',
+          'partialExportReady',
+          'exportReady',
+          'partialExportDone',
+          'exportDone',
+        ].includes(order.step)
+      ) {
+        orderStats.shippingReady += 1;
+      }
+      if (['partialShipping', 'shipping', 'partialShippingDone'].includes(order.step)) {
+        orderStats.shipping += 1;
+      }
+      if (['shippingDone'].includes(order.step)) {
+        orderStats.shippingDone += 1;
+      }
+    });
+
+    // * 판매자의 오늘매출현황 -> 1달치 조회했던 주문데이터 활용
+    // 1달치 조회한 주문 중 오늘 생성된 주문 && 주문상태가 결제확인 단계 이상인 주문 필터링
+    const sellerOrdersToday = ordersWithRealStep.filter((order) => {
+      return (
+        dayjs(order.createDate).isToday() &&
+        ![
+          'orderReceived',
+          'paymentCanceled',
+          'orderInvalidated',
+          'paymentFailed',
+        ].includes(order.step)
+      );
+    });
+
+    // 추려낸 주문상품의 배송비 + 주문상품옵션가격
+    const sellerOrderItemsToday = sellerOrdersToday.flatMap((order) => order.orderItems);
+    const orderItemOptionsToday = sellerOrderItemsToday.flatMap((orderItem) => {
+      const { options, shippingCost } = orderItem;
+      return { ...options, shippingCost };
+    });
+    // 판매자의 오늘환불현황
+    // 환불상품에 판매자 상품이 포함된 환불조회하고
+    // 환불 상품에서 판매자 상품만 추려냄
+    // const sellerRefund = await this.prisma.refund.findMany({
+    //   where: {
+    //     items: { some: { orderItem: { goods: { sellerId } } } },
+    //   },
+    // });
+
+    // return {
+    //   orders: { 배송완료: orderStats.shippingDone, 배송준비중: orderStats.shippingReady, 배송중: orderStats.shipping },
+    //   sales: { 주문: { count: sellerOrdersToday.length, sum: 0 }, 환불: { count: 0, sum: 0 } },
+    // };
+    return {
+      sellerOrdersCount: ordersWithRealStep.length,
+      ordersWithRealStep,
+      // sellerOrdersTodayCount: sellerOrdersToday.length,
+      // orderStats,
+    };
   }
 }
