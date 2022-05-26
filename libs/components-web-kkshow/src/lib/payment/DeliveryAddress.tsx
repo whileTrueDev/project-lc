@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
-import { PaymentPageDto } from '@project-lc/shared-types';
+import { PaymentPageDto, OrderDetailRes } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -335,24 +335,29 @@ export function DeliveryAddress(): JSX.Element {
   );
 }
 
-export function SuccessDeliveryAddress(): JSX.Element {
+export type SuccessDeliveryAddressProps = { data: OrderDetailRes };
+
+export function SuccessDeliveryAddress(props: SuccessDeliveryAddressProps): JSX.Element {
+  const { data } = props;
   return (
     <>
       <Flex direction="column" mt={3}>
         <Text fontWeight="bold">수령인</Text>
-        <Text>이진은</Text>
+        <Text>{data.recipientName}</Text>
       </Flex>
       <Flex direction="column" mt={3}>
         <Text fontWeight="bold">연락처</Text>
         <HStack>
-          <Text>010-1234-1234</Text>
+          <Text>{`${data.recipientPhone}`}</Text>
         </HStack>
       </Flex>
       <Flex direction="column" alignItems="flex-start" mt={3}>
         <Text fontWeight="bold">배송지주소</Text>
         <Flex direction="column">
-          <Text>(12345) 부산광역시 수영구 641 </Text>
-          <Text>힐탑더블시티 101동 1409호</Text>
+          <Text>
+            ({data.recipientPostalCode}) {data.recipientAddress}
+          </Text>
+          <Text>{data.recipientDetailAddress}</Text>
         </Flex>
       </Flex>
     </>

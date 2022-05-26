@@ -98,7 +98,7 @@ export function Receipt(): JSX.Element {
             </GridItem>
             <GridItem colSpan={4}>
               <Heading size="lg">배송지 정보</Heading>
-              <SuccessDeliveryAddress />
+              <SuccessDeliveryAddress data={orderDetailData} />
             </GridItem>
             <GridItem
               colSpan={3}
