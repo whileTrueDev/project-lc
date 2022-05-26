@@ -18,6 +18,7 @@ import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { CouponModule } from '@project-lc/nest-modules-coupon';
 import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { ExchangeModule } from '@project-lc/nest-modules-exchange';
+import { ExportModule } from '@project-lc/nest-modules-export';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { GoodsCategoryModule } from '@project-lc/nest-modules-goods-category';
 import { GoodsInformationSubjectModule } from '@project-lc/nest-modules-goods-information-subject';
@@ -32,6 +33,7 @@ import {
 import { KkshowSearchModule } from '@project-lc/nest-modules-kkshow-search';
 import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { ManualModule } from '@project-lc/nest-modules-manual';
+import { MileageModule } from '@project-lc/nest-modules-mileage';
 import { NoticeModule } from '@project-lc/nest-modules-notice';
 import { NotificationModule } from '@project-lc/nest-modules-notification';
 import { OrderModule } from '@project-lc/nest-modules-order';
@@ -83,9 +85,11 @@ import { AppController } from './app.controller';
     GoodsReviewModule.withControllers(),
     GoodsCategoryModule.withControllers(),
     GoodsInformationSubjectModule.withControllers(),
+    MileageModule.withControllers(),
     CouponModule.withControllers(),
     RefundModule.withControllers(),
     ExchangeModule.withControllers(),
+    ExportModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],
