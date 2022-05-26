@@ -40,7 +40,7 @@ export function AdminSellerSignupListDetailDialog(
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Flex direction="column" h={300}>
+              <Flex direction="column" h={300} justifyContent="space-between">
                 {sellerDetail.agreementFlag ? '🟢이용동의 완료' : '❗이용동의 필요'}
                 <HStack justifyContent="space-between">
                   <Text>이메일</Text>
