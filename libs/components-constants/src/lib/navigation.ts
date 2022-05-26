@@ -230,6 +230,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '방송인',
     href: '/broadcaster',
     children: [
+      { name: '가입자 목록', href: '/broadcaster/signup-list', icon: FcList },
       { name: '정산정보 검수', href: '/broadcaster/settlement-info', icon: FcInspection },
       { name: '정산', href: '/broadcaster/settlement', icon: FcMoneyTransfer },
       {
@@ -243,6 +244,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '판매자',
     href: '/seller',
     children: [
+      { name: '가입자 목록', href: '/seller/signup-list', icon: FcList },
       { name: '계좌정보 목록', href: '/seller/account', icon: FcList },
       {
         name: '사업자 등록정보 검수',
@@ -251,6 +253,11 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
       },
       { name: '정산', href: '/seller/settlement', icon: FcMoneyTransfer },
     ],
+  },
+  {
+    name: '구매자',
+    href: '/customer',
+    children: [{ name: '가입자 목록', href: '/customer/signup-list', icon: FcList }],
   },
   {
     name: '상품',

@@ -1119,6 +1119,9 @@ enum PrivacyApproachHistoryInfoType {
   sellerSettlementAccount // 판매자 계좌
   sellerBusinessRegistration // 판매자 사업자 등록증
   sellerMailOrderCertificate // 판매자 통신판매신고증
+  broadcasterList // 방송인 리스트
+  sellerList // 판매자 리스트
+  customerList // 구매자 리스트
 }
 
 enum PrivacyApproachHistoryActionType {

@@ -2,7 +2,7 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { Customer } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CustomerService } from '@project-lc/nest-modules-customer';
-import { FindManyDto } from '@project-lc/shared-types';
+import { FindManyDto, CustomerIncludeDto } from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin/customer')
@@ -14,6 +14,7 @@ export class AdminCustomerController {
     @Query() dto: FindManyDto,
     @Query('orderBy') orderBy: string,
     @Query('orderByColumn') orderByColumn: keyof Customer,
+    @Query('include') include: CustomerIncludeDto,
   ): Promise<Customer[]> {
     const _take = Number(dto.take);
     const _skip = Number(dto.skip);
@@ -37,10 +38,13 @@ export class AdminCustomerController {
       ? orderByColumn
       : undefined;
 
+    const _include = include;
+
     return this.customerService.findAll({
       take: Number.isNaN(_take) ? undefined : _take,
       skip: Number.isNaN(_skip) ? undefined : _skip,
       orderBy: _orderByColumn ? { [_orderByColumn]: _orderBy } : undefined,
+      include: JSON.parse(`${_include}`) || undefined,
     });
   }
 }
