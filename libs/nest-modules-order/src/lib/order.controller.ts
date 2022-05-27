@@ -15,6 +15,8 @@ import { Order } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
   CreateOrderDto,
+  FindAllOrderByBroadcasterRes,
+  FindManyDto,
   GetNonMemberOrderDetailDto,
   GetOrderListDto,
   OrderDetailRes,
@@ -95,5 +97,14 @@ export class OrderController {
   @Delete(':orderId')
   deleteOrder(@Param('orderId', ParseIntPipe) orderId: number): Promise<boolean> {
     return this.orderService.deleteOrder(orderId);
+  }
+
+  /** 방송인 후원 주문 목록 조회  */
+  @Get('by-broadcaster/:broadcasterId')
+  getOrderListByBroadcaster(
+    @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
+    @Query(new ValidationPipe({ transform: true })) dto: FindManyDto,
+  ): Promise<FindAllOrderByBroadcasterRes> {
+    return this.orderService.findAllByBroadcaster(broadcasterId, dto);
   }
 }
