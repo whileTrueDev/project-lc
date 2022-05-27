@@ -1,10 +1,17 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
-import { Order, OrderItemOption, OrderProcessStep, Prisma } from '@prisma/client';
+import {
+  Order,
+  OrderItem,
+  OrderItemOption,
+  OrderProcessStep,
+  Prisma,
+} from '@prisma/client';
 import { UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
+  CreateOrderItemDto,
   FmOrderStatusNumString,
   GetNonMemberOrderDetailDto,
   GetOneOrderDetailDto,
@@ -131,7 +138,12 @@ export class OrderService {
     }
 
     // 주문에 연결된 주문상품, 주문상품옵션, 주문상품후원 생성
-    // TODO: 주문상품옵션 생성시 주문상품명, 이미지 추가하기
+    const orderItemsConnectedGoodsIds = orderItems.map((i) => i.goodsId);
+    const orderItemConnectedGoodsData = await this.prisma.goods.findMany({
+      where: { id: { in: orderItemsConnectedGoodsIds } },
+      select: { id: true, goods_name: true, image: true },
+    });
+
     const order = await this.prisma.order.create({
       data: {
         ...createInput,
@@ -140,10 +152,19 @@ export class OrderService {
           // 주문에 연결된 주문상품 생성
           create: orderItems.map((item) => {
             const { options, support, ...rest } = item;
+            const connectedGoodsData = orderItemConnectedGoodsData.find(
+              (goodsData) => goodsData.id === item.goodsId,
+            );
+            // 상품이름
+            const goodsName = connectedGoodsData?.goods_name;
+            // 상품대표이미지(이미지 중 첫번째)
+            const imageUrl = connectedGoodsData?.image[0]?.image;
             return {
               ...rest,
               // 주문상품옵션들 생성
-              options: { create: options },
+              options: {
+                create: options.map((opt) => ({ ...opt, goodsName, imageUrl })),
+              },
               // 주문상품에 후원정보가 있는경우 주문상품후원생성
               support: support
                 ? {
@@ -159,6 +180,18 @@ export class OrderService {
         },
       },
     });
+
+    /** *************** */
+    /**
+     *
+     * 4.주문배송비 생성
+     * 주문에 적용된 배송비 구하기
+     * 연결된 배송정책이 같은 상품끼리 연결
+     * (createOrderDto) => (
+     *  {주문id, 배송비 결제방식, 실제배송비, 배송방법, 배송그룹id, 배송setid, 주문상품옵션id들 } []
+     * )
+     */
+    /** *************** */
 
     // 주문 생성 후 장바구니 비우기
     if (cartItemIdList) {
@@ -635,47 +668,6 @@ export class OrderService {
     }
 
     return true;
-  }
-
-  /**
-   * 판매자 본인의 상품에 의거한 실제 주문 상태를 조회합니다.
-   * 이는 여러 판매자의 상품이 하나의 주문에 포함될 수 있는 상황에 대한 처리 용도입니다.
-   */
-  private getOrderRealStep(
-    orderStep: OrderProcessStep,
-    orderItemOtions: { step: OrderProcessStep }[],
-  ): OrderProcessStep {
-    if (orderItemOtions.length === 0) return orderStep;
-    const isPartialStep = orderStep.includes('partial');
-
-    // 주문의 상태가 "부분0000"일 때,
-    if (isPartialStep) {
-      // "부분" 상태를 제거한 상태
-      const nonPartialStepString = orderStep.replace('partial', '');
-      const nonPartialStep = (nonPartialStepString[0].toLocaleLowerCase() +
-        nonPartialStepString.slice(1)) as OrderProcessStep;
-      // 옵션들 모두가 "부분" 상태를 제거한 상태만 있는 지 확인, 그렇다면 "부분" 상태를 제거한 상태를 반환
-      if (orderItemOtions.every((o) => o.step === nonPartialStep)) {
-        return nonPartialStep;
-      }
-    }
-
-    // 옵션들 모두가 주문상태보다 작은지 확인, 그렇다면 옵션들 중 가장 높은 상태를 반환
-    if (
-      orderItemOtions.every(
-        (o) =>
-          Number(orderProcessStepDict[o.step]) < Number(orderProcessStepDict[orderStep]),
-      )
-    ) {
-      return orderItemOtions.reduce((acc, curr) => {
-        if (!acc) return curr.step;
-        if (Number(orderProcessStepDict[acc]) < Number(orderProcessStepDict[curr.step]))
-          return curr.step;
-        return acc;
-      }, orderItemOtions[0].step);
-    }
-
-    return orderStep;
   }
 
   /** 판매자센터 마이페이지 홈 오늘매출현황, 주문현황조회 */

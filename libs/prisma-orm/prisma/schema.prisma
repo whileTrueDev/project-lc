@@ -1697,12 +1697,12 @@ model OrderItemOption {
   exchangeItems           ExchangeItem[] // 교환상품
   orderShipping           OrderShipping?          @relation(fields: [orderShippingId], references: [id], onDelete: SetNull)
   orderShippingId         Int?
-  amountInGoodsReady      Int? //  상품준비("35") 상태 상품(옵션) 개수
-  amountInExportReady     Int? //  출고준비("45") 상태 상품(옵션) 개수
-  amountInExportDone      Int? //  출고완료("55") 상태 상품(옵션) 개수
-  amountInShipping        Int? //  배송중("65") 상태 상품(옵션) 개수
-  amountInShippingDone    Int? //  배송완료("75") 상태 상품(옵션) 개수
-  amountInPaymentCanceled Int? //  결제취소("85") 상태 상품(옵션) 개수
+  amountInGoodsReady      Int                     @default(0) //  상품준비("35") 상태 상품(옵션) 개수
+  amountInExportReady     Int                     @default(0) //  출고준비("45") 상태 상품(옵션) 개수
+  amountInExportDone      Int                     @default(0) //  출고완료("55") 상태 상품(옵션) 개수
+  amountInShipping        Int                     @default(0) //  배송중("65") 상태 상품(옵션) 개수
+  amountInShippingDone    Int                     @default(0) //  배송완료("75") 상태 상품(옵션) 개수
+  amountInPaymentCanceled Int                     @default(0) //  결제취소("85") 상태 상품(옵션) 개수
 }
 
 // 주문상품후원
