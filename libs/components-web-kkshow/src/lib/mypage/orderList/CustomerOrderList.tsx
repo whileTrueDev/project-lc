@@ -61,7 +61,9 @@ export function CustomerOrderList({ customerId }: { customerId: number }): JSX.E
     return <Text>주문내역을 조회하던 중 오류가 발생하였습니다 {error.message}</Text>;
   return (
     <Stack>
-      <Text fontWeight="bold">주문/배송내역</Text>
+      <Text fontSize="xl" fontWeight="bold">
+        주문/배송내역
+      </Text>
 
       {/* 주문내역 조회 필터 - 기간 */}
       <CustomerOrderPeriodFilter
