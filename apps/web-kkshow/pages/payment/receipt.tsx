@@ -136,12 +136,15 @@ export function Receipt(): JSX.Element {
                 <Text>쿠폰사용</Text>
                 <Text>
                   -{' '}
-                  {orderDetailData.customerCouponLogs[0].customerCoupon.coupon.amount.toLocaleString()}
+                  {orderDetailData.customerCouponLogs[0]?.customerCoupon.coupon.amount.toLocaleString() ||
+                    0}
                 </Text>
               </Flex>
               <Flex justifyContent="space-between" color="gray.500">
                 <Text>적립금사용</Text>
-                <Text>- {orderDetailData.mileageLogs[0].amount.toLocaleString()}</Text>
+                <Text>
+                  - {orderDetailData.mileageLogs[0]?.amount.toLocaleString() || 0}
+                </Text>
               </Flex>
               <Divider mt={2} mb={2} />
               {paymentData.card && (

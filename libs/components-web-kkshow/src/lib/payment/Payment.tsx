@@ -87,7 +87,7 @@ export function PaymentBox(): JSX.Element {
     0,
   );
   const productNameArray = order.orderItems.map((item) => item.goodsName);
-  const DISCOUNT = 3000;
+  const DISCOUNT = order.totalDiscount || 0;
   let productName = '';
   if (productNameArray.length > 1) {
     productName = `${productNameArray[0]} 외 ${productNameArray.length - 1}개`;

@@ -9,28 +9,20 @@ import {
   Center,
   Divider,
   HStack,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { BsShopWindow } from 'react-icons/bs';
 import { OrderDetailRes } from '@project-lc/shared-types';
-
-export interface DummyOrder {
-  id: number;
-  sellerId: number;
-  shopName: string;
-  goods_name: string;
-  consumer_price: number;
-  image: string;
-  option_title: string;
-  number: number;
-  shipping_cost: number;
-}
+import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 
 export function ReceiptOrderItemInfo({
   data,
 }: {
   data: OrderDetailRes['orderItems'];
 }): JSX.Element {
+  console.log(data);
+  const backGroundColor = useColorModeValue('yellow.100', 'gray.700');
   return (
     <Box>
       <Heading size="lg">주문상품</Heading>
@@ -38,8 +30,8 @@ export function ReceiptOrderItemInfo({
 
       {data?.map((item, index: number) => (
         <Box key={item.id}>
-          <Grid templateColumns="repeat(10, 1fr)">
-            <GridItem colSpan={10}>
+          <Grid templateColumns="repeat(8, 2fr)">
+            <GridItem colSpan={8}>
               <HStack>
                 <BsShopWindow />
                 <Text>{item.goods.seller.sellerShop.shopName}</Text>
@@ -60,27 +52,29 @@ export function ReceiptOrderItemInfo({
                     width={70}
                     height={70}
                   />
-                  <Flex direction="column" m={3}>
+                  <Flex direction="column" ml={1}>
                     <Text>{item.goods.goods_name}</Text>
-                    <Text mt={3} as="sub">
-                      옵션 : {item.options[index].value}
-                    </Text>
+                    {item.options.map((option) => (
+                      <Flex key={option.id} fontSize="xs">
+                        <Text as="span">옵션 : {option.value}</Text>
+                        <TextDotConnector mr={2} ml={2} />
+                        <Text>{option.quantity}개</Text>
+                        <TextDotConnector mr={2} ml={2} />
+                        <Text as="span">
+                          {Number(option.discountPrice).toLocaleString()}원
+                        </Text>
+                      </Flex>
+                    ))}
                   </Flex>
                 </Flex>
               </Link>
             </GridItem>
             <GridItem>
               <Center w="100%" h="100%">
-                <Text>{item.options[index].quantity}개</Text>
-              </Center>
-            </GridItem>
-            <GridItem>
-              <Center w="100%" h="100%">
                 <Text fontWeight="bold">
-                  {(
-                    Number(item.options[index].normalPrice) -
-                    Number(item.options[index].discountPrice)
-                  ).toLocaleString()}
+                  {item.options
+                    .map((option) => Number(option.discountPrice))
+                    .reduce((prev, next) => prev + next)}
                   원
                 </Text>
               </Center>
@@ -159,21 +153,34 @@ export function MobileReceiptOrderItemInfo({
                 </Text>
               </Link>
               <Flex direction="column" ml={1}>
-                <Flex fontSize="xs">
-                  <Text>옵션:</Text>
-                  <Text>{item.options[index].value}</Text>
+                <Flex fontSize="xs" direction="column">
+                  {item.options.map((option) => (
+                    <Flex key={option.id} fontSize="xs">
+                      <Text as="span">옵션 : {option.value}</Text>
+                      <TextDotConnector mr={2} ml={2} />
+                      <Text>{option.quantity}개</Text>
+                      <TextDotConnector mr={2} ml={2} />
+                      <Text as="span">
+                        {Number(option.discountPrice).toLocaleString()}원
+                      </Text>
+                    </Flex>
+                  ))}
                 </Flex>
                 <Flex fontSize="xs">
-                  <Text>구매수량:</Text>
-                  <Text>{item.options[index].quantity}개</Text>
+                  <Text>총 구매수량:</Text>
+                  <Text>
+                    {item.options
+                      .map((option) => Number(option.quantity))
+                      .reduce((prev, next) => prev + next)}
+                    개
+                  </Text>
                 </Flex>
                 <Flex justifyContent="space-between">
                   <Box />
                   <Text fontWeight="bold">
-                    {(
-                      Number(item.options[index].normalPrice) -
-                      Number(item.options[index].discountPrice)
-                    ).toLocaleString()}
+                    {item.options
+                      .map((option) => Number(option.discountPrice))
+                      .reduce((prev, next) => prev + next)}
                     원
                   </Text>
                 </Flex>
