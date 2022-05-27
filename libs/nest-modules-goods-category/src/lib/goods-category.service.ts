@@ -7,8 +7,9 @@ import { GoodsCategory } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateGoodsCategoryDto,
-  GoodsCategoryRes,
+  AdminGoodsCategoryRes,
   UpdateGoodsCategoryDto,
+  GoodsCategoryRes,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 
@@ -41,7 +42,7 @@ export class GoodsCategoryService {
   }
 
   // 카테고리 조회
-  async getCategories(): Promise<GoodsCategoryRes> {
+  async getCategories(): Promise<AdminGoodsCategoryRes> {
     const categories = await this.prisma.goodsCategory.findMany({
       include: { _count: { select: { goods: true } } },
     });
@@ -49,6 +50,24 @@ export class GoodsCategoryService {
     return categories.map((c) => {
       const { _count, ...category } = c;
       return { ...category, goodsCount: _count.goods };
+    });
+  }
+
+  /** 특정 카테고리의 하위 카테고리 목록 조회 */
+  async findChildCategories(
+    parentCategoryId: GoodsCategory['parentCategoryId'],
+  ): Promise<GoodsCategoryRes> {
+    return this.prisma.goodsCategory.findMany({
+      where: { parentCategoryId },
+      include: { _count: { select: { childrenCategories: true } } },
+    });
+  }
+
+  /** 최상위 카테고리 목록 조회 */
+  async findMainCategories(): Promise<GoodsCategoryRes> {
+    return this.prisma.goodsCategory.findMany({
+      where: { mainCategoryFlag: true },
+      include: { _count: { select: { childrenCategories: true } } },
     });
   }
 

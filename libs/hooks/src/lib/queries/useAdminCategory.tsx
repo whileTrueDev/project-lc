@@ -1,12 +1,14 @@
-import { GoodsCategoryRes } from '@project-lc/shared-types';
+import { AdminGoodsCategoryRes } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
-export const getAdminCategory = async (): Promise<GoodsCategoryRes> => {
-  return axios.get<GoodsCategoryRes>('/admin/goods-category').then((res) => res.data);
+export const getAdminCategory = async (): Promise<AdminGoodsCategoryRes> => {
+  return axios
+    .get<AdminGoodsCategoryRes>('/admin/goods-category')
+    .then((res) => res.data);
 };
 
-export const useAdminCategory = (): UseQueryResult<GoodsCategoryRes, AxiosError> => {
-  return useQuery<GoodsCategoryRes, AxiosError>('AdminCategory', getAdminCategory);
+export const useAdminCategory = (): UseQueryResult<AdminGoodsCategoryRes, AxiosError> => {
+  return useQuery<AdminGoodsCategoryRes, AxiosError>('AdminCategory', getAdminCategory);
 };

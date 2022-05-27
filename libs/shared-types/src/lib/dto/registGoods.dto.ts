@@ -13,6 +13,7 @@ import {
   ValidateNested,
   IsNumber,
   IsObject,
+  IsJSON,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { GoodsOptionDto } from './goodsOption.dto';
@@ -136,14 +137,11 @@ export class RegistGoodsDto {
   @IsNumber()
   categoryId: number;
 
-  @IsNumber()
-  informationSubjectId: number;
-
   @IsOptional()
   @IsNumber()
   informationNoticeId?: number;
 
   @IsOptional()
-  @IsObject()
-  informationNoticeContents?: GoodsInformationNoticeDto['contents'];
+  @IsJSON()
+  informationNoticeContents?: string;
 }
