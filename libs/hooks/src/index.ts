@@ -150,6 +150,7 @@ export * from './lib/queries/useReviews';
 export * from './lib/queries/useSellCommission';
 export * from './lib/queries/useSellerGoodsList';
 export * from './lib/queries/useSellerOrderCancelRequest';
+export * from './lib/queries/useSellerOrderStats';
 export * from './lib/queries/useSellerSettlementHistory';
 export * from './lib/queries/useSettlementHistory';
 export * from './lib/queries/useSettlementHistoryCalender';
