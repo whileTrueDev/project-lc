@@ -18,21 +18,21 @@ import {
 import { GoodsByIdRes, RegistGoodsDto } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
 import { FormProvider, useForm } from 'react-hook-form';
-import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
-import GoodsRegistDataBasic from './GoodsRegistDataBasic';
-import GoodsRegistDataOptions from './GoodsRegistDataOptions';
-import GoodsRegistDataSales from './GoodsRegistDataSales';
-import GoodsRegistDescription from './GoodsRegistDescription';
-import GoodsRegistExtraInfo from './GoodsRegistExtraInfo';
+import GoodsRegistCommonInfo from './goods-regist/GoodsRegistCommonInfo';
+import GoodsRegistDataBasic from './goods-regist/GoodsRegistDataBasic';
+import GoodsRegistDataOptions from './goods-regist/GoodsRegistDataOptions';
+import GoodsRegistDataSales from './goods-regist/GoodsRegistDataSales';
+import GoodsRegistDescription from './goods-regist/GoodsRegistDescription';
+import GoodsRegistExtraInfo from './goods-regist/GoodsRegistExtraInfo';
 import {
   addGoodsOptionInfo,
   GoodsFormOption,
   GoodsFormValues,
   saveContentsImageToS3,
-} from './GoodsRegistForm';
-import GoodsRegistMemo from './GoodsRegistMemo';
-import GoodsRegistPictures from './GoodsRegistPictures';
-import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
+} from './goods-regist/GoodsRegistForm';
+import GoodsRegistMemo from './goods-regist/GoodsRegistMemo';
+import GoodsRegistPictures from './goods-regist/GoodsRegistPictures';
+import GoodsRegistShippingPolicy from './goods-regist/GoodsRegistShippingPolicy';
 
 type GoodsFormSubmitDataType = Omit<GoodsFormValues, 'options'> & {
   options: GoodsFormOption[];

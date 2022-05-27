@@ -1,5 +1,5 @@
 import { Container } from '@chakra-ui/react';
-import { GoodsRegistForm } from '@project-lc/components-seller/GoodsRegistForm';
+import { GoodsRegistForm } from '@project-lc/components-seller/goods-regist/GoodsRegistForm';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 
 export function GoodsRegist(): JSX.Element {
