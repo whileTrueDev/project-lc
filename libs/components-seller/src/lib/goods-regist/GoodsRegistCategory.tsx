@@ -107,7 +107,7 @@ function Category({ depth = 0, category, onClick }: CategoryProps): JSX.Element 
               size="xs"
               variant="solid"
               aria-label="sub-category-btn"
-              icon={subCategory.isOpen ? <ChevronRightIcon /> : <ChevronDownIcon />}
+              icon={subCategory.isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
             />
           ) : null}
         </Box>
