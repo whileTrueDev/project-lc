@@ -136,13 +136,13 @@ export function OrderDetail(): JSX.Element {
         </Box>
 
         {/* 주문 상품 정보 */}
-        {/*  // TODO: 주문-배송비 테이블 생성 후 주석 처리된 코드처럼 OrderDetailShippingItem 활용하여 주문상품 표시하도록 수정하기(임의로 주문상품정보 표시하도록 해둠) */}
-        <SectionWithTitle title="주문 상품 정보">
+        {/*  // TODO: 주문-배송비 테이블 생성 후 주석 처리된 코드처럼 OrderDetailShippingItem 활용하여 주문상품 & 주문상품 상태별 개수 표시하도록 수정하기(임의로 주문상품정보 표시하도록 해둠) */}
+        {/* <SectionWithTitle title="주문 상품 정보">
           {order.data.shippings.map((shipping) => (
             <OrderDetailShippingItem key={shipping.id} shipping={shipping} />
           ))}
-        </SectionWithTitle>
-        {/* <SectionWithTitle title="주문 상품 정보">
+        </SectionWithTitle> */}
+        <SectionWithTitle title="주문 상품 정보">
           {order.data.orderItems.flatMap((item) =>
             item.options.map((opt) => (
               <OrderItemOptionInfo
@@ -153,7 +153,7 @@ export function OrderDetail(): JSX.Element {
               />
             )),
           )}
-        </SectionWithTitle> */}
+        </SectionWithTitle>
 
         {/* 주문자 / 수령자 정보 */}
         <SectionWithTitle title="주문자 / 수령자 정보">

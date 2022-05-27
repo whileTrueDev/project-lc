@@ -182,15 +182,7 @@ export class OrderService {
     });
 
     /** *************** */
-    /**
-     *
-     * 4.주문배송비 생성
-     * 주문에 적용된 배송비 구하기
-     * 연결된 배송정책이 같은 상품끼리 연결
-     * (createOrderDto) => (
-     *  {주문id, 배송비 결제방식, 실제배송비, 배송방법, 배송그룹id, 배송setid, 주문상품옵션id들 } []
-     * )
-     */
+    // TODO: 주문에 부과된 배송비정보(OrderShipping) 생성???
     /** *************** */
 
     // 주문 생성 후 장바구니 비우기
@@ -561,20 +553,43 @@ export class OrderService {
       };
     }
 
-    await this.prisma.$transaction([
-      this.prisma.order.update({
-        where: { id: orderId },
-        data: updateInput,
-      }),
-      // 주문 상태를 바꾸는 경우 -> 주문에 연결된 주문상품옵션 상태도 같이 변경
-      // TODO: 주문상품옵션 상태별 개수 변경
-      rest.step
-        ? this.prisma.orderItemOption.updateMany({
-            where: { orderItem: { orderId } },
-            data: { step: rest.step },
-          })
-        : undefined,
-    ]);
+    // 주문 업데이트
+    await this.prisma.order.update({
+      where: { id: orderId },
+      data: updateInput,
+    });
+
+    // 주문 상태를 바꾸는 경우 주문상품옵션의 상태와 개수도 변경
+    if (rest.step) {
+      const orderItemOptions = await this.prisma.orderItemOption.findMany({
+        where: { orderItem: { orderId } },
+        select: { id: true, quantity: true },
+      });
+      // 주문상태를 결제확인으로 바꾸는경우(주문접수 -> 결제확인)
+      // => 해당 주문에 포함된 주문상품옵션의 상태도 모두 결제확인으로 변경
+      if (rest.step === 'paymentConfirmed') {
+        await this.prisma.orderItemOption.updateMany({
+          where: { orderItem: { orderId } },
+          data: { step: rest.step },
+        });
+      }
+      // 주문상태를 상품준비로 바꾸는 경우(결제완료 -> 상품준비)
+      // => 해당 주문에 포함된 주문상품옵션 상태도 모두 상품준비로 변경 + 주문상품옵션의 상품준비상태 개수 업데이트
+      if (rest.step === 'goodsReady') {
+        await this.prisma.$transaction(
+          orderItemOptions.map((opt) => {
+            return this.prisma.orderItemOption.update({
+              where: { id: opt.id },
+              data: {
+                step: rest.step,
+                amountInGoodsReady: opt.quantity,
+              },
+            });
+          }),
+        );
+      }
+    }
+
     return true;
   }
 
