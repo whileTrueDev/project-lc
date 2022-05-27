@@ -177,6 +177,7 @@ export function ReviewDetail({
             <GoodsDisplay2
               size="xs"
               goods={{
+                id: goods.data.id,
                 imageSrc: goods.data.image[0].image,
                 name: goods.data.goods_name,
                 seller: goods.data.seller,
