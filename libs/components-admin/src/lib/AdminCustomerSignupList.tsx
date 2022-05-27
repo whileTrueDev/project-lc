@@ -9,12 +9,7 @@ export function AdminCustomerSignupList(): JSX.Element {
   const { data: customers } = useAdminCustomer({
     orderBy: 'desc',
     orderByColumn: 'createDate',
-    includeOpts: {
-      addresses: true,
-      coupons: true,
-      goodsReview: true,
-      mileage: true,
-    },
+    includeModels: ['addresses', 'coupons', 'goodsReview', 'mileage'],
   });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { setCustomerDetail } = adminCustomerListStore();

@@ -1,6 +1,5 @@
 import { Customer } from '@prisma/client';
-import { Type } from 'class-transformer';
-import { IsOptional, IsBoolean, IsString, IsIn, ValidateNested } from 'class-validator';
+import { IsBoolean, IsIn, IsOptional, IsString } from 'class-validator';
 import { FindManyDto } from './findMany.dto';
 
 // findCustomers include 옵션
@@ -21,7 +20,6 @@ export class FindCustomerDto extends FindManyDto {
   @IsIn([
     'id',
     'name',
-    'password',
     'email',
     'nickname',
     'phone',
@@ -34,7 +32,7 @@ export class FindCustomerDto extends FindManyDto {
   orderByColumn?: keyof Customer;
 
   @IsOptional()
-  @Type(() => CustomerIncludeDto)
-  @ValidateNested()
-  includeOpts?: CustomerIncludeDto;
+  @IsString({ each: true })
+  @IsIn(['mileage', 'coupons', 'goodsReview', 'addresses'], { each: true })
+  includeModels?: Array<'mileage' | 'coupons' | 'goodsReview' | 'addresses'>;
 }
