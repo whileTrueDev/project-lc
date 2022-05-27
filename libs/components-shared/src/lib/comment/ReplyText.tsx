@@ -1,5 +1,7 @@
-import { Flex, Avatar, Box, Text } from '@chakra-ui/react';
+/* eslint-disable react/no-array-index-key */
+import { Avatar, Box, Flex, Text } from '@chakra-ui/react';
 import dayjs from 'dayjs';
+import 'suneditor/dist/css/suneditor.min.css';
 
 export interface ReplyTextProps {
   avatar: string;

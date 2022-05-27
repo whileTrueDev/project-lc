@@ -17,12 +17,14 @@ import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
 import { useRouter } from 'next/router';
 import { FormProvider, NestedValue, useForm } from 'react-hook-form';
+import GoodsRegistCategory from './GoodsRegistCategory';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
 import GoodsRegistDataOptions from './GoodsRegistDataOptions';
 import GoodsRegistDataSales from './GoodsRegistDataSales';
 import GoodsRegistDescription from './GoodsRegistDescription';
 import GoodsRegistExtraInfo from './GoodsRegistExtraInfo';
+import GoodsRegistKeywords from './GoodsRegistKeywords';
 import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
@@ -129,6 +131,7 @@ export function GoodsRegistForm(): JSX.Element {
       option_values: '',
       image: [],
       options: [],
+      searchKeywords: [],
       // 기타정보 (최대, 최소구매수량)
       min_purchase_limit: 'unlimit',
       max_purchase_limit: 'unlimit',
@@ -283,6 +286,9 @@ export function GoodsRegistForm(): JSX.Element {
         {/* 기본정보 */}
         <GoodsRegistDataBasic />
 
+        {/* 상품 카테고리 정보 */}
+        <GoodsRegistCategory />
+
         {/* 판매정보 */}
         <GoodsRegistDataSales />
 
@@ -301,6 +307,9 @@ export function GoodsRegistForm(): JSX.Element {
 
         {/* 배송비 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
         <GoodsRegistShippingPolicy />
+
+        {/* 상품 키워드 정보 */}
+        <GoodsRegistKeywords />
 
         {/* 기타정보 - 최소, 최대구매수량 */}
         <GoodsRegistExtraInfo />

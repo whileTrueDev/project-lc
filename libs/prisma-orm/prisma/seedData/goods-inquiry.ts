@@ -6,6 +6,7 @@ export const createGoodsInquiry = async (prisma: PrismaClient): Promise<void> =>
       content: '문의내용입니다 어떻게 된 일일까요?',
       writerId: 1,
       goodsId: 1,
+      status: 'answered',
       comments: {
         create: [
           {
@@ -18,6 +19,17 @@ export const createGoodsInquiry = async (prisma: PrismaClient): Promise<void> =>
           },
         ],
       },
+    },
+  });
+};
+
+export const createGoodsInquiry2 = async (prisma: PrismaClient): Promise<void> => {
+  await prisma.goodsInquiry.create({
+    data: {
+      content: '문의내용입니다 어떻게 된 일일까요2??',
+      writerId: 1,
+      goodsId: 2,
+      status: 'requested',
     },
   });
 };
