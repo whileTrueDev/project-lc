@@ -16,16 +16,10 @@ const GOODS_STATUS: { value: GoodsStatus; label: string }[] = [
   { value: 'unsold', label: '판매중지' },
 ];
 
-export type GoodsRegistRadioName = keyof Omit<
+export type GoodsRegistRadioName = keyof Pick<
   RegistGoodsDto,
   // 프론트구현 때, 필요한 값 제거하시면 됩니다.
-  | 'options'
-  | 'image'
-  | 'informationSubjectId'
-  | 'informationNoticeId'
-  | 'searchKeyword'
-  | 'categoryId'
-  | 'informationNoticeContents'
+  'goods_status' | 'cancel_type' | 'option_use'
 >;
 // 상품등록 폼에서 사용하는 라디오그룹
 export function GoodsRegistRadio({

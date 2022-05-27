@@ -15,7 +15,6 @@ export function GoodsDetailActions({ goods }: GoodsDetailActionsProps): JSX.Elem
         <GoodsExposeSwitch
           goodsId={goods.id}
           goodsView={goods.goods_view}
-          confirmedGoodsId={goods.confirmation?.firstmallGoodsConnectionId || undefined}
           isReadOnly={onLiveShopping}
         />
       </Box>
