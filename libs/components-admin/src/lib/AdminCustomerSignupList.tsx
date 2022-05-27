@@ -6,11 +6,15 @@ import { adminCustomerListStore } from '@project-lc/stores';
 import { AdminCustomerSignupListDetailDialog } from './AdminCustomerSignupListDetailDialog';
 
 export function AdminCustomerSignupList(): JSX.Element {
-  const { data: customers } = useAdminCustomer('desc', undefined, {
-    addresses: true,
-    coupons: true,
-    goodsReview: true,
-    mileage: true,
+  const { data: customers } = useAdminCustomer({
+    orderBy: 'desc',
+    orderByColumn: 'createDate',
+    includeOpts: {
+      addresses: true,
+      coupons: true,
+      goodsReview: true,
+      mileage: true,
+    },
   });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { setCustomerDetail } = adminCustomerListStore();

@@ -1,32 +1,17 @@
-import { useQuery, UseQueryResult } from 'react-query';
 import { Customer } from '@prisma/client';
+import { FindCustomerDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { CustomerIncludeDto } from '@project-lc/shared-types';
-
+import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
-export const getAdminCustomer = async (
-  orderBy: string,
-  orderByColumn?: string,
-  include?: CustomerIncludeDto,
-): Promise<Customer[]> => {
+export const getAdminCustomer = async (dto: FindCustomerDto): Promise<Customer[]> => {
   return axios
-    .get<Customer[]>('/admin/customer', {
-      params: {
-        orderBy,
-        orderByColumn,
-        include,
-      },
-    })
+    .get<Customer[]>('/admin/customer', { params: dto })
     .then((res) => res.data);
 };
 
 export const useAdminCustomer = (
-  orderBy: string,
-  orderByColumn?: string,
-  include?: CustomerIncludeDto,
+  dto: FindCustomerDto,
 ): UseQueryResult<Customer[], AxiosError> => {
-  return useQuery<Customer[], AxiosError>(['getAdminCustomer'], () =>
-    getAdminCustomer(orderBy, orderByColumn, include),
-  );
+  return useQuery<Customer[], AxiosError>(['AdminCustomer'], () => getAdminCustomer(dto));
 };
