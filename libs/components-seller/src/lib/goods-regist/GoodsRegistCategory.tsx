@@ -100,14 +100,14 @@ function Category({ depth = 0, category, onClick }: CategoryProps): JSX.Element 
   return (
     <Box mt={2}>
       <Flex key={category.id} gap={2} ml={depth}>
-        <Box w={4}>
+        <Box w={4} mr={1}>
           {category._count.childrenCategories > 0 ? (
             <IconButton
               onClick={subCategory.onToggle}
               size="xs"
-              variant="unstyle"
+              variant="solid"
               aria-label="sub-category-btn"
-              icon={subCategory.isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
+              icon={subCategory.isOpen ? <ChevronRightIcon /> : <ChevronDownIcon />}
             />
           ) : null}
         </Box>
