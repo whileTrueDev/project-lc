@@ -75,3 +75,15 @@ export const exportableSteps: OrderProcessStep[] = [
   'exportReady',
   'partialExportDone',
 ];
+// 판매자센터 마이페이지 주문현황
+export const sellerOrderSteps = {
+  shippingReady: [
+    'goodsReady',
+    'partialExportReady',
+    'exportReady',
+    'partialExportDone',
+    'exportDone',
+  ],
+  shipping: ['partialShipping', 'shipping', 'partialShippingDone'],
+  shippingDone: ['shippingDone'],
+};

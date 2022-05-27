@@ -247,6 +247,7 @@ CREATE TABLE `GoodsReviewComment` (
 CREATE TABLE `GoodsInquiry` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `content` TEXT NOT NULL,
+    `status` ENUM('requested', 'answered', 'adminAnswered') NOT NULL DEFAULT 'requested',
     `createDate` DATETIME(3) NOT NULL,
     `writerId` INTEGER NOT NULL,
     `goodsId` INTEGER NOT NULL,

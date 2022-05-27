@@ -24,6 +24,7 @@ export class GoodsInquiryCommentDto {
   @IsString() content: string;
 }
 
+/** 상품 문의 조회 DTO */
 export class FindManyGoodsInquiryDto extends DefaultPaginationDto {
   @Type(() => Number) @IsOptional() @IsInt() goodsId?: Goods['id'];
   @Type(() => Number) @IsOptional() @IsInt() customerId?: Customer['id'];

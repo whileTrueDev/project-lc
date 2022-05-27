@@ -95,6 +95,18 @@ export const mypageNavLinks: MypageLink[] = [
     name: '상품',
     href: '/mypage/goods',
     checkIsActive: defaultIsActiveChecker,
+    children: [
+      {
+        name: '상품 목록',
+        href: '/mypage/goods',
+        checkIsActive: (pathname, linkHref) => pathname === linkHref,
+      },
+      {
+        name: '문의 관리',
+        href: '/mypage/goods-inquiries',
+        checkIsActive: (pathname, linkHref) => pathname === linkHref,
+      },
+    ],
   },
   {
     icon: MdLiveTv,

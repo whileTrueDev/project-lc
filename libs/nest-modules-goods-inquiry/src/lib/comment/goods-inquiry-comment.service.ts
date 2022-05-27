@@ -27,15 +27,22 @@ export class GoodsInquiryCommentService {
     goodsInquiryId: GoodsInquiry['id'],
     dto: GoodsInquiryCommentDto,
   ): Promise<GoodsInquiryComment> {
-    return this.prisma.goodsInquiryComment.create({
-      data: {
-        goodsInquiryId,
-        content: dto.content,
-        adminId: dto.adminId,
-        sellerId: dto.sellerId,
-        writtenBySellerFlag: !!dto.sellerId,
-      },
-    });
+    const result = await this.prisma.$transaction([
+      this.prisma.goodsInquiryComment.create({
+        data: {
+          goodsInquiryId,
+          content: dto.content,
+          adminId: dto.adminId,
+          sellerId: dto.sellerId,
+          writtenBySellerFlag: !!dto.sellerId,
+        },
+      }),
+      this.prisma.goodsInquiry.update({
+        where: { id: goodsInquiryId },
+        data: { status: dto.sellerId ? 'answered' : 'adminAnswered' },
+      }),
+    ]);
+    return result[0];
   }
 
   /** 특정 상품문의 답변 수정 */

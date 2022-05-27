@@ -24,6 +24,7 @@ import {
   OrderDetailRes,
   OrderListRes,
   OrderPurchaseConfirmationDto,
+  OrderStatsRes,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { OrderService } from './order.service';
@@ -47,6 +48,14 @@ export class OrderController {
   @Post()
   createOrder(@Body(ValidationPipe) dto: CreateOrderDto): Promise<Order> {
     return this.orderService.createOrder(dto);
+  }
+
+  /** 판매자 주문현황 조회 */
+  @Get('stats')
+  async getOrdersStats(
+    @Query('sellerId', ParseIntPipe) sellerId: number,
+  ): Promise<OrderStatsRes> {
+    return this.orderService.getOrderStats(sellerId);
   }
 
   /** 비회원 주문 상세조회 - 가드 적용하지 않아야 함 */

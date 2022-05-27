@@ -1481,11 +1481,19 @@ model GoodsReviewComment {
 // *****************
 // 상품문의
 // *****************
+// 상품 문의 상태
+enum GoodsInquiryStatus {
+  requested // 답변 필요
+  answered // 답변 완료
+  adminAnswered // 크크쇼 관리자에 의해 답변 완료
+}
+
 // 상품문의
 model GoodsInquiry {
-  id         Int      @id @default(autoincrement()) // 상품문의고유번호
-  content    String   @db.Text // 상품문의내용
-  createDate DateTime @default(now()) //생성일
+  id         Int                @id @default(autoincrement()) // 상품문의고유번호
+  content    String             @db.Text // 상품문의내용
+  status     GoodsInquiryStatus @default(requested) // 상품 문의 상태
+  createDate DateTime           @default(now()) //생성일
 
   writerId Int // 상품문의 작성한 소비자 고유번호
   // 상품문의작성자

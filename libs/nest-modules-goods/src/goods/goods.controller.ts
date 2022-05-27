@@ -30,6 +30,7 @@ import {
   GoodsImageDto,
   GoodsListRes,
   GoodsOptionWithStockInfo,
+  GoodsOutlineByIdRes,
   RegistGoodsDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
@@ -148,7 +149,7 @@ export class GoodsController {
   @UseGuards(JwtAuthGuard)
   registGoods(
     @SellerInfo() seller: UserPayload,
-    @Body(ValidationPipe) dto: RegistGoodsDto,
+    @Body(new ValidationPipe({ transform: true })) dto: RegistGoodsDto,
   ): Promise<{ goodsId: number }> {
     return this.goodsService.registGoods(seller.id, dto);
   }
@@ -162,6 +163,14 @@ export class GoodsController {
   @Get(':goodsId')
   getOneGoods(@Param('goodsId', ParseIntPipe) goodsId: number): Promise<GoodsByIdRes> {
     return this.goodsService.getOneGoods(goodsId);
+  }
+
+  /** 상품 개별 조회 (반환 데이터가 간략함) */
+  @Get(':goodsId/outline')
+  getOneGoodsOutline(
+    @Param('goodsId', ParseIntPipe) goodsId: number,
+  ): Promise<GoodsOutlineByIdRes> {
+    return this.goodsService.getOneGoodsOutline(goodsId);
   }
 
   /** 상품 수정 */
