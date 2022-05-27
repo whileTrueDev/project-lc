@@ -56,7 +56,6 @@ export class CustomerService {
     if (dto.birthDate) {
       dto.birthDate = new Date(dto.birthDate);
     }
-    await this._clearCaches(this.#CUSTOMER_CACHE_KEY);
     return this.prisma.customer.update({
       where: { id: customerId },
       data: dto,
@@ -68,7 +67,6 @@ export class CustomerService {
     const result = await this.prisma.customer.delete({
       where: { id: customerId },
     });
-    await this._clearCaches(this.#CUSTOMER_CACHE_KEY);
     return !!result;
   }
 
