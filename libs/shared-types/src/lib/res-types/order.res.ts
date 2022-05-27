@@ -15,6 +15,7 @@ import {
   OrderItemOption,
   OrderItemSupport,
   OrderPayment,
+  OrderShipping,
   Refund,
   Return,
   ReturnImage,
@@ -58,6 +59,7 @@ export type OrderBaseData = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: Nullable<OrderPayment>;
   refunds: Nullable<Refund[]>;
+  shippings: (OrderShipping & { items: OrderItemOption[] })[];
 };
 
 export type OrderDataWithRelations = OrderBaseData & {

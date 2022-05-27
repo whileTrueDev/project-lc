@@ -127,6 +127,7 @@ export class OrderService {
     }
 
     // 주문에 연결된 주문상품, 주문상품옵션, 주문상품후원 생성
+    // TODO: 주문상품옵션 생성시 주문상품명, 이미지 추가하기
     const order = await this.prisma.order.create({
       data: {
         ...createInput,
@@ -407,6 +408,7 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true } },
         returns: { include: { items: true } },
         orderCancellations: { include: { items: true } },
+        shippings: { include: { items: true } },
       },
     });
 
@@ -449,6 +451,7 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true, images: true } },
         returns: { include: { items: true, images: true } },
         orderCancellations: { include: { items: true } },
+        shippings: { include: { items: true } },
       },
     });
   }
@@ -527,6 +530,7 @@ export class OrderService {
         data: updateInput,
       }),
       // 주문 상태를 바꾸는 경우 -> 주문에 연결된 주문상품옵션 상태도 같이 변경
+      // TODO: 주문상품옵션 상태별 개수 변경
       rest.step
         ? this.prisma.orderItemOption.updateMany({
             where: { orderItem: { orderId } },

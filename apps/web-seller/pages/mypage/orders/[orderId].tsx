@@ -35,6 +35,7 @@ import { OrderDetailExchangeInfo } from '@project-lc/components-seller/kkshow-or
 import { OrderDetailCancelInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailCancelInfo';
 import { OrderDetailExportInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExportInfo';
 import { OrderExchangeReturnCancelExistsAlert } from '@project-lc/components-seller/kkshow-order/OrderExchangeReturnCancelExistsAlert';
+import { OrderItemOption, OrderShipping } from '@prisma/client';
 
 const exchangeSectionTitle = '교환 정보';
 const returnSectionTitle = '반품 정보';
@@ -136,12 +137,12 @@ export function OrderDetail(): JSX.Element {
 
         {/* 주문 상품 정보 */}
         {/*  // TODO: 주문-배송비 테이블 생성 후 주석 처리된 코드처럼 OrderDetailShippingItem 활용하여 주문상품 표시하도록 수정하기(임의로 주문상품정보 표시하도록 해둠) */}
-        {/* <SectionWithTitle title="주문 상품 정보">
-          {order.data.shippings.map((shipping) => (
-            <OrderDetailShippingItem key={shipping.shipping_seq} shipping={shipping} />
-          ))}
-        </SectionWithTitle> */}
         <SectionWithTitle title="주문 상품 정보">
+          {order.data.shippings.map((shipping) => (
+            <OrderDetailShippingItem key={shipping.id} shipping={shipping} />
+          ))}
+        </SectionWithTitle>
+        {/* <SectionWithTitle title="주문 상품 정보">
           {order.data.orderItems.flatMap((item) =>
             item.options.map((opt) => (
               <OrderItemOptionInfo
@@ -152,7 +153,7 @@ export function OrderDetail(): JSX.Element {
               />
             )),
           )}
-        </SectionWithTitle>
+        </SectionWithTitle> */}
 
         {/* 주문자 / 수령자 정보 */}
         <SectionWithTitle title="주문자 / 수령자 정보">
@@ -256,20 +257,20 @@ export function OrderDetailLoading(): JSX.Element {
 }
 
 interface OrderDetailShippingItemProps {
-  shipping: FmOrderShipping;
+  shipping: OrderShipping & { items: OrderItemOption[] };
 }
 function OrderDetailShippingItem({
   shipping,
 }: OrderDetailShippingItemProps): JSX.Element {
   return (
-    <Box key={shipping.shipping_seq} mt={6} borderWidth="0.025rem" p={2} pl={4}>
+    <Box key={shipping.id} mt={6} borderWidth="0.025rem" p={2} pl={4}>
       {/* 배송정보 */}
       <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
-        <Text>{convertFmOrderShippingTypesToString(shipping.shipping_type)}</Text>
-        {shipping.shipping_type === 'free' ? null : (
+        <Text>{convertFmOrderShippingTypesToString(shipping.shippingCostPayType)}</Text>
+        {shipping.shippingCostPayType === 'free' ? null : (
           <>
             <TextDotConnector />
-            <Text>배송비: {getLocaleNumber(shipping.shipping_cost)} 원</Text>
+            <Text>배송비: {getLocaleNumber(shipping.shippingCost)} 원</Text>
           </>
         )}
       </Stack>
@@ -277,9 +278,9 @@ function OrderDetailShippingItem({
       {/* 상품(옵션) 정보 */}
       <Box mt={4}>
         {shipping.items.map((item) => (
-          <Box key={item.item_seq} mt={2}>
-            <OrderDetailGoods orderItem={item} />
-            <OrderDetailOptionList options={item.options} />
+          <Box key={item.id} mt={2}>
+            {/* <OrderDetailGoods orderItem={item} />
+            <OrderDetailOptionList options={item.options} /> */}
           </Box>
         ))}
       </Box>
