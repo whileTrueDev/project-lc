@@ -458,6 +458,7 @@ export class GoodsService {
     const infoNotice = (await this.prisma.goodsInformationNotice.findFirst({
       where: { goodsId },
     })) as GoodsInformationNoticeRes;
+    if (!result && !infoNotice) return null;
     return { ...result, informationNotice: infoNotice };
   }
 
