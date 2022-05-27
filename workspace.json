@@ -702,6 +702,7 @@
       "tags": []
     },
     "nest-modules-goods-category": "libs/nest-modules-goods-category",
+    "nest-modules-goods-information-subject": "libs/nest-modules-goods-information-subject",
     "nest-modules-goods-inquiry": "libs/nest-modules-goods-inquiry",
     "nest-modules-goods-review": "libs/nest-modules-goods-review",
     "nest-modules-inquiry": {

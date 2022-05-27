@@ -19,7 +19,6 @@ import {
 import { GridSelectionModel } from '@material-ui/data-grid';
 import PasswordCheckForm from '@project-lc/components-shared/PasswordCheckForm';
 import {
-  useDeleteFmGoods,
   useDeleteLcGoods,
   useFmOrdersByGoods,
   useLiveShoppingList,
@@ -31,7 +30,6 @@ import {
   SellerGoodsListItem,
 } from '@project-lc/shared-types';
 import { useMemo, useRef, useState } from 'react';
-import { useQueryClient } from 'react-query';
 
 export function DeleteGoodsAlertDialog({
   onClose,
@@ -50,13 +48,10 @@ export function DeleteGoodsAlertDialog({
     setStep('alert');
     onClose();
   };
-  const queryClient = useQueryClient();
   const toast = useToast();
   const cancelRef = useRef<HTMLButtonElement>(null);
   // Goods테이블에서 삭제요청
   const deleteLcGoods = useDeleteLcGoods();
-  // fm-goods 테이블에서 삭제요청
-  const deleteFmGoods = useDeleteFmGoods();
 
   // 해당 상품 주문 조회
   // [결제취소, 결제실패, 배송완료, 주문무효]를 제외한 상태의 주문이 있는지 체크하여
@@ -127,48 +122,22 @@ export function DeleteGoodsAlertDialog({
       });
       return;
     }
-
-    // 검수된 상품
-    const confirmedGoods = items.filter(
-      (item) =>
-        selectedGoodsIds.includes(item.id) &&
-        item.confirmation &&
-        item.confirmation.status === 'confirmed' &&
-        item.confirmation.firstmallGoodsConnectionId !== null,
-    );
-    try {
-      // 전체 선택된 상품 Goods테이블에서 삭제요청
-      const deleteGoodsFromLcDb = deleteLcGoods.mutateAsync({
+    // 전체 선택된 상품 Goods테이블에서 삭제요청
+    await deleteLcGoods
+      .mutateAsync({
         ids: selectedGoodsIds.map((id) => Number(id)),
-      });
-
-      const promises = [deleteGoodsFromLcDb];
-
-      if (confirmedGoods.length > 0) {
-        // 선택된 상품 중 검수된 상품이 있다면 fm-goods 테이블에서도 삭제요청
-        const deleteGoodsFromFmDb = deleteFmGoods.mutateAsync({
-          ids: confirmedGoods.map((item) => Number(item.id)),
+      })
+      .then(() => {
+        toast({ title: '상품이 삭제되었습니다', status: 'success', isClosable: true });
+        handleClose();
+      })
+      .catch(() => {
+        toast({
+          title: '상품 삭제 중 오류가 발생하였습니다',
+          status: 'error',
+          isClosable: true,
         });
-        promises.push(deleteGoodsFromFmDb);
-      }
-
-      await Promise.all(promises);
-      queryClient.invalidateQueries('SellerGoodsList');
-      toast({
-        title: '상품이 삭제되었습니다',
-        status: 'success',
-        isClosable: true,
       });
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: '상품 삭제 중 오류가 발생하였습니다',
-        status: 'error',
-        isClosable: true,
-      });
-    } finally {
-      handleClose();
-    }
   };
 
   return (
@@ -237,9 +206,7 @@ export function DeleteGoodsAlertDialog({
                   ml={3}
                   colorScheme="red"
                   isDisabled={!isDeletable || !(hasliveShoppingList.length === 0)}
-                  isLoading={
-                    deleteLcGoods.isLoading || deleteFmGoods.isLoading || orders.isLoading
-                  }
+                  isLoading={deleteLcGoods.isLoading || orders.isLoading}
                 >
                   확인
                 </Button>
