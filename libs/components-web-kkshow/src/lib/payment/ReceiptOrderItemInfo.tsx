@@ -9,7 +9,6 @@ import {
   Center,
   Divider,
   HStack,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { ChakraNextImage } from '@project-lc/components-core/ChakraNextImage';
 import { BsShopWindow } from 'react-icons/bs';
@@ -21,14 +20,12 @@ export function ReceiptOrderItemInfo({
 }: {
   data: OrderDetailRes['orderItems'];
 }): JSX.Element {
-  console.log(data);
-  const backGroundColor = useColorModeValue('yellow.100', 'gray.700');
   return (
     <Box>
       <Heading size="lg">주문상품</Heading>
       <Divider m={2} />
 
-      {data?.map((item, index: number) => (
+      {data?.map((item) => (
         <Box key={item.id}>
           <Grid templateColumns="repeat(8, 2fr)">
             <GridItem colSpan={8}>
@@ -107,7 +104,7 @@ export function MobileReceiptOrderItemInfo({
     <Box>
       <Heading size="lg">주문상품</Heading>
       <Divider m={2} />
-      {data.map((item, index: number) => (
+      {data.map((item) => (
         <Box key={item.id}>
           <Grid templateColumns="repeat(10, 1fr)">
             <GridItem colSpan={10}>
