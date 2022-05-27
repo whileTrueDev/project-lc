@@ -1,22 +1,35 @@
 /* eslint-disable react/no-array-index-key */
-import { Box, Button, ButtonGroup, Center, Spinner, Text } from '@chakra-ui/react';
-import { Goods } from '@prisma/client';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Center,
+  Heading,
+  Spinner,
+  Text,
+} from '@chakra-ui/react';
+import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
 import { GoodsInquiryItem } from '@project-lc/components-shared/goods-inquiry/GoodsInquiryItem';
-import { useInfiniteGoodsInquiries, useProfile } from '@project-lc/hooks';
+import { useInfiniteGoodsInquiries } from '@project-lc/hooks';
 import { useState } from 'react';
 
-interface SellerGoodsInquiryListProps {
-  goodsId?: Goods['id'];
+export function Inquiry(): JSX.Element {
+  return (
+    <AdminPageLayout>
+      <Heading>상품 문의 관리</Heading>
+
+      <Box maxW="5xl">
+        <AdminGoodsInquiryList />
+      </Box>
+    </AdminPageLayout>
+  );
 }
-export function SellerGoodsInquiryList({
-  goodsId,
-}: SellerGoodsInquiryListProps): JSX.Element | null {
-  const { data: profile } = useProfile();
+
+export default Inquiry;
+
+export function AdminGoodsInquiryList(): JSX.Element | null {
   const { data, isFetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteGoodsInquiries(
-      { sellerId: profile?.id, goodsId },
-      { enabled: !!profile?.id },
-    );
+    useInfiniteGoodsInquiries({});
 
   const [onlyRequested, setOnlyRequested] = useState(false);
   const handleFilterClick = (): void => {
@@ -46,7 +59,7 @@ export function SellerGoodsInquiryList({
           {page.goodsInquiries
             .filter((iq) => (onlyRequested ? iq.status === 'requested' : true))
             .map((inq) => (
-              <GoodsInquiryItem key={inq.id} inquiry={inq} />
+              <GoodsInquiryItem key={inq.id} inquiry={inq} deletable />
             ))}
         </Box>
       ))}
@@ -67,4 +80,3 @@ export function SellerGoodsInquiryList({
     </Box>
   );
 }
-export default SellerGoodsInquiryList;
