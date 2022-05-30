@@ -356,7 +356,7 @@ const customerMypageActivityChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
 const customerMypageInfoChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
   {
     name: '회원 정보 수정',
-    href: '/mypage/회원 정보',
+    href: '/mypage/info',
     checkIsActive: defaultIsActiveChecker,
   },
   {

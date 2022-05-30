@@ -52,6 +52,10 @@ export class CustomerService {
     customerId: Customer['id'],
     dto: UpdateCustomerDto,
   ): Promise<Customer> {
+    /* eslint no-param-reassign: "error" */
+    if (dto.birthDate) {
+      dto.birthDate = new Date(dto.birthDate);
+    }
     return this.prisma.customer.update({
       where: { id: customerId },
       data: dto,
