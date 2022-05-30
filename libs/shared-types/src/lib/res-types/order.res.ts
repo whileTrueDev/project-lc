@@ -66,6 +66,10 @@ export type OrderBaseData = Order & {
   payment?: Nullable<OrderPayment>;
   refunds: Nullable<Refund[]>;
   shippings: (OrderShipping & { items: OrderItemOption[] })[];
+  orderCancellations?: Nullable<OrderCancellationBaseData[]>;
+  exports: Nullable<ExportBaseData[]>;
+  mileageLogs: CustomerMileageLog[] | null;
+  customerCouponLogs: CustomerCouponLogWithCustomerCoupon[] | null;
 };
 
 export interface CustomerCouponWithCoupon extends CustomerCoupon {
@@ -75,22 +79,9 @@ export interface CustomerCouponLogWithCustomerCoupon extends CustomerCouponLog {
   customerCoupon: CustomerCouponWithCoupon;
 }
 
-export type OrderDataWithRelations = Order & {
-  orderItems: OrderItemWithRelations[];
-  payment?: OrderPayment | null;
-  refunds: Refund[] | null;
-  exports: Export[] | null;
-  mileageLogs: CustomerMileageLog[] | null;
-  customerCouponLogs: CustomerCouponLogWithCustomerCoupon[] | null;
-  exchanges:
-    | (Pick<Exchange, 'id' | 'exchangeCode'> & { exchangeItems: ExchangeItem[] })[]
-    | null;
-  returns: (Pick<Return, 'id' | 'returnCode'> & { items: ReturnItem[] })[] | null;
-  orderCancellations?:
-    | (Pick<OrderCancellation, 'id' | 'cancelCode'> & {
-        items: OrderCancellationItem[];
-      })[]
-    | null;
+export type OrderDataWithRelations = OrderBaseData & {
+  exchanges: Nullable<ExchangeBaseData[]>;
+  returns: Nullable<ReturnBaseData[]>;
 };
 
 /** 주문 목록 리턴 데이터 타입 */
@@ -103,8 +94,6 @@ export type OrderListRes = {
 /** 주문 상세 리턴데이터 타입 -> 주문 완료 페이지 혹은 주문 상세 페이지 작업하면서 수정 필요
  */
 export type OrderDetailRes = OrderBaseData & {
-  orderCancellations?: Nullable<OrderCancellationBaseData[]>;
-  exports: Nullable<ExportBaseData[]>;
   exchanges: Nullable<ExchangeDataWithImages[]>;
   returns: Nullable<ReturnDataWithImages[]>;
 };
