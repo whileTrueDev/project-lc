@@ -182,6 +182,7 @@ export function GoodsRegistForm(): JSX.Element {
 
     // 상품필수정보 (품목별 정보제공고시 정보)
     const informationNoticeDto: Record<string, string> = {};
+    console.log('informationNotice: ', informationNotice);
     Object.entries(informationNotice).forEach(([key, value]) => {
       if (!value) {
         // 기본값 처리
