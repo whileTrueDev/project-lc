@@ -21,7 +21,7 @@ import {
 import { MileageSettingDto, CustomerMileageDto } from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
-// @UseInterceptors(HttpCacheInterceptor)
+@UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('mileage')
 @Controller('admin/mileage')
 export class AdminMileageController {
