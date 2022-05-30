@@ -12,7 +12,6 @@ import OrderItemSupport from './OrderItemSupport';
 export function OrderItemInfo(): JSX.Element {
   const { control, getValues } = useFormContext<CreateOrderForm>();
   const { fields: orderItems } = useFieldArray({ control, name: 'orderItems' });
-
   const isGiftOrder = getValues('giftFlag');
   return (
     <SectionWithTitle title="주문 상품">
@@ -58,7 +57,6 @@ export function OrderItem({
   disableSupportInfo = false,
 }: OrderItemProps): JSX.Element | null {
   const goods = useGoodsById(orderItem.goodsId);
-
   if (goods.isLoading) return <Spinner />;
   if (!goods.data) return null;
   return (

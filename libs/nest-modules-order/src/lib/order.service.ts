@@ -259,10 +259,25 @@ export class OrderService {
                 id: true,
                 goods_name: true,
                 image: true,
+                seller: {
+                  select: {
+                    sellerShop: {
+                      select: {
+                        shopName: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
         },
+        customerCouponLogs: {
+          include: {
+            customerCoupon: { include: { coupon: true } },
+          },
+        },
+        mileageLogs: true,
         payment: true,
         refunds: true,
         exports: true,
@@ -300,10 +315,25 @@ export class OrderService {
                 id: true,
                 goods_name: true,
                 image: true,
+                seller: {
+                  select: {
+                    sellerShop: {
+                      select: {
+                        shopName: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
         },
+        customerCouponLogs: {
+          include: {
+            customerCoupon: { include: { coupon: true } },
+          },
+        },
+        mileageLogs: true,
         payment: true,
         refunds: true,
         exports: true,

@@ -15,33 +15,34 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { GoodsInquiryCommentForm } from '@project-lc/components-shared/goods-inquiry/GoodsInquiryCommentForm';
 import { useGoodsInquiryCommentMutation, useProfile } from '@project-lc/hooks';
 import { FindGoodsInquiryItem, GoodsInquiryCommentDto } from '@project-lc/shared-types';
 import { SubmitHandler } from 'react-hook-form';
+import GoodsInquiryCommentForm from './GoodsInquiryCommentForm';
 
-export interface SellerGoodsInquiryCommentCreateDialogProps {
+export interface GoodsInquiryCommentCreateDialogProps {
   inquiry: FindGoodsInquiryItem;
   isOpen: boolean;
   onClose: () => void;
 }
-export function SellerGoodsInquiryCommentCreateDialog({
+export function GoodsInquiryCommentCreateDialog({
   inquiry,
   isOpen,
   onClose,
-}: SellerGoodsInquiryCommentCreateDialogProps): JSX.Element {
+}: GoodsInquiryCommentCreateDialogProps): JSX.Element {
   const formId = 'goods-inquiry-comment-form';
   const toast = useToast();
   const { data: profile } = useProfile();
 
   const goodsInquiryCreate = useGoodsInquiryCommentMutation();
   const handleSubmit: SubmitHandler<GoodsInquiryCommentDto> = (formData) => {
-    if (profile) {
+    if (profile && ['admin', 'seller'].includes(profile.type)) {
       goodsInquiryCreate
         .mutateAsync({
           goodsInquiryId: inquiry.id,
           content: formData.content,
-          sellerId: profile.id,
+          sellerId: profile.type === 'seller' ? profile.id : undefined,
+          adminId: profile.type === 'admin' ? profile.id : undefined,
         })
         .then(() => {
           toast({ description: '상품 문의 답변을 작성하였습니다.', status: 'success' });
@@ -76,7 +77,12 @@ export function SellerGoodsInquiryCommentCreateDialog({
         <ModalFooter>
           <ButtonGroup>
             <Button onClick={onClose}>닫기</Button>
-            <Button form={formId} type="submit" colorScheme="blue">
+            <Button
+              form={formId}
+              type="submit"
+              colorScheme="blue"
+              isLoading={goodsInquiryCreate.isLoading}
+            >
               생성
             </Button>
           </ButtonGroup>
@@ -86,4 +92,4 @@ export function SellerGoodsInquiryCommentCreateDialog({
   );
 }
 
-export default SellerGoodsInquiryCommentCreateDialog;
+export default GoodsInquiryCommentCreateDialog;

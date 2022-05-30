@@ -1,5 +1,9 @@
 import {
   Broadcaster,
+  Coupon,
+  CustomerCoupon,
+  CustomerCouponLog,
+  CustomerMileageLog,
   Exchange,
   ExchangeItem,
   Export,
@@ -17,6 +21,7 @@ import {
   Return,
   ReturnItem,
   SellType,
+  SellerShop,
 } from '@prisma/client';
 
 export type OrderItemSupportWithBroadcasterInfo = OrderItemSupport & {
@@ -30,6 +35,7 @@ export type OriginGoods = {
   id: Goods['id'];
   goods_name: Goods['goods_name'];
   image: GoodsImages[];
+  seller: { sellerShop: { shopName: SellerShop['shopName'] } };
 };
 
 export type OrderItemWithRelations = OrderItem & {
@@ -39,11 +45,20 @@ export type OrderItemWithRelations = OrderItem & {
   goods: OriginGoods;
 };
 
+export interface CustomerCouponWithCoupon extends CustomerCoupon {
+  coupon: Coupon;
+}
+export interface CustomerCouponLogWithCustomerCoupon extends CustomerCouponLog {
+  customerCoupon: CustomerCouponWithCoupon;
+}
+
 export type OrderDataWithRelations = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: OrderPayment | null;
   refunds: Refund[] | null;
   exports: Export[] | null;
+  mileageLogs: CustomerMileageLog[] | null;
+  customerCouponLogs: CustomerCouponLogWithCustomerCoupon[] | null;
   exchanges:
     | (Pick<Exchange, 'id' | 'exchangeCode'> & { exchangeItems: ExchangeItem[] })[]
     | null;
