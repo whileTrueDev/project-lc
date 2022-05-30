@@ -1,5 +1,9 @@
 import {
   Broadcaster,
+  Coupon,
+  CustomerCoupon,
+  CustomerCouponLog,
+  CustomerMileageLog,
   Exchange,
   ExchangeImage,
   ExchangeItem,
@@ -21,6 +25,7 @@ import {
   ReturnImage,
   ReturnItem,
   Seller,
+  SellerShop,
 } from '@prisma/client';
 
 export type OrderItemSupportWithBroadcasterInfo = OrderItemSupport & {
@@ -35,6 +40,7 @@ export type OriginGoods = {
   goods_name: Goods['goods_name'];
   image: GoodsImages[];
   sellerId: Seller['id'];
+  seller: { sellerShop: { shopName: SellerShop['shopName'] } };
 };
 
 type Nullable<T> = T | null;
@@ -62,11 +68,29 @@ export type OrderBaseData = Order & {
   shippings: (OrderShipping & { items: OrderItemOption[] })[];
 };
 
-export type OrderDataWithRelations = OrderBaseData & {
-  orderCancellations?: Nullable<OrderCancellationBaseData[]>;
-  exports: Nullable<ExportBaseData[]>;
-  exchanges: Nullable<ExchangeBaseData[]>;
-  returns: Nullable<ReturnBaseData[]>;
+export interface CustomerCouponWithCoupon extends CustomerCoupon {
+  coupon: Coupon;
+}
+export interface CustomerCouponLogWithCustomerCoupon extends CustomerCouponLog {
+  customerCoupon: CustomerCouponWithCoupon;
+}
+
+export type OrderDataWithRelations = Order & {
+  orderItems: OrderItemWithRelations[];
+  payment?: OrderPayment | null;
+  refunds: Refund[] | null;
+  exports: Export[] | null;
+  mileageLogs: CustomerMileageLog[] | null;
+  customerCouponLogs: CustomerCouponLogWithCustomerCoupon[] | null;
+  exchanges:
+    | (Pick<Exchange, 'id' | 'exchangeCode'> & { exchangeItems: ExchangeItem[] })[]
+    | null;
+  returns: (Pick<Return, 'id' | 'returnCode'> & { items: ReturnItem[] })[] | null;
+  orderCancellations?:
+    | (Pick<OrderCancellation, 'id' | 'cancelCode'> & {
+        items: OrderCancellationItem[];
+      })[]
+    | null;
 };
 
 /** 주문 목록 리턴 데이터 타입 */

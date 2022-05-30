@@ -1,10 +1,10 @@
-import { Flex, Radio, RadioGroup } from '@chakra-ui/react';
+import { RadioGroup, Radio, Flex } from '@chakra-ui/react';
+import { useKkshowOrderStore } from '@project-lc/stores';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
-import { useKkshowOrder } from '@project-lc/stores';
 
 export function PaymentSelection(): JSX.Element {
-  const paymentType = useKkshowOrder((s) => s.paymentType);
-  const handlePaymentType = useKkshowOrder((s) => s.handlePaymentType);
+  const paymentType = useKkshowOrderStore((s) => s.paymentType);
+  const handlePaymentType = useKkshowOrderStore((s) => s.handlePaymentType);
 
   return (
     <SectionWithTitle title="결제수단">

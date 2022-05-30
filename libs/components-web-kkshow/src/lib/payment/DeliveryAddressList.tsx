@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 import { CustomerAddress } from '@prisma/client';
 import { PaymentPageDto } from '@project-lc/shared-types';
-import { useKkshowOrder } from '@project-lc/stores';
+import { useKkshowOrderStore } from '@project-lc/stores';
 import { useFormContext } from 'react-hook-form';
 import CustomerAddressList from '../address/CustomerAddressList';
 
@@ -19,7 +19,7 @@ type DeliveryListProps = {
 };
 
 export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX.Element {
-  const { handleAddressType } = useKkshowOrder();
+  const { handleAddressType } = useKkshowOrderStore();
   const handleAddressSelect = (data: CustomerAddress): void => {
     setValue('recipient', data.recipient || '');
     setValue('recipientPhone', data.phone || '');

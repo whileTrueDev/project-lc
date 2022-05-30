@@ -1,17 +1,10 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
-import {
-  Order,
-  OrderItem,
-  OrderItemOption,
-  OrderProcessStep,
-  Prisma,
-} from '@prisma/client';
+import { Order, OrderItemOption, OrderProcessStep, Prisma } from '@prisma/client';
 import { UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
-  CreateOrderItemDto,
   FmOrderStatusNumString,
   GetNonMemberOrderDetailDto,
   GetOneOrderDetailDto,
@@ -427,10 +420,25 @@ export class OrderService {
                 goods_name: true,
                 image: true,
                 sellerId: true,
+                seller: {
+                  select: {
+                    sellerShop: {
+                      select: {
+                        shopName: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
         },
+        customerCouponLogs: {
+          include: {
+            customerCoupon: { include: { coupon: true } },
+          },
+        },
+        mileageLogs: true,
         payment: true,
         refunds: true,
         exports: { include: { items: true } },
@@ -470,10 +478,25 @@ export class OrderService {
                 goods_name: true,
                 image: true,
                 sellerId: true,
+                seller: {
+                  select: {
+                    sellerShop: {
+                      select: {
+                        shopName: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
         },
+        customerCouponLogs: {
+          include: {
+            customerCoupon: { include: { coupon: true } },
+          },
+        },
+        mileageLogs: true,
         payment: true,
         refunds: true,
         exports: { include: { items: true } },

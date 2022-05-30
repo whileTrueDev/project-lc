@@ -110,7 +110,7 @@ export class OrderController {
     return this.orderService.getOrderList(dto);
   }
 
-  /** 주문수정
+  /*
    * 관리자 | 판매자가 사용
    */
   @UseGuards(JwtAuthGuard)
