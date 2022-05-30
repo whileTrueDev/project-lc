@@ -1,8 +1,9 @@
-import { Goods, GoodsReview, GoodsReviewItem } from '@prisma/client';
+import { Goods, GoodsReview } from '@prisma/client';
 import {
   FindManyGoodsReviewDto,
   GoodsReviewCommentRes,
   GoodsReviewRes,
+  GoodsReviewItem,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import {
@@ -24,8 +25,12 @@ export const getReviews = async (
 };
 
 // 특정 리뷰 검색
-export const getOneReview = async (reviewId: GoodsReview['id']): Promise<GoodsReview> => {
-  return axios.get<GoodsReview>(`/goods-review/${reviewId}`, {}).then((res) => res.data);
+export const getOneReview = async (
+  reviewId: GoodsReviewItem['id'],
+): Promise<GoodsReviewItem> => {
+  return axios
+    .get<GoodsReviewItem>(`/goods-review/${reviewId}`, {})
+    .then((res) => res.data);
 };
 
 // 특정 리뷰
