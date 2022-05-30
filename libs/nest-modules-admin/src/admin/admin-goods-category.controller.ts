@@ -17,7 +17,7 @@ import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { GoodsCategoryService } from '@project-lc/nest-modules-goods-category';
 import {
   CreateGoodsCategoryDto,
-  GoodsCategoryRes,
+  AdminGoodsCategoryRes,
   UpdateGoodsCategoryDto,
 } from '@project-lc/shared-types';
 
@@ -32,7 +32,7 @@ export class AdminGoodsCategoryController {
   constructor(private readonly categoryService: GoodsCategoryService) {}
 
   @Get()
-  async getCategories(): Promise<GoodsCategoryRes> {
+  async getCategories(): Promise<AdminGoodsCategoryRes> {
     return this.categoryService.getCategories();
   }
 

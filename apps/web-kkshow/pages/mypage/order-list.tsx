@@ -1,4 +1,4 @@
-import { Center, Spinner } from '@chakra-ui/react';
+import { Box, Center, Spinner } from '@chakra-ui/react';
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 import CustomerOrderList from '@project-lc/components-web-kkshow/mypage/orderList/CustomerOrderList';
 import { useProfile } from '@project-lc/hooks';
@@ -20,7 +20,9 @@ export function OrderList(): JSX.Element {
   }
   return (
     <CustomerMypageLayout>
-      <CustomerOrderList customerId={data.id} />
+      <Box p={[2, 2, 4]}>
+        <CustomerOrderList customerId={data.id} />
+      </Box>
     </CustomerMypageLayout>
   );
 }

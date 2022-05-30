@@ -56,6 +56,9 @@
       "@project-lc/nest-modules-goods-category": [
         "libs/nest-modules-goods-category/src/index.ts"
       ],
+      "@project-lc/nest-modules-goods-information-subject": [
+        "libs/nest-modules-goods-information-subject/src/index.ts"
+      ],
       "@project-lc/nest-modules-goods-inquiry": [
         "libs/nest-modules-goods-inquiry/src/index.ts"
       ],
@@ -90,9 +93,7 @@
         "libs/nest-modules-notification/src/index.ts"
       ],
       "@project-lc/nest-modules-order": ["libs/nest-modules-order/src/index.ts"],
-      "@project-lc/nest-modules-order-cancel": [
-        "libs/nest-modules-order-cancel/src/index.ts"
-      ],
+      "@project-lc/nest-modules-order-cancel": ["libs/nest-modules-order-cancel/src/index.ts"],
       "@project-lc/nest-modules-overlay": ["libs/nest-modules-overlay/src/index.ts"],
       "@project-lc/nest-modules-overlay-controller": [
         "libs/nest-modules-overlay-controller/src/index.ts"

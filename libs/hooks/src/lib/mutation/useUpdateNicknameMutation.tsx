@@ -1,11 +1,12 @@
 import { ChangeNicknameDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
-import { Broadcaster } from '.prisma/client';
+import { Broadcaster, Customer } from '.prisma/client';
 import axios from '../../axios';
 
 export type useUpdateNicknameMutationRes = Broadcaster;
-
+export type useUpdataCustomerNicknameMutationRes = Customer;
+export type ChangeNicknameDtoWithId = ChangeNicknameDto & { id: number };
 export const useUpdateNicknameMutation = (): UseMutationResult<
   useUpdateNicknameMutationRes,
   AxiosError,

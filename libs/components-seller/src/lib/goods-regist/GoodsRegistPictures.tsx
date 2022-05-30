@@ -23,8 +23,8 @@ import { GoodsImageDto } from '@project-lc/shared-types';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { GoodsFormValues, uploadGoodsImageToS3 } from './GoodsRegistForm';
-import { GoodsRegistPictureDialog } from './GoodsRegistPictureDialog';
 import { GoodsRegistPictureOrderChangeDialog } from './GoodsRegistPictureOrderChangeDialog';
+import { GoodsRegistPictureDialog } from './GoodsRegistPictureDialog';
 
 // 여러 상품 이미지를 s3에 업로드 후 imageDto로 변경
 // 상품사진은 file 로 들어옴

@@ -19,14 +19,3 @@ export const useChangeGoodsView = (): UseMutationResult<
       axios.patch('/goods/expose', dto).then((res) => res.data),
   );
 };
-
-export const useChangeFmGoodsView = (): UseMutationResult<
-  useChangeGoodsViewRes,
-  AxiosError,
-  useChangeGoodsViewDto
-> => {
-  return useMutation<useChangeGoodsViewRes, AxiosError, useChangeGoodsViewDto>(
-    (dto: useChangeGoodsViewDto) =>
-      axios.patch('/fm-goods/expose', dto).then((res) => res.data),
-  );
-};

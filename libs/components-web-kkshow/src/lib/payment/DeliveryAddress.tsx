@@ -14,8 +14,8 @@ import {
 } from '@chakra-ui/react';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
-import { PaymentPageDto } from '@project-lc/shared-types';
-import { useKkshowOrder } from '@project-lc/stores';
+import { PaymentPageDto, OrderDetailRes } from '@project-lc/shared-types';
+import { useKkshowOrderStore } from '@project-lc/stores';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { DeliveryAddressDialog } from './DeliveryAddressDialog';
@@ -33,11 +33,10 @@ export function DeliveryAddress(): JSX.Element {
     onOpen: addressOnOpen,
   } = useDisclosure();
 
-  const { addressType, handleAddressType } = useKkshowOrder();
+  const { addressType, handleAddressType } = useKkshowOrderStore();
 
   const { data: profile } = useProfile();
   const { data: defaultAddress, isLoading } = useDefaultCustomerAddress(profile?.id);
-
   const {
     register,
     setValue,
@@ -333,5 +332,34 @@ export function DeliveryAddress(): JSX.Element {
       <DeliveryAddressDialog isOpen={addressIsOpen} onClose={addressOnClose} />
       <DeliveryAddressList isOpen={addressListIsOpen} onClose={addressListOnClose} />
     </SectionWithTitle>
+  );
+}
+
+export type SuccessDeliveryAddressProps = { data: OrderDetailRes };
+
+export function SuccessDeliveryAddress(props: SuccessDeliveryAddressProps): JSX.Element {
+  const { data } = props;
+  return (
+    <>
+      <Flex direction="column" mt={3}>
+        <Text fontWeight="bold">수령인</Text>
+        <Text>{data.recipientName}</Text>
+      </Flex>
+      <Flex direction="column" mt={3}>
+        <Text fontWeight="bold">연락처</Text>
+        <HStack>
+          <Text>{`${data.recipientPhone}`}</Text>
+        </HStack>
+      </Flex>
+      <Flex direction="column" alignItems="flex-start" mt={3}>
+        <Text fontWeight="bold">배송지주소</Text>
+        <Flex direction="column">
+          <Text>
+            ({data.recipientPostalCode}) {data.recipientAddress}
+          </Text>
+          <Text>{data.recipientDetailAddress}</Text>
+        </Flex>
+      </Flex>
+    </>
   );
 }

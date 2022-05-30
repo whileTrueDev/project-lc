@@ -225,14 +225,12 @@ const columns: GridColumns = [
     renderCell: ({ row }) => {
       const goodsId = row.id;
       const goodsView = row.goods_view;
-      const confirmedGoodsId = row.confirmation?.firstmallGoodsConnectionId;
       const goodsOnLiveShopping = row.onLiveShopping; // 라이브쇼핑 진행중인 경우 노출 변경 불가하도록
       return (
         <Flex alignItems="center" justifyContent="center">
           <GoodsExposeSwitch
             goodsId={goodsId}
             goodsView={goodsView}
-            confirmedGoodsId={confirmedGoodsId}
             isReadOnly={goodsOnLiveShopping}
           />
         </Flex>

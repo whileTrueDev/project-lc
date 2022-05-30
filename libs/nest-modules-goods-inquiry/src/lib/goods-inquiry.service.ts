@@ -46,6 +46,7 @@ export class GoodsInquiryService {
     const realTake = take + 1;
     const result = await this.prisma.goodsInquiry.findMany({
       where,
+      orderBy: { createDate: 'desc' },
       skip,
       take: realTake,
       ...this.findParam,
