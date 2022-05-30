@@ -1,5 +1,6 @@
 import {
   Body,
+  CacheTTL,
   Controller,
   Delete,
   Get,
@@ -19,6 +20,7 @@ import { GoodsInquiryCommentService } from './goods-inquiry-comment.service';
 
 @UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('goods-inquiry')
+@CacheTTL(300)
 @Controller('goods-inquiry/:goodsInquiryId/comment')
 export class GoodsInquiryCommentController {
   constructor(private readonly service: GoodsInquiryCommentService) {}

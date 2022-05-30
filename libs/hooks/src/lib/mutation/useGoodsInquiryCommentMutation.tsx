@@ -31,7 +31,9 @@ export const useGoodsInquiryCommentMutation = (): UseMutationResult<
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries(INFINITE_INQUIRIES_KEY);
-        queryClient.invalidateQueries(['GoodsInquiryComment', data.goodsInquiryId]);
+        queryClient.invalidateQueries(['GoodsInquiryComment', data.goodsInquiryId], {
+          refetchInactive: true,
+        });
       },
     },
   );
@@ -63,7 +65,9 @@ export const useGoodsInquiryCommentUpdateMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries(['GoodsInquiryComment', data.goodsInquiryId]);
+        queryClient.invalidateQueries(['GoodsInquiryComment', data.goodsInquiryId], {
+          refetchInactive: true,
+        });
       },
     },
   );
@@ -95,7 +99,7 @@ export const useGoodsInquiryCommentDeleteMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.invalidateQueries(INFINITE_INQUIRIES_KEY);
-        queryClient.invalidateQueries('GoodsInquiryComment');
+        queryClient.invalidateQueries('GoodsInquiryComment', { refetchInactive: true });
       },
     },
   );

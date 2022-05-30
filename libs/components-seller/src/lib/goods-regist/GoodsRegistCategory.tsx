@@ -154,8 +154,8 @@ function GoodsRegistInformationNotice({
   const { data } = useGoodsInformationSubjectById(informationSubjectId);
 
   useEffect(() => {
-    if (!informationNotice && data) initializeNotice(data.items);
-  }, [data, informationNotice, initializeNotice]);
+    if (data) initializeNotice(data.items);
+  }, [data, initializeNotice]);
 
   if (!data) return null;
   return (

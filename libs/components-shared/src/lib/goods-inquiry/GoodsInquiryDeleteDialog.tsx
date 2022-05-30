@@ -20,7 +20,7 @@ export function GoodsInquiryDeleteDialog({
   const goodsInquiryDelete = useGoodsInquiryDeleteMutation();
   const handleDelete = async (): Promise<void> => {
     if (profile && ['admin', 'customer'].includes(profile.type)) {
-      goodsInquiryDelete
+      return goodsInquiryDelete
         .mutateAsync(inquiry.id)
         .then(() => {
           toast({ description: '상품 문의를 삭제하였습니다.', status: 'success' });
@@ -41,6 +41,7 @@ export function GoodsInquiryDeleteDialog({
       onClose={onClose}
       title="상품 문의 삭제"
       onConfirm={handleDelete}
+      isLoading={goodsInquiryDelete.isLoading}
     >
       <Box textAlign="center">
         <Text>해당 상품 문의를 삭제하시겠습니까?</Text>
