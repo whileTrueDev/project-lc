@@ -24,7 +24,7 @@ export function getOrderProcessStepNameByStringNumber(
   stringNumber: FmOrderStatusNumString,
 ): OrderProcessStep {
   const stepKey = Object.keys(orderProcessStepDict).find(
-    (key) => orderProcessStepDict[key] === stringNumber,
+    (key: OrderProcessStep) => orderProcessStepDict[key] === stringNumber,
   );
   return stepKey as OrderProcessStep;
 }

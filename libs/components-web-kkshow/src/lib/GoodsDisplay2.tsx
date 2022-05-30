@@ -7,8 +7,8 @@ import {
   Seller,
   SellerShop,
 } from '@prisma/client';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import NextLink from 'next/link';
-import { OrderStatusBadge } from './mypage/orderList/CustomerOrderItem';
 
 export interface GoodsDisplay2Props {
   goods: {
