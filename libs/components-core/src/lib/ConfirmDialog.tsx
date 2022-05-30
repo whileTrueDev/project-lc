@@ -47,7 +47,7 @@ export function ConfirmDialog({
           <AlertDialogHeader>{title}</AlertDialogHeader>
           <AlertDialogBody>{children}</AlertDialogBody>
           <AlertDialogFooter>
-            <Button isLoading={isLoading} ref={cancelRef} onClick={onClose}>
+            <Button ref={cancelRef} onClick={onClose}>
               {cancelString}
             </Button>
             <Button
