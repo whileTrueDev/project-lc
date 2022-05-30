@@ -53,7 +53,7 @@ export type GoodsByIdResBase = Goods & {
 };
 
 export type GoodsByIdSellerInfo = {
-  seller: Pick<Seller, 'avatar' | 'id' | 'name'> & {
+  seller: Pick<Seller, 'avatar' | 'id' | 'name' | 'email'> & {
     sellerShop?: {
       shopName: SellerShop['shopName'];
     };

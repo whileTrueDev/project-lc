@@ -273,7 +273,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '상품',
     href: '/goods',
     children: [
-      { name: '상품검수', href: '/goods/confirmation', icon: FcInspection },
+      { name: '상품목록/검수', href: '/goods/confirmation', icon: FcInspection },
       { name: '상품카테고리', href: '/goods/category', icon: FcList },
       { name: '상품문의관리', href: '/goods/inquiry', icon: FcSms },
     ],
