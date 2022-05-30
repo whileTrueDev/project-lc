@@ -47,9 +47,11 @@ export function AdminBroadcasterSignupListDetailDialog(
                 </HStack>
                 <HStack justifyContent="space-between">
                   <Text>채널주소</Text>
-                  <Link href={broadcasterDetail.channels[0].url} isExternal>
+                  <Link href={broadcasterDetail.channels[0]?.url || '미등록'} isExternal>
                     <HStack>
-                      <Text color="blue">{broadcasterDetail.channels[0].url}</Text>
+                      <Text color="blue">
+                        {broadcasterDetail.channels[0]?.url || '미등록'}
+                      </Text>
                       <ExternalLinkIcon />
                     </HStack>
                   </Link>
@@ -61,7 +63,8 @@ export function AdminBroadcasterSignupListDetailDialog(
                 <HStack justifyContent="space-between">
                   <Text>선물 수령지</Text>
                   <Text>
-                    {` (${broadcasterDetail.broadcasterAddress.postalCode})
+                    {broadcasterDetail.broadcasterAddress &&
+                      ` (${broadcasterDetail.broadcasterAddress.postalCode})
                     ${broadcasterDetail.broadcasterAddress.address}
                     ${broadcasterDetail.broadcasterAddress.detailAddress}`}
                   </Text>

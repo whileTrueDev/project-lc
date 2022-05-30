@@ -1,4 +1,4 @@
-import { Heading, Stack, Text, useDisclosure, Button } from '@chakra-ui/react';
+import { Heading, Stack, Text, useDisclosure, Button, Box } from '@chakra-ui/react';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import { useAdminSellerList } from '@project-lc/hooks';
@@ -33,17 +33,19 @@ export function AdminSellerSignupList(): JSX.Element {
       headerName: '상점명',
       width: 100,
       flex: 1,
-      valueFormatter: ({ row }) => row.sellerShop.shopName,
+      valueFormatter: ({ row }) => row.sellerShop?.shopName || '상점명 등록필요',
     },
     {
       field: 'sellerBusinessRegistration',
       headerName: '사업자등록증',
       renderCell: ({ row }: GridRowData) => (
-        <ConfirmationBadge
-          status={
-            row.sellerBusinessRegistration[0].BusinessRegistrationConfirmation.status
-          }
-        />
+        <Box lineHeight={2}>
+          <ConfirmationBadge
+            status={
+              row.sellerBusinessRegistration[0]?.BusinessRegistrationConfirmation.status
+            }
+          />
+        </Box>
       ),
       flex: 1,
     },
@@ -51,7 +53,7 @@ export function AdminSellerSignupList(): JSX.Element {
       field: 'sellerSettlementAccount',
       headerName: '계좌정보',
       renderCell: ({ row }: GridRowData) =>
-        row.sellerSettlementAccount ? (
+        row.sellerSettlementAccount.length ? (
           <Text>
             {`${row.sellerSettlementAccount[0].bank} - ${row.sellerSettlementAccount[0].number}`}
           </Text>

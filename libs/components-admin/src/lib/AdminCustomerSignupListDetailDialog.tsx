@@ -55,7 +55,7 @@ export function AdminCustomerSignupListDetailDialog(
                 </HStack>
                 <HStack justifyContent="space-between">
                   <Text>보유 마일리지</Text>
-                  <Text>{customerDetail.mileage.mileage.toLocaleString()}원</Text>
+                  <Text>{customerDetail.mileage?.mileage.toLocaleString() || 0}원</Text>
                 </HStack>
                 <HStack justifyContent="space-between">
                   <Text>작성한 리뷰수</Text>

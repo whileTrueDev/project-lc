@@ -35,7 +35,7 @@ export function AdminSellerSignupListDetailDialog(
             <ModalHeader>
               <Flex alignItems="center">
                 <Avatar src={sellerDetail.avatar || ''} size="xs" mr={3} />
-                {sellerDetail.sellerShop.shopName}
+                {sellerDetail.sellerShop?.shopName || '상점명 등록필요'}
               </Flex>
             </ModalHeader>
             <ModalCloseButton />
@@ -49,7 +49,7 @@ export function AdminSellerSignupListDetailDialog(
                 <HStack justifyContent="space-between">
                   <Text>계좌번호</Text>
                   <Text>
-                    {`${sellerDetail.sellerSettlementAccount[0].bank} - ${sellerDetail.sellerSettlementAccount[0].number}`}
+                    {`${sellerDetail.sellerSettlementAccount[0]?.bank} - ${sellerDetail.sellerSettlementAccount[0]?.number}`}
                   </Text>
                 </HStack>
                 <HStack justifyContent="space-between">
@@ -57,7 +57,7 @@ export function AdminSellerSignupListDetailDialog(
                   <ConfirmationBadge
                     status={
                       sellerDetail.sellerBusinessRegistration[0]
-                        .BusinessRegistrationConfirmation.status
+                        ?.BusinessRegistrationConfirmation.status
                     }
                   />
                 </HStack>
