@@ -35,7 +35,14 @@ export class CustomerAddressService {
       // 기본 배송지로 생성시 기존 기본주소록을 기본이 아니도록 수정
       await this.resetDefaultAddress(customerId);
     }
-    return this.prisma.customerAddress.create({ data: { customerId, ...dto } });
+    return this.prisma.customerAddress.create({
+      data: {
+        customerId,
+        ...dto,
+        // 첫 등록시 바로 기본배송지 체크여부와 관계없이 기본배송지로 설정되도록
+        isDefault: howMany === 0 ? true : dto.isDefault,
+      },
+    });
   }
 
   /** 특정 주소록 수정 */

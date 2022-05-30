@@ -39,7 +39,12 @@ export function MypageBreadcrumb(): JSX.Element | null {
   const getBreadcrumbName = useCallback(
     (pathname: string): string => {
       if (/[0-9]+/.test(pathname)) return pathname;
-      const currNavLink = navLinks.find((link) => link.href.includes(pathname));
+      const currNavLink = navLinks.find((link) => {
+        if (link.children && link.children.length > 0) {
+          return link.children.find((l) => l.href.includes(pathname));
+        }
+        return link.href.includes(pathname);
+      });
       if (!currNavLink) return pathname;
       if (!currNavLink.children) return currNavLink.name;
       const realNavLink = currNavLink.children.find((childLink) => {

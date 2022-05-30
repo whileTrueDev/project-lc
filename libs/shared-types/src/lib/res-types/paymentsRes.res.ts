@@ -82,7 +82,7 @@ export type PaymentDiscount = {
   amount: number;
 };
 
-export interface PaymentByOrderId {
+export interface Payment {
   version: string;
   paymentKey: string;
   type: string;
@@ -123,4 +123,10 @@ export interface PaymentByOrderId {
   failure: null | PaymentFailure;
   cashReceipt: null | PaymentCashReceipt;
   discount: null | PaymentDiscount;
+}
+
+export interface CreatePaymentRes {
+  status: string;
+  message?: string;
+  orderId: string;
 }

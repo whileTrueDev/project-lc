@@ -55,6 +55,7 @@ function ReviewCreateOrderItem({ item }: ReviewCreateOrderItemProps): JSX.Elemen
             imageSrc: item.goods.image[0].image,
             name: item.goods.goods_name,
             options: item.options,
+            id: item.goodsId,
           }}
         />
 

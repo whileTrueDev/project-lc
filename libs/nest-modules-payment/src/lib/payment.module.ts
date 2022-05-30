@@ -1,12 +1,13 @@
 import { Module, DynamicModule } from '@nestjs/common';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
+import { PaymentInfoController } from './payment-info.controller';
 
 @Module({})
 export class PaymentModule {
   private static providers = [PaymentService];
 
-  private static controllers = [PaymentController];
+  private static controllers = [PaymentController, PaymentInfoController];
   private static exports = [PaymentService];
 
   static withoutControllers(): DynamicModule {

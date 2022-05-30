@@ -17,19 +17,8 @@ export class CouponLogService {
     customerId: CustomerCouponDto['customerId'],
   ): Promise<CustomerCouponLog[]> {
     const query = await this.prismaService.customerCoupon.findMany({
-      where: {
-        customerId,
-      },
-      select: {
-        logs: {
-          select: {
-            id: true,
-            customerCouponId: true,
-            type: true,
-            createDate: true,
-          },
-        },
-      },
+      where: { customerId },
+      select: { logs: true },
     });
 
     const result = query.flatMap((item) => item.logs);

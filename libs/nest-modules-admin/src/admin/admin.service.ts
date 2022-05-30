@@ -239,7 +239,7 @@ export class AdminService {
   }
 
   public async getOneGoods(goodsId: string | number): Promise<AdminGoodsByIdRes> {
-    return this.prisma.goods.findFirst({
+    const result = (await this.prisma.goods.findFirst({
       where: {
         id: Number(goodsId),
       },
@@ -272,9 +272,9 @@ export class AdminService {
         },
         categories: true,
         informationNotice: true,
-        informationSubject: true,
       },
-    });
+    })) as AdminGoodsByIdRes;
+    return result;
   }
 
   public async getRegisteredLiveShoppings(id?: string): Promise<LiveShoppingWithGoods[]> {

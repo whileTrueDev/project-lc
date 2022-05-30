@@ -1,4 +1,5 @@
 import { Module, DynamicModule } from '@nestjs/common';
+import { GoodsCategoryController } from './goods-category.controller';
 import { GoodsCategoryService } from './goods-category.service';
 
 @Module({
@@ -12,7 +13,7 @@ export class NestModulesGoodsCategoryModule {}
 export class GoodsCategoryModule {
   private static readonly providers = [GoodsCategoryService];
   private static readonly exports = [GoodsCategoryService];
-  private static readonly controllers = [];
+  private static readonly controllers = [GoodsCategoryController];
 
   static withoutControllers(): DynamicModule {
     return {

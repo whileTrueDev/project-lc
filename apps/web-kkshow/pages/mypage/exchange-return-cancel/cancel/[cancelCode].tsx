@@ -1,3 +1,4 @@
+import { Box } from '@chakra-ui/react';
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
 import CustomerOrderCancelDetail from '@project-lc/components-web-kkshow/mypage/exchange-return-cancel/detailPage/CustomerOrderCancelDetail';
 import { useRouter } from 'next/router';
@@ -7,7 +8,9 @@ export function OrderCancelDetailPage(): JSX.Element {
   const { cancelCode } = router.query;
   return (
     <CustomerMypageLayout>
-      <CustomerOrderCancelDetail cancelCode={cancelCode as string} />
+      <Box p={[2, 2, 4]}>
+        <CustomerOrderCancelDetail cancelCode={cancelCode as string} />
+      </Box>
     </CustomerMypageLayout>
   );
 }

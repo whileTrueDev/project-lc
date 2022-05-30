@@ -1,4 +1,5 @@
 export * from './lib/asteriskify';
+export * from './lib/cookieManager';
 export * from './lib/checkGoodsPurchasable';
 export * from './lib/createChakraTheme';
 export * from './lib/createMuiTheme';
