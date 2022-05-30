@@ -94,7 +94,8 @@ export const useGoodsInquiryCommentDeleteMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['GoodsInquiryComment']);
+        queryClient.invalidateQueries(INFINITE_INQUIRIES_KEY);
+        queryClient.invalidateQueries('GoodsInquiryComment');
       },
     },
   );

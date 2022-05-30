@@ -4,10 +4,6 @@ import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
 
-export interface useAdminCategoryMutationDto {
-  _field: 'default field';
-}
-
 // 생성 뮤테이션
 export const useAdminCategoryCreateMutation = (): UseMutationResult<
   GoodsCategory,

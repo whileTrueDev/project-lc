@@ -16,8 +16,11 @@ import {
   useProfile,
 } from '@project-lc/hooks';
 import { GoodsByIdRes, RegistGoodsDto } from '@project-lc/shared-types';
+import { goodsRegistStore } from '@project-lc/stores';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import GoodsRegistCategory from './goods-regist/GoodsRegistCategory';
 import GoodsRegistCommonInfo from './goods-regist/GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './goods-regist/GoodsRegistDataBasic';
 import GoodsRegistDataOptions from './goods-regist/GoodsRegistDataOptions';
@@ -30,6 +33,7 @@ import {
   GoodsFormValues,
   saveContentsImageToS3,
 } from './goods-regist/GoodsRegistForm';
+import GoodsRegistKeywords from './goods-regist/GoodsRegistKeywords';
 import GoodsRegistMemo from './goods-regist/GoodsRegistMemo';
 import GoodsRegistPictures from './goods-regist/GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './goods-regist/GoodsRegistShippingPolicy';
@@ -99,8 +103,23 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       option_view_type: 'divide',
       option_suboption_use: '0',
       member_input_use: '0',
+      categoryId: goodsData.categories[0].id,
+      searchKeywords:
+        goodsData.searchKeyword?.split(',').map((k) => ({ keyword: k })) || [],
     },
   });
+
+  const informationNotice = goodsRegistStore((s) => s.informationNotice);
+  // 카테고리 초기값 구성
+  const handleCaregorySelect = goodsRegistStore((s) => s.handleCaregorySelect);
+  const initializeNotice = goodsRegistStore((s) => s.initializeNotice);
+  useEffect(() => {
+    if (goodsData) {
+      handleCaregorySelect(goodsData.categories[0]);
+      initializeNotice(goodsData.informationNotice.contents);
+    }
+  }, [goodsData, handleCaregorySelect, initializeNotice]);
+
   const { handleSubmit } = methods;
 
   const editGoods = async (data: GoodsFormSubmitDataType): Promise<void> => {
@@ -120,6 +139,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       shippingGroupId,
       contents,
       image,
+      categoryId,
       ...goodsFormData
     } = data;
 
@@ -133,7 +153,25 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       max_purchase_ea: Number(max_purchase_ea) || 0,
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
+      categoryId,
     };
+
+    // 상품필수정보 (품목별 정보제공고시 정보)
+    const informationNoticeDto: Record<string, string> = {};
+    Object.entries(informationNotice).forEach(([key, value]) => {
+      if (!value) {
+        // 기본값 처리
+        informationNoticeDto[key] = '상세설명 및 상세이미지 참조';
+      } else {
+        informationNoticeDto[key] = value;
+      }
+    });
+    goodsDto.informationNoticeContents = JSON.stringify(informationNoticeDto);
+
+    if (!categoryId) {
+      toast({ description: '상품 카테고리를 선택해주세요', status: 'warning' });
+      return;
+    }
 
     if (!shippingGroupId) {
       // 배송비정책 그룹을 선택하지 않은 경우
@@ -261,6 +299,9 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
         {/* 기본정보 */}
         <GoodsRegistDataBasic />
 
+        {/* 상품 카테고리 정보 */}
+        <GoodsRegistCategory />
+
         {/* 판매정보 */}
         <GoodsRegistDataSales />
 
@@ -279,6 +320,9 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
 
         {/* 배송비 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
         <GoodsRegistShippingPolicy />
+
+        {/* 상품 키워드 정보 */}
+        <GoodsRegistKeywords />
 
         {/* 기타정보 - 최소, 최대구매수량 */}
         <GoodsRegistExtraInfo />

@@ -67,6 +67,15 @@ export class GoodsInquiryCommentService {
     const result = await this.prisma.goodsInquiryComment.delete({
       where: { id: commentId },
     });
+    const commentCount = await this.prisma.goodsInquiryComment.count({
+      where: { id: result.goodsInquiryId },
+    });
+    if (commentCount === 0) {
+      await this.prisma.goodsInquiry.update({
+        where: { id: result.goodsInquiryId },
+        data: { status: 'requested' },
+      });
+    }
     return !!result;
   }
 }

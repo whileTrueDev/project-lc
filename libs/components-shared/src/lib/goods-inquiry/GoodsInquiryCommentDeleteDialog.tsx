@@ -5,24 +5,24 @@ import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { useGoodsInquiryCommentDeleteMutation, useProfile } from '@project-lc/hooks';
 import { FindGoodsInquiryItem } from '@project-lc/shared-types';
 
-export interface SellerGoodsInquiryCommentDeleteDialogProps {
+export interface GoodsInquiryCommentDeleteDialogProps {
   inquiry: FindGoodsInquiryItem;
   comment?: GoodsInquiryComment | null;
   isOpen: boolean;
   onClose: () => void;
 }
-export function SellerGoodsInquiryCommentDeleteDialog({
+export function GoodsInquiryCommentDeleteDialog({
   inquiry,
   comment,
   isOpen,
   onClose,
-}: SellerGoodsInquiryCommentDeleteDialogProps): JSX.Element {
+}: GoodsInquiryCommentDeleteDialogProps): JSX.Element {
   const toast = useToast();
   const { data: profile } = useProfile();
 
   const goodsInquiryDelete = useGoodsInquiryCommentDeleteMutation();
   const handleDelete = async (): Promise<void> => {
-    if (profile && comment) {
+    if (profile && comment && ['admin', 'seller'].includes(profile.type)) {
       goodsInquiryDelete
         .mutateAsync({ goodsInquiryCommentId: comment.id, goodsInquiryId: inquiry.id })
         .then(() => {
@@ -50,4 +50,4 @@ export function SellerGoodsInquiryCommentDeleteDialog({
   );
 }
 
-export default SellerGoodsInquiryCommentDeleteDialog;
+export default GoodsInquiryCommentDeleteDialog;

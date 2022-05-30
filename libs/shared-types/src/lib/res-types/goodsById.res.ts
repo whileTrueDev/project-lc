@@ -6,7 +6,6 @@ import {
   GoodsImages,
   GoodsInfo,
   GoodsInformationNotice,
-  GoodsInformationSubject,
   GoodsOptions,
   GoodsOptionsSupplies,
   LiveShopping,
@@ -19,6 +18,9 @@ import {
   ShippingSet,
 } from '@prisma/client';
 
+export interface GoodsInformationNoticeRes extends GoodsInformationNotice {
+  contents: Record<string, string>;
+}
 export type GoodsRelatedBroadcaster = Pick<Broadcaster, 'id' | 'avatar' | 'userNickname'>;
 export type GoodsByIdResBase = Goods & {
   options: (GoodsOptions & {
@@ -47,8 +49,7 @@ export type GoodsByIdResBase = Goods & {
     }
   >;
   categories: GoodsCategory[];
-  informationNotice: GoodsInformationNotice;
-  informationSubject: GoodsInformationSubject;
+  informationNotice: GoodsInformationNoticeRes;
 };
 
 export type GoodsByIdSellerInfo = {

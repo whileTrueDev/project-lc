@@ -1,41 +1,30 @@
 import {
   FormControl,
   FormLabel,
-  Switch,
   Spinner,
-  VisuallyHidden,
+  Switch,
   useToast,
+  VisuallyHidden,
 } from '@chakra-ui/react';
-import { useChangeFmGoodsView, useChangeGoodsView } from '@project-lc/hooks';
 import { GoodsView } from '@prisma/client';
-import { useQueryClient } from 'react-query';
 import { GOODS_VIEW } from '@project-lc/components-constants/goodsStatus';
+import { useChangeGoodsView } from '@project-lc/hooks';
+import { useQueryClient } from 'react-query';
 
 export function GoodsExposeSwitch({
   goodsId,
   goodsView,
-  confirmedGoodsId,
   isReadOnly = false,
 }: {
   goodsId: number;
   goodsView: GoodsView;
-  confirmedGoodsId?: number;
   isReadOnly?: boolean;
 }): JSX.Element {
   const queryClient = useQueryClient();
   const changeGoodsView = useChangeGoodsView();
-  const changeFmGoodsView = useChangeFmGoodsView();
   const toast = useToast();
   const changeView = async (): Promise<void> => {
     try {
-      if (confirmedGoodsId) {
-        // 검수된 상품의 경우 fm-goods에서도 수정
-        await changeFmGoodsView.mutateAsync({
-          id: confirmedGoodsId,
-          view: goodsView === 'look' ? 'notLook' : 'look',
-        });
-      }
-      // 미검수 상품의 경우 Goods에서 수정
       await changeGoodsView.mutateAsync({
         id: goodsId,
         view: goodsView === 'look' ? 'notLook' : 'look',
@@ -44,7 +33,10 @@ export function GoodsExposeSwitch({
       queryClient.invalidateQueries('GoodsById');
     } catch (error) {
       console.error(error);
-      toast({ title: '상품 상태 변경 에러', status: 'error' });
+      toast({
+        description: '상품 상태 변경 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        status: 'error',
+      });
     }
   };
   const label = GOODS_VIEW[goodsView];
@@ -55,7 +47,7 @@ export function GoodsExposeSwitch({
           {label}
         </FormLabel>
       </VisuallyHidden>
-      {changeFmGoodsView.isLoading || changeGoodsView.isLoading ? (
+      {changeGoodsView.isLoading ? (
         <Spinner size="sm" />
       ) : (
         <Switch

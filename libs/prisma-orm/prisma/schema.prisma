@@ -237,18 +237,16 @@ model Goods {
   GoodsInfo               GoodsInfo?         @relation(fields: [goodsInfoId], references: [id])
   goodsInfoId             Int?
 
-  LiveShopping         LiveShopping[]
-  productPromotion     ProductPromotion[] // 하나의 상품이 여러개 홍보아이템 등록될 수 있음
-  coupons              Coupon[] // 상품에 적용가능한 쿠폰
-  searchKeyword        String? // ',' 구분자로 하는 검색키워드의 문자열
-  cartItems            CartItem[] // 연결된 장바구니 상품
-  orderItems           OrderItem[] // 연결된 주문상품
-  reviews              GoodsReview[] // 작성된 리뷰
-  informationSubjectId Int? // 정보제공고시 품목고유번호
-  informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
-  informationNotice    GoodsInformationNotice? // 연결된 상품정보제공 내용
-  categories           GoodsCategory[] // 상품이 해당하는 카테고리들
-  goodsInquiry         GoodsInquiry[]
+  LiveShopping      LiveShopping[]
+  productPromotion  ProductPromotion[] // 하나의 상품이 여러개 홍보아이템 등록될 수 있음
+  coupons           Coupon[] // 상품에 적용가능한 쿠폰
+  searchKeyword     String? // ',' 구분자로 하는 검색키워드의 문자열
+  cartItems         CartItem[] // 연결된 장바구니 상품
+  orderItems        OrderItem[] // 연결된 주문상품
+  reviews           GoodsReview[] // 작성된 리뷰
+  informationNotice GoodsInformationNotice? // 연결된 상품정보제공 내용
+  categories        GoodsCategory[] // 상품이 해당하는 카테고리들
+  goodsInquiry      GoodsInquiry[]
 
   @@index([sellerId], name: "sellerId")
   @@fulltext([goods_name])
@@ -1966,10 +1964,11 @@ model ExportItem {
 // ****************
 // 상품 품목
 model GoodsInformationSubject {
-  id      Int     @id @default(autoincrement()) // 상품품목 고유번호
-  subject String // 상품품목명 => 전자상거래 등에서의 상품 등의 정보제공에 관한 고시 Ⅲ. 상품 등의 정보의 내용 (1) 의류 (2) 구두/신발.... 에서 '의류', '구두/신발' 과 같은 품목명. 현재 대부분 상품은 '가공식품'에 해당할듯
+  id      Int    @id @default(autoincrement()) // 상품품목 고유번호
+  subject String @unique // 상품품목명 => 전자상거래 등에서의 상품 등의 정보제공에 관한 고시 Ⅲ. 상품 등의 정보의 내용 (1) 의류 (2) 구두/신발.... 에서 '의류', '구두/신발' 과 같은 품목명. 현재 대부분 상품은 '가공식품'에 해당할듯
   items   Json // 상품품목별 필요한 정보를 key로 하는 JSON object 형태로 저장 (예: 가공식품의 경우 {"제품명": "", 식품유형: "", 생산자및소재지: "", 유통기한: "", 포장단위별내용물용량: "", 원재료및함량: "", ...})
-  goods   Goods[] // 상품품목에 해당하는 상품들
+
+  goodsCategory GoodsCategory[]
 }
 
 // 상품정보제공
@@ -1992,4 +1991,7 @@ model GoodsCategory {
   parentCategory     GoodsCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id], onDelete: Cascade) // 상위 부모 카테고리
   childrenCategories GoodsCategory[] @relation("CategoryHierarchy") // 하위 자식카테고리들
   goods              Goods[] // 이 카테고리에 해당하는 상품들
+
+  informationSubjectId Int? // 정보제공고시 품목고유번호
+  informationSubject   GoodsInformationSubject? @relation(fields: [informationSubjectId], references: [id]) // 해당되는 정보제공고시 품목
 }
