@@ -8,9 +8,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
+import { Redis } from 'ioredis';
 import _ from 'lodash';
 import { join } from 'path';
-import { Observable, of, tap } from 'rxjs';
+import { delay, from, Observable, of, tap } from 'rxjs';
 import { CACHE_CLEAR_KEY_METADATA } from '../constants/cache-clear-key';
 
 @Injectable()
@@ -70,10 +71,14 @@ export class HttpCacheInterceptor extends CacheInterceptor {
 
       return next.handle().pipe(
         tap((resData) => {
-          if (this.isNil(resData)) return null;
-          const keys = [...new Set(clearCacheKeys)];
-          return keys.map((cachekey) => this._clearCaches(cachekey));
+          if (this.isNil(resData)) return of(undefined);
+          const cacheKeys = [...new Set(clearCacheKeys)];
+          return from(this._clearCaches(cacheKeys));
         }),
+        // tap nextFunction 이 끝나지 않아도 응답이 진행되어
+        // 재 요청시 stale 데이터가 반환되는 현상이 있음.
+        // 이 현상에 대한 임시 처리 : 0.5초 딜레이 추가
+        delay(500),
       );
     }
 
@@ -113,22 +118,26 @@ export class HttpCacheInterceptor extends CacheInterceptor {
    * 받은 캐시키에 해당하는 캐시 데이터를 삭제합니다. 해당 캐시키가 포함되는 모든 key에 대해 삭제합니다.
    * @param cacheKey 삭제할 캐시 키
    */
-  private async _clearCaches(cacheKey: string): Promise<boolean> {
+  private async _clearCaches(cacheKeys: string[]): Promise<boolean[]> {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const client: Cluster = await this.cacheManager.store.getClient();
-    const redisNodes = client.nodes();
-    const _keys: string[][] = await Promise.all(
-      redisNodes.map((redis) => redis.keys(`*${cacheKey}*`)),
-    );
-    const keys = _.flatten(_keys);
+    const redisNodes = client.nodes() as Redis[];
 
-    const result = await Promise.all(keys.map((key) => this.cacheManager.del(key))).catch(
-      (err) => {
-        console.error(`An error occurred during clear caches - ${cacheKey}`, err);
-        return false;
-      },
+    return Promise.all(
+      cacheKeys.map(async (cacheKey) => {
+        const _keys: boolean[][] = await Promise.all(
+          redisNodes.map(async (redis) => {
+            const k = await redis.keys(`*${cacheKey}*`);
+            return Promise.all(k.map((_k) => !!redis.del(_k))).catch((err) => {
+              console.error(`An error occurred during clear caches - ${cacheKey}`, err);
+              return [false];
+            });
+          }),
+        );
+        const results = _.flatten(_keys);
+        return results.every((r) => !!r);
+      }),
     );
-    return !!result;
   }
 }
