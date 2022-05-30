@@ -1,10 +1,12 @@
 import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
-  PaymentByOrderId,
+  Payment,
   PaymentTransaction,
+  CreatePaymentRes,
   TossPaymentCancelDto,
 } from '@project-lc/shared-types';
+import axios from 'axios';
 import { PaymentsByDateRequestType, TossPaymentsApi } from '@project-lc/utils';
 
 export enum KKsPaymentProviders {
@@ -14,24 +16,23 @@ export enum KKsPaymentProviders {
 
 @Injectable()
 export class PaymentService {
-  private PAYMENTS_SECRET_KEY: string;
-  constructor(private readonly configService: ConfigService) {
-    this.PAYMENTS_SECRET_KEY = this.configService.get('PAYMENTS_SECRET_KEY');
-  }
-
-  /** 결제승인 요청 API */
-  async createPayment(dto): Promise<boolean> {
+  /** 토스페이먼츠 결제승인 요청 API */
+  async createPayment(dto): Promise<CreatePaymentRes> {
     try {
       await TossPaymentsApi.createPayment(dto);
-      return true;
+      return { status: 'success', orderId: dto.orderId };
     } catch (err) {
       console.error(err);
-      return false;
+      return {
+        status: 'error',
+        message: err.response.data.message,
+        orderId: dto.orderId,
+      };
     }
   }
 
   /** 주문번호별 결제내역 */
-  async getPaymentByOrderId(orderId: string): Promise<PaymentByOrderId> {
+  async getPaymentByOrderCode(orderId: string): Promise<Payment> {
     try {
       return TossPaymentsApi.getPaymentByOrderId(orderId);
     } catch (error) {

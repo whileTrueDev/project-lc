@@ -35,7 +35,7 @@ import {
 import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
 import { useCartMutation, useProfile } from '@project-lc/hooks';
 import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
-import { useGoodsViewStore, useKkshowOrder } from '@project-lc/stores';
+import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
 import {
   checkGoodsPurchasable,
   getStandardShippingCost,
@@ -418,7 +418,7 @@ function GoodsViewButtonSet({
     toast,
   ]);
 
-  const orderPrepare = useKkshowOrder((s) => s.handleOrderPrepare);
+  const orderPrepare = useKkshowOrderStore((s) => s.handleOrderPrepare);
   // 주문 클릭시
   const handleOrderClick = useCallback(
     (type: 'gift' | 'instant-order' = 'instant-order'): void => {

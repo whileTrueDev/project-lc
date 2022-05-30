@@ -1,6 +1,6 @@
 import { Button, Stack, useToast } from '@chakra-ui/react';
 import { useCart, useCartCalculatedMetrics, useProfile } from '@project-lc/hooks';
-import { useCartStore, useKkshowOrder } from '@project-lc/stores';
+import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
 import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
@@ -38,7 +38,7 @@ export function CartActions(): JSX.Element {
   }, [data, selectedItems, toast]);
 
   // 주문 클릭시
-  const orderPrepare = useKkshowOrder((s) => s.handleOrderPrepare);
+  const orderPrepare = useKkshowOrderStore((s) => s.handleOrderPrepare);
   const handleOrderClick = useCallback((): void => {
     if (!data) return;
     if (!executePurchaseCheck()) return;
