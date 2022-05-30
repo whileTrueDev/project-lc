@@ -41,10 +41,6 @@ export function AdminMileageManageDialog(
     defaultValues: { mileage: 0, actionType: 'earn', reason: '' },
   });
 
-  const handleRadio = (value: CustomerMileageDto['actionType']): void => {
-    setValue('actionType', value);
-  };
-
   const handleDialogClose = (): void => {
     reset();
     onClose();
@@ -98,7 +94,6 @@ export function AdminMileageManageDialog(
     register,
     watch,
     reset,
-    setValue,
     formState: { errors },
   } = methods;
   return (
@@ -159,7 +154,7 @@ export function AdminMileageManageDialog(
               닫기
             </Button>
             <Button colorScheme="blue" type="submit">
-              확인
+              {actionType[watch('actionType')]}
             </Button>
           </ModalFooter>
         </ModalContent>

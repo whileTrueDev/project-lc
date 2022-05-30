@@ -11,14 +11,14 @@ export function MileageActionTypeBadge(props: MileageActionTypeBadgeProps): JSX.
     case 'earn':
       return (
         <Box lineHeight={lineHeight}>
-          <Badge colorScheme="red">적립</Badge>
+          <Badge colorScheme="blue">적립</Badge>
         </Box>
       );
     case 'consume':
     default:
       return (
         <Box lineHeight={lineHeight}>
-          <Badge colorScheme="blue">사용</Badge>
+          <Badge colorScheme="red">사용</Badge>
         </Box>
       );
   }
