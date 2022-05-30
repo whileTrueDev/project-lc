@@ -3,6 +3,7 @@ import {
   FindManyGoodsReviewDto,
   GoodsReviewCommentRes,
   GoodsReviewRes,
+  GoodsReviewItem,
 } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import {
@@ -21,6 +22,24 @@ export const getReviews = async (
       params: { ...dto },
     })
     .then((res) => res.data);
+};
+
+// 특정 리뷰 검색
+export const getOneReview = async (
+  reviewId: GoodsReviewItem['id'],
+): Promise<GoodsReviewItem> => {
+  return axios
+    .get<GoodsReviewItem>(`/goods-review/${reviewId}`, {})
+    .then((res) => res.data);
+};
+
+// 특정 리뷰
+export const useOneReview = (
+  reviewId: GoodsReview['id'],
+): UseQueryResult<GoodsReviewItem, AxiosError> => {
+  return useQuery<GoodsReviewItem, AxiosError>(['OneReview', reviewId], () =>
+    getOneReview(reviewId),
+  );
 };
 
 // 상품의 모든 후기

@@ -13,7 +13,6 @@ ALTER TABLE `BroadcasterSettlementItems` ADD COLUMN `exportId` INTEGER NULL,
 
 -- AlterTable
 ALTER TABLE `Goods` ADD COLUMN `informationNoticeId` INTEGER NULL,
-    ADD COLUMN `informationSubjectId` INTEGER NULL,
     ADD COLUMN `searchKeyword` VARCHAR(191) NULL;
 
 -- AlterTable
@@ -247,6 +246,7 @@ CREATE TABLE `GoodsReviewComment` (
 CREATE TABLE `GoodsInquiry` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `content` TEXT NOT NULL,
+    `status` ENUM('requested', 'answered', 'adminAnswered') NOT NULL DEFAULT 'requested',
     `createDate` DATETIME(3) NOT NULL,
     `writerId` INTEGER NOT NULL,
     `goodsId` INTEGER NOT NULL,
@@ -514,6 +514,7 @@ CREATE TABLE `GoodsInformationSubject` (
     `subject` VARCHAR(191) NOT NULL,
     `items` JSON NOT NULL,
 
+    UNIQUE INDEX `GoodsInformationSubject_subject_key`(`subject`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -533,6 +534,7 @@ CREATE TABLE `GoodsCategory` (
     `name` VARCHAR(191) NOT NULL,
     `mainCategoryFlag` BOOLEAN NOT NULL DEFAULT false,
     `parentCategoryId` INTEGER NULL,
+    `informationSubjectId` INTEGER NULL,
 
     UNIQUE INDEX `GoodsCategory_categoryCode_key`(`categoryCode`),
     PRIMARY KEY (`id`)
@@ -582,9 +584,6 @@ ALTER TABLE `SellerSettlementItems` ADD CONSTRAINT `SellerSettlementItems_relate
 
 -- AddForeignKey
 ALTER TABLE `SellerSettlementItems` ADD CONSTRAINT `SellerSettlementItems_exportId_fkey` FOREIGN KEY (`exportId`) REFERENCES `Export`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Goods` ADD CONSTRAINT `Goods_informationSubjectId_fkey` FOREIGN KEY (`informationSubjectId`) REFERENCES `GoodsInformationSubject`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Goods` ADD CONSTRAINT `Goods_informationNoticeId_fkey` FOREIGN KEY (`informationNoticeId`) REFERENCES `GoodsInformationNotice`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -784,6 +783,9 @@ ALTER TABLE `ExportItem` ADD CONSTRAINT `ExportItem_exportId_fkey` FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE `GoodsCategory` ADD CONSTRAINT `GoodsCategory_parentCategoryId_fkey` FOREIGN KEY (`parentCategoryId`) REFERENCES `GoodsCategory`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `GoodsCategory` ADD CONSTRAINT `GoodsCategory_informationSubjectId_fkey` FOREIGN KEY (`informationSubjectId`) REFERENCES `GoodsInformationSubject`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `_GoodsToGoodsCategory` ADD FOREIGN KEY (`A`) REFERENCES `Goods`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

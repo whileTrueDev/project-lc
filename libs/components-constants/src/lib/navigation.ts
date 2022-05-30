@@ -95,6 +95,18 @@ export const mypageNavLinks: MypageLink[] = [
     name: '상품',
     href: '/mypage/goods',
     checkIsActive: defaultIsActiveChecker,
+    children: [
+      {
+        name: '상품 목록',
+        href: '/mypage/goods',
+        checkIsActive: (pathname, linkHref) => pathname === linkHref,
+      },
+      {
+        name: '문의 관리',
+        href: '/mypage/goods-inquiries',
+        checkIsActive: (pathname, linkHref) => pathname === linkHref,
+      },
+    ],
   },
   {
     icon: MdLiveTv,
@@ -257,14 +269,15 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '구매자',
     href: '/customer',
-    children: [{ name: '가입자 목록', href: '/customer/signup-list', icon: FcList }],
+    children: [{ name: '마일리지 관리', href: '/customer/mileage', icon: FcList }, { name: '가입자 목록', href: '/customer/signup-list', icon: FcList }],
   },
   {
     name: '상품',
     href: '/goods',
     children: [
       { name: '상품검수', href: '/goods/confirmation', icon: FcInspection },
-      { name: '카테고리', href: '/goods/category', icon: FcList },
+      { name: '상품카테고리', href: '/goods/category', icon: FcList },
+      { name: '상품문의관리', href: '/goods/inquiry', icon: FcSms },
     ],
   },
   {
@@ -350,7 +363,7 @@ const customerMypageActivityChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
 const customerMypageInfoChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
   {
     name: '회원 정보 수정',
-    href: '/mypage/회원 정보',
+    href: '/mypage/info',
     checkIsActive: defaultIsActiveChecker,
   },
   {

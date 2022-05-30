@@ -148,6 +148,7 @@ export * from './lib/res-types/fmOrder.res';
 export * from './lib/res-types/fmSettlements.res';
 export * from './lib/res-types/goodsById.res';
 export * from './lib/res-types/goodsCategory.res';
+export * from './lib/res-types/goodsInformationSubject.res';
 export * from './lib/res-types/goodsInquiry.res';
 export * from './lib/res-types/goodsList.res';
 export * from './lib/res-types/goodsReview.res';

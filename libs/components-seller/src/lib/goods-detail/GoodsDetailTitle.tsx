@@ -1,4 +1,4 @@
-import { Heading, Stack, Text } from '@chakra-ui/react';
+import { Stack, Text } from '@chakra-ui/react';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
 import { GoodsConfirmStatusBadge } from '@project-lc/components-shared/GoodsConfirmStatusBadge';
 import GoodsStatusBadge from '@project-lc/components-shared/GoodsStatusBadge';
@@ -11,7 +11,9 @@ export interface GoodsDetailTitleProps {
 export function GoodsDetailTitle({ goods }: GoodsDetailTitleProps): JSX.Element {
   return (
     <Stack>
-      <Heading>{goods.goods_name}</Heading>
+      <Text as="h3" fontSize={{ base: 'xl', md: '3xl' }} fontWeight="bold">
+        {goods.goods_name}
+      </Text>
 
       <Stack direction="row" alignItems="center">
         <GoodsStatusBadge goodsStatus={goods.goods_status} />

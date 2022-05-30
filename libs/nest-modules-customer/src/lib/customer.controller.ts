@@ -63,6 +63,14 @@ export class CustomerController {
     return newCustomer;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('validate-password')
+  public async validatePassword(
+    @Body(ValidationPipe) dto: PasswordValidateDto,
+  ): Promise<boolean> {
+    return this.customerService.checkPassword(dto.email, dto.password);
+  }
+
   /** 1명의 소비자 정보 조회 */
   @Get(':customerId')
   @UseInterceptors(HttpCacheInterceptor)

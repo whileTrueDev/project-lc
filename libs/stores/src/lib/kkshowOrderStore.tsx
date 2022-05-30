@@ -45,8 +45,8 @@ export interface KkshowOrderStore {
   resetOrder: () => void;
   handleOrderPrepare: (orderData: OrderPrepareData) => void;
 }
-export const useKkshowOrder = create<KkshowOrderStore>((set, get) => ({
-  paymentType: '카드',
+export const useKkshowOrderStore = create<KkshowOrderStore>((set, get) => ({
+  paymentType: '미선택',
   addressType: 'manual',
   handlePaymentType(value: '카드' | '계좌이체' | '가상계좌' | '미선택') {
     set({

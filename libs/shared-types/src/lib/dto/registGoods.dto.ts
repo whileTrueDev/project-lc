@@ -13,11 +13,18 @@ import {
   ValidateNested,
   IsNumber,
   IsObject,
+  IsJSON,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { GoodsOptionDto } from './goodsOption.dto';
 import { GoodsImageDto } from './goodsImage.dto';
 import { GoodsInformationNoticeDto } from './goodsInformationNotice.dto';
+
+/** 상품 키워드 DTO */
+class GoodsSearchKeywordDto {
+  @IsString()
+  keyword: string;
+}
 
 export class RegistGoodsDto {
   @IsString()
@@ -123,20 +130,18 @@ export class RegistGoodsDto {
   goodsInfoId?: number;
 
   @IsOptional()
-  @IsString()
-  searchKeyword?: string;
+  @ValidateNested({ each: true })
+  @Type(() => GoodsSearchKeywordDto)
+  searchKeywords?: GoodsSearchKeywordDto[] = [];
 
   @IsNumber()
   categoryId: number;
-
-  @IsNumber()
-  informationSubjectId: number;
 
   @IsOptional()
   @IsNumber()
   informationNoticeId?: number;
 
   @IsOptional()
-  @IsObject()
-  informationNoticeContents?: GoodsInformationNoticeDto['contents'];
+  @IsJSON()
+  informationNoticeContents?: string;
 }

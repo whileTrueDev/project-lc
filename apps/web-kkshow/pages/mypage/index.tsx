@@ -11,7 +11,7 @@ export function Index(): JSX.Element {
     <CustomerMypageLayout>
       <CustomerStatusSection />
       {/* 데스크탑 화면일 때 - 주문목록 표시 */}
-      <Box display={{ base: 'none', md: 'block' }}>
+      <Box display={{ base: 'none', md: 'block' }} p={[2, 2, 4]}>
         {data && <CustomerOrderList customerId={data.id} />}
       </Box>
       {/* 모바일 화면일 때 마이페이지 메뉴 목록 표시 */}

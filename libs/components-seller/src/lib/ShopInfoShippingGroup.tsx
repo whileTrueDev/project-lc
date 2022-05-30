@@ -23,7 +23,7 @@ import {
   ShippingGroupDeleteConfirmDialog,
   ShippingGroupRegistDialog,
   ShippingGroupRelatedItemsDialog,
-} from './GoodsRegistShippingPolicy';
+} from './goods-regist/GoodsRegistShippingPolicy';
 import ShippingGroupDetailModal from './ShippingGroupDetailModal';
 
 /** 상점설정에서 사용하는 배송비정책 아이템 - 라디오버튼이 없다 */

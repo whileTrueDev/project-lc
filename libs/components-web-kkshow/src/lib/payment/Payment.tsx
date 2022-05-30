@@ -1,13 +1,13 @@
 import { Box, Button, Center, Divider, Flex, Text, useToast } from '@chakra-ui/react';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { CreateOrderForm } from '@project-lc/shared-types';
-import { useKkshowOrder } from '@project-lc/stores';
-import { getCustomerWebHost } from '@project-lc/utils';
-import { getLocaleNumber } from '@project-lc/utils-frontend';
+import { getLocaleNumber, setCookie } from '@project-lc/utils-frontend';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
-import { SubmitHandler, useFormContext } from 'react-hook-form';
+import { useFormContext, SubmitHandler } from 'react-hook-form';
+import { useKkshowOrderStore } from '@project-lc/stores';
+import { getCustomerWebHost } from '@project-lc/utils';
 import { TermBox } from './TermBox';
 
 const mileageSetting = {
@@ -28,17 +28,13 @@ function getOrderPrice(
 async function doPayment(
   paymentType: '카드' | '계좌이체' | '가상계좌' | '미선택',
   client_key: string,
-  price: number,
-  shipping_cost: number,
-  discount: number,
-  mileage: number,
-  coupon: number,
+  amount: number,
   productName: string,
   customerName: string,
 ): Promise<void> {
   return loadTossPayments(client_key).then((tossPayments) => {
     tossPayments.requestPayment(paymentType, {
-      amount: getOrderPrice(price, shipping_cost, discount, mileage, coupon),
+      amount,
       orderId: `${dayjs().format('YYYYMMDDHHmmssSSS')}${nanoid(6)}`,
       orderName: `${productName}`,
       customerName,
@@ -83,16 +79,15 @@ export function MileageBenefit({
 
 export function PaymentBox(): JSX.Element {
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
-  const { paymentType, order } = useKkshowOrder();
+  const { paymentType, order } = useKkshowOrderStore();
   const toast = useToast();
-  /** 상품상세페이지와 연결 이후, goods로부터 정보 가져오도록 변경 */
   const PRODUCT_PRICE = order.orderPrice;
   const SHIPPING_COST = order.orderItems.reduce(
     (prev, curr) => prev + Number(curr.shippingCost),
     0,
   );
   const productNameArray = order.orderItems.map((item) => item.goodsName);
-  const DISCOUNT = 3000;
+  const DISCOUNT = order.totalDiscount || 0;
   let productName = '';
   if (productNameArray.length > 1) {
     productName = `${productNameArray[0]} 외 ${productNameArray.length - 1}개`;
@@ -110,14 +105,21 @@ export function PaymentBox(): JSX.Element {
       });
     } else {
       console.log(submitData);
-      await doPayment(
-        paymentType,
-        CLIENT_KEY,
+      const amount = getOrderPrice(
         PRODUCT_PRICE,
         SHIPPING_COST,
         DISCOUNT,
         getValues('usedMileageAmount') || 0,
         getValues('usedCouponAmount') || 0,
+      );
+      const cookieExpire = new Date();
+      cookieExpire.setMinutes(cookieExpire.getMinutes() + 1);
+      setCookie('amount', amount, { expire: cookieExpire });
+      // doPayment(paymentType, CLIENT_KEY, amount, productName, getValues('name'));
+      await doPayment(
+        paymentType,
+        CLIENT_KEY,
+        amount,
         productName,
         getValues('ordererName'),
       );

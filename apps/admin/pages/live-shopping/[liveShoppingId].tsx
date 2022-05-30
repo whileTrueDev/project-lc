@@ -33,14 +33,14 @@ import { LiveShoppingDatePicker } from '@project-lc/components-admin/LiveShoppin
 import { LiveShoppingDetailTitle } from '@project-lc/components-admin/LiveShoppingDetailTitle';
 import { LiveShoppingProgressSelector } from '@project-lc/components-admin/LiveShoppingProgressSelector';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
+import { GoodsDetailCommonInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailCommonInfo';
+import { GoodsDetailImagesInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailImagesInfo';
+import { GoodsDetailInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailInfo';
+import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailOptionsInfo';
+import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailPurchaseLimitInfo';
+import { GoodsDetailShippingInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailShippingInfo';
+import { GoodsDetailSummary } from '@project-lc/components-seller/goods-detail/GoodsDetailSummary';
 import { BroadcasterName } from '@project-lc/components-shared/BroadcasterName';
-import { GoodsDetailCommonInfo } from '@project-lc/components-seller/GoodsDetailCommonInfo';
-import { GoodsDetailImagesInfo } from '@project-lc/components-seller/GoodsDetailImagesInfo';
-import { GoodsDetailInfo } from '@project-lc/components-seller/GoodsDetailInfo';
-import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/GoodsDetailOptionsInfo';
-import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/GoodsDetailPurchaseLimitInfo';
-import { GoodsDetailShippingInfo } from '@project-lc/components-seller/GoodsDetailShippingInfo';
-import { GoodsDetailSummary } from '@project-lc/components-seller/GoodsDetailSummary';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import {
   useAdminGoodsById,
@@ -48,12 +48,12 @@ import {
   useProfile,
   useUpdateLiveShoppingManageMutation,
 } from '@project-lc/hooks';
-import { LiveShoppingDTO, LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
+import { LIVE_SHOPPING_PROGRESS } from '@project-lc/shared-types';
+import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { AxiosError } from 'axios';
 
 function getDuration(startDate: Date, endDate: Date): string {
   if (startDate && startDate) {

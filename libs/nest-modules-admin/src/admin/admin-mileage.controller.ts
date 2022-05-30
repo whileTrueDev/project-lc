@@ -38,9 +38,12 @@ export class AdminMileageController {
   }
 
   /** 특정 소비자 마일리지 업데이트 / 마일리지 로우 없으면 insert */
-  @Patch()
-  updateMileage(@Body(ValidationPipe) dto: CustomerMileageDto): Promise<CustomerMileage> {
-    return this.mileageService.upsertMileage(dto);
+  @Patch('/:customerId')
+  updateMileage(
+    @Param('customerId', ParseIntPipe) customerId: number,
+    @Body(ValidationPipe) dto: CustomerMileageDto,
+  ): Promise<CustomerMileage> {
+    return this.mileageService.upsertMileage({ customerId, ...dto });
   }
 
   /** 마일리지 로그 */
