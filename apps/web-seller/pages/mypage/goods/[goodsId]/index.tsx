@@ -1,18 +1,19 @@
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 import { Box, Button, Center, Spinner, Stack } from '@chakra-ui/react';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
-import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
-import { GoodsDetailActions } from '@project-lc/components-seller/GoodsDetailActions';
-import { GoodsDetailCommonInfo } from '@project-lc/components-seller/GoodsDetailCommonInfo';
-import { GoodsDetailImagesInfo } from '@project-lc/components-seller/GoodsDetailImagesInfo';
-import { GoodsDetailInfo } from '@project-lc/components-seller/GoodsDetailInfo';
-import { GoodsDetailMemo } from '@project-lc/components-seller/GoodsDetailMemo';
-import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/GoodsDetailOptionsInfo';
-import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/GoodsDetailPurchaseLimitInfo';
-import { GoodsDetailShippingInfo } from '@project-lc/components-seller/GoodsDetailShippingInfo';
-import { GoodsDetailSummary } from '@project-lc/components-seller/GoodsDetailSummary';
-import { GoodsDetailTitle } from '@project-lc/components-seller/GoodsDetailTitle';
+import { GoodsDetailActions } from '@project-lc/components-seller/goods-detail/GoodsDetailActions';
+import { GoodsDetailCommonInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailCommonInfo';
+import { GoodsDetailImagesInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailImagesInfo';
+import { GoodsDetailInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailInfo';
+import { GoodsDetailKeywords } from '@project-lc/components-seller/goods-detail/GoodsDetailKeywords';
+import { GoodsDetailMemo } from '@project-lc/components-seller/goods-detail/GoodsDetailMemo';
+import { GoodsDetailOptionsInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailOptionsInfo';
+import { GoodsDetailPurchaseLimitInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailPurchaseLimitInfo';
+import { GoodsDetailShippingInfo } from '@project-lc/components-seller/goods-detail/GoodsDetailShippingInfo';
+import { GoodsDetailSummary } from '@project-lc/components-seller/goods-detail/GoodsDetailSummary';
+import { GoodsDetailTitle } from '@project-lc/components-seller/goods-detail/GoodsDetailTitle';
 import GoodsEditButton from '@project-lc/components-seller/GoodsEditButton';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { useGoodsById } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -67,7 +68,6 @@ export function GoodsDetail(): JSX.Element {
         </Box>
 
         {/* 상품 정보 */}
-
         <SectionWithTitle title="기본 정보">
           <GoodsDetailInfo goods={goods.data} />
         </SectionWithTitle>
@@ -87,6 +87,12 @@ export function GoodsDetail(): JSX.Element {
         <SectionWithTitle title="구매 제한">
           <GoodsDetailPurchaseLimitInfo goods={goods.data} />
         </SectionWithTitle>
+
+        {goods.data.searchKeyword && (
+          <SectionWithTitle title="키워드">
+            <GoodsDetailKeywords goods={goods.data} />
+          </SectionWithTitle>
+        )}
 
         {goods.data.ShippingGroup && (
           <SectionWithTitle title="배송정책">

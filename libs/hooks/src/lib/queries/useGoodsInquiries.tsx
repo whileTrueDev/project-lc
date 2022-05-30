@@ -26,6 +26,7 @@ export const getInquiries = async (
 export const INFINITE_INQUIRIES_KEY = 'InfiniteInquiries';
 export const useInfiniteGoodsInquiries = (
   dto: FindManyGoodsReviewDto,
+  options?: { enabled?: boolean },
 ): UseInfiniteQueryResult<PaginatedGoodsInquiryRes, AxiosError> => {
   return useInfiniteQuery(
     INFINITE_INQUIRIES_KEY,
@@ -34,6 +35,7 @@ export const useInfiniteGoodsInquiries = (
       getNextPageParam(prev) {
         return prev.nextCursor;
       },
+      enabled: options?.enabled,
     },
   );
 };

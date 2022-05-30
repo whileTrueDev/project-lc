@@ -1,13 +1,12 @@
-import { IsNumber, IsObject, IsOptional } from 'class-validator';
-import { GoodsInformationSubjectItems } from './goodsInformationSubject.dto';
+import { IsJSON, IsNumber, IsOptional } from 'class-validator';
 
 export class GoodsInformationNoticeDto {
   @IsOptional()
   @IsNumber()
   id?: number;
 
-  @IsObject()
-  contents: GoodsInformationSubjectItems;
+  @IsJSON()
+  contents: string;
 
   @IsNumber()
   goodsId: number;

@@ -14,15 +14,18 @@ import {
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { useCreateGoodsCommonInfo, useProfile, useRegistGoods } from '@project-lc/hooks';
 import { GoodsOptionDto, RegistGoodsDto } from '@project-lc/shared-types';
+import { goodsRegistStore } from '@project-lc/stores';
 import { s3 } from '@project-lc/utils-s3';
 import { useRouter } from 'next/router';
 import { FormProvider, NestedValue, useForm } from 'react-hook-form';
+import GoodsRegistCategory from './GoodsRegistCategory';
 import GoodsRegistCommonInfo from './GoodsRegistCommonInfo';
 import GoodsRegistDataBasic from './GoodsRegistDataBasic';
 import GoodsRegistDataOptions from './GoodsRegistDataOptions';
 import GoodsRegistDataSales from './GoodsRegistDataSales';
 import GoodsRegistDescription from './GoodsRegistDescription';
 import GoodsRegistExtraInfo from './GoodsRegistExtraInfo';
+import GoodsRegistKeywords from './GoodsRegistKeywords';
 import GoodsRegistMemo from './GoodsRegistMemo';
 import GoodsRegistPictures from './GoodsRegistPictures';
 import GoodsRegistShippingPolicy from './GoodsRegistShippingPolicy';
@@ -116,6 +119,7 @@ export function GoodsRegistForm(): JSX.Element {
   const toast = useToast();
   const router = useRouter();
   const goBackAlertDialog = useDisclosure();
+  const informationNotice = goodsRegistStore((s) => s.informationNotice);
 
   const methods = useForm<GoodsFormValues>({
     defaultValues: {
@@ -129,6 +133,7 @@ export function GoodsRegistForm(): JSX.Element {
       option_values: '',
       image: [],
       options: [],
+      searchKeywords: [],
       // 기타정보 (최대, 최소구매수량)
       min_purchase_limit: 'unlimit',
       max_purchase_limit: 'unlimit',
@@ -160,6 +165,7 @@ export function GoodsRegistForm(): JSX.Element {
       image,
       option_title,
       option_values,
+      categoryId,
       ...goodsData
     } = data;
 
@@ -171,32 +177,41 @@ export function GoodsRegistForm(): JSX.Element {
       max_purchase_ea: Number(max_purchase_ea) || 0,
       min_purchase_ea: Number(min_purchase_ea) || 0,
       shippingGroupId: Number(shippingGroupId) || undefined,
+      categoryId,
     };
+
+    // 상품필수정보 (품목별 정보제공고시 정보)
+    const informationNoticeDto: Record<string, string> = {};
+    Object.entries(informationNotice).forEach(([key, value]) => {
+      if (!value) {
+        // 기본값 처리
+        informationNoticeDto[key] = '상세설명 및 상세이미지 참조';
+      } else {
+        informationNoticeDto[key] = value;
+      }
+    });
+    goodsDto.informationNoticeContents = JSON.stringify(informationNoticeDto);
+
+    if (!categoryId) {
+      toast({ description: '상품 카테고리를 선택해주세요', status: 'warning' });
+      return;
+    }
 
     if (!shippingGroupId) {
       // 배송비정책 그룹을 선택하지 않은 경우
-      toast({
-        title: '배송비 정책을 선택해주세요',
-        status: 'warning',
-      });
+      toast({ description: '배송비 정책을 선택해주세요', status: 'warning' });
       return;
     }
 
     if (!image || image.length < 1) {
       // 등록된 사진이 없는 경우
-      toast({
-        title: '상품 사진을 1개 이상 등록해주세요',
-        status: 'warning',
-      });
+      toast({ description: '상품 사진을 1개 이상 등록해주세요', status: 'warning' });
       return;
     }
 
     if (options.length === 0) {
       // 등록된 옵션이 없는 경우
-      toast({
-        title: '상품 옵션을 1개 이상 등록해주세요',
-        status: 'warning',
-      });
+      toast({ description: '상품 옵션을 1개 이상 등록해주세요', status: 'warning' });
       return;
     }
 
@@ -210,7 +225,7 @@ export function GoodsRegistForm(): JSX.Element {
       };
     } else {
       // 상세설명을 입력하지 않은 경우 - 상품 수정 기능이 없는 동안 필수값으로 설정함
-      toast({ title: '상세설명을 입력해주세요', status: 'warning' });
+      toast({ description: '상세설명을 입력해주세요', status: 'warning' });
       return;
     }
 
@@ -234,7 +249,7 @@ export function GoodsRegistForm(): JSX.Element {
     } else if (!data.goodsInfoId) {
       // 상품 공통정보 없는 경우 (신규등록 안함 & 기존정보 불러오기도 안함)
       toast({
-        title: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
+        description: '상품 공통 정보를 입력하거나 기존 정보를 불러와서 등록해주세요',
         status: 'warning',
       });
       return;
@@ -242,18 +257,12 @@ export function GoodsRegistForm(): JSX.Element {
 
     mutateAsync(goodsDto)
       .then(() => {
-        toast({
-          title: '상품을 성공적으로 등록하였습니다',
-          status: 'success',
-        });
+        toast({ description: '상품을 성공적으로 등록하였습니다', status: 'success' });
         router.push('/mypage/goods');
       })
       .catch((error) => {
         console.error(error);
-        toast({
-          title: '상품 등록 중 오류가 발생하였습니다',
-          status: 'error',
-        });
+        toast({ description: '상품 등록 중 오류가 발생하였습니다', status: 'error' });
       });
   };
 
@@ -283,6 +292,9 @@ export function GoodsRegistForm(): JSX.Element {
         {/* 기본정보 */}
         <GoodsRegistDataBasic />
 
+        {/* 상품 카테고리 정보 */}
+        <GoodsRegistCategory />
+
         {/* 판매정보 */}
         <GoodsRegistDataSales />
 
@@ -301,6 +313,9 @@ export function GoodsRegistForm(): JSX.Element {
 
         {/* 배송비 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
         <GoodsRegistShippingPolicy />
+
+        {/* 상품 키워드 정보 */}
+        <GoodsRegistKeywords />
 
         {/* 기타정보 - 최소, 최대구매수량 */}
         <GoodsRegistExtraInfo />

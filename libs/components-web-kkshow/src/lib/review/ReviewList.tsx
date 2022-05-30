@@ -23,6 +23,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import StarRating from '@project-lc/components-core/StarRating';
+import { CommentList } from '@project-lc/components-shared/comment/CommentList';
 import {
   useGoodsById,
   useGoodsReviewComments,
@@ -33,7 +34,6 @@ import { FindManyGoodsReviewDto, GoodsReviewItem } from '@project-lc/shared-type
 import { asteriskify } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
-import { CommentList } from '../CommentList';
 import GoodsDisplay2 from '../GoodsDisplay2';
 import ReviewDeleteDialog from './ReviewDeleteDialog';
 import ReviewUpdateDialog from './ReviewUpdateDialog';
@@ -177,6 +177,7 @@ export function ReviewDetail({
             <GoodsDisplay2
               size="xs"
               goods={{
+                id: goods.data.id,
                 imageSrc: goods.data.image[0].image,
                 name: goods.data.goods_name,
                 seller: goods.data.seller,
