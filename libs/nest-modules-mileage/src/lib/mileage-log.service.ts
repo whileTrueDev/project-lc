@@ -10,6 +10,13 @@ export class MileageLogService {
   findMileageLogs(customerId?: number): Promise<CustomerMileageLog[]> {
     return this.prismaService.customerMileageLog.findMany({
       where: { customerId: customerId || undefined },
+      include: {
+        customer: {
+          select: {
+            email: true,
+          },
+        },
+      },
     });
   }
 }
