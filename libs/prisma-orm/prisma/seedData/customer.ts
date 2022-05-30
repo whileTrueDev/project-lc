@@ -6,7 +6,7 @@ export const dummyCustomer: Customer = {
   name: '테스트소비자',
   password: COMMON_DUMMY_PASSWORD,
   email: 'testcustomer@gmail.com',
-  nickname: 'test2',
+  nickname: '테스트소비자nick',
   phone: '010-1234-5678',
   createDate: new Date('2022-04-18T02:49:51.674Z'),
   gender: 'unknown',

@@ -27,22 +27,38 @@ export class GoodsInquiryCommentService {
     goodsInquiryId: GoodsInquiry['id'],
     dto: GoodsInquiryCommentDto,
   ): Promise<GoodsInquiryComment> {
-    const result = await this.prisma.$transaction([
-      this.prisma.goodsInquiryComment.create({
-        data: {
-          goodsInquiryId,
-          content: dto.content,
-          adminId: dto.adminId,
-          sellerId: dto.sellerId,
-          writtenBySellerFlag: !!dto.sellerId,
-        },
-      }),
-      this.prisma.goodsInquiry.update({
-        where: { id: goodsInquiryId },
-        data: { status: dto.sellerId ? 'answered' : 'adminAnswered' },
-      }),
-    ]);
-    return result[0];
+    const result = await this.prisma.goodsInquiryComment.create({
+      data: {
+        goodsInquiryId,
+        content: dto.content,
+        adminId: dto.adminId,
+        sellerId: dto.sellerId,
+        writtenBySellerFlag: !!dto.sellerId,
+      },
+    });
+
+    if (result) {
+      const commentCount = await this.prisma.goodsInquiryComment.count({
+        where: { goodsInquiryId },
+      });
+      if (commentCount > 0) {
+        await this.prisma.goodsInquiry.update({
+          where: { id: goodsInquiryId },
+          data: { status: 'answered' },
+        });
+      } else if (dto.adminId) {
+        await this.prisma.goodsInquiry.update({
+          where: { id: goodsInquiryId },
+          data: { status: 'adminAnswered' },
+        });
+      } else {
+        await this.prisma.goodsInquiry.update({
+          where: { id: goodsInquiryId },
+          data: { status: 'answered' },
+        });
+      }
+    }
+    return result;
   }
 
   /** 특정 상품문의 답변 수정 */
@@ -67,10 +83,10 @@ export class GoodsInquiryCommentService {
     const result = await this.prisma.goodsInquiryComment.delete({
       where: { id: commentId },
     });
-    const commentCount = await this.prisma.goodsInquiryComment.count({
-      where: { id: result.goodsInquiryId },
+    const comments = await this.prisma.goodsInquiryComment.findMany({
+      where: { goodsInquiryId: result.goodsInquiryId },
     });
-    if (commentCount === 0) {
+    if (comments.length === 0) {
       await this.prisma.goodsInquiry.update({
         where: { id: result.goodsInquiryId },
         data: { status: 'requested' },
