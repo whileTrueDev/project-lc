@@ -1,5 +1,4 @@
-import { GoodsCategoryRes } from '@project-lc/shared-types';
-import { CustomerMileage, CustomerMileageLog, MileageSetting } from '@prisma/client';
+import { CustomerMileage } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';

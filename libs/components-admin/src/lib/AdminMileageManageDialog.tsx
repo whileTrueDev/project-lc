@@ -19,23 +19,23 @@ import {
   Box,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { adminMileageManageStore } from '@project-lc/stores';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { CustomerMileageDto } from '@project-lc/shared-types';
 import { useAdminMileageMutation } from '@project-lc/hooks';
 import { parseErrorObject } from '@project-lc/utils-frontend';
+import { GridRowData } from '@material-ui/data-grid';
 
 type AdminMileageManageDialogProps = {
   isOpen: boolean;
   onClose: () => void;
+  mileageDetail: GridRowData | undefined;
 };
 
 export function AdminMileageManageDialog(
   props: AdminMileageManageDialogProps,
 ): JSX.Element {
-  const { isOpen, onClose } = props;
-  const { mileage } = adminMileageManageStore();
-  const { mutateAsync } = useAdminMileageMutation(mileage?.customerId);
+  const { isOpen, onClose, mileageDetail } = props;
+  const { mutateAsync } = useAdminMileageMutation(mileageDetail?.customerId);
   const toast = useToast();
   const methods = useForm<CustomerMileageDto>({
     defaultValues: { mileage: 0, actionType: 'earn', reason: '' },
@@ -54,6 +54,8 @@ export function AdminMileageManageDialog(
     earn: '적립',
     consume: '차감',
   };
+
+  const { control } = methods;
 
   const onSubmit = (formData: CustomerMileageDto): void => {
     mutateAsync(formData)
@@ -76,9 +78,9 @@ export function AdminMileageManageDialog(
   const getMileageAfterUpdate = (): number => {
     let result;
     if (watch('actionType') === 'earn') {
-      result = Number(mileage?.mileage) + Number(watch('mileage'));
+      result = Number(mileageDetail?.mileage) + Number(watch('mileage'));
     } else {
-      result = Number(mileage?.mileage) - Number(watch('mileage'));
+      result = Number(mileageDetail?.mileage) - Number(watch('mileage'));
     }
     return result;
   };
@@ -109,23 +111,31 @@ export function AdminMileageManageDialog(
           <ModalBody>
             <HStack>
               <Text>대상 이메일 :</Text>
-              <Text fontWeight="bold">{mileage?.customer.email}</Text>
+              <Text fontWeight="bold">{mileageDetail?.customer.email}</Text>
             </HStack>
             <HStack>
               <Text>현재 보유액 :</Text>
-              <Text fontWeight="bold">{mileage?.mileage}</Text>
+              <Text fontWeight="bold">{mileageDetail?.mileage.toLocaleString()}</Text>
             </HStack>
-            <RadioGroup
-              defaultValue="earn"
-              onChange={(value) => handleRadio(value as CustomerMileageDto['actionType'])}
-            >
-              <HStack>
-                <Radio value="earn">적립</Radio>
-                <Radio value="consume" colorScheme="red">
-                  차감
-                </Radio>
-              </HStack>
-            </RadioGroup>
+
+            <Controller
+              name="actionType"
+              control={control}
+              render={({ field }) => (
+                <RadioGroup {...field} defaultValue="earn">
+                  <HStack>
+                    <Radio value="earn">적립</Radio>
+                    <Radio value="consume" colorScheme="red">
+                      차감
+                    </Radio>
+                  </HStack>
+                </RadioGroup>
+              )}
+              rules={{
+                required: { value: true, message: '적립/차감선택 필요' },
+              }}
+            />
+
             <Flex direction="column">
               <Text>금액</Text>
               <Input type="number" {...register('mileage', { valueAsNumber: true })} />

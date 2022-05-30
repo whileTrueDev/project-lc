@@ -7,7 +7,6 @@ import {
   GridToolbar,
 } from '@material-ui/data-grid';
 import { useAdminMileageLogList } from '@project-lc/hooks';
-import { adminMileageManageStore } from '@project-lc/stores';
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import { AdminMileageLogDetailDialog } from './AdminMileageLogDetailDialog';
@@ -16,8 +15,7 @@ import { MileageActionTypeBadge } from './MileageActionTypeBadge';
 export function AdminMileageLogList(): JSX.Element {
   const { data } = useAdminMileageLogList();
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const { setMileageLogDetail } = adminMileageManageStore();
-
+  const [mileageLogDetail, setMileageLogDetail] = useState<GridRowData>();
   const [filterModel, setFilterModel] = useState<GridFilterModel>({
     items: [],
   });
@@ -30,7 +28,11 @@ export function AdminMileageLogList(): JSX.Element {
       valueGetter: ({ row }: GridRowData) => row.customer.email,
       flex: 1,
     },
-    { field: 'amount', headerName: '변동액' },
+    {
+      field: 'amount',
+      headerName: '변동액',
+      valueFormatter: ({ row }: GridRowData) => row.amount.toLocaleString(),
+    },
     {
       field: 'actionType',
       headerName: '유형',
@@ -77,7 +79,11 @@ export function AdminMileageLogList(): JSX.Element {
         onFilterModelChange={(model) => setFilterModel(model)}
         disableSelectionOnClick
       />
-      <AdminMileageLogDetailDialog isOpen={isOpen} onClose={onClose} />
+      <AdminMileageLogDetailDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        mileageLogDetail={mileageLogDetail}
+      />
     </Box>
   );
 }

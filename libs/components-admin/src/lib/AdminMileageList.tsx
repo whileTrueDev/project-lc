@@ -7,14 +7,14 @@ import {
   GridToolbar,
 } from '@material-ui/data-grid';
 import { useAdminMileageList } from '@project-lc/hooks';
-import { adminMileageManageStore } from '@project-lc/stores';
 import { useState } from 'react';
 import { AdminMileageManageDialog } from './AdminMileageManageDialog';
 
 export function AdminMileageList(): JSX.Element {
   const { data } = useAdminMileageList();
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const { setMileageDetail } = adminMileageManageStore();
+
+  const [mileageDetail, setMileageDetail] = useState<GridRowData>();
 
   const [filterModel, setFilterModel] = useState<GridFilterModel>({
     items: [],
@@ -28,7 +28,11 @@ export function AdminMileageList(): JSX.Element {
       valueGetter: ({ row }: GridRowData) => row.customer.email,
       flex: 1,
     },
-    { field: 'mileage', headerName: '보유액' },
+    {
+      field: 'mileage',
+      headerName: '보유액',
+      valueFormatter: ({ row }: GridRowData) => row.mileage.toLocaleString(),
+    },
     {
       field: 'button',
       headerName: '관리',
@@ -62,7 +66,11 @@ export function AdminMileageList(): JSX.Element {
         disableColumnMenu
         disableSelectionOnClick
       />
-      <AdminMileageManageDialog isOpen={isOpen} onClose={onClose} />
+      <AdminMileageManageDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        mileageDetail={mileageDetail}
+      />
     </Box>
   );
 }

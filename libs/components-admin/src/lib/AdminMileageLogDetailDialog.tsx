@@ -18,23 +18,23 @@ import {
   Link,
   Flex,
 } from '@chakra-ui/react';
-import { adminMileageManageStore } from '@project-lc/stores';
 import { useOneReview } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
+import { GridRowData } from '@material-ui/data-grid';
 import { MileageActionTypeBadge } from './MileageActionTypeBadge';
 
 type AdminMileageManageDialogProps = {
   isOpen: boolean;
   onClose: () => void;
+  mileageLogDetail: GridRowData | undefined;
 };
 
 export function AdminMileageLogDetailDialog(
   props: AdminMileageManageDialogProps,
 ): JSX.Element {
-  const { isOpen, onClose } = props;
-  const { mileageLog } = adminMileageManageStore();
-  const { data: reviewData } = useOneReview(mileageLog?.reviewId);
+  const { isOpen, onClose, mileageLogDetail } = props;
+  const { data: reviewData } = useOneReview(mileageLogDetail?.reviewId);
 
   return (
     <>
@@ -47,25 +47,27 @@ export function AdminMileageLogDetailDialog(
             <Flex direction="column" minH={300} justifyContent="space-around">
               <HStack>
                 <Text>이메일 :</Text>
-                <Text fontWeight="bold">{mileageLog?.customer.email}</Text>
+                <Text fontWeight="bold">{mileageLogDetail?.customer.email}</Text>
               </HStack>
               <HStack>
                 <Text>유형</Text>
                 <Text fontWeight="bold">
                   <MileageActionTypeBadge
-                    actionType={mileageLog?.actionType}
+                    actionType={mileageLogDetail?.actionType}
                     lineHeight={2}
                   />
                 </Text>
               </HStack>
               <HStack>
-                <Text>{mileageLog?.actionType === 'earn' ? '적립 : ' : '사용: '}</Text>
-                <Text fontWeight="bold">{mileageLog?.amount}</Text>
+                <Text>
+                  {mileageLogDetail?.actionType === 'earn' ? '적립 : ' : '사용: '}
+                </Text>
+                <Text fontWeight="bold">{mileageLogDetail?.amount.toLocaleString()}</Text>
               </HStack>
               <HStack>
                 <Text>생성일</Text>
                 <Text fontWeight="bold">
-                  {dayjs(mileageLog?.createDate).format('YYYY-MM-DD HH:mm:ss')}
+                  {dayjs(mileageLogDetail?.createDate).format('YYYY-MM-DD HH:mm:ss')}
                 </Text>
               </HStack>
               <HStack>

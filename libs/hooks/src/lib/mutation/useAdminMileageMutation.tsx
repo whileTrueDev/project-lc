@@ -19,6 +19,7 @@ export const useAdminMileageMutation = (
         queryClient.invalidateQueries('AdminMileage', {
           refetchInactive: true,
         });
+        queryClient.invalidateQueries('AdminMileageLog', { refetchInactive: true });
       },
     },
   );
