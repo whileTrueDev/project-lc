@@ -1,46 +1,40 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { Customer } from '@prisma/client';
+import {
+  CacheInterceptor,
+  Controller,
+  Get,
+  Query,
+  UseGuards,
+  UseInterceptors,
+  ValidationPipe,
+} from '@nestjs/common';
+import { Customer, Prisma } from '@prisma/client';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CustomerService } from '@project-lc/nest-modules-customer';
-import { FindManyDto } from '@project-lc/shared-types';
+import { FindCustomerDto } from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin/customer')
+@UseInterceptors(CacheInterceptor)
 export class AdminCustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @Get()
   findAll(
-    @Query() dto: FindManyDto,
-    @Query('orderBy') orderBy: string,
-    @Query('orderByColumn') orderByColumn: keyof Customer,
+    @Query(new ValidationPipe({ transform: true }))
+    dto: FindCustomerDto,
   ): Promise<Customer[]> {
     const _take = Number(dto.take);
     const _skip = Number(dto.skip);
-    const _orderBy = ['desc', 'asc'].includes(orderBy.toLowerCase())
-      ? orderBy
-      : undefined;
-    const keys: Array<keyof Customer> = [
-      'id',
-      'name',
-      'password',
-      'email',
-      'nickname',
-      'phone',
-      'createDate',
-      'gender',
-      'birthDate',
-      'agreementFlag',
-      'inactiveFlag',
-    ];
-    const _orderByColumn: keyof Customer = keys.includes(orderByColumn)
-      ? orderByColumn
-      : undefined;
+    const _include: Prisma.CustomerInclude = {};
+    dto.includeModels.forEach((include) => {
+      _include[include] = true;
+    });
 
     return this.customerService.findAll({
       take: Number.isNaN(_take) ? undefined : _take,
       skip: Number.isNaN(_skip) ? undefined : _skip,
-      orderBy: _orderByColumn ? { [_orderByColumn]: _orderBy } : undefined,
+      orderBy: dto.orderByColumn ? { [dto.orderByColumn]: dto.orderBy } : undefined,
+      include: _include,
     });
   }
 }

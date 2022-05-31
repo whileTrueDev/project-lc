@@ -179,6 +179,18 @@ export class BroadcasterService {
     return null;
   }
 
+  /** 모든 방송인 정보 조회 */
+  public async getBroadcasters(): Promise<Broadcaster[]> {
+    const include = {
+      broadcasterAddress: true,
+      broadcasterContacts: true,
+      channels: true,
+    };
+    return this.prisma.broadcaster.findMany({
+      include,
+    });
+  }
+
   /** 방송인 활동명 변경 */
   public async updateNickname(
     id: Broadcaster['id'],

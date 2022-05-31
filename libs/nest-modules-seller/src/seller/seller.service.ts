@@ -233,6 +233,13 @@ export class SellerService {
         name: true,
         avatar: true,
         inactiveFlag: true,
+        sellerBusinessRegistration: {
+          include: {
+            BusinessRegistrationConfirmation: true,
+          },
+        },
+        sellerSettlementAccount: true,
+        SellerContacts: true,
       },
     });
   }
