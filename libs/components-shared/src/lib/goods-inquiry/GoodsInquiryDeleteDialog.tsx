@@ -19,21 +19,21 @@ export function GoodsInquiryDeleteDialog({
 
   const goodsInquiryDelete = useGoodsInquiryDeleteMutation();
   const handleDelete = async (): Promise<void> => {
-    if (profile && ['admin', 'customer'].includes(profile.type)) {
-      goodsInquiryDelete
-        .mutateAsync(inquiry.id)
-        .then(() => {
-          toast({ description: '상품 문의를 삭제하였습니다.', status: 'success' });
-          onClose();
-        })
-        .catch(() => {
-          toast({
-            description:
-              '상품 문의를 삭제하는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-            status: 'error',
-          });
+    if (!profile) return undefined;
+    if (!['admin', 'customer'].includes(profile.type)) return undefined;
+    return goodsInquiryDelete
+      .mutateAsync(inquiry.id)
+      .then(() => {
+        toast({ description: '상품 문의를 삭제하였습니다.', status: 'success' });
+        onClose();
+      })
+      .catch(() => {
+        toast({
+          description:
+            '상품 문의를 삭제하는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          status: 'error',
         });
-    }
+      });
   };
   return (
     <ConfirmDialog
@@ -41,6 +41,7 @@ export function GoodsInquiryDeleteDialog({
       onClose={onClose}
       title="상품 문의 삭제"
       onConfirm={handleDelete}
+      isLoading={goodsInquiryDelete.isLoading}
     >
       <Box textAlign="center">
         <Text>해당 상품 문의를 삭제하시겠습니까?</Text>

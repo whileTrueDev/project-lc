@@ -22,21 +22,23 @@ export function GoodsInquiryCommentDeleteDialog({
 
   const goodsInquiryDelete = useGoodsInquiryCommentDeleteMutation();
   const handleDelete = async (): Promise<void> => {
-    if (profile && comment && ['admin', 'seller'].includes(profile.type)) {
-      goodsInquiryDelete
-        .mutateAsync({ goodsInquiryCommentId: comment.id, goodsInquiryId: inquiry.id })
-        .then(() => {
-          toast({ description: '문의 답변을 삭제하였습니다.', status: 'success' });
-          onClose();
-        })
-        .catch(() => {
-          toast({
-            description:
-              '문의 답변을 삭제하는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-            status: 'error',
-          });
+    if (!profile) return undefined;
+    if (!comment) return undefined;
+    if (!['admin', 'seller'].includes(profile.type)) return undefined;
+
+    return goodsInquiryDelete
+      .mutateAsync({ goodsInquiryCommentId: comment.id, goodsInquiryId: inquiry.id })
+      .then(() => {
+        toast({ description: '문의 답변을 삭제하였습니다.', status: 'success' });
+        onClose();
+      })
+      .catch(() => {
+        toast({
+          description:
+            '문의 답변을 삭제하는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          status: 'error',
         });
-    }
+      });
   };
   return (
     <ConfirmDialog
@@ -44,6 +46,7 @@ export function GoodsInquiryCommentDeleteDialog({
       onClose={onClose}
       title="문의 답변 삭제"
       onConfirm={handleDelete}
+      isLoading={goodsInquiryDelete.isLoading}
     >
       해당 문의 답변을 삭제할까요?
     </ConfirmDialog>

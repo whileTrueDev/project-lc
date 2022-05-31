@@ -3,6 +3,7 @@ import { GoodsInquiryCreateDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
+import { INFINITE_INQUIRIES_KEY } from '../queries/useGoodsInquiries';
 
 export type useGoodsInquiryMutationRes = GoodsInquiry;
 
@@ -18,8 +19,9 @@ export const useGoodsInquiryMutation = (): UseMutationResult<
         .post<useGoodsInquiryMutationRes>('/goods-inquiry', dto)
         .then((res) => res.data),
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries('InfiniteInquiries');
+      onSuccess: (data) => {
+        queryClient.invalidateQueries(INFINITE_INQUIRIES_KEY);
+        queryClient.invalidateQueries(['GoodsInquiryComment', data.id]);
       },
     },
   );
@@ -39,7 +41,8 @@ export const useGoodsInquiryDeleteMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('InfiniteInquiries');
+        queryClient.invalidateQueries(INFINITE_INQUIRIES_KEY);
+        queryClient.invalidateQueries('GoodsInquiryComment');
       },
     },
   );

@@ -58,6 +58,14 @@ export class MileageService {
 
   /** 마일리지 모두 조회 */
   findAllMileage(): Promise<CustomerMileage[]> {
-    return this.prismaService.customerMileage.findMany();
+    return this.prismaService.customerMileage.findMany({
+      include: {
+        customer: {
+          select: {
+            email: true,
+          },
+        },
+      },
+    });
   }
 }
