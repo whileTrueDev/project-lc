@@ -68,6 +68,7 @@ export * from './lib/mutation/useOrderPurchaseConfirmMutation';
 export * from './lib/mutation/usePaymentMutation';
 export * from './lib/mutation/useRegistGoods';
 export * from './lib/mutation/useRestoreInactiveDataMutation';
+export * from './lib/mutation/useReviewCommentMutation';
 export * from './lib/mutation/useReviewImageMutation';
 export * from './lib/mutation/useReviewMutation';
 export * from './lib/mutation/useSellerOrderCancelMutation';

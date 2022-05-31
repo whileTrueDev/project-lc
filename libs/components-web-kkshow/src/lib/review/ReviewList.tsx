@@ -30,21 +30,29 @@ import {
   useInfiniteReviews,
   useProfile,
 } from '@project-lc/hooks';
-import { FindManyGoodsReviewDto, GoodsReviewItem } from '@project-lc/shared-types';
+import {
+  FindManyGoodsReviewDto,
+  GoodsReviewCommentItem,
+  GoodsReviewItem,
+} from '@project-lc/shared-types';
 import { asteriskify } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import GoodsDisplay2 from '../GoodsDisplay2';
+import ReviewCommentDeleteDialog from './ReviewCommentDeleteDialog';
+import ReviewCommentUpdateDialog from './ReviewCommentUpdateDialog';
 import ReviewDeleteDialog from './ReviewDeleteDialog';
 import ReviewUpdateDialog from './ReviewUpdateDialog';
 
 export interface ReviewListProps extends Omit<ReviewDetailProps, 'review'> {
   dto: FindManyGoodsReviewDto;
   enabled?: boolean;
+  filterFn?: Parameters<Array<GoodsReviewItem>['filter']>[0];
 }
 export function ReviewList({
   dto,
   enabled,
+  filterFn,
   ...rest
 }: ReviewListProps): JSX.Element | null {
   const reviews = useInfiniteReviews(dto, enabled);
@@ -67,7 +75,7 @@ export function ReviewList({
             </Box>
           )}
 
-          {page.reviews.map((review) => (
+          {page.reviews.filter(filterFn || ((r) => r)).map((review) => (
             <ReviewDetail key={review.id} review={review} {...rest} />
           ))}
 
@@ -154,10 +162,29 @@ export function ReviewDetail({
   // 후기 상품 정보
   const goods = useGoodsById(includeGoodsInfo ? review.goodsId : null);
 
+  // ********************
+  // 후기 수정/삭제 핸들러
+  const [selectedComment, setSelectedComment] = useState<null | GoodsReviewCommentItem>(
+    null,
+  );
+  // 후기 댓글 수정 다이얼로그
+  const updateCommentDialog = useDisclosure();
+  const onCommentUpdate = (_comment: GoodsReviewCommentItem): void => {
+    setSelectedComment(_comment);
+    updateCommentDialog.onOpen();
+  };
+  // 후기 댓글 삭제 다이얼로그
+  const deleteCommentDialog = useDisclosure();
+  const onCommentDelete = (_comment: GoodsReviewCommentItem): void => {
+    setSelectedComment(_comment);
+    deleteCommentDialog.onOpen();
+  };
+
   return (
     <>
       <Box my={4}>
-        {profile.data?.id === review.writerId && (
+        {((profile && profile.data?.type === 'admin') ||
+          profile.data?.id === review.writerId) && (
           <Flex gap={2} my={1}>
             {editable && (
               <Button leftIcon={<EditIcon />} size="xs" onClick={updateDialog.onOpen}>
@@ -169,6 +196,19 @@ export function ReviewDetail({
                 삭제
               </Button>
             )}
+            {/* 리뷰 수정 다이얼로그 */}
+            <ReviewUpdateDialog
+              reviewId={review.id}
+              review={review}
+              isOpen={updateDialog.isOpen}
+              onClose={updateDialog.onClose}
+            />
+            {/* 리뷰 삭제 다이얼로그 */}
+            <ReviewDeleteDialog
+              reviewId={review.id}
+              isOpen={deleteDialog.isOpen}
+              onClose={deleteDialog.onClose}
+            />
           </Flex>
         )}
 
@@ -227,10 +267,45 @@ export function ReviewDetail({
             </Button>
           )}
         </Box>
-        <Box mt={2}>{comments.data && <CommentList comments={comments.data} />}</Box>
+        <Box mt={2}>
+          <CommentList
+            comments={comments.data || []}
+            isButtonSetVisible={(comment) => {
+              const _comment = comment as GoodsReviewCommentItem;
+              return !!(
+                profile.data &&
+                (profile.data.type === 'admin' || // 관리자거나
+                  (profile.data.type === 'customer' && // 로그인 유저가 소비자면서 댓글이 해당 소비자가 작성한 것인 경우
+                    profile.data.id === _comment.customerId) ||
+                  (profile.data.type === 'seller' && // 로그인 유저가 판매자면서 댓글이 해당 판매자가 작성한 것인 경우
+                    profile.data.id === _comment.sellerId))
+              );
+            }}
+            onCommentDelete={(comment) =>
+              onCommentDelete(comment as GoodsReviewCommentItem)
+            }
+            onCommentUpdate={(comment) =>
+              onCommentUpdate(comment as GoodsReviewCommentItem)
+            }
+          />
+          {/* 리뷰 수정 다이얼로그 */}
+          <ReviewCommentUpdateDialog
+            isOpen={updateCommentDialog.isOpen}
+            onClose={updateCommentDialog.onClose}
+            comment={selectedComment}
+          />
+          {/* 리뷰 삭제 다이얼로그 */}
+          <ReviewCommentDeleteDialog
+            isOpen={deleteCommentDialog.isOpen}
+            onClose={deleteCommentDialog.onClose}
+            review={review}
+            comment={selectedComment}
+          />
+        </Box>
       </Box>
       <Divider />
 
+      {/* 리뷰 이미지 자세히보기 모달 */}
       <Modal
         isOpen={dialog.isOpen && selectedImageIdx !== null}
         onClose={dialog.onClose}
@@ -287,19 +362,6 @@ export function ReviewDetail({
           />
         </ModalContent>
       </Modal>
-
-      <ReviewUpdateDialog
-        reviewId={review.id}
-        review={review}
-        isOpen={updateDialog.isOpen}
-        onClose={updateDialog.onClose}
-      />
-
-      <ReviewDeleteDialog
-        reviewId={review.id}
-        isOpen={deleteDialog.isOpen}
-        onClose={deleteDialog.onClose}
-      />
     </>
   );
 }

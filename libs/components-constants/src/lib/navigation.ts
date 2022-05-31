@@ -9,6 +9,9 @@ import {
   FcAdvertising,
   FcCloseUpMode,
   FcBiohazard,
+  FcDecision,
+  FcQuestions,
+  FcRating,
 } from 'react-icons/fc';
 
 import {
@@ -275,7 +278,8 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     children: [
       { name: '상품검수', href: '/goods/confirmation', icon: FcInspection },
       { name: '상품카테고리', href: '/goods/category', icon: FcList },
-      { name: '상품문의관리', href: '/goods/inquiry', icon: FcSms },
+      { name: '상품문의관리', href: '/goods/inquiry', icon: FcQuestions },
+      { name: '상품리뷰관리', href: '/goods/review', icon: FcRating },
     ],
   },
   {
