@@ -1,9 +1,9 @@
 /* eslint-disable react/no-array-index-key */
 import { Box, Text } from '@chakra-ui/react';
+import { ReviewList } from '@project-lc/components-shared/goods-review/ReviewList';
+import { ReviewPolicy } from '@project-lc/components-shared/goods-review/ReviewPolicy';
 import { useGoodsById } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
-import ReviewList from '../review/ReviewList';
-import { ReviewPolicy } from '../review/ReviewPolicy';
 
 export function GoodsViewReviews(): JSX.Element | null {
   const router = useRouter();

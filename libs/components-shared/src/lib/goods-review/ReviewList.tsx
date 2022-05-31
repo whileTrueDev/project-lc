@@ -25,7 +25,6 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import StarRating from '@project-lc/components-core/StarRating';
-import { CommentList } from '@project-lc/components-shared/comment/CommentList';
 import {
   useGoodsById,
   useGoodsReviewComments,
@@ -40,7 +39,8 @@ import {
 import { asteriskify } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
-import GoodsDisplay2 from '../GoodsDisplay2';
+import CommentList from '../comment/CommentList';
+import GoodsDisplay2 from '../goods/GoodsDisplay2';
 import ReviewCommentCreateDialog from './ReviewCommentCreateDialog';
 import ReviewCommentDeleteDialog from './ReviewCommentDeleteDialog';
 import ReviewCommentUpdateDialog from './ReviewCommentUpdateDialog';

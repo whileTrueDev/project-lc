@@ -1,5 +1,5 @@
 import { Box, Text } from '@chakra-ui/react';
-import { ReviewList } from '@project-lc/components-web-kkshow/review/ReviewList';
+import { ReviewList } from '@project-lc/components-shared/goods-review/ReviewList';
 import MypageLayout from '@project-lc/components-shared/MypageLayout';
 import { useProfile } from '@project-lc/hooks';
 

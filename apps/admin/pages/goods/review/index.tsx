@@ -1,7 +1,7 @@
 import { Box, Heading } from '@chakra-ui/react';
 import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
-import { ReviewList } from '@project-lc/components-web-kkshow/review/ReviewList';
-import { ReviewPolicy } from '@project-lc/components-web-kkshow/review/ReviewPolicy';
+import { ReviewList } from '@project-lc/components-shared/goods-review/ReviewList';
+import { ReviewPolicy } from '@project-lc/components-shared/goods-review/ReviewPolicy';
 
 export function GoodsReviewIndex(): JSX.Element {
   return (
