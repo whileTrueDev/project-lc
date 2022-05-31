@@ -7,6 +7,28 @@ import { CouponDto } from '@project-lc/shared-types';
 export class CouponService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  /** 쿠폰 상세조회 */
+  findCoupon(couponId: number): Promise<Coupon> {
+    return this.prismaService.coupon.findFirst({
+      where: {
+        id: couponId,
+      },
+      include: {
+        customerCoupons: {
+          include: {
+            customer: {
+              select: {
+                email: true,
+                nickname: true,
+              },
+            },
+            logs: true,
+          },
+        },
+      },
+    });
+  }
+
   /** 쿠폰 목록 조회 */
   findCoupons(): Promise<Coupon[]> {
     return this.prismaService.coupon.findMany();
@@ -17,6 +39,8 @@ export class CouponService {
     return this.prismaService.coupon.create({
       data: {
         ...dto,
+        startDate: new Date(dto.startDate),
+        endDate: new Date(dto.endDate),
       },
     });
   }

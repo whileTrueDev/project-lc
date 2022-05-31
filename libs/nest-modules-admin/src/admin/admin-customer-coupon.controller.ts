@@ -29,8 +29,11 @@ export class AdminCustomerCouponController {
   @Get()
   async getAllCustomerCoupons(
     @Query('customerId') customerId?: number,
+    @Query('couponId') couponId?: number,
   ): Promise<CustomerCoupon[]> {
-    return this.customerCouponService.findCustomerCoupons(customerId || undefined);
+    return this.customerCouponService.findCustomerCoupons(
+      { customerId, couponId } || undefined,
+    );
   }
 
   /** 쿠폰을 특정 소비자에게 발급 */

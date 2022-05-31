@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
@@ -18,7 +19,7 @@ import { CouponLogService, CouponService } from '@project-lc/nest-modules-coupon
 import { CouponDto } from '@project-lc/shared-types';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
-@UseInterceptors(HttpCacheInterceptor)
+// @UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('coupon')
 @Controller('admin/coupon')
 export class AdminCouponController {
@@ -28,9 +29,17 @@ export class AdminCouponController {
   ) {}
 
   /** 모든 쿠폰 목록 조회 */
-  @Get()
+  @Get('list')
   async getAllCoupons(): Promise<Coupon[]> {
     return this.couponService.findCoupons();
+  }
+
+  /** 하나의 쿠폰 조회 */
+  @Get(':couponId')
+  async getOneCoupon(
+    @Param('couponId', ParseIntPipe) couponId: Coupon['id'],
+  ): Promise<Coupon> {
+    return this.couponService.findCoupon(couponId);
   }
 
   /** 쿠폰 생성 */
@@ -58,7 +67,9 @@ export class AdminCouponController {
 
   /** 쿠폰 사용 내역 조회 */
   @Get('history')
-  async getCouponLogs(): Promise<CustomerCouponLog[]> {
-    return this.couponLogService.adminFindCouponLogs();
+  async getCouponLogs(
+    @Query('customerCouponId', ParseIntPipe) customerCouponId?: number,
+  ): Promise<CustomerCouponLog[]> {
+    return this.couponLogService.adminFindCouponLogs(customerCouponId);
   }
 }
