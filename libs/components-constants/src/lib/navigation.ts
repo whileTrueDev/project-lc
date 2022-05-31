@@ -1,28 +1,26 @@
 import {
-  FcMoneyTransfer,
-  FcInspection,
-  FcList,
-  FcDislike,
-  FcVideoCall,
-  FcFaq,
-  FcSms,
-  FcAdvertising,
-  FcCloseUpMode,
-  FcBiohazard,
-  FcDecision,
-  FcQuestions,
-  FcRating,
-} from 'react-icons/fc';
-
-import {
-  AiOutlineShop,
+  AiOutlineContainer,
   AiOutlineHome,
   AiOutlineSetting,
-  AiOutlineContainer,
+  AiOutlineShop,
 } from 'react-icons/ai';
 import { BsBox } from 'react-icons/bs';
-import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
+import {
+  FcAdvertising,
+  FcBiohazard,
+  FcCloseUpMode,
+  FcDislike,
+  FcFaq,
+  FcInspection,
+  FcList,
+  FcMoneyTransfer,
+  FcQuestions,
+  FcRating,
+  FcSms,
+  FcVideoCall,
+} from 'react-icons/fc';
 import { IconType } from 'react-icons/lib';
+import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
 
 export interface NavItem {
   label: string;
@@ -107,6 +105,11 @@ export const mypageNavLinks: MypageLink[] = [
       {
         name: '문의 관리',
         href: '/mypage/goods-inquiries',
+        checkIsActive: (pathname, linkHref) => pathname === linkHref,
+      },
+      {
+        name: '상품 후기 관리',
+        href: '/mypage/goods-reviews',
         checkIsActive: (pathname, linkHref) => pathname === linkHref,
       },
     ],

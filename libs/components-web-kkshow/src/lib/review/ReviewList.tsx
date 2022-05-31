@@ -1,5 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import {
+  AddIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   DeleteIcon,
@@ -7,6 +8,7 @@ import {
 } from '@chakra-ui/icons';
 import {
   AspectRatio,
+  Badge,
   Box,
   Button,
   Center,
@@ -39,14 +41,18 @@ import { asteriskify } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import GoodsDisplay2 from '../GoodsDisplay2';
+import ReviewCommentCreateDialog from './ReviewCommentCreateDialog';
 import ReviewCommentDeleteDialog from './ReviewCommentDeleteDialog';
 import ReviewCommentUpdateDialog from './ReviewCommentUpdateDialog';
 import ReviewDeleteDialog from './ReviewDeleteDialog';
 import ReviewUpdateDialog from './ReviewUpdateDialog';
 
 export interface ReviewListProps extends Omit<ReviewDetailProps, 'review'> {
+  /** 리뷰 목록 정보 불러올 때 적용할 파라미터 */
   dto: FindManyGoodsReviewDto;
+  /** 리뷰목록정보 불러오는 작업을 언제 적용할 지 여부, 기본값 true로, 입력하지 않으면 항시 불러옴. */
   enabled?: boolean;
+  /** 목록 필터링 함수. 해당 함수를 통과한 목록만 보여지게 됨 */
   filterFn?: Parameters<Array<GoodsReviewItem>['filter']>[0];
 }
 export function ReviewList({
@@ -106,11 +112,18 @@ export function ReviewList({
 export default ReviewList;
 
 export interface ReviewDetailProps {
+  /** 리뷰 정보 */
   review: GoodsReviewItem;
+  /** 리뷰 내용이 기본적으로 접혀있도록 구성할 지 여부 */
   defaultFolded?: boolean;
+  /** 수정 버튼을 보여줄 지 여부 (true여도 실제 수정 가능한 유저에게만 보입니다: 관리자, 소비자본인작성후기) */
   editable?: boolean;
+  /** 삭제 버튼을 보여줄 지 여부 (true여도 실제 삭제 가능한 유저에게만 보입니다: 관리자, 소비자본인작성후기) */
   removable?: boolean;
+  /** 상품 정보 포함할 지 여부 */
   includeGoodsInfo?: boolean;
+  /** 해당 후기에 판매자가 댓글을 하나라도 남겼는 지 여부에 따른 Badge를 표시할 지 여부 */
+  includeCommentStatus?: boolean;
 }
 export function ReviewDetail({
   review,
@@ -118,6 +131,7 @@ export function ReviewDetail({
   editable = false,
   removable = false,
   includeGoodsInfo = false,
+  includeCommentStatus = false,
 }: ReviewDetailProps): JSX.Element {
   const displayName = useMemo(() => {
     if (!review.writer.nickname) return asteriskify(review.writer.name);
@@ -151,16 +165,8 @@ export function ReviewDetail({
     setFolded(false);
   };
 
-  // 자기 후기인지 확인
-  const profile = useProfile();
-
-  // 후기 수정 다이얼로그
-  const updateDialog = useDisclosure();
-  // 후기 삭제 다이얼로그
-  const deleteDialog = useDisclosure();
-
-  // 후기 상품 정보
-  const goods = useGoodsById(includeGoodsInfo ? review.goodsId : null);
+  const { data: profile } = useProfile(); // 자기 후기인지 확인
+  const goods = useGoodsById(review.goodsId); // 후기 상품 정보
 
   // ********************
   // 후기 수정/삭제 핸들러
@@ -183,34 +189,25 @@ export function ReviewDetail({
   return (
     <>
       <Box my={4}>
-        {((profile && profile.data?.type === 'admin') ||
-          profile.data?.id === review.writerId) && (
-          <Flex gap={2} my={1}>
-            {editable && (
-              <Button leftIcon={<EditIcon />} size="xs" onClick={updateDialog.onOpen}>
-                수정
-              </Button>
-            )}
-            {removable && (
-              <Button leftIcon={<DeleteIcon />} size="xs" onClick={deleteDialog.onOpen}>
-                삭제
-              </Button>
-            )}
-            {/* 리뷰 수정 다이얼로그 */}
-            <ReviewUpdateDialog
-              reviewId={review.id}
-              review={review}
-              isOpen={updateDialog.isOpen}
-              onClose={updateDialog.onClose}
-            />
-            {/* 리뷰 삭제 다이얼로그 */}
-            <ReviewDeleteDialog
-              reviewId={review.id}
-              isOpen={deleteDialog.isOpen}
-              onClose={deleteDialog.onClose}
-            />
-          </Flex>
+        {includeCommentStatus && (
+          <Box>
+            {profile &&
+              comments.data &&
+              comments.data.some(
+                (x) => profile.type === 'seller' && profile.id === x.sellerId,
+              ) && (
+                <Badge variant="solid" colorScheme="green">
+                  (판매자)댓글 작성 완료
+                </Badge>
+              )}
+          </Box>
         )}
+
+        <ReviewDetailButtonSet
+          editable={editable}
+          removable={removable}
+          review={review}
+        />
 
         {includeGoodsInfo && goods.data && (
           <Box my={2}>
@@ -218,10 +215,11 @@ export function ReviewDetail({
               size="xs"
               goods={{
                 id: goods.data.id,
-                imageSrc: goods.data.image[0].image,
+                imageSrc: goods.data.image[0]?.image,
                 name: goods.data.goods_name,
                 seller: goods.data.seller,
               }}
+              disableLink
             />
           </Box>
         )}
@@ -273,12 +271,12 @@ export function ReviewDetail({
             isButtonSetVisible={(comment) => {
               const _comment = comment as GoodsReviewCommentItem;
               return !!(
-                profile.data &&
-                (profile.data.type === 'admin' || // 관리자거나
-                  (profile.data.type === 'customer' && // 로그인 유저가 소비자면서 댓글이 해당 소비자가 작성한 것인 경우
-                    profile.data.id === _comment.customerId) ||
-                  (profile.data.type === 'seller' && // 로그인 유저가 판매자면서 댓글이 해당 판매자가 작성한 것인 경우
-                    profile.data.id === _comment.sellerId))
+                profile &&
+                (profile.type === 'admin' || // 관리자거나
+                  (profile.type === 'customer' && // 로그인 유저가 소비자면서 댓글이 해당 소비자가 작성한 것인 경우
+                    profile.id === _comment.customerId) ||
+                  (profile.type === 'seller' && // 로그인 유저가 판매자면서 댓글이 해당 판매자가 작성한 것인 경우
+                    profile.id === _comment.sellerId))
               );
             }}
             onCommentDelete={(comment) =>
@@ -362,6 +360,89 @@ export function ReviewDetail({
           />
         </ModalContent>
       </Modal>
+    </>
+  );
+}
+
+type ReviewDetailButtonSetProps = Pick<
+  ReviewDetailProps,
+  'review' | 'editable' | 'removable'
+>;
+function ReviewDetailButtonSet({
+  review,
+  editable,
+  removable,
+}: ReviewDetailButtonSetProps): JSX.Element {
+  const { data: profile } = useProfile(); // 로그인 유저 확인을 위해
+  const goods = useGoodsById(review.goodsId); // 후기 상품 정보
+  // 후기 수정 다이얼로그
+  const updateDialog = useDisclosure();
+  // 후기 삭제 다이얼로그
+  const deleteDialog = useDisclosure();
+  // 후기 댓글 작성 다이얼로그
+  const createCommentDialog = useDisclosure();
+
+  return (
+    <>
+      {/* 수정/삭제 */}
+      {(profile?.type === 'admin' || // 관리자이거나
+        // 소비자 본인이 작성한 후기의 경우
+        (profile?.type === 'customer' && profile?.id === review.writerId)) && (
+        <Flex gap={2} my={1}>
+          {editable && (
+            <>
+              <Button leftIcon={<EditIcon />} size="xs" onClick={updateDialog.onOpen}>
+                수정
+              </Button>
+              {/* 리뷰 수정 다이얼로그 */}
+              <ReviewUpdateDialog
+                reviewId={review.id}
+                review={review}
+                isOpen={updateDialog.isOpen}
+                onClose={updateDialog.onClose}
+              />
+            </>
+          )}
+          {removable && (
+            <>
+              <Button leftIcon={<DeleteIcon />} size="xs" onClick={deleteDialog.onOpen}>
+                삭제
+              </Button>
+              {/* 리뷰 삭제 다이얼로그 */}
+              <ReviewDeleteDialog
+                reviewId={review.id}
+                isOpen={deleteDialog.isOpen}
+                onClose={deleteDialog.onClose}
+              />
+            </>
+          )}
+        </Flex>
+      )}
+
+      {/* 댓글 작성 */}
+      {((profile && // 해당 상품 판매자인 경우
+        profile.type === 'seller' &&
+        profile.id === goods.data?.sellerId) ||
+        (profile && // 또는 해당 리뷰를 작성한 소비자의 경우
+          profile.type === 'customer' &&
+          profile.id === review.writerId)) && (
+        <>
+          <Button
+            leftIcon={<AddIcon />}
+            size="xs"
+            colorScheme="blue"
+            variant="outline"
+            onClick={createCommentDialog.onOpen}
+          >
+            댓글 작성
+          </Button>
+          <ReviewCommentCreateDialog
+            goodsReview={review}
+            isOpen={createCommentDialog.isOpen}
+            onClose={createCommentDialog.onClose}
+          />
+        </>
+      )}
     </>
   );
 }

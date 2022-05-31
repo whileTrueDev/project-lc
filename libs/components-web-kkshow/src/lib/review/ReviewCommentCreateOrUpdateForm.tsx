@@ -40,8 +40,8 @@ export function ReviewCommentCreateOrUpdateForm({
                 message: '댓글을 최대 500자까지 작성 가능합니다.',
               },
             })}
-            minH={200}
-            maxH={350}
+            minH={100}
+            maxH={200}
           />
           <FormErrorMessage fontSize="xs">
             {methods.formState.errors.content?.message}

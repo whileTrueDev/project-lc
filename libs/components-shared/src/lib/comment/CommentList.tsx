@@ -90,6 +90,14 @@ export function CommentList({
                     content={comment.content}
                   />
                 )}
+                {(comment as GoodsReviewCommentItem).customer && (
+                  <ReplyText
+                    avatar=""
+                    name={(comment as GoodsReviewCommentItem).customer.nickname || ''}
+                    createDate={comment.createDate}
+                    content={comment.content}
+                  />
+                )}
               </Box>
             </Flex>
           ))}
