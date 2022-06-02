@@ -31,6 +31,7 @@ import {
   useCartItemDeleteMutation,
   useCartItemOptDeleteMutation,
   useCartOptionQuantity,
+  useCartShippingCostByShippingGroup,
   useCartTruncateMutation,
 } from '@project-lc/hooks';
 import { CartItemRes } from '@project-lc/shared-types';
@@ -70,45 +71,9 @@ export function CartTable(): JSX.Element {
     getCartKey(); // 장바구니 식별 키 생성 (없는 경우에만 생성됨)
   }, [handleSelectAll, data]);
 
-  // * 아래는 모두 별도 로직으로 분리하기 --------------------
-
-  // 배송그룹별 카트아이템들 Record<배송그룹id, 카트상품id[]>
-  const groupedCartItems: Record<number, number[]> = useMemo(() => {
-    const result: Record<number, number[]> = {};
-    if (!data) return result;
-    return data.reduce((obj, cartItem) => {
-      if (!cartItem.shippingGroupId) return obj;
-      if (obj[cartItem.shippingGroupId]) {
-        obj[cartItem.shippingGroupId].push(cartItem.id);
-        return obj;
-      }
-      return { ...obj, [cartItem.shippingGroupId]: [cartItem.id] };
-    }, result);
-  }, [data]);
-
-  // 배송그룹 목록 배송그룹id []
-  const shippingGroupIdList = useMemo(
-    () => Object.keys(groupedCartItems).map((key) => Number(key)),
-    [groupedCartItems],
-  );
-
-  // 배송그룹별 선택된 카트아이템 Record<배송그룹id, 선택된 카트상품id[]>
-  const groupedSelectedItems = useMemo(() => {
-    const obj = { ...groupedCartItems };
-
-    shippingGroupIdList.forEach((groupId) => {
-      obj[groupId] = groupedCartItems[groupId].filter((itemId) =>
-        selectedItems.includes(itemId),
-      );
-    });
-    return obj;
-  }, [groupedCartItems, selectedItems, shippingGroupIdList]);
-
-  // 배송그룹별 표시될 배송비(selectedItems, 배송그룹정보) => 배송비 Record<배송그룹id, 배송비>
-  // const totalShippingCostByShippingGroupId: Record<number, number | null> =
-  //   useMemo(() => {}, []);
-
-  // * 이 위로는 모두 별도 로직으로 분리하기 --------------------
+  // 배송비정책별 장바구니 상품, 배송비정책 별 배송비, 배송비정책 id 목록
+  const { cartItemsObjectGroupedById, totalShippingCostObjectById, shippingGroupIdList } =
+    useCartShippingCostByShippingGroup();
 
   if (isLoading)
     return (
@@ -130,11 +95,6 @@ export function CartTable(): JSX.Element {
 
   return (
     <Box>
-      <Box>
-        <Box>배송그룹목록 {JSON.stringify(shippingGroupIdList)}</Box>
-        <Box>배송그룹별 카트아이템들 {JSON.stringify(groupedCartItems)}</Box>
-        <Box>배송그룹별 선택된 카트아이템 {JSON.stringify(groupedSelectedItems)}</Box>
-      </Box>
       <Box mt={6}>
         <Text fontSize="lg">
           총 선택된 상품 {selectedItems.length} / {data.length}
@@ -181,19 +141,23 @@ export function CartTable(): JSX.Element {
             {/* {data.map((cartItem) => (
               <CartTableRow key={cartItem.id} cartItem={cartItem} />
             ))} */}
+            {/* 동일한 배송비 그룹별로 장바구니 상품 묶어서 표시 */}
             {shippingGroupIdList.map((shippingGroupId) => {
-              return groupedCartItems[shippingGroupId].map((cartItemId, index) => {
-                const item = data.find((d) => d.id === cartItemId);
-                if (!item) return null;
-                return (
-                  <CartTableRow
-                    key={cartItemId}
-                    cartItem={item}
-                    rowSpan={groupedCartItems[shippingGroupId].length} // 동일배송그룹에 속하는 장바구니상품 개수만큼 rowSpan
-                    hideShippingCost={index !== 0} // 첫번째 카트상품만 배송비 td 표시
-                  />
-                );
-              });
+              return cartItemsObjectGroupedById[shippingGroupId].map(
+                (cartItemId, index) => {
+                  const item = data.find((d) => d.id === cartItemId);
+                  if (!item) return null;
+                  return (
+                    <CartTableRow
+                      key={cartItemId}
+                      cartItem={item}
+                      rowSpan={cartItemsObjectGroupedById[shippingGroupId].length} // 동일배송그룹에 속하는 장바구니상품 개수만큼 rowSpan
+                      hideShippingCost={index !== 0} // 첫번째 카트상품만 배송비 td 표시
+                      shippingCost={totalShippingCostObjectById[shippingGroupId]}
+                    />
+                  );
+                },
+              );
             })}
           </Tbody>
         </Table>
@@ -212,11 +176,13 @@ export function CartTable(): JSX.Element {
 type CartTableItemProps = CartItemDisplayProps & {
   rowSpan?: number;
   hideShippingCost?: boolean;
+  shippingCost?: number | null;
 };
 export function CartTableRow({
   cartItem,
   rowSpan,
   hideShippingCost = false,
+  shippingCost,
 }: CartTableItemProps): JSX.Element {
   // 카트 상품 삭제
   const deleteCartItem = useCartItemDeleteMutation();
@@ -231,13 +197,24 @@ export function CartTableRow({
         <CartItemDisplay cartItem={cartItem} />
       </Td>
 
+      {/* 상품가격 */}
       <Td w="200px">
         <CartItemPriceDisplay cartItem={cartItem} />
       </Td>
 
+      {/* 배송비 */}
       {!hideShippingCost && (
         <Td w="200px" textAlign="center" rowSpan={rowSpan}>
-          <CartItemSellerInfoDisplay cartItem={cartItem} />
+          <Box color="GrayText" my={1} fontSize={{ base: 'xs', md: 'sm' }}>
+            {shippingCost ? (
+              <>
+                <Text>배송비</Text>
+                <Text>{getLocaleNumber(shippingCost)} 원</Text>
+              </>
+            ) : (
+              <Text>-</Text>
+            )}
+          </Box>
         </Td>
       )}
 
