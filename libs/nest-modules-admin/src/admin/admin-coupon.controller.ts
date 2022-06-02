@@ -50,7 +50,6 @@ export class AdminCouponController {
   /** 쿠폰 생성 */
   @Post()
   async createCoupon(@Body() dto: CouponDto): Promise<Coupon> {
-    console.log(dto);
     return this.couponService.createCoupon(dto);
   }
 

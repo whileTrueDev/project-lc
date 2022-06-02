@@ -72,6 +72,7 @@ export function CouponActionType(value: CouponLogType): JSX.Element {
         </Box>
       );
     default:
+      return <Box />;
   }
 }
 

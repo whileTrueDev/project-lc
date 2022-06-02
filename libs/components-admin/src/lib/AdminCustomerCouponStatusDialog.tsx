@@ -13,7 +13,7 @@ import {
 import { useAdminCustomerCouponPatchMutation } from '@project-lc/hooks';
 import { useState } from 'react';
 import { CouponStatus } from '@prisma/client';
-import { GridColumns, GridRowData } from '@material-ui/data-grid';
+import { GridRowData } from '@material-ui/data-grid';
 
 type AdminCustomerCouponStatusDialogProps = {
   isOpen: boolean;
