@@ -1,5 +1,7 @@
-import { IsInt, IsString } from 'class-validator';
-import { SellType } from '@prisma/client';
+import { IsIn, IsInt, IsNumber, IsOptional, IsString, ValidateIf } from 'class-validator';
+import { LiveShopping, SellType } from '@prisma/client';
+import { Type } from 'class-transformer';
+import { FindManyDto } from './findMany.dto';
 
 export class BroadcasterPurchaseDto {
   @IsInt() id: number;
@@ -17,3 +19,22 @@ export type BroacasterPurchaseWithDividedMessageDto = Omit<
   userNickname: string;
   userMessage: string;
 };
+
+export class FindBroadcasterPurchaseDto extends FindManyDto {
+  @IsOptional()
+  @IsIn(['liveShopping', 'productPromotion'])
+  @IsString()
+  by?: Exclude<SellType, 'normal'>;
+
+  @Type(() => Number)
+  @IsOptional()
+  @IsNumber()
+  @ValidateIf((obj) => obj.by === 'liveShopping')
+  liveShoppinId?: LiveShopping['id'];
+
+  @Type(() => Number)
+  @IsOptional()
+  @IsNumber()
+  @ValidateIf((obj) => obj.by === 'productPromotion')
+  productPromotionId?: LiveShopping['id'];
+}

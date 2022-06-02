@@ -1,13 +1,10 @@
-import { Box, Container } from '@chakra-ui/react';
+import { Box, Center, Spinner, Text } from '@chakra-ui/react';
 import { GridColumns, GridRowData, GridSortModel } from '@material-ui/data-grid';
 import { SellType } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { SellTypeBadge } from '@project-lc/components-shared/SellTypeBadge';
-import {
-  useDisplaySize,
-  useFmOrdersDuringLiveShoppingSalesPurchaseDone,
-  useProfile,
-} from '@project-lc/hooks';
+import { useBroadcasterPurchases, useDisplaySize, useProfile } from '@project-lc/hooks';
+import { BroadcasterPurchasesItem } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useState } from 'react';
@@ -26,32 +23,51 @@ const columns: GridColumns = [
     headerName: '판매유형',
     width: 120,
     renderCell: ({ row }: GridRowData) => {
-      return <SellTypeBadge sellType={row.sellType as SellType} lineHeight={2} />;
+      return <SellTypeBadge sellType={row.channel as SellType} lineHeight={2} />;
     },
+    sortable: false,
   },
   {
     field: 'goods_name',
     headerName: '상품명',
     width: 400,
+    renderCell: ({ row }) => {
+      const data = row as BroadcasterPurchasesItem;
+      return (
+        <Text isTruncated>
+          {data.goods.goods_name}(
+          <Text as="span" fontSize="xs">
+            {data.options.map((o) => `${o.value}${o.quantity}개`).join(',')}
+          </Text>
+          )
+        </Text>
+      );
+    },
+    sortable: false,
   },
   {
     field: 'userNickname',
     headerName: '닉네임',
     width: 140,
+    valueFormatter: ({ row }) => (row as BroadcasterPurchasesItem).support.nickname,
+    sortable: false,
   },
   {
     field: 'userMessage',
     headerName: '메세지',
     minWidth: 400,
     flex: 1,
+    valueFormatter: ({ row }) => (row as BroadcasterPurchasesItem).support.message,
+    sortable: false,
   },
   {
     field: 'settleprice',
     headerName: '금액',
     width: 120,
     valueFormatter: ({ row }) => {
-      return `${getLocaleNumber(row.settleprice)}원`;
+      return `${getLocaleNumber((row as BroadcasterPurchasesItem).order.paymentPrice)}원`;
     },
+    sortable: false,
   },
 ];
 
@@ -68,50 +84,55 @@ const mobileColumn: GridColumns = [
     field: 'userNickname',
     headerName: '닉네임',
     width: 140,
+    valueFormatter: ({ row }) => (row as BroadcasterPurchasesItem).support.nickname,
   },
   {
     field: 'settleprice',
-    headerName: ' ',
-    width: 80,
+    headerName: '금액',
+    width: 120,
     valueFormatter: ({ row }) => {
-      return `${getLocaleNumber(row.settleprice)}원`;
+      return `${getLocaleNumber((row as BroadcasterPurchasesItem).order.paymentPrice)}원`;
     },
   },
 ];
 
 export function BroadcasterPurchaseList(): JSX.Element {
-  const { data: profileData } = useProfile();
   const { isMobileSize } = useDisplaySize();
   const [pageSize, setPageSize] = useState(15);
-  const sortModel: GridSortModel = [
-    {
-      field: 'regist_date',
-      sort: 'desc',
-    },
-  ];
+  const sortModel: GridSortModel = [{ field: 'regist_date', sort: 'desc' }];
+  const { data: profileData } = useProfile();
+  const { data: purchaseData, isLoading } = useBroadcasterPurchases(profileData?.id);
 
-  const { data: purchaseData, isLoading } =
-    useFmOrdersDuringLiveShoppingSalesPurchaseDone(profileData?.id);
+  if (isLoading)
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+
+  if (!purchaseData || purchaseData.length === 0)
+    return (
+      <Box my={10}>
+        <Text>아직 현황에 표시할 데이터가 없습니다.</Text>
+      </Box>
+    );
+
   return (
     <Box>
-      {purchaseData && !isLoading && (
-        <Container maxW="1600px" p={{ base: 0, md: 8 }}>
-          <ChakraDataGrid
-            autoHeight
-            disableExtendRowFullWidth
-            pagination
-            pageSize={pageSize}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            rowsPerPageOptions={[15, 20, 30]}
-            disableSelectionOnClick
-            disableColumnMenu
-            loading={isLoading}
-            columns={isMobileSize ? mobileColumn : columns}
-            rows={purchaseData}
-            sortModel={sortModel}
-          />
-        </Container>
-      )}
+      <ChakraDataGrid
+        autoHeight
+        disableExtendRowFullWidth
+        pagination
+        pageSize={pageSize}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        rowsPerPageOptions={[15, 20, 30]}
+        disableSelectionOnClick
+        disableColumnMenu
+        loading={isLoading}
+        columns={isMobileSize ? mobileColumn : columns}
+        rows={purchaseData || []}
+        sortModel={sortModel}
+      />
     </Box>
   );
 }

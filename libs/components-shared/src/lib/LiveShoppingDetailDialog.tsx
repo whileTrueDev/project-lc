@@ -31,13 +31,13 @@ export function LiveShoppingDetailDialog(
   const { isOpen, onClose, liveShopping, type } = props;
   if (!liveShopping) return null;
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>상세정보</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          <Stack spacing={4}>
+        <ModalBody fontSize="sm">
+          <Stack spacing={2}>
             {liveShopping.seller.sellerShop && (
               <Stack direction="row" alignItems="center">
                 <Text as="span">라이브쇼핑명: </Text>
@@ -173,7 +173,7 @@ export function LiveShoppingDetailDialog(
               <Text>요청사항</Text>
               <Textarea
                 resize="none"
-                rows={10}
+                rows={4}
                 value={liveShopping.requests || ''}
                 readOnly
               />
