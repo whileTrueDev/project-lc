@@ -6,6 +6,7 @@ import {
   ShippingGroup,
   ShippingSetType,
   ShippingOptType,
+  CartItem,
 } from '@prisma/client';
 import { GoodsByIdRes } from '@project-lc/shared-types';
 import { getStandardShippingCost } from './getStandardShippingCost';
@@ -196,45 +197,25 @@ export const getAdditionalShippingCostUnlimitDelivery = (
   });
 
   return shippingCostByOptType;
-  // // 배송비 옵션 타입 : 무료, 고정인경우 1개의 추가배송옵션만 존재
-  // if (['free', 'fixed'].includes(optType)) {
-  //   result = addShippingCost(result, foundShippingOptions[0]);
-  // }
-  // // 배송비 옵션 타입 : 수량, 개수인경우
-  // if (['amount', 'cnt'].includes(optType)) {
-  //   // 주문상품 개수, 가격에 적용가능한 구간값 가진 배송옵션 찾기
-  //   const applicableOption = findApplicableOptionSection(
-  //     foundShippingOptions,
-  //     itemOption[optType],
-  //   );
-  //   result = addShippingCost(result, applicableOption);
-  // }
-  // // 배송비 옵션 타입 :수량(구간반복), 개수(구간반복)인 경우
-  // if (['amount_rep', 'cnt_rep'].includes(optType)) {
-  //   result = addRepeatShippingOptionCost({
-  //     baseCost: result,
-  //     optType,
-  //     shippingOptions: foundShippingOptions,
-  //     itemOption,
-  //   });
-  // }
-
-  // return result;
 };
 
 /** 장바구니 페이지에서 해당 배송비 정책에 부과될 배송비 계산
  * => 기본 배송세트(ShippingSet.default_yn === Y)의 배송옵션을 기준으로 계산 (주소, 배송방식 고려하지 않음)
+ *
+ * @param shippingGroup 장바구니상품에 적용된 배송비정책 shippingGroup & shippingSet & shippingOption & shippingCost
+ * @param cartItems 해당 배송비정책과 연결된 장바구니상품들 cartItem & cartItemOption
+ * @param withShippingCalculTypeFree 장바구니에 담긴 상품중 배송비정책 ShippingCalculType이 무료계산-묶음배송이 있는지 여부
  * */
 export const calculateShippingCostInCartTable = ({
   shippingGroup,
-  options,
+  cartItems,
   withShippingCalculTypeFree,
 }: {
   shippingGroup: GoodsByIdRes['ShippingGroup'];
-  options: CartItemOption[];
+  cartItems: Array<CartItem & { options: CartItemOption[] }>;
   withShippingCalculTypeFree?: boolean; // 동일 판매자의 shipping_calcul_type === 'free'인 다른 배송그룹상품과 같이 주문했는지 여부
 }): number | null => {
-  if (!options.length) return null;
+  if (!cartItems.length) return null;
 
   const {
     shipping_calcul_type,
@@ -255,16 +236,17 @@ export const calculateShippingCostInCartTable = ({
     (withShippingCalculTypeFree && shipping_calcul_free_yn);
 
   // 전체 상품옵션개수, 상품옵션가격, 상품옵션무게 총합
-  const optionsTotal = {
-    // 가격 총합
-    amount: options
-      .map((opt) => opt.discountPrice)
-      .reduce((sum, cur) => sum + Number(cur), 0),
-    // 개수 총 합
-    cnt: options.map((opt) => opt.quantity).reduce((sum, cur) => sum + cur, 0),
-    // 무게 총 합
-    weight: options.map((opt) => opt.weight).reduce((sum, cur) => sum + cur, 0),
-  };
+  const optionsTotal = cartItems
+    .flatMap((item) => item.options)
+    .reduce((total, opt) => {
+      return {
+        cnt: total.cnt ? total.cnt + opt.quantity : opt.quantity,
+        amount: total.amount
+          ? total.amount + Number(opt.discountPrice)
+          : Number(opt.discountPrice),
+        weight: total.weight ? total.weight + opt.weight : opt.weight,
+      };
+    }, {} as { cnt?: number; amount?: number; weight?: number });
 
   let shippingCostResult = 0;
 
@@ -280,23 +262,6 @@ export const calculateShippingCostInCartTable = ({
       );
     }
   }
-  // 배송비그룹 개별계산-개별배송인경우 상품 개수만큼 기본배송비와 추가배송비 부과
-  if (shipping_calcul_type === 'each') {
-    if (!isStdShippingCostFree) {
-      shippingCostResult +=
-        optionsTotal.cnt * Number(getStandardShippingCost(shippingGroup));
-    }
-    if (!isAddShippingCostFree) {
-      options.forEach((opt) => {
-        shippingCostResult +=
-          opt.quantity *
-          getAdditionalShippingCostUnlimitDelivery(
-            { amount: Number(opt.discountPrice), cnt: 1, weight: opt.weight },
-            shippingGroup,
-          );
-      });
-    }
-  }
   // 배송비그룹 무료계산-묶음배송인 경우 기본배송비는 무료, 추가배송비 1번만 부과
   if (shipping_calcul_type === 'free') {
     if (!isAddShippingCostFree) {
@@ -306,5 +271,40 @@ export const calculateShippingCostInCartTable = ({
       );
     }
   }
+  // 배송비그룹 개별계산-개별배송인경우 상품별로 기본배송비와 추가배송비 부과
+  if (shipping_calcul_type === 'each') {
+    // 장바구니 상품별로 주문가격, 개수, 무게 구한다
+    const optionsTotalByItemList = cartItems.map((item) => {
+      return {
+        cartItemId: item.id,
+        optionsTotal: item.options.reduce((total, opt) => {
+          return {
+            cnt: total.cnt ? total.cnt + opt.quantity : opt.quantity,
+            amount: total.amount
+              ? total.amount + Number(opt.discountPrice)
+              : Number(opt.discountPrice),
+            weight: total.weight ? total.weight + opt.weight : opt.weight,
+          };
+        }, {} as { cnt?: number; amount?: number; weight?: number }),
+      };
+    });
+
+    if (!isStdShippingCostFree) {
+      // 상품별로 기본배송비 부과
+      optionsTotalByItemList.forEach((_) => {
+        shippingCostResult += Number(getStandardShippingCost(shippingGroup));
+      });
+    }
+    if (!isAddShippingCostFree) {
+      // 상품별로 추가배송비 부과
+      optionsTotalByItemList.forEach((itemOptionTotal) => {
+        shippingCostResult += getAdditionalShippingCostUnlimitDelivery(
+          itemOptionTotal.optionsTotal, // 상품별 옵션 총 금액, 총 수량, 총 무게
+          shippingGroup,
+        );
+      });
+    }
+  }
+
   return shippingCostResult;
 };
