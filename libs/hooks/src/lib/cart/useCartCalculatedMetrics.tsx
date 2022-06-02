@@ -21,9 +21,15 @@ export function useCartCalculatedMetrics(): CartCalculatedMetrics {
   const selectedItems = useCartStore((s) => s.selectedItems);
 
   const { totalShippingCostObjectById } = useCartShippingGroups();
-  const totalShippingCost = Object.values(totalShippingCostObjectById)
-    .filter((v): v is number => v !== null)
-    .reduce((sum, cost) => sum + cost, 0);
+  const totalShippingCost = Object.values(totalShippingCostObjectById).reduce(
+    (sum, costObj) => {
+      if (costObj) {
+        return sum + costObj.std + costObj.add;
+      }
+      return sum;
+    },
+    0,
+  );
 
   const calculated = useMemo(() => {
     if (!data) return defaultCartCalculatedMetrics;

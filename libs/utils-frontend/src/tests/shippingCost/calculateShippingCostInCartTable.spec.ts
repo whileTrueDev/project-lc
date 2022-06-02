@@ -241,7 +241,9 @@ describe('장바구니 배송비계산', () => {
           cartItems,
           withShippingCalculTypeFree: false,
         });
-        expect(shippingCost).toBe(5000);
+        expect(shippingCost.std).toBe(2000);
+        expect(shippingCost.add).toBe(3000);
+        expect(shippingCost.add + shippingCost.std).toBe(5000);
       });
     });
 
@@ -258,7 +260,9 @@ describe('장바구니 배송비계산', () => {
           cartItems,
           withShippingCalculTypeFree: false,
         });
-        expect(shippingCost).toBe(7000);
+        expect(shippingCost.std).toBe(4000);
+        expect(shippingCost.add).toBe(3000);
+        expect(shippingCost.add + shippingCost.std).toBe(7000);
       });
     });
 
@@ -275,7 +279,9 @@ describe('장바구니 배송비계산', () => {
           cartItems,
           withShippingCalculTypeFree: false,
         });
-        expect(shippingCost).toBe(3000);
+        expect(shippingCost.std).toBe(0);
+        expect(shippingCost.add).toBe(3000);
+        expect(shippingCost.add + shippingCost.std).toBe(3000);
       });
     });
   });

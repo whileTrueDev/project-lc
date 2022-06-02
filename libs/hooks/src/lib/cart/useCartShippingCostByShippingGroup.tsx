@@ -3,13 +3,14 @@ import { useCartStore } from '@project-lc/stores';
 import {
   calculateShippingCostInCartTable,
   ShippingGroupData,
+  ShippingOptionCost,
 } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
 import { useCart } from '../queries/useCart';
 
 export function useCartShippingGroups(): {
   cartItemsObjectGroupedById: Record<number, number[]>; // { [배송비그룹id] : 장바구니상품id[], ... }
-  totalShippingCostObjectById: Record<number, number | null>; // { [배송비그룹id] : 부과되는 배송비, ... }
+  totalShippingCostObjectById: Record<number, ShippingOptionCost | null>; // { [배송비그룹id] : 부과되는 배송비 정보(기본, 추가), ... }
   shippingGroupIdList: number[];
   shippingGroupWithShopNameObject: Record<
     number,
@@ -75,25 +76,39 @@ export function useCartShippingGroups(): {
     }, result);
   }, [data]);
 
-  // 배송그룹별 표시될 배송비(selectedItems, 배송그룹정보) => 배송비 Record<배송그룹id, 배송비>
-  const totalShippingCostObjectById: Record<number, number | null> = useMemo(() => {
-    const result: Record<number, number | null> = {};
-    if (!data) return result;
-    shippingGroupIdList.forEach((id) => {
-      const shippingGroup =
-        data.find((cartItem) => cartItem.shippingGroupId === id)?.shippingGroup || null;
-      const cartItems = data.filter((item) => groupedSelectedItems[id].includes(item.id));
-      const withShippingCalculTypeFree = false; //  TODO: 다른 배송비그룹 정보 필요
+  // 배송그룹별 표시될 배송비(selectedItems, 배송그룹정보) => 배송비 Record<배송그룹id, 부과되는 배송비 정보(기본, 추가)>
+  const totalShippingCostObjectById: Record<number, ShippingOptionCost | null> =
+    useMemo(() => {
+      const result: Record<number, ShippingOptionCost | null> = {};
+      if (!data) return result;
+      shippingGroupIdList.forEach((id) => {
+        // 배송비그룹 정보
+        const shippingGroup = shippingGroupWithShopNameObject[id];
+        // 배송비그룹에 연결된 장바구니상품 정보
+        const cartItems = data.filter((item) =>
+          groupedSelectedItems[id].includes(item.id),
+        );
+        // 장바구니상품에 연결된 배송비정책 중 동일한 판매자의 배송비 정책이면서 무료계산-묶음배송 방식인 배송비 정책이 존재하는지 확인
+        const withShippingCalculTypeFree = Object.values(shippingGroupWithShopNameObject)
+          .filter(
+            (group) => group.id !== id && group.sellerId === shippingGroup?.sellerId,
+          )
+          .some((group) => group.shipping_calcul_type === 'free');
 
-      const shipcost = calculateShippingCostInCartTable({
-        shippingGroup,
-        cartItems,
-        withShippingCalculTypeFree,
+        const shippingCost = calculateShippingCostInCartTable({
+          shippingGroup,
+          cartItems,
+          withShippingCalculTypeFree,
+        });
+        result[id] = shippingCost;
       });
-      result[id] = shipcost;
-    });
-    return result;
-  }, [data, groupedSelectedItems, shippingGroupIdList]);
+      return result;
+    }, [
+      data,
+      groupedSelectedItems,
+      shippingGroupIdList,
+      shippingGroupWithShopNameObject,
+    ]);
 
   return {
     cartItemsObjectGroupedById,

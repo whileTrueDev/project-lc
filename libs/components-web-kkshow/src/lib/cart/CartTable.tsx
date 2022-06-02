@@ -150,13 +150,17 @@ export function CartTable(): JSX.Element {
                 (cartItemId, index) => {
                   const item = data.find((d) => d.id === cartItemId);
                   if (!item) return null;
+                  const shippingCostObj = totalShippingCostObjectById[shippingGroupId];
+                  const shippingCost = shippingCostObj
+                    ? shippingCostObj.std + shippingCostObj.add
+                    : null;
                   return (
                     <CartTableRow
                       key={cartItemId}
                       cartItem={item}
                       rowSpan={cartItemsObjectGroupedById[shippingGroupId].length} // 동일배송그룹에 속하는 장바구니상품 개수만큼 rowSpan
                       hideShippingCost={index !== 0} // 첫번째 카트상품만 배송비 td 표시
-                      shippingCost={totalShippingCostObjectById[shippingGroupId]}
+                      shippingCost={shippingCost}
                       shopName={shippingGroupWithShopNameObject[shippingGroupId].shopName}
                     />
                   );
@@ -172,7 +176,10 @@ export function CartTable(): JSX.Element {
           {shippingGroupIdList.map((shippingGroupId) => {
             const shopName =
               shippingGroupWithShopNameObject[shippingGroupId].shopName || '';
-            const shippingCost = totalShippingCostObjectById[shippingGroupId];
+            const shippingCostObj = totalShippingCostObjectById[shippingGroupId];
+            const shippingCost = shippingCostObj
+              ? shippingCostObj.std + shippingCostObj.add
+              : null;
             return (
               <Box key={shippingGroupId} {...boxStyle}>
                 <Box>
@@ -184,7 +191,7 @@ export function CartTable(): JSX.Element {
                 </Box>
                 <Stack direction="row" fontSize={{ base: 'xs', md: 'sm' }} my={1}>
                   <CartItemShopNameAndShippingCost
-                    shippingCost={shippingCost || null}
+                    shippingCost={shippingCost}
                     shopName={shopName}
                   />
                 </Stack>
@@ -237,7 +244,7 @@ export function CartTableRow({
           fontSize={{ base: 'xs', md: 'sm' }}
         >
           <CartItemShopNameAndShippingCost
-            shippingCost={shippingCost || null}
+            shippingCost={shippingCost}
             shopName={shopName || ''}
           />
         </Td>
@@ -408,12 +415,12 @@ export function CartItemShopNameAndShippingCost({
   shippingCost,
 }: {
   shopName: string;
-  shippingCost: number | null;
+  shippingCost?: number | null;
 }): JSX.Element {
   return (
     <>
       <Text>{shopName}</Text>
-      {shippingCost ? (
+      {shippingCost !== null ? (
         <Stack direction={{ base: 'row', sm: 'column' }} color="GrayText" my={1}>
           <Text>배송비</Text>
           <Text>{getLocaleNumber(shippingCost)} 원</Text>

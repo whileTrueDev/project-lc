@@ -219,6 +219,11 @@ function sumItemOptionValues(options: CartItemOption[]): {
   }, {} as { cnt?: number; amount?: number; weight?: number });
 }
 
+export type ShippingOptionCost = {
+  std: number; // 기본배송비
+  add: number; // 추가배송비
+};
+
 /** 장바구니 페이지에서 해당 배송비 정책에 부과될 배송비 계산
  * => 기본 배송세트(ShippingSet.default_yn === Y)의 배송옵션을 기준으로 계산 (주소, 배송방식 고려하지 않음)
  *
@@ -234,7 +239,7 @@ export const calculateShippingCostInCartTable = ({
   shippingGroup: GoodsByIdRes['ShippingGroup'];
   cartItems: Array<CartItem & { options: CartItemOption[] }>;
   withShippingCalculTypeFree?: boolean; // 동일 판매자의 shipping_calcul_type === 'free'인 다른 배송그룹상품과 같이 주문했는지 여부
-}): number | null => {
+}): ShippingOptionCost | null => {
   if (!cartItems.length) return null;
 
   const {
@@ -258,15 +263,18 @@ export const calculateShippingCostInCartTable = ({
   // 전체 상품옵션개수, 상품옵션가격, 상품옵션무게 총합
   const optionsTotal = sumItemOptionValues(cartItems.flatMap((item) => item.options));
 
-  let shippingCostResult = 0;
+  const shippingCost = {
+    std: 0,
+    add: 0,
+  };
 
   // 배송비그룹 묶음계산-무료배송인경우 기본배송비 1번만 부과, 추가배송비 1번만 부과
   if (shipping_calcul_type === 'bundle') {
     if (!isStdShippingCostFree) {
-      shippingCostResult += Number(getStandardShippingCost(shippingGroup));
+      shippingCost.std += Number(getStandardShippingCost(shippingGroup));
     }
     if (!isAddShippingCostFree) {
-      shippingCostResult += getAdditionalShippingCostUnlimitDelivery(
+      shippingCost.add += getAdditionalShippingCostUnlimitDelivery(
         optionsTotal, // 상품옵션 총 금액, 총 수량, 총 무게
         shippingGroup,
       );
@@ -275,7 +283,7 @@ export const calculateShippingCostInCartTable = ({
   // 배송비그룹 무료계산-묶음배송인 경우 기본배송비는 무료, 추가배송비 1번만 부과
   if (shipping_calcul_type === 'free') {
     if (!isAddShippingCostFree) {
-      shippingCostResult += getAdditionalShippingCostUnlimitDelivery(
+      shippingCost.add += getAdditionalShippingCostUnlimitDelivery(
         optionsTotal, // 상품옵션 총 금액, 총 수량, 총 무게
         shippingGroup,
       );
@@ -294,19 +302,18 @@ export const calculateShippingCostInCartTable = ({
     if (!isStdShippingCostFree) {
       // 상품별로 기본배송비 부과
       optionsTotalByItemList.forEach((_) => {
-        shippingCostResult += Number(getStandardShippingCost(shippingGroup));
+        shippingCost.std += Number(getStandardShippingCost(shippingGroup));
       });
     }
     if (!isAddShippingCostFree) {
       // 상품별로 추가배송비 부과
       optionsTotalByItemList.forEach((itemOptionTotal) => {
-        shippingCostResult += getAdditionalShippingCostUnlimitDelivery(
+        shippingCost.add += getAdditionalShippingCostUnlimitDelivery(
           itemOptionTotal.optionsTotal, // 상품별 옵션 총 금액, 총 수량, 총 무게
           shippingGroup,
         );
       });
     }
   }
-
-  return shippingCostResult;
+  return shippingCost;
 };
