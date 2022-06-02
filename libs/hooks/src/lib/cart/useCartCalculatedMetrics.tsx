@@ -1,7 +1,7 @@
 import { useCartStore } from '@project-lc/stores';
 import { useMemo } from 'react';
 import { useCart } from '../queries/useCart';
-import useCartShippingCostByShippingGroup from './useCartShippingCostByShippingGroup';
+import useCartShippingGroups from './useCartShippingCostByShippingGroup';
 
 interface CartCalculatedMetrics {
   totalGoodsPrice: number;
@@ -20,7 +20,7 @@ export function useCartCalculatedMetrics(): CartCalculatedMetrics {
   const { data } = useCart();
   const selectedItems = useCartStore((s) => s.selectedItems);
 
-  const { totalShippingCostObjectById } = useCartShippingCostByShippingGroup();
+  const { totalShippingCostObjectById } = useCartShippingGroups();
   const totalShippingCost = Object.values(totalShippingCostObjectById)
     .filter((v): v is number => v !== null)
     .reduce((sum, cost) => sum + cost, 0);

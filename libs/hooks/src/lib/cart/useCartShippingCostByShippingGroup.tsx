@@ -7,7 +7,7 @@ import {
 import { useMemo } from 'react';
 import { useCart } from '../queries/useCart';
 
-export function useCartShippingCostByShippingGroup(): {
+export function useCartShippingGroups(): {
   cartItemsObjectGroupedById: Record<number, number[]>; // { [배송비그룹id] : 장바구니상품id[], ... }
   totalShippingCostObjectById: Record<number, number | null>; // { [배송비그룹id] : 부과되는 배송비, ... }
   shippingGroupIdList: number[];
@@ -18,6 +18,15 @@ export function useCartShippingCostByShippingGroup(): {
 } {
   const { data } = useCart();
   const selectedItems = useCartStore((s) => s.selectedItems);
+
+  // 배송그룹 목록 배송그룹id []
+  const shippingGroupIdList = useMemo(() => {
+    if (!data) return [];
+    const idList = data
+      .map((cartItem) => cartItem.shippingGroupId)
+      .filter((id): id is number => id !== null);
+    return Array.from(new Set<number>(idList));
+  }, [data]);
 
   // 배송그룹별 카트아이템들 Record<배송그룹id, 카트상품id[]>
   const cartItemsObjectGroupedById: Record<number, number[]> = useMemo(() => {
@@ -32,12 +41,6 @@ export function useCartShippingCostByShippingGroup(): {
       return { ...obj, [cartItem.shippingGroupId]: [cartItem.id] };
     }, result);
   }, [data]);
-
-  // 배송그룹 목록 배송그룹id []
-  const shippingGroupIdList = useMemo(
-    () => Object.keys(cartItemsObjectGroupedById).map((key) => Number(key)),
-    [cartItemsObjectGroupedById],
-  );
 
   // 배송그룹별 선택된 카트아이템 Record<배송그룹id, 선택된 카트상품id[]>
   const groupedSelectedItems = useMemo(() => {
@@ -100,4 +103,4 @@ export function useCartShippingCostByShippingGroup(): {
   };
 }
 
-export default useCartShippingCostByShippingGroup;
+export default useCartShippingGroups;
