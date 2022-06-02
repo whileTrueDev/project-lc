@@ -199,6 +199,27 @@ export const getAdditionalShippingCostUnlimitDelivery = (
   return shippingCostByOptType;
 };
 
+/** 장바구니 상품옵션 목록 받아서
+ * 총 주문개수
+ * 총 주문가격
+ * 총 무게 계산
+ */
+function sumItemOptionValues(options: CartItemOption[]): {
+  cnt?: number;
+  amount?: number;
+  weight?: number;
+} {
+  return options.reduce((total, opt) => {
+    const sumOfAmount = Number(opt.discountPrice) * opt.quantity;
+    const sumOfWeight = opt.weight * opt.quantity;
+    return {
+      cnt: total.cnt ? total.cnt + opt.quantity : opt.quantity,
+      amount: total.amount ? total.amount + sumOfAmount : sumOfAmount,
+      weight: total.weight ? total.weight + sumOfWeight : sumOfWeight,
+    };
+  }, {} as { cnt?: number; amount?: number; weight?: number });
+}
+
 /** 장바구니 페이지에서 해당 배송비 정책에 부과될 배송비 계산
  * => 기본 배송세트(ShippingSet.default_yn === Y)의 배송옵션을 기준으로 계산 (주소, 배송방식 고려하지 않음)
  *
@@ -236,17 +257,7 @@ export const calculateShippingCostInCartTable = ({
     (withShippingCalculTypeFree && shipping_calcul_free_yn);
 
   // 전체 상품옵션개수, 상품옵션가격, 상품옵션무게 총합
-  const optionsTotal = cartItems
-    .flatMap((item) => item.options)
-    .reduce((total, opt) => {
-      return {
-        cnt: total.cnt ? total.cnt + opt.quantity : opt.quantity,
-        amount: total.amount
-          ? total.amount + Number(opt.discountPrice)
-          : Number(opt.discountPrice),
-        weight: total.weight ? total.weight + opt.weight : opt.weight,
-      };
-    }, {} as { cnt?: number; amount?: number; weight?: number });
+  const optionsTotal = sumItemOptionValues(cartItems.flatMap((item) => item.options));
 
   let shippingCostResult = 0;
 
@@ -277,15 +288,7 @@ export const calculateShippingCostInCartTable = ({
     const optionsTotalByItemList = cartItems.map((item) => {
       return {
         cartItemId: item.id,
-        optionsTotal: item.options.reduce((total, opt) => {
-          return {
-            cnt: total.cnt ? total.cnt + opt.quantity : opt.quantity,
-            amount: total.amount
-              ? total.amount + Number(opt.discountPrice)
-              : Number(opt.discountPrice),
-            weight: total.weight ? total.weight + opt.weight : opt.weight,
-          };
-        }, {} as { cnt?: number; amount?: number; weight?: number }),
+        optionsTotal: sumItemOptionValues(item.options),
       };
     });
 
