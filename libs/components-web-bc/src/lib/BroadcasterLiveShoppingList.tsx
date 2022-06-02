@@ -1,16 +1,15 @@
 import { ExternalLinkIcon } from '@chakra-ui/icons';
-import { Box, Button, Flex, Link, Text, Tooltip, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, Link, Text, Tooltip, useDisclosure } from '@chakra-ui/react';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { LiveShoppingDetailDialog } from '@project-lc/components-shared/LiveShoppingDetailDialog';
 import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveShoppingProgressBadge';
 import {
-  useBroadcasterFmOrdersDuringLiveShoppingSales,
   useBroadcasterLiveShoppingList,
   useDisplaySize,
   useProfile,
 } from '@project-lc/hooks';
-import { getLiveShoppingProgress } from '@project-lc/shared-types';
+import { getLiveShoppingProgress, LiveShoppingWithGoods } from '@project-lc/shared-types';
 import { liveShoppingStateBoardWindowStore } from '@project-lc/stores';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
@@ -21,7 +20,8 @@ export function BroadcasterLiveShoppingList({
   useSmallSize?: boolean;
 }): JSX.Element {
   const { data: profileData } = useProfile();
-  const [liveShoppingId, setLiveShoppingId] = useState(0);
+  const [selectedLiveShopping, setSelectedLiveShopping] =
+    useState<LiveShoppingWithGoods>();
   const [pageSize, setPageSize] = useState<number>(5);
   const { isMobileSize } = useDisplaySize();
 
@@ -29,33 +29,16 @@ export function BroadcasterLiveShoppingList({
     broadcasterId: profileData?.id,
   });
 
-  const { data: salesData, isLoading: isSalesLoading } =
-    useBroadcasterFmOrdersDuringLiveShoppingSales({
-      broadcasterId: profileData?.id,
-    });
-
   const {
     isOpen: detailIsOpen,
     onOpen: detailOnOpen,
     onClose: detailOnClose,
   } = useDisclosure();
 
-  const handleDetailOpenClick = (id: number): void => {
-    const index = tableData?.findIndex((x) => x.id === id) || 0;
-    setLiveShoppingId(index);
+  const handleDetailOpenClick = (target: LiveShoppingWithGoods): void => {
+    setSelectedLiveShopping(target);
     detailOnOpen();
   };
-
-  const liveShoppingWithSales = [];
-
-  if (tableData && salesData) {
-    for (let i = 0; i < tableData.length; i++) {
-      liveShoppingWithSales.push({
-        ...tableData[i],
-        ...salesData.find((itmInner) => itmInner.id === tableData[i].id),
-      });
-    }
-  }
 
   function StateBoardWindowOpenButton({
     shoppingProgress,
@@ -98,13 +81,7 @@ export function BroadcasterLiveShoppingList({
       sortable: false,
       disableColumnMenu: true,
       renderCell: ({ row }: GridRowData) => (
-        <Button
-          size="xs"
-          colorScheme="blue"
-          onClick={() => {
-            handleDetailOpenClick(row.id);
-          }}
-        >
+        <Button size="xs" colorScheme="blue" onClick={() => handleDetailOpenClick(row)}>
           상세보기
         </Button>
       ),
@@ -197,12 +174,12 @@ export function BroadcasterLiveShoppingList({
           row.sellEndDate ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm') : '미정'
         }`,
     },
-    {
-      headerName: '매출',
-      field: 'sales',
-      valueFormatter: ({ row }) =>
-        `${row.sales ? row.sales.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'}원`,
-    },
+    // {
+    //   headerName: '매출',
+    //   field: 'sales',
+    //   valueFormatter: ({ row }) =>
+    //     `${row.sales ? row.sales.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'}원`,
+    // },
     {
       headerName: '유튜브영상',
       field: 'liveShoppingVideo.youtubeUrl',
@@ -256,38 +233,32 @@ export function BroadcasterLiveShoppingList({
   ];
 
   return (
-    <Box minHeight={useSmallSize ? 0 : { base: 300, md: 600 }} mb={useSmallSize ? 1 : 24}>
-      {liveShoppingWithSales && (
-        <>
-          <Flex m={4}>
-            <ChakraDataGrid
-              disableExtendRowFullWidth
-              autoHeight
-              pagination
-              autoPageSize
-              pageSize={pageSize}
-              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-              rowsPerPageOptions={[5, 10, 15]}
-              disableSelectionOnClick
-              disableColumnMenu
-              disableColumnSelector
-              columns={isMobileSize ? mobileColumns : columns}
-              rows={liveShoppingWithSales}
-            />
-          </Flex>
-        </>
-      )}
+    <>
+      <Box mb={useSmallSize ? 1 : 24}>
+        <ChakraDataGrid
+          minH={{ base: 200, md: 300 }}
+          disableExtendRowFullWidth
+          autoHeight
+          pagination
+          autoPageSize
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[5, 10, 15]}
+          disableSelectionOnClick
+          disableColumnMenu
+          disableColumnSelector
+          columns={isMobileSize ? mobileColumns : columns}
+          rows={tableData || []}
+        />
 
-      {liveShoppingWithSales && liveShoppingWithSales.length !== 0 && (
         <LiveShoppingDetailDialog
-          isOpen={detailIsOpen}
+          isOpen={detailIsOpen && !!selectedLiveShopping}
           onClose={detailOnClose}
-          data={liveShoppingWithSales}
-          id={liveShoppingId}
+          liveShopping={selectedLiveShopping}
           type="broadcaster"
         />
-      )}
-    </Box>
+      </Box>
+    </>
   );
 }
 

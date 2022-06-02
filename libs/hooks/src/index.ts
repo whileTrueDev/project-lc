@@ -112,7 +112,6 @@ export * from './lib/queries/useBroadcaster';
 export * from './lib/queries/useBroadcasterAccumulatedSettlementAmount';
 export * from './lib/queries/useBroadcasterChannels';
 export * from './lib/queries/useBroadcasterContacts';
-export * from './lib/queries/useBroadcasterFmOrdersDuringLiveShoppingSales';
 export * from './lib/queries/useBroadcasterLiveShoppingList';
 export * from './lib/queries/useBroadcasterReceivableSettlementAmount';
 export * from './lib/queries/useBroadcasterSettlementHistory';

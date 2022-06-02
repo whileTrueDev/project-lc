@@ -8,6 +8,7 @@ import {
   LiveShoppingParamsDto,
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
+  LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -79,7 +80,7 @@ export class LiveShoppingService {
   }
 
   /**
-   *
+   * @deprecated
    * @author m'baku
    * @description 해당 방송인에게 매칭된 모든 라이브 쇼핑에 연결된 상품들의 fmGoodsSeq 반환받는다
    * @param broadcasterId
@@ -100,21 +101,32 @@ export class LiveShoppingService {
 
   async getBroadcasterRegisteredLiveShoppings(
     broadcasterId: number,
-  ): Promise<LiveShopping[]> {
+  ): Promise<LiveShoppingWithGoods[]> {
     // 자신의 id를 반환하는 쿼리 수행하기
     return this.prisma.liveShopping.findMany({
-      where: {
-        broadcasterId: Number(broadcasterId),
-      },
+      where: { broadcasterId },
       include: {
-        goods: { select: { goods_name: true, summary: true } },
+        goods: {
+          select: { goods_name: true, summary: true, image: true, options: true },
+        },
         seller: { select: { sellerShop: true } },
         broadcaster: {
-          select: { userNickname: true, channels: true },
+          select: {
+            id: true,
+            userName: true,
+            userNickname: true,
+            email: true,
+            avatar: true,
+            BroadcasterPromotionPage: true,
+            channels: true,
+          },
         },
-        liveShoppingVideo: { select: { youtubeUrl: true } },
+        liveShoppingVideo: {
+          select: { youtubeUrl: true },
+        },
+        images: true,
       },
-      orderBy: [{ sellStartDate: 'desc' }, { id: 'desc' }],
+      orderBy: { createDate: 'desc' },
     });
   }
 
@@ -156,7 +168,9 @@ export class LiveShoppingService {
     });
   }
 
-  /** 특정 라이브 쇼핑의 현황(응원메시지 데이터) 조회 - 생성일 내림차순 조회(최신순)
+  /**
+   * @deprecated
+   * 특정 라이브 쇼핑의 현황(응원메시지 데이터) 조회 - 생성일 내림차순 조회(최신순)
    * @param liveShoppingId 라이브쇼핑 고유id
    */
   /** 해당 fmGoodsSeq가 라이브쇼핑에 등록되어 있으면 true를 반환 */
@@ -169,6 +183,7 @@ export class LiveShoppingService {
   }
 
   /**
+   * @deprecated
    * 전달된 fmGoodsSeq 배열에 해당하는 라이브쇼핑 목록 정보 조회
    * @param fmGoodsSeqs 퍼스트몰 상품 고유번호 fmGoodsSeq 배열 (liveShopping.fmGoodsSeq)
    */

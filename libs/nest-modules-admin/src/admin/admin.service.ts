@@ -293,6 +293,7 @@ export class AdminService {
             email: true,
             avatar: true,
             BroadcasterPromotionPage: true,
+            channels: true,
           },
         },
         liveShoppingVideo: {

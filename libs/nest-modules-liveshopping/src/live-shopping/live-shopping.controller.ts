@@ -23,6 +23,7 @@ import {
   ApprovedGoodsNameAndId,
   LiveShoppingParamsDto,
   LiveShoppingRegistDTO,
+  LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
 import { LiveShoppingService } from './live-shopping.service';
 import { PurchaseMessageService } from './purchase-message.service';
@@ -74,7 +75,7 @@ export class LiveShoppingController {
   @Get('/broadcaster')
   getBroadcasterLiveShoppings(
     @Query('broadcasterId', ParseIntPipe) broadcasterId: number,
-  ): Promise<LiveShopping[]> {
+  ): Promise<LiveShoppingWithGoods[]> {
     return this.liveShoppingService.getBroadcasterRegisteredLiveShoppings(broadcasterId);
   }
 

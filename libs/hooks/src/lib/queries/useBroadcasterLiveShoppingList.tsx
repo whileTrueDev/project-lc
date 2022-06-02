@@ -6,7 +6,7 @@ import axios from '../../axios';
 // return type any로 안하면 리액트 테이블에서 컬럼 린트 에러 발생
 export const getBroadcasterLiveShoppingList = async (
   broadcasterId: number | undefined,
-): Promise<any[]> => {
+): Promise<LiveShoppingWithGoods[]> => {
   return axios
     .get<LiveShoppingWithGoods[]>('/live-shoppings/broadcaster', {
       params: {
