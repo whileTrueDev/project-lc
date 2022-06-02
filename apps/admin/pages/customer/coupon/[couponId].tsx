@@ -8,6 +8,7 @@ import {
   Heading,
   Badge,
   Box,
+  Flex,
 } from '@chakra-ui/react';
 import AdminPageLayout from '@project-lc/components-admin/AdminPageLayout';
 import {
@@ -231,8 +232,12 @@ export function CouponManage(): JSX.Element {
           </ConfirmDialog>
         </GridItem>
         <GridItem colSpan={1}>
-          <Button onClick={issueAllOnOpen}>일괄발급</Button>
-          <Heading size="lg">고객 목록</Heading>
+          <Flex justifyContent="space-between">
+            <Heading size="lg">고객 목록</Heading>
+            <Button onClick={issueAllOnOpen} colorScheme="blue">
+              일괄발급
+            </Button>
+          </Flex>
           {data && (
             <ChakraDataGrid
               rows={customerData || []}
@@ -241,6 +246,7 @@ export function CouponManage(): JSX.Element {
               density="compact"
             />
           )}
+
           <ConfirmDialog
             title="발급확인"
             isOpen={issueIsOpen}
