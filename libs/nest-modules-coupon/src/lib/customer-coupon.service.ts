@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CustomerCoupon, CouponLogType } from '@prisma/client';
+import { CustomerCoupon, CouponLogType, Customer } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { CustomerCouponDto, CouponStatusDto } from '@project-lc/shared-types';
 
@@ -40,6 +40,19 @@ export class CustomerCouponService {
     return this.prismaService.customerCoupon.create({
       data: { logs: { create: { type: 'issue' } }, ...dto },
     });
+  }
+
+  async createAllCustomerCoupon(
+    dto: CustomerCouponDto,
+    customers: Customer[],
+  ): Promise<number> {
+    const target = customers.map((item) => {
+      return { customerId: item.id, couponId: dto.couponId, status: dto.status };
+    });
+    const result = await this.prismaService.customerCoupon.createMany({
+      data: target,
+    });
+    return result.count;
   }
 
   /** 특정 소비자에게 발급된 쿠폰 상태 변경 */

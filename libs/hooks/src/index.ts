@@ -91,6 +91,7 @@ export * from './lib/queries/useAdminBroadcasterSettlementHistoriesByRound';
 export * from './lib/queries/useAdminBroadcasterSettlementInfoList';
 export * from './lib/queries/useAdminCategory';
 export * from './lib/queries/useAdminCoupon';
+export * from './lib/queries/useAdminCouponHistory';
 export * from './lib/queries/useAdminCustomer';
 export * from './lib/queries/useAdminCustomerCoupon';
 export * from './lib/queries/useAdminDuplicatePromotionPageFlag';

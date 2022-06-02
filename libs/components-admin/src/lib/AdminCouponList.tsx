@@ -1,16 +1,26 @@
-import { Box, Button, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, useDisclosure, useToast, Text } from '@chakra-ui/react';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
-import { useAdminCouponList } from '@project-lc/hooks';
+import { useAdminCouponList, useAdminCouponDeleteMutation } from '@project-lc/hooks';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
+import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { AdminCouponListDetailDialog } from './AdminCouponListDetailDialog';
 
 export function AdminCouponList(): JSX.Element {
+  const toast = useToast();
   const { data } = useAdminCouponList();
+  const { mutateAsync } = useAdminCouponDeleteMutation();
   const [couponDetail, setCouponDetail] = useState<GridRowData>();
+  const [couponToDelete, setCouponToDelete] = useState<GridRowData>();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: deleteIsOpen,
+    onOpen: deleteOnOpen,
+    onClose: deleteOnClose,
+  } = useDisclosure();
+
   const router = useRouter();
   const columns: GridColumns = [
     { field: 'id', headerName: 'id' },
@@ -83,6 +93,15 @@ export function AdminCouponList(): JSX.Element {
         </Button>
       ),
     },
+    {
+      field: 'delete',
+      headerName: '삭제',
+      renderCell: ({ row }: GridRowData) => (
+        <Button size="xs" onClick={() => handleCouponDeleteClick(row)}>
+          삭제
+        </Button>
+      ),
+    },
   ];
 
   const handleButtonClick = (row: GridRowData): void => {
@@ -93,6 +112,27 @@ export function AdminCouponList(): JSX.Element {
   const handleSettingClick = (row: GridRowData): void => {
     router.push(`coupon/${row.id}`);
   };
+
+  const handleCouponDeleteClick = (row: GridRowData): void => {
+    setCouponToDelete(row);
+    deleteOnOpen();
+  };
+
+  const handleCouponDelete = (): Promise<void> =>
+    mutateAsync(couponToDelete?.id)
+      .then(() => {
+        toast({
+          description: '삭제완료',
+          status: 'success',
+        });
+        deleteOnClose();
+      })
+      .catch(() => {
+        toast({
+          description: '삭제실패',
+          status: 'error',
+        });
+      });
   return (
     <Box>
       <ChakraDataGrid density="compact" rows={data || []} columns={columns} minH={500} />
@@ -101,6 +141,14 @@ export function AdminCouponList(): JSX.Element {
         onClose={onClose}
         data={couponDetail}
       />
+      <ConfirmDialog
+        title="일괄발급확인"
+        isOpen={deleteIsOpen}
+        onClose={deleteOnClose}
+        onConfirm={handleCouponDelete}
+      >
+        <Text>삭제하시겠습니까?</Text>
+      </ConfirmDialog>
     </Box>
   );
 }

@@ -9,6 +9,46 @@ type CustomerCouponWithoutCustomerIdAndCustomerId = Omit<
   'customerId' | 'couponId'
 >;
 
+export const useAdminCustomerCouponPostMutation = (): UseMutationResult<
+  CustomerCoupon,
+  AxiosError,
+  CustomerCouponDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<CustomerCoupon, AxiosError, CustomerCouponDto>(
+    (dto: CustomerCouponDto) => {
+      return axios
+        .post<CustomerCoupon>('/admin/customer-coupon', dto)
+        .then((res) => res.data);
+    },
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('AdminCustomerCoupon', { refetchInactive: true });
+      },
+    },
+  );
+};
+
+export const useAdminAllCustomerCouponPostMutation = (): UseMutationResult<
+  number,
+  AxiosError,
+  CustomerCouponDto
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<number, AxiosError, CustomerCouponDto>(
+    (dto: CustomerCouponDto) => {
+      return axios
+        .post<number>('/admin/customer-coupon/all', dto)
+        .then((res) => res.data);
+    },
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('AdminCustomerCoupon', { refetchInactive: true });
+      },
+    },
+  );
+};
+
 export const useAdminCustomerCouponPatchMutation = (): UseMutationResult<
   CustomerCoupon,
   AxiosError,

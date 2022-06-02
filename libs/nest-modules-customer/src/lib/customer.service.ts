@@ -43,7 +43,17 @@ export class CustomerService {
 
   /** 모든 소비자 정보 조회 */
   public async findAll(opts?: Prisma.CustomerFindManyArgs): Promise<Customer[]> {
-    const { take, skip, orderBy, include } = opts;
+    let take;
+    let skip;
+    let orderBy;
+    let include;
+    if (opts) {
+      take = opts.take || undefined;
+      skip = opts.skip || undefined;
+      orderBy = opts.orderBy || undefined;
+      include = opts.include || undefined;
+    }
+
     return this.prisma.customer.findMany({ take, skip, orderBy, include });
   }
 

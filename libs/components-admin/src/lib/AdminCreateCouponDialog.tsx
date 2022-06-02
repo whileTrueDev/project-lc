@@ -20,6 +20,7 @@ import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { AmountUnit, DiscountApplyType, DiscountApplyField } from '@prisma/client';
 import { useAdminCouponMutation } from '@project-lc/hooks';
 import { CouponDto } from '@project-lc/shared-types';
+
 import { AdminCreateCouponConfirmDialog } from './AdminCreateCouponConfirmDialog';
 
 type AdminCreateCouponDialogProps = {
@@ -56,8 +57,8 @@ export function AdminCreateCouponDialog(
       maxDiscountAmountWon: 0,
       minOrderAmountWon: 0,
       name: '',
-      startDate: new Date(),
-      endDate: new Date(),
+      startDate: undefined,
+      endDate: undefined,
       applyField: 'goods',
       applyType: 'allGoods',
       memo: '',

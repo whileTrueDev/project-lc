@@ -4,6 +4,12 @@ import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from '@project-lc/components-core/ConfirmDialog';
+import dayjs from 'dayjs';
+import {
+  DiscountUnitTransformer,
+  DiscountApplyFieldTransformer,
+  DiscountApplyTypeTransformer,
+} from '@project-lc/utils-frontend';
 import { CreateCouponData } from './AdminCreateCouponDialog';
 
 export function AdminCreateCouponConfirmDialog(
@@ -20,14 +26,14 @@ export function AdminCreateCouponConfirmDialog(
       onClose={onClose}
       onConfirm={onConfirm}
     >
-      <Box>
+      <Flex direction="column" gap={3} minHeight={500}>
         <Flex direction="column">
           <Text>쿠폰이름</Text>
           <Text bgColor="yellow.100">{getValues('name')}</Text>
         </Flex>
         <Flex direction="column">
           <Text>할인방법</Text>
-          <Text bgColor="yellow.100">{getValues('unit')}</Text>
+          <Text bgColor="yellow.100">{DiscountUnitTransformer(getValues('unit'))}</Text>
         </Flex>
         <Flex direction="column">
           <Text>할인액(할인율)</Text>
@@ -35,19 +41,31 @@ export function AdminCreateCouponConfirmDialog(
         </Flex>
         <Flex direction="column">
           <Text>쿠폰 할인 영역</Text>
-          <Text bgColor="yellow.100">{getValues('applyField')}</Text>
+          <Text bgColor="yellow.100">
+            {DiscountApplyFieldTransformer(getValues('applyField'))}
+          </Text>
         </Flex>
         <Flex direction="column">
           <Text>할인 상품 범주</Text>
-          <Text bgColor="yellow.100">{getValues('applyType')}</Text>
+          <Text bgColor="yellow.100">
+            {DiscountApplyTypeTransformer(getValues('applyType'))}
+          </Text>
         </Flex>
         <Flex direction="column">
           <Text>시작날짜</Text>
-          <Text bgColor="yellow.100">{getValues('startDate')}</Text>
+          <Text bgColor="yellow.100">
+            {getValues('startDate')
+              ? dayjs(getValues('startDate')).format('YYYY-MM-DD HH:mm:ss')
+              : '시작날짜를 입력하세요'}
+          </Text>
         </Flex>
         <Flex direction="column">
           <Text>종료날짜</Text>
-          <Text bgColor="yellow.100">{getValues('endDate')}</Text>
+          <Text bgColor="yellow.100">
+            {getValues('endDate')
+              ? dayjs(getValues('endDate')).format('YYYY-MM-DD HH:mm:ss')
+              : ''}
+          </Text>
         </Flex>
         <Flex direction="column">
           <Text>최대할인금액</Text>
@@ -61,7 +79,7 @@ export function AdminCreateCouponConfirmDialog(
           <Text>메모</Text>
           <Text bgColor="yellow.100">{getValues('memo')}</Text>
         </Flex>
-      </Box>
+      </Flex>
     </ConfirmDialog>
   );
 }

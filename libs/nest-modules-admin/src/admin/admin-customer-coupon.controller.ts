@@ -17,13 +17,17 @@ import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
 import { CouponStatusDto, CustomerCouponDto } from '@project-lc/shared-types';
+import { CustomerService } from '@project-lc/nest-modules-customer';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('customer-coupon')
 @Controller('admin/customer-coupon')
 export class AdminCustomerCouponController {
-  constructor(private readonly customerCouponService: CustomerCouponService) {}
+  constructor(
+    private readonly customerCouponService: CustomerCouponService,
+    private readonly customerService: CustomerService,
+  ) {}
 
   /** 모든 소비자 또는 특정 소비자의 모든 쿠폰 목록 조회 */
   @Get()
@@ -42,6 +46,15 @@ export class AdminCustomerCouponController {
     @Body(ValidationPipe) dto: CustomerCouponDto,
   ): Promise<CustomerCoupon> {
     return this.customerCouponService.createCustomerCoupon(dto);
+  }
+
+  /** 쿠폰을 특정 소비자에게 발급 */
+  @Post('/all')
+  async createAllCustomerCoupon(
+    @Body(ValidationPipe) dto: CustomerCouponDto,
+  ): Promise<number> {
+    const customers = await this.customerService.findAll();
+    return this.customerCouponService.createAllCustomerCoupon(dto, customers);
   }
 
   /** 특정 소비자에게 발급된 쿠폰 목록 조회 */

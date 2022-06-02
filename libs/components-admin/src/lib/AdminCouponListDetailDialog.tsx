@@ -13,6 +13,11 @@ import {
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import { GridRowData } from '@material-ui/data-grid';
+import {
+  DiscountUnitTransformer,
+  DiscountApplyFieldTransformer,
+  DiscountApplyTypeTransformer,
+} from '@project-lc/utils-frontend';
 
 type AdminCouponListDetailDialogProps = {
   isOpen: boolean;
@@ -33,14 +38,14 @@ export function AdminCouponListDetailDialog(
           <ModalCloseButton />
           <ModalBody>
             {data && (
-              <Box>
+              <Flex direction="column" gap={3} minHeight={500}>
                 <Flex direction="column">
                   <Text>쿠폰이름</Text>
                   <Text bgColor="yellow.100">{data.name}</Text>
                 </Flex>
                 <Flex direction="column">
                   <Text>할인방법</Text>
-                  <Text bgColor="yellow.100">{data.unit}</Text>
+                  <Text bgColor="yellow.100">{DiscountUnitTransformer(data.unit)}</Text>
                 </Flex>
                 <Flex direction="column">
                   <Text>할인액(할인율)</Text>
@@ -48,11 +53,15 @@ export function AdminCouponListDetailDialog(
                 </Flex>
                 <Flex direction="column">
                   <Text>쿠폰 할인 영역</Text>
-                  <Text bgColor="yellow.100">{data.applyField}</Text>
+                  <Text bgColor="yellow.100">
+                    {DiscountApplyFieldTransformer(data.applyField)}
+                  </Text>
                 </Flex>
                 <Flex direction="column">
                   <Text>할인 상품 범주</Text>
-                  <Text bgColor="yellow.100">{data.applyType}</Text>
+                  <Text bgColor="yellow.100">
+                    {DiscountApplyTypeTransformer(data.applyType)}
+                  </Text>
                 </Flex>
                 <Flex direction="column">
                   <Text>시작날짜</Text>
@@ -78,7 +87,7 @@ export function AdminCouponListDetailDialog(
                   <Text>메모</Text>
                   <Text bgColor="yellow.100">{data.memo}</Text>
                 </Flex>
-              </Box>
+              </Flex>
             )}
           </ModalBody>
 
