@@ -1,5 +1,9 @@
+import { SellerShop } from '@prisma/client';
 import { useCartStore } from '@project-lc/stores';
-import { calculateShippingCostInCartTable } from '@project-lc/utils-frontend';
+import {
+  calculateShippingCostInCartTable,
+  ShippingGroupData,
+} from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
 import { useCart } from '../queries/useCart';
 
@@ -7,6 +11,10 @@ export function useCartShippingCostByShippingGroup(): {
   cartItemsObjectGroupedById: Record<number, number[]>; // { [배송비그룹id] : 장바구니상품id[], ... }
   totalShippingCostObjectById: Record<number, number | null>; // { [배송비그룹id] : 부과되는 배송비, ... }
   shippingGroupIdList: number[];
+  shippingGroupWithShopNameObject: Record<
+    number,
+    ShippingGroupData & { shopName: SellerShop['shopName'] }
+  >;
 } {
   const { data } = useCart();
   const selectedItems = useCartStore((s) => s.selectedItems);
@@ -43,6 +51,27 @@ export function useCartShippingCostByShippingGroup(): {
     return obj;
   }, [cartItemsObjectGroupedById, selectedItems, shippingGroupIdList]);
 
+  // 배송그룹 정보 & 상점정보
+  const shippingGroupWithShopNameObject = useMemo(() => {
+    const result: Record<
+      number,
+      ShippingGroupData & { shopName: SellerShop['shopName'] }
+    > = {};
+    if (!data) return result;
+
+    return data.reduce((obj, cartItem) => {
+      if (!cartItem.shippingGroupId || obj[cartItem.shippingGroupId]) return obj;
+
+      return {
+        ...obj,
+        [cartItem.shippingGroupId]: {
+          ...cartItem.shippingGroup,
+          shopName: cartItem.goods.seller.sellerShop?.shopName,
+        },
+      };
+    }, result);
+  }, [data]);
+
   // 배송그룹별 표시될 배송비(selectedItems, 배송그룹정보) => 배송비 Record<배송그룹id, 배송비>
   const totalShippingCostObjectById: Record<number, number | null> = useMemo(() => {
     const result: Record<number, number | null> = {};
@@ -67,6 +96,7 @@ export function useCartShippingCostByShippingGroup(): {
     cartItemsObjectGroupedById,
     totalShippingCostObjectById,
     shippingGroupIdList,
+    shippingGroupWithShopNameObject,
   };
 }
 

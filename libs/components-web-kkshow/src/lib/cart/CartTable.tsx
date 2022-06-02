@@ -72,8 +72,12 @@ export function CartTable(): JSX.Element {
   }, [handleSelectAll, data]);
 
   // 배송비정책별 장바구니 상품, 배송비정책 별 배송비, 배송비정책 id 목록
-  const { cartItemsObjectGroupedById, totalShippingCostObjectById, shippingGroupIdList } =
-    useCartShippingCostByShippingGroup();
+  const {
+    cartItemsObjectGroupedById,
+    totalShippingCostObjectById,
+    shippingGroupIdList,
+    shippingGroupWithShopNameObject,
+  } = useCartShippingCostByShippingGroup();
 
   if (isLoading)
     return (
@@ -99,6 +103,7 @@ export function CartTable(): JSX.Element {
         <Text fontSize="lg">
           총 선택된 상품 {selectedItems.length} / {data.length}
         </Text>
+        <Text fontSize="lg">{JSON.stringify(shippingGroupWithShopNameObject)}</Text>
       </Box>
 
       <Box py={6}>
@@ -154,6 +159,7 @@ export function CartTable(): JSX.Element {
                       rowSpan={cartItemsObjectGroupedById[shippingGroupId].length} // 동일배송그룹에 속하는 장바구니상품 개수만큼 rowSpan
                       hideShippingCost={index !== 0} // 첫번째 카트상품만 배송비 td 표시
                       shippingCost={totalShippingCostObjectById[shippingGroupId]}
+                      shopName={shippingGroupWithShopNameObject[shippingGroupId].shopName}
                     />
                   );
                 },
@@ -177,12 +183,14 @@ type CartTableItemProps = CartItemDisplayProps & {
   rowSpan?: number;
   hideShippingCost?: boolean;
   shippingCost?: number | null;
+  shopName?: string;
 };
 export function CartTableRow({
   cartItem,
   rowSpan,
   hideShippingCost = false,
   shippingCost,
+  shopName,
 }: CartTableItemProps): JSX.Element {
   // 카트 상품 삭제
   const deleteCartItem = useCartItemDeleteMutation();
@@ -204,8 +212,14 @@ export function CartTableRow({
 
       {/* 배송비 */}
       {!hideShippingCost && (
-        <Td w="200px" textAlign="center" rowSpan={rowSpan}>
-          <Box color="GrayText" my={1} fontSize={{ base: 'xs', md: 'sm' }}>
+        <Td
+          w="200px"
+          textAlign="center"
+          rowSpan={rowSpan}
+          fontSize={{ base: 'xs', md: 'sm' }}
+        >
+          <Text>{shopName}</Text>
+          <Box color="GrayText" my={1}>
             {shippingCost ? (
               <>
                 <Text>배송비</Text>
