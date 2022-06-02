@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Coupon } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { CouponDto } from '@project-lc/shared-types';
+import { GoodsService } from '@project-lc/nest-modules-goods';
 
 @Injectable()
 export class CouponService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly goodsService: GoodsService,
+  ) {}
 
   /** 쿠폰 상세조회 */
   findCoupon(couponId: number): Promise<Coupon> {
@@ -31,16 +35,41 @@ export class CouponService {
 
   /** 쿠폰 목록 조회 */
   findCoupons(): Promise<Coupon[]> {
-    return this.prismaService.coupon.findMany();
+    return this.prismaService.coupon.findMany({
+      include: {
+        goods: true,
+      },
+    });
   }
 
   /** 쿠폰 생성 */
-  createCoupon(dto: CouponDto): Promise<Coupon> {
+  async createCoupon(dto: CouponDto): Promise<Coupon> {
+    let goodsList;
+
+    if (dto.applyType === 'allGoods') {
+      goodsList = await this.goodsService
+        .findAllConfirmedLcGoodsListWithCategory()
+        .then((item) => item.map((value) => ({ id: value.id })));
+    } else if (dto.applyType === 'exceptSelectedGoods') {
+      goodsList = await this.goodsService
+        .findAllConfirmedLcGoodsListWithCategory()
+        .then((item) =>
+          item
+            .map((value) => !dto.goods.includes(value.id) && { id: value.id })
+            .filter(Boolean),
+        );
+    } else {
+      goodsList = dto.goods.map((item) => ({ id: item }));
+    }
+
     return this.prismaService.coupon.create({
       data: {
         ...dto,
         startDate: new Date(dto.startDate),
-        endDate: new Date(dto.endDate),
+        endDate: dto.endDate ? new Date(dto.endDate) : undefined,
+        goods: {
+          connect: goodsList,
+        },
       },
     });
   }

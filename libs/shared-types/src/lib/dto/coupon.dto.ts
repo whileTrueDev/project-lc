@@ -5,9 +5,11 @@ import {
   IsEnum,
   IsBoolean,
   IsDate,
+  IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { AmountUnit, DiscountApplyField, DiscountApplyType } from '@prisma/client';
+import { AmountUnit, DiscountApplyField, DiscountApplyType, Goods } from '@prisma/client';
+import { GridRowId, GridRowData, GridSelectionModel } from '@material-ui/data-grid';
 
 export class CouponDto {
   @IsOptional()
@@ -53,4 +55,8 @@ export class CouponDto {
   @IsOptional()
   @IsBoolean()
   concurrentFlag?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  goods?: Goods['id'][];
 }

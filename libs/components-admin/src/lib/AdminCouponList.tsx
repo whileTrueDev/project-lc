@@ -70,7 +70,7 @@ export function AdminCouponList(): JSX.Element {
       field: 'endDate',
       headerName: '종료일',
       valueFormatter: ({ row }: GridRowData) =>
-        dayjs(row.endDate).format('YYYY-MM-DD HH:mm:ss'),
+        row.endDate ? dayjs(row.endDate).format('YYYY-MM-DD HH:mm:ss') : '미정',
       flex: 1,
     },
     { field: 'maxDiscountAmountWon', headerName: '최대할인액', flex: 1 },
