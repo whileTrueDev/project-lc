@@ -9,7 +9,6 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AmountUnit, DiscountApplyField, DiscountApplyType, Goods } from '@prisma/client';
-import { GridRowId, GridRowData, GridSelectionModel } from '@material-ui/data-grid';
 
 export class CouponDto {
   @IsOptional()

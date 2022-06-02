@@ -7,6 +7,11 @@ import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { AdminCouponListDetailDialog } from './AdminCouponListDetailDialog';
+import {
+  DiscountUnitBage,
+  DiscountApplyFieldBadge,
+  DiscountApplyTypeBadge,
+} from './AdminCouponListBadge';
 
 export function AdminCouponList(): JSX.Element {
   const toast = useToast();
@@ -28,29 +33,17 @@ export function AdminCouponList(): JSX.Element {
     {
       field: 'unit',
       headerName: '할인유형',
-      valueFormatter: ({ row }: GridRowData) => (row.unit === 'P' ? '원' : '퍼센트'),
+      renderCell: ({ row }: GridRowData) => DiscountUnitBage(row.unit),
     },
     {
       field: 'applyField',
       headerName: '유형',
-      valueFormatter: ({ row }: GridRowData) =>
-        row.applyField === 'goods' ? '상품할인' : '배송비할인',
+      renderCell: ({ row }: GridRowData) => DiscountApplyFieldBadge(row.applyField),
     },
     {
       field: 'applyType',
       headerName: '범위',
-      valueFormatter: ({ row }: GridRowData) => {
-        switch (row.applyType) {
-          case 'selectedGoods':
-            return '선택된상품만';
-          case 'exceptSelectedGoods':
-            return '특성상품제외';
-          case 'allGoods':
-            return '모든상품';
-          default:
-            return '';
-        }
-      },
+      renderCell: ({ row }: GridRowData) => DiscountApplyTypeBadge(row.applyType),
     },
     {
       field: 'createDate',
@@ -79,7 +72,7 @@ export function AdminCouponList(): JSX.Element {
       field: 'detail',
       headerName: '상세보기',
       renderCell: ({ row }: GridRowData) => (
-        <Button size="xs" onClick={() => handleButtonClick(row)}>
+        <Button size="xs" colorScheme="blue" onClick={() => handleButtonClick(row)}>
           상세보기
         </Button>
       ),
@@ -88,7 +81,7 @@ export function AdminCouponList(): JSX.Element {
       field: 'setting',
       headerName: '상세보기',
       renderCell: ({ row }: GridRowData) => (
-        <Button size="xs" onClick={() => handleSettingClick(row)}>
+        <Button size="xs" colorScheme="green" onClick={() => handleSettingClick(row)}>
           관리
         </Button>
       ),
@@ -97,7 +90,7 @@ export function AdminCouponList(): JSX.Element {
       field: 'delete',
       headerName: '삭제',
       renderCell: ({ row }: GridRowData) => (
-        <Button size="xs" onClick={() => handleCouponDeleteClick(row)}>
+        <Button size="xs" colorScheme="red" onClick={() => handleCouponDeleteClick(row)}>
           삭제
         </Button>
       ),

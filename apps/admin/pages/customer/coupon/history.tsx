@@ -37,13 +37,13 @@ export function History(): JSX.Element {
   const { data } = useAdminCouponHistory();
   return (
     <AdminPageLayout>
-      <Box>
+      <Box mb={1}>
         <Button
           onClick={() => {
             router.push('/customer/coupon');
           }}
         >
-          쿠폰목록으로 돌아가기
+          {'< 쿠폰목록'}
         </Button>
       </Box>
       <ChakraDataGrid rows={data || []} columns={columns} minH={500} />

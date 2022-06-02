@@ -14,13 +14,13 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
-import { GridRowData, GridColumns, GridToolbar } from '@material-ui/data-grid';
-import {
-  DiscountUnitTransformer,
-  DiscountApplyFieldTransformer,
-  DiscountApplyTypeTransformer,
-} from '@project-lc/utils-frontend';
+import { GridRowData, GridColumns } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
+import {
+  DiscountUnitBage,
+  DiscountApplyFieldBadge,
+  DiscountApplyTypeBadge,
+} from './AdminCouponListBadge';
 
 const columns: GridColumns = [
   { field: 'id', headerName: 'id', width: 10 },
@@ -52,39 +52,33 @@ export function AdminCouponListDetailDialog(
                   <Flex direction="column" gap={3} minHeight={500}>
                     <Flex direction="column">
                       <Text>쿠폰이름</Text>
-                      <Text bgColor="yellow.100">{data.name}</Text>
+                      <Text fontWeight="bold">{data.name}</Text>
                     </Flex>
                     <Flex direction="column">
                       <Text>할인방법</Text>
-                      <Text bgColor="yellow.100">
-                        {DiscountUnitTransformer(data.unit)}
-                      </Text>
+                      {DiscountUnitBage(data.unit)}
                     </Flex>
                     <Flex direction="column">
                       <Text>할인액(할인율)</Text>
-                      <Text bgColor="yellow.100">{data.amount}</Text>
+                      <Text fontWeight="bold">{data.amount}</Text>
                     </Flex>
                     <Flex direction="column">
                       <Text>쿠폰 할인 영역</Text>
-                      <Text bgColor="yellow.100">
-                        {DiscountApplyFieldTransformer(data.applyField)}
-                      </Text>
+                      {DiscountApplyFieldBadge(data.applyField)}
                     </Flex>
                     <Flex direction="column">
                       <Text>할인 상품 범주</Text>
-                      <Text bgColor="yellow.100">
-                        {DiscountApplyTypeTransformer(data.applyType)}
-                      </Text>
+                      {DiscountApplyTypeBadge(data.applyType)}
                     </Flex>
                     <Flex direction="column">
                       <Text>시작날짜</Text>
-                      <Text bgColor="yellow.100">
+                      <Text fontWeight="bold">
                         {dayjs(data.startDate).format('YYYY-MM-DD HH:mm:ss')}
                       </Text>
                     </Flex>
                     <Flex direction="column">
                       <Text>종료날짜</Text>
-                      <Text bgColor="yellow.100">
+                      <Text fontWeight="bold">
                         {data.endDate
                           ? dayjs(data.endDate).format('YYYY-MM-DD HH:mm:ss')
                           : '미정'}
@@ -92,15 +86,15 @@ export function AdminCouponListDetailDialog(
                     </Flex>
                     <Flex direction="column">
                       <Text>최대할인금액</Text>
-                      <Text bgColor="yellow.100">{data.maxDiscountAmountWon}</Text>
+                      <Text fontWeight="bold">{data.maxDiscountAmountWon}</Text>
                     </Flex>
                     <Flex direction="column">
                       <Text>최소주문액</Text>
-                      <Text bgColor="yellow.100">{data.minOrderAmountWon}</Text>
+                      <Text fontWeight="bold">{data.minOrderAmountWon}</Text>
                     </Flex>
                     <Flex direction="column">
                       <Text>메모</Text>
-                      <Text bgColor="yellow.100">{data.memo}</Text>
+                      <Text fontWeight="bold">{data.memo}</Text>
                     </Flex>
                   </Flex>
                 )}
