@@ -1,17 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { Broadcaster } from '@prisma/client';
+import { Broadcaster, Export } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { BroadcasterSettlementTargets, FindManyDto } from '@project-lc/shared-types';
+import { calcBcSettlementTotalInfo } from '@project-lc/utils';
 
 @Injectable()
 export class BroadcasterSettlementService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private async findAlreadySettled(
+    broadcasterId: Broadcaster['id'],
+  ): Promise<Export['exportCode'][]> {
+    return this.prisma.broadcasterSettlementItems
+      .findMany({
+        select: { exportCode: true },
+        where: { settlements: { broadcasterId } },
+      })
+      .then((r) => r.map((_) => _.exportCode));
+  }
+
   /** 현재 정산 예정 금액 조회 */
   public async getReceivableAmount(broadcasterId: Broadcaster['id']): Promise<number> {
+    const alreadySettled = await this.findAlreadySettled(broadcasterId);
     const targets = await this.prisma.exportItem.findMany({
-      include: { export: true },
+      include: {
+        export: true,
+        orderItem: {
+          select: {
+            support: { select: { liveShopping: true, productPromotion: true } },
+          },
+        },
+      },
       where: {
+        export: { exportCode: { notIn: alreadySettled } },
         orderItem: {
           support: {
             broadcasterId,
@@ -23,8 +44,9 @@ export class BroadcasterSettlementService {
         },
       },
     });
-    const amount = targets.reduce((prev, target) => prev + Number(target.amount), 0);
-    return amount;
+
+    const total = calcBcSettlementTotalInfo({ items: targets });
+    return total.settleAmount;
   }
 
   /**
@@ -35,11 +57,7 @@ export class BroadcasterSettlementService {
     broadcasterId?: Broadcaster['id'],
     paginationDto?: FindManyDto,
   ): Promise<BroadcasterSettlementTargets> {
-    const alreadyExists = await this.prisma.broadcasterSettlementItems.findMany({
-      select: { orderId: true },
-      where: { settlements: { broadcasterId } },
-    });
-
+    const alreadySettled = await this.findAlreadySettled(broadcasterId);
     const result = await this.prisma.export.findMany({
       include: {
         items: {
@@ -84,10 +102,10 @@ export class BroadcasterSettlementService {
         },
       },
       where: {
+        exportCode: { notIn: alreadySettled },
         buyConfirmSubject: { not: null },
         buyConfirmDate: { not: null },
         order: {
-          id: { notIn: alreadyExists.map((ae) => Number(ae.orderId)) },
           deleteFlag: false,
           supportOrderIncludeFlag: true,
           orderItems: {

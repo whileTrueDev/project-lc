@@ -1,7 +1,5 @@
-import {
-  BroadcasterSettlementTargetsItem,
-  ExportItemWithMarketingMethod,
-} from '@project-lc/shared-types';
+import { LiveShopping, ProductPromotion } from '@prisma/client';
+import { ExportItemWithMarketingMethod } from '@project-lc/shared-types';
 
 export interface BroadcasterSettlementTotalInfo {
   price?: number;
@@ -44,9 +42,14 @@ export interface BcSettlementTotalInfo {
 }
 
 /** 방송인 정산 금액 (총 출고금액, 총 정산금액) 계산함수 */
-export const calcBcSettlementTotalInfo = (
-  target: BroadcasterSettlementTargetsItem,
-): BcSettlementTotalInfo => {
+export const calcBcSettlementTotalInfo = (target: {
+  items: {
+    amount: number;
+    orderItem: {
+      support: { liveShopping: LiveShopping; productPromotion: ProductPromotion };
+    };
+  }[];
+}): BcSettlementTotalInfo => {
   return target.items.reduce<BcSettlementTotalInfo>((prev, curr) => {
     let settleAmount = 0;
     if (curr.orderItem.support.liveShopping) {
