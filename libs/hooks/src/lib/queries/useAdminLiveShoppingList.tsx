@@ -7,12 +7,7 @@ export const getAdminLiveShoppingList = async (
   dto: FindLiveShoppingDto,
 ): Promise<LiveShoppingWithGoods[]> => {
   return axios
-    .get<LiveShoppingWithGoods[]>('admin/live-shoppings', {
-      params: {
-        liveShoppingId: dto.id,
-        goodsIds: dto.goodsIds,
-      },
-    })
+    .get<LiveShoppingWithGoods[]>('admin/live-shoppings', { params: dto })
     .then((res) => res.data);
 };
 
