@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -10,7 +11,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { LiveShopping, LiveShoppingPurchaseMessage } from '@prisma/client';
+import { LiveShoppingPurchaseMessage } from '@prisma/client';
 import {
   CacheClearKeys,
   HttpCacheInterceptor,
@@ -21,7 +22,7 @@ import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { GoodsService } from '@project-lc/nest-modules-goods';
 import {
   ApprovedGoodsNameAndId,
-  LiveShoppingParamsDto,
+  FindLiveShoppingDto,
   LiveShoppingRegistDTO,
   LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
@@ -41,10 +42,13 @@ export class LiveShoppingController {
 
   @Get()
   getLiveShoppings(
-    @SellerInfo() seller: UserPayload,
-    @Query(ValidationPipe) dto?: LiveShoppingParamsDto,
-  ): Promise<LiveShopping[]> {
-    return this.liveShoppingService.getRegisteredLiveShoppings(seller.id, dto);
+    @Query(new ValidationPipe({ transform: true })) dto?: FindLiveShoppingDto,
+  ): Promise<LiveShoppingWithGoods[]> {
+    if (!dto || !(dto.broadcasterId || dto.goodsIds || dto.id || dto.sellerId))
+      throw new BadRequestException(
+        'broadcasterId, goodsIds, id, sellerId 파라미터 중 하나를 포함해야 합니다.',
+      );
+    return this.liveShoppingService.findLiveShoppings(dto);
   }
 
   /** 라이브쇼핑 등록 */
@@ -70,13 +74,6 @@ export class LiveShoppingController {
     const sellerId = seller.id;
     const goodsList = await this.goodsService.findMyGoodsNames(sellerId);
     return goodsList;
-  }
-
-  @Get('/broadcaster')
-  getBroadcasterLiveShoppings(
-    @Query('broadcasterId', ParseIntPipe) broadcasterId: number,
-  ): Promise<LiveShoppingWithGoods[]> {
-    return this.liveShoppingService.getBroadcasterRegisteredLiveShoppings(broadcasterId);
   }
 
   /** 특정 라이브 쇼핑에 대한 응원메시지 목록 데이터 조회 */

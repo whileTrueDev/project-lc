@@ -14,6 +14,7 @@ import { ProductPromotionModule } from '@project-lc/nest-modules-product-promoti
 import { SellerModule } from '@project-lc/nest-modules-seller';
 import { MileageModule } from '@project-lc/nest-modules-mileage';
 import { CouponModule } from '@project-lc/nest-modules-coupon';
+import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { AdminAccountService } from './admin-account.service';
 import { AdminCustomerController } from './admin-customer.controller';
 import { AdminGoodsCategoryController } from './admin-goods-category.controller';
@@ -73,6 +74,7 @@ export class AdminModule {
     CustomerModule.withoutControllers(),
     MileageModule.withoutControllers(),
     CouponModule.withoutControllers(),
+    LiveShoppingModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {

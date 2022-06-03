@@ -5,7 +5,7 @@ import { PrismaService } from '@project-lc/prisma-orm';
 import {
   LiveShoppingFmGoodsSeq,
   LiveShoppingId,
-  LiveShoppingParamsDto,
+  FindLiveShoppingDto,
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
   LiveShoppingWithGoods,
@@ -51,30 +51,37 @@ export class LiveShoppingService {
     return true;
   }
 
-  async getRegisteredLiveShoppings(
-    sellerId: UserPayload['id'],
-    dto: LiveShoppingParamsDto,
-  ): Promise<LiveShopping[]> {
+  async findLiveShoppings(dto?: FindLiveShoppingDto): Promise<LiveShoppingWithGoods[]> {
     // 자신의 id를 반환하는 쿼리 수행하기
-    const { id, goodsIds } = dto;
+    const { id, goodsIds, broadcasterId, sellerId } = dto;
     return this.prisma.liveShopping.findMany({
       where: {
-        id: id ? Number(id) : undefined,
+        id: id || undefined,
+        broadcasterId: broadcasterId || undefined,
         goodsId:
           goodsIds?.length >= 1
             ? { in: goodsIds.map((goodsid) => Number(goodsid)) }
             : undefined,
-        seller: {
-          id: sellerId,
-        },
+        sellerId: sellerId || undefined,
       },
       include: {
         goods: {
-          select: { goods_name: true, summary: true },
+          select: { goods_name: true, summary: true, image: true, options: true },
         },
         seller: { select: { sellerShop: true } },
-        broadcaster: { select: { userNickname: true, channels: true } },
+        broadcaster: {
+          select: {
+            id: true,
+            userName: true,
+            userNickname: true,
+            email: true,
+            avatar: true,
+            BroadcasterPromotionPage: true,
+            channels: true,
+          },
+        },
         liveShoppingVideo: { select: { youtubeUrl: true } },
+        images: true,
       },
     });
   }
@@ -97,37 +104,6 @@ export class LiveShoppingService {
     });
 
     return fmGoodsSeqs;
-  }
-
-  async getBroadcasterRegisteredLiveShoppings(
-    broadcasterId: number,
-  ): Promise<LiveShoppingWithGoods[]> {
-    // 자신의 id를 반환하는 쿼리 수행하기
-    return this.prisma.liveShopping.findMany({
-      where: { broadcasterId },
-      include: {
-        goods: {
-          select: { goods_name: true, summary: true, image: true, options: true },
-        },
-        seller: { select: { sellerShop: true } },
-        broadcaster: {
-          select: {
-            id: true,
-            userName: true,
-            userNickname: true,
-            email: true,
-            avatar: true,
-            BroadcasterPromotionPage: true,
-            channels: true,
-          },
-        },
-        liveShoppingVideo: {
-          select: { youtubeUrl: true },
-        },
-        images: true,
-      },
-      orderBy: { createDate: 'desc' },
-    });
   }
 
   async getLiveShoppingsForOverlayController(): Promise<

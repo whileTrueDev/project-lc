@@ -1,9 +1,12 @@
 import {
+  Broadcaster,
   LiveShopping,
   LiveShoppingImage,
   LiveShoppingImageType,
   LiveShopppingProgressType,
+  Seller,
 } from '@prisma/client';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsDate,
@@ -98,8 +101,10 @@ export type LiveShoppingWithSales = Pick<
   LiveShoppingDTO,
   'id' | 'sellStartDate' | 'sellEndDate' | 'fmGoodsSeq'
 >;
-export class LiveShoppingParamsDto {
-  @IsOptional() @IsString() id?: string;
+export class FindLiveShoppingDto {
+  @Type(() => Number) @IsOptional() @IsNumber() id?: LiveShopping['id'];
+  @Type(() => Number) @IsOptional() @IsNumber() broadcasterId?: Broadcaster['id'];
+  @Type(() => Number) @IsOptional() @IsNumber() sellerId?: Seller['id'];
   @IsOptional() @IsArray() goodsIds?: number[];
 }
 export type LiveShoppingBroadcastDate = Pick<
