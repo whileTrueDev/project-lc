@@ -16,6 +16,7 @@ export const useAdminCouponMutation = (): UseMutationResult<
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('AdminCoupon', { refetchInactive: true });
+        queryClient.invalidateQueries('AdminCouponList', { refetchInactive: true });
       },
     },
   );

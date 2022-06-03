@@ -25,7 +25,7 @@ export const useAdminCustomerCoupon = (
   dto: CustomerCouponType,
 ): UseQueryResult<CustomerCoupon[], AxiosError> => {
   return useQuery<CustomerCoupon[], AxiosError>(
-    'AdminCustomerCoupon',
+    ['AdminCustomerCoupon', dto],
     () => getAdminCustomerCoupon(dto),
     { enabled: !!dto.couponId || !!dto.customerId },
   );

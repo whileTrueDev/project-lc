@@ -31,7 +31,7 @@ export function AdminCouponCreationGoodsList(): JSX.Element {
           columns={columns}
           minH={500}
           onSelectionModelChange={(newSelectionModel) => {
-            handleSelection(newSelectionModel as number[]);
+            handleSelection(newSelectionModel as CouponDto['goods']);
           }}
           selectionModel={selectionModel}
           checkboxSelection

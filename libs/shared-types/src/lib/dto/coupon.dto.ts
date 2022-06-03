@@ -56,6 +56,6 @@ export class CouponDto {
   concurrentFlag?: boolean;
 
   @IsOptional()
-  @IsArray()
+  @IsNumber({}, { each: true })
   goods?: Goods['id'][];
 }

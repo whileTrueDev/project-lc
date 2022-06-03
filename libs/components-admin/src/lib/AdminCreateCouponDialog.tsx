@@ -187,6 +187,7 @@ export function AdminCreateCouponDialog(
                           type="datetime-local"
                           {...register('startDate', {
                             required: '쿠폰 시작날짜를 입력하세요',
+                            valueAsDate: true,
                           })}
                         />
                       </Flex>
@@ -194,7 +195,10 @@ export function AdminCreateCouponDialog(
                     </FormControl>
                     <Flex direction="column">
                       <Text>종료날짜</Text>
-                      <Input type="datetime-local" {...register('endDate')} />
+                      <Input
+                        type="datetime-local"
+                        {...register('endDate', { valueAsDate: true })}
+                      />
                     </Flex>
                     <Flex direction="column">
                       <Text>최대할인금액</Text>
