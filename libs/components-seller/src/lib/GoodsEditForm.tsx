@@ -103,7 +103,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
       option_view_type: 'divide',
       option_suboption_use: '0',
       member_input_use: '0',
-      categoryId: goodsData.categories[0].id,
+      categoryId: goodsData.categories[0]?.id,
       searchKeywords:
         goodsData.searchKeyword?.split(',').map((k) => ({ keyword: k })) || [],
     },
@@ -116,15 +116,15 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
   useEffect(() => {
     if (goodsData) {
       handleCaregorySelect(goodsData.categories[0]);
-      initializeNotice(goodsData.informationNotice.contents);
+      initializeNotice(goodsData.informationNotice?.contents);
     }
   }, [goodsData, handleCaregorySelect, initializeNotice]);
 
   const { handleSubmit } = methods;
 
   const editGoods = async (data: GoodsFormSubmitDataType): Promise<void> => {
-    if (!profileData || !goodsData) return;
-    const userMail = profileData.email;
+    if (!profileData || !goodsData || !goodsData.seller.email) return;
+    const userMail = goodsData.seller.email;
 
     const {
       id,
@@ -319,7 +319,7 @@ export function GoodsEditForm({ goodsData }: { goodsData: GoodsByIdRes }): JSX.E
         <GoodsRegistCommonInfo />
 
         {/* 배송비 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
-        <GoodsRegistShippingPolicy />
+        <GoodsRegistShippingPolicy sellerId={goodsData.seller.id} />
 
         {/* 상품 키워드 정보 */}
         <GoodsRegistKeywords />

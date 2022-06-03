@@ -182,6 +182,7 @@ async function createDummyGoods(
       options: { create: [defaultOption, secondOption] },
       confirmation: { create: confirmation },
       contents,
+      categories: { connect: { id: 1 } },
     },
   });
   return createdGoods;

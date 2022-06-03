@@ -33,7 +33,7 @@ import {
   useDeleteShippingGroup,
   useProfile,
   useSellerGoodsList,
-  useSellerShippingGroupList,
+  useShippingGroupList,
 } from '@project-lc/hooks';
 import {
   SellerGoodsSortColumn,
@@ -44,9 +44,9 @@ import { useShippingGroupItemStore } from '@project-lc/stores';
 import NextLink from 'next/link';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { GoodsFormValues } from './GoodsRegistForm';
 import { ShippingGroupDetailModal } from '../ShippingGroupDetailModal';
 import ShippingPolicyForm from '../ShippingPolicyForm';
+import { GoodsFormValues } from './GoodsRegistForm';
 
 // 컬럼 헤더와 목록으로 이뤄진 상자 스타일 컴포넌트 - 배송비그룹 컨테이너, 연결된상품 컨테이너에 사용할 예정
 export function OutlinedContainerBox({
@@ -289,7 +289,11 @@ export function ShippingGroupContainerBox({
     </OutlinedContainerBox>
   );
 }
-export function GoodsRegistShippingPolicy(): JSX.Element {
+export function GoodsRegistShippingPolicy({
+  sellerId,
+}: {
+  sellerId?: number;
+}): JSX.Element {
   const {
     isOpen: registModalOpen,
     onOpen: onRegistModalOpen,
@@ -313,7 +317,7 @@ export function GoodsRegistShippingPolicy(): JSX.Element {
 
   const { watch, setValue } = useFormContext<GoodsFormValues>();
 
-  const { data } = useSellerShippingGroupList();
+  const { data } = useShippingGroupList(sellerId || 0, !!sellerId);
   const [clickedGroupId, setClickedGroupId] = useState<null | number>(null);
   const toast = useToast();
 
