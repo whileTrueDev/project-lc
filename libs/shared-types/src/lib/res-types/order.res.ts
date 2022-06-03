@@ -1,5 +1,9 @@
 import {
   Broadcaster,
+  Coupon,
+  CustomerCoupon,
+  CustomerCouponLog,
+  CustomerMileageLog,
   Exchange,
   ExchangeItem,
   Export,
@@ -16,10 +20,7 @@ import {
   Refund,
   Return,
   ReturnItem,
-  CustomerMileageLog,
-  CustomerCouponLog,
-  CustomerCoupon,
-  Coupon,
+  SellType,
   SellerShop,
 } from '@prisma/client';
 
@@ -80,3 +81,35 @@ export type OrderListRes = {
  * 주문 완료 페이지 혹은 주문 상세 페이지 작업하면서 수정 필요
  */
 export type OrderDetailRes = OrderDataWithRelations;
+
+/**
+ * 방송인 후원 주문 목록 타입
+ */
+export interface FindAllOrderByBroadcaster {
+  orderCode: string;
+  step: string;
+  orderPrice: number;
+  paymentPrice: number;
+  giftFlag: boolean;
+  supportOrderIncludeFlag: boolean;
+  createDate: Order['createDate'];
+  orderItems: Array<{
+    id: OrderItem['id'];
+    channel: SellType;
+    review: GoodsReview | null;
+    support: OrderItemSupport;
+    goods: {
+      goods_name: Goods['goods_name'];
+      image: GoodsImages[];
+      seller: {
+        sellerShop: {
+          shopName: string | null;
+        };
+      };
+    };
+  }>;
+}
+export type FindAllOrderByBroadcasterRes = {
+  orders: FindAllOrderByBroadcaster[];
+  nextCursor?: number;
+};

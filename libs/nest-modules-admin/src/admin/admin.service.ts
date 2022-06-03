@@ -120,11 +120,6 @@ export class AdminService {
   public async getGoodsInfo({ sort, direction }): Promise<AdminGoodsListRes> {
     const items = await this.prisma.goods.findMany({
       orderBy: [{ [sort]: direction }],
-      where: {
-        confirmation: {
-          OR: [{ status: 'waiting' }, { status: 'needReconfirmation' }],
-        },
-      },
       include: {
         options: {
           include: {

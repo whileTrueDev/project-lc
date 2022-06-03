@@ -313,7 +313,7 @@ export function GoodsRegistForm(): JSX.Element {
         <GoodsRegistCommonInfo />
 
         {/* 배송비 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
-        <GoodsRegistShippingPolicy />
+        <GoodsRegistShippingPolicy sellerId={profileData?.id} />
 
         {/* 상품 키워드 정보 */}
         <GoodsRegistKeywords />

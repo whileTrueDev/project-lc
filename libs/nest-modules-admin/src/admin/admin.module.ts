@@ -1,5 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
+import { CouponModule } from '@project-lc/nest-modules-coupon';
 import { CustomerModule } from '@project-lc/nest-modules-customer';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import { GoodsCategoryModule } from '@project-lc/nest-modules-goods-category';
@@ -7,19 +8,21 @@ import {
   KkshowMainModule,
   KkshowShoppingModule,
 } from '@project-lc/nest-modules-kkshow-main';
+import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { ManualModule } from '@project-lc/nest-modules-manual';
+import { MileageModule } from '@project-lc/nest-modules-mileage';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
 import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { SellerModule } from '@project-lc/nest-modules-seller';
-import { MileageModule } from '@project-lc/nest-modules-mileage';
-import { CouponModule } from '@project-lc/nest-modules-coupon';
-import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { AdminAccountService } from './admin-account.service';
+import { AdminCouponController } from './admin-coupon.controller';
+import { AdminCustomerCouponController } from './admin-customer-coupon.controller';
 import { AdminCustomerController } from './admin-customer.controller';
 import { AdminGoodsCategoryController } from './admin-goods-category.controller';
 import { AdminKkshowMainController } from './admin-kkshow-main.controller';
 import { AdminManualController } from './admin-manual.controller';
+import { AdminMileageController } from './admin-mileage.controller';
 import { AdminPolicyController } from './admin-policy.controller';
 import { AdminPrivacyApproachSevice } from './admin-privacy-approach.service';
 import { AdminProductPromotionController } from './admin-product-promotion.controller';
@@ -27,9 +30,6 @@ import { AdminPromotionPageController } from './admin-promotion-page.controller'
 import { AdminSettlementService } from './admin-settlement.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
-import { AdminMileageController } from './admin-mileage.controller';
-import { AdminCouponController } from './admin-coupon.controller';
-import { AdminCustomerCouponController } from './admin-customer-coupon.controller';
 
 @Module({})
 export class AdminModule {

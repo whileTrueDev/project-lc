@@ -1,14 +1,15 @@
+import { RepeatIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
+  Flex,
   Link,
   Select,
   Stack,
   Text,
-  useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { GridCellParams, GridColumns } from '@material-ui/data-grid';
+import { GridColumns } from '@material-ui/data-grid';
 import { GoodsConfirmationStatuses, GoodsStatus } from '@prisma/client';
 import {
   GOODS_CONFIRMATION_STATUS,
@@ -16,7 +17,7 @@ import {
 } from '@project-lc/components-constants/goodsStatus';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { ShippingGroupDetailButton } from '@project-lc/components-seller/SellerGoodsList';
-import { useAdminGoodsList, useDisplaySize, useProfile } from '@project-lc/hooks';
+import { useAdminGoodsList, useProfile } from '@project-lc/hooks';
 import {
   AdminGoodsData,
   SellerGoodsSortColumn,
@@ -26,7 +27,7 @@ import { useSellerGoodsListPanelStore } from '@project-lc/stores';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
-import { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 import { ConfirmationBadge } from './AdminBusinessRegistrationList';
 import { AdminGoodsConfirmationDialog } from './AdminGoodsConfirmationDialog';
 import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
@@ -34,120 +35,6 @@ import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
 function formatDate(date: Date): string {
   return dayjs(date).format('YYYY/MM/DD HH:mm');
 }
-
-// * 상품목록 datagrid 컬럼 ***********************************************
-const columns: GridColumns = [
-  {
-    field: 'confirmation',
-    headerName: '검수승인',
-    width: 100,
-    renderCell: () => <Button size="xs">승인하기</Button>,
-    sortable: false,
-  },
-  {
-    field: 'rejection',
-    headerName: '검수반려',
-    width: 100,
-    renderCell: () => <Button size="xs">반려하기</Button>,
-    sortable: false,
-  },
-  {
-    field: 'goods_status',
-    headerName: '상품상태',
-    minWidth: 50,
-    valueGetter: ({ row }) => {
-      return GOODS_STATUS[row.goods_status as GoodsStatus];
-    },
-    sortable: false,
-  },
-  {
-    field: 'confirm_status',
-    headerName: '검수상태',
-    minWidth: 50,
-    renderCell: ({ row }) => {
-      const confirmStatus = row.confirmation.status as GoodsConfirmationStatuses;
-      return <Text>{GOODS_CONFIRMATION_STATUS[confirmStatus].label}</Text>;
-    },
-    sortable: false,
-  },
-  {
-    field: 'businessRegistrationStatus',
-    headerName: '사업자등록정보검수상태',
-    minWidth: 200,
-    renderCell: (params) => (
-      <ConfirmationBadge status={params.row.businessRegistrationStatus} />
-    ),
-  },
-  {
-    field: 'name',
-    headerName: '판매자명(고유번호)',
-    minWidth: 140,
-    sortable: false,
-    valueGetter: ({ row }) => `${row.name} (${row.sellerId})`,
-  },
-  {
-    field: 'goods_name',
-    headerName: '상품명',
-    minWidth: 500,
-    sortable: false,
-    renderCell: ({ row }) => {
-      const goodsId = row.id;
-      const { goods_name } = row;
-      return (
-        <NextLink href={`/goods/${goodsId}`} passHref>
-          <Link width="100%">
-            <Text isTruncated>{goods_name}</Text>
-          </Link>
-        </NextLink>
-      );
-    },
-  },
-  {
-    field: 'default_price',
-    headerName: '판매가',
-    type: 'number',
-    valueFormatter: ({ row }) => `${getLocaleNumber(row.default_price)}원`,
-    sortable: false,
-  },
-  {
-    field: 'default_consumer_price',
-    headerName: '정가',
-    type: 'number',
-    valueFormatter: ({ row }) => `${getLocaleNumber(row.default_consumer_price)}원`,
-    sortable: false,
-  },
-  {
-    field: 'shippingGroup',
-    headerName: '배송비',
-    sortable: false,
-    minWidth: 80,
-    renderCell: ({ row }) => {
-      const { shippingGroup } = row;
-      if (!shippingGroup) {
-        return null;
-      }
-      const { id, shipping_group_name } = shippingGroup;
-      return <ShippingGroupDetailButton id={id} name={shipping_group_name} />;
-    },
-  },
-  {
-    field: 'date',
-    headerName: '등록일/수정일',
-    minWidth: 150,
-    renderCell: ({ row }) => {
-      const { regist_date, update_date } = row;
-      return (
-        <Box>
-          <Text height="20px">{formatDate(regist_date as Date)}</Text>
-          <Text>{formatDate(update_date as Date)}</Text>
-        </Box>
-      );
-    },
-    sortable: false,
-  },
-];
-// * 상품목록 datagrid 컬럼 끝*********************************************
-
 type UniqueSellerType = {
   sellerId: number;
   sellerName: string;
@@ -269,7 +156,157 @@ function SellerFilterSelect({
 
 // * 상품 검수를 위한 미승인 상품 목록
 export function AdminGoodsList(): JSX.Element {
-  const { isDesktopSize } = useDisplaySize();
+  const confirmDialog = useDisclosure();
+  const rejectionDialog = useDisclosure();
+  const [selectedRow, setSelectedRow] = useState<null | AdminGoodsData>(null);
+
+  const handleConfirmClick = useCallback(
+    (data: AdminGoodsData): void => {
+      setSelectedRow(data);
+      confirmDialog.onOpen();
+    },
+    [confirmDialog],
+  );
+  const handleRejectClick = useCallback(
+    (data: AdminGoodsData): void => {
+      setSelectedRow(data);
+      rejectionDialog.onOpen();
+    },
+    [rejectionDialog],
+  );
+
+  // * 상품목록 datagrid 컬럼 ***********************************************
+  const columns: GridColumns = useMemo(
+    () => [
+      {
+        field: 'confirmation.status',
+        headerName: '검수승인/반려',
+        valueGetter: ({ row }) => row.confirmation.status,
+        width: 140,
+        renderCell: ({ row }) => {
+          const confirmStatus = row.confirmation.status as GoodsConfirmationStatuses;
+          const _row = row as AdminGoodsData;
+          if (_row.confirmation.status === 'confirmed') {
+            return <Text>{GOODS_CONFIRMATION_STATUS[confirmStatus].label}</Text>;
+          }
+          return (
+            <Flex gap={2}>
+              <Text color="red.500" fontWeight="bold">
+                {GOODS_CONFIRMATION_STATUS[confirmStatus].label}
+              </Text>
+              <Stack spacing={0.5}>
+                <Button
+                  colorScheme="green"
+                  size="xs"
+                  onClick={() => handleConfirmClick(_row)}
+                >
+                  승인하기
+                </Button>
+                <Button
+                  colorScheme="red"
+                  size="xs"
+                  onClick={() => handleRejectClick(_row)}
+                >
+                  반려하기
+                </Button>
+              </Stack>
+            </Flex>
+          );
+        },
+      },
+      {
+        field: 'goods_status',
+        headerName: '상태',
+        width: 60,
+        valueGetter: ({ row }) => {
+          return GOODS_STATUS[row.goods_status as GoodsStatus];
+        },
+        sortable: false,
+      },
+      {
+        field: 'businessRegistrationStatus',
+        headerName: '사업자정보',
+        minWidth: 120,
+        renderCell: (params) => (
+          <Flex lineHeight={1.5}>
+            <ConfirmationBadge status={params.row.businessRegistrationStatus} />
+          </Flex>
+        ),
+      },
+      {
+        field: 'name',
+        headerName: '판매자명(고유번호)',
+        minWidth: 140,
+        sortable: false,
+        valueGetter: ({ row }) => `${row.name} (${row.sellerId})`,
+      },
+      {
+        field: 'goods_name',
+        headerName: '상품명',
+        minWidth: 500,
+        sortable: false,
+        renderCell: ({ row }) => {
+          const goodsId = row.id;
+          const { goods_name } = row;
+          return (
+            <Flex justify="flex-start">
+              <NextLink href={`/goods/${goodsId}`} passHref>
+                <Link>
+                  <Text isTruncated>{goods_name}</Text>
+                </Link>
+              </NextLink>
+            </Flex>
+          );
+        },
+      },
+      {
+        field: 'default_price',
+        headerName: '판매가',
+        type: 'number',
+        valueFormatter: ({ row }) => `${getLocaleNumber(row.default_price)}원`,
+        sortable: false,
+      },
+      {
+        field: 'default_consumer_price',
+        headerName: '정가',
+        type: 'number',
+        valueFormatter: ({ row }) => `${getLocaleNumber(row.default_consumer_price)}원`,
+        sortable: false,
+      },
+      {
+        field: 'shippingGroup',
+        headerName: '배송비',
+        sortable: false,
+        minWidth: 80,
+        renderCell: ({ row }) => {
+          const { shippingGroup } = row;
+          if (!shippingGroup) {
+            return null;
+          }
+          const { id, shipping_group_name } = shippingGroup;
+          return <ShippingGroupDetailButton id={id} name={shipping_group_name} />;
+        },
+      },
+      {
+        field: 'date',
+        headerName: '등록일/수정일',
+        minWidth: 150,
+        renderCell: ({ row }) => {
+          const { regist_date, update_date } = row;
+          return (
+            <Box>
+              <Text height="20px">{formatDate(regist_date as Date)}</Text>
+              <Text>{formatDate(update_date as Date)}</Text>
+            </Box>
+          );
+        },
+        sortable: false,
+      },
+    ],
+    [handleConfirmClick, handleRejectClick],
+  );
+  // * 상품목록 datagrid 컬럼 끝*********************************************
+
   const {
     itemPerPage,
     sort,
@@ -288,40 +325,18 @@ export function AdminGoodsList(): JSX.Element {
     setFilterSellerId,
   } = useAdminGoodsConfirmList({ sort, direction });
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const {
-    isOpen: isRejectionOpen,
-    onOpen: onRejectionOpen,
-    onClose: onRejectionClose,
-  } = useDisclosure();
-  const [selectedRow, setSelectedRow] = useState<null | AdminGoodsData>(null);
-
-  const handleClick = async (param: GridCellParams): Promise<void> => {
-    if (param.field === 'confirmation') {
-      setSelectedRow(param.row as AdminGoodsData);
-      onOpen();
-    }
-    if (param.field === 'rejection') {
-      setSelectedRow(param.row as AdminGoodsData);
-      onRejectionOpen();
-    }
-    // 이외의 클릭에 대해서는 다른 패널에 대해서 상세보기로 이동시키기
-  };
-
   return (
     <>
       <ChakraDataGrid
-        bg={useColorModeValue('inherit', 'gray.300')}
         loading={isLoading}
         rows={rows}
         autoHeight
-        columns={columns.map((x) => ({ ...x, flex: isDesktopSize ? 1 : undefined }))}
+        columns={columns}
         disableSelectionOnClick
         disableColumnMenu
         pageSize={itemPerPage}
         rowCount={rowCount}
         onPageChange={changePage}
-        onCellClick={handleClick}
         components={{
           Toolbar: () => (
             <Stack
@@ -348,10 +363,10 @@ export function AdminGoodsList(): JSX.Element {
                 />
               </Stack>
               <Button
+                isLoading={isLoading}
                 size="xs"
-                onClick={() => {
-                  refetch();
-                }}
+                leftIcon={<RepeatIcon />}
+                onClick={() => refetch()}
               >
                 새로고침
               </Button>
@@ -360,16 +375,16 @@ export function AdminGoodsList(): JSX.Element {
         }}
       />
       <AdminGoodsConfirmationDialog
-        isOpen={isOpen}
-        onClose={onClose}
+        isOpen={confirmDialog.isOpen}
+        onClose={confirmDialog.onClose}
         row={selectedRow}
         callback={() => {
           refetch();
         }}
       />
       <AdminGoodsRejectionDialog
-        isOpen={isRejectionOpen}
-        onClose={onRejectionClose}
+        isOpen={rejectionDialog.isOpen}
+        onClose={rejectionDialog.onClose}
         row={selectedRow}
       />
     </>

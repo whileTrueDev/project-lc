@@ -38,3 +38,4 @@ export class FindBroadcasterPurchaseDto extends FindManyDto {
   @ValidateIf((obj) => obj.by === 'productPromotion')
   productPromotionId?: LiveShopping['id'];
 }
+export class OrderByBroadcasterDto extends FindManyDto {}

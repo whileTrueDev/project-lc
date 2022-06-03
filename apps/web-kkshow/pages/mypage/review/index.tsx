@@ -1,9 +1,9 @@
 /* eslint-disable react/no-array-index-key */
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react';
+import ReviewCreateList from '@project-lc/components-shared/goods-review/ReviewCreateList';
+import ReviewList from '@project-lc/components-shared/goods-review/ReviewList';
+import { ReviewPolicy } from '@project-lc/components-shared/goods-review/ReviewPolicy';
 import CustomerMypageLayout from '@project-lc/components-web-kkshow/mypage/CustomerMypageLayout';
-import ReviewCreateList from '@project-lc/components-web-kkshow/review/ReviewCreateList';
-import ReviewList from '@project-lc/components-web-kkshow/review/ReviewList';
-import { ReviewPolicy } from '@project-lc/components-web-kkshow/review/ReviewPolicy';
 import { useOrderItemReviewNeeded, useProfile } from '@project-lc/hooks';
 import { useMemo } from 'react';
 
