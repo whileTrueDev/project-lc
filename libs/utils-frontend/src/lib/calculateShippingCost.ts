@@ -138,7 +138,7 @@ export function calculateShippingCostByOptType({
     result = addShippingCost(result, shippingOptions[0]);
   }
   // 배송비 옵션 타입 : 수량, 개수인경우
-  if (['amount', 'cnt'].includes(optType)) {
+  if (optType === 'amount' || optType === 'cnt') {
     // 주문상품 개수, 가격에 적용가능한 구간값 가진 배송옵션 찾기
     const applicableOption = findApplicableOptionSection(
       shippingOptions,
