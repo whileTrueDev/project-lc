@@ -6,13 +6,10 @@ import { LiveShoppingProgressBadge } from '@project-lc/components-shared/LiveSho
 import { useAdminLiveShoppingList, useProfile } from '@project-lc/hooks';
 import { getLiveShoppingProgress, LiveShoppingWithGoods } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { SeletctedLiveShoppingType } from './AdminGiftList';
 
 export function AdminLiveShoppingList({
-  setSelectedGoods,
   onRowClick,
 }: {
-  setSelectedGoods: (selectedGoods: SeletctedLiveShoppingType) => void;
   onRowClick: (liveShoppingId: number) => void;
 }): JSX.Element {
   const { data: profileData } = useProfile();
@@ -26,13 +23,6 @@ export function AdminLiveShoppingList({
 
   function handleClick(row: LiveShoppingWithGoods): void {
     onRowClick(row.id);
-    setSelectedGoods({
-      goodsId: row.goodsId,
-      broadcastStartDate: row.broadcastStartDate,
-      broadcastEndDate: row.broadcastEndDate,
-      sellEndDate: row.sellEndDate,
-      sellStartDate: row.sellStartDate,
-    });
   }
   const columns: GridColumns = [
     { field: 'id', width: 50 },

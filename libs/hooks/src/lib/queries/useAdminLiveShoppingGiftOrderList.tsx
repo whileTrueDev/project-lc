@@ -1,10 +1,9 @@
+import { AdminLiveShoppingGiftOrder } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
-export interface AdminLiveShoppingGiftOrderList {
-  _field?: 'default field';
-}
+export type AdminLiveShoppingGiftOrderList = AdminLiveShoppingGiftOrder[];
 
 export const getAdminLiveShoppingGiftOrderList = async ({
   liveShoppingId,
