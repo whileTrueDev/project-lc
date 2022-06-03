@@ -10,7 +10,6 @@ import {
   UseInfiniteQueryOptions,
   UseInfiniteQueryResult,
   useQuery,
-  UseQueryOptions,
   UseQueryResult,
 } from 'react-query';
 import axios from '../../axios';

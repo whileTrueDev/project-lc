@@ -110,7 +110,7 @@ export class FmOrdersController {
     @SellerInfo() seller: UserPayload,
   ): Promise<{ id: number; sales: string }[]> {
     let liveShoppingList = await this.liveShoppingService
-      .getRegisteredLiveShoppings(seller.id, {})
+      .findLiveShoppings({ sellerId: seller.id })
       .then((result) => {
         return result.map((val) => {
           if (val.sellStartDate && val.sellEndDate) {
@@ -134,7 +134,7 @@ export class FmOrdersController {
     @Query('broadcasterId') broadcasterId: number,
   ): Promise<{ id: number; sales: string }[]> {
     let liveShoppingList = await this.liveShoppingService
-      .getBroadcasterRegisteredLiveShoppings(broadcasterId)
+      .findLiveShoppings({ broadcasterId })
       .then((result) => {
         return result.map((val) => {
           if (val.sellStartDate && val.sellEndDate) {

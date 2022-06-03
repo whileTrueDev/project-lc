@@ -1,8 +1,8 @@
 import { DynamicModule, Module } from '@nestjs/common';
+import { UserPwManager } from '@project-lc/nest-core';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
 import { PrismaModule } from '@project-lc/prisma-orm';
-import { UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsController } from './broadcaster-contacts.controller';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
@@ -13,8 +13,6 @@ import { BroadcasterSettlementController } from './broadcaster-settlement.contro
 import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterController } from './broadcaster.controller';
 import { BroadcasterService } from './broadcaster.service';
-import { BroadcasterPurchasesController } from './broadcaster-purchases.controller';
-import { BroadcasterPurchasesService } from './broadcaster-purchases.service';
 
 @Module({})
 export class BroadcasterModule {
@@ -26,7 +24,6 @@ export class BroadcasterModule {
     BroadcasterSettlementService,
     BroadcasterPromotionPageService,
     UserPwManager,
-    BroadcasterPurchasesService,
   ];
 
   private static readonly exports = [
@@ -43,7 +40,6 @@ export class BroadcasterModule {
     BroadcasterContactsController,
     BroadcasterSettlementController,
     BroadcasterSettlementHistoryController,
-    BroadcasterPurchasesController,
   ];
 
   private static readonly imports = [PrismaModule, CipherModule, MailVerificationModule];
