@@ -134,13 +134,13 @@ export function CartTable(): JSX.Element {
         </ButtonGroup>
 
         {/* PC화면 */}
-        <Table display={{ base: 'none', md: 'block' }}>
+        <Table display={{ base: 'none', md: 'block' }} mt={2}>
           <Thead>
             <Tr>
               <Th fontFamily="inherit">상품</Th>
               <Th fontFamily="inherit">가격</Th>
-              <Th fontFamily="inherit">배송비</Th>
               <Th />
+              <Th fontFamily="inherit">배송비</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -181,7 +181,7 @@ export function CartTable(): JSX.Element {
               ? shippingCostObj.std + shippingCostObj.add
               : null;
             return (
-              <Box key={shippingGroupId} {...boxStyle}>
+              <Box key={shippingGroupId} {...boxStyle} mt={2}>
                 <Box>
                   {cartItemsObjectGroupedById[shippingGroupId].map((cartItemId) => {
                     const cartItem = data.find((d) => d.id === cartItemId);
@@ -235,6 +235,20 @@ export function CartTableRow({
         <CartItemPriceDisplay cartItem={cartItem} />
       </Td>
 
+      <Td>
+        <Box>
+          <Button
+            size="sm"
+            aria-label="delete-cart-item"
+            onClick={() => handleCartItemDelete(cartItem.id)}
+            isLoading={deleteCartItem.isLoading}
+            leftIcon={<DeleteIcon />}
+          >
+            상품삭제
+          </Button>
+        </Box>
+      </Td>
+
       {/* 배송비 */}
       {!hideShippingCost && (
         <Td
@@ -249,20 +263,6 @@ export function CartTableRow({
           />
         </Td>
       )}
-
-      <Td>
-        <Box>
-          <Button
-            size="sm"
-            aria-label="delete-cart-item"
-            onClick={() => handleCartItemDelete(cartItem.id)}
-            isLoading={deleteCartItem.isLoading}
-            leftIcon={<DeleteIcon />}
-          >
-            상품삭제
-          </Button>
-        </Box>
-      </Td>
     </Tr>
   );
 }
