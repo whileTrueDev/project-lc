@@ -31,6 +31,7 @@ import {
 import dayjs from 'dayjs';
 import { FmOrdersService } from './fm-orders.service';
 
+/** @deprecated */
 @UseGuards(JwtAuthGuard)
 @Controller('fm-orders')
 export class FmOrdersController {
@@ -187,10 +188,10 @@ export class FmOrdersController {
     return this.fmOrdersService.changeOrderStatus(orderId, status);
   }
 
+  /** @deprecated order/by-broadcaster 엔드포인트로 수정 */
   @Get('/broadcaster/purchases')
   async getBroadcasterPurchases(
-    @Query('broadcasterId', ParseIntPipe)
-    broadcasterId: number,
+    @Query('broadcasterId', ParseIntPipe) broadcasterId: number,
   ): Promise<BroacasterPurchaseWithDividedMessageDto[]> {
     const liveShoppingFmGoodsSeqs =
       await this.liveShoppingService.getFmGoodsSeqsLinkedToLiveShoppings(broadcasterId);

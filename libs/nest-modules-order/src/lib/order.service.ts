@@ -5,6 +5,8 @@ import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
+  FindAllOrderByBroadcasterRes,
+  FindManyDto,
   GetNonMemberOrderDetailDto,
   GetOrderListDto,
   OrderDetailRes,
@@ -661,5 +663,61 @@ export class OrderService {
         환불: { count: sellerRefunds.length, sum: todayRefundAmountTotal },
       },
     };
+  }
+
+  /** 방송인 후원 주문 목록 조회  */
+  public async findAllByBroadcaster(
+    broadcasterId: number,
+    dto: FindManyDto,
+  ): Promise<FindAllOrderByBroadcasterRes> {
+    const minTake = 5;
+    const realTake = Math.min(minTake, dto.take ? Number(dto.take) : undefined) + 1;
+    const orders = await this.prisma.order.findMany({
+      skip: dto.skip ? Number(dto.skip) : undefined,
+      take: realTake || undefined,
+      where: {
+        deleteFlag: false,
+        orderItems: { every: { support: { broadcasterId } } },
+      },
+      orderBy: { createDate: 'desc' },
+      select: {
+        orderCode: true,
+        step: true,
+        orderPrice: true,
+        paymentPrice: true,
+        giftFlag: true,
+        supportOrderIncludeFlag: true,
+        createDate: true,
+        orderItems: {
+          select: {
+            id: true,
+            channel: true,
+            review: true,
+            support: true,
+            goods: {
+              select: {
+                goods_name: true,
+                image: true,
+                seller: { select: { sellerShop: { select: { shopName: true } } } },
+              },
+            },
+          },
+        },
+      },
+    });
+    // 주문에 포함된 상품 중 방송인에게 후원한 상품만 추리기
+    const _result = orders.map((x) => ({
+      ...x,
+      orderItems: x.orderItems.filter((i) => i.support.broadcasterId === broadcasterId),
+    }));
+    const nextCursor = (dto.skip || 0) + (dto.take || minTake); // 다음 조회시 skip 값으로 사용
+
+    if (_result.length === realTake) {
+      return {
+        orders: _result.slice(0, dto.take || minTake),
+        nextCursor,
+      };
+    }
+    return { nextCursor: undefined, orders: _result };
   }
 }

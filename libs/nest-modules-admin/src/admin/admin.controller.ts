@@ -21,6 +21,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   AdminClassChangeHistory,
   Administrator,
+  Broadcaster,
   BusinessRegistrationConfirmation,
   ConfirmHistory,
   GoodsConfirmation,
@@ -179,6 +180,13 @@ export class AdminController {
     @Body(ValidationPipe) dto: ChangeSellCommissionDto,
   ): Promise<boolean> {
     return this.adminService.updateSellCommission(dto.commissionRate);
+  }
+
+  /** 방송인 목록 조회 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('/broadcasters')
+  public async findBroadcasters(): Promise<Broadcaster[]> {
+    return this.broadcasterService.getBroadcasters();
   }
 
   // 상품검수를 위한 상품 리스트

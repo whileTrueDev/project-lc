@@ -9,7 +9,8 @@ import {
 } from '@chakra-ui/react';
 import { useOrderItemReviewNeeded, useProfile } from '@project-lc/hooks';
 import { OrderItemReviewNeeded } from '@project-lc/shared-types';
-import GoodsDisplay2 from '../GoodsDisplay2';
+import GoodsDisplay2 from '../goods/GoodsDisplay2';
+
 import ReviewCreateDialog from './ReviewCreateDialog';
 
 export function ReviewCreateList(): JSX.Element | null {

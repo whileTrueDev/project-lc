@@ -174,30 +174,31 @@ function GoodsRegistInformationNotice({
           </ListItem>
         </UnorderedList>
       </Box>
-      {Object.keys(data.items as object).map((key) => (
-        <FormControl key={key}>
-          <Grid templateColumns="repeat(4, 1fr)" gap={2} mb={2}>
-            <GridItem colSpan={[4, 4, 1]}>
-              <FormLabel fontSize="sm" fontWeight="normal">
-                {key}
-              </FormLabel>
-            </GridItem>
-            <GridItem colSpan={[4, 4, 3]}>
-              <Input
-                size="sm"
-                placeholder="상세설명 및 상세이미지 참조"
-                value={
-                  key === '소비자상담 관련 전화번호'
-                    ? data.items[key]
-                    : informationNotice[key]
-                }
-                isReadOnly={key === '소비자상담 관련 전화번호'}
-                onChange={(e) => handleChange(key, e.target.value)}
-              />
-            </GridItem>
-          </Grid>
-        </FormControl>
-      ))}
+      {informationNotice &&
+        Object.keys(data.items as object).map((key) => (
+          <FormControl key={key}>
+            <Grid templateColumns="repeat(4, 1fr)" gap={2} mb={2}>
+              <GridItem colSpan={[4, 4, 1]}>
+                <FormLabel fontSize="sm" fontWeight="normal">
+                  {key}
+                </FormLabel>
+              </GridItem>
+              <GridItem colSpan={[4, 4, 3]}>
+                <Input
+                  size="sm"
+                  placeholder="상세설명 및 상세이미지 참조"
+                  value={
+                    key === '소비자상담 관련 전화번호'
+                      ? data.items[key]
+                      : informationNotice[key]
+                  }
+                  isReadOnly={key === '소비자상담 관련 전화번호'}
+                  onChange={(e) => handleChange(key, e.target.value)}
+                />
+              </GridItem>
+            </Grid>
+          </FormControl>
+        ))}
     </Box>
   );
 }

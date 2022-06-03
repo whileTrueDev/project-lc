@@ -1,25 +1,26 @@
 import {
-  FcMoneyTransfer,
-  FcInspection,
-  FcList,
-  FcDislike,
-  FcVideoCall,
-  FcFaq,
-  FcSms,
-  FcAdvertising,
-  FcCloseUpMode,
-  FcBiohazard,
-} from 'react-icons/fc';
-
-import {
-  AiOutlineShop,
+  AiOutlineContainer,
   AiOutlineHome,
   AiOutlineSetting,
-  AiOutlineContainer,
+  AiOutlineShop,
 } from 'react-icons/ai';
 import { BsBox } from 'react-icons/bs';
-import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
+import {
+  FcAdvertising,
+  FcBiohazard,
+  FcCloseUpMode,
+  FcDislike,
+  FcFaq,
+  FcInspection,
+  FcList,
+  FcMoneyTransfer,
+  FcQuestions,
+  FcRating,
+  FcSms,
+  FcVideoCall,
+} from 'react-icons/fc';
 import { IconType } from 'react-icons/lib';
+import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
 
 export interface NavItem {
   label: string;
@@ -104,6 +105,11 @@ export const mypageNavLinks: MypageLink[] = [
       {
         name: '문의 관리',
         href: '/mypage/goods-inquiries',
+        checkIsActive: (pathname, linkHref) => pathname === linkHref,
+      },
+      {
+        name: '상품 후기 관리',
+        href: '/mypage/goods-reviews',
         checkIsActive: (pathname, linkHref) => pathname === linkHref,
       },
     ],
@@ -242,6 +248,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '방송인',
     href: '/broadcaster',
     children: [
+      { name: '가입자 목록', href: '/broadcaster/signup-list', icon: FcList },
       { name: '정산정보 검수', href: '/broadcaster/settlement-info', icon: FcInspection },
       { name: '정산', href: '/broadcaster/settlement', icon: FcMoneyTransfer },
       {
@@ -255,6 +262,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '판매자',
     href: '/seller',
     children: [
+      { name: '가입자 목록', href: '/seller/signup-list', icon: FcList },
       { name: '계좌정보 목록', href: '/seller/account', icon: FcList },
       {
         name: '사업자 등록정보 검수',
@@ -267,15 +275,19 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '구매자',
     href: '/customer',
-    children: [{ name: '마일리지 관리', href: '/customer/mileage', icon: FcList }],
+    children: [
+      { name: '마일리지 관리', href: '/customer/mileage', icon: FcList },
+      { name: '가입자 목록', href: '/customer/signup-list', icon: FcList },
+    ],
   },
   {
     name: '상품',
     href: '/goods',
     children: [
-      { name: '상품검수', href: '/goods/confirmation', icon: FcInspection },
+      { name: '상품목록/검수', href: '/goods/confirmation', icon: FcInspection },
       { name: '상품카테고리', href: '/goods/category', icon: FcList },
-      { name: '상품문의관리', href: '/goods/inquiry', icon: FcSms },
+      { name: '상품문의관리', href: '/goods/inquiry', icon: FcQuestions },
+      { name: '상품리뷰관리', href: '/goods/review', icon: FcRating },
     ],
   },
   {
