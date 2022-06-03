@@ -79,7 +79,7 @@ export function AdminCouponList(): JSX.Element {
     },
     {
       field: 'setting',
-      headerName: '상세보기',
+      headerName: '관리',
       renderCell: ({ row }: GridRowData) => (
         <Button size="xs" colorScheme="green" onClick={() => handleSettingClick(row)}>
           관리
@@ -128,7 +128,13 @@ export function AdminCouponList(): JSX.Element {
       });
   return (
     <Box>
-      <ChakraDataGrid density="compact" rows={data || []} columns={columns} minH={500} />
+      <ChakraDataGrid
+        disableColumnMenu
+        density="compact"
+        rows={data || []}
+        columns={columns}
+        minH={500}
+      />
       <AdminCouponListDetailDialog
         isOpen={isOpen}
         onClose={onClose}

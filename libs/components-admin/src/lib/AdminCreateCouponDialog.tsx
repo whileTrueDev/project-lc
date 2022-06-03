@@ -17,6 +17,8 @@ import {
   FormErrorMessage,
   Grid,
   GridItem,
+  InputGroup,
+  InputRightAddon,
 } from '@chakra-ui/react';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { AmountUnit, DiscountApplyType, DiscountApplyField } from '@prisma/client';
@@ -135,13 +137,18 @@ export function AdminCreateCouponDialog(
                     </FormControl>
                     <FormControl isInvalid={!!errors.amount}>
                       <Flex direction="column">
-                        <Text>할인액</Text>
-                        <Input
-                          {...register('amount', {
-                            required: '할인액(할인율)을 입력해주세요',
-                            valueAsNumber: true,
-                          })}
-                        />
+                        <Text>할인액/할인율</Text>
+                        <InputGroup maxW="200px">
+                          <Input
+                            {...register('amount', {
+                              required: '할인액(할인율)을 입력해주세요',
+                              valueAsNumber: true,
+                            })}
+                          />
+                          <InputRightAddon>
+                            {watch('unit') === 'P' ? '%' : '원'}
+                          </InputRightAddon>
+                        </InputGroup>
                       </Flex>
                       <FormErrorMessage>{errors.amount?.message}</FormErrorMessage>
                     </FormControl>
