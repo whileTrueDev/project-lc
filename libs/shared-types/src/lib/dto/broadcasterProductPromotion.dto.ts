@@ -8,7 +8,12 @@ export class broadcasterProductPromotionDto {
 export class CreateProductPromotionDto {
   /** 상품홍보페이지 id */
   @IsNumber()
-  broadcasterPromotionPageId: number;
+  @IsOptional()
+  broadcasterPromotionPageId?: number;
+
+  /** 홍보하는 방송인 고유번호 */
+  @IsNumber()
+  broadcasterId: number;
 
   /** project-lc 상품 고유번호 */
   @IsNumber()
@@ -20,7 +25,8 @@ export class CreateProductPromotionDto {
    * LiveShopping.fmGoodsSeq 와 중복되면 안됨
    * */
   @IsNumber()
-  fmGoodsSeq: number;
+  @IsOptional()
+  fmGoodsSeq?: number;
 
   @IsNumber()
   @IsOptional()

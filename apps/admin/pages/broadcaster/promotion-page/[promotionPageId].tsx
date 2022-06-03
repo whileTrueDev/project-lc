@@ -40,7 +40,10 @@ export function BroadcasterPromotionPageDetail(): JSX.Element {
         <Divider my={10} />
 
         {/* 상품홍보페이지에 연결된 상품홍보 영역 */}
-        <AdminBroadcasterProductPromotionSection promotionPageId={promotionPageId} />
+        <AdminBroadcasterProductPromotionSection
+          promotionPageId={promotionPageId}
+          broadcasterId={pageData.broadcasterId}
+        />
       </Box>
     </AdminPageLayout>
   );
