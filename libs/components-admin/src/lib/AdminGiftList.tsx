@@ -1,9 +1,13 @@
-import { Box, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Button, Text, useColorModeValue } from '@chakra-ui/react';
 import { GridColumns, GridRowParams } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import TooltipedText from '@project-lc/components-core/TooltipedText';
 import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
-import { useDisplaySize, useFmOrdersByGoods } from '@project-lc/hooks';
+import {
+  useAdminLiveShoppingGiftOrderList,
+  useDisplaySize,
+  useFmOrdersByGoods,
+} from '@project-lc/hooks';
 import {
   convertFmOrderStatusToString,
   FmOrderStatusNumString,
@@ -125,8 +129,14 @@ function getDateString(date: Date | string | null | undefined): string | undefin
 
 export function AdminGiftList(props: {
   selectedGoods: SeletctedLiveShoppingType;
+  selectedLiveShoppingId: number | null;
 }): JSX.Element {
-  const { selectedGoods } = props;
+  const { selectedGoods, selectedLiveShoppingId } = props;
+
+  const { data, refetch } = useAdminLiveShoppingGiftOrderList({
+    liveShoppingId: selectedLiveShoppingId,
+  });
+
   const orders = useFmOrdersByGoods(
     {
       searchStatuses: getFmOrderStatusByNames([
@@ -161,6 +171,7 @@ export function AdminGiftList(props: {
   }, [orders.data]);
 
   // 퍼스트몰 주문정보로 이동하기
+  // TODO: 크크쇼 주문정보로 이동하기
   const handleRowClick = (param: GridRowParams): void => {
     if (param.row?.order_seq) {
       const url = `http://whiletrue.firstmall.kr/admin/order/view?query_string=&no=${param.row?.order_seq}`;
@@ -170,6 +181,10 @@ export function AdminGiftList(props: {
 
   return (
     <Box minHeight={{ base: 300, md: 600 }} mt={3}>
+      <Button size="xs" onClick={() => refetch()} disabled={!selectedLiveShoppingId}>
+        새로고침
+      </Button>
+      <Box>{JSON.stringify(data)}</Box>
       <ChakraDataGrid
         bg={dataGridBgColor}
         autoHeight

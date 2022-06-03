@@ -10,8 +10,10 @@ import { SeletctedLiveShoppingType } from './AdminGiftList';
 
 export function AdminLiveShoppingList({
   setSelectedGoods,
+  onRowClick,
 }: {
   setSelectedGoods: (selectedGoods: SeletctedLiveShoppingType) => void;
+  onRowClick: (liveShoppingId: number) => void;
 }): JSX.Element {
   const { data: profileData } = useProfile();
 
@@ -23,6 +25,7 @@ export function AdminLiveShoppingList({
   );
 
   function handleClick(row: LiveShoppingWithGoods): void {
+    onRowClick(row.id);
     setSelectedGoods({
       goodsId: row.goodsId,
       broadcastStartDate: row.broadcastStartDate,
