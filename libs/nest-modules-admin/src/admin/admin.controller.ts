@@ -26,6 +26,7 @@ import {
   LiveShopping,
   PrivacyApproachHistory,
   ConfirmHistory,
+  Broadcaster,
 } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
@@ -166,6 +167,13 @@ export class AdminController {
     @Body(ValidationPipe) dto: ChangeSellCommissionDto,
   ): Promise<boolean> {
     return this.adminService.updateSellCommission(dto.commissionRate);
+  }
+
+  /** 방송인 목록 조회 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('/broadcasters')
+  public async findBroadcasters(): Promise<Broadcaster[]> {
+    return this.broadcasterService.getBroadcasters();
   }
 
   // 상품검수를 위한 상품 리스트

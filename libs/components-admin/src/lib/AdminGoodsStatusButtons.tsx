@@ -10,7 +10,7 @@ import AdminGoodsRejectionDialog from './AdminGoodsRejectionDialog';
 
 export function AdminGoodsStatusButtons(props: {
   goods: AdminGoodsByIdRes;
-}): JSX.Element {
+}): JSX.Element | null {
   const { goods } = props;
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -29,6 +29,8 @@ export function AdminGoodsStatusButtons(props: {
     }),
     [goods],
   );
+
+  if (goods.confirmation.status === 'confirmed') return null;
 
   return (
     <>
