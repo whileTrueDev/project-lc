@@ -22,16 +22,17 @@ import {
   AdminClassChangeHistory,
   Administrator,
   BusinessRegistrationConfirmation,
+  ConfirmHistory,
   GoodsConfirmation,
   LiveShopping,
   PrivacyApproachHistory,
-  ConfirmHistory,
 } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   BroadcasterService,
   BroadcasterSettlementHistoryService,
+  BroadcasterSettlementInfoService,
   BroadcasterSettlementService,
 } from '@project-lc/nest-modules-broadcaster';
 import { GoodsService } from '@project-lc/nest-modules-goods';
@@ -49,13 +50,16 @@ import {
   AdminSignUpDto,
   BroadcasterDTO,
   BroadcasterSettlementInfoConfirmationDto,
+  BroadcasterSettlementTargets,
   BusinessRegistrationConfirmationDto,
   BusinessRegistrationRejectionDto,
   ChangeSellCommissionDto,
+  ConfirmHistoryDto,
   CreateManyBroadcasterSettlementHistoryDto,
   EmailDupCheckDto,
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
+  FindManyDto,
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingDTO,
@@ -65,7 +69,6 @@ import {
   PrivacyApproachHistoryDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
-  ConfirmHistoryDto,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
@@ -84,11 +87,12 @@ export class AdminController {
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly orderCancelService: OrderCancelService,
     private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
-    private readonly broadcasterSettlementService: BroadcasterSettlementService,
+    private readonly broadcasterSettlementInfoService: BroadcasterSettlementInfoService,
     private readonly sellerService: SellerService,
     private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
     private readonly adminPrivacyApproachSevice: AdminPrivacyApproachSevice,
+    private readonly settlementService: BroadcasterSettlementService,
   ) {
     const wtIp = config.get('WHILETRUE_IP_ADDRESS');
     if (wtIp) this.allowedIpAddresses.push(wtIp);
@@ -139,6 +143,15 @@ export class AdminController {
   @Get('/settlement-history')
   getSettlementHistory(): ReturnType<SellerSettlementService['findSettlementHistory']> {
     return this.sellerSettlementService.findSettlementHistory();
+  }
+
+  /** 방송인 정산 대상 목록 조회 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('/settlement/broadcaster/targets')
+  public async findSettlementTargets(
+    @Query(new ValidationPipe({ transform: true })) dto: FindManyDto,
+  ): Promise<BroadcasterSettlementTargets> {
+    return this.settlementService.findSettlementTargets(undefined, dto);
   }
 
   /** 방송인 단일 정산처리 */
@@ -295,7 +308,7 @@ export class AdminController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/settelment-info-list/broadcaster')
   getBroadcasterSettlementInfoList(): Promise<AdminBroadcasterSettlementInfoList> {
-    return this.broadcasterSettlementService.getBroadcasterSettlementInfoList();
+    return this.broadcasterSettlementInfoService.getBroadcasterSettlementInfoList();
   }
 
   /** 방송인 정산정보 검수상태, 사유 수정 */
@@ -308,6 +321,7 @@ export class AdminController {
     return this.adminSettlementService.setBroadcasterSettlementInfoConfirmation(dto);
   }
 
+  /** 방송인 정산정보 검수 내역 생성 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/settlement-info/confirmation/history')
   createSettlementConfirmHistory(

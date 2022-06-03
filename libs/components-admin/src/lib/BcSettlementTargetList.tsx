@@ -33,8 +33,7 @@ import {
   useCreateSettleBcManyMutation,
 } from '@project-lc/hooks';
 import {
-  BroadcasterSettlementTarget,
-  convertFmDeliveryCompanyToString,
+  BroadcasterSettlementTargetsItem,
   CreateBroadcasterSettlementHistoryItem,
 } from '@project-lc/shared-types';
 import { settlementHistoryStore } from '@project-lc/stores';
@@ -51,8 +50,10 @@ export function calcSettleAmount(
 
 /** 총 주문금액 셀 */
 function TotalAmountCell({ row }: GridCellParams): JSX.Element {
-  const total = useBroadcasterSettlementTotalInfo(row as BroadcasterSettlementTarget);
-  return <Text>{!total.price ? '-' : getLocaleNumber(total.price)}</Text>;
+  const total = useBroadcasterSettlementTotalInfo(
+    row as BroadcasterSettlementTargetsItem,
+  );
+  return <Text>{!total ? '-' : getLocaleNumber(total.amount)}</Text>;
 }
 
 /** 방송인 수익 정산 대상 목록 */
@@ -62,9 +63,9 @@ export function BcSettlementTargetList(): JSX.Element {
   // * 상세보기 관련
   const detailDialog = useDisclosure();
   const [detailSelected, setDetailSelected] =
-    useState<BroadcasterSettlementTarget | null>(null);
+    useState<BroadcasterSettlementTargetsItem | null>(null);
   const onDetailOpen = useCallback(
-    (data: BroadcasterSettlementTarget): void => {
+    (data: BroadcasterSettlementTargetsItem): void => {
       detailDialog.onOpen();
       setDetailSelected(data);
     },
@@ -78,29 +79,29 @@ export function BcSettlementTargetList(): JSX.Element {
   // * datagrid columns
   const columns = useMemo<GridColumns>(() => {
     return [
-      { field: 'export_code', headerName: '출고코드', width: 150 },
+      { field: 'exportCode', headerName: '출고코드', width: 150 },
       {
-        field: 'confirm_date',
+        field: 'buyConfirmDate',
         headerName: '구매확정일',
         width: 150,
-        valueFormatter: ({ row }) => dayjs(row.confirm_date).format('YYYY/MM/DD'),
+        valueFormatter: ({ row }) => dayjs(row.buyConfirmDate).format('YYYY/MM/DD'),
       },
       {
-        field: 'order_user_name',
+        field: 'order.userName',
         headerName: '주문자(수령자)',
         width: 130,
         sortable: false,
-        valueFormatter: ({ row }) => `${row.order_user_name}(${row.recipient_user_name})`,
-      },
-      { field: 'buy_confirm', headerName: '구매확정타입', sortable: false, width: 120 },
-      {
-        field: 'delivery_company_code',
-        headerName: '택배사',
-        width: 100,
         valueFormatter: ({ row }) =>
-          convertFmDeliveryCompanyToString(row.delivery_company_code),
+          `${row.items[0].orderItem.order.ordererName}(${row.items[0].orderItem.order.recipientName})`,
       },
-      { field: 'delivery_number', headerName: '운송장번호', width: 150 },
+      {
+        field: 'buyConfirmSubject',
+        headerName: '구매확정타입',
+        sortable: false,
+        width: 120,
+      },
+      { field: 'deliveryCompany', headerName: '택배사', width: 100 },
+      { field: 'deliveryNumber', headerName: '운송장번호', width: 150 },
       {
         field: 'totalAmount',
         headerName: '총 주문금액',
@@ -114,7 +115,7 @@ export function BcSettlementTargetList(): JSX.Element {
         renderCell: ({ row }) => (
           <Button
             size="xs"
-            onClick={() => onDetailOpen(row as BroadcasterSettlementTarget)}
+            onClick={() => onDetailOpen(row as BroadcasterSettlementTargetsItem)}
           >
             자세히보기
           </Button>
@@ -122,12 +123,6 @@ export function BcSettlementTargetList(): JSX.Element {
       },
     ];
   }, [onDetailOpen]);
-
-  // * datagrid rows
-  const rows = useMemo(() => {
-    if (!targets.data) return [];
-    return targets.data.map((x) => ({ ...x, id: x.export_seq })) || [];
-  }, [targets.data]);
 
   // * datagrid 선택된 행
   const [selectedRows, setSelectedRows] = useState<GridSelectionModel>([]);
@@ -138,6 +133,7 @@ export function BcSettlementTargetList(): JSX.Element {
   // * 일괄 정산 처리
   const confirmDialog = useDisclosure();
   const toast = useToast();
+  const roundStore = settlementHistoryStore();
   const { mutateAsync } = useCreateSettleBcManyMutation();
   const onSuccess = (): void => {
     toast({ status: 'success', title: '정산처리 성공' });
@@ -145,39 +141,40 @@ export function BcSettlementTargetList(): JSX.Element {
   const onFail = (): void => {
     toast({ status: 'error', title: '정산처리 실패' });
   };
-
-  const roundStore = settlementHistoryStore();
-
   const onExecuteSettleMany = async (): Promise<void> => {
     const round = roundStore.selectedRound; // 'YYYY년MM월/1회차'
-    if (!round) toast({ title: '회차를 설정해 주세요.' });
-    else {
-      const _exports = rows.filter((r) => selectedRows.includes(r.id));
-      const dtoItems: Array<CreateBroadcasterSettlementHistoryItem> = [];
-      _exports.forEach((exp) => {
-        exp.items.forEach((i) => {
-          if (!(i.liveShopping || i.productPromotion)) return;
-          const commissionRate =
-            i.liveShopping?.broadcasterCommissionRate ||
-            i.productPromotion?.broadcasterCommissionRate ||
-            '0';
-          const amount = calcSettleAmount(Number(i.price), commissionRate);
-          dtoItems.push({
-            amount,
-            exportCode: exp.export_code,
-            liveShoppingId: i.liveShopping?.id,
-            productPromotionId: i.productPromotion?.id,
-            broadcasterId:
-              i.liveShopping?.broadcaster.id ||
-              i.productPromotion?.broadcasterPromotionPage.broadcaster.id,
-            orderId: exp.order_seq.toString(),
-            broadcasterCommissionRate: commissionRate,
-          });
+    if (!round) {
+      toast({ title: '회차를 설정해 주세요.' });
+      return;
+    }
+    const _exports = targets.data?.filter((r) => selectedRows.includes(r.id));
+    const dtoItems: Array<CreateBroadcasterSettlementHistoryItem> = [];
+    if (!_exports) {
+      toast({ description: '선택된 행이 없습니다. ' });
+      return;
+    }
+    _exports.forEach((exp) => {
+      exp.items.forEach((i) => {
+        if (!(i.orderItem.support.liveShopping || i.orderItem.support.productPromotion))
+          return;
+        const commissionRate =
+          i.orderItem.support.liveShopping?.broadcasterCommissionRate ||
+          i.orderItem.support.productPromotion?.broadcasterCommissionRate ||
+          '0';
+        const amount = calcSettleAmount(Number(i.amount), commissionRate);
+        dtoItems.push({
+          amount,
+          exportCode: exp.exportCode || `NON_EXPORT_CODE_${exp.id}`,
+          liveShoppingId: i.orderItem.support.liveShopping?.id,
+          productPromotionId: i.orderItem.support.productPromotion?.id,
+          broadcasterId: i.orderItem.support.broadcaster.id,
+          orderId: i.orderItem.order.id.toString(),
+          broadcasterCommissionRate: commissionRate,
         });
       });
+    });
 
-      await mutateAsync({ round, items: dtoItems }).then(onSuccess).catch(onFail);
-    }
+    await mutateAsync({ round, items: dtoItems }).then(onSuccess).catch(onFail);
   };
 
   return (
@@ -186,7 +183,7 @@ export function BcSettlementTargetList(): JSX.Element {
         bg={useColorModeValue('inherit', 'gray.300')}
         autoHeight
         columns={columns}
-        rows={rows}
+        rows={targets.data || []}
         rowsPerPageOptions={[10, 20, 50, 100]}
         disableSelectionOnClick
         disableColumnMenu
@@ -249,7 +246,7 @@ export function BcSettlementTargetList(): JSX.Element {
 }
 
 interface BcSettlementTargetDetailProps {
-  settlementTarget: BroadcasterSettlementTarget;
+  settlementTarget: BroadcasterSettlementTargetsItem;
 }
 /** 방송인 수익 정산 상세 정보 */
 function BcSettlementTargetDetail({
@@ -258,19 +255,16 @@ function BcSettlementTargetDetail({
   const total = useBroadcasterSettlementTotalInfo(settlementTarget);
   const infos = useMemo(
     () => [
-      { title: '출고코드', value: settlementTarget.export_code },
+      { title: '출고코드', value: settlementTarget.exportCode },
       {
         title: '주문자(수령자)',
-        value: `${settlementTarget.order_user_name}(${settlementTarget.recipient_user_name})`,
+        value: `${settlementTarget.items[0].orderItem.order.ordererName}(${settlementTarget.items[0].orderItem.order.recipientName})`,
       },
-      {
-        title: '택배사',
-        value: convertFmDeliveryCompanyToString(settlementTarget.delivery_company_code),
-      },
-      { title: '운송장번호', value: settlementTarget.delivery_number },
+      { title: '택배사', value: settlementTarget.deliveryCompany },
+      { title: '운송장번호', value: settlementTarget.deliveryNumber },
       {
         title: '총 출고 가격',
-        value: total.price ? `${getLocaleNumber(total.price)}원` : '-',
+        value: total ? `${getLocaleNumber(total.amount)}원` : '-',
       },
       {
         title: '총 정산액',
@@ -278,13 +272,11 @@ function BcSettlementTargetDetail({
       },
     ],
     [
-      settlementTarget.delivery_company_code,
-      settlementTarget.delivery_number,
-      settlementTarget.export_code,
-      settlementTarget.order_user_name,
-      settlementTarget.recipient_user_name,
-      total.price,
-      total.settleAmount,
+      settlementTarget.deliveryCompany,
+      settlementTarget.deliveryNumber,
+      settlementTarget.exportCode,
+      settlementTarget.items,
+      total,
     ],
   );
   return (
@@ -302,67 +294,49 @@ function BcSettlementTargetDetail({
         출고상품정보
       </Heading>
       {settlementTarget.items.map((item) => (
-        <Box
-          key={item.item_option_seq}
-          borderWidth="thin"
-          borderRadius="md"
-          p={{ base: 1, sm: 2 }}
-        >
+        <Box key={item.id} borderWidth="thin" borderRadius="md" p={{ base: 1, sm: 2 }}>
           <Grid templateColumns="repeat(4, 1fr)" gap={{ base: 1, sm: 2 }}>
             <GridItem colSpan={{ base: 4, sm: 1 }}>
-              {item.image && (
+              {item.orderItem.goods.image && (
                 <ChakraNextImage
-                  src={`http://whiletrue.firstmall.kr${item.image}`}
+                  src={item.orderItem.goods.image[0].image}
                   width={75}
                   height={75}
                 />
               )}
             </GridItem>
             <GridItem colSpan={{ base: 4, sm: 3 }}>
-              <Text fontWeight="bold">{item.goods_name}</Text>
-              {item.title1 && item.option1 && (
-                <Text fontSize="sm">{`${item.title1}: ${item.option1}`}</Text>
+              <Text fontWeight="bold">{item.orderItem.goods.goods_name}</Text>
+              {item.orderItemOption.name && item.orderItemOption.value && (
+                <Text fontSize="sm">{`${item.orderItemOption.name}: ${item.orderItemOption.value}`}</Text>
               )}
-              <Text fontSize="sm">{getLocaleNumber(item.price)} 원</Text>
+              <Text fontSize="sm">{getLocaleNumber(item.amount)} 원</Text>
             </GridItem>
           </Grid>
           <Box mt={4}>
             <Grid mt={1} templateColumns="1fr 2fr">
               <GridTableItem
                 title="판매유형"
-                value={<SellTypeBadge sellType={item.sellType} />}
+                value={<SellTypeBadge sellType={item.orderItem.channel} />}
               />
               <GridTableItem
                 title="방송인 활동명"
-                value={
-                  item.liveShopping?.broadcaster.userNickname ||
-                  item.productPromotion?.broadcasterPromotionPage.broadcaster
-                    .userNickname ||
-                  ''
-                }
+                value={item.orderItem.support?.broadcaster.userNickname}
               />
-              <GridTableItem
-                title="퍼스트몰 상품번호"
-                value={
-                  item.liveShopping?.fmGoodsSeq ||
-                  item.productPromotion?.fmGoodsSeq ||
-                  '-'
-                }
-              />
-              {item.liveShopping && (
+              {item.orderItem.support.liveShopping && (
                 <GridTableItem
                   title="판매기간"
                   value={
                     <Box>
                       <Text>
-                        {dayjs(item.liveShopping.sellStartDate).format(
+                        {dayjs(item.orderItem.support.liveShopping.sellStartDate).format(
                           'YYYY/MM/DD HH시 mm분',
                         )}{' '}
                         부터
                       </Text>
 
                       <Text>
-                        {dayjs(item.liveShopping.sellEndDate).format(
+                        {dayjs(item.orderItem.support.liveShopping.sellEndDate).format(
                           'YYYY/MM/DD HH시 mm분',
                         )}{' '}
                         까지
@@ -371,22 +345,22 @@ function BcSettlementTargetDetail({
                   }
                 />
               )}
-              {item.liveShopping && (
+              {item.orderItem.support.liveShopping && (
                 <GridTableItem
                   title="정산액 및 수수료율"
                   value={`${calcSettleAmount(
-                    Number(item.price),
-                    item.liveShopping.broadcasterCommissionRate,
-                  ).toLocaleString()}원 (${item.liveShopping.broadcasterCommissionRate.toString()}%)`}
+                    Number(item.amount),
+                    item.orderItem.support.liveShopping.broadcasterCommissionRate,
+                  ).toLocaleString()}원 (${item.orderItem.support.liveShopping.broadcasterCommissionRate.toString()}%)`}
                 />
               )}
-              {item.productPromotion && (
+              {item.orderItem.support.productPromotion && (
                 <GridTableItem
                   title="정산액 및 수수료율"
                   value={`${calcSettleAmount(
-                    Number(item.price),
-                    item.productPromotion.broadcasterCommissionRate,
-                  ).toLocaleString()}원 (${item.productPromotion.broadcasterCommissionRate.toString()}%)`}
+                    Number(item.amount),
+                    item.orderItem.support.productPromotion.broadcasterCommissionRate,
+                  ).toLocaleString()}원 (${item.orderItem.support.productPromotion.broadcasterCommissionRate.toString()}%)`}
                 />
               )}
             </Grid>
@@ -398,7 +372,7 @@ function BcSettlementTargetDetail({
 }
 
 interface BcSettlementTargetDetailDialogProps {
-  settlementTarget: BroadcasterSettlementTarget;
+  settlementTarget: BroadcasterSettlementTargetsItem;
   isOpen: boolean;
   onClose: () => void;
 }

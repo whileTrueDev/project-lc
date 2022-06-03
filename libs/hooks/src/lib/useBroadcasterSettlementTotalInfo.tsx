@@ -1,16 +1,10 @@
-import { BroadcasterSettlementTarget } from '@project-lc/shared-types';
-import {
-  BroadcasterSettlementTotalInfo,
-  calcBroadcasterSettlementTotalInfo,
-} from '@project-lc/utils';
+import { BroadcasterSettlementTargetsItem } from '@project-lc/shared-types';
+import { BcSettlementTotalInfo, calcBcSettlementTotalInfo } from '@project-lc/utils';
 import { useMemo } from 'react';
 
-/** 방송인 정산 정보 */
+/** 방송인 정산 대상 총 정보 */
 export const useBroadcasterSettlementTotalInfo = (
-  settlementTarget: BroadcasterSettlementTarget,
-): BroadcasterSettlementTotalInfo => {
-  return useMemo(
-    () => calcBroadcasterSettlementTotalInfo(settlementTarget.items),
-    [settlementTarget.items],
-  );
+  settlementTarget: BroadcasterSettlementTargetsItem,
+): BcSettlementTotalInfo => {
+  return useMemo(() => calcBcSettlementTotalInfo(settlementTarget), [settlementTarget]);
 };

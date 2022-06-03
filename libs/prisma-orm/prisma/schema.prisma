@@ -699,6 +699,8 @@ model ProductPromotion {
   broadcasterId Int?
   broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 
+  orderItemSupport OrderItemSupport[]
+  cartItemSupport  CartItemSupport[]
 }
 
 // -------------------------------------------------
@@ -735,6 +737,8 @@ model LiveShopping {
   BroadcasterSettlementItems  BroadcasterSettlementItems[]
   images                      LiveShoppingImage[]
   followers                   Customer[]
+  orderItemSupport            OrderItemSupport[]
+  cartItemSupport             CartItemSupport[]
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -1433,6 +1437,13 @@ model CartItemSupport {
   broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
   cartItemId    Int?         @unique // 후원이 연결된 장바구니 상품 고유번호
   cartItem      CartItem?    @relation(fields: [cartItemId], references: [id], onDelete: Cascade) // 후원이 연결된 장바구니 상품
+
+  // 연결된 라이브쇼핑
+  liveShoppingId     Int?
+  liveShopping       LiveShopping?     @relation(fields: [liveShoppingId], references: [id])
+  // 연결된 상품홍보
+  productPromotionId Int?
+  productPromotion   ProductPromotion? @relation(fields: [productPromotionId], references: [id])
 }
 
 // *****************
@@ -1658,13 +1669,19 @@ model OrderItemOption {
 
 // 주문상품후원
 model OrderItemSupport {
-  id            Int          @id @default(autoincrement()) // 주문 상품 후원 고유번호
-  message       String? // 후원메시지
-  nickname      String? // 후원한 사람 닉네임(필요없을거 같기는 한데 비회원의 경우 필요할거같아서 일단 넣어둠)
-  broadcasterId Int? // 후원 대상 방송인 고유번호
-  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
-  orderItemId   Int?         @unique // 후원이 연결된 주문 상품 고유번호
-  orderItem     OrderItem?   @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 후원이 연결된 주문 상품
+  id                 Int               @id @default(autoincrement()) // 주문 상품 후원 고유번호
+  message            String? // 후원메시지
+  nickname           String? // 후원한 사람 닉네임(필요없을거 같기는 한데 비회원의 경우 필요할거같아서 일단 넣어둠)
+  broadcasterId      Int? // 후원 대상 방송인 고유번호
+  broadcaster        Broadcaster?      @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
+  orderItemId        Int?              @unique // 후원이 연결된 주문 상품 고유번호
+  orderItem          OrderItem?        @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 후원이 연결된 주문 상품
+  // 연결된 라이브쇼핑
+  liveShoppingId     Int?
+  liveShopping       LiveShopping?     @relation(fields: [liveShoppingId], references: [id])
+  // 연결된 상품홍보
+  productPromotionId Int?
+  productPromotion   ProductPromotion? @relation(fields: [productPromotionId], references: [id])
 }
 
 // ****************
@@ -1900,9 +1917,9 @@ model Export {
 
 // 구매확정주체
 enum BuyConfirmSubject {
-  admin
-  customer
-  system
+  admin // 관리자에 의해
+  customer // 소비자에 의해
+  system // 자동처리에 의해
 }
 
 // 출고상품

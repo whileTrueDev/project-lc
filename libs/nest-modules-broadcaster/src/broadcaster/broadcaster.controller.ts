@@ -43,8 +43,8 @@ import __multer from 'multer';
 import { Broadcaster, BroadcasterAddress } from '.prisma/client';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
-import { BroadcasterSettlementService } from './broadcaster-settlement.service';
 import { BroadcasterService } from './broadcaster.service';
+import { BroadcasterSettlementInfoService } from './settlement-info/broadcaster-settlement-info.service';
 
 @CacheClearKeys('broadcaster')
 @Controller('broadcaster')
@@ -54,7 +54,7 @@ export class BroadcasterController {
     private readonly channelService: BroadcasterChannelService,
     private readonly mailVerificationService: MailVerificationService,
     private readonly broadcasterContactsService: BroadcasterContactsService,
-    private readonly broadcasterSettlementService: BroadcasterSettlementService,
+    private readonly broadcasterSettlementInfoService: BroadcasterSettlementInfoService,
     private readonly prismaService: PrismaService,
   ) {}
 
@@ -98,11 +98,11 @@ export class BroadcasterController {
           this.broadcasterContactsService.restoreBroadcasterContacts(broadcaster.id),
           this.broadcasterService.restoreBroadcasterAddress(broadcaster.id),
           this.channelService.restoreBroadcasterChannel(broadcaster.id),
-          this.broadcasterSettlementService
+          this.broadcasterSettlementInfoService
             .restoreBroadcasterSettlement(broadcaster.id)
             .then((settlementInfo) => {
               if (settlementInfo) {
-                this.broadcasterSettlementService.restoreBroadcasterSettlementConfirmation(
+                this.broadcasterSettlementInfoService.restoreBroadcasterSettlementConfirmation(
                   settlementInfo.id,
                 );
               }

@@ -203,6 +203,8 @@ CREATE TABLE `CartItemSupport` (
     `nickname` VARCHAR(191) NULL,
     `broadcasterId` INTEGER NULL,
     `cartItemId` INTEGER NULL,
+    `liveShoppingId` INTEGER NULL,
+    `productPromotionId` INTEGER NULL,
 
     UNIQUE INDEX `CartItemSupport_cartItemId_key`(`cartItemId`),
     PRIMARY KEY (`id`)
@@ -349,6 +351,8 @@ CREATE TABLE `OrderItemSupport` (
     `nickname` VARCHAR(191) NULL,
     `broadcasterId` INTEGER NULL,
     `orderItemId` INTEGER NULL,
+    `liveShoppingId` INTEGER NULL,
+    `productPromotionId` INTEGER NULL,
 
     UNIQUE INDEX `OrderItemSupport_orderItemId_key`(`orderItemId`),
     PRIMARY KEY (`id`)
@@ -649,6 +653,12 @@ ALTER TABLE `CartItemSupport` ADD CONSTRAINT `CartItemSupport_broadcasterId_fkey
 ALTER TABLE `CartItemSupport` ADD CONSTRAINT `CartItemSupport_cartItemId_fkey` FOREIGN KEY (`cartItemId`) REFERENCES `CartItem`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `CartItemSupport` ADD CONSTRAINT `CartItemSupport_productPromotionId_fkey` FOREIGN KEY (`productPromotionId`) REFERENCES `ProductPromotion`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `CartItemSupport` ADD CONSTRAINT `CartItemSupport_liveShoppingId_fkey` FOREIGN KEY (`liveShoppingId`) REFERENCES `LiveShopping`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `GoodsReview` ADD CONSTRAINT `GoodsReview_goodsId_fkey` FOREIGN KEY (`goodsId`) REFERENCES `Goods`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -707,6 +717,13 @@ ALTER TABLE `OrderItemSupport` ADD CONSTRAINT `OrderItemSupport_broadcasterId_fk
 
 -- AddForeignKey
 ALTER TABLE `OrderItemSupport` ADD CONSTRAINT `OrderItemSupport_orderItemId_fkey` FOREIGN KEY (`orderItemId`) REFERENCES `OrderItem`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderItemSupport` ADD CONSTRAINT `OrderItemSupport_productPromotionId_fkey` FOREIGN KEY (`productPromotionId`) REFERENCES `ProductPromotion`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderItemSupport` ADD CONSTRAINT `OrderItemSupport_liveShoppingId_fkey` FOREIGN KEY (`liveShoppingId`) REFERENCES `LiveShopping`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
 
 -- AddForeignKey
 ALTER TABLE `Refund` ADD CONSTRAINT `Refund_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

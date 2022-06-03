@@ -1,5 +1,6 @@
 import {
   Coupon,
+  LiveShopping,
   Order,
   OrderItem,
   OrderItemOption,
@@ -7,6 +8,7 @@ import {
   OrderPayment,
   OrderProcessStep,
   PaymentMethod,
+  ProductPromotion,
   SellType,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
@@ -43,6 +45,11 @@ export class CreateOrderItemSupportDto {
   broadcasterId: OrderItemSupport['broadcasterId'];
 
   @IsOptional() avatar?: string | null;
+
+  /** 후원이 발생된 liveShopping 고유번호 */
+  @IsOptional() @IsNumber() liveShoppingId?: LiveShopping['id'];
+  /** 후원이 발생된 productPromotion 고유번호 */
+  @IsOptional() @IsNumber() productPromotionId?: ProductPromotion['id'];
 }
 
 /** 주문상품옵션 OrderItemOption 생성 dto */
