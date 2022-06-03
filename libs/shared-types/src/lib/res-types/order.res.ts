@@ -25,6 +25,7 @@ import {
   ReturnImage,
   ReturnItem,
   Seller,
+  SellType,
   SellerShop,
 } from '@prisma/client';
 
@@ -96,4 +97,35 @@ export type OrderListRes = {
 export type OrderDetailRes = OrderBaseData & {
   exchanges: Nullable<ExchangeDataWithImages[]>;
   returns: Nullable<ReturnDataWithImages[]>;
+};
+/**
+ * 방송인 후원 주문 목록 타입
+ */
+export interface FindAllOrderByBroadcaster {
+  orderCode: string;
+  step: string;
+  orderPrice: number;
+  paymentPrice: number;
+  giftFlag: boolean;
+  supportOrderIncludeFlag: boolean;
+  createDate: Order['createDate'];
+  orderItems: Array<{
+    id: OrderItem['id'];
+    channel: SellType;
+    review: GoodsReview | null;
+    support: OrderItemSupport;
+    goods: {
+      goods_name: Goods['goods_name'];
+      image: GoodsImages[];
+      seller: {
+        sellerShop: {
+          shopName: string | null;
+        };
+      };
+    };
+  }>;
+}
+export type FindAllOrderByBroadcasterRes = {
+  orders: FindAllOrderByBroadcaster[];
+  nextCursor?: number;
 };

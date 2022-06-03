@@ -1,14 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Flex,
-  Image,
-  Text,
-  useDisclosure,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Image, Text, useDisclosure } from '@chakra-ui/react';
 import { GoodsInquiryComment } from '@prisma/client';
 import {
   useGoodsInquiryComments,
@@ -117,28 +109,16 @@ export function GoodsInquiryItem({
       <CommentList
         commentType="답변"
         comments={comments.data || []}
-        buttonSet={({ comment: c }): JSX.Element => {
-          const _comment = c as GoodsInquiryCommentResItem;
-          if (
-            profile && profile.id && profile.type === 'admin'
-              ? _comment.adminId === profile.id
-              : _comment.sellerId === profile?.id
-          ) {
-            return (
-              <ButtonGroup size="xs">
-                <Button onClick={() => onCommentUpdate(_comment)} leftIcon={<EditIcon />}>
-                  수정
-                </Button>
-                <Button
-                  onClick={() => onCommentDelete(_comment)}
-                  leftIcon={<DeleteIcon />}
-                >
-                  삭제
-                </Button>
-              </ButtonGroup>
-            );
-          }
-          return <></>;
+        onCommentDelete={(c) => onCommentDelete(c as GoodsInquiryCommentResItem)}
+        onCommentUpdate={(c) => onCommentUpdate(c as GoodsInquiryCommentResItem)}
+        isButtonSetVisible={(comment) => {
+          const _comment = comment as GoodsInquiryCommentResItem;
+          return !!(
+            profile &&
+            (profile.type === 'admin' || // 관리자거나
+              // 로그인 유저가 판매자면서 답변이 해당 판매자가 직접 작성한 경우
+              (profile.type === 'seller' && profile.id && _comment.sellerId))
+          );
         }}
       />
 

@@ -1,9 +1,10 @@
 /* eslint-disable react/no-array-index-key */
-import { Icon } from '@chakra-ui/icons';
-import { Box, Collapse, Flex, Text } from '@chakra-ui/react';
+import { DeleteIcon, EditIcon, Icon } from '@chakra-ui/icons';
+import { Box, Button, ButtonGroup, Collapse, Flex, Text } from '@chakra-ui/react';
 import {
   GoodsInquiryCommentRes,
   GoodsInquiryCommentResItem,
+  GoodsReviewCommentItem,
   GoodsReviewCommentRes,
 } from '@project-lc/shared-types';
 import { useState } from 'react';
@@ -14,13 +15,22 @@ import ReplyText from './ReplyText';
 export interface CommentListProps {
   comments: GoodsReviewCommentRes | GoodsInquiryCommentRes;
   commentType?: '댓글' | '답변';
-  /** 댓글 수정/삭제 등 버튼모음. 이름 위에 버튼이 표시됩니다. */
-  buttonSet?: (props: { comment: CommentListProps['comments'][number] }) => JSX.Element;
+  isButtonSetVisible?: (
+    comment: GoodsReviewCommentItem | GoodsInquiryCommentResItem,
+  ) => boolean;
+  onCommentUpdate?: (
+    comment: GoodsReviewCommentItem | GoodsInquiryCommentResItem,
+  ) => void;
+  onCommentDelete?: (
+    comment: GoodsReviewCommentItem | GoodsInquiryCommentResItem,
+  ) => void;
 }
 export function CommentList({
   comments,
   commentType = '댓글',
-  buttonSet,
+  isButtonSetVisible,
+  onCommentUpdate,
+  onCommentDelete,
 }: CommentListProps): JSX.Element | null {
   const [commentOpen, setCommentOpen] = useState(false);
   if (comments.length === 0) return null;
@@ -42,7 +52,26 @@ export function CommentList({
             <Flex key={comment.id} gap={2} my={2}>
               <Icon as={BsArrowReturnRight} mt={1} />
               <Box>
-                {buttonSet ? buttonSet({ comment }) : null}
+                {isButtonSetVisible && isButtonSetVisible(comment) && (
+                  <ButtonGroup size="xs">
+                    <Button
+                      onClick={
+                        onCommentUpdate ? () => onCommentUpdate(comment) : undefined
+                      }
+                      leftIcon={<EditIcon />}
+                    >
+                      수정
+                    </Button>
+                    <Button
+                      onClick={
+                        onCommentDelete ? () => onCommentDelete(comment) : undefined
+                      }
+                      leftIcon={<DeleteIcon />}
+                    >
+                      삭제
+                    </Button>
+                  </ButtonGroup>
+                )}
                 {comment.seller && (
                   <ReplyText
                     avatar={comment.seller.avatar || ''}
@@ -57,6 +86,14 @@ export function CommentList({
                   <ReplyText
                     avatar="" // 크크쇼 심볼 로고 추가 필요
                     name="크크쇼 관리자"
+                    createDate={comment.createDate}
+                    content={comment.content}
+                  />
+                )}
+                {(comment as GoodsReviewCommentItem).customer && (
+                  <ReplyText
+                    avatar=""
+                    name={(comment as GoodsReviewCommentItem).customer.nickname || ''}
                     createDate={comment.createDate}
                     content={comment.content}
                   />

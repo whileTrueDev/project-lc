@@ -46,19 +46,21 @@ export function GoodsDetailInfo({ goods }: GoodsDetailInfoProps): JSX.Element {
         </Text>
       </Box>
 
-      <Box>
-        <Text fontWeight="bold">상품 필수 정보</Text>
-        <Box fontSize="sm">
-          {Object.keys(goods.informationNotice.contents).map((key) => (
-            <Grid key={key} templateColumns="repeat(4, 1fr)" py={1} gap={2}>
-              <GridItem colSpan={[4, 4, 1]}>{key}</GridItem>
-              <GridItem colSpan={[4, 4, 3]} alignItems="center" display="flex">
-                {goods.informationNotice.contents[key]}
-              </GridItem>
-            </Grid>
-          ))}
+      {goods.informationNotice && (
+        <Box>
+          <Text fontWeight="bold">상품 필수 정보</Text>
+          <Box fontSize="sm">
+            {Object.keys(goods.informationNotice.contents).map((key) => (
+              <Grid key={key} templateColumns="repeat(4, 1fr)" py={1} gap={2}>
+                <GridItem colSpan={[4, 4, 1]}>{key}</GridItem>
+                <GridItem colSpan={[4, 4, 3]} alignItems="center" display="flex">
+                  {goods.informationNotice.contents[key]}
+                </GridItem>
+              </Grid>
+            ))}
+          </Box>
         </Box>
-      </Box>
+      )}
     </Stack>
   );
 }

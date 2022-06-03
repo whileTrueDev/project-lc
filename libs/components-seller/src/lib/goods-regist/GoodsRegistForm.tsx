@@ -182,6 +182,7 @@ export function GoodsRegistForm(): JSX.Element {
 
     // 상품필수정보 (품목별 정보제공고시 정보)
     const informationNoticeDto: Record<string, string> = {};
+    console.log('informationNotice: ', informationNotice);
     Object.entries(informationNotice).forEach(([key, value]) => {
       if (!value) {
         // 기본값 처리
@@ -312,7 +313,7 @@ export function GoodsRegistForm(): JSX.Element {
         <GoodsRegistCommonInfo />
 
         {/* 배송비 (내가 생성한 배송정책 조회 기능 + 선택 기능 포함), 배송정책 등록 다이얼로그와 연결 */}
-        <GoodsRegistShippingPolicy />
+        <GoodsRegistShippingPolicy sellerId={profileData?.id} />
 
         {/* 상품 키워드 정보 */}
         <GoodsRegistKeywords />

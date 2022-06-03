@@ -1,7 +1,13 @@
-import { GetOrderListDto, OrderListRes } from '@project-lc/shared-types';
+import {
+  FindAllOrderByBroadcasterRes,
+  FindManyDto,
+  GetOrderListDto,
+  OrderListRes,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import {
   useInfiniteQuery,
+  UseInfiniteQueryOptions,
   UseInfiniteQueryResult,
   useQuery,
   UseQueryResult,
@@ -66,6 +72,32 @@ export const useSellerOrderList = (
         dto.periodEnd ||
         dto.searchStatuses
       ),
+    },
+  );
+};
+export const getOrderByBroadcasterList = async (
+  broadcasterId?: number,
+  dto?: FindManyDto,
+): Promise<FindAllOrderByBroadcasterRes> => {
+  return axios
+    .get<FindAllOrderByBroadcasterRes>(`/order/by-broadcaster/${broadcasterId}`, {
+      params: dto,
+    })
+    .then((res) => res.data);
+};
+export const useOrderByBroadcasterList = (
+  broadcasterId?: number,
+  dto?: FindManyDto,
+  options?: UseInfiniteQueryOptions<FindAllOrderByBroadcasterRes, AxiosError>,
+): UseInfiniteQueryResult<FindAllOrderByBroadcasterRes, AxiosError> => {
+  return useInfiniteQuery<FindAllOrderByBroadcasterRes, AxiosError>(
+    ['OrderByBroadcasterList', broadcasterId, dto],
+    ({ pageParam = 0 }) =>
+      getOrderByBroadcasterList(broadcasterId, { ...dto, skip: pageParam }),
+    {
+      ...options,
+      enabled: !!broadcasterId,
+      getNextPageParam: (lastPage) => lastPage?.nextCursor,
     },
   );
 };

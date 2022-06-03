@@ -31,8 +31,13 @@ export interface GoodsDisplay2Props {
     };
   };
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  disableLink?: boolean;
 }
-export function GoodsDisplay2({ goods, size = 'md' }: GoodsDisplay2Props): JSX.Element {
+export function GoodsDisplay2({
+  goods,
+  size = 'md',
+  disableLink = false,
+}: GoodsDisplay2Props): JSX.Element {
   let imageSize = 100;
   switch (size) {
     case 'xs':
@@ -56,18 +61,24 @@ export function GoodsDisplay2({ goods, size = 'md' }: GoodsDisplay2Props): JSX.E
   }
   return (
     <Flex gap={2}>
-      <Image
-        rounded="md"
-        src={goods.imageSrc}
-        width={imageSize}
-        height={imageSize}
-        objectFit="cover"
-        draggable={false}
-      />
+      {goods.imageSrc && (
+        <Image
+          rounded="md"
+          src={goods.imageSrc}
+          width={imageSize}
+          height={imageSize}
+          objectFit="cover"
+          draggable={false}
+        />
+      )}
       <Box>
-        <NextLink passHref href={`/goods/${goods.id}`}>
-          <Link fontWeight="bold">{goods.name}</Link>
-        </NextLink>
+        {disableLink ? (
+          <Text fontWeight="bold">{goods.name}</Text>
+        ) : (
+          <NextLink passHref href={`/goods/${goods.id}`}>
+            <Link fontWeight="bold">{goods.name}</Link>
+          </NextLink>
+        )}
         {goods.options &&
           goods.options.map((opt) => (
             <Flex key={opt.id} align="center" gap={1}>

@@ -1,5 +1,6 @@
 import { IsInt, IsString } from 'class-validator';
 import { SellType } from '@prisma/client';
+import { FindManyDto } from './findMany.dto';
 
 export class BroadcasterPurchaseDto {
   @IsInt() id: number;
@@ -17,3 +18,5 @@ export type BroacasterPurchaseWithDividedMessageDto = Omit<
   userNickname: string;
   userMessage: string;
 };
+
+export class OrderByBroadcasterDto extends FindManyDto {}

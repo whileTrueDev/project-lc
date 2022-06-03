@@ -1,5 +1,6 @@
 import { Button, SimpleGrid, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
+import { ReviewCreateDialog } from '@project-lc/components-shared/goods-review/ReviewCreateDialog';
 import { useOrderPurchaseConfirmMutation } from '@project-lc/hooks';
 import {
   deliveryTrackingAbleSteps,
@@ -10,7 +11,6 @@ import {
   reviewAbleSteps,
 } from '@project-lc/shared-types';
 import { useRouter } from 'next/router';
-import ReviewCreateDialog from '../../review/ReviewCreateDialog';
 import { OrderCancelDialog } from './OrderCancelDialog';
 import { OrderItemOptionInfoProps } from './OrderItemOptionInfo';
 

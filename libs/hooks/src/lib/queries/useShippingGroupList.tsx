@@ -11,8 +11,12 @@ export type ShippingGroupListItemType = ShippingGroup & {
 
 export type ShippingGroupList = ShippingGroupListItemType[];
 
-export const getShippingGroupList = async (): Promise<ShippingGroupList> => {
-  return axios.get<ShippingGroupList>('/shipping-group').then((res) => res.data);
+export const getShippingGroupList = async (
+  sellerId: number,
+): Promise<ShippingGroupList> => {
+  return axios
+    .get<ShippingGroupList>('/shipping-group', { params: { sellerId } })
+    .then((res) => res.data);
 };
 
 export const useShippingGroupList = (
@@ -21,7 +25,7 @@ export const useShippingGroupList = (
 ): UseQueryResult<ShippingGroupList, AxiosError> => {
   return useQuery<ShippingGroupList, AxiosError>(
     ['ShippingGroupList', sellerId],
-    getShippingGroupList,
+    () => getShippingGroupList(sellerId),
     {
       enabled,
     },
