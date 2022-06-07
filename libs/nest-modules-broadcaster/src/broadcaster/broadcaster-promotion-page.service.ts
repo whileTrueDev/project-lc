@@ -90,4 +90,25 @@ export class BroadcasterPromotionPageService {
       },
     });
   }
+
+  /** 방송인 id로 상품홍보페이지id 찾거나 생성 */
+  public async findOrCreatePromotionPageId({
+    broadcasterId,
+  }: {
+    broadcasterId: Broadcaster['id'];
+  }): Promise<BroadcasterPromotionPage['id']> {
+    const existPromotionPage = await this.prisma.broadcasterPromotionPage.findUnique({
+      where: { broadcasterId },
+    });
+    if (!existPromotionPage) {
+      // 없으면 홍보 페이지 만들기
+      const newPromotionPage = await this.prisma.broadcasterPromotionPage.create({
+        data: {
+          broadcaster: { connect: { id: broadcasterId } },
+        },
+      });
+      return newPromotionPage.id;
+    }
+    return existPromotionPage.id;
+  }
 }

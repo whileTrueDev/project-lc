@@ -1,6 +1,7 @@
 import { useCartStore } from '@project-lc/stores';
 import { useMemo } from 'react';
 import { useCart } from '../queries/useCart';
+import useCartShippingGroups from './useCartShippingCostByShippingGroup';
 
 interface CartCalculatedMetrics {
   totalGoodsPrice: number;
@@ -18,6 +19,18 @@ const defaultCartCalculatedMetrics: CartCalculatedMetrics = {
 export function useCartCalculatedMetrics(): CartCalculatedMetrics {
   const { data } = useCart();
   const selectedItems = useCartStore((s) => s.selectedItems);
+
+  const { totalShippingCostObjectById } = useCartShippingGroups();
+  const totalShippingCost = Object.values(totalShippingCostObjectById).reduce(
+    (sum, costObj) => {
+      if (costObj) {
+        return sum + costObj.std + costObj.add;
+      }
+      return sum;
+    },
+    0,
+  );
+
   const calculated = useMemo(() => {
     if (!data) return defaultCartCalculatedMetrics;
     return data
@@ -33,12 +46,12 @@ export function useCartCalculatedMetrics(): CartCalculatedMetrics {
         );
         return {
           totalGoodsPrice: prev.totalGoodsPrice + itemprice,
-          totalShippingCost: prev.totalShippingCost + Number(item.shippingCost),
+          totalShippingCost,
           totalOrderPrice: prev.totalOrderPrice + orderPrice,
           totalDiscountAmount: prev.totalDiscountAmount + (itemprice - orderPrice),
         };
       }, defaultCartCalculatedMetrics);
-  }, [data, selectedItems]);
+  }, [data, selectedItems, totalShippingCost]);
 
   return calculated;
 }

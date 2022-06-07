@@ -762,6 +762,30 @@ export class GoodsService {
     });
   }
 
+  /** 전체 상품목록 조회(카테고리 포함) -
+   * 관리자에서 쿠폰에 연결하기 위한 상품(project-lc goods) 전체목록. 검수완료 & 정상판매중 일 것
+   * goodsConfirmation.status === confirmed && goods.status === normal
+   * goodsId, goodsName, sellerId, sellerEmail
+   * */
+  public async findAllConfirmedLcGoodsListWithCategory(): Promise<AdminAllLcGoodsList> {
+    return this.prisma.goods.findMany({
+      where: {
+        goods_status: 'normal',
+        AND: {
+          confirmation: {
+            status: 'confirmed',
+          },
+        },
+      },
+      select: {
+        id: true,
+        goods_name: true,
+        seller: { select: { id: true, email: true } },
+        categories: true,
+      },
+    });
+  }
+
   /**
    * 상품 노출 여부를 조절하여 보이지 않도록 설정하지 않은 모든 상품의 상품번호를 반환합니다.
    */

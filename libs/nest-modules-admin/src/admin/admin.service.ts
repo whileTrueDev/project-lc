@@ -8,6 +8,7 @@ import {
   Administrator,
   GoodsConfirmation,
 } from '@prisma/client';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminClassDto,
@@ -18,12 +19,14 @@ import {
   GoodsRejectionDto,
   LiveShoppingDTO,
   LiveShoppingImageDto,
-  LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly productPromotionService: ProductPromotionService,
+  ) {}
 
   // 관리자 페이지 정산 데이터
   public async getSettlementInfo(): Promise<AdminSettlementInfoType> {
@@ -272,33 +275,6 @@ export class AdminService {
     return result;
   }
 
-  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShoppingWithGoods[]> {
-    return this.prisma.liveShopping.findMany({
-      where: { id: id ? Number(id) : undefined },
-      include: {
-        goods: {
-          select: { goods_name: true, summary: true, image: true, options: true },
-        },
-        seller: { select: { sellerShop: true } },
-        broadcaster: {
-          select: {
-            id: true,
-            userName: true,
-            userNickname: true,
-            email: true,
-            avatar: true,
-            BroadcasterPromotionPage: true,
-          },
-        },
-        liveShoppingVideo: {
-          select: { youtubeUrl: true },
-        },
-        images: true,
-      },
-      orderBy: { createDate: 'desc' },
-    });
-  }
-
   public async updateLiveShoppings(
     dto: LiveShoppingDTO,
     videoId?: number | null,
@@ -334,6 +310,24 @@ export class AdminService {
     });
 
     if (!liveShoppingUpdate) throw new InternalServerErrorException(`업데이트 실패`);
+
+    // 방송인을 등록하는 경우 => 해당방송인의 상품홍보페이지에 라이브쇼핑 진행상품 등록
+    if (dto.broadcasterId) {
+      try {
+        const liveshoppingGoodsId = liveShoppingUpdate.goodsId;
+        const { broadcasterId } = dto;
+        await this.productPromotionService.createProductPromotion({
+          goodsId: liveshoppingGoodsId,
+          broadcasterId,
+        });
+      } catch (e) {
+        throw new InternalServerErrorException(
+          e,
+          `방송인의 상품홍보페이지에 라이브쇼핑 진행상품 등록 오류, 방송인 고유번호 : ${dto.broadcasterId}`,
+        );
+      }
+    }
+
     return true;
   }
 

@@ -8,21 +8,18 @@ export function BroadcasterChannelButton({
   channelUrl,
   size = 'xs',
   ...buttonProps
-}: BroadcasterChannelButtonProps): JSX.Element {
+}: BroadcasterChannelButtonProps): JSX.Element | null {
+  if (!channelUrl) return null;
   return (
-    <>
-      {channelUrl && (
-        <Tooltip label="방송인 채널로 이동">
-          <IconButton
-            aria-label="open-broadcaster-channel-button"
-            icon={<ExternalLinkIcon />}
-            onClick={() => window.open(channelUrl, '_blank')}
-            size={size}
-            {...buttonProps}
-          />
-        </Tooltip>
-      )}
-    </>
+    <Tooltip label="방송인 채널로 이동">
+      <IconButton
+        aria-label="open-broadcaster-channel-button"
+        icon={<ExternalLinkIcon />}
+        onClick={() => window.open(channelUrl, '_blank')}
+        size={size}
+        {...buttonProps}
+      />
+    </Tooltip>
   );
 }
 
