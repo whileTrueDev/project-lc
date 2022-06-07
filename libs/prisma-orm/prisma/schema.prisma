@@ -1943,6 +1943,7 @@ model Export {
   deliveryNumber       String // 운송장번호
   bundleExportCode     String? // 합포장출고코드(합포장인경우)
   exportDate           DateTime           @default(now()) //출고일시
+  shippingDoneDate     DateTime?
   buyConfirmDate       DateTime? // 구매확정일자(주문스키마에 있던것을 출고에 옮김)
   buyConfirmSubject    BuyConfirmSubject? // 구매확정주체(null | 소비자, 관리자, 시스템)
   exchangeExportedFlag Boolean            @default(false) // 재배송(교환출고인지) 여부
