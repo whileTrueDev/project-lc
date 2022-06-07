@@ -1,6 +1,11 @@
 import { Center, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
-import { useCustomerOrderCancelMutation, useOrderDetail } from '@project-lc/hooks';
+import {
+  useCreateRefundMutation,
+  useCustomerOrderCancelMutation,
+  useOrderDetail,
+} from '@project-lc/hooks';
+import { CreateRefundDto } from '@project-lc/shared-types';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
 
 export function OrderCancelDialog({
@@ -16,9 +21,11 @@ export function OrderCancelDialog({
 
   const toast = useToast();
   const orderCancelMutation = useCustomerOrderCancelMutation();
+  const createRefundMutation = useCreateRefundMutation();
   // 주문취소 요청
   const purchaseConfirmRequest = async (): Promise<void> => {
     if (!orderDetailData) return;
+
     const dto = {
       orderId: orderDetailData.id,
       items: orderDetailData.orderItems.flatMap((item) =>
@@ -29,15 +36,24 @@ export function OrderCancelDialog({
         })),
       ),
     };
+
     orderCancelMutation
       .mutateAsync(dto)
-      .then((res) => {
-        // 주문접수 단계에서 취소 신청하여 바로 주문취소가 완료된 경우
-        if (res.status === 'complete') {
-          toast({ title: '주문 취소 완료', status: 'success' });
-          return;
+      .then(async (res) => {
+        // 결제완료 주문인 경우 환불처리 진행
+        if (orderDetailData.step === 'paymentConfirmed') {
+          const refundDto: CreateRefundDto = {
+            orderId: orderDetailData.id,
+            reason: '소비자의 주문취소신청',
+            items: dto.items,
+            orderCancellationId: res.id,
+            refundAmount: orderDetailData.paymentPrice,
+            paymentKey: orderDetailData.payment?.paymentKey,
+          };
+          await createRefundMutation.mutateAsync(refundDto);
         }
-        toast({ title: '주문 취소 신청 완료', status: 'success' });
+
+        toast({ title: '주문 취소 완료', status: 'success' });
       })
       .catch((e) => {
         toast({
@@ -50,14 +66,15 @@ export function OrderCancelDialog({
 
   return (
     <ConfirmDialog
-      title="주문 취소 신청"
+      title="주문 취소"
       isOpen={isOpen}
       onClose={onClose}
       onConfirm={purchaseConfirmRequest}
+      isLoading={createRefundMutation.isLoading || orderCancelMutation.isLoading}
     >
       {orderDetailData ? (
         <Stack>
-          <Text>이 주문을 취소하시겠습니까?</Text>
+          <Text>이 주문을 취소하시겠습니까? {orderDetailData.step}</Text>
           <Text>주문번호 : {orderDetailData.orderCode}</Text>
           <Text>주문상품</Text>
           {orderDetailData.orderItems.flatMap((item) =>
