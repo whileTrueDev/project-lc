@@ -510,12 +510,12 @@ CREATE TABLE `Export` (
     `buyConfirmDate` DATETIME(3) NULL,
     `buyConfirmSubject` ENUM('admin', 'customer', 'system') NULL,
     `sellerId` INTEGER NULL,
-    `broadcasterSettlementItemsId` INTEGER NULL,
-    `sellerSettlementItemsId` INTEGER NULL,
+    `broadcasterSettlementsId` INTEGER NULL,
+    `sellerSettlementsId` INTEGER NULL,
 
     UNIQUE INDEX `Export_exportCode_key`(`exportCode`),
-    UNIQUE INDEX `Export_broadcasterSettlementItemsId_key`(`broadcasterSettlementItemsId`),
-    UNIQUE INDEX `Export_sellerSettlementItemsId_key`(`sellerSettlementItemsId`),
+    UNIQUE INDEX `Export_broadcasterSettlementsId_key`(`broadcasterSettlementsId`),
+    UNIQUE INDEX `Export_sellerSettlementsId_key`(`sellerSettlementsId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -815,10 +815,10 @@ ALTER TABLE `Export` ADD CONSTRAINT `Export_orderId_fkey` FOREIGN KEY (`orderId`
 ALTER TABLE `Export` ADD CONSTRAINT `Export_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Export` ADD CONSTRAINT `Export_sellerSettlementItemsId_fkey` FOREIGN KEY (`sellerSettlementItemsId`) REFERENCES `SellerSettlementItems`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Export` ADD CONSTRAINT `Export_sellerSettlementsId_fkey` FOREIGN KEY (`sellerSettlementsId`) REFERENCES `SellerSettlements`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Export` ADD CONSTRAINT `Export_broadcasterSettlementItemsId_fkey` FOREIGN KEY (`broadcasterSettlementItemsId`) REFERENCES `BroadcasterSettlementItems`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Export` ADD CONSTRAINT `Export_broadcasterSettlementsId_fkey` FOREIGN KEY (`broadcasterSettlementsId`) REFERENCES `BroadcasterSettlements`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ExportItem` ADD CONSTRAINT `ExportItem_orderItemId_fkey` FOREIGN KEY (`orderItemId`) REFERENCES `OrderItem`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

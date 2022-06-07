@@ -113,6 +113,8 @@ model SellerSettlements {
   seller               Seller                  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   settlementItems      SellerSettlementItems[]
 
+  Export Export?
+
   @@index([id], name: "SellerSettlementsIndex")
 }
 
@@ -142,8 +144,7 @@ model SellerSettlementItems {
   SellerSettlements   SellerSettlements? @relation(fields: [sellerSettlementsId], references: [id], onDelete: Cascade)
 
   relatedOrderId Int? // (project-lc Order테이블의) 주문 고유번호 => 기존 퍼스트몰 fm_order.order_seq 저장하는 컬럼명이 orderId라서 relatedOrderId라고 씀
-  order          Order?  @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
-  export         Export?
+  order          Order? @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
 }
 
 // 판매자 정산 계좌 정보
@@ -611,6 +612,8 @@ model BroadcasterSettlements {
   broadcaster                Broadcaster                  @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
   broadcasterSettlementItems BroadcasterSettlementItems[]
 
+  Export Export?
+
   @@unique([broadcasterId, round])
 }
 
@@ -631,8 +634,7 @@ model BroadcasterSettlementItems {
   settlements              BroadcasterSettlements @relation(fields: [broadcasterSettlementsId], references: [id], onDelete: Cascade)
 
   relatedOrderId Int? // (project-lc Order테이블의) 주문 고유번호 => 기존 퍼스트몰 fm_order.order_seq 저장하는 컬럼명이 orderId라서 relatedOrderId라고 씀
-  order          Order?  @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
-  export         Export?
+  order          Order? @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
 }
 
 // 방송인 정산을 위한 계약자, 계좌정보(방송인 정산등록정보)
@@ -1940,7 +1942,7 @@ model Export {
   deliveryCompany      String // 택배사
   deliveryNumber       String // 운송장번호
   bundleExportCode     String? // 합포장출고코드(합포장인경우)
-  exportDate           DateTime //출고일시
+  exportDate           DateTime           @default(now()) //출고일시
   buyConfirmDate       DateTime? // 구매확정일자(주문스키마에 있던것을 출고에 옮김)
   buyConfirmSubject    BuyConfirmSubject? // 구매확정주체(null | 소비자, 관리자, 시스템)
   exchangeExportedFlag Boolean            @default(false) // 재배송(교환출고인지) 여부
@@ -1949,10 +1951,10 @@ model Export {
   seller               Seller?            @relation(fields: [sellerId], references: [id])
   items                ExportItem[] // 출고상품
 
-  broadcasterSettlementItemsId Int?                        @unique
-  broadcasterSettlementItems   BroadcasterSettlementItems? @relation(fields: [broadcasterSettlementItemsId], references: [id], onDelete: SetNull)
-  sellerSettlementItemsId      Int?                        @unique
-  sellerSettlementItems        SellerSettlementItems?      @relation(fields: [sellerSettlementItemsId], references: [id], onDelete: SetNull)
+  broadcasterSettlementsId Int?                    @unique
+  broadcasterSettlements   BroadcasterSettlements? @relation(fields: [broadcasterSettlementsId], references: [id], onDelete: SetNull)
+  sellerSettlementsId      Int?                    @unique
+  sellerSettlements        SellerSettlements?      @relation(fields: [sellerSettlementsId], references: [id], onDelete: SetNull)
 }
 
 // 구매확정주체
