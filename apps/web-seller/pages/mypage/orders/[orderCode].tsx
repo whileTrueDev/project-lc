@@ -38,8 +38,8 @@ import { OrderExchangeReturnCancelExistsAlert } from '@project-lc/components-sel
 import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
 import { OrderItemOption, OrderShipping } from '@prisma/client';
 
-const exchangeSectionTitle = '교환 정보';
-const returnSectionTitle = '반품 정보';
+const exchangeSectionTitle = '교환(재배송) 정보';
+const returnSectionTitle = '반품(환불) 정보';
 const orderCancelSectionTitle = '주문취소 정보';
 
 /** 주문 상세 보기 페이지 */

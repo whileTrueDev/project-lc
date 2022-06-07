@@ -49,6 +49,8 @@ export interface OrderReturnStatusDialogProps {
   data: ReturnDataWithImages;
 }
 
+const RETURN_TEXT = '반품(환불)';
+
 export function OrderReturnStatusDialog({
   isOpen,
   onClose,
@@ -64,14 +66,14 @@ export function OrderReturnStatusDialog({
   const toast = useToast();
   const onSuccess = (): void => {
     toast({
-      title: '반품 상태를 변경하였습니다',
+      title: `${RETURN_TEXT} 상태를 변경하였습니다`,
       status: 'success',
     });
   };
 
   const onFail = (): void => {
     toast({
-      title: '반품 상태 변경 중 오류가 발생하였습니다',
+      title: `${RETURN_TEXT} 상태 변경 중 오류가 발생하였습니다`,
       status: 'error',
     });
   };
@@ -107,7 +109,10 @@ export function OrderReturnStatusDialog({
   }
   if (!returnDetail) {
     return (
-      <Text>해당 환불신청 내역이 존재하지 않습니다 환불신청코드: {data.returnCode}</Text>
+      <Text>
+        해당 {RETURN_TEXT}신청 내역이 존재하지 않습니다 {RETURN_TEXT}신청코드:{' '}
+        {data.returnCode}
+      </Text>
     );
   }
 
@@ -115,7 +120,7 @@ export function OrderReturnStatusDialog({
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="3xl">
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(onSubmit)}>
-        <ModalHeader>반품 상태 관리</ModalHeader>
+        <ModalHeader>{RETURN_TEXT} 상태 관리</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={2}>
@@ -123,13 +128,13 @@ export function OrderReturnStatusDialog({
             <Stack spacing={1} my={2}>
               <Stack direction="row" justifyContent="space-between">
                 <Stack>
-                  <Text fontWeight="bold">환불요청코드</Text>
+                  <Text fontWeight="bold">{RETURN_TEXT}요청코드</Text>
                   <Text pl={4}>{returnDetail.returnCode}</Text>
                 </Stack>
               </Stack>
 
               <Stack>
-                <Text fontWeight="bold">환불요청 처리상태</Text>
+                <Text fontWeight="bold">{RETURN_TEXT}요청 처리상태</Text>
 
                 <Stack pl={4}>
                   <Stack direction="row" alignItems="center">
@@ -138,15 +143,19 @@ export function OrderReturnStatusDialog({
                     />
                   </Stack>
                   {returnDetail.rejectReason && (
-                    <Text pl={4}>환불요청 거절 사유 : {returnDetail.rejectReason}</Text>
+                    <Text pl={4}>
+                      {RETURN_TEXT}요청 거절 사유 : {returnDetail.rejectReason}
+                    </Text>
                   )}
 
                   <Text>요청일 : {requestDate}</Text>
                   <Stack pl={4}>
-                    <Text>환불요청 사유 : {returnDetail.reason}</Text>
+                    <Text>
+                      {RETURN_TEXT}요청 사유 : {returnDetail.reason}
+                    </Text>
                     {returnDetail.images.length && (
                       <>
-                        <Text>환불요청 이미지 : </Text>
+                        <Text>{RETURN_TEXT}요청 이미지 : </Text>
                         {returnDetail.images.map((img) => (
                           <Image
                             maxW="400px"
@@ -164,7 +173,7 @@ export function OrderReturnStatusDialog({
               </Stack>
 
               <Stack>
-                <Text fontWeight="bold">환불요청한 주문상품</Text>
+                <Text fontWeight="bold">{RETURN_TEXT}요청한 주문상품</Text>
                 <Stack pl={4}>
                   {returnDetail.items.map((item) => (
                     <ExchangeReturnCancelRequestGoodsData key={item.id} {...item} />
@@ -188,12 +197,13 @@ export function OrderReturnStatusDialog({
                   <List spacing={3}>
                     <ListItem>
                       <ListIcon as={RiErrorWarningFill} color="orange.500" />
-                      반품완료 선택시, 환불이 진행되므로 반드시 물품 수령 및 확인 후,
-                      반품완료를 선택하세요.
+                      {RETURN_TEXT}완료 선택시, 실제 환불이 진행되므로 반드시 물품 수령 및
+                      확인 후,
+                      {RETURN_TEXT}완료를 선택하세요.
                     </ListItem>
                     <ListItem>
                       <ListIcon as={AiFillWarning} color="red.500" />
-                      반품 완료 등록 후,{' '}
+                      {RETURN_TEXT} 완료 등록 후,{' '}
                       <Text as="span" color="red.500" fontWeight="bold">
                         이전 단계로의 변경은 불가
                       </Text>
@@ -203,13 +213,13 @@ export function OrderReturnStatusDialog({
                 </Alert>
               )}
               <FormControl isInvalid={!!errors.status}>
-                <FormLabel>변경할 반품 상태</FormLabel>
+                <FormLabel>변경할 {RETURN_TEXT} 상태</FormLabel>
                 <Select
-                  placeholder="변경할 반품 상태를 선택하세요."
+                  placeholder={`변경할 ${RETURN_TEXT} 상태를 선택하세요.`}
                   {...register('status', {
                     required: {
                       value: true,
-                      message: '변경할 반품 상태를 선택해주세요.',
+                      message: `변경할 ${RETURN_TEXT} 상태를 선택해주세요.`,
                     },
                   })}
                   isDisabled={data.status === 'complete'}
@@ -227,7 +237,7 @@ export function OrderReturnStatusDialog({
               {/* 거절사유 */}
               {watch('status') === 'canceled' && (
                 <FormControl isInvalid={!!errors.rejectReason}>
-                  <FormLabel>반품요청 거절 사유</FormLabel>
+                  <FormLabel>{RETURN_TEXT}요청 거절 사유</FormLabel>
                   <Input {...register('rejectReason')} />
                   {errors.rejectReason && (
                     <FormErrorMessage>{errors.rejectReason.message}</FormErrorMessage>
@@ -239,7 +249,7 @@ export function OrderReturnStatusDialog({
                 <Alert mt={6} mb={2} status="info">
                   <Stack alignItems="center" justify="center" w="100%">
                     <AlertIcon />
-                    <AlertTitle>이 반품은 반품완료 처리되었습니다.</AlertTitle>
+                    <AlertTitle>이 {RETURN_TEXT}은 완료 처리되었습니다.</AlertTitle>
                     <AlertDescription>
                       환불 진행 정보는 환불정보에서 확인해주세요.
                     </AlertDescription>

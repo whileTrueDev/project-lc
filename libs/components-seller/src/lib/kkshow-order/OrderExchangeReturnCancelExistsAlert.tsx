@@ -6,8 +6,8 @@ const temp: Record<
   AlertTypeKey,
   { text: string; status: 'error' | 'warning' | 'info' | 'success' }
 > = {
-  return: { text: '반품', status: 'error' },
-  exchange: { text: '교환', status: 'warning' },
+  return: { text: '반품(환불)', status: 'error' },
+  exchange: { text: '교환(재배송)', status: 'warning' },
   cancel: { text: '주문취소', status: 'info' },
 };
 

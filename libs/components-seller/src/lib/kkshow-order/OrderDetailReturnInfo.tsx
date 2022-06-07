@@ -8,6 +8,8 @@ import OrderReturnStatusDialog from './OrderReturnStatusDialog';
 export interface OrderDetailReturnInfoProps {
   returnData: ReturnDataWithImages;
 }
+
+const RETURN_TEXT = '반품(환불)';
 export function OrderDetailReturnInfo({
   returnData,
 }: OrderDetailReturnInfoProps): JSX.Element {
@@ -20,7 +22,7 @@ export function OrderDetailReturnInfo({
         </Link>
         <ExchangeReturnCancelRequestStatusBadge
           status={returnData.status}
-          prefix="반품"
+          prefix={RETURN_TEXT}
         />
         <TextDotConnector />
         <Text isTruncated>
@@ -31,17 +33,18 @@ export function OrderDetailReturnInfo({
 
       <Stack>
         <Text>
-          (반품요청일) {dayjs(returnData.requestDate).format('YYYY년 MM월 DD일 HH:mm:ss')}
+          ({RETURN_TEXT}요청일){' '}
+          {dayjs(returnData.requestDate).format('YYYY년 MM월 DD일 HH:mm:ss')}
         </Text>
         {returnData.completeDate && (
           <Text>
-            (반품완료일){' '}
+            ({RETURN_TEXT}완료일){' '}
             {dayjs(returnData.completeDate).format('YYYY년 MM월 DD일 HH:mm:ss')}
           </Text>
         )}
         <Box>
           <Button size="sm" onClick={onOpen}>
-            반품 상태 관리
+            {RETURN_TEXT} 상태 관리
           </Button>
         </Box>
       </Stack>
