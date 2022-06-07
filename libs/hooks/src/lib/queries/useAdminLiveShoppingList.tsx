@@ -1,23 +1,18 @@
-import { LiveShoppingParamsDto, LiveShoppingWithGoods } from '@project-lc/shared-types';
+import { FindLiveShoppingDto, LiveShoppingWithGoods } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export const getAdminLiveShoppingList = async (
-  dto: LiveShoppingParamsDto,
+  dto: FindLiveShoppingDto,
 ): Promise<LiveShoppingWithGoods[]> => {
   return axios
-    .get<LiveShoppingWithGoods[]>('admin/live-shoppings', {
-      params: {
-        liveShoppingId: dto.id,
-        goodsIds: dto.goodsIds,
-      },
-    })
+    .get<LiveShoppingWithGoods[]>('admin/live-shoppings', { params: dto })
     .then((res) => res.data);
 };
 
 export const useAdminLiveShoppingList = (
-  dto: LiveShoppingParamsDto,
+  dto: FindLiveShoppingDto,
   options?: UseQueryOptions<LiveShoppingWithGoods[], AxiosError>,
 ): UseQueryResult<LiveShoppingWithGoods[], AxiosError> => {
   const queryKey = ['AdminLiveShoppingList', dto];

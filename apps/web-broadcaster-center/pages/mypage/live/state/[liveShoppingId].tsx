@@ -1,5 +1,5 @@
 import LiveShoppingCurrentStateBoard from '@project-lc/components-web-bc/LiveShoppingCurrentStateBoard';
-import { useBroadcasterLiveShoppingList, useProfile } from '@project-lc/hooks';
+import { useLiveShoppingList, useProfile } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 
@@ -8,7 +8,7 @@ export function LiveShoppingCurrentState(): JSX.Element {
   const liveShoppingId = Number(router.query.liveShoppingId);
 
   const { data: profileData } = useProfile();
-  const { data: liveShoppingList } = useBroadcasterLiveShoppingList({
+  const { data: liveShoppingList } = useLiveShoppingList({
     broadcasterId: profileData?.id,
   });
 

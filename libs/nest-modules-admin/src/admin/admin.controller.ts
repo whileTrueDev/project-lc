@@ -37,6 +37,7 @@ import {
   BroadcasterSettlementService,
 } from '@project-lc/nest-modules-broadcaster';
 import { GoodsService } from '@project-lc/nest-modules-goods';
+import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
 import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
 import {
@@ -90,6 +91,7 @@ export class AdminController {
     private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementInfoService: BroadcasterSettlementInfoService,
     private readonly sellerService: SellerService,
+    private readonly liveShoppingService: LiveShoppingService,
     private readonly projectLcGoodsService: GoodsService,
     private readonly config: ConfigService,
     private readonly adminPrivacyApproachSevice: AdminPrivacyApproachSevice,
@@ -231,9 +233,8 @@ export class AdminController {
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/live-shoppings')
-  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
-  getLiveShoppings(@Query('liveShoppingId') dto?: string): Promise<LiveShopping[]> {
-    return this.adminService.getRegisteredLiveShoppings(dto || null);
+  getLiveShoppings(): Promise<LiveShopping[]> {
+    return this.liveShoppingService.findLiveShoppings();
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)

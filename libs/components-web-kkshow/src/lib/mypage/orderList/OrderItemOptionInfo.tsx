@@ -3,7 +3,7 @@ import { OrderItemOption } from '@prisma/client';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
 import { OrderDataWithRelations, OrderItemWithRelations } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
-import { OrderStatusBadge } from './CustomerOrderItem';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 
 export interface OrderItemOptionInfoProps {
   option: OrderItemOption;

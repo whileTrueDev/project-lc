@@ -18,6 +18,7 @@ import {
   IsBoolean,
   IsEmail,
   IsEnum,
+  IsIn,
   IsISO8601,
   IsNumber,
   IsOptional,
@@ -289,12 +290,21 @@ export class GetOrderListDto {
   @IsOptional()
   orderCode?: string;
 
-  /** 특정 기간내 주문 조회시 사용. 조회할 기간 시작일자 2022-02-02 형태로 입력  https://github.com/typestack/class-validator/issues/407 */
+  /** 기간조회시 어느 컬럼 기준으로 할지 정함 - 주문일 혹은 입금일(기본값 : 주문일) */
+  @IsOptional()
+  @IsIn(['주문일', '입금일'])
+  searchDateType?: '주문일' | '입금일' = '주문일';
+
+  /** 특정 기간내 주문 조회시 사용.
+   * searchDateType 값에 따라 주문일 혹은 입금일을 기준으로 사용한다(기본값 : 주문일)
+   * 조회할 기간 시작일자 2022-02-02 형태로 입력  https://github.com/typestack/class-validator/issues/407 */
   @IsISO8601()
   @IsOptional()
   periodStart?: string;
 
-  /** 특정 기간내 주문 조회시 사용. 조회할 기간 마지막일자 2022-02-02 형태로 입력 */
+  /** 특정 기간내 주문 조회시 사용.
+   * searchDateType 값에 따라 주문일 혹은 입금일을 기준으로 사용한다(기본값 : 주문일)
+   * 조회할 기간 마지막일자 2022-02-02 형태로 입력 */
   @IsISO8601()
   @IsOptional()
   periodEnd?: string;
@@ -304,6 +314,14 @@ export class GetOrderListDto {
   @IsBoolean()
   @IsOptional()
   supportIncluded?: boolean;
+
+  /** 특정검색어로 조회시 -> 해당검색어가 특정컬럼에 포함되는 주문 검색 */
+  @IsOptional() @IsString() search?: string;
+
+  /** 특정 상태인 주문 검색시 */
+  @IsOptional()
+  @IsEnum(OrderProcessStep, { each: true })
+  searchStatuses?: OrderProcessStep[];
 }
 
 /** 비회원 주문 조회 dto */
@@ -315,6 +333,27 @@ export class GetNonMemberOrderDetailDto {
   /** 비회원주문 비밀번호 */
   @IsString()
   password: string;
+}
+
+/** 내보내기 위한 주문상세 여러개 조회 dto */
+export class GetOrderDetailsForSpreadsheetDto {
+  @IsNumber({}, { each: true })
+  @Type(() => Number)
+  orderIds: Order['id'][];
+}
+
+/** 개별 주문 1건 상세 조회 dto */
+export class GetOneOrderDetailDto {
+  /** 주문코드 */
+  @IsString()
+  @IsOptional()
+  orderCode?: string;
+
+  /** 주문고유번호 */
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  orderId?: Order['id'];
 }
 
 // ------------------수정 dto--------------------
