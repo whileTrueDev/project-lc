@@ -1,8 +1,9 @@
+import { ChangeReturnStatusDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
-import { ChangeReturnStatusDto } from '@project-lc/shared-types';
 import axios from '../../axios';
 
+/** 퍼스트몰 db 반품 업데이트 훅 */
 export const useUpdateReturnStatusMutation = (): UseMutationResult<
   boolean,
   AxiosError,
