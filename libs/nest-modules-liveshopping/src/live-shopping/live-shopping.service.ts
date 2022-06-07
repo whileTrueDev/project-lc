@@ -53,7 +53,10 @@ export class LiveShoppingService {
 
   async findLiveShoppings(dto?: FindLiveShoppingDto): Promise<LiveShoppingWithGoods[]> {
     // 자신의 id를 반환하는 쿼리 수행하기
-    const { id, goodsIds, broadcasterId, sellerId } = dto;
+    const id = dto?.id;
+    const goodsIds = dto?.goodsIds;
+    const broadcasterId = dto?.broadcasterId;
+    const sellerId = dto?.sellerId;
     return this.prisma.liveShopping.findMany({
       where: {
         id: id || undefined,

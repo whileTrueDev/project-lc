@@ -135,6 +135,6 @@ export type AdminLiveShoppingGiftOrder = Order & {
   orderItems: (OrderItem & {
     support: OrderItemSupportWithBroadcasterInfo | null;
     options: OrderItemOption[];
-    goods: Omit<OriginGoods, 'image'>;
+    goods: Omit<OriginGoods, 'image' | 'sellerId'>;
   })[];
 };
