@@ -27,7 +27,7 @@ export class BroadcasterSettlementService {
         },
       },
       where: {
-        export: { broadcasterSettlementItemsId: null },
+        export: { broadcasterSettlementsId: null },
         orderItem: {
           support: {
             broadcasterId,
@@ -96,7 +96,7 @@ export class BroadcasterSettlementService {
         },
       },
       where: {
-        broadcasterSettlementItemsId: null,
+        broadcasterSettlementsId: null,
         buyConfirmSubject: { not: null },
         buyConfirmDate: { not: null },
         order: {
