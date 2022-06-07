@@ -7,7 +7,7 @@ import axios from '../../axios';
 export type OrderMutationDto = { orderId: Order['id']; dto: UpdateOrderDto };
 
 /** 주문 update 훅 */
-export const useOrderMutation = (): UseMutationResult<
+export const useOrderUpdateMutation = (): UseMutationResult<
   boolean,
   AxiosError,
   OrderMutationDto

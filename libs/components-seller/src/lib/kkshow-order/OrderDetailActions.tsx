@@ -10,7 +10,10 @@ import {
 } from '@chakra-ui/react';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
-import { useChangeFmOrderStatusMutation, useOrderMutation } from '@project-lc/hooks';
+import {
+  useChangeFmOrderStatusMutation,
+  useOrderUpdateMutation,
+} from '@project-lc/hooks';
 import {
   exportableSteps,
   FindFmOrderDetailRes,
@@ -28,7 +31,7 @@ export interface OrderDetailActionsProps {
 }
 export function OrderDetailActions({ order }: OrderDetailActionsProps): JSX.Element {
   // const { mutateAsync: changeStatus, isLoading } = useChangeFmOrderStatusMutation();
-  const { mutateAsync: changeStatus, isLoading } = useOrderMutation();
+  const { mutateAsync: changeStatus, isLoading } = useOrderUpdateMutation();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const exportModal = useDisclosure();
