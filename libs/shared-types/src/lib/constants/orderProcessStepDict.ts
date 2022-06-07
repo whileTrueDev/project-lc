@@ -69,3 +69,21 @@ export const sellerOrderSteps = {
   shipping: ['partialShipping', 'shipping', 'partialShippingDone'],
   shippingDone: ['shippingDone'],
 };
+
+export const orderProcessStepKoreanDict = {
+  orderReceived: '주문접수', // 주문접수,
+  paymentConfirmed: '결제확인', // 결제확인,
+  goodsReady: '상품준비', // 상품준비,
+  partialExportReady: '부분출고준비', // 부분출고준비,
+  exportReady: '출고준비', // 출고준비,
+  partialExportDone: '부분출고완료', // 부분출고완료,
+  exportDone: '출고완료', // 출고완료,
+  partialShipping: '부분배송중', // 부분배송중,
+  shipping: '배송중', // 배송중,
+  partialShippingDone: '부분배송완료', // 부분배송완료,
+  shippingDone: '배송완료', // 배송완료,
+  purchaseConfirmed: '구매확정', // 구매확정(임의로 추가함)
+  paymentCanceled: '결제취소', // 결제취소,
+  orderInvalidated: '주문무효', // 주문무효,
+  paymentFailed: '결제실패', // 결제실패,
+};

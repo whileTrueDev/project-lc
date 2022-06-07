@@ -22,6 +22,7 @@ import {
   ReturnItem,
   SellType,
   SellerShop,
+  SellerSettlementItems,
 } from '@prisma/client';
 
 export type OrderItemSupportWithBroadcasterInfo = OrderItemSupport & {
@@ -68,6 +69,7 @@ export type OrderDataWithRelations = Order & {
         items: OrderCancellationItem[];
       })[]
     | null;
+  sellerSettlementItems?: SellerSettlementItems[] | null;
 };
 
 /** 주문 목록 리턴 데이터 타입 */

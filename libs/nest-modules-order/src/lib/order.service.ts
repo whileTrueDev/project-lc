@@ -237,7 +237,10 @@ export class OrderService {
   }
 
   /** 전체 주문목록 조회 */
-  async getOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
+  async getOrderList(
+    dto: GetOrderListDto,
+    include?: Prisma.OrderFindManyArgs['include'],
+  ): Promise<OrderListRes> {
     const { take, skip } = dto;
     const where = this.getOrderListFilterWhere(dto);
     const count = await this.prisma.order.count({ where });
@@ -284,6 +287,19 @@ export class OrderService {
         exchanges: { select: { id: true, exchangeCode: true, exchangeItems: true } },
         returns: { select: { id: true, returnCode: true, items: true } },
         orderCancellations: { select: { id: true, cancelCode: true, items: true } },
+        sellerSettlementItems: {
+          include: {
+            SellerSettlements: {
+              include: {
+                seller: {
+                  select: {
+                    sellerShop: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 

@@ -279,6 +279,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
       { name: '쿠폰관리', href: '/customer/coupon', icon: FcList },
       { name: '마일리지 관리', href: '/customer/mileage', icon: FcList },
       { name: '가입자 목록', href: '/customer/signup-list', icon: FcList },
+      { name: '주문 목록', href: '/customer/order', icon: FcList },
     ],
   },
   {

@@ -109,6 +109,7 @@ export * from './lib/queries/useAdminMileageList';
 export * from './lib/queries/useAdminMileageLogList';
 export * from './lib/queries/useAdminNotifications';
 export * from './lib/queries/useAdminOrderCancelRequest';
+export * from './lib/queries/useAdminOrderList';
 export * from './lib/queries/useAdminPolicy';
 export * from './lib/queries/useAdminProductPromotion';
 export * from './lib/queries/useAdminSellerList';
