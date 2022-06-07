@@ -118,6 +118,7 @@ export const shippingSelectOptions: ShippingSelectOption[] = [
   { key: 'amount_rep', label: '금액(구간반복)', suffix: '₩' },
   { key: 'cnt', label: '수량(구간입력)', suffix: '개' },
   { key: 'cnt_rep', label: '수량(구간반복)', suffix: '개' },
-  { key: 'weight', label: '무게(구간입력)', suffix: 'kg' },
-  { key: 'weight_rep', label: '무게(구간반복)', suffix: 'kg' },
+  // 무게 사용하지 않아서 배송비 계산기능 단순화 위해 주석처리함
+  // { key: 'weight', label: '무게(구간입력)', suffix: 'kg' },
+  // { key: 'weight_rep', label: '무게(구간반복)', suffix: 'kg' },
 ];

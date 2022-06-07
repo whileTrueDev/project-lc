@@ -446,6 +446,7 @@ export class GoodsService {
             id: true,
             name: true,
             avatar: true,
+            email: true,
             sellerShop: {
               select: {
                 shopName: true,
@@ -637,6 +638,7 @@ export class GoodsService {
 
   /** 상품 수정 */
   async updateOneGoods(id: number, dto: RegistGoodsDto): Promise<{ goodsId: number }> {
+    console.log('dto: ', dto);
     const {
       options: comingOptions,
       image,
@@ -680,9 +682,7 @@ export class GoodsService {
               };
             }),
           },
-          image: {
-            connect: image.map((img) => ({ id: img.id })),
-          },
+          image: { connect: image.map((img) => ({ id: img.id })) },
           ShippingGroup: shippingGroupId
             ? { connect: { id: shippingGroupId } }
             : undefined,
@@ -692,9 +692,7 @@ export class GoodsService {
               contents: JSON.parse(informationNoticeContents),
             },
           },
-          categories: {
-            connect: { id: categoryId },
-          },
+          categories: { connect: { id: categoryId } },
           confirmation: {
             update: {
               status: prevStatus === 'waiting' ? 'waiting' : 'needReconfirmation',

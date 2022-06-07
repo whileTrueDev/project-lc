@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
@@ -43,9 +44,9 @@ export class ShippingGroupController {
   // 배송그룹 조회
   @Get()
   getShippingGroupList(
-    @SellerInfo() sellerInfo: UserPayload,
+    @Query('sellerId', ParseIntPipe) sellerId: number,
   ): Promise<ShippingGroupListResult> {
-    return this.shippingGroupService.getShippingGroupList(sellerInfo.id);
+    return this.shippingGroupService.getShippingGroupList(sellerId);
   }
 
   // 배송그룹 생성
@@ -53,11 +54,7 @@ export class ShippingGroupController {
   createShippingGroup(
     @SellerInfo() sellerInfo: UserPayload,
     @Body(ValidationPipe) dto: ShippingGroupDto,
-  ): Promise<
-    ShippingGroup & {
-      seller: Seller;
-    }
-  > {
+  ): Promise<ShippingGroup & { seller: Seller }> {
     return this.shippingGroupService.createShippingGroup(sellerInfo.id, dto);
   }
 

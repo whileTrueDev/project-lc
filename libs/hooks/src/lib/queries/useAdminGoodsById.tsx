@@ -16,9 +16,6 @@ export const useAdminGoodsById = (
   return useQuery<AdminGoodsByIdRes, AxiosError>(
     ['AdminGoodsById', goodsId],
     () => getAdminGoodsById(goodsId),
-    {
-      initialData,
-      enabled: !!goodsId,
-    },
+    { initialData, enabled: !!goodsId },
   );
 };

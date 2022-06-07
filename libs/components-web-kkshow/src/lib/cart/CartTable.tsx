@@ -12,6 +12,7 @@ import {
   Image,
   Link,
   Spinner,
+  Stack,
   Table,
   Tbody,
   Td,
@@ -26,11 +27,13 @@ import {
   CartItemOption,
   CartItemOption as CartItemOptionType,
 } from '@prisma/client';
+import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import {
   useCart,
   useCartItemDeleteMutation,
   useCartItemOptDeleteMutation,
   useCartOptionQuantity,
+  useCartShippingGroups,
   useCartTruncateMutation,
 } from '@project-lc/hooks';
 import { CartItemRes } from '@project-lc/shared-types';
@@ -69,6 +72,14 @@ export function CartTable(): JSX.Element {
     }
     getCartKey(); // 장바구니 식별 키 생성 (없는 경우에만 생성됨)
   }, [handleSelectAll, data]);
+
+  // 배송비정책별 장바구니 상품, 배송비정책 별 배송비, 배송비정책 id 목록
+  const {
+    cartItemsObjectGroupedById,
+    totalShippingCostObjectById,
+    shippingGroupIdList,
+    shippingGroupWithShopNameObject,
+  } = useCartShippingGroups();
 
   if (isLoading)
     return (
@@ -123,35 +134,89 @@ export function CartTable(): JSX.Element {
         </ButtonGroup>
 
         {/* PC화면 */}
-        <Table display={{ base: 'none', md: 'block' }}>
+        <Table display={{ base: 'none', md: 'block' }} mt={2}>
           <Thead>
             <Tr>
               <Th fontFamily="inherit">상품</Th>
               <Th fontFamily="inherit">가격</Th>
-              <Th fontFamily="inherit">배송비</Th>
               <Th />
+              <Th fontFamily="inherit">배송비</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {data.map((cartItem) => (
-              <CartTableRow key={cartItem.id} cartItem={cartItem} />
-            ))}
+            {/* 동일한 배송비 그룹별로 장바구니 상품 묶어서 표시 */}
+            {shippingGroupIdList.map((shippingGroupId) => {
+              return cartItemsObjectGroupedById[shippingGroupId].map(
+                (cartItemId, index) => {
+                  const item = data.find((d) => d.id === cartItemId);
+                  if (!item) return null;
+                  const shippingCostObj = totalShippingCostObjectById[shippingGroupId];
+                  const shippingCost = shippingCostObj
+                    ? shippingCostObj.std + shippingCostObj.add
+                    : null;
+                  return (
+                    <CartTableRow
+                      key={cartItemId}
+                      cartItem={item}
+                      rowSpan={cartItemsObjectGroupedById[shippingGroupId].length} // 동일배송그룹에 속하는 장바구니상품 개수만큼 rowSpan
+                      hideShippingCost={index !== 0} // 첫번째 카트상품만 배송비 td 표시
+                      shippingCost={shippingCost}
+                      shopName={shippingGroupWithShopNameObject[shippingGroupId].shopName}
+                    />
+                  );
+                },
+              );
+            })}
           </Tbody>
         </Table>
 
         {/* 모바일 화면 */}
-        <Box display={{ base: 'block', md: 'none' }}>
-          {data.map((cartItem) => (
-            <CartItemListItem key={cartItem.id} cartItem={cartItem} />
-          ))}
-        </Box>
+        <Stack display={{ base: 'block', md: 'none' }}>
+          {/* 동일한 배송비 그룹별로 장바구니 상품 묶어서 표시 */}
+          {shippingGroupIdList.map((shippingGroupId) => {
+            const shopName =
+              shippingGroupWithShopNameObject[shippingGroupId].shopName || '';
+            const shippingCostObj = totalShippingCostObjectById[shippingGroupId];
+            const shippingCost = shippingCostObj
+              ? shippingCostObj.std + shippingCostObj.add
+              : null;
+            return (
+              <Box key={shippingGroupId} {...boxStyle} mt={2}>
+                <Box>
+                  {cartItemsObjectGroupedById[shippingGroupId].map((cartItemId) => {
+                    const cartItem = data.find((d) => d.id === cartItemId);
+                    if (!cartItem) return null;
+                    return <CartItemListItem key={cartItem.id} cartItem={cartItem} />;
+                  })}
+                </Box>
+                <Stack direction="row" fontSize={{ base: 'xs', md: 'sm' }} my={1}>
+                  <CartItemShopNameAndShippingCost
+                    shippingCost={shippingCost}
+                    shopName={shopName}
+                  />
+                </Stack>
+              </Box>
+            );
+          })}
+        </Stack>
       </Box>
     </Box>
   );
 }
 
-type CartTableItemProps = CartItemDisplayProps;
-export function CartTableRow({ cartItem }: CartTableItemProps): JSX.Element {
+type CartTableItemProps = CartItemDisplayProps & {
+  rowSpan?: number;
+  hideShippingCost?: boolean;
+  shippingCost?: number | null;
+  shopName?: string;
+};
+export function CartTableRow({
+  cartItem,
+  rowSpan,
+  hideShippingCost = false,
+  shippingCost,
+  shopName,
+}: CartTableItemProps): JSX.Element {
   // 카트 상품 삭제
   const deleteCartItem = useCartItemDeleteMutation();
   const handleCartItemDelete = (itemId: CartItemType['id']): void => {
@@ -165,12 +230,9 @@ export function CartTableRow({ cartItem }: CartTableItemProps): JSX.Element {
         <CartItemDisplay cartItem={cartItem} />
       </Td>
 
+      {/* 상품가격 */}
       <Td w="200px">
         <CartItemPriceDisplay cartItem={cartItem} />
-      </Td>
-
-      <Td w="200px" textAlign="center">
-        <CartItemSellerInfoDisplay cartItem={cartItem} />
       </Td>
 
       <Td>
@@ -186,6 +248,21 @@ export function CartTableRow({ cartItem }: CartTableItemProps): JSX.Element {
           </Button>
         </Box>
       </Td>
+
+      {/* 배송비 */}
+      {!hideShippingCost && (
+        <Td
+          w="200px"
+          textAlign="center"
+          rowSpan={rowSpan}
+          fontSize={{ base: 'xs', md: 'sm' }}
+        >
+          <CartItemShopNameAndShippingCost
+            shippingCost={shippingCost}
+            shopName={shopName || ''}
+          />
+        </Td>
+      )}
     </Tr>
   );
 }
@@ -203,7 +280,6 @@ export function CartItemListItem({ cartItem }: CartItemListItemProps): JSX.Eleme
         <CartItemDisplay
           cartItem={cartItem}
           displayPrice
-          displaySellerInfo
           onClose={() => handleCartItemDelete(cartItem.id)}
         />
       </Box>
@@ -331,6 +407,28 @@ export function CartItemSellerInfoDisplay({ cartItem }: CartTableItemProps): JSX
         {!cartItem.shippingCostIncluded ? getLocaleNumber(cartItem.shippingCost) : 0} 원
       </Text>
     </Box>
+  );
+}
+
+export function CartItemShopNameAndShippingCost({
+  shopName,
+  shippingCost,
+}: {
+  shopName: string;
+  shippingCost?: number | null;
+}): JSX.Element {
+  return (
+    <>
+      <Text>{shopName}</Text>
+      {shippingCost !== null ? (
+        <Stack direction={{ base: 'row', sm: 'column' }} color="GrayText" my={1}>
+          <Text>배송비</Text>
+          <Text>{getLocaleNumber(shippingCost)} 원</Text>
+        </Stack>
+      ) : (
+        <Text>-</Text>
+      )}
+    </>
   );
 }
 

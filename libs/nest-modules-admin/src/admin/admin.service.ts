@@ -8,6 +8,7 @@ import {
   Administrator,
   GoodsConfirmation,
 } from '@prisma/client';
+import { ProductPromotionService } from '@project-lc/nest-modules-product-promotion';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminClassDto,
@@ -23,7 +24,10 @@ import {
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly productPromotionService: ProductPromotionService,
+  ) {}
 
   // 관리자 페이지 정산 데이터
   public async getSettlementInfo(): Promise<AdminSettlementInfoType> {
@@ -121,11 +125,6 @@ export class AdminService {
   public async getGoodsInfo({ sort, direction }): Promise<AdminGoodsListRes> {
     const items = await this.prisma.goods.findMany({
       orderBy: [{ [sort]: direction }],
-      where: {
-        confirmation: {
-          OR: [{ status: 'waiting' }, { status: 'needReconfirmation' }],
-        },
-      },
       include: {
         options: {
           include: {
@@ -339,6 +338,24 @@ export class AdminService {
     });
 
     if (!liveShoppingUpdate) throw new InternalServerErrorException(`업데이트 실패`);
+
+    // 방송인을 등록하는 경우 => 해당방송인의 상품홍보페이지에 라이브쇼핑 진행상품 등록
+    if (dto.broadcasterId) {
+      try {
+        const liveshoppingGoodsId = liveShoppingUpdate.goodsId;
+        const { broadcasterId } = dto;
+        await this.productPromotionService.createProductPromotion({
+          goodsId: liveshoppingGoodsId,
+          broadcasterId,
+        });
+      } catch (e) {
+        throw new InternalServerErrorException(
+          e,
+          `방송인의 상품홍보페이지에 라이브쇼핑 진행상품 등록 오류, 방송인 고유번호 : ${dto.broadcasterId}`,
+        );
+      }
+    }
+
     return true;
   }
 

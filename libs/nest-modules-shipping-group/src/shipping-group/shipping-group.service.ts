@@ -113,8 +113,16 @@ export class ShippingGroupService {
     groupId: number,
     shippingSets: ShippingSetDto[],
   ): Promise<void> {
+    // 배송설정dto들 중 기본값 설정이 없다면 첫번째 배송설정을 default로 설정한다
+    let shippingSetDtoList = [...shippingSets];
+    if (!shippingSetDtoList.some((set) => set.default_yn === 'Y')) {
+      shippingSetDtoList = shippingSetDtoList.map((set, index) => {
+        return { ...set, default_yn: index === 0 ? 'Y' : 'N' };
+      });
+    }
+
     await Promise.all(
-      shippingSets.map(async (set) => {
+      shippingSetDtoList.map(async (set) => {
         await this.createShippingSet(groupId, set);
       }),
     );

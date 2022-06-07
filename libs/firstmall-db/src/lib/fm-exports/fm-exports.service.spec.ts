@@ -3,6 +3,7 @@ import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CacheConfig } from '@project-lc/nest-core';
+import { BroadcasterPromotionPageService } from '@project-lc/nest-modules-broadcaster';
 import { GoodsModule } from '@project-lc/nest-modules-goods';
 import {
   LiveShoppingModule,
@@ -41,6 +42,7 @@ describe('FmExportsService', () => {
         FmOrdersService,
         ProductPromotionService,
         LiveShoppingService,
+        BroadcasterPromotionPageService,
       ],
     }).compile();
 
