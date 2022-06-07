@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Broadcaster, Export } from '@prisma/client';
+import { Broadcaster } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import { BroadcasterSettlementTargets, FindManyDto } from '@project-lc/shared-types';
 import { calcBcSettlementTotalInfo } from '@project-lc/utils';
@@ -8,20 +8,8 @@ import { calcBcSettlementTotalInfo } from '@project-lc/utils';
 export class BroadcasterSettlementService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async findAlreadySettled(
-    broadcasterId: Broadcaster['id'],
-  ): Promise<Export['exportCode'][]> {
-    return this.prisma.broadcasterSettlementItems
-      .findMany({
-        select: { exportCode: true },
-        where: { settlements: { broadcasterId } },
-      })
-      .then((r) => r.map((_) => _.exportCode));
-  }
-
   /** 현재 정산 예정 금액 조회 */
   public async getReceivableAmount(broadcasterId: Broadcaster['id']): Promise<number> {
-    const alreadySettled = await this.findAlreadySettled(broadcasterId);
     const targets = await this.prisma.exportItem.findMany({
       include: {
         export: true,
@@ -32,7 +20,7 @@ export class BroadcasterSettlementService {
         },
       },
       where: {
-        export: { exportCode: { notIn: alreadySettled } },
+        export: { broadcasterSettlementItemsId: null },
         orderItem: {
           support: {
             broadcasterId,
@@ -57,7 +45,6 @@ export class BroadcasterSettlementService {
     broadcasterId?: Broadcaster['id'],
     paginationDto?: FindManyDto,
   ): Promise<BroadcasterSettlementTargets> {
-    const alreadySettled = await this.findAlreadySettled(broadcasterId);
     const result = await this.prisma.export.findMany({
       include: {
         items: {
@@ -102,7 +89,7 @@ export class BroadcasterSettlementService {
         },
       },
       where: {
-        exportCode: { notIn: alreadySettled },
+        broadcasterSettlementItemsId: null,
         buyConfirmSubject: { not: null },
         buyConfirmDate: { not: null },
         order: {
