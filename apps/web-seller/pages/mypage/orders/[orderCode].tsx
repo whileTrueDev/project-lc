@@ -35,6 +35,7 @@ import { OrderDetailExchangeInfo } from '@project-lc/components-seller/kkshow-or
 import { OrderDetailCancelInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailCancelInfo';
 import { OrderDetailExportInfo } from '@project-lc/components-seller/kkshow-order/OrderDetailExportInfo';
 import { OrderExchangeReturnCancelExistsAlert } from '@project-lc/components-seller/kkshow-order/OrderExchangeReturnCancelExistsAlert';
+import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
 import { OrderItemOption, OrderShipping } from '@prisma/client';
 
 const exchangeSectionTitle = '교환 정보';
@@ -45,7 +46,7 @@ const orderCancelSectionTitle = '주문취소 정보';
 export function OrderDetail(): JSX.Element {
   const router = useRouter();
 
-  const orderCode = router.query.orderId as string; // 주문코드
+  const orderCode = router.query.orderCode as string; // 주문코드
 
   const order = useOrderDetail({ orderCode });
 
@@ -226,35 +227,6 @@ export function OrderDetail(): JSX.Element {
 }
 
 export default OrderDetail;
-
-export function OrderDetailLoading(): JSX.Element {
-  return (
-    <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2}>
-      <Stack p={4}>
-        <Skeleton height={12} />
-        <Skeleton height={6} w={280} />
-      </Stack>
-
-      <Stack mt={6}>
-        <Stack
-          padding="6"
-          boxShadow="lg"
-          bg={useColorModeValue('gray.200', 'gray.700')}
-          direction="row"
-          spacing={6}
-        >
-          <Skeleton w={280} height={72} />
-          <VStack>
-            <Box w={280}>
-              <SkeletonCircle size="12" />
-              <SkeletonText mt="4" noOfLines={4} spacing="4" />
-            </Box>
-          </VStack>
-        </Stack>
-      </Stack>
-    </Stack>
-  );
-}
 
 interface OrderDetailShippingItemProps {
   shipping: OrderShipping & { items: OrderItemOption[] };
