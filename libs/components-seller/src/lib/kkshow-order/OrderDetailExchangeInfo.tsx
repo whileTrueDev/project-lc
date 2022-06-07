@@ -8,6 +8,9 @@ import OrderExchangeStatusDialog from './OrderExchangeStatusDialog';
 export interface OrderDetailExchangeInfoProps {
   exchangeData: ExchangeDataWithImages;
 }
+
+const EXCHANGE_TEXT = '교환(재배송)';
+
 export function OrderDetailExchangeInfo({
   exchangeData,
 }: OrderDetailExchangeInfoProps): JSX.Element {
@@ -20,7 +23,7 @@ export function OrderDetailExchangeInfo({
         </Link>
         <ExchangeReturnCancelRequestStatusBadge
           status={exchangeData.status}
-          prefix="교환"
+          prefix={EXCHANGE_TEXT}
         />
         <TextDotConnector />
         <Text isTruncated>
@@ -33,18 +36,18 @@ export function OrderDetailExchangeInfo({
 
       <Stack>
         <Text>
-          (교환요청일){' '}
+          ({EXCHANGE_TEXT}요청일){' '}
           {dayjs(exchangeData.requestDate).format('YYYY년 MM월 DD일 HH:mm:ss')}
         </Text>
         {exchangeData.completeDate && (
           <Text>
-            (교환완료일){' '}
+            ({EXCHANGE_TEXT}완료일){' '}
             {dayjs(exchangeData.completeDate).format('YYYY년 MM월 DD일 HH:mm:ss')}
           </Text>
         )}
         <Box>
           <Button size="sm" onClick={onOpen}>
-            교환 상태 관리
+            {EXCHANGE_TEXT} 상태 관리
           </Button>
         </Box>
       </Stack>

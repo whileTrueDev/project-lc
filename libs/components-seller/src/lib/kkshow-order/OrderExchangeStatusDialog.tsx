@@ -47,6 +47,7 @@ export interface OrderExchangeStatusDialogProps {
   onClose: () => void;
   data: ExchangeDataWithImages;
 }
+const EXCHANGE_TEXT = '교환(재배송)';
 export function OrderExchangeStatusDialog({
   isOpen,
   onClose,
@@ -62,14 +63,14 @@ export function OrderExchangeStatusDialog({
   const toast = useToast();
   const onSuccess = (): void => {
     toast({
-      title: '교환 상태를 변경하였습니다',
+      title: `${EXCHANGE_TEXT} 상태를 변경하였습니다`,
       status: 'success',
     });
   };
 
   const onFail = (): void => {
     toast({
-      title: '교환 상태 변경 중 오류가 발생하였습니다',
+      title: `${EXCHANGE_TEXT} 상태 변경 중 오류가 발생하였습니다`,
       status: 'error',
     });
   };
@@ -113,7 +114,8 @@ export function OrderExchangeStatusDialog({
   if (!exchangeDetail) {
     return (
       <Text>
-        해당 교환신청 내역이 존재하지 않습니다 교환신청코드: {data.exchangeCode}
+        해당 {EXCHANGE_TEXT}신청 내역이 존재하지 않습니다 {EXCHANGE_TEXT}신청코드:{' '}
+        {data.exchangeCode}
       </Text>
     );
   }
@@ -122,7 +124,7 @@ export function OrderExchangeStatusDialog({
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="3xl">
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(onSubmit)}>
-        <ModalHeader>교환 상태 관리</ModalHeader>
+        <ModalHeader>{EXCHANGE_TEXT} 상태 관리</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={2}>
@@ -130,13 +132,13 @@ export function OrderExchangeStatusDialog({
             <Stack spacing={1} my={2}>
               <Stack direction="row" justifyContent="space-between">
                 <Stack>
-                  <Text fontWeight="bold">재배송요청코드</Text>
+                  <Text fontWeight="bold">{EXCHANGE_TEXT}요청코드</Text>
                   <Text pl={4}>{exchangeDetail.exchangeCode}</Text>
                 </Stack>
               </Stack>
 
               <Stack>
-                <Text fontWeight="bold">재배송요청 처리상태</Text>
+                <Text fontWeight="bold">{EXCHANGE_TEXT}요청 처리상태</Text>
 
                 <Stack pl={4}>
                   <Stack direction="row" alignItems="center">
@@ -146,16 +148,18 @@ export function OrderExchangeStatusDialog({
                   </Stack>
                   {exchangeDetail.rejectReason && (
                     <Text pl={4}>
-                      재배송요청 거절 사유 : {exchangeDetail.rejectReason}
+                      {EXCHANGE_TEXT}요청 거절 사유 : {exchangeDetail.rejectReason}
                     </Text>
                   )}
 
                   <Text>요청일 : {requestDate}</Text>
                   <Stack pl={4}>
-                    <Text>재배송요청 사유 : {exchangeDetail.reason}</Text>
+                    <Text>
+                      {EXCHANGE_TEXT}요청 사유 : {exchangeDetail.reason}
+                    </Text>
                     {exchangeDetail.images.length && (
                       <>
-                        <Text>재배송요청 이미지 : </Text>
+                        <Text>{EXCHANGE_TEXT}요청 이미지 : </Text>
                         {exchangeDetail.images.map((img) => (
                           <Image
                             maxW="400px"
@@ -173,7 +177,7 @@ export function OrderExchangeStatusDialog({
               </Stack>
 
               <Stack>
-                <Text fontWeight="bold">재배송요청 주문상품</Text>
+                <Text fontWeight="bold">{EXCHANGE_TEXT}요청 주문상품</Text>
                 <Stack pl={4}>
                   {exchangeDetail.items.map((item) => (
                     <ExchangeReturnCancelRequestGoodsData key={item.id} {...item} />
@@ -227,7 +231,7 @@ export function OrderExchangeStatusDialog({
               {/* 거절사유 */}
               {watch('status') === 'canceled' && (
                 <FormControl isInvalid={!!errors.rejectReason}>
-                  <FormLabel>재배송요청 거절 사유</FormLabel>
+                  <FormLabel>{EXCHANGE_TEXT}요청 거절 사유</FormLabel>
                   <Input {...register('rejectReason')} />
                   {errors.rejectReason && (
                     <FormErrorMessage>{errors.rejectReason.message}</FormErrorMessage>
@@ -239,9 +243,9 @@ export function OrderExchangeStatusDialog({
                 <Alert mt={6} mb={2} status="info">
                   <Stack alignItems="center" justify="center" w="100%">
                     <AlertIcon />
-                    <AlertTitle>이 재배송요청은 완료 처리되었습니다.</AlertTitle>
+                    <AlertTitle>이 {EXCHANGE_TEXT}요청은 완료 처리되었습니다.</AlertTitle>
                     <AlertDescription>
-                      재배송 진행 정보는 교환정보에서 확인해주세요.
+                      {EXCHANGE_TEXT} 진행 정보는 교환정보에서 확인해주세요.
                     </AlertDescription>
                   </Stack>
                 </Alert>
