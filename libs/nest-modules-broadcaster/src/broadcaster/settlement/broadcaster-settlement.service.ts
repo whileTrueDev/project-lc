@@ -18,6 +18,13 @@ export class BroadcasterSettlementService {
             support: { select: { liveShopping: true, productPromotion: true } },
           },
         },
+        orderItemOption: {
+          select: {
+            normalPrice: true,
+            discountPrice: true,
+            quantity: true,
+          },
+        },
       },
       where: {
         export: { broadcasterSettlementItemsId: null },
