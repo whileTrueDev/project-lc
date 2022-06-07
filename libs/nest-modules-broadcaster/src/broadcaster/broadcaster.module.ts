@@ -1,8 +1,8 @@
 import { DynamicModule, Module } from '@nestjs/common';
+import { UserPwManager } from '@project-lc/nest-core';
 import { CipherModule } from '@project-lc/nest-modules-cipher';
 import { MailVerificationModule } from '@project-lc/nest-modules-mail-verification';
 import { PrismaModule } from '@project-lc/prisma-orm';
-import { UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsController } from './broadcaster-contacts.controller';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';

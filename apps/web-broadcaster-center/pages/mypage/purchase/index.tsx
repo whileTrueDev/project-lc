@@ -1,7 +1,7 @@
-import { broadcasterCenterMypageNavLinks } from '@project-lc/components-constants/navigation';
-import { BroadcasterPurchaseList } from '@project-lc/components-web-bc/BroadcasterPurchaseList';
-import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { Box } from '@chakra-ui/react';
+import { broadcasterCenterMypageNavLinks } from '@project-lc/components-constants/navigation';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { BroadcasterPurchaseList } from '@project-lc/components-web-bc/BroadcasterPurchaseList';
 
 export function PurchaseIndex(): JSX.Element {
   return (

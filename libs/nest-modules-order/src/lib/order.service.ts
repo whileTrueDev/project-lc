@@ -681,7 +681,7 @@ export class OrderService {
       take: realTake || undefined,
       where: {
         deleteFlag: false,
-        orderItems: { every: { support: { broadcasterId } } },
+        orderItems: { some: { support: { broadcasterId } } },
       },
       orderBy: { createDate: 'desc' },
       select: {

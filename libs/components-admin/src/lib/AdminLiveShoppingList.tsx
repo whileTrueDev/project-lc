@@ -17,9 +17,7 @@ export function AdminLiveShoppingList({
 
   const { data, isLoading } = useAdminLiveShoppingList(
     {},
-    {
-      enabled: !!profileData?.id,
-    },
+    { enabled: !!profileData?.id },
   );
 
   function handleClick(row: LiveShoppingWithGoods): void {
