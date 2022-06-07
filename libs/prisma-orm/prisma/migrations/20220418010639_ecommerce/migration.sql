@@ -8,8 +8,7 @@
 ALTER TABLE `BroadcasterPromotionPage` ADD COLUMN `comment` VARCHAR(191) NULL;
 
 -- AlterTable
-ALTER TABLE `BroadcasterSettlementItems` ADD COLUMN `exportId` INTEGER NULL,
-    ADD COLUMN `relatedOrderId` INTEGER NULL;
+ALTER TABLE `BroadcasterSettlementItems` ADD COLUMN `relatedOrderId` INTEGER NULL;
 
 -- AlterTable
 ALTER TABLE `Goods` ADD COLUMN `informationNoticeId` INTEGER NULL,
@@ -19,8 +18,7 @@ ALTER TABLE `Goods` ADD COLUMN `informationNoticeId` INTEGER NULL,
 ALTER TABLE `ProductPromotion` ADD COLUMN `broadcasterId` INTEGER NULL;
 
 -- AlterTable
-ALTER TABLE `SellerSettlementItems` ADD COLUMN `exportId` INTEGER NULL,
-    ADD COLUMN `relatedOrderId` INTEGER NULL;
+ALTER TABLE `SellerSettlementItems` ADD COLUMN `relatedOrderId` INTEGER NULL;
 
 -- CreateTable
 CREATE TABLE `MileageSetting` (
@@ -495,8 +493,12 @@ CREATE TABLE `Export` (
     `buyConfirmDate` DATETIME(3) NULL,
     `buyConfirmSubject` ENUM('admin', 'customer', 'system') NULL,
     `sellerId` INTEGER NULL,
+    `broadcasterSettlementItemsId` INTEGER NULL,
+    `sellerSettlementItemsId` INTEGER NULL,
 
     UNIQUE INDEX `Export_exportCode_key`(`exportCode`),
+    UNIQUE INDEX `Export_broadcasterSettlementItemsId_key`(`broadcasterSettlementItemsId`),
+    UNIQUE INDEX `Export_sellerSettlementItemsId_key`(`sellerSettlementItemsId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -587,16 +589,10 @@ CREATE UNIQUE INDEX `Goods_informationNoticeId_key` ON `Goods`(`informationNotic
 ALTER TABLE `SellerSettlementItems` ADD CONSTRAINT `SellerSettlementItems_relatedOrderId_fkey` FOREIGN KEY (`relatedOrderId`) REFERENCES `Order`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `SellerSettlementItems` ADD CONSTRAINT `SellerSettlementItems_exportId_fkey` FOREIGN KEY (`exportId`) REFERENCES `Export`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Goods` ADD CONSTRAINT `Goods_informationNoticeId_fkey` FOREIGN KEY (`informationNoticeId`) REFERENCES `GoodsInformationNotice`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `BroadcasterSettlementItems` ADD CONSTRAINT `BroadcasterSettlementItems_relatedOrderId_fkey` FOREIGN KEY (`relatedOrderId`) REFERENCES `Order`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `BroadcasterSettlementItems` ADD CONSTRAINT `BroadcasterSettlementItems_exportId_fkey` FOREIGN KEY (`exportId`) REFERENCES `Export`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ProductPromotion` ADD CONSTRAINT `ProductPromotion_broadcasterId_fkey` FOREIGN KEY (`broadcasterId`) REFERENCES `Broadcaster`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -788,6 +784,12 @@ ALTER TABLE `Export` ADD CONSTRAINT `Export_orderId_fkey` FOREIGN KEY (`orderId`
 
 -- AddForeignKey
 ALTER TABLE `Export` ADD CONSTRAINT `Export_sellerId_fkey` FOREIGN KEY (`sellerId`) REFERENCES `Seller`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Export` ADD CONSTRAINT `Export_sellerSettlementItemsId_fkey` FOREIGN KEY (`sellerSettlementItemsId`) REFERENCES `SellerSettlementItems`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Export` ADD CONSTRAINT `Export_broadcasterSettlementItemsId_fkey` FOREIGN KEY (`broadcasterSettlementItemsId`) REFERENCES `BroadcasterSettlementItems`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ExportItem` ADD CONSTRAINT `ExportItem_orderItemId_fkey` FOREIGN KEY (`orderItemId`) REFERENCES `OrderItem`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
