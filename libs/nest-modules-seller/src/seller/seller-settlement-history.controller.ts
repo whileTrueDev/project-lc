@@ -10,7 +10,7 @@ import { SellerSettlements } from '@prisma/client';
 import { HttpCacheInterceptor, SellerInfo, UserPayload } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { FindSettlementHistoryDto } from '@project-lc/shared-types';
-import { SellerSettlementService } from './seller-settlement.service';
+import { SellerSettlementService } from './settlement/seller-settlement.service';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
