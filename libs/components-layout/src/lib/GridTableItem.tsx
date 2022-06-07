@@ -14,7 +14,7 @@ export function useTableHeaderConfig(useColorMode: typeof useColorModeValue) {
     p: 3,
     pb: 5,
     pt: 2,
-    fontSize: 13,
+    fontSize: 'xs',
     backgroundColor: useColorMode('gray.50', 'gray.700'),
     borderBottomColor: useColorMode('gray.100', 'gray.750'),
     borderBottomWidth: 1.5,
@@ -29,7 +29,7 @@ export function useTableValueConfig(useColorMode: typeof useColorModeValue) {
     p: 3,
     borderBottomColor: useColorMode('gray.100', 'gray.750'),
     borderBottomWidth: 1.5,
-    fontSize: 14,
+    fontSize: 'sm',
     mb: [3, 0, 0, 0],
   };
 }
@@ -40,7 +40,7 @@ export function useDialogHeaderConfig(useColorMode: typeof useColorModeValue) {
     p: 3,
     pb: 5,
     pt: 2,
-    fontSize: 13,
+    fontSize: 'xs',
     backgroundColor: useColorMode('gray.50', 'whiteAlpha.300'),
     borderBottomColor: useColorMode('gray.100', 'whiteAlpha.350'),
     borderBottomWidth: 1.5,
@@ -55,7 +55,7 @@ export function useDialogValueConfig(useColorMode: typeof useColorModeValue) {
     p: 3,
     borderBottomColor: useColorMode('gray.100', 'whiteAlpha.350'),
     borderBottomWidth: 1.5,
-    fontSize: 14,
+    fontSize: 'sm',
     mb: [3, 0, 0, 0],
   };
 }

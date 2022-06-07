@@ -3,6 +3,8 @@ import {
   CartItemOption,
   CartItemSupport,
   Customer,
+  LiveShopping,
+  ProductPromotion,
   SellType,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
@@ -35,6 +37,10 @@ export class CartItemSupportDto {
   @IsNumber() broadcasterId: CartItemSupport['broadcasterId'];
   @IsString() nickname: CartItemSupport['nickname'];
   @IsOptional() @IsString() message?: CartItemSupport['message'];
+  /** 후원이 발생된 liveShopping 고유번호 */
+  @IsOptional() @IsNumber() liveShoppingId?: LiveShopping['id'];
+  /** 후원이 발생된 productPromotion 고유번호 */
+  @IsOptional() @IsNumber() productPromotionId?: ProductPromotion['id'];
 }
 
 /** 카트 상품 정보 DTO */
