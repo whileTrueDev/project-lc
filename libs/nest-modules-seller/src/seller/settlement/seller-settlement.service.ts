@@ -23,157 +23,82 @@ export class SellerSettlementService {
    * 정산 처리를 진행합니다.
    * @author hwasurr(dan)
    * */
-  public async executeSettle(
-    id: UserPayload['id'],
-    dto: ExecuteSettlementDto,
-  ): Promise<boolean> {
-    const { target, round } = dto;
-    const { order_seq, shipping_cost } = target;
-
-    // 출고가 발생한 주문을 통해 해당 주문에 대한 이전 정산 처리를 조회
-    const settlementHistories = await this.findSettlementHistory(id, {
-      order_seq,
-    });
-
-    // 이전 정산 정보를 바탕으로, 배송비 중복 부과 방지 처리 ( 배송비는 해당 order_shipping의 첫 출고에만 부과)
-    let shippingCost = shipping_cost;
-    let shippingCostIncluded = true;
-    const targetShippingSeqs = target.options.map((x) => x.shipping_seq);
-    const filtered = settlementHistories.find((h) => {
-      return targetShippingSeqs.includes(h.shippingId);
-    });
-    if (filtered) {
-      // 이 주문의 shipping_seq 에 대한 배송비를 이미 부과한 경우
-      shippingCost = '0';
-      shippingCostIncluded = false;
-    }
-
-    // 수수료 정보 조회
+  public async executeSettle(dto: ExecuteSettlementDto): Promise<boolean> {
     const sellCommission = await this.findSellCommission();
-
-    const totalInfo = target.options.reduce(
+    const totalInfo = dto.items.reduce(
       (acc, curr) => {
         const ea = Number(acc.ea) + Number(curr.ea);
         const price = Number(acc.price) + Number(curr.price);
 
-        // 라이브쇼핑인지 여부
-        // 판매된 시각과 라이브쇼핑 판매기간을 비교해 포함되면 라이브쇼핑을 통한 구매로 판단
-        const liveShopping = curr.LiveShopping.find((lvs) => {
-          return checkOrderDuringLiveShopping(target, lvs);
-        });
-        // 상품홍보를 통한 정산대상인지 여부
-        const productPromotion =
-          curr.productPromotion.length > 0 ? curr.productPromotion[0] : null;
-
         let commission = Math.floor(price * Number(sellCommission.commissionDecimal));
-        if (liveShopping || productPromotion) {
-          let wtCommissionRate: Prisma.Decimal;
-          let bcCommissionRate: Prisma.Decimal;
-          if (liveShopping) {
-            wtCommissionRate = liveShopping.whiletrueCommissionRate;
-            bcCommissionRate = liveShopping.broadcasterCommissionRate;
-          } else if (productPromotion) {
-            wtCommissionRate = productPromotion.whiletrueCommissionRate;
-            bcCommissionRate = productPromotion.broadcasterCommissionRate;
-          }
+        if (
+          curr.sellType === SellType.liveShopping ||
+          curr.sellType === SellType.productPromotion
+        ) {
+          const wtCommissionRate = curr.whiletrueCommissionRate;
+          const bcCommissionRate = curr.broadcasterCommissionRate;
           const wtCommission = Math.floor(price * (Number(wtCommissionRate) * 0.01));
           const brCommission = Math.floor(price * (Number(bcCommissionRate) * 0.01));
           commission = wtCommission + brCommission;
         }
-
-        return {
-          ea,
-          price,
-          commission,
-        };
+        return { ea, price, commission };
       },
       { ea: 0, price: 0, commission: 0 },
     );
 
-    const totalPgCommission = this.calcPgCommission({
-      paymentMethod: target.payment,
-      pg: target.pg,
-      targetAmount: totalInfo.price + Number(shippingCost),
-    });
-
     // 주문정보 불러오기
     // 라이브쇼핑 주문의 경우, 일반 주문의 경우 분기처리
     const today = dayjs().format('YYYY/MM');
-    await this.prisma.sellerSettlements.create({
+    const result = await this.prisma.sellerSettlements.create({
       data: {
-        exportId: target.export_seq,
-        exportCode: target.export_code,
-        orderId: String(target.order_seq),
-        round: `${today}/${round}차`,
-        shippingCost,
-        shippingId: target.options[0].shipping_seq,
-        startDate: target.export_date, // 출고일
+        exportId: dto.exportId,
+        exportCode: dto.exportCode,
+        orderId: String(dto.orderId),
+        round: `${today}/${dto.round}차`,
+        shippingCost: dto.shippingCost,
+        shippingId: dto.shippingId,
+        startDate: dto.startDate,
         date: new Date(),
-        doneDate: target.confirm_date, // 구매확정일
-        buyer: target.order_user_name,
-        recipient: target.recipient_user_name,
-        paymentMethod: target.payment,
-        pg: target.pg,
-        pgCommission: totalPgCommission.commission,
-        pgCommissionRate: totalPgCommission.rate,
-        sellerId: target.options[0].seller.id,
+        doneDate: dto.doneDate, // 구매확정일
+        buyer: dto.buyer,
+        recipient: dto.recipient,
+        paymentMethod: dto.paymentMethod,
+        pg: dto.pg,
+        pgCommission: dto.pgCommission,
+        pgCommissionRate: dto.pgCommissionRate,
+        sellerId: dto.sellerId,
         settlementItems: {
-          create: target.options.map((opt) => {
-            const price = Number(opt.price) * opt.ea;
-            const liveShopping = opt.LiveShopping.find((lvs) => {
-              return checkOrderDuringLiveShopping(target, lvs);
-            });
-            const productPromotion =
-              opt.productPromotion.length > 0 ? opt.productPromotion[0] : null;
-            const sellType = liveShopping
-              ? SellType.liveShopping
-              : productPromotion
-              ? SellType.productPromotion
-              : SellType.normal;
-            // 수수료율 정보
-            const wtCommissionRate = liveShopping
-              ? liveShopping.whiletrueCommissionRate
-              : productPromotion
-              ? productPromotion.whiletrueCommissionRate
-              : sellCommission.commissionRate;
-            const wtCommission = Math.floor(0.01 * Number(wtCommissionRate) * price);
-            const bcCommissionRate = liveShopping
-              ? liveShopping.broadcasterCommissionRate
-              : productPromotion
-              ? productPromotion.broadcasterCommissionRate
-              : 0;
-            const bcCommission = Math.floor(0.01 * Number(bcCommissionRate) * price);
-
+          create: dto.items.map((item) => {
             return {
-              itemId: opt.item_seq,
-              goods_name: opt.goods_name,
-              goods_image: opt.image,
-              option_title: opt.title1,
-              option1: opt.option1,
-              optionId: opt.item_option_seq,
-              ea: opt.ea,
-              price,
-              pricePerPiece: Number(opt.price),
-              liveShoppingId: liveShopping ? liveShopping?.id : null,
-              productPromotionId: productPromotion ? productPromotion.id : null,
-              sellType,
-              whiletrueCommissionRate: wtCommissionRate,
-              broadcasterCommissionRate: bcCommissionRate,
-              whiletrueCommission: wtCommission,
-              broadcasterCommission: bcCommission,
+              itemId: item.itemId,
+              goods_name: item.goods_name,
+              goods_image: item.goods_image,
+              option_title: item.option_title,
+              option1: item.option1,
+              optionId: item.optionId,
+              ea: item.ea,
+              price: item.price,
+              pricePerPiece: Number(item.pricePerPiece),
+              liveShoppingId: item.liveShoppingId,
+              productPromotionId: item.productPromotionId,
+              sellType: item.sellType,
+              whiletrueCommissionRate: item.whiletrueCommissionRate,
+              broadcasterCommissionRate: item.broadcasterCommissionRate,
+              whiletrueCommission: item.whiletrueCommission || 0,
+              broadcasterCommission: item.broadcasterCommission || 0,
             };
           }),
         },
-        shippingCostIncluded,
         totalEa: totalInfo.ea,
         totalPrice: totalInfo.price,
-        totalAmount:
-          totalInfo.price -
-          totalInfo.commission -
-          totalPgCommission.commission +
-          Number(shippingCost),
-        totalCommission: totalInfo.commission + totalPgCommission.commission,
+        totalAmount: totalInfo.price - totalInfo.commission,
+        totalCommission: totalInfo.commission,
       },
+    });
+
+    this.prisma.export.update({
+      where: { exportCode: dto.exportCode },
+      data: { sellerSettlementItemsId: result.id },
     });
 
     return true;
@@ -239,7 +164,6 @@ export class SellerSettlementService {
             id: true,
             orderItem: {
               select: {
-                order: { select: { id: true, payment: { select: { method: true } } } },
                 channel: true,
                 goods: {
                   select: {
@@ -286,11 +210,22 @@ export class SellerSettlementService {
         },
         seller: {
           select: {
+            email: true,
+            name: true,
             sellerShop: { select: { shopName: true } },
             sellerSettlementAccount: true,
           },
         },
-        order: { select: { recipientName: true, ordererName: true } },
+        order: {
+          select: {
+            id: true,
+            recipientName: true,
+            ordererName: true,
+            supportOrderIncludeFlag: true,
+            createDate: true,
+            payment: { select: { method: true } },
+          },
+        },
       },
     });
   }

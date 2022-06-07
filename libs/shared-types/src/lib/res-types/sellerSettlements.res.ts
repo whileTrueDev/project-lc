@@ -10,6 +10,7 @@ import {
   OrderItemOption,
   OrderPayment,
   ProductPromotion,
+  Seller,
   SellerSettlementAccount,
   SellerShop,
 } from '@prisma/client';
@@ -17,9 +18,8 @@ import {
 type SellerSettlementTargetsExportItem = Pick<ExportItem, 'id' | 'amount' | 'status'> & {
   orderItem: {
     channel: OrderItem['channel'];
-    order: { id: Order['id'] } & {
-      payment: Pick<OrderPayment, 'method'> | null;
-    };
+    shippingCost: OrderItem['shippingCost'];
+    shippingCostIncluded: OrderItem['shippingCostIncluded'];
     goods: {
       goods_name: Goods['goods_name'];
       image: Pick<GoodsImages, 'id' | 'image'>[];
@@ -32,22 +32,27 @@ type SellerSettlementTargetsExportItem = Pick<ExportItem, 'id' | 'amount' | 'sta
         | 'id'
         | 'whiletrueCommissionRate'
         | 'broadcasterCommissionRate'
-      >;
+      > | null;
       productPromotion: Pick<
         ProductPromotion,
         'id' | 'whiletrueCommissionRate' | 'broadcasterCommissionRate'
-      >;
+      > | null;
     };
   };
   orderItemOption: OrderItemOption;
 };
 export type SellerSettlementTarget = Export & {
   items: Array<SellerSettlementTargetsExportItem>;
-  seller: {
+  seller: Pick<Seller, 'email' | 'name'> & {
     sellerShop: { shopName: SellerShop['shopName'] };
-    sellerSettlementAccount: SellerSettlementAccount[];
+    sellerSettlementAccount: SellerSettlementAccount[] | null;
   };
-  order: Pick<Order, 'recipientName' | 'ordererName'>;
+  order: Pick<
+    Order,
+    'id' | 'recipientName' | 'ordererName' | 'supportOrderIncludeFlag' | 'createDate'
+  > & {
+    payment: Pick<OrderPayment, 'method'> | null;
+  };
 };
 
 export type SellerSettlementTargetRes = SellerSettlementTarget[];

@@ -148,9 +148,8 @@ export class AdminController {
   @Post('/settlement')
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('seller/settlement', 'seller/settlement-history')
-  executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
-    if (dto.target.options.length === 0) return null;
-    return this.sellerSettlementService.executeSettle(dto.sellerId, dto);
+  async executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
+    return this.sellerSettlementService.executeSettle(dto);
   }
 
   /** 판매자 정산 완료 목록 */
