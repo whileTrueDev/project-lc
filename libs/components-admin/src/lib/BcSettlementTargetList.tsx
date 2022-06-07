@@ -53,7 +53,7 @@ function TotalAmountCell({ row }: GridCellParams): JSX.Element {
   const total = useBroadcasterSettlementTotalInfo(
     row as BroadcasterSettlementTargetsItem,
   );
-  return <Text>{!total ? '-' : getLocaleNumber(total.amount)}</Text>;
+  return <Text>{!total ? '-' : getLocaleNumber(total.total)}</Text>;
 }
 
 /** 방송인 수익 정산 대상 목록 */
@@ -161,7 +161,9 @@ export function BcSettlementTargetList(): JSX.Element {
           i.orderItem.support.liveShopping?.broadcasterCommissionRate ||
           i.orderItem.support.productPromotion?.broadcasterCommissionRate ||
           '0';
-        const amount = calcSettleAmount(Number(i.amount), commissionRate);
+        const optionPrice =
+          i.orderItemOption.quantity * Number(i.orderItemOption.discountPrice);
+        const amount = calcSettleAmount(optionPrice, commissionRate);
         dtoItems.push({
           amount,
           exportCode: exp.exportCode || `NON_EXPORT_CODE_${exp.id}`,
@@ -264,7 +266,7 @@ function BcSettlementTargetDetail({
       { title: '운송장번호', value: settlementTarget.deliveryNumber },
       {
         title: '총 출고 가격',
-        value: total ? `${getLocaleNumber(total.amount)}원` : '-',
+        value: total ? `${getLocaleNumber(total.total)}원` : '-',
       },
       {
         title: '총 정산액',
