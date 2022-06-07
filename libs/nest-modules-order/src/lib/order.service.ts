@@ -599,7 +599,7 @@ export class OrderService {
         });
       }
       // 주문상태를 상품준비로 바꾸는 경우(결제완료 -> 상품준비)
-      // => 해당 주문에 포함된 주문상품옵션 상태도 모두 상품준비로 변경 + 주문상품옵션의 상품준비상태 개수 업데이트
+      // => 해당 주문에 포함된 주문상품옵션 상태도 모두 상품준비로 변경
       if (rest.step === 'goodsReady') {
         await this.prisma.$transaction(
           orderItemOptions.map((opt) => {
@@ -607,7 +607,6 @@ export class OrderService {
               where: { id: opt.id },
               data: {
                 step: rest.step,
-                amountInGoodsReady: opt.quantity,
               },
             });
           }),
