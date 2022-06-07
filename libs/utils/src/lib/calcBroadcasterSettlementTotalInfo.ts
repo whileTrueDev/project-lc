@@ -1,4 +1,4 @@
-import { LiveShopping, ProductPromotion } from '@prisma/client';
+import { LiveShopping, Prisma, ProductPromotion } from '@prisma/client';
 import { ExportItemWithMarketingMethod } from '@project-lc/shared-types';
 
 export interface BroadcasterSettlementTotalInfo {
@@ -37,42 +37,44 @@ export const calcBroadcasterSettlementTotalInfo = (
 };
 
 export interface BcSettlementTotalInfo {
-  amount?: number;
+  total?: number;
   settleAmount?: number;
 }
 
 /** 방송인 정산 금액 (총 출고금액, 총 정산금액) 계산함수 */
 export const calcBcSettlementTotalInfo = (target: {
   items: {
-    amount: number;
     orderItem: {
       support: { liveShopping: LiveShopping; productPromotion: ProductPromotion };
+    };
+    orderItemOption: {
+      quantity: number;
+      normalPrice: Prisma.Decimal;
+      discountPrice: Prisma.Decimal;
     };
   }[];
 }): BcSettlementTotalInfo => {
   return target.items.reduce<BcSettlementTotalInfo>((prev, curr) => {
-    let settleAmount = 0;
+    const itemPrice = Number(curr.orderItemOption.discountPrice);
+    let settleAmount = curr.orderItemOption.quantity * itemPrice;
+
     if (curr.orderItem.support.liveShopping) {
       settleAmount = Math.floor(
-        Number(curr.amount) *
+        settleAmount *
           (Number(curr.orderItem.support.liveShopping.broadcasterCommissionRate) / 100),
       );
     }
     if (curr.orderItem.support.productPromotion) {
       settleAmount = Math.floor(
-        Number(curr.amount) *
+        settleAmount *
           (Number(curr.orderItem.support.productPromotion.broadcasterCommissionRate) /
             100),
       );
     }
 
-    if (!prev)
-      return {
-        amount: Number(curr.amount),
-        settleAmount,
-      };
+    if (!prev) return { total: settleAmount, settleAmount };
     return {
-      amount: (prev.amount || 0) + Number(curr.amount),
+      total: (prev.total || 0) + itemPrice,
       settleAmount: (prev.settleAmount || 0) + settleAmount,
     };
   }, {});
