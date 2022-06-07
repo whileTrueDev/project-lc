@@ -1,28 +1,7 @@
-import { Box, Stack } from '@chakra-ui/react';
-import { OrderProcessStep } from '@prisma/client';
-import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
-import {
-  FmOrderStatusNumString,
-  OrderDataWithRelations,
-  OrderItemWithRelations,
-  orderProcessStepDict,
-} from '@project-lc/shared-types';
+import { Stack } from '@chakra-ui/react';
+import { OrderDataWithRelations, OrderItemWithRelations } from '@project-lc/shared-types';
 import { OrderItemActionButtons } from './CustomerOrderItemActionButtons';
 import { OrderItemOptionInfo } from './OrderItemOptionInfo';
-
-export function orderProcessStepToFmOrderStatus(
-  step: OrderProcessStep,
-): FmOrderStatusNumString {
-  return orderProcessStepDict[step];
-}
-/** FmOrderStatusBadge 래핑한 컴포넌트 */
-export function OrderStatusBadge({ step }: { step: OrderProcessStep }): JSX.Element {
-  return (
-    <Box>
-      <FmOrderStatusBadge orderStatus={orderProcessStepToFmOrderStatus(step)} />
-    </Box>
-  );
-}
 
 export function OrderItem({
   orderItem,

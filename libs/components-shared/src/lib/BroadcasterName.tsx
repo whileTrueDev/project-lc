@@ -1,8 +1,8 @@
 import { Text } from '@chakra-ui/react';
-import { BroadcasterDTOWithoutUserId } from '@project-lc/shared-types';
+import { Broadcaster } from '@prisma/client';
 
 export function BroadcasterName(props: {
-  data: BroadcasterDTOWithoutUserId;
+  data: { userNickname: Broadcaster['userNickname'] };
   color?: string;
 }): JSX.Element {
   const { data, color } = props;

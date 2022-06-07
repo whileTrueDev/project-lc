@@ -8,6 +8,7 @@ import {
   KkshowMainModule,
   KkshowShoppingModule,
 } from '@project-lc/nest-modules-kkshow-main';
+import { LiveShoppingModule } from '@project-lc/nest-modules-liveshopping';
 import { ManualModule } from '@project-lc/nest-modules-manual';
 import { MileageModule } from '@project-lc/nest-modules-mileage';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
@@ -73,6 +74,7 @@ export class AdminModule {
     CustomerModule.withoutControllers(),
     MileageModule.withoutControllers(),
     CouponModule.withoutControllers(),
+    LiveShoppingModule.withoutControllers(),
   ];
 
   static withoutControllers(): DynamicModule {

@@ -19,7 +19,6 @@ import {
   GoodsRejectionDto,
   LiveShoppingDTO,
   LiveShoppingImageDto,
-  LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -274,33 +273,6 @@ export class AdminService {
       },
     })) as AdminGoodsByIdRes;
     return result;
-  }
-
-  public async getRegisteredLiveShoppings(id?: string): Promise<LiveShoppingWithGoods[]> {
-    return this.prisma.liveShopping.findMany({
-      where: { id: id ? Number(id) : undefined },
-      include: {
-        goods: {
-          select: { goods_name: true, summary: true, image: true, options: true },
-        },
-        seller: { select: { sellerShop: true } },
-        broadcaster: {
-          select: {
-            id: true,
-            userName: true,
-            userNickname: true,
-            email: true,
-            avatar: true,
-            BroadcasterPromotionPage: true,
-          },
-        },
-        liveShoppingVideo: {
-          select: { youtubeUrl: true },
-        },
-        images: true,
-      },
-      orderBy: { createDate: 'desc' },
-    });
   }
 
   public async updateLiveShoppings(

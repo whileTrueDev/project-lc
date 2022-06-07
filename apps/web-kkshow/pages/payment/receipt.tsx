@@ -24,7 +24,7 @@ export function Receipt(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const orderCode = router.query.orderCode as string;
   const orderId = Number(router.query.orderId);
-  const { data: orderDetailData } = useOrderDetail(orderId);
+  const { data: orderDetailData } = useOrderDetail({ orderId });
   const { data: paymentData, isLoading } = usePaymentByOrderCode(orderCode);
   const virtualAccountBoxBgColor = useColorModeValue('gray.100', 'gray.700');
   const productOriginPrice = orderDetailData?.orderItems[0].options.reduce(
