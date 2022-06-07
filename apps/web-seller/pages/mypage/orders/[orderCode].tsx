@@ -189,7 +189,7 @@ export function OrderDetail(): JSX.Element {
           </SectionWithTitle>
         )}
 
-        {/* 반품 정보 */}
+        {/* 반품(환불) 정보 */}
         {order.data.returns.length > 0 && (
           <SectionWithTitle title={returnSectionTitle}>
             {order.data.returns.map((_ret) => (
@@ -199,7 +199,7 @@ export function OrderDetail(): JSX.Element {
             ))}
           </SectionWithTitle>
         )}
-        {/* 교환 정보 */}
+        {/* 교환(재배송) 정보 */}
         {order.data.exchanges.length > 0 && (
           <SectionWithTitle title={exchangeSectionTitle}>
             {order.data.exchanges.map((exchangeData) => (
