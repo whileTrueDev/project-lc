@@ -98,10 +98,8 @@ export function OrderDetail(): JSX.Element {
           <OrderDetailTitle order={order.data} />
         </Box>
 
-        {/* 환불(주문취소요청) , 반품, 교환 알림 문구 */}
-        {(order.data.returns.length > 0 ||
-          order.data.orderCancellations.length > 0 ||
-          order.data.exchanges.length > 0) && (
+        {/* 반품(환불), 교환(재배송) 요청 여부 알림 문구 */}
+        {(order.data.returns.length > 0 || order.data.exchanges.length > 0) && (
           <Stack as="section">
             {order.data.returns.length > 0 && (
               <OrderExchangeReturnCancelExistsAlert
@@ -113,12 +111,6 @@ export function OrderDetail(): JSX.Element {
               <OrderExchangeReturnCancelExistsAlert
                 alertTypeKey="exchange"
                 targetSectionTitle={exchangeSectionTitle}
-              />
-            )}
-            {order.data.orderCancellations.length > 0 && (
-              <OrderExchangeReturnCancelExistsAlert
-                alertTypeKey="cancel"
-                targetSectionTitle={orderCancelSectionTitle}
               />
             )}
           </Stack>
