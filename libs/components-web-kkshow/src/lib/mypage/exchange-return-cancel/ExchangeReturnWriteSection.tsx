@@ -76,7 +76,7 @@ export function ExchangeReturnWriteSection({
     },
   });
 
-  const { data, isLoading, isError } = useOrderDetail(orderId);
+  const { data, isLoading, isError } = useOrderDetail({ orderId });
 
   const exchangeRequest = useCustomerExchangeMutation();
   const returnRequest = useCustomerReturnMutation();

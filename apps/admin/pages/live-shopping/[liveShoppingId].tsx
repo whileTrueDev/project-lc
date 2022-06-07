@@ -73,9 +73,7 @@ export function LiveShoppingDetail(): JSX.Element {
   const { data: profileData } = useProfile();
   const { data: liveShopping, isLoading: liveShoppingIsLoading } =
     useAdminLiveShoppingList(
-      {
-        id: liveShoppingId,
-      },
+      { id: Number(liveShoppingId) },
       { enabled: !!profileData?.id },
     );
 

@@ -1,5 +1,6 @@
 import {
   Broadcaster,
+  BroadcasterChannel,
   BroadcasterPromotionPage,
   GoodsImages,
   GoodsOptions,
@@ -22,6 +23,7 @@ export interface LiveShoppingWithGoods extends LiveShopping {
     Broadcaster,
     'id' | 'userName' | 'userNickname' | 'email' | 'avatar'
   > & {
+    channels: BroadcasterChannel[];
     BroadcasterPromotionPage: BroadcasterPromotionPage | null;
   };
   liveShoppingVideo: { youtubeUrl: string };
