@@ -27,7 +27,6 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { SellType } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import { CommissionInfo } from '@project-lc/components-shared/CommissionInfo';
 import {
@@ -35,11 +34,7 @@ import {
   useSellCommission,
   useSellerSettlementTargets,
 } from '@project-lc/hooks';
-import {
-  ExecuteSettlementDto,
-  SellerSettlementItemDto,
-  SellerSettlementTarget,
-} from '@project-lc/shared-types';
+import { SellerSettlementTarget } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
@@ -258,14 +253,6 @@ function SettlementItemInfoDialog({
           const whiletrueCommission =
             (Number(item.orderItemOption.discountPrice) * item.orderItemOption.quantity) /
             (Number(whiletrueCommissionRate) * 0.01);
-
-          console.log(
-            'item.orderItemOption.discountPrice: ',
-            item.orderItemOption.discountPrice,
-          );
-          console.log('item.orderItemOption.quantity: ', item.orderItemOption.quantity);
-          console.log('broadcasterCommissionRate: ', broadcasterCommissionRate);
-          console.log('broadcasterCommission: ', broadcasterCommission);
           return {
             relatedOrderId: selectedSettleItem.order.id,
             ea: item.orderItemOption.quantity,
@@ -383,31 +370,6 @@ function SettlementItemOptionDetail({
     if (item.orderItem.support.productPromotion) return '상품홍보';
     return '기본판매';
   }, [item.orderItem.support.liveShopping, item.orderItem.support.productPromotion]);
-
-  // // 수수료 금액
-  // const commissionPrice = useMemo(() => {
-  //   if (!liveShopping) {
-  //     if (commissionInfo.data) {
-  //       return Math.floor(Number(commissionInfo.data.commissionDecimal) * totalPrice);
-  //     }
-  //     return 0;
-  //   }
-  //   return 0;
-  // }, [commissionInfo.data, liveShopping, totalPrice]);
-
-  // // 수수료 정보
-  // const pgCommission = useMemo(() => {
-  //   return calcPgCommission({
-  //     paymentMethod: settlementTarget.payment,
-  //     pg: settlementTarget.pg,
-  //     targetAmount: totalPrice + Number(settlementTarget.shipping_cost),
-  //   });
-  // }, [
-  //   settlementTarget.payment,
-  //   settlementTarget.pg,
-  //   settlementTarget.shipping_cost,
-  //   totalPrice,
-  // ]);
 
   return (
     <Grid

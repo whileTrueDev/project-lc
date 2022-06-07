@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { Injectable } from '@nestjs/common';
-import { Prisma, SellCommission, Seller, SellType } from '@prisma/client';
+import { SellCommission, Seller, SellType } from '@prisma/client';
 import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -8,11 +8,7 @@ import {
   FmExport,
   SellerSettlementTargetRes,
 } from '@project-lc/shared-types';
-import {
-  calcPgCommission,
-  CalcPgCommissionOptions,
-  checkOrderDuringLiveShopping,
-} from '@project-lc/utils';
+import { calcPgCommission, CalcPgCommissionOptions } from '@project-lc/utils';
 import dayjs from 'dayjs';
 
 @Injectable()
@@ -93,15 +89,10 @@ export class SellerSettlementService {
         totalPrice: totalInfo.price,
         totalAmount: totalInfo.price - totalInfo.commission,
         totalCommission: totalInfo.commission,
+        Export: { connect: { exportCode: dto.exportCode } },
       },
     });
-
-    this.prisma.export.update({
-      where: { exportCode: dto.exportCode },
-      data: { sellerSettlementItemsId: result.id },
-    });
-
-    return true;
+    return !!result;
   }
 
   /** 정산 고정 수수료 정보를 조회힙니다. */
@@ -157,7 +148,7 @@ export class SellerSettlementService {
     sellerId?: Seller['id'],
   ): Promise<SellerSettlementTargetRes> {
     return this.prisma.export.findMany({
-      where: { sellerId, sellerSettlementItemsId: null },
+      where: { sellerId, sellerSettlementsId: null },
       include: {
         items: {
           select: {
