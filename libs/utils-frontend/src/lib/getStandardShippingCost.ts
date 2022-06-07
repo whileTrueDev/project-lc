@@ -11,8 +11,11 @@ export const getStandardShippingCost = (
   const opts = shippingSet.shippingOptions.filter(
     (opt) => opt.shipping_set_type === 'std',
   );
+  // 구간시작값 오름차순으로 정렬한 후 첫번째 옵션 선택
+  opts.sort((a, b) => a.section_st - b.section_st);
   const defaultOpt = opts.find((o) => o.shipping_set_type === 'std');
   if (!defaultOpt) return null;
+
   const cost = defaultOpt?.shippingCost.find((c) => c.shipping_cost)?.shipping_cost;
 
   return cost;
