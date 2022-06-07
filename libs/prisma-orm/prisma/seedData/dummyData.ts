@@ -79,17 +79,45 @@ export const testsellerExtraData: {
     shipping_group_name: '기본 배송 그룹',
     shippingSets: {
       create: {
-        shipping_set_name: '배송세트이름',
+        shipping_set_name: '택배',
+        default_yn: 'Y',
         shippingOptions: {
-          create: {
-            shipping_opt_type: 'fixed',
-            shippingCost: {
-              create: {
-                shipping_area_name: '대한민국',
-                shipping_cost: 2500,
+          create: [
+            {
+              shipping_set_type: 'std',
+              shipping_opt_type: 'fixed',
+              shippingCost: {
+                create: {
+                  shipping_area_name: '대한민국',
+                  shipping_cost: 2500,
+                },
               },
             },
-          },
+            {
+              shipping_set_type: 'add',
+              shipping_opt_type: 'cnt',
+              section_st: 0,
+              section_ed: 5,
+              shippingCost: {
+                create: {
+                  shipping_area_name: '대한민국',
+                  shipping_cost: 2500,
+                },
+              },
+            },
+            {
+              shipping_set_type: 'add',
+              shipping_opt_type: 'cnt',
+              section_st: 5,
+              section_ed: 0,
+              shippingCost: {
+                create: {
+                  shipping_area_name: '대한민국',
+                  shipping_cost: 1000,
+                },
+              },
+            },
+          ],
         },
       },
     },

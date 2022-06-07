@@ -33,7 +33,10 @@ export class CouponController {
 
   @Get()
   getCustomerCoupons(@CustomerInfo() { id }: UserPayload): Promise<CustomerCoupon[]> {
-    return this.customerCouponService.findCustomerCoupons(id);
+    return this.customerCouponService.findCustomerCoupons({
+      customerId: id,
+      couponId: null,
+    });
   }
 
   @Get('history')

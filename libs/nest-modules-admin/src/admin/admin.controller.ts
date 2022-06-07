@@ -362,6 +362,12 @@ export class AdminController {
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('confirmed-goods-list-category')
+  async findAllConfirmedLcGoodsListWithCategory(): Promise<AdminAllLcGoodsList> {
+    return this.projectLcGoodsService.findAllConfirmedLcGoodsListWithCategory();
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('privacy-approach-history')
   async createPrivacyApproachHistory(
     @Req() req: Request,

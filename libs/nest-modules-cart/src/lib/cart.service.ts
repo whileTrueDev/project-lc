@@ -37,6 +37,14 @@ export class CartService {
             seller: { select: { sellerShop: { select: { shopName: true } } } },
           },
         },
+        // 배송비정책 정보
+        shippingGroup: {
+          include: {
+            shippingSets: {
+              include: { shippingOptions: { include: { shippingCost: true } } },
+            },
+          },
+        },
       },
     });
   }
