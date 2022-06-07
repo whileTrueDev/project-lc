@@ -53,3 +53,20 @@ export const useAdminAllConfirmedLcGoodsList = (): UseQueryResult<
     getAdminAllConfirmedLcGoodsList,
   );
 };
+
+/** 검수완료 & 판매상태 정상인 모든 상품 조회 */
+export const getAdminAllConfirmedLcGoodsListWithCategory =
+  async (): Promise<AdminAllLcGoodsList> => {
+    return axios
+      .get<AdminAllLcGoodsList>('/admin/confirmed-goods-list-category')
+      .then((res) => res.data);
+  };
+export const useAdminAllConfirmedLcGoodsListWithCategory = (): UseQueryResult<
+  AdminAllLcGoodsList,
+  AxiosError
+> => {
+  return useQuery<AdminAllLcGoodsList, AxiosError>(
+    'AdminAllConfirmedLcGoodsListWithCategory',
+    getAdminAllConfirmedLcGoodsListWithCategory,
+  );
+};

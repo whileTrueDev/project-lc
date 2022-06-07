@@ -9,7 +9,16 @@ export class CouponLogService {
 
   /** 모든 쿠폰 사용 내역 조회 */
   adminFindCouponLogs(): Promise<CustomerCouponLog[]> {
-    return this.prismaService.customerCouponLog.findMany({});
+    return this.prismaService.customerCouponLog.findMany({
+      include: {
+        customerCoupon: {
+          include: {
+            coupon: true,
+            customer: true,
+          },
+        },
+      },
+    });
   }
 
   /** 특정 소비자의 쿠폰 사용 내역 조회 */
