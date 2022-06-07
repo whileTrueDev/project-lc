@@ -46,9 +46,11 @@ import { FmGoodsSeqInputHelpText } from './AdminGoodsConfirmationDialog';
 
 export interface AdminBroadcasterProductPromotionSectionProps {
   promotionPageId: number;
+  broadcasterId: number;
 }
 export function AdminBroadcasterProductPromotionSection({
   promotionPageId,
+  broadcasterId,
 }: AdminBroadcasterProductPromotionSectionProps): JSX.Element {
   const { data: productPromotionList } = useAdminProductPromotion(promotionPageId);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -61,6 +63,7 @@ export function AdminBroadcasterProductPromotionSection({
           isOpen={isOpen}
           onClose={onClose}
           promotionPageId={promotionPageId}
+          broadcasterId={broadcasterId}
         />
       </Stack>
 
@@ -214,10 +217,12 @@ export function AdminProductPromotionCreateModal({
   isOpen,
   onClose,
   promotionPageId,
+  broadcasterId,
 }: {
   isOpen: boolean;
   onClose: () => void;
   promotionPageId: number;
+  broadcasterId: number;
 }): JSX.Element {
   const toast = useToast();
 
@@ -235,6 +240,7 @@ export function AdminProductPromotionCreateModal({
       broadcasterPromotionPageId,
       goodsId,
       fmGoodsSeq,
+      broadcasterId,
       ...rest,
     };
     createProductPromotion
