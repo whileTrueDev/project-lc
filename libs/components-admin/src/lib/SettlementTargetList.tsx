@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import {
   Box,
   Button,
@@ -220,38 +221,32 @@ function SettlementItemInfoDialog({
         items: selectedSettleItem.items.map((item) => {
           let whiletrueCommissionRate: string | null;
           let broadcasterCommissionRate: string | null;
-          switch (item.orderItem.channel) {
-            case 'liveShopping': {
-              whiletrueCommissionRate =
-                item.orderItem.support.liveShopping?.whiletrueCommissionRate.toString() ||
-                null;
-              broadcasterCommissionRate =
-                item.orderItem.support.liveShopping?.broadcasterCommissionRate.toString() ||
-                null;
-              break;
-            }
-            case 'productPromotion': {
-              whiletrueCommissionRate =
-                item.orderItem.support.productPromotion?.whiletrueCommissionRate.toString() ||
-                null;
-              broadcasterCommissionRate =
-                item.orderItem.support.productPromotion?.broadcasterCommissionRate.toString() ||
-                null;
-              break;
-            }
-            case 'normal':
-            default: {
-              whiletrueCommissionRate =
-                commissionInfo.data?.commissionRate.toString() || '0';
-              broadcasterCommissionRate = '0';
-              break;
-            }
+          if (item.orderItem.support.liveShopping) {
+            whiletrueCommissionRate =
+              item.orderItem.support.liveShopping?.whiletrueCommissionRate.toString() ||
+              null;
+            broadcasterCommissionRate =
+              item.orderItem.support.liveShopping?.broadcasterCommissionRate.toString() ||
+              null;
+          } else if (item.orderItem.support.productPromotion) {
+            whiletrueCommissionRate =
+              item.orderItem.support.productPromotion?.whiletrueCommissionRate.toString() ||
+              null;
+            broadcasterCommissionRate =
+              item.orderItem.support.productPromotion?.broadcasterCommissionRate.toString() ||
+              null;
+          } else {
+            whiletrueCommissionRate =
+              commissionInfo.data?.commissionRate.toString() || '0';
+            broadcasterCommissionRate = '0';
           }
           const broadcasterCommission =
-            (Number(item.orderItemOption.discountPrice) * item.orderItemOption.quantity) /
+            Number(item.orderItemOption.discountPrice) *
+            item.orderItemOption.quantity *
             (Number(broadcasterCommissionRate) * 0.01);
           const whiletrueCommission =
-            (Number(item.orderItemOption.discountPrice) * item.orderItemOption.quantity) /
+            Number(item.orderItemOption.discountPrice) *
+            item.orderItemOption.quantity *
             (Number(whiletrueCommissionRate) * 0.01);
           return {
             relatedOrderId: selectedSettleItem.order.id,
@@ -265,7 +260,11 @@ function SettlementItemInfoDialog({
             price:
               Number(item.orderItemOption.discountPrice) * item.orderItemOption.quantity,
             pricePerPiece: Number(item.orderItemOption.discountPrice),
-            sellType: item.orderItem.channel,
+            sellType: item.orderItem.support.liveShopping
+              ? SellType.liveShopping
+              : item.orderItem.support.productPromotion
+              ? SellType.productPromotion
+              : SellType.normal,
             liveShoppingId: item.orderItem.support.liveShopping?.id,
             productPromotionId: item.orderItem.support.productPromotion?.id,
             broadcasterCommissionRate,
@@ -446,7 +445,7 @@ function SettlementItemOptionDetail({
 
       <GridItem>판매 수수료</GridItem>
       <GridItem color="green.500">
-        {item.orderItem.channel === SellType.liveShopping && (
+        {item.orderItem.support.liveShopping && (
           <CommissionInfo
             totalPrice={totalPrice}
             broadcasterCommissionRate={
@@ -457,7 +456,7 @@ function SettlementItemOptionDetail({
             }
           />
         )}
-        {item.orderItem.channel === SellType.productPromotion && (
+        {item.orderItem.support.productPromotion && (
           <CommissionInfo
             totalPrice={totalPrice}
             broadcasterCommissionRate={
@@ -468,19 +467,22 @@ function SettlementItemOptionDetail({
             }
           />
         )}
-        {item.orderItem.channel === SellType.normal && (
-          <Box>
-            <Text>
-              {commissionInfo.data && (
-                <CommissionInfo
-                  totalPrice={totalPrice}
-                  broadcasterCommissionRate="0"
-                  whiletrueCommissionRate={commissionInfo.data.commissionRate}
-                />
-              )}
-            </Text>
-          </Box>
-        )}
+        {item.orderItem.channel === SellType.normal &&
+          !(
+            item.orderItem.support.liveShopping || item.orderItem.support.productPromotion
+          ) && (
+            <Box>
+              <Text>
+                {commissionInfo.data && (
+                  <CommissionInfo
+                    totalPrice={totalPrice}
+                    broadcasterCommissionRate="0"
+                    whiletrueCommissionRate={commissionInfo.data.commissionRate}
+                  />
+                )}
+              </Text>
+            </Box>
+          )}
         <Text />
       </GridItem>
 

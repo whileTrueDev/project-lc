@@ -31,11 +31,7 @@ export class SellerSettlementService {
           curr.sellType === SellType.liveShopping ||
           curr.sellType === SellType.productPromotion
         ) {
-          const wtCommissionRate = curr.whiletrueCommissionRate;
-          const bcCommissionRate = curr.broadcasterCommissionRate;
-          const wtCommission = Math.floor(price * (Number(wtCommissionRate) * 0.01));
-          const brCommission = Math.floor(price * (Number(bcCommissionRate) * 0.01));
-          commission = wtCommission + brCommission;
+          commission = curr.broadcasterCommission + curr.whiletrueCommission;
         }
         return { ea, price, commission };
       },
