@@ -1938,11 +1938,12 @@ model Export {
   exportCode           String?            @unique // 출고코드
   orderId              Int // 주문 고유번호
   order                Order              @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status               OrderProcessStep   @default(exportDone) // 출고상태
+  status               OrderProcessStep   @default(exportDone) // 출고상태 : 출고준비 | 출고완료(기본값) | 배송중 | 배송완료 -> 모두 OrderProcessStep 에 있어서 그대로 사용함
   deliveryCompany      String // 택배사
   deliveryNumber       String // 운송장번호
   bundleExportCode     String? // 합포장출고코드(합포장인경우)
   exportDate           DateTime           @default(now()) //출고일시
+  shippingDoneDate     DateTime?
   buyConfirmDate       DateTime? // 구매확정일자(주문스키마에 있던것을 출고에 옮김)
   buyConfirmSubject    BuyConfirmSubject? // 구매확정주체(null | 소비자, 관리자, 시스템)
   exchangeExportedFlag Boolean            @default(false) // 재배송(교환출고인지) 여부
