@@ -34,6 +34,7 @@ import {
   createDummyOrderWithCancellation,
   createDummyOrderWithExchange,
   createDummyOrderWithReturn,
+  createDummyOrderWithSupport,
   nonMemberOrder,
   normalOrder,
   orderExportReady,
@@ -385,6 +386,7 @@ async function main(): Promise<void> {
   // 더미 주문데이터 생성
   await createDummyOrderData();
   await createDummyOrderCancelReturnExchange();
+  await createDummyOrderWithSupport(); // 방송인 후원 정보 포함된 주문 생성
 
   // 더미 상품리뷰 생성
   await createGoodsReview(prisma);
