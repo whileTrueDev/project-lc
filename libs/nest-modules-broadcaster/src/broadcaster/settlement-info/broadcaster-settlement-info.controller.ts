@@ -16,23 +16,21 @@ import {
   BroadcasterSettlementInfoRes,
 } from '@project-lc/shared-types';
 import { BroadcasterSettlementInfo } from '.prisma/client';
-import { BroadcasterSettlementService } from './broadcaster-settlement.service';
+import { BroadcasterSettlementInfoService } from './broadcaster-settlement-info.service';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('broadcaster/settlement-info')
 @Controller('broadcaster/settlement-info')
-export class BroadcasterSettlementController {
-  constructor(
-    private readonly broadcasterSettlementService: BroadcasterSettlementService,
-  ) {}
+export class BroadcasterSettlementInfoController {
+  constructor(private readonly service: BroadcasterSettlementInfoService) {}
 
-  /** 방송인 정산등록정보 등록 */
+  /** 방송인 정산정보 등록 */
   @Post()
   public async insertSettlementInfo(
     @Body(ValidationPipe) dto: BroadcasterSettlementInfoDto,
   ): Promise<BroadcasterSettlementInfo> {
-    return this.broadcasterSettlementService.insertSettlementInfo(dto);
+    return this.service.insertSettlementInfo(dto);
   }
 
   /** 방송인 정산등록정보 조회 */
@@ -40,8 +38,6 @@ export class BroadcasterSettlementController {
   public async selectBroadcasterSettlementInfo(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
   ): Promise<BroadcasterSettlementInfoRes> {
-    return this.broadcasterSettlementService.selectBroadcasterSettlementInfo(
-      broadcasterId,
-    );
+    return this.service.selectBroadcasterSettlementInfo(broadcasterId);
   }
 }

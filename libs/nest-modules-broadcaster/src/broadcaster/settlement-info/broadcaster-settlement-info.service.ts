@@ -11,10 +11,10 @@ import {
   BroadcasterSettlementInfoRes,
 } from '@project-lc/shared-types';
 import { Broadcaster, BroadcasterSettlementInfo } from '.prisma/client';
-import { BroadcasterService } from './broadcaster.service';
+import { BroadcasterService } from '../broadcaster.service';
 
 @Injectable()
-export class BroadcasterSettlementService {
+export class BroadcasterSettlementInfoService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly broadcasterService: BroadcasterService,

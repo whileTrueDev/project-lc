@@ -12,7 +12,7 @@ export function OrderCancelDialog({
   onClose: () => void;
   orderId: number;
 }): JSX.Element {
-  const { data: orderDetailData } = useOrderDetail(orderId);
+  const { data: orderDetailData } = useOrderDetail({ orderId });
 
   const toast = useToast();
   const orderCancelMutation = useCustomerOrderCancelMutation();

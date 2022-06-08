@@ -8,10 +8,12 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
+import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateReturnDto,
   CreateReturnRes,
@@ -26,6 +28,7 @@ import { ReturnService } from './return.service';
 
 @UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('return')
+@UseGuards(JwtAuthGuard)
 @Controller('return')
 export class ReturnController {
   constructor(private readonly returnService: ReturnService) {}

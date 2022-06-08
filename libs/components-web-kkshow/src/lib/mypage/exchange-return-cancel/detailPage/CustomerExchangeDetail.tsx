@@ -1,13 +1,12 @@
 import { Button, Center, Image, Spinner, Stack, Text, useToast } from '@chakra-ui/react';
-import { Export, ExportProcessStatus } from '@prisma/client';
+import { Export } from '@prisma/client';
+import { ExchangeReturnCancelRequestGoodsData } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestGoodsData';
+import { ExchangeReturnCancelRequestStatusBadge } from '@project-lc/components-shared/order/ExchangeReturnCancelRequestStatusBadge';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { useDeleteCustomerExchange, useExchangeDetail } from '@project-lc/hooks';
 import { ExchangeDetailRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import {
-  ExchangeReturnCancelRequestGoodsData,
-  ExchangeReturnCancelRequestStatusBadge,
-} from '../list/ExchangeReturnCancelListItem';
 
 export interface CustomerExchangeDetailProps {
   exchangeCode: string;
@@ -117,7 +116,7 @@ export function ExchangeDetialData({ data }: { data: ExchangeDetailRes }): JSX.E
       </Stack>
 
       <Stack>
-        <Text fontWeight="bold">취소요청한 주문상품</Text>
+        <Text fontWeight="bold">재배송요청 주문상품</Text>
         <Stack pl={4}>
           {data.items.map((item) => (
             <ExchangeReturnCancelRequestGoodsData key={item.id} {...item} />
@@ -130,13 +129,6 @@ export function ExchangeDetialData({ data }: { data: ExchangeDetailRes }): JSX.E
     </Stack>
   );
 }
-
-const EXPORT_PROCESS_STATUS: Record<ExportProcessStatus, string> = {
-  preparing: '출고준비중',
-  exportDone: '출고완료',
-  shipping: '배송중',
-  shippingDone: '배송완료',
-};
 
 export interface ReExportDataProps {
   exportData: Export | null; // export가 예약어라 변수명으로 쓸 수 없음
@@ -152,7 +144,9 @@ export function ReExportData(props: ReExportDataProps): JSX.Element {
       <Stack pl={4}>
         {exportData ? (
           <Stack>
-            <Text>상태 : {EXPORT_PROCESS_STATUS[exportData.status]}</Text>
+            <Text>
+              상태 : <OrderStatusBadge step={exportData.status} />
+            </Text>
             <Text>
               출고일 :{' '}
               {exportData.exportDate &&

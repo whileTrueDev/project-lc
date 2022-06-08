@@ -113,6 +113,8 @@ model SellerSettlements {
   seller               Seller                  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   settlementItems      SellerSettlementItems[]
 
+  Export Export?
+
   @@index([id], name: "SellerSettlementsIndex")
 }
 
@@ -142,9 +144,7 @@ model SellerSettlementItems {
   SellerSettlements   SellerSettlements? @relation(fields: [sellerSettlementsId], references: [id], onDelete: Cascade)
 
   relatedOrderId Int? // (project-lc Order테이블의) 주문 고유번호 => 기존 퍼스트몰 fm_order.order_seq 저장하는 컬럼명이 orderId라서 relatedOrderId라고 씀
-  order          Order?  @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
-  exportId       Int?
-  export         Export? @relation(fields: [exportId], references: [id], onDelete: SetNull)
+  order          Order? @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
 }
 
 // 판매자 정산 계좌 정보
@@ -426,6 +426,7 @@ model ShippingGroup {
   shipping_add_free_yn    YesOrNo_UPPERCASE? @default(N) // '추가배송비 무료화',
   orderItems              OrderItem[] // 해당 배송비정책 참조하는 주문 상품들
   cartItems               CartItem[] // 해당 배송비정책 참조하는 장바구니 상품들
+  orderShippings          OrderShipping[] // 해당 배송비정책 참조하는 주문에 부과된 배송비
 }
 
 // 배송비 계산 기준
@@ -452,6 +453,7 @@ model ShippingSet {
   swap_shiping_cost   Decimal?           @db.Decimal(11, 2) // '맞교환 배송비',
   prepay_info         PrepayInfo         @default(delivery) // 선불/착불 정보
   shiping_free_yn     YesOrNo_UPPERCASE  @default(N) //'무료배송시 반품왕복배송비',
+  orderShippings      OrderShipping[] // 해당 배송설정 참조하는 주문에 부과된 배송비정보
 }
 
 // 착불/선불 정보
@@ -610,6 +612,8 @@ model BroadcasterSettlements {
   broadcaster                Broadcaster                  @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
   broadcasterSettlementItems BroadcasterSettlementItems[]
 
+  Export Export?
+
   @@unique([broadcasterId, round])
 }
 
@@ -630,9 +634,7 @@ model BroadcasterSettlementItems {
   settlements              BroadcasterSettlements @relation(fields: [broadcasterSettlementsId], references: [id], onDelete: Cascade)
 
   relatedOrderId Int? // (project-lc Order테이블의) 주문 고유번호 => 기존 퍼스트몰 fm_order.order_seq 저장하는 컬럼명이 orderId라서 relatedOrderId라고 씀
-  order          Order?  @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
-  exportId       Int?
-  export         Export? @relation(fields: [exportId], references: [id], onDelete: SetNull)
+  order          Order? @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
 }
 
 // 방송인 정산을 위한 계약자, 계좌정보(방송인 정산등록정보)
@@ -699,6 +701,8 @@ model ProductPromotion {
   broadcasterId Int?
   broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 
+  orderItemSupport OrderItemSupport[]
+  cartItemSupport  CartItemSupport[]
 }
 
 // -------------------------------------------------
@@ -735,6 +739,8 @@ model LiveShopping {
   BroadcasterSettlementItems  BroadcasterSettlementItems[]
   images                      LiveShoppingImage[]
   followers                   Customer[]
+  orderItemSupport            OrderItemSupport[]
+  cartItemSupport             CartItemSupport[]
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -1437,6 +1443,13 @@ model CartItemSupport {
   broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
   cartItemId    Int?         @unique // 후원이 연결된 장바구니 상품 고유번호
   cartItem      CartItem?    @relation(fields: [cartItemId], references: [id], onDelete: Cascade) // 후원이 연결된 장바구니 상품
+
+  // 연결된 라이브쇼핑
+  liveShoppingId     Int?
+  liveShopping       LiveShopping?     @relation(fields: [liveShoppingId], references: [id])
+  // 연결된 상품홍보
+  productPromotionId Int?
+  productPromotion   ProductPromotion? @relation(fields: [productPromotionId], references: [id])
 }
 
 // *****************
@@ -1566,6 +1579,7 @@ model Order {
   orderCancellations         OrderCancellation[] // 주문에 연결된 주무취소정보
   broadcasterSettlementItems BroadcasterSettlementItems[]
   sellerSettlementItems      SellerSettlementItems[]
+  shippings                  OrderShipping[] // 주문에 포함된 배송비정보
   customerCouponLogs         CustomerCouponLog[]
 
   @@index([orderCode])
@@ -1613,6 +1627,43 @@ enum PaymentMethod {
   virtualAccount // 가상계좌
 }
 
+// FmOrderShipping 테이블에 해당 (주문에 부과된 배송비정보 저장하는 테이블인듯 함)
+// 하나의 주문에 여러 배송비가 부과될 수 있다
+model OrderShipping {
+  id                  Int                 @id @default(autoincrement()) // 고유 식별 번호
+  shippingCostPayType ShippingCostPayType @default(prepay) // shipping_type 배송비 결제방식
+  shippingCost        String? // shipping_cost 실배송비
+  shippingMethod      ShippingMethod? // shipping_method 배송방법
+  shippingGroup       ShippingGroup?      @relation(fields: [shippingGroupId], references: [id], onDelete: SetNull)
+  shippingSet         ShippingSet?        @relation(fields: [shippingSetId], references: [id], onDelete: SetNull)
+  shippingGroupId     Int?
+  shippingSetId       Int?
+  items               OrderItemOption[] // 해당 배송비에 포함된 주문상품옵션들
+  order               Order?              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId             Int?
+}
+
+// 배송비 결제 방식
+enum ShippingCostPayType {
+  free // 무료
+  prepay //  선불 - 주문시결제
+  postpaid //착불
+}
+
+// 배송방법
+enum ShippingMethod {
+  delivery // 택배
+  postpaid // 택배착불
+  each_delivery // 택배
+  each_postpaid // 택배착불
+  quick // 퀵서비스
+  direct_delivery // 직접배송
+  direct_store // 매장수령
+  freight // 화물배송
+  direct // 직접수령
+  coupon // 티켓
+}
+
 // ****************
 // 주문상품
 // ****************
@@ -1646,6 +1697,8 @@ model OrderItemOption {
   orderItem              OrderItem               @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 옵션이 연결된 주문 상품
   goodsOptionId          Int? // 참조하는 상품옵션 고유번호
   goodsOption            GoodsOptions?           @relation(fields: [goodsOptionId], references: [id], onDelete: SetNull) // 주문상품옵션이 연결된 상품옵션
+  goodsName              String? // 주문당시 상품명
+  imageUrl               String? // 상품대표이미지 url
   name                   String? // 주문했을 당시 옵션명
   value                  String? // 주문했을 당시 옵션값
   quantity               Int // 옵션 선택 수량(개수)
@@ -1658,17 +1711,25 @@ model OrderItemOption {
   exportItems            ExportItem[] // 출고상품
   orderCancellationItems OrderCancellationItem[] // 주문취소상품
   exchangeItems          ExchangeItem[] // 교환상품
+  orderShipping          OrderShipping?          @relation(fields: [orderShippingId], references: [id], onDelete: SetNull)
+  orderShippingId        Int?
 }
 
 // 주문상품후원
 model OrderItemSupport {
-  id            Int          @id @default(autoincrement()) // 주문 상품 후원 고유번호
-  message       String? // 후원메시지
-  nickname      String? // 후원한 사람 닉네임(필요없을거 같기는 한데 비회원의 경우 필요할거같아서 일단 넣어둠)
-  broadcasterId Int? // 후원 대상 방송인 고유번호
-  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
-  orderItemId   Int?         @unique // 후원이 연결된 주문 상품 고유번호
-  orderItem     OrderItem?   @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 후원이 연결된 주문 상품
+  id                 Int               @id @default(autoincrement()) // 주문 상품 후원 고유번호
+  message            String? // 후원메시지
+  nickname           String? // 후원한 사람 닉네임(필요없을거 같기는 한데 비회원의 경우 필요할거같아서 일단 넣어둠)
+  broadcasterId      Int? // 후원 대상 방송인 고유번호
+  broadcaster        Broadcaster?      @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
+  orderItemId        Int?              @unique // 후원이 연결된 주문 상품 고유번호
+  orderItem          OrderItem?        @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 후원이 연결된 주문 상품
+  // 연결된 라이브쇼핑
+  liveShoppingId     Int?
+  liveShopping       LiveShopping?     @relation(fields: [liveShoppingId], references: [id])
+  // 연결된 상품홍보
+  productPromotionId Int?
+  productPromotion   ProductPromotion? @relation(fields: [productPromotionId], references: [id])
 }
 
 // ****************
@@ -1872,54 +1933,50 @@ model OrderCancellationItem {
 // 출고
 // ****************
 
-// 출고진행상태
-enum ExportProcessStatus {
-  preparing // 출고준비중
-  exportDone // 출고완료
-  shipping // 배송중
-  shippingDone // 배송완료
-}
-
 // 출고
 model Export {
-  id                         Int                          @id @default(autoincrement()) // 출고고유번호
-  exportCode                 String?                      @unique // 출고코드
-  orderId                    Int // 주문 고유번호
-  order                      Order                        @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status                     ExportProcessStatus          @default(exportDone) // 출고상태
-  deliveryCompany            String // 택배사
-  deliveryNumber             String // 운송장번호
-  bundleExportCode           String? // 합포장출고코드(합포장인경우)
-  exportDate                 DateTime //출고일시
-  buyConfirmDate             DateTime? // 구매확정일자(주문스키마에 있던것을 출고에 옮김)
-  buyConfirmSubject          BuyConfirmSubject? // 구매확정주체(null | 소비자, 관리자, 시스템)
-  broadcasterSettlementItems BroadcasterSettlementItems[]
-  sellerSettlementItems      SellerSettlementItems[]
-  exchangeExportedFlag       Boolean                      @default(false) // 재배송(교환출고인지) 여부
-  exchange                   Exchange? // 교환출고시 연결된 교환데이터
-  sellerId                   Int? // 출고 진행한 판매자
-  seller                     Seller?                      @relation(fields: [sellerId], references: [id])
-  items                      ExportItem[] // 출고상품
+  id                   Int                @id @default(autoincrement()) // 출고고유번호
+  exportCode           String?            @unique // 출고코드
+  orderId              Int // 주문 고유번호
+  order                Order              @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status               OrderProcessStep   @default(exportDone) // 출고상태 : 출고준비 | 출고완료(기본값) | 배송중 | 배송완료 -> 모두 OrderProcessStep 에 있어서 그대로 사용함
+  deliveryCompany      String // 택배사
+  deliveryNumber       String // 운송장번호
+  bundleExportCode     String? // 합포장출고코드(합포장인경우)
+  exportDate           DateTime           @default(now()) //출고일시
+  shippingDoneDate     DateTime?
+  buyConfirmDate       DateTime? // 구매확정일자(주문스키마에 있던것을 출고에 옮김)
+  buyConfirmSubject    BuyConfirmSubject? // 구매확정주체(null | 소비자, 관리자, 시스템)
+  exchangeExportedFlag Boolean            @default(false) // 재배송(교환출고인지) 여부
+  exchange             Exchange? // 교환출고시 연결된 교환데이터
+  sellerId             Int? // 출고 진행한 판매자
+  seller               Seller?            @relation(fields: [sellerId], references: [id])
+  items                ExportItem[] // 출고상품
+
+  broadcasterSettlementsId Int?                    @unique
+  broadcasterSettlements   BroadcasterSettlements? @relation(fields: [broadcasterSettlementsId], references: [id], onDelete: SetNull)
+  sellerSettlementsId      Int?                    @unique
+  sellerSettlements        SellerSettlements?      @relation(fields: [sellerSettlementsId], references: [id], onDelete: SetNull)
 }
 
 // 구매확정주체
 enum BuyConfirmSubject {
-  admin
-  customer
-  system
+  admin // 관리자에 의해
+  customer // 소비자에 의해
+  system // 자동처리에 의해
 }
 
 // 출고상품
 model ExportItem {
-  id                Int                 @id @default(autoincrement()) // 출고상품 고유번호
+  id                Int              @id @default(autoincrement()) // 출고상품 고유번호
   exportId          Int // 연결된 출고고유번호
-  export            Export              @relation(fields: [exportId], references: [id], onDelete: Cascade) // 연결된 출고정보
+  export            Export           @relation(fields: [exportId], references: [id], onDelete: Cascade) // 연결된 출고정보
   orderItemId       Int // 주문상품 고유번호
-  orderItem         OrderItem           @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
+  orderItem         OrderItem        @relation(fields: [orderItemId], references: [id]) // 연결된 주문상품
   orderItemOptionId Int // 주문상품 옵션 고유번호
-  orderItemOption   OrderItemOption     @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
+  orderItemOption   OrderItemOption  @relation(fields: [orderItemOptionId], references: [id]) // 연결된주문상품옵션
   amount            Int // 개수
-  status            ExportProcessStatus @default(exportDone) // 출고상태
+  status            OrderProcessStep @default(exportDone) // 출고상태 : 출고준비 | 출고완료(기본값) | 배송중 | 배송완료 -> 모두 OrderProcessStep 에 있어서 그대로 사용함
 }
 
 // ****************
