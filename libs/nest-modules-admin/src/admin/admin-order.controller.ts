@@ -49,6 +49,7 @@ export class AdminOrderController {
     return this.orderService.getOrderDetail(orderId);
   }
 
+  /** 주문 상태 수정 */
   @Patch(':orderId')
   updateOrderStatus(
     @Param('orderId', ParseIntPipe) orderId: number,
