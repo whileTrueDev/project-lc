@@ -249,6 +249,10 @@ export type CreateOrderForm = CreateOrderDto & {
   ordererPhone2?: string;
   ordererPhone3?: string;
   paymentType: PaymentMethod;
+
+  recipientPhone1?: string;
+  recipientPhone2?: string;
+  recipientPhone3?: string;
 };
 
 // ------------------조회 dto--------------------

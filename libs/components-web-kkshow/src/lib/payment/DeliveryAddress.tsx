@@ -12,11 +12,17 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
+import { CustomerAddress } from '@prisma/client';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
-import { useDefaultCustomerAddress, useProfile } from '@project-lc/hooks';
-import { PaymentPageDto, OrderDetailRes } from '@project-lc/shared-types';
+import {
+  getOrderShippingCheck,
+  useDefaultCustomerAddress,
+  useGetOrderShippingCheck,
+  useProfile,
+} from '@project-lc/hooks';
+import { OrderDetailRes, CreateOrderForm } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { DeliveryAddressDialog } from './DeliveryAddressDialog';
 import { DeliveryAddressList } from './DeliveryAddressList';
@@ -33,7 +39,7 @@ export function DeliveryAddress(): JSX.Element {
     onOpen: addressOnOpen,
   } = useDisclosure();
 
-  const { addressType, handleAddressType } = useKkshowOrderStore();
+  const { addressType, handleAddressType, setShippingData } = useKkshowOrderStore();
 
   const { data: profile } = useProfile();
   const { data: defaultAddress, isLoading } = useDefaultCustomerAddress(profile?.id);
@@ -45,44 +51,97 @@ export function DeliveryAddress(): JSX.Element {
     resetField,
     trigger,
     formState: { errors },
-  } = useFormContext<PaymentPageDto>();
+  } = useFormContext<CreateOrderForm>();
   /**
    * TODO: 배송지 정보 OrderCreateDto 사용하도록 수정 필요
    */
   function handleRadio(value: string): void {
     handleAddressType(value);
     if (value === 'manual') {
-      resetField('recipient');
-      resetField('postalCode');
-      resetField('address');
-      resetField('detailAddress');
+      resetField('recipientName');
+      resetField('recipientPostalCode');
+      resetField('recipientAddress');
+      resetField('recipientDetailAddress');
       resetField('recipientPhone1');
       resetField('recipientPhone2');
       resetField('recipientPhone3');
+      resetField('memo');
+    }
+    if (value === 'default') {
+      setDefaultAddressData(defaultAddress);
     }
   }
 
+  const setDefaultAddressData = useCallback(
+    (_defaultAddress?: CustomerAddress): void => {
+      if (_defaultAddress) {
+        const phone1 = _defaultAddress.phone?.slice(0, 3);
+        const phone2 = _defaultAddress.phone?.slice(3, 7);
+        const phone3 = _defaultAddress.phone?.slice(7, 12);
+        setValue('recipientName', _defaultAddress.recipient || '');
+        setValue('recipientPhone1', phone1 || '');
+        setValue('recipientPhone2', phone2 || '');
+        setValue('recipientPhone3', phone3 || '');
+        setValue('recipientPostalCode', _defaultAddress.postalCode || '');
+        setValue('recipientAddress', _defaultAddress.address || '');
+        setValue('recipientDetailAddress', _defaultAddress.detailAddress || '');
+        setValue('memo', _defaultAddress.memo || '');
+      }
+    },
+    [setValue],
+  );
+
   const handleRecipientInfo = async (): Promise<void> => {
-    setValue('recipient', getValues('name'));
-    setValue('recipientPhone1', getValues('orderPhone1') || '');
-    setValue('recipientPhone2', getValues('orderPhone2') || '');
-    setValue('recipientPhone3', getValues('orderPhone3') || '');
-    await trigger('recipient');
+    setValue('recipientName', getValues('ordererName'));
+    setValue('recipientPhone1', getValues('ordererPhone').slice(0, 3) || '');
+    setValue('recipientPhone2', getValues('ordererPhone').slice(3, 7) || '');
+    setValue('recipientPhone3', getValues('ordererPhone').slice(7, 12) || '');
+    await trigger('recipientName');
     await trigger('recipientPhone1');
     await trigger('recipientPhone2');
     await trigger('recipientPhone3');
   };
 
+  // * 맨 처음 렌더링시 기본배송지 정보 있으면 addressType을 default로 설정하고 기본배송지정보를 표시한다
   useEffect(() => {
     if (!isLoading && defaultAddress) {
+      // addressType을 default로 설정
       handleAddressType('default');
-      setValue('recipient', defaultAddress.recipient!);
-      setValue('recipientPhone', defaultAddress.phone!);
-      setValue('postalCode', defaultAddress.postalCode!);
-      setValue('address', defaultAddress.address!);
-      setValue('detailAddress', defaultAddress.detailAddress!);
+      // 기본배송지정보를 표시
+      setDefaultAddressData(defaultAddress);
     }
-  }, [defaultAddress, isLoading]);
+  }, [defaultAddress, handleAddressType, isLoading, setDefaultAddressData]);
+
+  // * 배송지 주소 변경시 배송비를 다시 계산한다
+  // const shippingCheck = useGetOrderShippingCheck();
+  const address = watch('recipientAddress');
+  useEffect(() => {
+    if (address) {
+      console.log('address change');
+      console.log({ address });
+      const orderItems = getValues('orderItems');
+      const isGiftOrder = getValues('giftFlag') || false;
+      const items = orderItems
+        .flatMap((i) => {
+          return i.options.map((opt) => ({ ...opt, goodsId: i.goodsId }));
+        })
+        .map((opt) => ({
+          goodsId: opt.goodsId,
+          goodsOptionId: opt.goodsOptionId,
+          quantity: opt.quantity,
+        }));
+
+      console.log(items);
+
+      getOrderShippingCheck({ isGiftOrder, items, address })
+        .then((res) => {
+          if (res) {
+            setShippingData(res);
+          }
+        })
+        .catch((e) => console.error(e));
+    }
+  }, [address, getValues, setShippingData]);
 
   return (
     <SectionWithTitle title="배송지 정보">
@@ -101,81 +160,16 @@ export function DeliveryAddress(): JSX.Element {
           </Stack>
         </RadioGroup>
       )}
-      {!isLoading && addressType === 'default' && (
-        <>
-          <Flex direction="column" mt={3}>
-            <Text fontWeight="semibold">수령인</Text>
-            <Text>{`${defaultAddress?.recipient}`}</Text>
-          </Flex>
-          <Flex direction="column" mt={3}>
-            <Text fontWeight="semibold">연락처</Text>
-            <HStack>
-              <Text>
-                {`${defaultAddress?.phone?.slice(0, 3)} - ${defaultAddress?.phone?.slice(
-                  3,
-                  7,
-                )} - ${defaultAddress?.phone?.slice(7, 11)}`}
-              </Text>
-            </HStack>
-          </Flex>
-          <Flex direction="column" alignItems="flex-start" mt={3}>
-            <Text fontWeight="semibold">배송지주소</Text>
-            <Flex direction="column">
-              <Text>{`(${defaultAddress?.postalCode}) ${defaultAddress?.address}`}</Text>
-              <Text>{`${defaultAddress?.detailAddress}`}</Text>
-            </Flex>
-          </Flex>
-          <Flex direction="column" mt={3}>
-            <Text fontWeight="semibold">배송메모</Text>
-            <HStack>
-              <Text>{defaultAddress?.memo}</Text>
-            </HStack>
-          </Flex>
-        </>
-      )}
-      {!isLoading && addressType === 'list' && (
-        <>
-          <Flex direction="column" mt={3}>
-            <Text fontWeight="semibold">수령인</Text>
-            <Text>{`${getValues('recipient')}`}</Text>
-          </Flex>
-          <Flex direction="column" mt={3}>
-            <Text fontWeight="semibold">연락처</Text>
-            <HStack>
-              <Text>
-                {`${getValues('recipientPhone').slice(0, 3)} - ${getValues(
-                  'recipientPhone',
-                ).slice(3, 7)} - ${getValues('recipientPhone').slice(7, 11)}`}
-              </Text>
-            </HStack>
-          </Flex>
-          <Flex direction="column" alignItems="flex-start" mt={3}>
-            <Text fontWeight="semibold">배송지주소</Text>
-            <Flex direction="column">
-              <Text>{`(${getValues('postalCode')}) ${getValues('address')}`}</Text>
-              <Text>{`${getValues('detailAddress')}`}</Text>
-            </Flex>
-          </Flex>
-          <Flex direction="column" mt={3}>
-            <Text fontWeight="semibold">배송메모</Text>
-            <HStack>
-              <Text>{getValues('deliveryMemo')}</Text>
-            </HStack>
-          </Flex>
-        </>
-      )}
-
-      {!isLoading && addressType === 'manual' && (
-        <>
-          <FormControl isInvalid={!!errors.recipient}>
+      {!isLoading && (
+        <Stack mt={4}>
+          <FormControl isInvalid={!!errors.recipientName}>
             <Flex direction="column">
               <Text fontWeight="semibold">수령인</Text>
               <Box>
                 <Input
                   w={{ base: '100%', md: '15%' }}
                   placeholder="수령인"
-                  value={watch('recipient')}
-                  {...register('recipient', {
+                  {...register('recipientName', {
                     required: {
                       value: true,
                       message: '받는사람의 이름을 입력해주세요(2글자 이상)',
@@ -189,7 +183,7 @@ export function DeliveryAddress(): JSX.Element {
                 </Button>
               </Box>
               <FormErrorMessage mt={0}>
-                {errors.recipient && errors.recipient.message}
+                {errors.recipientName && errors.recipientName.message}
               </FormErrorMessage>
             </Flex>
           </FormControl>
@@ -251,7 +245,11 @@ export function DeliveryAddress(): JSX.Element {
             </FormControl>
           </Flex>
           <FormControl
-            isInvalid={!!errors.postalCode || !!errors.address || !!errors.detailAddress}
+            isInvalid={
+              !!errors.recipientPostalCode ||
+              !!errors.recipientAddress ||
+              !!errors.recipientDetailAddress
+            }
           >
             <Flex direction="column" alignItems="flex-start">
               <Text fontWeight="semibold">배송지주소</Text>
@@ -261,8 +259,7 @@ export function DeliveryAddress(): JSX.Element {
                     isReadOnly
                     w="15"
                     placeholder="우편번호"
-                    value={getValues('postalCode')}
-                    {...register('postalCode', {
+                    {...register('recipientPostalCode', {
                       required: { value: true, message: '우편번호를 입력해주세요' },
                     })}
                   />
@@ -271,7 +268,7 @@ export function DeliveryAddress(): JSX.Element {
                   </Button>
                 </HStack>
                 <FormErrorMessage mt={0}>
-                  {errors.postalCode && errors.postalCode.message}
+                  {errors.recipientPostalCode && errors.recipientPostalCode.message}
                 </FormErrorMessage>
               </Flex>
               <Flex direction="column" w="100%">
@@ -280,21 +277,19 @@ export function DeliveryAddress(): JSX.Element {
                     w={{ base: '100%', md: '50%' }}
                     isReadOnly
                     placeholder="기본주소"
-                    value={getValues('address')}
-                    {...register('address', {
+                    {...register('recipientAddress', {
                       required: { value: true, message: '주소를 입력해주세요' },
                     })}
                   />
                   <FormErrorMessage mt={0}>
-                    {errors.address && errors.address.message}
+                    {errors.recipientAddress && errors.recipientAddress.message}
                   </FormErrorMessage>
                 </Flex>
                 <Flex direction="column">
                   <Input
                     w={{ base: '100%', md: '50%' }}
                     placeholder="상세주소"
-                    value={watch('detailAddress')}
-                    {...register('detailAddress', {
+                    {...register('recipientDetailAddress', {
                       required: { value: true, message: '상세주소를 입력해주세요' },
                       maxLength: {
                         value: 30,
@@ -303,20 +298,21 @@ export function DeliveryAddress(): JSX.Element {
                     })}
                   />
                   <FormErrorMessage mt={0}>
-                    {errors.detailAddress && errors.detailAddress.message}
+                    {errors.recipientDetailAddress &&
+                      errors.recipientDetailAddress.message}
                   </FormErrorMessage>
                 </Flex>
               </Flex>
             </Flex>
           </FormControl>
 
-          <FormControl isInvalid={!!errors.deliveryMemo}>
+          <FormControl isInvalid={!!errors.memo}>
             <Text fontWeight="semibold">배송메모</Text>
 
             <Input
               w={{ base: '100%', md: '50%' }}
               placeholder="문 앞 / 직접 받고 부재 시 문 앞 / 경비실 / 택배함"
-              {...register('deliveryMemo', {
+              {...register('memo', {
                 required: '배송메모를 입력해주세요.',
                 maxLength: {
                   value: 30,
@@ -324,11 +320,10 @@ export function DeliveryAddress(): JSX.Element {
                 },
               })}
             />
-            <FormErrorMessage mt={0}>{errors.deliveryMemo?.message}</FormErrorMessage>
+            <FormErrorMessage mt={0}>{errors.memo?.message}</FormErrorMessage>
           </FormControl>
-        </>
+        </Stack>
       )}
-
       <DeliveryAddressDialog isOpen={addressIsOpen} onClose={addressOnClose} />
       <DeliveryAddressList isOpen={addressListIsOpen} onClose={addressListOnClose} />
     </SectionWithTitle>
