@@ -1,6 +1,11 @@
 import { Button, Stack, useToast } from '@chakra-ui/react';
-import { useCart, useCartCalculatedMetrics, useProfile } from '@project-lc/hooks';
-import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
+import {
+  useCart,
+  useCartCalculatedMetrics,
+  useCartShippingGroups,
+  useProfile,
+} from '@project-lc/hooks';
+import { OrderShippingData, useCartStore, useKkshowOrderStore } from '@project-lc/stores';
 import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
@@ -37,12 +42,34 @@ export function CartActions(): JSX.Element {
     });
   }, [data, selectedItems, toast]);
 
+  // 배송그룹별 선택된 카트아이템 Record<배송그룹id, 선택된 카트상품id[]>
+  // 배송그룹별 표시될 배송비(selectedItems, 배송그룹정보) => 배송비 Record<배송그룹id, 부과되는 배송비 정보(기본, 추가)>
+  const { groupedSelectedItems, totalShippingCostObjectById } = useCartShippingGroups();
+
   // 주문 클릭시
   const orderPrepare = useKkshowOrderStore((s) => s.handleOrderPrepare);
+  const setShippingData = useKkshowOrderStore((s) => s.setShippingData);
   const handleOrderClick = useCallback((): void => {
     if (!data) return;
     if (!executePurchaseCheck()) return;
 
+    // kkshowOrderStore에 배송비정보 저장
+    const groupIdList = Object.keys(groupedSelectedItems).map((id) => Number(id));
+    const shippingData = groupIdList.reduce((_shippingData, id) => {
+      return {
+        ..._shippingData,
+        [id]: {
+          // cartId가 아닌 goodsId 저장 (주문페이지에는 카트id정보가 없음)
+          items: data
+            .filter((cartItem) => groupedSelectedItems[id].includes(cartItem.id))
+            .map((cartItem) => cartItem.goods.id),
+          cost: totalShippingCostObjectById[id],
+        },
+      };
+    }, {} as OrderShippingData);
+    setShippingData(shippingData);
+
+    // kkshowOrderStore에 주문정보 저장
     orderPrepare({
       orderPrice: calculated.totalOrderPrice,
       giftFlag: false,
@@ -85,10 +112,13 @@ export function CartActions(): JSX.Element {
     calculated.totalOrderPrice,
     data,
     executePurchaseCheck,
+    groupedSelectedItems,
     orderPrepare,
     profile.data?.id,
     router,
     selectedItems,
+    setShippingData,
+    totalShippingCostObjectById,
   ]);
 
   return (

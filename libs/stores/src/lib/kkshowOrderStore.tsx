@@ -33,6 +33,14 @@ export type OrderPrepareData = Pick<
   | 'supportOrderIncludeFlag'
 >;
 
+/** 배송비정보 타입 */
+export type OrderShippingData = Record<
+  number, // 배송비그룹 id
+  {
+    cost: { std: number; add: number } | null; // 기본배송비, 추가배송비
+    items: number[]; // 해당배송비에 포함된 goodsId[]
+  }
+>;
 export interface KkshowOrderStore {
   handlePaymentType(value: string): void;
   handleAddressType(value: string): void;
@@ -44,6 +52,10 @@ export interface KkshowOrderStore {
   order: CreateOrderForm;
   resetOrder: () => void;
   handleOrderPrepare: (orderData: OrderPrepareData) => void;
+
+  // ******* 배송비 저장
+  shipping: OrderShippingData;
+  setShippingData: (data: OrderShippingData) => void;
 }
 export const useKkshowOrderStore = create<KkshowOrderStore>((set, get) => ({
   paymentType: '미선택',
@@ -71,5 +83,11 @@ export const useKkshowOrderStore = create<KkshowOrderStore>((set, get) => ({
         ...orderPrepareData,
       },
     }));
+  },
+
+  // ******* 배송비 저장
+  shipping: {},
+  setShippingData: (data: OrderShippingData) => {
+    set({ shipping: data });
   },
 }));

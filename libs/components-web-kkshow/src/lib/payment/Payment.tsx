@@ -79,13 +79,14 @@ export function MileageBenefit({
 
 export function PaymentBox(): JSX.Element {
   const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
-  const { paymentType, order } = useKkshowOrderStore();
+  const { paymentType, order, shipping } = useKkshowOrderStore();
   const toast = useToast();
   const PRODUCT_PRICE = order.orderPrice;
-  const SHIPPING_COST = order.orderItems.reduce(
-    (prev, curr) => prev + Number(curr.shippingCost),
-    0,
-  );
+  // orderItem.shippingCost 가 아닌 kkshowOrderStore에 저장된 배송비 정보 참조하여 배송비 계산
+  const SHIPPING_COST = Object.values(shipping).reduce((prev, curr) => {
+    if (!curr.cost) return prev;
+    return prev + curr.cost.std + curr.cost.add;
+  }, 0);
   const productNameArray = order.orderItems.map((item) => item.goodsName);
   const DISCOUNT = order.totalDiscount || 0;
   let productName = '';
@@ -137,6 +138,7 @@ export function PaymentBox(): JSX.Element {
       as="form"
       onSubmit={handleSubmit(onSubmit)}
     >
+      <Text>{JSON.stringify(shipping)}</Text>
       <SectionWithTitle title="적립혜택" disableDivider>
         <Flex justifyContent="space-between" h="60px" alignItems="center">
           {mileageSetting.mileageStrategy === 'noMileage' ? (

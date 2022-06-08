@@ -16,6 +16,7 @@ export function useCartShippingGroups(): {
     number,
     ShippingGroupData & { shopName: SellerShop['shopName'] }
   >;
+  groupedSelectedItems: Record<number, number[]>;
 } {
   const { data } = useCart();
   const selectedItems = useCartStore((s) => s.selectedItems);
@@ -115,6 +116,7 @@ export function useCartShippingGroups(): {
     totalShippingCostObjectById,
     shippingGroupIdList,
     shippingGroupWithShopNameObject,
+    groupedSelectedItems,
   };
 }
 
