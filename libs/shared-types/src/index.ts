@@ -45,6 +45,7 @@ export * from './lib/dto/changeGoodsView.dto';
 export * from './lib/dto/changeNickname.dto';
 export * from './lib/dto/changeReturnStatus.dto';
 export * from './lib/dto/changeSellCommission.dto';
+export * from './lib/dto/checkOrderShippingCost.dto';
 export * from './lib/dto/confirmHistory.dto';
 export * from './lib/dto/coupon.dto';
 export * from './lib/dto/createAdminNotification.dto';

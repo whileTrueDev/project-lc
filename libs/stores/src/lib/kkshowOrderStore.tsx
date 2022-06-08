@@ -37,6 +37,7 @@ export type OrderPrepareData = Pick<
 export type OrderShippingData = Record<
   number, // 배송비그룹 id
   {
+    isShippingAvailable?: boolean;
     cost: { std: number; add: number } | null; // 기본배송비, 추가배송비
     items: number[]; // 해당배송비에 포함된 goodsId[]
   }

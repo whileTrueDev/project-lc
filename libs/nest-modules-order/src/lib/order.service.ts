@@ -19,6 +19,7 @@ import {
   OrderStatsRes,
   sellerOrderSteps,
   UpdateOrderDto,
+  OrderShippingCheckDto,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
@@ -882,5 +883,79 @@ export class OrderService {
       };
     }
     return { nextCursor: undefined, orders: _result };
+  }
+
+  /** 배송비 조회
+   *
+   * 리턴형태
+   * {
+   *  배송비그룹id : { isShippingAvailable: boolean, items: goodsId[], cost: number },
+   *  배송비그룹id : { isShippingAvailable: boolean, items: goodsId[], cost: number },
+   * }
+   */
+  async checkOrderShippingCost(dto: OrderShippingCheckDto): Promise<any> {
+    console.log(dto);
+    // 배송비 조회 위해 필요한 정보
+
+    // * 선물주문이 아닌경우 dto로 들어온 주소
+    let address = dto.address || '';
+    // * 선물주문인경우 방송인의 주소
+    if (dto.isGiftOrder && dto.broadcasterId) {
+      const broadcasterAddress = await this.prisma.broadcasterAddress.findUnique({
+        where: { broadcasterId: dto.broadcasterId },
+      });
+      address = broadcasterAddress.address;
+    }
+
+    // 쿼리스트링으로 넘어오는 items validation 오류 해결 못해서 여기서 객체로 바꿈
+    const items = dto.items.map((list) => JSON.parse(list.toString()));
+
+    // * 주문상품의 배송비 그룹 정보(배송정책,배송옵션,배송지역별가격)
+    const goodsIdList = [...new Set(items.map((i) => i.goodsId))];
+
+    const shippingGroups = await this.prisma.shippingGroup.findMany({
+      where: { goods: { some: { id: { in: goodsIdList } } } },
+      include: {
+        shippingSets: {
+          include: { shippingOptions: { include: { shippingCost: true } } },
+        },
+      },
+    });
+
+    // * 주문상품옵션의 가격(가격정보는 프론트에서 보내지 않았음)
+    const optionIdList = [...new Set(items.map((i) => i.goodsOptionId))];
+    const options = await this.prisma.goodsOptions.findMany({
+      where: { id: { in: optionIdList } },
+      include: { goods: { select: { shippingGroupId: true } } },
+    });
+
+    // * 배송그룹별 주문상품
+    const shippingGroupIdList = shippingGroups.map((sg) => sg.id);
+    const dataByShippingGroupId = shippingGroupIdList.reduce((obj, shippingGroupId) => {
+      const includedOptions = options.filter(
+        (opt) => opt.goods.shippingGroupId === shippingGroupId,
+      );
+      return {
+        ...obj,
+        [shippingGroupId]: {
+          items: includedOptions.map((opt) => opt.id),
+          cost: includedOptions.reduce((sum, cur) => sum + Number(cur.price), 0), // 여기서 가격은 필요없음..
+        },
+      };
+    }, {} as Record<number, { isShippingAvailable?: boolean; items: number[]; cost: number }>);
+
+    // TODO: 필요한 정보 정리해서 배송비 계산하기
+    console.log({ address, shippingGroups, options, dataByShippingGroupId });
+    // * 리턴값
+    // 배송비그룹 id 별 배송가능여부, 포함된 주문상품id, 배송비
+
+    const dummyResult = {
+      1: {
+        isShippingAvailable: true,
+        items: [1, 2, 3, 4],
+        cost: { std: 2000, add: 2000 },
+      },
+    };
+    return dummyResult;
   }
 }
