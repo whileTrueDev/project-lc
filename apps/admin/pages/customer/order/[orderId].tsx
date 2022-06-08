@@ -311,6 +311,16 @@ export function VirtualAccountDetail(props: TossPaymentDetailProps): JSX.Element
       <GridItem>
         <Text>{paymentData.virtualAccount.dueDate}</Text>
       </GridItem>
+      <GridItem>
+        <Text>입금상태</Text>
+      </GridItem>
+      <GridItem>
+        <Text>
+          {paymentData.virtualAccount.settlementStatus === 'COMPLETE'
+            ? '입금완료'
+            : '입금대기'}
+        </Text>
+      </GridItem>
     </>
   );
 }
