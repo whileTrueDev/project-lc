@@ -192,26 +192,14 @@ export class AdminService {
     return false;
   }
 
+  /** 상품 검수 여부 변경 */
   public async setGoodsConfirmation(
     dto: GoodsConfirmationDto,
   ): Promise<GoodsConfirmation> {
-    // 상품 검수 확인시 동일한 퍼스트몰 상품번호로 검수된 상품이 있는지(중복 여부) 확인 - 이미 존재하면 400 에러
-    const { firstmallGoodsConnectionId } = dto;
-    const hasDuplicatedFmGoodsConnectionId = await this.checkDupFMGoodsConnectionId(
-      firstmallGoodsConnectionId,
-    );
-
-    if (hasDuplicatedFmGoodsConnectionId) {
-      throw new BadRequestException(
-        `이미 ( 퍼스트몰 상품 고유번호 : ${firstmallGoodsConnectionId} ) 로 검수된
-        상품or라이브쇼핑or상품홍보가 존재합니다. 퍼스트몰 상품 고유번호를 다시 확인해주세요.`,
-      );
-    }
-    // 동일한 퍼스트몰 상품번호로 검수된 상품이 없다면(중복이 아닌 경우) 그대로 검수 확인 진행
     const goodsConfirmation = await this.prisma.goodsConfirmation.update({
       where: { goodsId: dto.goodsId },
       data: {
-        firstmallGoodsConnectionId,
+        firstmallGoodsConnectionId: null,
         status: dto.status,
         rejectionReason: null,
       },
