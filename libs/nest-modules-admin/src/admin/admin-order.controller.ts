@@ -1,24 +1,21 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
-  Delete,
-  ForbiddenException,
   Get,
-  Header,
   Param,
   ParseIntPipe,
   Patch,
-  Post,
-  Put,
   Query,
-  Req,
-  UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
-import { GetOrderListDto, OrderListRes, OrderDetailRes } from '@project-lc/shared-types';
+import {
+  GetOrderListDto,
+  OrderListRes,
+  OrderDetailRes,
+  UpdateOrderDto,
+} from '@project-lc/shared-types';
 import { OrderService } from '@project-lc/nest-modules-order';
 
 @UseInterceptors(HttpCacheInterceptor)
@@ -36,21 +33,6 @@ export class AdminOrderController {
   getOrderList(
     @Query(new ValidationPipe({ transform: true })) dto: GetOrderListDto,
   ): Promise<OrderListRes> {
-    const include = {
-      sellerSettlementItems: {
-        include: {
-          SellerSettlements: {
-            include: {
-              seller: {
-                select: {
-                  sellerShop: true,
-                },
-              },
-            },
-          },
-        },
-      },
-    };
     // 특정 소비자의 주문 조회
     if (dto.customerId) {
       return this.orderService.getCustomerOrderList(dto);
@@ -65,5 +47,13 @@ export class AdminOrderController {
     @Param('orderId', ParseIntPipe) orderId: number,
   ): Promise<OrderDetailRes> {
     return this.orderService.getOrderDetail(orderId);
+  }
+
+  @Patch(':orderId')
+  updateOrderStatus(
+    @Param('orderId', ParseIntPipe) orderId: number,
+    @Body(ValidationPipe) dto: UpdateOrderDto,
+  ): Promise<boolean> {
+    return this.orderService.updateOrder(orderId, dto);
   }
 }

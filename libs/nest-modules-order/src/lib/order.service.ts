@@ -237,10 +237,7 @@ export class OrderService {
   }
 
   /** 전체 주문목록 조회 */
-  async getOrderList(
-    dto: GetOrderListDto,
-    include?: Prisma.OrderFindManyArgs['include'],
-  ): Promise<OrderListRes> {
+  async getOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
     const { take, skip } = dto;
     const where = this.getOrderListFilterWhere(dto);
     const count = await this.prisma.order.count({ where });
@@ -288,12 +285,12 @@ export class OrderService {
         returns: { select: { id: true, returnCode: true, items: true } },
         orderCancellations: { select: { id: true, cancelCode: true, items: true } },
         sellerSettlementItems: {
-          include: {
-            SellerSettlements: {
-              include: {
-                seller: {
+          select: {
+            liveShopping: {
+              select: {
+                broadcaster: {
                   select: {
-                    sellerShop: true,
+                    userNickname: true,
                   },
                 },
               },
@@ -312,7 +309,7 @@ export class OrderService {
   }
 
   /** 주문 상세 조회 */
-  async findOneOrderDetail(where: Prisma.OrderWhereInput): Promise<OrderDetailRes> {
+  async findOneOrderDetail(where: Prisma.OrderWhereInput): Promise<any> {
     // 주문이 있는지 확인
     await this.findOneOrder(where);
 
@@ -356,6 +353,19 @@ export class OrderService {
         exchanges: { select: { id: true, exchangeCode: true, exchangeItems: true } },
         returns: { select: { id: true, returnCode: true, items: true } },
         orderCancellations: { select: { id: true, cancelCode: true, items: true } },
+        sellerSettlementItems: {
+          select: {
+            liveShopping: {
+              select: {
+                broadcaster: {
+                  select: {
+                    userNickname: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }

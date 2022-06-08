@@ -1,11 +1,11 @@
-import { Link, Button, Text } from '@chakra-ui/react';
+import { Link, Text, Box } from '@chakra-ui/react';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { useAdminOrderList } from '@project-lc/hooks';
-import { GridColumns, GridRowData } from '@material-ui/data-grid';
-import { orderProcessStepKoreanDict } from '@project-lc/shared-types';
+import { GridColumns, GridRowData, GridToolbar } from '@material-ui/data-grid';
 import { OrderProcessStep } from '@prisma/client';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
+import { KkshowOrderStatusBadge } from '@project-lc/components-shared/KkshowOrderStatusBadge';
 
 const columns: GridColumns = [
   {
@@ -28,6 +28,13 @@ const columns: GridColumns = [
     valueGetter: ({ row }: GridRowData) => row.orderItems[0].goods.goods_name,
     flex: 1,
   },
+  {
+    field: 'sellerShop',
+    headerName: '판매자',
+    valueGetter: ({ row }: GridRowData) =>
+      row.orderItems[0].goods.seller.sellerShop.shopName,
+    flex: 1,
+  },
   { field: 'ordererName', headerName: '주문자명' },
   {
     field: 'paymentType',
@@ -38,13 +45,23 @@ const columns: GridColumns = [
   {
     field: 'step',
     headerName: '주문상태',
-    valueFormatter: ({ row }: GridRowData) =>
-      orderProcessStepKoreanDict[row.step as OrderProcessStep],
+    renderCell: ({ row }) => (
+      <Box lineHeight={2}>
+        <KkshowOrderStatusBadge orderStatus={row.step as OrderProcessStep} />
+      </Box>
+    ),
+  },
+  {
+    field: 'broadcaster',
+    headerName: '방송인',
+    valueGetter: ({ row }: GridRowData) =>
+      row.sellerSettlementItems[0]?.liveShopping.broadcaster.userNickname,
   },
   {
     field: 'createDate',
     headerName: '주문날짜',
     valueFormatter: ({ row }) => dayjs(row.createDate).format('YYYY-MM-DD HH:mm:ss'),
+    type: 'date',
     flex: 1,
   },
 ];
@@ -64,9 +81,11 @@ function PaymentTypeSwitch(paymentType: string): string {
 
 export function AdminOrderList(): JSX.Element {
   const { data } = useAdminOrderList();
-  console.log(data);
   return (
     <ChakraDataGrid
+      components={{
+        Toolbar: GridToolbar,
+      }}
       columns={columns}
       rows={data?.orders || []}
       minH={500}

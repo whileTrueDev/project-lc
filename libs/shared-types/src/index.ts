@@ -16,6 +16,7 @@ export * from './lib/constants/fmOrderReturnTypes';
 export * from './lib/constants/fmOrderShippingTypes';
 export * from './lib/constants/fmOrderSitetypes';
 export * from './lib/constants/fmOrderStatuses';
+export * from './lib/constants/kkshowOrderStatuses';
 export * from './lib/constants/liveShoppingProgress';
 export * from './lib/constants/orderProcessStepDict';
 export * from './lib/constants/orderStats';
