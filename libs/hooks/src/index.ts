@@ -125,6 +125,8 @@ export * from './lib/queries/useBroadcasterSettlementHistory';
 export * from './lib/queries/useBroadcasterSettlementInfo';
 export * from './lib/queries/useCart';
 export * from './lib/queries/useCustomerAddress';
+export * from './lib/queries/useCustomerCoupon';
+export * from './lib/queries/useCustomerCouponHistory';
 export * from './lib/queries/useCustomerInfo';
 export * from './lib/queries/useCustomerStatus';
 export * from './lib/queries/useDefaultContacts';

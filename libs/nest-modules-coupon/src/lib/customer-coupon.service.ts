@@ -16,6 +16,7 @@ export class CustomerCouponService {
       where: {
         customerId: Number(dto.customerId) || undefined,
         couponId: Number(dto.couponId) || undefined,
+        status: 'notUsed',
       },
       include: {
         customer: {
@@ -24,6 +25,7 @@ export class CustomerCouponService {
             email: true,
           },
         },
+        coupon: true,
       },
     });
   }
