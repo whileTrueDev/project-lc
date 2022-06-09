@@ -442,7 +442,9 @@ export class OrderService {
         exports: true,
         exchanges: { select: { id: true, exchangeCode: true, exchangeItems: true } },
         returns: { select: { id: true, returnCode: true, items: true } },
-        orderCancellations: { select: { id: true, cancelCode: true, items: true } },
+        orderCancellations: {
+          select: { id: true, cancelCode: true, requestDate: true, items: true },
+        },
         sellerSettlementItems: {
           select: {
             liveShopping: {

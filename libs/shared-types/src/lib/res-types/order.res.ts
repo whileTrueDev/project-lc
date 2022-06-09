@@ -53,7 +53,10 @@ export type OrderItemWithRelations = OrderItem & {
   goods: OriginGoods;
 };
 
-export type OrderCancellationBaseData = Pick<OrderCancellation, 'id' | 'cancelCode'> & {
+export type OrderCancellationBaseData = Pick<
+  OrderCancellation,
+  'id' | 'cancelCode' | 'requestDate'
+> & {
   items: OrderCancellationItem[];
 };
 export type ExportBaseData = Export;
