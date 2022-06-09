@@ -42,6 +42,12 @@ export class OrderShippingCheckDto {
   @IsString()
   address?: string;
 
+  /** 우편번호 - 선물주문이 "아닌" 경우 필요함 */
+  @ValidateIf((o) => !o.isGiftOrder)
+  @IsOptional()
+  @IsString()
+  postalCode?: string;
+
   /** 선물받을 방송인 고유번호 broadcaster.id - 선물주문인 경우 필요함 */
   @ValidateIf((o) => o.isGiftOrder)
   @Type(() => Number)

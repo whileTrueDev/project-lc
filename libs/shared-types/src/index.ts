@@ -20,6 +20,7 @@ export * from './lib/constants/liveShoppingProgress';
 export * from './lib/constants/orderProcessStepDict';
 export * from './lib/constants/orderStats';
 export * from './lib/constants/publicImageS3Key';
+export * from './lib/constants/remoteAreaPostalcode';
 export * from './lib/constants/sellType';
 export * from './lib/constants/shippingTypes';
 export * from './lib/constants/signupRegisterOptions';
