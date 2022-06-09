@@ -53,12 +53,14 @@ export type OrderItemWithRelations = OrderItem & {
   goods: OriginGoods;
 };
 
-export type OrderCancellationBaseData = OrderCancellation & {
+export type OrderCancellationBaseData = Pick<OrderCancellation, 'id' | 'cancelCode'> & {
   items: OrderCancellationItem[];
 };
-export type ExportBaseData = Export & { items: ExportItem[] };
-export type ExchangeBaseData = Exchange & { exchangeItems: ExchangeItem[] };
-export type ReturnBaseData = Return & { items: ReturnItem[] };
+export type ExportBaseData = Export;
+export type ExchangeBaseData = Pick<Exchange, 'id' | 'exchangeCode'> & {
+  exchangeItems: ExchangeItem[];
+};
+export type ReturnBaseData = Pick<Return, 'id' | 'returnCode'> & { items: ReturnItem[] };
 export type ReturnDataWithImages = ReturnBaseData & { images: ReturnImage[] };
 export type ExchangeDataWithImages = ExchangeBaseData & { images: ExchangeImage[] };
 
@@ -106,6 +108,7 @@ export type OrderListRes = {
 export type OrderDetailRes = OrderBaseData & {
   exchanges: Nullable<ExchangeDataWithImages[]>;
   returns: Nullable<ReturnDataWithImages[]>;
+  sellerSettlementItems?: SellerSettlementItemsRes[] | null;
 };
 /**
  * 방송인 후원 주문 목록 타입

@@ -46,7 +46,7 @@ export class AdminOrderController {
   getOrderDetail(
     @Param('orderId', ParseIntPipe) orderId: number,
   ): Promise<OrderDetailRes> {
-    return this.orderService.getOrderDetail(orderId);
+    return this.orderService.getOrderDetail({ orderId });
   }
 
   /** 주문 상태 수정 */
