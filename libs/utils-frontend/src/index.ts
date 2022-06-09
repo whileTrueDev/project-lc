@@ -1,5 +1,4 @@
 export * from './lib/asteriskify';
-export * from './lib/calculateShippingCost';
 export * from './lib/checkGoodsPurchasable';
 export * from './lib/cookieManager';
 export * from './lib/createChakraTheme';
@@ -13,3 +12,4 @@ export * from './lib/getShippingOptionLabel';
 export * from './lib/getStandardShippingCost';
 export * from './lib/openKakaoChannel';
 export * from './lib/parseErrorObject';
+export * from './lib/checkGoodsPurchasable';

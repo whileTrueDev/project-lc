@@ -1,14 +1,19 @@
 import {
   CartItem,
   CartItemOption,
+  GoodsOptions,
   ShippingCost,
   ShippingGroup,
   ShippingOption,
   ShippingOptType,
   ShippingSet,
 } from '@prisma/client';
-import { GoodsByIdRes } from '@project-lc/shared-types';
-import { getStandardShippingCost } from './getStandardShippingCost';
+import {
+  GoodsByIdRes,
+  remoteAreaPostalcode,
+  ShippingCheckItem,
+} from '@project-lc/shared-types';
+import { getStandardShippingCost } from '@project-lc/utils-frontend';
 
 /**
  * 가지고 있는 정보
@@ -219,6 +224,32 @@ function sumItemOptionValues(options: CartItemOption[]): {
   }, {} as { cnt?: number; amount?: number; weight?: number });
 }
 
+const checkShippingCostFree = (
+  shippingGroup: ShippingGroup,
+  withShippingCalculTypeFree: boolean,
+): {
+  isStdShippingCostFree: boolean;
+  isAddShippingCostFree: boolean;
+} => {
+  const { shipping_calcul_free_yn, shipping_std_free_yn, shipping_add_free_yn } =
+    shippingGroup;
+
+  // withShippingCalculTypeFree 값과
+  // shipping_calcul_free_yn, shipping_std_free_yn, shipping_add_free_yn 값에 따라
+  // 기본배송비와 추가배송비 부과여부 달라짐
+  const isStdShippingCostFree =
+    (withShippingCalculTypeFree && shipping_std_free_yn === 'Y') ||
+    (withShippingCalculTypeFree && shipping_calcul_free_yn === 'Y');
+
+  const isAddShippingCostFree =
+    (withShippingCalculTypeFree && shipping_add_free_yn === 'Y') ||
+    (withShippingCalculTypeFree && shipping_calcul_free_yn === 'Y');
+  return {
+    isStdShippingCostFree,
+    isAddShippingCostFree,
+  };
+};
+
 export type ShippingOptionCost = {
   std: number; // 기본배송비
   add: number; // 추가배송비
@@ -241,24 +272,12 @@ export const calculateShippingCostInCartTable = ({
   withShippingCalculTypeFree?: boolean; // 동일 판매자의 shipping_calcul_type === 'free'인 다른 배송그룹상품과 같이 주문했는지 여부
 }): ShippingOptionCost | null => {
   if (!cartItems.length) return null;
+  const { shipping_calcul_type } = shippingGroup;
 
-  const {
-    shipping_calcul_type,
-    shipping_calcul_free_yn,
-    shipping_std_free_yn,
-    shipping_add_free_yn,
-  } = shippingGroup;
-
-  // withShippingCalculTypeFree 값과
-  // shipping_calcul_free_yn, shipping_std_free_yn, shipping_add_free_yn 값에 따라
-  // 기본배송비와 추가배송비 부과여부 달라짐
-  const isStdShippingCostFree =
-    (withShippingCalculTypeFree && shipping_std_free_yn) ||
-    (withShippingCalculTypeFree && shipping_calcul_free_yn);
-
-  const isAddShippingCostFree =
-    (withShippingCalculTypeFree && shipping_add_free_yn) ||
-    (withShippingCalculTypeFree && shipping_calcul_free_yn);
+  const { isStdShippingCostFree, isAddShippingCostFree } = checkShippingCostFree(
+    shippingGroup,
+    withShippingCalculTypeFree,
+  );
 
   // 전체 상품옵션개수, 상품옵션가격, 상품옵션무게 총합
   const optionsTotal = sumItemOptionValues(cartItems.flatMap((item) => item.options));
@@ -317,3 +336,200 @@ export const calculateShippingCostInCartTable = ({
   }
   return shippingCost;
 };
+
+/** 주소지 고려하여 기본배송비 계산
+ * 배송정책이 지역제한배송이고 기본배송비옵션 중 주어진 주소가 없는경우 배송불가지역으로 판단함
+ * 그 외에는 기본배송비 계산
+ */
+function calculateStdShippingCost({
+  address,
+  shippingGroupData,
+  itemOption,
+}: {
+  address: string;
+  shippingGroupData: ShippingGroupData;
+  itemOption: { amount?: number; cnt?: number; weight?: number };
+}): {
+  isShippingAvailable: boolean;
+  cost: number | null;
+} {
+  // 1. shippingGroup(배송비그룹)의 default shippingSet(배송정책)찾기
+  const defaultShippingSet =
+    shippingGroupData.shippingSets.find((set) => set.default_yn === 'Y') ||
+    shippingGroupData.shippingSets[0];
+
+  // 3. shippingSet(배송정책)의 shippingOptions를 std options(기본배송비옵션)와 add options(추가배송비옵션) 로 구분
+  const stdOptions = defaultShippingSet.shippingOptions.filter(
+    (opt) => opt.shipping_set_type === 'std',
+  );
+
+  const optType = stdOptions[0].shipping_opt_type;
+
+  // 4. 기본배송비 구하기
+  const isNationwide = defaultShippingSet.delivery_limit === 'unlimit';
+  if (isNationwide) {
+    //     1. shippingSet 이 ∏전국배송인경우
+    //         1. 옵션과 상품옵션 총 개수, 총 가격, 총 무게에 따라 계산
+    const cost = calculateShippingCostByOptType({
+      optType,
+      shippingOptions: stdOptions,
+      itemOption,
+    });
+    return { isShippingAvailable: true, cost };
+  }
+
+  const areas = stdOptions
+    .flatMap((opt) => opt.shippingCost)
+    .map((cost) => cost.shipping_area_name);
+  //     2. shippingSet이 지역배송인경우
+  //         1. 옵션에 연결된 지역 중 배송지가 존재하는지 확인
+  //             1. 존재한다면 추가배송비옵션과 상품옵션 총 개수, 총 가격에 따라 계산
+  //             2. 존재하지 않는다면 배송불가지역
+
+  return { isShippingAvailable: false, cost: null };
+}
+
+/** 주소지 고려하여 추가배송비 계산
+ */
+function calculateAddShippingCost({
+  address,
+  shippingGroupData,
+  goodsOptions,
+}: {
+  address: string;
+  shippingGroupData: ShippingGroupData;
+  goodsOptions: (ShippingCheckItem & GoodsOptions)[];
+}): number {
+  // 1. shippingGroup(배송비그룹)의 default shippingSet(배송정책)찾기
+  const defaultShippingSet =
+    shippingGroupData.shippingSets.find((set) => set.default_yn === 'Y') ||
+    shippingGroupData.shippingSets[0];
+  // 3. shippingSet(배송정책)의 shippingOptions를 std options(기본배송비옵션)와 add options(추가배송비옵션) 로 구분
+  const addOptions = defaultShippingSet.shippingOptions.filter(
+    (opt) => opt.shipping_set_type === 'add',
+  );
+  if (addOptions.length === 0) return 0;
+
+  // 5. (add options 추가배송비옵션이 존재하는 경우) 추가배송비 구하기
+  //     1. 추가배송비옵션에 연결된 지역 확인
+  //     2. 배송지에 해당하는 추가배송비 옵션만 골라내기
+  //     3. 해당 추가배송비옵션과 상품옵션 총 개수, 가격에 따라 계산
+  return 0;
+}
+
+/** 제주 및 도서산간지역인지 확인 */
+export function checkRemoteArea({
+  address,
+  postalCode,
+}: {
+  address: string;
+  postalCode: string;
+}): boolean {
+  let result = false;
+  const remotePostalCodeList = Object.values(remoteAreaPostalcode);
+  for (let i = 0; i < remotePostalCodeList.length; i++) {
+    const code = remotePostalCodeList[i];
+    if (Array.isArray(code)) {
+      // 우편번호 범위(배열)인 경우
+      const start = Number(code[0]);
+      const end = Number(code[1]);
+      if (start <= Number(postalCode) && end >= Number(postalCode)) {
+        result = true;
+        break;
+      }
+    }
+    // 단일 우편번호인경우
+    if (code === postalCode) {
+      result = true;
+      break;
+    }
+  }
+  return result;
+}
+
+/** 주소변경시 실행하는 배송비계산 */
+export function calculateShippingCost({
+  address,
+  shippingGroupData,
+  goodsOptions,
+  withShippingCalculTypeFree,
+}: {
+  address: string;
+  shippingGroupData: ShippingGroupData;
+  goodsOptions: (ShippingCheckItem & GoodsOptions)[];
+  withShippingCalculTypeFree?: boolean; // 동일 판매자의 shipping_calcul_type === 'free'인 다른 배송그룹상품과 같이 주문했는지 여부
+}): {
+  isShippingAvailable: boolean;
+  cost: { std: number; add: number } | null;
+} {
+  // 2. 배송비그룹의 배송비계산방식에 따라 기본배송비, 추가배송비 부과
+  const { shipping_calcul_type } = shippingGroupData;
+  const { isStdShippingCostFree, isAddShippingCostFree } = checkShippingCostFree(
+    shippingGroupData,
+    withShippingCalculTypeFree,
+  );
+
+  const result: { isShippingAvailable: boolean; cost: null | { std: 0; add: 0 } } = {
+    isShippingAvailable: true,
+    cost: { std: 0, add: 0 },
+  };
+
+  // 배송비그룹 묶음계산-무료배송인경우 기본배송비 1번만 부과, 추가배송비 1번만 부과
+  if (shipping_calcul_type === 'bundle') {
+    const _itepOption = {};
+    if (!isStdShippingCostFree) {
+      const { isShippingAvailable, cost } = calculateStdShippingCost({
+        address,
+        shippingGroupData,
+        itemOption: {},
+      });
+      //   shippingCost.std += Number(getStandardShippingCost(shippingGroup));
+    }
+    if (!isAddShippingCostFree) {
+      //   shippingCost.add += getAdditionalShippingCostUnlimitDelivery(
+      //     optionsTotal, // 상품옵션 총 금액, 총 수량, 총 무게
+      //     shippingGroup,
+      //   );
+    }
+  }
+  // 배송비그룹 무료계산-묶음배송인 경우 기본배송비는 무료, 추가배송비 1번만 부과
+  if (shipping_calcul_type === 'free') {
+    if (!isAddShippingCostFree) {
+      //   shippingCost.add += getAdditionalShippingCostUnlimitDelivery(
+      //     optionsTotal, // 상품옵션 총 금액, 총 수량, 총 무게
+      //     shippingGroup,
+      //   );
+    }
+  }
+  // 배송비그룹 개별계산-개별배송인경우 상품별로 기본배송비와 추가배송비 부과
+  if (shipping_calcul_type === 'each') {
+    // 장바구니 상품별로 주문가격, 개수, 무게 구한다
+    // const optionsTotalByItemList = cartItems.map((item) => {
+    //   return {
+    //     cartItemId: item.id,
+    //     optionsTotal: sumItemOptionValues(item.options),
+    //   };
+    // });
+
+    if (!isStdShippingCostFree) {
+      // 상품별로 기본배송비 부과
+      //   optionsTotalByItemList.forEach((_) => {
+      //     shippingCost.std += Number(getStandardShippingCost(shippingGroup));
+      //   });
+    }
+    if (!isAddShippingCostFree) {
+      // 상품별로 추가배송비 부과
+      //   optionsTotalByItemList.forEach((itemOptionTotal) => {
+      //     shippingCost.add += getAdditionalShippingCostUnlimitDelivery(
+      //       itemOptionTotal.optionsTotal, // 상품별 옵션 총 금액, 총 수량, 총 무게
+      //       shippingGroup,
+      //     );
+      //   });
+    }
+  }
+
+  return {
+    isShippingAvailable: true,
+    cost: { std: 1000, add: 0 },
+  };
+}

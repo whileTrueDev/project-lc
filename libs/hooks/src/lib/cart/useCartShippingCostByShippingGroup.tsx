@@ -4,7 +4,7 @@ import {
   calculateShippingCostInCartTable,
   ShippingGroupData,
   ShippingOptionCost,
-} from '@project-lc/utils-frontend';
+} from '@project-lc/utils';
 import { useMemo } from 'react';
 import { useCart } from '../queries/useCart';
 
