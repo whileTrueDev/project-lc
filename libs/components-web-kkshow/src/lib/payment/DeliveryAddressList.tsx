@@ -8,7 +8,7 @@ import {
   ModalOverlay,
 } from '@chakra-ui/react';
 import { CustomerAddress } from '@prisma/client';
-import { PaymentPageDto } from '@project-lc/shared-types';
+import { CreateOrderForm } from '@project-lc/shared-types';
 import { useKkshowOrderStore } from '@project-lc/stores';
 import { useFormContext } from 'react-hook-form';
 import CustomerAddressList from '../address/CustomerAddressList';
@@ -21,12 +21,17 @@ type DeliveryListProps = {
 export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX.Element {
   const { handleAddressType } = useKkshowOrderStore();
   const handleAddressSelect = (data: CustomerAddress): void => {
-    setValue('recipient', data.recipient || '');
-    setValue('recipientPhone', data.phone || '');
-    setValue('postalCode', data.postalCode || '');
-    setValue('address', data.address || '');
-    setValue('detailAddress', data.detailAddress || '');
-    setValue('deliveryMemo', data.memo || '');
+    const phone1 = data.phone?.slice(0, 3);
+    const phone2 = data.phone?.slice(3, 7);
+    const phone3 = data.phone?.slice(7, 12);
+    setValue('recipientName', data.recipient || '');
+    setValue('recipientPhone1', phone1 || '');
+    setValue('recipientPhone2', phone2 || '');
+    setValue('recipientPhone3', phone3 || '');
+    setValue('recipientPostalCode', data.postalCode || '');
+    setValue('recipientAddress', data.address || '');
+    setValue('recipientDetailAddress', data.detailAddress || '');
+    setValue('memo', data.memo || '');
     if (data.isDefault) {
       handleAddressType('default');
     } else {
@@ -35,7 +40,7 @@ export function DeliveryAddressList({ onClose, isOpen }: DeliveryListProps): JSX
     onClose();
   };
 
-  const { setValue } = useFormContext<PaymentPageDto>();
+  const { setValue } = useFormContext<CreateOrderForm>();
 
   return (
     <Modal onClose={onClose} isOpen={isOpen} isCentered size="sm">

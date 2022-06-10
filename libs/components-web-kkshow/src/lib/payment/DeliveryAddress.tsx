@@ -52,9 +52,7 @@ export function DeliveryAddress(): JSX.Element {
     trigger,
     formState: { errors },
   } = useFormContext<CreateOrderForm>();
-  /**
-   * TODO: 배송지 정보 OrderCreateDto 사용하도록 수정 필요
-   */
+
   function handleRadio(value: string): void {
     handleAddressType(value);
     if (value === 'manual') {
@@ -115,25 +113,28 @@ export function DeliveryAddress(): JSX.Element {
   // * 배송지 주소 변경시 배송비를 다시 계산한다
   // const shippingCheck = useGetOrderShippingCheck();
   const address = watch('recipientAddress');
+  const postalCode = watch('recipientPostalCode');
   useEffect(() => {
     if (address) {
       console.log('address change');
-      console.log({ address });
-      const orderItems = getValues('orderItems');
-      const isGiftOrder = getValues('giftFlag') || false;
-      const items = orderItems
-        .flatMap((i) => {
-          return i.options.map((opt) => ({ ...opt, goodsId: i.goodsId }));
-        })
-        .map((opt) => ({
-          goodsId: opt.goodsId,
-          goodsOptionId: opt.goodsOptionId,
-          quantity: opt.quantity,
-        }));
+      const params = {
+        address,
+        postalCode,
+        isGiftOrder: getValues('giftFlag') || false,
+        items: getValues('orderItems')
+          .flatMap((i) => {
+            return i.options.map((opt) => ({ ...opt, goodsId: i.goodsId }));
+          })
+          .map((opt) => ({
+            goodsId: opt.goodsId,
+            goodsOptionId: opt.goodsOptionId,
+            quantity: opt.quantity,
+          })),
+      };
+      console.log(params);
 
-      console.log(items);
-
-      getOrderShippingCheck({ isGiftOrder, items, address })
+      // 배송비 조회 요청
+      getOrderShippingCheck(params)
         .then((res) => {
           if (res) {
             setShippingData(res);
@@ -141,7 +142,7 @@ export function DeliveryAddress(): JSX.Element {
         })
         .catch((e) => console.error(e));
     }
-  }, [address, getValues, setShippingData]);
+  }, [address, getValues, postalCode, setShippingData]);
 
   return (
     <SectionWithTitle title="배송지 정보">
