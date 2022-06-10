@@ -27,7 +27,7 @@ import KkshowLayout from '@project-lc/components-web-kkshow/KkshowLayout';
 import {
   useBroadcaster,
   useBroadcasterChannels,
-  useLiveShoppingNowPlaying,
+  useLiveShoppingNowOnLive,
   usePromotionPage,
   usePromotionPageGoods,
 } from '@project-lc/hooks';
@@ -149,7 +149,9 @@ function PromotionPageGoodsList({
   }, [fetchNextPage, inView]);
 
   // 라이브쇼핑 상품 조회
-  const liveShopping = useLiveShoppingNowPlaying(broadcasterId);
+  const liveShopping = useLiveShoppingNowOnLive({
+    broadcasterId: Number(broadcasterId),
+  });
 
   return (
     <Box>
@@ -161,7 +163,12 @@ function PromotionPageGoodsList({
             </Text>
             <SimpleGrid mt={4} columns={[1, 2, 3]} spacing={4}>
               {liveShopping.data?.map((x) => (
-                <PromotinoPageGoodsDisplay key={x.goodsId} item={x} isLive />
+                <PromotinoPageGoodsDisplay
+                  broadcasterId={broadcasterId}
+                  key={x.goodsId}
+                  item={x}
+                  isLive
+                />
               ))}
             </SimpleGrid>
           </Box>
@@ -177,6 +184,7 @@ function PromotionPageGoodsList({
                 <Fragment key={idx}>
                   {page.productPromotions.map((promotionItem) => (
                     <PromotinoPageGoodsDisplay
+                      broadcasterId={broadcasterId}
                       key={promotionItem.id}
                       item={promotionItem}
                       isLive={liveShopping.data?.some(
@@ -213,6 +221,7 @@ function PromotionPageGoodsList({
 
 export default BroadcasterPromotionPage;
 interface PromotinoPageGoodsDisplayProps {
+  broadcasterId: number | string;
   item: {
     goods: {
       id: number;
@@ -225,6 +234,7 @@ interface PromotinoPageGoodsDisplayProps {
   isLive?: boolean;
 }
 function PromotinoPageGoodsDisplay({
+  broadcasterId,
   item,
   isLive,
 }: PromotinoPageGoodsDisplayProps): JSX.Element | null {
@@ -244,7 +254,7 @@ function PromotinoPageGoodsDisplay({
         />
 
         <Box py={2} px={1}>
-          <NextLink href={`/goods/${item.goods.id}?bc=1&isLive=true`} passHref>
+          <NextLink href={`/goods/${item.goods.id}?bc=${broadcasterId}`} passHref>
             <LinkOverlay>
               <Text noOfLines={1}>
                 {isLive && (

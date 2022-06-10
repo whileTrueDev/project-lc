@@ -2,6 +2,7 @@ import { CartItemRes } from '@project-lc/shared-types';
 import create from 'zustand';
 
 export interface ICartStore {
+  /** 선택된 goodsId 배열 */
   selectedItems: number[];
   handleToggle: (s: CartItemRes[number]) => void;
   handleSelectAll: (allData: CartItemRes) => void;

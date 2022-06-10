@@ -25,7 +25,6 @@ export function GoodsViewMeta(): JSX.Element | null {
   const router = useRouter();
   const goodsId = router.query.goodsId as string;
   const goods = useGoodsById(goodsId);
-
   if (goods.isLoading) return <GoodsViewMetaLoading />;
   if (!goods.data) return null;
   return (

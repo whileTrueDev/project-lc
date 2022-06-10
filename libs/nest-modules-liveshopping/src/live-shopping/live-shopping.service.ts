@@ -11,6 +11,7 @@ import {
   LiveShoppingWithGoods,
   getLiveShoppingProgress,
   LiveShoppingOutline,
+  FindNowPlayingLiveShoppingDto,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -88,12 +89,18 @@ export class LiveShoppingService {
     });
   }
 
-  /** 현재 판매중(라이브 진행중 포함) 인 라이브쇼핑 목록 조회 */
-  public async getNowPlayingLiveShopping(dto?: {
-    broadcasterId?: number;
-  }): Promise<LiveShoppingOutline[]> {
+  /** 현재 판매중(라이브 진행중 포함)인 라이브쇼핑 목록 조회 */
+  public async getNowPlayingLiveShopping(
+    dto: FindNowPlayingLiveShoppingDto,
+  ): Promise<LiveShoppingOutline[]> {
     const liveShoppings = await this.prisma.liveShopping.findMany({
-      where: { broadcasterId: dto?.broadcasterId || undefined, progress: 'confirmed' },
+      where: {
+        goodsId: dto.goodsIds
+          ? { in: dto.goodsIds.map((x) => Number(x)) }
+          : dto.goodsId || undefined,
+        broadcasterId: dto.broadcasterId || undefined,
+        progress: 'confirmed',
+      },
       select: {
         id: true,
         goodsId: true,
@@ -110,6 +117,7 @@ export class LiveShoppingService {
         sellEndDate: true,
         broadcastStartDate: true,
         broadcastEndDate: true,
+        broadcasterId: true,
         progress: true,
         images: true,
         liveShoppingName: true,

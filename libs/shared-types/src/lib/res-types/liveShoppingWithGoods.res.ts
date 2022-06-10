@@ -39,6 +39,7 @@ export type LiveShoppingOutline = Pick<
   | 'sellEndDate'
   | 'broadcastStartDate'
   | 'broadcastEndDate'
+  | 'broadcasterId'
   | 'progress'
   | 'liveShoppingName'
 > & {

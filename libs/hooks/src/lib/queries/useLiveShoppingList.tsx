@@ -1,11 +1,11 @@
-import { AxiosError } from 'axios';
-import { useQuery, UseQueryResult, UseQueryOptions } from 'react-query';
 import {
   FindLiveShoppingDto,
+  FindNowPlayingLiveShoppingDto,
   LiveShoppingOutline,
   LiveShoppingWithGoods,
 } from '@project-lc/shared-types';
-import { Broadcaster } from '@prisma/client';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export const getLiveShoppingList = async (
@@ -30,25 +30,24 @@ export const useLiveShoppingList = (
   );
 };
 
-export const getLiveShoppingNowPlaying = async (
-  broadcasterId: Broadcaster['id'],
+export const getLiveShoppingNowOnLive = async (
+  dto: FindNowPlayingLiveShoppingDto,
 ): Promise<LiveShoppingOutline[]> => {
   return axios
-    .get<LiveShoppingOutline[]>('/live-shoppings/now-playing', {
-      params: { broadcasterId },
+    .get<LiveShoppingOutline[]>('/live-shoppings/now-on-live', {
+      params: dto,
     })
     .then((res) => res.data);
 };
 
 /** 현재 진행중인 라이브쇼핑 목록 조회 */
-export const useLiveShoppingNowPlaying = (
-  broadcasterId?: Broadcaster['id'] | string,
+export const useLiveShoppingNowOnLive = (
+  dto: FindNowPlayingLiveShoppingDto,
 ): UseQueryResult<LiveShoppingOutline[], AxiosError> => {
-  const queryKey = ['LiveShoppingNowPlaying', broadcasterId];
-  const bcId = Number(broadcasterId);
+  const queryKey = ['LiveShoppingNowOnLive', dto];
   return useQuery<LiveShoppingOutline[], AxiosError>(
     queryKey,
-    () => getLiveShoppingNowPlaying(bcId),
-    { enabled: !!bcId },
+    () => getLiveShoppingNowOnLive(dto),
+    { enabled: !(!dto.broadcasterId && !dto.goodsId && !dto.goodsIds) },
   );
 };

@@ -23,6 +23,7 @@ import { GoodsService } from '@project-lc/nest-modules-goods';
 import {
   ApprovedGoodsNameAndId,
   FindLiveShoppingDto,
+  FindNowPlayingLiveShoppingDto,
   LiveShoppingOutline,
   LiveShoppingRegistDTO,
   LiveShoppingWithGoods,
@@ -89,10 +90,13 @@ export class LiveShoppingController {
     return this.purchaseMessageService.getAllMessagesAndPrice(liveShoppingId);
   }
 
-  @Get('now-playing')
-  getNowPlayingLiveShopping(
-    @Query('broadcasterId', ParseIntPipe) broadcasterId: number,
+  @Get('now-on-live')
+  async getNowPlayingLiveShopping(
+    @Query(new ValidationPipe({ transform: true })) dto: FindNowPlayingLiveShoppingDto,
   ): Promise<LiveShoppingOutline[]> {
-    return this.liveShoppingService.getNowPlayingLiveShopping({ broadcasterId });
+    if (dto.broadcasterId || dto.goodsId || dto.goodsIds) {
+      return this.liveShoppingService.getNowPlayingLiveShopping(dto);
+    }
+    return [];
   }
 }

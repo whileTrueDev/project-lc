@@ -277,7 +277,7 @@ export class FmOrdersService {
 
     // * 판매유형(라이브쇼핑, 홍보페이지, 일반)
     const lvs = await this.liveShoppingService.findLiveShoppingsByGoodsIds(goodsIds);
-    const pps = await this.productPromotionService.findProductPromotionsByGoodsIds(
+    const pps = await this.productPromotionService._findProductPromotionsByGoodsIds(
       goodsIds,
     );
     const liveShoppingIds = lvs.map((x) => x.fmGoodsSeq);
