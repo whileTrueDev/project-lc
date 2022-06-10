@@ -95,25 +95,11 @@ export const testsellerExtraData: {
             },
             {
               shipping_set_type: 'add',
-              shipping_opt_type: 'cnt',
-              section_st: 0,
-              section_ed: 5,
+              shipping_opt_type: 'fixed',
               shippingCost: {
                 create: {
-                  shipping_area_name: '대한민국',
-                  shipping_cost: 2500,
-                },
-              },
-            },
-            {
-              shipping_set_type: 'add',
-              shipping_opt_type: 'cnt',
-              section_st: 5,
-              section_ed: 0,
-              shippingCost: {
-                create: {
-                  shipping_area_name: '대한민국',
-                  shipping_cost: 1000,
+                  shipping_area_name: '제주특별자치도',
+                  shipping_cost: 5000,
                 },
               },
             },
