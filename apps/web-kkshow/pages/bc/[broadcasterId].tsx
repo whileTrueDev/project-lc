@@ -34,7 +34,7 @@ export function BroadcasterPromotionPage(): JSX.Element {
     [broadcasterId],
   );
 
-  if ((router.isReady && !broadcasterId) || typeof broadcasterId !== 'string') {
+  if (bc.isLoading) {
     return (
       <Box>
         <KkshowLayout>
@@ -46,7 +46,9 @@ export function BroadcasterPromotionPage(): JSX.Element {
     );
   }
 
-  if (!bc.data || !bc.data?.userNickname)
+  if (!bc.data) return null;
+
+  if (bc.data && !bc.data.userNickname)
     return (
       <Box>
         <KkshowLayout>
