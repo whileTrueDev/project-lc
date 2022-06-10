@@ -26,6 +26,6 @@ export const useGetOrderShippingCheck = (
   return useQuery<OrderShippingData, AxiosError>(
     'GetOrderShippingCheck',
     () => getOrderShippingCheck(dto),
-    { enabled: !!dto },
+    { enabled: !!dto && dto.items.length > 0 },
   );
 };

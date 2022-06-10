@@ -1,5 +1,12 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
-import { Order, OrderItemOption, OrderProcessStep, Prisma } from '@prisma/client';
+import {
+  Goods,
+  GoodsOptions,
+  Order,
+  OrderItemOption,
+  OrderProcessStep,
+  Prisma,
+} from '@prisma/client';
 import { UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -20,10 +27,13 @@ import {
   sellerOrderSteps,
   UpdateOrderDto,
   OrderShippingCheckDto,
+  ShippingCheckItem,
+  ShippingCostByShippingGroupId,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
+import { calculateShippingCost } from '@project-lc/utils';
 
 dayjs.extend(isToday);
 @Injectable()
@@ -889,30 +899,33 @@ export class OrderService {
    *
    * 리턴형태
    * {
-   *  배송비그룹id : { isShippingAvailable: boolean, items: goodsId[], cost: number },
-   *  배송비그룹id : { isShippingAvailable: boolean, items: goodsId[], cost: number },
+   *  배송비그룹id : { isShippingAvailable: boolean, items: goodsId[], cost: {std:number, add:number} | null },
+   *  배송비그룹id : { isShippingAvailable: boolean, items: goodsId[], cost: {std:number, add:number} | null },
+   *  ...
    * }
    */
-  async checkOrderShippingCost(dto: OrderShippingCheckDto): Promise<any> {
-    console.log(dto);
-    // 배송비 조회 위해 필요한 정보
-
+  async checkOrderShippingCost(
+    dto: OrderShippingCheckDto,
+  ): Promise<ShippingCostByShippingGroupId> {
     // * 선물주문이 아닌경우 dto로 들어온 주소
     let address = dto.address || '';
+    let postalCode = dto.postalCode || '';
     // * 선물주문인경우 방송인의 주소
     if (dto.isGiftOrder && dto.broadcasterId) {
       const broadcasterAddress = await this.prisma.broadcasterAddress.findUnique({
         where: { broadcasterId: dto.broadcasterId },
       });
       address = broadcasterAddress.address;
+      postalCode = broadcasterAddress.postalCode;
     }
 
-    // 쿼리스트링으로 넘어오는 items validation 오류 해결 못해서 여기서 객체로 바꿈
-    const items = dto.items.map((list) => JSON.parse(list.toString()));
+    // 쿼리스트링으로 넘어오는 items값 validation 오류(type transform 적용 안되서 string으로 들어옴) 해결 못해서 여기서 객체로 바꿈
+    const items: ShippingCheckItem[] = dto.items?.map((list) =>
+      JSON.parse(list.toString()),
+    );
 
     // * 주문상품의 배송비 그룹 정보(배송정책,배송옵션,배송지역별가격)
     const goodsIdList = [...new Set(items.map((i) => i.goodsId))];
-
     const shippingGroups = await this.prisma.shippingGroup.findMany({
       where: { goods: { some: { id: { in: goodsIdList } } } },
       include: {
@@ -928,34 +941,55 @@ export class OrderService {
       where: { id: { in: optionIdList } },
       include: { goods: { select: { shippingGroupId: true } } },
     });
+    const goodsOptionsWithQuanntity: (ShippingCheckItem &
+      GoodsOptions & { goods: { shippingGroupId: Goods['shippingGroupId'] } })[] =
+      options.map((opt) => {
+        const _item = items.find((i) => i.goodsOptionId === opt.id);
+        return { ...opt, ..._item };
+      });
 
-    // * 배송그룹별 주문상품
+    // * {배송그룹id : 상품옵션정보[]}
     const shippingGroupIdList = shippingGroups.map((sg) => sg.id);
-    const dataByShippingGroupId = shippingGroupIdList.reduce((obj, shippingGroupId) => {
-      const includedOptions = options.filter(
-        (opt) => opt.goods.shippingGroupId === shippingGroupId,
-      );
+    const goodsOptionsByShippingGroupId = shippingGroupIdList.reduce(
+      (obj, shippingGroupId) => {
+        const includedGoodsOptions = goodsOptionsWithQuanntity.filter(
+          (opt) => opt.goods.shippingGroupId === shippingGroupId,
+        );
+        return {
+          ...obj,
+          [shippingGroupId]: includedGoodsOptions,
+        };
+      },
+      {} as Record<
+        number,
+        (ShippingCheckItem &
+          GoodsOptions & { goods: { shippingGroupId: Goods['shippingGroupId'] } })[]
+      >,
+    );
+
+    const tempResult = shippingGroups.reduce((result, cur) => {
+      const curShippingGroupData = cur;
+      const goodsOptions = goodsOptionsByShippingGroupId[cur.id];
+      const withShippingCalculTypeFree = shippingGroups
+        .filter((g) => g.id !== cur.id && g.sellerId === cur.sellerId)
+        .some((g) => g.shipping_calcul_type === 'free');
+      const { cost, isShippingAvailable } = calculateShippingCost({
+        postalCode,
+        address,
+        shippingGroupData: curShippingGroupData,
+        goodsOptions,
+        withShippingCalculTypeFree,
+      });
       return {
-        ...obj,
-        [shippingGroupId]: {
-          items: includedOptions.map((opt) => opt.id),
-          cost: includedOptions.reduce((sum, cur) => sum + Number(cur.price), 0), // 여기서 가격은 필요없음..
+        ...result,
+        [cur.id]: {
+          cost,
+          isShippingAvailable,
+          items: [...new Set(goodsOptions.map((o) => o.goodsId))], // 해당배송비에 묶인 상품 goodsId
         },
       };
-    }, {} as Record<number, { isShippingAvailable?: boolean; items: number[]; cost: number }>);
+    }, {} as ShippingCostByShippingGroupId);
 
-    // TODO: 필요한 정보 정리해서 배송비 계산하기
-    console.log({ address, shippingGroups, options, dataByShippingGroupId });
-    // * 리턴값
-    // 배송비그룹 id 별 배송가능여부, 포함된 주문상품id, 배송비
-
-    const dummyResult = {
-      1: {
-        isShippingAvailable: true,
-        items: [1, 2, 3, 4],
-        cost: { std: 2000, add: 2000 },
-      },
-    };
-    return dummyResult;
+    return tempResult;
   }
 }

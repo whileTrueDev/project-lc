@@ -134,13 +134,15 @@ export function DeliveryAddress(): JSX.Element {
       console.log(params);
 
       // 배송비 조회 요청
-      getOrderShippingCheck(params)
-        .then((res) => {
-          if (res) {
-            setShippingData(res);
-          }
-        })
-        .catch((e) => console.error(e));
+      if (params.items.length > 0) {
+        getOrderShippingCheck(params)
+          .then((res) => {
+            if (res) {
+              setShippingData(res);
+            }
+          })
+          .catch((e) => console.error(e));
+      }
     }
   }, [address, getValues, postalCode, setShippingData]);
 
