@@ -68,3 +68,11 @@ export function getLiveShoppingProgress(
       return '등록됨';
   }
 }
+
+/** 라이브쇼핑이 현재 판매중인지 여부 조회 */
+export function getLiveShoppingIsNowLive(params: LiveShoppingProgressParams): boolean {
+  const liveShoppingStatus = getLiveShoppingProgress(params);
+  if (['판매중', '판매중', '방송진행중', '방송종료'].includes(liveShoppingStatus))
+    return true;
+  return false;
+}

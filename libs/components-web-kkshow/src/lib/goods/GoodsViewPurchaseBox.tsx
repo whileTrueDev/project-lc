@@ -42,7 +42,11 @@ import {
   useLiveShoppingNowOnLive,
   useProfile,
 } from '@project-lc/hooks';
-import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
+import {
+  getLiveShoppingIsNowLive,
+  GoodsByIdRes,
+  GoodsRelatedBroadcaster,
+} from '@project-lc/shared-types';
 import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
 import {
   checkGoodsPurchasable,
@@ -417,6 +421,13 @@ function GoodsViewButtonSet({
   const createCartItem = useCartMutation();
   const handleCartClick = useCallback((): void => {
     if (!executePurchaseCheck()) return;
+
+    const connectedLiveShopping = goods.LiveShopping?.find(
+      (ls) => ls.broadcasterId === selectedBc?.id && getLiveShoppingIsNowLive(ls),
+    )?.id;
+    const connectedProductPromotion = goods.productPromotion?.find(
+      (pp) => pp.broadcasterId === selectedBc?.id,
+    )?.id;
     createCartItem
       .mutateAsync({
         goodsId: goods.id,
@@ -437,6 +448,11 @@ function GoodsViewButtonSet({
               broadcasterId: selectedBc.id,
               nickname: selectedBc?.userNickname,
               message: supportMessage,
+              liveShoppingId: connectedLiveShopping,
+              // 라이브쇼핑 후원의 경우 상품홍보 후원으로는 포함시키지 않는다. (수수료 두번 처리될 가능성)
+              productPromotionId: !connectedLiveShopping
+                ? connectedProductPromotion
+                : undefined,
             }
           : undefined,
       })
@@ -451,8 +467,10 @@ function GoodsViewButtonSet({
     cartDoneDialog,
     createCartItem,
     executePurchaseCheck,
+    goods.LiveShopping,
     goods.ShippingGroup,
     goods.id,
+    goods.productPromotion,
     goods.shippingGroupId,
     selectedBc,
     selectedOpts,

@@ -9,7 +9,7 @@ import {
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
   LiveShoppingWithGoods,
-  getLiveShoppingProgress,
+  getLiveShoppingIsNowLive,
   LiveShoppingOutline,
   FindNowPlayingLiveShoppingDto,
 } from '@project-lc/shared-types';
@@ -125,9 +125,7 @@ export class LiveShoppingService {
     });
 
     return liveShoppings.filter((liveShopping) => {
-      const isLive = getLiveShoppingProgress(liveShopping);
-      if (['판매중', '판매중', '방송진행중', '방송종료'].includes(isLive)) return true;
-      return false;
+      return getLiveShoppingIsNowLive(liveShopping);
     });
   }
 

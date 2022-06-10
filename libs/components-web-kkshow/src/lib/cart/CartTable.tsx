@@ -319,7 +319,7 @@ export function CartItemDisplay({
   // 현재 상품이 라이브쇼핑 판매중인지 여부 (선택된 방송인에 의한 라이브쇼핑판매)
   const isNowLive = useIsThisGoodsNowOnLive(
     cartItem.goods.id,
-    cartItem.support.broadcasterId || undefined,
+    cartItem.support?.broadcasterId || undefined,
   );
 
   return (

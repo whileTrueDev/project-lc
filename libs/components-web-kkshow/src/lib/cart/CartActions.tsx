@@ -108,6 +108,8 @@ export function CartActions(): JSX.Element {
                   message: i.support.message || '',
                   nickname: i.support.broadcaster.userNickname,
                   avatar: i.support.broadcaster.avatar,
+                  liveShoppingId: i.support.liveShoppingId || undefined,
+                  productPromotionId: i.support.productPromotionId || undefined,
                 }
               : undefined,
           };

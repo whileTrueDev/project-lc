@@ -230,13 +230,13 @@ async function createDummyBroadcasterAddress(broadcaster: Broadcaster): Promise<
 async function createDummyBroadcasterChannel(broadcaster: Broadcaster): Promise<void> {
   await prisma.broadcasterChannel.create({
     data: {
-      url: dummyBroadcasterChannel.url,
+      url: `${dummyBroadcasterChannel.url}/asdfasdfasdfasdfasdfasdf`,
       broadcaster: { connect: { id: broadcaster.id } },
     },
   });
   await prisma.broadcasterChannel.create({
     data: {
-      url: 'https://afreecatv.com',
+      url: 'https://afreecatv.comasdfasdfasdfasdfasdfasdf',
       broadcaster: { connect: { id: broadcaster.id } },
     },
   });
