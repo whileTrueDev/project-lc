@@ -2,6 +2,7 @@ import {
   Broadcaster,
   BroadcasterChannel,
   BroadcasterPromotionPage,
+  Goods,
   GoodsImages,
   GoodsOptions,
   LiveShopping,
@@ -29,3 +30,22 @@ export interface LiveShoppingWithGoods extends LiveShopping {
   liveShoppingVideo: { youtubeUrl: string };
   images: LiveShoppingImage[];
 }
+
+export type LiveShoppingOutline = Pick<
+  LiveShopping,
+  | 'id'
+  | 'goodsId'
+  | 'sellStartDate'
+  | 'sellEndDate'
+  | 'broadcastStartDate'
+  | 'broadcastEndDate'
+  | 'progress'
+  | 'liveShoppingName'
+> & {
+  images: LiveShoppingImage[];
+} & {
+  goods: Pick<Goods, 'id' | 'goods_name' | 'summary'> & {
+    image: GoodsImages[];
+    options: GoodsOptions[];
+  };
+};

@@ -159,6 +159,7 @@ export * from './lib/queries/useOrderList';
 export * from './lib/queries/usePayment';
 export * from './lib/queries/usePolicy';
 export * from './lib/queries/useProfile';
+export * from './lib/queries/usePromotionPage';
 export * from './lib/queries/usePurchaseMessages';
 export * from './lib/queries/useReturn';
 export * from './lib/queries/useReviews';

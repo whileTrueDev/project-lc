@@ -3,8 +3,8 @@ import { Type } from 'class-transformer';
 import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class FindManyDto {
-  @Type(() => Number) @IsOptional() @IsNumber() take?: number;
-  @Type(() => Number) @IsOptional() @IsNumber() skip?: number;
+  @Type(() => Number) @IsOptional() @IsNumber() take?: number = 3;
+  @Type(() => Number) @IsOptional() @IsNumber() skip?: number = 0;
 
   @IsOptional()
   @IsString()

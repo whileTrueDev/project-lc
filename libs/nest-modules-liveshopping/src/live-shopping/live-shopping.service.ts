@@ -9,6 +9,8 @@ import {
   LiveShoppingRegistDTO,
   LiveShoppingsWithBroadcasterAndGoodsName,
   LiveShoppingWithGoods,
+  getLiveShoppingProgress,
+  LiveShoppingOutline,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -51,8 +53,8 @@ export class LiveShoppingService {
     return true;
   }
 
+  /** 라이브 쇼핑 목록 조회 */
   async findLiveShoppings(dto?: FindLiveShoppingDto): Promise<LiveShoppingWithGoods[]> {
-    // 자신의 id를 반환하는 쿼리 수행하기
     const { id, goodsIds, broadcasterId, sellerId } = dto;
     return this.prisma.liveShopping.findMany({
       where: {
@@ -83,6 +85,41 @@ export class LiveShoppingService {
         liveShoppingVideo: { select: { youtubeUrl: true } },
         images: true,
       },
+    });
+  }
+
+  /** 현재 판매중(라이브 진행중 포함) 인 라이브쇼핑 목록 조회 */
+  public async getNowPlayingLiveShopping(dto?: {
+    broadcasterId?: number;
+  }): Promise<LiveShoppingOutline[]> {
+    const liveShoppings = await this.prisma.liveShopping.findMany({
+      where: { broadcasterId: dto?.broadcasterId || undefined, progress: 'confirmed' },
+      select: {
+        id: true,
+        goodsId: true,
+        goods: {
+          select: {
+            id: true,
+            goods_name: true,
+            summary: true,
+            image: { take: 1, orderBy: { cut_number: 'asc' } },
+            options: true,
+          },
+        },
+        sellStartDate: true,
+        sellEndDate: true,
+        broadcastStartDate: true,
+        broadcastEndDate: true,
+        progress: true,
+        images: true,
+        liveShoppingName: true,
+      },
+    });
+
+    return liveShoppings.filter((liveShopping) => {
+      const isLive = getLiveShoppingProgress(liveShopping);
+      if (['판매중', '판매중', '방송진행중', '방송종료'].includes(isLive)) return true;
+      return false;
     });
   }
 
