@@ -221,63 +221,6 @@ const checkShippingCostFree = (
   };
 };
 
-/** 장바구니 페이지에서 해당 배송비 정책에 부과될 배송비 계산
- * 장바구니 화면에서는 주소정보가 없으므로 특정지역정보를 가지고 있는 추가배송비는 고려하지 않는다
- * => 기본 배송세트(ShippingSet.default_yn === Y)의 배송옵션을 기준으로 계산 (주소, 배송방식 고려하지 않음)
- *
- * @param shippingGroup 장바구니상품에 적용된 배송비정책 shippingGroup & shippingSet & shippingOption & shippingCost
- * @param cartItems 해당 배송비정책과 연결된 장바구니상품들 cartItem & cartItemOption
- * @param withShippingCalculTypeFree 장바구니에 담긴 상품중 배송비정책 ShippingCalculType이 무료계산-묶음배송이 있는지 여부
- * */
-export const calculateShippingCostInCartTable = ({
-  shippingGroup,
-  cartItems,
-  withShippingCalculTypeFree,
-}: {
-  shippingGroup: GoodsByIdRes['ShippingGroup'];
-  cartItems: Array<CartItem & { options: CartItemOption[] }>;
-  withShippingCalculTypeFree?: boolean; // 동일 판매자의 shipping_calcul_type === 'free'인 다른 배송그룹상품과 같이 주문했는지 여부
-}): ShippingOptionCost | null => {
-  if (!cartItems.length) return null;
-  const { shipping_calcul_type } = shippingGroup;
-
-  const { isStdShippingCostFree } = checkShippingCostFree(
-    shippingGroup,
-    withShippingCalculTypeFree,
-  );
-
-  const shippingCost = {
-    std: 0,
-    add: 0,
-  };
-
-  // 배송비그룹 묶음계산-무료배송인경우 기본배송비 1번만 부과
-  if (shipping_calcul_type === 'bundle') {
-    if (!isStdShippingCostFree) {
-      shippingCost.std += Number(getStandardShippingCost(shippingGroup));
-    }
-  }
-
-  // 배송비그룹 개별계산-개별배송인경우 상품별로 기본배송비 부과
-  if (shipping_calcul_type === 'each') {
-    // 장바구니 상품별로 주문가격, 개수, 무게 구한다
-    const optionsTotalByItemList = cartItems.map((item) => {
-      return {
-        cartItemId: item.id,
-        optionsTotal: sumItemOptionValues(item.options),
-      };
-    });
-
-    if (!isStdShippingCostFree) {
-      // 상품별로 기본배송비 부과
-      optionsTotalByItemList.forEach((_) => {
-        shippingCost.std += Number(getStandardShippingCost(shippingGroup));
-      });
-    }
-  }
-  return shippingCost;
-};
-
 /** 배송옵션목록에서 배송옵션에 설정된 주소목록을 반환 (주소 형태는 KOREA_PROVINCES 에 있음)
  * @return  예 : ['전라북도', '충청북도']
  */
@@ -361,14 +304,16 @@ export function checkShippingAvailable({
   return shippingFlag;
 }
 
-/** 주소지 고려하여 기본배송비 계산
+/** 기본배송비 계산
+ * address 가 있는 경우 주소지 고려하여 기본배송비 계산(지역제한배송인데 address 주소에 대한 배송옵션이 없는경우 배송불가지역으로 판단하여 null리턴)
+ * address 가 없는 경우 & 지역제한배송인 경우 배송옵션지역 중 임의로 첫번째 지역에 대한 배송옵션가격 적용
  */
 export function calculateStdShippingCost({
   address,
   shippingGroupData,
   itemOption,
 }: {
-  address: string;
+  address?: string;
   shippingGroupData: ShippingGroupData;
   itemOption: { amount?: number; cnt?: number; weight?: number };
 }): number | null {
@@ -388,15 +333,28 @@ export function calculateStdShippingCost({
   // 전국배송인경우 전체 배송옵션 고려하여 기본배송비 계산
   let shippingOptions = stdOptions;
 
-  // 지역제한배송인경우 받는곳 주소에 해당하는 배송옵션만 추려내어 기본배송비를 계산한다
-  if (isDeliveryAreaLimited) {
-    shippingOptions = filterDeliveryLimitedShippingOptions({
-      address,
-      shippingOptions: stdOptions,
-    });
+  // * 주소정보가 있는 경우
+  if (address) {
+    // 지역제한배송인경우 받는곳 주소에 해당하는 배송옵션만 추려내어 기본배송비를 계산한다
+    if (isDeliveryAreaLimited) {
+      shippingOptions = filterDeliveryLimitedShippingOptions({
+        address,
+        shippingOptions: stdOptions,
+      });
+    }
+
+    if (shippingOptions.length === 0) return null;
   }
 
-  if (shippingOptions.length === 0) return null;
+  // * 주소정보가 없는경우 => 기본배송옵션의 shippingCost.shipping_area_name이 대한민국이 아님. 특정 지역이 저장됨
+  // 지역제한배송인 경우 배송옵션 지역 중 첫번째 지역의 배송옵션 가격으로 기본배송비 계산한다
+  if (isDeliveryAreaLimited) {
+    const areaList = getShippingAreas(shippingOptions);
+    const baseArea = areaList[0];
+    shippingOptions = stdOptions.filter((opt) => {
+      return opt.shippingCost.some((cost) => cost.shipping_area_name === baseArea);
+    });
+  }
 
   const optType = shippingOptions[0].shipping_opt_type;
 
@@ -448,6 +406,77 @@ export function calculateAddShippingCost({
   });
   return cost;
 }
+
+/** 장바구니 페이지에서 해당 배송비 정책에 부과될 배송비 계산
+ * 장바구니 화면에서는 주소정보가 없으므로 특정지역정보를 가지고 있는 추가배송비는 고려하지 않는다
+ * => 기본 배송세트(ShippingSet.default_yn === Y)의 배송옵션을 기준으로 계산 (주소, 배송방식 고려하지 않음)
+ *
+ * @param shippingGroup 장바구니상품에 적용된 배송비정책 shippingGroup & shippingSet & shippingOption & shippingCost
+ * @param cartItems 해당 배송비정책과 연결된 장바구니상품들 cartItem & cartItemOption
+ * @param withShippingCalculTypeFree 장바구니에 담긴 상품중 배송비정책 ShippingCalculType이 무료계산-묶음배송이 있는지 여부
+ * */
+export const calculateShippingCostInCartTable = ({
+  shippingGroup,
+  cartItems,
+  withShippingCalculTypeFree,
+}: {
+  shippingGroup: GoodsByIdRes['ShippingGroup'];
+  cartItems: Array<CartItem & { options: CartItemOption[] }>;
+  withShippingCalculTypeFree?: boolean; // 동일 판매자의 shipping_calcul_type === 'free'인 다른 배송그룹상품과 같이 주문했는지 여부
+}): ShippingOptionCost | null => {
+  if (!cartItems.length) return null;
+  const { shipping_calcul_type } = shippingGroup;
+
+  const { isStdShippingCostFree } = checkShippingCostFree(
+    shippingGroup,
+    withShippingCalculTypeFree,
+  );
+
+  const shippingCost = {
+    std: 0,
+    add: 0,
+  };
+
+  // 배송비그룹 묶음계산-무료배송인경우 기본배송비 1번만 부과
+  if (shipping_calcul_type === 'bundle') {
+    // 전체 상품옵션개수, 상품옵션가격, 상품옵션무게 총합
+    const optionsTotal = sumItemOptionValues(cartItems.flatMap((item) => item.options));
+    if (!isStdShippingCostFree) {
+      // shippingCost.std += Number(getStandardShippingCost(shippingGroup));
+      shippingCost.std += Number(
+        calculateStdShippingCost({
+          shippingGroupData: shippingGroup,
+          itemOption: optionsTotal,
+        }),
+      );
+    }
+  }
+
+  // 배송비그룹 개별계산-개별배송인경우 상품별로 기본배송비 부과
+  if (shipping_calcul_type === 'each') {
+    // 장바구니 상품별로 주문가격, 개수, 무게 구한다
+    const optionsTotalByItemList = cartItems.map((item) => {
+      return {
+        cartItemId: item.id,
+        optionsTotal: sumItemOptionValues(item.options),
+      };
+    });
+
+    if (!isStdShippingCostFree) {
+      // 상품별로 기본배송비 부과
+      optionsTotalByItemList.forEach((itemData) => {
+        // shippingCost.std += Number(getStandardShippingCost(shippingGroup));
+        shippingCost.std += Number(
+          calculateStdShippingCost({
+            shippingGroupData: shippingGroup,
+            itemOption: itemData.optionsTotal,
+          }),
+        );
+      });
+    }
+  }
+  return shippingCost;
+};
 
 /** 제주 및 도서산간지역인지 확인 */
 export function checkRemoteArea({

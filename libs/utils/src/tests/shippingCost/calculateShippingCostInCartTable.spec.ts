@@ -7,6 +7,7 @@ import {
 } from '@prisma/client';
 import {
   calculateShippingCostInCartTable,
+  calculateStdShippingCost,
   ShippingGroupData,
 } from '../../lib/calculateShippingCost';
 import { createShippingOption } from './shippingOptions.spec';
@@ -191,6 +192,115 @@ describe('장바구니 배송비계산', () => {
         expect(shippingCost.add).toBe(0);
         expect(shippingCost.add + shippingCost.std).toBe(0);
       });
+    });
+  });
+
+  describe('기본배송비 30000원 미만 배송비 5000원, 30000이상 무료배송', () => {
+    const shippingOptions = [
+      createShippingOption({
+        setType: 'std',
+        optType: 'amount',
+        section_st: 0,
+        section_ed: 30000,
+        shippingCost: 5000,
+      }),
+      createShippingOption({
+        setType: 'std',
+        optType: 'amount',
+        section_st: 30000,
+        section_ed: 0,
+        shippingCost: 0,
+      }),
+    ];
+    const shippingGroupData: ShippingGroupData = {
+      ...dummyShippingGroup,
+      shipping_calcul_type: 'bundle',
+      shippingSets: [
+        {
+          ...dummyShippingSet,
+          shippingOptions,
+        },
+      ],
+    };
+    test('25000원 주문시 기본배송비 5000원', () => {
+      const stdCost = calculateStdShippingCost({
+        shippingGroupData,
+        itemOption: { amount: 25000 },
+      });
+      expect(stdCost).toBe(5000);
+    });
+
+    test('45000원 주문시 기본배송비 0원', () => {
+      const stdCost = calculateStdShippingCost({
+        shippingGroupData,
+        itemOption: { amount: 45000 },
+      });
+      expect(stdCost).toBe(0);
+    });
+  });
+
+  describe(`기본배송비 배송지역 서울, 경기도로 제한, 
+  서울지역 30000원 미만 배송비 2000원, 30000이상 무료배송
+  경기도지역 30000원 미만 배송비 5000원, 30000원이상 무료배송
+  `, () => {
+    const shippingOptions = [
+      createShippingOption({
+        setType: 'std',
+        optType: 'amount',
+        section_st: 0,
+        section_ed: 30000,
+        shippingCost: 2000,
+        shippingArea: '서울특별시',
+      }),
+      createShippingOption({
+        setType: 'std',
+        optType: 'amount',
+        section_st: 30000,
+        section_ed: 0,
+        shippingCost: 0,
+        shippingArea: '서울특별시',
+      }),
+      createShippingOption({
+        setType: 'std',
+        optType: 'amount',
+        section_st: 0,
+        section_ed: 30000,
+        shippingCost: 5000,
+        shippingArea: '경기도',
+      }),
+      createShippingOption({
+        setType: 'std',
+        optType: 'amount',
+        section_st: 30000,
+        section_ed: 0,
+        shippingCost: 0,
+        shippingArea: '경기도',
+      }),
+    ];
+    const shippingGroupData: ShippingGroupData = {
+      ...dummyShippingGroup,
+      shipping_calcul_type: 'bundle',
+      shippingSets: [
+        {
+          ...dummyShippingSet,
+          shippingOptions,
+        },
+      ],
+    };
+    test('25000원 주문시 기본배송비 2000원 (주소정보가 없는경우 첫번째 지역의 배송비 선택)', () => {
+      const stdCost = calculateStdShippingCost({
+        shippingGroupData,
+        itemOption: { amount: 25000 },
+      });
+      expect(stdCost).toBe(2000);
+    });
+
+    test('45000원 주문시 기본배송비 0원(주소정보가 없는경우 첫번째 지역의 배송비 선택)', () => {
+      const stdCost = calculateStdShippingCost({
+        shippingGroupData,
+        itemOption: { amount: 45000 },
+      });
+      expect(stdCost).toBe(0);
     });
   });
 });
