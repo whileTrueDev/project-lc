@@ -5,10 +5,10 @@ import {
   ShippingGroup,
   ShippingSet,
 } from '@prisma/client';
+import { ShippingGroupData } from '@project-lc/shared-types';
 import {
   calculateShippingCostInCartTable,
   calculateStdShippingCost,
-  ShippingGroupData,
 } from '../../lib/calculateShippingCost';
 import { createShippingOption } from './shippingOptions.spec';
 

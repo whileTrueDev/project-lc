@@ -1,4 +1,4 @@
-import { CreateOrderForm } from '@project-lc/shared-types';
+import { CreateOrderForm, ShippingCostByShippingGroupId } from '@project-lc/shared-types';
 import create from 'zustand';
 
 export const orderNeedToFillInDefault = {
@@ -34,14 +34,7 @@ export type OrderPrepareData = Pick<
 >;
 
 /** 배송비정보 타입 */
-export type OrderShippingData = Record<
-  number, // 배송비그룹 id
-  {
-    isShippingAvailable?: boolean;
-    cost: { std: number; add: number } | null; // 기본배송비, 추가배송비
-    items: number[]; // 해당배송비에 포함된 goodsId[]
-  }
->;
+export type OrderShippingData = ShippingCostByShippingGroupId;
 export interface KkshowOrderStore {
   handlePaymentType(value: string): void;
   handleAddressType(value: string): void;

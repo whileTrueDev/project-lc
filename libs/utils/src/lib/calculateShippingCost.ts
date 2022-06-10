@@ -2,45 +2,19 @@ import {
   CartItem,
   CartItemOption,
   GoodsOptions,
-  ShippingCost,
   ShippingGroup,
-  ShippingOption,
   ShippingOptType,
-  ShippingSet,
 } from '@prisma/client';
 import {
   GoodsByIdRes,
   koreaProvincesShortForm,
   remoteAreaPostalcode,
   ShippingCheckItem,
+  ShippingCostCalculatedType,
+  ShippingGroupData,
+  ShippingOptionCost,
+  ShippingOptionWithCost,
 } from '@project-lc/shared-types';
-import { getStandardShippingCost } from '@project-lc/utils-frontend';
-
-/**
- * 가지고 있는 정보
- * ShippingGroup - 반송지정보, 배송비 계산방식, 기본/추가배송비 부과 여부, shippingSet[] 등
- * ShippingSet - 배송방식(택배, 직접배송 등), 전국배송/일부지역배송, 배송비 선불여부, shippingOption[]
- * ShippingOption - 기본/추가배송비 여부,
- * ShippingCost - 배송비, 적용지역
- */
-
-export type ShippingOptionWithCost = ShippingOption & {
-  shippingCost: ShippingCost[];
-};
-export type ShippingSetWithOptions = ShippingSet & {
-  shippingOptions: Array<ShippingOptionWithCost>;
-};
-
-export type ShippingGroupData =
-  | (ShippingGroup & {
-      shippingSets: Array<ShippingSetWithOptions>;
-    })
-  | null;
-
-export type ShippingOptionCost = {
-  std: number; // 기본배송비
-  add: number; // 추가배송비
-};
 
 /** 배송옵션의 배송비를 합쳐서 리턴함 */
 export function addShippingCost(
@@ -305,8 +279,9 @@ export function checkShippingAvailable({
 }
 
 /** 기본배송비 계산
- * address 가 있는 경우 주소지 고려하여 기본배송비 계산(지역제한배송인데 address 주소에 대한 배송옵션이 없는경우 배송불가지역으로 판단하여 null리턴)
- * address 가 없는 경우 & 지역제한배송인 경우 배송옵션지역 중 임의로 첫번째 지역에 대한 배송옵션가격 적용
+ * @param address? optional 값. 배송지 주소
+ *        address 가 있는 경우 주소지 고려하여 기본배송비 계산(지역제한배송인데 address 주소에 대한 배송옵션이 없는경우 배송불가지역으로 판단하여 null리턴)
+ *        address 가 없는 경우 & 지역제한배송인 경우 배송옵션지역 중 임의로 첫번째 지역에 대한 배송옵션가격 적용
  */
 export function calculateStdShippingCost({
   address,
@@ -465,7 +440,6 @@ export const calculateShippingCostInCartTable = ({
     if (!isStdShippingCostFree) {
       // 상품별로 기본배송비 부과
       optionsTotalByItemList.forEach((itemData) => {
-        // shippingCost.std += Number(getStandardShippingCost(shippingGroup));
         shippingCost.std += Number(
           calculateStdShippingCost({
             shippingGroupData: shippingGroup,
@@ -521,10 +495,7 @@ export function calculateShippingCost({
   shippingGroupData: ShippingGroupData;
   goodsOptions: (ShippingCheckItem & GoodsOptions)[];
   withShippingCalculTypeFree?: boolean; // 동일 판매자의 shipping_calcul_type === 'free'인 다른 배송그룹상품과 같이 주문했는지 여부
-}): {
-  isShippingAvailable: boolean;
-  cost: ShippingOptionCost | null;
-} {
+}): ShippingCostCalculatedType {
   // 2. 배송비그룹의 배송비계산방식에 따라 기본배송비, 추가배송비 부과
   const { shipping_calcul_type } = shippingGroupData;
   const { isStdShippingCostFree, isAddShippingCostFree } = checkShippingCostFree(
