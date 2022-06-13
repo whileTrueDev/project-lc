@@ -1620,13 +1620,13 @@ enum PaymentMethod {
 model OrderShipping {
   id                  Int                 @id @default(autoincrement()) // 고유 식별 번호
   shippingCostPayType ShippingCostPayType @default(prepay) // shipping_type 배송비 결제방식
-  shippingCost        String? // shipping_cost 실배송비
+  shippingCost        Decimal             @default("0.00") @db.Decimal(10, 2) // shipping_cost 실배송비
   shippingMethod      ShippingMethod? // shipping_method 배송방법
   shippingGroup       ShippingGroup?      @relation(fields: [shippingGroupId], references: [id], onDelete: SetNull)
   shippingSet         ShippingSet?        @relation(fields: [shippingSetId], references: [id], onDelete: SetNull)
   shippingGroupId     Int?
   shippingSetId       Int?
-  items               OrderItemOption[] // 해당 배송비에 포함된 주문상품옵션들
+  items               OrderItem[] // 이 배송방법으로 주문된 상품 목록
   order               Order?              @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId             Int?
 }
@@ -1676,6 +1676,8 @@ model OrderItem {
   exchangeItems          ExchangeItem[] // 교환상품
   reviewId               Int?
   review                 GoodsReview?            @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+  orderShipping          OrderShipping?          @relation(fields: [orderShippingId], references: [id], onDelete: SetNull)
+  orderShippingId        Int?
 }
 
 // 주문상품옵션
@@ -1699,8 +1701,7 @@ model OrderItemOption {
   exportItems            ExportItem[] // 출고상품
   orderCancellationItems OrderCancellationItem[] // 주문취소상품
   exchangeItems          ExchangeItem[] // 교환상품
-  orderShipping          OrderShipping?          @relation(fields: [orderShippingId], references: [id], onDelete: SetNull)
-  orderShippingId        Int?
+
 }
 
 // 주문상품후원

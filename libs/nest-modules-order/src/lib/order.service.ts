@@ -5,6 +5,7 @@ import {
   Order,
   OrderItemOption,
   OrderProcessStep,
+  OrderShipping,
   Prisma,
 } from '@prisma/client';
 import { UserPwManager } from '@project-lc/nest-core';
@@ -29,6 +30,8 @@ import {
   OrderShippingCheckDto,
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
+  CreateOrderShippingDto,
+  CreateOrderShippingData,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
@@ -119,9 +122,49 @@ export class OrderService {
     };
   }
 
+  /** 주문에 포함된 배송비정보 생성 */
+  async createOrderShippingData(
+    orderId: number,
+    shippingData: CreateOrderShippingData[],
+  ): Promise<OrderShipping[]> {
+    // 주문에 연결된 주문상품 조회
+    const createdOrderItems = await this.prisma.orderItem.findMany({
+      where: { orderId },
+    });
+
+    return this.prisma.$transaction(
+      shippingData.map((_shippingData) => {
+        const { shippingCost, shippingGroupId, items } = _shippingData;
+
+        // goodsId로 배송비에 포함된 주문상품 찾기
+        const relatedOrderItemsIdList = createdOrderItems
+          .filter((item) => {
+            const { goodsId } = item;
+            return items.includes(goodsId);
+          })
+          .map((item) => ({ id: item.id }));
+
+        return this.prisma.orderShipping.create({
+          data: {
+            order: { connect: { id: orderId } },
+            shippingGroup: { connect: { id: shippingGroupId } },
+            shippingCost,
+            items: { connect: relatedOrderItemsIdList },
+          },
+        });
+      }),
+    );
+  }
+
   /** 주문생성 */
-  async createOrder(dto: CreateOrderDto): Promise<Order> {
-    console.log(dto);
+  async createOrder({
+    orderDto,
+    shippingData,
+  }: {
+    orderDto: CreateOrderDto;
+    shippingData: CreateOrderShippingData[];
+  }): Promise<Order> {
+    console.log(orderDto);
     const {
       customerId,
       cartItemIdList,
@@ -131,7 +174,7 @@ export class OrderService {
       totalDiscount,
       paymentId,
       ...data // createInput에 사용할 데이터
-    } = dto;
+    } = orderDto;
     const {
       nonMemberOrderFlag,
       giftFlag,
@@ -150,12 +193,12 @@ export class OrderService {
 
     // 비회원 주문의 경우 비밀번호 해시처리
     if (nonMemberOrderFlag) {
-      createInput = { ...createInput, ...(await this.handleNonMemberOrder(dto)) };
+      createInput = { ...createInput, ...(await this.handleNonMemberOrder(orderDto)) };
     }
 
     // 선물하기의 경우(주문상품은 1개, 후원데이터가 존재함)
     if (giftFlag && orderItems.length === 1 && !!orderItems[0].support) {
-      createInput = { ...createInput, ...(await this.handleGiftOrder(dto)) };
+      createInput = { ...createInput, ...(await this.handleGiftOrder(orderDto)) };
     }
 
     // 주문에 연결된 주문상품, 주문상품옵션, 주문상품후원 생성
@@ -168,7 +211,8 @@ export class OrderService {
     const order = await this.prisma.order.create({
       data: {
         ...createInput,
-        supportOrderIncludeFlag: supportOrderIncludeFlag || this.hasSupportOrderItem(dto),
+        supportOrderIncludeFlag:
+          supportOrderIncludeFlag || this.hasSupportOrderItem(orderDto),
         orderItems: {
           // 주문에 연결된 주문상품 생성
           create: orderItems.map((item) => {
@@ -201,10 +245,11 @@ export class OrderService {
     });
 
     /** *************** */
-    // TODO: 주문에 부과된 배송비정보(OrderShipping) 생성???
+    // * 주문에 부과된 배송비정보(OrderShipping) 생성
+    await this.createOrderShippingData(order.id, shippingData);
     /** *************** */
 
-    // 주문 생성 후 장바구니 비우기
+    // * 주문 생성 후 장바구니 비우기
     if (cartItemIdList) {
       await this.prisma.cartItem.deleteMany({
         where: { id: { in: cartItemIdList } },
@@ -471,7 +516,6 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true } },
         returns: { include: { items: true } },
         orderCancellations: { include: { items: true } },
-        shippings: { include: { items: true } },
       },
     });
 
@@ -529,7 +573,7 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true, images: true } },
         returns: { include: { items: true, images: true } },
         orderCancellations: { include: { items: true } },
-        shippings: { include: { items: true } },
+        shippings: { include: { items: { include: { options: true } } } },
       },
     });
   }

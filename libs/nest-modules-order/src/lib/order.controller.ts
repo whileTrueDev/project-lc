@@ -17,6 +17,7 @@ import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateOrderDto,
+  CreateOrderShippingDto,
   FindAllOrderByBroadcasterRes,
   FindManyDto,
   GetNonMemberOrderDetailDto,
@@ -50,9 +51,11 @@ export class OrderController {
   /** 주문생성 - 가드 적용하지 않아야 함 */
   @Post()
   createOrder(
-    @Body(new ValidationPipe({ transform: true })) dto: CreateOrderDto,
+    @Body('order', new ValidationPipe({ transform: true })) order: CreateOrderDto,
+    @Body('shipping', ValidationPipe) { shipping }: CreateOrderShippingDto,
   ): Promise<Order> {
-    return this.orderService.createOrder(dto);
+    console.log(shipping);
+    return this.orderService.createOrder({ orderDto: order, shippingData: shipping });
   }
 
   /** 판매자 주문현황 조회 */

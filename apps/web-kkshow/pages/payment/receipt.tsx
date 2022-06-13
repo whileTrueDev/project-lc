@@ -8,6 +8,8 @@ import {
   Divider,
   Button,
   useColorModeValue,
+  Spinner,
+  Center,
 } from '@chakra-ui/react';
 import { useDisplaySize, usePaymentByOrderCode, useOrderDetail } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
@@ -24,7 +26,9 @@ export function Receipt(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const orderCode = router.query.orderCode as string;
   const orderId = Number(router.query.orderId);
-  const { data: orderDetailData } = useOrderDetail({ orderId });
+  const { data: orderDetailData, isLoading: orderDetailLoading } = useOrderDetail({
+    orderId,
+  });
   const { data: paymentData, isLoading } = usePaymentByOrderCode(orderCode);
   const virtualAccountBoxBgColor = useColorModeValue('gray.100', 'gray.700');
   const productOriginPrice =
@@ -41,6 +45,22 @@ export function Receipt(): JSX.Element {
 
   const discount = productOriginPrice - productDiscountedPrice;
 
+  const totalShippingCost = orderDetailData.shippings
+    ? orderDetailData.shippings
+        .map((s) => Number(s.shippingCost))
+        .reduce((sum, cur) => sum + cur, 0)
+        .toLocaleString()
+    : '';
+
+  if (orderDetailLoading) {
+    return (
+      <KkshowLayout>
+        <Center minHeight="80vh">
+          <Spinner />
+        </Center>
+      </KkshowLayout>
+    );
+  }
   return (
     <KkshowLayout>
       <Flex m="auto" alignItems="center" justifyContent="center" direction="column" p={2}>
@@ -130,9 +150,7 @@ export function Receipt(): JSX.Element {
               </Flex>
               <Flex justifyContent="space-between" color="gray.500">
                 <Text>배송비</Text>
-                <Text>
-                  + {orderDetailData.orderItems[0].shippingCost.toLocaleString()}
-                </Text>
+                <Text>+ {totalShippingCost}</Text>
               </Flex>
               <Flex justifyContent="space-between" color="gray.500">
                 <Text>쿠폰사용</Text>

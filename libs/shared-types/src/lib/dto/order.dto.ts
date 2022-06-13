@@ -4,10 +4,10 @@ import {
   OrderItem,
   OrderItemOption,
   OrderItemSupport,
-  OrderPayment,
   OrderProcessStep,
   PaymentMethod,
   SellType,
+  ShippingMethod,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
@@ -470,4 +470,40 @@ export class OrderPurchaseConfirmationDto {
   /** 구매확정 할 주문상품옵션 고유번호 */
   @IsNumber()
   orderItemOptionId: OrderItemOption['id'];
+}
+
+/** 주문배송비 타입 dto */
+export class CreateOrderShippingData {
+  /** 이 배송방법의 총 배송비 */
+  @IsNumber()
+  shippingCost: number;
+
+  /** shipping_method 배송방법 */
+  @IsEnum(ShippingMethod)
+  @IsOptional()
+  shippingMethod?: ShippingMethod;
+
+  /** 배송비그룹 고유번호 */
+  @IsNumber()
+  shippingGroupId: number;
+
+  /** 배송정책 고유번호 */
+  @IsNumber()
+  @IsOptional()
+  shippingSetId?: number;
+
+  @IsNumber({}, { each: true })
+  items: number[]; // 이 배송방법으로 주문된 상품 목록 goodsId[] -> 특정 orderId && goodsId에 해당하는  OrderItem 조회
+
+  /** 주문고유번호 */
+  @IsNumber()
+  @IsOptional()
+  orderId?: number;
+}
+/** 주문배송비 생성 dto */
+export class CreateOrderShippingDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateOrderShippingData)
+  shipping: CreateOrderShippingData[];
 }

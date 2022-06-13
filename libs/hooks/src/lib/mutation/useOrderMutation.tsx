@@ -25,15 +25,21 @@ export const useOrderUpdateMutation = (): UseMutationResult<
   );
 };
 
+export type OrderCreateDataType = {
+  order: CreateOrderDto;
+  shipping: any;
+};
+
 /** 주문 생성 훅 */
 export const useOrderCreateMutation = (): UseMutationResult<
   Order,
   AxiosError,
-  CreateOrderDto
+  OrderCreateDataType
 > => {
   const queryClient = useQueryClient();
-  return useMutation<Order, AxiosError, CreateOrderDto>(
-    (dto: CreateOrderDto) => axios.post<Order>(`/order`, dto).then((res) => res.data),
+  return useMutation<Order, AxiosError, OrderCreateDataType>(
+    (dto: OrderCreateDataType) =>
+      axios.post<Order>(`/order`, dto).then((res) => res.data),
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('Cart', { refetchInactive: true }); // 주문 생성 후 주문에 포함되었던 장바구니 상품 삭제함

@@ -70,7 +70,7 @@ export type OrderBaseData = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: Nullable<OrderPayment>;
   refunds: Nullable<Refund[]>;
-  shippings: (OrderShipping & { items: OrderItemOption[] })[];
+
   orderCancellations?: Nullable<OrderCancellationBaseData[]>;
   exports: Nullable<ExportBaseData[]>;
   mileageLogs: CustomerMileageLog[] | null;
@@ -101,7 +101,9 @@ export type OrderListRes = {
 export type OrderDetailRes = OrderBaseData & {
   exchanges: Nullable<ExchangeDataWithImages[]>;
   returns: Nullable<ReturnDataWithImages[]>;
-  shippings: Nullable<OrderShipping[]>;
+  shippings: Nullable<
+    (OrderShipping & { items: (OrderItem & { options: OrderItemOption[] })[] })[]
+  >;
 };
 /**
  * 방송인 후원 주문 목록 타입
