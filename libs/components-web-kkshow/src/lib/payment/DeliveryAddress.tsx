@@ -131,7 +131,6 @@ export function DeliveryAddress(): JSX.Element {
             quantity: opt.quantity,
           })),
       };
-      console.log(params);
 
       // 배송비 조회 요청
       if (params.items.length > 0) {

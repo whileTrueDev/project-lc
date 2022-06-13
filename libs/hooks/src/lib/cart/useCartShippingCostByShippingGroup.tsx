@@ -1,10 +1,7 @@
 import { SellerShop } from '@prisma/client';
+import { ShippingOptionCost, ShippingGroupData } from '@project-lc/shared-types';
 import { useCartStore } from '@project-lc/stores';
-import {
-  calculateShippingCostInCartTable,
-  ShippingGroupData,
-  ShippingOptionCost,
-} from '@project-lc/utils';
+import { calculateShippingCostInCartTable } from '@project-lc/utils';
 import { useMemo } from 'react';
 import { useCart } from '../queries/useCart';
 

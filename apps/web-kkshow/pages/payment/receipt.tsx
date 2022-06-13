@@ -27,15 +27,17 @@ export function Receipt(): JSX.Element {
   const { data: orderDetailData } = useOrderDetail({ orderId });
   const { data: paymentData, isLoading } = usePaymentByOrderCode(orderCode);
   const virtualAccountBoxBgColor = useColorModeValue('gray.100', 'gray.700');
-  const productOriginPrice = orderDetailData?.orderItems[0].options.reduce(
-    (s, a) => s + Number(a.normalPrice),
-    0,
-  );
+  const productOriginPrice =
+    orderDetailData?.orderItems
+      .flatMap((item) => item.options)
+      .map((opt) => Number(opt.normalPrice) * opt.quantity)
+      .reduce((s, a) => s + Number(a), 0) || 0;
 
-  const productDiscountedPrice = orderDetailData?.orderItems[0].options.reduce(
-    (s, a) => s + Number(a.discountPrice),
-    0,
-  );
+  const productDiscountedPrice =
+    orderDetailData?.orderItems
+      .flatMap((item) => item.options)
+      .map((opt) => Number(opt.discountPrice) * opt.quantity)
+      .reduce((s, a) => s + Number(a), 0) || 0;
 
   const discount = productOriginPrice - productDiscountedPrice;
 

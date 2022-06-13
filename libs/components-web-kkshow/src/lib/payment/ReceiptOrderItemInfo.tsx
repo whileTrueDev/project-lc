@@ -76,7 +76,8 @@ export function ReceiptOrderItemInfo({
                 </Text>
               </Center>
             </GridItem>
-            <GridItem>
+            {/* //  TODO: 배송비 표시 수정 */}
+            {/* <GridItem>
               <Flex
                 w="100%"
                 h="100%"
@@ -87,7 +88,7 @@ export function ReceiptOrderItemInfo({
                 <Text fontWeight="bold">{item.shippingCost.toLocaleString()}원</Text>
                 <Text as="sub">배송비</Text>
               </Flex>
-            </GridItem>
+            </GridItem> */}
           </Grid>
         </Box>
       ))}
