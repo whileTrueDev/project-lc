@@ -1,13 +1,13 @@
 import { Box, Button, Center, Divider, Flex, Text, useToast } from '@chakra-ui/react';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
 import { CreateOrderForm } from '@project-lc/shared-types';
-import { getLocaleNumber, setCookie } from '@project-lc/utils-frontend';
+import { useKkshowOrderStore } from '@project-lc/stores';
+import { getCustomerWebHost } from '@project-lc/utils';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
-import { useFormContext, SubmitHandler } from 'react-hook-form';
-import { useKkshowOrderStore } from '@project-lc/stores';
-import { getCustomerWebHost } from '@project-lc/utils';
+import { useFormContext } from 'react-hook-form';
 import { TermBox } from './TermBox';
 
 const mileageSetting = {
@@ -15,7 +15,7 @@ const mileageSetting = {
   mileageStrategy: 'onPaymentPrice',
 };
 
-function getOrderPrice(
+export function getOrderPrice(
   originalPrice: number,
   shippingCost: number,
   discount: number,
@@ -25,7 +25,7 @@ function getOrderPrice(
   return originalPrice + shippingCost - discount - mileageDiscount - couponDiscount;
 }
 
-async function doPayment(
+export async function doPayment(
   paymentType: '카드' | '계좌이체' | '가상계좌' | '미선택',
   client_key: string,
   amount: number,
@@ -78,9 +78,7 @@ export function MileageBenefit({
 }
 
 export function PaymentBox(): JSX.Element {
-  const CLIENT_KEY = process.env.NEXT_PUBLIC_PAYMENTS_CLIENT_KEY!;
-  const { paymentType, order, shipping } = useKkshowOrderStore();
-  const toast = useToast();
+  const { order, shipping } = useKkshowOrderStore();
   const PRODUCT_PRICE = order.orderPrice;
   // orderItem.shippingCost 가 아닌 kkshowOrderStore에 저장된 배송비 정보 참조하여 배송비 계산
   const SHIPPING_COST = Object.values(shipping).reduce((prev, curr) => {
@@ -96,37 +94,7 @@ export function PaymentBox(): JSX.Element {
     productName = productNameArray[0] || '';
   }
 
-  const { handleSubmit, watch, getValues } = useFormContext<CreateOrderForm>();
-  const onSubmit: SubmitHandler<CreateOrderForm> = async (submitData) => {
-    if (paymentType === '미선택') {
-      toast({
-        title: '결제수단을 선택해주세요',
-        status: 'error',
-        position: 'top',
-      });
-    } else {
-      console.log(submitData);
-      const amount = getOrderPrice(
-        PRODUCT_PRICE,
-        SHIPPING_COST,
-        DISCOUNT,
-        getValues('usedMileageAmount') || 0,
-        getValues('usedCouponAmount') || 0,
-      );
-      const cookieExpire = new Date();
-      cookieExpire.setMinutes(cookieExpire.getMinutes() + 1);
-      setCookie('amount', amount, { expire: cookieExpire });
-      // doPayment(paymentType, CLIENT_KEY, amount, productName, getValues('name'));
-      await doPayment(
-        paymentType,
-        CLIENT_KEY,
-        amount,
-        productName,
-        getValues('ordererName'),
-      );
-      console.log('payment done');
-    }
-  };
+  const { watch } = useFormContext<CreateOrderForm>();
 
   return (
     <Box
@@ -135,8 +103,8 @@ export function PaymentBox(): JSX.Element {
       top="0px"
       left="0px"
       right="0px"
-      as="form"
-      onSubmit={handleSubmit(onSubmit)}
+      // as="form"
+      // onSubmit={handleSubmit(onSubmit)}
     >
       <Text>{JSON.stringify(shipping)}</Text>
       <SectionWithTitle title="적립혜택" disableDivider>

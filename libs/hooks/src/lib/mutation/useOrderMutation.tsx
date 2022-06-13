@@ -1,5 +1,5 @@
 import { Order } from '@prisma/client';
-import { UpdateOrderDto } from '@project-lc/shared-types';
+import { CreateOrderDto, UpdateOrderDto } from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
 import { useQueryClient, useMutation, UseMutationResult } from 'react-query';
 import axios from '../../axios';
@@ -22,5 +22,16 @@ export const useOrderUpdateMutation = (): UseMutationResult<
         queryClient.invalidateQueries('SellerOrderList', { refetchInactive: true });
       },
     },
+  );
+};
+
+/** 주문 생성 훅 */
+export const useOrderCreateMutation = (): UseMutationResult<
+  Order,
+  AxiosError,
+  CreateOrderDto
+> => {
+  return useMutation<Order, AxiosError, CreateOrderDto>((dto: CreateOrderDto) =>
+    axios.post<Order>(`/order`, dto).then((res) => res.data),
   );
 };
