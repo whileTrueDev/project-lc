@@ -129,13 +129,13 @@ export class OrderService {
       couponId,
       usedCouponAmount,
       totalDiscount,
+      paymentId,
       ...data // createInput에 사용할 데이터
     } = dto;
     const {
       nonMemberOrderFlag,
       giftFlag,
       orderItems,
-      payment,
       supportOrderIncludeFlag,
       orderCode,
     } = data;
@@ -144,7 +144,7 @@ export class OrderService {
       ...data,
       orderItems: undefined,
       orderCode: orderCode || this.createOrderCode(),
-      payment: payment ? { connect: { id: payment.id } } : undefined, // TODO: 결제api 작업 이후 CreateOrderDto에서 payment 값 필수로 바꾸고 이부분도 수정필요
+      payment: paymentId ? { connect: { id: paymentId } } : undefined,
       customer: !nonMemberOrderFlag ? { connect: { id: customerId } } : undefined,
     };
 
@@ -206,9 +206,9 @@ export class OrderService {
 
     // 주문 생성 후 장바구니 비우기
     if (cartItemIdList) {
-      // await this.prisma.cartItem.deleteMany({
-      //   where: { id: { in: cartItemIdList } },
-      // });
+      await this.prisma.cartItem.deleteMany({
+        where: { id: { in: cartItemIdList } },
+      });
     }
 
     // 선물주문인경우 생성된 주문데이터에서 받는사람(방송인) 정보 삭제하고 리턴

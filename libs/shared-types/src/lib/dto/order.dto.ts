@@ -225,12 +225,10 @@ export class CreateOrderDto {
   @Type(() => CreateOrderItemDto)
   orderItems: CreateOrderItemDto[];
 
-  /** 주문에 연결된 결제정보 
-   // TODO: 결제api 작업 후 수정필요
+  /** 주문에 연결된 결제정보 고유번호 OrderPayment.id
    */
-  // @IsNotEmptyObject()
   @IsOptional()
-  payment?: OrderPayment;
+  paymentId?: number;
 
   /** 주문으로 생성될 장바구니 상품들 id */
   @IsOptional()

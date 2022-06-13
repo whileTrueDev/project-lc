@@ -65,6 +65,7 @@ export function OrderPaymentForm(): JSX.Element | null {
     // * 주문 생성에 필요한 데이터를 formState에서 가져와 store에 저장
     handleOrderPrepare({
       ...rest,
+      cartItemIdList: selectedItems,
       customerId: profile?.id,
       recipientPhone: [recipientPhone1, recipientPhone2, recipientPhone3].join('-'),
     });

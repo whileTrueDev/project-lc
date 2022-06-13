@@ -31,7 +31,13 @@ export const useOrderCreateMutation = (): UseMutationResult<
   AxiosError,
   CreateOrderDto
 > => {
-  return useMutation<Order, AxiosError, CreateOrderDto>((dto: CreateOrderDto) =>
-    axios.post<Order>(`/order`, dto).then((res) => res.data),
+  const queryClient = useQueryClient();
+  return useMutation<Order, AxiosError, CreateOrderDto>(
+    (dto: CreateOrderDto) => axios.post<Order>(`/order`, dto).then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('Cart', { refetchInactive: true }); // 주문 생성 후 주문에 포함되었던 장바구니 상품 삭제함
+      },
+    },
   );
 };

@@ -101,6 +101,7 @@ export type OrderListRes = {
 export type OrderDetailRes = OrderBaseData & {
   exchanges: Nullable<ExchangeDataWithImages[]>;
   returns: Nullable<ReturnDataWithImages[]>;
+  shippings: Nullable<OrderShipping[]>;
 };
 /**
  * 방송인 후원 주문 목록 타입

@@ -23,6 +23,13 @@ export function Success(): JSX.Element {
 
   useEffect(() => {
     const tossPaymentsAmount = Number(getCookie('amount'));
+    console.log({
+      orderCode,
+      paymentKey,
+      redirectAmount,
+      isRequested: isRequested.current,
+      isSameAmount: redirectAmount === tossPaymentsAmount,
+    });
     if (
       orderCode &&
       paymentKey &&
@@ -40,8 +47,10 @@ export function Success(): JSX.Element {
         if (item.status === 'error') {
           router.push(`/payment/fail?message=${item.message}`);
         } else {
-          // TODO: 여기서 주문 생성 이후 orderId 받아오기
           console.log('after dopayment redirection order: ', order);
+          console.log('payment id', item.orderPaymentId);
+
+          const orderPaymentId = item.orderPaymentId || undefined; // 토스페이먼츠 결제요청 후 생성한 OrderPayment.id;
 
           // * createOrderForm 에서 createOrderDto에 해당하는 데이터만 가져오기
           const {
@@ -56,6 +65,7 @@ export function Success(): JSX.Element {
           } = order;
           const createOrderDto: CreateOrderDto = {
             ...createOrderDtoData,
+            paymentId: orderPaymentId,
             orderCode,
             recipientEmail: order.recipientEmail || '',
             paymentPrice: tossPaymentsAmount,
@@ -68,7 +78,7 @@ export function Success(): JSX.Element {
             .then((res) => {
               console.log(res);
               const orderId = res.id;
-              router.push(`/payment/receipt?orderId=${orderId}&orderCode=${orderCode}`); // todo : 1 들어간 자리에 orderId 넣기
+              router.push(`/payment/receipt?orderId=${orderId}&orderCode=${orderCode}`);
             })
             .catch((e) => {
               console.error(e);
