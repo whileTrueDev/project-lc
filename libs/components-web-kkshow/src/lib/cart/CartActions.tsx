@@ -55,18 +55,20 @@ export function CartActions(): JSX.Element {
 
     // kkshowOrderStore에 배송비정보 저장
     const groupIdList = Object.keys(groupedSelectedItems).map((id) => Number(id));
-    const shippingData = groupIdList.reduce((_shippingData, id) => {
-      return {
-        ..._shippingData,
+
+    let shippingData: OrderShippingData = {};
+    groupIdList.forEach((id) => {
+      shippingData = {
+        ...shippingData,
         [id]: {
-          // cartId가 아닌 goodsId 저장 (주문페이지에는 카트id정보가 없음)
-          items: data
+          items: data // cartId가 아닌 goodsId 저장 (주문페이지에는 카트id정보가 없음)
             .filter((cartItem) => groupedSelectedItems[id].includes(cartItem.id))
             .map((cartItem) => cartItem.goods.id),
           cost: totalShippingCostObjectById[id],
+          isShippingAvailable: true, // 장바구니 페이지에서는 주소정보가 없어서 일단 true로 넘김
         },
       };
-    }, {} as OrderShippingData);
+    });
     setShippingData(shippingData);
 
     // kkshowOrderStore에 주문정보 저장
@@ -82,11 +84,17 @@ export function CartActions(): JSX.Element {
         .map((i) => ({
           goodsName: i.goods.goods_name,
           goodsId: i.goods.id,
-          options: i.options.map((o) => ({
-            ...o,
-            goodsOptionId: o.goodsOptionsId as number,
-          })),
-          shippingCost: i.shippingCost,
+          options: i.options.map((o) => {
+            // CartOptionItem 타입에서 CreateOrderItemOptionDto 타입 만들기 위해 필요한 데이터만 사용
+            const { cartItemId, goodsOptionsId, id, ...optData } = o;
+            return {
+              ...optData,
+              normalPrice: Number(o.normalPrice),
+              discountPrice: Number(o.discountPrice),
+              goodsOptionId: o.goodsOptionsId as number,
+            };
+          }),
+          shippingCost: Number(i.shippingCost),
           shippingGroupId: i.shippingGroupId || 1,
           // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
           channel: 'normal',

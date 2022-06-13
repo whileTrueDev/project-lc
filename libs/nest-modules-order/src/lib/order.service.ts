@@ -121,14 +121,29 @@ export class OrderService {
 
   /** 주문생성 */
   async createOrder(dto: CreateOrderDto): Promise<Order> {
-    const { customerId, cartItemIdList, ...data } = dto;
-    const { nonMemberOrderFlag, giftFlag, orderItems, payment, supportOrderIncludeFlag } =
-      data;
+    console.log(dto);
+    const {
+      customerId,
+      cartItemIdList,
+      usedMileageAmount,
+      couponId,
+      usedCouponAmount,
+      totalDiscount,
+      ...data // createInput에 사용할 데이터
+    } = dto;
+    const {
+      nonMemberOrderFlag,
+      giftFlag,
+      orderItems,
+      payment,
+      supportOrderIncludeFlag,
+      orderCode,
+    } = data;
 
     let createInput: Prisma.OrderCreateInput = {
       ...data,
       orderItems: undefined,
-      orderCode: this.createOrderCode(),
+      orderCode: orderCode || this.createOrderCode(),
       payment: payment ? { connect: { id: payment.id } } : undefined, // TODO: 결제api 작업 이후 CreateOrderDto에서 payment 값 필수로 바꾸고 이부분도 수정필요
       customer: !nonMemberOrderFlag ? { connect: { id: customerId } } : undefined,
     };
@@ -157,12 +172,10 @@ export class OrderService {
         orderItems: {
           // 주문에 연결된 주문상품 생성
           create: orderItems.map((item) => {
-            const { options, support, ...rest } = item;
+            const { options, support, goodsName, ...rest } = item;
             const connectedGoodsData = orderItemConnectedGoodsData.find(
               (goodsData) => goodsData.id === item.goodsId,
             );
-            // 상품이름
-            const goodsName = connectedGoodsData?.goods_name;
             // 상품대표이미지(이미지 중 첫번째)
             const imageUrl = connectedGoodsData?.image[0]?.image;
             return {
@@ -193,9 +206,9 @@ export class OrderService {
 
     // 주문 생성 후 장바구니 비우기
     if (cartItemIdList) {
-      await this.prisma.cartItem.deleteMany({
-        where: { id: { in: cartItemIdList } },
-      });
+      // await this.prisma.cartItem.deleteMany({
+      //   where: { id: { in: cartItemIdList } },
+      // });
     }
 
     // 선물주문인경우 생성된 주문데이터에서 받는사람(방송인) 정보 삭제하고 리턴

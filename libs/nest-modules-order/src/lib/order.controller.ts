@@ -49,7 +49,9 @@ export class OrderController {
 
   /** 주문생성 - 가드 적용하지 않아야 함 */
   @Post()
-  createOrder(@Body(ValidationPipe) dto: CreateOrderDto): Promise<Order> {
+  createOrder(
+    @Body(new ValidationPipe({ transform: true })) dto: CreateOrderDto,
+  ): Promise<Order> {
     return this.orderService.createOrder(dto);
   }
 

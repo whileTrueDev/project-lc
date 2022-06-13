@@ -37,8 +37,8 @@ interface OrderItemProps {
       name: string | null;
       value: string | null;
       quantity: number;
-      normalPrice: Decimal;
-      discountPrice: Decimal;
+      normalPrice: number;
+      discountPrice: number;
     }>;
     support?: {
       broadcasterId: number | null;
@@ -46,7 +46,7 @@ interface OrderItemProps {
       nickname?: string | null;
       avatar?: string | null;
     };
-    shippingCost: string | Decimal;
+    shippingCost: string | number;
     shippingCostIncluded?: boolean;
   };
   disableSupportInfo?: boolean;
