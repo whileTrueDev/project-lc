@@ -12,6 +12,10 @@ import {
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import { GridRowData } from '@material-ui/data-grid';
+import {
+  DiscountApplyFieldBadge,
+  DiscountApplyTypeBadge,
+} from '@project-lc/components-shared/CouponBadge';
 
 type CustomerCouponDetailDialogProps = {
   isOpen: boolean;
@@ -45,15 +49,11 @@ export function CustomerCouponDetailDialog(
                   </Flex>
                   <Flex justifyContent="space-between">
                     <Text>할인유형</Text>
-                    <Text>
-                      {coupon.applyField === 'goods' ? '상품할인' : '배송비할인'}
-                    </Text>
+                    <Text>{DiscountApplyFieldBadge(coupon.applyField)}</Text>
                   </Flex>
                   <Flex justifyContent="space-between">
                     <Text>할인대상</Text>
-                    <Text>
-                      {coupon.applyType === 'allGoods' ? '모든상품' : '일부품목'}
-                    </Text>
+                    <Text>{DiscountApplyTypeBadge(coupon.applyType)}</Text>
                   </Flex>
                   <Flex justifyContent="space-between">
                     <Text>최소주문액</Text>

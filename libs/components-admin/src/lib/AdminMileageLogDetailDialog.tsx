@@ -22,7 +22,7 @@ import { useOneReview } from '@project-lc/hooks';
 import dayjs from 'dayjs';
 import NextLink from 'next/link';
 import { GridRowData } from '@material-ui/data-grid';
-import { MileageActionTypeBadge } from './MileageActionTypeBadge';
+import { MileageActionTypeBadge } from '@project-lc/components-shared/MileageActionTypeBadge';
 
 type AdminMileageManageDialogProps = {
   isOpen: boolean;

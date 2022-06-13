@@ -1,13 +1,17 @@
-import { Box, Button, useDisclosure } from '@chakra-ui/react';
+import { Button, useDisclosure } from '@chakra-ui/react';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { GridColumns, GridRowData } from '@material-ui/data-grid';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { CustomerCoupon, Coupon } from '@prisma/client';
+import { CustomerCoupon } from '@prisma/client';
+import {
+  DiscountApplyFieldBadge,
+  DiscountApplyTypeBadge,
+} from '@project-lc/components-shared/CouponBadge';
 import { CustomerCouponDetailDialog } from './CustomerCouponDetailDialog';
 
 type CustomerCouponListProps = {
-  data: CustomerCoupon[];
+  data: CustomerCoupon[] | undefined;
 };
 
 export function CustomerCouponList(props: CustomerCouponListProps): JSX.Element {
@@ -38,14 +42,15 @@ export function CustomerCouponList(props: CustomerCouponListProps): JSX.Element 
     {
       field: 'applyField',
       headerName: '종류',
-      valueFormatter: ({ row }: GridRowData) =>
-        row.coupon.applyField === 'goods' ? '제품할인' : '배송비할인',
+      renderCell: ({ row }: GridRowData) =>
+        DiscountApplyFieldBadge(row.coupon.applyField),
+      flex: 1,
     },
     {
-      field: 'applyField',
+      field: 'applyType',
       headerName: '적용대상',
-      valueFormatter: ({ row }: GridRowData) =>
-        row.coupon.applyType === 'allGoods' ? '모든 품목' : '일부 품목 제외',
+      renderCell: ({ row }: GridRowData) => DiscountApplyTypeBadge(row.coupon.applyType),
+      flex: 1,
     },
     {
       field: 'endDate',
@@ -74,7 +79,7 @@ export function CustomerCouponList(props: CustomerCouponListProps): JSX.Element 
           <ChakraDataGrid
             columns={columns}
             rows={data || []}
-            minH={400}
+            minH={500}
             disableColumnMenu
             disableColumnFilter
           />

@@ -9,8 +9,8 @@ import {
 import { useAdminMileageLogList } from '@project-lc/hooks';
 import { useState } from 'react';
 import dayjs from 'dayjs';
+import { MileageActionTypeBadge } from '@project-lc/components-shared/MileageActionTypeBadge';
 import { AdminMileageLogDetailDialog } from './AdminMileageLogDetailDialog';
-import { MileageActionTypeBadge } from './MileageActionTypeBadge';
 
 export function AdminMileageLogList(): JSX.Element {
   const { data } = useAdminMileageLogList();

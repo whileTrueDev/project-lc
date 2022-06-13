@@ -128,6 +128,8 @@ export * from './lib/queries/useCustomerAddress';
 export * from './lib/queries/useCustomerCoupon';
 export * from './lib/queries/useCustomerCouponHistory';
 export * from './lib/queries/useCustomerInfo';
+export * from './lib/queries/useCustomerMileage';
+export * from './lib/queries/useCustomerMileageHistory';
 export * from './lib/queries/useCustomerStatus';
 export * from './lib/queries/useDefaultContacts';
 export * from './lib/queries/useEmailDupCheck';
