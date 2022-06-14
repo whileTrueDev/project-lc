@@ -281,7 +281,6 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
       { name: '쿠폰관리', href: '/customer/coupon', icon: FcFinePrint },
       { name: '마일리지 관리', href: '/customer/mileage', icon: FcMoneyTransfer },
       { name: '가입자 목록', href: '/customer/signup-list', icon: FcBusinessman },
-      { name: '주문 목록', href: '/customer/order', icon: FcList },
     ],
   },
   {
@@ -302,7 +301,10 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '주문',
     href: 'order',
-    children: [{ name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike }],
+    children: [
+      { name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike },
+      { name: '주문 목록', href: '/order/list', icon: FcList },
+    ],
   },
   {
     name: '일반관리',
