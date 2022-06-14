@@ -61,22 +61,22 @@ export function OrderListDownloadDialog({
     if (orderDetails.data) {
       // FindFmOrderDetailRes 와 OrderDetailRes 타입이 달라서 해당 OrderSpreadSheetGenerator 사용할 수 없음
       // TODO: OrderSpreadSheetGenerator가 OrderDetailRes 사용할 수 있게 수정하기
-      // const ossg = new OrderSpreadSheetGenerator({
-      //   disabledColumnHeaders: disableHeaders,
-      // });
-      // const workbook = ossg.createXLSX(orderDetails.data);
-      // ossg
-      //   .download(`${fileName || getOrderDownloadFileName()}.xlsx`, workbook)
-      //   .then(() => {
-      //     toast({ status: 'success', title: '주문목록 다운로드 완료' });
-      //     onClose();
-      //   })
-      //   .catch(() => {
-      //     toast({
-      //       status: 'error',
-      //       title: '주문목록 다운로드중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-      //     });
-      //   });
+      const ossg = new OrderSpreadSheetGenerator({
+        disabledColumnHeaders: disableHeaders,
+      });
+      const workbook = ossg.createXLSX(orderDetails.data);
+      ossg
+        .download(`${fileName || getOrderDownloadFileName()}.xlsx`, workbook)
+        .then(() => {
+          toast({ status: 'success', title: '주문목록 다운로드 완료' });
+          onClose();
+        })
+        .catch(() => {
+          toast({
+            status: 'error',
+            title: '주문목록 다운로드중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          });
+        });
     }
   };
 
