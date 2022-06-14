@@ -54,7 +54,6 @@ export class OrderController {
     @Body('order', new ValidationPipe({ transform: true })) order: CreateOrderDto,
     @Body('shipping', ValidationPipe) { shipping }: CreateOrderShippingDto,
   ): Promise<Order> {
-    console.log(shipping);
     return this.orderService.createOrder({ orderDto: order, shippingData: shipping });
   }
 
