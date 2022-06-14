@@ -129,3 +129,12 @@ export type FindAllOrderByBroadcasterRes = {
   orders: FindAllOrderByBroadcaster[];
   nextCursor?: number;
 };
+
+/** 관리자 라이브쇼핑 선물주문 타입 */
+export type AdminLiveShoppingGiftOrder = Order & {
+  orderItems: (OrderItem & {
+    support: OrderItemSupportWithBroadcasterInfo | null;
+    options: OrderItemOption[];
+    goods: Omit<OriginGoods, 'image' | 'sellerId'>;
+  })[];
+};

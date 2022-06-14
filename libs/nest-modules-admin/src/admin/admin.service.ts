@@ -14,6 +14,7 @@ import {
   AdminClassDto,
   AdminGoodsByIdRes,
   AdminGoodsListRes,
+  AdminLiveShoppingGiftOrder,
   AdminSettlementInfoType,
   GoodsConfirmationDto,
   GoodsRejectionDto,
@@ -456,5 +457,76 @@ export class AdminService {
         newAdminClass: dto.newAdminClass,
       },
     });
+  }
+
+  /** 라이브쇼핑 선물주문 목록 조회
+   * 라이브쇼핑 판매시작일시~판매종료일시 생성된 선물 주문 중 주문상태가 주문무효 주문취소 등의 상태가 아닌 주문 중
+   * 라이브쇼핑 진행한 상품이 주문상품으로 포함 && 주문상품에 라이브쇼핑 진행한 방송인이 후원으로 연결된 주문
+   */
+  public async getLiveShoppingGiftOrders(
+    liveShoppingId: number,
+  ): Promise<AdminLiveShoppingGiftOrder[]> {
+    const liveShopping = await this.prisma.liveShopping.findUnique({
+      where: { id: liveShoppingId },
+    });
+
+    const { goodsId, broadcasterId, sellStartDate, sellEndDate } = liveShopping;
+
+    const giftOrders = await this.prisma.order.findMany({
+      where: {
+        createDate: {
+          gte: sellStartDate ? new Date(sellStartDate) : undefined,
+          lte: sellEndDate ? new Date(sellEndDate) : undefined,
+        },
+        orderItems: { some: { goodsId, support: { broadcasterId } } },
+        step: {
+          in: [
+            'orderReceived',
+            'paymentConfirmed',
+            'goodsReady',
+            'partialExportReady',
+            'exportReady',
+            'partialExportDone',
+            'exportDone',
+            'partialShipping',
+            'shipping',
+            'partialShippingDone',
+            'shippingDone',
+            'purchaseConfirmed',
+          ],
+        },
+        giftFlag: true,
+      },
+      orderBy: { createDate: 'desc' },
+      include: {
+        orderItems: {
+          include: {
+            options: true,
+            support: {
+              include: { broadcaster: { select: { userNickname: true, avatar: true } } },
+            },
+            goods: {
+              select: {
+                id: true,
+                goods_name: true,
+                seller: { select: { sellerShop: { select: { shopName: true } } } },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // 라이브쇼핑 진행한 주문상품만 필터링
+    const giftOrdersFilterByGoodsId = giftOrders.map((order) => {
+      const { orderItems, ...rest } = order;
+      const filtered = orderItems.filter((item) => item.goodsId === goodsId);
+      return {
+        ...rest,
+        orderItems: filtered,
+      };
+    });
+
+    return giftOrdersFilterByGoodsId;
   }
 }

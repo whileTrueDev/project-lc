@@ -5,10 +5,12 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
+import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateRefundDto,
   CreateRefundRes,
@@ -18,6 +20,7 @@ import {
 } from '@project-lc/shared-types';
 import { RefundService } from './refund.service';
 
+@UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('refund')
 @Controller('refund')

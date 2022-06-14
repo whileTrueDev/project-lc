@@ -51,6 +51,7 @@ import {
   AdminClassDto,
   AdminGoodsByIdRes,
   AdminGoodsListRes,
+  AdminLiveShoppingGiftOrder,
   AdminSellerListRes,
   AdminSettlementInfoType,
   AdminSignUpDto,
@@ -266,6 +267,15 @@ export class AdminController {
       videoId = await this.adminService.registVideoUrl(data.dto.videoUrl);
     }
     return this.adminService.updateLiveShoppings(data.dto, videoId);
+  }
+
+  /** 라이브쇼핑 선물주문 목록 조회 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('/live-shopping/:liveShoppingId/gift-orders')
+  getLiveShoppingGiftOrders(
+    @Param('liveShoppingId', ParseIntPipe) liveShoppingId: number,
+  ): Promise<AdminLiveShoppingGiftOrder[]> {
+    return this.adminService.getLiveShoppingGiftOrders(liveShoppingId);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
