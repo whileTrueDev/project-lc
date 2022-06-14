@@ -8,6 +8,7 @@ import {
   Query,
   UseInterceptors,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import {
@@ -17,7 +18,9 @@ import {
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { OrderService } from '@project-lc/nest-modules-order';
+import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 
+@UseGuards(JwtAuthGuard, AdminGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('admin/order')
 @Controller('admin/order')
