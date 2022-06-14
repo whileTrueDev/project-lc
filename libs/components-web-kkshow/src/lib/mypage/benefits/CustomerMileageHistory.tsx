@@ -33,16 +33,14 @@ export function CustomerMileagenHistoryList(): JSX.Element {
   const { data } = useCustomerMileageHistory();
   return (
     <Box>
-      {data?.length && (
-        <ChakraDataGrid
-          rows={data || []}
-          columns={column}
-          minH={500}
-          density="compact"
-          disableColumnSelector
-          disableSelectionOnClick
-        />
-      )}
+      <ChakraDataGrid
+        rows={data || []}
+        columns={column}
+        minH={500}
+        density="compact"
+        disableColumnSelector
+        disableSelectionOnClick
+      />
     </Box>
   );
 }

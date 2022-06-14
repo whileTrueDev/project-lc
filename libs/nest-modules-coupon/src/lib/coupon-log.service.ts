@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CustomerCouponLog, CustomerCoupon } from '@prisma/client';
+import { CustomerCouponLog } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
-import { CustomerCouponDto } from '@project-lc/shared-types';
+import { CustomerCouponDto, CustomerCouponLogRes } from '@project-lc/shared-types';
 
 @Injectable()
 export class CouponLogService {
@@ -24,14 +24,16 @@ export class CouponLogService {
   /** 특정 소비자의 쿠폰 사용 내역 조회 */
   async findCouponLogs(
     customerId: CustomerCouponDto['customerId'],
-  ): Promise<CustomerCoupon[]> {
-    return this.prismaService.$queryRaw`
-    SELECT cp.name, ccl.* FROM CustomerCoupon AS cc 
-    JOIN CustomerCouponLog AS ccl
-    ON cc.id = ccl.customerCouponId
-    JOIN Coupon AS cp
-    ON ccl.customerCouponId = cp.id
-    WHERE cc.customerId = ${customerId}
-`;
+  ): Promise<CustomerCouponLogRes[]> {
+    return this.prismaService.customerCouponLog.findMany({
+      where: { customerCoupon: { customerId } },
+      include: {
+        customerCoupon: {
+          select: {
+            coupon: { select: { name: true } },
+          },
+        },
+      },
+    });
   }
 }

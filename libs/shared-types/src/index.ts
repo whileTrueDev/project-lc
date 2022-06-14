@@ -134,6 +134,7 @@ export * from './lib/res-types/broadcasterSettlementInfoList.res';
 export * from './lib/res-types/broadcasterSettlementReceivableAmount.res';
 export * from './lib/res-types/broadcasterSettlementTargets.res';
 export * from './lib/res-types/cart.res';
+export * from './lib/res-types/coupon.res';
 export * from './lib/res-types/customer.res';
 export * from './lib/res-types/exchange.res';
 export * from './lib/res-types/export.res';

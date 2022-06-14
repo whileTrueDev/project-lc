@@ -9,7 +9,7 @@ const column: GridColumns = [
   {
     field: 'couponName',
     headerName: '쿠폰이름',
-    valueGetter: ({ row }: GridRowData) => row.name,
+    valueGetter: ({ row }: GridRowData) => row.customerCoupon.coupon.name,
     flex: 1,
   },
   {
@@ -31,9 +31,7 @@ export function CustomerCouponHistoryList(): JSX.Element {
   const { data } = useCustomerCouponHistory();
   return (
     <Box>
-      {data?.length && (
-        <ChakraDataGrid rows={data || []} columns={column} minH={500} density="compact" />
-      )}
+      <ChakraDataGrid rows={data || []} columns={column} minH={500} density="compact" />
     </Box>
   );
 }

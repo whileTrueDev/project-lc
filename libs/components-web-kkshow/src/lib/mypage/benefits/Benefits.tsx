@@ -37,7 +37,7 @@ export function Benefits(): JSX.Element {
           <Box>
             <Flex justifyContent="space-between">
               <Text>보유 마일리지</Text>
-              <Text fontWeight="bold">{mileage?.mileage.toLocaleString() || 0} 원</Text>
+              <Text fontWeight="bold">{mileage?.mileage?.toLocaleString() || 0} 원</Text>
             </Flex>
           </Box>
         </GridItem>

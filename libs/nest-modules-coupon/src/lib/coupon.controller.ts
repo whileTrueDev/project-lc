@@ -17,7 +17,11 @@ import {
   CacheClearKeys,
 } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
-import { CouponStatusDto } from '@project-lc/shared-types';
+import {
+  CouponStatusDto,
+  CustomerCouponRes,
+  CustomerCouponLogRes,
+} from '@project-lc/shared-types';
 import { CouponLogService } from './coupon-log.service';
 import { CustomerCouponService } from './customer-coupon.service';
 
@@ -32,7 +36,7 @@ export class CouponController {
   ) {}
 
   @Get()
-  getCustomerCoupons(@CustomerInfo() { id }: UserPayload): Promise<CustomerCoupon[]> {
+  getCustomerCoupons(@CustomerInfo() { id }: UserPayload): Promise<CustomerCouponRes[]> {
     return this.customerCouponService.findCustomerCoupons({
       customerId: id,
       couponId: null,
@@ -40,7 +44,9 @@ export class CouponController {
   }
 
   @Get('history')
-  async getCouponLogs(@CustomerInfo() { id }: UserPayload): Promise<CustomerCoupon[]> {
+  async getCouponLogs(
+    @CustomerInfo() { id }: UserPayload,
+  ): Promise<CustomerCouponLogRes[]> {
     return this.couponLogService.findCouponLogs(id);
   }
 
