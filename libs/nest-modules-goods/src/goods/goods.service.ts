@@ -459,10 +459,14 @@ export class GoodsService {
 
     return {
       ...result,
-      informationNotice: {
-        ...result.informationNotice,
-        contents: JSON.parse(result.informationNotice.contents as string),
-      },
+      informationNotice: result.informationNotice
+        ? {
+            ...result.informationNotice,
+            contents: result.informationNotice?.contents
+              ? JSON.parse(result.informationNotice?.contents as string)
+              : null,
+          }
+        : null,
     };
   }
 

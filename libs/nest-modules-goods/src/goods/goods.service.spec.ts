@@ -88,7 +88,7 @@ describe('GoodsService', () => {
         },
         informationNotice: {
           create: {
-            contents: { name: 'testContents', value: 'testContents' },
+            contents: JSON.stringify({ name: 'testContents', value: 'testContents' }),
           },
         },
       },
