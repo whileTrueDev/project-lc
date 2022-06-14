@@ -439,12 +439,10 @@ export class OrderService {
         mileageLogs: true,
         payment: true,
         refunds: true,
-        exports: true,
-        exchanges: { select: { id: true, exchangeCode: true, exchangeItems: true } },
-        returns: { select: { id: true, returnCode: true, items: true } },
-        orderCancellations: {
-          select: { id: true, cancelCode: true, requestDate: true, items: true },
-        },
+        exports: { include: { items: true } },
+        exchanges: { include: { exchangeItems: true } },
+        returns: { include: { items: true } },
+        orderCancellations: { include: { items: true } },
         sellerSettlementItems: {
           select: {
             liveShopping: {
@@ -512,10 +510,10 @@ export class OrderService {
         mileageLogs: true,
         payment: true,
         refunds: true,
-        exports: true,
-        exchanges: { select: { id: true, exchangeCode: true, exchangeItems: true } },
-        returns: { select: { id: true, returnCode: true, items: true } },
-        orderCancellations: { select: { id: true, cancelCode: true, items: true } },
+        exports: { include: { items: true } },
+        exchanges: { include: { exchangeItems: true, images: true } },
+        returns: { include: { items: true, images: true } },
+        orderCancellations: { include: { items: true } },
         sellerSettlementItems: {
           select: {
             liveShopping: {

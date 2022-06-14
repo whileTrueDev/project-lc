@@ -40,6 +40,7 @@ import {
   purchaseConfirmedOrder,
   shippingDoneOrder,
 } from './seedData/dummyOrder';
+import { dummyPayments } from './seedData/dummyPayment';
 import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquiry';
 
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
@@ -327,7 +328,10 @@ async function createDummyOrderCancelReturnExchange(): Promise<void> {
   await createDummyOrderWithExchange();
   await createDummyOrderWithReturn();
 }
-
+// 더미페이먼트 연결
+async function createDummyPayments(): Promise<void> {
+  await prisma.orderPayment.createMany({ data: dummyPayments });
+}
 /** 시드 메인 함수 */
 async function main(): Promise<void> {
   // 약관 데이터 저장
@@ -393,6 +397,9 @@ async function main(): Promise<void> {
   // 더미 상품문의 생성
   await createGoodsInquiry(prisma);
   await createGoodsInquiry2(prisma);
+
+  // 더미페이먼트 생성
+  await createDummyPayments();
 }
 
 main()
