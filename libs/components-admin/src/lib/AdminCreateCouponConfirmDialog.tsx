@@ -5,12 +5,12 @@ import {
   ConfirmDialogProps,
 } from '@project-lc/components-core/ConfirmDialog';
 import dayjs from 'dayjs';
-import { CreateCouponData } from './AdminCreateCouponDialog';
 import {
   DiscountUnitBage,
   DiscountApplyFieldBadge,
   DiscountApplyTypeBadge,
-} from './AdminCouponListBadge';
+} from '@project-lc/components-shared/CouponBadge';
+import { CreateCouponData } from './AdminCreateCouponDialog';
 
 export function AdminCreateCouponConfirmDialog(
   props: Pick<ConfirmDialogProps, 'isOpen' | 'onClose' | 'onConfirm'>,

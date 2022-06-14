@@ -1,5 +1,10 @@
 import { Box, Badge } from '@chakra-ui/react';
-import { DiscountApplyType, DiscountApplyField, AmountUnit } from '@prisma/client';
+import {
+  DiscountApplyType,
+  DiscountApplyField,
+  AmountUnit,
+  CouponLogType,
+} from '@prisma/client';
 
 export const DiscountUnitBage = (value: AmountUnit): JSX.Element => {
   switch (value) {
@@ -63,3 +68,28 @@ export const DiscountApplyTypeBadge = (value: DiscountApplyType): JSX.Element =>
       return <Box />;
   }
 };
+
+export function ActionTypeBadge(value: CouponLogType): JSX.Element {
+  switch (value) {
+    case 'issue':
+      return (
+        <Box lineHeight={2}>
+          <Badge colorScheme="blue">적립</Badge>
+        </Box>
+      );
+    case 'use':
+      return (
+        <Box lineHeight={2}>
+          <Badge colorScheme="red">사용</Badge>
+        </Box>
+      );
+    case 'restore':
+      return (
+        <Box lineHeight={2}>
+          <Badge colorScheme="green">복구</Badge>
+        </Box>
+      );
+    default:
+      return <Box />;
+  }
+}
