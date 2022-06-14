@@ -192,18 +192,22 @@ export function OrderReturnStatusDialog({
 
             {/* 반품상태변경 */}
             <Stack spacing={1} my={2}>
-              {watch('status') === 'complete' && (
-                <Alert mb={2} status="warning">
+              {watch('status') === 'processing' && (
+                <Alert mb={2} status="info">
                   <List spacing={3}>
                     <ListItem>
-                      <ListIcon as={RiErrorWarningFill} color="orange.500" />
-                      {RETURN_TEXT}완료 선택시, 실제 환불이 진행되므로 반드시 물품 수령 및
-                      확인 후,
-                      {RETURN_TEXT}완료를 선택하세요.
+                      <ListIcon as={RiErrorWarningFill} />
+                      요청 승인 선택시, 크크쇼 관리자가 소비자에게 입금하는 실제
+                      환불과정이 진행됩니다.
+                    </ListItem>
+                    <ListItem>
+                      <ListIcon as={RiErrorWarningFill} />
+                      크크쇼 관리자의 입금 후 자동으로 {RETURN_TEXT}요청은 완료처리
+                      됩니다.
                     </ListItem>
                     <ListItem>
                       <ListIcon as={AiFillWarning} color="red.500" />
-                      {RETURN_TEXT} 완료 등록 후,{' '}
+                      {RETURN_TEXT} 완료 처리 후,{' '}
                       <Text as="span" color="red.500" fontWeight="bold">
                         이전 단계로의 변경은 불가
                       </Text>
@@ -225,8 +229,11 @@ export function OrderReturnStatusDialog({
                   isDisabled={data.status === 'complete'}
                 >
                   <option value="requested">요청됨(초기 상태, 담당자 확인전)</option>
-                  <option value="processing">처리진행중(담당자 확인 후 처리 중)</option>
-                  <option value="complete">처리완료</option>
+                  <option value="processing">
+                    요청승인(크크쇼 관리자가 소비자에게 입금 후 자동 처리완료됨)
+                  </option>
+                  {/* 반품(환불)의 경우 관리자가 소비자에게 입금후 완료처리됨, 판매자가 완료처리할 수 없음 */}
+                  {/* <option value="complete">처리완료</option> */}
                   <option value="canceled">취소(거절)</option>
                 </Select>
                 {errors.status && (

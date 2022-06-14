@@ -56,7 +56,7 @@ export function AdminSettlementDoneList(): JSX.Element | null {
             <Td>{getLocaleNumber(history.totalPrice)}</Td>
             <Td>{getLocaleNumber(history.pgCommission)}</Td>
             <Td>{history.paymentMethod}</Td>
-            <Td>{history.pg}</Td>
+            <Td>{history.pg || '-'}</Td>
             <Td>{history.shippingCost}</Td>
             <Td>{getLocaleNumber(history.totalCommission)}</Td>
             <Td>{getLocaleNumber(history.totalAmount)}</Td>

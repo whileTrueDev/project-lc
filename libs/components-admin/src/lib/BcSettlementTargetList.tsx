@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import {
   Box,
@@ -310,16 +311,36 @@ function BcSettlementTargetDetail({
             <GridItem colSpan={{ base: 4, sm: 3 }}>
               <Text fontWeight="bold">{item.orderItem.goods.goods_name}</Text>
               {item.orderItemOption.name && item.orderItemOption.value && (
-                <Text fontSize="sm">{`${item.orderItemOption.name}: ${item.orderItemOption.value}`}</Text>
+                <Text fontSize="sm">{`${item.orderItemOption.name}: ${item.orderItemOption.value} ${item.amount}개`}</Text>
               )}
-              <Text fontSize="sm">{getLocaleNumber(item.amount)} 원</Text>
+              <Text fontSize="sm">
+                총{' '}
+                {getLocaleNumber(
+                  Number(item.orderItemOption.discountPrice) *
+                    item.orderItemOption.quantity,
+                )}{' '}
+                원{' '}
+                <Text fontSize="xs" as="span">
+                  (개당 {getLocaleNumber(item.orderItemOption.discountPrice)} 원)
+                </Text>
+              </Text>
             </GridItem>
           </Grid>
           <Box mt={4}>
             <Grid mt={1} templateColumns="1fr 2fr">
               <GridTableItem
                 title="판매유형"
-                value={<SellTypeBadge sellType={item.orderItem.channel} />}
+                value={
+                  <SellTypeBadge
+                    sellType={
+                      item.orderItem.support.liveShopping
+                        ? 'liveShopping'
+                        : item.orderItem.support.productPromotion
+                        ? 'productPromotion'
+                        : 'normal'
+                    }
+                  />
+                }
               />
               <GridTableItem
                 title="방송인 활동명"
@@ -351,7 +372,8 @@ function BcSettlementTargetDetail({
                 <GridTableItem
                   title="정산액 및 수수료율"
                   value={`${calcSettleAmount(
-                    Number(item.amount),
+                    Number(item.orderItemOption.discountPrice) *
+                      item.orderItemOption.quantity,
                     item.orderItem.support.liveShopping.broadcasterCommissionRate,
                   ).toLocaleString()}원 (${item.orderItem.support.liveShopping.broadcasterCommissionRate.toString()}%)`}
                 />
@@ -360,7 +382,8 @@ function BcSettlementTargetDetail({
                 <GridTableItem
                   title="정산액 및 수수료율"
                   value={`${calcSettleAmount(
-                    Number(item.amount),
+                    Number(item.orderItemOption.discountPrice) *
+                      item.orderItemOption.quantity,
                     item.orderItem.support.productPromotion.broadcasterCommissionRate,
                   ).toLocaleString()}원 (${item.orderItem.support.productPromotion.broadcasterCommissionRate.toString()}%)`}
                 />

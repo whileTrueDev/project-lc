@@ -1,38 +1,34 @@
-import { Box, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Button, Text, useColorModeValue } from '@chakra-ui/react';
 import { GridColumns, GridRowParams } from '@material-ui/data-grid';
+import { OrderItemOption, OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import TooltipedText from '@project-lc/components-core/TooltipedText';
 import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
-import { useDisplaySize, useFmOrdersByGoods } from '@project-lc/hooks';
-import {
-  convertFmOrderStatusToString,
-  FmOrderStatusNumString,
-  getFmOrderStatusByNames,
-  LiveShoppingProgressParams,
-} from '@project-lc/shared-types';
+import { useAdminLiveShoppingGiftOrderList, useDisplaySize } from '@project-lc/hooks';
+import { orderProcessStepDict } from '@project-lc/shared-types';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
-export type SeletctedLiveShoppingType = Partial<LiveShoppingProgressParams> & {
-  goodsId: number;
-  sellStartDate?: Date | null;
-};
-
 const columns: GridColumns = [
   {
-    field: 'regist_date',
+    field: 'createDate',
     headerName: '주문일시',
     width: 170,
-    valueFormatter: ({ row }) =>
-      dayjs(row.regist_date as any).format('YYYY/MM/DD HH:mm:ss'),
     renderCell: (params) => {
-      const date = dayjs(params.row.regist_date).format('YYYY/MM/DD HH:mm:ss');
+      const date = dayjs(params.row.createDate).format('YYYY/MM/DD HH:mm:ss');
       return <TooltipedText text={date} />;
     },
   },
   {
     field: 'goods_name',
     headerName: '상품',
+    renderCell: ({ row }) => {
+      const goodsNames = row.orderItems
+        .map((orderItem: { goods: { goods_name: string } }) => orderItem.goods.goods_name)
+        .join(' ,');
+      return <Text>{goodsNames}</Text>;
+    },
     width: 220,
   },
   {
@@ -43,15 +39,17 @@ const columns: GridColumns = [
     hideSortIcons: true,
     sortable: false,
     width: 120,
-    valueFormatter: ({ row }) => {
-      return row.totalEa + (row.totalType ? `/${row.totalType}` : '');
+    renderCell: (params) => {
+      const totalType = params.row.orderItems.length;
+      const totalEa = params.row.orderItems
+        .flatMap((oi: { options: OrderItemOption[] }) => oi.options)
+        .reduce((sum: number, cur: OrderItemOption) => sum + cur.quantity, 0);
+      return (
+        <Text>
+          {totalEa}({totalType})
+        </Text>
+      );
     },
-    renderCell: (params) => (
-      <Text>
-        {params.row.totalEa}
-        {params.row.totalType ? ` (${params.row.totalType})` : ''}
-      </Text>
-    ),
   },
   {
     field: 'only-web_recipient_user_name',
@@ -62,11 +60,11 @@ const columns: GridColumns = [
     hideSortIcons: true,
     sortable: false,
     disableExport: true,
-    valueFormatter: ({ row }) => row.recipient_user_name,
+    valueFormatter: ({ row }) => row.recipientName,
     renderCell: (params) => (
       <Text>
-        {params.row.recipient_user_name}
-        {params.row.order_user_name ? `/${params.row.order_user_name}` : ''}
+        {params.row.recipientName}
+        {params.row.ordererName ? `/${params.row.ordererName}` : ''}
       </Text>
     ),
   },
@@ -78,26 +76,14 @@ const columns: GridColumns = [
     hideSortIcons: true,
     sortable: false,
     width: 120,
-    valueFormatter: ({ value }) => {
-      let howmuch = '';
-      if (!Number.isNaN(Number(value))) {
-        howmuch = `${Math.floor(Number(value)).toLocaleString()}원`;
-      }
-      return howmuch;
-    },
     renderCell: (params) => {
-      let text = '';
-      if (params.row.totalPrice) {
-        const totalPrice = Math.floor(Number(params.row.totalPrice));
-        const shppingCost = Math.floor(Number(params.row.totalShippingCost));
-        let howMuch: number;
-        if (!Number.isNaN(shppingCost)) {
-          howMuch = totalPrice + shppingCost;
-        } else {
-          howMuch = totalPrice;
-        }
-        text = `${howMuch.toLocaleString()}원`;
-      }
+      const totalPrice = params.row.orderItems
+        .flatMap((oi: { options: OrderItemOption[] }) => oi.options)
+        .reduce(
+          (sum: number, cur: OrderItemOption) => sum + Number(cur.discountPrice),
+          0,
+        );
+      const text = `${getLocaleNumber(totalPrice)}원`;
       return <TooltipedText text={text} />;
     },
   },
@@ -107,60 +93,35 @@ const columns: GridColumns = [
     disableColumnMenu: true,
     disableReorder: true,
     width: 120,
-    valueFormatter: ({ value }) => convertFmOrderStatusToString(value as any) || '-',
     renderCell: ({ value }) => (
       <Box lineHeight={2}>
-        <FmOrderStatusBadge orderStatus={value as FmOrderStatusNumString} />
+        <FmOrderStatusBadge
+          orderStatus={orderProcessStepDict[value as OrderProcessStep]}
+        />
       </Box>
     ),
   },
 ];
 
-function getDateString(date: Date | string | null | undefined): string | undefined {
-  if (date) {
-    return dayjs(date).format('YYYY-MM-DD');
-  }
-  return undefined;
-}
-
 export function AdminGiftList(props: {
-  selectedGoods: SeletctedLiveShoppingType;
+  selectedLiveShoppingId: number | null;
 }): JSX.Element {
-  const { selectedGoods } = props;
-  const orders = useFmOrdersByGoods(
-    {
-      searchStatuses: getFmOrderStatusByNames([
-        '결제확인',
-        '배송완료',
-        '배송중',
-        '부분배송완료',
-        '부분배송중',
-        '부분출고완료',
-        '부분출고준비',
-        '상품준비',
-        '주문접수',
-        '출고완료',
-        '출고준비',
-      ]),
-      goodsIds: [selectedGoods.goodsId],
-      searchStartDate: getDateString(selectedGoods?.sellStartDate),
-      searchEndDate: getDateString(selectedGoods?.sellEndDate),
-    },
-    {},
-    'admin',
-  );
+  const { selectedLiveShoppingId } = props;
+
+  const { data, isLoading, refetch } = useAdminLiveShoppingGiftOrderList({
+    liveShoppingId: selectedLiveShoppingId,
+  });
+
   const { isDesktopSize } = useDisplaySize();
   const dataGridBgColor = useColorModeValue('inherit', 'gray.300');
 
-  const filteredOrders = useMemo(() => {
-    if (!orders.data) return [];
-    return orders.data.filter((d) => {
-      // 선물하기인 주문만 필터링
-      return d.giftFlag;
-    });
-  }, [orders.data]);
+  const orderData = useMemo(() => {
+    if (!data) return [];
+    return data;
+  }, [data]);
 
   // 퍼스트몰 주문정보로 이동하기
+  // TODO: 크크쇼 주문정보로 이동하기 -> [관리자] 주문 및 결제조회 일감 진행 후
   const handleRowClick = (param: GridRowParams): void => {
     if (param.row?.order_seq) {
       const url = `http://whiletrue.firstmall.kr/admin/order/view?query_string=&no=${param.row?.order_seq}`;
@@ -170,6 +131,12 @@ export function AdminGiftList(props: {
 
   return (
     <Box minHeight={{ base: 300, md: 600 }} mt={3}>
+      {selectedLiveShoppingId && (
+        <Button size="xs" onClick={() => refetch()} disabled={!selectedLiveShoppingId}>
+          새로고침
+        </Button>
+      )}
+
       <ChakraDataGrid
         bg={dataGridBgColor}
         autoHeight
@@ -178,7 +145,7 @@ export function AdminGiftList(props: {
         disableSelectionOnClick
         disableColumnMenu
         density="compact"
-        loading={orders.isLoading}
+        loading={isLoading}
         columns={columns.map((col) => {
           if (col.headerName === '상품') {
             const flex = isDesktopSize ? 1 : undefined;
@@ -186,7 +153,7 @@ export function AdminGiftList(props: {
           }
           return col;
         })}
-        rows={filteredOrders}
+        rows={orderData}
         onRowClick={handleRowClick}
       />
     </Box>

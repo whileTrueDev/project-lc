@@ -34,6 +34,7 @@ import {
   createDummyOrderWithCancellation,
   createDummyOrderWithExchange,
   createDummyOrderWithReturn,
+  createDummyOrderWithSupport,
   nonMemberOrder,
   normalOrder,
   orderExportReady,
@@ -42,7 +43,12 @@ import {
 } from './seedData/dummyOrder';
 import { dummyPayments } from './seedData/dummyPayment';
 import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquiry';
-
+import {
+  dummyCoupon,
+  dummyCustomerCoupon,
+  dummyCustomerCouponLog,
+} from './seedData/dummyCoupon';
+import { dummyMileage, dummyMileageLog } from './seedData/mileage';
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
@@ -332,6 +338,29 @@ async function createDummyOrderCancelReturnExchange(): Promise<void> {
 async function createDummyPayments(): Promise<void> {
   await prisma.orderPayment.createMany({ data: dummyPayments });
 }
+
+
+async function createDummyCoupon(): Promise<void> {
+  await prisma.coupon.create({ data: dummyCoupon });
+}
+
+async function createDummyCustomerCoupon(): Promise<void> {
+  await prisma.customerCoupon.create({ data: dummyCustomerCoupon });
+}
+
+async function createDummyCustomerCouponLog(): Promise<void> {
+  await prisma.customerCouponLog.create({ data: dummyCustomerCouponLog });
+}
+
+async function createDummyCustomerMileage(): Promise<void> {
+  await prisma.customerMileage.create({ data: dummyMileage });
+}
+
+async function createDummyCustomerMileageLog(): Promise<void> {
+  await prisma.customerMileageLog.create({ data: dummyMileageLog });
+}
+
+
 /** 시드 메인 함수 */
 async function main(): Promise<void> {
   // 약관 데이터 저장
@@ -389,6 +418,7 @@ async function main(): Promise<void> {
   // 더미 주문데이터 생성
   await createDummyOrderData();
   await createDummyOrderCancelReturnExchange();
+  await createDummyOrderWithSupport(); // 방송인 후원 정보 포함된 주문 생성
 
   // 더미 상품리뷰 생성
   await createGoodsReview(prisma);
@@ -400,6 +430,18 @@ async function main(): Promise<void> {
 
   // 더미페이먼트 생성
   await createDummyPayments();
+
+  // 더미 쿠폰 생성
+  await createDummyCoupon();
+  // 더미 커스터머 쿠폰 생성
+  await createDummyCustomerCoupon();
+  // 더미 쿠폰 로그 생성
+  await createDummyCustomerCouponLog();
+
+  // 더미 마일리지 생성
+  await createDummyCustomerMileage();
+  // 더미 마일리지 로그 생성
+  await createDummyCustomerMileageLog();
 }
 
 main()

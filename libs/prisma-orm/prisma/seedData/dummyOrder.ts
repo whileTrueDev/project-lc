@@ -60,10 +60,14 @@ const dummyOrderItemOptionData = [
   },
 ];
 
+type CreateDummyOrderOpts = DummyOrderFundamentalDataProps & {
+  withSupportData?: boolean;
+};
 export const createDummyOrder = async ({
   orderCode,
   step,
-}: DummyOrderFundamentalDataProps): Promise<{
+  withSupportData,
+}: CreateDummyOrderOpts): Promise<{
   orderId: number;
   orderItemId: number;
   orderItemOptionId: number;
@@ -71,6 +75,7 @@ export const createDummyOrder = async ({
   const order = await prisma.order.create({
     data: {
       customer: { connect: { id: 1 } },
+      supportOrderIncludeFlag: !!withSupportData,
       ...getDummyOrderFundamentalData({
         orderCode,
         step,
@@ -82,6 +87,16 @@ export const createDummyOrder = async ({
     data: {
       ...dummyOrderItemData[0],
       orderId: order.id,
+      support: {
+        create: !withSupportData
+          ? undefined
+          : {
+              broadcasterId: 1,
+              liveShoppingId: 1,
+              message: '테스트 메시지',
+              nickname: '테스터',
+            },
+      },
     },
   });
 
@@ -304,6 +319,81 @@ export const createDummyOrderWithReturn = async (): Promise<void> => {
         },
       },
       images: { create: [{ imageUrl: 'https://dummyimage.com/300' }] },
+    },
+  });
+};
+
+/** 방송인 후원이 포함된 주문 */
+export const createDummyOrderWithSupport = async (): Promise<void> => {
+  await createDummyOrder({
+    orderCode: 'orderWithSupport',
+    step: 'shippingDone',
+    withSupportData: true,
+  });
+  await createDummyOrder({
+    orderCode: 'orderWithSupport2',
+    step: 'shippingDone',
+    withSupportData: true,
+  });
+  await createDummyOrder({
+    orderCode: 'orderWithSupport3',
+    step: 'shippingDone',
+    withSupportData: true,
+  });
+  const order1 = await createDummyOrder({
+    orderCode: 'orderWithSupport4',
+    step: 'purchaseConfirmed',
+    withSupportData: true,
+  });
+  await prisma.export.create({
+    data: {
+      orderId: order1.orderId,
+      exportCode: 'E_TEST_01',
+      deliveryCompany: '테스트배송사',
+      deliveryNumber: '12341234',
+      buyConfirmSubject: 'system',
+      buyConfirmDate: new Date(),
+      shippingDoneDate: new Date(),
+      exportDate: new Date('2022-06-05'),
+      sellerId: 1,
+      items: {
+        create: [
+          {
+            amount: 1,
+            status: 'purchaseConfirmed',
+            orderItemId: order1.orderItemId,
+            orderItemOptionId: order1.orderItemOptionId,
+          },
+        ],
+      },
+    },
+  });
+  const order2 = await createDummyOrder({
+    orderCode: 'orderWithSupport5',
+    step: 'purchaseConfirmed',
+    withSupportData: true,
+  });
+  await prisma.export.create({
+    data: {
+      orderId: order2.orderId,
+      exportCode: 'E_TEST_02',
+      deliveryCompany: '테스트배송사2',
+      deliveryNumber: '0987654321',
+      buyConfirmSubject: 'system',
+      buyConfirmDate: new Date(),
+      shippingDoneDate: new Date(),
+      exportDate: new Date('2022-06-05'),
+      sellerId: 1,
+      items: {
+        create: [
+          {
+            amount: 1,
+            status: 'purchaseConfirmed',
+            orderItemId: order2.orderItemId,
+            orderItemOptionId: order2.orderItemOptionId,
+          },
+        ],
+      },
     },
   });
 };
