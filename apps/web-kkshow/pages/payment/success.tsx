@@ -88,9 +88,6 @@ export function Success(): JSX.Element {
         if (item.status === 'error') {
           router.push(`/payment/fail?message=${item.message}`);
         } else {
-          console.log('after dopayment redirection order: ', order);
-          console.log('payment id', item.orderPaymentId);
-
           const orderPaymentId = item.orderPaymentId || undefined; // 토스페이먼츠 결제요청 후 생성한 OrderPayment.id;
 
           // * createOrderDto 만들기 :  createOrderForm 에서 createOrderDto에 해당하는 데이터만 가져오기
@@ -104,13 +101,10 @@ export function Success(): JSX.Element {
           };
 
           // * CreateOrderShippingDto 만들기 :  store.shipping을 dto 형태로 바꾸기
-
           const shippingDto: CreateOrderShippingDto = {
             shipping: OrderShippingDataToDto(shipping),
           };
 
-          console.log('createOrderDto', createOrderDto);
-          console.log('CreateOrderShippingDto', shippingDto);
           // * 주문생성
           createOrder
             .mutateAsync({ order: createOrderDto, shipping: shippingDto })

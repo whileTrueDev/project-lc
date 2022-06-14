@@ -45,7 +45,7 @@ export function Receipt(): JSX.Element {
 
   const discount = productOriginPrice - productDiscountedPrice;
 
-  const totalShippingCost = orderDetailData.shippings
+  const totalShippingCost = orderDetailData?.shippings
     ? orderDetailData.shippings
         .map((s) => Number(s.shippingCost))
         .reduce((sum, cur) => sum + cur, 0)
@@ -156,14 +156,14 @@ export function Receipt(): JSX.Element {
                 <Text>쿠폰사용</Text>
                 <Text>
                   -{' '}
-                  {orderDetailData.customerCouponLogs[0]?.customerCoupon.coupon.amount.toLocaleString() ||
+                  {orderDetailData?.customerCouponLogs[0]?.customerCoupon.coupon.amount.toLocaleString() ||
                     0}
                 </Text>
               </Flex>
               <Flex justifyContent="space-between" color="gray.500">
                 <Text>적립금사용</Text>
                 <Text>
-                  - {orderDetailData.mileageLogs[0]?.amount.toLocaleString() || 0}
+                  - {orderDetailData?.mileageLogs[0]?.amount.toLocaleString() || 0}
                 </Text>
               </Flex>
               <Divider mt={2} mb={2} />
@@ -200,9 +200,9 @@ export function Receipt(): JSX.Element {
             </GridItem>
             <GridItem colSpan={7}>
               {isDesktopSize ? (
-                <ReceiptOrderItemInfo data={orderDetailData.orderItems} />
+                <ReceiptOrderItemInfo data={orderDetailData?.orderItems} />
               ) : (
-                <MobileReceiptOrderItemInfo data={orderDetailData.orderItems} />
+                <MobileReceiptOrderItemInfo data={orderDetailData?.orderItems} />
               )}
             </GridItem>
             <GridItem colSpan={7}>

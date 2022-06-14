@@ -103,10 +103,7 @@ export function PaymentBox(): JSX.Element {
       top="0px"
       left="0px"
       right="0px"
-      // as="form"
-      // onSubmit={handleSubmit(onSubmit)}
     >
-      <Text>{JSON.stringify(shipping)}</Text>
       <SectionWithTitle title="적립혜택" disableDivider>
         <Flex justifyContent="space-between" h="60px" alignItems="center">
           {mileageSetting.mileageStrategy === 'noMileage' ? (

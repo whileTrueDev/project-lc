@@ -50,8 +50,6 @@ export function OrderPaymentForm(): JSX.Element | null {
 
   // * submit => doPayment 실행(success 혹은 fail로 리다이렉트 됨)
   const onSubmit: SubmitHandler<CreateOrderForm> = async (submitData) => {
-    console.log({ paymentType, selectedItems }, submitData);
-
     const {
       ordererPhone1,
       ordererPhone2,
@@ -85,9 +83,8 @@ export function OrderPaymentForm(): JSX.Element | null {
       );
       const cookieExpire = new Date();
       cookieExpire.setMinutes(cookieExpire.getMinutes() + 1);
-      setCookie('amount', amount, { expire: cookieExpire });
+      setCookie('amount', amount, { expire: cookieExpire, path: '/' }); // path 설정 안하면 /payment로 저장되기는 함. 이유는 모르겠으나 한번은 path가 /goods로 저장되어 /payment페이지에서 쿠키가 읽히지 않음 -> 결제금액 비교 못하는 문제가 발생하여 '/' 로 저장함
 
-      console.log('before doPayment order :', order);
       await doPayment(
         paymentType,
         CLIENT_KEY,
@@ -95,11 +92,8 @@ export function OrderPaymentForm(): JSX.Element | null {
         productName,
         getValues('ordererName'),
       );
-      console.log('payment done');
     }
   };
-
-  // if (orderPrepareData.orderItems.length === 0) throw Error('asdf');
 
   return (
     <FormProvider {...methods}>
