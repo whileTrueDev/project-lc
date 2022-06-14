@@ -168,5 +168,6 @@ export * from './lib/res-types/productPromotion.res';
 export * from './lib/res-types/refund.res';
 export * from './lib/res-types/return.res';
 export * from './lib/res-types/searchResult.res';
+export * from './lib/res-types/sellerSettlements.res';
 export * from './lib/res-types/socialAccounts.res';
 export * from './lib/res-types/userProfile.res';

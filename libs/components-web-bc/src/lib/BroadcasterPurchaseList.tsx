@@ -41,6 +41,11 @@ export function BroadcasterPurchaseList(): JSX.Element | null {
       >
         새로고침
       </Button>
+
+      {purchaseData.pages.every((x) => x.orders.length === 0) && (
+        <Text my={10}>아직 데이터가 없습니다.</Text>
+      )}
+
       {purchaseData.pages.map((page, pageIndex) => (
         <Box key={pageIndex}>
           {page.orders.map((purchase) => (

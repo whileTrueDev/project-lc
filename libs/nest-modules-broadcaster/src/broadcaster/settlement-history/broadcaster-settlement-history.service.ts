@@ -56,6 +56,20 @@ export class BroadcasterSettlementHistoryService {
         .filter((x) => !!x),
     });
 
+    // Export에 정산정보 연결 작업
+    const exportCodes = items.map((i) => i.exportCode);
+    const bcSettlemtItems = await this.prisma.broadcasterSettlementItems.findMany({
+      where: { Export: null, exportCode: { in: exportCodes } },
+    });
+    await Promise.all(
+      bcSettlemtItems.map((_item) => {
+        return this.prisma.export.update({
+          where: { exportCode: _item.exportCode },
+          data: { broadcasterSettlementItems: { connect: { id: _item.id } } },
+        });
+      }),
+    );
+
     return result.count;
   }
 
