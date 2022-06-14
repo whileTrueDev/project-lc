@@ -1,21 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-
-export type kkshowOrderStatusEnglishString =
-  | 'orderReceived'
-  | 'paymentConfirmed'
-  | 'goodsReady'
-  | 'partialExportReady'
-  | 'exportReady'
-  | 'partialExportDone'
-  | 'exportDone'
-  | 'partialShipping'
-  | 'shipping'
-  | 'partialShippingDone'
-  | 'shippingDone'
-  | 'purchaseConfirmed'
-  | 'paymentCanceled'
-  | 'orderInvalidated'
-  | 'paymentFailed';
+import { OrderProcessStep } from '@prisma/client';
 
 export interface KkshowOrderStatus {
   name:
@@ -54,10 +38,7 @@ export const kkshowOrderStatusNames = [
   '주문무효',
   '결제실패',
 ];
-export const kkshowOrderStatuses: Record<
-  kkshowOrderStatusEnglishString,
-  KkshowOrderStatus
-> = {
+export const kkshowOrderStatuses: Record<OrderProcessStep, KkshowOrderStatus> = {
   orderReceived: { name: '주문접수', chakraColor: 'yellow' },
   paymentConfirmed: { name: '결제확인', chakraColor: 'green' },
   goodsReady: { name: '상품준비', chakraColor: 'cyan' },
