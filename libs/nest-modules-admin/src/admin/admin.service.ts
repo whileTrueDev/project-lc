@@ -268,14 +268,6 @@ export class AdminService {
     dto: LiveShoppingDTO,
     videoId?: number | null,
   ): Promise<boolean> {
-    if (dto.fmGoodsSeq) {
-      const isDuplicated = await this.checkDupFMGoodsConnectionId(Number(dto.fmGoodsSeq));
-      if (isDuplicated)
-        throw new BadRequestException(
-          `이미 다른 상품or라이브쇼핑or상품홍보에 연결된 퍼스트몰 상품번호입니다.
-          퍼스트몰 상품 고유번호를 다시 확인해주세요.`,
-        );
-    }
     const liveShoppingUpdate = await this.prisma.liveShopping.update({
       where: { id: Number(dto.id) },
       data: {
@@ -293,7 +285,6 @@ export class AdminService {
         videoId: videoId || undefined,
         whiletrueCommissionRate: dto.whiletrueCommissionRate || 0,
         broadcasterCommissionRate: dto.broadcasterCommissionRate || 0,
-        fmGoodsSeq: dto.fmGoodsSeq ? Number(dto.fmGoodsSeq) : undefined,
         liveShoppingName: dto.liveShoppingName || undefined,
       },
     });
@@ -388,7 +379,9 @@ export class AdminService {
     return false;
   }
 
-  /** 상품홍보 fmGoodsSeq 등록전 다른 곳에 등록된 fmGoodsSeq(goodsConfirmation, liveShopping) 과 중복되는지 확인
+  /**
+   * @deprecated
+   * 상품홍보 fmGoodsSeq 등록전 다른 곳에 등록된 fmGoodsSeq(goodsConfirmation, liveShopping) 과 중복되는지 확인
    * @return 중복되는 경우 true, 아니면 false
    */
   public async checkHasDuplicateFmGoodsSeq(goodsSeq: number): Promise<boolean> {

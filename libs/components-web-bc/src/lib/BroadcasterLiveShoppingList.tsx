@@ -113,7 +113,7 @@ export function BroadcasterLiveShoppingList({
           row.liveShoppingName || '라이브 쇼핑명은 라이브 쇼핑 확정 후, 등록됩니다.',
       },
       {
-        field: 'fmGoodsSeq',
+        field: 'goods_name',
         headerName: '상품명',
         minWidth: 350,
         renderCell: ({ row }) =>

@@ -12,6 +12,7 @@ import {
 export class BroadcasterPromotionPageService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** @deprecated */
   public async getFmGoodsSeqsLinkedToProductPromotions(
     id: Broadcaster['id'],
   ): Promise<broadcasterProductPromotionDto[]> {
