@@ -46,8 +46,6 @@ interface OrderItemProps {
       nickname?: string | null;
       avatar?: string | null;
     };
-    shippingCost: string | number;
-    shippingCostIncluded?: boolean;
   };
   disableSupportInfo?: boolean;
 }

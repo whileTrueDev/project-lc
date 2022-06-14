@@ -1,5 +1,5 @@
 // 다음주소찾기에서 해당 지역이 주소에 표시될때 형태
-export const koreaProvincesShortForm = {
+export const koreaProvincesShortForm: Record<string, string> = {
   강원도: '강원',
   경기도: '경기',
   경상남도: '경남',
