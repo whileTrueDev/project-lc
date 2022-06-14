@@ -70,6 +70,7 @@ export * from './lib/mutation/useNotificationMutation';
 export * from './lib/mutation/useOrderMutation';
 export * from './lib/mutation/useOrderPurchaseConfirmMutation';
 export * from './lib/mutation/usePaymentMutation';
+export * from './lib/mutation/useRefundMutation';
 export * from './lib/mutation/useRegistGoods';
 export * from './lib/mutation/useRestoreInactiveDataMutation';
 export * from './lib/mutation/useReviewCommentMutation';

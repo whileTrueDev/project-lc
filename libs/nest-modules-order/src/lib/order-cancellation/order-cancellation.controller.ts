@@ -8,10 +8,12 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
+import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateOrderCancellationDto,
   CreateOrderCancellationRes,
@@ -25,6 +27,7 @@ import {
 } from '@project-lc/shared-types';
 import { OrderCancellationService } from './order-cancellation.service';
 
+@UseGuards(JwtAuthGuard)
 @UseInterceptors(HttpCacheInterceptor)
 @CacheClearKeys('order/cancellation')
 @Controller('order/cancellation')
