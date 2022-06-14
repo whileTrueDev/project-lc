@@ -80,6 +80,12 @@ export function OrderListDownloadDialog({
     }
   };
 
+  const selectedOrdersOrderCodeList = orderDetails.data
+    ? orderDetails.data
+        .filter((o) => selectedOrders.includes(o.id))
+        .map((o) => o.orderCode as string)
+    : [];
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="2xl">
       <ModalOverlay />
@@ -87,10 +93,9 @@ export function OrderListDownloadDialog({
         <ModalHeader>주문 내보내기</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          {JSON.stringify(selectedOrders)}
           {orderDetails.isLoading && <OrderListDownloadLoading />}
           {!orderDetails.isLoading && orderDetails.data && (
-            <OrderListDownloadSetting targetOrderIds={selectedOrders} />
+            <OrderListDownloadSetting targetOrderIds={selectedOrdersOrderCodeList} />
           )}
         </ModalBody>
         <ModalFooter>
