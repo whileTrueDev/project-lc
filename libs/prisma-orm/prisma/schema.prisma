@@ -113,6 +113,8 @@ model SellerSettlements {
   seller               Seller                  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   settlementItems      SellerSettlementItems[]
 
+  Export Export?
+
   @@index([id], name: "SellerSettlementsIndex")
 }
 
@@ -142,9 +144,7 @@ model SellerSettlementItems {
   SellerSettlements   SellerSettlements? @relation(fields: [sellerSettlementsId], references: [id], onDelete: Cascade)
 
   relatedOrderId Int? // (project-lc Order테이블의) 주문 고유번호 => 기존 퍼스트몰 fm_order.order_seq 저장하는 컬럼명이 orderId라서 relatedOrderId라고 씀
-  order          Order?  @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
-  exportId       Int?
-  export         Export? @relation(fields: [exportId], references: [id], onDelete: SetNull)
+  order          Order? @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
 }
 
 // 판매자 정산 계좌 정보
@@ -612,6 +612,8 @@ model BroadcasterSettlements {
   broadcaster                Broadcaster                  @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
   broadcasterSettlementItems BroadcasterSettlementItems[]
 
+  Export Export?
+
   @@unique([broadcasterId, round])
 }
 
@@ -632,9 +634,7 @@ model BroadcasterSettlementItems {
   settlements              BroadcasterSettlements @relation(fields: [broadcasterSettlementsId], references: [id], onDelete: Cascade)
 
   relatedOrderId Int? // (project-lc Order테이블의) 주문 고유번호 => 기존 퍼스트몰 fm_order.order_seq 저장하는 컬럼명이 orderId라서 relatedOrderId라고 씀
-  order          Order?  @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
-  exportId       Int?
-  export         Export? @relation(fields: [exportId], references: [id], onDelete: SetNull)
+  order          Order? @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
 }
 
 // 방송인 정산을 위한 계약자, 계좌정보(방송인 정산등록정보)
@@ -701,6 +701,8 @@ model ProductPromotion {
   broadcasterId Int?
   broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
 
+  orderItemSupport OrderItemSupport[]
+  cartItemSupport  CartItemSupport[]
 }
 
 // -------------------------------------------------
@@ -737,6 +739,8 @@ model LiveShopping {
   BroadcasterSettlementItems  BroadcasterSettlementItems[]
   images                      LiveShoppingImage[]
   followers                   Customer[]
+  orderItemSupport            OrderItemSupport[]
+  cartItemSupport             CartItemSupport[]
 }
 
 // 라이브 커머스 랭킹 테이블
@@ -1438,6 +1442,13 @@ model CartItemSupport {
   broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
   cartItemId    Int?         @unique // 후원이 연결된 장바구니 상품 고유번호
   cartItem      CartItem?    @relation(fields: [cartItemId], references: [id], onDelete: Cascade) // 후원이 연결된 장바구니 상품
+
+  // 연결된 라이브쇼핑
+  liveShoppingId     Int?
+  liveShopping       LiveShopping?     @relation(fields: [liveShoppingId], references: [id])
+  // 연결된 상품홍보
+  productPromotionId Int?
+  productPromotion   ProductPromotion? @relation(fields: [productPromotionId], references: [id])
 }
 
 // *****************
@@ -1706,13 +1717,19 @@ model OrderItemOption {
 
 // 주문상품후원
 model OrderItemSupport {
-  id            Int          @id @default(autoincrement()) // 주문 상품 후원 고유번호
-  message       String? // 후원메시지
-  nickname      String? // 후원한 사람 닉네임(필요없을거 같기는 한데 비회원의 경우 필요할거같아서 일단 넣어둠)
-  broadcasterId Int? // 후원 대상 방송인 고유번호
-  broadcaster   Broadcaster? @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
-  orderItemId   Int?         @unique // 후원이 연결된 주문 상품 고유번호
-  orderItem     OrderItem?   @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 후원이 연결된 주문 상품
+  id                 Int               @id @default(autoincrement()) // 주문 상품 후원 고유번호
+  message            String? // 후원메시지
+  nickname           String? // 후원한 사람 닉네임(필요없을거 같기는 한데 비회원의 경우 필요할거같아서 일단 넣어둠)
+  broadcasterId      Int? // 후원 대상 방송인 고유번호
+  broadcaster        Broadcaster?      @relation(fields: [broadcasterId], references: [id], onDelete: SetNull) // 후원 대상 방송인
+  orderItemId        Int?              @unique // 후원이 연결된 주문 상품 고유번호
+  orderItem          OrderItem?        @relation(fields: [orderItemId], references: [id], onDelete: Cascade) // 후원이 연결된 주문 상품
+  // 연결된 라이브쇼핑
+  liveShoppingId     Int?
+  liveShopping       LiveShopping?     @relation(fields: [liveShoppingId], references: [id])
+  // 연결된 상품홍보
+  productPromotionId Int?
+  productPromotion   ProductPromotion? @relation(fields: [productPromotionId], references: [id])
 }
 
 // ****************
@@ -1918,32 +1935,35 @@ model OrderCancellationItem {
 
 // 출고
 model Export {
-  id                         Int                          @id @default(autoincrement()) // 출고고유번호
-  exportCode                 String?                      @unique // 출고코드
-  orderId                    Int // 주문 고유번호
-  order                      Order                        @relation(fields: [orderId], references: [id]) // 연결된 주문
-  status                     OrderProcessStep             @default(exportDone) // 출고상태 : 출고준비 | 출고완료(기본값) | 배송중 | 배송완료 -> 모두 OrderProcessStep 에 있어서 그대로 사용함
-  deliveryCompany            String // 택배사
-  deliveryNumber             String // 운송장번호
-  bundleExportCode           String? // 합포장출고코드(합포장인경우)
-  exportDate                 DateTime                     @default(now()) //출고일시
-  shippingDoneDate           DateTime? // 배송완료일자
-  buyConfirmDate             DateTime? // 구매확정일자(주문스키마에 있던것을 출고에 옮김)
-  buyConfirmSubject          BuyConfirmSubject? // 구매확정주체(null | 소비자, 관리자, 시스템)
-  broadcasterSettlementItems BroadcasterSettlementItems[]
-  sellerSettlementItems      SellerSettlementItems[]
-  exchangeExportedFlag       Boolean                      @default(false) // 재배송(교환출고인지) 여부
-  exchange                   Exchange? // 교환출고시 연결된 교환데이터
-  sellerId                   Int? // 출고 진행한 판매자
-  seller                     Seller?                      @relation(fields: [sellerId], references: [id])
-  items                      ExportItem[] // 출고상품
+  id                   Int                @id @default(autoincrement()) // 출고고유번호
+  exportCode           String?            @unique // 출고코드
+  orderId              Int // 주문 고유번호
+  order                Order              @relation(fields: [orderId], references: [id]) // 연결된 주문
+  status               OrderProcessStep   @default(exportDone) // 출고상태 : 출고준비 | 출고완료(기본값) | 배송중 | 배송완료 -> 모두 OrderProcessStep 에 있어서 그대로 사용함
+  deliveryCompany      String // 택배사
+  deliveryNumber       String // 운송장번호
+  bundleExportCode     String? // 합포장출고코드(합포장인경우)
+  exportDate           DateTime           @default(now()) //출고일시
+  shippingDoneDate     DateTime?
+  buyConfirmDate       DateTime? // 구매확정일자(주문스키마에 있던것을 출고에 옮김)
+  buyConfirmSubject    BuyConfirmSubject? // 구매확정주체(null | 소비자, 관리자, 시스템)
+  exchangeExportedFlag Boolean            @default(false) // 재배송(교환출고인지) 여부
+  exchange             Exchange? // 교환출고시 연결된 교환데이터
+  sellerId             Int? // 출고 진행한 판매자
+  seller               Seller?            @relation(fields: [sellerId], references: [id])
+  items                ExportItem[] // 출고상품
+
+  broadcasterSettlementsId Int?                    @unique
+  broadcasterSettlements   BroadcasterSettlements? @relation(fields: [broadcasterSettlementsId], references: [id], onDelete: SetNull)
+  sellerSettlementsId      Int?                    @unique
+  sellerSettlements        SellerSettlements?      @relation(fields: [sellerSettlementsId], references: [id], onDelete: SetNull)
 }
 
 // 구매확정주체
 enum BuyConfirmSubject {
-  admin
-  customer
-  system
+  admin // 관리자에 의해
+  customer // 소비자에 의해
+  system // 자동처리에 의해
 }
 
 // 출고상품

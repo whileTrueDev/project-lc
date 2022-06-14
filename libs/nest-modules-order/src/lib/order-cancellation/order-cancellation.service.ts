@@ -38,9 +38,9 @@ export class OrderCancellationService {
         `주문취소는 주문접수, 입금확인 단계에서만 신청 가능합니다.`,
       );
     }
-    // 취소요청한 주문이 주문접수상태이면(환불 필요없음) 주문취소, 주문취소상품 상태 바로 완료 처리
-    const status: ProcessStatus =
-      order.step === 'orderReceived' ? 'complete' : 'requested';
+
+    // 주문취소, 주문취소상품 상태 : 완료
+    const status: ProcessStatus = 'complete';
 
     // 주문취소코드 생성
     const cancelCode = nanoid();
@@ -52,7 +52,7 @@ export class OrderCancellationService {
         cancelCode,
         order: { connect: { id: orderId } },
         status,
-        completeDate: status === 'complete' ? new Date() : undefined,
+        completeDate: new Date(),
         items: {
           create: items.map((item) => ({
             orderItem: { connect: { id: item.orderItemId } },

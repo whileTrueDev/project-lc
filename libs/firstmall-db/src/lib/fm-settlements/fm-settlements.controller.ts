@@ -22,7 +22,7 @@ import { FmSettlementService } from './fm-settlements.service';
 export class FmSettlementController {
   constructor(private readonly fmSettleService: FmSettlementService) {}
 
-  /** 정산 대상 조회 - 모든 판매자 */
+  /** @deprecated 정산 대상 조회 - 모든 판매자 */
   @UseGuards(AdminGuard)
   @Get('targets')
   @UseInterceptors(HttpCacheInterceptor)
@@ -30,7 +30,7 @@ export class FmSettlementController {
     return this.fmSettleService.findAllSettleTargetList();
   }
 
-  /** 정산 대상 조회 - 모든 방송인 */
+  /** @deprecated 정산 대상 조회 - 모든 방송인 */
   @UseGuards(AdminGuard)
   @Get('broadcaster/targets')
   @UseInterceptors(HttpCacheInterceptor)
@@ -38,7 +38,7 @@ export class FmSettlementController {
     return this.fmSettleService.findBcSettleTargetList();
   }
 
-  /** 정산 대상 조회 - 특정 방송인 */
+  /** @deprecated 정산 대상 조회 - 특정 방송인 */
   @Get('broadcaster/:broadcasterId/targets')
   async getOneBcSettlementTargets(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,
@@ -47,7 +47,7 @@ export class FmSettlementController {
     return this.fmSettleService.findBcSettleTargetList(broadcasterId);
   }
 
-  /** 정산 예정 금액 조회 - 특정 방송인 */
+  /** @deprecated 정산 예정 금액 조회 - 특정 방송인 */
   @Get('broadcaster/:broadcasterId/receivable-amount')
   async getAmount(
     @Param('broadcasterId', ParseIntPipe) broadcasterId: number,

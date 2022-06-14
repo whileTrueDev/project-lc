@@ -231,11 +231,7 @@ export class OrderService {
               // 주문상품에 후원정보가 있는경우 주문상품후원생성
               support: support
                 ? {
-                    create: {
-                      message: support.message,
-                      nickname: support.nickname,
-                      broadcaster: { connect: { id: support.broadcasterId } },
-                    },
+                    create: support,
                   }
                 : undefined,
             };

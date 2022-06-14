@@ -69,6 +69,8 @@ export class CartService {
               broadcasterId: dto.support.broadcasterId,
               nickname: dto.support.nickname,
               message: dto.support.message,
+              liveShoppingId: dto.support.liveShoppingId,
+              productPromotionId: dto.support.productPromotionId,
             },
           }
         : undefined,
