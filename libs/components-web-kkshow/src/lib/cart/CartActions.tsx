@@ -94,11 +94,9 @@ export function CartActions(): JSX.Element {
               goodsOptionId: o.goodsOptionsId as number,
             };
           }),
-          shippingCost: Number(i.shippingCost),
           shippingGroupId: i.shippingGroupId || 1,
           // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
           channel: 'normal',
-          shippingCostIncluded: i.shippingCostIncluded, // 다른 상품에 이미 배송비가 포함되었는 지 여부
           support: i.support
             ? {
                 broadcasterId: i.support.id,

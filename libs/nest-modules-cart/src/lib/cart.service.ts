@@ -60,8 +60,6 @@ export class CartService {
       goodsId: dto.goodsId,
       customerId: dto.customerId,
       tempUserId: dto.tempUserId,
-      shippingCost: dto.shippingCost,
-      shippingCostIncluded: dto.shippingCostIncluded,
       shippingGroupId: dto.shippingGroupId,
       channel: dto.channel,
       options: { createMany: { data: dto.options } },

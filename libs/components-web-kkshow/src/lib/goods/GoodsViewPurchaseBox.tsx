@@ -385,8 +385,6 @@ function GoodsViewButtonSet({
           name: o.option_title,
           value: o.option1,
         })),
-        shippingCost: getStandardShippingCost(goods.ShippingGroup),
-        shippingCostIncluded: false,
         shippingGroupId: goods.shippingGroupId,
         // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
         channel: 'normal',
@@ -409,7 +407,6 @@ function GoodsViewButtonSet({
     cartDoneDialog,
     createCartItem,
     executePurchaseCheck,
-    goods.ShippingGroup,
     goods.id,
     goods.shippingGroupId,
     selectedBc,
@@ -438,15 +435,13 @@ function GoodsViewButtonSet({
               quantity: o.quantity,
               name: o.option_title,
               value: o.option1,
-              normalPrice: o.consumer_price,
-              discountPrice: o.price,
+              normalPrice: Number(o.consumer_price),
+              discountPrice: Number(o.price),
               weight: o.weight,
             })),
-            shippingCost: getStandardShippingCost(goods.ShippingGroup),
             shippingGroupId: goods.shippingGroupId || 1,
             // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
             channel: 'normal',
-            shippingCostIncluded: false, // 다른 상품에 이미 배송비가 포함되었는 지 여부
             support: selectedBc
               ? {
                   broadcasterId: selectedBc.id,
@@ -474,7 +469,6 @@ function GoodsViewButtonSet({
       profile.data?.id,
       goods.goods_name,
       goods.id,
-      goods.ShippingGroup,
       goods.shippingGroupId,
       selectedOpts,
       supportMessage,

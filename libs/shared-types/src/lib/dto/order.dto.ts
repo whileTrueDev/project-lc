@@ -103,16 +103,6 @@ export class CreateOrderItemDto {
   @Type(() => CreateOrderItemSupportDto)
   support?: CreateOrderItemSupportDto;
 
-  /** 주문당시 이 주문 상품에 포함된  배송비 Decimal @default("0.00") @db.Decimal(10, 2)  */
-  @IsNumber()
-  @Type(() => Number)
-  shippingCost: number;
-
-  /**  이 주문 상품에 동일 판매자의 배송비가 포함되었는지 여부 @default(false)  */
-  @IsBoolean()
-  @IsOptional()
-  shippingCostIncluded?: OrderItem['shippingCostIncluded'];
-
   /**  연결된 배송정책 id */
   @IsNumber()
   shippingGroupId: OrderItem['shippingGroupId'];
