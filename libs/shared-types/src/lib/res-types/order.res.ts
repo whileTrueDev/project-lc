@@ -55,7 +55,7 @@ export type OrderItemWithRelations = OrderItem & {
 
 export type OrderCancellationBaseData = Pick<
   OrderCancellation,
-  'id' | 'cancelCode' | 'requestDate'
+  'id' | 'cancelCode' | 'requestDate' | 'completeDate'
 > & {
   items: OrderCancellationItem[];
 };
