@@ -88,7 +88,6 @@ export class OrderController {
   }
 
   /** 개별 주문 상세조회 */
-  @UseGuards(JwtAuthGuard)
   @Get('detail')
   getOrderDetail(
     @Query(new ValidationPipe({ transform: true })) dto: GetOneOrderDetailDto,
