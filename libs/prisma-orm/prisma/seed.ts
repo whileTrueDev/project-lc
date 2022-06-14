@@ -339,7 +339,6 @@ async function createDummyPayments(): Promise<void> {
   await prisma.orderPayment.createMany({ data: dummyPayments });
 }
 
-
 async function createDummyCoupon(): Promise<void> {
   await prisma.coupon.create({ data: dummyCoupon });
 }
@@ -359,7 +358,6 @@ async function createDummyCustomerMileage(): Promise<void> {
 async function createDummyCustomerMileageLog(): Promise<void> {
   await prisma.customerMileageLog.create({ data: dummyMileageLog });
 }
-
 
 /** 시드 메인 함수 */
 async function main(): Promise<void> {
