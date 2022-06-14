@@ -457,6 +457,7 @@ export class GoodsService {
       },
     });
 
+    if (!result) return null;
     return {
       ...result,
       informationNotice: result.informationNotice
