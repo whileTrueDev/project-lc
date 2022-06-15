@@ -56,7 +56,11 @@ export class LiveShoppingService {
 
   /** 라이브 쇼핑 목록 조회 */
   async findLiveShoppings(dto?: FindLiveShoppingDto): Promise<LiveShoppingWithGoods[]> {
-    const { id, goodsIds, broadcasterId, sellerId } = dto;
+    // 자신의 id를 반환하는 쿼리 수행하기
+    const id = dto?.id;
+    const goodsIds = dto?.goodsIds;
+    const broadcasterId = dto?.broadcasterId;
+    const sellerId = dto?.sellerId;
     return this.prisma.liveShopping.findMany({
       where: {
         id: id || undefined,
@@ -85,6 +89,15 @@ export class LiveShoppingService {
         },
         liveShoppingVideo: { select: { youtubeUrl: true } },
         images: true,
+        orderItemSupport: {
+          select: {
+            orderItem: {
+              select: {
+                options: { select: { discountPrice: true, quantity: true } },
+              },
+            },
+          },
+        },
       },
     });
   }

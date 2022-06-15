@@ -6,12 +6,12 @@ import { useState } from 'react';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
-import { AdminCouponListDetailDialog } from './AdminCouponListDetailDialog';
 import {
   DiscountUnitBage,
   DiscountApplyFieldBadge,
   DiscountApplyTypeBadge,
-} from './AdminCouponListBadge';
+} from '@project-lc/components-shared/CouponBadge';
+import { AdminCouponListDetailDialog } from './AdminCouponListDetailDialog';
 
 export function AdminCouponList(): JSX.Element {
   const toast = useToast();

@@ -16,7 +16,11 @@ import { CustomerCoupon } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
-import { CouponStatusDto, CustomerCouponDto } from '@project-lc/shared-types';
+import {
+  CouponStatusDto,
+  CustomerCouponDto,
+  CustomerCouponRes,
+} from '@project-lc/shared-types';
 import { CustomerService } from '@project-lc/nest-modules-customer';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
@@ -34,7 +38,7 @@ export class AdminCustomerCouponController {
   async getAllCustomerCoupons(
     @Query('customerId') customerId?: number,
     @Query('couponId') couponId?: number,
-  ): Promise<CustomerCoupon[]> {
+  ): Promise<CustomerCouponRes[]> {
     return this.customerCouponService.findCustomerCoupons(
       { customerId, couponId } || undefined,
     );

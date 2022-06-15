@@ -100,7 +100,12 @@ export function SettlementList(): JSX.Element | null {
       valueFormatter: ({ value }) => (value ? getLocaleNumber(value as string) : value),
     },
     { field: 'paymentMethod', headerName: '결제수단', sortable: false },
-    { field: 'pg', headerName: 'pg사', sortable: false },
+    {
+      field: 'pg',
+      headerName: 'pg사',
+      sortable: false,
+      valueFormatter: ({ value }) => value || '-',
+    },
     {
       field: 'pgCommission',
       headerName: '전자결제수수료',

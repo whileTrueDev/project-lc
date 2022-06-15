@@ -8,6 +8,7 @@ import { useDisplaySize, useLiveShoppingList, useProfile } from '@project-lc/hoo
 import { getLiveShoppingProgress, LiveShoppingWithGoods } from '@project-lc/shared-types';
 import { liveShoppingStateBoardWindowStore } from '@project-lc/stores';
 import { getCustomerWebHost } from '@project-lc/utils';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { memo, useCallback, useMemo, useState } from 'react';
 
@@ -174,12 +175,23 @@ export function BroadcasterLiveShoppingList({
             row.sellEndDate ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm') : '미정'
           }`,
       },
-      // {
-      //   headerName: '매출',
-      //   field: 'sales',
-      //   valueFormatter: ({ row }) =>
-      //     `${row.sales ? row.sales.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'}원`,
-      // },
+      {
+        headerName: '매출',
+        field: 'sales',
+        valueFormatter: ({ row }) => {
+          const totalPrice = (row as LiveShoppingWithGoods).orderItemSupport.reduce(
+            (prev, o) => {
+              const optTotalPrice = o.orderItem.options.reduce(
+                (_p, opt) => _p + Number(opt.discountPrice) * opt.quantity,
+                0,
+              );
+              return prev + optTotalPrice;
+            },
+            0,
+          );
+          return `${getLocaleNumber(totalPrice)}원`;
+        },
+      },
       {
         headerName: '유튜브영상',
         field: 'liveShoppingVideo.youtubeUrl',

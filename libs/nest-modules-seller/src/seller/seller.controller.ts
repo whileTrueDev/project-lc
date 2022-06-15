@@ -16,22 +16,23 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
+  ConfirmHistory,
   SellCommission,
   Seller,
   SellerSettlementAccount,
-  ConfirmHistory,
 } from '@prisma/client';
-import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CacheClearKeys,
   HttpCacheInterceptor,
   SellerInfo,
   UserPayload,
 } from '@project-lc/nest-core';
-import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
+import { MailVerificationService } from '@project-lc/nest-modules-mail-verification';
+import { PrismaService } from '@project-lc/prisma-orm';
 import {
   BusinessRegistrationDto,
+  ConfirmHistoryDto,
   EmailDupCheckDto,
   FindSellerDto,
   FindSellerRes,
@@ -41,23 +42,23 @@ import {
   SellerShopInfoDto,
   SettlementAccountDto,
   SignUpDto,
-  ConfirmHistoryDto,
 } from '@project-lc/shared-types';
 import { s3 } from '@project-lc/utils-s3';
-import __multer from 'multer';
 import { SellerContactsService } from './seller-contacts.service';
 import {
   SellerSettlementInfo,
-  SellerSettlementService,
-} from './seller-settlement.service';
+  SellerSettlementInfoService,
+} from './seller-settlement-info.service';
 import { SellerShopService } from './seller-shop.service';
 import { SellerService } from './seller.service';
+import SellerSettlementService from './settlement/seller-settlement.service';
 
 @Controller('seller')
 @CacheClearKeys('seller')
 export class SellerController {
   constructor(
     private readonly sellerService: SellerService,
+    private readonly sellerSettlementInfoService: SellerSettlementInfoService,
     private readonly sellerSettlementService: SellerSettlementService,
     private readonly sellerShopService: SellerShopService,
     private readonly mailVerificationService: MailVerificationService,
@@ -140,7 +141,7 @@ export class SellerController {
   public async selectSellerSettlementInfo(
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerSettlementInfo> {
-    return this.sellerSettlementService.selectSellerSettlementInfo(sellerInfo);
+    return this.sellerSettlementInfoService.selectSellerSettlementInfo(sellerInfo);
   }
 
   // 본인의 사업자 등록정보 등록
@@ -154,11 +155,11 @@ export class SellerController {
   ): Promise<SellerBusinessRegistrationType> {
     // 사업자 등록정보 등록
     const sellerBusinessRegistration =
-      await this.sellerSettlementService.insertBusinessRegistration(dto, sellerInfo);
+      await this.sellerSettlementInfoService.insertBusinessRegistration(dto, sellerInfo);
 
     // 사업자 등록정보 검수정보 등록
     const businessRegistrationConfirmation =
-      await this.sellerSettlementService.insertBusinessRegistrationConfirmation(
+      await this.sellerSettlementInfoService.insertBusinessRegistrationConfirmation(
         sellerBusinessRegistration,
       );
 
@@ -180,7 +181,7 @@ export class SellerController {
     @Body(ValidationPipe) dto: SettlementAccountDto,
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<SellerSettlementAccount> {
-    return this.sellerSettlementService.insertSettlementAccount(dto, sellerInfo);
+    return this.sellerSettlementInfoService.insertSettlementAccount(dto, sellerInfo);
   }
 
   // 본인의 정산정보 및 정산 검수 히스토리 조회
@@ -190,7 +191,7 @@ export class SellerController {
   public async selectSellerSettlementHistory(
     @SellerInfo() sellerInfo: UserPayload,
   ): Promise<ConfirmHistory[]> {
-    return this.sellerSettlementService.getSettlementConfirmHistory(sellerInfo);
+    return this.sellerSettlementInfoService.getSettlementConfirmHistory(sellerInfo);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -198,7 +199,7 @@ export class SellerController {
   public async InsertSettlementHistory(
     @Body(ValidationPipe) dto: ConfirmHistoryDto,
   ): Promise<ConfirmHistory> {
-    return this.sellerSettlementService.createSettlementConfirmHistory(dto);
+    return this.sellerSettlementInfoService.createSettlementConfirmHistory(dto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -267,21 +268,21 @@ export class SellerController {
       await this.prismaService.$transaction(async (): Promise<void> => {
         const seller = await this.sellerService.restoreInactiveSeller(dto.email);
         Promise.all([
-          await this.sellerSettlementService.restoreInactiveBusinessRegistration(
+          await this.sellerSettlementInfoService.restoreInactiveBusinessRegistration(
             seller.id,
           ),
 
-          await this.sellerSettlementService
+          await this.sellerSettlementInfoService
             .restoreInactiveBusinessRegistrationConfirmation(seller.id)
             .then((data) => {
               if (data) {
-                this.sellerSettlementService.deleteInactiveBusinessRegistrationConfirmation(
+                this.sellerSettlementInfoService.deleteInactiveBusinessRegistrationConfirmation(
                   data.SellerBusinessRegistrationId,
                 );
               }
             }),
           this.sellerContactsService.restoreSellerContacts(seller.id),
-          this.sellerSettlementService.restoreSettlementAccount(seller.id),
+          this.sellerSettlementInfoService.restoreSettlementAccount(seller.id),
 
           s3.moveObjects(
             'inactive-business-registration',

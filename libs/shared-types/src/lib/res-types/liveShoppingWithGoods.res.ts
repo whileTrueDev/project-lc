@@ -7,6 +7,7 @@ import {
   GoodsOptions,
   LiveShopping,
   LiveShoppingImage,
+  OrderItemOption,
   SellerShop,
 } from '@prisma/client';
 
@@ -29,6 +30,11 @@ export interface LiveShoppingWithGoods extends LiveShopping {
   };
   liveShoppingVideo: { youtubeUrl: string };
   images: LiveShoppingImage[];
+  orderItemSupport: {
+    orderItem: {
+      options: Pick<OrderItemOption, 'discountPrice' | 'quantity'>[];
+    };
+  }[];
 }
 
 export type LiveShoppingOutline = Pick<

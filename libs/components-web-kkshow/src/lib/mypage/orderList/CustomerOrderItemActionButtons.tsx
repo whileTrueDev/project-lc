@@ -68,7 +68,7 @@ export function OrderItemActionButtons({
       disabled: false,
     },
     {
-      label: '주문 취소 신청',
+      label: '주문 취소',
       onClick: () => {
         if (!cancelDataIncludingThisOrderItem) {
           orderCancelDialog.onOpen();

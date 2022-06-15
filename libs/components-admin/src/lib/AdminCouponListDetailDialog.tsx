@@ -20,7 +20,7 @@ import {
   DiscountUnitBage,
   DiscountApplyFieldBadge,
   DiscountApplyTypeBadge,
-} from './AdminCouponListBadge';
+} from '@project-lc/components-shared/CouponBadge';
 
 const columns: GridColumns = [
   { field: 'id', headerName: 'id', width: 10 },

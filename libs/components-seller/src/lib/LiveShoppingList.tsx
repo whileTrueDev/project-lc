@@ -29,9 +29,11 @@ import {
   useDeleteLiveShopping,
   useDisplaySize,
   useLiveShoppingList,
+  useProfile,
 } from '@project-lc/hooks';
 import { LiveShoppingWithGoods } from '@project-lc/shared-types';
 import { getCustomerWebHost } from '@project-lc/utils';
+import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
@@ -59,7 +61,8 @@ export interface LiveShoppingWithSalesFrontType extends LiveShoppingWithoutDate 
 export function LiveShoppingList(): JSX.Element {
   const toast = useToast();
   const { isMobileSize } = useDisplaySize();
-  const { data, isLoading } = useLiveShoppingList({});
+  const { data: profile } = useProfile();
+  const { data, isLoading } = useLiveShoppingList({ sellerId: profile?.id });
 
   const [pageSize, setPageSize] = useState<number>(5);
 
@@ -178,12 +181,23 @@ export function LiveShoppingList(): JSX.Element {
           row.sellEndDate ? dayjs(row.sellEndDate).format('YYYY/MM/DD HH:mm') : '미정'
         }`,
     },
-    // {
-    //   headerName: '매출',
-    //   field: 'sales',
-    //   valueFormatter: ({ row }) =>
-    //     `${row.sales ? row.sales.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'}원`,
-    // },
+    {
+      headerName: '매출',
+      field: 'sales',
+      valueFormatter: ({ row }) => {
+        const totalPrice = (row as LiveShoppingWithGoods).orderItemSupport.reduce(
+          (prev, o) => {
+            const optTotalPrice = o.orderItem.options.reduce(
+              (_p, opt) => _p + Number(opt.discountPrice) * opt.quantity,
+              0,
+            );
+            return prev + optTotalPrice;
+          },
+          0,
+        );
+        return `${getLocaleNumber(totalPrice)}원`;
+      },
+    },
     {
       headerName: '유튜브영상',
       field: 'liveShoppingVideo.youtubeUrl',
