@@ -7,6 +7,7 @@ import {
   useProductPromotions,
   useProfile,
 } from '@project-lc/hooks';
+import { CartItemRes } from '@project-lc/shared-types';
 import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
 import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
@@ -51,6 +52,58 @@ export function CartActions(): JSX.Element {
     });
   }, [data, selectedItems, toast]);
 
+  /** 장바구니 -> 주문시 판매유형 결정
+   * 유입에 따른 처리 방식
+    상품홍보페이지를 통해 유입된 경우
+    상품이 라이브쇼핑중인 경우 - 라이브쇼핑
+    라이브쇼핑중 카트에 담고, 향후 라이브쇼핑이 판매기간이 끝난 이후 주문하고자 하는 경우 - 상품홍보
+    상품이 라이브쇼핑중이 아닌 경우 - 상품홍보
+    카트에 담고, 향후 주문하고자 하는 데 (방송인/판매자/관리자 의지로) 상품홍보가 끝난 경우 - 기본판매
+    방송인 선택 제거한 경우 - 기본판매
+    상품홍보페이지를 통하지 않고 유입된 경우
+    방송인 선택시 - 상품홍보
+    방송인 선택 + 해당 상품이 라이브쇼핑중인 경우 - 라이브쇼핑
+    방송인 선택 안한 경우 - 기본판매
+   */
+  const defineCorrectChannel = useCallback(
+    (item: CartItemRes[number]): SellType => {
+      let { channel } = item;
+      // 현재 주문시 상품홍보중인 상품의 경우
+      if (pp.data?.find((p) => p.broadcasterId === item.support?.broadcasterId)) {
+        channel = SellType.productPromotion;
+      } else {
+        // 상품홍보중인 상품을 장바구니에 담았으니, 현재 주문시 상품홍보중이 아닌 경우
+        channel = SellType.normal;
+      }
+
+      const liveShoppingOnLive = ls.data?.find(
+        (x) =>
+          x.goodsId === item.goodsId && x.broadcasterId === item.support?.broadcasterId,
+      );
+      // 현재 판매 진행중인 support 방송인의 라이브쇼핑이 있는 경우
+      if (liveShoppingOnLive) channel = SellType.liveShopping;
+      // 라이브쇼핑 기간동안 장바구니담았으나, 주문시 라이브쇼핑 판매기간이 지난경우
+      if (
+        !liveShoppingOnLive &&
+        channel === 'liveShopping' &&
+        item.support?.broadcasterId
+      ) {
+        channel = SellType.productPromotion;
+        // 근데 상품홍보가 끝난 경우
+        if (
+          !(
+            pp.data &&
+            pp.data.find((p) => p.broadcasterId === item.support?.broadcasterId)
+          )
+        ) {
+          channel = SellType.normal;
+        }
+      }
+      return channel;
+    },
+    [ls.data, pp.data],
+  );
+
   // 주문 클릭시
   const orderPrepare = useKkshowOrderStore((s) => s.handleOrderPrepare);
   const handleOrderClick = useCallback((): void => {
@@ -65,55 +118,28 @@ export function CartActions(): JSX.Element {
         .some((i) => i.support),
       orderItems: data
         .filter((cartItem) => selectedItems.includes(cartItem.id))
-        .map((i) => {
-          // 판매유형 결정
-          let { channel } = i;
-          const liveShoppingOnLive = ls.data?.find(
-            (x) =>
-              x.goodsId === i.goodsId && x.broadcasterId === i.support?.broadcasterId,
-          );
-          // 현재 판매 진행중인 support 방송인의 라이브쇼핑이 있는 경우
-          if (liveShoppingOnLive) channel = SellType.liveShopping;
-          // 라이브쇼핑 기간동안 장바구니담았으나, 주문시 라이브쇼핑 판매기간이 지난경우
-          if (
-            !liveShoppingOnLive &&
-            channel === 'liveShopping' &&
-            i.support?.broadcasterId
-          ) {
-            channel = SellType.productPromotion;
-          }
-
-          // 현재 주문시 상품홍보중인 상품의 경우
-          if (pp.data?.find((p) => p.broadcasterId === i.support?.broadcasterId)) {
-            channel = SellType.productPromotion;
-          } else {
-            // 상품홍보중인 상품을 장바구니에 담았으니, 현재 주문시 상품홍보중이 아닌 경우
-            channel = SellType.normal;
-          }
-
-          return {
-            goodsName: i.goods.goods_name,
-            goodsId: i.goods.id,
-            options: i.options.map((o) => ({
-              ...o,
-              goodsOptionId: o.goodsOptionsId as number,
-            })),
-            shippingCost: i.shippingCost,
-            shippingGroupId: i.shippingGroupId || 1,
-            channel,
-            shippingCostIncluded: i.shippingCostIncluded, // 다른 상품에 이미 배송비가 포함되었는 지 여부
-            support: i.support
-              ? {
-                  broadcasterId: i.support.id,
-                  message: i.support.message || '',
-                  nickname: i.support.broadcaster.userNickname,
-                  avatar: i.support.broadcaster.avatar,
-                  liveShoppingId: i.support.liveShoppingId || undefined,
-                  productPromotionId: i.support.productPromotionId || undefined,
-                }
-              : undefined,
-          };
-        }),
+        .map((i) => ({
+          goodsName: i.goods.goods_name,
+          goodsId: i.goods.id,
+          options: i.options.map((o) => ({
+            ...o,
+            goodsOptionId: o.goodsOptionsId as number,
+          })),
+          shippingCost: i.shippingCost,
+          shippingGroupId: i.shippingGroupId || 1,
+          channel: defineCorrectChannel(i), // 판매유형 결정
+          shippingCostIncluded: i.shippingCostIncluded, // 다른 상품에 이미 배송비가 포함되었는 지 여부
+          support: i.support
+            ? {
+                broadcasterId: i.support.id,
+                message: i.support.message || '',
+                nickname: i.support.broadcaster.userNickname,
+                avatar: i.support.broadcaster.avatar,
+                liveShoppingId: i.support.liveShoppingId || undefined,
+                productPromotionId: i.support.productPromotionId || undefined,
+              }
+            : undefined,
+        })),
     });
 
     // 비회원 주문 로그인화면으로 이동, 로그인 이후 페이지를 주문페이지로
@@ -125,10 +151,9 @@ export function CartActions(): JSX.Element {
   }, [
     calculated.totalOrderPrice,
     data,
+    defineCorrectChannel,
     executePurchaseCheck,
-    ls.data,
     orderPrepare,
-    pp.data,
     profile.data?.id,
     router,
     selectedItems,
