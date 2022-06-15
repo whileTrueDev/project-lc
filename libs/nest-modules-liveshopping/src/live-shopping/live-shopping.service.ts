@@ -85,6 +85,15 @@ export class LiveShoppingService {
         },
         liveShoppingVideo: { select: { youtubeUrl: true } },
         images: true,
+        orderItemSupport: {
+          select: {
+            orderItem: {
+              select: {
+                options: { select: { discountPrice: true, quantity: true } },
+              },
+            },
+          },
+        },
       },
     });
   }

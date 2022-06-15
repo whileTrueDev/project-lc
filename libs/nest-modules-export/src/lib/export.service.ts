@@ -9,7 +9,7 @@ import {
   ExportManyDto,
   ExportRes,
   findExportItemData,
-  findExportListDto,
+  FindExportListDto,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
@@ -247,10 +247,12 @@ export class ExportService {
   /** 출고목록조회 - 판매자, 관리자 용
    * @param dto.sellerId 값이 없으면 전체 출고목록 조회
    */
-  public async getExportList(dto: findExportListDto): Promise<ExportListRes> {
-    const { sellerId, skip, take } = dto;
+  public async getExportList(dto: FindExportListDto): Promise<ExportListRes> {
+    const { sellerId, orderCode, skip, take } = dto;
 
-    const where: Prisma.ExportWhereInput = sellerId ? { sellerId } : undefined;
+    const where: Prisma.ExportWhereInput = sellerId
+      ? { sellerId, order: { orderCode } }
+      : undefined;
 
     const totalCount = await this.prisma.export.count({ where });
     const data = await this.prisma.export.findMany({

@@ -612,7 +612,6 @@ model BroadcasterSettlements {
   broadcaster                Broadcaster                  @relation(fields: [broadcasterId], references: [id], onDelete: Cascade)
   broadcasterSettlementItems BroadcasterSettlementItems[]
 
-  Export Export?
 
   @@unique([broadcasterId, round])
 }
@@ -635,6 +634,8 @@ model BroadcasterSettlementItems {
 
   relatedOrderId Int? // (project-lc Order테이블의) 주문 고유번호 => 기존 퍼스트몰 fm_order.order_seq 저장하는 컬럼명이 orderId라서 relatedOrderId라고 씀
   order          Order? @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
+
+  Export Export?
 }
 
 // 방송인 정산을 위한 계약자, 계좌정보(방송인 정산등록정보)
@@ -1953,10 +1954,10 @@ model Export {
   seller               Seller?            @relation(fields: [sellerId], references: [id])
   items                ExportItem[] // 출고상품
 
-  broadcasterSettlementsId Int?                    @unique
-  broadcasterSettlements   BroadcasterSettlements? @relation(fields: [broadcasterSettlementsId], references: [id], onDelete: SetNull)
-  sellerSettlementsId      Int?                    @unique
-  sellerSettlements        SellerSettlements?      @relation(fields: [sellerSettlementsId], references: [id], onDelete: SetNull)
+  broadcasterSettlementItemsId Int?                        @unique
+  broadcasterSettlementItems   BroadcasterSettlementItems? @relation(fields: [broadcasterSettlementItemsId], references: [id])
+  sellerSettlementsId          Int?                        @unique
+  sellerSettlements            SellerSettlements?          @relation(fields: [sellerSettlementsId], references: [id], onDelete: SetNull)
 }
 
 // 구매확정주체

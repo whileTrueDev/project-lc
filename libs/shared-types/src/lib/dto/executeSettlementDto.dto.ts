@@ -1,32 +1,67 @@
-import { Seller } from '@prisma/client';
+import {
+  Order,
+  OrderShipping,
+  PaymentMethod,
+  Seller,
+  SellerSettlementItems,
+  SellerSettlements,
+  SellType,
+} from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsIn, IsNumber, IsString } from 'class-validator';
-import type { FmSettlementTarget } from '../res-types/fmSettlements.res';
+import {
+  IsArray,
+  IsDateString,
+  IsDefined,
+  IsEnum,
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
-class FmSettlementTargetClass {
-  account_date: Date;
-  buy_confirm: FmSettlementTarget['buy_confirm'];
-  complete_date: FmSettlementTarget['complete_date'];
-  confirm_date: FmSettlementTarget['confirm_date'];
-  export_code: FmSettlementTarget['export_code'];
-  export_seq: FmSettlementTarget['export_seq'];
-  options: FmSettlementTarget['options'];
-  order_date: FmSettlementTarget['order_date'];
-  order_seq: FmSettlementTarget['order_seq'];
-  export_date: FmSettlementTarget['export_date'];
-  shipping_date: FmSettlementTarget['shipping_date'];
-  status: FmSettlementTarget['status'];
-  shipping_cost: FmSettlementTarget['shipping_cost'];
+export class SellerSettlementItemDto {
+  @IsNumber() relatedOrderId: number;
+  @IsNumber() itemId: SellerSettlementItems['itemId'];
+  @IsString() goods_name: SellerSettlementItems['goods_name'];
+  @IsString() goods_image: SellerSettlementItems['goods_image'];
+  @IsString() option_title: SellerSettlementItems['option_title'];
+  @IsString() option1: SellerSettlementItems['option1'];
+  @IsNumber() optionId: SellerSettlementItems['optionId'];
+  @IsNumber() ea: SellerSettlementItems['ea'];
+  @IsNumber() price: SellerSettlementItems['price'];
+  @IsNumber() pricePerPiece: SellerSettlementItems['pricePerPiece'];
+  @IsOptional() @IsNumber() liveShoppingId?: SellerSettlementItems['liveShoppingId'];
+
+  @IsOptional()
+  @IsNumber()
+  productPromotionId?: SellerSettlementItems['productPromotionId'];
+
+  @IsEnum(SellType) sellType: SellType;
+  @IsOptional() @IsString() whiletrueCommissionRate: string | null;
+  @IsOptional() @IsString() broadcasterCommissionRate: string | null;
+  @IsOptional() @IsNumber() whiletrueCommission: number | null;
+  @IsOptional() @IsNumber() broadcasterCommission: number | null;
 }
 
 export class ExecuteSettlementDto {
-  @IsNumber()
-  sellerId: Seller['id'];
+  @IsNumber() sellerId: Seller['id'];
+  @IsString() @IsIn(['1', '2']) round: '1' | '2';
 
-  @Type(() => FmSettlementTargetClass)
-  target: FmSettlementTarget;
+  @IsNumber() exportId: SellerSettlements['exportId'];
+  @IsString() exportCode: SellerSettlements['exportCode'];
+  @IsNumber() orderId: Order['id'];
+  @IsDefined() shippingCost: SellerSettlements['shippingCost'] | number | string;
+  @IsNumber() shippingId: OrderShipping['id'];
+  @IsDateString() startDate: SellerSettlements['startDate'];
+  @IsDateString() doneDate: SellerSettlements['doneDate'];
+  @IsString() buyer: SellerSettlements['buyer'];
+  @IsString() recipient: SellerSettlements['recipient'];
+  @IsEnum(PaymentMethod) paymentMethod: PaymentMethod;
+  @IsOptional() @IsString() pg?: SellerSettlements['pg'];
+  @IsOptional() @IsNumber() pgCommission?: SellerSettlements['pgCommission'];
+  @IsOptional() @IsString() pgCommissionRate?: SellerSettlements['pgCommissionRate'];
 
-  @IsString()
-  @IsIn(['1', '2'])
-  round: '1' | '2';
+  @Type(() => SellerSettlementItemDto)
+  @IsArray()
+  items: SellerSettlementItemDto[];
 }

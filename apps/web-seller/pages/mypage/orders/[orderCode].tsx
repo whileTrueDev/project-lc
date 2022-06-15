@@ -88,7 +88,7 @@ export function OrderDetail(): JSX.Element {
 
   return (
     <MypageLayout>
-      <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2}>
+      <Stack m="auto" maxW="4xl" mt={{ base: 2, md: 8 }} spacing={6} p={2} mb={40}>
         <Box as="section">
           <Button size="sm" leftIcon={<ChevronLeftIcon />} onClick={() => router.back()}>
             목록으로

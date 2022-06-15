@@ -1,14 +1,10 @@
 import { SummaryList } from '@project-lc/components-core/SummaryList';
-import {
-  convertFmDeliveryCompanyToString,
-  convertFmExportConfirmStatusToString,
-  FmExportRes,
-} from '@project-lc/shared-types';
+import { ExportRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { FaBoxOpen, FaCalendarAlt, FaHamburger, FaShippingFast } from 'react-icons/fa';
 
 export interface ExportDetailSummaryProps {
-  exportData: FmExportRes;
+  exportData: ExportRes;
 }
 export function ExportDetailSummary({
   exportData,
@@ -18,39 +14,28 @@ export function ExportDetailSummary({
       listItems={[
         {
           id: '출고등록일시',
-          value: `출고 등록일시 ${dayjs(exportData.regist_date).format(
+          value: `출고 등록일시 ${dayjs(exportData.exportDate).format(
             'YYYY년 MM월 DD일 HH:mm:ss',
           )}`,
           icon: FaCalendarAlt,
         },
         {
-          id: '출고 완료일',
-          value: `출고 완료일 ${dayjs(exportData.complete_date).format(
-            'YYYY년 MM월 DD일',
-          )}`,
-          icon: FaCalendarAlt,
-          iconColor: 'cyan.600',
-          disabled: !exportData.complete_date,
-        },
-        {
           id: '배송 완료일',
-          value: `배송 완료일 ${dayjs(exportData.shipping_date).format(
+          value: `배송 완료일 ${dayjs(exportData.shippingDoneDate).format(
             'YYYY년 MM월 DD일',
           )}`,
           icon: FaCalendarAlt,
           iconColor: 'blue.500',
-          disabled: !exportData.shipping_date,
+          disabled: !exportData.shippingDoneDate,
         },
         {
           id: '택배사',
-          value: `택배사 ${convertFmDeliveryCompanyToString(
-            exportData.delivery_company_code,
-          )}`,
+          value: `택배사 ${exportData.deliveryCompany}`,
           icon: FaBoxOpen,
         },
         {
           id: '송장번호',
-          value: `송장번호 ${exportData.delivery_number}`,
+          value: `송장번호 ${exportData.deliveryNumber}`,
           icon: FaShippingFast,
         },
         {
@@ -60,13 +45,11 @@ export function ExportDetailSummary({
         },
         {
           id: '구매확정',
-          value: `구매확정 (${convertFmExportConfirmStatusToString(
-            exportData.buy_confirm,
-          )}, 
-            ${dayjs(exportData.confirm_date).format('YYYY년 MM월 DD일')})`,
+          value: `구매확정 (${exportData.buyConfirmSubject}), 
+            ${dayjs(exportData.buyConfirmDate).format('YYYY년 MM월 DD일')})`,
           icon: FaHamburger,
           iconColor: 'blue.500',
-          disabled: !(exportData.confirm_date && exportData.buy_confirm !== 'none'),
+          disabled: !(exportData.buyConfirmDate && exportData.buyConfirmSubject),
         },
       ]}
     />

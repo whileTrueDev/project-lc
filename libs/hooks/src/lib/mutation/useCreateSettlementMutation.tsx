@@ -18,7 +18,7 @@ export const useCreateSettlementMutation = (): UseMutationResult<
         .then((res) => res.data),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('SettlementTargets');
+        queryClient.invalidateQueries('SellerSettlementTargets');
         queryClient.invalidateQueries('AdminSettlementDoneList');
       },
     },

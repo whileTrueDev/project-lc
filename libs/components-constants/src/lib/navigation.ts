@@ -358,7 +358,7 @@ const customerMypageShoppingChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [
     href: '/mypage/exchange-return-cancel',
     checkIsActive: defaultIsActiveChecker,
   },
-  { name: '마일리지', href: '/mypage/마일리지', checkIsActive: defaultIsActiveChecker },
+  { name: '혜택관리', href: '/mypage/benefits', checkIsActive: defaultIsActiveChecker },
 ];
 /** 크크쇼 소비자 마이페이지 사이드바 - "활동" 하위 탭 */
 const customerMypageActivityChildrenNavLinks: Omit<MypageLink, 'icon'>[] = [

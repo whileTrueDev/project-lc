@@ -39,7 +39,11 @@ import {
 import { GoodsService } from '@project-lc/nest-modules-goods';
 import { LiveShoppingService } from '@project-lc/nest-modules-liveshopping';
 import { OrderCancelService } from '@project-lc/nest-modules-order-cancel';
-import { SellerService, SellerSettlementService } from '@project-lc/nest-modules-seller';
+import {
+  SellerService,
+  SellerSettlementInfoService,
+  SellerSettlementService,
+} from '@project-lc/nest-modules-seller';
 import {
   AdminAllLcGoodsList,
   AdminBroadcasterSettlementInfoList,
@@ -47,6 +51,7 @@ import {
   AdminClassDto,
   AdminGoodsByIdRes,
   AdminGoodsListRes,
+  AdminLiveShoppingGiftOrder,
   AdminSellerListRes,
   AdminSettlementInfoType,
   AdminSignUpDto,
@@ -71,7 +76,7 @@ import {
   PrivacyApproachHistoryDto,
   SellerGoodsSortColumn,
   SellerGoodsSortDirection,
-  AdminLiveShoppingGiftOrder,
+  SellerSettlementTargetRes,
 } from '@project-lc/shared-types';
 import { Request } from 'express';
 import { AdminAccountService } from './admin-account.service';
@@ -88,6 +93,7 @@ export class AdminController {
     private readonly adminSettlementService: AdminSettlementService,
     private readonly adminAccountService: AdminAccountService,
     private readonly sellerSettlementService: SellerSettlementService,
+    private readonly sellerSettlementInfoService: SellerSettlementInfoService,
     private readonly orderCancelService: OrderCancelService,
     private readonly bcSettlementHistoryService: BroadcasterSettlementHistoryService,
     private readonly broadcasterSettlementInfoService: BroadcasterSettlementInfoService,
@@ -132,14 +138,21 @@ export class AdminController {
     return this.adminService.getSettlementInfo();
   }
 
+  /** 판매자 정산 등록 정보 조회 */
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('/settlement/targets')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  findSellerSettlementTargets(): Promise<SellerSettlementTargetRes> {
+    return this.sellerSettlementService.findAllSettleTargetList();
+  }
+
   /** 판매자 정산처리 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('/settlement')
   @UseInterceptors(HttpCacheInterceptor)
   @CacheClearKeys('seller/settlement', 'seller/settlement-history')
-  executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
-    if (dto.target.options.length === 0) return null;
-    return this.sellerSettlementService.executeSettle(dto.sellerId, dto);
+  async executeSettle(@Body(ValidationPipe) dto: ExecuteSettlementDto): Promise<boolean> {
+    return this.sellerSettlementService.executeSettle(dto);
   }
 
   /** 판매자 정산 완료 목록 */
@@ -152,7 +165,7 @@ export class AdminController {
   /** 방송인 정산 대상 목록 조회 */
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('/settlement/broadcaster/targets')
-  public async findSettlementTargets(
+  public async findBcSettlementTargets(
     @Query(new ValidationPipe({ transform: true })) dto: FindManyDto,
   ): Promise<BroadcasterSettlementTargets> {
     return this.settlementService.findSettlementTargets(undefined, dto);
@@ -346,7 +359,7 @@ export class AdminController {
   createSettlementConfirmHistory(
     @Body() dto: ConfirmHistoryDto,
   ): Promise<ConfirmHistory> {
-    return this.sellerSettlementService.createSettlementConfirmHistory(dto);
+    return this.sellerSettlementInfoService.createSettlementConfirmHistory(dto);
   }
 
   /** 전체 판매자 계정 목록 조회 */

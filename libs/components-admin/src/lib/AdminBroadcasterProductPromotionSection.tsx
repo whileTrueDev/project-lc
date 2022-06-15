@@ -7,7 +7,6 @@ import {
   Divider,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Input,
   InputGroup,
@@ -42,7 +41,6 @@ import {
 } from '@project-lc/shared-types';
 import { useCallback } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { FmGoodsSeqInputHelpText } from './AdminGoodsConfirmationDialog';
 
 export interface AdminBroadcasterProductPromotionSectionProps {
   promotionPageId: number;
@@ -203,9 +201,6 @@ export function AdminProductPromotionForm({
         <FormErrorMessage>
           {errors.fmGoodsSeq && errors.fmGoodsSeq.message}
         </FormErrorMessage>
-        <FormHelperText>
-          <FmGoodsSeqInputHelpText />
-        </FormHelperText>
       </FormControl>
       <Button type="submit">생성</Button>
     </Stack>
@@ -506,9 +501,6 @@ export function AdminProductPromotionUpdateModal({
               <FormErrorMessage>
                 {errors.fmGoodsSeq && errors.fmGoodsSeq.message}
               </FormErrorMessage>
-              <FormHelperText>
-                <FmGoodsSeqInputHelpText />
-              </FormHelperText>
             </FormControl>
             <Stack direction="row">
               <Button type="submit" colorScheme="blue">

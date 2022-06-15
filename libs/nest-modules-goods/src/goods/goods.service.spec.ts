@@ -1,7 +1,7 @@
 import { CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Goods, GoodsCategory, GoodsView, PrismaClient } from '@prisma/client';
+import { Goods, GoodsView, PrismaClient } from '@prisma/client';
 import { CacheConfig } from '@project-lc/nest-core';
 import { PrismaModule } from '@project-lc/prisma-orm';
 import {
@@ -42,7 +42,7 @@ describe('GoodsService', () => {
     TEST_USER_ID = testSeller.id;
     const testCategory = await __prisma.goodsCategory.create({
       data: {
-        categoryCode: '2',
+        categoryCode: '3',
         name: 'test-category',
         mainCategoryFlag: true,
       },
@@ -88,7 +88,7 @@ describe('GoodsService', () => {
         },
         informationNotice: {
           create: {
-            contents: { name: 'testContents', value: 'testContents' },
+            contents: JSON.stringify({ name: 'testContents', value: 'testContents' }),
           },
         },
       },

@@ -63,35 +63,35 @@ export function SettlementInfoDialog({
           <Grid templateColumns="repeat(3, 1fr)" rowGap={4} mb={12}>
             <GridItem>
               <Stack>
-                <Text>정산번호</Text>
+                <Text fontWeight="bold">정산번호</Text>
                 <Text>{settlementInfo.id}</Text>
               </Stack>
             </GridItem>
 
             <GridItem>
               <Stack>
-                <Text>출고번호</Text>
+                <Text fontWeight="bold">출고번호</Text>
                 <Text>{settlementInfo.exportId}</Text>
               </Stack>
             </GridItem>
 
             <GridItem>
               <Stack>
-                <Text> 출고코드</Text>
+                <Text fontWeight="bold"> 출고코드</Text>
                 <Text>{settlementInfo.exportCode}</Text>
               </Stack>
             </GridItem>
 
             <GridItem>
               <Stack>
-                <Text>총금액</Text>
+                <Text fontWeight="bold">총금액</Text>
                 <Text>{getLocaleNumber(settlementInfo.totalPrice)}</Text>
               </Stack>
             </GridItem>
 
             <GridItem>
               <Stack spacing={1}>
-                <Text>수수료</Text>
+                <Text fontWeight="bold">수수료</Text>
                 <Text fontSize="sm">
                   총수수료: {getLocaleNumber(settlementInfo.totalCommission)}
                 </Text>
@@ -109,7 +109,7 @@ export function SettlementInfoDialog({
 
             <GridItem>
               <Stack>
-                <Text>총 정산금액</Text>
+                <Text fontWeight="bold">총 정산금액</Text>
                 <Text>{getLocaleNumber(settlementInfo.totalAmount)}</Text>
               </Stack>
             </GridItem>
@@ -173,17 +173,19 @@ export function SettlementInfoItem({
     >
       {settlementItem.goods_image && (
         <>
-          <GridItem>상품 이미지</GridItem>
+          <GridItem fontWeight="bold">상품 이미지</GridItem>
           <GridItem>
             <Image
               w="50px"
               h="50px"
-              src={`http://whiletrue.firstmall.kr${settlementItem.goods_image}`}
+              rounded="md"
+              objectFit="cover"
+              src={settlementItem.goods_image}
             />
           </GridItem>
         </>
       )}
-      <GridItem>상품명</GridItem>
+      <GridItem fontWeight="bold">상품명</GridItem>
       <GridItem>
         <Box>
           {settlementItem.goods_name}
@@ -195,18 +197,18 @@ export function SettlementInfoItem({
         </Box>
       </GridItem>
 
-      <GridItem>개수</GridItem>
+      <GridItem fontWeight="bold">개수</GridItem>
       <GridItem>{settlementItem.ea}</GridItem>
-      <GridItem>개당 가격</GridItem>
+      <GridItem fontWeight="bold">개당 가격</GridItem>
       <GridItem>{getLocaleNumber(settlementItem.pricePerPiece)}</GridItem>
-      <GridItem>총 가격</GridItem>
+      <GridItem fontWeight="bold">총 가격</GridItem>
       <GridItem>{getLocaleNumber(settlementItem.price)}</GridItem>
-      <GridItem>판매 유형</GridItem>
+      <GridItem fontWeight="bold">판매 유형</GridItem>
       <GridItem>
         <SellTypeBadge sellType={settlementItem.sellType} />
       </GridItem>
 
-      <GridItem>전자결제수수료</GridItem>
+      <GridItem fontWeight="bold">전자결제수수료</GridItem>
       <GridItem>{`${getLocaleNumber(pgCommission.commission)} (${
         pgCommission.rate === '0'
           ? pgCommission.description
@@ -214,7 +216,7 @@ export function SettlementInfoItem({
       })`}</GridItem>
       {settlementItem.liveShoppingId || settlementItem.productPromotionId ? (
         <>
-          <GridItem>방송인 수수료</GridItem>
+          <GridItem fontWeight="bold">방송인 수수료</GridItem>
           <GridItem>
             {getLocaleNumber(settlementItem.broadcasterCommission)} (
             {settlementItem.broadcasterCommissionRate}
@@ -222,7 +224,7 @@ export function SettlementInfoItem({
           </GridItem>
         </>
       ) : null}
-      <GridItem>크크쇼 수수료</GridItem>
+      <GridItem fontWeight="bold">크크쇼 수수료</GridItem>
       <GridItem>
         {getLocaleNumber(settlementItem.whiletrueCommission)} (
         {settlementItem.whiletrueCommissionRate}
