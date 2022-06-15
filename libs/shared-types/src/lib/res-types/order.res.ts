@@ -59,7 +59,7 @@ export type OrderCancellationBaseData = Pick<
 > & {
   items: OrderCancellationItem[];
 };
-export type ExportBaseData = Export;
+export type ExportBaseData = Export & { items: ExportItem[] };
 export type ExchangeBaseData = Pick<
   Exchange,
   'id' | 'exchangeCode' | 'status' | 'requestDate' | 'completeDate'
