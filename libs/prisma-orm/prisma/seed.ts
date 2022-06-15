@@ -337,12 +337,34 @@ async function createCartItems(): Promise<void> {
   await prisma.cartItem.create({ data: tempUserCartItemSample });
 }
 
+async function connectDummyOrderToOrderShipping(orderId: number): Promise<void> {
+  const orderShipping = await prisma.orderShipping.findFirst({
+    where: { orderId },
+  });
+  await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      orderItems: {
+        updateMany: {
+          where: { orderId },
+          data: { orderShippingId: orderShipping?.id },
+        },
+      },
+    },
+  });
+}
+
 async function createDummyOrderData(): Promise<void> {
-  await prisma.order.create({ data: normalOrder });
-  await prisma.order.create({ data: nonMemberOrder });
-  await prisma.order.create({ data: purchaseConfirmedOrder });
-  await prisma.order.create({ data: shippingDoneOrder });
-  await prisma.order.create({ data: orderExportReady });
+  const order1 = await prisma.order.create({ data: normalOrder });
+  await connectDummyOrderToOrderShipping(order1.id);
+  const order2 = await prisma.order.create({ data: nonMemberOrder });
+  await connectDummyOrderToOrderShipping(order2.id);
+  const order3 = await prisma.order.create({ data: purchaseConfirmedOrder });
+  await connectDummyOrderToOrderShipping(order3.id);
+  const order4 = await prisma.order.create({ data: shippingDoneOrder });
+  await connectDummyOrderToOrderShipping(order4.id);
+  const order5 = await prisma.order.create({ data: orderExportReady });
+  await connectDummyOrderToOrderShipping(order5.id);
 }
 
 async function createDummyOrderCancelReturnExchange(): Promise<void> {

@@ -80,6 +80,17 @@ export const createDummyOrder = async ({
         orderCode,
         step,
       }),
+      shippings: {
+        create: [
+          {
+            shippingCost: '2500',
+            shippingCostPayType: 'prepay',
+            shippingGroupId: 1,
+            shippingMethod: 'delivery',
+            shippingSetId: 1,
+          },
+        ],
+      },
     },
   });
 
@@ -96,6 +107,21 @@ export const createDummyOrder = async ({
               message: '테스트 메시지',
               nickname: '테스터',
             },
+      },
+    },
+  });
+
+  const orderShipping = await prisma.orderShipping.findFirst({
+    where: { orderId: order.id },
+  });
+  await prisma.order.update({
+    where: { id: order.id },
+    data: {
+      orderItems: {
+        updateMany: {
+          where: { orderId: order.id },
+          data: { orderShippingId: orderShipping?.id },
+        },
       },
     },
   });
@@ -119,11 +145,22 @@ export const createDummyOrder = async ({
   };
 };
 
-export const normalOrder = {
+export const normalOrder: Prisma.OrderCreateInput = {
   customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
     orderCode: 'dummy-order-1-asdfasd',
   }),
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
   orderItems: {
     create: [
       {
@@ -140,12 +177,23 @@ export const normalOrder = {
   },
 };
 
-export const nonMemberOrder = {
+export const nonMemberOrder: Prisma.OrderCreateInput = {
   ...getDummyOrderFundamentalData({
     orderCode: 'nonmember-order-dummy',
   }),
   nonMemberOrderFlag: true,
   nonMemberOrderPassword: 'test',
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
   orderItems: {
     create: [
       {
@@ -162,11 +210,21 @@ export const nonMemberOrder = {
   },
 };
 
-export const purchaseConfirmedOrder = {
+export const purchaseConfirmedOrder: Prisma.OrderCreateInput = {
   ...normalOrder,
   orderCode: 'dummy-order-2-qwer',
   step: 'purchaseConfirmed' as const,
-
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
   orderItems: {
     create: [
       {
@@ -189,10 +247,21 @@ export const purchaseConfirmedOrder = {
   },
 };
 
-export const shippingDoneOrder = {
+export const shippingDoneOrder: Prisma.OrderCreateInput = {
   ...normalOrder,
   orderCode: 'dummy-order-3-zxcv',
   step: 'shippingDone' as const,
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
   orderItems: {
     create: [
       {
@@ -215,12 +284,23 @@ export const shippingDoneOrder = {
   },
 };
 
-export const orderExportReady = {
+export const orderExportReady: Prisma.OrderCreateInput = {
   customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
     orderCode: 'orderExportReady-for-exchange-return',
     step: 'exportReady',
   }),
+  shippings: {
+    create: [
+      {
+        shippingCost: '2500',
+        shippingCostPayType: 'prepay',
+        shippingGroupId: 1,
+        shippingMethod: 'delivery',
+        shippingSetId: 1,
+      },
+    ],
+  },
   orderItems: {
     create: [
       {
