@@ -129,4 +129,5 @@ export interface CreatePaymentRes {
   status: string;
   message?: string;
   orderId: string;
+  orderPaymentId?: number; // OrderPayment 고유번호
 }

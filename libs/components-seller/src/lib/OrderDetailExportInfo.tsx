@@ -61,13 +61,6 @@ export function OrderDetailExportInfo({
         <Text>{deliveryCompany}</Text>
         <TextDotConnector />
         <Text>{_exports.delivery_number}</Text>
-        {/* 배송 조회 기능 아직 준비중이므로 주석처리 by @dan */}
-        {/* <Button
-          size="sm"
-          onClick={() => alert(`택배조회 ${deliveryCompany} ${_exports.delivery_number}`)}
-        >
-          배송 조회
-        </Button> */}
       </Stack>
 
       <Stack mt={2} spacing={1.5}>

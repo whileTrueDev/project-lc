@@ -1,12 +1,13 @@
 import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { OrderPayment, PaymentMethod } from '@prisma/client';
+import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  Payment,
-  PaymentTransaction,
   CreatePaymentRes,
+  Payment,
+  PaymentRequestDto,
+  PaymentTransaction,
   TossPaymentCancelDto,
 } from '@project-lc/shared-types';
-import axios from 'axios';
 import { PaymentsByDateRequestType, TossPaymentsApi } from '@project-lc/utils';
 
 export enum KKsPaymentProviders {
@@ -16,11 +17,48 @@ export enum KKsPaymentProviders {
 
 @Injectable()
 export class PaymentService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  /** 크크쇼 OrderPayment 테이블에 결제 데이터 저장 */
+  async savePaymentRecord(dto: {
+    method: string;
+    orderId?: number;
+    paymentKey: string;
+    depositDate?: Date;
+    depositor?: string;
+    depositDoneFlag: boolean;
+    account?: string;
+  }): Promise<OrderPayment> {
+    let paymentMethod: PaymentMethod = PaymentMethod.card;
+    if (dto.method === '카드') {
+      paymentMethod = PaymentMethod.card;
+    } else if (dto.method === '계좌이체') {
+      paymentMethod = PaymentMethod.transfer;
+    } else if (dto.method === '가상계좌') {
+      paymentMethod = PaymentMethod.virtualAccount;
+    }
+    return this.prisma.orderPayment.create({
+      data: {
+        ...dto,
+        method: paymentMethod,
+      },
+    });
+  }
+
   /** 토스페이먼츠 결제승인 요청 API */
-  async createPayment(dto): Promise<CreatePaymentRes> {
+  async createPayment(dto: PaymentRequestDto): Promise<CreatePaymentRes> {
     try {
-      await TossPaymentsApi.createPayment(dto);
-      return { status: 'success', orderId: dto.orderId };
+      const result = await TossPaymentsApi.createPayment(dto);
+
+      // 크크쇼 OrderPayment 테이블에 데이터 저장
+      const orderPayment = await this.savePaymentRecord({
+        method: result.method as PaymentMethod,
+        paymentKey: result.paymentKey,
+        depositDate: new Date(result.approvedAt),
+        depositDoneFlag: !!result.approvedAt,
+      });
+
+      return { status: 'success', orderId: dto.orderId, orderPaymentId: orderPayment.id };
     } catch (err) {
       console.error(err);
       return {

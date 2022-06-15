@@ -27,6 +27,10 @@ import {
   Seller,
   SellType,
   SellerShop,
+  ShippingOption,
+  ShippingCost,
+  ShippingSet,
+  ShippingGroup,
 } from '@prisma/client';
 
 export type OrderItemSupportWithBroadcasterInfo = OrderItemSupport & {
@@ -77,7 +81,7 @@ export type OrderBaseData = Order & {
   orderItems: OrderItemWithRelations[];
   payment?: Nullable<OrderPayment>;
   refunds: Nullable<Refund[]>;
-  shippings: (OrderShipping & { items: OrderItemOption[] })[];
+
   orderCancellations?: Nullable<OrderCancellationBaseData[]>;
   exports: Nullable<ExportBaseData[]>;
   mileageLogs: CustomerMileageLog[] | null;
@@ -118,6 +122,9 @@ export type OrderDetailRes = OrderBaseData & {
   exchanges: Nullable<ExchangeDataWithImages[]>;
   returns: Nullable<ReturnDataWithImages[]>;
   sellerSettlementItems?: SellerSettlementItemsRes[] | null;
+  shippings: Nullable<
+    (OrderShipping & { items: (OrderItem & { options: OrderItemOption[] })[] })[]
+  >;
 };
 /**
  * 방송인 후원 주문 목록 타입
@@ -150,6 +157,44 @@ export type FindAllOrderByBroadcasterRes = {
   orders: FindAllOrderByBroadcaster[];
   nextCursor?: number;
 };
+
+/**
+ * 가지고 있는 정보
+ * ShippingGroup - 반송지정보, 배송비 계산방식, 기본/추가배송비 부과 여부, shippingSet[] 등
+ * ShippingSet - 배송방식(택배, 직접배송 등), 전국배송/일부지역배송, 배송비 선불여부, shippingOption[]
+ * ShippingOption - 기본/추가배송비 여부,
+ * ShippingCost - 배송비, 적용지역
+ */
+export type ShippingOptionWithCost = ShippingOption & {
+  shippingCost: ShippingCost[];
+};
+export type ShippingSetWithOptions = ShippingSet & {
+  shippingOptions: Array<ShippingOptionWithCost>;
+};
+
+export type ShippingGroupData =
+  | (ShippingGroup & {
+      shippingSets: Array<ShippingSetWithOptions>;
+    })
+  | null;
+
+export type ShippingOptionCost = {
+  std: number; // 기본배송비
+  add: number; // 추가배송비
+};
+
+export type ShippingCostCalculatedType = {
+  isShippingAvailable: boolean;
+  cost: ShippingOptionCost | null;
+};
+
+/** 배송비계산 리턴타입 */
+export type ShippingCostByShippingGroupId = Record<
+  number, // 배송비그룹 id
+  ShippingCostCalculatedType & {
+    items: number[]; // 해당배송비그룹에 연결된 goodsId[]
+  }
+>;
 
 /** 관리자 라이브쇼핑 선물주문 타입 */
 export type AdminLiveShoppingGiftOrder = Order & {

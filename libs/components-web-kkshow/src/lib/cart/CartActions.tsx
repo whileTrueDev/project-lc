@@ -1,6 +1,11 @@
 import { Button, Stack, useToast } from '@chakra-ui/react';
-import { useCart, useCartCalculatedMetrics, useProfile } from '@project-lc/hooks';
-import { useCartStore, useKkshowOrderStore } from '@project-lc/stores';
+import {
+  useCart,
+  useCartCalculatedMetrics,
+  useCartShippingGroups,
+  useProfile,
+} from '@project-lc/hooks';
+import { OrderShippingData, useCartStore, useKkshowOrderStore } from '@project-lc/stores';
 import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
@@ -37,12 +42,36 @@ export function CartActions(): JSX.Element {
     });
   }, [data, selectedItems, toast]);
 
+  // 배송그룹별 선택된 카트아이템 Record<배송그룹id, 선택된 카트상품id[]>
+  // 배송그룹별 표시될 배송비(selectedItems, 배송그룹정보) => 배송비 Record<배송그룹id, 부과되는 배송비 정보(기본, 추가)>
+  const { groupedSelectedItems, totalShippingCostObjectById } = useCartShippingGroups();
+
   // 주문 클릭시
   const orderPrepare = useKkshowOrderStore((s) => s.handleOrderPrepare);
+  const setShippingData = useKkshowOrderStore((s) => s.setShippingData);
   const handleOrderClick = useCallback((): void => {
     if (!data) return;
     if (!executePurchaseCheck()) return;
 
+    // kkshowOrderStore에 배송비정보 저장
+    const groupIdList = Object.keys(groupedSelectedItems).map((id) => Number(id));
+
+    let shippingData: OrderShippingData = {};
+    groupIdList.forEach((id) => {
+      shippingData = {
+        ...shippingData,
+        [id]: {
+          items: data // cartId가 아닌 goodsId 저장 (주문페이지에는 카트id정보가 없음)
+            .filter((cartItem) => groupedSelectedItems[id].includes(cartItem.id))
+            .map((cartItem) => cartItem.goods.id),
+          cost: totalShippingCostObjectById[id],
+          isShippingAvailable: true, // 장바구니 페이지에서는 주소정보가 없어서 일단 true로 넘김
+        },
+      };
+    });
+    setShippingData(shippingData);
+
+    // kkshowOrderStore에 주문정보 저장
     orderPrepare({
       orderPrice: calculated.totalOrderPrice,
       giftFlag: false,
@@ -55,15 +84,19 @@ export function CartActions(): JSX.Element {
         .map((i) => ({
           goodsName: i.goods.goods_name,
           goodsId: i.goods.id,
-          options: i.options.map((o) => ({
-            ...o,
-            goodsOptionId: o.goodsOptionsId as number,
-          })),
-          shippingCost: i.shippingCost,
+          options: i.options.map((o) => {
+            // CartOptionItem 타입에서 CreateOrderItemOptionDto 타입 만들기 위해 필요한 데이터만 사용
+            const { cartItemId, goodsOptionsId, id, ...optData } = o;
+            return {
+              ...optData,
+              normalPrice: Number(o.normalPrice),
+              discountPrice: Number(o.discountPrice),
+              goodsOptionId: o.goodsOptionsId as number,
+            };
+          }),
           shippingGroupId: i.shippingGroupId || 1,
           // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
           channel: 'normal',
-          shippingCostIncluded: i.shippingCostIncluded, // 다른 상품에 이미 배송비가 포함되었는 지 여부
           support: i.support
             ? {
                 broadcasterId: i.support.id,
@@ -85,10 +118,13 @@ export function CartActions(): JSX.Element {
     calculated.totalOrderPrice,
     data,
     executePurchaseCheck,
+    groupedSelectedItems,
     orderPrepare,
     profile.data?.id,
     router,
     selectedItems,
+    setShippingData,
+    totalShippingCostObjectById,
   ]);
 
   return (

@@ -17,6 +17,7 @@ import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import {
   CreateOrderDto,
+  CreateOrderShippingDto,
   FindAllOrderByBroadcasterRes,
   FindManyDto,
   GetNonMemberOrderDetailDto,
@@ -26,6 +27,7 @@ import {
   OrderDetailRes,
   OrderListRes,
   OrderPurchaseConfirmationDto,
+  OrderShippingCheckDto,
   OrderStatsRes,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
@@ -48,8 +50,11 @@ export class OrderController {
 
   /** 주문생성 - 가드 적용하지 않아야 함 */
   @Post()
-  createOrder(@Body(ValidationPipe) dto: CreateOrderDto): Promise<Order> {
-    return this.orderService.createOrder(dto);
+  createOrder(
+    @Body('order', new ValidationPipe({ transform: true })) order: CreateOrderDto,
+    @Body('shipping', ValidationPipe) { shipping }: CreateOrderShippingDto,
+  ): Promise<Order> {
+    return this.orderService.createOrder({ orderDto: order, shippingData: shipping });
   }
 
   /** 판매자 주문현황 조회 */
@@ -82,7 +87,6 @@ export class OrderController {
   }
 
   /** 개별 주문 상세조회 */
-  @UseGuards(JwtAuthGuard)
   @Get('detail')
   getOrderDetail(
     @Query(new ValidationPipe({ transform: true })) dto: GetOneOrderDetailDto,
@@ -141,5 +145,20 @@ export class OrderController {
     @Query(new ValidationPipe({ transform: true })) dto: FindManyDto,
   ): Promise<FindAllOrderByBroadcasterRes> {
     return this.orderService.findAllByBroadcaster(broadcasterId, dto);
+  }
+
+  /** 주문생성 전 배송비 조회
+   => 배송비 조회 위한 {주문상품id, 옵션id, 개수}[] 정보를 쿼리스트링으로 받고있다 주문내역이 길면 문제가 생길 우려가 있다..
+   */
+  @Get('/shipping/check')
+  checkGetOrderShippingCost(
+    @Query(
+      new ValidationPipe({
+        transform: true,
+      }),
+    )
+    dto: OrderShippingCheckDto,
+  ): Promise<any> {
+    return this.orderService.checkOrderShippingCost(dto);
   }
 }

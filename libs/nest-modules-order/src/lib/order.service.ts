@@ -1,5 +1,13 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
-import { Order, OrderItemOption, OrderProcessStep, Prisma } from '@prisma/client';
+import {
+  Goods,
+  GoodsOptions,
+  Order,
+  OrderItemOption,
+  OrderProcessStep,
+  OrderShipping,
+  Prisma,
+} from '@prisma/client';
 import { UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
@@ -19,10 +27,16 @@ import {
   OrderStatsRes,
   sellerOrderSteps,
   UpdateOrderDto,
+  OrderShippingCheckDto,
+  ShippingCheckItem,
+  ShippingCostByShippingGroupId,
+  CreateOrderShippingDto,
+  CreateOrderShippingData,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
+import { calculateShippingCost } from '@project-lc/utils';
 
 dayjs.extend(isToday);
 @Injectable()
@@ -108,28 +122,82 @@ export class OrderService {
     };
   }
 
+  /** 주문에 포함된 배송비정보 생성 */
+  async createOrderShippingData(
+    orderId: number,
+    shippingData: CreateOrderShippingData[],
+  ): Promise<OrderShipping[]> {
+    // 주문에 연결된 주문상품 조회
+    const createdOrderItems = await this.prisma.orderItem.findMany({
+      where: { orderId },
+    });
+
+    return this.prisma.$transaction(
+      shippingData.map((_shippingData) => {
+        const { shippingCost, shippingGroupId, items } = _shippingData;
+
+        // goodsId로 배송비에 포함된 주문상품 찾기
+        const relatedOrderItemsIdList = createdOrderItems
+          .filter((item) => {
+            const { goodsId } = item;
+            return items.includes(goodsId);
+          })
+          .map((item) => ({ id: item.id }));
+
+        return this.prisma.orderShipping.create({
+          data: {
+            order: { connect: { id: orderId } },
+            shippingGroup: { connect: { id: shippingGroupId } },
+            shippingCost: String(shippingCost),
+            items: { connect: relatedOrderItemsIdList },
+          },
+        });
+      }),
+    );
+  }
+
   /** 주문생성 */
-  async createOrder(dto: CreateOrderDto): Promise<Order> {
-    const { customerId, cartItemIdList, ...data } = dto;
-    const { nonMemberOrderFlag, giftFlag, orderItems, payment, supportOrderIncludeFlag } =
-      data;
+  async createOrder({
+    orderDto,
+    shippingData,
+  }: {
+    orderDto: CreateOrderDto;
+    shippingData: CreateOrderShippingData[];
+  }): Promise<Order> {
+    const {
+      customerId,
+      cartItemIdList,
+      usedMileageAmount,
+      couponId,
+      usedCouponAmount,
+      totalDiscount,
+      paymentId,
+      ...data // createInput에 사용할 데이터
+    } = orderDto;
+    const {
+      nonMemberOrderFlag,
+      giftFlag,
+      orderItems,
+      supportOrderIncludeFlag,
+      orderCode,
+    } = data;
 
     let createInput: Prisma.OrderCreateInput = {
       ...data,
       orderItems: undefined,
-      orderCode: this.createOrderCode(),
-      payment: payment ? { connect: { id: payment.id } } : undefined, // TODO: 결제api 작업 이후 CreateOrderDto에서 payment 값 필수로 바꾸고 이부분도 수정필요
+      orderCode: orderCode || this.createOrderCode(),
+      payment: paymentId ? { connect: { id: paymentId } } : undefined,
       customer: !nonMemberOrderFlag ? { connect: { id: customerId } } : undefined,
     };
 
     // 비회원 주문의 경우 비밀번호 해시처리
     if (nonMemberOrderFlag) {
-      createInput = { ...createInput, ...(await this.handleNonMemberOrder(dto)) };
+      createInput = { ...createInput, ...(await this.handleNonMemberOrder(orderDto)) };
     }
 
     // 선물하기의 경우(주문상품은 1개, 후원데이터가 존재함)
     if (giftFlag && orderItems.length === 1 && !!orderItems[0].support) {
-      createInput = { ...createInput, ...(await this.handleGiftOrder(dto)) };
+      createInput = { ...createInput, ...(await this.handleGiftOrder(orderDto)) };
     }
 
     // 주문에 연결된 주문상품, 주문상품옵션, 주문상품후원 생성
@@ -142,16 +210,15 @@ export class OrderService {
     const order = await this.prisma.order.create({
       data: {
         ...createInput,
-        supportOrderIncludeFlag: supportOrderIncludeFlag || this.hasSupportOrderItem(dto),
+        supportOrderIncludeFlag:
+          supportOrderIncludeFlag || this.hasSupportOrderItem(orderDto),
         orderItems: {
           // 주문에 연결된 주문상품 생성
           create: orderItems.map((item) => {
-            const { options, support, ...rest } = item;
+            const { options, support, goodsName, ...rest } = item;
             const connectedGoodsData = orderItemConnectedGoodsData.find(
               (goodsData) => goodsData.id === item.goodsId,
             );
-            // 상품이름
-            const goodsName = connectedGoodsData?.goods_name;
             // 상품대표이미지(이미지 중 첫번째)
             const imageUrl = connectedGoodsData?.image[0]?.image;
             return {
@@ -173,10 +240,11 @@ export class OrderService {
     });
 
     /** *************** */
-    // TODO: 주문에 부과된 배송비정보(OrderShipping) 생성???
+    // * 주문에 부과된 배송비정보(OrderShipping) 생성
+    await this.createOrderShippingData(order.id, shippingData);
     /** *************** */
 
-    // 주문 생성 후 장바구니 비우기
+    // * 주문 생성 후 장바구니 비우기
     if (cartItemIdList) {
       await this.prisma.cartItem.deleteMany({
         where: { id: { in: cartItemIdList } },
@@ -514,20 +582,7 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true, images: true } },
         returns: { include: { items: true, images: true } },
         orderCancellations: { include: { items: true } },
-        sellerSettlementItems: {
-          select: {
-            liveShopping: {
-              select: {
-                broadcaster: {
-                  select: {
-                    userNickname: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-        shippings: { include: { items: true } },
+        shippings: { include: { items: { include: { options: true } } } },
       },
     });
   }
@@ -904,5 +959,103 @@ export class OrderService {
       };
     }
     return { nextCursor: undefined, orders: _result };
+  }
+
+  /** 배송비 조회
+   *
+   * 리턴형태
+   * {
+   *  배송비그룹id : { isShippingAvailable: boolean, items: goodsId[], cost: {std:number, add:number} | null },
+   *  배송비그룹id : { isShippingAvailable: boolean, items: goodsId[], cost: {std:number, add:number} | null },
+   *  ...
+   * }
+   */
+  async checkOrderShippingCost(
+    dto: OrderShippingCheckDto,
+  ): Promise<ShippingCostByShippingGroupId> {
+    // * 선물주문이 아닌경우 dto로 들어온 주소
+    let address = dto.address || '';
+    let postalCode = dto.postalCode || '';
+    // * 선물주문인경우 방송인의 주소
+    if (dto.isGiftOrder && dto.broadcasterId) {
+      const broadcasterAddress = await this.prisma.broadcasterAddress.findUnique({
+        where: { broadcasterId: dto.broadcasterId },
+      });
+      address = broadcasterAddress.address;
+      postalCode = broadcasterAddress.postalCode;
+    }
+
+    // 쿼리스트링으로 넘어오는 items값 validation 오류(type transform 적용 안되서 string으로 들어옴) 해결 못해서 여기서 객체로 바꿈
+    const items: ShippingCheckItem[] = dto.items?.map((list) =>
+      JSON.parse(list.toString()),
+    );
+
+    // * 주문상품의 배송비 그룹 정보(배송정책,배송옵션,배송지역별가격)
+    const goodsIdList = [...new Set(items.map((i) => i.goodsId))];
+    const shippingGroups = await this.prisma.shippingGroup.findMany({
+      where: { goods: { some: { id: { in: goodsIdList } } } },
+      include: {
+        shippingSets: {
+          include: { shippingOptions: { include: { shippingCost: true } } },
+        },
+      },
+    });
+
+    // * 주문상품옵션의 가격(가격정보는 프론트에서 보내지 않았음)
+    const optionIdList = [...new Set(items.map((i) => i.goodsOptionId))];
+    const options = await this.prisma.goodsOptions.findMany({
+      where: { id: { in: optionIdList } },
+      include: { goods: { select: { shippingGroupId: true } } },
+    });
+    const goodsOptionsWithQuanntity: (ShippingCheckItem &
+      GoodsOptions & { goods: { shippingGroupId: Goods['shippingGroupId'] } })[] =
+      options.map((opt) => {
+        const _item = items.find((i) => i.goodsOptionId === opt.id);
+        return { ...opt, ..._item };
+      });
+
+    // * {배송그룹id : 상품옵션정보[]}
+    const shippingGroupIdList = shippingGroups.map((sg) => sg.id);
+    const goodsOptionsByShippingGroupId = shippingGroupIdList.reduce(
+      (obj, shippingGroupId) => {
+        const includedGoodsOptions = goodsOptionsWithQuanntity.filter(
+          (opt) => opt.goods.shippingGroupId === shippingGroupId,
+        );
+        return {
+          ...obj,
+          [shippingGroupId]: includedGoodsOptions,
+        };
+      },
+      {} as Record<
+        number,
+        (ShippingCheckItem &
+          GoodsOptions & { goods: { shippingGroupId: Goods['shippingGroupId'] } })[]
+      >,
+    );
+
+    const tempResult = shippingGroups.reduce((result, cur) => {
+      const curShippingGroupData = cur;
+      const goodsOptions = goodsOptionsByShippingGroupId[cur.id];
+      const withShippingCalculTypeFree = shippingGroups
+        .filter((g) => g.id !== cur.id && g.sellerId === cur.sellerId)
+        .some((g) => g.shipping_calcul_type === 'free');
+      const { cost, isShippingAvailable } = calculateShippingCost({
+        postalCode,
+        address,
+        shippingGroupData: curShippingGroupData,
+        goodsOptions,
+        withShippingCalculTypeFree,
+      });
+      return {
+        ...result,
+        [cur.id]: {
+          cost,
+          isShippingAvailable,
+          items: [...new Set(goodsOptions.map((o) => o.goodsId))], // 해당배송비에 묶인 상품 goodsId
+        },
+      };
+    }, {} as ShippingCostByShippingGroupId);
+
+    return tempResult;
   }
 }

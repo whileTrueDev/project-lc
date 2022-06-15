@@ -1,11 +1,11 @@
 export * from './lib/asteriskify';
-export * from './lib/calculateShippingCost';
 export * from './lib/checkGoodsPurchasable';
 export * from './lib/cookieManager';
 export * from './lib/createChakraTheme';
 export * from './lib/createMuiTheme';
 export * from './lib/createReactQueryClient';
 export * from './lib/crop-image';
+export * from './lib/deliveryCompanies';
 export * from './lib/getCartKey';
 export * from './lib/getDiscountedRate';
 export * from './lib/getLocaleNumber';
@@ -13,3 +13,4 @@ export * from './lib/getShippingOptionLabel';
 export * from './lib/getStandardShippingCost';
 export * from './lib/openKakaoChannel';
 export * from './lib/parseErrorObject';
+export * from './lib/checkGoodsPurchasable';

@@ -49,8 +49,6 @@ export class CartItemDto {
   @IsOptional() @IsNumber() customerId?: CartItem['customerId'];
   @IsOptional() @IsString() tempUserId?: CartItem['tempUserId'];
   @IsOptional() @IsNumber() shippingGroupId?: CartItem['shippingGroupId'];
-  @IsDecimal() shippingCost: CartItem['shippingCost'];
-  @IsBoolean() shippingCostIncluded: CartItem['shippingCostIncluded'];
 
   // 유입 상품의 경로 정보
   @IsEnum(SellType) channel: SellType;

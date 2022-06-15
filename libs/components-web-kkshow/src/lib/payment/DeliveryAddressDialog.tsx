@@ -5,19 +5,19 @@ import {
   HStack,
   Input,
   InputLeftAddon,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalOverlay,
   Stack,
   Text,
   useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalBody,
   useToast,
 } from '@chakra-ui/react';
-import { PaymentPageDto } from '@project-lc/shared-types';
+import { CreateOrderForm } from '@project-lc/shared-types';
+import { useState } from 'react';
 import DaumPostcode, { AddressData } from 'react-daum-postcode';
 import { useFormContext } from 'react-hook-form';
-import { useState } from 'react';
 
 export function DeliveryAddressDialog({
   defaultOpen,
@@ -30,12 +30,12 @@ export function DeliveryAddressDialog({
 }): JSX.Element {
   const daumOpen = useDisclosure();
   const toast = useToast();
-  const { setValue, clearErrors, trigger } = useFormContext<PaymentPageDto>();
+  const { setValue, clearErrors, trigger } = useFormContext<CreateOrderForm>();
 
   const handleAddressSelected = (addressData: AddressData): void => {
     const { zonecode, address, buildingName } = addressData;
     const addr = buildingName ? `${address} (${buildingName})` : address;
-    clearErrors('address');
+    clearErrors('recipientAddress');
     setPostalCode(zonecode);
     setAddress(addr);
     daumOpen.onClose();
@@ -43,15 +43,15 @@ export function DeliveryAddressDialog({
 
   const handleModalOnSuccess = async (): Promise<void> => {
     if (detailAddress) {
-      setValue('address', address);
-      setValue('postalCode', postalCode);
-      setValue('detailAddress', detailAddress);
+      setValue('recipientAddress', address);
+      setValue('recipientPostalCode', postalCode);
+      setValue('recipientDetailAddress', detailAddress);
       setPostalCode('');
       setAddress('');
       setDetailAddress('');
-      await trigger('address');
-      await trigger('postalCode');
-      await trigger('detailAddress');
+      await trigger('recipientAddress');
+      await trigger('recipientPostalCode');
+      await trigger('recipientDetailAddress');
       onClose();
     } else {
       toast({

@@ -1,5 +1,7 @@
 import { IsNumber, IsString, IsOptional } from 'class-validator';
 
+// TODO: 사용하지 않는경우 삭제(DeliveryAddress 등에서 사용되던 PaymentPageDto 를 CreateOrderForm 로 교체하였습니다)
+
 export class PaymentPageDto {
   @IsNumber()
   customerId: number;
