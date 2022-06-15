@@ -32,6 +32,7 @@ import {
   ShippingCostByShippingGroupId,
   CreateOrderShippingDto,
   CreateOrderShippingData,
+  OrderDataWithRelations,
 } from '@project-lc/shared-types';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
@@ -429,21 +430,20 @@ export class OrderService {
     return originOrderStep;
   }
 
-  /** 특정 판매자 주문목록 조회 - 주문상품 중 판매자의 상품만 추려냄 & 주문상태 표시는 판매자의 상품 상태에 따라 표시되는 후처리 추가  */
-  async getSellerOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
-    if (!dto.sellerId)
-      throw new BadRequestException('판매자 주문 목록 조회시 sellerId를 입력해야합니다');
-    const { orders, ...rest } = await this.getOrderList(dto);
-
-    // 판매자 주문목록 후처리
+  /** 판매자 주문목록 후처리
     // 주문상품옵션 중 자기 상품옵션만 남기기
     // 자기상품옵션 상태에 기반한 주문상태 표시
-    const ordersWithOnlySellerGoodsOrderItems = orders.map((o) => {
+  */
+  private postProcessSellerOrders(
+    orders: OrderDataWithRelations[],
+    sellerId: number, // 판매자 고유번호
+  ): OrderDataWithRelations[] {
+    return orders.map((o) => {
       const { orderItems, ...orderRestData } = o;
 
       // 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
       const sellerGoodsOrderItems = orderItems.filter(
-        (oi) => oi.goods.sellerId === dto.sellerId,
+        (oi) => oi.goods.sellerId === sellerId,
       );
       // 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
       let displaySellerOrderStep: OrderProcessStep = o.step;
@@ -460,6 +460,20 @@ export class OrderService {
         orderItems: sellerGoodsOrderItems,
       };
     });
+  }
+
+  /** 특정 판매자 주문목록 조회 - 주문상품 중 판매자의 상품만 추려냄 & 주문상태 표시는 판매자의 상품 상태에 따라 표시되는 후처리 추가  */
+  async getSellerOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
+    if (!dto.sellerId)
+      throw new BadRequestException('판매자 주문 목록 조회시 sellerId를 입력해야합니다');
+    const { orders, ...rest } = await this.getOrderList(dto);
+
+    // 주문상품옵션 중 자기 상품옵션만 남기기
+    // 자기상품옵션 상태에 기반한 주문상태 표시
+    const ordersWithOnlySellerGoodsOrderItems = this.postProcessSellerOrders(
+      orders,
+      dto.sellerId,
+    );
 
     return {
       orders: ordersWithOnlySellerGoodsOrderItems,
@@ -595,10 +609,38 @@ export class OrderService {
 
   /** 개별 주문 상세 조회 */
   async getOrderDetail(dto: GetOneOrderDetailDto): Promise<OrderDetailRes> {
-    if (dto.orderId) {
-      return this.findOneOrderDetail({ id: dto.orderId, deleteFlag: false });
+    const whereInput: Prisma.OrderWhereInput = dto.orderId
+      ? { id: dto.orderId } // orderId 값이 있으면 orderId로 조회
+      : { orderCode: dto.orderCode }; // 아니면 orderCode로 조회
+
+    let result = await this.findOneOrderDetail({ ...whereInput, deleteFlag: false });
+
+    // 특정 판매자가 개별주문 상세조회시
+    // 주문상품 중 판매자의 상품만 보내기 & 판매자의 주문상품 상태에 따라 주문상태 표시
+    if (dto.sellerId) {
+      const { orderItems, ...orderRestData } = result;
+
+      // 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
+      const sellerGoodsOrderItems = orderItems.filter(
+        (oi) => oi.goods.sellerId === dto.sellerId,
+      );
+      // 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
+      let displaySellerOrderStep: OrderProcessStep = result.step;
+
+      if (sellerGoodsOrderItems.length > 0) {
+        displaySellerOrderStep = this.getOrderRealStep(
+          result.step,
+          sellerGoodsOrderItems.flatMap((oi) => oi.options),
+        );
+      }
+      result = {
+        ...orderRestData,
+        step: displaySellerOrderStep,
+        orderItems: sellerGoodsOrderItems,
+      };
     }
-    return this.findOneOrderDetail({ orderCode: dto.orderCode, deleteFlag: false });
+
+    return result;
   }
 
   /** 비회원 주문 상세 조회 */
