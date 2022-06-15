@@ -1,10 +1,7 @@
 import { SellerShop } from '@prisma/client';
+import { ShippingOptionCost, ShippingGroupData } from '@project-lc/shared-types';
 import { useCartStore } from '@project-lc/stores';
-import {
-  calculateShippingCostInCartTable,
-  ShippingGroupData,
-  ShippingOptionCost,
-} from '@project-lc/utils-frontend';
+import { calculateShippingCostInCartTable } from '@project-lc/utils';
 import { useMemo } from 'react';
 import { useCart } from '../queries/useCart';
 
@@ -16,6 +13,7 @@ export function useCartShippingGroups(): {
     number,
     ShippingGroupData & { shopName: SellerShop['shopName'] }
   >;
+  groupedSelectedItems: Record<number, number[]>;
 } {
   const { data } = useCart();
   const selectedItems = useCartStore((s) => s.selectedItems);
@@ -115,6 +113,7 @@ export function useCartShippingGroups(): {
     totalShippingCostObjectById,
     shippingGroupIdList,
     shippingGroupWithShopNameObject,
+    groupedSelectedItems,
   };
 }
 

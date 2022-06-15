@@ -4,8 +4,8 @@ import {
   YesOrNo_UPPERCASE,
   Prisma,
 } from '@prisma/client';
+import { ShippingOptionWithCost } from '@project-lc/shared-types';
 import {
-  ShippingOptionWithCost,
   findApplicableOptionSection,
   addShippingCost,
   addRepeatShippingOptionCost,

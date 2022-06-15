@@ -13,6 +13,7 @@ export function OrderItemInfo(): JSX.Element {
   const { control, getValues } = useFormContext<CreateOrderForm>();
   const { fields: orderItems } = useFieldArray({ control, name: 'orderItems' });
   const isGiftOrder = getValues('giftFlag');
+
   return (
     <SectionWithTitle title="주문 상품">
       {orderItems.map((item, idx) => (
@@ -32,12 +33,12 @@ interface OrderItemProps {
   orderItem: {
     goodsId: number | null;
     options: Array<{
-      goodsOptionId: number;
+      goodsOptionId: number | null;
       name: string | null;
       value: string | null;
       quantity: number;
-      normalPrice: Decimal;
-      discountPrice: Decimal;
+      normalPrice: number;
+      discountPrice: number;
     }>;
     support?: {
       broadcasterId: number | null;
@@ -45,8 +46,6 @@ interface OrderItemProps {
       nickname?: string | null;
       avatar?: string | null;
     };
-    shippingCost: string | Decimal;
-    shippingCostIncluded?: boolean;
   };
   disableSupportInfo?: boolean;
 }
@@ -89,8 +88,6 @@ export function OrderItem({
             </Stack>
           ))}
           <Box fontSize="sm">
-            <Text>배송비 {getLocaleNumber(orderItem.shippingCost)}원</Text>
-
             {!disableSupportInfo && (
               <OrderItemSupport
                 avatar={orderItem.support?.avatar}

@@ -8,9 +8,12 @@ export const usePaymentMutation = (): UseMutationResult<
   AxiosError,
   PaymentRequestDto
 > => {
-  return useMutation((dto) => {
-    return axios.post('/payment/success', dto).then((res) => {
-      return res.data;
-    });
-  });
+  return useMutation(
+    (dto) => {
+      return axios.post('/payment/success', dto).then((res) => {
+        return res.data;
+      });
+    },
+    // { retry: false },
+  );
 };

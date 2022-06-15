@@ -8,6 +8,8 @@ import {
   Divider,
   Button,
   useColorModeValue,
+  Spinner,
+  Center,
 } from '@chakra-ui/react';
 import { useDisplaySize, usePaymentByOrderCode, useOrderDetail } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
@@ -24,21 +26,41 @@ export function Receipt(): JSX.Element {
   const { isDesktopSize } = useDisplaySize();
   const orderCode = router.query.orderCode as string;
   const orderId = Number(router.query.orderId);
-  const { data: orderDetailData } = useOrderDetail({ orderId });
+  const { data: orderDetailData, isLoading: orderDetailLoading } = useOrderDetail({
+    orderId,
+  });
   const { data: paymentData, isLoading } = usePaymentByOrderCode(orderCode);
   const virtualAccountBoxBgColor = useColorModeValue('gray.100', 'gray.700');
-  const productOriginPrice = orderDetailData?.orderItems[0].options.reduce(
-    (s, a) => s + Number(a.normalPrice),
-    0,
-  );
+  const productOriginPrice =
+    orderDetailData?.orderItems
+      .flatMap((item) => item.options)
+      .map((opt) => Number(opt.normalPrice) * opt.quantity)
+      .reduce((s, a) => s + Number(a), 0) || 0;
 
-  const productDiscountedPrice = orderDetailData?.orderItems[0].options.reduce(
-    (s, a) => s + Number(a.discountPrice),
-    0,
-  );
+  const productDiscountedPrice =
+    orderDetailData?.orderItems
+      .flatMap((item) => item.options)
+      .map((opt) => Number(opt.discountPrice) * opt.quantity)
+      .reduce((s, a) => s + Number(a), 0) || 0;
 
   const discount = productOriginPrice - productDiscountedPrice;
 
+  const totalShippingCost = orderDetailData?.shippings
+    ? orderDetailData.shippings
+        .map((s) => Number(s.shippingCost))
+        .reduce((sum, cur) => sum + cur, 0)
+        .toLocaleString()
+    : '';
+
+  if (orderDetailLoading) {
+    return (
+      <KkshowLayout>
+        <Center minHeight="80vh">
+          <Spinner />
+        </Center>
+      </KkshowLayout>
+    );
+  }
   return (
     <KkshowLayout>
       <Flex m="auto" alignItems="center" justifyContent="center" direction="column" p={2}>
@@ -128,22 +150,20 @@ export function Receipt(): JSX.Element {
               </Flex>
               <Flex justifyContent="space-between" color="gray.500">
                 <Text>배송비</Text>
-                <Text>
-                  + {orderDetailData.orderItems[0].shippingCost.toLocaleString()}
-                </Text>
+                <Text>+ {totalShippingCost}</Text>
               </Flex>
               <Flex justifyContent="space-between" color="gray.500">
                 <Text>쿠폰사용</Text>
                 <Text>
                   -{' '}
-                  {orderDetailData.customerCouponLogs[0]?.customerCoupon.coupon.amount.toLocaleString() ||
+                  {orderDetailData?.customerCouponLogs[0]?.customerCoupon.coupon.amount.toLocaleString() ||
                     0}
                 </Text>
               </Flex>
               <Flex justifyContent="space-between" color="gray.500">
                 <Text>적립금사용</Text>
                 <Text>
-                  - {orderDetailData.mileageLogs[0]?.amount.toLocaleString() || 0}
+                  - {orderDetailData?.mileageLogs[0]?.amount.toLocaleString() || 0}
                 </Text>
               </Flex>
               <Divider mt={2} mb={2} />
@@ -180,9 +200,9 @@ export function Receipt(): JSX.Element {
             </GridItem>
             <GridItem colSpan={7}>
               {isDesktopSize ? (
-                <ReceiptOrderItemInfo data={orderDetailData.orderItems} />
+                <ReceiptOrderItemInfo data={orderDetailData?.orderItems} />
               ) : (
-                <MobileReceiptOrderItemInfo data={orderDetailData.orderItems} />
+                <MobileReceiptOrderItemInfo data={orderDetailData?.orderItems} />
               )}
             </GridItem>
             <GridItem colSpan={7}>
