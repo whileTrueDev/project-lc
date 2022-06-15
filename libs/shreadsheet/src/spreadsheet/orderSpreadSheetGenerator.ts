@@ -93,12 +93,13 @@ export const defaultColumOpts: OrderSpreadSheetColumnOption[] = [
     getValue: (order) => `${order.recipientAddress} ${order.recipientDetailAddress}`,
     mergeable: true,
   },
-  {
-    type: '주문정보',
-    headerName: '주소(지번)',
-    getValue: (order) => `${order.recipientAddress} ${order.recipientDetailAddress}`,
-    mergeable: true,
-  },
+  // 현재 저장하는 주소가 도로명밖에 없어서 지번은 주석처리 220615 joni
+  // {
+  //   type: '주문정보',
+  //   headerName: '주소(지번)',
+  //   getValue: (order) => `${order.recipientAddress} ${order.recipientDetailAddress}`,
+  //   mergeable: true,
+  // },
   {
     type: '주문정보',
     headerName: '배송메시지',
