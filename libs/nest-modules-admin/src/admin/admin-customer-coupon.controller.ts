@@ -57,8 +57,11 @@ export class AdminCustomerCouponController {
   async createAllCustomerCoupon(
     @Body(ValidationPipe) dto: CustomerCouponDto,
   ): Promise<number> {
+    if (dto.customerIds.length) {
+      return this.customerCouponService.createAllCustomerCoupon(dto); // customers
+    }
     const customers = await this.customerService.findAll();
-    return this.customerCouponService.createAllCustomerCoupon(dto, customers);
+    return this.customerCouponService.createAllCustomerCoupon(dto, customers); //
   }
 
   /** 특정 소비자에게 발급된 쿠폰 목록 조회 */

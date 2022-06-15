@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsEnum } from 'class-validator';
+import { IsNumber, IsOptional, IsEnum, IsArray } from 'class-validator';
 import { CouponStatus } from '@prisma/client';
 
 export class CustomerCouponDto {
@@ -15,6 +15,11 @@ export class CustomerCouponDto {
   @IsOptional()
   @IsEnum(CouponStatus)
   status?: CouponStatus;
+
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  customerIds?: number[];
 }
 export class CouponStatusDto {
   @IsNumber()
@@ -25,3 +30,9 @@ export class CouponStatusDto {
 }
 
 export type CustomerCouponIdAndStatus = Pick<CustomerCouponDto, 'id' | 'status'>;
+
+export type IssueManyCustomerList = {
+  customerId: number;
+  couponId: number;
+  status: CouponStatus;
+};

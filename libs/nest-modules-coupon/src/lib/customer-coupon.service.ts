@@ -5,6 +5,7 @@ import {
   CustomerCouponDto,
   CouponStatusDto,
   CustomerCouponRes,
+  IssueManyCustomerList,
 } from '@project-lc/shared-types';
 
 @Injectable()
@@ -49,11 +50,19 @@ export class CustomerCouponService {
 
   async createAllCustomerCoupon(
     dto: CustomerCouponDto,
-    customers: Customer[],
+    customers?: Customer[],
   ): Promise<number> {
-    const target = customers.map((item) => {
-      return { customerId: item.id, couponId: dto.couponId, status: dto.status };
-    });
+    let target: IssueManyCustomerList[];
+    if (customers) {
+      target = customers.map((item) => {
+        return { customerId: item.id, couponId: dto.couponId, status: dto.status };
+      });
+    } else if (dto.customerIds.length) {
+      target = dto.customerIds.map((id) => {
+        return { customerId: id, couponId: dto.couponId, status: dto.status };
+      });
+    }
+
     const result = await this.prismaService.customerCoupon.createMany({
       data: target,
     });
