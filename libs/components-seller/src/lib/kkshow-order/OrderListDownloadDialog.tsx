@@ -28,7 +28,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { useFmOrderDetails, useOrderDetailsForSpreadsheet } from '@project-lc/hooks';
+import { useOrderDetailsForSpreadsheet, useProfile } from '@project-lc/hooks';
 import { defaultColumOpts, OrderSpreadSheetGenerator } from '@project-lc/shreadsheet';
 import {
   getOrderDownloadFileName,
@@ -45,12 +45,14 @@ export function OrderListDownloadDialog({
   isOpen,
   onClose,
 }: OrderListDownloadDialogProps): JSX.Element {
+  const { data: profileData } = useProfile();
   const toast = useToast();
   // 선택된 주문
   const selectedOrders = useSellerOrderStore((state) => state.selectedOrders);
   // 선택된 주문 상세 정보 조회
   const orderDetails = useOrderDetailsForSpreadsheet({
     orderIds: selectedOrders.map((orderId) => Number(orderId)),
+    sellerId: profileData?.id,
   });
 
   const disableHeaders = useOrderListDownloadStore((st) => st.disableHeaders);
@@ -59,8 +61,6 @@ export function OrderListDownloadDialog({
   // 엑셀 생성 및 내보내기
   const onConfirm = async (): Promise<void> => {
     if (orderDetails.data) {
-      // FindFmOrderDetailRes 와 OrderDetailRes 타입이 달라서 해당 OrderSpreadSheetGenerator 사용할 수 없음
-      // TODO: OrderSpreadSheetGenerator가 OrderDetailRes 사용할 수 있게 수정하기
       const ossg = new OrderSpreadSheetGenerator({
         disabledColumnHeaders: disableHeaders,
       });

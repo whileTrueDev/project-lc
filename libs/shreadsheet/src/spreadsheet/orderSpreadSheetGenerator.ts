@@ -214,9 +214,18 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
     const cols: ColInfo[] = [];
     const merges: Range[] = [];
     orders.forEach((order) => {
+      // 이 주문에 포함된 주문상품옵션 전체 목록
+      const totalOrderItemOptionList = order.orderItems.flatMap((oi) => oi.options);
+      // 셀병합위해 사용할 주문상품옵션 순회 인덱스(해당 주문에 포함된 주문상품옵션 중 마지막 값인지 확인하기 위한 용도)
+      let orderItemOptionIndex = 0;
+
       order.shippings.forEach((ship) => {
-        ship.items.forEach((item) => {
-          item.options.forEach((opt, optIdx) => {
+        const shipItemIdList = ship.items.map((item) => item.id);
+        const shippingOrderItems = order.orderItems.filter((oi) =>
+          shipItemIdList.includes(oi.id),
+        );
+        shippingOrderItems.forEach((item) => {
+          item.options.forEach((opt) => {
             this.columns.forEach((field, fieldIdx) => {
               // 셀에 넣을 데이터 가져오기
               const v = field.getValue(order, ship, item, opt);
@@ -238,10 +247,14 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
               cols[fieldIdx] = { wch };
 
               // 셀 병합 설정
-              if (optIdx > 0 && optIdx === item.options.length - 1) {
+              // 주문에 포함된 주문상품옵션 중 마지막 주문상품옵션인지 확인하여 마지막인경우 셀병합 추가
+              if (
+                orderItemOptionIndex > 0 &&
+                orderItemOptionIndex === totalOrderItemOptionList.length - 1
+              ) {
                 if (field.mergeable) {
                   merges.push({
-                    s: { c: fieldIdx, r: rowIdx - item.options.length },
+                    s: { c: fieldIdx, r: rowIdx - totalOrderItemOptionList.length },
                     e: { c: fieldIdx, r: rowIdx - 1 },
                   });
                 }
@@ -250,6 +263,8 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
 
             // 다음 행을 넣기 위해 행인덱스 + 1
             rowIdx += 1;
+            // 주문상품옵션 순회 인덱스 증가(셀병합위해 사용)
+            orderItemOptionIndex += 1;
           });
         });
       });
