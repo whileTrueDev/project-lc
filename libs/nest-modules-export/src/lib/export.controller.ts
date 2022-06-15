@@ -5,8 +5,10 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 // import { SellerInfo, UserPayload } from '@project-lc/nest-core';
 import {
   CreateKkshowExportDto,
@@ -14,12 +16,11 @@ import {
   ExportListRes,
   ExportManyDto,
   ExportRes,
-  findExportListDto,
+  FindExportListDto,
 } from '@project-lc/shared-types';
 import { ExportService } from './export.service';
 
-// TODO: 프론트에서 사용할 때 가드 주석 해제 & SellerInfo 주석 해제
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('export')
 export class ExportController {
   constructor(private readonly exportService: ExportService) {}
@@ -60,7 +61,7 @@ export class ExportController {
   /** 출고목록조회 - 판매자, 관리자 용 */
   @Get()
   public getExportList(
-    @Query(new ValidationPipe({ transform: true })) dto: findExportListDto,
+    @Query(new ValidationPipe({ transform: true })) dto: FindExportListDto,
   ): Promise<ExportListRes> {
     return this.exportService.getExportList(dto);
   }

@@ -1,24 +1,24 @@
 import { Badge, Box, Heading, HStack, Text } from '@chakra-ui/react';
 import { TextDotConnector } from '@project-lc/components-core/TextDotConnector';
-import { FmExportRes } from '@project-lc/shared-types';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
+import { ExportRes } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
-import { FmOrderStatusBadge } from '@project-lc/components-shared/FmOrderStatusBadge';
 
 export interface ExportDetailTitleProps {
-  exportData: FmExportRes;
+  exportData: ExportRes;
 }
 export function ExportDetailTitle({ exportData }: ExportDetailTitleProps): JSX.Element {
   return (
     <Box>
-      <Heading>출고 {exportData.export_code}</Heading>
+      <Heading>출고 {exportData.exportCode}</Heading>
       <HStack alignItems="center">
-        <FmOrderStatusBadge orderStatus={exportData.status} />
+        <OrderStatusBadge step={exportData.status} />
         {/* 구매확정 배지 */}
-        {exportData.confirm_date && exportData.buy_confirm !== 'none' ? (
+        {exportData.buyConfirmDate && exportData.buyConfirmSubject ? (
           <Badge colorScheme="green">구매확정됨</Badge>
         ) : null}
         <TextDotConnector />
-        <Text>{dayjs(exportData.export_date).fromNow()} 출고</Text>
+        <Text>{dayjs(exportData.exportDate).fromNow()} 출고</Text>
       </HStack>
     </Box>
   );
