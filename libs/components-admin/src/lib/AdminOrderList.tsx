@@ -120,6 +120,15 @@ export function AdminOrderList(): JSX.Element {
     }
   }, [data, isLoading, page]);
 
+  // mui datagrid serverside 페이지네이션 참고 https://github.com/mui/mui-x/blob/v5.11.1/docs/data/data-grid/pagination/CursorPaginationGrid.tsx
+  // Some API clients return undefined while loading
+  // Following lines are here to prevent `rowCountState` from being undefined during the loading
+  const [rowCountState, setRowCountState] = useState(data?.count || 0);
+  useEffect(() => {
+    setRowCountState((prevRowCountState) =>
+      data?.count ? data.count : prevRowCountState,
+    );
+  }, [data, setRowCountState]);
   return (
     <ChakraDataGrid
       components={{
@@ -133,7 +142,9 @@ export function AdminOrderList(): JSX.Element {
       minH={500}
       loading={isLoading}
       disableSelectionOnClick
+      pageSize={pageSize}
       pagination
+      rowCount={rowCountState}
       paginationMode="server"
       onPageChange={handlePageChange}
     />
