@@ -13,31 +13,30 @@ import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
-  FmOrderStatusNumString,
+  CreateOrderShippingData,
   FindAllOrderByBroadcasterRes,
   FindManyDto,
+  FmOrderStatusNumString,
   GetNonMemberOrderDetailDto,
   GetOneOrderDetailDto,
   GetOrderListDto,
   getOrderProcessStepNameByStringNumber,
+  OrderDataWithRelations,
   OrderDetailRes,
   OrderListRes,
   orderProcessStepDict,
   OrderPurchaseConfirmationDto,
+  OrderShippingCheckDto,
   OrderStatsRes,
   sellerOrderSteps,
-  UpdateOrderDto,
-  OrderShippingCheckDto,
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
-  CreateOrderShippingDto,
-  CreateOrderShippingData,
-  OrderDataWithRelations,
+  UpdateOrderDto,
 } from '@project-lc/shared-types';
+import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
-import { calculateShippingCost } from '@project-lc/utils';
 
 dayjs.extend(isToday);
 @Injectable()
@@ -615,25 +614,38 @@ export class OrderService {
     let result = await this.findOneOrderDetail({ ...whereInput, deleteFlag: false });
 
     // 특정 판매자가 개별주문 상세조회시
-    // 주문상품 중 판매자의 상품만 보내기 & 판매자의 주문상품 상태에 따라 주문상태 표시
+    // 주문상품 중 판매자의 상품만 보내기 & 판매자의 주문상품 상태에 따라 주문상태 표시 & 판매자의 베송비그룹으로 계산된 배송비만 보내기
     if (dto.sellerId) {
-      const { orderItems, ...orderRestData } = result;
+      const { orderItems, shippings, ...orderRestData } = result;
 
-      // 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
+      // * 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
       const sellerGoodsOrderItems = orderItems.filter(
         (oi) => oi.goods.sellerId === dto.sellerId,
       );
-      // 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
+      // * 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
       let displaySellerOrderStep: OrderProcessStep = result.step;
-
       if (sellerGoodsOrderItems.length > 0) {
         displaySellerOrderStep = this.getOrderRealStep(
           result.step,
           sellerGoodsOrderItems.flatMap((oi) => oi.options),
         );
       }
+
+      // * 판매자 본인의 배송비정책과 연결된 주문배송비정보만 보내기
+      let sellerShippings = shippings;
+      const sellerShippingGroupList = await this.prisma.shippingGroup.findMany({
+        where: { sellerId: dto.sellerId },
+      });
+      if (sellerShippingGroupList.length > 0) {
+        const shippingGroupIdList = sellerShippingGroupList.map((g) => g.id);
+        sellerShippings = shippings.filter((s) =>
+          shippingGroupIdList.includes(s.shippingGroupId),
+        );
+      }
+
       result = {
         ...orderRestData,
+        shippings: sellerShippings,
         step: displaySellerOrderStep,
         orderItems: sellerGoodsOrderItems,
       };
