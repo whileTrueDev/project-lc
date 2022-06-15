@@ -60,10 +60,16 @@ export type OrderCancellationBaseData = Pick<
   items: OrderCancellationItem[];
 };
 export type ExportBaseData = Export;
-export type ExchangeBaseData = Pick<Exchange, 'id' | 'exchangeCode'> & {
+export type ExchangeBaseData = Pick<
+  Exchange,
+  'id' | 'exchangeCode' | 'status' | 'requestDate' | 'completeDate'
+> & {
   exchangeItems: ExchangeItem[];
 };
-export type ReturnBaseData = Pick<Return, 'id' | 'returnCode'> & { items: ReturnItem[] };
+export type ReturnBaseData = Pick<
+  Return,
+  'id' | 'returnCode' | 'status' | 'requestDate' | 'completeDate'
+> & { items: ReturnItem[] };
 export type ReturnDataWithImages = ReturnBaseData & { images: ReturnImage[] };
 export type ExchangeDataWithImages = ExchangeBaseData & { images: ExchangeImage[] };
 
