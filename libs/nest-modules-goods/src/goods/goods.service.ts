@@ -15,7 +15,6 @@ import {
   getLiveShoppingProgress,
   GoodsByIdRes,
   GoodsImageDto,
-  GoodsInformationNoticeRes,
   GoodsListDto,
   GoodsListRes,
   GoodsOptionDto,
@@ -454,13 +453,22 @@ export class GoodsService {
             },
           },
         },
+        informationNotice: true,
       },
     });
-    const infoNotice = (await this.prisma.goodsInformationNotice.findFirst({
-      where: { goodsId },
-    })) as GoodsInformationNoticeRes;
-    if (!result && !infoNotice) return null;
-    return { ...result, informationNotice: infoNotice };
+
+    if (!result) return null;
+    return {
+      ...result,
+      informationNotice: result.informationNotice
+        ? {
+            ...result.informationNotice,
+            contents: result.informationNotice?.contents
+              ? JSON.parse(result.informationNotice?.contents as string)
+              : null,
+          }
+        : null,
+    };
   }
 
   /** 상품 개별 간략 정보 조회 */
