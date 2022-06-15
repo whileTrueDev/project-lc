@@ -162,7 +162,7 @@ interface OrderSpreadSheetGeneratorOptions {
   disabledColumnHeaders?: Array<string>;
 }
 
-export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<FindFmOrderDetailRes> {
+export class OrderSpreadSheetGeneratorBackup extends SpreadSheetGenerator<FindFmOrderDetailRes> {
   private columns: OrderSpreadSheetColumnOption[];
 
   constructor(private opts?: OrderSpreadSheetGeneratorOptions) {
