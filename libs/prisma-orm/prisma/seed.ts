@@ -14,6 +14,11 @@ import {
 import { cartSample, tempUserCartItemSample } from './seedData/cart';
 import { dummyCustomer } from './seedData/customer';
 import {
+  dummyCoupon,
+  dummyCustomerCoupon,
+  dummyCustomerCouponLog,
+} from './seedData/dummyCoupon';
+import {
   defaultOption,
   defaultSellCommissionData,
   dummyBroadcasterAddress,
@@ -31,26 +36,17 @@ import {
   testsellerExtraData,
 } from './seedData/dummyData';
 import {
+  createDummyOrderData,
   createDummyOrderWithCancellation,
   createDummyOrderWithExchange,
   createDummyOrderWithReturn,
   createDummyOrderWithSupport,
-  nonMemberOrder,
-  normalOrder,
-  orderExportReady,
-  purchaseConfirmedOrder,
-  shippingDoneOrder,
 } from './seedData/dummyOrder';
 import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquiry';
-import {
-  dummyCoupon,
-  dummyCustomerCoupon,
-  dummyCustomerCouponLog,
-} from './seedData/dummyCoupon';
-import { dummyMileage, dummyMileageLog } from './seedData/mileage';
 import { createGoodsReview, createGoodsReview2 } from './seedData/goods-review';
 import { kkshowMainSeedData } from './seedData/kkshowMain';
 import { kkshowShoppingTabDummyData } from './seedData/kkshowShoppingTab';
+import { dummyMileage, dummyMileageLog } from './seedData/mileage';
 import { termsData } from './seedData/terms';
 
 const prisma = new PrismaClient();
@@ -335,14 +331,6 @@ async function genereateInitialKkshowShoppingTabData(): Promise<void> {
 async function createCartItems(): Promise<void> {
   await prisma.cartItem.create({ data: cartSample });
   await prisma.cartItem.create({ data: tempUserCartItemSample });
-}
-
-async function createDummyOrderData(): Promise<void> {
-  await prisma.order.create({ data: normalOrder });
-  await prisma.order.create({ data: nonMemberOrder });
-  await prisma.order.create({ data: purchaseConfirmedOrder });
-  await prisma.order.create({ data: shippingDoneOrder });
-  await prisma.order.create({ data: orderExportReady });
 }
 
 async function createDummyOrderCancelReturnExchange(): Promise<void> {
