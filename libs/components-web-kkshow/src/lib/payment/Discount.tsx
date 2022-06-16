@@ -22,21 +22,17 @@ import {
 import { GridColDef, GridRowData } from '@material-ui/data-grid';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import SectionWithTitle from '@project-lc/components-layout/SectionWithTitle';
+import { useCustomerCouponList, useCustomerMileage } from '@project-lc/hooks';
 import { CreateOrderForm } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useFormContext } from 'react-hook-form';
 
-// todo : 쿠폰 crud 이후 디비에서 가져오도록 변경
-const dummyCoupon = [
-  { id: 1, name: '3000원 할인 쿠폰', amount: 3000 },
-  { id: 2, name: '5000원 할인 쿠폰', amount: 5000 },
-  { id: 3, name: '10000원 할인 쿠폰', amount: 10000 },
-];
-
 export function Discount(): JSX.Element {
   const couponSelectDialog = useDisclosure();
   const discountCodeDialog = useDisclosure();
-  const MAX_MILEAGE = 1200;
+
+  const { data: customerMileage } = useCustomerMileage();
+  const { data: customerCoupons } = useCustomerCouponList();
 
   const {
     resetField,
@@ -58,7 +54,9 @@ export function Discount(): JSX.Element {
   };
 
   const handleUseMaxMileage = (): void => {
-    setValue('usedMileageAmount', MAX_MILEAGE);
+    if (customerMileage) {
+      setValue('usedMileageAmount', customerMileage.mileage);
+    }
   };
 
   const customerId = watch('customerId');
@@ -80,7 +78,7 @@ export function Discount(): JSX.Element {
           <Text fontWeight="semibold">쿠폰할인</Text>
           <Flex alignItems="center" gap={2}>
             <Input size="sm" maxW={150} isReadOnly {...register('usedCouponAmount')} />
-            {dummyCoupon && dummyCoupon.length > 0 && (
+            {customerCoupons && customerCoupons.length > 0 && (
               <Button size="xs" colorScheme="blue" onClick={couponSelectDialog.onOpen}>
                 쿠폰사용
               </Button>
@@ -104,20 +102,22 @@ export function Discount(): JSX.Element {
           <FormControl isInvalid={!!errors.usedMileageAmount}>
             <Flex gap={2} alignItems="center">
               <Input
-                isReadOnly={MAX_MILEAGE <= 0}
+                isReadOnly={!customerMileage || customerMileage?.mileage <= 0}
                 maxW={150}
                 type="number"
                 size="sm"
                 onFocus={(e) => e.target.select()}
                 {...register('usedMileageAmount', {
-                  max: {
-                    value: MAX_MILEAGE,
-                    message: '보유적립금 이상 사용할 수 없습니다.',
-                  },
+                  max: customerMileage
+                    ? {
+                        value: customerMileage.mileage,
+                        message: '보유적립금 이상 사용할 수 없습니다.',
+                      }
+                    : 0,
                   min: { value: 0, message: '0원이하로 적용할 수 없습니다.' },
                 })}
               />
-              {MAX_MILEAGE > 0 && (
+              {customerMileage && customerMileage.mileage > 0 && (
                 <Button size="xs" colorScheme="blue" onClick={handleUseMaxMileage}>
                   전액사용
                 </Button>
@@ -132,9 +132,13 @@ export function Discount(): JSX.Element {
                 </Button>
               ) : null}
             </Flex>
-            <FormHelperText color="GrayText">
-              보유한 총 적립금 {getLocaleNumber(MAX_MILEAGE) || 0} 원
-            </FormHelperText>
+
+            {customerMileage && (
+              <FormHelperText color="GrayText">
+                보유한 총 적립금 {getLocaleNumber(customerMileage.mileage) || 0} 원
+              </FormHelperText>
+            )}
+
             <FormErrorMessage>{errors.usedMileageAmount?.message}</FormErrorMessage>
           </FormControl>
         </Stack>
@@ -179,7 +183,6 @@ export function Discount(): JSX.Element {
 }
 
 type CouponSelectDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
-  // TODO: 쿠폰 정보 연결 필요
   onCouponSelect: (coupon: any) => void;
 };
 /** 쿠폰 선택 다이얼로그 */
@@ -188,6 +191,17 @@ function CouponSelectDialog({
   onClose,
   onCouponSelect,
 }: CouponSelectDialogProps): JSX.Element {
+  const { data: customerCoupons } = useCustomerCouponList();
+
+  const couponList = customerCoupons
+    ? customerCoupons.map((c) => {
+        return {
+          id: c.id, // CustomerCoupon 의 고유번호(CustomerCoupon.id)임. Coupon.id 가 아님
+          name: c.coupon.name,
+          amount: c.coupon.amount,
+        };
+      })
+    : [];
   // TODO: 쿠폰 사용 가능여부 처리 필요 (최소 주문금액 등 적용 가능 여부 판단 이후 선택못하도록) + 총 주문가격이 쿠폰할인금액보다 적은경우 처리
   const columns: GridColDef[] = [
     { field: 'name', headerName: '쿠폰명', flex: 1 },
@@ -231,7 +245,7 @@ function CouponSelectDialog({
             disableColumnMenu
             disableColumnSelector
             columns={columns}
-            rows={dummyCoupon}
+            rows={couponList}
           />
         </ModalBody>
         <ModalFooter>
