@@ -91,9 +91,12 @@ export function DeliveryAddress(): JSX.Element {
 
   const handleRecipientInfo = async (): Promise<void> => {
     setValue('recipientName', getValues('ordererName'));
-    setValue('recipientPhone1', getValues('ordererPhone').slice(0, 3) || '');
-    setValue('recipientPhone2', getValues('ordererPhone').slice(3, 7) || '');
-    setValue('recipientPhone3', getValues('ordererPhone').slice(7, 12) || '');
+    const ordererPhone1 = getValues('ordererPhone1');
+    const ordererPhone2 = getValues('ordererPhone2');
+    const ordererPhone3 = getValues('ordererPhone3');
+    setValue('recipientPhone1', ordererPhone1 || '');
+    setValue('recipientPhone2', ordererPhone2 || '');
+    setValue('recipientPhone3', ordererPhone3 || '');
     await trigger('recipientName');
     await trigger('recipientPhone1');
     await trigger('recipientPhone2');
