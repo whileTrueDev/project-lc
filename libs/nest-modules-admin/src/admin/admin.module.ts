@@ -61,7 +61,7 @@ export class AdminModule {
   ];
 
   private static readonly imports = [
-    ProductPromotionModule,
+    ProductPromotionModule.withoutControllers(),
     OrderCancelModule.withoutControllers(),
     SellerModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -60,8 +61,7 @@ export class BroadcasterController {
 
   /** 방송인 정보 조회 */
   @Get()
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(HttpCacheInterceptor)
+  @UseInterceptors(ClassSerializerInterceptor, HttpCacheInterceptor)
   public async findBroadcaster(
     @Query(ValidationPipe) dto: FindBroadcasterDto,
   ): Promise<BroadcasterRes | null> {

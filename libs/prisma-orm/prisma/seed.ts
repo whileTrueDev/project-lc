@@ -135,6 +135,11 @@ async function createBroadcasterPromotionPage(
     data: {
       broadcasterId,
       url: tempCatalogUrl, // 임시로 크크마켓 카테고리 링크
+      comment: `✍️Senior 2D Artist 
+      @SecondDinnerGames
+      🎨Illustrator for Hearthstone and MtG
+      Past: Blur, Blizzard, Gearbox, Disney, Valve, Bethesda, etc.
+      `,
     },
   });
 }
@@ -143,11 +148,13 @@ async function createBroadcasterPromotionPage(
 async function createProductPromotion(
   broadcasterPromotionPageId: number,
   goodsId: number,
+  broadcasterId: number,
 ): Promise<any> {
   return prisma.productPromotion.create({
     data: {
       broadcasterPromotionPageId,
       goodsId,
+      broadcasterId,
     },
   });
 }
@@ -246,7 +253,19 @@ async function createDummyBroadcasterAddress(broadcaster: Broadcaster): Promise<
 async function createDummyBroadcasterChannel(broadcaster: Broadcaster): Promise<void> {
   await prisma.broadcasterChannel.create({
     data: {
-      url: dummyBroadcasterChannel.url,
+      url: `${dummyBroadcasterChannel.url}/asdfasdfasdfasdfasdfasdf`,
+      broadcaster: { connect: { id: broadcaster.id } },
+    },
+  });
+  await prisma.broadcasterChannel.create({
+    data: {
+      url: 'https://afreecatv.comasdfasdfasdfasdfasdfasdf',
+      broadcaster: { connect: { id: broadcaster.id } },
+    },
+  });
+  await prisma.broadcasterChannel.create({
+    data: {
+      url: 'https://www.youtube.com/channel/UCN3w7jS8f6t2fPROcRY7e0g',
       broadcaster: { connect: { id: broadcaster.id } },
     },
   });
@@ -420,7 +439,7 @@ async function main(): Promise<void> {
   // 더미 상품홍보페이지 생성
   const promotionPage = await createBroadcasterPromotionPage(testbroadcaster.id);
   // 더미 상품홍보 아이템 생성
-  await createProductPromotion(promotionPage.id, goods4.id);
+  await createProductPromotion(promotionPage.id, goods4.id, testbroadcaster.id);
 
   // 더미 카트 상품 생성
   await createCartItems();

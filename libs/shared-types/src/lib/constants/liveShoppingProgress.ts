@@ -16,6 +16,7 @@ export interface LiveShoppingProgressParams {
   progress: LiveShopppingProgressType;
   broadcastStartDate?: Date | null;
   broadcastEndDate?: Date | null;
+  sellStartDate?: string | Date | undefined | null;
   sellEndDate?: string | Date | undefined | null;
 }
 
@@ -24,12 +25,23 @@ export interface LiveShoppingProgressParams {
  * @param params LiveShoppingProgressParams 라이브쇼핑의 상태에 필요한 파라미터들을 제공
  * @returns string 라이브 쇼핑의 상태
  */
-export function getLiveShoppingProgress(params: LiveShoppingProgressParams): string {
+export function getLiveShoppingProgress(
+  params: LiveShoppingProgressParams,
+):
+  | '조율중'
+  | '취소됨'
+  | '판매중'
+  | '판매종료'
+  | '방송진행중'
+  | '방송종료'
+  | '확정됨'
+  | '등록됨' {
   const { progress } = params;
 
   const 현재시각 = new Date().valueOf();
   const 방송시작시각 = getTimeValue(params?.broadcastStartDate);
   const 방송종료시각 = getTimeValue(params?.broadcastEndDate);
+  const 판매시작시각 = getTimeValue(params?.sellStartDate);
   const 판매종료시각 = getTimeValue(params?.sellEndDate);
   switch (progress) {
     case LIVE_SHOPPING_PROGRESS.조율중:
@@ -38,6 +50,9 @@ export function getLiveShoppingProgress(params: LiveShoppingProgressParams): str
       return '취소됨';
     case LIVE_SHOPPING_PROGRESS.확정됨:
       if (방송시작시각 && 방송종료시각) {
+        if (판매시작시각 && 판매시작시각 < 현재시각 && 판매종료시각 > 현재시각) {
+          return '판매중';
+        }
         if (판매종료시각 && 방송종료시각 < 현재시각 && 판매종료시각 < 현재시각) {
           return '판매종료';
         }
@@ -52,4 +67,12 @@ export function getLiveShoppingProgress(params: LiveShoppingProgressParams): str
     default:
       return '등록됨';
   }
+}
+
+/** 라이브쇼핑이 현재 판매중인지 여부 조회 */
+export function getLiveShoppingIsNowLive(params: LiveShoppingProgressParams): boolean {
+  const liveShoppingStatus = getLiveShoppingProgress(params);
+  if (['판매중', '판매중', '방송진행중', '방송종료'].includes(liveShoppingStatus))
+    return true;
+  return false;
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ProductPromotion } from '@prisma/client';
+import { Goods, ProductPromotion } from '@prisma/client';
 import { BroadcasterPromotionPageService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -104,12 +104,24 @@ export class ProductPromotionService {
    * 전달받은 fmGoodsSeq 배열에 해당하는 '상품홍보' 목록 조회
    * @param fmGoodsSeqs 퍼스트몰 상품 고유번호 fmGoodsSeq 배열 (productPromotion.fmGoodsSeq)
    */
-  public async findProductPromotionsByGoodsIds(
+  public async _findProductPromotionsByGoodsIds(
     fmGoodsSeqs: number[],
   ): Promise<ProductPromotion[]> {
     const _fmGoodsSeqs = fmGoodsSeqs.map((s) => Number(s)).filter((x) => !!x);
     return this.prisma.productPromotion.findMany({
       where: { fmGoodsSeq: { in: _fmGoodsSeqs } },
+    });
+  }
+
+  /**
+   * goodsId에 해당하는 상품홍보 목록 조회
+   */
+  public async findProductPromotionsByGoodsIds(
+    goodsIds: Goods['id'][],
+  ): Promise<ProductPromotion[]> {
+    const _goodsIds = goodsIds.map((s) => Number(s)).filter((x) => !!x);
+    return this.prisma.productPromotion.findMany({
+      where: { goodsId: { in: _goodsIds } },
     });
   }
 }
