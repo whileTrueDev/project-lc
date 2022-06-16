@@ -41,6 +41,7 @@ import {
   purchaseConfirmedOrder,
   shippingDoneOrder,
 } from './seedData/dummyOrder';
+import { dummyPayments } from './seedData/dummyPayment';
 import { createGoodsInquiry, createGoodsInquiry2 } from './seedData/goods-inquiry';
 import {
   dummyCoupon,
@@ -369,6 +370,10 @@ async function createDummyOrderCancelReturnExchange(): Promise<void> {
   await createDummyOrderWithExchange();
   await createDummyOrderWithReturn();
 }
+// 더미페이먼트 연결
+async function createDummyPayments(): Promise<void> {
+  await prisma.orderPayment.createMany({ data: dummyPayments });
+}
 
 async function createDummyCoupon(): Promise<void> {
   await prisma.coupon.create({ data: dummyCoupon });
@@ -456,6 +461,9 @@ async function main(): Promise<void> {
   // 더미 상품문의 생성
   await createGoodsInquiry(prisma);
   await createGoodsInquiry2(prisma);
+
+  // 더미페이먼트 생성
+  await createDummyPayments();
 
   // 더미 쿠폰 생성
   await createDummyCoupon();
