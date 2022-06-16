@@ -42,6 +42,7 @@ export interface KkshowOrderStore {
 
   // ******* 배송비 저장
   shipping: OrderShippingData;
+  resetShippingData: () => void;
   setShippingData: (data: OrderShippingData) => void;
 }
 export const useKkshowOrderStore = create<KkshowOrderStore>(
@@ -77,6 +78,7 @@ export const useKkshowOrderStore = create<KkshowOrderStore>(
 
       // ******* 배송비 저장
       shipping: {},
+      resetShippingData: () => set({ shipping: {} }),
       setShippingData: (data: OrderShippingData) => {
         set({ shipping: data });
       },

@@ -55,7 +55,7 @@ export function Success(): JSX.Element {
   const paymentKey = router.query.paymentKey as string;
   const redirectAmount = Number(router.query.amount as string);
 
-  const { order, shipping } = useKkshowOrderStore();
+  const { order, shipping, resetOrder, resetShippingData } = useKkshowOrderStore();
 
   const { mutateAsync } = usePaymentMutation();
 
@@ -63,14 +63,6 @@ export function Success(): JSX.Element {
 
   useEffect(() => {
     const tossPaymentsAmount = Number(getCookie('amount'));
-    console.log({
-      orderCode,
-      paymentKey,
-      redirectAmount,
-      tossPaymentsAmount,
-      isRequested: isRequested.current,
-      isSameAmount: redirectAmount === tossPaymentsAmount,
-    });
     if (
       orderCode &&
       paymentKey &&
@@ -109,7 +101,11 @@ export function Success(): JSX.Element {
           createOrder
             .mutateAsync({ order: createOrderDto, shipping: shippingDto })
             .then((res) => {
-              console.log(res);
+              // 주문스토어 주문,배송비정보 리셋
+              resetOrder();
+              resetShippingData();
+
+              // 주문완료페이지로 이동
               const orderId = res.id;
               router.push(`/payment/receipt?orderId=${orderId}&orderCode=${orderCode}`);
             })
