@@ -29,6 +29,7 @@ import {
   OrderPurchaseConfirmationDto,
   OrderShippingCheckDto,
   OrderStatsRes,
+  ShippingCostByShippingGroupId,
   UpdateOrderDto,
 } from '@project-lc/shared-types';
 import { OrderService } from './order.service';
@@ -151,14 +152,14 @@ export class OrderController {
    => 배송비 조회 위한 {주문상품id, 옵션id, 개수}[] 정보를 쿼리스트링으로 받고있다 주문내역이 길면 문제가 생길 우려가 있다..
    */
   @Get('/shipping/check')
-  checkGetOrderShippingCost(
+  checkOrderShippingCost(
     @Query(
       new ValidationPipe({
         transform: true,
       }),
     )
     dto: OrderShippingCheckDto,
-  ): Promise<any> {
+  ): Promise<ShippingCostByShippingGroupId> {
     return this.orderService.checkOrderShippingCost(dto);
   }
 }

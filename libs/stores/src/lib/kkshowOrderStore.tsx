@@ -24,15 +24,6 @@ export const orderNeedToFillInDefault = {
 };
 
 /** 주문 준비 데이터 타입  */
-// export type OrderPrepareData = Pick<
-//   CreateOrderForm,
-//   | 'orderItems'
-//   | 'cartItemIdList'
-//   | 'giftFlag'
-//   | 'nonMemberOrderFlag'
-//   | 'orderPrice'
-//   | 'supportOrderIncludeFlag'
-// >;
 export type OrderPrepareData = Partial<CreateOrderForm>;
 
 /** 배송비정보 타입 */

@@ -185,7 +185,7 @@ export function PaymentBox(): JSX.Element {
       </Center>
 
       <Box mt={6}>
-        <TermBox shopName="테스트" />
+        <TermBox shopName="테스트" /> {/* // TODO: shopName 변경 */}
       </Box>
     </Box>
   );
