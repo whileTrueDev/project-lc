@@ -49,7 +49,6 @@ import {
   AdminBroadcasterSettlementInfoList,
   AdminClassChangeHistoryDtoWithoutId,
   AdminClassDto,
-  AdminGoodsByIdRes,
   AdminGoodsListRes,
   AdminLiveShoppingGiftOrder,
   AdminSellerListRes,
@@ -67,6 +66,7 @@ import {
   ExecuteSettlementDto,
   FindBcSettlementHistoriesRes,
   FindManyDto,
+  GoodsByIdRes,
   GoodsConfirmationDto,
   GoodsRejectionDto,
   LiveShoppingDTO,
@@ -226,9 +226,9 @@ export class AdminController {
   @Get('/goods/:goodsId')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   getAdminGoodsById(
-    @Param('goodsId') goodsId: string | number,
-  ): Promise<AdminGoodsByIdRes> {
-    return this.adminService.getOneGoods(goodsId);
+    @Param('goodsId', ParseIntPipe) goodsId: number,
+  ): Promise<GoodsByIdRes> {
+    return this.projectLcGoodsService.getOneGoods(goodsId);
   }
 
   // 상품 검수 승인을 수행

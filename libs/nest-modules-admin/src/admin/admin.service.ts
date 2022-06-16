@@ -8,7 +8,6 @@ import { ProductPromotionService } from '@project-lc/nest-modules-product-promot
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   AdminClassDto,
-  AdminGoodsByIdRes,
   AdminGoodsListRes,
   AdminLiveShoppingGiftOrder,
   AdminSettlementInfoType,
@@ -190,45 +189,6 @@ export class AdminService {
     }
 
     return goodsConfirmation;
-  }
-
-  public async getOneGoods(goodsId: string | number): Promise<AdminGoodsByIdRes> {
-    const result = (await this.prisma.goods.findFirst({
-      where: {
-        id: Number(goodsId),
-      },
-      include: {
-        options: { include: { supply: true } },
-        ShippingGroup: {
-          include: {
-            shippingSets: {
-              include: {
-                shippingOptions: {
-                  include: { shippingCost: true },
-                },
-              },
-            },
-          },
-        },
-        confirmation: true,
-        image: true,
-        GoodsInfo: true,
-        seller: true,
-        LiveShopping: {
-          include: {
-            broadcaster: { select: { id: true, userNickname: true, avatar: true } },
-          },
-        },
-        productPromotion: {
-          include: {
-            broadcaster: { select: { id: true, userNickname: true, avatar: true } },
-          },
-        },
-        categories: true,
-        informationNotice: true,
-      },
-    })) as AdminGoodsByIdRes;
-    return result;
   }
 
   public async updateLiveShoppings(
