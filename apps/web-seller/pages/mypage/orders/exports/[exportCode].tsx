@@ -1,21 +1,19 @@
 import { Box, Button, Center, Stack, Text } from '@chakra-ui/react';
 import { SectionWithTitle } from '@project-lc/components-layout/SectionWithTitle';
-import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
-import { ExportDetailActions } from '@project-lc/components-seller/ExportDetailActions';
-import { ExportDetailItems } from '@project-lc/components-seller/ExportDetailItems';
 import { ExportDetailSummary } from '@project-lc/components-seller/ExportDetailSummary';
 import { ExportDetailTitle } from '@project-lc/components-seller/ExportDetailTitle';
-import { OrderDetailDeliveryInfo } from '@project-lc/components-seller/OrderDetailDeliveryInfo';
-import { useFmExport } from '@project-lc/hooks';
+import { DeliveryTrackingList } from '@project-lc/components-shared/delivery-tracking/DeliveryTracking';
+import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
+import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
+import { useExportByCode } from '@project-lc/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { OrderDetailLoading } from '@project-lc/components-shared/order/OrderDetailLoading';
 
 export default function ExportsDetail(): JSX.Element {
   const router = useRouter();
-  const id = router.query.id as string;
+  const exportCode = router.query.exportCode as string;
 
-  const exp = useFmExport(id);
+  const exp = useExportByCode(exportCode, { enabled: !!exportCode });
 
   if (exp.isLoading) {
     return (
@@ -52,17 +50,12 @@ export default function ExportsDetail(): JSX.Element {
         </Box>
 
         <Box as="section">
-          <ExportDetailActions exportData={exp.data} />
-        </Box>
-
-        <Box as="section">
           <ExportDetailSummary exportData={exp.data} />
         </Box>
 
         <SectionWithTitle title="출고 주문 정보">
-          <Stack mt={6} spacing={4}>
-            <ExportDetailItems exportData={exp.data} />
-            <OrderDetailDeliveryInfo orderDeliveryData={exp.data} />
+          <Stack spacing={4}>
+            <DeliveryTrackingList orderCode={exp.data.order.orderCode} />
           </Stack>
         </SectionWithTitle>
       </Stack>

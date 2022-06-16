@@ -62,7 +62,7 @@ export function OrderItemActionButtons({
     {
       label: '배송조회',
       onClick: () => {
-        alert('배송조회 페이지로 이동');
+        router.push(`/mypage/shipping-tracking/${order.orderCode}`);
       },
       display: deliveryTrackingAbleSteps.includes(step), // 출고완료 이후 표시
       disabled: false,

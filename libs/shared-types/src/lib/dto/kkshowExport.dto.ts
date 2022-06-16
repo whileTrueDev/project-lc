@@ -63,10 +63,15 @@ export class ExportManyDto {
 }
 
 /** 출고목록조회 dto */
-export class findExportListDto extends DefaultPaginationDto {
+export class FindExportListDto extends DefaultPaginationDto {
   @Type(() => Number)
   @IsNumber()
   @IsOptional()
   /** 출고 진행한 판매자 고유번호 */
   sellerId?: number;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  orderCode?: string;
 }

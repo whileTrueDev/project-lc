@@ -292,13 +292,13 @@ export function CartItemListItem({ cartItem }: CartItemListItemProps): JSX.Eleme
 export interface CartItemDisplayProps {
   cartItem: CartItemRes[number];
   displayPrice?: boolean;
-  displaySellerInfo?: boolean;
+  // displaySellerInfo?: boolean;
   onClose?: () => void;
 }
 export function CartItemDisplay({
   cartItem,
   displayPrice = false,
-  displaySellerInfo = false,
+  // displaySellerInfo = false,
   onClose,
 }: CartTableItemProps): JSX.Element {
   const selectedItems = useCartStore((s) => s.selectedItems);
@@ -377,7 +377,6 @@ export function CartItemDisplay({
           </Flex>
 
           {displayPrice && <CartItemPriceDisplay cartItem={cartItem} />}
-          {displaySellerInfo && <CartItemSellerInfoDisplay cartItem={cartItem} />}
         </Box>
       </Flex>
     </>
@@ -407,17 +406,6 @@ export function CartItemPriceDisplay({ cartItem }: CartTableItemProps): JSX.Elem
           </Text>
         </Flex>
       ))}
-    </Box>
-  );
-}
-
-export function CartItemSellerInfoDisplay({ cartItem }: CartTableItemProps): JSX.Element {
-  return (
-    <Box color="GrayText" my={1}>
-      <Text fontSize={{ base: 'xs', md: 'sm' }}>
-        배송비{' '}
-        {!cartItem.shippingCostIncluded ? getLocaleNumber(cartItem.shippingCost) : 0} 원
-      </Text>
     </Box>
   );
 }

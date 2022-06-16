@@ -5,11 +5,11 @@ import {
   OrderItem,
   OrderItemOption,
   OrderItemSupport,
-  OrderPayment,
   OrderProcessStep,
   PaymentMethod,
   ProductPromotion,
   SellType,
+  ShippingMethod,
 } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
@@ -69,11 +69,13 @@ export class CreateOrderItemOptionDto {
 
   /** 주문했을 당시 소비자가 (미할인가)  @db.Decimal(10, 2)  */
   @IsNumber()
-  normalPrice: OrderItemOption['normalPrice'];
+  @Type(() => Number)
+  normalPrice: number;
 
   /** 주문했을 당시 판매가 (할인가) @db.Decimal(10, 2)  */
   @IsNumber()
-  discountPrice: OrderItemOption['discountPrice'];
+  @Type(() => Number)
+  discountPrice: number;
 
   /** 주문했을 당시 옵션 개당 무게 (단위 kg) Float? */
   @IsNumber()
@@ -108,15 +110,6 @@ export class CreateOrderItemDto {
   @Type(() => CreateOrderItemSupportDto)
   support?: CreateOrderItemSupportDto;
 
-  /** 주문당시 이 주문 상품에 포함된  배송비 Decimal @default("0.00") @db.Decimal(10, 2)  */
-  @IsNumber()
-  shippingCost: OrderItem['shippingCost'] | string;
-
-  /**  이 주문 상품에 동일 판매자의 배송비가 포함되었는지 여부 @default(false)  */
-  @IsBoolean()
-  @IsOptional()
-  shippingCostIncluded?: OrderItem['shippingCostIncluded'];
-
   /**  연결된 배송정책 id */
   @IsNumber()
   shippingGroupId: OrderItem['shippingGroupId'];
@@ -127,12 +120,14 @@ export class CreateOrderItemDto {
 
 /** 주문 Order 생성 dto */
 export class CreateOrderDto {
-  // TODO : orderCode 추가? 주문(결제)페이지에서부터 고유한 orderCode 값이 필요하다고 함. order 데이터 생성 전 orderCode는 미리 생성하고 order 데이터 생성시 해당 코드값을 dto에 추가해야 할 수도 있다
+  @IsString()
+  @IsOptional()
+  orderCode?: string;
 
   /** 소비자 고유번호(비회원 주문인경우 validate 안함) */
   @ValidateIf((o) => !o.nonMemberOrderFlag)
   @IsNumber()
-  customerId?: Order['customerId'];
+  customerId?: number;
 
   /** 비회원 주문인 경우 true로 보냄. @default(false) */
   @IsBoolean()
@@ -165,8 +160,8 @@ export class CreateOrderDto {
 
   /** 받는사람 이메일 */
   @ValidateIf((o) => !o.giftFlag)
-  @IsEmail()
-  recipientEmail: Order['recipientEmail'];
+  @IsString()
+  recipientEmail: string;
 
   /** 받는사람 주소(배송지) 도로명 */
   @ValidateIf((o) => !o.giftFlag)
@@ -227,12 +222,10 @@ export class CreateOrderDto {
   @Type(() => CreateOrderItemDto)
   orderItems: CreateOrderItemDto[];
 
-  /** 주문에 연결된 결제정보 
-   // TODO: 결제api 작업 후 수정필요
+  /** 주문에 연결된 결제정보 고유번호 OrderPayment.id
    */
-  // @IsNotEmptyObject()
   @IsOptional()
-  payment?: OrderPayment;
+  paymentId?: number;
 
   /** 주문으로 생성될 장바구니 상품들 id */
   @IsOptional()
@@ -256,6 +249,10 @@ export type CreateOrderForm = CreateOrderDto & {
   ordererPhone2?: string;
   ordererPhone3?: string;
   paymentType: PaymentMethod;
+
+  recipientPhone1?: string;
+  recipientPhone2?: string;
+  recipientPhone3?: string;
 };
 
 // ------------------조회 dto--------------------
@@ -470,4 +467,40 @@ export class OrderPurchaseConfirmationDto {
   /** 구매확정 할 주문상품옵션 고유번호 */
   @IsNumber()
   orderItemOptionId: OrderItemOption['id'];
+}
+
+/** 주문배송비 타입 dto */
+export class CreateOrderShippingData {
+  /** 이 배송방법의 총 배송비 */
+  @IsNumber()
+  shippingCost: number;
+
+  /** shipping_method 배송방법 */
+  @IsEnum(ShippingMethod)
+  @IsOptional()
+  shippingMethod?: ShippingMethod;
+
+  /** 배송비그룹 고유번호 */
+  @IsNumber()
+  shippingGroupId: number;
+
+  /** 배송정책 고유번호 */
+  @IsNumber()
+  @IsOptional()
+  shippingSetId?: number;
+
+  @IsNumber({}, { each: true })
+  items: number[]; // 이 배송방법으로 주문된 상품 목록 goodsId[] -> 특정 orderId && goodsId에 해당하는  OrderItem 조회
+
+  /** 주문고유번호 */
+  @IsNumber()
+  @IsOptional()
+  orderId?: number;
+}
+/** 주문배송비 생성 dto */
+export class CreateOrderShippingDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateOrderShippingData)
+  shipping: CreateOrderShippingData[];
 }

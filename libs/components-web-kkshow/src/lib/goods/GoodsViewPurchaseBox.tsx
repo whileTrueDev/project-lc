@@ -48,10 +48,7 @@ import {
   GoodsRelatedBroadcaster,
 } from '@project-lc/shared-types';
 import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
-import {
-  checkGoodsPurchasable,
-  getStandardShippingCost,
-} from '@project-lc/utils-frontend';
+import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo } from 'react';
 import { GoGift } from 'react-icons/go';
@@ -439,8 +436,6 @@ function GoodsViewButtonSet({
           name: o.option_title,
           value: o.option1,
         })),
-        shippingCost: getStandardShippingCost(goods.ShippingGroup),
-        shippingCostIncluded: false,
         shippingGroupId: goods.shippingGroupId,
         channel: sellType,
         support: selectedBc
@@ -468,7 +463,6 @@ function GoodsViewButtonSet({
     createCartItem,
     executePurchaseCheck,
     goods.LiveShopping,
-    goods.ShippingGroup,
     goods.id,
     goods.productPromotion,
     goods.shippingGroupId,
@@ -499,14 +493,12 @@ function GoodsViewButtonSet({
               quantity: o.quantity,
               name: o.option_title,
               value: o.option1,
-              normalPrice: o.consumer_price,
-              discountPrice: o.price,
+              normalPrice: Number(o.consumer_price),
+              discountPrice: Number(o.price),
               weight: o.weight,
             })),
-            shippingCost: getStandardShippingCost(goods.ShippingGroup),
             shippingGroupId: goods.shippingGroupId || 1,
             channel: sellType,
-            shippingCostIncluded: false, // 다른 상품에 이미 배송비가 포함되었는 지 여부
             support: selectedBc
               ? {
                   broadcasterId: selectedBc.id,
@@ -534,7 +526,6 @@ function GoodsViewButtonSet({
       profile.data?.id,
       goods.goods_name,
       goods.id,
-      goods.ShippingGroup,
       goods.shippingGroupId,
       selectedOpts,
       sellType,

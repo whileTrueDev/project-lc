@@ -19,6 +19,7 @@ import { GoodsByIdRes } from '@project-lc/shared-types';
 import { getLocaleNumber, getStandardShippingCost } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
+import GoodsViewInformationNotice from './GoodsViewInformationNotice';
 import { GoodsViewPurchaseBox } from './GoodsViewPurchaseBox';
 
 export function GoodsViewMeta(): JSX.Element | null {
@@ -56,6 +57,9 @@ export function GoodsViewMeta(): JSX.Element | null {
             goodsOptions={goods.data.options}
             shippingGroup={goods.data.ShippingGroup}
           />
+
+          {/* 상품 필수 정보 */}
+          <GoodsViewInformationNotice />
 
           {/* 옵션 정보 및 후원 정보 */}
           <Box display={{ base: 'none', md: 'block' }}>

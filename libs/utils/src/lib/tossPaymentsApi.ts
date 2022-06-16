@@ -71,7 +71,7 @@ const getPaymentByOrderId = async (orderId: string): Promise<Payment> => {
 };
 
 /** 토스페이먼츠 결제승인 요청 API */
-const createPayment = async (dto: PaymentRequestDto): Promise<any> => {
+const createPayment = async (dto: PaymentRequestDto): Promise<Payment> => {
   const postData = {
     orderId: dto.orderId,
     amount: dto.amount,
