@@ -9,6 +9,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  ModalProps,
   Stack,
   Table,
   Tbody,
@@ -25,6 +26,7 @@ import { ErrorText } from '@project-lc/components-core/ErrorText';
 import { useSellerOrderCancelMutation } from '@project-lc/hooks';
 import {
   convertFmOrderStatusToString,
+  FindFmOrderDetailRes,
   FmOrderItem,
   FmOrderOption,
 } from '@project-lc/shared-types';
@@ -109,7 +111,9 @@ function OrderCancelRequstItem({
   );
 }
 
-export type OrderCancelRequestDialogProps = OrderExportDialogProps;
+export type OrderCancelRequestDialogProps = Pick<ModalProps, 'isOpen' | 'onClose'> & {
+  order: FindFmOrderDetailRes;
+};
 export function OrderCancelRequestDialog({
   order,
   isOpen,

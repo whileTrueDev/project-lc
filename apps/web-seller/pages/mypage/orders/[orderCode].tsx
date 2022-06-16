@@ -151,23 +151,7 @@ export function OrderDetail(): JSX.Element {
         {/* 주문자 / 수령자 정보 */}
         <SectionWithTitle title="주문자 / 수령자 정보">
           {/* OrderDetailDeliveryInfo 기존 컴포넌트 그대로 사용함 */}
-          <OrderDetailDeliveryInfo
-            orderDeliveryData={{
-              order_phone: '', // 주문자전화
-              recipient_phone: '',
-              recipient_address_street: '',
-              recipient_address: order.data.recipientAddress,
-              recipient_address_detail: order.data.recipientDetailAddress,
-              order_user_name: order.data.ordererName,
-              order_email: order.data.ordererEmail,
-              order_cellphone: order.data.ordererPhone, // '주문자휴대폰',
-              recipient_user_name: order.data.recipientAddress,
-              recipient_zipcode: order.data.recipientPostalCode,
-              recipient_cellphone: order.data.recipientPhone,
-              recipient_email: order.data.recipientEmail,
-              memo: order.data.memo,
-            }}
-          />
+          <OrderDetailDeliveryInfo orderDeliveryData={order.data} />
         </SectionWithTitle>
 
         {/* 출고 정보 */}
@@ -240,6 +224,7 @@ function OrderDetailShippingItem({
       </Stack>
 
       {/* 상품(옵션) 정보 */}
+      {/* // TODO: 상품정보 처리필요  */}
       <Box mt={4}>
         {shipping.items.map((item) => (
           <Box key={item.id} mt={2}>
