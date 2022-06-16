@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ProductPromotion } from '@prisma/client';
+import { Goods, ProductPromotion } from '@prisma/client';
 import { BroadcasterPromotionPageService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
@@ -93,7 +93,7 @@ export class ProductPromotionService {
    * @param goodsIds 상품 고유번호 GoodsId 배열 (productPromotion.goodsId)
    */
   public async findProductPromotionsByGoodsIds(
-    goodsIds: number[],
+    goodsIds: Goods['id'][],
   ): Promise<ProductPromotion[]> {
     const _goodsIds = goodsIds.map((s) => Number(s)).filter((x) => !!x);
     return this.prisma.productPromotion.findMany({

@@ -18,6 +18,8 @@ import {
   FcRating,
   FcSms,
   FcVideoCall,
+  FcBusinessman,
+  FcFinePrint,
 } from 'react-icons/fc';
 import { IconType } from 'react-icons/lib';
 import { MdLiveTv, MdOutlineShoppingCart, MdPayment } from 'react-icons/md';
@@ -248,7 +250,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '방송인',
     href: '/broadcaster',
     children: [
-      { name: '가입자 목록', href: '/broadcaster/signup-list', icon: FcList },
+      { name: '가입자 목록', href: '/broadcaster/signup-list', icon: FcBusinessman },
       { name: '정산정보 검수', href: '/broadcaster/settlement-info', icon: FcInspection },
       { name: '정산', href: '/broadcaster/settlement', icon: FcMoneyTransfer },
       {
@@ -262,7 +264,7 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '판매자',
     href: '/seller',
     children: [
-      { name: '가입자 목록', href: '/seller/signup-list', icon: FcList },
+      { name: '가입자 목록', href: '/seller/signup-list', icon: FcBusinessman },
       { name: '계좌정보 목록', href: '/seller/account', icon: FcList },
       {
         name: '사업자 등록정보 검수',
@@ -276,9 +278,9 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
     name: '구매자',
     href: '/customer',
     children: [
-      { name: '쿠폰관리', href: '/customer/coupon', icon: FcList },
-      { name: '마일리지 관리', href: '/customer/mileage', icon: FcList },
-      { name: '가입자 목록', href: '/customer/signup-list', icon: FcList },
+      { name: '쿠폰관리', href: '/customer/coupon', icon: FcFinePrint },
+      { name: '마일리지 관리', href: '/customer/mileage', icon: FcMoneyTransfer },
+      { name: '가입자 목록', href: '/customer/signup-list', icon: FcBusinessman },
     ],
   },
   {
@@ -299,7 +301,10 @@ export const adminSidebarMenuList: SidebarMenuLink[] = [
   {
     name: '주문',
     href: 'order',
-    children: [{ name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike }],
+    children: [
+      { name: '결제취소 요청', href: '/order/order-cancel', icon: FcDislike },
+      { name: '주문 목록', href: '/order/list', icon: FcList },
+    ],
   },
   {
     name: '일반관리',

@@ -39,6 +39,7 @@ import { OrderModule } from '@project-lc/nest-modules-order';
 import { OrderCancelModule } from '@project-lc/nest-modules-order-cancel';
 import { PaymentModule } from '@project-lc/nest-modules-payment';
 import { PolicyModule } from '@project-lc/nest-modules-policy';
+import { ProductPromotionModule } from '@project-lc/nest-modules-product-promotion';
 import { RefundModule } from '@project-lc/nest-modules-refund';
 import { ReturnModule } from '@project-lc/nest-modules-return';
 import { SellerModule } from '@project-lc/nest-modules-seller';
@@ -88,6 +89,7 @@ import { AppController } from './app.controller';
     RefundModule.withControllers(),
     ExchangeModule.withControllers(),
     ExportModule.withControllers(),
+    ProductPromotionModule.withControllers(),
   ],
   controllers: [AppController],
   providers: [],

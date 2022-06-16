@@ -27,7 +27,6 @@ import { boxStyle } from '@project-lc/components-constants/commonStyleProps';
 import { ChakraAutoComplete } from '@project-lc/components-core/ChakraAutoComplete';
 import { ConfirmDialog } from '@project-lc/components-core/ConfirmDialog';
 import {
-  getAdminDuplicateFmGoodsSeqFlagForProductPromotion,
   useAdminAllConfirmedLcGoodsList,
   useAdminProductPromotion,
   useAdminProductPromotionCreateMutation,
@@ -86,7 +85,6 @@ const commissionRateMinMax = {
 type ProductPromotionCreateFormData = {
   promotionPageId: number;
   goodsId: number | null;
-  fmGoodsSeq: number | null;
   broadcasterCommissionRate?: number;
   whiletrueCommissionRate?: number;
 };
@@ -174,34 +172,6 @@ export function AdminProductPromotionForm({
         </FormErrorMessage>
       </FormControl>
 
-      <FormControl isInvalid={!!errors.fmGoodsSeq}>
-        <Stack direction="row">
-          <FormLabel htmlFor="fmGoodsSeq" width="70%">
-            퍼스트몰 상품 고유번호
-          </FormLabel>
-          <Input
-            id="fmGoodsSeq"
-            autoComplete="off"
-            type="number"
-            {...register('fmGoodsSeq', {
-              required: '퍼스트몰 상품 고유번호를 입력해주세요.',
-              valueAsNumber: true,
-              validate: async (_fmGoodsSeq) => {
-                if (!_fmGoodsSeq) return '상품 고유번호는 숫자여야 합니다';
-                const isDuplicateFmGoodsSeq =
-                  await getAdminDuplicateFmGoodsSeqFlagForProductPromotion(_fmGoodsSeq);
-                return (
-                  !isDuplicateFmGoodsSeq ||
-                  '입력하신 퍼스트몰 고유번호는 다른 상품과 연결되어 있습니다. 상품홍보용 제품의 퍼스트몰 고유 번호는 다른 제품의 고유번호와 중복될 수 없습니다. 고유번호를 다시 확인해주세요.'
-                );
-              },
-            })}
-          />
-        </Stack>
-        <FormErrorMessage>
-          {errors.fmGoodsSeq && errors.fmGoodsSeq.message}
-        </FormErrorMessage>
-      </FormControl>
       <Button type="submit">생성</Button>
     </Stack>
   );
@@ -223,24 +193,18 @@ export function AdminProductPromotionCreateModal({
 
   const createProductPromotion = useAdminProductPromotionCreateMutation();
   const onSubmit: SubmitHandler<ProductPromotionCreateFormData> = async (data) => {
-    const {
-      goodsId,
-      fmGoodsSeq,
-      promotionPageId: broadcasterPromotionPageId,
-      ...rest
-    } = data;
-    if (!goodsId || !fmGoodsSeq) return;
+    const { goodsId, promotionPageId: broadcasterPromotionPageId, ...rest } = data;
+    if (!goodsId) return;
 
     const createDto: CreateProductPromotionDto = {
       broadcasterPromotionPageId,
       goodsId,
-      fmGoodsSeq,
       broadcasterId,
       ...rest,
     };
     createProductPromotion
       .mutateAsync(createDto)
-      .then((res) => {
+      .then(() => {
         toast({ title: '생성 성공', status: 'success' });
         onClose();
       })
@@ -260,7 +224,6 @@ export function AdminProductPromotionCreateModal({
             defaultValues={{
               promotionPageId,
               goodsId: null,
-              fmGoodsSeq: null,
               broadcasterCommissionRate: 5,
               whiletrueCommissionRate: 5,
             }}
@@ -287,12 +250,9 @@ export function ProductPromotionItemBox({
         promotionId: item.id,
         broadcasterPromotionPageId: item.broadcasterPromotionPageId,
       })
-      .then((res) => {
+      .then(() => {
         deleteDialog.onClose();
-        toast({
-          title: '해당 상품 홍보를 삭제하였습니다',
-          status: 'success',
-        });
+        toast({ title: '해당 상품 홍보를 삭제하였습니다', status: 'success' });
       });
   }, [deleteDialog, deleteRequest, item, toast]);
   return (
@@ -347,12 +307,7 @@ export function ProductPromotionItemBox({
           onClose={updateDialog.onClose}
           item={item}
         />
-        <Link href={`https://k-kmarket.com/goods/view?no=${item.fmGoodsSeq}`} isExternal>
-          퍼스트몰 상품 고유 번호 :
-          <Text as="span" color="blue.500">
-            {item.fmGoodsSeq}
-          </Text>
-        </Link>
+
         <Text>와일트루 수수료 : {item.whiletrueCommissionRate} %</Text>
         <Text>방송인 수수료 : {item.broadcasterCommissionRate} %</Text>
       </Stack>
@@ -376,12 +331,10 @@ export function AdminProductPromotionUpdateModal({
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm<UpdateProductPromotionDto>({
     defaultValues: {
       id: item.id,
       broadcasterPromotionPageId: item.broadcasterPromotionPageId,
-      fmGoodsSeq: item.fmGoodsSeq || undefined,
       goodsId: item.goodsId || undefined,
       broadcasterCommissionRate: Number(item.broadcasterCommissionRate),
       whiletrueCommissionRate: Number(item.whiletrueCommissionRate),
@@ -391,17 +344,10 @@ export function AdminProductPromotionUpdateModal({
   const updateRequest = useAdminProductPromotionUpdateMutation();
   const onSubmit: SubmitHandler<UpdateProductPromotionDto> = (data) => {
     if (!data.id || !data.broadcasterPromotionPageId) return;
-
-    const { fmGoodsSeq, ...rest } = data;
-    let dto: UpdateProductPromotionDto = {
-      ...rest,
-    };
-    if (fmGoodsSeq !== item.fmGoodsSeq) {
-      dto = { ...dto, fmGoodsSeq };
-    }
+    const dto: UpdateProductPromotionDto = data;
     updateRequest
       .mutateAsync(dto)
-      .then((res) => {
+      .then(() => {
         toast({ title: '홍보 상품 정보를 수정하였습니다', status: 'success' });
         onClose();
       })
@@ -467,41 +413,6 @@ export function AdminProductPromotionUpdateModal({
               </FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.fmGoodsSeq}>
-              <Stack direction="row">
-                <FormLabel htmlFor="fmGoodsSeq" width="70%">
-                  퍼스트몰 상품 고유번호
-                </FormLabel>
-                <Input
-                  id="fmGoodsSeq"
-                  autoComplete="off"
-                  type="number"
-                  {...register('fmGoodsSeq', {
-                    required: '퍼스트몰 상품 고유번호를 입력해주세요.',
-                    valueAsNumber: true,
-                    validate: async (_fmGoodsSeq) => {
-                      if (!_fmGoodsSeq) return '상품 고유번호는 숫자여야 합니다';
-                      // 이전 퍼스트몰 고유번호와 동일한경우 중복검사 하지 않고 updateRequest의 dto에서 제외한다
-                      if (watch('fmGoodsSeq') === _fmGoodsSeq) {
-                        return true;
-                      }
-                      // 이전 입력한 퍼스트몰 고유번호화 다른 경우 중복검사
-                      const isDuplicateFmGoodsSeq =
-                        await getAdminDuplicateFmGoodsSeqFlagForProductPromotion(
-                          _fmGoodsSeq,
-                        );
-                      return (
-                        !isDuplicateFmGoodsSeq ||
-                        '입력하신 퍼스트몰 고유번호는 다른 상품과 연결되어 있습니다. 상품홍보용 제품의 퍼스트몰 고유 번호는 다른 제품의 고유번호와 중복될 수 없습니다. 고유번호를 다시 확인해주세요.'
-                      );
-                    },
-                  })}
-                />
-              </Stack>
-              <FormErrorMessage>
-                {errors.fmGoodsSeq && errors.fmGoodsSeq.message}
-              </FormErrorMessage>
-            </FormControl>
             <Stack direction="row">
               <Button type="submit" colorScheme="blue">
                 수정

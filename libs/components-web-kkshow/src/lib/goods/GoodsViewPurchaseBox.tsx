@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { CloseIcon, Icon } from '@chakra-ui/icons';
 import {
   Accordion,
@@ -6,6 +7,7 @@ import {
   AccordionItem,
   AccordionPanel,
   Avatar,
+  Badge,
   Box,
   Button,
   ButtonGroup,
@@ -32,14 +34,21 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
+import { SellType } from '@prisma/client';
 import { ClickableUnderlinedText } from '@project-lc/components-core/ClickableUnderlinedText';
-import { useCartMutation, useProfile } from '@project-lc/hooks';
-import { GoodsByIdRes, GoodsRelatedBroadcaster } from '@project-lc/shared-types';
-import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
 import {
-  checkGoodsPurchasable,
-  getStandardShippingCost,
-} from '@project-lc/utils-frontend';
+  useCartMutation,
+  useIsThisGoodsNowOnLive,
+  useLiveShoppingNowOnLive,
+  useProfile,
+} from '@project-lc/hooks';
+import {
+  getLiveShoppingIsNowLive,
+  GoodsByIdRes,
+  GoodsRelatedBroadcaster,
+} from '@project-lc/shared-types';
+import { useGoodsViewStore, useKkshowOrderStore } from '@project-lc/stores';
+import { checkGoodsPurchasable } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo } from 'react';
 import { GoGift } from 'react-icons/go';
@@ -187,8 +196,22 @@ function GoodsViewBroadcasterSupportBox({
     }, []);
   }, [goods.LiveShopping, goods.productPromotion]);
 
-  if (relatedBroadcasters.length === 0) return null;
+  // 방송인 페이지로부터 접속시 기본값 처리
+  const router = useRouter();
+  const bcFromPromotionPage = router.query.bc as string;
+  useEffect(() => {
+    if (relatedBroadcasters && bcFromPromotionPage) {
+      const broadcaster = relatedBroadcasters.find(
+        (b) => b.id === Number(bcFromPromotionPage),
+      );
+      if (broadcaster) handleSelectBc(broadcaster);
+    }
+  }, [bcFromPromotionPage, handleSelectBc, relatedBroadcasters]);
 
+  // 현재 상품과 연결된 현재 판매중인 라이브쇼핑 목록
+  const ls = useLiveShoppingNowOnLive({ goodsId: goods.id });
+
+  if (relatedBroadcasters.length === 0) return null;
   return (
     <Accordion allowToggle>
       <AccordionItem>
@@ -214,8 +237,13 @@ function GoodsViewBroadcasterSupportBox({
             <Box>
               <Text mb={2}>후원가능한 방송인</Text>
               {relatedBroadcasters.map((bc) => (
-                <Flex key={bc.userNickname} gap={2}>
+                <Flex key={bc.userNickname} gap={2} alignItems="center">
                   <Avatar size="xs" src={bc.avatar || ''} />
+                  {ls.data?.some((l) => l.broadcasterId === bc.id) && (
+                    <Badge colorScheme="red" variant="solid">
+                      현재 LIVE 판매중
+                    </Badge>
+                  )}
                   <Text>{bc.userNickname}</Text>
                   <Button onClick={() => handleSelectBc(bc)} size="xs">
                     선택
@@ -238,6 +266,11 @@ function GoodsViewBroadcasterSupportBox({
                 </Flex>
                 <Avatar src={selectedBc.avatar || ''} />
                 <Text>{selectedBc.userNickname}</Text>
+                {ls.data?.some((l) => l.broadcasterId === selectedBc.id) && (
+                  <Badge colorScheme="red" variant="solid">
+                    현재 LIVE 판매중
+                  </Badge>
+                )}
               </Box>
 
               <Box flex={1}>
@@ -370,10 +403,28 @@ function GoodsViewButtonSet({
     });
   }, [goods, selectedOpts, toast]);
 
+  // 현재 상품이 라이브쇼핑 판매중인지 여부 (선택된 방송인에 의한 라이브쇼핑판매)
+  const isNowLive = useIsThisGoodsNowOnLive(goods.id, selectedBc?.id);
+  // 판매유형 정의
+  const sellType = useMemo<SellType>(() => {
+    // 방송인 선택시 + 해당 방송인이 현재 이 상품으로 라이브 진행중인 경우
+    if (selectedBc && isNowLive) return SellType.liveShopping;
+    // 방송인 선택시
+    if (selectedBc) return SellType.productPromotion;
+    return SellType.normal;
+  }, [isNowLive, selectedBc]);
+
   // 장바구니 담기
   const createCartItem = useCartMutation();
   const handleCartClick = useCallback((): void => {
     if (!executePurchaseCheck()) return;
+
+    const connectedLiveShopping = goods.LiveShopping?.find(
+      (ls) => ls.broadcasterId === selectedBc?.id && getLiveShoppingIsNowLive(ls),
+    )?.id;
+    const connectedProductPromotion = goods.productPromotion?.find(
+      (pp) => pp.broadcasterId === selectedBc?.id,
+    )?.id;
     createCartItem
       .mutateAsync({
         goodsId: goods.id,
@@ -386,13 +437,17 @@ function GoodsViewButtonSet({
           value: o.option1,
         })),
         shippingGroupId: goods.shippingGroupId,
-        // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
-        channel: 'normal',
+        channel: sellType,
         support: selectedBc
           ? {
               broadcasterId: selectedBc.id,
               nickname: selectedBc?.userNickname,
               message: supportMessage,
+              liveShoppingId: connectedLiveShopping,
+              // 라이브쇼핑 후원의 경우 상품홍보 후원으로는 포함시키지 않는다. (수수료 두번 처리될 가능성)
+              productPromotionId: !connectedLiveShopping
+                ? connectedProductPromotion
+                : undefined,
             }
           : undefined,
       })
@@ -407,10 +462,13 @@ function GoodsViewButtonSet({
     cartDoneDialog,
     createCartItem,
     executePurchaseCheck,
+    goods.LiveShopping,
     goods.id,
+    goods.productPromotion,
     goods.shippingGroupId,
     selectedBc,
     selectedOpts,
+    sellType,
     supportMessage,
     toast,
   ]);
@@ -440,8 +498,7 @@ function GoodsViewButtonSet({
               weight: o.weight,
             })),
             shippingGroupId: goods.shippingGroupId || 1,
-            // TODO: 유입 채널 경로 파악 기능 구현 이후 수정 필요
-            channel: 'normal',
+            channel: sellType,
             support: selectedBc
               ? {
                   broadcasterId: selectedBc.id,
@@ -471,6 +528,7 @@ function GoodsViewButtonSet({
       goods.id,
       goods.shippingGroupId,
       selectedOpts,
+      sellType,
       supportMessage,
       router,
     ],
