@@ -75,7 +75,7 @@ export class CustomerCouponService {
     });
 
     const writeLog = this.prismaService.customerCouponLog.create({
-      data: { customerCouponId: dto.id, type: couponLogType },
+      data: { customerCouponId: dto.id, type: couponLogType, orderId: dto.orderId },
     });
 
     const [customerCouon] = await this.prismaService.$transaction([

@@ -1,7 +1,9 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import {
+  CouponStatus,
   Goods,
   GoodsOptions,
+  MileageActionType,
   Order,
   OrderItemOption,
   OrderProcessStep,
@@ -37,6 +39,8 @@ import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
 import { calculateShippingCost } from '@project-lc/utils';
+import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
+import { MileageService } from '@project-lc/nest-modules-mileage';
 
 dayjs.extend(isToday);
 @Injectable()
@@ -45,6 +49,8 @@ export class OrderService {
     private readonly prisma: PrismaService,
     private readonly broadcasterService: BroadcasterService,
     private readonly userPwManager: UserPwManager,
+    private readonly customerCouponService: CustomerCouponService,
+    private readonly mileageService: MileageService,
   ) {}
 
   private async hash(pw: string): Promise<string> {
@@ -56,7 +62,9 @@ export class OrderService {
     dto: CreateOrderDto,
   ): Promise<Partial<Prisma.OrderCreateInput>> {
     const { nonMemberOrderFlag, nonMemberOrderPassword } = dto;
-    const hashedPassword = await this.hash(nonMemberOrderPassword);
+    const hashedPassword = nonMemberOrderPassword
+      ? await this.hash(nonMemberOrderPassword)
+      : undefined;
     return {
       nonMemberOrderFlag,
       nonMemberOrderPassword: hashedPassword,
@@ -244,6 +252,31 @@ export class OrderService {
     // * 주문에 부과된 배송비정보(OrderShipping) 생성
     await this.createOrderShippingData(order.id, shippingData);
     /** *************** */
+
+    // 비회원 주문이 아닌경우 - 마일리지, 쿠폰사용처리
+    if (!nonMemberOrderFlag) {
+      // 마일리지 사용시
+      if (usedMileageAmount) {
+        // * 마일리지 차감 처리 customerId, usedMileageAmount
+        await this.mileageService.upsertMileage({
+          customerId,
+          mileage: usedMileageAmount,
+          actionType: MileageActionType.consume,
+          reason: `주문 ${order.orderCode} 에 적립금 ${usedMileageAmount} 사용`,
+          orderId: order.id,
+        });
+      }
+
+      // 쿠폰 사용시
+      if (couponId) {
+        // * 쿠폰 사용처리 customerId, couponId, usedCouponAmount
+        await this.customerCouponService.updateCustomerCouponStatus({
+          id: couponId,
+          status: CouponStatus.used,
+          orderId: order.id,
+        });
+      }
+    }
 
     // * 주문 생성 후 장바구니 비우기
     if (cartItemIdList) {

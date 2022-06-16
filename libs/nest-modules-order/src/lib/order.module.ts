@@ -1,6 +1,8 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { UserPwManager } from '@project-lc/nest-core';
 import { BroadcasterModule } from '@project-lc/nest-modules-broadcaster';
+import { CouponModule } from '@project-lc/nest-modules-coupon';
+import { MileageModule } from '@project-lc/nest-modules-mileage';
 import { OrderCancellationController } from './order-cancellation/order-cancellation.controller';
 import { OrderCancellationService } from './order-cancellation/order-cancellation.service';
 import { OrderController } from './order.controller';
@@ -24,7 +26,11 @@ export class OrderModule {
     OrderItemController,
   ];
 
-  private static readonly imports = [BroadcasterModule.withoutControllers()];
+  private static readonly imports = [
+    BroadcasterModule.withoutControllers(),
+    CouponModule.withoutControllers(),
+    MileageModule.withoutControllers(),
+  ];
 
   static withoutControllers(): DynamicModule {
     return {
