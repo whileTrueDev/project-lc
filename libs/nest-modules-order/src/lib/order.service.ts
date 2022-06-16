@@ -164,7 +164,6 @@ export class OrderService {
     orderDto: CreateOrderDto;
     shippingData: CreateOrderShippingData[];
   }): Promise<Order> {
-    console.log(orderDto);
     const {
       customerId,
       cartItemIdList,

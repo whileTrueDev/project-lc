@@ -53,6 +53,7 @@ export class CustomerCouponService {
     customers?: Customer[],
   ): Promise<number> {
     let target: IssueManyCustomerList[];
+    let issueCount = 0;
     if (customers) {
       target = customers.map((item) => {
         return { customerId: item.id, couponId: dto.couponId, status: dto.status };
@@ -63,10 +64,38 @@ export class CustomerCouponService {
       });
     }
 
-    const result = await this.prismaService.customerCoupon.createMany({
-      data: target,
+    await this.prismaService.$transaction(async (prisma) => {
+      try {
+        const createMany = await Promise.all(
+          target.map((item: IssueManyCustomerList) => {
+            return prisma.customerCoupon
+              .create({
+                data: item,
+              })
+              .then((res) => res.id);
+          }),
+        );
+
+        await Promise.all(
+          createMany.map((customerCouponId: number) => {
+            return prisma.customerCouponLog
+              .create({
+                data: {
+                  customerCouponId,
+                  type: 'issue',
+                },
+              })
+              .then((res) => {
+                issueCount += 1;
+              });
+          }),
+        );
+      } catch (err) {
+        console.error(err);
+      }
     });
-    return result.count;
+
+    return issueCount;
   }
 
   /** 특정 소비자에게 발급된 쿠폰 상태 변경 */
