@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 
 interface GoodsDisplayDetailProps {
-  goods: KkshowShoppingTabGoodsData;
+  goods: Pick<KkshowShoppingTabGoodsData, 'discountedPrice' | 'normalPrice' | 'name'>;
   fontSize?: HeadingProps['fontSize'];
   noOfLines?: HeadingProps['noOfLines'];
 }
@@ -119,6 +119,7 @@ export const GoodsDisplayImage = ({
 );
 
 export interface GoodsDisplayProps extends GoodsDisplayDetailProps {
+  goods: KkshowShoppingTabGoodsData;
   variant?: 'small' | 'middle' | 'card';
 }
 export function GoodsDisplay({

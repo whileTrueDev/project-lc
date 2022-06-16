@@ -57,12 +57,23 @@ export type OrderItemWithRelations = OrderItem & {
   goods: OriginGoods;
 };
 
-export type OrderCancellationBaseData = OrderCancellation & {
+export type OrderCancellationBaseData = Pick<
+  OrderCancellation,
+  'id' | 'cancelCode' | 'requestDate' | 'completeDate' | 'status'
+> & {
   items: OrderCancellationItem[];
 };
 export type ExportBaseData = Export & { items: ExportItem[] };
-export type ExchangeBaseData = Exchange & { exchangeItems: ExchangeItem[] };
-export type ReturnBaseData = Return & { items: ReturnItem[] };
+export type ExchangeBaseData = Pick<
+  Exchange,
+  'id' | 'exchangeCode' | 'status' | 'requestDate' | 'completeDate'
+> & {
+  exchangeItems: ExchangeItem[];
+};
+export type ReturnBaseData = Pick<
+  Return,
+  'id' | 'returnCode' | 'status' | 'requestDate' | 'completeDate'
+> & { items: ReturnItem[] };
 export type ReturnDataWithImages = ReturnBaseData & { images: ReturnImage[] };
 export type ExchangeDataWithImages = ExchangeBaseData & { images: ExchangeImage[] };
 
@@ -84,9 +95,18 @@ export interface CustomerCouponLogWithCustomerCoupon extends CustomerCouponLog {
   customerCoupon: CustomerCouponWithCoupon;
 }
 
+export type SellerSettlementItemsRes = {
+  liveShopping: {
+    broadcaster: {
+      userNickname: Broadcaster['userNickname'];
+    };
+  };
+};
+
 export type OrderDataWithRelations = OrderBaseData & {
   exchanges: Nullable<ExchangeBaseData[]>;
   returns: Nullable<ReturnBaseData[]>;
+  sellerSettlementItems?: SellerSettlementItemsRes[] | null;
 };
 
 /** 주문 목록 리턴 데이터 타입 */
@@ -104,6 +124,7 @@ export type OrderDetailRes = OrderBaseData & {
   shippings: (OrderShipping & {
     items: (OrderItem & { options: OrderItemOption[] })[];
   })[];
+  sellerSettlementItems?: SellerSettlementItemsRes[] | null;
 };
 /**
  * 방송인 후원 주문 목록 타입

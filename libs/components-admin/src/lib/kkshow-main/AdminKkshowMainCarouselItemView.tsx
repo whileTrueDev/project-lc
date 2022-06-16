@@ -17,9 +17,7 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import ImageInputDialog, {
-  ImageInputFileReadData,
-} from '@project-lc/components-core/ImageInputDialog';
+import { ImageInputFileReadData } from '@project-lc/components-core/ImageInputDialog';
 import { useAdminLiveShoppingImageMutation } from '@project-lc/hooks';
 import {
   KkshowMainResData,
@@ -31,7 +29,7 @@ import {
   SimpleBannerItem,
   UpcomingLiveItem,
 } from '@project-lc/shared-types';
-import { getAdminHost } from '@project-lc/utils';
+import { getAdminHost, getCustomerWebHost } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
 import path from 'path';
 import { useMemo, useRef, useState } from 'react';
@@ -401,7 +399,7 @@ export function CarouselItemProductAndBroadcasterInfo(
     setValue(`carousel.${index}.liveShoppingName`, data.liveShoppingName || '');
     setValue(
       `carousel.${index}.productLinkUrl`,
-      data.fmGoodsSeq ? `https://k-kmarket.com/goods/view?no=${data.fmGoodsSeq}` : '',
+      `${getCustomerWebHost()}/goods/${data.goodsId}`,
     );
     setValue(`carousel.${index}.normalPrice`, Number(data.goods.options[0].price));
     setValue(

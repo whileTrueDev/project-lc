@@ -20,7 +20,7 @@ import { FmSettlementService } from './fm-settlements/fm-settlements.service';
     LiveShoppingModule.withoutControllers(),
     BroadcasterModule.withoutControllers(),
     SellerModule.withoutControllers(),
-    ProductPromotionModule,
+    ProductPromotionModule.withoutControllers(),
   ],
   controllers: [
     FmOrdersController,

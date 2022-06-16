@@ -92,7 +92,6 @@ export function LiveShoppingDetail(): JSX.Element {
       sellEndDate: '',
       rejectionReason: '',
       videoUrl: '',
-      fmGoodsSeq: null,
     },
   });
   const toast = useToast();
@@ -121,7 +120,6 @@ export function LiveShoppingDetail(): JSX.Element {
       sellEndDate: '',
       rejectionReason: '',
       videoUrl: '',
-      fmGoodsSeq: null,
     });
     toast({ title: '변경 완료', status: 'success' });
   };
@@ -199,40 +197,6 @@ export function LiveShoppingDetail(): JSX.Element {
               {liveShopping[0].progress === LIVE_SHOPPING_PROGRESS.취소됨 ? (
                 <Text>사유 : {liveShopping[0].rejectionReason}</Text>
               ) : null}
-            </Stack>
-
-            <Stack>
-              <Stack direction="row" alignItems="center">
-                <Text>퍼스트몰 상품 번호: </Text>
-                <Text
-                  as="span"
-                  fontWeight="bold"
-                  textDecoration={liveShopping[0].fmGoodsSeq ? 'underline' : 'unset'}
-                  color={liveShopping[0].fmGoodsSeq ? 'blue' : 'unset'}
-                  cursor={liveShopping[0].fmGoodsSeq ? 'pointer' : 'default'}
-                  onClick={() => {
-                    window.open(
-                      `http://whiletrue.firstmall.kr/goods/view?no=${liveShopping[0].fmGoodsSeq}`,
-                    );
-                  }}
-                >
-                  {liveShopping[0].fmGoodsSeq || '미입력'}
-                </Text>
-              </Stack>
-              {liveShopping[0].progress === 'confirmed' && !liveShopping[0].fmGoodsSeq && (
-                <Alert status="error">
-                  <Stack>
-                    <AlertIcon />
-                    <AlertTitle>퍼스트몰 상품 번호가 입력되지 않았습니다.</AlertTitle>
-                    <AlertDescription>
-                      진행상태가 확정됨이지만 퍼스트몰 상품 번호가 입력되지 않았습니다.
-                      <br />
-                      라이브 쇼핑 진행시 사용하는 퍼스트몰 상품 번호가 입력되지 않으면
-                      방송인 수익금이 올바르게 처리되지 않습니다.
-                    </AlertDescription>
-                  </Stack>
-                </Alert>
-              )}
             </Stack>
 
             <Divider />
@@ -415,24 +379,6 @@ export function LiveShoppingDetail(): JSX.Element {
                 />
               </Stack>
               <Divider />
-
-              <Stack maxW="300px">
-                <FormControl>
-                  <FormLabel>퍼스트몰 상품 번호</FormLabel>
-                  <FormLabel color="gray.500" fontSize="xs">
-                    해당 라이브를 위해 퍼스트몰에서 생성한 새 상품의 상품 번호를
-                    입력하세요.
-                  </FormLabel>
-                  <FormHelperText fontSize="xs">
-                    <Text fontSize="xs" color="red.500" as="span">
-                      (주의){' '}
-                    </Text>
-                    방송인,방송시각등이 확정되었음에도 입력하지 않는 경우, 방송인에게
-                    수익금으로 반영되지 않습니다.
-                  </FormHelperText>
-                  <Input mt={2} type="number" {...register('fmGoodsSeq')} />
-                </FormControl>
-              </Stack>
 
               <Button onClick={openConfirmModal} colorScheme="blue">
                 변경

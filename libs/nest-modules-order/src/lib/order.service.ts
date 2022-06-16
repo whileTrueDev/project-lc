@@ -148,7 +148,7 @@ export class OrderService {
           data: {
             order: { connect: { id: orderId } },
             shippingGroup: { connect: { id: shippingGroupId } },
-            shippingCost,
+            shippingCost: String(shippingCost),
             items: { connect: relatedOrderItemsIdList },
           },
         });
@@ -528,6 +528,20 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true } },
         returns: { include: { items: true } },
         orderCancellations: { include: { items: true } },
+        sellerSettlementItems: {
+          select: {
+            liveShopping: {
+              select: {
+                broadcaster: {
+                  select: {
+                    userNickname: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        shippings: { include: { items: true } },
       },
     });
 
@@ -540,7 +554,7 @@ export class OrderService {
   }
 
   /** 주문 상세 조회 */
-  async findOneOrderDetail(where: Prisma.OrderWhereInput): Promise<OrderDetailRes> {
+  async findOneOrderDetail(where: Prisma.OrderWhereInput): Promise<any> {
     // 주문이 있는지 확인
     await this.findOneOrder(where);
 

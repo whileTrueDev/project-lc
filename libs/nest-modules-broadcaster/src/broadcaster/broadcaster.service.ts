@@ -166,16 +166,20 @@ export class BroadcasterService {
       broadcasterAddress: true,
       broadcasterContacts: true,
     };
-    if (id)
-      return this.prisma.broadcaster.findUnique({
+    if (id) {
+      const result = await this.prisma.broadcaster.findUnique({
         where: { id: Number(id) },
         include,
       });
-    if (email)
-      return this.prisma.broadcaster.findUnique({
+      return new BroadcasterRes(result); // for password serialization
+    }
+    if (email) {
+      const result = await this.prisma.broadcaster.findUnique({
         where: { email },
         include,
       });
+      return new BroadcasterRes(result); // for password serialization
+    }
     return null;
   }
 

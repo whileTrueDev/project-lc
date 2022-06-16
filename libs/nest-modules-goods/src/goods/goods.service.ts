@@ -58,10 +58,12 @@ export class GoodsService {
         },
         LiveShopping: {
           select: {
+            // @deprecated
             fmGoodsSeq: true,
           },
         },
         productPromotion: {
+          // @deprecated
           select: { fmGoodsSeq: true },
         },
       },

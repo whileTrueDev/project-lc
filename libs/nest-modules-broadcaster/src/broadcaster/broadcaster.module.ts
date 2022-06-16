@@ -6,6 +6,7 @@ import { PrismaModule } from '@project-lc/prisma-orm';
 import { BroadcasterChannelService } from './broadcaster-channel.service';
 import { BroadcasterContactsController } from './broadcaster-contacts.controller';
 import { BroadcasterContactsService } from './broadcaster-contacts.service';
+import { BroadcasterPromotionPageContoller } from './broadcaster-promotion-page.controller';
 import { BroadcasterPromotionPageService } from './broadcaster-promotion-page.service';
 import { BroadcasterController } from './broadcaster.controller';
 import { BroadcasterService } from './broadcaster.service';
@@ -45,6 +46,7 @@ export class BroadcasterModule {
     BroadcasterSettlementController,
     BroadcasterSettlementInfoController,
     BroadcasterSettlementHistoryController,
+    BroadcasterPromotionPageContoller,
   ];
 
   private static readonly imports = [PrismaModule, CipherModule, MailVerificationModule];

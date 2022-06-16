@@ -34,6 +34,7 @@ import { ProductPromotionService } from '@project-lc/nest-modules-product-promot
 import { FirstmallDbService } from '../firstmall-db.service';
 import { StatCounter } from './utills/statCounter';
 
+/** @deprecated */
 @Injectable()
 export class FmOrdersService {
   constructor(
@@ -277,7 +278,7 @@ export class FmOrdersService {
 
     // * 판매유형(라이브쇼핑, 홍보페이지, 일반)
     const lvs = await this.liveShoppingService.findLiveShoppingsByGoodsIds(goodsIds);
-    const pps = await this.productPromotionService.findProductPromotionsByGoodsIds(
+    const pps = await this.productPromotionService._findProductPromotionsByGoodsIds(
       goodsIds,
     );
     const liveShoppingIds = lvs.map((x) => x.fmGoodsSeq);
@@ -886,39 +887,39 @@ export class FmOrdersService {
     return true;
   }
 
-  public async getOrdersStatsDuringLiveShoppingSales(
-    dto: LiveShoppingWithSales[],
-  ): Promise<{ id: number; sales: string }[]> {
-    const salesPrice = [];
+  // public async getOrdersStatsDuringLiveShoppingSales(
+  //   dto: LiveShoppingWithSales[],
+  // ): Promise<{ id: number; sales: string }[]> {
+  //   const salesPrice = [];
 
-    const sql = `
-    SELECT
-      SUM(fm_order.payment_price) as sales
-    FROM fm_order
-    JOIN fm_order_item USING(order_seq)
-    WHERE fm_order_item.goods_seq IN (?)
-    AND fm_order.step != 85 AND fm_order.step != 0
-    AND
-    regist_date BETWEEN ? AND ?;
-    `;
-    await Promise.all(
-      dto.map(async (val) => {
-        const sellStartDate = dayjs(val.sellStartDate).format('YYYY-MM-DD HH:mm:ss');
-        const sellEndDate = dayjs(val.sellEndDate).format('YYYY-MM-DD HH:mm:ss');
-        const salesSum = await this.db.query(sql, [
-          val.fmGoodsSeq,
-          sellStartDate,
-          sellEndDate,
-        ]);
-        salesPrice.push({
-          id: val.id,
-          sales: salesSum[0].sales ? Number(salesSum[0].sales).toFixed() : null,
-        });
-      }),
-    );
+  //   const sql = `
+  //   SELECT
+  //     SUM(fm_order.payment_price) as sales
+  //   FROM fm_order
+  //   JOIN fm_order_item USING(order_seq)
+  //   WHERE fm_order_item.goods_seq IN (?)
+  //   AND fm_order.step != 85 AND fm_order.step != 0
+  //   AND
+  //   regist_date BETWEEN ? AND ?;
+  //   `;
+  //   await Promise.all(
+  //     dto.map(async (val) => {
+  //       const sellStartDate = dayjs(val.sellStartDate).format('YYYY-MM-DD HH:mm:ss');
+  //       const sellEndDate = dayjs(val.sellEndDate).format('YYYY-MM-DD HH:mm:ss');
+  //       const salesSum = await this.db.query(sql, [
+  //         val.fmGoodsSeq,
+  //         sellStartDate,
+  //         sellEndDate,
+  //       ]);
+  //       salesPrice.push({
+  //         id: val.id,
+  //         sales: salesSum[0].sales ? Number(salesSum[0].sales).toFixed() : null,
+  //       });
+  //     }),
+  //   );
 
-    return salesPrice;
-  }
+  //   return salesPrice;
+  // }
 
   /** 주문의 선물하기 여부 조회 */
   private async findOneOrderGiftFlag(
