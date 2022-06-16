@@ -512,6 +512,7 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true } },
         returns: { include: { items: true } },
         orderCancellations: { include: { items: true } },
+        shippings: { include: { items: { include: { options: true } } } },
       },
     });
 

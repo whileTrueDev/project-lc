@@ -1,6 +1,6 @@
 export * from './lib/adminSignupListStore';
 export * from './lib/cartStore';
-export * from './lib/fmExportStore';
+export * from './lib/sellerExportStore';
 export * from './lib/fmOrderStore';
 export * from './lib/goodsRegistStore';
 export * from './lib/goodsViewStore';
