@@ -1,7 +1,4 @@
-import {
-  convertFmOrderStatusToString,
-  FindFmOrderDetailRes,
-} from '@project-lc/shared-types';
+import { getOrderStatusKrString } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { WorkBook, WorkSheet, CellObject, ColInfo, RowInfo, Range } from 'xlsx';
 import { SpreadSheetGenerator } from './spreadSheetGenerator';
@@ -10,10 +7,10 @@ export interface OrderSpreadSheetColumnOption {
   type: '주문정보' | '상품정보';
   headerName: string;
   getValue: (
-    order: FindFmOrderDetailRes,
-    ship?: FindFmOrderDetailRes['shippings'][number],
-    item?: FindFmOrderDetailRes['shippings'][number]['items'][number],
-    itemOption?: FindFmOrderDetailRes['shippings'][number]['items'][number]['options'][number],
+    order: any,
+    ship?: any,
+    item?: any,
+    itemOption?: any,
   ) => string | number | null | undefined;
   mergeable?: boolean;
 }
@@ -133,7 +130,7 @@ export const defaultColumOpts: OrderSpreadSheetColumnOption[] = [
   {
     type: '상품정보',
     headerName: '상태',
-    getValue: (_, __, ___, opt) => (opt ? convertFmOrderStatusToString(opt.step) : '-'),
+    getValue: (_, __, ___, opt) => (opt ? getOrderStatusKrString(opt.step) : '-'),
   },
   {
     type: '상품정보',
@@ -162,7 +159,7 @@ interface OrderSpreadSheetGeneratorOptions {
   disabledColumnHeaders?: Array<string>;
 }
 
-export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<FindFmOrderDetailRes> {
+export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<any> {
   private columns: OrderSpreadSheetColumnOption[];
 
   constructor(private opts?: OrderSpreadSheetGeneratorOptions) {
@@ -178,11 +175,11 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<FindFmOrderD
     }
   }
 
-  protected getSheetRef(orders: FindFmOrderDetailRes[]): string {
+  protected getSheetRef(orders: any[]): string {
     const lengthOfRows = orders.reduce((prev, curr) => {
       let num = 0;
-      curr.shippings.forEach((ship) => {
-        ship.items.forEach((item) => {
+      curr.shippings.forEach((ship: any) => {
+        ship.items.forEach((item: any) => {
           item.options.forEach(() => {
             num += 1;
           });
@@ -196,7 +193,7 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<FindFmOrderD
     return `A1:${col}${lengthOfRows}`;
   }
 
-  protected createSheet(orders: FindFmOrderDetailRes[]): WorkSheet {
+  protected createSheet(orders: any[]): WorkSheet {
     const sheet: WorkSheet = { '!ref': this.getSheetRef(orders) };
     // headers
     this.columns.forEach((field, fieldIdx) => {
@@ -209,9 +206,9 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<FindFmOrderD
     const cols: ColInfo[] = [];
     const merges: Range[] = [];
     orders.forEach((order) => {
-      order.shippings.forEach((ship) => {
-        ship.items.forEach((item) => {
-          item.options.forEach((opt, optIdx) => {
+      order.shippings.forEach((ship: any) => {
+        ship.items.forEach((item: any) => {
+          item.options.forEach((opt: any, optIdx: any) => {
             this.columns.forEach((field, fieldIdx) => {
               // 셀에 넣을 데이터 가져오기
               const v = field.getValue(order, ship, item, opt);
@@ -263,7 +260,7 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<FindFmOrderD
     return sheet;
   }
 
-  public createXLSX(orders: FindFmOrderDetailRes[]): WorkBook {
+  public createXLSX(orders: any[]): WorkBook {
     const sheet = this.createSheet(orders);
 
     const wb: WorkBook = {

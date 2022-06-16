@@ -16,10 +16,10 @@ import {
 } from '@chakra-ui/react';
 import SellTypeBadge from '@project-lc/components-shared/SellTypeBadge';
 import { SettlementDoneItem } from '@project-lc/hooks';
-import { FmOrder } from '@project-lc/shared-types';
 import { calcPgCommission } from '@project-lc/utils';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useMemo } from 'react';
+import { PaymentMethod } from '@prisma/client';
 import { LiveShopping, SellerSettlementItems } from '.prisma/client';
 
 export interface SettlementInfoDialogProps {
@@ -149,15 +149,10 @@ export function SettlementInfoItem({
     const shippingCost = Number(settlementInfo.shippingCost);
     return calcPgCommission({
       targetAmount: settlementItem.price + shippingCost,
-      paymentMethod: settlementInfo.paymentMethod as FmOrder['payment'],
-      pg: settlementInfo.pg,
+      paymentMethod: settlementInfo.paymentMethod as PaymentMethod,
+      pg: 'tossPayments',
     });
-  }, [
-    settlementInfo.paymentMethod,
-    settlementInfo.pg,
-    settlementInfo.shippingCost,
-    settlementItem.price,
-  ]);
+  }, [settlementInfo.paymentMethod, settlementInfo.shippingCost, settlementItem.price]);
 
   return (
     <Grid

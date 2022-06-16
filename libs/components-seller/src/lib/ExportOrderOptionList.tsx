@@ -23,7 +23,6 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import TextDotConnector from '@project-lc/components-core/TextDotConnector';
-import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
 import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import {
   useOrderDetail,
@@ -139,7 +138,7 @@ function ExportOrderShippingListItem({
         onSelect={() => handleSelect(shipping.id)}
       />
 
-      {isDone && <FmOrderStatusBadge orderStatus="55" />}
+      {isDone && <OrderStatusBadge step="exportDone" />}
       {!isExportable && <Badge>출고불가</Badge>}
 
       {/* 주문 상품 정보 및 출고처리 란 */}

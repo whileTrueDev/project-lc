@@ -3,9 +3,8 @@ import { GridColumns, GridRowParams } from '@material-ui/data-grid';
 import { OrderItemOption, OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import TooltipedText from '@project-lc/components-core/TooltipedText';
-import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { useAdminLiveShoppingGiftOrderList, useDisplaySize } from '@project-lc/hooks';
-import { orderProcessStepDict } from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
@@ -95,9 +94,7 @@ const columns: GridColumns = [
     width: 120,
     renderCell: ({ value }) => (
       <Box lineHeight={2}>
-        <FmOrderStatusBadge
-          orderStatus={orderProcessStepDict[value as OrderProcessStep]}
-        />
+        <OrderStatusBadge step={value as OrderProcessStep} />
       </Box>
     ),
   },

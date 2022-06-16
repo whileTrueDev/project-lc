@@ -82,8 +82,6 @@ export class LiveShoppingDTO {
   @IsNotEmpty()
   broadcasterCommissionRate?: string;
 
-  @IsOptional() @IsInt() fmGoodsSeq?: LiveShopping['fmGoodsSeq'];
-
   @IsOptional() @IsString() liveShoppingName?: LiveShopping['liveShoppingName'];
 
   @IsOptional()
@@ -99,7 +97,7 @@ export type LiveShoppingRegistDTO = Pick<
 
 export type LiveShoppingWithSales = Pick<
   LiveShoppingDTO,
-  'id' | 'sellStartDate' | 'sellEndDate' | 'fmGoodsSeq'
+  'id' | 'sellStartDate' | 'sellEndDate'
 >;
 export class FindLiveShoppingDto {
   @Type(() => Number) @IsOptional() @IsNumber() id?: LiveShopping['id'];
@@ -125,8 +123,6 @@ export type LiveShoppingsWithBroadcasterAndGoodsName = Pick<
     goods_name: string;
   };
 };
-
-export type LiveShoppingFmGoodsSeq = Pick<LiveShopping, 'fmGoodsSeq'>;
 
 export type LiveShoppingId = Pick<LiveShopping, 'id'>;
 

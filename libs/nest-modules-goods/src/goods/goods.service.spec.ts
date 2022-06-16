@@ -101,17 +101,6 @@ describe('GoodsService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-  describe('findMyGoodsIds', () => {
-    it('should return empty array', async () => {
-      const goodsIds = await service.findMyGoodsIds(5);
-      expect(goodsIds.length).toBe(0);
-      expect(goodsIds).toEqual([]);
-    });
-    it('should return array of goods ids (numbers)', async () => {
-      const goodsIds = await service.findMyGoodsIds(TEST_USER_ID);
-      expect(goodsIds).toEqual([TEST_CONFIRMATION_GOODS_CONNECTION_ID]);
-    });
-  });
   describe('getGoodsList', () => {
     it('should have 1 item and totalItemCount : 1', async () => {
       const goodsListData = await service.getGoodsList({

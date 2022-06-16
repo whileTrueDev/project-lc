@@ -28,7 +28,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { useFmOrderDetails, useOrderDetailsForSpreadsheet } from '@project-lc/hooks';
+import { useOrderDetailsForSpreadsheet } from '@project-lc/hooks';
 import { defaultColumOpts, OrderSpreadSheetGenerator } from '@project-lc/shreadsheet';
 import {
   getOrderDownloadFileName,

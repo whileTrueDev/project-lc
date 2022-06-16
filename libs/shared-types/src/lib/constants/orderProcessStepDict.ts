@@ -1,7 +1,60 @@
 import { OrderProcessStep } from '@prisma/client';
-import { FmOrderStatusNumString } from './fmOrderStatuses';
 
-export const orderProcessStepDict: Record<OrderProcessStep, FmOrderStatusNumString> = {
+export type OrderStatusNumString =
+  | '15'
+  | '25'
+  | '35'
+  | '40'
+  | '45'
+  | '50'
+  | '55'
+  | '60'
+  | '65'
+  | '70'
+  | '75'
+  | '80' // '80' : 구매확정 - 임의로 추가함
+  | '85'
+  | '95'
+  | '99';
+
+export interface OrderStatus {
+  name:
+    | '주문접수'
+    | '결제확인'
+    | '상품준비'
+    | '부분출고준비'
+    | '출고준비'
+    | '부분출고완료'
+    | '출고완료'
+    | '부분배송중'
+    | '배송중'
+    | '부분배송완료'
+    | '배송완료'
+    | '구매확정'
+    | '결제취소'
+    | '주문무효'
+    | '결제실패';
+  chakraColor: string;
+}
+
+export const orderStatuses: Record<OrderStatusNumString, OrderStatus> = {
+  '15': { name: '주문접수', chakraColor: 'yellow' },
+  '25': { name: '결제확인', chakraColor: 'green' },
+  '35': { name: '상품준비', chakraColor: 'cyan' },
+  '40': { name: '부분출고준비', chakraColor: 'teal' },
+  '45': { name: '출고준비', chakraColor: 'teal' },
+  '50': { name: '부분출고완료', chakraColor: 'blue' },
+  '55': { name: '출고완료', chakraColor: 'blue' },
+  '60': { name: '부분배송중', chakraColor: 'purple' },
+  '65': { name: '배송중', chakraColor: 'purple' },
+  '70': { name: '부분배송완료', chakraColor: 'messenger' },
+  '75': { name: '배송완료', chakraColor: 'messenger' },
+  '80': { name: '구매확정', chakraColor: 'orange' }, // '80' : 구매확정 - 임의로 추가함
+  '85': { name: '결제취소', chakraColor: 'gray' },
+  '95': { name: '주문무효', chakraColor: 'gray' },
+  '99': { name: '결제실패', chakraColor: 'gray' },
+};
+export const orderProcessStepDict: Record<OrderProcessStep, OrderStatusNumString> = {
   orderReceived: '15', // 주문접수,
   paymentConfirmed: '25', // 결제확인,
   goodsReady: '35', // 상품준비,
@@ -19,14 +72,50 @@ export const orderProcessStepDict: Record<OrderProcessStep, FmOrderStatusNumStri
   paymentFailed: '99', // 결제실패,
 };
 
+export function getOrderStatusColor(key: OrderProcessStep): OrderStatus['chakraColor'] {
+  return orderStatuses[orderProcessStepDict[key]].chakraColor;
+}
+
+export function getOrderStatusKrString(
+  key: OrderProcessStep,
+): OrderStatus['chakraColor'] {
+  return orderStatuses[orderProcessStepDict[key]].name;
+}
+
 /** '15' 와 같은 stringNumber로 orderReceived와 같은  OrderProcessStep 값 리턴 */
 export function getOrderProcessStepNameByStringNumber(
-  stringNumber: FmOrderStatusNumString,
+  stringNumber: OrderStatusNumString,
 ): OrderProcessStep {
   const stepKey = Object.keys(orderProcessStepDict).find(
     (key: OrderProcessStep) => orderProcessStepDict[key] === stringNumber,
   );
   return stepKey as OrderProcessStep;
+}
+
+/**
+ * 주문 상태 한글명 배열을 주문 상태 배열로 변경해 줍니다.
+ * @param targetStatusNames 주문 상태 한글명 배열
+ * @returns 주문 상태번호 배열
+ */
+export function getOrderStatusByNames(
+  targetStatusNames: Array<typeof orderStatuses[keyof typeof orderStatuses]['name']>,
+): OrderStatusNumString[] {
+  const entries = Object.entries(orderStatuses);
+  const filtered = entries.filter(([_, value]) => targetStatusNames.includes(value.name));
+  return filtered.map(([key, v]) => key) as OrderStatusNumString[];
+}
+
+/**
+ * 주문이 출고 처리가 가능한 지 확인합니다.
+ */
+export function isOrderExportable(step: OrderStatusNumString): boolean {
+  return getOrderStatusByNames([
+    '결제확인',
+    '상품준비',
+    '부분출고준비',
+    '출고준비',
+    '부분출고완료',
+  ]).includes(step);
 }
 
 /** 배송조회가 가능한 주문상태목록 - 출고완료 이후 */

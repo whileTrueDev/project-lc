@@ -13,7 +13,7 @@ import { GridColumns, GridRowId, GridToolbarContainer } from '@material-ui/data-
 import { OrderItemOption, OrderProcessStep } from '@prisma/client';
 import { ChakraDataGrid } from '@project-lc/components-core/ChakraDataGrid';
 import { TooltipedText } from '@project-lc/components-core/TooltipedText';
-import FmOrderStatusBadge from '@project-lc/components-shared/FmOrderStatusBadge';
+import { OrderStatusBadge } from '@project-lc/components-shared/order/OrderStatusBadge';
 import { useDisplaySize, useProfile, useSellerOrderList } from '@project-lc/hooks';
 import {
   isOrderExportable,
@@ -27,7 +27,6 @@ import NextLink from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaTruck } from 'react-icons/fa';
 import ExportManyDialog from '../ExportManyDialog';
-import OrderListDownloadDialog from './OrderListDownloadDialog';
 
 const columns: GridColumns = [
   {
@@ -128,9 +127,7 @@ const columns: GridColumns = [
     width: 120,
     renderCell: ({ row }) => (
       <Box lineHeight={2}>
-        <FmOrderStatusBadge
-          orderStatus={orderProcessStepDict[row.step as OrderProcessStep]}
-        />
+        <OrderStatusBadge step={row.step as OrderProcessStep} />
       </Box>
     ),
   },

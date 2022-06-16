@@ -40,81 +40,14 @@ export class GoodsService {
     sellerId?: Seller['id'],
     ids?: number[],
   ): Promise<number[]> {
-    const goodsIds = await this.prisma.goods.findMany({
+    const allGoods = await this.prisma.goods.findMany({
       where: {
         seller: sellerId ? { id: sellerId } : undefined,
         id: ids ? { in: ids } : undefined,
-        AND: {
-          confirmation: {
-            status: 'confirmed',
-          },
-        },
-      },
-      select: {
-        confirmation: {
-          select: {
-            firstmallGoodsConnectionId: true,
-          },
-        },
-        LiveShopping: {
-          select: {
-            fmGoodsSeq: true,
-          },
-        },
-        productPromotion: {
-          select: { fmGoodsSeq: true },
-        },
+        AND: { confirmation: { status: 'confirmed' } },
       },
     });
-
-    const allMyGoodsIds = goodsIds.reduce((prev, goods) => {
-      const lsGoodsIds = goods.LiveShopping.map((l) => l.fmGoodsSeq);
-      const productPromotionGoodsIds = goods.productPromotion.map((p) => p.fmGoodsSeq);
-      return prev
-        .concat(goods.confirmation.firstmallGoodsConnectionId)
-        .concat(lsGoodsIds)
-        .concat(productPromotionGoodsIds);
-    }, []);
-
-    return [...new Set(allMyGoodsIds)];
-  }
-
-  /**
-   * 관리자가 승인된 상품 ID(firsmall db의 goods_seq) 목록을 가져옵니다.
-   * @param ids? 특정 상품의 firstMallGoodsId만 조회하고 싶을 때
-   */
-  public async findAdminGoodsIds(ids?: number[]): Promise<number[]> {
-    const goodsIds = await this.prisma.goods.findMany({
-      where: {
-        id: ids ? { in: ids } : undefined,
-        AND: {
-          confirmation: {
-            status: 'confirmed',
-          },
-        },
-      },
-      select: {
-        confirmation: {
-          select: {
-            firstmallGoodsConnectionId: true,
-          },
-        },
-        LiveShopping: {
-          select: {
-            fmGoodsSeq: true,
-          },
-        },
-      },
-    });
-
-    const allGoodsIds = goodsIds.reduce((prev, goods) => {
-      const lsGoodsIds = goods.LiveShopping.map((l) => l.fmGoodsSeq);
-      return prev
-        .concat(goods.confirmation.firstmallGoodsConnectionId)
-        .concat(lsGoodsIds);
-    }, []);
-
-    return [...new Set(allGoodsIds)];
+    return allGoods.map((goods) => goods.id);
   }
 
   /**
@@ -146,11 +79,7 @@ export class GoodsService {
         goods_name: {
           search: goodsName ? goodsName.trim() : undefined,
         },
-        categories: {
-          some: {
-            id: categoryId,
-          },
-        },
+        categories: { some: { id: categoryId } },
       },
       orderBy: [{ [sort]: direction }],
       include: {

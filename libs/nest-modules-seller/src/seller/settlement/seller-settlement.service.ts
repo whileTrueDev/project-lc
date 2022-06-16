@@ -5,7 +5,6 @@ import { UserPayload } from '@project-lc/nest-core';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   ExecuteSettlementDto,
-  FmExport,
   SellerSettlementTargetRes,
 } from '@project-lc/shared-types';
 import { calcPgCommission, CalcPgCommissionOptions } from '@project-lc/utils';
@@ -226,8 +225,8 @@ export class SellerSettlementService {
     id?: UserPayload['id'],
     options?: {
       round?: string;
-      export_seq?: FmExport['export_seq'];
-      order_seq?: FmExport['order_seq'];
+      export_seq?: number;
+      order_seq?: number | string;
     },
   ) {
     return this.prisma.sellerSettlements.findMany({

@@ -19,10 +19,6 @@ import { OrderDetailGoods } from '@project-lc/components-seller/OrderDetailGoods
 import { OrderDetailOptionList } from '@project-lc/components-seller/OrderDetailOptionList';
 import { MypageLayout } from '@project-lc/components-shared/MypageLayout';
 import { useDisplaySize, useOrderDetail } from '@project-lc/hooks';
-import {
-  convertFmOrderShippingTypesToString,
-  FmOrderShipping,
-} from '@project-lc/shared-types';
 import { getLocaleNumber } from '@project-lc/utils-frontend';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
@@ -214,7 +210,7 @@ function OrderDetailShippingItem({
     <Box key={shipping.id} mt={6} borderWidth="0.025rem" p={2} pl={4}>
       {/* 배송정보 */}
       <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="nowrap">
-        <Text>{convertFmOrderShippingTypesToString(shipping.shippingCostPayType)}</Text>
+        {/* <Text>{shippingType}</Text> */}
         {shipping.shippingCostPayType === 'free' ? null : (
           <>
             <TextDotConnector />
@@ -224,14 +220,8 @@ function OrderDetailShippingItem({
       </Stack>
 
       {/* 상품(옵션) 정보 */}
-      {/* // TODO: 상품정보 처리필요  */}
       <Box mt={4}>
-        {shipping.items.map((item) => (
-          <Box key={item.id} mt={2}>
-            {/* <OrderDetailGoods orderItem={item} />
-            <OrderDetailOptionList options={item.options} /> */}
-          </Box>
-        ))}
+        <OrderDetailOptionList options={shipping.items} />
       </Box>
     </Box>
   );

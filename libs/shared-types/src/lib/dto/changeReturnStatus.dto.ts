@@ -1,11 +1,9 @@
-import { IsString, IsIn } from 'class-validator';
-import { FmOrderReturnBase } from '../res-types/fmOrder.res';
-import { returnStatusNames } from '../constants/fmOrderReturnStatuses';
+import { IsIn, IsString } from 'class-validator';
 
 export class ChangeReturnStatusDto {
   @IsString()
   return_code: string;
 
-  @IsIn(returnStatusNames)
-  status: FmOrderReturnBase['status'];
+  @IsIn(['request', 'ing', 'complete'])
+  status: 'request' | 'ing' | 'complete';
 }
