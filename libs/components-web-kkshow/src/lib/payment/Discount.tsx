@@ -61,6 +61,18 @@ export function Discount(): JSX.Element {
     setValue('usedMileageAmount', MAX_MILEAGE);
   };
 
+  const customerId = watch('customerId');
+  const isNonMemberOrder = !customerId;
+
+  // 비회원주문인경우 쿠폰 및 적립금 사용 불가
+  if (isNonMemberOrder) {
+    return (
+      <SectionWithTitle title="할인 및 적립금">
+        <Text>로그인 시 할인쿠폰 및 적립금 혜택을 받을 수 있습니다</Text>
+      </SectionWithTitle>
+    );
+  }
+
   return (
     <SectionWithTitle title="할인 및 적립금">
       <Stack spacing={4}>
@@ -176,7 +188,7 @@ function CouponSelectDialog({
   onClose,
   onCouponSelect,
 }: CouponSelectDialogProps): JSX.Element {
-  // TODO: 쿠폰 사용 가능여부 처리 필요 (최소 주문금액 등 적용 가능 여부 판단 이후 선택못하도록)
+  // TODO: 쿠폰 사용 가능여부 처리 필요 (최소 주문금액 등 적용 가능 여부 판단 이후 선택못하도록) + 총 주문가격이 쿠폰할인금액보다 적은경우 처리
   const columns: GridColDef[] = [
     { field: 'name', headerName: '쿠폰명', flex: 1 },
     { field: 'amount', headerName: '금액' },

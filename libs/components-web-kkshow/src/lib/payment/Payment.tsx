@@ -88,6 +88,9 @@ export function PaymentBox(): JSX.Element {
   const DISCOUNT = order.totalDiscount || 0;
   const { watch } = useFormContext<CreateOrderForm>();
 
+  const noMileageBenefit =
+    mileageSetting.mileageStrategy === 'noMileage' || !watch('customerId'); // 로그인 안한경우도 적립안됨
+
   return (
     <Box
       px={{ base: 0, lg: 4 }}
@@ -98,7 +101,7 @@ export function PaymentBox(): JSX.Element {
     >
       <SectionWithTitle title="적립혜택" disableDivider>
         <Flex justifyContent="space-between" h="60px" alignItems="center">
-          {mileageSetting.mileageStrategy === 'noMileage' ? (
+          {noMileageBenefit ? (
             <Text>적립 혜택이 없습니다</Text>
           ) : (
             <>
