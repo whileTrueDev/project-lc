@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import {
   AdminClassChangeHistory,
   Administrator,
@@ -37,28 +33,14 @@ export class AdminService {
         sellerBusinessRegistration: {
           include: {
             BusinessRegistrationConfirmation: true,
-            seller: {
-              select: {
-                email: true,
-                agreementFlag: true,
-                inactiveFlag: false,
-              },
-            },
+            seller: { select: { email: true, agreementFlag: true, inactiveFlag: false } },
           },
-          orderBy: {
-            id: 'desc',
-          },
+          orderBy: { id: 'desc' },
           take: 1,
         },
         sellerSettlementAccount: {
-          orderBy: {
-            id: 'desc',
-          },
-          include: {
-            seller: {
-              select: { email: true },
-            },
-          },
+          orderBy: { id: 'desc' },
+          include: { seller: { select: { email: true } } },
           take: 1,
         },
       },
@@ -176,21 +158,6 @@ export class AdminService {
       items: list,
       totalItemCount: items.length,
     };
-  }
-
-  /** 동일한 퍼스트몰 상품 고유번호로 검수된 상품이 있는지 확인(중복 상품 연결 방지 위함) */
-  private async checkDupFMGoodsConnectionId(fmGoodsId: number): Promise<boolean> {
-    const confirmData = await this.prisma.goodsConfirmation.findFirst({
-      where: { firstmallGoodsConnectionId: fmGoodsId },
-    });
-    const lv = await this.prisma.liveShopping.findFirst({
-      where: { fmGoodsSeq: fmGoodsId },
-    });
-    const pp = await this.prisma.productPromotion.findFirst({
-      where: { fmGoodsSeq: fmGoodsId },
-    });
-    if (confirmData || lv || pp) return true;
-    return false;
   }
 
   /** 상품 검수 여부 변경 */
@@ -376,37 +343,6 @@ export class AdminService {
     });
 
     if (result) return true;
-    return false;
-  }
-
-  /**
-   * @deprecated
-   * 상품홍보 fmGoodsSeq 등록전 다른 곳에 등록된 fmGoodsSeq(goodsConfirmation, liveShopping) 과 중복되는지 확인
-   * @return 중복되는 경우 true, 아니면 false
-   */
-  public async checkHasDuplicateFmGoodsSeq(goodsSeq: number): Promise<boolean> {
-    // 상품검수 테이블 fmGoodsConnectionId와 중복되는 값이 있는지 확인
-    const hasDuplicatedFmGoodsConnectionId = await this.checkDupFMGoodsConnectionId(
-      goodsSeq,
-    );
-
-    if (hasDuplicatedFmGoodsConnectionId) return true;
-
-    // 라이브쇼핑 테이블 fmGoodsSeq 와 중복값이 있는지 확인
-    const duplicatedFmGoodsSeqLiveShopping = await this.prisma.liveShopping.findFirst({
-      where: { fmGoodsSeq: goodsSeq },
-    });
-
-    if (duplicatedFmGoodsSeqLiveShopping) return true;
-
-    // 상품홍보 테이블 fmGoodsSeq와 중복값 있는지 확인
-    const duplicateFmGoodsSeqProductPromotion =
-      await this.prisma.productPromotion.findFirst({
-        where: { fmGoodsSeq: goodsSeq },
-      });
-
-    if (duplicateFmGoodsSeqProductPromotion) return true;
-
     return false;
   }
 

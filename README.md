@@ -49,11 +49,7 @@ Nx에서는 코드 모듈의 종류를 Application과 Library 두 가지로 나�
 
    공유되는 Typescript 타입정보는 모두 여기에서 생성되고 관리됩니다. 공유되는 타입은 모두 여기에 정의하고 사용합니다.
 
-6. `firstmall-db`
-
-   독립몰 데이터베이스에의 접근은 모두 이 라이브러리에서 이루어집니다. 원활한 구분을 위해 퍼스트몰과 관련된 DB에 접근하기 위한 service, module등은 모두 `FM` 접두어를 가집니다.
-
-7. `nest-core`와 `nest-modules-*`
+6. `nest-core`와 `nest-modules-*`
 
    nestjs 애플리케이션에서 동시에 사용가능한 모듈의 경우 여기에 정의합니다. 커스텀으로 생성한 Guard(passport strategy 포함), Pipe, Interceptor, Middleware, ExceptionFilter, Custom Decorator 의 경우 nest-core에, 이외 모든 모듈을 각각 `nest-modules-<이름>` 라이브러리에서 정의합니다.
 
@@ -127,7 +123,6 @@ App, Lib 별 더 자세한 내용은 해당 폴더의 README.md에 있습니다.
 - [libs/hooks](./libs/hooks/README.md)
 - [libs/stores](./libs/stores/README.md)
 - [libs/prisma-orm](./libs/prisma-orm/README.md)
-- [libs/firstmall-db](./libs/firstmall-db/README.md)
 - [libs/shared-types](./libs/shared-types/README.md)
 
 ## 브랜치 전략
