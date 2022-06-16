@@ -88,6 +88,7 @@ export class ProductPromotionService {
     return data;
   }
 
+  /** @deprecated */
   public async checkIsPromotionProductFmGoodsSeq(fmGoodsSeq: number): Promise<boolean> {
     const productPromotionFmGoodsSeq = await this.prisma.productPromotion.findFirst({
       where: {

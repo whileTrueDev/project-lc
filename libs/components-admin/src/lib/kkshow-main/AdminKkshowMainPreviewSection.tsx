@@ -15,6 +15,7 @@ import ImageInputDialog, {
 } from '@project-lc/components-core/ImageInputDialog';
 import { useAdminLiveShoppingImageMutation } from '@project-lc/hooks';
 import { LiveShoppingWithGoods } from '@project-lc/shared-types';
+import { getCustomerWebHost } from '@project-lc/utils';
 import { s3 } from '@project-lc/utils-s3';
 import dayjs from 'dayjs';
 import path from 'path';
@@ -61,7 +62,6 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
     const {
       broadcastStartDate: _broadcastStartDate,
       broadcaster,
-      fmGoodsSeq,
       liveShoppingName,
       goods,
       id,
@@ -77,15 +77,8 @@ export function AdminKkshowMainPreviewSection(): JSX.Element {
     } else {
       setValue('trailer.imageUrl', '', { shouldDirty: true });
     }
-
     setValue('trailer.liveShoppingId', id, { shouldDirty: true });
-
-    if (fmGoodsSeq) {
-      setValue(
-        'trailer.productLinkUrl',
-        `https://k-kmarket.com/goods/view?no=${fmGoodsSeq}`,
-      );
-    }
+    setValue('trailer.productLinkUrl', `${getCustomerWebHost()}/goods/${item.goodsId}`);
     setValue('trailer.broadcastStartDate', _broadcastStartDate);
     if (_broadcastStartDate && dateRef.current) {
       dateRef.current.value = '';

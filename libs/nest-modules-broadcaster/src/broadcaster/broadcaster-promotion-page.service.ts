@@ -77,6 +77,7 @@ export class BroadcasterPromotionPageService {
     return { nextCursor: undefined, productPromotions: resResult };
   }
 
+  /** @deprecated */
   public async getFmGoodsSeqsLinkedToProductPromotions(
     id: Broadcaster['id'],
   ): Promise<broadcasterProductPromotionDto[]> {

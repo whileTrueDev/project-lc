@@ -39,14 +39,6 @@ export class AdminProductPromotionController {
     return this.productPromotionService.createProductPromotion(dto);
   }
 
-  /** 상품홍보에 입력할 fmGoodsSeq가 다른 상품에 연결된 fmGoodsSeq와 중복인지 확인 */
-  @Get('duplicate')
-  async checkHasDuplicateFmGoodsSeq(
-    @Query('fmGoodsSeq', ParseIntPipe) fmGoodsSeq: number,
-  ): Promise<boolean> {
-    return this.adminService.checkHasDuplicateFmGoodsSeq(fmGoodsSeq);
-  }
-
   /** 상품홍보 수정 */
   @Patch()
   async updateProductPromotion(
