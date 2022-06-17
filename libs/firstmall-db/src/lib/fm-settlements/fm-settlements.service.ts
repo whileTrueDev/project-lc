@@ -11,6 +11,7 @@ import {
 import { FirstmallDbService } from '../firstmall-db.service';
 import { FmExportsService } from '../fm-exports/fm-exports.service';
 
+/** @deprecated */
 @Injectable()
 export class FmSettlementService {
   constructor(

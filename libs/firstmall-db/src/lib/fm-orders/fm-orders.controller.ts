@@ -105,53 +105,55 @@ export class FmOrdersController {
     return this.fmOrdersService.getOrdersStats(ids);
   }
 
-  @Get('/per-live-shopping')
-  async findSalesPerLiveShopping(
-    @SellerInfo() seller: UserPayload,
-  ): Promise<{ id: number; sales: string }[]> {
-    let liveShoppingList = await this.liveShoppingService
-      .findLiveShoppings({ sellerId: seller.id })
-      .then((result) => {
-        return result.map((val) => {
-          if (val.sellStartDate && val.sellEndDate) {
-            return {
-              id: val.id,
-              fmGoodsSeq: val.fmGoodsSeq,
-              sellStartDate: dayjs(val.sellStartDate).toString(),
-              sellEndDate: dayjs(val.sellEndDate).toString(),
-            };
-          }
-          return null;
-        });
-      });
+  // @deprecated
+  // @Get('/per-live-shopping')
+  // async findSalesPerLiveShopping(
+  //   @SellerInfo() seller: UserPayload,
+  // ): Promise<{ id: number; sales: string }[]> {
+  //   let liveShoppingList = await this.liveShoppingService
+  //     .findLiveShoppings({ sellerId: seller.id })
+  //     .then((result) => {
+  //       return result.map((val) => {
+  //         if (val.sellStartDate && val.sellEndDate) {
+  //           return {
+  //             id: val.id,
+  //             fmGoodsSeq: val.fmGoodsSeq,
+  //             sellStartDate: dayjs(val.sellStartDate).toString(),
+  //             sellEndDate: dayjs(val.sellEndDate).toString(),
+  //           };
+  //         }
+  //         return null;
+  //       });
+  //     });
 
-    liveShoppingList = liveShoppingList?.filter((n) => n);
-    return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
-  }
+  //   liveShoppingList = liveShoppingList?.filter((n) => n);
+  //   return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
+  // }
 
-  @Get('/broadcaster/per-live-shopping')
-  async broadcasterFindSalesPerLiveShopping(
-    @Query('broadcasterId') broadcasterId: number,
-  ): Promise<{ id: number; sales: string }[]> {
-    let liveShoppingList = await this.liveShoppingService
-      .findLiveShoppings({ broadcasterId })
-      .then((result) => {
-        return result.map((val) => {
-          if (val.sellStartDate && val.sellEndDate) {
-            return {
-              id: val.id,
-              fmGoodsSeq: val.fmGoodsSeq,
-              sellStartDate: dayjs(val.sellStartDate).toString(),
-              sellEndDate: dayjs(val.sellEndDate).toString(),
-            };
-          }
-          return null;
-        });
-      });
+  // @deprecated
+  // @Get('/broadcaster/per-live-shopping')
+  // async broadcasterFindSalesPerLiveShopping(
+  //   @Query('broadcasterId') broadcasterId: number,
+  // ): Promise<{ id: number; sales: string }[]> {
+  //   let liveShoppingList = await this.liveShoppingService
+  //     .findLiveShoppings({ broadcasterId })
+  //     .then((result) => {
+  //       return result.map((val) => {
+  //         if (val.sellStartDate && val.sellEndDate) {
+  //           return {
+  //             id: val.id,
+  //             fmGoodsSeq: val.fmGoodsSeq,
+  //             sellStartDate: dayjs(val.sellStartDate).toString(),
+  //             sellEndDate: dayjs(val.sellEndDate).toString(),
+  //           };
+  //         }
+  //         return null;
+  //       });
+  //     });
 
-    liveShoppingList = liveShoppingList?.filter((n) => n);
-    return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
-  }
+  //   liveShoppingList = liveShoppingList?.filter((n) => n);
+  //   return this.fmOrdersService.getOrdersStatsDuringLiveShoppingSales(liveShoppingList);
+  // }
 
   @Get('detail')
   async findOrderDetails(

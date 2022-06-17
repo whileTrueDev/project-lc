@@ -22,22 +22,3 @@ export const useAdminDuplicatePromotionPageFlag = (
     { enabled: !!url },
   );
 };
-
-/** 상품홍보에 등록할 fmGoodsSeq이 중복인지 확인 */
-export const getAdminDuplicateFmGoodsSeqFlagForProductPromotion = async (
-  fmGoodsSeq: number,
-): Promise<DuplicateFlag> => {
-  return axios
-    .get<DuplicateFlag>('/admin/product-promotion/duplicate', { params: { fmGoodsSeq } })
-    .then((res) => res.data);
-};
-
-export const useAdminDuplicateFmGoodsSeqFlagForProductPromotion = (
-  fmGoodsSeq: number,
-): UseQueryResult<DuplicateFlag, AxiosError> => {
-  return useQuery<DuplicateFlag, AxiosError>(
-    'AdminDuplicatePromotionPage',
-    () => getAdminDuplicateFmGoodsSeqFlagForProductPromotion(fmGoodsSeq),
-    { enabled: !!fmGoodsSeq },
-  );
-};

@@ -1,6 +1,8 @@
 import { IsInt, IsNumber, IsOptional } from 'class-validator';
 
+/** @deprecated */
 export class broadcasterProductPromotionDto {
+  /** @deprecated */
   @IsInt() fmGoodsSeq: number;
 }
 
@@ -19,15 +21,6 @@ export class CreateProductPromotionDto {
   @IsNumber()
   goodsId: number;
 
-  /** 퍼스트몰 상품 고유번호
-   * => ProductPromotion.fmGoodsSeq 는
-   * GoodsConfirmation.firstmallGoodsConnectionId 와
-   * LiveShopping.fmGoodsSeq 와 중복되면 안됨
-   * */
-  @IsNumber()
-  @IsOptional()
-  fmGoodsSeq?: number;
-
   @IsNumber()
   @IsOptional()
   broadcasterCommissionRate?: number;
@@ -42,11 +35,6 @@ export class UpdateProductPromotionDto {
   /** 방송홍보 id */
   @IsNumber()
   id: number;
-
-  /** 퍼스트몰 상품 id */
-  @IsNumber()
-  @IsOptional()
-  fmGoodsSeq?: number;
 
   /** 연결할 상품id (projectLcGoods) */
   @IsNumber()
