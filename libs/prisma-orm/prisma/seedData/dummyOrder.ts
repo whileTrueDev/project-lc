@@ -41,25 +41,6 @@ const dummyOrderItemData = [
   },
 ];
 
-const dummyOrderItemOptionData = [
-  {
-    name: '맛',
-    value: '매운맛',
-    quantity: 1,
-    normalPrice: 5000,
-    discountPrice: 4000,
-    goodsOptionId: 1,
-  },
-  {
-    name: '맛',
-    value: '순한맛',
-    quantity: 1,
-    normalPrice: 5000,
-    discountPrice: 4000,
-    goodsOptionId: 2,
-  },
-];
-
 type CreateDummyOrderOpts = DummyOrderFundamentalDataProps & {
   withSupportData?: boolean;
 };
@@ -83,10 +64,21 @@ export const createDummyOrder = async ({
     },
   });
 
+  const orderShipping = await prisma.orderShipping.create({
+    data: {
+      orderId: order.id,
+      shippingCost: 2500,
+      shippingMethod: 'delivery',
+      shippingGroupId: 1,
+      shippingSetId: 1,
+    },
+  });
+
   const orderItem = await prisma.orderItem.create({
     data: {
       ...dummyOrderItemData[0],
       orderId: order.id,
+      orderShippingId: orderShipping.id,
       support: {
         create: !withSupportData
           ? undefined
@@ -109,6 +101,7 @@ export const createDummyOrder = async ({
       normalPrice: 5000,
       discountPrice: 4000,
       goodsOption: { connect: { id: 1 } },
+      goodsName: '예스닭강정',
       step,
     },
   });
@@ -120,135 +113,28 @@ export const createDummyOrder = async ({
 };
 
 export const normalOrder = {
-  customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
     orderCode: 'dummy-order-1-asdfasd',
   }),
-  orderItems: {
-    create: [
-      {
-        ...dummyOrderItemData[0],
-        options: dummyOrderItemOptionData,
-      },
-    ].map((item) => {
-      const { options, ...rest } = item;
-      return {
-        ...rest,
-        options: { create: options },
-      };
-    }),
-  },
-};
-
-export const nonMemberOrder = {
-  ...getDummyOrderFundamentalData({
-    orderCode: 'nonmember-order-dummy',
-  }),
-  nonMemberOrderFlag: true,
-  nonMemberOrderPassword: 'test',
-  orderItems: {
-    create: [
-      {
-        ...dummyOrderItemData[0],
-        options: dummyOrderItemOptionData,
-      },
-    ].map((item) => {
-      const { options, ...rest } = item;
-      return {
-        ...rest,
-        options: { create: options },
-      };
-    }),
-  },
 };
 
 export const purchaseConfirmedOrder = {
   ...normalOrder,
   orderCode: 'dummy-order-2-qwer',
   step: 'purchaseConfirmed' as const,
-
-  orderItems: {
-    create: [
-      {
-        ...normalOrder.orderItems.create[0],
-        goodsId: 2,
-        options: {
-          create: [
-            {
-              ...normalOrder.orderItems.create[0].options.create[0],
-              step: 'purchaseConfirmed' as const,
-            },
-            {
-              ...normalOrder.orderItems.create[0].options.create[1],
-              step: 'purchaseConfirmed' as const,
-            },
-          ],
-        },
-      },
-    ],
-  },
 };
 
 export const shippingDoneOrder = {
   ...normalOrder,
   orderCode: 'dummy-order-3-zxcv',
   step: 'shippingDone' as const,
-  orderItems: {
-    create: [
-      {
-        ...normalOrder.orderItems.create[0],
-        goodsId: 2,
-        options: {
-          create: [
-            {
-              ...normalOrder.orderItems.create[0].options.create[0],
-              step: 'shippingDone' as const,
-            },
-            {
-              ...normalOrder.orderItems.create[0].options.create[1],
-              step: 'shippingDone' as const,
-            },
-          ],
-        },
-      },
-    ],
-  },
 };
 
 export const orderExportReady = {
-  customer: { connect: { id: 1 } },
   ...getDummyOrderFundamentalData({
     orderCode: 'orderExportReady-for-exchange-return',
     step: 'exportReady',
   }),
-  orderItems: {
-    create: [
-      {
-        ...dummyOrderItemData[0],
-        options: [
-          {
-            ...dummyOrderItemOptionData[0],
-            step: 'exportReady' as const,
-          },
-        ],
-      },
-      {
-        ...dummyOrderItemData[1],
-        options: [
-          {
-            ...dummyOrderItemOptionData[1],
-            step: 'exportReady' as const,
-          },
-        ],
-      },
-    ].map((item) => {
-      const { options, ...rest } = item;
-      return {
-        ...rest,
-        options: { create: options },
-      };
-    }),
-  },
 };
 
 export const createDummyOrderWithCancellation = async (): Promise<void> => {
@@ -395,5 +281,24 @@ export const createDummyOrderWithSupport = async (): Promise<void> => {
         ],
       },
     },
+  });
+};
+
+export const createDummyOrderData = async (): Promise<void> => {
+  await createDummyOrder({
+    orderCode: normalOrder.orderCode,
+    step: normalOrder.step,
+  });
+  await createDummyOrder({
+    orderCode: purchaseConfirmedOrder.orderCode,
+    step: purchaseConfirmedOrder.step,
+  });
+  await createDummyOrder({
+    orderCode: shippingDoneOrder.orderCode,
+    step: shippingDoneOrder.step,
+  });
+  await createDummyOrder({
+    orderCode: orderExportReady.orderCode,
+    step: orderExportReady.step,
   });
 };

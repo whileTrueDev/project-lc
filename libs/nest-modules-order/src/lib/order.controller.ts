@@ -80,7 +80,7 @@ export class OrderController {
   ): Promise<OrderDetailRes[]> {
     const result = await Promise.all(
       dto.orderIds.map((orderId) => {
-        return this.orderService.getOrderDetail({ orderId });
+        return this.orderService.getOrderDetail({ orderId, sellerId: dto.sellerId });
       }),
     );
     return result;

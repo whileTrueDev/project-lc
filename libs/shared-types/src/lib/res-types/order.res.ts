@@ -121,10 +121,10 @@ export type OrderListRes = {
 export type OrderDetailRes = OrderBaseData & {
   exchanges: Nullable<ExchangeDataWithImages[]>;
   returns: Nullable<ReturnDataWithImages[]>;
+  shippings: (OrderShipping & {
+    items: (OrderItem & { options: OrderItemOption[] })[];
+  })[];
   sellerSettlementItems?: SellerSettlementItemsRes[] | null;
-  shippings: Nullable<
-    (OrderShipping & { items: (OrderItem & { options: OrderItemOption[] })[] })[]
-  >;
 };
 /**
  * 방송인 후원 주문 목록 타입

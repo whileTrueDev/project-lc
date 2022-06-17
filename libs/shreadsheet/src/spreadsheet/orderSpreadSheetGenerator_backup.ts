@@ -1,8 +1,6 @@
-import { OrderShipping, OrderItem, OrderItemOption } from '@prisma/client';
 import {
   convertFmOrderStatusToString,
-  OrderDetailRes,
-  orderProcessStepDict,
+  FindFmOrderDetailRes,
 } from '@project-lc/shared-types';
 import dayjs from 'dayjs';
 import { WorkBook, WorkSheet, CellObject, ColInfo, RowInfo, Range } from 'xlsx';
@@ -12,10 +10,10 @@ export interface OrderSpreadSheetColumnOption {
   type: '주문정보' | '상품정보';
   headerName: string;
   getValue: (
-    order: OrderDetailRes,
-    ship?: OrderShipping & { items: (OrderItem & { options: OrderItemOption[] })[] },
-    item?: OrderItem & { options: OrderItemOption[] },
-    itemOption?: OrderItemOption,
+    order: FindFmOrderDetailRes,
+    ship?: FindFmOrderDetailRes['shippings'][number],
+    item?: FindFmOrderDetailRes['shippings'][number]['items'][number],
+    itemOption?: FindFmOrderDetailRes['shippings'][number]['items'][number]['options'][number],
   ) => string | number | null | undefined;
   mergeable?: boolean;
 }
@@ -24,82 +22,82 @@ export const defaultColumOpts: OrderSpreadSheetColumnOption[] = [
   {
     type: '주문정보',
     headerName: '주문번호',
-    getValue: (order) => order.orderCode,
+    getValue: (order) => order.order_seq,
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '주문일',
-    getValue: (order) => dayjs(new Date(order.createDate)).format('YYYY/MM/DD HH:mm:ss'),
+    getValue: (order) => dayjs(new Date(order.regist_date)).format('YYYY/MM/DD HH:mm:ss'),
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '주문자',
-    getValue: (order) => order.ordererName,
+    getValue: (order) => order.order_user_name,
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '주문자연락처',
-    getValue: (order) => order.ordererPhone,
+    getValue: (order) => order.order_phone,
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '주문자휴대폰',
-    getValue: (order) => order.ordererPhone,
+    getValue: (order) => order.order_cellphone,
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '주문자이메일',
-    getValue: (order) => order.ordererEmail,
+    getValue: (order) => order.order_email,
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '수령인',
-    getValue: (order) => order.recipientName,
+    getValue: (order) => order.recipient_user_name,
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '수령인연락처',
-    getValue: (order) => order.recipientPhone,
+    getValue: (order) => order.recipient_phone,
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '수령인휴대폰',
-    getValue: (order) => order.recipientPhone,
+    getValue: (order) => order.recipient_cellphone,
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '수령인이메일',
-    getValue: (order) => order.recipientEmail,
+    getValue: (order) => order.recipient_email,
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '우편번호',
-    getValue: (order) => order.recipientPostalCode,
+    getValue: (order) => order.recipient_zipcode,
     mergeable: true,
   },
   {
     type: '주문정보',
     headerName: '주소(도로명)',
-    getValue: (order) => `${order.recipientAddress} ${order.recipientDetailAddress}`,
+    getValue: (order) =>
+      `${order.recipient_address_street} ${order.recipient_address_detail}`,
     mergeable: true,
   },
-  // 현재 저장하는 주소가 도로명밖에 없어서 지번은 주석처리 220615 joni
-  // {
-  //   type: '주문정보',
-  //   headerName: '주소(지번)',
-  //   getValue: (order) => `${order.recipientAddress} ${order.recipientDetailAddress}`,
-  //   mergeable: true,
-  // },
+  {
+    type: '주문정보',
+    headerName: '주소(지번)',
+    getValue: (order) => `${order.recipient_address} ${order.recipient_address_detail}`,
+    mergeable: true,
+  },
   {
     type: '주문정보',
     headerName: '배송메시지',
@@ -109,28 +107,25 @@ export const defaultColumOpts: OrderSpreadSheetColumnOption[] = [
   {
     type: '주문정보',
     headerName: '배송비',
-    getValue: (order) =>
-      order.shippings
-        ?.map((shipping) => shipping.shippingCost)
-        .reduce((sum, cur) => sum + Number(cur), 0),
+    getValue: (order) => order.totalShippingCost,
     mergeable: true,
   },
   {
     type: '상품정보',
     headerName: '상품고유번호',
-    getValue: (_, __, item) => item?.goodsId,
+    getValue: (_, __, item) => item?.goods_seq,
   },
   {
     type: '상품정보',
     headerName: '상품명',
-    getValue: (_, __, ___, opt) => opt?.goodsName,
+    getValue: (_, __, item) => item?.goods_name,
   },
   {
     type: '상품정보',
     headerName: '옵션',
     getValue: (_, __, ___, opt) => {
-      if (opt?.name) {
-        return `${opt.name}: ${opt.value}`;
+      if (opt?.title1) {
+        return `${opt.title1}: ${opt.option1}`;
       }
       return '기본옵션';
     },
@@ -138,26 +133,25 @@ export const defaultColumOpts: OrderSpreadSheetColumnOption[] = [
   {
     type: '상품정보',
     headerName: '상태',
-    getValue: (_, __, ___, opt) =>
-      opt ? convertFmOrderStatusToString(orderProcessStepDict[opt.step]) : '-',
+    getValue: (_, __, ___, opt) => (opt ? convertFmOrderStatusToString(opt.step) : '-'),
   },
   {
     type: '상품정보',
     headerName: '수량',
-    getValue: (_, __, ___, opt) => opt?.quantity,
+    getValue: (_, __, ___, opt) => opt?.ea,
   },
   {
     type: '상품정보',
     headerName: '판매가',
     getValue: (_, __, ___, opt) => {
-      const price = Number(opt?.discountPrice);
-      return price;
+      const price = Number(opt?.price);
+      return price - Number(opt?.member_sale) - Number(opt?.mobile_sale);
     },
   },
   {
     type: '상품정보',
     headerName: '판매가x수량',
-    getValue: (_, __, ___, opt) => Number(opt?.discountPrice) * Number(opt?.quantity),
+    getValue: (_, __, ___, opt) => Number(opt?.price) * Number(opt?.ea),
   },
 ];
 
@@ -168,7 +162,7 @@ interface OrderSpreadSheetGeneratorOptions {
   disabledColumnHeaders?: Array<string>;
 }
 
-export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailRes> {
+export class OrderSpreadSheetGeneratorBackup extends SpreadSheetGenerator<FindFmOrderDetailRes> {
   private columns: OrderSpreadSheetColumnOption[];
 
   constructor(private opts?: OrderSpreadSheetGeneratorOptions) {
@@ -184,7 +178,7 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
     }
   }
 
-  protected getSheetRef(orders: OrderDetailRes[]): string {
+  protected getSheetRef(orders: FindFmOrderDetailRes[]): string {
     const lengthOfRows = orders.reduce((prev, curr) => {
       let num = 0;
       curr.shippings.forEach((ship) => {
@@ -202,7 +196,7 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
     return `A1:${col}${lengthOfRows}`;
   }
 
-  protected createSheet(orders: OrderDetailRes[]): WorkSheet {
+  protected createSheet(orders: FindFmOrderDetailRes[]): WorkSheet {
     const sheet: WorkSheet = { '!ref': this.getSheetRef(orders) };
     // headers
     this.columns.forEach((field, fieldIdx) => {
@@ -215,18 +209,9 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
     const cols: ColInfo[] = [];
     const merges: Range[] = [];
     orders.forEach((order) => {
-      // 이 주문에 포함된 주문상품옵션 전체 목록
-      const totalOrderItemOptionList = order.orderItems.flatMap((oi) => oi.options);
-      // 셀병합위해 사용할 주문상품옵션 순회 인덱스(해당 주문에 포함된 주문상품옵션 중 마지막 값인지 확인하기 위한 용도)
-      let orderItemOptionIndex = 0;
-
       order.shippings.forEach((ship) => {
-        const shipItemIdList = ship.items.map((item) => item.id);
-        const shippingOrderItems = order.orderItems.filter((oi) =>
-          shipItemIdList.includes(oi.id),
-        );
-        shippingOrderItems.forEach((item) => {
-          item.options.forEach((opt) => {
+        ship.items.forEach((item) => {
+          item.options.forEach((opt, optIdx) => {
             this.columns.forEach((field, fieldIdx) => {
               // 셀에 넣을 데이터 가져오기
               const v = field.getValue(order, ship, item, opt);
@@ -248,14 +233,10 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
               cols[fieldIdx] = { wch };
 
               // 셀 병합 설정
-              // 주문에 포함된 주문상품옵션 중 마지막 주문상품옵션인지 확인하여 마지막인경우 셀병합 추가
-              if (
-                orderItemOptionIndex > 0 &&
-                orderItemOptionIndex === totalOrderItemOptionList.length - 1
-              ) {
+              if (optIdx > 0 && optIdx === item.options.length - 1) {
                 if (field.mergeable) {
                   merges.push({
-                    s: { c: fieldIdx, r: rowIdx - totalOrderItemOptionList.length },
+                    s: { c: fieldIdx, r: rowIdx - item.options.length },
                     e: { c: fieldIdx, r: rowIdx - 1 },
                   });
                 }
@@ -264,8 +245,6 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
 
             // 다음 행을 넣기 위해 행인덱스 + 1
             rowIdx += 1;
-            // 주문상품옵션 순회 인덱스 증가(셀병합위해 사용)
-            orderItemOptionIndex += 1;
           });
         });
       });
@@ -284,7 +263,7 @@ export class OrderSpreadSheetGenerator extends SpreadSheetGenerator<OrderDetailR
     return sheet;
   }
 
-  public createXLSX(orders: OrderDetailRes[]): WorkBook {
+  public createXLSX(orders: FindFmOrderDetailRes[]): WorkBook {
     const sheet = this.createSheet(orders);
 
     const wb: WorkBook = {

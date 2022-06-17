@@ -29,7 +29,10 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useFmOrderDetails } from '@project-lc/hooks';
-import { defaultColumOpts, OrderSpreadSheetGenerator } from '@project-lc/shreadsheet';
+import {
+  defaultColumOpts,
+  OrderSpreadSheetGeneratorBackup,
+} from '@project-lc/shreadsheet';
 import {
   getOrderDownloadFileName,
   useFmOrderStore,
@@ -57,7 +60,7 @@ export function OrderListDownloadDialog({
   // 엑셀 생성 및 내보내기
   const onConfirm = async (): Promise<void> => {
     if (orderDetails.data) {
-      const ossg = new OrderSpreadSheetGenerator({
+      const ossg = new OrderSpreadSheetGeneratorBackup({
         disabledColumnHeaders: disableHeaders,
       });
       const workbook = ossg.createXLSX(orderDetails.data);
