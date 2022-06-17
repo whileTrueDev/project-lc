@@ -13,9 +13,10 @@ import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
-  FmOrderStatusNumString,
+  CreateOrderShippingData,
   FindAllOrderByBroadcasterRes,
   FindManyDto,
+  FmOrderStatusNumString,
   GetNonMemberOrderDetailDto,
   GetOneOrderDetailDto,
   GetOrderListDto,
@@ -24,19 +25,17 @@ import {
   OrderListRes,
   orderProcessStepDict,
   OrderPurchaseConfirmationDto,
+  OrderShippingCheckDto,
   OrderStatsRes,
   sellerOrderSteps,
-  UpdateOrderDto,
-  OrderShippingCheckDto,
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
-  CreateOrderShippingDto,
-  CreateOrderShippingData,
+  UpdateOrderDto,
 } from '@project-lc/shared-types';
+import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
-import { calculateShippingCost } from '@project-lc/utils';
 
 dayjs.extend(isToday);
 @Injectable()
@@ -682,9 +681,7 @@ export class OrderService {
           orderItemOptions.map((opt) => {
             return this.prisma.orderItemOption.update({
               where: { id: opt.id },
-              data: {
-                step: rest.step,
-              },
+              data: { step: rest.step },
             });
           }),
         );
