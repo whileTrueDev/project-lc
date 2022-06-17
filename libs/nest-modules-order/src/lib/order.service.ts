@@ -90,14 +90,20 @@ export class OrderService {
 
     // 방송인의 주소, 연락처 조회
     const { broadcasterAddress, broadcasterContacts } = broadcaster;
-    const defaultContact = broadcasterContacts.find(
-      (contact) => contact.isDefault === true,
-    );
+    const defaultContact =
+      broadcasterContacts.find((contact) => contact.isDefault === true) ||
+      broadcasterContacts[0];
+
+    let phone = defaultContact?.phoneNumber || '';
+    // Broadcaster.phoneNumber 000-0000-0000 형태로 저장됨 => Order.recipientPhone은 '-' 없는 00000000000 형태로 저장
+    if (phone.includes('-')) {
+      phone = defaultContact.phoneNumber.split('-').join('');
+    }
+
     return {
       giftFlag: true,
       recipientName: defaultContact?.name || broadcaster.userNickname,
-      recipientPhone:
-        defaultContact?.phoneNumber || broadcasterContacts[0]?.phoneNumber || '',
+      recipientPhone: phone,
       recipientEmail: defaultContact?.email || broadcasterContacts[0]?.email || '',
       recipientAddress: broadcasterAddress.address || '',
       recipientDetailAddress: broadcasterAddress.detailAddress || '',
@@ -118,7 +124,7 @@ export class OrderService {
   }
 
   /** 주문에서 주문자 정보 빈 문자열로 바꿔서 리턴 */
-  private removerecipientInfo<T extends Order>(order: T): T {
+  private removeRecipientInfo<T extends Order>(order: T): T {
     return {
       ...order,
       recipientName: '',
@@ -239,7 +245,11 @@ export class OrderService {
               // 주문상품에 후원정보가 있는경우 주문상품후원생성
               support: support
                 ? {
-                    create: support,
+                    create: {
+                      message: support.message,
+                      nickname: support.message,
+                      broadcasterId: support.broadcasterId,
+                    },
                   }
                 : undefined,
             };
@@ -287,7 +297,7 @@ export class OrderService {
 
     // 선물주문인경우 생성된 주문데이터에서 받는사람(방송인) 정보 삭제하고 리턴
     if (order.giftFlag) {
-      return this.removerecipientInfo(order);
+      return this.removeRecipientInfo(order);
     }
 
     return order;
@@ -386,7 +396,7 @@ export class OrderService {
       let _o = { ...order };
       //  선물하기 주문일 시 받는사람 정보 삭제
       if (_o.giftFlag) {
-        _o = this.removerecipientInfo(_o);
+        _o = this.removeRecipientInfo(_o);
       }
       // 비회원 주문인 경우 - 비회원비밀번호 정보 삭제
       if (_o.nonMemberOrderFlag) {
@@ -624,10 +634,26 @@ export class OrderService {
 
   /** 개별 주문 상세 조회 */
   async getOrderDetail(dto: GetOneOrderDetailDto): Promise<OrderDetailRes> {
-    if (dto.orderId) {
-      return this.findOneOrderDetail({ id: dto.orderId, deleteFlag: false });
+    const { appType } = dto;
+
+    const where: Prisma.OrderWhereInput = dto.orderId
+      ? {
+          id: dto.orderId,
+          deleteFlag: false,
+        }
+      : {
+          orderCode: dto.orderCode,
+          deleteFlag: false,
+        };
+
+    let data: OrderDetailRes = await this.findOneOrderDetail(where);
+
+    // 소비자센터에서 주문 조회 요청 && 선물주문인경우 => 받는사람 정보 삭제하고 리턴
+    if (appType === 'customer' && data.giftFlag) {
+      data = this.removeRecipientInfo(data);
     }
-    return this.findOneOrderDetail({ orderCode: dto.orderCode, deleteFlag: false });
+
+    return data;
   }
 
   /** 비회원 주문 상세 조회 */
@@ -645,6 +671,12 @@ export class OrderService {
     if (!isPasswordCorrect) {
       throw new BadRequestException(`주문 비밀번호가 일치하지 않습니다.`);
     }
+
+    // 선물주문인경우 받는사람 정보 삭제하고 리턴
+    if (order.giftFlag) {
+      return this.removeRecipientInfo(order);
+    }
+
     return order;
   }
 

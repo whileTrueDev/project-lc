@@ -320,6 +320,11 @@ export class GetOrderListDto {
   @IsOptional()
   @IsEnum(OrderProcessStep, { each: true })
   searchStatuses?: OrderProcessStep[];
+
+  /** 앱타입 - "customer"인 경우 받는사람 정보 삭제하고 리턴한다 */
+  @IsOptional()
+  @IsString()
+  appType?: string;
 }
 
 /** 비회원 주문 조회 dto */
@@ -352,6 +357,11 @@ export class GetOneOrderDetailDto {
   @IsNumber()
   @IsOptional()
   orderId?: Order['id'];
+
+  /** 앱타입 - "customer"인 경우 받는사람 정보 삭제하고 리턴한다 */
+  @IsOptional()
+  @IsString()
+  appType?: string;
 }
 
 // ------------------수정 dto--------------------
