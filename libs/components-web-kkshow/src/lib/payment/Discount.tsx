@@ -108,6 +108,7 @@ export function Discount(): JSX.Element {
                 size="sm"
                 onFocus={(e) => e.target.select()}
                 {...register('usedMileageAmount', {
+                  valueAsNumber: true,
                   max: customerMileage
                     ? {
                         value: customerMileage.mileage,

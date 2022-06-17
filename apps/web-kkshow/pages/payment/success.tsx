@@ -97,9 +97,14 @@ export function Success(): JSX.Element {
             shipping: OrderShippingDataToDto(shipping),
           };
 
+          const dto = {
+            order: createOrderDto,
+            shipping: shippingDto,
+          };
+
           // * 주문생성
           createOrder
-            .mutateAsync({ order: createOrderDto, shipping: shippingDto })
+            .mutateAsync(dto)
             .then((res) => {
               // 주문스토어 주문,배송비정보 리셋
               resetOrder();
