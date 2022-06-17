@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Flex,
@@ -339,6 +340,27 @@ export type SuccessDeliveryAddressProps = { data: OrderDetailRes };
 
 export function SuccessDeliveryAddress(props: SuccessDeliveryAddressProps): JSX.Element {
   const { data } = props;
+
+  // 선물주문인경우
+  if (data.giftFlag) {
+    // 선물받는 방송인 정보 표시
+    const supportOrderItem = data.orderItems.find((item) => !!item.support);
+    const support = supportOrderItem?.support;
+    if (support) {
+      return (
+        <Stack>
+          <Text fontWeight="bold">선물하기 주문 🎁</Text>
+          <Stack direction="row" alignItems="center">
+            {support.broadcaster.avatar && (
+              <Avatar src={support.broadcaster.avatar} mr={2} />
+            )}
+            <Text fontWeight="bold">{support.broadcaster.userNickname}</Text>
+            <Text>님께 발송됩니다</Text>
+          </Stack>
+        </Stack>
+      );
+    }
+  }
   return (
     <>
       <Flex direction="column" mt={3}>
