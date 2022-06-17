@@ -84,12 +84,15 @@ export function Success(): JSX.Element {
 
           // * createOrderDto 만들기 :  createOrderForm 에서 createOrderDto에 해당하는 데이터만 가져오기
           const createOrderDtoData = extractCreateOrderDtoDataFromCreateOrderForm(order);
+
+          const paymentPrice = tossPaymentsAmount; // 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한/입금해야 할 금액 + 총 배송비
+
           const createOrderDto: CreateOrderDto = {
             ...createOrderDtoData,
             paymentId: orderPaymentId,
             orderCode,
             recipientEmail: order.recipientEmail || '',
-            paymentPrice: tossPaymentsAmount,
+            paymentPrice,
           };
 
           // * CreateOrderShippingDto 만들기 :  store.shipping을 dto 형태로 바꾸기

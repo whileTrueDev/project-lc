@@ -144,7 +144,7 @@ export class CreateOrderDto {
   @IsNumber()
   orderPrice: Order['orderPrice'];
 
-  /** 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한 금액 */
+  /** 결제금액 = 할인(쿠폰,할인코드,마일리지 적용)이후 사용자가 실제 결제한/입금해야 할 금액 + 총 배송비 */
   @IsNumber()
   paymentPrice: Order['paymentPrice'];
 
