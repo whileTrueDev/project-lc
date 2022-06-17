@@ -73,9 +73,6 @@ export function AdminLiveShoppingUpdateConfirmModal(
             <Text>거절사유 : {watch('rejectionReason')}</Text>
           ) : null}
           {watch('videoUrl') ? <Text>영상 URL : {watch('videoUrl')}</Text> : null}
-          {watch('fmGoodsSeq') ? (
-            <Text>퍼스트몰 상품 번호 : {watch('fmGoodsSeq')}</Text>
-          ) : null}
         </Box>
       </Box>
     </ConfirmDialog>

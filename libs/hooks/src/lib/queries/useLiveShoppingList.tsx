@@ -1,6 +1,11 @@
+import {
+  FindLiveShoppingDto,
+  FindNowPlayingLiveShoppingDto,
+  LiveShoppingOutline,
+  LiveShoppingWithGoods,
+} from '@project-lc/shared-types';
 import { AxiosError } from 'axios';
-import { useQuery, UseQueryResult, UseQueryOptions } from 'react-query';
-import { FindLiveShoppingDto, LiveShoppingWithGoods } from '@project-lc/shared-types';
+import { useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import axios from '../../axios';
 
 export const getLiveShoppingList = async (
@@ -22,5 +27,27 @@ export const useLiveShoppingList = (
     queryKey,
     () => getLiveShoppingList(dto || null),
     options,
+  );
+};
+
+export const getLiveShoppingNowOnLive = async (
+  dto: FindNowPlayingLiveShoppingDto,
+): Promise<LiveShoppingOutline[]> => {
+  return axios
+    .get<LiveShoppingOutline[]>('/live-shoppings/now-on-live', {
+      params: dto,
+    })
+    .then((res) => res.data);
+};
+
+/** 현재 진행중인 라이브쇼핑 목록 조회 */
+export const useLiveShoppingNowOnLive = (
+  dto: FindNowPlayingLiveShoppingDto,
+): UseQueryResult<LiveShoppingOutline[], AxiosError> => {
+  const queryKey = ['LiveShoppingNowOnLive', dto];
+  return useQuery<LiveShoppingOutline[], AxiosError>(
+    queryKey,
+    () => getLiveShoppingNowOnLive(dto),
+    { enabled: !(!dto.broadcasterId && !dto.goodsId && !dto.goodsIds) },
   );
 };

@@ -35,6 +35,7 @@ import {
   useCartOptionQuantity,
   useCartShippingGroups,
   useCartTruncateMutation,
+  useIsThisGoodsNowOnLive,
 } from '@project-lc/hooks';
 import { CartItemRes } from '@project-lc/shared-types';
 import { useCartStore } from '@project-lc/stores';
@@ -315,6 +316,12 @@ export function CartItemDisplay({
     [cartItem, handleToggle, selectedItems],
   );
 
+  // 현재 상품이 라이브쇼핑 판매중인지 여부 (선택된 방송인에 의한 라이브쇼핑판매)
+  const isNowLive = useIsThisGoodsNowOnLive(
+    cartItem.goods.id,
+    cartItem.support?.broadcasterId || undefined,
+  );
+
   return (
     <>
       <Flex display={{ base: 'flex', lg: 'none' }} justify="space-between">
@@ -360,6 +367,11 @@ export function CartItemDisplay({
                 <Text fontSize="sm" noOfLines={1}>
                   {cartItem.support.broadcaster.userNickname}
                 </Text>
+                {isNowLive && (
+                  <Badge variant="solid" colorScheme="red">
+                    현재 LIVE판매중
+                  </Badge>
+                )}
               </Flex>
             )}
           </Flex>

@@ -15,30 +15,30 @@ import { BroadcasterService } from '@project-lc/nest-modules-broadcaster';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
   CreateOrderDto,
-  FmOrderStatusNumString,
+  CreateOrderShippingData,
   FindAllOrderByBroadcasterRes,
   FindManyDto,
+  FmOrderStatusNumString,
   GetNonMemberOrderDetailDto,
   GetOneOrderDetailDto,
   GetOrderListDto,
   getOrderProcessStepNameByStringNumber,
+  OrderDataWithRelations,
   OrderDetailRes,
   OrderListRes,
   orderProcessStepDict,
   OrderPurchaseConfirmationDto,
+  OrderShippingCheckDto,
   OrderStatsRes,
   sellerOrderSteps,
-  UpdateOrderDto,
-  OrderShippingCheckDto,
   ShippingCheckItem,
   ShippingCostByShippingGroupId,
-  CreateOrderShippingDto,
-  CreateOrderShippingData,
+  UpdateOrderDto,
 } from '@project-lc/shared-types';
+import { calculateShippingCost } from '@project-lc/utils';
 import { nanoid } from 'nanoid';
 import dayjs = require('dayjs');
 import isToday = require('dayjs/plugin/isToday');
-import { calculateShippingCost } from '@project-lc/utils';
 import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
 import { MileageService } from '@project-lc/nest-modules-mileage';
 
@@ -162,7 +162,7 @@ export class OrderService {
           data: {
             order: { connect: { id: orderId } },
             shippingGroup: { connect: { id: shippingGroupId } },
-            shippingCost,
+            shippingCost: String(shippingCost),
             items: { connect: relatedOrderItemsIdList },
           },
         });
@@ -178,7 +178,6 @@ export class OrderService {
     orderDto: CreateOrderDto;
     shippingData: CreateOrderShippingData[];
   }): Promise<Order> {
-    console.log(orderDto);
     const {
       customerId,
       cartItemIdList,
@@ -246,9 +245,9 @@ export class OrderService {
               support: support
                 ? {
                     create: {
-                      message: support.message,
-                      nickname: support.message,
                       broadcasterId: support.broadcasterId,
+                      message: support.message,
+                      nickname: support.nickname,
                     },
                   }
                 : undefined,
@@ -468,21 +467,20 @@ export class OrderService {
     return originOrderStep;
   }
 
-  /** 특정 판매자 주문목록 조회 - 주문상품 중 판매자의 상품만 추려냄 & 주문상태 표시는 판매자의 상품 상태에 따라 표시되는 후처리 추가  */
-  async getSellerOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
-    if (!dto.sellerId)
-      throw new BadRequestException('판매자 주문 목록 조회시 sellerId를 입력해야합니다');
-    const { orders, ...rest } = await this.getOrderList(dto);
-
-    // 판매자 주문목록 후처리
+  /** 판매자 주문목록 후처리
     // 주문상품옵션 중 자기 상품옵션만 남기기
     // 자기상품옵션 상태에 기반한 주문상태 표시
-    const ordersWithOnlySellerGoodsOrderItems = orders.map((o) => {
+  */
+  private postProcessSellerOrders(
+    orders: OrderDataWithRelations[],
+    sellerId: number, // 판매자 고유번호
+  ): OrderDataWithRelations[] {
+    return orders.map((o) => {
       const { orderItems, ...orderRestData } = o;
 
       // 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
       const sellerGoodsOrderItems = orderItems.filter(
-        (oi) => oi.goods.sellerId === dto.sellerId,
+        (oi) => oi.goods.sellerId === sellerId,
       );
       // 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
       let displaySellerOrderStep: OrderProcessStep = o.step;
@@ -499,6 +497,20 @@ export class OrderService {
         orderItems: sellerGoodsOrderItems,
       };
     });
+  }
+
+  /** 특정 판매자 주문목록 조회 - 주문상품 중 판매자의 상품만 추려냄 & 주문상태 표시는 판매자의 상품 상태에 따라 표시되는 후처리 추가  */
+  async getSellerOrderList(dto: GetOrderListDto): Promise<OrderListRes> {
+    if (!dto.sellerId)
+      throw new BadRequestException('판매자 주문 목록 조회시 sellerId를 입력해야합니다');
+    const { orders, ...rest } = await this.getOrderList(dto);
+
+    // 주문상품옵션 중 자기 상품옵션만 남기기
+    // 자기상품옵션 상태에 기반한 주문상태 표시
+    const ordersWithOnlySellerGoodsOrderItems = this.postProcessSellerOrders(
+      orders,
+      dto.sellerId,
+    );
 
     return {
       orders: ordersWithOnlySellerGoodsOrderItems,
@@ -555,6 +567,20 @@ export class OrderService {
         exchanges: { include: { exchangeItems: true } },
         returns: { include: { items: true } },
         orderCancellations: { include: { items: true } },
+        sellerSettlementItems: {
+          select: {
+            liveShopping: {
+              select: {
+                broadcaster: {
+                  select: {
+                    userNickname: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        shippings: { include: { items: true } },
       },
     });
 
@@ -567,7 +593,7 @@ export class OrderService {
   }
 
   /** 주문 상세 조회 */
-  async findOneOrderDetail(where: Prisma.OrderWhereInput): Promise<OrderDetailRes> {
+  async findOneOrderDetail(where: Prisma.OrderWhereInput): Promise<any> {
     // 주문이 있는지 확인
     await this.findOneOrder(where);
 
@@ -636,24 +662,56 @@ export class OrderService {
   async getOrderDetail(dto: GetOneOrderDetailDto): Promise<OrderDetailRes> {
     const { appType } = dto;
 
-    const where: Prisma.OrderWhereInput = dto.orderId
-      ? {
-          id: dto.orderId,
-          deleteFlag: false,
-        }
-      : {
-          orderCode: dto.orderCode,
-          deleteFlag: false,
-        };
+    const whereInput: Prisma.OrderWhereInput = dto.orderId
+      ? { id: dto.orderId } // orderId 값이 있으면 orderId로 조회
+      : { orderCode: dto.orderCode }; // 아니면 orderCode로 조회
 
-    let data: OrderDetailRes = await this.findOneOrderDetail(where);
+    let result = await this.findOneOrderDetail({ ...whereInput, deleteFlag: false });
 
-    // 소비자센터에서 주문 조회 요청 && 선물주문인경우 => 받는사람 정보 삭제하고 리턴
-    if (appType === 'customer' && data.giftFlag) {
-      data = this.removeRecipientInfo(data);
+    // 특정 판매자가 개별주문 상세조회시
+    // 주문상품 중 판매자의 상품만 보내기 & 판매자의 주문상품 상태에 따라 주문상태 표시 & 판매자의 베송비그룹으로 계산된 배송비만 보내기
+    if (dto.sellerId) {
+      const { orderItems, shippings, ...orderRestData } = result;
+
+      // * 주문상품옵션 중 판매자 본인의 상품옵션만 남기기
+      const sellerGoodsOrderItems = orderItems.filter(
+        (oi) => oi.goods.sellerId === dto.sellerId,
+      );
+      // * 판매자 본인의 상품옵션 상태에 기반한 주문상태 표시
+      let displaySellerOrderStep: OrderProcessStep = result.step;
+      if (sellerGoodsOrderItems.length > 0) {
+        displaySellerOrderStep = this.getOrderRealStep(
+          result.step,
+          sellerGoodsOrderItems.flatMap((oi) => oi.options),
+        );
+      }
+
+      // * 판매자 본인의 배송비정책과 연결된 주문배송비정보만 보내기
+      let sellerShippings = shippings;
+      const sellerShippingGroupList = await this.prisma.shippingGroup.findMany({
+        where: { sellerId: dto.sellerId },
+      });
+      if (sellerShippingGroupList.length > 0) {
+        const shippingGroupIdList = sellerShippingGroupList.map((g) => g.id);
+        sellerShippings = shippings.filter((s) =>
+          shippingGroupIdList.includes(s.shippingGroupId),
+        );
+      }
+
+      result = {
+        ...orderRestData,
+        shippings: sellerShippings,
+        step: displaySellerOrderStep,
+        orderItems: sellerGoodsOrderItems,
+      };
     }
 
-    return data;
+    // 소비자센터에서 주문 조회 요청 && 선물주문인경우 => 받는사람 정보 삭제하고 리턴
+    if (appType === 'customer' && result.giftFlag) {
+      result = this.removeRecipientInfo(result);
+    }
+
+    return result;
   }
 
   /** 비회원 주문 상세 조회 */

@@ -111,6 +111,8 @@ export function Success(): JSX.Element {
             })
             .catch((e) => {
               console.error(e);
+              console.error(e.response?.data?.message);
+              router.push('/payment/fail?message=주문생성 오류');
             });
         }
       });

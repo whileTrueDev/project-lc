@@ -343,6 +343,12 @@ export class GetOrderDetailsForSpreadsheetDto {
   @IsNumber({}, { each: true })
   @Type(() => Number)
   orderIds: Order['id'][];
+
+  /** 특정 판매자의 상품 주문내역 조회시 사용. 판매자 고유번호 */
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  sellerId?: number;
 }
 
 /** 개별 주문 1건 상세 조회 dto */
@@ -362,6 +368,12 @@ export class GetOneOrderDetailDto {
   @IsOptional()
   @IsString()
   appType?: string;
+
+  /** 특정 판매자의 상품 주문내역 조회시 사용. 판매자 고유번호 */
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  sellerId?: number;
 }
 
 // ------------------수정 dto--------------------
