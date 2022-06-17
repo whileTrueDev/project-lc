@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CustomerCoupon, CouponLogType, Customer } from '@prisma/client';
+import { CouponLogType, Customer, CustomerCoupon } from '@prisma/client';
 import { PrismaService } from '@project-lc/prisma-orm';
 import {
-  CustomerCouponDto,
   CouponStatusDto,
+  CreateCustomerCouponDto,
+  CreateCustomerCouponManyDto,
+  CustomerCouponDto,
   CustomerCouponRes,
   IssueManyCustomerList,
 } from '@project-lc/shared-types';
@@ -14,8 +16,8 @@ export class CustomerCouponService {
 
   /** 특정 소비자에게 발급된 쿠폰 모두 조회 */
   findCustomerCoupons(dto: {
-    customerId?: CustomerCouponDto['customerId'];
-    couponId?: CustomerCouponDto['couponId'];
+    customerId?: CustomerCoupon['customerId'];
+    couponId?: CustomerCoupon['couponId'];
   }): Promise<CustomerCouponRes[]> {
     return this.prismaService.customerCoupon.findMany({
       where: {
@@ -42,18 +44,17 @@ export class CustomerCouponService {
   }
 
   /** 특정 소비자에게 쿠폰 발급 */
-  createCustomerCoupon(dto: CustomerCouponDto): Promise<CustomerCoupon> {
+  createCustomerCoupon(dto: CreateCustomerCouponDto): Promise<CustomerCoupon> {
     return this.prismaService.customerCoupon.create({
       data: { logs: { create: { type: 'issue' } }, ...dto },
     });
   }
 
   async createAllCustomerCoupon(
-    dto: CustomerCouponDto,
+    dto: CreateCustomerCouponManyDto,
     customers?: Customer[],
   ): Promise<number> {
     let target: IssueManyCustomerList[];
-    let issueCount = 0;
     if (customers) {
       target = customers.map((item) => {
         return { customerId: item.id, couponId: dto.couponId, status: dto.status };
@@ -64,25 +65,14 @@ export class CustomerCouponService {
       });
     }
 
-    await this.prismaService.$transaction(async (prisma) => {
-      try {
-        await Promise.all(
-          target.map((item: IssueManyCustomerList) => {
-            return prisma.customerCoupon
-              .create({
-                data: { ...item, logs: { create: [{ type: 'issue' }] } },
-              })
-              .then((res) => {
-                issueCount += 1;
-              });
-          }),
-        );
-      } catch (err) {
-        console.error(err);
-      }
-    });
-
-    return issueCount;
+    const result = await this.prismaService.$transaction(
+      target.map((item: IssueManyCustomerList) => {
+        return this.prismaService.customerCoupon.create({
+          data: { ...item, logs: { create: [{ type: 'issue' }] } },
+        });
+      }),
+    );
+    return result.length;
   }
 
   /** 특정 소비자에게 발급된 쿠폰 상태 변경 */

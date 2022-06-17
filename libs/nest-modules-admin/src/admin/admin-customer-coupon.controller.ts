@@ -16,12 +16,13 @@ import { CustomerCoupon } from '@prisma/client';
 import { CacheClearKeys, HttpCacheInterceptor } from '@project-lc/nest-core';
 import { AdminGuard, JwtAuthGuard } from '@project-lc/nest-modules-authguard';
 import { CustomerCouponService } from '@project-lc/nest-modules-coupon';
+import { CustomerService } from '@project-lc/nest-modules-customer';
 import {
   CouponStatusDto,
-  CustomerCouponDto,
+  CreateCustomerCouponDto,
+  CreateCustomerCouponManyDto,
   CustomerCouponRes,
 } from '@project-lc/shared-types';
-import { CustomerService } from '@project-lc/nest-modules-customer';
 
 @UseGuards(JwtAuthGuard, AdminGuard)
 @UseInterceptors(HttpCacheInterceptor)
@@ -47,7 +48,7 @@ export class AdminCustomerCouponController {
   /** 쿠폰을 특정 소비자에게 발급 */
   @Post()
   async createCustomerCoupon(
-    @Body(ValidationPipe) dto: CustomerCouponDto,
+    @Body(ValidationPipe) dto: CreateCustomerCouponDto,
   ): Promise<CustomerCoupon> {
     return this.customerCouponService.createCustomerCoupon(dto);
   }
@@ -55,7 +56,7 @@ export class AdminCustomerCouponController {
   /** 쿠폰을 여러 소비자 또는 모두에게 발급 */
   @Post('/all')
   async createAllCustomerCoupon(
-    @Body(ValidationPipe) dto: CustomerCouponDto,
+    @Body(ValidationPipe) dto: CreateCustomerCouponManyDto,
   ): Promise<number> {
     if (dto.customerIds.length) {
       return this.customerCouponService.createAllCustomerCoupon(dto);
