@@ -195,7 +195,6 @@ export function CouponManage(): JSX.Element {
   const handleAllIssueCoupon = (): Promise<void> =>
     couponIssueAllMutateAsync({
       couponId: Number(couponId),
-      customerId: 0,
       customerIds: manyCustomerCouponIssue as number[],
       status: 'notUsed',
     })

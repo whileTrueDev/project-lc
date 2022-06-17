@@ -9,8 +9,9 @@ export class CustomerCouponDto {
   @IsNumber()
   couponId: number;
 
+  @IsOptional()
   @IsNumber()
-  customerId: number;
+  customerId?: number;
 
   @IsOptional()
   @IsEnum(CouponStatus)

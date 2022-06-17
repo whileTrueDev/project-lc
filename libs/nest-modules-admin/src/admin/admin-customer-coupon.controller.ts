@@ -52,16 +52,16 @@ export class AdminCustomerCouponController {
     return this.customerCouponService.createCustomerCoupon(dto);
   }
 
-  /** 쿠폰을 특정 소비자에게 발급 */
+  /** 쿠폰을 여러 소비자 또는 모두에게 발급 */
   @Post('/all')
   async createAllCustomerCoupon(
     @Body(ValidationPipe) dto: CustomerCouponDto,
   ): Promise<number> {
     if (dto.customerIds.length) {
-      return this.customerCouponService.createAllCustomerCoupon(dto); // customers
+      return this.customerCouponService.createAllCustomerCoupon(dto);
     }
     const customers = await this.customerService.findAll();
-    return this.customerCouponService.createAllCustomerCoupon(dto, customers); //
+    return this.customerCouponService.createAllCustomerCoupon(dto, customers);
   }
 
   /** 특정 소비자에게 발급된 쿠폰 목록 조회 */

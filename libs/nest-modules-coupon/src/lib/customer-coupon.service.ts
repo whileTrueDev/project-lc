@@ -66,24 +66,11 @@ export class CustomerCouponService {
 
     await this.prismaService.$transaction(async (prisma) => {
       try {
-        const createMany = await Promise.all(
+        await Promise.all(
           target.map((item: IssueManyCustomerList) => {
             return prisma.customerCoupon
               .create({
-                data: item,
-              })
-              .then((res) => res.id);
-          }),
-        );
-
-        await Promise.all(
-          createMany.map((customerCouponId: number) => {
-            return prisma.customerCouponLog
-              .create({
-                data: {
-                  customerCouponId,
-                  type: 'issue',
-                },
+                data: { ...item, logs: { create: [{ type: 'issue' }] } },
               })
               .then((res) => {
                 issueCount += 1;
