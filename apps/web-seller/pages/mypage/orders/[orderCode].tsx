@@ -161,7 +161,7 @@ export function OrderDetail(): JSX.Element {
               order_user_name: order.data.ordererName,
               order_email: order.data.ordererEmail,
               order_cellphone: order.data.ordererPhone, // '주문자휴대폰',
-              recipient_user_name: order.data.recipientAddress,
+              recipient_user_name: order.data.recipientName,
               recipient_zipcode: order.data.recipientPostalCode,
               recipient_cellphone: order.data.recipientPhone,
               recipient_email: order.data.recipientEmail,
